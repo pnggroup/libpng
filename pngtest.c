@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.4beta3 - June 28, 2002
+ * libpng 1.2.4rc1 - July 2, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -117,7 +117,13 @@ static int status_dots_requested=0;
 static int status_dots=1;
 
 void
+#ifdef PNG_1_0_X
+PNGAPI
+#endif
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
+#ifdef PNG_1_0_X
+PNGAPI
+#endif
 void
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
@@ -137,8 +143,14 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
     fprintf(stdout, "r");
 }
 
+#ifdef PNG_1_0_X
+PNGAPI
+#endif
 void
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
+#ifdef PNG_1_0_X
+PNGAPI
+#endif
 void
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
@@ -153,8 +165,14 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
    5 in case illegal filter values are present.) */
 static png_uint_32 filters_used[256];
 void
+#ifdef PNG_1_0_X
+PNGAPI
+#endif
 count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data);
 void
+#ifdef PNG_1_0_X
+PNGAPI
+#endif
 count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
     if(png_ptr != NULL && row_info != NULL)
@@ -169,8 +187,14 @@ count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 static png_uint_32 zero_samples;
 
 void
+#ifdef PNG_1_0_X
+PNGAPI
+#endif
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data);
 void
+#ifdef PNG_1_0_X
+PNGAPI
+#endif
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    png_bytep dp = data;
@@ -1514,4 +1538,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_4beta3 your_png_h_is_not_version_1_2_4beta3;
+typedef version_1_2_4rc1 your_png_h_is_not_version_1_2_4rc1;

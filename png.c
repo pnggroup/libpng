@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.2.4beta3 - June 28, 2002
+ * libpng version 1.2.4rc1 - July 2, 2002
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_4beta3 Your_png_h_is_not_version_1_2_4beta3;
+typedef version_1_2_4rc1 Your_png_h_is_not_version_1_2_4rc1;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = "1.2.4beta3";
+const char png_libpng_ver[18] = "1.2.4rc1";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -135,7 +135,11 @@ png_check_sig(png_bytep sig, int num)
 }
 
 /* Function to allocate memory for zlib and clear it to 0. */
+#ifdef PNG_1_0_X
+void PNGAPI
+#else
 voidpf /* private */
+#endif
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
    png_uint_32 num_bytes = (png_uint_32)items * size;
@@ -166,7 +170,11 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 }
 
 /* function to free memory for zlib */
+#ifdef PNG_1_0_X
+void PNGAPI
+#else
 void /* private */
+#endif
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
    png_free((png_structp)png_ptr, (png_voidp)ptr);
@@ -663,7 +671,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ((png_charp) "\n libpng version 1.2.4beta3 - June 28, 2002\n\
+   return ((png_charp) "\n libpng version 1.2.4rc1 - July 2, 2002\n\
    Copyright (c) 1998-2002 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -681,8 +689,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) "1.2.4beta3");
-   return((png_charp) "1.2.4beta3");
+      return((png_charp) "1.2.4rc1");
+   return((png_charp) "1.2.4rc1");
 }
 
 png_charp PNGAPI

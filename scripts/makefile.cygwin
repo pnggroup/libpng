@@ -79,7 +79,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 PNGDLL = 13
-PNGMIN = 1.2.4beta3
+PNGMIN = 1.2.4rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(PNGDLL).dll
@@ -150,7 +150,7 @@ libpng-config: scripts/libpng-config-head.in scripts/libpng-config-body.in
 	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo cflags=\"\"; \
 	echo ldflags=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng$(PNGDLL) -lz\"; \
+	echo libs=\"-lpng$(PNGMAJ) -lz\"; \
 	cat $(S)/scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -258,13 +258,22 @@ test-config-install: $(DB)/libpng-config
     gytiu=$$(( $$gytiu + 1 )); \
    done
 
-
 install: install-static install-shared install-man install-config
+
+# If you installed in $(DESTDIR), test-installed won't work until you
+# move the library to its final location.
+
+test-installed:
+	$(CC) $(CFLAGS) \
+	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
+	   -L$(ZLIBLIB) \
+	   -o pngtesti$(EXE) `$(BINPATH)/libpng12-config --ldflags --libs`
+	./pngtesti$(EXE) pngtest.png
 
 clean:
 	/bin/rm -f *.pic.o *.o $(STATLIB) $(IMPLIB) $(SHAREDLIB) \
 	pngtest-stat$(EXE) pngtest$(EXE) pngout.png $(SHAREDDEF) \
-	libpng-config libpng.pc
+	libpng-config libpng.pc pngtesti$(EXE)
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

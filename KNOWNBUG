@@ -1,15 +1,7 @@
 
-Known bugs in libpng version 1.2.4beta3
+Known bugs in libpng version 1.2.4rc1
 
-1. May 28, 2002:  Makefile.so9 has bugs.  The last line under the
-   install-headers target should be
-
-	(cd $(DI); ln -f -s $(LIBNAME) libpng; ln -f -s $(LIBNAME)/* .)
-
-   and the last line under the install-static target should be
-
-
-2. April 22, 2001: pnggccrd.c has been reported to crash on NetBSD when
+1. April 22, 2001: pnggccrd.c has been reported to crash on NetBSD when
    reading interlaced PNG files, when assembler code is enabled.
 
    STATUS: Under investigation.  The change to pnggccrd.c in libpng-1.2.1

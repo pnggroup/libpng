@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.2.4beta3 - June 28, 2002
+ * libpng 1.2.4rc1 - July 2, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -494,7 +494,10 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 
 #endif /* Not Borland DOS special memory handler */
 
-/* This function was added at libpng version 1.3.0.  The png_malloc_warn()
+#if defined(PNG_1_0_X)
+#  define png_malloc_warn png_malloc
+#else
+/* This function was added at libpng version 1.2.3.  The png_malloc_warn()
  * function will issue a png_warning and return NULL instead of issuing a
  * png_error, if it fails to allocate the requested memory.
  */
@@ -509,6 +512,7 @@ png_malloc_warn(png_structp png_ptr, png_uint_32 size)
    png_ptr->flags=save_flags;
    return(ptr);
 }
+#endif
 
 png_voidp PNGAPI
 png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,

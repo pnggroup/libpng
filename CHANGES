@@ -1139,11 +1139,14 @@ version 1.2.4beta2 [June 25, 2002]
   Added "test-installed" target to makefile.linux, makefile.gcmmx,
     makefile.sgi, and makefile.sggcc.
 version 1.2.4beta3 [June 28, 2002]
-  Plug memory leak of row_buf in pngtest.c when there is a png_error().
+  Plugged memory leak of row_buf in pngtest.c when there is a png_error().
   Detect buffer overflow in pngpread.c when IDAT is corrupted with extra data.
   Added "test-installed" target to makefile.32sunu, makefile.64sunu,
     makefile.beos, makefile.darwin, makefile.dec, makefile.macosx, 
-    makefile.solaris, and makefile.so9.
+    makefile.solaris, makefile.hpux, makefile.hpgcc, and makefile.so9.
+version 1.2.4rc1 [July 2, 2002]
+  Added "test-installed" target to makefile.cygwin and makefile.sco.
+  Revised pnggccrd.c to be able to back out version 1.0.x via PNG_1_0_X macro.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

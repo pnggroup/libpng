@@ -11,6 +11,7 @@ Known values for OPTION are:
   --cflags              print compiler flags
   --cppflags            print pre-processor flags
   --ldflags             print loader flags
+  --rpath               print path to shared library
   --help                display this help and exit
   --version             output version information
 EOF
@@ -48,6 +49,10 @@ while test $# -gt 0; do
 
     --libs)
         echo ${libs}
+        ;;
+
+    --rpath)
+        echo ${rpath}
         ;;
 
     --ldflags)

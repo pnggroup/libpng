@@ -33,7 +33,7 @@ RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.4beta3
+PNGMIN = 1.2.4rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -173,7 +173,7 @@ test-installed:
 	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
 	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs`
-	pngtesti pngtest.png
+	./pngtesti pngtest.png
 
 clean:
 	/bin/rm -f *.o libpng.a pngtest pngtesti pngout.png libpng.pc \

@@ -17,7 +17,7 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.4beta3
+PNGMIN = 1.2.4rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
@@ -158,7 +158,7 @@ test-installed:
 	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
 	   -L$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs`
-	pngtesti pngtest.png
+	./pngtesti pngtest.png
 
 clean:
 	rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \

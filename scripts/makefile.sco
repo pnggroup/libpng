@@ -24,7 +24,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -lm
 RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.4beta3
+PNGMIN = 1.2.4rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -94,7 +94,6 @@ pngtest: pngtest.o $(LIBNAME).so
 test: pngtest
 	./pngtest
 
-
 install-headers: png.h pngconf.h
 	-@if [ ! -d $(DI) ]; then mkdir $(DI); fi
 	-@if [ ! -d $(DI)/$(LIBNAME) ]; then mkdir $(DI)/$(LIBNAME); fi
@@ -154,6 +153,20 @@ install-config: libpng-config
 	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
 
 install: install-static install-shared install-man install-config
+
+# If you installed in $(DESTDIR), test-installed won't work until you
+# move the library to its final location.
+
+test-installed:
+	$(CC) $(CFLAGS) \
+	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
+	   -L$(ZLIBLIB) \
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs`
+	./pngtesti pngtest.png
+
+clean:
+	/bin/rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
+	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest-static pngtesti
 
 
 clean:
