@@ -8,6 +8,8 @@ for 0.9
 
 after 1.0
    overlaying one image on top of another
+   make pull reader use push reader internally to reduce code, and
+      increase amount of image read in an error situation
    optional palette creation
    histogram creation
    text conversion between different code types

@@ -2,10 +2,10 @@
 /* pngtrans.c - transforms the data in a row
    routines used by both readers and writers
 
-   libpng 1.0 beta 2 - version 0.88
+   libpng 1.0 beta 3 - version 0.89
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 25, 1996
+   May 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -72,7 +72,11 @@ png_set_filler(png_structp png_ptr, int filler, int filler_loc)
 {
    png_ptr->transformations |= PNG_FILLER;
    png_ptr->filler = (png_byte)filler;
-   png_ptr->filler_loc = (png_byte)filler_loc;
+   if (filler_loc == PNG_FILLER_AFTER)
+      png_ptr->flags |= PNG_FLAG_FILLER_AFTER;
+   else
+      png_ptr->flags &= ~PNG_FLAG_FILLER_AFTER;
+
    if (png_ptr->color_type == PNG_COLOR_TYPE_RGB &&
       png_ptr->bit_depth == 8)
       png_ptr->usr_channels = 4;

@@ -74,3 +74,30 @@ version 0.88
    fixed progressive bugs
    replaced tabs with spaces
    cleaned up documentation
+   added callbacks for read/write and warning/error functions
+version 0.89 
+   added new initialization API to make libpng work better with shared libs
+      we now have png_create_read_struct(), png_create_write_struct(),
+      png_create_info_struct(), png_destroy_read_struct(), and
+      png_destroy_write_struct() instead of the separate calls to
+      malloc and png_read_init(), png_info_init(), and png_write_init()
+   changed warning/error callback functions to fix bug - this means you
+      should use the new initialization API if you were using the old
+      png_set_message_fn() calls, and that the old API no longer exists
+      so that people are aware that they need to change their code
+   changed filter selection API to allow selection of multiple filters
+      since it didn't work in previous versions of libpng anyways
+   optimized filter selection code    
+   fixed png_set_background() to allow using an arbitrary RGB color for
+      paletted images
+   fixed gamma and background correction for paletted images, so
+      png_correct_palette is not needed unless you are correcting an
+      external palette (you will need to #define PNG_CORRECT_PALETTE_SUPPORTED
+      in pngconf.h)
+   fixed bug with Borland 64K memory allocation (Alexander Lehmann)
+   fixed bug in interlace handling (Smaraderagd, I think)
+   added more error checking for writing and image to reduce invalid files
+   separated read and write functions so that they won't both be linked
+      into a binary when only reading or writing functionality is used
+   new pngtest image also has interlacing and zTXt
+   updated dcumentation to reflect new API

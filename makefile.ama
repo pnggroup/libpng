@@ -23,7 +23,7 @@ AR= oml
 MKDIR= makedir
 
 OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o pngpread.o \
-pngread.o pngerror.o pngwrite.o pngrtran.o pngwtran.o pngio.o pngmem.o
+pngread.o pngerror.o pngwrite.o pngrtran.o pngwtran.o pngrio.o pngwio.o pngmem.o
 
 all: libpng.lib pngtest
 

@@ -48,47 +48,45 @@ void read_png(char *file_name)
    if (!fp)
       return;
 
-   /* allocate the necessary structures */
-   png_ptr = malloc(sizeof (png_struct));
+   /* Create and initialize the png_struct with the desired error handler
+      functions.  If you want to use the default stderr and longjump method,
+      you can supply NULL for the last three parameters.  We also check that
+      the header file is compatible with the library version.
+    */
+   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+      (void *)user_error_ptr, user_error_fn, user_warning_fn);
+
    if (!png_ptr)
    {
       fclose(fp);
       return;
    }
 
-   info_ptr = malloc(sizeof (png_info));
+   info_ptr = png_create_info_struct();
    if (!info_ptr)
    {
       fclose(fp);
-      free(png_ptr);
+      png_destroy_read_struct(&png_ptr,  (png_infopp)NULL, (png_infopp)NULL);
       return;
    }
 
-   /* set error handling */
+   /* set error handling if you are using the setjmp/longjmp method */
    if (setjmp(png_ptr->jmpbuf))
    {
-      png_read_destroy(png_ptr, info_ptr, (png_info *)0);
+      /* Free all of the memory associated with the png_ptr and info_ptr */
+      png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
       fclose(fp);
-      free(png_ptr);
-      free(info_ptr);
       /* If we get here, we had a problem reading the file */
       return;
    }
 
-   /* initialize the structures, info first for error handling */
-   png_info_init(info_ptr);
-   png_read_init(png_ptr);
-
    /* set up the input control if you are using standard C streams */
    png_init_io(png_ptr, fp);
 
-   /* if you are using replacement read functions, here you would call */
-   png_set_read_fn(png_ptr, (void *)io_ptr, user_read_fn);
-   /* where io_ptr is a structure you want available to the callbacks */
-
-   /* if you are using replacement message functions, here you would call */
-   png_set_message_fn(png_ptr, (void *)msg_ptr, user_error_fn, user_warning_fn);
-   /* where msg_ptr is a structure you want available to the callbacks */
+   /* if you are using replacement read functions, instead of calling
+      png_init_io() here you would call */
+   png_set_read_fn(png_ptr, (void *)user_io_ptr, user_read_fn);
+   /* where user_io_ptr is a structure you want available to the callbacks */
 
    /* read the file information */
    png_read_info(png_ptr, info_ptr);
@@ -96,29 +94,31 @@ void read_png(char *file_name)
    /* set up the transformations you want.  Note that these are
       all optional.  Only call them if you want them */
 
-   /* expand paletted colors into true rgb */
+   /* expand paletted colors into true RGB triplets */
    if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       png_set_expand(png_ptr);
 
    /* expand grayscale images to the full 8 bits */
-   if (info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
-      info_ptr->bit_depth < 8)
+   if (info_ptr->color_type == PNG_COLOR_TYPE_GRAY && info_ptr->bit_depth < 8)
       png_set_expand(png_ptr);
 
-   /* expand images with transparency to full alpha channels */
+   /* expand paletted or RGB images with transparency to full alpha channels
+    * so the data will be available as RGBA quartets */
    if (info_ptr->valid & PNG_INFO_tRNS)
       png_set_expand(png_ptr);
 
    /* Set the background color to draw transparent and alpha
-      images over */
+      images over.  It is possible to set the red, green, and blue
+      components directly for paletted images. */
+
    png_color_16 my_background;
 
    if (info_ptr->valid & PNG_INFO_bKGD)
       png_set_background(png_ptr, &(info_ptr->background),
-         PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
+                         PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
    else
       png_set_background(png_ptr, &my_background,
-         PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
+                         PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
 
    /* tell libpng to handle the gamma conversion for you */
    if (info_ptr->valid & PNG_INFO_gAMA)
@@ -126,18 +126,17 @@ void read_png(char *file_name)
    else
       png_set_gamma(png_ptr, screen_gamma, 0.45);
 
-   /* tell libpng to strip 16 bit depth files down to 8 bits */
+   /* tell libpng to strip 16 bit/color files down to 8 bits/color */
    if (info_ptr->bit_depth == 16)
       png_set_strip_16(png_ptr);
 
-   /* dither rgb files down to 8 bit palettes & reduce palettes
+   /* dither rgb files down to 8 bit palette & reduce palettes
       to the number of colors available on your screen */
    if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
    {
       if (info_ptr->valid & PNG_INFO_PLTE)
-         png_set_dither(png_ptr, info_ptr->palette,
-            info_ptr->num_palette, max_screen_colors,
-               info_ptr->histogram);
+         png_set_dither(png_ptr, info_ptr->palette, info_ptr->num_palette,
+                        max_screen_colors, info_ptr->histogram);
       else
       {
          png_color std_color_cube[MAX_SCREEN_COLORS] =
@@ -148,9 +147,8 @@ void read_png(char *file_name)
       }
    }
 
-   /* invert monocrome files */
-   if (info_ptr->bit_depth == 1 &&
-      info_ptr->color_type == PNG_COLOR_GRAY)
+   /* invert monocrome files to have 0 as white and 1 as black */
+   if (info_ptr->bit_depth == 1 && info_ptr->color_type == PNG_COLOR_GRAY)
       png_set_invert(png_ptr);
 
    /* shift the pixels down to their true bit depth */
@@ -158,7 +156,8 @@ void read_png(char *file_name)
       info_ptr->bit_depth > info_ptr->sig_bit)
       png_set_shift(png_ptr, &(info_ptr->sig_bit));
 
-   /* pack pixels into bytes */
+   /* pack multiple pixels with bit depths of 1, 2, and 4 into bytes
+      (useful only for paletted and grayscale images) */
    if (info_ptr->bit_depth < 8)
       png_set_packing(png_ptr);
 
@@ -171,21 +170,15 @@ void read_png(char *file_name)
    if (info_ptr->bit_depth == 16)
       png_set_swap(png_ptr);
 
-   /* add a filler byte to rgb files */
-   if (info_ptr->bit_depth == 8 &&
-      info_ptr->color_type == PNG_COLOR_TYPE_RGB)
+   /* add a filler byte to RGB files (before or after each RGB triplet) */
+   if (info_ptr->bit_depth == 8 && info_ptr->color_type == PNG_COLOR_TYPE_RGB)
       png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 
    /* turn on interlace handling if you are not using png_read_image() */
-   if (info_ptr->interlace_type)
-      number_passes = png_set_interlace_handling(png_ptr);
-   else
-      number_passes = 1;
+   number_passes = png_set_interlace_handling(png_ptr);
 
-   /* optional call to update palette with transformations */
-   png_start_read_image(png_ptr);
-
-   /* optional call to update the info structure */
+   /* optional call to gamma correct and add the background to the palette
+      and update info structure. */
    png_read_update_info(png_ptr, info_ptr);
 
    /* allocate the memory to hold the image using the fields
@@ -193,6 +186,12 @@ void read_png(char *file_name)
 
    /* the easiest way to read the image */
    png_bytep row_pointers[height];
+
+   for (row = 0; row < height; row++)
+   {
+     row_pointers[row] = malloc(info_ptr->rowbytes);
+   }
+
    png_read_image(png_ptr, row_pointers);
 
    /* the other way to read images - deal with interlacing */
@@ -216,16 +215,11 @@ void read_png(char *file_name)
          so here */
    }
 
-   /* read the rest of the file, getting any additional chunks
-      in info_ptr */
+   /* read the rest of the file, getting any additional chunks in info_ptr */
    png_read_end(png_ptr, info_ptr);
 
    /* clean up after the read, and free any memory allocated */
-   png_read_destroy(png_ptr, info_ptr, (png_infop)0);
-
-   /* free the structures */
-   free(png_ptr);
-   free(info_ptr);
+   png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 
    /* close the file */
    fclose(fp);
@@ -236,68 +230,74 @@ void read_png(char *file_name)
 
 /* progressively read a file */
 
-/* these will normally not be global unless you are only
-   reading in one image at a time */
-png_structp png_ptr;
-png_infop info_ptr;
-
 int
-initialize_png_reader()
+initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
 {
-   png_ptr = malloc(sizeof (png_struct));
-   if (!png_ptr)
-      return -1;
-   info_ptr = malloc(sizeof (png_info));
-   if (!info_ptr)
+   /* Create and initialize the png_struct with the desired error handler
+      functions.  If you want to use the default stderr and longjump method,
+      you can supply NULL for the last three parameters.  We also check that
+      the library version is compatible in case we are using dynamically
+      linked libraries.
+    */
+   *png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+       (void *)user_error_ptr, user_error_fn, user_warning_fn);
+
+   if (! *png_ptr)
    {
-      free(png_ptr);
-      return -1;
+      *info_ptr = NULL;
+      return ERROR;
    }
 
-   if (setjmp(png_ptr->jmpbuf))
+   *info_ptr = png_create_info_struct(png_ptr);
+
+   if (! *info_ptr)
    {
-      png_read_destroy(png_ptr, info_ptr, (png_info *)0);
-      /* free pointers before returning, if necessary */
-      free(png_ptr);
-      free(info_ptr);
-      return -1;
+      png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
+      return ERROR;
    }
 
-   png_info_init(info_ptr);
-   png_read_init(png_ptr);
+   if (setjmp((*png_ptr)->jmpbuf))
+   {
+      png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
+      return ERROR;
+   }
 
    /* this one's new.  You will need to provide all three
       function callbacks, even if you aren't using them all.
-      You can put a void pointer in place of the NULL, and
-      retrieve the pointer from inside the callbacks using
-      the function png_get_progressive_ptr(png_ptr); */
-   png_set_progressive_read_fn(png_ptr, NULL,
+      These functions shouldn't be dependent on global or
+      static variables if you are decoding several images
+      simultaneously.  You should store stream specific data
+      in a separate struct, given as the second parameter,
+      and retrieve the pointer from inside the callbacks using
+      the function png_get_progressive_ptr(png_ptr). */
+   png_set_progressive_read_fn(*png_ptr, (void *)stream_data,
       info_callback, row_callback, end_callback);
 
-   return 0;
+   return OK;
 }
 
 int
-process_data(png_bytep buffer, png_uint_32 length)
+process_data(png_structp *png_ptr, png_infop *info_ptr,
+   png_bytep buffer, png_uint_32 length)
 {
-   if (setjmp(png_ptr->jmpbuf))
+   if (setjmp((*png_ptr)->jmpbuf))
    {
-      png_read_destroy(png_ptr, info_ptr, (png_info *)0);
-      free(png_ptr);
-      free(info_ptr);
-      return -1;
+      /* Free the png_ptr and info_ptr memory on error */
+      png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
+      return ERROR;
    }
 
-   /* this one's new also.  Simply give it a chunk of data
-      from the file stream (in order, of course).  On Segmented
-      machines, don't give it any more then 64K.  The library
-      seems to run fine with sizes of 4K, although you can give
-      it much less if necessary (I assume you can give it chunks
-      of 1 byte, but I haven't tried less then 256 bytes yet).
-      When this function returns, you may want to display any
-      rows that were generated in the row callback. */
-   png_process_data(png_ptr, info_ptr, buffer, length);
-   return 0;
+   /* this one's new also.  Simply give it chunks of data as
+      they arrive from the data stream (in order, of course).
+      On Segmented machines, don't give it any more than 64K.
+      The library seems to run fine with sizes of 4K, although
+      you can give it much less if necessary (I assume you can
+      give it chunks of 1 byte, but I haven't tried with less
+      than 256 bytes yet).  When this function returns, you may
+      want to display any rows that were generated in the row
+      callback, if you aren't already displaying them there. */
+   png_process_data(*png_ptr, *info_ptr, buffer, length);
+   return OK;
 }
 
 info_callback(png_structp png_ptr, png_infop info)
@@ -363,43 +363,40 @@ void write_png(char *file_name, ... other image information ...)
    if (!fp)
       return;
 
-   /* allocate the necessary structures */
-   png_ptr = malloc(sizeof (png_struct));
+   /* Create and initialize the png_struct with the desired error handler
+      functions.  If you want to use the default stderr and longjump method,
+      you can supply NULL for the last three parameters.  We also check that
+      the library version is compatible in case we are using dynamically
+      linked libraries.
+    */
+   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+      (void *)user_error_ptr, user_error_fn, user_warning_fn);
+
    if (!png_ptr)
    {
       fclose(fp);
       return;
    }
 
-   info_ptr = malloc(sizeof (png_info));
+   info_ptr = png_create_info_struct(png_ptr);
    if (!info_ptr)
    {
       fclose(fp);
-      free(png_ptr);
+      png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
       return;
    }
 
    /* set error handling */
    if (setjmp(png_ptr->jmpbuf))
    {
-      png_write_destroy(png_ptr);
-      fclose(fp);
-      free(png_ptr);
-      free(info_ptr);
       /* If we get here, we had a problem reading the file */
+      fclose(fp);
+      png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
       return;
    }
 
-   /* initialize the structures */
-   png_info_init(info_ptr);
-   png_write_init(png_ptr);
-
    /* set up the output control if you are using standard C streams */
    png_init_io(png_ptr, fp);
-
-   /* if you are using replacement write functions, here you would call */
-   png_set_write_fn(png_ptr, (void *)io_ptr, user_write_fn, user_flush_fn);
-   /* where io_ptr is a structure you want available to the callbacks */
 
    /* if you are using replacement message functions, here you would call */
    png_set_message_fn(png_ptr, (void *)msg_ptr, user_error_fn, user_warning_fn);
@@ -432,9 +429,9 @@ void write_png(char *file_name, ... other image information ...)
    info_ptr->valid |= PNG_INFO_gAMA;
    info_ptr->gamma = gamma;
 
-   /* other optional chunks */
+   /* other optional chunks like cHRM, bKGD, tRNS, tEXt, tIME, oFFs, pHYs, */
 
-   /* write the file information */
+   /* write the file header information */
    png_write_info(png_ptr, info_ptr);
 
    /* set up the transformations you want.  Note that these are
@@ -466,8 +463,10 @@ void write_png(char *file_name, ... other image information ...)
    else
       number_passes = 1;
 
-   /* the easiest way to write the image */
-   png_bytep row_pointers[height];
+   /* the easiest way to write the image (you may choose to allocate the
+      memory differently, however) */
+   png_byte row_pointers[height][width];
+
    png_write_image(png_ptr, row_pointers);
 
    /* the other way to write the image - deal with interlacing */
@@ -485,19 +484,23 @@ void write_png(char *file_name, ... other image information ...)
       }
    }
 
+   /* You can write optional chunks like tEXt, tIME at the end as well.
+    * Note that if you wrote tEXt or zTXt chunks before the image, and
+    * you aren't writing out more at the end, you have to set
+    * info_ptr->num_text = 0 or they will be written out again.
+    */
+
    /* write the rest of the file */
    png_write_end(png_ptr, info_ptr);
-
-   /* clean up after the write, and free any memory allocated */
-   png_write_destroy(png_ptr);
 
    /* if you malloced the palette, free it here */
    if (info_ptr->palette)
       free(info_ptr->palette);
 
-   /* free the structures */
-   free(png_ptr);
-   free(info_ptr);
+   /* if you allocated any text comments, free them here */
+
+   /* clean up after the write, and free any memory allocated */
+   png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
 
    /* close the file */
    fclose(fp);

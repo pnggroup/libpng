@@ -71,35 +71,35 @@ O=obj
 ## variables
 OBJS = \
  png.$(O) \
+ pngerror.$(O) \
+ pngmem.$(O) \
+ pngpread.$(O) \
  pngrcb.$(O) \
+ pngread.$(O) \
+ pngrio.$(O) \
+ pngrtran.$(O) \
  pngrutil.$(O) \
  pngtrans.$(O) \
- pngwutil.$(O) \
- pngmem.$(O) \
- pngread.$(O) \
- pngpread.$(O) \
- pngerror.$(O) \
  pngwrite.$(O) \
- pngrtran.$(O) \
  pngwtran.$(O) \
- pngzlib.$(O) \
- pngio.$(O)
+ pngwio.$(O) \
+ pngwutil.$(O)
 
 LIBOBJS = \
  +png.$(O) \
- +pngrcb.$(O) \
- +pngrutil.$(O) \
- +pngtrans.$(O) \
- +pngwutil.$(O) \
+ +pngerror.$(O) \
  +pngmem.$(O) \
  +pngpread.$(O) \
  +pngread.$(O) \
- +pngerror.$(O) \
- +pngwrite.$(O) \
+ +pngrcb.$(O) \
+ +pngrio.$(O) \
  +pngrtran.$(O) \
+ +pngrutil.$(O) \
+ +pngtrans.$(O) \
+ +pngwrite.$(O) \
  +pngwtran.$(O) \
- +pngzlib.$(O) \
- +pngio.$(O)
+ +pngwio.$(O)
+ +pngwutil.$(O)
 
 LIBNAME=libpng$(MODEL).lib
 
@@ -133,12 +133,12 @@ pngrtran.obj: pngrtran.c
 pngrutil.obj: pngrutil.c
 pngerror.obj: pngerror.c
 pngmem.obj: pngmem.c
-pngio.obj: pngio.c
+pngrio.obj: pngrio.c
+pngwio.obj: pngwio.c
 pngtrans.obj: pngtrans.c
 pngwrite.obj: pngwrite.c
 pngwtran.obj: pngwtran.c
 pngwutil.obj: pngwutil.c
-pngzlib.obj: pngzlib.c
 
 
 $(LIBNAME): $(OBJS)

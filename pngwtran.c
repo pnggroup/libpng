@@ -1,10 +1,10 @@
 
 /* pngwtran.c - transforms the data in a row for png writers
 
-   libpng 1.0 beta 2 - version 0.88
+   libpng 1.0 beta 3 - version 0.89
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 25, 1996
+   May 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -18,7 +18,7 @@ png_do_write_transformations(png_structp png_ptr)
 #if defined(PNG_WRITE_FILLER_SUPPORTED)
    if (png_ptr->transformations & PNG_FILLER)
       png_do_write_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
-         png_ptr->filler_loc);
+         png_ptr->flags);
 #endif
 #if defined(PNG_WRITE_PACK_SUPPORTED)
    if (png_ptr->transformations & PNG_PACK)
@@ -299,12 +299,12 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 /* remove filler byte */
 void
 png_do_write_filler(png_row_infop row_info, png_bytep row,
-   png_byte filler_loc)
+   png_byte flags)
 {
    if (row && row_info && row_info->color_type == PNG_COLOR_TYPE_RGB &&
       row_info->bit_depth == 8)
    {
-      if (filler_loc == PNG_FILLER_AFTER)
+      if (flags & PNG_FLAG_FILLER_AFTER)
       {
          png_bytep sp, dp;
 

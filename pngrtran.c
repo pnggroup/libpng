@@ -1,10 +1,10 @@
 
 /* pngrtran.c - transforms the data in a row for png readers
 
-   libpng 1.0 beta 2 - version 0.88
+   libpng 1.0 beta 3 - version 0.89
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 25, 1996
+   May 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -22,7 +22,7 @@ png_set_background(png_structp png_ptr,
       sizeof(png_color_16));
    png_ptr->background_gamma = (float)background_gamma;
    png_ptr->background_gamma_type = (png_byte)(background_gamma_code);
-   png_ptr->background_expand = (png_byte)need_expand;
+   png_ptr->transformations |= (need_expand ? PNG_BACKGROUND_EXPAND : 0);
 }
 #endif
 
@@ -353,7 +353,6 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
    if (!(png_ptr->palette))
    {
       png_ptr->palette = palette;
-      png_ptr->user_palette = 1;
    }
    png_ptr->num_palette = (png_uint_16)num_palette;
 
@@ -468,45 +467,44 @@ png_init_read_transformations(png_structp png_ptr)
 
    color_type = png_ptr->color_type;
 
-#if defined(PNG_READ_EXPAND_SUPPORTED) && \
-    defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if (png_ptr->transformations & PNG_EXPAND)
+#if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
+   if (png_ptr->transformations & PNG_BACKGROUND_EXPAND)
    {
-      if (color_type == PNG_COLOR_TYPE_GRAY &&
-         png_ptr->bit_depth < 8 &&
-         (png_ptr->transformations & PNG_BACKGROUND) &&
-         png_ptr->background_expand)
-/*         (!(png_ptr->transformations & PNG_BACKGROUND) ||
-         png_ptr->background_expand)) */
+      if (color_type == PNG_COLOR_TYPE_GRAY)
       {
-         /* expand background chunk.  While this may not be
-            the fastest way to do this, it only happens once
-            per file. */
+         /* expand background chunk. */
          switch (png_ptr->bit_depth)
          {
             case 1:
-               png_ptr->background.gray *= (png_byte)0xff;
+               png_ptr->background.gray *= (png_uint_16)0xff;
+               png_ptr->background.red = png_ptr->background.green =
+               png_ptr->background.blue = png_ptr->background.gray;
                break;
             case 2:
-               png_ptr->background.gray *= (png_byte)0x55;
+               png_ptr->background.gray *= (png_uint_16)0x55;
+               png_ptr->background.red = png_ptr->background.green =
+               png_ptr->background.blue = png_ptr->background.gray;
                break;
             case 4:
-               png_ptr->background.gray *= (png_byte)0x11;
+               png_ptr->background.gray *= (png_uint_16)0x11;
+               png_ptr->background.red = png_ptr->background.green =
+               png_ptr->background.blue = png_ptr->background.gray;
+               break;
+            case 8:
+            case 16:
+               png_ptr->background.red = png_ptr->background.green =
+               png_ptr->background.blue = png_ptr->background.gray;
                break;
          }
       }
-      if (color_type == PNG_COLOR_TYPE_PALETTE &&
-         (png_ptr->transformations & PNG_BACKGROUND) &&
-         png_ptr->background_expand)
+      else if (color_type == PNG_COLOR_TYPE_PALETTE)
       {
-         /* expand background chunk */
-         png_ptr->background.red =
+         png_ptr->background.red   =
             png_ptr->palette[png_ptr->background.index].red;
          png_ptr->background.green =
             png_ptr->palette[png_ptr->background.index].green;
-         png_ptr->background.blue =
+         png_ptr->background.blue  =
             png_ptr->palette[png_ptr->background.index].blue;
-         color_type = PNG_COLOR_TYPE_RGB;
       }
    }
 #endif
@@ -519,10 +517,71 @@ png_init_read_transformations(png_structp png_ptr)
    {
       png_build_gamma_table(png_ptr);
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
-      if ((png_ptr->transformations & PNG_BACKGROUND) &&
-         (color_type != PNG_COLOR_TYPE_PALETTE))
+      if (png_ptr->transformations & PNG_BACKGROUND)
       {
-         if (png_ptr->background_gamma_type != PNG_BACKGROUND_GAMMA_UNKNOWN)
+         if (color_type == PNG_COLOR_TYPE_PALETTE)
+         {
+            int num_palette, i;
+            png_color back, back_1;
+            png_colorp palette;
+
+            palette = png_ptr->palette;
+            num_palette = png_ptr->num_palette;
+
+            back.red = png_ptr->gamma_table[png_ptr->background.red];
+            back.green = png_ptr->gamma_table[png_ptr->background.green];
+            back.blue = png_ptr->gamma_table[png_ptr->background.blue];
+
+            back_1.red = png_ptr->gamma_to_1[png_ptr->background.red];
+            back_1.green = png_ptr->gamma_to_1[png_ptr->background.green];
+            back_1.blue = png_ptr->gamma_to_1[png_ptr->background.blue];
+
+            for (i = 0; i < num_palette; i++)
+            {
+               if (i < (int)png_ptr->num_trans)
+               {
+                  if (png_ptr->trans[i] == 0)
+                  {
+                     palette[i] = back;
+                  }
+                  else if (png_ptr->trans[i] != 0xff)
+                  {
+                     int v, w;
+
+                     v = png_ptr->gamma_to_1[palette[i].red];
+                     w = (int)(((png_uint_32)(v) *
+                        (png_uint_32)(png_ptr->trans[i]) +
+                        (png_uint_32)(back_1.red) *
+                        (png_uint_32)(255 - png_ptr->trans[i]) +
+                        127) / 255);
+                     palette[i].red = png_ptr->gamma_from_1[w];
+
+                     v = png_ptr->gamma_to_1[palette[i].green];
+                     w = (int)(((png_uint_32)(v) *
+                        (png_uint_32)(png_ptr->trans[i]) +
+                        (png_uint_32)(back_1.green) *
+                        (png_uint_32)(255 - png_ptr->trans[i]) +
+                        127) / 255);
+                     palette[i].green = png_ptr->gamma_from_1[w];
+
+                     v = png_ptr->gamma_to_1[palette[i].blue];
+                     w = (int)(((png_uint_32)(v) *
+                        (png_uint_32)(png_ptr->trans[i]) +
+                        (png_uint_32)(back_1.blue) *
+                        (png_uint_32)(255 - png_ptr->trans[i]) +
+                        127) / 255);
+                     palette[i].blue = png_ptr->gamma_from_1[w];
+                  }
+               }
+               else
+               {
+                  palette[i].red = png_ptr->gamma_table[palette[i].red];
+                  palette[i].green = png_ptr->gamma_table[palette[i].green];
+                  palette[i].blue = png_ptr->gamma_table[palette[i].blue];
+               }
+            }
+         }
+         else if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN)
          {
             double g, gs, m;
 
@@ -571,7 +630,69 @@ png_init_read_transformations(png_structp png_ptr)
             }
          }
       }
+      else
 #endif
+      if (color_type == PNG_COLOR_TYPE_PALETTE)
+      {
+         int num_palette, i;
+         png_colorp palette;
+
+         palette = png_ptr->palette;
+         num_palette = png_ptr->num_palette;
+
+         for (i = 0; i < num_palette; i++)
+         {
+            palette[i].red = png_ptr->gamma_table[palette[i].red];
+            palette[i].green = png_ptr->gamma_table[palette[i].green];
+            palette[i].blue = png_ptr->gamma_table[palette[i].blue];
+         }
+      }
+   }
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+   else
+#endif
+#endif
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+   if (png_ptr->transformations & PNG_BACKGROUND &&
+       color_type == PNG_COLOR_TYPE_PALETTE)
+   {
+      int i;
+      png_color back;
+      png_colorp palette;
+
+      palette = png_ptr->palette;
+      back.red   = (png_byte)png_ptr->background.red;
+      back.green = (png_byte)png_ptr->background.green;
+      back.blue  = (png_byte)png_ptr->background.blue;
+
+      for (i = 0; i < png_ptr->num_trans; i++)
+      {
+         if (png_ptr->trans[i] == 0)
+         {
+            palette[i] = back;
+         }
+         else if (png_ptr->trans[i] != 0xff)
+         {
+            palette[i].red = (png_byte)((
+               (png_uint_32)(palette[i].red) *
+               (png_uint_32)(png_ptr->trans[i]) +
+               (png_uint_32)(back.red) *
+               (png_uint_32)(255 - png_ptr->trans[i]) +
+               127) / 255);
+            palette[i].green = (png_byte)((
+               (png_uint_32)(palette[i].green) *
+               (png_uint_32)(png_ptr->trans[i]) +
+               (png_uint_32)(back.green) *
+               (png_uint_32)(255 - png_ptr->trans[i]) +
+               127) / 255);
+            palette[i].blue = (png_byte)((
+               (png_uint_32)(palette[i].blue) *
+               (png_uint_32)(png_ptr->trans[i]) +
+               (png_uint_32)(back.blue) *
+               (png_uint_32)(255 - png_ptr->trans[i]) +
+               127) / 255);
+         }
+      }
    }
 #endif
 
@@ -769,7 +890,7 @@ png_do_read_transformations(png_structp png_ptr)
 #if defined(PNG_READ_FILLER_SUPPORTED)
    if (png_ptr->transformations & PNG_FILLER)
       png_do_read_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
-         png_ptr->filler, png_ptr->filler_loc);
+         png_ptr->filler, png_ptr->flags);
 #endif
 }
 
@@ -1002,14 +1123,14 @@ png_do_chop(png_row_infop row_info, png_bytep row)
 /* add filler byte */
 void
 png_do_read_filler(png_row_infop row_info, png_bytep row,
-   png_byte filler, png_byte filler_loc)
+   png_byte filler, png_byte flags)
 {
    png_bytep sp, dp;
    png_uint_32 i;
    if (row && row_info && row_info->color_type == 2 &&
       row_info->bit_depth == 8)
    {
-      if (filler_loc == PNG_FILLER_AFTER)
+      if (flags & PNG_FLAG_FILLER_AFTER)
       {
          for (i = 1, sp = row + (png_size_t)row_info->width * 3,
             dp = row + (png_size_t)row_info->width * 4;
@@ -1183,32 +1304,28 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
    }
 }
 
-#if defined(PNG_READ_DITHER_SUPPORTED)
+/* This function is currently unused? */
+#if defined(PNG_READ_DITHER_SUPPORTED) || defined(PNG_CORRECT_PALETTE_SUPPORTED)
 void
 png_correct_palette(png_structp png_ptr, png_colorp palette,
    int num_palette)
 {
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
    if ((png_ptr->transformations & (PNG_GAMMA)) &&
       (png_ptr->transformations & (PNG_BACKGROUND)))
    {
-      if (png_ptr->color_type == 3)
+      if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
          int i;
          png_color back, back_1;
 
-         back.red = png_ptr->gamma_table[png_ptr->palette[
-            png_ptr->background.index].red];
-         back.green = png_ptr->gamma_table[png_ptr->palette[
-            png_ptr->background.index].green];
-         back.blue = png_ptr->gamma_table[png_ptr->palette[
-            png_ptr->background.index].blue];
+         back.red = png_ptr->gamma_table[png_ptr->background.red];
+         back.green = png_ptr->gamma_table[png_ptr->background.green];
+         back.blue = png_ptr->gamma_table[png_ptr->background.blue];
 
-         back_1.red = png_ptr->gamma_to_1[png_ptr->palette[
-            png_ptr->background.index].red];
-         back_1.green = png_ptr->gamma_to_1[png_ptr->palette[
-            png_ptr->background.index].green];
-         back_1.blue = png_ptr->gamma_to_1[png_ptr->palette[
-            png_ptr->background.index].blue];
+         back_1.red = png_ptr->gamma_to_1[png_ptr->background.red];
+         back_1.green = png_ptr->gamma_to_1[png_ptr->background.green];
+         back_1.blue = png_ptr->gamma_to_1[png_ptr->background.blue];
 
          for (i = 0; i < num_palette; i++)
          {
@@ -1256,17 +1373,18 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
       }
       else
       {
-         int i, back;
+         int i;
+         png_color back;
 
-         back = png_ptr->gamma_table[png_ptr->background.gray];
+         back.red = png_ptr->gamma_table[png_ptr->background.red];
+         back.green = png_ptr->gamma_table[png_ptr->background.green];
+         back.blue = png_ptr->gamma_table[png_ptr->background.blue];
 
          for (i = 0; i < num_palette; i++)
          {
             if (palette[i].red == png_ptr->trans_values.gray)
             {
-               palette[i].red = (png_byte)back;
-               palette[i].green = (png_byte)back;
-               palette[i].blue = (png_byte)back;
+               palette[i] = back;
             }
             else
             {
@@ -1277,7 +1395,10 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
          }
       }
    }
-   else if (png_ptr->transformations & (PNG_GAMMA))
+   else
+#endif
+#if defined(PNG_READ_GAMMA_SUPPORTED)
+   if (png_ptr->transformations & (PNG_GAMMA))
    {
       int i;
 
@@ -1288,25 +1409,30 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
          palette[i].blue = png_ptr->gamma_table[palette[i].blue];
       }
    }
-   else if (png_ptr->transformations & (PNG_BACKGROUND))
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+   else
+#endif
+#endif
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+   if (png_ptr->transformations & (PNG_BACKGROUND))
    {
-      if (png_ptr->color_type == 3)
+      if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
          int i;
-         png_byte br, bg, bb;
+         png_color back;
 
-         br = palette[png_ptr->background.index].red;
-         bg = palette[png_ptr->background.index].green;
-         bb = palette[png_ptr->background.index].blue;
+         back.red   = (png_byte)png_ptr->background.red;
+         back.green = (png_byte)png_ptr->background.green;
+         back.blue  = (png_byte)png_ptr->background.blue;
 
          for (i = 0; i < num_palette; i++)
          {
             if (i >= (int)png_ptr->num_trans ||
                png_ptr->trans[i] == 0)
             {
-               palette[i].red = br;
-               palette[i].green = bg;
-               palette[i].blue = bb;
+               palette[i].red = back.red;
+               palette[i].green = back.green;
+               palette[i].blue = back.blue;
             }
             else if (i < (int)png_ptr->num_trans ||
                png_ptr->trans[i] != 0xff)
@@ -1314,19 +1440,19 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
                palette[i].red = (png_byte)((
                   (png_uint_32)(png_ptr->palette[i].red) *
                   (png_uint_32)(png_ptr->trans[i]) +
-                  (png_uint_32)(br) *
+                  (png_uint_32)(back.red) *
                   (png_uint_32)(255 - png_ptr->trans[i]) +
                   127) / 255);
                palette[i].green = (png_byte)((
                   (png_uint_32)(png_ptr->palette[i].green) *
                   (png_uint_32)(png_ptr->trans[i]) +
-                  (png_uint_32)(bg) *
+                  (png_uint_32)(back.green) *
                   (png_uint_32)(255 - png_ptr->trans[i]) +
                   127) / 255);
                palette[i].blue = (png_byte)((
                   (png_uint_32)(png_ptr->palette[i].blue) *
                   (png_uint_32)(png_ptr->trans[i]) +
-                  (png_uint_32)(bb) *
+                  (png_uint_32)(back.blue) *
                   (png_uint_32)(255 - png_ptr->trans[i]) +
                   127) / 255);
             }
@@ -1340,20 +1466,21 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
          {
             if (i == (int)png_ptr->trans_values.gray)
             {
-               palette[i].red = (png_byte)png_ptr->background.gray;
-               palette[i].green = (png_byte)png_ptr->background.gray;
-               palette[i].blue = (png_byte)png_ptr->background.gray;
+               palette[i].red = (png_byte)png_ptr->background.red;
+               palette[i].green = (png_byte)png_ptr->background.green;
+               palette[i].blue = (png_byte)png_ptr->background.blue;
             }
          }
       }
    }
+#endif
 }
 #endif
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
 /* replace any alpha or transparency with the supplied background color.
-   background is the color (in rgb or grey or palette index, as
-   appropriate).  note that paletted files are taken care of elsewhere */
+   background is the color.  note that paletted files are taken care of
+   elsewhere */
 void
 png_do_background(png_row_infop row_info, png_bytep row,
    png_color_16p trans_values, png_color_16p background,
@@ -1364,8 +1491,8 @@ png_do_background(png_row_infop row_info, png_bytep row,
 {
    png_bytep sp, dp;
    png_uint_32 i;
-
    int shift;
+
    if (row && row_info && background &&
       (!(row_info->color_type & PNG_COLOR_MASK_ALPHA) ||
       (row_info->color_type != PNG_COLOR_TYPE_PALETTE &&
@@ -1423,7 +1550,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                }
                case 4:
                {
-                  sp = row + 1;
+                  sp = row;
                   shift = 4;
                   for (i = 0; i < row_info->width; i++)
                   {
@@ -2013,7 +2140,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
       if (row_info->color_type & PNG_COLOR_MASK_ALPHA)
       {
          row_info->color_type &= ~PNG_COLOR_MASK_ALPHA;
-         row_info->channels -= (png_byte)1;
+         row_info->channels--;
          row_info->pixel_depth = (png_byte)(row_info->channels *
             row_info->bit_depth);
          row_info->rowbytes = ((row_info->width *

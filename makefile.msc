@@ -17,7 +17,7 @@ ERRFILE= >> pngerrs
 
 # variables
 OBJS1 = png$(O) pngrcb$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O) pngmem$(O) pngpread$(O)
-OBJS2 = pngread$(O) pngerror$(O) pngwrite$(O) pngrtran$(O) pngwtran$(O) pngio$(O)
+OBJS2 = pngread$(O) pngerror$(O) pngwrite$(O) pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
 
 all: libpng.lib
 
@@ -45,7 +45,10 @@ pngerror$(O): png.h pngconf.h
 pngmem$(O): png.h pngconf.h
         $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngio$(O): png.h pngconf.h
+pngrio$(O): png.h pngconf.h
+        $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+pngwio$(O): png.h pngconf.h
         $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngtest$(O): png.h pngconf.h

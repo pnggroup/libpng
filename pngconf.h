@@ -1,10 +1,10 @@
 
 /* pngconf.c - machine configurable file for libpng
 
-   libpng 1.0 beta 2 - version 0.88
+   libpng 1.0 beta 3 - version 0.89
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 25, 1996
+   May 25, 1996
    */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -78,7 +78,7 @@
 #endif /* PNGARG */
 
 /* enough people need this for various reasons to include it here */
-#ifndef MACOS
+#if !defined(MACOS) && !defined(RISCOS)
 #include <sys/types.h>
 #endif
 /* need the time information for reading tIME chunks */
@@ -179,6 +179,7 @@
 #define PNG_READ_FILLER_SUPPORTED
 #define PNG_READ_GAMMA_SUPPORTED
 #define PNG_READ_GRAY_TO_RGB_SUPPORTED
+#undef  PNG_CORRECT_PALETTE_SUPPORTED
 
 #define PNG_WRITE_INTERLACING_SUPPORTED
 #define PNG_WRITE_SHIFT_SUPPORTED

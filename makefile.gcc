@@ -13,7 +13,7 @@ RANLIB=ranlib
 prefix=.
 
 OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o \
-	pngread.o pngio.o pngwrite.o pngrtran.o pngwtran.o \
+	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o pngwtran.o \
 	pngmem.o pngerror.o pngpread.o
 
 all: libpng.a pngtest
@@ -35,7 +35,8 @@ clean:
 
 png.o: png.h pngconf.h
 pngerror.o: png.h pngconf.h
-pngio.o: png.h pngconf.h
+pngrio.o: png.h pngconf.h
+pngwio.o: png.h pngconf.h
 pngmem.o: png.h pngconf.h
 pngrcb.o: png.h pngconf.h
 pngread.o: png.h pngconf.h

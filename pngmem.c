@@ -1,10 +1,10 @@
 
 /* pngmem.c - stub functions for memory allocation
 
-   libpng 1.0 beta 2 - version 0.88
+   libpng 1.0 beta 3 - version 0.89
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 25, 1996
+   May 25, 1996
 
    This file provides a location for all memory allocation.  Users which
    need special memory handling are expected to modify the code in this file
@@ -17,6 +17,39 @@
 #if defined(__TURBOC__) && !defined(_Windows) && !defined(__FLAT__)
 /* if you change this, be sure to change the one in png.h also */
 
+/* Allocate memory for a png_struct.  The malloc and memset can be replaced
+ * by a single call to calloc() if this is thought to improve performance.
+ */
+png_voidp
+png_create_struct(uInt type)
+{
+   png_size_t type;
+   png_voidp struct_ptr;
+
+   if (type == PNG_STRUCT_INFO)
+     size = sizeof(png_info);
+   else if (type == PNG_STRUCT_PNG)
+     size = sizeof(png_struct);
+   else
+     return (png_voidp)NULL;
+
+   if ((struct_ptr = (png_voidp)farmalloc(size)) != NULL)
+   {
+      png_memset(struct_ptr, 0, size);
+   }
+
+   return (struct_ptr);
+}
+
+
+/* Free memory allocated by a png_create_struct() call */
+void
+png_destroy_struct(png_voidp struct_ptr)
+{
+   if (struct_ptr)
+      farfree (struct_ptr);
+}
+
 /* Allocate memory.  For reasonable files, size should never exceed
    64K.  However, zlib may allocate more then 64K if you don't tell
    it not to.  See zconf.h and png.h for more information. zlib does
@@ -27,7 +60,9 @@
    It gives you a segment with an offset of 8 (perhaps to store it's
    memory stuff).  zlib doesn't like this at all, so we have to
    detect and deal with it.  This code should not be needed in
-   Windows or OS/2 modes, and only in 16 bit mode.
+   Windows or OS/2 modes, and only in 16 bit mode.  This code has
+   been updated by Alexander Lehmann for version 0.89 to waste less
+   memory.
 */
 
 png_voidp
@@ -35,7 +70,7 @@ png_large_malloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
    if (!png_ptr || !size)
-      return ((voidp)0);
+      return ((voidp)NULL);
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
@@ -58,7 +93,7 @@ png_large_malloc(png_structp png_ptr, png_uint_32 size)
 
             if (ret)
                farfree(ret);
-            ret = 0;
+            ret = NULL;
 
             num_blocks = (int)(1 << (png_ptr->zlib_window_bits - 14));
             if (num_blocks < 1)
@@ -68,7 +103,7 @@ png_large_malloc(png_structp png_ptr, png_uint_32 size)
             else
                num_blocks++;
 
-            total_size = ((png_uint_32)65536L) * (png_uint_32)num_blocks;
+            total_size = ((png_uint_32)65536L) * (png_uint_32)num_blocks+16;
 
             table = farmalloc(total_size);
 
@@ -77,27 +112,25 @@ png_large_malloc(png_structp png_ptr, png_uint_32 size)
                png_error(png_ptr, "Out of Memory");
             }
 
-            if ((long)table & 0xffff)
+            if ((long)table & 0xfff0)
             {
-               farfree(table);
-               total_size += (png_uint_32)65536L;
-            }
-
-            table = farmalloc(total_size);
-
-            if (!table)
-            {
-               png_error(png_ptr, "Out of Memory");
+               png_error(png_ptr, "Farmalloc didn't return normalized pointer");
             }
 
             png_ptr->offset_table = table;
             png_ptr->offset_table_ptr = farmalloc(
                num_blocks * sizeof (png_bytep));
-            hptr = (png_byte huge *)table;
-            if ((long)hptr & 0xffff)
+
+            if (!png_ptr->offset_table_ptr)
             {
-               hptr = (png_byte huge *)((long)(hptr) & 0xffff0000L);
-               hptr += 65536L;
+               png_error(png_ptr, "Out of memory");
+            }
+
+            hptr = (png_byte huge *)table;
+            if ((long)hptr & 0xf)
+            {
+               hptr = (png_byte huge *)((long)(hptr) & 0xfffffff0L);
+               hptr += 16L;
             }
             for (i = 0; i < num_blocks; i++)
             {
@@ -109,12 +142,12 @@ png_large_malloc(png_structp png_ptr, png_uint_32 size)
             png_ptr->offset_table_count = 0;
             png_ptr->offset_table_count_free = 0;
          }
-
-         if (png_ptr->offset_table_count >= png_ptr->offset_table_number)
-            png_error(png_ptr, "Out of Memory");
-
-         ret = png_ptr->offset_table_ptr[png_ptr->offset_table_count++];
       }
+
+      if (png_ptr->offset_table_count >= png_ptr->offset_table_number)
+         png_error(png_ptr, "Out of Memory");
+
+      ret = png_ptr->offset_table_ptr[png_ptr->offset_table_count++];
    }
    else
       ret = farmalloc(size);
@@ -167,12 +200,62 @@ png_large_free(png_structp png_ptr, png_voidp ptr)
 
 #else /* Not the Borland DOS special memory handler */
 
+/* Allocate memory for a png_struct or a png_info.  The malloc and
+ * memset can be replaced by a single call to calloc() if this is thought
+ * to improve performance noticably.
+ */
+png_voidp
+png_create_struct(uInt type)
+{
+   size_t size;
+   png_voidp struct_ptr;
+
+   if (type == PNG_STRUCT_INFO)
+     size = sizeof(png_info);
+   else if (type == PNG_STRUCT_PNG)
+     size = sizeof(png_struct);
+   else
+     return (png_voidp)NULL;
+
+#if defined(__TURBOC__) && !defined(__FLAT__)
+   if ((struct_ptr = (png_voidp)farmalloc(size)) != NULL)
+#else
+# if defined(_MSC_VER) && defined(MAXSEG_64K)
+   if ((struct_ptr = (png_voidp)halloc(size)) != NULL)
+# else
+   if ((struct_ptr = (png_voidp)malloc(size)) != NULL)
+# endif
+#endif
+   {
+      png_memset(struct_ptr, 0, size);
+   }
+
+   return (struct_ptr);
+}
+
+
+/* Free memory allocated by a png_create_struct() call */
+void
+png_destroy_struct(png_voidp struct_ptr)
+{
+   if (struct_ptr)
+#if defined(__TURBOC__) && !defined(__FLAT__)
+      farfree(struct_ptr);
+#else
+# if defined(_MSC_VER) && defined(MAXSEG_64K)
+      hfree(struct_ptr);
+# else
+      free(struct_ptr);
+# endif
+#endif
+}
+
+
 /* Allocate memory.  For reasonable files, size should never exceed
    64K.  However, zlib may allocate more then 64K if you don't tell
    it not to.  See zconf.h and png.h for more information. zlib does
    need to allocate exactly 64K, so whatever you call here must
    have the ability to do that. */
-
 
 png_voidp
 png_large_malloc(png_structp png_ptr, png_uint_32 size)
@@ -299,5 +382,4 @@ png_free(png_structp png_ptr, void * ptr)
    if (ptr != (void *)0)
       free(ptr);
 }
-
 

@@ -1,10 +1,10 @@
 
 /* pngpread.c - read a png file in push mode
 
-   libpng 1.0 beta 2 - version 0.88
+   libpng 1.0 beta 3 - version 0.89
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 25, 1996
+   May 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -41,25 +41,25 @@ png_process_some_data(png_structp png_ptr, png_infop info)
       }
       case PNG_READ_IDAT_MODE:
       {
-         png_push_read_idat(png_ptr);
+         png_push_read_IDAT(png_ptr);
          break;
       }
       case PNG_READ_PLTE_MODE:
       {
-         png_push_read_plte(png_ptr, info);
+         png_push_read_PLTE(png_ptr, info);
          break;
       }
 #if defined(PNG_READ_tEXt_SUPPORTED)
       case PNG_READ_tEXt_MODE:
       {
-         png_push_read_text(png_ptr, info);
+         png_push_read_tEXt(png_ptr, info);
          break;
       }
 #endif
 #if defined(PNG_READ_zTXt_SUPPORTED)
       case PNG_READ_zTXt_MODE:
       {
-         png_push_read_ztxt(png_ptr, info);
+         png_push_read_zTXt(png_ptr, info);
          break;
       }
 #endif
@@ -107,7 +107,7 @@ png_push_read_sig(png_structp png_ptr)
 void
 png_push_read_chunk(png_structp png_ptr, png_infop info)
 {
-   if (!png_ptr->have_chunk_header)
+   if (!(png_ptr->flags & PNG_FLAG_HAVE_CHUNK_HEADER))
    {
       png_byte chunk_start[8];
 
@@ -120,7 +120,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
       png_push_fill_buffer(png_ptr, chunk_start, 8);
       png_ptr->push_length = png_get_uint_32(chunk_start);
       png_memcpy(png_ptr->push_chunk_name, (png_voidp)(chunk_start + 4), 4);
-      png_ptr->have_chunk_header = 1;
+      png_ptr->flags |= PNG_FLAG_HAVE_CHUNK_HEADER;
       png_reset_crc(png_ptr);
       png_calculate_crc(png_ptr, chunk_start + 4, 4);
    }
@@ -128,7 +128,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
    if (!png_memcmp(png_ptr->push_chunk_name, png_IHDR, 4))
    {
       if (png_ptr->mode != PNG_BEFORE_IHDR)
-         png_error(png_ptr, "Out of Place IHDR");
+         png_error(png_ptr, "Out of place IHDR");
 
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {
@@ -168,7 +168,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
    }
    else if (!png_memcmp(png_ptr->push_chunk_name, png_IEND, 4))
    {
-      png_error(png_ptr, "No Image in File");
+      png_error(png_ptr, "No image in file");
    }
 #if defined(PNG_READ_gAMA_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_gAMA, 4))
@@ -180,7 +180,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
       }
 
       if (png_ptr->mode != PNG_HAVE_IHDR)
-         png_error(png_ptr, "Out of Place gAMA");
+         png_error(png_ptr, "Out of place gAMA");
 
       png_handle_gAMA(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -196,7 +196,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
       }
 
       if (png_ptr->mode != PNG_HAVE_IHDR)
-         png_error(png_ptr, "Out of Place sBIT");
+         png_error(png_ptr, "Out of place sBIT");
 
       png_handle_sBIT(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -212,7 +212,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
       }
 
       if (png_ptr->mode != PNG_HAVE_IHDR)
-         png_error(png_ptr, "Out of Place cHRM");
+         png_error(png_ptr, "Out of place cHRM");
 
       png_handle_cHRM(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -228,7 +228,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
       }
       if (png_ptr->mode != PNG_HAVE_IHDR &&
          png_ptr->mode != PNG_HAVE_PLTE)
-         png_error(png_ptr, "Out of Place tRNS");
+         png_error(png_ptr, "Out of place tRNS");
 
       png_handle_tRNS(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -245,7 +245,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
 
       if (png_ptr->mode != PNG_HAVE_IHDR &&
          png_ptr->mode != PNG_HAVE_PLTE)
-         png_error(png_ptr, "Out of Place bKGD");
+         png_error(png_ptr, "Out of place bKGD");
 
       png_handle_bKGD(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -261,7 +261,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
       }
 
       if (png_ptr->mode != PNG_HAVE_PLTE)
-         png_error(png_ptr, "Out of Place hIST");
+         png_error(png_ptr, "Out of place hIST");
 
       png_handle_hIST(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -278,7 +278,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
 
       if (png_ptr->mode != PNG_HAVE_IHDR &&
          png_ptr->mode != PNG_HAVE_PLTE)
-         png_error(png_ptr, "Out of Place pHYs");
+         png_error(png_ptr, "Out of place pHYs");
 
       png_handle_pHYs(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -295,7 +295,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
 
       if (png_ptr->mode != PNG_HAVE_IHDR &&
          png_ptr->mode != PNG_HAVE_PLTE)
-         png_error(png_ptr, "Out of Place oFFs");
+         png_error(png_ptr, "Out of place oFFs");
 
       png_handle_oFFs(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -312,7 +312,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
 
       if (png_ptr->mode == PNG_BEFORE_IHDR ||
          png_ptr->mode == PNG_AFTER_IEND)
-         png_error(png_ptr, "Out of Place tIME");
+         png_error(png_ptr, "Out of place tIME");
 
       png_handle_tIME(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -323,7 +323,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
    {
       if (png_ptr->mode == PNG_BEFORE_IHDR ||
          png_ptr->mode == PNG_AFTER_IEND)
-         png_error(png_ptr, "Out of Place tEXt");
+         png_error(png_ptr, "Out of place tEXt");
 
       png_push_handle_tEXt(png_ptr, png_ptr->push_length);
    }
@@ -333,19 +333,43 @@ png_push_read_chunk(png_structp png_ptr, png_infop info)
    {
       if (png_ptr->mode == PNG_BEFORE_IHDR ||
          png_ptr->mode == PNG_AFTER_IEND)
-         png_error(png_ptr, "Out of Place zTXt");
+         png_error(png_ptr, "Out of place zTXt");
 
       png_push_handle_zTXt(png_ptr, png_ptr->push_length);
    }
 #endif
    else
    {
+      if (png_ptr->push_chunk_name[0] <41 || png_ptr->push_chunk_name[0]> 122 ||
+          (png_ptr->push_chunk_name[0]>90 && png_ptr->push_chunk_name[0]< 97) ||
+          png_ptr->push_chunk_name[1] <41 || png_ptr->push_chunk_name[1]> 122 ||
+          (png_ptr->push_chunk_name[1]>90 && png_ptr->push_chunk_name[1]< 97) ||
+          png_ptr->push_chunk_name[2] <41 || png_ptr->push_chunk_name[2]> 122 ||
+          (png_ptr->push_chunk_name[2]>90 && png_ptr->push_chunk_name[2]< 97) ||
+          png_ptr->push_chunk_name[3] <41 || png_ptr->push_chunk_name[3]> 122 ||
+          (png_ptr->push_chunk_name[3]>90 && png_ptr->push_chunk_name[3]< 97))
+      {
+         char msg[200];
+
+         sprintf(msg, "Invalid chunk type 0x%02X 0x%02X 0x%02X 0x%02X",
+            png_ptr->push_chunk_name[0], png_ptr->push_chunk_name[1],
+            png_ptr->push_chunk_name[2], png_ptr->push_chunk_name[3]);
+         png_error(png_ptr, msg);
+      }
+
       if ((png_ptr->push_chunk_name[0] & 0x20) == 0)
-         png_error(png_ptr, "Unknown Critical Chunk");
+      {
+         char msg[200];
+
+         sprintf(msg, "Unknown critical chunk %c%c%c%c",
+            png_ptr->push_chunk_name[0], png_ptr->push_chunk_name[1],
+            png_ptr->push_chunk_name[2], png_ptr->push_chunk_name[3]);
+         png_error(png_ptr, msg);
+      }
 
       png_push_crc_skip(png_ptr, png_ptr->push_length);
    }
-   png_ptr->have_chunk_header = 0;
+   png_ptr->flags &= ~PNG_FLAG_HAVE_CHUNK_HEADER;
 }
 
 void
@@ -513,9 +537,9 @@ png_push_restore_buffer(png_structp png_ptr, png_bytep buffer,
 }
 
 void
-png_push_read_idat(png_structp png_ptr)
+png_push_read_IDAT(png_structp png_ptr)
 {
-   if (!png_ptr->have_chunk_header)
+   if (!(png_ptr->flags & PNG_FLAG_HAVE_CHUNK_HEADER))
    {
       png_byte chunk_start[8];
 
@@ -529,13 +553,13 @@ png_push_read_idat(png_structp png_ptr)
       png_ptr->push_length = png_get_uint_32(chunk_start);
       png_memcpy(png_ptr->push_chunk_name,
          (png_voidp)(chunk_start + 4), 4);
-      png_ptr->have_chunk_header = 1;
+      png_ptr->flags |= PNG_FLAG_HAVE_CHUNK_HEADER;
       png_reset_crc(png_ptr);
       png_calculate_crc(png_ptr, chunk_start + 4, 4);
       if (png_memcmp(png_ptr->push_chunk_name, png_IDAT, 4))
       {
          png_ptr->process_mode = PNG_READ_END_MODE;
-         if (!png_ptr->zlib_finished)
+         if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
             png_error(png_ptr, "Not enough compressed data");
          return;
       }
@@ -585,7 +609,7 @@ png_push_read_idat(png_structp png_ptr)
       }
 
       png_push_check_crc(png_ptr);
-      png_ptr->have_chunk_header = 0;
+      png_ptr->flags &= ~PNG_FLAG_HAVE_CHUNK_HEADER;
    }
 }
 
@@ -595,7 +619,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 {
    int ret;
 
-   if (png_ptr->zlib_finished && buffer_length)
+   if ((png_ptr->flags & PNG_FLAG_ZLIB_FINISHED) && buffer_length)
       png_error(png_ptr, "Extra compression data");
 
    png_ptr->zstream->next_in = buffer;
@@ -612,11 +636,11 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
             png_push_process_row(png_ptr);
          }
          png_ptr->mode = PNG_AT_LAST_IDAT;
-         png_ptr->zlib_finished = 1;
+         png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
          break;
       }
       if (ret != Z_OK)
-         png_error(png_ptr, "Compression Error");
+         png_error(png_ptr, "Decompression Error");
       if (!(png_ptr->zstream->avail_out))
       {
          png_push_process_row(png_ptr);
@@ -638,10 +662,9 @@ png_push_process_row(png_structp png_ptr)
    png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
       (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
-   if (png_ptr->row_buf[0])
-      png_read_filter_row(&(png_ptr->row_info),
-         png_ptr->row_buf + 1, png_ptr->prev_row + 1,
-         (int)(png_ptr->row_buf[0]));
+   png_read_filter_row(png_ptr, &(png_ptr->row_info),
+      png_ptr->row_buf + 1, png_ptr->prev_row + 1,
+      (int)(png_ptr->row_buf[0]));
 
    png_memcpy(png_ptr->prev_row, png_ptr->row_buf, (png_size_t)png_ptr->rowbytes + 1);
 
@@ -811,7 +834,7 @@ void
 png_push_handle_PLTE(png_structp png_ptr, png_uint_32 length)
 {
    if (length % 3)
-      png_error(png_ptr, "Invalid Palette Chunk");
+      png_error(png_ptr, "Invalid palette chunk");
 
    png_ptr->num_palette = (png_uint_16)(length / 3);
    png_ptr->cur_palette = 0;
@@ -821,7 +844,7 @@ png_push_handle_PLTE(png_structp png_ptr, png_uint_32 length)
 }
 
 void
-png_push_read_plte(png_structp png_ptr, png_infop info)
+png_push_read_PLTE(png_structp png_ptr, png_infop info)
 {
    while (png_ptr->cur_palette < png_ptr->num_palette &&
       png_ptr->buffer_size >= 3)
@@ -862,7 +885,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_uint_32 length)
 }
 
 void
-png_push_read_text(png_structp png_ptr, png_infop info)
+png_push_read_tEXt(png_structp png_ptr, png_infop info)
 {
    if (png_ptr->buffer_size && png_ptr->current_text_left)
    {
@@ -931,7 +954,7 @@ png_push_handle_zTXt(png_structp png_ptr,
 }
 
 void
-png_push_read_ztxt(png_structp png_ptr, png_infop info)
+png_push_read_zTXt(png_structp png_ptr, png_infop info)
 {
    if (png_ptr->buffer_size && png_ptr->current_text_left)
    {
@@ -1105,13 +1128,13 @@ png_push_have_row(png_structp png_ptr, png_bytep row)
 png_voidp
 png_get_progressive_ptr(png_structp png_ptr)
 {
-   return png_ptr->push_ptr;
+   return png_ptr->io_ptr;
 }
 
 void
 png_push_read_end(png_structp png_ptr, png_infop info)
 {
-   if (!png_ptr->have_chunk_header)
+   if (!(png_ptr->flags & PNG_FLAG_HAVE_CHUNK_HEADER))
    {
       png_byte chunk_start[8];
 
@@ -1124,23 +1147,23 @@ png_push_read_end(png_structp png_ptr, png_infop info)
       png_push_fill_buffer(png_ptr, chunk_start, 8);
       png_ptr->push_length = png_get_uint_32(chunk_start);
       png_memcpy(png_ptr->push_chunk_name, (png_voidp)(chunk_start + 4), 4);
-      png_ptr->have_chunk_header = 1;
+      png_ptr->flags |= PNG_FLAG_HAVE_CHUNK_HEADER;
       png_reset_crc(png_ptr);
       png_calculate_crc(png_ptr, chunk_start + 4, 4);
    }
 
    if (!png_memcmp(png_ptr->push_chunk_name, png_IHDR, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid IHDR after IDAT");
    }
    else if (!png_memcmp(png_ptr->push_chunk_name, png_PLTE, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid PLTE after IDAT");
    }
    else if (!png_memcmp(png_ptr->push_chunk_name, png_IDAT, 4))
    {
       if (png_ptr->push_length > 0 || png_ptr->mode != PNG_AT_LAST_IDAT)
-         png_error(png_ptr, "too many IDAT's found");
+         png_error(png_ptr, "Too many IDAT's found");
    }
    else if (!png_memcmp(png_ptr->push_chunk_name, png_IEND, 4))
    {
@@ -1159,49 +1182,49 @@ png_push_read_end(png_structp png_ptr, png_infop info)
 #if defined(PNG_READ_gAMA_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_gAMA, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid gAMA after IDAT");
    }
 #endif
 #if defined(PNG_READ_sBIT_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_sBIT, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid sBIT after IDAT");
    }
 #endif
 #if defined(PNG_READ_cHRM_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_cHRM, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid cHRM after IDAT");
    }
 #endif
 #if defined(PNG_READ_tRNS_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_tRNS, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid tRNS after IDAT");
    }
 #endif
 #if defined(PNG_READ_bKGD_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_bKGD, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid bKGD after IDAT");
    }
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_hIST, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid hIST after IDAT");
    }
 #endif
 #if defined(PNG_READ_pHYs_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_pHYs, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid pHYs after IDAT");
    }
 #endif
 #if defined(PNG_READ_oFFs_SUPPORTED)
    else if (!png_memcmp(png_ptr->push_chunk_name, png_oFFs, 4))
    {
-      png_error(png_ptr, "invalid chunk after IDAT");
+      png_error(png_ptr, "Invalid oFFs after IDAT");
    }
 #endif
 #if defined(PNG_READ_tIME_SUPPORTED)
@@ -1215,7 +1238,7 @@ png_push_read_end(png_structp png_ptr, png_infop info)
 
       if (png_ptr->mode == PNG_BEFORE_IHDR ||
          png_ptr->mode == PNG_AFTER_IEND)
-         png_error(png_ptr, "Out of Place tIME");
+         png_error(png_ptr, "Out of place tIME");
 
       png_handle_tIME(png_ptr, info, png_ptr->push_length);
       png_push_check_crc(png_ptr);
@@ -1226,7 +1249,7 @@ png_push_read_end(png_structp png_ptr, png_infop info)
    {
       if (png_ptr->mode == PNG_BEFORE_IHDR ||
          png_ptr->mode == PNG_AFTER_IEND)
-         png_error(png_ptr, "Out of Place tEXt");
+         png_error(png_ptr, "Out of place tEXt");
 
       png_push_handle_tEXt(png_ptr, png_ptr->push_length);
    }
@@ -1236,21 +1259,45 @@ png_push_read_end(png_structp png_ptr, png_infop info)
    {
       if (png_ptr->mode == PNG_BEFORE_IHDR ||
          png_ptr->mode == PNG_AFTER_IEND)
-         png_error(png_ptr, "Out of Place zTXt");
+         png_error(png_ptr, "Out of place zTXt");
 
       png_push_handle_zTXt(png_ptr, png_ptr->push_length);
    }
 #endif
    else
    {
+      if (png_ptr->push_chunk_name[0] <41 || png_ptr->push_chunk_name[0]> 122 ||
+          (png_ptr->push_chunk_name[0]>90 && png_ptr->push_chunk_name[0]< 97) ||
+          png_ptr->push_chunk_name[1] <41 || png_ptr->push_chunk_name[1]> 122 ||
+          (png_ptr->push_chunk_name[1]>90 && png_ptr->push_chunk_name[1]< 97) ||
+          png_ptr->push_chunk_name[2] <41 || png_ptr->push_chunk_name[2]> 122 ||
+          (png_ptr->push_chunk_name[2]>90 && png_ptr->push_chunk_name[2]< 97) ||
+          png_ptr->push_chunk_name[3] <41 || png_ptr->push_chunk_name[3]> 122 ||
+          (png_ptr->push_chunk_name[3]>90 && png_ptr->push_chunk_name[3]< 97))
+      {
+         char msg[45];
+
+         sprintf(msg, "Invalid chunk type 0x%02X 0x%02X 0x%02X 0x%02X",
+            png_ptr->push_chunk_name[0], png_ptr->push_chunk_name[1],
+            png_ptr->push_chunk_name[2], png_ptr->push_chunk_name[3]);
+         png_error(png_ptr, msg);
+      }
+
       if ((png_ptr->push_chunk_name[0] & 0x20) == 0)
-         png_error(png_ptr, "Unknown Critical Chunk");
+      {
+         char msg[40];
+
+         sprintf(msg, "Unknown critical chunk %c%c%c%c",
+            png_ptr->push_chunk_name[0], png_ptr->push_chunk_name[1],
+            png_ptr->push_chunk_name[2], png_ptr->push_chunk_name[3]);
+         png_error(png_ptr, msg);
+      }
 
       png_push_crc_skip(png_ptr, png_ptr->push_length);
    }
    if (png_ptr->mode == PNG_AT_LAST_IDAT)
       png_ptr->mode = PNG_AFTER_IDAT;
-   png_ptr->have_chunk_header = 0;
+   png_ptr->flags &= ~PNG_FLAG_HAVE_CHUNK_HEADER;
 }
 
 void
@@ -1260,9 +1307,9 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
 {
    png_ptr->info_fn = info_fn;
    png_ptr->row_fn = row_fn;
-   png_ptr->push_ptr = progressive_ptr;
    png_ptr->end_fn = end_fn;
-   png_ptr->read_mode = PNG_READ_PUSH_MODE;
+
+   png_set_read_fn(png_ptr, progressive_ptr, png_push_fill_buffer);
 }
 
 void

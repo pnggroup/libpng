@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose png functions
 
-   libpng 1.0 beta 2 - version 0.88
+   libpng 1.0 beta 3 - version 0.89
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 25, 1996
+   May 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -13,7 +13,7 @@
 
 /* version information for c files.  This better match the version
    string defined in png.h */
-char png_libpng_ver[] = "0.88";
+char png_libpng_ver[] = "0.89";
 
 /* place to hold the signiture string for a png file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -25,39 +25,17 @@ png_byte FARDATA png_IHDR[4] = { 73,  72,  68,  82};
 png_byte FARDATA png_IDAT[4] = { 73,  68,  65,  84};
 png_byte FARDATA png_IEND[4] = { 73,  69,  78,  68};
 png_byte FARDATA png_PLTE[4] = { 80,  76,  84,  69};
-#if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED)
 png_byte FARDATA png_gAMA[4] = {103,  65,  77,  65};
-#endif
-#if defined(PNG_READ_sBIT_SUPPORTED) || defined(PNG_WRITE_sBIT_SUPPORTED)
 png_byte FARDATA png_sBIT[4] = {115,  66,  73,  84};
-#endif
-#if defined(PNG_READ_cHRM_SUPPORTED) || defined(PNG_WRITE_cHRM_SUPPORTED)
 png_byte FARDATA png_cHRM[4] = { 99,  72,  82,  77};
-#endif
-#if defined(PNG_READ_tRNS_SUPPORTED) || defined(PNG_WRITE_tRNS_SUPPORTED)
 png_byte FARDATA png_tRNS[4] = {116,  82,  78,  83};
-#endif
-#if defined(PNG_READ_bKGD_SUPPORTED) || defined(PNG_WRITE_bKGD_SUPPORTED)
 png_byte FARDATA png_bKGD[4] = { 98,  75,  71,  68};
-#endif
-#if defined(PNG_READ_hIST_SUPPORTED) || defined(PNG_WRITE_hIST_SUPPORTED)
 png_byte FARDATA png_hIST[4] = {104,  73,  83,  84};
-#endif
-#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_WRITE_tEXt_SUPPORTED)
 png_byte FARDATA png_tEXt[4] = {116,  69,  88, 116};
-#endif
-#if defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
 png_byte FARDATA png_zTXt[4] = {122,  84,  88, 116};
-#endif
-#if defined(PNG_READ_pHYs_SUPPORTED) || defined(PNG_WRITE_pHYs_SUPPORTED)
 png_byte FARDATA png_pHYs[4] = {112,  72,  89, 115};
-#endif
-#if defined(PNG_READ_oFFs_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
 png_byte FARDATA png_oFFs[4] = {111,  70,  70, 115};
-#endif
-#if defined(PNG_READ_tIME_SUPPORTED) || defined(PNG_WRITE_tIME_SUPPORTED)
 png_byte FARDATA png_tIME[4] = {116,  73,  77,  69};
-#endif
 
 /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
@@ -209,6 +187,21 @@ png_calculate_crc(png_structp png_ptr, png_bytep ptr,
 {
    png_ptr->crc = update_crc(png_ptr->crc, ptr, length);
 }
+
+png_infop
+png_create_info_struct(png_structp png_ptr)
+{
+   png_infop info_ptr;
+
+   if ((info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO)) != NULL)
+   {
+      png_memset(info_ptr, 0, sizeof(png_info));
+      png_ptr->do_free |= PNG_FREE_INFO;
+   }
+
+   return info_ptr;
+}
+
 void
 png_info_init(png_infop info)
 {
@@ -216,3 +209,20 @@ png_info_init(png_infop info)
    png_memset(info, 0, sizeof (png_info));
 }
 
+/* This function returns a pointer to the io_ptr associated with the user
+   functions.  The application should free any memory associated with this
+   pointer before png_write_destroy and png_read_destroy are called. */
+png_voidp
+png_get_io_ptr(png_structp png_ptr)
+{
+   return png_ptr->io_ptr;
+}
+ 
+/* Initialize the default input/output functions for the png file.  If you
+   change the read, or write routines, you can call either png_set_read_fn()
+   or png_set_write_fn() instead of png_init_io(). */
+void
+png_init_io(png_structp png_ptr, FILE *fp)
+{
+   png_ptr->io_ptr = (png_voidp)fp;
+}

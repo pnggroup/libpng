@@ -1,9 +1,9 @@
 /* pngrcb.c - callbacks while reading a png file
 
-   libpng 1.0 beta 2 - version 0.88
+   libpng 1.0 beta 3 - version 0.89
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 25, 1996
+   May 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -185,7 +185,7 @@ png_read_tIME(png_structp png_ptr, png_infop info,
 }
 #endif
 
-#if defined(PNG_READ_zTXt_SUPPORTED)
+#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
 void
 png_read_zTXt(png_structp png_ptr, png_infop info,
    png_charp key, png_charp text, png_uint_32 text_len, int compression)
@@ -214,10 +214,10 @@ png_read_zTXt(png_structp png_ptr, png_infop info,
       }
       else
       {
-         info->max_text = info->num_text + 16;
+         info->max_text = 16;
+         info->num_text = 0;
          info->text = (png_textp)png_large_malloc(png_ptr,
             info->max_text * sizeof (png_text));
-         info->num_text = 0;
       }
    }
 

@@ -4,19 +4,19 @@
 
 CC=gcc
 CFLAGS=-I../zlib -O2 -Wall -fPIC
-LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
+LDFLAGS=-L. -Wl,-rpath,. -L../zlib/ -Wl,-rpath,../zlib/ -lpng -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
 
-PNGVER = 0.86
+PNGVER = 0.89
 
 # where make install puts libpng.a, libpng.so*, and png.h
 prefix=/usr/local
 
 OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o \
-       pngread.o pngio.o pngwrite.o pngrtran.o pngwtran.o \
-       pngmem.o pngerror.o pngpread.o
+       pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
+       pngwtran.o pngmem.o pngerror.o pngpread.o
 
 all: libpng.so pngtest
 
@@ -59,7 +59,8 @@ clean:
 
 png.o: png.h pngconf.h
 pngerror.o: png.h pngconf.h
-pngio.o: png.h pngconf.h
+pngrio.o: png.h pngconf.h
+pngwio.o: png.h pngconf.h
 pngmem.o: png.h pngconf.h
 pngrcb.o: png.h pngconf.h
 pngread.o: png.h pngconf.h

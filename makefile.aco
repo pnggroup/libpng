@@ -1,0 +1,114 @@
+# Project:   libpng
+
+
+# Toolflags:
+CCflags = -c -depend !Depend -IC:,Zlib: -g -throwback  -DRISCOS  -fnah 
+C++flags = -c -depend !Depend -IC: -throwback
+Linkflags = -aif -c++ -o $@
+ObjAsmflags = -throwback -NoCache -depend !Depend
+CMHGflags = 
+LibFileflags = -c -o $@ 
+Squeezeflags = -o $@
+
+
+# Final targets:
+@.libpng-lib:   @.o.png @.o.pngerror @.o.pngrio @.o.pngwio @.o.pngmem \
+        @.o.pngpread @.o.pngrcb @.o.pngread @.o.pngrtran @.o.pngrutil \
+        @.o.pngtrans @.o.pngwrite @.o.pngwtran @.o.pngwutil
+        LibFile $(LibFileflags) @.o.png @.o.pngerror @.o.pngrio @.o.pngwio \
+        @.o.pngmem @.o.pngpread @.o.pngrcb @.o.pngread @.o.pngrtran \
+        @.o.pngrutil @.o.pngtrans @.o.pngwrite @.o.pngwtran @.o.pngwutil 
+@.test:   @.tests.pngtest 
+        echo Please run "Test" in directory tests 
+@.tests.pngtest:   @.o.pngtest @.libpng-lib C:o.Stubs Zlib:zlib_lib 
+        Link $(Linkflags) @.o.pngtest @.libpng-lib C:o.Stubs Zlib:zlib_lib 
+
+
+# User-editable dependencies:
+.c.o:
+        cc $(ccflags) -o $@ $<
+
+
+# Static dependencies:
+@.o.example:   @.tests.c.example
+        cc $(ccflags) -o @.o.example @.tests.c.example 
+@.o.pngtest:   @.tests.c.pngtest
+        cc $(ccflags) -o @.o.pngtest @.tests.c.pngtest 
+
+
+# Dynamic dependencies:
+o.png:	c.png
+o.png:	h.png
+o.png:	Zlib:h.zlib
+o.png:	Zlib:h.zconf
+o.png:	h.pngconf
+o.pngerror:	c.pngerror
+o.pngerror:	h.png
+o.pngerror:	Zlib:h.zlib
+o.pngerror:	Zlib:h.zconf
+o.pngerror:	h.pngconf
+o.pngrio:	c.pngrio
+o.pngrio:	h.png
+o.pngrio:	Zlib:h.zlib
+o.pngrio:	Zlib:h.zconf
+o.pngrio:	h.pngconf
+o.pngwio:	c.pngwio
+o.pngwio:	h.png
+o.pngwio:	Zlib:h.zlib
+o.pngwio:	Zlib:h.zconf
+o.pngwio:	h.pngconf
+o.pngmem:	c.pngmem
+o.pngmem:	h.png
+o.pngmem:	Zlib:h.zlib
+o.pngmem:	Zlib:h.zconf
+o.pngmem:	h.pngconf
+o.pngpread:	c.pngpread
+o.pngpread:	h.png
+o.pngpread:	Zlib:h.zlib
+o.pngpread:	Zlib:h.zconf
+o.pngpread:	h.pngconf
+o.pngrcb:	c.pngrcb
+o.pngrcb:	h.png
+o.pngrcb:	Zlib:h.zlib
+o.pngrcb:	Zlib:h.zconf
+o.pngrcb:	h.pngconf
+o.pngread:	c.pngread
+o.pngread:	h.png
+o.pngread:	Zlib:h.zlib
+o.pngread:	Zlib:h.zconf
+o.pngread:	h.pngconf
+o.pngrtran:	c.pngrtran
+o.pngrtran:	h.png
+o.pngrtran:	Zlib:h.zlib
+o.pngrtran:	Zlib:h.zconf
+o.pngrtran:	h.pngconf
+o.pngrutil:	c.pngrutil
+o.pngrutil:	h.png
+o.pngrutil:	Zlib:h.zlib
+o.pngrutil:	Zlib:h.zconf
+o.pngrutil:	h.pngconf
+o.pngtrans:	c.pngtrans
+o.pngtrans:	h.png
+o.pngtrans:	Zlib:h.zlib
+o.pngtrans:	Zlib:h.zconf
+o.pngtrans:	h.pngconf
+o.pngwrite:	c.pngwrite
+o.pngwrite:	h.png
+o.pngwrite:	Zlib:h.zlib
+o.pngwrite:	Zlib:h.zconf
+o.pngwrite:	h.pngconf
+o.pngwtran:	c.pngwtran
+o.pngwtran:	h.png
+o.pngwtran:	Zlib:h.zlib
+o.pngwtran:	Zlib:h.zconf
+o.pngwtran:	h.pngconf
+o.pngwutil:	c.pngwutil
+o.pngwutil:	h.png
+o.pngwutil:	Zlib:h.zlib
+o.pngwutil:	Zlib:h.zconf
+o.pngwutil:	h.pngconf
+o.pngtest:	tests.c.pngtest
+o.pngtest:	h.png
+o.pngtest:	Zlib:h.zlib
+o.pngtest:	Zlib:h.zconf
+o.pngtest:	h.pngconf

@@ -52,8 +52,10 @@ $   CALL MAKE pngerror.OBJ "cc ''CCOPT' pngerror" -
                 pngerror.c png.h pngconf.h
 $   CALL MAKE pngmem.OBJ "cc ''CCOPT' pngmem" -
                 pngmem.c png.h pngconf.h
-$   CALL MAKE pngio.OBJ "cc ''CCOPT' pngio" -
-                pngio.c png.h pngconf.h
+$   CALL MAKE pngrio.OBJ "cc ''CCOPT' pngrio" -
+                pngrio.c png.h pngconf.h
+$   CALL MAKE pngwio.OBJ "cc ''CCOPT' pngwio" -
+                pngwio.c png.h pngconf.h
 $   CALL MAKE pngtrans.OBJ "cc ''CCOPT' pngtrans" -
                 pngtrans.c png.h pngconf.h
 $   CALL MAKE pngwrite.OBJ "cc ''CCOPT' pngwrite" -
