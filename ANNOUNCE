@@ -1,5 +1,5 @@
 
-Libpng 1.2.8rc4 - November 29, 2004
+Libpng 1.2.8rc5 - November 29, 2004
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,10 +42,14 @@ version 1.2.8rc2 [November 26, 2004]
   Change tests in pngread.c and pngpread.c to
     if (png_ptr->transformations || (png_ptr->flags&PNG_FLAG_STRIP_ALPHA))
        png_do_read_transformations(png_ptr);
-version 1.2.8rc3 [November 29, 2004]
+version 1.2.8rc3 [November 28, 2004]
   Reverted pngrutil.c to version libpng-1.2.8beta5.
   Added scripts/makefile.elf with supporting code in pngconf.h for symbol
     versioning (John Bowler).
+version 1.2.8rc4 [November 29, 2004]
+  Added projects/visualc7 (Simon-pierre).
+version 1.2.8rc5 [November 29, 2004]
+  Fix new typo in scripts/pngw32.rc
 
 Send comments/corrections/commendations to
 png-implement at ccrc.wustl.edu (subscription required; write to

@@ -1406,6 +1406,8 @@ version 1.2.8rc3 [November 28, 2004]
     versioning (John Bowler).
 version 1.2.8rc4 [November 29, 2004]
   Added projects/visualc7 (Simon-pierre).
+version 1.2.8rc5 [November 29, 2004]
+  Fix new typo in scripts/pngw32.rc
 
 Send comments/corrections/commendations to
 png-implement at ccrc.wustl.edu (subscription required; write to
