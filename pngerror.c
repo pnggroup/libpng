@@ -1,11 +1,12 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.00.97
+ * libpng 0.97
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * May 28, 1997
+ * Copyright (c) 1998, Glenn Randers-Pehrson
+ * January 7, 1998
  *
  * This file provides a location for all error handling.  Users which
  * need special error handling are expected to write replacement functions
@@ -84,7 +85,7 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp message
    else {
       buffer[iout++] = ':';
       buffer[iout++] = ' ';
-      strncpy(buffer+iout, message, 64);
+      png_memcpy(buffer+iout, message, 64);
       buffer[iout+63] = 0;
    }
 }

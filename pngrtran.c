@@ -1,11 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.00.97
+ * libpng 0.97
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * May 28, 1997
+ * Copyright (c) 1998, Glenn Randers-Pehrson
+ * January 7, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -21,35 +22,40 @@
  * many machines.  However, it does take more operations than the corresponding
  * divide method, so it may be slower on some RISC systems.  There are two
  * shifts (by 8 or 16 bits) and an addition, versus a single integer divide.
- * The results may also be off by one for certain values.
+ *
+ * Note that the rounding factors are NOT supposed to be the same!  128 and
+ * 32768 are correct for the NODIV code; 127 and 32767 are correct for the
+ * standard method.
+ *
+ * [Optimized code by Greg Roelofs and Mark Adler...blame us for bugs. :-) ]
  */
 
-/* pixel and background should be in gamma 1.0 space */
-#define png_composite(composite, pixel, trans, background) \
-   { png_uint_16 temp = ((png_uint_16)(pixel) * (png_uint_16)(trans) + \
-                      (png_uint_16)(background)*(png_uint_16)(255 - \
-                      (png_uint_16)(trans)) + (png_uint_16)127); \
-     (composite) = (png_byte)(((temp >> 8) + temp) >> 8); }
+   /* fg and bg should be in `gamma 1.0' space; alpha is the opacity */
+#  define png_composite(composite, fg, alpha, bg) \
+     { png_uint_16 temp = ((png_uint_16)(fg) * (png_uint_16)(alpha) + \
+                        (png_uint_16)(bg)*(png_uint_16)(255 - \
+                        (png_uint_16)(alpha)) + (png_uint_16)128); \
+       (composite) = (png_byte)((temp + (temp >> 8)) >> 8); }
+#  define png_composite_16(composite, fg, alpha, bg) \
+     { png_uint_32 temp = ((png_uint_32)(fg) * (png_uint_32)(alpha) + \
+                        (png_uint_32)(bg)*(png_uint_32)(65535L - \
+                        (png_uint_32)(alpha)) + (png_uint_32)32768L); \
+       (composite) = (png_uint_16)((temp + (temp >> 16)) >> 16); }
 
-/* pixel and background should be in gamma 1.0 space */
-#define png_composite_16(composite, pixel, trans, background) \
-   { png_uint_32 temp = ((png_uint_32)(pixel) * (png_uint_32)(trans) + \
-                      (png_uint_32)(background)*(png_uint_32)(65535L - \
-                      (png_uint_32)(trans)) + (png_uint_32)32767); \
-     (composite) = (png_uint_16)(((temp >> 16) + temp) >> 16); }
-#else
-/* pixel and background should be in gamma 1.0 space */
-#define png_composite(composite, pixel, trans, background) \
-   (composite) = (png_byte)(((png_uint_16)(pixel) * (png_uint_16)(trans) + \
-     (png_uint_16)(background) * (png_uint_16)(255 - (png_uint_16)(trans)) + \
-     (png_uint_16)127) / 255)
- 
-/* pixel and background should be in gamma 1.0 space */
-#define png_composite_16(composite, pixel, trans, background) \
-   (composite) = (png_uint_16)(((png_uint_32)(pixel) * (png_uint_32)(trans) + \
-     (png_uint_32)(background)*(png_uint_32)(65535L - (png_uint_32)(trans)) + \
-     (png_uint_32)32767) / (png_uint_32)65535L)
-#endif
+#else  /* standard method using integer division */
+
+   /* fg and bg should be in `gamma 1.0' space; alpha is the opacity */
+#  define png_composite(composite, fg, alpha, bg) \
+     (composite) = (png_byte)(((png_uint_16)(fg) * (png_uint_16)(alpha) + \
+       (png_uint_16)(bg) * (png_uint_16)(255 - (png_uint_16)(alpha)) + \
+       (png_uint_16)127) / 255)
+#  define png_composite_16(composite, fg, alpha, bg) \
+     (composite) = (png_uint_16)(((png_uint_32)(fg) * (png_uint_32)(alpha) + \
+       (png_uint_32)(bg)*(png_uint_32)(65535L - (png_uint_32)(alpha)) + \
+       (png_uint_32)32767) / (png_uint_32)65535L)
+
+#endif /* ?PNG_READ_COMPOSITE_NODIV_SUPPORTED */
+
 
 /* Set the action on getting a CRC error for an ancillary or critical chunk. */
 void
@@ -1344,6 +1350,16 @@ png_do_chop(png_row_infop row_info, png_bytep row)
          *dp = (((((png_uint_32)(*sp) << 8) |
                    (png_uint_32)(*(sp + 1))) * 255 + 127) / (png_uint_32)65535L;
 
+
+          * GRR: no, I think this is what it really should be:
+         *dp = (((((png_uint_32)(*sp) << 8) |
+                   (png_uint_32)(*(sp + 1))) + 128L) / (png_uint_32)257L;
+
+          * GRR: here's the exact calculation with shifts:
+         temp = (((png_uint_32)(*sp) << 8) | (png_uint_32)(*(sp + 1))) + 128L;
+         *dp = (temp - (temp >> 8)) >> 8;
+
+
           * Approximate calculation with shift/add instead of multiply/divide:
          *dp = ((((png_uint_32)(*sp) << 8) |
                   (png_uint_32)((int)(*(sp + 1)) - *sp)) + 128) >> 8;
@@ -2558,6 +2574,22 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
          }
          case PNG_COLOR_TYPE_GRAY:
          {
+            if (row_info->bit_depth == 2)
+            {
+               for (i = 0, sp = row; i < row_info->width; i += 4)
+               {
+                  int a = *sp & 0xc0;
+                  int b = *sp & 0x30;
+                  int c = *sp & 0x0c;
+                  int d = *sp & 0x03;
+
+                  *sp = ((((int)gamma_table[a|(a>>2)|(a>>4)|(a>>6)])   ) & 0xc0)|
+                        ((((int)gamma_table[(b<<2)|b|(b>>2)|(b>>4)])>>2) & 0x30)|
+                        ((((int)gamma_table[(c<<4)|(c<<2)|c|(c>>2)])>>4) & 0x0c)|
+                        ((((int)gamma_table[(d<<6)|(d<<4)|(d<<2)|d])>>6)       );
+                  sp++;
+               }
+            }
             if (row_info->bit_depth == 4)
             {
                for (i = 0, sp = row; i < row_info->width; i += 2)

@@ -1,23 +1,22 @@
-README for libpng 1.10
+[NOTE:  this is still beta version 0.97c; the text below has already
+ been updated in anticipation of the imminent 1.0 release.]
 
-This first official release of libpng.  Don't let the fact that
+
+README for libpng 1.0
+
+This is the first official release of libpng.  Don't let the fact that
 it's the first release fool you.  The libpng library has been in
 extensive use and testing for about two years.  However, it's
 finally gotten to the stage where there haven't been significant
 changes to the API in some time, and people have a bad feeling about
 libraries with versions < 1.0.
 
-Note that the version number is 1.10 to avoid potential problems
-with shared libraries created for Linux ELF under version 0.89,
-which mistakenly used 1.0.89 as the library version number in
-false anticipation of an imminent 1.0 release.
-
 ****
 Note that some of the changes to the png_info structure render this
 version of the library binary incompatible with libpng-0.89 or
 earlier versions if you are using a shared library.  The type of the
 "filler" parameter for png_set_filler() has changed from png_byte to
-png_uint_32, which will affect shared-library applications which use
+png_uint_32, which will affect shared-library applications that use
 this function.
 
 To avoid problems with changes to the internals of png_info_struct,
@@ -28,7 +27,7 @@ accessing/storing the info_struct data, rather than manipulating it
 directly, to avoid such problems in the future.
 
 It is important to note that the APIs do not make current programs
-which access the info struct directly incompatible with the new
+that access the info struct directly incompatible with the new
 library.  However, it is strongly suggested that new programs use
 the new APIs (as shown in example.c), and older programs be converted
 to the new format, to facilitate upgrades in the future.

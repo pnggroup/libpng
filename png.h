@@ -1,11 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.00.97 beta 7
+ * libpng 0.97 beta
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Dec 31, 1997
+ * Copyright (c) 1998 Glenn Randers-Pehrson
+ * January 7, 1998
  *
  * BETA NOTICE:
  *    This is a beta version.  It reads and writes valid files on the
@@ -93,7 +94,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.00.97"
+#define PNG_LIBPNG_VER_STRING "0.97"
 
 /* careful here.  At one time, I wanted to use 082, but that would be octal.
  * Version 1.0 will be 100 here, etc.
@@ -107,6 +108,33 @@ extern "C" {
  */
 extern char png_libpng_ver[];
 
+/*
+ * Note about libpng version numbers:
+ *
+ *    Due to various miscommunications, unforeseen code incompatibilities
+ *    and occasional factors outside the authors' control, version numbering
+ *    on the library has not always been consistent and straightforward.
+ *    The following table summarizes matters since version 0.89c, which was
+ *    the first widely used release:
+ *
+ *      source                    png.h     shared-lib
+ *      version                   string    version
+ *      -------                   ------    ----------
+ *      0.89c ("1.0 beta 3")      0.89      1.0.89
+ *      0.90  ("1.0 beta 4")      0.90      0.90  [should have been 2.0.90]
+ *      0.95  ("1.0 beta 5")      0.95      0.95  [should have been 2.0.95]
+ *      0.96  ("1.0 beta 6")      0.96      0.96  [should have been 2.0.96]
+ *      0.97b ("1.00.97 beta 7")  1.00.97   1.0.0 [should have been 2.0.97]
+ *      0.97c                     0.97      2.0.97
+ *      0.98                      0.98      2.0.98
+ *      0.99                      0.99      2.0.99
+ *      1.0                       1.00      2.1.0
+ *
+ *    Henceforth the source version will match the shared-library minor
+ *    and patch numbers; the shared-library major version number will be
+ *    used for changes in backward compatibility, as it is intended.
+ */
+ 
 /* Structures to facilitate easy interlacing.  See png.c for more details */
 extern int FARDATA png_pass_start[];
 extern int FARDATA png_pass_inc[];

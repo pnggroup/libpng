@@ -167,21 +167,23 @@ version 0.96 [May, 1997]
    added read of CRC after IEND chunk for embedded PNGs (Laszlo Nyul)
    added typecasts to quiet compiler errors
    added more debugging info
-version 1.00 [not distributed, but Andreas handed off to G&G]
-   skipped version 1.00 to avoid potential problems with shared libraries
-   created with version 0.89
+version 0.97 [January, 1998]
    removed PNG_USE_OWN_CRC capability
    relocated png_set_crc_action from pngrutil.c to pngrtran.c
-   fixed typecasts of "new_key" etc.
+   fixed typecasts of "new_key", etc.
    added RFC 1152 date support
-version 1.00.97 [Dec 1997]
    fixed bug in gamma handling of 4-bit grayscale
    added more typecasts. 65536L becomes (png_uint_32)65536L, etc.
    minor corrections in libpng.txt
    added simple sRGB support
-   make it simpler to do conditional compiling
+   make it simpler to do conditional compiling: PNG_READ_NOT_FULLY_SUPPORTED
    fixed memory leak in pngwrite.c (free info_ptr->text)
    added more conditions for png_do_background, to avoid changing
       black pixels to background when a background is supplied and
       no pixels are transparent
-   include stdio.h in pngconf.h even when PNG_NO_STDIO is defined.
+   repaired PNG_NO_STDIO behaviour
+   tested NODIV support and made it default behaviour
+   added "-m" option to pngtest
+   [anything else?  2-bit grayscale gamma bug?]
+   regularized version numbering scheme and bumped shared-library major
+      version number to 2 to avoid potential problems with libpng 0.89 apps

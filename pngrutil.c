@@ -1,11 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.00.97
+ * libpng 0.97
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * May 28, 1997
+ * Copyright (c) 1998, Glenn Randers-Pehrson
+ * January 7, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -373,7 +374,12 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else if (png_ptr->mode & PNG_HAVE_PLTE)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place gAMA chunk");
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_gAMA)
+
+   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_gAMA
+#if defined(PNG_READ_sRGB_SUPPORTED)
+      && !(info_ptr->valid & PNG_INFO_sRGB)
+#endif
+      )
    {
       png_warning(png_ptr, "Duplicate gAMA chunk");
       png_crc_finish(png_ptr, length);
@@ -397,21 +403,14 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
-   if ((png_ptr->mode & PNG_HAVE_sRGB))
-      if(igamma != (png_uint_32)50000L)
+   if (info_ptr->valid & PNG_INFO_sRGB)
+      if(igamma != (png_uint_32)45000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-         return;
-      }
-#endif /* PNG_READ_sRGB_SUPPORTED */
-
-#if defined(PNG_READ_sRGB_SUPPORTED)
-   if (png_ptr->mode & PNG_HAVE_sRGB)
-      if(igamma != (png_uint_32)50000L)
-      {
-         png_warning(png_ptr,
-           "Ignoring incorrect gAMA value when sRGB is also present");
+#ifndef PNG_NO_STDIO
+         fprintf(stderr, "igamma = %lu\n", igamma);
+#endif
          return;
       }
 #endif /* PNG_READ_sRGB_SUPPORTED */
@@ -506,8 +505,12 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else if (png_ptr->mode & PNG_HAVE_PLTE)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Missing PLTE before cHRM");
+
    else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_cHRM
-      && !(info_ptr->valid & PNG_INFO_sRGB))
+#if defined(PNG_READ_sRGB_SUPPORTED)
+      && !(info_ptr->valid & PNG_INFO_sRGB)
+#endif
+      )
    {
       png_warning(png_ptr, "Duplicate cHRM chunk");
       png_crc_finish(png_ptr, length);
@@ -589,7 +592,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
-   if (png_ptr->mode & PNG_HAVE_sRGB)
+   if (info_ptr->valid & PNG_INFO_sRGB)
       {
       if (fabs(white_x - (float).3127) > (float).001 ||
           fabs(white_y - (float).3290) > (float).001 ||
@@ -598,10 +601,17 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           fabs(green_x - (float).3000) > (float).001 ||
           fabs(green_y - (float).6000) > (float).001 ||
           fabs( blue_x - (float).1500) > (float).001 ||
-          fabs( blue_y - (float).6000) > (float).001)
+          fabs( blue_y - (float).0600) > (float).001)
          {
+
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
+#ifndef PNG_NO_STDIO
+            fprintf(stderr,"wx=%f, wy=%f, rx=%f, ry=%f\n",
+               white_x, white_y, red_x, red_y);
+            fprintf(stderr,"gx=%f, gy=%f, bx=%f, by=%f\n",
+               green_x, green_y, blue_x, blue_y);
+#endif
          }
          return;
       }
@@ -618,8 +628,6 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_byte intent;
    png_byte buf[1];
-   float file_gamma;
-   float white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
 
    png_debug(1, "in png_handle_sRGB\n");
 
@@ -634,6 +642,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else if (png_ptr->mode & PNG_HAVE_PLTE)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place sRGB chunk");
+
    else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sRGB)
    {
       png_warning(png_ptr, "Duplicate sRGB chunk");
@@ -660,28 +669,38 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   /* if we really want to be paranoid we could check for
-      already defined gamma and chrm with values that are
-      inconsistent with sRGB -- for now, just ignore them */
-
-   file_gamma = (float)45000./(float)100000.;
-   png_set_gAMA(png_ptr, info_ptr, file_gamma);
-
-   white_x = (float)31270./(float)100000.;
-   white_y = (float)32900./(float)100000.;
-   red_x   = (float)64000./(float)100000.;
-   red_y   = (float)33000./(float)100000.;
-   green_x = (float)30000./(float)100000.;
-   green_y = (float)60000./(float)100000.;
-   blue_x  = (float)15000./(float)100000.;
-   blue_y  = (float) 6000./(float)100000.;
-
-   png_set_cHRM(png_ptr, info_ptr,
-      white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
-
-   png_set_sRGB(png_ptr, info_ptr, intent);
-}
+#ifdef PNG_READ_gAMA_SUPPORTED
+   if ((info_ptr->valid & PNG_INFO_gAMA))
+      if((png_uint_32)(png_ptr->gamma*(float)100000.+.5) != (png_uint_32)45000L)
+      {
+         png_warning(png_ptr,
+           "Ignoring incorrect gAMA value when sRGB is also present");
+#ifndef PNG_NO_STDIO
+           fprintf(stderr,"gamma=%f\n",png_ptr->gamma);
 #endif
+      }
+#endif /* PNG_READ_gAMA_SUPPORTED */
+
+#ifdef PNG_READ_cHRM_SUPPORTED
+   if (info_ptr->valid & PNG_INFO_cHRM)
+      if (fabs(info_ptr->x_white - (float).3127) > (float).001 ||
+          fabs(info_ptr->y_white - (float).3290) > (float).001 ||
+          fabs(  info_ptr->x_red - (float).6400) > (float).001 ||
+          fabs(  info_ptr->y_red - (float).3300) > (float).001 ||
+          fabs(info_ptr->x_green - (float).3000) > (float).001 ||
+          fabs(info_ptr->y_green - (float).6000) > (float).001 ||
+          fabs( info_ptr->x_blue - (float).1500) > (float).001 ||
+          fabs( info_ptr->y_blue - (float).0600) > (float).001)
+         {
+            png_warning(png_ptr,
+              "Ignoring incorrect cHRM value when sRGB is also present");
+         }
+#endif /* PNG_READ_cHRM_SUPPORTED */
+
+   png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr, intent);
+}
+#endif /* PNG_READ_sRGB_SUPPORTED */
+
 #if defined(PNG_READ_tRNS_SUPPORTED)
 void
 png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)

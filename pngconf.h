@@ -1,11 +1,12 @@
 
 /* pngconf.c - machine configurable file for libpng
  *
- * libpng 1.00.97
+ * libpng 0.97
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * May 28, 1997
+ * Copyright (c) 1998, Glenn Randers-Pehrson
+ * January 7, 1998
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -259,6 +260,7 @@ __dont__ include it again
 #define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #define PNG_READ_SWAP_ALPHA_SUPPORTED
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
+#define PNG_READ_COMPOSITE_NODIV_SUPPORTED        /* well tested on Intel */
 #endif /* PNG_READ_FULLY_SUPPORTED */
 #define PNG_READ_INTERLACING_SUPPORTED
 
@@ -274,7 +276,7 @@ __dont__ include it again
 #define PNG_WRITE_FLUSH_SUPPORTED
 #define PNG_WRITE_SWAP_ALPHA_SUPPORTED
 #define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-#endif /*PNG_WRITE_FULLY_SUPPORTED */
+#endif /* PNG_WRITE_FULLY_SUPPORTED */
 
 #if !defined(PNG_NO_STDIO)
 #define PNG_TIME_RFC1152_SUPPORTED
@@ -282,7 +284,6 @@ __dont__ include it again
 
 /* These are currently experimental features */
 #undef PNG_READ_16_TO_8_ACCURATE_SHIFT_SUPPORTED /* very little testing */
-#undef PNG_READ_COMPOSITE_NODIV_SUPPORTED        /* very little testing */
 
 /* This is only for PowerPC big-endian and 680x0 systems */
 #undef PNG_READ_BIG_ENDIAN_SUPPORTED             /* some testing */

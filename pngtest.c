@@ -1,11 +1,12 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.00.97
+ * libpng 0.97
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * May 28, 1997
+ * Copyright (c) 1998, Glenn Randers-Pehrson
+ * January 7, 1998
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -620,7 +621,10 @@ main(int argc, char *argv[])
    {
       int i;
       for (i=2; i<argc; ++i)
+         {
+         fprintf(STDERR, "Testing %s:\n",argv[i]);
          ierror += test(argv[i], outname);
+         }
    }
    else
    {

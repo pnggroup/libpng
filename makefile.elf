@@ -1,5 +1,6 @@
-# makefile for libpng on (linux) ELF
+# makefile for libpng on Linux ELF with gcc
 # Copyright (C) 1996, 1997 Andreas Dilger
+# Copyright (C) 1998 Glenn Randers-Pehrson
 # For conditions of distribution and use, see copyright notice in png.h
 
 CC=gcc
@@ -13,14 +14,15 @@ ZLIBINC=../zlib
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
          -Wmissing-declarations -Wtraditional -Wcast-align \
          -Wstrict-prototypes -Wmissing-prototypes #-Wconversion
-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops -malign-loops=2 -malign-functions=2 -fPIC #$(WARNMORE) -g -DPNG_DEBUG=5
+CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops -malign-loops=2 \
+       -malign-functions=2 #$(WARNMORE) -g -DPNG_DEBUG=5
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
 
-PNGMAJ = 1
-PNGMIN = 1.0
+PNGMAJ = 2
+PNGMIN = 0.97
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # where make install puts libpng.a, libpng.so*, and png.h
@@ -32,10 +34,17 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
        pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
        pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.so pngtest
+OBJSDLL = $(OBJS:.o=.pic.o)
+
+.SUFFIXES:      .c .o .pic.o
+
+.c.pic.o:
+	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
+
+all: libpng.a libpng.so pngtest
 
 libpng.a: $(OBJS)
-	ar rc $@  $(OBJS)
+	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.so: libpng.so.$(PNGMAJ)
@@ -44,43 +53,45 @@ libpng.so: libpng.so.$(PNGMAJ)
 libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
 	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
 
-libpng.so.$(PNGVER): $(OBJS)
-	gcc -shared -Wl,-soname,libpng.so.$(PNGMAJ) $(OBJS) -o libpng.so.$(PNGVER)
+libpng.so.$(PNGVER): $(OBJSDLL)
+	gcc -shared -Wl,-soname,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
+	 $(OBJSDLL)
 
 pngtest: pngtest.o libpng.so
-	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
-install: libpng.so.$(PNGVER)
+install: libpng.a libpng.so.$(PNGVER)
 	-@mkdir $(INCPATH) $(LIBPATH)
 	cp png.h pngconf.h $(INCPATH)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.so.$(PNGVER) $(LIBPATH)
+	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
-	-@/bin/rm $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
+	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
 	(cd $(LIBPATH); ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
 	 ln -sf libpng.so.$(PNGMAJ) libpng.so)
 
 clean:
-	rm -f *.o libpng.a libpng.so* pngtest pngout.png
+	/bin/rm -f *.o libpng.a libpng.so* pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o: png.h pngconf.h
-pngerror.o: png.h pngconf.h
-pngrio.o: png.h pngconf.h
-pngwio.o: png.h pngconf.h
-pngmem.o: png.h pngconf.h
-pngset.o: png.h pngconf.h
-pngget.o: png.h pngconf.h
-pngread.o: png.h pngconf.h
-pngrtran.o: png.h pngconf.h
-pngrutil.o: png.h pngconf.h
+png.o png.pic.o: png.h pngconf.h
+pngerror.o pngerror.pic.o: png.h pngconf.h
+pngrio.o pngrio.pic.o: png.h pngconf.h
+pngwio.o pngwio.pic.o: png.h pngconf.h
+pngmem.o pngmem.pic.o: png.h pngconf.h
+pngset.o pngset.pic.o: png.h pngconf.h
+pngget.o pngget.pic.o: png.h pngconf.h
+pngread.o pngread.pic.o: png.h pngconf.h
+pngrtran.o pngrtran.pic.o: png.h pngconf.h
+pngrutil.o pngrutil.pic.o: png.h pngconf.h
+pngtrans.o pngtrans.pic.o: png.h pngconf.h
+pngwrite.o pngwrite.pic.o: png.h pngconf.h
+pngwtran.o pngwtran.pic.o: png.h pngconf.h
+pngwutil.o pngwutil.pic.o: png.h pngconf.h
+pngpread.o pngpread.pic.o: png.h pngconf.h
+
 pngtest.o: png.h pngconf.h
-pngtrans.o: png.h pngconf.h
-pngwrite.o: png.h pngconf.h
-pngwtran.o: png.h pngconf.h
-pngwutil.o: png.h pngconf.h
-pngpread.o: png.h pngconf.h
