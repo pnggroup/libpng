@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.7beta11 - May 6, 2000
+ * libpng 1.0.7beta12 - May 12, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -240,6 +240,9 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    }
 
    info_ptr->valid |= PNG_INFO_pCAL;
+#ifdef PNG_FREE_ME_SUPPORTED
+   info_ptr->free_me |= PNG_FREE_PCAL;
+#endif
 }
 #endif
 
@@ -284,6 +287,9 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    png_memcpy(info_ptr->scal_s_height, sheight, (png_size_t)length);
 
    info_ptr->valid |= PNG_INFO_sCAL;
+#ifdef PNG_FREE_ME_SUPPORTED
+   info_ptr->free_me |= PNG_FREE_SCAL;
+#endif
 }
 #endif
 #endif
@@ -488,6 +494,9 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          info_ptr->num_text = 0;
          info_ptr->text = (png_textp)png_malloc(png_ptr,
             (png_uint_32)(info_ptr->max_text * sizeof (png_text)));
+#ifdef PNG_FREE_ME_SUPPORTED
+         info_ptr->free_me |= PNG_FREE_TEXT;
+#endif
       }
       png_debug1(3, "allocated %d entries for info_ptr->text\n",
          info_ptr->max_text);
@@ -495,9 +504,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
    for (i = 0; i < num_text; i++)
    {
       png_size_t text_length,key_len;
-#ifdef PNG_iTXt_SUPPORTED
       png_size_t lang_len,lang_key_len;
-#endif
       png_textp textp = &(info_ptr->text[info_ptr->num_text]);
 
       if (text_ptr[i].key == (png_charp)NULL)
@@ -505,7 +512,12 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
       key_len = png_strlen(text_ptr[i].key);
 
-      if(text_ptr[i].compression > 0)
+      if(text_ptr[i].compression <= 0)
+      {
+        lang_len = 0;
+        lang_key_len = 0;
+      }
+      else
 #ifdef PNG_iTXt_SUPPORTED
       {
         /* set iTXt data */
@@ -517,11 +529,6 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
           lang_key_len = png_strlen(text_ptr[i].lang_key);
         else
           lang_key_len = 0;
-      }
-      else
-      {
-        lang_len = 0;
-        lang_key_len = 0;
       }
 #else
       {
@@ -547,17 +554,9 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       }
 
       textp->key = (png_charp)png_malloc(png_ptr,
-         (png_uint_32)(key_len +
-#ifdef PNG_iTXt_SUPPORTED
-            lang_len + lang_key_len +
-#endif
-            text_length + 4));
+         (png_uint_32)(key_len + text_length + lang_len + lang_key_len + 4));
       png_debug2(2, "Allocated %d bytes at %x in png_set_text\n",
-         key_len + 
-#ifdef PNG_iTXt_SUPPORTED
-         lang_len + lang_key_len +
-#endif
-         text_length + 4, textp->key);
+         key_len + lang_len + lang_key_len + text_length + 4, textp->key);
 
       png_memcpy(textp->key, text_ptr[i].key,
          (png_size_t)(key_len));
@@ -603,9 +602,6 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       }
       info_ptr->text[info_ptr->num_text]= *textp;
       info_ptr->num_text++;
-#ifdef PNG_FREE_ME_SUPPORTED
-      info_ptr->free_me |= PNG_FREE_TEXT;
-#endif
       png_debug1(3, "transferred text chunk %d\n", info_ptr->num_text);
    }
 }

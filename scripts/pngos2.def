@@ -2,6 +2,8 @@
 ; PNGLIB module definition file for OS/2
 ;----------------------------------------
 
+; Caution: This file is probably out of date.
+
 LIBRARY		PNG
 DESCRIPTION	"PNG image compression library for OS/2"
 CODE		PRELOAD MOVEABLE DISCARDABLE

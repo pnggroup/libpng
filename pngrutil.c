@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.7beta11 - May 6, 2000
+ * libpng 1.0.7beta12 - May 12, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -2043,9 +2043,9 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    you want all pixels to be combined, pass 0xff (255) in mask.  */
 void /* PRIVATE */
 #ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
-png_combine_row_c /* PRIVATE */
+png_combine_row_c
 #else
-png_combine_row /* PRIVATE */
+png_combine_row
 #endif /* PNG_HAVE_ASSEMBLER_COMBINE_ROW */
    (png_structp png_ptr, png_bytep row, int mask)
 {

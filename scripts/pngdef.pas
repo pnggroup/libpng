@@ -1,9 +1,11 @@
 unit pngdef;
 
+// Caution: this file is probably out of date.
+
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.7beta11';
+  PNG_LIBPNG_VER_STRING = '1.0.7beta12';
   PNG_LIBPNG_VER        =  10007;
 
 type

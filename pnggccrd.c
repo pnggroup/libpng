@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.7beta11 - May 6, 2000
+ * libpng 1.0.7beta12 - May 12, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -230,7 +230,7 @@ png_read_filter_row_c(png_structp png_ptr, png_row_infop row_info,
 /* Use this routine for the x86 platform - it uses a faster MMX routine
    if the machine supports MMX. */
 
-void PNGAPI
+void /* PRIVATE */
 png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1,"in png_combine_row_asm\n");
@@ -4310,7 +4310,7 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
 
 // Optimized png_read_filter_row routines
 
-void PNGAPI
+void /* PRIVATE */
 png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    row, png_bytep prev_row, int filter)
 {

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.7beta11 - May 6, 2000
+ * libpng 1.0.7beta12 - May 12, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1245,8 +1245,7 @@ png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
 void PNGAPI
 png_write_png(png_structp png_ptr, png_infop info_ptr,
-                           int transforms,
-                           voidp params)
+              int transforms, voidp params)
 {
 #if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
    /* invert the alpha channel from opacity to transparency */

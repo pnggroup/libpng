@@ -1,10 +1,14 @@
-.TH LIBPNG 3 "May 6, 2000"
+.TH LIBPNG 3 "May 12, 2000"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.0.7beta11
+libpng \- Portable Network Graphics (PNG) Reference Library 1.0.7beta12
 .SH SYNOPSIS
 \fI\fB
 
 \fB#include <png.h>\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_access_version_number \fI(void\fP\fB);\fP
 
 \fI\fB
 
@@ -739,7 +743,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.7beta11 - May 6, 2000
+ libpng version 1.0.7beta12 - May 12, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -1291,7 +1295,7 @@ into the info_ptr is returned for any complex types.
     text_ptr[i].key   - keyword for comment.  Must contain
                          1-79 characters.
     text_ptr[i].text  - text comments for current
-                         keyword.  Can empty.
+                         keyword.  Can be empty.
     text_ptr[i].text_length - length of text string,
                  after decompression, 0 for iTXt
     text_ptr[i].itxt_length - length of itxt string,
@@ -1921,15 +1925,17 @@ It is also possible to individually free the info_ptr members that
 point to libpng-allocated storage with the following functions:
 
     png_free_data(png_ptr, info_ptr, mask, n)
-    mask         - identifies data to be freed, a mask
-                   containing the logical OR of one or more of
-                   PNG_FREE_PLTE, PNG_FREE_TRNS,
-                   PNG_FREE_HIST, PNG_FREE_ICCP,
-                   PNG_FREE_SPLT, PNG_FREE_ROWS,
-                   PNG_FREE_TEXT, PNG_FREE_UNKN,
-                   or simply PNG_FREE_ALL
-    n            - sequence number of item to be freed
-                   (-1 for all items)
+    mask - identifies data to be freed, a mask
+           containing the logical OR of one or
+           more of
+             PNG_FREE_PLTE, PNG_FREE_TRNS,
+             PNG_FREE_HIST, PNG_FREE_ICCP,
+             PNG_FREE_PCAL, PNG_FREE_ROWS,
+             PNG_FREE_SCAL, PNG_FREE_SPLT,
+             PNG_FREE_TEXT, PNG_FREE_UNKN,
+           or simply PNG_FREE_ALL
+    n    - sequence number of item to be freed
+           (-1 for all items)
 
 These functions may be safely called when the relevant storage has
 already been freed, or has not yet been allocated, or was allocated
@@ -1945,12 +1951,12 @@ or so that it will free data that was allocated by the user with png_malloc()
 or png_zalloc() and passed in via a png_set_*() function, with
 
     png_data_freer(png_ptr, info_ptr, freer, mask)
-    mask     - which data elements are affected
-               same choices as in png_free_data()
-    freer    - one of
-                 PNG_DESTROY_WILL_FREE_DATA
-                 PNG_SET_WILL_FREE_DATA
-                 PNG_USER_WILL_FREE_DATA
+    mask   - which data elements are affected
+             same choices as in png_free_data()
+    freer  - one of
+               PNG_DESTROY_WILL_FREE_DATA
+               PNG_SET_WILL_FREE_DATA
+               PNG_USER_WILL_FREE_DATA
 
 This function only affects data that has already been allocated.
 You can call this function after reading the PNG data but before calling
@@ -1959,12 +1965,22 @@ function is responsible for freeing any existing data that might be present,
 and again after the png_set_*() functions to control whether the user
 or png_destroy_*() is supposed to free the data.  When the user assumes
 responsibility for libpng-allocated data, the application must use
-png_free() to free it.
+png_free() to free it, and when the user transfers responsibility to libpng
+for data that the user has allocated, the user must have used png_malloc()
+or png_zalloc() to allocate it (the png_zalloc() function is the same
+as png_malloc() except that it also zeroes the newly-allocated memory).
 
 If you allocated your row_pointers in a single block, as suggested above in
 the description of the high level read interface, you must not transfer
 responsibility for freeing it to the png_set_rows or png_read_destroy function,
 because they would also try to free the individual row_pointers[i].
+
+If you allocated text_ptr.text, text_ptr.lang, and text_ptr.translated_keyword
+separately, do not transfer responsibility for freeing text_ptr to libpng,
+because when libpng fills a png_text structure it combines these members with
+the key member, and png_free_data() will free only text_ptr.key.  Similarly,
+if you transfer responsibility for free'ing text_ptr from libpng to your
+application, your application must not separately free those members.
 
 For a more compact example of reading a PNG image, see the file example.c.
 
@@ -2606,7 +2622,8 @@ transformations are permitted, enabled by the following masks.
     PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
     PNG_TRANSFORM_STRIP_FILLER  Strip out filler bytes.
 
-If you have valid image data in the info structure, simply do this:
+If you have valid image data in the info structure (you can use
+png_set_rows() to put image data in the info structure), simply do this:
 
     png_write_png(png_ptr, info_ptr, png_transforms, NULL)
 
@@ -2866,15 +2883,17 @@ It is also possible to individually free the info_ptr members that
 point to libpng-allocated storage with the following functions:
 
     png_free_data(png_ptr, info_ptr, mask, n)
-    mask         - identifies data to be freed, a mask
-                   containing the logical OR of one or more of
-                   PNG_FREE_PLTE, PNG_FREE_TRNS,
-                   PNG_FREE_HIST, PNG_FREE_ICCP,
-                   PNG_FREE_SPLT, PNG_FREE_ROWS,
-                   PNG_FREE_TEXT, PNG_FREE_UNKN,
-                   or simply PNG_FREE_ALL
-    n            - sequence number of item to be freed
-                   (-1 for all items)
+    mask  - identifies data to be freed, a mask
+            containing the logical OR of one or
+            more of
+              PNG_FREE_PLTE, PNG_FREE_TRNS,
+              PNG_FREE_HIST, PNG_FREE_ICCP,
+              PNG_FREE_PCAL, PNG_FREE_ROWS,
+              PNG_FREE_SCAL, PNG_FREE_SPLT,
+              PNG_FREE_TEXT, PNG_FREE_UNKN,
+            or simply PNG_FREE_ALL
+    n     - sequence number of item to be freed
+            (-1 for all items)
 
 These functions may be safely called when the relevant storage has
 already been freed, or has not yet been allocated, or was allocated
@@ -2894,12 +2913,12 @@ or so that it will free data that was allocated by the user with png_malloc()
 or png_zalloc() and passed in via a png_set_*() function, with
 
     png_data_freer(png_ptr, info_ptr, freer, mask)
-    mask     - which data elements are affected
-               same choices as in png_free_data()
-    freer    - one of
-                 PNG_DESTROY_WILL_FREE_DATA
-                 PNG_SET_WILL_FREE_DATA
-                 PNG_USER_WILL_FREE_DATA
+    mask   - which data elements are affected
+             same choices as in png_free_data()
+    freer  - one of
+               PNG_DESTROY_WILL_FREE_DATA
+               PNG_SET_WILL_FREE_DATA
+               PNG_USER_WILL_FREE_DATA
 
 For example, to transfer responsibility for some data from a read structure
 to a write structure, you could use
@@ -2921,8 +2940,17 @@ This function only affects data that has already been allocated.
 You can call this function before calling after the png_set_*() functions
 to control whether the user or png_destroy_*() is supposed to free the data.
 When the user assumes responsibility for libpng-allocated data, the
-application must use png_free() to free it.
+application must use
+png_free() to free it, and when the user transfers responsibility to libpng
+for data that the user has allocated, the user must have used png_malloc()
+or png_zalloc() to allocate it.
 
+If you allocated text_ptr.text, text_ptr.lang, and text_ptr.translated_keyword
+separately, do not transfer responsibility for freeing text_ptr to libpng,
+because when libpng fills a png_text structure it combines these members with
+the key member, and png_free_data() will free only text_ptr.key.  Similarly,
+if you transfer responsibility for free'ing text_ptr from libpng to your
+application, your application must not separately free those members.
 For a more compact example of writing a PNG image, see the file example.c.
 
 .SH V. Modifying/Customizing libpng:
@@ -3312,15 +3340,29 @@ png_set_error_fn(), which is essentially the same function, but with a new
 name to force compilation errors with applications that try to use the old
 method.
 
+Starting with version 1.0.7, you can find out which version of the library
+you are using at run-time:
+
+   png_uint_32 libpng_vn = png_access_version_number();
+
+The number libpng_vn is constructed from the major version, minor
+version with leading zero, and release number with leading zero,
+(e.g., libpng_vn for version 1.0.7 is 10007).
+
+You can also check which version of png.h you used when compiling your
+application:
+
+   png_uint_32 application_vn = PNG_LIBPNG_VER;
+
 .SH VII. Y2K Compliance in libpng
 
-May 6, 2000
+May 12, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.7beta11 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.7beta12 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3461,7 +3503,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.0.7beta11 - May 6, 2000:
+Libpng version 1.0.7beta12 - May 12, 2000:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (randeg@alum.rpi.edu).
 
@@ -3476,7 +3518,7 @@ Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
 Copyright (c) 1996, 1997 Andreas Dilger
 (libpng versions 0.89c, May 1996, through 0.96, May 1997)
 Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
-(libpng versions 0.97, January 1998, through 1.0.7beta11, May 6, 2000)
+(libpng versions 0.97, January 1998, through 1.0.7beta12, May 12, 2000)
 
 For the purposes of this copyright and license, "Contributing Authors"
 is defined as the following set of individuals:

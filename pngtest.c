@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.7beta11 - May 6, 2000
+ * libpng 1.0.7beta12 - May 12, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1152,9 +1152,11 @@ main(int argc, char *argv[])
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
    fprintf(STDERR,"%s",png_get_copyright(NULL));
    /* Show the version of libpng used in building the library */
-   fprintf(STDERR," library:%s",png_get_header_version(NULL));
+   fprintf(STDERR," library (%lu):%s", png_access_version_number(),
+      png_get_header_version(NULL));
    /* Show the version of libpng used in building the application */
-   fprintf(STDERR," pngtest:%s",PNG_HEADER_VERSION_STRING);
+   fprintf(STDERR," pngtest (%lu):%s", PNG_LIBPNG_VER,
+      PNG_HEADER_VERSION_STRING);
    fprintf(STDERR," sizeof(png_struct)=%d, sizeof(png_info)=%d\n",
                     sizeof(png_struct), sizeof(png_info));
 
@@ -1378,4 +1380,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7beta11 your_png_h_is_not_version_1_0_7beta11;
+typedef version_1_0_7beta12 your_png_h_is_not_version_1_0_7beta12;

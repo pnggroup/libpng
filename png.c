@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.7beta11 - May 6, 2000
+ * libpng version 1.0.7beta12 - May 12, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -14,14 +14,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7beta11 Your_png_h_is_not_version_1_0_7beta11;
+typedef version_1_0_7beta12 Your_png_h_is_not_version_1_0_7beta12;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.7beta11";
+char png_libpng_ver[12] = "1.0.7beta12";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -290,6 +290,8 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask, int num
 /* free text item num or (if num == -1) all text items */
 #ifdef PNG_FREE_ME_SUPPORTED
 if (mask & info_ptr->free_me & PNG_FREE_TEXT)
+#else
+if (mask & PNG_FREE_TEXT)
 #endif
 {
    if (num != -1)
@@ -314,15 +316,14 @@ if (mask & info_ptr->free_me & PNG_FREE_TEXT)
 
 #if defined(PNG_tRNS_SUPPORTED)
 /* free any tRNS entry */
-if (mask & PNG_FREE_TRNS)
+#ifdef PNG_FREE_ME_SUPPORTED
+if (mask & PNG_FREE_TRNS & info_ptr->free_me)
+#else
+if ((mask & PNG_FREE_TRNS) && (png_ptr->flags & PNG_FLAG_FREE_TRNS))
+#endif
 {
    if (info_ptr->valid & PNG_INFO_tRNS)
    {
-#ifdef PNG_FREE_ME_SUPPORTED
-       if (info_ptr->free_me & PNG_FREE_TRNS)
-#else
-       if (png_ptr->flags & PNG_FLAG_FREE_TRNS)
-#endif
          png_free(png_ptr, info_ptr->trans);
        info_ptr->valid &= ~PNG_INFO_tRNS;
    }
@@ -331,6 +332,11 @@ if (mask & PNG_FREE_TRNS)
 
 #if defined(PNG_sCAL_SUPPORTED)
 /* free any sCAL entry */
+#ifdef PNG_FREE_ME_SUPPORTED
+if (mask & PNG_FREE_SCAL & info_ptr->free_me)
+#else
+if (mask & PNG_FREE_SCAL)
+#endif
 {
    if (info_ptr->valid & PNG_INFO_sCAL)
    {
@@ -345,6 +351,11 @@ if (mask & PNG_FREE_TRNS)
 
 #if defined(PNG_pCAL_SUPPORTED)
 /* free any pCAL entry */
+#ifdef PNG_FREE_ME_SUPPORTED
+if (mask & PNG_FREE_PCAL & info_ptr->free_me)
+#else
+if (mask & PNG_FREE_PCAL)
+#endif
 {
    if (info_ptr->valid & PNG_INFO_pCAL)
    {
@@ -366,17 +377,16 @@ if (mask & PNG_FREE_TRNS)
 
 #if defined(PNG_iCCP_SUPPORTED)
 /* free any iCCP entry */
+#ifdef PNG_FREE_ME_SUPPORTED
+if (mask & PNG_FREE_ICCP & info_ptr->free_me)
+#else
 if (mask & PNG_FREE_ICCP)
+#endif
 {
    if (info_ptr->valid & PNG_INFO_iCCP)
    {
-#ifdef PNG_FREE_ME_SUPPORTED
-       if (info_ptr->free_me & PNG_FREE_ICCP)
-#endif
-       {
-         png_free(png_ptr, info_ptr->iccp_name);
-         png_free(png_ptr, info_ptr->iccp_profile);
-       }
+       png_free(png_ptr, info_ptr->iccp_name);
+       png_free(png_ptr, info_ptr->iccp_profile);
        info_ptr->valid &= ~PNG_INFO_iCCP;
    }
 }
@@ -384,7 +394,11 @@ if (mask & PNG_FREE_ICCP)
 
 #if defined(PNG_sPLT_SUPPORTED)
 /* free a given sPLT entry, or (if num == -1) all sPLT entries */
+#ifdef PNG_FREE_ME_SUPPORTED
+if (mask & PNG_FREE_SPLT & info_ptr->free_me)
+#else
 if (mask & PNG_FREE_SPLT)
+#endif
 {
    if (num != -1)
    {
@@ -408,7 +422,11 @@ if (mask & PNG_FREE_SPLT)
 #endif
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_FREE_ME_SUPPORTED
+if (mask & info_ptr->free_me & PNG_FREE_UNKN)
+#else
 if (mask & PNG_FREE_UNKN)
+#endif
 {
    if (num != -1)
    {
@@ -433,32 +451,30 @@ if (mask & PNG_FREE_UNKN)
 
 #if defined(PNG_hIST_SUPPORTED)
 /* free any hIST entry */
-if (mask & PNG_FREE_HIST)
+#ifdef PNG_FREE_ME_SUPPORTED
+if (mask & PNG_FREE_HIST  & info_ptr->free_me)
+#else
+if ((mask & PNG_FREE_HIST) && (png_ptr->flags & PNG_FLAG_FREE_HIST))
+#endif
 {
    if (info_ptr->valid & PNG_INFO_hIST)
    {
-#ifdef PNG_FREE_ME_SUPPORTED
-       if (info_ptr->free_me & PNG_FREE_HIST)
-#else
-       if (png_ptr->flags & PNG_FLAG_FREE_HIST)
-#endif
-         png_free(png_ptr, info_ptr->hist);
+       png_free(png_ptr, info_ptr->hist);
        info_ptr->valid &= ~PNG_INFO_hIST;
    }
 }
 #endif
 
 /* free any PLTE entry that was internally allocated */
-if (mask & PNG_FREE_PLTE)
+#ifdef PNG_FREE_ME_SUPPORTED
+if (mask & PNG_FREE_PLTE & info_ptr->free_me)
+#else
+if ((mask & PNG_FREE_PLTE) && (png_ptr->flags & PNG_FLAG_FREE_PLTE))
+#endif
 {
    if (info_ptr->valid & PNG_INFO_PLTE)
    {
-#ifdef PNG_FREE_ME_SUPPORTED
-       if (info_ptr->free_me & PNG_FREE_PLTE)
-#else
-       if (png_ptr->flags & PNG_FLAG_FREE_PLTE)
-#endif
-          png_zfree(png_ptr, info_ptr->palette);
+       png_zfree(png_ptr, info_ptr->palette);
        info_ptr->valid &= ~(PNG_INFO_PLTE);
        info_ptr->num_palette = 0;
    }
@@ -466,18 +482,20 @@ if (mask & PNG_FREE_PLTE)
 
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
 /* free any image bits attached to the info structure */
-if (mask & PNG_FREE_ROWS)
-{
 #ifdef PNG_FREE_ME_SUPPORTED
-   if (info_ptr->free_me & PNG_FREE_ROWS)
+if (mask & info_ptr->free_me & PNG_FREE_ROWS)
+#else
+if (mask & PNG_FREE_ROWS)
 #endif
-   {
+{
+    if(info_ptr->row_pointers)
+    {
        int row;
-
        for (row = 0; row < (int)info_ptr->height; row++)
           png_free(png_ptr, info_ptr->row_pointers[row]);
        png_free(png_ptr, info_ptr->row_pointers);
-   }
+       info_ptr->row_pointers=NULL;
+    }
 }
 #endif
 #ifdef PNG_FREE_ME_SUPPORTED
@@ -583,7 +601,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.7beta11 - May 6, 2000\n\
+   return ("\n libpng version 1.0.7beta12 - May 12, 2000\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson\n");
@@ -601,8 +619,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.7beta11");
-   return("1.0.7beta11");
+      return("1.0.7beta12");
+   return("1.0.7beta12");
 }
 
 png_charp PNGAPI
@@ -645,4 +663,11 @@ int PNGAPI
 png_reset_zstream(png_structp png_ptr)
 {
    return (inflateReset(&png_ptr->zstream));
+}
+
+png_uint_32 PNGAPI
+png_access_version_number(void)
+{
+   /* Version of *.c files used when building libpng */
+   return((png_uint_32) 10007L);
 }

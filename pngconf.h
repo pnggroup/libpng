@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.7beta11 - May 6, 2000
+ * libpng 1.0.7beta12 - May 12, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -57,6 +57,14 @@
  * #define PNG_NO_CONSOLE_IO
  * #define PNG_NO_STDIO
  */
+
+#ifdef PNG_BUILD_DLL
+#  ifndef PNG_CONSOLE_IO_SUPPORTED
+#    ifndef PNG_NO_CONSOLE_IO
+#      define PNG_NO_CONSOLE_IO
+#    endif
+#  endif
+#endif
 
 #  ifdef PNG_NO_STDIO
 #    ifndef PNG_NO_CONSOLE_IO
@@ -987,34 +995,9 @@ typedef z_stream FAR *  png_zstreamp;
 #  define PNG_ATTR_DLLIMP
 #endif
 
-#ifndef PNG_EXPORT
-#  define PNG_EXPORT(type,symbol) type symbol
-#endif
-
-#if defined(__MINGW32__) || defined(__CYGWIN32__)
-#  define PNG_ATTR_DLLIMP
-#endif
-
 #ifdef PNG_USE_GLOBAL_ARRAYS
 #ifndef PNG_EXPORT_VAR
-#  if defined(_MSC_VER) && defined(_DLL)   /* GRR 20000206 */
-#    define PNG_EXPORT_VAR(type) extern type __declspec(dllexport)
-#  endif
-#  ifdef PNG_DECL_DLLEXP
-#    define PNG_EXPORT_VAR(type) extern __declspec(dllexport) type
-#  endif
-#  ifdef PNG_ATTR_DLLEXP
-#    define PNG_EXPORT_VAR(type) extern type __attribute__((dllexport))
-#  endif
-#  ifdef PNG_DECL_DLLIMP
-#    define PNG_EXPORT_VAR(type) extern __declspec(dllimport) type
-#  endif
-#  ifdef PNG_ATTR_DLLIMP
-#    define PNG_EXPORT_VAR(type) extern type __attribute__((dllimport))
-#  endif
-#endif
-#ifndef PNG_EXPORT_VAR
-#    define PNG_EXPORT_VAR(type) extern type
+#  define PNG_EXPORT_VAR(type) extern type
 #endif
 #endif
 

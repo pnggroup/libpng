@@ -729,14 +729,22 @@ version 1.0.6j [May 3, 2000]
   Overloaded png_read_init() and png_write_init() with macros that convert
     calls to png_read_init_2() or png_write_init_2() that check the version
     and structure sizes.
-version 1.0.7beta11 [May 6, 2000]
+version 1.0.7beta11 [May 7, 2000]
   Removed the new PNG_CREATED_READ_STRUCT and PNG_CREATED_WRITE_STRUCT modes
     which are no longer used.
   Eliminated the three new members of png_text when PNG_NO_iTXt_SUPPORTED
     or PNG_LEGACY_SUPPORTED is defined.
-  In png_set_text, check if old application had allocated the png_text structure;
-    if so, only allow one text chunk to be processed to avoid memory overrun.
+  Made PNG_NO_ITXT_SUPPORTED the default setting, to avoid memory overrun
+    when old applications fill the info_ptr->text structure directly.
   Added PNGAPI macro, and added it to the definitions of all exported functions.
+version 1.0.7beta12 [May 12, 2000]
+  Revised pngset.c to avoid a problem with expanding the png_debug macro.
+  Deleted some extraneous defines from pngconf.h
+  Made PNG_NO_CONSOLE_IO the default condition when PNG_BUILD_DLL is defined.
+  Use MSC _RPTn debugging instead of fprintf if _MSC_VER is defined.
+  Added png_access_version_number() function.
+  Check for mask&PNG_FREE_CHNK (for TEXT, SCAL, PCAL) in png_free_data().
+  Expanded libpng.3/libpng.txt information about png_data_freer().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
