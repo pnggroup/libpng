@@ -1,4 +1,4 @@
-/* pngcrush.c - a simple program to recompress png files
+/* pngcrush.c - recompresses png files
  * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * This program reads in a PNG image, and writes it out again, with the
@@ -16,7 +16,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.5"
+#define PNGCRUSH_VERSION "1.4.6"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -57,6 +57,18 @@
  */
 
 /* Change log:
+ *
+ * Version 1.4.6 (built with libpng-1.0.8rc1)
+ *
+ *   Fixed bug in color-counting of noninterlaced images.
+ *
+ *   Added capability of processing multiple rows at a time (disabled by
+ *   default because it turns out to be no faster).
+ *
+ *   Replaced "return" statements in main() with "exit" statements.
+ *   Force exit instead of return with "-exit" argument.
+ *
+ *   Added the UCITA disclaimers to the help output.
  *
  * Version 1.4.5 (built with libpng-1.0.7rc2 and cexcept-1.0.0)
  *
@@ -257,13 +269,15 @@
 #endif
 
 #if PNGCRUSH_LIBPNG_VER != PNG_LIBPNG_VER
+int
 main()
 {
-  printf("Sorry, but version numbers in pngcrush.h and png.h must match\n");
+  printf("Version numbers in pngcrush.h and png.h do not match\n");
 }
 
 #else
 #if PNG_LIBPNG_VER < 96
+int
 main()
 {
   printf("Sorry, but pngcrush needs libpng version 0.96 or later\n");
@@ -388,10 +402,16 @@ static PNG_CONST char *outname = "pngout" DOT "png";
 static PNG_CONST char *directory_name = "pngcrush" DOT "bak";
 static PNG_CONST char *extension = "_C" DOT "png";
 
+static png_uint_32 width, height;
 static png_uint_32 measured_idat_length;
+static int pngcrush_must_exit=0;
 static int all_chunks_are_safe=0;
 static int number_of_open_files;
 static int do_pplt = 0;
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+static png_uint_32 max_rows_at_a_time=1;
+static png_uint_32 rows_at_a_time;
+#endif
 char pplt_string[1024];
 char *ip, *op, *dot;
 char in_string[256];
@@ -459,6 +479,9 @@ static int pauses=0;
 static int nosave=0;
 static int nointerlace=0;
 static png_bytep row_buf;
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+static png_bytepp row_pointers;
+#endif
 static int z_strategy;
 static int best_of_three;
 static int methods_specified=0;
@@ -504,6 +527,7 @@ static FILE *fpin, *fpout;
 png_uint_32 measure_idats(FILE *fpin);
 #ifdef PNGCRUSH_COUNT_COLORS
 int count_colors(FILE *fpin);
+static int reduce_to_gray, it_is_opaque;
 #endif
 png_uint_32 png_measure_idat(png_structp png_ptr);
 # define MAX_METHODS   200
@@ -515,6 +539,8 @@ static png_bytep png_row_filters=NULL;
 static TIME_T t_start, t_stop, t_decode, t_encode, t_misc;
 
 static png_uint_32 max_idat_size = PNG_ZBUF_SIZE;
+static png_uint_32 crushed_idat_size = 0x3ffffffL;
+static int already_crushed = 0;
 int ia;
 
 /********* Functions to make direct access to the png_ptr. ***************
@@ -778,7 +804,7 @@ int keep_chunk(png_const_charp name, char *argv[])
        fprintf(STDERR, "     Check for removal of the %s chunk.\n", name);
     for (i=1; i<=remove_chunks; i++)
     {
-    if(!strncmp(argv[i],"-r",2))
+    if(!strncmp(argv[i],"-rem",4))
       {
          int alla = 0;
          int allb = 0;
@@ -871,9 +897,8 @@ int
 main(int argc, char *argv[])
 {
    png_uint_32 y;
-   png_uint_32 width, height;
-   int num_pass, pass;
    int bit_depth, color_type;
+   int num_pass, pass;
    int try_method[MAX_METHODSP1];
    int fm[MAX_METHODSP1];
    int lv[MAX_METHODSP1];
@@ -970,6 +995,13 @@ main(int argc, char *argv[])
          }
       }
 
+   else if( !strncmp(argv[i],"-already",8))
+      {
+         names++;
+         BUMP_I;
+         crushed_idat_size = (png_uint_32)atoi(argv[i]);
+      }
+
    else if( !strncmp(argv[i],"-bkgd",5) ||
             !strncmp(argv[i],"-bKGD",5))
       {
@@ -1023,6 +1055,8 @@ main(int argc, char *argv[])
          pngcrush_mode=DIRECTORY_MODE;
          directory_name= argv[names++];
       }
+   else if(!strncmp(argv[i],"-exit",2))
+         pngcrush_must_exit=1;
    else if(!strncmp(argv[i],"-e",2))
       {
          BUMP_I;
@@ -1191,6 +1225,8 @@ main(int argc, char *argv[])
       {
       pauses++;
       }
+   else if(!strncmp(argv[i],"-q",2))
+         verbose=0;
 #ifdef PNG_gAMA_SUPPORTED
    else if(!strncmp(argv[i],"-rep",4))
       {
@@ -1232,6 +1268,14 @@ main(int argc, char *argv[])
          names++;
          BUMP_I;
          resolution=atoi(argv[i]);
+      }
+#endif
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+   else if(!strncmp(argv[i],"-rows",5))
+      {
+         names++;
+         BUMP_I;
+         max_rows_at_a_time=atoi(argv[i]);
       }
 #endif
    else if(!strncmp(argv[i],"-r",2))
@@ -1412,6 +1456,8 @@ main(int argc, char *argv[])
 
    if(verbose > 0)
    {
+ /* If you have modified this source, you may insert additional notices
+  * immediately after this sentence. */
       fprintf(STDERR, 
         "\n | %s %s, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson\n",
         progname, PNGCRUSH_VERSION);
@@ -1420,16 +1466,16 @@ main(int argc, char *argv[])
       fprintf(STDERR, 
         " | This program was built with libpng version %s,\n",
             PNG_LIBPNG_VER_STRING);
-      fprintf(STDERR,
-        " |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,\n");
-#if PNG_LIBPNG_VER > 89
-      fprintf(STDERR,
-        " |    Copyright (C) 1996, 1997 Andreas Dilger,\n");
-#endif
 #if PNG_LIBPNG_VER > 96
       fprintf(STDERR,
         " |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,\n");
 #endif
+#if PNG_LIBPNG_VER > 89
+      fprintf(STDERR,
+        " |    Copyright (C) 1996, 1997 Andreas Dilger,\n");
+#endif
+      fprintf(STDERR,
+        " |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,\n");
       fprintf(STDERR, 
         " | and zlib version %s, Copyright (C) 1998,\n",
             ZLIB_VERSION);
@@ -1437,11 +1483,13 @@ main(int argc, char *argv[])
         " |    Jean-loup Gailly and Mark Adler.\n");
 #if defined(__DJGPP__)
       fprintf(STDERR,
-        " | It was compiled with gcc version %s and as version %s\n",
-         __VERSION__, "2.81");
+        " | It was compiled with gcc version %s", __VERSION__);
+#  if defined(PNG_USE_PNGGCCRD)
       /* is there a macro for "as" versions? */
+      fprintf(STDERR, "\n | and as version %s", "2.9.5");
+#  endif
       fprintf(STDERR,
-        " | under DJGPP %d.%d, Copyright (C) 1995, D. J. Delorie\n",
+        "\n | under DJGPP %d.%d, Copyright (C) 1995, D. J. Delorie\n",
         __DJGPP__,__DJGPP_MINOR__);
       fprintf(STDERR,
         " | and loaded with PMODE/DJ, by Thomas Pytel and Matthias Grimrath\n");
@@ -1494,6 +1542,15 @@ main(int argc, char *argv[])
      }
      else
         fprintf(STDERR, "options:\n");
+     fprintf(STDERR,
+       "       -already already_crushed_size [e.g., 8192])\n");
+     if(verbose > 1)
+     {
+     fprintf(STDERR,
+       "\n               If file has an IDAT greater than this size, it\n");
+     fprintf(STDERR,
+       "               will be considered to be already crushed.\n\n");
+     }
      fprintf(STDERR,
        "        -brute (Use brute-force, try 114 different methods [11-124])\n");
      if(verbose > 1)
@@ -1817,7 +1874,7 @@ main(int argc, char *argv[])
      png_crush_pause();
      }
      fprintf(STDERR,
-       "            -h (help)\n");
+       "            -h (help and legal notices)\n");
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Display this information.\n\n");
@@ -1832,6 +1889,51 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               screen scrolls out of sight.\n\n");
      }
+ /* If you have modified this source, you may insert additional notices
+  * immediately after this sentence. */
+     fprintf (STDERR,
+     "\nCopyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)\n\n");
+     fprintf(STDERR,
+     "\nDISCLAIMER: The pngcrush computer program is supplied \"AS IS\".\n");
+     fprintf(STDERR,
+     "The Author disclaims all warranties, expressed or implied, including,\n");
+     fprintf(STDERR,
+     "without limitation, the warranties of merchantability and of fitness\n");
+     fprintf(STDERR,
+     "for  any purpose.  The Author assumes no liability for direct, indirect,\n");
+     fprintf(STDERR,
+     "incidental, special, exemplary, or consequential damages, which may\n");
+     fprintf(STDERR,
+     "result from the use of the computer program, even if advised of the\n");
+     fprintf(STDERR,
+     "possibility of such damage.  There is no warranty against interference\n");
+     fprintf(STDERR,
+     "with your enjoyment of the computer program or against infringement.\n");
+     fprintf(STDERR,
+     "There is no warranty that my efforts or the computer program will\n");
+     fprintf(STDERR,
+     "fulfill any of your particular purposes or needs.  This computer\n");
+     fprintf(STDERR,
+     "program is provided with all faults, and the entire risk of satisfactory\n");
+     fprintf(STDERR,
+     "quality, performance, accuracy, and effort is with the user.\n");
+     fprintf(STDERR,
+
+     "\nLICENSE: Permission is hereby granted to anyone to use, copy, modify,\n");
+     fprintf(STDERR,
+     "and distribute this computer program, or portions hereof, for any\n");
+     fprintf(STDERR,
+     "purpose, without fee, subject to the following restrictions:\n\n");
+     fprintf(STDERR,
+     "1. The origin of this binary or source code must not be misrepresented.\n\n");
+     fprintf(STDERR,
+     "2. Altered versions must be plainly marked as such and must not be\n");
+     fprintf(STDERR,
+     "misrepresented as being the original binary or source.\n\n");
+     fprintf(STDERR,
+     "3. The Copyright notice, disclaimer, and license may not be removed\n");
+     fprintf(STDERR,
+     "or altered from any source, binary, or altered source distribution.\n");
 
      if(pngcrush_mode == DEFAULT_MODE && argc - names != 2 && nosave == 0)
          exit(1);
@@ -1855,7 +1957,7 @@ main(int argc, char *argv[])
       if(inname == NULL) 
       {
          if(verbose > 0) show_result();
-         return 0;
+         exit(0);
       }
 
       if(pngcrush_mode == EXTENSION_MODE)
@@ -1905,7 +2007,7 @@ main(int argc, char *argv[])
 #endif
              {
                 fprintf(STDERR,"could not create directory %s\n",directory_name);
-                return 1;
+                exit(1);
              }
           }
           out_string[0] = '\0'; 
@@ -1930,8 +2032,6 @@ main(int argc, char *argv[])
           outname=out_string;
       }
 
-      output_color_type=force_output_color_type;
-      output_bit_depth=force_output_bit_depth;
 
       if(nosave < 2)
       {
@@ -1944,9 +2044,17 @@ main(int argc, char *argv[])
          }
          number_of_open_files++;
 
+         already_crushed = 0;
+
          idat_length[0]=measure_idats(fpin);
 
          FCLOSE(fpin);
+
+         if(already_crushed)
+         {
+            fprintf(STDERR, "File has already been crushed: %s\n", inname);
+            continue;
+         }
 
          if(verbose > 0)
          {
@@ -1962,7 +2070,9 @@ main(int argc, char *argv[])
          idat_length[0]=1;
 
 #ifdef PNGCRUSH_COUNT_COLORS
-      if (input_color_type == 2 || input_color_type == 4 || input_color_type == 6)
+      output_color_type = input_color_type;
+      if (force_output_color_type == 8 && (input_color_type == 2 ||
+          input_color_type == 4 || input_color_type == 6))
       /* check for unused alpha channel or single transparent color */
       {
          int alpha_status;
@@ -1979,8 +2089,20 @@ main(int argc, char *argv[])
 
          FCLOSE(fpin);
 
-         if(alpha_status)
-            /* TO DO */;
+         if (it_is_opaque)
+         {
+            if (output_color_type == 4)
+                output_color_type=0;
+            else if (output_color_type == 6)
+                output_color_type=2;
+         }
+         if (reduce_to_gray)
+         {
+            if (output_color_type == 2)
+                output_color_type=0;
+            else if (output_color_type == 6)
+                output_color_type=4;
+         }
       }
 
 #if 0  /* TO DO */
@@ -1996,7 +2118,15 @@ main(int argc, char *argv[])
         /* TO DO */
       }
 #endif
+      if(force_output_color_type == 8 && input_color_type != output_color_type)
+      {
+         P1 ("setting output color type to %d\n",output_color_type);
+         force_output_color_type = output_color_type;
+      }
 #endif /* PNGCRUSH_COUNT_COLORS */
+
+      output_color_type=force_output_color_type;
+      output_bit_depth=force_output_bit_depth;
 
       if(!methods_specified || try_method[0] == 0)
       {
@@ -2044,7 +2174,7 @@ main(int argc, char *argv[])
             {
                fprintf(STDERR, "Could not open output file %s\n", outname);
                FCLOSE(fpin);
-               return 1;
+               exit(1);
             }
 
             number_of_open_files++;
@@ -2152,14 +2282,14 @@ main(int argc, char *argv[])
             P1("   st_ino=%d, st_size=%d\n\n", (int)stat_in.st_ino,
                (int)stat_in.st_size);
             FCLOSE(fpin);
-            return 1;
+            exit(1);
          }
 #endif
          if ((fpout = FOPEN(outname, "wb")) == NULL)
          {
             fprintf(STDERR, "Could not open output file %s\n", outname);
             FCLOSE(fpin);
-            return 1;
+            exit(1);
          }
 
          number_of_open_files++;
@@ -2170,6 +2300,7 @@ main(int argc, char *argv[])
 
    Try
    {
+      png_uint_32 row_length;
       png_debug(0, "Allocating read and write structures\n");
 #ifdef PNG_USER_MEM_SUPPORTED
    read_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
@@ -2962,23 +3093,23 @@ main(int argc, char *argv[])
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    {
       int unit;
-      double width, height;
+      double scal_width, scal_height;
 
-      if (png_get_sCAL(read_ptr, read_info_ptr, &unit, &width, &height))
+      if (png_get_sCAL(read_ptr, read_info_ptr, &unit, &scal_width, &scal_height))
       {
-         png_set_sCAL(write_ptr, write_info_ptr, unit, width, height);
+         png_set_sCAL(write_ptr, write_info_ptr, unit, scal_width, scal_height);
       }
    }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
    {
       int unit;
-      png_charp width, height;
+      png_charp scal_width, scal_height;
 
-      if (png_get_sCAL_s(read_ptr, read_info_ptr, &unit, &width, &height))
+      if (png_get_sCAL_s(read_ptr, read_info_ptr, &unit, &scal_width, &scal_height))
       {
          if(keep_chunk("sCAL",argv))
-            png_set_sCAL_s(write_ptr, write_info_ptr, unit, width, height);
+            png_set_sCAL_s(write_ptr, write_info_ptr, unit, scal_width, scal_height);
       }
    }
 #endif
@@ -3177,6 +3308,12 @@ main(int argc, char *argv[])
 
 #define LARGE_PNGCRUSH
 
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+      rows_at_a_time=max_rows_at_a_time;
+      if(rows_at_a_time == 0 || rows_at_a_time < height)
+         rows_at_a_time=height;
+#endif
+
 #ifndef LARGE_PNGCRUSH
       {
          png_uint_32 rowbytes_s;
@@ -3186,7 +3323,11 @@ main(int argc, char *argv[])
 
          rowbytes_s = (png_size_t)rowbytes;
          if(rowbytes == (png_uint_32)rowbytes_s)
-            row_buf = png_malloc(read_ptr, rowbytes+2 );
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+            row_buf = png_malloc(read_ptr, rows_at_a_time*rowbytes+16);
+#else
+            row_buf = png_malloc(read_ptr, rowbytes+16);
+#endif
          else
          {
             fprintf(STDERR, "rowbytes= %d\n",rowbytes);
@@ -3195,14 +3336,18 @@ main(int argc, char *argv[])
       }
 #else
       {
-      png_uint_32 read_row_length, write_row_length, row_length;
+      png_uint_32 read_row_length, write_row_length;
       read_row_length=
          (png_uint_32)(png_get_rowbytes(read_ptr, read_info_ptr));
       write_row_length=
          (png_uint_32)(png_get_rowbytes(write_ptr, write_info_ptr));
       row_length = read_row_length > write_row_length ?
           read_row_length : write_row_length;
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+      row_buf = (png_bytep)png_malloc(read_ptr,rows_at_a_time*row_length+16);
+#else
       row_buf = (png_bytep)png_malloc(read_ptr,row_length+16);
+#endif
       }
 #endif
 
@@ -3219,6 +3364,13 @@ main(int argc, char *argv[])
        */
       }
 
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+      row_pointers = (png_bytepp)png_malloc(read_ptr,
+         rows_at_a_time*sizeof(png_bytepp));
+      for (i=0; i<rows_at_a_time; i++)
+        row_pointers[i]=row_buf + i*row_length;
+#endif
+
       P2("allocated rowbuf.\n");
       png_crush_pause();
 
@@ -3231,16 +3383,33 @@ main(int argc, char *argv[])
       t_start = t_stop;
       for (pass = 0; pass < num_pass; pass++)
       {
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+         png_uint_32 num_rows;
+#endif
          png_debug(0, "\nBegin Pass\n");
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+         num_rows=rows_at_a_time;
+         for (y = 0; y < height; y+=rows_at_a_time)
+#else
          for (y = 0; y < height; y++)
+#endif
          {
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+            if (y+num_rows > height) num_rows=height-y;
+            png_read_rows(read_ptr, row_pointers, (png_bytepp)NULL, num_rows);
+#else
             png_read_row(read_ptr, row_buf, (png_bytep)NULL);
+#endif
             if(nosave == 0)
             {
                t_stop = (TIME_T)clock();
                t_decode += (t_stop - t_start);
                t_start = t_stop;
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+               png_write_rows(write_ptr, row_pointers, num_rows);
+#else
                png_write_row(write_ptr, row_buf);
+#endif
                t_stop = (TIME_T)clock();
                t_encode += (t_stop - t_start);
                t_start = t_stop;
@@ -3251,7 +3420,7 @@ main(int argc, char *argv[])
       if(nosave)
       {
           t_stop = (TIME_T)clock();
-          t_decode += (t_stop - t_start);
+          t_decode += (t_stop -  t_start);
           t_start = t_stop;
       }
 
@@ -3430,8 +3599,17 @@ main(int argc, char *argv[])
 
       png_debug(0, "Destroying data structs\n");
       if(row_buf != (png_bytep)NULL)
+      {
          png_free(read_ptr, row_buf);
-      row_buf = (png_bytep)NULL;
+         row_buf = (png_bytep)NULL;
+      }
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+      if(row_pointers != (png_bytepp)NULL)
+      {
+         png_free(read_ptr, row_pointers);
+         row_pointers = (png_bytepp)NULL;
+      }
+#endif
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
       if(nosave == 0)
       {
@@ -3448,6 +3626,13 @@ main(int argc, char *argv[])
           fprintf(stderr, "  pngcrush caught libpng error:\n   %s\n\n",msg);
           if(row_buf != NULL)png_free(read_ptr, row_buf);
           row_buf = (png_bytep)NULL;
+#ifdef PNGCRUSH_MULTIPLE_ROWS
+          if(row_pointers != (png_bytepp)NULL)
+          {
+             png_free(read_ptr, row_pointers);
+             row_pointers = (png_bytepp)NULL;
+          }
+#endif
           if(nosave == 0)
           {
              png_destroy_info_struct(write_ptr, &write_end_info_ptr);
@@ -3484,7 +3669,7 @@ main(int argc, char *argv[])
             {
                free(png_row_filters); png_row_filters=NULL;
             }
-            return 1;
+            exit(1);
          }
          number_of_open_files++;
 
@@ -3555,7 +3740,9 @@ main(int argc, char *argv[])
             free(png_row_filters); png_row_filters=NULL;
          }
          if(verbose > 0) show_result();
-         return 0;
+         if(pngcrush_must_exit)
+            exit(0);
+         return(0);
       }
   }  /* end of loop on input files */
 }
@@ -3652,7 +3839,11 @@ png_measure_idat(png_structp png_ptr)
 #else
       if (!png_memcmp(chunk_name, png_IDAT, 4))
 #endif
+      {
          sum_idat_length += length;
+         if(length > crushed_idat_size)
+             already_crushed++;
+      }
 
       if(verbose > 1)
       {
@@ -3714,7 +3905,6 @@ png_measure_idat(png_structp png_ptr)
 #ifdef PNGCRUSH_COUNT_COLORS
 #define USE_HASHCODE
 static int result, num_rgba;
-static int it_is_gray, it_is_opaque;
 static int hashmiss, hashinserts;
 int
 count_colors(FILE *fpin)
@@ -3722,7 +3912,7 @@ count_colors(FILE *fpin)
    /* Copyright (C) 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
       See notice in pngcrush.c for conditions of use and distribution */
    int bit_depth, color_type, interlace_type, filter_type, compression_type;
-   png_uint_32 width, height, rowbytes, channels;
+   png_uint_32 rowbytes, channels;
 
    int i;
    int pass, num_pass;
@@ -3749,7 +3939,7 @@ count_colors(FILE *fpin)
    int png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
 
    result=0;
-   it_is_gray=1;
+   reduce_to_gray=1;
    it_is_opaque=1;
    hashmiss=0;
    hashinserts=0;
@@ -3808,6 +3998,9 @@ count_colors(FILE *fpin)
    else
       channels=1;
 
+   if(color_type == 0 || color_type == 3 || color_type == 4)
+      reduce_to_gray = 0;
+
    if(bit_depth == 8)
    {
       if(interlace_type)
@@ -3817,7 +4010,7 @@ count_colors(FILE *fpin)
 
       rowbytes = png_get_rowbytes(read_ptr, read_info_ptr);
 
-      row_buf  = png_malloc(read_ptr, rowbytes+2);
+      row_buf  = png_malloc(read_ptr, rowbytes+16);
 
       for (pass = 0; pass < num_pass; pass++)
       {
@@ -3826,16 +4019,24 @@ count_colors(FILE *fpin)
          png_uint_32 pass_height, pass_width, y;
          png_debug(0, "\nBegin Pass\n");
 
-         pass_height = (height - png_pass_ystart[pass]
+         if (interlace_type)
+         {
+            pass_height = (height - png_pass_ystart[pass]
                        + png_pass_yinc[pass] - 1) / png_pass_yinc[pass];
-         pass_width = (width - png_pass_start[pass]
+            pass_width = (width - png_pass_start[pass]
                        + png_pass_inc[pass] - 1) / png_pass_inc[pass];
+         }
+         else
+         {
+            pass_height=height;
+            pass_width=width;
+         }
 
          for (y = 0; y < pass_height; y++)
          {
             png_uint_32 x;
             png_read_row(read_ptr, row_buf, (png_bytep)NULL);
-            if(result < 2)
+            if(result < 2 || it_is_opaque || reduce_to_gray)
             {
               if(color_type==2)
               {
@@ -3846,11 +4047,13 @@ count_colors(FILE *fpin)
 #endif
                    png_uint_32 rgba_high = (255<<24)|(*(rp)<<16)|(*(rp+1)<<8)|
                                            *(rp+2);
+                   assert(num_rgba < 258);
                    rgba_hi[num_rgba]=rgba_high;         
-#ifdef USE_HASHCODE
-                   if(it_is_gray &&
+
+                   if(reduce_to_gray &&
                      ((*(rp)) != (*(rp+1)) || (*(rp)) != (*(rp+2))))
-                        it_is_gray=0;
+                        reduce_to_gray=0;
+#ifdef USE_HASHCODE
                    /*
                     *      R      G      B     mask
                     *  11,111  0,0000, 0000   0x3e00
@@ -3862,6 +4065,7 @@ count_colors(FILE *fpin)
                    hashcode=(int)(((rgba_high>>10)&0x3e00)|
                             ((rgba_high>> 7)&0x01f0)|
                             ((rgba_high>> 4)&0x000f));
+                   assert(hashcode < 16385);
                    if (hash[hashcode] < 0)
                    {
                       hash[hashcode] = i = num_rgba;
@@ -3889,6 +4093,7 @@ count_colors(FILE *fpin)
                                rgba_hi[j]=rgba_hi[j-1];
                                rgba_frequency[j]=rgba_frequency[j-1];
                             }
+                            assert(start+1 < 258);
                             rgba_hi[start+1]=rgba_high;
                             rgba_frequency[start+1]=0;
                             for(j=0; j<16384; j++)
@@ -3910,6 +4115,7 @@ count_colors(FILE *fpin)
                    else if(i == num_rgba)
                       num_rgba++;
 #endif
+                   assert(i < 258);
                    ++rgba_frequency[i];
                 }
               }
@@ -3922,13 +4128,14 @@ count_colors(FILE *fpin)
 #endif
                    png_uint_32 rgba_high = (*(rp+3)<<24)|(*(rp)<<16)|
                       (*(rp+1)<<8)|*(rp+2);
+                   assert(rp-row_buf+3 < rowbytes);
                    rgba_hi[num_rgba]=rgba_high;         
-#ifdef USE_HASHCODE
-                   if(it_is_gray &&
+                   if(reduce_to_gray &&
                      ((*(rp)) != (*(rp+1)) || (*(rp)) != (*(rp+2))))
-                        it_is_gray=0;
+                        reduce_to_gray=0;
                    if(it_is_opaque && (*(rp+3)) != 255)
                       it_is_opaque=0;
+#ifdef USE_HASHCODE
                    /*
                     *  A     R     G    B    mask
                     * 11,1 000,0 000,0 000   0x3800
@@ -3942,6 +4149,7 @@ count_colors(FILE *fpin)
                             ((rgba_high>>12)&0x0780)|
                             ((rgba_high>> 8)&0x0078)|
                             ((rgba_high>> 4)&0x0007));
+                   assert(hashcode < 16385);
                    if (hash[hashcode] < 0)
                    {
                       hash[hashcode] = i = num_rgba;
@@ -3959,11 +4167,11 @@ count_colors(FILE *fpin)
                       hashmiss += (i-start);
                       if(i == num_rgba)
                       {
-                         int j;
                          if (i > 256)
                             result=2;
                          else
                          {
+                            int j;
                             for(j=num_rgba; j>start+1; j--)
                             {
                                rgba_hi[j]=rgba_hi[j-1];
@@ -4002,10 +4210,11 @@ count_colors(FILE *fpin)
 #endif
                    png_uint_32 rgba_high = (*(rp+1)<<24)|(*(rp)<<16)|
                       (*(rp)<<8)|(*rp);
+                   assert(rp-row_buf+1 < rowbytes);
                    rgba_hi[num_rgba]=rgba_high;         
-#ifdef USE_HASHCODE
                    if(it_is_opaque && (*(rp+1)) != 255)
                       it_is_opaque=0;
+#ifdef USE_HASHCODE
                    /*
                     *    A          G          mask
                     * 11,1111,  0000,0000    0x3f00
@@ -4032,11 +4241,11 @@ count_colors(FILE *fpin)
                       hashmiss += (i-start);
                       if(i == num_rgba)
                       {
-                         int j;
                          if (i > 256)
                             result=2;
                          else
                          {
+                            int j;
                             for(j=num_rgba; j>start+1; j--)
                             {
                                rgba_hi[j]=rgba_hi[j-1];
@@ -4078,6 +4287,8 @@ count_colors(FILE *fpin)
    else
    {
       /* TO DO: 16-bit support */
+      reduce_to_gray=0;
+      it_is_opaque=0;
       result=0;
    }
 
@@ -4117,8 +4328,8 @@ count_colors(FILE *fpin)
            hashinserts);
       }
    P2 ("Finished checking alphas, result=%d\n",result);
-   if(it_is_gray)
-     P1 ("The image is all gray.\n");
+   if(reduce_to_gray)
+     P1 ("The truecolor image is all gray and will be reduced.\n");
    if(it_is_opaque)
      P1 ("The image is opaque.\n");
    }

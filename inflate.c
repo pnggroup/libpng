@@ -237,7 +237,6 @@ int f;
         break;
       }
       z->state->mode = CHECK4;
-      r=Z_DATA_ERROR;
     case CHECK4:
       NEEDBYTE
       z->state->sub.check.need = (uLong)NEXTBYTE << 24;

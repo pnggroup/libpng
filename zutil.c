@@ -202,6 +202,7 @@ void  zcfree (voidpf opaque, voidpf ptr)
 
 #ifndef STDC
 extern voidp  calloc OF((uInt items, uInt size));
+extern voidp  malloc OF((uInt items));
 extern void   free   OF((voidpf ptr));
 #endif
 
@@ -212,6 +213,16 @@ voidpf zcalloc (opaque, items, size)
 {
     if (opaque) items += size - size; /* make compiler happy */
     return (voidpf)calloc(items, size);
+}
+
+/* added to version 1.1.3pc -- glennrp */
+voidpf zmalloc (opaque, items, size)
+    voidpf opaque;
+    unsigned items;
+    unsigned size;
+{
+    if (opaque) items += size - size; /* make compiler happy */
+    return (voidpf)malloc(items * size);
 }
 
 void  zcfree (opaque, ptr)

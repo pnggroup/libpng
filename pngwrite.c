@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.7rc2 - June 28, 2000
+ * libpng 1.0.8rc1 - July 17, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -375,9 +375,12 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 
    /* write end of PNG file */
    png_write_IEND(png_ptr);
+   png_flush(png_ptr);
 }
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
+#if !defined(_WIN32_WCE)
+/* "time.h" functions are not supported on WindowsCE */
 void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
 {
@@ -399,6 +402,7 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
    tbuf = gmtime(&ttime);
    png_convert_from_struct_tm(ptime, tbuf);
 }
+#endif
 #endif
 
 /* Initialize png_ptr structure, and allocate any memory needed */
@@ -444,6 +448,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif
    {
       png_free(png_ptr, png_ptr->zbuf);
+      png_ptr->zbuf=NULL;
       png_destroy_struct(png_ptr);
       return ((png_structp)NULL);
    }
@@ -734,11 +739,11 @@ png_write_row(png_structp png_ptr, png_bytep row)
       (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
    png_debug1(3, "row_info->color_type = %d\n", png_ptr->row_info.color_type);
-   png_debug1(3, "row_info->width = %d\n", png_ptr->row_info.width);
+   png_debug1(3, "row_info->width = %lu\n", png_ptr->row_info.width);
    png_debug1(3, "row_info->channels = %d\n", png_ptr->row_info.channels);
    png_debug1(3, "row_info->bit_depth = %d\n", png_ptr->row_info.bit_depth);
    png_debug1(3, "row_info->pixel_depth = %d\n", png_ptr->row_info.pixel_depth);
-   png_debug1(3, "row_info->rowbytes = %d\n", png_ptr->row_info.rowbytes);
+   png_debug1(3, "row_info->rowbytes = %lu\n", png_ptr->row_info.rowbytes);
 
    /* Copy user's row into buffer, leaving room for filter byte. */
    png_memcpy_check(png_ptr, png_ptr->row_buf + 1, row,
@@ -863,6 +868,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
       if (png_ptr->num_chunk_list)
       {
          png_free(png_ptr, png_ptr->chunk_list);
+         png_ptr->chunk_list=NULL;
          png_ptr->num_chunk_list=0;
       }
 #endif

@@ -6,6 +6,10 @@
 #ifndef PNGCRUSH_H
 #define PNGCRUSH_H
 
+/*
+#include <malloc.h>
+*/
+
 #ifdef PNG_LIBPNG_VER
 #define PNGCRUSH_LIBPNG_VER PNG_LIBPNG_VER
 #else
@@ -14,13 +18,21 @@
 #define PNGCRUSH_LIBPNG_VER 10007
 #endif
 
+#ifndef PNG_NO_ZALLOC_ZERO
+#  define PNG_NO_ZALLOC_ZERO  /* speeds it up a little */
+#endif
+
 #ifndef PNG_USER_MEM_SUPPORTED
 #  define PNG_USER_MEM_SUPPORTED
 #endif
 
-#define PNG_NO_LEGACY_SUPPORTED
+#ifndef PNG_NO_LEGACY_SUPPORTED
+#  define PNG_NO_LEGACY_SUPPORTED
+#endif
 
-#define PNG_SETJMP_NOT_SUPPORTED
+#ifndef PNG_SETJMP_NOT_SUPPORTED
+#  define PNG_SETJMP_NOT_SUPPORTED
+#endif
 
 #if PNGCRUSH_LIBPNG_VER > 10006
 #define PNG_NO_FLOATING_POINT_SUPPORTED
