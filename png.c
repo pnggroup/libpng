@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose png functions
 
-	libpng 1.0 beta 2 - version 0.87
+   libpng 1.0 beta 2 - version 0.88
    For conditions of distribution and use, see copyright notice in png.h
-	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 15, 1996
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -13,7 +13,7 @@
 
 /* version information for c files.  This better match the version
    string defined in png.h */
-char png_libpng_ver[] = "0.87";
+char png_libpng_ver[] = "0.88";
 
 /* place to hold the signiture string for a png file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -95,7 +95,7 @@ int FARDATA png_pass_dsp_mask[] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 int
 png_check_sig(png_bytep sig, int num)
 {
-	if (num > 8)
+   if (num > 8)
       num = 8;
    if (num < 1)
       return 0;
@@ -107,22 +107,22 @@ png_check_sig(png_bytep sig, int num)
 voidpf
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
-	png_voidp ptr;
-	png_uint_32 num_bytes;
+   png_voidp ptr;
+   png_uint_32 num_bytes;
 
-	ptr = png_large_malloc((png_structp)png_ptr,
-		(png_uint_32)items * (png_uint_32)size);
-	num_bytes = (png_uint_32)items * (png_uint_32)size;
-	if (num_bytes > (png_uint_32)0x7fff)
-	{
-		png_memset(ptr, 0, (png_size_t)0x8000L);
-		png_memset((png_bytep)ptr + (png_size_t)0x8000L, 0,
-			(png_size_t)(num_bytes - (png_uint_32)0x8000L));
-	}
-	else
-	{
-		png_memset(ptr, 0, (png_size_t)num_bytes);
-	}
+   ptr = png_large_malloc((png_structp)png_ptr,
+      (png_uint_32)items * (png_uint_32)size);
+   num_bytes = (png_uint_32)items * (png_uint_32)size;
+   if (num_bytes > (png_uint_32)0x7fff)
+   {
+      png_memset(ptr, 0, (png_size_t)0x8000L);
+      png_memset((png_bytep)ptr + (png_size_t)0x8000L, 0,
+         (png_size_t)(num_bytes - (png_uint_32)0x8000L));
+   }
+   else
+   {
+      png_memset(ptr, 0, (png_size_t)num_bytes);
+   }
    return (voidpf)(ptr);
 }
 
@@ -130,7 +130,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 void
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
-	png_large_free((png_structp)png_ptr, (png_voidp)ptr);
+   png_large_free((png_structp)png_ptr, (png_voidp)ptr);
 }
 
 /* reset the crc variable to 32 bits of 1's.  Care must be taken
@@ -143,8 +143,8 @@ png_reset_crc(png_structp png_ptr)
 }
 
 /* Note: the crc code below was copied from the sample code in the
-	PNG spec, with appropriate modifications made to ensure the
-	variables are large enough */
+   PNG spec, with appropriate modifications made to ensure the
+   variables are large enough */
 
 /* table of crc's of all 8-bit messages.  If you wish to png_malloc this
    table, turn this into a pointer, and png_malloc it in make_crc_table().
@@ -193,7 +193,7 @@ update_crc(png_uint_32 crc, png_bytep buf, png_uint_32 len)
 
   if (n > 0) do
   {
-	c = crc_table[(png_byte)((c ^ (*p++)) & 0xff)] ^ (c >> 8);
+   c = crc_table[(png_byte)((c ^ (*p++)) & 0xff)] ^ (c >> 8);
   } while (--n);
 
   return c;
@@ -213,6 +213,6 @@ void
 png_info_init(png_infop info)
 {
    /* set everything to 0 */
-	png_memset(info, 0, sizeof (png_info));
+   png_memset(info, 0, sizeof (png_info));
 }
 

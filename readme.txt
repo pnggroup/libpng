@@ -1,8 +1,8 @@
-readme.txt - for libpng 0.87
+readme.txt - for libpng 0.88
 
 This is a bug fix for the second beta version of libpng 1.0, and
-a first try at a progressive (push) reader.  It hasn't been
-tested as much as the pull reader, but seems to work ok.
+a more secure progressive (push) reader.  The progressive reader
+hasn't been tested as much as the pull reader, but seems to work ok.
 
 I've implemented the callback functions for the error/warning
 messages and the input/output.  See the libpng.txt

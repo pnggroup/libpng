@@ -3,14 +3,14 @@ pngtodo.txt - list of things to do for libpng
 for 0.9
    improved dithering
    final bug fixes
-	cHRM transformation
+   cHRM transformation
    better documentation
 
 after 1.0
    overlaying one image on top of another
-	optional palette creation
-	histogram creation
-	text conversion between different code types
+   optional palette creation
+   histogram creation
+   text conversion between different code types
    support for other chunks being defined (sCAl, the gIF series,
       and others that people come up with).
    pull writer

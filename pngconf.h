@@ -1,10 +1,10 @@
 
 /* pngconf.c - machine configurable file for libpng
 
-	libpng 1.0 beta 2 - version 0.87
+   libpng 1.0 beta 2 - version 0.88
    For conditions of distribution and use, see copyright notice in png.h
-	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 15, 1996
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 25, 1996
    */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -27,7 +27,7 @@
    Unless this gets smaller then the size of a row (compressed),
    it should not make much difference how big this is.  */
 
-#define PNG_ZBUF_SIZE 32768
+#define PNG_ZBUF_SIZE 8192
 
 /* While libpng currently uses zlib for it's compression, it has been designed
    to stand on it's own.  Towards this end, there are two defines that are
@@ -49,10 +49,10 @@
 #endif
 
 /* this protects us against compilers which run on a windowing system
-	and thus don't have or would rather us not use the stdio types:
-	stdin, stdout, and stderr.  The only one currently used is stderr
-	in png_error() and png_warning().  #defining PNG_NO_STDIO will
-	prevent these from being compiled and used. */
+   and thus don't have or would rather us not use the stdio types:
+   stdin, stdout, and stderr.  The only one currently used is stderr
+   in png_error() and png_warning().  #defining PNG_NO_STDIO will
+   prevent these from being compiled and used. */
 
 /* #define PNG_NO_STDIO */
 
@@ -138,11 +138,11 @@
 #endif /* PNG_INTERNAL */
 
 /* the following uses const char * instead of char * for error
-	and warning message functions, so some compilers won't complain.
-	If you want to use const, define PNG_USE_CONST here.  It is not
-	normally defined to make configuration easier, as it is not a
+   and warning message functions, so some compilers won't complain.
+   If you want to use const, define PNG_USE_CONST here.  It is not
+   normally defined to make configuration easier, as it is not a
    critical part of the code.
-	*/
+   */
 
 #ifdef PNG_USE_CONST
 #  define PNG_CONST const
@@ -260,7 +260,7 @@ typedef size_t png_size_t;
 #define FAR __far
 #endif
 #define USE_FAR_KEYWORD
-#endif	/* LDATA != 1 */
+#endif   /* LDATA != 1 */
 
 /* SJT:  Possibly useful for moving data out of default segment.
    Uncomment it if you want. Could also define FARDATA as const
@@ -269,7 +269,7 @@ typedef size_t png_size_t;
 */
 #endif  /* __WIN32__, __FLAT__ */
 
-#endif	/* __BORLANDC__ */
+#endif   /* __BORLANDC__ */
 
 
 /* SJT:  Suggest testing for specific compiler first before
@@ -303,7 +303,7 @@ typedef unsigned char FAR png_bytef;
 /* End medium model changes to be in zconf.h */
 
 /* SJT: More typedefs */
-typedef void FAR *	png_voidp;
+typedef void FAR *   png_voidp;
 
 
 /* SJT: Add typedefs for pointers */
@@ -341,7 +341,7 @@ typedef z_stream *      png_zstreamp; /* zlib won't accept far z_stream */
 #   define png_strcat _fstrcat
 #   define png_strlen _fstrlen
 #   define png_strcmp _fstrcmp
-#   define png_memcmp _fmemcmp		/* SJT: added */
+#   define png_memcmp _fmemcmp      /* SJT: added */
 #   define png_memcpy _fmemcpy
 #   define png_memset _fmemset
 #else /* use the usual functions */
@@ -349,7 +349,7 @@ typedef z_stream *      png_zstreamp; /* zlib won't accept far z_stream */
 #   define png_strcat strcat
 #   define png_strlen strlen
 #   define png_strcmp strcmp
-#   define png_memcmp memcmp		/* SJT: added */
+#   define png_memcmp memcmp     /* SJT: added */
 #   define png_memcpy memcpy
 #   define png_memset memset
 #endif

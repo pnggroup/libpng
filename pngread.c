@@ -1,10 +1,10 @@
 
 /* pngread.c - read a png file
 
-   libpng 1.0 beta 2 - version 0.87
+   libpng 1.0 beta 2 - version 0.88
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 15, 1996
+   January 25, 1996
    */
 
 #define PNG_INTERNAL

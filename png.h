@@ -1,8 +1,8 @@
 
 /* png.h - header file for png reference library
 
-   libpng 1.0 beta 2 - version 0.87
-   Jan 15, 1996
+   libpng 1.0 beta 2 - version 0.88
+   Jan 25, 1996
 
    Note: This is a beta version.  It reads and writes valid files
    on the platforms I have, but it has had limited portability
@@ -27,7 +27,7 @@
    with testing, bug fixes, and patience.  You know who you are.  This
    wouldn't have been possible without all of you.
 
-   Thanks to Frank J. T. Wojcik for reviewing the documentation
+   Thanks to Frank J. T. Wojcik for helping with the documentation
 
    The PNG Reference Library is supplied "AS IS". The Contributing Authors
    and Group 42, Inc. disclaim all warranties, expressed or implied,
@@ -41,9 +41,9 @@
    to the following restrictions:
    1. The origin of this source code must not be misrepresented.
    2. Altered versions must be plainly marked as such and must not be
-      misrepresented as being the original source.
+     misrepresented as being the original source.
    3. This Copyright notice may not be removed or altered from any source or
-      altered source distribution.
+     altered source distribution.
 
    The Contributing Authors and Group 42, Inc. specifically permit, without
    fee, and encourage the use of this source code as a component to
@@ -74,10 +74,10 @@
 
 /* version information for png.h - this should match the version
    number in png.c */
-#define PNG_LIBPNG_VER_STRING "0.87"
-/* careful here.  I wanted to use 087, but that would be octal.  Version
+#define PNG_LIBPNG_VER_STRING "0.88"
+/* careful here.  I wanted to use 088, but that would be octal.  Version
    1.0 will be 100 here, etc. */
-#define PNG_LIBPNG_VER 87
+#define PNG_LIBPNG_VER 88
 
 /* variables defined in png.c - only it needs to define PNG_NO_EXTERN */
 #ifndef PNG_NO_EXTERN
@@ -99,7 +99,7 @@ typedef struct png_color_struct
    png_byte green;
    png_byte blue;
 } png_color;
-typedef png_color       FAR *      png_colorp;
+typedef png_color       FAR *    png_colorp;
 typedef png_color       FAR * FAR * png_colorpp;
 
 typedef struct png_color_16_struct
@@ -110,7 +110,7 @@ typedef struct png_color_16_struct
    png_uint_16 blue;
    png_uint_16 gray; /* for use in grayscale files */
 } png_color_16;
-typedef png_color_16    FAR *      png_color_16p;
+typedef png_color_16    FAR *    png_color_16p;
 typedef png_color_16    FAR * FAR * png_color_16pp;
 
 typedef struct png_color_8_struct
@@ -121,7 +121,7 @@ typedef struct png_color_8_struct
    png_byte gray; /* for use in grayscale files */
    png_byte alpha; /* for alpha channel files */
 } png_color_8;
-typedef png_color_8     FAR *      png_color_8p;
+typedef png_color_8     FAR *    png_color_8p;
 typedef png_color_8     FAR * FAR * png_color_8pp;
 
 /* png_text holds the text in a png file, and whether they are compressed
@@ -133,7 +133,7 @@ typedef struct png_text_struct
    png_charp text; /* comment */
    png_uint_32 text_length; /* length of text field */
 } png_text;
-typedef png_text        FAR *      png_textp;
+typedef png_text        FAR *    png_textp;
 typedef png_text        FAR * FAR * png_textpp;
 
 /* png_time is a way to hold the time in an machine independent way.
@@ -150,7 +150,7 @@ typedef struct png_time_struct
    png_byte minute; /* minute of hour, 0 - 59 */
    png_byte second; /* second of minute, 0 - 60 (for leap seconds) */
 } png_time;
-typedef png_time        FAR *      png_timep;
+typedef png_time        FAR *    png_timep;
 typedef png_time        FAR * FAR * png_timepp;
 
 /* png_info is a structure that holds the information in a png file.
@@ -231,7 +231,7 @@ typedef struct png_info_struct
    png_textp text; /* array of comments */
 #endif
 } png_info;
-typedef png_info        FAR *      png_infop;
+typedef png_info        FAR *    png_infop;
 typedef png_info        FAR * FAR * png_infopp;
 
 #define PNG_RESOLUTION_UNKNOWN 0
@@ -287,7 +287,7 @@ typedef struct png_row_info_struct
    png_byte pixel_depth; /* bits per pixel (depth * channels) */
 } png_row_info;
 
-typedef png_row_info    FAR *      png_row_infop;
+typedef png_row_info    FAR *    png_row_infop;
 typedef png_row_info    FAR * FAR * png_row_infopp;
 
 /* These are the function types for the I/O functions, and the functions which

@@ -1,59 +1,45 @@
-# makefile for libpng on (linux) ELF
+# makefile for libpng
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=gcc
-CFLAGS=-I../zlib -O2 -Wall -fPIC
+CC=cc
+CFLAGS=-I../zlib -O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
-RANLIB=ranlib
-#RANLIB=echo
+#RANLIB=ranlib
+RANLIB=echo
 
-PNGVER = 0.86
-
-# where make install puts libpng.a, libpng.so*, and png.h
+# where make install puts libpng.a and png.h
 prefix=/usr/local
 
 OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o \
-       pngread.o pngio.o pngwrite.o pngrtran.o pngwtran.o \
-       pngmem.o pngerror.o pngpread.o
+	pngread.o pngio.o pngwrite.o pngrtran.o pngwtran.o \
+   pngmem.o pngerror.o pngpread.o
 
-all: libpng.so pngtest
+all: libpng.a pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
-libpng.so: libpng.so.1
-	ln -sf libpng.so.1 libpng.so
-
-libpng.so.1: libpng.so.1.$(PNGVER)
-	ln -sf libpng.so.1.$(PNGVER) libpng.so.1
-
-libpng.so.1.$(PNGVER): $(OBJS)
-	gcc -shared -Wl,-soname,libpng.so.1 -o libpng.so.1.$(PNGVER) $(OBJS)
-
-pngtest: pngtest.o libpng.so
+pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
-install: libpng.so.1.$(PNGVER)
+install: libpng.a
 	-@mkdir $(prefix)/include
 	-@mkdir $(prefix)/lib
 	cp png.h $(prefix)/include
 	cp pngconf.h $(prefix)/include
 	chmod 644 $(prefix)/include/png.h
 	chmod 644 $(prefix)/include/pngconf.h
-	cp libpng.so.1.$(PNGVER) $(prefix)/lib
-	chmod 755 $(prefix)/lib/libpng.so.1.$(PNGVER)
-	-@/bin/rm $(prefix)/lib/libpng.so.1 $(prefix)/lib/libpng.so
-	(cd $(prefix)/lib; ln -sf libpng.so.1.$(PNGVER) libpng.so.1; \
-	 ln -sf libpng.so.1 libpng.so)
+	cp libpng.a $(prefix)/lib
+	chmod 644 $(prefix)/lib/libpng.a
 
 clean:
-	rm -f *.o libpng.so.1.$(PNGVER) libpng.so.1 libpng.so pngtest pngout.png
+	rm -f *.o libpng.a pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
@@ -71,3 +57,4 @@ pngwrite.o: png.h pngconf.h
 pngwtran.o: png.h pngconf.h
 pngwutil.o: png.h pngconf.h
 pngpread.o: png.h pngconf.h
+

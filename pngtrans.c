@@ -2,10 +2,10 @@
 /* pngtrans.c - transforms the data in a row
    routines used by both readers and writers
 
-	libpng 1.0 beta 2 - version 0.87
+   libpng 1.0 beta 2 - version 0.88
    For conditions of distribution and use, see copyright notice in png.h
-	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 15, 1996
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -199,7 +199,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
       }
       else if (row_info->color_type == 6 && row_info->bit_depth == 16)
       {
-			png_bytep rp;
+         png_bytep rp;
          png_byte t[2];
          png_uint_32 i;
 

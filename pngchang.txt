@@ -1,31 +1,31 @@
 pngchange.txt - changes for libpng
 
 version 0.2
-	added reader into png.h
-	fixed small problems in stub file
+   added reader into png.h
+   fixed small problems in stub file
 version 0.3
-	added pull reader
-	split up pngwrite.c to several files
-	added pnglib.txt
-	added example.c
-	cleaned up writer, adding a few new tranformations
-	fixed some bugs in writer
-	interfaced with zlib 0.5
-	added K&R support
-	added check for 64 KB blocks for 16 bit machines
+   added pull reader
+   split up pngwrite.c to several files
+   added pnglib.txt
+   added example.c
+   cleaned up writer, adding a few new tranformations
+   fixed some bugs in writer
+   interfaced with zlib 0.5
+   added K&R support
+   added check for 64 KB blocks for 16 bit machines
 version 0.4
-	cleaned up code and commented code
-	simplified time handling into png_time
-	created png_color_16 and png_color_8 to handle color needs
-	cleaned up color type defines
-	fixed various bugs
-	made various names more consistant
-	interfaced with zlib 0.71
-	cleaned up zTXt reader and writer (using zlib's Reset functions)
-	split transformations into pngrtran.c and pngwtran.c
+   cleaned up code and commented code
+   simplified time handling into png_time
+   created png_color_16 and png_color_8 to handle color needs
+   cleaned up color type defines
+   fixed various bugs
+   made various names more consistant
+   interfaced with zlib 0.71
+   cleaned up zTXt reader and writer (using zlib's Reset functions)
+   split transformations into pngrtran.c and pngwtran.c
 version 0.5
-	interfaced with zlib 0.8
-	fixed many reading and writing bugs
+   interfaced with zlib 0.8
+   fixed many reading and writing bugs
    saved using 3 spaces instead of tabs
 version 0.6
    added png_large_malloc() and png_large_free()
@@ -54,7 +54,8 @@ version 0.8
    changed external functions passing floats to doubles (k&r problems?)
    put all the configurable stuff in pngconf.h
    enabled png_set_shift to work with paletted images on read
-   added png_read_update_info() - updates info structure with transformations
+   added png_read_update_info() - updates info structure with
+      transformations
 version 0.81
    incorporated Tim Wegner's medium model code (thanks, Tim)
 version 0.85
@@ -66,7 +67,10 @@ version 0.86
    fixed bugs
    improved documentation
 version 0.87
-	fixed medium model bugs
-	fixed other bugs introduced in 0.85 and 0.86
+   fixed medium model bugs
+   fixed other bugs introduced in 0.85 and 0.86
    added some minor documentation
-
+version 0.88
+   fixed progressive bugs
+   replaced tabs with spaces
+   cleaned up documentation

@@ -1,10 +1,10 @@
 
 /* pngrutil.c - utilities to read a png file
 
-	libpng 1.0 beta 2 - version 0.87
+   libpng 1.0 beta 2 - version 0.88
    For conditions of distribution and use, see copyright notice in png.h
-	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 15, 1996
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 25, 1996
    */
 
 #define PNG_INTERNAL
@@ -30,8 +30,8 @@ png_get_uint_16(png_bytep buf)
 {
    png_uint_16 i;
 
-	i = (png_uint_16)(((png_uint_16)(*buf) << 8) +
-		(png_uint_16)(*(buf + 1)));
+   i = (png_uint_16)(((png_uint_16)(*buf) << 8) +
+      (png_uint_16)(*(buf + 1)));
 
    return i;
 }
@@ -99,7 +99,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info, png_uint_32 length)
       color_type == 5 || color_type > 6)
       png_error(png_ptr, "Invalid Color Type Found");
 
-	if (color_type == PNG_COLOR_TYPE_PALETTE &&
+   if (color_type == PNG_COLOR_TYPE_PALETTE &&
       bit_depth == 16)
       png_error(png_ptr, "Found Invalid Color Type and Bit Depth Combination");
 
@@ -121,9 +121,9 @@ png_handle_IHDR(png_structp png_ptr, png_infop info, png_uint_32 length)
    /* set internal variables */
    png_ptr->width = width;
    png_ptr->height = height;
-	png_ptr->bit_depth = (png_byte)bit_depth;
-	png_ptr->interlaced = (png_byte)interlace_type;
-	png_ptr->color_type = (png_byte)color_type;
+   png_ptr->bit_depth = (png_byte)bit_depth;
+   png_ptr->interlaced = (png_byte)interlace_type;
+   png_ptr->color_type = (png_byte)color_type;
 
    /* find number of channels */
    switch (png_ptr->color_type)
@@ -143,8 +143,8 @@ png_handle_IHDR(png_structp png_ptr, png_infop info, png_uint_32 length)
          break;
    }
    /* set up other useful info */
-	png_ptr->pixel_depth = (png_byte)(png_ptr->bit_depth *
-		png_ptr->channels);
+   png_ptr->pixel_depth = (png_byte)(png_ptr->bit_depth *
+      png_ptr->channels);
    png_ptr->rowbytes = ((png_ptr->width *
       (png_uint_32)png_ptr->pixel_depth + 7) >> 3);
    /* call the IHDR callback (which should just set up info) */
@@ -165,7 +165,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info, png_uint_32 length)
    num = (int)length / 3;
    palette = (png_colorp)png_large_malloc(png_ptr, num * sizeof (png_color));
    png_ptr->do_free |= PNG_FREE_PALETTE;
-	for (i = 0; i < num; i++)
+   for (i = 0; i < num; i++)
    {
       png_byte buf[3];
 
@@ -176,7 +176,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info, png_uint_32 length)
       palette[i].blue = buf[2];
    }
    png_ptr->palette = palette;
-	png_ptr->num_palette = (png_uint_16)num;
+   png_ptr->num_palette = (png_uint_16)num;
    png_read_PLTE(png_ptr, info, palette, num);
 }
 
@@ -191,7 +191,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info, png_uint_32 length)
    if (length != 4)
    {
       png_warning(png_ptr, "Incorrect gAMA chunk length");
-		png_crc_skip(png_ptr, length);
+      png_crc_skip(png_ptr, length);
       return;
    }
 
@@ -199,7 +199,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info, png_uint_32 length)
    igamma = png_get_uint_32(buf);
    /* check for zero gamma */
    if (!igamma)
-		return;
+      return;
 
    gamma = (float)igamma / (float)100000.0;
    png_read_gAMA(png_ptr, info, gamma);
@@ -212,20 +212,20 @@ void
 png_handle_sBIT(png_structp png_ptr, png_infop info, png_uint_32 length)
 {
    int slen;
-	png_byte buf[4];
+   png_byte buf[4];
 
    buf[0] = buf[1] = buf[2] = buf[3] = 0;
 
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       slen = 3;
    else
-		slen = png_ptr->channels;
+      slen = png_ptr->channels;
 
    if (length != (png_uint_32)slen)
    {
       png_warning(png_ptr, "Incorrect sBIT chunk length");
-		png_crc_skip(png_ptr, length);
-		return;
+      png_crc_skip(png_ptr, length);
+      return;
    }
 
    png_crc_read(png_ptr, buf, length);
@@ -238,7 +238,7 @@ png_handle_sBIT(png_structp png_ptr, png_infop info, png_uint_32 length)
    }
    else
    {
-		png_ptr->sig_bit.gray = buf[0];
+      png_ptr->sig_bit.gray = buf[0];
       png_ptr->sig_bit.alpha = buf[1];
    }
    png_read_sBIT(png_ptr, info, &(png_ptr->sig_bit));
@@ -256,8 +256,8 @@ png_handle_cHRM(png_structp png_ptr, png_infop info, png_uint_32 length)
    if (length != 32)
    {
       png_warning(png_ptr, "Incorrect cHRM chunk length");
-		png_crc_skip(png_ptr, length);
-		return;
+      png_crc_skip(png_ptr, length);
+      return;
    }
 
    png_crc_read(png_ptr, buf, 4);
@@ -293,7 +293,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info, png_uint_32 length)
    blue_y = (float)v / (float)100000.0;
 
    png_read_cHRM(png_ptr, info,
-		white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
+      white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
 }
 #endif
 
@@ -306,14 +306,14 @@ png_handle_tRNS(png_structp png_ptr, png_infop info, png_uint_32 length)
       if (length > png_ptr->num_palette)
       {
          png_warning(png_ptr, "Incorrect tRNS chunk length");
-			png_crc_skip(png_ptr, length);
+         png_crc_skip(png_ptr, length);
          return;
       }
 
       png_ptr->trans = (png_bytep)png_large_malloc(png_ptr, length);
       png_ptr->do_free |= PNG_FREE_TRANS;
-		png_crc_read(png_ptr, png_ptr->trans, length);
-		png_ptr->num_trans = (png_uint_16)length;
+      png_crc_read(png_ptr, png_ptr->trans, length);
+      png_ptr->num_trans = (png_uint_16)length;
    }
    else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
    {
@@ -322,7 +322,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info, png_uint_32 length)
       if (length != 6)
       {
          png_warning(png_ptr, "Incorrect tRNS chunk length");
-			png_crc_skip(png_ptr, length);
+         png_crc_skip(png_ptr, length);
          return;
       }
 
@@ -339,15 +339,15 @@ png_handle_tRNS(png_structp png_ptr, png_infop info, png_uint_32 length)
       if (length != 2)
       {
          png_warning(png_ptr, "Incorrect tRNS chunk length");
-			png_crc_skip(png_ptr, length);
-			return;
-		}
+         png_crc_skip(png_ptr, length);
+         return;
+      }
 
-		png_crc_read(png_ptr, buf, 2);
-		png_ptr->num_trans = 1;
-		png_ptr->trans_values.gray = png_get_uint_16(buf);
-	}
-	else
+      png_crc_read(png_ptr, buf, 2);
+      png_ptr->num_trans = 1;
+      png_ptr->trans_values.gray = png_get_uint_16(buf);
+   }
+   else
       png_warning(png_ptr, "Invalid tRNS chunk");
 
    png_read_tRNS(png_ptr, info, png_ptr->trans, png_ptr->num_trans,
@@ -371,8 +371,8 @@ png_handle_bKGD(png_structp png_ptr, png_infop info, png_uint_32 length)
 
    if (length != (png_uint_32)truelen)
    {
-		png_warning(png_ptr, "Incorrect bKGD chunk length");
-		png_crc_skip(png_ptr, length);
+      png_warning(png_ptr, "Incorrect bKGD chunk length");
+      png_crc_skip(png_ptr, length);
       return;
    }
 
@@ -396,20 +396,20 @@ png_handle_bKGD(png_structp png_ptr, png_infop info, png_uint_32 length)
 void
 png_handle_hIST(png_structp png_ptr, png_infop info, png_uint_32 length)
 {
-	int num, i;
+   int num, i;
 
-	if (length != 2 * png_ptr->num_palette)
-	{
-		png_warning(png_ptr, "Incorrect hIST chunk length");
-		png_crc_skip(png_ptr, length);
-		return;
-	}
+   if (length != 2 * png_ptr->num_palette)
+   {
+      png_warning(png_ptr, "Incorrect hIST chunk length");
+      png_crc_skip(png_ptr, length);
+      return;
+   }
 
    num = (int)length / 2;
-	png_ptr->hist = (png_uint_16p)png_large_malloc(png_ptr,
-		num * sizeof (png_uint_16));
+   png_ptr->hist = (png_uint_16p)png_large_malloc(png_ptr,
+      num * sizeof (png_uint_16));
    png_ptr->do_free |= PNG_FREE_HIST;
-	for (i = 0; i < num; i++)
+   for (i = 0; i < num; i++)
    {
       png_byte buf[2];
 
@@ -430,10 +430,10 @@ png_handle_pHYs(png_structp png_ptr, png_infop info, png_uint_32 length)
 
    if (length != 9)
    {
-		png_warning(png_ptr, "Incorrect pHYs chunk length");
-		png_crc_skip(png_ptr, length);
+      png_warning(png_ptr, "Incorrect pHYs chunk length");
+      png_crc_skip(png_ptr, length);
       return;
-	}
+   }
 
    png_crc_read(png_ptr, buf, 9);
 
@@ -454,12 +454,12 @@ png_handle_oFFs(png_structp png_ptr, png_infop info, png_uint_32 length)
 
    if (length != 9)
    {
-		png_warning(png_ptr, "Incorrect oFFs chunk length");
-		png_crc_skip(png_ptr, length);
+      png_warning(png_ptr, "Incorrect oFFs chunk length");
+      png_crc_skip(png_ptr, length);
       return;
    }
 
-	png_crc_read(png_ptr, buf, 9);
+   png_crc_read(png_ptr, buf, 9);
 
    offset_x = png_get_uint_32(buf);
    offset_y = png_get_uint_32(buf + 4);
@@ -477,8 +477,8 @@ png_handle_tIME(png_structp png_ptr, png_infop info, png_uint_32 length)
 
    if (length != 7)
    {
-		png_warning(png_ptr, "Incorrect tIME chunk length");
-		png_crc_skip(png_ptr, length);
+      png_warning(png_ptr, "Incorrect tIME chunk length");
+      png_crc_skip(png_ptr, length);
       return;
    }
 
@@ -489,7 +489,7 @@ png_handle_tIME(png_structp png_ptr, png_infop info, png_uint_32 length)
    mod_time.hour = buf[4];
    mod_time.day = buf[3];
    mod_time.month = buf[2];
-	mod_time.year = png_get_uint_16(buf);
+   mod_time.year = png_get_uint_16(buf);
 
    png_read_tIME(png_ptr, info, &mod_time);
 }
@@ -500,12 +500,12 @@ png_handle_tIME(png_structp png_ptr, png_infop info, png_uint_32 length)
 void
 png_handle_tEXt(png_structp png_ptr, png_infop info, png_uint_32 length)
 {
-	png_charp key;
+   png_charp key;
    png_charp text;
 
-	key = (png_charp )png_large_malloc(png_ptr, length + 1);
+   key = (png_charp )png_large_malloc(png_ptr, length + 1);
    png_crc_read(png_ptr, (png_bytep )key, length);
-	key[(png_size_t)length] = '\0';
+   key[(png_size_t)length] = '\0';
 
    for (text = key; *text; text++)
       /* empty loop */ ;
@@ -527,8 +527,8 @@ png_handle_zTXt(png_structp png_ptr, png_infop info, png_uint_32 length)
    int ret;
    png_uint_32 text_size, key_size;
 
-	key = png_large_malloc(png_ptr, length + 1);
-	png_crc_read(png_ptr, (png_bytep )key, length);
+   key = png_large_malloc(png_ptr, length + 1);
+   png_crc_read(png_ptr, (png_bytep )key, length);
    key[(png_size_t)length] = '\0';
 
    for (text = key; *text; text++)
@@ -538,7 +538,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info, png_uint_32 length)
    if (text == key + (png_size_t)length)
    {
       png_warning(png_ptr, "Zero length zTXt chunk");
-		png_large_free(png_ptr, key);
+      png_large_free(png_ptr, key);
       return;
    }
 
@@ -559,19 +559,19 @@ png_handle_zTXt(png_structp png_ptr, png_infop info, png_uint_32 length)
 
    key_size = text - key;
    text_size = 0;
-	text = NULL;
+   text = NULL;
    ret = Z_STREAM_END;
 
    while (png_ptr->zstream->avail_in)
    {
-		ret = inflate(png_ptr->zstream, Z_PARTIAL_FLUSH);
+      ret = inflate(png_ptr->zstream, Z_PARTIAL_FLUSH);
       if (ret != Z_OK && ret != Z_STREAM_END)
       {
-			if (png_ptr->zstream->msg)
-				png_warning(png_ptr, png_ptr->zstream->msg);
+         if (png_ptr->zstream->msg)
+            png_warning(png_ptr, png_ptr->zstream->msg);
          else
-				png_warning(png_ptr, "zTXt decompression error");
-			inflateReset(png_ptr->zstream);
+            png_warning(png_ptr, "zTXt decompression error");
+         inflateReset(png_ptr->zstream);
          png_ptr->zstream->avail_in = 0;
          png_large_free(png_ptr, key);
          png_large_free(png_ptr, text);
@@ -593,7 +593,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info, png_uint_32 length)
          }
          else
          {
-				png_charp tmp;
+            png_charp tmp;
 
             tmp = text;
             text = png_large_malloc(png_ptr, text_size +
@@ -620,7 +620,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info, png_uint_32 length)
          break;
    }
 
-	inflateReset(png_ptr->zstream);
+   inflateReset(png_ptr->zstream);
    png_ptr->zstream->avail_in = 0;
 
    if (ret != Z_STREAM_END)
@@ -683,7 +683,7 @@ png_combine_row(png_structp png_ptr, png_bytep row,
                {
                   value = (*sp >> shift) & 0x1;
                   *dp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
-						*dp |= (png_byte)(value << shift);
+                  *dp |= (png_byte)(value << shift);
                }
 
                if (shift == 0)
@@ -721,7 +721,7 @@ png_combine_row(png_structp png_ptr, png_bytep row,
                {
                   value = (*sp >> shift) & 0x3;
                   *dp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
-						*dp |= (png_byte)(value << shift);
+                  *dp |= (png_byte)(value << shift);
                }
 
                if (shift == 0)
@@ -758,7 +758,7 @@ png_combine_row(png_structp png_ptr, png_bytep row,
                {
                   value = (*sp >> shift) & 0xf;
                   *dp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
-						*dp |= (png_byte)(value << shift);
+                  *dp |= (png_byte)(value << shift);
                }
 
                if (shift == 0)
@@ -835,7 +835,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass)
             dshift = 7 - (int)((final_width + 7) & 7);
             for (i = row_info->width; i; i--)
             {
-					v = (png_byte)((*sp >> sshift) & 0x1);
+               v = (png_byte)((*sp >> sshift) & 0x1);
                for (j = 0; j < png_pass_inc[pass]; j++)
                {
                   *dp &= (png_byte)((0x7f7f >> (7 - dshift)) & 0xff);
@@ -871,11 +871,11 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass)
             dshift = (png_size_t)((3 - ((final_width + 3) & 3)) << 1);
             for (i = row_info->width; i; i--)
             {
-					v = (png_byte)((*sp >> sshift) & 0x3);
+               v = (png_byte)((*sp >> sshift) & 0x3);
                for (j = 0; j < png_pass_inc[pass]; j++)
                {
                   *dp &= (png_byte)((0x3f3f >> (6 - dshift)) & 0xff);
-						*dp |= (png_byte)(v << dshift);
+                  *dp |= (png_byte)(v << dshift);
                   if (dshift == 6)
                   {
                      dshift = 0;
@@ -908,7 +908,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass)
             dshift = (png_size_t)((1 - ((final_width + 1) & 1)) << 2);
             for (i = row_info->width; i; i--)
             {
-					v = (png_byte)((*sp >> sshift) & 0xf);
+               v = (png_byte)((*sp >> sshift) & 0xf);
                for (j = 0; j < png_pass_inc[pass]; j++)
                {
                   *dp &= (png_byte)((0xf0f >> (4 - dshift)) & 0xff);
@@ -1145,7 +1145,7 @@ png_read_finish_row(png_structp png_ptr)
             png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zstream->avail_in);
             png_ptr->idat_size -= png_ptr->zstream->avail_in;
          }
-			ret = inflate(png_ptr->zstream, Z_PARTIAL_FLUSH);
+         ret = inflate(png_ptr->zstream, Z_PARTIAL_FLUSH);
          if (ret == Z_STREAM_END)
          {
             if (!(png_ptr->zstream->avail_out) || png_ptr->zstream->avail_in ||
@@ -1279,11 +1279,11 @@ png_read_start_row(png_structp png_ptr)
    if (rowbytes > 65536L)
       png_error(png_ptr, "This image requires a row greater then 64KB");
 #endif
-	png_ptr->row_buf = (png_bytep )png_large_malloc(png_ptr, rowbytes);
+   png_ptr->row_buf = (png_bytep )png_large_malloc(png_ptr, rowbytes);
 
 #ifdef PNG_MAX_MALLOC_64K
    if (png_ptr->rowbytes + 1 > 65536L)
-		png_error(png_ptr, "This image requires a row greater then 64KB");
+      png_error(png_ptr, "This image requires a row greater then 64KB");
 #endif
    png_ptr->prev_row = png_large_malloc(png_ptr,
       png_ptr->rowbytes + 1);

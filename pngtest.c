@@ -1,8 +1,8 @@
 /* pngtest.c - a simple test program to test libpng
 
-	libpng 1.0 beta 2 - version 0.87
+   libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
-	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
    January 15, 1996
 */
 
@@ -16,7 +16,7 @@
 
 /* defined so I can write to a file on gui/windowing platforms */
 /*  #define STDERR stderr  */
-#define STDERR stdout	/* for DOS */
+#define STDERR stdout   /* for DOS */
 
 /* input and output filenames */
 char inname[] = "pngtest.png";
@@ -32,13 +32,13 @@ char inbuf[256], outbuf[256];
 int main()
 {
    FILE *fpin, *fpout;
-	png_bytep row_buf;
+   png_bytep row_buf;
    png_byte * near_row_buf;
    png_uint_32 rowbytes;
    png_uint_32 y;
    int channels, num_pass, pass;
 
-	row_buf = (png_bytep)0;
+   row_buf = (png_bytep)0;
    near_row_buf = (png_byte *)0;
 
    fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
@@ -75,7 +75,7 @@ int main()
    }
 
    if (setjmp(write_ptr.jmpbuf))
-	{
+   {
       fprintf(STDERR, "libpng write error\n");
       fclose(fpin);
       fclose(fpout);
@@ -93,7 +93,7 @@ int main()
    png_read_info(&read_ptr, &info_ptr);
    png_write_info(&write_ptr, &info_ptr);
 
-	if ((info_ptr.color_type & 3) == 2)
+   if ((info_ptr.color_type & 3) == 2)
       channels = 3;
    else
       channels = 1;
@@ -101,7 +101,7 @@ int main()
       channels++;
 
    rowbytes = ((info_ptr.width * info_ptr.bit_depth * channels + 7) >> 3);
-	near_row_buf = (png_byte *)malloc((size_t)rowbytes);
+   near_row_buf = (png_byte *)malloc((size_t)rowbytes);
    row_buf = (png_bytep)near_row_buf;
    if (!row_buf)
    {
@@ -130,8 +130,8 @@ int main()
 #ifdef TESTING
          fprintf(STDERR, "Processing line #%ld\n", y);
 #endif
-			png_read_rows(&read_ptr, (png_bytepp)&row_buf, (png_bytepp)0, 1);
-			png_write_rows(&write_ptr, (png_bytepp)&row_buf, 1);
+         png_read_rows(&read_ptr, (png_bytepp)&row_buf, (png_bytepp)0, 1);
+         png_write_rows(&write_ptr, (png_bytepp)&row_buf, 1);
       }
    }
 
