@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.2.1beta2 - October 25, 2001
+ * libpng 1.2.1beta3 - October 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -27,7 +27,7 @@ png_voidp /* PRIVATE */
 png_create_struct(int type)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   return (png_create_struct_2(type, (png_malloc_ptr)NULL, (png_voidp)NULL));
+   return (png_create_struct_2(type, png_malloc_ptr_NULL, png_voidp_NULL));
 }
 
 /* Alternate version of png_create_struct, for use with user-defined malloc. */
@@ -43,39 +43,30 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    else if (type == PNG_STRUCT_PNG)
      size = sizeof(png_struct);
    else
-     return ((png_voidp)NULL);
+     return (NULL);
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(malloc_fn != NULL)
    {
-      if (mem_ptr != NULL)
-      {
-         png_struct dummy_struct;
-         png_structp png_ptr = &dummy_struct;
-         png_ptr->mem_ptr=mem_ptr;
-         struct_ptr = (*(malloc_fn))(png_ptr, size);
-      }
-      else
-         struct_ptr = (*(malloc_fn))((png_structp)NULL, size);
-      if (struct_ptr != NULL)
-         png_memset(struct_ptr, 0, size);
-      return (struct_ptr);
+      png_struct dummy_struct;
+      png_structp png_ptr = &dummy_struct;
+      png_ptr->mem_ptr=mem_ptr;
+      struct_ptr = (*(malloc_fn))(png_ptr, size);
    }
+   else
 #endif /* PNG_USER_MEM_SUPPORTED */
-   if ((struct_ptr = (png_voidp)farmalloc(size)) != NULL)
-   {
+      struct_ptr = (png_voidp)farmalloc(size));
+   if (struct_ptr != NULL)
       png_memset(struct_ptr, 0, size);
-   }
    return (struct_ptr);
 }
-
 
 /* Free memory allocated by a png_create_struct() call */
 void /* PRIVATE */
 png_destroy_struct(png_voidp struct_ptr)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   png_destroy_struct_2(struct_ptr, (png_free_ptr)NULL, (png_voidp)NULL);
+   png_destroy_struct_2(struct_ptr, png_free_ptr_NULL, png_voidp_NULL);
 }
 
 /* Free memory allocated by a png_create_struct() call */
@@ -126,7 +117,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
    png_voidp ret;
 #endif
    if (png_ptr == NULL || size == 0)
-      return ((png_voidp)NULL);
+      return (NULL);
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(png_ptr->malloc_fn != NULL)
@@ -297,7 +288,7 @@ png_voidp /* PRIVATE */
 png_create_struct(int type)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   return (png_create_struct_2(type, (png_malloc_ptr)NULL, (png_voidp)NULL));
+   return (png_create_struct_2(type, png_malloc_ptr_NULL, png_voidp_NULL));
 }
 
 /* Allocate memory for a png_struct or a png_info.  The malloc and
@@ -315,7 +306,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    else if (type == PNG_STRUCT_PNG)
       size = sizeof(png_struct);
    else
-      return ((png_voidp)NULL);
+      return (NULL);
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(malloc_fn != NULL)
@@ -328,7 +319,9 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
          struct_ptr = (*(malloc_fn))(png_ptr, size);
       }
       else
-         struct_ptr = (*(malloc_fn))((png_structp)NULL, size);
+      {
+         struct_ptr = (*(malloc_fn))(png_structp_NULL, size);
+      }
       if (struct_ptr != NULL)
          png_memset(struct_ptr, 0, size);
       return (struct_ptr);
@@ -357,7 +350,7 @@ void /* PRIVATE */
 png_destroy_struct(png_voidp struct_ptr)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   png_destroy_struct_2(struct_ptr, (png_free_ptr)NULL, (png_voidp)NULL);
+   png_destroy_struct_2(struct_ptr, png_free_ptr_NULL, png_voidp_NULL);
 }
 
 /* Free memory allocated by a png_create_struct() call */
@@ -402,7 +395,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
    if (png_ptr == NULL || size == 0)
-      return ((png_voidp)NULL);
+      return (NULL);
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(png_ptr->malloc_fn != NULL)

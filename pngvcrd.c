@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.2.1beta2 - October 25, 2001
+ * libpng 1.2.1beta3 - October 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.1beta2 - October 25, 2001
+ * libpng 1.2.1beta3 - October 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -481,7 +481,7 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       png_debug_malloc directly, with png_ptr == NULL which is OK */
 
    if (size == 0)
-      return (png_voidp)(NULL);
+      return (NULL);
 
    /* This calls the library allocator twice, once to get the requested
       buffer and once to get a new free list entry. */
@@ -594,7 +594,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
    char inbuf[256], outbuf[256];
 
-   row_buf = (png_bytep)NULL;
+   row_buf = NULL;
 
 #if defined(_WIN32_WCE)
    MultiByteToWideChar(CP_ACP, 0, inname, -1, path, MAX_PATH);
@@ -621,12 +621,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
    png_debug(0, "Allocating read and write structures\n");
 #ifdef PNG_USER_MEM_SUPPORTED
-   read_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-      (png_error_ptr)NULL, (png_error_ptr)NULL, (png_voidp)NULL,
+   read_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
+      png_error_ptr_NULL, png_error_ptr_NULL, png_voidp_NULL,
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
 #else
-   read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-      (png_error_ptr)NULL, (png_error_ptr)NULL);
+   read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
+      png_error_ptr_NULL, png_error_ptr_NULL);
 #endif
 #if defined(PNG_NO_STDIO)
    png_set_error_fn(read_ptr, (png_voidp)inname, pngtest_error,
@@ -634,12 +634,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #ifdef PNG_WRITE_SUPPORTED
 #ifdef PNG_USER_MEM_SUPPORTED
-   write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-      (png_error_ptr)NULL, (png_error_ptr)NULL, (png_voidp)NULL,
+   write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
+      png_error_ptr_NULL, png_error_ptr_NULL, png_voidp_NULL,
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
 #else
-   write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-      (png_error_ptr)NULL, (png_error_ptr)NULL);
+   write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
+      png_error_ptr_NULL, png_error_ptr_NULL);
 #endif
 #if defined(PNG_NO_STDIO)
    png_set_error_fn(write_ptr, (png_voidp)inname, pngtest_error,
@@ -727,9 +727,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    else
    {
 #ifdef PNG_WRITE_SUPPORTED
-      png_set_write_status_fn(write_ptr, (png_write_status_ptr)NULL);
+      png_set_write_status_fn(write_ptr, png_write_status_ptr_NULL);
 #endif
-      png_set_read_status_fn(read_ptr, (png_read_status_ptr)NULL);
+      png_set_read_status_fn(read_ptr, png_read_status_ptr_NULL);
    }
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
@@ -749,11 +749,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #define HANDLE_CHUNK_ALWAYS       3
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_set_keep_unknown_chunks(read_ptr, HANDLE_CHUNK_ALWAYS,
-      (png_bytep)NULL, 0);
+      png_bytep_NULL, 0);
 #endif
 #if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
    png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE,
-      (png_bytep)NULL, 0);
+      png_bytep_NULL, 0);
 #endif
 
    png_debug(0, "Reading info struct\n");
@@ -1058,7 +1058,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_debug2(0, "0x%08lx (%ld bytes)\n", (unsigned long)row_buf,
             png_get_rowbytes(read_ptr, read_info_ptr));
 #endif /* !SINGLE_ROWBUF_ALLOC */
-         png_read_rows(read_ptr, (png_bytepp)&row_buf, (png_bytepp)NULL, 1);
+         png_read_rows(read_ptr, (png_bytepp)&row_buf, png_bytepp_NULL, 1);
 
 #ifdef PNG_WRITE_SUPPORTED
 #ifdef PNGTEST_TIMING
@@ -1512,4 +1512,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_1beta2 your_png_h_is_not_version_1_2_1beta2;
+typedef version_1_2_1beta3 your_png_h_is_not_version_1_2_1beta3;

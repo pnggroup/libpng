@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.2.1beta2 - October 25, 2001
+ * libpng 1.2.1beta3 - October 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -792,7 +792,7 @@ png_push_process_row(png_structp png_ptr)
             {
                for (i = 0; i < 4 && png_ptr->pass == 2; i++)
                {
-                  png_push_have_row(png_ptr, (png_bytep)NULL);
+                  png_push_have_row(png_ptr, png_bytep_NULL);
                   png_read_push_finish_row(png_ptr);
                }
             }
@@ -800,13 +800,13 @@ png_push_process_row(png_structp png_ptr)
 	    {
 	        for (i = 0; i < 2 && png_ptr->pass == 4; i++)
                 {
-                   png_push_have_row(png_ptr, (png_bytep)NULL);
+                   png_push_have_row(png_ptr, png_bytep_NULL);
                    png_read_push_finish_row(png_ptr);
                 }
             }
             if (png_ptr->pass == 6 && png_ptr->height <= 4)
             {
-                png_push_have_row(png_ptr, (png_bytep)NULL);
+                png_push_have_row(png_ptr, png_bytep_NULL);
                 png_read_push_finish_row(png_ptr);
             }
             break;
@@ -823,7 +823,7 @@ png_push_process_row(png_structp png_ptr)
             {
                for (i = 0; i < 4 && png_ptr->pass == 2; i++)
                {
-                  png_push_have_row(png_ptr, (png_bytep)NULL);
+                  png_push_have_row(png_ptr, png_bytep_NULL);
                   png_read_push_finish_row(png_ptr);
                }
             }
@@ -839,14 +839,14 @@ png_push_process_row(png_structp png_ptr)
             }
             for (i = 0; i < 4 && png_ptr->pass == 2; i++)
             {
-               png_push_have_row(png_ptr, (png_bytep)NULL);
+               png_push_have_row(png_ptr, png_bytep_NULL);
                png_read_push_finish_row(png_ptr);
             }
             if (png_ptr->pass == 4) /* pass 3 might be empty */
             {
                for (i = 0; i < 2 && png_ptr->pass == 4; i++)
                {
-                  png_push_have_row(png_ptr, (png_bytep)NULL);
+                  png_push_have_row(png_ptr, png_bytep_NULL);
                   png_read_push_finish_row(png_ptr);
                }
             }
@@ -864,7 +864,7 @@ png_push_process_row(png_structp png_ptr)
             {
                for (i = 0; i < 2 && png_ptr->pass == 4; i++)
                {
-                  png_push_have_row(png_ptr, (png_bytep)NULL);
+                  png_push_have_row(png_ptr, png_bytep_NULL);
                   png_read_push_finish_row(png_ptr);
                }
             }
@@ -880,12 +880,12 @@ png_push_process_row(png_structp png_ptr)
             }
             for (i = 0; i < 2 && png_ptr->pass == 4; i++)
             {
-               png_push_have_row(png_ptr, (png_bytep)NULL);
+               png_push_have_row(png_ptr, png_bytep_NULL);
                png_read_push_finish_row(png_ptr);
             }
             if (png_ptr->pass == 6) /* pass 5 might be empty */
             {
-               png_push_have_row(png_ptr, (png_bytep)NULL);
+               png_push_have_row(png_ptr, png_bytep_NULL);
                png_read_push_finish_row(png_ptr);
             }
             break;
@@ -900,7 +900,7 @@ png_push_process_row(png_structp png_ptr)
             }
             if (png_ptr->pass == 6) /* skip top generated row */
             {
-               png_push_have_row(png_ptr, (png_bytep)NULL);
+               png_push_have_row(png_ptr, png_bytep_NULL);
                png_read_push_finish_row(png_ptr);
             }
             break;
@@ -911,7 +911,7 @@ png_push_process_row(png_structp png_ptr)
             png_read_push_finish_row(png_ptr);
             if (png_ptr->pass != 6)
                break;
-            png_push_have_row(png_ptr, (png_bytep)NULL);
+            png_push_have_row(png_ptr, png_bytep_NULL);
             png_read_push_finish_row(png_ptr);
          }
       }
@@ -1072,8 +1072,8 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
       text_ptr->compression = PNG_TEXT_COMPRESSION_NONE;
       text_ptr->key = key;
 #ifdef PNG_iTXt_SUPPORTED
-      text_ptr->lang = (char *)NULL;
-      text_ptr->lang_key = (char *)NULL;
+      text_ptr->lang = NULL;
+      text_ptr->lang_key = NULL;
 #endif
       text_ptr->text = text;
 
@@ -1257,8 +1257,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
       text_ptr->compression = PNG_TEXT_COMPRESSION_zTXt;
       text_ptr->key = key;
 #ifdef PNG_iTXt_SUPPORTED
-      text_ptr->lang = (char *)NULL;
-      text_ptr->lang_key = (char *)NULL;
+      text_ptr->lang = NULL;
+      text_ptr->lang_key = NULL;
 #endif
       text_ptr->text = text;
 

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.1beta2 - October 25, 2001
+ * libpng 1.2.1beta3 - October 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -676,8 +676,8 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 #endif
       {
 #ifdef PNG_iTXt_SUPPORTED
-         textp->lang=(png_charp)NULL;
-         textp->lang_key=(png_charp)NULL;
+         textp->lang=NULL;
+         textp->lang_key=NULL;
 #endif
          textp->text=textp->key + key_len + 1;
       }

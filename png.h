@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.1beta2 - October 25, 2001
+ * libpng version 1.2.1beta3 - October 27, 2001
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.1beta2 - October 25, 2001: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.1beta3 - October 27, 2001: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -78,7 +78,7 @@
  *    1.2.0beta3-5             3    10200  3.1.2.0beta3-5
  *    1.2.0rc1                 3    10200  3.1.2.0rc1
  *    1.2.0                    3    10200  3.1.2.0
- *    1.2.1beta1-2             3    10201  3.1.2.1beta1-2
+ *    1.2.1beta1-3             3    10201  3.1.2.1beta1-3
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -108,7 +108,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.0.7, July 1, 2000, through  1.2.1beta2, October 25, 2001, are
+ * libpng versions 1.0.7, July 1, 2000, through  1.2.1beta3, October 27, 2001, are
  * Copyright (c) 2000, 2001 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors
@@ -213,13 +213,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    October 25, 2001
+ *    October 27, 2001
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.2.1beta2 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.2.1beta3 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -275,7 +275,7 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.2.1beta2"
+#define PNG_LIBPNG_VER_STRING "1.2.1beta3"
 
 #define PNG_LIBPNG_VER_SONUM   3
 #define PNG_LIBPNG_VER_DLLNUM  %DLLNUM%
@@ -287,7 +287,7 @@
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  2
+#define PNG_LIBPNG_VER_BUILD  3
 
 #define PNG_LIBPNG_BUILD_ALPHA    1
 #define PNG_LIBPNG_BUILD_BETA     2
@@ -322,6 +322,22 @@ extern "C" {
  * library functions, while the third has the internal library functions,
  * which applications aren't expected to use directly.
  */
+
+#define int_p_NULL                NULL     /* (int *)NULL */
+#define png_bytep_NULL            NULL     /* (png_bytep)NULL */
+#define png_bytepp_NULL           NULL     /* (png_bytepp)NULL */
+#define png_doublep_NULL          NULL     /* (png_doublep)NULL */
+#define png_error_ptr_NULL        NULL     /* (png_error_ptr)NULL */
+#define png_flush_ptr_NULL        NULL     /* (png_flush_ptr)NULL */
+#define png_free_ptr_NULL         NULL     /* (png_free_ptr)NULL */
+#define png_infopp_NULL           NULL     /* (png_infopp)NULL */
+#define png_malloc_ptr_NULL       NULL     /* (png_malloc_ptr)NULL */
+#define png_read_status_ptr_NULL  NULL     /* (png_read_status_ptr)NULL */
+#define png_rw_ptr_NULL           NULL     /* (png_rw_ptr)NULL */
+#define png_structp_NULL          NULL     /* (png_structp)NULL */
+#define png_uint_16p_NULL         NULL     /* (png_uint_16p)NULL */
+#define png_voidp_NULL            NULL     /* (png_voidp)NULL */
+#define png_write_status_ptr_NULL NULL     /* (png_write_status_ptr)NULL */
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
@@ -1217,9 +1233,9 @@ struct png_struct_def
 
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-   and png.h are both at version 1.2.1beta2
+   and png.h are both at version 1.2.1beta3
  */
-typedef png_structp version_1_2_1beta2;
+typedef png_structp version_1_2_1beta3;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -2336,7 +2352,7 @@ extern PNG_EXPORT(void,png_set_strip_error_numbers) PNGARG((png_structp
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project defs */
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.1beta2 - October 25, 2001 (header)\n"
+   " libpng version 1.2.1beta3 - October 27, 2001 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -2949,15 +2965,17 @@ PNG_EXTERN void png_do_shift PNGARG((png_row_infop row_info, png_bytep row,
 #endif
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
-PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
-   png_color_16p trans_values, png_color_16p background
 #if defined(PNG_READ_GAMMA_SUPPORTED)
-   , png_color_16p background_1,
+PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
+   png_color_16p trans_values, png_color_16p background,
+   png_color_16p background_1,
    png_bytep gamma_table, png_bytep gamma_from_1, png_bytep gamma_to_1,
    png_uint_16pp gamma_16, png_uint_16pp gamma_16_from_1,
-   png_uint_16pp gamma_16_to_1, int gamma_shift
+   png_uint_16pp gamma_16_to_1, int gamma_shift));
+#else
+PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
+   png_color_16p trans_values, png_color_16p background));
 #endif
-   ));
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
