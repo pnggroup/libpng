@@ -6,6 +6,8 @@
 #ifndef PNGCRUSH_H
 #define PNGCRUSH_H
 
+#define PNG_NO_LEGACY_SUPPORTED
+
 #define PNG_SETJMP_NOT_SUPPORTED
 
 #if PNG_LIBPNG_VER > 10006
@@ -36,21 +38,27 @@
 #define PNG_NO_WRITE_TRANSFORMS
 #define PNG_NO_PROGRESSIVE_READ
 #define PNG_NO_WRITE_WEIGHTED_FILTER
+#define PNG_NO_READ_COMPOSITED_NODIV
+
 #define PNG_READ_USER_TRANSFORM_SUPPORTED
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
 #define PNG_READ_EXPAND_SUPPORTED
 #define PNG_READ_FILLER_SUPPORTED
+
 #if (PNG_LIBPNG_VER > 10002)
 /* versions 0.96 through 1.0.2 have a stub png_rgb_to_gray() with the
  * wrong number of parameters */
 #  define PNG_READ_RGB_TO_GRAY_SUPPORTED
 #endif
+
 #ifndef PNG_NO_FLOATING_POINT_SUPPORTED
 #  define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #  define PNG_READ_BACKGROUND_SUPPORTED
 #  define PNG_READ_GAMMA_SUPPORTED
 #else
-#  define PNG_NO_READ_RGB_TO_GRAY
+#  if (PNG_LIBPNG_VER < 10007)
+#    define PNG_NO_READ_RGB_TO_GRAY
+#  endif
 #endif
 #if !defined(PNG_ZBUF_SIZE) && (PNG_LIBPNG_VER > 97)
 #  define PNG_ZBUF_SIZE 524288       /* increases the IDAT size */
@@ -66,6 +74,11 @@
 #endif
 #endif
 
+/* We are not supporting legacy code so we don't need the reserved space */
+
+/* This allows png_default_error() to return, when it is called after our
+   own exception handling, which only returns after "Too many IDAT's",
+   that we want to handle as a warning instead of an error. */
 #define PNG_ABORT()
 
 #endif

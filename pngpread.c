@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1336,12 +1336,14 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 len
 
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
+#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
       if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
            HANDLE_CHUNK_ALWAYS
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
            && png_ptr->read_user_chunk_fn == (png_user_chunk_ptr)NULL
 #endif
          )
+#endif
          png_chunk_error(png_ptr, "unknown critical chunk");
 
       /* to quiet compiler warnings about unused info_ptr */

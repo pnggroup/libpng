@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -434,6 +434,7 @@ png_get_gAMA(png_structp png_ptr, png_infop info_ptr, double *file_gamma)
    return (0);
 }
 #endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
 png_uint_32
 png_get_gAMA_fixed(png_structp png_ptr, png_infop info_ptr,
     png_fixed_point *int_file_gamma)
@@ -447,6 +448,7 @@ png_get_gAMA_fixed(png_structp png_ptr, png_infop info_ptr,
    }
    return (0);
 }
+#endif
 #endif
 
 #if defined(PNG_READ_sRGB_SUPPORTED)

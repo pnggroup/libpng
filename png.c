@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.6h - April 24, 2000
+ * libpng version 1.0.6i - May 1, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -14,14 +14,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_6h Your_png_h_is_not_version_1_0_6h;
+typedef version_1_0_6i Your_png_h_is_not_version_1_0_6i;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.6h";
+char png_libpng_ver[12] = "1.0.6i";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -134,7 +134,7 @@ png_check_sig(png_bytep sig, int num)
   return ((int)!png_sig_cmp(sig, (png_size_t)0, (png_size_t)num));
 }
 
-/* Function to allocate memory for zlib. */
+/* Function to allocate memory for zlib and clear it to 0. */
 voidpf
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
@@ -261,6 +261,7 @@ png_info_init(png_infop info_ptr)
    png_memset(info_ptr, 0, sizeof (png_info));
 }
 
+#ifdef PNG_FREE_ME_SUPPORTED
 void
 png_data_freer(png_structp png_ptr, png_infop info_ptr,
    int freer, png_uint_32 mask)
@@ -276,6 +277,7 @@ png_data_freer(png_structp png_ptr, png_infop info_ptr,
       png_warning(png_ptr,
          "Unknown freer parameter in png_data_freer.");
 }
+#endif
 
 void
 png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask, int num)
@@ -286,7 +288,9 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask, int num
 
 #if defined(PNG_TEXT_SUPPORTED)
 /* free text item num or (if num == -1) all text items */
+#ifdef PNG_FREE_ME_SUPPORTED
 if (mask & info_ptr->free_me & PNG_FREE_TEXT)
+#endif
 {
    if (num != -1)
    {
@@ -314,7 +318,11 @@ if (mask & PNG_FREE_TRNS)
 {
    if (info_ptr->valid & PNG_INFO_tRNS)
    {
+#ifdef PNG_FREE_ME_SUPPORTED
        if (info_ptr->free_me & PNG_FREE_TRNS)
+#else
+       if (png_ptr->flags & PNG_FLAG_FREE_TRNS)
+#endif
          png_free(png_ptr, info_ptr->trans);
        info_ptr->valid &= ~PNG_INFO_tRNS;
    }
@@ -362,7 +370,9 @@ if (mask & PNG_FREE_ICCP)
 {
    if (info_ptr->valid & PNG_INFO_iCCP)
    {
+#ifdef PNG_FREE_ME_SUPPORTED
        if (info_ptr->free_me & PNG_FREE_ICCP)
+#endif
        {
          png_free(png_ptr, info_ptr->iccp_name);
          png_free(png_ptr, info_ptr->iccp_profile);
@@ -427,7 +437,11 @@ if (mask & PNG_FREE_HIST)
 {
    if (info_ptr->valid & PNG_INFO_hIST)
    {
+#ifdef PNG_FREE_ME_SUPPORTED
        if (info_ptr->free_me & PNG_FREE_HIST)
+#else
+       if (png_ptr->flags & PNG_FLAG_FREE_HIST)
+#endif
          png_free(png_ptr, info_ptr->hist);
        info_ptr->valid &= ~PNG_INFO_hIST;
    }
@@ -439,7 +453,11 @@ if (mask & PNG_FREE_PLTE)
 {
    if (info_ptr->valid & PNG_INFO_PLTE)
    {
+#ifdef PNG_FREE_ME_SUPPORTED
        if (info_ptr->free_me & PNG_FREE_PLTE)
+#else
+       if (png_ptr->flags & PNG_FLAG_FREE_PLTE)
+#endif
           png_zfree(png_ptr, info_ptr->palette);
        info_ptr->valid &= ~(PNG_INFO_PLTE);
        info_ptr->num_palette = 0;
@@ -450,7 +468,9 @@ if (mask & PNG_FREE_PLTE)
 /* free any image bits attached to the info structure */
 if (mask & PNG_FREE_ROWS)
 {
+#ifdef PNG_FREE_ME_SUPPORTED
    if (info_ptr->free_me & PNG_FREE_ROWS)
+#endif
    {
        int row;
 
@@ -460,8 +480,10 @@ if (mask & PNG_FREE_ROWS)
    }
 }
 #endif
+#ifdef PNG_FREE_ME_SUPPORTED
    if(num == -1)
      info_ptr->free_me &= ~mask;
+#endif
 }
 
 /* This is an internal routine to free any memory that the info struct is
@@ -475,7 +497,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
     
-#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
    if (png_ptr->num_chunk_list)
    {
        png_free(png_ptr, png_ptr->chunk_list);
@@ -561,7 +583,7 @@ png_charp
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.6h - April 24, 2000\n\
+   return ("\n libpng version 1.0.6i - May 1, 2000\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson\n");
@@ -579,8 +601,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.6h");
-   return("1.0.6h");
+      return("1.0.6i");
+   return("1.0.6i");
 }
 
 png_charp

@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -167,7 +167,7 @@ png_text_compress(png_structp png_ptr,
    {
        comp->input = text;
        comp->input_len = text_len;
-       return(text_len);
+       return((int)text_len);
    }
 
    if (compression >= PNG_TEXT_COMPRESSION_LAST)
@@ -314,7 +314,7 @@ png_text_compress(png_structp png_ptr,
    if (png_ptr->zstream.avail_out < png_ptr->zbuf_size)
       text_len += png_ptr->zbuf_size - (png_size_t)png_ptr->zstream.avail_out;
 
-   return(text_len);
+   return((int)text_len);
 }
 
 /* ship the compressed text out via chunk writes */
@@ -647,8 +647,8 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
       profile_len = 0;
 
    if (profile_len)
-       profile_len = png_text_compress(png_ptr, profile, profile_len,
-                   PNG_TEXT_COMPRESSION_zTXt, &comp);
+       profile_len = png_text_compress(png_ptr, profile, (png_size_t)profile_len,
+          PNG_TEXT_COMPRESSION_zTXt, &comp);
 
    /* make sure we include the NULL after the name and the compression type */
    png_write_chunk_start(png_ptr, (png_bytep)png_iCCP,
@@ -1204,7 +1204,8 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
    png_free(png_ptr, new_key);
 
    /* compute the compressed data; do it now for the length */
-   text_len = png_text_compress(png_ptr, text, text_len, compression, &comp);
+   text_len = png_text_compress(png_ptr, text, text_len, compression,
+       &comp);
 
    /* write start of chunk */
    png_write_chunk_start(png_ptr, (png_bytep)png_zTXt, (png_uint_32)
@@ -1256,7 +1257,8 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
       text_len = 0;
 
    /* compute the compressed data; do it now for the length */
-   text_len = png_text_compress(png_ptr, text, text_len, compression-2, &comp);
+   text_len = png_text_compress(png_ptr, text, text_len, compression-2,
+      &comp);
 
    /* make sure we include the compression flag, the compression byte,
     * and the NULs after the key, lang, and lang_key parts */

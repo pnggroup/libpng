@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.6h - April 24, 2000
+ * libpng version 1.0.6i - May 1, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.6h - April 24, 2000: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.6i - May 1, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -48,9 +48,11 @@
  *    1.0.5s-v                 1.0.5s-v 10006  2.1.0.5s-v (not binary compatible)
  *    1.0.6 (+ 3 patches)      1.0.6    10006  2.1.0.6    (still binary incompat)
  *    1.0.6d-f                 1.0.6d-f 10007  2.1.0.6d-f (still binary incompat)
- *    1.0.6g                   1.0.6g   10007  2.1.0.6g   (compatible with 1.0.5)
- *    1.0.6h                   1.0.6h   10007  10.6h      (compatible with 1.0.5)
- *    1.0.7                    1.0.7    10007  10.7       (still compatible)
+ *    1.0.6g                   1.0.6g   10007  2.1.0.6g
+ *    1.0.6h                   1.0.6h   10007  10.6h
+ *    1.0.6 (+ 4 patches)      1.0.6    10006  2.1.0.6ad  (compatible with 1.0.0)
+ *    1.0.6i                   1.0.6i   10007  10.6i (can be compatible w/ 1.0.0)
+ *    1.0.7                    1.0.7    10007  10.7  (still can be compatible)
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -79,7 +81,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.89c, June 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.6h, April 24, 2000)
+ * (libpng versions 0.97, January 1998, through 1.0.6i, May 1, 2000)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -154,13 +156,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    April 24, 2000
+ *    May 1, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.6h are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.6i are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -238,7 +240,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.6h"
+#define PNG_LIBPNG_VER_STRING "1.0.6i"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -489,14 +491,12 @@ typedef struct png_info_struct
     * and initialize the appropriate fields below.
     */
 
-#if defined(PNG_gAMA_SUPPORTED) || defined(PNG_READ_GAMMA_SUPPORTED)
+#if defined(PNG_gAMA_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
    /* The gAMA chunk describes the gamma characteristics of the system
     * on which the image was created, normally in the range [1.0, 2.5].
     * Data is valid if (valid & PNG_INFO_gAMA) is non-zero.
     */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
    float gamma; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
-#endif
 #endif
 
 #if defined(PNG_sRGB_SUPPORTED)
@@ -517,9 +517,6 @@ typedef struct png_info_struct
    int num_text; /* number of comments read/to write */
    int max_text; /* current size of text array */
    png_textp text; /* array of comments read/to write */
-   int num_text_old; /* number of comments read/to write */
-   png_textp text_old; /* array of comments read/to write, backward
-                          compatible  with libpng-1.0.5 and earlier */
 #endif /* PNG_TEXT_SUPPORTED */
 
 #if defined(PNG_tIME_SUPPORTED)
@@ -595,7 +592,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_uint_16p hist;
 #endif
 
-#if defined(PNG_cHRM_SUPPORTED)
+#ifdef PNG_cHRM_SUPPORTED
    /* The cHRM chunk describes the CIE color characteristics of the monitor
     * on which the PNG was created.  This data allows the viewer to do gamut
     * mapping of the input image to ensure that the viewer sees the same
@@ -636,6 +633,16 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_byte pcal_nparams;   /* number of parameters given in pcal_params */
 #endif
 
+#ifdef PNG_FREE_ME_SUPPORTED
+   png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
+#endif
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+   /* storage for unknown chunks that the library doesn't recognize. */
+   png_unknown_chunkp unknown_chunks;
+   png_size_t unknown_chunks_num;
+#endif
+
 #if defined(PNG_iCCP_SUPPORTED)
    /* iCCP chunk data. */
    png_charp iccp_name;     /* profile name */
@@ -669,19 +676,13 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #endif
 #endif
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
-   /* storage for unknown chunks that the library doesn't recognize. */
-   png_unknown_chunkp unknown_chunks;
-   png_size_t unknown_chunks_num;
-#endif
-
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
    /* Memory has been allocated if (valid & PNG_ALLOCATED_INFO_ROWS) non-zero */
    /* Data valid if (valid & PNG_INFO_IDAT) non-zero */
    png_bytepp row_pointers;        /* the image bits */
 #endif
 
-#if defined(PNG_gAMA_SUPPORTED) || defined(PNG_READ_GAMMA_SUPPORTED)
+#if defined(PNG_FIXED_POINT_SUPPORTED) && defined(PNG_gAMA_SUPPORTED)
    png_fixed_point int_gamma; /* gamma of image, if (valid & PNG_INFO_gAMA) */
 #endif
 
@@ -695,8 +696,6 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_fixed_point int_x_blue;
    png_fixed_point int_y_blue;
 #endif
-
-   png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
 
 } png_info;
 
@@ -828,7 +827,8 @@ typedef void (*png_progressive_row_ptr) PNGARG((png_structp, png_bytep,
 #endif
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_LEGACY_SUPPORTED)
 typedef void (*png_user_transform_ptr) PNGARG((png_structp,
     png_row_infop, png_bytep));
 #endif
@@ -885,11 +885,14 @@ struct png_struct_def
    png_user_transform_ptr write_user_transform_fn; /* user write transform */
 #endif
 
+/* These were added in libpng-1.0.2 */
+#if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
    png_voidp user_transform_ptr; /* user supplied struct for user transform */
    png_byte user_transform_depth;    /* bit depth of user transformed pixels */
    png_byte user_transform_channels; /* channels in user transformed pixels */
+#endif
 #endif
 
    png_uint_32 mode;          /* tells us where we are in the PNG file */
@@ -941,14 +944,18 @@ struct png_struct_def
    png_byte sig_bytes;        /* magic bytes read/written from start of file */
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
+#ifdef PNG_LEGACY_SUPPORTED
+   png_byte filler;           /* filler byte for pixel expansion */
+#else
    png_uint_16 filler;           /* filler bytes for pixel expansion */
+#endif
 #endif
 
 #if defined(PNG_READ_bKGD_SUPPORTED)
    png_byte background_gamma_type;
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
    float background_gamma;
-#endif
+#  endif
    png_color_16 background;   /* background color in screen gamma space */
 #  if defined(PNG_READ_GAMMA_SUPPORTED)
      png_color_16 background_1; /* background normalized to gamma 1.0 */
@@ -978,7 +985,7 @@ struct png_struct_def
    png_uint_16pp gamma_16_to_1; /* converts from file to 1.0 */
 #endif
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined (PNG_READ_sBIT_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_sBIT_SUPPORTED)
    png_color_8 sig_bit;       /* significant bits in each available channel */
 #endif
 
@@ -1058,6 +1065,22 @@ struct png_struct_def
    png_free_ptr free_fn;             /* function for freeing memory */
 #endif
 
+/* New members added in libpng-1.0.6 */
+
+#ifdef PNG_FREE_ME_SUPPORTED
+   png_uint_32 free_me;       /* flags items libpng is responsible for freeing */
+#endif
+
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+   png_voidp user_chunk_ptr;
+   png_user_chunk_ptr read_user_chunk_fn; /* user read chunk handler */
+#endif
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+   int num_chunk_list;
+   png_bytep chunk_list;
+#endif
+
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
    png_byte rgb_to_gray_status;
    png_uint_16 rgb_to_gray_red_coeff;
@@ -1070,27 +1093,16 @@ struct png_struct_def
    png_byte empty_plte_permitted;
 #endif
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
-   int num_chunk_list;
-   png_bytep chunk_list;
-#endif
-
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_fixed_point int_gamma;
 #endif
 
-#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-   png_voidp user_chunk_ptr;
-   png_user_chunk_ptr read_user_chunk_fn; /* user read chunk handler */
-#endif
-
-   png_uint_32 free_me;       /* flags items libpng is responsible for freeing */
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.6h
+and png.h are both at * version 1.0.6i
  */
-typedef png_structp version_1_0_6h;
+typedef png_structp version_1_0_6i;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1574,18 +1586,21 @@ extern PNG_EXPORT(void,png_set_mem_fn) PNGARG((png_structp png_ptr,
 extern PNG_EXPORT(png_voidp,png_get_mem_ptr) PNGARG((png_structp png_ptr));
 #endif
 
-#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_LEGACY_SUPPORTED)
 extern PNG_EXPORT(void,png_set_read_user_transform_fn) PNGARG((png_structp
    png_ptr, png_user_transform_ptr read_user_transform_fn));
 #endif
 
-#ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
+#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_LEGACY_SUPPORTED)
 extern PNG_EXPORT(void,png_set_write_user_transform_fn) PNGARG((png_structp
    png_ptr, png_user_transform_ptr write_user_transform_fn));
 #endif
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_LEGACY_SUPPORTED)
 extern PNG_EXPORT(void,png_set_user_transform_info) PNGARG((png_structp
    png_ptr, png_voidp user_transform_ptr, int user_transform_depth,
    int user_transform_channels));
@@ -1634,18 +1649,17 @@ extern PNG_EXPORT(void,png_free) PNGARG((png_structp png_ptr, png_voidp ptr));
 /* Free data that was allocated internally */
 extern PNG_EXPORT(void,png_free_data) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 free_me, int num));
+#ifdef PNG_FREE_ME_SUPPORTED
 /* Reassign responsibility for freeing existing data, whether allocated
  * by libpng or by the application */
 extern PNG_EXPORT(void,png_data_freer) PNGARG((png_structp png_ptr,
    png_infop info_ptr, int freer, png_uint_32 mask));
+#endif
 /* assignments for png_data_freer */
 #define PNG_DESTROY_WILL_FREE_DATA 1
 #define PNG_SET_WILL_FREE_DATA 1
 #define PNG_USER_WILL_FREE_DATA 2
 /* Flags for png_ptr->free_me and info_ptr->free_me */
-#define PNG_FREE_PLTE 0x0001
-#define PNG_FREE_TRNS 0x0002
-#define PNG_FREE_TEXT 0x0004
 #define PNG_FREE_HIST 0x0008
 #define PNG_FREE_ICCP 0x0010
 #define PNG_FREE_SPLT 0x0020
@@ -1654,7 +1668,10 @@ extern PNG_EXPORT(void,png_data_freer) PNGARG((png_structp png_ptr,
 #define PNG_FREE_SCAL 0x0100 /* not used any more */
 #define PNG_FREE_UNKN 0x0200
 #define PNG_FREE_LIST 0x0400
-#define PNG_FREE_ALL  0x07ff
+#define PNG_FREE_PLTE 0x1000
+#define PNG_FREE_TRNS 0x2000
+#define PNG_FREE_TEXT 0x4000
+#define PNG_FREE_ALL  0x3fff
 
 #ifdef PNG_USER_MEM_SUPPORTED
 extern PNG_EXPORT(png_voidp,png_malloc_default) PNGARG((png_structp png_ptr,
@@ -2034,6 +2051,7 @@ extern PNG_EXPORT(png_uint_32,png_get_unknown_chunks) PNGARG((png_structp
 #endif
 
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
+/* The "params" pointer is currently not used and is for future expansion. */
 extern PNG_EXPORT(void, png_read_png) PNGARG((png_structp png_ptr,
                         png_infop info_ptr,
                         int transforms,
@@ -2084,7 +2102,7 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.6h - April 24, 2000 (header)\n"
+   " libpng version 1.0.6i - May 1, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -2150,6 +2168,8 @@ extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 #define PNG_WROTE_tIME             0x200
 #define PNG_WROTE_INFO_BEFORE_PLTE 0x400
 #define PNG_BACKGROUND_IS_GRAY     0x800
+#define PNG_CREATED_READ_STRUCT   0x1000
+#define PNG_CREATED_WRITE_STRUCT  0x2000
 
 /* flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                0x0001
@@ -2200,8 +2220,11 @@ extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 #define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
-#define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x1000 
-#define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x2000
+#define PNG_FLAG_FREE_PLTE                0x1000
+#define PNG_FLAG_FREE_TRNS                0x2000
+#define PNG_FLAG_FREE_HIST                0x4000
+#define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000L
+#define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x10000L
 
 /* For use in png_set_keep_unknown, png_handle_as_unknown */
 #define HANDLE_CHUNK_AS_DEFAULT   0

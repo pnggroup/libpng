@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -571,16 +571,24 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 #endif /* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_LEGACY_SUPPORTED)
 void
 png_set_user_transform_info(png_structp png_ptr, png_voidp
    user_transform_ptr, int user_transform_depth, int user_transform_channels)
 {
    png_debug(1, "in png_set_user_transform_info\n");
+#if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_ptr->user_transform_ptr = user_transform_ptr;
    png_ptr->user_transform_depth = (png_byte)user_transform_depth;
    png_ptr->user_transform_channels = (png_byte)user_transform_channels;
+#else
+   if(user_transform_ptr || user_transform_depth || user_transform_channels)
+      png_warning(png_ptr,
+        "This version of libpng does not support user transform info");
+#endif
 }
+#endif
 
 /* This function returns a pointer to the user_transform_ptr associated with
  * the user transform functions.  The application should free any memory
@@ -590,6 +598,11 @@ png_set_user_transform_info(png_structp png_ptr, png_voidp
 png_voidp
 png_get_user_transform_ptr(png_structp png_ptr)
 {
+#if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    return ((png_voidp)png_ptr->user_transform_ptr);
-}
+#else
+   if(png_ptr)
+     return (NULL);
+   return (NULL);
 #endif
+}

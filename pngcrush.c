@@ -15,7 +15,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.3"
+#define PNGCRUSH_VERSION "1.4.4"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -46,6 +46,10 @@
  */
 
 /* Change log:
+ *
+ * Version 1.4.4 (built with libpng-1.0.6i and cexcept-0.6.3)
+ *
+ *   Can be built on RISCOS platforms.
  *
  * Version 1.4.3 (built with libpng-1.0.6h and cexcept-0.6.3)
  *
@@ -213,14 +217,23 @@
 #    include <libc/dosio.h>      /* for _USE_LFN, djgpp 2.0 only */
 #  endif
 #  define SLASH "\\"
+#  define DOT "."
 #else
+# ifdef __riscos
+#  define SLASH "."
+#  define DOT "/"
+# else
 #  define SLASH "/"
+#  define DOT "."
+# endif
 #endif
-#if !defined(__TURBOC__) && !defined(_MSC_VER) && !defined(_MBCS)
+#if !defined(__TURBOC__) && !defined(_MSC_VER) && !defined(_MBCS) && !defined(__riscos)
 #  include <unistd.h>
 #endif
-#include <sys/types.h>
-#include <sys/stat.h>
+#ifndef __riscos
+#  include <sys/types.h>
+#  include <sys/stat.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -246,6 +259,26 @@
 #if (PNG_LIBPNG_VER > 95)
 
 /* so we can load pngcrush with pre-1.0.6 versions of libpng */
+
+/* for version 1.0.2 and earlier */
+#ifndef PNG_MAX_UINT
+#define PNG_MAX_UINT 2147483647L
+#endif
+
+/* for version 0.89c and earlier */
+#ifndef PNG_TEXT_COMPRESSION_NONE
+#define PNG_TEXT_COMPRESSION_NONE    -1
+#define PNG_TEXT_COMPRESSION_zTXt     0
+#endif
+#ifndef png_debug
+#define png_debug(l, m)
+#endif
+#ifndef png_debug1
+#define png_debug1(l, m, p1)
+#endif
+#ifndef png_debug2
+#define png_debug2(l, m, p1, p2)
+#endif
 
 #if (PNG_LIBPNG_VER < 10006)
 /* These shorter macros weren't defined until version 1.0.6 */
@@ -279,16 +312,22 @@
 #include <mem.h>
 #endif
 
+#if CLOCKS_PER_SEC <= 100
+#  define TIME_T long
+#else
+#  define TIME_T float
+#endif
+
 /* defined so I can write to a file on gui/windowing platforms */
 /*  #define STDERR stderr  */
 #define STDERR stdout   /* for DOS */
 
 /* input and output filenames */
-static PNG_CONST char *progname = "pngtest.png";
-static PNG_CONST char *inname = "pngtest.png";
-static PNG_CONST char *outname = "pngout.png";
-static PNG_CONST char *directory_name = "pngcrush.bak";
-static PNG_CONST char *extension = "_C.png";
+static PNG_CONST char *progname = "pngtest" DOT "png";
+static PNG_CONST char *inname = "pngtest" DOT "png";
+static PNG_CONST char *outname = "pngout" DOT "png";
+static PNG_CONST char *directory_name = "pngcrush" DOT "bak";
+static PNG_CONST char *extension = "_C" DOT "png";
 
 static png_uint_32 measured_idat_length;
 static int all_chunks_are_safe=0;
@@ -323,7 +362,11 @@ char *str_return;
 define_exception_type(const char *);
 extern struct exception_context the_exception_context[1];
 struct exception_context the_exception_context[1];
+#if (PNG_LIBPNG_VER > 96)
 png_const_charp msg;
+#else
+const char *msg;
+#endif
 
 static png_uint_32 total_input_length = 0;
 static png_uint_32 total_output_length = 0;
@@ -405,7 +448,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr);
 static png_uint_32 idat_length[MAX_METHODSP1];
 static int filter_method, zlib_level;
 static png_bytep png_row_filters=NULL;
-static float t_start, t_stop, t_decode, t_encode, t_misc;
+static TIME_T t_start, t_stop, t_decode, t_encode, t_misc;
 
 static png_uint_32 max_idat_size = PNG_ZBUF_SIZE;
 int ia;
@@ -419,6 +462,17 @@ int ia;
  * libpng.
  */
 
+#if (PNG_LIBPNG_VER < 95)
+png_uint_32
+png_get_rowbytes(png_structp png_ptr, png_infop info_ptr)
+{
+   if (png_ptr != NULL && info_ptr != NULL)
+      return(info_ptr->rowbytes);
+   else
+      return(0);
+}
+#endif
+
 #if (PNG_LIBPNG_VER < 10007)
 /* This is binary incompatible with versions earlier than 0.99h because of the
  * introduction of png_user_transform stuff ahead of the zbuf_size member
@@ -428,6 +482,14 @@ int ia;
 static png_uint_32
 png_get_compression_buffer_size(png_structp png_ptr)
 {
+   if(png_ptr->zbuf_size != PNG_ZBUF_SIZE)
+   {
+      fprintf(STDERR, "  png_ptr->zbuf_size = %d but PNG_ZBUF_SIZE is %d\n",
+         png_ptr->zbuf_size, PNG_ZBUF_SIZE);
+      fprintf(STDERR, "  You may be using pngcrush with an incompatible version");
+      fprintf(STDERR, "  of libpng.  pngcrush was compiled with version %s\n",
+         PNG_LIBPNG_VER_STRING);
+   }
    return(png_ptr->zbuf_size);
 }
 static void
@@ -590,6 +652,61 @@ void png_crush_pause(void)
         /* stifle compiler warning */ return;
    }
 }
+
+#ifdef __riscos
+#include <kernel.h>
+static int fileexists(const char *name)
+{
+# ifdef __acorn
+  int ret;
+  return _swix (8, 3 | 1<<31, 17, name, &ret) ? 0 : ret;
+# else
+  _kernel_swi_regs r;
+  r.r[0] = 17; r.r[1] = (int) name;
+  return _kernel_swi(8, &r, &r) ? 0 : r.r[0];
+# endif
+}
+
+static int filesize(const char *name)
+{
+# ifdef __acorn
+  int ret;
+  return _swix (8, 3 | 1<<27, 17, name, &ret) ? 0 : ret;
+# else
+  _kernel_swi_regs r;
+  r.r[0] = 17; r.r[1] = (int) name;
+  return _kernel_swi(8, &r, &r) ? 0 : r.r[4];
+# endif
+}
+
+static int mkdir(const char *name, int ignored)
+{
+# ifdef __acorn
+  _swi (8, 0x13, 8, name, 0);
+  return 0;
+# else
+  _kernel_swi_regs r;
+  r.r[0] = 8; r.r[1] = (int) name;
+  r.r[4] = r.r[3] = r.r[2] = 0;
+  return (int)_kernel_swi(8 | 1<<31, &r, &r);
+# endif
+}
+
+
+static void setfiletype(const char *name)
+{
+# ifdef __acorn
+  _swi (8, 7, 18, name, 0xB60);
+# else
+  _kernel_swi_regs r;
+  r.r[0] = 18; r.r[1] = (int) name; r.r[2] = 0xB60;
+  _kernel_swi(8 | 1<<31, &r, &r);
+# endif
+}
+#else
+#  define setfiletype(x)
+#endif
+
 int keep_chunk(png_const_charp name, char *argv[]);
 
 int keep_chunk(png_const_charp name, char *argv[])
@@ -665,7 +782,7 @@ show_result(void)
          -(100.0 - (100.0*total_output_length)/total_input_length),
          total_output_length - total_input_length);
    }
-   t_stop = (float)clock();
+   t_stop = (TIME_T)clock();
    t_misc += (t_stop - t_start);
    t_start = t_stop;
    fprintf(STDERR,"   CPU time used = %.3f seconds",
@@ -723,15 +840,19 @@ main(int argc, char *argv[])
       fprintf(STDERR, "  png.c version: %s\n\n", png_libpng_ver);
    }
 
-   t_start = (float)clock();
+   t_start = (TIME_T)clock();
 
    prog_string[0] = '\0';
    str_return = strcat(prog_string,argv[0]);
    progname = prog_string;
    for(i=0, cp=prog_string; *cp!='\0'; i++, cp++)
    {
+#ifdef __riscos
+      if(*cp == '.' || *cp == ':') progname = ++cp;
+#else
       if(*cp == '\\' || *cp == '/') progname = ++cp;
       if(*cp == '.') *cp='\0';
+#endif
    }
 
    for(i=0; i<MAX_METHODS; i++)
@@ -1676,7 +1797,11 @@ main(int argc, char *argv[])
           while(*ip != '\0')
           {
              *op++ = *ip++;
+#ifdef __riscos
+             if(*ip == '/')dot=op;
+#else
              if(*ip == '.')dot=op;
+#endif
           }
           *op = '\0';
 
@@ -1695,8 +1820,12 @@ main(int argc, char *argv[])
 
       if(pngcrush_mode == DIRECTORY_MODE)
       {
+#ifdef __riscos
+          if(fileexists(directory_name) & 2)
+#else
           struct stat stat_buf;
           if(stat(directory_name, &stat_buf) != 0)
+#endif
           {
 #if defined(_MBCS) || defined(WIN32) || defined(__WIN32__)
              if(_mkdir(directory_name) != 0)
@@ -1715,11 +1844,16 @@ main(int argc, char *argv[])
           in_string[0] = '\0'; 
           str_return = strcat(in_string,inname);
           ip = op = in_string;
+#ifdef __riscos
+          op = strrchr(in_string, '.');
+          if (!op) op = in_string; else op++;
+#else
           while(*ip != '\0')
           {
              if(*ip == '\\' || *ip == '/')op=ip+1;
              ip++;
           }
+#endif
 
           str_return = strcat(out_string,op);
           outname=out_string;
@@ -1751,6 +1885,7 @@ main(int argc, char *argv[])
          }
 
          if(idat_length[0] == 0) continue;
+
       }
       else
          idat_length[0]=1;
@@ -1787,7 +1922,9 @@ main(int argc, char *argv[])
          if(idat_length[best] == idat_length[0] && things_have_changed == 0
             && best != final_method && nosave == 0)
          {
+#ifndef __riscos
             struct stat stat_in, stat_out;
+#endif
             /* just copy input to output */
 
             P2("prepare to copy input to output\n");
@@ -1810,10 +1947,14 @@ main(int argc, char *argv[])
             number_of_open_files++;
             P2("copying input to output...");
 
+#ifndef __riscos
             stat(inname, &stat_in);
             stat(outname, &stat_out);
             if((stat_in.st_ino != stat_out.st_ino) || 
                (stat_in.st_size != stat_out.st_size))
+#else
+            /* (brokenly) assume that they're different */
+#endif
             {
                for(;;)
                {
@@ -1830,6 +1971,7 @@ main(int argc, char *argv[])
             png_crush_pause();
             FCLOSE(fpin);
             FCLOSE(fpout);
+            setfiletype(outname);
             break;
          }
 
@@ -1880,6 +2022,10 @@ main(int argc, char *argv[])
       number_of_open_files++;
       if(nosave == 0)
        {
+#ifndef __riscos
+         /* Can't sensibly check this on RISC OS without opening a file for
+            update or output
+          */
          struct stat stat_in, stat_out;
          stat(inname, &stat_in);
          stat(outname, &stat_out);
@@ -1897,7 +2043,7 @@ main(int argc, char *argv[])
             FCLOSE(fpin);
             return 1;
          }
-
+#endif
          if ((fpout = FOPEN(outname, "wb")) == NULL)
          {
             fprintf(STDERR, "Could not open output file %s\n", outname);
@@ -1969,7 +2115,9 @@ main(int argc, char *argv[])
      /* We don't need to check CRC's because they were already checked
         in the png_measure_idat function */
 
+#ifdef PNG_CRC_QUIET_USE
       png_set_crc_action(read_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
+#endif
 
 #if (PNG_LIBPNG_VER >= 10000)
    /* reinitialize zbuf - compression buffer */
@@ -2113,6 +2261,7 @@ main(int argc, char *argv[])
       png_debug(0, "Reading info struct\n");
       png_read_info(read_ptr, read_info_ptr);
 
+#if (PNG_LIBPNG_VER > 90)
       png_debug(0, "Transferring info struct\n");
       {
          int interlace_type, compression_type, filter_type;
@@ -2387,6 +2536,7 @@ main(int argc, char *argv[])
          }
       }
 #endif
+
 #if defined(PNG_READ_sRGB_SUPPORTED) && defined(PNG_WRITE_sRGB_SUPPORTED)
       {
          int file_intent;
@@ -2574,24 +2724,24 @@ main(int argc, char *argv[])
                 trns_gray = trans_values->gray;
                 if(output_color_type == 3)
                   {
-                    if(verbose > 2)
-                       fprintf(STDERR,"   Filling trns_array\n");
                     for (ia=0;ia<num_trans;ia++)
                        trns_array[ia]=trans[ia];
-                    if(verbose > 2)
-                       fprintf(STDERR,"   Extending trns_array\n");
                     for ( ; ia<256; ia++)
                        trns_array[ia]=255;
-                    if(verbose > 2)
-                       fprintf(STDERR,"   Done filling trns_array\n");
                     for (ia=0; ia<256; ia++)
                       {
                        if(trns_array[ia] != 255)
                           last_nonmax=ia;
                       }
-                    num_trans = last_nonmax+1;
-                    if(num_trans == 0 && verbose > 0)
+                    if(first_trial && verbose > 0)
+                    {
+                    if(last_nonmax < 0)
                        fprintf(STDERR,"   Deleting all-opaque tRNS chunk.\n");
+                    else if(last_nonmax+1 < num_trans)
+                       fprintf(STDERR,
+                    "   Truncating trailing opaque entries from tRNS chunk.\n");
+                    }
+                    num_trans = last_nonmax+1;
                   }
                 if(verbose > 1)
                    fprintf(STDERR,"   png_set_tRNS, num_trans=%d\n",num_trans);
@@ -2700,6 +2850,7 @@ main(int argc, char *argv[])
 #endif
 #endif
 #endif
+
 #if defined(PNG_sPLT_SUPPORTED)
    {
       png_sPLT_tp entries;
@@ -2821,6 +2972,7 @@ main(int argc, char *argv[])
          }
       }
 #endif
+
 #if defined(PNG_READ_tIME_SUPPORTED) && defined(PNG_WRITE_tIME_SUPPORTED)
       {
          png_timep mod_time;
@@ -2832,8 +2984,10 @@ main(int argc, char *argv[])
          }
       }
 #endif
+#endif /* PNG_LIBPNG_VER > 90 */
 
       png_read_transform_info(read_ptr, read_info_ptr);
+
 
       if(nosave == 0)
       {
@@ -2874,6 +3028,7 @@ main(int argc, char *argv[])
       P2("wrote info structure.\n");
       png_crush_pause();
 
+#if (PNG_LIBPNG_VER > 90)
 #ifdef PNG_WRITE_PACK_SUPPORTED
       if(output_bit_depth < input_bit_depth)
       {
@@ -2887,6 +3042,7 @@ main(int argc, char *argv[])
           png_set_packing(write_ptr);
       }
 #endif
+#endif  /* PNG_LIBPNG_VER > 90 */
       }  /* no save */
 
 #define LARGE_PNGCRUSH
@@ -2940,7 +3096,7 @@ main(int argc, char *argv[])
       if(nosave == 0)
         png_set_interlace_handling(write_ptr);
 
-      t_stop = (float)clock();
+      t_stop = (TIME_T)clock();
       t_misc += (t_stop - t_start);
       t_start = t_stop;
       for (pass = 0; pass < num_pass; pass++)
@@ -2951,11 +3107,11 @@ main(int argc, char *argv[])
             png_read_row(read_ptr, row_buf, (png_bytep)NULL);
             if(nosave == 0)
             {
-               t_stop = (float)clock();
+               t_stop = (TIME_T)clock();
                t_decode += (t_stop - t_start);
                t_start = t_stop;
                png_write_row(write_ptr, row_buf);
-               t_stop = (float)clock();
+               t_stop = (TIME_T)clock();
                t_encode += (t_stop - t_start);
                t_start = t_stop;
             }
@@ -2964,7 +3120,7 @@ main(int argc, char *argv[])
       }
       if(nosave)
       {
-          t_stop = (float)clock();
+          t_stop = (TIME_T)clock();
           t_decode += (t_stop - t_start);
           t_start = t_stop;
       }
@@ -3000,6 +3156,7 @@ main(int argc, char *argv[])
       png_debug(0, "Reading and writing end_info data\n");
       png_read_end(read_ptr, end_info_ptr);
 
+#if (PNG_LIBPNG_VER > 90)
 #if (defined(PNG_READ_tEXt_SUPPORTED) && defined(PNG_WRITE_tEXt_SUPPORTED)) || \
        (defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED))
       {
@@ -3136,6 +3293,7 @@ main(int argc, char *argv[])
       }
    }
 #endif
+#endif  /* PNG_LIBPNG_VER > 90 */
 
       if(nosave == 0)
          png_write_end(write_ptr, write_end_info_ptr);
@@ -3163,7 +3321,10 @@ main(int argc, char *argv[])
           png_destroy_info_struct(write_ptr, &write_end_info_ptr);
           png_destroy_write_struct(&write_ptr, &write_info_ptr);
           if(nosave == 0)
+          {
              FCLOSE(fpout);
+             setfiletype(outname);
+          }
           png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
           FCLOSE(fpin);
           if(verbose > 1)
@@ -3175,7 +3336,10 @@ main(int argc, char *argv[])
       write_ptr=NULL;
       FCLOSE(fpin);
       if(nosave == 0)
+      {
          FCLOSE(fpout);
+         setfiletype(outname);
+      }
 
       if(nosave != 0)
          break;
@@ -3217,20 +3381,25 @@ main(int argc, char *argv[])
       if (nosave == 0 && fpout)
       {
          FCLOSE(fpout);
+         setfiletype(outname);
       }
 
       if(verbose > 0 && nosave == 0)
       {
          png_uint_32 input_length, output_length;
 
+#ifdef __riscos
+         input_length = (unsigned long)filesize(inname);
+         output_length = (unsigned long)filesize(outname);
+#else
          struct stat stat_buf;
 
          stat(inname, &stat_buf);
          input_length = (unsigned long)stat_buf.st_size;
-         total_input_length += input_length;
          stat(outname, &stat_buf);
          output_length = (unsigned long)stat_buf.st_size;
-         total_output_length += output_length;
+#endif
+         total_input_length += input_length + output_length;
          if(input_length == output_length)
             fprintf(STDERR,
                "   Best %s method = %d for %s (no change)\n\n",
@@ -3264,7 +3433,11 @@ main(int argc, char *argv[])
 png_uint_32
 measure_idats(FILE *fpin)
 {
+#if (PNG_LIBPNG_VER > 96)
    png_const_charp msg;
+#else
+   const char *msg;
+#endif
    P2("measure_idats:\n");
    png_debug(0, "Allocating read structure\n");
    Try
@@ -3305,14 +3478,14 @@ png_measure_idat(png_structp png_ptr)
    png_debug(1, "in png_read_info\n");
 
    {
-      png_byte png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+      png_byte png_sign[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
-      png_read_data(png_ptr, png_sig, 8);
+      png_read_data(png_ptr, png_sign, 8);
       png_set_sig_bytes(png_ptr, 8);
 
-      if (png_sig_cmp(png_sig, 0, 8))
+      if (png_sig_cmp(png_sign, 0, 8))
       {
-         if (png_sig_cmp(png_sig, 0, 4))
+         if (png_sig_cmp(png_sign, 0, 4))
             png_error(png_ptr, "Not a PNG file");
          else
             png_error(png_ptr, "PNG file corrupted by ASCII conversion");
@@ -3340,18 +3513,6 @@ png_measure_idat(png_structp png_ptr)
       png_crc_read(png_ptr, chunk_name, 4);
 
 #ifdef PNG_UINT_IDAT
-      if (png_get_uint_32(chunk_name) == PNG_UINT_IHDR)
-#else
-      if (!png_memcmp(chunk_name, png_IHDR, 4))
-#endif
-      {
-         /* get the color type */
-         png_crc_read(png_ptr, buffer, 13);
-         length-=13;
-         input_color_type=buffer[9];
-      }
-
-#ifdef PNG_UINT_IDAT
       if (png_get_uint_32(chunk_name) == PNG_UINT_IDAT)
 #else
       if (!png_memcmp(chunk_name, png_IDAT, 4))
@@ -3363,7 +3524,21 @@ png_measure_idat(png_structp png_ptr)
          chunk_name[4]='\0';
          printf( "Reading %s chunk, length = %ld.\n", chunk_name, length);
       }
+
+#ifdef PNG_UINT_IDAT
+      if (png_get_uint_32(chunk_name) == PNG_UINT_IHDR)
+#else
+      if (!png_memcmp(chunk_name, png_IHDR, 4))
+#endif
+      {
+         /* get the color type */
+         png_crc_read(png_ptr, buffer, 13);
+         length-=13;
+         input_color_type=buffer[9];
+      }
+
       png_crc_finish(png_ptr, length);
+
 
 #ifdef PNG_UINT_IEND
       if (png_get_uint_32(chunk_name) == PNG_UINT_IEND)
@@ -3373,7 +3548,7 @@ png_measure_idat(png_structp png_ptr)
          return sum_idat_length;
    }
 }
-#else /* PNG_LIBPNG_VER < 96 */
+#else /* !PNG_LIBPNG_VER > 95 */
 main()
 {
   printf("Sorry, but pngcrush needs libpng version 0.96 or later\n");
