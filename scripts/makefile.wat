@@ -1,5 +1,5 @@
 # Makefile for libpng
-# Watcom 10a and later 32-bit protected mode flat memory model
+# Watcom 10.0a and later 32-bit protected mode flat memory model
 
 # Adapted by Pawel Mrochen, based on makefile.msc
 # For conditions of distribution and use, see copyright notice in png.h
@@ -7,9 +7,9 @@
 
 # To use, do "wmake -f makefile.wat"
 
-# ------------- Watcom 10a and later -------------
+# ------------- Watcom 10.0a and later -------------
 MODEL=-mf
-CFLAGS= $(MODEL) -fpi87 -fp5 -5r -oaeilmnrt -s -zp4 -i=..\zlib
+CFLAGS= $(MODEL) -5r -fp5 -fpi87 -oneatx -zp8 -i=..\zlib
 CC=wcc386
 LD=wcl386
 LIB=wlib -b -c
@@ -75,9 +75,9 @@ pngwutil$(O): png.h pngconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 libpng.lib: $(OBJS1) $(OBJS2) $(OBJS3)
-	$(LIB) -n libpng.lib +$(OBJS1)
-	$(LIB) libpng.lib +$(OBJS2)
-	$(LIB) libpng.lib +$(OBJS3)
+	$(LIB) -n libpng.lib $(OBJS1)
+	$(LIB) libpng.lib $(OBJS2)
+	$(LIB) libpng.lib $(OBJS3)
 
 pngtest.exe: pngtest.obj libpng.lib
 	$(LD) $(LDFLAGS) pngtest.obj libpng.lib ..\zlib\zlib.lib

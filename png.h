@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.0.1
+ * libpng 1.0.1a
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * March 15, 1998
+ * April 21, 1998
  *
  * Note about libpng version numbers:
  *
@@ -31,6 +31,7 @@
  *      1.00                      1.00       100  2.1.0 [int should be 10000]
  *      1.0.0                     1.0.0      100  2.1.0 [int should be 10000]
  *      1.0.1                     1.0.1    10001  2.1.0
+ *      1.0.1a                    1.0.1a   10002  2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
@@ -38,10 +39,9 @@
  *    The PNG_PNGLIB_VER macro, which is not used within libpng but
  *    is available for applications, is an unsigned integer of the form
  *    xyyzz corresponding to the source version x.y.z (leading zeros in y and z).
- *    
  *
- * See libpng.txt for more information.  The PNG specification is available
- * as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
+ * See libpng.txt or libpng.3 for more information.  The PNG specification is
+ * available as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
  * and as a W3C Recommendation <http://www.w3.org/TR/REC.png.html>
  *
  * Contributing Authors:
@@ -118,14 +118,14 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.1"
+#define PNG_LIBPNG_VER_STRING "1.0.1a"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
  * Versions 0.7 through 1.0.0 were in the range 0 to 100 here (only
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=bugfix */
-#define PNG_LIBPNG_VER    10001  /* 1.0.1 */
+#define PNG_LIBPNG_VER    10002  /* 1.0.2 */
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
@@ -589,7 +589,7 @@ struct png_struct_def
    png_byte sig_bytes;        /* magic bytes read/written from start of file */
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
-   png_byte filler;           /* filler byte for 24->32-bit pixel expansion */
+   png_uint_16 filler;           /* filler bytes for pixel expansion */
 #endif /* PNG_READ_FILLER_SUPPORTED */
 #if defined(PNG_READ_bKGD_SUPPORTED)
    png_byte background_gamma_type;
@@ -1590,7 +1590,7 @@ PNG_EXTERN png_int_32 png_get_int_32 PNGARG((png_bytep buf));
 #endif /* PNG_READ_pCAL_SUPPORTED */
 PNG_EXTERN png_uint_32 png_get_uint_32 PNGARG((png_bytep buf));
 PNG_EXTERN png_uint_16 png_get_uint_16 PNGARG((png_bytep buf));
-#endif /* PNG_BIG_ENDIAN_GET_SUPPORTED */
+#endif /* PNG_READ_BIG_ENDIAN_SUPPORTED */
 
 /* Initialize png_ptr struct for reading, and allocate any other memory.
  * (old interface - NOT DLL EXPORTED).

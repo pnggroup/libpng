@@ -20,7 +20,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
          -Wmissing-declarations -Wtraditional -Wcast-align \
          -Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 CFLAGS=-I$(ZLIBINC) -Wall -O3 \
-      #$(WARNMORE) -g -DPNG_DEBUG=5
+      # $(WARNMORE) -g -DPNG_DEBUG=5
 LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng -lz -lm
 
 #RANLIB=ranlib
@@ -29,7 +29,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0
+PNGMIN = 1.0.1a
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # where make install puts libpng.a, libpng.so*, and png.h

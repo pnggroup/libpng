@@ -1,0 +1,26 @@
+
+Libpng 1.0.1a April 21, 1998
+
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
+
+Changes since the last release:
+
+   Optimized Paeth calculations by replacing abs() function calls with intrinsics
+   plus other loop optimizations. Improves avg decoding speed by about 20 percent.
+   Commented out i386istic "align" compiler flags in makefile.lnx.
+   Reduced the default warning level in some makefiles, to make them consistent.
+   Removed references to IJG and JPEG in the ansi2knr.c copyright statement.
+   Fixed a bug in png_do_strip_filler with XXRRGGBB => RRGGBB transformation.
+   Added grayscale and 16-bit capability to png_do_read_filler().
+   Fixed a bug in pngset.c, introduced in version 0.99c, that sets rowbytes
+     too large when writing an image with bit_depth < 8 (Bob Dellaca).
+   Corrected some bugs in the experimental weighted filtering heuristics.
+   Moved a misplaced pngrutil code block that truncates tRNS if it has more
+     than num_palette entries -- test was done before num_palette was defined.
+   Fixed a png_convert_to_rfc1123() bug that converts day 31 to 0 (Steve Eddins).
+
+Send comments/corrections/commendations to
+png-implement@dworkin.wustl.edu or to randeg@alumni.rpi.edu
+
+Glenn R-P

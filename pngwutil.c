@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.1
+ * libpng 1.0.1a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 15, 1998
+ * April 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -1241,7 +1241,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
    if (pass < 6)
 #endif
    {
-      /* each pixel depth is handled seperately */
+      /* each pixel depth is handled separately */
       switch (row_info->pixel_depth)
       {
          case 1:
@@ -1251,12 +1251,13 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
             int shift;
             int d;
             int value;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
             dp = row;
             d = 0;
             shift = 7;
-            for (i = png_pass_start[pass]; i < row_info->width;
+            istop = row_info->width;
+            for (i = png_pass_start[pass]; i < istop;
                i += png_pass_inc[pass])
             {
                sp = row + (png_size_t)(i >> 3);
@@ -1284,12 +1285,13 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
             int shift;
             int d;
             int value;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
             dp = row;
             shift = 6;
             d = 0;
-            for (i = png_pass_start[pass]; i < row_info->width;
+            istop = row_info->width;
+            for (i = png_pass_start[pass]; i < istop;
                i += png_pass_inc[pass])
             {
                sp = row + (png_size_t)(i >> 2);
@@ -1316,12 +1318,13 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
             int shift;
             int d;
             int value;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
             dp = row;
             shift = 4;
             d = 0;
-            for (i = png_pass_start[pass]; i < row_info->width;
+            istop = row_info->width;
+            for (i = png_pass_start[pass]; i < istop;
                i += png_pass_inc[pass])
             {
                sp = row + (png_size_t)(i >> 1);
@@ -1345,7 +1348,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
          {
             png_bytep sp;
             png_bytep dp;
-            png_uint_32 i;
+            png_uint_32 i, istop;
             png_size_t pixel_bytes;
 
             /* start at the beginning */
@@ -1354,7 +1357,8 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
             pixel_bytes = (row_info->pixel_depth >> 3);
             /* loop through the row, only looking at the pixels that
                matter */
-            for (i = png_pass_start[pass]; i < row_info->width;
+            istop = row_info->width;
+            for (i = png_pass_start[pass]; i < istop;
                i += png_pass_inc[pass])
             {
                /* find out where the original pixel is */
@@ -1392,6 +1396,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 {
    png_bytep prev_row, best_row, row_buf;
    png_uint_32 mins, bpp;
+   png_byte filter_to_do = png_ptr->do_filter;
 
    png_debug(1, "in png_write_find_filter\n");
    /* find out how many bytes offset each pixel is */
@@ -1405,7 +1410,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
     * smallest value when summing the absolute values of the distances
     * from zero using anything >= 128 as negative numbers.  This is known
     * as the "minimum sum of absolute differences" heuristic.  Other
-    * heuristics are the "weighted minumum sum of absolute differences"
+    * heuristics are the "weighted minimum sum of absolute differences"
     * (experimental and can in theory improve compression), and the "zlib
     * predictive" method (not implemented in libpng 0.95), which does test
     * compressions of lines using different filter methods, and then chooses
@@ -1413,18 +1418,20 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
     * computationally expensive).
     */
 
+
    /* We don't need to test the 'no filter' case if this is the only filter
     * that has been chosen, as it doesn't actually do anything to the data.
     */
-   if (png_ptr->do_filter & PNG_FILTER_NONE &&
-       png_ptr->do_filter != PNG_FILTER_NONE)
+   if (filter_to_do & PNG_FILTER_NONE &&
+       filter_to_do != PNG_FILTER_NONE)
    {
       png_bytep rp;
       png_uint_32 sum = 0;
-      png_uint_32 i;
+      png_uint_32 i,istop;
       int v;
 
-      for (i = 0, rp = row_buf + 1; i < row_info->rowbytes; i++, rp++)
+      istop = row_info->rowbytes;
+      for (i = 0, rp = row_buf + 1; i < istop; i++, rp++)
       {
          v = *rp;
          sum += (v < 128) ? v : 256 - v;
@@ -1438,9 +1445,10 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK; /* Gives us some footroom */
 
          /* Reduce the sum if we match any of the previous rows */
-         for (i = 0; i < (png_uint_32)png_ptr->num_prev_filters; i++)
+         istop = (png_uint_32)png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
-            if (png_ptr->prev_filters[i] == PNG_FILTER_NONE)
+            if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_NONE)
             {
                sumlo = (sumlo * png_ptr->filter_weights[i]) >>
                   PNG_WEIGHT_SHIFT;
@@ -1468,15 +1476,34 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    }
 
    /* sub filter */
-   if (png_ptr->do_filter & PNG_FILTER_SUB)
+   if (filter_to_do == PNG_FILTER_SUB)
+   /* it's the only filter so no testing is needed */
+   {
+      png_bytep rp, lp, dp;
+      png_uint_32 i,istop;
+      for (i = 0, rp = row_buf + 1, dp = png_ptr->sub_row + 1; i < bpp;
+           i++, rp++, dp++)
+      {
+         *dp = *rp;
+      }
+      istop = row_info->rowbytes;
+      for (lp = row_buf + 1; i < istop;
+         i++, rp++, lp++, dp++)
+      {
+         *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
+      }
+      best_row = png_ptr->sub_row;
+   }
+
+   else if (filter_to_do & PNG_FILTER_SUB)
    {
       png_bytep rp, dp, lp;
       png_uint_32 sum = 0, lmins = mins;
-      png_uint_32 i;
+      png_uint_32 i, istop;
       int v;
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
-      /* We temporarily increase the "minumum sum" by the factor we
+      /* We temporarily increase the "minimum sum" by the factor we
        * would reduce the sum of this filter, so that we can do the
        * early exit comparison without scaling the sum each time.
        */
@@ -1486,7 +1513,8 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          lmlo = lmins & PNG_LOMASK;
          lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
 
-         for (i = 0; i < (png_uint_32)png_ptr->num_prev_filters; i++)
+         istop = (png_uint_32)png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
             if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_SUB)
             {
@@ -1534,7 +1562,8 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK;
 
-         for (i = 0; i < (png_uint_32)png_ptr->num_prev_filters; i++)
+         istop = (png_uint_32)png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
             if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_SUB)
             {
@@ -1565,12 +1594,28 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    }
 
    /* up filter */
-   if (png_ptr->do_filter & PNG_FILTER_UP)
+   if (filter_to_do == PNG_FILTER_UP)
+   {
+      png_bytep rp, dp, pp;
+      png_uint_32 i, istop;
+
+      istop = row_info->rowbytes;
+      for (i = 0, rp = row_buf + 1, dp = png_ptr->up_row + 1,
+           pp = prev_row + 1; i < istop;
+           i++, rp++, pp++, dp++)
+      {
+         *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
+      }
+      best_row = png_ptr->up_row;
+   }
+
+   else if (filter_to_do & PNG_FILTER_UP)
    {
       png_bytep rp, dp, pp;
       png_uint_32 sum = 0, lmins = mins;
-      png_uint_32 i;
+      png_uint_32 i, istop;
       int v;
+
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
@@ -1579,7 +1624,8 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          lmlo = lmins & PNG_LOMASK;
          lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
 
-         for (i = 0; i < (png_uint_32)png_ptr->num_prev_filters; i++)
+         istop = (png_uint_32)png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
             if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_UP)
             {
@@ -1602,8 +1648,9 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       }
 #endif
 
+      istop = row_info->rowbytes;
       for (i = 0, rp = row_buf + 1, dp = png_ptr->up_row + 1,
-           pp = prev_row + 1; i < row_info->rowbytes;
+           pp = prev_row + 1; i < istop;
            i++, rp++, pp++, dp++)
       {
          v = *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
@@ -1621,9 +1668,10 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK;
 
-         for (i = 0; i < (png_uint_32)png_ptr->num_prev_filters; i++)
+         istop = (png_uint_32)png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
-            if (png_ptr->prev_filters[i] == PNG_FILTER_UP)
+            if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_UP)
             {
                sumlo = (sumlo * png_ptr->filter_weights[i]) >>
                   PNG_WEIGHT_SHIFT;
@@ -1652,11 +1700,28 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    }
 
    /* avg filter */
-   if (png_ptr->do_filter & PNG_FILTER_AVG)
+   if (filter_to_do == PNG_FILTER_AVG)
+   {
+      png_bytep rp, dp, pp, lp;
+      png_uint_32 i,istop;
+      for (i = 0, rp = row_buf + 1, dp = png_ptr->avg_row + 1,
+           pp = prev_row + 1; i < bpp; i++, rp++, pp++, dp++)
+      {
+         *dp = (png_byte)(((int)*rp - ((int)*pp / 2)) & 0xff);
+      }
+      istop = row_info->rowbytes;
+      for (lp = row_buf + 1; i < istop; i++, rp++, pp++, lp++, dp++)
+      {
+         *dp = (png_byte)(((int)*rp - (((int)*pp + (int)*lp) / 2)) & 0xff);
+      }
+      best_row = png_ptr->avg_row;
+   }
+
+   else if (filter_to_do & PNG_FILTER_AVG)
    {
       png_bytep rp, dp, pp, lp;
       png_uint_32 sum = 0, lmins = mins;
-      png_uint_32 i;
+      png_uint_32 i,istop;
       int v;
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
@@ -1666,7 +1731,8 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          lmlo = lmins & PNG_LOMASK;
          lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
 
-         for (i = 0; i < (png_uint_32)png_ptr->num_prev_filters; i++)
+         istop = (png_uint_32)png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
             if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_AVG)
             {
@@ -1696,8 +1762,8 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 
          sum += (v < 128) ? v : 256 - v;
       }
-      for (lp = row_buf + 1; i < row_info->rowbytes;
-           i++, rp++, pp++, lp++, dp++)
+      istop = row_info->rowbytes;
+      for (lp = row_buf + 1; i < istop; i++, rp++, pp++, lp++, dp++)
       {
          v = *dp = (png_byte)(((int)*rp - (((int)*pp + (int)*lp) / 2)) & 0xff);
 
@@ -1714,9 +1780,10 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK;
 
-         for (i = 0; i < png_ptr->num_prev_filters; i++)
+         istop = png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
-            if (png_ptr->prev_filters[i] == PNG_FILTER_NONE)
+            if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_NONE)
             {
                sumlo = (sumlo * png_ptr->filter_weights[i]) >>
                   PNG_WEIGHT_SHIFT;
@@ -1745,11 +1812,50 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    }
 
    /* Paeth filter */
-   if (png_ptr->do_filter & PNG_FILTER_PAETH)
+   if (filter_to_do == PNG_FILTER_PAETH)
+   {
+      png_bytep rp, dp, pp, cp, lp;
+      png_uint_32 i, istop;
+      for (i = 0, rp = row_buf + 1, dp = png_ptr->paeth_row + 1,
+           pp = prev_row + 1; i < bpp; i++, rp++, pp++, dp++)
+      {
+         *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
+      }
+
+      istop = row_info->rowbytes;
+      for (lp = row_buf + 1, cp = prev_row + 1; i < istop;
+           i++, rp++, pp++, lp++, dp++, cp++)
+      {
+         int a, b, c, pa, pb, pc, p;
+
+         b = *pp;
+         c = *cp;
+         a = *lp;
+
+         p = a + b - c;
+
+#ifdef PNG_USE_ABS
+         pa = abs(p - a);
+         pb = abs(p - b);
+         pc = abs(p - c);
+#else
+         pa = p > a ? p - a : a - p;
+         pb = p > b ? p - b : b - p;
+         pc = p > c ? p - c : c - p;
+#endif
+
+         p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
+
+         *dp = (png_byte)(((int)*rp - p) & 0xff);
+      }
+      best_row = png_ptr->paeth_row;
+   }
+
+   else if (filter_to_do & PNG_FILTER_PAETH)
    {
       png_bytep rp, dp, pp, cp, lp;
       png_uint_32 sum = 0, lmins = mins;
-      png_uint_32 i;
+      png_uint_32 i, istop;
       int v;
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
@@ -1759,7 +1865,8 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          lmlo = lmins & PNG_LOMASK;
          lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
 
-         for (i = 0; i < png_ptr->num_prev_filters; i++)
+         istop = png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
             if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_PAETH)
             {
@@ -1783,13 +1890,15 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #endif
 
       for (i = 0, rp = row_buf + 1, dp = png_ptr->paeth_row + 1,
-           pp = prev_row + 1; (unsigned)i < bpp; i++, rp++, pp++, dp++)
+           pp = prev_row + 1; i < bpp; i++, rp++, pp++, dp++)
       {
          v = *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
 
          sum += (v < 128) ? v : 256 - v;
       }
-      for (lp = row_buf + 1, cp = prev_row + 1; i < row_info->rowbytes;
+
+      istop = row_info->rowbytes;
+      for (lp = row_buf + 1, cp = prev_row + 1; i < istop;
            i++, rp++, pp++, lp++, dp++, cp++)
       {
          int a, b, c, pa, pb, pc, p;
@@ -1799,16 +1908,30 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          a = *lp;
 
          p = a + b - c;
+
+#ifndef PNG_SLOW_PAETH
+#ifdef PNG_USE_ABS
          pa = abs(p - a);
          pb = abs(p - b);
          pc = abs(p - c);
+#else
+         pa = p > a ? p - a : a - p;
+         pb = p > b ? p - b : b - p;
+         pc = p > c ? p - c : c - p;
+#endif
 
+         p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
+#else /* PNG_SLOW_PAETH */
+         pa = abs(p - a);
+         pb = abs(p - b);
+         pc = abs(p - c);
          if (pa <= pb && pa <= pc)
             p = a;
          else if (pb <= pc)
             p = b;
          else
             p = c;
+#endif /* PNG_SLOW_PAETH */
 
          v = *dp = (png_byte)(((int)*rp - p) & 0xff);
 
@@ -1825,9 +1948,10 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK;
 
-         for (i = 0; i < png_ptr->num_prev_filters; i++)
+         istop =  png_ptr->num_prev_filters;
+         for (i = 0; i < istop; i++)
          {
-            if (png_ptr->prev_filters[i] == PNG_FILTER_PAETH)
+            if (png_ptr->prev_filters[i] == PNG_FILTER_VALUE_PAETH)
             {
                sumlo = (sumlo * png_ptr->filter_weights[i]) >>
                   PNG_WEIGHT_SHIFT;
@@ -1855,15 +1979,17 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    }
 
    /* Do the actual writing of the filtered row data from the chosen filter. */
+
    png_write_filtered_row(png_ptr, best_row);
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    /* Save the type of filter we picked this time for future calculations */
    if (png_ptr->num_prev_filters > 0)
    {
-      int i;
+      int i, istop;
 
-      for (i = 1; i < (int)png_ptr->num_prev_filters; i++)
+      istop = (int)png_ptr->num_prev_filters;
+      for (i = 1; i < istop; i++)
       {
          png_ptr->prev_filters[i] = png_ptr->prev_filters[i - 1];
       }

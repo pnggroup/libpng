@@ -1,0 +1,113 @@
+
+Known bugs and suggested enhancements in libpng-1.0.1
+
+1. March 13, 1998 -- BUG -- pngtrans.c:
+
+   row_info->channels should be updated --
+   row_info->color_type should be updated --
+
+   STATUS: I think this is all fixed in libpng-1.0.1a but needs
+   to be tested.
+
+2. March 14, 1998 -- ENHANCEMENT -- Glenn
+
+   We should add the G>GA, G>GX, G>AG, and G>XG transformations
+   in png_do_read_filler()
+
+   STATUS:  Implemented in libpng-1.0.1a
+
+3. March 14, 1998 -- BUG? -- Greg Roelofs
+
+   pngrtran.c:  if-test for channels/FILLER may be incorrect
+
+   STATUS: Under investigation
+
+4. March 15, 1998 -- BUG -- Kevin Bracey
+
+   pngwtran.c:
+      line 306: loop should count to row_info->width, not to
+             row_info->width*row_info->channnels
+
+   STATUS: Fixed in libpng-1.0.1a
+
+5. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
+
+   Loops need to be optimized everywhere
+
+   a. Make them count down instead of up -- Kevin Bracey
+   
+      Optimizing compilers don't need this, and making
+      the change would be error prone -- Tom Lane, Glenn R-P
+
+      Question whether i-- or --i is better.
+
+      STATUS: Under investigation.
+
+   b. Remove products and structure members from loop tests -- Glenn R-P
+
+      Can be accomplished without messing with loop guts.  This
+      was shown to be effective on optimized SGI compiler:
+
+              replace
+                  png_uint_32 i;
+                  for(i=0; i < s->a*s->b; i++)
+              with
+                  png_uint_32 i, count;
+                  istop = s->a*s->b;
+                  for(i=0; i<istop; i++)
+
+      STATUS: Mostly done in libpng-1.0.1a, done for all important loops.
+
+   c. Replace abs() with intrinsic ternary operations in Paeth
+      filtering -- Glenn R-P
+
+      STATUS: Done in libpng-1.0.1a
+      (can be restored to original behavior with #define PNG_USE_ABS)
+
+   d. In pngwutil.c, make separate simple loops to use when filter 
+      heuristic sums aren't needed. -- Glenn R-P
+
+      STATUS: Done in libpng-1.0.1a
+
+6. April 6, 1998 -- BUG -- bug in pngset.c (rowbytes too large) -- Bob Dellaca
+
+   pngset.c has a bug, introduced in version 0.99c, that sets rowbytes
+     too large when writing an image with bit_depth < 8
+
+   STATUS: Fixed in libpng-1.0.1a
+              
+7. April 10, 1998 -- BUG -- pngwutil weighted filtering bugs -- Glenn R-P
+
+   pngwutil.c has some bugs in the experimental weighted filter
+   algorithm (PNG_FILTER_XXX should be PNG_FILTER_VALUE_XXX in
+   several places)
+
+   STATUS: Andreas concurs.  Fixed in libpng-1.0.1a
+
+8. April 10, 1998 -- ENHANCEMENT -- run-time selection of malloc function
+   -- Bob Dellaca
+
+   pngmem.c currently provides a compile-time option to replace
+   png_malloc() and png_free().  It's been requested that these
+   be made possible at run time, via calls to new png_set_malloc_fn()
+   and png_set_free_fn() functions.
+
+   STATUS: Will do in libpng-1.0.1b
+
+9. April 11, 1998 -- BUG -- incorrect truncation of tRNS data in
+   illegal PNG file where tRNS precedes PLTE -- Larry Reeve
+
+   There is a misplaced pngrutil code block that truncates tRNS if it has
+   more than num_palette entries -- test was done before num_palette was
+   defined.  Although the PNG file is illegal, it shouldn't crash apps.
+   There is a simple fix; just moving the test to the point after
+   num_palette has been defined.
+
+   STATUS: Fixed in libpng-1.0.1a
+
+10. April 16, 1998 -- BUG -- incorrect operation of png_convert_to_rfc1123
+   with 31st day of the month -- Steve Eddins
+
+   The "ptime->date % 31" is wrong, should be "ptime->date % 32".
+
+   STATUS: Fixed in libpng-1.0.1a

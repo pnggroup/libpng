@@ -1,12 +1,12 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.1
+ * libpng 1.0.1a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 15, 1998
+ * April 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -446,13 +446,13 @@ png_push_save_buffer(png_structp png_ptr)
    {
       if (png_ptr->save_buffer_ptr != png_ptr->save_buffer)
       {
-         png_size_t i;
+         png_size_t i,istop;
          png_bytep sp;
          png_bytep dp;
 
+         istop = png_ptr->save_buffer_size;
          for (i = 0, sp = png_ptr->save_buffer_ptr, dp = png_ptr->save_buffer;
-            i < png_ptr->save_buffer_size;
-            i++, sp++, dp++)
+            i < istop; i++, sp++, dp++)
          {
             *dp = *sp;
          }

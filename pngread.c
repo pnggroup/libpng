@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.1
+ * libpng 1.0.1a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 15, 1998
+ * April 21, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -125,7 +125,7 @@ png_read_init(png_structp png_ptr)
 /* Read the information before the actual image data.  This has been
  * changed in v0.90 to allow reading a file that already has the magic
  * bytes read from the stream.  You can tell libpng how many bytes have
- * been read from the beginning of the stream (up to the maxumum of 8)
+ * been read from the beginning of the stream (up to the maximum of 8)
  * via png_set_sig_bytes(), and we will only check the remaining bytes
  * here.  The application can then have access to the signature bytes we
  * read if it is determined that this isn't a valid PNG file.
@@ -522,7 +522,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
 {
-   png_uint_32 i;
+   png_uint_32 i,image_height;
    int pass, j;
    png_bytepp rp;
 
@@ -530,12 +530,13 @@ png_read_image(png_structp png_ptr, png_bytepp image)
    /* save jump buffer and error functions */
    pass = png_set_interlace_handling(png_ptr);
 
-   png_ptr->num_rows = png_ptr->height; /* Make sure this is set correctly */
+   image_height=png_ptr->height;
+   png_ptr->num_rows = image_height; /* Make sure this is set correctly */
 
    for (j = 0; j < pass; j++)
    {
       rp = image;
-      for (i = 0; i < png_ptr->height; i++)
+      for (i = 0; i < image_height; i++)
       {
          png_read_row(png_ptr, *rp, NULL);
          rp++;
@@ -728,8 +729,9 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
 #if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->gamma_16_table != NULL)
    {
-      int i;
-      for (i = 0; i < (1 << (8 - png_ptr->gamma_shift)); i++)
+      int i,istop;
+      istop = (1 << (8 - png_ptr->gamma_shift));
+      for (i = 0; i < istop; i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_table[i]);
       }
@@ -739,8 +741,9 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_16_table);
    if (png_ptr->gamma_16_from_1 != NULL)
    {
-      int i;
-      for (i = 0; i < (1 << (8 - png_ptr->gamma_shift)); i++)
+      int i,istop;
+      istop = (1 << (8 - png_ptr->gamma_shift));
+      for (i = 0; i < istop; i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_from_1[i]);
       }
@@ -748,8 +751,9 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_16_from_1);
    if (png_ptr->gamma_16_to_1 != NULL)
    {
-      int i;
-      for (i = 0; i < (1 << (8 - png_ptr->gamma_shift)); i++)
+      int i,istop;
+      istop = (1 << (8 - png_ptr->gamma_shift));
+      for (i = 0; i < istop; i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_to_1[i]);
       }

@@ -9,7 +9,7 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CC=cc
-CFLAGS=-I$(ZLIBINC) -O # -g -DPNG_DEBUG=1
+CFLAGS=-I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
 #RANLIB=echo

@@ -1,12 +1,12 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng 1.0.1
+ * libpng 1.0.1a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 15, 1998
+ * April 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -96,13 +96,15 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
          {
             png_bytep sp, dp;
             int mask, v;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
             sp = row;
             dp = row;
             mask = 0x80;
             v = 0;
-            for (i = 0; i < row_info->width; i++)
+           
+            istop = row_info->width;
+            for (i = 0; i < istop; i++)
             {
                if (*sp != 0)
                   v |= mask;
@@ -125,13 +127,14 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
          {
             png_bytep sp, dp;
             int shift, v;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
             sp = row;
             dp = row;
             shift = 6;
             v = 0;
-            for (i = 0; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0; i < istop; i++)
             {
                png_byte value;
 
@@ -156,13 +159,14 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
          {
             png_bytep sp, dp;
             int shift, v;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
             sp = row;
             dp = row;
             shift = 4;
             v = 0;
-            for (i = 0; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0; i < istop; i++)
             {
                png_byte value;
 
@@ -246,7 +250,7 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       if (row_info->bit_depth < 8)
       {
          png_bytep bp;
-         png_uint_32 i;
+         png_uint_32 i, istop;
          png_byte mask;
 
          if (bit_depth->gray == 1 && row_info->bit_depth == 2)
@@ -256,7 +260,8 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
          else
             mask = 0xff;
 
-         for (bp = row, i = 0; i < row_info->rowbytes; i++, bp++)
+         istop = row_info->rowbytes;
+         for (bp = row, i = 0; i < istop; i++, bp++)
          {
             png_uint_16 v;
             int j;
@@ -275,9 +280,10 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       else if (row_info->bit_depth == 8)
       {
          png_bytep bp;
-         png_uint_32 i;
+         png_uint_32 i, istop;
 
-         for (bp = row, i = 0; i < row_info->width; i++)
+         istop = row_info->width;
+         for (bp = row, i = 0; i < istop; i++)
          {
             png_uint_32 c;
 
@@ -301,9 +307,10 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       else
       {
          png_bytep bp;
-         png_uint_32 i;
+         png_uint_32 i, istop;
 
-         for (bp = row, i = 0; i < row_info->width * row_info->channels; i++)
+         istop = row_info->width;
+         for (bp = row, i = 0; i < istop; i++)
          {
             png_uint_32 c;
 
@@ -345,12 +352,12 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
          if (row_info->bit_depth == 8)
          {
             png_bytep sp, dp;
-            png_byte save;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
-            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0, sp = dp = row; i < istop; i++)
             {
-               save = *(sp++);
+               png_byte save = *(sp++);
                *(dp++) = *(sp++);
                *(dp++) = *(sp++);
                *(dp++) = *(sp++);
@@ -361,11 +368,12 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
          else
          {
             png_bytep sp, dp;
-            png_byte save[2];
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
-            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0, sp = dp = row; i < istop; i++)
             {
+               png_byte save[2];
                save[0] = *(sp++);
                save[1] = *(sp++);
                *(dp++) = *(sp++);
@@ -385,12 +393,12 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
          if (row_info->bit_depth == 8)
          {
             png_bytep sp, dp;
-            png_byte save;
             png_uint_32 i;
 
-            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0, sp = dp = row; i < istop; i++)
             {
-               save = *(sp++);
+               png_byte save = *(sp++);
                *(dp++) = *(sp++);
                *(dp++) = save;
             }
@@ -399,11 +407,12 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
          else
          {
             png_bytep sp, dp;
-            png_byte save[2];
             png_uint_32 i;
 
-            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0, sp = dp = row; i < istop; i++)
             {
+               png_byte save[2];
                save[0] = *(sp++);
                save[1] = *(sp++);
                *(dp++) = *(sp++);
@@ -432,9 +441,10 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
          if (row_info->bit_depth == 8)
          {
             png_bytep sp, dp;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
-            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0, sp = dp = row; i < istop; i++)
             {
                *(dp++) = *(sp++);
                *(dp++) = *(sp++);
@@ -446,9 +456,10 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
          else
          {
             png_bytep sp, dp;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
-            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0, sp = dp = row; i < istop; i++)
             {
                *(dp++) = *(sp++);
                *(dp++) = *(sp++);
@@ -467,9 +478,10 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
          if (row_info->bit_depth == 8)
          {
             png_bytep sp, dp;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
-            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0, sp = dp = row; i < istop; i++)
             {
                *(dp++) = *(sp++);
                *(dp++) = 255 - *(sp++);
@@ -479,9 +491,10 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
          else
          {
             png_bytep sp, dp;
-            png_uint_32 i;
+            png_uint_32 i, istop;
 
-            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            istop = row_info->width;
+            for (i = 0, sp = dp = row; i < istop; i++)
             {
                *(dp++) = *(sp++);
                *(dp++) = *(sp++);
