@@ -5,7 +5,7 @@
 LIBRARY lpngce
 
 EXPORTS
-;Version 1.0.9beta9
+;Version 1.0.9rc2
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -179,4 +179,7 @@ EXPORTS
   png_init_io    @171
   png_convert_to_rfc1123     @172
   png_set_invalid  @173
-  png_mmx_supported  @174
+;To be added at version 1.2.0
+; png_permit_mng_features  @174
+;To be added at version 1.2.0
+; png_mmx_support  @175

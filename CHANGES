@@ -856,11 +856,12 @@ version 1.0.9beta4 [December 1, 2000]
   Change png_chunk_warning to png_warning in png_check_keyword().
   Increased the first part of msg buffer from 16 to 18 in png_chunk_error().
 version 1.0.9beta5 [December 15, 2000]
-  Added support for filter method 64 (for PNG datastreams embedded in MNG)
+  Added support for filter method 64 (for PNG datastreams embedded in MNG).
 version 1.0.9beta6 [December 18, 2000]
   Revised png_set_filter() to accept filter method 64 when appropriate.
   Added new PNG_HAVE_PNG_SIGNATURE bit to png_ptr->mode and use it to
     help prevent applications from using MNG features in PNG datastreams.
+  Added png_permit_mng_features() function.
   Revised libpng.3/libpng.txt.  Changed "filter type" to "filter method".
 version 1.0.9rc1 [December 23, 2000]
   Revised test for PNG_HAVE_PNG_SIGNATURE in pngrutil.c
@@ -879,6 +880,14 @@ version 1.0.9beta9 [January 15, 2001]
     wince and msvc project module definition files.
   Minor revision of makefile.cygwin.
   Fixed bug with progressive reading of narrow interlaced images in pngpread.c
+version 1.0.9beta10 [January 16, 2001]
+  Do not typedef png_FILE_p in pngconf.h when PNG_NO_STDIO is defined.
+  Fixed "png_mmx_supported" typo in project definition files.
+version 1.0.9rc2 [January 22, 2001]
+  Updated makefile.sgi to make shared library.
+  Removed png_mmx_support() function and disabled PNG_MNG_FEATURES_SUPPORTED
+    by default, for the benefit of DLL forward compatibility.  These will
+    be re-enabled in version 1.2.0.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

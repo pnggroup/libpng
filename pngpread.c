@@ -1,9 +1,9 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.9beta9 - January 15, 2001
+ * libpng 1.0.9rc2 - January 22, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -786,9 +786,9 @@ png_push_process_row(png_structp png_ptr)
             for (i = 0; i < 8 && png_ptr->pass == 0; i++)
             {
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
-               png_read_push_finish_row(png_ptr);
+               png_read_push_finish_row(png_ptr); /* updates png_ptr->pass */
             }
-            if (png_ptr->pass == 2)
+            if (png_ptr->pass == 2) /* pass 1 might be empty */
             {
                for (i = 0; i < 4 && png_ptr->pass == 2; i++)
                {
@@ -806,7 +806,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 2)
+            if (png_ptr->pass == 2) /* skip top 4 generated rows */
             {
                for (i = 0; i < 4 && png_ptr->pass == 2; i++)
                {
@@ -829,7 +829,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 4)
+            if (png_ptr->pass == 4) /* pass 3 might be empty */
             {
                for (i = 0; i < 2 && png_ptr->pass == 4; i++)
                {
@@ -847,7 +847,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 4)
+            if (png_ptr->pass == 4) /* skip top two generated rows */
             {
                for (i = 0; i < 2 && png_ptr->pass == 4; i++)
                {
@@ -870,7 +870,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 6)
+            if (png_ptr->pass == 6) /* pass 5 might be empty */
             {
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
@@ -885,7 +885,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 6)
+            if (png_ptr->pass == 6) /* skip top generated row */
             {
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);

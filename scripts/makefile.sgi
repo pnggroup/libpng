@@ -1,4 +1,5 @@
-# makefile for libpng
+# makefile for libpng (.a and .so), SGI IRIX with 'cc'
+# Copyright (C) 2001 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
@@ -6,6 +7,9 @@
 prefix=/usr/local
 
 # Where the zlib library and include files are located
+# You can add the -n32 option; then zlib must also be compiled with -n32
+#ZLIBLIB=/usr/local/lib32
+#ZLIBINC=/usr/local/include
 #ZLIBLIB=/usr/local/lib
 #ZLIBINC=/usr/local/include
 ZLIBLIB=../zlib
@@ -15,8 +19,16 @@ CC=cc
 
 WARNMORE=-fullwarn
 # You can add the -n32 option; then zlib must also be compiled with -n32
-CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) # -g -DPNG_DEBUG=5
+# Note: -KPIC is the default anyhow
+CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) -KPIC # -g -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+LDSHARED=cc -shared
+
+VER=1.0.9rc2
+SONUM=2
+SHAREDLIB=libpng.so
+libdir=$(prefix)
+#libdir=$(prefix)/lib32
 
 RANLIB=echo
 #RANLIB=ranlib
@@ -25,11 +37,19 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.a pngtest
+all: libpng.a pngtest shared
+
+shared: $(SHAREDLIB).$(SONUM).$(VER)
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
+
+$(SHAREDLIB).$(SONUM).$(VER): $(OBJS)
+	$(LDSHARED) -o $@ $(OBJS)
+	rm -f $(SHAREDLIB) $(SHAREDLIB).?
+	ln -s $@ $(SHAREDLIB)
+	ln -s $@ $(SHAREDLIB).$(SONUM)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -47,8 +67,16 @@ install: libpng.a
 	cp libpng.a $(prefix)/lib
 	chmod 644 $(prefix)/lib/libpng.a
 
+install-shared: $(SHAREDLIB).$(SONUM).$(VER)
+	cp $(SHAREDLIB).$(SONUM).$(VER) $(libdir); 
+	chmod 755 $(SHAREDLIB).$(SONUM).$(VER)
+	cd $(libdir);
+	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM);
+	ln -s $(SHAREDLIB).$(SONUM).$(VER) $(SHAREDLIB).$(SONUM);
+	ln -s $(SHAREDLIB).$(SONUM) $(SHAREDLIB);
+
 clean:
-	rm -f *.o libpng.a pngtest pngout.png
+	rm -f *.o libpng.a pngtest pngout.png $(SHAREDLIB).* 
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

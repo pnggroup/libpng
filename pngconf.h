@@ -1,8 +1,8 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.9beta9 - January 15, 2001
+ * libpng 1.0.9rc2 - January 22, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -493,11 +493,13 @@
 #  endif
 #endif
 
-/* Disable if you don't need to support PNGs that are embedded in MNG
+/* Enable if you need to support PNGs that are embedded in MNG
    datastreams */
+/*
 #ifndef PNG_NO_MNG_FEATURES
 #  define PNG_MNG_FEATURES_SUPPORTED
 #endif
+*/
 
 /* Deprecated, will be removed from version 2.0.0 */
 #ifndef PNG_NO_READ_EMPTY_PLTE
@@ -984,11 +986,15 @@ typedef png_int_16      FAR * png_int_16p;
 typedef PNG_CONST char  FAR * png_const_charp;
 typedef char            FAR * png_charp;
 typedef png_fixed_point FAR * png_fixed_point_p;
+
+#ifndef PNG_NO_STDIO
 #if defined(_WIN32_WCE)
 typedef HANDLE                png_FILE_p;
 #else
 typedef FILE                * png_FILE_p;
 #endif
+#endif
+
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 typedef double          FAR * png_doublep;
 #endif

@@ -6,9 +6,9 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.9beta9 - January 15, 2001
+ * libpng 1.0.9rc2 - January 22, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
  *
  * Based on MSVC code contributed by Nirav Chhatrapati, Intel Corp., 1998.
@@ -4964,9 +4964,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 //              not be inlined?  is there a way to modify the label for
 //              each inlined instance, e.g., by appending _1, _2, etc.?
 //              maybe if don't use leading "." in label name? (nope...sigh)]
-
-// GRR TO DO:  make sure PNGAPI doesn't do/require anything screwy here
-//             [looks OK for everybody except possibly Cygwin (__cdecl)]
 
 int PNGAPI
 png_mmx_support(void)
