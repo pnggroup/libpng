@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.9beta1 - November 10, 2000
+ libpng version 1.0.9beta10 - January 16, 2001
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -67,7 +67,7 @@ majority of the needs of its users.
 
 Libpng uses zlib for its compression and decompression of PNG files.
 Further information about zlib, and the latest version of zlib, can
-be found at the zlib home page, <ftp://ftp.freesoftware.com/pub/infozip/zlib/>.
+be found at the zlib home page, <http://www.info-zip.org/pub/infozip/zlib/>.
 The zlib compression utility is a general purpose utility that is
 useful for more than PNG files, and can be used without libpng.
 See the documentation delivered with zlib for more details.
@@ -371,7 +371,7 @@ row_pointers prior to calling png_read_png() with
    row_pointers = png_malloc(png_ptr, height*sizeof(png_bytep));
    for (int i=0; i<height, i++)
       row_pointers[i]=png_malloc(png_ptr, width*pixel_size);
-   png_set_rows(png_ptr, info_ptr, &row_pointers); 
+   png_set_rows(png_ptr, info_ptr, &row_pointers);
 
 Alternatively you could allocate your image in one big block and define
 row_pointers[i] to point into the proper places in your block.
@@ -400,7 +400,7 @@ in until png_read_end() has read the chunk data following the image.
 
     png_get_IHDR(png_ptr, info_ptr, &width, &height,
        &bit_depth, &color_type, &interlace_type,
-       &compression_type, &filter_type);
+       &compression_type, &filter_method);
 
     width          - holds the width of the image
                      in pixels (up to 2^31).
@@ -428,15 +428,18 @@ in until png_read_end() has read the chunk data following the image.
                      PNG_COLOR_MASK_COLOR
                      PNG_COLOR_MASK_ALPHA
 
-    filter_type    - (must be PNG_FILTER_TYPE_BASE
-                     for PNG 1.0)
+    filter_method  - (must be PNG_FILTER_TYPE_BASE
+                     for PNG 1.0, and can also be
+                     PNG_INTRAPIXEL_DIFFERENCING if
+                     the PNG datastream is embedded in
+                     a MNG-1.0 datastream)
     compression_type - (must be PNG_COMPRESSION_TYPE_BASE
                      for PNG 1.0)
     interlace_type - (PNG_INTERLACE_NONE or
                      PNG_INTERLACE_ADAM7)
     Any or all of interlace_type, compression_type, of
-                     filter_type can be NULL if you are not
-                     interested in their values.
+                     filter_method can be NULL if you are
+                     not interested in their values.
 
     channels = png_get_channels(png_ptr, info_ptr);
     channels       - number of channels of info for the
@@ -466,7 +469,7 @@ in until png_read_end() has read the chunk data following the image.
                          info_ptr);
     color_type       = png_get_color_type(png_ptr,
                          info_ptr);
-    filter_type      = png_get_filter_type(png_ptr,
+    filter_method    = png_get_filter_type(png_ptr,
                          info_ptr);
     compression_type = png_get_compression_type(png_ptr,
                          info_ptr);
@@ -564,7 +567,7 @@ into the info_ptr is returned for any complex types.
                          (empty string for unknown).
     num_text       - number of comments (same as num_comments;
                      you can put NULL here to avoid the duplication)
-    Note while png_set_text() will accept text, language, and 
+    Note while png_set_text() will accept text, language, and
     translated keywords that can be NULL pointers, the structure
     returned by png_get_text will always contain regular
     zero-terminated C strings.  They might be empty strings but
@@ -959,7 +962,7 @@ histogram, it may not do as good a job.
       if (png_get_valid(png_ptr, info_ptr,
          PNG_INFO_PLTE))
       {
-         png_color_16p histogram;
+         png_uint_16p histogram;
 
          png_get_hIST(png_ptr, info_ptr,
             &histogram);
@@ -1247,7 +1250,7 @@ application instead of by libpng, you can use
     png_set_invalid(png_ptr, info_ptr, mask);
     mask - identifies the chunks to be made invalid,
            containing the logical OR of one or
-           more of 
+           more of
              PNG_INFO_gAMA, PNG_INFO_sBIT,
              PNG_INFO_cHRM, PNG_INFO_PLTE,
              PNG_INFO_tRNS, PNG_INFO_bKGD,
@@ -1539,10 +1542,11 @@ maximum possible compression at the expense of slower writing.  If you
 have no special needs in this area, let the library do what it wants by
 not calling this function at all, as it has been tuned to deliver a good
 speed/compression ratio. The second parameter to png_set_filter() is
-the filter method, for which the only valid value is '0' (as of the
-July 1999 PNG specification, version 1.2).  The third parameter is a
-flag that indicates which filter type(s) are to be tested for each
-scanline.  See the PNG specification for details on the specific filter
+the filter method, for which the only valid values are 0 (as of the
+July 1999 PNG specification, version 1.2) or 64 (if you are writing
+a PNG datastream that is to be embedded in a MNG datastream).  The third
+parameter is a flag that indicates which filter type(s) are to be tested
+for each scanline.  See the PNG specification for details on the specific filter
 types.
 
 
@@ -1562,6 +1566,9 @@ wants to start and stop using particular filters during compression,
 it should start out with all of the filters (to ensure that the previous
 row of pixels will be stored in case it's needed later), and then add
 and remove them after the start of compression.
+
+If you are writing a PNG datastream that is to be embedded in a MNG
+datastream, the second parameter can be either 0 or 64.
 
 The png_set_compression_*() functions interface to the zlib compression
 library, and should mostly be ignored unless you really know what you are
@@ -1601,7 +1608,7 @@ Some of the more important parts of the png_info are:
 
     png_set_IHDR(png_ptr, info_ptr, width, height,
        bit_depth, color_type, interlace_type,
-       compression_type, filter_type)
+       compression_type, filter_method)
     width          - holds the width of the image
                      in pixels (up to 2^31).
     height         - holds the height of the image
@@ -1633,7 +1640,11 @@ Some of the more important parts of the png_info are:
                      PNG_INTERLACE_ADAM7
     compression_type - (must be
                      PNG_COMPRESSION_TYPE_DEFAULT)
-    filter_type    - (must be PNG_FILTER_TYPE_DEFAULT)
+    filter_method  - (must be PNG_FILTER_TYPE_DEFAULT
+                     or, if you are writing a PNG to
+                     be embedded in a MNG datastream,
+                     can also be
+                     PNG_INTRAPIXEL_DIFFERENCING)
 
     png_set_PLTE(png_ptr, info_ptr, palette,
        num_palette);
@@ -2231,13 +2242,22 @@ For a more compact example of writing a PNG image, see the file example.c.
 
 V. Modifying/Customizing libpng:
 
-There are two issues here.  The first is changing how libpng does
+There are three issues here.  The first is changing how libpng does
 standard things like memory allocation, input/output, and error handling.
 The second deals with more complicated things like adding new chunks,
 adding new transformations, and generally changing how libpng works.
+Both of those are compile-time issues; that is, they are generally
+determined at the time the code is written, and there is rarely a need
+to provide the user with a means of changing them.  The third is a
+run-time issue:  choosing between and/or tuning one or more alternate
+versions of computationally intensive routines; specifically, optimized
+assembly-language (and therefore compiler- and platform-dependent)
+versions.
+
+Memory allocation, input/output, and error handling
 
 All of the memory allocation, input/output, and error handling in libpng
-goes through callbacks that are user settable.  The default routines are
+goes through callbacks that are user-settable.  The default routines are
 in pngmem.c, pngrio.c, pngwio.c, and pngerror.c, respectively.  To change
 these functions, call the appropriate png_set_*_fn() function.
 
@@ -2470,6 +2490,10 @@ structures appropriately for all of the filter types.
 
     png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE,
        filters);
+              The second parameter can also be PNG_INTRAPIXEL_DIFFERENCING
+              if you are writing a PNG to be embedded in a MNG
+              datastream.  This parameter must be the same as the
+              value of filter_method used in png_set_IHDR().
 
 It is also possible to influence how libpng chooses from among the
 available filters.  This is done in two ways - by telling it how
@@ -2581,7 +2605,33 @@ When PNG_DEBUG = 1, the macros are defined, but only png_debug statements
 having level = 0 will be printed.  There aren't any such statements in
 this version of libpng, but if you insert some they will be printed.
 
-VI.  Changes to Libpng from version 0.88
+
+VI.  MNG support
+
+The MNG specification (available at http://www.libpng.org/pub/mng) allows
+certain extensions to PNG for PNG images that are embedded in MNG datastreams.
+Libpng can support some of these extensions.  To enable them, use the
+png_permit_mng_features() function:
+
+   feature_set = png_permit_mng_features(png_ptr, mask)
+   mask is a png_uint_32 containing the logical OR of the
+        features you want to enable.  These include
+        PNG_FLAG_MNG_EMPTY_PLTE
+        PNG_FLAG_MNG_FILTER_64
+        PNG_ALL_MNG_FEATURES
+   feature_set is a png_32_uint that is the logical AND of
+      your mask with the set of MNG features that is
+      supported by the version of libpng that you are using.
+
+It is an error to use this function when reading or writing a standalone
+PNG file with the PNG 8-byte signature.  The PNG datastream must be wrapped
+in a MNG datastream.  As a minimum, it must have the MNG 8-byte signature
+and the MHDR and MEND chunks.  Libpng does not provide support for these
+or any other MNG chunks; your application must provide its own support for
+them.  You may wish to consider using libmng (available at
+http://www.libmng.com) instead.
+
+VII.  Changes to Libpng from version 0.88
 
 It should be noted that versions of libpng later than 0.96 are not
 distributed by the original libpng author, Guy Schalnat, nor by
@@ -2630,15 +2680,15 @@ application:
 
    png_uint_32 application_vn = PNG_LIBPNG_VER;
 
-VII. Y2K Compliance in libpng
+VIII. Y2K Compliance in libpng
 
-November 10, 2000
+January 16, 2001
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.9beta1 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.9beta10 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

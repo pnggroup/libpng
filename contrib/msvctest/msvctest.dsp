@@ -54,12 +54,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386
-# ADD LINK32 ..\..\dll\msvc\win32\libpng\dll\libpng1.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll\libpng1.lib /nologo /subsystem:console /machine:I386
 # Begin Special Build Tool
 OutDir=.\dll
 SOURCE="$(InputPath)"
 PostBuild_Desc=[Run Test]
-PostBuild_Cmds=set path=..\..\dll\msvc\win32\libpng\dll;..\..\dll\msvc\win32\zlib\dll;	$(outdir)\msvctest.exe ..\..\pngtest.png
+PostBuild_Cmds=set path=..\..\projects\msvc\win32\libpng\dll;..\..\projects\msvc\win32\zlib\dll;	$(outdir)\msvctest.exe ..\..\pngtest.png
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "msvctest - Win32 Debug DLL"
@@ -84,12 +84,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\..\dll\msvc\win32\libpng\dll_dbg\libpng1d.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_dbg\libpng1d.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 OutDir=.\dll_dbg
 SOURCE="$(InputPath)"
 PostBuild_Desc=[Run Test]
-PostBuild_Cmds=set path=..\..\dll\msvc\win32\libpng\dll_dbg;..\..\dll\msvc\win32\zlib\dll_dbg;	$(outdir)\msvctest.exe ..\..\pngtest.png
+PostBuild_Cmds=set path=..\..\projects\msvc\win32\libpng\dll_dbg;..\..\projects\msvc\win32\zlib\dll_dbg;	$(outdir)\msvctest.exe ..\..\pngtest.png
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "msvctest - Win32 ASM DLL"
@@ -114,12 +114,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386
-# ADD LINK32 ..\..\dll\msvc\win32\libpng\dll_asm\libpng1a.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_asm\libpng1a.lib /nologo /subsystem:console /machine:I386
 # Begin Special Build Tool
 OutDir=.\dll_asm
 SOURCE="$(InputPath)"
 PostBuild_Desc=[Run Test]
-PostBuild_Cmds=set path=..\..\dll\msvc\win32\libpng\dll_asm;..\..\dll\msvc\win32\zlib\dll_asm;	$(outdir)\msvctest.exe ..\..\pngtest.png
+PostBuild_Cmds=set path=..\..\projects\msvc\win32\libpng\dll_asm;..\..\projects\msvc\win32\zlib\dll_asm;	$(outdir)\msvctest.exe ..\..\pngtest.png
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "msvctest - Win32 Debug ASM DLL"
@@ -144,12 +144,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\..\dll\msvc\win32\libpng\dll_dbga\libpng1b.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_dbga\libpng1b.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 OutDir=.\dll_dbga
 SOURCE="$(InputPath)"
 PostBuild_Desc=[Run Test]
-PostBuild_Cmds=set path=..\..\dll\msvc\win32\libpng\dll_dbga;..\..\dll\msvc\win32\zlib\dll_dbga;	$(outdir)\msvctest.exe ..\..\pngtest.png
+PostBuild_Cmds=set path=..\..\projects\msvc\win32\libpng\dll_dbga;..\..\projects\msvc\win32\zlib\dll_dbga;	$(outdir)\msvctest.exe ..\..\pngtest.png
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "msvctest - Win32 LIB"
@@ -174,7 +174,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386
-# ADD LINK32 ..\..\dll\msvc\win32\libpng\lib\libpng.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\lib\libpng.lib /nologo /subsystem:console /machine:I386
 # Begin Special Build Tool
 OutDir=.\lib
 SOURCE="$(InputPath)"
@@ -204,7 +204,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\..\dll\msvc\win32\libpng\lib_dbg\libpng.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\lib_dbg\libpng.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 OutDir=.\lib_dbg
 SOURCE="$(InputPath)"

@@ -571,7 +571,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -584,7 +583,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -597,7 +595,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -610,7 +607,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -623,7 +619,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -636,7 +631,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -649,7 +643,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -662,7 +655,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -675,7 +667,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -688,7 +679,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -701,7 +691,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -714,7 +703,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -727,7 +715,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -740,7 +727,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -753,7 +739,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
@@ -766,7 +751,6 @@ DEP_CPP_PNGTE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\

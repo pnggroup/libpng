@@ -1,8 +1,8 @@
 Microsoft Developer Studio Build File, Format Version 6.00 for
 msvctest
 
-Assumes that libpng DLLs and LIBs are in ..\..\dll\msvc\win32\libpng
-Assumes that zlib DLLs and LIBs are in ..\..\dll\msvc\win32\zlib
+Assumes that libpng DLLs and LIBs are in ..\..\projects\msvc\win32\libpng
+Assumes that zlib DLLs and LIBs are in ..\..\projects\msvc\win32\zlib
 
 To build:
 

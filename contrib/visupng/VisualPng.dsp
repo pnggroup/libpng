@@ -60,11 +60,11 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 libpng1.lib zlibd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /libpath:"libpng" /libpath:"zlib"
-# ADD LINK32 libpng1.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /libpath:"..\..\dll\msvc\win32\libpng\dll"
+# ADD LINK32 libpng1.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /libpath:"..\..\projects\msvc\win32\libpng\dll"
 # Begin Special Build Tool
 OutDir=.\dll
 SOURCE="$(InputPath)"
-PostBuild_Cmds=set path=..\..\dll\msvc\win32\libpng\dll;..\..\dll\msvc\win32\zlib\dll;	$(outdir)\VisualPng.exe ..\..\contrib\pngsuite\basn6a16.png
+PostBuild_Cmds=set path=..\..\projects\msvc\win32\libpng\dll;..\..\projects\msvc\win32\zlib\dll;	$(outdir)\VisualPng.exe ..\..\contrib\pngsuite\basn6a16.png
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "VisualPng - Win32 Debug DLL"
@@ -94,12 +94,12 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 libpng1.lib zlibd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"libc" /pdbtype:sept /libpath:"libpng" /libpath:"zlib"
 # SUBTRACT BASE LINK32 /nodefaultlib
-# ADD LINK32 libpng1d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"libc" /pdbtype:sept /libpath:"..\..\dll\msvc\win32\libpng\dll_dbg"
+# ADD LINK32 libpng1d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"libc" /pdbtype:sept /libpath:"..\..\projects\msvc\win32\libpng\dll_dbg"
 # SUBTRACT LINK32 /nodefaultlib
 # Begin Special Build Tool
 OutDir=.\dll_dbg
 SOURCE="$(InputPath)"
-PostBuild_Cmds=set path=..\..\dll\msvc\win32\libpng\dll_dbg;..\..\dll\msvc\win32\zlib\dll_dbg;	$(outdir)\VisualPng.exe ..\..\contrib\pngsuite\basn6a16.png
+PostBuild_Cmds=set path=..\..\projects\msvc\win32\libpng\dll_dbg;..\..\projects\msvc\win32\zlib\dll_dbg;	$(outdir)\VisualPng.exe ..\..\contrib\pngsuite\basn6a16.png
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "VisualPng - Win32 LIB"
@@ -128,8 +128,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 libpng1.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /libpath:"..\..\dll\msvc\win32\libpng\dll"
-# ADD LINK32 libpng.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /libpath:"..\..\dll\msvc\win32\libpng\lib"
+# ADD BASE LINK32 libpng1.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /libpath:"..\..\projects\msvc\win32\libpng\dll"
+# ADD LINK32 libpng.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /libpath:"..\..\projects\msvc\win32\libpng\lib"
 # Begin Special Build Tool
 OutDir=.\lib
 SOURCE="$(InputPath)"
@@ -161,9 +161,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 libpng1d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"libc" /pdbtype:sept /libpath:"..\..\dll\msvc\win32\libpng\dll_dbg"
+# ADD BASE LINK32 libpng1d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"libc" /pdbtype:sept /libpath:"..\..\projects\msvc\win32\libpng\dll_dbg"
 # SUBTRACT BASE LINK32 /nodefaultlib
-# ADD LINK32 libpng.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"libc" /pdbtype:sept /libpath:"..\..\dll\msvc\win32\libpng\lib_dbg"
+# ADD LINK32 libpng.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"libc" /pdbtype:sept /libpath:"..\..\projects\msvc\win32\libpng\lib_dbg"
 # SUBTRACT LINK32 /nodefaultlib
 # Begin Special Build Tool
 OutDir=.\lib_dbg

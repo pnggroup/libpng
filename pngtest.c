@@ -1,9 +1,9 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.9beta1 - November 10, 2000
+ * libpng 1.0.9beta10 - January 16, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -48,6 +48,14 @@
 #  define WRITEFILE(file, data, length, check) \
      check=(png_size_t)fwrite(data,(png_size_t)1, length, file)
 #  define FCLOSE(file) fclose(file)
+#endif
+
+#if defined(PNG_NO_STDIO)
+#if defined(_WIN32_WCE)
+typedef HANDLE                png_FILE_p;
+#else
+typedef FILE                * png_FILE_p;
+#endif
 #endif
 
 /* Makes pngtest verbose so we can find problems (needs to be before png.h) */
@@ -257,6 +265,7 @@ static int wrote_question = 0;
    not reading from a standard C stream, you should create a replacement
    read_data function and use it at run time with png_set_read_fn(), rather
    than changing the library. */
+
 #ifndef USE_FAR_KEYWORD
 static void
 pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
@@ -1449,4 +1458,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_9beta1 your_png_h_is_not_version_1_0_9beta1;
+typedef version_1_0_9beta10 your_png_h_is_not_version_1_0_9beta10;

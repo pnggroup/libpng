@@ -14,7 +14,7 @@ $   @makevms
 $   set def [-.pngminus]
 $   @makevms
 $   set def [--]
-$   exit 
+$   exit
 $ endif
 $ Make = ""
 $ If F$Search ("Sys$System:MMS.EXE") .nes. "" Then Make = "MMS"
@@ -54,7 +54,7 @@ $ if make.eqs.""
 $  then
 $   dele pngtest.obj;*
 $   CALL MAKE png.OBJ "cc ''CCOPT' png" -
-	png.c png.h pngconf.h   
+	png.c png.h pngconf.h
 $   CALL MAKE pngpread.OBJ "cc ''CCOPT' pngpread" -
 					 pngpread.c png.h pngconf.h
 $   CALL MAKE pngset.OBJ "cc ''CCOPT' pngset" -
@@ -90,8 +90,8 @@ $   CALL MAKE libpng.OLB "lib/crea libpng.olb *.obj" *.OBJ
 $   write sys$output "Building pngtest..."
 $   CALL MAKE pngtest.OBJ "cc ''CCOPT' pngtest" -
 	pngtest.c png.h pngconf.h
-$   call make pngtest.exe - 
-	"LINK pngtest,libpng.olb/lib,''zlibsrc'libz.olb/lib" - 
+$   call make pngtest.exe -
+	"LINK pngtest,libpng.olb/lib,''zlibsrc'libz.olb/lib" -
 	pngtest.obj libpng.olb
 $   write sys$output "Testing Libpng..."
 $   run pngtest

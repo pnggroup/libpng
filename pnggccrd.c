@@ -6,14 +6,14 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.9beta1 - November 10, 2000
+ * libpng 1.0.9beta10 - January 16, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
  *
  * Based on MSVC code contributed by Nirav Chhatrapati, Intel Corp., 1998.
  * Interface to libpng contributed by Gilles Vollant, 1999.
- * GNU C port by Greg Roelofs, 1999-2000.
+ * GNU C port by Greg Roelofs, 1999-2001.
  *
  * Lines 2350-4300 converted in place with intel2gas 1.3.1:
  *
@@ -198,10 +198,19 @@
  *     correctly (but 48-bit RGB just fine)
  *
  * 20000916:
- *  - fixed bug in png_read_filter_row_mmx_avg(), bpp == 2 case; three errors:  
+ *  - fixed bug in png_read_filter_row_mmx_avg(), bpp == 2 case; three errors:
  *     - "_ShiftBpp.use = 24;"      should have been   "_ShiftBpp.use = 16;"
  *     - "_ShiftRem.use = 40;"      should have been   "_ShiftRem.use = 48;"
  *     - "psllq _ShiftRem, %%mm2"   should have been   "psrlq _ShiftRem, %%mm2"
+ *
+ * 20010103:
+ *  - renamed mmxsupport() to png_mmx_support(), with auto-set of mmx_supported,
+ *     and made it public
+ *
+ * 20010104:
+ *  - removed dependency on png_read_filter_row_c() (C code already duplicated
+ *     within MMX version of png_read_filter_row()) so no longer necessary to
+ *     compile it into pngrutil.o
  *
  * STILL TO DO:
  *     - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
@@ -211,7 +220,7 @@
  *        (only width_mmx case) (near line 1606)
  *     - rewrite all MMX interlacing code so it's aligned with beginning
  *        of the row buffer, not the end (see 19991007 for details)
- *     - pick one version of mmxsupport() and get rid of the other
+ *     x pick one version of mmxsupport() and get rid of the other
  *     - add error messages to any remaining bogus default cases
  *     - enable pixel_depth == 8 cases in png_read_filter_row()? (test speed)
  *     - add support for runtime enable/disable/query of various MMX routines
@@ -224,10 +233,6 @@
 
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
 
-int mmxsupport(void);
-
-static int mmx_supported = 2;
-
 #ifdef PNG_USE_LOCAL_ARRAYS
 static const int FARDATA png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 static const int FARDATA png_pass_inc[7]   = {8, 8, 4, 4, 2, 2, 1};
@@ -237,25 +242,26 @@ static const int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 // djgpp, Win32, and Cygwin add their own underscores to global variables,
 // so define them without:
 #if defined(__DJGPP__) || defined(WIN32) || defined(__CYGWIN__)
+#  define _mmx_supported  mmx_supported
 #  define _unmask         unmask
 #  define _const4         const4
 #  define _const6         const6
-#  define _mask8_0        mask8_0  
-#  define _mask16_1       mask16_1 
-#  define _mask16_0       mask16_0 
-#  define _mask24_2       mask24_2 
-#  define _mask24_1       mask24_1 
-#  define _mask24_0       mask24_0 
-#  define _mask32_3       mask32_3 
-#  define _mask32_2       mask32_2 
-#  define _mask32_1       mask32_1 
-#  define _mask32_0       mask32_0 
-#  define _mask48_5       mask48_5 
-#  define _mask48_4       mask48_4 
-#  define _mask48_3       mask48_3 
-#  define _mask48_2       mask48_2 
-#  define _mask48_1       mask48_1 
-#  define _mask48_0       mask48_0 
+#  define _mask8_0        mask8_0
+#  define _mask16_1       mask16_1
+#  define _mask16_0       mask16_0
+#  define _mask24_2       mask24_2
+#  define _mask24_1       mask24_1
+#  define _mask24_0       mask24_0
+#  define _mask32_3       mask32_3
+#  define _mask32_2       mask32_2
+#  define _mask32_1       mask32_1
+#  define _mask32_0       mask32_0
+#  define _mask48_5       mask48_5
+#  define _mask48_4       mask48_4
+#  define _mask48_3       mask48_3
+#  define _mask48_2       mask48_2
+#  define _mask48_1       mask48_1
+#  define _mask48_0       mask48_0
 #  define _FullLength     FullLength
 #  define _MMXLength      MMXLength
 #  define _dif            dif
@@ -270,6 +276,8 @@ static const int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #  define _pbtemp         pbtemp
 #  define _pctemp         pctemp
 #endif
+
+static int _mmx_supported = 2;
 
 /* These constants are used in the inlined MMX assembly code.
    Ignore gcc's "At top level: defined but not used" warnings. */
@@ -318,11 +326,6 @@ static int          _pbtemp;
 static int          _pctemp;
 
 
-void /* PRIVATE */
-png_read_filter_row_c(png_structp png_ptr, png_row_infop row_info,
-   png_bytep row, png_bytep prev_row, int filter);
-
-
 
 
 //===========================================================================//
@@ -352,16 +355,16 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1,"in png_combine_row_asm\n");
 
-   if (mmx_supported == 2)
-       mmx_supported = mmxsupport();
+   if (_mmx_supported == 2) {
+       png_mmx_support();
+   }
 
    if (mask == 0xff)
    {
       png_memcpy(row, png_ptr->row_buf + 1,
        (png_size_t)((png_ptr->width * png_ptr->row_info.pixel_depth + 7) >> 3));
    }
-   /* GRR:  add "else if (mask == 0)" case?
-    *       or does png_combine_row() not even get called in that case? */
+   /* GRR:  png_combine_row() never called with mask == 0 */
    else
    {
       switch (png_ptr->row_info.pixel_depth)
@@ -537,7 +540,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-            if (mmx_supported)
+            if ( _mmx_supported  )
             {
                png_uint_32 len;
                int diff;
@@ -642,7 +645,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   png_memcpy(dstptr, srcptr, rep_bytes);
                   srcptr += stride;
                   dstptr += stride;
-               } 
+               }
             } /* end of else */
 
             break;
@@ -653,7 +656,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-            if (mmx_supported)
+            if ( _mmx_supported )
             {
                png_uint_32 len;
                int diff;
@@ -774,7 +777,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   png_memcpy(dstptr, srcptr, rep_bytes);
                   srcptr += stride;
                   dstptr += stride;
-               } 
+               }
             } /* end of else */
 
             break;
@@ -785,7 +788,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-            if (mmx_supported)
+            if ( _mmx_supported )
             {
                png_uint_32 len;
                int diff;
@@ -921,7 +924,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   png_memcpy(dstptr, srcptr, rep_bytes);
                   srcptr += stride;
                   dstptr += stride;
-               } 
+               }
             } /* end of else */
 
             break;
@@ -932,7 +935,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-            if (mmx_supported)
+            if ( _mmx_supported )
             {
                png_uint_32 len;
                int diff;
@@ -1086,7 +1089,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-            if (mmx_supported)
+            if ( _mmx_supported )
             {
                png_uint_32 len;
                int diff;
@@ -1246,7 +1249,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   png_memcpy(dstptr, srcptr, rep_bytes);
                   srcptr += stride;
                   dstptr += stride;
-               } 
+               }
             } /* end of else */
 
             break;
@@ -1273,7 +1276,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                png_memcpy(dstptr, srcptr, rep_bytes);
                srcptr += stride;
                dstptr += stride;
-            } 
+            }
             break;
          }       // end 64 bpp
 
@@ -1311,13 +1314,18 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
  */
 
 void /* PRIVATE */
-png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
-   png_uint_32 transformations)
+png_do_read_interlace(png_structp png_ptr)
 {
+   png_row_infop row_info = &(png_ptr->row_info);
+   png_bytep row = png_ptr->row_buf + 1;
+   int pass = png_ptr->pass;
+   png_uint_32 transformations = png_ptr->transformations;
+
    png_debug(1,"in png_do_read_interlace\n");
 
-   if (mmx_supported == 2)
-       mmx_supported = mmxsupport();
+   if (_mmx_supported == 2) {
+       png_mmx_support();
+   }
 
    if (row != NULL && row_info != NULL)
    {
@@ -1520,7 +1528,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
             // New code by Nirav Chhatrapati - Intel Corporation
 
-            if (mmx_supported)  // use MMX code if machine supports it
+            if ( _mmx_supported )
             {
                //--------------------------------------------------------------
                if (pixel_bytes == 3)
@@ -2095,7 +2103,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                            : "=c" (dummy_value_c),        // output regs (dummy)
                              "=S" (dummy_value_S),
                              "=D" (dummy_value_D)
- 
+
                            : "1" (sptr),      // esi      // input regs
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
@@ -2153,7 +2161,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                            : "=c" (dummy_value_c),        // output regs (dummy)
                              "=S" (dummy_value_S),
                              "=D" (dummy_value_D)
- 
+
                            : "1" (sptr),      // esi      // input regs
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
@@ -2398,7 +2406,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                      sptr-= pixel_bytes;
                   }
                }
-            } // end of mmx_supported =========================================
+            } // end of _mmx_supported ========================================
 
             else /* MMX not supported:  use modified C code - takes advantage
                   *   of inlining of memcpy for a constant */
@@ -4749,43 +4757,32 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    row, png_bytep prev_row, int filter)
 {
 #ifdef PNG_DEBUG
-   char filnm[6];
+   char filnm[10];
 #endif
 
-#define UseMMX 1
-
+/* GRR:  these are superseded by png_ptr->asm_flags: */
 #define UseMMX_sub    1   // GRR:  converted 20000730
 #define UseMMX_up     1   // GRR:  converted 20000729
 #define UseMMX_avg    1   // GRR:  converted 20000828 (+ 16-bit bugfix 20000916)
 #define UseMMX_paeth  1   // GRR:  converted 20000828
 
-   if (mmx_supported == 2)
-       mmx_supported = mmxsupport();
-
-   if (!mmx_supported)
-   {
-       png_read_filter_row_c(png_ptr, row_info, row, prev_row, filter);
-       return;
+   if (_mmx_supported == 2) {
+       png_mmx_support();
    }
 
 #ifdef PNG_DEBUG
    png_debug(1, "in png_read_filter_row\n");
-#if (UseMMX == 1)
-   png_debug1(0,"%s, ", "MMX");
-#else
-   png_debug1(0,"%s, ", "x86");
-#endif
    switch (filter)
    {
       case 0: sprintf(filnm, "none");
          break;
-      case 1: sprintf(filnm, "sub");
+      case 1: sprintf(filnm, "sub-%s", "MMX");
          break;
-      case 2: sprintf(filnm, "up");
+      case 2: sprintf(filnm, "up-%s", "MMX");
          break;
-      case 3: sprintf(filnm, "avg");
+      case 3: sprintf(filnm, "avg-%s", "MMX");
          break;
-      case 4: sprintf(filnm, "Paeth");
+      case 4: sprintf(filnm, "Paeth-%s", "MMX");
          break;
       default: sprintf(filnm, "unknw");
          break;
@@ -4795,7 +4792,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    png_debug2(0, "pixdepth=%2d, bytes=%d, ", (int)row_info->pixel_depth,
       (int)((row_info->pixel_depth + 7) >> 3));
    png_debug1(0,"rowbytes=%8ld\n", row_info->rowbytes);
-#endif
+#endif /* PNG_DEBUG */
 
    switch (filter)
    {
@@ -4803,13 +4800,13 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_SUB:
-#if (UseMMX_sub == 1)
-         if ((row_info->pixel_depth > 8) && (row_info->rowbytes >= 128))
+         if (
+             (row_info->pixel_depth >= PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT) &&
+             (row_info->rowbytes >= PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT))
          {
             png_read_filter_row_mmx_sub(row_info, row);
          }
          else
-#endif
          {
             png_uint_32 i;
             png_uint_32 istop = row_info->rowbytes;
@@ -4826,33 +4823,35 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_UP:
-#if (UseMMX_up == 1)
-         if ((row_info->pixel_depth > 8) && (row_info->rowbytes >= 128))
+         if (
+             (row_info->pixel_depth >= PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT) &&
+             (row_info->rowbytes >= PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT))
          {
             png_read_filter_row_mmx_up(row_info, row, prev_row);
          }
          else
-#endif
          {
-            png_bytep rp;
-            png_bytep pp;
             png_uint_32 i;
-            for (i = 0, rp = row, pp = prev_row;
-               i < row_info->rowbytes; i++, rp++, pp++)
+            png_uint_32 istop = row_info->rowbytes;
+            png_bytep rp = row;
+            png_bytep pp = prev_row;
+
+            for (i = 0; i < istop; ++i)
             {
-                  *rp = (png_byte)(((int)(*rp) + (int)(*pp)) & 0xff);
+               *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
+               rp++;
             }
          }  //end !UseMMX_up
          break;
 
       case PNG_FILTER_VALUE_AVG:
-#if (UseMMX_avg == 1)
-         if ((row_info->pixel_depth > 8) && (row_info->rowbytes >= 128))
+         if (
+             (row_info->pixel_depth >= PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT) &&
+             (row_info->rowbytes >= PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT))
          {
             png_read_filter_row_mmx_avg(row_info, row, prev_row);
          }
          else
-#endif
          {
             png_uint_32 i;
             png_bytep rp = row;
@@ -4878,13 +4877,13 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_PAETH:
-#if (UseMMX_paeth == 1)
-         if ((row_info->pixel_depth > 8) && (row_info->rowbytes >= 128))
+         if (
+             (row_info->pixel_depth >= PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT) &&
+             (row_info->rowbytes >= PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT))
          {
             png_read_filter_row_mmx_paeth(row_info, row, prev_row);
          }
          else
-#endif
          {
             png_uint_32 i;
             png_bytep rp = row;
@@ -4892,7 +4891,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
             png_bytep lp = row;
             png_bytep cp = prev_row;
             png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
-            png_uint_32 istop=row_info->rowbytes - bpp;
+            png_uint_32 istop = row_info->rowbytes - bpp;
 
             for (i = 0; i < bpp; i++)
             {
@@ -4900,7 +4899,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
                rp++;
             }
 
-            for (i = 0; i < istop; i++)   // use leftover rp,pp
+            for (i = 0; i < istop; i++)   /* use leftover rp,pp */
             {
                int a, b, c, pa, pb, pc, p;
 
@@ -4930,7 +4929,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
                      p = c;
                 */
 
-               p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
+               p = (pa <= pb && pa <= pc) ? a : (pb <= pc) ? b : c;
 
                *rp = (png_byte)(((int)(*rp) + p) & 0xff);
                rp++;
@@ -4939,7 +4938,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       default:
-         png_warning(png_ptr, "Ignoring bad adaptive filter type");
+         png_warning(png_ptr, "Ignoring bad row-filter type");
          *row=0;
          break;
    }
@@ -4964,85 +4963,24 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 //             [is there a way to signal that a *single* function should
 //              not be inlined?  is there a way to modify the label for
 //              each inlined instance, e.g., by appending _1, _2, etc.?
-//              maybe if don't use leading "." in label name? (not tested)]
+//              maybe if don't use leading "." in label name? (nope...sigh)]
 
-#ifdef ORIG_THAT_USED_TO_CLOBBER_EBX
-
-int mmxsupport(void)
-{
-    int mmx_supported_local = 0;
-
-    __asm__ __volatile__ (
-//      ".byte  0x66          \n\t"  // convert 16-bit pushf to 32-bit pushfd
-//      "pushf                \n\t"  // save Eflag to stack
-        "pushfl               \n\t"  // save Eflag to stack
-        "popl %%eax           \n\t"  // get Eflag from stack into eax
-        "movl %%eax, %%ecx    \n\t"  // make another copy of Eflag in ecx
-        "xorl $0x200000, %%eax \n\t" // toggle ID bit in Eflag (i.e., bit 21)
-        "pushl %%eax          \n\t"  // save modified Eflag back to stack
-//      ".byte  0x66          \n\t"  // convert 16-bit popf to 32-bit popfd
-//      "popf                 \n\t"  // restore modified value to Eflag reg
-        "popfl                \n\t"  // restore modified value to Eflag reg
-        "pushfl               \n\t"  // save Eflag to stack
-        "popl %%eax           \n\t"  // get Eflag from stack
-        "xorl %%ecx, %%eax    \n\t"  // compare new Eflag with original Eflag
-        "jz .NOT_SUPPORTED    \n\t"  // if same, CPUID instr. is not supported
-
-        "xorl %%eax, %%eax    \n\t"  // set eax to zero
-//      ".byte  0x0f, 0xa2    \n\t"  // CPUID instruction (two-byte opcode)
-        "cpuid                \n\t"  // get the CPU identification info
-        "cmpl $1, %%eax       \n\t"  // make sure eax return non-zero value
-        "jl .NOT_SUPPORTED    \n\t"  // if eax is zero, MMX is not supported
-
-        "xorl %%eax, %%eax    \n\t"  // set eax to zero and...
-        "incl %%eax           \n\t"  // ...increment eax to 1.  This pair is
-                                     // faster than the instruction "mov eax, 1"
-        "cpuid                \n\t"  // get the CPU identification info again
-        "andl $0x800000, %%edx \n\t" // mask out all bits but MMX bit (23)
-        "cmpl $0, %%edx       \n\t"  // 0 = MMX not supported
-        "jz .NOT_SUPPORTED    \n\t"  // non-zero = yes, MMX IS supported
-
-        "movl $1, %0          \n\t"  // set return value to 1 and fall through
-
-    ".NOT_SUPPORTED:          \n\t"  // target label for jump instructions
-        "movl %0, %%eax       \n\t"  // move return value to eax
-                                     // DONE
-
-        : "=m" (mmx_supported_local) // %0 (output list:  memory only)
-
-        :                            // any variables used on input (none)
-
-        : "%eax", "%ebx",            // clobber list
-          "%ecx", "%edx"
-//      , "memory"   // if write to a variable gcc thought was in a reg
-//      , "cc"       // "condition codes" (flag bits)
-    );
-
-    //mmx_supported_local=0; // test code for force don't support MMX
-    //printf("MMX : %u (1=MMX supported)\n",mmx_supported_local);
-
-    return mmx_supported_local;
-}
-
-
-#else /* !ORIG_THAT_USED_TO_CLOBBER_EBX */
-
-
-int mmxsupport(void)
+int PNGAPI
+png_mmx_support(void)
 {
     __asm__ __volatile__ (
         "pushl %%ebx          \n\t"  // ebx gets clobbered by CPUID instruction
         "pushl %%ecx          \n\t"  // so does ecx...
         "pushl %%edx          \n\t"  // ...and edx (but ecx & edx safe on Linux)
 //      ".byte  0x66          \n\t"  // convert 16-bit pushf to 32-bit pushfd
-//      "pushf                \n\t"  // save Eflag to stack
+//      "pushf                \n\t"  // 16-bit pushf
         "pushfl               \n\t"  // save Eflag to stack
         "popl %%eax           \n\t"  // get Eflag from stack into eax
         "movl %%eax, %%ecx    \n\t"  // make another copy of Eflag in ecx
         "xorl $0x200000, %%eax \n\t" // toggle ID bit in Eflag (i.e., bit 21)
         "pushl %%eax          \n\t"  // save modified Eflag back to stack
 //      ".byte  0x66          \n\t"  // convert 16-bit popf to 32-bit popfd
-//      "popf                 \n\t"  // restore modified value to Eflag reg
+//      "popf                 \n\t"  // 16-bit popf
         "popfl                \n\t"  // restore modified value to Eflag reg
         "pushfl               \n\t"  // save Eflag to stack
         "popl %%eax           \n\t"  // get Eflag from stack
@@ -5064,6 +5002,7 @@ int mmxsupport(void)
         "jz .NOT_SUPPORTED    \n\t"  // non-zero = yes, MMX IS supported
 
         "movl $1, %%eax       \n\t"  // set return value to 1
+        "movl %%eax, _mmx_supported \n\t" // save in global static variable, too
         "popl %%edx           \n\t"  // restore edx
         "popl %%ecx           \n\t"  // restore ecx
         "popl %%ebx           \n\t"  // restore ebx ("row" in png_do_interlace)
@@ -5071,13 +5010,14 @@ int mmxsupport(void)
 
     ".NOT_SUPPORTED:          \n\t"  // target label for jump instructions
         "movl $0, %%eax       \n\t"  // set return value to 0
+        "movl %%eax, _mmx_supported \n\t" // save in global static variable, too
         "popl %%edx           \n\t"  // restore edx
         "popl %%ecx           \n\t"  // restore ecx
         "popl %%ebx           \n\t"  // restore ebx ("row" in png_do_interlace)
 //      "ret                  \n\t"  // DONE:  no MMX support
                                      // (fall through to standard C "ret")
 
-        : // "=m" (mmx_supported_local) // %0 (output list:  memory only)
+        :                            // output list (none)
 
         :                            // any variables used on input (none)
 
@@ -5087,12 +5027,7 @@ int mmxsupport(void)
 //      , "cc"       // "condition codes" (flag bits)
     );
 
-    //mmx_supported_local=0; // test code for force don't support MMX
-    //printf("MMX : %u (1=MMX supported)\n",mmx_supported_local);
-
-    //return mmx_supported_local;
+    // return %%eax;
 }
-
-#endif /* ?ORIG_THAT_USED_TO_CLOBBER_EBX */
 
 #endif /* PNG_ASSEMBLER_CODE_SUPPORTED && PNG_USE_PNGGCCRD */

@@ -267,7 +267,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     */
    if (color_type & PNG_COLOR_MASK_COLOR)
    {
-      png_uint_32 num_palette;
+      int num_palette;
       png_colorp palette;
 
       /* This reduces the image to the application supplied palette */
@@ -603,9 +603,9 @@ void write_png(char *file_name /* , ... other image information ... */)
       PNG_INTERLACE_????, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
    /* set the palette if there is one.  REQUIRED for indexed-color images */
-   palette = (png_colorp)png_malloc(png_ptr, 256 * sizeof (png_color));
+   palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH * sizeof (png_color));
    /* ... set palette colors ... */
-   png_set_PLTE(png_ptr, info_ptr, palette, 256);
+   png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
    /* You must not free palette here, because png_set_PLTE only makes a link to
       the palette that you malloced.  Wait until you are about to destroy
       the png structure. */
