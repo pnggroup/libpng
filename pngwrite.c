@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.2beta6 - March 31, 2002
+ * libpng 1.2.2rc1 - April 7, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -953,6 +953,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
       png_ptr = *png_ptr_ptr;
 #ifdef PNG_USER_MEM_SUPPORTED
       free_fn = png_ptr->free_fn;
+      mem_ptr = png_ptr->mem_ptr;
 #endif
    }
 

@@ -18,7 +18,7 @@ RM = rm -f
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2beta6
+PNGMIN = 1.2.2rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -57,9 +57,12 @@ pngtest$(E): pngtest$(O) libpng$(A)
 
 install: libpng.a
 	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(INCPATH)/libpng  ]; then mkdir $(INCPATH)/libpng; fi
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	cp png.h pngconf.h $(INCPATH)
-	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	-@rm $(INCPATH)/png.h
+	-@rm $(INCPATH)/pngconf.h
+	cp png.h pngconf.h $(INCPATH)/libpng
+	chmod 644 $(INCPATH)/libpng/png.h $(INCPATH)/libpng/pngconf.h
 	cp libpng.a $(LIBPATH)
 
 clean:

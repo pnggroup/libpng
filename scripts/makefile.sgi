@@ -31,7 +31,7 @@ LDSHARED=cc $(ABI) -shared
 # See "man dso" for info about shared objects
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.2beta6
+PNGMIN = 1.2.2rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 RANLIB=echo

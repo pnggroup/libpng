@@ -25,11 +25,11 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2beta6
+PNGMIN = 1.2.2rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
-INCPATH=$(prefix)/include
+INCPATH=$(prefix)/include/libpng
 LIBPATH=$(prefix)/lib
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
@@ -69,6 +69,8 @@ test: pngtest
 install-headers: png.h pngconf.h
 	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
 	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
+	-@/bin/rm -f $(INCPATH)/png.h
+	-@/bin/rm -f $(INCPATH)/pngconf.h
 	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
 	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h

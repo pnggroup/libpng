@@ -1,5 +1,5 @@
 
-Libpng 1.2.2beta6 - March 31, 2002
+Libpng 1.2.2rc1 - April 7, 2002
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -45,10 +45,15 @@ version 1.2.2beta5 [March 26, 2002]
   Revised makefiles to put png.h and pngconf.h only in $prefix/include/libpngNN
   Revised makefiles to make symlink to libpng.so.NN in addition to libpngNN.so
 version 1.2.2beta6 [March 31, 2002]
+version 1.0.13beta1 [March 31, 2002]
   Prevent png_zalloc() from trying to memset memory that it failed to acquire.
   Add typecasts of PNG_MAX_UINT in pngset_cHRM_fixed() (Matt Holgate).
   Ensure that the right function (user or default) is used to free the
     png_struct after an error in png_create_read_struct_2().
+version 1.2.2rc1 [April 7, 2002]
+  Save the ebx register in pnggccrd.c (Sami Farin)
+  Add "mem_ptr = png_ptr->mem_ptr" in png_destroy_write_struct() (Paul Gardner).
+  Updated makefiles to put headers in include/libpng and remove old include/*.h.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

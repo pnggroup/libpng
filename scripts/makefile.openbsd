@@ -6,8 +6,8 @@ PREFIX?= /usr/local
 LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
-SHLIB_MAJOR=	3
-SHLIB_MINOR=	0
+SHLIB_MAJOR=	0
+SHLIB_MINOR=	1.2.2rc1
 
 LIB=	png
 SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \
@@ -37,8 +37,8 @@ test:	pngtest
 		LD_LIBRARY_PATH="${.OBJDIR}" ${.OBJDIR}/pngtest
 
 beforeinstall:
-	if [ ! -d ${DESTDIR}${PREFIX}/include ]; then \
-	  ${INSTALL} -d -o root -g wheel ${DESTDIR}${PREFIX}/include; \
+	if [ ! -d ${DESTDIR}${PREFIX}/include/libpng ]; then \
+	  ${INSTALL} -d -o root -g wheel ${DESTDIR}${PREFIX}/include/libpng; \
 	fi
 	if [ ! -d ${DESTDIR}${LIBDIR} ]; then \
 	  ${INSTALL} -d -o root -g wheel ${DESTDIR}${LIBDIR}; \
@@ -59,9 +59,11 @@ beforeinstall:
 afterinstall:
 	@rm -f ${DESTDIR}${LIBDIR}/libpng_pic.a
 	@rm -f ${DESTDIR}${LIBDIR}/debug/libpng.a
+	@rm -f ${DESTDIR}${PREFIX}/include/png.h
+	@rm -f ${DESTDIR}${PREFIX}/include/pngconf.h
 	@rmdir ${DESTDIR}${LIBDIR}/debug 2>/dev/null || true
 	${INSTALL} ${INSTALL_COPY} -o ${SHAREOWN} -g ${SHAREGRP} \
-		-m ${NONBINMODE} ${HDRS} ${DESTDIR}${PREFIX}/include
+		-m ${NONBINMODE} ${HDRS} ${DESTDIR}${PREFIX}/include/libpng
 	${INSTALL} ${INSTALL_COPY} -o ${SHAREOWN} -g ${SHAREGRP} \
 		-m ${NONBINMODE} ${DOCS} ${DESTDIR}${PREFIX}/share/doc/png
 

@@ -12,6 +12,10 @@
 # $CFLAGS, and include pnggccrd.o in $OBJS, below.
 
 CC=gcc
+ifdef MINGW
+MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
+MINGW_LDFLAGS=-mno-cygwin -L/usr/lib/mingw
+endif
 
 # where "make install" puts libpng.a, libpng.so*, png.h, and pngconf.h
 prefix=/usr
@@ -32,14 +36,12 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 #CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 #        -fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
-CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
+CFLAGS=$(MINGW_CCFLAGS) -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer
 
-# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
-# have to change it.
 PNGMAJ = 0
 #PNGDLL = $12
-PNGMIN = 1.2.2beta6
+PNGMIN = 1.2.2rc1
 PNGMIN_BASE = 1.2.2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
@@ -50,8 +52,8 @@ SHAREDDEF=libpng.def
 LIBS=$(SHAREDLIB) $(STATLIB)
 EXE=.exe
 
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
-LDSHARED=gcc -shared -Wl,--enable-auto-image-base
+LDFLAGS=-L. $(MINGW_LDFLAGS) -L$(ZLIBLIB) -lpng -lz
+LDSFLAGS=-shared -L.  $(MINGW_LDFLAGS) -Wl,--enable-auto-image-base
 LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(SHAREDDEF)
 
 RANLIB=ranlib
@@ -111,7 +113,7 @@ $(SHAREDDEF): projects/msvc/png32ms.def
 	sed -e 's/\([^;]*\);/;/' > $@
 
 $(SHAREDLIB): $(OBJSDLL) $(SHAREDDEF)
-	$(LDSHARED) -o $@ $(LDEXTRA) $(OBJSDLL) -L. -L$(ZLIBLIB) -lz
+	$(CC) $(LDSFLAGS) -o $@ $(LDEXTRA) $(OBJSDLL) -L. -L$(ZLIBLIB) -lz
 
 pngtest$(EXE): pngtest.pic.o $(SHAREDLIB)
 	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
@@ -146,7 +148,10 @@ install-shared: $(SHAREDLIB) install-headers install-docs install-man
 	install -s -m 755 $(SHAREDLIB) $(BINPATH)
 
 install-headers:
-	-@if [ ! -d $(INCPATH)  ]; then mkdir -p $(INCPATH); fi
+	-@if [ ! -d $(INCPATH)]; then mkdir -p $(INCPATH); fi
+	-@if [ ! -d $(INCPATH)/libpng  ]; then mkdir -p $(INCPATH)/libpng; fi
+	-@rm -f ${INCPATH)/png.h
+	-@rm -f ${INCPATH)/pngconf.h
 	install -m 644 png.h pngconf.h $(INCPATH)
 
 install-docs:
