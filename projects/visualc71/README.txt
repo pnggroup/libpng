@@ -6,7 +6,9 @@ For conditions of distribution and use, see copyright notice in png.h
 Assumptions:
 * The libpng source files are in ..\..
 * The zlib source files are in ..\..\..\zlib
-* The zlib project files are in ..\..\..\zlib\projects\visualc7
+* The zlib project file is in . /* Warning: This is until the zlib project
+  files get intergrated into the next zlib release. The final zlib project
+  directory will then be ..\..\..\zlib\projects\visualc71. */
 
 To use:
 

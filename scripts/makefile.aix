@@ -18,7 +18,7 @@ RM = rm -f
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.8rc5
+PNGMIN = 1.2.8
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local

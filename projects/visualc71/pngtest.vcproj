@@ -2,7 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="pngtest">
+	Name="pngtest"
+	RootNamespace="pngtest">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
@@ -26,9 +27,9 @@
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\$(OutDir)\..
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
@@ -73,9 +74,9 @@ $(OutDir)\pngtest.exe ..\..\pngtest.png"
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\$(OutDir)\..
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
@@ -121,9 +122,9 @@ $(OutDir)\pngtest.exe ..\..\pngtest.png"
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\$(OutDir)\..
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
@@ -169,9 +170,9 @@ $(OutDir)\pngtest.exe ..\..\pngtest.png"
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\$(OutDir)\..
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
@@ -218,9 +219,9 @@ $(OutDir)\pngtest.exe ..\..\pngtest.png"
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\Win32_DLL_Release
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\..\Win32_DLL_Release\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
@@ -267,9 +268,9 @@ $(OutDir)\pngtest.exe ..\..\pngtest.png"
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\$(OutDir)\..
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
@@ -315,9 +316,9 @@ $(OutDir)\pngtest.exe ..\..\pngtest.png"
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\$(OutDir)\..
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
@@ -363,9 +364,9 @@ $(OutDir)\pngtest.exe ..\..\pngtest.png"
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\$(OutDir)\..
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
@@ -411,9 +412,9 @@ $(OutDir)\pngtest.exe ..\..\pngtest.png"
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;..\..\..\zlib\projects\visualc7\$(OutDir)\..
-$(OutDir)\pngtest.exe ..\..\pngtest.png"
-				Outputs="pngout.png"/>
+				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
+$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
+				Outputs="$(IntDir)\pngout.png"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"

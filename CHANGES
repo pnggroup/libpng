@@ -1407,7 +1407,9 @@ version 1.2.8rc3 [November 28, 2004]
 version 1.2.8rc4 [November 29, 2004]
   Added projects/visualc7 (Simon-pierre).
 version 1.2.8rc5 [November 29, 2004]
-  Fix new typo in scripts/pngw32.rc
+  Fixed new typo in scripts/pngw32.rc
+version 1.2.8 [December 3, 2004]
+  Removed projects/visualc7, added projects/visualc71.
 
 Send comments/corrections/commendations to
 png-implement at ccrc.wustl.edu (subscription required; write to
