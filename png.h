@@ -1,10 +1,10 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.2a - December 29, 1998
+ * libpng version 1.0.2b - January 6, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
  *
  * Note about libpng version numbers:
  *
@@ -119,7 +119,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.2a"
+#define PNG_LIBPNG_VER_STRING "1.0.2b"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -1490,12 +1490,16 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #endif
 
 extern PNG_EXPORT(png_charp,png_get_copyright) PNGARG((png_structp png_ptr));
-#ifdef PNG_NO_EXTERN
 extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr));
+
+#ifdef PNG_NO_EXTERN
+/* this only gets included in png.c */
 png_charp
 png_get_header_version(png_structp png_ptr)
 {
-   return("\n libpng version 1.0.2a - December 29, 1998 (header)\n");
+   if(png_ptr == NULL)
+     /* silence compiler warning about unused png_ptr */ ;
+   return("\n libpng version 1.0.2b - January 6, 1999 (header)\n");
 }
 #endif
 
@@ -2160,16 +2164,11 @@ PNG_EXTERN void png_push_read_zTXt PNGARG((png_structp png_ptr,
 
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
-#endif
- 
-
 #endif /* PNG_INTERNAL */
 
 #ifdef __cplusplus
 }
 #endif
-
-#ifdef PNG_NO_EXTERN
 
 /* do not put anything past this line */
 #endif /* _PNG_H */

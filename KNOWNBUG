@@ -68,6 +68,10 @@ Known bugs and suggested enhancements in libpng-1.0.2
    "static pngcharp tIME_string" should be changed to
    "static char tIME_string[30]" in pngtest.c
 
+   Also -- December 30, 1998 -- there are some misplaced brackets in
+   pngtest.c that cause pngtest to try to write a tIME chunk
+   even when no tIME chunk was present in the source file.
+
    STATUS: Fixed in libpng-1.0.2a
 
 8. August 24, 1998 -- BUG -- John Cromer

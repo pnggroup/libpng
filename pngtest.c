@@ -1,11 +1,11 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.2a -December 29, 1998
+ * libpng 1.0.2b -January 6, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -735,16 +735,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_tIME(read_ptr, read_info_ptr, &mod_time))
       {
          png_set_tIME(write_ptr, write_info_ptr, mod_time);
-      }
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
-      {
          /* we have to use png_strcpy instead of "=" because the string
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
          png_strcpy(tIME_string,png_convert_to_rfc1123(read_ptr, mod_time));
          tIME_chunk_present++;
-      }
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
+      }
    }
 #endif
 #if defined(PNG_READ_tRNS_SUPPORTED) && defined(PNG_WRITE_tRNS_SUPPORTED)

@@ -352,12 +352,14 @@ version 1.0.1e [June 6, 1998]
   Added makefile.w32, for Microsoft C++ 4.0 and later (Tim Wegner).
 version 1.0.2 [June 14, 1998]
   Fixed two bugs in makefile.bor .
-version 1.0.2a [December 29, 1998]
+version 1.0.2a [December 30, 1998]
   Replaced and extended code that was removed from png_set_filler() in 1.0.1a.
   Fixed a bug in png_do_filler() that made it fail to write filler bytes in
     the left-most pixel of each row (Kevin Bracey).
   Changed "static pngcharp tIME_string" to "static char tIME_string[30]"
     in pngtest.c (Duncan Simpson).
+  Fixed a bug in pngtest.c that caused pngtest to try to write a tIME chunk
+    even when no tIME chunk was present in the source file.
   Fixed a problem in pngrutil.c: gray_to_rgb didn't always work with 16-bit.
   Fixed a problem in png_read_push_finish_row(), which would not skip some
     passes that it should skip, for images that are less than 3 pixels high.
@@ -376,3 +378,9 @@ version 1.0.2a [December 29, 1998]
   Removed lines after Dynamic Dependencies" in makefile.aco .
   Revised makefile.dec to make a shared library (Jeremie Petit).
   Removed trailing blanks from all files. 
+version 1.0.2b [January 6, 1999]
+  Removed misplaced #endif and #ifdef PNG_NO_EXTERN near the end of png.h
+  Added "if" tests to silence complaints about unused png_ptr in png.h and png.c
+  Changed "check_if_png" function in example.c to return true (nonzero) if PNG.
+  Changed libpng.txt to demonstrate png_sig_cmp() instead of png_check_sig()
+    which is obsolete.

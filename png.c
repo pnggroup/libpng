@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.2a - December 29, 1998
+ * libpng version 1.0.2b - January 6, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, Glenn Randers-Pehrson
  * 
  */
 
@@ -16,7 +16,7 @@
  * string defined in png.h.
  */
 
-char png_libpng_ver[12] = "1.0.2a";
+char png_libpng_ver[12] = "1.0.2b";
 
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -115,8 +115,8 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 }
 
 /* (Obsolete) function to check signature bytes.  It does not allow one
- * to check a partial signature.  This function will be removed in the
- * future - use png_sig_cmp().
+ * to check a partial signature.  This function might be removed in the
+ * future - use png_sig_cmp().  Returns true (nonzero) if the file is a PNG.
  */
 int
 png_check_sig(png_bytep sig, int num)
@@ -350,9 +350,10 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 png_charp
 png_get_copyright(png_structp png_ptr)
 {
-   return("\n libpng version 1.0.2a - December 29, 1998\n\
+   if(png_ptr == NULL)
+     /* silence compiler warning about unused png_ptr */ ;
+   return("\n libpng version 1.0.2b - January 6, 1999\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
-   Copyright (c) 1998, Glenn Randers-Pehrson\n");
+   Copyright (c) 1998, 1999, Glenn Randers-Pehrson\n");
 }
-

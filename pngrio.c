@@ -1,11 +1,11 @@
 
 /* pngrio.c - functions for data input
  *
- * libpng 1.0.2a - December 29, 1998
+ * libpng 1.0.2b - January 6, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
  *
  * This file provides a location for all input.  Users who need
  * special handling are expected to write a function that has the same

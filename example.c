@@ -15,8 +15,11 @@
 
 #include "png.h"
 
-/* Check to see if a file is a PNG file using png_sig_cmp().  Returns
- * non-zero if the image is a PNG, and 0 if it isn't a PNG.
+/* Check to see if a file is a PNG file using png_sig_cmp().  png_sig_cmp()
+ * returns zero if the image is a PNG and nonzero if it isn't a PNG.
+ *
+ * The function check_if_png() shown here, but not used, returns nonzero (true)
+ * if the file can be opened and is a PNG, 0 (false) otherwise.
  *
  * If this call is successful, and you are going to keep the file open,
  * you should call png_set_sig_bytes(png_ptr, PNG_BYTES_TO_CHECK); once
@@ -41,12 +44,14 @@ int check_if_png(char *file_name, FILE **fp)
    if ((*fp = fopen(file_name, "rb")) != NULL);
       return 0;
 
-   /* Read in the signature bytes */
+   /* Read in some of the signature bytes */
    if (fread(buf, 1, PNG_BYTES_TO_CHECK, *fp) != PNG_BYTES_TO_CHECK)
       return 0;
 
-   /* Compare the first PNG_BYTES_TO_CHECK bytes of the signature. */
-   return(png_sig_cmp(buf, (png_size_t)0, PNG_BYTES_TO_CHECK));
+   /* Compare the first PNG_BYTES_TO_CHECK bytes of the signature.
+      Return nonzero (true) if they match */
+
+   return(!png_sig_cmp(buf, (png_size_t)0, PNG_BYTES_TO_CHECK));
 }
 
 /* Read a PNG file.  You may want to return an error code if the read
