@@ -436,9 +436,25 @@ version 1.0.3d [September 4, 1999]
   Fixed type casting of igamma in pngrutil.c
   Added new png_expand functions to scripts/pngdef.pas and pngos2.def
   Added a demo read_user_transform_fn that examines the row filters in pngtest.c
-version 1.0.4 [September 19, 1999]
+version 1.0.4 [September 24, 1999]
   Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
   Delete #define PNG_INTERNAL and include "png.h" from pngasmrd.h
   Made several minor corrections to pngtest.c
   Renamed the makefiles with longer but more user friendly extensions.
   Copied the PNG copyright and license to a separate LICENSE file.
+  Revised documentation, png.h, and example.c to remove reference to
+    "viewing_gamma" which no longer appears in the PNG specification.
+  Revised pngvcrd.c to use MMX code for interlacing only on the final pass.
+  Updated pngvcrd.c to use the faster C filter algorithms from libpng-1.0.1a
+  Split makefile.win32vc into two versions, makefile.vcawin32 (uses MMX
+    assembler code) and makefile.vcwin32 (doesn't).
+  Added a CPU timing report to pngtest.c (enabled by defining PNGTEST_TIMING)
+version 1.0.4a [September 25, 1999]
+  Increase max_pixel_depth in pngrutil.c if a user transform needs it.
+  Changed several division operations to right-shifts in pngvcrd.c
+version 1.0.4b [September 30, 1999]
+  Added parentheses in line 3732 of pngvcrd.c
+  Added a comment in makefile.linux warning about buggy -O3 in pgcc 2.95.1
+version 1.0.4c [October 1, 1999]
+  Added a "png_check_version" function in png.c and pngtest.c that will generate
+    a helpful compiler error if an old png.h is found in the search path.

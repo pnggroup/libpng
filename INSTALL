@@ -1,5 +1,5 @@
 
-Installing libpng version 1.0.4 - September 19, 1999
+Installing libpng version 1.0.4c - October 1, 1999
 
 Before installing libpng, you must first install zlib.  zlib
 can usually be found wherever you got libpng.  zlib can be
@@ -10,7 +10,7 @@ zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.0.4" or "lpng103" and "zlib-1.1.3"
+might be called "libpng-1.0.4c" or "lpng103" and "zlib-1.1.3"
 or "zlib113") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -47,8 +47,8 @@ include
  makefile.hpux    =>  HPUX (10.20 and 11.00) makefile
  makefile.sgi     =>  Silicon Graphics IRIX makefile
  makefile.sunos   =>  Sun makefile
- makefile.solaris =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0.4)
- makefile.linux   =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.4)
+ makefile.solaris =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0.4c)
+ makefile.linux   =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.4c)
  makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.mips    =>  MIPS makefile
  makefile.acorn   =>  Acorn makefile
@@ -61,7 +61,10 @@ include
  build.bat        =>  MS-DOS batch file for Borland compiler
  makefile.dj2     =>  DJGPP 2 makefile
  makefile.msc     =>  Microsoft C makefile
- makefile.win32vc =>  makefile for Microsoft Visual C++ 4.0 and later
+ makefile.vcawin32 => makefile for Microsoft Visual C++ 5.0 and later (uses
+                      assembler code)
+ makefile.vcwin32 =>  makefile for Microsoft Visual C++ 4.0 and later (does not
+                      use assembler code)
  makefile.turboc3 =>  Turbo C 3.0 makefile
  makefile.os2     =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
  pngos2.def       =>  OS/2 module definition file used by makefile.os2

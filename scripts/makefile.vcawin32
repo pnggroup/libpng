@@ -1,24 +1,31 @@
 # makefile for libpng
-# Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+# Copyright (C) 1998 Tim Wegner
 # For conditions of distribution and use, see copyright notice in png.h
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
+# To use, do "nmake /f scripts\makefile.vcawin32"
 
-# -------- Microsoft C 5.1 and later, does not use assembler code -----
-MODEL=-AL
-CFLAGS=-Oait -Gs -nologo -W3 $(MODEL) -I..\zlib
-#-Ox generates bad code with MSC 5.1
+# ---------- Microsoft Visual C++ 5.0 and later, uses assembler code------
+
+# Caution: the assembler code was introduced at libpng version 1.0.4 and has
+# not yet been thoroughly tested.
+
+# If you don't want to use assembler code, use makefile.vcwin32 instead.
+
+MODEL=- 
+CFLAGS=-DPNG_USE_PNGVCRD -Ox -GA3s -nologo -W3 -I..\zlib
+
 CC=cl
 LD=link
-LDFLAGS=/e/st:0x1500/noe 
+LDFLAGS= 
 O=.obj
 
 #uncomment next to put error messages in a file
-ERRFILE= >> pngerrs
+#ERRFILE= >> pngerrs
 
 # variables
 OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O)
 OBJS2 = pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O)
-OBJS3 = pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
+OBJS3 = pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O) pngvcrd$(O)
 
 all: libpng.lib
 
@@ -35,12 +42,15 @@ pngread$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngpread$(O): png.h pngconf.h
-		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngrtran$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngrutil$(O): png.h pngconf.h
+pngrutil$(O): png.h pngconf.h pngasmrd.h
+	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+pngvcrd$(O): png.h pngconf.h pngasmrd.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngerror$(O): png.h pngconf.h
@@ -72,12 +82,10 @@ pngwutil$(O): png.h pngconf.h
 
 libpng.lib: $(OBJS1) $(OBJS2) $(OBJS3)
 	del libpng.lib
-	lib libpng $(OBJS1);
-	lib libpng $(OBJS2);
-	lib libpng $(OBJS3);
+	lib /OUT:libpng.lib $(OBJS1) $(OBJS2) $(OBJS3)
 
 pngtest.exe: pngtest.obj libpng.lib 
-	$(LD) $(LDFLAGS) pngtest.obj,,,libpng.lib ..\zlib\zlib.lib ;
+	$(LD) $(LDFLAGS) pngtest.obj libpng.lib ..\zlib\zlib.lib /OUT:pngtest.exe /SUBSYSTEM:CONSOLE
 
 test: pngtest.exe
 	pngtest

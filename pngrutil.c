@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.4 - September 19, 1999
+ * libpng 1.0.4c - October 1, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -945,7 +945,7 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   num = (int)length / 2;
+   num = (int)length / 2 ;
    png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
       (png_uint_32)(num * sizeof (png_uint_16)));
    png_ptr->flags |= PNG_FLAG_FREE_HIST;
@@ -1892,6 +1892,7 @@ png_do_read_interlace
             png_size_t pixel_bytes = (row_info->pixel_depth >> 3);
             png_bytep sp = row + (png_size_t)(row_info->width - 1) * pixel_bytes;
             png_bytep dp = row + (png_size_t)(final_width - 1) * pixel_bytes;
+
             int jstop = png_pass_inc[pass];
             png_uint_32 i;
 
@@ -1937,7 +1938,7 @@ png_read_filter_row
       {
          png_uint_32 i;
          png_uint_32 istop = row_info->rowbytes;
-         png_uint_32 bpp = (row_info->pixel_depth + 7) / 8;
+         png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
          png_bytep rp = row + bpp;
          png_bytep lp = row;
 
@@ -1968,20 +1969,20 @@ png_read_filter_row
          png_bytep rp = row;
          png_bytep pp = prev_row;
          png_bytep lp = row;
-         png_uint_32 bpp = (row_info->pixel_depth + 7) / 8;
+         png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
          png_uint_32 istop = row_info->rowbytes - bpp;
 
          for (i = 0; i < bpp; i++)
          {
             *rp = (png_byte)(((int)(*rp) +
-               ((int)(*pp++) / 2)) & 0xff);
+               ((int)(*pp++) / 2 )) & 0xff);
             rp++;
          }
 
          for (i = 0; i < istop; i++)
          {
             *rp = (png_byte)(((int)(*rp) +
-               (int)(*pp++ + *lp++) / 2) & 0xff);
+               (int)(*pp++ + *lp++) / 2 ) & 0xff);
             rp++;
          }
          break;
@@ -1993,7 +1994,7 @@ png_read_filter_row
          png_bytep pp = prev_row;
          png_bytep lp = row;
          png_bytep cp = prev_row;
-         png_uint_32 bpp = (row_info->pixel_depth + 7) / 8;
+         png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
          png_uint_32 istop=row_info->rowbytes - bpp;
 
          for (i = 0; i < bpp; i++)
@@ -2265,6 +2266,16 @@ png_read_start_row(png_structp png_ptr)
             max_pixel_depth = 48;
       }
    }
+#endif
+
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+   if(png_ptr->transformations & PNG_USER_TRANSFORM)
+     {
+       int user_pixel_depth=png_ptr->user_transform_depth*
+         png_ptr->user_transform_channels;
+       if(user_pixel_depth > max_pixel_depth)
+         max_pixel_depth=user_pixel_depth;
+     }
 #endif
 
    /* align the width on the next larger 8 pixels.  Mainly used

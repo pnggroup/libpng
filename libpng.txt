@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.4 - September 19, 1999
+ libpng version 1.0.4c - October 1, 1999
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -697,17 +697,15 @@ or as an RGB triplet that may or may not be in the palette (need_expand = 0).
 To properly display PNG images on any kind of system, the application needs
 to know what the display gamma is.  Ideally, the user will know this, and
 the application will allow them to set it.  One method of allowing the user
-to set the display gamma separately for each system is to check for the
-DISPLAY_GAMMA and VIEWING_GAMMA environment variables or for a SCREEN_GAMMA
-environment variable, which will hopefully be correctly set.
+to set the display gamma separately for each system is to check for a
+SCREEN_GAMMA or DISPLAY_GAMMA environment variable, which will hopefully be
+correctly set.
 
-Note that display_gamma is the gamma of your display, while screen_gamma is
-the overall gamma correction required to produce pleasing results,
-which depends on the lighting conditions in the surrounding environment.
-Screen_gamma is display_gamma/viewing_gamma, where viewing_gamma is
-the amount of additional gamma correction needed to compensate for
-a (viewing_gamma=1.25) environment.  In a dim or brightly lit room, no
-compensation other than the display_gamma is needed (viewing_gamma=1.0).
+Note that display_gamma is the overall gamma correction required to produce
+pleasing results, which depends on the lighting conditions in the surrounding
+environment.  In a dim or brightly lit room, no compensation other than
+the physical gamma exponent of the monitor is needed, while in a dark room
+a slightly smaller exponent is better.
 
    double gamma, screen_gamma;
 
@@ -2060,13 +2058,13 @@ the old method.
 
 VII. Y2K Compliance in libpng
 
-January 13, 1999
+October 1, 1999
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.4 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.4c are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

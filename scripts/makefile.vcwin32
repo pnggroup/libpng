@@ -2,11 +2,13 @@
 # Copyright (C) 1998 Tim Wegner
 # For conditions of distribution and use, see copyright notice in png.h
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
-# To use, do "nmake /f scripts\makefile.w32"
+# To use, do "nmake /f scripts\makefile.vcwin32"
 
-# ------------- Microsoft Visual C++ 4.0 and later -------------
+# ---------- Microsoft Visual C++ 4.0 and later, no assembler code------
+# If you want to use assembler code, use makefile.vcawin32 instead.
+
 MODEL=- 
-CFLAGS=-DPNG_USE_PNGVCRD -Ox -GA3s -nologo -W3 -I..\zlib
+CFLAGS= -Ox -GA3s -nologo -W3 -I..\zlib
 
 CC=cl
 LD=link
@@ -19,7 +21,7 @@ O=.obj
 # variables
 OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O)
 OBJS2 = pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O)
-OBJS3 = pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O) pngvcrd$(O)
+OBJS3 = pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
 
 all: libpng.lib
 
@@ -42,9 +44,6 @@ pngrtran$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngrutil$(O): png.h pngconf.h pngasmrd.h
-	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
-
-pngvcrd$(O): png.h pngconf.h pngasmrd.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngerror$(O): png.h pngconf.h

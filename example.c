@@ -197,7 +197,8 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    /* Some suggestions as to how to get a screen gamma value */
 
-   /* Note that screen gamma is (display_gamma/viewing_gamma) */
+   /* Note that screen gamma is the display_exponent, which includes
+    * the CRT_exponent and any correction for viewing conditions */
    if (/* We have a user-defined screen gamma value */)
    {
       screen_gamma = user-defined screen_gamma;

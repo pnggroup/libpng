@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.4 - September 19, 1999
+ * libpng version 1.0.4c - October 1, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -9,19 +9,19 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.4 - September 19, 1999: Glenn R-P
+ *  libpng versions 0.97, January 1998, through 1.0.4c - October 1, 1999: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
  *    
- *    January 13, 1999
+ *    October 1, 1999
  *    
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *    
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.4 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.4c are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *    
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -86,8 +86,8 @@
  *    0.98                     0.98        98  2.0.98
  *    0.99                     0.99        98  2.0.99
  *    0.99a-m                  0.99        99  2.0.99
- *    1.00                     1.00       100  2.1.0 [int should be 10000]
- *    1.0.0                    1.0.0      100  2.1.0 [int should be 10000]
+ *    1.00                     1.00       100  2.1.0 [100 should be 10000]
+ *    1.0.0                    1.0.0      100  2.1.0 [100 should be 10000]
  *    1.0.1                    1.0.1    10001  2.1.0
  *    1.0.1a-e                 1.0.1a-e 10002  2.1.0.1a-e
  *    1.0.2                    1.0.2    10002  2.1.0.2
@@ -95,6 +95,8 @@
  *    1.0.3                    1.0.3    10003  2.1.0.3
  *    1.0.3a-d                 1.0.3a-d 10004  2.1.0.3a-d
  *    1.0.4                    1.0.4    10004  2.1.0.4
+ *    1.0.4a-c                 1.0.4a-c 10005  2.1.0.4a-c
+ *    1.0.5                    1.0.5    10005  2.1.0.5
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
@@ -108,7 +110,18 @@
  * is available as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
  * and as a W3C Recommendation <http://www.w3.org/TR/REC.png.html>
  *
- * Contributing Authors:
+ * COPYRIGHT NOTICE:
+ *
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * (libpng versions 0.5, May 1995, through 0.89c, May 1996)
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * (libpng versions 0.90, December 1996, through 0.96, May 1997)
+ * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * (libpng versions 0.97, January 1998, through 1.0.4c, October 1, 1999)
+ *
+ * For the purposes of this copyright and license, "Contributing Authors"
+ * is defined as the following set of individuals:
+ *
  *    John Bowler
  *    Kevin Bracey
  *    Sam Bushell
@@ -123,21 +136,6 @@
  *    Tom Tanner
  *    Willem van Schaik
  *    Tim Wegner
- *
- * The contributing authors would like to thank all those who helped
- * with testing, bug fixes, and patience.  This wouldn't have been
- * possible without all of you.
- *
- * Thanks to Frank J. T. Wojcik for helping with the documentation.
- *
- * COPYRIGHT NOTICE:
- *
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
- * (libpng versions 0.5, May 1995, through 0.89c, May 1996)
- * Copyright (c) 1996, 1997 Andreas Dilger
- * (libpng versions 0.90, December 1996, through 0.96, May 1997)
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.4, September 19, 1999)
  *
  * The PNG Reference Library is supplied "AS IS".  The Contributing Authors
  * and Group 42, Inc. disclaim all warranties, expressed or implied,
@@ -169,6 +167,20 @@
  * appreciated.
  */
 
+/*
+ *
+ * Libpng is OSI Certified Open Source Software.  OSI Certified is a
+ * certification mark of the Open Source Initiative.
+ */
+
+/*
+ * The contributing authors would like to thank all those who helped
+ * with testing, bug fixes, and patience.  This wouldn't have been
+ * possible without all of you.
+ *
+ * Thanks to Frank J. T. Wojcik for helping with the documentation.
+ */
+
 #ifndef _PNG_H
 #define _PNG_H
 
@@ -196,14 +208,16 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.4"
+#define PNG_LIBPNG_VER_STRING "1.0.4c"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
  * Versions 0.7 through 1.0.0 were in the range 0 to 100 here (only
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=bugfix */
-#define PNG_LIBPNG_VER    10004  /* 1.0.4 */
+#define PNG_LIBPNG_VER    10005  /* 1.0.5 */
+
+/* Note to maintainer: update this number in scripts/pngdef.pas as well */
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
@@ -701,7 +715,7 @@ struct png_struct_def
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    int gamma_shift;      /* number of "insignificant" bits 16-bit gamma */
    float gamma;          /* file gamma value */
-   float screen_gamma;   /* screen gamma value (display_gamma/viewing_gamma */
+   float screen_gamma;   /* screen gamma value (display_exponent) */
 #endif /* PNG_READ_GAMMA_SUPPORTED */
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_bytep gamma_table;     /* gamma table for 8-bit depth files */
@@ -790,6 +804,11 @@ struct png_struct_def
    png_byte empty_plte_permitted;
 #endif
 };
+
+/* This prevents a compiler error in png_get_copyright() in png.c if png.c
+and png.h are both at * version 1.0.4c
+ */
+typedef png_structp version_1_0_4c;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -993,7 +1012,7 @@ extern PNG_EXPORT(void,png_set_dither) PNGARG((png_structp png_ptr,
 #endif /* PNG_READ_DITHER_SUPPORTED */
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
-/* Handle gamma correction. Screen_gamma=(display_gamma/viewing_gamma) */
+/* Handle gamma correction. Screen_gamma=(display_exponent) */
 extern PNG_EXPORT(void,png_set_gamma) PNGARG((png_structp png_ptr,
    double screen_gamma, double default_file_gamma));
 #endif /* PNG_READ_GAMMA_SUPPORTED */
@@ -1610,7 +1629,7 @@ png_get_header_version(png_structp png_ptr)
 {
    if(png_ptr == NULL)
      /* silence compiler warning about unused png_ptr */ ;
-   return("\n libpng version 1.0.4 - September 19, 1999 (header)\n");
+   return("\n libpng version 1.0.4c - October 1, 1999 (header)\n");
 }
 #endif
 

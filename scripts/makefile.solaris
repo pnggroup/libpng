@@ -1,5 +1,5 @@
 # makefile for libpng on Solaris 2.x with gcc
-# Contributed by William L. Sebok, based on makefile.lnx
+# Contributed by William L. Sebok, based on makefile.linux
 # Copyright (C) 1996, 1997 Andreas Dilger
 # Copyright (C) 1998 Greg Roelofs
 # For conditions of distribution and use, see copyright notice in png.h
@@ -36,7 +36,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.4
+PNGMIN = 1.0.4c
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include

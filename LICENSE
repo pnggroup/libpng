@@ -5,7 +5,25 @@ Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
 Copyright (c) 1996, 1997 Andreas Dilger
 (libpng versions 0.90, December 1996, through 0.96, May 1997)
 Copyright (c) 1998, 1999 Glenn Randers-Pehrson
-(libpng versions 0.97, January 1998, through 1.0.4, September 19, 1999)
+(libpng versions 0.97, January 1998, through 1.0.4c, October 1, 1999)
+
+For the purposes of this copyright and license, "Contributing Authors"
+is defined as the following set of individuals:
+
+   John Bowler
+   Kevin Bracey
+   Sam Bushell
+   Andreas Dilger
+   Magnus Holmgren
+   Tom Lane
+   Dave Martindale
+   Glenn Randers-Pehrson
+   Greg Roelofs
+   Guy Eric Schalnat
+   Paul Schmidt
+   Tom Tanner
+   Willem van Schaik
+   Tim Wegner
 
 The PNG Reference Library is supplied "AS IS".  The Contributing Authors
 and Group 42, Inc. disclaim all warranties, expressed or implied,
@@ -37,5 +55,5 @@ source code in a product, acknowledgment is not required but would be
 appreciated.
 
 Glenn Randers-Pehrson
-randeg at alum.rpi.edu
-September 19, 1999
+randeg@alum.rpi.edu
+October 1, 1999

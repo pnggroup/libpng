@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.4 - September 19, 1999
+ * libpng 1.0.4c - October 1, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -35,7 +35,23 @@
 #define PNG_DEBUG 0
 #endif
 
+/* Turn on CPU timing
+#define PNGTEST_TIMING
+*/
+
+#ifdef PNGTEST_TIMING
+static float t_start, t_stop, t_decode, t_encode, t_misc;
+#include <time.h>
+#endif
+
 #include "png.h"
+
+#ifdef PNGTEST_TIMING
+static float t_start, t_stop, t_decode, t_encode, t_misc;
+#if !defined(PNG_READ_tIME_SUPPORTED) && !defined(PNG_WRITE_tIME_SUPPORTED)
+#include <time.h>
+#endif
+#endif
 
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
 static int tIME_chunk_present=0;
@@ -800,16 +816,36 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
    png_debug(0, "Writing row data\n");
 
+#if defined(PNG_READ_INTERLACING_SUPPORTED) || \
+  defined(PNG_WRITE_INTERLACING_SUPPORTED)
    num_pass = png_set_interlace_handling(read_ptr);
    png_set_interlace_handling(write_ptr);
+#else
+   num_pass=1;
+#endif
 
+#ifdef PNGTEST_TIMING
+   t_stop = (float)clock();
+   t_misc += (t_stop - t_start);
+   t_start = t_stop;
+#endif
    for (pass = 0; pass < num_pass; pass++)
    {
       png_debug1(0, "Writing row data for pass %d\n",pass);
       for (y = 0; y < height; y++)
       {
          png_read_rows(read_ptr, (png_bytepp)&row_buf, (png_bytepp)NULL, 1);
+#ifdef PNGTEST_TIMING
+         t_stop = (float)clock();
+         t_decode += (t_stop - t_start);
+         t_start = t_stop;
+#endif
          png_write_rows(write_ptr, (png_bytepp)&row_buf, 1);
+#ifdef PNGTEST_TIMING
+         t_stop = (float)clock();
+         t_encode += (t_stop - t_start);
+         t_start = t_stop;
+#endif
       }
    }
 
@@ -1040,7 +1076,9 @@ main(int argc, char *argv[])
 #endif
       }
 #ifdef PNG_USER_MEM_SUPPORTED
-         fprintf(STDERR, "Maximum memory allocation: %d bytes\n",
+         fprintf(STDERR, " Current memory allocation: %d bytes\n",
+            current_allocation);
+         fprintf(STDERR, " Maximum memory allocation: %d bytes\n",
             maximum_allocation);
 #endif
    }
@@ -1103,10 +1141,26 @@ main(int argc, char *argv[])
 #endif
        }
 #ifdef PNG_USER_MEM_SUPPORTED
-       fprintf(STDERR, "Maximum memory allocation: %d bytes\n",
+       fprintf(STDERR, " Current memory allocation: %d bytes\n",
+          current_allocation);
+       fprintf(STDERR, " Maximum memory allocation: %d bytes\n",
           maximum_allocation);
 #endif
    }
+
+#ifdef PNGTEST_TIMING
+   t_stop = (float)clock();
+   t_misc += (t_stop - t_start);
+   t_start = t_stop;
+   fprintf(STDERR," CPU time used = %.3f seconds",
+      (t_misc+t_decode+t_encode)/(float)CLOCKS_PER_SEC);
+   fprintf(STDERR," (decoding %.3f,\n",
+      t_decode/(float)CLOCKS_PER_SEC);
+   fprintf(STDERR,"        encoding %.3f ,",
+      t_encode/(float)CLOCKS_PER_SEC);
+   fprintf(STDERR," other %.3f seconds)\n\n",
+      t_misc/(float)CLOCKS_PER_SEC);
+#endif
 
    if (ierror == 0)
       fprintf(STDERR, "libpng passes test\n");
@@ -1115,3 +1169,10 @@ main(int argc, char *argv[])
    return (int)(ierror != 0);
 }
 
+/* Generate a compiler error if there is an old png.h in the search path. */
+void
+png_check_pngtest_version
+   (version_1_0_4c png_h_is_not_version_1_0_4c)
+{
+   if(png_h_is_not_version_1_0_4c == NULL) return;
+}

@@ -14,12 +14,12 @@ Known bugs and suggested enhancements in libpng-1.0.4
    Question whether i-- or --i is better.
 
    STATUS: Under investigation, postponed until after
-   libpng-1.0.4.  About 160 loops will be turned around
+   libpng-1.0.5.  About 160 loops will be turned around
    in libpng-1.0.Nn, for testing.
 
 2. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
 
-   libpng-1.0.4 and earlier transform colors to gamma=1.0 space for
+   libpng-1.0.5 and earlier transform colors to gamma=1.0 space for
    merging with background, and then back to the image's gamma.  The
    bit_depth of the intermediate (gamma=1.0) representation is probably
    not sufficient.  In the typical gamma=1/2.2 situation, the linear
@@ -34,7 +34,7 @@ Known bugs and suggested enhancements in libpng-1.0.4
    It should be possible to use libpng without floating-point aritmetic.
 
    STATUS: Under investigation, implementation postponed until after
-   libpng-1.0.4.  The application interface will change because replacements
+   libpng-1.0.5.  The application interface will change because replacements
    for the png_set_gAMA(), png_set_cHRM(), and corresponding png_get_()
    functions will be needed.
 

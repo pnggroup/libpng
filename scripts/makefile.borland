@@ -2,8 +2,8 @@
 # Borland C++ 4.5 (Note: All modules are compiled in C mode)
 # Will work with C++ 4.02 also
 # To build the library, do: 
-#       "make -fmakefile.bor -DMODEL=m"
-# or:   "make -fmakefile.bor -DMODEL=l"
+#       "make -fmakefile.borland -DMODEL=m"
+# or:   "make -fmakefile.borland -DMODEL=l"
 #
 # ------------- Borland C++ 4.5 -------------
 
