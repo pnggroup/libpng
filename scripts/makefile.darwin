@@ -23,7 +23,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.6rc1
+PNGMIN = 1.2.6rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -124,6 +124,7 @@ install-shared: install-headers $(LIBNAME).dylib libpng.pc \
 	libpng.3.$(PNGMIN).dylib
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).$(PNGVER)*.dylib
+	-@/bin/rm -f $(DL)/$(LIBNAME).$(PNGMAJ)*.dylib
 	-@/bin/rm -f $(DL)/$(LIBNAME).dylib
 	-@/bin/rm -f $(DL)/libpng.dylib
 	-@/bin/rm -f $(DL)/libpng.3.dylib

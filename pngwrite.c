@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.6rc1 - August 4, 2004
+ * libpng 1.2.6rc2 - August 8, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -104,10 +104,10 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
             up++)
        {
          int keep=png_handle_as_unknown(png_ptr, up->name);
-         if (keep != HANDLE_CHUNK_NEVER &&
+         if (keep != PNG_HANDLE_CHUNK_NEVER &&
             up->location && !(up->location & PNG_HAVE_PLTE) &&
             !(up->location & PNG_HAVE_IDAT) &&
-            ((up->name[3] & 0x20) || keep == HANDLE_CHUNK_ALWAYS ||
+            ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
             png_write_chunk(png_ptr, up->name, up->data, up->size);
@@ -268,10 +268,10 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
             up++)
        {
          int keep=png_handle_as_unknown(png_ptr, up->name);
-         if (keep != HANDLE_CHUNK_NEVER &&
+         if (keep != PNG_HANDLE_CHUNK_NEVER &&
             up->location && (up->location & PNG_HAVE_PLTE) &&
             !(up->location & PNG_HAVE_IDAT) &&
-            ((up->name[3] & 0x20) || keep == HANDLE_CHUNK_ALWAYS ||
+            ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
             png_write_chunk(png_ptr, up->name, up->data, up->size);
@@ -368,9 +368,9 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
             up++)
        {
          int keep=png_handle_as_unknown(png_ptr, up->name);
-         if (keep != HANDLE_CHUNK_NEVER &&
+         if (keep != PNG_HANDLE_CHUNK_NEVER &&
             up->location && (up->location & PNG_AFTER_IDAT) &&
-            ((up->name[3] & 0x20) || keep == HANDLE_CHUNK_ALWAYS ||
+            ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
             png_write_chunk(png_ptr, up->name, up->data, up->size);

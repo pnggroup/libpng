@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng version 1.2.6rc1 - August 4, 2004
+ * libpng version 1.2.6rc2 - August 8, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1924,6 +1924,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->rowbytes = row_width * 4;
          }
       }
+      row_info->color_type |= PNG_COLOR_MASK_ALPHA;
    } /* COLOR_TYPE == GRAY */
    else if (row_info->color_type == PNG_COLOR_TYPE_RGB)
    {
@@ -1932,8 +1933,8 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
          /* This changes the data from RGB to RGBX */
          if (flags & PNG_FLAG_FILLER_AFTER)
          {
-            png_bytep sp = row + (png_size_t)row_width * 6;
-            png_bytep dp = sp  + (png_size_t)row_width * 2;
+            png_bytep sp = row + (png_size_t)row_width * 3;
+            png_bytep dp = sp  + (png_size_t)row_width;
             for (i = 1; i < row_width; i++)
             {
                *(--dp) = lo_filler;
@@ -2008,6 +2009,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->rowbytes = row_width * 8;
          }
       }
+      row_info->color_type |= PNG_COLOR_MASK_ALPHA;
    } /* COLOR_TYPE == RGB */
 }
 #endif
@@ -2273,7 +2275,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                   png_byte blue  = *(sp++);
                   if(red != green || red != blue)
                      rgb_error |= 1;
-                  *(dp++) =  (png_byte)((gc*red + gc*green + bc*blue)>>8);
+                  *(dp++) =  (png_byte)((rc*red + gc*green + bc*blue)>>15);
                   *(dp++) = *(sp++);  /* alpha */
                }
             }

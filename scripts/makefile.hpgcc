@@ -41,7 +41,7 @@ RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.6rc1
+PNGMIN = 1.2.6rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -134,6 +134,7 @@ install-shared: install-headers $(LIBNAME).sl.$(PNGVER) libpng.pc \
 	libpng.sl.3.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).sl.$(PNGVER)* $(DL)/$(LIBNAME).sl
+	-@/bin/rm -f $(DL)/$(LIBNAME).sl.$(PNGMAJ)
 	-@/bin/rm -f $(DL)/libpng.sl
 	-@/bin/rm -f $(DL)/libpng.sl.3
 	-@/bin/rm -f $(DL)/libpng.sl.3.$(PNGMIN)*

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.6rc1 - August 4, 2004
+ * libpng 1.2.6rc2 - August 8, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1061,12 +1061,12 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
     int i, old_num_chunks;
     if (num_chunks == 0)
     {
-      if(keep == HANDLE_CHUNK_ALWAYS || keep == HANDLE_CHUNK_IF_SAFE)
+      if(keep == PNG_HANDLE_CHUNK_ALWAYS || keep == PNG_HANDLE_CHUNK_IF_SAFE)
         png_ptr->flags |= PNG_FLAG_KEEP_UNKNOWN_CHUNKS;
       else
         png_ptr->flags &= ~PNG_FLAG_KEEP_UNKNOWN_CHUNKS;
 
-      if(keep == HANDLE_CHUNK_ALWAYS)
+      if(keep == PNG_HANDLE_CHUNK_ALWAYS)
         png_ptr->flags |= PNG_FLAG_KEEP_UNSAFE_CHUNKS;
       else
         png_ptr->flags &= ~PNG_FLAG_KEEP_UNSAFE_CHUNKS;

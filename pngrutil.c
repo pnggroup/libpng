@@ -1,6 +1,6 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng version 1.2.6rc1 - August 4, 2004
+ * libpng version 1.2.6rc2 - August 8, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -833,14 +833,14 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
       {
-      if (abs(int_x_white - 31270L) > 1000 ||
-          abs(int_y_white - 32900L) > 1000 ||
-          abs(int_x_red   - 64000L) > 1000 ||
-          abs(int_y_red   - 33000L) > 1000 ||
-          abs(int_x_green - 30000L) > 1000 ||
-          abs(int_y_green - 60000L) > 1000 ||
-          abs(int_x_blue  - 15000L) > 1000 ||
-          abs(int_y_blue  -  6000L) > 1000)
+      if (abs((png_int_32)(int_x_white - 31270L)) > 1000 ||
+          abs((png_int_32)(int_y_white - 32900L)) > 1000 ||
+          abs((png_int_32)(int_x_red   - 64000L)) > 1000 ||
+          abs((png_int_32)(int_y_red   - 33000L)) > 1000 ||
+          abs((png_int_32)(int_x_green - 30000L)) > 1000 ||
+          abs((png_int_32)(int_y_green - 60000L)) > 1000 ||
+          abs((png_int_32)(int_x_blue  - 15000L)) > 1000 ||
+          abs((png_int_32)(int_y_blue  -  6000L)) > 1000)
          {
 
             png_warning(png_ptr,
@@ -956,14 +956,14 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_READ_cHRM_SUPPORTED
 #ifdef PNG_FIXED_POINT_SUPPORTED
    if (info_ptr->valid & PNG_INFO_cHRM)
-      if (abs(info_ptr->int_x_white - 31270L) > 1000 ||
-          abs(info_ptr->int_y_white - 32900L) > 1000 ||
-          abs(info_ptr->int_x_red   - 64000L) > 1000 ||
-          abs(info_ptr->int_y_red   - 33000L) > 1000 ||
-          abs(info_ptr->int_x_green - 30000L) > 1000 ||
-          abs(info_ptr->int_y_green - 60000L) > 1000 ||
-          abs(info_ptr->int_x_blue  - 15000L) > 1000 ||
-          abs(info_ptr->int_y_blue  -  6000L) > 1000)
+      if (abs((png_int_32)(info_ptr->int_x_white - 31270L)) > 1000 ||
+          abs((png_int_32)(info_ptr->int_y_white - 32900L)) > 1000 ||
+          abs((png_int_32)(info_ptr->int_x_red   - 64000L)) > 1000 ||
+          abs((png_int_32)(info_ptr->int_y_red   - 33000L)) > 1000 ||
+          abs((png_int_32)(info_ptr->int_x_green - 30000L)) > 1000 ||
+          abs((png_int_32)(info_ptr->int_y_green - 60000L)) > 1000 ||
+          abs((png_int_32)(info_ptr->int_x_blue  - 15000L)) > 1000 ||
+          abs((png_int_32)(info_ptr->int_y_blue  -  6000L)) > 1000)
          {
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
@@ -2160,7 +2160,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
       if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
-           HANDLE_CHUNK_ALWAYS
+           PNG_HANDLE_CHUNK_ALWAYS
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
            && png_ptr->read_user_chunk_fn == NULL
 #endif
@@ -2194,7 +2194,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           {
              if (!(png_ptr->chunk_name[0] & 0x20))
                 if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
-                     HANDLE_CHUNK_ALWAYS)
+                     PNG_HANDLE_CHUNK_ALWAYS)
                  {
                    png_free(png_ptr, chunk.data);
                    png_chunk_error(png_ptr, "unknown critical chunk");

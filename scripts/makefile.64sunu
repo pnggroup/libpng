@@ -33,7 +33,7 @@ RANLIB=echo
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.6rc1
+PNGMIN = 1.2.6rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -140,7 +140,9 @@ install-static: install-headers libpng.a
 install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	libpng.so.3.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
-	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ).$(PNGVER)* $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ).$(PNGVER)*
+	-@/bin/rm -f $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.3
 	-@/bin/rm -f $(DL)/libpng.so.3.$(PNGVER)*

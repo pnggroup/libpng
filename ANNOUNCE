@@ -1,5 +1,5 @@
 
-Libpng 1.2.6rc1 - August 4, 2004
+Libpng 1.2.6rc2 - August 8, 2004
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -60,6 +60,7 @@ Changes since the last public release (1.2.5):
   Updated contrib/visupng/VisualPng.dsp (Cosmin).
   Updated contrib/visupng/cexcept.h to version 2.0.0 (Cosmin).
   Added a separate distribution with "configure" and supporting files (Junichi).
+version 1.2.6rc1 [August 4, 2004]
   Added user ability to change png_size_t via a PNG_SIZE_T macro.
   Added png_sizeof() and png_convert_size() functions.
   Added PNG_SIZE_MAX (maximum value of a png_size_t variable.
@@ -72,7 +73,6 @@ Changes since the last public release (1.2.5):
   Renamed PNG_MAX_UINT to PNG_UINT_31_MAX.
   Made png_zalloc() issue a png_warning and return NULL on potential
     overflow.
-  Turn on PNG_NO_ZALLOC_ZERO by default in version 1.2.x
   Revised "clobber list" in pnggccrd.c so it will compile under gcc-3.4.
   Revised Borland portion of png_malloc() to return NULL or issue
     png_error() according to setting of PNG_FLAG_MALLOC_NULL_MEM_OK.
@@ -86,12 +86,28 @@ Changes since the last public release (1.2.5):
   Updated makefile.darwin and removed makefile.macosx from scripts directory.
   Imposed default one million column, one-million row limits on the image
     dimensions, and added png_set_user_limits() function and
-    PNG_SET_USER_LIMITS_SUPPORTED macro to override them..
+    PNG_SET_USER_LIMITS_SUPPORTED macro to override them.
   Fixed wrong cast of returns from png_get_user_width|height_max().
   Fixed buffer overflow vulnerability in png_handle_tRNS()
   Fixed integer arithmetic overflow vulnerability in png_read_png().
   Fixed some harmless bugs in png_handle_sBIT, etc, that would cause
     duplicate chunk types to go undetected.
+  Changed some "keep the compiler happy" from empty statements to returns,
+Revised libpng.txt to remove 1.2.x stuff from the 1.0.x distribution
+version 1.2.6rc2 [August 8, 2004]
+  Revised makefile.darwin and makefile.solaris.  Removed makefile.macosx.
+  Revised pngtest's png_debug_malloc() to use png_malloc() instead of
+     png_malloc_default() which is not supposed to be exported.
+  Fixed off-by-one error in one of the conversions to PNG_ROWBYTES() in
+     pngpread.c.  Bug was introduced in 1.2.6rc1.
+  Fixed bug in RGB to RGBX transformation introduced in 1.2.6rc1.
+  Fixed old bug in RGB to Gray transformation.
+  Fixed problem with 64-bit compilers by casting arguments to abs()
+    to png_int_32.
+  Changed "ln -sf" to "ln -f -s" in three makefiles (solaris, sco, so9).
+  Changed "HANDLE_CHUNK_*" to "PNG_HANDLE_CHUNK_*" (Cosmin)
+  Added "-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)" to 15 *NIX makefiles.
+  Added code to update the row_info->colortype in png_do_read_filler() (MSB).
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net
