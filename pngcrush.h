@@ -3,6 +3,9 @@
 /* Special defines for pngcrush, mostly just to reduce the size of the
    static executable. */
 
+#ifndef PNGCRUSH_H
+#define PNGCRUSH_H
+
 #define PNG_NO_READ_cHRM
 #define PNG_NO_WRITE_cHRM
 #define PNG_NO_READ_hIST
@@ -40,4 +43,5 @@
 #endif
 #ifndef PNG_ZBUF_SIZE
 #  define PNG_ZBUF_SIZE 524288       /* increases the IDAT size */
+#endif
 #endif

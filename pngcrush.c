@@ -15,7 +15,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.3.6"
+#define PNGCRUSH_VERSION "1.4.0"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -29,8 +29,8 @@
  * exemplary, or consequential damages, which may result from the use of
  * the pngcrush program, even if advised of the possibility of such damage.
  *
- * Permission is hereby granted to use, copy, modify, and distribute this
- * source code, or portions hereof, for any purpose, without fee, subject
+ * Permission is hereby granted to anyone to use, copy, modify, and distribute
+ * this source code, or portions hereof, for any purpose, without fee, subject
  * to the following restrictions:
  *
  * 1. The origin of this source code must not be misrepresented.
@@ -44,12 +44,12 @@
 
 /* To do:
  *
- * Version 1.3.*: check for unused alpha channel and ok-to-reduce-depth.
+ * Version 1.4.*: check for unused alpha channel and ok-to-reduce-depth.
  *   Rearrange palette to put most-used color first and transparent color
  *   second (see ImageMagick 5.1.1 and later).
  *   Finish pplt (partial palette) feature.
  *
- * Version 1.3.*: Use an alternate write function for the trial passes, that
+ * Version 1.4.*: Use an alternate write function for the trial passes, that
  *   simply counts bytes rather than actually writing to a file, to save wear
  *   and tear on disk drives.
  *
@@ -62,6 +62,8 @@
  *   recompressing.
  *
  * Change log:
+ *
+ * Version 1.4.0 (built with libpng-1.0.6 + libpng-1.0.6-patch-a)
  *
  * Version 1.3.6 (built with libpng-1.0.5v)
  *
@@ -1907,7 +1909,8 @@ main(int argc, char *argv[])
 #if !defined(PNG_tIME_SUPPORTED)
           PNG_tIME;
 #endif
-#endif
+#endif /* PNG_USE_LOCAL_ARRAYS */
+
           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE,
             (png_bytep)NULL, 0);
 #if !defined(PNG_cHRM_SUPPORTED)
@@ -1938,7 +1941,8 @@ main(int argc, char *argv[])
           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
             (png_bytep)png_tIME, 1);
 #endif
-#else   /* !PNG_UINT_IHDR */
+
+#else   /* PNG_UINT_IHDR */
 
 #if !defined(PNG_cHRM_SUPPORTED) || !defined(PNG_hIST_SUPPORTED) || \
     !defined(PNG_iCCP_SUPPORTED) || !defined(PNG_sCAL_SUPPORTED) || \
@@ -1985,7 +1989,7 @@ main(int argc, char *argv[])
           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
             chunk_name, 1);
 #endif
-#endif  /* !PNG_UINT_IHDR */
+#endif  /* PNG_UINT_IHDR */
           }
         }
 #endif
@@ -2065,7 +2069,7 @@ main(int argc, char *argv[])
                 if(verbose > 0 && first_trial)
                    fprintf(STDERR, "   Adding an alpha channel.\n");
 #ifdef PNG_READ_FILLER_SUPPORTED
-                png_set_filler(read_ptr, (png_uint_32)65535, PNG_FILLER_AFTER);
+                png_set_filler(read_ptr, (png_uint_32)65535L, PNG_FILLER_AFTER);
 #endif
                 need_expand = 1;
             }
@@ -2230,7 +2234,7 @@ main(int argc, char *argv[])
          else if(intent >= 0)
          {
 #ifdef PNG_gAMA_SUPPORTED
-            if(file_gamma > 45000L && file_gamma < 46000L)
+            if(file_gamma >= 45000L && file_gamma <= 46000L)
             {
                things_have_changed=1;
                if(first_trial)
