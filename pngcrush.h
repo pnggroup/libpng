@@ -66,4 +66,6 @@
 #endif
 #endif
 
+#define PNG_ABORT()
+
 #endif

@@ -15,7 +15,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.1"
+#define PNGCRUSH_VERSION "1.4.2"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -45,26 +45,15 @@
  *    or altered from any source or altered source distribution.
  */
 
-/* To do:
+/* Change log:
  *
- * Version 1.4.*: check for unused alpha channel and ok-to-reduce-depth.
- *   Rearrange palette to put most-used color first and transparent color
- *   second (see ImageMagick 5.1.1 and later).
- *   Finish pplt (partial palette) feature.
+ * Version 1.4.2 (built with libpng-1.0.6f and cexcept-0.6.0)
  *
- * Version 1.4.*: Use an alternate write function for the trial passes, that
- *   simply counts bytes rather than actually writing to a file, to save wear
- *   and tear on disk drives.
+ *   Removes extra IDAT chunks (such as found in some POV-ray PNGs) with
+ *   a warning instead of bailing out (this feature requires libpng-1.0.6f
+ *   or later, compiled with "#define PNG_ABORT()").
  *
- * Version 1.4.*: Allow in-place file replacement or as a filter, as in
- *    "pngcrush -overwrite file.png"
- *    "pngcreator | pngcrush > output.png"
- *
- * Version 1.4.*: Remove text-handling and color-handling features and put
- *   those in a separate program or programs, to avoid unnecessary
- *   recompressing.
- *
- * Change log:
+ *   Removed old setjmp interface entirely.
  *
  * Version 1.4.1 (built with libpng-1.0.6e and cexcept-0.6.0)
  *
@@ -187,7 +176,25 @@
  *   types, compression levels, or compression strategies.
  */
 
-#define USE_CEXCEPT
+/* To do:
+ *
+ * Version 1.4.*: check for unused alpha channel and ok-to-reduce-depth.
+ *   Rearrange palette to put most-used color first and transparent color
+ *   second (see ImageMagick 5.1.1 and later).
+ *   Finish pplt (partial palette) feature.
+ *
+ * Version 1.4.*: Use an alternate write function for the trial passes, that
+ *   simply counts bytes rather than actually writing to a file, to save wear
+ *   and tear on disk drives.
+ *
+ * Version 1.4.*: Allow in-place file replacement or as a filter, as in
+ *    "pngcrush -overwrite file.png"
+ *    "pngcreator | pngcrush > output.png"
+ *
+ * Version 1.4.*: Remove text-handling and color-handling features and put
+ *   those in a separate program or programs, to avoid unnecessary
+ *   recompressing.
+ */
 
 #if defined(__DJGPP__)
 #  if ((__DJGPP__ == 2) && (__DJGPP_MINOR__ == 0))
@@ -227,9 +234,6 @@
 #if (PNG_LIBPNG_VER > 95)
 
 /* so we can load pngcrush with pre-1.0.6 versions of libpng */
-#ifndef png_jmpbuf
-#  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
-#endif
 
 #if (PNG_LIBPNG_VER < 10006)
 /* These shorter macros weren't defined until version 1.0.6 */
@@ -299,7 +303,6 @@ int best;
 char buffer[256];
 char *str_return;
 
-#ifdef USE_CEXCEPT
 /* The cexcept documentation recommends putting the following three lines in a
  * separate header file, but it appears to work with them embedded here.
  * There is only one "Throw" and it is in this file. */
@@ -308,15 +311,6 @@ define_exception_type(const char *);
 extern struct exception_context the_exception_context[1];
 
 struct exception_context the_exception_context[1];
-
-#else
-#ifndef PNG_JMPBUF_SUPPORTED
-#ifndef PNG_SETJMP_NOT_SUPPORTED
-/* Old setjmp interface */
-jmp_buf jmpbuf;
-#endif
-#endif
-#endif
 
 static png_uint_32 total_input_length = 0;
 static png_uint_32 total_output_length = 0;
@@ -405,15 +399,25 @@ int ia;
 
 /* cexcept interface */
 
-#ifdef USE_CEXCEPT
 static void
 png_cexcept_error(png_structp png_ptr, png_const_charp msg)
 {
    if(png_ptr)
      ;
+#if (PNG_LIBPNG_VER > 10006)
+   if (!strcmp(msg, "Too many IDAT's found"))
+   {
+#ifndef PNG_NO_CONSOLE_IO
+     fprintf(stderr, "Correcting ");
+#else
+     png_warning(png_ptr, msg);
+#endif
+     /* png_ptr->mode |= PNG_AFTER_IDAT; */
+   }
+   else
+#endif
    Throw msg;
 }
-#endif
 
 /* START of code to validate memory allocation and deallocation */
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -1603,11 +1607,9 @@ main(int argc, char *argv[])
    for(;;)  /* loop on input files */
 
    {
-#ifdef USE_CEXCEPT
    png_const_charp msg;
    Try
    {
-#endif
       first_trial = 1;
 
       if(png_row_filters != NULL)
@@ -1866,38 +1868,22 @@ main(int argc, char *argv[])
       png_debug(0, "Allocating read and write structures\n");
 #ifdef PNG_USER_MEM_SUPPORTED
    read_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-#ifdef USE_CEXCEPT
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL, (png_voidp)NULL,
-#else
-      (png_error_ptr)NULL, (png_error_ptr)NULL, (png_voidp)NULL,
-#endif
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
 #else
    read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-#ifdef USE_CEXCEPT
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
-#else
-      (png_error_ptr)NULL, (png_error_ptr)NULL);
-#endif
 #endif
 
    if(nosave == 0)
    {
 #ifdef PNG_USER_MEM_SUPPORTED
    write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-#ifdef USE_CEXCEPT
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL, (png_voidp)NULL,
-#else
-      (png_error_ptr)NULL, (png_error_ptr)NULL, (png_voidp)NULL,
-#endif
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
 #else
    write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-#ifdef USE_CEXCEPT
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
-#else
-      (png_error_ptr)NULL, (png_error_ptr)NULL);
-#endif
 #endif
 
    }
@@ -1912,38 +1898,6 @@ main(int argc, char *argv[])
 
       P2("structures created.\n");
             png_crush_pause();
-
-      png_debug(0, "Setting jmpbuf for read and write structs\n");
-#ifndef PNG_SETJMP_NOT_SUPPORTED
-#  ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
-#  else
-   if (setjmp(png_jmpbuf(read_ptr)))
-#  endif
-      {
-          PNG_CRUSH_CLEANUP
-          continue;
-      }
-
-#if defined(USE_FAR_KEYWORD)
-      png_memcpy(png_jmpbuf(read_ptr),jmpbuf,sizeof(jmp_buf));
-#endif
-   if(nosave == 0)
-#  ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
-#  else
-   if (setjmp(png_jmpbuf(write_ptr)))
-#  endif
-         {
-             PNG_CRUSH_CLEANUP
-             continue;
-         }
-#if defined(USE_FAR_KEYWORD)
-      png_memcpy(png_jmpbuf(write_ptr),jmpbuf,sizeof(jmp_buf));
-#endif
-      P2("jmp_buf has been set.\n");
-      png_crush_pause();
-#endif
 
       png_debug(0, "Initializing input and output streams\n");
 #if !defined(PNG_NO_STDIO)
@@ -3250,14 +3204,12 @@ main(int argc, char *argv[])
          if(verbose > 0) show_result();
          return 0;
       }
-#ifdef USE_CEXCEPT
    }
    Catch (msg)
    {
      fprintf(stderr, "Caught libpng error:\n   %s\n\n",msg);
      PNG_CRUSH_CLEANUP
    }
-#endif
    }  /* end of loop on input files */
 }
 
@@ -3265,35 +3217,17 @@ png_uint_32
 measure_idats(FILE *fpin)
 {
    png_uint_32 measured_idat_length;
+   png_const_charp msg;
    P2("measure_idats:\n");
    png_debug(0, "Allocating read structure\n");
    read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
-#ifdef USE_CEXCEPT
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
-#else
-      (png_error_ptr)NULL, (png_error_ptr)NULL);
-#endif
    png_debug(0, "Allocating read_info,  end_info structures\n");
    read_info_ptr = png_create_info_struct(read_ptr);
    end_info_ptr = png_create_info_struct(read_ptr);
-   png_debug(0, "Setting jmpbuf for read struct\n");
 
-#ifndef PNG_SETJMP_NOT_SUPPORTED
-#  ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
-#  else
-   if (setjmp(png_jmpbuf(read_ptr)))
-#  endif
-      {
-          PNG_CRUSH_CLEANUP
-          P2("returning from measure_idats after longjump\n");
-          return 0;
-      }
-
-#  if defined(USE_FAR_KEYWORD)
-   png_memcpy(png_jmpbuf(read_ptr),jmpbuf,sizeof(jmp_buf));
-#  endif
-#endif
+   Try
+   {
 
 #if !defined(PNG_NO_STDIO)
    png_init_io(read_ptr, fpin);
@@ -3307,6 +3241,13 @@ measure_idats(FILE *fpin)
    png_debug(0, "Destroying data structs\n");
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
    return measured_idat_length;
+   }
+   Catch (msg)
+   {
+      PNG_CRUSH_CLEANUP
+      P2("Measure_idats caught libpng error:\n   %s\n\n",msg);
+   }
+   return 0;
 }
 
 
