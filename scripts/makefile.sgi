@@ -5,7 +5,7 @@
 
 LIBNAME=libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.17
+PNGMIN = 1.0.18
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Where make install puts libpng.a, libpng10.so, and libpng10/png.h
