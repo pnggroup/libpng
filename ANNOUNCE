@@ -1,5 +1,5 @@
 
-Libpng 1.2.2beta1 - February 22, 2002
+Libpng 1.2.2beta2 - February 24, 2002
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,13 +9,19 @@ Changes since the last public release (1.2.1):
 version 1.2.2beta1 [February 22, 2002]
   Fixed a bug with reading the length of iCCP profiles (Larry Reeves).
   Revised makefile.linux, makefile.gcmmx, and makefile.sgi to generate
-    libpng.a, libpng12.so (not libpng.so.3), and libpng12/png.h (not png.h)
+    libpng.a, libpng12.so (not libpng.so.3), and libpng12/png.h
   Revised makefile.darwin to remove "-undefined suppress" option.
   Added checks for gamma and chromaticity values over 21474.83, which exceed
     the limit for PNG unsigned 32-bit integers when encoded.
   Revised calls to png_create_read_struct() and png_create_write_struct()
     for simpler debugging.
   Revised png_zalloc() so zlib handles errors (uses PNG_FLAG_MALLOC_NULL_MEM_OK)
+version 1.2.2beta2 [February 24, 2002]
+  Check chunk_length and idat_size for invalid (over PNG_MAX_UINT) lengths.
+  Check for invalid image dimensions in png_get_IHDR.
+  Added missing "fi;" in the install target of the SGI makefiles.
+  Added install-static to all makefiles that make shared libraries.
+  Always do gamma compensation when image is partially transparent.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

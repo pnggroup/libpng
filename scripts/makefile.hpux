@@ -19,12 +19,14 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2beta1
+PNGMIN = 1.2.2beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
 # where make install puts libpng.a, libpng12.sl, and png.h
 prefix=/opt/libpng
+LIBPATH=$prefix/lib
+INCPATH=$prefix/include
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -60,22 +62,31 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 
-install: libpng.a
-	-@mkdir $(prefix)/include
-	-@mkdir $(prefix)/include/$(LIBNAME)
-	-@mkdir $(prefix)/lib
-	cp png.h $(prefix)/include
-	cp pngconf.h $(prefix)/include
-	cp png.h $(prefix)/include/$(LIBNAME)
-	cp pngconf.h $(prefix)/include/$(LIBNAME)
-	chmod 644 $(prefix)/include/png.h
-	chmod 644 $(prefix)/include/pngconf.h
-	chmod 644 $(prefix)/include/$(LIBNAME)/png.h
-	chmod 644 $(prefix)/include/$(LIBNAME)/pngconf.h
-	cp libpng.a $(LIBNAME).sl.$(PNGVER) $(prefix)/lib
-	chmod 644 $(prefix)/lib/libpng.a
-	chmod 755 $(prefix)/lib/$(LIBNAME).sl.$(PNGVER)
-	(cd $(prefix)/lib; \
+install-static: libpng.a
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	cp png.h pngconf.h $(INCPATH)
+	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	cp libpng.a $(LIBPATH)
+	chmod 644 $(LIBPATH)/libpng.a
+
+install: libpng.a $(LIBNAME).sl.$(PNGVER)
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	ln -f -s $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)
+	ln -f -s $(INCPATH)/$(LIBNAME)/pngconf.h $(INCPATH)
+	cp libpng.a $(LIBPATH)/$(LIBNAME).a
+	chmod 644 $(LIBPATH)/$(LIBNAME).a
+	-@/bin/rm -f $(LIBPATH)/libpng.a
+	ln -f -s $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+	cp $(LIBNAME).sl.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).sl.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).sl.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).sl
+	(cd $(LIBPATH); \
 	ln -f -s $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ); \
 	ln -f -s $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl)
 

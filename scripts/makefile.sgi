@@ -28,10 +28,11 @@ LDFLAGS_A=$(ABI) -L. -L$(ZLIBLIB) -lpng12 -lz -lm
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=cc $(ABI) -shared
 
-VER=1.2.2beta1
 # See "man dso" for info about shared objects
-SONUM=0
-SHAREDLIB=libpng12.so
+LIBNAME=libpng12
+PNGMAJ = 0
+PNGMIN = 1.2.2beta2
+PNGVER = $(PNGMAJ).$(PNGMIN)
 
 RANLIB=echo
 #RANLIB=ranlib
@@ -46,17 +47,17 @@ OBJS = pnggccrd.o png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 
 all: libpng.a pngtest shared
 
-shared: $(SHAREDLIB).$(SONUM).$(VER)
+shared: $(LIBNAME).so.$(PNGMAJ).$(PNGVER)
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
-$(SHAREDLIB).$(SONUM).$(VER): $(OBJS)
+$(LIBNAME).so.$(PNGVER): $(OBJS)
 	$(LDSHARED) -o $@ $(OBJS)
-	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM)
-	ln -s $@ $(SHAREDLIB)
-	ln -s $@ $(SHAREDLIB).$(SONUM)
+	rm -f $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)
+	ln -s $@ $(LIBNAME).so
+	ln -s $@ $(LIBNAME).so.$(PNGMAJ)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -64,33 +65,36 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 
-install: libpng.a
-	-@mkdir $(INCPATH)
-	-@mkdir $(LIBPATH)
-	cp png.h $(INCPATH)
-	cp pngconf.h $(INCPATH)
-	chmod 644 $(INCPATH)/png.h
-	chmod 644 $(INCPATH)/pngconf.h
+install-static: libpng.a
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	cp png.h pngconf.h $(INCPATH)
+	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
 	cp libpng.a $(LIBPATH)
 	chmod 644 $(LIBPATH)/libpng.a
 
-install-shared: $(SHAREDLIB).$(SONUM).$(VER)
-	-@mkdir $(LIBPATH)
-	-@mkdir $(INCPATH)
-	-@mkdir $(INCPATH)/libpng12
-	cp png.h $(INCPATH)/libpng12
-	cp pngconf.h $(INCPATH)/libpng12
-	chmod 644 $(INCPATH)/libpng12/png.h
-	chmod 644 $(INCPATH)/libpng12/pngconf.h
-	cp $(SHAREDLIB).$(SONUM).$(VER) $(LIBPATH)
-	chmod 755 $(SHAREDLIB).$(SONUM).$(VER)
-	(cd $(LIBPATH); if test -f $(SHAREDLIB).$(SONUM).$(VER); then \
-	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM); \
-	ln -s $(SHAREDLIB).$(SONUM).$(VER) $(SHAREDLIB).$(SONUM); \
-	ln -s $(SHAREDLIB).$(SONUM) $(SHAREDLIB))
+install: libpng.a $(LIBNAME).so.$(PNGVER)
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	ln -sf $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)
+	ln -sf $(INCPATH)/$(LIBNAME)/pngconf.h $(INCPATH)
+	cp libpng.a $(LIBPATH)/$(LIBNAME).a
+	chmod 644 $(LIBPATH)/$(LIBNAME).a
+	-@/bin/rm -f $(LIBPATH)/libpng.a
+	ln -sf $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+	cp $(LIBNAME).so.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
+	(cd $(LIBPATH); ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
+	 ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png $(SHAREDLIB) $(SHAREDLIB).$(SONUM)*
+	rm -f *.o libpng.a pngtest pngout.png $(LIBNAME).so \
+	$(LIBNAME).so.$(PNGMAJ)*
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

@@ -1,5 +1,6 @@
 # makefile for libpng on BeOS x86 ELF with gcc
 # modified from makefile.linux by Sander Stoks
+# Copyright (C) 2002 Glenn Randers-Pehrson
 # Copyright (C) 1999 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
@@ -13,7 +14,7 @@ ZLIBINC=/usr/local/include
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2beta1
+PNGMIN = 1.2.2beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 ALIGN=
@@ -67,26 +68,41 @@ $(LIBNAME).so.$(PNGVER) \
 	 $(OBJSDLL)
 
 pngtest: pngtest.o $(LIBNAME).so
-	$(CC) -L$(ZLIBLIB) -lz -lpng -o pngtest pngtest.o
+	$(CC) -L$(ZLIBLIB) -lz -lpng12 -o pngtest pngtest.o
 
 test: pngtest
 	./pngtest
 
-install: libpng.a $(LIBNAME).so.$(PNGVER)
-	-@mkdir $(INCPATH) $(LIBPATH)
+install-static: libpng.a
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	cp png.h pngconf.h $(INCPATH)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	-@mkdir $(INCPATH) $(LIBPATH)/$(LIBNAME)
+	cp libpng.a $(LIBPATH)
+	chmod 644 $(LIBPATH)/libpng.a
+
+install: libpng.a $(LIBNAME).so.$(PNGVER)
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
 	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
-	cp libpng.a $(LIBNAME).so.$(PNGVER) $(LIBPATH)
+	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	ln -sf $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)
+	ln -sf $(INCPATH)/$(LIBNAME)/pngconf.h $(INCPATH)
+	cp libpng.a $(LIBPATH)/$(LIBNAME).a
+	chmod 644 $(LIBPATH)/$(LIBNAME).a
+	-@/bin/rm -f $(LIBPATH)/libpng.a
+	ln -sf $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+	cp $(LIBNAME).so.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ) $(LIBPATH)/$(LIBNAME).so
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
 	(cd $(LIBPATH); ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	 ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 
 clean:
-	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest pngout.png
+	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* \
+	pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

@@ -7,7 +7,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.2.2beta1';
+  PNG_LIBPNG_VER_STRING = '1.2.2beta2';
   PNG_LIBPNG_VER        =  10202;
 
 type

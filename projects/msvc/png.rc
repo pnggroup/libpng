@@ -81,7 +81,7 @@ BEGIN
       VALUE "FileDescription", "PNG image compression library\000"
       VALUE "FileVersion", PNG_LIBPNG_VER_STRING "\000"
       VALUE "InternalName", PNG_LIBPNG_DLLFNAME QUOTE(PNG_LIBPNG_VER_MAJOR) DLLFNAME_POSTFIX " (Windows 32 bit)\000"
-      VALUE "LegalCopyright", "\251 1998-2000 Glenn Randers-Pehrson\000"
+      VALUE "LegalCopyright", "\251 1998-2002 Glenn Randers-Pehrson\000"
       VALUE "OriginalFilename", PNG_LIBPNG_DLLFNAME QUOTE(PNG_LIBPNG_VER_MAJOR) DLLFNAME_POSTFIX ".DLL\000"
 #ifdef PRIVATEBUILD
       VALUE "PrivateBuild", PRIVATEBUILD

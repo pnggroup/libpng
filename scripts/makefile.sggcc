@@ -23,12 +23,13 @@ CFLAGS=$(ABI) -I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=CC $(ABI) -shared
 
-VER=1.2.2beta1
+PNGMAJ = 0
+PNGMIN = 1.2.2beta2
+PNGVER = $(PNGMAJ).$(PNGMIN)
 # See "man dso" for info about shared objects
-SONUM=0
-LIBS=libpng12.so.$(SONUM).$(VER)
-SHAREDLIB=libpng12.so
-libdir=$(prefix)/lib32
+LIBS=libpng12.so.$(PNGMAJ).$(PNGVER)
+LIBNAME=libpng12
+LIBPATH=$(prefix)/lib32
 
 RANLIB=echo
 #RANLIB=ranlib
@@ -37,17 +38,17 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.a $(SHAREDLIB).$(VER) pngtest
+all: libpng.a $(LIBNAME).so.$(PNGVER) pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
-$(SHAREDLIB).$(VER): $(OBJS)
+$(LIBNAME).so.$(PNGVER): $(OBJS)
 	$(LDSHARED) -o $@ $(OBJS)
-	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM)
-	ln -s $@ $(SHAREDLIB)
-	ln -s $@ $(SHAREDLIB).$(SONUM)
+	rm -f $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)
+	ln -s $@ $(LIBNAME).so
+	ln -s $@ $(LIBNAME).so.$(PNGMAJ)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -55,25 +56,32 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 
-install: libpng.a
-	-@mkdir $(prefix)/include
-	-@mkdir $(prefix)/lib
-	cp png.h pngconf.h $(prefix)/include
-	chmod 644 $(prefix)/include/png.h
-	chmod 644 $(prefix)/include/pngconf.h
-	cp libpng.a $(prefix)/lib
-	chmod 644 $(prefix)/lib/libpng.a
+install-static: libpng.a
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	cp png.h pngconf.h $(INCPATH)
+	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	cp libpng.a $(LIBPATH)
+	chmod 644 $(LIBPATH)/libpng.a
 
-install-shared: $(SHAREDLIB).$(VER)
-	-@mkdir $(prefix)/include/libpng12
-	cp png.h pngconf.h $(prefix)/include/libpng12
-	chmod 644 $(prefix)/include/libpng12/png.h
-	chmod 644 $(prefix)/include/libpng12/pngconf.h
-	cp $(SHAREDLIB).$(VER) $(libdir); chmod 755 $(SHAREDLIB).$(VER)
-	(cd $(libdir); if test -f $(SHAREDLIB).$(VER); then \
-	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM); \
-	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB); \
-	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB).$(SONUM); \
+install: libpng.a $(LIBNAME).so.$(PNGVER)
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	ln -sf $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)
+	ln -sf $(INCPATH)/$(LIBNAME)/pngconf.h $(INCPATH)
+	cp libpng.a $(LIBPATH)/$(LIBNAME).a
+	chmod 644 $(LIBPATH)/$(LIBNAME).a
+	-@/bin/rm -f $(LIBPATH)/libpng.a
+	ln -sf $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+	cp $(LIBNAME).so.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
+	(cd $(LIBPATH); ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
+	 ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 	(ldconfig || true)  >/dev/null 2>&1; \
 	fi)
 

@@ -35,9 +35,9 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2beta1
+PNGMIN = 1.2.2beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
-SHAREDLIB = libpng12
+LIBNAME = libpng12
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
@@ -53,43 +53,54 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a $(SHAREDLIB).sl pngtest
+all: libpng.a $(LIBNAME).sl pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-$(SHAREDLIB).sl: $(SHAREDLIB).sl.$(PNGMAJ)
-	ln -f -s $(SHAREDLIB).sl.$(PNGMAJ) $(SHAREDLIB).sl
+$(LIBNAME).sl: $(LIBNAME).sl.$(PNGMAJ)
+	ln -f -s $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl
 
-$(SHAREDLIB).sl.$(PNGMAJ): $(SHAREDLIB).sl.$(PNGVER)
-	ln -f -s $(SHAREDLIB).sl.$(PNGVER) $(SHAREDLIB).sl.$(PNGMAJ)
+$(LIBNAME).sl.$(PNGMAJ): $(LIBNAME).sl.$(PNGVER)
+	ln -f -s $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ)
 
-$(SHAREDLIB).sl.$(PNGVER): $(OBJSDLL)
+$(LIBNAME).sl.$(PNGVER): $(OBJSDLL)
 	$(LD) -b -L$(ZLIBLIB) +s +b $(ZLIBLIB) \
 	+h libpng.sl.$(PNGMAJ) -o libpng.sl.$(PNGVER) $(OBJSDLL) -lz
 
-pngtest: pngtest.o $(SHAREDLIB).sl
+pngtest: pngtest.o $(LIBNAME).sl
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
-install: libpng.a $(SHAREDLIB).sl.$(PNGVER)
-	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
+install-static: libpng.a
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	-@if [ ! -d $(INCPATH)/$(LIBNAME)  ]; then mkdir $(INCPATH)/$(LIBNAME); fi
 	cp png.h pngconf.h $(INCPATH)
-	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	cp libpng.a $(LIBPATH)
+	chmod 644 $(LIBPATH)/libpng.a
+
+install: libpng.a $(LIBNAME).sl.$(PNGVER)
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
-	cp libpng.a $(SHAREDLIB).sl.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/$(SHAREDLIB).sl.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/$(SHAREDLIB).sl.$(PNGMAJ) \
-	$(LIBPATH)/$(SHAREDLIB).sl
-	(cd $(LIBPATH); ln -sf $(SHAREDLIB).sl.$(PNGVER) \
-	$(SHAREDLIB).sl.$(PNGMAJ); \
-	 ln -sf $(SHAREDLIB).sl.$(PNGMAJ) $(SHAREDLIB).sl)
+	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	ln -sf $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)
+	ln -sf $(INCPATH)/$(LIBNAME)/pngconf.h $(INCPATH)
+	cp libpng.a $(LIBPATH)/$(LIBNAME).a
+	chmod 644 $(LIBPATH)/$(LIBNAME).a
+	-@/bin/rm -f $(LIBPATH)/libpng.a
+	ln -sf $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+	cp $(LIBNAME).sl.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).sl.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).sl.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).sl
+	(cd $(LIBPATH); ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ); \
+	 ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl)
 
 clean:
 	/bin/rm -f *.o libpng.a $(SHAREDLIB).sl $(SHAREDLIB).sl.$(PNGMAJ)* \

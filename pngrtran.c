@@ -1,9 +1,9 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.2.2beta1 - February 22, 2002
+ * libpng 1.2.2beta2 - February 24, 2002
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -510,13 +510,19 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
  * only do transformations on images where the file_gamma and screen_gamma
  * are not close reciprocals, otherwise it slows things down slightly, and
  * also needlessly introduces small errors.
+ *
+ * We will turn off gamma transformation later if no semitransparent entries
+ * are present in the tRNS array for palette images.  We can't do it here
+ * because we don't necessarily have the tRNS chunk yet.
  */
 void PNGAPI
 png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 {
    png_debug(1, "in png_set_gamma\n");
-   if (fabs(scrn_gamma * file_gamma - 1.0) > PNG_GAMMA_THRESHOLD)
-      png_ptr->transformations |= PNG_GAMMA;
+   if ((fabs(scrn_gamma * file_gamma - 1.0) > PNG_GAMMA_THRESHOLD) ||
+       (png_ptr->color_type & PNG_COLOR_MASK_ALPHA) ||
+       (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE))
+     png_ptr->transformations |= PNG_GAMMA;
    png_ptr->gamma = (float)file_gamma;
    png_ptr->screen_gamma = (float)scrn_gamma;
 }
@@ -746,6 +752,22 @@ png_init_read_transformations(png_structp png_ptr)
    png_ptr->background_1 = png_ptr->background;
 #endif
 #if defined(PNG_READ_GAMMA_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
+
+   if ((color_type == PNG_COLOR_TYPE_PALETTE && png_ptr->num_trans != 0)
+       && (fabs(png_ptr->screen_gamma * png_ptr->gamma - 1.0)
+         < PNG_GAMMA_THRESHOLD))
+   {
+    int i,k;
+    k=0;
+    for (i=0; i<png_ptr->num_trans; i++)
+    {
+      if (png_ptr->trans[i] != 0 && png_ptr->trans[i] != 0xff)
+        k=1; /* partial transparency is present */
+    }
+    if (k == 0)
+      png_ptr->transformations &= (~PNG_GAMMA);
+   }
+
    if (png_ptr->transformations & (PNG_GAMMA | PNG_RGB_TO_GRAY))
    {
       png_build_gamma_table(png_ptr);
@@ -754,6 +776,8 @@ png_init_read_transformations(png_structp png_ptr)
       {
          if (color_type == PNG_COLOR_TYPE_PALETTE)
          {
+           /* could skip if no transparency and 
+           */
             png_color back, back_1;
             png_colorp palette = png_ptr->palette;
             int num_palette = png_ptr->num_palette;
@@ -3150,17 +3174,17 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         png_uint_16 v, w, x;
 
                         v = gamma_16_to_1[*(sp + 1) >> gamma_shift][*sp];
-                        png_composite_16(w, v, a, background->red);
+                        png_composite_16(w, v, a, background_1->red);
                         x = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
                         *dp = (png_byte)((x >> 8) & 0xff);
                         *(dp + 1) = (png_byte)(x & 0xff);
                         v = gamma_16_to_1[*(sp + 3) >> gamma_shift][*(sp + 2)];
-                        png_composite_16(w, v, a, background->green);
+                        png_composite_16(w, v, a, background_1->green);
                         x = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
                         *(dp + 2) = (png_byte)((x >> 8) & 0xff);
                         *(dp + 3) = (png_byte)(x & 0xff);
                         v = gamma_16_to_1[*(sp + 5) >> gamma_shift][*(sp + 4)];
-                        png_composite_16(w, v, a, background->blue);
+                        png_composite_16(w, v, a, background_1->blue);
                         x = gamma_16_from_1[(w & 0xff) >> gamma_shift][w >> 8];
                         *(dp + 4) = (png_byte)((x >> 8) & 0xff);
                         *(dp + 5) = (png_byte)(x & 0xff);
