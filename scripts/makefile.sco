@@ -18,15 +18,13 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CFLAGS= -dy -belf -I$(ZLIBINC) -O3
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -lm
 
 #RANLIB=ranlib
 RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
-# have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.3rc6
+PNGMIN = 1.2.3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -44,6 +42,11 @@ BINPATH=$(prefix)/bin
 # via DESTDIR, that location must already exist before
 # you execute make install.
 DESTDIR=
+
+DB=$(DESTDIR)/$(BINPATH)
+DI=$(DESTDIR)/$(INCPATH)
+DL=$(DESTDIR)/$(LIBPATH)
+DM=$(DESTDIR)/$(MANPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -93,70 +96,65 @@ test: pngtest
 
 
 install-headers: png.h pngconf.h
-	-@if [ ! -d $(DESTDIR)$(INCPATH) ]; then mkdir $(DESTDIR)$(INCPATH); fi
-	-@if [ ! -d $(DESTDIR)$(INCPATH)/$(LIBNAME) ]; then \
-	mkdir $(DESTDIR)$(INCPATH)/$(LIBNAME); fi
-	-@/bin/rm -f $(DESTDIR)$(INCPATH)/png.h
-	-@/bin/rm -f $(DESTDIR)$(INCPATH)/pngconf.h
-	cp png.h pngconf.h $(DESTDIR)$(INCPATH)/$(LIBNAME)
-	chmod 644 $(DESTDIR)$(INCPATH)/$(LIBNAME)/png.h \
-	$(DESTDIR)$(INCPATH)/$(LIBNAME)/pngconf.h
-	-@/bin/rm -f $(DESTDIR)$(INCPATH)/png.h $(DESTDIR)$(INCPATH)/pngconf.h
-	-@/bin/rm -f $(DESTDIR)$(INCPATH)/libpng
-	(cd $(DESTDIR)$(INCPATH); ln -f -s $(LIBNAME) libpng; \
+	-@if [ ! -d $(DI) ]; then mkdir $(DI); fi
+	-@if [ ! -d $(DI)/$(LIBNAME) ]; then mkdir $(DI)/$(LIBNAME); fi
+	-@/bin/rm -f $(DI)/png.h
+	-@/bin/rm -f $(DI)/pngconf.h
+	cp png.h pngconf.h $(DI)/$(LIBNAME)
+	chmod 644 $(DI)/$(LIBNAME)/png.h \
+	$(DI)/$(LIBNAME)/pngconf.h
+	-@/bin/rm -f $(DI)/png.h $(DI)/pngconf.h
+	-@/bin/rm -f $(DI)/libpng
+	(cd $(DI); ln -f -s $(LIBNAME) libpng; \
 	ln -f -s $(LIBNAME)/* .)
 
 install-static: install-headers libpng.a
-	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
-	cp libpng.a $(DESTDIR)$(LIBPATH)/$(LIBNAME).a
-	chmod 644 $(DESTDIR)$(LIBPATH)/$(LIBNAME).a
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.a
-	(cd $(DESTDIR)$(LIBPATH); ln -f -s $(LIBNAME).a libpng.a)
+	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
+	cp libpng.a $(DL)/$(LIBNAME).a
+	chmod 644 $(DL)/$(LIBNAME).a
+	-@/bin/rm -f $(DL)/libpng.a
+	(cd $(DL); ln -f -s $(LIBNAME).a libpng.a)
 
 install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
-	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* \
-	$(DESTDIR)$(LIBPATH)/$(LIBNAME).so
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.so
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.so.3
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.so.3.*
-	cp $(LIBNAME).so.$(PNGVER) $(DESTDIR)$(LIBPATH)
-	chmod 755 $(DESTDIR)$(LIBPATH)/$(LIBNAME).so.$(PNGVER)
-	(cd $(DESTDIR)$(LIBPATH); \
+	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)* \
+	$(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/libpng.so
+	-@/bin/rm -f $(DL)/libpng.so.3
+	-@/bin/rm -f $(DL)/libpng.so.3.*
+	cp $(LIBNAME).so.$(PNGVER) $(DL)
+	chmod 755 $(DL)/$(LIBNAME).so.$(PNGVER)
+	(cd $(DL); \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.3; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.3.$(PNGMIN); \
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
-	-@if [ ! -d $(DESTDIR)$(LIBPATH)/pkgconfig ]; then \
-	mkdir $(DESTDIR)$(LIBPATH)/pkgconfig; fi
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/$(LIBNAME).pc
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.pc
-	cp libpng.pc $(DESTDIR)$(LIBPATH)/pkgconfig/$(LIBNAME).pc
-	chmod 644 $(DESTDIR)$(LIBPATH)/pkgconfig/$(LIBNAME).pc
-	(cd $(DESTDIR)$(LIBPATH)/pkgconfig; ln -f -s $(LIBNAME).pc libpng.pc)
+	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
+	-@/bin/rm -f $(DL)/pkgconfig/$(LIBNAME).pc
+	-@/bin/rm -f $(DL)/pkgconfig/libpng.pc
+	cp libpng.pc $(DL)/pkgconfig/$(LIBNAME).pc
+	chmod 644 $(DL)/pkgconfig/$(LIBNAME).pc
+	(cd $(DL)/pkgconfig; ln -f -s $(LIBNAME).pc libpng.pc)
 
 install-man: libpng.3 libpngpf.3 png.5
-	-@if [ ! -d $(DESTDIR)$(MANPATH) ]; then mkdir $(DESTDIR)$(MANPATH); fi
-	-@if [ ! -d $(DESTDIR)$(MANPATH)/man3 ]; then \
-	mkdir $(DESTDIR)$(MANPATH)/man3; fi
-	-@/bin/rm -f $(DESTDIR)$(MANPATH)/man3/libpng.3
-	-@/bin/rm -f $(DESTDIR)$(MANPATH)/man3/libpngpf.3
-	cp libpng.3 $(DESTDIR)$(MANPATH)/man3
-	cp libpngpf.3 $(DESTDIR)$(MANPATH)/man3
-	-@if [ ! -d $(DESTDIR)$(MANPATH)/man5 ]; then \
-	mkdir $(DESTDIR)$(MANPATH)/man5; fi
-	-@/bin/rm -f $(DESTDIR)$(MANPATH)/man5/png.5
-	cp png.5 $(DESTDIR)$(MANPATH)/man5
+	-@if [ ! -d $(DM) ]; then mkdir $(DM); fi
+	-@if [ ! -d $(DM)/man3 ]; then mkdir $(DM)/man3; fi
+	-@/bin/rm -f $(DM)/man3/libpng.3
+	-@/bin/rm -f $(DM)/man3/libpngpf.3
+	cp libpng.3 $(DM)/man3
+	cp libpngpf.3 $(DM)/man3
+	-@if [ ! -d $(DM)/man5 ]; then mkdir $(DM)/man5; fi
+	-@/bin/rm -f $(DM)/man5/png.5
+	cp png.5 $(DM)/man5
 
 install-config: libpng-config
-	-@if [ ! -d $(DESTDIR)$(BINPATH) ]; then \
-	mkdir $(DESTDIR)$(BINPATH); fi
-	-@/bin/rm -f $(DESTDIR)$(BINPATH)/libpng-config
-	-@/bin/rm -f $(DESTDIR)$(BINPATH)/$(LIBNAME)-config
-	cp libpng-config $(DESTDIR)$(BINPATH)/$(LIBNAME)-config
-	chmod 755 $(DESTDIR)$(BINPATH)/$(LIBNAME)-config
-	(cd $(DESTDIR)$(BINPATH); ln -sf $(LIBNAME)-config libpng-config)
+	-@if [ ! -d $(DB) ]; then mkdir $(DB); fi
+	-@/bin/rm -f $(DB)/libpng-config
+	-@/bin/rm -f $(DB)/$(LIBNAME)-config
+	cp libpng-config $(DB)/$(LIBNAME)-config
+	chmod 755 $(DB)/$(LIBNAME)-config
+	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
 
 install: install-static install-shared install-man install-config
 

@@ -16,10 +16,8 @@ AR = ar rcs
 RANLIB = ranlib
 RM = rm -f
 
-# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
-# have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.3rc4
+PNGMIN = 1.2.3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -35,6 +33,9 @@ LIBPATH=$(prefix)/lib
 # via DESTDIR, that location must already exist before
 # you execute make install.
 DESTDIR=
+
+DI=$(DESTDIR)/$(INCPATH)
+DL=$(DESTDIR)/$(LIBPATH)
 
 CDEBUG = -g -DPNG_DEBUG=5
 LDDEBUG =
@@ -67,17 +68,16 @@ pngtest$(E): pngtest$(O) libpng$(A)
 	$(LD) -o $@ pngtest$(O) $(LDFLAGS)
 
 install: libpng.a
-	-@if [ ! -d $(DESTDIR)$(INCPATH)  ]; then mkdir $(DESTDIR)$(INCPATH); fi
-	-@if [ ! -d $(DESTDIR)$(INCPATH)/libpng  ]; then mkdir \
-	$(DESTDIR)$(INCPATH)/libpng; fi
-	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
-	-@rm $(DESTDIR)$(INCPATH)/png.h
-	-@rm $(DESTDIR)$(INCPATH)/pngconf.h
-	cp png.h pngconf.h $(DESTDIR)$(INCPATH)/libpng
-	chmod 644 $(DESTDIR)$(INCPATH)/libpng/png.h \
-	$(DESTDIR)$(INCPATH)/libpng/pngconf.h
-	(cd $(DESTDIR)$(INCPATH); ln -f -s libpng/* .)
-	cp libpng.a $(DESTDIR)$(LIBPATH)
+	-@if [ ! -d $(DI)  ]; then mkdir $(DI); fi
+	-@if [ ! -d $(DI)/libpng  ]; then mkdir $(DI)/libpng; fi
+	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
+	-@rm $(DI)/png.h
+	-@rm $(DI)/pngconf.h
+	cp png.h pngconf.h $(DI)/libpng
+	chmod 644 $(DI)/libpng/png.h \
+	$(DI)/libpng/pngconf.h
+	(cd $(DI); ln -f -s libpng/* .)
+	cp libpng.a $(DL)
 
 clean:
 	/bin/rm -f *.o libpng.a pngtest pngout.png

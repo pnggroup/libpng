@@ -1,19 +1,16 @@
 
-Libpng 1.2.3rc6 - May 13, 2002
+Libpng 1.2.3 - May 21, 2002
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Changes since the last public release (1.2.2):
 
-version 1.2.2patch03 [April 18, 2002]
   Changed ${PNGMAJ}.${PNGVER} bug to ${PNGVER} in makefile.sgi and makefile.sggcc
   Fixed VER -> PNGVER typo in makefile.macosx and added install-static to install
   Added install: target to makefile.32sunu and makefile.64sunu
   Revised 15 makefiles to link libpng.a to libpngNN.a and the include libpng
     subdirectory to libpngNN subdirectory without the full pathname.
   Moved generation of libpng.pc from "install" to "all" in 15 makefiles.
-version 1.2.3rc1 [April 27, 2002]
   Added install-man target to 15 makefiles (Dimitri Papadopolous-Orfanos).
   Added $(DESTDIR) feature to 24 makefiles (Tim Mooney)
   Fixed bug with $prefix, should be $(prefix) in makefile.hpux.
@@ -23,36 +20,18 @@ version 1.2.3rc1 [April 27, 2002]
   Revised makefile.darwin to make relative links without full pathname.
   Added setjmp() at the end of png_create_*_struct_2() in case user forgets
     to put one in their application.
-  Restored png_zalloc() and png_zfree() prototypes to version 1.2.1 and
-    removed them from module definition files.
-version 1.2.3rc2 [May 1, 2002]
-  Fixed bug in reporting number of channels in pngget.c and pngset.c,
-    that was introduced in version 1.2.2beta5.
-  Exported png_zalloc(), png_zfree(), png_default_read(), png_default_write(),
-    png_default_flush(), and png_push_fill_buffer() and included them in
-    module definition files.
+  Fixed bug in reporting number of channels in pngget.c, introduced in
+    version 1.2.2
   Added "libpng.pc" dependency to the "install-shared" target in 15 makefiles.
-version 1.2.3rc3 [May 1, 2002]
-  Revised prototype for png_default_flush()
   Remove old libpng.pc and libpngNN.pc before installing new ones.
-version 1.2.3rc4 [May 2, 2002]
-  Typos in *.def files (png_default_read|write -> png_default_read|write_data)
-  In makefiles, changed rm libpng.NN.pc to rm libpngNN.pc
-  Added libpng-config and libpngNN-config and modified makefiles to install them.
-  Changed $(MANPATH) to $(DESTDIR)$(MANPATH) in makefiles
+  Revised 15 makefiles to build libpng-config and libpngNN-config from
+    libpng-config-*.in.
   Added "Win32 DLL VB" configuration to projects/msvc/libpng.dsp
-version 1.2.3rc5 [May 11, 2002]
   Changed "error" and "message" in prototypes to "error_message" and
     "warning_message" to avoid namespace conflict.
-  Revised 15 makefiles to build libpng-config from libpng-config-*.in
-  Once more restored png_zalloc and png_zfree to nonexported form.
-  Restored png_default_read|write_data, png_default_flush, png_read_fill_buffer
-    to nonexported form, but with PNGAPI, and removed them from module def files.
-version 1.2.3rc6 [May 13, 2002]
-  Removed "PNGAPI" from png_zalloc() and png_zfree() in png.c
-  Changed "Gz" to "Gd" in projects/msvc/libpng.dsp and zlib.dsp.
-  Removed leftover libpng-config "sed" script from four makefiles.
-  Revised libpng-config creating script in 16 makefiles.
+  Restored png_zalloc and png_zfree to nonexported form as in libpng-1.2.1.
+  Removed description of png_set_mem_fn() from documentation.
+  Revised projects/msvc/README.txt
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

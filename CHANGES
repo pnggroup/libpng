@@ -1113,11 +1113,18 @@ version 1.2.3rc5 [May 11, 2002]
   Once more restored png_zalloc and png_zfree to regular nonexported form.
   Restored png_default_read|write_data, png_default_flush, png_read_fill_buffer
     to nonexported form, but with PNGAPI, and removed them from module def files.
-version 1.2.3rc6 [May 13, 2002]
+version 1.2.3rc6 [May 14, 2002]
   Removed "PNGAPI" from png_zalloc() and png_zfree() in png.c
   Changed "Gz" to "Gd" in projects/msvc/libpng.dsp and zlib.dsp.
   Removed leftover libpng-config "sed" script from four makefiles.
   Revised libpng-config creating script in 16 makefiles.
+version 1.2.3 [May 21, 2002]
+  Revised libpng-config target in makefile.cygwin.
+  Removed description of png_set_mem_fn() from documentation.
+  Revised makefile.freebsd.
+  Minor cosmetic changes to 15 makefiles, e.g., $(DI) = $(DESTDIR)/$(INCDIR).
+  Revised projects/msvc/README.txt
+  Changed -lpng to -lpngNN in LDFLAGS in several makefiles.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
