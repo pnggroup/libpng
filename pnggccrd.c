@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.6g - April 24, 2000
+ * libpng 1.0.6h - April 24, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson

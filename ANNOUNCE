@@ -1,5 +1,5 @@
 
-Libpng 1.0.6g - April 24, 2000
+Libpng 1.0.6h - April 24, 2000
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -33,7 +33,7 @@ version 1.0.6f [April 14, 2000]
   Removed superfluous prototype for png_set_itxt from png.h
   Removed "else" from pngread.c, after png_error(), and changed "0" to "length".
   Changed several png_errors about malformed ancillary chunks to png_warnings.
-version 1.0.6g [April 24, 2000]
+version 1.0.6h [April 24, 2000]
   Added png_pass-* arrays to pnggccrd.c when PNG_USE_LOCAL_ARRAYS is defined.
   Relocated paragraph about png_set_background() in libpng.3/libpng.txt
     and other revisions (Matthias Benckmann)

@@ -2,7 +2,7 @@
 # Contributed by Mike Hopkirk (hops@sco.com) modified from Makefile.lnx
 #   force ELF build dynamic linking, SONAME setting in lib and RPATH in app
 # Copyright (C) 1996, 1997 Andreas Dilger
-# Copyright (C) 1998 Greg Roelofs
+# Copyright (C) 1998, 2000 Greg Roelofs
 # For conditions of distribution and use, see copyright notice in png.h
 
 CC=cc
@@ -22,10 +22,10 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 #RANLIB=ranlib
 RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 10.  You should not
 # have to change it.
-PNGMAJ = 2
-PNGMIN = 1.0.6g
+PNGMAJ = 10
+PNGMIN = 6h
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include

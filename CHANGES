@@ -696,6 +696,9 @@ version 1.0.6g [April 24, 2000]
   Relocated info_ptr->free_me, png_ptr->free_me, and other info_ptr and
     png_ptr members to restore binary compatibility with libpng-1.0.5
     (breaks compatibility with libpng-1.0.6).
+version 1.0.6h [April 24, 2000]
+  Changed shared library so-number pattern from 2.x.y.z to xy.z (this builds
+    libpng.so.10 & libpng.so.10.6h instead of libpng.so.2 & libpng.so.2.1.0.6h)
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
