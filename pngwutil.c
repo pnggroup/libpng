@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng version 1.2.7 - September 12, 2004
+ * libpng version 1.2.8beta1 - November 1, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -219,7 +219,7 @@ png_text_compress(png_structp png_ptr,
             png_error(png_ptr, "zlib error");
       }
       /* check to see if we need more room */
-      if (!png_ptr->zstream.avail_out && png_ptr->zstream.avail_in)
+      if (!(png_ptr->zstream.avail_out))
       {
          /* make sure the output array has room */
          if (comp->num_output_ptr >= comp->max_output_ptr)

@@ -5,7 +5,7 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.7
+PNGMIN = 1.2.8beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc

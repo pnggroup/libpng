@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng  1.2.7 - September 12, 2004
+ * libpng  1.2.8beta1 - November 1, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -380,7 +380,8 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
 /* remove filler or alpha byte(s) */
 void /* PRIVATE */
-png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
+png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags,
+  png_uint_32 transformations)
 {
    png_debug(1, "in png_do_strip_filler\n");
 #if defined(PNG_USELESS_TESTS_SUPPORTED)
@@ -392,7 +393,9 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
       png_uint_32 row_width=row_info->width;
       png_uint_32 i;
 
-      if (row_info->color_type == PNG_COLOR_TYPE_RGB &&
+      if ((row_info->color_type == PNG_COLOR_TYPE_RGB ||
+         (row_info->color_type == PNG_COLOR_TYPE_RGBA &&
+         (transformations & PNG_STRIP_ALPHA))) &&
          row_info->channels == 4)
       {
          if (row_info->bit_depth == 8)
@@ -471,7 +474,9 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
          }
          row_info->channels = 3;
       }
-      else if (row_info->color_type == PNG_COLOR_TYPE_GRAY &&
+      else if ((row_info->color_type == PNG_COLOR_TYPE_GRAY &&
+         (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
+         (transformations & PNG_STRIP_ALPHA))) &&
           row_info->channels == 2)
       {
          if (row_info->bit_depth == 8)

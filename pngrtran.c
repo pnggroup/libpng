@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng version  1.2.7 - September 12, 2004
+ * libpng version  1.2.8beta1 - November 1, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1211,7 +1211,7 @@ png_do_read_transformations(png_structp png_ptr)
 #if defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
    if (png_ptr->transformations & PNG_STRIP_ALPHA)
       png_do_strip_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
-         PNG_FLAG_FILLER_AFTER);
+         PNG_FLAG_FILLER_AFTER,png_ptr->transformations);
 #endif
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)

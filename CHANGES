@@ -1364,6 +1364,12 @@ version 1.0.17rc1 and 1.2.7rc1 [September 4, 2004]
 version 1.0.17 and 1.2.7 [September 12, 2004]
   Added makefile.hp64
   Changed projects/msvc/png32ms.def to scripts/png32ms.def in makefile.cygwin
+version 1.2.8beta1 [November 1, 2004]
+  Fixed bug in png_text_compress() that would fail to complete a large block.
+  Fixed bug, introduced in libpng-1.2.7, that overruns a buffer during
+    strip alpha operation in png_do_strip_filler().
+  Added PNG_1_2_X definition in pngconf.h
+  #ifdef out png_info_init in png.c and png_read_init in pngread.c (as of 1.3.0)
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu (subscription required; write to

@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.7 - September 12, 2004
+ * libpng version 1.2.8beta1 - November 1, 2004
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -8,7 +8,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.7 - September 12, 2004: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.8beta1 - November 1, 2004: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -135,7 +135,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.2.7, September 12, 2004, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.2.8beta1, November 1, 2004, are
  * Copyright (c) 2004 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -247,13 +247,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    September 12, 2004
+ *    November 1, 2004
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.2.7 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.2.8beta1 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -309,9 +309,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.2.7"
+#define PNG_LIBPNG_VER_STRING "1.2.8beta1"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.7 - September 12, 2004 (header)\n"
+   " libpng version 1.2.8beta1 - November 1, 2004 (header)\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  %DLLNUM%
@@ -319,11 +319,11 @@
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   2
-#define PNG_LIBPNG_VER_RELEASE 7
+#define PNG_LIBPNG_VER_RELEASE 8
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  0
+#define PNG_LIBPNG_VER_BUILD  1
 
 #define PNG_LIBPNG_BUILD_ALPHA    1
 #define PNG_LIBPNG_BUILD_BETA     2
@@ -331,14 +331,14 @@
 #define PNG_LIBPNG_BUILD_STABLE   4
 #define PNG_LIBPNG_BUILD_TYPEMASK 7
 #define PNG_LIBPNG_BUILD_PATCH    8 /* Can be OR'ed with STABLE only */
-#define PNG_LIBPNG_BUILD_TYPE 4
+#define PNG_LIBPNG_BUILD_TYPE 2
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
  * Versions 0.7 through 1.0.0 were in the range 0 to 100 here (only
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=release */
-#define PNG_LIBPNG_VER 10207 /* 1.2.7 */
+#define PNG_LIBPNG_VER 10208 /* 1.2.8 */
 
 #ifndef PNG_VERSION_INFO_ONLY
 
@@ -1315,7 +1315,7 @@ struct png_struct_def
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_2_7;
+typedef png_structp version_1_2_8beta1;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -3090,7 +3090,7 @@ PNG_EXTERN void png_do_write_invert_alpha PNGARG((png_row_infop row_info,
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
 PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
-   png_bytep row, png_uint_32 flags));
+   png_bytep row, png_uint_32 flags, png_uint_32 transformations));
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)

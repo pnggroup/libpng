@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.7 - September 12, 2004
+ libpng version 1.2.8beta1 - November 1, 2004
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp@users.sourceforge.net>
  Copyright (c) 1998-2004 Glenn Randers-Pehrson
@@ -771,9 +771,10 @@ in RGB RGB RGB format unless png_set_filler() or png_set_add_alpha()
 is called to insert filler bytes, either before or after each RGB triplet.
 16-bit RGB data will be returned RRGGBB RRGGBB, with the most significant
 byte of the color value first, unless png_set_strip_16() is called to
-transform it to regular RGB RGB triplets, or png_set_filler|add alpha()
-is called to insert filler bytes, either before or after each RRGGBB
-triplet.  Similarly, 8-bit or 16-bit grayscale data can be modified with
+transform it to regular RGB RGB triplets, or png_set_filler() or
+png_set_add alpha() is called to insert filler bytes, either before or
+after each RRGGBB triplet.  Similarly, 8-bit or 16-bit grayscale data can
+be modified with
 png_set_filler(), png_set_add_alpha(), or png_set_strip_16().
 
 The following code transforms grayscale images of less than 8 to 8 bits,
@@ -867,7 +868,7 @@ to do that, you can add a true alpha channel with
     png_set_add_alpha(png_ptr, filler, PNG_FILLER_AFTER);
 
 where "filler" contains the alpha value to assign to each pixel.
-This function became available in libpng-1.2.7.
+This function was added in libpng-1.2.7.
 
 If you are reading an image with an alpha channel, and you need the
 data as ARGB instead of the normal PNG format RGBA:
@@ -2903,13 +2904,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-September 12, 2004
+November 1, 2004
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.7 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.8beta1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
