@@ -32,6 +32,9 @@
  *
  * The default value of TOO_FAR has been changed to 32767 in deflate.c
  * Glenn Randers-Pehrson, February 2000.
+ *
+ * The switch statement in inflate.c was rearranged so that case BLOCKS is
+ * checked first.  Glenn Randers-Pehrson, April 2001.
  */
 
 #ifndef _ZLIB_H

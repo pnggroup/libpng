@@ -160,6 +160,52 @@ int f;
   r = Z_BUF_ERROR;
   while (1) switch (z->state->mode)
   {
+    case BLOCKS:
+      r = inflate_blocks(z->state->blocks, z, r);
+      if (r == Z_DATA_ERROR)
+      {
+        z->state->mode = BAD;
+        z->state->sub.marker = 0;       /* can try inflateSync */
+        break;
+      }
+      if (r == Z_OK)
+        r = f;
+      if (r != Z_STREAM_END)
+        return r;
+      r = f;
+      inflate_blocks_reset(z->state->blocks, z, &z->state->sub.check.was);
+      if (z->state->nowrap)
+      {
+        z->state->mode = DONE;
+        break;
+      }
+      z->state->mode = CHECK4;
+    case CHECK4:
+      NEEDBYTE
+      z->state->sub.check.need = (uLong)NEXTBYTE << 24;
+      z->state->mode = CHECK3;
+    case CHECK3:
+      NEEDBYTE
+      z->state->sub.check.need += (uLong)NEXTBYTE << 16;
+      z->state->mode = CHECK2;
+    case CHECK2:
+      NEEDBYTE
+      z->state->sub.check.need += (uLong)NEXTBYTE << 8;
+      z->state->mode = CHECK1;
+    case CHECK1:
+      NEEDBYTE
+      z->state->sub.check.need += (uLong)NEXTBYTE;
+      if (z->state->sub.check.was != z->state->sub.check.need)
+      {
+        z->state->mode = BAD;
+        z->msg = (char*)"incorrect data check";
+        z->state->sub.marker = 5;       /* can't try inflateSync */
+        break;
+      }
+      Tracev((stderr, "inflate: zlib check ok\n"));
+      z->state->mode = DONE;
+    case DONE:
+      return Z_STREAM_END;
     case METHOD:
       NEEDBYTE
       if (((z->state->sub.method = NEXTBYTE) & 0xf) != Z_DEFLATED)
@@ -217,52 +263,6 @@ int f;
       z->msg = (char*)"need dictionary";
       z->state->sub.marker = 0;       /* can try inflateSync */
       return Z_STREAM_ERROR;
-    case BLOCKS:
-      r = inflate_blocks(z->state->blocks, z, r);
-      if (r == Z_DATA_ERROR)
-      {
-        z->state->mode = BAD;
-        z->state->sub.marker = 0;       /* can try inflateSync */
-        break;
-      }
-      if (r == Z_OK)
-        r = f;
-      if (r != Z_STREAM_END)
-        return r;
-      r = f;
-      inflate_blocks_reset(z->state->blocks, z, &z->state->sub.check.was);
-      if (z->state->nowrap)
-      {
-        z->state->mode = DONE;
-        break;
-      }
-      z->state->mode = CHECK4;
-    case CHECK4:
-      NEEDBYTE
-      z->state->sub.check.need = (uLong)NEXTBYTE << 24;
-      z->state->mode = CHECK3;
-    case CHECK3:
-      NEEDBYTE
-      z->state->sub.check.need += (uLong)NEXTBYTE << 16;
-      z->state->mode = CHECK2;
-    case CHECK2:
-      NEEDBYTE
-      z->state->sub.check.need += (uLong)NEXTBYTE << 8;
-      z->state->mode = CHECK1;
-    case CHECK1:
-      NEEDBYTE
-      z->state->sub.check.need += (uLong)NEXTBYTE;
-      if (z->state->sub.check.was != z->state->sub.check.need)
-      {
-        z->state->mode = BAD;
-        z->msg = (char*)"incorrect data check";
-        z->state->sub.marker = 5;       /* can't try inflateSync */
-        break;
-      }
-      Tracev((stderr, "inflate: zlib check ok\n"));
-      z->state->mode = DONE;
-    case DONE:
-      return Z_STREAM_END;
     case BAD:
       return Z_DATA_ERROR;
     default:

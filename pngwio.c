@@ -1,9 +1,9 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 1.0.9beta5 - December 14, 2000
+ * libpng 1.0.11 - April 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -17,6 +17,7 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+#ifdef PNG_WRITE_SUPPORTED
 
 /* Write the data to whatever output you are using.  The default routine
    writes to a file pointer.  Note that this routine sometimes gets called
@@ -224,3 +225,4 @@ void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
 }
 #   endif
 #   endif
+#endif /* PNG_WRITE_SUPPORTED */

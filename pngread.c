@@ -1,9 +1,9 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.9beta5 - December 14, 2000
+ * libpng 1.0.11 - April 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -246,6 +246,8 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
          else
             png_error(png_ptr, "PNG file corrupted by ASCII conversion");
       }
+      if (num_checked < 3)
+         png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
    }
 
    for(;;)
@@ -665,8 +667,11 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
+/*       old interface (pre-1.0.9):
          png_do_read_interlace(&(png_ptr->row_info),
             png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
+ */
+         png_do_read_interlace(png_ptr);
 
       if (dsp_row != NULL)
          png_combine_row(png_ptr, dsp_row,
@@ -710,7 +715,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta5
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.11
  */
 
 void PNGAPI
@@ -759,7 +764,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta5
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.11
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -1047,7 +1052,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 }
 
 /* free all memory used by the read (old method) */
-void PNGAPI
+void /* PRIVATE */
 png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr)
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -1300,7 +1305,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
    /* Optional call to gamma correct and add the background to the palette
     * and update info structure.  REQUIRED if you are expecting libpng to
-    * update the palette for you (ie you selected such a transform above).
+    * update the palette for you (i.e., you selected such a transform above).
     */
    png_read_update_info(png_ptr, info_ptr);
 
@@ -1312,13 +1317,15 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    if(info_ptr->row_pointers == NULL)
    {
       info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
-                                         info_ptr->height * sizeof(png_bytep));
+         info_ptr->height * sizeof(png_bytep));
 #ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_ROWS;
 #endif
       for (row = 0; row < (int)info_ptr->height; row++)
-         info_ptr->row_pointers[row] = png_malloc(png_ptr,
+      {
+         info_ptr->row_pointers[row] = (png_bytep)png_malloc(png_ptr,
             png_get_rowbytes(png_ptr, info_ptr));
+      }
    }
 
    png_read_image(png_ptr, info_ptr->row_pointers);
@@ -1327,7 +1334,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* read rest of file, and get additional chunks in info_ptr - REQUIRED */
    png_read_end(png_ptr, info_ptr);
 
-   if(transforms == 0 || params == (voidp)NULL)
+   if(transforms == 0 || params == NULL)
       /* quiet compiler warnings */ return;
 
 }

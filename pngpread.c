@@ -1,9 +1,9 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.9beta5 - December 14, 2000
+ * libpng 1.0.11 - April 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -772,18 +772,42 @@ png_push_process_row(png_structp png_ptr)
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
+/*       old interface (pre-1.0.9):
          png_do_read_interlace(&(png_ptr->row_info),
             png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
+ */
+         png_do_read_interlace(png_ptr);
 
-      switch (png_ptr->pass)
-      {
+    switch (png_ptr->pass)
+    {
          case 0:
          {
             int i;
             for (i = 0; i < 8 && png_ptr->pass == 0; i++)
             {
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
-               png_read_push_finish_row(png_ptr);
+               png_read_push_finish_row(png_ptr); /* updates png_ptr->pass */
+            }
+            if (png_ptr->pass == 2) /* pass 1 might be empty */
+            {
+               for (i = 0; i < 4 && png_ptr->pass == 2; i++)
+               {
+                  png_push_have_row(png_ptr, NULL);
+                  png_read_push_finish_row(png_ptr);
+               }
+            }
+	    if (png_ptr->pass == 4 && png_ptr->height <= 4)
+	    {
+	        for (i = 0; i < 2 && png_ptr->pass == 4; i++)
+                {
+                   png_push_have_row(png_ptr, NULL);
+                   png_read_push_finish_row(png_ptr);
+                }
+            }
+            if (png_ptr->pass == 6 && png_ptr->height <= 4)
+            {
+                png_push_have_row(png_ptr, NULL);
+                png_read_push_finish_row(png_ptr);
             }
             break;
          }
@@ -795,7 +819,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 2)
+            if (png_ptr->pass == 2) /* skip top 4 generated rows */
             {
                for (i = 0; i < 4 && png_ptr->pass == 2; i++)
                {
@@ -818,6 +842,14 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
             }
+            if (png_ptr->pass == 4) /* pass 3 might be empty */
+            {
+               for (i = 0; i < 2 && png_ptr->pass == 4; i++)
+               {
+                  png_push_have_row(png_ptr, NULL);
+                  png_read_push_finish_row(png_ptr);
+               }
+            }
             break;
          }
          case 3:
@@ -828,7 +860,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 4)
+            if (png_ptr->pass == 4) /* skip top two generated rows */
             {
                for (i = 0; i < 2 && png_ptr->pass == 4; i++)
                {
@@ -851,6 +883,11 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
             }
+            if (png_ptr->pass == 6) /* pass 5 might be empty */
+            {
+               png_push_have_row(png_ptr, NULL);
+               png_read_push_finish_row(png_ptr);
+            }
             break;
          }
          case 5:
@@ -861,7 +898,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 6)
+            if (png_ptr->pass == 6) /* skip top generated row */
             {
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
@@ -928,6 +965,11 @@ png_read_push_finish_row(png_structp png_ptr)
       do
       {
          png_ptr->pass++;
+         if ((png_ptr->pass == 1 && png_ptr->width < 5) ||
+             (png_ptr->pass == 3 && png_ptr->width < 3) ||
+             (png_ptr->pass == 5 && png_ptr->width < 2))
+           png_ptr->pass++;
+
          if (png_ptr->pass >= 7)
             break;
 
@@ -953,7 +995,8 @@ png_read_push_finish_row(png_structp png_ptr)
 
 #if defined(PNG_READ_tEXt_SUPPORTED)
 void /* PRIVATE */
-png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
+png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
+   length)
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
@@ -965,7 +1008,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
 #ifdef PNG_MAX_MALLOC_64K
    png_ptr->skip_length = 0;  /* This may not be necessary */
 
-   if (length > (png_uint_32)65535L) /* Can't hold the entire string in memory */
+   if (length > (png_uint_32)65535L) /* Can't hold entire string in memory */
    {
       png_warning(png_ptr, "tEXt chunk too large to fit in memory");
       png_ptr->skip_length = length - (png_uint_32)65535L;
@@ -1044,7 +1087,8 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
 
 #if defined(PNG_READ_zTXt_SUPPORTED)
 void /* PRIVATE */
-png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
+png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
+   length)
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
@@ -1156,8 +1200,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
             if (text == NULL)
             {
                text = (png_charp)png_malloc(png_ptr,
-                  (png_uint_32)(png_ptr->zbuf_size - png_ptr->zstream.avail_out +
-                     key_size + 1));
+                  (png_uint_32)(png_ptr->zbuf_size - png_ptr->zstream.avail_out
+                     + key_size + 1));
                png_memcpy(text + key_size, png_ptr->zbuf,
                   png_ptr->zbuf_size - png_ptr->zstream.avail_out);
                png_memcpy(text, key, key_size);
@@ -1228,7 +1272,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 
 #if defined(PNG_READ_iTXt_SUPPORTED)
 void /* PRIVATE */
-png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
+png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
+   length)
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
@@ -1240,7 +1285,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
 #ifdef PNG_MAX_MALLOC_64K
    png_ptr->skip_length = 0;  /* This may not be necessary */
 
-   if (length > (png_uint_32)65535L) /* Can't hold the entire string in memory */
+   if (length > (png_uint_32)65535L) /* Can't hold entire string in memory */
    {
       png_warning(png_ptr, "iTXt chunk too large to fit in memory");
       png_ptr->skip_length = length - (png_uint_32)65535L;
@@ -1338,7 +1383,8 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
  * name or a critical chunk), the chunk is (currently) silently ignored.
  */
 void /* PRIVATE */
-png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
+png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
+   length)
 {
    png_uint_32 skip=0;
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
@@ -1349,7 +1395,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 len
       if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
            HANDLE_CHUNK_ALWAYS
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-           && png_ptr->read_user_chunk_fn == (png_user_chunk_ptr)NULL
+           && png_ptr->read_user_chunk_fn == NULL
 #endif
          )
 #endif
@@ -1374,12 +1420,12 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 len
        }
 #endif
 
-       strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
+       png_strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
        chunk.data = (png_bytep)png_malloc(png_ptr, length);
        png_crc_read(png_ptr, chunk.data, length);
        chunk.size = length;
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-       if(png_ptr->read_user_chunk_fn != (png_user_chunk_ptr)NULL)
+       if(png_ptr->read_user_chunk_fn != NULL)
        {
           /* callback to user unknown chunk handler */
           if ((*(png_ptr->read_user_chunk_fn)) (png_ptr, &chunk) <= 0)

@@ -1,9 +1,9 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.9beta5 - December 14, 2000
+ * libpng 1.0.11 - April 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -119,7 +119,12 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(png_ptr->malloc_fn != NULL)
-       return ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
+   {
+       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
+       if (ret == NULL)
+          png_error(png_ptr, "Out of memory!");
+       return (ret);
+   }
    else
        return png_malloc_default(png_ptr, size);
 }
@@ -373,15 +378,18 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn)
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
 {
-#ifndef PNG_USER_MEM_SUPPORTED
    png_voidp ret;
-#endif
    if (png_ptr == NULL || size == 0)
       return ((png_voidp)NULL);
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(png_ptr->malloc_fn != NULL)
-       return ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
+   {
+       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
+       if (ret == NULL)
+          png_error(png_ptr, "Out of Memory!");
+       return (ret);
+   }
    else
        return (png_malloc_default(png_ptr, size));
 }
@@ -407,9 +415,7 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 #endif
 
    if (ret == NULL)
-   {
       png_error(png_ptr, "Out of Memory");
-   }
 
    return (ret);
 }

@@ -1,9 +1,9 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.9beta5 - December 14, 2000
+ * libpng 1.0.11 - April 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -11,6 +11,7 @@
 /* get internal access to png.h */
 #define PNG_INTERNAL
 #include "png.h"
+#ifdef PNG_WRITE_SUPPORTED
 
 /* Writes all the PNG information.  This is the suggested way to use the
  * library.  If you have a new chunk to add, make a function to write it,
@@ -28,6 +29,13 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
    if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
    {
    png_write_sig(png_ptr); /* write PNG signature */
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+   if((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&(png_ptr->mng_features_permitted))
+   {
+      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream\n");
+      png_ptr->mng_features_permitted=0;
+   }
+#endif
    /* write IHDR information. */
    png_write_IHDR(png_ptr, info_ptr->width, info_ptr->height,
       info_ptr->bit_depth, info_ptr->color_type, info_ptr->compression_type,
@@ -57,7 +65,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_WRITE_iCCP_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_iCCP)
-      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_TEXT_COMPRESSION_zTXt,
+      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_COMPRESSION_TYPE_BASE,
                      info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
 #endif
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
@@ -774,6 +782,15 @@ png_write_row(png_structp png_ptr, png_bytep row)
       png_do_write_transformations(png_ptr);
 
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
+   /* Write filter_method 64 (intrapixel differencing) only if
+    * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
+    * 2. Libpng did not write a PNG signature (this filter_method is only
+    *    used in PNG datastreams that are embedded in MNG datastreams) and
+    * 3. The application called png_permit_mng_features with a mask that
+    *    included PNG_FLAG_MNG_FILTER_64 and
+    * 4. The filter_method is 64 and
+    * 5. The color_type is RGB or RGBA
+    */
    if((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
       (png_ptr->filter_type == PNG_INTRAPIXEL_DIFFERENCING))
    {
@@ -908,7 +925,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 
 
 /* Free any memory used in png_ptr struct (old method) */
-void PNGAPI
+void /* PRIVATE */
 png_write_destroy(png_structp png_ptr)
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -977,6 +994,11 @@ void PNGAPI
 png_set_filter(png_structp png_ptr, int method, int filters)
 {
    png_debug(1, "in png_set_filter\n");
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+   if((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+      (method == PNG_INTRAPIXEL_DIFFERENCING))
+         method = PNG_FILTER_TYPE_BASE;
+#endif
    if (method == PNG_FILTER_TYPE_BASE)
    {
       switch (filters & (PNG_ALL_FILTERS | 0x07))
@@ -1116,12 +1138,11 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 
       if (png_ptr->filter_weights == NULL)
       {
-         png_ptr->filter_weights = (png_uint_16p) png_malloc(png_ptr,
+         png_ptr->filter_weights = (png_uint_16p)png_malloc(png_ptr,
             (png_uint_32)(sizeof(png_uint_16) * num_weights));
 
-         png_ptr->inv_filter_weights = (png_uint_16p) png_malloc(png_ptr,
+         png_ptr->inv_filter_weights = (png_uint_16p)png_malloc(png_ptr,
             (png_uint_32)(sizeof(png_uint_16) * num_weights));
-
          for (i = 0; i < num_weights; i++)
          {
             png_ptr->inv_filter_weights[i] =
@@ -1151,10 +1172,10 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
     */
    if (png_ptr->filter_costs == NULL)
    {
-      png_ptr->filter_costs = (png_uint_16p) png_malloc(png_ptr,
+      png_ptr->filter_costs = (png_uint_16p)png_malloc(png_ptr,
          (png_uint_32)(sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
 
-      png_ptr->inv_filter_costs = (png_uint_16p) png_malloc(png_ptr,
+      png_ptr->inv_filter_costs = (png_uint_16p)png_malloc(png_ptr,
          (png_uint_32)(sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
 
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
@@ -1338,7 +1359,8 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
    /* It is REQUIRED to call this to finish writing the rest of the file */
    png_write_end(png_ptr, info_ptr);
 
-   if(transforms == 0 || params == (voidp)NULL)
+   if(transforms == 0 || params == NULL)
       /* quiet compiler warnings */ return;
 }
 #endif
+#endif /* PNG_WRITE_SUPPORTED */

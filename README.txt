@@ -10,7 +10,7 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
  * If you have modified this source, you may insert additional notices
  * immediately after this sentence.
  *
- * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+ * Copyright (C) 1998-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
@@ -25,7 +25,7 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
  * risk of satisfactory quality, performance, accuracy, and effort is with
  * the user.
  *
- * Permission is hereby irrevocably granted to anyone to use, copy, modify,
+ * Permission is hereby irrevocably granted to everyone to use, copy, modify,
  * and distribute this source code, or portions hereof, for any purpose,
  * without payment of any fee, subject to the following restrictions:
  *
@@ -40,13 +40,14 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
 
 This is the output of "pngcrush" and "pngcrush -help":
 
- | pngcrush 1.5.3, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
- | This is a free, open-source program.  Permission is
- | irrevocably granted to everyone to use this version
- | of pngcrush without payment of any fee.
- | This program was built with libpng version 1.0.9beta5,
- | and is running with  libpng version 1.0.9beta5 - December 14, 2000 (header)
- |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
+
+ | pngcrush 1.5.4, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+ | This is a free, open-source program.  Permission is irrevocably
+ | granted to everyone to use this version of pngcrush without
+ | payment of any fee.
+ | This program was built with libpng version 1.0.11, and is
+ | running with  libpng version 1.0.11 - April 27, 2001 (header)
+ |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  | and zlib version 1.1.3pc, Copyright (C) 1998,
@@ -58,9 +59,9 @@ usage: pngcrush [options] infile.png outfile.png
        pngcrush -d dir [other options] files.png ...
 options:
       -already already_crushed_size [e.g., 8192]
+    -bit_depth depth (bit_depth to use in output file)
         -brute (Use brute-force, try 114 different methods [11-124])
             -c color_type of output file [0, 2, 4, or 6]
-           -cc (do color counting)
             -d directory_name (where output files will go)
  -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
             -e extension  (used for creating output filename)
@@ -71,9 +72,9 @@ options:
          -iccp length "Profile Name" iccp_file
          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
             -l zlib_compression_level [0-9]
+         -loco ("loco crush" truecolor PNGs)
             -m method [0 through 200]
-          -max maximum_IDAT_size [default 524288]
-        -no_cc (no color counting)
+          -max maximum_IDAT_size [default 8192]
             -n (no save; does not do compression or write output PNG)
      -plte_len n (truncate PLTE)
             -q (quiet)
@@ -82,7 +83,6 @@ options:
 -replace_gamma gamma (float or fixed*100000) even if gAMA is present.
           -res dpi
          -srgb [0, 1, 2, or 3]
-         -loco ("loco crush" truecolor PNGs)
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
          -trns index red green blue gray
             -v (display more detailed information)
@@ -90,6 +90,24 @@ options:
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
             -h (help and legal notices)
             -p (pause)
+
+
+ | pngcrush 1.5.4, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+ | This is a free, open-source program.  Permission is irrevocably
+ | granted to everyone to use this version of pngcrush without
+ | payment of any fee.
+ | This program was built with libpng version 1.0.11, and is
+ | running with  libpng version 1.0.11 - April 27, 2001 (header)
+ |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
+ |    Copyright (C) 1996, 1997 Andreas Dilger,
+ |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
+ | and zlib version 1.1.3pc, Copyright (C) 1998,
+ |    Jean-loup Gailly and Mark Adler.
+
+
+usage: pngcrush [options] infile.png outfile.png
+       pngcrush -e ext [other options] files.png ...
+       pngcrush -d dir [other options] files.png ...
 
 options (Note: any option can be spelled out for clarity, e.g.,
           "pngcrush -dir New -method 7 -remove bkgd *.png"
@@ -101,6 +119,10 @@ options (Note: any option can be spelled out for clarity, e.g.,
                will be considered to be already crushed and will
                not be processed, unless you are making other changes
                or the "-force" option is present.
+
+    -bit_depth depth (bit_depth to use in output file)
+
+               Default output depth is same as input depth.
 
         -brute (Use brute-force, try 114 different methods [11-124])
 
@@ -119,8 +141,6 @@ options (Note: any option can be spelled out for clarity, e.g.,
                You can use 0 or 4 to convert color to grayscale.
                Use 0 or 2 to delete an unwanted alpha channel.
                Default is to use same color type as the input file.
-
-           -cc (do color counting)
 
             -d directory_name (where output files will go)
 
@@ -174,6 +194,15 @@ options (Note: any option can be spelled out for clarity, e.g.,
                with the preceding '-m method' or '-brute_force'
                argument.
 
+         -loco ("loco crush" truecolor PNGs)
+
+               Make the file more compressible by performing a
+               lossless reversible color transformation.
+               The resulting file is a MNG, not a PNG, and should
+               be given the ".mng" file extension.  The
+               "loco" option has no effect on grayscale or
+               indexed-color PNG files.
+
             -m method [0 through 200]
 
                pngcrush method to try (0 means try all of 1-10).
@@ -184,10 +213,7 @@ options (Note: any option can be spelled out for clarity, e.g.,
                1, 4, and 7 use no filtering; methods 11 and up use 
                specified filter, compression level, and strategy.
 
-          -max maximum_IDAT_size [default 524288]
-
-        -no_cc (no color counting)
-
+          -max maximum_IDAT_size [default 8192]
             -n (no save; does not do compression or write output PNG)
 
                Useful in conjunction with -v option to get info.
@@ -228,15 +254,6 @@ options (Note: any option can be spelled out for clarity, e.g.,
          -srgb [0, 1, 2, or 3]
 
                Value of 'rendering intent' for sRGB chunk.
-
-         -loco ("loco crush" truecolor PNGs)
-
-               Make the file more compressible by performing a
-               lossless reversible color transformation.
-               The resulting file is a MNG, not a PNG, and should
-               be given the ".mng" file extension.  The
-               "loco" option has no effect on grayscale or
-               indexed-color PNG files.
 
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
 
@@ -294,31 +311,3 @@ options (Note: any option can be spelled out for clarity, e.g.,
                screen scrolls out of sight.
 
 
-Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
-
-
-DISCLAIMER: The pngcrush computer program is supplied "AS IS".
-The Author disclaims all warranties, expressed or implied, including,
-without limitation, the warranties of merchantability and of fitness
-for  any purpose.  The Author assumes no liability for direct, indirect,
-incidental, special, exemplary, or consequential damages, which may
-result from the use of the computer program, even if advised of the
-possibility of such damage.  There is no warranty against interference
-with your enjoyment of the computer program or against infringement.
-There is no warranty that my efforts or the computer program will
-fulfill any of your particular purposes or needs.  This computer
-program is provided with all faults, and the entire risk of satisfactory
-quality, performance, accuracy, and effort is with the user.
-
-LICENSE: Permission is hereby irrevocably granted to everyone to use,
-copy, modify, and distribute this computer program, or portions hereof,
-purpose, without payment of any fee, subject to the following
-restrictions:
-
-1. The origin of this binary or source code must not be misrepresented.
-
-2. Altered versions must be plainly marked as such and must not be
-misrepresented as being the original binary or source.
-
-3. The Copyright notice, disclaimer, and license may not be removed
-or altered from any source, binary, or altered source distribution.

@@ -18,6 +18,10 @@
 #define PNGCRUSH_LIBPNG_VER 10007
 #endif
 
+#if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD)
+#define PNG_NO_ASSEMBLER_CODE
+#endif
+
 #ifndef PNG_NO_ZALLOC_ZERO
 #  define PNG_NO_ZALLOC_ZERO  /* speeds it up a little */
 #endif
@@ -26,7 +30,7 @@
 #  define PNG_USER_MEM_SUPPORTED
 #endif
 
-#define PNG_MNG_FEATURES_SUPPORTED /* extra filter types */
+#define PNG_MNG_FEATURES_SUPPORTED /* extra filter type */
 
 #ifndef PNG_NO_LEGACY_SUPPORTED
 #  define PNG_NO_LEGACY_SUPPORTED
@@ -41,8 +45,6 @@
 #define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #endif
 
-#define PNG_NO_READ_cHRM
-#define PNG_NO_WRITE_cHRM
 #define PNG_NO_READ_hIST
 #define PNG_NO_WRITE_hIST
 #define PNG_NO_READ_pCAL
@@ -87,9 +89,6 @@
 #  if (PNGCRUSH_LIBPNG_VER < 10007)
 #    define PNG_NO_READ_RGB_TO_GRAY
 #  endif
-#endif
-#if !defined(PNG_ZBUF_SIZE) && (PNGCRUSH_LIBPNG_VER > 97)
-#  define PNG_ZBUF_SIZE 524288       /* increases the IDAT size */
 #endif
 
 /* Changed in version 0.99 */

@@ -1,9 +1,9 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.9beta5 - December 14, 2000
+ * libpng 1.0.11 - April 27, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -61,11 +61,12 @@ png_warning(png_structp png_ptr, png_const_charp message)
  */
 #define isnonalpha(c) ((c) < 41 || (c) > 122 || ((c) > 90 && (c) < 97))
 static PNG_CONST char png_digit[16] = {
-   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-};
+   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+   'F' };
 
 static void /* PRIVATE */
-png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp message)
+png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
+   message)
 {
    int iout = 0, iin = 0;
 
@@ -107,7 +108,7 @@ png_chunk_error(png_structp png_ptr, png_const_charp message)
 void PNGAPI
 png_chunk_warning(png_structp png_ptr, png_const_charp message)
 {
-   char msg[16+64];
+   char msg[18+64];
    png_format_buffer(png_ptr, msg, message);
    png_warning(png_ptr, msg);
 }
