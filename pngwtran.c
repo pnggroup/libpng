@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng 1.2.0beta1 - May 6, 2001
+ * libpng 1.2.0beta2 - May 7, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -10,6 +10,7 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+#ifdef PNG_WRITE_SUPPORTED
 
 /* Transform the data according to the user's wishes.  The order of
  * transformations is significant.
@@ -559,3 +560,4 @@ png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
    }
 }
 #endif /* PNG_MNG_FEATURES_SUPPORTED */
+#endif /* PNG_WRITE_SUPPORTED */

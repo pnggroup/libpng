@@ -940,6 +940,9 @@ version 1.2.0beta1 [May 6, 2001]
     by default.
   Added runtime selection of MMX features.
   Added png_set_strip_error_numbers function and related macros.
+version 1.2.0beta2 [May 7, 2001]
+  Finished merging 1.2.0beta1 with version 1.0.9
+  Added a check for attempts to read or write PLTE in grayscale PNG datastreams.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

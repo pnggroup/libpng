@@ -338,7 +338,8 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    for (row = 0; row < height; row++)
    {
-      row_pointers[row] = malloc(png_get_rowbytes(png_ptr, info_ptr));
+      row_pointers[row] = png_malloc(png_ptr, png_get_rowbytes(png_ptr,
+         info_ptr));
    }
 
    /* Now it's time to read the image.  One of these methods is REQUIRED */
@@ -494,7 +495,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
  * png_progressive_combine_row() passing in the row and the
  * old row.  You can call this function for NULL rows (it will
  * just return) and for non-interlaced images (it just does the
- * memcpy for you) if it will make the code easier.  Thus, you
+ * png_memcpy for you) if it will make the code easier.  Thus, you
  * can just do this for all cases:
  */
 
@@ -603,7 +604,8 @@ void write_png(char *file_name /* , ... other image information ... */)
       PNG_INTERLACE_????, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
    /* set the palette if there is one.  REQUIRED for indexed-color images */
-   palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH * sizeof (png_color));
+   palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH
+             * sizeof (png_color));
    /* ... set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
    /* You must not free palette here, because png_set_PLTE only makes a link to

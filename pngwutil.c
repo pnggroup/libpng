@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.2.0beta1 - May 6, 2001
+ * libpng 1.2.0beta2 - May 7, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -10,6 +10,7 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+#ifdef PNG_WRITE_SUPPORTED
 
 /* Place a 32-bit number into a buffer in PNG byte order.  We work
  * with unsigned numbers for convenience, although one supported
@@ -234,8 +235,8 @@ png_text_compress(png_structp png_ptr,
                old_ptr = comp->output_ptr;
                comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                   (png_uint_32)(comp->max_output_ptr * sizeof (png_charpp)));
-               png_memcpy(comp->output_ptr, old_ptr,
-           old_max * sizeof (png_charp));
+               png_memcpy(comp->output_ptr, old_ptr, old_max
+                  * sizeof (png_charp));
                png_free(png_ptr, old_ptr);
             }
             else
@@ -284,7 +285,7 @@ png_text_compress(png_structp png_ptr,
                   comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                      (png_uint_32)(comp->max_output_ptr * sizeof (png_charpp)));
                   png_memcpy(comp->output_ptr, old_ptr,
-              old_max * sizeof (png_charp));
+                     old_max * sizeof (png_charp));
                   png_free(png_ptr, old_ptr);
                }
                else
@@ -434,7 +435,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
       !((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
       ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
-      (color_type == PNG_COLOR_TYPE_RGB || 
+      (color_type == PNG_COLOR_TYPE_RGB ||
        color_type == PNG_COLOR_TYPE_RGB_ALPHA) &&
       (filter_type == PNG_INTRAPIXEL_DIFFERENCING)) &&
 #endif
@@ -538,16 +539,23 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
         !(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE) &&
 #endif
         num_pal == 0) || num_pal > 256)
+   {
+     if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
      {
-       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-         {
-           png_error(png_ptr, "Invalid number of colors in palette");
-         }
-       else
-         {
-           png_warning(png_ptr, "Invalid number of colors in palette");
-           return;
-         }
+        png_error(png_ptr, "Invalid number of colors in palette");
+     }
+     else
+     {
+        png_warning(png_ptr, "Invalid number of colors in palette");
+        return;
+     }
+   }
+
+   if (!(png_ptr->color_type&PNG_COLOR_MASK_COLOR))
+   {
+      png_warning(png_ptr,
+        "Ignoring request to write a PLTE chunk in grayscale PNG");
+      return;
    }
 
    png_ptr->num_palette = (png_uint_16)num_pal;
@@ -728,7 +736,7 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
    }
 
    /* make sure we include the NULL after the name */
-   png_write_chunk_start(png_ptr, (png_bytep) png_sPLT,
+   png_write_chunk_start(png_ptr, (png_bytep)png_sPLT,
           (png_uint_32)(name_len + 2 + palette_size));
    png_write_chunk_data(png_ptr, (png_bytep)new_name, name_len + 1);
    png_write_chunk_data(png_ptr, (png_bytep)&spalette->depth, 1);
@@ -1486,8 +1494,8 @@ png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
    png_debug1(3, "sCAL total length = %d\n", total_len);
    png_write_chunk_start(png_ptr, (png_bytep)png_sCAL, (png_uint_32)total_len);
    png_write_chunk_data(png_ptr, (png_bytep)&unit, 1);
-   png_write_chunk_data(png_ptr, (png_bytep)wbuf, strlen(wbuf)+1);
-   png_write_chunk_data(png_ptr, (png_bytep)hbuf, strlen(hbuf));
+   png_write_chunk_data(png_ptr, (png_bytep)wbuf, png_strlen(wbuf)+1);
+   png_write_chunk_data(png_ptr, (png_bytep)hbuf, png_strlen(hbuf));
 
    png_write_chunk_end(png_ptr);
 }
@@ -1505,15 +1513,15 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
 
    png_debug(1, "in png_write_sCAL_s\n");
 
-   strcpy(wbuf,(const char *)width);
-   strcpy(hbuf,(const char *)height);
+   png_strcpy(wbuf,(const char *)width);
+   png_strcpy(hbuf,(const char *)height);
    total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
 
    png_debug1(3, "sCAL total length = %d\n", total_len);
    png_write_chunk_start(png_ptr, (png_bytep)png_sCAL, (png_uint_32)total_len);
    png_write_chunk_data(png_ptr, (png_bytep)&unit, 1);
-   png_write_chunk_data(png_ptr, (png_bytep)wbuf, strlen(wbuf)+1);
-   png_write_chunk_data(png_ptr, (png_bytep)hbuf, strlen(hbuf));
+   png_write_chunk_data(png_ptr, (png_bytep)wbuf, png_strlen(wbuf)+1);
+   png_write_chunk_data(png_ptr, (png_bytep)hbuf, png_strlen(hbuf));
 
    png_write_chunk_end(png_ptr);
 }
@@ -2631,3 +2639,4 @@ png_write_filtered_row(png_structp png_ptr, png_bytep filtered_row)
    }
 #endif
 }
+#endif /* PNG_WRITE_SUPPORTED */
