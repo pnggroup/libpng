@@ -228,9 +228,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
         if ((pbImageData = (png_byte *) malloc(ulRowBytes * (*piHeight)
                             * sizeof(png_byte))) == NULL)
         {
-            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-            *ppbImageData = pbImageData = NULL;
-            return FALSE;
+            png_error(png_ptr, "Visual PNG: out of memory");
         }
         *ppbImageData = pbImageData;
         
@@ -239,10 +237,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
         if ((ppbRowPointers = (png_bytepp) malloc((*piHeight)
                             * sizeof(png_bytep))) == NULL)
         {
-            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-            free(pbImageData);
-            *ppbImageData = pbImageData = NULL;
-            return FALSE;
+            png_error(png_ptr, "Visual PNG: out of memory");
         }
         
         // set the individual row-pointers to point at the correct offsets
@@ -269,6 +264,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
     Catch (msg)
     {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
         *ppbImageData = pbImageData = NULL;
         
         if(ppbRowPointers)

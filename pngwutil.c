@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.7rc1 - June 9, 2000
+ * libpng 1.0.7beta18 - June 24, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -658,7 +658,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
    if (compression_type)
       png_warning(png_ptr, "Unknown compression type in iCCP chunk");
 
-   if (profile == NULL || *profile == '\0')
+   if (profile == NULL)
       profile_len = 0;
 
    if (profile_len)

@@ -1,5 +1,5 @@
 /*===
-cexcept.h 0.6.1 (2000-Apr-22-Sat)
+cexcept.h 1.0.0 (2000-Jun-21-Wed)
 Adam M. Costello <amc@cs.berkeley.edu>
 
 An interface for exception-handling in ANSI C, developed jointly with
@@ -107,14 +107,15 @@ Catch (expression) statement
     confusion with the C++ keywords, which have subtly different
     semantics.
 
-    A Try/Catch statement has a syntax similar to an if/else statement,
-    except that the parenthesized expression goes after the second
-    keyword rather than the first.  As with if/else, there are two
-    clauses, each of which may be a simple statement ending with a
-    semicolon or a brace-enclosed compound statement.  But whereas
-    the else clause is optional, the Catch clause is required.  The
-    expression must be an lvalue (something capable of being assigned
-    to) of the exact same type passed to define_exception_type().
+    A Try/Catch statement has a syntax similar to an if/else
+    statement, except that the parenthesized expression goes after
+    the second keyword rather than the first.  As with if/else,
+    there are two clauses, each of which may be a simple statement
+    ending with a semicolon or a brace-enclosed compound statement.
+    But whereas the else clause is optional, the Catch clause is
+    required.  The expression must be a modifiable lvalue (something
+    capable of being assigned to) of the exact same type passed to
+    define_exception_type().
 
     If a Throw that uses the same exception context as the Try/Catch is
     executed within the Try clause (typically within a function called
@@ -135,9 +136,17 @@ Catch (expression) statement
     return, break, continue, goto, longjmp) is forbidden--the compiler
     will not complain, but bad things will happen at run-time.  Jumping
     into or out of a Catch clause is okay, and so is jumping around
-    inside a Try clause.  Also note that the values of any non-volatile
-    automatic variables changed within the Try clause are undefined
-    after an exception is caught.
+    inside a Try clause.  In many cases where one is tempted to return
+    from a Try clause, it will suffice to use Throw, and then return
+    from the Catch clause.  Another option is to set a flag variable and
+    use goto to jump to the end of the Try clause, then check the flag
+    after the Try/Catch statement.
+
+    IMPORTANT: The values of any non-volatile automatic variables
+    changed within the Try clause are undefined after an exception is
+    caught.  Therefore, variables modified inside the Try block whose
+    values are needed later outside the Try block must either use static
+    storage or be declared with the "volatile" type qualifier.
 
 
 Throw expression;
@@ -149,8 +158,8 @@ Throw expression;
     be compatible with the type passed to define_exception_type().  The
     exception must be caught, otherwise the program may crash.
 
-    Slight limitation:  The expression cannot be a comma-expression (but
-    no one would want to use a comma-expression here anyway).
+    Slight limitation:  If the expression is a comma-expression it must
+    be enclosed in parentheses.
 
 
 Try statement

@@ -12,6 +12,14 @@
 #  error PRIVATEBUILD or SPECIALBUILD must be defined as a string describing the type of change brought to the standard library
 #endif /* defined(DLLFNAME_POSTFIX)... */
 
+#if !defined(DLLFNAME_POSTFIX) && defined(PNG_USE_PNGVCRD)
+#  if defined(PNG_DEBUG) && (PNG_DEBUG > 0)
+#    define DLLFNAME_POSTFIX "B"
+#  else
+#    define DLLFNAME_POSTFIX "A"
+#  endif /* !defined(DLLFNAME_POSTFIX)... */
+#endif
+
 #if defined(PNG_DEBUG) && (PNG_DEBUG > 0)
 #  define VS_DEBUG VS_FF_DEBUG
 #  ifndef DLLFNAME_POSTFIX
@@ -22,7 +30,9 @@
 #  endif /* COMMENTS */
 #else
 #  define VS_DEBUG 0
-#  define DLLFNAME_POSTFIX
+#  ifndef DLLFNAME_POSTFIX
+#     define DLLFNAME_POSTFIX
+#  endif /* DLLFNAME_POSTFIX */
 #endif /* defined(DEBUG)... */
 
 #ifdef PRIVATEBUILD
