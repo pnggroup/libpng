@@ -1,11 +1,11 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.5k - December 27, 1999
+ * libpng 1.0.5m - January 7, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  */
 
 #define PNG_INTERNAL
@@ -304,7 +304,7 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
    return (retval);
 }
 #endif /* PNG_READ_pHYs_SUPPORTED */
-#endif  /* PNG_INCH_CONVERSIONS $$ PNG_FLOATING_POINT_SUPPORTED */
+#endif  /* PNG_INCH_CONVERSIONS && PNG_FLOATING_POINT_SUPPORTED */
 
 /* png_get_channels really belongs in here, too, but it's been around longer */
 
@@ -779,3 +779,12 @@ png_get_rgb_to_gray_status (png_structp png_ptr)
    return png_ptr->rgb_to_gray_status;
 }
 #endif
+
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+png_voidp
+png_get_user_chunk_ptr(png_structp png_ptr)
+{
+   return (png_ptr->user_chunk_ptr);
+}
+#endif
+

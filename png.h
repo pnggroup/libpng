@@ -1,27 +1,27 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.5k - December 27, 1999
+ * libpng version 1.0.5m - January 7, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.5k - December 27, 1999: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.5m - January 7, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
  *
- *    December 27, 1999
+ *    January 7, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.5k are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.5m are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -98,7 +98,7 @@
  *    1.0.4a-f                 1.0.4a-f 10005  2.1.0.4a-f
  *    1.0.5                    1.0.5    10005  2.1.0.5
  *    1.0.5a-d                 1.0.5a-d 10006  2.1.0.5a-d
- *    1.0.5e-k                 1.0.5e-k 10100  2.1.0.5e-k
+ *    1.0.5e-m                 1.0.5e-m 10100  2.1.0.5e-m
  *    1.1.0                    1.1.0    10100  3.1.0.0
  *
  *    Henceforth the source version will match the shared-library minor
@@ -122,8 +122,8 @@
  * (libpng versions 0.5, May 1995, through 0.89c, May 1996)
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.5k, December 27, 1999)
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * (libpng versions 0.97, January 1998, through 1.0.5m, January 7, 2000)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -224,7 +224,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.5k"
+#define PNG_LIBPNG_VER_STRING "1.0.5m"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -418,9 +418,9 @@ typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
  * The following members may have allocated storage attached that should be
  * cleaned up before the structure is discarded: palette, trans, text,
  * pcal_purpose, pcal_units, pcal_params, hist, iccp_name, iccp_profile,
- * splt_palettes, and scal_unit.  Of these, the text, pcal_*, hist, iccp_*,
- * splt_*, and scal_unit members are automatically freed when the info
- * structure is deallocated. The palette member is not.
+ * splt_palettes, scal_unit, and row_pointers.  Of these, the text, pcal_*,
+ * hist, iccp_*, splt_*, scal_unit, and row_pointers members are automatically
+ * freed when the info structure is deallocated. The palette member is not.
  *
  * More allocation details: all the chunk-reading functions that change these
  * members go through the corresponding png_set_* functions.  Functions to
@@ -655,6 +655,11 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_unknown_chunkp unknown_chunks;
    png_size_t unknown_chunks_num;
 #endif
+
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+   /* Data valid if (valid & PNG_INFO_IDAT) non-zero */
+   png_bytepp row_pointers;		/* the image bits */
+#endif
 } png_info;
 
 typedef png_info FAR * png_infop;
@@ -743,6 +748,7 @@ typedef png_info FAR * FAR * png_infopp;
 #define PNG_INFO_iCCP 0x1000   /* ESR, 1.0.6 */
 #define PNG_INFO_sPLT 0x2000   /* ESR, 1.0.6 */
 #define PNG_INFO_sCAL 0x4000   /* ESR, 1.0.6 */
+#define PNG_INFO_IDAT 0x8000   /* ESR, 1.0.6 */
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -789,6 +795,28 @@ typedef void (*png_user_transform_ptr) PNGARG((png_structp,
     png_row_infop, png_bytep));
 #endif
 
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+typedef int (*png_user_chunk_ptr) PNGARG((png_structp, png_unknown_chunkp));
+#endif
+#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+typedef void (*png_unknown_chunk_ptr) PNGARG((png_structp));
+#endif
+
+/* Transform masks for the high-level interface */
+#define PNG_TRANSFORM_IDENTITY		0x0000	/* read and write */
+#define PNG_TRANSFORM_STRIP_16		0x0001  /* read only */
+#define PNG_TRANSFORM_STRIP_ALPHA	0x0002	/* read only */
+#define PNG_TRANSFORM_PACKING		0x0004	/* read and write */
+#define PNG_TRANSFORM_PACKSWAP		0x0008	/* read and write */
+#define PNG_TRANSFORM_EXPAND		0x0010	/* read only */
+#define PNG_TRANSFORM_INVERT_MONO	0x0020	/* read and write */
+#define PNG_TRANSFORM_SHIFT		0x0040	/* read and write */
+#define PNG_TRANSFORM_BGR		0x0080	/* read and write */
+#define PNG_TRANSFORM_SWAP_ALPHA	0x0100	/* read and write */
+#define PNG_TRANSFORM_SWAP_ENDIAN	0x0200	/* read and write */
+#define PNG_TRANSFORM_INVERT_ALPHA	0x0200	/* read and write */
+#define PNG_TRANSFORM_STRIP_FILLER	0x0800	/* WRITE only */
+
 typedef png_voidp (*png_malloc_ptr) PNGARG((png_structp, png_size_t));
 typedef void (*png_free_ptr) PNGARG((png_structp, png_voidp));
 
@@ -823,6 +851,11 @@ struct png_struct_def
    png_voidp user_transform_ptr; /* user supplied struct for user transform */
    png_byte user_transform_depth;    /* bit depth of user transformed pixels */
    png_byte user_transform_channels; /* channels in user transformed pixels */
+#endif
+
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+   png_voidp user_chunk_ptr;
+   png_user_chunk_ptr read_user_chunk_fn; /* user read chunk handler */
 #endif
 
    png_uint_32 mode;          /* tells us where we are in the PNG file */
@@ -1011,9 +1044,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.5k
+and png.h are both at * version 1.0.5m
  */
-typedef png_structp version_1_0_5k;
+typedef png_structp version_1_0_5m;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1506,6 +1539,13 @@ extern PNG_EXPORT(png_voidp,png_get_user_transform_ptr)
    PNGARG((png_structp png_ptr));
 #endif
 
+#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
+extern PNG_EXPORT(void,png_set_read_user_chunk_fn) PNGARG((png_structp png_ptr,
+   png_voidp user_chunk_ptr, png_user_chunk_ptr read_user_chunk_fn));
+extern PNG_EXPORT(png_voidp,png_get_user_chunk_ptr) PNGARG((png_structp
+   png_ptr));
+#endif
+
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 /* Sets the function callbacks for the push reader, and a pointer to a
  * user-defined structure available to the callback functions.
@@ -1925,6 +1965,19 @@ extern PNG_EXPORT(png_uint_32,png_get_unknown_chunks) PNGARG((png_structp
 extern PNG_EXPORT(void,png_free_chunk_list) PNGARG((png_structp png_ptr));
 #endif
 
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+extern PNG_EXPORT(void, png_read_png) PNGARG((png_structp png_ptr,
+						png_infop info_ptr,
+						int transforms,
+						voidp params));
+extern PNG_EXPORT(void, png_write_png) PNGARG((png_structp png_ptr,
+						png_infop info_ptr,
+						int transforms,
+						voidp params));
+extern PNG_EXPORT(void, png_free_pixels) PNGARG((png_structp png_ptr,
+					      png_infop info_ptr));
+#endif
+
 /* Define PNG_DEBUG at compile time for debugging information.  Higher
  * numbers for PNG_DEBUG mean more debugging information.  This has
  * only been added since version 0.95 so it is not implemented throughout
@@ -1964,7 +2017,8 @@ extern PNG_EXPORT(png_charp,png_get_header_ver) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
-#define PNG_HEADER_VERSION_STRING " libpng version 1.0.5k - December 27, 1999 (header)\n"
+#define PNG_HEADER_VERSION_STRING \
+   " libpng version 1.0.5m - January 7, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on

@@ -1,11 +1,11 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.5k - December 27, 1999
+ * libpng 1.0.5m - January 7, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * This file provides a location for all memory allocation.  Users who
  * need special memory handling are expected to supply replacement

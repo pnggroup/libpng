@@ -1,11 +1,11 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.5k - December 27, 1999
+ * libpng 1.0.5m - January 7, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * The functions here are used during reads to store data from the file
  * into the info struct, and during writes to store application data
@@ -81,14 +81,14 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    info_ptr->int_x_blue  = blue_x;
    info_ptr->int_y_blue  = blue_y;
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   info_ptr->x_white = (float)white_x/100000.;
-   info_ptr->y_white = (float)white_y/100000.;
-   info_ptr->x_red   = (float)red_x/100000.;
-   info_ptr->y_red   = (float)red_y/100000.;
-   info_ptr->x_green = (float)green_x/100000.;
-   info_ptr->y_green = (float)green_y/100000.;
-   info_ptr->x_blue  = (float)blue_x/100000.;
-   info_ptr->y_blue  = (float)blue_y/100000.;
+   info_ptr->x_white = (float)(white_x/100000.);
+   info_ptr->y_white = (float)(white_y/100000.);
+   info_ptr->x_red   = (float)(red_x/100000.);
+   info_ptr->y_red   = (float)(red_y/100000.);
+   info_ptr->x_green = (float)(green_x/100000.);
+   info_ptr->y_green = (float)(green_y/100000.);
+   info_ptr->x_blue  = (float)(blue_x/100000.);
+   info_ptr->y_blue  = (float)(blue_y/100000.);
 #endif
    info_ptr->valid |= PNG_INFO_cHRM;
 }
@@ -121,7 +121,7 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
       return;
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   info_ptr->gamma = (float)int_gamma/100000.;
+   info_ptr->gamma = (float)(int_gamma/100000.);
 #endif
    info_ptr->int_gamma = int_gamma;
    info_ptr->valid |= PNG_INFO_gAMA;
@@ -733,3 +733,15 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
     png_ptr->chunk_list=new_list;
 }
 #endif
+
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+void
+png_set_read_user_chunk_fn(png_structp png_ptr, png_voidp user_chunk_ptr,
+   png_user_chunk_ptr read_user_chunk_fn)
+{
+   png_debug(1, "in png_set_read_user_chunk_fn\n");
+   png_ptr->read_user_chunk_fn = read_user_chunk_fn;
+   png_ptr->user_chunk_ptr = user_chunk_ptr;
+}
+#endif
+

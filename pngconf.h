@@ -1,11 +1,11 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.5k - December 27, 1999
+ * libpng 1.0.5m - January 7, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -551,6 +551,16 @@ __dont__ include it again
 #  define PNG_READ_zTXt_SUPPORTED
 #  define PNG_zTXt_SUPPORTED
 #endif
+#ifndef PNG_NO_READ_USER_CHUNKS
+#  define PNG_READ_USER_CHUNKS_SUPPORTED
+#  define PNG_USER_CHUNKS_SUPPORTED
+#  ifdef PNG_NO_READ_UNKNOWN_CHUNKS
+#    undef PNG_NO_READ_UNKNOWN_CHUNKS
+#  endif
+#  ifdef PNG_NO_HANDLE_AS_UNKNOWN
+#    undef PNG_NO_HANDLE_AS_UNKNOWN
+#  endif
+#endif
 #ifndef PNG_NO_READ_UNKNOWN_CHUNKS
 #  define PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 #  define PNG_UNKNOWN_CHUNKS_SUPPORTED
@@ -696,8 +706,16 @@ __dont__ include it again
 #endif
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
 
+/* Turn this off to disable png_read_png() and 
+ * png_write_png() and leave the image_bits member
+ * out of the info structure.
+ */
+#ifndef PNG_NO_INFO_IMAGE
+#  define PNG_INFO_IMAGE_SUPPORTED
+#endif
+
 /* need the time information for reading tIME chunks */
-#if defined(PNG_READ_tIME_SUPPORTED) || defined(PNG_WRITE_tIME_SUPPORTED)
+#if defined(PNG_tIME_SUPPORTED)
 #  include <time.h>
 #endif
 

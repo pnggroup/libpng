@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.5k - December 27, 1999
+ * libpng version 1.0.5m - January 7, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  */
 
@@ -19,7 +19,7 @@
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.5k";
+char png_libpng_ver[12] = "1.0.5m";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -448,6 +448,25 @@ png_free_hIST(png_structp png_ptr, png_infop info_ptr)
 }
 #endif
 
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+/* free any image bits attached to the info structure */
+void
+png_free_pixels(png_structp png_ptr, png_infop info_ptr)
+{
+   if (png_ptr == NULL || info_ptr == NULL)
+       return;
+   if (info_ptr->valid & PNG_INFO_IDAT)
+   {
+       int row;
+
+       for (row = 0; row < (int)info_ptr->height; row++)
+	   png_free(png_ptr, info_ptr->row_pointers[row]);
+       png_free(png_ptr, info_ptr->row_pointers);
+       info_ptr->valid &= ~PNG_INFO_IDAT;
+   }
+}
+#endif
+
 /* This is an internal routine to free any memory that the info struct is
  * pointing to before re-using it or freeing the struct itself.  Recall
  * that png_free() checks for NULL pointers for us.
@@ -480,6 +499,9 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_hIST_SUPPORTED)
    png_free_hIST(png_ptr, info_ptr);
+#endif
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+   png_free_pixels(png_ptr, info_ptr);
 #endif
    png_info_init(info_ptr);
 }
@@ -558,10 +580,10 @@ png_charp
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.5k - December 27, 1999\n\
+   return ("\n libpng version 1.0.5m - January 7, 2000\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
-   Copyright (c) 1998, 1999 Glenn Randers-Pehrson\n");
+   Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson\n");
    return ("");
 }
 
@@ -576,8 +598,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.5k");
-   return("1.0.5k");
+      return("1.0.5m");
+   return("1.0.5m");
 }
 
 png_charp
@@ -601,9 +623,9 @@ png_get_header_version(png_structp png_ptr)
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_version
-   (version_1_0_5k png_h_is_not_version_1_0_5k)
+   (version_1_0_5m png_h_is_not_version_1_0_5m)
 {
-   if(png_h_is_not_version_1_0_5k == NULL)
+   if(png_h_is_not_version_1_0_5m == NULL)
      return;
 }
 

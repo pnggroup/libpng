@@ -1,11 +1,11 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.5k - December 27, 1999
+ * libpng 1.0.5m - January 7, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -627,7 +627,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5k.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5m.
  */
 
 void
@@ -676,7 +676,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5k.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5m.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -802,8 +802,10 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       else if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name))
       {
          if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
+	 {
             if (length > 0 || png_ptr->mode & PNG_AFTER_IDAT)
                png_error(png_ptr, "Too many IDAT's found");
+	 }
          else
             png_ptr->mode |= PNG_AFTER_IDAT;
          png_handle_unknown(png_ptr, info_ptr, length);
@@ -1079,3 +1081,131 @@ png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
 {
    png_ptr->read_row_fn = read_row_fn;
 }
+
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+void png_read_png(png_structp png_ptr, png_infop info_ptr,
+			   int transforms,
+			   voidp params)
+{
+   int row;
+
+   if(transforms == 0 || params == (voidp)NULL)
+      /* quiet compiler warnings */ ;
+
+#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
+   /* invert the alpha channel from opacity to transparency */
+   if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
+       png_set_invert_alpha(png_ptr);
+#endif
+
+   /* The call to png_read_info() gives us all of the information from the
+    * PNG file before the first IDAT (image data chunk).
+    */
+   png_read_info(png_ptr, info_ptr);
+
+   /* -------------- image transformations start here ------------------- */
+
+#if defined(PNG_READ_16_TO_8_SUPPORTED)
+   /* tell libpng to strip 16 bit/color files down to 8 bits/color */
+   if (transforms & PNG_TRANSFORM_STRIP_16)
+       png_set_strip_16(png_ptr);
+#endif
+
+#if defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
+   /* Strip alpha bytes from the input data without combining with the
+    * background (not recommended).
+    */
+   if (transforms & PNG_TRANSFORM_STRIP_ALPHA)
+       png_set_strip_alpha(png_ptr);
+#endif
+
+#if defined(PNG_READ_PACK_SUPPORTED)
+   /* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
+    * byte into separate bytes (useful for paletted and grayscale images).
+    */
+   if (transforms & PNG_TRANSFORM_PACKING)
+       png_set_packing(png_ptr);
+#endif
+
+#if defined(PNG_READ_PACKSWAP_SUPPORTED)
+   /* Change the order of packed pixels to least significant bit first
+    * (not useful if you are using png_set_packing). */
+   if (transforms & PNG_TRANSFORM_PACKSWAP)
+       png_set_packswap(png_ptr);
+#endif
+
+#if defined(PNG_READ_EXPAND_SUPPORTED)
+   /* Expand paletted colors into true RGB triplets
+    * Expand grayscale images to full 8 bits from 1, 2, or 4 bits/pixel
+    * Expand paletted or RGB images with transparency to full alpha
+    * channels so the data will be available as RGBA quartets.
+    */
+   if (transforms & PNG_TRANSFORM_EXPAND)
+       if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
+	   png_set_expand(png_ptr);
+#endif
+
+   /* We don't handle background color or gamma transformation or dithering. */
+
+#if defined(PNG_READ_INVERT_SUPPORTED)
+   /* invert monochrome files to have 0 as white and 1 as black */
+   if (transforms & PNG_TRANSFORM_INVERT_MONO)
+       png_set_invert_mono(png_ptr);
+#endif
+
+#if defined(PNG_READ_SHIFT_SUPPORTED)
+   /* If you want to shift the pixel values from the range [0,255] or
+    * [0,65535] to the original [0,7] or [0,31], or whatever range the
+    * colors were originally in:
+    */
+   if ((transforms & PNG_TRANSFORM_SHIFT)
+       && png_get_valid(png_ptr, info_ptr, PNG_INFO_sBIT))
+   {
+      png_color_8p sig_bit;
+
+      png_get_sBIT(png_ptr, info_ptr, &sig_bit);
+      png_set_shift(png_ptr, sig_bit);
+   }
+#endif
+
+#if defined(PNG_READ_BGR_SUPPORTED)
+   /* flip the RGB pixels to BGR (or RGBA to BGRA) */
+   if (transforms & PNG_TRANSFORM_BGR)
+       png_set_bgr(png_ptr);
+#endif
+
+#if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
+   /* swap the RGBA or GA data to ARGB or AG (or BGRA to ABGR) */
+   if (transforms & PNG_TRANSFORM_SWAP_ALPHA)
+       png_set_swap_alpha(png_ptr);
+#endif
+
+#if defined(PNG_READ_SWAP_SUPPORTED)
+   /* swap bytes of 16 bit files to least significant byte first */
+   if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
+       png_set_swap(png_ptr);
+#endif
+
+   /* We don't handle adding filler bytes */
+
+   /* Optional call to gamma correct and add the background to the palette
+    * and update info structure.  REQUIRED if you are expecting libpng to
+    * update the palette for you (ie you selected such a transform above).
+    */
+   png_read_update_info(png_ptr, info_ptr);
+
+   /* -------------- image transformations end here ------------------- */
+
+   info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
+					 info_ptr->height * sizeof(png_bytep));
+   for (row = 0; row < (int)info_ptr->height; row++)
+       info_ptr->row_pointers[row] = png_malloc(png_ptr, 
+				      png_get_rowbytes(png_ptr, info_ptr));
+
+   png_read_image(png_ptr, info_ptr->row_pointers);
+   info_ptr->valid |= PNG_INFO_IDAT;
+
+   /* read rest of file, and get additional chunks in info_ptr - REQUIRED */
+   png_read_end(png_ptr, info_ptr);
+}
+#endif

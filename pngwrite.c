@@ -1,11 +1,11 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.5k - December 27, 1999
+ * libpng 1.0.5m - January 7, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  */
 
 /* get internal access to png.h */
@@ -812,6 +812,9 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 #if defined(PNG_hIST_SUPPORTED)
       png_free_hIST(png_ptr, info_ptr);
 #endif
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+   png_free_pixels(png_ptr, info_ptr);
+#endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)info_ptr, free_fn);
@@ -1178,5 +1181,89 @@ png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    png_debug(1, "in png_set_write_user_transform_fn\n");
    png_ptr->transformations |= PNG_USER_TRANSFORM;
    png_ptr->write_user_transform_fn = write_user_transform_fn;
+}
+#endif
+
+
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+void png_write_png(png_structp png_ptr, png_infop info_ptr,
+			   int transforms,
+			   voidp params)
+{
+   if(transforms == 0 || params == (voidp)NULL)
+      /* quiet compiler warnings */ ;
+
+#if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
+   /* invert the alpha channel from opacity to transparency */
+   if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
+       png_set_invert_alpha(png_ptr);
+#endif
+
+   /* Write the file header information. */
+   png_write_info(png_ptr, info_ptr);
+
+   /* ------ these transformations don't touch the info structure ------- */
+
+#if defined(PNG_WRITE_INVERT_SUPPORTED)
+   /* invert monochrome pixels */
+   if (transforms & PNG_TRANSFORM_INVERT_MONO)
+       png_set_invert_mono(png_ptr);
+#endif
+
+#if defined(PNG_WRITE_SHIFT_SUPPORTED)
+   /* Shift the pixels up to a legal bit depth and fill in
+    * as appropriate to correctly scale the image.
+    */
+   if ((transforms & PNG_TRANSFORM_SHIFT)
+	       && (info_ptr->valid & PNG_INFO_sBIT))
+       png_set_shift(png_ptr, &info_ptr->sig_bit);
+#endif
+
+#if defined(PNG_WRITE_PACK_SUPPORTED)
+   /* pack pixels into bytes */
+   if (transforms & PNG_TRANSFORM_PACKING)
+       png_set_packing(png_ptr);
+#endif
+
+#if defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
+   /* swap location of alpha bytes from ARGB to RGBA */
+   if (transforms & PNG_TRANSFORM_SWAP_ALPHA)
+       png_set_swap_alpha(png_ptr);
+#endif
+
+#if defined(PNG_WRITE_FILLER_SUPPORTED)
+   /* Get rid of filler (OR ALPHA) bytes, pack XRGB/RGBX/ARGB/RGBA into
+    * RGB (4 channels -> 3 channels). The second parameter is not used.
+    */
+   if (transforms & PNG_TRANSFORM_STRIP_FILLER)
+       png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
+#endif
+
+#if defined(PNG_WRITE_BGR_SUPPORTED)
+   /* flip BGR pixels to RGB */
+   if (transforms & PNG_TRANSFORM_BGR)
+       png_set_bgr(png_ptr);
+#endif
+
+#if defined(PNG_WRITE_SWAP_SUPPORTED)
+   /* swap bytes of 16-bit files to most significant byte first */
+   if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
+       png_set_swap(png_ptr);
+#endif
+
+#if defined(PNG_WRITE_PACKSWAP_SUPPORTED)
+   /* swap bits of 1, 2, 4 bit packed pixel formats */
+   if (transforms & PNG_TRANSFORM_PACKSWAP)
+       png_set_packswap(png_ptr);
+#endif
+
+   /* ----------------------- end of transformations ------------------- */
+
+   /* write the bits */
+   if (info_ptr->valid & PNG_INFO_IDAT)
+       png_write_image(png_ptr, info_ptr->row_pointers);
+
+   /* It is REQUIRED to call this to finish writing the rest of the file */
+   png_write_end(png_ptr, info_ptr);
 }
 #endif

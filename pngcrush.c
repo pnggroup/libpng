@@ -15,7 +15,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.3.2"
+#define PNGCRUSH_VERSION "1.3.3"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -53,6 +53,11 @@
  *   and tear on disk drives.
  *
  * Change log:
+ *
+ * Version 1.3.3 (built with libpng-1.0.5m)
+ *
+ *   Restored ability to enter gamma as a float even when floating point
+ *   arithmetic is not enabled.
  *
  * Version 1.3.2 (built with libpng-1.0.5k)
  *   
@@ -741,7 +746,30 @@ main(int argc, char *argv[])
       {
          names++;
          i++;
-         if (intent < 0) specified_gamma=atoi(argv[i]);
+         if (intent < 0)
+            {
+               int c;
+               char number[16];
+               char *n=number;
+               int nzeroes=-1;
+               int length=strlen(argv[i]);
+               for (c=0; c<length; c++)
+                  {
+                     if( *(argv[i]+c) == '.')
+                        {
+                           nzeroes=5;
+                        }
+                     else if (nzeroes != 0)
+                        {
+                           *n++=*(argv[i]+c);
+                           nzeroes--;
+                        }
+                  }
+               for (c=0; c<nzeroes; c++)
+                  *n++='0';
+               *n='\0';
+               specified_gamma=atoi(number);
+            }
       }
 #endif
    else if(!strncmp(argv[i],"-h",2))
@@ -852,7 +880,6 @@ main(int argc, char *argv[])
          {
            text_compression[text_inputs] = PNG_ITXT_COMPRESSION_NONE;
            names+=2;
-           printf("Adding an iTXt chunk.\n");
          }
          names+=3;
          if( !strncmp(argv[++i],"b",1))
@@ -1043,7 +1070,7 @@ main(int argc, char *argv[])
      else
         fprintf(STDERR, "options:\n");
      fprintf(STDERR,
-       "        -brute (Use brute-force, try 114 different methods)\n");
+       "        -brute (Use brute-force, try 114 different methods [11-124])\n");
      if(verbose > 1)
      {
      fprintf(STDERR,
@@ -1131,7 +1158,7 @@ main(int argc, char *argv[])
        "               additions, removals, or changes were requested.\n\n");
      }
      fprintf(STDERR,
-       "            -g gamma_value (float, e.g., 0.45455)\n");
+       "            -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)\n");
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Value to insert in gAMA chunk, only if the input\n");
@@ -1143,7 +1170,7 @@ main(int argc, char *argv[])
        "               gAMA chunk, use the '-replace_gamma' option.\n\n");
      png_crush_pause();
      fprintf(STDERR,
-       "          -itxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
+       "         -itxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Compressed iTXt chunk to insert (see -text).\n\n");
@@ -1296,10 +1323,14 @@ main(int argc, char *argv[])
      }
 
      fprintf(STDERR,
-       "      -verbose (write more detailed information)\n");
+       "            -v (display more detailed information)\n");
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Repeat the option (use \"-v -v\") for even more.\n\n");
+     fprintf(STDERR,
+       "      -version (display the pngcrush version)\n");
+     if(verbose > 1)
+        fprintf(STDERR,"\n");
      fprintf(STDERR,
        "            -w compression_window_size [32, 16, 8, 4, 2, 1, 512]\n");
      if(verbose > 1)
@@ -1324,7 +1355,7 @@ main(int argc, char *argv[])
        "               '-m method' argument.\n\n");
      }
      fprintf(STDERR,
-       "         -zitxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
+       "        -zitxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Compressed iTXt chunk to insert (see -text).\n\n");
@@ -2382,13 +2413,13 @@ main(int argc, char *argv[])
                     png_set_text(write_ptr, write_info_ptr, added_text, 1);
                     png_free(write_ptr,added_text);
                     if(added_text[0].compression < 0)
-                       printf("Added a tEXt chunk.\n");
+                       printf("   Added a tEXt chunk.\n");
                     else if(added_text[0].compression == 0)
-                       printf("Added a zTXt chunk.\n");
+                       printf("   Added a zTXt chunk.\n");
                     else if(added_text[0].compression == 1)
-                       printf("Added an uncompressed iTXt chunk.\n");
+                       printf("   Added an uncompressed iTXt chunk.\n");
                     else
-                       printf("Added a compressed iTXt chunk.\n");
+                       printf("   Added a compressed iTXt chunk.\n");
                   }
               }
          }
@@ -2453,8 +2484,8 @@ main(int argc, char *argv[])
       if(output_bit_depth < input_bit_depth)
       {
           png_color_8 true_bits;
-          write_ptr->bit_depth=output_bit_depth;
-          true_bits.gray = 8 - (input_bit_depth - output_bit_depth);
+          write_ptr->bit_depth=(png_byte)output_bit_depth;
+          true_bits.gray = (png_byte)(8 - (input_bit_depth - output_bit_depth));
           png_set_shift(read_ptr, &true_bits);
           png_set_packing(write_ptr);
       }
@@ -2626,13 +2657,14 @@ main(int argc, char *argv[])
                     png_set_text(write_ptr, write_end_info_ptr, added_text, 1);
                     png_free(write_ptr,added_text);
                     if(added_text[0].compression < 0)
-                       printf("Added a tEXt chunk after IDAT.\n");
+                       printf("   Added a tEXt chunk after IDAT.\n");
                     else if(added_text[0].compression == 0)
-                       printf("Added a zTXt chunk after IDAT.\n");
+                       printf("   Added a zTXt chunk after IDAT.\n");
                     else if(added_text[0].compression == 1)
-                       printf("Added an uncompressed iTXt chunk after IDAT.\n");
+                       printf(
+                       "   Added an uncompressed iTXt chunk after IDAT.\n");
                     else
-                       printf("Added a compressed iTXt chunk after IDAT.\n");
+                       printf("   Added a compressed iTXt chunk after IDAT.\n");
                   }
               }
          }

@@ -20,6 +20,8 @@
 #define PNG_NO_READ_tIME
 #define PNG_NO_WRITE_tIME
 
+#define PNG_NO_INFO_IMAGE
+#define PNG_NO_READ_USER_CHUNKS
 #define PNG_NO_EASY_ACCESS
 #define PNG_NO_READ_EMPTY_PLTE
 #define PNG_NO_WRITE_TRANSFORMS
@@ -38,7 +40,5 @@
 #  define PNG_NO_READ_RGB_TO_GRAY
 #endif
 #define PNG_ZBUF_SIZE 524288       /* increases the IDAT size */
-/*
 #define PNG_NO_GLOBAL_ARRAYS
-*/
 #define TOO_FAR 32767     /* Improves zlib/deflate compression */

@@ -1,11 +1,11 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.5k - December 27, 1999
+ * libpng 1.0.5m - January 7, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * This file contains routines that are only called from within
  * libpng itself during the course of reading an image.
@@ -1907,20 +1907,19 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
 
-   /* In the future we can have code here that calls user-supplied
-    * callback functions for unknown chunks before they are ignored or
-    * cause an error.
-    */
-
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
       if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
-           HANDLE_CHUNK_ALWAYS)
-         png_chunk_error(png_ptr, "unknown critical chunk");
+           HANDLE_CHUNK_ALWAYS
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+           && png_ptr->read_user_chunk_fn == (png_user_chunk_ptr)NULL
+#endif
+        )
+          png_chunk_error(png_ptr, "unknown critical chunk");
 
       /* to quiet compiler warnings about unused info_ptr */
       if (info_ptr == NULL)
-         return;
+        return;
    }
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
@@ -1941,7 +1940,22 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        chunk.data = (png_bytep)png_malloc(png_ptr, length);
        png_crc_read(png_ptr, chunk.data, length);
        chunk.size = length;
-       png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+       if(png_ptr->read_user_chunk_fn != (png_user_chunk_ptr)NULL)
+       {
+          /* callback to user unknown chunk handler */
+          if ((*(png_ptr->read_user_chunk_fn)) (png_ptr, &chunk) <= 0)
+          {
+             if (!(png_ptr->chunk_name[0] & 0x20))
+                if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
+                     HANDLE_CHUNK_ALWAYS)
+                   png_chunk_error(png_ptr, "unknown critical chunk");
+             png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
+          }
+       }
+       else
+#endif
+          png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
        png_free(png_ptr, chunk.data);
    }
    else
