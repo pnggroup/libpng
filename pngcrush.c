@@ -15,12 +15,12 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.3.3"
+#define PNGCRUSH_VERSION "1.3.4"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
  *
- * Copyright (c) 1998, 1999, Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * The pngcrush program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
@@ -53,6 +53,10 @@
  *   and tear on disk drives.
  *
  * Change log:
+ *
+ * Version 1.3.4 (built with libpng-1.0.5m)
+ *
+ *   Do not allow pngcrush to overwrite the input file.
  *
  * Version 1.3.3 (built with libpng-1.0.5m)
  *
@@ -175,6 +179,9 @@
 static PNG_CONST char *progname = "pngtest.png";
 static PNG_CONST char *inname = "pngtest.png";
 static PNG_CONST char *outname = "pngout.png";
+#if 0
+static PNG_CONST char *tmpname = "pngtmp.png";
+#endif
 static PNG_CONST char *directory_name = "pngcrush.bak";
 static PNG_CONST char *extension = "_C.png";
 
@@ -527,6 +534,9 @@ main(int argc, char *argv[])
    png_fixed_point file_gamma=0;
 #endif
    char *cp;
+#if 0
+   FILE *tmpfile (void);
+#endif
 
    int i;
    row_buf = (png_bytep)NULL;
@@ -992,7 +1002,7 @@ main(int argc, char *argv[])
    if(verbose > 0)
    {
       fprintf(STDERR, 
-        "\n | %s %s, Copyright (C) 1998, 1999, Glenn Randers-Pehrson\n",
+        "\n | %s %s, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson\n",
         progname, PNGCRUSH_VERSION);
       fprintf(STDERR, " | This is a free, open-source program.  Permission is\n");
       fprintf(STDERR, " | granted to everyone to use pngcrush without fee.\n");
@@ -1004,7 +1014,7 @@ main(int argc, char *argv[])
       fprintf(STDERR,
         " |    Copyright (C) 1996, 1997 Andreas Dilger,\n");
       fprintf(STDERR,
-        " |    Copyright (C) 1998, 1999, Glenn Randers-Pehrson,\n");
+        " |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,\n");
       fprintf(STDERR, 
         " | and zlib version %s, Copyright (c) 1998,\n",
             ZLIB_VERSION);
@@ -1531,6 +1541,7 @@ main(int argc, char *argv[])
          if(idat_length[best] == idat_length[0] && things_have_changed == 0
             && best != final_method && nosave == 0)
          {
+            struct stat stat_in, stat_out;
             /* just copy input to output */
 
             if(verbose > 2)
@@ -1542,6 +1553,7 @@ main(int argc, char *argv[])
                fprintf(STDERR, "Could not find input file %s\n", inname);
                return 1;
             }
+
             number_of_open_files++;
             if ((fpout = FOPEN(outname, "wb")) == NULL)
             {
@@ -1549,18 +1561,25 @@ main(int argc, char *argv[])
                FCLOSE(fpin);
                return 1;
             }
+
             number_of_open_files++;
             if(verbose > 2)
                printf("copying input to output...");
-            for(;;)
+
+            stat(inname, &stat_in);
+            stat(outname, &stat_out);
+            if(stat_in.st_ino != stat_out.st_ino)
             {
-               png_size_t num_in;
+               for(;;)
+               {
+                  png_size_t num_in;
 
-               num_in = fread(buffer, 1, 1, fpin);
-               if (!num_in)
-                  break;
-               fwrite(buffer, 1, 1, fpout);
+                  num_in = fread(buffer, 1, 1, fpin);
+                  if (!num_in)
+                     break;
+                  fwrite(buffer, 1, 1, fpout);
 
+               }
             }
             if(verbose > 2)
                printf("copy complete.\n");
@@ -1618,12 +1637,23 @@ main(int argc, char *argv[])
       number_of_open_files++;
       if(nosave == 0)
        {
+         struct stat stat_in, stat_out;
+         stat(inname, &stat_in);
+         stat(outname, &stat_out);
+         if(stat_in.st_ino == stat_out.st_ino)
+         {
+            fprintf(STDERR, "Cannot overwrite input file %s\n", inname);
+            FCLOSE(fpin);
+            return 1;
+         }
+
          if ((fpout = FOPEN(outname, "wb")) == NULL)
          {
             fprintf(STDERR, "Could not open output file %s\n", outname);
             FCLOSE(fpin);
             return 1;
          }
+
          number_of_open_files++;
         }
 

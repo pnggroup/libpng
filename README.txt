@@ -29,10 +29,11 @@ This is the copyright notice, disclaimer, and license:
 
 This is the output of "pngcrush" and "pngcrush -help":
 
- | pngcrush 1.3.2, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
+
+ | pngcrush 1.3.4, Copyright (C) 1998, 1999, 2000, Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.0.5k,
+ | This program was built with libpng version 1.0.5m,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1998, 1999, Glenn Randers-Pehrson,
@@ -45,15 +46,15 @@ usage: pngcrush [options] infile.png outfile.png
        pngcrush -d dir [other options] files.png ...
 
 options:
-        -brute (Use brute-force, try 114 different methods)
+        -brute (Use brute-force, try 114 different methods [11-124])
             -c color_type of output file [0, 2, 4, or 6]
             -d directory_name (where output files will go)
  -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
             -e extension  (used for creating output filename)
             -f user_filter [0-5]
         -force (Write a new output file even if larger than input)
-            -g gamma_value (float, e.g., 0.45455)
-          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+            -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)
+         -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
             -l zlib_compression_level [0-9]
             -m method [0 through 200]
           -max maximum_IDAT_size [1 through 524288]
@@ -66,14 +67,14 @@ options:
          -srgb [0, 1, 2, or 3]
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
          -trns index red green blue gray
-      -verbose (write more detailed information)
+            -v (display more detailed information)
+      -version (display the pngcrush version)
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
             -h (help)
             -p (pause)
 
-
 options:
-        -brute (Use brute-force, try 114 different methods)
+        -brute (Use brute-force, try 114 different methods [11-124])
 
                Very time-consuming and generally not worthwhile.
                You can restrict this option to certain filter types,
@@ -120,13 +121,13 @@ options:
                if it is smaller than any generated file and no chunk
                additions, removals, or changes were requested.
 
-            -g gamma_value (float, e.g., 0.45455)
+            -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)
 
                Value to insert in gAMA chunk, only if the input
                file has no gAMA chunk.  To replace an existing
                gAMA chunk, use the '-replace_gamma' option.
 
-          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+         -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
 
                Compressed iTXt chunk to insert (see -text).
 
@@ -199,9 +200,11 @@ options:
                You must give all five parameters regardless of the
                color type, scaled to the output bit depth.
 
-      -verbose (write more detailed information)
+            -v (display more detailed information)
 
                Repeat the option (use "-v -v") for even more.
+
+      -version (display the pngcrush version)
 
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
 
@@ -216,7 +219,7 @@ options:
                zlib compression strategy to use with the preceding
                '-m method' argument.
 
-         -zitxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+        -zitxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
 
                Compressed iTXt chunk to insert (see -text).
 
