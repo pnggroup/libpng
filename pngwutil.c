@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.10beta1 - March 14, 2001
+ * libpng 1.0.10rc1 - March 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1489,8 +1489,8 @@ png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
    png_debug1(3, "sCAL total length = %d\n", total_len);
    png_write_chunk_start(png_ptr, (png_bytep)png_sCAL, (png_uint_32)total_len);
    png_write_chunk_data(png_ptr, (png_bytep)&unit, 1);
-   png_write_chunk_data(png_ptr, (png_bytep)wbuf, strlen(wbuf)+1);
-   png_write_chunk_data(png_ptr, (png_bytep)hbuf, strlen(hbuf));
+   png_write_chunk_data(png_ptr, (png_bytep)wbuf, png_strlen(wbuf)+1);
+   png_write_chunk_data(png_ptr, (png_bytep)hbuf, png_strlen(hbuf));
 
    png_write_chunk_end(png_ptr);
 }
@@ -1508,15 +1508,15 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
 
    png_debug(1, "in png_write_sCAL_s\n");
 
-   strcpy(wbuf,(const char *)width);
-   strcpy(hbuf,(const char *)height);
+   png_strcpy(wbuf,(const char *)width);
+   png_strcpy(hbuf,(const char *)height);
    total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
 
    png_debug1(3, "sCAL total length = %d\n", total_len);
    png_write_chunk_start(png_ptr, (png_bytep)png_sCAL, (png_uint_32)total_len);
    png_write_chunk_data(png_ptr, (png_bytep)&unit, 1);
-   png_write_chunk_data(png_ptr, (png_bytep)wbuf, strlen(wbuf)+1);
-   png_write_chunk_data(png_ptr, (png_bytep)hbuf, strlen(hbuf));
+   png_write_chunk_data(png_ptr, (png_bytep)wbuf, png_strlen(wbuf)+1);
+   png_write_chunk_data(png_ptr, (png_bytep)hbuf, png_strlen(hbuf));
 
    png_write_chunk_end(png_ptr);
 }

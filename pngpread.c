@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.10beta1 - March 14, 2001
+ * libpng 1.0.10rc1 - March 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -796,6 +796,19 @@ png_push_process_row(png_structp png_ptr)
                   png_read_push_finish_row(png_ptr);
                }
             }
+	    if (png_ptr->pass == 4 && png_ptr->height <= 4)
+	    {
+	        for (i = 0; i < 2 && png_ptr->pass == 4; i++)
+                {
+                   png_push_have_row(png_ptr, NULL);
+                   png_read_push_finish_row(png_ptr);
+                }
+            }
+            if (png_ptr->pass == 6 && png_ptr->height <= 4)
+            {
+                png_push_have_row(png_ptr, NULL);
+                png_read_push_finish_row(png_ptr);
+            }
             break;
          }
          case 1:
@@ -1403,7 +1416,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 len
        }
 #endif
 
-       strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
+       png_strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
        chunk.data = (png_bytep)png_malloc(png_ptr, length);
        png_crc_read(png_ptr, chunk.data, length);
        chunk.size = length;

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.10beta1 - March 14, 2001
+ * libpng 1.0.10rc1 - March 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -537,7 +537,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
                fprintf(STDERR, "Duplicate free of memory\n");
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
-            memset(ptr, 0x55, pinfo->size);
+            png_memset(ptr, 0x55, pinfo->size);
             png_free_default(png_ptr, pinfo);
             pinfo=NULL;
             break;
@@ -1522,4 +1522,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_10beta1 your_png_h_is_not_version_1_0_10beta1;
+typedef version_1_0_10rc1 your_png_h_is_not_version_1_0_10rc1;

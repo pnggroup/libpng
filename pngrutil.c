@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.10beta1 - March 14, 2001
+ * libpng 1.0.10rc1 - March 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -30,7 +30,7 @@ __inline double strtod(const char *nptr, char **endptr)
       MultiByteToWideChar(CP_ACP, 0, nptr, -1, str, len);
       result = wcstod(str, &end);
       len = WideCharToMultiByte(CP_ACP, 0, end, -1, NULL, 0, NULL, NULL);
-      *endptr = (char *)nptr + (strlen(nptr) - len + 1);
+      *endptr = (char *)nptr + (png_strlen(nptr) - len + 1);
       free(str);
    }
    return result;
@@ -1667,8 +1667,8 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   swidth = (png_charp)png_malloc(png_ptr, strlen(ep) + 1);
-   png_memcpy(swidth, ep, (png_size_t)strlen(ep));
+   swidth = (png_charp)png_malloc(png_ptr, png_strlen(ep) + 1);
+   png_memcpy(swidth, ep, (png_size_t)png_strlen(ep));
 #endif
 #endif
 
@@ -1685,8 +1685,8 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   sheight = (png_charp)png_malloc(png_ptr, strlen(ep) + 1);
-   png_memcpy(sheight, ep, (png_size_t)strlen(ep));
+   sheight = (png_charp)png_malloc(png_ptr, png_strlen(ep) + 1);
+   png_memcpy(sheight, ep, (png_size_t)png_strlen(ep));
 #endif
 #endif
 
@@ -2053,7 +2053,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
            length = (png_uint_32)65535L;
        }
 #endif
-       strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
+       png_strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
        chunk.data = (png_bytep)png_malloc(png_ptr, length);
        png_crc_read(png_ptr, chunk.data, length);
        chunk.size = length;

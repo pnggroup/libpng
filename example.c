@@ -494,7 +494,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
  * png_progressive_combine_row() passing in the row and the
  * old row.  You can call this function for NULL rows (it will
  * just return) and for non-interlaced images (it just does the
- * memcpy for you) if it will make the code easier.  Thus, you
+ * png_memcpy for you) if it will make the code easier.  Thus, you
  * can just do this for all cases:
  */
 

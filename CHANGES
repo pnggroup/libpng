@@ -906,6 +906,10 @@ version 1.0.10beta1 [March 14, 2001]
   Fixed bugs in png_combine_row() in pnggccrd.c and pngvcrd.c (C version)
   Added warnings when retrieving or setting gamma=0.
   Increased the first part of msg buffer from 16 to 18 in png_chunk_warning().
+version 1.0.10rc1 [March 23, 2001]
+  Changed all instances of memcpy, strcpy, and strlen to png_memcpy, png_strcpy,
+    and png_strlen.
+  Revised png_mmx_supported() function in pnggccrd.c to return proper value.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.0.10beta1 - March 14, 2001
+ * libpng version 1.0.10rc1 - March 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -2531,7 +2531,7 @@ png_do_read_interlace(png_structp png_ptr)
             } // end of _mmx_supported ========================================
 
             else /* MMX not supported:  use modified C code - takes advantage
-                  *   of inlining of memcpy for a constant */
+                  *   of inlining of png_memcpy for a constant */
                  /* GRR 19991007:  does it?  or should pixel_bytes in each
                   *   block be replaced with immediate value (e.g., 1)? */
                  /* GRR 19991017:  replaced with constants in each case */
@@ -5148,18 +5148,16 @@ png_mmx_support(void)
         "jz .NOT_SUPPORTED    \n\t"  // non-zero = yes, MMX IS supported
 
         "movl $1, %%eax       \n\t"  // set return value to 1
+        "jmp  .RETURN         \n\t"  // DONE:  have MMX support
+
+    ".NOT_SUPPORTED:          \n\t"  // target label for jump instructions
+        "movl $0, %%eax       \n\t"  // set return value to 0
+    ".RETURN:          \n\t"  // target label for jump instructions
         "movl %%eax, _mmx_supported \n\t" // save in global static variable, too
         "popl %%edx           \n\t"  // restore edx
         "popl %%ecx           \n\t"  // restore ecx
         "popl %%ebx           \n\t"  // restore ebx
-        "ret                  \n\t"  // DONE:  have MMX support
 
-    ".NOT_SUPPORTED:          \n\t"  // target label for jump instructions
-        "movl $0, %%eax       \n\t"  // set return value to 0
-//      "movl %%eax, _mmx_supported \n\t" // save in global static variable, too
-        "popl %%edx           \n\t"  // restore edx
-        "popl %%ecx           \n\t"  // restore ecx
-        "popl %%ebx           \n\t"  // restore ebx
 //      "ret                  \n\t"  // DONE:  no MMX support
                                      // (fall through to standard C "ret")
 
@@ -5172,10 +5170,11 @@ png_mmx_support(void)
 //      , "memory"   // if write to a variable gcc thought was in a reg
 //      , "cc"       // "condition codes" (flag bits)
     );
+#else     
+    _mmx_supported = 0;
 #endif /* PNG_MMX_CODE_SUPPORTED */
 
-    _mmx_supported = 0;
-    return 0;
+    return _mmx_supported;
 }
 
 #endif /* PNG_USE_PNGGCCRD */

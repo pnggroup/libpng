@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.10beta1 - March 14, 2001
+ * libpng 1.0.10rc1 - March 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -408,7 +408,7 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
 #endif
    png_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)num_palette,
       sizeof (png_color));
-   memcpy(png_ptr->palette, palette, num_palette * sizeof (png_color));
+   png_memcpy(png_ptr->palette, palette, num_palette * sizeof (png_color));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
 
@@ -532,7 +532,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
       return;
 
    new_iccp_name = png_malloc(png_ptr, png_strlen(name)+1);
-   strcpy(new_iccp_name, name);
+   png_strcpy(new_iccp_name, name);
    new_iccp_profile = png_malloc(png_ptr, proflen);
    png_memcpy(new_iccp_profile, profile, (png_size_t)proflen);
 
@@ -736,7 +736,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 #endif
        png_ptr->trans = info_ptr->trans = png_malloc(png_ptr, num_trans);
-       memcpy(info_ptr->trans, trans, num_trans);
+       png_memcpy(info_ptr->trans, trans, num_trans);
 #ifdef PNG_FREE_ME_SUPPORTED
        info_ptr->free_me |= PNG_FREE_TRNS;
 #else

@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.10beta1 - March 14, 2001
+ * libpng 1.0.10rc1 - March 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -1777,7 +1777,7 @@ loop4_pass4:
             } /* end of mmx_supported */
 
             else /* MMX not supported:  use modified C code - takes advantage
-                  * of inlining of memcpy for a constant */
+                  * of inlining of png_memcpy for a constant */
             {
                if (pixel_bytes == 1)
                {
