@@ -1304,6 +1304,8 @@ version 1.2.6rc4 [August 10, 2004]
 version 1.2.6rc5 [August 10, 2004]
   Moved  "PNG_HANDLE_CHUNK_*" macros out of PNG_ASSEMBLER_CODE_SUPPORTED
      section of png.h where they were inadvertently placed in version rc3.
+version 1.2.6rc6 [August 15, 2004]
+  Revised pngtest so memory allocation testing is only done when PNG_DEBUG==1.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net

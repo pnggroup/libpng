@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.6rc5 - August 10, 2004
+ * libpng 1.2.6 - August 15, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -470,7 +470,7 @@ pngtest_error(png_structp png_ptr, png_const_charp message)
 /* END of code to validate stdio-free compilation */
 
 /* START of code to validate memory allocation and deallocation */
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
 
 /* Allocate memory.  For reasonable files, size should never exceed
    64K.  However, zlib may allocate more then 64K if you don't tell
@@ -536,10 +536,8 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       pinformation = pinfo;
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
-#if PNG_DEBUG
       if(verbose)
          printf("png_malloc %lu bytes at %x\n",size,pinfo->pointer);
-#endif
       assert(pinfo->size != 12345678);
       return (png_voidp)(pinfo->pointer);
    }
@@ -588,10 +586,8 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    }
 
    /* Finally free the data. */
-#if PNG_DEBUG
    if(verbose)
       printf("Freeing %x\n",ptr);
-#endif
    png_free_default(png_ptr, ptr);
    ptr=NULL;
 }
@@ -657,7 +653,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 
    png_debug(0, "Allocating read and write structures\n");
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
    read_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
       png_error_ptr_NULL, png_error_ptr_NULL, png_voidp_NULL,
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
@@ -670,7 +666,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        pngtest_warning);
 #endif
 #ifdef PNG_WRITE_SUPPORTED
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
    write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
       png_error_ptr_NULL, png_error_ptr_NULL, png_voidp_NULL,
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
@@ -1392,7 +1388,7 @@ main(int argc, char *argv[])
    if (multiple)
    {
       int i;
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
       int allocation_now = current_allocation;
 #endif
       for (i=2; i<argc; ++i)
@@ -1427,7 +1423,7 @@ main(int argc, char *argv[])
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
          }
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
          if (allocation_now != current_allocation)
             fprintf(STDERR, "MEMORY ERROR: %d bytes lost\n",
                current_allocation-allocation_now);
@@ -1446,7 +1442,7 @@ main(int argc, char *argv[])
          }
 #endif
       }
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
          fprintf(STDERR, " Current memory allocation: %10d bytes\n",
             current_allocation);
          fprintf(STDERR, " Maximum memory allocation: %10d bytes\n",
@@ -1463,7 +1459,7 @@ main(int argc, char *argv[])
       for (i=0; i<3; ++i)
       {
          int kerror;
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
          int allocation_now = current_allocation;
 #endif
          if (i == 1) status_dots_requested = 1;
@@ -1502,7 +1498,7 @@ main(int argc, char *argv[])
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
          }
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
          if (allocation_now != current_allocation)
              fprintf(STDERR, "MEMORY ERROR: %d bytes lost\n",
                current_allocation-allocation_now);
@@ -1521,7 +1517,7 @@ main(int argc, char *argv[])
           }
 #endif
        }
-#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
+#if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
        fprintf(STDERR, " Current memory allocation: %10d bytes\n",
           current_allocation);
        fprintf(STDERR, " Maximum memory allocation: %10d bytes\n",
@@ -1555,4 +1551,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_6rc5 your_png_h_is_not_version_1_2_6rc5;
+typedef version_1_2_6 your_png_h_is_not_version_1_2_6;

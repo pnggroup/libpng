@@ -41,7 +41,7 @@ RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.6rc5
+PNGMIN = 1.2.6
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
