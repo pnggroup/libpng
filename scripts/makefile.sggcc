@@ -22,7 +22,7 @@ CFLAGS=$(ABI) -I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=CC $(ABI) -shared
 
-VER=1.2.0
+VER=1.2.1beta1
 # See "man dso" for info about shared objects
 SONUM=3
 LIBS=libpng.so.$(SONUM).$(VER)

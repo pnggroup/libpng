@@ -1,30 +1,14 @@
 
-Libpng 1.2.0 - September 1, 2001
+Libpng 1.2.1beta1 - October 19, 2001
 
 This is a public release of libpng, intended for use in production codes.
 
-Changes since the last public release (1.0.12):
+Changes since the last public release (1.2.0):
 
-  Enabled PNG_MNG_FEATURES_SUPPORTED and enabled PNG_ASSEMBLER_CODE_SUPPORTED
-    by default.
-  Added runtime selection of MMX features.
-  Added png_set_strip_error_numbers function and related macros.
-  Enabled user memory function by default.
-  Increased png_mng_features flag from png_byte to png_uint_32.
-  Bumped shared-library (so-number) and dll-number to 3.
-  Updated makefile.ibmc, makefile.gcmmx
-  Added some typecasts to eliminate gcc 3.0 warnings.  Changed prototypes
-     of png_write_oFFS width and height from png_uint_32 to png_int_32.
-  Updated example.c
-  Revised prototypes for png_debug_malloc and png_debug_free in pngtest.c
-  Revised pnggccrd.c to conditionally compile some thread-unsafe code only
-     when PNG_THREAD_UNSAFE_OK is defined.
-  Added tests to prevent pngwutil.c from writing a bKGD or tRNS chunk with
-     value exceeding 2^bit_depth-1
-  Removed restriction that do_invert_mono only operate on 1-bit opaque files
-  Replaced calls to fprintf(stderr,...) with png_warning() or png_debug()
-     in pnggccrd.c
-  Fixed contrib/gregbook/rpng-x.c, rpng2-x.c to avoid crash with XFreeGC().
+  Revised makefile.std in contrib/pngminus
+  Include background_1 in png_struct regardless of gamma support.
+  Revised makefile.netbsd and makefile.macosx, added makefile.darwin.
+  Revised example.c to provide more details about using row_callback().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

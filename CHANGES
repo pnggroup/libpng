@@ -733,10 +733,11 @@ version 1.0.6j [May 3, 2000]
 version 1.0.7beta11 [May 7, 2000]
   Removed the new PNG_CREATED_READ_STRUCT and PNG_CREATED_WRITE_STRUCT modes
     which are no longer used.
-  Eliminated the three new members of png_text when PNG_NO_iTXt_SUPPORTED
-    or PNG_LEGACY_SUPPORTED is defined.
-  Made PNG_NO_ITXT_SUPPORTED the default setting, to avoid memory overrun
-    when old applications fill the info_ptr->text structure directly.
+  Eliminated the three new members of png_text when PNG_LEGACY_SUPPORTED is
+    defined or when neither PNG_READ_iTXt_SUPPORTED nor PNG_WRITE_iTXT_SUPPORTED
+    is defined.
+  Made PNG_NO_READ|WRITE_iTXt the default setting, to avoid memory
+    overrun when old applications fill the info_ptr->text structure directly.
   Added PNGAPI macro, and added it to the definitions of all exported functions.
   Relocated version macro definitions ahead of the includes of zlib.h and
     pngconf.h in png.h.
@@ -980,6 +981,11 @@ version 1.2.0beta5 [August 8, 2001]
 version 1.2.0 [September 1, 2001]
   Changed a png_warning() to png_debug() in pnggccrd.c
   Fixed contrib/gregbook/rpng-x.c, rpng2-x.c to avoid crash with XFreeGC().
+version 1.2.1beta1 [October 19, 2001]
+  Revised makefile.std in contrib/pngminus
+  Include background_1 in png_struct regardless of gamma support.
+  Revised makefile.netbsd and makefile.macosx, added makefile.darwin.
+  Revised example.c to provide more details about using row_callback().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,5 +1,7 @@
 # makefile for libpng, MACOS X
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+# Modified by Karin Kosina <kyrah@sim.no> 20011010:
+# build shared library (*.dylib)
 # For conditions of distribution and use, see copyright notice in png.h
 
 # where make install puts libpng.a and png.h
@@ -12,8 +14,16 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CC=cc
-CFLAGS=-I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
+CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
+LDSHARED=cc -lz -dynamiclib -compatibility_version $(VER) -current_version $(VER)
+
+PNGMAJ = 3
+PNGMIN = 1.2.1beta1
+VER = $(PNGMAJ).$(PNGMIN)
+SHAREDLIB=libpng
+SHAREDLIB_POSTFIX=dylib
+libdir=$(prefix)/lib
 
 #RANLIB=echo
 RANLIB=ranlib
@@ -22,11 +32,16 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.a pngtest
+all: libpng.a pngtest shared
+
+shared: $(SHAREDLIB).$(VER).$(SHAREDLIB_POSTFIX)
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
+
+$(SHAREDLIB).$(VER).$(SHAREDLIB_POSTFIX): $(OBJS)
+	$(LDSHARED) -o $@ $(OBJS)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -44,8 +59,13 @@ install: libpng.a
 	cp libpng.a $(prefix)/lib
 	chmod 644 $(prefix)/lib/libpng.a
 
+install-shared: $(SHAREDLIB).$(VER).$(SHAREDLIB_POSTFIX)
+	cp $(SHAREDLIB).$(VER).$(SHAREDLIB_POSTFIX) $(libdir)
+	(cd $(libdir); \
+	ln -s $(SHAREDLIB).$(VER).$(SHAREDLIB_POSTFIX) $(SHAREDLIB).$(SHAREDLIB_POSTFIX)) 
+
 clean:
-	rm -f *.o libpng.a pngtest pngout.png
+	rm -f *.o libpng.a pngtest pngout.png $(SHAREDLIB).$(VER).$(SHAREDLIB_POSTFIX) $(SHAREDLIB).$(SHAREDLIB_POSTFIX)
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

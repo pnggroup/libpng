@@ -480,21 +480,47 @@ info_callback(png_structp png_ptr, png_infop info)
 row_callback(png_structp png_ptr, png_bytep new_row,
    png_uint_32 row_num, int pass)
 {
-/* this function is called for every row in the image.  If the
- * image is interlacing, and you turned on the interlace handler,
+/*
+ * This function is called for every row in the image.  If the
+ * image is interlaced, and you turned on the interlace handler,
  * this function will be called for every row in every pass.
- * Some of these rows will not be changed from the previous pass.
- * When the row is not changed, the new_row variable will be NULL.
+ *
+ * In this function you will receive a pointer to new row data from
+ * libpng called new_row that is to replace a corresponding row (of
+ * the same data format) in a buffer allocated by your application.
+ * 
+ * The new row data pointer new_row may be NULL, indicating there is
+ * no new data to be replaced (in cases of interlace loading).
+ * 
+ * If new_row is not NULL then you need to call
+ * png_progressive_combine_row() to replace the corresponding row as
+ * shown below:
+ */
+   /* Check if row_num is in bounds. */
+   if((row_num >= 0) && (row_num < height))
+   {
+     /* Get pointer to corresponding row in our
+      * PNG read buffer.
+      */
+     png_bytep old_row = ((png_bytep *)our_data)[row_num];
+
+     /* If both rows are allocated then copy the new row
+      * data to the corresponding row data.
+      */
+     if((old_row != NULL) && (new_row != NULL))
+     png_progressive_combine_row(png_ptr, old_row, new_row);
+   }
+/*
  * The rows and passes are called in order, so you don't really
  * need the row_num and pass, but I'm supplying them because it
  * may make your life easier.
  *
  * For the non-NULL rows of interlaced images, you must call
- * png_progressive_combine_row() passing in the row and the
- * old row.  You can call this function for NULL rows (it will
- * just return) and for non-interlaced images (it just does the
- * png_memcpy for you) if it will make the code easier.  Thus, you
- * can just do this for all cases:
+ * png_progressive_combine_row() passing in the new row and the
+ * old row, as demonstrated above.  You can call this function for
+ * NULL rows (it will just return) and for non-interlaced images
+ * (it just does the png_memcpy for you) if it will make the code
+ * easier.  Thus, you can just do this for all cases:
  */
 
    png_progressive_combine_row(png_ptr, old_row, new_row);
@@ -503,8 +529,8 @@ row_callback(png_structp png_ptr, png_bytep new_row,
  * that the first pass (pass == 0 really) will completely cover
  * the old row, so the rows do not have to be initialized.  After
  * the first pass (and only for interlaced images), you will have
- * to pass the current row, and the function will combine the
- * old row and the new row.
+ * to pass the current row as new_row, and the function will combine
+ * the old row and the new row.
  */
 }
 
