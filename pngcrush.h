@@ -6,6 +6,13 @@
 #ifndef PNGCRUSH_H
 #define PNGCRUSH_H
 
+#define PNG_SETJMP_NOT_SUPPORTED
+
+#if PNG_LIBPNG_VER > 10006
+#define PNG_NO_FLOATING_POINT_SUPPORTED
+#define PNG_READ_GRAY_TO_RGB_SUPPORTED
+#endif
+
 #define PNG_NO_READ_cHRM
 #define PNG_NO_WRITE_cHRM
 #define PNG_NO_READ_hIST
@@ -33,7 +40,11 @@
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
 #define PNG_READ_EXPAND_SUPPORTED
 #define PNG_READ_FILLER_SUPPORTED
-#define PNG_READ_RGB_TO_GRAY_SUPPORTED
+#if (PNG_LIBPNG_VER > 10002)
+/* versions 0.96 through 1.0.2 have a stub png_rgb_to_gray() with the
+ * wrong number of parameters */
+#  define PNG_READ_RGB_TO_GRAY_SUPPORTED
+#endif
 #ifndef PNG_NO_FLOATING_POINT_SUPPORTED
 #  define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #  define PNG_READ_BACKGROUND_SUPPORTED
@@ -41,7 +52,18 @@
 #else
 #  define PNG_NO_READ_RGB_TO_GRAY
 #endif
-#ifndef PNG_ZBUF_SIZE
+#if !defined(PNG_ZBUF_SIZE) && (PNG_LIBPNG_VER > 97)
 #  define PNG_ZBUF_SIZE 524288       /* increases the IDAT size */
 #endif
+
+/* Changed in version 0.99 */
+#if PNG_LIBPNG_VER < 99
+#undef PNG_CONST
+#ifndef PNG_NO_CONST
+#  define PNG_CONST const
+#else
+#  define PNG_CONST
+#endif
+#endif
+
 #endif

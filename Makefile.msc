@@ -47,7 +47,7 @@ all: $(EXES)
 $(PNGCRUSH)$(E): $(OBJS)
 	$(LD) $(LDFLAGS) -out:$@ $(OBJS) $(LIBS)
 
-$(PNGCRUSH)$(O): $(PNGCRUSH).c png.h pngconf.h zlib.h pngcrush.h
+$(PNGCRUSH)$(O): $(PNGCRUSH).c png.h pngconf.h zlib.h pngcrush.h cexcept.h
 
 # maintenance ---------------------------------------------------------------
 

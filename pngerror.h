@@ -52,7 +52,7 @@ typedef struct png_jmpbuf_struct
 typedef png_jmpbuf FAR * png_jmpbufp;
 typedef png_jmpbuf FAR * FAR * png_jmpbufpp;
 
-#define png_jmp_env(png_ptr) png_get_jmpbuf(png_ptr)->env  
+#define png_jmpbuf(png_ptr) png_get_jmpbuf(png_ptr)->env  
 
 extern PNG_EXPORT(png_jmpbufp,png_get_jmpbuf)
    PNGARG((png_structp));
@@ -60,6 +60,9 @@ extern PNG_EXPORT(png_jmpbufp,png_get_jmpbuf)
 #define png_setjmp(png_ptr) setjmp(png_get_jmpbuf(png_ptr)->env)
 #define png_longjmp(png_ptr,val) longjmp(png_get_jmpbuf(png_ptr)->env,val)
 
+#else
+#   define png_jmpbuf(png_ptr) \
+    (LIBPNG_WAS_COMPILED_WITH__PNG_SETJMP_NOT_SUPPORTED)
 #endif /* PNG_SETJMP_SUPPORTED */
 
 #endif /* _PNGERROR_H */

@@ -5,7 +5,10 @@ This is the copyright notice, disclaimer, and license:
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
  *
- * Copyright (c) 1998, 1999, Glenn Randers-Pehrson
+ * If you have modified this source, you may insert additional notices
+ * immediately after this sentence.
+ *
+ * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * The pngcrush program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
@@ -14,8 +17,8 @@ This is the copyright notice, disclaimer, and license:
  * exemplary, or consequential damages, which may result from the use of
  * the pngcrush program, even if advised of the possibility of such damage.
  *
- * Permission is hereby granted to use, copy, modify, and distribute this
- * source code, or portions hereof, for any purpose, without fee, subject
+ * Permission is hereby granted to anyone to use, copy, modify, and distribute
+ * this source code, or portions hereof, for any purpose, without fee, subject
  * to the following restrictions:
  *
  * 1. The origin of this source code must not be misrepresented.
@@ -30,15 +33,14 @@ This is the copyright notice, disclaimer, and license:
 This is the output of "pngcrush" and "pngcrush -help":
 
 
-
- | pngcrush 1.3.5, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
+ | pngcrush 1.4.1, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.1.0a,
+ | This program was built with libpng version 1.0.6e,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
- | and zlib version 1.1.3, Copyright (c) 1998,
+ | and zlib version 1.1.3, Copyright (C) 1998,
  |    Jean-loup Gailly and Mark Adler.
 
 
@@ -57,12 +59,12 @@ options:
          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
             -l zlib_compression_level [0-9]
             -m method [0 through 200]
-          -max maximum_IDAT_size [1 through 524288]
+          -max maximum_IDAT_size [1 through 8192]
             -n (no save; does not do compression or write output PNG)
             -plte_len n (truncate PLTE)
             -q (quiet)
           -rem chunkname (or "alla" or "allb")
--replace_gamma gamma_value (float) even when file has a gAMA chunk.
+-replace_gamma gamma (float or fixed*100000) even if gAMA is present.
           -res dpi
          -srgb [0, 1, 2, or 3]
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
@@ -74,9 +76,6 @@ options:
             -p (pause)
 
 
-usage: pngcrush [options] infile.png outfile.png
-       pngcrush -e ext [other options] files.png ...
-       pngcrush -d dir [other options] files.png ...
 
 options:
         -brute (Use brute-force, try 114 different methods [11-124])
@@ -93,6 +92,7 @@ options:
                fewer colors present in the input file.  Color types
                4 and 6 are padded with an opaque alpha channel if
                the input file does not have alpha information.
+               You can use 0 or 4 to convert color to grayscale.
                Use 0 or 2 to delete an unwanted alpha channel.
                Default is to use same color type as the input file.
 
@@ -134,7 +134,7 @@ options:
 
          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
 
-               Compressed iTXt chunk to insert (see -text).
+               Uncompressed iTXt chunk to insert (see -text).
 
             -l zlib_compression_level [0-9]
 
@@ -152,7 +152,7 @@ options:
                1, 4, and 7 use no filtering; methods 11 and up use 
                specified filter, compression level, and strategy.
 
-          -max maximum_IDAT_size [1 through 524288]
+          -max maximum_IDAT_size [1 through 8192]
 
             -n (no save; does not do compression or write output PNG)
 
@@ -175,14 +175,14 @@ options:
                different chunks, repeat: -rem tEXt -rem pHYs.
                Known chunks (those in the PNG 1.1 spec or extensions
                document) can be named with all lower-case letters,
-               so "-rem bkgd" is equivalent to "-rem bKGD".
+               so "-rem bkgd" is equivalent to "-rem bKGD".  But
+               note: "-rem text" removes all forms of text chunks;
                Exact case is required to remove unknown chunks.
-               "-rem text" also removes zTXt.  If you like to do
-               surgery with a chain-saw, "-rem alla" removes
+               To do surgery with a chain-saw, "-rem alla" removes
                all known ancillary chunks except for tRNS, and
                "-rem allb" removes all but tRNS and gAMA.
 
--replace_gamma gamma_value (float) even when file has a gAMA chunk.
+-replace_gamma gamma (float or fixed*100000) even if gAMA is present.
 
           -res dpi
 

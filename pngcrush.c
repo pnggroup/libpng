@@ -15,10 +15,13 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.0"
+#define PNGCRUSH_VERSION "1.4.1"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
+ *
+ * If you have modified this source, you may insert additional notices
+ * immediately after this sentence.
  *
  * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
@@ -62,6 +65,14 @@
  *   recompressing.
  *
  * Change log:
+ *
+ * Version 1.4.1 (built with libpng-1.0.6e and cexcept-0.6.0)
+ *
+ *   Uses cexcept.h for error handling instead of libpng's built-in
+ *   setjmp/longjmp mechanism.  See http://cexcept.sourceforge.net/
+ *
+ *   Pngcrush.c will now run when compiled with old versions of libpng back
+ *   to version 0.96, although some features will not be available.
  *
  * Version 1.4.0 (built with libpng-1.0.6 + libpng-1.0.6-patch-a)
  *
@@ -176,6 +187,8 @@
  *   types, compression levels, or compression strategies.
  */
 
+#define USE_CEXCEPT
+
 #if defined(__DJGPP__)
 #  if ((__DJGPP__ == 2) && (__DJGPP_MINOR__ == 0))
 #    include <libc/dosio.h>      /* for _USE_LFN, djgpp 2.0 only */
@@ -205,15 +218,45 @@
 #define P1 if(verbose > 1)printf
 #define P2 if(verbose > 2)printf
 
-/* we don't need the extra libpng tranformations
+/* we don't need the extra libpng transformations
  * so they are ifdef'ed out in a special version of pngconf.h */
 
 #define PNG_INTERNAL
 #include "png.h"
 
+#if (PNG_LIBPNG_VER > 95)
+
 /* so we can load pngcrush with pre-1.0.6 versions of libpng */
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#endif
+
+#if (PNG_LIBPNG_VER < 10006)
+/* These shorter macros weren't defined until version 1.0.6 */
+#if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED)
+#define PNG_gAMA_SUPPORTED
+#endif
+#if defined(PNG_READ_pHYs_SUPPORTED) || defined(PNG_WRITE_pHYs_SUPPORTED)
+#define PNG_pHYs_SUPPORTED
+#endif
+#if defined(PNG_READ_sRGB_SUPPORTED) || defined(PNG_WRITE_sRGB_SUPPORTED)
+#define PNG_sRGB_SUPPORTED
+#endif
+#if defined(PNG_READ_cHRM_SUPPORTED) || defined(PNG_WRITE_cHRM_SUPPORTED)
+#define PNG_cHRM_SUPPORTED
+#endif
+#if defined(PNG_READ_hIST_SUPPORTED) || defined(PNG_WRITE_hIST_SUPPORTED)
+#define PNG_hIST_SUPPORTED
+#endif
+#if defined(PNG_READ_pCAL_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED)
+#define PNG_pCAL_SUPPORTED
+#endif
+#if defined(PNG_READ_tIME_SUPPORTED) || defined(PNG_WRITE_tIME_SUPPORTED)
+#define PNG_tIME_SUPPORTED
+#endif
+#if defined(PNG_READ_tRNS_SUPPORTED) || defined(PNG_WRITE_tRNS_SUPPORTED)
+#define PNG_tRNS_SUPPORTED
+#endif
 #endif
 
 #ifdef __TURBOC__
@@ -256,10 +299,22 @@ int best;
 char buffer[256];
 char *str_return;
 
+#ifdef USE_CEXCEPT
+/* The cexcept documentation recommends putting the following three lines in a
+ * separate header file, but it appears to work with them embedded here.
+ * There is only one "Throw" and it is in this file. */
+#include "cexcept.h"
+define_exception_type(const char *);
+extern struct exception_context the_exception_context[1];
+
+struct exception_context the_exception_context[1];
+
+#else
 #ifndef PNG_JMPBUF_SUPPORTED
 #ifndef PNG_SETJMP_NOT_SUPPORTED
 /* Old setjmp interface */
 jmp_buf jmpbuf;
+#endif
 #endif
 #endif
 
@@ -299,17 +354,25 @@ static int methods_specified=0;
 static int intent=-1;
 static int plte_len=-1;
 #ifdef PNG_gAMA_SUPPORTED
+#  ifdef PNG_FIXED_POINT_SUPPORTED
 static int specified_gamma=0;
 static int force_specified_gamma=0;
+#  else
+static double specified_gamma=0.0;
+static double force_specified_gamma=0.0;
+#  endif
 static int double_gamma=0;
 #endif
 static int names;
+#ifdef PNG_tRNS_SUPPORTED
 static int have_trns=0;
 static png_uint_16 trns_index=0;
 static png_uint_16 trns_red=0;
 static png_uint_16 trns_green=0;
 static png_uint_16 trns_blue=0;
 static png_uint_16 trns_gray=0;
+#endif
+static png_byte trns_array[256];
 static int have_bkgd=0;
 static png_uint_16 bkgd_red=0;
 static png_uint_16 bkgd_green=0;
@@ -317,7 +380,6 @@ static png_uint_16 bkgd_blue=0;
 
 static png_colorp palette;
 static int num_palette;
-static png_byte trns_array[256];
 
 #ifdef REORDER_PALETTE
 static png_byte palette_reorder[256];
@@ -340,6 +402,18 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 
 static int max_idat_size = PNG_ZBUF_SIZE;
 int ia;
+
+/* cexcept interface */
+
+#ifdef USE_CEXCEPT
+static void
+png_cexcept_error(png_structp png_ptr, png_const_charp msg)
+{
+   if(png_ptr)
+     ;
+   Throw msg;
+}
+#endif
 
 /* START of code to validate memory allocation and deallocation */
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -582,7 +656,11 @@ main(int argc, char *argv[])
    int ntrial;
    int lev, strat, filt;
 #ifdef PNG_gAMA_SUPPORTED
+#ifdef PNG_FIXED_POINT_SUPPORTED
    png_fixed_point file_gamma=0;
+#else
+   double file_gamma=0.;
+#endif
 #endif
    char *cp;
    int i;
@@ -807,6 +885,7 @@ main(int argc, char *argv[])
          BUMP_I;
          if (intent < 0)
             {
+#ifdef PNG_FIXED_POINT_SUPPORTED
                int c;
                char number[16];
                char *n=number;
@@ -828,6 +907,9 @@ main(int argc, char *argv[])
                   *n++='0';
                *n='\0';
                specified_gamma=atoi(number);
+#else
+               specified_gamma=atof(argv[i]);
+#endif
             }
       }
 #endif
@@ -882,6 +964,7 @@ main(int argc, char *argv[])
          names++;
          BUMP_I;
          {
+#ifdef PNG_FIXED_POINT_SUPPORTED
             int c;
             char number[16];
             char *n=number;
@@ -903,6 +986,9 @@ main(int argc, char *argv[])
                *n++='0';
             *n='\0';
             force_specified_gamma=atoi(number);
+#else
+            force_specified_gamma=atof(argv[i]);
+#endif
          }
          things_have_changed=1;
       }
@@ -928,7 +1014,11 @@ main(int argc, char *argv[])
             !strncmp(argv[i],"-sRGB",5))
       {
 #ifdef PNG_gAMA_SUPPORTED
+#ifdef PNG_FIXED_POINT_SUPPORTED
          specified_gamma=45455L;
+#else
+         specified_gamma=0.45455;
+#endif
 #endif
          intent=0;
          BUMP_I;
@@ -947,28 +1037,35 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-s",2))
          verbose=0;
    else if( !strncmp(argv[i],"-text",5) || !strncmp(argv[i],"-tEXt",5) ||
-            !strncmp(argv[i],"-ztxt",5) || !strncmp(argv[i],"-zTXt",5) ||
+#ifdef PNG_iTXt_SUPPORTED
+            !strncmp(argv[i],"-itxt",5) || !strncmp(argv[i],"-iTXt",5) ||
             !strncmp(argv[i],"-zitxt",6) || !strncmp(argv[i],"-ziTXt",6) ||
-            !strncmp(argv[i],"-itxt",5) || !strncmp(argv[i],"-iTXt",5))
+#endif
+            !strncmp(argv[i],"-ztxt",5) || !strncmp(argv[i],"-zTXt",5))
       {
          i+=2; BUMP_I; i-=3;
          if(strlen(argv[i+2]) < 80 && strlen(argv[i+3]) < 2048 &&
             text_inputs < 10)
          {
+#ifdef PNG_iTXt_SUPPORTED
          if( !strncmp(argv[i],"-zi",3))
          {
             text_compression[text_inputs] = PNG_ITXT_COMPRESSION_zTXt;
               names+=2;
          }
-         else if( !strncmp(argv[i],"-z",2))
+         else
+#endif
+         if( !strncmp(argv[i],"-z",2))
             text_compression[text_inputs] = PNG_TEXT_COMPRESSION_zTXt;
          else if( !strncmp(argv[i],"-t",2))
             text_compression[text_inputs] = PNG_TEXT_COMPRESSION_NONE;
+#ifdef PNG_iTXt_SUPPORTED
          else
          {
            text_compression[text_inputs] = PNG_ITXT_COMPRESSION_NONE;
            names+=2;
          }
+#endif
          names+=3;
          if( !strncmp(argv[++i],"b",1))
             text_where[text_inputs]=1;
@@ -1001,14 +1098,17 @@ main(int argc, char *argv[])
               "keyword exceeds 79 characters or text exceeds 2047 characters\n");
             i+=3;
             names+=3;
+#ifdef PNG_iTXt_SUPPORTED
             if( !strncmp(argv[i],"-i",2) || !strncmp(argv[i],"-zi",3))
             {
               i++;
               BUMP_I;
               names+=2;
             }
+#endif
          }
       }
+#ifdef PNG_tRNS_SUPPORTED
    else if( !strncmp(argv[i],"-trns",5) ||
             !strncmp(argv[i],"-tRNS",5))
       {
@@ -1020,6 +1120,7 @@ main(int argc, char *argv[])
          trns_blue=(png_uint_16)atoi(argv[++i]);
          trns_gray=(png_uint_16)atoi(argv[++i]);
       }
+#endif
    else if(!strncmp(argv[i],"-version",8))
       {
          fprintf(STDERR,"libpng ");
@@ -1090,10 +1191,14 @@ main(int argc, char *argv[])
             PNG_LIBPNG_VER_STRING);
       fprintf(STDERR,
         " |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,\n");
+#if PNG_LIBPNG_VER > 89
       fprintf(STDERR,
         " |    Copyright (C) 1996, 1997 Andreas Dilger,\n");
+#endif
+#if PNG_LIBPNG_VER > 96
       fprintf(STDERR,
         " |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,\n");
+#endif
       fprintf(STDERR, 
         " | and zlib version %s, Copyright (C) 1998,\n",
             ZLIB_VERSION);
@@ -1249,7 +1354,11 @@ main(int argc, char *argv[])
        "               additions, removals, or changes were requested.\n\n");
      }
      fprintf(STDERR,
+#ifdef PNG_FIXED_POINT_SUPPORTED
        "            -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)\n");
+#else
+       "            -g gamma (float, e.g., 0.45455)\n");
+#endif
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Value to insert in gAMA chunk, only if the input\n");
@@ -1260,11 +1369,13 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               gAMA chunk, use the '-replace_gamma' option.\n\n");
      png_crush_pause();
+#ifdef PNG_iTXt_SUPPORTED
      fprintf(STDERR,
        "         -itxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Uncompressed iTXt chunk to insert (see -text).\n\n");
+#endif
      fprintf(STDERR,
        "            -l zlib_compression_level [0-9]\n");
      if(verbose > 1)
@@ -1359,7 +1470,11 @@ main(int argc, char *argv[])
      }
       png_crush_pause();
      fprintf(STDERR,
+#ifdef PNG_FIXED_POINT_SUPPORTED
        "-replace_gamma gamma (float or fixed*100000) even if gAMA is present.\n");
+#else
+       "-replace_gamma gamma (float, e.g. 0.45455) even if gAMA is present.\n");
+#endif
      if(verbose > 1)
         fprintf(STDERR,"\n");
      fprintf(STDERR,
@@ -1401,6 +1516,7 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               tEXt, iTXt, or zTXt chunks per pngcrush run.\n\n");
      }
+#ifdef PNG_tRNS_SUPPORTED
      fprintf(STDERR,
        "         -trns index red green blue gray\n");
      if(verbose > 1)
@@ -1412,6 +1528,7 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               color type, scaled to the output bit depth.\n\n");
      }
+#endif
 
      fprintf(STDERR,
        "            -v (display more detailed information)\n");
@@ -1445,11 +1562,13 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               '-m method' argument.\n\n");
      }
+#ifdef PNG_iTXt_SUPPORTED
      fprintf(STDERR,
        "        -zitxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Compressed iTXt chunk to insert (see -text).\n\n");
+#endif
      fprintf(STDERR,
        "         -ztxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
@@ -1484,6 +1603,11 @@ main(int argc, char *argv[])
    for(;;)  /* loop on input files */
 
    {
+#ifdef USE_CEXCEPT
+   png_const_charp msg;
+   Try
+   {
+#endif
       first_trial = 1;
 
       if(png_row_filters != NULL)
@@ -1742,33 +1866,40 @@ main(int argc, char *argv[])
       png_debug(0, "Allocating read and write structures\n");
 #ifdef PNG_USER_MEM_SUPPORTED
    read_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
+#ifdef USE_CEXCEPT
+      (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL, (png_voidp)NULL,
+#else
       (png_error_ptr)NULL, (png_error_ptr)NULL, (png_voidp)NULL,
+#endif
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
 #else
    read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
+#ifdef USE_CEXCEPT
+      (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
+#else
       (png_error_ptr)NULL, (png_error_ptr)NULL);
 #endif
-
-#if defined(PNG_NO_STDIO)
-      png_set_error_fn(read_ptr, (png_voidp)inname, png_default_error,
-         png_default_warning);
 #endif
 
    if(nosave == 0)
    {
 #ifdef PNG_USER_MEM_SUPPORTED
    write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
+#ifdef USE_CEXCEPT
+      (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL, (png_voidp)NULL,
+#else
       (png_error_ptr)NULL, (png_error_ptr)NULL, (png_voidp)NULL,
+#endif
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
 #else
    write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
+#ifdef USE_CEXCEPT
+      (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
+#else
       (png_error_ptr)NULL, (png_error_ptr)NULL);
 #endif
-
-#if defined(PNG_NO_STDIO)
-      png_set_error_fn(write_ptr, (png_voidp)outname, png_default_error,
-          png_default_warning);
 #endif
+
    }
       png_debug(0, "Allocating read_info, write_info and end_info structures\n");
       read_info_ptr = png_create_info_struct(read_ptr);
@@ -1787,13 +1918,7 @@ main(int argc, char *argv[])
 #  ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
 #  else
-#    ifdef PNG_JMPBUF_SUPPORTED
-   /* New setjmp interface */
    if (setjmp(png_jmpbuf(read_ptr)))
-#    else
-   /* old interface */
-   if (setjmp(read_ptr->jmpbuf))
-#    endif
 #  endif
       {
           PNG_CRUSH_CLEANUP
@@ -1807,13 +1932,7 @@ main(int argc, char *argv[])
 #  ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
 #  else
-#    ifdef PNG_JMPBUF_SUPPORTED
-   /* New setjmp interface */
    if (setjmp(png_jmpbuf(write_ptr)))
-#    else
-   /* Old interface */
-   if (setjmp(write_ptr->jmpbuf))
-#    endif
 #  endif
          {
              PNG_CRUSH_CLEANUP
@@ -1869,8 +1988,7 @@ main(int argc, char *argv[])
             P2("reinitializing write zbuf.\n");
             png_free(write_ptr, write_ptr->zbuf);
             write_ptr->zbuf_size = (png_size_t)max_idat_size;
-            write_ptr->zbuf =
-              (png_bytep)png_malloc(write_ptr,
+            write_ptr->zbuf = (png_bytep)png_malloc(write_ptr,
                  (png_uint_32)write_ptr->zbuf_size);
          }
        }
@@ -1887,6 +2005,7 @@ main(int argc, char *argv[])
         else
         {
 #ifndef PNG_UINT_IHDR
+/* We are using libpng-1.0.6 or earlier */
 #ifdef PNG_USE_LOCAL_ARRAYS
 #if !defined(PNG_cHRM_SUPPORTED)
           PNG_cHRM;
@@ -1942,7 +2061,7 @@ main(int argc, char *argv[])
             (png_bytep)png_tIME, 1);
 #endif
 
-#else   /* PNG_UINT_IHDR */
+#else   /* PNG_UINT_IHDR is defined; we are using libpng newer than 1.0.6 */
 
 #if !defined(PNG_cHRM_SUPPORTED) || !defined(PNG_hIST_SUPPORTED) || \
     !defined(PNG_iCCP_SUPPORTED) || !defined(PNG_sCAL_SUPPORTED) || \
@@ -1992,7 +2111,7 @@ main(int argc, char *argv[])
 #endif  /* PNG_UINT_IHDR */
           }
         }
-#endif
+#endif  /* PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED */
 
       png_debug(0, "Reading info struct\n");
       png_read_info(read_ptr, read_info_ptr);
@@ -2031,15 +2150,19 @@ main(int argc, char *argv[])
             if(output_bit_depth != input_bit_depth)
                need_expand = 1;
 
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
             if((color_type == 2 || color_type == 6 || color_type == 3) &&
               (output_color_type == 0 || output_color_type == 4))
             {
-#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+#ifdef PNG_FIXED_POINT_SUPPORTED
                png_set_rgb_to_gray_fixed(read_ptr, 1, -1, -1);
+#else
+               png_set_rgb_to_gray(read_ptr, 1, 0., 0.);
+#endif
                if(output_bit_depth < 8)output_bit_depth=8;
                if(color_type == 3) need_expand = 1;
-#endif
             }
+#endif
            
             if(color_type != 3 && output_color_type == 3)
             {
@@ -2067,7 +2190,7 @@ main(int argc, char *argv[])
                (color_type != 4 && color_type != 6))
             {
                 if(verbose > 0 && first_trial)
-                   fprintf(STDERR, "   Adding an alpha channel.\n");
+                   fprintf(STDERR, "   Adding an opaque alpha channel.\n");
 #ifdef PNG_READ_FILLER_SUPPORTED
                 png_set_filler(read_ptr, (png_uint_32)65535L, PNG_FILLER_AFTER);
 #endif
@@ -2167,6 +2290,7 @@ main(int argc, char *argv[])
       }
 #endif
 #if defined(PNG_READ_cHRM_SUPPORTED) && defined(PNG_WRITE_cHRM_SUPPORTED)
+#ifdef PNG_FIXED_POINT_SUPPORTED
       {
          png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y,
             blue_x, blue_y;
@@ -2179,7 +2303,22 @@ main(int argc, char *argv[])
                red_x, red_y, green_x, green_y, blue_x, blue_y);
          }
       }
+#else
+      {
+         double white_x, white_y, red_x, red_y, green_x, green_y,
+            blue_x, blue_y;
+
+         if (png_get_cHRM(read_ptr, read_info_ptr, &white_x, &white_y,
+            &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y))
+         {
+            if(keep_chunk("cHRM",argv))
+            png_set_cHRM(write_ptr, write_info_ptr, white_x, white_y,
+               red_x, red_y, green_x, green_y, blue_x, blue_y);
+         }
+      }
 #endif
+#endif
+
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_WRITE_gAMA_SUPPORTED)
       {
          if(force_specified_gamma > 0)
@@ -2189,22 +2328,43 @@ main(int argc, char *argv[])
                things_have_changed=1;
                if(verbose > 0)
                  fprintf(STDERR,
+#ifdef PNG_FIXED_POINT_SUPPORTED
                 "   Inserting gAMA chunk with gamma=(%d/100000)\n",
+#else
+                "   Inserting gAMA chunk with gamma=%f\n",
+#endif
                     force_specified_gamma);
             }
+#ifdef PNG_FIXED_POINT_SUPPORTED
             png_set_gAMA_fixed(write_ptr, write_info_ptr, 
                (png_fixed_point)force_specified_gamma);
             file_gamma=(png_fixed_point)force_specified_gamma;
+#else
+            png_set_gAMA(write_ptr, write_info_ptr, 
+               force_specified_gamma);
+            file_gamma=force_specified_gamma;
+#endif
          }
+#ifdef PNG_FIXED_POINT_SUPPORTED
          else if (png_get_gAMA_fixed(read_ptr, read_info_ptr, &file_gamma))
+#else
+         else if (png_get_gAMA(read_ptr, read_info_ptr, &file_gamma))
+#endif
          {
             if(keep_chunk("gAMA",argv))
             {
                if(verbose > 1 && first_trial)
+#ifdef PNG_FIXED_POINT_SUPPORTED
                  fprintf(STDERR, "   gamma=(%d/100000)\n", (int)file_gamma);
                if(double_gamma)
                  file_gamma+=file_gamma;
                png_set_gAMA_fixed(write_ptr, write_info_ptr, file_gamma);
+#else
+                 fprintf(STDERR, "   gamma=%f\n", file_gamma);
+               if(double_gamma)
+                 file_gamma+=file_gamma;
+               png_set_gAMA(write_ptr, write_info_ptr, file_gamma);
+#endif
             }
          }
          else if(specified_gamma > 0)
@@ -2214,11 +2374,20 @@ main(int argc, char *argv[])
                things_have_changed=1;
                if(verbose > 0)
                  fprintf(STDERR,
+#ifdef PNG_FIXED_POINT_SUPPORTED
                  "   Inserting gAMA chunk with gamma=(%d/100000)\n",
+#else
+                 "   Inserting gAMA chunk with gamma=%f\n",
+#endif
                     specified_gamma);
             }
+#ifdef PNG_FIXED_POINT_SUPPORTED
                png_set_gAMA_fixed(write_ptr, write_info_ptr, specified_gamma);
             file_gamma=(png_fixed_point)specified_gamma;
+#else
+               png_set_gAMA(write_ptr, write_info_ptr, specified_gamma);
+            file_gamma=specified_gamma;
+#endif
          }
       }
 #endif
@@ -2234,7 +2403,11 @@ main(int argc, char *argv[])
          else if(intent >= 0)
          {
 #ifdef PNG_gAMA_SUPPORTED
+#ifdef PNG_FIXED_POINT_SUPPORTED
             if(file_gamma >= 45000L && file_gamma <= 46000L)
+#else
+            if(file_gamma >= 0.45000 && file_gamma <= 0.46000)
+#endif
             {
                things_have_changed=1;
                if(first_trial)
@@ -2251,7 +2424,11 @@ main(int argc, char *argv[])
                if(first_trial)
                {
                   fprintf(STDERR,
+#ifdef PNG_FIXED_POINT_SUPPORTED
           "   Ignoring sRGB request; gamma=(%lu/100000) is not approx. 0.455\n",
+#else
+          "   Ignoring sRGB request; gamma=%f is not approx. 0.455\n",
+#endif
                    file_gamma);
                }
             }
@@ -2277,7 +2454,11 @@ main(int argc, char *argv[])
 #endif
 #if defined(PNG_READ_oFFs_SUPPORTED) && defined(PNG_WRITE_oFFs_SUPPORTED)
       {
+#if PNG_LIBPNG_VER < 10006
+         png_uint_32 offset_x, offset_y;
+#else
          png_int_32 offset_x, offset_y;
+#endif
          int unit_type;
 
          if (png_get_oFFs(read_ptr, read_info_ptr,&offset_x,&offset_y,&unit_type))
@@ -2556,6 +2737,7 @@ main(int argc, char *argv[])
                   fprintf(STDERR,"%d  %s",ntext,text_ptr[ntext].key);
                   if(text_ptr[ntext].text_length != 0)
                      fprintf(STDERR,": %s\n",text_ptr[ntext].text);
+#ifdef PNG_iTXt_SUPPORTED
                   else if (text_ptr[ntext].itxt_length != 0)
                   {
                      fprintf(STDERR," (%s: %s): \n",
@@ -2563,6 +2745,7 @@ main(int argc, char *argv[])
                           text_ptr[ntext].lang_key);
                      fprintf(STDERR,"%s\n",text_ptr[ntext].text);
                   }
+#endif
                   else
                      fprintf(STDERR,"\n");
                }
@@ -2594,6 +2777,7 @@ main(int argc, char *argv[])
                              num_to_write--;
                            }
                        }
+#ifdef PNG_iTXt_SUPPORTED
                      if(text_ptr[ntext].compression==PNG_ITXT_COMPRESSION_NONE
                        ||text_ptr[ntext].compression==PNG_ITXT_COMPRESSION_zTXt)
                        {
@@ -2603,6 +2787,7 @@ main(int argc, char *argv[])
                              num_to_write--;
                            }
                        }
+#endif
                    }
                    if (num_to_write > 0)
                       png_set_text(write_ptr, write_info_ptr, text_ptr,
@@ -2617,8 +2802,10 @@ main(int argc, char *argv[])
                     added_text = (png_textp)
                        png_malloc(write_ptr, (png_uint_32)sizeof(png_text));
                     added_text[0].key = &text_keyword[ntext*80];
+#ifdef PNG_iTXt_SUPPORTED
                     added_text[0].lang = &text_lang[ntext*80];
                     added_text[0].lang_key = &text_lang_key[ntext*80];
+#endif
                     added_text[0].text = &text_text[ntext*2048];
                     added_text[0].compression = text_compression[ntext];
                     png_set_text(write_ptr, write_info_ptr, added_text, 1);
@@ -2626,10 +2813,12 @@ main(int argc, char *argv[])
                        printf("   Added a tEXt chunk.\n");
                     else if(added_text[0].compression == 0)
                        printf("   Added a zTXt chunk.\n");
+#ifdef PNG_iTXt_SUPPORTED
                     else if(added_text[0].compression == 1)
                        printf("   Added an uncompressed iTXt chunk.\n");
                     else
                        printf("   Added a compressed iTXt chunk.\n");
+#endif
                     png_free(write_ptr,added_text);
                   }
               }
@@ -2842,6 +3031,7 @@ main(int argc, char *argv[])
                   fprintf(STDERR,"%d  %s",ntext,text_ptr[ntext].key);
                   if(text_ptr[ntext].text_length != 0)
                      fprintf(STDERR,": %s\n",text_ptr[ntext].text);
+#ifdef PNG_iTXt_SUPPORTED
                   else if (text_ptr[ntext].itxt_length != 0)
                   {
                      fprintf(STDERR," (%s: %s): \n",
@@ -2849,6 +3039,7 @@ main(int argc, char *argv[])
                           text_ptr[ntext].lang_key);
                      fprintf(STDERR,"%s\n",text_ptr[ntext].text);
                   }
+#endif
                   else
                      fprintf(STDERR,"\n");
                }
@@ -2880,6 +3071,7 @@ main(int argc, char *argv[])
                              num_to_write--;
                            }
                        }
+#ifdef PNG_iTXt_SUPPORTED
                      if(text_ptr[ntext].compression==PNG_ITXT_COMPRESSION_NONE
                        ||text_ptr[ntext].compression==PNG_ITXT_COMPRESSION_zTXt)
                        {
@@ -2889,6 +3081,7 @@ main(int argc, char *argv[])
                              num_to_write--;
                            }
                        }
+#endif
                    }
                    if (num_to_write > 0)
                       png_set_text(write_ptr, write_end_info_ptr, text_ptr,
@@ -2903,8 +3096,10 @@ main(int argc, char *argv[])
                     added_text = (png_textp)
                        png_malloc(write_ptr, (png_uint_32)sizeof(png_text));
                     added_text[0].key = &text_keyword[ntext*80];
+#ifdef PNG_iTXt_SUPPORTED
                     added_text[0].lang = &text_lang[ntext*80];
                     added_text[0].lang_key = &text_lang_key[ntext*80];
+#endif
                     added_text[0].text = &text_text[ntext*2048];
                     added_text[0].compression = text_compression[ntext];
                     png_set_text(write_ptr, write_end_info_ptr, added_text, 1);
@@ -2912,10 +3107,12 @@ main(int argc, char *argv[])
                        printf("   Added a tEXt chunk.\n");
                     else if(added_text[0].compression == 0)
                        printf("   Added a zTXt chunk.\n");
+#ifdef PNG_iTXt_SUPPORTED
                     else if(added_text[0].compression == 1)
                        printf("   Added an uncompressed iTXt chunk.\n");
                     else
                        printf("   Added a compressed iTXt chunk.\n");
+#endif
                     png_free(write_ptr,added_text);
                   }
               }
@@ -3053,6 +3250,14 @@ main(int argc, char *argv[])
          if(verbose > 0) show_result();
          return 0;
       }
+#ifdef USE_CEXCEPT
+   }
+   Catch (msg)
+   {
+     fprintf(stderr, "Caught libpng error:\n   %s\n\n",msg);
+     PNG_CRUSH_CLEANUP
+   }
+#endif
    }  /* end of loop on input files */
 }
 
@@ -3063,9 +3268,10 @@ measure_idats(FILE *fpin)
    P2("measure_idats:\n");
    png_debug(0, "Allocating read structure\n");
    read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
+#ifdef USE_CEXCEPT
+      (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
+#else
       (png_error_ptr)NULL, (png_error_ptr)NULL);
-#if defined(PNG_NO_STDIO)
-   png_set_error_fn(read_ptr, (png_voidp)inname, png_default_error, png_default_warning);
 #endif
    png_debug(0, "Allocating read_info,  end_info structures\n");
    read_info_ptr = png_create_info_struct(read_ptr);
@@ -3076,13 +3282,7 @@ measure_idats(FILE *fpin)
 #  ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
 #  else
-#    ifdef PNG_JMPBUF_SUPPORTED
-   /* New setjmp interface */
    if (setjmp(png_jmpbuf(read_ptr)))
-#    else
-   /* old interface */
-   if (setjmp(read_ptr->jmpbuf))
-#    endif
 #  endif
       {
           PNG_CRUSH_CLEANUP
@@ -3176,4 +3376,9 @@ png_measure_idat(png_structp png_ptr, png_infop info_ptr)
          return sum_idat_length;
    }
 }
-
+#else /* PNG_LIBPNG_VER < 96 */
+main()
+{
+  printf("Sorry, but pngcrush needs libpng version 0.96 or later\n");
+}
+#endif

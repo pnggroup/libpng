@@ -35,7 +35,7 @@ EXES = $(PNGCRUSH)$(E)
 
 # implicit make rules -------------------------------------------------------
 
-.c$(O): png.h pngconf.h zlib.h pngcrush.h
+.c$(O): png.h pngconf.h zlib.h pngcrush.h cexcept.h
 	$(CC) -c $(CFLAGS) $<
 
 
@@ -47,7 +47,7 @@ all:  $(EXES)
 $(PNGCRUSH)$(E): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
-$(PNGCRUSH)$(O): $(PNGCRUSH).c png.h pngconf.h zlib.h pngcrush.h
+$(PNGCRUSH)$(O): $(PNGCRUSH).c png.h pngconf.h zlib.h pngcrush.h cexcept.h
 
 # maintenance ---------------------------------------------------------------
 
