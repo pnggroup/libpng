@@ -17,7 +17,7 @@ RANLIB = ranlib
 RM = rm -f
 
 PNGMAJ = 0
-PNGMIN = 1.2.5beta2
+PNGMIN = 1.2.5rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local

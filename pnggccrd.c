@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.5beta2 - August 16, 2002
+ * libpng version 1.2.5rc1 - August 24, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -5075,7 +5075,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
    if (_mmx_supported == 2) {
        /* this should have happened in png_init_mmx_flags() already */
+#if !defined(PNG_1_0_X)
        png_warning(png_ptr, "asm_flags may not have been initialized");
+#endif
        png_mmx_support();
    }
 #endif /* PNG_ASSEMBLER_CODE_SUPPORTED */

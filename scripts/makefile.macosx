@@ -17,7 +17,7 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.5beta2
+PNGMIN = 1.2.5rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
@@ -108,16 +108,19 @@ install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
 	libpng.pc libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f \
-	$(DL)/$(LIBNAME).$(PNGMAJ)*.$(SHAREDLIB_POSTFIX)
+	$(DL)/$(LIBNAME).$(PNGVER)*.$(SHAREDLIB_POSTFIX)
 	-@/bin/rm -f $(DL)/$(LIBNAME).$(SHAREDLIB_POSTFIX)
 	-@/bin/rm -f libpng.$(SHARED_POSTFIX)
 	-@/bin/rm -f libpng.3.$(SHARED_POSTFIX)
-	-@/bin/rm -f libpng.3.*.$(SHARED_POSTFIX)
+	-@/bin/rm -f libpng.3.$(PNGMIN)*.$(SHARED_POSTFIX)
 	cp libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX) $(DL)
 	cp $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) $(DL)
 	chmod 755 $(DL)/$(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
 	chmod 755 $(DL)/libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX)
 	(cd $(DL); \
+	ln -f -s libpng.3.$(PNGMIN).$(SHARED_POSTFIX) \
+	libpng.3.$(SHARED_POSTFIX); \
+	ln -f -s libpng.3.$(SHARED_POSTFIX) libpng.$(SHARED_POSTFIX); \
 	ln -f -s $(LIBNAME).$(PNGVER).$(SHARED_POSTFIX) \
 	libpng.$(SHARED_POSTFIX); \
 	ln -f -s libpng.3.$(PNGMIN).$(SHARED_POSTFIX) \
@@ -165,10 +168,11 @@ test-installed:
 	./pngtesti pngtest.png
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
+	rm -f *.o libpng.a pngtest pngout.png libpng-config \
 	$(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
 	$(LIBNAME).$(SHAREDLIB_POSTFIX) \
-	libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX)
+	libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX) \
+	libpng.pc
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

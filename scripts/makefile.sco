@@ -24,7 +24,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -lm
 RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.5beta2
+PNGMIN = 1.2.5rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -119,17 +119,17 @@ install-static: install-headers libpng.a
 install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	libpng.so.3.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
-	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)* $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.3
-	-@/bin/rm -f $(DL)/libpng.so.3.*
+	-@/bin/rm -f $(DL)/libpng.so.3.$(PNGMIN)*
 	cp $(LIBNAME).so.$(PNGVER) $(DL)
 	cp libpng.so.3.$(PNGMIN) $(DL)
 	chmod 755 $(DL)/$(LIBNAME).so.$(PNGVER)
 	chmod 755 $(DL)/libpng.so.3.$(PNGMIN)
 	(cd $(DL); \
-	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so; \
 	ln -f -s libpng.so.3.$(PNGMIN) libpng.so.3; \
+	ln -f -s libpng.so.3 libpng.so; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
@@ -171,13 +171,10 @@ test-installed:
 	./pngtesti pngtest.png
 
 clean:
-	/bin/rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
+	/bin/rm -f *.o libpng.a pngtest pngout.png libpng-config \
 	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest-static pngtesti \
-	libpng.so.3.$(PNGMIN)
-
-
-clean:
-	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest pngout.png
+	libpng.so.3.$(PNGMIN) \
+	libpng.pc
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

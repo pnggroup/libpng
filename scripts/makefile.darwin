@@ -23,7 +23,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.5beta2
+PNGMIN = 1.2.5rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -123,18 +123,18 @@ install-static: install-headers libpng.a
 install-shared: install-headers $(LIBNAME).dylib libpng.pc \
 	libpng.3.$(PNGMIN).dylib
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
-	-@/bin/rm -f $(DL)/$(LIBNAME).$(PNGMAJ)*.dylib
+	-@/bin/rm -f $(DL)/$(LIBNAME).$(PNGVER)*.dylib
 	-@/bin/rm -f $(DL)/$(LIBNAME).dylib
 	-@/bin/rm -f $(DL)/libpng.dylib
 	-@/bin/rm -f $(DL)/libpng.3.dylib
-	-@/bin/rm -f $(DL)/libpng.3.*.dylib
+	-@/bin/rm -f $(DL)/libpng.3.$(PNGMIN)*.dylib
 	cp $(LIBNAME).$(PNGVER).dylib $(DL)
 	cp libpng.3.$(PNGMIN).dylib $(DL)
 	chmod 755 $(DL)/$(LIBNAME).$(PNGVER).dylib
 	chmod 755 $(DL)/libpng.3.$(PNGMIN).dylib
 	(cd $(DL); \
-	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.dylib; \
 	ln -sf libpng.3.$(PNGMIN).dylib libpng.3.dylib; \
+	ln -sf libpng.3.dylib libpng.dylib; \
 	ln -sf $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib; \
 	ln -sf $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib)
 	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
@@ -176,8 +176,9 @@ test-installed:
 	./pngtesti pngtest.png
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
-	$(LIBNAME).*dylib pngtesti libpng.3.$(PNGMIN).dylib
+	rm -f *.o libpng.a pngtest pngout.png libpng-config \
+	libpng.3.$(PNGMIN).dylib \
+	libpng.pc $(LIBNAME).*dylib pngtesti
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
