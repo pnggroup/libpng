@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.7beta12 - May 12, 2000
+ * libpng 1.0.7beta13 - May 16, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -502,21 +502,6 @@ defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #define PNG_ASSEMBLER_CODE_SUPPORTED
 #endif
 
-/* Do not use global arrays (helps with building DLL's)
- * They are no longer used in libpng itself, since version 1.0.5c,
- * but might be required for some pre-1.0.5c applications.
- */
-#ifdef PNG_NO_GLOBAL_ARRAYS
-#  define PNG_USE_LOCAL_ARRAYS
-#else
-#  if defined(__GNUC__) && defined(WIN32)
-#    define PNG_NO_GLOBAL_ARRAYS
-#    define PNG_USE_LOCAL_ARRAYS
-#  else
-#    define PNG_USE_GLOBAL_ARRAYS
-#  endif
-#endif
-
 /* These are currently experimental features, define them if you want */
 
 /* very little testing */
@@ -934,6 +919,18 @@ typedef z_stream FAR *  png_zstreamp;
 
 #if !defined(PNG_DLL) && defined(PNG_BUILD_DLL)
 #  define PNG_DLL
+#endif
+
+/* Do not use global arrays (helps with building DLL's)
+ * They are no longer used in libpng itself, since version 1.0.5c,
+ * but might be required for some pre-1.0.5c applications.
+ */
+#if !defined(PNG_USE_LOCAL_ARRAYS) && !defined(PNG_USE_GLOBAL_ARRAYS)
+#  if defined(PNG_NO_GLOBAL_ARRAYS) || (defined(__GNUC__) && defined(PNG_DLL))
+#    define PNG_USE_LOCAL_ARRAYS
+#  else
+#    define PNG_USE_GLOBAL_ARRAYS
+#  endif
 #endif
 
 #if defined(PNG_BUILD_DLL) && !defined(PNG_NO_MODULEDEF)

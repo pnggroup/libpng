@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.7beta12 - May 12, 2000
+ * libpng version 1.0.7beta13 - May 16, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -14,14 +14,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7beta12 Your_png_h_is_not_version_1_0_7beta12;
+typedef version_1_0_7beta13 Your_png_h_is_not_version_1_0_7beta13;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.7beta12";
+char png_libpng_ver[12] = "1.0.7beta13";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -302,14 +302,17 @@ if (mask & PNG_FREE_TEXT)
          info_ptr->text[num].key = NULL;
      }
    }
-   else if (info_ptr->text != NULL)
+   else
    {
-     int i;
-     for (i = 0; i < info_ptr->num_text; i++)
-         png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, i);
-     png_free(png_ptr, info_ptr->text);
-     info_ptr->text = NULL;
-     info_ptr->num_text=0;
+     if (info_ptr->text != NULL)
+     {
+       int i;
+       for (i = 0; i < info_ptr->num_text; i++)
+           png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, i);
+       png_free(png_ptr, info_ptr->text);
+       info_ptr->text = NULL;
+       info_ptr->num_text=0;
+     }
    }
 }
 #endif
@@ -344,7 +347,7 @@ if (mask & PNG_FREE_SCAL)
        png_free(png_ptr, info_ptr->scal_s_width);
        png_free(png_ptr, info_ptr->scal_s_height);
 #endif
-          info_ptr->valid &= ~PNG_INFO_sCAL;
+       info_ptr->valid &= ~PNG_INFO_sCAL;
    }
 }
 #endif
@@ -369,8 +372,8 @@ if (mask & PNG_FREE_PCAL)
              png_free(png_ptr, info_ptr->pcal_params[i]);
              }
            png_free(png_ptr, info_ptr->pcal_params);
+           info_ptr->valid &= ~PNG_INFO_pCAL;
        }
-       info_ptr->valid &= ~PNG_INFO_pCAL;
    }
 }
 #endif
@@ -501,6 +504,8 @@ if (mask & PNG_FREE_ROWS)
 #ifdef PNG_FREE_ME_SUPPORTED
    if(num == -1)
      info_ptr->free_me &= ~mask;
+   else
+     info_ptr->free_me &= ~(mask & ~PNG_FREE_MUL);
 #endif
 }
 
@@ -601,7 +606,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.7beta12 - May 12, 2000\n\
+   return ("\n libpng version 1.0.7beta13 - May 16, 2000\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson\n");
@@ -619,8 +624,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.7beta12");
-   return("1.0.7beta12");
+      return("1.0.7beta13");
+   return("1.0.7beta13");
 }
 
 png_charp PNGAPI

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.7beta12 - May 12, 2000
+ * libpng 1.0.7beta13 - May 16, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1380,4 +1380,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7beta12 your_png_h_is_not_version_1_0_7beta12;
+typedef version_1_0_7beta13 your_png_h_is_not_version_1_0_7beta13;

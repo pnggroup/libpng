@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.7beta12 - May 12, 2000
+ * libpng 1.0.7beta13 - May 16, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -805,11 +805,12 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   if(info_ptr->row_pointers != row_pointers)
+   if(info_ptr->row_pointers && (info_ptr->row_pointers != row_pointers))
    {
       png_free_data(png_ptr, info_ptr, PNG_FREE_ROWS, 0);
       info_ptr->row_pointers = row_pointers;
    }
+   info_ptr->valid |= PNG_INFO_IDAT;
 }
 #endif
 

@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.7beta12 - May 12, 2000
+ * libpng 1.0.7beta13 - May 16, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -4500,7 +4500,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       default:
-         png_error(png_ptr, "#103 Bad adaptive filter type");
+         png_warning(png_ptr, "Ignoring bad adaptive filter type");
+         *row=0;
          break;
    }
 }
