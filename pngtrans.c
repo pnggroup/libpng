@@ -12,7 +12,7 @@
 #include "png.h"
 
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
-/* turn on bgr to rgb mapping */
+/* turn on BGR-to-RGB mapping */
 void
 png_set_bgr(png_structp png_ptr)
 {

@@ -522,7 +522,7 @@ png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 #endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
-/* Expand paletted images to rgb, expand grayscale images of
+/* Expand paletted images to RGB, expand grayscale images of
  * less than 8-bit depth to 8-bit depth, and expand tRNS chunks
  * to alpha channels.
  */
@@ -3142,7 +3142,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
 #if defined(PNG_READ_GAMMA_SUPPORTED)
 /* Gamma correct the image, avoiding the alpha channel.  Make sure
  * you do this after you deal with the transparency issue on grayscale
- * or rgb images. If your bit depth is 8, use gamma_table, if it
+ * or RGB images. If your bit depth is 8, use gamma_table, if it
  * is 16, use gamma_16_table and gamma_shift.  Build these with
  * build_gamma_table().
  */
@@ -3324,7 +3324,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
 #endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
-/* Expands a palette row to an rgb or rgba row depending
+/* Expands a palette row to an RGB or RGBA row depending
  * upon whether you supply trans and num_trans.
  */
 void
