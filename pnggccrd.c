@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.0.8beta3 - July 11, 2000
+ * libpng version 1.0.8beta4 - July 14, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -166,9 +166,9 @@ static const int png_pass_inc[7]   = {8, 8, 4, 4, 2, 2, 1};
 static const int png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #endif
 
-// djgpp and Win32 add their own underscores to global variables,
+// djgpp, Win32, and Cygwin add their own underscores to global variables,
 // so define them without:
-#if defined(__DJGPP__) || defined(WIN32)
+#if defined(__DJGPP__) || defined(WIN32) || defined(__CYGWIN__)
 #  define _unmask      unmask
 #  define _const4      const4
 #  define _const6      const6

@@ -4,7 +4,7 @@ COPYRIGHT NOTICE, DISCLAIMER, and LICENSE:
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng version 1.0.8beta3, July 11, 2000 is Copyright (c) 2000 Glenn Randers-Pehrson
+libpng version 1.0.8beta4, July 14, 2000 is Copyright (c) 2000 Glenn Randers-Pehrson
 Distributed according to the same disclaimer and license as libpng-1.0.6
 with the following individuals added to the list of Contributing Authors
 
@@ -87,11 +87,11 @@ boxes and the like:
    printf("%s",png_get_copyright(NULL));
 
 Also, the PNG logo (in PNG format, of course) is supplied in the
-file "pngnow.png".
+files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
 
 Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is a
 certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 randeg@alum.rpi.edu
-July 11, 2000
+July 14, 2000

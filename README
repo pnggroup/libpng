@@ -1,4 +1,4 @@
-README for libpng 1.0.8beta3 - July 11, 2000 (shared library 2.1)
+README for libpng 1.0.8beta4 - July 14, 2000 (shared library 2.1)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -148,7 +148,8 @@ Files in this distribution:
       pngerror.c    =>  Error/warning message I/O functions
       pngget.c      =>  Functions for retrieving info from struct
       pngmem.c      =>  Memory handling functions
-      pngnow.png    =>  PNG logo
+      pngbar.png    =>  PNG logo, 88x31
+      pngnow.png    =>  PNG logo, 98x31
       pngpread.c    =>  Progressive reading functions
       pngread.c     =>  Read data/helper high-level functions
       pngrio.c      =>  Lowest-level data read I/O functions
@@ -176,9 +177,9 @@ Files in this distribution:
        descrip.mms      =>  VMS makefile for MMS or MMK
        makefile.std     =>  Generic UNIX makefile (cc, creates static libpng.a)
        makefile.linux   =>  Linux/ELF makefile
-                            (gcc, creates libpng.so.2.1.0.8beta3)
+                            (gcc, creates libpng.so.2.1.0.8beta4)
        makefile.gcmmx   =>  Linux/ELF makefile (gcc, creates
-                            libpng.so.2.1.0.8beta3, uses assembler code
+                            libpng.so.2.1.0.8beta4, uses assembler code
                             tuned for Intel MMX platform)
        makefile.gcc     =>  Generic makefile (gcc, creates static libpng.a)
        makefile.knr     =>  Archaic UNIX Makefile that converts files with
@@ -190,10 +191,10 @@ Files in this distribution:
        makefile.intel   =>  Intel C/C++ version 4.0 and later
        libpng.icc       =>  Project file, IBM VisualAge/C++ 4.0 or later
        makefile.sgi     =>  Silicon Graphics IRIX (cc, creates static lib)
-       makefile.sggcc   =>  Silicon Graphics (gcc, creates libpng.so.2.1.0.8beta3)
+       makefile.sggcc   =>  Silicon Graphics (gcc, creates libpng.so.2.1.0.8beta4)
        makefile.sunos   =>  Sun makefile
        makefile.solaris =>  Solaris 2.X makefile
-                            (gcc, creates libpng.so.2.1.0.8beta3)
+                            (gcc, creates libpng.so.2.1.0.8beta4)
        makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc
        makefile.mips    =>  MIPS makefile
        makefile.acorn   =>  Acorn makefile

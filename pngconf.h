@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.8beta3 - July 11, 2000
+ * libpng 1.0.8beta4 - July 14, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -48,6 +48,60 @@
 #if defined(MAXSEG_64K) && !defined(PNG_MAX_MALLOC_64K)
 #define PNG_MAX_MALLOC_64K
 #endif
+
+/* Special munging to support doing things the 'cygwin' way:
+ * 'Normal' png-on-win32 defines/defaults:
+ *   PNG_BUILD_DLL -- building dll
+ *   PNG_USE_DLL   -- building an application, linking to dll
+ *   (no define)   -- building static library, or building an 
+ *                    application and linking to the static lib
+ * 'Cygwin' defines/defaults:
+ *   PNG_BUILD_DLL -- building the dll
+ *   (no define)   -- building an application, linking to the dll
+ *   PNG_STATIC    -- building the static lib, or building an application
+ *                    which links to the static lib.
+ * Thus,
+ * a cygwin user should define either PNG_BUILD_DLL or PNG_STATIC, and
+ * this bit of #ifdefs will define the 'correct' config variables based on
+ * that. If a cygwin user *wants* to define 'PNG_USE_DLL' that's okay, but
+ * unnecessary.
+ */
+#if defined(__CYGWIN__)
+#  if defined(PNG_BUILD_DLL)
+#    if defined(PNG_USE_DLL)
+#      undef PNG_USE_DLL
+#    endif
+#    if !defined(PNG_DLL)
+#      define PNG_DLL
+#    endif
+#    if defined(PNG_STATIC)
+#      undef PNG_STATIC
+#    endif
+#  else
+#    if defined(PNG_STATIC)
+#      if defined(PNG_USE_DLL)
+#        undef PNG_USE_DLL
+#      endif
+#      if defined(PNG_DLL)
+#        undef PNG_DLL
+#      endif
+#    else
+#      if defined(PNG_USE_DLL)
+#        if !defined(PNG_DLL)
+#          define PNG_DLL
+#        endif
+#      else
+#        if defined(PNG_DLL)
+#           define PNG_USE_DLL
+#        else
+#           define PNG_USE_DLL
+#           define PNG_DLL
+#        endif
+#      endif
+#    endif
+#  endif
+#endif
+
 
 /* This protects us against compilers that run on a windowing system
  * and thus don't have or would rather us not use the stdio types:
@@ -534,6 +588,9 @@ defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #ifndef PNG_NO_USER_MEM
 #define PNG_USER_MEM_SUPPORTED
 #endif
+#ifndef PNG_NO_ZALLOC_ZERO
+#define PNG_ZALLOC_ZERO
+#endif
 */
 
 /* This is only for PowerPC big-endian and 680x0 systems */
@@ -854,7 +911,7 @@ typedef size_t png_size_t;
 #define LDATA 0
 #endif
 
-#if !defined(__WIN32__) && !defined(__FLAT__)
+#if !defined(__WIN32__) && !defined(__FLAT__) && !defined(__CYGWIN__)
 #define PNG_MAX_MALLOC_64K
 #if (LDATA != 1)
 #ifndef FAR
@@ -868,7 +925,7 @@ typedef size_t png_size_t;
  * const if your compiler supports it. (SJT)
 #  define FARDATA FAR
  */
-#endif  /* __WIN32__, __FLAT__ */
+#endif  /* __WIN32__, __FLAT__, __CYGWIN__ */
 
 #endif   /* __BORLANDC__ */
 
@@ -952,12 +1009,43 @@ typedef z_stream FAR *  png_zstreamp;
  * It is equivalent to Microsoft predefined macro _DLL which is
  * automatically defined when you compile using the share
  * version of the CRT (C Run-Time library)
+ * 
+ * The cygwin mods make this behavior a little different: 
+ * Define PNG_BUILD_DLL if you are building a dll for use with cygwin
+ * Define PNG_STATIC if you are building a static library for use with cygwin,
+ *   -or- if you are building an application that you want to link to the 
+ *   static library.
+ * PNG_USE_DLL is defined by default (no user action needed) unless one of
+ *   the other flags is defined.
  */
 
 #if !defined(PNG_DLL) && (defined(PNG_BUILD_DLL) || defined(PNG_USE_DLL))
 #  define PNG_DLL
 #endif
-
+/* If CYGWIN, then disallow GLOBAL ARRAYS unless building a static lib.
+ * When building a static lib, default to no GLOBAL ARRAYS, but allow
+ * command-line override
+ */
+#if defined(__CYGWIN__)
+#  if !defined(PNG_STATIC)
+#    if defined(PNG_USE_GLOBAL_ARRAYS)
+#      undef PNG_USE_GLOBAL_ARRAYS
+#    endif
+#    if !defined(PNG_USE_LOCAL_ARRAYS)
+#      define PNG_USE_LOCAL_ARRAYS
+#    endif
+#  else
+#    if defined(PNG_USE_LOCAL_ARRAYS) || defined(PNG_NO_GLOBAL_ARRAYS)
+#      if defined(PNG_USE_GLOBAL_ARRAYS)
+#        undef PNG_USE_GLOBAL_ARRAYS
+#      endif
+#    endif
+#  endif
+#  if !defined(PNG_USE_LOCAL_ARRAYS) && !defined(PNG_USE_GLOBAL_ARRAYS)
+#    define PNG_USE_LOCAL_ARRAYS
+#  endif
+#endif
+    
 /* Do not use global arrays (helps with building DLL's)
  * They are no longer used in libpng itself, since version 1.0.5c,
  * but might be required for some pre-1.0.5c applications.
@@ -972,19 +1060,21 @@ typedef z_stream FAR *  png_zstreamp;
 
 #ifndef PNGAPI
 
-#if defined(__MINGW32__) || defined(__CYGWIN32__) && !defined(PNG_MODULEDEF)
+
+#if defined(__MINGW32__) || defined(__CYGWIN__) && !defined(PNG_MODULEDEF)
 #  ifndef PNG_NO_MODULEDEF
 #    define PNG_NO_MODULEDEF
 #  endif
-#endif
-
+#endif 
+ 
 #if !defined(PNG_IMPEXP) && defined(PNG_BUILD_DLL) && !defined(PNG_NO_MODULEDEF)
 #  define PNG_IMPEXP
 #endif
 
 #if defined(PNG_DLL) || defined(_DLL) || defined(__DLL__ ) || \
-    defined(_Windows) || defined(_WINDOWS) || \
-    defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+    (( defined(_Windows) || defined(_WINDOWS) || \
+       defined(WIN32) || defined(_WIN32) || defined(__WIN32__) \
+	  ) && !defined(__CYGWIN__))
 
 #  ifdef __GNUC__
 #    define PNGAPI __cdecl
@@ -1026,11 +1116,18 @@ typedef z_stream FAR *  png_zstreamp;
 #        endif
 #     endif
 #  endif  /* PNG_IMPEXP */
-#else /* !(DLL || WINDOWS) */
-#  if 0 /* ... other platforms, with other meanings */
+#else /* !(DLL || non-cygwin WINDOWS) */
+#  if defined(__CYGWIN__) && !defined(PNG_DLL)
+#    if !defined(PNG_IMPEXP)
+#      define PNG_IMPEXP
+#    endif
+#    define PNGAPI __cdecl
 #  else
-#     define PNGAPI
-#     define PNG_IMPEXP
+#    if 0 /* ... other platforms, with other meanings */
+#    else
+#       define PNGAPI
+#       define PNG_IMPEXP
+#    endif
 #  endif
 #endif
 #endif

@@ -3,6 +3,8 @@
 # Copyright 1998-2000 Greg Roelofs
 # For conditions of distribution and use, see copyright notice in png.h
 
+# CAUTION: Do not use this makefile with gcc versions 2.7.2.2 and earlier.
+
 CC=gcc
 
 # where "make install" puts libpng.a, libpng.so*, png.h and pngconf.h
@@ -34,7 +36,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.8beta3
+PNGMIN = 1.0.8beta4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include

@@ -1,0 +1,165 @@
+# makefile for cygwin on x86
+#   builds both dll (with import lib) and static lib versions
+#   of the library, and builds two copies of pngtest: one
+#   statically linked and one dynamically linked.
+#   
+#   based on makefile for linux-elf w/mmx by:
+# Copyright (C) 1998-2000 Greg Roelofs
+# Copyright (C) 1996, 1997 Andreas Dilger
+# For conditions of distribution and use, see copyright notice in png.h
+
+# To enable assembler optimizations, add '-DPNG_USE_PNGGCCRD' to
+# $CFLAGS, and include pnggccrd.o in $OBJS, below.
+
+CC=gcc
+
+# where "make install" puts libpng.a, libpng.so*, png.h and pngconf.h
+prefix=/usr
+
+# Where the zlib library and include files are located
+ZLIBLIB=${prefix}/lib
+ZLIBINC=${prefix}/include
+#ZLIBLIB=../zlib
+#ZLIBINC=../zlib
+
+SHAREDLIB=libpng.dll
+STATLIB=libpng.a
+IMPLIB=libpng.dll.a
+SHAREDDEF=libpng.def
+LIBS=$(SHAREDLIB) $(STATLIB)
+EXE=.exe
+
+ALIGN=
+# for i386:
+#ALIGN=-malign-loops=2 -malign-functions=2
+
+WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
+	-Wmissing-declarations -Wtraditional -Wcast-align \
+	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
+
+#CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
+#        -fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
+CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
+        -fomit-frame-pointer 
+
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
+LDSHARED=gcc -shared -Wl,--enable-auto-image-base
+LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(SHAREDDEF)
+
+RANLIB=ranlib
+#RANLIB=echo
+
+# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
+# have to change it.
+PNGMAJ = 2
+PNGMIN = 1.0.8beta3
+PNGVER = $(PNGMAJ).$(PNGMIN)
+
+INCPATH=$(prefix)/include
+LIBPATH=$(prefix)/lib
+BINPATH=$(prefix)/bin
+MANPATH=$(prefix)/man
+MAN3PATH=$(MANPATH)/man3
+DOCPATH=$(prefix)/doc/libpng-$(PNGMIN)
+CYGDOCPATH=$(prefix)/doc/Cygwin
+
+OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
+	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
+	pngwtran.o pngmem.o pngerror.o pngpread.o # pnggccrd.o
+
+OBJSDLL = $(OBJS:.o=.pic.o)
+
+.SUFFIXES:      .c .o .pic.o
+
+%.o : %.c
+	$(CC) -c $(CFLAGS) -DPNG_STATIC -DZLIB_STATIC -o $@ $<
+
+%.pic.o : %.c
+	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
+
+all: $(SHAREDLIB) $(STATLIB) pngtest$(EXE) pngtest-stat$(EXE)
+
+pnggccrd.o:	png.h pngconf.h pngasmrd.h
+	@echo ""
+	@echo '    You can ignore the single "control reaches end of non-void function"'
+	@echo '    warning and multiple "<variable> defined but not used" warnings:'
+	@echo ""
+	$(CC) -c $(CFLAGS) -DPNG_STATIC -DZLIB_STATIC -o $@ $*.c
+
+pnggccrd.pic.o:	png.h pngconf.h pngasmrd.h
+	@echo ""
+	@echo '    You can ignore the single "control reaches end of non-void function"'
+	@echo '    warning and multiple "<variable> defined but not used" warnings:'
+	@echo ""
+	$(CC) -c $(CFLAGS) -o $@ pnggccrd.c
+
+$(STATLIB): $(OBJS)
+	ar rc $@ $(OBJS)
+	$(RANLIB) $@
+
+$(SHAREDDEF): msvc/png32ms.def
+	cat $< | sed -e '1{G;s/^\(.*\)\(\n\)/EXPORTS/;};2,/^EXPORTS/d' > $@
+
+$(SHAREDLIB): $(OBJSDLL) $(SHAREDDEF)
+	$(LDSHARED) -o $@ $(LDEXTRA) $(OBJSDLL) -L. -L$(ZLIBLIB) -lz 
+
+pngtest$(EXE): pngtest.pic.o $(SHAREDLIB)
+	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
+
+pngtest-stat$(EXE): pngtest.o $(STATLIB)
+	$(CC) -static $(CFLAGS) $< $(LDFLAGS) -o $@
+
+pngtest.pic.o: pngtest.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+pngtest.o: pngtest.c
+	$(CC) $(CFLAGS) -DPNG_STATIC -DZLIB_STATIC -c $< -o $@
+
+test: test-dll test-stat
+
+test-stat: pngtest-stat$(EXE)
+	./pngtest-stat
+
+test-dll: pngtest$(EXE)
+	./pngtest
+
+install: $(STATLIB) $(SHAREDLIB)
+	-@if [ ! -d $(INCPATH)  ]; then mkdir -p $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir -p $(LIBPATH); fi
+	-@if [ ! -d $(BINPATH) ]; then mkdir -p $(BINPATH); fi
+	-@if [ ! -d $(MAN3PATH) ]; then mkdir -p $(MAN3PATH); fi
+	-@if [ ! -d $(DOCPATH) ]; then mkdir -p $(DOCPATH); fi
+	install -m 644 png.h pngconf.h $(INCPATH)
+	install -m 755 $(STATLIB) $(IMPLIB) $(LIBPATH)
+	install -s -m 755 $(SHAREDLIB) $(BINPATH)
+	install -m 644 $(DOCS) $(DOCPATH)
+	install -m 644 libpngpf.3 libpng.3 $(MAN3PATH)
+
+clean:
+	/bin/rm -f *.pic.o *.o $(STATLIB) $(IMPLIB) $(SHAREDLIB) \
+	pngtest-stat$(EXE) pngtest$(EXE) pngout.png $(SHAREDDEF)
+
+DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
+writelock:
+	chmod a-w *.[ch35] $(DOCS) scripts/*
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+png.o png.pic.o:		png.h pngconf.h png.c pngasmrd.h
+pngerror.o pngerror.pic.o:	png.h pngconf.h pngerror.c
+pngrio.o pngrio.pic.o:		png.h pngconf.h pngrio.c
+pngwio.o pngwio.pic.o:		png.h pngconf.h pngwio.c
+pngmem.o pngmem.pic.o:		png.h pngconf.h pngmem.c
+pngset.o pngset.pic.o:		png.h pngconf.h pngset.c
+pngget.o pngget.pic.o:		png.h pngconf.h pngget.c
+pngread.o pngread.pic.o:	png.h pngconf.h pngread.c
+pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngrtran.c
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngrutil.c pngasmrd.h
+pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngtrans.c
+pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
+pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c
+pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngwutil.c
+pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
+
+pngtest.o:			png.h pngconf.h pngtest.c
+pngtest-stat.o:			png.h pngconf.h pngtest.c

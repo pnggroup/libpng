@@ -19,8 +19,8 @@ CFLAGS=-I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32 # -g -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=gcc -shared
 
-VER=1.0.8beta3
-LIBS=libpng.so.1.0.8beta3
+VER=1.0.8beta4
+LIBS=libpng.so.1.0.8beta4
 SHAREDLIB=libpng.so
 libdir=$(prefix)/lib32
 

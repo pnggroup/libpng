@@ -9,6 +9,13 @@ Known bugs and suggested enhancements in libpng-1.0.7
    STATUS: Under investigation.  Experts on MMX assembler code are
    invited to help with the debugging.  Note that pngvcrd.c works fine.
 
+   Update: fixed in libpng-1.0.8beta1.  It compiles under gcc-2.7.2.3
+   and seems to work; under gcc-2.7.2.1 it compiles but crashes in
+   execution.  It is recommended that people use 2.95.2 or later.
+
+   The png_read_filter() function has still not been fully converted and
+   will not compile under gcc-2.95.2; it is currently ifdef'ed out.
+
 2. July 3, 2000 -- BUG -- MEMORY LEAK
 
    There is a memory leak in pngpread.c; it doesn't free "key".
@@ -38,11 +45,18 @@ Known bugs and suggested enhancements in libpng-1.0.7
    Libpng-1.0.7 does not support WindowsCE.
 
    STATUS:  Libpng-1.0.8 and libpng-2.0.0 will support WindowsCE.  A
-   new typedef, png_file_p, will be added which is normally FILE * but
+   new typedef, png_FILE_p, will be added which is normally FILE * but
    will be HANDLE if libpng is being built for WindowsCE.  Other patches
    required for WindowsCE support have been provided and will be applied.
+   Finished in libpng-1.0.8beta3.
 
-6. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
+6. July 13, 2000 -- ENHANCEMENT -- Cygwin support
+
+   Libpng-1.0.7 does not support building DLLs under Cygwin
+
+   STATUS: Cygwin support has been added to libpng-1.0.8beta4.
+
+7. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
 
    Loops need to be optimized everywhere
 
@@ -57,7 +71,7 @@ Known bugs and suggested enhancements in libpng-1.0.7
    libpng-1.1.0.  About 160 loops will be turned around
    in libpng-2.0.x betaxx, for testing.
 
-7. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
+8. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
 
    libpng-1.0.5 and earlier transform colors to gamma=1.0 space for
    merging with background, and then back to the image's gamma.  The
@@ -69,7 +83,7 @@ Known bugs and suggested enhancements in libpng-1.0.7
 
    STATUS: under development.
 
-8. September 1999 -- ENHANCEMENT --
+9. September 1999 -- ENHANCEMENT --
 
    It should be possible to use libpng without floating-point aritmetic.
 

@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.8beta3 - July 11, 2000
+ * libpng version 1.0.8beta4 - July 14, 2000
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_8beta3 Your_png_h_is_not_version_1_0_8beta3;
+typedef version_1_0_8beta4 Your_png_h_is_not_version_1_0_8beta4;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.8beta3";
+char png_libpng_ver[12] = "1.0.8beta4";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -140,6 +140,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
    png_uint_32 num_bytes = (png_uint_32)items * size;
    png_voidp ptr = (png_voidp)png_malloc((png_structp)png_ptr, num_bytes);
 
+#ifndef PNG_NO_ZALLOC_ZERO
    if (num_bytes > (png_uint_32)0x8000L)
    {
       png_memset(ptr, 0, (png_size_t)0x8000L);
@@ -150,6 +151,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
    {
       png_memset(ptr, 0, (png_size_t)num_bytes);
    }
+#endif
    return ((voidpf)ptr);
 }
 
@@ -616,7 +618,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.8beta3 - July 11, 2000\n\
+   return ("\n libpng version 1.0.8beta4 - July 14, 2000\n\
    Copyright (c) 1998-2000 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -634,8 +636,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.8beta3");
-   return("1.0.8beta3");
+      return("1.0.8beta4");
+   return("1.0.8beta4");
 }
 
 png_charp PNGAPI
