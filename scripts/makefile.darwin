@@ -23,7 +23,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.7beta1
+PNGMIN = 1.2.7beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 

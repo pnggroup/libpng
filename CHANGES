@@ -1316,6 +1316,7 @@ version 1.0.16rc1 and 1.2.6rc1 [August 4, 2004]
   Revised use of PNG_SET_USER_LIMITS_SUPPORTED macro.
   Fixed wrong cast of returns from png_get_user_width|height_max().
   Changed some "keep the compiler happy" from empty statements to returns,
+  Revised libpng.txt to remove 1.2.x stuff from the 1.0.x distribution
 version 1.0.16rc2 and 1.2.6rc2 [August 7, 2004]
   Revised makefile.darwin and makefile.solaris.  Removed makefile.macosx.
   Revised pngtest's png_debug_malloc() to use png_malloc() instead of
@@ -1352,8 +1353,14 @@ version 1.2.7beta1 [August 26, 2004]
     PNG Spec (second edition) and the PNG ISO/IEC Standard.
   Added "test-dd" target in 15 makefiles, to run pngtest in DESTDIR.
   Fixed bug with "optimized window size" in the IDAT datastream.
+version 1.2.7beta2 [August 29, 2004]
+  Fixed bug with sCAL chunk and big-endian machines (David Munro).
+  Undid new code added in 1.2.6rc2 to update the color_type in
+    png_set_filler().
+  Added png_set_add_alpha() that updates color type.
 
 Send comments/corrections/commendations to
-png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net
+png-implement@ccrc.wustl.edu (subscription required; write to
+majordomo@ccrc.wustl.edu) or to glennrp@users.sourceforge.net
 
 Glenn R-P
