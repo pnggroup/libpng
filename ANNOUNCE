@@ -1,5 +1,5 @@
 
-Libpng 1.0.9beta3 - November 23, 2000
+Libpng 1.0.9beta4 - December 1, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -29,9 +29,11 @@ Changes since the last public release (1.0.8):
   Set VS_FF_PRERELEASE and VS_FF_PATCHED flags in msvc/png.rc when appropriate.
   Add error message in png_set_compression_buffer_size() when malloc fails.
   Revised PNG_LIBPNG_BUILD_TYPE macro in png.h, used in the msvc project.
-  Ifdef'ed out the png_flush() in pngwrite.c that crashes some applications
+  Removed the png_flush() in pngwrite.c that crashes some applications
     that don't set png_output_flush_fn.
   Added makefile.macosx and makefile.aix to scripts directory.
+  Change png_chunk_warning to png_warning in png_check_keyword().
+  Increased the first part of msg buffer from 16 to 18 in png_chunk_error().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

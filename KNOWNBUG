@@ -1,14 +1,21 @@
 
 Known bugs and suggested enhancements in libpng-1.0.8
 
-0: November 3, 2000 -- BUG -- incorrect iCCP chunk is written
+1: November 28, 2000 -- BUG -- buffer overflow in png_chunk_warning
+
+   A buffer overflow occurs in png_chunk_warning() because 16 bytes
+   are allocated for "[nn][nn][nn][nn]" which requires 18 bytes.
+
+   Status: Fixed in libpng-1.0.9beta4
+
+2: November 3, 2000 -- BUG -- incorrect iCCP chunk is written
 
    The compression_type byte in the iCCP chunk written by libpng is
    usually incorrect.
 
    Status: Fixed in libpng-1.0.9beta1
 
-1. October 12, 2000 -- BUG -- pngtest fails
+3. October 12, 2000 -- BUG -- pngtest fails
 
    The three WRITEFILE calls in pngtest.c are incorrect.  They must be
    changed to read
@@ -17,7 +24,7 @@ Known bugs and suggested enhancements in libpng-1.0.8
    WRITEFILE(io_ptr, near_data, length, check);
    WRITEFILE(io_ptr, buf, written, err);
 
-2. August 28, 2000 -- BUG -- pnggccrd.c
+4. August 28, 2000 -- BUG -- pnggccrd.c
 
    The interlacing() function has still not been fully converted and
    will not compile under gcc-2.95.2; it is currently ifdef'ed out.
@@ -26,7 +33,7 @@ Known bugs and suggested enhancements in libpng-1.0.8
    which have been fixed.  The replacement files are available at the
    PNG web site (http://www.libpng.org/pub/png).
 
-3. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
+5. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
 
    Loops need to be optimized everywhere
 
@@ -41,7 +48,7 @@ Known bugs and suggested enhancements in libpng-1.0.8
    libpng-2.0.0.  About 160 loops will be turned around
    in libpng-2.0.x betaxx, for testing.
 
-4. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
+6. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
 
    libpng-1.0.5 and earlier transform colors to gamma=1.0 space for
    merging with background, and then back to the image's gamma.  The
@@ -53,7 +60,7 @@ Known bugs and suggested enhancements in libpng-1.0.8
 
    STATUS: under development.
 
-5. September 1999 -- ENHANCEMENT --
+7. September 1999 -- ENHANCEMENT --
 
    It should be possible to use libpng without floating-point arithmetic.
 
