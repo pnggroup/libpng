@@ -1,5 +1,5 @@
 
-Libpng 1.0.8rc1 - July 17, 2000
+Libpng 1.0.8 - July 24, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -19,6 +19,7 @@ Changes since the last public release (1.0.7):
   Added cygwin subdirectory, makefile.cygwin, and cygwin support in pngconf.h
   Added PNG_NO_ZALLOC_ZERO macro (makes png_zalloc skip zeroing memory)
   Revised png_debug() macros and statements to eliminate compiler warnings.
+  Updated makefile.hpux to build a shared library.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

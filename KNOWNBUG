@@ -1,62 +1,15 @@
 
-Known bugs and suggested enhancements in libpng-1.0.7
+Known bugs and suggested enhancements in libpng-1.0.8
 
 1. July 2, 2000 -- BUG -- pnggccrd.c
-
-   Some programs compiled with PNG_USE_PNGGCCRD crash in pnggccrd.c.
-   Also, pnggccrd.c will not compile under gcc-2.95-2.
-
-   STATUS: Under investigation.  Experts on MMX assembler code are
-   invited to help with the debugging.  Note that pngvcrd.c works fine.
-
-   Update: fixed in libpng-1.0.8beta1.  It compiles under gcc-2.7.2.3
-   and seems to work; under gcc-2.7.2.1 it compiles but crashes in
-   execution.  It is recommended that people use 2.95.2 or later.
 
    The png_read_filter() function has still not been fully converted and
    will not compile under gcc-2.95.2; it is currently ifdef'ed out.
 
-2. July 3, 2000 -- BUG -- MEMORY LEAK
+   STATUS: Under investigation.  Experts on MMX assembler code are
+   invited to help with the debugging.  Note that pngvcrd.c works fine.
 
-   There is a memory leak in pngpread.c; it doesn't free "key".
-
-   STATUS: Fixed in libpng-1.0.8beta1, by adding.
-
-      png_free(png_ptr, text_ptr);
-
-   after lines 1221 and 1038 in pngpread.c
-
-3. July 3, 2000 -- BUG -- PNG_EXPORT_VAR
-
-   The definition of PNG_EXPORT_VAR, in pngconf.h, should be
-   #  define PNG_EXPORT_VAR(type) extern PNG_IMPEXP type
-
-   STATUS: Fixed in libpng-1.0.8beta1.
-
-4. July 3, 2000 -- BUG -- PNG_NO_STDIO
-
-   Several places in pngrutil.c and pngwutil.c, there are printf statements
-   inside PNG_NO_STDIO blocks (should be PNG_NO_CONSOLE_IO)
-
-   STATUS: Fixed in libpng-1.0.8beta1.
-
-5. July 3, 2000 -- ENHANCEMENT -- WindowsCE support
-
-   Libpng-1.0.7 does not support WindowsCE.
-
-   STATUS:  Libpng-1.0.8 and libpng-2.0.0 will support WindowsCE.  A
-   new typedef, png_FILE_p, will be added which is normally FILE * but
-   will be HANDLE if libpng is being built for WindowsCE.  Other patches
-   required for WindowsCE support have been provided and will be applied.
-   Finished in libpng-1.0.8beta3.
-
-6. July 13, 2000 -- ENHANCEMENT -- Cygwin support
-
-   Libpng-1.0.7 does not support building DLLs under Cygwin
-
-   STATUS: Cygwin support has been added to libpng-1.0.8beta4.
-
-7. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
+2. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
 
    Loops need to be optimized everywhere
 
@@ -68,10 +21,10 @@ Known bugs and suggested enhancements in libpng-1.0.7
    Question whether i-- or --i is better.
 
    STATUS: Under investigation, postponed until after
-   libpng-1.1.0.  About 160 loops will be turned around
+   libpng-2.0.0.  About 160 loops will be turned around
    in libpng-2.0.x betaxx, for testing.
 
-8. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
+3. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
 
    libpng-1.0.5 and earlier transform colors to gamma=1.0 space for
    merging with background, and then back to the image's gamma.  The
@@ -83,12 +36,12 @@ Known bugs and suggested enhancements in libpng-1.0.7
 
    STATUS: under development.
 
-9. September 1999 -- ENHANCEMENT --
+4. September 1999 -- ENHANCEMENT --
 
    It should be possible to use libpng without floating-point aritmetic.
 
    STATUS: Under investigation, implementation postponed until after
-   libpng-1.0.7.
+   libpng-2.0.0.
 
    Much of this was completed in libpng-1.0.6, but gamma compensation
    is not yet done in fixed-point arithmetic.
