@@ -200,3 +200,16 @@ version 0.98 [January, 1998]
       PNG_TIME_RFC1152_SUPPORTED macro to PNG_TIME_RFC1123_SUPPORTED
    added png_invert_alpha capability (Glenn R-P -- suggestion by Jon Vincent)
    changed srgb_intent from png_byte to int to avoid compiler bugs
+version 0.99 [January, 1998]
+   free info_ptr->text instead of end_info_ptr->text in pngread.c (John Bowler)
+   fixed a longstanding "packswap" bug in pngtrans.c
+   fixed some inconsistencies in pngconf.h that prevented compiling with
+      PNG_READ_GAMMA_SUPPORTED and PNG_READ_hIST_SUPPORTED undefined
+   fixed some typos and made other minor rearrangement of libpng.txt (Andreas)
+   changed recommendation about file_gamma for PC images to .50 from .51 in
+      example.c and libpng.txt, and changed file_gamma for sRGB images to .45
+   added a number of functions to access information from the png structure
+      png_get_image_height(), etc. (Glenn R-P, suggestion by Brad Pettit)
+   added TARGET_MACOS similar to zlib-1.0.8
+   define PNG_ALWAYS_EXTERN when __MWERKS__ && WIN32 are defined
+   added type casting to all png_malloc() function calls

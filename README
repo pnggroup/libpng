@@ -1,4 +1,4 @@
-[NOTE:  this is still beta version 0.97d; the text below has already
+[NOTE:  this is still beta version 0.99; the text below has already
  been updated in anticipation of the imminent 1.0 release.]
 
 
@@ -99,11 +99,11 @@ fix.  Please mention "libpng" somewhere in the subject line.  Thanks.
 This release was created and will be supported by myself (of course
 based in a large way on Guy's and Andreas' earlier work), and the PNG group.
 
-adilger@enel.ucalgary.ca
+randeg@alumni.rpi.edu
 png-implement@dworkin.wustl.edu
 
 You can't reach Guy, the original libpng author, at the addresses
-given in previous versions of this document.  He will read mail
+given in previous versions of this document.  He and Andreas will read mail
 addressed to the png-implement list, however.
 
 Please do not send general questions about PNG.  Send them to

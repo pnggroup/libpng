@@ -1,11 +1,11 @@
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  *
  * This file provides a location for all memory allocation.  Users which
  * need special memory handling are expected to modify the code in this file
@@ -58,7 +58,10 @@ void
 png_destroy_struct(png_voidp struct_ptr)
 {
    if (struct_ptr != NULL)
+   {
       farfree (struct_ptr);
+      struct_ptr = NULL;
+   }
 }
 
 /* Allocate memory.  For reasonable files, size should never exceed
@@ -107,8 +110,10 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
             png_byte huge * hptr;
 
             if (ret != NULL)
+            {
                farfree(ret);
-            ret = NULL;
+               ret = NULL;
+            }
 
             num_blocks = (int)(1 << (png_ptr->zlib_window_bits - 14));
             if (num_blocks < 1)
@@ -124,7 +129,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 
             if (table == NULL)
             {
-               png_error(png_ptr, "Out of Memory");
+               png_error(png_ptr, "Out Of Memory."); /* Note "O" and "M" */
             }
 
             if ((png_size_t)table & 0xfff0)
@@ -138,7 +143,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 
             if (png_ptr->offset_table_ptr == NULL)
             {
-               png_error(png_ptr, "Out of memory");
+               png_error(png_ptr, "Out Of memory.");
             }
 
             hptr = (png_byte huge *)table;
@@ -160,7 +165,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
       }
 
       if (png_ptr->offset_table_count >= png_ptr->offset_table_number)
-         png_error(png_ptr, "Out of Memory");
+         png_error(png_ptr, "Out of Memory.");
 
       ret = png_ptr->offset_table_ptr[png_ptr->offset_table_count++];
    }
@@ -169,7 +174,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 
    if (ret == NULL)
    {
-      png_error(png_ptr, "Out of Memory");
+      png_error(png_ptr, "Out of memory."); /* Note "o" and "m" */
    }
 
    return ret;
@@ -207,7 +212,10 @@ PNG_FREE(png_structp png_ptr, png_voidp ptr)
    }
 
    if (ptr != NULL)
+   {
       farfree(ptr);
+      ptr = NULL;
+   }
 }
 
 #else /* Not the Borland DOS special memory handler */
@@ -250,15 +258,20 @@ void
 png_destroy_struct(png_voidp struct_ptr)
 {
    if (struct_ptr != NULL)
+   {
 #if defined(__TURBOC__) && !defined(__FLAT__)
       farfree(struct_ptr);
+      struct_ptr = NULL;
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
       hfree(struct_ptr);
+      struct_ptr = NULL;
 # else
       free(struct_ptr);
+      struct_ptr = NULL;
 # endif
 #endif
+   }
 }
 
 
@@ -309,11 +322,14 @@ PNG_FREE(png_structp png_ptr, png_voidp ptr)
 
 #if defined(__TURBOC__) && !defined(__FLAT__)
    farfree(ptr);
+   ptr = NULL;
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
    hfree(ptr);
+   ptr = NULL;
 # else
    free(ptr);
+   ptr = NULL;
 # endif
 #endif
 }

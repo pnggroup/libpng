@@ -204,7 +204,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* If we don't have another value */
    else
    {
-      screen_gamma = 2.2;  /* A good guess for a PC monitors in a brightly
+      screen_gamma = 2.2;  /* A good guess for a PC monitors in a dimly
                               lit room */
       screen_gamma = 1.7 or 1.0;  /* A good guess for Mac systems */
    }
@@ -223,7 +223,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       if (png_get_gAMA(png_ptr, info_ptr, &image_gamma)
          png_set_gamma(png_ptr, screen_gamma, image_gamma);
       else
-         png_set_gamma(png_ptr, screen_gamma, 0.51);
+         png_set_gamma(png_ptr, screen_gamma, 0.50);
 
    /* Dither RGB files down to 8 bit palette or reduce palettes
     * to the number of colors available on your screen.
@@ -255,7 +255,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    }
 
    /* invert monocrome files to have 0 as white and 1 as black */
-   png_set_invert(png_ptr);
+   png_set_invert_mono(png_ptr);
 
    /* If you want to shift the pixel values from the range [0,255] or
     * [0,65535] to the original [0,7] or [0,31], or whatever range the
@@ -549,7 +549,7 @@ void write_png(char *file_name, ... other image information ...)
       PNG_INTERLACE_????, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
    /* set the palette if there is one.  REQUIRED for indexed-color images */
-   palette = png_malloc(png_ptr, 256 * sizeof (png_color));
+   palette = (png_colorp)png_malloc(png_ptr, 256 * sizeof (png_color));
    ... set palette colors ...
    png_set_PLTE(png_ptr, info_ptr, palette, 256);
 
@@ -600,7 +600,7 @@ void write_png(char *file_name, ... other image information ...)
     */
 
    /* invert monocrome pixels */
-   png_set_invert(png_ptr);
+   png_set_invert_mono(png_ptr);
 
    /* Shift the pixels up to a legal bit depth and fill in
     * as appropriate to correctly scale the image.

@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -58,7 +58,7 @@ png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = png_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
    png_ptr->zstream.zalloc = png_zalloc;
    png_ptr->zstream.zfree = png_zfree;
    png_ptr->zstream.opaque = (voidpf)png_ptr;
@@ -100,7 +100,7 @@ png_read_init(png_structp png_ptr)
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = png_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
    png_ptr->zstream.zalloc = png_zalloc;
    png_ptr->zstream.zfree = png_zfree;
    png_ptr->zstream.opaque = (voidpf)png_ptr;
@@ -665,7 +665,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    if (end_info_ptr != NULL)
    {
 #if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
-      png_free(png_ptr, info_ptr->text);
+      png_free(png_ptr, end_info_ptr->text);
 #endif
       png_destroy_struct((png_voidp)end_info_ptr);
       *end_info_ptr_ptr = (png_infop)NULL;
@@ -710,7 +710,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_to_1);
 #endif
    if (png_ptr->flags & PNG_FLAG_FREE_PALETTE)
-      png_free(png_ptr, png_ptr->palette);
+      png_zfree(png_ptr, png_ptr->palette);
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) && defined(PNG_READ_bKGD_SUPPORTED)
    if (png_ptr->flags & PNG_FLAG_FREE_TRANS)
       png_free(png_ptr, png_ptr->trans);

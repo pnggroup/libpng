@@ -1,12 +1,12 @@
 
 /* pngconf.c - machine configurable file for libpng
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -27,7 +27,7 @@
  * where it becomes significant, if you are concerned with memory
  * usage.  Note that zlib allocates at least 32Kb also.  For readers,
  * this describes the size of the buffer available to read the data in.
- * Unless this gets smaller then the size of a row (compressed),
+ * Unless this gets smaller than the size of a row (compressed),
  * it should not make much difference how big this is.
  */
 
@@ -55,8 +55,6 @@
  * #define PNG_NO_STDIO
  */
 
-/* We still need stdio.h for FILE even when PNG_NO_STDIO is defined.
- */
 #ifndef PNG_NO_STDIO 
 #include <stdio.h>
 #endif
@@ -88,9 +86,11 @@
  * just __MWERKS__ is not good enough, because the Codewarrior is now used
  * on non-Mac platforms.
  */
+#ifndef MACOS
 #if (defined(__MWERKS__) && defined(macintosh)) || defined(applec) || \
-    defined(THINK_C) || defined(__SC__)
+    defined(THINK_C) || defined(__SC__) || defined(TARGET_OS_MAC)
 #define MACOS
+#endif
 #endif
 
 /* enough people need this for various reasons to include it here */
@@ -155,6 +155,11 @@ __dont__ include it again
 #endif
 #else
 #include <math.h>
+#endif
+
+/* Codewarrior on NT has linking problems without this. */
+#if defined(__MWERKS__) && defined(WIN32)
+#define PNG_ALWAYS_EXTERN
 #endif
 
 /* For some reason, Borland C++ defines memcmp, etc. in mem.h, not
@@ -234,7 +239,8 @@ __dont__ include it again
 /* GR-P, 0.96a: Set "*FULLY_SUPPORTED as default but allow user
    to turn it off with "*NOT_FULLY_SUPPORTED" on the compile line,
    then pick and choose which ones to define without having to edit
-   this file */
+   this file.
+ */
 
 #ifndef PNG_READ_NOT_FULLY_SUPPORTED
 #define PNG_READ_FULLY_SUPPORTED
@@ -245,7 +251,6 @@ __dont__ include it again
 
 #ifdef PNG_READ_FULLY_SUPPORTED
 #define PNG_PROGRESSIVE_READ_SUPPORTED
-#define PNG_READ_OPT_PLTE_SUPPORTED
 #define PNG_READ_EXPAND_SUPPORTED
 #define PNG_READ_SHIFT_SUPPORTED
 #define PNG_READ_PACK_SUPPORTED
@@ -264,10 +269,10 @@ __dont__ include it again
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
 #define PNG_READ_COMPOSITE_NODIV_SUPPORTED        /* well tested on Intel */
 #endif /* PNG_READ_FULLY_SUPPORTED */
-#define PNG_READ_INTERLACING_SUPPORTED
+
+#define PNG_READ_INTERLACING_SUPPORTED  /* required for PNG-compliant decoders */
 
 #ifdef PNG_WRITE_FULLY_SUPPORTED
-#define PNG_WRITE_INTERLACING_SUPPORTED
 #define PNG_WRITE_SHIFT_SUPPORTED
 #define PNG_WRITE_PACK_SUPPORTED
 #define PNG_WRITE_BGR_SUPPORTED
@@ -281,8 +286,32 @@ __dont__ include it again
 #define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif /* PNG_WRITE_FULLY_SUPPORTED */
 
+#define PNG_WRITE_INTERLACING_SUPPORTED  /* not required for PNG-compliant */
+                                         /* encoders, but can cause trouble
+                                            if left undefined */
+
 #if !defined(PNG_NO_STDIO)
 #define PNG_TIME_RFC1123_SUPPORTED
+#endif
+
+/* This adds extra functions in pngget.c for accessing data from the
+ * info pointer (added in version 0.99)
+ * png_get_image_width()
+ * png_get_image_height()
+ * png_get_bit_depth()
+ * png_get_color_type()
+ * png_get_compression_type()
+ * png_get_filter_type()
+ * png_get_interlace_type()
+ * png_get_pixel_aspect_ratio()
+ * png_get_pixels_per_meter()
+ * png_get_x_offset_pixels()
+ * png_get_y_offset_pixels()
+ * png_get_x_offset_microns()
+ * png_get_y_offset_microns()
+ */
+#if !defined(PNG_NO_EASY_ACCESS)
+#define PNG_EASY_ACCESS_SUPPORTED
 #endif
 
 /* These are currently experimental features, define them if you want */
@@ -307,11 +336,17 @@ __dont__ include it again
 /* Any chunks you are not interested in, you can undef here.  The
  * ones that allocate memory may be expecially important (hIST,
  * tEXt, zTXt, tRNS, pCAL).  Others will just save time and make png_info
- * a bit smaller.  OPT_PLTE only disables the optional palette in RGB
- * and RGBA images.
+ * a bit smaller.
  */
 
-#ifdef PNG_READ_FULLY_SUPPORTED
+#ifndef PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED
+#define PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
+#endif
+#ifndef PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED
+#define PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
+#endif
+
+#ifdef PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
 #define PNG_READ_bKGD_SUPPORTED
 #define PNG_READ_cHRM_SUPPORTED
 #define PNG_READ_gAMA_SUPPORTED
@@ -325,9 +360,11 @@ __dont__ include it again
 #define PNG_READ_tIME_SUPPORTED
 #define PNG_READ_tRNS_SUPPORTED
 #define PNG_READ_zTXt_SUPPORTED
-#endif /* PNG_READ_FULLY_SUPPORTED */
+#define PNG_READ_OPT_PLTE_SUPPORTED /* only affects support of the optional */
+                                    /* PLTE chunk in RGB and RGBA images */
+#endif /* PNG_READ_ANCILLARY_CHUNKS_SUPPORTED */
 
-#ifdef PNG_WRITE_FULLY_SUPPORTED
+#ifdef PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
 #define PNG_WRITE_bKGD_SUPPORTED
 #define PNG_WRITE_cHRM_SUPPORTED
 #define PNG_WRITE_gAMA_SUPPORTED
@@ -341,7 +378,7 @@ __dont__ include it again
 #define PNG_WRITE_tIME_SUPPORTED
 #define PNG_WRITE_tRNS_SUPPORTED
 #define PNG_WRITE_zTXt_SUPPORTED
-#endif /* PNG_WRITE_FULLY_SUPPORTED */
+#endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
 
 /* need the time information for reading tIME chunks */
 #if defined(PNG_READ_tIME_SUPPORTED) || defined(PNG_WRITE_tIME_SUPPORTED)
@@ -467,7 +504,7 @@ typedef z_stream FAR *  png_zstreamp;
 
 /* allow for compilation as dll with BORLAND C++ 5.0 */
 #if defined(__BORLANDC__) && defined(_Windows) && defined(__DLL__)
-#   define PNG_EXPORT(t,s) t _export s
+#   define PNG_EXPORT(type,symbol) type _export symbol
 #endif
 
 /* allow for compilation as shared lib under BeOS */
@@ -476,7 +513,7 @@ typedef z_stream FAR *  png_zstreamp;
 #endif
 
 #ifndef PNG_EXPORT
-#define PNG_EXPORT(t,s) t s
+#define PNG_EXPORT(type,symbol) type symbol
 #endif
 
 

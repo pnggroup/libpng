@@ -1,12 +1,12 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  */
 
 #define PNG_INTERNAL
@@ -68,7 +68,8 @@ png_set_shift(png_structp png_ptr, png_color_8p true_bits)
 }
 #endif
 
-#if defined(PNG_READ_INTERLACING_SUPPORTED) || defined(PNG_WRITE_INTERLACING_SUPPORTED)
+#if defined(PNG_READ_INTERLACING_SUPPORTED) || \
+    defined(PNG_WRITE_INTERLACING_SUPPORTED)
 int
 png_set_interlace_handling(png_structp png_ptr)
 {
@@ -299,7 +300,7 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
    png_debug(1, "in png_do_packswap\n");
    if (
 #if defined(PNG_USELESS_TESTS_SUPPORTED)
-       row != NULL && row_info != NULL
+       row != NULL && row_info != NULL &&
 #endif
        row_info->bit_depth < 8)
    {

@@ -1,12 +1,12 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  */
 
 #define PNG_INTERNAL
@@ -29,6 +29,179 @@ png_get_rowbytes(png_structp png_ptr, png_infop info_ptr)
    else
       return(0);
 }
+
+#ifdef PNG_EASY_ACCESS_SUPPORTED
+/* easy access to info, added in libpng-0.99 */
+png_uint_32
+png_get_image_width(png_structp png_ptr, png_infop info_ptr)
+{
+   if (info_ptr != NULL)
+   {
+      return info_ptr->width;
+   }
+   return (0);
+}
+
+png_uint_32
+png_get_image_height(png_structp png_ptr, png_infop info_ptr)
+{
+   if (info_ptr != NULL)
+   {
+      return info_ptr->height;
+   }
+   return (0);
+}
+
+png_byte
+png_get_bit_depth(png_structp png_ptr, png_infop info_ptr)
+{
+   if (info_ptr != NULL)
+   {
+      return info_ptr->bit_depth;
+   }
+   return (0);
+}
+
+png_byte
+png_get_color_type(png_structp png_ptr, png_infop info_ptr)
+{
+   if (info_ptr != NULL)
+   {
+      return info_ptr->color_type;
+   }
+   return (0);
+}
+
+png_byte
+png_get_filter_type(png_structp png_ptr, png_infop info_ptr)
+{
+   if (info_ptr != NULL)
+   {
+      return info_ptr->filter_type;
+   }
+   return (0);
+}
+
+png_byte
+png_get_interlace_type(png_structp png_ptr, png_infop info_ptr)
+{
+   if (info_ptr != NULL)
+   {
+      return info_ptr->interlace_type;
+   }
+   return (0);
+}
+
+png_byte
+png_get_compression_type(png_structp png_ptr, png_infop info_ptr)
+{
+   if (info_ptr != NULL)
+   {
+      return info_ptr->compression_type;
+   }
+   return (0);
+}
+
+png_uint_32
+png_get_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
+{
+#if defined(PNG_READ_pHYs_SUPPORTED) || defined(PNG_WRITE_pHYs_SUPPORTED)
+   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_pHYs)
+   {
+      png_debug1(1, "in %s retrieval function\n", "png_get_pixels_per_meter");
+      if(info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
+          return (0);
+      else return (info_ptr->x_pixels_per_unit);
+   }
+   else
+#endif
+   return (0);
+}
+
+float
+png_get_pixel_aspect_ratio(png_structp png_ptr, png_infop info_ptr)
+   {
+#if defined(PNG_READ_pHYs_SUPPORTED) || defined(PNG_WRITE_pHYs_SUPPORTED)
+   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_pHYs)
+   {
+      png_debug1(1, "in %s retrieval function\n", "png_get_aspect_ratio");
+      if (info_ptr->x_pixels_per_unit == 0)
+         return NULL;
+      else
+         return (float)info_ptr->y_pixels_per_unit
+            /(float)info_ptr->x_pixels_per_unit;
+   }
+   else
+#endif
+      return (0);
+}
+
+png_uint_32
+png_get_x_offset_microns(png_structp png_ptr, png_infop info_ptr)
+{
+#if defined(PNG_READ_oFFs_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
+   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_oFFs)
+   {
+      png_debug1(1, "in %s retrieval function\n", "png_get_x_offset_microns");
+      if(info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
+          return (0);
+      else return (info_ptr->x_offset);
+   }
+   else
+#endif
+   return (0);
+}
+
+png_uint_32
+png_get_y_offset_microns(png_structp png_ptr, png_infop info_ptr)
+{
+#if defined(PNG_READ_oFFs_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
+   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_oFFs)
+   {
+      png_debug1(1, "in %s retrieval function\n", "png_get_y_offset_microns");
+      if(info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
+          return (0);
+      else return (info_ptr->y_offset);
+   }
+   else
+#endif
+   return (0);
+}
+
+png_uint_32
+png_get_x_offset_pixels(png_structp png_ptr, png_infop info_ptr)
+{
+#if defined(PNG_READ_oFFs_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
+   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_oFFs)
+   {
+      png_debug1(1, "in %s retrieval function\n", "png_get_x_offset_microns");
+      if(info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
+          return (0);
+      else return (info_ptr->x_offset);
+   }
+   else
+#endif
+   return (0);
+}
+
+png_uint_32
+png_get_y_offset_pixels(png_structp png_ptr, png_infop info_ptr)
+{
+#if defined(PNG_READ_oFFs_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
+   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_oFFs)
+   {
+      png_debug1(1, "in %s retrieval function\n", "png_get_y_offset_microns");
+      if(info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
+          return (0);
+      else return (info_ptr->y_offset);
+   }
+   else
+#endif
+   return (0);
+}
+
+/* png_get_channels really belongs in here, too, but it's been around longer */
+#endif
 
 png_byte
 png_get_channels(png_structp png_ptr, png_infop info_ptr)

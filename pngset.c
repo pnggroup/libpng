@@ -1,12 +1,12 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  *
  * The functions here are used during reads to store data from the file
  * into the info struct, and during writes to store application data
@@ -239,7 +239,7 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    png_set_sRGB(png_ptr, info_ptr, intent);
 
 #if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED)
-   file_gamma = (float).51;
+   file_gamma = (float).45;
    png_set_gAMA(png_ptr, info_ptr, file_gamma);
 #endif
 

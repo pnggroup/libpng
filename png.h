@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 0.98 beta
+ * libpng 0.99 beta
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  *
  * Note about libpng version numbers:
  *
@@ -119,30 +119,30 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "0.98"
+#define PNG_LIBPNG_VER_STRING "0.99"
 
 /* careful here.  At one time, I wanted to use 082, but that would be octal.
  * Version 1.0 will be 100 here, etc.
  */
-#define PNG_LIBPNG_VER  98
+#define PNG_LIBPNG_VER  99
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
-#ifndef PNG_NO_EXTERN
+#if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
 /* Version information for C files, stored in png.c.  This had better match
  * the version above.
  */
-extern char png_libpng_ver[];
+extern char png_libpng_ver[5];
 
 /* Structures to facilitate easy interlacing.  See png.c for more details */
-extern int FARDATA png_pass_start[];
-extern int FARDATA png_pass_inc[];
-extern int FARDATA png_pass_ystart[];
-extern int FARDATA png_pass_yinc[];
-extern int FARDATA png_pass_mask[];
-extern int FARDATA png_pass_dsp_mask[];
+extern int FARDATA png_pass_start[7];
+extern int FARDATA png_pass_inc[7];
+extern int FARDATA png_pass_ystart[7];
+extern int FARDATA png_pass_yinc[7];
+extern int FARDATA png_pass_mask[7];
+extern int FARDATA png_pass_dsp_mask[7];
 /* These aren't currently used.  If you need them, see png.c for more details
-extern int FARDATA png_pass_width[];
-extern int FARDATA png_pass_height[];
+extern int FARDATA png_pass_width[7];
+extern int FARDATA png_pass_height[7];
 */
 #endif /* PNG_NO_EXTERN */
 
@@ -268,7 +268,8 @@ typedef struct png_info_struct
     * and initialize the appropriate fields below.
     */
 
-#if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED)
+#if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED) || \
+    defined(PNG_READ_GAMMA_SUPPORTED)
    /* The gAMA chunk describes the gamma characteristics of the system
     * on which the image was created, normally in the range [1.0, 2.5].
     * Data is valid if (valid & PNG_INFO_gAMA) is non-zero.
@@ -323,7 +324,8 @@ typedef struct png_info_struct
    png_bytep trans; /* transparent values for paletted image */
    png_color_16 trans_values; /* transparent color for non-palette image */
 #endif /* PNG_READ_tRNS_SUPPORTED || PNG_WRITE_tRNS_SUPPORTED */
-#if defined(PNG_READ_bKGD_SUPPORTED) || defined(PNG_WRITE_bKGD_SUPPORTED)
+#if defined(PNG_READ_bKGD_SUPPORTED) || defined(PNG_WRITE_bKGD_SUPPORTED) || \
+    defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* The bKGD chunk gives the suggested image background color if the
     * display program does not have its own background color and the image
     * is needs to composited onto a background before display.  The colors
@@ -443,6 +445,15 @@ typedef png_info FAR * FAR * png_infopp;
 #define PNG_RESOLUTION_UNKNOWN    0 /* pixels/unknown unit (aspect ratio) */
 #define PNG_RESOLUTION_METER      1 /* pixels/meter */
 #define PNG_RESOLUTION_LAST       2 /* Not a valid value */
+
+/* These are for the sRGB chunk.  These values should NOT be changed. */
+#define PNG_sRGB_INTENT_SATURATION 0
+#define PNG_sRGB_INTENT_PERCEPTUAL 1
+#define PNG_sRGB_INTENT_ABSOLUTE   2
+#define PNG_sRGB_INTENT_RELATIVE   3
+#define PNG_sRGB_INTENT_LAST       4 /* Not a valid value */
+                        
+
 
 /* These determine if an ancillary chunk's data has been successfully read
  * from the PNG header, or if the application has filled in the corresponding
@@ -636,8 +647,10 @@ struct png_struct_def
 #if defined(PNG_READ_DITHER_SUPPORTED)
    png_bytep palette_lookup;         /* lookup table for dithering */
    png_bytep dither_index;           /* index translation for palette files */
-   png_uint_16p hist;                /* histogram */
 #endif /* PNG_READ_DITHER_SUPPORTED */
+#if defined(PNG_READ_DITHER_SUPPORTED) || defined(PNG_READ_hIST_SUPPORTED)
+   png_uint_16p hist;                /* histogram */
+#endif
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_byte heuristic_method;        /* heuristic for row filter selection */
    png_byte num_prev_filters;        /* number of weights for previous rows */
@@ -1091,6 +1104,13 @@ extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
 /* frees a pointer allocated by png_malloc() */
 extern PNG_EXPORT(void,png_free) PNGARG((png_structp png_ptr, png_voidp ptr));
 
+#ifdef PNGTEST_MEMORY_DEBUG
+/* debugging versions of png_malloc() and png_free() */
+extern PNG_EXPORT(png_voidp,png_debug_malloc) PNGARG((png_structp png_ptr,
+   png_uint_32 size));
+extern PNG_EXPORT(void,png_debug_free) PNGARG((png_structp png_ptr,
+   png_voidp ptr));
+#endif
 #if defined(USE_FAR_KEYWORD)  /* memory model conversion function */
 extern void *far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,int check));
 #endif /* USE_FAR_KEYWORD */
@@ -1123,17 +1143,66 @@ extern PNG_EXPORT(void,png_chunk_warning) PNGARG((png_structp png_ptr,
  * to avoid problems with future changes in the size and internal layout of
  * png_info_struct.
  */
-/* Returns "flag" if chunk data is valid in info_ptr */
+/* Returns "flag" if chunk data is valid in info_ptr. */
 extern PNG_EXPORT(png_uint_32,png_get_valid) PNGARG((png_structp png_ptr,
 png_infop info_ptr, png_uint_32 flag));
 
-/* Returns number of bytes needed to hold a transformed row */
+/* Returns number of bytes needed to hold a transformed row. */
 extern PNG_EXPORT(png_uint_32,png_get_rowbytes) PNGARG((png_structp png_ptr,
 png_infop info_ptr));
 
-/* Returns number of color channels in image */
+/* Returns number of color channels in image. */
 extern PNG_EXPORT(png_byte,png_get_channels) PNGARG((png_structp png_ptr,
 png_infop info_ptr));
+
+#ifdef PNG_EASY_ACCESS_SUPPORTED
+/* Returns image width in pixels. */
+extern PNG_EXPORT(png_uint_32, png_get_image_width) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns image height in pixels. */
+extern PNG_EXPORT(png_uint_32, png_get_image_height) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns image bit_depth. */
+extern PNG_EXPORT(png_byte, png_get_bit_depth) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns image color_type. */
+extern PNG_EXPORT(png_byte, png_get_color_type) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns image filter_type. */
+extern PNG_EXPORT(png_byte, png_get_filter_type) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns image interlace_type. */
+extern PNG_EXPORT(png_byte, png_get_interlace_type) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns image compression_type. */
+extern PNG_EXPORT(png_byte, png_get_compression_type) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns image resolution in pixels per meter, from pHYs chunk data. */
+extern PNG_EXPORT(png_uint_32, png_get_pixels_per_meter) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns pixel aspect ratio, computed from pHYs chunk data.  */
+extern PNG_EXPORT(float, png_get_pixel_aspect_ratio) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+/* Returns image x, y offset in pixels or microns, from oFFs chunk data. */
+extern PNG_EXPORT(png_uint_32, png_get_x_offset_pixels) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+extern PNG_EXPORT(png_uint_32, png_get_y_offset_pixels) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+extern PNG_EXPORT(png_uint_32, png_get_x_offset_microns) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+extern PNG_EXPORT(png_uint_32, png_get_y_offset_microns) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+
+#endif /* PNG_EASY_ACCESS_SUPPORTED */
 
 /* Returns pointer to signature string read from PNG header */
 extern PNG_EXPORT(png_bytep,png_get_signature) PNGARG((png_structp png_ptr,
@@ -1294,6 +1363,9 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
  * libpng yet, but more support will be added as needed.
  */
 #if (PNG_DEBUG > 0)
+#ifdef PNG_NO_STDIO
+#include <stdio.h>
+#endif
 #ifndef PNG_DEBUG_FILE
 #define PNG_DEBUG_FILE stderr
 #endif /* PNG_DEBUG_FILE */
@@ -1411,31 +1483,31 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #ifndef PNG_NO_EXTERN
-/* place to hold the signiture string for a PNG file. */
-extern png_byte FARDATA png_sig[];
+/* place to hold the signature string for a PNG file. */
+extern png_byte FARDATA png_sig[8];
 
 /* Constant strings for known chunk types.  If you need to add a chunk,
  * add a string holding the name here.  See png.c for more details.  We
  * can't selectively include these, since we still check for chunk in the
  * wrong locations with these labels.
  */
-extern png_byte FARDATA png_IHDR[];
-extern png_byte FARDATA png_IDAT[];
-extern png_byte FARDATA png_IEND[];
-extern png_byte FARDATA png_PLTE[];
-extern png_byte FARDATA png_bKGD[];
-extern png_byte FARDATA png_cHRM[];
-extern png_byte FARDATA png_gAMA[];
-extern png_byte FARDATA png_hIST[];
-extern png_byte FARDATA png_oFFs[];
-extern png_byte FARDATA png_pCAL[];
-extern png_byte FARDATA png_pHYs[];
-extern png_byte FARDATA png_sBIT[];
-extern png_byte FARDATA png_sRGB[];
-extern png_byte FARDATA png_tEXt[];
-extern png_byte FARDATA png_tIME[];
-extern png_byte FARDATA png_tRNS[];
-extern png_byte FARDATA png_zTXt[];
+extern png_byte FARDATA png_IHDR[5];
+extern png_byte FARDATA png_IDAT[5];
+extern png_byte FARDATA png_IEND[5];
+extern png_byte FARDATA png_PLTE[5];
+extern png_byte FARDATA png_bKGD[5];
+extern png_byte FARDATA png_cHRM[5];
+extern png_byte FARDATA png_gAMA[5];
+extern png_byte FARDATA png_hIST[5];
+extern png_byte FARDATA png_oFFs[5];
+extern png_byte FARDATA png_pCAL[5];
+extern png_byte FARDATA png_pHYs[5];
+extern png_byte FARDATA png_sBIT[5];
+extern png_byte FARDATA png_sRGB[5];
+extern png_byte FARDATA png_tEXt[5];
+extern png_byte FARDATA png_tIME[5];
+extern png_byte FARDATA png_tRNS[5];
+extern png_byte FARDATA png_zTXt[5];
 
 #endif /* PNG_NO_EXTERN */
 
@@ -1550,7 +1622,7 @@ PNG_EXTERN void png_write_chunk_data PNGARG((png_structp png_ptr,
 /* Finish a chunk started with png_write_chunk_start() (includes CRC). */
 PNG_EXTERN void png_write_chunk_end PNGARG((png_structp png_ptr));
 
-/* simple function to write the signiture */
+/* simple function to write the signature */
 PNG_EXTERN void png_write_sig PNGARG((png_structp png_ptr));
 
 /* write various chunks */

@@ -1,12 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -372,7 +372,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                   {
                      png_dsortp t;
 
-                     t = png_malloc(png_ptr, sizeof (png_dsort));
+                     t = (png_dsortp)png_malloc(png_ptr, sizeof (png_dsort));
                      t->next = hash[d];
                      t->left = (png_byte)i;
                      t->right = (png_byte)j;

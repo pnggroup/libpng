@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  */
 
 #define PNG_INTERNAL
@@ -200,12 +200,16 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
       filter_type = PNG_FILTER_TYPE_BASE;
    }
 
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
    if (interlace_type != PNG_INTERLACE_NONE &&
       interlace_type != PNG_INTERLACE_ADAM7)
    {
       png_warning(png_ptr, "Invalid interlace type specified");
       interlace_type = PNG_INTERLACE_ADAM7;
    }
+#else
+   interlace_type=PNG_INTERLACE_NONE;
+#endif
 
    /* save off the relevent information */
    png_ptr->bit_depth = (png_byte)bit_depth;
@@ -351,7 +355,7 @@ png_write_sRGB(png_structp png_ptr, int srgb_intent)
    png_byte buf[1];
 
    png_debug(1, "in png_write_sRGB\n");
-   if(srgb_intent > 3)
+   if(srgb_intent >= PNG_sRGB_INTENT_LAST)
          png_warning(png_ptr,
             "Invalid sRGB rendering intent specified");
    buf[0]=(png_byte)srgb_intent;
@@ -821,7 +825,8 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
          }
 
          /* save the data */
-         output_ptr[num_output_ptr] = png_malloc(png_ptr, png_ptr->zbuf_size);
+         output_ptr[num_output_ptr] = (png_charp)png_malloc(png_ptr,
+            png_ptr->zbuf_size);
          png_memcpy(output_ptr[num_output_ptr], png_ptr->zbuf,
             png_ptr->zbuf_size);
          num_output_ptr++;
@@ -874,7 +879,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
          }
 
          /* save off the data */
-         output_ptr[num_output_ptr] = png_malloc(png_ptr,
+         output_ptr[num_output_ptr] = (png_charp)png_malloc(png_ptr,
             png_ptr->zbuf_size);
          png_memcpy(output_ptr[num_output_ptr], png_ptr->zbuf,
             png_ptr->zbuf_size);
@@ -1098,6 +1103,7 @@ png_write_start_row(png_structp png_ptr)
       }
    }
 
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* if interlaced, we need to set up width and height of pass */
    if (png_ptr->interlaced)
    {
@@ -1115,6 +1121,7 @@ png_write_start_row(png_structp png_ptr)
       }
    }
    else
+#endif
    {
       png_ptr->num_rows = png_ptr->height;
       png_ptr->usr_width = png_ptr->width;
@@ -1137,6 +1144,7 @@ png_write_finish_row(png_structp png_ptr)
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
 
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* if interlaced, go to next pass */
    if (png_ptr->interlaced)
    {
@@ -1178,6 +1186,7 @@ png_write_finish_row(png_structp png_ptr)
          return;
       }
    }
+#endif
 
    /* if we get here, we've just written the last row, so we need
       to flush the compressor */

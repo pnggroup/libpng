@@ -1,12 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -298,10 +298,13 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       whatever the normal CRC configuration tells us.  However, if we
       have an RGB image, the PLTE can be considered ancillary, so
       we will act as though it is. */
+#if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+#endif
    {
       png_crc_finish(png_ptr, 0);
    }
+#if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
    else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
    {
       /* If we don't want to use the data from an ancillary chunk,
@@ -328,7 +331,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          png_chunk_warning(png_ptr, "CRC error");
       }
    }
-
+#endif
    png_ptr->palette = palette;
    png_ptr->num_palette = (png_uint_16)num;
    png_set_PLTE(png_ptr, info_ptr, palette, num);
@@ -404,7 +407,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
-      if(igamma != (png_uint_32)51000L)
+      if(igamma != (png_uint_32)45000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -416,7 +419,9 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
    file_gamma = (float)igamma / (float)100000.0;
+#ifdef PNG_READ_GAMMA_SUPPORTED
    png_ptr->gamma = file_gamma;
+#endif
    png_set_gAMA(png_ptr, info_ptr, file_gamma);
 }
 #endif
@@ -663,15 +668,15 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    intent = buf[0];
    /* check for bad intent */
-   if (intent > 3)
+   if (intent >= PNG_sRGB_INTENT_LAST)
    {
       png_warning(png_ptr, "Unknown sRGB intent");
       return;
    }
 
-#ifdef PNG_READ_gAMA_SUPPORTED
+#if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
    if ((info_ptr->valid & PNG_INFO_gAMA))
-      if((png_uint_32)(png_ptr->gamma*(float)100000.+.5) != (png_uint_32)51000L)
+      if((png_uint_32)(png_ptr->gamma*(float)100000.+.5) != (png_uint_32)45000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -1329,7 +1334,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                png_charp tmp;
 
                tmp = text;
-               text = png_malloc(png_ptr, text_size +
+               text = (png_charp)png_malloc(png_ptr, text_size +
                   png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1);
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);

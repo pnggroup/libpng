@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  */
 
 /* get internal access to png.h */
@@ -34,7 +34,12 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    /* write IHDR information. */
    png_write_IHDR(png_ptr, info_ptr->width, info_ptr->height,
       info_ptr->bit_depth, info_ptr->color_type, info_ptr->compression_type,
-      info_ptr->filter_type, info_ptr->interlace_type);
+      info_ptr->filter_type,
+#if defined(PNG_WRITE_INTERLACING_SUPPORTED)
+      info_ptr->interlace_type);
+#else
+      0);
+#endif
    /* the rest of these check to see if the valid field has the appropriate
       flag set, and if it does, writes the chunk. */
 #if defined(PNG_WRITE_gAMA_SUPPORTED)
@@ -71,9 +76,9 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          if (png_ptr->transformations & PNG_INVERT_ALPHA &&
             info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
          {
-            int i;
-            for (i=0; i<info_ptr->num_trans; i++)
-               info_ptr->trans[i] = 255 - info_ptr->trans[i];
+            int j;
+            for (j=0; j<info_ptr->num_trans; j++)
+               info_ptr->trans[j] = 255 - info_ptr->trans[j];
          }
 #endif
       png_write_tRNS(png_ptr, info_ptr->trans, &(info_ptr->trans_values),
@@ -315,7 +320,7 @@ png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = png_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
 
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
@@ -346,7 +351,7 @@ png_write_init(png_structp png_ptr)
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = png_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
@@ -386,9 +391,13 @@ png_write_image(png_structp png_ptr, png_bytepp image)
    png_bytepp rp; /* points to current row */
 
    png_debug(1, "in png_write_image\n");
+#if defined(PNG_WRITE_INTERLACING_SUPPORTED)
    /* intialize interlace handling.  If image is not interlaced,
       this will set pass to 1 */
    num_pass = png_set_interlace_handling(png_ptr);
+#else
+   num_pass = 1;
+#endif
    /* loop through passes */
    for (pass = 0; pass < num_pass; pass++)
    {
@@ -749,7 +758,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             }
             else
             {
-               png_ptr->paeth_row = (png_bytep )png_malloc(png_ptr,
+               png_ptr->paeth_row = (png_bytep)png_malloc(png_ptr,
                   png_ptr->rowbytes + 1);
                png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
             }

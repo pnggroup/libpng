@@ -1,14 +1,14 @@
 libpng.txt - a description on how to use and modify libpng
 
-   libpng version 0.98
+   libpng version 0.99
    Updated and distributed by Glenn Randers-Pehrson <randeg@alumni.rpi.edu>
    Copyright (c) 1998, Glenn Randers-Pehrson
-   January 16, 1998
+   January 30, 1998
 
       based on:
 
    libpng 1.0 beta 6  version 0.96
-   Updated and distributed by Andreas Dilger <adilger@enel.ucalgary.ca>,
+   Updated and distributed by Andreas Dilger 
    Copyright (c) 1996, 1997 Andreas Dilger
    May 28, 1997
 
@@ -239,9 +239,11 @@ Functions are used to get the information from the info_ptr:
                      PNG_COLOR_MASK_COLOR
                      PNG_COLOR_MASK_ALPHA
 
-    interlace_type - PNG_INTERLACE_TYPE_NONE or PNG_INTERLACE_TYPE_ADAM7
-    compression_type - (must be PNG_COMPRESSION_TYPE_BASE for PNG 1.0)
     filter_type    - (must be PNG_FILTER_TYPE_BASE for PNG 1.0)
+    compression_type - (must be PNG_COMPRESSION_TYPE_BASE for PNG 1.0)
+    interlace_type - (PNG_INTERLACE_TYPE_NONE or PNG_INTERLACE_TYPE_ADAM7)
+    Any or all of interlace_type, compression_type, of filter_type can be
+    NULL if you are not interested in their values.
 
     channels = png_get_channels(png_ptr, info_ptr);
     channels       - number of channels of info for the color type
@@ -257,6 +259,17 @@ Functions are used to get the information from the info_ptr:
                      already read in 4 bytes of signature before staring
                      libpng, the remaining 4 bytes would be in signature[4]
                      through signature[7] (see png_set_sig_bytes())).
+    
+Information from each if the IHDR fields can be retrieve separately as well:
+
+    width            = png_get_image_width(png_ptr, info_ptr);
+    height           = png_get_image_height(png_ptr, info_ptr);
+    bit_depth        = png_get_bit_depth(png_ptr, info_ptr);
+    color_type       = png_get_color_type(png_ptr, info_ptr);
+    filter_type      = png_get_filter_type(png_ptr, info_ptr);
+    compression_type = png_get_compression_type(png_ptr, info_ptr);
+    interlace_type   = png_get_interlace_type(png_ptr, info_ptr);
+
 
 These are also important, but their validity depends on whether the chunk
 has been read.  The png_get_valid(png_ptr, info_ptr, PNG_INFO_<chunk>) and
@@ -315,6 +328,15 @@ into the info_ptr is returned for any complex types.
     res_x          - pixels/unit physical resolution in x direction
     res_y          - pixels/unit physical resolution in x direction
     unit_type      - PNG_RESOLUTION_UNKOWN, PNG_RESOLUTION_METER
+
+The data from the pHYs chunk can be retrieved in several convenient
+forms:
+
+    res_x_and_y = png_get_pixels_per_meter(png_ptr, info_ptr)
+    aspect_ratio = png_get_pixel_aspect_ratio(png_ptr, info_ptr)
+
+   (Each of these returns 0 [signifying "unknown"] if the data is not
+     present or if res_x is 0; res_x_and_y is 0 if res_x != res_y)
 
 For more information, see the png_info definition in png.h and the
 PNG specification for chunk contents.  Be careful with trusting
@@ -392,8 +414,21 @@ PNG can have files with 16 bits per channel.  If you only can handle
     if (bit_depth == 16)
         png_set_strip_16(png_ptr);
 
+The png_set_background() function tells libpng to composite images
+with alpha or simple transparency against the supplied background
+color.  If the PNG file contains a bKGD chunk (PNG_INFO_bKGD valid),
+you may use this color, or supply another color more suitable for
+the current display (e.g., the background color from a web page).  You
+need to tell libpng whether the color is in the gamma space of the
+display (PNG_BACKGROUND_GAMMA_SCREEN for colors you supply), the file
+(PNG_BACKGROUND_GAMMA_FILE for colors from the bKGD chunk), or one
+that is neither of these gammas (PNG_BACKGROUND_GAMMA_UNIQUE - I don't
+know why anyone would use this, but it's here).
+
 If, for some reason, you don't need the alpha channel on an image,
-and you want to remove it rather than combining it with the background:
+and you want to remove it rather than combining it with the background
+(but the image author certainly had in mind that you *would* combine
+it with the background, so that's what you should probably do):
 
     if (color_type & PNG_COLOR_MASK_ALPHA)
         png_set_strip_alpha(png_ptr);
@@ -449,17 +484,6 @@ RGB.  This code will do that conversion:
         color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
           png_set_gray_to_rgb(png_ptr);
 
-The png_set_background() function tells libpng to composite images
-with alpha or simple transparency against the supplied background
-color.  If the PNG file contains a bKGD chunk (PNG_INFO_bKGD valid),
-you may use this color, or supply another color more suitable for
-the current display (e.g., the background color from a web page).  You
-need to tell libpng whether the color is in the gamma space of the
-display (PNG_BACKGROUND_GAMMA_SCREEN for colors you supply), the file
-(PNG_BACKGROUND_GAMMA_FILE for colors from the bKGD chunk), or one
-that is neither of these gammas (PNG_BACKGROUND_GAMMA_UNIQUE - I don't
-know why anyone would use this, but it's here).
-
 If you have a grayscale and you are using png_set_expand() to change to
 a higher bit-depth you must indicate if the supplied background gray
 is supplied in the original file bit depth (need_expand = 1) or in the
@@ -507,15 +531,16 @@ is needed (viewing_gamma=1.0).
    /* If we don't have another value */
    else
    {
-      screen_gamma = 2.2; /* A good guess for a PC monitor in a bright office */
-      screen_gamma = 1.956; /* A good guess for a PC monitor in a dim room */
+      screen_gamma = 2.5; /* A good guess for a PC monitor in a bright office */
+      screen_gamma = 2.2; /* A good guess for a PC monitor in a dim room */
+      screen_gamma = 2.0; /* A good guess for a PC monitor in a dark room */
       screen_gamma = 1.7 or 1.0;  /* A good guess for Mac systems */
    }
 
 The png_set_gamma() function handles gamma transformations of the data.
 Pass both the file gamma and the current screen_gamma.  If the file does
 not have a gamma value, you can pass one anyway if you have an idea what
-it is (usually 0.51 is a good guess for GIF images on PCs).  Note
+it is (usually 0.50 is a good guess for GIF images on PCs).  Note
 that file gammas are inverted from screen gammas.  See the discussions
 on gamma in the PNG specification for an excellent description of what
 gamma is, and why all applications should support it.  It is strongly
@@ -524,7 +549,7 @@ recommended that PNG viewers support gamma correction.
    if (png_get_gAMA(png_ptr, info_ptr, &gamma))
       png_set_gamma(png_ptr, screen_gamma, gamma);
    else
-      png_set_gamma(png_ptr, screen_gamma, 0.51);
+      png_set_gamma(png_ptr, screen_gamma, 0.50);
 
 If you need to reduce an RGB file to a paletted file, or if a paletted
 file has more entries then will fit on your screen, png_set_dither()
@@ -579,7 +604,8 @@ need to change the order the pixels are packed into bytes, you can use:
        png_set_packswap(png_ptr);
 
 The last thing to handle is interlacing; this is covered in detail below,
-but you must call the function here.
+but you must call the function here if you want libpng to handle expansion
+of the interlaced image.
 
     number_of_passes = png_set_interlace_handling(png_ptr);
 
@@ -587,7 +613,7 @@ After setting the transformations, libpng can update your png_info
 structure to reflect any transformations you've requested with this
 call.  This is most useful to update the info structure's rowbytes
 field so you can use it to allocate your image memory.  This function
-will also update your palette with the correct display gamma and
+will also update your palette with the correct screen_gamma and
 background if these have been given with the calls above.
 
     png_read_update_info(png_ptr, info_ptr);
@@ -970,7 +996,7 @@ contain, see the PNG specification.
 Some of the more important parts of the png_info are:
 
     png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, color_type,
-       interlace_type,
+       interlace_type, compression_type, filter_type)
     width          - holds the width of the image in pixels (up to 2^31).
     height         - holds the height of the image in pixels (up to 2^31).
     bit_depth      - holds the bit depth of one of the image channels.
@@ -987,11 +1013,9 @@ Some of the more important parts of the png_info are:
                      PNG_COLOR_MASK_COLOR
                      PNG_COLOR_MASK_ALPHA
 
-    interlace_type - PNG_INTERLACE_TYPE_NONE or PNG_INTER_LACE_TYPE_ADAM7
+    interlace_type - PNG_INTERLACE_TYPE_NONE or PNG_INTERLACE_TYPE_ADAM7
     compression_type - (must be PNG_COMPRESSION_TYPE_DEFAULT for PNG 1.0)
     filter_type    - (must be PNG_FILTER_TYPE_DEFAULT for PNG 1.0)
-    Any or all of interlace_type, compression_type, of filter_type can be
-    NULL if you are not interested in their values.
 
     png_set_PLTE(png_ptr, info_ptr, palette, num_palette);
     palette        - the palette for the file (array of png_color)
@@ -1005,6 +1029,12 @@ Some of the more important parts of the png_info are:
                      The presence of the sRGB chunk means that the pixel
                      data is in the sRGB color space.  This chunk also
                      implies specific values of gAMA and cHRM.
+                     Rendering intent is the CSS-1 property that has been
+                     defined by the International Color Consortium
+                     (http://www.color.org).  It can be one of
+                     PNG_SRGB_INTENT_SATURATION, PNG_SRGB_INTENT_PERCEPTUAL,
+                     PNG_SRGB_INTENT_ABSOLUTE, or PNG_SRGB_INTENT_RELATIVE.
+                        
 
     png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr, srgb_intent);
     srgb_intent    - the rendering intent (PNG_INFO_sRGB)
@@ -1222,7 +1252,7 @@ PNG files describe monochrome as black being zero and white being
 one. This code would be used if the pixels are supplied with this reversed
 (black being one and white being zero):
 
-    png_set_invert(png_ptr);
+    png_set_invert_mono(png_ptr);
 
 It is possible to have libpng flush any pending output, either manually,
 or automatically after a certain number of lines have been written.  To
@@ -1308,8 +1338,8 @@ and only update the rows that are actually used.
 
 After you are finished writing the image, you should finish writing
 the file.  If you are interested in writing comments or time, you should
-pass the an appropriately filled png_info pointer.  If you
-are not interested, you can pass NULL.
+pass an appropriately filled png_info pointer.  If you are not interested,
+you can pass NULL.
 
     png_write_end(png_ptr, info_ptr);
 
@@ -1501,14 +1531,19 @@ Controlling row filtering:
 
 If you want to control whether libpng uses filtering or not, which
 filters are used, and how it goes about picking row filters, you
-can call one of these functions.  Filtering is enabled by default for
-RGB and grayscale images (with and without alpha), and for 8-bit
-paletted images, but not for paletted images with bit depths less
-than 8 bits/pixel.  The 'method' parameter sets the main filtering
-method, which is currently only '0' in the PNG 1.0 specification.
-The 'filters' parameter sets which filter(s), if any, should be
-used for each scanline.  Possible values are PNG_ALL_FILTERS and
-PNG_NO_FILTERS to turn filtering on and off, respectively.
+can call one of these functions.  The selection and configuration
+of row filters can have a significant impact on the size and
+encoding speed and a somewhat lesser impact on the decoding speed
+of an image.  Filtering is enabled by default for RGB and grayscale
+images (with and without alpha), and for 8-bit paletted images, but
+not for paletted images with bit depths less than 8 bits/pixel.
+
+The 'method' parameter sets the main filtering method, which is
+currently only '0' in the PNG 1.0 specification.  The 'filters'
+parameter sets which filter(s), if any, should be used for each
+scanline.  Possible values are PNG_ALL_FILTERS and PNG_NO_FILTERS
+to turn filtering on and off, respectively.
+
 Individual filter types are PNG_FILTER_NONE, PNG_FILTER_SUB,
 PNG_FILTER_UP, PNG_FILTER_AVG, PNG_FILTER_PAETH, which can be bitwise
 ORed together '|' to specify one or more filters to use.  These
@@ -1560,10 +1595,15 @@ There are a bunch of #define's in pngconf.h that control what parts of
 libpng are compiled.  All the defines end in _SUPPORTED.  If you are
 never going to use an ability, you can change the #define to #undef
 before recompiling libpng and save yourself code and data space.
-You can also turn them off en masse with a compiler directive to
-define PNG_READ_NOT_FULLY_SUPPORTED or PNG_WRITE_NOT_FULLY_SUPPORTED,
+You can also turn them off en masse with a compiler directive that
+defines PNG_READ[or WRITE]_NOT_FULLY_SUPPORTED, or
+PNG_READ[or WRITE]_ANCILLARY_CHUNKS_NOT_SUPPORTED, or all four,
 along with directives to turn on any of the capabilities that you do
-want.
+want.  The NOT_FULLY_SUPPORTED directives disable the extra
+transformations but still leave the library fully capable of reading
+and writing PNG files with all known public chunks [except for sPLT].
+Use of the PNG_READ[or WRITE]_ANCILLARY_CHUNKS_NOT_SUPPORTED directive
+produces a library that is incapable of reading or writing ancillary chunks.
 
 All the reading and writing specific code are in separate files, so the
 linker should only grab the files it needs.  However, if you want to

@@ -1,12 +1,12 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  */
 
 #define PNG_INTERNAL
@@ -23,6 +23,10 @@ png_do_write_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_FILLER)
       png_do_strip_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
          png_ptr->flags);
+#endif
+#if defined(PNG_WRITE_PACKSWAP_SUPPORTED)
+   if (png_ptr->transformations & PNG_PACKSWAP)
+      png_do_packswap(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 #if defined(PNG_WRITE_PACK_SUPPORTED)
    if (png_ptr->transformations & PNG_PACK)

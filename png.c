@@ -1,12 +1,12 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  */
 
 #define PNG_INTERNAL
@@ -16,9 +16,9 @@
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
  */
-char png_libpng_ver[] = "0.98";
+char png_libpng_ver[5] = "0.99";
 
-/* Place to hold the signiture string for a PNG file. */
+/* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
 /* Constant strings for known chunk types.  If you need to add a chunk,
@@ -132,7 +132,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
    png_uint_32 num_bytes;
 
    num_bytes = (png_uint_32)items * size;
-   ptr = png_malloc((png_structp)png_ptr, num_bytes);
+   ptr = (png_voidp)png_malloc((png_structp)png_ptr, num_bytes);
    if (num_bytes > (png_uint_32)0x8000)
    {
       png_memset(ptr, 0, (png_size_t)0x8000L);

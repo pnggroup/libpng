@@ -1,12 +1,12 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 0.98
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 16, 1998
+ * January 30, 1998
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -37,6 +37,11 @@
 
 #include "png.h"
 
+#ifdef PNGTEST_MEMORY_DEBUG
+#include <unistd.h>
+void *sbrk (ssize_t incr);
+#endif
+
 int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname);
 
 #ifdef __TURBOC__
@@ -47,6 +52,8 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname);
 /*  #define STDERR stderr  */
 #define STDERR stdout   /* for DOS */
 
+static int verbose = 0;
+
 #if defined(PNG_NO_STDIO)
 /* START of code to validate stdio-free compilation */
 /* These copies of the default read/write functions come from pngrio.c and */
@@ -56,6 +63,8 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname);
    read_data function and use it at run time with png_set_read_fn(), rather
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
+static void
+png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length);
 static void
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -81,6 +90,8 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
  
+static void
+png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length);
 static void
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -124,6 +135,8 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
 static void
+png_default_flush(png_structp png_ptr);
+static void
 png_default_flush(png_structp png_ptr)
 {
    FILE *io_ptr;
@@ -138,6 +151,8 @@ png_default_flush(png_structp png_ptr)
    write_data function and use it at run time with png_set_write_fn(), rather
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
+static void
+png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length);
 static void
 png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -158,6 +173,8 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
 
+static void
+png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length);
 static void
 png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -228,6 +245,107 @@ png_default_error(png_structp png_ptr, png_const_charp message)
 }
 #endif /* PNG_NO_STDIO */
 /* END of code to validate stdio-free compilation */
+
+/* START of code to validate memory allocation and deallocation */
+#ifdef PNGTEST_MEMORY_DEBUG
+/* Borland DOS special memory handler */
+#if defined(__TURBOC__) && !defined(_Windows) && !defined(__FLAT__)
+ERROR - memory debugging is not supported on this platform
+#else
+
+/* Allocate memory.  For reasonable files, size should never exceed
+   64K.  However, zlib may allocate more then 64K if you don't tell
+   it not to.  See zconf.h and png.h for more information.  zlib does
+   need to allocate exactly 64K, so whatever you call here must
+   have the ability to do that.
+
+   This piece of code can be compiled to validate max 64K allocations
+   by setting MAXSEG_64K in zlib zconf.h *or* PNG_MAX_MALLOC_64K. */
+typedef struct memory_information {
+   png_uint_32                    size;
+   png_voidp                      pointer;
+   struct memory_information FAR *next;
+} memory_information;
+typedef memory_information FAR *memory_infop;
+
+static memory_infop pinformation = NULL;
+static int current_allocation = 0;
+static int maximum_allocation = 0;
+
+extern PNG_EXPORT(png_voidp,png_debug_malloc) PNGARG((png_structp png_ptr,
+   png_uint_32 size));
+extern PNG_EXPORT(void,png_debug_free) PNGARG((png_structp png_ptr,
+   png_voidp ptr));
+
+png_voidp
+png_malloc(png_structp png_ptr, png_uint_32 size) {
+   if (png_ptr == NULL) {
+      fprintf(STDERR, "NULL pointer to memory allocator\n");
+      return NULL;
+   }
+   if (size == 0)
+      return NULL;
+
+   /* This calls the library allocator twice, once to get the requested
+      buffer and once to get a new free list entry. */
+   {
+      memory_infop pinfo = png_debug_malloc(png_ptr, sizeof *pinfo);
+      pinfo->size = size;
+      current_allocation += size;
+      if (current_allocation > maximum_allocation)
+         maximum_allocation = current_allocation;
+      pinfo->pointer = png_debug_malloc(png_ptr, size);
+      pinfo->next = pinformation;
+      pinformation = pinfo;
+      /* Make sure the caller isn't assuming zeroed memory. */
+      png_memset(pinfo->pointer, 0xdd, pinfo->size);
+      return pinfo->pointer;
+   }
+}
+
+/* Free a pointer.  It is removed from the list at the same time. */
+void
+png_free(png_structp png_ptr, png_voidp ptr)
+{
+   if (png_ptr == NULL)
+      fprintf(STDERR, "NULL pointer to memory allocator\n");
+   if (ptr == 0) {
+#if 0 /* This happens all the time. */
+      fprintf(STDERR, "WARNING: freeing NULL pointer\n");
+#endif
+      return;
+   }
+
+   /* Unlink the element from the list. */
+   {
+      memory_infop FAR *ppinfo = &pinformation;
+      for (;;) {
+         memory_infop pinfo = *ppinfo;
+         if (pinfo->pointer == ptr) {
+            *ppinfo = pinfo->next;
+            current_allocation -= pinfo->size;
+            if (current_allocation < 0)
+               fprintf(STDERR, "Duplicate free of memory\n");
+            /* We must free the list element too, but first kill
+               the memory which is to be freed. */
+            memset(ptr, 0x55, pinfo->size);
+            png_debug_free(png_ptr, pinfo);
+            break;
+         }
+         if (pinfo->next == NULL) {
+            fprintf(STDERR, "Pointer %x not found\n", ptr);
+            break;
+         }
+         ppinfo = &pinfo->next;
+      }
+   }
+
+   /* Finally free the data. */
+   png_debug_free(png_ptr, ptr);
+}
+#endif /* Not Borland DOS special memory handler */
+#endif
+/* END of code to test memory allocation/deallocation */
 
 /* Test one file */
 int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
@@ -338,7 +456,11 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
           &color_type, &interlace_type, &compression_type, &filter_type))
       {
          png_set_IHDR(write_ptr, write_info_ptr, width, height, bit_depth,
+#if defined(PNG_WRITE_INTERLACING_SUPPORTED)
             color_type, interlace_type, compression_type, filter_type);
+#else
+            color_type, PNG_INTERLACE_NONE, compression_type, filter_type);
+#endif
       }
    }
 #if defined(PNG_READ_bKGD_SUPPORTED) && defined(PNG_WRITE_bKGD_SUPPORTED)
@@ -517,6 +639,17 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_debug(0, "Reading and writing end_info data\n");
    png_read_end(read_ptr, end_info_ptr);
    png_write_end(write_ptr, end_info_ptr);
+ 
+#ifdef PNG_EASY_ACCESS_SUPPORTED
+   if(verbose)
+   {
+      png_uint_32 iwidth, iheight;
+      iwidth = png_get_image_width(write_ptr, write_info_ptr);
+      iheight = png_get_image_height(write_ptr, write_info_ptr);
+      fprintf(STDERR, "Image width = %lu, height = %lu\n",
+         iwidth, iheight);
+   }
+#endif
 
    png_debug(0, "Destroying data structs\n");
    png_free(read_ptr, row_buf);
@@ -590,6 +723,19 @@ main(int argc, char *argv[])
    int ierror = 0;
 
    fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
+   fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
+
+   /* Do some consistency checking on the memory allocation settings, I'm
+      not sure this matters, but it is nice to know, the first of these
+      tests should be impossible because of the way the macros are set
+      in pngconf.h */
+   #if defined(MAXSEG_64K) && !defined(PNG_MAX_MALLOC_64K)
+      fprintf(STDERR, " NOTE: Zlib compiled for max 64k, libpng not\n");
+   #endif
+   /* I think the following can happen. */
+   #if !defined(MAXSEG_64K) && defined(PNG_MAX_MALLOC_64K)
+      fprintf(STDERR, " NOTE: libpng compiled for max 64k, zlib not\n");
+   #endif
 
    if (strcmp(png_libpng_ver, PNG_LIBPNG_VER_STRING))
    {
@@ -602,16 +748,27 @@ main(int argc, char *argv[])
 
    if (argc > 1)
    {
-   if (strcmp(argv[1], "-m") == 0)
-      multiple = 1;
-   else
-      inname = argv[1];
+      if (strcmp(argv[1], "-m") == 0)
+         multiple = 1;
+      else if (strcmp(argv[1], "-mv") == 0 ||
+               strcmp(argv[1], "-vm") == 0 )
+      {
+         multiple = 1;
+         verbose = 1;
+      }
+      else if (strcmp(argv[1], "-v") == 0)
+      {
+         verbose = 1;
+         inname = argv[2];
+      }
+      else
+         inname = argv[1];
    }
 
-   if (!multiple && argc == 3)
-     outname = argv[2];
+   if (!multiple && argc == 3+verbose)
+     outname = argv[2+verbose];
 
-   if ((!multiple && argc > 3) || (multiple && argc < 2))
+   if ((!multiple && argc > 3+verbose) || (multiple && argc < 2))
    {
      fprintf(STDERR,
        "usage: %s [infile.png] [outfile.png]\n\t%s -m {infile.png}\n",
@@ -626,31 +783,84 @@ main(int argc, char *argv[])
    if (multiple)
    {
       int i;
+#ifdef PNGTEST_MEMORY_DEBUG
+      int allocation_now = current_allocation;
+#endif
       for (i=2; i<argc; ++i)
-         {
+      {
          int kerror;
          fprintf(STDERR, "Testing %s:",argv[i]);
          kerror = test_one_file(argv[i], outname);
-         if (kerror == 0) fprintf(STDERR, " PASS\n");
+         if (kerror == 0) 
+            fprintf(STDERR, " PASS\n");
          else {
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
             }
+#ifdef PNGTEST_MEMORY_DEBUG
+         if (allocation_now != current_allocation)
+            fprintf(STDERR, "MEMORY ERROR: %d bytes lost\n",
+               current_allocation-allocation_now);
+         if (current_allocation != 0) {
+            memory_infop pinfo = pinformation;
+
+            fprintf(STDERR, "MEMORY ERROR: %d bytes still allocated\n",
+               current_allocation);
+            while (pinfo != NULL) {
+               fprintf(STDERR, " %d bytes at %x\n", pinfo->size, pinfo->pointer);
+               pinfo = pinfo->next;
+               }
          }
+#endif
+      }
+#ifdef PNGTEST_MEMORY_DEBUG
+         fprintf(STDERR, "Maximum memory allocation: %d bytes\n",
+            maximum_allocation);
+#endif
    }
    else
    {
       int i;
       for (i=0; i<3; ++i) {
          int kerror;
-         fprintf(STDERR, "Testing %s:",inname);
+#ifdef PNGTEST_MEMORY_DEBUG
+         int allocation_now = current_allocation;
+#endif
+         if (i == 0 || verbose == 1 || ierror != 0)
+            fprintf(STDERR, "Testing %s:",inname);
          kerror = test_one_file(inname, outname);
-         if (kerror == 0) fprintf(STDERR, " PASS\n");
-         else {
+         if(kerror == 0)
+         {
+            if(verbose == 1 || i == 2) fprintf(STDERR, " PASS\n");
+         }
+         else
+         {
+            if(verbose == 0 && i != 2)
+               fprintf(STDERR, "Testing %s:",inname);
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
-            }
+         }
+#ifdef PNGTEST_MEMORY_DEBUG
+         if (allocation_now != current_allocation)
+             fprintf(STDERR, "MEMORY ERROR: %d bytes lost\n",
+               current_allocation-allocation_now);
+         if (current_allocation != 0) {
+             memory_infop pinfo = pinformation;
+   
+             fprintf(STDERR, "MEMORY ERROR: %d bytes still allocated\n",
+                current_allocation);
+             while (pinfo != NULL) {
+                fprintf(STDERR, " %d bytes at %x\n", pinfo->size, pinfo->pointer);
+                pinfo = pinfo->next;
+             }
+          }
+         fprintf(STDERR, "sbrk(0)=%d\n",sbrk(0));
+#endif
        }
+#ifdef PNGTEST_MEMORY_DEBUG
+       fprintf(STDERR, "Maximum memory allocation: %d bytes\n",
+          maximum_allocation);
+#endif
    }
 
    if (ierror == 0)
