@@ -40,9 +40,7 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
 
 This is the output of "pngcrush" and "pngcrush -help":
 
-
-
- | pngcrush 1.5.5, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+ | pngcrush 1.5.6, Copyright (C) 1998-2001 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
@@ -97,7 +95,7 @@ options:
             -p (pause)
 
 
- | pngcrush 1.5.5, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+ | pngcrush 1.5.6, Copyright (C) 1998-2001 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
