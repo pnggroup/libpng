@@ -10,8 +10,8 @@ MANDIR= ${LOCALBASE}/man
 INCSDIR=${LOCALBASE}/include
 
 LIB=png
-SHLIB_MAJOR= 2
-SHLIB_MINOR= 1.2.0beta2
+SHLIB_MAJOR= 3
+SHLIB_MINOR= 1.2.0beta3
 SRCS=	pnggccrd.c png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c

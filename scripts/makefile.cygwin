@@ -35,12 +35,12 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
 # have to change it.
-PNGMAJ = 2
-#PNGDLL = $2# msvc
-PNGDLL = 2# cygwin 1.2.0beta2
-PNGMIN = 1.2.0beta2
+PNGMAJ = 3
+#PNGDLL = $3# msvc
+PNGDLL = 2# cygwin 1.2.0beta3
+PNGMIN = 1.2.0beta3
 PNGMIN_BASE = 1.2.0
 PNGVER = $(PNGMAJ).$(PNGMIN)
 

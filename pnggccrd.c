@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.0beta2 - May 7, 2001
+ * libpng version 1.2.0beta3 - May 18, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -233,12 +233,6 @@
  *     - enable pixel_depth == 8 cases in png_read_filter_row()? (test speed)
  *     x add support for runtime enable/disable/query of various MMX routines
  */
-
-/*
-#ifndef PNG_DEBUG
-#  define PNG_DEBUG 0
-#endif
-*/
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -4962,16 +4956,28 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
       case 0: sprintf(filnm, "none");
          break;
       case 1: sprintf(filnm, "sub-%s",
-        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB)? "MMX" : "x86");
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB)? "MMX" : 
+#endif
+"x86");
          break;
       case 2: sprintf(filnm, "up-%s",
-        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP)? "MMX" : "x86");
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP)? "MMX" :
+#endif
+ "x86");
          break;
       case 3: sprintf(filnm, "avg-%s",
-        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG)? "MMX" : "x86");
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG)? "MMX" :
+#endif
+ "x86");
          break;
       case 4: sprintf(filnm, "Paeth-%s",
-        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH)? "MMX":"x86");
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH)? "MMX":
+#endif
+"x86");
          break;
       default: sprintf(filnm, "unknw");
          break;

@@ -22,10 +22,10 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 #RANLIB=ranlib
 RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
 # have to change it.
-PNGMAJ = 2
-PNGMIN = 1.2.0beta2
+PNGMAJ = 3
+PNGMIN = 1.2.0beta3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include

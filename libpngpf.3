@@ -1,6 +1,6 @@
-.TH LIBPNGPF 3 "May 7, 2001"
+.TH LIBPNGPF 3 "May 18, 2001"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.2.0beta2
+libpng \- Portable Network Graphics (PNG) Reference Library 1.2.0beta3
 (private functions)
 .SH SYNOPSIS
 \fB#include <png.h>\fP
@@ -47,11 +47,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.0beta2
 
 \fI\fB
 
-\fBpng_voidp png_create_struct (int \fP\fItype\fP\fB, png_malloc_ptr \fImalloc_fn\fP\fB);\fP
+\fBpng_voidp png_create_struct (int \fItype\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_voidp png_create_struct_2 (int \fItype\fP\fB);\fP
+\fBpng_voidp png_create_struct_2 (int \fP\fItype\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_voidp \fImem_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -63,7 +63,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.0beta2
 
 \fI\fB
 
-\fBvoid png_destroy_struct_2 (png_voidp \fP\fIstruct_ptr\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+\fBvoid png_destroy_struct_2 (png_voidp \fP\fIstruct_ptr\fP\fB, png_free_ptr \fP\fIfree_fn\fP\fB, png_voidp \fImem_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -429,6 +429,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.0beta2
 
 \fBvoid png_write_data (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fP\fIdata\fP\fB, png_size_t \fIlength\fP\fB);\fP
 
+\fI\fB
+
 \fBvoid png_write_filtered_row (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIfiltered_row\fP\fB);\fP
 
 \fI\fB
@@ -543,7 +545,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.0beta2
 
 .SH DESCRIPTION
 The functions listed above are used privately by libpng
-and are not recommended for use by applications.  They
+and are not recommended for use by applications.  They are
+not "exported" to applications using shared libraries.  They
 are listed alphabetically here as an aid to libpng maintainers.
 See png.h for more information on these functions.
 

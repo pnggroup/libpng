@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.2.0beta2 - May 7, 2001
+ * libpng 1.2.0beta3 - May 18, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -623,7 +623,7 @@
  * png_get_x_offset_microns()
  * png_get_y_offset_microns()
  */
-#ifndef PNG_NO_EASY_ACCESS
+#if !defined(PNG_NO_EASY_ACCESS) && !defined(PNG_EASY_ACCESS_SUPPORTED)
 #  define PNG_EASY_ACCESS_SUPPORTED
 #endif
 
@@ -638,6 +638,10 @@
 #  endif
 #endif
 
+#if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
+#  define PNG_USER_MEM_SUPPORTED
+#endif
+
 /* These are currently experimental features, define them if you want */
 
 /* very little testing */
@@ -646,9 +650,6 @@
 #  ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #    define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #  endif
-#endif
-#ifndef PNG_NO_USER_MEM
-#  define PNG_USER_MEM_SUPPORTED
 #endif
 #ifndef PNG_NO_ZALLOC_ZERO
 #  define PNG_ZALLOC_ZERO
