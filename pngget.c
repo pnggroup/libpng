@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.2.6beta3 - July 18, 2004
+ * libpng 1.2.6beta4 - July 28, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -570,11 +570,11 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
          channels++;
       pixel_depth = *bit_depth * channels;
       rowbytes_per_pixel = (pixel_depth + 7) >> 3;
-      if (width == 0 || *width > PNG_MAX_UINT)
+      if (width == 0 || *width > PNG_UINT_31_MAX)
         png_error(png_ptr, "Invalid image width");
-      if (height == 0 || *height > PNG_MAX_UINT)
+      if (height == 0 || *height > PNG_UINT_31_MAX)
         png_error(png_ptr, "Invalid image height");
-      if (*width > PNG_MAX_UINT/rowbytes_per_pixel - 64)
+      if (*width > PNG_UINT_32_MAX/rowbytes_per_pixel - 64)
       {
          png_error(png_ptr,
             "Width too large for libpng to process image data.");
@@ -827,13 +827,13 @@ png_get_user_chunk_ptr(png_structp png_ptr)
 }
 #endif
 
-
+#ifdef PNG_WRITE_SUPPORTED
 png_uint_32 PNGAPI
 png_get_compression_buffer_size(png_structp png_ptr)
 {
    return (png_uint_32)(png_ptr? png_ptr->zbuf_size : 0L);
 }
-
+#endif
 
 #ifndef PNG_1_0_X
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED

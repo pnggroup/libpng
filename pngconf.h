@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.6beta3 - July 18, 2004
+ * libpng version 1.2.6beta4 - July 28, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -257,8 +257,11 @@
 #      undef _BSD_SOURCE
 #    endif
 #    ifdef _SETJMP_H
-      __png.h__ already includes setjmp.h;
-      __dont__ include it again.;
+     /* If you encounter a compiler error here, see the explanation
+      * near the end of INSTALL.
+      */
+         __png.h__ already includes setjmp.h;
+         __dont__ include it again.;
 #    endif
 #  endif /* __linux__ */
 
@@ -991,7 +994,13 @@ typedef unsigned char png_byte;
 
 /* This is usually size_t.  It is typedef'ed just in case you need it to
    change (I'm not sure if you will or not, so I thought I'd be safe) */
-typedef size_t png_size_t;
+#ifdef PNG_SIZE_T
+   typedef PNG_SIZE_T png_size_t;
+#  define png_sizeof(x) png_convert_size(sizeof (x))
+#else
+   typedef size_t png_size_t;
+#  define png_sizeof(x) sizeof (x)
+#endif
 
 /* The following is needed for medium model support.  It cannot be in the
  * PNG_INTERNAL section.  Needs modification for other compilers besides

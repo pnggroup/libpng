@@ -1,5 +1,5 @@
 
-Libpng 1.2.6beta3 - July 18, 2004
+Libpng 1.2.6beta4 - July 28, 2004
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -12,8 +12,73 @@ Changes since the last public release (1.2.5):
   Fixed memory overrun bug in png_do_read_filler() with 16-bit datastreams,
     introduced in version 1.0.2.
   Fixed potential overrun in pngerror.c by using strncpy instead of memcpy.
+  Revised makefile.macosx, makefile.dec, makefile.aix, and makefile.32sunu.
+  Changed the one instance of "ln -sf" to "ln -f -s" in each Sun makefile.
+  Fixed potential overrun in pngerror.c by using strncpy instead of memcpy.
+  Added "#!/bin/sh" at the top of configure, for recognition of the
+    'x' flag under Cygwin (Cosmin).
+  Optimized vacuous tests that silence compiler warnings, in png.c (Cosmin).
+  Added support for PNG_USER_CONFIG, in pngconf.h (Cosmin).
+  Fixed the special memory handler for Borland C under DOS, in pngmem.c
+    (Cosmin).
+  Removed some spurious assignments in pngrutil.c (Cosmin).
+  Replaced 65536 with 65536L, and 0xffff with 0xffffL, to silence warnings
+    on 16-bit platforms (Cosmin).
+  Enclosed shift op expressions in parentheses, to silence warnings (Cosmin).
+  Used proper type png_fixed_point, to avoid problems on 16-bit platforms,
+    in png_handle_sRGB() (Cosmin).
+  Added compression_type to png_struct, and optimized the window size
+    inside the deflate stream (Cosmin).
+  Fixed definition of isnonalpha(), in pngerror.c and pngrutil.c (Cosmin).
+  Fixed handling of unknown chunks that come after IDAT (Cosmin).
+  Allowed png_error() and png_warning() to work even if png_ptr == NULL
+    (Cosmin).
+  Replaced row_info->rowbytes with row_bytes in png_write_find_filter()
+    (Cosmin).
+  Fixed definition of PNG_LIBPNG_VER_DLLNUM (Simon-Pierre).
+  Used PNG_LIBPNG_VER and PNG_LIBPNG_VER_STRING instead of the hardcoded
+    values in png.c (Simon-Pierre, Cosmin).
+  Initialized png_libpng_ver[] with PNG_LIBPNG_VER_STRING (Simon-Pierre).
+  Replaced PNG_LIBPNG_VER_MAJOR with PNG_LIBPNG_VER_DLLNUM in png.rc
+    (Simon-Pierre).
+  Moved the definition of PNG_HEADER_VERSION_STRING near the definitions
+    of the other PNG_LIBPNG_VER_... symbols in png.h (Cosmin).
+  Relocated #ifndef PNGAPI guards in pngconf.h (Simon-Pierre, Cosmin).
+  Updated scripts/makefile.vc(a)win32 (Cosmin).
+  Updated the MSVC project (Simon-Pierre, Cosmin).
+  Updated the Borland C++ Builder project (Cosmin).
+  Avoided access to asm_flags in pngvcrd.c, if PNG_1_0_X is defined (Cosmin).
+  Commented out warning about uninitialized mmx_support in pngvcrd.c (Cosmin).
+  Removed scripts/makefile.bd32 and scripts/pngdef.pas (Cosmin).
+  Added extra guard around inclusion of Turbo C memory headers, in pngconf.h
+    (Cosmin).
+  Renamed projects/msvc/ to projects/visualc6/, and projects/borland/ to
+    projects/cbuilder5/ (Cosmin).
+  Moved projects/visualc6/png32ms.def to scripts/pngw32.def,
+    and projects/visualc6/png.rc to scripts/pngw32.rc (Cosmin).
+  Added projects/visualc6/pngtest.dsp; removed contrib/msvctest/ (Cosmin).
+  Updated contrib/visupng/VisualPng.dsp (Cosmin).
+  Updated contrib/visupng/cexcept.h to version 2.0.0 (Cosmin).
+  Added a separate distribution with "configure" and supporting files (Junichi).
+  Added user ability to change png_size_t via a PNG_SIZE_T macro.
+  Added png_sizeof() and png_convert_size() functions.
+  Added PNG_SIZE_MAX (maximum value of a png_size_t variable.
+  Added check in png_malloc_default() for (size_t)size != (png_uint_32)size
+    which would indicate an overflow.
+  Changed sPLT failure action from png_error to png_warning and abandon chunk.
+  Changed sCAL and iCCP failures from png_error to png_warning and abandon.
+  Added png_get_uint_31(png_ptr, buf) function.
+  Added PNG_UINT_32_MAX macro.
+  Renamed PNG_MAX_UINT to PNG_UINT_31_MAX.
+  Made png_zalloc() issue a png_warning and return NULL on potential
+    overflow.
+  Turn on PNG_NO_ZALLOC_ZERO by default in version 1.2.x
+  Revised "clobber list" in pnggccrd.c so it will compile under gcc-3.4.
+  Revised Borland portion of png_malloc() to return NULL or issue
+    png_error() according to setting of PNG_FLAG_MALLOC_NULL_MEM_OK.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net
 
 Glenn R-P
+

@@ -1,7 +1,6 @@
-
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng version 1.2.6beta3 - July 18, 2004
+ * libpng version 1.2.6beta4 - July 28, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -38,6 +37,14 @@ __inline double strtod(const char *nptr, char **endptr)
 #  endif
 #endif
 
+png_uint_32 /* PRIVATE */
+png_get_uint_31(png_structp png_ptr, png_bytep buf)
+{
+   png_uint_32 i = png_get_uint_32(buf);
+   if (i > PNG_UINT_31_MAX)
+     png_error(png_ptr, "PNG unsigned integer out of range.\n");
+   return (i);
+}
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
 png_uint_32 /* PRIVATE */
@@ -199,7 +206,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
             if (text ==  NULL)
             {
-               text_size = prefix_size + sizeof(msg) + 1;
+               text_size = prefix_size + png_sizeof(msg) + 1;
                text = (png_charp)png_malloc_warn(png_ptr, text_size);
                if (text ==  NULL)
                  {
@@ -213,7 +220,8 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
             /* Copy what we can of the error message into the text chunk */
             text_size = (png_size_t)(chunklength - (text - chunkdata) - 1);
-            text_size = sizeof(msg) > text_size ? text_size : sizeof(msg);
+            text_size = png_sizeof(msg) > text_size ? text_size :
+               png_sizeof(msg);
             png_memcpy(text + prefix_size, msg, text_size + 1);
             break;
          }
@@ -346,14 +354,13 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_crc_read(png_ptr, buf, 13);
    png_crc_finish(png_ptr, 0);
 
-   width = png_get_uint_32(buf);
-   height = png_get_uint_32(buf + 4);
+   width = png_get_uint_31(png_ptr, buf);
+   height = png_get_uint_31(png_ptr, buf + 4);
    bit_depth = buf[8];
    color_type = buf[9];
    compression_type = buf[10];
    filter_type = buf[11];
    interlace_type = buf[12];
-
 
    /* set internal variables */
    png_ptr->width = width;
@@ -673,7 +680,7 @@ png_handle_sBIT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else
       truelen = (png_size_t)png_ptr->channels;
 
-   if (length != truelen)
+   if (length != truelen || length > 4)
    {
       png_warning(png_ptr, "Incorrect sBIT chunk length");
       png_crc_finish(png_ptr, length);
@@ -1154,8 +1161,18 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    new_palette.nentries = data_length / entry_size;
-   new_palette.entries = (png_sPLT_entryp)png_malloc(
-       png_ptr, new_palette.nentries * sizeof(png_sPLT_entry));
+   if (new_palette.nentries > PNG_SIZE_MAX / png_sizeof(png_sPLT_entry))
+   {
+       png_warning(png_ptr, "sPLT chunk too long");
+       return;
+   }
+   new_palette.entries = (png_sPLT_entryp)png_malloc_warn(
+       png_ptr, new_palette.nentries * png_sizeof(png_sPLT_entry));
+   if (new_palette.entries == NULL)
+   {
+       png_warning(png_ptr, "sPLT chunk requires too much memory");
+       return;
+   }
 
 #ifndef PNG_NO_POINTER_INDEXING
    for (i = 0; i < new_palette.nentries; i++)
@@ -1397,7 +1414,7 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   int num, i;
+   unsigned int num, i;
    png_uint_16 readbuf[PNG_MAX_PALETTE_LENGTH];
 
    png_debug(1, "in png_handle_hIST\n");
@@ -1423,8 +1440,8 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   num = (int)length / 2 ;
-   if (num != png_ptr->num_palette)
+   num = length / 2 ;
+   if (num != png_ptr->num_palette || num > PNG_MAX_PALETTE_LENGTH)
    {
       png_warning(png_ptr, "Incorrect hIST chunk length");
       png_crc_finish(png_ptr, length);
@@ -1625,7 +1642,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(3, "Allocating pCAL parameters array\n");
    params = (png_charpp)png_malloc_warn(png_ptr, (png_uint_32)(nparams
-      *sizeof(png_charp))) ;
+      *png_sizeof(png_charp))) ;
    if (params == NULL)
      {
        png_free(png_ptr, purpose);
@@ -1883,7 +1900,8 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (text != key + slength)
       text++;
 
-   text_ptr = (png_textp)png_malloc_warn(png_ptr, (png_uint_32)sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr,
+      (png_uint_32)png_sizeof(png_text));
    if (text_ptr == NULL)
    {
      png_warning(png_ptr, "Not enough memory to process text chunk.");
@@ -1979,7 +1997,8 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    chunkdata = (png_charp)png_decompress_chunk(png_ptr, comp_type, chunkdata,
                                     (png_size_t)length, prefix_len, &data_len);
 
-   text_ptr = (png_textp)png_malloc_warn(png_ptr, (png_uint_32)sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr,
+     (png_uint_32)png_sizeof(png_text));
    if (text_ptr == NULL)
    {
      png_warning(png_ptr,"Not enough memory to process zTXt chunk.");
@@ -2088,7 +2107,8 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           (size_t)length, prefix_len, &data_len);
    else
        data_len=png_strlen(chunkdata + prefix_len);
-   text_ptr = (png_textp)png_malloc_warn(png_ptr, (png_uint_32)sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr,
+      (png_uint_32)png_sizeof(png_text));
    if (text_ptr == NULL)
    {
      png_warning(png_ptr,"Not enough memory to process iTXt chunk.");
@@ -2863,8 +2883,7 @@ png_read_finish_row(png_structp png_ptr)
                png_crc_finish(png_ptr, 0);
 
                png_read_data(png_ptr, chunk_length, 4);
-               png_ptr->idat_size = png_get_uint_32(chunk_length);
-
+               png_ptr->idat_size = png_get_uint_31(png_ptr, chunk_length);
                png_reset_crc(png_ptr);
                png_crc_read(png_ptr, png_ptr->chunk_name, 4);
                if (png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
@@ -3085,6 +3104,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if ((png_uint_32)png_ptr->rowbytes + 1 > (png_uint_32)65536L)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
+   if ((png_uint_32)png_ptr->rowbytes + 1 > PNG_SIZE_MAX)
+      png_error(png_ptr, "Row has too many bytes to allocate in memory.");
    png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
       png_ptr->rowbytes + 1));
 

@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.6beta3 - July 18, 2004
+ libpng version 1.2.6beta4 - July 28, 2004
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp@users.sourceforge.net>
  Copyright (c) 1998-2004 Glenn Randers-Pehrson
@@ -379,8 +379,14 @@ where row_pointers is an array of pointers to the pixel data for each row:
 If you know your image size and pixel size ahead of time, you can allocate
 row_pointers prior to calling png_read_png() with
 
+   if (height > PNG_UINT_32_MAX/png_sizeof(png_byte))
+      png_error (png_ptr,
+         "Image is too tall to process in memory");
+   if (width > PNG_UINT_32_MAX/pixel_size)
+      png_error (png_ptr,
+         "Image is too wide to process in memory");
    row_pointers = png_malloc(png_ptr,
-      height*sizeof(png_bytep));
+      height*png_sizeof(png_bytep));
    for (int i=0; i<height, i++)
       row_pointers[i]=png_malloc(png_ptr,
          width*pixel_size);
@@ -2320,9 +2326,9 @@ Your replacement memory functions must have prototypes as follows:
        png_size_t size);
     void free_fn(png_structp png_ptr, png_voidp ptr);
 
-Your malloc_fn() should return NULL in case of failure.  The png_malloc()
-function will call png_error() if it receives a NULL from the system
-memory allocator or from your replacement malloc_fn().
+Your malloc_fn() must return NULL in case of failure.  The png_malloc()
+function will normally call png_error() if it receives a NULL from the
+system memory allocator or from your replacement malloc_fn().
 
 Input/Output in libpng is done through png_read() and png_write(),
 which currently just call fread() and fwrite().  The FILE * is stored in
@@ -2848,13 +2854,13 @@ application:
 
 VII. Y2K Compliance in libpng
 
-July 18, 2004
+July 28, 2004
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.6beta3 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.6beta4 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

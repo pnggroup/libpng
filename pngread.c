@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.2.6beta3 - July 18, 2004
+ * libpng 1.2.6beta4 - July 28, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -77,7 +77,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       return (NULL);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+   png_memcpy(png_ptr->jmpbuf,jmpbuf,png_sizeof(jmp_buf));
 #endif
 #endif
 
@@ -154,7 +154,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
       PNG_ABORT();
-   png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+   png_memcpy(png_ptr->jmpbuf,jmpbuf,png_sizeof(jmp_buf));
 #else
    if (setjmp(png_ptr->jmpbuf))
       PNG_ABORT();
@@ -180,7 +180,8 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
 {
    /* We only come here via pre-1.0.12-compiled applications */
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
-   if(sizeof(png_struct) > png_struct_size || sizeof(png_info) > png_info_size)
+   if(png_sizeof(png_struct) > png_struct_size || 
+      png_sizeof(png_info) > png_info_size)
    {
       char msg[80];
       png_ptr->warning_fn=NULL;
@@ -195,7 +196,7 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
       png_warning(png_ptr, msg);
    }
 #endif
-   if(sizeof(png_struct) > png_struct_size)
+   if(png_sizeof(png_struct) > png_struct_size)
      {
        png_ptr->error_fn=NULL;
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
@@ -204,7 +205,7 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
        png_error(png_ptr,
        "The png struct allocated by the application for reading is too small.");
      }
-   if(sizeof(png_info) > png_info_size)
+   if(png_sizeof(png_info) > png_info_size)
      {
        png_ptr->error_fn=NULL;
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
@@ -247,10 +248,10 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* save jump buffer and error functions */
-   png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
+   png_memcpy(tmp_jmp, png_ptr->jmpbuf, png_sizeof (jmp_buf));
 #endif
 
-   if(sizeof(png_struct) > png_struct_size)
+   if(png_sizeof(png_struct) > png_struct_size)
      {
        png_destroy_struct(png_ptr);
        *ptr_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG);
@@ -258,11 +259,11 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
      }
 
    /* reset all variables to 0 */
-   png_memset(png_ptr, 0, sizeof (png_struct));
+   png_memset(png_ptr, 0, png_sizeof (png_struct));
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */
-   png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
+   png_memcpy(png_ptr->jmpbuf, tmp_jmp, png_sizeof (jmp_buf));
 #endif
 
    /* initialize zbuf - compression buffer */
@@ -288,6 +289,7 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    png_set_read_fn(png_ptr, png_voidp_NULL, png_rw_ptr_NULL);
 }
 
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 /* Read the information before the actual image data.  This has been
  * changed in v0.90 to allow reading a file that already has the magic
  * bytes read from the stream.  You can tell libpng how many bytes have
@@ -384,16 +386,13 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       png_uint_32 length;
 
       png_read_data(png_ptr, chunk_length, 4);
-      length = png_get_uint_32(chunk_length);
+      length = png_get_uint_31(png_ptr,chunk_length);
 
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
 
       png_debug2(0, "Reading %s chunk, length=%lu.\n", png_ptr->chunk_name,
          length);
-
-      if (length > PNG_MAX_UINT)
-         png_error(png_ptr, "Invalid chunk length.");
 
       /* This should be a binary subdivision search or a hash for
        * matching the chunk name rather than a linear search.
@@ -507,6 +506,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
          png_handle_unknown(png_ptr, info_ptr, length);
    }
 }
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
 /* optional call to update the users info_ptr structure */
 void PNGAPI
@@ -521,6 +521,7 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
    png_read_transform_info(png_ptr, info_ptr);
 }
 
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 /* Initialize palette, background, etc, after transformations
  * are set, but before any reading takes place.  This allows
  * the user to obtain a gamma-corrected palette, for example.
@@ -533,7 +534,9 @@ png_start_read_image(png_structp png_ptr)
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       png_read_start_row(png_ptr);
 }
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 void PNGAPI
 png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 {
@@ -673,10 +676,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             png_crc_finish(png_ptr, 0);
 
             png_read_data(png_ptr, chunk_length, 4);
-            png_ptr->idat_size = png_get_uint_32(chunk_length);
-
-            if (png_ptr->idat_size > PNG_MAX_UINT)
-              png_error(png_ptr, "Invalid chunk length.");
+            png_ptr->idat_size = png_get_uint_31(png_ptr,chunk_length);
 
             png_reset_crc(png_ptr);
             png_crc_read(png_ptr, png_ptr->chunk_name, 4);
@@ -767,7 +767,9 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    if (png_ptr->read_row_fn != NULL)
       (*(png_ptr->read_row_fn))(png_ptr, png_ptr->row_number, png_ptr->pass);
 }
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 /* Read one or more rows of image data.  If the image is interlaced,
  * and png_set_interlace_handling() has been called, the rows need to
  * contain the contents of the rows from the previous pass.  If the
@@ -789,7 +791,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.6beta3
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.6beta4
  */
 
 void PNGAPI
@@ -826,7 +828,9 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
          dp++;
       }
 }
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 /* Read the entire image.  If the image has an alpha channel or a tRNS
  * chunk, and you have called png_handle_alpha()[*], you will need to
  * initialize the image to the current image that PNG will be overlaying.
@@ -837,7 +841,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.6beta3
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.6beta4
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -871,7 +875,9 @@ png_read_image(png_structp png_ptr, png_bytepp image)
       }
    }
 }
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 /* Read the end of the PNG file.  Will not read past the end of the
  * file, will verify the end is accurate, and will read any comments
  * or time information at the end of the file, if info is not NULL.
@@ -946,15 +952,12 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 #endif /* PNG_GLOBAL_ARRAYS */
 
       png_read_data(png_ptr, chunk_length, 4);
-      length = png_get_uint_32(chunk_length);
+      length = png_get_uint_31(png_ptr,chunk_length);
 
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
 
       png_debug1(0, "Reading %s chunk.\n", png_ptr->chunk_name);
-
-      if (length > PNG_MAX_UINT)
-         png_error(png_ptr, "Invalid chunk length.");
 
       if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
          png_handle_IHDR(png_ptr, info_ptr, length);
@@ -1058,6 +1061,7 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
          png_handle_unknown(png_ptr, info_ptr, length);
    } while (!(png_ptr->mode & PNG_HAVE_IEND));
 }
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
 /* free all memory used by the read */
 void PNGAPI
@@ -1249,7 +1253,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
     * being used again.
     */
 #ifdef PNG_SETJMP_SUPPORTED
-   png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
+   png_memcpy(tmp_jmp, png_ptr->jmpbuf, png_sizeof (jmp_buf));
 #endif
 
    error_fn = png_ptr->error_fn;
@@ -1259,7 +1263,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    free_fn = png_ptr->free_fn;
 #endif
 
-   png_memset(png_ptr, 0, sizeof (png_struct));
+   png_memset(png_ptr, 0, png_sizeof (png_struct));
 
    png_ptr->error_fn = error_fn;
    png_ptr->warning_fn = warning_fn;
@@ -1269,7 +1273,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
-   png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
+   png_memcpy(png_ptr->jmpbuf, tmp_jmp, png_sizeof (jmp_buf));
 #endif
 
 }
@@ -1280,6 +1284,8 @@ png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
    png_ptr->read_row_fn = read_row_fn;
 }
 
+
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
 void PNGAPI
 png_read_png(png_structp png_ptr, png_infop info_ptr,
@@ -1400,7 +1406,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    if(info_ptr->row_pointers == NULL)
    {
       info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
-         info_ptr->height * sizeof(png_bytep));
+         info_ptr->height * png_sizeof(png_bytep));
 #ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_ROWS;
 #endif
@@ -1422,3 +1428,4 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
 }
 #endif
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */

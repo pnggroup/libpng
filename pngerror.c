@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng version 1.2.6beta3 - July 18, 2004
+ * libpng version 1.2.6beta4 - July 28, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -199,7 +199,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 #  ifdef USE_FAR_KEYWORD
    {
       jmp_buf jmpbuf;
-      png_memcpy(jmpbuf,png_ptr->jmpbuf,sizeof(jmp_buf));
+      png_memcpy(jmpbuf,png_ptr->jmpbuf,png_sizeof(jmp_buf));
       longjmp(jmpbuf, 1);
    }
 #  else

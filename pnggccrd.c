@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.6beta3 - July 18, 2004
+ * libpng version 1.2.6beta4 - July 28, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -222,6 +222,10 @@
  *
  * 20020304:
  *  - eliminated incorrect use of width_mmx in pixel_bytes == 8 case
+ *
+ * 20040724:
+ *   - more tinkering with clobber list at lines 4529 and 5033, to get
+ *     it to compile on gcc-3.4.
  *
  * STILL TO DO:
  *     - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
@@ -4531,8 +4535,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
       : "0" (bpp),              // eax    // input regs
         "1" (row)               // edi
 
-      : "%ebx", "%ecx", "%edx"            // clobber list
-      , "%esi"
+      : "%esi", "%ecx", "%edx"            // clobber list
 
 #if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
       , "%mm0", "%mm1", "%mm2", "%mm3"
@@ -5036,7 +5039,10 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
         "1" (prev_row),         // esi
         "2" (row)               // edi
 
-      : "%eax", "%ebx", "%ecx"            // clobber list (no input regs!)
+      : "%eax", "%ecx"            // clobber list (no input regs!)
+#ifndef __PIC__
+      , "%ebx"
+#endif
 
 #if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
       , "%mm0", "%mm1", "%mm2", "%mm3"

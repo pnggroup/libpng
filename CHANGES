@@ -1214,7 +1214,7 @@ version 1.2.6beta3 [July 18, 2004]
     (Cosmin).
   Replaced row_info->rowbytes with row_bytes in png_write_find_filter()
     (Cosmin).
-? Fixed definition of PNG_LIBPNG_VER_DLLNUM (Simon-Pierre).
+  Fixed definition of PNG_LIBPNG_VER_DLLNUM (Simon-Pierre).
   Used PNG_LIBPNG_VER and PNG_LIBPNG_VER_STRING instead of the hardcoded
     values in png.c (Simon-Pierre, Cosmin).
   Initialized png_libpng_ver[] with PNG_LIBPNG_VER_STRING (Simon-Pierre).
@@ -1236,9 +1236,34 @@ version 1.2.6beta3 [July 18, 2004]
   Moved projects/visualc6/png32ms.def to scripts/pngw32.def,
     and projects/visualc6/png.rc to scripts/pngw32.rc (Cosmin).
   Added projects/visualc6/pngtest.dsp; removed contrib/msvctest/ (Cosmin).
+  Changed line endings to DOS style in cbuilder5 and visualc6 files, even
+    in the tar.* distributions (Cosmin).
   Updated contrib/visupng/VisualPng.dsp (Cosmin).
   Updated contrib/visupng/cexcept.h to version 2.0.0 (Cosmin).
   Added a separate distribution with "configure" and supporting files (Junichi).
+version 1.2.6beta4 [July 28, 2004]
+  Added user ability to change png_size_t via a PNG_SIZE_T macro.
+  Added png_sizeof() and png_convert_size() functions.
+  Added PNG_SIZE_MAX (maximum value of a png_size_t variable.
+  Added check in png_malloc_default() for (size_t)size != (png_uint_32)size
+    which would indicate an overflow.
+  Changed sPLT failure action from png_error to png_warning and abandon chunk.
+  Changed sCAL and iCCP failures from png_error to png_warning and abandon.
+  Added png_get_uint_31(png_ptr, buf) function.
+  Added PNG_UINT_32_MAX macro.
+  Renamed PNG_MAX_UINT to PNG_UINT_31_MAX.
+  Made png_zalloc() issue a png_warning and return NULL on potential
+    overflow.
+  Turn on PNG_NO_ZALLOC_ZERO by default in version 1.2.x
+  Revised "clobber list" in pnggccrd.c so it will compile under gcc-3.4.
+  Revised Borland portion of png_malloc() to return NULL or issue
+    png_error() according to setting of PNG_FLAG_MALLOC_NULL_MEM_OK.
+  Added PNG_NO_SEQUENTIAL_READ_SUPPORTED macro to conditionally remove
+    sequential read support.
+  Added some "#if PNG_WRITE_SUPPORTED" blocks.
+  #ifdef'ed out some redundancy in png_malloc_default().
+  Use png_malloc instead of png_zalloc to allocate the pallete.
+
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.6beta3 - July 18, 2004
+ * libpng 1.2.6beta4 - July 28, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -27,6 +27,8 @@
  * testing a wide variety of files easily.  You can also test a number
  * of files at once by typing "pngtest -m file1.png file2.png ..."
  */
+
+#include "png.h"
 
 #if defined(_WIN32_WCE)
 #  if _WIN32_WCE < 211
@@ -80,8 +82,6 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #include <time.h>
 #endif
 
-#include "png.h"
-
 /* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
@@ -127,7 +127,7 @@ PNGAPI
 #endif
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
-    if(png_ptr == NULL || row_number > PNG_MAX_UINT) return;
+    if(png_ptr == NULL || row_number > PNG_UINT_31_MAX) return;
     if(status_pass != pass)
     {
        fprintf(stdout,"\n Pass %d: ",pass);
@@ -154,7 +154,7 @@ PNGAPI
 #endif
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
-    if(png_ptr == NULL || row_number > PNG_MAX_UINT || pass > 7) return;
+    if(png_ptr == NULL || row_number > PNG_UINT_31_MAX || pass > 7) return;
     fprintf(stdout, "w");
 }
 
@@ -511,7 +511,7 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       buffer and once to get a new free list entry. */
    {
       memory_infop pinfo = (memory_infop)png_malloc_default(png_ptr,
-         (png_uint_32)sizeof *pinfo);
+         (png_uint_32)png_sizeof (*pinfo));
       pinfo->size = size;
       current_allocation += size;
       total_allocation += size;
@@ -699,7 +699,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(read_ptr),jmpbuf,sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(read_ptr),jmpbuf,png_sizeof(jmp_buf));
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
@@ -721,7 +721,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(write_ptr),jmpbuf,sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(write_ptr),jmpbuf,png_sizeof(jmp_buf));
 #endif
 #endif
 #endif
@@ -1306,8 +1306,11 @@ main(int argc, char *argv[])
    /* Show the version of libpng used in building the application */
    fprintf(STDERR," pngtest (%lu):%s", (unsigned long)PNG_LIBPNG_VER,
       PNG_HEADER_VERSION_STRING);
-   fprintf(STDERR," sizeof(png_struct)=%ld, sizeof(png_info)=%ld\n",
-                    (long)sizeof(png_struct), (long)sizeof(png_info));
+   fprintf(STDERR," png_sizeof(png_struct)=%ld, png_sizeof(png_info)=%ld\n",
+                    (long)png_sizeof(png_struct), (long)png_sizeof(png_info));
+   fprintf(STDERR," PNG_UINT_31_MAX=%lu, PNG_UINT_32_MAX=%lu\n",
+      PNG_UINT_31_MAX, PNG_UINT_32_MAX);
+   fprintf(STDERR," PNG_SIZE_MAX=%u\n",PNG_SIZE_MAX);
 
    /* Do some consistency checking on the memory allocation settings, I'm
       not sure this matters, but it is nice to know, the first of these
@@ -1538,4 +1541,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_6beta3 your_png_h_is_not_version_1_2_6beta3;
+typedef version_1_2_6beta4 your_png_h_is_not_version_1_2_6beta4;
