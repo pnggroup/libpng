@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.7beta13 - May 16, 2000
+ libpng version 1.0.7beta14 - May 17, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -1179,7 +1179,7 @@ When you are done, you can free all memory allocated by libpng like this:
        &end_info);
 
 It is also possible to individually free the info_ptr members that
-point to libpng-allocated storage with the following functions:
+point to libpng-allocated storage with the following function:
 
     png_free_data(png_ptr, info_ptr, mask, n)
     mask - identifies data to be freed, a mask
@@ -1194,7 +1194,7 @@ point to libpng-allocated storage with the following functions:
     n    - sequence number of item to be freed
            (-1 for all items)
 
-These functions may be safely called when the relevant storage has
+This function may be safely called when the relevant storage has
 already been freed, or has not yet been allocated, or was allocated
 by the user and not by libpng,  and will in those
 cases do nothing.  The "n" parameter is ignored if only one item
@@ -1238,6 +1238,23 @@ because when libpng fills a png_text structure it combines these members with
 the key member, and png_free_data() will free only text_ptr.key.  Similarly,
 if you transfer responsibility for free'ing text_ptr from libpng to your
 application, your application must not separately free those members.
+
+The png_free_data() function will turn off the "valid" flag for anything
+it frees.  If you need to turn the flag off for a chunk that was freed by your
+application instead of by libpng, you can use
+
+    png_set_invalid(png_ptr, info_ptr, mask);
+    mask - identifies the chunks to be made invalid,
+           containing the logical OR of one or
+           more of 
+             PNG_INFO_gAMA, PNG_INFO_sBIT,
+             PNG_INFO_cHRM, PNG_INFO_PLTE,
+             PNG_INFO_tRNS, PNG_INFO_bKGD,
+             PNG_INFO_hIST, PNG_INFO_pHYs,
+             PNG_INFO_oFFs, PNG_INFO_tIME,
+             PNG_INFO_pCAL, PNG_INFO_sRGB,
+             PNG_INFO_iCCP, PNG_INFO_sPLT,
+             PNG_INFO_sCAL, PNG_INFO_IDAT
 
 For a more compact example of reading a PNG image, see the file example.c.
 
@@ -2137,7 +2154,7 @@ When you are done, you can free all memory used by libpng like this:
     png_destroy_write_struct(&png_ptr, &info_ptr);
 
 It is also possible to individually free the info_ptr members that
-point to libpng-allocated storage with the following functions:
+point to libpng-allocated storage with the following function:
 
     png_free_data(png_ptr, info_ptr, mask, n)
     mask  - identifies data to be freed, a mask
@@ -2152,7 +2169,7 @@ point to libpng-allocated storage with the following functions:
     n     - sequence number of item to be freed
             (-1 for all items)
 
-These functions may be safely called when the relevant storage has
+This function may be safely called when the relevant storage has
 already been freed, or has not yet been allocated, or was allocated
 by the user  and not by libpng,  and will in those
 cases do nothing.  The "n" parameter is ignored if only one item
@@ -2613,13 +2630,13 @@ application:
 
 VII. Y2K Compliance in libpng
 
-May 16, 2000
+May 17, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.7beta13 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.7beta14 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

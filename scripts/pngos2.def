@@ -38,6 +38,7 @@ EXPORTS
   png_build_grayscale_palette
   png_set_strip_alpha
   png_set_swap_alpha
+  png_set_invalid
   png_set_invert_alpha
   png_set_filler
   png_set_swap

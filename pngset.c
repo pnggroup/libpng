@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.7beta13 - May 16, 2000
+ * libpng 1.0.7beta14 - May 17, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -802,15 +802,16 @@ void PNGAPI
 png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
 {
    png_debug1(1, "in %s storage function\n", "rows");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    if(info_ptr->row_pointers && (info_ptr->row_pointers != row_pointers))
-   {
       png_free_data(png_ptr, info_ptr, PNG_FREE_ROWS, 0);
-      info_ptr->row_pointers = row_pointers;
-   }
-   info_ptr->valid |= PNG_INFO_IDAT;
+   info_ptr->row_pointers = row_pointers;
+   if(row_pointers)
+      info_ptr->valid |= PNG_INFO_IDAT;
+
 }
 #endif
 
@@ -823,4 +824,11 @@ png_set_compression_buffer_size(png_structp png_ptr, png_uint_32 size)
     png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, size);
     png_ptr->zstream.next_out = png_ptr->zbuf;
     png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+}
+
+void PNGAPI
+png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
+{
+   if (png_ptr && info_ptr)
+      info_ptr->valid &= ~(mask);
 }

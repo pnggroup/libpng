@@ -566,7 +566,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    {
       /* If we get here, we had a problem reading the file */
       fclose(fp);
-      png_destroy_write_struct(&png_ptr,  (png_infopp)info_ptr);
+      png_destroy_write_struct(&png_ptr, &info_ptr);
       return;
    }
 
@@ -762,7 +762,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_free(png_ptr, trans);
 
    /* clean up after the write, and free any memory allocated */
-   png_destroy_write_struct(&png_ptr, (png_infopp)info_ptr);
+   png_destroy_write_struct(&png_ptr, &info_ptr);
 
    /* close the file */
    fclose(fp);

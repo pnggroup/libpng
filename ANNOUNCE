@@ -1,5 +1,5 @@
 
-Libpng 1.0.7beta13 - May 16, 2000
+Libpng 1.0.7beta14 - May 17, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -72,6 +72,9 @@ Changes since the last public release (1.0.6):
   Made the default PNG_USE_LOCAL_ARRAYS depend on PNG_DLL instead of WIN32.
   Make png_free_data() ignore its final parameter when freeing data that can
     have multiple instances (text, sPLT, unknowns).
+  Removed info_ptr->valid tests from png_free_data(), as in version 1.0.5.
+  Added png_set_invalid() function.
+  Fixed incorrect illustrations of png_destroy_write_struct() in example.c.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -5,7 +5,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.7beta13';
+  PNG_LIBPNG_VER_STRING = '1.0.7beta14';
   PNG_LIBPNG_VER        =  10007;
 
 type
@@ -509,6 +509,9 @@ procedure png_set_hIST(png_ptr: png_structp; info_ptr: png_infop;
              hist: png_uint_16p);
              stdcall;
 function png_set_interlace_handling(png_ptr: png_structp): int;
+             stdcall;
+procedure png_set_invalid(png_ptr: png_structp; info_ptr:png_infop;
+             mask: int);
              stdcall;
 procedure png_set_invert_alpha(png_ptr: png_structp);
              stdcall;
