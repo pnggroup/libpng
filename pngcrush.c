@@ -25,7 +25,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.5.9"
+#define PNGCRUSH_VERSION "1.5.10"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -67,6 +67,12 @@
  */
 
 /* Change log:
+ *
+ * Version 1.5.10 (built with libpng-1.2.4 and zlib-1.1.4pc)
+ *
+ *   Fixed bug, introduced in 1.5.9, that caused defaults for method 0 to
+ *   be used instead of copying the original image, when the original was
+ *   already smallest.
  *
  * Version 1.5.9 (built with libpng-1.2.4beta3 and zlib-1.1.4pc)
  *
@@ -2620,7 +2626,7 @@ main(int argc, char *argv[])
             break;
          }
 
-         if(best == final_method)
+         if(idat_length[best] == idat_length[final_method])
          {
             break;
          }
