@@ -1,12 +1,12 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng 1.00
+ * libpng 1.0.0
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 7, 1998
+ * March 8, 1998
  */
 
 #define PNG_INTERNAL
@@ -16,7 +16,7 @@
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
  */
-char png_libpng_ver[5] = "1.00";
+char png_libpng_ver[6] = "1.0.0";
 
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};

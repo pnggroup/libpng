@@ -1,5 +1,5 @@
 # Makefile for libpng
-# Watcom 10a+ 32-bit protected mode flat memory model
+# Watcom 10a and later 32-bit protected mode flat memory model
 
 # Adapted by Pawel Mrochen, based on makefile.msc
 # For conditions of distribution and use, see copyright notice in png.h
@@ -7,7 +7,7 @@
 
 # To use, do "wmake -f makefile.wat"
 
-# ------------- Watcom 10a+ -------------
+# ------------- Watcom 10a and later -------------
 MODEL=-mf
 CFLAGS= $(MODEL) -fpi87 -fp5 -5r -oaeilmnrt -s -zp4 -i=..\zlib
 CC=wcc386

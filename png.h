@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.00
+ * libpng 1.0.0
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * March 7, 1998
+ * March 8, 1998
  *
  * Note about libpng version numbers:
  *
@@ -27,8 +27,8 @@
  *      0.97c                     0.97      2.0.97
  *      0.98                      0.98      2.0.98
  *      0.99                      0.99      2.0.99
- *      0.99a-i                   0.99      2.0.99
- *      1.00                      1.00      2.1.0
+ *      0.99a-m                   0.99      2.0.99
+ *      1.0.0                     1.00      2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
@@ -112,10 +112,10 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.00"
+#define PNG_LIBPNG_VER_STRING "1.0.0"
 
 /* careful here.  At one time, I wanted to use 082, but that would be octal.
- * Version 1.0 will be 100 here, etc.
+ * Version 1.0.0 will be 100 here, etc.
  */
 #define PNG_LIBPNG_VER  100
 
@@ -124,7 +124,7 @@ extern "C" {
 /* Version information for C files, stored in png.c.  This had better match
  * the version above.
  */
-extern char png_libpng_ver[5];
+extern char png_libpng_ver[6];
 
 /* Structures to facilitate easy interlacing.  See png.c for more details */
 extern int FARDATA png_pass_start[7];

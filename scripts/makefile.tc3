@@ -14,15 +14,12 @@ O=.obj
 E=.exe
 
 # variables
-OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O)
-pngwutil$(O)
+OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O)
 OBJS2 = pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O)
 OBJS3 = pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
 OBJSL1 = +png$(O) +pngset$(O) +pngget$(O) +pngrutil$(O) +pngtrans$(O)
-OBJSL2 = +pngwutil$(O) +pngmem$(O) +pngpread$(O) +pngread$(O)
-+pngerror$(O)
-OBJSL3 = +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O)
-+pngwio$(O)
+OBJSL2 = +pngwutil$(O) +pngmem$(O) +pngpread$(O) +pngread$(O) +pngerror$(O)
+OBJSL3 = +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O) +pngwio$(O)
 
 all: libpng.lib pngtest.exe
 
