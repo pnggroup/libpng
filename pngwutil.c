@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng version 1.2.8beta3 - November 3, 2004
+ * libpng version 1.2.8beta4 - November 13, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -357,9 +357,9 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
       png_write_chunk_data(png_ptr, png_ptr->zbuf,
          png_ptr->zbuf_size - png_ptr->zstream.avail_out);
 
-   /* reset zlib for another zTXt/iTXt or the image data */
+   /* reset zlib for another zTXt/iTXt or image data */
    deflateReset(&png_ptr->zstream);
-
+   png_ptr->zstream.data_type = Z_BINARY;
 }
 #endif
 
@@ -523,6 +523,9 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
       png_ptr->zlib_mem_level, png_ptr->zlib_strategy);
    png_ptr->zstream.next_out = png_ptr->zbuf;
    png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+   /* libpng is not interested in zstream.data_type */
+   /* set it to a predefined value, to avoid its evaluation inside zlib */
+   png_ptr->zstream.data_type = Z_BINARY;
 
    png_ptr->mode = PNG_HAVE_IHDR;
 }
@@ -1871,6 +1874,7 @@ png_write_finish_row(png_structp png_ptr)
    }
 
    deflateReset(&png_ptr->zstream);
+   png_ptr->zstream.data_type = Z_BINARY;
 }
 
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)

@@ -8,14 +8,21 @@
 
 #define PNG_LIBPNG_DLLFNAME "LIBPNG"
 
-#if defined(DLLFNAME_POSTFIX) && !defined(PRIVATEBUILD) && !defined(SPECIALBUILD)
-#  error PRIVATEBUILD or SPECIALBUILD must be defined as a string describing the type of change brought to the standard library
+#if defined(DLLFNAME_POSTFIX) && !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING) && \
+    !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
+#  error PNG_LIBPNG_BUILD_PRIVATE_STRING or PNG_LIBPNG_BUILD_SPECIAL_STRING \
+must be defined as a string describing the type of change brought to the \
+standard library
 #endif /* defined(DLLFNAME_POSTFIX)... */
 
 #if defined(PNG_USE_PNGVCRD)
-#  if !defined(SPECIALBUILD)
-#    define SPECIALBUILD "Use MMX instructions"
-#  endif /* SPECIALBUILD */
+#  if !(PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_SPECIAL)
+#    define PNG_LIBPNG_BUILD_TYPE_SAVE PNG_LIBPNG_BUILD_TYPE
+#    undef PNG_LIBPNG_BUILD_TYPE
+#    define PNG_LIBPNG_BUILD_TYPE \
+        PNG_LIBPNG_BUILD_TYPE_SAVE|PNG_LIBPNG_BUILD_SPECIAL
+#    define PNG_LIBPNG_BUILD_SPECIAL_STRING "Use MMX instructions"
+#  endif /* PNG_LIBPNG_BUILD_SPECIAL */
 #endif
 
 #if defined(PNG_DEBUG) && (PNG_DEBUG > 0)
@@ -33,17 +40,17 @@
 #  endif /* DLLFNAME_POSTFIX */
 #endif /* defined(DEBUG)... */
 
-#ifdef PRIVATEBUILD
+#if (PNG_LIBPNG_BUILD_PRIVATE & PNG_LIBPNG_BUILD_TYPE)
 #  define VS_PRIVATEBUILD VS_FF_PRIVATEBUILD
 #else
 #  define VS_PRIVATEBUILD 0
-#endif /* PRIVATEBUILD */
+#endif /* PNG_LIBPNG_BUILD_PRIVATE */
 
-#ifdef SPECIALBUILD
+#if (PNG_LIBPNG_BUILD_SPECIAL & PNG_LIBPNG_BUILD_TYPE)
 #  define VS_SPECIALBUILD VS_FF_SPECIALBUILD
 #else
 #  define VS_SPECIALBUILD 0
-#endif /* SPECIALBUILD */
+#endif /* PNG_LIBPNG_BUILD_SPECIAL */
 
 #if ((PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_TYPEMASK) != \
       PNG_LIBPNG_BUILD_STABLE)

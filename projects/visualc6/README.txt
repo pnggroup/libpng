@@ -48,10 +48,13 @@ If you change anything in the source files, or select different compiler
 settings, please change the DLL name to something different than any of
 the above names.
 
-Also, make sure that DLLFNAME_POSTFIX and (PRIVATEBUILD or SPECIALBUILD)
-are defined when compiling the resource file.  DLLFNAME_POSTFIX contains
-the trailing letters that come after the version number.  PRIVATEBUILD
-and/or SPECIALBUILD store information describing the type of change made
+Also, make sure that DLLFNAME_POSTFIX and (PNG_LIBPNG_BUILD_PRIVATE_STRING
+or PNG_LIBPNG_BUILD_SPECIAL_STRING) are defined and that PNG_LIBPNG_BUILD_TYPE
+has either the PNG_LIBPNG_BUILD_SPECIAL or PNG_LIBPNG_BUILD_PRIVATE flag
+set when compiling the resource file.  DLLFNAME_POSTFIX contains
+the trailing letters that come after the version number.
+PNG_LIBPNG_BUILD_PRIVATE_STRING and/or PNG_LIBPNG_BUILD_SPECIAL_STRING store
+information describing the type of change made
 in the VERSIONINFO structure.  Please refer to MSDN for more information
 on the used macros and the nature of their content.  For an example on
 how to define these macros, look at the resource compiler settings for

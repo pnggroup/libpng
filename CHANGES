@@ -1373,8 +1373,15 @@ version 1.2.8beta1 [November 1, 2004]
 version 1.2.8beta2 [November 2, 2004]
   Reduce color_type to a nonalpha type after strip alpha operation in
     png_do_strip_filler().
-version 1.2.8beta3 [November 3, 2004]
+version 1.2.8beta3 [Novermber 3, 2004]
   Revised definitions of PNG_MAX_UINT_32, PNG_MAX_SIZE, and PNG_MAXSUM
+version 1.2.8beta4 [November 13, 2004]
+  Fixed (again) definition of PNG_LIBPNG_VER_DLLNUM in png.h (Cosmin).
+  Added PNG_LIBPNG_BUILD_PRIVATE in png.h (Cosmin).
+  Set png_ptr->zstream.data_type to Z_BINARY, to avoid unnecessary detection
+    of data type in deflate (Cosmin).
+  Deprecated but continue to support SPECIALBUILD and PRIVATEBUILD in favor of
+    PNG_LIBPNG_BUILD_SPECIAL_STRING and PNG_LIBPNG_BUILD_PRIVATE_STRING.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu (subscription required; write to

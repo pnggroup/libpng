@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.8beta3 - November 3, 2004
+ * libpng version 1.2.8beta4 - November 13, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -21,6 +21,36 @@
 #include "pngusr.h"
 #endif
 #define PNG_1_2_X
+
+#define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_BETA
+
+#if (PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_SPECIAL)
+/* SPECIALBUILD is deprecated.  Use PNG_LIBPNG_BUILD_SPECIAL_STRING instead. */
+#  if defined(SPECIALBUILD) && !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
+#    define PNG_LIBPNG_BUILD_TYPE_SAVE PNG_LIBPNG_BUILD_TYPE
+#    undef PNG_LIBPNG_BUILD_TYPE
+#    define PNG_LIBPNG_BUILD_TYPE \
+        PNG_LIBPNG_BUILD_TYPE_SAVE|PNG_LIBPNG_BUILD_SPECIAL
+#    define PNG_LIBPNG_BUILD_SPECIAL_STRING SPECIALBUILD
+#  else
+#    if !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
+#      define PNG_LIBPNG_BUILD_SPECIAL_STRING special build string.
+#    endif
+#  endif
+#endif
+#if (PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_PRIVATE)
+/* PRIVATEBUILD is deprecated.  Use PNG_LIBPNG_BUILD_PRIVATE_STRING instead. */
+#  if defined(PRIVATEBUILD) && !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING)
+#    undef PNG_LIBPNG_BUILD_TYPE
+#    define PNG_LIBPNG_BUILD_TYPE \
+        PNG_LIBPNG_BUILD_TYPE_SAVE|PNG_LIBPNG_BUILD_PRIVATE
+#    define PNG_LIBPNG_BUILD_PRIVATE_STRING PRIVATEBUILD
+#  else
+#    if !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING)
+#      define PNG_LIBPNG_BUILD_PRIVATE_STRING private build string.
+#    endif
+#  endif
+#endif
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your
