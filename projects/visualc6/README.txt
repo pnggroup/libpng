@@ -46,19 +46,9 @@ Notes:
 
 If you change anything in the source files, or select different compiler
 settings, please change the DLL name to something different than any of
-the above names.
-
-Also, make sure that DLLFNAME_POSTFIX and (PNG_LIBPNG_BUILD_PRIVATE_STRING
-or PNG_LIBPNG_BUILD_SPECIAL_STRING) are defined and that PNG_LIBPNG_BUILD_TYPE
-has either the PNG_LIBPNG_BUILD_SPECIAL or PNG_LIBPNG_BUILD_PRIVATE flag
-set when compiling the resource file.  DLLFNAME_POSTFIX contains
-the trailing letters that come after the version number.
-PNG_LIBPNG_BUILD_PRIVATE_STRING and/or PNG_LIBPNG_BUILD_SPECIAL_STRING store
-information describing the type of change made
-in the VERSIONINFO structure.  Please refer to MSDN for more information
-on the used macros and the nature of their content.  For an example on
-how to define these macros, look at the resource compiler settings for
-the "Win32 DLL VB" configuration.
+the above names. Also, make sure that in your "pngusr.h" you define
+PNG_USER_PRIVATEBUILD and PNG_USER_DLLFNAME_POSTFIX according to the
+instructions provided in "pngconf.h".
 
 All DLLs built by this project use the Microsoft dynamic C runtime library
 MSVCRT.DLL (MSVCRTD.DLL for debug versions).  If you distribute any of the

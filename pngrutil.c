@@ -1,6 +1,6 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng version 1.2.8beta5 - November 20, 2004
+ * libpng version 1.2.8rc1 - November 24, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2260,59 +2260,46 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
    }
    else
    {
+#if defined(PNG_READ_PACKSWAP_SUPPORTED)
+      static const png_byte bitrev[16] =
+         {0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
+          0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F};
+      static const png_byte lastbyte_mask_norm[8] =
+         {0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE};
+      static const png_byte lastbyte_mask_swap[8] =
+         {0x00, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F};
+      const png_byte *lastbyte_mask =
+         (png_ptr->transformations & PNG_PACKSWAP) ?
+            lastbyte_mask_swap : lastbyte_mask_norm;
+#else
+      static const png_byte lastbyte_mask[8] =
+         {0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE};
+#endif
       switch (png_ptr->row_info.pixel_depth)
       {
          case 1:
          {
             png_bytep sp = png_ptr->row_buf + 1;
             png_bytep dp = row;
-            int s_inc, s_start, s_end;
-            int m = 0x80;
-            int shift;
             png_uint_32 i;
-            png_uint_32 row_width = png_ptr->width;
+            png_byte pixel_mask;
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (png_ptr->transformations & PNG_PACKSWAP)
-            {
-                s_start = 0;
-                s_end = 7;
-                s_inc = 1;
-            }
-            else
+               mask = (bitrev[mask & 0x0F] << 4) | bitrev[(mask >> 4) & 0x0F];
 #endif
+            pixel_mask = (png_byte)mask;
+
+            for (i = png_ptr->width; i >= 8; i -= 8)
             {
-                s_start = 7;
-                s_end = 0;
-                s_inc = -1;
+               *dp = (*sp & pixel_mask) | (*dp & ~pixel_mask);
+               sp++;
+               dp++;
             }
-
-            shift = s_start;
-
-            for (i = 0; i < row_width; i++)
+            if (i > 0)
             {
-               if (m & mask)
-               {
-                  int value;
-
-                  value = (*sp >> shift) & 0x01;
-                  *dp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
-                  *dp |= (png_byte)(value << shift);
-               }
-
-               if (shift == s_end)
-               {
-                  shift = s_start;
-                  sp++;
-                  dp++;
-               }
-               else
-                  shift += s_inc;
-
-               if (m == 1)
-                  m = 0x80;
-               else
-                  m >>= 1;
+               pixel_mask &= lastbyte_mask[i];
+               *dp = (*sp & pixel_mask) | (*dp & ~pixel_mask);
             }
             break;
          }
@@ -2320,51 +2307,40 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
          {
             png_bytep sp = png_ptr->row_buf + 1;
             png_bytep dp = row;
-            int s_start, s_end, s_inc;
-            int m = 0x80;
-            int shift;
             png_uint_32 i;
-            png_uint_32 row_width = png_ptr->width;
-            int value;
+            png_byte pixel_mask[2];
+            int m = 0x80;
+            int j;
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (png_ptr->transformations & PNG_PACKSWAP)
-            {
-               s_start = 0;
-               s_end = 6;
-               s_inc = 2;
-            }
-            else
+               mask = bitrev[mask & 0x0F] | (bitrev[(mask >> 4) & 0x0F] << 4);
 #endif
+            for (j = 0; j < 2; j++)
             {
-               s_start = 6;
-               s_end = 0;
-               s_inc = -2;
-            }
-
-            shift = s_start;
-
-            for (i = 0; i < row_width; i++)
-            {
-               if (m & mask)
+               pixel_mask[j] = 0;
+               for (i = 4; i > 0; i--)
                {
-                  value = (*sp >> shift) & 0x03;
-                  *dp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
-                  *dp |= (png_byte)(value << shift);
-               }
-
-               if (shift == s_end)
-               {
-                  shift = s_start;
-                  sp++;
-                  dp++;
-               }
-               else
-                  shift += s_inc;
-               if (m == 1)
-                  m = 0x80;
-               else
+                  pixel_mask[j] <<= 2;
+                  if (m & mask)
+                     pixel_mask[j] |= 0x03;
                   m >>= 1;
+               }
+            }
+            j = 0;
+            for (i = png_ptr->width; i >= 4; i -= 4)
+            {
+               if (pixel_mask[j] != 0)
+                  *dp = (*sp & pixel_mask[j]) | (*dp & ~pixel_mask[j]);
+               sp++;
+               dp++;
+               j ^= 1;
+            }
+            if (i > 0)
+            {
+               pixel_mask[j] &= lastbyte_mask[i * 2];
+               if (pixel_mask[j] != 0)
+                  *dp = (*sp & pixel_mask[j]) | (*dp & ~pixel_mask[j]);
             }
             break;
          }
@@ -2372,50 +2348,41 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
          {
             png_bytep sp = png_ptr->row_buf + 1;
             png_bytep dp = row;
-            int s_start, s_end, s_inc;
-            int m = 0x80;
-            int shift;
             png_uint_32 i;
-            png_uint_32 row_width = png_ptr->width;
-            int value;
+            png_byte pixel_mask[4];
+            int m = 0x80;
+            int j;
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (png_ptr->transformations & PNG_PACKSWAP)
-            {
-               s_start = 0;
-               s_end = 4;
-               s_inc = 4;
-            }
-            else
+               mask = ((mask & 0x55) << 1) | ((mask & 0xAA) >> 1);
 #endif
+            for (j = 0; j < 4; j++)
             {
-               s_start = 4;
-               s_end = 0;
-               s_inc = -4;
-            }
-            shift = s_start;
-
-            for (i = 0; i < row_width; i++)
-            {
-               if (m & mask)
+               pixel_mask[j] = 0;
+               for (i = 2; i > 0; i--)
                {
-                  value = (*sp >> shift) & 0xf;
-                  *dp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
-                  *dp |= (png_byte)(value << shift);
-               }
-
-               if (shift == s_end)
-               {
-                  shift = s_start;
-                  sp++;
-                  dp++;
-               }
-               else
-                  shift += s_inc;
-               if (m == 1)
-                  m = 0x80;
-               else
+                  pixel_mask[j] <<= 4;
+                  if (m & mask)
+                     pixel_mask[j] |= 0x0F;
                   m >>= 1;
+               }
+            }
+            j = 0;
+            for (i = png_ptr->width; i >= 2; i -= 2)
+            {
+               if (pixel_mask[j] != 0)
+                  *dp = (*sp & pixel_mask[j]) | (*dp & ~pixel_mask[j]);
+               sp++;
+               dp++;
+               j += 1;
+               j &= 3;
+            }
+            if (i > 0)
+            {
+               pixel_mask[j] &= lastbyte_mask[4];
+               if (pixel_mask[j] != 0)
+                  *dp = (*sp & pixel_mask[j]) | (*dp & ~pixel_mask[j]);
             }
             break;
          }
@@ -2425,24 +2392,123 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep dp = row;
             png_size_t pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
             png_uint_32 i;
-            png_uint_32 row_width = png_ptr->width;
-            png_byte m = 0x80;
+            int m = 0x80;
 
-
-            for (i = 0; i < row_width; i++)
+            switch (pixel_bytes)
             {
-               if (m & mask)
-               {
-                  png_memcpy(dp, sp, pixel_bytes);
-               }
-
-               sp += pixel_bytes;
-               dp += pixel_bytes;
-
-               if (m == 1)
-                  m = 0x80;
-               else
-                  m >>= 1;
+               case 1:
+                  for (i = png_ptr->width; i > 0; i--)
+                  {
+                     if (m & mask)
+                     {
+                        *(dp + 0) = *(sp + 0);
+                     }
+                     sp += 1;
+                     dp += 1;
+                     if ((m >>= 1) == 0)
+                        m = 0x80;
+                  }
+                  break;
+               case 2:
+                  for (i = png_ptr->width; i > 0; i--)
+                  {
+                     if (m & mask)
+                     {
+                        *(dp + 0) = *(sp + 0);
+                        *(dp + 1) = *(sp + 1);
+                     }
+                     sp += 2;
+                     dp += 2;
+                     if ((m >>= 1) == 0)
+                        m = 0x80;
+                  }
+                  break;
+               case 3:
+                  for (i = png_ptr->width; i > 0; i--)
+                  {
+                     if (m & mask)
+                     {
+                        *(dp + 0) = *(sp + 0);
+                        *(dp + 1) = *(sp + 1);
+                        *(dp + 2) = *(sp + 2);
+                     }
+                     sp += 3;
+                     dp += 3;
+                     if ((m >>= 1) == 0)
+                        m = 0x80;
+                  }
+                  break;
+               case 4:
+                  for (i = png_ptr->width; i > 0; i--)
+                  {
+                     if (m & mask)
+                     {
+                        *(dp + 0) = *(sp + 0);
+                        *(dp + 1) = *(sp + 1);
+                        *(dp + 2) = *(sp + 2);
+                        *(dp + 3) = *(sp + 3);
+                     }
+                     sp += 4;
+                     dp += 4;
+                     if ((m >>= 1) == 0)
+                        m = 0x80;
+                  }
+                  break;
+               case 6:
+                  for (i = png_ptr->width; i > 0; i--)
+                  {
+                     if (m & mask)
+                     {
+                        *(dp + 0) = *(sp + 0);
+                        *(dp + 1) = *(sp + 1);
+                        *(dp + 2) = *(sp + 2);
+                        *(dp + 3) = *(sp + 3);
+                        *(dp + 4) = *(sp + 4);
+                        *(dp + 5) = *(sp + 5);
+                     }
+                     sp += 6;
+                     dp += 6;
+                     if ((m >>= 1) == 0)
+                        m = 0x80;
+                  }
+                  break;
+               case 8:
+                  for (i = png_ptr->width; i > 0; i--)
+                  {
+                     if (m & mask)
+                     {
+                        *(dp + 0) = *(sp + 0);
+                        *(dp + 1) = *(sp + 1);
+                        *(dp + 2) = *(sp + 2);
+                        *(dp + 3) = *(sp + 3);
+                        *(dp + 4) = *(sp + 4);
+                        *(dp + 5) = *(sp + 5);
+                        *(dp + 6) = *(sp + 6);
+                        *(dp + 7) = *(sp + 7);
+                     }
+                     sp += 8;
+                     dp += 8;
+                     if ((m >>= 1) == 0)
+                        m = 0x80;
+                  }
+                  break;
+               default:
+                /*for (i = png_ptr->width; i > 0; i--)
+                 *{
+                 *   if (m & mask)
+                 *   {
+                 *      png_size_t j;
+                 *      for (j = 0; j < pixel_bytes; j++)
+                 *      {
+                 *         *(dp + j) = *(sp + j);
+                 *      }
+                 *   }
+                 *   sp += pixel_bytes;
+                 *   dp += pixel_bytes;
+                 *   if ((m >>= 1) == 0)
+                 *      m = 0x80;
+                 *}
+                */break;
             }
             break;
          }
@@ -2471,122 +2537,101 @@ png_do_read_interlace(png_structp png_ptr)
 #endif
 
    png_debug(1,"in png_do_read_interlace (stock C version)\n");
-   if (row != NULL && row_info != NULL)
+   if (row != NULL && row_info != NULL &&
+       pass < 6)
    {
-      png_uint_32 final_width;
-
-      final_width = row_info->width * png_pass_inc[pass];
+      png_uint_32 final_width = row_info->width * png_pass_inc[pass];
 
       switch (row_info->pixel_depth)
       {
          case 1:
          {
+            static const png_byte pixeltable1[24] =
+               {0x00, 0x00, 0x00, 0xFF, 0x00, 0x0F, 0xF0, 0xFF,
+                0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F,
+                0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF};
             png_bytep sp = row + (png_size_t)((row_info->width - 1) >> 3);
             png_bytep dp = row + (png_size_t)((final_width - 1) >> 3);
-            int sshift, dshift;
-            int s_start, s_end, s_inc;
-            int jstop = png_pass_inc[pass];
-            png_byte v;
+            int nbits = 8 / png_pass_inc[pass];
+            int sshift = 7 - (int)((row_info->width + 7) & 0x07);
+            int s_inc = nbits;
+            png_byte smask = (1 << nbits) - 1;
+            const png_byte *pix = pixeltable1 + (2 * nbits);
             png_uint_32 i;
-            int j;
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-                sshift = (int)((row_info->width + 7) & 0x07);
-                dshift = (int)((final_width + 7) & 0x07);
-                s_start = 7;
-                s_end = 0;
-                s_inc = -1;
+                sshift = 7 - sshift;
+                s_inc = -s_inc;
             }
-            else
 #endif
-            {
-                sshift = 7 - (int)((row_info->width + 7) & 0x07);
-                dshift = 7 - (int)((final_width + 7) & 0x07);
-                s_start = 0;
-                s_end = 7;
-                s_inc = 1;
-            }
+            sshift &= (0x10 - nbits);
 
-            for (i = 0; i < row_info->width; i++)
+            for (i = (row_info->width + nbits - 1) / nbits;
+                 i > 0; i--)
             {
-               v = (png_byte)((*sp >> sshift) & 0x01);
-               for (j = 0; j < jstop; j++)
+               *dp-- = pix[(*sp >> sshift) & smask];
+
+               sshift += s_inc;
+               if (sshift >= 8)
                {
-                  *dp &= (png_byte)((0x7f7f >> (7 - dshift)) & 0xff);
-                  *dp |= (png_byte)(v << dshift);
-                  if (dshift == s_end)
-                  {
-                     dshift = s_start;
-                     dp--;
-                  }
-                  else
-                     dshift += s_inc;
-               }
-               if (sshift == s_end)
-               {
-                  sshift = s_start;
+                  sshift -= 8;
                   sp--;
                }
-               else
-                  sshift += s_inc;
+               else if (sshift < 0)
+               {
+                  sshift += 8;
+                  sp--;
+               }
             }
             break;
          }
          case 2:
          {
-            png_bytep sp = row + (png_uint_32)((row_info->width - 1) >> 2);
-            png_bytep dp = row + (png_uint_32)((final_width - 1) >> 2);
-            int sshift, dshift;
-            int s_start, s_end, s_inc;
-            int jstop = png_pass_inc[pass];
+            static const png_byte pixeltable2[20] =
+               {0x00, 0x55, 0xAA, 0xFF,
+                0x00, 0x05, 0x0A, 0x0F, 0x50, 0x55, 0x5A, 0x5F,
+                0xA0, 0xA5, 0xAA, 0xAF, 0xF0, 0xF5, 0xFA, 0xFF};
+            png_bytep sp = row + (png_size_t)((row_info->width - 1) >> 2);
+            png_bytep dp = row + (png_size_t)((final_width - 1) >> 2);
+            int is2 = (png_pass_inc[pass] == 2);
+            int is8 = (png_pass_inc[pass] == 8);
+            int sshift = (int)((3 - ((row_info->width + 3) & 0x03)) << 1);
+            int s_inc = 2 << is2;
+            png_byte smask = (4 << (2 * is2)) - 1;
+            const png_byte *pix = pixeltable2 + (4 * is2);
             png_uint_32 i;
+            png_byte v;
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-               sshift = (int)(((row_info->width + 3) & 0x03) << 1);
-               dshift = (int)(((final_width + 3) & 0x03) << 1);
-               s_start = 6;
-               s_end = 0;
-               s_inc = -2;
+               sshift = 6 - sshift;
+               s_inc = -s_inc;
             }
-            else
 #endif
-            {
-               sshift = (int)((3 - ((row_info->width + 3) & 0x03)) << 1);
-               dshift = (int)((3 - ((final_width + 3) & 0x03)) << 1);
-               s_start = 0;
-               s_end = 6;
-               s_inc = 2;
-            }
+            sshift &= (0x0E - (2 * is2));
 
-            for (i = 0; i < row_info->width; i++)
+            for (i = (row_info->width + is2) >> is2;
+                 i > 0; i--)
             {
-               png_byte v;
-               int j;
+               v = pix[(*sp >> sshift) & smask];
+               *dp-- = v;
+               if (is8)
+                  *dp-- = v;
 
-               v = (png_byte)((*sp >> sshift) & 0x03);
-               for (j = 0; j < jstop; j++)
+               sshift += s_inc;
+               if (sshift >= 8)
                {
-                  *dp &= (png_byte)((0x3f3f >> (6 - dshift)) & 0xff);
-                  *dp |= (png_byte)(v << dshift);
-                  if (dshift == s_end)
-                  {
-                     dshift = s_start;
-                     dp--;
-                  }
-                  else
-                     dshift += s_inc;
-               }
-               if (sshift == s_end)
-               {
-                  sshift = s_start;
+                  sshift -= 8;
                   sp--;
                }
-               else
-                  sshift += s_inc;
+               else if (sshift < 0)
+               {
+                  sshift += 8;
+                  sp--;
+               }
             }
             break;
          }
@@ -2594,54 +2639,39 @@ png_do_read_interlace(png_structp png_ptr)
          {
             png_bytep sp = row + (png_size_t)((row_info->width - 1) >> 1);
             png_bytep dp = row + (png_size_t)((final_width - 1) >> 1);
-            int sshift, dshift;
-            int s_start, s_end, s_inc;
+            int jinit = png_pass_inc[pass] >> 1;
+            int sshift = (int)((1 - ((row_info->width + 1) & 0x01)) << 2);
+            int s_inc = 4;
             png_uint_32 i;
-            int jstop = png_pass_inc[pass];
+            png_byte v;
+            int j;
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-               sshift = (int)(((row_info->width + 1) & 0x01) << 2);
-               dshift = (int)(((final_width + 1) & 0x01) << 2);
-               s_start = 4;
-               s_end = 0;
-               s_inc = -4;
+               sshift = 4 - sshift;
+               s_inc = -s_inc;
             }
-            else
 #endif
+            for (i = row_info->width; i > 0; i--)
             {
-               sshift = (int)((1 - ((row_info->width + 1) & 0x01)) << 2);
-               dshift = (int)((1 - ((final_width + 1) & 0x01)) << 2);
-               s_start = 0;
-               s_end = 4;
-               s_inc = 4;
-            }
+               v = (*sp >> sshift) & 0x0F;
+               v |= v << 4;
 
-            for (i = 0; i < row_info->width; i++)
-            {
-               png_byte v = (png_byte)((*sp >> sshift) & 0xf);
-               int j;
+               for (j = jinit; j > 0; j--)
+                  *dp-- = v;
 
-               for (j = 0; j < jstop; j++)
+               sshift += s_inc;
+               if (sshift >= 8)
                {
-                  *dp &= (png_byte)((0xf0f >> (4 - dshift)) & 0xff);
-                  *dp |= (png_byte)(v << dshift);
-                  if (dshift == s_end)
-                  {
-                     dshift = s_start;
-                     dp--;
-                  }
-                  else
-                     dshift += s_inc;
-               }
-               if (sshift == s_end)
-               {
-                  sshift = s_start;
+                  sshift -= 8;
                   sp--;
                }
-               else
-                  sshift += s_inc;
+               else if (sshift < 0)
+               {
+                  sshift += 8;
+                  sp--;
+               }
             }
             break;
          }
@@ -2649,23 +2679,112 @@ png_do_read_interlace(png_structp png_ptr)
          {
             png_size_t pixel_bytes = (row_info->pixel_depth >> 3);
             png_bytep sp = row + (png_size_t)(row_info->width - 1) * pixel_bytes;
-            png_bytep dp = row + (png_size_t)(final_width - 1) * pixel_bytes;
-
-            int jstop = png_pass_inc[pass];
+            png_bytep dp = row + (png_size_t)(final_width - 2) * pixel_bytes;
+            int jinit = png_pass_inc[pass] >> 1;
             png_uint_32 i;
+            int j;
 
-            for (i = 0; i < row_info->width; i++)
+            switch (pixel_bytes)
             {
-               png_byte v[8];
-               int j;
-
-               png_memcpy(v, sp, pixel_bytes);
-               for (j = 0; j < jstop; j++)
-               {
-                  png_memcpy(dp, v, pixel_bytes);
-                  dp -= pixel_bytes;
-               }
-               sp -= pixel_bytes;
+               case 1:
+                  for (i = row_info->width; i > 0; i--)
+                  {
+                     for (j = jinit; j > 0; j--)
+                     {
+                        *(dp + 0) = *(dp + 1) = *(sp + 0);
+                        dp -= 2;
+                     }
+                     sp -= 1;
+                  }
+                  break;
+               case 2:
+                  for (i = row_info->width; i > 0; i--)
+                  {
+                     for (j = jinit; j > 0; j--)
+                     {
+                        *(dp + 0) = *(dp + 2) = *(sp + 0);
+                        *(dp + 1) = *(dp + 3) = *(sp + 1);
+                        dp -= 4;
+                     }
+                     sp -= 2;
+                  }
+                  break;
+               case 3:
+                  for (i = row_info->width; i > 0; i--)
+                  {
+                     for (j = jinit; j > 0; j--)
+                     {
+                        *(dp + 0) = *(dp + 3) = *(sp + 0);
+                        *(dp + 1) = *(dp + 4) = *(sp + 1);
+                        *(dp + 2) = *(dp + 5) = *(sp + 2);
+                        dp -= 6;
+                     }
+                     sp -= 3;
+                  }
+                  break;
+               case 4:
+                  for (i = row_info->width; i > 0; i--)
+                  {
+                     for (j = jinit; j > 0; j--)
+                     {
+                        *(dp + 0) = *(dp + 4) = *(sp + 0);
+                        *(dp + 1) = *(dp + 5) = *(sp + 1);
+                        *(dp + 2) = *(dp + 6) = *(sp + 2);
+                        *(dp + 3) = *(dp + 7) = *(sp + 3);
+                        dp -= 8;
+                     }
+                     sp -= 4;
+                  }
+                  break;
+               case 6:
+                  for (i = row_info->width; i > 0; i--)
+                  {
+                     for (j = jinit; j > 0; j--)
+                     {
+                        *(dp + 0) = *(dp +  6) = *(sp + 0);
+                        *(dp + 1) = *(dp +  7) = *(sp + 1);
+                        *(dp + 2) = *(dp +  8) = *(sp + 2);
+                        *(dp + 3) = *(dp +  9) = *(sp + 3);
+                        *(dp + 4) = *(dp + 10) = *(sp + 4);
+                        *(dp + 5) = *(dp + 11) = *(sp + 5);
+                        dp -= 12;
+                     }
+                     sp -= 6;
+                  }
+                  break;
+               case 8:
+                  for (i = row_info->width; i > 0; i--)
+                  {
+                     for (j = jinit; j > 0; j--)
+                     {
+                        *(dp + 0) = *(dp +  8) = *(sp + 0);
+                        *(dp + 1) = *(dp +  9) = *(sp + 1);
+                        *(dp + 2) = *(dp + 10) = *(sp + 2);
+                        *(dp + 3) = *(dp + 11) = *(sp + 3);
+                        *(dp + 4) = *(dp + 12) = *(sp + 4);
+                        *(dp + 5) = *(dp + 13) = *(sp + 5);
+                        *(dp + 6) = *(dp + 14) = *(sp + 6);
+                        *(dp + 7) = *(dp + 15) = *(sp + 7);
+                        dp -= 16;
+                     }
+                     sp -= 8;
+                  }
+                  break;
+               default:
+                /*for (i = row_info->width; i > 0; i--)
+                 *{
+                 *   for (j = jinit; j > 0; j--)
+                 *   {
+                 *      png_size_t k;
+                 *      for (k = 0; k < pixel_bytes; k++)
+                 *      {
+                 *         *(dp + pixel_bytes + k) = *(dp + k) = *(sp + k);
+                 *      }
+                 *      dp -= (2 * pixel_bytes);
+                 *   }
+                 *   sp -= pixel_bytes;
+                 *}
+                */break;
             }
             break;
          }

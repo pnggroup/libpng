@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.8beta5 - November 20, 2004
+ * libpng version 1.2.8rc1 - November 24, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -17,13 +17,53 @@
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
+#define PNG_1_2_X
+
+/* 
+ * PNG_USER_CONFIG has to be defined on the compiler command line. This
+ * includes the resource compiler for Windows DLL configurations.
+ */
 #ifdef PNG_USER_CONFIG
 #include "pngusr.h"
 #endif
-#define PNG_1_2_X
 
-/* Added at libpng-1.2.8 */
-#define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_BETA
+/*
+ * Added at libpng-1.2.8
+ *  
+ * If you create a private DLL you need to define in "pngusr.h" the followings:
+ * #define PNG_USER_PRIVATEBUILD <Describes by whom and why this version of
+ *        the DLL was built>
+ *  e.g. #define PNG_USER_PRIVATEBUILD "Build by MyCompany for xyz reasons."
+ * #define PNG_USER_DLLFNAME_POSTFIX <two-letter postfix that serve to
+ *        distinguish your DLL from those of the official release. These
+ *        correspond to the trailing letters that come after the version
+ *        number and must match your private DLL name>
+ *  e.g. // private DLL "libpng13gx.dll"
+ *       #define PNG_USER_DLLFNAME_POSTFIX "gx"
+ * 
+ * The following macros are also at your disposal if you want to complete the 
+ * DLL VERSIONINFO structure.
+ * - PNG_USER_VERSIONINFO_COMMENTS
+ * - PNG_USER_VERSIONINFO_COMPANYNAME
+ * - PNG_USER_VERSIONINFO_LEGALTRADEMARKS
+ */
+
+#ifdef __STDC__
+#ifdef SPECIALBUILD
+#  pragma message("PNG_LIBPNG_SPECIALBUILD (and deprecated SPECIALBUILD)\
+ are now LIBPNG reserved macros. Use PNG_USER_PRIVATEBUILD instead.")
+#endif
+
+#ifdef PRIVATEBUILD
+# pragma message("PRIVATEBUILD is deprecated. Use\
+ PNG_USER_PRIVATEBUILD instead.")
+# define PNG_USER_PRIVATEBUILD PRIVATEBUILD
+#endif
+#endif /* __STDC__ */
+
+#ifndef PNG_VERSION_INFO_ONLY
+
+/* End of material added to libpng-1.2.8 */
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your
@@ -1125,6 +1165,9 @@ typedef double          FAR * FAR * png_doublepp;
 /* Pointers to pointers to pointers; i.e., pointer to array */
 typedef char            FAR * FAR * FAR * png_charppp;
 
+#if defined(PNG_1_0_X) || defined(PNG_1_2_X)
+/* SPC -  Is this stuff deprecated? */
+/* It'll be removed as of libpng-1.3.0 - GR-P */
 /* libpng typedefs for types in zlib. If zlib changes
  * or another compression library is used, then change these.
  * Eliminates need to change all the source files.
@@ -1132,6 +1175,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 typedef charf *         png_zcharp;
 typedef charf * FAR *   png_zcharpp;
 typedef z_stream FAR *  png_zstreamp;
+#endif /* (PNG_1_0_X) || defined(PNG_1_2_X) */
 
 /*
  * Define PNG_BUILD_DLL if the module being built is a Windows
@@ -1376,78 +1420,7 @@ typedef z_stream FAR *  png_zstreamp;
 #endif /* PNG_INTERNAL */
 #endif /* PNG_READ_SUPPORTED */
 
-/*
- * Added at libpng-1.2.8
- *
- *  Can define PNG_LIBPNG_BUILD_TYPE using only the following:
- *             PNG_LIBPNG_BUILD_PRIVATE (including DLLFNAME_POSTFIX and
- *             PNG_LIBPNG_BUILD_PRIVATE_STRING)
- *
- * Ref MSDN
- * VS_FF_PRIVATEBUILD File was ****not built using standard release****
- * procedures. If this value is given, the StringFileInfo block must
- * contain a PrivateBuild string. 
- *
- * VS_FF_SPECIALBUILD File was built by the original company *****using
- * standard release procedures***** but is a variation of the standard
- * file of the same version number. If this value is given, the
- * StringFileInfo block must contain a SpecialBuild string. 
- */
-
-#ifndef PNG_LIBPNG_BUILD_TYPE
-#  define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_BASE_TYPE
-#else
-#  define PNG_LIBPNG_BUILD_TYPE_SAVE (PNG_LIBPNG_BUILD_TYPE & \
-     PNG_LIBPNG_BUILD_PRIVATE)
-#  undef PNG_LIBPNG_BUILD_TYPE
-#  define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_BASE_TYPE | \
-     PNG_LIBPNG_BUILD_TYPE_SAVE
-#  undef PNG_LIBPNG_BUILD_TYPE_SAVE
-#endif
-  
-#undef PNG_LIBPNG_BUILD_BASE_TYPE
-  
-/* Private as priority over Special */
-#if ((PNG_LIBPNG_BUILD_TYPE & (PNG_LIBPNG_BUILD_PRIVATE | \
-   PNG_LIBPNG_BUILD_SPECIAL)) == (PNG_LIBPNG_BUILD_PRIVATE | \
-   PNG_LIBPNG_BUILD_SPECIAL))
-#  define PNG_LIBPNG_BUILD_TYPE_SAVE PNG_LIBPNG_BUILD_TYPE
-#  define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_TYPE_SAVE & \
-     ~PNG_LIBPNG_BUILD_SPECIAL
-#  undef PNG_LIBPNG_BUILD_TYPE_SAVE
-#endif
-  
-/* Verify if PNG_LIBPNG_BUILD_PRIVATE_STRING is defined if PNG_LIBPNG_BUILD_PRIVATE is set */
-#if (PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_PRIVATE)
-  /*
-   * PRIVATEBUILD is deprecated. Use PNG_LIBPNG_BUILD_PRIVATE_STRING instead.
-   */
-# if defined(PRIVATEBUILD) && !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING)
-#   define PNG_LIBPNG_BUILD_PRIVATE_STRING PRIVATEBUILD
-# else
-#   if !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING)
-#     error "PNG_LIBPNG_BUILD_PRIVATE_STRING must be defined if \
-      PNG_LIBPNG_BUILD_PRIVATE set"
-#   endif
-# endif
-/* Verify if PNG_LIBPNG_BUILD_SPECIAL_STRING is defined \
-   if PNG_LIBPNG_BUILD_SPECIAL is set */
-#else
-#  if (PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_SPECIAL)
-     /*
-      * SPECIALBUILD is deprecated. Use PNG_LIBPNG_BUILD_SPECIAL_STRING instead.
-      */
-#    if defined(SPECIALBUILD) && !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
-#      define PNG_LIBPNG_BUILD_SPECIAL_STRING SPECIALBUILD
-#    else
-#      if !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
-#         error "PNG_LIBPNG_BUILD_SPECIAL_STRING must be defined \
-          if PNG_LIBPNG_BUILD_SPECIAL is set"
-#      endif
-#    endif
-#  endif
-#endif
-/* End of material added to libpng-1.2.8 */
+/* Added at libpng-1.2.8 */
+#endif /* PNG_VERSION_INFO_ONLY */
 
 #endif /* PNGCONF_H */
-

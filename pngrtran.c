@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng version  1.2.8beta5 - November 20, 2004
+ * libpng version  1.2.8rc1 - November 24, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2104,7 +2104,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 /* reduce RGB files to grayscale, with or without alpha
  * using the equation given in Poynton's ColorFAQ at
  * <http://www.inforamp.net/~poynton/>
- * Copyright (c) 1998-01-04 Charles Poynton poynton@inforamp.net
+ * Copyright (c) 1998-01-04 Charles Poynton poynton at inforamp.net
  *
  *     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
  *

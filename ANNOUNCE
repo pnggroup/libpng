@@ -1,5 +1,5 @@
 
-Libpng 1.2.8beta5 - November 20, 2004
+Libpng 1.2.8rc1 - November 24, 2004
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -30,10 +30,16 @@ version 1.2.8beta5 [November 20, 2004]
     compatibility.
   Revised handling of SPECIALBUILD, PRIVATEBUILD, 
     PNG_LIBPNG_BUILD_SPECIAL_STRING and PNG_LIBPNG_BUILD_PRIVATE_STRING.
+version 1.2.8rc1 [November 24, 2004]
+  Moved handling of BUILD macros from pngconf.h to png.h
+  Added definition of PNG_LIBPNG_BASE_TYPE in png.h, inadvertently
+    omitted from beta5.
+  Revised scripts/pngw32.rc
+  Despammed mailing addresses by masking "@" with "at".
 
 Send comments/corrections/commendations to
-png-implement@ccrc.wustl.edu (subscription required; write to
-majordomo@ccrc.wustl.edu with "subscribe png-implement" in the message)
-or to glennrp@users.sourceforge.net
+png-implement at ccrc.wustl.edu (subscription required; write to
+majordomo at ccrc.wustl.edu with "subscribe png-implement" in the message)
+or to glennrp at users.sourceforge.net
 
 Glenn R-P
