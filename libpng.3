@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "May 2, 1998"
+.TH LIBPNG 3 "May 9, 1998"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library
 .SH SYNOPSIS
@@ -396,7 +396,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.1b May 2, 1998
+ libpng version 1.0.1c May 9, 1998
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alumni.rpi.edu>
  Copyright (c) 1998, Glenn Randers-Pehrson
@@ -539,7 +539,7 @@ be NULL if the default error handlers are to be used).  See the section
 on Changes to Libpng below regarding the old initialization functions.
 
     png_structp png_ptr = png_create_read_struct
-       (PNG_LIBPNG_VER_STRING, (void *)user_error_ptr,
+       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn);
     if (!png_ptr)
         return;
@@ -974,21 +974,19 @@ RGB.  This code will do that conversion:
           png_set_gray_to_rgb(png_ptr);
 
 If you have a grayscale and you are using png_set_expand() to change to
-a higher bit-depth you must indicate if the supplied background gray
-is supplied in the original file bit depth (need_expand = 1) or in the
-expanded bit depth (need_expand = 0).  Similarly, if you are reading
-a paletted image, you must indicate if you have supplied the background
-as a palette index that needs to be expanded (need_expand = 1).  You can
-also specify an RGB triplet that isn't in the palette when setting your
-background for a paletted image.
+a higher bit-depth, you must either supply the background color as a gray
+value at the original file bit-depth (need_expand = 1) or else supply the
+background color as an RGB triplet at the final, expanded bit depth
+(need_expand = 0).  Similarly, if you are reading a paletted image, you
+must either supply the background color as a palette index (need_expand = 1)
+or as an RGB triplet that may or may not be in the palette (need_expand = 0).
 
     png_color_16 my_background;
     png_color_16p image_background;
 
-    if (png_get_bKGD(png_ptr, info_ptr,
-        &image_background))
-        png_set_background(png_ptr, image_background),
-        PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
+    if (png_get_bKGD(png_ptr, info_ptr, &image_background))
+        png_set_background(png_ptr, image_background,
+          PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
     else
         png_set_background(png_ptr, &my_background,
           PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
@@ -1271,7 +1269,7 @@ png_infop info_ptr;
  initialize_png_reader()
  {
     png_ptr = png_create_read_struct
-        (PNG_LIBPNG_VER_STRING, (void *)user_error_ptr,
+        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
          user_error_fn, user_warning_fn);
     if (!png_ptr)
         return -1;
@@ -1443,7 +1441,7 @@ both "png_ptr"; you can call them anything you like, such as
 "read_ptr" and "write_ptr".  Look at pngtest.c, for example.
 
     png_structp png_ptr = png_create_write_struct
-       (PNG_LIBPNG_VER_STRING, (void *)user_error_ptr,
+       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn);
     if (!png_ptr)
        return;
@@ -2223,19 +2221,23 @@ Removing unwanted object code:
 
 There are a bunch of #define's in pngconf.h that control what parts of
 libpng are compiled.  All the defines end in _SUPPORTED.  If you are
-never going to use an ability, you can change the #define to #undef
-before recompiling libpng and save yourself code and data space.
-You can also turn a number of them off en masse with a compiler directive
-that defines PNG_READ[or WRITE]_TRANSFORMS_NOT_SUPPORTED, or
-PNG_READ[or WRITE]_ANCILLARY_CHUNKS_NOT_SUPPORTED, or all four,
+never going to use a capability, you can change the #define to #undef
+before recompiling libpng and save yourself code and data space, or
+you can turn off individual capabilities with defines that begin with
+PNG_NO_.
+
+You can also turn all of the transforms and ancillary chunk capabilities
+off en masse with  compiler directives that define
+PNG_NO_READ[or WRITE]_TRANSFORMS, or PNG_NO_READ[or WRITE]_ANCILLARY_CHUNKS,
+or all four,
 along with directives to turn on any of the capabilities that you do
-want.  The PNG_READ[or WRITE]_TRANSFORMS_NOT_SUPPORTED directives disable
+want.  The PNG_NO_READ[or WRITE]_TRANSFORMS directives disable
 the extra transformations but still leave the library fully capable of reading
 and writing PNG files with all known public chunks [except for sPLT].
-Use of the PNG_READ[or WRITE]_ANCILLARY_CHUNKS_NOT_SUPPORTED directive
+Use of the PNG_NO_READ[or WRITE]_ANCILLARY_CHUNKS directive
 produces a library that is incapable of reading or writing ancillary chunks.
 If you are not using the progressive reading capability, you can
-turn that off with PNG_PROGRESSIVE_READ_NOT_SUPPORTED (don't confuse
+turn that off with PNG_NO_PROGRESSIVE_READ (don't confuse
 this with the INTERLACING capability, which you'll still have).
 
 All the reading and writing specific code are in separate files, so the
@@ -2372,7 +2374,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
   
-Libpng version 1.0.1b May 2, 1998:
+Libpng version 1.0.1c May 9, 1998:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (randeg@alumni.rpi.edu).
 

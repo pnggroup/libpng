@@ -20,7 +20,8 @@ Known bugs and suggested enhancements in libpng-1.0.1
 
    pngrtran.c:  if-test for channels/FILLER may be incorrect
 
-   STATUS: Under investigation
+   STATUS: Under investigation.  Appears to be working correctly
+   in libpng-1.0.1c.
 
 4. March 15, 1998 -- BUG -- Kevin Bracey
 
@@ -52,11 +53,12 @@ Known bugs and suggested enhancements in libpng-1.0.1
                   png_uint_32 i;
                   for(i=0; i < s->a*s->b; i++)
               with
-                  png_uint_32 i, count;
+                  png_uint_32 i, istop;
                   istop = s->a*s->b;
                   for(i=0; i<istop; i++)
 
       STATUS: Mostly done in libpng-1.0.1a, done for all important loops.
+              More done in libpng-1.0.1b.
 
    c. Replace abs() with intrinsic ternary operations in Paeth
       filtering -- Glenn R-P
@@ -92,7 +94,7 @@ Known bugs and suggested enhancements in libpng-1.0.1
    be made possible at run time, via calls to new png_set_malloc_fn()
    and png_set_free_fn() functions.
 
-   STATUS: Will do in libpng-1.0.1b
+   STATUS: Under consideration
 
 9. April 11, 1998 -- BUG -- incorrect truncation of tRNS data in
    illegal PNG file where tRNS precedes PLTE -- Larry Reeve
@@ -131,3 +133,26 @@ Known bugs and suggested enhancements in libpng-1.0.1
    that a warning be issued in such cases.
 
    STATUS: Done in libpng-1.0.1b
+
+14. May 2, 1998 -- BUG -- incorrect mask for filler bytes
+
+   In pngrtran.c, png_do_filler(), the masks for hi_filler and low_filler
+   should be 0xff instead of 0xf
+
+   STATUS: Fixed in libpng-1.0.1c
+
+15. May 3, 1998 -- BUG -- buffer overflow in png_do_read_filler()
+
+   In pngrutil.c, max_pixel_depth needs to be set to 32 when using
+   png_do_read_filler with palette images.
+
+   STATUS: Fixed in libpng-1.0.1c (see also items 1 and 3 above).
+
+16. May 3, 1998 -- BUG -- type definitions wrong on error functions -- Tom Lane
+
+   In png_create_xxx_struct(), the error functions should have typedef
+   png_voidp instead of (void *).  Needs to be corrected in the functions,
+   the prototypes in png.h, the example.c file, and libpng.txt and libpng.3
+
+   
+   STATUS: Fixed in libpng-1.0.1c

@@ -1,12 +1,12 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * 1.0.1b
+ * 1.0.1c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 2, 1998
+ * May 9, 1998
  */
 
 #define PNG_INTERNAL
@@ -218,9 +218,8 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       row_info->color_type != PNG_COLOR_TYPE_PALETTE)
    {
       int shift_start[4], shift_dec[4];
-      int channels;
+      int channels = 0;
 
-      channels = 0;
       if (row_info->color_type & PNG_COLOR_MASK_COLOR)
       {
          shift_start[channels] = row_info->bit_depth - bit_depth->red;
@@ -281,26 +280,23 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       {
          png_bytep bp = row;
          png_uint_32 i;
-         png_uint_32 row_width = row_info->width;
+         png_uint_32 istop = channels * row_info->width;
 
-         for (i = 0; i < row_width; i++)
+         for (i = 0; i < istop; i++, bp++)
          {
-            int c;
 
-            for (c = 0; c < channels; c++, bp++)
+            png_uint_16 v;
+            int j;
+            int c = (int)(i%channels);
+
+            v = *bp;
+            *bp = 0;
+            for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
             {
-               png_uint_16 v;
-               int j;
-
-               v = *bp;
-               *bp = 0;
-               for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
-               {
-                  if (j > 0)
-                     *bp |= (png_byte)((v << j) & 0xff);
-                  else
-                     *bp |= (png_byte)((v >> (-j)) & 0xff);
-               }
+               if (j > 0)
+                  *bp |= (png_byte)((v << j) & 0xff);
+               else
+                  *bp |= (png_byte)((v >> (-j)) & 0xff);
             }
          }
       }
@@ -308,29 +304,25 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       {
          png_bytep bp;
          png_uint_32 i;
-         png_uint_32 row_width = row_info->width;
+         png_uint_32 istop = channels * row_info->width;
 
-         for (bp = row, i = 0; i < row_width; i++)
+         for (bp = row, i = 0; i < istop; i++)
          {
-            int c;
+            int c = (int)(i%channels);
+            png_uint_16 value, v;
+            int j;
 
-            for (c = 0; c < channels; c++, bp += 2)
+            v = ((png_uint_16)(*bp) << 8) + *(bp + 1);
+            value = 0;
+            for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
             {
-               png_uint_16 value, v;
-               int j;
-
-               v = ((png_uint_16)(*bp) << 8) + *(bp + 1);
-               value = 0;
-               for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
-               {
-                  if (j > 0)
-                     value |= (png_uint_16)((v << j) & (png_uint_16)0xffff);
-                  else
-                     value |= (png_uint_16)((v >> (-j)) & (png_uint_16)0xffff);
-               }
-               *bp = (png_byte)(value >> 8);
-               *(bp + 1) = (png_byte)(value & 0xff);
+               if (j > 0)
+                  value |= (png_uint_16)((v << j) & (png_uint_16)0xffff);
+               else
+                  value |= (png_uint_16)((v >> (-j)) & (png_uint_16)0xffff);
             }
+            *bp++ = (png_byte)(value >> 8);
+            *bp++ = (png_byte)(value & 0xff);
          }
       }
    }

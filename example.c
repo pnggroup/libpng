@@ -83,7 +83,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     * was compiled with a compatible version of the library.  REQUIRED
     */
    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-      (void *)user_error_ptr, user_error_fn, user_warning_fn);
+      png_voidp user_error_ptr, user_error_fn, user_warning_fn);
 
    if (png_ptr == NULL)
    {
@@ -362,7 +362,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
     * linked libraries.
     */
    *png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-       (void *)user_error_ptr, user_error_fn, user_warning_fn);
+       png_voidp user_error_ptr, user_error_fn, user_warning_fn);
 
    if (*png_ptr == NULL)
    {
@@ -498,7 +498,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * in case we are using dynamically linked libraries.  REQUIRED.
     */
    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-      (void *)user_error_ptr, user_error_fn, user_warning_fn);
+      png_voidp user_error_ptr, user_error_fn, user_warning_fn);
 
    if (png_ptr == NULL)
    {

@@ -1,7 +1,9 @@
 TODO - list of things to do for libpng
 
 fix problem with C++ and EXTERN "C"
+add capability to set user malloc/free functions at run time
 add "grayscale->palette" transformation and "palette->grayscale" detection
+color to gray transformation
 improved dithering
 multi-lingual error and warning message support
 sPLT chunk handling

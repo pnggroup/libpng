@@ -1,14 +1,14 @@
 
-Libpng 1.0.1b May 2, 1998
+Libpng 1.0.1c May 9, 1998
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
 
 Changes since the last public release:
 
-libpng-1.0.1a:
+version 1.0.1a [April 21, 1998]
   Optimized Paeth calculations by replacing abs() function calls with intrinsics
-  plus other loop optimizations. Improves avg decoding speed by about 20 percent.
+  plus other loop optimizations. Improves avg decoding speed by about 20%.
   Commented out i386istic "align" compiler flags in makefile.lnx.
   Reduced the default warning level in some makefiles, to make them consistent.
   Removed references to IJG and JPEG in the ansi2knr.c copyright statement.
@@ -20,7 +20,8 @@ libpng-1.0.1a:
   Moved a misplaced pngrutil code block that truncates tRNS if it has more
     than num_palette entries -- test was done before num_palette was defined.
   Fixed a png_convert_to_rfc1123() bug that converts day 31 to 0 (Steve Eddins).
-libpng-1.0.1b:
+  Changed compiler flags in makefile.wat for better optimization (Pawel Mrochen).
+version 1.0.1b [May 2, 1998]
   Relocated png_do_gray_to_rgb() within png_do_read_transformations() (Greg).
   Relocated the png_composite macros from pngrtran.c to png.h (Greg).
   Added makefile.sco (contributed by Mike Hopkirk).
@@ -29,6 +30,18 @@ libpng-1.0.1b:
   More work on the Paeth-filtering, achieving imperceptible speedup (A Kleinert).
   More work on loop optimization which may help when compiled with C++ compilers.
   Added warnings when people try to use transforms they've defined out.
+  Collapsed 4 "i" and "c" loops into single "i" loops in pngrtran and pngwtran.
+  Revised paragraph about png_set_expand() in libpng.txt and libpng.3 (Greg)
+version 1.0.1c [May 9, 1998]
+  Fixed a bug in pngrtran.c (introduced in libpng-1.0.1a) where the masks for
+    filler bytes should have been 0xff instead of 0xf.
+  Added max_pixel_depth=32 in pngrutil.c when using FILLER with palette images.
+  Moved PNG_WRIGHT_WEIGHTED_FILTER_SUPPORTED and PNG_WRITE_FLUSH_SUPPORTED
+    out of the PNG_WRITE_TRANSFORMS_NOT_SUPPORTED block of pngconf.h
+  Added "PNG_NO_WRITE_TRANSFORMS" etc., as alternatives for *_NOT_SUPPORTED,
+    for consistency, in pngconf.h
+  Added individual "ifndef PNG_NO_CAPABILITY" for the capabilities in pngconf.h
+    to make it easier to remove unwanted capabilities via the compile line
 
 Send comments/corrections/commendations to
 png-implement@dworkin.wustl.edu or to randeg@alumni.rpi.edu

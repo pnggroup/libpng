@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.1b
+ * 1.0.1c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 2, 1998
+ * May 9, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -17,7 +17,7 @@
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
 png_structp
-png_create_read_struct(png_const_charp user_png_ver, voidp error_ptr,
+png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn)
 {
    png_structp png_ptr;
@@ -82,7 +82,7 @@ png_create_read_struct(png_const_charp user_png_ver, voidp error_ptr,
 }
 
 /* Initialize PNG structure for reading, and allocate any memory needed.
-   This interface is depreciated in favour of the png_create_read_struct(),
+   This interface is deprecated in favour of the png_create_read_struct(),
    and it will eventually disappear. */
 void
 png_read_init(png_structp png_ptr)

@@ -310,3 +310,15 @@ version 1.0.1b [May 2, 1998]
   More work on the Paeth-filtering, achieving imperceptible speedup (A Kleinert).
   More work on loop optimization which may help when compiled with C++ compilers.
   Added warnings when people try to use transforms they've defined out.
+  Collapsed 4 "i" and "c" loops into single "i" loops in pngrtran and pngwtran.
+  Revised paragraph about png_set_expand() in libpng.txt and libpng.3 (Greg)
+version 1.0.1c [May 9, 1998]
+  Fixed a bug in pngrtran.c (introduced in libpng-1.0.1a) where the masks for
+    filler bytes should have been 0xff instead of 0xf.
+  Added max_pixel_depth=32 in pngrutil.c when using FILLER with palette images.
+  Moved PNG_WRIGHT_WEIGHTED_FILTER_SUPPORTED and PNG_WRITE_FLUSH_SUPPORTED
+    out of the PNG_WRITE_TRANSFORMS_NOT_SUPPORTED block of pngconf.h
+  Added "PNG_NO_WRITE_TRANSFORMS" etc., as alternatives for *_NOT_SUPPORTED,
+    for consistency, in pngconf.h
+  Added individual "ifndef PNG_NO_[CAPABILITY]" in pngconf.h to make it easier
+    to remove unwanted capabilities via the compile line

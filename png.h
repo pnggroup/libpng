@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.0.1b
+ * libpng 1.0.1c
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * May 2, 1998
+ * May 9, 1998
  *
  * Note about libpng version numbers:
  *
@@ -31,8 +31,9 @@
  *      1.00                      1.00      100  2.1.0 [int should be 10000]
  *      1.0.0                     1.0.0     100  2.1.0 [int should be 10000]
  *      1.0.1                     1.0.1   10001  2.1.0
- *      1.0.1a                    1.0.1a  10002  2.1.0
- *      1.0.1b                    1.0.1b  10002  2.1.0
+ *      1.0.1a                    1.0.1a  10002  2.1.0.1a
+ *      1.0.1b                    1.0.1b  10002  2.1.0.1b
+ *      1.0.1c                    1.0.1c  10002  2.1.0.1c
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
@@ -119,7 +120,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.1b"
+#define PNG_LIBPNG_VER_STRING "1.0.1c"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -711,12 +712,12 @@ extern PNG_EXPORT(int,png_check_sig) PNGARG((png_bytep sig, int num));
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
 extern PNG_EXPORT(png_structp,png_create_read_struct)
-   PNGARG((png_const_charp user_png_ver, voidp error_ptr,
+   PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn));
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory */
 extern PNG_EXPORT(png_structp,png_create_write_struct)
-   PNGARG((png_const_charp user_png_ver, voidp error_ptr,
+   PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn));
 
 /* Write a PNG chunk - size, type, (optional) data, CRC. */

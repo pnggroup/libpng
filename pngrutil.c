@@ -1,12 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * 1.0.1b
+ * 1.0.1c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 2, 1998
+ * May 9, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -73,7 +73,7 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
    png_size_t i;
    png_size_t istop = png_ptr->zbuf_size;
 
-   for (i = skip; i > istop; i -= istop)
+   for (i = (png_size_t)skip; i > istop; i -= istop)
    {
       png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
    }
@@ -2225,7 +2225,7 @@ void
 png_read_start_row(png_structp png_ptr)
 {
    int max_pixel_depth;
-   png_uint_32 rowbytes;
+   png_uint_32 row_bytes;
 
    png_debug(1, "in png_read_start_row\n");
    png_ptr->zstream.avail_in = 0;
@@ -2243,10 +2243,10 @@ png_read_start_row(png_structp png_ptr)
          png_pass_start[png_ptr->pass]) /
          png_pass_inc[png_ptr->pass];
 
-         rowbytes = ((png_ptr->iwidth *
+         row_bytes = ((png_ptr->iwidth *
             (png_uint_32)png_ptr->pixel_depth + 7) >> 3) +1;
-         png_ptr->irowbytes = (png_size_t)rowbytes;
-         if((png_uint_32)png_ptr->irowbytes != rowbytes)
+         png_ptr->irowbytes = (png_size_t)row_bytes;
+         if((png_uint_32)png_ptr->irowbytes != row_bytes)
             png_error(png_ptr, "Rowbytes overflow in png_read_start_row");
    }
    else
@@ -2293,7 +2293,9 @@ png_read_start_row(png_structp png_ptr)
 #if defined(PNG_READ_FILLER_SUPPORTED)
    if (png_ptr->transformations & (PNG_FILLER))
    {
-      if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY)
+      if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+         max_pixel_depth = 32;
+      else if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY)
       {
          if (max_pixel_depth <= 8)
             max_pixel_depth = 16;
@@ -2333,16 +2335,16 @@ png_read_start_row(png_structp png_ptr)
 
    /* align the width on the next larger 8 pixels.  Mainly used
       for interlacing */
-   rowbytes = ((png_ptr->width + 7) & ~((png_uint_32)7));
+   row_bytes = ((png_ptr->width + 7) & ~((png_uint_32)7));
    /* calculate the maximum bytes needed, adding a byte and a pixel
       for safety's sake */
-   rowbytes = ((rowbytes * (png_uint_32)max_pixel_depth + 7) >> 3) +
+   row_bytes = ((row_bytes * (png_uint_32)max_pixel_depth + 7) >> 3) +
       1 + ((max_pixel_depth + 7) >> 3);
 #ifdef PNG_MAX_MALLOC_64K
-   if (rowbytes > (png_uint_32)65536L)
+   if (row_bytes > (png_uint_32)65536L)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
-   png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, rowbytes);
+   png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, row_bytes);
 
 #ifdef PNG_MAX_MALLOC_64K
    if ((png_uint_32)png_ptr->rowbytes + 1 > (png_uint_32)65536L)

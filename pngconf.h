@@ -1,12 +1,12 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.1b
+ * libpng 1.0.1c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 2, 1998
+ * May 9, 1998
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -237,72 +237,139 @@ __dont__ include it again
 /* Any transformations you will not be using can be undef'ed here */
 
 /* GR-P, 0.96a: Set "*TRANSFORMS_SUPPORTED as default but allow user
-   to turn it off with "*TRANSFORMS_NOT_SUPPORTED" on the compile line,
-   then pick and choose which ones to define without having to edit
-   this file. It is safe to use the *TRANSFORMS_NOT_SUPPORTED if you
-   only want to have a png-compliant reader/writer but don't need
+   to turn it off with "*TRANSFORMS_NOT_SUPPORTED" or *PNG_NO_*_TRANSFORMS
+   on the compile line, then pick and choose which ones to define without
+   having to edit this file. It is safe to use the *TRANSFORMS_NOT_SUPPORTED
+   if you only want to have a png-compliant reader/writer but don't need
    any of the extra transformations.  This saves about 80 kbytes in a
-   typical installation of the library.
+   typical installation of the library. (PNG_NO_* form added in version
+   1.0.1c, for consistency)
  */
 
 
-#ifndef PNG_READ_TRANSFORMS_NOT_SUPPORTED
+#if !defined(PNG_READ_TRANSFORMS_NOT_SUPPORTED) && \
+    !defined(PNG_NO_READ_TRANSFORMS)
 #define PNG_READ_TRANSFORMS_SUPPORTED
 #endif
-#ifndef PNG_WRITE_TRANSFORMS_NOT_SUPPORTED
+#if !defined(PNG_WRITE_TRANSFORMS_NOT_SUPPORTED) && \
+    !defined(PNG_NO_WRITE_TRANSFORMS)
 #define PNG_WRITE_TRANSFORMS_SUPPORTED
 #endif
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
+#ifndef PNG_NO_READ_EXPAND
 #define PNG_READ_EXPAND_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_SHIFT
 #define PNG_READ_SHIFT_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_PACK
 #define PNG_READ_PACK_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_BGR
 #define PNG_READ_BGR_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_SWAP
 #define PNG_READ_SWAP_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_PACKSWAP
 #define PNG_READ_PACKSWAP_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_INVERT
 #define PNG_READ_INVERT_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_DITHER
 #define PNG_READ_DITHER_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_BACKGROUND
 #define PNG_READ_BACKGROUND_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_16_TO_8
 #define PNG_READ_16_TO_8_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_FILLER
 #define PNG_READ_FILLER_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_GAMMA
 #define PNG_READ_GAMMA_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_GRAY_TO_RGB
 #define PNG_READ_GRAY_TO_RGB_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_SWAP_ALPHA
 #define PNG_READ_SWAP_ALPHA_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_INVERT_ALPHA
 #define PNG_READ_INVERT_ALPHA_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_STRIP_ALPHA
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_USER_TRANSFORM
 #define PNG_READ_USER_TRANSFORM_SUPPORTED
+#endif
 /* the following aren't implemented yet
 #define PNG_READ_RGB_TO_GRAY_SUPPORTED
  */
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
-#ifndef PNG_PROGRESSIVE_READ_NOT_SUPPORTED   /* if you don't do progressive   */
+#if !defined(PNG_NO_PROGRESSIVE_READ) && \
+ !defined(PNG_PROGRESSIVE_READ_NOT_SUPPORTED) /* if you don't do progressive   */
 #define PNG_PROGRESSIVE_READ_SUPPORTED       /* reading.  This is not talking */
 #endif                               /* about interlacing capability!  You'll */
               /* still have interlacing unless you change the following line: */
 #define PNG_READ_INTERLACING_SUPPORTED /* required for PNG-compliant decoders */
+
+#ifndef PNG_NO_READ_COMPOSITED_NODIV
 #define PNG_READ_COMPOSITE_NODIV_SUPPORTED    /* well tested on Intel and SGI */
+#endif
 
 #ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
+#ifndef PNG_NO_WRITE_SHIFT
 #define PNG_WRITE_SHIFT_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_PACK
 #define PNG_WRITE_PACK_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_BGR
 #define PNG_WRITE_BGR_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_SWAP
 #define PNG_WRITE_SWAP_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_PACKSWAP
 #define PNG_WRITE_PACKSWAP_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_INVERT
 #define PNG_WRITE_INVERT_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_FILLER
 #define PNG_WRITE_FILLER_SUPPORTED  /* This is the same as WRITE_STRIP_ALPHA */
-#define PNG_WRITE_FLUSH_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_SWAP_ALPHA
 #define PNG_WRITE_SWAP_ALPHA_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_INVERT_ALPHA
 #define PNG_WRITE_INVERT_ALPHA_SUPPORTED
-#define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+#endif
+#ifndef PNG_NO_WRITE_USER_TRANSFORM
 #define PNG_WRITE_USER_TRANSFORM_SUPPORTED
+#endif
 #endif /* PNG_WRITE_TRANSFORMS_SUPPORTED */
 
 #define PNG_WRITE_INTERLACING_SUPPORTED  /* not required for PNG-compliant
                                             encoders, but can cause trouble
                                             if left undefined */
 
-#if !defined(PNG_NO_STDIO)
+#ifndef PNG_NO_WRITE_WEIGHTED_FILTER
+#define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+#endif
+
+#ifndef PNG_NO_WRITE_FLUSH
+#define PNG_WRITE_FLUSH_SUPPORTED
+#endif
+
+#ifndef PNG_NO_STDIO
 #define PNG_TIME_RFC1123_SUPPORTED
 #endif
 
@@ -322,7 +389,7 @@ __dont__ include it again
  * png_get_x_offset_microns()
  * png_get_y_offset_microns()
  */
-#if !defined(PNG_NO_EASY_ACCESS)
+#ifndef PNG_NO_EASY_ACCESS
 #define PNG_EASY_ACCESS_SUPPORTED
 #endif
 
@@ -351,45 +418,100 @@ __dont__ include it again
  * a bit smaller.
  */
 
-#ifndef PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED
+#if !defined(PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED) && \
+    !defined(PNG_NO_READ_ANCILLARY_CHUNKS)
 #define PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
 #endif
-#ifndef PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED
+#if !defined(PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED) && \
+    !defined(PNG_NO_WRITE_ANCILLARY_CHUNKS)
 #define PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
 #endif
 
 #ifdef PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
+#ifndef PNG_NO_PNG_READ_bKGD
 #define PNG_READ_bKGD_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_cHRM
 #define PNG_READ_cHRM_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_gAMA
 #define PNG_READ_gAMA_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_hIST
 #define PNG_READ_hIST_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_oFFs
 #define PNG_READ_oFFs_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_pCAL
 #define PNG_READ_pCAL_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_pHYs
 #define PNG_READ_pHYs_SUPPORTED
+#endif
+#ifndef PNG_NO_READ_sBIT
 #define PNG_READ_sBIT_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_sRGB
 #define PNG_READ_sRGB_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_tEXt
 #define PNG_READ_tEXt_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_tIME
 #define PNG_READ_tIME_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_tRNS
 #define PNG_READ_tRNS_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_zTXt
 #define PNG_READ_zTXt_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_READ_OPT_PLTE
 #define PNG_READ_OPT_PLTE_SUPPORTED /* only affects support of the optional */
-                                    /* PLTE chunk in RGB and RGBA images */
+#endif                              /* PLTE chunk in RGB and RGBA images */
 #endif /* PNG_READ_ANCILLARY_CHUNKS_SUPPORTED */
 
 #ifdef PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
+#ifndef PNG_NO_PNG_WRITE_bKGD
 #define PNG_WRITE_bKGD_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_cHRM
 #define PNG_WRITE_cHRM_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_gAMA
 #define PNG_WRITE_gAMA_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_hIST
 #define PNG_WRITE_hIST_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_oFFs
 #define PNG_WRITE_oFFs_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_pCAL
 #define PNG_WRITE_pCAL_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_pHYs
 #define PNG_WRITE_pHYs_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_sBIT
 #define PNG_WRITE_sBIT_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_sRGB
 #define PNG_WRITE_sRGB_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_tEXt
 #define PNG_WRITE_tEXt_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_tIME
 #define PNG_WRITE_tIME_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_tRNS
 #define PNG_WRITE_tRNS_SUPPORTED
+#endif
+#ifndef PNG_NO_PNG_WRITE_zTXt
 #define PNG_WRITE_zTXt_SUPPORTED
+#endif
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
 
 /* need the time information for reading tIME chunks */

@@ -1,12 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.1b
+ * 1.0.1c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 2, 1998
+ * May 9, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -576,13 +576,16 @@ png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
 void
 png_init_read_transformations(png_structp png_ptr)
 {
-   int color_type = png_ptr->color_type;
+#if defined(PNG_USELESS_TESTS_SUPPORTED)
+   if(png_ptr == NULL) return;
+#endif
 
    png_debug(1, "in png_init_read_transformations\n");
 
 #if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
    if (png_ptr->transformations & PNG_BACKGROUND_EXPAND)
    {
+      int color_type = png_ptr->color_type;
       if (!(color_type & PNG_COLOR_MASK_COLOR))  /* i.e., GRAY or GRAY_ALPHA */
       {
          /* expand background chunk. */
@@ -1322,10 +1325,10 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
             png_uint_32 i;
             png_uint_32 istop = row_info->rowbytes;
 
-            for (bp = row, i = 0; i < istop; i++, bp++)
+            for (bp = row, i = 0; i < istop; i++)
             {
                *bp >>= 1;
-               *bp &= 0x55;
+               *bp++ &= 0x55;
             }
             break;
          }
@@ -1337,43 +1340,37 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
             png_byte mask = (png_byte)(((int)0xf0 >> shift[0]) & (int)0xf0) |
                (png_byte)((int)0xf >> shift[0]);
 
-            for (bp = row, i = 0; i < istop; i++, bp++)
+            for (bp = row, i = 0; i < istop; i++)
             {
                *bp >>= shift[0];
-               *bp &= mask;
+               *bp++ &= mask;
             }
             break;
          }
          case 8:
          {
-            png_bytep bp;
+            png_bytep bp = row;
             png_uint_32 i;
-            int cstop=(int)row_info->channels;
+            png_uint_32 istop = row_width * channels;
 
-            for (bp = row, i = 0; i < row_width; i++)
+            for (i = 0; i < istop; i++)
             {
-               for (c = 0; c < cstop; c++, bp++)
-               {
-                  *bp >>= shift[c];
-               }
+               *bp++ >>= shift[i%channels];
             }
             break;
          }
          case 16:
          {
-            png_bytep bp;
-            png_size_t i;
-            int cstop=(int)row_info->channels;
+            png_bytep bp = row;
+            png_uint_32 i;
+            png_uint_32 istop = channels * row_width;
 
-            for (bp = row, i = 0; i < row_width; i++)
+            for (i = 0; i < istop; i++)
             {
-               for (c = 0; c < cstop; c++, bp += 2)
-               {
-                  value = (png_uint_16)((*bp << 8) + *(bp + 1));
-                  value >>= shift[c];
-                  *bp = (png_byte)(value >> 8);
-                  *(bp + 1) = (png_byte)(value & 0xff);
-               }
+               value = (png_uint_16)((*bp << 8) + *(bp + 1));
+               value >>= shift[i%channels];
+               *bp++ = (png_byte)(value >> 8);
+               *bp++ = (png_byte)(value & 0xff);
             }
             break;
          }
@@ -1620,8 +1617,8 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
    png_uint_32 i;
    png_uint_32 row_width = row_info->width;
 
-   png_byte hi_filler = (png_byte)((filler>>8) & 0xf);
-   png_byte low_filler = (png_byte)(filler & 0xf);
+   png_byte hi_filler = (png_byte)((filler>>8) & 0xff);
+   png_byte low_filler = (png_byte)(filler & 0xff);
 
    png_debug(1, "in png_do_read_filler\n");
    if (

@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * 1.0.1b
+ * 1.0.1c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 2, 1998
+ * May 9, 1998
  */
 
 #define PNG_INTERNAL
@@ -1432,7 +1432,6 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_bytep rp;
       png_uint_32 sum = 0;
       png_uint_32 i;
-      int j;
       int v;
 
       for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
@@ -1445,6 +1444,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          png_uint_32 sumhi, sumlo;
+         int j;
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK; /* Gives us some footroom */
 
@@ -1484,7 +1484,6 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    {
       png_bytep rp, lp, dp;
       png_uint_32 i;
-      int j;
       for (i = 0, rp = row_buf + 1, dp = png_ptr->sub_row + 1; i < bpp;
            i++, rp++, dp++)
       {
@@ -1503,7 +1502,6 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_bytep rp, dp, lp;
       png_uint_32 sum = 0, lmins = mins;
       png_uint_32 i;
-      int j;
       int v;
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
@@ -1513,6 +1511,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
        */
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
+         int j;
          png_uint_32 lmhi, lmlo;
          lmlo = lmins & PNG_LOMASK;
          lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
@@ -1561,6 +1560,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
+         int j;
          png_uint_32 sumhi, sumlo;
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK;
@@ -1615,13 +1615,13 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_bytep rp, dp, pp;
       png_uint_32 sum = 0, lmins = mins;
       png_uint_32 i;
-      int j;
       int v;
 
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
+         int j;
          png_uint_32 lmhi, lmlo;
          lmlo = lmins & PNG_LOMASK;
          lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
@@ -1663,6 +1663,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
+         int j;
          png_uint_32 sumhi, sumlo;
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK;
@@ -1720,12 +1721,12 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_bytep rp, dp, pp, lp;
       png_uint_32 sum = 0, lmins = mins;
       png_uint_32 i;
-      int j;
       int v;
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
+         int j;
          png_uint_32 lmhi, lmlo;
          lmlo = lmins & PNG_LOMASK;
          lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
@@ -1774,6 +1775,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
+         int j;
          png_uint_32 sumhi, sumlo;
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK;
@@ -1852,12 +1854,12 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_bytep rp, dp, pp, cp, lp;
       png_uint_32 sum = 0, lmins = mins;
       png_uint_32 i;
-      int j;
       int v;
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
+         int j;
          png_uint_32 lmhi, lmlo;
          lmlo = lmins & PNG_LOMASK;
          lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
@@ -1938,6 +1940,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
+         int j;
          png_uint_32 sumhi, sumlo;
          sumlo = sum & PNG_LOMASK;
          sumhi = (sum >> PNG_HISHIFT) & PNG_HIMASK;

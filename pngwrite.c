@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.1b
+ * 1.0.1c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 2, 1998
+ * May 9, 1998
  */
 
 /* get internal access to png.h */
@@ -281,7 +281,7 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
 
 /* Initialize png_ptr structure, and allocate any memory needed */
 png_structp
-png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
+png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn)
 {
    png_structp png_ptr;
