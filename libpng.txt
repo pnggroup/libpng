@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.7beta2 - August 29, 2004
+ libpng version 1.2.7rc1 - September 4, 2004
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp@users.sourceforge.net>
  Copyright (c) 1998-2004 Glenn Randers-Pehrson
@@ -767,14 +767,14 @@ unless the library has been told to transform it into another format.
 For example, 4 bit/pixel paletted or grayscale data will be returned
 2 pixels/byte with the leftmost pixel in the high-order bits of the
 byte, unless png_set_packing() is called.  8-bit RGB data will be stored
-in RGB RGB RGB format unless png_set_filler() is called to insert filler
-bytes, either before or after each RGB triplet.  16-bit RGB data will
-be returned RRGGBB RRGGBB, with the most significant byte of the color
-value first, unless png_set_strip_16() is called to transform it to
-regular RGB RGB triplets, or png_set_filler() is called to insert
-filler bytes, either before or after each RRGGBB triplet.  Similarly,
-8-bit or 16-bit grayscale data can be modified with png_set_filler()
-or png_set_strip_16().
+in RGB RGB RGB format unless png_set_filler() or png_set_add_alpha()
+is called to insert filler bytes, either before or after each RGB triplet.
+16-bit RGB data will be returned RRGGBB RRGGBB, with the most significant
+byte of the color value first, unless png_set_strip_16() is called to
+transform it to regular RGB RGB triplets, or png_set_filler|add alpha()
+is called to insert filler bytes, either before or after each RRGGBB
+triplet.  Similarly, 8-bit or 16-bit grayscale data can be modified with
+png_set_filler(), png_set_add_alpha(), or png_set_strip_16().
 
 The following code transforms grayscale images of less than 8 to 8 bits,
 changes paletted images to RGB, and adds a full alpha channel if there is
@@ -858,6 +858,16 @@ you want the filler before the RGB or after.  This transformation
 does not affect images that already have full alpha channels.  To add an
 opaque alpha channel, use filler=0xff or 0xffff and PNG_FILLER_AFTER which
 will generate RGBA pixels.
+
+Note that png_set_filler() does not change the color type.  If you want
+to do that, you can add a true alpha channel with
+
+    if (color_type == PNG_COLOR_TYPE_RGB ||
+           color_type == PNG_COLOR_TYPE_GRAY)
+    png_set_add_alpha(png_ptr, filler, PNG_FILLER_AFTER);
+
+where "filler" contains the alpha value to assign to each pixel.
+This function became available in libpng-1.2.7.
 
 If you are reading an image with an alpha channel, and you need the
 data as ARGB instead of the normal PNG format RGBA:
@@ -2893,13 +2903,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-August 29, 2004
+September 4, 2004
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.7beta2 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.7rc1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

@@ -1,5 +1,5 @@
 
-Libpng 1.2.7beta2 - August 29, 2004
+Libpng 1.2.7rc1 - September 4, 2004
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -14,11 +14,13 @@ version 1.2.7beta1 [August 26, 2004]
     PNG Spec (second edition) and the PNG ISO/IEC Standard.
   Added "test-dd" target in 15 makefiles, to run pngtest in DESTDIR.
   Fixed bug with "optimized window size" in the IDAT datastream.
-version 1.2.7beta1 [August 29, 2004]
+version 1.2.7beta1 [August 28, 2004]
   Fixed bug with sCAL chunk and big-endian machines (David Munro).
   Undid new code added in 1.2.6rc2 to update the color_type in
     png_set_filler().
   Added png_set_add_alpha() that updates color type.
+version 1.0.17rc1 and 1.2.7rc1 [September 4, 2004]
+  Revised png_set_strip_filler() to not remove alpha if color_type has alpha.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu (subscription required; write to
