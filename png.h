@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 0.99a beta
- * For conditions of distribution and use, see copyright notice in png.h
+ * libpng 0.99c beta
+ * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  *
  * Note about libpng version numbers:
  *
@@ -28,6 +28,8 @@
  *      0.98                      0.98      2.0.98
  *      0.99                      0.99      2.0.99
  *      0.99a                     0.99      2.0.99
+ *      0.99b                     0.99      2.0.99
+ *      0.99c                     0.99      2.0.99
  *      1.0                       1.00      2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
@@ -47,12 +49,12 @@
  *
  * See libpng.txt for more information.  The PNG specification is available
  * as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
- * and as a W3C Recommendation <http://www.w3.org/pub/WWW/TR/REC.png.html>
+ * and as a W3C Recommendation <http://www.w3.org/TR/REC.png.html>
  *
  * Contributing Authors:
  *    John Bowler
- *    Sam Bushell
  *    Kevin Bracey
+ *    Sam Bushell
  *    Andreas Dilger
  *    Magnus Holmgren
  *    Tom Lane
@@ -69,6 +71,8 @@
  * possible without all of you.
  *
  * Thanks to Frank J. T. Wojcik for helping with the documentation.
+ *
+ * COPYRIGHT NOTICE:
  *
  * The PNG Reference Library is supplied "AS IS".  The Contributing Authors
  * and Group 42, Inc. disclaim all warranties, expressed or implied,
@@ -247,7 +251,7 @@ typedef struct png_info_struct
    png_uint_32 width;       /* width of image in pixels (from IHDR) */
    png_uint_32 height;      /* height of image in pixels (from IHDR) */
    png_uint_32 valid;       /* valid chunk data (see PNG_INFO_ below) */
-   png_size_t rowbytes;     /* bytes needed to hold an untransformed row */
+   png_uint_32 rowbytes;    /* bytes needed to hold an untransformed row */
    png_colorp palette;      /* array of color values (valid & PNG_INFO_PLTE) */
    png_uint_16 num_palette; /* number of color entries in "palette" (PLTE) */
    png_uint_16 num_trans;   /* number of transparent palette color (tRNS) */
@@ -481,7 +485,7 @@ typedef png_info FAR * FAR * png_infopp;
 typedef struct png_row_info_struct
 {
    png_uint_32 width; /* width of row */
-   png_size_t rowbytes; /* number of bytes in row */
+   png_uint_32 rowbytes; /* number of bytes in row */
    png_byte color_type; /* color type of row */
    png_byte bit_depth; /* bit depth of row */
    png_byte channels; /* number of channels (1, 2, 3, or 4) */
@@ -544,8 +548,8 @@ struct png_struct_def
    png_uint_32 height;        /* height of image in pixels */
    png_uint_32 num_rows;      /* number of rows in current pass */
    png_uint_32 usr_width;     /* width of row at start of write */
-   png_size_t rowbytes;       /* size of row in bytes */
-   png_size_t irowbytes;      /* size of current interlaced row in bytes */
+   png_uint_32 rowbytes;      /* size of row in bytes */
+   png_uint_32 irowbytes;     /* size of current interlaced row in bytes */
    png_uint_32 iwidth;        /* width of current interlaced row in pixels */
    png_uint_32 row_number;    /* current row in interlace pass */
    png_bytep prev_row;        /* buffer to save previous (unfiltered) row */
@@ -1105,6 +1109,12 @@ extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
 /* frees a pointer allocated by png_malloc() */
 extern PNG_EXPORT(void,png_free) PNGARG((png_structp png_ptr, png_voidp ptr));
 
+extern PNG_EXPORT(void,png_buffered_memcpy) PNGARG((png_structp png_ptr,
+   png_voidp s1, png_voidp s2, png_uint_32 size));
+
+extern PNG_EXPORT(void,png_buffered_memset) PNGARG((png_structp png_ptr,
+   png_voidp s1, int value, png_uint_32 size));
+
 #ifdef PNGTEST_MEMORY_DEBUG
 /* debugging versions of png_malloc() and png_free() */
 extern PNG_EXPORT(png_voidp,png_debug_malloc) PNGARG((png_structp png_ptr,
@@ -1434,10 +1444,10 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_GAMMA              0x2000
 #define PNG_GRAY_TO_RGB        0x4000
 #define PNG_FILLER             0x8000
-#define PNG_PACKSWAP          0x10000
-#define PNG_SWAP_ALPHA        0x20000
-#define PNG_STRIP_ALPHA       0x40000
-#define PNG_INVERT_ALPHA      0x80000
+#define PNG_PACKSWAP          0x10000L
+#define PNG_SWAP_ALPHA        0x20000L
+#define PNG_STRIP_ALPHA       0x40000L
+#define PNG_INVERT_ALPHA      0x80000L
 
 /* flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
@@ -1483,7 +1493,7 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
    abs((int)((c1).blue) - (int)((c2).blue)))
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
-#ifndef PNG_NO_EXTERN
+#if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
 /* place to hold the signature string for a PNG file. */
 extern png_byte FARDATA png_sig[8];
 
@@ -1677,7 +1687,7 @@ PNG_EXTERN void png_write_bKGD PNGARG((png_structp png_ptr,
 
 #if defined(PNG_WRITE_hIST_SUPPORTED)
 PNG_EXTERN void png_write_hIST PNGARG((png_structp png_ptr, png_uint_16p hist,
-   png_uint_32 num_hist));
+   int num_hist));
 #endif
 
 #if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)

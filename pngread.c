@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 0.99a
+ * libpng 0.99c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -17,7 +17,7 @@
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
 png_structp
-png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
+png_create_read_struct(png_const_charp user_png_ver, voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn)
 {
    png_structp png_ptr;
@@ -58,7 +58,8 @@ png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
+     (png_uint_32)png_ptr->zbuf_size);
    png_ptr->zstream.zalloc = png_zalloc;
    png_ptr->zstream.zfree = png_zfree;
    png_ptr->zstream.opaque = (voidpf)png_ptr;
@@ -100,7 +101,8 @@ png_read_init(png_structp png_ptr)
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
+     (png_uint_32)png_ptr->zbuf_size);
    png_ptr->zstream.zalloc = png_zalloc;
    png_ptr->zstream.zfree = png_zfree;
    png_ptr->zstream.opaque = (voidpf)png_ptr;
@@ -407,14 +409,17 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    png_ptr->row_info.channels = png_ptr->channels;
    png_ptr->row_info.bit_depth = png_ptr->bit_depth;
    png_ptr->row_info.pixel_depth = png_ptr->pixel_depth;
-   png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
-      (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
+   {
+      png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
+         (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
+   }
 
    png_read_filter_row(png_ptr, &(png_ptr->row_info),
       png_ptr->row_buf + 1, png_ptr->prev_row + 1,
       (int)(png_ptr->row_buf[0]));
 
-   png_memcpy(png_ptr->prev_row, png_ptr->row_buf, png_ptr->rowbytes + 1);
+   png_buffered_memcpy(png_ptr, png_ptr->prev_row, png_ptr->row_buf,
+      png_ptr->rowbytes + 1);
 
    if (png_ptr->transformations)
       png_do_read_transformations(png_ptr);

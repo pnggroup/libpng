@@ -5,7 +5,7 @@
 
 # ------------- Microsoft C 5.1 and later -------------
 MODEL=-AL
-CFLAGS=-Oait -Gs -nologo -W2 $(MODEL) -I..\zlib
+CFLAGS=-Oait -Gs -nologo -W3 $(MODEL) -I..\zlib
 #-Ox generates bad code with MSC 5.1
 CC=cl
 LD=link

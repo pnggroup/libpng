@@ -1,12 +1,12 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 0.99a
+ * libpng 0.99c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -284,7 +284,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size) {
       return (NULL);
    }
    if (size == 0)
-      return (NULL);
+      return (png_voidp)(NULL);
 
    /* This calls the library allocator twice, once to get the requested
       buffer and once to get a new free list entry. */
@@ -299,7 +299,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size) {
       pinformation = pinfo;
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
-      return ((png_voidp)pinfo->pointer);
+      return (png_voidp)(pinfo->pointer);
    }
 }
 
@@ -612,6 +612,7 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_debug(0, "\nWriting info struct\n");
    png_write_info(write_ptr, write_info_ptr);
 
+   png_debug(0, "\nAllocating row buffer \n");
    row_buf = (png_bytep)png_malloc(read_ptr, 
       png_get_rowbytes(read_ptr, read_info_ptr));
    if (row_buf == NULL)
@@ -623,12 +624,14 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       fclose(fpout);
       return (1);
    }
+   png_debug(0, "Writing row data\n");
 
    num_pass = png_set_interlace_handling(read_ptr);
    png_set_interlace_handling(write_ptr);
 
    for (pass = 0; pass < num_pass; pass++)
    {
+      png_debug1(0, "Writing row data for pass %d\n",pass);
       for (y = 0; y < height; y++)
       {
          png_read_rows(read_ptr, (png_bytepp)&row_buf, (png_bytepp)NULL, 1);
@@ -867,5 +870,5 @@ main(int argc, char *argv[])
       fprintf(STDERR, "libpng passes test\n");
    else
       fprintf(STDERR, "libpng FAILS test\n");
-   return ((int)(ierror != 0));
+   return (int)(ierror != 0);
 }

@@ -214,5 +214,14 @@ version 0.99 [January 30, 1998]
    define PNG_ALWAYS_EXTERN when __MWERKS__ && WIN32 are defined
    added type casting to all png_malloc() function calls
 version 0.99a [January 31, 1998]
-   added type casts and parentheses to all returns that return a value.(Tim W.)
-
+   Added type casts and parentheses to all returns that return a value.(Tim W.)
+version 0.99b [February 4, 1998]
+   Added type cast png_uint_32 on malloc function calls where needed.
+   Changed type of num_hist from png_uint_32 to int (same as num_palette).
+   Added checks for rowbytes overflow, in case png_size_t is less than 32 bits.
+   Renamed makefile.elf to makefile.lnx.
+version 0.99c [February 7, 1998]
+   More type casting.  Removed erroneous overflow test in pngmem.c.
+   Added png_buffered_memcpy() and png_buffered_memset(), apply them to rowbytes.
+   Added UNIX manual pages libpng.3, initially created by R. P. C. Rodgers,
+      U.S. National Library of Medicine (rodgers@nlm.nih.gov), and png.5.

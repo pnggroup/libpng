@@ -1,12 +1,12 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 0.99a
+ * libpng 0.99c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  *
  * The functions here are used during reads to store data from the file
  * into the info struct, and during writes to store application data
@@ -84,6 +84,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    int color_type, int interlace_type, int compression_type,
    int filter_type)
 {
+   int rowbytes_per_pixel;
    png_debug1(1, "in %s storage function\n", "IHDR");
    if (info_ptr == NULL)
       return;
@@ -104,7 +105,16 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
       info_ptr->channels++;
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels * info_ptr->bit_depth);
-   info_ptr->rowbytes = ((info_ptr->width * info_ptr->pixel_depth + 7) >> 3);
+
+   /* check for overflow */
+   rowbytes_per_pixel = (info_ptr->pixel_depth + 7) >> 3;
+   info_ptr->rowbytes = info_ptr->width * rowbytes_per_pixel;
+   if (( width > (png_uint_32)2147483647L/rowbytes_per_pixel))
+   {
+      png_warning(png_ptr,
+         "Width too large to process image data; rowbytes will overflow.");
+      info_ptr->rowbytes = (png_size_t)0;
+   }
 }
 
 #if defined(PNG_READ_oFFs_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
@@ -129,8 +139,8 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    png_charp purpose, png_int_32 X0, png_int_32 X1, int type, int nparams,
    png_charp units, png_charpp params)
 {
-   png_size_t length;
-   int i;
+   png_uint_32 length;
+   png_uint_32 i;
 
    png_debug1(1, "in %s storage function\n", "pCAL");
    if (info_ptr == NULL)
@@ -139,7 +149,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    length = png_strlen(purpose) + 1;
    png_debug1(3, "allocating purpose for info (%d bytes)\n", length);
    info_ptr->pcal_purpose = (png_charp)png_malloc(png_ptr, length);
-   png_memcpy(info_ptr->pcal_purpose, purpose, length);
+   png_memcpy(info_ptr->pcal_purpose, purpose, (png_size_t)length);
 
    png_debug(3, "storing X0, X1, type, and nparams in info\n");
    info_ptr->pcal_X0 = X0;
@@ -150,10 +160,10 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    length = png_strlen(units) + 1;
    png_debug1(3, "allocating units for info (%d bytes)\n", length);
    info_ptr->pcal_units = (png_charp)png_malloc(png_ptr, length);
-   png_memcpy(info_ptr->pcal_units, units, length);
+   png_memcpy(info_ptr->pcal_units, units, (png_size_t)length);
 
    info_ptr->pcal_params = (png_charpp)png_malloc(png_ptr,
-      (nparams + 1) * sizeof(png_charp));
+      (png_uint_32)((nparams + 1) * sizeof(png_charp)));
    info_ptr->pcal_params[nparams] = NULL;
 
    for (i = 0; i < nparams; i++)
@@ -161,7 +171,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
       length = png_strlen(params[i]) + 1;
       png_debug2(3, "allocating parameter %d for info (%d bytes)\n", i, length);
       info_ptr->pcal_params[i] = (png_charp)png_malloc(png_ptr, length);
-      png_memcpy(info_ptr->pcal_params[i], params[i], length);
+      png_memcpy(info_ptr->pcal_params[i], params[i], (png_size_t)length);
    }
 
    info_ptr->valid |= PNG_INFO_pCAL;
@@ -289,7 +299,8 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          old_text = info_ptr->text;
          info_ptr->text = (png_textp)png_malloc(png_ptr,
             info_ptr->max_text * sizeof (png_text));
-         png_memcpy(info_ptr->text, old_text, old_max * sizeof(png_text));
+         png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max *
+            sizeof(png_text)));
          png_free(png_ptr, old_text);
       }
       else
@@ -297,7 +308,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          info_ptr->max_text = num_text + 8;
          info_ptr->num_text = 0;
          info_ptr->text = (png_textp)png_malloc(png_ptr,
-            info_ptr->max_text * sizeof (png_text));
+            (png_uint_32)(info_ptr->max_text * sizeof (png_text)));
       }
       png_debug1(3, "allocated %d entries for info_ptr->text\n",
          info_ptr->max_text);

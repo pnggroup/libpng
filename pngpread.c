@@ -1,12 +1,12 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 0.99a
+ * libpng 0.99c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  */
 
 #define PNG_INTERNAL
@@ -466,7 +466,8 @@ png_push_save_buffer(png_structp png_ptr)
 
       new_max = png_ptr->save_buffer_size + png_ptr->current_buffer_size + 256;
       old_buffer = png_ptr->save_buffer;
-      png_ptr->save_buffer = (png_bytep)png_malloc(png_ptr, new_max);
+      png_ptr->save_buffer = (png_bytep)png_malloc(png_ptr, 
+         (png_uint_32)new_max);
       png_memcpy(png_ptr->save_buffer, old_buffer, png_ptr->save_buffer_size);
       png_free(png_ptr, old_buffer);
       png_ptr->save_buffer_max = new_max;
@@ -527,7 +528,12 @@ png_push_read_IDAT(png_structp png_ptr)
       png_size_t save_size;
 
       if (png_ptr->idat_size < (png_uint_32)png_ptr->save_buffer_size)
-         save_size = png_ptr->idat_size;
+      {
+         save_size = (png_size_t)png_ptr->idat_size;
+         /* check for overflow */
+         if((png_uint_32)save_size != png_ptr->idat_size)
+            png_error(png_ptr, "save_size overflowed in pngpread");
+      }
       else
          save_size = png_ptr->save_buffer_size;
 
@@ -544,7 +550,12 @@ png_push_read_IDAT(png_structp png_ptr)
       png_size_t save_size;
 
       if (png_ptr->idat_size < (png_uint_32)png_ptr->current_buffer_size)
-         save_size = png_ptr->idat_size;
+      {
+         save_size = (png_size_t)png_ptr->idat_size;
+         /* check for overflow */
+         if((png_uint_32)save_size != png_ptr->idat_size)
+            png_error(png_ptr, "save_size overflowed in pngpread");
+      }
       else
          save_size = png_ptr->current_buffer_size;
 
@@ -619,6 +630,7 @@ png_push_process_row(png_structp png_ptr)
    png_ptr->row_info.channels = png_ptr->channels;
    png_ptr->row_info.bit_depth = png_ptr->bit_depth;
    png_ptr->row_info.pixel_depth = png_ptr->pixel_depth;
+   
    png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
       (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
@@ -626,7 +638,8 @@ png_push_process_row(png_structp png_ptr)
       png_ptr->row_buf + 1, png_ptr->prev_row + 1,
       (int)(png_ptr->row_buf[0]));
 
-   png_memcpy(png_ptr->prev_row, png_ptr->row_buf, png_ptr->rowbytes + 1);
+   png_buffered_memcpy(png_ptr, png_ptr->prev_row, png_ptr->row_buf,
+      png_ptr->rowbytes + 1);
 
    if (png_ptr->transformations)
       png_do_read_transformations(png_ptr);
@@ -761,7 +774,8 @@ png_read_push_finish_row(png_structp png_ptr)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
-      png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+      png_buffered_memset(png_ptr, png_ptr->prev_row, 0,
+         (png_size_t)png_ptr->rowbytes + 1);
       do
       {
          png_ptr->pass++;
@@ -771,8 +785,7 @@ png_read_push_finish_row(png_structp png_ptr)
             png_pass_inc[png_ptr->pass] - 1 -
             png_pass_start[png_ptr->pass]) /
             png_pass_inc[png_ptr->pass];
-         png_ptr->irowbytes = ((png_ptr->iwidth *
-            png_ptr->pixel_depth + 7) >> 3) + 1;
+         png_ptr->irowbytes = ((png_ptr->pixel_depth + 7) >> 3) + 1;
          if (!(png_ptr->transformations & PNG_INTERLACE))
          {
             png_ptr->num_rows = (png_ptr->height +
@@ -806,11 +819,12 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
    }
 #endif
 
-   png_ptr->current_text = (png_charp)png_malloc(png_ptr, length+1);
+   png_ptr->current_text = (png_charp)png_malloc(png_ptr, 
+         (png_uint_32)(length+1));
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
-   png_ptr->current_text_size = length;
-   png_ptr->current_text_left = length;
+   png_ptr->current_text_size = (png_size_t)length;
+   png_ptr->current_text_left = (png_size_t)length;
    png_ptr->process_mode = PNG_READ_tEXt_MODE;
 }
 
@@ -857,7 +871,7 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
       if (text != key + png_ptr->current_text_size)
          text++;
 
-      text_ptr = (png_textp)png_malloc(png_ptr, sizeof(png_text));
+      text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
       text_ptr->compression = PNG_TEXT_COMPRESSION_NONE;
       text_ptr->key = key;
       text_ptr->text = text;
@@ -889,11 +903,12 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
    }
 #endif
 
-   png_ptr->current_text = (png_charp)png_malloc(png_ptr, length+1);
+   png_ptr->current_text = (png_charp)png_malloc(png_ptr,
+       (png_uint_32)(length+1));
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
-   png_ptr->current_text_size = length;
-   png_ptr->current_text_left = length;
+   png_ptr->current_text_size = (png_size_t)length;
+   png_ptr->current_text_left = (png_size_t)length;
    png_ptr->process_mode = PNG_READ_zTXt_MODE;
 }
 
@@ -978,8 +993,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
             if (text == NULL)
             {
                text = (png_charp)png_malloc(png_ptr,
-                  png_ptr->zbuf_size - png_ptr->zstream.avail_out +
-                     key_size + 1);
+                  (png_uint_32)(png_ptr->zbuf_size - png_ptr->zstream.avail_out +
+                     key_size + 1));
                png_memcpy(text + key_size, png_ptr->zbuf,
                   png_ptr->zbuf_size - png_ptr->zstream.avail_out);
                png_memcpy(text, key, key_size);
@@ -993,7 +1008,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 
                tmp = text;
                text = (png_charp)png_malloc(png_ptr, text_size +
-                  png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1);
+                  (png_uint_32)(png_ptr->zbuf_size - png_ptr->zstream.avail_out
+                   + 1));
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
                png_memcpy(text + text_size, png_ptr->zbuf,
@@ -1029,9 +1045,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
       png_free(png_ptr, key);
       key = text;
       text += key_size;
-      text_size -= key_size;
 
-      text_ptr = (png_textp)png_malloc(png_ptr, sizeof(png_text));
+      text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
       text_ptr->compression = PNG_TEXT_COMPRESSION_zTXt;
       text_ptr->key = key;
       text_ptr->text = text;

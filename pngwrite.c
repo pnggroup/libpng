@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 0.99a
+ * libpng 0.99c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  */
 
 /* get internal access to png.h */
@@ -77,7 +77,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
             info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
          {
             int j;
-            for (j=0; j<info_ptr->num_trans; j++)
+            for (j=0; j<(int)info_ptr->num_trans; j++)
                info_ptr->trans[j] = 255 - info_ptr->trans[j];
          }
 #endif
@@ -230,7 +230,8 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 
    if (png_ptr->time_buffer == NULL)
    {
-      png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, 29*sizeof(char));
+      png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, (png_uint_32)(29*
+         sizeof(char)));
    }
 
 #ifdef USE_FAR_KEYWORD
@@ -320,7 +321,8 @@ png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
+      (png_uint_32)png_ptr->zbuf_size);
 
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
@@ -351,7 +353,8 @@ png_write_init(png_structp png_ptr)
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
+      (png_uint_32)png_ptr->zbuf_size);
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
@@ -487,6 +490,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
    png_ptr->row_info.bit_depth = png_ptr->usr_bit_depth;
    png_ptr->row_info.pixel_depth = (png_byte)(png_ptr->row_info.bit_depth *
       png_ptr->row_info.channels);
+
    png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
       (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
@@ -498,7 +502,8 @@ png_write_row(png_structp png_ptr, png_bytep row)
    png_debug1(3, "row_info->rowbytes = %d\n", png_ptr->row_info.rowbytes);
 
    /* Copy user's row into buffer, leaving room for filter byte. */
-   png_memcpy(png_ptr->row_buf + 1, row, png_ptr->row_info.rowbytes);
+   png_buffered_memcpy(png_ptr, png_ptr->row_buf + 1, row,
+      png_ptr->row_info.rowbytes);
 
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)
    /* handle interlacing */
@@ -611,7 +616,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
       if (info_ptr->pcal_params != NULL)
       {
          int i;
-         for (i = 0; i < info_ptr->pcal_nparams; i++)
+         for (i = 0; i < (int)info_ptr->pcal_nparams; i++)
          {
             png_free(png_ptr, info_ptr->pcal_params[i]);
          }
@@ -714,7 +719,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
          if (png_ptr->do_filter & PNG_FILTER_SUB && png_ptr->sub_row == NULL)
          {
             png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
-               png_ptr->rowbytes + 1);
+              (png_ptr->rowbytes + 1));
             png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
          }
 
@@ -728,7 +733,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             else
             {
                png_ptr->up_row = (png_bytep)png_malloc(png_ptr,
-                  png_ptr->rowbytes + 1);
+                  (png_ptr->rowbytes + 1));
                png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
             }
          }
@@ -743,7 +748,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             else
             {
                png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
-                  png_ptr->rowbytes + 1);
+                  (png_ptr->rowbytes + 1));
                png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
             }
          }
@@ -759,7 +764,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             else
             {
                png_ptr->paeth_row = (png_bytep)png_malloc(png_ptr,
-                  png_ptr->rowbytes + 1);
+                  (png_ptr->rowbytes + 1));
                png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
             }
          }
@@ -815,7 +820,7 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
       if (png_ptr->prev_filters == NULL)
       {
          png_ptr->prev_filters = (png_bytep)png_malloc(png_ptr,
-            sizeof(png_byte) * num_weights);
+            (png_uint_32)(sizeof(png_byte) * num_weights));
 
          /* To make sure that the weighting starts out fairly */
          for (i = 0; i < num_weights; i++)
@@ -827,10 +832,10 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
       if (png_ptr->filter_weights == NULL)
       {
          png_ptr->filter_weights = (png_uint_16p)png_malloc(png_ptr,
-            sizeof(png_uint_16) * num_weights);
+            (png_uint_32)(sizeof(png_uint_16) * num_weights));
 
          png_ptr->inv_filter_weights = (png_uint_16p)png_malloc(png_ptr,
-            sizeof(png_uint_16) * num_weights);
+            (png_uint_32)(sizeof(png_uint_16) * num_weights));
 
          for (i = 0; i < num_weights; i++)
          {
@@ -862,10 +867,10 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
    if (png_ptr->filter_costs == NULL)
    {
       png_ptr->filter_costs = (png_uint_16p)png_malloc(png_ptr,
-         sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST);
+         (png_uint_32)(sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
 
       png_ptr->inv_filter_costs = (png_uint_16p)png_malloc(png_ptr,
-         sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST);
+         (png_uint_32)(sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
 
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
       {

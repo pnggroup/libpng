@@ -1,12 +1,12 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 0.99a
+ * libpng 0.99c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  */
 
 #define PNG_INTERNAL
@@ -126,14 +126,14 @@ png_get_pixel_aspect_ratio(png_structp png_ptr, png_infop info_ptr)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_aspect_ratio");
       if (info_ptr->x_pixels_per_unit == 0)
-         return (0.0);
+         return ((float)0.0);
       else
          return ((float)info_ptr->y_pixels_per_unit
             /(float)info_ptr->x_pixels_per_unit);
    }
    else
 #endif
-      return (0.0);
+      return ((float)0.0);
 }
 
 png_uint_32
@@ -209,7 +209,7 @@ png_get_channels(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr != NULL)
       return(info_ptr->channels);
    else
-      return(0);
+      return (0);
 }
 
 png_bytep
@@ -218,7 +218,7 @@ png_get_signature(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr != NULL)
       return(info_ptr->signature);
    else
-      return(NULL);
+      return (NULL);
 }
 
 #if defined(PNG_READ_bKGD_SUPPORTED)
@@ -322,6 +322,10 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
    if (info_ptr != NULL && width != NULL && height != NULL &&
       bit_depth != NULL && color_type != NULL)
    {
+      png_uint_32 rowbytes;
+      int pixel_depth, channels;
+      png_uint_32 rowbytes_per_pixel;
+
       png_debug1(1, "in %s retrieval function\n", "IHDR");
       *width = info_ptr->width;
       *height = info_ptr->height;
@@ -333,6 +337,24 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
          *filter_type = info_ptr->filter_type;
       if (interlace_type != NULL)
          *interlace_type = info_ptr->interlace_type;
+
+      /* check for potential overflow of rowbytes */
+      if (*color_type == PNG_COLOR_TYPE_PALETTE)
+         channels = 1;
+      else if (*color_type & PNG_COLOR_MASK_COLOR)
+         channels = 3;
+      else
+         channels = 1;
+      if (*color_type & PNG_COLOR_MASK_ALPHA)
+         channels++;
+      pixel_depth = *bit_depth * channels;
+      rowbytes_per_pixel = (pixel_depth + 7) >> 3;
+      rowbytes = *width * rowbytes_per_pixel;
+      if ((*width > (png_uint_32)2147483647L/rowbytes_per_pixel))
+      {
+         png_warning(png_ptr,
+            "Width too large for libpng to process image data.");
+      }
       return (1);
    }
    return (0);

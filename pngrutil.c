@@ -1,12 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 0.99a
+ * libpng 0.99
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -226,7 +226,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    /* set up other useful info */
    png_ptr->pixel_depth = (png_byte)(png_ptr->bit_depth *
-      png_ptr->channels);
+   png_ptr->channels);
    png_ptr->rowbytes = ((png_ptr->width *
       (png_uint_32)png_ptr->pixel_depth + 7) >> 3);
    png_debug1(3,"bit_depth = %d\n", png_ptr->bit_depth);
@@ -909,7 +909,7 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    num = (int)length / 2;
    png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
-      num * sizeof (png_uint_16));
+      (png_uint_32)(num * sizeof (png_uint_16)));
    png_ptr->flags |= PNG_FLAG_FREE_HIST;
    for (i = 0; i < num; i++)
    {
@@ -1097,10 +1097,11 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    for (buf = units; *buf != '\0'; buf++);
 
    png_debug(3, "Allocating pCAL parameters array\n");
-   params = (png_charpp)png_malloc(png_ptr, nparams*sizeof(png_charp)) ;
+   params = (png_charpp)png_malloc(png_ptr, (png_uint_32)(nparams
+      *sizeof(png_charp))) ;
 
    /* Get pointers to the start of each parameter string. */
-   for (i = 0; i < nparams; i++)
+   for (i = 0; i < (int)nparams; i++)
    {
       buf++; /* Skip the null string terminator from previous parameter. */
 
@@ -1213,7 +1214,7 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (text != key + (png_size_t)length)
       text++;
 
-   text_ptr = (png_textp)png_malloc(png_ptr, sizeof(png_text));
+   text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
    text_ptr->compression = PNG_TEXT_COMPRESSION_NONE;
    text_ptr->key = key;
    text_ptr->text = text;
@@ -1303,14 +1304,14 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
             if (text ==  NULL)
             {
                text_size = key_size + sizeof(msg) + 1;
-               text = (png_charp)png_malloc(png_ptr, text_size);
+               text = (png_charp)png_malloc(png_ptr, (png_uint_32)text_size);
                png_memcpy(text, key, key_size);
             }
 
             text[text_size - 1] = '\0';
 
             /* Copy what we can of the error message into the text chunk */
-            text_size = length - (text - key) - 1;
+            text_size = (png_size_t)length - (text - key) - 1;
             text_size = sizeof(msg) > text_size ? text_size : sizeof(msg);
             png_memcpy(text + key_size, msg, text_size + 1);
             break;
@@ -1320,8 +1321,8 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
             if (text == NULL)
             {
                text = (png_charp)png_malloc(png_ptr,
-                  png_ptr->zbuf_size - png_ptr->zstream.avail_out +
-                     key_size + 1);
+                  (png_uint_32)(png_ptr->zbuf_size - png_ptr->zstream.avail_out
+                     + key_size + 1));
                png_memcpy(text + key_size, png_ptr->zbuf,
                   png_ptr->zbuf_size - png_ptr->zstream.avail_out);
                png_memcpy(text, key, key_size);
@@ -1334,8 +1335,8 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                png_charp tmp;
 
                tmp = text;
-               text = (png_charp)png_malloc(png_ptr, text_size +
-                  png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1);
+               text = (png_charp)png_malloc(png_ptr, (png_uint_32)(text_size +
+                  png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1));
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
                png_memcpy(text + text_size, png_ptr->zbuf,
@@ -1361,7 +1362,6 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_free(png_ptr, key);
       key = text;
       text += key_size;
-      text_size -= key_size;
    }
    else /* if (comp_type >= PNG_TEXT_COMPRESSION_LAST) */
    {
@@ -1381,7 +1381,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_memcpy(text, msg, text_size + 1);
    }
 
-   text_ptr = (png_textp)png_malloc(png_ptr, sizeof(png_text));
+   text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
    text_ptr->compression = comp_type;
    text_ptr->key = key;
    text_ptr->text = text;
@@ -1879,6 +1879,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    png_debug(1, "in png_read_filter_row\n");
    png_debug2(2,"row = %d, filter = %d\n", png_ptr->row_number, filter);
 
+
    switch (filter)
    {
       case PNG_FILTER_VALUE_NONE:
@@ -1992,7 +1993,7 @@ png_read_finish_row(png_structp png_ptr)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
-      png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+      png_buffered_memset(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
       do
       {
          png_ptr->pass++;
@@ -2002,8 +2003,9 @@ png_read_finish_row(png_structp png_ptr)
             png_pass_inc[png_ptr->pass] - 1 -
             png_pass_start[png_ptr->pass]) /
             png_pass_inc[png_ptr->pass];
-         png_ptr->irowbytes = ((png_ptr->iwidth *
-            png_ptr->pixel_depth + 7) >> 3) + 1;
+            png_ptr->irowbytes = ((png_ptr->iwidth *
+               (png_uint_32)png_ptr->pixel_depth + 7) >> 3) +1;
+
          if (!(png_ptr->transformations & PNG_INTERLACE))
          {
             png_ptr->num_rows = (png_ptr->height +
@@ -2104,8 +2106,12 @@ png_read_start_row(png_structp png_ptr)
          png_pass_inc[png_ptr->pass] - 1 -
          png_pass_start[png_ptr->pass]) /
          png_pass_inc[png_ptr->pass];
-      png_ptr->irowbytes = ((png_ptr->iwidth *
-         png_ptr->pixel_depth + 7) >> 3) + 1;
+
+         rowbytes = ((png_ptr->iwidth *
+            (png_uint_32)png_ptr->pixel_depth + 7) >> 3) +1;
+         png_ptr->irowbytes = (png_size_t)rowbytes;
+         if((png_uint_32)png_ptr->irowbytes != rowbytes)
+            png_error(png_ptr, "Rowbytes overflow in png_read_start_row");
    }
    else
    {
@@ -2194,9 +2200,10 @@ png_read_start_row(png_structp png_ptr)
    if ((png_uint_32)png_ptr->rowbytes + 1 > (png_uint_32)65536L)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
-   png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, png_ptr->rowbytes + 1);
+   png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
+      png_ptr->rowbytes + 1));
 
-   png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+   png_buffered_memset(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
    png_debug1(3, "width = %d,\n", png_ptr->width);
    png_debug1(3, "height = %d,\n", png_ptr->height);

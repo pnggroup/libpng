@@ -1,11 +1,11 @@
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 0.99a
+ * libpng 0.99c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  *
  * This file provides a location for all memory allocation.  Users which
  * need special memory handling are expected to modify the code in this file
@@ -261,14 +261,11 @@ png_destroy_struct(png_voidp struct_ptr)
    {
 #if defined(__TURBOC__) && !defined(__FLAT__)
       farfree(struct_ptr);
-      struct_ptr = NULL;
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
       hfree(struct_ptr);
-      struct_ptr = NULL;
 # else
       free(struct_ptr);
-      struct_ptr = NULL;
 # endif
 #endif
    }
@@ -285,21 +282,27 @@ png_voidp
 PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
+   png_size_t length;
+
    if (png_ptr == NULL || size == 0)
       return ((png_voidp)NULL);
 
 #ifdef PNG_MAX_MALLOC_64K
-   if (size > (png_uint_32)65536L)
+   if (png_size > (png_uint_32)65536L)
       png_error(png_ptr, "Cannot Allocate > 64K");
 #endif
 
+   length = (png_size_t)size;
+   if ((png_uint_32)length != size)
+      png_error(png_ptr, "Cannot Allocate > size_t");
+
 #if defined(__TURBOC__) && !defined(__FLAT__)
-   ret = farmalloc((png_size_t)size);
+   ret = farmalloc(length);
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
-   ret = halloc(size, 1);
+   ret = halloc(length, 1);
 # else
-   ret = malloc(size);
+   ret = malloc(length);
 # endif
 #endif
 
@@ -322,17 +325,43 @@ PNG_FREE(png_structp png_ptr, png_voidp ptr)
 
 #if defined(__TURBOC__) && !defined(__FLAT__)
    farfree(ptr);
-   ptr = NULL;
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
    hfree(ptr);
-   ptr = NULL;
 # else
    free(ptr);
-   ptr = NULL;
 # endif
 #endif
 }
 
 #endif /* Not Borland DOS special memory handler */
 
+void
+png_buffered_memcpy (png_structp png_ptr, png_voidp s1, png_voidp s2,
+   png_uint_32 length)
+{
+   png_size_t size;
+   png_uint_32 i;
+   for (i=0; i<length; i+=65530)
+   {
+      size = (png_size_t)(length - i);
+      if (size > (png_size_t)65530L)
+         size=(png_size_t)65530L;
+      png_memcpy (s1, s2, size);
+   }
+}
+
+void
+png_buffered_memset (png_structp png_ptr, png_voidp s1, int value,
+   png_uint_32 length)
+{
+   png_size_t size;
+   png_uint_32 i;
+   for (i=0; i<length; i+=65530)
+   {
+      size = length - i;
+      if (size > 65530)
+         size=65530;
+      png_memset (s1, value, size);
+   }
+}

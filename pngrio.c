@@ -1,12 +1,12 @@
 
 /* pngrio.c - functions for data input
  *
- * libpng 0.99a
+ * libpng 0.99c
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 31, 1998
+ * February 7, 1998
  *
  * This file provides a location for all input.  Users which need
  * special handling are expected to write a function which has the same
@@ -99,7 +99,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       }
       while (remaining != 0);
    }
-   if (check != length)
+   if ((png_uint_32)check != (png_uint_32)length)
    {
       png_error(png_ptr, "read Error");
    }
