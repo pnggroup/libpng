@@ -38,6 +38,9 @@ Known bugs and suggested enhancements in libpng-1.0.5
    for the png_set_gAMA(), png_set_cHRM(), and corresponding png_get_()
    functions will be needed.
 
+   Much of this was completed in libpng-1.0.5h, but gamma compensation
+   is not yet done in fixed-point arithmetic.
+
 4. October 1999 -- BUG
 
    pngvcrd.c is failing for interlaced PNGs that have empty passes.
@@ -64,4 +67,10 @@ Known bugs and suggested enhancements in libpng-1.0.5
    is not backward compatible (the lang member was added, and the
    translated_key member was added to libpng-1.0.5g)
 
-   STATUS: Will be fixed before the next public release.
+   STATUS: Fixed in libpng-1.0.5j/1.1.0
+
+7. December 1999 -- BUG
+
+   The new pnggccrd.c has syntax errors when compiled with gcc.
+
+   STATUS: Under investigation.

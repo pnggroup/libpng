@@ -1,8 +1,8 @@
 /* pngasmrd.h - assembler version of utilities to read a PNG file
  *
- * libpng 1.0.5h - December 10, 1999
+ * libpng 1.0.5q - February 5, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1999, 2000 Glenn Randers-Pehrson
  *
  */
 
@@ -21,7 +21,7 @@
 /* Set this in the makefile for gcc on Pentium, not in pngconf.h */
 #ifdef PNG_USE_PNGGCCRD
 /* Platform must be Pentium.  Makefile must assemble and load pnggccrd.c
- * (not available in libpng 1.0.5h).
+ * (not available in libpng 1.0.5q).
  * MMX will be detected at run time and used if present.
  */
 #define PNG_HAVE_ASSEMBLER_COMBINE_ROW

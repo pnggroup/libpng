@@ -1,11 +1,11 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.5h - December 10, 1999
+ * libpng 1.0.5q - February 5, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * This file provides a location for all error handling.  Users who
  * need special error handling are expected to write replacement functions
@@ -67,21 +67,26 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp message
 {
    int iout = 0, iin = 0;
 
-   while (iin < 4) {
+   while (iin < 4)
+   {
       int c = png_ptr->chunk_name[iin++];
-      if (isnonalpha(c)) {
+      if (isnonalpha(c))
+      {
          buffer[iout++] = '[';
          buffer[iout++] = png_digit[(c & 0xf0) >> 4];
-         buffer[iout++] = png_digit[c & 0xf];
+         buffer[iout++] = png_digit[c & 0x0f];
          buffer[iout++] = ']';
-      } else {
+      }
+      else
+      {
          buffer[iout++] = (png_byte)c;
       }
    }
 
    if (message == NULL)
       buffer[iout] = 0;
-   else {
+   else
+   {
       buffer[iout++] = ':';
       buffer[iout++] = ' ';
       png_memcpy(buffer+iout, message, 64);
@@ -117,14 +122,18 @@ png_default_error(png_structp png_ptr, png_const_charp message)
    fprintf(stderr, "libpng error: %s\n", message);
 #endif
 
-#ifdef USE_FAR_KEYWORD
+#ifdef PNG_SETJMP_SUPPORTED
+#  ifdef USE_FAR_KEYWORD
    {
       jmp_buf jmpbuf;
       png_memcpy(jmpbuf,png_ptr->jmpbuf,sizeof(jmp_buf));
       longjmp(jmpbuf, 1);
    }
-#else
+#  else
    longjmp(png_ptr->jmpbuf, 1);
+# endif
+#else
+   PNG_ABORT();
 #endif
 }
 

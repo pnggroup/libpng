@@ -3,7 +3,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.5h';
+  PNG_LIBPNG_VER_STRING = '1.0.5n';
   PNG_LIBPNG_VER        =  10006;
 
 type
@@ -55,6 +55,9 @@ type
              stdcall;
   png_write_status_ptr = procedure(png_ptr: Pointer;
                            row_number: png_uint_32; pass: int);
+             stdcall;
+  png_user_chunk_ptr = procedure(png_ptr: Pointer;
+                             data: png_unknown_chunkp);
              stdcall;
   png_user_transform_ptr = procedure(png_ptr: Pointer;
                              row_info: Pointer; data: png_bytep);
@@ -380,6 +383,9 @@ function png_get_text(png_ptr: png_structp; info_ptr: png_infop;
              var text_ptr: png_textp; var num_text: int):
              png_uint_32;
              stdcall;
+function png_get_user_chunk_ptr(png_ptr: png_structp):
+             png_voidp;
+             stdcall;
 function png_get_valid(png_ptr: png_structp; info_ptr: png_infop;
              flag: png_uint_32): png_uint_32;
              stdcall;
@@ -525,6 +531,9 @@ procedure png_set_read_fn(png_ptr: png_structp;
 procedure png_set_read_status_fn(png_ptr: png_structp;
              read_row_fn: png_read_status_ptr);
              stdcall;
+procedure png_set_read_user_chunk_fn(png_ptr: png_structp;
+             read_user_chunk_fn: png_user_chunk_ptr);
+             stdcall;
 procedure png_set_read_user_transform_fn(png_ptr: png_structp;
              read_user_transform_fn: png_user_transform_ptr);
              stdcall;
@@ -613,13 +622,21 @@ procedure png_get_spalettes(png_ptr: png_structp;
              stdcall;
 procedure png_free_pCAL(png_ptr: png_structp; info_ptr: png_infop);
              stdcall;
+procedure png_free_sCAL(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
 procedure png_set_iCCP(png_ptr: png_structp; info_ptr: png_infop;
              name: png_charp; compression_type: int; profile: png_charp;
              proflen: int);
              stdcall;
+procedure png_free_hIST(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
 procedure png_free_iCCP(png_ptr: png_structp; info_ptr: png_infop);
              stdcall;
+procedure png_free_PLTE(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
 procedure png_free_text(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
+procedure png_free_tRNS(png_ptr: png_structp; info_ptr: png_infop);
              stdcall;
 procedure png_set_spalettes(png_ptr: png_structp; info_ptr: png_infop;
              entries: png_spalette_p; nentries: int);
@@ -673,6 +690,7 @@ function png_get_signature; external pngDLL;
 function png_get_tIME; external pngDLL;
 function png_get_tRNS; external pngDLL;
 function png_get_text; external pngDLL;
+function png_get_user_chunk_ptr; external pngDLL;
 function png_get_valid; external pngDLL;
 function png_get_x_offset_microns; external pngDLL;
 function png_get_x_offset_pixels; external pngDLL;
@@ -735,6 +753,7 @@ procedure png_set_swap_alpha; external pngDLL;
 procedure png_set_tIME; external pngDLL;
 procedure png_set_tRNS; external pngDLL;
 procedure png_set_text; external pngDLL;
+procedure png_set_user_chunk_fn; external pngDLL;
 procedure png_set_write_fn; external pngDLL;
 procedure png_set_write_status_fn; external pngDLL;
 procedure png_set_write_user_transform_fn; external pngDLL;
@@ -755,8 +774,12 @@ procedure png_get_iCCP; external pngDLL;
 procedure png_get_spalettes; external pngDLL;
 procedure png_free_pCAL; external pngDLL;
 procedure png_set_iCCP; external pngDLL;
+procedure png_free_hIST; external pngDLL;
 procedure png_free_iCCP; external pngDLL;
+procedure png_free_PLTE; external pngDLL;
+procedure png_free_sCAL; external pngDLL;
 procedure png_free_text; external pngDLL;
+procedure png_free_tRNS; external pngDLL;
 procedure png_set_spalettes; external pngDLL;
 procedure png_free_sPLT; external pngDLL;
 

@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "December 10, 1999"
+.TH LIBPNG 3 "February 5, 2000"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
+libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5q
 .SH SYNOPSIS
 \fI\fB
 
@@ -84,7 +84,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
+\fBvoid png_free_chunk_list (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_free_default(png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fIptr\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_free_hIST (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fI\fP\fB);\fP
 
 \fI\fB
 
@@ -96,11 +104,19 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
+\fBvoid png_free_pixels (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_free_PLTE (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_free_sCAL (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBvoid png_free_spalette (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fInum_text\fP\fB);\fP
+\fBvoid png_free_spalettes (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fInum_text\fP\fB);\fP
 
 \fI\fB
 
@@ -109,6 +125,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 \fI\fB
 
 \fBvoid png_free_text (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fInum_text\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_free_tRNS (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_free_unknown_chunks (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fInum_unknowns\fP\fB);\fP
 
 \fI\fB
 
@@ -172,7 +196,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
-\fBpng_uint_32 png_get_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charpp \fP\fIname\fP\fB, int \fP\fI*compression_type\fP\fB, png_charpp \fP\fIprofile\fP\fB, int \fI*proflen\fP\fB);\fP
+\fBpng_uint_32 png_get_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charpp \fP\fIname\fP\fB, int \fP\fI*compression_type\fP\fB, png_charpp \fP\fIprofile\fP\fB, png_uint_32 \fI*proflen\fP\fB);\fP
 
 \fI\fB
 
@@ -270,6 +294,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
+\fBpng_voidp png_get_user_chunk_ptr (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBpng_voidp png_get_user_transform_ptr (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
@@ -359,6 +387,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 \fI\fB
 
 \fBvoid png_read_info (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_read_png (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fItransforms\fP\fB, voidp \fIparams\fP\fB);\fP
 
 \fI\fB
 
@@ -470,7 +502,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
-\fBvoid png_set_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_charp \fP\fIprofile\fP\fB, int \fIproflen\fP\fB);\fP
+\fBvoid png_set_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_charp \fP\fIprofile\fP\fB, png_uint_32 \fIproflen\fP\fB);\fP
 
 \fI\fB
 
@@ -490,7 +522,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
-\fBvoid png_set_keep_unknown_chunks (png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_keep_unknown_chunks (png_structp \fP\fIpng_ptr\fP\fB, int \fP\fIkeep\fP\fB, png_bytep \fP\fIchunk_list\fP\fB, int \fInum_chunks\fP\fB);\fP
 
 \fI\fB
 
@@ -606,7 +638,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
-\fBpng_uint_32 png_set_unknown_chunks (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_unknown_chunkp \fP\fIunknowns\fP\fB, int \fInum\fP\fB);\fP
+\fBpng_uint_32 png_set_unknown_chunks (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_unknown_chunkp \fP\fIunknowns\fP\fB, int \fP\fInum\fP\fB, int \fIlocation\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_read_user_chunk_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIuser_chunk_ptr\fP\fB, png_user_chunk_ptr \fIread_user_chunk_fn\fP\fB);\fP
 
 \fI\fB
 
@@ -682,6 +718,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
+\fBvoid png_write_png (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fItransforms\fP\fB, voidp \fIparams\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_write_row (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIrow\fP\fB);\fP
 
 \fI\fB
@@ -701,10 +741,10 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.5h - December 10, 1999
+ libpng version 1.0.5q - February 5, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
- Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  For conditions of distribution and use, see copyright
  notice in png.h.
 
@@ -720,10 +760,9 @@ libpng.txt - A description on how to use and modify libpng
  Schalnat, Group 42, Inc.
 
  Updated/rewritten per request in the libpng FAQ
- Copyright (c) 1995 Frank J. T. Wojcik
- December 18, 1995 && January 20, 1996
+ Copyright (c) 1995, 1996 Frank J. T. Wojcik
+ December 18, 1995 & January 20, 1996
 
- *
 .SH I. Introduction
 
 This file describes how to use and modify the PNG reference library
@@ -803,13 +842,14 @@ And while I'm on the topic, make sure you include the libpng header file:
 
 .SH III. Reading
 
-Reading PNG files:
-
 We'll now walk you through the possible functions to call when reading
-in a PNG file, briefly explaining the syntax and purpose of each one.
-See example.c and png.h for more detail.  While Progressive reading
-is covered in the next section, you will still need some of the
-functions discussed in this section to read a PNG file.
+in a PNG file sequentially, briefly explaining the syntax and purpose
+of each one.  See example.c and png.h for more detail.  While
+progressive reading is covered in the next section, you will still
+need some of the functions discussed in this section to read a PNG
+file.
+
+.SS Setup
 
 You will want to do the I/O initialization(*) before you get into libpng,
 so if it doesn't work, you don't have much to undo.  Of course, you
@@ -909,6 +949,10 @@ free any memory.
         return;
     }
 
+If you would rather avoid the complexity of setjmp/longjmp issues,
+you can compile libpng with PNG_SETJMP_NOT_SUPPORTED, in which case
+errors will result in a call to PNG_ABORT() which defaults to abort().
+
 Now you need to set up the input code.  The default for libpng is to
 use the C function fread().  If you use this, you will need to pass a
 valid FILE * in the function png_init_io().  Be sure that the file is
@@ -925,6 +969,42 @@ libpng know that there are some bytes missing from the start of the file.
 
     png_set_sig_bytes(png_ptr, number);
 
+.SS Setting up callback code
+
+You can set up a callback function to handle any unknown chunks in the
+input stream. You must supply the function
+
+    read_chunk_callback(png_ptr ptr,
+         png_unknown_chunkp chunk);
+    {
+       /* The unknown chunk structure contains your
+          chunk data: */
+           png_byte name[5];
+           png_byte *data;
+           png_size_t size;
+       /* Note that libpng has already taken care of the
+          CRC handling */
+
+       /* put your code here.  Return one of the following: */
+
+       return (-n); /* chunk had an error */
+       return (0); /* did not recognize */
+       return (n); /* success */
+    }
+
+(You can give your function another name that you like instead of
+"read_chunk_callback")
+
+To inform libpng about your function, use
+
+    png_set_read_user_chunk_fn(png_ptr, user_chunk_ptr,
+        read_chunk_callback);
+
+This names not only the callback function, but also a user pointer that
+you can retrieve with
+
+    png_get_user_chunk_ptr(png_ptr);
+
 At this point, you can set up a callback function that will be
 called after each row has been read, which you can use to control
 a progress meter or the like.  It's demonstrated in pngtest.c.
@@ -940,19 +1020,6 @@ You must supply a function
 To inform libpng about your function, use
 
     png_set_read_status_fn(png_ptr, read_row_callback);
-
-In PNG files, the alpha channel in an image is the level of opacity.
-If you need the alpha channel in an image to be the level of transparency
-instead of opacity, you can invert the alpha channel (or the tRNS chunk
-data) after it's read, so that 0 is fully opaque and 255 (in 8-bit or
-paletted images) or 65535 (in 16-bit images) is fully transparent, with
-
-    png_set_invert_alpha(png_ptr);
-
-This has to appear here rather than later with the other transformations
-because the tRNS chunk data must be modified in the case of paletted images.
-If your image is not a paletted image, the tRNS data (which in such cases
-represents a single color to be rendered as transparent) won't be changed.
 
 Finally, you can write your own transformation function if none of
 the existing ones meets your needs.  This is done by setting a callback
@@ -977,6 +1044,8 @@ function
     png_set_user_transform_info(png_ptr, user_ptr,
        user_depth, user_channels);
 
+The user's application, not libpng, is responsible for allocating and
+freeing any memory required for the user structure.
 
 You can retrieve the pointer via the function
 png_get_user_transform_ptr().  For example:
@@ -984,23 +1053,100 @@ png_get_user_transform_ptr().  For example:
     voidp read_user_transform_ptr =
        png_get_user_transform_ptr(png_ptr);
 
-You are now ready to read all the file information up to the actual
-image data.  You do this with a call to png_read_info().
+.SS Unknown-chunk handling
+
+Now you get to set the way the library processes unknown chunks in the
+input PNG stream. Both known and unknown chunks will be read.  Normal
+behavior is that known chunks will be parsed into information in
+various info_ptr members; unknown chunks will be discarded. To change
+this, you can call:
+
+    png_set_keep_unknown_chunks(png_ptr, info_ptr, keep,
+        chunk_list, num_chunks);
+    keep       - 0: do not keep
+                 1: keep only if safe-to-copy
+                 2: keep even if unsafe-to-copy
+    chunk_list - list of chunks affected (a byte string,
+                 five bytes per chunk, NULL or '\0' if
+                 num_chunks is 0)
+    num_chunks - number of chunks affected; if 0, all
+                 unknown chunks are affected
+
+Unknown chunks declared in this way will be saved as raw data onto a
+list of png_unknown_chunk structures.  If a chunk that is normally
+known to libpng is named in the list, it will be handled as unknown,
+according to the "keep" directive.  If a chunk is named in successive
+instances of png_set_keep_unknown_chunks(), the final instance will
+take precedence.
+
+.SS The high-level read interface
+
+At this point there are two ways to proceed; through the high-level
+read interface, or through a sequence of low-level read operations.
+You can use the high-level interface if (a) you are willing to read
+the entire image into memory, and (b) the input transformations
+you want to do are limited to the following set:
+
+    PNG_TRANSFORM_IDENTITY      No transformation
+    PNG_TRANSFORM_STRIP_16      Strip 16-bit samples to 8 bits
+    PNG_TRANSFORM_STRIP_ALPHA   Discard the alpha channel
+    PNG_TRANSFORM_PACKING       Expand 1, 2 and 4-bit samples to bytes
+    PNG_TRANSFORM_PACKSWAP      Change order of packed pixels to LSB first
+    PNG_TRANSFORM_EXPAND        Perform set_expand()
+    PNG_TRANSFORM_INVERT_MONO   Invert monochrome images
+    PNG_TRANSFORM_SHIFT         Normalize pixels to the sBIT depth
+    PNG_TRANSFORM_BGR           Flip RGB to BGR, RGBA to BGRA
+    PNG_TRANSFORM_SWAP_ALPHA    Flip RGBA to ARGB or GA to AG
+    PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity to transparency
+    PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
+
+(This excludes setting a background color, doing gamma transformation,
+dithering, and setting filler.)  If this is the case, simply do this:
+
+    png_read_png(png_ptr, info_ptr, png_transforms, NULL)
+
+where png_transforms is an integer containing the logical-or of some set of
+transformation flags.  This call is equivalent to png_read_info(),
+followed the set of transformations indicated by the transform mask,
+followed by png_update_info(), followed by a read of the image bytes
+to the info member `rowpointers', followed by png_read_end().
+
+(The final parameter of this call is not yet used.  Someday it
+will point to transformation parameters.)
+
+.SS The low-level read interface
+
+If you are going the low-level route, you are now ready to read all
+the file information up to the actual image data.  You do this with a
+call to png_read_info().
 
     png_read_info(png_ptr, info_ptr);
 
-This will read all chunks up to but not including the image data.
-Both known and unknown chunks will be read.  Known chunks will be
-parsed into information in various info_ptr members; unknown chunks
-will be discarded, unless you previously called
+This will process all chunks up to but not including the image data.
 
-    png_set_keep_unknown_chunks();
+There is one transformation you may need to set up before doing
+png_read_info(), however.  In PNG files, the alpha channel in an image
+is the level of opacity.  If you need the alpha channel in an image to
+be the level of transparency instead of opacity, you can invert the
+alpha channel (or the tRNS chunk data) after it's read, so that 0 is
+fully opaque and 255 (in 8-bit or paletted images) or 65535 (in 16-bit
+images) is fully transparent, with
 
-in which case they will be saved as raw data onto a list of
-png_unknown_chunk structures (and written out if you subsequently
-call png_write_info and friends).
+    png_set_invert_alpha(png_ptr);
 
-Functions are used to get the information from the info_ptr:
+This must appear before png_write_info() instead of later with the
+other transformations because in the case of paletted images the tRNS
+chunk data has to be inverted before the tRNS chunk is written.
+If your image is not a paletted image, the tRNS data (which in such cases
+represents a single color to be rendered as transparent) won't need to
+be changed, and you can safely do this transformation after your
+png_read_info() call.
+
+.SS Querying the info structure
+
+Functions are used to get the information from the info_ptr once it
+has been read.  Note that these fields may not be completely filled
+in until png_read_end() has read the chunk data following the image.
 
     png_get_IHDR(png_ptr, info_ptr, &width, &height,
        &bit_depth, &color_type, &interlace_type,
@@ -1140,20 +1286,28 @@ into the info_ptr is returned for any complex types.
 
     png_get_bKGD(png_ptr, info_ptr, &background);
     background     - background color (PNG_VALID_bKGD)
+                     valid 16-bit red, green and blue
+                     values, regardless of color_type
 
     num_text = png_get_text(png_ptr, info_ptr, &text_ptr);
     text_ptr       - array of png_text holding image
                      comments
-    text_ptr[i]->lang  - language of comment (NULL for unknown).
+    text_ptr[i]->compression - type of compression used
+                 on "text" PNG_TEXT_COMPRESSION_NONE
+                           PNG_TEXT_COMPRESSION_zTXt
+                           PNG_ITXT_COMPRESSION_NONE
+                           PNG_ITXT_COMPRESSION_zTXt
     text_ptr[i]->key   - keyword for comment.
-    text_ptr[i]->translated_keyword  - keyword in UTF-8 (NULL for unknown).
     text_ptr[i]->text  - text comments for current
                          keyword.
-    text_ptr[i]->compression - type of compression used
-                     on "text" PNG_TEXT_COMPRESSION_NONE
-                     or PNG_TEXT_COMPRESSION_zTXt
+    text_ptr[i]->text_length - length of text string,
+                 after decompression, 0 for iTXt
+    text_ptr[i]->itxt_length - length of itxt string,
+                 after decompression, 0 for tEXt/zTXt
+    text_ptr[i]->lang  - language of comment (NULL for unknown).
+    text_ptr[i]->translated_keyword  - keyword in UTF-8 (NULL
+                         for unknown).
     num_text       - number of comments
-
     num_spalettes = png_get_spalettes(png_ptr, info_ptr, &palette_ptr);
     palette_ptr    - array of png_spalette structures holding contents
                      of one or more sPLT chunks read.
@@ -1188,6 +1342,7 @@ into the info_ptr is returned for any complex types.
     unknowns[i].name  - name of unknown chunk
     unknowns[i].data  - data of unknown chunk
     unknowns[i].size  - size of unknown chunk
+    unknowns[i].location - position of chunk in file
 
 The data from the pHYs chunk can be retrieved in several convenient
 forms:
@@ -1231,6 +1386,8 @@ However, some or all of the text chunks may be after the image, so, to
 make sure you have read all the text chunks, don't mess with these
 until after you read the stuff after the image.  This will be
 mentioned again below in the discussion that goes with png_read_end().
+
+.SS Input transformations
 
 After you've read the header information, you can set up the library
 to handle any special transformations of the image data.  The various
@@ -1566,6 +1723,8 @@ are allocating one large chunk, you will need to build an
 array of pointers to each row, as it will be needed for some
 of the functions below.
 
+.SS Reading image data
+
 After you've allocated memory, you can read the image data.
 The simplest way to do this is in one function call.  If you are
 allocating enough memory to hold the whole image, you can just
@@ -1674,12 +1833,14 @@ the second parameter NULL.
     png_read_rows(png_ptr, NULL, row_pointers,
        number_of_rows);
 
-After you are finished reading the image, you can finish reading
-the file.  If you are interested in comments or time, which may be
-stored either before or after the image data, you should pass the
-separate png_info struct if you want to keep the comments from
-before and after the image separate.  If you are not interested, you
-can pass NULL.
+.SS Finishing a sequential read
+
+After you are finished reading the image through either the high- or
+low-level interfaces, you can finish reading the file.  If you are
+interested in comments or time, which may be stored either before or
+after the image data, you should pass the separate png_info struct if
+you want to keep the comments from before and after the image
+separate.  If you are not interested, you can pass NULL.
 
    png_read_end(png_ptr, end_info);
 
@@ -1694,15 +1855,19 @@ point to allocated storage with the following functions:
     png_free_text(png_ptr, info_ptr, num)
     num          - number of text item to be freed (-1 for all items)
 
+    png_free_hIST(png_ptr, info_ptr)
+
     png_free_iCCP(png_ptr, info_ptr)
 
     png_free_pCAL(png_ptr, info_ptr)
 
     png_free_sCAL(png_ptr, info_ptr)
 
-    png_free_spalette(png_ptr, info_ptr, num)
+    png_free_spalettes(png_ptr, info_ptr, num)
     num          - number of suggested-paletted entry to be freed
                    (-1 for all suggested palettes)
+
+    png_free_pixels(png_ptr, info_ptr)
 
     png_free_unknown_chunk(png_ptr, info_ptr, num)
     num          - number of unknown chunk to be freed
@@ -1714,8 +1879,7 @@ case do nothing.
 
 For a more compact example of reading a PNG image, see the file example.c.
 
-
-Reading PNG files progressively:
+.SS Reading PNG files progressively
 
 The progressive reader is slightly different then the non-progressive
 reader.  Instead of calling png_read_info(), png_read_rows(), and
@@ -1892,6 +2056,8 @@ Much of this is very similar to reading.  However, everything of
 importance is repeated here, so you won't have to constantly look
 back up in the reading section to understand writing.
 
+.SS Setup
+
 You will want to do the I/O initialization before you get into libpng,
 so if it doesn't work, you don't have anything to undo. If you are not
 using the standard I/O functions, you will need to replace them with
@@ -1954,6 +2120,10 @@ section below for more information on the libpng error handling.
     ...
     return;
 
+If you would rather avoid the complexity of setjmp/longjmp issues,
+you can compile libpng with PNG_SETJMP_NOT_SUPPORTED, in which case
+errors will result in a call to PNG_ABORT() which defaults to abort().
+
 Now you need to set up the output code.  The default for libpng is to
 use the C function fwrite().  If you use this, you will need to pass a
 valid FILE * in the function png_init_io().  Be sure that the file is
@@ -1962,6 +2132,8 @@ another way, see the discussion on libpng I/O handling in the Customizing
 Libpng section below.
 
     png_init_io(png_ptr, fp);
+
+.SS Write callbacks
 
 At this point, you can set up a callback function that will be
 called after each row has been written, which you can use to control
@@ -2016,6 +2188,8 @@ data.  See the Compression Library for details on the compression levels.
         Z_DEFAULT_STRATEGY);
     png_set_compression_window_bits(png_ptr, 15);
     png_set_compression_method(png_ptr, 8);
+
+.SS Setting the contents of info for output
 
 You now need to fill in the png_info structure with all the data you
 wish to write before the actual image.  Note that the only thing you
@@ -2146,15 +2320,22 @@ Some of the more important parts of the png_info are:
     png_set_text(png_ptr, info_ptr, text_ptr, num_text);
     text_ptr       - array of png_text holding image
                      comments
-    text_ptr[i]->lang  - language of comment (NULL for unknown).
+    text_ptr[i]->compression - type of compression used
+                 on "text" PNG_TEXT_COMPRESSION_NONE
+                           PNG_TEXT_COMPRESSION_zTXt
+                           PNG_ITXT_COMPRESSION_NONE
+                           PNG_ITXT_COMPRESSION_zTXt
     text_ptr[i]->key   - keyword for comment.
-    text_ptr[i]->translated_keyword  - keyword in UTF-8 (NULL for unknown).
     text_ptr[i]->text  - text comments for current
                          keyword.
-    text_ptr[i]->compression - type of compression used
-         on "text" PNG_TEXT_COMPRESSION_NONE or
-         PNG_TEXT_COMPRESSION_zTXt
-    num_text    - number of comments in text_ptr
+    text_ptr[i]->text_length - length of text string,
+                 after decompression, 0 for iTXt
+    text_ptr[i]->itxt_length - length of itxt string,
+                 after decompression, 0 for tEXt/zTXt
+    text_ptr[i]->lang  - language of comment (NULL for unknown).
+    text_ptr[i]->translated_keyword  - keyword in UTF-8 (NULL
+                         for unknown).
+    num_text       - number of comments
 
     png_set_spalettes(png_ptr, info_ptr, &palette_ptr, num_spalettes);
     palette_ptr    - array of png_spalette structures to be added to
@@ -2189,20 +2370,15 @@ Some of the more important parts of the png_info are:
     unknowns[i].name  - name of unknown chunk
     unknowns[i].data  - data of unknown chunk
     unknowns[i].size  - size of unknown chunk
-
-In PNG files, the alpha channel in an image is the level of opacity.
-If your data is supplied as a level of transparency, you can invert the
-alpha channel before you write it, so that 0 is fully transparent and 255
-(in 8-bit or paletted images) or 65535 (in 16-bit images) is fully opaque,
-with
-
-    png_set_invert_alpha(png_ptr);
-
-This must appear here instead of later with the other transformations
-because in the case of paletted images the tRNS chunk data has to
-be inverted before the tRNS chunk is written.  If your image is not a
-paletted image, the tRNS data (which in such cases represents a single
-color to be rendered as transparent) won't be changed.
+    unknowns[i].location - position to write chunk in file
+                           0: do not write chunk
+                           PNG_HAVE_IHDR: before PLTE
+                           PNG_HAVE_PLTE: before IDAT
+                           PNG_AFTER_IDAT: after IDAT
+    The "location" member is set automatically according to
+    what part of the output file has already been written.
+    You can change its value after calling png_set_unknown_chunks()
+    as demonstrated in pngtest.c.
 
 A quick word about text and num_text.  text is an array of png_text
 structures.  num_text is the number of valid structures in the array.
@@ -2284,6 +2460,8 @@ by the software.  To facilitate the use of RFC 1123 dates, a function
 png_convert_to_rfc1123(png_timep) is provided to convert from PNG
 time to an RFC 1123 format string.
 
+.SS Writing unknown chunks
+
 You can use the png_set_unknown_chunks function to queue up chunks
 for writing.  You give it a chunk name, raw data, and a size; that's
 all there is to it.  The chunks will be written by the next following
@@ -2292,10 +2470,62 @@ Any chunks previously read into the info structure's unknown-chunk
 list will also be written out in a sequence that satisfies the PNG
 specification's ordering rules.
 
-You are now ready to write all the file information up to the actual
-image data.  You do this with a call to png_write_info().
+.SS The high-level write interface
+
+At this point there are two ways to proceed; through the high-level
+write interface, or through a sequence of low-level write operations.
+You can use the high-level interface if your image data is present
+on the rowpointers member of the info structure.  All defined output
+transformations are pernmitted, enabled by the following masks.
+
+    PNG_TRANSFORM_IDENTITY      No transformation
+    PNG_TRANSFORM_PACKING       Pack 1, 2 and 4-bit samples
+    PNG_TRANSFORM_PACKSWAP      Change order of packed pixels to LSB first
+    PNG_TRANSFORM_INVERT_MONO   Invert monochrome images
+    PNG_TRANSFORM_SHIFT         Normalize pixels to the sBIT depth
+    PNG_TRANSFORM_BGR           Flip RGB to BGR, RGBA to BGRA
+    PNG_TRANSFORM_SWAP_ALPHA    Flip RGBA to ARGB or GA to AG
+    PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity to transparency
+    PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
+    PNG_TRANSFORM_STRIP_FILLER  Strip out filler bytes.
+
+If you have valid image data on the rowpointers member, simply do this:
+
+    png_write_png(png_ptr, info_ptr, png_transforms, NULL)
+
+where png_transforms is an integer containing the logical-or of some set of
+transformation flags.  This call is equivalent to png_write_info(),
+followed by the set of transformations indicated by the transform
+mask, followed by followed by a write of the image bytes to the info
+member `rowpointers', followed by png_write_end().
+
+(The final parameter of this call is not yet used.  Someday it
+may point to output transformation parameters.)
+
+.SS The low-level write interface
+
+If you are going the low-level route instead, you are now ready to
+write all the file information up to the actual image data.  You do
+this with a call to png_write_info().
 
     png_write_info(png_ptr, info_ptr);
+
+Note that there is one transformation you may need to do before
+png_write_info().  In PNG files, the alpha channel in an image is the
+level of opacity.  If your data is supplied as a level of
+transparency, you can invert the alpha channel before you write it, so
+that 0 is fully transparent and 255 (in 8-bit or paletted images) or
+65535 (in 16-bit images) is fully opaque, with
+
+    png_set_invert_alpha(png_ptr);
+
+This must appear before png_write_info() instead of later with the
+other transformations because in the case of paletted images the tRNS
+chunk data has to be inverted before the tRNS chunk is written.  If
+your image is not a paletted image, the tRNS data (which in such cases
+represents a single color to be rendered as transparent) won't need to
+be changed, and you can safely do this transformation after your
+png_write_info() call.
 
 If you need to write a private chunk that you want to appear before
 the PLTE chunk when PLTE is present, you can write the PNG info in
@@ -2437,6 +2667,8 @@ may be acceptable for real-time applications).  Infrequent flushing will
 only degrade the compression performance by a few percent over images
 that do not use flushing.
 
+.SS Writing the image data
+
 That's it for the transformations.  Now you can write the image data.
 The simplest way to do this is in one function call.  If have the
 whole image in memory, you can just call png_write_image() and libpng
@@ -2470,7 +2702,7 @@ row_pointers:
     png_write_row(png_ptr, &row_pointer);
 
 When the file is interlaced, things can get a good deal more
-complicated.  The only currently (as of August 1999 -- PNG Specification
+complicated.  The only currently (as of January 2000 -- PNG Specification
 version 1.2, dated July 1999) defined interlacing scheme for PNG files
 is the "Adam7" interlace scheme, that breaks down an
 image into seven smaller images of varying size.  libpng will build
@@ -2500,6 +2732,8 @@ As some of these rows are not used, and thus return immediately,
 you may want to read about interlacing in the PNG specification,
 and only update the rows that are actually used.
 
+.SS Finishing a sequential write
+
 After you are finished writing the image, you should finish writing
 the file.  If you are interested in writing comments or time, you should
 pass an appropriately filled png_info pointer.  If you are not interested,
@@ -2517,15 +2751,19 @@ point to allocated storage with the following functions:
     png_free_text(png_ptr, info_ptr, num)
     num          - number of text item to be freed (-1 for all items)
 
+    png_free_hIST(png_ptr, info_ptr)
+
     png_free_iCCP(png_ptr, info_ptr)
 
     png_free_pCAL(png_ptr, info_ptr)
 
     png_free_sCAL(png_ptr, info_ptr)
 
-    png_free_spalette(png_ptr, info_ptr, num)
+    png_free_spalettes(png_ptr, info_ptr, num)
     num          - number of suggested-paletted entry to be freed
                    (-1 for all suggested palettes)
+
+    png_free_pixels(png_ptr, info_ptr)
 
     png_free_unknown_chunk(png_ptr, info_ptr, num)
     num          - number of unknown chunk entry to be freed
@@ -2535,8 +2773,7 @@ These functions may be safely called when the relevant storage has
 already been freed, or has not yet been allocated, and will in that
 case do nothing.
 
-You must free any data you allocated for info_ptr, such as comments,
-palette, or histogram, before the call to png_destroy_write_struct();
+If you allocated palette data, you must free it before the call to png_destroy_write_struct();
 
 For a more compact example of writing a PNG image, see the file example.c.
 
@@ -2596,8 +2833,11 @@ a write stream, and vice versa.
 Error handling in libpng is done through png_error() and png_warning().
 Errors handled through png_error() are fatal, meaning that png_error()
 should never return to its caller.  Currently, this is handled via
-setjmp() and longjmp(), but you could change this to do things like
-exit() if you should wish.  On non-fatal errors, png_warning() is called
+setjmp() and longjmp() (unless you have compiled libpng with
+PNG_SETJMP_NOT_SUPPORTED, in which case it is handled via PNG_ABORT()),
+but you could change this to do things like exit() if you should wish.
+
+On non-fatal errors, png_warning() is called
 to print a warning message, and then control returns to the calling code.
 By default png_error() and png_warning() print a message on stderr via
 fprintf() unless the library is compiled with PNG_NO_STDIO defined.  If
@@ -2630,16 +2870,25 @@ after a longjmp, so the user may want to be careful about doing anything after
 setjmp returns non-zero besides returning itself.  Consult your compiler
 documentation for more details.
 
-If you need to read or write custom chunks, you will need to get deeper
-into the libpng code, as a mechanism has not yet been supplied for user
-callbacks with custom chunks.  First, read the PNG specification, and have
-a first level of understanding of how it works.  Pay particular attention
-to the sections that describe chunk names, and look at how other chunks
-were designed, so you can do things similarly.  Second, check out the
-sections of libpng that read and write chunks.  Try to find a chunk that
-is similar to yours and use it as a template.  More details can be found in the
-comments inside the code.  A way of handling unknown chunks in a generic
-method, potentially via callback functions, would be best.
+.SS Custom chunks
+
+If you need to read or write custom chunks, you may need to get deeper
+into the libpng code.  The library now has mechanisms for storing
+and writing chunks of unknown type; you can even declare callbacks
+for custom chunks.  Hoewver, this may not be good enough if the
+library code itself needs to know about interactions between your
+chunk and existing `intrinsic' chunks.
+
+If you need to write a new intrinsic chunk, first read the PNG
+specification. Acquire a first level of
+understanding of how it works.  Pay particular attention to the
+sections that describe chunk names, and look at how other chunks were
+designed, so you can do things similarly.  Second, check out the
+sections of libpng that read and write chunks.  Try to find a chunk
+that is similar to yours and use it as a template.  More details can
+be found in the comments inside the code.  It is best to handle unknown
+chunks in a generic method, via callback functions, instead of by
+modifying libpng functions.
 
 If you wish to write your own transformation for the data, look through
 the part of the code that does the transformations, and check out some of
@@ -2647,7 +2896,7 @@ the simpler ones to get an idea of how they work.  Try to find a similar
 transformation to the one you want to add and copy off of it.  More details
 can be found in the comments inside the code itself.
 
-Configuring for 16 bit platforms:
+.SS Configuring for 16 bit platforms
 
 You may need to change the png_large_malloc() and png_large_free()
 routines in pngmem.c, as these are required to allocate 64K, although
@@ -2656,13 +2905,13 @@ you will want to look into zconf.h to tell zlib (and thus libpng) that
 it cannot allocate more then 64K at a time.  Even if you can, the memory
 won't be accessible.  So limit zlib and libpng to 64K by defining MAXSEG_64K.
 
-Configuring for DOS:
+.SS Configuring for DOS
 
 For DOS users who only have access to the lower 640K, you will
 have to limit zlib's memory usage via a png_set_compression_mem_level()
 call.  See zlib.h or zconf.h in the zlib library for more information.
 
-Configuring for Medium Model:
+.SS Configuring for Medium Model
 
 Libpng's support for medium model has been tested on most of the popular
 compilers.  Make sure MAXSEG_64K gets defined, USE_FAR_KEYWORD gets
@@ -2670,10 +2919,10 @@ defined, and FAR gets defined to far in pngconf.h, and you should be
 all set.  Everything in the library (except for zlib's structure) is
 expecting far data.  You must use the typedefs with the p or pp on
 the end for pointers (or at least look at them and be careful).  Make
-note that the row's of data are defined as png_bytepp, which is an
+note that the rows of data are defined as png_bytepp, which is an
 unsigned char far * far *.
 
-Configuring for gui/windowing platforms:
+.SS Configuring for gui/windowing platforms:
 
 You will need to write new error and warning functions that use the GUI
 interface, as described previously, and set them to be the error and
@@ -2682,7 +2931,7 @@ in order to have them available during the structure initialization.
 They can be changed later via png_set_error_fn().  On some compilers,
 you may also have to change the memory allocators (png_malloc, etc.).
 
-Configuring for compiler xxx:
+.SS Configuring for compiler xxx:
 
 All includes for libpng are in pngconf.h.  If you need to add/change/delete
 an include, this is the place to do it.  The includes that are not
@@ -2690,7 +2939,7 @@ needed outside libpng are protected by the PNG_INTERNAL definition,
 which is only defined for those routines inside libpng itself.  The
 files in libpng proper only include png.h, which includes pngconf.h.
 
-Configuring zlib:
+.SS Configuring zlib:
 
 There are special functions to configure the compression.  Perhaps the
 most useful one changes the compression level, which currently uses
@@ -2722,7 +2971,7 @@ zlib.h for more information on what these mean.
         window_bits);
     png_set_compression_method(png_ptr, method);
 
-Controlling row filtering:
+.SS Controlling row filtering
 
 If you want to control whether libpng uses filtering or not, which
 filters are used, and how it goes about picking row filters, you
@@ -2788,7 +3037,7 @@ Note that the numbers above were invented purely for this example and
 are given only to help explain the function usage.  Little testing has
 been done to find optimum values for either the costs or the weights.
 
-Removing unwanted object code:
+.SS Removing unwanted object code
 
 There are a bunch of #define's in pngconf.h that control what parts of
 libpng are compiled.  All the defines end in _SUPPORTED.  If you are
@@ -2826,7 +3075,7 @@ library to fail if they call functions not available in your library.
 The size of the library itself should not be an issue, because only
 those sections that are actually used will be loaded into memory.
 
-Requesting debug printout:
+.SS Requesting debug printout
 
 The macro definition PNG_DEBUG can be used to request debugging
 printout.  Set it to an integer value in the range 0 to 3.  Higher
@@ -2898,13 +3147,13 @@ the old method.
 
 .SH VII. Y2K Compliance in libpng
 
-December 10, 1999
+February 5, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.5h are Y2K compliant.  It is my belief that earlier
+upward through 1.0.5q are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3030,7 +3279,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.0.5h - December 10, 1999:
+Libpng version 1.0.5q - February 5, 2000:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (randeg@alum.rpi.edu).
 
@@ -3044,8 +3293,8 @@ Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
 (libpng versions 0.5, May 1995, through 0.89c, May 1996)
 Copyright (c) 1996, 1997 Andreas Dilger
 (libpng versions 0.90, December 1996, through 0.96, May 1997)
-Copyright (c) 1998, 1999 Glenn Randers-Pehrson
-(libpng versions 0.97, January 1998, through 1.0.5h, December 10, 1999)
+Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+(libpng versions 0.97, January 1998, through 1.0.5q, February 5, 2000)
 
 For the purposes of this copyright and license, "Contributing Authors"
 is defined as the following set of individuals:
@@ -3058,6 +3307,7 @@ is defined as the following set of individuals:
    Tom Lane
    Dave Martindale
    Glenn Randers-Pehrson
+   Eric S. Raymond
    Greg Roelofs
    Guy Eric Schalnat
    Paul Schmidt

@@ -1,11 +1,11 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.5h - December 10, 1999
+ * libpng 1.0.5q - February 5, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * This file contains functions optionally called by an application
  * in order to tell libpng how to handle data when reading a PNG.
@@ -367,7 +367,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                      {
                         int j, next_j;
 
-                        if (num_new_palette & 1)
+                        if (num_new_palette & 0x01)
                         {
                            j = p->left;
                            next_j = p->right;
@@ -897,8 +897,8 @@ png_init_read_transformations(png_structp png_ptr)
 #endif
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* No GAMMA transformation */
-   if (png_ptr->transformations & PNG_BACKGROUND &&
-       color_type == PNG_COLOR_TYPE_PALETTE)
+   if ((png_ptr->transformations & PNG_BACKGROUND) &&
+       (color_type == PNG_COLOR_TYPE_PALETTE))
    {
       int i;
       int istop = (int)png_ptr->num_trans;
@@ -931,7 +931,7 @@ png_init_read_transformations(png_structp png_ptr)
 
 #if defined(PNG_READ_SHIFT_SUPPORTED)
    if ((png_ptr->transformations & PNG_SHIFT) &&
-      color_type == PNG_COLOR_TYPE_PALETTE)
+      (color_type == PNG_COLOR_TYPE_PALETTE))
    {
       png_uint_16 i;
       png_uint_16 istop = png_ptr->num_palette;
@@ -1009,7 +1009,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 #if defined(PNG_READ_16_TO_8_SUPPORTED)
-   if ((png_ptr->transformations & PNG_16_TO_8) && info_ptr->bit_depth == 16)
+   if ((png_ptr->transformations & PNG_16_TO_8) && (info_ptr->bit_depth == 16))
       info_ptr->bit_depth = 8;
 #endif
 
@@ -1026,7 +1026,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 #if defined(PNG_READ_PACK_SUPPORTED)
-   if ((png_ptr->transformations & PNG_PACK) && info_ptr->bit_depth < 8)
+   if ((png_ptr->transformations & PNG_PACK) && (info_ptr->bit_depth < 8))
       info_ptr->bit_depth = 8;
 #endif
 
@@ -1057,9 +1057,9 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 
 #if defined(PNG_READ_FILLER_SUPPORTED)
    /* STRIP_ALPHA and FILLER allowed:  MASK_ALPHA bit stripped above */
-   if (png_ptr->transformations & PNG_FILLER &&
-       (info_ptr->color_type == PNG_COLOR_TYPE_RGB ||
-        info_ptr->color_type == PNG_COLOR_TYPE_GRAY))
+   if ((png_ptr->transformations & PNG_FILLER) &&
+       ((info_ptr->color_type == PNG_COLOR_TYPE_RGB) ||
+       (info_ptr->color_type == PNG_COLOR_TYPE_GRAY)))
       info_ptr->channels++;
 #endif
 
@@ -1177,7 +1177,7 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
    /* if gray -> RGB, do so now only if background is non-gray; else do later
     * for performance reasons */
-   if (png_ptr->transformations & PNG_GRAY_TO_RGB &&
+   if ((png_ptr->transformations & PNG_GRAY_TO_RGB) &&
        !(png_ptr->mode & PNG_BACKGROUND_IS_GRAY))
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
@@ -1251,8 +1251,8 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
 
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
    /* if gray -> RGB, do so now only if we did not do so above */
-   if (png_ptr->transformations & PNG_GRAY_TO_RGB &&
-       png_ptr->mode & PNG_BACKGROUND_IS_GRAY)
+   if ((png_ptr->transformations & PNG_GRAY_TO_RGB) &&
+       (png_ptr->mode & PNG_BACKGROUND_IS_GRAY))
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
@@ -1330,10 +1330,10 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
          {
             png_bytep sp = row + (png_size_t)((row_width - 1) >> 3);
             png_bytep dp = row + (png_size_t)row_width - 1;
-            png_uint_32 shift = 7 - (int)((row_width + 7) & 7);
+            png_uint_32 shift = 7 - (int)((row_width + 7) & 0x07);
             for (i = 0; i < row_width; i++)
             {
-               *dp = (png_byte)((*sp >> shift) & 0x1);
+               *dp = (png_byte)((*sp >> shift) & 0x01);
                if (shift == 7)
                {
                   shift = 0;
@@ -1351,10 +1351,10 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
 
             png_bytep sp = row + (png_size_t)((row_width - 1) >> 2);
             png_bytep dp = row + (png_size_t)row_width - 1;
-            png_uint_32 shift = (int)((3 - ((row_width + 3) & 3)) << 1);
+            png_uint_32 shift = (int)((3 - ((row_width + 3) & 0x03)) << 1);
             for (i = 0; i < row_width; i++)
             {
-               *dp = (png_byte)((*sp >> shift) & 0x3);
+               *dp = (png_byte)((*sp >> shift) & 0x03);
                if (shift == 6)
                {
                   shift = 0;
@@ -1371,10 +1371,10 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
          {
             png_bytep sp = row + (png_size_t)((row_width - 1) >> 1);
             png_bytep dp = row + (png_size_t)row_width - 1;
-            png_uint_32 shift = (int)((1 - ((row_width + 1) & 1)) << 2);
+            png_uint_32 shift = (int)((1 - ((row_width + 1) & 0x01)) << 2);
             for (i = 0; i < row_width; i++)
             {
-               *dp = (png_byte)((*sp >> shift) & 0xf);
+               *dp = (png_byte)((*sp >> shift) & 0x0f);
                if (shift == 4)
                {
                   shift = 0;
@@ -1674,9 +1674,15 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                *(--dp) = (png_byte)(255 - *(--sp));
+
+/*             This does nothing:
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
+               We can replace it with:
+*/
+               sp-=3;
+               dp=sp;
             }
          }
          /* This inverts the alpha channel in RRGGBBAA */
@@ -1690,12 +1696,18 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             {
                *(--dp) = (png_byte)(255 - *(--sp));
                *(--dp) = (png_byte)(255 - *(--sp));
+
+/*             This does nothing:
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
+               We can replace it with:
+*/
+               sp-=6;
+               dp=sp;
             }
          }
       }
@@ -1725,8 +1737,12 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             {
                *(--dp) = (png_byte)(255 - *(--sp));
                *(--dp) = (png_byte)(255 - *(--sp));
+/*
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
+*/
+               sp-=2;
+               dp=sp;
             }
          }
       }
@@ -2518,7 +2534,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                   shift = 7;
                   for (i = 0; i < row_width; i++)
                   {
-                     if ((png_uint_16)((*sp >> shift) & 0x1)
+                     if ((png_uint_16)((*sp >> shift) & 0x01)
                         == trans_values->gray)
                      {
                         *sp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
@@ -2543,7 +2559,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                      shift = 6;
                      for (i = 0; i < row_width; i++)
                      {
-                        if ((png_uint_16)((*sp >> shift) & 0x3)
+                        if ((png_uint_16)((*sp >> shift) & 0x03)
                             == trans_values->gray)
                         {
                            *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
@@ -2551,9 +2567,9 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         }
                         else
                         {
-                           png_byte p = (png_byte)((*sp >> shift) & 0x3);
+                           png_byte p = (png_byte)((*sp >> shift) & 0x03);
                            png_byte g = (png_byte)((gamma_table [p | (p << 2) |
-                               (p << 4) | (p << 6)] >> 6) & 0x3);
+                               (p << 4) | (p << 6)] >> 6) & 0x03);
                            *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
                            *sp |= (png_byte)(g << shift);
                         }
@@ -2573,7 +2589,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                      shift = 6;
                      for (i = 0; i < row_width; i++)
                      {
-                        if ((png_uint_16)((*sp >> shift) & 0x3)
+                        if ((png_uint_16)((*sp >> shift) & 0x03)
                             == trans_values->gray)
                         {
                            *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
@@ -2599,7 +2615,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                      shift = 4;
                      for (i = 0; i < row_width; i++)
                      {
-                        if ((png_uint_16)((*sp >> shift) & 0xf)
+                        if ((png_uint_16)((*sp >> shift) & 0x0f)
                             == trans_values->gray)
                         {
                            *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
@@ -2607,9 +2623,9 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         }
                         else
                         {
-                           png_byte p = (png_byte)((*sp >> shift) & 0xf);
+                           png_byte p = (png_byte)((*sp >> shift) & 0x0f);
                            png_byte g = (png_byte)((gamma_table[p |
-                             (p << 4)] >> 4) & 0xf);
+                             (p << 4)] >> 4) & 0x0f);
                            *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
                            *sp |= (png_byte)(g << shift);
                         }
@@ -2629,7 +2645,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                      shift = 4;
                      for (i = 0; i < row_width; i++)
                      {
-                        if ((png_uint_16)((*sp >> shift) & 0xf)
+                        if ((png_uint_16)((*sp >> shift) & 0x0f)
                             == trans_values->gray)
                         {
                            *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
@@ -3362,10 +3378,10 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
             {
                sp = row + (png_size_t)((row_width - 1) >> 3);
                dp = row + (png_size_t)row_width - 1;
-               shift = 7 - (int)((row_width + 7) & 7);
+               shift = 7 - (int)((row_width + 7) & 0x07);
                for (i = 0; i < row_width; i++)
                {
-                  if ((*sp >> shift) & 0x1)
+                  if ((*sp >> shift) & 0x01)
                      *dp = 1;
                   else
                      *dp = 0;
@@ -3385,10 +3401,10 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
             {
                sp = row + (png_size_t)((row_width - 1) >> 2);
                dp = row + (png_size_t)row_width - 1;
-               shift = (int)((3 - ((row_width + 3) & 3)) << 1);
+               shift = (int)((3 - ((row_width + 3) & 0x03)) << 1);
                for (i = 0; i < row_width; i++)
                {
-                  value = (*sp >> shift) & 0x3;
+                  value = (*sp >> shift) & 0x03;
                   *dp = (png_byte)value;
                   if (shift == 6)
                   {
@@ -3406,10 +3422,10 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
             {
                sp = row + (png_size_t)((row_width - 1) >> 1);
                dp = row + (png_size_t)row_width - 1;
-               shift = (int)((row_width & 1) << 2);
+               shift = (int)((row_width & 0x01) << 2);
                for (i = 0; i < row_width; i++)
                {
-                  value = (*sp >> shift) & 0xf;
+                  value = (*sp >> shift) & 0x0f;
                   *dp = (png_byte)value;
                   if (shift == 4)
                   {
@@ -3508,10 +3524,10 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                   gray = (png_uint_16)(gray*0xff);
                   sp = row + (png_size_t)((row_width - 1) >> 3);
                   dp = row + (png_size_t)row_width - 1;
-                  shift = 7 - (int)((row_width + 7) & 7);
+                  shift = 7 - (int)((row_width + 7) & 0x07);
                   for (i = 0; i < row_width; i++)
                   {
-                     if ((*sp >> shift) & 0x1)
+                     if ((*sp >> shift) & 0x01)
                         *dp = 0xff;
                      else
                         *dp = 0;
@@ -3532,10 +3548,10 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                   gray = (png_uint_16)(gray*0x55);
                   sp = row + (png_size_t)((row_width - 1) >> 2);
                   dp = row + (png_size_t)row_width - 1;
-                  shift = (int)((3 - ((row_width + 3) & 3)) << 1);
+                  shift = (int)((3 - ((row_width + 3) & 0x03)) << 1);
                   for (i = 0; i < row_width; i++)
                   {
-                     value = (*sp >> shift) & 0x3;
+                     value = (*sp >> shift) & 0x03;
                      *dp = (png_byte)(value | (value << 2) | (value << 4) |
                         (value << 6));
                      if (shift == 6)
@@ -3555,10 +3571,10 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                   gray = (png_uint_16)(gray*0x11);
                   sp = row + (png_size_t)((row_width - 1) >> 1);
                   dp = row + (png_size_t)row_width - 1;
-                  shift = (int)((1 - ((row_width + 1) & 1)) << 2);
+                  shift = (int)((1 - ((row_width + 1) & 0x01)) << 2);
                   for (i = 0; i < row_width; i++)
                   {
-                     value = (*sp >> shift) & 0xf;
+                     value = (*sp >> shift) & 0x0f;
                      *dp = (png_byte)(value | (value << 4));
                      if (shift == 4)
                      {
@@ -3809,7 +3825,7 @@ png_build_gamma_table(png_structp png_ptr)
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
     defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-      if (png_ptr->transformations & (PNG_BACKGROUND | PNG_RGB_TO_GRAY))
+      if (png_ptr->transformations & ((PNG_BACKGROUND) | PNG_RGB_TO_GRAY))
       {
 
          g = 1.0 / (png_ptr->gamma);

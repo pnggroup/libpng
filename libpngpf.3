@@ -1,6 +1,6 @@
-.TH LIBPNGPF 3 December 10, 1999
+.TH LIBPNGPF 3 February 5, 2000
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
+libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5q
 (private functions)
 .SH SYNOPSIS
 \fB#include <png.h>\fP
@@ -184,6 +184,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 \fI\fB
 
 \fBpng_uint_32 png_get_uint_32 (png_bytep \fIbuf\fP\fB);\fP
+
+\fI\fB
+
+\fBint png_handle_as_unknown (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIchunk_name\fP\fB);\fP
 
 \fI\fB
 
@@ -505,9 +509,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 
 \fI\fB
 
-\fBvoid png_write_sPLT (png_structp \fP\fIpng_ptr\fP\fB, \fIpng_spalette_p
-
-\fI\fBpalette\fP\fB);\fP
+\fBvoid png_write_sPLT (png_structp \fP\fIpng_ptr\fP\fB, png_spalette_p \fIpalette\fP\fB);\fP
 
 \fI\fB
 

@@ -136,6 +136,19 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* If we have already read some of the signature */
    png_set_sig_bytes(png_ptr, sig_read);
 
+#ifdef hilevel
+   /*
+    * If you have enough memory to read in the entire image at once,
+    * and you need to specify only transforms that can be controlled
+    * with one of the PNG_TRANSFORM_* bits (this presently excludes
+    * dithering, filling, setting background, and doing gamma
+    * adjustment), then you can read the entire image (including
+    * pixels) into the info structure with this call:
+    */
+   png_read_png(png_ptr, info_ptr, png_transforms, NULL);
+#else
+   /* OK, you're doing it the hard way, with the lower-level functions */
+
    /* The call to png_read_info() gives us all of the information from the
     * PNG file before the first IDAT (image data chunk).  REQUIRED
     */
@@ -275,7 +288,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     */
    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_sBIT))
    {
-      png_color8p sig_bit;
+      png_color_8p sig_bit;
 
       png_get_sBIT(png_ptr, info_ptr, &sig_bit);
       png_set_shift(png_ptr, sig_bit);
@@ -350,6 +363,9 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    /* read rest of file, and get additional chunks in info_ptr - REQUIRED */
    png_read_end(png_ptr, info_ptr);
+#endif hilevel
+
+   /* At this point you have read the entire image */
 
    /* clean up after the read, and free any memory allocated - REQUIRED */
    png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
@@ -530,7 +546,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    }
 
    /* Set error handling.  REQUIRED if you aren't supplying your own
-    * error hadnling functions in the png_create_write_struct() call.
+    * error handling functions in the png_create_write_struct() call.
     */
    if (setjmp(png_ptr->jmpbuf))
    {
@@ -552,6 +568,15 @@ void write_png(char *file_name /* , ... other image information ... */)
    /* where user_io_ptr is a structure you want available to the callbacks */
 #endif no_streams /* only use one initialization method */
 
+#ifdef hilevel
+   /* This is the easy way.  Use it if you already have all the
+    * image info living info in the structure.  You could "|" many
+    * PNG_TRANSFORM flags into the png_transforms integer here.
+    */
+   png_write_png(png_ptr, info_ptr, png_transforms, NULL);
+#else
+   /* This is the hard way */
+
    /* Set the image information here.  Width and height are up to 2^31,
     * bit_depth is one of 1, 2, 4, 8, or 16, but valid values also depend on
     * the color_type selected. color_type is one of PNG_COLOR_TYPE_GRAY,
@@ -567,6 +592,11 @@ void write_png(char *file_name /* , ... other image information ... */)
    palette = (png_colorp)png_malloc(png_ptr, 256 * sizeof (png_color));
    /* ... set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, 256);
+   /* You can free the palette here if you like, since libpng has made its
+      own copy.  In versions of libpng earlier than version 1.0.5n, it was
+      necessary to keep the palette until after png_write_end(), because
+      libpng was using the caller's copy. */
+   free(palette);
 
    /* optional significant bit chunk */
    /* if we are dealing with a grayscale image then */
@@ -615,6 +645,9 @@ void write_png(char *file_name /* , ... other image information ... */)
     *   png_write_info_before_PLTE(write_ptr, write_info_ptr);
     *   write_my_chunk();
     *   png_write_info(png_ptr, info_ptr);
+    *
+    * However, given the level of known- and unknown-chunk support in 1.1.0
+    * and up, this should no longer be necessary.
     */
 
    /* Once we write out the header, the compression type on the text
@@ -695,14 +728,20 @@ void write_png(char *file_name /* , ... other image information ... */)
 #endif no_entire /* use only one output method */
 
    /* You can write optional chunks like tEXt, zTXt, and tIME at the end
-    * as well.
+    * as well.  Shouldn't be necessary in 1.1.0 and up as all the public
+    * chunks are supported and you can use png_set_unknown_chunks() to
+    * register unknown chunks into the info structure to be written out.
     */
 
    /* It is REQUIRED to call this to finish writing the rest of the file */
    png_write_end(png_ptr, info_ptr);
+#endif hilevel
 
-   /* if you malloced the palette, free it here */
-   free(info_ptr->palette);
+   /* if you malloced a palette and have not already freed it, free it
+      here (do *not* free libpng's copy of the palette in info_ptr->palette,
+      as recommended in versions 1.0.5m and earlier of this example; libpng
+      now takes care of that automatically). */
+   free(palette);
 
    /* clean up after the write, and free any memory allocated */
    png_destroy_write_struct(&png_ptr, (png_infopp)NULL);

@@ -47,6 +47,7 @@ EXPORTS
   png_set_dither
   png_set_gamma
   png_set_flush
+  png_set_user_chunk_fn
   png_write_flush
   png_start_read_image
   png_read_update_info
@@ -79,6 +80,7 @@ EXPORTS
   png_get_header_ver
   png_get_header_version
   png_get_libpng_ver
+  png_get_user_chunk_ptr
 ; png_get_mem_fn
 ; png_set_mem_fn
   png_set_write_fn
@@ -177,20 +179,24 @@ EXPORTS
   png_write_PLTE
   png_write_IDAT
   png_write_IEND
-  png_write_gAMA
-  png_write_sBIT
-  png_write_cHRM
-  png_write_sRGB
-  png_write_tRNS
   png_write_bKGD
+  png_write_cHRM
+  png_write_gAMA
   png_write_hIST
-  png_check_keyword
-  png_write_tEXt
-  png_write_zTXt
+  png_write_iCCP
+  png_write_iTXt
   png_write_oFFs
   png_write_pCAL
   png_write_pHYs
+  png_write_sBIT
+  png_write_sCAL
+  png_write_sPLT
+  png_write_sRGB
+  png_check_keyword
+  png_write_tEXt
   png_write_tIME
+  png_write_tRNS
+  png_write_zTXt
   png_write_finish_row
   png_write_start_row
   png_build_gamma_table
@@ -229,18 +235,22 @@ EXPORTS
   png_handle_IHDR
   png_handle_PLTE
   png_handle_IEND
-  png_handle_gAMA
-  png_handle_sBIT
-  png_handle_cHRM
-  png_handle_sRGB
-  png_handle_tRNS
   png_handle_bKGD
+  png_handle_cHRM
+  png_handle_gAMA
   png_handle_hIST
+  png_handle_iCCP
+  png_handle_iTXt
   png_handle_oFFs
   png_handle_pCAL
   png_handle_pHYs
-  png_handle_tIME
+  png_handle_sBIT
+  png_handle_sCAL
+  png_handle_sPLT
+  png_handle_sRGB
   png_handle_tEXt
+  png_handle_tIME
+  png_handle_tRNS
   png_handle_zTXt
   png_handle_unknown
   png_check_chunk_name
@@ -282,13 +292,16 @@ EXPORTS
   png_get_iCCP 
   png_get_sCAL
   png_get_spalettes 
-  png_free_pCAL 
   png_set_iCCP 
-  png_free_iCCP 
-  png_free_text 
-  png_free_sCAL
   png_set_spalettes 
+  png_free_hIST 
+  png_free_iCCP 
+  png_free_pCAL 
+  png_free_PLTE 
+  png_free_sCAL
   png_free_sPLT 
+  png_free_text 
+  png_free_tRNS 
 
   png_IHDR
   png_IDAT

@@ -6,17 +6,6 @@
 
 CC=gcc
 
-case "`type ld`" in *ucb*) echo "
-# WARNING:
-# The commands "CC" and "LD" must NOT refer to /usr/ucb/cc and
-# /usr/ucb/ld.  If they do, you need to adjust your PATH environment
-# variable to put /usr/ccs/bin ahead of /usr/ucb.  The environment
-# variable LD_LIBRARY_PATH should not be set at all.  If it is,
-# things are likely to break because of the libucb dependency that
-# is created.
-" ;;
-esac
-
 # Where make install puts libpng.a, libpng.so*, and png.h
 prefix=/usr/local
 
@@ -42,7 +31,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.5h
+PNGMIN = 1.0.5q
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -72,6 +61,18 @@ libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
 	ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
 
 libpng.so.$(PNGVER): $(OBJSDLL)
+	@case "`type ld`" in *ucb*) \
+	echo; \
+	echo '## WARNING:'; \
+	echo '## The commands "CC" and "LD" must NOT refer to /usr/ucb/cc'; \
+	echo '## and /usr/ucb/ld.  If they do, you need to adjust your PATH'; \
+	echo '## environment variable to put /usr/ccs/bin ahead of /usr/ucb.'; \
+	echo '## The environment variable LD_LIBRARY_PATH should not be set'; \
+	echo '## at all.  If it is, things are likely to break because of'; \
+	echo '## the libucb dependency that is created.'; \
+	echo; \
+	;; \
+	esac
 	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h libpng.so.$(PNGMAJ) \
 	 -o libpng.so.$(PNGVER) $(OBJSDLL) -lz
 

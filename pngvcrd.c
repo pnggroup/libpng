@@ -2,10 +2,10 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.5h - December 10, 1999
+ * libpng 1.0.5q - February 5, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
- * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * Contributed by Nirav Chhatrapati, Intel Corporation, 1998
  * Interface to libpng contributed by Gilles Vollant, 1999
@@ -33,6 +33,9 @@ static int mmxsupport()
 {
   int mmx_supported_local = 0;
   _asm {
+    push ebx          //CPUID will trash these
+    push ecx
+    push edx
     pushfd            //Save Eflag to stack
     pop eax           //Get Eflag from stack into eax
     mov ecx, eax      //Make another copy of Eflag in ecx
@@ -70,7 +73,9 @@ static int mmxsupport()
 
 NOT_SUPPORTED:
     mov  eax, mmx_supported_local  //move return value to eax
-
+    pop edx          //CPUID trashed these
+    pop ecx
+    pop ebx
   }
 
   //mmx_supported_local=0; // test code for force don't support MMX
@@ -3653,7 +3658,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #ifdef PNG_DEBUG
    char filnm[6];
 #endif
-   #define UseMMX 1
+#define UseMMX 1
 
    if (mmx_supported == 2)
        mmx_supported = mmxsupport();

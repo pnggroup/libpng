@@ -77,7 +77,8 @@ int main(int argc, char *argv[])
           if ((fp_al = fopen (argv[argi], "rb")) == NULL)
           {
             fprintf (stderr, "PNM2PNG\n");
-            fprintf (stderr, "Error:  alpha-channel file %s does not exist\n", argv[argi]);
+            fprintf (stderr, "Error:  alpha-channel file %s does not exist\n",
+               argv[argi]);
             exit (1);
           }
           break;
@@ -511,8 +512,8 @@ png_uint_32 get_value (FILE *pnm_file, int depth)
     for (i = 0; i < depth; i++)
       mask = (mask << 1) | 0x01;
 
-  get_token (pnm_file, token);
-  sscanf (token, "%lu", &ret_value);
+  get_token (pnm_file, (char *) token);
+  sscanf ((const char *) token, "%lu", &ret_value);
 
   ret_value &= mask;
 
