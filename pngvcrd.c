@@ -102,8 +102,8 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
        mmx_supported = 0;
    else
 #endif
-      if (mmx_supported == 2)
-          mmx_supported = mmxsupport();
+       if (mmx_supported == 2)
+           mmx_supported = mmxsupport();
 
    if (mask == 0xff)
    {
@@ -961,24 +961,25 @@ void
 png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
    png_uint_32 transformations)
 {
-#ifndef ENABLE_PNGVCRD_INTERLACE
+#ifdef DISABLE_PNGVCRD_INTERLACE
    int save_mmx_supported = mmx_supported;
 #endif
 
    png_debug(1,"in png_do_read_interlace\n");
 
-#ifndef ENABLE_PNGVCRD_INTERLACE
-   /* passes 0 and 2 affect rpng2-win + stefan_full_rgba.png
-    * symptom: first pixel in every 4th or 8th row is wrong color
-    * pass < 6 affects pngtest + any interlaced png
-    * symptom: corruption of heap, crash in png_destroy_read
+#ifdef DISABLE_PNGVCRD_INTERLACE
+   /* A sign error in the post-MMX cleanup code for each pixel_depth resulted
+    * in bad pixels at the beginning of some rows of some images, and also
+    * (due to out-of-range memory reads and writes) caused heap corruption
+    * when compiled with MSVC 6.0.  The error is now fixed, and the code
+    * appears to work completely correctly, so it is enabled by default.
     */
-   if(pass < 6)
+   if (1)  /* all passes caused a heap problem in the old code */
       mmx_supported = 0;
-#else
-   if (mmx_supported == 2)
-       mmx_supported = mmxsupport();
+   else
 #endif
+       if (mmx_supported == 2)
+           mmx_supported = mmxsupport();
 
    if (row != NULL && row_info != NULL)
    {
@@ -1163,19 +1164,18 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
             __int64 const4 = 0x0000000000FFFFFF;
             __int64 const5 = 0x000000FFFFFF0000;
             __int64 const6 = 0x00000000000000FF;
-            //int mmx_supported = 1;
-
             png_bytep sptr, dp;
             png_uint_32 i;
             png_size_t pixel_bytes;
-
             int width = row_info->width;
 
             pixel_bytes = (row_info->pixel_depth >> 3);
 
-            sptr = row + (row_info->width - 1) * pixel_bytes;
+            sptr = row + (width - 1) * pixel_bytes;
             dp = row + (final_width - 1) * pixel_bytes;
             // New code by Nirav Chhatrapati - Intel Corporation
+            // sign fix by GRR
+            // NOTE:  there is NO MMX code for 48-bit and 64-bit images
 
             if (mmx_supported) // use MMX routine if machine supports it
             {
@@ -1480,8 +1480,8 @@ loop2_pass0:
                         }
                      }
 
-                     sptr -= (width_mmx*2 + 2);
-                     dp -= (width_mmx*16 + 2);
+                     sptr -= (width_mmx*2 - 2);	// sign fixed
+                     dp -= (width_mmx*16 - 2);	// sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1492,9 +1492,7 @@ loop2_pass0:
                         {
                            dp -= pixel_bytes;
                            png_memcpy(dp, v, pixel_bytes);
-                           //dp -= pixel_bytes;
                         }
-                        //sptr -= pixel_bytes;
                      }
                   }
 
@@ -1528,8 +1526,8 @@ loop2_pass2:
                         }
                      }
 
-                     sptr -= (width_mmx*2 + 2);
-                     dp -= (width_mmx*8 + 2);
+                     sptr -= (width_mmx*2 - 2);	// sign fixed
+                     dp -= (width_mmx*8 - 2);	// sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1540,9 +1538,7 @@ loop2_pass2:
                         {
                            dp -= pixel_bytes;
                            png_memcpy(dp, v, pixel_bytes);
-                           //dp -= pixel_bytes;
                         }
-                        //sptr -= pixel_bytes;
                      }
                   }
 
@@ -1571,8 +1567,8 @@ loop2_pass4:
                         }
                      }
 
-                     sptr -= (width_mmx*2 + 2);
-                     dp -= (width_mmx*4 + 2);
+                     sptr -= (width_mmx*2 - 2);	// sign fixed
+                     dp -= (width_mmx*4 - 2);	// sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1583,9 +1579,7 @@ loop2_pass4:
                         {
                            dp -= pixel_bytes;
                            png_memcpy(dp, v, pixel_bytes);
-                           //dp -= pixel_bytes;
                         }
-                        //sptr -= pixel_bytes;
                      }
                   }
                } /* end of pixel_bytes == 2 */
@@ -1626,8 +1620,8 @@ loop4_pass0:
                         }
                      }
 
-                     sptr -= (width_mmx*4 + 4);
-                     dp -= (width_mmx*32 + 4);
+                     sptr -= (width_mmx*4 - 4);	// sign fixed
+                     dp -= (width_mmx*32 - 4);	// sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1638,9 +1632,7 @@ loop4_pass0:
                         {
                            dp -= pixel_bytes;
                            png_memcpy(dp, v, pixel_bytes);
-                           //dp -= pixel_bytes;
                         }
-                        //sptr -= pixel_bytes;
                      }
                   }
 
@@ -1674,8 +1666,8 @@ loop4_pass2:
                         }
                      }
 
-                     sptr -= (width_mmx*4 + 4);
-                     dp -= (width_mmx*16 + 4);
+                     sptr -= (width_mmx*4 - 4);	// sign fixed
+                     dp -= (width_mmx*16 - 4);	// sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1686,9 +1678,7 @@ loop4_pass2:
                         {
                            dp -= pixel_bytes;
                            png_memcpy(dp, v, pixel_bytes);
-                           //dp -= pixel_bytes;
                         }
-                        //sptr -= pixel_bytes;
                      }
                   }
 
@@ -1720,8 +1710,8 @@ loop4_pass4:
                         }
                      }
 
-                     sptr -= (width_mmx*4 + 4);
-                     dp -= (width_mmx*8 + 4);
+                     sptr -= (width_mmx*4 - 4);	// sign fixed
+                     dp -= (width_mmx*8 - 4);	// sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1732,9 +1722,7 @@ loop4_pass4:
                         {
                            dp -= pixel_bytes;
                            png_memcpy(dp, v, pixel_bytes);
-                           //dp -= pixel_bytes;
                         }
-                        //sptr -= pixel_bytes;
                      }
                   }
 
@@ -1742,7 +1730,7 @@ loop4_pass4:
 
                else if (pixel_bytes == 6)
                {
-                  for (i = row_info->width; i; i--)
+                  for (i = width; i; i--)
                   {
                      png_byte v[8];
                      int j;
@@ -1758,7 +1746,7 @@ loop4_pass4:
 
                else
                {
-                  for (i = row_info->width; i; i--)
+                  for (i = width; i; i--)
                   {
                      png_byte v[8];
                      int j;
@@ -1778,7 +1766,7 @@ loop4_pass4:
             {
                if (pixel_bytes == 1)
                {
-                  for (i = row_info->width; i; i--)
+                  for (i = width; i; i--)
                   {
                      png_byte v[8];
                      int j;
@@ -1794,7 +1782,7 @@ loop4_pass4:
                }
                else if (pixel_bytes == 3)
                {
-                  for (i = row_info->width; i; i--)
+                  for (i = width; i; i--)
                   {
                      png_byte v[8];
                      int j;
@@ -1809,7 +1797,7 @@ loop4_pass4:
                }
                else if (pixel_bytes == 2)
                {
-                  for (i = row_info->width; i; i--)
+                  for (i = width; i; i--)
                   {
                      png_byte v[8];
                      int j;
@@ -1824,7 +1812,7 @@ loop4_pass4:
                }
                else if (pixel_bytes == 4)
                {
-                  for (i = row_info->width; i; i--)
+                  for (i = width; i; i--)
                   {
                      png_byte v[8];
                      int j;
@@ -1839,7 +1827,7 @@ loop4_pass4:
                }
                else if (pixel_bytes == 6)
                {
-                  for (i = row_info->width; i; i--)
+                  for (i = width; i; i--)
                   {
                      png_byte v[8];
                      int j;
@@ -1854,7 +1842,7 @@ loop4_pass4:
                }
                else
                {
-                  for (i = row_info->width; i; i--)
+                  for (i = width; i; i--)
                   {
                      png_byte v[8];
                      int j;
@@ -1878,7 +1866,7 @@ loop4_pass4:
          (png_uint_32)row_info->pixel_depth + 7) >> 3);
    }
 
-#ifndef ENABLE_PNGVCRD_INTERLACE
+#ifdef DISABLE_PNGVCRD_INTERLACE
    mmx_supported = save_mmx_supported;
 #endif
 }
