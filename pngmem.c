@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -130,7 +130,7 @@ png_voidp
 png_malloc_default(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
-#endif PNG_USER_MEM_SUPPORTED
+#endif /* PNG_USER_MEM_SUPPORTED */
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
@@ -245,7 +245,7 @@ void
 png_free_default(png_structp png_ptr, png_voidp ptr)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
-      
+
    if (png_ptr->offset_table != NULL)
    {
       int i;
@@ -468,7 +468,7 @@ png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,
    size = (png_size_t)length;
    if ((png_uint_32)size != length)
       png_error(png_ptr,"Overflow in png_memcpy_check.");
-  
+
    return(png_memcpy (s1, s2, size));
 }
 

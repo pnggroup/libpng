@@ -1,17 +1,17 @@
 
-Installing libpng version 1.0.2 - June 14, 1998
+Installing libpng version 1.0.2a - December 29, 1998
 
 Before installing libpng, you must first install zlib.  zlib
 can usually be found wherever you got libpng.  zlib can be
 placed in another directory, at the same level as libpng.
 Note that your system might already have a preinstalled
-zlib, but you will still need to have access to the 
+zlib, but you will still need to have access to the
 zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.0.2" or "lpng102" and "zlib-1.1.2"
-or "zlib112") so that you have directories called "zlib" and "libpng".
+might be called "libpng-1.0.2a" or "lpng103" and "zlib-1.1.3"
+or "zlib113") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
 

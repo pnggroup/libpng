@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -515,7 +515,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * image has alpha or transparency, and png_handle_alpha()[*] has been
  * called, the rows contents must be initialized to the contents of the
  * screen.
- * 
+ *
  * "row" holds the actual image, and pixels are placed in it
  * as they arrive.  If the image is displayed after each pass, it will
  * appear to "sparkle" in.  "display_row" can be used to display a
@@ -530,7 +530,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.2.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.2a.
  */
 
 void
@@ -550,7 +550,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
       {
          png_bytep rptr = *rp++;
          png_bytep dptr = *dp++;
-   
+
          png_read_row(png_ptr, rptr, dptr);
       }
    else if(rp != NULL)
@@ -579,7 +579,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.2.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.2a.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -820,9 +820,9 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
       {
          png_free(png_ptr, png_ptr->gamma_16_table[i]);
       }
+   png_free(png_ptr, png_ptr->gamma_16_table);
    }
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
-   png_free(png_ptr, png_ptr->gamma_16_table);
    if (png_ptr->gamma_16_from_1 != NULL)
    {
       int i;
@@ -831,8 +831,8 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
       {
          png_free(png_ptr, png_ptr->gamma_16_from_1[i]);
       }
-   }
    png_free(png_ptr, png_ptr->gamma_16_from_1);
+   }
    if (png_ptr->gamma_16_to_1 != NULL)
    {
       int i;
@@ -841,8 +841,8 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
       {
          png_free(png_ptr, png_ptr->gamma_16_to_1[i]);
       }
-   }
    png_free(png_ptr, png_ptr->gamma_16_to_1);
+   }
 #endif
 #endif
 #if defined(PNG_TIME_RFC1123_SUPPORTED)

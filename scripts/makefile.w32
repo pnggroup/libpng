@@ -14,7 +14,7 @@ LDFLAGS=
 O=.obj
 
 #uncomment next to put error messages in a file
-ERRFILE= >> pngerrs
+#ERRFILE= >> pngerrs
 
 # variables
 OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O)

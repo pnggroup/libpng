@@ -1,6 +1,6 @@
-.TH LIBPNGPF 3 "June 14, 1998"
+.TH LIBPNGPF 3 "December 29, 1998"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.0.2 - June 14, 1998
+libpng \- Portable Network Graphics (PNG) Reference Library 1.0.2a - December 29, 1998
 (private functions)
 .SH SYNOPSIS
 #include <png.h>
@@ -88,7 +88,7 @@ row);
 
 void png_do_read_transformations (png_structp png_ptr);
 
-void png_do_rgb_to_gray (png_row_infop row_info, png_bytep
+int png_do_rgb_to_gray (png_row_infop row_info, png_bytep
 row);
 
 void png_do_shift (png_row_infop row_info, png_bytep row,

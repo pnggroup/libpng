@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.2 -June 14, 1998
+ * libpng 1.0.2a -December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -94,7 +94,7 @@ void
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    png_bytep dp = data;
-   if(png_ptr == NULL)return; 
+   if(png_ptr == NULL)return;
 
    /* contents of row_info:
     *  png_uint_32 width      width of row
@@ -211,10 +211,10 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    can't handle far buffers in the medium and small models, we have to copy
    the data.
 */
- 
+
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
- 
+
 static void
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -474,7 +474,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;
 #endif   
-   
+
    char inbuf[256], outbuf[256];
 
    row_buf = (png_bytep)NULL;
@@ -538,10 +538,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       fclose(fpout);
       return (1);
    }
+#ifdef USE_FAR_KEYWORD
+   png_memcpy(read_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+#endif
 
    png_debug(0, "Setting jmpbuf for write struct\n");
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(read_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
    if (setjmp(jmpbuf))
 #else
    if (setjmp(write_ptr->jmpbuf))
@@ -554,10 +556,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       fclose(fpout);
       return (1);
    }
-
 #ifdef USE_FAR_KEYWORD
    png_memcpy(write_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
 #endif
+
    png_debug(0, "Initializing input and output streams\n");
 #if !defined(PNG_NO_STDIO)
    png_init_io(read_ptr, fpin);
@@ -764,7 +766,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_write_info(write_ptr, write_info_ptr);
 
    png_debug(0, "\nAllocating row buffer \n");
-   row_buf = (png_bytep)png_malloc(read_ptr, 
+   row_buf = (png_bytep)png_malloc(read_ptr,
       png_get_rowbytes(read_ptr, read_info_ptr));
    if (row_buf == NULL)
    {
@@ -793,7 +795,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_debug(0, "Reading and writing end_info data\n");
    png_read_end(read_ptr, end_info_ptr);
    png_write_end(write_ptr, end_info_ptr);
- 
+
 #ifdef PNG_EASY_ACCESS_SUPPORTED
    if(verbose)
    {
@@ -900,6 +902,7 @@ main(int argc, char *argv[])
 
    fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
+   fprintf(STDERR,"%s",png_get_copyright(NULL));
 
    /* Do some consistency checking on the memory allocation settings, I'm
       not sure this matters, but it is nice to know, the first of these
@@ -975,13 +978,13 @@ main(int argc, char *argv[])
          int kerror;
          fprintf(STDERR, "Testing %s:",argv[i]);
          kerror = test_one_file(argv[i], outname);
-         if (kerror == 0) 
+         if (kerror == 0)
          {
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
             fprintf(STDERR, " PASS (%lu zero samples)\n",zero_samples);
 #else
             fprintf(STDERR, " PASS\n");
-#endif 
+#endif
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
          if(tIME_chunk_present != 0)
             fprintf(STDERR, " tIME = %s\n",tIME_string);
@@ -1055,7 +1058,7 @@ main(int argc, char *argv[])
                current_allocation-allocation_now);
          if (current_allocation != 0) {
              memory_infop pinfo = pinformation;
-   
+
              fprintf(STDERR, "MEMORY ERROR: %d bytes still allocated\n",
                 current_allocation);
              while (pinfo != NULL) {

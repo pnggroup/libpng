@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.2 - June 14, 1998
+ libpng version 1.0.2a - December 29, 1998
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alumni.rpi.edu>
  Copyright (c) 1998, Glenn Randers-Pehrson
@@ -10,7 +10,7 @@ libpng.txt - A description on how to use and modify libpng
  based on:
 
  libpng 1.0 beta 6  version 0.96 May 28, 1997
- Updated and distributed by Andreas Dilger 
+ Updated and distributed by Andreas Dilger
  Copyright (c) 1996, 1997 Andreas Dilger
 
  libpng 1.0 beta 2 - version 0.88  January 26, 1996
@@ -40,7 +40,8 @@ as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/> and as a
 W3C Recommendation <http://www.w3.org/TR/REC.png.html>. Some
 additional chunks are described in the special-purpose public chunks
 documents at <ftp://ftp.uu.net/graphics/png/documents/>.  Other information
-about PNG can be found at the PNG home page, <http://www.cdrom.com/pub/png/>.
+about PNG, and the latest version of libpng, can be found at the PNG home
+page, <http://www.cdrom.com/pub/png/>.
 
 Most users will not have to modify the library significantly; advanced
 users may want to modify it more.  All attempts were made to make it as
@@ -57,6 +58,8 @@ work to be done (see the TODO file), libpng should cover the
 majority of the needs of its users.
 
 Libpng uses zlib for its compression and decompression of PNG files.
+Further information about zlib, and the latest version of zlib, can
+be found at the zlib home page, <http://www.cdrom.com/pub/infozip/zlib/>.
 The zlib compression utility is a general purpose utility that is
 useful for more than PNG files, and can be used without libpng.
 See the documentation delivered with zlib for more details.
@@ -179,8 +182,8 @@ are only necessary if you are not using the libpng supplied error
 handling and memory alloc/free functions.
 
 When libpng encounters an error, it expects to longjmp back
-to your routine.  Therefore, you will need to call setjmp and pass the
-jmpbuf field of your png_struct.  If you read the file from different
+to your routine.  Therefore, you will need to call setjmp and pass
+your png_ptr->jmpbuf.  If you read the file from different
 routines, you will need to update the jmpbuf field every time you enter
 a new routine that will call a png_ function.
 
@@ -253,7 +256,7 @@ with
 You must supply the function
 
     void read_transform_fn(png_ptr ptr, row_info_ptr
-       row_info, png_bytep data) 
+       row_info, png_bytep data)
 
 See pngtest.c for a working example.  Your function will be called
 after all of the other transformations have been processed.
@@ -282,7 +285,7 @@ Functions are used to get the information from the info_ptr:
                          are present.
                      PNG_COLOR_TYPE_GRAY
                         (bit depths 1, 2, 4, 8, 16)
-                     PNG_COLOR_TYPE_GRAY_ALPHA  
+                     PNG_COLOR_TYPE_GRAY_ALPHA
                         (bit depths 8, 16)
                      PNG_COLOR_TYPE_PALETTE
                         (bit depths 1, 2, 4, 8)
@@ -588,6 +591,63 @@ RGB.  This code will do that conversion:
         color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
           png_set_gray_to_rgb(png_ptr);
 
+Conversely, you can convert an RGB or RGBA image to grayscale or grayscale
+with alpha.  This is intended for conversion of images that really are
+gray (red == green == blue), so the function simply strips out the red
+and blue channels, leaving the green channel in the gray position.
+
+    if (color_type == PNG_COLOR_TYPE_RGB ||
+        color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+          png_set_rgb_to_gray(png_ptr, error_action,
+             float red_weight, float green_weight);
+
+    error_action = 1: silently do the conversion
+    error_action = 2: issue a warning if the original
+                      image has any pixel where
+                      red != green or red != blue
+    error_action = 3: issue an error and abort the
+                      conversion if the original
+                      image has any pixel where
+                      red != green or red != blue
+
+    red_weight:       weight of red component
+                      (NULL -> default 54/256)
+    green_weight:     weight of green component
+                      (NULL -> default 183/256)
+
+If you have set error_action = 1 or 2, you can
+later check whether the image really was gray, after processing
+the image rows, with the png_get_rgb_to_gray_status(png_ptr) function.
+It will return a png_byte that is zero if the image was gray or
+1 if there were any non-gray pixels.  bKGD and sBIT data
+will be silently converted to grayscale, using the green channel
+data, regardless of the error_action setting.
+
+With 0.0<=red_weight+green_weight<=1.0,
+the normalized graylevel is computed:
+
+    int rw = red_weight * 256;
+    int gw = green_weight * 256;
+    int bw = 256 - (rw + gw);
+    gray = (rw*red + gw*green + bw*blue)/256;
+
+The default values approximate those recommended in the Charles
+Poynton's Color FAQ, <http://www.inforamp.net/~poynton/>
+Copyright (c) 1998-01-04 Charles Poynton poynton@inforamp.net
+
+    Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
+
+Libpng approximates this with
+
+    Y = 0.211 * R    + 0.715 * G    + 0.074 * B
+
+which can be expressed with integers as
+
+    Y = (54 * R + 183 * G + 19 * B)/256
+
+The calculation is done in a linear colorspace, if the image gamma
+is known.
+
 If you have a grayscale and you are using png_set_expand() to change to
 a higher bit-depth, you must either supply the background color as a gray
 value at the original file bit-depth (need_expand = 1) or else supply the
@@ -647,7 +707,7 @@ compensation other than the display_gamma is needed (viewing_gamma=1.0).
 The png_set_gamma() function handles gamma transformations of the data.
 Pass both the file gamma and the current screen_gamma.  If the file does
 not have a gamma value, you can pass one anyway if you have an idea what
-it is (usually 0.50 is a good guess for GIF images on PCs).  Note
+it is (usually 0.45455 is a good guess for GIF images on PCs).  Note
 that file gammas are inverted from screen gammas.  See the discussions
 on gamma in the PNG specification for an excellent description of what
 gamma is, and why all applications should support it.  It is strongly
@@ -656,7 +716,7 @@ recommended that PNG viewers support gamma correction.
    if (png_get_gAMA(png_ptr, info_ptr, &gamma))
       png_set_gamma(png_ptr, screen_gamma, gamma);
    else
-      png_set_gamma(png_ptr, screen_gamma, 0.50);
+      png_set_gamma(png_ptr, screen_gamma, 0.45455);
 
 If you need to reduce an RGB file to a paletted file, or if a paletted
 file has more entries then will fit on your screen, png_set_dither()
@@ -907,7 +967,9 @@ png_infop info_ptr;
        to be called when the header info is valid,
        when each row is completed, and when the image
        is finished.  If you aren't using all functions,
-       you can specify a NULL parameter.  You can use
+       you can specify NULL parameters.  Even when all
+       three functions are NULL, you need to call
+       png_set_progressive_read_fn().  You can use
        any struct as the user_ptr (cast to a void pointer
        for the function call), and retrieve the pointer
        from inside the callbacks using the function
@@ -939,21 +1001,21 @@ png_infop info_ptr;
        of data from the file stream (in order, of
        course).  On machines with segmented memory
        models machines, don't give it any more than
-       64K.  The library seems to run fine with sizes 
+       64K.  The library seems to run fine with sizes
        of 4K. Although you can give it much less if
        necessary (I assume you can give it chunks of
        1 byte, I haven't tried less then 256 bytes
        yet).  When this function returns, you may
        want to display any rows that were generated
        in the row callback if you don't already do
-       so there. 
+       so there.
      */
     png_process_data(png_ptr, info_ptr, buffer, length);
     return 0;
  }
 
  /* This function is called (as set by
-    png_set_progressive_fn() above) when enough data
+    png_set_progressive_read_fn() above) when enough data
     has been supplied so all of the header has been
     read.
  */
@@ -1010,7 +1072,7 @@ png_infop info_ptr;
        for interlaced images), you will have to pass
        the current row, and the function will combine
        the old row and the new row.
-    */  
+    */
  }
 
  void
@@ -1040,7 +1102,7 @@ You will want to do the I/O initialization before you get into libpng,
 so if it doesn't work, you don't have anything to undo. If you are not
 using the standard I/O functions, you will need to replace them with
 custom writing functions.  See the discussion under Customizing libpng.
-    
+
     FILE *fp = fopen(file_name, "wb");
     if (!fp)
     {
@@ -1081,20 +1143,22 @@ png_create_write_struct_2() instead of png_create_read_struct():
 After you have these structures, you will need to set up the
 error handling.  When libpng encounters an error, it expects to
 longjmp() back to your routine.  Therefore, you will need to call
-setjmp and pass the jmpbuf field of your png_struct.  If you
+setjmp() and pass the png_ptr->jmpbuf.  If you
 write the file from different routines, you will need to update
 the jmpbuf field every time you enter a new routine that will
 call a png_ function.  See your documentation of setjmp/longjmp
 for your compiler for more information on setjmp/longjmp.  See
 the discussion on libpng error handling in the Customizing Libpng
 section below for more information on the libpng error handling.
-    
+
     if (setjmp(png_ptr->jmpbuf))
-    {    
+    {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         fclose(fp);
         return;
     }
+    ...
+    return;
 
 Now you need to set up the output code.  The default for libpng is to
 use the C function fwrite().  If you use this, you will need to pass a
@@ -1135,7 +1199,7 @@ flag that indicates which filter type(s) are to be tested for each
 scanline.  See the Compression Library for details on the specific filter
 types.
 
-    
+
     /* turn on or off filtering, and/or choose
        specific filters */
     png_set_filter(png_ptr, 0,
@@ -1234,7 +1298,7 @@ Some of the more important parts of the png_info are:
                      PNG_SRGB_INTENT_PERCEPTUAL,
                      PNG_SRGB_INTENT_ABSOLUTE, or
                      PNG_SRGB_INTENT_RELATIVE.
-                        
+
 
     png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr,
        srgb_intent);
@@ -1325,7 +1389,7 @@ png_text structure holds a keyword-text value, and a compression type.
 The compression types have the same valid numbers as the compression
 types of the image data.  Currently, the only valid number is zero.
 However, you can store text either compressed or uncompressed, unlike
-images which always have to be compressed.  So if you don't want the
+images, which always have to be compressed.  So if you don't want the
 text compressed, set the compression type to PNG_TEXT_COMPRESSION_NONE.
 Until text gets around 1000 bytes, it is not worth compressing it.
 After the text has been written out to the file, the compression type
@@ -1385,7 +1449,7 @@ depending on whether you mean the PNG file, the time the image was
 created in a non-PNG format, a still photo from which the image was
 scanned, or possibly the subject matter itself.  In order to facilitate
 machine-readable dates, it is recommended that the "Creation Time"
-tEXt chunk use RFC 1123 format dates (e.g. 22 May 1997 18:07:10 GMT"),
+tEXt chunk use RFC 1123 format dates (e.g. "22 May 1997 18:07:10 GMT"),
 although this isn't a requirement.  Unlike the tIME chunk, the
 "Creation Time" tEXt chunk is not expected to be automatically changed
 by the software.  To facilitate the use of RFC 1123 dates, a function
@@ -1427,7 +1491,7 @@ correctly pack the pixels into a single byte:
 PNG files reduce possible bit depths to 1, 2, 4, 8, and 16.  If your
 data is of another bit depth, you can write an sBIT chunk into the
 file so that decoders can get the original data if desired.
-    
+
     /* Set the true bit depth of the image data */
     if (color_type & PNG_COLOR_MASK_COLOR)
     {
@@ -1488,7 +1552,7 @@ with
 You must supply the function
 
     void write_transform_fn(png_ptr ptr, row_info_ptr
-       row_info, png_bytep data) 
+       row_info, png_bytep data)
 
 See pngtest.c for a working example.  Your function will be called
 before any of the other transformations have been processed.
@@ -1603,7 +1667,7 @@ The second deals with more complicated things like adding new chunks,
 adding new transformations, and generally changing how libpng works.
 
 All of the memory allocation, input/output, and error handling in libpng
-goes through callbacks which are user settable.  The default routines are
+goes through callbacks that are user settable.  The default routines are
 in pngmem.c, pngrio.c, pngwio.c, and pngerror.c respectively.  To change
 these functions, call the appropriate png_set_???_fn() function.
 
@@ -1645,7 +1709,7 @@ The replacement I/O functions should have prototypes as follows:
 
 Supplying NULL for the read, write, or flush functions sets them back
 to using the default C stream functions.  It is an error to read from
-a write stream, and vice versa. 
+a write stream, and vice versa.
 
 Error handling in libpng is done through png_error() and png_warning().
 Errors handled through png_error() are fatal, meaning that png_error()
@@ -1712,7 +1776,7 @@ won't be accessible.  So limit zlib and libpng to 64K by defining MAXSEG_64K.
 
 Configuring for DOS:
 
-For DOS users which only have access to the lower 640K, you will
+For DOS users who only have access to the lower 640K, you will
 have to limit zlib's memory usage via a png_set_compression_mem_level()
 call.  See zlib.h or zconf.h in the zlib library for more information.
 
@@ -1724,7 +1788,7 @@ defined, and FAR gets defined to far in pngconf.h, and you should be
 all set.  Everything in the library (except for zlib's structure) is
 expecting far data.  You must use the typedefs with the p or pp on
 the end for pointers (or at least look at them and be careful).  Make
-note that the row's of data are defined as png_bytepp which is a
+note that the row's of data are defined as png_bytepp, which is an
 unsigned char far * far *.
 
 Configuring for gui/windowing platforms:
@@ -1784,8 +1848,8 @@ can call one of these functions.  The selection and configuration
 of row filters can have a significant impact on the size and
 encoding speed and a somewhat lesser impact on the decoding speed
 of an image.  Filtering is enabled by default for RGB and grayscale
-images (with and without alpha), and for 8-bit paletted images, but
-not for paletted images with bit depths less than 8 bits/pixel.
+images (with and without alpha), but not for paletted images nor
+for any images with bit depths less than 8 bits/pixel.
 
 The 'method' parameter sets the main filtering method, which is
 currently only '0' in the PNG 1.0 specification.  The 'filters'
@@ -1820,10 +1884,10 @@ by telling it the relative computational costs of the filters.
        PNG_FILTER_SELECTION_WEIGHTED, 3,
        weights, costs);
 
-The weights are multiplying factors which indicate to libpng that row
-should be the same for successive rows unless another row filter is that
-many times better than the previous filter.  In the above example, if
-the previous 3 filters were SUB, SUB, NONE, the SUB filter could have a
+The weights are multiplying factors that indicate to libpng that the
+row filter should be the same for successive rows unless another row filter
+is that many times better than the previous filter.  In the above example,
+if the previous 3 filters were SUB, SUB, NONE, the SUB filter could have a
 "sum of absolute differences" 1.5 x 1.3 times higher than other filters
 and still be chosen, while the NONE filter could have a sum 1.1 times
 higher than other filters and still be chosen.  Unspecified weights are
@@ -1878,10 +1942,46 @@ or DLL file), you should not remove or disable any parts of the library,
 as this will cause applications linked with different versions of the
 library to fail if they call functions not available in your library.
 The size of the library itself should not be an issue, because only
-those sections which are actually used will be loaded into memory.
+those sections that are actually used will be loaded into memory.
 
+Requesting debug printout:
 
-Changes to Libpng from version 0.88
+The macro definition PNG_DEBUG can be used to request debugging
+printout.  Set it to an integer value in the range 0 to 3.  Higher
+numbers result in increasing amounts of debugging information.  The
+information is printed to the "stderr" file, unless another file
+name is specified in the PNG_DEBUG_FILE macro definition.
+
+When PNG_DEBUG > 0, the following functions (macros) become available:
+
+   png_debug(level, message)
+   png_debug1(level, message, p1)
+   png_debug2(level, message, p1, p2)
+
+in which "level" is compared to PNG_DEBUG to decide whether to print
+the message, "message" is the formatted string to be printed,
+and p1 and p2 are parameters that are to be embedded in the string
+according to printf-style formatting directives.  For example,
+
+   png_debug1(2, "foo=%d\n", foo);
+
+is expanded to
+
+   if(PNG_DEBUG > 2)
+     fprintf(PNG_DEBUG_FILE, "foo=%d\n", foo);
+
+When PNG_DEBUG is defined but is zero, the macros aren't defined, but you
+can still use PNG_DEBUG to control your own debugging:
+
+   #ifdef PNG_DEBUG
+       fprintf(stderr, ...
+   #endif
+
+When PNG_DEBUG = 1, the macros are defined, but only png_debug statements
+having level = 0 will be printed.  There aren't any such statements in
+this version of libpng, but if you insert some they will be printed.
+
+VI.  Changes to Libpng from version 0.88
 
 It should be noted that versions of libpng later than 0.96 are not
 distributed by the original libpng author, Guy Schalnat, nor by
@@ -1907,7 +2007,7 @@ allocating and freeing the png_struct for each image read.
 
 Setting the error callbacks via png_set_message_fn() before
 png_read_init() as was suggested in libpng-0.88 is no longer supported
-because this caused applications which do not use custom error functions
+because this caused applications that do not use custom error functions
 to fail if the png_ptr was not initialized to zero.  It is still possible
 to set the error callbacks AFTER png_read_init(), or to change them with
 png_set_error_fn(), which is essentially the same function, but with a

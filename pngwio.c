@@ -1,7 +1,7 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -184,11 +184,11 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    }
 }
 
-#if defined(USE_FAR_KEYWORD) 
-#if defined(_MSC_VER)   
+#if defined(USE_FAR_KEYWORD)
+#if defined(_MSC_VER)
 void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
 {
-   void *near_ptr;   
+   void *near_ptr;
    void FAR *far_ptr;
    FP_OFF(near_ptr) = FP_OFF(ptr);
    far_ptr = (void FAR *)near_ptr;
@@ -200,7 +200,7 @@ void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
 #  else
 void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
 {
-   void *near_ptr;   
+   void *near_ptr;
    void FAR *far_ptr;
    near_ptr = (void FAR *)ptr;
    far_ptr = (void FAR *)near_ptr;

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -424,7 +424,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-#ifndef PNG_NO_STDIO
+#ifndef PNG_NO_CONSOLE_IO
          fprintf(stderr, "igamma = %lu\n", igamma);
 #endif
          return;
@@ -496,6 +496,9 @@ png_handle_sBIT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else
    {
       png_ptr->sig_bit.gray = buf[0];
+      png_ptr->sig_bit.red = buf[0];
+      png_ptr->sig_bit.green = buf[0];
+      png_ptr->sig_bit.blue = buf[0];
       png_ptr->sig_bit.alpha = buf[1];
    }
    png_set_sBIT(png_ptr, info_ptr, &(png_ptr->sig_bit));
@@ -624,7 +627,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
-#ifndef PNG_NO_STDIO
+#ifndef PNG_NO_CONSOLE_IO
             fprintf(stderr,"wx=%f, wy=%f, rx=%f, ry=%f\n",
                white_x, white_y, red_x, red_y);
             fprintf(stderr,"gx=%f, gy=%f, bx=%f, by=%f\n",
@@ -693,7 +696,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-#ifndef PNG_NO_STDIO
+#ifndef PNG_NO_CONSOLE_IO
            fprintf(stderr,"gamma=%f\n",png_ptr->gamma);
 #endif
       }
@@ -1890,7 +1893,6 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 }
 #endif
 
-#ifndef PNG_READ_SLOW_FILTERING
 void
 png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    png_bytep prev_row, int filter)
@@ -1947,7 +1949,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
                ((int)(*pp++) / 2)) & 0xff);
             rp++;
          }
-        
+
          for (i = 0; i < istop; i++)
          {
             *rp = (png_byte)(((int)(*rp) +
@@ -2010,118 +2012,11 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
          break;
       }
       default:
-         png_error(png_ptr, "Bad adaptive filter type");
+         png_warning(png_ptr, "Ignoring bad adaptive filter type");
+         *row=0;
          break;
    }
 }
-#else /* PNG_READ_SLOW_FILTERING */
-void
-png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
-   png_bytep prev_row, int filter)
-{
-   png_debug(1, "in png_read_filter_row\n");
-   png_debug2(2,"row = %d, filter = %d\n", png_ptr->row_number, filter);
-
-
-   switch (filter)
-   {
-      case PNG_FILTER_VALUE_NONE:
-         break;
-      case PNG_FILTER_VALUE_SUB:
-      {
-         png_uint_32 i;
-         int bpp = (row_info->pixel_depth + 7) / 8;
-         png_bytep rp;
-         png_bytep lp;
-
-         for (i = (png_uint_32)bpp, rp = row + bpp, lp = row;
-            i < row_info->rowbytes; i++, rp++, lp++)
-         {
-            *rp = (png_byte)(((int)(*rp) + (int)(*lp)) & 0xff);
-         }
-         break;
-      }
-      case PNG_FILTER_VALUE_UP:
-      {
-         png_uint_32 i;
-         png_bytep rp;
-         png_bytep pp;
-
-         for (i = 0, rp = row, pp = prev_row;
-            i < row_info->rowbytes; i++, rp++, pp++)
-         {
-            *rp = (png_byte)(((int)(*rp) + (int)(*pp)) & 0xff);
-         }
-         break;
-      }
-      case PNG_FILTER_VALUE_AVG:
-      {
-         png_uint_32 i;
-         int bpp = (row_info->pixel_depth + 7) / 8;
-         png_bytep rp;
-         png_bytep pp;
-         png_bytep lp;
-
-         for (i = 0, rp = row, pp = prev_row;
-            i < (png_uint_32)bpp; i++, rp++, pp++)
-         {
-            *rp = (png_byte)(((int)(*rp) +
-               ((int)(*pp) / 2)) & 0xff);
-         }
-         for (lp = row; i < row_info->rowbytes; i++, rp++, lp++, pp++)
-         {
-            *rp = (png_byte)(((int)(*rp) +
-               (int)(*pp + *lp) / 2) & 0xff);
-         }
-         break;
-      }
-      case PNG_FILTER_VALUE_PAETH:
-      {
-         int bpp = (row_info->pixel_depth + 7) / 8;
-         png_uint_32 i;
-         png_bytep rp;
-         png_bytep pp;
-         png_bytep lp;
-         png_bytep cp;
-
-         for (i = 0, rp = row, pp = prev_row,
-            lp = row - bpp, cp = prev_row - bpp;
-            i < row_info->rowbytes; i++, rp++, pp++, lp++, cp++)
-         {
-            int a, b, c, pa, pb, pc, p;
-
-            b = *pp;
-            if (i >= (png_uint_32)bpp)
-            {
-               c = *cp;
-               a = *lp;
-            }
-            else
-            {
-               a = c = 0;
-            }
-            p = a + b - c;
-            pa = abs(p - a);
-            pb = abs(p - b);
-            pc = abs(p - c);
-
-            if (pa <= pb && pa <= pc)
-               p = a;
-            else if (pb <= pc)
-               p = b;
-            else
-               p = c;
-
-            *rp = (png_byte)(((int)(*rp) + p) & 0xff);
-         }
-         break;
-      }
-      default:
-         png_error(png_ptr, "Bad adaptive filter type");
-         break;
-   }
-}
-#endif /* PNG_READ_SLOW_FILTERING */
 
 void
 png_read_finish_row(png_structp png_ptr)
@@ -2320,19 +2215,25 @@ png_read_start_row(png_structp png_ptr)
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
    if (png_ptr->transformations & PNG_GRAY_TO_RGB)
    {
-      if ((png_ptr->num_trans && (png_ptr->transformations & PNG_EXPAND)) ||
-         png_ptr->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+      if (
+#if defined(PNG_READ_EXPAND_SUPPORTED)
+        (png_ptr->num_trans && (png_ptr->transformations & PNG_EXPAND)) ||
+#endif
+#if defined(PNG_READ_FILLER_SUPPORTED)
+        (png_ptr->transformations & (PNG_FILLER)) ||
+#endif
+        png_ptr->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       {
          if (max_pixel_depth <= 16)
             max_pixel_depth = 32;
-         else if (max_pixel_depth <= 32)
+         else
             max_pixel_depth = 64;
       }
       else
       {
          if (max_pixel_depth <= 8)
             max_pixel_depth = 24;
-         else if (max_pixel_depth <= 16)
+         else
             max_pixel_depth = 48;
       }
    }

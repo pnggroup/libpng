@@ -1,11 +1,10 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.0.2 - June 14, 1998
- * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
+ * libpng version 1.0.2a - December 29, 1998
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998 Glenn Randers-Pehrson
+ * Copyright (c) 1998, Glenn Randers-Pehrson
  *
  * Note about libpng version numbers:
  *
@@ -31,6 +30,9 @@
  *    1.0.0                     1.0.0      100  2.1.0 [int should be 10000]
  *    1.0.1                     1.0.1    10001  2.1.0
  *    1.0.1a-e                  1.0.1a-e 10002  2.1.0.1a-e
+ *    1.0.2                     1.0.2    10002  2.1.0.2
+ *    1.0.2a                    1.0.2a   10003  2.1.0.2a
+ *    1.0.3                     1.0.3    10003  2.1.0.3
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
@@ -117,14 +119,14 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.2"
+#define PNG_LIBPNG_VER_STRING "1.0.2a"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
  * Versions 0.7 through 1.0.0 were in the range 0 to 100 here (only
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=bugfix */
-#define PNG_LIBPNG_VER    10002  /* 1.0.2 */
+#define PNG_LIBPNG_VER    10003  /* 1.0.3 */
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
@@ -144,6 +146,7 @@ extern int FARDATA png_pass_dsp_mask[7];
 extern int FARDATA png_pass_width[7];
 extern int FARDATA png_pass_height[7];
 */
+
 #endif /* PNG_NO_EXTERN */
 
 /* Three color definitions.  The order of the red, green, and blue, (and the
@@ -453,7 +456,7 @@ typedef png_info FAR * FAR * png_infopp;
 #define PNG_sRGB_INTENT_ABSOLUTE   2
 #define PNG_sRGB_INTENT_RELATIVE   3
 #define PNG_sRGB_INTENT_LAST       4 /* Not a valid value */
-                        
+
 
 
 /* These determine if an ancillary chunk's data has been successfully read
@@ -689,6 +692,12 @@ struct png_struct_def
    png_malloc_ptr malloc_fn;         /* function for allocating memory */
    png_free_ptr free_fn;             /* function for freeing memory */
 #endif /* PNG_USER_MEM_SUPPORTED */
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+   png_byte rgb_to_gray_status;
+   png_byte rgb_to_gray_red_coeff;
+   png_byte rgb_to_gray_green_coeff;
+   png_byte rgb_to_gray_blue_coeff;
+#endif
 };
 
 typedef png_struct FAR * FAR * png_structpp;
@@ -734,7 +743,7 @@ extern PNG_EXPORT(png_structp,png_create_read_struct_2)
    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
    png_malloc_ptr malloc_fn, png_free_ptr free_fn));
 extern PNG_EXPORT(png_structp,png_create_write_struct_2)
-   PNGARG((png_const_charp user_png_ver, png_voidp error_ptr, 
+   PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
    png_malloc_ptr malloc_fn, png_free_ptr free_fn));
 #endif
@@ -800,8 +809,11 @@ extern PNG_EXPORT(void,png_set_gray_to_rgb) PNGARG((png_structp png_ptr));
 #endif /* PNG_READ_GRAY_TO_RGB_SUPPORTED */
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-/* Reduce RGB to grayscale. (Not yet implemented) */
-extern PNG_EXPORT(void,png_set_rgb_to_gray) PNGARG((png_structp png_ptr));
+/* Reduce RGB to grayscale. */
+extern PNG_EXPORT(void,png_set_rgb_to_gray) PNGARG((png_structp png_ptr,
+   int error_action, float red, float green ));
+extern PNG_EXPORT(png_byte,png_get_rgb_to_gray_status) PNGARG((png_structp
+   png_ptr));
 #endif /* PNG_READ_RGB_TO_GRAY_SUPPORTED */
 
 extern PNG_EXPORT(void,png_build_grayscale_palette) PNGARG((int bit_depth,
@@ -1105,6 +1117,7 @@ extern PNG_EXPORT(void,png_init_io) PNGARG((png_structp png_ptr, FILE *fp));
  * method of error handling.  If error_fn or warning_fn is NULL, the
  * default function will be used.
  */
+
 extern PNG_EXPORT(void,png_set_error_fn) PNGARG((png_structp png_ptr,
    png_voidp error_ptr, png_error_ptr error_fn, png_error_ptr warning_fn));
 
@@ -1343,7 +1356,7 @@ extern PNG_EXPORT(png_uint_32,png_get_IHDR) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 *width, png_uint_32 *height,
    int *bit_depth, int *color_type, int *interlace_type,
    int *compression_type, int *filter_type));
-  
+
 extern PNG_EXPORT(void,png_set_IHDR) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 width, png_uint_32 height, int bit_depth,
    int color_type, int interlace_type, int compression_type, int filter_type));
@@ -1449,28 +1462,42 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
  * only been added since version 0.95 so it is not implemented throughout
  * libpng yet, but more support will be added as needed.
  */
+#ifdef PNG_DEBUG
 #if (PNG_DEBUG > 0)
-#ifdef PNG_NO_STDIO
-#include <stdio.h>
-#endif
 #ifndef PNG_DEBUG_FILE
 #define PNG_DEBUG_FILE stderr
 #endif /* PNG_DEBUG_FILE */
 
 #define png_debug(l,m)        if (PNG_DEBUG > l) \
                                  fprintf(PNG_DEBUG_FILE,"%s"m,(l==1 ? "\t" : \
-                                    (l==2 ? "\t\t":(l==3 ? "\t\t\t":""))))
+                                    (l==2 ? "\t\t":(l>2 ? "\t\t\t":""))))
 #define png_debug1(l,m,p1)    if (PNG_DEBUG > l) \
                                  fprintf(PNG_DEBUG_FILE,"%s"m,(l==1 ? "\t" : \
-                                    (l==2 ? "\t\t":(l==3 ? "\t\t\t":""))),p1)
+                                    (l==2 ? "\t\t":(l>2 ? "\t\t\t":""))),p1)
 #define png_debug2(l,m,p1,p2) if (PNG_DEBUG > l) \
                                  fprintf(PNG_DEBUG_FILE,"%s"m,(l==1 ? "\t" : \
-                                    (l==2 ? "\t\t":(l==3 ? "\t\t\t":""))),p1,p2)
-#else
-#define png_debug(l, m)
-#define png_debug1(l, m, p1)
-#define png_debug2(l, m, p1, p2)
+                                    (l==2 ? "\t\t":(l>2 ? "\t\t\t":""))),p1,p2)
 #endif /* (PNG_DEBUG > 0) */
+#endif /* PNG_DEBUG */
+#ifndef png_debug
+#define png_debug(l, m)
+#endif
+#ifndef png_debug1
+#define png_debug1(l, m, p1)
+#endif
+#ifndef png_debug2
+#define png_debug2(l, m, p1, p2)
+#endif
+
+extern PNG_EXPORT(png_charp,png_get_copyright) PNGARG((png_structp png_ptr));
+#ifdef PNG_NO_EXTERN
+extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr));
+png_charp
+png_get_header_version(png_structp png_ptr)
+{
+   return("\n libpng version 1.0.2a - December 29, 1998 (header)\n");
+}
+#endif
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -1485,28 +1512,30 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
  * [Optimized code by Greg Roelofs and Mark Adler...blame us for bugs. :-) ]
  */
 
-   /* fg and bg should be in `gamma 1.0' space; alpha is the opacity */
-#  define png_composite(composite, fg, alpha, bg) \
-     { png_uint_16 temp = ((png_uint_16)(fg) * (png_uint_16)(alpha) + \
-                        (png_uint_16)(bg)*(png_uint_16)(255 - \
-                        (png_uint_16)(alpha)) + (png_uint_16)128); \
+ /* fg and bg should be in `gamma 1.0' space; alpha is the opacity          */
+
+#  define png_composite(composite, fg, alpha, bg)                            \
+     { png_uint_16 temp = ((png_uint_16)(fg) * (png_uint_16)(alpha) +        \
+                        (png_uint_16)(bg)*(png_uint_16)(255 -                \
+                        (png_uint_16)(alpha)) + (png_uint_16)128);           \
        (composite) = (png_byte)((temp + (temp >> 8)) >> 8); }
-#  define png_composite_16(composite, fg, alpha, bg) \
-     { png_uint_32 temp = ((png_uint_32)(fg) * (png_uint_32)(alpha) + \
-                        (png_uint_32)(bg)*(png_uint_32)(65535L - \
-                        (png_uint_32)(alpha)) + (png_uint_32)32768L); \
+
+#  define png_composite_16(composite, fg, alpha, bg)                         \
+     { png_uint_32 temp = ((png_uint_32)(fg) * (png_uint_32)(alpha) +        \
+                        (png_uint_32)(bg)*(png_uint_32)(65535L -             \
+                        (png_uint_32)(alpha)) + (png_uint_32)32768L);        \
        (composite) = (png_uint_16)((temp + (temp >> 16)) >> 16); }
 
 #else  /* standard method using integer division */
 
-   /* fg and bg should be in `gamma 1.0' space; alpha is the opacity */
-#  define png_composite(composite, fg, alpha, bg) \
-     (composite) = (png_byte)(((png_uint_16)(fg) * (png_uint_16)(alpha) + \
-       (png_uint_16)(bg) * (png_uint_16)(255 - (png_uint_16)(alpha)) + \
+#  define png_composite(composite, fg, alpha, bg)                            \
+     (composite) = (png_byte)(((png_uint_16)(fg) * (png_uint_16)(alpha) +    \
+       (png_uint_16)(bg) * (png_uint_16)(255 - (png_uint_16)(alpha)) +       \
        (png_uint_16)127) / 255)
-#  define png_composite_16(composite, fg, alpha, bg) \
+
+#  define png_composite_16(composite, fg, alpha, bg)                         \
      (composite) = (png_uint_16)(((png_uint_32)(fg) * (png_uint_32)(alpha) + \
-       (png_uint_32)(bg)*(png_uint_32)(65535L - (png_uint_32)(alpha)) + \
+       (png_uint_32)(bg)*(png_uint_32)(65535L - (png_uint_32)(alpha)) +      \
        (png_uint_32)32767) / (png_uint_32)65535L)
 
 #endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
@@ -1552,7 +1581,7 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_DITHER             0x0040
 #define PNG_BACKGROUND         0x0080
 #define PNG_BACKGROUND_EXPAND  0x0100
-#define PNG_RGB_TO_GRAY        0x0200 /* Not currently implemented */
+                          /*   0x0200 unused */
 #define PNG_16_TO_8            0x0400
 #define PNG_RGBA               0x0800
 #define PNG_EXPAND             0x1000
@@ -1564,6 +1593,9 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_STRIP_ALPHA       0x40000L
 #define PNG_INVERT_ALPHA      0x80000L
 #define PNG_USER_TRANSFORM   0x100000L
+#define PNG_RGB_TO_GRAY_ERR  0x200000L
+#define PNG_RGB_TO_GRAY_WARN 0x400000L
+#define PNG_RGB_TO_GRAY      0x600000L  /* two bits, RGB_TO_GRAY_ERR|WARN */
 
 /* flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
@@ -1725,8 +1757,8 @@ PNG_EXTERN void png_flush PNGARG((png_structp png_ptr));
 #endif
 
 /* Place a 32-bit number into a buffer in PNG byte order (big-endian).
- * The only currently known PNG chunk that uses signed numbers is
- * the ancillary extension chunk, pCAL.
+ * The only currently known PNG chunks that use signed numbers are
+ * the ancillary extension chunks, oFFs and pCAL.
  */
 PNG_EXTERN void png_save_uint_32 PNGARG((png_bytep buf, png_uint_32 i));
 
@@ -1922,8 +1954,8 @@ PNG_EXTERN void png_do_packswap PNGARG((png_row_infop row_info, png_bytep row));
 #endif
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-PNG_EXTERN void png_do_rgb_to_gray PNGARG((png_row_infop row_info,
-   png_bytep row));
+PNG_EXTERN int png_do_rgb_to_gray PNGARG((png_structp png_ptr, png_row_infop
+   row_info, png_bytep row));
 #endif
 
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
@@ -2128,11 +2160,16 @@ PNG_EXTERN void png_push_read_zTXt PNGARG((png_structp png_ptr,
 
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
+#endif
+ 
+
 #endif /* PNG_INTERNAL */
 
 #ifdef __cplusplus
 }
 #endif
+
+#ifdef PNG_NO_EXTERN
 
 /* do not put anything past this line */
 #endif /* _PNG_H */

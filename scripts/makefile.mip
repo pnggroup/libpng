@@ -2,6 +2,9 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
+# where make install puts libpng.a and png.h
+prefix=/usr/local
+
 CC=cc
 CFLAGS=-I../zlib -O -systype sysv -DSYSV -w -Dmips
 #CFLAGS=-O
@@ -9,9 +12,6 @@ LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
 #RANLIB=ranlib
 RANLIB=echo
-
-# where make install puts libpng.a and png.h
-prefix=/usr/local
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \

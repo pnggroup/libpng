@@ -89,7 +89,7 @@ version 0.89 [July, 1996]
      so that people are aware that they need to change their code
   changed filter selection API to allow selection of multiple filters
      since it didn't work in previous versions of libpng anyways
-  optimized filter selection code    
+  optimized filter selection code
   fixed png_set_background() to allow using an arbitrary RGB color for
      paletted images
   fixed gamma and background correction for paletted images, so
@@ -256,7 +256,7 @@ version 0.99g [March 6, 1998, morning]
   Minor changes to pngtest.c to suppress compiler warnings.
   Removed "beta" language from documentation.
 version 0.99h [March 6, 1998, evening]
-  Minor changes to previous minor changes to pngtest.c 
+  Minor changes to previous minor changes to pngtest.c
   Changed PNG_READ_NOT_FULLY_SUPPORTED to PNG_READ_TRANSFORMS_NOT_SUPPORTED
   and added PNG_PROGRESSIVE_READ_NOT_SUPPORTED macro
 version 1.00 [March 7, 1998]
@@ -334,7 +334,7 @@ version 1.0.1d [May 24, 1998]
     Bob Dellaca, to make a png32bd.dll with Borland C++ 4.5
   Fixed error in example.c with png_set_text: num_text is 3, not 2 (Guido V.)
   Changed several loops from count-down to count-up, for consistency.
-version 1.0.2 [June 14, 1998]
+version 1.0.1e [June 6, 1998]
   Revised libpng.txt and libpng.3 description of png_set_read|write_fn(), and
     added warnings when people try to set png_read_fn and png_write_fn in
     the same structure.
@@ -350,4 +350,29 @@ version 1.0.2 [June 14, 1998]
     and revised pngtest.c to demonstrate their use, replacing the
     PNGTEST_DEBUG_MEM feature.
   Added makefile.w32, for Microsoft C++ 4.0 and later (Tim Wegner).
-  Fixed two bugs in makefile.bor
+version 1.0.2 [June 14, 1998]
+  Fixed two bugs in makefile.bor .
+version 1.0.2a [December 29, 1998]
+  Replaced and extended code that was removed from png_set_filler() in 1.0.1a.
+  Fixed a bug in png_do_filler() that made it fail to write filler bytes in
+    the left-most pixel of each row (Kevin Bracey).
+  Changed "static pngcharp tIME_string" to "static char tIME_string[30]"
+    in pngtest.c (Duncan Simpson).
+  Fixed a problem in pngrutil.c: gray_to_rgb didn't always work with 16-bit.
+  Fixed a problem in png_read_push_finish_row(), which would not skip some
+    passes that it should skip, for images that are less than 3 pixels high.
+  Interchanged the order of calls to png_do_swap() and png_do_shift()
+    in pngwtran.c (John Cromer).
+  Added #ifdef PNG_DEBUG/#endif surrounding use of PNG_DEBUG in png.h .
+  Changed "bad adaptive filter type" from error to warning in pngrutil.c .
+  Fixed a documentation error about default filtering with 8-bit indexed-color.
+  Separated the PNG_NO_STDIO macro into PNG_NO_STDIO and PNG_NO_CONSOLE_IO
+    (L. Peter Deutsch).
+  Added png_set_rgb_to_gray() and png_get_rgb_to_gray_status() functions.
+  Added png_get_copyright() and png_get_header_version() functions.
+  Revised comments on png_set_progressive_read_fn() in libpng.txt and example.c
+  Added information about debugging in libpng.txt and libpng.3 .
+  Changed "ln -sf" to "ln -s -f" in makefile.s2x, makefile.lnx, and makefile.sco.
+  Removed lines after Dynamic Dependencies" in makefile.aco .
+  Revised makefile.dec to make a shared library (Jeremie Petit).
+  Removed trailing blanks from all files. 

@@ -220,11 +220,14 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    if (png_get_sRGB(png_ptr, info_ptr, &intent))
       png_set_sRGB(png_ptr, intent, 0);
-   else 
+   else
+   {
+      double image_gamma;
       if (png_get_gAMA(png_ptr, info_ptr, &image_gamma))
          png_set_gamma(png_ptr, screen_gamma, image_gamma);
       else
-         png_set_gamma(png_ptr, screen_gamma, 0.50);
+         png_set_gamma(png_ptr, screen_gamma, 0.45455);
+   }
 
    /* Dither RGB files down to 8 bit palette or reduce palettes
     * to the number of colors available on your screen.
@@ -324,13 +327,13 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       {
 #ifdef sparkle /* Read the image using the "sparkle" effect. */
          png_read_rows(png_ptr, &row_pointers[y], NULL, number_of_rows);
-        
+
          png_read_rows(png_ptr, NULL, row_pointers[y], number_of_rows);
 #else no_sparkle /* Read the image using the "rectangle" effect */
          png_read_rows(png_ptr, NULL, &row_pointers[y], number_of_rows);
 #endif no_sparkle /* use only one of these two methods */
       }
-     
+
       /* if you want to display the image after every pass, do
          so here */
 #endif no_single /* use only one of these two methods */
@@ -384,8 +387,11 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
       return ERROR;
    }
 
-   /* this one's new.  You will need to provide all three
+   /* This one's new.  You will need to provide all three
     * function callbacks, even if you aren't using them all.
+    * If you aren't using all functions, you can specify NULL
+    * parameters.  Even when all three functions are NULL,
+    * you need to call png_set_progressive_read_fn().
     * These functions shouldn't be dependent on global or
     * static variables if you are decoding several images
     * simultaneously.  You should store stream specific data
@@ -565,7 +571,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    sig_bit.alpha = true_alpha_bit_depth;
    png_set_sBIT(png_ptr, info_ptr, sig_bit);
 
-  
+
    /* Optional gamma chunk is strongly suggested if you have any guess
     * as to the correct gamma of the image.
     */

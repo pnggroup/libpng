@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -423,7 +423,7 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
    png_uint_32 *width, png_uint_32 *height, int *bit_depth,
    int *color_type, int *interlace_type, int *compression_type,
    int *filter_type)
-   
+
 {
    if (png_ptr != NULL && info_ptr != NULL && width != NULL && height != NULL &&
       bit_depth != NULL && color_type != NULL)
@@ -641,3 +641,10 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
 }
 #endif
 
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+png_byte
+png_get_rgb_to_gray_status (png_structp png_ptr)
+{
+   return png_ptr->rgb_to_gray_status;
+}
+#endif

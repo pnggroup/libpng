@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -60,10 +60,10 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    can't handle far buffers in the medium and small models, we have to copy
    the data.
 */
- 
+
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
- 
+
 static void
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {

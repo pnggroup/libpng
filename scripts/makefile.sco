@@ -7,6 +7,9 @@
 
 CC=cc
 
+# where make install puts libpng.a, libpng.so*, and png.h
+prefix=/usr/local
+
 # Where the zlib library and include files are located
 #ZLIBLIB=/usr/local/lib
 #ZLIBINC=/usr/local/include
@@ -22,11 +25,9 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.2
+PNGMIN = 1.0.2a
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
-# where make install puts libpng.a, libpng.so*, and png.h
-prefix=/usr/local
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 
@@ -48,10 +49,10 @@ libpng.a: $(OBJS)
 	$(RANLIB) $@
 
 libpng.so: libpng.so.$(PNGMAJ)
-	ln -sf libpng.so.$(PNGMAJ) libpng.so
+	ln -s -f libpng.so.$(PNGMAJ) libpng.so
 
 libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+	ln -s -f libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
 
 libpng.so.$(PNGVER): $(OBJSDLL)
 	$(CC) -G  -Wl,-h,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
@@ -70,8 +71,8 @@ install: libpng.a libpng.so.$(PNGVER)
 	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
 	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -sf libpng.so.$(PNGMAJ) libpng.so)
+	(cd $(LIBPATH); ln -s -f libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
+	 ln -s -f libpng.so.$(PNGMAJ) libpng.so)
 
 clean:
 	/bin/rm -f *.o libpng.a libpng.so* pngtest pngout.png

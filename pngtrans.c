@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -99,6 +99,24 @@ png_set_filler(png_structp png_ptr, png_uint_32 filler, int filler_loc)
       png_ptr->flags |= PNG_FLAG_FILLER_AFTER;
    else
       png_ptr->flags &= ~PNG_FLAG_FILLER_AFTER;
+
+   /* This should probably go in the "do_filler" routine.
+    * I attempted to do that in libpng-1.0.1a but that caused problems
+    * so I restored it in libpng-1.0.2a
+   */
+
+   if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
+   {
+      png_ptr->usr_channels = 4;
+   }
+
+   /* Also I added this in libpng-1.0.2a (what happens when we expand
+    * a less-than-8-bit grayscale to GA? */
+
+   if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY && png_ptr->bit_depth >= 8)
+   {
+      png_ptr->usr_channels = 2;
+   }
 }
 #endif
 

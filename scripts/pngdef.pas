@@ -3,7 +3,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.2';
+  PNG_LIBPNG_VER_STRING = '1.0.2a';
   PNG_LIBPNG_VER        =  10001;
 
 type
@@ -259,6 +259,10 @@ function png_create_read_struct(user_png_ver: png_charp;
              error_ptr: user_error_ptr; error_fn: png_error_ptr;
              warn_fn: png_error_ptr): png_structp;
              stdcall;
+function png_get_copyright(png_ptr: png_structp): png_charp;
+             stdcall;
+function png_get_header_version(png_ptr: png_structp): png_charp;
+             stdcall;
 function png_create_write_struct(user_png_ver: png_charp;
              error_ptr: user_error_ptr; error_fn: png_error_ptr;
              warn_fn: png_error_ptr): png_structp;
@@ -342,6 +346,8 @@ function png_get_pixels_per_meter(png_ptr: png_structp;
              info_ptr: png_infop): png_uint_32;
              stdcall;
 function png_get_progressive_ptr(png_ptr: png_structp): png_voidp;
+             stdcall;
+function png_get_rgb_to_gray_status(png_ptr: png_structp);
              stdcall;
 function png_get_rowbytes(png_ptr: png_structp; info_ptr: png_infop):
              png_uint_32;
@@ -509,6 +515,8 @@ procedure png_set_read_status_fn(png_ptr: png_structp;
              stdcall;
 procedure png_set_read_user_transform_fn(png_ptr: png_structp;
              read_user_transform_fn: png_user_transform_ptr);
+             stdcall;
+procedure png_set_rgb_to_gray(png_ptr: png_structp; int: error_action);
              stdcall;
 procedure png_set_sBIT(png_ptr: png_structp; info_ptr: png_infop;
              sig_bits: png_color_8p);

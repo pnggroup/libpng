@@ -1,67 +1,38 @@
 
-Libpng 1.0.2 - June 14, 1998
+Libpng 1.0.2a - December 29, 1998
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
-Changes since the previous public release (1.0.1):
+Changes since the last public release:
 
-  Optimized Paeth calculations by replacing abs() function calls with intrinsics
-  plus other loop optimizations. Improves avg decoding speed by about 20%.
-  Commented out i386istic "align" compiler flags in makefile.lnx.
-  Reduced the default warning level in some makefiles, to make them consistent.
-  Removed references to IJG and JPEG in the ansi2knr.c copyright statement.
-  Fixed a bug in png_do_strip_filler with XXRRGGBB => RRGGBB transformation.
-  Added grayscale and 16-bit capability to png_do_read_filler().
-  Fixed a bug in pngset.c, introduced in version 0.99c, that sets rowbytes
-    too large when writing an image with bit_depth < 8 (Bob Dellaca).
-  Corrected some bugs in the experimental weighted filtering heuristics.
-  Moved a misplaced pngrutil code block that truncates tRNS if it has more
-    than num_palette entries -- test was done before num_palette was defined.
-  Fixed a png_convert_to_rfc1123() bug that converts day 31 to 0 (Steve Eddins).
-  Changed compiler flags in makefile.wat for better optimization (Pawel Mrochen).
-  Relocated png_do_gray_to_rgb() within png_do_read_transformations() (Greg).
-  Relocated the png_composite macros from pngrtran.c to png.h (Greg).
-  Added makefile.sco (contributed by Mike Hopkirk).
-  Fixed a bug in pngrtran.c that would set channels=5 under some circumstances.
-  Added warnings when people try to use transforms they've defined out.
-  Collapsed 4 "i" and "c" loops into single "i" loops in pngrtran and pngwtran.
-  Revised paragraph about png_set_expand() in libpng.txt and libpng.3 (Greg)
-  Added max_pixel_depth=32 in pngrutil.c when using FILLER with palette images.
-  Moved PNG_WRITE_WEIGHTED_FILTER_SUPPORTED and PNG_WRITE_FLUSH_SUPPORTED
-    out of the PNG_WRITE_TRANSFORMS_NOT_SUPPORTED block of pngconf.h
-  Added "PNG_NO_WRITE_TRANSFORMS" etc., as alternatives for *_NOT_SUPPORTED,
-    for consistency, in pngconf.h
-  Added individual "ifndef PNG_NO_CAPABILITY" for the capabilities in pngconf.h
-    to make it easier to remove unwanted capabilities via the compile line
-  Made some corrections to grammar (which, it's) in documentation (Greg).
-  Corrected example.c, use of row_pointers in png_write_image().
-  Revised png_read_rows() to avoid repeated if-testing for NULL (A Kleinert)
-  More corrections to example.c, use of row_pointers in png_write_image()
-    and png_read_rows().
-  Added pngdll.mak and pngdef.pas to scripts directory, contributed by
-    Bob Dellaca, to make a png32bd.dll with Borland C++ 4.5
-  Fixed error in example.c with png_set_text: num_text is 3, not 2 (Guido V.)
-  Changed several loops from count-down to count-up, for consistency.
-  Revised libpng.txt and libpng.3 description of png_set_read|write_fn(), and
-    added warnings when people try to set png_read_fn and png_write_fn in
-    the same structure.
-  Added a test such that png_do_gamma will be done when num_trans==0
-    for truecolor images that have defined a background.  This corrects an
-    error that was introduced in libpng-0.90 that can cause gamma processing
-    to be skipped.
-  Added tests in png.h to include "trans" and "trans_values" in structures
-    when PNG_READ_BACKGROUND_SUPPORTED or PNG_READ_EXPAND_SUPPORTED is defined.
-  Add png_free(png_ptr->time_buffer) in png_destroy_read_struct()
-  Moved png_convert_to_rfc_1123() from pngwrite.c to png.c
-  Added capability for user-provided malloc_fn() and free_fn() functions,
-    and revised pngtest.c to demonstrate their use, replacing the
-    PNGTEST_DEBUG_MEM feature.
-  Added makefile.w32, for Microsoft C++ 4.0 and later (Tim Wegner).
-  Fixed two bugs in makefile.bor
+libpng-1.0.2a:
+
+  Replaced and extended code that was removed from png_set_filler() in 1.0.1a.
+  Fixed a bug in png_do_filler() that made it fail to write filler bytes in
+    the left-most pixel of each row (Kevin Bracey).
+  Changed "static pngcharp tIME_string" to "static char tIME_string[30]"
+    in pngtest.c (Duncan Simpson).
+  Fixed a problem in pngrutil.c: gray_to_rgb didn't always work with 16-bit.
+  Fixed a problem in png_read_push_finish_row(), which would not skip some
+    passes that it should skip, for images that are less than 3 pixels high.
+  Interchanged the order of calls to png_do_swap() and png_do_shift()
+    in pngwtran.c (John Cromer).
+  Added #ifdef PNG_DEBUG/#endif surrounding use of PNG_DEBUG in png.h .
+  Changed "bad adaptive filter type" from error to warning in pngrutil.c .
+  Fixed a documentation error about default filtering with 8-bit indexed-color.
+  Separated the PNG_NO_STDIO macro into PNG_NO_STDIO and PNG_NO_CONSOLE_IO
+    (L. Peter Deutsch).
+  Added png_set_rgb_to_gray() and png_get_rgb_to_gray_status() functions.
+  Added png_get_copyright() and png_get_header_version() functions.
+  Revised comments on png_set_progressive_read_fn() in libpng.txt and example.c
+  Added information about debugging in libpng.txt and libpng.3 .
+  Changed "ln -sf" to "ln -s -f" in makefile.s2x, makefile.lnx, and makefile.sco.
+  Removed lines after Dynamic Dependencies" in makefile.aco .
+  Revised makefile.dec to make a shared library (Jeremie Petit).
+  Removed trailing blanks from all files. 
 
 Send comments/corrections/commendations to
 png-implement@dworkin.wustl.edu or to randeg@alumni.rpi.edu
 
-Glenn Randers-Pehrson
-libpng maintainer
-PNG Development Group
+Glenn R-P

@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -92,7 +92,7 @@ png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
       num_to_check = png_ptr->buffer_size;
    }
 
-   png_push_fill_buffer(png_ptr, &(info_ptr->signature[num_checked]), 
+   png_push_fill_buffer(png_ptr, &(info_ptr->signature[num_checked]),
       num_to_check);
    png_ptr->sig_bytes += num_to_check;
 
@@ -466,7 +466,7 @@ png_push_save_buffer(png_structp png_ptr)
 
       new_max = png_ptr->save_buffer_size + png_ptr->current_buffer_size + 256;
       old_buffer = png_ptr->save_buffer;
-      png_ptr->save_buffer = (png_bytep)png_malloc(png_ptr, 
+      png_ptr->save_buffer = (png_bytep)png_malloc(png_ptr,
          (png_uint_32)new_max);
       png_memcpy(png_ptr->save_buffer, old_buffer, png_ptr->save_buffer_size);
       png_free(png_ptr, old_buffer);
@@ -630,7 +630,7 @@ png_push_process_row(png_structp png_ptr)
    png_ptr->row_info.channels = png_ptr->channels;
    png_ptr->row_info.bit_depth = png_ptr->bit_depth;
    png_ptr->row_info.pixel_depth = png_ptr->pixel_depth;
-   
+
    png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
       (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
@@ -781,6 +781,7 @@ png_read_push_finish_row(png_structp png_ptr)
          png_ptr->pass++;
          if (png_ptr->pass >= 7)
             break;
+
          png_ptr->iwidth = (png_ptr->width +
             png_pass_inc[png_ptr->pass] - 1 -
             png_pass_start[png_ptr->pass]) /
@@ -789,18 +790,15 @@ png_read_push_finish_row(png_structp png_ptr)
          png_ptr->irowbytes = ((png_ptr->iwidth *
             png_ptr->pixel_depth + 7) >> 3) + 1;
 
-         if (!(png_ptr->transformations & PNG_INTERLACE))
-         {
-            png_ptr->num_rows = (png_ptr->height +
-               png_pass_yinc[png_ptr->pass] - 1 -
-               png_pass_ystart[png_ptr->pass]) /
-               png_pass_yinc[png_ptr->pass];
-            if (!(png_ptr->num_rows))
-               continue;
-         }
          if (png_ptr->transformations & PNG_INTERLACE)
             break;
-      } while (png_ptr->iwidth == 0);
+
+         png_ptr->num_rows = (png_ptr->height +
+            png_pass_yinc[png_ptr->pass] - 1 -
+            png_pass_ystart[png_ptr->pass]) /
+            png_pass_yinc[png_ptr->pass];
+
+      } while (png_ptr->iwidth == 0 || png_ptr->num_rows == 0);
    }
 }
 
@@ -826,7 +824,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
    }
 #endif
 
-   png_ptr->current_text = (png_charp)png_malloc(png_ptr, 
+   png_ptr->current_text = (png_charp)png_malloc(png_ptr,
          (png_uint_32)(length+1));
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;

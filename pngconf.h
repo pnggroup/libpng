@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -16,6 +16,7 @@
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
+
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your
@@ -49,13 +50,28 @@
 /* This protects us against compilers that run on a windowing system
  * and thus don't have or would rather us not use the stdio types:
  * stdin, stdout, and stderr.  The only one currently used is stderr
- * in png_error() and png_warning().  #defining PNG_NO_STDIO will
- * prevent these from being compiled and used.
+ * in png_error() and png_warning().  #defining PNG_NO_CONSOLE_IO will
+ * prevent these from being compiled and used. #defining PNG_NO_STDIO
+ * will also prevent these, plus will prevent the entire set of stdio
+ * macros and functions (FILE *, printf, etc.) from being compiled and used,
+ * unless PNG_DEBUG has been #defined.
+ *
+ * #define PNG_NO_CONSOLE_IO
  * #define PNG_NO_STDIO
  */
 
-#ifndef PNG_NO_STDIO 
-#include <stdio.h>
+#ifdef PNG_DEBUG
+#  if (PNG_DEBUG > 0)
+#    include <stdio.h>
+#  endif
+#else
+#  ifdef PNG_NO_STDIO
+#    ifndef PNG_NO_CONSOLE_IO
+#      define PNG_NO_CONSOLE_IO
+#    endif
+#  else
+#    include <stdio.h>
+#  endif
 #endif
 
 /* This macro protects us against machines that don't have function
@@ -307,11 +323,9 @@ __dont__ include it again
 #ifndef PNG_NO_READ_USER_TRANSFORM
 #define PNG_READ_USER_TRANSFORM_SUPPORTED
 #endif
-/* the following aren't implemented yet
 #ifndef PNG_NO_READ_RGB_TO_GRAY
 #define PNG_READ_RGB_TO_GRAY_SUPPORTED
 #endif
- */
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
 #if !defined(PNG_NO_PROGRESSIVE_READ) && \
@@ -631,7 +645,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
  */
 typedef charf *         png_zcharp;
 typedef charf * FAR *   png_zcharpp;
-typedef z_stream FAR *  png_zstreamp; 
+typedef z_stream FAR *  png_zstreamp;
 
 /* allow for compilation as dll under MS Windows */
 #ifdef __WIN32DLL__
@@ -680,7 +694,7 @@ typedef z_stream FAR *  png_zstreamp;
 /* End of memory model independent support */
 
 /* Just a double check that someone hasn't tried to define something
- * contradictory. 
+ * contradictory.
  */
 #if (PNG_ZBUF_SIZE > 65536) && defined(PNG_MAX_MALLOC_64K)
 #undef PNG_ZBUF_SIZE

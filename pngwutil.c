@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -376,9 +376,9 @@ png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
    {
       png_byte maxbits;
 
-      maxbits = color_type==PNG_COLOR_TYPE_PALETTE ? 8:png_ptr->usr_bit_depth;
-      if (sbit->red == 0 || sbit->red > maxbits || 
-          sbit->green == 0 || sbit->green > maxbits || 
+      maxbits = color_type==PNG_COLOR_TYPE_PALETTE ? 8 : png_ptr->usr_bit_depth;
+      if (sbit->red == 0 || sbit->red > maxbits ||
+          sbit->green == 0 || sbit->green > maxbits ||
           sbit->blue == 0 || sbit->blue > maxbits)
       {
          png_warning(png_ptr, "Invalid sBIT depth specified");
@@ -952,7 +952,7 @@ void
 png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    png_int_32 X1, int type, int nparams, png_charp units, png_charpp params)
 {
-   png_size_t purpose_len, units_len, total_len; 
+   png_size_t purpose_len, units_len, total_len;
    png_uint_32p params_len;
    png_byte buf[10];
    png_charp new_purpose;
@@ -1180,7 +1180,7 @@ png_write_finish_row(png_structp png_ptr)
       if (png_ptr->pass < 7)
       {
          if (png_ptr->prev_row != NULL)
-            png_memset(png_ptr->prev_row, 0, 
+            png_memset(png_ptr->prev_row, 0,
                (png_size_t) (((png_uint_32)png_ptr->usr_channels *
                (png_uint_32)png_ptr->usr_bit_depth *
                png_ptr->width + 7) >> 3) + 1);
@@ -1772,7 +1772,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       }
       for (lp = row_buf + 1; i < row_bytes; i++)
       {
-         v = *dp++ = 
+         v = *dp++ =
           (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2)) & 0xff);
 
          sum += (v < 128) ? v : 256 - v;

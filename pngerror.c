@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.2 - June 14, 1998
+ * libpng 1.0.2a - December 29, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -113,7 +113,7 @@ png_chunk_warning(png_structp png_ptr, png_const_charp message)
 static void
 png_default_error(png_structp png_ptr, png_const_charp message)
 {
-#ifndef PNG_NO_STDIO
+#ifndef PNG_NO_CONSOLE_IO
    fprintf(stderr, "libpng error: %s\n", message);
 #endif
 
@@ -139,7 +139,7 @@ png_default_warning(png_structp png_ptr, png_const_charp message)
    if (png_ptr == NULL)
       return;
 
-#ifndef PNG_NO_STDIO
+#ifndef PNG_NO_CONSOLE_IO
    fprintf(stderr, "libpng warning: %s\n", message);
 #endif
 }

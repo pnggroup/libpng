@@ -100,7 +100,7 @@ LIBOBJS = \
  +pngtrans.$(O) \
  +pngwrite.$(O) \
  +pngwtran.$(O) \
- +pngwio.$(O)
+ +pngwio.$(O) \
  +pngwutil.$(O)
 
 LIBNAME=libpng$(MODEL).lib
@@ -121,7 +121,7 @@ libpng: $(LIBNAME)
 
 pngtest: pngtest$(MODEL).exe
 
-test:
+test: pngtest$(MODEL).exe
 	pngtest$(MODEL)
 
 

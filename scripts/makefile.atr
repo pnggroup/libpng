@@ -9,6 +9,7 @@ LBR = png.lib
 LDFLAGS=-lpng -lz -lm
 
 # where make install puts libpng.a and png.h
+prefix=/usr/local
 
 OBJS = $(LBR)(png.o) $(LBR)(pngset.o) $(LBR)(pngget.o) $(LBR)(pngrutil.o)\
 	$(LBR)(pngtrans.o) $(LBR)(pngwutil.o)\
@@ -28,4 +29,5 @@ install: libpng.a
 	-@mkdir $(prefix)/lib
 	cp png.h $(prefix)/include
 	cp pngconf.h $(prefix)/include
-	chmod 644 $(prefix)/include/p
+	chmod 644 $(prefix)/include/png.h
+	chmod 644 $(prefix)/include/pngconf.h

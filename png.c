@@ -1,11 +1,11 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng 1.0.2 - June 14, 1998
- * For conditions of distribution and use, see copyright notice in png.h
+ * libpng version 1.0.2a - December 29, 1998
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
+ * 
  */
 
 #define PNG_INTERNAL
@@ -15,7 +15,8 @@
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
  */
-char png_libpng_ver[12] = "1.0.2";
+
+char png_libpng_ver[12] = "1.0.2a";
 
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -317,8 +318,8 @@ png_charp
 png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 {
    static PNG_CONST char short_months[12][4] =
-	{"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
    if (png_ptr->time_buffer == NULL)
    {
@@ -345,3 +346,13 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
    return ((png_charp)png_ptr->time_buffer);
 }
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
+
+png_charp
+png_get_copyright(png_structp png_ptr)
+{
+   return("\n libpng version 1.0.2a - December 29, 1998\n\
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
+   Copyright (c) 1996, 1997 Andreas Dilger\n\
+   Copyright (c) 1998, Glenn Randers-Pehrson\n");
+}
+
