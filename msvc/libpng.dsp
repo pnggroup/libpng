@@ -105,7 +105,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i ".." /d "NDEBUG" /d "PNG_USE_PNGVCRD"
+# ADD RSC /l 0x409 /i ".." /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -133,7 +133,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /i ".." /d "_DEBUG" /d PNG_DEBUG=1  /d "PNG_USE_PNGVCRD"
+# ADD RSC /l 0x409 /i ".." /d "_DEBUG" /d PNG_DEBUG=1
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo

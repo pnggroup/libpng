@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.7beta17 - June 24, 2000
+ * libpng 1.0.7rc1 - June 9, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -43,8 +43,8 @@
  */
 
 /*
- * NOTES (mostly by Greg Roelofs)
- * =====
+ * GRR NOTES
+ * =========
  *
  * 19991006:
  *  - fixed sign error in post-MMX cleanup code (16- & 32-bit cases)
@@ -125,9 +125,8 @@
  * 20000319:
  *  - fixed a register-name typo in png_do_read_interlace(), default (MMX) case,
  *     pass == 4 or 5, that caused visible corruption of interlaced images
- *
- *  - When compiling with gcc, be sure to use  -fomit-frame-pointer
  */
+
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -144,9 +143,8 @@ static const int png_pass_inc[7]   = {8, 8, 4, 4, 2, 2, 1};
 static const int png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #endif
 
-// djgpp and Win32 add their own underscores to global variables,
-// so define them without:
-#if (defined __DJBPP__) || defined (WIN32)
+// djgpp adds its own underscores to global variables, so define them without:
+#ifdef __DJGPP__
 #  define _unmask      unmask
 #  define _const4      const4
 #  define _const6      const6

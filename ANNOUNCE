@@ -1,5 +1,5 @@
 
-Libpng 1.0.7beta17 - June 24, 2000
+Libpng 1.0.7rc1 - June 9, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -91,7 +91,6 @@ Changes since the last public release (1.0.6):
   Added PNG_USE_DLL macro.
   Added "msvc" and contrib/msvctest directories with MSVC++ project files
     (Simon-Pierre Cadieux) and contrib/visupng directory (Willem van Schaik).
-  Removed leading underscores from "_PNG_H" and "_PNG_SAVE_BSD_SOURCE" macros.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -119,7 +119,7 @@ LINK32=link.exe
 OutDir=.\dll_asm
 SOURCE="$(InputPath)"
 PostBuild_Desc=[Run Test]
-PostBuild_Cmds=set path=..\..\msvc\win32\libpng\dll_asm;..\..\msvc\win32\zlib\dll_asm;	$(outdir)\msvctest.exe ..\..\pngtest.png
+PostBuild_Cmds=set path=..\..\msvc\win32\libpng\dll_asm;..\..\msvc\win32\zlib\dll;	$(outdir)\msvctest.exe ..\..\pngtest.png
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "msvctest - Win32 Debug ASM DLL"
@@ -149,7 +149,7 @@ LINK32=link.exe
 OutDir=.\dll_dbga
 SOURCE="$(InputPath)"
 PostBuild_Desc=[Run Test]
-PostBuild_Cmds=set path=..\..\msvc\win32\libpng\dll_dbga;..\..\msvc\win32\zlib\dll_dbga;	$(outdir)\msvctest.exe ..\..\pngtest.png
+PostBuild_Cmds=set path=..\..\msvc\win32\libpng\dll_dbga;..\..\msvc\win32\zlib\dll_dbg;	$(outdir)\msvctest.exe ..\..\pngtest.png
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "msvctest - Win32 LIB"

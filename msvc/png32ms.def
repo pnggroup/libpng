@@ -1,12 +1,12 @@
 ;------------------------------------------
-; LIBPNG module definition file for Windows
+; PNGLIB module definition file for Windows
 ;------------------------------------------
 
 LIBRARY
 DESCRIPTION "PNG image compression library for Windows"
 
 EXPORTS
-;Version 1.0.7beta17
+;Version 1.0.7rc1
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3

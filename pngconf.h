@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.7beta17 - June 24, 2000
+ * libpng 1.0.7rc1 - June 9, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -133,7 +133,7 @@
 
 #  ifdef __linux__
 #    ifdef _BSD_SOURCE
-#      define PNG_SAVE_BSD_SOURCE
+#      define _PNG_SAVE_BSD_SOURCE
 #      undef _BSD_SOURCE
 #    endif
 #    ifdef _SETJMP_H
@@ -146,9 +146,9 @@
 #include <setjmp.h>
 
 #  ifdef __linux__
-#    ifdef PNG_SAVE_BSD_SOURCE
+#    ifdef _PNG_SAVE_BSD_SOURCE
 #      define _BSD_SOURCE
-#      undef PNG_SAVE_BSD_SOURCE
+#      undef _PNG_SAVE_BSD_SOURCE
 #    endif
 #  endif /* __linux__ */
 #endif /* PNG_SETJMP_SUPPORTED */
@@ -950,15 +950,7 @@ typedef z_stream FAR *  png_zstreamp;
 #  endif
 #endif
 
-#ifndef PNGAPI
-
-#if defined(__MINGW32__) || defined(__CYGWIN32__) && !defined(PNG_MODULEDEF)
-#  ifndef PNG_NO_MODULEDEF
-#    define PNG_NO_MODULEDEF
-#  endif
-#endif
-
-#if !defined(PNG_IMPEXP) && defined(PNG_BUILD_DLL) && !defined(PNG_NO_MODULEDEF)
+#if defined(PNG_BUILD_DLL) && !defined(PNG_NO_MODULEDEF)
 #  define PNG_IMPEXP
 #endif
 
@@ -966,11 +958,7 @@ typedef z_stream FAR *  png_zstreamp;
     defined(_Windows) || defined(_WINDOWS) || \
     defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 
-#  ifdef __GNUC__
-#    define PNGAPI __cdecl
-#  else
-#    define PNGAPI _cdecl
-#  endif
+#  define PNGAPI _cdecl
 
 #  if !defined(PNG_IMPEXP) && (!defined(PNG_DLL) || \
        0 /* WINCOMPILER_WITH_NO_SUPPORT_FOR_DECLIMPEXP */)
@@ -1006,17 +994,19 @@ typedef z_stream FAR *  png_zstreamp;
 #        endif
 #     endif
 #  endif  /* PNG_IMPEXP */
-#else /* !(DLL || WINDOWS) */
+#else
 #  if 0 /* ... other platforms, with other meanings */
 #  else
 #     define PNGAPI
-#     define PNG_IMPEXP
 #  endif
-#endif
 #endif
 
 #ifndef PNG_EXPORT
-#  define PNG_EXPORT(type,symbol) PNG_IMPEXP type PNGAPI symbol
+#  define PNG_EXPORT(type,symbol) type PNGAPI symbol
+#endif
+
+#if defined(__MINGW32__) || defined(__CYGWIN32__)
+#  define PNG_ATTR_DLLIMP
 #endif
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
