@@ -1008,7 +1008,6 @@ version 1.2.1rc1 [November 24, 2001]
   Updated various makefiles so "make clean" does not remove previous major
     version of the shared library.
 version 1.2.1rc2 [December 4, 2001]
-  Added a pop/push operation to pngvcrd.c, to preserve Eflag.
   Always allocate 256-entry internal palette, hist, and trans arrays, to
     avoid out-of-bounds memory reference caused by invalid PNG datastreams.
   Added a check for prefix_length > data_length in iCCP chunk handler.
@@ -1066,8 +1065,31 @@ version 1.0.13rc1 [April 7, 2002]
   Add "mem_ptr = png_ptr->mem_ptr" in png_destroy_write_struct() (Paul Gardner).
   Updated makefiles to put headers in include/libpng and remove old include/*.h.
 version 1.2.2 [April 15, 2002]
+version 1.0.13 [April 15, 2002]
   Revised description of png_set_filter() in libpng.3/libpng.txt.
   Revised makefile.netbsd and added makefile.neNNbsd and makefile.freebsd
+version 1.0.13patch01 [April 17, 2002]
+version 1.2.2patch01 [April 17, 2002]
+  Changed ${PNGMAJ}.${PNGVER} bug to ${PNGVER} in makefile.sgi and makefile.sggcc
+  Fixed VER -> PNGVER typo in makefile.macosx and added install-static to install
+  Added install: target to makefile.32sunu and makefile.64sunu
+version 1.0.13patch03 [April 18, 2002]
+version 1.2.2patch03 [April 18, 2002]
+  Revised 15 makefiles to link libpng.a to libpngNN.a and the include libpng
+  subdirectory to libpngNN subdirectory without the full pathname.
+  Moved generation of libpng.pc from "install" to "all" in 15 makefiles.
+version 1.2.3rc1 [April 27, 2002]
+  Added install-man target to 15 makefiles (Dimitri Papadopolous-Orfanos).
+  Added $(DESTDIR) feature to 24 makefiles (Tim Mooney)
+  Fixed bug with $prefix, should be $(prefix) in makefile.hpux.
+  Updated cygwin-specific portion of pngconf.h and revised makefile.cygwin
+  Added a link from libpngNN.pc to libpng.pc in 15 makefiles.
+  Added links from include/libpngNN/*.h to include/*.h in 24 makefiles.
+  Revised makefile.darwin to make relative links without full pathname.
+  Added setjmp() at the end of png_create_*_struct_2() in case user forgets
+    to put one in their application.
+  Restored png_zalloc() and png_zfree() prototypes to version 1.2.1 and
+    removed them from module definition files.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

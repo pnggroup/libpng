@@ -1,49 +1,30 @@
 
-Libpng 1.2.2 - April 15, 2002
+Libpng 1.2.3rc1 - April 27, 2002
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
-Changes since the last public release (1.2.1):
+Changes since the last public release (1.2.2):
 
-  Fixed a bug with reading the length of iCCP profiles (Larry Reeves).
-  Revised makefile.linux, makefile.gcmmx, and others to generate
-    libpng.a, libpngNN.so, libpng.so.NN, and libpngNN/png.h
-  Revised makefile.darwin to remove "-undefined suppress" option.
-  Added checks for gamma and chromaticity values over 21474.83, which exceed
-    the limit for PNG unsigned 32-bit integers when encoded.
-  Revised calls to png_create_read_struct() and png_create_write_struct()
-    for simpler debugging.
-  Revised png_zalloc() so zlib handles errors (uses PNG_FLAG_MALLOC_NULL_MEM_OK)
-  Check chunk_length and idat_size for invalid (over PNG_MAX_UINT) lengths.
-  Check for invalid image dimensions in png_get_IHDR.
-  Added install-shared and install-static targets to all makefiles that make
-    shared libraries.
-  Always do gamma compensation when image is partially transparent.
-  Modified shared-library makefiles to install pkgconfig/libpngNN.pc.
-  Export (with PNGAPI) png_zalloc, png_zfree, and png_handle_as_unknown
-  Removed unused png_write_destroy_info prototype from png.h
-  Eliminated incorrect use of width_mmx from pnggccrd.c in pixel_bytes == 8 case
-  Stopped a double free of palette, hist, and trans when not using free_me.
-  Added makefile.32sunu for Sun Ultra 32 and makefile.64sunu for Sun Ultra 64.
-  Compute background.gray and background_1.gray even when color_type is RGB
-    in case image gets reduced to gray later (Jason Summers).
-  Added PNG_1_0_X macro which can be used to build a 1.0.x-compatible library.
-  Added missing PNGAPI to several function definitions.
-  Check for invalid bit_depth or color_type in png_get_IHDR(), and
-    check for missing PLTE or IHDR in png_push_read_chunk() (Matthias Clasen).
-  Revised iTXt support to accept NULL for lang and lang_key.
-  Compute gamma for color components of background even when color_type is gray.
-  Revised makefiles to put png.h and pngconf.h only in $prefix/include/libpngNN
-  Revised makefiles to make symlink to libpng.so.NN in addition to libpngNN.so
-  Prevent png_zalloc() from trying to memset memory that it failed to acquire.
-  Add typecasts of PNG_MAX_UINT in pngset_cHRM_fixed() (Matt Holgate).
-  Ensure that the right function (user or default) is used to free the
-    png_struct after an error in png_create_read_struct_2().
-  Save the ebx register in pnggccrd.c (Sami Farin)
-  Add "mem_ptr = png_ptr->mem_ptr" in png_destroy_write_struct() (Paul Gardner).
-  Updated makefiles to put headers in include/libpng and remove old include/*.h.
-  Revised description of png_set_filter() in libpng.3/libpng.txt.
-  Revised makefile.netbsd and added makefile.neNNbsd and makefile.freebsd
+version 1.2.2patch03 [April 18, 2002]
+  Changed ${PNGMAJ}.${PNGVER} bug to ${PNGVER} in makefile.sgi and makefile.sggcc
+  Fixed VER -> PNGVER typo in makefile.macosx and added install-static to install
+  Added install: target to makefile.32sunu and makefile.64sunu
+  Revised 15 makefiles to link libpng.a to libpngNN.a and the include libpng
+    subdirectory to libpngNN subdirectory without the full pathname.
+  Moved generation of libpng.pc from "install" to "all" in 15 makefiles.
+version 1.2.3rc1 [April 27, 2002]
+  Added install-man target to 15 makefiles (Dimitri Papadopolous-Orfanos).
+  Added $(DESTDIR) feature to 24 makefiles (Tim Mooney)
+  Fixed bug with $prefix, should be $(prefix) in makefile.hpux.
+  Updated cygwin-specific portion of pngconf.h and revised makefile.cygwin
+  Added a link from libpngNN.pc to libpng.pc in 15 makefiles.
+  Added links from include/libpngNN/*.h to include/*.h in 24 makefiles.
+  Revised makefile.darwin to make relative links without full pathname.
+  Added setjmp() at the end of png_create_*_struct_2() in case user forgets
+    to put one in their application.
+  Restored png_zalloc() and png_zfree() prototypes to version 1.2.1 and
+    removed them from module definition files.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

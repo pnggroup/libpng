@@ -1,7 +1,8 @@
 # makefile for libpng using gcc (generic, static library)
-# Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+# Copyright (C) 2002 Glenn Randers-Pehrson
 # Copyright (C) 2000 Cosmin Truta
 # Copyright (C) 2000 Marc O. Gloor (AIX support added, from makefile.gcc)
+# Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
 # Location of the zlib library and include files
@@ -18,12 +19,22 @@ RM = rm -f
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2
+PNGMIN = 1.2.3rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
+
+# override DESTDIR= on the make install command line to easily support
+# installing into a temporary location.  Example:
+#
+#    make install DESTDIR=/tmp/build/libpng
+#
+# If you're going to install into a temporary location
+# via DESTDIR, that location must already exist before
+# you execute make install.
+DESTDIR=
 
 CDEBUG = -g -DPNG_DEBUG=5
 LDDEBUG =
@@ -56,14 +67,17 @@ pngtest$(E): pngtest$(O) libpng$(A)
 	$(LD) -o $@ pngtest$(O) $(LDFLAGS)
 
 install: libpng.a
-	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
-	-@if [ ! -d $(INCPATH)/libpng  ]; then mkdir $(INCPATH)/libpng; fi
-	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	-@rm $(INCPATH)/png.h
-	-@rm $(INCPATH)/pngconf.h
-	cp png.h pngconf.h $(INCPATH)/libpng
-	chmod 644 $(INCPATH)/libpng/png.h $(INCPATH)/libpng/pngconf.h
-	cp libpng.a $(LIBPATH)
+	-@if [ ! -d $(DESTDIR)$(INCPATH)  ]; then mkdir $(DESTDIR)$(INCPATH); fi
+	-@if [ ! -d $(DESTDIR)$(INCPATH)/libpng  ]; then mkdir \
+	$(DESTDIR)$(INCPATH)/libpng; fi
+	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
+	-@rm $(DESTDIR)$(INCPATH)/png.h
+	-@rm $(DESTDIR)$(INCPATH)/pngconf.h
+	cp png.h pngconf.h $(DESTDIR)$(INCPATH)/libpng
+	chmod 644 $(DESTDIR)$(INCPATH)/libpng/png.h \
+	$(DESTDIR)$(INCPATH)/libpng/pngconf.h
+	(cd $(DESTDIR)$(INCPATH); ln -f -s libpng/* .)
+	cp libpng.a $(DESTDIR)$(LIBPATH)
 
 clean:
 	/bin/rm -f *.o libpng.a pngtest pngout.png

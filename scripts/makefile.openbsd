@@ -7,7 +7,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.2.2
+SHLIB_MINOR=	1.2.3rc1
 
 LIB=	png
 SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \
@@ -64,6 +64,8 @@ afterinstall:
 	@rmdir ${DESTDIR}${LIBDIR}/debug 2>/dev/null || true
 	${INSTALL} ${INSTALL_COPY} -o ${SHAREOWN} -g ${SHAREGRP} \
 		-m ${NONBINMODE} ${HDRS} ${DESTDIR}${PREFIX}/include/libpng
+	${INSTALL} ${INSTALL_COPY} -o ${SHAREOWN} -g ${SHAREGRP} \
+		-m ${NONBINMODE} ${HDRS} ${DESTDIR}${PREFIX}/include
 	${INSTALL} ${INSTALL_COPY} -o ${SHAREOWN} -g ${SHAREGRP} \
 		-m ${NONBINMODE} ${DOCS} ${DESTDIR}${PREFIX}/share/doc/png
 

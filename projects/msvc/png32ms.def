@@ -6,7 +6,7 @@ LIBRARY
 DESCRIPTION "PNG image compression library for Windows"
 
 EXPORTS
-;Version 1.2.2
+;Version 1.2.3rc1
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -213,5 +213,6 @@ EXPORTS
   png_set_strip_error_numbers @193
 ; Added at version 1.2.2
   png_handle_as_unknown @194
-  png_zalloc @195
-  png_zfree @196
+; Added at version 1.2.2 and deleted from version 1.2.3
+; png_zalloc @195
+; png_zfree @196

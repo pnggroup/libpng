@@ -2,7 +2,7 @@
 ; PNG.LIB module definition file for OS/2
 ;----------------------------------------
 
-; Version 1.2.2
+; Version 1.2.3rc1
 
 LIBRARY		PNG
 DESCRIPTION	"PNG image compression library for OS/2"
@@ -197,8 +197,6 @@ EXPORTS
   png_init_mmx_flags
 
 ; Added at version 1.2.2:
-  png_zalloc
-  png_zfree
   png_handle_as_unknown
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.2 - April 15, 2002
+ * libpng 1.2.3rc1 - April 27, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -530,7 +530,20 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       1, png_doublep_NULL, png_doublep_NULL);
 #endif
 
-   return ((png_structp)png_ptr);
+#ifdef PNG_SETJMP_SUPPORTED
+/* Applications that neglect to set up their own setjmp() and then encounter
+   a png_error() will longjmp here.  Since the jmpbuf is then meaningless we
+   abort instead of returning. */
+#ifdef USE_FAR_KEYWORD
+   if (setjmp(jmpbuf))
+      PNG_ABORT();
+   png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+#else
+   if (setjmp(png_ptr->jmpbuf))
+      PNG_ABORT();
+#endif
+#endif
+   return (png_ptr);
 }
 
 /* Initialize png_ptr structure, and allocate any memory needed */

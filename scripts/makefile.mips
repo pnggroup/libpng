@@ -1,9 +1,22 @@
 # makefile for libpng
+# Copyright (C) Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
 # where make install puts libpng.a and png.h
 prefix=/usr/local
+INCPATH=$(prefix)/include
+LIBPATH=$(prefix)/lib
+
+# override DESTDIR= on the make install command line to easily support
+# installing into a temporary location.  Example:
+#
+#    make install DESTDIR=/tmp/build/libpng
+#
+# If you're going to install into a temporary location
+# via DESTDIR, that location must already exist before
+# you execute make install.
+DESTDIR=
 
 CC=cc
 CFLAGS=-I../zlib -O -systype sysv -DSYSV -w -Dmips
@@ -30,17 +43,18 @@ test: pngtest
 	./pngtest
 
 install: libpng.a
-	-@mkdir $(prefix)/include
-	-@mkdir $(prefix)/include/libpng
-	-@mkdir $(prefix)/lib
-	-@rm -f $(prefix)/include/png.h
-	-@rm -f $(prefix)/include/pngconf.h
-	cp png.h $(prefix)/include/libpng
-	cp pngconf.h $(prefix)/include/libpng
-	chmod 644 $(prefix)/include/libpng/png.h
-	chmod 644 $(prefix)/include/libpng/pngconf.h
-	cp libpng.a $(prefix)/lib
-	chmod 644 $(prefix)/lib/libpng.a
+	-@mkdir $(DESTDIR)$(INCPATH)
+	-@mkdir $(DESTDIR)$(INCPATH)/libpng
+	-@mkdir $(DESTDIR)$(LIBPATH)
+	-@rm -f $(DESTDIR)$(INCPATH)/png.h
+	-@rm -f $(DESTDIR)$(INCPATH)/pngconf.h
+	cp png.h $(DESTDIR)$(INCPATH)/libpng
+	cp pngconf.h $(DESTDIR)$(INCPATH)/libpng
+	chmod 644 $(DESTDIR)$(INCPATH)/libpng/png.h
+	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngconf.h
+	(cd $(DESTDIR)$(INCPATH); ln -f -s libpng/* .)
+	cp libpng.a $(DESTDIR)$(LIBPATH)
+	chmod 644 $(DESTDIR)$(LIBPATH)/libpng.a
 
 clean:
 	rm -f *.o libpng.a pngtest pngout.png

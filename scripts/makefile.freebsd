@@ -3,8 +3,23 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
+.include <bsd.own.mk>
+
 # where make install puts libpng.a and png.h
 prefix=/usr/local
+INCPATH=$(prefix)/include
+LIBPATH=$(prefix)/lib
+MANPATH=$(prefix)/man
+
+# override DESTDIR= on the make install command line to easily support
+# installing into a temporary location.  Example:
+#
+#    make install DESTDIR=/tmp/build/libpng
+#
+# If you're going to install into a temporary location
+# via DESTDIR, that location must already exist before
+# you execute make install.
+DESTDIR=
 
 PNGMAJ= 5
 .if (${OBJFORMAT} == "elf")
@@ -49,23 +64,22 @@ test: pngtest
 	./pngtest
 
 install: libpng.a libpng.so.${PNGVER}
-	-@mkdir $(prefix)/include/libpng
+	-@mkdir $(DESTDIR)$(INCPATH)/libpng
 	${INSTALL} -o ${INCOWN} -g ${INCGRP} -m ${INCMODE} \
-		png.h pngconf.h $(prefix)/include/libpng
-	ln -sf libpng/png.h $(prefix)/include/png.h
-	ln -sf libpng/pngconf.h $(prefix)/include/pngconf.h
+		png.h pngconf.h $(DESTDIR)$(INCPATH)/libpng
+	(cd $(DESTDIR)$(INCPATH); rm -f png.h pngconf.h; ln -sf libpng/*.h .)
 	${INSTALL} -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
-		libpng.a libpng.so.${PNGVER} $(prefix)/lib
-	$(RANLIB) $(prefix)/lib/libpng.a
-	ln -sf libpng.so.${PNGVER} $(prefix)/lib/libpng.so
+		libpng.a libpng.so.${PNGVER} $(DESTDIR)$(LIBPATH)
+	$(RANLIB) $(DESTDIR)$(LIBPATH)/libpng.a
+	ln -sf libpng.so.${PNGVER} $(DESTDIR)$(LIBPATH)/libpng.so
 	/sbin/ldconfig -R
 	${INSTALL} -o ${MANOWN} -g ${MANGRP} -m ${MANMODE} \
-		libpng.3 libpngpf.3 $(prefix)/man/man3
+		libpng.3 libpngpf.3 $(DESTDIR)$(MANPATH)/man3
 	${INSTALL} -o ${MANOWN} -g ${MANGRP} -m ${MANMODE} \
-		png.5 $(prefix)/man/man5
+		png.5 $(DESTDIR)$(MANPATH)/man5
 
 clean:
-	rm -f *.o libpng.a libpng.so libpng.so.${PNGVER} pngtest pngout.png
+	rm -f *.o *.so libpng.a libpng.so.${PNGVER} pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

@@ -25,12 +25,23 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2
+PNGMIN = 1.2.3rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
+MANPATH=$(prefix)/man
+
+# override DESTDIR= on the make install command line to easily support
+# installing into a temporary location.  Example:
+#
+#    make install DESTDIR=/tmp/build/libpng
+#
+# If you're going to install into a temporary location
+# via DESTDIR, that location must already exist before
+# you execute make install.
+DESTDIR=
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -43,11 +54,14 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
 
-all: libpng.a $(LIBNAME).dylib pngtest
+all: libpng.a $(LIBNAME).dylib pngtest libpng.pc
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
+
+libpng.pc:
+	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
 
 $(LIBNAME).dylib: $(LIBNAME).$(PNGMAJ).dylib
 	ln -sf $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib
@@ -57,7 +71,7 @@ $(LIBNAME).$(PNGMAJ).dylib: $(LIBNAME).$(PNGVER).dylib
 
 $(LIBNAME).$(PNGVER).dylib: $(OBJSDLL)
 	$(CC) -dynamiclib \
-	 -install_name $(LIBPATH)/$(LIBNAME).$(PNGMAJ).dylib \
+	 -install_name $(DESTDIR)$(LIBPATH)/$(LIBNAME).$(PNGMAJ).dylib \
 	 -current_version $(PNGMIN) -compatibility_version $(PNGMIN) \
 	 -o $(LIBNAME).$(PNGVER).dylib \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
@@ -69,42 +83,54 @@ test: pngtest
 	./pngtest
 
 install-headers: png.h pngconf.h
-	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
-	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
-	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
-	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
-	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	-@/bin/rm -f $(INCPATH)/libpng
-	ln -sf $(INCPATH)/$(LIBNAME) $(INCPATH)/libpng
+	-@if [ ! -d $(DESTDIR)$(INCPATH) ]; then mkdir $(DESTDIR)$(INCPATH); fi
+	-@if [ ! -d $(DESTDIR)$(INCPATH)/$(LIBNAME) ]; then mkdir $(DESTDIR)$(INCPATH)/$(LIBNAME); fi
+	cp png.h pngconf.h $(DESTDIR)$(INCPATH)/$(LIBNAME)
+	chmod 644 $(DESTDIR)$(INCPATH)/$(LIBNAME)/png.h $(DESTDIR)$(INCPATH)/$(LIBNAME)/pngconf.h
+	-@/bin/rm -f $(DESTDIR)$(INCPATH)/png.h $(DESTDIR)$(INCPATH)/pngconf.h
+	-@/bin/rm -f $(DESTDIR)$(INCPATH)/libpng
+	(cd $(DESTDIR)$(INCPATH); ln -sf $(LIBNAME) libpng; ln -sf $(LIBNAME)/* .)
 
 install-static: install-headers libpng.a
-	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	cp libpng.a $(LIBPATH)/$(LIBNAME).a
-	chmod 644 $(LIBPATH)/$(LIBNAME).a
-	-@/bin/rm -f $(LIBPATH)/libpng.a
-	ln -sf $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
+	cp libpng.a $(DESTDIR)$(LIBPATH)/$(LIBNAME).a
+	chmod 644 $(DESTDIR)$(LIBPATH)/$(LIBNAME).a
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.a
+	(cd $(DESTDIR)$(LIBPATH); ln -sf $(LIBNAME).a libpng.a)
 
 install-shared: install-headers $(LIBNAME).dylib
-	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).$(PNGMAJ)*.dylib
-	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).dylib
-	-@/bin/rm -f $(LIBPATH)/libpng.dylib
-	-@/bin/rm -f $(LIBPATH)/libpng.3.dylib
-	-@/bin/rm -f $(LIBPATH)/libpng.3.*.dylib
-	cp $(LIBNAME).$(PNGVER).dylib $(LIBPATH)
-	chmod 755 $(LIBPATH)/$(LIBNAME).$(PNGVER).dylib
-	(cd $(LIBPATH); \
+	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/$(LIBNAME).$(PNGMAJ)*.dylib
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/$(LIBNAME).dylib
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.dylib
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.3.dylib
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.3.*.dylib
+	cp $(LIBNAME).$(PNGVER).dylib $(DESTDIR)$(LIBPATH)
+	chmod 755 $(DESTDIR)$(LIBPATH)/$(LIBNAME).$(PNGVER).dylib
+	(cd $(DESTDIR)$(LIBPATH); \
 	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.dylib; \
 	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.3.dylib; \
 	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.3.$(PNGMIN).dylib; \
 	ln -sf $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib; \
 	ln -sf $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib)
-	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi
-	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
-	cp libpng.pc $(LIBPATH)/pkgconfig/libpng12.pc
-	chmod 644 $(LIBPATH)/pkgconfig/libpng12.pc
+	-@if [ ! -d $(DESTDIR)$(LIBPATH)/pkgconfig ]; then \
+	mkdir $(DESTDIR)$(LIBPATH)/pkgconfig; fi
+	cp libpng.pc $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
+	chmod 644 $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
+	(cd $(DESTDIR)$(LIBPATH)/pkgconfig; ln -sf libpng12.pc libpng.pc)
 
-install: install-static install-shared
+install-man: libpng.3 libpngpf.3 png.5
+	-@if [ ! -d $(MANPATH) ]; then mkdir $(MANPATH); fi
+	-@if [ ! -d $(MANPATH)/man3 ]; then mkdir $(MANPATH)/man3; fi
+	-@/bin/rm -f $(MANPATH)/man3/libpng.3
+	-@/bin/rm -f $(MANPATH)/man3/libpngpf.3
+	cp libpng.3 $(MANPATH)/man3
+	cp libpngpf.3 $(MANPATH)/man3
+	-@if [ ! -d $(MANPATH)/man5 ]; then mkdir $(MANPATH)/man5; fi
+	-@/bin/rm -f $(MANPATH)/man5/png.5
+	cp png.5 $(MANPATH)/man5
+
+install: install-static install-shared install-man
 
 clean:
 	rm -f *.o libpng.a $(LIBNAME).*dylib pngtest pngout.png
