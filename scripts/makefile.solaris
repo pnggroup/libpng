@@ -1,4 +1,5 @@
 # makefile for libpng on Solaris 2.x with gcc
+# Copyright (C) 2002 Glenn Randers-Pehrson
 # Contributed by William L. Sebok, based on makefile.linux
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
@@ -6,7 +7,7 @@
 
 CC=gcc
 
-# Where make install puts libpng.a, libpng.so*, and png.h
+# Where make install puts libpng.a, libpng12.so*, and png.h
 prefix=/usr/local
 
 # Where the zlib library and include files are located
@@ -28,10 +29,10 @@ LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng -lz -lm
 #RANLIB=ranlib
 RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
-PNGMAJ = 3
-PNGMIN = 1.2.1
+PNGMAJ = 0
+PNGMIN = 1.2.2beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -48,19 +49,19 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a libpng.so pngtest
+all: libpng.a libpng12.so pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-libpng.so: libpng.so.$(PNGMAJ)
-	ln -f -s libpng.so.$(PNGMAJ) libpng.so
+libpng12.so: libpng12.so.$(PNGMAJ)
+	ln -f -s libpng12.so.$(PNGMAJ) libpng12.so
 
-libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+libpng12.so.$(PNGMAJ): libpng12.so.$(PNGVER)
+	ln -f -s libpng12.so.$(PNGVER) libpng12.so.$(PNGMAJ)
 
-libpng.so.$(PNGVER): $(OBJSDLL)
+libpng12.so.$(PNGVER): $(OBJSDLL)
 	@case "`type ld`" in *ucb*) \
 	echo; \
 	echo '## WARNING:'; \
@@ -73,27 +74,34 @@ libpng.so.$(PNGVER): $(OBJSDLL)
 	echo; \
 	;; \
 	esac
-	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h libpng.so.$(PNGMAJ) \
-	 -o libpng.so.$(PNGVER) $(OBJSDLL) -lz
+	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h libpng12.so.$(PNGMAJ) \
+	 -o libpng12.so.$(PNGVER) $(OBJSDLL) -lz
 
-pngtest: pngtest.o libpng.so
+pngtest: pngtest.o libpng12.so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
-install: libpng.a libpng.so.$(PNGVER)
+install: libpng.a libpng12.so.$(PNGVER)
 	-@mkdir $(INCPATH) $(LIBPATH)
-	cp png.h pngconf.h $(INCPATH)
+	-@mkdir $(INCPATH)/libpng12
+	cp png.h pngconf.h $(INCPATH)/libpng12
+	cp png.h pngconf.h $(INCPATH)/libpng12
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -f -s libpng.so.$(PNGMAJ) libpng.so)
+	chmod 644 $(INCPATH)/libpng12/png.h \
+	$(INCPATH)/libpng12/pngconf.h
+	cp libpng.a libpng12.so.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/libpng12.so.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/libpng12.so.$(PNGMAJ) \
+	$(LIBPATH)/libpng12.so
+	(cd $(LIBPATH); \
+	ln -f -s libpng12.so.$(PNGVER) libpng12.so.$(PNGMAJ); \
+	ln -f -s libpng12.so.$(PNGMAJ) libpng12.so)
 
 clean:
-	/bin/rm -f *.o libpng.a libpng.so libpng.so.$(PNGMAJ)* pngtest pngout.png
+	/bin/rm -f *.o libpng.a libpng12.so libpng12.so.$(PNGMAJ)* \
+	pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

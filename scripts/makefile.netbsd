@@ -8,10 +8,12 @@ LOCALBASE?=/usr/local
 LIBDIR=	${LOCALBASE}/lib
 MANDIR= ${LOCALBASE}/man
 INCSDIR=${LOCALBASE}/include
+# Should also copy png.h and pngconf.h to $(INCSDIR)/libpng12.
 
 LIB=png
-SHLIB_MAJOR= 3
-SHLIB_MINOR= 1.2.1
+# Shared lib name should be png12.
+SHLIB_MAJOR= 0
+SHLIB_MINOR= 1.2.2beta1
 SRCS=	pnggccrd.c png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c

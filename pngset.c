@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.1 - December 12, 2001
+ * libpng 1.2.2beta1 - February 22, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -40,6 +40,25 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (white_x < 0.0 || white_y < 0.0 ||
+         red_x < 0.0 ||   red_y < 0.0 ||
+       green_x < 0.0 || green_y < 0.0 ||
+        blue_x < 0.0 ||  blue_y < 0.0)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set negative chromaticity value");
+      return;
+   }
+   if (white_x > 21474.83 || white_y > 21474.83 ||
+         red_x > 21474.83 ||   red_y > 21474.83 ||
+       green_x > 21474.83 || green_y > 21474.83 ||
+        blue_x > 21474.83 ||  blue_y > 21474.83)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set chromaticity value exceeding 21474.83");
+      return;
+   }
+
    info_ptr->x_white = (float)white_x;
    info_ptr->y_white = (float)white_y;
    info_ptr->x_red   = (float)red_x;
@@ -51,12 +70,12 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FIXED_POINT_SUPPORTED
    info_ptr->int_x_white = (png_fixed_point)(white_x*100000.+0.5);
    info_ptr->int_y_white = (png_fixed_point)(white_y*100000.+0.5);
-   info_ptr->int_x_red   = (png_fixed_point)(red_x*100000.+0.5);
-   info_ptr->int_y_red   = (png_fixed_point)(red_y*100000.+0.5);
+   info_ptr->int_x_red   = (png_fixed_point)(  red_x*100000.+0.5);
+   info_ptr->int_y_red   = (png_fixed_point)(  red_y*100000.+0.5);
    info_ptr->int_x_green = (png_fixed_point)(green_x*100000.+0.5);
    info_ptr->int_y_green = (png_fixed_point)(green_y*100000.+0.5);
-   info_ptr->int_x_blue  = (png_fixed_point)(blue_x*100000.+0.5);
-   info_ptr->int_y_blue  = (png_fixed_point)(blue_y*100000.+0.5);
+   info_ptr->int_x_blue  = (png_fixed_point)( blue_x*100000.+0.5);
+   info_ptr->int_y_blue  = (png_fixed_point)( blue_y*100000.+0.5);
 #endif
    info_ptr->valid |= PNG_INFO_cHRM;
 }
@@ -72,6 +91,24 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (white_x < 0 || white_y < 0 ||
+         red_x < 0 ||   red_y < 0 ||
+       green_x < 0 || green_y < 0 ||
+        blue_x < 0 ||  blue_y < 0)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set negative chromaticity value");
+      return;
+   }
+   if (white_x > PNG_MAX_UINT || white_y > PNG_MAX_UINT ||
+         red_x > PNG_MAX_UINT ||   red_y > PNG_MAX_UINT ||
+       green_x > PNG_MAX_UINT || green_y > PNG_MAX_UINT ||
+        blue_x > PNG_MAX_UINT ||  blue_y > PNG_MAX_UINT)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set chromaticity value exceeding 21474.83");
+      return;
+   }
    info_ptr->int_x_white = white_x;
    info_ptr->int_y_white = white_y;
    info_ptr->int_x_red   = red_x;
@@ -83,12 +120,12 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    info_ptr->x_white = (float)(white_x/100000.);
    info_ptr->y_white = (float)(white_y/100000.);
-   info_ptr->x_red   = (float)(red_x/100000.);
-   info_ptr->y_red   = (float)(red_y/100000.);
+   info_ptr->x_red   = (float)(  red_x/100000.);
+   info_ptr->y_red   = (float)(  red_y/100000.);
    info_ptr->x_green = (float)(green_x/100000.);
    info_ptr->y_green = (float)(green_y/100000.);
-   info_ptr->x_blue  = (float)(blue_x/100000.);
-   info_ptr->y_blue  = (float)(blue_y/100000.);
+   info_ptr->x_blue  = (float)( blue_x/100000.);
+   info_ptr->y_blue  = (float)( blue_y/100000.);
 #endif
    info_ptr->valid |= PNG_INFO_cHRM;
 }
@@ -100,16 +137,25 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
 void PNGAPI
 png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
 {
+   double gamma;
    png_debug1(1, "in %s storage function\n", "gAMA");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   info_ptr->gamma = (float)file_gamma;
+   /* Check for overflow */
+   if (file_gamma > 21474.83)
+   {
+      png_warning(png_ptr, "Limiting gamma to 21474.83");
+      gamma=21474.83;
+   }
+   else
+      gamma=file_gamma;
+   info_ptr->gamma = (float)gamma;
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   info_ptr->int_gamma = (int)(file_gamma*100000.+.5);
+   info_ptr->int_gamma = (int)(gamma*100000.+.5);
 #endif
    info_ptr->valid |= PNG_INFO_gAMA;
-   if(file_gamma == 0.0)
+   if(gamma == 0.0)
       png_warning(png_ptr, "Setting gamma=0");
 }
 #endif
@@ -117,18 +163,35 @@ void PNGAPI
 png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
    int_gamma)
 {
+   png_fixed_point gamma;
+
    png_debug1(1, "in %s storage function\n", "gAMA");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (int_gamma > PNG_MAX_UINT)
+   {
+     png_warning(png_ptr, "Limiting gamma to 21474.83");
+     gamma=PNG_MAX_UINT;
+   }
+   else
+   {
+     if (int_gamma < 0)
+     {
+       png_warning(png_ptr, "Setting negative gamma to zero");
+       gamma=0;
+     }
+     else
+       gamma=int_gamma;
+   }
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   info_ptr->gamma = (float)(int_gamma/100000.);
+   info_ptr->gamma = (float)(gamma/100000.);
 #endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   info_ptr->int_gamma = int_gamma;
+   info_ptr->int_gamma = gamma;
 #endif
    info_ptr->valid |= PNG_INFO_gAMA;
-   if(int_gamma == 0)
+   if(gamma == 0)
       png_warning(png_ptr, "Setting gamma=0");
 }
 #endif
@@ -415,6 +478,8 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
       in case of an invalid PNG file that has too-large sample values. */
    png_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)256,
       sizeof (png_color));
+   if (png_ptr->palette == NULL)
+      png_error(png_ptr, "Unable to malloc palette");
    png_memcpy(png_ptr->palette, palette, num_palette * sizeof (png_color));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;

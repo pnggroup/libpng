@@ -1,4 +1,5 @@
 # makefile for libpng on HP-UX using GCC
+# Copyright (C) 2002, Glenn Randers-Pehrson
 # Copyright (C) 2001, Laurent faillie
 # Copyright (C) 1998, 1999 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
@@ -31,11 +32,12 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 RANLIB=ranlib
 #RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
-PNGMAJ = 3
-PNGMIN = 1.2.1
+PNGMAJ = 0
+PNGMIN = 1.2.2beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
+SHAREDLIB = libpng12
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
@@ -51,41 +53,47 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a libpng.sl pngtest
+all: libpng.a $(SHAREDLIB).sl pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-libpng.sl: libpng.sl.$(PNGMAJ)
-	ln -f -s libpng.sl.$(PNGMAJ) libpng.sl
+$(SHAREDLIB).sl: $(SHAREDLIB).sl.$(PNGMAJ)
+	ln -f -s $(SHAREDLIB).sl.$(PNGMAJ) $(SHAREDLIB).sl
 
-libpng.sl.$(PNGMAJ): libpng.sl.$(PNGVER)
-	ln -f -s libpng.sl.$(PNGVER) libpng.sl.$(PNGMAJ)
+$(SHAREDLIB).sl.$(PNGMAJ): $(SHAREDLIB).sl.$(PNGVER)
+	ln -f -s $(SHAREDLIB).sl.$(PNGVER) $(SHAREDLIB).sl.$(PNGMAJ)
 
-libpng.sl.$(PNGVER): $(OBJSDLL)
+$(SHAREDLIB).sl.$(PNGVER): $(OBJSDLL)
 	$(LD) -b -L$(ZLIBLIB) +s +b $(ZLIBLIB) \
 	+h libpng.sl.$(PNGMAJ) -o libpng.sl.$(PNGVER) $(OBJSDLL) -lz
 
-pngtest: pngtest.o libpng.sl
+pngtest: pngtest.o $(SHAREDLIB).sl
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
-install: libpng.a libpng.sl.$(PNGVER)
+install: libpng.a $(SHAREDLIB).sl.$(PNGVER)
 	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME)  ]; then mkdir $(INCPATH)/$(LIBNAME); fi
 	cp png.h pngconf.h $(INCPATH)
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.a libpng.sl.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/libpng.sl.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.sl.$(PNGMAJ) $(LIBPATH)/libpng.sl
-	(cd $(LIBPATH); ln -sf libpng.sl.$(PNGVER) libpng.sl.$(PNGMAJ); \
-	 ln -sf libpng.sl.$(PNGMAJ) libpng.sl)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	cp libpng.a $(SHAREDLIB).sl.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(SHAREDLIB).sl.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(SHAREDLIB).sl.$(PNGMAJ) \
+	$(LIBPATH)/$(SHAREDLIB).sl
+	(cd $(LIBPATH); ln -sf $(SHAREDLIB).sl.$(PNGVER) \
+	$(SHAREDLIB).sl.$(PNGMAJ); \
+	 ln -sf $(SHAREDLIB).sl.$(PNGMAJ) $(SHAREDLIB).sl)
 
 clean:
-	/bin/rm -f *.o libpng.a libpng.sl libpng.sl.$(PNGMAJ)* pngtest pngout.png
+	/bin/rm -f *.o libpng.a $(SHAREDLIB).sl $(SHAREDLIB).sl.$(PNGMAJ)* \
+	pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

@@ -10,10 +10,10 @@ CC=gcc
 ZLIBLIB=/usr/local/lib
 ZLIBINC=/usr/local/include
 
-# read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
-PNGMAJ = 3
-PNGMIN = 1.2.1
+PNGMAJ = 0
+PNGMIN = 1.2.2beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 ALIGN=
@@ -29,15 +29,16 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 CFLAGS=-I$(ZLIBINC) -Wall -O1 -funroll-loops \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 # LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
-LDFLAGS=-L. -Wl,-soname=libpng.so.$(PNGMAJ) -L$(ZLIBLIB) -lz -lm
+LDFLAGS=-L. -Wl,-soname=$(LIBNAME).so.$(PNGMAJ) -L$(ZLIBLIB) -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
 
-# where make install puts libpng.a, libpng.so*, and png.h
+# where make install puts libpng.a, libpng12.so*, and png.h
 prefix=/usr/local
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
+LIBNAME=libpng12
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -47,42 +48,45 @@ OBJSDLL = $(OBJS)
 
 .SUFFIXES:      .c .o
 
-all: libpng.a libpng.so pngtest
+all: libpng.a $(LIBNAME).so pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-libpng.so: libpng.so.$(PNGMAJ)
-	ln -sf libpng.so.$(PNGMAJ) libpng.so
-	cp libpng.so* /boot/home/config/lib
+$(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
+	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
+	cp $(LIBNAME).so* /boot/home/config/lib
 
-libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+$(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
+	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
-libpng.so.$(PNGVER): $(OBJSDLL)
-	$(CC) -L$(ZLIBLIB) -lz -nostart -Wl,-soname,libpng.so.$(PNGMAJ) -o
-libpng.so.$(PNGVER) \
+$(LIBNAME).so.$(PNGVER): $(OBJSDLL)
+	$(CC) -L$(ZLIBLIB) -lz -nostart -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) -o
+$(LIBNAME).so.$(PNGVER) \
 	 $(OBJSDLL)
 
-pngtest: pngtest.o libpng.so
+pngtest: pngtest.o $(LIBNAME).so
 	$(CC) -L$(ZLIBLIB) -lz -lpng -o pngtest pngtest.o
 
 test: pngtest
 	./pngtest
 
-install: libpng.a libpng.so.$(PNGVER)
+install: libpng.a $(LIBNAME).so.$(PNGVER)
 	-@mkdir $(INCPATH) $(LIBPATH)
 	cp png.h pngconf.h $(INCPATH)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -sf libpng.so.$(PNGMAJ) libpng.so)
+	-@mkdir $(INCPATH) $(LIBPATH)/$(LIBNAME)
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	cp libpng.a $(LIBNAME).so.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ) $(LIBPATH)/$(LIBNAME).so
+	(cd $(LIBPATH); ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
+	 ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 
 clean:
-	/bin/rm -f *.o libpng.a libpng.so libpng.so.$(PNGMAJ)* pngtest pngout.png
+	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

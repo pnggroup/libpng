@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.2.1 - December 12, 2001
+ * libpng version 1.2.2beta1 - February 22, 2002
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_1 Your_png_h_is_not_version_1_2_1;
+typedef version_1_2_2beta1 Your_png_h_is_not_version_1_2_2beta1;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = "1.2.1";
+const char png_libpng_ver[18] = "1.2.2beta1";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -139,7 +139,13 @@ voidpf /* PRIVATE */
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
    png_uint_32 num_bytes = (png_uint_32)items * size;
-   png_voidp ptr = (png_voidp)png_malloc((png_structp)png_ptr, num_bytes);
+   png_voidp ptr;
+   png_structp p=png_ptr;
+   png_uint_32 save_flags=p->flags;
+
+   p->flags|=PNG_FLAG_MALLOC_NULL_MEM_OK;
+   ptr = (png_voidp)png_malloc((png_structp)png_ptr, num_bytes);
+   p->flags=save_flags;
 
 #ifndef PNG_NO_ZALLOC_ZERO
    if (num_bytes > (png_uint_32)0x8000L)
@@ -645,7 +651,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ((png_charp) "\n libpng version 1.2.1 - December 12, 2001\n\
+   return ((png_charp) "\n libpng version 1.2.2beta1 - February 22, 2002\n\
    Copyright (c) 1998-2001 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -663,8 +669,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) "1.2.1");
-   return((png_charp) "1.2.1");
+      return((png_charp) "1.2.2beta1");
+   return((png_charp) "1.2.2beta1");
 }
 
 png_charp PNGAPI
@@ -714,7 +720,7 @@ png_uint_32 PNGAPI
 png_access_version_number(void)
 {
    /* Version of *.c files used when building libpng */
-   return((png_uint_32) 10201L);
+   return((png_uint_32) 10202L);
 }
 
 

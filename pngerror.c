@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.2.1 - December 12, 2001
+ * libpng 1.2.2beta1 - February 22, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)

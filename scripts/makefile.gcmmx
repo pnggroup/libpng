@@ -1,6 +1,8 @@
-# makefile for libpng on Linux ELF with gcc using MMX assembler code
-# Copyright 1996-1997 Andreas Dilger
+# makefile for libpng.a and libpng12.so on Linux ELF with gcc using MMX
+# assembler code
+# Copyright 2002 Greg Roelofs and Glenn Randers-Pehrson
 # Copyright 1998-2001 Greg Roelofs
+# Copyright 1996-1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
 
 # CAUTION: Do not use this makefile with gcc versions 2.7.2.2 and earlier.
@@ -11,9 +13,15 @@
 #        there are no floating-point programs (e.g., SETI@Home) running in
 #        the background!  Context switches between MMX and FPU are expensive.
 
+LIBNAME = libpng12
+PNGMAJ = 0
+PNGMIN = 1.2.2beta1
+PNGVER = $(PNGMAJ).$(PNGMIN)
+
 CC=gcc
 
-# where "make install" puts libpng.a, libpng.so*, png.h, and pngconf.h
+# where "make install" puts libpng.a, libpng12/libpng12.so*,
+# $(LIBNAME)/png.h and $(LIBNAME)/pngconf.h
 prefix=/usr/local
 
 # Where the zlib library and include files are located
@@ -46,17 +54,11 @@ CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall \
 #	-m486 -malign-double -ffast-math \
 #	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
 
-LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng12 -lz -lm
 LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
-
-# read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
-# have to change it.
-PNGMAJ = 3
-PNGMIN = 1.2.1
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
@@ -72,7 +74,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a libpng.so pngtest pngtest-static
+all: libpng.a $(LIBNAME).so pngtest pngtest-static
 
 pnggccrd.o:	pnggccrd.c png.h pngconf.h
 	$(CC) -c $(CFLAGS) -o $@ $*.c
@@ -80,49 +82,54 @@ pnggccrd.o:	pnggccrd.c png.h pngconf.h
 pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
 	$(CC) -c $(CFLAGS) -fPIC -o $@ pnggccrd.c
 
-libpng.a: $(OBJS)
+$(LIBNAME).a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-libpng.so: libpng.so.$(PNGMAJ)
-	ln -sf libpng.so.$(PNGMAJ) libpng.so
+$(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
+	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
 
-libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+$(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
+	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
-libpng.so.$(PNGVER): $(OBJSDLL)
-	$(CC) -shared -Wl,-soname,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
+$(LIBNAME).so.$(PNGVER): $(OBJSDLL)
+	$(CC) -shared -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) -o $(LIBNAME).so.$(PNGVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz -lm -lc
 
-pngtest: pngtest.o libpng.so
+pngtest: pngtest.o $(LIBNAME).so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
-pngtest-static: pngtest.o libpng.a
+pngtest-static: pngtest.o $(LIBNAME).a
 	$(CC) -o pngtest-static $(CFLAGS) pngtest.o $(LDFLAGS_A)
 
 test: pngtest pngtest-static
 	@echo ""
-	@echo "   Testing dynamically linked version:"
+	@echo "   Running pngtest dynamically linked with libpng12.so:"
 	@echo ""
 	./pngtest
 	@echo ""
-	@echo "   Testing statically linked version:"
+	@echo "   Running pngtest statically linked with libpng.a:"
 	@echo ""
 	./pngtest-static
 
-install: libpng.a libpng.so.$(PNGVER)
+install: libpng.a $(LIBNAME).so.$(PNGVER)
 	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME)  ]; then mkdir $(INCPATH)/$(LIBNAME); fi
 	cp png.h pngconf.h $(INCPATH)
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -sf libpng.so.$(PNGMAJ) libpng.so)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	cp libpng.a $(LIBNAME).so.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ) \
+	$(LIBPATH)/$(LIBNAME).so
+	(cd $(LIBPATH); ln -sf $(LIBNAME).so.$(PNGVER) \
+	$(LIBNAME).so.$(PNGMAJ); \
+	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 
 clean:
-	/bin/rm -f *.o libpng.a libpng.so libpng.so.$(PNGMAJ)* pngtest pngout.png
+	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

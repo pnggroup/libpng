@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.1 - December 12, 2001
+ * libpng 1.2.2beta1 - February 22, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -443,11 +443,12 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    int i;
    png_debug(1, "in png_create_write_struct\n");
 #ifdef PNG_USER_MEM_SUPPORTED
-   if ((png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
-      (png_malloc_ptr)malloc_fn, (png_voidp)mem_ptr)) == NULL)
+   png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
+      (png_malloc_ptr)malloc_fn, (png_voidp)mem_ptr);
 #else
-   if ((png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG)) == NULL)
+   png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG);
 #endif /* PNG_USER_MEM_SUPPORTED */
+   if (png_ptr == NULL)
       return (NULL);
 
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED

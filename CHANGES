@@ -1012,8 +1012,18 @@ version 1.2.1rc2 [December 4, 2001]
   Always allocate 256-entry internal palette, hist, and trans arrays, to
     avoid out-of-bounds memory reference caused by invalid PNG datastreams.
   Added a check for prefix_length > data_length in iCCP chunk handler.
-version 1.2.1 [December 12, 2001]
+version 1.2.1 [December 7, 2001]
   None.
+version 1.2.2beta1 [February 22, 2002]
+  Fixed a bug with reading the length of iCCP profiles (Larry Reeves).
+  Revised makefile.linux, makefile.gcmmx, and makefile.sgi to generate
+    libpng.a, libpng12.so (not libpng.so.3), and libpng12/png.h (not png.h)
+  Revised makefile.darwin to remove "-undefined suppress" option.
+  Added checks for gamma and chromaticity values over 21474.83, which exceed
+    the limit for PNG unsigned 32-bit integers when encoded.
+  Revised calls to png_create_read_struct() and png_create_write_struct()
+    for simpler debugging.
+  Revised png_zalloc() so zlib handles errors (uses PNG_FLAG_MALLOC_NULL_MEM_OK)
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

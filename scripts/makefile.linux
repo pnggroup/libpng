@@ -1,11 +1,17 @@
-# makefile for libpng on Linux ELF with gcc
-# Copyright (C) 1998, 1999 Greg Roelofs
+# makefile for libpng.a and libpng12.so on Linux ELF with gcc
+# Copyright (C) 1998, 1999, 2002 Greg Roelofs and Glenn Randers-Pehrson
 # Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
 
+LIBNAME = libpng12
+PNGMAJ = 0
+PNGMIN = 1.2.2beta1
+PNGVER = $(PNGMAJ).$(PNGMIN)
+
 CC=gcc
 
-# where "make install" puts libpng.a, libpng.so*, png.h and pngconf.h
+# where "make install" puts libpng.a, libpng12/libpng12.so*,
+# libpng12/png.h and libpng12/pngconf.h
 prefix=/usr/local
 
 # Where the zlib library and include files are located
@@ -26,16 +32,12 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
-LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
+
+LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng12 -lz -lm
+LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
-
-# read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
-# have to change it.
-PNGMAJ = 3
-PNGMIN = 1.2.1
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
@@ -51,41 +53,58 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a libpng.so pngtest
+all: libpng.a $(LIBNAME).so pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-libpng.so: libpng.so.$(PNGMAJ)
-	ln -sf libpng.so.$(PNGMAJ) libpng.so
+$(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
+	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
 
-libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+$(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
+	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
-libpng.so.$(PNGVER): $(OBJSDLL)
-	$(CC) -shared -Wl,-soname,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
-	 $(OBJSDLL) -L$(ZLIBLIB) -lz -lm -lc
+$(LIBNAME).so.$(PNGVER): $(OBJSDLL)
+	$(CC) -shared -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) \
+	-o $(LIBNAME).so.$(PNGVER) \
+	$(OBJSDLL) -L$(ZLIBLIB) -lz -lm -lc
 
-pngtest: pngtest.o libpng.so
+pngtest: pngtest.o $(LIBNAME).so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
-test: pngtest
-	./pngtest
+pngtest-static: pngtest.o $(LIBNAME).a
+	$(CC) -o pngtest-static $(CFLAGS) pngtest.o $(LDFLAGS_A)
 
-install: libpng.a libpng.so.$(PNGVER)
+test: pngtest pngtest-static
+	@echo ""
+	@echo "   Running pngtest dynamically linked with libpng12.so:"
+	@echo ""
+	./pngtest
+	@echo ""
+	@echo "   Running pngtest statically linked with libpng.a:"
+	@echo ""
+	./pngtest-static
+
+install: libpng.a $(LIBNAME).so.$(PNGVER)
 	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME)  ]; then mkdir $(INCPATH)/$(LIBNAME); fi
 	cp png.h pngconf.h $(INCPATH)
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -sf libpng.so.$(PNGMAJ) libpng.so)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	cp libpng.a $(LIBNAME).so.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ) \
+	$(LIBPATH)/$(LIBNAME).so
+	(cd $(LIBPATH); ln -sf $(LIBNAME).so.$(PNGVER) \
+	$(LIBNAME).so.$(PNGMAJ); \
+	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 
 clean:
-	/bin/rm -f *.o libpng.a libpng.so libpng.so.$(PNGMAJ)* pngtest pngout.png
+	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNMAJ)* \
+	pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
