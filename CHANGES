@@ -267,3 +267,4 @@ version 1.00 [March 7, 1998]
    updated some of the makefiles (Tom Lane)
    changed some typedefs (s_start, etc.) in pngrutil.c
    fixed dimensions of "short_months" array in pngwrite.c
+   Replaced ansi2knr.c with the one from jpeg-v6

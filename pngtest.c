@@ -52,7 +52,8 @@ static int status_pass=1;
 static int status_dots_requested=0;
 static int status_dots=1;
 
-void read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
+void
+read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
     if(png_ptr == NULL || row_number > 0x3fffffffL) return;
     if(status_pass != pass)
@@ -70,7 +71,8 @@ void read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
     fprintf(stdout, "r");
 }
 
-void write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
+void
+write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
     if(png_ptr == NULL || row_number > 0x3fffffffL || pass > 7) return;
     fprintf(stdout, "w");
@@ -84,8 +86,8 @@ void write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 
 static png_uint_32 black_pixels;
 
-void count_black_pixels(png_structp png_ptr, png_row_infop row_info,
-		   png_bytep data)
+void
+count_black_pixels(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    png_bytep dp = data;
    if(png_ptr == NULL)return; 
@@ -203,8 +205,8 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
  
-static void png_default_read_data(png_structp png_ptr, png_bytep data,
-   png_size_t length)
+static void
+png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    int check;
    png_byte *n_data;
@@ -245,7 +247,8 @@ static void png_default_read_data(png_structp png_ptr, png_bytep data,
 #endif /* USE_FAR_KEYWORD */
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
-static void png_default_flush(png_structp png_ptr)
+static void
+png_default_flush(png_structp png_ptr)
 {
    FILE *io_ptr;
    io_ptr = (FILE *)CVT_PTR((png_ptr->io_ptr));
@@ -452,7 +455,8 @@ png_free(png_structp png_ptr, png_voidp ptr)
 /* END of code to test memory allocation/deallocation */
 
 /* Test one file */
-int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
+int
+test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 {
    static FILE *fpin, *fpout;  /* "static" prevents setjmp corruption */
    png_structp read_ptr, write_ptr;
