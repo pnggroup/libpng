@@ -1100,6 +1100,12 @@ version 1.2.3rc2 [May 1, 2002]
 version 1.2.3rc3 [May 1, 2002]
   Revised prototype for png_default_flush()
   Remove old libpng.pc and libpngNN.pc before installing new ones.
+version 1.2.3rc4 [May 3, 2002]
+  Typos in *.def files (png_default_read|write -> png_default_read|write_data)
+  In makefiles, changed rm libpng.NN.pc to rm libpngNN.pc
+  Added libpng-config and libpngNN-config and modified makefiles to install them.
+  Changed $(MANPATH) to $(DESTDIR)$(MANPATH) in makefiles
+  Added "Win32 DLL VB" configuration to projects/msvc/libpng.dsp
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

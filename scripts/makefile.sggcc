@@ -36,7 +36,7 @@ LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=CC $(ABI) -shared
 
 PNGMAJ = 0
-PNGMIN = 1.2.3rc3
+PNGMIN = 1.2.3rc4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 # See "man dso" for info about shared objects
 LIBS=libpng12.so.$(PNGVER)
@@ -44,6 +44,7 @@ LIBNAME=libpng12
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib32
 MANPATH=$(prefix)/man
+BINPATH=$(prefix)/bin
 
 # override DESTDIR= on the make install command line to easily support
 # installing into a temporary location.  Example:
@@ -120,24 +121,35 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
 	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 	-@if [ ! -d $(DESTDIR)$(LIBPATH)/pkgconfig ]; then \
 	mkdir $(DESTDIR)$(LIBPATH)/pkgconfig; fi
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.12.pc
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.pc
 	cp libpng.pc $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
 	chmod 644 $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
 	(cd $(DESTDIR)$(LIBPATH)/pkgconfig; ln -sf libpng12.pc libpng.pc)
 
 install-man: libpng.3 libpngpf.3 png.5
-	-@if [ ! -d $(MANPATH) ]; then mkdir $(MANPATH); fi
-	-@if [ ! -d $(MANPATH)/man3 ]; then mkdir $(MANPATH)/man3; fi
-	-@/bin/rm -f $(MANPATH)/man3/libpng.3
-	-@/bin/rm -f $(MANPATH)/man3/libpngpf.3
-	cp libpng.3 $(MANPATH)/man3
-	cp libpngpf.3 $(MANPATH)/man3
-	-@if [ ! -d $(MANPATH)/man5 ]; then mkdir $(MANPATH)/man5; fi
-	-@/bin/rm -f $(MANPATH)/man5/png.5
-	cp png.5 $(MANPATH)/man5
+	-@if [ ! -d $(DESTDIR)$(MANPATH) ]; then mkdir $(DESTDIR)$(MANPATH); fi
+	-@if [ ! -d $(DESTDIR)$(MANPATH)/man3 ]; then \
+	mkdir $(DESTDIR)$(MANPATH)/man3; fi
+	-@/bin/rm -f $(DESTDIR)$(MANPATH)/man3/libpng.3
+	-@/bin/rm -f $(DESTDIR)$(MANPATH)/man3/libpngpf.3
+	cp libpng.3 $(DESTDIR)$(MANPATH)/man3
+	cp libpngpf.3 $(DESTDIR)$(MANPATH)/man3
+	-@if [ ! -d $(DESTDIR)$(MANPATH)/man5 ]; then \
+	mkdir $(DESTDIR)$(MANPATH)/man5; fi
+	-@/bin/rm -f $(DESTDIR)$(MANPATH)/man5/png.5
+	cp png.5 $(DESTDIR)$(MANPATH)/man5
 
-install: install-static install-shared install-man
+install-config: scripts/libpng-config
+	-@if [ ! -d $(DESTDIR)$(BINPATH) ]; then \
+	mkdir $(DESTDIR)$(BINPATH); fi
+	-@/bin/rm -f $(DESTDIR)$(BINPATH)/libpng-config
+	-@/bin/rm -f $(DESTDIR)$(BINPATH)/libpng12-config
+	cp scripts/libpng-config $(DESTDIR)$(BINPATH)/libpng12-config
+	chmod 755 $(DESTDIR)$(BINPATH)/libpng12-config
+	(cd $(DESTDIR)$(BINPATH); ln -sf libpng12-config libpng-config)
+
+install: install-static install-shared install-man install-config
 
 clean:
 	rm -f *.o libpng.a pngtest pngout.png

@@ -2,7 +2,7 @@
 ; PNG.LIB module definition file for OS/2
 ;----------------------------------------
 
-; Version 1.2.3rc3
+; Version 1.2.3rc4
 
 LIBRARY		PNG
 DESCRIPTION	"PNG image compression library for OS/2"
@@ -202,8 +202,8 @@ EXPORTS
   png_zfree
 
 ; Added at version 1.2.3
-  png_default_read
-  png_default_write
+  png_default_read_data
+  png_default_write_data
   png_default_flush
   png_push_fill_buffer
 
