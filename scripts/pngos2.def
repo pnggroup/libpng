@@ -325,3 +325,6 @@ EXPORTS
   png_tIME
   png_tRNS
   png_zTXt
+
+  png_mmx_supported
+  png_permit_empty_plte

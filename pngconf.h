@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.9beta8 - January 12, 2001
+ * libpng 1.0.9beta9 - January 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -499,7 +499,7 @@
 #  define PNG_MNG_FEATURES_SUPPORTED
 #endif
 
-/* Deprecated, will be removed */
+/* Deprecated, will be removed from version 2.0.0 */
 #ifndef PNG_NO_READ_EMPTY_PLTE
 #  define PNG_READ_EMPTY_PLTE_SUPPORTED
 #endif
@@ -586,9 +586,11 @@
 #  define PNG_EASY_ACCESS_SUPPORTED
 #endif
 
+/* PNG_ASSEMBLER_CODE will be enabled by default in version 1.2.0 
+   even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined */
 #ifndef PNG_NO_ASSEMBLER_CODE
-#  define PNG_ASSEMBLER_CODE_SUPPORTED
 #  if defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD)
+#    define PNG_ASSEMBLER_CODE_SUPPORTED
 #    define PNG_MMX_CODE_SUPPORTED
 #  endif
 #endif
@@ -1214,7 +1216,7 @@ typedef z_stream FAR *  png_zstreamp;
 /* These are the default thresholds before the MMX code kicks in; if either
  * rowbytes or bitdepth is below the threshold, plain C code is used.  These
  * can be overridden at runtime via the png_set_mmx_thresholds() call in
- * libpng 1.0.9 and later.  The values below were chosen by Intel.
+ * libpng 1.2.0 and later.  The values below were chosen by Intel.
  */
 
 #ifndef PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT

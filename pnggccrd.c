@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.9beta8 - January 12, 2001
+ * libpng 1.0.9beta9 - January 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -223,7 +223,7 @@
  *     x pick one version of mmxsupport() and get rid of the other
  *     - add error messages to any remaining bogus default cases
  *     - enable pixel_depth == 8 cases in png_read_filter_row()? (test speed)
- *     x add support for runtime enable/disable/query of various MMX routines
+ *     - add support for runtime enable/disable/query of various MMX routines
  */
 
 //#define PNG_DEBUG 2   // GRR

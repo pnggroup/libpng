@@ -38,7 +38,8 @@ CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.9beta8
+PNGMIN = 1.0.9beta9
+PNGMIN_BASE = 1.0.9
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(PNGMAJ).dll
@@ -60,7 +61,7 @@ LIBPATH=$(prefix)/lib
 BINPATH=$(prefix)/bin
 MANPATH=$(prefix)/man
 MAN3PATH=$(MANPATH)/man3
-DOCPATH=$(prefix)/doc/libpng-$(PNGMIN)
+DOCPATH=$(prefix)/doc/libpng-$(PNGMIN_BASE)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \

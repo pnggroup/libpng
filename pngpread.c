@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.9beta8 - January 12, 2001
+ * libpng 1.0.9beta9 - January 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -778,8 +778,8 @@ png_push_process_row(png_structp png_ptr)
  */
          png_do_read_interlace(png_ptr);
 
-      switch (png_ptr->pass)
-      {
+    switch (png_ptr->pass)
+    {
          case 0:
          {
             int i;
@@ -787,6 +787,14 @@ png_push_process_row(png_structp png_ptr)
             {
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
+            }
+            if (png_ptr->pass == 2)
+            {
+               for (i = 0; i < 4 && png_ptr->pass == 2; i++)
+               {
+                  png_push_have_row(png_ptr, NULL);
+                  png_read_push_finish_row(png_ptr);
+               }
             }
             break;
          }
@@ -821,6 +829,14 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
             }
+            if (png_ptr->pass == 4)
+            {
+               for (i = 0; i < 2 && png_ptr->pass == 4; i++)
+               {
+                  png_push_have_row(png_ptr, NULL);
+                  png_read_push_finish_row(png_ptr);
+               }
+            }
             break;
          }
          case 3:
@@ -850,6 +866,11 @@ png_push_process_row(png_structp png_ptr)
                png_read_push_finish_row(png_ptr);
             }
             for (i = 0; i < 2 && png_ptr->pass == 4; i++)
+            {
+               png_push_have_row(png_ptr, NULL);
+               png_read_push_finish_row(png_ptr);
+            }
+            if (png_ptr->pass == 6)
             {
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
@@ -931,6 +952,11 @@ png_read_push_finish_row(png_structp png_ptr)
       do
       {
          png_ptr->pass++;
+         if ((png_ptr->pass == 1 && png_ptr->width < 5) ||
+             (png_ptr->pass == 3 && png_ptr->width < 3) ||
+             (png_ptr->pass == 5 && png_ptr->width < 2))
+           png_ptr->pass++;
+
          if (png_ptr->pass >= 7)
             break;
 

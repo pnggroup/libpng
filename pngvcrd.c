@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.9beta8 - January 12, 2001
+ * libpng 1.0.9beta9 - January 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -18,8 +18,6 @@
  * when compiled with MSVC 6.0.  The error was fixed in version 1.0.4e.
  *
  * [png_read_filter_row_mmx_avg() bpp == 2 bugfix, GRR 20000916]
- *
- * [runtime MMX configuration, GRR 20010102]
  *
  */
 

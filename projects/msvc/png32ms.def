@@ -6,7 +6,7 @@ LIBRARY
 DESCRIPTION "PNG image compression library for Windows"
 
 EXPORTS
-;Version 1.0.9beta8
+;Version 1.0.9beta9
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -176,3 +176,8 @@ EXPORTS
   png_write_init_2    @167
   png_access_version_number  @168
 ;  png_sig_bytes    @169
+  png_libpng_ver    @170
+  png_init_io    @171
+  png_convert_to_rfc1123     @172
+  png_set_invalid  @173
+  png_mmx_supported  @174
