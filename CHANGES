@@ -1394,6 +1394,12 @@ version 1.2.8rc1 [November 24, 2004]
     omitted from beta5.
   Revised scripts/pngw32.rc
   Despammed mailing addresses by masking "@" with "at".
+version 1.2.8rc2 [November 26, 2004]
+  Added two missing "\" in png.h
+  Change tests in pngread.c and pngpread.c to
+    if (png_ptr->transformations || (png_ptr->flags&PNG_FLAG_STRIP_ALPHA))
+       png_do_read_transformations(png_ptr);
+
 
 Send comments/corrections/commendations to
 png-implement at ccrc.wustl.edu (subscription required; write to
