@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.6beta4 - July 28, 2004
+ * libpng 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -458,6 +458,12 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif
 #endif /* PNG_1_0_X */
 
+   /* added at libpng-1.2.6 */
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
+   png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
+#endif
+
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
@@ -640,6 +646,12 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
 
    /* reset all variables to 0 */
    png_memset(png_ptr, 0, png_sizeof (png_struct));
+
+   /* added at libpng-1.2.6 */
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
+   png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
+#endif
 
 #if !defined(PNG_1_0_X)
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
@@ -829,8 +841,8 @@ png_write_row(png_structp png_ptr, png_bytep row)
    png_ptr->row_info.pixel_depth = (png_byte)(png_ptr->row_info.bit_depth *
       png_ptr->row_info.channels);
 
-   png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
-      (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
+   png_ptr->row_info.rowbytes = PNG_ROWBYTES(png_ptr->row_info.pixel_depth,
+      png_ptr->row_info.width);
 
    png_debug1(3, "row_info->color_type = %d\n", png_ptr->row_info.color_type);
    png_debug1(3, "row_info->width = %lu\n", png_ptr->row_info.width);

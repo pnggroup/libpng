@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng version 1.2.6beta4 - July 28, 2004
+ * libpng version 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -195,8 +195,8 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
       }
       row_info->bit_depth = (png_byte)bit_depth;
       row_info->pixel_depth = (png_byte)(bit_depth * row_info->channels);
-      row_info->rowbytes =
-         ((row_info->width * row_info->pixel_depth + 7) >> 3);
+      row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
+         row_info->width);
    }
 }
 #endif

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.6beta4 - July 28, 2004
+ * libpng version 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -669,6 +669,25 @@
 #endif
 #endif /* PNG_1_0_X */
 
+/* Added at libpng-1.2.6 */
+#if !defined(PNG_1_0_X)
+#ifndef PNG_SET_USER_LIMITS_SUPPORTED
+#if !defined(PNG_NO_SET_USER_LIMITS) && !defined(PNG_SET_USER_LIMITS_SUPPORTED)
+#  define PNG_SET_USER_LIMITS_SUPPORTED
+#endif
+#endif
+#endif /* PNG_1_0_X */
+
+/* Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGS no matter
+ * how large, set these limits to 0x7fffffffL
+ */
+#ifndef PNG_USER_WIDTH_MAX
+#  define PNG_USER_WIDTH_MAX 1000000L
+#endif
+#ifndef PNG_USER_HEIGHT_MAX
+#  define PNG_USER_HEIGHT_MAX 1000000L
+#endif
+
 /* These are currently experimental features, define them if you want */
 
 /* very little testing */
@@ -683,10 +702,8 @@
 /* This is only for PowerPC big-endian and 680x0 systems */
 /* some testing */
 /*
-#ifdef PNG_READ_SUPPORTED
-#  ifndef PNG_PNG_READ_BIG_ENDIAN_SUPPORTED
-#    define PNG_READ_BIG_ENDIAN_SUPPORTED
-#  endif
+#ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
+#  define PNG_READ_BIG_ENDIAN_SUPPORTED
 #endif
 */
 

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.6beta4 - July 28, 2004
+ * libpng 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -519,6 +519,12 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       if (current_allocation > maximum_allocation)
          maximum_allocation = current_allocation;
       pinfo->pointer = (png_voidp)png_malloc_default(png_ptr, size);
+      if (size != 0 && pinfo->pointer == NULL)
+      {
+         current_allocation -= size;
+         total_allocation -= size;
+         png_error(png_ptr,"out of memory in pngtest->png_malloc_default.\n");
+      }
       pinfo->next = pinformation;
       pinformation = pinfo;
       /* Make sure the caller isn't assuming zeroed memory. */
@@ -1308,9 +1314,6 @@ main(int argc, char *argv[])
       PNG_HEADER_VERSION_STRING);
    fprintf(STDERR," png_sizeof(png_struct)=%ld, png_sizeof(png_info)=%ld\n",
                     (long)png_sizeof(png_struct), (long)png_sizeof(png_info));
-   fprintf(STDERR," PNG_UINT_31_MAX=%lu, PNG_UINT_32_MAX=%lu\n",
-      PNG_UINT_31_MAX, PNG_UINT_32_MAX);
-   fprintf(STDERR," PNG_SIZE_MAX=%u\n",PNG_SIZE_MAX);
 
    /* Do some consistency checking on the memory allocation settings, I'm
       not sure this matters, but it is nice to know, the first of these
@@ -1541,4 +1544,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_6beta4 your_png_h_is_not_version_1_2_6beta4;
+typedef version_1_2_6rc1 your_png_h_is_not_version_1_2_6rc1;

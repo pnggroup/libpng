@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng version 1.2.6beta4 - July 28, 2004
+ * libpng version 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -35,9 +35,9 @@ png_error(png_structp png_ptr, png_const_charp error_message)
    char msg[16];
    if (png_ptr->flags&(PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
    {
-     int offset = 0;
      if (*error_message == '#')
      {
+         int offset;
          for (offset=1; offset<15; offset++)
             if (*(error_message+offset) == ' ')
                 break;
@@ -190,9 +190,6 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    else
 #endif
    fprintf(stderr, "libpng error: %s\n", error_message);
-#else
-   if (error_message)
-     /* make compiler happy */ ;
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -206,9 +203,14 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    longjmp(png_ptr->jmpbuf, 1);
 # endif
 #else
+   /* make compiler happy */ ;
    if (png_ptr)
-     /* make compiler happy */ ;
    PNG_ABORT();
+#endif
+#ifdef PNG_NO_CONSOLE_IO
+   /* make compiler happy */ ;
+   if (&error_message != NULL)
+      return;
 #endif
 }
 
@@ -245,9 +247,11 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 #  endif
      fprintf(stderr, "libpng warning: %s\n", warning_message);
 #else
+   /* make compiler happy */ ;
    if (warning_message)
-     /* appease compiler */ ;
+     return;
 #endif
+   /* make compiler happy */ ;
    if (png_ptr)
       return;
 }

@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng version 1.2.6beta4 - July 28, 2004
+ * libpng version 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -125,7 +125,8 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
    if (mask == 0xff)
    {
       png_memcpy(row, png_ptr->row_buf + 1,
-       (png_size_t)((png_ptr->width * png_ptr->row_info.pixel_depth + 7) >> 3));
+       (png_size_t)PNG_ROWBYTES(png_ptr->row_info.pixel_depth,
+       png_ptr->width));
    }
    /* GRR:  add "else if (mask == 0)" case?
     *       or does png_combine_row() not even get called in that case? */
@@ -1902,8 +1903,8 @@ loop4_pass4:
       } /* end switch (row_info->pixel_depth) */
 
       row_info->width = final_width;
-      row_info->rowbytes = ((final_width *
-         (png_uint_32)row_info->pixel_depth + 7) >> 3);
+
+      row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,final_width);
    }
 
 }

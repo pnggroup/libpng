@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng version 1.2.6beta4 - July 28, 2004
+ * libpng version 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1151,7 +1151,8 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
 
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels *
       info_ptr->bit_depth);
-   info_ptr->rowbytes = ((info_ptr->width * info_ptr->pixel_depth + 7) >> 3);
+
+   info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth,info_ptr->width);
 
 #if !defined(PNG_READ_EXPAND_SUPPORTED)
    if(png_ptr)
@@ -1382,8 +1383,8 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
 #endif
       png_ptr->row_info.pixel_depth = (png_byte)(png_ptr->row_info.bit_depth *
          png_ptr->row_info.channels);
-      png_ptr->row_info.rowbytes = (png_ptr->row_info.width *
-         png_ptr->row_info.pixel_depth+7)>>3;
+      png_ptr->row_info.rowbytes = PNG_ROWBYTES(png_ptr->row_info.pixel_depth,
+         png_ptr->row_info.width);
    }
 #endif
 
@@ -2089,8 +2090,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
       row_info->color_type |= PNG_COLOR_MASK_COLOR;
       row_info->pixel_depth = (png_byte)(row_info->channels *
          row_info->bit_depth);
-      row_info->rowbytes = ((row_width *
-         row_info->pixel_depth + 7) >> 3);
+      row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,row_width);
    }
 }
 #endif
@@ -2343,8 +2343,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
       row_info->color_type &= ~PNG_COLOR_MASK_COLOR;
       row_info->pixel_depth = (png_byte)(row_info->channels *
          row_info->bit_depth);
-      row_info->rowbytes = ((row_width *
-         row_info->pixel_depth + 7) >> 3);
+      row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,row_width);
    }
    return rgb_error;
 }
@@ -3262,8 +3261,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
          row_info->channels--;
          row_info->pixel_depth = (png_byte)(row_info->channels *
             row_info->bit_depth);
-         row_info->rowbytes = ((row_width *
-            row_info->pixel_depth + 7) >> 3);
+         row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,row_width);
       }
    }
 }
@@ -3737,8 +3735,8 @@ png_do_expand(png_row_infop row_info, png_bytep row,
             row_info->color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
             row_info->channels = 2;
             row_info->pixel_depth = (png_byte)(row_info->bit_depth << 1);
-            row_info->rowbytes =
-               ((row_width * row_info->pixel_depth) >> 3);
+            row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
+               row_width);
          }
       }
       else if (row_info->color_type == PNG_COLOR_TYPE_RGB && trans_value)
@@ -3792,8 +3790,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
          row_info->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
          row_info->channels = 4;
          row_info->pixel_depth = (png_byte)(row_info->bit_depth << 2);
-         row_info->rowbytes =
-            ((row_width * row_info->pixel_depth) >> 3);
+         row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,row_width);
       }
    }
 }
@@ -3846,8 +3843,7 @@ png_do_dither(png_row_infop row_info, png_bytep row,
          row_info->color_type = PNG_COLOR_TYPE_PALETTE;
          row_info->channels = 1;
          row_info->pixel_depth = row_info->bit_depth;
-         row_info->rowbytes =
-             ((row_width * row_info->pixel_depth + 7) >> 3);
+         row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,row_width);
       }
       else if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA &&
          palette_lookup != NULL && row_info->bit_depth == 8)
@@ -3876,8 +3872,7 @@ png_do_dither(png_row_infop row_info, png_bytep row,
          row_info->color_type = PNG_COLOR_TYPE_PALETTE;
          row_info->channels = 1;
          row_info->pixel_depth = row_info->bit_depth;
-         row_info->rowbytes =
-            ((row_width * row_info->pixel_depth + 7) >> 3);
+         row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,row_width);
       }
       else if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
          dither_lookup && row_info->bit_depth == 8)

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.6beta4 - July 28, 2004
+ * libpng 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -247,7 +247,6 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    int color_type, int interlace_type, int compression_type,
    int filter_type)
 {
-   int rowbytes_per_pixel;
    png_debug1(1, "in %s storage function\n", "IHDR");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
@@ -255,8 +254,22 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    /* check for width and height valid values */
    if (width == 0 || height == 0)
       png_error(png_ptr, "Image width or height is zero in IHDR");
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (width > png_ptr->user_width_max || height > png_ptr->user_height_max)
+      png_error(png_ptr, "image size exceeds user limits in IHDR");
+#else
+   if (width > PNG_USER_WIDTH_MAX || height > PNG_USER_HEIGHT_MAX)
+      png_error(png_ptr, "image size exceeds user limits in IHDR");
+#endif
    if (width > PNG_UINT_31_MAX || height > PNG_UINT_31_MAX)
       png_error(png_ptr, "Invalid image size in IHDR");
+   if ( width > (PNG_UINT_32_MAX
+                 >> 3)      /* 8-byte RGBA pixels */
+                 - 64       /* bigrowbuf hack */
+                 - 1        /* filter byte */
+                 - 7*8      /* rounding of width to multiple of 8 pixels */
+                 - 8)       /* extra max_pixel_depth pad */
+      png_warning(png_ptr, "Width is too large for libpng to process pixels");
 
    /* check other values */
    if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&
@@ -324,16 +337,16 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
       info_ptr->channels++;
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels * info_ptr->bit_depth);
 
-   /* check for overflow */
-   rowbytes_per_pixel = (info_ptr->pixel_depth + 7) >> 3;
-   if ( width > PNG_UINT_32_MAX/rowbytes_per_pixel - 64)
-   {
-      png_warning(png_ptr,
-         "Width too large to process image data; rowbytes will overflow.");
+   /* check for potential overflow */
+   if ( width > (PNG_UINT_32_MAX
+                 >> 3)      /* 8-byte RGBA pixels */
+                 - 64       /* bigrowbuf hack */
+                 - 1        /* filter byte */
+                 - 7*8      /* rounding of width to multiple of 8 pixels */
+                 - 8)       /* extra max_pixel_depth pad */
       info_ptr->rowbytes = (png_size_t)0;
-   }
    else
-      info_ptr->rowbytes = (info_ptr->width * info_ptr->pixel_depth + 7) >> 3;
+      info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth,width);
 }
 
 #if defined(PNG_oFFs_SUPPORTED)
@@ -1187,4 +1200,20 @@ png_set_mmx_thresholds (png_structp png_ptr,
     png_ptr->mmx_rowbytes_threshold = mmx_rowbytes_threshold;
 }
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
+
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+/* this function was added to libpng 1.2.6 */
+void PNGAPI
+png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
+    png_uint_32 user_height_max)
+{
+    /* Images with dimensions larger than these limits will be
+     * rejected by png_set_IHDR().  To accept any PNG datastream
+     * regardless of dimensions, set both limits to 0x7ffffffL.
+     */
+    png_ptr->user_width_max = user_width_max;
+    png_ptr->user_height_max = user_height_max;
+}
+#endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
+
 #endif /* ?PNG_1_0_X */

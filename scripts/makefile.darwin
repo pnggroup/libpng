@@ -1,5 +1,5 @@
 # makefile for libpng on Darwin / Mac OS X
-# Copyright (C) 2002 Glenn Randers-Pehrson
+# Copyright (C) 2002,2004 Glenn Randers-Pehrson
 # Copyright (C) 2001 Christoph Pfisterer
 # derived from makefile.linux:
 #  Copyright (C) 1998, 1999 Greg Roelofs
@@ -23,7 +23,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.5
+PNGMIN = 1.2.6rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -85,18 +85,17 @@ $(LIBNAME).$(PNGMAJ).dylib: $(LIBNAME).$(PNGVER).dylib
 
 $(LIBNAME).$(PNGVER).dylib: $(OBJSDLL)
 	$(CC) -dynamiclib \
-	 -install_name $(DL)/$(LIBNAME).$(PNGMAJ).dylib \
-	 -flat_namespace -undefined suppress \
+	 -install_name $(LIBPATH)/$(LIBNAME).$(PNGMAJ).dylib \
+	 -current_version $(PNGVER) -compatibility_version $(PNGVER) \
 	 -o $(LIBNAME).$(PNGVER).dylib \
-	 $(OBJSDLL)
+	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
 libpng.3.$(PNGMIN).dylib: $(OBJSDLL)
 	$(CC) -dynamiclib \
-	 -install_name $(DL)/libpng.3.dylib \
+	 -install_name $(LIBPATH)/libpng.3.dylib \
 	 -current_version 3 -compatibility_version 3 \
-	 -flat_namespace -undefined suppress \
 	 -o libpng.3.$(PNGMIN).dylib \
-	 $(OBJSDLL)
+	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
 pngtest: pngtest.o $(LIBNAME).dylib
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -117,6 +116,7 @@ install-static: install-headers libpng.a
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	cp libpng.a $(DL)/$(LIBNAME).a
 	chmod 644 $(DL)/$(LIBNAME).a
+	$(RANLIB) $(DL)/$(LIBNAME).a
 	-@/bin/rm -f $(DL)/libpng.a
 	(cd $(DL); ln -sf $(LIBNAME).a libpng.a)
 

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.2.6beta4 - July 28, 2004
+ * libpng 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -58,6 +58,12 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
 #endif
 #endif /* PNG_1_0_X */
+
+   /* added at libpng-1.2.6 */
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
+   png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
+#endif
 
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
@@ -264,6 +270,12 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, png_sizeof (jmp_buf));
+#endif
+
+   /* added at libpng-1.2.6 */
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
+   png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
 #endif
 
    /* initialize zbuf - compression buffer */
@@ -712,8 +724,8 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    png_ptr->row_info.channels = png_ptr->channels;
    png_ptr->row_info.bit_depth = png_ptr->bit_depth;
    png_ptr->row_info.pixel_depth = png_ptr->pixel_depth;
-   png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
-      (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
+   png_ptr->row_info.rowbytes = PNG_ROWBYTES(png_ptr->row_info.pixel_depth,
+       png_ptr->row_info.width);
 
    if(png_ptr->row_buf[0])
    png_read_filter_row(png_ptr, &(png_ptr->row_info),
@@ -791,7 +803,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.6beta4
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.6rc1
  */
 
 void PNGAPI
@@ -841,7 +853,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.6beta4
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.6rc1
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -1071,8 +1083,8 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    png_structp png_ptr = NULL;
    png_infop info_ptr = NULL, end_info_ptr = NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
-   png_free_ptr free_fn = NULL;
-   png_voidp mem_ptr = NULL;
+   png_free_ptr free_fn;
+   png_voidp mem_ptr;
 #endif
 
    png_debug(1, "in png_destroy_read_struct\n");
@@ -1295,34 +1307,38 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    int row;
 
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
-   /* invert the alpha channel from opacity to transparency */
+   /* invert the alpha channel from opacity to transparency
+    */
    if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
        png_set_invert_alpha(png_ptr);
 #endif
 
-   /* The call to png_read_info() gives us all of the information from the
+   /* png_read_info() gives us all of the information from the
     * PNG file before the first IDAT (image data chunk).
     */
    png_read_info(png_ptr, info_ptr);
+   if (info_ptr->height > PNG_UINT_32_MAX/png_sizeof(png_bytep))
+      png_error(png_ptr,"Image is too high to process with png_read_png()");
 
    /* -------------- image transformations start here ------------------- */
 
 #if defined(PNG_READ_16_TO_8_SUPPORTED)
-   /* tell libpng to strip 16 bit/color files down to 8 bits/color */
+   /* tell libpng to strip 16 bit/color files down to 8 bits per color
+    */
    if (transforms & PNG_TRANSFORM_STRIP_16)
        png_set_strip_16(png_ptr);
 #endif
 
 #if defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
-   /* Strip alpha bytes from the input data without combining with the
-    * background (not recommended).
+   /* Strip alpha bytes from the input data without combining with
+    * the background (not recommended).
     */
    if (transforms & PNG_TRANSFORM_STRIP_ALPHA)
        png_set_strip_alpha(png_ptr);
 #endif
 
 #if defined(PNG_READ_PACK_SUPPORTED) && !defined(PNG_READ_EXPAND_SUPPORTED)
-   /* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
+   /* Extract multiple pixels with bit depths of 1, 2, or 4 from a single
     * byte into separate bytes (useful for paletted and grayscale images).
     */
    if (transforms & PNG_TRANSFORM_PACKING)
@@ -1331,7 +1347,8 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
    /* Change the order of packed pixels to least significant bit first
-    * (not useful if you are using png_set_packing). */
+    * (not useful if you are using png_set_packing).
+    */
    if (transforms & PNG_TRANSFORM_PACKSWAP)
        png_set_packswap(png_ptr);
 #endif
@@ -1349,10 +1366,12 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
          png_set_expand(png_ptr);
 #endif
 
-   /* We don't handle background color or gamma transformation or dithering. */
+   /* We don't handle background color or gamma transformation or dithering.
+    */
 
 #if defined(PNG_READ_INVERT_SUPPORTED)
-   /* invert monochrome files to have 0 as white and 1 as black */
+   /* invert monochrome files to have 0 as white and 1 as black
+    */
    if (transforms & PNG_TRANSFORM_INVERT_MONO)
        png_set_invert_mono(png_ptr);
 #endif
@@ -1373,19 +1392,22 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #if defined(PNG_READ_BGR_SUPPORTED)
-   /* flip the RGB pixels to BGR (or RGBA to BGRA) */
+   /* flip the RGB pixels to BGR (or RGBA to BGRA)
+    */
    if (transforms & PNG_TRANSFORM_BGR)
        png_set_bgr(png_ptr);
 #endif
 
 #if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
-   /* swap the RGBA or GA data to ARGB or AG (or BGRA to ABGR) */
+   /* swap the RGBA or GA data to ARGB or AG (or BGRA to ABGR)
+    */
    if (transforms & PNG_TRANSFORM_SWAP_ALPHA)
        png_set_swap_alpha(png_ptr);
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED)
-   /* swap bytes of 16 bit files to least significant byte first */
+   /* swap bytes of 16 bit files to least significant byte first
+    */
    if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
        png_set_swap(png_ptr);
 #endif

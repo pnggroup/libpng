@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng version 1.2.6beta4 - July 28, 2004
+ * libpng version 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -782,8 +782,8 @@ png_push_process_row(png_structp png_ptr)
    png_ptr->row_info.bit_depth = png_ptr->bit_depth;
    png_ptr->row_info.pixel_depth = png_ptr->pixel_depth;
 
-   png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
-      (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
+   png_ptr->row_info.rowbytes = PNG_ROWBYTES(png_ptr->row_info.pixel_depth,
+       png_ptr->row_info.width);
 
    png_read_filter_row(png_ptr, &(png_ptr->row_info),
       png_ptr->row_buf + 1, png_ptr->prev_row + 1,
@@ -1008,8 +1008,8 @@ png_read_push_finish_row(png_structp png_ptr)
             png_pass_start[png_ptr->pass]) /
             png_pass_inc[png_ptr->pass];
 
-         png_ptr->irowbytes = ((png_ptr->iwidth *
-            png_ptr->pixel_depth + 7) >> 3) + 1;
+         png_ptr->irowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,
+            png_ptr->iwidth);
 
          if (png_ptr->transformations & PNG_INTERLACE)
             break;

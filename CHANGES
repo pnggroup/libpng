@@ -1241,7 +1241,7 @@ version 1.2.6beta3 [July 18, 2004]
   Updated contrib/visupng/VisualPng.dsp (Cosmin).
   Updated contrib/visupng/cexcept.h to version 2.0.0 (Cosmin).
   Added a separate distribution with "configure" and supporting files (Junichi).
-version 1.2.6beta4 [July 28, 2004]
+version 1.2.6beta4 [August 4, 2004]
   Added user ability to change png_size_t via a PNG_SIZE_T macro.
   Added png_sizeof() and png_convert_size() functions.
   Added PNG_SIZE_MAX (maximum value of a png_size_t variable.
@@ -1256,6 +1256,7 @@ version 1.2.6beta4 [July 28, 2004]
     overflow.
   Turn on PNG_NO_ZALLOC_ZERO by default in version 1.2.x
   Revised "clobber list" in pnggccrd.c so it will compile under gcc-3.4.
+version 1.2.6beta4 [July 28, 2004]
   Revised Borland portion of png_malloc() to return NULL or issue
     png_error() according to setting of PNG_FLAG_MALLOC_NULL_MEM_OK.
   Added PNG_NO_SEQUENTIAL_READ_SUPPORTED macro to conditionally remove
@@ -1263,7 +1264,27 @@ version 1.2.6beta4 [July 28, 2004]
   Added some "#if PNG_WRITE_SUPPORTED" blocks.
   #ifdef'ed out some redundancy in png_malloc_default().
   Use png_malloc instead of png_zalloc to allocate the pallete.
-
+version 1.2.6beta4d [July 28, 2004]
+  Fixed buffer overflow vulnerability in png_handle_tRNS()
+  Fixed integer arithmetic overflow vulnerability in png_read_png().
+  Fixed some harmless bugs in png_handle_sBIT, etc, that would cause
+    duplicate chunk types to go undetected.
+  Fixed some timestamps in the -config version
+version 1.2.6beta4e [July 28, 2004]
+  Fixed some timestamps in the -config version
+version 1.2.6beta4f [July 28, 2004]
+  Rearranged order of processing of color types in png_handle_tRNS().
+version 1.2.6beta4g [July 31, 2004]
+  Added ROWBYTES macro to calculate rowbytes without integer overflow.
+  Updated makefile.darwin and removed makefile.macosx from scripts directory.
+version 1.2.6beta4h [August 1, 2004]
+  Imposed default one million column, one-million row limits on the image
+    dimensions, and added png_set_user_limits() function to override them.
+  Revised use of PNG_SET_USER_LIMITS_SUPPORTED macro.
+version 1.2.6beta4j [August 1, 2004]
+  Fixed wrong cast of returns from png_get_user_width|height_max().
+version 1.2.6rc6 [August 4, 2004]
+  Changed some "keep the compiler happy" from empty statements to returns,
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net

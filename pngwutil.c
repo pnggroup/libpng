@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng version 1.2.6beta4 - July 28, 2004
+ * libpng version 1.2.6rc1 - August 4, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -473,7 +473,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->height = height;
 
    png_ptr->pixel_depth = (png_byte)(bit_depth * png_ptr->channels);
-   png_ptr->rowbytes = ((width * (png_size_t)png_ptr->pixel_depth + 7) >> 3);
+   png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, width);
    /* set the usr info, so any transformations can modify it */
    png_ptr->usr_width = png_ptr->width;
    png_ptr->usr_bit_depth = png_ptr->bit_depth;
@@ -617,7 +617,7 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
              png_ptr->height < 16384 && png_ptr->width < 16384)
          {
             png_uint_32 uncompressed_idat_size = png_ptr->height *
-               ((png_ptr->width *
+               (PNG_ROWBYTES(png_ptr->channels*png_ptr->bit_depth,
                   png_ptr->channels * png_ptr->bit_depth + 15) >> 3);
             unsigned int z_cinfo = z_cmf >> 4;
             unsigned int half_z_window_size = 1 << (z_cinfo + 7);
@@ -1691,8 +1691,8 @@ png_write_start_row(png_structp png_ptr)
    png_size_t buf_size;
 
    png_debug(1, "in png_write_start_row\n");
-   buf_size = (png_size_t)(((png_ptr->width * png_ptr->usr_channels *
-                            png_ptr->usr_bit_depth + 7) >> 3) + 1);
+   buf_size = (png_size_t)(PNG_ROWBYTES(
+      png_ptr->usr_channels*png_ptr->usr_bit_depth,png_ptr->width)+1);
 
    /* set up row buffer */
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, (png_uint_32)buf_size);
@@ -1828,9 +1828,8 @@ png_write_finish_row(png_structp png_ptr)
       {
          if (png_ptr->prev_row != NULL)
             png_memset(png_ptr->prev_row, 0,
-               (png_size_t) (((png_uint_32)png_ptr->usr_channels *
-               (png_uint_32)png_ptr->usr_bit_depth *
-               png_ptr->width + 7) >> 3) + 1);
+               (png_size_t)(PNG_ROWBYTES(png_ptr->usr_channels*
+               png_ptr->usr_bit_depth,png_ptr->width))+1);
          return;
       }
    }
@@ -2037,8 +2036,8 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
          png_pass_inc[pass] - 1 -
          png_pass_start[pass]) /
          png_pass_inc[pass];
-         row_info->rowbytes = ((row_info->width *
-            row_info->pixel_depth + 7) >> 3);
+         row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
+            row_info->width);
    }
 }
 #endif
@@ -2064,7 +2063,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 
    png_debug(1, "in png_write_find_filter\n");
    /* find out how many bytes offset each pixel is */
-   bpp = (row_info->pixel_depth + 7) / 8;
+   bpp = (row_info->pixel_depth + 7) >> 3;
 
    prev_row = png_ptr->prev_row;
    best_row = row_buf = png_ptr->row_buf;
