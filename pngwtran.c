@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng version 1.2.8beta4 - November 13, 2004
+ * libpng version 1.2.8beta5 - November 20, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -38,9 +38,10 @@ png_do_write_transformations(png_structp png_ptr)
            png_ptr->row_buf + 1);      /* start of pixel data for row */
 #endif
 #if defined(PNG_WRITE_FILLER_SUPPORTED)
-   if (png_ptr->transformations & PNG_FILLER)
+   if (png_ptr->transformations & PNG_FILLER ||
+       (png_ptr->flags & PNG_FLAG_STRIP_ALPHA))
       png_do_strip_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
-         png_ptr->flags,png_ptr->transformations);
+         png_ptr->flags);
 #endif
 #if defined(PNG_WRITE_PACKSWAP_SUPPORTED)
    if (png_ptr->transformations & PNG_PACKSWAP)

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.8beta4 - November 13, 2004
+ * libpng version 1.2.8beta5 - November 20, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -22,35 +22,8 @@
 #endif
 #define PNG_1_2_X
 
+/* Added at libpng-1.2.8 */
 #define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_BETA
-
-#if (PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_SPECIAL)
-/* SPECIALBUILD is deprecated.  Use PNG_LIBPNG_BUILD_SPECIAL_STRING instead. */
-#  if defined(SPECIALBUILD) && !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
-#    define PNG_LIBPNG_BUILD_TYPE_SAVE PNG_LIBPNG_BUILD_TYPE
-#    undef PNG_LIBPNG_BUILD_TYPE
-#    define PNG_LIBPNG_BUILD_TYPE \
-        PNG_LIBPNG_BUILD_TYPE_SAVE|PNG_LIBPNG_BUILD_SPECIAL
-#    define PNG_LIBPNG_BUILD_SPECIAL_STRING SPECIALBUILD
-#  else
-#    if !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
-#      define PNG_LIBPNG_BUILD_SPECIAL_STRING special build string.
-#    endif
-#  endif
-#endif
-#if (PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_PRIVATE)
-/* PRIVATEBUILD is deprecated.  Use PNG_LIBPNG_BUILD_PRIVATE_STRING instead. */
-#  if defined(PRIVATEBUILD) && !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING)
-#    undef PNG_LIBPNG_BUILD_TYPE
-#    define PNG_LIBPNG_BUILD_TYPE \
-        PNG_LIBPNG_BUILD_TYPE_SAVE|PNG_LIBPNG_BUILD_PRIVATE
-#    define PNG_LIBPNG_BUILD_PRIVATE_STRING PRIVATEBUILD
-#  else
-#    if !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING)
-#      define PNG_LIBPNG_BUILD_PRIVATE_STRING private build string.
-#    endif
-#  endif
-#endif
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your
@@ -1402,6 +1375,79 @@ typedef z_stream FAR *  png_zstreamp;
 
 #endif /* PNG_INTERNAL */
 #endif /* PNG_READ_SUPPORTED */
+
+/*
+ * Added at libpng-1.2.8
+ *
+ *  Can define PNG_LIBPNG_BUILD_TYPE using only the following:
+ *             PNG_LIBPNG_BUILD_PRIVATE (including DLLFNAME_POSTFIX and
+ *             PNG_LIBPNG_BUILD_PRIVATE_STRING)
+ *
+ * Ref MSDN
+ * VS_FF_PRIVATEBUILD File was ****not built using standard release****
+ * procedures. If this value is given, the StringFileInfo block must
+ * contain a PrivateBuild string. 
+ *
+ * VS_FF_SPECIALBUILD File was built by the original company *****using
+ * standard release procedures***** but is a variation of the standard
+ * file of the same version number. If this value is given, the
+ * StringFileInfo block must contain a SpecialBuild string. 
+ */
+
+#ifndef PNG_LIBPNG_BUILD_TYPE
+#  define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_BASE_TYPE
+#else
+#  define PNG_LIBPNG_BUILD_TYPE_SAVE (PNG_LIBPNG_BUILD_TYPE & \
+     PNG_LIBPNG_BUILD_PRIVATE)
+#  undef PNG_LIBPNG_BUILD_TYPE
+#  define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_BASE_TYPE | \
+     PNG_LIBPNG_BUILD_TYPE_SAVE
+#  undef PNG_LIBPNG_BUILD_TYPE_SAVE
+#endif
+  
+#undef PNG_LIBPNG_BUILD_BASE_TYPE
+  
+/* Private as priority over Special */
+#if ((PNG_LIBPNG_BUILD_TYPE & (PNG_LIBPNG_BUILD_PRIVATE | \
+   PNG_LIBPNG_BUILD_SPECIAL)) == (PNG_LIBPNG_BUILD_PRIVATE | \
+   PNG_LIBPNG_BUILD_SPECIAL))
+#  define PNG_LIBPNG_BUILD_TYPE_SAVE PNG_LIBPNG_BUILD_TYPE
+#  define PNG_LIBPNG_BUILD_TYPE PNG_LIBPNG_BUILD_TYPE_SAVE & \
+     ~PNG_LIBPNG_BUILD_SPECIAL
+#  undef PNG_LIBPNG_BUILD_TYPE_SAVE
+#endif
+  
+/* Verify if PNG_LIBPNG_BUILD_PRIVATE_STRING is defined if PNG_LIBPNG_BUILD_PRIVATE is set */
+#if (PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_PRIVATE)
+  /*
+   * PRIVATEBUILD is deprecated. Use PNG_LIBPNG_BUILD_PRIVATE_STRING instead.
+   */
+# if defined(PRIVATEBUILD) && !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING)
+#   define PNG_LIBPNG_BUILD_PRIVATE_STRING PRIVATEBUILD
+# else
+#   if !defined(PNG_LIBPNG_BUILD_PRIVATE_STRING)
+#     error "PNG_LIBPNG_BUILD_PRIVATE_STRING must be defined if \
+      PNG_LIBPNG_BUILD_PRIVATE set"
+#   endif
+# endif
+/* Verify if PNG_LIBPNG_BUILD_SPECIAL_STRING is defined \
+   if PNG_LIBPNG_BUILD_SPECIAL is set */
+#else
+#  if (PNG_LIBPNG_BUILD_TYPE & PNG_LIBPNG_BUILD_SPECIAL)
+     /*
+      * SPECIALBUILD is deprecated. Use PNG_LIBPNG_BUILD_SPECIAL_STRING instead.
+      */
+#    if defined(SPECIALBUILD) && !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
+#      define PNG_LIBPNG_BUILD_SPECIAL_STRING SPECIALBUILD
+#    else
+#      if !defined(PNG_LIBPNG_BUILD_SPECIAL_STRING)
+#         error "PNG_LIBPNG_BUILD_SPECIAL_STRING must be defined \
+          if PNG_LIBPNG_BUILD_SPECIAL is set"
+#      endif
+#    endif
+#  endif
+#endif
+/* End of material added to libpng-1.2.8 */
 
 #endif /* PNGCONF_H */
 
