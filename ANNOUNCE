@@ -1,5 +1,5 @@
 
-Libpng 1.2.1beta4 - November 7, 2001
+Libpng 1.2.1rc1 - November 24, 2001
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -23,6 +23,14 @@ version 1.2.1beta4 [November 7, 2001]
   Added error message if png_write_info() was omitted.
   Type cast NULLs appearing in function calls when _NO_PROTO or
     PNG_TYPECAST_NULL is defined.
+version 1.2.1rc1 [November 24, 2001]
+  Type cast NULLs appearing in function calls except when PNG_NO_TYPECAST_NULL
+  Changed typecast of "size" argument to png_size_t in pngmem.c calls to
+    the user malloc_fn, to agree with the prototype in png.h
+  Added a pop/push operation to pnggccrd.c, to preserve Eflag (Maxim Sobolev)
+  Updated makefile.sgi to recognize LIBPATH and INCPATH.
+  Updated various makefiles so "make clean" does not remove previous major
+    version of the shared library.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

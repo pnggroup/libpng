@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.1beta4 - November 7, 2001
+ * libpng version 1.2.1rc1 - November 24, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -5287,6 +5287,8 @@ png_mmx_support(void)
         "popfl                \n\t"  // restore modified value to Eflag reg
         "pushfl               \n\t"  // save Eflag to stack
         "popl %%eax           \n\t"  // get Eflag from stack
+        "pushl %%ecx          \n\t"  // save original Eflag to stack
+        "popfl                \n\t"  // restore original Eflag
         "xorl %%ecx, %%eax    \n\t"  // compare new Eflag with original Eflag
         "jz .NOT_SUPPORTED    \n\t"  // if same, CPUID instr. is not supported
 
