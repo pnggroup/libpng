@@ -9,7 +9,7 @@
 
 # ------------- Watcom 10a+ -------------
 MODEL=-mf
-CFLAGS= $(MODEL) -fpi87 -fp5 -5r -oaeilmnrt -s -i=..\zlib
+CFLAGS= $(MODEL) -fpi87 -fp5 -5r -oaeilmnrt -s -zp4 -i=..\zlib
 CC=wcc386
 LD=wcl386
 LIB=wlib -b -c

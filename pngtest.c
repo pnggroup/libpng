@@ -79,8 +79,7 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 }
 
 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 /* example of using user transform callback (we don't transform anything,
    but merely count the black pixels) */
 
@@ -166,7 +165,7 @@ count_black_pixels(png_structp png_ptr, png_row_infop row_info, png_bytep data)
        }
     }
 }
-#endif /* PNG_READ|WRITE_USER_TRANSFORM_SUPPORTED */
+#endif /* PNG_WRITE_USER_TRANSFORM_SUPPORTED */
 
 static int verbose = 0;
 static int wrote_question = 0;
@@ -563,11 +562,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_set_read_status_fn(read_ptr, NULL);
    }
 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-   black_pixels=0;
-   png_set_write_user_transform_fn(write_ptr, count_black_pixels);
-#endif
+#  if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+     black_pixels=0;
+     png_set_write_user_transform_fn(write_ptr, count_black_pixels);
+#  endif
 
    png_debug(0, "Reading info struct\n");
    png_read_info(read_ptr, read_info_ptr);
@@ -949,8 +947,7 @@ main(int argc, char *argv[])
          fprintf(STDERR, "Testing %s:",argv[i]);
          kerror = test_one_file(argv[i], outname);
          if (kerror == 0) 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
             fprintf(STDERR, " PASS (%lu black pixels)\n",black_pixels);
 #else
             fprintf(STDERR, " PASS\n");
@@ -996,8 +993,7 @@ main(int argc, char *argv[])
          if(kerror == 0)
          {
             if(verbose == 1 || i == 2)
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
                 fprintf(STDERR, " PASS (%lu black pixels)\n",black_pixels);
 #else
                 fprintf(STDERR, " PASS\n");

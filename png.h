@@ -27,7 +27,7 @@
  *      0.97c                     0.97      2.0.97
  *      0.98                      0.98      2.0.98
  *      0.99                      0.99      2.0.99
- *      0.99a-i                   0.99      2.0.99
+ *      0.99a-m                   0.99      2.0.99
  *      1.00                      1.00      2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
@@ -812,7 +812,7 @@ extern PNG_EXPORT(void,png_set_swap) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(void,png_set_packing) PNGARG((png_structp png_ptr));
 #endif /* PNG_READ_PACK_SUPPORTED || PNG_WRITE_PACK_SUPPORTED */
 
-#if defined(PNG_READ_PACKSWAP_SUPPORTED) || defined(PNG_WRITE_PACKSWAP_SUPPOR)
+#if defined(PNG_READ_PACKSWAP_SUPPORTED) || defined(PNG_WRITE_PACKSWAP_SUPPORTED)
 /* Swap packing order of pixels in bytes. */
 extern PNG_EXPORT(void,png_set_packswap) PNGARG((png_structp png_ptr));
 #endif /* PNG_READ_PACKSWAP_SUPPORTED || PNG_WRITE_PACKSWAP_SUPPOR */
