@@ -15,7 +15,7 @@
 
 LIBNAME = libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.14
+PNGMIN = 1.0.15rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
@@ -129,6 +129,10 @@ $(LIBNAME).so.$(PNGVER): $(OBJSDLL)
 	-o $(LIBNAME).so.$(PNGVER) \
 	$(OBJSDLL) -L$(ZLIBLIB) -lz -lm -lc
 
+libpng.so.2.$(PNGMIN): $(OBJSDLL)
+	$(CC) -shared -Wl,-soname,libpng.so.2 \
+	-o libpng.so.2.$(PNGMIN) \
+
 pngtest: pngtest.o $(LIBNAME).so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
@@ -161,18 +165,20 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DL)/libpng.a
 	(cd $(DL); ln -sf $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
+install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
+	libpng.so.2.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
-	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)* $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.2
-	-@/bin/rm -f $(DL)/libpng.so.2.*
+	-@/bin/rm -f $(DL)/libpng.so.2.$(PNGMIN)*
 	cp $(LIBNAME).so.$(PNGVER) $(DL)
+	cp libpng.so.2.$(PNGMIN) $(DL)
 	chmod 755 $(DL)/$(LIBNAME).so.$(PNGVER)
+	chmod 755 $(DL)/libpng.so.2.$(PNGMIN)
 	(cd $(DL); \
-	ln -sf $(LIBNAME).so.$(PNGVER) libpng.so; \
-	ln -sf $(LIBNAME).so.$(PNGVER) libpng.so.2; \
-	ln -sf $(LIBNAME).so.$(PNGVER) libpng.so.2.$(PNGMIN); \
+	ln -sf libpng.so.2.$(PNGMIN) libpng.so.2; \
+	ln -sf libpng.so.2 libpng.so; \
 	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
@@ -214,8 +220,10 @@ test-installed:
 	./pngtesti pngtest.png
 
 clean:
-	/bin/rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
-	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest-static pngtesti
+	/bin/rm -f *.o libpng.a pngtest pngout.png libpng-config \
+	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest-static pngtesti \
+	libpng.so.2.$(PNGMIN) \
+	libpng.pc
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

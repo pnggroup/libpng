@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.14 - July 8, 2002
+ * libpng 1.0.15rc1 - August 24, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
