@@ -569,7 +569,6 @@ SOURCE=..\..\png.c
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -583,7 +582,6 @@ DEP_CPP_PNG_C=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -596,7 +594,6 @@ DEP_CPP_PNG_C=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -607,7 +604,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -619,7 +615,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -631,7 +626,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -643,7 +637,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -655,7 +648,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -667,7 +659,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -679,7 +670,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -691,7 +681,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -703,7 +692,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -715,7 +703,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -727,7 +714,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -739,7 +725,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -751,7 +736,6 @@ NODEP_CPP_PNG_C=\
 
 DEP_CPP_PNG_C=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNG_C=\
@@ -774,7 +758,6 @@ SOURCE=..\..\pngerror.c
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -788,7 +771,6 @@ DEP_CPP_PNGER=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -801,7 +783,6 @@ DEP_CPP_PNGER=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -812,7 +793,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -824,7 +804,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -836,7 +815,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -848,7 +826,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -860,7 +837,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -872,7 +848,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -884,7 +859,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -896,7 +870,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -908,7 +881,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -920,7 +892,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -932,7 +903,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -944,7 +914,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -956,7 +925,6 @@ NODEP_CPP_PNGER=\
 
 DEP_CPP_PNGER=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGER=\
@@ -975,7 +943,6 @@ SOURCE=..\..\pnggccrd.c
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -989,7 +956,6 @@ DEP_CPP_PNGGC=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1002,7 +968,6 @@ DEP_CPP_PNGGC=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1013,7 +978,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1025,7 +989,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1037,7 +1000,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1049,7 +1011,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1061,7 +1022,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1073,7 +1033,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1085,7 +1044,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1097,7 +1055,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1109,7 +1066,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1121,7 +1077,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1133,7 +1088,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1145,7 +1099,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1157,7 +1110,6 @@ NODEP_CPP_PNGGC=\
 
 DEP_CPP_PNGGC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGC=\
@@ -1176,7 +1128,6 @@ SOURCE=..\..\pngget.c
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1190,7 +1141,6 @@ DEP_CPP_PNGGE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1203,7 +1153,6 @@ DEP_CPP_PNGGE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1214,7 +1163,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1226,7 +1174,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1238,7 +1185,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1250,7 +1196,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1262,7 +1207,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1274,7 +1218,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1286,7 +1229,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1298,7 +1240,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1310,7 +1251,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1322,7 +1262,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1334,7 +1273,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1346,7 +1284,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1358,7 +1295,6 @@ NODEP_CPP_PNGGE=\
 
 DEP_CPP_PNGGE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGGE=\
@@ -1377,7 +1313,6 @@ SOURCE=..\..\pngmem.c
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1391,7 +1326,6 @@ DEP_CPP_PNGME=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1404,7 +1338,6 @@ DEP_CPP_PNGME=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1415,7 +1348,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1427,7 +1359,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1439,7 +1370,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1451,7 +1381,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1463,7 +1392,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1475,7 +1403,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1487,7 +1414,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1499,7 +1425,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1511,7 +1436,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1523,7 +1447,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1535,7 +1458,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1547,7 +1469,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1559,7 +1480,6 @@ NODEP_CPP_PNGME=\
 
 DEP_CPP_PNGME=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGME=\
@@ -1578,7 +1498,6 @@ SOURCE=..\..\pngpread.c
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1592,7 +1511,6 @@ DEP_CPP_PNGPR=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1605,7 +1523,6 @@ DEP_CPP_PNGPR=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1616,7 +1533,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1628,7 +1544,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1640,7 +1555,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1652,7 +1566,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1664,7 +1577,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1676,7 +1588,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1688,7 +1599,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1700,7 +1610,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1712,7 +1621,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1724,7 +1632,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1736,7 +1643,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1748,7 +1654,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1760,7 +1665,6 @@ NODEP_CPP_PNGPR=\
 
 DEP_CPP_PNGPR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGPR=\
@@ -1779,7 +1683,6 @@ SOURCE=..\..\pngread.c
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1793,7 +1696,6 @@ DEP_CPP_PNGRE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1806,7 +1708,6 @@ DEP_CPP_PNGRE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1817,7 +1718,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1829,7 +1729,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1841,7 +1740,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1853,7 +1751,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1865,7 +1762,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1877,7 +1773,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1889,7 +1784,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1901,7 +1795,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1913,7 +1806,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1925,7 +1817,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1937,7 +1828,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1949,7 +1839,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1961,7 +1850,6 @@ NODEP_CPP_PNGRE=\
 
 DEP_CPP_PNGRE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRE=\
@@ -1980,7 +1868,6 @@ SOURCE=..\..\pngrio.c
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -1994,7 +1881,6 @@ DEP_CPP_PNGRI=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2007,7 +1893,6 @@ DEP_CPP_PNGRI=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2018,7 +1903,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2030,7 +1914,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2042,7 +1925,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2054,7 +1936,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2066,7 +1947,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2078,7 +1958,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2090,7 +1969,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2102,7 +1980,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2114,7 +1991,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2126,7 +2002,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2138,7 +2013,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2150,7 +2024,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2162,7 +2035,6 @@ NODEP_CPP_PNGRI=\
 
 DEP_CPP_PNGRI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRI=\
@@ -2181,7 +2053,6 @@ SOURCE=..\..\pngrtran.c
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2195,7 +2066,6 @@ DEP_CPP_PNGRT=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2208,7 +2078,6 @@ DEP_CPP_PNGRT=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2219,7 +2088,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2231,7 +2099,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2243,7 +2110,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2255,7 +2121,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2267,7 +2132,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2279,7 +2143,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2291,7 +2154,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2303,7 +2165,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2315,7 +2176,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2327,7 +2187,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2339,7 +2198,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2351,7 +2209,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2363,7 +2220,6 @@ NODEP_CPP_PNGRT=\
 
 DEP_CPP_PNGRT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRT=\
@@ -2382,7 +2238,6 @@ SOURCE=..\..\pngrutil.c
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2396,7 +2251,6 @@ DEP_CPP_PNGRU=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2409,7 +2263,6 @@ DEP_CPP_PNGRU=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2420,7 +2273,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2432,7 +2284,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2444,7 +2295,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2456,7 +2306,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2468,7 +2317,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2480,7 +2328,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2492,7 +2339,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2504,7 +2350,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2516,7 +2361,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2528,7 +2372,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2540,7 +2383,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2552,7 +2394,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2564,7 +2405,6 @@ NODEP_CPP_PNGRU=\
 
 DEP_CPP_PNGRU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGRU=\
@@ -2583,7 +2423,6 @@ SOURCE=..\..\pngset.c
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2597,7 +2436,6 @@ DEP_CPP_PNGSE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2610,7 +2448,6 @@ DEP_CPP_PNGSE=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2621,7 +2458,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2633,7 +2469,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2645,7 +2480,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2657,7 +2491,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2669,7 +2502,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2681,7 +2513,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2693,7 +2524,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2705,7 +2535,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2717,7 +2546,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2729,7 +2557,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2741,7 +2568,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2753,7 +2579,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2765,7 +2590,6 @@ NODEP_CPP_PNGSE=\
 
 DEP_CPP_PNGSE=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGSE=\
@@ -2784,7 +2608,6 @@ SOURCE=..\..\pngtrans.c
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2798,7 +2621,6 @@ DEP_CPP_PNGTR=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2811,7 +2633,6 @@ DEP_CPP_PNGTR=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2822,7 +2643,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2834,7 +2654,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2846,7 +2665,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2858,7 +2676,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2870,7 +2687,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2882,7 +2698,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2894,7 +2709,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2906,7 +2720,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2918,7 +2731,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2930,7 +2742,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2942,7 +2753,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2954,7 +2764,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2966,7 +2775,6 @@ NODEP_CPP_PNGTR=\
 
 DEP_CPP_PNGTR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTR=\
@@ -2985,7 +2793,6 @@ SOURCE=..\..\pngvcrd.c
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -2999,7 +2806,6 @@ DEP_CPP_PNGVC=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3012,7 +2818,6 @@ DEP_CPP_PNGVC=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3023,7 +2828,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3035,7 +2839,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3047,7 +2850,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3059,7 +2861,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3071,7 +2872,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3083,7 +2883,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3095,7 +2894,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3107,7 +2905,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3119,7 +2916,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3131,7 +2927,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3143,7 +2938,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3155,7 +2949,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3167,7 +2960,6 @@ NODEP_CPP_PNGVC=\
 
 DEP_CPP_PNGVC=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGVC=\
@@ -3186,7 +2978,6 @@ SOURCE=..\..\pngwio.c
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3200,7 +2991,6 @@ DEP_CPP_PNGWI=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3213,7 +3003,6 @@ DEP_CPP_PNGWI=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3224,7 +3013,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3236,7 +3024,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3248,7 +3035,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3260,7 +3046,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3272,7 +3057,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3284,7 +3068,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3296,7 +3079,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3308,7 +3090,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3320,7 +3101,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3332,7 +3112,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3344,7 +3123,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3356,7 +3134,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3368,7 +3145,6 @@ NODEP_CPP_PNGWI=\
 
 DEP_CPP_PNGWI=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWI=\
@@ -3387,7 +3163,6 @@ SOURCE=..\..\pngwrite.c
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3401,7 +3176,6 @@ DEP_CPP_PNGWR=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3414,7 +3188,6 @@ DEP_CPP_PNGWR=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3425,7 +3198,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3437,7 +3209,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3449,7 +3220,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3461,7 +3231,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3473,7 +3242,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3485,7 +3253,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3497,7 +3264,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3509,7 +3275,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3521,7 +3286,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3533,7 +3297,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3545,7 +3308,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3557,7 +3319,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3569,7 +3330,6 @@ NODEP_CPP_PNGWR=\
 
 DEP_CPP_PNGWR=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWR=\
@@ -3588,7 +3348,6 @@ SOURCE=..\..\pngwtran.c
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3602,7 +3361,6 @@ DEP_CPP_PNGWT=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3615,7 +3373,6 @@ DEP_CPP_PNGWT=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3626,7 +3383,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3638,7 +3394,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3650,7 +3405,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3662,7 +3416,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3674,7 +3427,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3686,7 +3438,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3698,7 +3449,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3710,7 +3460,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3722,7 +3471,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3734,7 +3482,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3746,7 +3493,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3758,7 +3504,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3770,7 +3515,6 @@ NODEP_CPP_PNGWT=\
 
 DEP_CPP_PNGWT=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWT=\
@@ -3789,7 +3533,6 @@ SOURCE=..\..\pngwutil.c
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3803,7 +3546,6 @@ DEP_CPP_PNGWU=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3816,7 +3558,6 @@ DEP_CPP_PNGWU=\
 	"..\..\..\zlib\zconf.h"\
 	"..\..\..\zlib\zlib.h"\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3827,7 +3568,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3839,7 +3579,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3851,7 +3590,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3863,7 +3601,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3875,7 +3612,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3887,7 +3623,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3899,7 +3634,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3911,7 +3645,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3923,7 +3656,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3935,7 +3667,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3947,7 +3678,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3959,7 +3689,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3971,7 +3700,6 @@ NODEP_CPP_PNGWU=\
 
 DEP_CPP_PNGWU=\
 	"..\..\png.h"\
-	"..\..\pngasmrd.h"\
 	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGWU=\
@@ -3989,10 +3717,6 @@ NODEP_CPP_PNGWU=\
 # Begin Source File
 
 SOURCE=..\..\png.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\pngasmrd.h
 # End Source File
 # Begin Source File
 

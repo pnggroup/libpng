@@ -1,13 +1,17 @@
 # makefile for libpng on Linux ELF with gcc using MMX assembler code
 # Copyright 1996-1997 Andreas Dilger
-# Copyright 1998-2000 Greg Roelofs
+# Copyright 1998-2001 Greg Roelofs
 # For conditions of distribution and use, see copyright notice in png.h
 
 # CAUTION: Do not use this makefile with gcc versions 2.7.2.2 and earlier.
 
+# NOTE:  When testing MMX performance on a multitasking system, make sure
+#        there are no floating-point programs (e.g., SETI@Home) running in
+#        the background!  Context switches between MMX and FPU are expensive.
+
 CC=gcc
 
-# where "make install" puts libpng.a, libpng.so*, png.h and pngconf.h
+# where "make install" puts libpng.a, libpng.so*, png.h, and pngconf.h
 prefix=/usr/local
 
 # Where the zlib library and include files are located
@@ -26,8 +30,18 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
+### for generic gcc:
 CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
+### for gcc 2.95.2 on 686:
+#CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \
+#	-mcpu=i686 -malign-double -ffast-math -fstrict-aliasing \
+#	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
+### for gcc 2.7.2.3 on 486 and up:
+#CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \
+#	-m486 -malign-double -ffast-math \
+#	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
+
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
 LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm
 
@@ -37,7 +51,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.9beta7
+PNGMIN = 1.0.9beta8
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -56,19 +70,21 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 
 all: libpng.a libpng.so pngtest pngtest-static
 
-pnggccrd.o:	pnggccrd.c png.h pngconf.h pngasmrd.h
+pnggccrd.o:	pnggccrd.c png.h pngconf.h
 	@echo ""
 	@echo '    You can ignore the single "control reaches end of non-void function"'
 	@echo '    warning and multiple "<variable> defined but not used" warnings:'
 	@echo ""
 	$(CC) -c $(CFLAGS) -o $@ $*.c
+	@echo ""
 
-pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h pngasmrd.h
+pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
 	@echo ""
 	@echo '    You can ignore the single "control reaches end of non-void function"'
 	@echo '    warning and multiple "<variable> defined but not used" warnings:'
 	@echo ""
 	$(CC) -c $(CFLAGS) -fPIC -o $@ pnggccrd.c
+	@echo ""
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
@@ -118,7 +134,7 @@ DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
 	chmod a-w *.[ch35] $(DOCS) scripts/*
 
-png.o png.pic.o:		png.h pngconf.h png.c pngasmrd.h
+png.o png.pic.o:		png.h pngconf.h png.c
 pngerror.o pngerror.pic.o:	png.h pngconf.h pngerror.c
 pngrio.o pngrio.pic.o:		png.h pngconf.h pngrio.c
 pngwio.o pngwio.pic.o:		png.h pngconf.h pngwio.c
@@ -127,7 +143,7 @@ pngset.o pngset.pic.o:		png.h pngconf.h pngset.c
 pngget.o pngget.pic.o:		png.h pngconf.h pngget.c
 pngread.o pngread.pic.o:	png.h pngconf.h pngread.c
 pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngrtran.c
-pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngrutil.c pngasmrd.h
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngrutil.c
 pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngtrans.c
 pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
 pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c

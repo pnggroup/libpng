@@ -1,9 +1,9 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.9beta7 - December 28, 2000
+ * libpng 1.0.9beta8 - January 12, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -667,8 +667,11 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
+/*       old interface (pre-1.0.9):
          png_do_read_interlace(&(png_ptr->row_info),
             png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
+ */
+         png_do_read_interlace(png_ptr);
 
       if (dsp_row != NULL)
          png_combine_row(png_ptr, dsp_row,
@@ -712,7 +715,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta7
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta8
  */
 
 void PNGAPI
@@ -761,7 +764,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta7
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta8
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)

@@ -13,14 +13,14 @@ ZLIBINC=/usr/local/include
 
 CC=gcc
 
-WARNMORE=
-CFLAGS=-I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32 # -g -DPNG_DEBUG=5
+WARNMORE= # -g -DPNG_DEBUG=5
+CFLAGS=-I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
 # zlib must also be compiled with n32
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=gcc -shared
 
-VER=1.0.9beta7
-LIBS=libpng.so.1.0.9beta7
+VER=1.0.9beta8
+LIBS=libpng.so.1.0.9beta8
 SHAREDLIB=libpng.so
 libdir=$(prefix)/lib32
 

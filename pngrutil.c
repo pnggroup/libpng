@@ -1,9 +1,9 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.9beta7 - December 28, 2000
+ * libpng 1.0.9beta8 - January 12, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -266,6 +266,13 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          png_warning(png_ptr,
             "Incomplete compressed datastream in chunk other than IDAT");
 #endif
+         text_size=prefix_size;
+         if (text ==  NULL)
+         {
+            text = (png_charp)png_malloc(png_ptr, text_size+1);
+            png_memcpy(text, chunkdata, prefix_size);
+         }
+         *(text + text_size) = 0x00;
       }
 
       inflateReset(&png_ptr->zstream);
@@ -1063,6 +1070,8 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                                     slength, prefix_length, &data_length);
 
    profile_length = data_length - prefix_length;
+
+   /* Check the profile_size recorded in the first 32 bits of the ICC profile */
    profile_size = ((*(chunkdata+prefix_length))<<24) |
                   ((*(chunkdata+prefix_length+1))<<16) |
                   ((*(chunkdata+prefix_length+2))<< 8) |
@@ -2156,13 +2165,9 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    a zero indicates the pixel is to be skipped.  This is in addition
    to any alpha or transparency value associated with the pixel.  If
    you want all pixels to be combined, pass 0xff (255) in mask.  */
+#ifndef PNG_HAVE_ASSEMBLER_COMBINE_ROW
 void /* PRIVATE */
-#ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
-png_combine_row_c
-#else
-png_combine_row
-#endif /* PNG_HAVE_ASSEMBLER_COMBINE_ROW */
-   (png_structp png_ptr, png_bytep row, int mask)
+png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1,"in png_combine_row\n");
    if (mask == 0xff)
@@ -2362,25 +2367,24 @@ png_combine_row
       }
    }
 }
+#endif /* !PNG_HAVE_ASSEMBLER_COMBINE_ROW */
 
-#if defined(PNG_READ_INTERLACING_SUPPORTED)
+#ifdef PNG_READ_INTERLACING_SUPPORTED
+#ifndef PNG_HAVE_ASSEMBLER_READ_INTERLACE   /* else in pngvcrd.c, pnggccrd.c */
 void /* PRIVATE */
-#ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
-png_do_read_interlace_c
-#else
-png_do_read_interlace
-#endif /* PNG_HAVE_ASSEMBLER_READ_INTERLACE */
-   (png_row_infop row_info, png_bytep row, int pass,
-   png_uint_32 transformations)
+png_do_read_interlace(png_structp png_ptr)
 {
+   png_row_infop row_info = &(png_ptr->row_info);
+   png_bytep row = png_ptr->row_buf + 1;
+   int pass = png_ptr->pass;
+   png_uint_32 transformations = png_ptr->transformations;
 #ifdef PNG_USE_LOCAL_ARRAYS
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
-
    /* offset to next interlace block */
    const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 #endif
 
-   png_debug(1,"in png_do_read_interlace\n");
+   png_debug(1,"in png_do_read_interlace (stock C version)\n");
    if (row != NULL && row_info != NULL)
    {
       png_uint_32 final_width;
@@ -2590,15 +2594,12 @@ png_do_read_interlace
       return;
 #endif
 }
-#endif
+#endif /* !PNG_HAVE_ASSEMBLER_READ_INTERLACE */
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
 
+#ifndef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
 void /* PRIVATE */
-#ifdef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
-png_read_filter_row_c
-#else
-png_read_filter_row
-#endif /* PNG_HAVE_ASSEMBLER_READ_FILTER_ROW */
-   (png_structp png_ptr, png_row_infop row_info, png_bytep row,
+png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    png_bytep prev_row, int filter)
 {
    png_debug(1, "in png_read_filter_row\n");
@@ -2719,6 +2720,7 @@ png_read_filter_row
          break;
    }
 }
+#endif /* !PNG_HAVE_ASSEMBLER_READ_FILTER_ROW */
 
 void /* PRIVATE */
 png_read_finish_row(png_structp png_ptr)

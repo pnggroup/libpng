@@ -1,9 +1,9 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.9beta7 - December 28, 2000
+ * libpng 1.0.9beta8 - January 12, 2001
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000, 2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -772,8 +772,11 @@ png_push_process_row(png_structp png_ptr)
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
+/*       old interface (pre-1.0.9):
          png_do_read_interlace(&(png_ptr->row_info),
             png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
+ */
+         png_do_read_interlace(png_ptr);
 
       switch (png_ptr->pass)
       {

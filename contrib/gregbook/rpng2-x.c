@@ -25,10 +25,11 @@
     - 1.10:  added support for non-default visuals; fixed X pixel-conversion
     - 1.11:  added -usleep option for demos; fixed command-line parsing bug
     - 1.12:  added -pause option for demos and testing
+    - 1.20:  added runtime MMX-enabling/disabling and new -mmx* options
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -55,7 +56,7 @@
 
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
-#define VERSION   "1.12 of 19 March 2000"
+#define VERSION   "1.20 of 4 January 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -359,6 +360,14 @@ int main(int argc, char **argv)
             pause_after_pass = TRUE;
         } else if (!strncmp(*argv, "-timing", 2)) {
             timing = TRUE;
+#if (defined(__i386__) || defined(_M_IX86))
+        } else if (!strncmp(*argv, "-nommxfilters", 7)) {
+            rpng2_info.nommxfilters = TRUE;
+        } else if (!strncmp(*argv, "-nommxcombine", 7)) {
+            rpng2_info.nommxcombine = TRUE;
+        } else if (!strncmp(*argv, "-nommxinterlace", 7)) {
+            rpng2_info.nommxinterlace = TRUE;
+#endif
         } else {
             if (**argv != '-') {
                 filename = *argv;
@@ -414,10 +423,13 @@ int main(int argc, char **argv)
     /* usage screen */
 
     if (error) {
-        fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
+        fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
         readpng2_version_info();
         fprintf(stderr, "\n"
           "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg | -bgpat pat]\n"
+#if (defined(__i386__) || defined(_M_IX86))
+          "        %*s [-nommxfilters] [-nommxcombine] [-nommxinterlace]\n"
+#endif
           "        %*s [-usleep dur | -timing] [-pause] file.png\n\n"
           "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"
           "    exp \ttransfer-function exponent (``gamma'') of the display\n"
@@ -429,6 +441,10 @@ int main(int argc, char **argv)
           "\t\t  used with transparent images; overrides -bgpat\n"
           "    pat \tdesired background pattern number (1-%d); used with\n"
           "\t\t  transparent images; overrides -bgcolor\n"
+#if (defined(__i386__) || defined(_M_IX86))
+          "    -nommx*\tdisable optimized MMX routines for decoding row filters,\n"
+          "\t\t  combining rows, and expanding interlacing, respectively\n"
+#endif
           "    dur \tduration in microseconds to wait after displaying each\n"
           "\t\t  row (for demo purposes)\n"
           "    -timing\tenables delay for every block read, to simulate modem\n"
@@ -436,8 +452,11 @@ int main(int argc, char **argv)
           "    -pause\tpauses after displaying each pass until key pressed\n"
           "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
           "is displayed) to quit.\n"
-          "\n", PROGNAME, strlen(PROGNAME), " ", default_display_exponent,
-          num_bgpat);
+          "\n", PROGNAME,
+#if (defined(__i386__) || defined(_M_IX86))
+          strlen(PROGNAME), " ",
+#endif
+          strlen(PROGNAME), " ", default_display_exponent, num_bgpat);
         exit(1);
     }
 

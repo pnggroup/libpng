@@ -13,7 +13,7 @@
 
 CC=gcc
 
-# where "make install" puts libpng.a, libpng.so*, png.h and pngconf.h
+# where "make install" puts libpng.a, libpng.so*, png.h, and pngconf.h
 prefix=/usr
 
 # Where the zlib library and include files are located
@@ -38,7 +38,7 @@ CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.9beta7
+PNGMIN = 1.0.9beta8
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(PNGMAJ).dll
@@ -86,14 +86,14 @@ all-static: $(STATLIB) pngtest-stat$(EXE)
 
 all-shared: $(SHAREDLIB) pngtest$(EXE)
 
-pnggccrd.o:	png.h pngconf.h pngasmrd.h
+pnggccrd.o:	png.h pngconf.h
 	@echo ""
 	@echo '    You can ignore the single "control reaches end of non-void function"'
 	@echo '    warning and multiple "<variable> defined but not used" warnings:'
 	@echo ""
 	$(CC) -c $(CFLAGS) -DPNG_STATIC -DZLIB_STATIC -o $@ $*.c
 
-pnggccrd.pic.o:	png.h pngconf.h pngasmrd.h
+pnggccrd.pic.o:	png.h pngconf.h
 	@echo ""
 	@echo '    You can ignore the single "control reaches end of non-void function"'
 	@echo '    warning and multiple "<variable> defined but not used" warnings:'
@@ -164,7 +164,7 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o:		png.h pngconf.h png.c pngasmrd.h
+png.o png.pic.o:		png.h pngconf.h png.c
 pngerror.o pngerror.pic.o:	png.h pngconf.h pngerror.c
 pngrio.o pngrio.pic.o:		png.h pngconf.h pngrio.c
 pngwio.o pngwio.pic.o:		png.h pngconf.h pngwio.c
@@ -173,7 +173,7 @@ pngset.o pngset.pic.o:		png.h pngconf.h pngset.c
 pngget.o pngget.pic.o:		png.h pngconf.h pngget.c
 pngread.o pngread.pic.o:	png.h pngconf.h pngread.c
 pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngrtran.c
-pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngrutil.c pngasmrd.h
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngrutil.c
 pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngtrans.c
 pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
 pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c

@@ -70,7 +70,7 @@ pngrtran$(O): png.h pngconf.h
 pngrutil$(O): png.h pngconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngvcrd$(O): png.h pngconf.h pngasmrd.h
+pngvcrd$(O): png.h pngconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 pngerror$(O): png.h pngconf.h

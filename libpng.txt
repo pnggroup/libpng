@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.9beta7 - December 28, 2000
+ libpng version 1.0.9beta8 - January 12, 2001
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -2242,13 +2242,22 @@ For a more compact example of writing a PNG image, see the file example.c.
 
 V. Modifying/Customizing libpng:
 
-There are two issues here.  The first is changing how libpng does
+There are three issues here.  The first is changing how libpng does
 standard things like memory allocation, input/output, and error handling.
 The second deals with more complicated things like adding new chunks,
 adding new transformations, and generally changing how libpng works.
+Both of those are compile-time issues; that is, they are generally
+determined at the time the code is written, and there is rarely a need
+to provide the user with a means of changing them.  The third is a
+run-time issue:  choosing between and/or tuning one or more alternate
+versions of computationally intensive routines; specifically, optimized
+assembly-language (and therefore compiler- and platform-dependent)
+versions.
+
+Memory allocation, input/output, and error handling
 
 All of the memory allocation, input/output, and error handling in libpng
-goes through callbacks that are user settable.  The default routines are
+goes through callbacks that are user-settable.  The default routines are
 in pngmem.c, pngrio.c, pngwio.c, and pngerror.c, respectively.  To change
 these functions, call the appropriate png_set_*_fn() function.
 
@@ -2596,6 +2605,7 @@ When PNG_DEBUG = 1, the macros are defined, but only png_debug statements
 having level = 0 will be printed.  There aren't any such statements in
 this version of libpng, but if you insert some they will be printed.
 
+
 VI.  MNG support
 
 The MNG specification (available at http://www.libpng.org/pub/mng) allows
@@ -2672,13 +2682,13 @@ application:
 
 VIII. Y2K Compliance in libpng
 
-December 28, 2000
+January 12, 2001
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.9beta7 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.9beta8 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

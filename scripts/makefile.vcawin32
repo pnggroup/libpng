@@ -46,10 +46,10 @@ pngpread$(O): png.h pngconf.h
 pngrtran$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngrutil$(O): png.h pngconf.h pngasmrd.h
+pngrutil$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngvcrd$(O): png.h pngconf.h pngasmrd.h
+pngvcrd$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngerror$(O): png.h pngconf.h

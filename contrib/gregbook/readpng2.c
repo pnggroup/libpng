@@ -4,7 +4,7 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -51,6 +51,7 @@ void readpng2_version_info(void)
 {
     fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
       PNG_LIBPNG_VER_STRING, png_libpng_ver);
+
     fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
       ZLIB_VERSION, zlib_version);
 }
@@ -109,7 +110,6 @@ int readpng2_init(mainprog_info *mainprog_ptr)
 
     png_set_progressive_read_fn(png_ptr, mainprog_ptr,
       readpng2_info_callback, readpng2_row_callback, readpng2_end_callback);
-
 
     /* make sure we save our pointers for use in readpng2_decode_data() */
 
