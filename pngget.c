@@ -1,12 +1,12 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.1
+ * libpng 1.00
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 9, 1998
+ * March 7, 1998
  */
 
 #define PNG_INTERNAL
@@ -259,14 +259,14 @@ float
 png_get_x_offset_inches(png_structp png_ptr, png_infop info_ptr)
 {
    return ((float)png_get_x_offset_microns(png_ptr, info_ptr)
-     *.03937/1.0.100. +.5)
+     *.03937/1000000. +.5)
 }
 
 float
 png_get_y_offset_inches(png_structp png_ptr, png_infop info_ptr)
 {
    return ((float)png_get_y_offset_microns(png_ptr, info_ptr)
-     *.03937/1.0.100. +.5)
+     *.03937/1000000. +.5)
 }
 
 #if defined(PNG_READ_pHYs_SUPPORTED)

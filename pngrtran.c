@@ -1,12 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.1
+ * libpng 1.00
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 9, 1998
+ * March 7, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -665,8 +665,7 @@ png_init_read_transformations(png_structp png_ptr)
         if (png_ptr->transformations & PNG_INVERT_ALPHA)
         {
 #if defined(PNG_READ_EXPAND_SUPPORTED)
-           /* GRR BUG #1:  was (png_ptr->transformations & !PNG_EXPAND) */
-           if (!(png_ptr->transformations & PNG_EXPAND))
+           if (png_ptr->transformations & !PNG_EXPAND)
 #endif
            {
            /* invert the alpha channel (in tRNS) unless the pixels are 
@@ -713,65 +712,41 @@ png_init_read_transformations(png_structp png_ptr)
             }
             else
             {
-               double g, gs;
+               double g;
 
-/*
-               GRR BUG #3:  inconsistent with handling of full RGBA below
-               g = 1.0 / png_ptr->background_gamma;
-               gs = 1.0 / (png_ptr->background_gamma * png_ptr->screen_gamma);
- */
-               switch (png_ptr->background_gamma_type)
-               {
-                  case PNG_BACKGROUND_GAMMA_SCREEN:
-                     g = (png_ptr->screen_gamma);
-                     gs = 1.0;
-                     break;
-                  case PNG_BACKGROUND_GAMMA_FILE:
-                     g = 1.0 / (png_ptr->gamma);
-                     gs = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
-                     break;
-                  case PNG_BACKGROUND_GAMMA_UNIQUE:
-                     g = 1.0 / (png_ptr->background_gamma);
-                     gs = 1.0 / (png_ptr->background_gamma *
-                                 png_ptr->screen_gamma);
-                     break;
-                  default:
-                     g = 1.0;    /* back_1 */
-                     gs = 1.0;   /* back */
-               }
+               g = 1.0 / (png_ptr->background_gamma * png_ptr->screen_gamma);
 
-               if (
-/*
-                   GRR BUG #2:  This creates self-inconsistent images--fully
-                     transparent and fully opaque look fine, but translucent
-                     pixels are wrong (too bright if XV's code can be trusted).
-                     Commenting it out makes an internally self-consistent
-                     image, but still not consistent with RGBA version of same
-                     thing (again, too bright in XV).
-                   png_ptr->background_gamma_type==PNG_BACKGROUND_GAMMA_SCREEN||
- */
-                   fabs(gs - 1.0) < PNG_GAMMA_THRESHOLD)
+               if (png_ptr->background_gamma_type==PNG_BACKGROUND_GAMMA_SCREEN||
+                   fabs(g - 1.0) < PNG_GAMMA_THRESHOLD)
                {
-                  back.red   = (png_byte)png_ptr->background.red;
+                  back.red = (png_byte)png_ptr->background.red;
                   back.green = (png_byte)png_ptr->background.green;
-                  back.blue  = (png_byte)png_ptr->background.blue;
+                  back.blue = (png_byte)png_ptr->background.blue;
                }
                else
                {
-                  back.red = (png_byte)(pow(
-                     (double)png_ptr->background.red/255, gs) * 255.0 + .5);
-                  back.green = (png_byte)(pow(
-                     (double)png_ptr->background.green/255, gs) * 255.0 + .5);
-                  back.blue = (png_byte)(pow(
-                     (double)png_ptr->background.blue/255, gs) * 255.0 + .5);
+                  back.red =
+                     (png_byte)(pow((double)png_ptr->background.red/255, g) *
+                      255.0 + 0.5);
+                  back.green =
+                     (png_byte)(pow((double)png_ptr->background.green/255, g) *
+                      255.0 + 0.5);
+                  back.blue =
+                     (png_byte)(pow((double)png_ptr->background.blue/255, g) *
+                      255.0 + 0.5);
                }
 
-               back_1.red = (png_byte)(pow(
-                  (double)png_ptr->background.red/255, g) * 255.0 + .5);
-               back_1.green = (png_byte)(pow(
-                  (double)png_ptr->background.green/255, g) * 255.0 + .5);
-               back_1.blue = (png_byte)(pow(
-                  (double)png_ptr->background.blue/255, g) * 255.0 + .5);
+               g = 1.0 / png_ptr->background_gamma;
+
+               back_1.red =
+                  (png_byte)(pow((double)png_ptr->background.red/255, g) *
+                   255.0 + 0.5);
+               back_1.green =
+                  (png_byte)(pow((double)png_ptr->background.green/255, g) *
+                   255.0 + 0.5);
+               back_1.blue =
+                  (png_byte)(pow((double)png_ptr->background.blue/255, g) *
+                   255.0 + 0.5);
             }
 
             for (i = 0; i < num_palette; i++)
