@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.3 - January 14, 1999
+ * libpng 1.0.4 - September 17, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -971,6 +971,8 @@ png_set_compression_window_bits(png_structp png_ptr, int window_bits)
 {
    if (window_bits > 15)
       png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
+   else if (window_bits < 8)
+      png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_WINDOW_BITS;
    png_ptr->zlib_window_bits = window_bits;
 }
@@ -1001,4 +1003,3 @@ png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    png_ptr->write_user_transform_fn = write_user_transform_fn;
 }
 #endif
-

@@ -1,8 +1,8 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.3 - January 14, 1999
+ libpng version 1.0.4 - September 17, 1999
  Updated and distributed by Glenn Randers-Pehrson
- <randeg@alumni.rpi.edu>
+ <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999 Glenn Randers-Pehrson
  For conditions of distribution and use, see copyright
  notice in png.h.
@@ -22,6 +22,7 @@ libpng.txt - A description on how to use and modify libpng
  Copyright (c) 1995 Frank J. T. Wojcik
  December 18, 1995 && January 20, 1996
 
+ *
 I. Introduction
 
 This file describes how to use and modify the PNG reference library
@@ -35,11 +36,17 @@ INSTALL file for instructions on how to install libpng.
 
 Libpng was written as a companion to the PNG specification, as a way
 of reducing the amount of time and effort it takes to support the PNG
-file format in application programs.  The PNG specification is available
+file format in application programs.
+
+The PNG-1.2 specification is available at <http://www.cdrom.com/png>.
+
+The PNG-1.0 specification is available
 as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/> and as a
 W3C Recommendation <http://www.w3.org/TR/REC.png.html>. Some
 additional chunks are described in the special-purpose public chunks
-documents at <ftp://ftp.uu.net/graphics/png/documents/>.  Other information
+documents at <ftp://ftp.uu.net/graphics/png/documents/>.
+
+Other information
 about PNG, and the latest version of libpng, can be found at the PNG home
 page, <http://www.cdrom.com/pub/png/>.
 
@@ -260,6 +267,21 @@ You must supply the function
 
 See pngtest.c for a working example.  Your function will be called
 after all of the other transformations have been processed.
+
+You can also set up a pointer to a user structure for use by your
+callback function, and you can inform libpng that your transform
+function will change the number of channels or bit depth with the
+function
+
+    png_set_user_transform_info(png_ptr, user_ptr,
+       user_depth, user_channels);
+
+
+You can retrieve the pointer via the function
+png_get_user_transform_ptr().  For example:
+
+    voidp read_user_transform_ptr =
+       png_get_user_transform_ptr(png_ptr);
 
 You are now ready to read all the file information up to the actual
 image data.  You do this with a call to png_read_info().
@@ -506,13 +528,18 @@ grayscale images with bit depths of 2 or 4 or if there is a multiple-image
 viewing application that wishes to treat all images in the same way.
 
     if (color_type == PNG_COLOR_TYPE_PALETTE &&
-        bit_depth <= 8) png_set_expand(png_ptr);
+        bit_depth <= 8) png_set_palette_to_rgb(png_ptr);
 
     if (color_type == PNG_COLOR_TYPE_GRAY &&
-        bit_depth < 8) png_set_expand(png_ptr);
+        bit_depth < 8) png_set_gray_1_2_4_to_8(png_ptr);
 
     if (png_get_valid(png_ptr, info_ptr,
-        PNG_INFO_tRNS)) png_set_expand(png_ptr);
+        PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
+
+These three functions are actually aliases for png_set_expand(), added
+in libpng version 1.0.4, with the function names expanded to improve code
+readability.  In some future version they may actually do different
+things.
 
 PNG can have files with 16 bits per channel.  If you only can handle
 8 bits per channel, this will strip the pixels down to 8 bit.
@@ -599,7 +626,7 @@ and blue channels, leaving the green channel in the gray position.
     if (color_type == PNG_COLOR_TYPE_RGB ||
         color_type == PNG_COLOR_TYPE_RGB_ALPHA)
           png_set_rgb_to_gray(png_ptr, error_action,
-             float red_weight, float green_weight);
+             double red_weight, double green_weight);
 
     error_action = 1: silently do the conversion
     error_action = 2: issue a warning if the original
@@ -648,7 +675,8 @@ which can be expressed with integers as
 The calculation is done in a linear colorspace, if the image gamma
 is known.
 
-If you have a grayscale and you are using png_set_expand() to change to
+If you have a grayscale and you are using png_set_expand_depth() or
+png_set_expand() to change to
 a higher bit-depth, you must either supply the background color as a gray
 value at the original file bit-depth (need_expand = 1) or else supply the
 background color as an RGB triplet at the final, expanded bit depth
@@ -681,6 +709,8 @@ the amount of additional gamma correction needed to compensate for
 a (viewing_gamma=1.25) environment.  In a dim or brightly lit room, no
 compensation other than the display_gamma is needed (viewing_gamma=1.0).
 
+   double gamma, screen_gamma;
+
    if (/* We have a user-defined screen
        gamma value */)
    {
@@ -691,7 +721,7 @@ compensation other than the display_gamma is needed (viewing_gamma=1.0).
    else if ((gamma_str = getenv("SCREEN_GAMMA"))
       != NULL)
    {
-      screen_gamma = atof(gamma_str);
+      screen_gamma = (double)atof(gamma_str);
    }
    /* If we don't have another value */
    else
@@ -831,7 +861,7 @@ row_pointers:
     png_read_row(png_ptr, &row_pointers, NULL);
 
 If the file is interlaced (info_ptr->interlace_type != 0), things get
-somewhat harder.  The only current (PNG Specification version 1.0)
+somewhat harder.  The only current (PNG Specification version 1.2)
 interlacing type for PNG is (interlace_type == PNG_INTERLACE_ADAM7)
 is a somewhat complicated 2D interlace scheme, known as Adam7, that
 breaks down an image into seven smaller images of varying size, based
@@ -1194,7 +1224,7 @@ have no special needs in this area, let the library do what it wants by
 not calling this function at all, as it has been tuned to deliver a good
 speed/compression ratio. The second parameter to png_set_filter() is
 the filter method, for which the only valid value is '0' (as of the
-October 1996 PNG specification, version 1.0).  The third parameter is a
+July 1999 PNG specification, version 1.2).  The third parameter is a
 flag that indicates which filter type(s) are to be tested for each
 scanline.  See the Compression Library for details on the specific filter
 types.
@@ -1226,7 +1256,7 @@ data.  See the Compression Library for details on the compression levels.
 You now need to fill in the png_info structure with all the data you
 wish to write before the actual image.  Note that the only thing you
 are allowed to write after the image is the text chunks and the time
-chunk (as of PNG Specification 1.0, anyway).  See png_write_end() and
+chunk (as of PNG Specification 1.2, anyway).  See png_write_end() and
 the latest PNG specification for more information on that.  If you
 wish to write them before the image, fill them in now, and flag that
 data as being valid.  If you want to wait until after the data, don't
@@ -1555,7 +1585,21 @@ You must supply the function
        row_info, png_bytep data)
 
 See pngtest.c for a working example.  Your function will be called
-before any of the other transformations have been processed.
+before any of the other transformations are processed.
+
+You can also set up a pointer to a user structure for use by your
+callback function.
+
+    png_set_user_transform_info(png_ptr, user_ptr, 0, 0);
+
+The user_channels and user_depth parameters of this function are ignored
+when writing; you can set them to zero as shown.
+
+You can retrieve the pointer via the function
+png_get_user_transform_ptr().  For example:
+
+    voidp write_user_transform_ptr =
+       png_get_user_transform_ptr(png_ptr);
 
 It is possible to have libpng flush any pending output, either manually,
 or automatically after a certain number of lines have been written.  To
@@ -1612,8 +1656,8 @@ row_pointers:
     png_write_row(png_ptr, &row_pointer);
 
 When the file is interlaced, things can get a good deal more
-complicated.  The only currently (as of February 1998 -- PNG Specification
-version 1.0, dated October 1996) defined interlacing scheme for PNG files
+complicated.  The only currently (as of August 1999 -- PNG Specification
+version 1.2, dated July 1999) defined interlacing scheme for PNG files
 is the "Adam7" interlace scheme, that breaks down an
 image into seven smaller images of varying size.  libpng will build
 these images for you, or you can do them yourself.  If you want to
@@ -1658,7 +1702,6 @@ palette, or histogram, before the call to png_destroy_write_struct();
 
 For a more compact example of writing a PNG image, see the file example.c.
 
-
 V. Modifying/Customizing libpng:
 
 There are two issues here.  The first is changing how libpng does
@@ -1685,7 +1728,8 @@ which currently just call fread() and fwrite().  The FILE * is stored in
 png_struct and is initialized via png_init_io().  If you wish to change
 the method of I/O, the library supplies callbacks that you can set
 through the function png_set_read_fn() and png_set_write_fn() at run
-time, instead of calling the png_init_io() function.  These functions
+time, instead of calling the png_init_io() function.
+These functions
 also provide a void pointer that can be retrieved via the function
 png_get_io_ptr().  For example:
 
@@ -1852,7 +1896,7 @@ images (with and without alpha), but not for paletted images nor
 for any images with bit depths less than 8 bits/pixel.
 
 The 'method' parameter sets the main filtering method, which is
-currently only '0' in the PNG 1.0 specification.  The 'filters'
+currently only '0' in the PNG 1.2 specification.  The 'filters'
 parameter sets which filter(s), if any, should be used for each
 scanline.  Possible values are PNG_ALL_FILTERS and PNG_NO_FILTERS
 to turn filtering on and off, respectively.
@@ -2021,9 +2065,9 @@ January 13, 1999
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
-This is your unofficial assurance that libpng from version 0.81 and
-upward are Y2K compliant.  It is my belief that earlier versions were
-also Y2K compliant.
+This is your unofficial assurance that libpng from version 0.71 and
+upward through 1.0.4 are Y2K compliant.  It is my belief that earlier
+versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
 will hold years up to 65535.  The other two hold the date in text
@@ -2052,14 +2096,17 @@ png_convert_from_time_t() function calls gmtime() to convert from system
 clock time, which returns (year - 1900), which we properly convert to
 the full 4-digit year.  There is a possibility that applications using
 libpng are not passing 4-digit years into the png_convert_to_rfc_1123()
-function, or incorrectly passing only a 2-digit year instead of
-"year - 1900" into the png_convert_from_struct_tm() function, but this
-is not under our control.  The libpng documentation has always stated
-that it works with 4-digit years, and the APIs have been documented as
-such.
+function, or that they are incorrectly passing only a 2-digit year
+instead of "year - 1900" into the png_convert_from_struct_tm() function,
+but this is not under our control.  The libpng documentation has always
+stated that it works with 4-digit years, and the APIs have been
+documented as such.
 
 The tIME chunk itself is also Y2K compliant.  It uses a 2-byte unsigned
 integer to hold the year, and can hold years as large as 65535.
+
+zlib, upon which libpng depends, is also Y2K compliant.  It contains
+no date-related code.
 
 
    Glenn Randers-Pehrson

@@ -14,6 +14,7 @@ ZLIBINC=../zlib
 CC=cc
 
 WARNMORE=-fullwarn
+# You can add the -n32 option; then zlib must also be compiled with -n32
 CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) # -g -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 

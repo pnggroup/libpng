@@ -13,8 +13,8 @@ ZLIBINC=../zlib
 
 
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow -Wconversion \
-         -Wmissing-declarations -Wtraditional -Wcast-align \
-         -Wstrict-prototypes -Wmissing-prototypes
+	-Wmissing-declarations -Wtraditional -Wcast-align \
+	-Wstrict-prototypes -Wmissing-prototypes
 CC=gcc
 CFLAGS=-I$(ZLIBINC) -O # $(WARNMORE) -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm

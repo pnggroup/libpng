@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.3 - January 14, 1999
+ * libpng 1.0.4 - September 17, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -523,7 +523,7 @@ png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
 /* Expand paletted images to rgb, expand grayscale images of
- * less than 8 bit depth to 8 bit depth, and expand tRNS chunks
+ * less than 8-bit depth to 8-bit depth, and expand tRNS chunks
  * to alpha channels.
  */
 void
@@ -532,7 +532,45 @@ png_set_expand(png_structp png_ptr)
    png_debug(1, "in png_set_expand\n");
    png_ptr->transformations |= PNG_EXPAND;
 }
-#endif
+
+/* GRR 19990627:  the following three functions currently are identical
+ *  to png_set_expand().  However, it is entirely reasonable that someone
+ *  might wish to expand an indexed image to RGB but *not* expand a single,
+ *  fully transparent palette entry to a full alpha channel--perhaps instead
+ *  convert tRNS to the grayscale/RGB format (16-bit RGB value), or replace
+ *  the transparent color with a particular RGB value, or drop tRNS entirely.
+ *  IOW, a future version of the library may make the transformations flag
+ *  a bit more fine-grained, with separate bits for each of these three
+ *  functions.
+ *
+ *  More to the point, these functions make it obvious what libpng will be
+ *  doing, whereas "expand" can (and does) mean any number of things.
+ */
+
+/* Expand paletted images to RGB. */
+void
+png_set_palette_to_rgb(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_expand\n");
+   png_ptr->transformations |= PNG_EXPAND;
+}
+
+/* Expand grayscale images of less than 8-bit depth to 8 bits. */
+void
+png_set_gray_1_2_4_to_8(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_expand\n");
+   png_ptr->transformations |= PNG_EXPAND;
+}
+
+/* Expand tRNS chunks to alpha channels. */
+void
+png_set_tRNS_to_alpha(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_expand\n");
+   png_ptr->transformations |= PNG_EXPAND;
+}
+#endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
 void
@@ -548,8 +586,8 @@ png_set_gray_to_rgb(png_structp png_ptr)
  * for example, to convert a 24 bpp RGB image into an 8 bpp grayscale image.
  */
 void
-png_set_rgb_to_gray(png_structp png_ptr, int error_action, float red,
-  float green)
+png_set_rgb_to_gray(png_structp png_ptr, int error_action, double red,
+  double green)
 {
    png_debug(1, "in png_set_rgb_to_gray\n");
    switch(error_action)
@@ -570,8 +608,8 @@ png_set_rgb_to_gray(png_structp png_ptr, int error_action, float red,
    }
 #endif
    {
-      png_byte red_byte = (png_byte)(red*255.0 + 0.5);
-      png_byte green_byte = (png_byte)(green*255.0 + 0.5);
+      png_byte red_byte = (png_byte)((float)red*255.0 + 0.5);
+      png_byte green_byte = (png_byte)((float)green*255.0 + 0.5);
       if(red < 0.0 || green < 0.0)
       {
          red_byte = 54;
@@ -1018,6 +1056,16 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       ++info_ptr->channels;
 #endif
 
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+   if(png_ptr->transformations & PNG_USER_TRANSFORM)
+     {
+       if(info_ptr->bit_depth < png_ptr->user_transform_depth)
+         info_ptr->bit_depth = png_ptr->user_transform_depth;
+       if(info_ptr->channels < png_ptr->user_transform_channels)
+         info_ptr->channels = png_ptr->user_transform_channels;
+     }
+#endif
+
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels *
       info_ptr->bit_depth);
    info_ptr->rowbytes = ((info_ptr->width * info_ptr->pixel_depth + 7) >> 3);
@@ -1223,6 +1271,7 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    if (png_ptr->transformations & PNG_USER_TRANSFORM)
+    {
       if(png_ptr->read_user_transform_fn != NULL)
         (*(png_ptr->read_user_transform_fn)) /* user read transform function */
           (png_ptr,                    /* png_ptr */
@@ -1234,6 +1283,15 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
              /*  png_byte channels;          number of channels (1-4) */
              /*  png_byte pixel_depth;       bits per pixel (depth*channels) */
            png_ptr->row_buf + 1);      /* start of pixel data for row */
+      if(png_ptr->user_transform_depth)
+         png_ptr->row_info.bit_depth = png_ptr->user_transform_depth;
+      if(png_ptr->user_transform_channels)
+         png_ptr->row_info.channels = png_ptr->user_transform_channels;
+      png_ptr->row_info.pixel_depth = (png_byte)(png_ptr->row_info.bit_depth *
+         png_ptr->row_info.channels);
+      png_ptr->row_info.rowbytes = (png_ptr->row_info.width * 
+         png_ptr->row_info.pixel_depth+7)>>3;
+   }
 #endif
 
 }
@@ -1737,7 +1795,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             *(--dp) = lo_filler;
             row_info->channels = 2;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 2;
+            row_info->rowbytes = row_width * 4;
          }
          /* This changes the data from GG to XXGG */
          else
@@ -1752,8 +1810,8 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
                *(--dp) = lo_filler;
             }
             row_info->channels = 2;
-            row_info->pixel_depth = 16;
-            row_info->rowbytes = row_width * 2;
+            row_info->pixel_depth = 32;
+            row_info->rowbytes = row_width * 4;
          }
       }
    } /* COLOR_TYPE == GRAY */
@@ -1817,7 +1875,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             *(--dp) = lo_filler;
             row_info->channels = 4;
             row_info->pixel_depth = 64;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = row_width * 8;
          }
          /* This changes the data from RRGGBB to XXRRGGBB */
          else
@@ -1837,7 +1895,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             }
             row_info->channels = 4;
             row_info->pixel_depth = 64;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = row_width * 8;
          }
       }
    } /* COLOR_TYPE == RGB */
@@ -1869,8 +1927,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
             {
                *(dp--) = *sp;
                *(dp--) = *sp;
-               *(dp--) = *sp;
-               sp--;
+               *(dp--) = *(sp--);
             }
          }
          else
@@ -1883,10 +1940,8 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
                *(dp--) = *(sp - 1);
                *(dp--) = *sp;
                *(dp--) = *(sp - 1);
-               *(dp--) = *sp;
-               *(dp--) = *(sp - 1);
-               sp--;
-               sp--;
+               *(dp--) = *(sp--);
+               *(dp--) = *(sp--);
             }
          }
       }
@@ -1901,8 +1956,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
                *(dp--) = *(sp--);
                *(dp--) = *sp;
                *(dp--) = *sp;
-               *(dp--) = *sp;
-               sp--;
+               *(dp--) = *(sp--);
             }
          }
          else
@@ -1917,10 +1971,8 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
                *(dp--) = *(sp - 1);
                *(dp--) = *sp;
                *(dp--) = *(sp - 1);
-               *(dp--) = *sp;
-               *(dp--) = *(sp - 1);
-               sp--;
-               sp--;
+               *(dp--) = *(sp--);
+               *(dp--) = *(sp--);
             }
          }
       }

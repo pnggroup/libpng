@@ -35,45 +35,45 @@ $ if f$search("SYS$SYSTEM:MMS.EXE").eqs.""
 $  then
 $   dele pngtest.obj;*
 $   CALL MAKE png.OBJ "cc ''CCOPT' png" -
-                png.c png.h pngconf.h   
+	png.c png.h pngconf.h   
 $   CALL MAKE pngpread.OBJ "cc ''CCOPT' pngpread" -
 					 pngpread.c png.h pngconf.h
 $   CALL MAKE pngset.OBJ "cc ''CCOPT' pngset" -
-                pngset.c png.h pngconf.h
+	pngset.c png.h pngconf.h
 $   CALL MAKE pngget.OBJ "cc ''CCOPT' pngget" -
-                pngget.c png.h pngconf.h
+	pngget.c png.h pngconf.h
 $   CALL MAKE pngread.OBJ "cc ''CCOPT' pngread" -
-                pngread.c png.h pngconf.h
+	pngread.c png.h pngconf.h
 $   CALL MAKE pngpread.OBJ "cc ''CCOPT' pngpread" -
 					 pngpread.c png.h pngconf.h
 $   CALL MAKE pngrtran.OBJ "cc ''CCOPT' pngrtran" -
-                pngrtran.c png.h pngconf.h
+	pngrtran.c png.h pngconf.h
 $   CALL MAKE pngrutil.OBJ "cc ''CCOPT' pngrutil" -
-                pngrutil.c png.h pngconf.h
+	pngrutil.c png.h pngconf.h
 $   CALL MAKE pngerror.OBJ "cc ''CCOPT' pngerror" -
-                pngerror.c png.h pngconf.h
+	pngerror.c png.h pngconf.h
 $   CALL MAKE pngmem.OBJ "cc ''CCOPT' pngmem" -
-                pngmem.c png.h pngconf.h
+	pngmem.c png.h pngconf.h
 $   CALL MAKE pngrio.OBJ "cc ''CCOPT' pngrio" -
-                pngrio.c png.h pngconf.h
+	pngrio.c png.h pngconf.h
 $   CALL MAKE pngwio.OBJ "cc ''CCOPT' pngwio" -
-                pngwio.c png.h pngconf.h
+	pngwio.c png.h pngconf.h
 $   CALL MAKE pngtrans.OBJ "cc ''CCOPT' pngtrans" -
-                pngtrans.c png.h pngconf.h
+	pngtrans.c png.h pngconf.h
 $   CALL MAKE pngwrite.OBJ "cc ''CCOPT' pngwrite" -
-                pngwrite.c png.h pngconf.h
+	pngwrite.c png.h pngconf.h
 $   CALL MAKE pngwtran.OBJ "cc ''CCOPT' pngwtran" -
-                pngwtran.c png.h pngconf.h
+	pngwtran.c png.h pngconf.h
 $   CALL MAKE pngwutil.OBJ "cc ''CCOPT' pngwutil" -
-                pngwutil.c png.h pngconf.h
+	pngwutil.c png.h pngconf.h
 $   write sys$output "Building Libpng ..."
 $   CALL MAKE libpng.OLB "lib/crea libpng.olb *.obj" *.OBJ
 $   write sys$output "Building pngtest..."
 $   CALL MAKE pngtest.OBJ "cc ''CCOPT' pngtest" -
-                pngtest.c png.h pngconf.h
+	pngtest.c png.h pngconf.h
 $   call make pngtest.exe - 
-                "LINK pngtest,libpng.olb/lib,''zlibsrc'libgz.olb/lib" - 
-                pngtest.obj libpng.olb
+	"LINK pngtest,libpng.olb/lib,''zlibsrc'libgz.olb/lib" - 
+	pngtest.obj libpng.olb
 $   write sys$output "Testing Libpng..."
 $   run pngtest
 $  else

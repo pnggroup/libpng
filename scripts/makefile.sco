@@ -25,15 +25,15 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.3
+PNGMIN = 1.0.4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
-       pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-       pngwtran.o pngmem.o pngerror.o pngpread.o
+	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
+	pngwtran.o pngmem.o pngerror.o pngpread.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
@@ -49,10 +49,10 @@ libpng.a: $(OBJS)
 	$(RANLIB) $@
 
 libpng.so: libpng.so.$(PNGMAJ)
-	ln -s -f libpng.so.$(PNGMAJ) libpng.so
+	ln -f -s libpng.so.$(PNGMAJ) libpng.so
 
 libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -s -f libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+	ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
 
 libpng.so.$(PNGVER): $(OBJSDLL)
 	$(CC) -G  -Wl,-h,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
@@ -71,8 +71,8 @@ install: libpng.a libpng.so.$(PNGVER)
 	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
 	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -s -f libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -s -f libpng.so.$(PNGMAJ) libpng.so)
+	(cd $(LIBPATH); ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
+	 ln -f -s libpng.so.$(PNGMAJ) libpng.so)
 
 clean:
 	/bin/rm -f *.o libpng.a libpng.so* pngtest pngout.png

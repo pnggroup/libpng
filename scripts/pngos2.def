@@ -149,6 +149,9 @@ EXPORTS
   png_set_tIME
   png_get_tRNS
   png_set_tRNS
+  png_set_gray_1_2_4_to_8
+  png_set_tRNS_to_alpha
+  png_set_palette_to_rgb
 
   png_create_struct
   png_destroy_struct

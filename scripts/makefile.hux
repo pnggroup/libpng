@@ -1,4 +1,3 @@
-===========================================================================
 # makefile for libpng, HPUX (10.20 and 11.00)
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42
 # Copyright (C) 1999 Glenn Randers-Pehrson
@@ -17,36 +16,36 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 RANLIB=ranlib
 
 # where make install puts libpng.a and png.h
-prefix=/opt/libpng/
+prefix=/opt/libpng
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
-        pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-        pngwtran.o pngmem.o pngerror.o pngpread.o
+	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
+	pngwtran.o pngmem.o pngerror.o pngpread.o
 
 all: libpng.a pngtest
 
 libpng.a: $(OBJS)
-        ar rc $@  $(OBJS)
-        $(RANLIB) $@
+	ar rc $@  $(OBJS)
+	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a
-        $(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
-        ./pngtest
+	./pngtest
 
 install: libpng.a
-        -@mkdir $(prefix)/include
-        -@mkdir $(prefix)/lib
-        cp png.h $(prefix)/include
-        cp pngconf.h $(prefix)/include
-        chmod 644 $(prefix)/include/png.h
-        chmod 644 $(prefix)/include/pngconf.h
-        cp libpng.a $(prefix)/lib
-        chmod 644 $(prefix)/lib/libpng.a
+	-@mkdir $(prefix)/include
+	-@mkdir $(prefix)/lib
+	cp png.h $(prefix)/include
+	cp pngconf.h $(prefix)/include
+	chmod 644 $(prefix)/include/png.h
+	chmod 644 $(prefix)/include/pngconf.h
+	cp libpng.a $(prefix)/lib
+	chmod 644 $(prefix)/lib/libpng.a
 
 clean:
-        rm -f *.o libpng.a pngtest pngout.png
+	rm -f *.o libpng.a pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

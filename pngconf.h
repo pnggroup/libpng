@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.3 - January 14, 1999
+ * libpng 1.0.4 - September 17, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -54,25 +54,24 @@
  * prevent these from being compiled and used. #defining PNG_NO_STDIO
  * will also prevent these, plus will prevent the entire set of stdio
  * macros and functions (FILE *, printf, etc.) from being compiled and used,
- * unless PNG_DEBUG has been #defined.
+ * unless (PNG_DEBUG > 0) has been #defined.
  *
  * #define PNG_NO_CONSOLE_IO
  * #define PNG_NO_STDIO
  */
 
-#ifdef PNG_DEBUG
-#  if (PNG_DEBUG > 0)
-#    include <stdio.h>
-#  endif
-#else
 #  ifdef PNG_NO_STDIO
 #    ifndef PNG_NO_CONSOLE_IO
 #      define PNG_NO_CONSOLE_IO
 #    endif
+#    ifdef PNG_DEBUG
+#      if (PNG_DEBUG > 0)
+#        include <stdio.h>
+#      endif
+#    endif
 #  else
 #    include <stdio.h>
 #  endif
-#endif
 
 /* This macro protects us against machines that don't have function
  * prototypes (ie K&R style headers).  If your compiler does not handle
@@ -173,7 +172,7 @@ __dont__ include it again
 #endif
 
 /* Codewarrior on NT has linking problems without this. */
-#if defined(__MWERKS__) && defined(WIN32)
+#if (defined(__MWERKS__) && defined(WIN32)) || defined(__STDC__)
 #define PNG_ALWAYS_EXTERN
 #endif
 
@@ -339,6 +338,10 @@ __dont__ include it again
 #define PNG_READ_COMPOSITE_NODIV_SUPPORTED    /* well tested on Intel and SGI */
 #endif
 
+#ifndef PNG_NO_READ_EMPTY_PLTE
+#define PNG_READ_EMPTY_PLTE_SUPPORTED  /* useful for MNG applications */
+#endif
+
 #ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
 #ifndef PNG_NO_WRITE_SHIFT
 #define PNG_WRITE_SHIFT_SUPPORTED
@@ -384,6 +387,10 @@ __dont__ include it again
 #define PNG_WRITE_FLUSH_SUPPORTED
 #endif
 
+#ifndef PNG_NO_WRITE_EMPTY_PLTE
+#define PNG_WRITE_EMPTY_PLTE_SUPPORTED  /* useful for MNG applications */
+#endif
+
 #ifndef PNG_NO_STDIO
 #define PNG_TIME_RFC1123_SUPPORTED
 #endif
@@ -406,6 +413,10 @@ __dont__ include it again
  */
 #ifndef PNG_NO_EASY_ACCESS
 #define PNG_EASY_ACCESS_SUPPORTED
+#endif
+
+#ifndef PNG_NO_ASSEMBLER_CODE
+#define PNG_ASSEMBLER_CODE_SUPPORTED
 #endif
 
 /* These are currently experimental features, define them if you want */

@@ -1,53 +1,56 @@
 
-Libpng 1.0.3 - January 14, 1999
+Libpng 1.0.4 - September 17, 1999
 
 This is a public release of libpng, intended for use in production codes.
 
-Changes since the previous public release (1.0.2):
+Changes since the last public release (1.0.3):
 
-libpng-1.0.3:
-
-  Replaced and extended code that was removed from png_set_filler() in 1.0.1a.
-  Fixed a bug in png_do_filler() that made it fail to write filler bytes in
-    the left-most pixel of each row (Kevin Bracey).
-  Changed "static pngcharp tIME_string" to "static char tIME_string[30]"
-    in pngtest.c (Duncan Simpson).
-  Fixed a bug in pngtest.c that caused pngtest to try to write a tIME chunk
-    even when no tIME chunk was present in the source file.
-  Fixed a problem in pngrutil.c: gray_to_rgb didn't always work with 16-bit.
-  Fixed a problem in png_read_push_finish_row(), which would not skip some
-    passes that it should skip, for images that are less than 3 pixels high.
-  Interchanged the order of calls to png_do_swap() and png_do_shift()
-    in pngwtran.c (John Cromer).
-  Added #ifdef PNG_DEBUG/#endif surrounding use of PNG_DEBUG in png.h .
-  Changed "bad adaptive filter type" from error to warning in pngrutil.c .
-  Fixed a documentation error about default filtering with 8-bit indexed-color.
-  Separated the PNG_NO_STDIO macro into PNG_NO_STDIO and PNG_NO_CONSOLE_IO
-    (L. Peter Deutsch).
-  Added png_set_rgb_to_gray() and png_get_rgb_to_gray_status() functions.
-  Added png_get_copyright() and png_get_header_version() functions.
-  Revised comments on png_set_progressive_read_fn() in libpng.txt and example.c
-  Added information about debugging in libpng.txt and libpng.3 .
-  Changed "ln -sf" to "ln -s -f" in makefile.s2x, makefile.lnx, and makefile.sco.
-  Removed lines after Dynamic Dependencies" in makefile.aco .
-  Revised makefile.dec to make a shared library (Jeremie Petit).
-  Removed trailing blanks from all files. 
-  Removed misplaced #endif and #ifdef PNG_NO_EXTERN near the end of png.h
-  Added "if" tests to silence complaints about unused png_ptr in png.h and png.c
-  Changed "check_if_png" function in example.c to return true (nonzero) if PNG.
-  Changed libpng.txt to demonstrate png_sig_cmp() instead of png_check_sig()
-    which is obsolete.
-  Added makefile.hux, for Hewlett Packard HPUX 10.20 and 11.00 (Jim Rice)
-  Added a statement of Y2K compliance in png.h, libpng.1, and Y2KINFO.
+  Added check for PNG_READ_INTERLACE_SUPPORTED in pngread.c; issue a warning
+     if an attempt is made to read an interlaced image when it's not supported.
+  Added check if png_ptr->trans is defined before free'ing it in pngread.c
+  Modified the Y2K statement to include versions back to version 0.71
+  Fixed a bug in the check for valid IHDR bit_depth/color_types in pngrutil.c
+  Modified makefile.wat (added -zp8 flag, ".symbolic", changed some comments)
+  Replaced leading blanks with tab characters in makefile.hux
+  Changed "dworkin.wustl.edu" to "ccrc.wustl.edu" in various documents.
+  Changed (float)red and (float)green to (double)red, (double)green
+     in png_set_rgb_to_gray() to avoid "promotion" problems in AIX.
+  Fixed a bug in pngconf.h that omitted <stdio.h> when PNG_DEBUG==0 (K Bracey).
+  Reformatted libpng.3 and libpngpf.3 with proper fonts (script by J. vanZandt).
+  Updated documentation to refer to the PNG-1.2 specification.
+  Removed ansi2knr.c and left pointers to the latest source for ansi2knr.c
+    in makefile.knr, INSTALL, and README (L. Peter Deutsch)
+  Fixed bugs in calculation of the length of rowbytes when adding alpha
+    channels to 16-bit images, in pngrtran.c (Chris Nokleberg)
+  Added function png_set_user_transform_info() to store user_transform_ptr,
+    user_depth, and user_channels into the png_struct, and a function
+    png_get_user_transform_ptr() to retrieve the pointer (Chris Nokleberg)
+  Added function png_set_empty_plte_permitted() to make libpng useable
+    in MNG applications.
+  Corrected the typedef for png_free_ptr in png.h (Jesse Jones).
+  Correct gamma with srgb is 45455 instead of 45000 in pngrutil.c, to be
+    consistent with PNG-1.2, and allow variance of 500 before complaining.
+  Added assembler code contributed by Intel in file pngvcrd.c and modified
+    makefile.w32 to use it (Nirav Chhatrapati, INTEL Corporation, Gilles Vollant)
+  Define PNG_USE_PNGVCRD in makefile.w32, to get MMX assembler code.
+  Changed "ln -s -f" to "ln -f -s" in the makefiles to make Solaris happy.
+  Added makefile.beo for BEOS on X86, contributed by Sander Stok.
+  Replaced 2147483647L several places with PNG_MAX_UINT macro, defined in png.h
+  Changed leading blanks to tabs in all makefiles.
+  Made alternate versions of  png_set_expand() in pngrtran.c, namely
+    png_set_gray_1_2_4_to_8, png_set_palette_to_rgb, and png_set_tRNS_to_alpha
+    (Greg Roelofs, in "PNG: The Definitive Guide").
+  Relocated start of 'extern "C"' block in png.h so it doesn't include pngconf.h
+  Revised calculation of num_blocks in pngmem.c to avoid a potentially
+    negative shift distance, whose results are undefined in the C language.
+  Added a check in pngset.c to prevent writing multiple tIME chunks.
+  Added a check in pngwrite.c to detect invalid small window_bits sizes.
+  Added a demo read_user_transform_fn that examines the row filters in pngtest.c
+  Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
+  Made several minor corrections to pngtest.c
+  Changed "hptr += 16L" to "hptr = hptr + 16L" in pngmem.c for Turbo 3.0
 
 Send comments/corrections/commendations to
-png-implement@dworkin.wustl.edu or to randeg@alumni.rpi.edu
+png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
 
 Glenn R-P
-
-Send comments/corrections/commendations to
-png-implement@dworkin.wustl.edu or to randeg@alumni.rpi.edu
-
-Glenn Randers-Pehrson
-libpng maintainer
-PNG Development Group

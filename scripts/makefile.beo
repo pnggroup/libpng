@@ -1,44 +1,41 @@
-# makefile for libpng on Solaris 2.x with gcc
-# Contributed by William L. Sebok, based on makefile.lnx
+# makefile for libpng on BeOS x86 ELF with gcc
+# modified from makefile.lnx by Sander Stoks
 # Copyright (C) 1996, 1997 Andreas Dilger
-# Copyright (C) 1998 Greg Roelofs
+# Copyright (C) 1999 Greg Roelofs
 # For conditions of distribution and use, see copyright notice in png.h
 
 CC=gcc
 
-# The commands "CC" and "LD" must NOT refer to /usr/ucb/cc and /usr/ucb/ld.
-# If they do, you need to adjust your PATH environment variable.
-# The environment variable LD_LIBRARY_PATH should not be set at all.  If
-# it is, things are likely to break.
-
-# Where make install puts libpng.a, libpng.so*, and png.h
-prefix=/usr/local
-
 # Where the zlib library and include files are located
-# Changing these to ../zlib poses a security risk.  If you want
-# to have zlib in an adjacent directory, specify the full path instead of "..".
-#ZLIBLIB=../zlib
-#ZLIBINC=../zlib
-
 ZLIBLIB=/usr/local/lib
 ZLIBINC=/usr/local/include
+
+ALIGN=
+# For I-386:
+# ALIGN=-malign-loops=2 -malign-functions=2
 
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
-CFLAGS=-I$(ZLIBINC) -Wall -O3 \
-	# $(WARNMORE) -g -DPNG_DEBUG=5
-LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng -lz -lm
 
-#RANLIB=ranlib
-RANLIB=echo
+# On BeOS, -O1 is actually better than -O3.  This is a known bug but it's
+# still here in R4.5
+CFLAGS=-I$(ZLIBINC) -Wall -O1 -funroll-loops \
+	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
+# LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS=-L. -Wl,-soname=libpng.so.$(PNGMAJ) -L$(ZLIBLIB) -lz -lm
+
+RANLIB=ranlib
+#RANLIB=echo
 
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.4
+PNGMIN = 1.0.3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
+# where make install puts libpng.a, libpng.so*, and png.h
+prefix=/usr/local
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 
@@ -46,12 +43,9 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-OBJSDLL = $(OBJS:.o=.pic.o)
+OBJSDLL = $(OBJS)
 
-.SUFFIXES:      .c .o .pic.o
-
-.c.pic.o:
-	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
+.SUFFIXES:      .c .o
 
 all: libpng.a libpng.so pngtest
 
@@ -60,17 +54,19 @@ libpng.a: $(OBJS)
 	$(RANLIB) $@
 
 libpng.so: libpng.so.$(PNGMAJ)
-	ln -f -s libpng.so.$(PNGMAJ) libpng.so
+	ln -sf libpng.so.$(PNGMAJ) libpng.so
+	cp libpng.so* /boot/home/config/lib
 
 libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
 
 libpng.so.$(PNGVER): $(OBJSDLL)
-	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h libpng.so.$(PNGMAJ) \
-	 -o libpng.so.$(PNGVER) $(OBJSDLL) -lz
+	$(CC) -L$(ZLIBLIB) -lz -nostart -Wl,-soname,libpng.so.$(PNGMAJ) -o
+libpng.so.$(PNGVER) \
+	 $(OBJSDLL)
 
 pngtest: pngtest.o libpng.so
-	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
+	$(CC) -L$(ZLIBLIB) -lz -lpng -o pngtest pngtest.o
 
 test: pngtest
 	./pngtest
@@ -82,8 +78,8 @@ install: libpng.a libpng.so.$(PNGVER)
 	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
 	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -f -s libpng.so.$(PNGMAJ) libpng.so)
+	(cd $(LIBPATH); ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
+	 ln -sf libpng.so.$(PNGMAJ) libpng.so)
 
 clean:
 	/bin/rm -f *.o libpng.a libpng.so* pngtest pngout.png
@@ -105,5 +101,4 @@ pngwrite.o pngwrite.pic.o: png.h pngconf.h
 pngwtran.o pngwtran.pic.o: png.h pngconf.h
 pngwutil.o pngwutil.pic.o: png.h pngconf.h
 pngpread.o pngpread.pic.o: png.h pngconf.h
-
 pngtest.o: png.h pngconf.h

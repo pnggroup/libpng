@@ -386,4 +386,57 @@ version 1.0.2a [January 6, 1999]
     which is obsolete.
 version 1.0.3 [January 14, 1999]
   Added makefile.hux, for Hewlett Packard HPUX 10.20 and 11.00 (Jim Rice)
-  Added a statement of Y2K compliance in png.h, libpng.1, and Y2KINFO.
+  Added a statement of Y2K compliance in png.h, libpng.3, and Y2KINFO.
+version 1.0.3a [August 12, 1999]
+  Added check for PNG_READ_INTERLACE_SUPPORTED in pngread.c; issue a warning
+     if an attempt is made to read an interlaced image when it's not supported.
+  Added check if png_ptr->trans is defined before free'ing it in pngread.c
+  Modified the Y2K statement to include versions back to version 0.71
+  Fixed a bug in the check for valid IHDR bit_depth/color_types in pngrutil.c
+  Modified makefile.wat (added -zp8 flag, ".symbolic", changed some comments)
+  Replaced leading blanks with tab characters in makefile.hux
+  Changed "dworkin.wustl.edu" to "ccrc.wustl.edu" in various documents.
+  Changed (float)red and (float)green to (double)red, (double)green
+     in png_set_rgb_to_gray() to avoid "promotion" problems in AIX.
+  Fixed a bug in pngconf.h that omitted <stdio.h> when PNG_DEBUG==0 (K Bracey).
+  Reformatted libpng.3 and libpngpf.3 with proper fonts (script by J. vanZandt).
+  Updated documentation to refer to the PNG-1.2 specification.
+  Removed ansi2knr.c and left pointers to the latest source for ansi2knr.c
+    in makefile.knr, INSTALL, and README (L. Peter Deutsch)
+  Fixed bugs in calculation of the length of rowbytes when adding alpha
+    channels to 16-bit images, in pngrtran.c (Chris Nokleberg)
+  Added function png_set_user_transform_info() to store user_transform_ptr,
+    user_depth, and user_channels into the png_struct, and a function
+    png_get_user_transform_ptr() to retrieve the pointer (Chris Nokleberg)
+  Added function png_set_empty_plte_permitted() to make libpng useable
+    in MNG applications.
+  Corrected the typedef for png_free_ptr in png.h (Jesse Jones).
+  Correct gamma with srgb is 45455 instead of 45000 in pngrutil.c, to be
+    consistent with PNG-1.2, and allow variance of 500 before complaining.
+  Added assembler code contributed by Intel in file pngvcrd.c and modified
+    makefile.w32 to use it (Nirav Chhatrapati, INTEL Corporation, Gilles Vollant)
+  Changed "ln -s -f" to "ln -f -s" in the makefiles to make Solaris happy.
+  Added some aliases for png_set_expand() in pngrtran.c, namely
+    png_set_expand_PLTE(), png_set_expand_depth(), and png_set_expand_tRNS()
+    (Greg Roelofs, in "PNG: The Definitive Guide").
+  Added makefile.beo for BEOS on X86, contributed by Sander Stok.
+version 1.0.3b [August 26, 1999]
+  Replaced 2147483647L several places with PNG_MAX_UINT macro, defined in png.h
+  Changed leading blanks to tabs in all makefiles.
+  Define PNG_USE_PNGVCRD in makefile.w32, to get MMX assembler code.
+  Made alternate versions of  png_set_expand() in pngrtran.c, namely
+    png_set_gray_1_2_4_to_8, png_set_palette_to_rgb, and png_set_tRNS_to_alpha
+    (Greg Roelofs, in "PNG: The Definitive Guide").  Deleted the 1.0.3a aliases.
+  Relocated start of 'extern "C"' block in png.h so it doesn't include pngconf.h
+  Revised calculation of num_blocks in pngmem.c to avoid a potentially
+    negative shift distance, whose results are undefined in the C language.
+  Added a check in pngset.c to prevent writing multiple tIME chunks.
+  Added a check in pngwrite.c to detect invalid small window_bits sizes.
+version 1.0.3d [September 4, 1999]
+  Fixed type casting of igamma in pngrutil.c
+  Added new png_expand functions to scripts/pngdef.pas and pngos2.def
+  Added a demo read_user_transform_fn that examines the row filters in pngtest.c
+version 1.0.4 [September 17, 1999]
+  Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
+  Delete #define PNG_INTERNAL and include "png.h" from pngasmrd.h
+  Made several minor corrections to pngtest.c

@@ -151,7 +151,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* tell libpng to strip 16 bit/color files down to 8 bits/color */
    png_set_strip_16(png_ptr);
 
-   /* Strip alpha bytes from the input data without combining with th
+   /* Strip alpha bytes from the input data without combining with the
     * background (not recommended).
     */
    png_set_strip_alpha(png_ptr);

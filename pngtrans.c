@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 1.0.3 - January 14, 1999
+ * libpng 1.0.4 - September 17, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -570,3 +570,26 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 }
 #endif /* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */
 
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+void
+png_set_user_transform_info(png_structp png_ptr, png_voidp
+   user_transform_ptr, int user_transform_depth, int user_transform_channels)
+{
+   png_debug(1, "in png_set_user_transform_info\n");
+   png_ptr->user_transform_ptr = user_transform_ptr;
+   png_ptr->user_transform_depth = user_transform_depth;
+   png_ptr->user_transform_channels = user_transform_channels;
+}
+
+/* This function returns a pointer to the user_transform_ptr associated with
+ * the user transform functions.  The application should free any memory
+ * associated with this pointer before png_write_destroy and png_read_destroy
+ * are called.
+ */
+png_voidp
+png_get_user_transform_ptr(png_structp png_ptr)
+{
+   return ((png_voidp)png_ptr->user_transform_ptr);
+}
+#endif

@@ -1,4 +1,4 @@
-README for libpng 1.0.3 - January 14, 1999 (shared library 2.1)
+README for libpng 1.0.4 - September 17, 1999 (shared library 2.1)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -49,7 +49,7 @@ to set different actions based on whether the CRC error occurred in a
 critical or an ancillary chunk.
 
 The changes made to the library, and bugs fixed are based on discussions
-on the PNG implementation mailing list <png-implement@dworking.wustl.edu>
+on the PNG implementation mailing list <png-implement@ccrc.wustl.edu>
 and not on material submitted to Guy.
 
 For a detailed description on using libpng, read libpng.txt.  For
@@ -98,8 +98,8 @@ fix.  Please mention "libpng" somewhere in the subject line.  Thanks.
 This release was created and will be supported by myself (of course
 based in a large way on Guy's and Andreas' earlier work), and the PNG group.
 
-randeg@alumni.rpi.edu
-png-implement@dworkin.wustl.edu
+randeg@alum.rpi.edu
+png-implement@ccrc.wustl.edu
 
 You can't reach Guy, the original libpng author, at the addresses
 given in previous versions of this document.  He and Andreas will read mail
@@ -108,7 +108,7 @@ addressed to the png-implement list, however.
 Please do not send general questions about PNG.  Send them to
 the address in the specification (png-group@w3.org).  At the same
 time, please do not send libpng questions to that address, send them to me
-or to png-implement@dworkin.wustl.edu.  I'll
+or to png-implement@ccrc.wustl.edu.  I'll
 get them in the end anyway.  If you have a question about something
 in the PNG specification that is related to using libpng, send it
 to me.  Send me any questions that start with "I was using libpng,
@@ -126,8 +126,6 @@ Files in this distribution:
       CHANGES       =>  Description of changes between libpng versions
       README        =>  This file
       TODO          =>  Things not implemented in the current library
-      ansi2knr.1    =>  Manual page for ansi2knr
-      ansi2knr.c    =>  Converts files to K&R style function declarations
       build.bat     =>  MS-DOS batch file for Borland compiler
       descrip.mms   =>  VMS project file
       example.c     =>  Example code for using libpng functions
@@ -155,38 +153,42 @@ Files in this distribution:
       pngwtran.c    =>  Write data transformations
       pngwutil.c    =>  Write utility functions
       scripts       =>  Directory containing scripts for building libpng:
-        descrip.mms   =>  VMS makefile for MMS or MMK
-        makefile.std  =>  Generic UNIX makefile
-        makefile.knr  =>  Archaic UNIX Makefile that converts files with ansi2knr
-        makefile.dec  =>  DEC Alpha UNIX makefile
-        makefile.hux  =>  HPUX (10.20 and 11.00) makefile
-        makefile.sgi  =>  Silicon Graphics IRIX makefile
-        makefile.sun  =>  Sun makefile
-        makefile.s2x  =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0)
-        makefile.lnx  =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0)
-        makefile.mip  =>  MIPS makefile
-        makefile.aco  =>  Acorn makefile
-        makefile.ama  =>  Amiga makefile
-        smakefile.ppc =>  AMIGA smakefile for SAS C V6.58/7.00 PPC compiler
-                          (Requires SCOPTIONS, copied from scripts/SCOPTIONS.ppc)
-        makefile.atr  =>  Atari makefile
-        makefile.bor  =>  Borland makefile
-        build.bat     =>  MS-DOS batch file for Borland compiler
-        makefile.dj2  =>  DJGPP 2 makefile
-        makefile.msc  =>  Microsoft C makefile
-        makefile.w32  =>  makefile for Microsoft Visual C++ 4.0 and later
-        makefile.tc3  =>  Turbo C 3.0 makefile
-        makefile.os2  =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
-        makefile.wat  =>  Watcom 10a+ Makefile, 32-bit flat memory model
-        pngos2.def    =>  OS/2 module definition file used by makefile.os2
-        makevms.com   =>  VMS build script
-        pngdll.mak    =>  To make a png32bd.dll with Borland C++ 4.5
-        pngdef.pas    =>  Defines for a png32bd.dll with Borland C++ 4.5
+        descrip.mms   => VMS makefile for MMS or MMK
+        makefile.std  => Generic UNIX makefile
+        makefile.knr  => Archaic UNIX Makefile that converts files with ansi2knr
+                        (Requires ansi2knr.c from ftp://ftp.cs.wisc.edu/ghost)
+        makefile.dec  => DEC Alpha UNIX makefile
+        makefile.hux  => HPUX (10.20 and 11.00) makefile
+        makefile.sgi  => Silicon Graphics IRIX makefile
+        makefile.sun  => Sun makefile
+        makefile.s2x  => Solaris 2.X makefile (gcc, creates libpng.so.2.1.0)
+        makefile.lnx  => Linux/ELF makefile (gcc, creates libpng.so.2.1.0)
+        makefile.sco  => For SCO OSr5  ELF and Unixware 7 with Native cc
+        makefile.mip  => MIPS makefile
+        makefile.aco  => Acorn makefile
+        makefile.ama  => Amiga makefile
+        smakefile.ppc => AMIGA smakefile for SAS C V6.58/7.00 PPC compiler
+                         (Requires SCOPTIONS, copied from scripts/SCOPTIONS.ppc)
+        makefile.atr  => Atari makefile
+        makefile.beo  => BEOS makefile for X86
+        makefile.bor  => Borland makefile
+        build.bat     => MS-DOS batch file for Borland compiler
+        makefile.dj2  => DJGPP 2 makefile
+        makefile.msc  => Microsoft C makefile
+        makefile.w32  => makefile for Microsoft Visual C++ 4.0 and later
+        makefile.tc3  => Turbo C 3.0 makefile
+        makefile.os2  => OS/2 Makefile (gcc and emx, requires pngos2.def)
+        pngos2.def    => OS/2 module definition file used by makefile.os2
+        makefile.wat  => Watcom 10a+ Makefile, 32-bit flat memory model
+        makevms.com   => VMS build script
+        pngdll.mak    => To make a png32bd.dll with Borland C++ 4.5
+        pngdef.pas    => Defines for a png32bd.dll with Borland C++ 4.5
+        SCOPTIONS.ppc => Used with smakefile.ppc
 
 Good luck, and happy coding.
 
 -Glenn Randers-Pehrson
- Internet: randeg@alumni.rpi.edu
+ Internet: randeg@alum.rpi.edu
  Web: http://www.rpi.edu/~randeg/index.html
 
 -Andreas Eric Dilger

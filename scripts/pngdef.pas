@@ -3,7 +3,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.3';
+  PNG_LIBPNG_VER_STRING = '1.0.3b';
   PNG_LIBPNG_VER        =  10001;
 
 type
@@ -475,6 +475,8 @@ procedure png_set_gAMA(png_ptr: png_structp; info_ptr: png_infop;
 procedure png_set_gamma(png_ptr: png_structp; screen_gamma,
              default_file_gamma: double);
              stdcall;
+procedure png_set_gray_1_2_4_to_8(png_ptr: png_structp);
+             stdcall;
 procedure png_set_gray_to_rgb(png_ptr: png_structp);
              stdcall;
 procedure png_set_hIST(png_ptr: png_structp; info_ptr: png_infop;
@@ -488,6 +490,8 @@ procedure png_set_invert_mono(png_ptr: png_structp);
              stdcall;
 procedure png_set_oFFs(png_ptr: png_structp; info_ptr: png_infop;
              offset_x, offset_y: png_uint_32; unit_type: int);
+             stdcall;
+procedure png_set_palette_to_rgb(png_ptr: png_structp);
              stdcall;
 procedure png_set_pCAL(png_ptr: png_structp; info_ptr: png_infop;
              purpose: png_charp; X0, X1: png_int_32;
@@ -545,6 +549,8 @@ procedure png_set_tIME(png_ptr: png_structp; info_ptr: png_infop;
 procedure png_set_tRNS(png_ptr: png_structp; info_ptr: png_infop;
              trans: png_bytep; num_trans: int;
              trans_values: png_color_16p);
+             stdcall;
+procedure png_set_tRNS_to_alpha(png_ptr: png_structp);
              stdcall;
 procedure png_set_text(png_ptr: png_structp; info_ptr: png_infop;
              text_ptr: png_textp; num_text: int);

@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.3 - January 14, 1999
+ * libpng 1.0.4 - September 17, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -157,8 +157,9 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
                ret = NULL;
             }
 
-            num_blocks = (int)(1 << (png_ptr->zlib_window_bits - 14));
-            if (num_blocks < 1)
+            if(png_ptr->zlib_window_bits > 14)
+               num_blocks = (int)(1 << (png_ptr->zlib_window_bits - 14));
+            else
                num_blocks = 1;
             if (png_ptr->zlib_mem_level >= 7)
                num_blocks += (int)(1 << (png_ptr->zlib_mem_level - 7));
@@ -192,12 +193,12 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
             if ((png_size_t)hptr & 0xf)
             {
                hptr = (png_byte huge *)((long)(hptr) & 0xfffffff0L);
-               hptr += 16L;
+               hptr = hptr + 16L;  /* "hptr += 16L" fails on Turbo C++ 3.0 */
             }
             for (i = 0; i < num_blocks; i++)
             {
                png_ptr->offset_table_ptr[i] = (png_bytep)hptr;
-               hptr += (png_uint_32)65536L;
+               hptr = hptr + (png_uint_32)65536L;  /* "+=" fails on TC++3.0 */
             }
 
             png_ptr->offset_table_number = num_blocks;

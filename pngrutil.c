@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.3 - January 14, 1999
+ * libpng 1.0.3b - August 26, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -13,6 +13,10 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+#include "pngasmrd.h"
+#endif
 
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
@@ -165,8 +169,8 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    interlace_type = buf[12];
 
    /* check for width and height valid values */
-   if (width == 0 || width > (png_uint_32)2147483647L || height == 0 ||
-        height > (png_uint_32)2147483647L)
+   if (width == 0 || width > PNG_MAX_UINT || height == 0 ||
+        height > PNG_MAX_UINT)
       png_error(png_ptr, "Invalid image size in IHDR");
 
    /* check other values */
@@ -178,7 +182,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       color_type == 5 || color_type > 6)
       png_error(png_ptr, "Invalid color type in IHDR");
 
-   if ((color_type == PNG_COLOR_TYPE_PALETTE && bit_depth) > 8 ||
+   if (((color_type == PNG_COLOR_TYPE_PALETTE) && bit_depth > 8) ||
        ((color_type == PNG_COLOR_TYPE_RGB ||
          color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
          color_type == PNG_COLOR_TYPE_RGB_ALPHA) && bit_depth < 8))
@@ -420,7 +424,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
-      if(igamma != (png_uint_32)45000L)
+      if(fabs((float)igamma - 45455.)>500.)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -692,7 +696,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
    if ((info_ptr->valid & PNG_INFO_gAMA))
-      if((png_uint_32)(png_ptr->gamma*(float)100000.+.5) != (png_uint_32)45000L)
+      if(fabs((png_ptr->gamma*(float)100000.+.5)-45455.) > 500.)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -871,9 +875,21 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
       png_ptr->background.index = buf[0];
-      png_ptr->background.red = (png_uint_16)png_ptr->palette[buf[0]].red;
-      png_ptr->background.green = (png_uint_16)png_ptr->palette[buf[0]].green;
-      png_ptr->background.blue = (png_uint_16)png_ptr->palette[buf[0]].blue;
+      if(info_ptr->num_palette)
+      {
+          if(buf[0] > info_ptr->num_palette)
+          {
+             png_warning(png_ptr, "Incorrect bKGD chunk index value");
+             png_crc_finish(png_ptr, length);
+             return;
+          }
+          png_ptr->background.red =
+             (png_uint_16)png_ptr->palette[buf[0]].red;
+          png_ptr->background.green =
+             (png_uint_16)png_ptr->palette[buf[0]].green;
+          png_ptr->background.blue =
+             (png_uint_16)png_ptr->palette[buf[0]].blue;
+      }
    }
    else if (!(png_ptr->color_type & PNG_COLOR_MASK_COLOR)) /* GRAY */
    {
@@ -1480,8 +1496,12 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    to any alpha or transparency value associated with the pixel.  If
    you want all pixels to be combined, pass 0xff (255) in mask.  */
 void
-png_combine_row(png_structp png_ptr, png_bytep row,
-   int mask)
+#ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+png_combine_row_c
+#else
+png_combine_row
+#endif /* PNG_HAVE_ASSEMBLER_COMBINE_ROW */
+   (png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1,"in png_combine_row\n");
    if (mask == 0xff)
@@ -1684,7 +1704,12 @@ png_combine_row(png_structp png_ptr, png_bytep row,
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED)
 void
-png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
+#ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
+png_do_read_interlace_c
+#else
+png_do_read_interlace
+#endif /* PNG_HAVE_ASSEMBLER_READ_INTERLACE */
+   (png_row_infop row_info, png_bytep row, int pass,
    png_uint_32 transformations)
 {
    png_debug(1,"in png_do_read_interlace\n");
@@ -1894,13 +1919,16 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 #endif
 
 void
-png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
+#ifdef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+png_read_filter_row_c
+#else
+png_read_filter_row
+#endif /* PNG_HAVE_ASSEMBLER_READ_FILTER_ROW */
+   (png_structp png_ptr, png_row_infop row_info, png_bytep row,
    png_bytep prev_row, int filter)
 {
    png_debug(1, "in png_read_filter_row\n");
    png_debug2(2,"row = %d, filter = %d\n", png_ptr->row_number, filter);
-
-
    switch (filter)
    {
       case PNG_FILTER_VALUE_NONE:

@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.3 - January 14, 1999
+ * libpng 1.0.4 - September 17, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -284,17 +284,21 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
    png_byte buf[3];
 
    png_debug(1, "in png_write_PLTE\n");
-   if (num_pal == 0 || num_pal > 256)
-   {
-      if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-      {
-         png_error(png_ptr, "Invalid number of colors in palette");
-      }
-      else
-      {
-         png_warning(png_ptr, "Invalid number of colors in palette");
-         return;
-      }
+   if ((
+#ifdef PNG_WRITE_EMPTY_PLTE_SUPPORTED
+        !png_ptr->empty_plte_permitted &&
+#endif
+        num_pal == 0) || num_pal > 256)
+     {
+       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+         {
+           png_error(png_ptr, "Invalid number of colors in palette");
+         }
+       else
+         {
+           png_warning(png_ptr, "Invalid number of colors in palette");
+           return;
+         }
    }
 
    png_ptr->num_palette = (png_uint_16)num_pal;
@@ -524,7 +528,12 @@ png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
    png_debug(1, "in png_write_bKGD\n");
    if (color_type == PNG_COLOR_TYPE_PALETTE)
    {
-      if (back->index > png_ptr->num_palette)
+      if (
+#ifdef PNG_WRITE_EMPTY_PLTE_SUPPORTED
+          (!png_ptr->empty_plte_permitted ||
+          (png_ptr->empty_plte_permitted && png_ptr->num_palette)) &&
+#endif
+         back->index > png_ptr->num_palette)
       {
          png_warning(png_ptr, "Invalid background palette index");
          return;
@@ -713,6 +722,11 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
 
    /* make sure we include the 0 after the key */
    png_write_chunk_start(png_ptr, png_tEXt, (png_uint_32)key_len+text_len+1);
+   /*
+    * We leave it to the application to meet PNG-1.0 requirements on the
+    * contents of the text.  PNG-1.0 through PNG-1.2 discourage the use of
+    * any non-Latin-1 characters except for NEWLINE.  ISO PNG will forbid them.
+    */
    png_write_chunk_data(png_ptr, (png_bytep)new_key, key_len + 1);
    if (text_len)
       png_write_chunk_data(png_ptr, (png_bytep)text, text_len);
