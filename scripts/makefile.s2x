@@ -7,10 +7,13 @@
 CC=gcc
 
 # Where the zlib library and include files are located
-# ZLIBLIB=/usr/local/lib
-# ZLIBINC=/usr/local/include
-ZLIBLIB=../zlib
-ZLIBINC=../zlib
+# Changing these to ../zlib poses a security risk.  If you want
+# to have zlib in an adjacent directory, specify the full path instead of "..".
+#ZLIBLIB=../zlib
+#ZLIBINC=../zlib
+
+ZLIBLIB=/usr/local/lib
+ZLIBINC=/usr/local/include
 
 
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \

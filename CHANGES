@@ -281,3 +281,8 @@ version 1.0.0a [March 9, 1998]
 version 1.0.0b [March 13, 1998]
    Quieted compiler complaints about two empty "for" loops in pngrutil.c
    Minor changes to makefile.s2x
+   Removed #ifdef/#endif around a png_free() in pngread.c
+version 1.0.1 [March 14, 1998]
+   Changes makefile.s2x to reduce security risk of using a relative pathname
+   Fixed some typos in the documentation (Greg).
+   Fixed a problem with value of "channels" returned by png_read_update_info()

@@ -1,12 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.0b
+ * libpng 1.0.1
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 13, 1998
+ * March 15, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -665,7 +665,6 @@ png_init_read_transformations(png_structp png_ptr)
         if (png_ptr->transformations & PNG_INVERT_ALPHA)
         {
 #if defined(PNG_READ_EXPAND_SUPPORTED)
-           /* GRR BUG #1:  was (png_ptr->transformations & !PNG_EXPAND) */
            if (!(png_ptr->transformations & PNG_EXPAND))
 #endif
            {
@@ -715,11 +714,6 @@ png_init_read_transformations(png_structp png_ptr)
             {
                double g, gs;
 
-/*
-               GRR BUG #3:  inconsistent with handling of full RGBA below
-               g = 1.0 / png_ptr->background_gamma;
-               gs = 1.0 / (png_ptr->background_gamma * png_ptr->screen_gamma);
- */
                switch (png_ptr->background_gamma_type)
                {
                   case PNG_BACKGROUND_GAMMA_SCREEN:
@@ -740,17 +734,7 @@ png_init_read_transformations(png_structp png_ptr)
                      gs = 1.0;   /* back */
                }
 
-               if (
-/*
-                   GRR BUG #2:  This creates self-inconsistent images--fully
-                     transparent and fully opaque look fine, but translucent
-                     pixels are wrong (too bright if XV's code can be trusted).
-                     Commenting it out makes an internally self-consistent
-                     image, but still not consistent with RGBA version of same
-                     thing (again, too bright in XV).
-                   png_ptr->background_gamma_type==PNG_BACKGROUND_GAMMA_SCREEN||
- */
-                   fabs(gs - 1.0) < PNG_GAMMA_THRESHOLD)
+               if ( fabs(gs - 1.0) < PNG_GAMMA_THRESHOLD)
                {
                   back.red   = (png_byte)png_ptr->background.red;
                   back.green = (png_byte)png_ptr->background.green;
@@ -1005,8 +989,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
-   if ((png_ptr->transformations & PNG_GRAY_TO_RGB) &&
-      !(info_ptr->color_type & PNG_COLOR_MASK_COLOR))
+   if (png_ptr->transformations & PNG_GRAY_TO_RGB)
       info_ptr->color_type |= PNG_COLOR_MASK_COLOR;
 #endif
 
@@ -1018,12 +1001,8 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       info_ptr->channels = 1;
 
 #if defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
-   if ((png_ptr->transformations & PNG_STRIP_ALPHA) &&
-       info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
-   {
-      info_ptr->channels--;
+   if (png_ptr->transformations & PNG_STRIP_ALPHA)
       info_ptr->color_type &= ~PNG_COLOR_MASK_ALPHA;
-   }
 #endif
 
 #if defined(PNG_READ_FILLER_SUPPORTED)

@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.0b
+ * libpng 1.0.1
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 13, 1998
+ * March 15, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -123,7 +123,7 @@ png_read_init(png_structp png_ptr)
 }
 
 /* Read the information before the actual image data.  This has been
- * changed in v0.90 to allow reading a file which already has the magic
+ * changed in v0.90 to allow reading a file that already has the magic
  * bytes read from the stream.  You can tell libpng how many bytes have
  * been read from the beginning of the stream (up to the maxumum of 8)
  * via png_set_sig_bytes(), and we will only check the remaining bytes

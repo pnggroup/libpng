@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.0.0b
+ * libpng 1.0.1
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * March 13, 1998
+ * March 15, 1998
  *
  * Note about libpng version numbers:
  *
@@ -37,7 +37,7 @@
  *    used for changes in backward compatibility, as it is intended.
  *    The PNG_PNGLIB_VER macro, which is not used within libpng but
  *    is available for applications, is an unsigned integer of the form
- *    xyyzz corresponding to the source version x.y.z (leading zeros in y and z)
+ *    xyyzz corresponding to the source version x.y.z (leading zeros in y and z).
  *    
  *
  * See libpng.txt for more information.  The PNG specification is available
@@ -118,13 +118,13 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.0b"
+#define PNG_LIBPNG_VER_STRING "1.0.1"
 
-/* Gareful here.  At one time, Guy wanted to use 082, but that would be octal.
- * We must not include leading zeroes.
+/* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
+ * We must not include leading zeros.
  * Versions 0.7 through 1.0.0 were in the range 0 to 100 here (only
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
- * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z-bugfix*/
+ * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=bugfix */
 #define PNG_LIBPNG_VER    10001  /* 1.0.1 */
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */

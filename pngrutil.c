@@ -1,12 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.0b
+ * libpng 1.0.1
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 13, 1998
+ * March 15, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -1114,7 +1114,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    for (buf = units; *buf != 0x00; buf++)
-   /* Empty loop to move past the units string. */ ;
+      /* Empty loop to move past the units string. */ ;
 
    png_debug(3, "Allocating pCAL parameters array\n");
    params = (png_charpp)png_malloc(png_ptr, (png_uint_32)(nparams
@@ -1127,7 +1127,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
       png_debug1(3, "Reading pCAL parameter %d\n", i);
       for (params[i] = buf; *buf != 0x00 && buf <= endptr; buf++)
-      /* Empty loop to move past each parameter string */ ;
+         /* Empty loop to move past each parameter string */ ;
 
       /* Make sure we haven't run out of data yet */
       if (buf > endptr)
