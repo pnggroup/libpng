@@ -13,3 +13,11 @@ Known bugs in libpng-1.0.10
    compile pnggccrd.c (Richard Kettlewell).
 
    STATUS: fixed in libpng-1.0.11beta1.
+
+3. April 5, 2001: The prototypes don't match several functions.
+
+   Functions png_info_init, png_zalloc, and several others have PNGAPI
+   in the C functions but not in the prototypes in png.h.  The functions
+   involved are all either deprecated or intended only for internal use.
+
+   STATUS: PNGAPI was removed from the C code in libpng-1.0.11beta2.

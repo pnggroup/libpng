@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.11beta1 - April 4, 2001
+ * libpng 1.0.11beta2 - April 11, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1185,10 +1185,15 @@ typedef z_stream FAR *  png_zstreamp;
 #    endif
 #    define PNGAPI __cdecl
 #  else
-#    if 0 /* ... other platforms, with other meanings */
+#    if (defined(__IBMC__) || defined(IBMCPP__)) && defined(__OS2__)
+#      define PNGAPI _System
+#      define PNG_IMPEXP
 #    else
-#       define PNGAPI
-#       define PNG_IMPEXP
+#      if 0 /* ... other platforms, with other meanings */
+#      else
+#        define PNGAPI
+#        define PNG_IMPEXP
+#      endif
 #    endif
 #  endif
 #endif

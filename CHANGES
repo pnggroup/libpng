@@ -914,10 +914,13 @@ version 1.0.10rc1 [March 23, 2001]
 version 1.0.10 [March 30, 2001]
   Deleted extraneous space (introduced in 1.0.9) from line 42 of makefile.cygwin
   Added beos project files (Chris Herborth)
-version 1.0.11beta1 [April 4, 2001]
+version 1.0.11beta1 [April 3, 2001]
   Added type casts on several png_malloc() calls (Dimitri Papadapoulos).
   Removed a no-longer needed AIX work-around from pngconf.h
   Changed several "//" single-line comments to C-style in pnggccrd.c
+version 1.0.11beta2 [April 11, 2001]
+  Removed PNGAPI from several functions whose prototypes did not have PNGAPI.
+  Updated scripts/pngos2.def
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

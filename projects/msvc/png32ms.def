@@ -6,7 +6,7 @@ LIBRARY
 DESCRIPTION "PNG image compression library for Windows"
 
 EXPORTS
-;Version 1.0.11beta1
+;Version 1.0.11beta2
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -83,7 +83,7 @@ EXPORTS
   png_read_end    @74
   png_read_image    @75
   png_read_info    @76
-  png_read_init    @77
+  png_read_init    @77 ; deprecated
   png_read_png    @78
   png_read_row    @79
   png_read_rows    @80
@@ -168,7 +168,7 @@ EXPORTS
   png_write_image    @159
   png_write_info    @160
   png_write_info_before_PLTE  @161
-  png_write_init    @162
+  png_write_init    @162 ; deprecated
   png_write_png    @163
   png_write_row    @164
   png_write_rows    @165
