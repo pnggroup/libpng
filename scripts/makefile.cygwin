@@ -36,6 +36,12 @@ DESTDIR=
 # list at the bottom of this makefile.
 
 CC=gcc
+AR=ar
+ARFLAGS=rc
+RANLIB=ranlib
+#RANLIB=echo
+MKDIR=/bin/mkdir -pv
+
 ifdef MINGW
 MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
 MINGW_LDFLAGS=-mno-cygwin -L/usr/lib/mingw
@@ -79,7 +85,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 CYGDLL = 12
-PNGMIN = 1.2.6beta1
+PNGMIN = 1.2.6beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
@@ -92,10 +98,6 @@ EXE=.exe
 LDFLAGS=$(strip -L. $(MINGW_LDFLAGS) -lpng $(addprefix -L,$(ZLIBLIB)) -lz)
 LDSFLAGS=$(strip -shared -L.  $(MINGW_LDFLAGS) -Wl,--export-all)
 LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(addprefix -L,$(ZLIBLIB)) -lz
-
-MKDIR=/bin/mkdir -pv
-RANLIB=ranlib
-#RANLIB=echo
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
@@ -173,7 +175,7 @@ pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
 	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
 
 $(STATLIB): $(OBJS)
-	ar rc $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 $(SHAREDDEF): projects/msvc/png32ms.def

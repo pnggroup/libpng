@@ -15,10 +15,14 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.6beta1
+PNGMIN = 1.2.6beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
+AR=ar
+ARFLAGS=rc
+RANLIB=ranlib
+#RANLIB=echo
 
 # where "make install" puts libpng12.a, libpng12.so*,
 # libpng12/png.h and libpng12/pngconf.h
@@ -58,9 +62,6 @@ CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall \
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng12 -lz -lm
 LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm
 
-RANLIB=ranlib
-#RANLIB=echo
-
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 MANPATH=$(prefix)/man
@@ -95,7 +96,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a $(LIBNAME).so pngtest pngtest-static libpng.pc libpng-config
 
 libpng.a: $(OBJS)
-	ar rc $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:

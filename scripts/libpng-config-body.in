@@ -77,6 +77,10 @@ while test $# -gt 0; do
         echo ${R_opts}
         ;;
 
+    --ldopts)
+        echo ${ldopts}
+        ;;
+
     --ldflags)
         echo ${ldflags} ${L_opts} ${R_opts} ${libs}
         ;;

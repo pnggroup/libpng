@@ -25,11 +25,13 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CC=cc
-CFLAGS=-I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
-
+AR=ar
+ARFLAGS=rc
 #RANLIB=echo
 RANLIB=ranlib
+
+CFLAGS=-I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -38,7 +40,7 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 all: libpng.a pngtest
 
 libpng.a: $(OBJS)
-	ar rc $@  $(OBJS)
+	$(AR) $(ARFLAGS) $@  $(OBJS)
 	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a

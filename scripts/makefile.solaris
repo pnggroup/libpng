@@ -6,6 +6,10 @@
 # For conditions of distribution and use, see copyright notice in png.h
 
 CC=gcc
+AR=ar
+ARFLAGS=rc
+#RANLIB=ranlib
+RANLIB=echo
 
 # Where make install puts libpng.a, libpng12.so*, and png.h
 prefix=/usr/local
@@ -26,11 +30,8 @@ CFLAGS=-I$(ZLIBINC) -Wall -O3 \
 	# $(WARNMORE) -g -DPNG_DEBUG=5
 LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng12 -lz -lm
 
-#RANLIB=ranlib
-RANLIB=echo
-
 PNGMAJ = 0
-PNGMIN = 1.2.6beta1
+PNGMIN = 1.2.6beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -68,7 +69,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a $(LIBNAME).so pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
-	ar rc $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:

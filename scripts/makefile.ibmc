@@ -16,6 +16,7 @@ ZLIBLIB = ../zlib
 CC = icc
 LD = ilink
 AR = ilib
+ARFLAGS=
 RM = del
 
 CFLAGS = -I$(ZLIBINC) -Mc -O2 -W3
@@ -37,7 +38,7 @@ LIBS = libpng$(A) $(ZLIBLIB)/zlib$(A)
 all: libpng$(A) pngtest$(E)
 
 libpng$(A): $(OBJS)
-	$(AR) -out:$@ $(OBJS)
+	$(AR) $(ARFLAGS) -out:$@ $(OBJS)
 
 test: pngtest$(E)
 	pngtest$(E)

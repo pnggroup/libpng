@@ -6,13 +6,17 @@
 # For conditions of distribution and use, see copyright notice in png.h
 
 CC=gcc
+AR=ar
+ARFLAGS=rc
+RANLIB=ranlib
+#RANLIB=echo
 
 # Where the zlib library and include files are located
 ZLIBLIB=/usr/local/lib
 ZLIBINC=/usr/local/include
 
 PNGMAJ = 0
-PNGMIN = 1.2.6beta1
+PNGMIN = 1.2.6beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 ALIGN=
@@ -27,9 +31,6 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 # still here in R4.5
 CFLAGS=-I$(ZLIBINC) -Wall -O1 -funroll-loops \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
-
-RANLIB=ranlib
-#RANLIB=echo
 
 # where make install puts libpng.a, libpng12.so*, and png.h
 prefix=/usr/local
@@ -66,7 +67,7 @@ OBJSDLL = $(OBJS)
 all: libpng.a $(LIBNAME).so pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
-	ar rc $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:

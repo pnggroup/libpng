@@ -18,9 +18,14 @@ ZLIBINC=../zlib
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.6beta1
+PNGMIN = 1.2.6beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
+
 CC=gcc
+AR=ar
+ARFLAGS=rc
+RANLIB=echo
+#RANLIB=ranlib
 
 # ABI can be blank to use default for your system, -32, -o32, -n32, or -64
 # See "man abi".  zlib must be built with the same ABI.
@@ -34,9 +39,6 @@ LDSHARED=cc $(ABI) -shared -soname $(LIBNAME).so.$(PNGMAJ) \
 LDLEGACY=cc $(ABI) -shared -soname libpng.so.3 \
   -set_version sgi$3.0
 # See "man dso" for info about shared objects
-
-RANLIB=echo
-#RANLIB=ranlib
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
@@ -66,7 +68,7 @@ OBJS = pnggccrd.o png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 all: libpng.a pngtest shared libpng.pc libpng-config
 
 libpng.a: $(OBJS)
-	ar rc $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 shared: $(LIBNAME).so.$(PNGVER)
