@@ -4,15 +4,15 @@
 # Copyright (C) 2002 Patrick R.L. Welche
 # For conditions of distribution and use, see copyright notice in png.h
 
-# You should also run makefile.ne0bsd
+# You should also run makefile.netbsd
 
 LOCALBASE?=/usr/local
 LIBDIR=	${LOCALBASE}/lib
 MANDIR= ${LOCALBASE}/man
-INCSDIR=${LOCALBASE}/include/libpng
+INCSDIR=${LOCALBASE}/include/libpng12
 
-LIB=	png
-SHLIB_MAJOR=	3
+LIB=	png12
+SHLIB_MAJOR=	0
 SHLIB_MINOR=	1.2.2
 SRCS=	pnggccrd.c png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 		pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \

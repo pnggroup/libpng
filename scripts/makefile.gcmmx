@@ -15,7 +15,7 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.2rc1
+PNGMIN = 1.2.2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
@@ -43,7 +43,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 # Remove -DPNG_THREAD_UNSAFE_OK if you need thread safety
 ### for generic gcc:
 CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall \
-       	-O3 $(ALIGN) -funroll-loops \
+	-O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### for gcc 2.95.2 on 686:
 #CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \

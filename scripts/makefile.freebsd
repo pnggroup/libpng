@@ -1,0 +1,93 @@
+# makefile for libpng under FreeBSD
+# Copyright (C) 2002 Glenn Randers-Pehrson and Andrey A. Chernov
+# Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+# For conditions of distribution and use, see copyright notice in png.h
+
+# where make install puts libpng.a and png.h
+prefix=/usr/local
+
+PNGMAJ= 5
+.if (${OBJFORMAT} == "elf")
+PNGVER= $(PNGMAJ)
+.else
+PNGMIN= 0
+PNGVER= $(PNGMAJ).$(PNGMIN)
+.endif
+
+CFLAGS+= -I. -DPNG_USE_PNGGCCRD
+.if (${MACHINE_ARCH} != "i386")
+CFLAGS+= -DPNG_NO_ASSEMBLER_CODE
+.endif
+LDFLAGS+=-L. -lpng -lz -lm -static
+
+OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
+	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
+	pngwtran.o pngmem.o pngerror.o pngpread.o pnggccrd.o
+
+.SUFFIXES: .c .so .o
+
+.c.so:
+	${CC} ${CFLAGS} -fPIC -DPIC -o $@ -c $<
+
+all: libpng.a libpng.so.${PNGVER} pngtest
+
+libpng.a: $(OBJS)
+	ar rc $@  $(OBJS)
+	$(RANLIB) $@
+
+libpng.so.${PNGVER}: $(OBJS:S/o$/so/g)
+.if (${OBJFORMAT} == "elf")
+	${CC} -shared -Wl,-x,-soname,$@ -o $@ $(OBJS:S/o$/so/g) -lz -lm
+.else
+	${CC} -shared -Wl,-x -o $@ $(OBJS:S/o$/so/g) -lz -lm
+.endif
+
+pngtest: pngtest.o libpng.a
+	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
+
+test: pngtest
+	./pngtest
+
+install: libpng.a libpng.so.${PNGVER}
+	-@mkdir $(prefix)/include/libpng
+	${INSTALL} -o ${INCOWN} -g ${INCGRP} -m ${INCMODE} \
+		png.h pngconf.h $(prefix)/include/libpng
+	ln -sf libpng/png.h $(prefix)/include/png.h
+	ln -sf libpng/pngconf.h $(prefix)/include/pngconf.h
+	${INSTALL} -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
+		libpng.a libpng.so.${PNGVER} $(prefix)/lib
+	$(RANLIB) $(prefix)/lib/libpng.a
+	ln -sf libpng.so.${PNGVER} $(prefix)/lib/libpng.so
+	/sbin/ldconfig -R
+	${INSTALL} -o ${MANOWN} -g ${MANGRP} -m ${MANMODE} \
+		libpng.3 libpngpf.3 $(prefix)/man/man3
+	${INSTALL} -o ${MANOWN} -g ${MANGRP} -m ${MANMODE} \
+		png.5 $(prefix)/man/man5
+
+clean:
+	rm -f *.o libpng.a libpng.so libpng.so.${PNGVER} pngtest pngout.png
+
+DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
+writelock:
+	chmod a-w *.[ch35] $(DOCS) scripts/*
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+png.o: png.h pngconf.h
+pngerror.o: png.h pngconf.h
+pngrio.o: png.h pngconf.h
+pngwio.o: png.h pngconf.h
+pngmem.o: png.h pngconf.h
+pngset.o: png.h pngconf.h
+pngget.o: png.h pngconf.h
+pngread.o: png.h pngconf.h
+pngrtran.o: png.h pngconf.h
+pngrutil.o: png.h pngconf.h
+pngtest.o: png.h pngconf.h
+pngtrans.o: png.h pngconf.h
+pngwrite.o: png.h pngconf.h
+pngwtran.o: png.h pngconf.h
+pngwutil.o: png.h pngconf.h
+pngpread.o: png.h pngconf.h
+pnggccrd.o: png.h pngconf.h
+

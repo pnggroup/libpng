@@ -1,59 +1,49 @@
 
-Libpng 1.2.2rc1 - April 7, 2002
+Libpng 1.2.2 - April 15, 2002
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Changes since the last public release (1.2.1):
 
-version 1.2.2beta1 [February 22, 2002]
   Fixed a bug with reading the length of iCCP profiles (Larry Reeves).
   Revised makefile.linux, makefile.gcmmx, and others to generate
-    libpng.a, libpngNN.so (not libpng.so.3), and libpngNN/png.h
+    libpng.a, libpngNN.so, libpng.so.NN, and libpngNN/png.h
   Revised makefile.darwin to remove "-undefined suppress" option.
   Added checks for gamma and chromaticity values over 21474.83, which exceed
     the limit for PNG unsigned 32-bit integers when encoded.
   Revised calls to png_create_read_struct() and png_create_write_struct()
     for simpler debugging.
   Revised png_zalloc() so zlib handles errors (uses PNG_FLAG_MALLOC_NULL_MEM_OK)
-version 1.2.2beta2 [February 23, 2002]
   Check chunk_length and idat_size for invalid (over PNG_MAX_UINT) lengths.
   Check for invalid image dimensions in png_get_IHDR.
-  Added missing "fi;" in the install target of the SGI makefiles.
-  Added install-static to all makefiles that make shared libraries.
+  Added install-shared and install-static targets to all makefiles that make
+    shared libraries.
   Always do gamma compensation when image is partially transparent.
-version 1.2.2beta3 [March 7, 2002]
   Modified shared-library makefiles to install pkgconfig/libpngNN.pc.
   Export (with PNGAPI) png_zalloc, png_zfree, and png_handle_as_unknown
   Removed unused png_write_destroy_info prototype from png.h
   Eliminated incorrect use of width_mmx from pnggccrd.c in pixel_bytes == 8 case
-  Added install-shared target to all makefiles that make shared libraries.
   Stopped a double free of palette, hist, and trans when not using free_me.
   Added makefile.32sunu for Sun Ultra 32 and makefile.64sunu for Sun Ultra 64.
-version 1.2.2beta4 [March 8, 2002]
   Compute background.gray and background_1.gray even when color_type is RGB
     in case image gets reduced to gray later (Jason Summers).
-  Relocated a misplaced /bin/rm in the "install-shared" makefile targets
   Added PNG_1_0_X macro which can be used to build a 1.0.x-compatible library.
-version 1.2.2beta5 [March 26, 2002]
   Added missing PNGAPI to several function definitions.
   Check for invalid bit_depth or color_type in png_get_IHDR(), and
     check for missing PLTE or IHDR in png_push_read_chunk() (Matthias Clasen).
   Revised iTXt support to accept NULL for lang and lang_key.
   Compute gamma for color components of background even when color_type is gray.
-  Changed "()" to "{}" in pkgconfig/libpngNN.pc.
   Revised makefiles to put png.h and pngconf.h only in $prefix/include/libpngNN
   Revised makefiles to make symlink to libpng.so.NN in addition to libpngNN.so
-version 1.2.2beta6 [March 31, 2002]
-version 1.0.13beta1 [March 31, 2002]
   Prevent png_zalloc() from trying to memset memory that it failed to acquire.
   Add typecasts of PNG_MAX_UINT in pngset_cHRM_fixed() (Matt Holgate).
   Ensure that the right function (user or default) is used to free the
     png_struct after an error in png_create_read_struct_2().
-version 1.2.2rc1 [April 7, 2002]
   Save the ebx register in pnggccrd.c (Sami Farin)
   Add "mem_ptr = png_ptr->mem_ptr" in png_destroy_write_struct() (Paul Gardner).
   Updated makefiles to put headers in include/libpng and remove old include/*.h.
+  Revised description of png_set_filter() in libpng.3/libpng.txt.
+  Revised makefile.netbsd and added makefile.neNNbsd and makefile.freebsd
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
