@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "March 8, 1998"
+.TH LIBPNG 3 "March 9, 1998"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library
 .SH SYNOPSIS
@@ -396,7 +396,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.0 March 8, 1998
+ libpng version 1.0.0a March 9, 1998
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alumni.rpi.edu>
  Copyright (c) 1998, Glenn Randers-Pehrson
@@ -2291,28 +2291,29 @@ on the library has not always been consistent and straightforward.
 The following table summarizes matters since version 0.89c, which was
 the first widely used release:
 
- source                    png.h     shared-lib
- version                   string    version
- -------                   ------    ----------
- 0.89c ("1.0 beta 3")      0.89      1.0.89
- 0.90  ("1.0 beta 4")      0.90      0.90
-                        [should have been 2.0.90]
- 0.95  ("1.0 beta 5")      0.95      0.95
-                        [should have been 2.0.95]
- 0.96  ("1.0 beta 6")      0.96      0.96
-                        [should have been 2.0.96]
- 0.97b ("1.00.97 beta 7")  1.00.97   1.0.0
-                         [should have been 2.0.97]
- 0.97c                     0.97      2.0.97
- 0.98                      0.98      2.0.98
- 0.99                      0.99      2.0.99
- 0.99a-m                   0.99      2.0.99
- 1.0.0                     1.00      2.1.0
+   source     png.h   png.h   shared-lib
+   version    string    int   version
+   -------    ------  ------  ----------
+   0.89c      0.89        89  1.0.89
+   0.90       0.90        90  0.90  [should be 2.0.90]
+   0.95       0.95        95  0.95  [should be 2.0.95]
+   0.96       0.96        96  0.96  [should be 2.0.96]
+   0.97b 7")  1.00.97     97  1.0.1 [should be 2.0.97]
+   0.97c      0.97        97  2.0.97
+   0.98       0.98        98  2.0.98
+   0.99       0.99        98  2.0.99
+   0.99a-m    0.99        99  2.0.99
+   1.00       1.00       100  2.1.0 [should be 10000]
+   1.0.0      1.0.0      100  2.1.0 [should be 10000]
+   1.0.1      1.0.1    10001  2.1.0
 
-Henceforth the source version will match the shared-library minor
-and patch numbers; the shared-library major version number will be
+Henceforth the source version will match the shared-library
+minor and patch numbers; the shared-library major version number will be
 used for changes in backward compatibility, as it is intended.
-
+The PNG_PNGLIB_VER macro, which is not used within libpng but
+is available for applications, is an unsigned integer of the form
+xyyzz corresponding to the source version x.y.z (leading zeros in y and z)
+ 
 .SH "SEE ALSO"
 libpngpf(3), png(5)
 .LP
@@ -2365,7 +2366,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
   
-Libpng version 1.0.0 (March 8, 1998):
+Libpng version 1.0.0a March 9, 1998:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (randeg@alumni.rpi.edu).
 

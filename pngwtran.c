@@ -1,12 +1,12 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng 1.0.0
+ * libpng 1.0.0a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 8, 1998
+ * March 9, 1998
  */
 
 #define PNG_INTERNAL

@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.0
+ * libpng 1.0.0a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 8, 1998
+ * March 9, 1998
  */
 
 #define PNG_INTERNAL
@@ -340,7 +340,7 @@ png_write_gAMA(png_structp png_ptr, double file_gamma)
    png_byte buf[4];
 
    png_debug(1, "in png_write_gAMA\n");
-   /* file_gamma is saved in 1/100,000ths */
+   /* file_gamma is saved in 1/1000000ths */
    igamma = (png_uint_32)(file_gamma * 100000.0 + 0.5);
    png_save_uint_32(buf, igamma);
    png_write_chunk(png_ptr, png_gAMA, buf, (png_size_t)4);
@@ -426,7 +426,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    png_byte buf[32];
 
    png_debug(1, "in png_write_cHRM\n");
-   /* each value is saved int 1/100,000ths */
+   /* each value is saved int 1/1000000ths */
    if (white_x < 0 || white_x > 0.8 || white_y < 0 || white_y > 0.8 ||
        white_x + white_y > 1.0)
    {
