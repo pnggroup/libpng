@@ -1,17 +1,17 @@
 
 /* pngrio.c - functions for data input
  *
- * libpng 1.0.1c
+ * libpng 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  *
- * This file provides a location for all input.  Users which need
- * special handling are expected to write a function which has the same
- * arguments as this, and perform a similar function, but possibly has
- * a different input method.  Note that you shouldn't change this
+ * This file provides a location for all input.  Users who need
+ * special handling are expected to write a function that has the same
+ * arguments as this and performs a similar function, but that possibly
+ * has a different input method.  Note that you shouldn't change this
  * function, but rather write a replacement function and then make
  * libpng use it at run time with png_set_read_fn(...).
  */
@@ -35,7 +35,7 @@ png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 }
 
 #if !defined(PNG_NO_STDIO)
-/* This is the function which does the actual reading of data.  If you are
+/* This is the function that does the actual reading of data.  If you are
    not reading from a standard C stream, you should create a replacement
    read_data function and use it at run time with png_set_read_fn(), rather
    than changing the library. */
@@ -114,10 +114,10 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    png_ptr      - pointer to a png input data structure
    io_ptr       - pointer to user supplied structure containing info about
                   the input functions.  May be NULL.
-   read_data_fn - pointer to a new input function which takes as it's
+   read_data_fn - pointer to a new input function that takes as its
                   arguments a pointer to a png_struct, a pointer to
                   a location where input data can be stored, and a 32-bit
-                  unsigned int which is the number of bytes to be read.
+                  unsigned int that is the number of bytes to be read.
                   To exit and output any fatal error messages the new write
                   function should call png_error(png_ptr, "Error msg"). */
 void

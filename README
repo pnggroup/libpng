@@ -178,6 +178,8 @@ Files in this distribution:
         makefile.wat  =>  Watcom 10a+ Makefile, 32-bit flat memory model
         pngos2.def    =>  OS/2 module definition file used by makefile.os2
         makevms.com   =>  VMS build script
+        pngdll.mak    =>  To make a png32bd.dll with Borland C++ 4.5
+        pngdef.pas    =>  Defines for a png32bd.dll with Borland C++ 4.5
 
 Good luck, and happy coding.
 

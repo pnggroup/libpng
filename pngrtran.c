@@ -1,16 +1,16 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * 1.0.1c
+ * 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
- * Transformations which are used in both reading and writing are
+ * Transformations that are used in both reading and writing are
  * in pngtrans.c.
  */
 
@@ -208,11 +208,11 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
          /* swap the palette around, and set up a table, if necessary */
          if (full_dither)
          {
-            int j;
+            int j = num_palette;
 
             /* put all the useful colors within the max, but don't
                move the others */
-            for (i = 0, j = num_palette; i < maximum_colors; i++)
+            for (i = 0; i < maximum_colors; i++)
             {
                if ((int)sort[i] >= maximum_colors)
                {
@@ -225,11 +225,11 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
          }
          else
          {
-            int j;
+            int j = num_palette;
 
             /* move all the used colors inside the max limit, and
                develop a translation table */
-            for (i = 0, j = num_palette; i < maximum_colors; i++)
+            for (i = 0; i < maximum_colors; i++)
             {
                /* only move the colors we need to */
                if ((int)sort[i] >= maximum_colors)
@@ -576,16 +576,19 @@ png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
 void
 png_init_read_transformations(png_structp png_ptr)
 {
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-   if(png_ptr == NULL) return;
-#endif
-
    png_debug(1, "in png_init_read_transformations\n");
+#if defined(PNG_USELESS_TESTS_SUPPORTED)
+   if(png_ptr != NULL)
+#endif
+  {
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) || defined(PNG_READ_SHIFT_SUPPORTED) \
+ || defined(PNG_READ_GAMMA_SUPPORTED)
+   int color_type = png_ptr->color_type;
+#endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
    if (png_ptr->transformations & PNG_BACKGROUND_EXPAND)
    {
-      int color_type = png_ptr->color_type;
       if (!(color_type & PNG_COLOR_MASK_COLOR))  /* i.e., GRAY or GRAY_ALPHA */
       {
          /* expand background chunk. */
@@ -881,6 +884,7 @@ png_init_read_transformations(png_structp png_ptr)
       }
    }
 #endif
+ }
 }
 
 /* Modify the info structure to reflect the transformations.  The
@@ -1334,19 +1338,20 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
          }
          case 4:
          {
-            png_bytep bp;
+            png_bytep bp = row;
             png_uint_32 i;
             png_uint_32 istop = row_info->rowbytes;
             png_byte mask = (png_byte)(((int)0xf0 >> shift[0]) & (int)0xf0) |
                (png_byte)((int)0xf >> shift[0]);
 
-            for (bp = row, i = 0; i < istop; i++)
+            for (i = 0; i < istop; i++)
             {
                *bp >>= shift[0];
                *bp++ &= mask;
             }
             break;
          }
+#ifndef PNG_SLOW_SHIFT
          case 8:
          {
             png_bytep bp = row;
@@ -1374,6 +1379,43 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
             }
             break;
          }
+#else
+         case 8:
+         {
+            png_bytep bp;
+            png_uint_32 i;
+            int cstop;
+
+            cstop=(int)row_info->channels;
+            for (bp = row, i = 0; i < row_width; i++)
+            {
+               for (c = 0; c < cstop; c++, bp++)
+               {
+                  *bp >>= shift[c];
+               }
+            }
+            break;
+         }
+         case 16:
+         {
+            png_bytep bp;
+            png_size_t i;
+            int cstop;
+
+            cstop=(int)row_info->channels;
+            for (bp = row, i = 0; i < row_width; i++)
+            {
+               for (c = 0; c < cstop; c++, bp += 2)
+               {
+                  value = (png_uint_16)((*bp << 8) + *(bp + 1));
+                  value >>= shift[c];
+                  *bp = (png_byte)(value >> 8);
+                  *(bp + 1) = (png_byte)(value & 0xff);
+               }
+            }
+            break;
+         }
+#endif
       }
    }
 }

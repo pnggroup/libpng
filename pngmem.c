@@ -1,12 +1,12 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.1c
+ * libpng 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  *
  * This file provides a location for all memory allocation.  Users who
  * need special memory handling are expected to modify the code in this file
@@ -72,7 +72,7 @@ png_destroy_struct(png_voidp struct_ptr)
  * have the ability to do that.
  *
  * Borland seems to have a problem in DOS mode for exactly 64K.
- * It gives you a segment with an offset of 8 (perhaps to store it's
+ * It gives you a segment with an offset of 8 (perhaps to store its
  * memory stuff).  zlib doesn't like this at all, so we have to
  * detect and deal with it.  This code should not be needed in
  * Windows or OS/2 modes, and only in 16 bit mode.  This code has

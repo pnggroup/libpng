@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * 1.0.1c
+ * 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  */
 
 /* get internal access to png.h */
@@ -824,9 +824,7 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
    int num_weights, png_doublep filter_weights,
    png_doublep filter_costs)
 {
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
    int i;
-#endif
 
    png_debug(1, "in png_set_filter_heuristics\n");
    if (heuristic_method >= PNG_FILTER_HEURISTIC_LAST)

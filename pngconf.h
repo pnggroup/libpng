@@ -1,12 +1,12 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.1c
+ * libpng 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -47,7 +47,7 @@
 #define PNG_MAX_MALLOC_64K
 #endif
 
-/* This protects us against compilers which run on a windowing system
+/* This protects us against compilers that run on a windowing system
  * and thus don't have or would rather us not use the stdio types:
  * stdin, stdout, and stderr.  The only one currently used is stderr
  * in png_error() and png_warning().  #defining PNG_NO_STDIO will
@@ -309,7 +309,9 @@ __dont__ include it again
 #define PNG_READ_USER_TRANSFORM_SUPPORTED
 #endif
 /* the following aren't implemented yet
+#ifndef PNG_NO_READ_RGB_TO_GRAY
 #define PNG_READ_RGB_TO_GRAY_SUPPORTED
+#endif
  */
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
@@ -428,88 +430,88 @@ __dont__ include it again
 #endif
 
 #ifdef PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
-#ifndef PNG_NO_PNG_READ_bKGD
+#ifndef PNG_NO_READ_bKGD
 #define PNG_READ_bKGD_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_cHRM
+#ifndef PNG_NO_READ_cHRM
 #define PNG_READ_cHRM_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_gAMA
+#ifndef PNG_NO_READ_gAMA
 #define PNG_READ_gAMA_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_hIST
+#ifndef PNG_NO_READ_hIST
 #define PNG_READ_hIST_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_oFFs
+#ifndef PNG_NO_READ_oFFs
 #define PNG_READ_oFFs_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_pCAL
+#ifndef PNG_NO_READ_pCAL
 #define PNG_READ_pCAL_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_pHYs
+#ifndef PNG_NO_READ_pHYs
 #define PNG_READ_pHYs_SUPPORTED
 #endif
 #ifndef PNG_NO_READ_sBIT
 #define PNG_READ_sBIT_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_sRGB
+#ifndef PNG_NO_READ_sRGB
 #define PNG_READ_sRGB_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_tEXt
+#ifndef PNG_NO_READ_tEXt
 #define PNG_READ_tEXt_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_tIME
+#ifndef PNG_NO_READ_tIME
 #define PNG_READ_tIME_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_tRNS
+#ifndef PNG_NO_READ_tRNS
 #define PNG_READ_tRNS_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_zTXt
+#ifndef PNG_NO_READ_zTXt
 #define PNG_READ_zTXt_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_READ_OPT_PLTE
+#ifndef PNG_NO_READ_OPT_PLTE
 #define PNG_READ_OPT_PLTE_SUPPORTED /* only affects support of the optional */
 #endif                              /* PLTE chunk in RGB and RGBA images */
 #endif /* PNG_READ_ANCILLARY_CHUNKS_SUPPORTED */
 
 #ifdef PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
-#ifndef PNG_NO_PNG_WRITE_bKGD
+#ifndef PNG_NO_WRITE_bKGD
 #define PNG_WRITE_bKGD_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_cHRM
+#ifndef PNG_NO_WRITE_cHRM
 #define PNG_WRITE_cHRM_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_gAMA
+#ifndef PNG_NO_WRITE_gAMA
 #define PNG_WRITE_gAMA_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_hIST
+#ifndef PNG_NO_WRITE_hIST
 #define PNG_WRITE_hIST_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_oFFs
+#ifndef PNG_NO_WRITE_oFFs
 #define PNG_WRITE_oFFs_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_pCAL
+#ifndef PNG_NO_WRITE_pCAL
 #define PNG_WRITE_pCAL_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_pHYs
+#ifndef PNG_NO_WRITE_pHYs
 #define PNG_WRITE_pHYs_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_sBIT
+#ifndef PNG_NO_WRITE_sBIT
 #define PNG_WRITE_sBIT_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_sRGB
+#ifndef PNG_NO_WRITE_sRGB
 #define PNG_WRITE_sRGB_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_tEXt
+#ifndef PNG_NO_WRITE_tEXt
 #define PNG_WRITE_tEXt_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_tIME
+#ifndef PNG_NO_WRITE_tIME
 #define PNG_WRITE_tIME_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_tRNS
+#ifndef PNG_NO_WRITE_tRNS
 #define PNG_WRITE_tRNS_SUPPORTED
 #endif
-#ifndef PNG_NO_PNG_WRITE_zTXt
+#ifndef PNG_NO_WRITE_zTXt
 #define PNG_WRITE_zTXt_SUPPORTED
 #endif
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */

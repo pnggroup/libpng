@@ -1,12 +1,12 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * 1.0.1c
+ * 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -87,8 +87,8 @@ png_set_interlace_handling(png_structp png_ptr)
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
 /* Add a filler byte on read, or remove a filler or alpha byte on write.
  * The filler type has changed in v0.95 to allow future 2-byte fillers
- * for 48-bit input data, as well as avoiding problems with some compilers
- * which don't like bytes as parameters.
+ * for 48-bit input data, as well as to avoid problems with some compilers
+ * that don't like bytes as parameters.
  */
 void
 png_set_filler(png_structp png_ptr, png_uint_32 filler, int filler_loc)
@@ -148,7 +148,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 
       for (i = 0; i < istop; i++)
       {
-         *rp++ = (png_byte)(~(*rp));
+         *rp = (png_byte)(~(*rp));
+         rp++;
       }
    }
 }

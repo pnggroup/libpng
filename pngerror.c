@@ -1,14 +1,14 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.1c
+ * libpng 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  *
- * This file provides a location for all error handling.  Users which
+ * This file provides a location for all error handling.  Users who
  * need special error handling are expected to write replacement functions
  * and use png_set_error_fn() to use those functions.  See the instructions
  * at each function.
@@ -52,7 +52,7 @@ png_warning(png_structp png_ptr, png_const_charp message)
       png_default_warning(png_ptr, message);
 }
 
-/* These utilities are used internally to build an error message which relates
+/* These utilities are used internally to build an error message that relates
  * to the current chunk.  The chunk name comes from png_ptr->chunk_name,
  * this is used to prefix the message.  The message is limited in length
  * to 63 bytes, the name characters are output as hex digits wrapped in []

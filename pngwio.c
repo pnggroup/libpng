@@ -1,17 +1,17 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 1.0.1c
+ * libpng 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  *
- * This file provides a location for all output.  Users which need
- * special handling are expected to write functions which have the same
- * arguments as these, and perform similar functions, but possibly use
- * different output methods.  Note that you shouldn't change these
+ * This file provides a location for all output.  Users who need
+ * special handling are expected to write functions that have the same
+ * arguments as these and perform similar functions, but that possibly
+ * use different output methods.  Note that you shouldn't change these
  * functions, but rather write replacement functions and then change
  * them at run time with png_set_write_fn(...).
  */
@@ -35,7 +35,7 @@ png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 }
 
 #if !defined(PNG_NO_STDIO)
-/* This is the function which does the actual writing of data.  If you are
+/* This is the function that does the actual writing of data.  If you are
    not writing to a standard C stream, you should create a replacement
    write_data function and use it at run time with png_set_write_fn(), rather
    than changing the library. */
@@ -133,13 +133,13 @@ png_default_flush(png_structp png_ptr)
    png_ptr       - pointer to a png output data structure
    io_ptr        - pointer to user supplied structure containing info about
                    the output functions.  May be NULL.
-   write_data_fn - pointer to a new output function which takes as its
+   write_data_fn - pointer to a new output function that takes as its
                    arguments a pointer to a png_struct, a pointer to
-                   data to be written, and a 32-bit unsigned int which is
+                   data to be written, and a 32-bit unsigned int that is
                    the number of bytes to be written.  The new write
                    function should call png_error(png_ptr, "Error msg")
                    to exit and output any fatal error messages.
-   flush_data_fn - pointer to a new flush function which takes as its
+   flush_data_fn - pointer to a new flush function that takes as its
                    arguments a pointer to a png_struct.  After a call to
                    the flush function, there should be no data in any buffers
                    or pending transmission.  If the output method doesn't do

@@ -10,8 +10,8 @@ zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-%VER% or "lpng100" and "zlib-1.1.1"
-or "zlib111") so that you have directories called "zlib" and "libpng".
+might be called "libpng-%VER% or "lpng100" and "zlib-1.1.2"
+or "zlib112") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
 
@@ -61,6 +61,8 @@ include
       pngos2.def    =>  OS/2 module definition file used by makefile.os2
       makefile.wat  =>  Watcom 10a+ Makefile, 32-bit flat memory model
       makevms.com   =>  VMS build script
+      pngdll.mak    =>  To make a png32bd.dll with Borland C++ 4.5
+      pngdef.pas    =>  Defines for a png32bd.dll with Borland C++ 4.5
 
 Copy the file (or files) that you need from the
 scripts directory into this directory, for example

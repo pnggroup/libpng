@@ -1,12 +1,12 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.1c
+ * libpng 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -180,7 +180,7 @@ static int wrote_question = 0;
 /* START of code to validate stdio-free compilation */
 /* These copies of the default read/write functions come from pngrio.c and */
 /* pngwio.c.  They allow "don't include stdio" testing of the library. */
-/* This is the function which does the actual reading of data.  If you are
+/* This is the function that does the actual reading of data.  If you are
    not reading from a standard C stream, you should create a replacement
    read_data function and use it at run time with png_set_read_fn(), rather
    than changing the library. */
@@ -262,7 +262,7 @@ png_default_flush(png_structp png_ptr)
 }
 #endif
 
-/* This is the function which does the actual writing of data.  If you are
+/* This is the function that does the actual writing of data.  If you are
    not writing to a standard C stream, you should create a replacement
    write_data function and use it at run time with png_set_write_fn(), rather
    than changing the library. */
@@ -352,8 +352,8 @@ static void
 png_default_error(png_structp png_ptr, png_const_charp message)
 {
    png_default_warning(png_ptr, message);
-   /* We can return because png_error calls the default handler which is
-    * actually ok in this case. */
+   /* We can return because png_error calls the default handler, which is
+    * actually OK in this case. */
 }
 #endif /* PNG_NO_STDIO */
 /* END of code to validate stdio-free compilation */
@@ -439,7 +439,7 @@ png_free(png_structp png_ptr, png_voidp ptr)
             if (current_allocation < 0)
                fprintf(STDERR, "Duplicate free of memory\n");
             /* We must free the list element too, but first kill
-               the memory which is to be freed. */
+               the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
             png_debug_free(png_ptr, pinfo);
             break;

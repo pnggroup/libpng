@@ -316,18 +316,18 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 #ifdef single /* Read the image a single row at a time */
       for (y = 0; y < height; y++)
       {
-         png_bytep row_pointers = row[y];
-         png_read_rows(png_ptr, &row_pointers, NULL, 1);
+         png_read_rows(png_ptr, &row_pointers[y], NULL, 1);
       }
 
 #else no_single /* Read the image several rows at a time */
       for (y = 0; y < height; y += number_of_rows)
       {
 #ifdef sparkle /* Read the image using the "sparkle" effect. */
-         png_read_rows(png_ptr, row_pointers, NULL, number_of_rows);
+         png_read_rows(png_ptr, &row_pointers[y], NULL, number_of_rows);
         
+         png_read_rows(png_ptr, NULL, row_pointers[y], number_of_rows);
 #else no_sparkle /* Read the image using the "rectangle" effect */
-         png_read_rows(png_ptr, NULL, row_pointers, number_of_rows);
+         png_read_rows(png_ptr, NULL, &row_pointers[y], number_of_rows);
 #endif no_sparkle /* use only one of these two methods */
       }
      
@@ -581,7 +581,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    text_ptr[2].key = "Description";
    text_ptr[2].text = "<long text>";
    text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
-   png_set_text(png_ptr, info_ptr, text_ptr, 2);
+   png_set_text(png_ptr, info_ptr, text_ptr, 3);
 
    /* other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs, */
    /* note that if sRGB is present the cHRM chunk must be ignored
@@ -638,7 +638,11 @@ void write_png(char *file_name /* , ... other image information ... */)
     * layout, however, so choose what fits your needs best).  You need to
     * use the first method if you aren't handling interlacing yourself.
     */
-   png_byte row_pointers[height][width];
+   png_uint_32 k, height, width;
+   png_byte image[height][width];
+   png_bytep row_pointers[height];
+   for (k = 0; k < height; k++)
+     row_pointers[k] = image + k*width;
 
    /* One of the following output methods is REQUIRED */
 #ifdef entire /* write out the entire image data in one call */
@@ -653,13 +657,12 @@ void write_png(char *file_name /* , ... other image information ... */)
    for (pass = 0; pass < number_passes; pass++)
    {
       /* Write a few rows at a time. */
-      png_write_rows(png_ptr, row_pointers, number_of_rows);
+      png_write_rows(png_ptr, &row_pointers[first_row], number_of_rows);
 
       /* If you are only writing one row at a time, this works */
       for (y = 0; y < height; y++)
       {
-         png_bytep row_pointers = row[y];
-         png_write_rows(png_ptr, &row_pointers, 1);
+         png_write_rows(png_ptr, &row_pointers[y], 1);
       }
    }
 #endif no_entire /* use only one output method */

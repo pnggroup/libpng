@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * 1.0.1c
+ * 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -766,7 +766,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
    }
 
    /* We can't write the chunk until we find out how much data we have,
-    * which means we need to run the compressor first, and save the
+    * which means we need to run the compressor first and save the
     * output.  This shouldn't be a problem, as the vast majority of
     * comments should be reasonable, but we will set up an array of
     * malloc'd pointers to be sure.
@@ -1412,7 +1412,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 
    /* The prediction method we use is to find which method provides the
     * smallest value when summing the absolute values of the distances
-    * from zero using anything >= 128 as negative numbers.  This is known
+    * from zero, using anything >= 128 as negative numbers.  This is known
     * as the "minimum sum of absolute differences" heuristic.  Other
     * heuristics are the "weighted minimum sum of absolute differences"
     * (experimental and can in theory improve compression), and the "zlib

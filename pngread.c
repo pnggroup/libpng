@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * 1.0.1c
+ * 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -520,7 +520,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
    /* save jump buffer and error functions */
    rp = row;
    dp = display_row;
-   if(rp != NULL && dp != NULL)
+   if (rp != NULL && dp != NULL)
       for (i = 0; i < num_rows; i++)
       {
          png_bytep rptr = *rp++;
@@ -528,25 +528,19 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
    
          png_read_row(png_ptr, rptr, dptr);
       }
-   else
+   else if(rp != NULL)
       for (i = 0; i < num_rows; i++)
       {
-         png_bytep rptr;
-         png_bytep dptr;
-   
-         if (rp != NULL)
-            rptr = *rp;
-         else
-            rptr = NULL;
-         if (dp != NULL)
-            dptr = *dp;
-         else
-            dptr = NULL;
-         png_read_row(png_ptr, rptr, dptr);
-         if (row != NULL)
-            rp++;
-         if (display_row != NULL)
-            dp++;
+         png_bytep rptr = *rp;
+         png_read_row(png_ptr, rptr, NULL);
+         rp++;
+      }
+   else if(dp != NULL)
+      for (i = 0; i < num_rows; i++)
+      {
+         png_bytep dptr = *dp;
+         png_read_row(png_ptr, NULL, dptr);
+         dp++;
       }
 }
 

@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.0.1c
+ * libpng 1.0.1d
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  *
  * Note about libpng version numbers:
  *
@@ -120,7 +120,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.1c"
+#define PNG_LIBPNG_VER_STRING "1.0.1d"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -233,7 +233,7 @@ typedef png_time FAR * FAR * png_timepp;
  * With libpng < 0.95, it was only possible to directly set and read the
  * the values in the png_info_struct, which meant that the contents and
  * order of the values had to remain fixed.  With libpng 0.95 and later,
- * however, * there are now functions which abstract the contents of
+ * however, there are now functions that abstract the contents of
  * png_info_struct from the application, so this makes it easier to use
  * libpng with dynamic libraries, and even makes it possible to use
  * libraries that don't have all of the libpng ancillary chunk-handing
@@ -291,14 +291,14 @@ typedef struct png_info_struct
    /* The tEXt and zTXt chunks contain human-readable textual data in
     * uncompressed and compressed forms, respectively.  The data in "text"
     * is an array of pointers to uncompressed, null-terminated C strings.
-    * Each chunk has a keyword which describes the textual data contained
+    * Each chunk has a keyword that describes the textual data contained
     * in that chunk.  Keywords are not required to be unique, and the text
     * string may be empty.  Any number of text chunks may be in an image.
     */
    int num_text; /* number of comments read/to write */
    int max_text; /* current size of text array */
    png_textp text; /* array of comments read/to write */
-#endif /* PNG_READ_tEXt/zTXt_SUPPORTED || PNG_WRITE_tEXt/zTXt_SUPPORTED */
+#endif /* PNG_READ_OR_WRITE_tEXt_OR_zTXt_SUPPORTED */
 #if defined(PNG_READ_tIME_SUPPORTED) || defined(PNG_WRITE_tIME_SUPPORTED)
    /* The tIME chunk holds the last time the displayed image data was
     * modified.  See the png_time struct for the contents of this struct.
@@ -321,7 +321,7 @@ typedef struct png_info_struct
     * same order as the palette colors, starting from index 0.  Values
     * for the data are in the range [0, 255], ranging from fully transparent
     * to fully opaque, respectively.  For non-paletted images, there is a
-    * single color specified which should be treated as fully transparent.
+    * single color specified that should be treated as fully transparent.
     * Data is valid if (valid & PNG_INFO_tRNS) is non-zero.
     */
    png_bytep trans; /* transparent values for paletted image */
@@ -493,10 +493,11 @@ typedef struct png_row_info_struct
 typedef png_row_info FAR * png_row_infop;
 typedef png_row_info FAR * FAR * png_row_infopp;
 
-/* These are the function types for the I/O functions, and the functions which
- * modify the default I/O functions to user I/O functions.  The png_error_ptr
- * type should match that of user supplied warning and error functions, while
- * the png_rw_ptr type should match that of the user read/write data functions.
+/* These are the function types for the I/O functions and for the functions
+ * that allow the user to override the default I/O functions with his or her
+ * own.  The png_error_ptr type should match that of user-supplied warning
+ * and error functions, while the png_rw_ptr type should match that of the
+ * user read/write data functions.
  */
 typedef struct png_struct_def png_struct;
 typedef png_struct FAR * png_structp;
@@ -1140,7 +1141,7 @@ extern PNG_EXPORT(png_voidp,png_get_progressive_ptr)
 extern PNG_EXPORT(void,png_process_data) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_bytep buffer, png_size_t buffer_size));
 
-/* function which combines rows.  Not very much different than the
+/* function that combines rows.  Not very much different than the
  * png_combine_row() call.  Is this even used?????
  */
 extern PNG_EXPORT(void,png_progressive_combine_row) PNGARG((png_structp png_ptr,
@@ -1392,8 +1393,7 @@ extern PNG_EXPORT(png_uint_32,png_get_text) PNGARG((png_structp png_ptr,
     defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
 extern PNG_EXPORT(void,png_set_text) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_textp text_ptr, int num_text));
-#endif /* PNG_READ_tEXt_SUPPORTED || PNG_WRITE_tEXt_SUPPORTED ||
-          PNG_READ_zTXt_SUPPORTED || PNG_WRITE_zTXt_SUPPORTED */
+#endif /* PNG_READ_OR_WRITE_tEXt_OR_zTXt_SUPPORTED */
 
 #if defined(PNG_READ_tIME_SUPPORTED)
 extern PNG_EXPORT(png_uint_32,png_get_tIME) PNGARG((png_structp png_ptr,
@@ -1446,9 +1446,9 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #endif /* (PNG_DEBUG > 0) */
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
-/* With these routines, we avoid an integer divide, which will be slower on
- * many machines.  However, it does take more operations than the corresponding
- * divide method, so it may be slower on some RISC systems.  There are two
+/* With these routines we avoid an integer divide, which will be slower on
+ * most machines.  However, it does take more operations than the corresponding
+ * divide method, so it may be slower on a few RISC systems.  There are two
  * shifts (by 8 or 16 bits) and an addition, versus a single integer divide.
  *
  * Note that the rounding factors are NOT supposed to be the same!  128 and

@@ -1,5 +1,5 @@
 
-Libpng 1.0.1c May 9, 1998
+Libpng 1.0.1d May 21, 1998
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -32,7 +32,7 @@ version 1.0.1b [May 2, 1998]
   Added warnings when people try to use transforms they've defined out.
   Collapsed 4 "i" and "c" loops into single "i" loops in pngrtran and pngwtran.
   Revised paragraph about png_set_expand() in libpng.txt and libpng.3 (Greg)
-version 1.0.1c [May 9, 1998]
+version 1.0.1c [May 11, 1998]
   Fixed a bug in pngrtran.c (introduced in libpng-1.0.1a) where the masks for
     filler bytes should have been 0xff instead of 0xf.
   Added max_pixel_depth=32 in pngrutil.c when using FILLER with palette images.
@@ -42,6 +42,19 @@ version 1.0.1c [May 9, 1998]
     for consistency, in pngconf.h
   Added individual "ifndef PNG_NO_CAPABILITY" for the capabilities in pngconf.h
     to make it easier to remove unwanted capabilities via the compile line
+  Made some corrections to grammar (which, it's) in documentation (Greg).
+  Corrected example.c, use of row_pointers in png_write_image().
+version 1.0.1d [May 21, 1998]
+  Corrected several statements that some compilers interpret as illegal use
+    of side effects in pngrutil.c and pngtrans.c, that were introduced in
+    version 1.0.1b
+  Revised png_read_rows() to avoid repeated if-testing for NULL (A Kleinert)
+  More corrections to example.c, use of row_pointers in png_write_image()
+    and png_read_rows().
+  Added pngdll.mak and pngdef.pas to scripts directory, contributed by
+    Bob Dellaca, to make a png32bd.dll with Borland C++ 4.5
+  Fixed error in example.c with png_set_text: num_text is 3, not 2 (Guido V.)
+  Changed several loops from count-down to count-up, for consistency.
 
 Send comments/corrections/commendations to
 png-implement@dworkin.wustl.edu or to randeg@alumni.rpi.edu

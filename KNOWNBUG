@@ -42,7 +42,9 @@ Known bugs and suggested enhancements in libpng-1.0.1
 
       Question whether i-- or --i is better.
 
-      STATUS: Under investigation.
+      STATUS: Under investigation.  About 150 loops turned around
+      in libpng-1.0.1d, for testing.  Object files and executables
+      are about 20k smaller in SGI and gcc-compiled codes.  
 
    b. Remove products and structure members from loop tests -- Glenn R-P
 
@@ -156,3 +158,29 @@ Known bugs and suggested enhancements in libpng-1.0.1
 
    
    STATUS: Fixed in libpng-1.0.1c
+
+17. May 10, 1998 -- DOCUMENTATION -- Greg
+
+   There are a number of incorrect usages of "which" and "it's" in the
+   comments.
+
+   STATUS:
+
+   Fixed in libpng-1.0.1c
+
+18. May 20, 1998 -- BUG -- illegal use of side effects -- Magnus Holmgren
+
+   In libpng-1.0.1b several illegal uses of side effects were
+   introduced while tuning loops in pngrutil.c; also one in pngtrans.c.
+
+   STATUS:
+
+   Fixed in libpng-1.0.1d
+
+19. May 20, 1998 -- ENHANCEMENT --  script for making DLL -- Bob Dellaca
+
+   Bob Dellaca contributed script for making PNG DLL on Borland C++ 4.5
+
+   STATUS:
+
+   Added to distribution in libpng-1.0.1d 

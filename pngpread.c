@@ -1,12 +1,12 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * 1.0.1c
+ * 1.0.1d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 9, 1998
+ * May 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -1070,7 +1070,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 /* This function is called when we haven't found a handler for this
- * chunk.  In the future we will have code here which can handle
+ * chunk.  In the future we will have code here that can handle
  * user-defined callback functions for unknown chunks before they are
  * ignored or cause an error.  If there isn't a problem with the
  * chunk itself (ie a bad chunk name or a critical chunk), the chunk
