@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.2.3rc1 - April 27, 2002
+ * libpng 1.2.3rc2 - May 1, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -524,7 +524,7 @@ png_push_crc_finish(png_structp png_ptr)
    }
 }
 
-void /* PRIVATE */
+void PNGAPI
 png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
 {
    png_bytep ptr;
@@ -1497,7 +1497,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
    png_ptr->row_fn = row_fn;
    png_ptr->end_fn = end_fn;
 
-   png_set_read_fn(png_ptr, progressive_ptr, (png_rw_ptr)png_push_fill_buffer);
+   png_set_read_fn(png_ptr, progressive_ptr, png_push_fill_buffer);
 }
 
 png_voidp PNGAPI

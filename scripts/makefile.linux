@@ -5,7 +5,7 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.3rc1
+PNGMIN = 1.2.3rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
@@ -118,7 +118,7 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.a
 	(cd $(DESTDIR)$(LIBPATH); ln -sf $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).so.$(PNGVER)
+install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
 	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* \
 	$(DESTDIR)$(LIBPATH)/$(LIBNAME).so

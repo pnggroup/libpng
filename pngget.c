@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.2.3rc1 - April 27, 2002
+ * libpng 1.2.3rc2 - May 1, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -560,7 +560,9 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
          *interlace_type = info_ptr->interlace_type;
 
       /* check for potential overflow of rowbytes */
-      if (*color_type & PNG_COLOR_MASK_COLOR)
+      if (*color_type == PNG_COLOR_TYPE_PALETTE)
+         channels = 1;
+      else if (*color_type & PNG_COLOR_MASK_COLOR)
          channels = 3;
       else
          channels = 1;

@@ -25,7 +25,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.3rc1
+PNGMIN = 1.2.3rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -98,7 +98,7 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.a
 	(cd $(DESTDIR)$(LIBPATH); ln -sf $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).dylib
+install-shared: install-headers $(LIBNAME).dylib libpng.pc
 	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/$(LIBNAME).$(PNGMAJ)*.dylib
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/$(LIBNAME).dylib

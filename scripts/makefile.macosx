@@ -17,7 +17,7 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.3rc1
+PNGMIN = 1.2.3rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
@@ -88,7 +88,7 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.a
 	(cd $(DESTDIR)$(LIBPATH); ln -f -s $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
+install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) libpng.pc
 	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
 	-@/bin/rm -f \
 	$(DESTDIR)$(LIBPATH)/$(LIBNAME).$(PNGMAJ)*.$(SHAREDLIB_POSTFIX)

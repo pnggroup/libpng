@@ -1,7 +1,7 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 1.2.3rc1 - April 27, 2002
+ * libpng 1.2.3rc2 - May 1, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -40,7 +40,7 @@ png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    write_data function and use it at run time with png_set_write_fn(), rather
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
-static void /* PRIVATE */
+void PNGAPI
 png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
@@ -63,7 +63,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
 
-static void /* PRIVATE */
+void PNGAPI
 png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
@@ -126,7 +126,7 @@ png_flush(png_structp png_ptr)
 }
 
 #if !defined(PNG_NO_STDIO)
-static void /* PRIVATE */
+void PNGAPI
 png_default_flush(png_structp png_ptr)
 {
 #if !defined(_WIN32_WCE)
@@ -171,7 +171,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    if (write_data_fn != NULL)
       png_ptr->write_data_fn = write_data_fn;
    else
-      png_ptr->write_data_fn = (png_rw_ptr)png_default_write_data;
+      png_ptr->write_data_fn = png_default_write_data;
 #else
    png_ptr->write_data_fn = write_data_fn;
 #endif
@@ -181,7 +181,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    if (output_flush_fn != NULL)
       png_ptr->output_flush_fn = output_flush_fn;
    else
-      png_ptr->output_flush_fn = (png_flush_ptr)png_default_flush;
+      png_ptr->output_flush_fn = png_default_flush;
 #else
    png_ptr->output_flush_fn = output_flush_fn;
 #endif

@@ -1,5 +1,5 @@
 
-Libpng 1.2.3rc1 - April 27, 2002
+Libpng 1.2.3rc2 - May 1, 2002
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,6 +25,13 @@ version 1.2.3rc1 [April 27, 2002]
     to put one in their application.
   Restored png_zalloc() and png_zfree() prototypes to version 1.2.1 and
     removed them from module definition files.
+version 1.2.3rc2 [May 1, 2002]
+  Fixed bug in reporting number of channels in pngget.c and pngset.c,
+    that was introduced in version 1.2.2beta5.
+  Exported png_zalloc(), png_zfree(), png_default_read(), png_default_write(),
+    png_default_flush(), and png_push_fill_buffer() and included them in
+    module definition files.
+  Added "libpng.pc" dependency to the "install-shared" target in 15 makefiles.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

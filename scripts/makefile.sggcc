@@ -36,7 +36,7 @@ LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=CC $(ABI) -shared
 
 PNGMAJ = 0
-PNGMIN = 1.2.3rc1
+PNGMIN = 1.2.3rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 # See "man dso" for info about shared objects
 LIBS=libpng12.so.$(PNGVER)
@@ -103,7 +103,7 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/libpng.a
 	(cd $(DESTDIR)$(LIBPATH); ln -f -s $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).so.$(PNGVER)
+install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
 	-@if [ ! -d $(DESTDIR)$(LIBPATH) ]; then mkdir $(DESTDIR)$(LIBPATH); fi
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* \
 	$(DESTDIR)$(LIBPATH)/$(LIBNAME).so
