@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.8beta4 - July 14, 2000
+ * libpng 1.0.8rc1 - July 17, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -62,6 +62,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif
    {
       png_free(png_ptr, png_ptr->zbuf);
+      png_ptr->zbuf=NULL;
       png_destroy_struct(png_ptr);
       return (png_structp)NULL;
    }
@@ -315,7 +316,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
 
-      png_debug2(0, "Reading %s chunk, length=%d.\n", png_ptr->chunk_name,
+      png_debug2(0, "Reading %s chunk, length=%lu.\n", png_ptr->chunk_name,
          length);
 
       /* This should be a binary subdivision search or a hash for
@@ -465,7 +466,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    const int png_pass_mask[7] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
 #endif
    int ret;
-   png_debug2(1, "in png_read_row (row %d, pass %d)\n",
+   png_debug2(1, "in png_read_row (row %lu, pass %d)\n",
       png_ptr->row_number, png_ptr->pass);
    /* save jump buffer and error functions */
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
@@ -697,7 +698,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.8beta4
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.8rc1
  */
 
 void PNGAPI
@@ -746,7 +747,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.8beta4
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.8rc1
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)

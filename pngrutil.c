@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.8beta4 - July 14, 2000
+ * libpng 1.0.8rc1 - July 17, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -388,7 +388,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       (png_uint_32)png_ptr->pixel_depth + 7) >> 3);
    png_debug1(3,"bit_depth = %d\n", png_ptr->bit_depth);
    png_debug1(3,"channels = %d\n", png_ptr->channels);
-   png_debug1(3,"rowbytes = %d\n", png_ptr->rowbytes);
+   png_debug1(3,"rowbytes = %lu\n", png_ptr->rowbytes);
    png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,
       color_type, interlace_type, compression_type, filter_type);
 }
@@ -1541,7 +1541,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   png_debug1(2, "Allocating and reading pCAL chunk data (%d bytes)\n",
+   png_debug1(2, "Allocating and reading pCAL chunk data (%lu bytes)\n",
       length + 1);
    purpose = (png_charp)png_malloc(png_ptr, length + 1);
    slength = (png_size_t)length;
@@ -1661,7 +1661,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   png_debug1(2, "Allocating and reading sCAL chunk data (%d bytes)\n",
+   png_debug1(2, "Allocating and reading sCAL chunk data (%lu bytes)\n",
       length + 1);
    buffer = (png_charp)png_malloc(png_ptr, length + 1);
    slength = (png_size_t)length;
@@ -2576,7 +2576,7 @@ png_read_filter_row
    png_bytep prev_row, int filter)
 {
    png_debug(1, "in png_read_filter_row\n");
-   png_debug2(2,"row = %d, filter = %d\n", png_ptr->row_number, filter);
+   png_debug2(2,"row = %lu, filter = %d\n", png_ptr->row_number, filter);
    switch (filter)
    {
       case PNG_FILTER_VALUE_NONE:
@@ -2990,12 +2990,12 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    png_memset_check(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
-   png_debug1(3, "width = %d,\n", png_ptr->width);
-   png_debug1(3, "height = %d,\n", png_ptr->height);
-   png_debug1(3, "iwidth = %d,\n", png_ptr->iwidth);
-   png_debug1(3, "num_rows = %d\n", png_ptr->num_rows);
-   png_debug1(3, "rowbytes = %d,\n", png_ptr->rowbytes);
-   png_debug1(3, "irowbytes = %d,\n", png_ptr->irowbytes);
+   png_debug1(3, "width = %lu,\n", png_ptr->width);
+   png_debug1(3, "height = %lu,\n", png_ptr->height);
+   png_debug1(3, "iwidth = %lu,\n", png_ptr->iwidth);
+   png_debug1(3, "num_rows = %lu\n", png_ptr->num_rows);
+   png_debug1(3, "rowbytes = %lu,\n", png_ptr->rowbytes);
+   png_debug1(3, "irowbytes = %lu,\n", png_ptr->irowbytes);
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }

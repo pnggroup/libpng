@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.8beta4 - July 14, 2000
+ * libpng 1.0.8rc1 - July 17, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -104,6 +104,8 @@ static int status_dots_requested=0;
 static int status_dots=1;
 
 void
+read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
+void
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
     if(png_ptr == NULL || row_number > PNG_MAX_UINT) return;
@@ -123,6 +125,8 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 }
 
 void
+write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
+void
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
     if(png_ptr == NULL || row_number > PNG_MAX_UINT || pass > 7) return;
@@ -135,6 +139,8 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
    but merely examine the row filters.  We set this to 256 rather than
    5 in case illegal filter values are present.) */
 static png_uint_32 filters_used[256];
+void
+count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data);
 void
 count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
@@ -149,6 +155,8 @@ count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 
 static png_uint_32 zero_samples;
 
+void
+count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data);
 void
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
@@ -517,6 +525,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
             png_free_default(png_ptr, pinfo);
+            pinfo=NULL;
             break;
          }
          if (pinfo->next == NULL)
@@ -534,6 +543,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
       printf("Freeing %x\n",ptr);
 #endif
    png_free_default(png_ptr, ptr);
+   ptr=NULL;
 }
 #endif /* PNG_USER_MEM_SUPPORTED */
 /* END of code to test memory allocation/deallocation */
@@ -878,22 +888,24 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    {
       int unit;
-      double width, height;
+      double scal_width, scal_height;
 
-      if (png_get_sCAL(read_ptr, read_info_ptr, &unit, &width, &height))
+      if (png_get_sCAL(read_ptr, read_info_ptr, &unit, &scal_width,
+         &scal_height))
       {
-         png_set_sCAL(write_ptr, write_info_ptr, unit, width, height);
+         png_set_sCAL(write_ptr, write_info_ptr, unit, scal_width, scal_height);
       }
    }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
    {
       int unit;
-      png_charp width, height;
+      png_charp scal_width, scal_height;
 
-      if (png_get_sCAL_s(read_ptr, read_info_ptr, &unit, &width, &height))
+      if (png_get_sCAL_s(read_ptr, read_info_ptr, &unit, &scal_width,
+          &scal_height))
       {
-         png_set_sCAL_s(write_ptr, write_info_ptr, unit, width, height);
+         png_set_sCAL_s(write_ptr, write_info_ptr, unit, scal_width, scal_height);
       }
    }
 #endif
@@ -1091,6 +1103,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
    png_debug(0, "Destroying data structs\n");
    png_free(read_ptr, row_buf);
+   row_buf=NULL;
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
    png_destroy_info_struct(write_ptr, &write_end_info_ptr);
    png_destroy_write_struct(&write_ptr, &write_info_ptr);
@@ -1435,4 +1448,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_8beta4 your_png_h_is_not_version_1_0_8beta4;
+typedef version_1_0_8rc1 your_png_h_is_not_version_1_0_8rc1;

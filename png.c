@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.8beta4 - July 14, 2000
+ * libpng version 1.0.8rc1 - July 17, 2000
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_8beta4 Your_png_h_is_not_version_1_0_8beta4;
+typedef version_1_0_8rc1 Your_png_h_is_not_version_1_0_8rc1;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.8beta4";
+char png_libpng_ver[12] = "1.0.8rc1";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -363,7 +363,10 @@ if (mask & PNG_FREE_PCAL)
     {
         int i;
         for (i = 0; i < (int)info_ptr->pcal_nparams; i++)
+        {
           png_free(png_ptr, info_ptr->pcal_params[i]);
+          info_ptr->pcal_params[i]=NULL;
+        }
         png_free(png_ptr, info_ptr->pcal_params);
         info_ptr->pcal_params = NULL;
     }
@@ -493,7 +496,10 @@ if (mask & PNG_FREE_ROWS)
     {
        int row;
        for (row = 0; row < (int)info_ptr->height; row++)
+       {
           png_free(png_ptr, info_ptr->row_pointers[row]);
+          info_ptr->row_pointers[row]=NULL;
+       }
        png_free(png_ptr, info_ptr->row_pointers);
        info_ptr->row_pointers=NULL;
     }
@@ -524,6 +530,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
    if (png_ptr->num_chunk_list)
    {
        png_free(png_ptr, png_ptr->chunk_list);
+       png_ptr->chunk_list=NULL;
        png_ptr->num_chunk_list=0;
    }
 #endif
@@ -618,11 +625,11 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.8beta4 - July 14, 2000\n\
+   return ((png_charp) "\n libpng version 1.0.8rc1 - July 17, 2000\n\
    Copyright (c) 1998-2000 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
-   return ("");
+   return ((png_charp) "");
 }
 
 /* The following return the library version as a short string in the
@@ -636,8 +643,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.8beta4");
-   return("1.0.8beta4");
+      return((png_charp) "1.0.8rc1");
+   return((png_charp) "1.0.8rc1");
 }
 
 png_charp PNGAPI
@@ -645,8 +652,8 @@ png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return(PNG_LIBPNG_VER_STRING);
-   return(PNG_LIBPNG_VER_STRING);
+      return((png_charp) PNG_LIBPNG_VER_STRING);
+   return((png_charp) PNG_LIBPNG_VER_STRING);
 }
 
 png_charp PNGAPI
@@ -654,8 +661,8 @@ png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return(PNG_HEADER_VERSION_STRING);
-   return(PNG_HEADER_VERSION_STRING);
+      return((png_charp) PNG_HEADER_VERSION_STRING);
+   return((png_charp) PNG_HEADER_VERSION_STRING);
 }
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED

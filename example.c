@@ -755,11 +755,13 @@ void write_png(char *file_name /* , ... other image information ... */)
       allocated it with malloc() instead of png_malloc(), use free() instead
       of png_free(). */
    png_free(png_ptr, palette);
+   palette=NULL;
 
    /* Similarly, if you png_malloced any data that you passed in with
       png_set_something(), such as a hist or trans array, free it here,
       when you can be sure that libpng is through with it. */
    png_free(png_ptr, trans);
+   trans=NULL;
 
    /* clean up after the write, and free any memory allocated */
    png_destroy_write_struct(&png_ptr, &info_ptr);

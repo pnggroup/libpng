@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.8beta4 - July 14, 2000
+ * libpng 1.0.8rc1 - July 17, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -77,7 +77,7 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
    png_uint_32 length)
 {
    png_byte buf[4];
-   png_debug2(0, "Writing %s chunk (%d bytes)\n", chunk_name, length);
+   png_debug2(0, "Writing %s chunk (%lu bytes)\n", chunk_name, length);
 
    /* write the length */
    png_save_uint_32(buf, length);
@@ -339,9 +339,11 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
       png_write_chunk_data(png_ptr,(png_bytep)comp->output_ptr[i],
          png_ptr->zbuf_size);
       png_free(png_ptr, comp->output_ptr[i]);
+      comp->output_ptr[i]=NULL;
    }
    if (comp->max_output_ptr != 0)
       png_free(png_ptr, comp->output_ptr);
+      comp->output_ptr=NULL;
    /* write anything left in zbuf */
    if (png_ptr->zstream.avail_out < (png_uint_32)png_ptr->zbuf_size)
       png_write_chunk_data(png_ptr, png_ptr->zbuf,
@@ -1400,7 +1402,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    for (i = 0; i < nparams; i++)
    {
       params_len[i] = png_strlen(params[i]) + (i == nparams - 1 ? 0 : 1);
-      png_debug2(3, "pCAL parameter %d length = %d\n", i, params_len[i]);
+      png_debug2(3, "pCAL parameter %d length = %lu\n", i, params_len[i]);
       total_len += (png_size_t)params_len[i];
    }
 
