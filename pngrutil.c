@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.9beta4 - December 1, 2000
+ * libpng 1.0.9beta5 - December 15, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -353,7 +353,14 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (compression_type != PNG_COMPRESSION_TYPE_BASE)
       png_error(png_ptr, "Unknown compression method in IHDR");
 
-   if (filter_type != PNG_FILTER_TYPE_BASE)
+   if(
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+      !((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+      (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
+      (color_type == PNG_COLOR_TYPE_RGB || 
+       color_type == PNG_COLOR_TYPE_RGB_ALPHA)) &&
+#endif
+      filter_type != PNG_FILTER_TYPE_BASE)
       png_error(png_ptr, "Unknown filter method in IHDR");
 
    /* set internal variables */
@@ -362,6 +369,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->bit_depth = (png_byte)bit_depth;
    png_ptr->interlaced = (png_byte)interlace_type;
    png_ptr->color_type = (png_byte)color_type;
+   png_ptr->filter_type = (png_byte)filter_type;
 
    /* find number of channels */
    switch (png_ptr->color_type)

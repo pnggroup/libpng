@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.9beta4 - December 1, 2000
+ * libpng version 1.0.9beta5 - December 15, 2000
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.9beta4 - December 1, 2000: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.9beta5 - December 15, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -58,7 +58,7 @@
  *    1.0.8beta1-4                  10008  2.1.0.8beta1-4
  *    1.0.8rc1                      10008  2.1.0.8rc1
  *    1.0.8                         10008  2.1.0.8
- *    1.0.9beta1-4                  10009  2.1.0.9beta1-4
+ *    1.0.9beta1-5                  10009  2.1.0.9beta1-5
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -85,7 +85,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.0.7, July 1, 2000, through  1.0.9beta4, December 1, 2000, are
+ * libpng versions 1.0.7, July 1, 2000, through  1.0.9beta5, December 15, 2000, are
  * Copyright (c) 2000 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors
@@ -190,13 +190,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    December 1, 2000
+ *    December 15, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.9beta4 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.9beta5 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -252,7 +252,7 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.9beta4"
+#define PNG_LIBPNG_VER_STRING "1.0.9beta5"
 
 #define PNG_LIBPNG_VER_SONUM   2
 
@@ -263,7 +263,7 @@
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  4
+#define PNG_LIBPNG_VER_BUILD  5
 
 #define PNG_LIBPNG_BUILD_ALPHA    1
 #define PNG_LIBPNG_BUILD_BETA     2
@@ -703,6 +703,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* iCCP chunk data. */
    png_charp iccp_name;     /* profile name */
    png_charp iccp_profile;  /* International Color Consortium profile data */
+                            /* Note to maintainer: should be png_bytep */
    png_uint_32 iccp_proflen;  /* ICC profile data length */
    png_byte iccp_compression; /* Always zero */
 #endif
@@ -783,6 +784,7 @@ typedef png_info FAR * FAR * png_infopp;
 
 /* This is for filter type. PNG 1.0-1.2 only define the single type. */
 #define PNG_FILTER_TYPE_BASE      0 /* Single row per-byte filtering */
+#define PNG_INTRAPIXEL_DIFFERENCING 64 /* Used only in MNG datastreams */
 #define PNG_FILTER_TYPE_DEFAULT   PNG_FILTER_TYPE_BASE
 
 /* These are for the interlacing type.  These values should NOT be changed. */
@@ -1166,12 +1168,14 @@ struct png_struct_def
    png_fixed_point int_gamma;
 #endif
 
+   png_byte filter_type;
+
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.9beta4
+and png.h are both at * version 1.0.9beta5
  */
-typedef png_structp version_1_0_9beta4;
+typedef png_structp version_1_0_9beta5;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -2023,12 +2027,14 @@ extern PNG_EXPORT(void,png_set_sRGB_gAMA_and_cHRM) PNGARG((png_structp png_ptr,
 extern PNG_EXPORT(png_uint_32,png_get_iCCP) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_charpp name, int *compression_type,
    png_charpp profile, png_uint_32 *proflen));
+   /* Note to maintainer: profile should be png_bytepp */
 #endif
 
 #if defined(PNG_iCCP_SUPPORTED)
 extern PNG_EXPORT(void,png_set_iCCP) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_charp name, int compression_type,
    png_charp profile, png_uint_32 proflen));
+   /* Note to maintainer: profile should be png_bytep */
 #endif
 
 #if defined(PNG_READ_sPLT_SUPPORTED)
@@ -2210,7 +2216,7 @@ extern PNG_EXPORT(png_uint_32,png_permit_mng_features) PNGARG((png_structp
 #endif
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.9beta4 - December 1, 2000 (header)\n"
+   " libpng version 1.0.9beta5 - December 15, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -2594,6 +2600,7 @@ PNG_EXTERN void png_write_sRGB PNGARG((png_structp png_ptr,
 PNG_EXTERN void png_write_iCCP PNGARG((png_structp png_ptr,
    png_charp name, int compression_type,
    png_charp profile, int proflen));
+   /* Note to maintainer: profile should be png_bytep */
 #endif
 
 #if defined(PNG_WRITE_sPLT_SUPPORTED)
@@ -2995,6 +3002,13 @@ PNG_EXTERN void png_push_read_iTXt PNGARG((png_structp png_ptr,
 #endif
 
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+
+#ifdef PNG_MNG_FEATURES_SUPPORTED
+PNG_EXTERN void png_do_read_intrapixel PNGARG((png_row_infop row_info,
+   png_bytep row));
+PNG_EXTERN void png_do_write_intrapixel PNGARG((png_row_infop row_info,
+   png_bytep row));
+#endif
 
 #endif /* PNG_INTERNAL */
 

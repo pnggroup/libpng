@@ -855,6 +855,8 @@ version 1.0.9beta3 [November 23, 2000]
 version 1.0.9beta4 [December 1, 2000]
   Change png_chunk_warning to png_warning in png_check_keyword().
   Increased the first part of msg buffer from 16 to 18 in png_chunk_error().
+version 1.0.9beta5 [December 15, 2000]
+  Added support for filter method 64 (for PNG datastreams embedded in MNG)
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

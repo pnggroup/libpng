@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.9beta4 - December 1, 2000
+ libpng version 1.0.9beta5 - December 15, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -2581,7 +2581,24 @@ When PNG_DEBUG = 1, the macros are defined, but only png_debug statements
 having level = 0 will be printed.  There aren't any such statements in
 this version of libpng, but if you insert some they will be printed.
 
-VI.  Changes to Libpng from version 0.88
+VI.  MNG support
+
+The MNG specification (available at http://www.libpng.org/pub/mng) allows
+certain extensions to PNG for PNG images that are embedded in MNG datastreams.
+Libpng can support some of these extensions.  To enable them, use the
+png_permit_mng_features() function:
+
+   feature_set = png_permit_mng_features(png_ptr, mask)
+   mask is a png_uint_32 containing the logical OR of the
+        features you want to enable.  These include
+        PNG_FLAG_MNG_EMPTY_PLTE
+        PNG_FLAG_MNG_FILTER_64
+        PNG_ALL_MNG_FEATURES
+   feature_set is a png_32_uint that is the logical AND of
+      your mask with the set of MNG features that is
+      supported by the version of libpng that you are using.
+
+VII.  Changes to Libpng from version 0.88
 
 It should be noted that versions of libpng later than 0.96 are not
 distributed by the original libpng author, Guy Schalnat, nor by
@@ -2630,15 +2647,15 @@ application:
 
    png_uint_32 application_vn = PNG_LIBPNG_VER;
 
-VII. Y2K Compliance in libpng
+VIII. Y2K Compliance in libpng
 
-December 1, 2000
+December 15, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.9beta4 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.9beta5 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

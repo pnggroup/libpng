@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.9beta4 - December 1, 2000
+ * libpng 1.0.9beta5 - December 15, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -772,6 +772,15 @@ png_write_row(png_structp png_ptr, png_bytep row)
    /* handle other transformations */
    if (png_ptr->transformations)
       png_do_write_transformations(png_ptr);
+
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+   if((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+      (png_ptr->filter_type == PNG_INTRAPIXEL_DIFFERENCING))
+   {
+      /* Intrapixel differencing */
+      png_do_write_intrapixel(&(png_ptr->row_info), png_ptr->row_buf + 1);
+   }
+#endif
 
    /* Find a filter if necessary, filter the row and write it out. */
    png_write_find_filter(png_ptr, &(png_ptr->row_info));
