@@ -62,7 +62,7 @@ CFG=lpngce - Win32 (WCE MIPS) Debug
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /QMRWCE /c
-# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I "..\..\zlibce" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /QMRWCE /c
+# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I "..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /QMRWCE /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -93,7 +93,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /QMRWCE /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlibce" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /QMRWCE /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /QMRWCE /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -124,7 +124,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /Qsh4 /MC /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /Qsh4 /MC /W3 /O2 /I ".." /I "..\..\zlibce" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /Qsh4 /MC /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH4" /d "_SH4_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -155,7 +155,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /Qsh4 /MC /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /Qsh4 /MC /W3 /Zi /Od /I ".." /I "..\..\zlibce" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /Qsh4 /MC /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH4" /d "_SH4_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -186,7 +186,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I ".." /I "..\..\zlibce" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH3" /d "_SH3_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -217,7 +217,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlibce" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH3" /d "_SH3_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -248,7 +248,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clarm.exe
 # ADD BASE CPP /nologo /MC /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "ARM" /D "_ARM_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /MC /W3 /O2 /I ".." /I "..\..\zlibce" /D "NDEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /MC /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ARM" /d "_ARM_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -279,7 +279,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clarm.exe
 # ADD BASE CPP /nologo /MC /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "ARM" /D "_ARM_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /MC /W3 /Zi /Od /I ".." /I "..\..\zlibce" /D "DEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /MC /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ARM" /d "_ARM_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -310,7 +310,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /QMFWCE /MC /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /QMFWCE /MC /W3 /O2 /I ".." /I "..\..\zlibce" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /QMFWCE /MC /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -341,7 +341,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /QMFWCE /MC /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /QMFWCE /MC /W3 /Zi /Od /I ".." /I "..\..\zlibce" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /QMFWCE /MC /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -372,7 +372,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /ML /W3 /O2 /D "x86" /D "_i386_" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "NDEBUG" /D "i_386_" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /Gs8192 /GF /c
-# ADD CPP /nologo /ML /W3 /O2 /I ".." /I "..\..\zlibce" /D "x86" /D "_i386_" /D "_x86_" /D "NDEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /Gs8192 /GF /c
+# ADD CPP /nologo /ML /W3 /O2 /I ".." /I "..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "NDEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /Gs8192 /GF /c
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
 # ADD RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
@@ -402,7 +402,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MLd /W3 /Zi /Od /D "x86" /D "_i386_" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "DEBUG" /D "i_386_" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /Gs8192 /GF /c
-# ADD CPP /nologo /MLd /W3 /Zi /Od /I ".." /I "..\..\zlibce" /D "x86" /D "_i386_" /D "_x86_" /D "DEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /Gs8192 /GF /c
+# ADD CPP /nologo /MLd /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "DEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /Gs8192 /GF /c
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
 # ADD RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
@@ -432,7 +432,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /ML /W3 /O2 /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "STRICT" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /ML /W3 /O2 /I ".." /I "..\..\zlibce" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /ML /W3 /O2 /I ".." /I "..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "WIN32" /d "STRICT" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "_WIN32_WCE_EMULATION" /d "INTERNATIONAL" /d "USA" /d "INTLMSG_CODEPAGE" /d "NDEBUG"
@@ -461,7 +461,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MLd /W3 /Gm /Zi /Od /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "STRICT" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /MLd /W3 /Gm /Zi /Od /I ".." /I "..\..\zlibce" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /MLd /W3 /Gm /Zi /Od /I ".." /I "..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "WIN32" /d "STRICT" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "_WIN32_WCE_EMULATION" /d "INTERNATIONAL" /d "USA" /d "INTLMSG_CODEPAGE" /d "_DEBUG" /d "x86" /d "i486" /d "_x86_"
@@ -490,7 +490,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clppc.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "PPC" /D "_PPC_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I ".." /I "..\..\zlibce" /D "NDEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ppc" /d "_ppc_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
@@ -521,7 +521,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clppc.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "PPC" /D "_PPC_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "LPNGCE_EXPORTS" /YX /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlibce" /D "DEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_BUILD_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ppc" /d "_ppc_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
@@ -574,14 +574,14 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNG_C=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -593,8 +593,8 @@ NODEP_CPP_PNG_C=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNG_C=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -612,7 +612,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -624,7 +624,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -636,7 +636,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -648,7 +648,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -660,7 +660,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -672,7 +672,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -684,7 +684,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -696,7 +696,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -708,7 +708,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -720,7 +720,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -732,7 +732,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -744,7 +744,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -756,7 +756,7 @@ DEP_CPP_PNG_C=\
 	
 NODEP_CPP_PNG_C=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -779,14 +779,14 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGER=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -798,8 +798,8 @@ NODEP_CPP_PNGER=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGER=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -817,7 +817,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -829,7 +829,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -841,7 +841,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -853,7 +853,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -865,7 +865,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -877,7 +877,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -889,7 +889,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -901,7 +901,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -913,7 +913,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -925,7 +925,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -937,7 +937,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -949,7 +949,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -961,7 +961,7 @@ DEP_CPP_PNGER=\
 	
 NODEP_CPP_PNGER=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -980,14 +980,14 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGGC=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -999,8 +999,8 @@ NODEP_CPP_PNGGC=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGGC=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1018,7 +1018,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -1030,7 +1030,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -1042,7 +1042,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -1054,7 +1054,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -1066,7 +1066,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -1078,7 +1078,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -1090,7 +1090,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -1102,7 +1102,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -1114,7 +1114,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -1126,7 +1126,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -1138,7 +1138,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -1150,7 +1150,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -1162,7 +1162,7 @@ DEP_CPP_PNGGC=\
 	
 NODEP_CPP_PNGGC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -1181,14 +1181,14 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGGE=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1200,8 +1200,8 @@ NODEP_CPP_PNGGE=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGGE=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1219,7 +1219,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -1231,7 +1231,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -1243,7 +1243,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -1255,7 +1255,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -1267,7 +1267,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -1279,7 +1279,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -1291,7 +1291,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -1303,7 +1303,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -1315,7 +1315,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -1327,7 +1327,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -1339,7 +1339,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -1351,7 +1351,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -1363,7 +1363,7 @@ DEP_CPP_PNGGE=\
 	
 NODEP_CPP_PNGGE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -1382,14 +1382,14 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGME=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1401,8 +1401,8 @@ NODEP_CPP_PNGME=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGME=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1420,7 +1420,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -1432,7 +1432,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -1444,7 +1444,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -1456,7 +1456,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -1468,7 +1468,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -1480,7 +1480,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -1492,7 +1492,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -1504,7 +1504,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -1516,7 +1516,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -1528,7 +1528,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -1540,7 +1540,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -1552,7 +1552,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -1564,7 +1564,7 @@ DEP_CPP_PNGME=\
 	
 NODEP_CPP_PNGME=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -1583,14 +1583,14 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGPR=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1602,8 +1602,8 @@ NODEP_CPP_PNGPR=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGPR=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1621,7 +1621,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -1633,7 +1633,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -1645,7 +1645,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -1657,7 +1657,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -1669,7 +1669,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -1681,7 +1681,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -1693,7 +1693,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -1705,7 +1705,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -1717,7 +1717,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -1729,7 +1729,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -1741,7 +1741,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -1753,7 +1753,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -1765,7 +1765,7 @@ DEP_CPP_PNGPR=\
 	
 NODEP_CPP_PNGPR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -1784,14 +1784,14 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGRE=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1803,8 +1803,8 @@ NODEP_CPP_PNGRE=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGRE=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -1822,7 +1822,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -1834,7 +1834,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -1846,7 +1846,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -1858,7 +1858,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -1870,7 +1870,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -1882,7 +1882,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -1894,7 +1894,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -1906,7 +1906,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -1918,7 +1918,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -1930,7 +1930,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -1942,7 +1942,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -1954,7 +1954,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -1966,7 +1966,7 @@ DEP_CPP_PNGRE=\
 	
 NODEP_CPP_PNGRE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -1985,14 +1985,14 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGRI=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2004,8 +2004,8 @@ NODEP_CPP_PNGRI=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGRI=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2023,7 +2023,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -2035,7 +2035,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -2047,7 +2047,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -2059,7 +2059,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -2071,7 +2071,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -2083,7 +2083,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -2095,7 +2095,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -2107,7 +2107,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -2119,7 +2119,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -2131,7 +2131,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -2143,7 +2143,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -2155,7 +2155,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -2167,7 +2167,7 @@ DEP_CPP_PNGRI=\
 	
 NODEP_CPP_PNGRI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -2186,14 +2186,14 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGRT=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2205,8 +2205,8 @@ NODEP_CPP_PNGRT=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGRT=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2224,7 +2224,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -2236,7 +2236,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -2248,7 +2248,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -2260,7 +2260,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -2272,7 +2272,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -2284,7 +2284,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -2296,7 +2296,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -2308,7 +2308,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -2320,7 +2320,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -2332,7 +2332,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -2344,7 +2344,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -2356,7 +2356,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -2368,7 +2368,7 @@ DEP_CPP_PNGRT=\
 	
 NODEP_CPP_PNGRT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -2387,14 +2387,14 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGRU=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2406,8 +2406,8 @@ NODEP_CPP_PNGRU=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGRU=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2425,7 +2425,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -2437,7 +2437,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -2449,7 +2449,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -2461,7 +2461,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -2473,7 +2473,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -2485,7 +2485,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -2497,7 +2497,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -2509,7 +2509,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -2521,7 +2521,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -2533,7 +2533,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -2545,7 +2545,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -2557,7 +2557,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -2569,7 +2569,7 @@ DEP_CPP_PNGRU=\
 	
 NODEP_CPP_PNGRU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -2588,14 +2588,14 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGSE=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2607,8 +2607,8 @@ NODEP_CPP_PNGSE=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGSE=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2626,7 +2626,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -2638,7 +2638,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -2650,7 +2650,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -2662,7 +2662,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -2674,7 +2674,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -2686,7 +2686,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -2698,7 +2698,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -2710,7 +2710,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -2722,7 +2722,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -2734,7 +2734,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -2746,7 +2746,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -2758,7 +2758,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -2770,7 +2770,7 @@ DEP_CPP_PNGSE=\
 	
 NODEP_CPP_PNGSE=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -2789,14 +2789,14 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGTR=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2808,8 +2808,8 @@ NODEP_CPP_PNGTR=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGTR=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -2827,7 +2827,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -2839,7 +2839,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -2851,7 +2851,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -2863,7 +2863,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -2875,7 +2875,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -2887,7 +2887,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -2899,7 +2899,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -2911,7 +2911,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -2923,7 +2923,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -2935,7 +2935,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -2947,7 +2947,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -2959,7 +2959,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -2971,7 +2971,7 @@ DEP_CPP_PNGTR=\
 	
 NODEP_CPP_PNGTR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -2990,14 +2990,14 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGVC=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3009,8 +3009,8 @@ NODEP_CPP_PNGVC=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGVC=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3028,7 +3028,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -3040,7 +3040,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -3052,7 +3052,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -3064,7 +3064,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -3076,7 +3076,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -3088,7 +3088,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -3100,7 +3100,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -3112,7 +3112,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -3124,7 +3124,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -3136,7 +3136,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -3148,7 +3148,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -3160,7 +3160,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -3172,7 +3172,7 @@ DEP_CPP_PNGVC=\
 	
 NODEP_CPP_PNGVC=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -3191,14 +3191,14 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGWI=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3210,8 +3210,8 @@ NODEP_CPP_PNGWI=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGWI=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3229,7 +3229,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -3241,7 +3241,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -3253,7 +3253,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -3265,7 +3265,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -3277,7 +3277,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -3289,7 +3289,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -3301,7 +3301,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -3313,7 +3313,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -3325,7 +3325,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -3337,7 +3337,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -3349,7 +3349,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -3361,7 +3361,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -3373,7 +3373,7 @@ DEP_CPP_PNGWI=\
 	
 NODEP_CPP_PNGWI=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -3392,14 +3392,14 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGWR=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3411,8 +3411,8 @@ NODEP_CPP_PNGWR=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGWR=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3430,7 +3430,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -3442,7 +3442,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -3454,7 +3454,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -3466,7 +3466,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -3478,7 +3478,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -3490,7 +3490,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -3502,7 +3502,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -3514,7 +3514,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -3526,7 +3526,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -3538,7 +3538,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -3550,7 +3550,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -3562,7 +3562,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -3574,7 +3574,7 @@ DEP_CPP_PNGWR=\
 	
 NODEP_CPP_PNGWR=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -3593,14 +3593,14 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGWT=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3612,8 +3612,8 @@ NODEP_CPP_PNGWT=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGWT=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3631,7 +3631,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -3643,7 +3643,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -3655,7 +3655,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -3667,7 +3667,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -3679,7 +3679,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -3691,7 +3691,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -3703,7 +3703,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -3715,7 +3715,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -3727,7 +3727,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -3739,7 +3739,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -3751,7 +3751,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -3763,7 +3763,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -3775,7 +3775,7 @@ DEP_CPP_PNGWT=\
 	
 NODEP_CPP_PNGWT=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -3794,14 +3794,14 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGWU=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3813,8 +3813,8 @@ NODEP_CPP_PNGWU=\
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGWU=\
-	"..\..\zlibce\zconf.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zconf.h"\
+	"..\..\zlib\zlib.h"\
 	"..\png.h"\
 	"..\pngasmrd.h"\
 	"..\pngconf.h"\
@@ -3832,7 +3832,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Release"
@@ -3844,7 +3844,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE SH3) Debug"
@@ -3856,7 +3856,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Release"
@@ -3868,7 +3868,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE ARM) Debug"
@@ -3880,7 +3880,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Release"
@@ -3892,7 +3892,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE MIPSFP) Debug"
@@ -3904,7 +3904,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Release"
@@ -3916,7 +3916,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86) Debug"
@@ -3928,7 +3928,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Release"
@@ -3940,7 +3940,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE x86em) Debug"
@@ -3952,7 +3952,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Release"
@@ -3964,7 +3964,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "lpngce - Win32 (WCE PPC) Debug"
@@ -3976,7 +3976,7 @@ DEP_CPP_PNGWU=\
 	
 NODEP_CPP_PNGWU=\
 	"..\alloc.h"\
-	"..\..\zlibce\zlib.h"\
+	"..\..\zlib\zlib.h"\
 	
 
 !ENDIF 

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.8beta2 - July 10, 2000
+ * libpng 1.0.8beta3 - July 11, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1264,9 +1264,11 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
-   png_ptr->free_me |= PNG_FREE_TRNS;
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+      png_ptr->free_me |= PNG_FREE_TRNS;
 #else
-   png_ptr->flags |= PNG_FLAG_FREE_TRNS;
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+      png_ptr->flags |= PNG_FLAG_FREE_TRNS;
 #endif
    png_set_tRNS(png_ptr, info_ptr, png_ptr->trans, png_ptr->num_trans,
       &(png_ptr->trans_values));
@@ -1510,7 +1512,7 @@ png_handle_oFFs(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
 #if defined(PNG_READ_pCAL_SUPPORTED)
-/* read the pCAL chunk (png-scivis-19970203) */
+/* read the pCAL chunk (described in the PNG Extensions document) */
 void /* PRIVATE */
 png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {

@@ -1,4 +1,4 @@
-README for libpng 1.0.8beta2 - July 10, 2000 (shared library 2.1)
+README for libpng 1.0.8beta3 - July 11, 2000 (shared library 2.1)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -176,9 +176,9 @@ Files in this distribution:
        descrip.mms      =>  VMS makefile for MMS or MMK
        makefile.std     =>  Generic UNIX makefile (cc, creates static libpng.a)
        makefile.linux   =>  Linux/ELF makefile
-                            (gcc, creates libpng.so.2.1.0.8beta2)
+                            (gcc, creates libpng.so.2.1.0.8beta3)
        makefile.gcmmx   =>  Linux/ELF makefile (gcc, creates
-                            libpng.so.2.1.0.8beta2, uses assembler code
+                            libpng.so.2.1.0.8beta3, uses assembler code
                             tuned for Intel MMX platform)
        makefile.gcc     =>  Generic makefile (gcc, creates static libpng.a)
        makefile.knr     =>  Archaic UNIX Makefile that converts files with
@@ -190,10 +190,10 @@ Files in this distribution:
        makefile.intel   =>  Intel C/C++ version 4.0 and later
        libpng.icc       =>  Project file, IBM VisualAge/C++ 4.0 or later
        makefile.sgi     =>  Silicon Graphics IRIX (cc, creates static lib)
-       makefile.sggcc   =>  Silicon Graphics (gcc, creates libpng.so.2.1.0.8beta2)
+       makefile.sggcc   =>  Silicon Graphics (gcc, creates libpng.so.2.1.0.8beta3)
        makefile.sunos   =>  Sun makefile
        makefile.solaris =>  Solaris 2.X makefile
-                            (gcc, creates libpng.so.2.1.0.8beta2)
+                            (gcc, creates libpng.so.2.1.0.8beta3)
        makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc
        makefile.mips    =>  MIPS makefile
        makefile.acorn   =>  Acorn makefile

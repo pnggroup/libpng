@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.8beta2 - July 10, 2000
+ * libpng 1.0.8beta3 - July 11, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1368,7 +1368,7 @@ png_write_oFFs(png_structp png_ptr, png_uint_32 x_offset,
 #endif
 
 #if defined(PNG_WRITE_pCAL_SUPPORTED)
-/* write the pCAL chunk (png-scivis-19970203) */
+/* write the pCAL chunk (described in the PNG extensions document) */
 void /* PRIVATE */
 png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    png_int_32 X1, int type, int nparams, png_charp units, png_charpp params)

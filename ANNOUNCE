@@ -1,101 +1,10 @@
 
-Libpng 1.0.8beta2 - July 10, 2000
+Libpng 1.0.8beta3 - July 11, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
-Changes since the last public release (1.0.6):
+Changes since the last public release (1.0.7):
 
-  Changed sprintf() to strcpy() in png_write_sCAL_s() to work without STDIO
-  Added data_length parameter to png_decompress_chunk() function
-  Revised documentation to remove reference to abandoned png_free_chnk functions
-  Fixed an error in png_rgb_to_gray_fixed()
-  Revised example.c, usage of png_destroy_write_struct().
-  Renamed makefile.ibmvac3 to makefile.ibmc, added libpng.icc IBM project file
-  Added a check for info_ptr->free_me&PNG_FREE_TEXT when free'ing text in png.c
-  Simplify png_sig_bytes() function to remove use of non-ISO-C strdup().
-  Added png_data_freer() function.
-  In the code that checks for over-length tRNS chunks, added check of
-    info_ptr->num_trans as well as png_ptr->num_trans (Matthias Benckmann)
-  Check for existing data and free it if the free_me flag is set, in png_set_*()
-    and png_handle_*().
-  Only define PNG_WEIGHTED_FILTERS_SUPPORTED when PNG_FLOATING_POINT_SUPPORTED
-    is defined.
-  Changed several instances of PNG_NO_CONSOLE_ID to PNG_NO_STDIO in pngrutil.c
-    and mentioned the purposes of the two macros in libpng.txt/libpng.3.
-  Revised png_set_iCCP() and png_set_rows() to avoid prematurely freeing data.
-  Add checks in png_set_text() for NULL members of the input text structure.
-  Removed superfluous prototype for png_set_itxt from png.h
-  Removed "else" from pngread.c, after png_error(), and changed "0" to "length".
-  Changed several png_errors about malformed ancillary chunks to png_warnings.
-  Added png_pass-* arrays to pnggccrd.c when PNG_USE_LOCAL_ARRAYS is defined.
-  Relocated paragraph about png_set_background() in libpng.3/libpng.txt
-    and other revisions (Matthias Benckmann)
-  Relocated info_ptr->free_me to restore binary compatibility with libpng-1.0.5
-    (breaks compatibility with libpng-1.0.6).
-  Relocated info_ptr->free_me, png_ptr->free_me, and other info_ptr and
-    png_ptr members to restore binary compatibility with libpng-1.0.5
-    (breaks compatibility with libpng-1.0.6).
-  Rearranged some members at the end of png_info and png_struct, to put
-    unknown_chunks_num and free_me within the original size of the png_structs
-    and free_me, png_read_user_fn, and png_free_fn within the original png_info,
-    because some old applications allocate the structs directly instead of
-    using png_create_*().
-  Added documentation of user memory functions in libpng.txt/libpng.3
-  Modified png_read_png so that it will use user_allocated row_pointers
-    if present, unless free_me directs that it be freed, and added description
-    of the use of png_set_rows() and png_get_rows() in libpng.txt/libpng.3.
-  Added PNG_LEGACY_SUPPORTED macro, and #ifdef out all new (since version
-    1.00) members of png_struct and png_info, to regain binary compatibility
-    when you define this macro.  Capabilities lost in this event
-    are user transforms (new in version 1.0.0),the user transform pointer
-    (new in version 1.0.2), rgb_to_gray (new in 1.0.5), iCCP, sCAL, sPLT,
-    the high-level interface, and unknown chunks support (all new in 1.0.6).
-    This was necessary because of old applications that allocate the structs
-    directly as authors were instructed to do in libpng-0.88 and earlier,
-    instead of using png_create_*(). 
-  Added makefile.intel and updated makefile.watcom (Pawel Mrochen)
-  Overloaded png_read_init() and png_write_init() with macros that convert
-    calls to png_read_init_2() or png_write_init_2() that check the version
-    and structure sizes.
-  Made PNG_NO_ITXT_SUPPORTED the default setting, to avoid memory overrun
-    when old applications fill the info_ptr->text structure directly.
-  Added PNGAPI macro, and added it to the definitions of all exported functions.
-  Relocated version macro definitions ahead of the includes of zlib.h and
-    pngconf.h in png.h.
-  Made PNG_NO_CONSOLE_IO the default condition when PNG_BUILD_DLL is defined.
-  Use MSC _RPTn debugging instead of fprintf if _MSC_VER is defined.
-  Added png_access_version_number() function.
-  Check for mask&PNG_FREE_CHNK (for TEXT, SCAL, PCAL) in png_free_data().
-  Expanded libpng.3/libpng.txt information about png_data_freer().
-  Changed pnggccrd.c and pngvcrd.c to handle bad adaptive filter types as
-    warnings instead of errors, as pngrutil.c does.
-  Set the PNG_INFO_IDAT valid flag in png_set_rows() so png_write_png()
-    will actually write IDATs.
-  Made the default PNG_USE_LOCAL_ARRAYS depend on PNG_DLL instead of WIN32.
-  Make png_free_data() ignore its final parameter when freeing data that can
-    have multiple instances (text, sPLT, unknowns).
-  Removed info_ptr->valid tests from png_free_data(), as in version 1.0.5.
-  Added png_set_invalid() function.
-  Fixed incorrect illustrations of png_destroy_write_struct() in example.c.
-  Revised the deliberately erroneous Linux setjmp code in pngconf.h to produce
-    fewer error messages.
-  Set each pointer to NULL after freeing it in png_free_data().
-  Worked around a problem in pngconf.h; AIX's strings.h defines an "index"
-    macro that conflicts with libpng's png_color_16.index. (Dimitri Papadapoulos)
-  Added PNG_NO_POINTER_INDEXING macro to use array-indexing instead of pointer
-    indexing in pngrutil.c and pngwutil.c to accommodate a buggy compiler.
-  Added a check for overlength PLTE chunk in pngrutil.c.
-  Added PNG_NO_POINTER_INDEXING macro to use array-indexing instead of pointer
-    indexing in pngrutil.c and pngwutil.c to accommodate a buggy compiler.
-  Added a warning in png_decompress_chunk() when it runs out of data.
-  Revised the copyright/disclaimer/license notice.
-  Corrected the definition of PNG_TRANSFORM_INVERT_ALPHA  (0x0400 not 0x0200)
-  Added PNG_USE_DLL macro.
-  Added "msvc" and contrib/msvctest directories with MSVC++ project files
-    (Simon-Pierre Cadieux) and contrib/visupng directory (Willem van Schaik).
-  Removed leading underscores from "_PNG_H" and "_PNG_SAVE_BSD_SOURCE" macros.
-  Fixed bugs in pngwrite.c and pngwutil.c that prevented writing iCCP chunks.
-  Revised the definition of "trans_values" in libpng.3/libpng.txt
   Added png_free(png_ptr, key) two places in pngpread.c to stop memory leaks.
   Changed PNG_NO_STDIO to PNG_NO_CONSOLE_IO, several places in pngrutil.c and
      pngwutil.c.
@@ -103,7 +12,9 @@ Changes since the last public release (1.0.6):
   Removed unused "#include <assert.h>" from png.c
   Added WindowsCE support.
   Revised pnggccrd.c to work with gcc-2.95.2 and in the Cygwin environment.
-
+  Only set the PNG_FLAG_FREE_TRNS or PNG_FREE_TRNS flag in png_handle_tRNS()
+     for indexed-color input files to avoid potential double-freeing trans array
+     under some unusual conditions; problem was introduced in version 1.0.7.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.8beta2 - July 10, 2000
+ * libpng 1.0.8beta3 - July 11, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -557,20 +557,33 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif
 
+#if defined(_WIN32_WCE)
+   TCHAR path[MAX_PATH];
+#endif
    char inbuf[256], outbuf[256];
 
    row_buf = (png_bytep)NULL;
 
+#if defined(_WIN32_WCE)
+   MultiByteToWideChar(CP_ACP, 0, inname, -1, path, MAX_PATH);
+   if ((fpin = CreateFile(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL)) == INVALID_HANDLE_VALUE)
+#else
    if ((fpin = fopen(inname, "rb")) == NULL)
+#endif
    {
       fprintf(STDERR, "Could not find input file %s\n", inname);
       return (1);
    }
 
+#if defined(_WIN32_WCE)
+   MultiByteToWideChar(CP_ACP, 0, outname, -1, path, MAX_PATH);
+   if ((fpout = CreateFile(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL)) == INVALID_HANDLE_VALUE)
+#else
    if ((fpout = fopen(outname, "wb")) == NULL)
+#endif
    {
       fprintf(STDERR, "Could not open output file %s\n", outname);
-      fclose(fpin);
+      FCLOSE(fpin);
       return (1);
    }
 
@@ -619,8 +632,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
-      fclose(fpin);
-      fclose(fpout);
+      FCLOSE(fpin);
+      FCLOSE(fpout);
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
@@ -638,8 +651,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
-      fclose(fpin);
-      fclose(fpout);
+      FCLOSE(fpin);
+      FCLOSE(fpout);
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
@@ -965,8 +978,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infopp)NULL);
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
-      fclose(fpin);
-      fclose(fpout);
+      FCLOSE(fpin);
+      FCLOSE(fpout);
       return (1);
    }
    png_debug(0, "Writing row data\n");
@@ -1082,20 +1095,30 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_destroy_info_struct(write_ptr, &write_end_info_ptr);
    png_destroy_write_struct(&write_ptr, &write_info_ptr);
 
-   fclose(fpin);
-   fclose(fpout);
+   FCLOSE(fpin);
+   FCLOSE(fpout);
 
    png_debug(0, "Opening files for comparison\n");
+#if defined(_WIN32_WCE)
+   MultiByteToWideChar(CP_ACP, 0, inname, -1, path, MAX_PATH);
+   if ((fpin = CreateFile(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL)) == INVALID_HANDLE_VALUE)
+#else
    if ((fpin = fopen(inname, "rb")) == NULL)
+#endif
    {
       fprintf(STDERR, "Could not find file %s\n", inname);
       return (1);
    }
 
+#if defined(_WIN32_WCE)
+   MultiByteToWideChar(CP_ACP, 0, outname, -1, path, MAX_PATH);
+   if ((fpout = CreateFile(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL)) == INVALID_HANDLE_VALUE)
+#else
    if ((fpout = fopen(outname, "rb")) == NULL)
+#endif
    {
       fprintf(STDERR, "Could not find file %s\n", outname);
-      fclose(fpin);
+      FCLOSE(fpin);
       return (1);
    }
 
@@ -1122,8 +1145,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
               ZLIB_VERSION);
             wrote_question=1;
          }
-         fclose(fpin);
-         fclose(fpout);
+         FCLOSE(fpin);
+         FCLOSE(fpout);
          return (0);
       }
 
@@ -1145,14 +1168,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
               ZLIB_VERSION);
             wrote_question=1;
          }
-         fclose(fpin);
-         fclose(fpout);
+         FCLOSE(fpin);
+         FCLOSE(fpout);
          return (0);
       }
    }
 
-   fclose(fpin);
-   fclose(fpout);
+   FCLOSE(fpin);
+   FCLOSE(fpout);
 
    return (0);
 }
@@ -1412,4 +1435,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_8beta2 your_png_h_is_not_version_1_0_8beta2;
+typedef version_1_0_8beta3 your_png_h_is_not_version_1_0_8beta3;
