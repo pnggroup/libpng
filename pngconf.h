@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.8rc2 - November 26, 2004
+ * libpng version 1.2.8rc3 - November 28, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1320,6 +1320,17 @@ typedef z_stream FAR *  png_zstreamp;
 #endif
 #ifndef PNG_IMPEXP
 #  define PNG_IMPEXP
+#endif
+
+#ifdef PNG_BUILDSYMS
+#  ifndef PNG_EXPORT
+#    define PNG_EXPORT(type,symbol) PNG_FUNCTION_EXPORT symbol END
+#  endif
+#  ifdef PNG_USE_GLOBAL_ARRAYS
+#    ifndef PNG_EXPORT_VAR
+#      define PNG_EXPORT_VAR(type) PNG_DATA_EXPORT
+#    endif
+#  endif
 #endif
 
 #ifndef PNG_EXPORT
