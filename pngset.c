@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.6f - April 14, 2000
+ * libpng 1.0.6g - April 24, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -693,6 +693,14 @@ png_set_unknown_chunks(png_structp png_ptr,
     info_ptr->unknown_chunks_num += num_unknowns;
     info_ptr->free_me |= PNG_FREE_UNKN;
 }
+void
+png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
+   int chunk, int location)
+{
+   if(png_ptr != NULL && info_ptr != NULL && chunk >= 0 && chunk < 
+         (int)info_ptr->unknown_chunks_num)
+      info_ptr->unknown_chunks[chunk].location = (png_byte)location;
+}
 #endif
 
 #if defined(PNG_READ_EMPTY_PLTE_SUPPORTED) || \
@@ -772,3 +780,14 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
 }
 #endif
 
+
+void
+png_set_compression_buffer_size(png_structp png_ptr, png_uint_32 size)
+{
+    if(png_ptr->zbuf)
+       png_free(png_ptr, png_ptr->zbuf);
+    png_ptr->zbuf_size = (png_size_t)size;
+    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, size);
+    png_ptr->zstream.next_out = png_ptr->zbuf;
+    png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+}

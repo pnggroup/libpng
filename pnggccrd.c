@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.6f - April 14, 2000
+ * libpng 1.0.6g - April 24, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -136,6 +136,12 @@
 int mmxsupport(void);
 
 static int mmx_supported = 2;
+
+#ifdef PNG_USE_LOCAL_ARRAYS
+static const int png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+static const int png_pass_inc[7]   = {8, 8, 4, 4, 2, 2, 1};
+static const int png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
+#endif
 
 // djgpp adds its own underscores to global variables, so define them without:
 #ifdef __DJGPP__
@@ -4494,7 +4500,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       default:
-         png_error(png_ptr, "Bad adaptive filter type");
+         png_error(png_ptr, "#103 Bad adaptive filter type");
          break;
    }
 }

@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.6f - April 14, 2000
+ * libpng version 1.0.6g - April 24, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.6f - April 14, 2000: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.6g - April 24, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -47,7 +47,7 @@
  *    1.0.5e-r                 1.0.5e-r 10100  2.1.0.5e-r (not compatible)
  *    1.0.5s-v                 1.0.5s-v 10006  2.1.0.5s-v (compatible)
  *    1.0.6 (+ 3 patches)      1.0.6    10006  2.1.0.6
- *    1.0.6d-f                 1.0.6d-f 10007  2.1.0.6d-f
+ *    1.0.6d-g                 1.0.6d-g 10007  2.1.0.6d-g
  *    1.0.7                    1.0.7    10007  2.1.0.7    (still compatible)
  *
  *    Henceforth the source version will match the shared-library minor
@@ -73,7 +73,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.89c, June 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.6f, April 14, 2000)
+ * (libpng versions 0.97, January 1998, through 1.0.6g, April 24, 2000)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -148,13 +148,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    April 14, 2000
+ *    April 24, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.6f are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.6g are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -232,7 +232,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.6f"
+#define PNG_LIBPNG_VER_STRING "1.0.6g"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -483,8 +483,6 @@ typedef struct png_info_struct
     * and initialize the appropriate fields below.
     */
 
-   png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
-
 #if defined(PNG_gAMA_SUPPORTED) || defined(PNG_READ_GAMMA_SUPPORTED)
    /* The gAMA chunk describes the gamma characteristics of the system
     * on which the image was created, normally in the range [1.0, 2.5].
@@ -493,7 +491,6 @@ typedef struct png_info_struct
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    float gamma; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
 #endif
-   png_fixed_point int_gamma; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
 #endif
 
 #if defined(PNG_sRGB_SUPPORTED)
@@ -609,16 +606,6 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    float x_blue;
    float y_blue;
 #endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
-   png_fixed_point int_x_white;
-   png_fixed_point int_y_white;
-   png_fixed_point int_x_red;
-   png_fixed_point int_y_red;
-   png_fixed_point int_x_green;
-   png_fixed_point int_y_green;
-   png_fixed_point int_x_blue;
-   png_fixed_point int_y_blue;
-#endif
 #endif
 
 #if defined(PNG_pCAL_SUPPORTED)
@@ -687,6 +674,24 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* Data valid if (valid & PNG_INFO_IDAT) non-zero */
    png_bytepp row_pointers;        /* the image bits */
 #endif
+
+#if defined(PNG_gAMA_SUPPORTED) || defined(PNG_READ_GAMMA_SUPPORTED)
+   png_fixed_point int_gamma; /* gamma of image, if (valid & PNG_INFO_gAMA) */
+#endif
+
+#if defined(PNG_cHRM_SUPPORTED) && defined(PNG_FIXED_POINT_SUPPORTED)
+   png_fixed_point int_x_white;
+   png_fixed_point int_y_white;
+   png_fixed_point int_x_red;
+   png_fixed_point int_y_red;
+   png_fixed_point int_x_green;
+   png_fixed_point int_y_green;
+   png_fixed_point int_x_blue;
+   png_fixed_point int_y_blue;
+#endif
+
+   png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
+
 } png_info;
 
 typedef png_info FAR * png_infop;
@@ -881,14 +886,8 @@ struct png_struct_def
    png_byte user_transform_channels; /* channels in user transformed pixels */
 #endif
 
-#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-   png_voidp user_chunk_ptr;
-   png_user_chunk_ptr read_user_chunk_fn; /* user read chunk handler */
-#endif
-
    png_uint_32 mode;          /* tells us where we are in the PNG file */
    png_uint_32 flags;         /* flags indicating various things to libpng */
-   png_uint_32 free_me;       /* flags items libpng is responsible for freeing */
    png_uint_32 transformations; /* which transformations to perform */
 
    z_stream zstream;          /* pointer to decompression structure (below) */
@@ -962,7 +961,6 @@ struct png_struct_def
    float gamma;          /* file gamma value */
    float screen_gamma;   /* screen gamma value (display_exponent) */
 #endif
-   png_fixed_point int_gamma;
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
@@ -1070,12 +1068,23 @@ struct png_struct_def
    int num_chunk_list;
    png_bytep chunk_list;
 #endif
+
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
+   png_fixed_point int_gamma;
+#endif
+
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+   png_voidp user_chunk_ptr;
+   png_user_chunk_ptr read_user_chunk_fn; /* user read chunk handler */
+#endif
+
+   png_uint_32 free_me;       /* flags items libpng is responsible for freeing */
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.6f
+and png.h are both at * version 1.0.6g
  */
-typedef png_structp version_1_0_6f;
+typedef png_structp version_1_0_6g;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1113,6 +1122,15 @@ extern PNG_EXPORT(png_structp,png_create_read_struct)
 extern PNG_EXPORT(png_structp,png_create_write_struct)
    PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn));
+
+extern PNG_EXPORT(png_uint_32,png_get_compression_buffer_size)
+   PNGARG((png_structp png_ptr));
+
+extern PNG_EXPORT(void,png_set_compression_buffer_size)
+   PNGARG((png_structp png_ptr, png_uint_32 size));
+
+/* Reset the compression stream */
+extern PNG_EXPORT(int,png_reset_zstream) PNGARG((png_structp png_ptr));
 
 #ifdef PNG_USER_MEM_SUPPORTED
 extern PNG_EXPORT(png_structp,png_create_read_struct_2)
@@ -2003,6 +2021,8 @@ extern PNG_EXPORT(void, png_set_keep_unknown_chunks) PNGARG((png_structp
    png_ptr, int keep, png_bytep chunk_list, int num_chunks));
 extern PNG_EXPORT(void, png_set_unknown_chunks) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_unknown_chunkp unknowns, int num_unknowns));
+extern PNG_EXPORT(void, png_set_unknown_chunk_location)
+   PNGARG((png_structp png_ptr, png_infop info_ptr, int chunk, int location));
 extern PNG_EXPORT(png_uint_32,png_get_unknown_chunks) PNGARG((png_structp
    png_ptr, png_infop info_ptr, png_unknown_chunkpp entries));
 #endif
@@ -2058,7 +2078,7 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.6f - April 14, 2000 (header)\n"
+   " libpng version 1.0.6g - April 24, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on

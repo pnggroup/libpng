@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.6f - April 14, 2000
+ * libpng 1.0.6g - April 24, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -893,7 +893,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             generated locations in write_info_ptr are wrong because we
             haven't written anything yet */
          for (i = 0; i < (png_size_t)num_unknowns; i++)
-           write_info_ptr->unknown_chunks[i].location = unknowns[i].location;
+           png_set_unknown_chunk_location(write_ptr, write_info_ptr, i,
+             unknowns[i].location);
       }
    }
 #endif
@@ -1007,8 +1008,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             generated locations in write_end_info_ptr are wrong because we
             haven't written the end_info yet */
          for (i = 0; i < (png_size_t)num_unknowns; i++)
-           write_end_info_ptr->unknown_chunks[i].location =
-              unknowns[i].location;
+           png_set_unknown_chunk_location(write_ptr, write_end_info_ptr, i,
+             unknowns[i].location);
       }
    }
 #endif
@@ -1344,4 +1345,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_6f your_png_h_is_not_version_1_0_6f;
+typedef version_1_0_6g your_png_h_is_not_version_1_0_6g;
