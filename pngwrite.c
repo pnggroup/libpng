@@ -1,10 +1,10 @@
 
 /* pngwrite.c - general routines to write a png file
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1996
+   January 15, 1996
    */
 
 /* get internal access to png.h */
@@ -161,12 +161,12 @@ png_write_end(png_structp png_ptr, png_infop info)
 void
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
 {
-	ptime->year = 1900 + ttime->tm_year;
-	ptime->month = ttime->tm_mon + 1;
-	ptime->day = ttime->tm_mday;
-	ptime->hour = ttime->tm_hour;
-	ptime->minute = ttime->tm_min;
-	ptime->second = ttime->tm_sec;
+	ptime->year = (png_uint_16)(1900 + ttime->tm_year);
+	ptime->month = (png_byte)(ttime->tm_mon + 1);
+	ptime->day = (png_byte)ttime->tm_mday;
+	ptime->hour = (png_byte)ttime->tm_hour;
+	ptime->minute = (png_byte)ttime->tm_min;
+	ptime->second = (png_byte)ttime->tm_sec;
 }
 
 void
@@ -322,8 +322,8 @@ png_write_row(png_structp png_ptr, png_bytep row)
    png_ptr->row_info.width = png_ptr->usr_width;
    png_ptr->row_info.channels = png_ptr->usr_channels;
    png_ptr->row_info.bit_depth = png_ptr->usr_bit_depth;
-   png_ptr->row_info.pixel_depth = png_ptr->row_info.bit_depth *
-      png_ptr->row_info.channels;
+	png_ptr->row_info.pixel_depth = (png_byte)(png_ptr->row_info.bit_depth *
+		png_ptr->row_info.channels);
    png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
       (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
@@ -421,14 +421,14 @@ png_write_row(png_structp png_ptr, png_bytep row)
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
 /* Set the automatic flush interval or 0 to turn flushing off */
 void
-png_set_flush(png_struct *png_ptr, int nrows)
+png_set_flush(png_structp png_ptr, int nrows)
 {
 	png_ptr->flush_dist = (nrows < 0 ? 0 : nrows);
 }
 
 /* flush the current output buffers now */
 void
-png_write_flush(png_struct *png_ptr)
+png_write_flush(png_structp png_ptr)
 {
 	int wrote_IDAT;
 
@@ -501,7 +501,7 @@ void
 png_set_filtering(png_structp png_ptr, int filter)
 {
    png_ptr->do_custom_filter = 1;
-   png_ptr->do_filter = filter;
+   png_ptr->do_filter = (png_byte)filter;
 }
 
 void

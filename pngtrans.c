@@ -2,10 +2,10 @@
 /* pngtrans.c - transforms the data in a row
    routines used by both readers and writers
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1996
+   January 15, 1996
    */
 
 #define PNG_INTERNAL
@@ -113,7 +113,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
          i < row_info->rowbytes;
          i++, rp++)
       {
-         *rp = ~(*rp);
+         *rp = (png_byte)(~(*rp));
       }
    }
 }

@@ -1,10 +1,10 @@
 
 /* pngio.c - stub functions for i/o and memory allocation
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1996
+   January 15, 1996
 
    This file provides a location for all input/output.  Users which need
 	special handling are expected to write functions which have the same
@@ -164,7 +164,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 #else
    /* this works in MSC also but with lost segment warning */
    n_data = (png_byte *)data;
-   if ((PNG_BYTEP )n_data == data)
+   if ((png_bytep)n_data == data)
 #endif
    {
       check = fread(n_data, 1, (size_t)length, png_ptr->fp);
@@ -196,16 +196,19 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 }
 #endif
 
+/* This function is called to output any data pending writing (normally
+	to disk.  After png_flush is called, there should be no data pending
+	writing in any buffers. */
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
 void
-png_flush(png_struct *png_ptr)
+png_flush(png_structp png_ptr)
 {
 	if (png_ptr->output_flush_fn)
 		(*(png_ptr->output_flush_fn))(png_ptr);
 }
 
 void
-png_default_flush(png_struct *png_ptr)
+png_default_flush(png_structp png_ptr)
 {
 	if (png_ptr->fp)
 		fflush(png_ptr->fp);
@@ -223,19 +226,20 @@ png_default_flush(png_struct *png_ptr)
 						 arguments a pointer to a png_struct, a pointer to
 						 data to be written, and a 32-bit unsigned int which is
 						 the number of bytes to be written.  The new write
-						 function should call png_error("Error msg")
+						 function should call png_error(png_ptr, "Error msg")
 						 to exit and output any fatal error messages.
 	flush_data_fn - pointer to a new flush function which takes as its
 						 arguments a pointer to a png_struct.  After a call to
 						 the flush function, there should be no data in any buffers
 						 or pending transmission.  If the output method doesn't do
-						 any buffering of ouput, this parameter can be NULL.  If
-						 PNG_WRITE_FLUSH_SUPPORTED is not defined at libpng
-						 compile time, output_flush_fn will be ignored, although
-						 it must be supplied for compatibility. */
+						 any buffering of ouput, a function prototype must still be
+						 supplied although it doesn't have to do anything.  If
+						 PNG_WRITE_FLUSH_SUPPORTED is not defined at libpng compile
+						 time, output_flush_fn will be ignored, although it must be
+						 supplied for compatibility. */
 void
-png_set_write_fn(png_structp png_ptr, png_voidp io_ptr, png_rw_ptr write_data_fn,
-	png_flush_ptr output_flush_fn)
+png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
+	png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn)
 {
 	png_ptr->io_ptr = io_ptr;
 
@@ -245,10 +249,10 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr, png_rw_ptr write_data_fn
 		png_ptr->write_data_fn = png_default_write_data;
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
-	if (output_flush_fn == NULL)
-		png_ptr->output_flush_fn = png_default_flush;
-	else
+	if (output_flush_fn)
 		png_ptr->output_flush_fn = output_flush_fn;
+	else
+		png_ptr->output_flush_fn = png_default_flush;
 #endif /* PNG_WRITE_FLUSH_SUPPORTED */
 
 	/* It is an error to read while writing a png file */
@@ -270,7 +274,8 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr, png_rw_ptr write_data_fn
 						To exit and output any fatal error messages the new write
                   function should call png_error(png_ptr, "Error msg"). */
 void
-png_set_read_fn(png_struct *png_ptr, void *io_ptr, png_rw_ptr read_data_fn)
+png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
+	png_rw_ptr read_data_fn)
 {
 	png_ptr->io_ptr = io_ptr;
 
@@ -291,8 +296,8 @@ png_set_read_fn(png_struct *png_ptr, void *io_ptr, png_rw_ptr read_data_fn)
 /* This function returns a pointer to the io_ptr associated with the user
 	functions.  The application should free any memory associated with this
 	pointer before png_write_destroy and png_read_destroy are called. */
-void *
-png_get_io_ptr(png_struct *png_ptr)
+png_voidp
+png_get_io_ptr(png_structp png_ptr)
 {
 	return png_ptr->io_ptr;
 }

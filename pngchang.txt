@@ -65,5 +65,8 @@ version 0.85
 version 0.86
    fixed bugs
    improved documentation
-
+version 0.87
+	fixed medium model bugs
+	fixed other bugs introduced in 0.85 and 0.86
+   added some minor documentation
 

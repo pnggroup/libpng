@@ -1,10 +1,10 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1996
+   January 15, 1996
 
 	This file provides a location for all error handling.  Users which
    need special error handling are expected to write replacement functions
@@ -42,6 +42,10 @@ png_warning(png_structp png_ptr, png_const_charp message)
 		png_default_warning(png_ptr, message);
 }
 
+/* This is the default error handling function.  Note that replacements for
+	this function MUST NOT RETURN, or the program will likely crash.  This
+	function is used by default, or if the program supplies NULL for the
+	error function pointer in png_set_message_fn(). */
 void
 png_default_error(png_structp png_ptr, png_const_charp message)
 {

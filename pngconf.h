@@ -1,10 +1,10 @@
 
 /* pngconf.c - machine configurable file for libpng
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1996
+   January 15, 1996
    */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -27,7 +27,7 @@
    Unless this gets smaller then the size of a row (compressed),
    it should not make much difference how big this is.  */
 
-#define PNG_ZBUF_SIZE 8192
+#define PNG_ZBUF_SIZE 32768
 
 /* While libpng currently uses zlib for it's compression, it has been designed
    to stand on it's own.  Towards this end, there are two defines that are

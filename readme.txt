@@ -1,4 +1,4 @@
-readme.txt - for libpng 0.86
+readme.txt - for libpng 0.87
 
 This is a bug fix for the second beta version of libpng 1.0, and
 a first try at a progressive (push) reader.  It hasn't been
@@ -60,6 +60,11 @@ You can reach me at:
 internet: schalnat@group42.com
 CompuServe: 75501,1625
 
+I tend to check my CompuServe account very infrequently, so you may
+want to use the internet account.  If I don't answer your email
+immediately, please be patient.  If you don't receive a reply within
+a week, you may want to write and ask if I got the first email.
+
 Please do not send me general questions about PNG.  Send them to
 the address in the specification.  At the same time, please do
 not send libpng questions to that address, send them to me.  I'll
@@ -70,7 +75,7 @@ and ...".  If in doubt, send questions to me.  I'll bounce them
 to others, if necessary.
 
 Please do not send suggestions on how to change PNG.  We have
-been discussing PNG for 9 months now, and it is official and
+been discussing PNG for over a year now, and it is official and
 finished.  If you have suggestions for libpng, however, I'll
 gladly listen.  Even if your suggestion is not used for version
 1.0, it may be used later.

@@ -1,9 +1,9 @@
 libpng.txt - a description on how to use and modify libpng
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
 	For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-	January 10, 1996
+	January 15, 1996
 	Updated/rewritten per request in the libpng FAQ
 	Copyright (c) 1995 Frank J. T. Wojcik
 	December 18, 1995
@@ -13,7 +13,7 @@ I. Introduction
 This file describes how to use and modify the PNG reference library
 (known as libpng) for your own use.  There are five sections to this
 file: introduction, structures, reading, writing, and modification and
-configuration notes for various special platforms.  Other then this
+configuration notes for various special platforms.  In addition to this
 file, example.c is a good starting point for using the library, as
 it is heavily commented and should include everything most people
 will need.
@@ -22,7 +22,7 @@ Libpng was written as a companion to the PNG specification, as a
 way to reduce the amount of time and effort it takes to support
 the PNG file format in application programs.  Most users will not
 have to modify the library significantly; advanced users may want
-to modify it more.  The library was coded for both kind of users.
+to modify it more.  The library was coded for both kinds of users.
 All attempts were made to make it as complete as possible, while
 keeping the code easy to understand.  Currently, this library
 only supports C.  Support for other languages is being considered.
@@ -37,8 +37,14 @@ majority of the needs of it's users.
 
 Libpng uses zlib for its compression and decompression of PNG files.
 The zlib compression utility is a general purpose utility that is
-useful for more then PNG files, and can be used without libpng.
+useful for more than PNG files, and can be used without libpng.
 See the documentation delivered with zlib for more details.
+
+Libpng is thread safe provided the threads are using different
+instances of the structures.  Each thread should have its own
+png_struct and png_info instances, and thus its own image.
+Libpng does not protect itself against two threads using the
+same instance of a structure.
 
 
 
@@ -287,8 +293,8 @@ PNG can have files with 16 bits per channel.  If you only can handle
    if (info_ptr->bit_depth == 16)
       png_set_strip_16(png_ptr);
 
-If you need to reduce an rgb file to a paletted file (perhaps because
-a paletted file has more entries then will fit on your screen)
+If you need to reduce an rgb file to a paletted file, or if a
+paletted file has more entries then will fit on your screen,
 png_set_dither() will do that.  Note that this is a simple match
 dither, that merely finds the closest color available.  This should
 work fairly well with optimized palettes, and fairly badly with linear
@@ -799,7 +805,7 @@ time_t routine uses gmtime().  You don't have to use either of
 these, but if you wish to fill in the png_time structure directly,
 you should provide the time in universal time (GMT) if possible
 instead of your local time.  Note that the year number is the full
-year (ie 1996, rather than 96)
+year (ie 1996, rather than 96).
 
 It is possible to have libpng flush any pending output, either manually,
 or automatically after a certain number of lines have been written.  To
@@ -1024,8 +1030,9 @@ The replacement I/O functions should have prototypes as follows:
 		png_uint_32 length);
 	void user_flush_data(png_structp png_ptr);
 
-Note that you can pass NULL for the flush function if you are not doing
-flushing of the output data.
+Supplying NULL for the read, write, or flush functions sets them back
+to using the default C stream functions.  It is an error to read from
+a write stream, and vice versa.
 
 Error handling in libpng is done through png_error() and png_warning().
 Errors handled through png_error() are fatal, meaning that png_error()
@@ -1073,12 +1080,18 @@ itself.
 
 Configuring for 16 bit platforms:
 
-You will probably need to change the png_large_malloc() and
+You may need to change the png_large_malloc() and
 png_large_free() routines in pngmem.c, as these are requred
 to allocate 64K.  Also, you will want to look into zconf.h to tell
 zlib (and thus libpng) that it cannot allocate more then 64K at a
 time.  Even if you can, the memory won't be accessable.  So limit zlib
 and libpng to 64K by defining MAXSEG_64K.
+
+Configuring for DOS:
+
+For DOS users which only have access to the lower 640K, you will
+have to limit zlib's memory usage via a png_set_compression_mem_level()
+call.  See zlib.h or zconf.h in the zlib library for more information.
 
 Configuring for Medium Model:
 
@@ -1089,7 +1102,7 @@ all set.  Everything in the library (except for zlib's structure) is
 expecting far data.  You must use the typedefs with the p or pp on
 the end for pointers (or at least look at them and be careful).  Make
 note that the row's of data are defined as png_bytepp which is a
-unsigned char far * far *
+unsigned char far * far *.
 
 Configuring for gui/windowing platforms:
 
@@ -1099,14 +1112,47 @@ You may want to write a single function to do this and call it something
 like png_message().  On some compliers, you may have to change the
 memory allocators (png_malloc, etc.).
 
-
 Configuring for compiler xxx:
 
 All includes for libpng are in pngconf.h.  If you need to add/change/delete
 an include, this is the place to do it.  The includes that are not
 needed outside libpng are protected by the PNG_INTERNAL definition,
 which is only defined for those routines inside libpng itself.  The
-files in libpng proper only include png.h.
+files in libpng proper only include png.h, which includes pngconf.h.
+
+Configuring zlib:
+
+There are special functions to configure the compression.  Perhaps
+the most useful one changes the compression level.  The library
+normally uses the default compression level, but for maximum
+compression (9) or maximum speed (1), you may desire to change the
+level.  You do this by calling:
+
+	png_set_compression_mem_level(png_ptr, level);
+
+Another useful one is to reduce the memory level used by the library.
+The memory level defaults to 8, but it can be lowered if you are
+short on memory (running DOS, for example, where you only have 640K).
+
+	png_set_compression_mem_level(png_ptr, level);
+
+If you want to control whether libpng uses filtering or not, you
+can call this function.  I recommend not changing the default unless
+you are experimenting with compression ratios.
+
+	png_set_filtering(png_ptr, use_filter);
+
+The other functions are for configuring zlib.  They are not recommended
+for normal use and may result in writing an invalid png file.  See
+zlib.h for more information on what these mean.
+
+	png_set_compression_strategy(png_ptr, strategy);
+	png_set_compression_window_bits(png_ptr, window_bits);
+	png_set_compression_method(png_ptr, method);
+
+Except for png_set_filtering(), all of these are just controlling
+zlib, so see the zlib documentation (zlib.h and zconf.h) for more
+information.
 
 Removing unwanted object code:
 

@@ -1,9 +1,9 @@
 /* pngrcb.c - callbacks while reading a png file
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1996
+   January 15, 1996
    */
 
 #define PNG_INTERNAL
@@ -20,11 +20,11 @@ png_read_IHDR(png_structp png_ptr, png_infop info,
 
    info->width = width;
    info->height = height;
-   info->bit_depth = bit_depth;
-   info->color_type = color_type;
-   info->compression_type = compression_type;
-   info->filter_type = filter_type;
-	info->interlace_type = interlace_type;
+	info->bit_depth = (png_byte)bit_depth;
+	info->color_type =(png_byte) color_type;
+	info->compression_type = (png_byte)compression_type;
+	info->filter_type = (png_byte)filter_type;
+	info->interlace_type = (png_byte)interlace_type;
    if (info->color_type == PNG_COLOR_TYPE_PALETTE)
       info->channels = 1;
    else if (info->color_type & PNG_COLOR_MASK_COLOR)
@@ -33,7 +33,7 @@ png_read_IHDR(png_structp png_ptr, png_infop info,
       info->channels = 1;
    if (info->color_type & PNG_COLOR_MASK_ALPHA)
       info->channels++;
-   info->pixel_depth = info->channels * info->bit_depth;
+	info->pixel_depth = (png_byte)(info->channels * info->bit_depth);
    info->rowbytes = ((info->width * info->pixel_depth + 7) >> 3);
 }
 
@@ -45,7 +45,7 @@ png_read_PLTE(png_structp png_ptr, png_infop info,
       return;
 
    info->palette = palette;
-   info->num_palette = num;
+	info->num_palette = (png_uint_16)num;
    info->valid |= PNG_INFO_PLTE;
 }
 
@@ -112,7 +112,7 @@ png_read_tRNS(png_structp png_ptr, png_infop info,
       png_memcpy(&(info->trans_values), trans_values,
          sizeof(png_color_16));
    }
-   info->num_trans = num_trans;
+	info->num_trans = (png_uint_16)num_trans;
    info->valid |= PNG_INFO_tRNS;
 }
 #endif
@@ -152,7 +152,7 @@ png_read_pHYs(png_structp png_ptr, png_infop info,
 
    info->x_pixels_per_unit = res_x;
    info->y_pixels_per_unit = res_y;
-   info->phys_unit_type = unit_type;
+	info->phys_unit_type = (png_byte)unit_type;
    info->valid |= PNG_INFO_pHYs;
 }
 #endif
@@ -167,7 +167,7 @@ png_read_oFFs(png_structp png_ptr, png_infop info,
 
    info->x_offset = offset_x;
    info->y_offset = offset_y;
-   info->offset_unit_type = unit_type;
+   info->offset_unit_type = (png_byte)unit_type;
    info->valid |= PNG_INFO_oFFs;
 }
 #endif
@@ -200,16 +200,22 @@ png_read_zTXt(png_structp png_ptr, png_infop info,
          png_uint_32 old_max;
 
          old_max = info->max_text;
-         info->max_text = info->num_text + 16;
-			info->text = (png_textp)png_realloc(png_ptr,
-            info->text,
-            info->max_text * sizeof (png_text),
-				old_max * sizeof (png_text));
+			info->max_text = info->num_text + 16;
+			{
+				png_textp old_text;
+
+				old_text = info->text;
+				info->text = (png_textp)png_large_malloc(png_ptr,
+					info->max_text * sizeof (png_text));
+				png_memcpy(info->text, old_text,
+					(png_size_t)(old_max * sizeof (png_text)));
+				png_large_free(png_ptr, old_text);
+			}
       }
       else
       {
          info->max_text = info->num_text + 16;
-         info->text = (png_textp)png_malloc(png_ptr,
+         info->text = (png_textp)png_large_malloc(png_ptr,
             info->max_text * sizeof (png_text));
          info->num_text = 0;
       }

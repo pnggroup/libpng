@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose png functions
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1996
+   January 15, 1996
    */
 
 #define PNG_INTERNAL
@@ -13,7 +13,7 @@
 
 /* version information for c files.  This better match the version
    string defined in png.h */
-char FARDATA png_libpng_ver[] = "0.86";
+char png_libpng_ver[] = "0.87";
 
 /* place to hold the signiture string for a png file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -107,11 +107,22 @@ png_check_sig(png_bytep sig, int num)
 voidpf
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
-	voidp ptr;
+	png_voidp ptr;
+	png_uint_32 num_bytes;
 
-	ptr = ((voidp)png_large_malloc((png_structp)png_ptr,
-		(png_uint_32)items * (png_uint_32)size));
-	png_memset(ptr, 0, (png_uint_32)items * (png_uint_32)size);
+	ptr = png_large_malloc((png_structp)png_ptr,
+		(png_uint_32)items * (png_uint_32)size);
+	num_bytes = (png_uint_32)items * (png_uint_32)size;
+	if (num_bytes > (png_uint_32)0x7fff)
+	{
+		png_memset(ptr, 0, (png_size_t)0x8000L);
+		png_memset((png_bytep)ptr + (png_size_t)0x8000L, 0,
+			(png_size_t)(num_bytes - (png_uint_32)0x8000L));
+	}
+	else
+	{
+		png_memset(ptr, 0, (png_size_t)num_bytes);
+	}
    return (voidpf)(ptr);
 }
 
@@ -119,7 +130,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 void
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
-	png_large_free((png_structp)png_ptr, (voidp)ptr);
+	png_large_free((png_structp)png_ptr, (png_voidp)ptr);
 }
 
 /* reset the crc variable to 32 bits of 1's.  Care must be taken

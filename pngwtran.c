@@ -1,10 +1,10 @@
 
 /* pngwtran.c - transforms the data in a row for png writers
 
-	libpng 1.0 beta 2 - version 0.86
+	libpng 1.0 beta 2 - version 0.87
    For conditions of distribution and use, see copyright notice in png.h
 	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1996
+   January 15, 1996
    */
 
 #define PNG_INTERNAL
@@ -78,13 +78,13 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_byte bit_depth)
                else
                {
                   mask = 0x80;
-                  *dp = v;
+						*dp = (png_byte)v;
 						dp++;
                   v = 0;
                }
             }
             if (mask != 0x80)
-               *dp = v;
+					*dp = (png_byte)v;
             break;
          }
          case 2:
@@ -94,7 +94,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_byte bit_depth)
             int shift;
             png_int_32 i;
             int v;
-            png_byte value;
+				png_byte value;
 
             sp = row;
             dp = row;
@@ -102,12 +102,12 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_byte bit_depth)
             v = 0;
             for (i = 0; i < row_info->width; i++)
             {
-               value = *sp & 0x3;
+					value = (png_byte)(*sp & 0x3);
                v |= (value << shift);
                if (shift == 0)
                {
                   shift = 6;
-                  *dp = v;
+						*dp = (png_byte)v;
                   dp++;
                   v = 0;
                }
@@ -116,7 +116,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_byte bit_depth)
                sp++;
             }
             if (shift != 6)
-                   *dp = v;
+					*dp = (png_byte)v;
             break;
          }
          case 4:
@@ -134,13 +134,13 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_byte bit_depth)
             v = 0;
             for (i = 0; i < row_info->width; i++)
             {
-               value = *sp & 0xf;
+					value = (png_byte)(*sp & 0xf);
                v |= (value << shift);
 
                if (shift == 0)
                {
                   shift = 4;
-                  *dp = v;
+						*dp = (png_byte)v;
                   dp++;
                   v = 0;
                }
@@ -150,12 +150,12 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_byte bit_depth)
                sp++;
             }
             if (shift != 4)
-               *dp = v;
+					*dp = (png_byte)v;
             break;
          }
       }
       row_info->bit_depth = bit_depth;
-      row_info->pixel_depth = bit_depth * row_info->channels;
+		row_info->pixel_depth = (png_uint_16)(bit_depth * row_info->channels);
       row_info->rowbytes =
          ((row_info->width * row_info->pixel_depth + 7) >> 3);
    }
@@ -276,7 +276,8 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
             {
                png_uint_16 value, v;
 
-               v = ((png_uint_16)(*bp) << 8) + (png_uint_16)(*(bp + 1));
+					v = (png_uint_16)(((png_uint_16)(*bp) << 8) +
+						(png_uint_16)(*(bp + 1)));
                value = 0;
                for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
                {
@@ -285,8 +286,8 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
                   else
                      value |= (png_uint_16)((v >> (-j)) & (png_uint_16)0xffff);
                }
-               *bp = value >> 8;
-               *(bp + 1) = value & 0xff;
+					*bp = (png_byte)(value >> 8);
+               *(bp + 1) = (png_byte)(value & 0xff);
             }
          }
       }
