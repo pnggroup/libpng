@@ -910,6 +910,10 @@ version 1.0.10rc1 [March 23, 2001]
   Changed all instances of memcpy, strcpy, and strlen to png_memcpy, png_strcpy,
     and png_strlen.
   Revised png_mmx_supported() function in pnggccrd.c to return proper value.
+  Fixed bug in progressive reading (pngpread.c) with small images (height < 8).
+version 1.0.10 [March 30, 2001]
+  Deleted extraneous space (introduced in 1.0.9) from line 42 of makefile.cygwin
+  Added beos project files (Chris Herborth)
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
