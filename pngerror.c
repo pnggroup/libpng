@@ -1,12 +1,11 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  *
  * This file provides a location for all error handling.  Users who
  * need special error handling are expected to write replacement functions

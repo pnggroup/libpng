@@ -1,12 +1,11 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  *
  * This file provides a location for all output.  Users who need
  * special handling are expected to write functions that have the same
@@ -175,7 +174,14 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 #endif /* PNG_WRITE_FLUSH_SUPPORTED */
 
    /* It is an error to read while writing a png file */
-   png_ptr->read_data_fn = NULL;
+   if (png_ptr->read_data_fn != NULL)
+   {
+      png_ptr->read_data_fn = NULL;
+      png_warning(png_ptr,
+         "Attempted to set both read_data_fn and write_data_fn in");
+      png_warning(png_ptr,
+         "the same structure.  Resetting read_data_fn to NULL.");
+   }
 }
 
 #if defined(USE_FAR_KEYWORD) 

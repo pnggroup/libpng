@@ -1,12 +1,11 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -575,7 +574,8 @@ png_write_hIST(png_structp png_ptr, png_uint_16p hist, int num_hist)
 }
 #endif
 
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED) || \
+    defined(PNG_WRITE_pCAL_SUPPORTED)
 /* Check that the tEXt or zTXt keyword is valid per PNG 1.0 specification,
  * and if invalid, correct the keyword rather than discarding the entire
  * chunk.  The PNG 1.0 specification requires keywords 1-79 characters in
@@ -1416,10 +1416,19 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
     * as the "minimum sum of absolute differences" heuristic.  Other
     * heuristics are the "weighted minimum sum of absolute differences"
     * (experimental and can in theory improve compression), and the "zlib
-    * predictive" method (not implemented in libpng 0.95), which does test
-    * compressions of lines using different filter methods, and then chooses
-    * the (series of) filter(s) which give minimum compressed data size (VERY
+    * predictive" method (not implemented yet), which does test compressions
+    * of lines using different filter methods, and then chooses the
+    * (series of) filter(s) that give minimum compressed data size (VERY
     * computationally expensive).
+    *
+    * GRR 980525:  consider also
+    *   (1) minimum sum of absolute differences from running average (i.e.,
+    *       keep running sum of non-absolute differences & count of bytes)
+    *       [track dispersion, too?  restart average if dispersion too large?]
+    *  (1b) minimum sum of absolute differences from sliding average, probably
+    *       with window size <= deflate window (usually 32K)
+    *   (2) minimum sum of squared differences from zero or running average
+    *       (i.e., ~ root-mean-square approach)
     */
 
 

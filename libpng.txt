@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.1d May 21, 1998
+ libpng version 1.0.1e - June 6, 1998
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alumni.rpi.edu>
  Copyright (c) 1998, Glenn Randers-Pehrson
@@ -164,10 +164,21 @@ on Changes to Libpng below regarding the old initialization functions.
         return;
     }
 
+If you want to use your own memory allocation routines,
+define PNG_USER_MEM_SUPPORTED and use
+png_create_read_struct_2() instead of png_create_read_struct():
 
-The error handling routines passed to png_create_read_struct() are only
-necessary if you are not using the libpng supplied error handling
-functions.  When libpng encounters an error, it expects to longjmp back
+    png_structp png_ptr = png_create_read_struct_2
+       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
+        user_error_fn, user_warning_fn, (png_voidp)
+        user_mem_ptr, user_malloc_fn, user_free_fn);
+
+The error handling routines passed to png_create_read_struct()
+and the memory alloc/free routines passed to png_create_struct_2()
+are only necessary if you are not using the libpng supplied error
+handling and memory alloc/free functions.
+
+When libpng encounters an error, it expects to longjmp back
 to your routine.  Therefore, you will need to call setjmp and pass the
 jmpbuf field of your png_struct.  If you read the file from different
 routines, you will need to update the jmpbuf field every time you enter
@@ -1058,6 +1069,15 @@ both "png_ptr"; you can call them anything you like, such as
        return;
     }
 
+If you want to use your own memory allocation routines,
+define PNG_USER_MEM_SUPPORTED and use
+png_create_write_struct_2() instead of png_create_read_struct():
+
+    png_structp png_ptr = png_create_write_struct_2
+       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
+        user_error_fn, user_warning_fn, (png_voidp)
+        user_mem_ptr, user_malloc_fn, user_free_fn);
+
 After you have these structures, you will need to set up the
 error handling.  When libpng encounters an error, it expects to
 longjmp() back to your routine.  Therefore, you will need to call
@@ -1605,14 +1625,15 @@ time, instead of calling the png_init_io() function.  These functions
 also provide a void pointer that can be retrieved via the function
 png_get_io_ptr().  For example:
 
-    png_set_read_fn(png_structp png_ptr,
-        voidp io_ptr, png_rw_ptr read_data_fn)
+    png_set_read_fn(png_structp read_ptr,
+        voidp read_io_ptr, png_rw_ptr read_data_fn)
 
-    png_set_write_fn(png_structp png_ptr,
-        voidp io_ptr, png_rw_ptr write_data_fn,
+    png_set_write_fn(png_structp write_ptr,
+        voidp write_io_ptr, png_rw_ptr write_data_fn,
         png_flush_ptr output_flush_fn);
 
-    voidp io_ptr = png_get_io_ptr(png_ptr);
+    voidp read_io_ptr = png_get_io_ptr(read_ptr);
+    voidp write_io_ptr = png_get_io_ptr(write_ptr);
 
 The replacement I/O functions should have prototypes as follows:
 
@@ -1624,7 +1645,7 @@ The replacement I/O functions should have prototypes as follows:
 
 Supplying NULL for the read, write, or flush functions sets them back
 to using the default C stream functions.  It is an error to read from
-a write stream, and vice versa.
+a write stream, and vice versa. 
 
 Error handling in libpng is done through png_error() and png_warning().
 Errors handled through png_error() are fatal, meaning that png_error()

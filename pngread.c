@@ -1,12 +1,11 @@
 
 /* pngread.c - read a PNG file
  *
- * 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -20,12 +19,31 @@ png_structp
 png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn)
 {
+
+#ifdef PNG_USER_MEM_SUPPORTED
+   return (png_create_read_struct_2(user_png_ver, error_ptr, error_fn,
+      warn_fn, NULL, NULL, NULL));
+}
+
+/* Alternate create PNG structure for reading, and allocate any memory needed. */
+png_structp
+png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
+   png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
+   png_malloc_ptr malloc_fn, png_free_ptr free_fn)
+{
+#endif /* PNG_USER_MEM_SUPPORTED */
+
    png_structp png_ptr;
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;
 #endif
    png_debug(1, "in png_create_read_struct\n");
+#ifdef PNG_USER_MEM_SUPPORTED
+   if ((png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
+      (png_malloc_ptr)malloc_fn)) == NULL)
+#else
    if ((png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG)) == NULL)
+#endif
    {
       return (png_structp)NULL;
    }
@@ -42,6 +60,11 @@ png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef USE_FAR_KEYWORD
    png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
 #endif
+
+#ifdef PNG_USER_MEM_SUPPORTED
+   png_set_mem_fn(png_ptr, mem_ptr, malloc_fn, free_fn);
+#endif /* PNG_USER_MEM_SUPPORTED */
+
    png_set_error_fn(png_ptr, error_ptr, error_fn, warn_fn);
 
    /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
@@ -489,7 +512,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 /* Read one or more rows of image data.  If the image is interlaced,
  * and png_set_interlace_handling() has been called, the rows need to
  * contain the contents of the rows from the previous pass.  If the
- * image has alpha or transparency, and png_handle_alpha() has been
+ * image has alpha or transparency, and png_handle_alpha()[*] has been
  * called, the rows contents must be initialized to the contents of the
  * screen.
  * 
@@ -506,6 +529,8 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * also, but you may.  If the image is not interlaced, or if you have
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
+ *
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.1e.
  */
 
 void
@@ -683,6 +708,9 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 {
    png_structp png_ptr = NULL;
    png_infop info_ptr = NULL, end_info_ptr = NULL;
+#ifdef PNG_USER_MEM_SUPPORTED
+   png_free_ptr free_fn = NULL;
+#endif /* PNG_USER_MEM_SUPPORTED */
 
    png_debug(1, "in png_destroy_read_struct\n");
    /* save jump buffer and error functions */
@@ -695,6 +723,10 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    if (end_info_ptr_ptr != NULL)
       end_info_ptr = *end_info_ptr_ptr;
 
+#ifdef PNG_USER_MEM_SUPPORTED
+   free_fn = png_ptr->free_fn;
+#endif
+
    png_read_destroy(png_ptr, info_ptr, end_info_ptr);
 
    if (info_ptr != NULL)
@@ -702,7 +734,12 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 #if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
       png_free(png_ptr, info_ptr->text);
 #endif
+
+#ifdef PNG_USER_MEM_SUPPORTED
+      png_destroy_struct_2((png_voidp)info_ptr, free_fn);
+#else
       png_destroy_struct((png_voidp)info_ptr);
+#endif
       *info_ptr_ptr = (png_infop)NULL;
    }
 
@@ -711,13 +748,21 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 #if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
       png_free(png_ptr, end_info_ptr->text);
 #endif
+#ifdef PNG_USER_MEM_SUPPORTED
+      png_destroy_struct_2((png_voidp)end_info_ptr, free_fn);
+#else
       png_destroy_struct((png_voidp)end_info_ptr);
+#endif
       *end_info_ptr_ptr = (png_infop)NULL;
    }
 
    if (png_ptr != NULL)
    {
+#ifdef PNG_USER_MEM_SUPPORTED
+      png_destroy_struct_2((png_voidp)png_ptr, free_fn);
+#else
       png_destroy_struct((png_voidp)png_ptr);
+#endif
       *png_ptr_ptr = (png_structp)NULL;
    }
 }
@@ -730,6 +775,9 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_error_ptr error_fn;
    png_error_ptr warning_fn;
    png_voidp error_ptr;
+#ifdef PNG_USER_MEM_SUPPORTED
+   png_free_ptr free_fn;
+#endif
 
    png_debug(1, "in png_read_destroy\n");
    /* save jump buffer and error functions */
@@ -771,7 +819,6 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
          png_free(png_ptr, png_ptr->gamma_16_table[i]);
       }
    }
-#endif
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_free(png_ptr, png_ptr->gamma_16_table);
    if (png_ptr->gamma_16_from_1 != NULL)
@@ -795,6 +842,10 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    }
    png_free(png_ptr, png_ptr->gamma_16_to_1);
 #endif
+#endif
+#if defined(PNG_TIME_RFC1123_SUPPORTED)
+   png_free(png_ptr, png_ptr->time_buffer);
+#endif /* PNG_TIME_RFC1123_SUPPORTED */
 
    inflateEnd(&png_ptr->zstream);
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
@@ -809,12 +860,18 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    error_fn = png_ptr->error_fn;
    warning_fn = png_ptr->warning_fn;
    error_ptr = png_ptr->error_ptr;
+#ifdef PNG_USER_MEM_SUPPORTED
+   free_fn = png_ptr->free_fn;
+#endif
 
    png_memset(png_ptr, 0, sizeof (png_struct));
 
    png_ptr->error_fn = error_fn;
    png_ptr->warning_fn = warning_fn;
    png_ptr->error_ptr = error_ptr;
+#ifdef PNG_USER_MEM_SUPPORTED
+   png_ptr->free_fn = free_fn;
+#endif
 
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
 }

@@ -1,12 +1,11 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -302,11 +301,11 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
    }
    return (retval);
 }
-#endif
-
+#endif /* PNG_READ_pHYs_SUPPORTED */
 #endif  /* PNG_INCH_CONVERSIONS */
 
 /* png_get_channels really belongs in here, too, but it's been around longer */
+
 #endif  /* PNG_EASY_ACCESS_SUPPORTED */
 
 png_byte

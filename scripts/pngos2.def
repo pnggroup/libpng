@@ -12,7 +12,9 @@ EXPORTS
   png_sig_cmp
   png_check_sig
   png_create_read_struct
+; png_create_read_struct_2
   png_create_write_struct
+; png_create_write_struct_2
   png_write_chunk
   png_write_chunk_start
   png_write_chunk_data
@@ -72,6 +74,8 @@ EXPORTS
   png_init_io
   png_set_error_fn
   png_get_error_ptr
+; png_get_mem_fn
+; png_set_mem_fn
   png_set_write_fn
   png_set_read_fn
   png_set_write_status_fn
@@ -89,8 +93,8 @@ EXPORTS
   png_free
   png_memcpy_check
   png_memset_check
-; png_debug_malloc
-; png_debug_free
+; png_malloc_default
+; png_free_default
 ; png_far_to_near
   png_error
   png_chunk_error

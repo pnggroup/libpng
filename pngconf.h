@@ -1,12 +1,11 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -400,6 +399,7 @@ __dont__ include it again
 /* very little testing */
 /*
 #define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#define PNG_USER_MEM_SUPPORTED
 */
 
 /* This is only for PowerPC big-endian and 680x0 systems */
@@ -663,6 +663,7 @@ typedef z_stream FAR *  png_zstreamp;
 #   define NOCHECK 0
 #   define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
 #   define CVT_PTR_NOCHECK(ptr) (png_far_to_near(png_ptr,ptr,NOCHECK))
+#   define png_strcpy _fstrcpy
 #   define png_strlen _fstrlen
 #   define png_memcmp _fmemcmp      /* SJT: added */
 #   define png_memcpy _fmemcpy
@@ -670,6 +671,7 @@ typedef z_stream FAR *  png_zstreamp;
 #else /* use the usual functions */
 #   define CVT_PTR(ptr)         (ptr)
 #   define CVT_PTR_NOCHECK(ptr) (ptr)
+#   define png_strcpy strcpy
 #   define png_strlen strlen
 #   define png_memcmp memcmp     /* SJT: added */
 #   define png_memcpy memcpy

@@ -1,12 +1,11 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -927,6 +926,11 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    }
 #endif
 
+#if defined(PNG_READ_GAMMA_SUPPORTED)
+   if (png_ptr->transformations & PNG_GAMMA)
+      info_ptr->gamma = png_ptr->gamma;
+#endif
+
 #if defined(PNG_READ_16_TO_8_SUPPORTED)
    if ((png_ptr->transformations & PNG_16_TO_8) && info_ptr->bit_depth == 16)
       info_ptr->bit_depth = 8;
@@ -1013,7 +1017,7 @@ png_do_read_transformations(png_structp png_ptr)
          png_do_expand_palette(&(png_ptr->row_info), png_ptr->row_buf + 1,
             png_ptr->palette, png_ptr->trans, png_ptr->num_trans);
       }
-      else if (png_ptr->transformations & PNG_EXPAND)
+      else
       {
          if (png_ptr->num_trans)
             png_do_expand(&(png_ptr->row_info), png_ptr->row_buf + 1,
@@ -1084,7 +1088,11 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
    if ((png_ptr->transformations & PNG_GAMMA) &&
-      !(png_ptr->transformations & PNG_BACKGROUND) &&
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+      !((png_ptr->transformations & PNG_BACKGROUND) &&
+      ((png_ptr->num_trans != 0) ||
+      (png_ptr->color_type & PNG_COLOR_MASK_ALPHA))) &&
+#endif
       (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE))
       png_do_gamma(&(png_ptr->row_info), png_ptr->row_buf + 1,
          png_ptr->gamma_table, png_ptr->gamma_16_table,
@@ -2197,45 +2205,112 @@ png_do_background(png_row_infop row_info, png_bytep row,
                }
                case 2:
                {
-                  sp = row;
-                  shift = 6;
-                  for (i = 0; i < row_width; i++)
+#if defined(PNG_READ_GAMMA_SUPPORTED)
+                  if (gamma_table != NULL)
                   {
-                     if ((png_uint_16)((*sp >> shift) & 0x3)
-                         == trans_values->gray)
+                     sp = row;
+                     shift = 6;
+                     for (i = 0; i < row_width; i++)
                      {
-                        *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
-                        *sp |= (png_byte)(background->gray << shift);
+                        if ((png_uint_16)((*sp >> shift) & 0x3)
+                            == trans_values->gray)
+                        {
+                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
+                           *sp |= (png_byte)(background->gray << shift);
+                        }
+                        else
+                        {
+                           png_byte p = (*sp >> shift) & 0x3;
+                           png_byte g = (gamma_table [p | (p << 2) | (p << 4) |
+                               (p << 6)] >> 6) & 0x3;
+                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
+                           *sp |= (png_byte)(g << shift);
+                        }
+                        if (!shift)
+                        {
+                           shift = 6;
+                           sp++;
+                        }
+                        else
+                           shift -= 2;
                      }
-                     if (!shift)
+                  }
+                  else
+#endif
+                  {
+                     sp = row;
+                     shift = 6;
+                     for (i = 0; i < row_width; i++)
                      {
-                        shift = 6;
-                        sp++;
+                        if ((png_uint_16)((*sp >> shift) & 0x3)
+                            == trans_values->gray)
+                        {
+                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
+                           *sp |= (png_byte)(background->gray << shift);
+                        }
+                        if (!shift)
+                        {
+                           shift = 6;
+                           sp++;
+                        }
+                        else
+                           shift -= 2;
                      }
-                     else
-                        shift -= 2;
                   }
                   break;
                }
                case 4:
                {
-                  sp = row;
-                  shift = 4;
-                  for (i = 0; i < row_width; i++)
+#if defined(PNG_READ_GAMMA_SUPPORTED)
+                  if (gamma_table != NULL)
                   {
-                     if ((png_uint_16)((*sp >> shift) & 0xf)
-                         == trans_values->gray)
+                     sp = row;
+                     shift = 4;
+                     for (i = 0; i < row_width; i++)
                      {
-                        *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
-                        *sp |= (png_byte)(background->gray << shift);
+                        if ((png_uint_16)((*sp >> shift) & 0xf)
+                            == trans_values->gray)
+                        {
+                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
+                           *sp |= (png_byte)(background->gray << shift);
+                        }
+                        else
+                        {
+                           png_byte p = (*sp >> shift) & 0xf;
+                           png_byte g = (gamma_table[p | (p << 4)] >> 4) & 0xf;
+                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
+                           *sp |= (png_byte)(g << shift);
+                        }
+                        if (!shift)
+                        {
+                           shift = 4;
+                           sp++;
+                        }
+                        else
+                           shift -= 4;
                      }
-                     if (!shift)
+                  }
+                  else
+#endif
+                  {
+                     sp = row;
+                     shift = 4;
+                     for (i = 0; i < row_width; i++)
                      {
-                        shift = 4;
-                        sp++;
+                        if ((png_uint_16)((*sp >> shift) & 0xf)
+                            == trans_values->gray)
+                        {
+                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
+                           *sp |= (png_byte)(background->gray << shift);
+                        }
+                        if (!shift)
+                        {
+                           shift = 4;
+                           sp++;
+                        }
+                        else
+                           shift -= 4;
                      }
-                     else
-                        shift -= 4;
                   }
                   break;
                }

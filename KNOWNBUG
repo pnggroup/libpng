@@ -184,3 +184,13 @@ Known bugs and suggested enhancements in libpng-1.0.1
    STATUS:
 
    Added to distribution in libpng-1.0.1d 
+
+20. May 26, 1998 -- BUG -- png_do_gamma is skipped -- Magnus Holmgren
+
+   When a background color is defined for a truecolor image, but no
+   transparent color is defined, gamma correction is not done.
+   The test in pngrtran should include " && !png_ptr->trans_values"
+
+   STATUS:
+
+   Fixed in libpng-1.0.1e

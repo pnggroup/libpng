@@ -1,5 +1,5 @@
 
-Libpng 1.0.1d May 21, 1998
+Libpng 1.0.1e - June 6, 1998
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -36,7 +36,7 @@ version 1.0.1c [May 11, 1998]
   Fixed a bug in pngrtran.c (introduced in libpng-1.0.1a) where the masks for
     filler bytes should have been 0xff instead of 0xf.
   Added max_pixel_depth=32 in pngrutil.c when using FILLER with palette images.
-  Moved PNG_WRIGHT_WEIGHTED_FILTER_SUPPORTED and PNG_WRITE_FLUSH_SUPPORTED
+  Moved PNG_WRITE_WEIGHTED_FILTER_SUPPORTED and PNG_WRITE_FLUSH_SUPPORTED
     out of the PNG_WRITE_TRANSFORMS_NOT_SUPPORTED block of pngconf.h
   Added "PNG_NO_WRITE_TRANSFORMS" etc., as alternatives for *_NOT_SUPPORTED,
     for consistency, in pngconf.h
@@ -44,10 +44,9 @@ version 1.0.1c [May 11, 1998]
     to make it easier to remove unwanted capabilities via the compile line
   Made some corrections to grammar (which, it's) in documentation (Greg).
   Corrected example.c, use of row_pointers in png_write_image().
-version 1.0.1d [May 21, 1998]
-  Corrected several statements that some compilers interpret as illegal use
-    of side effects in pngrutil.c and pngtrans.c, that were introduced in
-    version 1.0.1b
+version 1.0.1d [May 24, 1998]
+  Corrected several statements that used side effects illegally in pngrutil.c
+    and pngtrans.c, that were introduced in version 1.0.1b
   Revised png_read_rows() to avoid repeated if-testing for NULL (A Kleinert)
   More corrections to example.c, use of row_pointers in png_write_image()
     and png_read_rows().
@@ -55,6 +54,21 @@ version 1.0.1d [May 21, 1998]
     Bob Dellaca, to make a png32bd.dll with Borland C++ 4.5
   Fixed error in example.c with png_set_text: num_text is 3, not 2 (Guido V.)
   Changed several loops from count-down to count-up, for consistency.
+version 1.0.1e [June 5, 1998]
+  Revised libpng.txt and libpng.3 description of png_set_read|write_fn(), and
+    added warnings when people try to set png_read_fn and png_write_fn in
+    the same structure.
+  Added a test such that png_do_gamma will be done when num_trans==0
+    for truecolor images that have defined a background.  This corrects an
+    error that was introduced in libpng-0.90 that can cause gamma processing
+    to be skipped.
+  Added tests in png.h to include "trans" and "trans_values" in structures
+    when PNG_READ_BACKGROUND_SUPPORTED or PNG_READ_EXPAND_SUPPORTED is defined.
+  Add png_free(png_ptr->time_buffer) in png_destroy_read_struct()
+  Moved png_convert_to_rfc_1123() from pngwrite.c to png.c
+  Added capability for user-provided malloc_fn() and free_fn() functions,
+    and revised pngtest.c to demonstrate their use, replacing the
+    PNGTEST_DEBUG_MEM feature.
 
 Send comments/corrections/commendations to
 png-implement@dworkin.wustl.edu or to randeg@alumni.rpi.edu

@@ -1,12 +1,11 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  */
 
 #define PNG_INTERNAL
@@ -16,7 +15,7 @@
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
  */
-char png_libpng_ver[12] = "1.0.1d";
+char png_libpng_ver[12] = "1.0.1e";
 
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -128,12 +127,10 @@ png_check_sig(png_bytep sig, int num)
 voidpf
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
-   png_voidp ptr;
-   png_uint_32 num_bytes;
+   png_uint_32 num_bytes = (png_uint_32)items * size;
+   png_voidp ptr = (png_voidp)png_malloc((png_structp)png_ptr, num_bytes);
 
-   num_bytes = (png_uint_32)items * size;
-   ptr = (png_voidp)png_malloc((png_structp)png_ptr, num_bytes);
-   if (num_bytes > (png_uint_32)0x8000)
+   if (num_bytes > (png_uint_32)0x8000L)
    {
       png_memset(ptr, 0, (png_size_t)0x8000L);
       png_memset((png_bytep)ptr + (png_size_t)0x8000L, 0,
@@ -201,7 +198,12 @@ png_create_info_struct(png_structp png_ptr)
 
    png_debug(1, "in png_create_info_struct\n");
    if(png_ptr == NULL) return (NULL);
+#ifdef PNG_USER_MEM_SUPPORTED
+   if ((info_ptr = (png_infop)png_create_struct_2(PNG_STRUCT_INFO,
+      png_ptr->malloc_fn)) != NULL)
+#else
    if ((info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO)) != NULL)
+#endif
    {
       png_info_init(info_ptr);
    }
@@ -227,7 +229,11 @@ png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
    {
       png_info_destroy(png_ptr, info_ptr);
 
+#ifdef PNG_USER_MEM_SUPPORTED
+      png_destroy_struct_2((png_voidp)info_ptr, png_ptr->free_fn);
+#else
       png_destroy_struct((png_voidp)info_ptr);
+#endif
       *info_ptr_ptr = (png_infop)NULL;
    }
 }
@@ -252,11 +258,10 @@ void
 png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 {
 #if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
-   int i;
-
    png_debug(1, "in png_info_destroy\n");
    if (info_ptr->text != NULL)
    {
+      int i;
       for (i = 0; i < info_ptr->num_text; i++)
       {
          png_free(png_ptr, info_ptr->text[i].key);
@@ -269,6 +274,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
    png_free(png_ptr, info_ptr->pcal_units);
    if (info_ptr->pcal_params != NULL)
    {
+      int i;
       for (i = 0; i < (int)info_ptr->pcal_nparams; i++)
       {
          png_free(png_ptr, info_ptr->pcal_params[i]);
@@ -302,3 +308,40 @@ png_init_io(png_structp png_ptr, FILE *fp)
    png_ptr->io_ptr = (png_voidp)fp;
 }
 #endif
+
+#if defined(PNG_TIME_RFC1123_SUPPORTED)
+/* Convert the supplied time into an RFC 1123 string suitable for use in
+ * a "Creation Time" or other text-based time string.
+ */
+png_charp
+png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
+{
+   static PNG_CONST char short_months[12][4] =
+	{"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+   if (png_ptr->time_buffer == NULL)
+   {
+      png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, (png_uint_32)(29*
+         sizeof(char)));
+   }
+
+#ifdef USE_FAR_KEYWORD
+   {
+      char near_time_buf[29];
+      sprintf(near_time_buf, "%d %s %d %02d:%02d:%02d +0000",
+               ptime->day % 32, short_months[(ptime->month - 1) % 12],
+               ptime->year, ptime->hour % 24, ptime->minute % 60,
+               ptime->second % 61);
+      png_memcpy(png_ptr->time_buffer, near_time_buf,
+      29*sizeof(char));
+   }
+#else
+   sprintf(png_ptr->time_buffer, "%d %s %d %02d:%02d:%02d +0000",
+               ptime->day % 32, short_months[(ptime->month - 1) % 12],
+               ptime->year, ptime->hour % 24, ptime->minute % 60,
+               ptime->second % 61);
+#endif
+   return ((png_charp)png_ptr->time_buffer);
+}
+#endif /* PNG_TIME_RFC1123_SUPPORTED */

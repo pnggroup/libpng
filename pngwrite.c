@@ -1,12 +1,11 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * 1.0.1d
+ * libpng 1.0.1e - June 6, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * May 21, 1998
  */
 
 /* get internal access to png.h */
@@ -218,43 +217,6 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    png_write_IEND(png_ptr);
 }
 
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
-/* Convert the supplied time into an RFC 1123 string suitable for use in
- * a "Creation Time" or other text-based time string.
- */
-png_charp
-png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
-{
-   static PNG_CONST char short_months[12][4] =
-	{"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-   if (png_ptr->time_buffer == NULL)
-   {
-      png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, (png_uint_32)(29*
-         sizeof(char)));
-   }
-
-#ifdef USE_FAR_KEYWORD
-   {
-      char near_time_buf[29];
-      sprintf(near_time_buf, "%d %s %d %02d:%02d:%02d +0000",
-               ptime->day % 32, short_months[(ptime->month - 1) % 12],
-               ptime->year, ptime->hour % 24, ptime->minute % 60,
-               ptime->second % 61);
-      png_memcpy(png_ptr->time_buffer, near_time_buf,
-      29*sizeof(char));
-   }
-#else
-   sprintf(png_ptr->time_buffer, "%d %s %d %02d:%02d:%02d +0000",
-               ptime->day % 32, short_months[(ptime->month - 1) % 12],
-               ptime->year, ptime->hour % 24, ptime->minute % 60,
-               ptime->second % 61);
-#endif
-   return ((png_charp)png_ptr->time_buffer);
-}
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
-
 #if defined(PNG_WRITE_tIME_SUPPORTED)
 void
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
@@ -284,12 +246,29 @@ png_structp
 png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn)
 {
+#ifdef PNG_USER_MEM_SUPPORTED
+   return (png_create_write_struct_2(user_png_ver, error_ptr, error_fn,
+      warn_fn, NULL, NULL, NULL));
+}
+
+/* Alternate initialize png_ptr structure, and allocate any memory needed */
+png_structp
+png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
+   png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
+   png_malloc_ptr malloc_fn, png_free_ptr free_fn)
+{
+#endif /* PNG_USER_MEM_SUPPORTED */
    png_structp png_ptr;
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;
 #endif
    png_debug(1, "in png_create_write_struct\n");
+#ifdef PNG_USER_MEM_SUPPORTED
+   if ((png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
+      (png_malloc_ptr)malloc_fn)) == NULL)
+#else
    if ((png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG)) == NULL)
+#endif /* PNG_USER_MEM_SUPPORTED */
    {
       return ((png_structp)NULL);
    }
@@ -306,6 +285,9 @@ png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef USE_FAR_KEYWORD
    png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
 #endif
+#ifdef PNG_USER_MEM_SUPPORTED
+   png_set_mem_fn(png_ptr, mem_ptr, malloc_fn, free_fn);
+#endif /* PNG_USER_MEM_SUPPORTED */
    png_set_error_fn(png_ptr, error_ptr, error_fn, warn_fn);
 
    /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
@@ -334,7 +316,6 @@ png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 
    return ((png_structp)png_ptr);
 }
-
 
 /* Initialize png_ptr structure, and allocate any memory needed */
 void
@@ -631,10 +612,18 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 {
    png_structp png_ptr = NULL;
    png_infop info_ptr = NULL;
+#ifdef PNG_USER_MEM_SUPPORTED
+   png_free_ptr free_fn = NULL;
+#endif
 
    png_debug(1, "in png_destroy_write_struct\n");
    if (png_ptr_ptr != NULL)
+   {
       png_ptr = *png_ptr_ptr;
+#ifdef PNG_USER_MEM_SUPPORTED
+      free_fn = png_ptr->free_fn;
+#endif
+   }
 
    if (info_ptr_ptr != NULL)
       info_ptr = *info_ptr_ptr;
@@ -657,14 +646,22 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
          png_free(png_ptr, info_ptr->pcal_params);
       }
 #endif
+#ifdef PNG_USER_MEM_SUPPORTED
+      png_destroy_struct_2((png_voidp)info_ptr, free_fn);
+#else
       png_destroy_struct((png_voidp)info_ptr);
+#endif
       *info_ptr_ptr = (png_infop)NULL;
    }
 
    if (png_ptr != NULL)
    {
       png_write_destroy(png_ptr);
+#ifdef PNG_USER_MEM_SUPPORTED
+      png_destroy_struct_2((png_voidp)png_ptr, free_fn);
+#else
       png_destroy_struct((png_voidp)png_ptr);
+#endif
       *png_ptr_ptr = (png_structp)NULL;
    }
 }
@@ -678,6 +675,9 @@ png_write_destroy(png_structp png_ptr)
    png_error_ptr error_fn;
    png_error_ptr warning_fn;
    png_voidp error_ptr;
+#ifdef PNG_USER_MEM_SUPPORTED
+   png_free_ptr free_fn;
+#endif
 
    png_debug(1, "in png_write_destroy\n");
    /* free any memory zlib uses */
@@ -708,12 +708,18 @@ png_write_destroy(png_structp png_ptr)
    error_fn = png_ptr->error_fn;
    warning_fn = png_ptr->warning_fn;
    error_ptr = png_ptr->error_ptr;
+#ifdef PNG_USER_MEM_SUPPORTED
+   free_fn = png_ptr->free_fn;
+#endif
 
    png_memset(png_ptr, 0, sizeof (png_struct));
 
    png_ptr->error_fn = error_fn;
    png_ptr->warning_fn = warning_fn;
    png_ptr->error_ptr = error_ptr;
+#ifdef PNG_USER_MEM_SUPPORTED
+   png_ptr->free_fn = free_fn;
+#endif
 
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
 }

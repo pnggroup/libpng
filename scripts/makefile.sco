@@ -22,7 +22,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.1d
+PNGMIN = 1.0.1e
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # where make install puts libpng.a, libpng.so*, and png.h
