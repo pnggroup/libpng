@@ -1,6 +1,12 @@
 $! make libpng under VMS
 $!
 $!
+$! Check for MMK/MMS
+$!
+$ Make = ""
+$ If F$Search ("Sys$System:MMS.EXE") .nes. "" Then Make = "MMS"
+$ If F$Type (MMK) .eqs. "STRING" Then Make = "MMK"
+$!
 $! Look for the compiler used
 $!
 $ zlibsrc = "[-.zlib]"
@@ -28,10 +34,10 @@ $    comp  = "__decc__=1"
 $  endif
 $ endif
 $!
-$! Build the thing plain or with mms
+$! Build the thing plain or with mms/mmk
 $!
 $ write sys$output "Compiling Libpng sources ..."
-$ if f$search("SYS$SYSTEM:MMS.EXE").eqs.""
+$ if make.eqs.""
 $  then
 $   dele pngtest.obj;*
 $   CALL MAKE png.OBJ "cc ''CCOPT' png" -
@@ -72,12 +78,12 @@ $   write sys$output "Building pngtest..."
 $   CALL MAKE pngtest.OBJ "cc ''CCOPT' pngtest" -
 	pngtest.c png.h pngconf.h
 $   call make pngtest.exe - 
-	"LINK pngtest,libpng.olb/lib,''zlibsrc'libgz.olb/lib" - 
+	"LINK pngtest,libpng.olb/lib,''zlibsrc'libz.olb/lib" - 
 	pngtest.obj libpng.olb
 $   write sys$output "Testing Libpng..."
 $   run pngtest
 $  else
-$   mms/macro=('comp',zlibsrc='zlibsrc')
+$   'make'/macro=('comp',zlibsrc='zlibsrc')
 $  endif
 $ write sys$output "Libpng build completed"
 $ exit

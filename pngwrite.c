@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.5a - October 23, 1999
+ * libpng 1.0.5c - November 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -22,13 +22,11 @@
  * them in png_write_end(), and compressing them.
  */
 void
-png_write_info(png_structp png_ptr, png_infop info_ptr)
+png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 {
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
-   int i;
-#endif
-
-   png_debug(1, "in png_write_info\n");
+   png_debug(1, "in png_write_info_before_PLTE\n");
+   if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
+   {
    png_write_sig(png_ptr); /* write PNG signature */
    /* write IHDR information. */
    png_write_IHDR(png_ptr, info_ptr->width, info_ptr->height,
@@ -61,6 +59,21 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          info_ptr->x_green, info_ptr->y_green,
          info_ptr->x_blue, info_ptr->y_blue);
 #endif
+      png_ptr->mode |= PNG_WROTE_INFO_BEFORE_PLTE;
+   }
+}
+
+void
+png_write_info(png_structp png_ptr, png_infop info_ptr)
+{
+#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+   int i;
+#endif
+
+   png_debug(1, "in png_write_info\n");
+
+   png_write_info_before_PLTE(png_ptr, info_ptr);
+
    if (info_ptr->valid & PNG_INFO_PLTE)
       png_write_PLTE(png_ptr, info_ptr->palette,
          (png_uint_32)info_ptr->num_palette);
@@ -112,7 +125,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_tIME)
    {
       png_write_tIME(png_ptr, &(info_ptr->mod_time));
-      png_ptr->flags |= PNG_FLAG_WROTE_tIME;
+      png_ptr->mode |= PNG_WROTE_tIME;
    }
 #endif
 #if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
@@ -172,7 +185,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_WRITE_tIME_SUPPORTED)
       /* check to see if user has supplied a time chunk */
       if (info_ptr->valid & PNG_INFO_tIME &&
-         !(png_ptr->flags & PNG_FLAG_WROTE_tIME))
+         !(png_ptr->mode & PNG_WROTE_tIME))
          png_write_tIME(png_ptr, &(info_ptr->mod_time));
 #endif
 #if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)

@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.5a - October 23, 1999
+ * libpng version 1.0.5c - November 27, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -9,19 +9,19 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.5a - October 23, 1999: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.5c - November 27, 1999: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
  *    
- *    October 23, 1999
+ *    November 27, 1999
  *    
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *    
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.5a are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.5c are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *    
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -97,7 +97,7 @@
  *    1.0.4                    1.0.4    10004  2.1.0.4
  *    1.0.4a-f                 1.0.4a-f 10005  2.1.0.4a-f
  *    1.0.5                    1.0.5    10005  2.1.0.5
- *    1.0.5a                   1.0.5a   10006  2.1.0.5a
+ *    1.0.5a-d                 1.0.5a-d 10006  2.1.0.5a-d
  *    1.0.6                    1.0.6    10006  2.1.0.6
  *
  *    Henceforth the source version will match the shared-library minor
@@ -122,7 +122,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.5a, October 23, 1999)
+ * (libpng versions 0.97, January 1998, through 1.0.5c, November 27, 1999)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -222,7 +222,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.5a"
+#define PNG_LIBPNG_VER_STRING "1.0.5c"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -238,8 +238,14 @@ extern "C" {
 /* Version information for C files, stored in png.c.  This had better match
  * the version above.
  */
+#ifdef PNG_GLOBAL_ARRAYS
 extern char png_libpng_ver[12];   /* need room for 99.99.99aa */
+#else
+#define png_libpng_ver png_get_header_ver(NULL)
+#endif
 
+#ifdef PNG_GLOBAL_ARRAYS
+/* This was removed in version 1.0.5c */
 /* Structures to facilitate easy interlacing.  See png.c for more details */
 extern int FARDATA png_pass_start[7];
 extern int FARDATA png_pass_inc[7];
@@ -251,6 +257,7 @@ extern int FARDATA png_pass_dsp_mask[7];
 extern int FARDATA png_pass_width[7];
 extern int FARDATA png_pass_height[7];
 */
+#endif
 
 #endif /* PNG_NO_EXTERN */
 
@@ -559,10 +566,10 @@ typedef png_info FAR * FAR * png_infopp;
 #define PNG_RESOLUTION_LAST       2 /* Not a valid value */
 
 /* These are for the sRGB chunk.  These values should NOT be changed. */
-#define PNG_sRGB_INTENT_SATURATION 0
-#define PNG_sRGB_INTENT_PERCEPTUAL 1
-#define PNG_sRGB_INTENT_ABSOLUTE   2
-#define PNG_sRGB_INTENT_RELATIVE   3
+#define PNG_sRGB_INTENT_PERCEPTUAL 0
+#define PNG_sRGB_INTENT_RELATIVE   1
+#define PNG_sRGB_INTENT_SATURATION 2
+#define PNG_sRGB_INTENT_ABSOLUTE   3
 #define PNG_sRGB_INTENT_LAST       4 /* Not a valid value */
 
 
@@ -820,9 +827,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.5a
+and png.h are both at * version 1.0.5c
  */
-typedef png_structp version_1_0_5a;
+typedef png_structp version_1_0_5c;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -895,6 +902,8 @@ extern PNG_EXPORT(png_infop,png_create_info_struct)
 extern void png_info_init PNGARG((png_infop info_ptr));
 
 /* Writes all the PNG information before the image. */
+extern PNG_EXPORT(void,png_write_info_before_PLTE) PNGARG((png_structp png_ptr,
+   png_infop info_ptr));
 extern PNG_EXPORT(void,png_write_info) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 
@@ -1633,21 +1642,14 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define png_debug2(l, m, p1, p2)
 #endif
 
+extern PNG_EXPORT(png_bytep,png_sig_bytes) PNGARG((png_structp png_ptr));
+
 extern PNG_EXPORT(png_charp,png_get_copyright) PNGARG((png_structp png_ptr));
+extern PNG_EXPORT(png_charp,png_get_header_ver) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr));
+extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
-#ifdef PNG_NO_EXTERN
-/* this only gets included in png.c */
-
-#define PNG_GET_HEADER \
-png_charp \
-png_get_header_version(png_structp png_ptr) \
-{ \
-   if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */ \
-      return("\n libpng version 1.0.5a - October 23, 1999 (header)\n"); \
-   return("\n libpng version 1.0.5a - October 23, 1999 (header)\n"); \
-}
-#endif
+#define PNG_HEADER_VERSION_STRING " libpng version 1.0.5c - November 27, 1999 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -1701,15 +1703,19 @@ png_get_header_version(png_structp png_ptr) \
 /* Various modes of operation.  Note that after an init, mode is set to
  * zero automatically when the structure is created.
  */
-#define PNG_BEFORE_IHDR       0x00
-#define PNG_HAVE_IHDR         0x01
-#define PNG_HAVE_PLTE         0x02
-#define PNG_HAVE_IDAT         0x04
-#define PNG_AFTER_IDAT        0x08
-#define PNG_HAVE_IEND         0x10
-#define PNG_HAVE_gAMA         0x20
-#define PNG_HAVE_cHRM         0x40
-#define PNG_HAVE_sRGB         0x80
+#define PNG_BEFORE_IHDR             0x00
+#define PNG_HAVE_IHDR               0x01
+#define PNG_HAVE_PLTE               0x02
+#define PNG_HAVE_IDAT               0x04
+#define PNG_AFTER_IDAT              0x08
+#define PNG_HAVE_IEND               0x10
+#define PNG_HAVE_gAMA               0x20
+#define PNG_HAVE_cHRM               0x40
+#define PNG_HAVE_sRGB               0x80
+#define PNG_HAVE_CHUNK_HEADER      0x100
+#define PNG_WROTE_tIME             0x200
+#define PNG_WROTE_INFO_BEFORE_PLTE 0x400
+#define PNG_BACKGROUND_IS_GRAY     0x800
 
 /* push model modes */
 #define PNG_READ_SIG_MODE   0
@@ -1773,9 +1779,7 @@ png_get_header_version(png_structp png_ptr) \
 #define PNG_FLAG_FREE_PALETTE             0x1000
 #define PNG_FLAG_FREE_TRANS               0x2000
 #define PNG_FLAG_FREE_HIST                0x4000
-#define PNG_FLAG_HAVE_CHUNK_HEADER        0x8000L
-#define PNG_FLAG_WROTE_tIME              0x10000L
-#define PNG_FLAG_BACKGROUND_IS_GRAY      0x20000L
+
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
                                      PNG_FLAG_CRC_ANCILLARY_NOWARN)
@@ -1794,8 +1798,13 @@ png_get_header_version(png_structp png_ptr) \
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
 /* place to hold the signature string for a PNG file. */
-extern png_byte FARDATA png_sig[8];
+#ifdef PNG_GLOBAL_ARRAYS
+   extern png_byte FARDATA png_sig[8];
+#else
+#define png_sig png_sig_bytes(NULL)
+#endif
 
+#ifdef PNG_GLOBAL_ARRAYS
 /* Constant strings for known chunk types.  If you need to add a chunk,
  * add a string holding the name here.  See png.c for more details.  We
  * can't selectively include these, since we still check for chunk in the
@@ -1818,6 +1827,7 @@ extern png_byte FARDATA png_tEXt[5];
 extern png_byte FARDATA png_tIME[5];
 extern png_byte FARDATA png_tRNS[5];
 extern png_byte FARDATA png_zTXt[5];
+#endif /* PNG_GLOBAL_ARRAYS */
 
 #endif /* PNG_NO_EXTERN */
 

@@ -222,7 +222,8 @@ int main(int argc, char **argv)
         fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
         ++error;
     } else {
-        if ((rc = readpng_init(infile, &image_width, &image_height)) != 0) {
+        if ((rc = readpng_init(infile, (long *)(&image_width), 
+                               (long *)(&image_height))) != 0) {
             switch (rc) {
                 case 1:
                     fprintf(stderr, PROGNAME
@@ -542,7 +543,8 @@ static int rpng_x_create_window()
 
 static int rpng_x_display_image()
 {
-    uch *src, *dest;
+    uch *src;
+    char *dest;
     uch r, g, b, a;
     int ximage_rowbytes = ximage->bytes_per_line;
     ulg i, row, lastrow = 0;

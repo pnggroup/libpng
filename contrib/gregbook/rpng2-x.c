@@ -57,6 +57,10 @@
 #include <X11/Xos.h>
 #include <X11/keysym.h>	/* defines XK_* macros */
 
+#ifdef VMS
+#include <unistd.h>
+#endif
+
 /* all for PvdM background code: */
 #ifndef PI
 #  define PI             3.141592653589793238
@@ -721,7 +725,8 @@ static int rpng2_x_create_window()
 
 static int rpng2_x_load_bg_image()
 {
-    uch *src, *dest;
+    uch *src;
+    char *dest;
     uch r1, r2, g1, g2, b1, b2;
     uch r1_inv, r2_inv, g1_inv, g2_inv, b1_inv, b2_inv;
     int k, hmax, max;
@@ -784,7 +789,7 @@ static int rpng2_x_load_bg_image()
             g2_inv = g2_min + (g2_diff * (yidx_max-yidx)) / yidx_max;
             b2_inv = b2_min + (b2_diff * (yidx_max-yidx)) / yidx_max;
 
-            dest = bg_data + row*bg_rowbytes;
+            dest = (char *)(bg_data + row*bg_rowbytes);
             for (i = 0;  i < rpng2_info.width;  ++i) {
                 even_odd_horiz = (i / bgscale) & 1;
                 even_odd = even_odd_vert ^ even_odd_horiz;
@@ -837,7 +842,7 @@ static int rpng2_x_load_bg_image()
             yidx = row % bgscale;
             if (yidx > hmax)
                 yidx = bgscale-1 - yidx;
-            dest = bg_data + row*bg_rowbytes;
+            dest = (char *)(bg_data + row*bg_rowbytes);
             for (i = 0;  i < rpng2_info.width;  ++i) {
                 xidx = i % bgscale;
                 if (xidx > hmax)
@@ -887,7 +892,7 @@ static int rpng2_x_load_bg_image()
 
         for (row = 0;  row < rpng2_info.height;  ++row) {
             y = row - hh;
-            dest = bg_data + row*bg_rowbytes;
+            dest = (char *)(bg_data + row*bg_rowbytes);
             for (i = 0;  i < rpng2_info.width;  ++i) {
                 x = i - hw;
                 angle = (x == 0)? PI_2 : atan((double)y / (double)x);
@@ -1001,7 +1006,8 @@ static void rpng2_x_display_row(ulg row)
     uch bg_red   = rpng2_info.bg_red;
     uch bg_green = rpng2_info.bg_green;
     uch bg_blue  = rpng2_info.bg_blue;
-    uch *src, *src2=NULL, *dest;
+    uch *src, *src2=NULL;
+    char *dest;
     uch r, g, b, a;
     int ximage_rowbytes = ximage->bytes_per_line;
     ulg i, pixel;

@@ -7,9 +7,10 @@
 CC=gcc
 
 # The commands "CC" and "LD" must NOT refer to /usr/ucb/cc and /usr/ucb/ld.
-# If they do, you need to adjust your PATH environment variable.
-# The environment variable LD_LIBRARY_PATH should not be set at all.  If
-# it is, things are likely to break.
+# If they do, you need to adjust your PATH environment variable to put
+# /usr/ccs/bin ahead of /usr/ucb.  The environment variable LD_LIBRARY_PATH
+# should not be set at all.  If it is, things are likely to break because
+# of the libucb dependency that is created.
 
 # Where make install puts libpng.a, libpng.so*, and png.h
 prefix=/usr/local
@@ -36,7 +37,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.5a
+PNGMIN = 1.0.5c
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include

@@ -3,8 +3,8 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.5a';
-  PNG_LIBPNG_VER        =  10005;
+  PNG_LIBPNG_VER_STRING = '1.0.5c';
+  PNG_LIBPNG_VER        =  10006;
 
 type
   png_uint_32 = Cardinal;
@@ -261,7 +261,11 @@ function png_create_read_struct(user_png_ver: png_charp;
              stdcall;
 function png_get_copyright(png_ptr: png_structp): png_charp;
              stdcall;
+function png_get_header_ver(png_ptr: png_structp): png_charp;
+             stdcall;
 function png_get_header_version(png_ptr: png_structp): png_charp;
+             stdcall;
+function png_get_libpng_ver(png_ptr: png_structp): png_charp;
              stdcall;
 function png_create_write_struct(user_png_ver: png_charp;
              error_ptr: user_error_ptr; error_fn: png_error_ptr;
@@ -589,6 +593,8 @@ procedure png_write_image(png_ptr: png_structp; image: png_bytepp);
              stdcall;
 procedure png_write_info(png_ptr: png_structp; info_ptr: png_infop);
              stdcall;
+procedure png_write_info_before_PLTE(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
 procedure png_write_row(png_ptr: png_structp; row: png_bytep);
              stdcall;
 procedure png_write_rows(png_ptr: png_structp; row: png_bytepp;
@@ -716,6 +722,7 @@ procedure png_write_end; external pngDLL;
 procedure png_write_flush; external pngDLL;
 procedure png_write_image; external pngDLL;
 procedure png_write_info; external pngDLL;
+procedure png_write_info_before_PLTE; external pngDLL;
 procedure png_write_row; external pngDLL;
 procedure png_write_rows; external pngDLL;
 

@@ -1,12 +1,12 @@
 
-Libpng 1.0.5a - October 23, 1999
+Libpng 1.0.5c - November 27, 1999
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
 
 Changes since the last public release (1.0.5):
 
-version 1.0.5a [October 23, 1999]
+version libpng-1.0.5a October 23, 1999
   Added contrib/pngsuite and contrib/pngminus (Willem van Schaik)
   Fixed a typo in the png_set_sRGB() function call in example.c (Jan Nijtmans)
   Further optimization and bugfix of pngvcrd.c
@@ -14,6 +14,26 @@ version 1.0.5a [October 23, 1999]
     text_ptr structure.  Instead, it makes its own copy.
   Created separate write_end_info_struct in pngtest.c for a more severe test.
   Added code in pngwrite.c to free info_ptr->text[i].key to stop a memory leak.
+version libpng-1.0.5b November 23, 1999
+  Moved PNG_FLAG_HAVE_CHUNK_HEADER, PNG_FLAG_BACKGROUND_IS_GRAY and
+    PNG_FLAG_WROTE_tIME from flags to mode.
+  Added png_write_info_before_PLTE() function.
+  Fixed some typecasting in contrib/gregbook/*.c
+  Updated scripts/makevms.com and added makevms.com to contrib/gregbook
+    and contrib/pngminus (Martin Zinser)
+version 1.0.5c [November 27, 1999]
+  Moved png_get_header_version from png.h to png.c, to accomodate ansi2knr.
+  Removed all global arrays (according to PNG_NO_GLOBAL_ARRAYS macro), to
+    accomodate making DLL's: Moved usr_png_ver from global variable to function
+    png_get_header_ver() in png.c.  Moved png_sig to png_sig_bytes in png.c and
+    eliminated use of png_sig in pngwutil.c.  Moved the various png_CHNK arrays
+    into pngtypes.h.  Eliminated use of global png_pass arrays.  Declared the
+    png_CHNK and png_pass arrays to be "const".  Made the global arrays
+    available to applications (although none are used in libpng itself) when
+    PNG_NO_GLOBAL_ARRAYS is not defined or when PNG_GLOBAL_ARRAYS is defined.
+  Removed some extraneous "-I" from contrib/pngminus/makefile.std
+  Changed the PNG_sRGB_INTENT macros in png.h to be consistent with PNG-1.2.
+  Change PNG_SRGB_INTENT to PNG_sRGB_INTENT in libpng.txt and libpng.3 
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.5a - October 23, 1999
+ * libpng 1.0.5c - November 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -773,7 +773,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
       if (png_get_text(read_ptr, read_info_ptr, &text_ptr, &num_text) > 0)
       {
-         int i;
          png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
          png_set_text(write_ptr, write_info_ptr, text_ptr, num_text);
       }
@@ -812,6 +811,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
    png_debug(0, "\nWriting info struct\n");
+
+/* If we wanted, we could write info in two steps:
+   png_write_info_before_PLTE(write_ptr, write_info_ptr);
+ */
    png_write_info(write_ptr, write_info_ptr);
 
    png_debug(0, "\nAllocating row buffer \n");
@@ -872,7 +875,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
       if (png_get_text(read_ptr, end_info_ptr, &text_ptr, &num_text) > 0)
       {
-         int i;
          png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
          png_set_text(write_ptr, write_end_info_ptr, text_ptr, num_text);
       }
@@ -1005,6 +1007,10 @@ main(int argc, char *argv[])
    fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
    fprintf(STDERR,"%s",png_get_copyright(NULL));
+   /* Show the version of libpng used in building the library */
+   fprintf(STDERR," library:%s",png_get_header_version(NULL));
+   /* Show the version of libpng used in building the application */
+   fprintf(STDERR," pngtest:%s",PNG_HEADER_VERSION_STRING);
 
    /* Do some consistency checking on the memory allocation settings, I'm
       not sure this matters, but it is nice to know, the first of these
@@ -1217,7 +1223,7 @@ main(int argc, char *argv[])
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_pngtest_version
-   (version_1_0_5a png_h_is_not_version_1_0_5a)
+   (version_1_0_5c png_h_is_not_version_1_0_5c)
 {
-   if(png_h_is_not_version_1_0_5a == NULL) return;
+   if(png_h_is_not_version_1_0_5c == NULL) return;
 }

@@ -604,6 +604,14 @@ void write_png(char *file_name /* , ... other image information ... */)
    /* Write the file header information.  REQUIRED */
    png_write_info(png_ptr, info_ptr);
 
+   /* If you want, you can write the info in two steps, in case you need to
+    * write your private chunk ahead of PLTE:
+    *
+    *   png_write_info_before_PLTE(write_ptr, write_info_ptr);
+    *   write_my_chunk();
+    *   png_write_info(png_ptr, info_ptr);
+    */
+
    /* Once we write out the header, the compression type on the text
     * chunks gets changed to PNG_TEXT_COMPRESSION_NONE_WR or
     * PNG_TEXT_COMPRESSION_zTXt_WR, so it doesn't get written out again

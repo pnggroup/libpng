@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.5a - October 23, 1999
+ libpng version 1.0.5c - November 27, 1999
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -229,7 +229,7 @@ called after each row has been read, which you can use to control
 a progress meter or the like.  It's demonstrated in pngtest.c.
 You must supply a function
 
-    void read_row_callback(png_ptr, png_uint_32 row, int pass);
+    void read_row_callback(png_ptr ptr, png_uint_32 row, int pass);
     {
       /* put your code here */
     }
@@ -1322,10 +1322,10 @@ Some of the more important parts of the png_info are:
                      Color Consortium
                      (http://www.color.org).
                      It can be one of
-                     PNG_SRGB_INTENT_SATURATION,
-                     PNG_SRGB_INTENT_PERCEPTUAL,
-                     PNG_SRGB_INTENT_ABSOLUTE, or
-                     PNG_SRGB_INTENT_RELATIVE.
+                     PNG_sRGB_INTENT_SATURATION,
+                     PNG_sRGB_INTENT_PERCEPTUAL,
+                     PNG_sRGB_INTENT_ABSOLUTE, or
+                     PNG_sRGB_INTENT_RELATIVE.
 
 
     png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr,
@@ -1487,6 +1487,14 @@ time to an RFC 1123 format string.
 You are now ready to write all the file information up to the actual
 image data.  You do this with a call to png_write_info().
 
+    png_write_info(png_ptr, info_ptr);
+
+If you need to write a private chunk that you want to appear before
+the PLTE chunk when PLTE is present, you can write the PNG info in
+two steps, and insert code to write your own chunk between them:
+
+    png_write_info_before_PLTE(png_ptr, info_ptr);
+    write_my_private_chunks();
     png_write_info(png_ptr, info_ptr);
 
 After you've written the file information, you can set up the library
@@ -2058,13 +2066,13 @@ the old method.
 
 VII. Y2K Compliance in libpng
 
-October 23, 1999
+November 27, 1999
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.5a are Y2K compliant.  It is my belief that earlier
+upward through 1.0.5c are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

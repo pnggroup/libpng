@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.5a - October 23, 1999
+ * libpng 1.0.5c - November 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -416,6 +416,14 @@ __dont__ include it again
 
 #ifndef PNG_NO_ASSEMBLER_CODE
 #define PNG_ASSEMBLER_CODE_SUPPORTED
+#endif
+
+/* Do not use global arrays (helps with building DLL's)
+ * They are no longer used in libpng itself, since version 1.0.5c,
+ * but might be required for some pre-1.0.5c applications.
+ */
+#ifndef PNG_NO_GLOBAL_ARRAYS
+#define PNG_GLOBAL_ARRAYS
 #endif
 
 /* These are currently experimental features, define them if you want */

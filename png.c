@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.5a - October 23, 1999
+ * libpng version 1.0.5c - November 27, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -12,16 +12,21 @@
 #define PNG_NO_EXTERN
 #include "png.h"
 
-PNG_GET_HEADER
-
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
  */
 
-char png_libpng_ver[12] = "1.0.5a";
+#ifdef PNG_GLOBAL_ARRAYS
+/* png_libpng_ver was changed to a function in version 1.0.5c */
+char png_libpng_ver[12] = "1.0.5c";
 
+/* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+ 
+/* This was moved to pngtypes.h and other places in version 1.0.5c.
+ * It was nicer having them all in one place, but it interfered with
+ * people building DLL's. */
 
 /* Constant strings for known chunk types.  If you need to add a chunk,
  * add a string holding the name here.  If you want to make the code
@@ -75,6 +80,8 @@ int FARDATA png_pass_mask[] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
 /* Mask to determine which pixels to overwrite while displaying */
 int FARDATA png_pass_dsp_mask[] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 
+#endif
+
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
  * stream we can set num_bytes = 8 so that libpng will not attempt to read
@@ -102,6 +109,7 @@ png_set_sig_bytes(png_structp png_ptr, int num_bytes)
 int
 png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 {
+   png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
    if (num_to_check > 8)
       num_to_check = 8;
    else if (num_to_check < 1)
@@ -113,7 +121,7 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
    if (start + num_to_check > 8)
       num_to_check = 8 - start;
 
-   return ((int)(png_memcmp(&sig[start], &png_sig[start], num_to_check)));
+   return ((int)(png_memcmp(&sig[start], &png_signature[start], num_to_check)));
 }
 
 /* (Obsolete) function to check signature bytes.  It does not allow one
@@ -356,22 +364,65 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 }
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
 
+/* Signature string for a PNG file. */
+png_bytep
+png_sig_bytes(png_structp png_ptr)
+{
+   const png_byte png_sig_numbers[9] = {137, 80, 78, 71, 13, 10, 26, 10, 0};
+   if (png_ptr == NULL) /* silence compiler warning */
+     return ((png_bytep) strdup(png_sig_numbers));
+   return ((png_bytep) strdup(png_sig_numbers));
+}
+
 png_charp
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.5a - October 23, 1999\n\
+   return ("\n libpng version 1.0.5c - November 27, 1999\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999 Glenn Randers-Pehrson\n");
    return ("");
 }
 
+/* The following return the library version as a short string in the
+ * format 1.0.0 through 99.99.99zz.  To get the version of *.h files used
+ * with your application, print out PNG_LIBPNG_VER_STRING, which is defined
+ * in png.h.
+ */
+
+png_charp
+png_get_libpng_ver(png_structp png_ptr)
+{
+   /* Version of *.c files used when building libpng */
+   if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
+      return("1.0.5c");
+   return("1.0.5c");
+}
+
+png_charp
+png_get_header_ver(png_structp png_ptr)
+{
+   /* Version of *.h files used when building libpng */
+   if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
+      return(PNG_LIBPNG_VER_STRING);
+   return(PNG_LIBPNG_VER_STRING);
+}
+
+png_charp
+png_get_header_version(png_structp png_ptr)
+{
+   /* Returns longer string containing both version and date */
+   if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
+      return(PNG_HEADER_VERSION_STRING);
+   return(PNG_HEADER_VERSION_STRING);
+}
+
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_version
-   (version_1_0_5a png_h_is_not_version_1_0_5a)
+   (version_1_0_5c png_h_is_not_version_1_0_5c)
 {
-   if(png_h_is_not_version_1_0_5a == NULL)
+   if(png_h_is_not_version_1_0_5c == NULL)
      return;
 }

@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.5a - October 23, 1999
+ * libpng 1.0.5c - November 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -92,13 +92,13 @@ png_set_background(png_structp png_ptr,
    /* Note:  if need_expand is set and color_type is either RGB or RGB_ALPHA
     * (in which case need_expand is superfluous anyway), the background color
     * might actually be gray yet not be flagged as such. This is not a problem
-    * for the current code, which uses PNG_FLAG_BACKGROUND_IS_GRAY only to
+    * for the current code, which uses PNG_BACKGROUND_IS_GRAY only to
     * decide when to do the png_do_gray_to_rgb() transformation.
     */
    if ((need_expand && !(png_ptr->color_type & PNG_COLOR_MASK_COLOR)) ||
        (!need_expand && background_color->red == background_color->green &&
         background_color->red == background_color->blue))
-      png_ptr->flags |= PNG_FLAG_BACKGROUND_IS_GRAY;
+      png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
 }
 #endif
 
@@ -1171,7 +1171,7 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
    /* if gray -> RGB, do so now only if background is non-gray; else do later
     * for performance reasons */
    if (png_ptr->transformations & PNG_GRAY_TO_RGB &&
-       !(png_ptr->flags & PNG_FLAG_BACKGROUND_IS_GRAY))
+       !(png_ptr->mode & PNG_BACKGROUND_IS_GRAY))
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
@@ -1245,7 +1245,7 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
    /* if gray -> RGB, do so now only if we did not do so above */
    if (png_ptr->transformations & PNG_GRAY_TO_RGB &&
-       png_ptr->flags & PNG_FLAG_BACKGROUND_IS_GRAY)
+       png_ptr->mode & PNG_BACKGROUND_IS_GRAY)
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 

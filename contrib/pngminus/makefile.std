@@ -10,13 +10,13 @@ RM=rm
 CP=cp
 
 PNGPATH = /usr/local
-PNGINC = -I$(PNGPATH)/include
-#PNGLIB = -L$(PNGPATH)/lib -lpng
+PNGINC = $(PNGPATH)/include
+#PNGLIB = $(PNGPATH)/lib -lpng
 PNGLIB = $(PNGPATH)/lib/libpng.a
 
 ZPATH = /usr/local
-ZINC = -I$(ZPATH)/include
-#ZLIB = -L$(ZPATH)/lib -lz
+ZINC = $(ZPATH)/include
+#ZLIB = $(ZPATH)/lib -lz
 ZLIB = $(ZPATH)/lib/libz.a
 
 CCFLAGS=-I$(PNGINC) -I$(ZINC)

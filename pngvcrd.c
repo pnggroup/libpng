@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.5a - October 23, 1999
+ * libpng 1.0.5c - November 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -96,6 +96,7 @@ NOT_SUPPORTED:
 void
 png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
+   const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 #ifdef DISABLE_PNGVCRD_COMBINE
    int save_mmx_supported = mmx_supported;
 #endif
@@ -966,6 +967,7 @@ void
 png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
    png_uint_32 transformations)
 {
+   const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 #ifdef DISABLE_PNGVCRD_INTERLACE
    int save_mmx_supported = mmx_supported;
 #endif

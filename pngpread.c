@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.5a - October 23, 1999
+ * libpng 1.0.5c - November 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -116,13 +116,14 @@ png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
 void
 png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 {
+#include "pngtypes.h"
    /* First we make sure we have enough data for the 4 byte chunk name
     * and the 4 byte chunk length before proceeding with decoding the
     * chunk data.  To fully decode each of these chunks, we also make
     * sure we have enough data in the buffer for the 4 byte CRC at the
     * end of every chunk (except IDAT, which is handled separately).
     */
-   if (!(png_ptr->flags & PNG_FLAG_HAVE_CHUNK_HEADER))
+   if (!(png_ptr->mode & PNG_HAVE_CHUNK_HEADER))
    {
       png_byte chunk_length[4];
 
@@ -136,7 +137,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_ptr->push_length = png_get_uint_32(chunk_length);
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
-      png_ptr->flags |= PNG_FLAG_HAVE_CHUNK_HEADER;
+      png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
    if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
@@ -159,7 +160,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 
       png_handle_PLTE(png_ptr, info_ptr, png_ptr->push_length);
    }
-   else if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
+   else if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
    {
       /* If we reach an IDAT chunk, this means we have read all of the
        * header chunks, and we can start reading the image (or if this
@@ -343,7 +344,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_push_handle_unknown(png_ptr, info_ptr, png_ptr->push_length);
    }
 
-   png_ptr->flags &= ~PNG_FLAG_HAVE_CHUNK_HEADER;
+   png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
 }
 
 void
@@ -496,7 +497,8 @@ png_push_restore_buffer(png_structp png_ptr, png_bytep buffer,
 void
 png_push_read_IDAT(png_structp png_ptr)
 {
-   if (!(png_ptr->flags & PNG_FLAG_HAVE_CHUNK_HEADER))
+   const png_byte png_IDAT[5] = { 73,  68,  65,  84, '\0'};
+   if (!(png_ptr->mode & PNG_HAVE_CHUNK_HEADER))
    {
       png_byte chunk_length[4];
 
@@ -511,9 +513,9 @@ png_push_read_IDAT(png_structp png_ptr)
 
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
-      png_ptr->flags |= PNG_FLAG_HAVE_CHUNK_HEADER;
+      png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
 
-      if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
+      if (png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
       {
          png_ptr->process_mode = PNG_READ_CHUNK_MODE;
          if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
@@ -576,7 +578,7 @@ png_push_read_IDAT(png_structp png_ptr)
       }
 
       png_crc_finish(png_ptr, 0);
-      png_ptr->flags &= ~PNG_FLAG_HAVE_CHUNK_HEADER;
+      png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
    }
 }
 
@@ -767,6 +769,30 @@ png_push_process_row(png_structp png_ptr)
 void
 png_read_push_finish_row(png_structp png_ptr)
 {
+   /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
+   
+   /* start of interlace block */
+   const int png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
+   
+   /* offset to next interlace block */
+   const int png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
+   
+   /* start of interlace block in the y direction */
+   const int png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
+   
+   /* offset to next interlace block in the y direction */
+   const int png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
+   
+   /* Width of interlace block.  This is not currently used - if you need
+    * it, uncomment it here and in png.h
+   const int png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
+   */
+   
+   /* Height of interlace block.  This is not currently used - if you need
+    * it, uncomment it here and in png.h
+   const int png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
+   */
+   
    png_ptr->row_number++;
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
@@ -1115,6 +1141,7 @@ void
 png_progressive_combine_row (png_structp png_ptr,
    png_bytep old_row, png_bytep new_row)
 {
+   const int png_pass_dsp_mask[7] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
    if (new_row != NULL)    /* new_row must == png_ptr->row_buf here. */
       png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);
 }

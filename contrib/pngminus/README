@@ -94,8 +94,8 @@ can be part of a pipe.
 To list the options type "png2pnm -h" or "pnm2png -h".
 
 
-Just like IKEA
---------------
+Just like Scandinavian furniture
+--------------------------------
 You have to put it together yourself. I did test the software under
 MS-DOS with Turbo-C 3.0 and under RedHat Linux 4.2 with gcc. In both
 cases I used libpng-1.0.4 and zlib-1.1.3. Later versions should be OK,

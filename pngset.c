@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.5a - October 23, 1999
+ * libpng 1.0.5c - November 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -368,7 +368,7 @@ png_set_tIME(png_structp png_ptr, png_infop info_ptr, png_timep mod_time)
 {
    png_debug1(1, "in %s storage function\n", "tIME");
    if (png_ptr == NULL || info_ptr == NULL ||
-       (png_ptr->flags & PNG_FLAG_WROTE_tIME))
+       (png_ptr->mode & PNG_WROTE_tIME))
       return;
 
    png_memcpy(&(info_ptr->mod_time), mod_time, sizeof (png_time));

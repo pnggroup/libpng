@@ -22,6 +22,7 @@ EXPORTS
   png_create_info_struct
   png_info_init
   png_write_info
+  png_write_info_before_PLTE
   png_read_info
   png_convert_to_rfc1123
   png_convert_from_struct_tm
@@ -75,7 +76,9 @@ EXPORTS
   png_get_copyright
   png_set_error_fn
   png_get_error_ptr
+  png_get_header_ver
   png_get_header_version
+  png_get_libpng_ver
 ; png_get_mem_fn
 ; png_set_mem_fn
   png_set_write_fn
