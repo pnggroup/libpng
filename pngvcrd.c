@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.4c - October 1, 1999
+ * libpng 1.0.4d - October 6, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -80,8 +80,8 @@ NOT_SUPPORTED:
    of interlaced images, depending on the mask value.
    The mask value describes which pixels are to be combined with
    the row.  The pattern always repeats every 8 pixels, so just 8
-   bits are needed.  A one indicates the pixels is to be combined,
-   a zero indicates the pixel is to be skipped.  This is in addition
+   bits are needed.  A one indicates the pixel is to be combined; a
+   zero indicates the pixel is to be skipped.  This is in addition
    to any alpha or transparency value associated with the pixel.  If
    you want all pixels to be combined, pass 0xff (255) in mask.  */
 
@@ -91,12 +91,17 @@ NOT_SUPPORTED:
 void
 png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
+#ifdef DISABLE_PNGVCRD_COMBINE
    int save_mmx_supported = mmx_supported;
+#endif
+
    png_debug(1,"in png_combine_row_asm\n");
 
+#ifdef DISABLE_PNGVCRD_COMBINE
    if ((png_ptr->transformations & PNG_INTERLACE) && png_ptr->pass != 6)
        mmx_supported = 0;
    else
+#endif
       if (mmx_supported == 2)
           mmx_supported = mmxsupport();
 
@@ -105,6 +110,8 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
       png_memcpy(row, png_ptr->row_buf + 1,
        (png_size_t)((png_ptr->width * png_ptr->row_info.pixel_depth + 7) >> 3));
    }
+   /* GRR:  add "else if (mask == 0)" case?
+    *       or does png_combine_row() not even get called in that case? */
    else
    {
       switch (png_ptr->row_info.pixel_depth)
@@ -220,6 +227,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             }
             break;
          }
+
          case 4:
          {
             png_bytep sp;
@@ -273,6 +281,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             }
             break;
          }
+
          case 8:
          {
             png_bytep srcptr;
@@ -305,7 +314,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   pand       mm0,mm7       //nonzero if keep byte
                   pcmpeqb    mm0,mm6       //zeros->1s, v versa
 
-                  mov        ecx,len       //load length of line
+                  mov        ecx,len       //load length of line (pixels)
                   mov        esi,srcptr    //load source
                   mov        ebx,dstptr    //load dest
                   cmp        ecx,0         //lcr
@@ -353,9 +362,9 @@ end8:
                register unsigned int incr1, initial_val, final_val;
                png_size_t pixel_bytes;
                png_uint_32 i;
-               //if ((mask != 0x0f) && (mask != 0x33))
                register int disp = png_pass_inc[png_ptr->pass];
                int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
+
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
                   pixel_bytes;
@@ -372,7 +381,7 @@ end8:
             } /* end of else */
 
             break;
-         }       //end 8bpp
+         }       // end 8 bpp
 
          case 16:
          {
@@ -483,7 +492,7 @@ end16:
             } /* end of else */
 
             break;
-         }
+         }       // end 16 bpp
 
          case 24:
          {
@@ -596,6 +605,7 @@ end24:
                png_uint_32 i;
                register int disp = png_pass_inc[png_ptr->pass];
                int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
+
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
                   pixel_bytes;
@@ -612,7 +622,7 @@ end24:
             } /* end of else */
 
             break;
-         }       //end 24bpp
+         }       // end 24 bpp
 
          case 32:
          {
@@ -734,6 +744,7 @@ end32:
                png_uint_32 i;
                register int disp = png_pass_inc[png_ptr->pass];
                int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
+
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
                   pixel_bytes;
@@ -750,7 +761,7 @@ end32:
             } /* end of else */
 
             break;
-         }       //end 32bpp
+         }       // end 32 bpp
 
          case 48:
          {
@@ -890,6 +901,7 @@ end48:
                png_uint_32 i;
                register int disp = png_pass_inc[png_ptr->pass];
                int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
+
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
                   pixel_bytes;
@@ -904,8 +916,9 @@ end48:
                   dstptr += incr1;
                }
             } /* end of else */
-            break;  // end 48 bpp
-         }
+
+            break;
+         }       // end 48 bpp
 
          default:
          {
@@ -916,6 +929,7 @@ end48:
             unsigned int i;
             register int disp = png_pass_inc[png_ptr->pass];  // get the offset
             register unsigned int incr1, initial_val, final_val;
+
             pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
             sptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
                pixel_bytes;
@@ -932,8 +946,11 @@ end48:
             break;
          }
       } /* end switch (png_ptr->row_info.pixel_depth) */
-   }
+   } /* end if (non-trivial mask) */
+
+#ifdef DISABLE_PNGVCRD_COMBINE
    mmx_supported = save_mmx_supported;
+#endif
 
 } /* end png_combine_row() */
 
@@ -944,12 +961,24 @@ void
 png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
    png_uint_32 transformations)
 {
-
+#ifndef ENABLE_PNGVCRD_INTERLACE
    int save_mmx_supported = mmx_supported;
+#endif
+
    png_debug(1,"in png_do_read_interlace\n");
 
-   // mmx_supported = mmxsupport();  // doesn't work
-   mmx_supported = 0;
+#ifndef ENABLE_PNGVCRD_INTERLACE
+   /* passes 0 and 2 affect rpng2-win + stefan_full_rgba.png
+    * symptom: first pixel in every 4th or 8th row is wrong color
+    * pass < 6 affects pngtest + any interlaced png
+    * symptom: corruption of heap, crash in png_destroy_read
+    */
+   if(pass < 6)
+      mmx_supported = 0;
+#else
+   if (mmx_supported == 2)
+       mmx_supported = mmxsupport();
+#endif
 
    if (row != NULL && row_info != NULL)
    {
@@ -1848,7 +1877,10 @@ loop4_pass4:
       row_info->rowbytes = ((final_width *
          (png_uint_32)row_info->pixel_depth + 7) >> 3);
    }
+
+#ifndef ENABLE_PNGVCRD_INTERLACE
    mmx_supported = save_mmx_supported;
+#endif
 }
 
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
@@ -3769,7 +3801,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
                p = b - c;
                pc = a - c;
 
-#ifdef    PNG_USE_ABS
+#ifdef PNG_USE_ABS
                pa = abs(p);
                pb = abs(pc);
                pc = abs(p + pc);

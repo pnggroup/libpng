@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.4c - October 1, 1999
+ libpng version 1.0.4d - October 6, 1999
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -2058,13 +2058,13 @@ the old method.
 
 VII. Y2K Compliance in libpng
 
-October 1, 1999
+October 6, 1999
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.4c are Y2K compliant.  It is my belief that earlier
+upward through 1.0.4d are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

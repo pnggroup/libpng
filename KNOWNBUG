@@ -38,3 +38,13 @@ Known bugs and suggested enhancements in libpng-1.0.4
    for the png_set_gAMA(), png_set_cHRM(), and corresponding png_get_()
    functions will be needed.
 
+4. September 1999 -- BUG --
+
+   Portions of the new MMX code in pngvcrd.c are defined out because the
+   did not work properly.  When PNGVCRD_INTERLACE_BUG_IS_FIXED is defined,
+   to enable the code, pngtest pngtest.png pngout.png results in a
+   "Debug error! Damage before normal block # 57 at 0x007e19f0" on
+   a Pentium II with MMX system.  This seems to be caused by the heap
+   being trashed before a free() in png_read_destroy().
+
+   When PNGVCRD_COMBINE_BUG_IS_FIXED is defined (what?)

@@ -1,5 +1,5 @@
 
-Libpng 1.0.4c - October 1, 1999
+Libpng 1.0.4d - October 6, 1999
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -69,15 +69,20 @@ version 1.0.4 [September 24, 1999]
   Split makefile.win32vc into two versions, makefile.vcawin32 (uses MMX
     assembler code) and makefile.vcwin32 (doesn't).
   Added a CPU timing report to pngtest.c (enabled by defining PNGTEST_TIMING)
+  Added a copy of pngnow.png to the distribution.
 version 1.0.4a September 25, 1999
   Increase max_pixel_depth in pngrutil.c if a user transform needs it.
   Changed several division operations to right-shifts in pngvcrd.c
 version 1.0.4b September 30, 1999
   Added parentheses in line 3732 of pngvcrd.c
   Added a comment in makefile.linux warning about buggy -O3 in pgcc 2.95.1
-version 1.0.4c [October 1, 1999]
   Added a "png_check_version" function in png.c and pngtest.c that will generate
     a helpful compiler error if an old png.h is found in the search path.
+version 1.0.4c October 1, 1999
+  Changed type of png_user_transform_depth|channels from int to png_byte.
+version 1.0.4d [October 6, 1999]
+  Changed 0.45 to 0.45455 in png_set_sRGB()
+  Removed unused PLTE entries from pngnow.png
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
