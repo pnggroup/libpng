@@ -24,7 +24,7 @@ CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) -KPIC # -g -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=cc -shared
 
-VER=1.0.9rc2
+VER=1.0.9
 SONUM=2
 SHAREDLIB=libpng.so
 libdir=$(prefix)

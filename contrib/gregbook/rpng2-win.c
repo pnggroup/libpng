@@ -56,7 +56,7 @@
 
 #define PROGNAME  "rpng2-win"
 #define LONGNAME  "Progressive PNG Viewer for Windows"
-#define VERSION   "1.20 of 4 January 2001"
+#define VERSION   "1.20 of 29 January 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -373,6 +373,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             rpng2_info.nommxcombine = TRUE;
         } else if (!strncmp(*argv, "-nommxinterlace", 7)) {
             rpng2_info.nommxinterlace = TRUE;
+        } else if (!strcmp(*argv, "-nommx")) {
+            rpng2_info.nommxfilters = TRUE;
+            rpng2_info.nommxcombine = TRUE;
+            rpng2_info.nommxinterlace = TRUE;
 #endif
         } else {
             if (**argv != '-') {
@@ -428,7 +432,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         fprintf(stderr, "\n"
           "Usage:  %s [-gamma exp] [-bgcolor bg | -bgpat pat] [-timing]\n"
 #if (defined(__i386__) || defined(_M_IX86))
-          "        %*s [-nommxfilters] [-nommxcombine] [-nommxinterlace]\n"
+          "        %*s [[-nommxfilters] [-nommxcombine] [-nommxinterlace] | -nommx]\n"
 #endif
           "        %*s file.png\n\n"
           "    exp \ttransfer-function exponent (``gamma'') of the display\n"

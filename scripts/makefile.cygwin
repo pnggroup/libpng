@@ -38,9 +38,9 @@ CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-#PNGDLL = $DLLNUM% # msvc
-PNGDLL = 2         # cygwin 1.0.9rc2
-PNGMIN = 1.0.9rc2
+#PNGDLL = $%DLLNUM% # msvc
+PNGDLL = 2 # cygwin 1.0.9
+PNGMIN = 1.0.9
 PNGMIN_BASE = 1.0.9
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
@@ -107,7 +107,7 @@ $(STATLIB): $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-$(SHAREDDEF): msvc/png32ms.def
+$(SHAREDDEF): projects/msvc/png32ms.def
 	cat $< | sed -e '1{G;s/^\(.*\)\(\n\)/EXPORTS/;};2,/^EXPORTS/d' > $@
 
 $(SHAREDLIB): $(OBJSDLL) $(SHAREDDEF)

@@ -883,11 +883,16 @@ version 1.0.9beta9 [January 15, 2001]
 version 1.0.9beta10 [January 16, 2001]
   Do not typedef png_FILE_p in pngconf.h when PNG_NO_STDIO is defined.
   Fixed "png_mmx_supported" typo in project definition files.
-version 1.0.9rc2 [January 22, 2001]
+version 1.0.9beta11 [January 19, 2001]
   Updated makefile.sgi to make shared library.
   Removed png_mmx_support() function and disabled PNG_MNG_FEATURES_SUPPORTED
     by default, for the benefit of DLL forward compatibility.  These will
     be re-enabled in version 1.2.0.
+version 1.0.9rc2 [January 22, 2001]
+  Revised cygwin support.
+version 1.0.9 [January 31, 2001]
+  Added check of cygwin's ALL_STATIC in pngconf.h
+  Added "-nommx" parameter to contrib/gregbook/rpng2-win and rpng2-x demos.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

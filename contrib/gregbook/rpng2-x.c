@@ -56,7 +56,7 @@
 
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
-#define VERSION   "1.20 of 4 January 2001"
+#define VERSION   "1.20 of 29 January 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -367,6 +367,10 @@ int main(int argc, char **argv)
             rpng2_info.nommxcombine = TRUE;
         } else if (!strncmp(*argv, "-nommxinterlace", 7)) {
             rpng2_info.nommxinterlace = TRUE;
+        } else if (!strcmp(*argv, "-nommx")) {
+            rpng2_info.nommxfilters = TRUE;
+            rpng2_info.nommxcombine = TRUE;
+            rpng2_info.nommxinterlace = TRUE;
 #endif
         } else {
             if (**argv != '-') {
@@ -428,7 +432,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "\n"
           "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg | -bgpat pat]\n"
 #if (defined(__i386__) || defined(_M_IX86))
-          "        %*s [-nommxfilters] [-nommxcombine] [-nommxinterlace]\n"
+          "        %*s [[-nommxfilters] [-nommxcombine] [-nommxinterlace] | -nommx]\n"
 #endif
           "        %*s [-usleep dur | -timing] [-pause] file.png\n\n"
           "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"

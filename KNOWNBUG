@@ -1,9 +1,4 @@
 
 Known bugs in libpng-1.0.9
 
-1: January 16, 2001 -- BUG -- progressive reading narrow interlaced PNGs
-
-   A crash occurs in Mozilla when reading a 2x533 interlaced RGB image.
-
-   Status: Under investigation.  It appears that pngpread.c is not
-   taking care to skip empty passes.
+None.

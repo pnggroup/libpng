@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.9rc2 - January 22, 2001
+ * libpng 1.0.9 - January 31, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -59,7 +59,9 @@
  *   PNG_BUILD_DLL -- building the dll
  *   (no define)   -- building an application, linking to the dll
  *   PNG_STATIC    -- building the static lib, or building an application
- *                    which links to the static lib.
+ *                    that links to the static lib.
+ *   ALL_STATIC    -- building various static libs, or building an application
+ *                    that links to the static libs.
  * Thus,
  * a cygwin user should define either PNG_BUILD_DLL or PNG_STATIC, and
  * this bit of #ifdefs will define the 'correct' config variables based on
@@ -78,6 +80,9 @@
 #      undef PNG_STATIC
 #    endif
 #  else
+#    if defined(ALL_STATIC)
+#      define PNG_STATIC
+#    endif
 #    if defined(PNG_STATIC)
 #      if defined(PNG_USE_DLL)
 #        undef PNG_USE_DLL
@@ -1028,7 +1033,7 @@ typedef z_stream FAR *  png_zstreamp;
  * LIBPNG DLL.
  *
  * Define PNG_USE_DLL if you want to *link* to the Windows LIBPNG DLL.
- * It is equivalent to Microsoft predefined macro _DLL which is
+ * It is equivalent to Microsoft predefined macro _DLL that is
  * automatically defined when you compile using the share
  * version of the CRT (C Run-Time library)
  *
