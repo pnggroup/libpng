@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.4f - October 12, 1999
+ * libpng version 1.0.5 - October 5, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -12,13 +12,11 @@
 #define PNG_NO_EXTERN
 #include "png.h"
 
-PNG_GET_HEADER
-
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
  */
 
-char png_libpng_ver[12] = "1.0.4f";
+char png_libpng_ver[12] = "1.0.5";
 
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -88,7 +86,7 @@ png_set_sig_bytes(png_structp png_ptr, int num_bytes)
    if (num_bytes > 8)
       png_error(png_ptr, "Too many bytes for PNG signature.");
 
-   png_ptr->sig_bytes = (png_byte)(num_bytes < 0 ? 0 : num_bytes);
+   png_ptr->sig_bytes = num_bytes < 0 ? 0 : num_bytes;
 }
 
 /* Checks whether the supplied bytes match the PNG signature.  We allow
@@ -352,19 +350,19 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 png_charp
 png_get_copyright(png_structp png_ptr)
 {
-   if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.4f - October 12, 1999\n\
+   if(png_ptr == NULL)
+     /* silence compiler warning about unused png_ptr */ ;
+   return("\n libpng version 1.0.5 - October 5, 1999\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999 Glenn Randers-Pehrson\n");
-   return ("");
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_version
-   (version_1_0_4f png_h_is_not_version_1_0_4f)
+   (version_1_0_5 png_h_is_not_version_1_0_5)
 {
-   if(png_h_is_not_version_1_0_4f == NULL)
-     return;
+   if(png_h_is_not_version_1_0_5 == NULL)
+     /* silence compiler warning about unused parameter */ ;
 }

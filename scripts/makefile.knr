@@ -2,7 +2,7 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
-# This makefile requires the file ansi2knr.c, which you can get
+# This makefile requires file file ansi2knr.c, which you can get
 # from the Ghostscript ftp site at ftp://ftp.cs.wisc.edu/ghost/
 # If you have libjpeg, you probably already have ansi2knr.c in the jpeg
 # source distribution.

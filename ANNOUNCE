@@ -1,12 +1,10 @@
 
-Libpng 1.0.4f - October 12, 1999
+Libpng 1.0.5 - October 5, 1999
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Changes since the last public release (1.0.3):
 
-version 1.0.3a [August 12, 1999]
   Added check for PNG_READ_INTERLACE_SUPPORTED in pngread.c; issue a warning
      if an attempt is made to read an interlaced image when it's not supported.
   Added check if png_ptr->trans is defined before free'ing it in pngread.c
@@ -30,70 +28,38 @@ version 1.0.3a [August 12, 1999]
   Added function png_set_empty_plte_permitted() to make libpng useable
     in MNG applications.
   Corrected the typedef for png_free_ptr in png.h (Jesse Jones).
-  Correct gamma with srgb is 45455 instead of 45000 in pngrutil.c, to be
-    consistent with PNG-1.2, and allow variance of 500 before complaining.
+  Correct gamma with srgb is 45455 instead of 45000 in pngrutil.c and
+    pngset.c, to be consistent with PNG-1.2, and allow variance of 500
+    before complaining.
   Added assembler code contributed by Intel in file pngvcrd.c and modified
     makefile.w32 to use it (Nirav Chhatrapati, INTEL Corporation, Gilles Vollant)
   Changed "ln -s -f" to "ln -f -s" in the makefiles to make Solaris happy.
-  Added some aliases for png_set_expand() in pngrtran.c, namely
-    png_set_expand_PLTE(), png_set_expand_depth(), and png_set_expand_tRNS()
-    (Greg Roelofs, in "PNG: The Definitive Guide").
   Added makefile.beo for BEOS on X86, contributed by Sander Stok.
-version 1.0.3b [August 26, 1999]
   Replaced 2147483647L several places with PNG_MAX_UINT macro, defined in png.h
   Changed leading blanks to tabs in all makefiles.
-  Define PNG_USE_PNGVCRD in makefile.w32, to get MMX assembler code.
   Made alternate versions of  png_set_expand() in pngrtran.c, namely
     png_set_gray_1_2_4_to_8, png_set_palette_to_rgb, and png_set_tRNS_to_alpha
-    (Greg Roelofs, in "PNG: The Definitive Guide").  Deleted the 1.0.3a aliases.
+    (Greg Roelofs, in "PNG: The Definitive Guide").
   Relocated start of 'extern "C"' block in png.h so it doesn't include pngconf.h
   Revised calculation of num_blocks in pngmem.c to avoid a potentially
     negative shift distance, whose results are undefined in the C language.
   Added a check in pngset.c to prevent writing multiple tIME chunks.
   Added a check in pngwrite.c to detect invalid small window_bits sizes.
-version 1.0.3d [September 4, 1999]
-  Fixed type casting of igamma in pngrutil.c
-  Added new png_expand functions to scripts/pngdef.pas and pngos2.def
   Added a demo read_user_transform_fn that examines the row filters in pngtest.c
-version 1.0.4 [September 24, 1999]
   Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
-  Delete #define PNG_INTERNAL and include "png.h" from pngasmrd.h
   Made several minor corrections to pngtest.c
   Changed "hptr += 16L" to "hptr = hptr + 16L" in pngmem.c for Turbo 3.0
   Renamed the makefiles with longer but more user friendly extensions.
+  Define PNG_USE_PNGVCRD in makefile.vcawin32, to get MMX assembler code.
   Copied the PNG copyright and license to a separate LICENSE file.
   Revised documentation, png.h, and example.c to remove reference to
     "viewing_gamma" which no longer appears in the PNG specification.
-  Revised pngvcrd.c to use MMX code for interlacing only on the final pass.
-  Updated pngvcrd.c to use the faster C filter algorithms from libpng-1.0.1a
-  Split makefile.win32vc into two versions, makefile.vcawin32 (uses MMX
-    assembler code) and makefile.vcwin32 (doesn't).
   Added a CPU timing report to pngtest.c (enabled by defining PNGTEST_TIMING)
-  Added a copy of pngnow.png to the distribution.
-version 1.0.4a September 25, 1999
   Increase max_pixel_depth in pngrutil.c if a user transform needs it.
-  Changed several division operations to right-shifts in pngvcrd.c
-version 1.0.4b September 30, 1999
-  Added parentheses in line 3732 of pngvcrd.c
   Added a comment in makefile.linux warning about buggy -O3 in pgcc 2.95.1
   Added a "png_check_version" function in png.c and pngtest.c that will generate
     a helpful compiler error if an old png.h is found in the search path.
-version 1.0.4c October 1, 1999
-  Changed type of png_user_transform_depth|channels from int to png_byte.
-version 1.0.4f [October 12, 1999]
-  Changed 0.45 to 0.45455 in png_set_sRGB()
-  Removed unused PLTE entries from pngnow.png
-  Re-enabled some parts of pngvcrd.c (png_combine_row) that work properly.
-version 1.0.4e [October 10, 1999]
-  Fixed sign error in pngvcrd.c (Greg Roelofs)
-  Replaced some instances of memcpy with simple assignments in pngvcrd (GR-P)
-version 1.0.4f [October 12, 1999]
-  Surrounded example.c code with #if 0 .. #endif to prevent people from
-    inadvertently trying to compile it.
-  Changed png_get_header_version() from a function to a macro in png.h
-  Added type casting mostly in pngrtran.c and pngwtran.c
-  Removed some pointless "ptr = NULL" in pngmem.c
-  Added a "contrib" directory containing the source code from Greg's book.
+  Added a copy of pngnow.png to the distribution.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.4f - October 12, 1999
+ * libpng 1.0.5 - October 5, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -465,8 +465,10 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    png_ptr->row_info.channels = png_ptr->channels;
    png_ptr->row_info.bit_depth = png_ptr->bit_depth;
    png_ptr->row_info.pixel_depth = png_ptr->pixel_depth;
-   png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
-      (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
+   {
+      png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
+         (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
+   }
 
    png_read_filter_row(png_ptr, &(png_ptr->row_info),
       png_ptr->row_buf + 1, png_ptr->prev_row + 1,
@@ -529,7 +531,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.4f.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5.
  */
 
 void
@@ -578,7 +580,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.4f.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)

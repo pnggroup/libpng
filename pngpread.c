@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.4f - October 12, 1999
+ * libpng 1.0.5 - October 5, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -94,7 +94,7 @@ png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
 
    png_push_fill_buffer(png_ptr, &(info_ptr->signature[num_checked]),
       num_to_check);
-   png_ptr->sig_bytes = (png_byte)(png_ptr->sig_bytes+num_to_check);
+   png_ptr->sig_bytes += num_to_check;
 
    if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
    {
