@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.6rc2 - August 8, 2004
+ libpng version 1.2.6rc3 - August 10, 2004
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp@users.sourceforge.net>
  Copyright (c) 1998-2004 Glenn Randers-Pehrson
@@ -332,9 +332,15 @@ this, you can call:
 
     png_set_keep_unknown_chunks(png_ptr, keep,
         chunk_list, num_chunks);
-    keep       - 0: do not keep
-                 1: keep only if safe-to-copy
-                 2: keep even if unsafe-to-copy
+    keep       - 0: do not handle as unknown
+                 1: do not keep
+                 2: keep only if safe-to-copy
+                 3: keep even if unsafe-to-copy
+               You can use these definitions:
+                 PNG_HANDLE_CHUNK_AS_DEFAULT   0
+                 PNG_HANDLE_CHUNK_NEVER        1
+                 PNG_HANDLE_CHUNK_IF_SAFE      2
+                 PNG_HANDLE_CHUNK_ALWAYS       3
     chunk_list - list of chunks affected (a byte string,
                  five bytes per chunk, NULL or '\0' if
                  num_chunks is 0)
@@ -342,13 +348,13 @@ this, you can call:
                  unknown chunks are affected.  If nonzero,
                  only the chunks in the list are affected
 
-
 Unknown chunks declared in this way will be saved as raw data onto a
 list of png_unknown_chunk structures.  If a chunk that is normally
 known to libpng is named in the list, it will be handled as unknown,
 according to the "keep" directive.  If a chunk is named in successive
 instances of png_set_keep_unknown_chunks(), the final instance will
-take precedence.
+take precedence.  The IHDR and IEND chunks should not be named in
+chunk_list; if they are, libpng will process them normally anyway.
 
 The high-level read interface
 
@@ -2878,13 +2884,13 @@ application:
 
 VII. Y2K Compliance in libpng
 
-August 8, 2004
+August 10, 2004
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.6rc2 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.6rc3 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

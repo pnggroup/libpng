@@ -1,5 +1,5 @@
 
-Libpng 1.2.6rc2 - August 8, 2004
+Libpng 1.2.6rc3 - August 10, 2004
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -108,6 +108,13 @@ version 1.2.6rc2 [August 8, 2004]
   Changed "HANDLE_CHUNK_*" to "PNG_HANDLE_CHUNK_*" (Cosmin)
   Added "-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)" to 15 *NIX makefiles.
   Added code to update the row_info->colortype in png_do_read_filler() (MSB).
+version 1.2.6rc3 [August 10, 2004]
+  Eliminated use of "abs()" in testing cHRM and gAMA values, to avoid
+    trouble with some 64-bit compilers.  Created PNG_OUT_OF_RANGE() macro.
+  Revised documentation of png_set_keep_unknown_chunks().
+  Check handle_as_unknown status in pngpread.c, as in pngread.c previously.
+  Restore "HANDLE_CHUNK_*" macros, but deprecated, for apps that use them.
+  Added "rim" definitions for CONST4 and CONST6 in pnggccrd.c
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net

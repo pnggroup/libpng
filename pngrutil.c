@@ -1,6 +1,6 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng version 1.2.6rc2 - August 8, 2004
+ * libpng version 1.2.6rc3 - August 10, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -620,7 +620,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
-      if(igamma < 45000L || igamma > 46000L)
+      if (PNG_OUT_OF_RANGE(igamma, 45500L, 500))
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -833,14 +833,14 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
       {
-      if (abs((png_int_32)(int_x_white - 31270L)) > 1000 ||
-          abs((png_int_32)(int_y_white - 32900L)) > 1000 ||
-          abs((png_int_32)(int_x_red   - 64000L)) > 1000 ||
-          abs((png_int_32)(int_y_red   - 33000L)) > 1000 ||
-          abs((png_int_32)(int_x_green - 30000L)) > 1000 ||
-          abs((png_int_32)(int_y_green - 60000L)) > 1000 ||
-          abs((png_int_32)(int_x_blue  - 15000L)) > 1000 ||
-          abs((png_int_32)(int_y_blue  -  6000L)) > 1000)
+      if (PNG_OUT_OF_RANGE(int_x_white, 31270,  1000) ||
+          PNG_OUT_OF_RANGE(int_y_white, 32900,  1000) ||
+          PNG_OUT_OF_RANGE(int_x_red,   64000L, 1000) ||
+          PNG_OUT_OF_RANGE(int_y_red,   33000,  1000) ||
+          PNG_OUT_OF_RANGE(int_x_green, 30000,  1000) ||
+          PNG_OUT_OF_RANGE(int_y_green, 60000L, 1000) ||
+          PNG_OUT_OF_RANGE(int_x_blue,  15000,  1000) ||
+          PNG_OUT_OF_RANGE(int_y_blue,   6000,  1000))
          {
 
             png_warning(png_ptr,
@@ -936,7 +936,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       igamma=(png_fixed_point)(info_ptr->gamma * 100000.);
 #  endif
 #endif
-      if(igamma < 45000L || igamma > 46000L)
+      if (PNG_OUT_OF_RANGE(igamma, 45500L, 500))
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -956,14 +956,14 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_READ_cHRM_SUPPORTED
 #ifdef PNG_FIXED_POINT_SUPPORTED
    if (info_ptr->valid & PNG_INFO_cHRM)
-      if (abs((png_int_32)(info_ptr->int_x_white - 31270L)) > 1000 ||
-          abs((png_int_32)(info_ptr->int_y_white - 32900L)) > 1000 ||
-          abs((png_int_32)(info_ptr->int_x_red   - 64000L)) > 1000 ||
-          abs((png_int_32)(info_ptr->int_y_red   - 33000L)) > 1000 ||
-          abs((png_int_32)(info_ptr->int_x_green - 30000L)) > 1000 ||
-          abs((png_int_32)(info_ptr->int_y_green - 60000L)) > 1000 ||
-          abs((png_int_32)(info_ptr->int_x_blue  - 15000L)) > 1000 ||
-          abs((png_int_32)(info_ptr->int_y_blue  -  6000L)) > 1000)
+      if (PNG_OUT_OF_RANGE(info_ptr->int_x_white, 31270,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->int_y_white, 32900,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->int_x_red,   64000L, 1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->int_y_red,   33000,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->int_x_green, 30000,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->int_y_green, 60000L, 1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->int_x_blue,  15000,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->int_y_blue,   6000,  1000))
          {
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");

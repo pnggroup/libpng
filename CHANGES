@@ -1269,7 +1269,6 @@ version 1.2.6rc1 [August 4, 2004]
   Fixed some harmless bugs in png_handle_sBIT, etc, that would cause
     duplicate chunk types to go undetected.
   Fixed some timestamps in the -config version
-  Fixed some timestamps in the -config version
   Rearranged order of processing of color types in png_handle_tRNS().
   Added ROWBYTES macro to calculate rowbytes without integer overflow.
   Updated makefile.darwin and removed makefile.macosx from scripts directory.
@@ -1278,12 +1277,12 @@ version 1.2.6rc1 [August 4, 2004]
   Revised use of PNG_SET_USER_LIMITS_SUPPORTED macro.
   Fixed wrong cast of returns from png_get_user_width|height_max().
   Changed some "keep the compiler happy" from empty statements to returns,
-version 1.2.6rc2 [August 8, 2004]
+version 1.2.6rc2 [August 7, 2004]
   Revised makefile.darwin and makefile.solaris.  Removed makefile.macosx.
   Revised pngtest's png_debug_malloc() to use png_malloc() instead of
-     png_malloc_default() which is not supposed to be exported.
+    png_malloc_default() which is not supposed to be exported.
   Fixed off-by-one error in one of the conversions to PNG_ROWBYTES() in
-     pngpread.c.  Bug was introduced in 1.2.6rc1.
+    pngpread.c.  Bug was introduced in 1.2.6rc1.
   Fixed bug in RGB to RGBX transformation introduced in 1.2.6rc1.
   Fixed old bug in RGB to Gray transformation.
   Fixed problem with 64-bit compilers by casting arguments to abs()
@@ -1292,6 +1291,13 @@ version 1.2.6rc2 [August 8, 2004]
   Changed "HANDLE_CHUNK_*" to "PNG_HANDLE_CHUNK_*" (Cosmin)
   Added "-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)" to 15 *NIX makefiles.
   Added code to update the row_info->colortype in png_do_read_filler() (MSB).
+version 1.2.6rc3 [August 10, 2004]
+  Eliminated use of "abs()" in testing cHRM and gAMA values, to avoid
+    trouble with some 64-bit compilers.  Created PNG_OUT_OF_RANGE() macro.
+  Revised documentation of png_set_keep_unknown_chunks().
+  Check handle_as_unknown status in pngpread.c, as in pngread.c previously.
+  Moved  "PNG_HANDLE_CHUNK_*" macros out of PNG_INTERNAL section of png.h
+  Added "rim" definitions for CONST4 and CONST6 in pnggccrd.c
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net

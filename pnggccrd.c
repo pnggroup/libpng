@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.6rc2 - August 8, 2004
+ * libpng version 1.2.6rc3 - August 10, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -1773,8 +1773,8 @@ png_do_read_interlace(png_structp png_ptr)
 
                         : "1" (sptr),      // esi      // input regs
                           "2" (dp),        // edi
-                          "0" (width)      // ecx
-// doesn't work           "i" (0x0000000000FFFFFFLL)   // %1 (a.k.a. _const4)
+                          "0" (width),     // ecx
+                          "rim" (_const4)  // %1(?)  (0x0000000000FFFFFFLL)
 
 #if 0  /* %mm0, ..., %mm4 not supported by gcc 2.7.2.3 or egcs 1.1 */
                         : "%mm0", "%mm1", "%mm2"       // clobber list
@@ -1817,7 +1817,8 @@ png_do_read_interlace(png_structp png_ptr)
 
                         : "1" (sptr),      // esi      // input regs
                           "2" (dp),        // edi
-                          "0" (width)      // ecx
+                          "0" (width),     // ecx
+                          "rim" (_const4)  // (0x0000000000FFFFFFLL)
 
 #if 0  /* %mm0, ..., %mm2 not supported by gcc 2.7.2.3 or egcs 1.1 */
                         : "%mm0", "%mm1", "%mm2"       // clobber list
@@ -1871,7 +1872,9 @@ png_do_read_interlace(png_structp png_ptr)
 
                            : "1" (sptr),      // esi      // input regs
                              "2" (dp),        // edi
-                             "0" (width_mmx)  // ecx
+                             "0" (width_mmx), // ecx
+                             "rim" (_const4), // 0x0000000000FFFFFFLL
+                             "rim" (_const6)  // 0x00000000000000FFLL
 
 #if 0  /* %mm0, ..., %mm3 not supported by gcc 2.7.2.3 or egcs 1.1 */
                            : "%mm0", "%mm1"               // clobber list

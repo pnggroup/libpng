@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.6rc2 - August 8, 2004
+ * libpng 1.2.6rc3 - August 10, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -470,7 +470,7 @@ pngtest_error(png_structp png_ptr, png_const_charp message)
 /* END of code to validate stdio-free compilation */
 
 /* START of code to validate memory allocation and deallocation */
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
 
 /* Allocate memory.  For reasonable files, size should never exceed
    64K.  However, zlib may allocate more then 64K if you don't tell
@@ -594,7 +594,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    png_free_default(png_ptr, ptr);
    ptr=NULL;
 }
-#endif /* PNG_USER_MEM_SUPPORTED */
+#endif /* PNG_USER_MEM_SUPPORTED && PNG_DEBUG */
 /* END of code to test memory allocation/deallocation */
 
 /* Test one file */
@@ -656,7 +656,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 
    png_debug(0, "Allocating read and write structures\n");
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
    read_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
       png_error_ptr_NULL, png_error_ptr_NULL, png_voidp_NULL,
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
@@ -669,7 +669,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        pngtest_warning);
 #endif
 #ifdef PNG_WRITE_SUPPORTED
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
    write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
       png_error_ptr_NULL, png_error_ptr_NULL, png_voidp_NULL,
       (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
@@ -1391,7 +1391,7 @@ main(int argc, char *argv[])
    if (multiple)
    {
       int i;
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
       int allocation_now = current_allocation;
 #endif
       for (i=2; i<argc; ++i)
@@ -1426,7 +1426,7 @@ main(int argc, char *argv[])
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
          }
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
          if (allocation_now != current_allocation)
             fprintf(STDERR, "MEMORY ERROR: %d bytes lost\n",
                current_allocation-allocation_now);
@@ -1445,7 +1445,7 @@ main(int argc, char *argv[])
          }
 #endif
       }
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
          fprintf(STDERR, " Current memory allocation: %10d bytes\n",
             current_allocation);
          fprintf(STDERR, " Maximum memory allocation: %10d bytes\n",
@@ -1462,7 +1462,7 @@ main(int argc, char *argv[])
       for (i=0; i<3; ++i)
       {
          int kerror;
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
          int allocation_now = current_allocation;
 #endif
          if (i == 1) status_dots_requested = 1;
@@ -1501,7 +1501,7 @@ main(int argc, char *argv[])
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
          }
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
          if (allocation_now != current_allocation)
              fprintf(STDERR, "MEMORY ERROR: %d bytes lost\n",
                current_allocation-allocation_now);
@@ -1520,7 +1520,7 @@ main(int argc, char *argv[])
           }
 #endif
        }
-#ifdef PNG_USER_MEM_SUPPORTED
+#if defined(PNG_USER_MEM_SUPPORTED) && defined(PNG_DEBUG)
        fprintf(STDERR, " Current memory allocation: %10d bytes\n",
           current_allocation);
        fprintf(STDERR, " Maximum memory allocation: %10d bytes\n",
@@ -1554,4 +1554,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_6rc2 your_png_h_is_not_version_1_2_6rc2;
+typedef version_1_2_6rc3 your_png_h_is_not_version_1_2_6rc3;
