@@ -16,7 +16,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.6"
+#define PNGCRUSH_VERSION "1.4.7"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -57,6 +57,12 @@
  */
 
 /* Change log:
+ *
+ * Version 1.4.7 (built with libpng-1.0.8rc1)
+ *
+ *   Restored the "-ext" option that was inadvertently overridden with
+ *   a new "-exit" option in version 1.4.6 ("-exit" is used to force an
+ *   "exit" instead of a "return" from the main program).
  *
  * Version 1.4.6 (built with libpng-1.0.8rc1)
  *
@@ -1055,7 +1061,7 @@ main(int argc, char *argv[])
          pngcrush_mode=DIRECTORY_MODE;
          directory_name= argv[names++];
       }
-   else if(!strncmp(argv[i],"-exit",2))
+   else if(!strncmp(argv[i],"-exit",5))
          pngcrush_must_exit=1;
    else if(!strncmp(argv[i],"-e",2))
       {
