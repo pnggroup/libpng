@@ -14,10 +14,10 @@ Requirements
 ------------
 
 * An ANSI C compiler -- preferrably gcc
-* libpng (tested with 1.0.0, 1.0.03)
-* zlib   (tested with 1.1.1, 1.1.3)
+* libpng (tested with 1.0.8)
+* zlib   (tested with 1.1.4)
 
-The latter two packages are available from ftp://ftp.uu.net/graphics/png/
+The latter two packages are available from http://www.libpng.org/pub/png/
 andr many other places, see the PNG Home Page for details.
 
 
@@ -132,20 +132,31 @@ This code was modified from the code for png_read_end() from the
 libpng library.  See pngmeta.c for the full copyright headers - they
 have to remain in that file to comply with them.
 
-The GNU automake/autoconf configuration files and all that libpng and
-zlib searching stuff was written by me and I give permission for
-other people to use it to autoconfigure png and zlib in their
-programs, as long as you acknowledge me.
+I wrote the GNU automake/autoconf configuration files with the libpng
+and zlib searching stuff and give permission for other people to use
+it to autoconfigure png and zlib in their programs, as long as you
+acknowledge me via my home page URI below.
+
+
+Getting Latest Versions
+----------------------
+
+See the:
+   PNG and MNG tools at SourceForge
+   http://sourceforge.net/projects/pmt/
+
+   CVS
+   http://cvs.ilrt.org/cvsweb/png/pngmeta/
 
 
 Thanks
 ------
 ... to Rick Rodgers <rodgers@nlm.nih.gov> for the manual page.
-... to Dan Brickley <daniel.brickley@bristol.ac.uk> for the RDF/XML output.
+... to Dan Brickley <daniel.brickley@bristol.ac.uk> for RDF/XML
+output idea.
 
 
 Dave Beckett
-D.J.Beckett@ukc.ac.uk
-http://www.cs.ukc.ac.uk/people/staff/djb1/
-31st January 2000
+Dave.Beckett@bristol.ac.uk
+http://purl.org/net/dajobe/
 

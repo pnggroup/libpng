@@ -2,6 +2,12 @@ Changes
 -------
 
 Version
+1.11    Checked with latest zlib (1.1.3), libpng (1.0.11).
+	Added --xrdf for RDF/XML output. 
+        Added RPM building support.
+        Tidied for CVS.
+        HTML now XHTML.
+
 1.10	Updated to use latest zlib (1.1.3), libpng (1.0.5o).  Added
 	GNU style --options including --help page and --version
 

@@ -1,20 +1,20 @@
 <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
-         xmlns:s='http://www.tasi.ac.uk/rdf/vocab#'
+         xmlns:png='http://www.w3.org/2000/08/pngmeta#'
          xmlns:dc='http://purl.org/dc/elements/1.0/'>
-  <s:Image about="ct1n0g04.png">
+  <png:Image about="ct1n0g04.png">
     <dc:type>image/png</dc:type>
-    <s:Title>PngSuite</s:Title>
-    <s:Author>Willem A.J. van Schaik
-(gwillem@ntuvax.ntu.ac.sg)</s:Author>
-    <s:Copyright>Copyright Willem van Schaik, Singapore 1995</s:Copyright>
-    <s:Description>A compilation of a set of images created to test the
+    <png:Title>PngSuite</png:Title>
+    <png:Author>Willem A.J. van Schaik
+(gwillem@ntuvax.ntu.ac.sg)</png:Author>
+    <png:Copyright>Copyright Willem van Schaik, Singapore 1995</png:Copyright>
+    <png:Description>A compilation of a set of images created to test the
 various color-types of the PNG format. Included are
 black&amp;white, color, paletted, with alpha channel, with
 transparency formats. All bit-depths allowed according
-to the spec are present.</s:Description>
-    <s:Software>Created on a NeXTstation color using "pnmtopng".</s:Software>
-    <s:Disclaimer>Freeware.</s:Disclaimer>
-  </s:Image>
+to the spec are present.</png:Description>
+    <png:Software>Created on a NeXTstation color using "pnmtopng".</png:Software>
+    <png:Disclaimer>Freeware.</png:Disclaimer>
+  </png:Image>
 </rdf:RDF>
 
-<!--Created by pngmeta V1.10 -->
+<!--Created by pngmeta V1.11 -->

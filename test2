@@ -1,3 +1,12 @@
 #!/bin/sh
 echo 'Testing compressed text chunk   - zTXT (SOIF format)'
-./pngmeta -soif -quiet ctzn0g04.png | diff -c test2.xpt -
+INPUT=ctzn0g04.png
+OUTPUT=test2.xpt
+
+for dir in . ..; do
+  if [ -r $dir/$OUTPUT ]; then
+    break;
+  fi
+done
+here=`pwd`
+cd $dir && $here/pngmeta -soif -quiet $INPUT | diff -c $OUTPUT -

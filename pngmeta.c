@@ -4,15 +4,11 @@
 
    tested up to libpng 1.0.5o and zlib 1.1.3
    
-   (C) Copyright Dave Beckett <D.J.Beckett@ukc.ac.uk>,
-   University of Kent at Canterbury, UK
-   http://www.cs.ukc.ac.uk/people/staff/djb1/
+   Copyright 1998-2000 Dave Beckett, ILRT, University of Bristol
+   http://purl.org/net/dajobe/
 
-   RDF support by daniel.brickley@bristol.ac.uk
 
-   $Source: /home/cur/djb1/develop/pngmeta/pngmeta/RCS/pngmeta.c,v $
-
-   $Id: pngmeta.c,v 1.10 2000/01/31 13:51:46 djb1 Exp $
+   $Id: pngmeta.c,v 1.12 2001/05/16 14:41:06 cmdjb Exp $
    
    The function png_skip_till_end() is a modified version of
    png_read_end() from libpng 1.0.0 by
@@ -86,15 +82,25 @@
 #define STDERR stderr
 #endif
 
+
+#define XMLRDF_MAGIC_FIELD "XMLRDFDATA"
+
+
 void png_skip_till_end PNGARG((png_structp png_ptr, png_infop info));
 void html_quote_string PNGARG((FILE *fd, const char *string));
 void print_init PNGARG((FILE *fd, int output_type, const char *filename, const char *uri, int quiet));
+void print_start_image PNGARG((FILE *fd, int output_type, const char *filename, const char *uri, int quiet));
 void print_kv PNGARG((FILE *fd, int output_type, const char *field, const char *value));
+void print_end_image PNGARG((FILE *fd, int output_type));
 void print_finish PNGARG((FILE *fd, int output_type));
 void user_warning_fn PNGARG((png_structp png_ptr, png_const_charp warning_msg));
 
 
 const char *progname;
+
+
+/* static - used to store magic RDF field if seen */
+static char *xmlrdf_magic_block=NULL;
 
 
 /* read data, ignoring IDATs, till the end of the png file.
@@ -150,6 +156,10 @@ png_skip_till_end(png_structp png_ptr, png_infop info_ptr)
      else if (!png_memcmp(png_ptr->chunk_name, png_zTXt, 4))
        png_handle_zTXt(png_ptr, info_ptr, length);
 #endif
+#if defined(PNG_READ_iTXt_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_iTXt, 4))
+         png_handle_iTXt(png_ptr, info_ptr, length);
+#endif
      else if (!png_memcmp(png_ptr->chunk_name, png_IEND, 4))
        png_handle_IEND(png_ptr, info_ptr, length);
      else
@@ -196,6 +206,34 @@ void print_init(FILE *fd, int output_type, const char *filename,
   switch (output_type)
     {
       case OUTPUT_SOIF:
+	break;
+      
+      case OUTPUT_HTML:
+	fputs("<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'blah'>\n", fd);
+	fputs("<html>\n<head>\n<title>Metadata for ", fd);
+	html_quote_string(fd, filename); 
+	fputs("</title>\n</head>\n<body>\n\n", fd);
+	break;
+      
+      case OUTPUT_XRDF:
+        fputs("<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'\n", fd);
+        fputs("         xmlns:png='http://www.w3.org/2000/08/pngmeta#'\n", fd);
+        fputs("         xmlns:dc='http://purl.org/dc/elements/1.0/'>\n", fd);
+        break;
+
+      default: /* OUTPUT_TEXT */
+        if (!quiet)
+          fprintf(fd, "%s: PNG metadata for %s:\n", progname, filename);
+    }
+}
+
+
+void print_start_image(FILE *fd, int output_type, const char *filename,
+                       const char *uri, int quiet)
+{
+  switch (output_type)
+    {
+      case OUTPUT_SOIF:
         if (uri)
           fprintf(fd, "@FILE { %s\n", uri);
         else
@@ -203,23 +241,16 @@ void print_init(FILE *fd, int output_type, const char *filename,
 	break;
       
       case OUTPUT_HTML:
-	fputs("<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 3.2//EN'>\n", fd);
-	fputs("<HTML>\n<HEAD>\n<TITLE>Metadata for ", fd);
-	html_quote_string(fd, filename); 
-	fputs("</TITLE>\n</HEAD>\n<BODY>\n<H1>Metadata for ", fd);
+	fputs("<h1>Metadata for ", fd);
 	html_quote_string(fd, filename);
-	fputs("</H1>\n<DL>\n", fd);
+	fputs("</h1>\n<dl>\n", fd);
 	break;
       
       case OUTPUT_XRDF:
-        fputs("<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'\n", fd);
-        fputs("         xmlns:s='http://www.tasi.ac.uk/rdf/vocab#'\n", fd);
-        fputs("         xmlns:dc='http://purl.org/dc/elements/1.0/'>\n", fd);
-
         if (uri)
-          fprintf(fd, "  <s:Image about=\"%s\"\n", uri);
+          fprintf(fd, "  <png:Image about=\"%s\"\n", uri);
         else {
-          fputs("  <s:Image about=\"", fd);
+          fputs("  <png:Image about=\"", fd);
           html_quote_string(fd, filename); 
           fputs("\">\n", fd);
         }
@@ -228,8 +259,7 @@ void print_init(FILE *fd, int output_type, const char *filename,
         break;
 
       default: /* OUTPUT_TEXT */
-        if (!quiet)
-          fprintf(fd, "%s: PNG metadata for %s:\n", progname, filename);
+        break;
     }
 }
 
@@ -245,19 +275,25 @@ void print_kv(FILE *fd, int output_type, const char *field, const char *value)
 	  break;
 	
 	case OUTPUT_HTML:
-	  /* HTML: <DT>field</DT>\n<DD><P>value</P></DD>\n" */
-	  fputs("  <DT>", fd);
+	  /* HTML: <dt>field<br /></dt>\n<dd>value</dd>\n" */
+	  fputs("  <dt>", fd);
 	  html_quote_string(fd, field);
-	  fputs("</DT>\n  <DD><P>", fd);
+	  fputs("<br /></dt>\n  <dd>", fd);
 	  html_quote_string(fd, value);
-	  fputs("</P></DD>\n\n", fd);
+	  fputs("</dd>\n\n", fd);
 	  break;
 	
         case OUTPUT_XRDF:
           /* RDF: simple flat text properties  */
 
+
+          if(strstr(field, XMLRDF_MAGIC_FIELD)) {
+            xmlrdf_magic_block=(char*)value;
+            break;
+          }
+
           /* start tag */
-          fputs("    <s:", fd);
+          fputs("    <png:", fd);
           html_quote_string(fd, field);
           fputs(">", fd);
 
@@ -269,7 +305,7 @@ void print_kv(FILE *fd, int output_type, const char *field, const char *value)
             html_quote_string(fd, value);
 
           /* end tag */
-          fputs("</s:", fd);
+          fputs("</png:", fd);
           html_quote_string(fd, field);
           fputs(">\n", fd);
           break;
@@ -277,6 +313,28 @@ void print_kv(FILE *fd, int output_type, const char *field, const char *value)
 	default: /* OUTPUT_TEXT */
 	  fprintf(fd, "%s: %s\n", field, value);
       }
+}
+
+
+void
+print_end_image(FILE *fd, int output_type)
+{
+  switch (output_type)
+    {
+      case OUTPUT_SOIF:
+	break;
+      
+      case OUTPUT_HTML:
+	fputs("</dl>\n\n", fd);
+	break;
+      
+      case OUTPUT_XRDF:
+        fputs("  </png:Image>\n", fd);
+        break;
+
+      default: /* OUTPUT_TEXT */
+        break;
+    }
 }
 
 
@@ -289,11 +347,11 @@ void print_finish(FILE *fd, int output_type)
 	break;
       
       case OUTPUT_HTML:
-	fprintf(fd, "</DL>\n\n<SMALL>Created by %s V%s</SMALL>\n\n</BODY>\n</HTML>\n", progname, VERSION);
+	fprintf(fd, "<hr /><small>Created by %s V%s</small>\n\n</body>\n</html>\n", progname, VERSION);
 	break;
 	
       case OUTPUT_XRDF:
-        fprintf(fd, "  </s:Image>\n</rdf:RDF>\n\n<!--Created by %s V%s -->\n", progname, VERSION);
+        fprintf(fd, "</rdf:RDF>\n\n<!--Created by %s V%s -->\n", progname, VERSION);
         break;
         
       /* case OUTPUT_TEXT / default */
@@ -340,7 +398,10 @@ int main(int argc, char *argv[])
   int i;
   char *p;
   char *uri= NULL;
-  
+#ifdef HAVE_PNG_GET_TEXT
+  png_textp text_ptr;
+  int num_text = 0;
+#endif
 
   /* Make progname just become the program name, not the full path -
      this is file system type specific since / is used as the
@@ -455,8 +516,7 @@ int main(int argc, char *argv[])
       fprintf(STDERR, "  --xrdf         format output in XML/RDF format\n");
       fprintf(STDERR, "  --help         display this help and exit\n");
       fprintf(STDERR, "  --version      output version information and exit\n");
-      fprintf(STDERR, "\n(C) Copyright 2000 Dave Beckett, University of Kent at Canterbury\nhttp://www.cs.ukc.ac.uk/people/staff/djb1/\n");
-      fprintf(STDERR, "RDF output by daniel.brickley@bristol.ac.uk\n");
+      fprintf(STDERR, "\nCopyright 1998-2000 Dave Beckett, ILRT, University of Bristol\nhttp://purl.org/net/dajobe/\n");
     }
     exit(1);
   }
@@ -500,6 +560,8 @@ int main(int argc, char *argv[])
   png_read_info(png_ptr, info_ptr);
   
   print_init(out_fp, output_type, pngfile, uri, quiet);
+
+  print_start_image(out_fp, output_type, pngfile, uri, quiet);
   
   if (output_type == OUTPUT_SOIF || all) {
 /*
@@ -539,8 +601,14 @@ int main(int argc, char *argv[])
   
   /* Local function */
   png_skip_till_end(png_ptr, end_info);
-  
-  
+
+
+#ifdef HAVE_PNG_GET_TEXT
+  if(png_get_text(png_ptr, info_ptr, &text_ptr, &num_text) > 0) {
+    for (i = 0; i < num_text; i++)
+      print_kv(out_fp, output_type, text_ptr[i].key, text_ptr[i].text);
+  }
+#else
   /* Print text keywords before IDAT */
   for (i = 0; i < info_ptr->num_text; i++)
     print_kv(out_fp, output_type, info_ptr->text[i].key, info_ptr->text[i].text);
@@ -548,6 +616,8 @@ int main(int argc, char *argv[])
   /* Print text keywords after IDAT */
   for (i = 0; i < end_info->num_text; i++)
     print_kv(out_fp, output_type, end_info->text[i].key, end_info->text[i].text);
+    
+#endif
   
   /* Print modification time (tIME chunk) if present */
   if (info_ptr->valid & PNG_INFO_tIME)
@@ -556,7 +626,15 @@ int main(int argc, char *argv[])
   else if (end_info->valid & PNG_INFO_tIME)
     print_kv(out_fp, output_type, "Modification Time",
              png_convert_to_rfc1123(png_ptr, &end_info->mod_time));
-  
+
+
+  print_end_image(out_fp, output_type);
+
+  /* print rest of RDF/XML stuff */
+  if(xmlrdf_magic_block && output_type == OUTPUT_XRDF) {
+    fputs(xmlrdf_magic_block, out_fp);
+  }
+
   print_finish(out_fp, output_type);
   
   

@@ -1,22 +1,23 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 3.2//EN'>
-<HTML>
-<HEAD>
-<TITLE>Metadata for 8859.png</TITLE>
-</HEAD>
-<BODY>
-<H1>Metadata for 8859.png</H1>
-<DL>
-  <DT>Title</DT>
-  <DD><P>ISO 8859-1 characters</P></DD>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'blah'>
+<html>
+<head>
+<title>Metadata for 8859.png</title>
+</head>
+<body>
 
-  <DT>Description</DT>
-  <DD><P>Here are all the printable characters from the 
+<h1>Metadata for 8859.png</h1>
+<dl>
+  <dt>Title<br /></dt>
+  <dd>ISO 8859-1 characters</dd>
+
+  <dt>Description<br /></dt>
+  <dd>Here are all the printable characters from the 
 ISO Latin-1 coded character set: hex codes 20 to 7E
 and A0 to FF. That includes a space (20) and a 
-non-breaking space (A0).</P></DD>
+non-breaking space (A0).</dd>
 
-  <DT>Test data</DT>
-  <DD><P>! " # $ % &amp; ' ( ) * + , - . /
+  <dt>Test data<br /></dt>
+  <dd>! " # $ % &amp; ' ( ) * + , - . /
 0 1 2 3 4 5 6 7 8 9 : ; &lt; = &gt; ?
 @ A B C D E F G H I J K L M N O
 P Q R S T U V W X Y Z [ \ ] ^ _
@@ -29,11 +30,11 @@ p q r s t u v w x y z { | } ~
 Ð Ñ Ò Ó Ô Õ Ö × Ø Ù Ú Û Ü Ý Þ ß
 à á â ã ä å æ ç è é ê ë ì í î ï
 ð ñ ò ó ô õ ö ÷ ø ù ú û ü ý þ ÿ
-</P></DD>
+</dd>
 
-</DL>
+</dl>
 
-<SMALL>Created by pngmeta V1.10</SMALL>
+<hr /><small>Created by pngmeta V1.11</small>
 
-</BODY>
-</HTML>
+</body>
+</html>

@@ -1,3 +1,12 @@
 #!/bin/sh
 echo 'Testing HTML output'
-./pngmeta -html -quiet 8859.png | diff -c test3.xpt -
+INPUT=8859.png
+OUTPUT=test3.xpt
+
+for dir in . ..; do
+  if [ -r $dir/$OUTPUT ]; then
+    break;
+  fi
+done
+here=`pwd`
+cd $dir && $here/pngmeta -html -quiet $INPUT | diff -c $OUTPUT -

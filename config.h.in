@@ -1,0 +1,14 @@
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define if you have the png_create_read_struct function.  */
+#undef HAVE_PNG_CREATE_READ_STRUCT
+
+/* Define if you have the png_get_text function.  */
+#undef HAVE_PNG_GET_TEXT
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+

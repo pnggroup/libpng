@@ -1,3 +1,12 @@
 #!/bin/sh
 echo 'Testing RDF/XML output'
-./pngmeta -xrdf ct1n0g04.png | diff -c test4.xpt -
+INPUT=ct1n0g04.png
+OUTPUT=test4.xpt
+
+for dir in . ..; do
+  if [ -r $dir/$OUTPUT ]; then
+    break;
+  fi
+done
+here=`pwd`
+cd $dir && $here/pngmeta -xrdf -quiet $INPUT | diff -c $OUTPUT -

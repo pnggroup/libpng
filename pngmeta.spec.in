@@ -1,8 +1,8 @@
 #
 # pngmeta -- Get Metadata from PNG images
 #
-%define name pngmeta
-%define version 1.11
+%define name @PACKAGE@
+%define version @VERSION@
 %define release 1
 %define prefix /usr
 

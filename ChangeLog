@@ -1,0 +1,156 @@
+2001-05-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Snapshotted pngmeta_1_11 for 1.11 release
+
+	* Makefile.am: Added man page to dist
+
+	* pngmeta.spec.in:
+	Tweak for gzipped mans
+
+	* Makefile.am: Added autogen.sh
+
+	* autogen.sh: For building from CVS
+
+	* .cvsignore: Ignore stuff
+
+	* README, pngmeta.spec.in:
+	Updated for sourceforge
+
+	* NEWS: Updated for 1.11
+
+	* README: Updated for latest versions
+
+	* configure.in:
+	Made local copies of libpng/zlib pick up includes too
+
+	* test4, test3, test2, test1:
+	Updated to work in 'make distcheck' mode
+
+	* pngmeta.1: Added --xrdf option
+	Updated zlib, png, my URIs
+
+	* configure.in: Added pngmeta.spec.in
+
+	* pngmeta.spec.in:
+	Now gets version, name from autoconf
+
+	* pngmeta.spec, pngmeta.spec.in:
+	Renamed pngmeta.spec to pngmeta.spec.in
+
+	* test1, test2, test3, test4:
+	Test scripts
+
+	* 8859.png: Test images
+
+	* pngmeta.c (png_start_image, png_end_image):
+	Added, separate from start/end output
+	Pass through any RDF/XML data stored in field XMLRDFDATA
+	Update to XHTML
+
+	* ct1n0g04.png, ctzn0g04.png:
+	Test images
+
+	* Makefile.old: Updated for 1.10 version
+
+2000-08-15  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* pngmeta.spec: Updated copyright
+
+	* pngmeta.c:
+	Uses png_get_text where available
+	Updated copyright
+
+	* Makefile.am: INCLUDES now CFLAGS
+
+	* configure.in:
+	Loads more changes to make it try to pick installed libpng/libz
+	wherever possible.
+
+2000-02-01  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* pngmeta.spec: Tweaked
+
+2000-01-31  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* Makefile.am:
+	Added pngmeta.spec to dist
+
+	* pngmeta.spec: New file.
+
+	* pngmeta.1, Makefile.old, configure.in:
+	Updated to 1.10 version
+
+	* pngmeta.c:
+	Updated for 1.10 release - added GNU --options, --help, --version
+
+	* NEWS: Updated for 1.10 release
+
+	* README: Updated for --options
+
+	* Makefile.am:
+	Added Makefile.old to dist
+
+	* Makefile.old: New file.
+
+1999-04-16  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* pngmeta.1: Added -uri URI docs.
+
+	* NEWS, configure.in:
+	1.9
+
+	* pngmeta.c:
+	Added -uri option to set uri for SOIF and RDF/XML output.
+	In RDF output, don't HTML-escape values that start with <RDF
+
+	* Makefile.am:
+	Added test4 files to dist.
+
+	* Makefile.am:
+	Added test4 for RDF/XML output
+
+	* pngmeta.1: Added -xrdf option
+
+	* README: 1.8 now with RDF/XML support
+
+	* NEWS: 1.8
+
+	* pngmeta.c:
+	Added RDF/XML thanks to Dan Brickley <daniel.brickley@bristol.ac.uk>
+
+	* configure.in: V 1.8
+	Look for ../libpng-[0-9] and ../zlib-[0-9]*
+
+1998-09-11  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* NEWS, README, configure.in, Makefile.am:
+	New file.
+
+	* pngmeta.c:
+	Take out version stuff; use VERSION passed in from autoconfiguration.
+
+1998-03-10  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* pngmeta.1: New file.
+
+	* pngmeta.c:
+	Upgraded for 1.0* versions of libraries
+	Output SOIF when progname is PngImage.sum
+	Output version and lib versions in usage message.
+	Use libpng time conversion routine.
+
+1997-10-17  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* pngmeta.c:
+	Updated for libpng 0.96 and zlib 1.0.4
+
+1997-01-30  Dave Beckett  <Dave.Beckett@bristol.ac.uk>
+
+	* pngmeta.c: PNG meta 1.3
+
+	* pngmeta.c: PNG meta 1.2
+
+	* pngmeta.c: PNG meta 1.0
+
+	* pngmeta.c: New file.
+
