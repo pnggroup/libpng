@@ -467,3 +467,10 @@ version 1.0.4d [October 6, 1999]
 version 1.0.4e [October 10, 1999]
   Fixed sign error in pngvcrd.c (Greg Roelofs)
   Replaced some instances of memcpy with simple assignments in pngvcrd (GR-P)
+version 1.0.4f [October 12, 1999]
+  Surrounded example.c code with #if 0 .. #endif to prevent people from
+    inadvertently trying to compile it.
+  Changed png_get_header_version() from a function to a macro in png.h
+  Added type casting mostly in pngrtran.c and pngwtran.c
+  Removed some pointless "ptr = NULL" in pngmem.c
+  Added a "contrib" directory containing the source code from Greg's book.

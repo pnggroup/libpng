@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.4e - October 10, 1999
+ * libpng 1.0.4f - October 12, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -380,7 +380,8 @@ png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
    {
       png_byte maxbits;
 
-      maxbits = color_type==PNG_COLOR_TYPE_PALETTE ? 8 : png_ptr->usr_bit_depth;
+      maxbits = (png_byte)(color_type==PNG_COLOR_TYPE_PALETTE ? 8 :
+                png_ptr->usr_bit_depth);
       if (sbit->red == 0 || sbit->red > maxbits ||
           sbit->green == 0 || sbit->green > maxbits ||
           sbit->blue == 0 || sbit->blue > maxbits)

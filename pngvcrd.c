@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.4e - October 10, 1999
+ * libpng 1.0.4f - October 12, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -1163,7 +1163,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
          default:         // This is the place where the routine is modified
          {
             __int64 const4 = 0x0000000000FFFFFF;
-            __int64 const5 = 0x000000FFFFFF0000;
+            // __int64 const5 = 0x000000FFFFFF0000;  // unused...
             __int64 const6 = 0x00000000000000FF;
             png_bytep sptr, dp;
             png_uint_32 i;
@@ -3643,7 +3643,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #ifdef PNG_DEBUG
    char filnm[6];
 #endif
-   #define UseMMX (1)
+   #define UseMMX 1
 
    if (mmx_supported == 2)
        mmx_supported = mmxsupport();
@@ -3656,7 +3656,11 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
 #ifdef PNG_DEBUG
    png_debug(1, "in png_read_filter_row\n");
-   png_debug1(0,"%s, ", (UseMMX?"MMX":"x86"));
+#if (UseMMX == 1)
+   png_debug1(0,"%s, ", "MMX");
+#else
+   png_debug1(0,"%s, ", "x86");
+#endif
    switch (filter)
    {
       case 0: sprintf(filnm, "None ");
@@ -3684,12 +3688,14 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
       case PNG_FILTER_VALUE_SUB:
       {
-         if ( UseMMX && (row_info->pixel_depth > 8) &&
+#if (UseMMX == 1)
+         if ((row_info->pixel_depth > 8) &&
             (row_info->rowbytes >= 128) )
          {
             png_read_filter_row_mmx_sub(row_info, row);
-         }  //end if UseMMX
+         }
          else
+#endif
          {
             png_uint_32 i;
             png_uint_32 istop = row_info->rowbytes;
@@ -3707,12 +3713,14 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
       }
       case PNG_FILTER_VALUE_UP:
       {
-         if ( UseMMX && (row_info->pixel_depth > 8) &&
+#if (UseMMX == 1)
+         if ((row_info->pixel_depth > 8) &&
              (row_info->rowbytes >= 128) )
          {
             png_read_filter_row_mmx_up(row_info, row, prev_row);
          }  //end if UseMMX
          else
+#endif
          {
             png_bytep rp;
             png_bytep pp;
@@ -3727,12 +3735,14 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
       }
       case PNG_FILTER_VALUE_AVG:
       {
-         if ( UseMMX && (row_info->pixel_depth > 8) &&
+#if (UseMMX == 1)
+         if ((row_info->pixel_depth > 8) &&
              (row_info->rowbytes >= 128) )
          {
             png_read_filter_row_mmx_avg(row_info, row, prev_row);
          }  //end if UseMMX
          else
+#endif
          {
             png_uint_32 i;
             png_bytep rp = row;
@@ -3759,12 +3769,14 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
       }
       case PNG_FILTER_VALUE_PAETH:
       {
-         if ( UseMMX && (row_info->pixel_depth > 8) &&
+#if (UseMMX == 1)
+         if ((row_info->pixel_depth > 8) &&
              (row_info->rowbytes >= 128) )
          {
             png_read_filter_row_mmx_paeth(row_info, row, prev_row);
          }  //end if UseMMX
          else
+#endif
          {
             png_uint_32 i;
             png_bytep rp = row;

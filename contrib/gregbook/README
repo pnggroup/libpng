@@ -1,0 +1,52 @@
+PNG: The Definitive Guide: Source Code
+
+Chapters 13, 14 and 15 of PNG: The Definitive Guide discuss three
+cross-platform demo programs that show how to use the libpng reference
+library: rpng, rpng2 and wpng. rpng and rpng2 are viewers; the first is a
+very simple example that that shows how a standard file-viewer might use
+libpng, while the second is designed to process streaming data and shows how
+a web browser might be written. wpng is a simple command-line program that
+reads binary PPM files (the ``raw'' RGB subset of NetPBM) and converts them
+to PNG.
+
+The source code for all three demo programs currently compiles only under
+Unix and 32-bit Windows. It has been tested with gcc 2.7.2.3 under Linux and
+Solaris and with Microsoft Visual C++ 5.0 under Windows 95. Brief
+instructions for compiling the programs are included at the top of the
+makefiles; makefile.unx is the Unix version, and makefile.w32 is (you
+guessed it!) the version for 32-bit Windows. libpng and zlib are required.
+
+----------------------------------------------------------------------------
+
+License
+
+The source code to the demo programs may be used and distributed freely
+(even if you didn't buy the book--but feel free to do so at any time),
+subject to the terms of the following BSD-like license:
+
+     Copyright (c) 1998-1999 Greg Roelofs. All rights reserved.
+
+     This software is provided "as is," without warranty of any kind,
+     express or implied. In no event shall the author or contributors
+     be held liable for any damages arising in any way from the use of
+     this software.
+
+     Permission is granted to anyone to use this software for any
+     purpose, including commercial applications, and to alter it and
+     redistribute it freely, subject to the following restrictions:
+
+       1. Redistributions of source code must retain the above
+          copyright notice, disclaimer, and this list of conditions.
+       2. Redistributions in binary form must reproduce the above
+          copyright notice, disclaimer, and this list of conditions in
+          the documentation and/or other materials provided with the
+          distribution.
+       3. All advertising materials mentioning features or use of this
+          software must display the following acknowledgment:
+
+               This product includes software developed by Greg Roelofs
+               and contributors for the book, "PNG: The Definitive
+               Guide," published by O'Reilly and Associates.
+
+----------------------------------------------------------
+http://www.cdrom.com/pub/png/book/sources.html

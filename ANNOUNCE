@@ -1,5 +1,5 @@
 
-Libpng 1.0.4e - October 10, 1999
+Libpng 1.0.4f - October 12, 1999
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -80,13 +80,20 @@ version 1.0.4b September 30, 1999
     a helpful compiler error if an old png.h is found in the search path.
 version 1.0.4c October 1, 1999
   Changed type of png_user_transform_depth|channels from int to png_byte.
-version 1.0.4e [October 10, 1999]
+version 1.0.4f [October 12, 1999]
   Changed 0.45 to 0.45455 in png_set_sRGB()
   Removed unused PLTE entries from pngnow.png
   Re-enabled some parts of pngvcrd.c (png_combine_row) that work properly.
 version 1.0.4e [October 10, 1999]
   Fixed sign error in pngvcrd.c (Greg Roelofs)
   Replaced some instances of memcpy with simple assignments in pngvcrd (GR-P)
+version 1.0.4f [October 12, 1999]
+  Surrounded example.c code with #if 0 .. #endif to prevent people from
+    inadvertently trying to compile it.
+  Changed png_get_header_version() from a function to a macro in png.h
+  Added type casting mostly in pngrtran.c and pngwtran.c
+  Removed some pointless "ptr = NULL" in pngmem.c
+  Added a "contrib" directory containing the source code from Greg's book.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

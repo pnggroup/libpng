@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.4e - October 10, 1999
+ * libpng 1.0.4f - October 12, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -77,7 +77,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          {
             int j;
             for (j=0; j<(int)info_ptr->num_trans; j++)
-               info_ptr->trans[j] = 255 - info_ptr->trans[j];
+               info_ptr->trans[j] = (png_byte)(255 - info_ptr->trans[j]);
          }
 #endif
       png_write_tRNS(png_ptr, info_ptr->trans, &(info_ptr->trans_values),
@@ -799,7 +799,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             if (png_ptr->prev_row == NULL)
             {
                png_warning(png_ptr, "Can't add Paeth filter after starting");
-               png_ptr->do_filter &= ~PNG_FILTER_PAETH;
+               png_ptr->do_filter &= (png_byte)(~PNG_FILTER_PAETH);
             }
             else
             {
@@ -850,8 +850,8 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
       num_weights = 0;
    }
 
-   png_ptr->num_prev_filters = num_weights;
-   png_ptr->heuristic_method = heuristic_method;
+   png_ptr->num_prev_filters = (png_byte)num_weights;
+   png_ptr->heuristic_method = (png_byte)heuristic_method;
 
    if (num_weights > 0)
    {
