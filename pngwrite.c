@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.1a
+ * libpng 1.0.1b
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * April 21, 1998
+ * May 2, 1998
  */
 
 /* get internal access to png.h */
@@ -422,6 +422,36 @@ png_write_row(png_structp png_ptr, png_bytep row)
    /* initialize transformations and other stuff if first time */
    if (png_ptr->row_number == 0 && png_ptr->pass == 0)
    {
+   /* check for transforms that have been set but were defined out */
+#if !defined(PNG_WRITE_INVERT_SUPPORTED) && defined(PNG_READ_INVERT_SUPPORTED)
+   if (png_ptr->transformations & PNG_INVERT_MONO)
+      png_warning(png_ptr, "PNG_WRITE_INVERT_SUPPORTED is not defined.");
+#endif
+#if !defined(PNG_WRITE_FILLER_SUPPORTED) && defined(PNG_READ_FILLER_SUPPORTED)
+   if (png_ptr->transformations & PNG_FILLER)
+      png_warning(png_ptr, "PNG_WRITE_FILLER_SUPPORTED is not defined.");
+#endif
+#if !defined(PNG_WRITE_PACKSWAP_SUPPORTED) && defined(PNG_READ_PACKSWAP_SUPPORTED)
+   if (png_ptr->transformations & PNG_PACKSWAP)
+      png_warning(png_ptr, "PNG_WRITE_PACKSWAP_SUPPORTED is not defined.");
+#endif
+#if !defined(PNG_WRITE_PACK_SUPPORTED) && defined(PNG_READ_PACK_SUPPORTED)
+   if (png_ptr->transformations & PNG_PACK)
+      png_warning(png_ptr, "PNG_WRITE_PACK_SUPPORTED is not defined.");
+#endif
+#if !defined(PNG_WRITE_SHIFT_SUPPORTED) && defined(PNG_READ_SHIFT_SUPPORTED)
+   if (png_ptr->transformations & PNG_SHIFT)
+      png_warning(png_ptr, "PNG_WRITE_SHIFT_SUPPORTED is not defined.");
+#endif
+#if !defined(PNG_WRITE_BGR_SUPPORTED) && defined(PNG_READ_BGR_SUPPORTED)
+   if (png_ptr->transformations & PNG_BGR)
+      png_warning(png_ptr, "PNG_WRITE_BGR_SUPPORTED is not defined.");
+#endif
+#if !defined(PNG_WRITE_SWAP_SUPPORTED) && defined(PNG_READ_SWAP_SUPPORTED)
+   if (png_ptr->transformations & PNG_SWAP_BYTES)
+      png_warning(png_ptr, "PNG_WRITE_SWAP_SUPPORTED is not defined.");
+#endif
+
       png_write_start_row(png_ptr);
    }
 

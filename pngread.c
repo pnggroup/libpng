@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.1a
+ * libpng 1.0.1b
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * April 21, 1998
+ * May 2, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -279,6 +279,38 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    /* save jump buffer and error functions */
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       png_read_start_row(png_ptr);
+   if (png_ptr->row_number == 0 && png_ptr->pass == 0)
+   {
+   /* check for transforms that have been set but were defined out */
+#if defined(PNG_WRITE_INVERT_SUPPORTED) && !defined(PNG_READ_INVERT_SUPPORTED)
+   if (png_ptr->transformations & PNG_INVERT_MONO)
+      png_warning(png_ptr, "PNG_READ_INVERT_SUPPORTED is not defined.");
+#endif
+#if defined(PNG_WRITE_FILLER_SUPPORTED) && !defined(PNG_READ_FILLER_SUPPORTED)
+   if (png_ptr->transformations & PNG_FILLER)
+      png_warning(png_ptr, "PNG_READ_FILLER_SUPPORTED is not defined.");
+#endif
+#if defined(PNG_WRITE_PACKSWAP_SUPPORTED) && !defined(PNG_READ_PACKSWAP_SUPPORTED)
+   if (png_ptr->transformations & PNG_PACKSWAP)
+      png_warning(png_ptr, "PNG_READ_PACKSWAP_SUPPORTED is not defined.");
+#endif
+#if defined(PNG_WRITE_PACK_SUPPORTED) && !defined(PNG_READ_PACK_SUPPORTED)
+   if (png_ptr->transformations & PNG_PACK)
+      png_warning(png_ptr, "PNG_READ_PACK_SUPPORTED is not defined.");
+#endif
+#if defined(PNG_WRITE_SHIFT_SUPPORTED) && !defined(PNG_READ_SHIFT_SUPPORTED)
+   if (png_ptr->transformations & PNG_SHIFT)
+      png_warning(png_ptr, "PNG_READ_SHIFT_SUPPORTED is not defined.");
+#endif
+#if defined(PNG_WRITE_BGR_SUPPORTED) && !defined(PNG_READ_BGR_SUPPORTED)
+   if (png_ptr->transformations & PNG_BGR)
+      png_warning(png_ptr, "PNG_READ_BGR_SUPPORTED is not defined.");
+#endif
+#if defined(PNG_WRITE_SWAP_SUPPORTED) && !defined(PNG_READ_SWAP_SUPPORTED)
+   if (png_ptr->transformations & PNG_SWAP_BYTES)
+      png_warning(png_ptr, "PNG_READ_SWAP_SUPPORTED is not defined.");
+#endif
+   }
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED)
    /* if interlaced and we do not need a new row, combine row and return */
@@ -488,25 +520,34 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
    /* save jump buffer and error functions */
    rp = row;
    dp = display_row;
-   for (i = 0; i < num_rows; i++)
-   {
-      png_bytep rptr;
-      png_bytep dptr;
-
-      if (rp != NULL)
-         rptr = *rp;
-      else
-         rptr = NULL;
-      if (dp != NULL)
-         dptr = *dp;
-      else
-         dptr = NULL;
-      png_read_row(png_ptr, rptr, dptr);
-      if (row != NULL)
-         rp++;
-      if (display_row != NULL)
-         dp++;
-   }
+   if(rp != NULL && dp != NULL)
+      for (i = 0; i < num_rows; i++)
+      {
+         png_bytep rptr = *rp++;
+         png_bytep dptr = *dp++;
+   
+         png_read_row(png_ptr, rptr, dptr);
+      }
+   else
+      for (i = 0; i < num_rows; i++)
+      {
+         png_bytep rptr;
+         png_bytep dptr;
+   
+         if (rp != NULL)
+            rptr = *rp;
+         else
+            rptr = NULL;
+         if (dp != NULL)
+            dptr = *dp;
+         else
+            dptr = NULL;
+         png_read_row(png_ptr, rptr, dptr);
+         if (row != NULL)
+            rp++;
+         if (display_row != NULL)
+            dp++;
+      }
 }
 
 /* Read the entire image.  If the image has an alpha channel or a tRNS
@@ -729,8 +770,8 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
 #if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->gamma_16_table != NULL)
    {
-      int i,istop;
-      istop = (1 << (8 - png_ptr->gamma_shift));
+      int i;
+      int istop = (1 << (8 - png_ptr->gamma_shift));
       for (i = 0; i < istop; i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_table[i]);
@@ -741,8 +782,8 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_16_table);
    if (png_ptr->gamma_16_from_1 != NULL)
    {
-      int i,istop;
-      istop = (1 << (8 - png_ptr->gamma_shift));
+      int i;
+      int istop = (1 << (8 - png_ptr->gamma_shift));
       for (i = 0; i < istop; i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_from_1[i]);
@@ -751,8 +792,8 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_16_from_1);
    if (png_ptr->gamma_16_to_1 != NULL)
    {
-      int i,istop;
-      istop = (1 << (8 - png_ptr->gamma_shift));
+      int i;
+      int istop = (1 << (8 - png_ptr->gamma_shift));
       for (i = 0; i < istop; i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_to_1[i]);

@@ -1,9 +1,11 @@
-# makefile for libpng on Linux ELF with gcc
+# makefile for SCO OSr5  ELF and Unixware 7 with Native cc
+# Contributed by Mike Hopkirk (hops@sco.com) modified from Makefile.lnx
+#   force ELF build dynamic linking, SONAME setting in lib and RPATH in app
 # Copyright (C) 1996, 1997 Andreas Dilger
 # Copyright (C) 1998 Greg Roelofs
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=gcc
+CC=cc
 
 # Where the zlib library and include files are located
 #ZLIBLIB=/usr/local/lib
@@ -11,20 +13,11 @@ CC=gcc
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-ALIGN=
-# For I-386:
-#ALIGN=-malign-loops=2 -malign-functions=2
+CFLAGS= -dy -belf -I$(ZLIBINC) -O3 
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
-WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
-         -Wmissing-declarations -Wtraditional -Wcast-align \
-         -Wstrict-prototypes -Wmissing-prototypes #-Wconversion
-
-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops \
-     $(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
-LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
-
-RANLIB=ranlib
-#RANLIB=echo
+#RANLIB=ranlib
+RANLIB=echo
 
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
@@ -46,7 +39,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .SUFFIXES:      .c .o .pic.o
 
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
+	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
 
 all: libpng.a libpng.so pngtest
 
@@ -61,11 +54,11 @@ libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
 	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
 
 libpng.so.$(PNGVER): $(OBJSDLL)
-	$(CC) -shared -Wl,-soname,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
+	$(CC) -G  -Wl,-h,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
 	 $(OBJSDLL)
 
 pngtest: pngtest.o libpng.so
-	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
+	LD_RUN_PATH=.:$(ZLIBLIB) $(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest

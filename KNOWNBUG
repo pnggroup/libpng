@@ -111,3 +111,23 @@ Known bugs and suggested enhancements in libpng-1.0.1
    The "ptime->date % 31" is wrong, should be "ptime->date % 32".
 
    STATUS: Fixed in libpng-1.0.1a
+
+11. April 21, 1998 -- ENHANCEMENT -- relocation of composite macros
+
+   png_composite() and png_composite_16() relocated to png.h
+
+   STATUS: Done in libpng-1.0.1b
+
+12. April 22, 1998 -- ENHANCEMENT -- makefile.sco
+
+   Mike Hopkirk contributed a makefile for SCO osr5 and sco UW7
+
+   STATUS: Added to libpng-1.0.1b distribution
+
+13: April 30, 1998 -- ENHANCEMENT -- warnings
+
+   When people define out some of the read transformations and then
+   try to use them, the request is silently ignored.  It was suggested
+   that a warning be issued in such cases.
+
+   STATUS: Done in libpng-1.0.1b

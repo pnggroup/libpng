@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.0.1a
+ * libpng 1.0.1b
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * April 21, 1998
+ * May 2, 1998
  *
  * Note about libpng version numbers:
  *
@@ -18,30 +18,31 @@
  *
  *      source                    png.h   png.h   shared-lib
  *      version                   string    int   version
- *      -------                   ------  ------  ----------
- *      0.89c ("1.0 beta 3")      0.89        89  1.0.89
- *      0.90  ("1.0 beta 4")      0.90        90  0.90  [should have been 2.0.90]
- *      0.95  ("1.0 beta 5")      0.95        95  0.95  [should have been 2.0.95]
- *      0.96  ("1.0 beta 6")      0.96        96  0.96  [should have been 2.0.96]
- *      0.97b ("1.00.97 beta 7")  1.00.97     97  1.0.1 [should have been 2.0.97]
- *      0.97c                     0.97        97  2.0.97
- *      0.98                      0.98        98  2.0.98
- *      0.99                      0.99        98  2.0.99
- *      0.99a-m                   0.99        99  2.0.99
- *      1.00                      1.00       100  2.1.0 [int should be 10000]
- *      1.0.0                     1.0.0      100  2.1.0 [int should be 10000]
- *      1.0.1                     1.0.1    10001  2.1.0
- *      1.0.1a                    1.0.1a   10002  2.1.0
+ *      -------                   ------  -----  ----------
+ *      0.89c ("1.0 beta 3")      0.89       89  1.0.89
+ *      0.90  ("1.0 beta 4")      0.90       90  0.90  [should have been 2.0.90]
+ *      0.95  ("1.0 beta 5")      0.95       95  0.95  [should have been 2.0.95]
+ *      0.96  ("1.0 beta 6")      0.96       96  0.96  [should have been 2.0.96]
+ *      0.97b ("1.00.97 beta 7")  1.00.97    97  1.0.1 [should have been 2.0.97]
+ *      0.97c                     0.97       97  2.0.97
+ *      0.98                      0.98       98  2.0.98
+ *      0.99                      0.99       98  2.0.99
+ *      0.99a-m                   0.99       99  2.0.99
+ *      1.00                      1.00      100  2.1.0 [int should be 10000]
+ *      1.0.0                     1.0.0     100  2.1.0 [int should be 10000]
+ *      1.0.1                     1.0.1   10001  2.1.0
+ *      1.0.1a                    1.0.1a  10002  2.1.0
+ *      1.0.1b                    1.0.1b  10002  2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
- *    used for changes in backward compatibility, as it is intended.
- *    The PNG_PNGLIB_VER macro, which is not used within libpng but
- *    is available for applications, is an unsigned integer of the form
- *    xyyzz corresponding to the source version x.y.z (leading zeros in y and z).
+ *    used for changes in backward compatibility, as it is intended.  The
+ *    PNG_PNGLIB_VER macro, which is not used within libpng but is available
+ *    for applications, is an unsigned integer of the form xyyzz corresponding
+ *    to the source version x.y.z (leading zeros in y and z).
  *
- * See libpng.txt or libpng.3 for more information.  The PNG specification is
- * available as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
+ * See libpng.txt or libpng.3 for more information.  The PNG specification
+ * is available as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
  * and as a W3C Recommendation <http://www.w3.org/TR/REC.png.html>
  *
  * Contributing Authors:
@@ -118,7 +119,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.1a"
+#define PNG_LIBPNG_VER_STRING "1.0.1b"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -1443,6 +1444,45 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define png_debug2(l, m, p1, p2)
 #endif /* (PNG_DEBUG > 0) */
 
+#ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
+/* With these routines, we avoid an integer divide, which will be slower on
+ * many machines.  However, it does take more operations than the corresponding
+ * divide method, so it may be slower on some RISC systems.  There are two
+ * shifts (by 8 or 16 bits) and an addition, versus a single integer divide.
+ *
+ * Note that the rounding factors are NOT supposed to be the same!  128 and
+ * 32768 are correct for the NODIV code; 127 and 32767 are correct for the
+ * standard method.
+ *
+ * [Optimized code by Greg Roelofs and Mark Adler...blame us for bugs. :-) ]
+ */
+
+   /* fg and bg should be in `gamma 1.0' space; alpha is the opacity */
+#  define png_composite(composite, fg, alpha, bg) \
+     { png_uint_16 temp = ((png_uint_16)(fg) * (png_uint_16)(alpha) + \
+                        (png_uint_16)(bg)*(png_uint_16)(255 - \
+                        (png_uint_16)(alpha)) + (png_uint_16)128); \
+       (composite) = (png_byte)((temp + (temp >> 8)) >> 8); }
+#  define png_composite_16(composite, fg, alpha, bg) \
+     { png_uint_32 temp = ((png_uint_32)(fg) * (png_uint_32)(alpha) + \
+                        (png_uint_32)(bg)*(png_uint_32)(65535L - \
+                        (png_uint_32)(alpha)) + (png_uint_32)32768L); \
+       (composite) = (png_uint_16)((temp + (temp >> 16)) >> 16); }
+
+#else  /* standard method using integer division */
+
+   /* fg and bg should be in `gamma 1.0' space; alpha is the opacity */
+#  define png_composite(composite, fg, alpha, bg) \
+     (composite) = (png_byte)(((png_uint_16)(fg) * (png_uint_16)(alpha) + \
+       (png_uint_16)(bg) * (png_uint_16)(255 - (png_uint_16)(alpha)) + \
+       (png_uint_16)127) / 255)
+#  define png_composite_16(composite, fg, alpha, bg) \
+     (composite) = (png_uint_16)(((png_uint_32)(fg) * (png_uint_32)(alpha) + \
+       (png_uint_32)(bg)*(png_uint_32)(65535L - (png_uint_32)(alpha)) + \
+       (png_uint_32)32767) / (png_uint_32)65535L)
+
+#endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
+
 /* These next functions are used internally in the code.  They generally
  * shouldn't be used unless you are writing code to add or replace some
  * functionality in libpng.  More information about most functions can
@@ -1525,6 +1565,7 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_FLAG_FREE_HIST                0x4000
 #define PNG_FLAG_HAVE_CHUNK_HEADER        0x8000L
 #define PNG_FLAG_WROTE_tIME              0x10000L
+#define PNG_FLAG_BACKGROUND_IS_GRAY      0x20000L
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
                                      PNG_FLAG_CRC_ANCILLARY_NOWARN)

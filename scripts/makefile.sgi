@@ -11,7 +11,7 @@ ZLIBINC=../zlib
 CC=cc
 
 WARNMORE=-fullwarn
-CFLAGS=-I$(ZLIBINC) -O # $(WARNMORE) -g -DPNG_DEBUG=5
+CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) # -g -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
 RANLIB=echo

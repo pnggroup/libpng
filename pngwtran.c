@@ -1,12 +1,12 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng 1.0.1a
+ * 1.0.1b
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * April 21, 1998
+ * May 2, 1998
  */
 
 #define PNG_INTERNAL
@@ -96,15 +96,15 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
          {
             png_bytep sp, dp;
             int mask, v;
-            png_uint_32 i, istop;
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
             sp = row;
             dp = row;
             mask = 0x80;
             v = 0;
            
-            istop = row_info->width;
-            for (i = 0; i < istop; i++)
+            for (i = 0; i < row_width; i++)
             {
                if (*sp != 0)
                   v |= mask;
@@ -127,14 +127,14 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
          {
             png_bytep sp, dp;
             int shift, v;
-            png_uint_32 i, istop;
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
             sp = row;
             dp = row;
             shift = 6;
             v = 0;
-            istop = row_info->width;
-            for (i = 0; i < istop; i++)
+            for (i = 0; i < row_width; i++)
             {
                png_byte value;
 
@@ -159,14 +159,14 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
          {
             png_bytep sp, dp;
             int shift, v;
-            png_uint_32 i, istop;
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
             sp = row;
             dp = row;
             shift = 4;
             v = 0;
-            istop = row_info->width;
-            for (i = 0; i < istop; i++)
+            for (i = 0; i < row_width; i++)
             {
                png_byte value;
 
@@ -218,7 +218,7 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       row_info->color_type != PNG_COLOR_TYPE_PALETTE)
    {
       int shift_start[4], shift_dec[4];
-      png_uint_32 channels;
+      int channels;
 
       channels = 0;
       if (row_info->color_type & PNG_COLOR_MASK_COLOR)
@@ -249,9 +249,10 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       /* with low row depths, could only be grayscale, so one channel */
       if (row_info->bit_depth < 8)
       {
-         png_bytep bp;
-         png_uint_32 i, istop;
+         png_bytep bp = row;
+         png_uint_32 i;
          png_byte mask;
+         png_uint_32 row_bytes = row_info->rowbytes;
 
          if (bit_depth->gray == 1 && row_info->bit_depth == 2)
             mask = 0x55;
@@ -260,8 +261,7 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
          else
             mask = 0xff;
 
-         istop = row_info->rowbytes;
-         for (bp = row, i = 0; i < istop; i++, bp++)
+         for (i = 0; i < row_bytes; i++, bp++)
          {
             png_uint_16 v;
             int j;
@@ -279,13 +279,13 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       }
       else if (row_info->bit_depth == 8)
       {
-         png_bytep bp;
-         png_uint_32 i, istop;
+         png_bytep bp = row;
+         png_uint_32 i;
+         png_uint_32 row_width = row_info->width;
 
-         istop = row_info->width;
-         for (bp = row, i = 0; i < istop; i++)
+         for (i = 0; i < row_width; i++)
          {
-            png_uint_32 c;
+            int c;
 
             for (c = 0; c < channels; c++, bp++)
             {
@@ -307,12 +307,12 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
       else
       {
          png_bytep bp;
-         png_uint_32 i, istop;
+         png_uint_32 i;
+         png_uint_32 row_width = row_info->width;
 
-         istop = row_info->width;
-         for (bp = row, i = 0; i < istop; i++)
+         for (bp = row, i = 0; i < row_width; i++)
          {
-            png_uint_32 c;
+            int c;
 
             for (c = 0; c < channels; c++, bp += 2)
             {
@@ -352,10 +352,9 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
          if (row_info->bit_depth == 8)
          {
             png_bytep sp, dp;
-            png_uint_32 i, istop;
-
-            istop = row_info->width;
-            for (i = 0, sp = dp = row; i < istop; i++)
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
+            for (i = 0, sp = dp = row; i < row_width; i++)
             {
                png_byte save = *(sp++);
                *(dp++) = *(sp++);
@@ -368,10 +367,10 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
          else
          {
             png_bytep sp, dp;
-            png_uint_32 i, istop;
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
-            istop = row_info->width;
-            for (i = 0, sp = dp = row; i < istop; i++)
+            for (i = 0, sp = dp = row; i < row_width; i++)
             {
                png_byte save[2];
                save[0] = *(sp++);
@@ -394,9 +393,9 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
          {
             png_bytep sp, dp;
             png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
-            istop = row_info->width;
-            for (i = 0, sp = dp = row; i < istop; i++)
+            for (i = 0, sp = dp = row; i < row_width; i++)
             {
                png_byte save = *(sp++);
                *(dp++) = *(sp++);
@@ -408,9 +407,9 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
          {
             png_bytep sp, dp;
             png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
-            istop = row_info->width;
-            for (i = 0, sp = dp = row; i < istop; i++)
+            for (i = 0, sp = dp = row; i < row_width; i++)
             {
                png_byte save[2];
                save[0] = *(sp++);
@@ -441,10 +440,9 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
          if (row_info->bit_depth == 8)
          {
             png_bytep sp, dp;
-            png_uint_32 i, istop;
-
-            istop = row_info->width;
-            for (i = 0, sp = dp = row; i < istop; i++)
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
+            for (i = 0, sp = dp = row; i < row_width; i++)
             {
                *(dp++) = *(sp++);
                *(dp++) = *(sp++);
@@ -456,10 +454,10 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
          else
          {
             png_bytep sp, dp;
-            png_uint_32 i, istop;
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
-            istop = row_info->width;
-            for (i = 0, sp = dp = row; i < istop; i++)
+            for (i = 0, sp = dp = row; i < row_width; i++)
             {
                *(dp++) = *(sp++);
                *(dp++) = *(sp++);
@@ -478,10 +476,10 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
          if (row_info->bit_depth == 8)
          {
             png_bytep sp, dp;
-            png_uint_32 i, istop;
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
-            istop = row_info->width;
-            for (i = 0, sp = dp = row; i < istop; i++)
+            for (i = 0, sp = dp = row; i < row_width; i++)
             {
                *(dp++) = *(sp++);
                *(dp++) = 255 - *(sp++);
@@ -491,10 +489,10 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
          else
          {
             png_bytep sp, dp;
-            png_uint_32 i, istop;
+            png_uint_32 i;
+            png_uint_32 row_width = row_info->width;
 
-            istop = row_info->width;
-            for (i = 0, sp = dp = row; i < istop; i++)
+            for (i = 0, sp = dp = row; i < row_width; i++)
             {
                *(dp++) = *(sp++);
                *(dp++) = *(sp++);

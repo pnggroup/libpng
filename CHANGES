@@ -300,4 +300,13 @@ version 1.0.1a [April 21, 1998]
   Moved a misplaced pngrutil code block that truncates tRNS if it has more
     than num_palette entries -- test was done before num_palette was defined.
   Fixed a png_convert_to_rfc1123() bug that converts day 31 to 0 (Steve Eddins).
-  Changed compiler flags in makefile.wat for better optimization (Pawel Mrochen)
+  Changed compiler flags in makefile.wat for better optimization (Pawel Mrochen).
+version 1.0.1b [May 2, 1998]
+  Relocated png_do_gray_to_rgb() within png_do_read_transformations() (Greg).
+  Relocated the png_composite macros from pngrtran.c to png.h (Greg).
+  Added makefile.sco (contributed by Mike Hopkirk).
+  Fixed two bugs (missing definitions of "istop") introduced in libpng-1.0.1a.
+  Fixed a bug in pngrtran.c that would set channels=5 under some circumstances.
+  More work on the Paeth-filtering, achieving imperceptible speedup (A Kleinert).
+  More work on loop optimization which may help when compiled with C++ compilers.
+  Added warnings when people try to use transforms they've defined out.
