@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.11beta3 - April 15, 2001
+ * libpng 1.0.11rc1 - April 20, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -137,7 +137,7 @@ png_get_y_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_pHYs_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_pHYs)
    {
-       png_debug1(1, "in %s retrieval function\n", "png_get_y_pixels_per_meter");
+      png_debug1(1, "in %s retrieval function\n", "png_get_y_pixels_per_meter");
       if(info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
           return (0);
       else return (info_ptr->y_pixels_per_unit);

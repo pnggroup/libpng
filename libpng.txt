@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.11beta3 - April 15, 2001
+ libpng version 1.0.11rc1 - April 20, 2001
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -2314,6 +2314,10 @@ Your replacement memory functions must have prototypes as follows:
        png_uint_32 size);
     void free_fn(png_structp png_ptr, png_voidp ptr);
 
+Your malloc_fn() can return NULL in case of failure.  The png_malloc()
+function will call png_error() if it receives a NULL from the system
+memory allocator or from your replacement malloc_fn().
+
 Input/Output in libpng is done through png_read() and png_write(),
 which currently just call fread() and fwrite().  The FILE * is stored in
 png_struct and is initialized via png_init_io().  If you wish to change
@@ -2717,13 +2721,13 @@ application:
 
 VIII. Y2K Compliance in libpng
 
-April 15, 2001
+April 20, 2001
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.11beta3 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.11rc1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

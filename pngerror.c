@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.11beta3 - April 15, 2001
+ * libpng 1.0.11rc1 - April 20, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -61,11 +61,12 @@ png_warning(png_structp png_ptr, png_const_charp message)
  */
 #define isnonalpha(c) ((c) < 41 || (c) > 122 || ((c) > 90 && (c) < 97))
 static PNG_CONST char png_digit[16] = {
-   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-};
+   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+   'F' };
 
 static void /* PRIVATE */
-png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp message)
+png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
+   message)
 {
    int iout = 0, iin = 0;
 

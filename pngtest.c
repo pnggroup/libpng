@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.11beta3 - April 15, 2001
+ * libpng 1.0.11rc1 - April 20, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1028,18 +1028,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    row_buf = (png_bytep)png_malloc(read_ptr,
       png_get_rowbytes(read_ptr, read_info_ptr));
    png_debug1(0, "0x%08lx\n\n", (unsigned long)row_buf);
-   if (row_buf == NULL)
-   {
-      fprintf(STDERR, "No memory to allocate row buffer\n");
-      png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infopp)NULL);
-#ifdef PNG_WRITE_SUPPORTED
-      png_destroy_info_struct(write_ptr, &write_end_info_ptr);
-      png_destroy_write_struct(&write_ptr, &write_info_ptr);
-#endif
-      FCLOSE(fpin);
-      FCLOSE(fpout);
-      return (1);
-   }
 #endif /* SINGLE_ROWBUF_ALLOC */
    png_debug(0, "Writing row data\n");
 
@@ -1523,4 +1511,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_11beta3 your_png_h_is_not_version_1_0_11beta3;
+typedef version_1_0_11rc1 your_png_h_is_not_version_1_0_11rc1;

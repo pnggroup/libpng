@@ -25,4 +25,7 @@ Known bugs in libpng-1.0.10
 4. April 14, 2001: Many instances of png_malloc() are not followed by
    a check to make sure it didn't return NULL.
 
-   STATUS: tests were added in libpng-1.0.11beta3.
+   STATUS: This only seems to matter if the user is using a custom
+   malloc_fn() that returns NULL.  In libpng-1.0.11rc1 the return from
+   malloc_fn() will be checked for NULL and png_error() issued if one
+   is found.

@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.11beta3 - April 15, 2001
+ * libpng 1.0.11rc1 - April 20, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -235,11 +235,6 @@ png_text_compress(png_structp png_ptr,
                old_ptr = comp->output_ptr;
                comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                   (png_uint_32)(comp->max_output_ptr * sizeof (png_charpp)));
-               if (comp->output_ptr == (png_charpp)NULL)
-               {
-                  png_warning (png_ptr, "Cannot allocate compression buffer");
-                  comp->output_ptr=old_ptr;
-               }
                png_memcpy(comp->output_ptr, old_ptr, old_max
                   * sizeof (png_charp));
                png_free(png_ptr, old_ptr);
@@ -247,23 +242,14 @@ png_text_compress(png_structp png_ptr,
             else
                comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                   (png_uint_32)(comp->max_output_ptr * sizeof (png_charp)));
-               if (comp->output_ptr == (png_charpp)NULL)
-               {
-                  png_warning (png_ptr, "Cannot allocate compression buffer");
-               }
          }
 
          /* save the data */
          comp->output_ptr[comp->num_output_ptr] = (png_charp)png_malloc(png_ptr,
             (png_uint_32)png_ptr->zbuf_size);
-         if (comp->output_ptr[comp->num_output_ptr] == (png_charp)NULL)
-            png_warning (png_ptr, "Cannot allocate compression buffer");
-         else
-         {
-            png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
-               png_ptr->zbuf_size);
-            comp->num_output_ptr++;
-         }
+         png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
+            png_ptr->zbuf_size);
+         comp->num_output_ptr++;
 
          /* and reset the buffer */
          png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
@@ -298,8 +284,7 @@ png_text_compress(png_structp png_ptr,
                   /* This could be optimized to realloc() */
                   comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                      (png_uint_32)(comp->max_output_ptr * sizeof (png_charpp)));
-                  if (comp->output_ptr != (png_charpp)NULL)
-                    png_memcpy(comp->output_ptr, old_ptr,
+                  png_memcpy(comp->output_ptr, old_ptr,
                        old_max * sizeof (png_charp));
                   png_free(png_ptr, old_ptr);
                }
@@ -311,14 +296,9 @@ png_text_compress(png_structp png_ptr,
             /* save off the data */
             comp->output_ptr[comp->num_output_ptr] =
                (png_charp)png_malloc(png_ptr, (png_uint_32)png_ptr->zbuf_size);
-            if (comp->output_ptr[comp->num_output_ptr] == (png_charp)NULL)
-               png_warning (png_ptr, "Cannot allocate compression buffer");
-            else
-            {
-               png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
-                  png_ptr->zbuf_size);
-               comp->num_output_ptr++;
-            }
+            png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
+               png_ptr->zbuf_size);
+            comp->num_output_ptr++;
 
             /* and reset the buffer pointers */
             png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
@@ -1130,12 +1110,6 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 
    *new_key = (png_charp)png_malloc(png_ptr, (png_uint_32)(key_len + 2));
  
-   if (*new_key == (png_charp)NULL)
-   {
-      png_warning(png_ptr, "Could not allocate new key; keyword not checked");
-      return key_len;
-   }
-
    /* Replace non-printing characters with a blank and print a warning */
    for (kp = key, dp = *new_key; *kp != '\0'; kp++, dp++)
    {
@@ -1451,12 +1425,6 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    params_len = (png_uint_32p)png_malloc(png_ptr, (png_uint_32)(nparams
       *sizeof(png_uint_32)));
 
-   if (params_len == (png_uint_32p)NULL)
-   {
-      png_warning (png_ptr, "Could not allocate params for pCAL");
-      return;
-   }
-
    /* Find the length of each parameter, making sure we don't count the
       null terminator for the last parameter. */
    for (i = 0; i < nparams; i++)
@@ -1640,8 +1608,6 @@ png_write_start_row(png_structp png_ptr)
 
    /* set up row buffer */
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, (png_uint_32)buf_size);
-   if (png_ptr->row_buf == (png_bytep)NULL)
-      png_error(png_ptr, "Could not allocate row buffer");
    png_ptr->row_buf[0] = PNG_FILTER_VALUE_NONE;
 
    /* set up filtering buffer, if using this filter */
@@ -1649,8 +1615,6 @@ png_write_start_row(png_structp png_ptr)
    {
       png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
          (png_ptr->rowbytes + 1));
-      if (png_ptr->sub_row == (png_bytep)NULL)
-         png_error(png_ptr, "Could not allocate sub row buffer");
       png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
    }
 
@@ -1665,8 +1629,6 @@ png_write_start_row(png_structp png_ptr)
       {
          png_ptr->up_row = (png_bytep )png_malloc(png_ptr,
             (png_ptr->rowbytes + 1));
-         if (png_ptr->up_row == (png_bytep)NULL)
-            png_error(png_ptr, "Could not allocate up row buffer");
          png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
       }
 
@@ -1674,8 +1636,6 @@ png_write_start_row(png_structp png_ptr)
       {
          png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
             (png_ptr->rowbytes + 1));
-         if (png_ptr->avg_row == (png_bytep)NULL)
-            png_error(png_ptr, "Could not allocate avg row buffer");
          png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
       }
 
@@ -1683,8 +1643,6 @@ png_write_start_row(png_structp png_ptr)
       {
          png_ptr->paeth_row = (png_bytep )png_malloc(png_ptr,
             (png_ptr->rowbytes + 1));
-         if (png_ptr->paeth_row == (png_bytep)NULL)
-            png_error(png_ptr, "Could not allocate paeth row buffer");
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
    }

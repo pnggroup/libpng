@@ -338,7 +338,8 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    for (row = 0; row < height; row++)
    {
-      row_pointers[row] = malloc(png_get_rowbytes(png_ptr, info_ptr));
+      row_pointers[row] = png_malloc(png_ptr, png_get_rowbytes(png_ptr,
+         info_ptr));
    }
 
    /* Now it's time to read the image.  One of these methods is REQUIRED */
@@ -605,8 +606,6 @@ void write_png(char *file_name /* , ... other image information ... */)
    /* set the palette if there is one.  REQUIRED for indexed-color images */
    palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH
              * sizeof (png_color));
-   if (palette == NULL)
-      png_error(png_ptr, "Example: malloc of palette failed");
    /* ... set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
    /* You must not free palette here, because png_set_PLTE only makes a link to
