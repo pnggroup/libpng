@@ -1,6 +1,8 @@
 Pngcrush documentation
 
-This is the copyright notice, disclaimer, and license:
+This is is a copy of the copyright notice, disclaimer, and license, for
+your convenience (the actual notice appears in the file pngcrush.c; in
+case of any discrepancy, the copy in pngcrush.c shall prevail):
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -38,12 +40,13 @@ This is the copyright notice, disclaimer, and license:
 
 This is the output of "pngcrush" and "pngcrush -help":
 
- | pngcrush 1.5.1, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
+
+ | pngcrush 1.5.2, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | irrevocably granted to everyone to use this version
  | of pngcrush without payment of any fee.
- | This program was built with libpng version 1.0.8,
- | and is running with  libpng version 1.0.8 - July 24, 2000 (header)
+ | This program was built with libpng version 1.0.9beta2,
+ | and is running with  libpng version 1.0.9beta2 - November 19, 2000 (header)
  |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -66,14 +69,16 @@ options:
           -fix (fix otherwise fatal conditions such as bad CRCs)
         -force (Write a new output file even if larger than input)
             -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)
+         -iccp length "Profile Name" iccp_file
          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
             -l zlib_compression_level [0-9]
             -m method [0 through 200]
-          -max maximum_IDAT_size [1 through 524288]
+          -max maximum_IDAT_size [default 524288]
         -no_cc (no color counting)
             -n (no save; does not do compression or write output PNG)
      -plte_len n (truncate PLTE)
             -q (quiet)
+       -reduce (do lossless color type or bit depth reduction)
           -rem chunkname (or "alla" or "allb")
 -replace_gamma gamma (float or fixed*100000) even if gAMA is present.
           -res dpi
@@ -86,29 +91,16 @@ options:
             -h (help and legal notices)
             -p (pause)
 
+options (Note: any option can be spelled out for clarity, e.g.,
+          "pngcrush -dir New -method 7 -remove bkgd *.png"
+          is the same as "pngcrush -d New -m 7 -rem bkgd *.png"):
 
- | pngcrush 1.5.1, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
- | This is a free, open-source program.  Permission is
- | irrevocably granted to everyone to use this version
- | of pngcrush without payment of any fee.
- | This program was built with libpng version 1.0.8,
- | and is running with  libpng version 1.0.8 - July 24, 2000 (header)
- |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
- |    Copyright (C) 1996, 1997 Andreas Dilger,
- |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
- | and zlib version 1.1.3pc, Copyright (C) 1998,
- |    Jean-loup Gailly and Mark Adler.
-
-
-usage: pngcrush [options] infile.png outfile.png
-       pngcrush -e ext [other options] files.png ...
-       pngcrush -d dir [other options] files.png ...
-
-options:
       -already already_crushed_size [e.g., 8192]
 
                If file has an IDAT greater than this size, it
-               will be considered to be already crushed.
+               will be considered to be already crushed and will
+               not be processed, unless you are making other changes
+               or the "-force" option is present.
 
         -brute (Use brute-force, try 114 different methods [11-124])
 
@@ -168,6 +160,10 @@ options:
                file has no gAMA chunk.  To replace an existing
                gAMA chunk, use the '-replace_gamma' option.
 
+         -iccp length "Profile Name" iccp_file
+
+               file with ICC profile to insert in an iCCP chunk.
+
          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
 
                Uncompressed iTXt chunk to insert (see -text).
@@ -188,7 +184,7 @@ options:
                1, 4, and 7 use no filtering; methods 11 and up use 
                specified filter, compression level, and strategy.
 
-          -max maximum_IDAT_size [1 through 524288]
+          -max maximum_IDAT_size [default 524288]
 
         -no_cc (no color counting)
 
@@ -199,10 +195,13 @@ options:
      -plte_len n (truncate PLTE)
 
                Truncates the PLTE.  Be sure not to truncate it to
-
                less than the greatest index present in IDAT.
 
             -q (quiet)
+
+       -reduce (do lossless color type or bit depth reduction)
+
+          (if possible)
 
           -rem chunkname (or "alla" or "allb")
 
@@ -249,6 +248,9 @@ options:
 
       -version (display the pngcrush version)
 
+               Look for the most recent version of pngcrush at
+               http://pmt.sourceforge.net
+
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
 
                Size of the sliding compression window, in kbytes
@@ -261,6 +263,8 @@ options:
 
                zlib compression strategy to use with the preceding
                '-m method' argument.
+
+         -zmem zlib_compression_mem_level [1-9, default 9]
 
         -zitxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
 
@@ -279,4 +283,5 @@ options:
                Wait for [enter] key before continuing display.
                e.g., type 'pngcrush -pause -help', if the help
                screen scrolls out of sight.
+
 

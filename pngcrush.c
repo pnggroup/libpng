@@ -1,9 +1,12 @@
 /* pngcrush.c - recompresses png files
  * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
+ * The most recent version of pngcrush can be found at
+ * http://pmt.sourceforge.net/pngcrush/
+ *
  * This program reads in a PNG image, and writes it out again, with the
- * optimum filter_type and zlib_level.  It uses brute force (trying
- * filter_type none, and libpng adaptive filtering, with compression
+ * optimum filter_method and zlib_level.  It uses brute force (trying
+ * filter_method none, and libpng adaptive filtering, with compression
  * levels 3 and 9).  It does the most time-consuming method last in case
  * it turns out to be the best.
  *
@@ -14,9 +17,13 @@
  *
  * Thanks to Greg Roelofs for various bug fixes, suggestions, and
  * occasionally creating Linux executables.
+ *
+ * Thanks to Stephan Levavej for some helpful suggestions about gcc compiler
+ * options and for a suggestion to increase the Z_MEM_LEVEL from default.
+ *
  */
 
-#define PNGCRUSH_VERSION "1.5.1"
+#define PNGCRUSH_VERSION "1.5.2"
 
 /*
 */
@@ -57,6 +64,26 @@
  */
 
 /* Change log:
+ *
+ * Version 1.5.2 (built with libpng-1.0.9beta1)
+ *
+ *   Added "-iccp" option.
+ *
+ *   Increased the zlib memory level, which improves compression (typically
+ *   about 1.3 percent for photos) at the expense of increased memory usage.
+ *
+ *   Enabled the "-max max_idat_size" option, even when max_idat_size
+ *   exceeds the default 1/2 megabyte size.
+ *
+ *   Added missing "png_ptr" argument to png_error() call
+ *
+ *   Revised the "-help" output slightly and improved the "-version" output.
+ *
+ *   The "-already[_crushed]" option is now ignored if the "-force" option
+ *   is present or if chunks are being added, deleted, or modified.
+ *
+ *   Improved "things_have_changed" behavior (now, when set in a particular
+ *   file, it is not set for all remaining files)
  *
  * Version 1.5.1 (built with libpng-1.0.8)
  *
@@ -272,26 +299,31 @@
 
 /* To do:
  *
- * Version 1.4.*: check for unused alpha channel and ok-to-reduce-depth.
- *   Rearrange palette to put most-used color first and transparent color
- *   second (see ImageMagick 5.1.1 and later).
- *   Finish pplt (partial palette) feature.
+ *   Check for unused alpha channel and ok-to-reduce-depth.
  *   Take care that sBIT and bKGD data aren't lost when reducing images
  *   from truecolor to grayscale.
  *
- * Version 1.4.*: Use an alternate write function for the trial passes, that
+ *   Rearrange palette to put most-used color first and transparent color
+ *   second (see ImageMagick 5.1.1 and later).
+ *
+ *   Finish pplt (partial palette) feature.
+ *
+ *   Use an alternate write function for the trial passes, that
  *   simply counts bytes rather than actually writing to a file, to save wear
  *   and tear on disk drives.
  *
- * Version 1.4.*: Allow in-place file replacement or as a filter, as in
+ *   Allow in-place file replacement or as a filter, as in
  *    "pngcrush -overwrite file.png"
  *    "pngcreator | pngcrush > output.png"
  *
- * Version 1.4.*: Remove text-handling and color-handling features and put
+ *   Remove text-handling and color-handling features and put
  *   those in a separate program or programs, to avoid unnecessary
  *   recompressing.
  *
+ *   Move the Photoshop-fixing stuff into a separate program.
+ *
  *   add "-time" directive
+ *
  */
 
 #define PNG_INTERNAL
@@ -300,6 +332,11 @@
 /* we don't need the some of the extra libpng transformations
  * so they are ifdef'ed out in a special version of pngconf.h, which
  * includes pngcrush.h and is included by png.h */
+
+/* defined so I can write to a file on gui/windowing platforms */
+/*  #define STDERR stderr  */
+#define STDERR stdout   /* for DOS */
+
 
 #ifndef PNGCRUSH_LIBPNG_VER
 #  define PNGCRUSH_LIBPNG_VER PNG_LIBPNG_VER
@@ -427,16 +464,13 @@ main()
 #  define TIME_T float
 #endif
 
-/* defined so I can write to a file on gui/windowing platforms */
-/*  #define STDERR stderr  */
-#define STDERR stdout   /* for DOS */
-
 /* input and output filenames */
 static PNG_CONST char *progname = "pngtest" DOT "png";
 static PNG_CONST char *inname = "pngtest" DOT "png";
 static PNG_CONST char *outname = "pngout" DOT "png";
 static PNG_CONST char *directory_name = "pngcrush" DOT "bak";
 static PNG_CONST char *extension = "_C" DOT "png";
+
 
 static png_uint_32 width, height;
 static png_uint_32 measured_idat_length;
@@ -464,6 +498,15 @@ char text_keyword[800];
 #ifdef PNG_iTXt_SUPPORTED
 char text_lang[800];
 char text_lang_key[800];
+#endif
+#if (PNG_LIBPNG_VER < 10009)
+#undef PNG_iCCP_SUPPORTED
+#endif
+#ifdef PNG_iCCP_SUPPORTED
+int iccp_length = 0;
+char *iccp_text;
+char *iccp_file;
+char iccp_name[80];
 #endif
 int best;
 
@@ -498,8 +541,10 @@ static int verbose=1;
 static int help=0;
 static int fix=0;
 static int things_have_changed=0;
+static int global_things_have_changed=0;
 static int default_compression_window=15;
 static int force_compression_window=0;
+static int compression_mem_level=9;
 static int final_method=0;
 static int brute_force=0;
 static int brute_force_level=0;
@@ -562,6 +607,7 @@ static png_infop write_end_info_ptr;
 static FILE *fpin, *fpout;
 png_uint_32 measure_idats(FILE *fpin);
 static int do_color_count;
+static int reduction_ok=0;
 #ifdef PNGCRUSH_COUNT_COLORS
 int count_colors(FILE *fpin);
 static int num_rgba, reduce_to_gray, it_is_opaque;
@@ -571,11 +617,15 @@ png_uint_32 png_measure_idat(png_structp png_ptr);
 # define MAX_METHODSP1 201
 # define DEFAULT_METHODS 10
 static png_uint_32 idat_length[MAX_METHODSP1];
-static int filter_method, zlib_level;
+static int filter_type, zlib_level;
 static png_bytep png_row_filters=NULL;
 static TIME_T t_start, t_stop, t_decode, t_encode, t_misc;
 
+#if (PNG_LIBPNG_VER >= 10000)
+static png_uint_32 max_idat_size = 524288;
+#else
 static png_uint_32 max_idat_size = PNG_ZBUF_SIZE;
+#endif
 static png_uint_32 crushed_idat_size = 0x3ffffffL;
 static int already_crushed = 0;
 int ia;
@@ -622,8 +672,8 @@ png_set_compression_buffer_size(png_structp png_ptr, png_uint_32 size)
        png_free(png_ptr, png_ptr->zbuf); png_ptr->zbuf=NULL;
     png_ptr->zbuf_size = (png_size_t)size;
     png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, size);
-    if(png_ptr->zbuf)
-       png_error("Unable to malloc zbuf");
+    if(!png_ptr->zbuf)
+       png_error(png_ptr,"Unable to malloc zbuf");
 }
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
@@ -1096,7 +1146,7 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-dou",4))
       {
          double_gamma++;
-         things_have_changed=1;
+         global_things_have_changed=1;
       }
 #endif
    else if(!strncmp(argv[i],"-d",2))
@@ -1114,7 +1164,7 @@ main(int argc, char *argv[])
          extension= argv[names++];
       }
    else if(!strncmp(argv[i],"-force",6))
-         things_have_changed=1;
+         global_things_have_changed=1;
    else if(!strncmp(argv[i],"-fix",4))
       fix++;
    else if(!strncmp(argv[i],"-f",2))
@@ -1231,12 +1281,46 @@ main(int argc, char *argv[])
          help++;
          verbose++;
       }
+   else if(!strncmp(argv[i],"-iccp",5))
+      {
+#ifdef PNG_iCCP_SUPPORTED
+         FILE *iccp_fn;
+         if(iccp_length)
+            free(iccp_text);
+         iccp_length=atoi(argv[++i]);
+         names+=3;
+         strcpy(iccp_name,argv[++i]);
+         iccp_file=argv[++i];
+         if ((iccp_fn = FOPEN(iccp_file, "rb")) == NULL)
+         {
+            fprintf(STDERR, "Could not find file: %s\n", iccp_file);
+            iccp_length=0;
+         }
+         else
+         {
+            int ic;
+            iccp_text=malloc(iccp_length+1);
+            iccp_text[iccp_length]=(char)0x00;
+            for (ic=0; ic<iccp_length; ic++)
+            {
+                  png_size_t num_in;
+                  num_in = fread(buffer, 1, 1, iccp_fn);
+                  if (!num_in)
+                     break;
+                  iccp_text[ic]=buffer[0];
+            }
+         }
+#else
+         names+=3;
+         i+=3;
+         fprintf(STDERR, "libpng-1.0.9 or later is required to support iCCP.\n");
+#endif
+      }
    else if(!strncmp(argv[i],"-max",4))
       {
          names++;
          BUMP_I;
          max_idat_size = (png_uint_32)atoi(argv[i]);
-         if (max_idat_size > PNG_ZBUF_SIZE) max_idat_size=PNG_ZBUF_SIZE;
       }
    else if(!strncmp(argv[i],"-m",2))
       {
@@ -1269,7 +1353,7 @@ main(int argc, char *argv[])
          do_pplt++;
          BUMP_I;
          strcpy(pplt_string,argv[i]);
-         things_have_changed=1;
+         global_things_have_changed=1;
       }
    else if(!strncmp(argv[i],"-p",2))
       {
@@ -1277,6 +1361,10 @@ main(int argc, char *argv[])
       }
    else if(!strncmp(argv[i],"-q",2))
          verbose=0;
+   else if(!strncmp(argv[i],"-reduce",7))
+      {
+        reduction_ok++;
+      }
 #ifdef PNG_gAMA_SUPPORTED
    else if(!strncmp(argv[i],"-rep",4))
       {
@@ -1309,7 +1397,7 @@ main(int argc, char *argv[])
             force_specified_gamma=atof(argv[i]);
 #endif
          }
-         things_have_changed=1;
+         global_things_have_changed=1;
       }
 #endif
 #ifdef PNG_pHYs_SUPPORTED
@@ -1318,6 +1406,7 @@ main(int argc, char *argv[])
          names++;
          BUMP_I;
          resolution=atoi(argv[i]);
+         global_things_have_changed=1;
       }
 #endif
 #ifdef PNGCRUSH_MULTIPLE_ROWS
@@ -1448,11 +1537,14 @@ main(int argc, char *argv[])
 #endif
    else if(!strncmp(argv[i],"-version",8))
       {
-         fprintf(STDERR,"libpng ");
+         fprintf(STDERR, " pngcrush ");
+         fprintf(STDERR, PNGCRUSH_VERSION );
+         fprintf(STDERR,", uses libpng ");
          fprintf(STDERR, PNG_LIBPNG_VER_STRING );
-         fprintf(STDERR,", uses zlib ");
+         fprintf(STDERR,"and zlib ");
          fprintf(STDERR, ZLIB_VERSION );
-         fprintf(STDERR,"\n");
+         fprintf(STDERR, "\n Check http://pmt.sourceforge.net\n");
+         fprintf(STDERR, " for the most recent version.\n");
       }
    else if(!strncmp(argv[i],"-v",2))
       {
@@ -1462,6 +1554,11 @@ main(int argc, char *argv[])
       {
          default_compression_window=atoi(argv[++i]);
          force_compression_window++;
+         names++;
+      }
+   else if(!strncmp(argv[i],"-zm",3))
+      {
+         compression_mem_level=atoi(argv[++i]);
          names++;
       }
    else if(!strncmp(argv[i],"-z",2))
@@ -1593,7 +1690,12 @@ main(int argc, char *argv[])
      if(verbose > 1)
      {
       png_crush_pause();
-        fprintf(STDERR, "\noptions:\n");
+        fprintf(STDERR,
+      "\noptions (Note: any option can be spelled out for clarity, e.g.,\n");
+        fprintf(STDERR,
+      "          \"pngcrush -dir New -method 7 -remove bkgd *.png\"\n");
+        fprintf(STDERR,
+      "          is the same as \"pngcrush -d New -m 7 -rem bkgd *.png\"):\n\n");
      }
      else
         fprintf(STDERR, "options:\n");
@@ -1604,7 +1706,11 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "\n               If file has an IDAT greater than this size, it\n");
      fprintf(STDERR,
-       "               will be considered to be already crushed.\n\n");
+       "               will be considered to be already crushed and will\n");
+     fprintf(STDERR,
+       "               not be processed, unless you are making other changes\n");
+     fprintf(STDERR,
+       "               or the \"-force\" option is present.\n\n");
      }
      fprintf(STDERR,
        "        -brute (Use brute-force, try 114 different methods [11-124])\n");
@@ -1722,6 +1828,16 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               gAMA chunk, use the '-replace_gamma' option.\n\n");
      png_crush_pause();
+#ifdef PNG_iCCP_SUPPORTED
+     fprintf(STDERR,
+       "         -iccp length \"Profile Name\" iccp_file\n");
+     if(verbose > 1)
+     {
+     fprintf(STDERR,
+       "\n               file with ICC profile to insert in an iCCP chunk.");
+     fprintf(STDERR, "\n\n");
+     }
+#endif
 #ifdef PNG_iTXt_SUPPORTED
      fprintf(STDERR,
        "         -itxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
@@ -1763,7 +1879,7 @@ main(int argc, char *argv[])
      }
 
      fprintf(STDERR,
-       "          -max maximum_IDAT_size [1 through %d]\n",PNG_ZBUF_SIZE);
+       "          -max maximum_IDAT_size [default %d]\n",PNG_ZBUF_SIZE);
      if(verbose > 1)
         fprintf(STDERR,"\n");
 #if 0
@@ -1791,13 +1907,18 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "\n               Truncates the PLTE.  Be sure not to truncate it to\n");
      fprintf(STDERR,
-       "\n               less than the greatest index present in IDAT.\n\n");
+       "               less than the greatest index present in IDAT.\n\n");
  
      }
      fprintf(STDERR,
        "            -q (quiet)\n");
      if(verbose > 1)
         fprintf(STDERR,"\n");
+     fprintf(STDERR,
+       "       -reduce (do lossless color type or bit depth reduction)\n");
+     if(verbose > 1)
+     fprintf(STDERR,
+       "\n          (if possible)\n\n");
      fprintf(STDERR,
        "          -rem chunkname (or \"alla\" or \"allb\")\n");
      if(verbose > 1)
@@ -1890,7 +2011,6 @@ main(int argc, char *argv[])
        "               color type, scaled to the output bit depth.\n\n");
      }
 #endif
-
      fprintf(STDERR,
        "            -v (display more detailed information)\n");
      if(verbose > 1)
@@ -1899,7 +2019,12 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "      -version (display the pngcrush version)\n");
      if(verbose > 1)
-        fprintf(STDERR,"\n");
+     {
+     fprintf(STDERR,
+       "\n               Look for the most recent version of pngcrush at\n");
+     fprintf(STDERR,
+       "               http://pmt.sourceforge.net\n\n");
+     }
      fprintf(STDERR,
        "            -w compression_window_size [32, 16, 8, 4, 2, 1, 512]\n");
      if(verbose > 1)
@@ -1923,6 +2048,10 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               '-m method' argument.\n\n");
      }
+     fprintf(STDERR,
+       "         -zmem zlib_compression_mem_level [1-9, default 9]\n");
+     if(verbose > 1)
+        fprintf(STDERR,"\n");
 #ifdef PNG_iTXt_SUPPORTED
      fprintf(STDERR,
        "        -zitxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
@@ -2012,6 +2141,8 @@ main(int argc, char *argv[])
 
   {
       first_trial = 1;
+
+      things_have_changed=global_things_have_changed;
 
       if(png_row_filters != NULL)
       {
@@ -2121,7 +2252,7 @@ main(int argc, char *argv[])
          if(already_crushed)
          {
             fprintf(STDERR, "File has already been crushed: %s\n", inname);
-            continue;
+            if(!things_have_changed) continue;
          }
 
          if(verbose > 0)
@@ -2142,6 +2273,7 @@ main(int argc, char *argv[])
       if (do_color_count)
       {
       if (force_output_color_type == 8 && (input_color_type == 2 ||
+          (input_color_type == 3) ||
           input_color_type == 4 || input_color_type == 6))
       /* check for unused alpha channel or single transparent color */
       {
@@ -2298,7 +2430,7 @@ main(int argc, char *argv[])
          }
          else
          {
-             filter_method=fm[best];
+             filter_type=fm[best];
              zlib_level=lv[best];
              if(zs[best] == 0)z_strategy=Z_DEFAULT_STRATEGY;
              if(zs[best] == 1)z_strategy=Z_FILTERED;
@@ -2317,7 +2449,7 @@ main(int argc, char *argv[])
              if((trial == 6 || trial == 9 || trial == 10) && best_of_three != 3)
                 continue;
           }
-          filter_method=fm[trial];
+          filter_type=fm[trial];
           zlib_level=lv[trial];
           if(zs[trial] == 0)z_strategy=Z_DEFAULT_STRATEGY;
           if(zs[trial] == 1)z_strategy=Z_FILTERED;
@@ -2325,7 +2457,7 @@ main(int argc, char *argv[])
           final_method=trial;
           if(nosave == 0)
             P2("   Begin trial %d, filter %d, strategy %d, level %d\n",
-              trial, filter_method, z_strategy, zlib_level);
+              trial, filter_type, z_strategy, zlib_level);
       }
 
       P2("prepare to open files.\n");
@@ -2463,7 +2595,7 @@ main(int argc, char *argv[])
       }
       if(nosave == 0)
        {
-         if(png_get_compression_buffer_size(write_ptr) < max_idat_size)
+         if(png_get_compression_buffer_size(write_ptr) != max_idat_size)
          {
             P2("reinitializing write zbuf.\n");
             png_set_compression_buffer_size(write_ptr, max_idat_size);
@@ -2511,6 +2643,9 @@ main(int argc, char *argv[])
 
           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE,
             (png_bytep)NULL, 0);
+
+/* Process the following chunks as if safe-to-copy since it is known that
+   recompressing the IDAT chunks has no effect on them */
 #if !defined(PNG_cHRM_SUPPORTED)
           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
             (png_bytep)png_cHRM, 1);
@@ -2593,30 +2728,44 @@ main(int argc, char *argv[])
 #endif  /* PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED */
 
       png_debug(0, "Reading info struct\n");
+   {
+      png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+
+      png_read_data(read_ptr, png_signature, 8);
+      png_set_sig_bytes(read_ptr, 8);
+
+      if (png_sig_cmp(png_signature, 0, 8))
+      {
+         if (png_sig_cmp(png_signature, 0, 4))
+            png_error(read_ptr, "Not a PNG file!");
+         else
+            png_error(read_ptr, "PNG file corrupted by ASCII conversion");
+      }
+   }
       png_read_info(read_ptr, read_info_ptr);
 
 #if (PNG_LIBPNG_VER > 90)
       png_debug(0, "Transferring info struct\n");
       {
-         int interlace_type, compression_type, filter_type;
+         int interlace_method, compression_method, filter_method;
 
          if (png_get_IHDR(read_ptr, read_info_ptr, &width, &height, &bit_depth,
-             &color_type, &interlace_type, &compression_type, &filter_type))
+             &color_type, &interlace_method, &compression_method, &filter_method))
          {
             int compression_window;
             int need_expand = 0;
-            int output_interlace_type=interlace_type;
+            int output_interlace_method=interlace_method;
             input_color_type=color_type;
             input_bit_depth=bit_depth;
             if(nointerlace)
-               output_interlace_type=0;
+               output_interlace_method=0;
             if(verbose > 1 && first_trial)
             {
                fprintf(STDERR, "   IHDR chunk data:\n");
                fprintf(STDERR, "      Width=%ld, height=%ld\n", width, height);
                fprintf(STDERR, "      Bit depth =%d\n", bit_depth);
                fprintf(STDERR, "      Color type=%d\n", color_type);
-               fprintf(STDERR, "      Interlace =%d\n", interlace_type);
+               fprintf(STDERR, "      Interlace =%d\n", interlace_method);
             }
 
             if(output_color_type > 7)
@@ -2720,6 +2869,7 @@ main(int argc, char *argv[])
                int channels=0;
 
                png_set_compression_strategy(write_ptr, z_strategy);
+               png_set_compression_mem_level(write_ptr, compression_mem_level);
 
                if (output_color_type == 0)channels=1;
                if (output_color_type == 2)channels=3;
@@ -2757,10 +2907,10 @@ main(int argc, char *argv[])
                 fprintf(STDERR, "   Setting IHDR\n");
 
             png_set_IHDR(write_ptr, write_info_ptr, width, height,
-              output_bit_depth, output_color_type, output_interlace_type,
-              compression_type, filter_type);
+              output_bit_depth, output_color_type, output_interlace_method,
+              compression_method, filter_method);
 
-            if(output_color_type != input_color_type) things_have_changed++;
+            if(output_color_type != input_color_type) things_have_changed=1;
          }
       }
 #if defined(PNG_READ_bKGD_SUPPORTED) && defined(PNG_WRITE_bKGD_SUPPORTED)
@@ -2953,15 +3103,26 @@ main(int argc, char *argv[])
       png_charp name;
       png_charp profile;
       png_uint_32 proflen;
-      int compression_type;
+      int compression_method;
 
-      if (png_get_iCCP(read_ptr, read_info_ptr, &name, &compression_type, 
+      if (png_get_iCCP(read_ptr, read_info_ptr, &name, &compression_method, 
                       &profile, &proflen))
       {
+         P1 ("Got iccp chunk, proflen=%lu\n",proflen);
          if(keep_chunk("iCCP",argv))
-            png_set_iCCP(write_ptr, write_info_ptr, name, compression_type, 
+            png_set_iCCP(write_ptr, write_info_ptr, name, compression_method, 
                       profile, proflen);
+         
       }
+#ifdef PNG_iCCP_SUPPORTED
+      else if (iccp_length)
+      {
+          png_set_iCCP(write_ptr, write_info_ptr, iccp_name, 0, 
+              iccp_text, iccp_length);
+         P1 ("Wrote iccp chunk, proflen=%d\n",iccp_length);
+      }
+#endif
+
    }
 #endif
 #if defined(PNG_READ_oFFs_SUPPORTED) && defined(PNG_WRITE_oFFs_SUPPORTED)
@@ -3015,8 +3176,16 @@ main(int argc, char *argv[])
             if (png_get_pHYs(read_ptr, read_info_ptr, &res_x, &res_y,
                 &unit_type))
             {
+            if(res_x == 0 && res_y == 0)
+            {
+               if(verbose > 0 && first_trial)
+                  fprintf(STDERR, "   Deleting useless pHYs 0 0 chunk\n");
+            }
+            else
+            {
                if(keep_chunk("pHYs",argv))
-            png_set_pHYs(write_ptr, write_info_ptr, res_x, res_y, unit_type);
+               png_set_pHYs(write_ptr, write_info_ptr, res_x, res_y, unit_type);
+            }
             }
          }
          else
@@ -3366,12 +3535,12 @@ main(int argc, char *argv[])
       {
       png_set_compression_level(write_ptr, zlib_level);
 
-      if     (filter_method == 0)png_set_filter(write_ptr,0,PNG_FILTER_NONE);
-      else if(filter_method == 1)png_set_filter(write_ptr,0,PNG_FILTER_SUB);
-      else if(filter_method == 2)png_set_filter(write_ptr,0,PNG_FILTER_UP);
-      else if(filter_method == 3)png_set_filter(write_ptr,0,PNG_FILTER_AVG);
-      else if(filter_method == 4)png_set_filter(write_ptr,0,PNG_FILTER_PAETH);
-      else if(filter_method == 5)png_set_filter(write_ptr,0,PNG_ALL_FILTERS);
+      if     (filter_type == 0)png_set_filter(write_ptr,0,PNG_FILTER_NONE);
+      else if(filter_type == 1)png_set_filter(write_ptr,0,PNG_FILTER_SUB);
+      else if(filter_type == 2)png_set_filter(write_ptr,0,PNG_FILTER_UP);
+      else if(filter_type == 3)png_set_filter(write_ptr,0,PNG_FILTER_AVG);
+      else if(filter_type == 4)png_set_filter(write_ptr,0,PNG_FILTER_PAETH);
+      else if(filter_type == 5)png_set_filter(write_ptr,0,PNG_ALL_FILTERS);
       else                       png_set_filter(write_ptr,0,PNG_FILTER_NONE);
 
 
@@ -3464,7 +3633,7 @@ main(int argc, char *argv[])
 
       {
       /* check for sufficient memory: we need 2*zlib_window
-         and, if filter_method == 5, 4*rowbytes in separate allocations.
+         and, if filter_type == 5, 4*rowbytes in separate allocations.
          If it's not enough we can drop the "average" filter and
          we can reduce the zlib_window for writing.  We can't change
          the input zlib_window because the input file might have
@@ -3766,6 +3935,8 @@ main(int argc, char *argv[])
       if(nosave)
          break;
 
+      first_trial=0;
+
       if (nosave == 0)
       {
          png_debug(0, "Opening file for length measurement\n");
@@ -3789,11 +3960,10 @@ main(int argc, char *argv[])
          {
          fprintf(STDERR,
          "   IDAT length with method %d (fm %d zl %d zs %d)= %8lu\n",
-             trial,filter_method,zlib_level,z_strategy,idat_length[trial]);
+             trial,filter_type,zlib_level,z_strategy,idat_length[trial]);
          fflush(STDERR);
          }
 
-         first_trial=0;
       } /* end of trial-loop */
 
       if (fpin)
@@ -3847,6 +4017,10 @@ main(int argc, char *argv[])
             free(png_row_filters); png_row_filters=NULL;
          }
          if(verbose > 0) show_result();
+#ifdef PNG_iCCP_SUPPORTED
+         if(iccp_length)
+            free(iccp_text);
+#endif
          if(pngcrush_must_exit)
             exit(0);
          return(0);
@@ -3874,6 +4048,7 @@ measure_idats(FILE *fpin)
 #else
    png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
 #endif
+
    png_set_sig_bytes(read_ptr, 0);
    measured_idat_length=png_measure_idat(read_ptr);
    P2("measure_idats: IDAT length=%lu\n",measured_idat_length);
@@ -3898,7 +4073,6 @@ png_measure_idat(png_structp png_ptr)
    /* Copyright (C) 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
       See notice in pngcrush.c for conditions of use and distribution */
    png_uint_32 sum_idat_length=0;
-   png_debug(1, "in png_read_info\n");
 
    {
       png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -3909,7 +4083,7 @@ png_measure_idat(png_structp png_ptr)
       if (png_sig_cmp(png_signature, 0, 8))
       {
          if (png_sig_cmp(png_signature, 0, 4))
-            png_error(png_ptr, "Not a PNG file");
+            png_error(png_ptr, "Not a PNG file..");
          else
             png_error(png_ptr, "PNG file corrupted by ASCII conversion");
       }
@@ -3927,7 +4101,11 @@ png_measure_idat(png_structp png_ptr)
       PNG_IDAT;
       PNG_IEND;
       PNG_IHDR;
+#ifdef PNG_iCCP_SUPPORTED
       PNG_iCCP;
+#else
+      const png_byte png_iCCP[5]={105, 67, 67, 80, '\0'};
+#endif
 #endif
 #endif
       png_byte chunk_name[5];
@@ -3970,6 +4148,7 @@ png_measure_idat(png_structp png_ptr)
          input_color_type=buffer[9];
       }
 
+#ifdef PNG_iCCP_SUPPORTED
       /* check for bad photoshop iccp chunk */
 #ifdef PNG_UINT_IDAT
       if (png_get_uint_32(chunk_name) == PNG_UINT_iCCP)
@@ -3977,6 +4156,12 @@ png_measure_idat(png_structp png_ptr)
       if (!png_memcmp(chunk_name, png_iCCP, 4))
 #endif
       {
+        /* Check for bad Photoshop iCCP chunk.  Libpng will reject the
+         * bad chunk because the Adler-32 bytes are missing, but we check
+         * here to see if it's really the sRGB profile, and if so, set the
+         * "intent" flag and gamma so pngcrush will write an sRGB chunk
+         * and a gamma chunk.
+         */
          if (length == 2615)
          {
              png_crc_read(png_ptr, buffer, 22);
@@ -3997,6 +4182,7 @@ png_measure_idat(png_structp png_ptr)
              }
          }
       }
+#endif
 
       png_crc_finish(png_ptr, length);
 
@@ -4016,8 +4202,9 @@ count_colors(FILE *fpin)
 {
    /* Copyright (C) 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
       See notice in pngcrush.c for conditions of use and distribution */
-   int bit_depth, color_type, interlace_type, filter_type, compression_type;
-   png_uint_32 rowbytes, channels;
+   int bit_depth, color_type, interlace_method, filter_method, compression_method;
+   png_uint_32 rowbytes;
+   volatile png_uint_32 channels;
 
    int i;
    int pass, num_pass;
@@ -4025,6 +4212,7 @@ count_colors(FILE *fpin)
    volatile int result, hashmiss, hashinserts;
 
    png_uint_32 rgba_frequency[257];
+
    png_uint_32 rgba_hi[257]; /* Actually contains ARGB not RGBA */
 #if 0
    png_uint_32 rgba_lo[257]; /* Low bytes of ARGB in 16-bit PNGs */
@@ -4053,7 +4241,9 @@ count_colors(FILE *fpin)
 
    num_rgba=0;
    for (i=0; i<257; i++)
+   {
       rgba_frequency[i]=0;
+   }
 
    P2("Checking alphas:\n");
    png_debug(0, "Allocating read structure\n");
@@ -4075,10 +4265,12 @@ count_colors(FILE *fpin)
 
 #ifdef USE_HASHCODE
    int hash[16385];
+#endif
+
+#ifdef USE_HASHCODE
    for (i=0; i<16385; i++)
       hash[i]=-1;
 #endif
-
    end_info_ptr = NULL;
 
 #if !defined(PNG_NO_STDIO)
@@ -4087,6 +4279,20 @@ count_colors(FILE *fpin)
    png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
 #endif
 
+   {
+      png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+
+      png_read_data(read_ptr, png_signature, 8);
+      png_set_sig_bytes(read_ptr, 8);
+
+      if (png_sig_cmp(png_signature, 0, 8))
+      {
+         if (png_sig_cmp(png_signature, 0, 4))
+            png_error(read_ptr, "Not a PNG file.");
+         else
+            png_error(read_ptr, "PNG file corrupted by ASCII conversion");
+      }
+   }
    png_read_info(read_ptr, read_info_ptr);
 
 #ifdef PNG_CRC_QUIET_USE
@@ -4094,7 +4300,7 @@ count_colors(FILE *fpin)
 #endif
 
    png_get_IHDR(read_ptr, read_info_ptr, &width, &height, &bit_depth,
-             &color_type, &interlace_type, &compression_type, &filter_type);
+             &color_type, &interlace_method, &compression_method, &filter_method);
 
    if (color_type == 2)
       channels = 3;
@@ -4106,11 +4312,11 @@ count_colors(FILE *fpin)
       channels=1;
 
    if(color_type == 0 || color_type == 3 || color_type == 4)
-      reduce_to_gray = 0;
+      reduce_to_gray = 1;
 
    if(bit_depth == 8)
    {
-      if(interlace_type)
+      if(interlace_method)
          num_pass=7;
       else
          num_pass = 1;
@@ -4126,7 +4332,7 @@ count_colors(FILE *fpin)
          png_uint_32 pass_height, pass_width, y;
          png_debug(0, "\nBegin Pass\n");
 
-         if (interlace_type)
+         if (interlace_method)
          {
             pass_height = (height - png_pass_ystart[pass]
                        + png_pass_yinc[pass] - 1) / png_pass_yinc[pass];
@@ -4143,7 +4349,8 @@ count_colors(FILE *fpin)
          {
             png_uint_32 x;
             png_read_row(read_ptr, row_buf, (png_bytep)NULL);
-            if(result < 2 || it_is_opaque || reduce_to_gray)
+            if(result < 2 || it_is_opaque || 
+                 reduce_to_gray)
             {
               if(color_type==2)
               {
@@ -4160,6 +4367,11 @@ count_colors(FILE *fpin)
                    if(reduce_to_gray &&
                      ((*(rp)) != (*(rp+1)) || (*(rp)) != (*(rp+2))))
                         reduce_to_gray=0;
+
+                   if (result > 1 || !it_is_opaque)
+                      continue;
+
+
 #ifdef USE_HASHCODE
                    /*
                     *      R      G      B     mask
@@ -4242,6 +4454,9 @@ count_colors(FILE *fpin)
                         reduce_to_gray=0;
                    if(it_is_opaque && (*(rp+3)) != 255)
                       it_is_opaque=0;
+
+                   if (result > 1)
+                      continue;
 #ifdef USE_HASHCODE
                    /*
                     *  A     R     G    B    mask
@@ -4384,8 +4599,6 @@ count_colors(FILE *fpin)
               }
               else /* other color type */
               {
-                  /* to do: check color type 3 for max sample that is present
-                     and reduce palette if possible */
                   result=2;
               }
             }
@@ -4436,14 +4649,30 @@ count_colors(FILE *fpin)
         P2 ("hashcode misses=%d, inserts=%d\n",hashmiss,
            hashinserts);
       }
-   if(reduce_to_gray)
-     P1 ("The truecolor image is all gray and will be reduced.\n");
    if(color_type == 0 || color_type == 2)
      it_is_opaque=0;
-   if(it_is_opaque)
-     P1 ("The image is opaque and the alpha channel will be removed.\n");
+   if(reduction_ok)
+   {
+     if(reduce_to_gray)
+        P1 ("The truecolor image is all gray and will be reduced.\n");
+     if(it_is_opaque)
+       P1 ("The image is opaque and the alpha channel will be removed.\n");
+   }
+   else
+   {
+     if(reduce_to_gray)
+        P1 ("The truecolor image is all gray and could be reduced.\n");
+     if(it_is_opaque)
+       P1 ("The image is opaque and the alpha channel could be removed.\n");
+     if (reduce_to_gray || it_is_opaque)
+       P1 ("Rerun pngcrush with the \"-reduce\" option to do so.\n");
+     reduce_to_gray = 0;
+     it_is_opaque = 0;
+
+   }
    P2 ("Finished checking alphas, result=%d\n",result);
    }
+
    ret=result;
    return (ret);
 }
