@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.11beta2 - April 11, 2001
+ * libpng 1.0.11beta3 - April 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -155,6 +155,11 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
       png_ptr->dither_index = (png_bytep)png_malloc(png_ptr,
          (png_uint_32)(num_palette * sizeof (png_byte)));
+      if (png_ptr->dither_index == (png_bytep)NULL)
+      {
+         png_warning (png_ptr, "Malloc of dither index failed");
+         return;
+      }
       for (i = 0; i < num_palette; i++)
          png_ptr->dither_index[i] = (png_byte)i;
    }
@@ -172,6 +177,12 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
          /* initialize an array to sort colors */
          sort = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_palette
             * sizeof (png_byte)));
+         if (sort == (png_bytep)NULL)
+         {
+            png_warning (png_ptr, "Malloc of sort array for dither failed");
+            png_free (png_ptr, png_ptr->dither_index);
+            return;
+         }
 
          /* initialize the sort array */
          for (i = 0; i < num_palette; i++)
@@ -302,6 +313,14 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             (png_uint_32)(num_palette * sizeof (png_byte)));
          palette_to_index = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)(num_palette * sizeof (png_byte)));
+         if (index_to_palette == (png_bytep)NULL || palette_to_index ==
+            (png_bytep)NULL)
+         {
+            png_warning (png_ptr, "Malloc of index array for dither failed");
+            png_free (png_ptr, index_to_palette);
+            png_free (png_ptr, png_ptr->dither_index);
+            return;
+         }
 
          /* initialize the sort array */
          for (i = 0; i < num_palette; i++)
@@ -312,6 +331,14 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
          hash = (png_dsortpp)png_malloc(png_ptr, (png_uint_32)(769 *
             sizeof (png_dsortp)));
+         if (hash == (png_dsortpp)NULL)
+         {
+            png_warning (png_ptr, "Malloc of hash array for dither failed");
+            png_free (png_ptr, palette_to_index);
+            png_free (png_ptr, index_to_palette);
+            png_free (png_ptr, png_ptr->dither_index);
+            return;
+         }
          for (i = 0; i < 769; i++)
             hash[i] = NULL;
 /*         png_memset(hash, 0, 769 * sizeof (png_dsortp)); */
@@ -346,10 +373,13 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
                      t = (png_dsortp)png_malloc(png_ptr, (png_uint_32)(sizeof
                          (png_dsort)));
+                     if (t != (png_dsortp)NULL)
+                     {
                      t->next = hash[d];
                      t->left = (png_byte)i;
                      t->right = (png_byte)j;
                      hash[d] = t;
+                     }
                   }
                }
             }
@@ -456,16 +486,25 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
       png_ptr->palette_lookup = (png_bytep )png_malloc(png_ptr,
          (png_uint_32)(num_entries * sizeof (png_byte)));
-
-      png_memset(png_ptr->palette_lookup, 0, num_entries * sizeof (png_byte));
+      if (png_ptr->palette_lookup == (png_bytep)NULL)
+      {
+         png_warning(png_ptr, "Malloc of palette_lookup for dither failed");
+      }
+      else
+        png_memset(png_ptr->palette_lookup, 0, num_entries * sizeof (png_byte));
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
          sizeof(png_byte)));
-
-      png_memset(distance, 0xff, num_entries * sizeof(png_byte));
-
-      for (i = 0; i < num_palette; i++)
+      if (distance == (png_bytep)NULL)
       {
+         png_warning(png_ptr, "Malloc of distance array for dither failed");
+      }
+      else
+      {
+        png_memset(distance, 0xff, num_entries * sizeof(png_byte));
+
+        for (i = 0; i < num_palette; i++)
+        {
          int ir, ig, ib;
          int r = (palette[i].red >> (8 - PNG_DITHER_RED_BITS));
          int g = (palette[i].green >> (8 - PNG_DITHER_GREEN_BITS));
@@ -496,11 +535,12 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                      png_ptr->palette_lookup[d_index] = (png_byte)i;
                   }
                }
-            }
-         }
-      }
+             }
+           }
+        }
 
       png_free(png_ptr, distance);
+      }
    }
 }
 #endif
@@ -3858,6 +3898,11 @@ png_build_gamma_table(png_structp png_ptr)
 
       png_ptr->gamma_table = (png_bytep)png_malloc(png_ptr,
          (png_uint_32)256);
+      if (png_ptr->gamma_table == (png_bytep)NULL)
+      {
+         png_warning (png_ptr, "Malloc of gamma table failed");
+         return;
+      }
 
       for (i = 0; i < 256; i++)
       {
@@ -3874,6 +3919,11 @@ png_build_gamma_table(png_structp png_ptr)
 
          png_ptr->gamma_to_1 = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)256);
+         if (png_ptr->gamma_to_1 == (png_bytep)NULL)
+         {
+         png_warning (png_ptr, "Malloc of gamma_to_1 table failed");
+         return;
+         }
 
          for (i = 0; i < 256; i++)
          {
@@ -3884,6 +3934,11 @@ png_build_gamma_table(png_structp png_ptr)
 
          png_ptr->gamma_from_1 = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)256);
+         if (png_ptr->gamma_from_1 == (png_bytep)NULL)
+         {
+         png_warning (png_ptr, "Malloc of gamma_from_1 table failed");
+         return;
+         }
 
          if(png_ptr->screen_gamma > 0.000001)
             g = 1.0 / png_ptr->screen_gamma;
@@ -3946,6 +4001,11 @@ png_build_gamma_table(png_structp png_ptr)
 
       png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
          (png_uint_32)(num * sizeof (png_uint_16p)));
+      if (png_ptr->gamma_16_table == (png_uint_16pp)NULL)
+      {
+         png_warning (png_ptr, "Malloc of gamma_16 table failed");
+         return;
+      }
 
       if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
       {
@@ -3956,6 +4016,11 @@ png_build_gamma_table(png_structp png_ptr)
          {
             png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
                (png_uint_32)(256 * sizeof (png_uint_16)));
+           if (png_ptr->gamma_16_table[i] == (png_uint_16p)NULL)
+           {
+              png_warning (png_ptr, "Malloc of gamma_16 table entry failed");
+              return;
+           }
          }
 
          g = 1.0 / g;
@@ -3986,6 +4051,11 @@ png_build_gamma_table(png_structp png_ptr)
          {
             png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
                (png_uint_32)(256 * sizeof (png_uint_16)));
+            if (png_ptr->gamma_16_table[i] == (png_uint_16p)NULL)
+            {
+              png_warning (png_ptr, "Malloc of gamma_16 table entry failed");
+              return;
+            }
 
             ig = (((png_uint_32)i * (png_uint_32)png_gamma_shift[shift]) >> 4);
             for (j = 0; j < 256; j++)
@@ -4006,11 +4076,22 @@ png_build_gamma_table(png_structp png_ptr)
 
          png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
             (png_uint_32)(num * sizeof (png_uint_16p )));
+         if (png_ptr->gamma_16_to_1 == (png_uint_16pp)NULL)
+         {
+            png_warning (png_ptr, "Malloc of gamma_16_to_1 table failed");
+            return;
+         }
 
          for (i = 0; i < num; i++)
          {
             png_ptr->gamma_16_to_1[i] = (png_uint_16p)png_malloc(png_ptr,
                (png_uint_32)(256 * sizeof (png_uint_16)));
+            if (png_ptr->gamma_16_to_1[i] == (png_uint_16p)NULL)
+            {
+               png_warning (png_ptr,
+                 "Malloc of gamma_16_to_1 table entry failed");
+               return;
+            }
 
             ig = (((png_uint_32)i *
                (png_uint_32)png_gamma_shift[shift]) >> 4);
@@ -4029,11 +4110,23 @@ png_build_gamma_table(png_structp png_ptr)
 
          png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
             (png_uint_32)(num * sizeof (png_uint_16p)));
+         if (png_ptr->gamma_16_from_1 == (png_uint_16pp)NULL)
+         {
+            png_warning (png_ptr,
+              "Malloc of gamma_16_from_1 table failed");
+            return;
+         }
 
          for (i = 0; i < num; i++)
          {
             png_ptr->gamma_16_from_1[i] = (png_uint_16p)png_malloc(png_ptr,
                (png_uint_32)(256 * sizeof (png_uint_16)));
+            if (png_ptr->gamma_16_from_1[i] == (png_uint_16p)NULL)
+            {
+               png_warning (png_ptr,
+                 "Malloc of gamma_16_from_1 table failed");
+               return;
+            }
 
             ig = (((png_uint_32)i *
                (png_uint_32)png_gamma_shift[shift]) >> 4);

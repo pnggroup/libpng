@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.11beta2 - April 11, 2001
+ * libpng 1.0.11beta3 - April 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -143,14 +143,22 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
    if (info_ptr->num_palette == 0)
+   {
        png_warning(png_ptr,
-		   "Palette size 0, hIST allocation skipped.");
+          "Palette size 0, hIST allocation skipped.");
+       return;
+   }
 
 #ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
 #endif
    png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
       (png_uint_32)(info_ptr->num_palette * sizeof (png_uint_16)));
+   if (png_ptr->hist == (png_uint_16p)NULL)
+   {
+      png_warning (png_ptr, "Could not allocate memory for histogram");
+      return;
+   }
 
    for (i = 0; i < info_ptr->num_palette; i++)
        png_ptr->hist[i] = hist[i];
@@ -292,6 +300,11 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    length = png_strlen(purpose) + 1;
    png_debug1(3, "allocating purpose for info (%lu bytes)\n", length);
    info_ptr->pcal_purpose = (png_charp)png_malloc(png_ptr, length);
+   if (info_ptr->pcal_purpose == (png_charp)NULL)
+   {
+      png_warning (png_ptr, "Could not allocate memory for pCAL");
+      return;
+   }
    png_memcpy(info_ptr->pcal_purpose, purpose, (png_size_t)length);
 
    png_debug(3, "storing X0, X1, type, and nparams in info\n");
@@ -303,10 +316,24 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    length = png_strlen(units) + 1;
    png_debug1(3, "allocating units for info (%lu bytes)\n", length);
    info_ptr->pcal_units = (png_charp)png_malloc(png_ptr, length);
+   if (info_ptr->pcal_units == (png_charp)NULL)
+   {
+      png_free (png_ptr, info_ptr->pcal_purpose);
+      png_warning (png_ptr, "Could not allocate memory for pCAL units");
+      return;
+   }
    png_memcpy(info_ptr->pcal_units, units, (png_size_t)length);
 
    info_ptr->pcal_params = (png_charpp)png_malloc(png_ptr,
       (png_uint_32)((nparams + 1) * sizeof(png_charp)));
+   if (info_ptr->pcal_params == (png_charpp)NULL)
+   {
+      png_free (png_ptr, info_ptr->pcal_purpose);
+      png_free (png_ptr, info_ptr->pcal_units);
+      png_warning (png_ptr, "Could not allocate memory for pCAL params");
+      return;
+   }
+
    info_ptr->pcal_params[nparams] = NULL;
 
    for (i = 0; i < nparams; i++)
@@ -314,7 +341,13 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
       length = png_strlen(params[i]) + 1;
       png_debug2(3, "allocating parameter %d for info (%lu bytes)\n", i, length);
       info_ptr->pcal_params[i] = (png_charp)png_malloc(png_ptr, length);
-      png_memcpy(info_ptr->pcal_params[i], params[i], (png_size_t)length);
+      if (info_ptr->pcal_params[i] == (png_charp)NULL)
+      {
+         nparams=i;
+         png_warning (png_ptr, "Could not allocate memory for pCAL params");
+      }
+      else
+         png_memcpy(info_ptr->pcal_params[i], params[i], (png_size_t)length);
    }
 
    info_ptr->valid |= PNG_INFO_pCAL;
@@ -357,12 +390,14 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    length = png_strlen(swidth) + 1;
    png_debug1(3, "allocating unit for info (%d bytes)\n", length);
    info_ptr->scal_s_width = (png_charp)png_malloc(png_ptr, length);
-   png_memcpy(info_ptr->scal_s_width, swidth, (png_size_t)length);
+   if (info_ptr->scal_s_width != (png_charp)NULL)
+      png_memcpy(info_ptr->scal_s_width, swidth, (png_size_t)length);
 
    length = png_strlen(sheight) + 1;
    png_debug1(3, "allocating unit for info (%d bytes)\n", length);
-   info_ptr->scal_s_width = (png_charp)png_malloc(png_ptr, length);
-   png_memcpy(info_ptr->scal_s_height, sheight, (png_size_t)length);
+   info_ptr->scal_s_height = (png_charp)png_malloc(png_ptr, length);
+   if (info_ptr->scal_s_height != (png_charp)NULL)
+      png_memcpy(info_ptr->scal_s_height, sheight, (png_size_t)length);
 
    info_ptr->valid |= PNG_INFO_sCAL;
 #ifdef PNG_FREE_ME_SUPPORTED
@@ -408,6 +443,11 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
 #endif
    png_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)num_palette,
       sizeof (png_color));
+   if (png_ptr->palette == (png_colorp)NULL)
+   {
+      png_warning(png_ptr, "Unable to allocate palette");
+      return;
+   }
    png_memcpy(png_ptr->palette, palette, num_palette * sizeof (png_color));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
@@ -532,8 +572,19 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
       return;
 
    new_iccp_name = (png_charp)png_malloc(png_ptr, png_strlen(name)+1);
+   if (new_iccp_name == (png_charp)NULL) 
+   {
+     png_warning (png_ptr, "Could not allocate memory for ICC profile name");
+     return;
+   }
    png_strcpy(new_iccp_name, name);
    new_iccp_profile = (png_charp)png_malloc(png_ptr, proflen);
+   if (new_iccp_profile == (png_charp)NULL) 
+   {
+     png_warning (png_ptr, "Could not allocate memory for ICC profile");
+     png_free (png_ptr, new_iccp_name);
+     return;
+   }
    png_memcpy(new_iccp_profile, profile, (png_size_t)proflen);
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_ICCP, 0);
@@ -579,6 +630,12 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          old_text = info_ptr->text;
          info_ptr->text = (png_textp)png_malloc(png_ptr,
             (png_uint_32)(info_ptr->max_text * sizeof (png_text)));
+         if (info_ptr->text == (png_textp)NULL)
+         {
+            png_warning (png_ptr, "Could not allocate memory for text");
+            info_ptr->text = old_text;
+            return;
+         }
          png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max *
             sizeof(png_text)));
          png_free(png_ptr, old_text);
@@ -589,6 +646,11 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          info_ptr->num_text = 0;
          info_ptr->text = (png_textp)png_malloc(png_ptr,
             (png_uint_32)(info_ptr->max_text * sizeof (png_text)));
+         if (info_ptr->text == (png_textp)NULL)
+         {
+            png_warning (png_ptr, "Could not allocate memory for text");
+            return;
+         }
 #ifdef PNG_FREE_ME_SUPPORTED
          info_ptr->free_me |= PNG_FREE_TEXT;
 #endif
@@ -650,6 +712,11 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
       textp->key = (png_charp)png_malloc(png_ptr,
          (png_uint_32)(key_len + text_length + lang_len + lang_key_len + 4));
+      if (textp->key == (png_charp)NULL)
+      {
+         png_warning (png_ptr, "Could not allocate memory for text pointer");
+         return;
+      }
       png_debug2(2, "Allocated %d bytes at %x in png_set_text\n",
          key_len + lang_len + lang_key_len + text_length + 4, (int)textp->key);
 
@@ -737,6 +804,11 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 #endif
        png_ptr->trans = info_ptr->trans = (png_bytep)png_malloc(png_ptr,
            num_trans);
+       if (png_ptr->trans == (png_bytep)NULL)
+       {
+          png_warning (png_ptr, "Could not allocate memory for tRNS array");
+          return;
+       }
        png_memcpy(info_ptr->trans, trans, num_trans);
 #ifdef PNG_FREE_ME_SUPPORTED
        info_ptr->free_me |= PNG_FREE_TRNS;
@@ -767,6 +839,11 @@ png_set_sPLT(png_structp png_ptr,
 
     np = (png_sPLT_tp)png_malloc(png_ptr,
         (info_ptr->splt_palettes_num + nentries) * sizeof(png_sPLT_t));
+    if (np == (png_sPLT_tp)NULL)
+    {
+       png_warning (png_ptr, "Could not allocate memory for sPLT");
+       return;
+    }
 
     png_memcpy(np, info_ptr->splt_palettes,
            info_ptr->splt_palettes_num * sizeof(png_sPLT_t));
@@ -779,14 +856,22 @@ png_set_sPLT(png_structp png_ptr,
         png_sPLT_tp from = entries + i;
 
         to->name = (png_charp)png_malloc(png_ptr,
-                                        png_strlen(from->name) + 1);
+            png_strlen(from->name) + 1);
         png_strcpy(to->name, from->name);
         to->entries = (png_sPLT_entryp)png_malloc(png_ptr,
-                                 from->nentries * sizeof(png_sPLT_t));
-        png_memcpy(to->entries, from->entries,
+            from->nentries * sizeof(png_sPLT_t));
+        if (to->entries == (png_sPLT_entryp)NULL)
+        {
+           png_warning(png_ptr, "Could not allocate memory for sPLT entry");
+           nentries=i;
+        }
+        else
+        {
+          png_memcpy(to->entries, from->entries,
                from->nentries * sizeof(png_sPLT_t));
-        to->nentries = from->nentries;
-        to->depth = from->depth;
+          to->nentries = from->nentries;
+          to->depth = from->depth;
+        }
     }
 
     info_ptr->splt_palettes = np;
@@ -812,6 +897,11 @@ png_set_unknown_chunks(png_structp png_ptr,
     np = (png_unknown_chunkp)png_malloc(png_ptr,
         (info_ptr->unknown_chunks_num + num_unknowns) *
         sizeof(png_unknown_chunk));
+    if (np == (png_unknown_chunkp)NULL)
+    {
+       png_warning (png_ptr, "Could not allocate memory for unknown chunk");
+       return;
+    }
 
     png_memcpy(np, info_ptr->unknown_chunks,
            info_ptr->unknown_chunks_num * sizeof(png_unknown_chunk));
@@ -825,11 +915,19 @@ png_set_unknown_chunks(png_structp png_ptr,
 
         png_strcpy((png_charp)to->name, (png_charp)from->name);
         to->data = (png_bytep)png_malloc(png_ptr, from->size);
-        png_memcpy(to->data, from->data, from->size);
-        to->size = from->size;
+        if (to->data == (png_bytep)NULL)
+        {
+           png_warning(png_ptr, "Could not allocate memory for unknown entry");
+           num_unknowns=i;
+        }
+        else
+        {
+          png_memcpy(to->data, from->data, from->size);
+          to->size = from->size;
 
-        /* note our location in the read or write sequence */
-        to->location = (png_byte)(png_ptr->mode & 0xff);
+          /* note our location in the read or write sequence */
+          to->location = (png_byte)(png_ptr->mode & 0xff);
+        }
     }
 
     info_ptr->unknown_chunks = np;

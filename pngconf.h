@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.11beta2 - April 11, 2001
+ * libpng 1.0.11beta3 - April 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)

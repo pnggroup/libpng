@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.11beta2 - April 11, 2001
+ * libpng 1.0.11beta3 - April 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -512,6 +512,8 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
       (png_uint_32)png_ptr->zbuf_size);
+   if (png_ptr->zbuf == (png_bytep)NULL)
+      png_error(png_ptr, "Could not allocate zbuf for writing");
 
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
@@ -581,6 +583,8 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
       (png_uint_32)png_ptr->zbuf_size);
+   if (png_ptr->zbuf == (png_bytep)NULL)
+      png_error(png_ptr, "Could not allocate zbuf for writing");
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
@@ -1029,6 +1033,8 @@ png_set_filter(png_structp png_ptr, int method, int filters)
          {
             png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
               (png_ptr->rowbytes + 1));
+           if (png_ptr->sub_row == (png_bytep)NULL)
+              png_error(png_ptr, "Could not allocate sub_row");
             png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
          }
 
@@ -1043,6 +1049,10 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             {
                png_ptr->up_row = (png_bytep)png_malloc(png_ptr,
                   (png_ptr->rowbytes + 1));
+               if (png_ptr->up_row == (png_bytep)NULL)
+               {
+                 png_error(png_ptr, "Could not allocate sub_row");
+               }
                png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
             }
          }
@@ -1058,6 +1068,8 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             {
                png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
                   (png_ptr->rowbytes + 1));
+               if (png_ptr->avg_row == (png_bytep)NULL)
+                  png_error(png_ptr, "Could not allocate avg_row");
                png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
             }
          }
@@ -1074,6 +1086,8 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             {
                png_ptr->paeth_row = (png_bytep)png_malloc(png_ptr,
                   (png_ptr->rowbytes + 1));
+               if (png_ptr->paeth_row == (png_bytep)NULL)
+                 png_error(png_ptr, "Could not allocate avg_row");
                png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
             }
          }
@@ -1129,10 +1143,13 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
          png_ptr->prev_filters = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)(sizeof(png_byte) * num_weights));
 
-         /* To make sure that the weighting starts out fairly */
-         for (i = 0; i < num_weights; i++)
+         if (png_ptr->prev_filters != (png_bytep)NULL)
          {
-            png_ptr->prev_filters[i] = 255;
+           /* To make sure that the weighting starts out fairly */
+           for (i = 0; i < num_weights; i++)
+           {
+              png_ptr->prev_filters[i] = 255;
+           }
          }
       }
 
@@ -1143,12 +1160,22 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 
          png_ptr->inv_filter_weights = (png_uint_16p)png_malloc(png_ptr,
             (png_uint_32)(sizeof(png_uint_16) * num_weights));
-
-         for (i = 0; i < num_weights; i++)
+         if (png_ptr->inv_filter_weights == (png_uint_16p)NULL)
          {
-            png_ptr->inv_filter_weights[i] =
-            png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
+            png_free(png_ptr, png_ptr->filter_weights);
+            png_ptr->filter_weights = NULL;
          }
+         if (png_ptr->filter_weights != (png_uint_16p)NULL &&
+             png_ptr->inv_filter_weights != (png_uint_16p)NULL)
+         {
+           for (i = 0; i < num_weights; i++)
+           {
+              png_ptr->inv_filter_weights[i] =
+              png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
+           }
+         }
+         else
+            num_weights=0;
       }
 
       for (i = 0; i < num_weights; i++)

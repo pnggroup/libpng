@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.11beta2 - April 11, 2001
+ * libpng 1.0.11beta3 - April 15, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -115,6 +115,8 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
      (png_uint_32)png_ptr->zbuf_size);
+   if (png_ptr->zbuf == (png_bytep)NULL)
+      png_error(png_ptr, "Could not allocate zbuf");
    png_ptr->zstream.zalloc = png_zalloc;
    png_ptr->zstream.zfree = png_zfree;
    png_ptr->zstream.opaque = (voidpf)png_ptr;
@@ -197,6 +199,8 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
      (png_uint_32)png_ptr->zbuf_size);
+   if (png_ptr->zbuf == (png_bytep)NULL)
+      png_error(png_ptr, "Could not allocate zbuf");
    png_ptr->zstream.zalloc = png_zalloc;
    png_ptr->zstream.zfree = png_zfree;
    png_ptr->zstream.opaque = (voidpf)png_ptr;
@@ -715,7 +719,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.11beta2
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.11beta3
  */
 
 void PNGAPI
@@ -764,7 +768,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.11beta2
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.11beta3
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -1305,7 +1309,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
    /* Optional call to gamma correct and add the background to the palette
     * and update info structure.  REQUIRED if you are expecting libpng to
-    * update the palette for you (ie you selected such a transform above).
+    * update the palette for you (i.e., you selected such a transform above).
     */
    png_read_update_info(png_ptr, info_ptr);
 
@@ -1317,13 +1321,26 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    if(info_ptr->row_pointers == NULL)
    {
       info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
-                                         info_ptr->height * sizeof(png_bytep));
+         info_ptr->height * sizeof(png_bytep));
+      if (info_ptr->row_pointers)
+         png_error(png_ptr, "png_read_png could not allocate row pointers");
 #ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_ROWS;
 #endif
       for (row = 0; row < (int)info_ptr->height; row++)
+      {
          info_ptr->row_pointers[row] = (png_bytep)png_malloc(png_ptr,
             png_get_rowbytes(png_ptr, info_ptr));
+         if (info_ptr->row_pointers)
+         {
+            int allocated_row;
+            for (allocated_row=0; allocated_row < row; allocated_row++)
+               png_free(png_ptr, info_ptr->row_pointers[allocated_row]);
+            if (info_ptr->free_me & !(PNG_FREE_ROWS))
+               png_free (png_ptr, info_ptr->row_pointers);
+            png_error(png_ptr, "png_read_png could not allocate row pointer");
+         }
+      }
    }
 
    png_read_image(png_ptr, info_ptr->row_pointers);

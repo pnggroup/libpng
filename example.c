@@ -603,7 +603,10 @@ void write_png(char *file_name /* , ... other image information ... */)
       PNG_INTERLACE_????, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
    /* set the palette if there is one.  REQUIRED for indexed-color images */
-   palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH * sizeof (png_color));
+   palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH
+             * sizeof (png_color));
+   if (palette == NULL)
+      png_error(png_ptr, "Example: malloc of palette failed");
    /* ... set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
    /* You must not free palette here, because png_set_PLTE only makes a link to

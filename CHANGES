@@ -921,6 +921,8 @@ version 1.0.11beta1 [April 3, 2001]
 version 1.0.11beta2 [April 11, 2001]
   Removed PNGAPI from several functions whose prototypes did not have PNGAPI.
   Updated scripts/pngos2.def
+version 1.0.11beta3 [April 15, 2001]
+  Added checking the results of many instances of png_malloc() for NULL
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

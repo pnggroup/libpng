@@ -21,3 +21,8 @@ Known bugs in libpng-1.0.10
    involved are all either deprecated or intended only for internal use.
 
    STATUS: PNGAPI was removed from the C code in libpng-1.0.11beta2.
+
+4. April 14, 2001: Many instances of png_malloc() are not followed by
+   a check to make sure it didn't return NULL.
+
+   STATUS: tests were added in libpng-1.0.11beta3.
