@@ -267,7 +267,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     */
    if (color_type & PNG_COLOR_MASK_COLOR)
    {
-      png_uint_32 num_palette;
+      int num_palette;
       png_colorp palette;
 
       /* This reduces the image to the application supplied palette */

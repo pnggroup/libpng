@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.9beta6 - December 18, 2000
+ * libpng 1.0.9rc1 - December 23, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -286,10 +286,8 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       png_warning(png_ptr, "Unknown zTXt compression type");
 #endif
 
-      /* Copy what we can of the error message into the text chunk */
-      text_size = (png_size_t)(chunklength - (text - chunkdata));
-      text_size = sizeof(msg) > text_size ? text_size : sizeof(msg);
-      png_memcpy(text, msg, text_size);
+      *(chunkdata + prefix_size) = 0x00;
+      *newlength=prefix_size;
    }
 
    return chunkdata;
@@ -365,15 +363,17 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
     */
    if((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&png_ptr->mng_features_permitted)
       png_warning(png_ptr,"MNG features are not allowed in a PNG datastream\n");
-   if(!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
-      (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
-      ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
-      (color_type == PNG_COLOR_TYPE_RGB || 
-       color_type == PNG_COLOR_TYPE_RGB_ALPHA)) &&
-       filter_type != PNG_FILTER_TYPE_BASE)
-      png_error(png_ptr, "Unknown filter method in IHDR");
    if(filter_type != PNG_FILTER_TYPE_BASE)
-      png_warning(png_ptr, "Invalid filter method in IHDR");
+   {
+     if(!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+        (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
+        ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
+        (color_type == PNG_COLOR_TYPE_RGB || 
+         color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
+        png_error(png_ptr, "Unknown filter method in IHDR");
+     if(png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)
+        png_warning(png_ptr, "Invalid filter method in IHDR");
+   }
 #else
    if(filter_type != PNG_FILTER_TYPE_BASE)
       png_error(png_ptr, "Unknown filter method in IHDR");
@@ -1946,6 +1946,11 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else
    {
        comp_type = *(++text);
+       if (comp_type != PNG_TEXT_COMPRESSION_zTXt)
+       {
+          png_warning(png_ptr, "Unknown compression type in zTXt chunk");
+          comp_type = PNG_TEXT_COMPRESSION_zTXt;
+       }
        text++;        /* skip the compression_method byte */
    }
    prefix_len = text - chunkdata;

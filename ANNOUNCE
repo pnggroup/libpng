@@ -1,5 +1,5 @@
 
-Libpng 1.0.9beta6 - December 18, 2000
+Libpng 1.0.9rc1 - December 23, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -39,11 +39,8 @@ Changes since the last public release (1.0.8):
   Added new PNG_HAVE_PNG_SIGNATURE bit to png_ptr->mode and use it to
     help prevent applications from using MNG features in PNG datastreams.
   Revised libpng.3/libpng.txt.  Changed "filter type" to "filter method".
-
-Send comments/corrections/commendations to
-png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
-
-Glenn R-P
+  Fixed error handling of unknown compression type in png_decompress_chunk().
+  In pngconf.h, define __cdecl when _MSC_VER is defined.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

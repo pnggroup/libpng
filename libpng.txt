@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.9beta6 - December 18, 2000
+ libpng version 1.0.9rc1 - December 23, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -962,7 +962,7 @@ histogram, it may not do as good a job.
       if (png_get_valid(png_ptr, info_ptr,
          PNG_INFO_PLTE))
       {
-         png_color_16p histogram;
+         png_uint_16p histogram;
 
          png_get_hIST(png_ptr, info_ptr,
             &histogram);
@@ -2615,8 +2615,11 @@ png_permit_mng_features() function:
 
 It is an error to use this function when reading or writing a standalone
 PNG file with the PNG 8-byte signature.  The PNG datastream must be wrapped
-in a MNG datastream (as a minimum, it must have the MNG 8-byte signature
-and the MHDR and MEND chunks).
+in a MNG datastream.  As a minimum, it must have the MNG 8-byte signature
+and the MHDR and MEND chunks.  Libpng does not provide support for these
+or any other MNG chunks; your application must provide its own support for
+them.  You may wish to consider using libmng (available at
+http://www.libmng.com) instead.
 
 VII.  Changes to Libpng from version 0.88
 
@@ -2669,13 +2672,13 @@ application:
 
 VIII. Y2K Compliance in libpng
 
-December 18, 2000
+December 23, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.9beta6 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.9rc1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
