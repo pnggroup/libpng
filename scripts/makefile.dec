@@ -32,13 +32,13 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.5
+PNGMIN = 1.2.6beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
 CC=cc
 CFLAGS=-std -w1 -I$(ZLIBINC) -O # -g -DPNG_DEBUG=1
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS=-L$(ZLIBLIB) -rpath $(ZLIBLIB) libpng.a -lz -lm
 
 #RANLIB=echo
 RANLIB=ranlib
@@ -73,11 +73,11 @@ $(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
 $(LIBNAME).so.$(PNGVER): $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB)
+	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB) \
 	-soname $(LIBNAME).so.$(PNGMAJ)
 
 libpng.so.3.$(PNGMIN): $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB)
+	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB) \
 	-soname libpng.so.3
 
 pngtest: pngtest.o libpng.a

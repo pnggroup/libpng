@@ -35,13 +35,13 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 #LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng12 -lz -lm
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -lm
+LDFLAGS=-L$(ZLIBLIB) libpng.a -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.5
+PNGMIN = 1.2.6beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 

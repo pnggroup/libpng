@@ -26,14 +26,14 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 CFLAGS=-I$(ZLIBINC) $(SUN_CC_FLAGS) \
 	# $(WARNMORE) -g -DPNG_DEBUG=5
-LDFLAGS=-L. -R. $(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng12 -lz -lm
+LDFLAGS=$(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) libpng.a -lz -lm
 
 #RANLIB=ranlib
 RANLIB=echo
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.5
+PNGMIN = 1.2.6beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -138,7 +138,7 @@ install-static: install-headers libpng.a
 	(cd $(DL); ln -f -s $(LIBNAME).a libpng.a)
 
 install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
-	libpng.so.3
+	libpng.so.3.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
 	-@/bin/rm -f $(DL)/libpng.so

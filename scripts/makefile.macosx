@@ -17,11 +17,11 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.5
+PNGMIN = 1.2.6beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -current_version $(PNGVER)
+LDFLAGS=-L$(ZLIBLIB) libpng.a -lz
 
 LIBNAME=libpng12
 SHAREDLIB_POSTFIX=dylib

@@ -19,12 +19,12 @@ CC=cc
 CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
 # Caution: be sure you have built zlib with the same CFLAGS.
 CCFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS=-L$(ZLIBLIB) libpng.a -lz -lm
 
 RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.5
+PNGMIN = 1.2.6beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 

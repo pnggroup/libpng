@@ -1177,6 +1177,14 @@ version 1.2.5 and 1.0.15 [October 3, 2002]
   Revised makefile.macosx, makefile.darwin, makefile.hpgcc, and makefile.hpux,
     and makefile.aix.
   Relocated two misplaced PNGAPI lines in pngtest.c
+version 1.2.6beta1 [October 22, 2002]
+  Commented out warning about uninitialized mmx_support in pnggccrd.c.
+  Changed "IBMCPP__" flag to "__IBMCPP__" in pngconf.h.
+  Added missing backslashes in makefile.dec.
+  Fixed install-shared target dependency in makefile.32sunu.
+  Revised makefile.dec, makefile.macosx, makefile.aix, makefile sg*,
+    makefile.hp*, makefile.beos, makefile.*sunu (only affecting LDFLAGS
+    used in running pngtest).
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
