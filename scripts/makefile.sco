@@ -26,7 +26,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.3rc5
+PNGMIN = 1.2.3rc6
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -68,7 +68,7 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/libpng12"; \
+	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo cflags=\"-belf\"; \
 	echo ldflags=\"-L$(LIBPATH)\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \

@@ -15,7 +15,7 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.3rc5
+PNGMIN = 1.2.3rc6
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
@@ -94,17 +94,12 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/libpng12 -DPNG_THREAD_UNSAFE_OK \
+	echo cppflags=\"-I$(INCPATH)/$(LIBNAME) -DPNG_THREAD_UNSAFE_OK \
 	   -DPNG_USE_PNGGCCRD"; \
 	echo cflags=\"\"; \
 	echo ldflags=\"\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
-	chmod +x libpng-config
-
-	cat scripts/libpng-config.in | sed -e s\!@PREFIX@!$(prefix)! > \
-	  -e s!\#CFLAGS!-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD! \
-	  -e s!\#LIBS!-lm! > libpng-config
 	chmod +x libpng-config
 
 pnggccrd.o:	pnggccrd.c png.h pngconf.h

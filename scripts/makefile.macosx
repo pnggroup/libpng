@@ -17,7 +17,7 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.3rc5
+PNGMIN = 1.2.3rc6
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
@@ -60,15 +60,11 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/libpng12"; \
+	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo cflags=\"\"; \
 	echo ldflags=\"-L$(LIBPATH)\"; \
 	echo libs=\"-lpng12 -lz\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
-	chmod +x libpng-config
-
-	cat scripts/libpng-config.in | sed -e s\!@PREFIX@!$(prefix)! > \
-	libpng-config
 	chmod +x libpng-config
 
 libpng.a: $(OBJS)

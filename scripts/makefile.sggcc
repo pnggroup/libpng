@@ -38,7 +38,7 @@ LDSHARED=CC $(ABI) -shared
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.3rc5
+PNGMIN = 1.2.3rc6
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBS=$(LIBNAME).so.$(PNGVER)
 INCPATH=$(prefix)/include
@@ -75,7 +75,7 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/libpng12 -DPNG_USE_PNGGCCRD \
+	echo cppflags=\"-I$(INCPATH)/$(LIBNAME) -DPNG_USE_PNGGCCRD \
 		-DPNG_NO_ASSEMBLER_CODE\"; \
 	echo cflags=\"$(ABI)\"; \
 	echo ldflags=\"-L$(LIBPATH)\"; \

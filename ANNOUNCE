@@ -1,5 +1,5 @@
 
-Libpng 1.2.3rc5 - May 11, 2002
+Libpng 1.2.3rc6 - May 13, 2002
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -48,6 +48,11 @@ version 1.2.3rc5 [May 11, 2002]
   Once more restored png_zalloc and png_zfree to nonexported form.
   Restored png_default_read|write_data, png_default_flush, png_read_fill_buffer
     to nonexported form, but with PNGAPI, and removed them from module def files.
+version 1.2.3rc6 [May 13, 2002]
+  Removed "PNGAPI" from png_zalloc() and png_zfree() in png.c
+  Changed "Gz" to "Gd" in projects/msvc/libpng.dsp and zlib.dsp.
+  Removed leftover libpng-config "sed" script from four makefiles.
+  Revised libpng-config creating script in 16 makefiles.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -5,7 +5,7 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.3rc5
+PNGMIN = 1.2.3rc6
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
@@ -77,15 +77,11 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/libpng12"; \
+	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo cflags=\"\"; \
-	echo ldflags=\"-L$(LIBPATH) -Wl,-rpath,$(LIBPATH)"; \
+	echo ldflags=\"-L$(LIBPATH) -Wl,-rpath,$(LIBPATH)\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
-	chmod +x libpng-config
-
-	cat scripts/libpng-config.in | sed -e s\!@PREFIX@!$(prefix)! > \
-	  -e s!\#LIBS!-lm! > libpng-config
 	chmod +x libpng-config
 
 $(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
