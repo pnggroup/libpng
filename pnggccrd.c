@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.9beta2 - November 19, 2000
+ * libpng 1.0.9beta3 - November 23, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -198,7 +198,7 @@
  *     correctly (but 48-bit RGB just fine)
  *
  * 20000916:
- *  - fixed bug in png_read_filter_row_mmx_avg(), bpp == 2 case; three errors:  
+ *  - fixed bug in png_read_filter_row_mmx_avg(), bpp == 2 case; three errors:
  *     - "_ShiftBpp.use = 24;"      should have been   "_ShiftBpp.use = 16;"
  *     - "_ShiftRem.use = 40;"      should have been   "_ShiftRem.use = 48;"
  *     - "psllq _ShiftRem, %%mm2"   should have been   "psrlq _ShiftRem, %%mm2"
@@ -240,22 +240,22 @@ static const int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #  define _unmask         unmask
 #  define _const4         const4
 #  define _const6         const6
-#  define _mask8_0        mask8_0  
-#  define _mask16_1       mask16_1 
-#  define _mask16_0       mask16_0 
-#  define _mask24_2       mask24_2 
-#  define _mask24_1       mask24_1 
-#  define _mask24_0       mask24_0 
-#  define _mask32_3       mask32_3 
-#  define _mask32_2       mask32_2 
-#  define _mask32_1       mask32_1 
-#  define _mask32_0       mask32_0 
-#  define _mask48_5       mask48_5 
-#  define _mask48_4       mask48_4 
-#  define _mask48_3       mask48_3 
-#  define _mask48_2       mask48_2 
-#  define _mask48_1       mask48_1 
-#  define _mask48_0       mask48_0 
+#  define _mask8_0        mask8_0
+#  define _mask16_1       mask16_1
+#  define _mask16_0       mask16_0
+#  define _mask24_2       mask24_2
+#  define _mask24_1       mask24_1
+#  define _mask24_0       mask24_0
+#  define _mask32_3       mask32_3
+#  define _mask32_2       mask32_2
+#  define _mask32_1       mask32_1
+#  define _mask32_0       mask32_0
+#  define _mask48_5       mask48_5
+#  define _mask48_4       mask48_4
+#  define _mask48_3       mask48_3
+#  define _mask48_2       mask48_2
+#  define _mask48_1       mask48_1
+#  define _mask48_0       mask48_0
 #  define _FullLength     FullLength
 #  define _MMXLength      MMXLength
 #  define _dif            dif
@@ -642,7 +642,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   png_memcpy(dstptr, srcptr, rep_bytes);
                   srcptr += stride;
                   dstptr += stride;
-               } 
+               }
             } /* end of else */
 
             break;
@@ -774,7 +774,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   png_memcpy(dstptr, srcptr, rep_bytes);
                   srcptr += stride;
                   dstptr += stride;
-               } 
+               }
             } /* end of else */
 
             break;
@@ -921,7 +921,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   png_memcpy(dstptr, srcptr, rep_bytes);
                   srcptr += stride;
                   dstptr += stride;
-               } 
+               }
             } /* end of else */
 
             break;
@@ -1246,7 +1246,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   png_memcpy(dstptr, srcptr, rep_bytes);
                   srcptr += stride;
                   dstptr += stride;
-               } 
+               }
             } /* end of else */
 
             break;
@@ -1273,7 +1273,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                png_memcpy(dstptr, srcptr, rep_bytes);
                srcptr += stride;
                dstptr += stride;
-            } 
+            }
             break;
          }       // end 64 bpp
 
@@ -2095,7 +2095,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                            : "=c" (dummy_value_c),        // output regs (dummy)
                              "=S" (dummy_value_S),
                              "=D" (dummy_value_D)
- 
+
                            : "1" (sptr),      // esi      // input regs
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
@@ -2153,7 +2153,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                            : "=c" (dummy_value_c),        // output regs (dummy)
                              "=S" (dummy_value_S),
                              "=D" (dummy_value_D)
- 
+
                            : "1" (sptr),      // esi      // input regs
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx

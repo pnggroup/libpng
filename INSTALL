@@ -1,5 +1,5 @@
 
-Installing libpng version 1.0.9beta2 - November 19, 2000
+Installing libpng version 1.0.9beta3 - November 23, 2000
 
 Before installing libpng, you must first install zlib.  zlib
 can usually be found wherever you got libpng.  zlib can be
@@ -10,7 +10,7 @@ zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.0.9beta2" or "lpng109" and "zlib-1.1.3"
+might be called "libpng-1.0.9beta3" or "lpng109" and "zlib-1.1.3"
 or "zlib113") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -53,29 +53,31 @@ instructions in the README* files.
 
 Else enter the zlib directory and follow the instructions in zlib/README,
 then come back here and choose the appropriate makefile.sys in the scripts
-directory.  
+directory.
 
 The files that are presently available in the scripts directory
 include
 
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
- makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.9beta2)
- makefile.gcmmx    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.9beta2,
+ makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.9beta3)
+ makefile.gcmmx    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.9beta3,
                        uses assembler code tuned for Intel MMX platform)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
                        ftp://ftp.cs.wisc.edu/ghost)
+ makefile.aix      =>  AIX makefile
  makefile.cygwin   =>  Cygwin/gcc makefile
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.hpux     =>  HPUX (10.20 and 11.00) makefile
  makefile.ibmc     =>  IBM C/C++ version 3.x for Win32 and OS/2 (static)
  makefile.intel    =>  Intel C/C++ version 4.0 and later
  libpng.icc        =>  Project file for IBM VisualAge/C++ version 4.0 or later
+ makefile.macosx   =>  MACOS X Makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
- makefile.sggcc    =>  Silicon Graphics (gcc, creates libpng.so.2.1.0.9beta2)
+ makefile.sggcc    =>  Silicon Graphics (gcc, creates libpng.so.2.1.0.9beta3)
  makefile.sunos    =>  Sun makefile
- makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0.9beta2)
+ makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0.9beta3)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.mips     =>  MIPS makefile
  makefile.acorn    =>  Acorn makefile

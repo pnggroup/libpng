@@ -2,7 +2,7 @@
 #   builds both dll (with import lib) and static lib versions
 #   of the library, and builds two copies of pngtest: one
 #   statically linked and one dynamically linked.
-#   
+#
 #   based on makefile for linux-elf w/mmx by:
 # Copyright (C) 1998-2000 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
@@ -33,12 +33,12 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 #CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 #        -fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
 CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
-        -fomit-frame-pointer 
+	-fomit-frame-pointer
 
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.9beta2
+PNGMIN = 1.0.9beta3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(PNGMAJ).dll
@@ -108,7 +108,7 @@ $(SHAREDDEF): msvc/png32ms.def
 	cat $< | sed -e '1{G;s/^\(.*\)\(\n\)/EXPORTS/;};2,/^EXPORTS/d' > $@
 
 $(SHAREDLIB): $(OBJSDLL) $(SHAREDDEF)
-	$(LDSHARED) -o $@ $(LDEXTRA) $(OBJSDLL) -L. -L$(ZLIBLIB) -lz 
+	$(LDSHARED) -o $@ $(LDEXTRA) $(OBJSDLL) -L. -L$(ZLIBLIB) -lz
 
 pngtest$(EXE): pngtest.pic.o $(SHAREDLIB)
 	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
@@ -132,7 +132,7 @@ test-shared: pngtest$(EXE)
 
 install: install-static install-shared
 
-install-static: $(STATLIB) install-headers install-docs install-man 
+install-static: $(STATLIB) install-headers install-docs install-man
 	-@if [ ! -d $(LIBPATH) ]; then mkdir -p $(LIBPATH); fi
 	install -m 755 $(STATLIB) $(LIBPATH)
 

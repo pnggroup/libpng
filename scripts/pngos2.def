@@ -297,11 +297,11 @@ EXPORTS
   png_pass_dsp_mask
 ; png_pass_width
 ; png_pass_height
-  png_get_iCCP 
+  png_get_iCCP
   png_get_sCAL
-  png_get_sPLT 
-  png_set_iCCP 
-  png_set_sPLT 
+  png_get_sPLT
+  png_set_iCCP
+  png_set_sPLT
   png_free_data
 
   png_IHDR

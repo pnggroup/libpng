@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.9beta2 - November 19, 2000
+ * libpng 1.0.9beta3 - November 23, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -33,7 +33,7 @@
 #define PNG_ZBUF_SIZE 8192
 #endif
 
-#ifndef PNG_NO_FLOATING_POINT_SUPPORTED 
+#ifndef PNG_NO_FLOATING_POINT_SUPPORTED
 #define PNG_FLOATING_POINT_SUPPORTED
 #endif
 
@@ -53,7 +53,7 @@
  * 'Normal' png-on-win32 defines/defaults:
  *   PNG_BUILD_DLL -- building dll
  *   PNG_USE_DLL   -- building an application, linking to dll
- *   (no define)   -- building static library, or building an 
+ *   (no define)   -- building static library, or building an
  *                    application and linking to the static lib
  * 'Cygwin' defines/defaults:
  *   PNG_BUILD_DLL -- building the dll
@@ -1015,11 +1015,11 @@ typedef z_stream FAR *  png_zstreamp;
  * It is equivalent to Microsoft predefined macro _DLL which is
  * automatically defined when you compile using the share
  * version of the CRT (C Run-Time library)
- * 
- * The cygwin mods make this behavior a little different: 
+ *
+ * The cygwin mods make this behavior a little different:
  * Define PNG_BUILD_DLL if you are building a dll for use with cygwin
  * Define PNG_STATIC if you are building a static library for use with cygwin,
- *   -or- if you are building an application that you want to link to the 
+ *   -or- if you are building an application that you want to link to the
  *   static library.
  * PNG_USE_DLL is defined by default (no user action needed) unless one of
  *   the other flags is defined.
@@ -1051,7 +1051,7 @@ typedef z_stream FAR *  png_zstreamp;
 #    define PNG_USE_LOCAL_ARRAYS
 #  endif
 #endif
-    
+
 /* Do not use global arrays (helps with building DLL's)
  * They are no longer used in libpng itself, since version 1.0.5c,
  * but might be required for some pre-1.0.5c applications.
@@ -1071,8 +1071,8 @@ typedef z_stream FAR *  png_zstreamp;
 #  ifndef PNG_NO_MODULEDEF
 #    define PNG_NO_MODULEDEF
 #  endif
-#endif 
- 
+#endif
+
 #if !defined(PNG_IMPEXP) && defined(PNG_BUILD_DLL) && !defined(PNG_NO_MODULEDEF)
 #  define PNG_IMPEXP
 #endif

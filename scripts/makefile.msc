@@ -9,7 +9,7 @@ CFLAGS=-Oait -Gs -nologo -W3 -A$(MODEL) -I..\zlib
 #-Ox generates bad code with MSC 5.1
 CC=cl
 LD=link
-LDFLAGS=/e/st:0x1500/noe 
+LDFLAGS=/e/st:0x1500/noe
 O=.obj
 
 #uncomment next to put error messages in a file
@@ -76,7 +76,7 @@ libpng.lib: $(OBJS1) $(OBJS2) $(OBJS3)
 	lib libpng $(OBJS2);
 	lib libpng $(OBJS3);
 
-pngtest.exe: pngtest.obj libpng.lib 
+pngtest.exe: pngtest.obj libpng.lib
 	$(LD) $(LDFLAGS) pngtest.obj,,,libpng.lib ..\zlib\zlib.lib ;
 
 test: pngtest.exe

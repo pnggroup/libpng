@@ -84,7 +84,7 @@ libpng.lib: $(OBJS1) $(OBJS2) $(OBJS3)
 	del libpng.lib
 	lib /OUT:libpng.lib $(OBJS1) $(OBJS2) $(OBJS3)
 
-pngtest.exe: pngtest.obj libpng.lib 
+pngtest.exe: pngtest.obj libpng.lib
 	$(LD) $(LDFLAGS) pngtest.obj libpng.lib ..\zlib\zlib.lib /OUT:pngtest.exe /SUBSYSTEM:CONSOLE
 
 test: pngtest.exe

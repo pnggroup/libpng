@@ -5,7 +5,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.9beta2';
+  PNG_LIBPNG_VER_STRING = '1.0.9beta3';
   PNG_LIBPNG_VER        =  10009;
 
 type
@@ -209,7 +209,7 @@ const
   PNG_CRC_WARN_DISCARD = 2;  // (INVALID)           warn/discard data
   PNG_CRC_WARN_USE     = 3;  // warn/use data       warn/use data
   PNG_CRC_QUIET_USE    = 4;  // quiet/use data      quiet/use data
-  PNG_CRC_NO_CHANGE    = 5;  // use current value   use current value 
+  PNG_CRC_NO_CHANGE    = 5;  // use current value   use current value
 
 // Flags for png_set_filter() to say which filters to use.  The flags
 // are chosen so that they don't conflict with real filter types
@@ -241,7 +241,7 @@ const
   PNG_FILTER_HEURISTIC_DEFAULT    = 0;  // Currently "UNWEIGHTED"
   PNG_FILTER_HEURISTIC_UNWEIGHTED = 1;  // Used by libpng < 0.95
   PNG_FILTER_HEURISTIC_WEIGHTED   = 2;  // Experimental feature
-  PNG_FILTER_HEURISTIC_LAST       = 3;  // Not a valid value 
+  PNG_FILTER_HEURISTIC_LAST       = 3;  // Not a valid value
 
 procedure png_build_grayscale_palette(bit_depth: int; palette: png_colorp);
              stdcall;
@@ -340,7 +340,7 @@ function png_get_oFFs(png_ptr: png_structp; info_ptr: png_infop;
              var unit_type: int): png_uint_32;
              stdcall;
 function png_get_sCAL(png_ptr: png_structp; info_ptr: png_infop;
-             var unit:int; var width: png_uint_32; height: png_uint_32): 
+             var unit:int; var width: png_uint_32; height: png_uint_32):
              png_uint_32;
              stdcall
 function png_get_pCAL(png_ptr: png_structp; info_ptr: png_infop;
@@ -373,7 +373,7 @@ function png_get_sBIT(png_ptr: png_structp; info_ptr: png_infop;
              stdcall;
 function png_get_sRGB(png_ptr: png_structp; info_ptr: png_infop;
              var file_srgb_intent: int): png_uint_32;
-             stdcall; 
+             stdcall;
 function png_get_signature(png_ptr: png_structp; info_ptr: png_infop):
              png_bytep;
              stdcall;

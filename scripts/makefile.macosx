@@ -1,4 +1,4 @@
-# makefile for libpng, SGI IRIX with gcc
+# makefile for libpng, MACOS X
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
@@ -6,42 +6,27 @@
 prefix=/usr/local
 
 # Where the zlib library and include files are located
-ZLIBLIB=/usr/local/lib32
-ZLIBINC=/usr/local/include
-#ZLIBLIB=../zlib
-#ZLIBINC=../zlib
+#ZLIBLIB=/usr/local/lib
+#ZLIBINC=/usr/local/include
+ZLIBLIB=../zlib
+ZLIBINC=../zlib
 
-CC=gcc
+CC=cc
+CFLAGS=-I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
 
-WARNMORE=
-CFLAGS=-I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32 # -g -DPNG_DEBUG=5
-# zlib must also be compiled with n32
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
-LDSHARED=gcc -shared
-
-VER=1.0.9beta3
-LIBS=libpng.so.1.0.9beta3
-SHAREDLIB=libpng.so
-libdir=$(prefix)/lib32
-
-RANLIB=echo
-#RANLIB=ranlib
+#RANLIB=echo
+RANLIB=ranlib
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.a $(SHAREDLIB).$(VER) pngtest
+all: libpng.a pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
-
-$(SHAREDLIB).$(VER): $(OBJS)
-	$(LDSHARED) -o $@ $(OBJS)
-	rm -f $(SHAREDLIB) $(SHAREDLIB).1
-	ln -s $@ $(SHAREDLIB)
-	ln -s $@ $(SHAREDLIB).1
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -58,16 +43,13 @@ install: libpng.a
 	chmod 644 $(prefix)/include/pngconf.h
 	cp libpng.a $(prefix)/lib
 	chmod 644 $(prefix)/lib/libpng.a
-	cp $(SHAREDLIB).$(VER) $(libdir); chmod 755 $(SHAREDLIB).$(VER)
-	cd $(libdir); if test -f $(SHAREDLIB).$(VER); then \
-	rm -f $(SHAREDLIB) $(SHAREDLIB).1; \
-	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB); \
-	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB).1; \
-	(ldconfig || true)  >/dev/null 2>&1; \
-	fi
 
 clean:
 	rm -f *.o libpng.a pngtest pngout.png
+
+DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
+writelock:
+	chmod a-w *.[ch35] $(DOCS) scripts/*
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
