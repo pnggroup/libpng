@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 0.99
+ * libpng 0.99a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  */
 
 /* get internal access to png.h */
@@ -249,7 +249,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
                ptime->year, ptime->hour % 24, ptime->minute % 60,
                ptime->second % 61);
 #endif
-   return png_ptr->time_buffer;
+   return ((png_charp)png_ptr->time_buffer);
 }
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
 
@@ -289,7 +289,7 @@ png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
    png_debug(1, "in png_create_write_struct\n");
    if ((png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG)) == NULL)
    {
-      return (png_structp)NULL;
+      return ((png_structp)NULL);
    }
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
@@ -299,7 +299,7 @@ png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
    {
       png_free(png_ptr, png_ptr->zbuf);
       png_destroy_struct(png_ptr);
-      return (png_structp)NULL;
+      return ((png_structp)NULL);
    }
 #ifdef USE_FAR_KEYWORD
    png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
@@ -329,7 +329,7 @@ png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
       1, NULL, NULL);
 #endif
 
-   return (png_ptr);
+   return ((png_structp)png_ptr);
 }
 
 

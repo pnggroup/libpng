@@ -1,12 +1,12 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 0.99
+ * libpng 0.99a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -281,10 +281,10 @@ png_voidp
 png_malloc(png_structp png_ptr, png_uint_32 size) {
    if (png_ptr == NULL) {
       fprintf(STDERR, "NULL pointer to memory allocator\n");
-      return NULL;
+      return (NULL);
    }
    if (size == 0)
-      return NULL;
+      return (NULL);
 
    /* This calls the library allocator twice, once to get the requested
       buffer and once to get a new free list entry. */
@@ -299,7 +299,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size) {
       pinformation = pinfo;
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
-      return pinfo->pointer;
+      return ((png_voidp)pinfo->pointer);
    }
 }
 
@@ -369,14 +369,14 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    if ((fpin = fopen(inname, "rb")) == NULL)
    {
       fprintf(STDERR, "Could not find input file %s\n", inname);
-      return 1;
+      return (1);
    }
 
    if ((fpout = fopen(outname, "wb")) == NULL)
    {
       fprintf(STDERR, "Could not open output file %s\n", outname);
       fclose(fpin);
-      return 1;
+      return (1);
    }
 
    png_debug(0, "Allocating read and write structures\n");
@@ -409,7 +409,7 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       fclose(fpin);
       fclose(fpout);
-      return 1;
+      return (1);
    }
 
    png_debug(0, "Setting jmpbuf for write struct\n");
@@ -425,7 +425,7 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       fclose(fpin);
       fclose(fpout);
-      return 1;
+      return (1);
    }
 
 #ifdef USE_FAR_KEYWORD
@@ -621,7 +621,7 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       fclose(fpin);
       fclose(fpout);
-      return 1;
+      return (1);
    }
 
    num_pass = png_set_interlace_handling(read_ptr);
@@ -663,14 +663,14 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    if ((fpin = fopen(inname, "rb")) == NULL)
    {
       fprintf(STDERR, "Could not find file %s\n", inname);
-      return 1;
+      return (1);
    }
 
    if ((fpout = fopen(outname, "rb")) == NULL)
    {
       fprintf(STDERR, "Could not find file %s\n", outname);
       fclose(fpin);
-      return 1;
+      return (1);
    }
 
    while (1)
@@ -686,7 +686,7 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
                  inname, outname);
          fclose(fpin);
          fclose(fpout);
-         return 1;
+         return (1);
       }
 
       if (!num_in)
@@ -697,14 +697,14 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          fprintf(STDERR, "Files %s and %s are different\n", inname, outname);
          fclose(fpin);
          fclose(fpout);
-         return 1;
+         return (1);
       }
    }
 
    fclose(fpin);
    fclose(fpout);
 
-   return 0;
+   return (0);
 }
 
 /* input and output filenames */
@@ -867,5 +867,5 @@ main(int argc, char *argv[])
       fprintf(STDERR, "libpng passes test\n");
    else
       fprintf(STDERR, "libpng FAILS test\n");
-   return ierror != 0;
+   return ((int)(ierror != 0));
 }

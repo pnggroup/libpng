@@ -1,12 +1,12 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 0.99
+ * libpng 0.99a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  */
 
 #define PNG_INTERNAL
@@ -126,14 +126,14 @@ png_get_pixel_aspect_ratio(png_structp png_ptr, png_infop info_ptr)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_aspect_ratio");
       if (info_ptr->x_pixels_per_unit == 0)
-         return NULL;
+         return (0.0);
       else
-         return (float)info_ptr->y_pixels_per_unit
-            /(float)info_ptr->x_pixels_per_unit;
+         return ((float)info_ptr->y_pixels_per_unit
+            /(float)info_ptr->x_pixels_per_unit);
    }
    else
 #endif
-      return (0);
+      return (0.0);
 }
 
 png_uint_32

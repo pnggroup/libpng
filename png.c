@@ -1,12 +1,12 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng 0.99
+ * libpng 0.99a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  */
 
 #define PNG_INTERNAL
@@ -16,7 +16,7 @@
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
  */
-char png_libpng_ver[5] = "0.99";
+char png_libpng_ver[6] = "0.99";
 
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -103,15 +103,15 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
    if (num_to_check > 8)
       num_to_check = 8;
    else if (num_to_check < 1)
-      return 0;
+      return (0);
 
    if (start > 7)
-      return 0;
+      return (0);
 
    if (start + num_to_check > 8)
       num_to_check = 8 - start;
 
-   return (png_memcmp(&sig[start], &png_sig[start], num_to_check));
+   return ((int)(png_memcmp(&sig[start], &png_sig[start], num_to_check)));
 }
 
 /* (Obsolete) function to check signature bytes.  It does not allow one
@@ -121,7 +121,7 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 int
 png_check_sig(png_bytep sig, int num)
 {
-  return !png_sig_cmp(sig, (png_size_t)0, (png_size_t)num);
+  return ((int)!png_sig_cmp(sig, (png_size_t)0, (png_size_t)num));
 }
 
 /* Function to allocate memory for zlib. */
@@ -143,7 +143,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
    {
       png_memset(ptr, 0, (png_size_t)num_bytes);
    }
-   return (voidpf)(ptr);
+   return ((voidpf)ptr);
 }
 
 /* function to free memory for zlib */
@@ -205,7 +205,7 @@ png_create_info_struct(png_structp png_ptr)
       png_info_init(info_ptr);
    }
 
-   return info_ptr;
+   return (info_ptr);
 }
 
 /* This function frees the memory associated with a single info struct.
@@ -286,7 +286,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 png_voidp
 png_get_io_ptr(png_structp png_ptr)
 {
-   return png_ptr->io_ptr;
+   return (png_ptr->io_ptr);
 }
 
 #if !defined(PNG_NO_STDIO)

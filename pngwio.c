@@ -1,12 +1,12 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 0.99
+ * libpng 0.99a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  *
  * This file provides a location for all output.  Users which need
  * special handling are expected to write functions which have the same

@@ -1,12 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 0.99
+ * libpng 0.99a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -27,7 +27,7 @@ png_get_uint_32(png_bytep buf)
       ((png_uint_32)(*(buf + 2)) << 8) +
       (png_uint_32)(*(buf + 3));
 
-   return i;
+   return (i);
 }
 
 #if defined(PNG_READ_pCAL_SUPPORTED)
@@ -44,7 +44,7 @@ png_get_int_32(png_bytep buf)
       ((png_int_32)(*(buf + 2)) << 8) +
       (png_int_32)(*(buf + 3));
 
-   return i;
+   return (i);
 }
 #endif /* PNG_READ_pCAL_SUPPORTED */
 
@@ -57,7 +57,7 @@ png_get_uint_16(png_bytep buf)
    i = (png_uint_16)(((png_uint_16)(*buf) << 8) +
       (png_uint_16)(*(buf + 1)));
 
-   return i;
+   return (i);
 }
 #endif /* PNG_READ_BIG_ENDIAN_SUPPORTED */
 
@@ -100,10 +100,10 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
       {
          png_chunk_error(png_ptr, "CRC error");
       }
-      return 1;
+      return (1);
    }
 
-   return 0;
+   return (0);
 }
 
 /* Compare the CRC stored in the PNG file with that calculated by libpng from
@@ -132,10 +132,10 @@ png_crc_error(png_structp png_ptr)
    if (need_crc)
    {
       crc = png_get_uint_32(crc_bytes);
-      return (crc != png_ptr->crc);
+      return ((int)(crc != png_ptr->crc));
    }
    else
-      return 0;
+      return (0);
 }
 
 

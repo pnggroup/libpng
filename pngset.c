@@ -1,12 +1,12 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 0.99
+ * libpng 0.99a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  *
  * The functions here are used during reads to store data from the file
  * into the info struct, and during writes to store application data

@@ -200,7 +200,7 @@ version 0.98 [January, 1998]
       PNG_TIME_RFC1152_SUPPORTED macro to PNG_TIME_RFC1123_SUPPORTED
    added png_invert_alpha capability (Glenn R-P -- suggestion by Jon Vincent)
    changed srgb_intent from png_byte to int to avoid compiler bugs
-version 0.99 [January, 1998]
+version 0.99 [January 30, 1998]
    free info_ptr->text instead of end_info_ptr->text in pngread.c (John Bowler)
    fixed a longstanding "packswap" bug in pngtrans.c
    fixed some inconsistencies in pngconf.h that prevented compiling with
@@ -213,3 +213,6 @@ version 0.99 [January, 1998]
    added TARGET_MACOS similar to zlib-1.0.8
    define PNG_ALWAYS_EXTERN when __MWERKS__ && WIN32 are defined
    added type casting to all png_malloc() function calls
+version 0.99a [January 31, 1998]
+   added type casts and parentheses to all returns that return a value.(Tim W.)
+

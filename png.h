@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 0.99 beta
+ * libpng 0.99a beta
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  *
  * Note about libpng version numbers:
  *
@@ -27,6 +27,7 @@
  *      0.97c                     0.97      2.0.97
  *      0.98                      0.98      2.0.98
  *      0.99                      0.99      2.0.99
+ *      0.99a                     0.99      2.0.99
  *      1.0                       1.00      2.1.0
  *
  *    Henceforth the source version will match the shared-library minor

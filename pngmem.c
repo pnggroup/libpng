@@ -1,11 +1,11 @@
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 0.99
+ * libpng 0.99a
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 30, 1998
+ * January 31, 1998
  *
  * This file provides a location for all memory allocation.  Users which
  * need special memory handling are expected to modify the code in this file
@@ -42,7 +42,7 @@ png_create_struct(int type)
    else if (type == PNG_STRUCT_PNG)
      size = sizeof(png_struct);
    else
-     return (png_voidp)NULL;
+     return ((png_voidp)NULL);
 
    if ((struct_ptr = (png_voidp)farmalloc(size)) != NULL)
    {
@@ -88,7 +88,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
    if (png_ptr == NULL || size == 0)
-      return ((voidp)NULL);
+      return ((png_voidp)NULL);
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
@@ -177,7 +177,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
       png_error(png_ptr, "Out of memory."); /* Note "o" and "m" */
    }
 
-   return ret;
+   return (ret);
 }
 
 /* free a pointer allocated by PNG_MALLOC().  In the default
@@ -234,7 +234,7 @@ png_create_struct(int type)
    else if (type == PNG_STRUCT_PNG)
       size = sizeof(png_struct);
    else
-      return (png_voidp)NULL;
+      return ((png_voidp)NULL);
 
 #if defined(__TURBOC__) && !defined(__FLAT__)
    if ((struct_ptr = (png_voidp)farmalloc(size)) != NULL)
@@ -286,7 +286,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
    if (png_ptr == NULL || size == 0)
-      return (NULL);
+      return ((png_voidp)NULL);
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
@@ -308,7 +308,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
       png_error(png_ptr, "Out of Memory");
    }
 
-   return ret;
+   return (ret);
 }
 
 /* Free a pointer allocated by PNG_MALLOC().  In the default
