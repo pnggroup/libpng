@@ -32,7 +32,7 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.5rc1
+PNGMIN = 1.2.5rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -74,11 +74,11 @@ $(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
 
 $(LIBNAME).so.$(PNGVER): $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB)
-	-soname $(LIBNAME).so.$(PNGMAJ) -lz -lm
+	-soname $(LIBNAME).so.$(PNGMAJ)
 
 libpng.so.3.$(PNGMIN): $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB)
-	-soname libpng.so.3 -lz -lm
+	-soname libpng.so.3
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)

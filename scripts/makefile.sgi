@@ -5,7 +5,7 @@
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.5rc1
+PNGMIN = 1.2.5rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Where make install puts libpng.a, libpng12.so, and libpng12/png.h

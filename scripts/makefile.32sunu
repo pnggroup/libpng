@@ -33,7 +33,7 @@ RANLIB=echo
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.5rc1
+PNGMIN = 1.2.5rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -106,11 +106,11 @@ $(LIBNAME).so.$(PNGVER): $(OBJSDLL)
 	;; \
 	esac
 	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h $(LIBNAME).so.$(PNGMAJ) \
-	 -o $(LIBNAME).so.$(PNGVER) $(OBJSDLL) -lz
+	 -o $(LIBNAME).so.$(PNGVER) $(OBJSDLL)
 
 libpng.so.3.$(PNGMIN): $(OBJS)
 	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h libpng.so.3 \
-	 -o libpng.so.3.$(PNGMIN)  $(OBJSDLL) -lz
+	 -o libpng.so.3.$(PNGMIN)  $(OBJSDLL)
 
 pngtest: pngtest.o $(LIBNAME).so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -150,7 +150,7 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	ln -f -s libpng.so.3 libpng.so; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
-	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig
+	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
 	-@/bin/rm -f $(DL)/pkgconfig/libpng12.pc
 	-@/bin/rm -f $(DL)/pkgconfig/libpng.pc
 	cp libpng.pc $(DL)/pkgconfig/libpng12.pc

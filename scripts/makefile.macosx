@@ -17,7 +17,7 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.5rc1
+PNGMIN = 1.2.5rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
@@ -77,10 +77,10 @@ libpng.a: $(OBJS)
 	$(RANLIB) $@
 
 $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX): $(OBJS)
-	$(LDSHARED) -o $@ $(OBJS)
+	cc -dynamiclib -compatibility_version $(PNGMAJ) -o $@ $(OBJS)
 
 libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX): $(OBJS)
-	$(LDSHARED) -o $@ $(OBJS)
+	cc -dynamiclib -compatibility_version 3 -o $@ $(OBJS)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)

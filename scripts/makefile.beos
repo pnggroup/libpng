@@ -12,7 +12,7 @@ ZLIBLIB=/usr/local/lib
 ZLIBINC=/usr/local/include
 
 PNGMAJ = 0
-PNGMIN = 1.2.5rc1
+PNGMIN = 1.2.5rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 ALIGN=
@@ -92,11 +92,11 @@ $(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
 	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
 $(LIBNAME).so.$(PNGVER): $(OBJSDLL)
-	$(CC) -L$(ZLIBLIB) -lz -nostart -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) -o \
+	$(CC) -nostart -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) -o \
 	$(LIBNAME).so.$(PNGVER) $(OBJSDLL)
 
 libpng.so.3.$(PNGMIN): $(OBJSDLL)
-	$(CC) -L$(ZLIBLIB) -lz -nostart -Wl,-soname,libpng.so.3 -o \
+	$(CC) -nostart -Wl,-soname,libpng.so.3 -o \
 	libpng.so.3.$(PNGMIN) $(OBJSDLL)
 
 pngtest: pngtest.o $(LIBNAME).so

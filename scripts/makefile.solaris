@@ -30,7 +30,7 @@ LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng12 -lz -lm
 RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.5rc1
+PNGMIN = 1.2.5rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -104,12 +104,12 @@ $(LIBNAME).so.$(PNGVER): $(OBJSDLL)
 	echo; \
 	;; \
 	esac
-	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h $(LIBNAME).so.$(PNGMAJ) \
-	 -o $(LIBNAME).so.$(PNGVER) $(OBJSDLL) -lz
+	$(LD) -G -h $(LIBNAME).so.$(PNGMAJ) \
+	 -o $(LIBNAME).so.$(PNGVER) $(OBJSDLL)
 
 libpng.so.3.$(PNGMIN): $(OBJS)
-	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h libpng.so.3 \
-	 -o libpng.so.3.$(PNGMIN) $(OBJSDLL) -lz
+	$(LD) -G -h libpng.so.3 \
+	 -o libpng.so.3.$(PNGMIN) $(OBJSDLL)
 
 pngtest: pngtest.o $(LIBNAME).so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
