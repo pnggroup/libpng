@@ -78,11 +78,11 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGDLL = 13
-PNGMIN = 1.2.4
+CYGDLL = 12
+PNGMIN = 1.2.5beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
-SHAREDLIB=cygpng$(PNGDLL).dll
+SHAREDLIB=cygpng$(CYGDLL).dll
 STATLIB=libpng.a
 IMPLIB=libpng.dll.a
 SHAREDDEF=libpng.def
@@ -150,7 +150,7 @@ libpng-config: scripts/libpng-config-head.in scripts/libpng-config-body.in
 	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo cflags=\"\"; \
 	echo ldflags=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng$(PNGMAJ) -lz\"; \
+	echo libs=\"-lpng$(CYGDLL) -lz\"; \
 	cat $(S)/scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 

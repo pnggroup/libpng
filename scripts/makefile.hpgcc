@@ -7,7 +7,7 @@
 
 CC=gcc
 
-# where "make install" puts libpng.a, libpng.so*, png.h and pngconf.h
+# where "make install" puts libpng.a, libpng.sl*, png.h and pngconf.h
 prefix=/usr/local
 
 # Where the zlib library and include files are located
@@ -33,7 +33,7 @@ RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.4
+PNGMIN = 1.2.5beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -88,14 +88,14 @@ libpng-config:
 	chmod +x libpng-config
 
 $(LIBNAME).sl: $(LIBNAME).sl.$(PNGMAJ)
-	ln -f -s $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl
+	ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl
 
 $(LIBNAME).sl.$(PNGMAJ): $(LIBNAME).sl.$(PNGVER)
-	ln -f -s $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ)
+	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ)
 
 $(LIBNAME).sl.$(PNGVER): $(OBJSDLL)
 	$(LD) -b -L$(ZLIBLIB) +s +b $(ZLIBLIB) \
-	+h libpng.sl.$(PNGMAJ) -o libpng.sl.$(PNGVER) $(OBJSDLL) -lz
+	+h $(LIBNAME).sl.$(PNGMAJ) -o $(LIBNAME).sl.$(PNGVER) $(OBJSDLL) -lz
 
 pngtest: pngtest.o $(LIBNAME).sl
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -123,19 +123,18 @@ install-static: install-headers libpng.a
 install-shared: install-headers $(LIBNAME).sl.$(PNGVER) libpng.pc
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).sl.$(PNGMAJ)* $(DL)/$(LIBNAME).sl
-	-@/bin/rm -f $(DL)/libpng.so
-	-@/bin/rm -f $(DL)/libpng.so.3
-	-@/bin/rm -f $(DL)/libpng.so.3.*
+	-@/bin/rm -f $(DL)/libpng.sl
+	-@/bin/rm -f $(DL)/libpng.sl.3
+	-@/bin/rm -f $(DL)/libpng.sl.3.*
 	cp $(LIBNAME).sl.$(PNGVER) $(DL)
 	chmod 755 $(DL)/$(LIBNAME).sl.$(PNGVER)
 	(cd $(DL); \
-	ln -sf $(LIBNAME).so.$(PNGVER) libpng.so; \
+	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl; \
 	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl.3; \
 	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl.3.$(PNGMIN); \
 	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ); \
 	ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl)
-	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir \
-	$(DL)/pkgconfig; fi
+	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
 	-@/bin/rm -f $(DL)/pkgconfig/$(LIBNAME).pc
 	-@/bin/rm -f $(DL)/pkgconfig/libpng.pc
 	cp libpng.pc $(DL)/pkgconfig/$(LIBNAME).pc

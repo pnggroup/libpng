@@ -52,8 +52,10 @@ WLIBS = $(PNGLIB) $(ZLIB)
 CC = cc
 LD = cc
 RM = rm -f
-CFLAGS = -O -fullwarn $(INCS)
-LDFLAGS =
+# ABI must be the same as that used to build libpng.
+ABI=
+CFLAGS = $(ABI) -O -fullwarn $(INCS)
+LDFLAGS = $(ABI)
 O = .o
 E =
 

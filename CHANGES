@@ -1149,6 +1149,18 @@ version 1.2.4rc1 [July 2, 2002]
   Revised pnggccrd.c to be able to back out version 1.0.x via PNG_1_0_X macro.
 version 1.2.4 [July 8, 2002]
   Changed png_warning() to png_error() when width is too large to process.
+version 1.2.4patch01 [July 20, 2002]
+  Revised makefile.cygwin to use DLL number 12 instead of 13.
+version 1.2.5beta1 [August 6, 2002]
+  Added code to contrib/gregbook/readpng2.c to ignore unused chunks.
+  Replaced toucan.png in contrib/gregbook (it has been corrupt since 1.0.11)
+  Removed some stray *.o files from contrib/gregbook.
+  Changed png_error() to png_warning() about "Too much data" in pngpread.c
+    and about "Extra compressed data" in pngrutil.c.
+  Prevent png_ptr->pass from exceeding 7 in png_push_finish_row().
+  Updated makefile.hggcc
+  Updated png.c and pnggccrd.c handling of return from png_mmx_support()
+
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
