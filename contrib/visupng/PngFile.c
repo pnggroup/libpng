@@ -348,11 +348,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
         // we can allocate memory for an array of row-pointers
         
         if ((ppbRowPointers = (png_bytepp) malloc(iHeight * sizeof(png_bytep))) == NULL)
-        {
-            fclose(pfFile);
-            png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
-            return FALSE;
-        }
+            Throw "Visualpng: Out of memory";
         
         // set the individual row-pointers to point at the correct offsets
         

@@ -40,7 +40,7 @@ ZLIB = /usr/local/lib/libz.a		# statically linked against zlib
 
 #XINC = -I/usr/include/X11		# old-style, stock X distributions
 #XLIB = -L/usr/lib/X11 -lX11
-#XINC = -I/usr/openwin/include/X11	# Sun workstations (OpenWindows)
+#XINC = -I/usr/openwin/include    	# Sun workstations (OpenWindows)
 #XLIB = -L/usr/openwin/lib -lX11
 XINC = -I/usr/X11R6/include		# new X distributions (XFree86, etc.)
 XLIB = -L/usr/X11R6/lib -lX11

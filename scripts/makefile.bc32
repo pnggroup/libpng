@@ -3,7 +3,7 @@
 # To build the library, do:
 #       "make -fmakefile.bc32"
 #
-# ---------- 32-bit Borland C++ ----------
+# -------------------- 32-bit Borland C++ --------------------
 
 ### Absolutely necessary for this makefile to work
 .AUTODEPEND

@@ -4,7 +4,7 @@
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
 # To use, do "nmake /f scripts\makefile.vcawin32"
 
-# ---------- Microsoft Visual C++ 5.0 and later, uses assembler code ------
+# -------- Microsoft Visual C++ 5.0 and later, uses assembler code --------
 
 # Caution: the assembler code was introduced at libpng version 1.0.4 and has
 # not yet been thoroughly tested.

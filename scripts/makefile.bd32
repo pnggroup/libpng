@@ -1,5 +1,5 @@
 # Makefile for png32bd.dll
-# ------------- 32-bit Borland C++ -------------
+# -------------------- 32-bit Borland C++ --------------------
 
 # This makefile expects to find zlib.h and zlib32bd.lib in the
 # $(ZLIBDIR) directory.

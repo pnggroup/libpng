@@ -737,6 +737,8 @@ version 1.0.7beta11 [May 7, 2000]
   Made PNG_NO_ITXT_SUPPORTED the default setting, to avoid memory overrun
     when old applications fill the info_ptr->text structure directly.
   Added PNGAPI macro, and added it to the definitions of all exported functions.
+  Relocated version macro definitions ahead of the includes of zlib.h and
+    pngconf.h in png.h.
 version 1.0.7beta12 [May 12, 2000]
   Revised pngset.c to avoid a problem with expanding the png_debug macro.
   Deleted some extraneous defines from pngconf.h
@@ -791,7 +793,10 @@ version 1.0.7beta18 [June 23, 2000]
   Updated contrib/visupng/cexcept.h to version 1.0.0.
   Fixed bugs in pngwrite.c and pngwutil.c that prevented writing iCCP chunks.
 version 1.0.7rc2 [June 28, 2000]
+  Updated license to include disclaimers required by UCITA.
   Fixed "DJBPP" typo in pnggccrd.c introduced in beta18.
+version 1.0.7 [July 1, 2000]
+  Revised the definition of "trans_values" in libpng.3/libpng.txt
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

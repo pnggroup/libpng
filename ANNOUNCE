@@ -1,5 +1,5 @@
 
-Libpng 1.0.7rc2 - June 28, 2000
+Libpng 1.0.7 - July 1, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -60,6 +60,8 @@ Changes since the last public release (1.0.6):
   Made PNG_NO_ITXT_SUPPORTED the default setting, to avoid memory overrun
     when old applications fill the info_ptr->text structure directly.
   Added PNGAPI macro, and added it to the definitions of all exported functions.
+  Relocated version macro definitions ahead of the includes of zlib.h and
+    pngconf.h in png.h.
   Made PNG_NO_CONSOLE_IO the default condition when PNG_BUILD_DLL is defined.
   Use MSC _RPTn debugging instead of fprintf if _MSC_VER is defined.
   Added png_access_version_number() function.
@@ -93,6 +95,7 @@ Changes since the last public release (1.0.6):
     (Simon-Pierre Cadieux) and contrib/visupng directory (Willem van Schaik).
   Removed leading underscores from "_PNG_H" and "_PNG_SAVE_BSD_SOURCE" macros.
   Fixed bugs in pngwrite.c and pngwutil.c that prevented writing iCCP chunks.
+  Revised the definition of "trans_values" in libpng.3/libpng.txt
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

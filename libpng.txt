@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.7rc2 - June 28, 2000
+ libpng version 1.0.7 - July 1, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -522,8 +522,9 @@ into the info_ptr is returned for any complex types.
                      &trans_values);
     trans          - array of transparent entries for
                      palette (PNG_INFO_tRNS)
-    trans_values   - transparent pixel for non-paletted
-                     images (PNG_INFO_tRNS)
+    trans_values   - graylevel or color sample values of
+                     the single transparent color for
+                     non-paletted images (PNG_INFO_tRNS)
     num_trans      - number of transparent entries
                      (PNG_INFO_tRNS)
 
@@ -1696,8 +1697,9 @@ Some of the more important parts of the png_info are:
        trans_values);
     trans          - array of transparent entries for
                      palette (PNG_INFO_tRNS)
-    trans_values   - transparent pixel for non-paletted
-                     images (PNG_INFO_tRNS)
+    trans_values   - graylevel or color sample values of
+                     the single transparent color for
+                     non-paletted images (PNG_INFO_tRNS)
     num_trans      - number of transparent entries
                      (PNG_INFO_tRNS)
 
@@ -2632,13 +2634,13 @@ application:
 
 VII. Y2K Compliance in libpng
 
-June 28, 2000
+July 1, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.7rc2 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.7 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

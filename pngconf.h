@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.7rc2 - June 28, 2000
+ * libpng 1.0.7 - July 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -640,7 +640,7 @@ defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #    define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 #  endif
 #endif
-#if !defined (PNG_NO_READ_USER_CHUNKS) && \
+#if !defined(PNG_NO_READ_USER_CHUNKS) && \
      defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
 #  define PNG_READ_USER_CHUNKS_SUPPORTED
 #  define PNG_USER_CHUNKS_SUPPORTED
