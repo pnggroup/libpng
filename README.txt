@@ -10,12 +10,18 @@ This is the copyright notice, disclaimer, and license:
  *
  * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
- * The pngcrush program is supplied "AS IS".  The Author disclaims all
+ * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
  * warranties of merchantability and of fitness for any purpose.  The
  * Author assumes no liability for direct, indirect, incidental, special,
  * exemplary, or consequential damages, which may result from the use of
- * the pngcrush program, even if advised of the possibility of such damage.
+ * the computer program, even if advised of the possibility of such damage.
+ * There is no warranty against interference with your enjoyment of the
+ * computer program or against infringement.  There is no warranty that my
+ * efforts or the computer program will fulfill any of your particular purposes
+ * or needs.  This computer program is provided with all faults, and the entire
+ * risk of satisfactory quality, performance, accuracy, and effort is with
+ * the user.
  *
  * Permission is hereby granted to anyone to use, copy, modify, and distribute
  * this source code, or portions hereof, for any purpose, without fee, subject
@@ -33,13 +39,14 @@ This is the copyright notice, disclaimer, and license:
 This is the output of "pngcrush" and "pngcrush -help":
 
 
- | pngcrush 1.4.5, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
+
+ | pngcrush 1.5.0, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.0.7rc2,
- |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
- |    Copyright (C) 1996, 1997 Andreas Dilger,
+ | This program was built with libpng version 1.0.8,
  |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
+ |    Copyright (C) 1996, 1997 Andreas Dilger,
+ |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  | and zlib version 1.1.3pc, Copyright (C) 1998,
  |    Jean-loup Gailly and Mark Adler.
 
@@ -48,6 +55,7 @@ usage: pngcrush [options] infile.png outfile.png
        pngcrush -e ext [other options] files.png ...
        pngcrush -d dir [other options] files.png ...
 options:
+       -already already_crushed_size [e.g., 8192])
         -brute (Use brute-force, try 114 different methods [11-124])
             -c color_type of output file [0, 2, 4, or 6]
             -d directory_name (where output files will go)
@@ -73,8 +81,19 @@ options:
             -v (display more detailed information)
       -version (display the pngcrush version)
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
-            -h (help)
+            -h (help and legal notices)
             -p (pause)
+
+
+ | pngcrush 1.5.0, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
+ | This is a free, open-source program.  Permission is
+ | granted to everyone to use pngcrush without fee.
+ | This program was built with libpng version 1.0.8,
+ |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
+ |    Copyright (C) 1996, 1997 Andreas Dilger,
+ |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
+ | and zlib version 1.1.3pc, Copyright (C) 1998,
+ |    Jean-loup Gailly and Mark Adler.
 
 
 usage: pngcrush [options] infile.png outfile.png
@@ -82,6 +101,11 @@ usage: pngcrush [options] infile.png outfile.png
        pngcrush -d dir [other options] files.png ...
 
 options:
+       -already already_crushed_size [e.g., 8192])
+
+               If file has an IDAT greater than this size, it
+               will be considered to be already crushed.
+
         -brute (Use brute-force, try 114 different methods [11-124])
 
                Very time-consuming and generally not worthwhile.
@@ -238,7 +262,7 @@ options:
 
                zTXt chunk to insert (see -text).
 
-            -h (help)
+            -h (help and legal notices)
 
                Display this information.
 
@@ -247,4 +271,3 @@ options:
                Wait for [enter] key before continuing display.
                e.g., type 'pngcrush -pause -help', if the help
                screen scrolls out of sight.
-

@@ -16,7 +16,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.8"
+#define PNGCRUSH_VERSION "1.5.0"
 
 /*
 */
@@ -57,6 +57,13 @@
  */
 
 /* Change log:
+ *
+ * Version 1.5.0 (built with libpng-1.0.8)
+ *
+ *   After encountering an image with a bad Photoshop iCCP chunk, pngcrush
+ *   1.4.5 through 1.4.8 write sRGB and gAMA=45455 chunks in all
+ *   remaining PNG files on the command line.  This has been fixed so the
+ *   correction is only applied to the particular bad input file.
  *
  * Version 1.4.8 (built with libpng-1.0.8rc1)
  *
@@ -107,7 +114,7 @@
  *
  * Version 1.4.4 (built with libpng-1.0.6i and cexcept-0.6.3)
  *
- *   Can be built on RISC OS platforms.
+ *   Can be built on RISC OS platforms, thanks to Darren Salt.
  *
  * Version 1.4.3 (built with libpng-1.0.6h and cexcept-0.6.3)
  *
@@ -504,9 +511,11 @@ static int plte_len=-1;
 #ifdef PNG_gAMA_SUPPORTED
 #  ifdef PNG_FIXED_POINT_SUPPORTED
 static int specified_gamma=0;
+static int image_specified_gamma=0;
 static int force_specified_gamma=0;
 #  else
 static double specified_gamma=0.0;
+static double image_specified_gamma=0;
 static double force_specified_gamma=0.0;
 #  endif
 static int double_gamma=0;
@@ -1967,6 +1976,8 @@ main(int argc, char *argv[])
          free(png_row_filters); png_row_filters=NULL;
       }
 
+      image_specified_gamma=0;
+
       inname=argv[names++];
 
       if(inname == NULL) 
@@ -2758,7 +2769,7 @@ main(int argc, char *argv[])
 
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_WRITE_gAMA_SUPPORTED)
       {
-         if(force_specified_gamma > 0)
+         if(force_specified_gamma)
          {
             if(first_trial)
             {
@@ -2790,6 +2801,8 @@ main(int argc, char *argv[])
          {
             if(keep_chunk("gAMA",argv))
             {
+               if(image_specified_gamma)
+                   file_gamma=image_specified_gamma;
                if(verbose > 1 && first_trial)
 #ifdef PNG_FIXED_POINT_SUPPORTED
                  fprintf(STDERR, "   gamma=(%d/100000)\n", (int)file_gamma);
@@ -2804,7 +2817,7 @@ main(int argc, char *argv[])
 #endif
             }
          }
-         else if(specified_gamma > 0)
+         else if(specified_gamma)
          {
             if(first_trial)
             {
@@ -3919,9 +3932,9 @@ png_measure_idat(png_structp png_ptr)
                 "   Replacing bad Photoshop ICCP chunk with an sRGB chunk\n");
 #ifdef PNG_gAMA_SUPPORTED
 #ifdef PNG_FIXED_POINT_SUPPORTED
-                specified_gamma=45455L;
+                image_specified_gamma=45455L;
 #else
-                specified_gamma=0.45455;
+                image_specified_gamma=0.45455;
 #endif
 #endif
                 intent=0;
