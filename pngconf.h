@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.6f - April 14, 2000
+ * libpng 1.0.6h - April 24, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -16,8 +16,6 @@
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
-
-#include "pngcrush.h" /* except for this line, this is libpng's pngconf.h */
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your

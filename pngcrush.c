@@ -15,7 +15,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.2"
+#define PNGCRUSH_VERSION "1.4.3"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -46,6 +46,18 @@
  */
 
 /* Change log:
+ *
+ * Version 1.4.3 (built with libpng-1.0.6h and cexcept-0.6.3)
+ *
+ *   Reduced scope of Try/Catch blocks to avoid nesting them, and
+ *   removed returns from within the Try blocks, where they are not
+ *   allowed.
+ *
+ *   Removed direct access to the png structure when possible, and isolated
+ *   the remaining direct accesses to the png structure into new
+ *   png_get_compression_buffer_size(), png_set_compression_buffer_size(),
+ *   and png_set_unknown_chunk_location() functions that were installed
+ *   in libpng version 1.0.6g.
  *
  * Version 1.4.2 (built with libpng-1.0.6f and cexcept-0.6.0)
  *
@@ -278,6 +290,7 @@ static PNG_CONST char *outname = "pngout.png";
 static PNG_CONST char *directory_name = "pngcrush.bak";
 static PNG_CONST char *extension = "_C.png";
 
+static png_uint_32 measured_idat_length;
 static int all_chunks_are_safe=0;
 static int number_of_open_files;
 static int do_pplt = 0;
@@ -309,8 +322,8 @@ char *str_return;
 #include "cexcept.h"
 define_exception_type(const char *);
 extern struct exception_context the_exception_context[1];
-
 struct exception_context the_exception_context[1];
+png_const_charp msg;
 
 static png_uint_32 total_input_length = 0;
 static png_uint_32 total_output_length = 0;
@@ -385,7 +398,7 @@ static png_infop end_info_ptr;
 static png_infop write_end_info_ptr;
 static FILE *fpin, *fpout;
 png_uint_32 measure_idats(FILE *fpin);
-png_uint_32 png_measure_idat(png_structp png_ptr, png_infop info_ptr);
+png_uint_32 png_measure_idat(png_structp png_ptr);
 # define MAX_METHODS   200
 # define MAX_METHODSP1 201
 # define DEFAULT_METHODS 10
@@ -394,8 +407,53 @@ static int filter_method, zlib_level;
 static png_bytep png_row_filters=NULL;
 static float t_start, t_stop, t_decode, t_encode, t_misc;
 
-static int max_idat_size = PNG_ZBUF_SIZE;
+static png_uint_32 max_idat_size = PNG_ZBUF_SIZE;
 int ia;
+
+/********* Functions to make direct access to the png_ptr. ***************
+ *
+ * Making direct access to the png_ptr or info_ptr is frowned upon because
+ * it incurs a risk of binary incompatibility with otherwise compatible
+ * versions of libpng, so all such accesses are collected here.  These
+ * functions could be candidates for inclusion in some future version of
+ * libpng.
+ */
+
+#if (PNG_LIBPNG_VER < 10007)
+/* This is binary incompatible with versions earlier than 0.99h because of the
+ * introduction of png_user_transform stuff ahead of the zbuf_size member
+ * of png_ptr in libpng version 0.99h.  Not needed after libpng-1.0.6g
+ * because the functions became available in libpng.
+ */
+static png_uint_32
+png_get_compression_buffer_size(png_structp png_ptr)
+{
+   return(png_ptr->zbuf_size);
+}
+static void
+png_set_compression_buffer_size(png_structp png_ptr, png_uint_32 size)
+{
+    if(png_ptr->zbuf)
+       png_free(png_ptr, png_ptr->zbuf);
+    {
+       png_ptr->zbuf_size = (png_size_t)size;
+       png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, size);
+    }
+}
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+static void
+png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
+   int chunk, int location)
+{
+   if(png_ptr != NULL && info_ptr != NULL && chunk >= 0 && chunk < 
+         info_ptr->unknown_chunks_num)
+      info_ptr->unknown_chunks[chunk].location = (png_byte)location;
+}
+#endif
+#endif
+
+/************* end of direct access functions *****************************/
 
 /* cexcept interface */
 
@@ -404,19 +462,20 @@ png_cexcept_error(png_structp png_ptr, png_const_charp msg)
 {
    if(png_ptr)
      ;
-#if (PNG_LIBPNG_VER > 10006)
+#if (PNG_LIBPNG_VER > 10006 && defined(PNGCRUSH_H))
    if (!strcmp(msg, "Too many IDAT's found"))
    {
 #ifndef PNG_NO_CONSOLE_IO
-     fprintf(stderr, "Correcting ");
+     fprintf(stderr, "\nIn %s, correcting ",inname);
 #else
      png_warning(png_ptr, msg);
 #endif
-     /* png_ptr->mode |= PNG_AFTER_IDAT; */
    }
    else
 #endif
-   Throw msg;
+   {
+      Throw msg;
+   }
 }
 
 /* START of code to validate memory allocation and deallocation */
@@ -531,21 +590,6 @@ void png_crush_pause(void)
         /* stifle compiler warning */ return;
    }
 }
-#define PNG_CRUSH_CLEANUP \
-      fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname); \
-      if(row_buf != NULL)png_free(read_ptr, row_buf); \
-      row_buf = (png_bytep)NULL; \
-      png_destroy_info_struct(write_ptr, &write_end_info_ptr); \
-      png_destroy_write_struct(&write_ptr, &write_info_ptr); \
-      if(nosave == 0) \
-      { \
-         FCLOSE(fpout); \
-      } \
-      png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr); \
-      FCLOSE(fpin); \
-      if(verbose > 1) \
-        fprintf(STDERR, "returning after longjump\n");
-
 int keep_chunk(png_const_charp name, char *argv[]);
 
 int keep_chunk(png_const_charp name, char *argv[])
@@ -926,7 +970,7 @@ main(int argc, char *argv[])
       {
          names++;
          BUMP_I;
-         max_idat_size = atoi(argv[i]);
+         max_idat_size = (png_uint_32)atoi(argv[i]);
          if (max_idat_size > PNG_ZBUF_SIZE) max_idat_size=PNG_ZBUF_SIZE;
       }
    else if(!strncmp(argv[i],"-m",2))
@@ -1604,12 +1648,9 @@ main(int argc, char *argv[])
    for (ia=0; ia<255; ia++)
       trns_array[ia]=255;
 
-   for(;;)  /* loop on input files */
+  for(;;)  /* loop on input files */
 
-   {
-   png_const_charp msg;
-   Try
-   {
+  {
       first_trial = 1;
 
       if(png_row_filters != NULL)
@@ -1713,6 +1754,11 @@ main(int argc, char *argv[])
       }
       else
          idat_length[0]=1;
+
+      if (input_color_type == 4 || input_color_type == 6)
+      /* check for unused alpha channel */
+      {
+      }
 
       if(!methods_specified || try_method[0] == 0)
       {
@@ -1865,6 +1911,8 @@ main(int argc, char *argv[])
       P2("files are opened.\n");
             png_crush_pause();
 
+   Try
+   {
       png_debug(0, "Allocating read and write structures\n");
 #ifdef PNG_USER_MEM_SUPPORTED
    read_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
@@ -1921,31 +1969,26 @@ main(int argc, char *argv[])
      /* We don't need to check CRC's because they were already checked
         in the png_measure_idat function */
 
-      read_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_NOWARN |
-                         PNG_FLAG_CRC_ANCILLARY_USE    |
-                         PNG_FLAG_CRC_CRITICAL_IGNORE;
+      png_set_crc_action(read_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
 
+#if (PNG_LIBPNG_VER >= 10000)
    /* reinitialize zbuf - compression buffer */
 
-      if(read_ptr->zbuf_size < (png_size_t)max_idat_size)
+      if(png_get_compression_buffer_size(read_ptr) < max_idat_size)
       {
-      P2("reinitializing read zbuf.\n");
-      png_free(read_ptr, read_ptr->zbuf);
-      read_ptr->zbuf_size = (png_size_t)max_idat_size;
-      read_ptr->zbuf = 
-        (png_bytep)png_malloc(read_ptr, (png_uint_32)read_ptr->zbuf_size);
+         P2("reinitializing read zbuf.\n");
+         png_set_compression_buffer_size(read_ptr, max_idat_size);
       }
       if(nosave == 0)
        {
-         if(write_ptr->zbuf_size > (png_size_t)max_idat_size)
+         if(png_get_compression_buffer_size(write_ptr) < max_idat_size)
          {
             P2("reinitializing write zbuf.\n");
-            png_free(write_ptr, write_ptr->zbuf);
-            write_ptr->zbuf_size = (png_size_t)max_idat_size;
-            write_ptr->zbuf = (png_bytep)png_malloc(write_ptr,
-                 (png_uint_32)write_ptr->zbuf_size);
+            png_set_compression_buffer_size(write_ptr, max_idat_size);
          }
        }
+#endif
+
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
       png_set_keep_unknown_chunks(read_ptr, HANDLE_CHUNK_ALWAYS,
          (png_bytep)NULL, 0);
@@ -2172,8 +2215,7 @@ main(int argc, char *argv[])
                int required_window;
                int channels=0;
 
-               write_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
-               write_ptr->zlib_strategy = z_strategy;
+               png_set_compression_strategy(write_ptr, z_strategy);
 
                if (output_color_type == 0)channels=1;
                if (output_color_type == 2)channels=3;
@@ -2813,12 +2855,12 @@ main(int argc, char *argv[])
             &unknowns);
          if (num_unknowns)
          {
-            png_size_t i;
+            int i;
             png_set_unknown_chunks(write_ptr, write_info_ptr, unknowns,
               num_unknowns);
-            for (i = 0; i < read_info_ptr->unknown_chunks_num; i++)
-              write_info_ptr->unknown_chunks[i].location =
-                 unknowns[i].location;
+            for (i = 0; i < num_unknowns; i++)
+                png_set_unknown_chunk_location(write_ptr, write_info_ptr,
+                i, (int)unknowns[i].location);
          }
       }
 #endif
@@ -2836,7 +2878,10 @@ main(int argc, char *argv[])
       if(output_bit_depth < input_bit_depth)
       {
           png_color_8 true_bits;
+#if 0
+          /* why did we need this? */
           write_ptr->bit_depth=(png_byte)output_bit_depth;
+#endif
           true_bits.gray = (png_byte)(8 - (input_bit_depth - output_bit_depth));
           png_set_shift(read_ptr, &true_bits);
           png_set_packing(write_ptr);
@@ -2876,18 +2921,7 @@ main(int argc, char *argv[])
 #endif
 
       if (row_buf == NULL)
-      {
-         fprintf(STDERR, "Insufficient memory to allocate row buffer\n");
-         png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infopp)NULL);
-         png_destroy_write_struct(&write_ptr, &write_info_ptr);
-         if(png_row_filters != NULL)
-         {
-            free(png_row_filters); png_row_filters=NULL;
-         }
-         FCLOSE(fpin);
-         FCLOSE(fpout);
-         return 1;
-      }
+         png_error(read_ptr, "Insufficient memory to allocate row buffer");
 
       {
       /* check for sufficient memory: we need 2*zlib_window
@@ -3092,13 +3126,13 @@ main(int argc, char *argv[])
          &unknowns);
       if (num_unknowns && nosave == 0)
       {
-         png_size_t i;
+         int i;
          printf("setting %d unknown chunks after IDAT\n",num_unknowns);
          png_set_unknown_chunks(write_ptr, write_end_info_ptr, unknowns,
            num_unknowns);
-         for (i = 0; i < read_info_ptr->unknown_chunks_num; i++)
-           write_end_info_ptr->unknown_chunks[i].location =
-              unknowns[i].location;
+         for (i = 0; i < num_unknowns; i++)
+             png_set_unknown_chunk_location(write_ptr, write_end_info_ptr,
+             i, (int)unknowns[i].location);
       }
    }
 #endif
@@ -3116,9 +3150,29 @@ main(int argc, char *argv[])
          png_destroy_info_struct(write_ptr, &write_end_info_ptr);
          png_destroy_write_struct(&write_ptr, &write_info_ptr);
       }
+      }
+      Catch (msg)
+      {
+          if(nosave == 0)
+            fprintf(stderr, "While converting %s to %s:\n", inname, outname);
+          else
+            fprintf(stderr, "While reading %s:\n", inname);
+          fprintf(stderr, "  pngcrush caught libpng error:\n   %s\n\n",msg);
+          if(row_buf != NULL)png_free(read_ptr, row_buf);
+          row_buf = (png_bytep)NULL;
+          png_destroy_info_struct(write_ptr, &write_end_info_ptr);
+          png_destroy_write_struct(&write_ptr, &write_info_ptr);
+          if(nosave == 0)
+             FCLOSE(fpout);
+          png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
+          FCLOSE(fpin);
+          if(verbose > 1)
+            fprintf(stderr, "returning after cleanup\n");
+          trial = MAX_METHODS+1;
+       }
+
       read_ptr=NULL;
       write_ptr=NULL;
-
       FCLOSE(fpin);
       if(nosave == 0)
          FCLOSE(fpout);
@@ -3204,72 +3258,61 @@ main(int argc, char *argv[])
          if(verbose > 0) show_result();
          return 0;
       }
-   }
-   Catch (msg)
-   {
-     fprintf(stderr, "Caught libpng error:\n   %s\n\n",msg);
-     PNG_CRUSH_CLEANUP
-   }
-   }  /* end of loop on input files */
+  }  /* end of loop on input files */
 }
 
 png_uint_32
 measure_idats(FILE *fpin)
 {
-   png_uint_32 measured_idat_length;
    png_const_charp msg;
    P2("measure_idats:\n");
    png_debug(0, "Allocating read structure\n");
+   Try
+   {
    read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
    png_debug(0, "Allocating read_info,  end_info structures\n");
    read_info_ptr = png_create_info_struct(read_ptr);
    end_info_ptr = png_create_info_struct(read_ptr);
 
-   Try
-   {
-
 #if !defined(PNG_NO_STDIO)
    png_init_io(read_ptr, fpin);
 #else
    png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
 #endif
-
-   read_ptr->sig_bytes=0;
-   measured_idat_length=png_measure_idat(read_ptr, read_info_ptr);
+   png_set_sig_bytes(read_ptr, 0);
+   measured_idat_length=png_measure_idat(read_ptr);
    P2("measure_idats: IDAT length=%lu\n",measured_idat_length);
    png_debug(0, "Destroying data structs\n");
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
-   return measured_idat_length;
    }
    Catch (msg)
    {
-      PNG_CRUSH_CLEANUP
-      P2("Measure_idats caught libpng error:\n   %s\n\n",msg);
+      fprintf(STDERR, "\nWhile reading %s ", inname);
+      fprintf(STDERR,"pngcrush caught libpng error:\n   %s\n\n",msg);
+      png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
+      png_debug(0, "Destroyed data structs\n");
+      measured_idat_length=0;
    }
-   return 0;
+   return measured_idat_length;
 }
 
 
 png_uint_32
-png_measure_idat(png_structp png_ptr, png_infop info_ptr)
+png_measure_idat(png_structp png_ptr)
 {
    png_uint_32 sum_idat_length=0;
    png_debug(1, "in png_read_info\n");
 
-   /* If we haven't checked all of the PNG signature bytes, do so now. */
-   if (png_ptr->sig_bytes < 8)
    {
-      png_size_t num_checked = png_ptr->sig_bytes,
-                 num_to_check = 8 - num_checked;
+      png_byte png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
-      png_read_data(png_ptr, &(info_ptr->signature[num_checked]), num_to_check);
-      png_ptr->sig_bytes = 8;
+      png_read_data(png_ptr, png_sig, 8);
+      png_set_sig_bytes(png_ptr, 8);
 
-      if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
+      if (png_sig_cmp(png_sig, 0, 8))
       {
-         if (num_checked < 4 &&
-             png_sig_cmp(info_ptr->signature, num_checked, num_to_check - 4))
+         if (png_sig_cmp(png_sig, 0, 4))
             png_error(png_ptr, "Not a PNG file");
          else
             png_error(png_ptr, "PNG file corrupted by ASCII conversion");
@@ -3282,10 +3325,12 @@ png_measure_idat(png_structp png_ptr, png_infop info_ptr)
 #ifdef PNG_USE_LOCAL_ARRAYS
       PNG_IDAT;
       PNG_IEND;
+      PNG_IHDR;
 #endif
 #endif
       png_byte chunk_name[5];
       png_byte chunk_length[4];
+      png_byte buffer[16];
       png_uint_32 length;
 
       png_read_data(png_ptr, chunk_length, 4);
@@ -3294,6 +3339,17 @@ png_measure_idat(png_structp png_ptr, png_infop info_ptr)
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, chunk_name, 4);
 
+#ifdef PNG_UINT_IDAT
+      if (png_get_uint_32(chunk_name) == PNG_UINT_IHDR)
+#else
+      if (!png_memcmp(chunk_name, png_IHDR, 4))
+#endif
+      {
+         /* get the color type */
+         png_crc_read(png_ptr, buffer, 13);
+         length-=13;
+         input_color_type=buffer[9];
+      }
 
 #ifdef PNG_UINT_IDAT
       if (png_get_uint_32(chunk_name) == PNG_UINT_IDAT)
