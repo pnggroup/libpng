@@ -3,7 +3,7 @@
 /* Special defines for pngcrush, mostly just to reduce the size of the
    static executable. */
 
-#define PNG_NO_FLOAING_POINT_SUPPORTED /* undef this if you want to be able
+#define PNG_NO_FLOATING_POINT_SUPPORTED /* undef this if you want to be able
                                            to reduce color to gray */
 #define PNG_NO_READ_cHRM
 #define PNG_NO_WRITE_cHRM

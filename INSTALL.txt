@@ -1,16 +1,16 @@
 
-There's a sample makefile.gcc for pngcrush, which you can use
+There's a sample Makefile.gcc for pngcrush, which you can use
 by typing
 
-    make -f makefile.gcc
+    make -f Makefile.gcc
 
-However, all you should need to do is enter the pngcrush-1.3.0
+However, all you should need to do is enter the pngcrush-n.n.n
 directory and type
 
     cc -O -o pngcrush *.c -lm
     cp pngcrush /usr/local/bin  # or wherever you want
 
-You might want to create a makefile if you are planning to do
+You might want to create your own Makefile if you are planning to do
 something more complicated, like loading with your system's shared
 libraries for libpng and zlib.
 

@@ -1,5 +1,35 @@
+Pngcrush documentation
 
- | pngcrush 1.3.1, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
+This is the copyright notice, disclaimer, and license:
+
+/*
+ * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
+ *
+ * Copyright (c) 1998, 1999, Glenn Randers-Pehrson
+ *
+ * The pngcrush program is supplied "AS IS".  The Author disclaims all
+ * warranties, expressed or implied, including, without limitation, the
+ * warranties of merchantability and of fitness for any purpose.  The
+ * Author assumes no liability for direct, indirect, incidental, special,
+ * exemplary, or consequential damages, which may result from the use of
+ * the pngcrush program, even if advised of the possibility of such damage.
+ *
+ * Permission is hereby granted to use, copy, modify, and distribute this
+ * source code, or portions hereof, for any purpose, without fee, subject
+ * to the following restrictions:
+ *
+ * 1. The origin of this source code must not be misrepresented.
+ *
+ * 2. Altered versions must be plainly marked as such and must not be
+ *    misrepresented as being the original source.
+ *
+ * 3. This Copyright notice, disclaimer, and license may not be removed
+ *    or altered from any source or altered source distribution.
+ */
+
+This is the output of "pngcrush" and "pngcrush -help":
+
+ | pngcrush 1.3.2, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
  | This program was built with libpng version 1.0.5k,
@@ -13,6 +43,7 @@
 usage: pngcrush [options] infile.png outfile.png
        pngcrush -e ext [other options] files.png ...
        pngcrush -d dir [other options] files.png ...
+
 options:
         -brute (Use brute-force, try 114 different methods)
             -c color_type of output file [0, 2, 4, or 6]
@@ -39,6 +70,7 @@ options:
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
             -h (help)
             -p (pause)
+
 
 options:
         -brute (Use brute-force, try 114 different methods)

@@ -15,7 +15,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.3.1"
+#define PNGCRUSH_VERSION "1.3.2"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -53,6 +53,15 @@
  *   and tear on disk drives.
  *
  * Change log:
+ *
+ * Version 1.3.2 (built with libpng-1.0.5k)
+ *   
+ *   Renamed "dirname" to "directory_name" to avoid conflict with "dirname"
+ *   that appears in string.h on some platforms.
+ *
+ *   Fixed "PNG_NO_FLOAING_POINT" typo in pngcrush.h
+ *
+ *   #ifdef'ed out parts of the help screen for options that are unsupported.
  *
  * Version 1.3.1 (built with libpng-1.0.5k): Eliminated some spurious warnings
  *   that were being issued by libpng-1.0.5j.  Added  -itxt, -ztxt, and
@@ -161,7 +170,7 @@
 static PNG_CONST char *progname = "pngtest.png";
 static PNG_CONST char *inname = "pngtest.png";
 static PNG_CONST char *outname = "pngout.png";
-static PNG_CONST char *dirname = "pngcrush.bak";
+static PNG_CONST char *directory_name = "pngcrush.bak";
 static PNG_CONST char *extension = "_C.png";
 
 static int all_chunks_are_safe=0;
@@ -641,7 +650,7 @@ main(int argc, char *argv[])
       {
          i++;
          pngcrush_mode=DIRECTORY_MODE;
-         dirname= argv[names++];
+         directory_name= argv[names++];
       }
    else if(!strncmp(argv[i],"-e",2))
       {
@@ -784,11 +793,13 @@ main(int argc, char *argv[])
          things_have_changed=1;
       }
 #endif
+#ifdef PNG_pHYs_SUPPORTED
    else if(!strncmp(argv[i],"-res",4))
       {
          names++;
          resolution=atoi(argv[++i]);
       }
+#endif
    else if(!strncmp(argv[i],"-r",2))
       {
          remove_chunks=i;
@@ -797,6 +808,7 @@ main(int argc, char *argv[])
       }
    else if( !strncmp(argv[i],"-save",5))
          all_chunks_are_safe++;
+#ifdef PNG_sRGB_SUPPORTED
    else if( !strncmp(argv[i],"-srgb",5) ||
             !strncmp(argv[i],"-sRGB",5))
       {
@@ -816,6 +828,7 @@ main(int argc, char *argv[])
          else
            i--;
       }
+#endif
    else if(!strncmp(argv[i],"-s",2))
          verbose=0;
    else if( !strncmp(argv[i],"-text",5) || !strncmp(argv[i],"-tEXt",5) ||
@@ -993,6 +1006,7 @@ main(int argc, char *argv[])
    else if(default_compression_window ==  2) default_compression_window=11;
    else if(default_compression_window ==  1) default_compression_window=10;
    else if(default_compression_window == 512) default_compression_window= 9;
+   /* Use of compression window size 256 is not recommended. */
    else if(default_compression_window == 256) default_compression_window= 8;
    else if(default_compression_window != 15)
    {
@@ -1396,20 +1410,20 @@ main(int argc, char *argv[])
       if(pngcrush_mode == DIRECTORY_MODE)
       {
           struct stat stat_buf;
-          if(stat(dirname, &stat_buf) != 0)
+          if(stat(directory_name, &stat_buf) != 0)
           {
-#ifdef _MBCS
-             if(_mkdir(dirname) != 0)
+#if defined(_MBCS) || defined(__WIN32__)
+             if(_mkdir(directory_name) != 0)
 #else
-             if(mkdir(dirname, 0x1ed) != 0)
+             if(mkdir(directory_name, 0x1ed) != 0)
 #endif
              {
-                fprintf(STDERR,"could not create directory %s\n",dirname);
+                fprintf(STDERR,"could not create directory %s\n",directory_name);
                 return 1;
              }
           }
           out_string[0] = '\0'; 
-          str_return = strcat(out_string,dirname);
+          str_return = strcat(out_string,directory_name);
           str_return = strcat(out_string,SLASH);
 
           in_string[0] = '\0'; 
