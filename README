@@ -1,4 +1,4 @@
-[NOTE:  this is still beta version 0.99d; the text below has already
+[NOTE:  this is still beta version 0.99e; the text below has already
  been updated in anticipation of the imminent 1.0 release.]
 
 
@@ -127,19 +127,22 @@ Files in this distribution:
       CHANGES       =>  Description of changes between libpng versions
       README        =>  This file
       TODO          =>  Things not implemented in the current library
+      ansi2knr.1    =>  Manual page for ansi2knr
       ansi2knr.c    =>  Converts files to K&R style function declarations
       build.bat     =>  MS-DOS batch file for Borland compiler
       descrip.mms   =>  VMS project file
       example.c     =>  Example code for using libpng functions
+      libpng.3      =>  manual page for libpng
       libpng.txt    =>  Description of libpng and its functions
+      libpngpf.3    =>  manual page for libpng's private functions
       makefile.aco  =>  ACORN makefile
       makefile.ama  =>  Amiga makefile
       makefile.atr  =>  Atari makefile
       makefile.bor  =>  Borland makefile
       makefile.dec  =>  DEC makefile
       makefile.dj2  =>  DJGPP 2 makefile
-      makefile.elf  =>  Unix ELF makefile
       makefile.knr  =>  Makefile which calls ansi2knr to convert files
+      makefile.lnx  =>  Unix Linux/ELF makefile
       makefile.mip  =>  MIPS makefile
       makefile.msc  =>  Microsoft C makefile
       makefile.sgi  =>  Silicon Graphics Irix makefile
@@ -147,10 +150,12 @@ Files in this distribution:
       makefile.sun  =>  SUN makefile
       makefile.tc3  =>  Turbo C 3.0 makefile
       makevms.com   =>  VMS make program
+      png.5         =>  manual page for the PNG format
       png.c         =>  Basic interface functions common to library
       png.h         =>  Library function and interface declarations
       pngconf.h     =>  System specific library configuration
       pngerror.c    =>  Error/warning message I/O functions
+      pngget.c      =>  Functions for retrieving info from struct
       pngmem.c      =>  Memory handling functions
       pngpread.c    =>  Progressive reading functions
       pngread.c     =>  Read data/helper high-level functions
@@ -178,5 +183,4 @@ Good luck, and happy coding.
 
 -Guy Eric Schalnat
  (formerly of Group 42, Inc)
- Web: http://www.group42.com/
-
+ Internet: gschal@infinet.com

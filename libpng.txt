@@ -1,27 +1,28 @@
 libpng.txt - A description on how to use and modify libpng
 
-libpng version 0.99d
-Updated and distributed by Glenn Randers-Pehrson <randeg@alumni.rpi.edu>
-Copyright (c) 1998, Glenn Randers-Pehrson
-February 8, 1998
+ libpng version 0.99e
+ Updated and distributed by Glenn Randers-Pehrson
+ <randeg@alumni.rpi.edu>
+ Copyright (c) 1998, Glenn Randers-Pehrson
+ February 28, 1998
 
-based on:
+ based on:
 
-libpng 1.0 beta 6  version 0.96
-Updated and distributed by Andreas Dilger 
-Copyright (c) 1996, 1997 Andreas Dilger
-May 28, 1997
+ libpng 1.0 beta 6  version 0.96
+ Updated and distributed by Andreas Dilger 
+ Copyright (c) 1996, 1997 Andreas Dilger
+ May 28, 1997
 
-libpng 1.0 beta 2 - version 0.88
-For conditions of distribution and use, see copyright notice in png.h
-Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-January 26, 1996
+ libpng 1.0 beta 2 - version 0.88
+ For conditions of distribution and use, see copyright
+ notice in png.h. Copyright (c) 1995, 1996 Guy Eric
+ Schalnat, Group 42, Inc.  January 26, 1996
 
-Updated/rewritten per request in the libpng FAQ
-Copyright (c) 1995 Frank J. T. Wojcik
-December 18, 1995 && January 20, 1996
+ Updated/rewritten per request in the libpng FAQ
+ Copyright (c) 1995 Frank J. T. Wojcik
+ December 18, 1995 && January 20, 1996
 
-I. Introduction
+Introduction
 
 This file describes how to use and modify the PNG reference library
 (known as libpng) for your own use.  There are five sections to this
@@ -73,9 +74,7 @@ II. Structures
 There are two main structures that are important to libpng, png_struct
 and png_info.  The first, png_struct, is an internal structure that
 will not, for the most part, be used by a user except as the first
-variable passed to every libpng function call.  It is not actually
-used in many of the functions; do not be alarmed about compiler
-warnings that say something to the effect that "png_ptr is not used."
+variable passed to every libpng function call.
 
 The png_info structure is designed to provide information about the
 PNG file.  At one time, the fields of png_info were intended to be
@@ -257,8 +256,8 @@ Functions are used to get the information from the info_ptr:
                      for PNG 1.0)
     compression_type - (must be PNG_COMPRESSION_TYPE_BASE
                      for PNG 1.0)
-    interlace_type - (PNG_INTERLACE_TYPE_NONE or
-                     PNG_INTERLACE_TYPE_ADAM7)
+    interlace_type - (PNG_INTERLACE_NONE or
+                     PNG_INTERLACE_ADAM7)
     Any or all of interlace_type, compression_type, of
                      filter_type can be
     NULL if you are not interested in their values.
@@ -275,7 +274,7 @@ Functions are used to get the information from the info_ptr:
     signature      - holds the signature read from the
                      file (if any).  The data is kept in
                      the same offset it would be if the
-                     whole signature were read (ie if an
+                     whole signature were read (i.e. if an
                      application had already read in 4
                      bytes of signature before starting
                      libpng, the remaining 4 bytes would
@@ -377,12 +376,16 @@ into the info_ptr is returned for any complex types.
                      x direction
     res_y          - pixels/unit physical resolution in
                      x direction
-    unit_type      - PNG_RESOLUTION_UNKOWN,
+    unit_type      - PNG_RESOLUTION_UNKNOWN,
                      PNG_RESOLUTION_METER
 
 The data from the pHYs chunk can be retrieved in several convenient
 forms:
 
+    res_x = png_get_x_pixels_per_meter(png_ptr,
+                  info_ptr)
+    res_y = png_get_y_pixels_per_meter(png_ptr,
+                  info_ptr)
     res_x_and_y = png_get_pixels_per_meter(png_ptr,
                   info_ptr)
     aspect_ratio = png_get_pixel_aspect_ratio(png_ptr,
@@ -425,7 +428,7 @@ ways to transform the data will be described in the order that they
 should occur.  This is important, as some of these change the color
 type and/or bit depth of the data, and some others only work on
 certain color types and bit depths.  Even though each transformation
-checks to see if it has data that it can do somthing with, you should
+checks to see if it has data that it can do something with, you should
 make sure to only enable a transformation if it will be valid for the
 data.  For example, don't swap red and blue on grayscale data.
 
@@ -497,7 +500,7 @@ values of the pixels:
 
 PNG files have possible bit depths of 1, 2, 4, 8, and 16.  All pixels
 stored in a PNG image have been "scaled" or "shifted" up to the next
-higher possible bit depth (eg from 5 bits/sample in the range [0,31] to
+higher possible bit depth (e.g. from 5 bits/sample in the range [0,31] to
 8 bits/sample in the range [0, 255]).  However, it is also possible to
 convert the PNG pixel data back to the original bit depth of the image.
 This call reduces the pixels back down to the original bit depth:
@@ -571,9 +574,8 @@ the overall gamma correction required to produce pleasing results,
 which depends on the lighting conditions in the surrounding environment.
 Screen_gamma is display_gamma/viewing_gamma, where viewing_gamma is
 the amount of additional gamma correction needed to compensate for
-a dim (viewing_gamma=1.125) or dark (viewing_gamma=1.25) environment.
-In a brightly lit room, no compensation other than the display_gamma
-is needed (viewing_gamma=1.0).
+a (viewing_gamma=1.25) environment.  In a dim or brightly lit room, no
+compensation other than the display_gamma is needed (viewing_gamma=1.0).
 
    if (/* We have a user-defined screen
        gamma value */)
@@ -590,10 +592,8 @@ is needed (viewing_gamma=1.0).
    /* If we don't have another value */
    else
    {
-      screen_gamma = 2.5; /* A good guess for a
-           PC monitor in a bright office */
       screen_gamma = 2.2; /* A good guess for a
-           PC monitor in a dim room */
+           PC monitor in a bright office or a dim room */
       screen_gamma = 2.0; /* A good guess for a
            PC monitor in a dark room */
       screen_gamma = 1.7 or 1.0;  /* A good
@@ -656,8 +656,8 @@ zero):
       png_set_invert_mono(png_ptr);
 
 PNG files store 16 bit pixels in network byte order (big-endian,
-ie. most significant bits first).  This code chages the storage to the
-other way (little-endian, ie. least significant bits first, eg. the
+ie. most significant bits first).  This code changes the storage to the
+other way (little-endian, i.e. least significant bits first, the
 way PCs store them):
 
     if (bit_depth == 16)
@@ -713,7 +713,7 @@ You can point to void or char or whatever you use for pixels.
 
 If you don't want to read in the whole image at once, you can
 use png_read_rows() instead.  If there is no interlacing (check
-interlace_type == PNG_INTERLACE_TYPE_NONE), this is simple:
+interlace_type == PNG_INTERLACE_NONE), this is simple:
 
     png_read_rows(png_ptr, row_pointers, NULL,
        number_of_rows);
@@ -728,7 +728,7 @@ row_pointers:
 
 If the file is interlaced (info_ptr->interlace_type != 0), things get
 somewhat harder.  The only current (PNG Specification version 1.0)
-interlacing type for PNG is (interlace_type == PNG_INTERLACE_TYPE_ADAM7)
+interlacing type for PNG is (interlace_type == PNG_INTERLACE_ADAM7)
 is a somewhat complicated 2D interlace scheme, known as Adam7, that
 breaks down an image into seven smaller images of varying size, based
 on an 8x8 grid.
@@ -767,7 +767,7 @@ numbered scanlines.  Phew!
 If you want libpng to expand the images, call this before calling
 png_start_read_image() or png_read_update_info():
 
-    if (interlace_type == PNG_INTERLACE_TYPE_ADAM7)
+    if (interlace_type == PNG_INTERLACE_ADAM7)
         number_of_passes
            = png_set_interlace_handling(png_ptr);
 
@@ -1057,7 +1057,8 @@ have no special needs in this area, let the library do what it wants by
 not calling this function at all, as it has been tuned to deliver a good
 speed/compression ratio. The second parameter to png_set_filter() is
 the filter method, for which the only valid value is '0' (as of the
-06/96 PNG specification.  The third parameter is a flag that indicates
+October 1996 PNG specification, version 1.0).  The third parameter is a
+flag that indicates
 which filter type(s) are to be tested for each scanline.  See the
 Compression Library for details on the specific filter types.
 
@@ -1128,8 +1129,8 @@ Some of the more important parts of the png_info are:
                      PNG_COLOR_MASK_COLOR
                      PNG_COLOR_MASK_ALPHA
 
-    interlace_type - PNG_INTERLACE_TYPE_NONE or
-                     PNG_INTERLACE_TYPE_ADAM7
+    interlace_type - PNG_INTERLACE_NONE or
+                     PNG_INTERLACE_ADAM7
     compression_type - (must be
                      PNG_COMPRESSION_TYPE_DEFAULT)
     filter_type    - (must be PNG_FILTER_TYPE_DEFAULT)
@@ -1226,7 +1227,7 @@ Some of the more important parts of the png_info are:
                   in x direction
     res_y       - pixels/unit physical resolution
                   in y direction
-    unit_type   - PNG_RESOLUTION_UNKOWN,
+    unit_type   - PNG_RESOLUTION_UNKNOWN,
                   PNG_RESOLUTION_METER
 
 In PNG files, the alpha channel in an image is the level of opacity.
@@ -1267,7 +1268,7 @@ The keywords that are given in the PNG Specification are:
     Description      Description of image (possibly long)
     Copyright        Copyright notice
     Creation Time    Time of original image creation
-                    (usually RFC 1123 format, see below)
+                     (usually RFC 1123 format, see below)
     Software         Software used to create the image
     Disclaimer       Legal disclaimer
     Warning          Warning of nature of content
@@ -1277,7 +1278,7 @@ The keywords that are given in the PNG Specification are:
 
 The keyword-text pairs work like this.  Keywords should be short
 simple descriptions of what the comment is about.  Some typical
-keywords are found in the PNG specification, as is some recomendations
+keywords are found in the PNG specification, as is some recommendations
 on keywords.  You can repeat keywords in a file.  You can even write
 some text before the image and some after.  For example, you may want
 to put a description of the image before the image, but leave the
@@ -1301,7 +1302,7 @@ time_t routine uses gmtime().  You don't have to use either of
 these, but if you wish to fill in the png_time structure directly,
 you should provide the time in universal time (GMT) if possible
 instead of your local time.  Note that the year number is the full
-year (ie 1996, rather than 96 - PNG is year 2000 compliant!), and
+year (e.g. 1998, rather than 98 - PNG is year 2000 compliant!), and
 that months start with 1.
 
 If you want to store the time of the original image creation, you should
@@ -1311,7 +1312,7 @@ depending on whether you mean the PNG file, the time the image was
 created in a non-PNG format, a still photo from which the image was
 scanned, or possibly the subject matter itself.  In order to facilitate
 machine-readable dates, it is recommended that the "Creation Time"
-tEXt chunk use RFC 1123 format dates (eg 22 May 1997 18:07:10 GMT"),
+tEXt chunk use RFC 1123 format dates (e.g. 22 May 1997 18:07:10 GMT"),
 although this isn't a requirement.  Unlike the tIME chunk, the
 "Creation Time" tEXt chunk is not expected to be automatically changed
 by the software.  To facilitate the use of RFC 1123 dates, a function
@@ -1329,7 +1330,7 @@ ways to transform the data will be described in the order that they
 should occur.  This is important, as some of these change the color
 type and/or bit depth of the data, and some others only work on
 certain color types and bit depths.  Even though each transformation
-checks to see if it has data that it can do somthing with, you should
+checks to see if it has data that it can do something with, you should
 make sure to only enable a transformation if it will be valid for the
 data.  For example, don't swap red and blue on grayscale data.
 
@@ -1372,7 +1373,7 @@ file so that decoders can get the original data if desired.
     png_set_sBIT(png_ptr, info_ptr, &sig_bit);
 
 If the data is stored in the row buffer in a bit depth other than
-one supported by PNG (ie 3 bit data in the range 0-7 for a 4-bit PNG),
+one supported by PNG (e.g. 3 bit data in the range 0-7 for a 4-bit PNG),
 this will scale the values to appear to be the correct bit depth as
 is required by PNG.
 
@@ -1380,8 +1381,8 @@ is required by PNG.
 
 PNG files store 16 bit pixels in network byte order (big-endian,
 ie. most significant bits first).  This code would be used if they are
-supplied the other way (little-endian, ie. least significant bits
-first, eg. the way PCs store them):
+supplied the other way (little-endian, i.e. least significant bits
+first, the way PCs store them):
 
     if (bit_depth > 8)
        png_set_swap(png_ptr);
@@ -1418,9 +1419,9 @@ Note that the distance between rows is from the last time png_write_flush()
 was called, or the first row of the image if it has never been called.
 So if you write 50 lines, and then png_set_flush 25, it will flush the
 output on the next scanline, and every 25 lines thereafter, unless
-png_write_flush()ls is called before 25 more lines have been written.
+png_write_flush() is called before 25 more lines have been written.
 If nrows is too small (less than about 10 lines for a 640 pixel wide
-RGB image) the image compression may decrease noticably (although this
+RGB image) the image compression may decrease noticeably (although this
 may be acceptable for real-time applications).  Infrequent flushing will
 only degrade the compression performance by a few percent over images
 that do not use flushing.
@@ -1458,9 +1459,9 @@ row_pointers:
     png_write_row(png_ptr, &row_pointer);
 
 When the file is interlaced, things can get a good deal more
-complicated.  The only currently (as of 6/96 -- PNG Specification
-version 1.0) defined interlacing scheme for PNG files is a
-compilcated interlace scheme, known as Adam7, that breaks down an
+complicated.  The only currently (as of February 1998 -- PNG Specification
+version 1.0, dated October 1996) defined interlacing scheme for PNG files
+is the "Adam7" interlace scheme, that breaks down an
 image into seven smaller images of varying size.  libpng will build
 these images for you, or you can do them yourself.  If you want to
 build them yourself, see the PNG specification for details of which
@@ -1513,9 +1514,9 @@ The second deals with more complicated things like adding new chunks,
 adding new transformations, and generally changing how libpng works.
 
 All of the memory allocation, input/output, and error handling in libpng
-goes through callbacks which are user setable.  The default routines are
+goes through callbacks which are user settable.  The default routines are
 in pngmem.c, pngrio.c, pngwio.c, and pngerror.c respectively.  To change
-these functions, call the approprate png_set_???_fn() function.
+these functions, call the appropriate png_set_???_fn() function.
 
 Memory allocation is done through the functions png_large_malloc(),
 png_malloc(), png_realloc(), png_large_free(), and png_free().  These
@@ -1613,11 +1614,11 @@ can be found in the comments inside the code itself.
 Configuring for 16 bit platforms:
 
 You may need to change the png_large_malloc() and png_large_free()
-routines in pngmem.c, as these are requred to allocate 64K, although
+routines in pngmem.c, as these are required to allocate 64K, although
 there is already support for many of the common DOS compilers.  Also,
 you will want to look into zconf.h to tell zlib (and thus libpng) that
 it cannot allocate more then 64K at a time.  Even if you can, the memory
-won't be accessable.  So limit zlib and libpng to 64K by defining MAXSEG_64K.
+won't be accessible.  So limit zlib and libpng to 64K by defining MAXSEG_64K.
 
 Configuring for DOS:
 
@@ -1642,7 +1643,7 @@ You will need to write new error and warning functions that use the GUI
 interface, as described previously, and set them to be the error and
 warning functions at the time that png_create_???_struct() is called,
 in order to have them available during the structure initialization.
-They can be changed later via png_set_error_fn().  On some compliers,
+They can be changed later via png_set_error_fn().  On some compilers,
 you may also have to change the memory allocators (png_malloc, etc.).
 
 Configuring for compiler xxx:
@@ -1744,7 +1745,7 @@ to be considered when selecting row filters.  This means that filters
 with higher costs are less likely to be chosen over filters with lower
 costs, unless their "sum of absolute differences" is that much smaller.
 The costs do not necessarily reflect the exact computational speeds of
-the various filters, since this would unduely influence the final image
+the various filters, since this would unduly influence the final image
 size.
 
 Note that the numbers above were invented purely for this example and
@@ -1815,16 +1816,4 @@ to set the error callbacks AFTER png_read_init(), or to change them with
 png_set_error_fn(), which is essentially the same function, but with a
 new name to force compilation errors with applications that try to use
 the old method.
-.SH AUTHORS
-This man page: Glenn Randers-Pehrson
-
-Libpng version 0.99d (February 8, 1998):
-Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
-Currently maintained by Glenn Randers-Pehrson (randeg@alumni.rpi.edu).
-
-Supported by the PNG development group
-.br
-(png-implement@dworkin.wustl.edu).
-
-.\" end of man page
 

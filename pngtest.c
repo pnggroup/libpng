@@ -1,12 +1,12 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 0.99d
+ * libpng 0.99e
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 8, 1998
+ * February 28, 1998
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -37,10 +37,6 @@
 
 #include "png.h"
 
-#ifdef PNGTEST_MEMORY_DEBUG
-#include <unistd.h>
-#endif
-
 int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname);
 
 #ifdef __TURBOC__
@@ -52,6 +48,7 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname);
 #define STDERR stdout   /* for DOS */
 
 static int verbose = 0;
+static int wrote_question = 0;
 
 #if defined(PNG_NO_STDIO)
 /* START of code to validate stdio-free compilation */
@@ -686,9 +683,20 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          fprintf(STDERR, "Files %s and %s are of a different size\n",
                  inname, outname);
+         if(wrote_question == 0)
+         {
+            fprintf(STDERR,
+              "   Was %s written with the same chunk size (8k),",inname);
+            fprintf(STDERR,
+              " filtering\n   heuristic (libpng default), compression");
+            fprintf(STDERR,
+              " level (zlib default)\n   and zlib version (%s)?\n\n",
+              ZLIB_VERSION);
+            wrote_question=1;
+         }
          fclose(fpin);
          fclose(fpout);
-         return (1);
+         return (0);
       }
 
       if (!num_in)
@@ -697,9 +705,20 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_memcmp(inbuf, outbuf, num_in))
       {
          fprintf(STDERR, "Files %s and %s are different\n", inname, outname);
+         if(wrote_question == 0)
+         {
+            fprintf(STDERR,
+              "   Was %s written with the same chunk size (8k),",inname);
+            fprintf(STDERR,
+              " filtering\n   heuristic (libpng default), compression");
+            fprintf(STDERR,
+              " level (zlib default)\n   and zlib version (%s)?\n\n",
+              ZLIB_VERSION);
+            wrote_question=1;
+         }
          fclose(fpin);
          fclose(fpout);
-         return (1);
+         return (0);
       }
    }
 

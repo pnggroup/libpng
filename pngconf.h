@@ -1,12 +1,12 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 0.99d
+ * libpng 0.99e
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 8, 1998
+ * February 28, 1998
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -318,7 +318,7 @@ __dont__ include it again
 
 /* very little testing */
 /*
-#define PNG_READ_16_TO_8_ACCURATE_SHIFT_SUPPORTED
+#define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 */
 
 /* This is only for PowerPC big-endian and 680x0 systems */

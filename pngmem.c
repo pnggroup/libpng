@@ -1,11 +1,11 @@
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 0.99d
+ * libpng 0.99e
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 8, 1998
+ * February 28, 1998
  *
  * This file provides a location for all memory allocation.  Users which
  * need special memory handling are expected to modify the code in this file
@@ -297,7 +297,7 @@ PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
    ret = halloc(size, 1);
 # else
-   ret = malloc(size);
+   ret = malloc((size_t)size);
 # endif
 #endif
 

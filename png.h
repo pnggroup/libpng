@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 0.99d beta
+ * libpng 0.99e beta
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * February 8, 1998
+ * February 28, 1998
  *
  * Note about libpng version numbers:
  *
@@ -30,7 +30,7 @@
  *      0.99a                     0.99      2.0.99
  *      0.99b                     0.99      2.0.99
  *      0.99c                     0.99      2.0.99
- *      0.99d                     0.99      2.0.99
+ *      0.99e                     0.99      2.0.99
  *      1.0                       1.00      2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
@@ -65,6 +65,7 @@
  *    Guy Eric Schalnat
  *    Paul Schmidt
  *    Tom Tanner
+ *    Willem van Schaik
  *    Tim Wegner
  *
  * The contributing authors would like to thank all those who helped
@@ -708,6 +709,21 @@ extern PNG_EXPORT(png_structp,png_create_write_struct)
    PNGARG((png_const_charp user_png_ver, voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn));
 
+/* Write a PNG chunk - size, type, (optional) data, CRC. */
+extern PNG_EXPORT(void,png_write_chunk) PNGARG((png_structp png_ptr,
+   png_bytep chunk_name, png_bytep data, png_size_t length));
+
+/* Write the start of a PNG chunk - length and chunk name. */
+extern PNG_EXPORT(void,png_write_chunk_start) PNGARG((png_structp png_ptr,
+   png_bytep chunk_name, png_uint_32 length));
+
+/* Write the data of a PNG chunk started with png_write_chunk_start(). */
+extern PNG_EXPORT(void,png_write_chunk_data) PNGARG((png_structp png_ptr,
+   png_bytep data, png_size_t length));
+
+/* Finish a chunk started with png_write_chunk_start() (includes CRC). */
+extern PNG_EXPORT(void,png_write_chunk_end) PNGARG((png_structp png_ptr));
+
 /* Allocate and initialize the info structure */
 extern PNG_EXPORT(png_infop,png_create_info_struct)
    PNGARG((png_structp png_ptr));
@@ -1200,6 +1216,10 @@ png_ptr, png_infop info_ptr));
 /* Returns image resolution in pixels per meter, from pHYs chunk data. */
 extern PNG_EXPORT(png_uint_32, png_get_pixels_per_meter) PNGARG((png_structp
 png_ptr, png_infop info_ptr));
+extern PNG_EXPORT(png_uint_32, png_get_x_pixels_per_meter) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
+extern PNG_EXPORT(png_uint_32, png_get_y_pixels_per_meter) PNGARG((png_structp
+png_ptr, png_infop info_ptr));
 
 /* Returns pixel aspect ratio, computed from pHYs chunk data.  */
 extern PNG_EXPORT(float, png_get_pixel_aspect_ratio) PNGARG((png_structp
@@ -1619,21 +1639,6 @@ PNG_EXTERN void png_save_int_32 PNGARG((png_bytep buf, png_int_32 i));
  * just to avoid potential problems on pre-ANSI C compilers.
  */
 PNG_EXTERN void png_save_uint_16 PNGARG((png_bytep buf, unsigned int i));
-
-/* Write a PNG chunk - size, type, (optional) data, CRC. */
-PNG_EXTERN void png_write_chunk PNGARG((png_structp png_ptr,
-   png_bytep chunk_name, png_bytep data, png_size_t length));
-
-/* Write the start of a PNG chunk - length and chunk name. */
-PNG_EXTERN void png_write_chunk_start PNGARG((png_structp png_ptr,
-   png_bytep chunk_name, png_uint_32 length));
-
-/* Write the data of a PNG chunk started with png_write_chunk_start(). */
-PNG_EXTERN void png_write_chunk_data PNGARG((png_structp png_ptr,
-   png_bytep data, png_size_t length));
-
-/* Finish a chunk started with png_write_chunk_start() (includes CRC). */
-PNG_EXTERN void png_write_chunk_end PNGARG((png_structp png_ptr));
 
 /* simple function to write the signature */
 PNG_EXTERN void png_write_sig PNGARG((png_structp png_ptr));

@@ -1,12 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 0.99d
+ * libpng 0.99e
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 8, 1998
+ * February 28, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -771,8 +771,9 @@ png_init_read_transformations(png_structp png_ptr)
                }
             }
          }
-         else
          /* if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN)*/
+         else
+         /* color_type != PNG_COLOR_TYPE_PALETTE */
          {
             double g, gs, m;
 
@@ -799,6 +800,7 @@ png_init_read_transformations(png_structp png_ptr)
 
             if (color_type & PNG_COLOR_MASK_COLOR)
             {
+               /* RGB or RGBA */
                png_ptr->background_1.red = (png_uint_16)(pow(
                   (double)png_ptr->background.red / m, g) * m + .5);
                png_ptr->background_1.green = (png_uint_16)(pow(
@@ -814,6 +816,7 @@ png_init_read_transformations(png_structp png_ptr)
             }
             else
             {
+               /* GRAY or GRAY ALPHA */
                png_ptr->background_1.gray = (png_uint_16)(pow(
                   (double)png_ptr->background.gray / m, g) * m + .5);
                png_ptr->background.gray = (png_uint_16)(pow(
@@ -822,6 +825,7 @@ png_init_read_transformations(png_structp png_ptr)
          }
       }
       else
+      /* transformation does not include PNG_BACKGROUND */
 #endif
       if (color_type == PNG_COLOR_TYPE_PALETTE)
       {
@@ -844,6 +848,7 @@ png_init_read_transformations(png_structp png_ptr)
 #endif
 #endif
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
+   /* No GAMMA transformation */
    if (png_ptr->transformations & PNG_BACKGROUND &&
        color_type == PNG_COLOR_TYPE_PALETTE)
    {
@@ -1130,14 +1135,14 @@ png_do_read_transformations(png_structp png_ptr)
          (png_uint_32)png_ptr->filler, png_ptr->flags);
 #endif
 
-#if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
-   if (png_ptr->transformations & PNG_SWAP_ALPHA)
-      png_do_read_swap_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
-#endif
-
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
    if (png_ptr->transformations & PNG_INVERT_ALPHA)
       png_do_read_invert_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
+#if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
+   if (png_ptr->transformations & PNG_SWAP_ALPHA)
+      png_do_read_swap_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED)
@@ -1516,10 +1521,10 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0, sp = dp = row + row_info->rowbytes;
                i < row_info->width; i++)
             {
-               *(--dp) = *(--sp);
-               *(--dp) = *(--sp);
-               *(--dp) = *(--sp);
                *(--dp) = 255 - *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
             }
          }
          /* This inverts the alpha channel in RRGGBBAA */
@@ -1531,20 +1536,20 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0, sp = dp = row + row_info->rowbytes;
                i < row_info->width; i++)
             {
-               *(--dp) = *(--sp);
-               *(--dp) = *(--sp);
-               *(--dp) = *(--sp);
-               *(--dp) = *(--sp);
-               *(--dp) = *(--sp);
-               *(--dp) = *(--sp);
                *(--dp) = 255 - *(--sp);
                *(--dp) = 255 - *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
             }
          }
       }
       else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       {
-         /* This inverts the alpha channel in AG */
+         /* This inverts the alpha channel in GA */
          if (row_info->bit_depth == 8)
          {
             png_bytep sp, dp;
@@ -1553,11 +1558,11 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0, sp = dp = row + row_info->rowbytes;
                i < row_info->width; i++)
             {
-               *(--dp) = *(--sp);
                *(--dp) = 255 - *(--sp);
+               *(--dp) = *(--sp);
             }
          }
-         /* This inverts the alpha channel in AAGG */
+         /* This inverts the alpha channel in GGAA */
          else
          {
             png_bytep sp, dp;
@@ -1566,10 +1571,10 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0, sp = dp = row + row_info->rowbytes;
                i < row_info->width; i++)
             {
-               *(--dp) = *(--sp);
-               *(--dp) = *(--sp);
                *(--dp) = 255 - *(--sp);
                *(--dp) = 255 - *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
             }
          }
       }
@@ -1919,7 +1924,7 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
          back.green = (png_byte)png_ptr->background.green;
          back.blue  = (png_byte)png_ptr->background.blue;
 
-         for (i = 0; i < (int)png_ptr->num_trans && i < num_palette; i++)
+         for (i = 0; i < (int)png_ptr->num_trans; i++)
          {
             if (png_ptr->trans[i] == 0)
             {
@@ -1986,7 +1991,6 @@ png_do_background(png_row_infop row_info, png_bytep row,
       {
          case PNG_COLOR_TYPE_GRAY:
          {
-            /* We currently don't do gamma correction for 2 and 4 bit */
             switch (row_info->bit_depth)
             {
                case 1:

@@ -6,7 +6,7 @@
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 8, 1998
+ * February 28, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -257,6 +257,20 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_error(png_ptr, "Duplicate PLTE chunk");
 
    png_ptr->mode |= PNG_HAVE_PLTE;
+
+#if defined (PNG_READ_tRNS_SUPPORTED)
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+   {
+      if (info_ptr != NULL && info_ptr->valid & PNG_INFO_tRNS)
+      {
+         if (png_ptr->num_trans > png_ptr->num_palette)
+         {
+            png_warning(png_ptr, "Truncating incorrect tRNS chunk length");
+            png_ptr->num_trans = png_ptr->num_palette;
+         }
+      }
+   }
+#endif
 
 #if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
    if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
@@ -1419,8 +1433,8 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
       png_chunk_error(png_ptr, "unknown critical chunk");
-      /* to quiet compiler warnings about unused info_ptr */
 
+      /* to quiet compiler warnings about unused info_ptr */
       if (info_ptr == NULL)
          return;
    }

@@ -224,12 +224,23 @@ version 0.99c [February 7, 1998]
    More type casting.  Removed erroneous overflow test in pngmem.c.
    Added png_buffered_memcpy() and png_buffered_memset(), apply them to rowbytes.
    Added UNIX manual pages libpng.3 (incorporating libpng.txt) and  png.5.
-version 0.99d [February 8, 1998]
+version 0.99d [February 11, 1998]
    Renamed "far_to_near()" "png_far_to_near()"
    Revised libpng.3
    Version 99c "buffered" operations didn't work as intended.  Replaced them
-   with png_memcpy_check() and png_memset_check().
-version 0.99e [February 9, 1998]
-   Fixed a bug with background compositing of paletted images in pngrtran.c
+     with png_memcpy_check() and png_memset_check().
    Added many "if (png_ptr == NULL) return" to quell compiler warnings about
-      unused png_ptr, mostly in pngget.c and pngset.c.
+     unused png_ptr, mostly in pngget.c and pngset.c.
+   Check for overlength tRNS chunk present when indexed-color PLTE is read.
+   Cleaned up spelling errors in libpng.3/libpng.txt
+   Corrected a problem with png_get_tRNS() which returned undefined trans array
+version 0.99e [February 28, 1998]
+   Corrected png_get_tRNS() again.
+   Add parentheses for easier reading of pngget.c, fixed "||" should be "&&".
+   Touched up example.c to make more of it compileable, although the entire
+     file still can't be compiled (Willem van Schaik)
+   Fixed a bug in png_do_shift() (Bryan Tsai)
+   Added a space in png.h prototype for png_write_chunk_start()
+   Replaced pngtest.png with one created with zlib 1.1.1
+   Changed pngtest to report PASS even when file size is different (Jean-loup G.)
+   Corrected some logic errors in png_do_invert_alpha() (Chris Patterson)

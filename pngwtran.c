@@ -1,12 +1,12 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng 0.99d
+ * libpng 0.99e
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 8, 1998
+ * February 28, 1998
  */
 
 #define PNG_INTERNAL
@@ -42,13 +42,13 @@ png_do_write_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_SWAP_BYTES)
       png_do_swap(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
-#if defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
-   if (png_ptr->transformations & PNG_SWAP_ALPHA)
-      png_do_write_swap_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
-#endif
 #if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
    if (png_ptr->transformations & PNG_INVERT_ALPHA)
       png_do_write_invert_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+#if defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
+   if (png_ptr->transformations & PNG_SWAP_ALPHA)
+      png_do_write_swap_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 #if defined(PNG_WRITE_BGR_SUPPORTED)
    if (png_ptr->transformations & PNG_BGR)
@@ -227,7 +227,7 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
          channels++;
       }
 
-      /* with low row dephts, could only be grayscale, so one channel */
+      /* with low row depths, could only be grayscale, so one channel */
       if (row_info->bit_depth < 8)
       {
          png_bytep bp;
