@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng version 1.2.8beta2 - November 2, 2004
+ * libpng version 1.2.8beta3 - November 3, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2048,7 +2048,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
  * been specified by the application, and then writes the row out with the
  * chosen filter.
  */
-#define PNG_MAXSUM (~((png_uint_32)0) >> 1)
+#define PNG_MAXSUM (((png_uint_32)(-1)) >> 1)
 #define PNG_HISHIFT 10
 #define PNG_LOMASK ((png_uint_32)0xffffL)
 #define PNG_HIMASK ((png_uint_32)(~PNG_LOMASK >> PNG_HISHIFT))
