@@ -1,4 +1,4 @@
-README for libpng version 1.2.7rc1 - September 4, 2004 (shared library 12.0)
+README for libpng version 1.2.7 - September 12, 2004 (shared library 12.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -54,7 +54,7 @@ to set different actions based on whether the CRC error occurred in a
 critical or an ancillary chunk.
 
 The changes made to the library, and bugs fixed are based on discussions
-on the PNG implementation mailing list <png-implement@ccrc.wustl.edu>
+on the PNG-implement mailing list
 and not on material submitted privately to Guy, Andreas, or Glenn.  They will
 forward any good suggestions to the list.
 
@@ -105,16 +105,18 @@ based in a large way on Guy's and Andreas' earlier work), and the PNG group.
 
 glennrp@users.sourceforge.net
 png-implement@ccrc.wustl.edu (subscription required; write to
-majordomo@ccrc.wustl.edu)
+majordomo@ccrc.wustl.edu with "subscribe png-implement" in the message).
 
 You can't reach Guy, the original libpng author, at the addresses
 given in previous versions of this document.  He and Andreas will read mail
 addressed to the png-implement list, however.
 
 Please do not send general questions about PNG.  Send them to
-the address in the specification (png-group@w3.org).  At the same
-time, please do not send libpng questions to that address, send them to me
-or to png-implement@ccrc.wustl.edu.  I'll
+the (png-list@ccrc.wustl.edu, subscription required, write to
+majordomo@ccrc.wustl.edu with "subscribe png-list" in your message).
+On the other hand,
+please do not send libpng questions to that address, send them to me
+or to the png-implement list.  I'll
 get them in the end anyway.  If you have a question about something
 in the PNG specification that is related to using libpng, send it
 to me.  Send me any questions that start with "I was using libpng,
@@ -187,9 +189,9 @@ Files in this distribution:
        descrip.mms      =>  VMS makefile for MMS or MMK
        makefile.std     =>  Generic UNIX makefile (cc, creates static libpng.a)
        makefile.linux   =>  Linux/ELF makefile
-                            (gcc, creates libpng12.so.0.1.2.7rc1)
+                            (gcc, creates libpng12.so.0.1.2.7)
        makefile.gcmmx   =>  Linux/ELF makefile
-                            (gcc, creates libpng12.so.0.1.2.7rc1,
+                            (gcc, creates libpng12.so.0.1.2.7,
                             uses assembler code tuned for Intel MMX platform)
        makefile.gcc     =>  Generic makefile (gcc, creates static libpng.a)
        makefile.knr     =>  Archaic UNIX Makefile that converts files with
@@ -202,20 +204,21 @@ Files in this distribution:
        makefile.freebsd =>  FreeBSD makefile
        makefile.hpgcc   =>  HPUX makefile using gcc
        makefile.hpux    =>  HPUX (10.20 and 11.00) makefile
+       makefile.hp64    =>  HPUX (10.20 and 11.00) makefile, 64 bit
        makefile.ibmc    =>  IBM C/C++ version 3.x for Win32 and OS/2 (static)
        makefile.intel   =>  Intel C/C++ version 4.0 and later
        libpng.icc       =>  Project file, IBM VisualAge/C++ 4.0 or later
        makefile.netbsd  =>  NetBSD/cc makefile, PNGGCCRD, makes libpng.so.
-       makefile.ne0bsd  =>  NetBSD/cc makefile, PNGGCCRD, makes libpng0.so
+       makefile.ne12bsd  =>  NetBSD/cc makefile, PNGGCCRD, makes libpng12.so
        makefile.openbsd =>  OpenBSD makefile
        makefile.sgi     =>  Silicon Graphics IRIX (cc, creates static lib)
        makefile.sggcc   =>  Silicon Graphics
-                            (gcc, creates libpng12.so.0.1.2.7rc1)
+                            (gcc, creates libpng12.so.0.1.2.7)
        makefile.sunos   =>  Sun makefile
        makefile.solaris =>  Solaris 2.X makefile
-                            (gcc, creates libpng12.so.0.1.2.7rc1)
+                            (gcc, creates libpng12.so.0.1.2.7)
        makefile.so9     =>  Solaris 9 makefile
-                            (gcc, creates libpng12.so.0.1.2.7rc1)
+                            (gcc, creates libpng12.so.0.1.2.7)
        makefile.32sunu  =>  Sun Ultra 32-bit makefile
        makefile.64sunu  =>  Sun Ultra 64-bit makefile
        makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc
@@ -229,7 +232,6 @@ Files in this distribution:
        makefile.beos    =>  BEOS makefile for X86
        makefile.bor     =>  Borland makefile (uses bcc)
        makefile.bc32    =>  32-bit Borland C++ (all modules compiled in C mode)
-       makefile.bd32    =>  To make a png32bd.dll with Borland C++ 4.5
        makefile.tc3     =>  Turbo C 3.0 makefile
        makefile.dj2     =>  DJGPP 2 makefile
        makefile.msc     =>  Microsoft C makefile
@@ -242,7 +244,6 @@ Files in this distribution:
        pngos2.def       =>  OS/2 module definition file used by makefile.os2
        makefile.watcom  =>  Watcom 10a+ Makefile, 32-bit flat memory model
        makevms.com      =>  VMS build script
-       pngdef.pas       =>  Defines for a png32bd.dll with Borland C++ 4.5
        SCOPTIONS.ppc    =>  Used with smakefile.ppc
 
 Good luck, and happy coding.
