@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.11 - April 27, 2001
+ * libpng 1.0.12beta1 - May 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -31,6 +31,38 @@ png_default_warning PNGARG((png_structp png_ptr,
 void PNGAPI
 png_error(png_structp png_ptr, png_const_charp message)
 {
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+   char msg[16];
+   if (png_ptr->flags&(PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
+   {
+     int offset = 0;
+     if (*message == '#')
+     {
+         for (offset=1; offset<15; offset++)
+            if (*(message+offset) == ' ')
+                break;
+         if (png_ptr->flags&PNG_FLAG_STRIP_ERROR_TEXT)
+         {
+            int i;
+            for (i=0; i<offset-1; i++)
+               msg[i]=message[i+1];
+            msg[i]='\0';
+            message=msg;
+         }
+         else
+            message+=offset;
+     }
+     else
+     {
+         if (png_ptr->flags&PNG_FLAG_STRIP_ERROR_TEXT)
+         {
+            msg[0]='0';        
+            msg[1]='\0';
+            message=msg;
+         }
+     }
+   }
+#endif
    if (png_ptr->error_fn != NULL)
       (*(png_ptr->error_fn))(png_ptr, message);
 
@@ -47,10 +79,22 @@ png_error(png_structp png_ptr, png_const_charp message)
 void PNGAPI
 png_warning(png_structp png_ptr, png_const_charp message)
 {
+     int offset = 0;
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+   if (png_ptr->flags&(PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
+#endif
+   {
+     if (*message == '#')
+     {
+         for (offset=1; offset<15; offset++)
+            if (*(message+offset) == ' ')
+                break;
+     }
+   }
    if (png_ptr->warning_fn != NULL)
-      (*(png_ptr->warning_fn))(png_ptr, message);
+      (*(png_ptr->warning_fn))(png_ptr, (png_const_charp)(message+offset));
    else
-      png_default_warning(png_ptr, message);
+      png_default_warning(png_ptr, (png_const_charp)(message+offset));
 }
 
 /* These utilities are used internally to build an error message that relates
@@ -122,6 +166,27 @@ static void /* PRIVATE */
 png_default_error(png_structp png_ptr, png_const_charp message)
 {
 #ifndef PNG_NO_CONSOLE_IO
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+   if (*message == '#')
+   {
+     int offset;
+     char error_number[16];
+     for (offset=0; offset<15; offset++)
+     {
+         error_number[offset] = *(message+offset+1);
+         if (*(message+offset) == ' ')
+             break;
+     }
+     if((offset > 1) && (offset < 15))
+     {
+       error_number[offset-1]='\0';
+       fprintf(stderr, "libpng error no. %s: %s\n", error_number, message+offset);
+     }
+     else
+       fprintf(stderr, "libpng error: %s, offset=%d\n", message,offset);
+   }
+   else
+#endif
    fprintf(stderr, "libpng error: %s\n", message);
 #else
    if (message)
@@ -154,7 +219,29 @@ static void /* PRIVATE */
 png_default_warning(png_structp png_ptr, png_const_charp message)
 {
 #ifndef PNG_NO_CONSOLE_IO
-   fprintf(stderr, "libpng warning: %s\n", message);
+#  ifdef PNG_ERROR_NUMBERS_SUPPORTED
+   if (*message == '#')
+   {
+     int offset;
+     char warning_number[16];
+     for (offset=0; offset<15; offset++)
+     {
+        warning_number[offset]=*(message+offset+1);
+        if (*(message+offset) == ' ')
+            break;
+     }
+     if((offset > 1) && (offset < 15))
+     {
+       warning_number[offset-1]='\0';
+       fprintf(stderr, "libpng warning no. %s: %s\n", warning_number,
+          message+offset);
+     }
+     else
+       fprintf(stderr, "libpng warning: %s\n", message);
+   }
+   else
+#  endif
+     fprintf(stderr, "libpng warning: %s\n", message);
 #else
    if (message)
      /* appease compiler */ ;
@@ -189,4 +276,15 @@ png_get_error_ptr(png_structp png_ptr)
 }
 
 
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+void
+png_set_strip_error_numbers(png_structp png_ptr, png_uint_32 strip_mode)
+{
+   if(png_ptr != NULL)
+   {
+     png_ptr->flags &=
+       ((~(PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))&strip_mode);
+   }
+}
+#endif
 

@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.11 - April 27, 2001
+ * libpng 1.0.12beta1 - May 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -45,8 +45,8 @@
 #  define PNG_WRITE_SUPPORTED
 #endif
 
-/* Enable if you need to support PNGs that are embedded in MNG
-   datastreams */
+/* Enabled by default in 1.2.0.  You can disable this if you don't need to
+   support PNGs that are embedded in MNG datastreams */
 /*
 #ifndef PNG_NO_MNG_FEATURES
 #  ifndef PNG_MNG_FEATURES_SUPPORTED
@@ -91,46 +91,57 @@
  * this bit of #ifdefs will define the 'correct' config variables based on
  * that. If a cygwin user *wants* to define 'PNG_USE_DLL' that's okay, but
  * unnecessary.
+ *
+ * Also, the precedence order is:
+ *   ALL_STATIC (since we can't #undef something outside our namespace)
+ *   PNG_BUILD_DLL
+ *   PNG_STATIC
+ *   (nothing) == PNG_USE_DLL 
  */
 #if defined(__CYGWIN__)
-#  if defined(PNG_BUILD_DLL)
+#  if defined(ALL_STATIC)
+#    if defined(PNG_BUILD_DLL)
+#      undef PNG_BUILD_DLL
+#    endif
 #    if defined(PNG_USE_DLL)
 #      undef PNG_USE_DLL
 #    endif
-#    if !defined(PNG_DLL)
-#      define PNG_DLL
+#    if defined(PNG_DLL)
+#      undef PNG_DLL
 #    endif
-#    if defined(PNG_STATIC)
-#      undef PNG_STATIC
-#    endif
-#  else
-#    if defined(ALL_STATIC)
+#    if !defined(PNG_STATIC)
 #      define PNG_STATIC
 #    endif
-#    if defined(PNG_STATIC)
+#  else
+#    if defined (PNG_BUILD_DLL)
+#      if defined(PNG_STATIC)
+#        undef PNG_STATIC
+#      endif
 #      if defined(PNG_USE_DLL)
 #        undef PNG_USE_DLL
 #      endif
-#      if defined(PNG_DLL)
-#        undef PNG_DLL
+#      if !defined(PNG_DLL)
+#        define PNG_DLL
 #      endif
 #    else
-#      if defined(PNG_USE_DLL)
+#      if defined(PNG_STATIC)
+#        if defined(PNG_USE_DLL)
+#          undef PNG_USE_DLL
+#        endif
+#        if defined(PNG_DLL)
+#          undef PNG_DLL
+#        endif
+#      else
+#        if !defined(PNG_USE_DLL)
+#          define PNG_USE_DLL
+#        endif
 #        if !defined(PNG_DLL)
 #          define PNG_DLL
 #        endif
-#      else
-#        if defined(PNG_DLL)
-#           define PNG_USE_DLL
-#        else
-#           define PNG_USE_DLL
-#           define PNG_DLL
-#        endif
-#      endif
-#    endif
+#      endif  
+#    endif  
 #  endif
 #endif
-
 
 /* This protects us against compilers that run on a windowing system
  * and thus don't have or would rather us not use the stdio types:
@@ -306,7 +317,8 @@
 #  include "alloc.h"
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (defined(WIN32) || defined(_Windows) || \
+    defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__))
 #  include <malloc.h>
 #endif
 
@@ -578,6 +590,13 @@
 #  define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif
 
+/* Will be enabled in libpng-1.2.0 */
+/*
+#ifndef PNG_NO_ERROR_NUMBERS
+#define PNG_ERROR_NUMBERS_SUPPORTED
+#endif
+*/
+
 #ifndef PNG_NO_WRITE_FLUSH
 #  define PNG_WRITE_FLUSH_SUPPORTED
 #endif
@@ -609,12 +628,22 @@
  * png_get_x_offset_microns()
  * png_get_y_offset_microns()
  */
-#ifndef PNG_NO_EASY_ACCESS
+#if !defined(PNG_NO_EASY_ACCESS) && !defined(PNG_EASY_ACCESS_SUPPORTED)
 #  define PNG_EASY_ACCESS_SUPPORTED
 #endif
 
-/* PNG_ASSEMBLER_CODE will be enabled by default in version 1.2.0 
+/* PNG_ASSEMBLER_CODE was enabled by default in version 1.2.0 
    even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined */
+/*
+#if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
+#  ifndef PNG_ASSEMBLER_CODE_SUPPORTED
+#    define PNG_ASSEMBLER_CODE_SUPPORTED
+#  endif
+#  if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
+#    define PNG_MMX_CODE_SUPPORTED
+#  endif
+#endif
+*/
 #if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
 #  if defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD)
 #    ifndef PNG_ASSEMBLER_CODE_SUPPORTED
@@ -626,6 +655,13 @@
 #  endif
 #endif
 
+/* This will be enabled by default in libpng-1.2.0 */
+/*
+#if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
+#  define PNG_USER_MEM_SUPPORTED
+#endif
+*/
+
 /* These are currently experimental features, define them if you want */
 
 /* very little testing */
@@ -634,9 +670,6 @@
 #  ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #    define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #  endif
-#endif
-#ifndef PNG_NO_USER_MEM
-#  define PNG_USER_MEM_SUPPORTED
 #endif
 #ifndef PNG_NO_ZALLOC_ZERO
 #  define PNG_ZALLOC_ZERO

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.11 - April 27, 2001
+ * libpng 1.0.12beta1 - May 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -444,7 +444,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_debug(1, "in png_create_write_struct\n");
 #ifdef PNG_USER_MEM_SUPPORTED
    if ((png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
-      (png_malloc_ptr)malloc_fn)) == NULL)
+      (png_malloc_ptr)malloc_fn, (png_voidp)mem_ptr)) == NULL)
 #else
    if ((png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG)) == NULL)
 #endif /* PNG_USER_MEM_SUPPORTED */
@@ -489,6 +489,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       * only check the first digit.
       */
      if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
+         (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
          (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
      {
         png_error(png_ptr,
@@ -496,15 +497,17 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
      }
 
      /* Libpng 1.0.6 was not binary compatible, due to insertion of the
-        info_ptr->free_me member.  Note to maintainer: this test can be
-        removed from version 2.0.0 and beyond because the previous test
-        would have already rejected it. */
+        info_ptr->free_me member.  Libpng-1.0.1 and earlier were not
+        compatible due to insertion of the user transform function. Note
+        to maintainer: this test can be removed from version 1.2.0 and
+        beyond because the previous test would have already rejected it. */
 
-     if (user_png_ver[4] == '6' && user_png_ver[2] == '0' &&
-         user_png_ver[0] == '1' && user_png_ver[5] == '\0')
+     if (user_png_ver[0] == '1' && user_png_ver[2] == '0' &&
+         (user_png_ver[4] <  '2' || user_png_ver[4] == '6') &&
+         user_png_ver[5] == '\0')
      {
         png_error(png_ptr,
-           "Application must be recompiled; version 1.0.6 was incompatible");
+        "Application must be recompiled; versions <= 1.0.6 were incompatible");
      }
    }
 
@@ -529,13 +532,36 @@ void PNGAPI
 png_write_init(png_structp png_ptr)
 {
    /* We only come here via pre-1.0.7-compiled applications */
-   png_write_init_2(png_ptr, "1.0.0", 10000, 10000);
+   png_write_init_2(png_ptr, "1.0.0", 0, 0);
 }
 
+#undef png_write_init_2
 void PNGAPI
 png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
    png_size_t png_struct_size, png_size_t png_info_size)
 {
+   /* We only come here via pre-1.0.12-compiled applications */
+   if(sizeof(png_struct) > png_struct_size)
+     {
+       png_ptr->error_fn=(png_error_ptr)NULL;
+       png_error(png_ptr,
+         "The png struct allocated by the application is too small.");
+     }
+   if(sizeof(png_info) > png_info_size)
+     {
+       png_ptr->error_fn=(png_error_ptr)NULL;
+       png_error(png_ptr,
+         "The info struct allocated by the application is too small.");
+     }
+   png_write_init_3(&png_ptr, user_png_ver, png_struct_size);
+}
+
+
+void PNGAPI
+png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
+   png_size_t png_struct_size)
+{
+   png_structp png_ptr=*ptr_ptr;
 #ifdef PNG_SETJMP_SUPPORTED
    jmp_buf tmp_jmp; /* to save current jump buffer */
 #endif
@@ -547,27 +573,27 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
 #ifdef PNG_LEGACY_SUPPORTED
        png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
 #else
-       png_ptr->error_fn=(png_error_ptr)NULL;
-       png_error(png_ptr,
-       "Application uses deprecated png_write_init() and must be recompiled.");
+       png_ptr->warning_fn=(png_error_ptr)NULL;
+       png_warning(png_ptr,
+     "Application uses deprecated png_write_init() and should be recompiled.");
+       break;
 #endif
      }
    } while (png_libpng_ver[i++]);
 
-   if (sizeof(png_struct) > png_struct_size ||
-      sizeof(png_info) > png_info_size)
-     {
-       png_ptr->error_fn=(png_error_ptr)NULL;
-       png_error(png_ptr,
-      "Application and library have different sized structs. Please recompile.");
-     }
-
-   png_debug(1, "in png_write_init_2\n");
+   png_debug(1, "in png_write_init_3\n");
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* save jump buffer and error functions */
    png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
 #endif
+
+   if (sizeof(png_struct) > png_struct_size)
+     {
+       png_destroy_struct(png_ptr);
+       png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG);
+       *ptr_ptr = png_ptr;
+     }
 
    /* reset all variables to 0 */
    png_memset(png_ptr, 0, sizeof (png_struct));
@@ -577,11 +603,12 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
 #endif
 
+   png_set_write_fn(png_ptr, NULL, NULL, NULL);
+
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
       (png_uint_32)png_ptr->zbuf_size);
-   png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_set_filter_heuristics(png_ptr, PNG_FILTER_HEURISTIC_DEFAULT,
@@ -876,6 +903,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
    png_infop info_ptr = NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
    png_free_ptr free_fn = NULL;
+   png_voidp mem_ptr = NULL;
 #endif
 
    png_debug(1, "in png_destroy_write_struct\n");
@@ -904,7 +932,8 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 #endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)info_ptr, free_fn);
+      png_destroy_struct_2((png_voidp)info_ptr, (png_free_ptr)free_fn,
+         (png_voidp)mem_ptr);
 #else
       png_destroy_struct((png_voidp)info_ptr);
 #endif
@@ -915,7 +944,8 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
    {
       png_write_destroy(png_ptr);
 #ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)png_ptr, free_fn);
+      png_destroy_struct_2((png_voidp)png_ptr, (png_free_ptr)free_fn,
+         (png_voidp)mem_ptr);
 #else
       png_destroy_struct((png_voidp)png_ptr);
 #endif

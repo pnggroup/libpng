@@ -1,5 +1,5 @@
 Microsoft Developer Studio Build File, Format Version 6.00 for
-libpng 1.0.11 (April 27, 2001) and zlib
+libpng 1.0.12beta1 (May 14, 2001) and zlib
 
 Copyright (C) 2000 Simon-Pierre Cadieux
 For conditions of distribution and use, see copyright notice in png.h
@@ -24,12 +24,12 @@ To build:
 This project will build the PNG Development Group's "official" versions of
 libpng and zlib libraries:
 
-   libpng1.dll          (default version, currently C code only)
-   libpng1.dll         (C + Assembler version)
-   libpng1.dll         (C + Assembler debug version)
-   libpng1.dll         (C code debug version)
-   libpng1[c,e-m].dll   (reserved for official versions) 
-   libpng1[n-z].dll     (available for private versions)
+   libpng2.dll          (default version, currently C code only)
+   libpng2.dll         (C + Assembler version)
+   libpng2.dll         (C + Assembler debug version)
+   libpng2.dll         (C code debug version)
+   libpng2[c,e-m].dll   (reserved for official versions) 
+   libpng2[n-z].dll     (available for private versions)
    zlib.dll             (default version, currently C code only)
    zlibd.dll            (debug version)
 

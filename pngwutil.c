@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.11 - April 27, 2001
+ * libpng 1.0.12beta1 - May 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -285,7 +285,7 @@ png_text_compress(png_structp png_ptr,
                   comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                      (png_uint_32)(comp->max_output_ptr * sizeof (png_charpp)));
                   png_memcpy(comp->output_ptr, old_ptr,
-                       old_max * sizeof (png_charp));
+                     old_max * sizeof (png_charp));
                   png_free(png_ptr, old_ptr);
                }
                else
@@ -435,7 +435,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
       !((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
       ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
-      (color_type == PNG_COLOR_TYPE_RGB || 
+      (color_type == PNG_COLOR_TYPE_RGB ||
        color_type == PNG_COLOR_TYPE_RGB_ALPHA) &&
       (filter_type == PNG_INTRAPIXEL_DIFFERENCING)) &&
 #endif
@@ -460,7 +460,9 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->bit_depth = (png_byte)bit_depth;
    png_ptr->color_type = (png_byte)color_type;
    png_ptr->interlaced = (png_byte)interlace_type;
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
    png_ptr->filter_type = (png_byte)filter_type;
+#endif
    png_ptr->width = width;
    png_ptr->height = height;
 
@@ -536,20 +538,27 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
    png_debug(1, "in png_write_PLTE\n");
    if ((
 #if defined(PNG_MNG_FEATURES_SUPPORTED) || \
-    defined (PNG_WRITE_EMPTY_PLTE_SUPPORTED)
+    defined(PNG_WRITE_EMPTY_PLTE_PERMITTED)
         !(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE) &&
 #endif
         num_pal == 0) || num_pal > 256)
+   {
+     if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
      {
-       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-         {
-           png_error(png_ptr, "Invalid number of colors in palette");
-         }
-       else
-         {
-           png_warning(png_ptr, "Invalid number of colors in palette");
-           return;
-         }
+        png_error(png_ptr, "Invalid number of colors in palette");
+     }
+     else
+     {
+        png_warning(png_ptr, "Invalid number of colors in palette");
+        return;
+     }
+   }
+
+   if (!(png_ptr->color_type&PNG_COLOR_MASK_COLOR))
+   {
+      png_warning(png_ptr,
+        "Ignoring request to write a PLTE chunk in grayscale PNG");
+      return;
    }
 
    png_ptr->num_palette = (png_uint_16)num_pal;
@@ -1020,7 +1029,7 @@ png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
    {
       if (
 #if defined(PNG_MNG_FEATURES_SUPPORTED) || \
-    defined (PNG_WRITE_EMPTY_PLTE_SUPPORTED)
+    defined(PNG_WRITE_EMPTY_PLTE_PERMITTED)
           (png_ptr->num_palette ||
           (!(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE))) &&
 #endif
@@ -1109,7 +1118,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    png_debug1(2, "Keyword to be checked is '%s'\n", key);
 
    *new_key = (png_charp)png_malloc(png_ptr, (png_uint_32)(key_len + 2));
- 
+
    /* Replace non-printing characters with a blank and print a warning */
    for (kp = key, dp = *new_key; *kp != '\0'; kp++, dp++)
    {
@@ -1417,9 +1426,9 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
       png_warning(png_ptr, "Unrecognized equation type for pCAL chunk");
 
    purpose_len = png_check_keyword(png_ptr, purpose, &new_purpose) + 1;
-   png_debug1(3, "pCAL purpose length = %d\n", purpose_len);
+   png_debug1(3, "pCAL purpose length = %d\n", (int)purpose_len);
    units_len = png_strlen(units) + (nparams == 0 ? 0 : 1);
-   png_debug1(3, "pCAL units length = %d\n", units_len);
+   png_debug1(3, "pCAL units length = %d\n", (int)units_len);
    total_len = purpose_len + units_len + 10;
 
    params_len = (png_uint_32p)png_malloc(png_ptr, (png_uint_32)(nparams
@@ -1434,7 +1443,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
       total_len += (png_size_t)params_len[i];
    }
 
-   png_debug1(3, "pCAL total length = %d\n", total_len);
+   png_debug1(3, "pCAL total length = %d\n", (int)total_len);
    png_write_chunk_start(png_ptr, (png_bytep)png_pCAL, (png_uint_32)total_len);
    png_write_chunk_data(png_ptr, (png_bytep)new_purpose, purpose_len);
    png_save_int_32(buf, X0);
@@ -1486,7 +1495,7 @@ png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
 #endif
    total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
 
-   png_debug1(3, "sCAL total length = %d\n", total_len);
+   png_debug1(3, "sCAL total length = %d\n", (int)total_len);
    png_write_chunk_start(png_ptr, (png_bytep)png_sCAL, (png_uint_32)total_len);
    png_write_chunk_data(png_ptr, (png_bytep)&unit, 1);
    png_write_chunk_data(png_ptr, (png_bytep)wbuf, png_strlen(wbuf)+1);

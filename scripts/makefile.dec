@@ -17,7 +17,7 @@ ZLIBINC=../zlib
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.11
+PNGMIN = 1.0.12beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=cc

@@ -5,7 +5,7 @@
 LIBRARY lpngce
 
 EXPORTS
-;Version 1.0.11
+;Version 1.0.12beta1
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -76,13 +76,15 @@ EXPORTS
   png_malloc    @68
   png_memcpy_check    @69
   png_memset_check    @70
+; png_permit_empty_plte is deprecated
   png_permit_empty_plte  @71
   png_process_data    @72
   png_progressive_combine_row  @73
   png_read_end    @74
   png_read_image    @75
   png_read_info    @76
-  png_read_init    @77 ; deprecated
+; png_read_init is deprecated
+  png_read_init    @77
   png_read_png    @78
   png_read_row    @79
   png_read_rows    @80
@@ -167,19 +169,44 @@ EXPORTS
   png_write_image    @159
   png_write_info    @160
   png_write_info_before_PLTE  @161
-  png_write_init    @162 ; deprecated
+; png_write_init is deprecated
+  png_write_init    @162
   png_write_png    @163
   png_write_row    @164
   png_write_rows    @165
+; png_read_init_2 and png_write_init_2 are deprecated.
   png_read_init_2    @166
   png_write_init_2    @167
   png_access_version_number  @168
 ;  png_sig_bytes    @169
-  png_libpng_ver    @170
+;  png_libpng_ver    @170
   png_init_io    @171
   png_convert_to_rfc1123     @172
   png_set_invalid  @173
-;To be added at version 1.2.0
-; png_permit_mng_features  @174
-;To be added at version 1.2.0
-; png_mmx_support  @175
+; Added at version 1.0.12
+; For compatiblity with 1.0.7-1.0.11
+  png_info_init @174
+  png_read_init_3    @175
+  png_write_init_3    @176
+  png_info_init_3 @177
+  png_destroy_struct  @178
+; To be added at version 1.2.0
+; For use with PNG_USER_MEM_SUPPORTED
+; png_destroy_struct_2  @179
+; png_create_read_struct_2 @180
+; png_create_write_struct_2 @181
+; png_malloc_default @182
+; png_free_default @183
+; MNG features
+; png_permit_mng_features  @184
+; MMX support
+; png_mmx_support  @185
+; png_get_mmx_flagmask  @186
+; png_get_asm_flagmask  @187
+; png_get_asm_flags  @188
+; png_get_mmx_bitdepth_threshold  @189
+; png_get_mmx_rowbytes_threshold  @190
+; png_set_asm_flags  @191
+; png_init_mmx_flags  @192
+; Strip error numbers
+; png_set_strip_error_numbers @193

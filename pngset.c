@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.11 - April 27, 2001
+ * libpng 1.0.12beta1 - May 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -654,8 +654,9 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
       textp->key = (png_charp)png_malloc(png_ptr,
          (png_uint_32)(key_len + text_length + lang_len + lang_key_len + 4));
-      png_debug2(2, "Allocated %d bytes at %x in png_set_text\n",
-         key_len + lang_len + lang_key_len + text_length + 4, (int)textp->key);
+      png_debug2(2, "Allocated %lu bytes at %x in png_set_text\n",
+         (png_uint_32)(key_len + lang_len + lang_key_len + text_length + 4),
+         (int)textp->key);
 
       png_memcpy(textp->key, text_ptr[i].key,
          (png_size_t)(key_len));
@@ -968,3 +969,58 @@ png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
       info_ptr->valid &= ~(mask);
 }
 
+
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+/* this function was added to libpng 1.2.0 and should always exist by default */
+void PNGAPI
+png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
+{
+    png_uint_32 settable_asm_flags;
+    png_uint_32 settable_mmx_flags;
+
+    settable_mmx_flags =
+#ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+                         PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  |
+#endif
+#ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
+                         PNG_ASM_FLAG_MMX_READ_INTERLACE    |
+#endif
+#ifdef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+                         PNG_ASM_FLAG_MMX_READ_FILTER_SUB   |
+                         PNG_ASM_FLAG_MMX_READ_FILTER_UP    |
+                         PNG_ASM_FLAG_MMX_READ_FILTER_AVG   |
+                         PNG_ASM_FLAG_MMX_READ_FILTER_PAETH |
+#endif
+                         0;
+
+    /* could be some non-MMX ones in the future, but not currently: */
+    settable_asm_flags = settable_mmx_flags;
+
+    if (!(png_ptr->asm_flags & PNG_ASM_FLAG_MMX_SUPPORT_COMPILED) ||
+        !(png_ptr->asm_flags & PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU))
+    {
+        /* clear all MMX flags if MMX isn't supported */
+        settable_asm_flags &= ~settable_mmx_flags;
+        png_ptr->asm_flags &= ~settable_mmx_flags;
+    }
+
+    /* we're replacing the settable bits with those passed in by the user,
+     * so first zero them out of the master copy, then logical-OR in the
+     * allowed subset that was requested */
+
+    png_ptr->asm_flags &= ~settable_asm_flags;			/* zero them */
+    png_ptr->asm_flags |= (asm_flags & settable_asm_flags);	/* set them */
+}
+#endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
+
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+/* this function was added to libpng 1.2.0 */
+void PNGAPI
+png_set_mmx_thresholds (png_structp png_ptr,
+                        png_byte mmx_bitdepth_threshold,
+                        png_uint_32 mmx_rowbytes_threshold)
+{
+    png_ptr->mmx_bitdepth_threshold = mmx_bitdepth_threshold;
+    png_ptr->mmx_rowbytes_threshold = mmx_rowbytes_threshold;
+}
+#endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
