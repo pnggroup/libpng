@@ -16,7 +16,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.5.0"
+#define PNGCRUSH_VERSION "1.5.1"
 
 /*
 */
@@ -43,9 +43,9 @@
  * risk of satisfactory quality, performance, accuracy, and effort is with
  * the user.
  *
- * Permission is hereby granted to anyone to use, copy, modify, and distribute
- * this source code, or portions hereof, for any purpose, without fee, subject
- * to the following restrictions:
+ * Permission is hereby irrevocably granted to everyone to use, copy, modify,
+ * and distribute this source code, or portions hereof, for any purpose,
+ * without payment of any fee, subject to the following restrictions:
  *
  * 1. The origin of this source code must not be misrepresented.
  *
@@ -57,6 +57,19 @@
  */
 
 /* Change log:
+ *
+ * Version 1.5.1 (built with libpng-1.0.8)
+ *
+ *   Disabled color counting by default and made it controllable with new
+ *   -cc and -no_cc commandline arguments.
+ *
+ *   Added some #ifdef PNG_COUNT_COLORS around code that needs it.
+ *
+ *   Revised count_colors() attempting to avoid stack corruption that has
+ *   been observed on RedHat 6.2
+ *
+ *   Added the word "irrevocably" to the license and changed "without fee"
+ *   to "without payment of any fee".
  *
  * Version 1.5.0 (built with libpng-1.0.8)
  *
@@ -548,9 +561,10 @@ static png_infop end_info_ptr;
 static png_infop write_end_info_ptr;
 static FILE *fpin, *fpout;
 png_uint_32 measure_idats(FILE *fpin);
+static int do_color_count;
 #ifdef PNGCRUSH_COUNT_COLORS
 int count_colors(FILE *fpin);
-static int reduce_to_gray, it_is_opaque;
+static int num_rgba, reduce_to_gray, it_is_opaque;
 #endif
 png_uint_32 png_measure_idat(png_structp png_ptr);
 # define MAX_METHODS   200
@@ -605,11 +619,11 @@ static void
 png_set_compression_buffer_size(png_structp png_ptr, png_uint_32 size)
 {
     if(png_ptr->zbuf)
-       png_free(png_ptr, png_ptr->zbuf);
-    {
-       png_ptr->zbuf_size = (png_size_t)size;
-       png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, size);
-    }
+       png_free(png_ptr, png_ptr->zbuf); png_ptr->zbuf=NULL;
+    png_ptr->zbuf_size = (png_size_t)size;
+    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, size);
+    if(png_ptr->zbuf)
+       png_error("Unable to malloc zbuf");
 }
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
@@ -756,8 +770,7 @@ void png_crush_pause(void)
       char keystroke;
       fprintf(STDERR, "Press [ENTER] key to continue.\n");
       keystroke=(char)getc(stdin);
-      if (keystroke)
-        /* stifle compiler warning */ return;
+      keystroke = keystroke; /* stifle compiler warning */
    }
 }
 
@@ -940,6 +953,13 @@ main(int argc, char *argv[])
    int i;
    row_buf = (png_bytep)NULL;
    number_of_open_files=0;
+#ifdef PNGCRUSH_COUNT_COLORS
+   reduce_to_gray=0;
+   it_is_opaque=0;
+#else
+   do_color_count = 0;
+   do_color_count = do_color_count; /* silence compiler warning */
+#endif
 
    if (strcmp(png_libpng_ver, PNG_LIBPNG_VER_STRING))
    {
@@ -1060,6 +1080,12 @@ main(int argc, char *argv[])
          BUMP_I;
          force_output_bit_depth=atoi(argv[i]);
       }
+#ifdef PNGCRUSH_COUNT_COLORS
+   else if(!strncmp(argv[i],"-cc",3))
+         do_color_count=1;
+   else if(!strncmp(argv[i],"-no_cc",6))
+         do_color_count=0;
+#endif
    else if(!strncmp(argv[i],"-c",2))
       {
          names++;
@@ -1486,10 +1512,15 @@ main(int argc, char *argv[])
         "\n | %s %s, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson\n",
         progname, PNGCRUSH_VERSION);
       fprintf(STDERR, " | This is a free, open-source program.  Permission is\n");
-      fprintf(STDERR, " | granted to everyone to use pngcrush without fee.\n");
+      fprintf(STDERR, " | irrevocably granted to everyone to use this version\n");
+      fprintf(STDERR, " | of pngcrush without payment of any fee.\n");
       fprintf(STDERR, 
         " | This program was built with libpng version %s,\n",
             PNG_LIBPNG_VER_STRING);
+#if PNG_LIBPNG_VER > 10001
+      fprintf(STDERR,
+        " | and is running with %s", png_get_header_version(NULL));
+#endif
 #if PNG_LIBPNG_VER > 96
       fprintf(STDERR,
         " |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,\n");
@@ -1567,7 +1598,7 @@ main(int argc, char *argv[])
      else
         fprintf(STDERR, "options:\n");
      fprintf(STDERR,
-       "       -already already_crushed_size [e.g., 8192])\n");
+       "      -already already_crushed_size [e.g., 8192]\n");
      if(verbose > 1)
      {
      fprintf(STDERR,
@@ -1609,6 +1640,12 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               Default is to use same color type as the input file.\n\n");
      }
+#ifdef PNGCRUSH_COUNT_COLORS
+     fprintf(STDERR,
+       "           -cc (do color counting)\n");
+     if(verbose > 1)
+        fprintf(STDERR,"\n");
+#endif
      fprintf(STDERR,
        "            -d directory_name (where output files will go)\n");
      if(verbose > 1)
@@ -1735,6 +1772,12 @@ main(int argc, char *argv[])
      if(verbose > 1)
         fprintf(STDERR,"\n");
 #endif
+#ifdef PNGCRUSH_COUNT_COLORS
+     fprintf(STDERR,
+       "        -no_cc (no color counting)\n");
+     if(verbose > 1)
+        fprintf(STDERR,"\n");
+#endif
      fprintf(STDERR,
        "            -n (no save; does not do compression or write output PNG)\n");
      if(verbose > 1)
@@ -1742,20 +1785,17 @@ main(int argc, char *argv[])
        "\n               Useful in conjunction with -v option to get info.\n\n");
 
      fprintf(STDERR,
-       "            -plte_len n (truncate PLTE)\n");
+       "     -plte_len n (truncate PLTE)\n");
      if(verbose > 1)
      {
      fprintf(STDERR,
        "\n               Truncates the PLTE.  Be sure not to truncate it to\n");
      fprintf(STDERR,
-       "\n               less than the greatest index present in IDAT.\n");
+       "\n               less than the greatest index present in IDAT.\n\n");
  
      }
      fprintf(STDERR,
        "            -q (quiet)\n");
-     if(verbose > 1)
-        fprintf(STDERR,"\n");
-
      if(verbose > 1)
         fprintf(STDERR,"\n");
      fprintf(STDERR,
@@ -1943,11 +1983,13 @@ main(int argc, char *argv[])
      "quality, performance, accuracy, and effort is with the user.\n");
      fprintf(STDERR,
 
-     "\nLICENSE: Permission is hereby granted to anyone to use, copy, modify,\n");
+     "\nLICENSE: Permission is hereby irrevocably granted to everyone to use,\n");
      fprintf(STDERR,
-     "and distribute this computer program, or portions hereof, for any\n");
+     "copy, modify, and distribute this computer program, or portions hereof,\n");
      fprintf(STDERR,
-     "purpose, without fee, subject to the following restrictions:\n\n");
+     "purpose, without payment of any fee, subject to the following\n");
+     fprintf(STDERR,
+     "restrictions:\n\n");
      fprintf(STDERR,
      "1. The origin of this binary or source code must not be misrepresented.\n\n");
      fprintf(STDERR,
@@ -2097,6 +2139,8 @@ main(int argc, char *argv[])
 
 #ifdef PNGCRUSH_COUNT_COLORS
       output_color_type = input_color_type;
+      if (do_color_count)
+      {
       if (force_output_color_type == 8 && (input_color_type == 2 ||
           input_color_type == 4 || input_color_type == 6))
       /* check for unused alpha channel or single transparent color */
@@ -2112,6 +2156,14 @@ main(int argc, char *argv[])
          number_of_open_files++;
 
          alpha_status=count_colors(fpin);
+         if(num_rgba < 257)
+         {
+            P1 ("Finished counting colors. num_rgba=%d\n", num_rgba);
+         }
+         else
+         {
+            P1 ("Finished counting colors. num_rgba is more than 256\n");
+         }
          alpha_status = alpha_status; /* silence compiler warning. */
 
          FCLOSE(fpin);
@@ -2149,6 +2201,7 @@ main(int argc, char *argv[])
       {
          P1 ("setting output color type to %d\n",output_color_type);
          force_output_color_type = output_color_type;
+      }
       }
 #endif /* PNGCRUSH_COUNT_COLORS */
 
@@ -2586,10 +2639,12 @@ main(int argc, char *argv[])
             {
                 if(verbose > 0 && first_trial)
                 {
+#ifdef PNGCRUSH_COUNT_COLORS
                    if(reduce_to_gray)
                       fprintf(STDERR,
                   "   Reducing all-gray truecolor image to grayscale.\n");
                    else
+#endif
                       fprintf(STDERR,
                   "   Reducing truecolor image to grayscale.\n");
                 }
@@ -2620,9 +2675,11 @@ main(int argc, char *argv[])
             {
                 if(verbose > 0 && first_trial)
                 {
+#ifdef PNGCRUSH_COUNT_COLORS
                    if(it_is_opaque)
                       fprintf(STDERR, "   Stripping opaque alpha channel.\n");
                    else
+#endif
                       fprintf(STDERR, "   Stripping existing alpha channel.\n");
                 }
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
@@ -3282,7 +3339,7 @@ main(int argc, char *argv[])
                     else
                        printf("   Added a compressed iTXt chunk.\n");
 #endif
-                    png_free(write_ptr,added_text);
+                    png_free(write_ptr,added_text); added_text=(png_textp)NULL;
                   }
               }
          }
@@ -3608,7 +3665,7 @@ main(int argc, char *argv[])
                     else
                        printf("   Added a compressed iTXt chunk.\n");
 #endif
-                    png_free(write_ptr,added_text);
+                    png_free(write_ptr,added_text); added_text=(png_textp)NULL;
                   }
               }
          }
@@ -3651,14 +3708,12 @@ main(int argc, char *argv[])
       png_debug(0, "Destroying data structs\n");
       if(row_buf != (png_bytep)NULL)
       {
-         png_free(read_ptr, row_buf);
-         row_buf = (png_bytep)NULL;
+         png_free(read_ptr, row_buf); row_buf = (png_bytep)NULL;
       }
 #ifdef PNGCRUSH_MULTIPLE_ROWS
       if(row_pointers != (png_bytepp)NULL)
       {
-         png_free(read_ptr, row_pointers);
-         row_pointers = (png_bytepp)NULL;
+         png_free(read_ptr, row_pointers); row_pointers = (png_bytepp)NULL;
       }
 #endif
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
@@ -3675,13 +3730,14 @@ main(int argc, char *argv[])
           else
             fprintf(stderr, "While reading %s:\n", inname);
           fprintf(stderr, "  pngcrush caught libpng error:\n   %s\n\n",msg);
-          if(row_buf != NULL)png_free(read_ptr, row_buf);
-          row_buf = (png_bytep)NULL;
+          if(row_buf)
+          {
+             png_free(read_ptr, row_buf); row_buf = (png_bytep)NULL;
+          }
 #ifdef PNGCRUSH_MULTIPLE_ROWS
           if(row_pointers != (png_bytepp)NULL)
           {
-             png_free(read_ptr, row_pointers);
-             row_pointers = (png_bytepp)NULL;
+             png_free(read_ptr, row_pointers); row_pointers = (png_bytepp)NULL;
           }
 #endif
           if(nosave == 0)
@@ -3955,8 +4011,6 @@ png_measure_idat(png_structp png_ptr)
 
 #ifdef PNGCRUSH_COUNT_COLORS
 #define USE_HASHCODE
-static int result, num_rgba;
-static int hashmiss, hashinserts;
 int
 count_colors(FILE *fpin)
 {
@@ -3967,8 +4021,9 @@ count_colors(FILE *fpin)
 
    int i;
    int pass, num_pass;
+   int ret;
+   volatile int result, hashmiss, hashinserts;
 
-   int total;
    png_uint_32 rgba_frequency[257];
    png_uint_32 rgba_hi[257]; /* Actually contains ARGB not RGBA */
 #if 0
@@ -3994,6 +4049,7 @@ count_colors(FILE *fpin)
    it_is_opaque=1;
    hashmiss=0;
    hashinserts=0;
+   row_buf = (png_bytep)NULL;
 
    num_rgba=0;
    for (i=0; i<257; i++)
@@ -4328,6 +4384,8 @@ count_colors(FILE *fpin)
               }
               else /* other color type */
               {
+                  /* to do: check color type 3 for max sample that is present
+                     and reduce palette if possible */
                   result=2;
               }
             }
@@ -4343,7 +4401,7 @@ count_colors(FILE *fpin)
       result=0;
    }
 
-   png_free (read_ptr, row_buf);
+   png_free (read_ptr, row_buf); row_buf = (png_bytep)NULL;
    png_debug(0, "Destroying data structs\n");
    png_destroy_read_struct(&read_ptr, &read_info_ptr, NULL);
    }
@@ -4354,14 +4412,14 @@ count_colors(FILE *fpin)
    {
       fprintf(STDERR, "\nWhile checking alphas in %s ", inname);
       fprintf(STDERR,"pngcrush caught libpng error:\n   %s\n\n",msg);
-      png_free (read_ptr, row_buf);
+      png_free (read_ptr, row_buf); row_buf = (png_bytep)NULL;
       png_destroy_read_struct(&read_ptr, &read_info_ptr, NULL);
       png_debug(0, "Destroyed data structs\n");
       result=2;
    }
    if(verbose > 1)
    {
-      total=0;
+      int total=0;
       if(num_rgba && num_rgba < 257)
       {
         for(i=0; i<num_rgba; i++)
@@ -4378,15 +4436,16 @@ count_colors(FILE *fpin)
         P2 ("hashcode misses=%d, inserts=%d\n",hashmiss,
            hashinserts);
       }
-   P2 ("Finished checking alphas, result=%d\n",result);
    if(reduce_to_gray)
      P1 ("The truecolor image is all gray and will be reduced.\n");
    if(color_type == 0 || color_type == 2)
      it_is_opaque=0;
    if(it_is_opaque)
      P1 ("The image is opaque and the alpha channel will be removed.\n");
+   P2 ("Finished checking alphas, result=%d\n",result);
    }
-   return (result);
+   ret=result;
+   return (ret);
 }
 #endif /* PNGCRUSH_COUNT_COLORS */
 #endif /* PNG_LIBPNG_VER < 96 */

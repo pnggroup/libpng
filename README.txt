@@ -23,9 +23,9 @@ This is the copyright notice, disclaimer, and license:
  * risk of satisfactory quality, performance, accuracy, and effort is with
  * the user.
  *
- * Permission is hereby granted to anyone to use, copy, modify, and distribute
- * this source code, or portions hereof, for any purpose, without fee, subject
- * to the following restrictions:
+ * Permission is hereby irrevocably granted to anyone to use, copy, modify,
+ * and distribute this source code, or portions hereof, for any purpose,
+ * without payment of any fee, subject to the following restrictions:
  *
  * 1. The origin of this source code must not be misrepresented.
  *
@@ -38,12 +38,12 @@ This is the copyright notice, disclaimer, and license:
 
 This is the output of "pngcrush" and "pngcrush -help":
 
-
-
- | pngcrush 1.5.0, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
+ | pngcrush 1.5.1, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
- | granted to everyone to use pngcrush without fee.
+ | irrevocably granted to everyone to use this version
+ | of pngcrush without payment of any fee.
  | This program was built with libpng version 1.0.8,
+ | and is running with  libpng version 1.0.8 - July 24, 2000 (header)
  |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -55,9 +55,10 @@ usage: pngcrush [options] infile.png outfile.png
        pngcrush -e ext [other options] files.png ...
        pngcrush -d dir [other options] files.png ...
 options:
-       -already already_crushed_size [e.g., 8192])
+      -already already_crushed_size [e.g., 8192]
         -brute (Use brute-force, try 114 different methods [11-124])
             -c color_type of output file [0, 2, 4, or 6]
+           -cc (do color counting)
             -d directory_name (where output files will go)
  -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
             -e extension  (used for creating output filename)
@@ -69,8 +70,9 @@ options:
             -l zlib_compression_level [0-9]
             -m method [0 through 200]
           -max maximum_IDAT_size [1 through 524288]
+        -no_cc (no color counting)
             -n (no save; does not do compression or write output PNG)
-            -plte_len n (truncate PLTE)
+     -plte_len n (truncate PLTE)
             -q (quiet)
           -rem chunkname (or "alla" or "allb")
 -replace_gamma gamma (float or fixed*100000) even if gAMA is present.
@@ -85,10 +87,12 @@ options:
             -p (pause)
 
 
- | pngcrush 1.5.0, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
+ | pngcrush 1.5.1, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
- | granted to everyone to use pngcrush without fee.
+ | irrevocably granted to everyone to use this version
+ | of pngcrush without payment of any fee.
  | This program was built with libpng version 1.0.8,
+ | and is running with  libpng version 1.0.8 - July 24, 2000 (header)
  |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -101,7 +105,7 @@ usage: pngcrush [options] infile.png outfile.png
        pngcrush -d dir [other options] files.png ...
 
 options:
-       -already already_crushed_size [e.g., 8192])
+      -already already_crushed_size [e.g., 8192]
 
                If file has an IDAT greater than this size, it
                will be considered to be already crushed.
@@ -123,6 +127,8 @@ options:
                You can use 0 or 4 to convert color to grayscale.
                Use 0 or 2 to delete an unwanted alpha channel.
                Default is to use same color type as the input file.
+
+           -cc (do color counting)
 
             -d directory_name (where output files will go)
 
@@ -184,17 +190,19 @@ options:
 
           -max maximum_IDAT_size [1 through 524288]
 
+        -no_cc (no color counting)
+
             -n (no save; does not do compression or write output PNG)
 
                Useful in conjunction with -v option to get info.
 
-            -plte_len n (truncate PLTE)
+     -plte_len n (truncate PLTE)
 
                Truncates the PLTE.  Be sure not to truncate it to
 
                less than the greatest index present in IDAT.
-            -q (quiet)
 
+            -q (quiet)
 
           -rem chunkname (or "alla" or "allb")
 
@@ -271,3 +279,4 @@ options:
                Wait for [enter] key before continuing display.
                e.g., type 'pngcrush -pause -help', if the help
                screen scrolls out of sight.
+
