@@ -34,13 +34,13 @@ WARNMORE= # -g -DPNG_DEBUG=5
 CFLAGS=$(ABI) -I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=CC $(ABI) -shared
-
-PNGMAJ = 0
-PNGMIN = 1.2.3rc4
-PNGVER = $(PNGMAJ).$(PNGMIN)
 # See "man dso" for info about shared objects
-LIBS=libpng12.so.$(PNGVER)
+
 LIBNAME=libpng12
+PNGMAJ = 0
+PNGMIN = 1.2.3rc5
+PNGVER = $(PNGMAJ).$(PNGMIN)
+LIBS=$(LIBNAME).so.$(PNGVER)
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib32
 MANPATH=$(prefix)/man
@@ -63,7 +63,7 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.a $(LIBNAME).so.$(PNGVER) pngtest libpng.pc
+all: libpng.a $(LIBNAME).so.$(PNGVER) pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
@@ -71,6 +71,17 @@ libpng.a: $(OBJS)
 
 libpng.pc:
 	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
+
+libpng-config:
+	( cat scripts/libpng-config-head.in; \
+	echo prefix=\"$(prefix)\"; \
+	echo cppflags=\"-I$(INCPATH)/libpng12 -DPNG_USE_PNGGCCRD \
+		-DPNG_NO_ASSEMBLER_CODE\"; \
+	echo cflags=\"$(ABI)\"; \
+	echo ldflags=\"-L$(LIBPATH)\"; \
+	echo libs=\"-lpng12 -lz -lm\"; \
+	cat scripts/libpng-config-body.in ) > libpng-config
+	chmod +x libpng-config
 
 $(LIBNAME).so.$(PNGVER): $(OBJS)
 	$(LDSHARED) -o $@ $(OBJS)
@@ -121,11 +132,11 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
 	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 	-@if [ ! -d $(DESTDIR)$(LIBPATH)/pkgconfig ]; then \
 	mkdir $(DESTDIR)$(LIBPATH)/pkgconfig; fi
-	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/$(LIBNAME).pc
 	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.pc
-	cp libpng.pc $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
-	chmod 644 $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
-	(cd $(DESTDIR)$(LIBPATH)/pkgconfig; ln -sf libpng12.pc libpng.pc)
+	cp libpng.pc $(DESTDIR)$(LIBPATH)/pkgconfig/$(LIBNAME).pc
+	chmod 644 $(DESTDIR)$(LIBPATH)/pkgconfig/$(LIBNAME).pc
+	(cd $(DESTDIR)$(LIBPATH)/pkgconfig; ln -sf $(LIBNAME).pc libpng.pc)
 
 install-man: libpng.3 libpngpf.3 png.5
 	-@if [ ! -d $(DESTDIR)$(MANPATH) ]; then mkdir $(DESTDIR)$(MANPATH); fi
@@ -140,14 +151,14 @@ install-man: libpng.3 libpngpf.3 png.5
 	-@/bin/rm -f $(DESTDIR)$(MANPATH)/man5/png.5
 	cp png.5 $(DESTDIR)$(MANPATH)/man5
 
-install-config: scripts/libpng-config
+install-config: libpng-config
 	-@if [ ! -d $(DESTDIR)$(BINPATH) ]; then \
 	mkdir $(DESTDIR)$(BINPATH); fi
 	-@/bin/rm -f $(DESTDIR)$(BINPATH)/libpng-config
-	-@/bin/rm -f $(DESTDIR)$(BINPATH)/libpng12-config
-	cp scripts/libpng-config $(DESTDIR)$(BINPATH)/libpng12-config
-	chmod 755 $(DESTDIR)$(BINPATH)/libpng12-config
-	(cd $(DESTDIR)$(BINPATH); ln -sf libpng12-config libpng-config)
+	-@/bin/rm -f $(DESTDIR)$(BINPATH)/$(LIBNAME)-config
+	cp libpng-config $(DESTDIR)$(BINPATH)/$(LIBNAME)-config
+	chmod 755 $(DESTDIR)$(BINPATH)/$(LIBNAME)-config
+	(cd $(DESTDIR)$(BINPATH); ln -sf $(LIBNAME)-config libpng-config)
 
 install: install-static install-shared install-man install-config
 

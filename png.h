@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.3rc4 - May 3, 2002
+ * libpng version 1.2.3rc5 - May 11, 2002
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -8,7 +8,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.3rc4 - May 3, 2002: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.3rc5 - May 11, 2002: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -86,7 +86,7 @@
  *    1.2.2rc1                12    10202  12.so.0.1.2.2rc1
  *    1.0.13                  10    10013  10.so.0.1.0.13
  *    1.2.2                   12    10202  12.so.0.1.2.2
- *    1.2.3rc1-4              12    10203  12.so.0.1.2.3rc1-4
+ *    1.2.3rc1-5              12    10203  12.so.0.1.2.3rc1-5
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -116,7 +116,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.2.3rc4, May 3, 2002, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.2.3rc5, May 11, 2002, are
  * Copyright (c) 2000-2002 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors
@@ -221,13 +221,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    May 3, 2002
+ *    May 11, 2002
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.2.3rc4 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.2.3rc5 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -283,7 +283,7 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.2.3rc4"
+#define PNG_LIBPNG_VER_STRING "1.2.3rc5"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  %DLLNUM%
@@ -295,7 +295,7 @@
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  4
+#define PNG_LIBPNG_VER_BUILD  5
 
 #define PNG_LIBPNG_BUILD_ALPHA    1
 #define PNG_LIBPNG_BUILD_BETA     2
@@ -1263,9 +1263,9 @@ struct png_struct_def
 
 
 /* This prevents a compiler error in png.c if png.c and png.h are both at
-   version 1.2.3rc4
+   version 1.2.3rc5
  */
-typedef png_structp version_1_2_3rc4;
+typedef png_structp version_1_2_3rc5;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1736,21 +1736,9 @@ extern PNG_EXPORT(png_voidp,png_get_error_ptr) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(void,png_set_write_fn) PNGARG((png_structp png_ptr,
    png_voidp io_ptr, png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn));
 
-extern PNG_EXPORT(void,png_default_write_data) PNGARG((png_structp png_ptr,
-   png_bytep data, png_size_t length));
-
-#if defined(PNG_WRITE_FLUSH_SUPPORTED)
-#if !defined(PNG_NO_STDIO)
-PNG_EXPORT(void,png_default_flush) PNGARG((png_structp png_ptr));
-#endif
-#endif
-
 /* Replace the default data input function with a user supplied one. */
 extern PNG_EXPORT(void,png_set_read_fn) PNGARG((png_structp png_ptr,
    png_voidp io_ptr, png_rw_ptr read_data_fn));
-
-extern PNG_EXPORT(void,png_default_read_data) PNGARG((png_structp png_ptr,
-   png_bytep data, png_size_t length));
 
 /* Return the user pointer associated with the I/O functions */
 extern PNG_EXPORT(png_voidp,png_get_io_ptr) PNGARG((png_structp png_ptr));
@@ -1829,13 +1817,6 @@ extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
 /* frees a pointer allocated by png_malloc() */
 extern PNG_EXPORT(void,png_free) PNGARG((png_structp png_ptr, png_voidp ptr));
 
-/* Function to allocate memory for zlib. */
-extern PNG_EXPORT(voidpf,png_zalloc) PNGARG((voidpf png_ptr, uInt items,
-   uInt size));
-
-/* Function to free memory for zlib */
-extern PNG_EXPORT(void,png_zfree) PNGARG((voidpf png_ptr, voidpf ptr));
-
 /* Free data that was allocated internally */
 extern PNG_EXPORT(void,png_free_data) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 free_me, int num));
@@ -1884,19 +1865,19 @@ extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
 
 /* Fatal error in PNG image of libpng - can't continue */
 extern PNG_EXPORT(void,png_error) PNGARG((png_structp png_ptr,
-   png_const_charp error));
+   png_const_charp error_message));
 
 /* The same, but the chunk name is prepended to the error string. */
 extern PNG_EXPORT(void,png_chunk_error) PNGARG((png_structp png_ptr,
-   png_const_charp error));
+   png_const_charp error_message));
 
 /* Non-fatal error in libpng.  Can continue, but may have a problem. */
 extern PNG_EXPORT(void,png_warning) PNGARG((png_structp png_ptr,
-   png_const_charp message));
+   png_const_charp warning_message));
 
 /* Non-fatal error in libpng, chunk name is prepended to message. */
 extern PNG_EXPORT(void,png_chunk_warning) PNGARG((png_structp png_ptr,
-   png_const_charp message));
+   png_const_charp warning_message));
 
 /* The png_set_<chunk> functions are for storing values in the png_info_struct.
  * Similarly, the png_get_<chunk> calls are used to read values from the
@@ -2248,11 +2229,6 @@ PNG_EXPORT(int,png_handle_as_unknown) PNGARG((png_structp png_ptr, png_bytep
    chunk_name));
 #endif
 
-#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-PNG_EXPORT(void,png_push_fill_buffer) PNGARG((png_structp png_ptr,
-   png_bytep buffer, png_size_t length));
-#endif
-
 /* Png_free_data() will turn off the "valid" flag for anything it frees.
    If you need to turn it off for a chunk that your application has freed,
    you can use png_set_invalid(png_ptr, info_ptr, PNG_INFO_CHNK); */
@@ -2411,7 +2387,7 @@ extern PNG_EXPORT(void,png_set_strip_error_numbers) PNGARG((png_structp
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project defs */
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.3rc4 - May 3, 2002 (header)\n"
+   " libpng version 1.2.3rc5 - May 11, 2002 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -2679,6 +2655,32 @@ PNG_EXTERN void png_destroy_struct_2 PNGARG((png_voidp struct_ptr,
 /* Free any memory that info_ptr points to and reset struct. */
 PNG_EXTERN void png_info_destroy PNGARG((png_structp png_ptr,
    png_infop info_ptr));
+
+/* Function to allocate memory for zlib. */
+PNG_EXTERN voidpf png_zalloc PNGARG((voidpf png_ptr, uInt items, uInt size));
+
+/* Function to free memory for zlib */
+PNG_EXTERN void png_zfree PNGARG((voidpf png_ptr, voidpf ptr));
+
+/* Next four functions are used internally as callbacks.  PNGAPI is required
+ * but not PNG_EXPORT.  PNGAPI added at libpng version 1.2.3. */
+
+PNG_EXTERN void PNGAPI png_default_read_data PNGARG((png_structp png_ptr,
+   png_bytep data, png_size_t length));
+
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+PNG_EXTERN void PNGAPI png_push_fill_buffer PNGARG((png_structp png_ptr,
+   png_bytep buffer, png_size_t length));
+#endif
+
+PNG_EXTERN void PNGAPI png_default_write_data PNGARG((png_structp png_ptr,
+   png_bytep data, png_size_t length));
+
+#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+#if !defined(PNG_NO_STDIO)
+PNG_EXTERN void PNGAPI png_default_flush PNGARG((png_structp png_ptr));
+#endif
+#endif
 
 /* Reset the CRC variable */
 PNG_EXTERN void png_reset_crc PNGARG((png_structp png_ptr));

@@ -33,7 +33,7 @@ RANLIB=echo
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.3rc4
+PNGMIN = 1.2.3rc5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -62,7 +62,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
 
-all: libpng.a $(LIBNAME).so pngtest libpng.pc
+all: libpng.a $(LIBNAME).so pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
@@ -70,6 +70,16 @@ libpng.a: $(OBJS)
 
 libpng.pc:
 	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
+
+libpng-config:
+	( cat scripts/libpng-config-head.in; \
+	echo prefix=\"$(prefix)\"; \
+	echo cppflags=\"-I$(INCPATH)/libpng12"; \
+	echo cflags=\"-xtarget=ultra\"; \
+	echo ldflags=\"-xtarget=ultra -L$(LIBPATH) -R$(LIBPATH)\"; \
+	echo libs=\"-lpng12 -lz -lm\"; \
+	cat scripts/libpng-config-body.in ) > libpng-config
+	chmod +x libpng-config
 
 $(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
@@ -154,12 +164,12 @@ install-man: libpng.3 libpngpf.3 png.5
 	-@/bin/rm -f $(DESTDIR)$(MANPATH)/man5/png.5
 	cp png.5 $(DESTDIR)$(MANPATH)/man5
 
-install-config: scripts/libpng-config
+install-config: libpng-config
 	-@if [ ! -d $(DESTDIR)$(BINPATH) ]; then \
 	mkdir $(DESTDIR)$(BINPATH); fi
 	-@/bin/rm -f $(DESTDIR)$(BINPATH)/libpng-config
 	-@/bin/rm -f $(DESTDIR)$(BINPATH)/libpng12-config
-	cp scripts/libpng-config $(DESTDIR)$(BINPATH)/libpng12-config
+	cp libpng-config $(DESTDIR)$(BINPATH)/libpng12-config
 	chmod 755 $(DESTDIR)$(BINPATH)/libpng12-config
 	(cd $(DESTDIR)$(BINPATH); ln -sf libpng12-config libpng-config)
 

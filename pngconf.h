@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.2.3rc4 - May 3, 2002
+ * libpng 1.2.3rc5 - May 11, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -99,9 +99,10 @@
  * CYGWIN (2002-01-20): The preceding is now obsolete. With the advent
  *   of auto-import in binutils, we no longer need to worry about 
  *   __declspec(dllexport) / __declspec(dllimport) and friends.  Therefore,
- *   we don't need to worry about PNG_STATIC or ALL_STATIC.  However, we
- *   DO need to worry about PNG_BUILD_DLL because that changes some defaults
- *   such as CONSOLE_IO.
+ *   we don't need to worry about PNG_STATIC or ALL_STATIC when it comes
+ *   to __declspec() stuff.  However, we DO need to worry about 
+ *   PNG_BUILD_DLL and PNG_STATIC because those change some defaults
+ *   such as CONSOLE_IO and whether GLOBAL_ARRAYS are allowed.
  */
 #if defined(__CYGWIN__)
 #  if defined(ALL_STATIC)

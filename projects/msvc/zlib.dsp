@@ -24,6 +24,7 @@ CFG=zlib - Win32 DLL
 !MESSAGE "zlib - Win32 DLL Debug ASM" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "zlib - Win32 LIB" (based on "Win32 (x86) Static Library")
 !MESSAGE "zlib - Win32 LIB Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "zlib - Win32 DLL VB" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -193,6 +194,36 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL VB"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "zlib___Win32_DLL_VB"
+# PROP BASE Intermediate_Dir "zlib___Win32_DLL_VB"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir ".\win32\zlib\dll_vb"
+# PROP Intermediate_Dir ".\win32\zlib\dll_vb"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+CPP=cl.exe
+# ADD BASE CPP /nologo /MD /W3 /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "ZLIB_DLL" /FD /c
+# ADD CPP /nologo /Gz /MD /W3 /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "ZLIB_DLL" /FD /c
+MTL=midl.exe
+RSC=rc.exe
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 /nologo /dll /machine:I386
+# SUBTRACT BASE LINK32 /pdb:none
+# ADD LINK32 /nologo /dll /machine:I386 /out:".\win32\zlib\dll_vb/zlibvb.dll"
+# SUBTRACT LINK32 /pdb:none
+
 !ENDIF 
 
 # Begin Target
@@ -203,6 +234,7 @@ LIB32=link.exe -lib
 # Name "zlib - Win32 DLL Debug ASM"
 # Name "zlib - Win32 LIB"
 # Name "zlib - Win32 LIB Debug"
+# Name "zlib - Win32 DLL VB"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -244,6 +276,11 @@ SOURCE=..\..\..\zlib\contrib\asm386\gvmat32c.c
 
 !ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
 
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL VB"
+
+# PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ENDIF 
@@ -312,6 +349,8 @@ SOURCE=.\zlib.def
 
 # PROP Exclude_From_Build 1
 
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL VB"
+
 !ENDIF 
 
 # End Source File
@@ -334,6 +373,8 @@ SOURCE=..\..\..\zlib\msdos\zlib.rc
 !ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL VB"
 
 !ENDIF 
 

@@ -2,7 +2,7 @@
 ; PNG.LIB module definition file for OS/2
 ;----------------------------------------
 
-; Version 1.2.3rc4
+; Version 1.2.3rc5
 
 LIBRARY		PNG
 DESCRIPTION	"PNG image compression library for OS/2"
@@ -198,14 +198,10 @@ EXPORTS
 
 ; Added at version 1.2.2:
   png_handle_as_unknown
-  png_zalloc
-  png_zfree
 
-; Added at version 1.2.3
-  png_default_read_data
-  png_default_write_data
-  png_default_flush
-  png_push_fill_buffer
+; Added at version 1.2.2 and deleted from 1.2.3:
+; png_zalloc
+; png_zfree
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
   png_libpng_ver
