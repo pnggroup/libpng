@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.0.16 - August 15, 2004
+ * libpng version 1.0.17 - September 12, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -17,9 +17,7 @@
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
-#ifdef PNG_USER_CONFIG
-#include "pngusr.h"
-#endif
+#define PNG_1_0_X
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your
@@ -589,13 +587,6 @@
 #  endif
 #endif /* PNG_WRITE_TRANSFORMS_SUPPORTED */
 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-#  ifndef PNG_NO_USER_TRANSFORM_PTR
-#    define PNG_USER_TRANSFORM_PTR_SUPPORTED
-#  endif
-#endif
-
 #define PNG_WRITE_INTERLACING_SUPPORTED  /* not required for PNG-compliant
                                             encoders, but can cause trouble
                                             if left undefined */
@@ -604,12 +595,6 @@
      defined(PNG_FLOATING_POINT_SUPPORTED)
 #  define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif
-
-#ifndef PNG_1_0_X
-#ifndef PNG_NO_ERROR_NUMBERS
-#define PNG_ERROR_NUMBERS_SUPPORTED
-#endif
-#endif /* PNG_1_0_X */
 
 #ifndef PNG_NO_WRITE_FLUSH
 #  define PNG_WRITE_FLUSH_SUPPORTED
@@ -621,6 +606,19 @@
 #endif
 
 #endif /* PNG_WRITE_SUPPORTED */
+
+#ifndef PNG_1_0_X
+#  ifndef PNG_NO_ERROR_NUMBERS
+#    define PNG_ERROR_NUMBERS_SUPPORTED
+#  endif
+#endif /* PNG_1_0_X */
+
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#  ifndef PNG_NO_USER_TRANSFORM_PTR
+#    define PNG_USER_TRANSFORM_PTR_SUPPORTED
+#  endif
+#endif
 
 #ifndef PNG_NO_STDIO
 #  define PNG_TIME_RFC1123_SUPPORTED

@@ -1,25 +1,29 @@
-# makefile for libpng on Darwin / Mac OS X
-# Copyright (C) 2002,2004 Glenn Randers-Pehrson
-# Copyright (C) 2001 Christoph Pfisterer
-# derived from makefile.linux:
-#  Copyright (C) 1998, 1999 Greg Roelofs
-#  Copyright (C) 1996, 1997 Andreas Dilger
+# makefile for libpng, HPUX (10.20 and 11.00) using the ANSI/C product.
+# Copyright (C) 1999-2002 Glenn Randers-Pehrson
+# Copyright (C) 1995 Guy Eric Schalnat, Group 42
+# contributed by Jim Rice and updated by Chris Schleicher, Hewlett Packard
 # For conditions of distribution and use, see copyright notice in png.h
 
-# where "make install" puts libpng.a, libpng10.dylib, png.h and pngconf.h
-prefix=/usr/local
-
 # Where the zlib library and include files are located
-#ZLIBLIB=/usr/local/lib
-#ZLIBINC=/usr/local/include
-ZLIBLIB=../zlib
-ZLIBINC=../zlib
+ZLIBLIB=/opt/zlib/lib
+ZLIBINC=/opt/zlib/include
+
+# Note that if you plan to build a libpng shared library, zlib must also
+# be a shared library, which zlib's configure does not do.  After running
+# zlib's configure, edit the appropriate lines of makefile to read:
+#   CFLAGS=-O1 -DHAVE_UNISTD -DUSE_MAP -fPIC \
+#   LDSHARED=ld -b
+#   SHAREDLIB=libz.sl
 
 CC=cc
-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng10 -lz
+CFLAGS=-I$(ZLIBINC) -O -Ae -Wl,+vnocompatwarnings +DD64 \
+-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +Z -DHAVE_UNISTD_H -DUSE_MMAP
+# Caution: be sure you have built zlib with the same CFLAGS.
+CCFLAGS=-I$(ZLIBINC) -O -Ae -Wl,+vnocompatwarnings +DD64 \
+-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +Z -DHAVE_UNISTD_H -DUSE_MMAP
 
-#RANLIB=echo
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+
 RANLIB=ranlib
 
 PNGMAJ = 0
@@ -27,6 +31,8 @@ PNGMIN = 1.0.17
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 
+# where make install puts libpng.a, libpng10.sl, and png.h
+prefix=/opt/libpng
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 MANPATH=$(prefix)/man
@@ -53,52 +59,46 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
-.SUFFIXES:      .c .o .pic.o
+.SUFFIXES:	.c .o .pic.o
 
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
+	$(CC) -c $(CFLAGS) +z -o $@ $*.c
 
-all: libpng.a $(LIBNAME).dylib pngtest libpng.pc libpng-config
+all: libpng.a $(LIBNAME).sl pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:
-	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! | \
-	   sed -e s/-lm// > libpng.pc
+	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
+	echo ccopts=\"-Ae +DA1.1 +DS2.0\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng10 -lz\"; \
+	echo libs=\"-lpng10 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
-$(LIBNAME).dylib: $(LIBNAME).$(PNGMAJ).dylib
-	ln -sf $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib
+$(LIBNAME).sl: $(LIBNAME).sl.$(PNGMAJ)
+	ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl
 
-$(LIBNAME).$(PNGMAJ).dylib: $(LIBNAME).$(PNGVER).dylib
-	ln -sf $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib
+$(LIBNAME).sl.$(PNGMAJ): $(LIBNAME).sl.$(PNGVER)
+	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ)
 
-$(LIBNAME).$(PNGVER).dylib: $(OBJSDLL)
-	$(CC) -dynamiclib \
-	 -install_name $(LIBPATH)/$(LIBNAME).$(PNGMAJ).dylib \
-	 -current_version $(PNGVER) -compatibility_version $(PNGVER) \
-	 -o $(LIBNAME).$(PNGVER).dylib \
-	 $(OBJSDLL) -L$(ZLIBLIB) -lz
+$(LIBNAME).sl.$(PNGVER): $(OBJSDLL)
+	$(LD) -b +s \
+	+h $(LIBNAME).sl.$(PNGMAJ) -o $(LIBNAME).sl.$(PNGVER) $(OBJSDLL)
 
-libpng.3.$(PNGMIN).dylib: $(OBJSDLL)
-	$(CC) -dynamiclib \
-	 -install_name $(LIBPATH)/libpng.3.dylib \
-	 -current_version 3 -compatibility_version 3 \
-	 -o libpng.3.$(PNGMIN).dylib \
-	 $(OBJSDLL) -L$(ZLIBLIB) -lz
+libpng.sl.3.$(PNGMIN): $(OBJSDLL)
+	$(LD) -b +s \
+	+h libpng.sl.3 -o libpng.sl.3.$(PNGMIN) $(OBJSDLL)
 
-pngtest: pngtest.o $(LIBNAME).dylib
-	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
+pngtest: pngtest.o libpng.a
+	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
@@ -116,28 +116,26 @@ install-static: install-headers libpng.a
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	cp libpng.a $(DL)/$(LIBNAME).a
 	chmod 644 $(DL)/$(LIBNAME).a
-	$(RANLIB) $(DL)/$(LIBNAME).a
 	-@/bin/rm -f $(DL)/libpng.a
 	(cd $(DL); ln -sf $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).dylib libpng.pc \
-	libpng.3.$(PNGMIN).dylib
+install-shared: install-headers $(LIBNAME).sl.$(PNGVER) libpng.pc \
+	libpng.sl.3.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
-	-@/bin/rm -f $(DL)/$(LIBNAME).$(PNGVER)*.dylib
-	-@/bin/rm -f $(DL)/$(LIBNAME).$(PNGMAJ)*.dylib
-	-@/bin/rm -f $(DL)/$(LIBNAME).dylib
-	-@/bin/rm -f $(DL)/libpng.dylib
-	-@/bin/rm -f $(DL)/libpng.3.dylib
-	-@/bin/rm -f $(DL)/libpng.3.$(PNGMIN)*.dylib
-	cp $(LIBNAME).$(PNGVER).dylib $(DL)
-	cp libpng.3.$(PNGMIN).dylib $(DL)
-	chmod 755 $(DL)/$(LIBNAME).$(PNGVER).dylib
-	chmod 755 $(DL)/libpng.3.$(PNGMIN).dylib
+	-@/bin/rm -f $(DL)/$(LIBNAME).sl.$(PNGVER)* $(DL)/$(LIBNAME).sl
+	-@/bin/rm -f $(DL)/$(LIBNAME).sl.$(PNGMAJ)
+	-@/bin/rm -f $(DL)/libpng.sl
+	-@/bin/rm -f $(DL)/libpng.sl.3
+	-@/bin/rm -f $(DL)/libpng.sl.3.$(PNGMIN)*
+	cp $(LIBNAME).sl.$(PNGVER) $(DL)
+	cp libpng.sl.3.$(PNGMIN) $(DL)
+	chmod 755 $(DL)/$(LIBNAME).sl.$(PNGVER)
+	chmod 755 $(DL)/libpng.sl.3.$(PNGMIN)
 	(cd $(DL); \
-	ln -sf libpng.3.$(PNGMIN).dylib libpng.3.dylib; \
-	ln -sf libpng.3.dylib libpng.dylib; \
-	ln -sf $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib; \
-	ln -sf $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib)
+	ln -sf libpng.sl.3.$(PNGMIN) libpng.sl.3; \
+	ln -sf libpng.sl.3 libpng.sl; \
+	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ); \
+	ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl)
 	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
 	-@/bin/rm -f $(DL)/pkgconfig/$(LIBNAME).pc
 	-@/bin/rm -f $(DL)/pkgconfig/libpng.pc
@@ -173,23 +171,26 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) -I$(DI) -I$(ZLIBINC) \
+	$(CC) -I$(DI) -I$(ZLIBINC) $(CCFLAGS) \
 	   `$(BINPATH)/libpng10-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) \
 	   -o pngtestd `$(BINPATH)/libpng10-config --ldflags`
 	./pngtestd pngtest.png
 
 test-installed:
-	$(CC) $(CFLAGS) \
+	echo
+	echo Testing installed dynamic shared library.
+	$(CC) $(CCFLAGS) \
 	   `$(BINPATH)/libpng10-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/libpng10-config --ldflags`
 	./pngtesti pngtest.png
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png libpng-config \
-	libpng.3.$(PNGMIN).dylib \
-	libpng.pc $(LIBNAME).*dylib pngtesti
+	/bin/rm -f *.o libpng.a pngtest pngtesti pngout.png \
+	libpng-config $(LIBNAME).sl $(LIBNAME).sl.$(PNGMAJ)* \
+	libpng.sl.3.$(PNGMIN) \
+	libpng.pc
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
@@ -197,20 +198,19 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h
-pngerror.o pngerror.pic.o: png.h pngconf.h
-pngrio.o pngrio.pic.o: png.h pngconf.h
-pngwio.o pngwio.pic.o: png.h pngconf.h
-pngmem.o pngmem.pic.o: png.h pngconf.h
-pngset.o pngset.pic.o: png.h pngconf.h
-pngget.o pngget.pic.o: png.h pngconf.h
-pngread.o pngread.pic.o: png.h pngconf.h
-pngrtran.o pngrtran.pic.o: png.h pngconf.h
-pngrutil.o pngrutil.pic.o: png.h pngconf.h
-pngtrans.o pngtrans.pic.o: png.h pngconf.h
-pngwrite.o pngwrite.pic.o: png.h pngconf.h
-pngwtran.o pngwtran.pic.o: png.h pngconf.h
-pngwutil.o pngwutil.pic.o: png.h pngconf.h
-pngpread.o pngpread.pic.o: png.h pngconf.h
-
+png.o: png.h pngconf.h
+pngerror.o: png.h pngconf.h
+pngrio.o: png.h pngconf.h
+pngwio.o: png.h pngconf.h
+pngmem.o: png.h pngconf.h
+pngset.o: png.h pngconf.h
+pngget.o: png.h pngconf.h
+pngread.o: png.h pngconf.h
+pngrtran.o: png.h pngconf.h
+pngrutil.o: png.h pngconf.h
 pngtest.o: png.h pngconf.h
+pngtrans.o: png.h pngconf.h
+pngwrite.o: png.h pngconf.h
+pngwtran.o: png.h pngconf.h
+pngwutil.o: png.h pngconf.h
+pngpread.o: png.h pngconf.h
