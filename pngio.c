@@ -1,10 +1,10 @@
 
-/* pngstub.c - stub functions for i/o and memory allocation
+/* pngio.c - stub functions for i/o and memory allocation
 
-	libpng 1.0 beta 2 - version 0.85
+	libpng 1.0 beta 2 - version 0.86
    For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   December 19, 1995
+	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 10, 1996
 
    This file provides a location for all input/output.  Users which need
 	special handling are expected to write functions which have the same
@@ -16,13 +16,12 @@
 #define PNG_INTERNAL
 #include "png.h"
 
-/* Write the data to whatever output you are using.  The default
-   routine writes to a file pointer.  If you need to write to something
-	else, this is a good example of how to do it.  Note that this routine
-	sometimes gets called with very small lengths, so you should implement
-	some kind of simple buffering if you are using unbuffered writes.  This
-	should never be asked to write more then 64K on a 16 bit machine.  The
-	cast to png_size_t is there for insurance. */
+/* Write the data to whatever output you are using.  The default routine
+	writes to a file pointer.  Note that this routine sometimes gets called
+	with very small lengths, so you should implement some kind of simple
+	buffering if you are using unbuffered writes.  This should never be asked
+	to write more then 64K on a 16 bit machine.  The cast to png_size_t is
+	there to quiet warnings of certain compilers. */
 
 void
 png_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
@@ -33,6 +32,10 @@ png_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 		png_error(png_ptr, "Call to NULL write function");
 }
 
+/* This is the function which does the actual writing of data.  If you are
+	not writing to a standard C stream, you should create a replacement
+	write_data function and use it at run time with png_set_write_fn(), rather
+	than changing the library. */
 #ifndef USE_FAR_KEYWORD
 void
 png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
@@ -106,17 +109,12 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 
 #endif
 
-/* Read the data from whatever input you are using.  The default
-   routine reads from a file pointer.  If you need to read from something
-   else, this is the place to do it.  We suggest saving the old code
-   for future use.  Note that this routine sometimes gets called with
-   very small lengths, so you should implement some kind of simple
-   buffering if you are using unbuffered reads.  This should
-   never be asked to read more then 64K on a 16 bit machine.  The cast
-	to png_size_t is there for insurance, but if you are having problems
-	with it, you can take it out.  Just be sure to cast length to whatever
-	fread needs in that spot if you don't have a function prototype for
-	it. */
+/* Read the data from whatever input you are using.  The default routine
+	reads from a file pointer.  Note that this routine sometimes gets called
+	with very small lengths, so you should implement some kind of simple
+	buffering if you are using unbuffered reads.  This should never be asked
+	to read more then 64K on a 16 bit machine.  The cast to png_size_t is
+	there to quiet some compilers */
 void
 png_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 {
@@ -135,6 +133,10 @@ png_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 	}
 }
 
+/* This is the function which does the actual reading of data.  If you are
+	not reading from a standard C stream, you should create a replacement
+	read_data function and use it at run time with png_set_read_fn(), rather
+	than changing the library. */
 #ifndef USE_FAR_KEYWORD
 void
 png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
@@ -221,7 +223,7 @@ png_default_flush(png_struct *png_ptr)
 						 arguments a pointer to a png_struct, a pointer to
 						 data to be written, and a 32-bit unsigned int which is
 						 the number of bytes to be written.  The new write
-						 function should call (*(png_ptr->error_fn))("Error msg")
+						 function should call png_error("Error msg")
 						 to exit and output any fatal error messages.
 	flush_data_fn - pointer to a new flush function which takes as its
 						 arguments a pointer to a png_struct.  After a call to
@@ -264,7 +266,9 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr, png_rw_ptr write_data_fn
 	read_data_fn - pointer to a new input function which takes as it's
 						arguments a pointer to a png_struct, a pointer to
 						a location where input data can be stored, and a 32-bit
-						unsigned int which is the number of bytes to be read. */
+						unsigned int which is the number of bytes to be read.
+						To exit and output any fatal error messages the new write
+                  function should call png_error(png_ptr, "Error msg"). */
 void
 png_set_read_fn(png_struct *png_ptr, void *io_ptr, png_rw_ptr read_data_fn)
 {
@@ -293,10 +297,9 @@ png_get_io_ptr(png_struct *png_ptr)
 	return png_ptr->io_ptr;
 }
 
-/* Initialize the input/output for the png file.  If you change
-	the read and write routines, you will probably need to change
-   this routine (or write your own).  If you change the parameters
-   of this routine, remember to change png.h also. */
+/* Initialize the default input/output functions for the png file.  If you
+	change the read, or write routines, you can call either png_set_read_fn()
+   or png_set_write_fn() instead of png_init_io(). */
 void
 png_init_io(png_structp png_ptr, FILE *fp)
 {

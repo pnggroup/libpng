@@ -1,10 +1,10 @@
 
 /* pngwrite.c - general routines to write a png file
 
-	libpng 1.0 beta 2 - version 0.85
+	libpng 1.0 beta 2 - version 0.86
    For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   December 19, 1995
+	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 10, 1996
    */
 
 /* get internal access to png.h */
@@ -114,7 +114,7 @@ png_write_info(png_structp png_ptr, png_infop info)
 void
 png_write_end(png_structp png_ptr, png_infop info)
 {
-   /* see if user wants us to write information chunks */
+	/* see if user wants us to write information chunks */
    if (info)
    {
 #if defined(PNG_WRITE_tIME_SUPPORTED)

@@ -79,13 +79,21 @@ void read_png(char *file_name)
    png_info_init(info_ptr);
    png_read_init(png_ptr);
 
-   /* set up the input control */
+   /* set up the input control if you are using standard C streams */
    png_init_io(png_ptr, fp);
 
-   /* read the file information */
-   png_read_info(png_ptr, info_ptr);
+	/* if you are using replacement read functions, here you would call */
+	png_set_read_fn(png_ptr, (void *)io_ptr, user_read_fn);
+	/* where io_ptr is a structure you want available to the callbacks */
 
-   /* set up the transformations you want.  Note that these are
+	/* if you are using replacement message functions, here you would call */
+	png_set_message_fn(png_ptr, (void *)msg_ptr, user_error_fn, user_warning_fn);
+	/* where msg_ptr is a structure you want available to the callbacks */
+
+	/* read the file information */
+	png_read_info(png_ptr, info_ptr);
+
+	/* set up the transformations you want.  Note that these are
       all optional.  Only call them if you want them */
 
    /* expand paletted colors into true rgb */
@@ -102,7 +110,7 @@ void read_png(char *file_name)
       png_set_expand(png_ptr);
 
    /* Set the background color to draw transparent and alpha
-      images over */
+		images over */
    png_color_16 my_background;
 
    if (info_ptr->valid & PNG_INFO_bKGD)
@@ -120,7 +128,7 @@ void read_png(char *file_name)
 
    /* tell libpng to strip 16 bit depth files down to 8 bits */
    if (info_ptr->bit_depth == 16)
-      png_set_strip_16(png_ptr);
+		png_set_strip_16(png_ptr);
 
    /* dither rgb files down to 8 bit palettes & reduce palettes
       to the number of colors available on your screen */
@@ -138,7 +146,7 @@ void read_png(char *file_name)
          png_set_dither(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
             MAX_SCREEN_COLORS, NULL);
       }
-   }
+	}
 
    /* invert monocrome files */
    if (info_ptr->bit_depth == 1 &&
@@ -156,7 +164,7 @@ void read_png(char *file_name)
 
    /* flip the rgb pixels to bgr */
    if (info_ptr->color_type == PNG_COLOR_TYPE_RGB ||
-      info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+		info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       png_set_bgr(png_ptr);
 
    /* swap bytes of 16 bit files to least significant bit first */
@@ -174,7 +182,7 @@ void read_png(char *file_name)
    else
       number_passes = 1;
 
-   /* optional call to update palette with transformations */
+	/* optional call to update palette with transformations */
    png_start_read_image(png_ptr);
 
    /* optional call to update the info structure */
@@ -192,7 +200,7 @@ void read_png(char *file_name)
    for (pass = 0; pass < number_passes; pass++)
    {
       /* Read the image using the "sparkle" effect. */
-      png_read_rows(png_ptr, row_pointers, NULL, number_of_rows);
+		png_read_rows(png_ptr, row_pointers, NULL, number_of_rows);
 
       /* If you are only reading on row at a time, this works */
       for (y = 0; y < height; y++)
@@ -210,7 +218,7 @@ void read_png(char *file_name)
 
    /* read the rest of the file, getting any additional chunks
       in info_ptr */
-   png_read_end(png_ptr, info_ptr);
+	png_read_end(png_ptr, info_ptr);
 
    /* clean up after the read, and free any memory allocated */
    png_read_destroy(png_ptr, info_ptr, (png_infop)0);
@@ -262,7 +270,7 @@ initialize_png_reader()
 		function callbacks, even if you aren't using them all.
 		You can put a void pointer in place of the NULL, and
 		retrieve the pointer from inside the callbacks using
-		the function png_get_msg_ptr(png_ptr); */
+		the function png_get_progressive_ptr(png_ptr); */
 	png_set_progressive_read_fn(png_ptr, NULL,
 		info_callback, row_callback, end_callback);
 
@@ -372,7 +380,7 @@ void write_png(char *file_name, ... other image information ...)
    }
 
    /* set error handling */
-   if (setjmp(png_ptr->jmpbuf))
+	if (setjmp(png_ptr->jmpbuf))
    {
       png_write_destroy(png_ptr);
       fclose(fp);
@@ -386,10 +394,18 @@ void write_png(char *file_name, ... other image information ...)
    png_info_init(info_ptr);
    png_write_init(png_ptr);
 
-   /* set up the output control */
+   /* set up the output control if you are using standard C streams */
    png_init_io(png_ptr, fp);
 
-   /* set the file information here */
+	/* if you are using replacement write functions, here you would call */
+	png_set_write_fn(png_ptr, (void *)io_ptr, user_write_fn, user_flush_fn);
+	/* where io_ptr is a structure you want available to the callbacks */
+
+	/* if you are using replacement message functions, here you would call */
+	png_set_message_fn(png_ptr, (void *)msg_ptr, user_error_fn, user_warning_fn);
+	/* where msg_ptr is a structure you want available to the callbacks */
+
+	/* set the file information here */
    info_ptr->width = ;
    info_ptr->height = ;
    etc.
@@ -402,10 +418,18 @@ void write_png(char *file_name, ... other image information ...)
 
    /* optional significant bit chunk */
    info_ptr->valid |= PNG_INFO_sBIT;
-   info_ptr->sig_bit = true_bit_depth;
-
-   /* optional gamma chunk */
-   info_ptr->valid |= PNG_INFO_gAMA;
+	/* if we are dealing with a grayscale image then */
+	info_ptr->sig_bit.gray = true_bit_depth;
+	/* otherwise, if we are dealing with a color image then */
+	info_ptr->sig_bit.red = true_red_bit_depth;
+	info_ptr->sig_bit.green = true_green_bit_depth;
+	info_ptr->sig_bit.blue = true_blue_bit_depth;
+	/* if the image has an alpha channel then */
+   info_ptr->sig_bit.alpha = true_alpha_bit_depth;
+  
+	/* optional gamma chunk is strongly suggested if you have any guess
+	   as to the correct gamma of the image */
+	info_ptr->valid |= PNG_INFO_gAMA;
    info_ptr->gamma = gamma;
 
    /* other optional chunks */

@@ -1,26 +1,33 @@
 
 /* png.h - header file for png reference library
 
-   libpng 1.0 beta 2 - version 0.85
-   December 19, 1995
+	libpng 1.0 beta 2 - version 0.86
+	Jan 10, 1996
 
-   Note: This is a beta version.  It reads and writes valid files
-   on the platforms I have, but it has had limited portability
-   testing.  Furthermore, you will may have to modify the
-   includes below to get it to work on your system, and you
-   may have to supply the correct compiler flags in the makefile.
-   Read the readme.txt for more information, and how to contact
-   me if you have any problems, or if you want your compiler/
-   platform to be supported in the next official libpng release.
+	Note: This is a beta version.  It reads and writes valid files
+	on the platforms I have, but it has had limited portability
+	testing.  Furthermore, you will may have to modify the
+	includes below to get it to work on your system, and you
+	may have to supply the correct compiler flags in the makefile.
+	Read the readme.txt for more information, and how to contact
+	me if you have any problems, or if you want your compiler/
+	platform to be supported in the next official libpng release.
 
-   See readme.txt for more information
+	See readme.txt for more information
 
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
 	Contributing Authors:
+      Andreas Dilger
       Dave Martindale
-      Guy Eric Schalnat
-      Paul Schmidt
-      Tim Wegner
+		Guy Eric Schalnat
+		Paul Schmidt
+		Tim Wegner
+
+	The contributing authors would like to thank all those who helped
+	with testing, bug fixes, and patience.  You know who you are.  This
+	wouldn't have been possible without all of you.
+
+   Thanks to Frank J. T. Wojcik for reviewing the documentation
 
    The PNG Reference Library is supplied "AS IS". The Contributing Authors
    and Group 42, Inc. disclaim all warranties, expressed or implied,
@@ -67,10 +74,10 @@
 
 /* version information for png.h - this should match the version
    number in png.c */
-#define PNG_LIBPNG_VER_STRING "0.85"
-/* careful here.  I wanted to use 085, but that would be octal.  Version
-   1.0 will be 100 here, etc. */
-#define PNG_LIBPNG_VER 85
+#define PNG_LIBPNG_VER_STRING "0.86"
+/* careful here.  I wanted to use 086, but that would be octal.  Version
+	1.0 will be 100 here, etc. */
+#define PNG_LIBPNG_VER 86
 
 /* variables defined in png.c - only it needs to define PNG_NO_EXTERN */
 #ifndef PNG_NO_EXTERN
@@ -265,6 +272,7 @@ typedef png_info        FAR * FAR * png_infopp;
 /* these determine if a function in the info needs freed */
 #define PNG_FREE_PALETTE 0x0001
 #define PNG_FREE_HIST 0x0002
+#define PNG_FREE_TRANS 0x0004
 
 /* this is used for the transformation routines, as some of them
 	change these values for the row.  It also should enable using
@@ -290,10 +298,10 @@ typedef png_row_info    FAR * FAR * png_row_infopp;
 typedef struct png_struct_def png_struct;
 typedef png_struct FAR * png_structp;
 
-#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef void (*png_msg_ptr) PNGARG((png_structp, png_const_charp));
 typedef void (*png_rw_ptr) PNGARG((png_structp, png_bytep, png_uint_32));
 typedef void (*png_flush_ptr) PNGARG((png_structp));
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef void (*png_progressive_info_ptr) PNGARG((png_structp, png_infop));
 typedef void (*png_progressive_end_ptr) PNGARG((png_structp, png_infop));
 typedef void (*png_progressive_row_ptr) PNGARG((png_structp, png_bytep,
@@ -305,7 +313,7 @@ typedef void (*png_progressive_row_ptr) PNGARG((png_structp, png_bytep,
 	people who will be modifying the library for their own special needs.
 	*/
 
-typedef struct png_struct_def
+struct png_struct_def
 {
 	jmp_buf jmpbuf; /* used in png_error */
 	png_byte mode; /* used to determine where we are in the png file */
@@ -507,6 +515,11 @@ extern void png_set_expand PNGARG((png_structp png_ptr));
 extern void png_set_bgr PNGARG((png_structp png_ptr));
 #endif
 
+#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
+/* Expand the grayscale to 24 bit RGB if necessary. */
+extern void png_set_gray_to_rgb PNGARG((png_structp png_ptr));
+#endif
+
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
 #define PNG_FILLER_BEFORE 0
 #define PNG_FILLER_AFTER 1
@@ -664,9 +677,10 @@ extern void png_set_compression_method PNGARG((png_structp png_ptr,
    int method));
 
 /* These next functions are stubs of typical c functions for input/output,
-   memory, and error handling.  They are in the file pngstub.c, and are
-   set up to be easily modified for users that need to.  See the file
-   pngstub.c for more information */
+	memory, and error handling.  They are in the file pngio.c, and pngerror.c.
+	These functions can be replaced at run time for those applications that
+	need to handle I/O in a different manner.  See the file libpng.txt for
+	more information */
 
 /* Write the data to whatever output you are using. */
 extern void png_write_data PNGARG((png_structp png_ptr, png_bytep data,
@@ -676,7 +690,7 @@ extern void png_write_data PNGARG((png_structp png_ptr, png_bytep data,
 extern void png_read_data PNGARG((png_structp png_ptr, png_bytep data,
 	png_uint_32 length));
 
-/* Initialize the input/output for the png file. */
+/* Initialize the input/output for the png file to the default functions. */
 extern void png_init_io PNGARG((png_structp png_ptr, FILE *fp));
 
 /* Replace the error message and abort, and warning functions with user
@@ -691,7 +705,7 @@ extern png_voidp png_get_msg_ptr PNGARG((png_structp png_ptr));
 
 /* Replace the default data output functions with a user supplied one(s).
 	If buffered output is not used, then output_flush_fn can be set to NULL.
-	if PNG_WRITE_FLUSH_SUPPORTED is not defined at libpng compile time
+	If PNG_WRITE_FLUSH_SUPPORTED is not defined at libpng compile time
 	output_flush_fn will be ignored (and thus can be NULL). */
 extern void png_set_write_fn PNGARG((png_structp png_ptr, png_voidp io_ptr,
 	png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn));
@@ -709,7 +723,7 @@ extern void png_set_push_fn PNGARG((png_structp png_ptr, png_voidp push_ptr,
 	png_progressive_end_ptr end_fn));
 
 /* returns the user pointer assiciated with the push read functions */
-extern void * png_get_progressive_ptr PNGARG((png_structp png_ptr));
+extern png_voidp png_get_progressive_ptr PNGARG((png_structp png_ptr));
 
 extern png_voidp png_large_malloc PNGARG((png_structp png_ptr,
 	png_uint_32 size));
@@ -1117,6 +1131,9 @@ extern void png_do_unshift PNGARG((png_row_infop row_info, png_bytep row,
 #if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
 extern void png_do_invert PNGARG((png_row_infop row_info, png_bytep row));
 #endif
+
+extern void png_build_grayscale_palette PNGARG((int bit_depth,
+	png_colorp palette));
 
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
 extern void png_do_gray_to_rgb PNGARG((png_row_infop row_info,

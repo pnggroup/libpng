@@ -1,10 +1,10 @@
 
 /* pngpread.c - read a png file in push mode
 
-	libpng 1.0 beta 2 - version 0.85
+	libpng 1.0 beta 2 - version 0.86
    For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   December 19, 1995
+	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 10, 1996
    */
 
 #define PNG_INTERNAL
@@ -850,8 +850,10 @@ png_push_read_text(png_structp png_ptr, png_infop info)
 			text_size = png_ptr->buffer_size;
 		else
 			text_size = png_ptr->current_text_left;
-		png_push_fill_buffer(png_ptr, png_ptr->current_text_ptr, text_size);
-		png_calculate_crc(png_ptr, png_ptr->current_text_ptr, text_size);
+		png_push_fill_buffer(png_ptr, (png_bytep)png_ptr->current_text_ptr,
+			text_size);
+		png_calculate_crc(png_ptr, (png_bytep)png_ptr->current_text_ptr,
+			text_size);
 		png_ptr->current_text_left -= text_size;
 		png_ptr->current_text_ptr += text_size;
 	}
@@ -902,8 +904,10 @@ png_push_read_ztxt(png_structp png_ptr, png_infop info)
 			text_size = png_ptr->buffer_size;
 		else
 			text_size = png_ptr->current_text_left;
-		png_push_fill_buffer(png_ptr, png_ptr->current_text_ptr, text_size);
-		png_calculate_crc(png_ptr, png_ptr->current_text_ptr, text_size);
+		png_push_fill_buffer(png_ptr, (png_bytep)png_ptr->current_text_ptr,
+			text_size);
+		png_calculate_crc(png_ptr, (png_bytep)png_ptr->current_text_ptr,
+			text_size);
 		png_ptr->current_text_left -= text_size;
 		png_ptr->current_text_ptr += text_size;
 	}
@@ -950,6 +954,7 @@ png_push_read_ztxt(png_structp png_ptr, png_infop info)
 		key_size = text - key;
 		text_size = 0;
 		text = NULL;
+      ret = Z_STREAM_END;
 
 		while (png_ptr->zstream->avail_in)
 		{

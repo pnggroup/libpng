@@ -62,5 +62,8 @@ version 0.85
    added i/o, error, and memory callback functions
    fixed some bugs (16 bit, 4 bit interlaced, etc.)
    added first run progressive reader (barely tested)
+version 0.86
+   fixed bugs
+   improved documentation
 
 

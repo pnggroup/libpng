@@ -1,9 +1,9 @@
 /* pngtest.c - a simple test program to test libpng 
 
-   libpng 1.0 beta 2 - version 0.81
+   libpng 1.0 beta 2 - version 0.86
    For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   August 24, 1995
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 10, 1996
    */
 
 #include <stdio.h>

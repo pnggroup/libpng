@@ -1,21 +1,23 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
 
-	libpng 1.0 beta 2 - version 0.85
+	libpng 1.0 beta 2 - version 0.86
    For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   December 19, 1995
+	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 10, 1996
 
-   This file provides a location for all error handling.  Users which
-   need special error handling are expected to modify the code in this
-   file to meet their needs.  See the instructions at each function. */
+	This file provides a location for all error handling.  Users which
+   need special error handling are expected to write replacement functions
+	and use png_set_message_fn() to use those functions.  See the instructions
+	at each function. */
 
 #define PNG_INTERNAL
 #include "png.h"
 
-/* This function is called whenever there is an error.  Replace with
-	however you wish to handle the error.  Note that this function
-	MUST NOT return, or the program will crash */
+/* This function is called whenever there is a fatal error.  This function
+	should not be changed.  If there is a need to handle errors differently,
+	you should supply a replacement error function and use png_set_message_fn()
+   to replace the error function at run-time. */
 void
 png_error(png_structp png_ptr, png_const_charp message)
 {
@@ -27,6 +29,10 @@ png_error(png_structp png_ptr, png_const_charp message)
 	png_default_error(png_ptr, message);
 }
 
+/* This function is called whenever there is a non-fatal error.  This function
+	should not be changed.  If there is a need to handle warnings differently,
+	you should supply a replacement warning function and use
+	png_set_message_fn() to replace the warning function at run-time. */
 void
 png_warning(png_structp png_ptr, png_const_charp message)
 {
@@ -54,11 +60,10 @@ png_default_error(png_structp png_ptr, png_const_charp message)
 #endif
 }
 
-/* This function is called when there is a warning, but the library
-   thinks it can continue anyway.  You don't have to do anything here
-   if you don't want to.  In the default configuration, png_ptr is
+/* This function is called when there is a warning, but the library thinks
+	it can continue anyway.  Replacement functions don't have to do anything
+	here if you don't want to.  In the default configuration, png_ptr is
    not used, but it is passed in case it may be useful. */
-
 void
 png_default_warning(png_structp png_ptr, png_const_charp message)
 {
@@ -70,10 +75,10 @@ png_default_warning(png_structp png_ptr, png_const_charp message)
 #endif
 }
 
-/* This function is called when the application wants to use another
-	method of handling errors and warnings.  Note that the error function must
-	NOT return to the calling routine or serious problems will occur. The
-	error return method used in the default routine calls
+/* This function is called when the application wants to use another method
+	of handling errors and warnings.  Note that the error function MUST NOT
+	return to the calling routine or serious problems will occur. The error
+	return method used in the default routine calls
 	longjmp(png_ptr->jmpbuf, 1) */
 void
 png_set_message_fn(png_structp png_ptr, png_voidp msg_ptr, png_msg_ptr error_fn,

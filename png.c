@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose png functions
 
-	libpng 1.0 beta 2 - version 0.85
+	libpng 1.0 beta 2 - version 0.86
    For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   December 19, 1995
+	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 10, 1996
    */
 
 #define PNG_INTERNAL
@@ -13,7 +13,7 @@
 
 /* version information for c files.  This better match the version
    string defined in png.h */
-char FARDATA png_libpng_ver[] = "0.85";
+char FARDATA png_libpng_ver[] = "0.86";
 
 /* place to hold the signiture string for a png file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -107,7 +107,7 @@ png_check_sig(png_bytep sig, int num)
 voidpf
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
-	voidp * ptr;
+	voidp ptr;
 
 	ptr = ((voidp)png_large_malloc((png_structp)png_ptr,
 		(png_uint_32)items * (png_uint_32)size));

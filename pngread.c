@@ -1,10 +1,10 @@
 
 /* pngread.c - read a png file
 
-	libpng 1.0 beta 2 - version 0.85
+	libpng 1.0 beta 2 - version 0.86
    For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   December 19, 1995
+	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 10, 1996
    */
 
 #define PNG_INTERNAL
@@ -633,7 +633,7 @@ png_read_destroy(png_structp png_ptr, png_infop info, png_infop end_info)
 		if (png_ptr->do_free & PNG_FREE_PALETTE)
 			png_free(png_ptr, info->palette);
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) && defined(PNG_READ_bKGD_SUPPORTED)
-		if (png_ptr->do_free & PNG_FREE_PALETTE)
+		if (png_ptr->do_free & PNG_FREE_TRANS)
 			png_free(png_ptr, info->trans);
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)

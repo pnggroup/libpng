@@ -1,12 +1,8 @@
-readme.txt - for libpng 0.85
+readme.txt - for libpng 0.86
 
 This is a bug fix for the second beta version of libpng 1.0, and
 a first try at a progressive (push) reader.  It hasn't been
-tested very much, but I'm not going to have time to test it for
-a few days, and I wanted to give an advanced look at the
-progressive reader to everyone.  Please report bugs back
-(and fixes, if you find them), and I'll release a new version
-in a week or two.  Thanks.
+tested as much as the pull reader, but seems to work ok.
 
 I've implemented the callback functions for the error/warning
 messages and the input/output.  See the libpng.txt
@@ -44,8 +40,7 @@ be available at the same place you picked up libpng.  If it is
 not there, try ftp.uu.net in the /graphics/png directory.
 
 This code is currently being archived at ftp.uu.net in the
-/graphics/png directory, and at ftp.group42.com (204.94.158.25)
-in the /pub/png directory, and on CompuServe, Lib 20 (PNG SUPPORT)
+/graphics/png directory, and on CompuServe, Lib 20 (PNG SUPPORT)
 at GO GRAPHSUP.  If you can't find it in any of those places,
 e-mail me, and I'll help you find it.
 
@@ -87,5 +82,4 @@ Good luck, and happy coding.
  Internet: schalnat@group42.com
  CompuServe: 75501,1625
  Web: www.group42.com
- FTP: ftp.group42.com (204.94.158.25)
 

@@ -1,10 +1,10 @@
 
 /* pngrtran.c - transforms the data in a row for png readers
 
-	libpng 1.0 beta 2 - version 0.85
+	libpng 1.0 beta 2 - version 0.86
    For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   December 19, 1995
+	Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+   January 10, 1996
    */
 
 #define PNG_INTERNAL
@@ -1168,7 +1168,8 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
          color_inc = 1;
          break;
       default:
-         num_palette = 0;
+			num_palette = 0;
+         color_inc = 0;
          break;
    }
 
@@ -1493,11 +1494,11 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         else
                         {
                            v = gamma_16[
-                              *(sp + 1) >> gamma_shift][*sp];
+										*(sp + 1) >> gamma_shift][*sp];
                            *sp = (v >> 8) & 0xff;
                            *(sp + 1) = v & 0xff;
                         }
-                     }
+							}
                   }
                   else
 #endif
@@ -2025,7 +2026,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
    you do this after you deal with the trasparency issue on grayscale
    or rgb images. If your bit depth is 8, use gamma_table, if it is 16,
    use gamma_16_table and gamma_shift.  Build these with
-   build_gamma_table().  If your bit depth < 8, gamma correct a
+   build_gamma_table().  If your bit depth <= 8, gamma correct a
    palette, not the data.  */
 void
 png_do_gamma(png_row_infop row_info, png_bytep row,
@@ -2659,7 +2660,7 @@ png_build_gamma_table(png_structp png_ptr)
          if ((int)png_ptr->sig_bit.green > sig_bit)
             sig_bit = png_ptr->sig_bit.green;
          if ((int)png_ptr->sig_bit.blue > sig_bit)
-            sig_bit = png_ptr->sig_bit.blue;
+				sig_bit = png_ptr->sig_bit.blue;
       }
       else
       {
@@ -2691,17 +2692,17 @@ png_build_gamma_table(png_structp png_ptr)
       png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
          num * sizeof (png_uint_16p ));
 
-      if ((png_ptr->transformations & PNG_16_TO_8) &&
-         !(png_ptr->transformations & PNG_BACKGROUND))
-      {
+		if ((png_ptr->transformations & PNG_16_TO_8) &&
+			!(png_ptr->transformations & PNG_BACKGROUND))
+		{
 			double fin, fout;
 			png_uint_32 last, max;
 
-         for (i = 0; i < num; i++)
-         {
-            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
+			for (i = 0; i < num; i++)
+			{
+				png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
 					256 * sizeof (png_uint_16));
-         }
+			}
 
 			g = 1.0 / g;
 			last = 0;
@@ -2709,33 +2710,33 @@ png_build_gamma_table(png_structp png_ptr)
 			{
 				fout = ((double)i + 0.5) / 256.0;
 				fin = pow(fout, g);
-				max = (png_uint_32)(fin * (double)(num << 8));
+				max = (png_uint_32)(fin * (double)((png_uint_32)num << 8));
 				while (last <= max)
 				{
-					png_ptr->gamma_16_table[(int)(last & 0xff) >> shift]
+					png_ptr->gamma_16_table[(int)(last & (0xff >> shift))]
 						[(int)(last >> (8 - shift))] =
 						(png_uint_16)i | ((png_uint_16)i << 8);
-               last++;
-            }
-         }
+					last++;
+				}
+			}
 			while (last < ((png_uint_32)num << 8))
 			{
-					png_ptr->gamma_16_table[(int)(last & 0xff) >> shift]
-						[(int)(last >> (8 - shift))] =
+				png_ptr->gamma_16_table[(int)(last & (0xff >> shift))]
+					[(int)(last >> (8 - shift))] =
 					(png_uint_16)65535L;
 				last++;
          }
       }
-      else
-      {
-         for (i = 0; i < num; i++)
-         {
-            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
-               256 * sizeof (png_uint_16));
+		else
+		{
+			for (i = 0; i < num; i++)
+			{
+				png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
+					256 * sizeof (png_uint_16));
 
-            ig = (((png_uint_32)i *
-               (png_uint_32)png_gamma_shift[shift]) >> 4);
-            for (j = 0; j < 256; j++)
+				ig = (((png_uint_32)i *
+					(png_uint_32)png_gamma_shift[shift]) >> 4);
+				for (j = 0; j < 256; j++)
             {
                png_ptr->gamma_16_table[i][j] =
                   (png_uint_16)(pow((double)(ig + ((png_uint_32)j << 8)) /
