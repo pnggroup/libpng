@@ -16,11 +16,11 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.7"
+#define PNGCRUSH_VERSION "1.4.8"
 
 /*
-#define PNGCRUSH_COUNT_COLORS
 */
+#define PNGCRUSH_COUNT_COLORS
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -57,6 +57,11 @@
  */
 
 /* Change log:
+ *
+ * Version 1.4.8 (built with libpng-1.0.8rc1)
+ *
+ *   Detect and remove all-opaque alpha channel.
+ *   Detect and reduce all-gray truecolor images to grayscale.
  *
  * Version 1.4.7 (built with libpng-1.0.8rc1)
  *
@@ -251,6 +256,8 @@
  *   Rearrange palette to put most-used color first and transparent color
  *   second (see ImageMagick 5.1.1 and later).
  *   Finish pplt (partial palette) feature.
+ *   Take care that sBIT and bKGD data aren't lost when reducing images
+ *   from truecolor to grayscale.
  *
  * Version 1.4.*: Use an alternate write function for the trial passes, that
  *   simply counts bytes rather than actually writing to a file, to save wear
@@ -270,6 +277,10 @@
 #define PNG_INTERNAL
 #include "png.h"
 
+/* we don't need the some of the extra libpng transformations
+ * so they are ifdef'ed out in a special version of pngconf.h, which
+ * includes pngcrush.h and is included by png.h */
+
 #ifndef PNGCRUSH_LIBPNG_VER
 #  define PNGCRUSH_LIBPNG_VER PNG_LIBPNG_VER
 #endif
@@ -278,7 +289,8 @@
 int
 main()
 {
-  printf("Version numbers in pngcrush.h and png.h do not match\n");
+  printf("Version numbers in pngcrush.h (%d) and png.h (%d) do not match\n",
+      PNGCRUSH_LIBPNG_VER, PNG_LIBPNG_VER);
 }
 
 #else
@@ -287,6 +299,8 @@ int
 main()
 {
   printf("Sorry, but pngcrush needs libpng version 0.96 or later\n");
+  printf("You have built pngcrush with libpng version %s\n",
+     PNG_LIBPNG_VER_STRING);
 }
 
 #else
@@ -329,10 +343,6 @@ main()
 #define FCLOSE(file) {fclose(file); file=NULL;--number_of_open_files;};
 #define P1 if(verbose > 1)printf
 #define P2 if(verbose > 2)printf
-
-/* we don't need the extra libpng transformations
- * so they are ifdef'ed out in a special version of pngconf.h */
-
 
 #if (PNG_LIBPNG_VER > 95)
 
@@ -440,9 +450,7 @@ int best;
 char buffer[256];
 char *str_return;
 
-/* The cexcept documentation recommends putting the following three lines in a
- * separate header file, but it appears to work with them embedded here.
- * There is only one "Throw" and it is in this file. */
+/* Set up the "cexcept" Try/Throw/Catch exception handler. */
 #include "cexcept.h"
 define_exception_type(const char *);
 extern struct exception_context the_exception_context[1];
@@ -745,6 +753,7 @@ void png_crush_pause(void)
 }
 
 #ifdef __riscos
+/* The riscos/acorn support was contributed by Darren Salt. */
 #include <kernel.h>
 static int fileexists(const char *name)
 {
@@ -2092,6 +2101,7 @@ main(int argc, char *argv[])
          number_of_open_files++;
 
          alpha_status=count_colors(fpin);
+         alpha_status = alpha_status; /* silence compiler warning. */
 
          FCLOSE(fpin);
 
@@ -2563,6 +2573,15 @@ main(int argc, char *argv[])
             if((color_type == 2 || color_type == 6 || color_type == 3) &&
               (output_color_type == 0 || output_color_type == 4))
             {
+                if(verbose > 0 && first_trial)
+                {
+                   if(reduce_to_gray)
+                      fprintf(STDERR,
+                  "   Reducing all-gray truecolor image to grayscale.\n");
+                   else
+                      fprintf(STDERR,
+                  "   Reducing truecolor image to grayscale.\n");
+                }
 #ifdef PNG_FIXED_POINT_SUPPORTED
                png_set_rgb_to_gray_fixed(read_ptr, 1, -1, -1);
 #else
@@ -2589,7 +2608,12 @@ main(int argc, char *argv[])
                (output_color_type != 4 && output_color_type != 6))
             {
                 if(verbose > 0 && first_trial)
-                   fprintf(STDERR, "   Stripping existing alpha channel.\n");
+                {
+                   if(it_is_opaque)
+                      fprintf(STDERR, "   Stripping opaque alpha channel.\n");
+                   else
+                      fprintf(STDERR, "   Stripping existing alpha channel.\n");
+                }
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
                 png_set_strip_alpha(read_ptr);
 #endif
@@ -2687,6 +2711,11 @@ main(int argc, char *argv[])
          }
          if (have_bkgd)
          {
+            /* If we are reducing an RGB image to grayscale, but the
+               background color isn't gray, the green channel is written.
+               That's not spec-compliant.  We should really check for
+               a non-gray bKGD and refuse to do the reduction if one is
+               present. */
             png_color_16 backgd;
             png_color_16p background = &backgd;
             background->red=bkgd_red;
@@ -3071,6 +3100,9 @@ main(int argc, char *argv[])
 #if defined(PNG_READ_sBIT_SUPPORTED) && defined(PNG_WRITE_sBIT_SUPPORTED)
       {
          png_color_8p sig_bit;
+
+         /* If we are reducing a truecolor PNG to grayscale, and the
+            RGB sBIT values aren't identical, we'll lose sBIT info. */
 
          if (png_get_sBIT(read_ptr, read_info_ptr, &sig_bit))
          {
@@ -3800,14 +3832,14 @@ png_measure_idat(png_structp png_ptr)
    png_debug(1, "in png_read_info\n");
 
    {
-      png_byte png_sign[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+      png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
-      png_read_data(png_ptr, png_sign, 8);
+      png_read_data(png_ptr, png_signature, 8);
       png_set_sig_bytes(png_ptr, 8);
 
-      if (png_sig_cmp(png_sign, 0, 8))
+      if (png_sig_cmp(png_signature, 0, 8))
       {
-         if (png_sig_cmp(png_sign, 0, 4))
+         if (png_sig_cmp(png_signature, 0, 4))
             png_error(png_ptr, "Not a PNG file");
          else
             png_error(png_ptr, "PNG file corrupted by ASCII conversion");
@@ -4336,8 +4368,10 @@ count_colors(FILE *fpin)
    P2 ("Finished checking alphas, result=%d\n",result);
    if(reduce_to_gray)
      P1 ("The truecolor image is all gray and will be reduced.\n");
+   if(color_type == 0 || color_type == 2)
+     it_is_opaque=0;
    if(it_is_opaque)
-     P1 ("The image is opaque.\n");
+     P1 ("The image is opaque and the alpha channel will be removed.\n");
    }
    return (result);
 }
