@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.2.1rc1 - November 24, 2001
+ * libpng version 1.2.1rc2 - December 4, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -39,6 +39,7 @@ png_mmx_support(void)
     push ebx          //CPUID will trash these
     push ecx
     push edx
+
     pushfd            //Save Eflag to stack
     pop eax           //Get Eflag from stack into eax
     mov ecx, eax      //Make another copy of Eflag in ecx
@@ -48,6 +49,8 @@ png_mmx_support(void)
     popfd             //Restored modified value back to Eflag reg
     pushfd            //Save Eflag to stack
     pop eax           //Get Eflag from stack
+    push ecx          // save original Eflag to stack
+    popfd             // restore original Eflag
     xor eax, ecx      //Compare the new Eflag with the original Eflag
     jz NOT_SUPPORTED  //If the same, CPUID instruction is not supported,
                       //skip following instructions and jump to

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.1rc1 - November 24, 2001
+ * libpng 1.2.1rc2 - December 4, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -152,8 +152,9 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
 #ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
 #endif
+   /* Changed from info->num_palette to 256 in version 1.2.1 */
    png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
-      (png_uint_32)(info_ptr->num_palette * sizeof (png_uint_16)));
+      (png_uint_32)(256 * sizeof (png_uint_16)));
 
    for (i = 0; i < info_ptr->num_palette; i++)
        png_ptr->hist[i] = hist[i];
@@ -410,7 +411,9 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
 #endif
-   png_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)num_palette,
+   /* Changed in libpng-1.2.1 to allocate 256 instead of num_palette entries,
+      in case of an invalid PNG file that has too-large sample values. */
+   png_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)256,
       sizeof (png_color));
    png_memcpy(png_ptr->palette, palette, num_palette * sizeof (png_color));
    info_ptr->palette = png_ptr->palette;
@@ -740,8 +743,9 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FREE_ME_SUPPORTED
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 #endif
+       /* Changed from num_trans to 256 in version 1.2.1 */
        png_ptr->trans = info_ptr->trans = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)num_trans);
+           (png_uint_32)256);
        png_memcpy(info_ptr->trans, trans, (png_size_t)num_trans);
 #ifdef PNG_FREE_ME_SUPPORTED
        info_ptr->free_me |= PNG_FREE_TRNS;

@@ -1,5 +1,5 @@
 
-Libpng 1.2.1rc1 - November 24, 2001
+Libpng 1.2.1rc2 - December 4, 2001
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -31,6 +31,11 @@ version 1.2.1rc1 [November 24, 2001]
   Updated makefile.sgi to recognize LIBPATH and INCPATH.
   Updated various makefiles so "make clean" does not remove previous major
     version of the shared library.
+version 1.2.1rc2 [December 4, 2001]
+  Added a pop/push operation to pngvcrd.c, to preserve Eflag.
+  Always allocate 256-entry internal palette, hist, and trans arrays, to
+    avoid out-of-bounds memory reference caused by invalid PNG datastreams.
+  Added a check for prefix_length > data_length in iCCP chunk handler.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

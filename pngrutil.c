@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.2.1rc1 - November 24, 2001
+ * libpng 1.2.1rc2 - December 4, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1029,7 +1029,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    profile_length = data_length - prefix_length;
 
-   if ( profile_length < 4)
+   if ( prefix_length > data_length || profile_length < 4)
    {
       png_free(png_ptr, chunkdata);
       png_warning(png_ptr, "Profile size field missing from iCCP chunk");
