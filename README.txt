@@ -1,8 +1,8 @@
 
- | pngcrush 1.3.0, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
+ | pngcrush 1.3.1, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.0.5j,
+ | This program was built with libpng version 1.0.5k,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1998, 1999, Glenn Randers-Pehrson,
@@ -22,6 +22,7 @@ options:
             -f user_filter [0-5]
         -force (Write a new output file even if larger than input)
             -g gamma_value (float, e.g., 0.45455)
+          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
             -l zlib_compression_level [0-9]
             -m method [0 through 200]
           -max maximum_IDAT_size [1 through 524288]
@@ -38,21 +39,6 @@ options:
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
             -h (help)
             -p (pause)
-
- | pngcrush 1.3.0, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
- | This is a free, open-source program.  Permission is
- | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.0.5j,
- |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
- |    Copyright (C) 1996, 1997 Andreas Dilger,
- |    Copyright (C) 1998, 1999, Glenn Randers-Pehrson,
- | and zlib version 1.1.3, Copyright (c) 1998,
- |    Jean-loup Gailly and Mark Adler.
-
-
-usage: pngcrush [options] infile.png outfile.png
-       pngcrush -e ext [other options] files.png ...
-       pngcrush -d dir [other options] files.png ...
 
 options:
         -brute (Use brute-force, try 114 different methods)
@@ -107,6 +93,10 @@ options:
                Value to insert in gAMA chunk, only if the input
                file has no gAMA chunk.  To replace an existing
                gAMA chunk, use the '-replace_gamma' option.
+
+          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+
+               Compressed iTXt chunk to insert (see -text).
 
             -l zlib_compression_level [0-9]
 
@@ -169,7 +159,7 @@ options:
                tEXt chunk to insert.  keyword < 80 chars,
 
                text < 2048 chars. For now, you can only add ten
-               tEXt or zTXt chunks per pngcrush run.
+               tEXt, iTXt, or zTXt chunks per pngcrush run.
 
          -trns index red green blue gray
 
@@ -193,6 +183,14 @@ options:
 
                zlib compression strategy to use with the preceding
                '-m method' argument.
+
+         -zitxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+
+               Compressed iTXt chunk to insert (see -text).
+
+         -ztxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+
+               zTXt chunk to insert (see -text).
 
             -h (help)
 

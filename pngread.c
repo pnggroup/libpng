@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.5j - December 21, 1999
+ * libpng 1.0.5k - December 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -253,10 +253,29 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
        */
       if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
          png_handle_IHDR(png_ptr, info_ptr, length);
-      else if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))
-         png_handle_PLTE(png_ptr, info_ptr, length);
       else if (!png_memcmp(png_ptr->chunk_name, png_IEND, 4))
          png_handle_IEND(png_ptr, info_ptr, length);
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+      else if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name))
+      {
+         if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
+            png_ptr->mode |= PNG_HAVE_IDAT;
+         png_handle_unknown(png_ptr, info_ptr, length);
+         if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))
+            png_ptr->mode |= PNG_HAVE_PLTE;
+         else if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
+         {
+            if (!(png_ptr->mode & PNG_HAVE_IHDR))
+               png_error(png_ptr, "Missing IHDR before IDAT");
+            else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+                     !(png_ptr->mode & PNG_HAVE_PLTE))
+               png_error(png_ptr, "Missing PLTE before IDAT");
+            break;
+         }
+      }
+#endif
+      else if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))
+         png_handle_PLTE(png_ptr, info_ptr, length);
       else if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
       {
          if (!(png_ptr->mode & PNG_HAVE_IHDR))
@@ -421,7 +440,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       switch (png_ptr->pass)
       {
          case 0:
-            if (png_ptr->row_number & 7)
+            if (png_ptr->row_number & 0x07)
             {
                if (dsp_row != NULL)
                   png_combine_row(png_ptr, dsp_row,
@@ -431,7 +450,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             }
             break;
          case 1:
-            if ((png_ptr->row_number & 7) || png_ptr->width < 5)
+            if ((png_ptr->row_number & 0x07) || png_ptr->width < 5)
             {
                if (dsp_row != NULL)
                   png_combine_row(png_ptr, dsp_row,
@@ -441,7 +460,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             }
             break;
          case 2:
-            if ((png_ptr->row_number & 7) != 4)
+            if ((png_ptr->row_number & 0x07) != 4)
             {
                if (dsp_row != NULL && (png_ptr->row_number & 4))
                   png_combine_row(png_ptr, dsp_row,
@@ -546,6 +565,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
       (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
+   if(png_ptr->row_buf[0])
    png_read_filter_row(png_ptr, &(png_ptr->row_info),
       png_ptr->row_buf + 1, png_ptr->prev_row + 1,
       (int)(png_ptr->row_buf[0]));
@@ -607,7 +627,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5j.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5k.
  */
 
 void
@@ -656,7 +676,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5j.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5k.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -776,6 +796,21 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 
       if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
          png_handle_IHDR(png_ptr, info_ptr, length);
+      else if (!png_memcmp(png_ptr->chunk_name, png_IEND, 4))
+         png_handle_IEND(png_ptr, info_ptr, length);
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+      else if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name))
+      {
+         if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
+            if (length > 0 || png_ptr->mode & PNG_AFTER_IDAT)
+               png_error(png_ptr, "Too many IDAT's found");
+         else
+            png_ptr->mode |= PNG_AFTER_IDAT;
+         png_handle_unknown(png_ptr, info_ptr, length);
+         if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))
+            png_ptr->mode |= PNG_HAVE_PLTE;
+      }
+#endif
       else if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
       {
          /* Zero length IDATs are legal after the last IDAT has been
@@ -788,8 +823,6 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       }
       else if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))
          png_handle_PLTE(png_ptr, info_ptr, length);
-      else if (!png_memcmp(png_ptr->chunk_name, png_IEND, 4))
-         png_handle_IEND(png_ptr, info_ptr, length);
 #if defined(PNG_READ_bKGD_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_bKGD, 4))
          png_handle_bKGD(png_ptr, info_ptr, length);

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.5j - December 21, 1999
+ * libpng 1.0.5k - December 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -554,6 +554,9 @@ __dont__ include it again
 #ifndef PNG_NO_READ_UNKNOWN_CHUNKS
 #  define PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 #  define PNG_UNKNOWN_CHUNKS_SUPPORTED
+#  ifndef PNG_NO_HANDLE_AS_UNKNOWN
+#    define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#  endif
 #endif
 #ifndef PNG_NO_READ_OPT_PLTE
 #  define PNG_READ_OPT_PLTE_SUPPORTED /* only affects support of the */
@@ -677,6 +680,11 @@ __dont__ include it again
 #  define PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
 #  ifndef PNG_UNKNOWN_CHUNKS_SUPPORTED
 #    define PNG_UNKNOWN_CHUNKS_SUPPORTED
+#  endif
+#  ifndef PNG_NO_HANDLE_AS_UNKNOWN
+#     ifndef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#       define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#     endif
 #  endif
 #endif
 #if defined(PNG_WRITE_iTXt_SUPPORTED) || defined(PNG_WRITE_tEXt_SUPPORTED) || \

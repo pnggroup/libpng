@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.5j - December 21, 1999
+ * libpng 1.0.5k - December 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -584,8 +584,8 @@ png_write_gAMA(png_structp png_ptr, double file_gamma)
    png_write_chunk(png_ptr, (png_bytep)png_gAMA, buf, (png_size_t)4);
 }
 #endif
-void
 #ifdef PNG_FIXED_POINT_SUPPORTED
+void
 png_write_gAMA_fixed(png_structp png_ptr, png_fixed_point file_gamma)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
@@ -1741,7 +1741,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                i += png_pass_inc[pass])
             {
                sp = row + (png_size_t)(i >> 3);
-               value = (int)(*sp >> (7 - (int)(i & 7))) & 0x1;
+               value = (int)(*sp >> (7 - (int)(i & 0x07))) & 0x01;
                d |= (value << shift);
 
                if (shift == 0)
@@ -1775,7 +1775,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                i += png_pass_inc[pass])
             {
                sp = row + (png_size_t)(i >> 2);
-               value = (*sp >> ((3 - (int)(i & 3)) << 1)) & 0x3;
+               value = (*sp >> ((3 - (int)(i & 0x03)) << 1)) & 0x03;
                d |= (value << shift);
 
                if (shift == 0)
@@ -1808,7 +1808,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                i += png_pass_inc[pass])
             {
                sp = row + (png_size_t)(i >> 1);
-               value = (*sp >> ((1 - (int)(i & 1)) << 2)) & 0xf;
+               value = (*sp >> ((1 - (int)(i & 0x01)) << 2)) & 0x0f;
                d |= (value << shift);
 
                if (shift == 0)
@@ -1915,7 +1915,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    /* We don't need to test the 'no filter' case if this is the only filter
     * that has been chosen, as it doesn't actually do anything to the data.
     */
-   if (filter_to_do & PNG_FILTER_NONE &&
+   if ((filter_to_do & PNG_FILTER_NONE) &&
        filter_to_do != PNG_FILTER_NONE)
    {
       png_bytep rp;

@@ -3,8 +3,23 @@
 /* Special defines for pngcrush, mostly just to reduce the size of the
    static executable. */
 
-#define PNG_NO_FLOATING_POINT_SUPPORTED /* undef this if you want to be able
+#define PNG_NO_FLOAING_POINT_SUPPORTED /* undef this if you want to be able
                                            to reduce color to gray */
+#define PNG_NO_READ_cHRM
+#define PNG_NO_WRITE_cHRM
+#define PNG_NO_READ_hIST
+#define PNG_NO_WRITE_hIST
+#define PNG_NO_READ_iCCP
+#define PNG_NO_WRITE_iCCP
+#define PNG_NO_READ_pCAL
+#define PNG_NO_WRITE_pCAL
+#define PNG_NO_READ_sCAL
+#define PNG_NO_WRITE_sCAL
+#define PNG_NO_READ_sPLT
+#define PNG_NO_WRITE_sPLT
+#define PNG_NO_READ_tIME
+#define PNG_NO_WRITE_tIME
+
 #define PNG_NO_EASY_ACCESS
 #define PNG_NO_READ_EMPTY_PLTE
 #define PNG_NO_WRITE_TRANSFORMS
@@ -27,4 +42,3 @@
 #define PNG_NO_GLOBAL_ARRAYS
 */
 #define TOO_FAR 32767     /* Improves zlib/deflate compression */
-

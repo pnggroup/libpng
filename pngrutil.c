@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.5j - December 21, 1999
+ * libpng 1.0.5k - December 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -31,7 +31,7 @@ png_get_uint_32(png_bytep buf)
    return (i);
 }
 
-#if defined(PNG_READ_pCAL_SUPPORTED)
+#if defined(PNG_READ_pCAL_SUPPORTED) || defined(PNG_READ_oFFs_SUPPORTED)
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
  * data is stored in the PNG file in two's complement format, and it is
  * assumed that the machine format for signed integers is the same. */
@@ -87,10 +87,10 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
 
    if (png_crc_error(png_ptr))
    {
-      if ((png_ptr->chunk_name[0] & 0x20 &&                /* Ancillary */
+      if (((png_ptr->chunk_name[0] & 0x20) &&                /* Ancillary */
            !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)) ||
           (!(png_ptr->chunk_name[0] & 0x20) &&             /* Critical  */
-           png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE))
+          (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE)))
       {
          png_chunk_warning(png_ptr, "CRC error");
       }
@@ -455,7 +455,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #if defined (PNG_READ_tRNS_SUPPORTED)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
-      if (info_ptr != NULL && info_ptr->valid & PNG_INFO_tRNS)
+      if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS))
       {
          if (png_ptr->num_trans > png_ptr->num_palette)
          {
@@ -482,7 +482,7 @@ png_handle_IEND(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          return;
    }
 
-   png_ptr->mode |= PNG_AFTER_IDAT | PNG_HAVE_IEND;
+   png_ptr->mode |= (PNG_AFTER_IDAT | PNG_HAVE_IEND);
 
    if (length != 0)
    {
@@ -515,7 +515,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place gAMA chunk");
 
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_gAMA
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_gAMA)
 #if defined(PNG_READ_sRGB_SUPPORTED)
       && !(info_ptr->valid & PNG_INFO_sRGB)
 #endif
@@ -549,7 +549,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
 #ifndef PNG_NO_CONSOLE_IO
-         fprintf(stderr, "igamma = %lu\n", igamma);
+         fprintf(stderr, "gamma = (%d/100000)\n", (int)igamma);
 #endif
          return;
       }
@@ -557,10 +557,10 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    file_gamma = (float)igamma / (float)100000.0;
-#ifdef PNG_READ_GAMMA_SUPPORTED
-   png_ptr->gamma = file_gamma;
-#endif
-   png_set_gAMA(png_ptr, info_ptr, file_gamma);
+#  ifdef PNG_READ_GAMMA_SUPPORTED
+     png_ptr->gamma = file_gamma;
+#  endif
+     png_set_gAMA(png_ptr, info_ptr, file_gamma);
 #endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
    png_set_gAMA_fixed(png_ptr, info_ptr, igamma);
@@ -592,7 +592,7 @@ png_handle_sBIT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place sBIT chunk");
    }
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sBIT)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sBIT))
    {
       png_warning(png_ptr, "Duplicate sBIT chunk");
       png_crc_finish(png_ptr, length);
@@ -659,7 +659,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Missing PLTE before cHRM");
 
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_cHRM
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM)
 #if defined(PNG_READ_sRGB_SUPPORTED)
       && !(info_ptr->valid & PNG_INFO_sRGB)
 #endif
@@ -796,9 +796,6 @@ void
 png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    int intent;
-#if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
-   int igamma;
-#endif
    png_byte buf[1];
 
    png_debug(1, "in png_handle_sRGB\n");
@@ -815,7 +812,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place sRGB chunk");
 
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sRGB)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sRGB))
    {
       png_warning(png_ptr, "Duplicate sRGB chunk");
       png_crc_finish(png_ptr, length);
@@ -842,26 +839,31 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   igamma=png_ptr->gamma * 100000.;
+   if ((info_ptr->valid & PNG_INFO_gAMA))
+   {
+   int igamma;
+#ifdef PNG_FIXED_POINT_SUPPORTED
+      igamma=(int)info_ptr->int_gamma;
 #else
-#  ifdef PNG_FIXED_POINT_SUPPORTED
-   igamma=(int)png_ptr->int_gamma;
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
+      igamma=info_ptr->gamma * 100000.;
 #  endif
 #endif
-   if ((info_ptr->valid & PNG_INFO_gAMA))
       if(igamma < 45000L || igamma > 46000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
 #ifndef PNG_NO_CONSOLE_IO
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-           fprintf(stderr,"gamma=%f\n",png_ptr->gamma);
-#else
-           fprintf(stderr,"gamma=(%lu/100000)\n",png_ptr->int_gamma);
-#endif
+#  ifdef PNG_FIXED_POINT_SUPPORTED
+         fprintf(stderr,"incorrect gamma=(%d/100000)\n",(int)png_ptr->int_gamma);
+#  else
+#    ifdef PNG_FLOATING_POINT_SUPPORTED
+         fprintf(stderr,"incorrect gamma=%f\n",png_ptr->gamma);
+#    endif
+#  endif
 #endif
       }
+   }
 #endif /* PNG_READ_gAMA_SUPPORTED */
 
 #ifdef PNG_READ_cHRM_SUPPORTED
@@ -909,7 +911,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place iCCP chunk");
 
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_iCCP)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_iCCP))
    {
       png_warning(png_ptr, "Duplicate iCCP chunk");
       png_crc_finish(png_ptr, length);
@@ -981,16 +983,6 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else if (png_ptr->mode & PNG_HAVE_IDAT)
    {
       png_warning(png_ptr, "Invalid sPLT after IDAT");
-      png_crc_finish(png_ptr, length);
-      return;
-   }
-   else if (png_ptr->mode & PNG_HAVE_PLTE)
-      /* Should be an error, but we can cope with it */
-      png_warning(png_ptr, "Out of place sPLT chunk");
-
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sPLT)
-   {
-      png_warning(png_ptr, "Duplicate sPLT chunk");
       png_crc_finish(png_ptr, length);
       return;
    }
@@ -1087,7 +1079,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_tRNS)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS))
    {
       png_warning(png_ptr, "Duplicate tRNS chunk");
       png_crc_finish(png_ptr, length);
@@ -1190,7 +1182,7 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_bKGD)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_bKGD))
    {
       png_warning(png_ptr, "Duplicate bKGD chunk");
       png_crc_finish(png_ptr, length);
@@ -1278,7 +1270,7 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_hIST)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_hIST))
    {
       png_warning(png_ptr, "Duplicate hIST chunk");
       png_crc_finish(png_ptr, length);
@@ -1329,7 +1321,7 @@ png_handle_pHYs(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_pHYs)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs))
    {
       png_warning(png_ptr, "Duplicate pHYS chunk");
       png_crc_finish(png_ptr, length);
@@ -1372,7 +1364,7 @@ png_handle_oFFs(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_oFFs)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_oFFs))
    {
       png_warning(png_ptr, "Duplicate oFFs chunk");
       png_crc_finish(png_ptr, length);
@@ -1420,7 +1412,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_pCAL)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_pCAL))
    {
       png_warning(png_ptr, "Duplicate pCAL chunk");
       png_crc_finish(png_ptr, length);
@@ -1540,7 +1532,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sCAL)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sCAL))
    {
       png_warning(png_ptr, "Duplicate sCAL chunk");
       png_crc_finish(png_ptr, length);
@@ -1597,7 +1589,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       png_warning(png_ptr, "Invalid sCAL data");
       png_free(png_ptr, buffer);
-#if defined(PNG_FIXED_POINT_SUPPORTED)&& !defined(PNG_FLOATING_POINT_SUPPORTED)
+#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
       png_free(png_ptr, swidth);
       png_free(png_ptr, sheight);
 #endif
@@ -1614,7 +1606,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
    png_free(png_ptr, buffer);
-#if defined(PNG_FIXED_POINT_SUPPORTED)&& !defined(PNG_FLOATING_POINT_SUPPORTED)
+#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
    png_free(png_ptr, swidth);
    png_free(png_ptr, sheight);
 #endif
@@ -1632,7 +1624,7 @@ png_handle_tIME(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Out of place tIME chunk");
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_tIME)
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tIME))
    {
       png_warning(png_ptr, "Duplicate tIME chunk");
       png_crc_finish(png_ptr, length);
@@ -1905,17 +1897,26 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_debug(1, "in png_handle_unknown\n");
 
    if (png_ptr->mode & PNG_HAVE_IDAT)
-      png_ptr->mode |= PNG_AFTER_IDAT;
+   {
+#ifdef PNG_USE_LOCAL_ARRAYS
+      PNG_IDAT;
+#endif
+      if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))  /* not an IDAT */
+         png_ptr->mode |= PNG_AFTER_IDAT;
+   }
+
+   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
 
    /* In the future we can have code here that calls user-supplied
     * callback functions for unknown chunks before they are ignored or
     * cause an error.
     */
-   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
 
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
-      png_chunk_error(png_ptr, "unknown critical chunk");
+      if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
+           HANDLE_CHUNK_ALWAYS)
+         png_chunk_error(png_ptr, "unknown critical chunk");
 
       /* to quiet compiler warnings about unused info_ptr */
       if (info_ptr == NULL)
@@ -1926,7 +1927,6 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_ptr->flags & PNG_FLAG_KEEP_UNKNOWN_CHUNKS)
    {
        png_unknown_chunk chunk;
-
 
 #ifdef PNG_MAX_MALLOC_64K
        if (length > (png_uint_32)65535L)
@@ -1946,9 +1946,11 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    else
 #endif
-       skip = length;
+
+   skip = length;
 
    png_crc_finish(png_ptr, skip);
+
 }
 
 /* This function is called to verify that a chunk name is valid.
@@ -2032,7 +2034,7 @@ png_combine_row
                {
                   int value;
 
-                  value = (*sp >> shift) & 0x1;
+                  value = (*sp >> shift) & 0x01;
                   *dp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
                   *dp |= (png_byte)(value << shift);
                }
@@ -2085,7 +2087,7 @@ png_combine_row
             {
                if (m & mask)
                {
-                  value = (*sp >> shift) & 0x3;
+                  value = (*sp >> shift) & 0x03;
                   *dp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
                   *dp |= (png_byte)(value << shift);
                }
@@ -2227,8 +2229,8 @@ png_do_read_interlace
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-                sshift = (int)((row_info->width + 7) & 7);
-                dshift = (int)((final_width + 7) & 7);
+                sshift = (int)((row_info->width + 7) & 0x07);
+                dshift = (int)((final_width + 7) & 0x07);
                 s_start = 7;
                 s_end = 0;
                 s_inc = -1;
@@ -2236,8 +2238,8 @@ png_do_read_interlace
             else
 #endif
             {
-                sshift = 7 - (int)((row_info->width + 7) & 7);
-                dshift = 7 - (int)((final_width + 7) & 7);
+                sshift = 7 - (int)((row_info->width + 7) & 0x07);
+                dshift = 7 - (int)((final_width + 7) & 0x07);
                 s_start = 0;
                 s_end = 7;
                 s_inc = 1;
@@ -2245,7 +2247,7 @@ png_do_read_interlace
 
             for (i = 0; i < row_info->width; i++)
             {
-               v = (png_byte)((*sp >> sshift) & 0x1);
+               v = (png_byte)((*sp >> sshift) & 0x01);
                for (j = 0; j < jstop; j++)
                {
                   *dp &= (png_byte)((0x7f7f >> (7 - dshift)) & 0xff);
@@ -2280,8 +2282,8 @@ png_do_read_interlace
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-               sshift = (int)(((row_info->width + 3) & 3) << 1);
-               dshift = (int)(((final_width + 3) & 3) << 1);
+               sshift = (int)(((row_info->width + 3) & 0x03) << 1);
+               dshift = (int)(((final_width + 3) & 0x03) << 1);
                s_start = 6;
                s_end = 0;
                s_inc = -2;
@@ -2289,8 +2291,8 @@ png_do_read_interlace
             else
 #endif
             {
-               sshift = (int)((3 - ((row_info->width + 3) & 3)) << 1);
-               dshift = (int)((3 - ((final_width + 3) & 3)) << 1);
+               sshift = (int)((3 - ((row_info->width + 3) & 0x03)) << 1);
+               dshift = (int)((3 - ((final_width + 3) & 0x03)) << 1);
                s_start = 0;
                s_end = 6;
                s_inc = 2;
@@ -2301,7 +2303,7 @@ png_do_read_interlace
                png_byte v;
                int j;
 
-               v = (png_byte)((*sp >> sshift) & 0x3);
+               v = (png_byte)((*sp >> sshift) & 0x03);
                for (j = 0; j < jstop; j++)
                {
                   *dp &= (png_byte)((0x3f3f >> (6 - dshift)) & 0xff);
@@ -2336,8 +2338,8 @@ png_do_read_interlace
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-               sshift = (int)(((row_info->width + 1) & 1) << 2);
-               dshift = (int)(((final_width + 1) & 1) << 2);
+               sshift = (int)(((row_info->width + 1) & 0x01) << 2);
+               dshift = (int)(((final_width + 1) & 0x01) << 2);
                s_start = 4;
                s_end = 0;
                s_inc = -4;
@@ -2345,8 +2347,8 @@ png_do_read_interlace
             else
 #endif
             {
-               sshift = (int)((1 - ((row_info->width + 1) & 1)) << 2);
-               dshift = (int)((1 - ((final_width + 1) & 1)) << 2);
+               sshift = (int)((1 - ((row_info->width + 1) & 0x01)) << 2);
+               dshift = (int)((1 - ((final_width + 1) & 0x01)) << 2);
                s_start = 0;
                s_end = 4;
                s_inc = 4;

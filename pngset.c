@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.5j - December 21, 1999
+ * libpng 1.0.5k - December 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -112,7 +112,6 @@ png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
 }
 #endif
 #endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
 void
 png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
    int_gamma)
@@ -127,7 +126,6 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
    info_ptr->int_gamma = int_gamma;
    info_ptr->valid |= PNG_INFO_gAMA;
 }
-#endif
 
 #if defined(PNG_hIST_SUPPORTED)
 void
@@ -137,8 +135,9 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   info_ptr->hist = png_malloc(png_ptr, sizeof(png_uint_16) * info_ptr->num_palette);
-   memcpy(info_ptr->hist, hist, sizeof(png_uint_16) * info_ptr->num_palette);
+   info_ptr->hist = png_malloc(png_ptr, sizeof(png_uint_16) *
+      info_ptr->num_palette);
+   png_memcpy(info_ptr->hist, hist, sizeof(png_uint_16) * info_ptr->num_palette);
    info_ptr->valid |= PNG_INFO_hIST;
 }
 #endif
@@ -420,7 +419,7 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
 void
 png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
              png_charp name, int compression_type,
-             png_charp profile, int proflen)
+             png_charp profile, png_uint_32 proflen)
 {
    png_debug1(1, "in %s storage function\n", "iCCP");
    if (png_ptr == NULL || info_ptr == NULL || name == NULL || profile == NULL)
@@ -429,8 +428,8 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
    info_ptr->iccp_name = png_malloc(png_ptr, png_strlen(name)+1);
    strcpy(info_ptr->iccp_name, name);
    info_ptr->iccp_profile = png_malloc(png_ptr, proflen);
-   memcpy(info_ptr->iccp_profile, profile, proflen);
-   info_ptr->iccp_proflen = (png_uint_32)proflen;
+   png_memcpy(info_ptr->iccp_profile, profile, (png_size_t)proflen);
+   info_ptr->iccp_proflen = proflen;
    /* Compression is always zero but is here so the API and info structure
     * does not have to change * if we introduce multiple compression types */
    info_ptr->iccp_compression = (png_byte)compression_type;
@@ -596,7 +595,8 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 
    if (trans != NULL)
    {
-      info_ptr->trans = trans;
+      info_ptr->trans = png_malloc(png_ptr, num_trans);
+      png_memcpy(info_ptr->trans, trans, num_trans);
    }
 
    if (trans_values != NULL)
@@ -622,7 +622,7 @@ png_set_spalettes(png_structp png_ptr,
     np = (png_spalette_p)png_malloc(png_ptr,
         (info_ptr->splt_palettes_num + nentries) * sizeof(png_spalette));
 
-    memcpy(np, info_ptr->splt_palettes,
+    png_memcpy(np, info_ptr->splt_palettes,
            info_ptr->splt_palettes_num * sizeof(png_spalette));
     png_free(png_ptr, info_ptr->splt_palettes);
 
@@ -636,7 +636,7 @@ png_set_spalettes(png_structp png_ptr,
         png_strcpy(to->name, from->name);
         to->entries = (png_spalette_entryp)png_malloc(png_ptr,
                                  from->nentries * sizeof(png_spalette));
-        memcpy(to->entries, from->entries,
+        png_memcpy(to->entries, from->entries,
                from->nentries * sizeof(png_spalette));
 	to->nentries = from->nentries;
 	to->depth = from->depth;
@@ -663,7 +663,7 @@ png_set_unknown_chunks(png_structp png_ptr,
         (info_ptr->unknown_chunks_num + num_unknowns) *
         sizeof(png_unknown_chunk));
 
-    memcpy(np, info_ptr->unknown_chunks,
+    png_memcpy(np, info_ptr->unknown_chunks,
            info_ptr->unknown_chunks_num * sizeof(png_unknown_chunk));
     png_free(png_ptr, info_ptr->unknown_chunks);
 
@@ -674,7 +674,7 @@ png_set_unknown_chunks(png_structp png_ptr,
 
         png_strcpy((png_charp)to->name, (png_charp)from->name);
         to->data = (png_bytep)png_malloc(png_ptr, from->size);
-        memcpy(to->data, from->data, from->size);
+        png_memcpy(to->data, from->data, from->size);
         to->size = from->size;
 
         /* note our location in the read or write sequence */
@@ -699,43 +699,37 @@ png_permit_empty_plte (png_structp png_ptr, int empty_plte_permitted)
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
 void
-png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep chunk_list,
-    int num_chunks)
+png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
+   chunk_list, int num_chunks)
 {
-
-/*
-    png_set_keep_unknown_chunks(png_ptr, keep, chunk_list,
-        num_chunks);
-    keep       - 0: do not keep
-                 1: keep only if safe-to-copy
-                 2: keep even if unsafe-to-copy
-    The following are not yet implemented
-                    in libpng version 1.0.5j:
-    chunk_list - list of chunks affected, NULL if
-                 num_chunks is 0.
-    num_chunks - number of chunks affected.  If 0, all
-                 unknown chunks are affected.
-*/
-
+    png_bytep new_list, p;
+    int i, old_num_chunks;
     if (num_chunks == 0)
     {
-      if(keep)
+      if(keep == HANDLE_CHUNK_ALWAYS || keep == HANDLE_CHUNK_IF_SAFE)
         png_ptr->flags |= PNG_FLAG_KEEP_UNKNOWN_CHUNKS;
       else
         png_ptr->flags &= ~PNG_FLAG_KEEP_UNKNOWN_CHUNKS;
 
-      if(keep == 2)
+      if(keep == HANDLE_CHUNK_ALWAYS)
         png_ptr->flags |= PNG_FLAG_KEEP_UNSAFE_CHUNKS;
       else
         png_ptr->flags &= ~PNG_FLAG_KEEP_UNSAFE_CHUNKS;
+      return;
     }
-    else
+    if (chunk_list == NULL)
+      return;
+    old_num_chunks=png_ptr->num_chunk_list;
+    new_list=png_malloc(png_ptr,5*(num_chunks+old_num_chunks));
+    if(png_ptr->chunk_list != (png_bytep)NULL)
     {
-      /* to do: set up chunk_list processing */
-      png_warning(png_ptr,
-        "chunk_list not yet implemented in png_set_keep_unknown_chunks");
-      if (chunk_list == NULL || num_chunks == 0)
-        /* do nothing right now */ ; 
+       png_memcpy(new_list, png_ptr->chunk_list, 5*old_num_chunks);
+       png_free_chunk_list(png_ptr);
     }
+    png_memcpy(new_list+5*old_num_chunks, chunk_list, 5*num_chunks);
+    for (p=new_list+5*old_num_chunks+4, i=0; i<num_chunks; i++, p+=5)
+       *p=(png_byte)keep;
+    png_ptr->num_chunk_list=old_num_chunks+num_chunks;
+    png_ptr->chunk_list=new_list;
 }
 #endif

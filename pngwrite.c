@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.5j - December 21, 1999
+ * libpng 1.0.5k - December 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -95,9 +95,11 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
             up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
             up++)
        {
-         if (up->location && (!(up->location & PNG_HAVE_PLTE)) &&
-            (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS ||
-            up->name[3] & 0x20))
+         int keep=png_handle_as_unknown(png_ptr, up->name);
+         if (keep != HANDLE_CHUNK_NEVER &&
+            up->location && (!(up->location & PNG_HAVE_PLTE)) &&
+            ((up->name[3] & 0x20) || keep == HANDLE_CHUNK_ALWAYS ||
+            (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
             png_write_chunk(png_ptr, up->name, up->data, up->size);
          }
@@ -130,7 +132,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
       {
 #if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
          /* invert the alpha channel (in tRNS) */
-         if (png_ptr->transformations & PNG_INVERT_ALPHA &&
+         if ((png_ptr->transformations & PNG_INVERT_ALPHA) &&
             info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
          {
             int j;
@@ -253,10 +255,12 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
             up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
             up++)
        {
-         if (up->location && (up->location& PNG_HAVE_PLTE) &&
-            !(up->location& PNG_HAVE_IDAT) &&
-            (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS ||
-            up->name[3] & 0x20))
+         int keep=png_handle_as_unknown(png_ptr, up->name);
+         if (keep != HANDLE_CHUNK_NEVER &&
+            up->location && (up->location & PNG_HAVE_PLTE) &&
+            !(up->location & PNG_HAVE_IDAT) &&
+            ((up->name[3] & 0x20) || keep == HANDLE_CHUNK_ALWAYS ||
+            (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
             png_write_chunk(png_ptr, up->name, up->data, up->size);
          }
@@ -285,7 +289,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_WRITE_tIME_SUPPORTED)
       /* check to see if user has supplied a time chunk */
-      if (info_ptr->valid & PNG_INFO_tIME &&
+      if ((info_ptr->valid & PNG_INFO_tIME) &&
          !(png_ptr->mode & PNG_WROTE_tIME))
          png_write_tIME(png_ptr, &(info_ptr->mod_time));
 #endif
@@ -351,9 +355,11 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
             up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
             up++)
        {
-         if ((up->location && (up->location & PNG_AFTER_IDAT)) &&
-            (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS ||
-            up->name[3] & 0x20))
+         int keep=png_handle_as_unknown(png_ptr, up->name);
+         if (keep != HANDLE_CHUNK_NEVER &&
+            up->location && (up->location & PNG_AFTER_IDAT) &&
+            ((up->name[3] & 0x20) || keep == HANDLE_CHUNK_ALWAYS ||
+            (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
             png_write_chunk(png_ptr, up->name, up->data, up->size);
          }
@@ -594,49 +600,49 @@ png_write_row(png_structp png_ptr, png_bytep row)
       switch (png_ptr->pass)
       {
          case 0:
-            if (png_ptr->row_number & 7)
+            if (png_ptr->row_number & 0x07)
             {
                png_write_finish_row(png_ptr);
                return;
             }
             break;
          case 1:
-            if ((png_ptr->row_number & 7) || png_ptr->width < 5)
+            if ((png_ptr->row_number & 0x07) || png_ptr->width < 5)
             {
                png_write_finish_row(png_ptr);
                return;
             }
             break;
          case 2:
-            if ((png_ptr->row_number & 7) != 4)
+            if ((png_ptr->row_number & 0x07) != 4)
             {
                png_write_finish_row(png_ptr);
                return;
             }
             break;
          case 3:
-            if ((png_ptr->row_number & 3) || png_ptr->width < 3)
+            if ((png_ptr->row_number & 0x03) || png_ptr->width < 3)
             {
                png_write_finish_row(png_ptr);
                return;
             }
             break;
          case 4:
-            if ((png_ptr->row_number & 3) != 2)
+            if ((png_ptr->row_number & 0x03) != 2)
             {
                png_write_finish_row(png_ptr);
                return;
             }
             break;
          case 5:
-            if ((png_ptr->row_number & 1) || png_ptr->width < 2)
+            if ((png_ptr->row_number & 0x01) || png_ptr->width < 2)
             {
                png_write_finish_row(png_ptr);
                return;
             }
             break;
          case 6:
-            if (!(png_ptr->row_number & 1))
+            if (!(png_ptr->row_number & 0x01))
             {
                png_write_finish_row(png_ptr);
                return;
@@ -784,6 +790,9 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 #if defined(PNG_WRITE_TEXT_SUPPORTED)
       png_free_text(png_ptr, info_ptr, -1);
 #endif
+#if defined(PNG_WRITE_tRNS_SUPPORTED)
+   png_free_tRNS(png_ptr, info_ptr);
+#endif
 #if defined(PNG_WRITE_sCAL_SUPPORTED)
       png_free_sCAL(png_ptr, info_ptr);
 #endif
@@ -796,8 +805,9 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 #if defined(PNG_WRITE_sPLT_SUPPORTED)
       png_free_spalettes(png_ptr, info_ptr, -1);
 #endif
-#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
       png_free_unknown_chunks(png_ptr, info_ptr, -1);
+      png_free_chunk_list(png_ptr);
 #endif
 #if defined(PNG_hIST_SUPPORTED)
       png_free_hIST(png_ptr, info_ptr);
@@ -915,14 +925,14 @@ png_set_filter(png_structp png_ptr, int method, int filters)
        */
       if (png_ptr->row_buf != NULL)
       {
-         if (png_ptr->do_filter & PNG_FILTER_SUB && png_ptr->sub_row == NULL)
+         if ((png_ptr->do_filter & PNG_FILTER_SUB) && png_ptr->sub_row == NULL)
          {
             png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
               (png_ptr->rowbytes + 1));
             png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
          }
 
-         if (png_ptr->do_filter & PNG_FILTER_UP && png_ptr->up_row == NULL)
+         if ((png_ptr->do_filter & PNG_FILTER_UP) && png_ptr->up_row == NULL)
          {
             if (png_ptr->prev_row == NULL)
             {
@@ -937,7 +947,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             }
          }
 
-         if (png_ptr->do_filter & PNG_FILTER_AVG && png_ptr->avg_row == NULL)
+         if ((png_ptr->do_filter & PNG_FILTER_AVG) && png_ptr->avg_row == NULL)
          {
             if (png_ptr->prev_row == NULL)
             {
@@ -952,7 +962,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             }
          }
 
-         if (png_ptr->do_filter & PNG_FILTER_PAETH &&
+         if ((png_ptr->do_filter & PNG_FILTER_PAETH) &&
              png_ptr->paeth_row == NULL)
          {
             if (png_ptr->prev_row == NULL)

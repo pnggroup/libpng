@@ -9,13 +9,13 @@
  * Optionally, it can remove unwanted chunks or add gAMA, sRGB, bKGD,
  * tEXt/zTXt, and tRNS chunks.
  *
- * Uses libpng-1.0.5i.  This program was based upon libpng's pngtest.c.
+ * Uses libpng and zlib.  This program was based upon libpng's pngtest.c.
  *
  * Thanks to Greg Roelofs for various bug fixes, suggestions, and
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.2.2"
+#define PNGCRUSH_VERSION "1.3.1"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -44,21 +44,26 @@
 
 /* To do:
  *
- * Version 1.2.*: check for unused alpha channel and ok-to-reduce-depth.
+ * Version 1.3.*: check for unused alpha channel and ok-to-reduce-depth.
  *   Rearrange palette to put most-used color first and
  *   transparent color second.  Finish pplt (partial palette) feature.
  *
- * Version 1.2.*: Use an alternate write function for the trial passes, that
+ * Version 1.3.*: Use an alternate write function for the trial passes, that
  *   simply counts bytes rather than actually writing to a file, to save wear
  *   and tear on disk drives.
  *
- * Version 1.2.*: Drop explicit support for pCAL, hIST, sCAL, sPLT, iCCP,
- *   tIME, and cHRM chunks and handle them as unknown but safe-to-copy, once
- *   libpng is able to override the unsafe-to-copy status of unknown chunks.
- *
  * Change log:
  *
- * Version 1.2.2: Added support for handling unknown chunks.
+ * Version 1.3.1 (built with libpng-1.0.5k): Eliminated some spurious warnings
+ *   that were being issued by libpng-1.0.5j.  Added  -itxt, -ztxt, and
+ *   -zitxt descriptions to the help screen.
+ *
+ *   Dropped explicit support for pCAL, hIST, sCAL, sPLT, iCCP, tIME, and
+ *   cHRM chunks and handle them as unknown but safe-to-copy instead, using
+ *   new png_handle_as_unknown function available in libpng-1.0.5k.
+ *
+ * Version 1.3.0 (built with libpng-1.0.5j): Added support for handling
+ *   unknown chunks.
  *
  *   pngcrush is now fixed-point only, unless PNG_NO_FLOATING_POINT_SUPPORTED
  *   is undefined in pngcrush.h.
@@ -82,11 +87,12 @@
  *   The "-m method" can be used any of the 124 methods, without having to
  *   specify the filter, level, and strategy, instead of just the first 10.
  *
- * Version 1.2.1: Fixed -srgb parameter so it really does take an argument,
- *   and so it continues to use "0" if an integer does not follow the -srgb.
+ * Version 1.2.1 (built with libpng-1.0.5f): Fixed -srgb parameter so it
+ *   really does take an argument, and so it continues to use "0" if an
+ *   integer does not follow the -srgb.
+ *
  *   Added "-plte_len n" argument for truncating the PLTE.  Be sure not to
  *   truncate it to less than the greatest index actually appearing in IDAT.
- *   Built with libpng-1.0.5f.
  *
  * Version 1.2.0: Removed registration requirement.  Added open source
  *   license.  Redefined TOO_FAR=32k in deflate.c.
@@ -158,6 +164,7 @@ static PNG_CONST char *outname = "pngout.png";
 static PNG_CONST char *dirname = "pngcrush.bak";
 static PNG_CONST char *extension = "_C.png";
 
+static int all_chunks_are_safe=0;
 static int number_of_open_files;
 static int do_pplt = 0;
 char pplt_string[1024];
@@ -788,6 +795,8 @@ main(int argc, char *argv[])
          names++;
          i++;
       }
+   else if( !strncmp(argv[i],"-save",5))
+         all_chunks_are_safe++;
    else if( !strncmp(argv[i],"-srgb",5) ||
             !strncmp(argv[i],"-sRGB",5))
       {
@@ -808,9 +817,7 @@ main(int argc, char *argv[])
            i--;
       }
    else if(!strncmp(argv[i],"-s",2))
-      {
          verbose=0;
-      }
    else if( !strncmp(argv[i],"-text",5) || !strncmp(argv[i],"-tEXt",5) ||
             !strncmp(argv[i],"-ztxt",5) || !strncmp(argv[i],"-zTXt",5) ||
             !strncmp(argv[i],"-zitxt",6) || !strncmp(argv[i],"-ziTXt",6) ||
@@ -942,15 +949,13 @@ main(int argc, char *argv[])
       }
    }
 
+   if(verbose > 0)
    {
       fprintf(STDERR, 
         "\n | %s %s, Copyright (C) 1998, 1999, Glenn Randers-Pehrson\n",
         progname, PNGCRUSH_VERSION);
       fprintf(STDERR, " | This is a free, open-source program.  Permission is\n");
       fprintf(STDERR, " | granted to everyone to use pngcrush without fee.\n");
-   }
-   if(verbose > 0)
-   {
       fprintf(STDERR, 
         " | This program was built with libpng version %s,\n",
             PNG_LIBPNG_VER_STRING);
@@ -1124,6 +1129,11 @@ main(int argc, char *argv[])
        "               gAMA chunk, use the '-replace_gamma' option.\n\n");
      png_crush_pause();
      fprintf(STDERR,
+       "          -itxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
+     if(verbose > 1)
+     fprintf(STDERR,
+       "\n               Compressed iTXt chunk to insert (see -text).\n\n");
+     fprintf(STDERR,
        "            -l zlib_compression_level [0-9]\n");
      if(verbose > 1)
      {
@@ -1229,15 +1239,15 @@ main(int argc, char *argv[])
      }
 /*
      fprintf(STDERR,
-       "         -save chunkname\n");
+       "         -save (keep all copy-unsafe chunks)\n");
      if(verbose > 1)
      {
      fprintf(STDERR,
-       "\n               Name of an otherwise unknown ancillary chunk that\n");
+       "\n               Save otherwise unknown ancillary chunks that\n");
      fprintf(STDERR,
        "               would be considered copy-unsafe.  This option makes\n");
      fprintf(STDERR,
-       "               the chunk 'known' to %s, so it can be copied.\n\n",
+       "               all chunks 'known' to %s, so they can be copied.\n\n",
                        progname);
      }
 */
@@ -1257,7 +1267,7 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "\n               text < 2048 chars. For now, you can only add ten\n");
      fprintf(STDERR,
-       "               tEXt or zTXt chunks per pngcrush run.\n\n");
+       "               tEXt, iTXt, or zTXt chunks per pngcrush run.\n\n");
      }
      fprintf(STDERR,
        "         -trns index red green blue gray\n");
@@ -1299,17 +1309,16 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               '-m method' argument.\n\n");
      }
-#if 0
+     fprintf(STDERR,
+       "         -zitxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
+     if(verbose > 1)
+     fprintf(STDERR,
+       "\n               Compressed iTXt chunk to insert (see -text).\n\n");
      fprintf(STDERR,
        "         -ztxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
      fprintf(STDERR,
-       "\n               zTXt chunk to insert.  keyword < 80 chars,\n");
-     fprintf(STDERR,
-       "\n               text < 2048 chars. For now, you can only add ten\n");
-     fprintf(STDERR,
-       "               tEXt or zTXt chunks per pngcrush run.\n\n");
-#endif
+       "\n               zTXt chunk to insert (see -text).\n\n");
      png_crush_pause();
      }
      fprintf(STDERR,
@@ -1694,11 +1703,70 @@ main(int argc, char *argv[])
          }
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
-      png_set_keep_unknown_chunks(read_ptr, 2, (png_bytep)NULL, 0);
+      png_set_keep_unknown_chunks(read_ptr, HANDLE_CHUNK_ALWAYS,
+         (png_bytep)NULL, 0);
 #endif
 #if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
       if(nosave == 0)
-         png_set_keep_unknown_chunks(write_ptr, 1, (png_bytep)NULL, 0);
+        if(all_chunks_are_safe != 0)
+           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            (png_bytep)NULL, 0);
+        else
+        {
+#ifdef PNG_USE_LOCAL_ARRAYS
+#if !defined(PNG_cHRM_SUPPORTED)
+          PNG_cHRM;
+#endif
+#if !defined(PNG_hIST_SUPPORTED)
+          PNG_hIST;
+#endif
+#if !defined(PNG_iCCP_SUPPORTED)
+          PNG_iCCP;
+#endif
+#if !defined(PNG_pCAL_SUPPORTED)
+          PNG_pCAL;
+#endif
+#if !defined(PNG_sCAL_SUPPORTED)
+          PNG_sCAL;
+#endif
+#if !defined(PNG_sPLT_SUPPORTED)
+          PNG_sPLT;
+#endif
+#if !defined(PNG_tIME_SUPPORTED)
+          PNG_tIME;
+#endif
+#endif
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE,
+            (png_bytep)NULL, 0);
+#if !defined(PNG_cHRM_SUPPORTED)
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+            (png_bytep)png_cHRM, 1);
+#endif
+#if !defined(PNG_hIST_SUPPORTED)
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+            (png_bytep)png_hIST, 1);
+#endif
+#if !defined(PNG_iCCP_SUPPORTED)
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+            (png_bytep)png_iCCP, 1);
+#endif
+#if !defined(PNG_sCAL_SUPPORTED)
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            (png_bytep)png_sCAL, 1);
+#endif
+#if !defined(PNG_pCAL_SUPPORTED)
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            (png_bytep)png_pCAL, 1);
+#endif
+#if !defined(PNG_sPLT_SUPPORTED)
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            (png_bytep)png_sPLT, 1);
+#endif
+#if !defined(PNG_tIME_SUPPORTED)
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            (png_bytep)png_tIME, 1);
+#endif
+          }
 #endif
 
       png_debug(0, "Reading info struct\n");
@@ -1741,7 +1809,8 @@ main(int argc, char *argv[])
             if((color_type == 2 || color_type == 6 || color_type == 3) &&
               (output_color_type == 0 || output_color_type == 4))
             {
-#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED) && \
+    defined(PNG_FLOATING_POINT_SUPPORTED)
                png_set_rgb_to_gray(read_ptr, 1, 54./255., 183./255.);
                if(output_bit_depth < 8)output_bit_depth=8;
                if(color_type == 3) need_expand = 1;
@@ -1848,7 +1917,6 @@ main(int argc, char *argv[])
               output_bit_depth, output_color_type, interlace_type,
               compression_type, filter_type);
 
-
             if(output_color_type != input_color_type) things_have_changed++;
          }
       }
@@ -1913,8 +1981,9 @@ main(int argc, char *argv[])
             if(keep_chunk("gAMA",argv))
             {
                if(verbose > 1 && trial == 1)
-                 fprintf(STDERR, "   gamma=(%lu/100000)\n", file_gamma);
-               if(double_gamma)file_gamma+=file_gamma;
+                 fprintf(STDERR, "   gamma=(%d/100000)\n", (int)file_gamma);
+               if(double_gamma)
+                 file_gamma+=file_gamma;
                png_set_gAMA_fixed(write_ptr, write_info_ptr, file_gamma);
             }
          }
@@ -1928,8 +1997,7 @@ main(int argc, char *argv[])
                  "   Inserting gAMA chunk with gamma=(%d/100000)\n",
                     specified_gamma);
             }
-            png_set_gAMA_fixed(write_ptr, write_info_ptr,
-               (png_fixed_point)specified_gamma);
+               png_set_gAMA_fixed(write_ptr, write_info_ptr, specified_gamma);
             file_gamma=(png_fixed_point)specified_gamma;
          }
       }
@@ -1971,22 +2039,11 @@ main(int argc, char *argv[])
          }
       }
 #endif
-#if defined(PNG_READ_hIST_SUPPORTED) && defined(PNG_WRITE_hIST_SUPPORTED)
-      {
-         png_uint_16p hist;
-
-         if (png_get_hIST(read_ptr, read_info_ptr, &hist))
-         {
-            if(keep_chunk("hIST",argv))
-            png_set_hIST(write_ptr, write_info_ptr, hist);
-         }
-      }
-#endif
-#if defined(PNG_iCCP_SUPPORTED)
+#if defined(PNG_READ_iCCP_SUPPORTED) && defined(PNG_WRITE_iCCP_SUPPORTED)
    {
       png_charp name;
       png_charp profile;
-      png_int_32 proflen;
+      png_uint_32 proflen;
       int compression_type;
 
       if (png_get_iCCP(read_ptr, read_info_ptr, &name, &compression_type, 
@@ -2060,6 +2117,46 @@ main(int argc, char *argv[])
       }
 #endif
 
+     if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
+     {
+        if (plte_len > 0)
+           num_palette=plte_len;
+        if (do_pplt != 0)
+        {
+           printf("PPLT: %s\n",pplt_string);
+        }
+        if(output_color_type == 3)
+           png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
+        else if(keep_chunk("PLTE",argv))
+           png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
+        if(verbose > 1 && trial == 1)
+        {
+           int i;
+           png_colorp p = palette;
+           fprintf(STDERR, "   Palette:\n");
+           fprintf(STDERR, "      I    R    G    B ( color )    A\n");
+           for (i=0; i<num_palette; i++)
+           {
+              fprintf(STDERR, "   %4d %4d %4d %4d (#%2.2x%2.2x%2.2x) %4d\n",
+                  i, p->red, p->green, p->blue,
+                     p->red, p->green, p->blue,
+                     trns_array[i]);
+              p++;
+           }
+        }
+     }
+
+#if defined(PNG_READ_hIST_SUPPORTED) && defined(PNG_WRITE_hIST_SUPPORTED)
+      {
+         png_uint_16p hist;
+
+         if (png_get_hIST(read_ptr, read_info_ptr, &hist))
+         {
+            if(keep_chunk("hIST",argv))
+            png_set_hIST(write_ptr, write_info_ptr, hist);
+         }
+      }
+#endif
 #if defined(PNG_READ_tRNS_SUPPORTED) && defined(PNG_WRITE_tRNS_SUPPORTED)
       {
          png_bytep trans;
@@ -2157,36 +2254,6 @@ main(int argc, char *argv[])
       }
 #endif
 
-
-     if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
-     {
-        if (plte_len > 0)
-           num_palette=plte_len;
-        if (do_pplt != 0)
-        {
-           printf("PPLT: %s\n",pplt_string);
-        }
-        if(output_color_type == 3)
-           png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
-        else if(keep_chunk("PLTE",argv))
-           png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
-        if(verbose > 1 && trial == 1)
-        {
-           int i;
-           png_colorp p = palette;
-           fprintf(STDERR, "   Palette:\n");
-           fprintf(STDERR, "      I    R    G    B ( color )    A\n");
-           for (i=0; i<num_palette; i++)
-           {
-              fprintf(STDERR, "   %4d %4d %4d %4d (#%2.2x%2.2x%2.2x) %4d\n",
-                  i, p->red, p->green, p->blue,
-                     p->red, p->green, p->blue,
-                     trns_array[i]);
-              p++;
-           }
-        }
-     }
-
 #if defined(PNG_READ_sBIT_SUPPORTED) && defined(PNG_WRITE_sBIT_SUPPORTED)
       {
          png_color_8p sig_bit;
@@ -2211,6 +2278,18 @@ main(int argc, char *argv[])
       }
 #endif
 #if defined(PNG_sCAL_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+   {
+      int unit;
+      double width, height;
+
+      if (png_get_sCAL(read_ptr, read_info_ptr, &unit, &width, &height))
+      {
+         png_set_sCAL(write_ptr, write_info_ptr, unit, width, height);
+      }
+   }
+#else
+#ifdef PNG_FIXED_POINT_SUPPORTED
    {
       int unit;
       png_charp width, height;
@@ -2221,6 +2300,8 @@ main(int argc, char *argv[])
             png_set_sCAL_s(write_ptr, write_info_ptr, unit, width, height);
       }
    }
+#endif
+#endif
 #endif
 #if defined(PNG_sPLT_SUPPORTED)
    {
@@ -2458,7 +2539,8 @@ main(int argc, char *argv[])
       }
 
    
-#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED) && \
+    defined(PNG_FLOATING_POINT_SUPPORTED)
       if((color_type == 2 || color_type == 6 || color_type == 3) &&
           (output_color_type == 0 || output_color_type == 4))
       {
@@ -2562,6 +2644,7 @@ main(int argc, char *argv[])
       if (num_unknowns && nosave == 0)
       {
          png_size_t i;
+         printf("setting %d unknown chunks after IDAT\n",num_unknowns);
          png_set_unknown_chunks(write_ptr, write_end_info_ptr, unknowns,
            num_unknowns);
          for (i = 0; i < read_info_ptr->unknown_chunks_num; i++)

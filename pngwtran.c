@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng 1.0.5j - December 21, 1999
+ * libpng 1.0.5k - December 27, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -140,7 +140,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             {
                png_byte value;
 
-               value = (png_byte)(*sp & 0x3);
+               value = (png_byte)(*sp & 0x03);
                v |= (value << shift);
                if (shift == 0)
                {
@@ -172,7 +172,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             {
                png_byte value;
 
-               value = (png_byte)(*sp & 0xf);
+               value = (png_byte)(*sp & 0x0f);
                v |= (value << shift);
 
                if (shift == 0)
