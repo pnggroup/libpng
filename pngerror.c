@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -130,7 +130,7 @@ png_default_error(png_structp png_ptr, png_const_charp message)
 
 /* This function is called when there is a warning, but the library thinks
  * it can continue anyway.  Replacement functions don't have to do anything
- * here if you don't want to.  In the default configuration, png_ptr is
+ * here if you don't want them to.  In the default configuration, png_ptr is
  * not used, but it is passed in case it may be useful.
  */
 static void

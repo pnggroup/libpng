@@ -1,5 +1,5 @@
 
-Installing libpng version 1.0.1e - June 6, 1998
+Installing libpng version 1.0.2 - June 14, 1998
 
 Before installing libpng, you must first install zlib.  zlib
 can usually be found wherever you got libpng.  zlib can be
@@ -10,7 +10,7 @@ zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.0.1e" or "lpng102" and "zlib-1.1.2"
+might be called "libpng-1.0.2" or "lpng102" and "zlib-1.1.2"
 or "zlib112") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -56,6 +56,7 @@ include
       build.bat     =>  MS-DOS batch file for Borland compiler
       makefile.dj2  =>  DJGPP 2 makefile
       makefile.msc  =>  Microsoft C makefile
+      makefile.w32  =>  makefile for Microsoft Visual C++ 4.0 and later
       makefile.tc3  =>  Turbo C 3.0 makefile
       makefile.os2  =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
       pngos2.def    =>  OS/2 module definition file used by makefile.os2

@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.1e - June 6, 1998
+ libpng version 1.0.2 - June 14, 1998
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alumni.rpi.edu>
  Copyright (c) 1998, Glenn Randers-Pehrson
@@ -1003,8 +1003,8 @@ png_infop info_ptr;
           new_row);
 
     /* where old_row is what was displayed for
-       previous rows.  Note that the first pass
-       (pass == 0, really) will completely cover
+       previously for the row.  Note that the first
+       pass (pass == 0, really) will completely cover
        the old row, so the rows do not have to be
        initialized.  After the first pass (and only
        for interlaced images), you will have to pass

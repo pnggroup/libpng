@@ -1,4 +1,4 @@
-README for libpng 1.0.1e - June 6, 1998 (shared library 2.1)
+README for libpng 1.0.2 - June 14, 1998 (shared library 2.1)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -173,6 +173,7 @@ Files in this distribution:
         build.bat     =>  MS-DOS batch file for Borland compiler
         makefile.dj2  =>  DJGPP 2 makefile
         makefile.msc  =>  Microsoft C makefile
+        makefile.w32  =>  makefile for Microsoft Visual C++ 4.0 and later
         makefile.tc3  =>  Turbo C 3.0 makefile
         makefile.os2  =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
         makefile.wat  =>  Watcom 10a+ Makefile, 32-bit flat memory model

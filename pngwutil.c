@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -273,7 +273,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
 }
 
 /* write the palette.  We are careful not to trust png_color to be in the
- * correct order for PNG, so people can redefine it to any convient
+ * correct order for PNG, so people can redefine it to any convenient
  * structure.
  */
 void
@@ -835,7 +835,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
          png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
          png_ptr->zstream.next_out = png_ptr->zbuf;
       }
-   /* continue until we don't have anymore to compress */
+   /* continue until we don't have any more to compress */
    } while (png_ptr->zstream.avail_in);
 
    /* finish the compression */

@@ -334,7 +334,7 @@ version 1.0.1d [May 24, 1998]
     Bob Dellaca, to make a png32bd.dll with Borland C++ 4.5
   Fixed error in example.c with png_set_text: num_text is 3, not 2 (Guido V.)
   Changed several loops from count-down to count-up, for consistency.
-version 1.0.1e [June 6, 1998]
+version 1.0.2 [June 14, 1998]
   Revised libpng.txt and libpng.3 description of png_set_read|write_fn(), and
     added warnings when people try to set png_read_fn and png_write_fn in
     the same structure.
@@ -349,3 +349,5 @@ version 1.0.1e [June 6, 1998]
   Added capability for user-provided malloc_fn() and free_fn() functions,
     and revised pngtest.c to demonstrate their use, replacing the
     PNGTEST_DEBUG_MEM feature.
+  Added makefile.w32, for Microsoft C++ 4.0 and later (Tim Wegner).
+  Fixed two bugs in makefile.bor

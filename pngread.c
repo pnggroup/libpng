@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -281,7 +281,7 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
 
 /* Initialize palette, background, etc, after transformations
  * are set, but before any reading takes place.  This allows
- * the user to obtail a gamma corrected palette, for example.
+ * the user to obtain a gamma-corrected palette, for example.
  * If the user doesn't call this, we will do it ourselves.
  */
 void
@@ -530,7 +530,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.1e.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.2.
  */
 
 void
@@ -570,7 +570,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
 }
 
 /* Read the entire image.  If the image has an alpha channel or a tRNS
- * chunk, and you have called png_handle_alpha(), you will need to
+ * chunk, and you have called png_handle_alpha()[*], you will need to
  * initialize the image to the current image that PNG will be overlaying.
  * We set the num_rows again here, in case it was incorrectly set in
  * png_read_start_row() by a call to png_read_update_info() or
@@ -578,6 +578,8 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * prior to either of these functions like it should have been.  You can
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
+ *
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.2.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1466,13 +1466,13 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    }
 }
 
-/* Combines the row recently read in with the previous row.
-   This routine takes care of alpha and transparency if requested.
+/* Combines the row recently read in with the existing pixels in the
+   row.  This routine takes care of alpha and transparency if requested.
    This routine also handles the two methods of progressive display
    of interlaced images, depending on the mask value.
    The mask value describes which pixels are to be combined with
    the row.  The pattern always repeats every 8 pixels, so just 8
-   bits are needed.  A one indicates the pixels is to be combined,
+   bits are needed.  A one indicates the pixel is to be combined,
    a zero indicates the pixel is to be skipped.  This is in addition
    to any alpha or transparency value associated with the pixel.  If
    you want all pixels to be combined, pass 0xff (255) in mask.  */
@@ -2156,7 +2156,7 @@ png_read_finish_row(png_structp png_ptr)
             if (!(png_ptr->num_rows))
                continue;
          }
-         if (png_ptr->transformations & PNG_INTERLACE)
+         else  /* if (png_ptr->transformations & PNG_INTERLACE) */
             break;
       } while (png_ptr->iwidth == 0);
 

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.1e -June 6, 1998
+ * libpng 1.0.2 -June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -13,7 +13,7 @@
  * properly.  It does not currently test all of the transforms, although
  * it probably should.
  *
- * The program will fail in certain legitimate cases:
+ * The program will report "FAIL" in certain legitimate cases:
  * 1) when the compression level or filter selection method is changed.
  * 2) when the chunk size is not 8K.
  * 3) unknown ancillary chunks exist in the input file.
@@ -39,7 +39,7 @@
 
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
 static int tIME_chunk_present=0;
-static png_charp tIME_string = "no tIME chunk present in file";
+static char tIME_string[30] = "no tIME chunk present in file";
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
 
 int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));

@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -523,7 +523,7 @@ png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
 /* Expand paletted images to rgb, expand grayscale images of
- * less then 8 bit depth to 8 bit depth, and expand tRNS chunks
+ * less than 8 bit depth to 8 bit depth, and expand tRNS chunks
  * to alpha channels.
  */
 void
@@ -2819,7 +2819,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
 /* Gamma correct the image, avoiding the alpha channel.  Make sure
- * you do this after you deal with the trasparency issue on grayscale
+ * you do this after you deal with the transparency issue on grayscale
  * or rgb images. If your bit depth is 8, use gamma_table, if it
  * is 16, use gamma_16_table and gamma_shift.  Build these with
  * build_gamma_table().

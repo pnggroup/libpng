@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -117,7 +117,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.1e"
+#define PNG_LIBPNG_VER_STRING "1.0.2"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.

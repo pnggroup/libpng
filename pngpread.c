@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -77,8 +77,9 @@ png_process_some_data(png_structp png_ptr, png_infop info_ptr)
 
 /* Read any remaining signature bytes from the stream and compare them with
  * the correct PNG signature.  It is possible that this routine is called
- * with bytes already read from the signature, whether because they have been
- * checked by the calling application, or from multiple calls to this routine.
+ * with bytes already read from the signature, either because they have been
+ * checked by the calling application, or because of multiple calls to this
+ * routine.
  */
 void
 png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
@@ -1116,7 +1117,7 @@ void
 png_progressive_combine_row (png_structp png_ptr,
    png_bytep old_row, png_bytep new_row)
 {
-   if (new_row != NULL)
+   if (new_row != NULL)    /* new_row must == png_ptr->row_buf here. */
       png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);
 }
 

@@ -1,15 +1,17 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
  *
  * This file provides a location for all memory allocation.  Users who
- * need special memory handling are expected to modify the code in this file
- * to meet their needs.  See the instructions at each function.
+ * need special memory handling are expected to supply replacement
+ * functions for png_malloc() and png_free(), and to use
+ * png_create_read_struct_2() and png_create_write_struct_2() to
+ * identify the replacement functions.
  */
 
 #define PNG_INTERNAL

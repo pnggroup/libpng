@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -130,7 +130,7 @@ png_set_invert_mono(png_structp png_ptr)
    png_ptr->transformations |= PNG_INVERT_MONO;
 }
 
-/* invert monocrome grayscale data */
+/* invert monochrome grayscale data */
 void
 png_do_invert(png_row_infop row_info, png_bytep row)
 {

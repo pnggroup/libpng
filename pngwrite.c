@@ -1,7 +1,7 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.1e - June 6, 1998
+ * libpng 1.0.2 - June 14, 1998
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -15,7 +15,7 @@
 /* Writes all the PNG information.  This is the suggested way to use the
  * library.  If you have a new chunk to add, make a function to write it,
  * and put it in the correct location here.  If you want the chunk written
- * after the image data, put it in png_write_end().  I strongly encurage
+ * after the image data, put it in png_write_end().  I strongly encourage
  * you to supply a PNG_INFO_ flag, and check info_ptr->valid before writing
  * the chunk, as that will keep the code from breaking if you want to just
  * write a plain PNG file.  If you have long comments, I suggest writing
