@@ -29,6 +29,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
         -fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
@@ -36,7 +37,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.8
+PNGMIN = 1.0.9beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -53,7 +54,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a libpng.so pngtest
+all: libpng.a libpng.so pngtest pngtest-static
 
 pnggccrd.o:	pnggccrd.c png.h pngconf.h pngasmrd.h
 	@echo ""
@@ -86,8 +87,18 @@ libpng.so.$(PNGVER): $(OBJSDLL)
 pngtest: pngtest.o libpng.so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
-test: pngtest
+pngtest-static: pngtest.o libpng.a
+	$(CC) -o pngtest-static $(CFLAGS) pngtest.o $(LDFLAGS_A)
+
+test: pngtest pngtest-static
+	@echo ""
+	@echo "   Testing dynamically linked version:"
+	@echo ""
 	./pngtest
+	@echo ""
+	@echo "   Testing statically linked version:"
+	@echo ""
+	./pngtest-static
 
 install: libpng.a libpng.so.$(PNGVER)
 	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi

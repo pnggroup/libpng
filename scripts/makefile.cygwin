@@ -22,13 +22,6 @@ ZLIBINC=${prefix}/include
 #ZLIBLIB=../zlib
 #ZLIBINC=../zlib
 
-SHAREDLIB=libpng.dll
-STATLIB=libpng.a
-IMPLIB=libpng.dll.a
-SHAREDDEF=libpng.def
-LIBS=$(SHAREDLIB) $(STATLIB)
-EXE=.exe
-
 ALIGN=
 # for i386:
 #ALIGN=-malign-loops=2 -malign-functions=2
@@ -42,6 +35,19 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
         -fomit-frame-pointer 
 
+# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
+# have to change it.
+PNGMAJ = 2
+PNGMIN = 1.0.9beta1
+PNGVER = $(PNGMAJ).$(PNGMIN)
+
+SHAREDLIB=cygpng$(PNGMAJ).dll
+STATLIB=libpng.a
+IMPLIB=libpng.dll.a
+SHAREDDEF=libpng.def
+LIBS=$(SHAREDLIB) $(STATLIB)
+EXE=.exe
+
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
 LDSHARED=gcc -shared -Wl,--enable-auto-image-base
 LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(SHAREDDEF)
@@ -49,19 +55,12 @@ LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(SHAREDDEF)
 RANLIB=ranlib
 #RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
-# have to change it.
-PNGMAJ = 2
-PNGMIN = 1.0.8beta3
-PNGVER = $(PNGMAJ).$(PNGMIN)
-
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 BINPATH=$(prefix)/bin
 MANPATH=$(prefix)/man
 MAN3PATH=$(MANPATH)/man3
 DOCPATH=$(prefix)/doc/libpng-$(PNGMIN)
-CYGDOCPATH=$(prefix)/doc/Cygwin
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -77,7 +76,15 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 %.pic.o : %.c
 	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
 
-all: $(SHAREDLIB) $(STATLIB) pngtest$(EXE) pngtest-stat$(EXE)
+all: all-static all-shared
+
+static: all-static
+
+shared: all-shared
+
+all-static: $(STATLIB) pngtest-stat$(EXE)
+
+all-shared: $(SHAREDLIB) pngtest$(EXE)
 
 pnggccrd.o:	png.h pngconf.h pngasmrd.h
 	@echo ""
@@ -91,7 +98,7 @@ pnggccrd.pic.o:	png.h pngconf.h pngasmrd.h
 	@echo '    You can ignore the single "control reaches end of non-void function"'
 	@echo '    warning and multiple "<variable> defined but not used" warnings:'
 	@echo ""
-	$(CC) -c $(CFLAGS) -o $@ pnggccrd.c
+	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ pnggccrd.c
 
 $(STATLIB): $(OBJS)
 	ar rc $@ $(OBJS)
@@ -115,24 +122,36 @@ pngtest.pic.o: pngtest.c
 pngtest.o: pngtest.c
 	$(CC) $(CFLAGS) -DPNG_STATIC -DZLIB_STATIC -c $< -o $@
 
-test: test-dll test-stat
+test: test-static test-shared
 
-test-stat: pngtest-stat$(EXE)
+test-static: pngtest-stat$(EXE)
 	./pngtest-stat
 
-test-dll: pngtest$(EXE)
+test-shared: pngtest$(EXE)
 	./pngtest
 
-install: $(STATLIB) $(SHAREDLIB)
-	-@if [ ! -d $(INCPATH)  ]; then mkdir -p $(INCPATH); fi
+install: install-static install-shared
+
+install-static: $(STATLIB) install-headers install-docs install-man 
+	-@if [ ! -d $(LIBPATH) ]; then mkdir -p $(LIBPATH); fi
+	install -m 755 $(STATLIB) $(LIBPATH)
+
+install-shared: $(SHAREDLIB) install-headers install-docs install-man
 	-@if [ ! -d $(LIBPATH) ]; then mkdir -p $(LIBPATH); fi
 	-@if [ ! -d $(BINPATH) ]; then mkdir -p $(BINPATH); fi
-	-@if [ ! -d $(MAN3PATH) ]; then mkdir -p $(MAN3PATH); fi
-	-@if [ ! -d $(DOCPATH) ]; then mkdir -p $(DOCPATH); fi
-	install -m 644 png.h pngconf.h $(INCPATH)
-	install -m 755 $(STATLIB) $(IMPLIB) $(LIBPATH)
+	install -m 755 $(IMPLIB) $(LIBPATH)
 	install -s -m 755 $(SHAREDLIB) $(BINPATH)
+
+install-headers:
+	-@if [ ! -d $(INCPATH)  ]; then mkdir -p $(INCPATH); fi
+	install -m 644 png.h pngconf.h $(INCPATH)
+
+install-docs:
+	-@if [ ! -d $(DOCPATH) ]; then mkdir -p $(DOCPATH); fi
 	install -m 644 $(DOCS) $(DOCPATH)
+
+install-man:
+	-@if [ ! -d $(MAN3PATH) ]; then mkdir -p $(MAN3PATH); fi
 	install -m 644 libpngpf.3 libpng.3 $(MAN3PATH)
 
 clean:

@@ -2,13 +2,15 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.8 - July 24, 2000
+ * libpng 1.0.9beta1 - November 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
  *
  * Contributed by Nirav Chhatrapati, Intel Corporation, 1998
  * Interface to libpng contributed by Gilles Vollant, 1999
+ *
+ * [png_read_filter_row_mmx_avg() bpp == 2 bugfix, GRR 20000916]
  *
  */
 
@@ -2117,8 +2119,8 @@ davg4lp:
       case 2:
       {
          ActiveMask.use  = 0x000000000000ffff;
-         ShiftBpp.use = 24;   // == 3 * 8
-         ShiftRem.use = 40;   // == 64 - 24
+         ShiftBpp.use = 16;   // == 2 * 8     [BUGFIX]
+         ShiftRem.use = 48;   // == 64 - 16   [BUGFIX]
          _asm {
             // Load ActiveMask
             movq mm7, ActiveMask
@@ -2133,7 +2135,7 @@ davg4lp:
                               // (we correct position in loop below)
 davg2lp:
             movq mm0, [edi + ebx]
-            psllq mm2, ShiftRem  // shift data to position correctly
+            psrlq mm2, ShiftRem  // shift data to position correctly   [BUGFIX]
             movq mm1, [esi + ebx]
             // Add (Prev_row/2) to Average
             movq mm3, mm5

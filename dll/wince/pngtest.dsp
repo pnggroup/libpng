@@ -62,7 +62,7 @@ CFG=pngtest - Win32 (WCE MIPS) Debug
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /QMRWCE /c
-# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /QMRWCE /c
+# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /QMRWCE /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -93,7 +93,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /QMRWCE /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /QMRWCE /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /QMRWCE /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -124,7 +124,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /Qsh4 /MC /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /Qsh4 /MC /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /Qsh4 /MC /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH4" /d "_SH4_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -155,7 +155,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /Qsh4 /MC /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /Qsh4 /MC /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /Qsh4 /MC /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH4" /d "_SH4_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -186,7 +186,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH3" /d "_SH3_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -217,7 +217,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH3" /d "_SH3_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -248,7 +248,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clarm.exe
 # ADD BASE CPP /nologo /MC /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "ARM" /D "_ARM_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /MC /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /MC /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ARM" /d "_ARM_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -279,7 +279,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clarm.exe
 # ADD BASE CPP /nologo /MC /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "ARM" /D "_ARM_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /MC /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /MC /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ARM" /d "_ARM_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -310,7 +310,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /QMFWCE /MC /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /QMFWCE /MC /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /QMFWCE /MC /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -341,7 +341,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /QMFWCE /MC /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /QMFWCE /MC /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /QMFWCE /MC /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -372,7 +372,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /ML /W3 /O2 /D "x86" /D "_i386_" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "NDEBUG" /D "i_386_" /D "_MBCS" /Gs8192 /GF /c
-# ADD CPP /nologo /ML /W3 /O2 /I ".." /I "..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "NDEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /Gs8192 /GF /c
+# ADD CPP /nologo /ML /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "NDEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /Gs8192 /GF /c
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
 # ADD RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
@@ -402,7 +402,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MLd /W3 /Zi /Od /D "x86" /D "_i386_" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "DEBUG" /D "i_386_" /D "_MBCS" /Gs8192 /GF /c
-# ADD CPP /nologo /MLd /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "DEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /Gs8192 /GF /c
+# ADD CPP /nologo /MLd /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "DEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /Gs8192 /GF /c
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
 # ADD RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
@@ -432,7 +432,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /ML /W3 /O2 /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "STRICT" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D "_MBCS" /YX /c
-# ADD CPP /nologo /ML /W3 /O2 /I ".." /I "..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /ML /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "WIN32" /d "STRICT" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "_WIN32_WCE_EMULATION" /d "INTERNATIONAL" /d "USA" /d "INTLMSG_CODEPAGE" /d "NDEBUG"
@@ -461,7 +461,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MLd /W3 /Gm /Zi /Od /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "STRICT" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D "_MBCS" /YX /c
-# ADD CPP /nologo /MLd /W3 /Gm /Zi /Od /I ".." /I "..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /MLd /W3 /Gm /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "WIN32" /d "STRICT" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "_WIN32_WCE_EMULATION" /d "INTERNATIONAL" /d "USA" /d "INTLMSG_CODEPAGE" /d "_DEBUG" /d "x86" /d "i486" /d "_x86_"
@@ -490,7 +490,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clppc.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "PPC" /D "_PPC_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /M$(CECrt) /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ppc" /d "_ppc_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
@@ -521,7 +521,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clppc.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "PPC" /D "_PPC_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /YX /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "PNG_USE_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ppc" /d "_ppc_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
@@ -568,209 +568,209 @@ SOURCE=..\pngtest.c
 !IF  "$(CFG)" == "pngtest - Win32 (WCE MIPS) Release"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE SH4) Release"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE SH4) Debug"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE SH3) Release"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE SH3) Debug"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE ARM) Release"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE ARM) Debug"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE x86) Release"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE x86) Debug"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE x86em) Release"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE x86em) Debug"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE PPC) Release"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ELSEIF  "$(CFG)" == "pngtest - Win32 (WCE PPC) Debug"
 
 DEP_CPP_PNGTE=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\png.h"\
-	"..\pngasmrd.h"\
-	"..\pngconf.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\png.h"\
+	"..\..\pngasmrd.h"\
+	"..\..\pngconf.h"\
 	
 NODEP_CPP_PNGTE=\
-	"..\alloc.h"\
+	"..\..\alloc.h"\
 	
 
 !ENDIF 

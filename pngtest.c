@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.8 - July 24, 2000
+ * libpng 1.0.9beta1 - November 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -16,7 +16,8 @@
  * The program will report "FAIL" in certain legitimate cases:
  * 1) when the compression level or filter selection method is changed.
  * 2) when the maximum IDAT size (PNG_ZBUF_SIZE in pngconf.h) is not 8192.
- * 3) unknown ancillary chunks exist in the input file.
+ * 3) unknown unsafe-to-copy ancillary chunks or unknown critical chunks
+ *    exist in the input file.
  * 4) others not listed here...
  * In these cases, it is best to check with another tool such as "pngcheck"
  * to see what the differences between the two files are.
@@ -345,7 +346,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
 
-   WRITEFILE((png_FILE_p)png_ptr->io_ptr,  data, 1, check);
+   WRITEFILE((png_FILE_p)png_ptr->io_ptr,  data, length, check);
    if (check != length)
    {
       png_error(png_ptr, "Write Error");
@@ -372,7 +373,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)near_data == data)
    {
-      WRITEFILE(io_ptr, near_data, 1, check);
+      WRITEFILE(io_ptr, near_data, length, check);
    }
    else
    {
@@ -384,7 +385,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
       {
          written = MIN(NEAR_BUF_SIZE, remaining);
          png_memcpy(buf, data, written); /* copy far buffer to near buffer */
-         WRITEFILE(io_ptr, written, 1, err);
+         WRITEFILE(io_ptr, buf, written, err);
          if (err != written)
             break;
          else
@@ -1448,4 +1449,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_8 your_png_h_is_not_version_1_0_8;
+typedef version_1_0_9beta1 your_png_h_is_not_version_1_0_9beta1;

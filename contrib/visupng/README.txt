@@ -13,8 +13,8 @@ binaries, go to "http://www.schaik.com/png/visualpng.html".
 
 Assumes that
 
-   libpng DLLs and LIBs are in ..\..\msvc\win32\libpng
-   zlib DLLs and LIBs are in   ..\..\msvc\win32\zlib
+   libpng DLLs and LIBs are in ..\..\dll\msvc\win32\libpng
+   zlib DLLs and LIBs are in   ..\..\dll\msvc\win32\zlib
    libpng header files are in  ..\..\..\libpng
    zlib header files are in    ..\..\..\zlib
    the pngsuite images are in  ..\pngsuite

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.8 - July 24, 2000
+ * libpng 1.0.9beta1 - November 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -741,10 +741,27 @@ png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
 void PNGAPI
 png_permit_empty_plte (png_structp png_ptr, int empty_plte_permitted)
 {
-   png_debug(1, "in png_permit_empty_plte\n");
+   /* This function is deprecated in favor of png_permit_mng_features()
+      and will be removed from libpng-2.0.0 */
+   png_debug(1, "in png_permit_empty_plte, DEPRECATED.\n");
    if (png_ptr == NULL)
       return;
-   png_ptr->empty_plte_permitted=(png_byte)empty_plte_permitted;
+   png_ptr->mng_features_permitted = (png_byte)
+     ((png_ptr->mng_features_permitted & (~(PNG_FLAG_MNG_EMPTY_PLTE))) |
+     ((empty_plte_permitted & PNG_FLAG_MNG_EMPTY_PLTE)));
+}
+#endif
+
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+png_uint_32 PNGAPI
+png_permit_mng_features (png_structp png_ptr, png_uint_32 mng_features)
+{
+   png_debug(1, "in png_permit_mng_features\n");
+   if (png_ptr == NULL)
+      return (png_uint_32)0;
+   png_ptr->mng_features_permitted =
+     (png_byte)(mng_features & PNG_ALL_MNG_FEATURES);
+   return (png_uint_32)png_ptr->mng_features_permitted;
 }
 #endif
 

@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.8 - July 24, 2000
+ * libpng 1.0.9beta1 - November 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -398,6 +398,7 @@
 #define PNG_NO_WRITE_USER_TRANSFORM
 #define PNG_NO_USER_MEM
 #define PNG_NO_READ_EMPTY_PLTE
+#define PNG_NO_MNG_FEATURES
 #define PNG_NO_FIXED_POINT_SUPPORTED
 #endif
 
@@ -490,8 +491,12 @@
 #endif
 #endif
 
+#ifndef PNG_NO_MNG_FEATURES
+#define PNG_MNG_FEATURES_SUPPORTED  /* Useful for MNG applications */
+#endif
+/* Deprecated, will be removed */
 #ifndef PNG_NO_READ_EMPTY_PLTE
-#define PNG_READ_EMPTY_PLTE_SUPPORTED  /* useful for MNG applications */
+#define PNG_READ_EMPTY_PLTE_SUPPORTED
 #endif
 
 #ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
@@ -547,8 +552,9 @@ defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #define PNG_WRITE_FLUSH_SUPPORTED
 #endif
 
+/* Deprecated, see PNG_MNG_FEATURES_SUPPORTED, above */
 #ifndef PNG_NO_WRITE_EMPTY_PLTE
-#define PNG_WRITE_EMPTY_PLTE_SUPPORTED  /* useful for MNG applications */
+#define PNG_WRITE_EMPTY_PLTE_SUPPORTED
 #endif
 
 #ifndef PNG_NO_STDIO
@@ -1130,6 +1136,13 @@ typedef z_stream FAR *  png_zstreamp;
 #    endif
 #  endif
 #endif
+#endif
+
+#ifndef PNGAPI
+#  define PNGAPI
+#endif
+#ifndef PNG_IMPEXP
+#  define PNG_IMPEXP
 #endif
 
 #ifndef PNG_EXPORT

@@ -778,7 +778,8 @@ version 1.0.7beta16 [June 4, 2000]
   Added a check for overlength PLTE chunk in pngrutil.c.
   Added PNG_NO_POINTER_INDEXING macro to use array-indexing instead of pointer
     indexing in pngrutil.c and pngwutil.c to accommodate a buggy compiler.
-  Added a warning in png_decompress_chunk() when it runs out of data.
+  Added a warning in png_decompress_chunk() when it runs out of data, e.g.
+    when it tries to read an erroneous PhotoShop iCCP chunk.
   Added PNG_USE_DLL macro.
   Revised the copyright/disclaimer/license notice.
   Added contrib/msvctest directory
@@ -797,7 +798,7 @@ version 1.0.7rc2 [June 28, 2000]
   Fixed "DJBPP" typo in pnggccrd.c introduced in beta18.
 version 1.0.7 [July 1, 2000]
   Revised the definition of "trans_values" in libpng.3/libpng.txt
-version 1.0.8 [July 24, 2000]
+version 1.0.9beta1 [November 10, 2000]
 version 1.0.8beta1 [July 8, 2000]
   Added png_free(png_ptr, key) two places in pngpread.c to stop memory leaks.
   Changed PNG_NO_STDIO to PNG_NO_CONSOLE_IO, several places in pngrutil.c and
@@ -816,13 +817,32 @@ version 1.0.8beta3 [July 11, 2000]
   Further revisions to pngtest.c and files in the wince subdirectory.
 version 1.0.8beta4 [July 14, 2000]
   Added the files pngbar.png and pngbar.jpg to the distribution.
-  Added cygwin subdirectory, makefile.cygwin, and cygwin support in pngconf.h
+  Added makefile.cygwin, and cygwin support in pngconf.h
   Added PNG_NO_ZALLOC_ZERO macro (makes png_zalloc skip zeroing memory)
 version 1.0.8rc1 [July 16, 2000]
   Revised png_debug() macros and statements to eliminate compiler warnings.
 version 1.0.8 [July 24, 2000]
   Added png_flush() in pngwrite.c, after png_write_IEND().
   Updated makefile.hpux to build a shared library.
+version 1.0.9beta1 [November 10, 2000]
+  Fixed typo in scripts/makefile.hpux
+  Updated makevms.com in scripts and contrib/* and contrib/* (Martin Zinser)
+  Fixed seqence-point bug in contrib/pngminus/png2pnm (Martin Zinser)
+  Changed "cdrom.com" in documentation to "libpng.org"
+  Revised pnggccrd.c to get it all working, and updated makefile.gcmmx (Greg).
+  Changed type of "params" from voidp to png_voidp in png_read|write_png().
+  Make sure PNGAPI and PNG_IMPEXP are defined in pngconf.h.
+  Revised the 3 instances of WRITEFILE in pngtest.c.
+  Relocated "msvc" and "wince" project subdirectories into "dll" subdirectory.
+  Updated png.rc in dll/msvc project
+  Revised makefile.dec to define and use LIBPATH and INCPATH
+  Increased size of global png_libpng_ver[] array from 12 to 18 chars.
+  Made global png_libpng_ver[], png_sig[] and png_pass_*[] arrays const.
+  Removed duplicate png_crc_finish() from png_handle_bKGD() function.
+  Added a warning when application calls png_read_update_info() multiple times.
+  Revised makefile.cygwin
+  Fixed bugs in iCCP support in pngrutil.c and pngwutil.c.
+  Replaced png_set_empty_plte_permitted() with png_permit_mng_features().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

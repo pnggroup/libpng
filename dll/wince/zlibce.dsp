@@ -62,7 +62,7 @@ CFG=zlibce - Win32 (WCE MIPS) Debug
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /GX- /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /QMRWCE  /c
-# ADD CPP /nologo /M$(CECrt) /W3 /GX- /O2 /I "..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /QMRWCE  /c
+# ADD CPP /nologo /M$(CECrt) /W3 /GX- /O2 /I "..\..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /QMRWCE  /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -93,7 +93,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /QMRWCE  /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /I "..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /QMRWCE  /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /I "..\..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /QMRWCE  /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -124,7 +124,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /Qsh4 /MC /W3 /GX- /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /Qsh4 /MC /W3 /GX- /O2 /I "..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /Qsh4 /MC /W3 /GX- /O2 /I "..\..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH4" /d "_SH4_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -155,7 +155,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /Qsh4 /MC /W3 /GX- /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /Qsh4 /MC /W3 /GX- /Zi /Od /I "..\..\zlib" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /Qsh4 /MC /W3 /GX- /Zi /Od /I "..\..\..\zlib" /D "DEBUG" /D "SHx" /D "SH4" /D "_SH4_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH4" /d "_SH4_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -186,7 +186,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /GX- /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /M$(CECrt) /W3 /GX- /O2 /I "..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /M$(CECrt) /W3 /GX- /O2 /I "..\..\..\zlib" /D "NDEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH3" /d "_SH3_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -217,7 +217,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=shcl.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /I "..\..\zlib" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /I "..\..\..\zlib" /D "DEBUG" /D "SHx" /D "SH3" /D "_SH3_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "SHx" /d "SH3" /d "_SH3_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -248,7 +248,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clarm.exe
 # ADD BASE CPP /nologo /MC /W3 /GX- /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "ARM" /D "_ARM_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /MC /W3 /GX- /O2 /I "..\..\zlib" /D "NDEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /MC /W3 /GX- /O2 /I "..\..\..\zlib" /D "NDEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ARM" /d "_ARM_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -279,7 +279,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clarm.exe
 # ADD BASE CPP /nologo /MC /W3 /GX- /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "ARM" /D "_ARM_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /MC /W3 /GX- /Zi /Od /I "..\..\zlib" /D "DEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /MC /W3 /GX- /Zi /Od /I "..\..\..\zlib" /D "DEBUG" /D "ARM" /D "_ARM_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ARM" /d "_ARM_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -310,7 +310,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /QMFWCE /MC /W3 /GX- /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /QMFWCE /MC /W3 /GX- /O2 /I "..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /QMFWCE /MC /W3 /GX- /O2 /I "..\..\..\zlib" /D "NDEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "NDEBUG"
@@ -341,7 +341,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clmips.exe
 # ADD BASE CPP /nologo /QMFWCE /MC /W3 /GX- /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /QMFWCE /MC /W3 /GX- /Zi /Od /I "..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /QMFWCE /MC /W3 /GX- /Zi /Od /I "..\..\..\zlib" /D "DEBUG" /D "MIPS" /D "_MIPS_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "MIPS" /d "_MIPS_" /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "UNICODE" /d "DEBUG"
@@ -372,7 +372,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /ML /W3 /GX- /O2 /D "x86" /D "_i386_" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "NDEBUG" /D "i_386_" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /Gs8192 /GF  /c
-# ADD CPP /nologo /ML /W3 /GX- /O2 /I "..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "NDEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /Gs8192 /GF  /c
+# ADD CPP /nologo /ML /W3 /GX- /O2 /I "..\..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "NDEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /Gs8192 /GF  /c
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
 # ADD RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
@@ -402,7 +402,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MLd /W3 /GX- /Zi /Od /D "x86" /D "_i386_" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "DEBUG" /D "i_386_" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /Gs8192 /GF  /c
-# ADD CPP /nologo /MLd /W3 /GX- /Zi /Od /I "..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "DEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /Gs8192 /GF  /c
+# ADD CPP /nologo /MLd /W3 /GX- /Zi /Od /I "..\..\..\zlib" /D "x86" /D "_i386_" /D "_x86_" /D "DEBUG" /D "i_386_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /Gs8192 /GF  /c
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
 # ADD RSC /l 0x411 /r /d "x86" /d "_i386_" /d "_x86_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
@@ -432,7 +432,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /ML /W3 /GX- /O2 /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "STRICT" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /ML /W3 /GX- /O2 /I "..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /ML /W3 /GX- /O2 /I "..\..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "NDEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "WIN32" /d "STRICT" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "_WIN32_WCE_EMULATION" /d "INTERNATIONAL" /d "USA" /d "INTLMSG_CODEPAGE" /d "NDEBUG"
@@ -461,7 +461,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MLd /W3 /Gm /GX- /Zi /Od /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "WIN32" /D "STRICT" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /MLd /W3 /Gm /GX- /Zi /Od /I "..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /MLd /W3 /Gm /GX- /Zi /Od /I "..\..\..\zlib" /D "_UNICODE" /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "_DEBUG" /D "x86" /D "i486" /D "_x86_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "WIN32" /d "STRICT" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d "_WIN32_WCE_EMULATION" /d "INTERNATIONAL" /d "USA" /d "INTLMSG_CODEPAGE" /d "_DEBUG" /d "x86" /d "i486" /d "_x86_"
@@ -490,7 +490,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clppc.exe
 # ADD BASE CPP /nologo /M$(CECrt) /W3 /GX- /O2 /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "NDEBUG" /D "PPC" /D "_PPC_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /M$(CECrt) /W3 /GX- /O2 /I "..\..\zlib" /D "NDEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /M$(CECrt) /W3 /GX- /O2 /I "..\..\..\zlib" /D "NDEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ppc" /d "_ppc_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "NDEBUG"
@@ -521,7 +521,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=clppc.exe
 # ADD BASE CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D "DEBUG" /D "PPC" /D "_PPC_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "_USRDLL" /D "ZLIBCE_EXPORTS" /YX /c
-# ADD CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /I "..\..\zlib" /D "DEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
+# ADD CPP /nologo /M$(CECrtDebug) /W3 /GX- /Zi /Od /I "..\..\..\zlib" /D "DEBUG" /D "PPC" /D "_PPC_" /D _WIN32_WCE=$(CEVersion) /D "$(CEConfigName)" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_MBCS" /D "ZLIB_DLL" /c
 # SUBTRACT CPP /YX
 RSC=rc.exe
 # ADD BASE RSC /l 0x411 /r /d "ppc" /d "_ppc_" /d _WIN32_WCE=$(CEVersion) /d "$(CEConfigName)" /d UNDER_CE=$(CEVersion) /d "UNICODE" /d "DEBUG"
@@ -563,118 +563,118 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\..\zlib\adler32.c
+SOURCE=..\..\..\zlib\adler32.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_ADLER=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -682,118 +682,118 @@ DEP_CPP_ADLER=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\compress.c
+SOURCE=..\..\..\zlib\compress.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_COMPR=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -801,118 +801,118 @@ DEP_CPP_COMPR=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\crc32.c
+SOURCE=..\..\..\zlib\crc32.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_CRC32=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -920,150 +920,150 @@ DEP_CPP_CRC32=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\deflate.c
+SOURCE=..\..\..\zlib\deflate.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_DEFLA=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -1071,134 +1071,134 @@ DEP_CPP_DEFLA=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\gzio.c
+SOURCE=..\..\..\zlib\gzio.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_GZIO_C=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -1206,198 +1206,198 @@ DEP_CPP_GZIO_C=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infblock.c
+SOURCE=..\..\..\zlib\infblock.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_INFBL=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -1405,214 +1405,214 @@ DEP_CPP_INFBL=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infcodes.c
+SOURCE=..\..\..\zlib\infcodes.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_INFCO=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -1620,214 +1620,214 @@ DEP_CPP_INFCO=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inffast.c
+SOURCE=..\..\..\zlib\inffast.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_INFFA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inffast.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inffast.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -1835,150 +1835,150 @@ DEP_CPP_INFFA=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inflate.c
+SOURCE=..\..\..\zlib\inflate.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_INFLA=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -1986,166 +1986,166 @@ DEP_CPP_INFLA=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inftrees.c
+SOURCE=..\..\..\zlib\inftrees.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_INFTR=\
-	"..\..\zlib\inffixed.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\inffixed.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -2153,198 +2153,198 @@ DEP_CPP_INFTR=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infutil.c
+SOURCE=..\..\..\zlib\infutil.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_INFUT=\
-	"..\..\zlib\infblock.h"\
-	"..\..\zlib\infcodes.h"\
-	"..\..\zlib\inftrees.h"\
-	"..\..\zlib\infutil.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\infblock.h"\
+	"..\..\..\zlib\infcodes.h"\
+	"..\..\..\zlib\inftrees.h"\
+	"..\..\..\zlib\infutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -2352,166 +2352,166 @@ DEP_CPP_INFUT=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\trees.c
+SOURCE=..\..\..\zlib\trees.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_TREES=\
-	"..\..\zlib\deflate.h"\
-	"..\..\zlib\trees.h"\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\deflate.h"\
+	"..\..\..\zlib\trees.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -2519,118 +2519,118 @@ DEP_CPP_TREES=\
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\uncompr.c
+SOURCE=..\..\..\zlib\uncompr.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_UNCOM=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
 	
 
 !ENDIF 
@@ -2642,134 +2642,134 @@ SOURCE=.\zlibce.def
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\zutil.c
+SOURCE=..\..\..\zlib\zutil.c
 
 !IF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Release"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Release"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH4) Debug"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Release"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE SH3) Debug"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Release"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE ARM) Debug"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Release"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE MIPSFP) Debug"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Release"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86) Debug"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Release"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE x86em) Debug"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Release"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ELSEIF  "$(CFG)" == "zlibce - Win32 (WCE PPC) Debug"
 
 DEP_CPP_ZUTIL=\
-	"..\..\zlib\zconf.h"\
-	"..\..\zlib\zlib.h"\
-	"..\..\zlib\zutil.h"\
+	"..\..\..\zlib\zconf.h"\
+	"..\..\..\zlib\zlib.h"\
+	"..\..\..\zlib\zutil.h"\
 	
 
 !ENDIF 
@@ -2781,47 +2781,47 @@ DEP_CPP_ZUTIL=\
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\..\zlib\deflate.h
+SOURCE=..\..\..\zlib\deflate.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infblock.h
+SOURCE=..\..\..\zlib\infblock.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infcodes.h
+SOURCE=..\..\..\zlib\infcodes.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inffast.h
+SOURCE=..\..\..\zlib\inffast.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inffixed.h
+SOURCE=..\..\..\zlib\inffixed.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inftrees.h
+SOURCE=..\..\..\zlib\inftrees.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infutil.h
+SOURCE=..\..\..\zlib\infutil.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\trees.h
+SOURCE=..\..\..\zlib\trees.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\zconf.h
+SOURCE=..\..\..\zlib\zconf.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\zlib.h
+SOURCE=..\..\..\zlib\zlib.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\zutil.h
+SOURCE=..\..\..\zlib\zutil.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

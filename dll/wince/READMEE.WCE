@@ -8,9 +8,9 @@ libpng for WindowsCE Rel.1.0
 
 Introduction
 ============
-This is libpng 1.0.7 ported to WindowsCE 2.0 and 2.11.
-libpng 1.0.7 is a PNG reference library.
-See README, a document of original libpng 1.0.7.
+This is libpng 1.0.9beta1 ported to WindowsCE 2.0 and 2.11.
+libpng 1.0.9beta1 is a PNG reference library.
+See README, a document of original libpng 1.0.9beta1.
 
 zlib for WindowsCE
 ==================
@@ -23,7 +23,7 @@ This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
 arising from the use of this software.
 
-See README and LICENSE, documents of original libpng 1.0.7, for conditions
+See README and LICENSE, documents of original libpng 1.0.9beta1, for conditions
 of use and distribution.
 
 Files
@@ -33,8 +33,8 @@ Files
  READMEJ.WCE - this file(in Japanese)
  png32ce.def - module definition file to make DLLs
 
-Sample programs(../pngtest.c and ../contrib/*) can build on WindowsCE 2.11.
-WindowsCE 2.0 and below do not support 'console' functions.
+Sample programs(../../pngtest.c and ../../contrib/*) can build on WindowsCE
+2.11.  WindowsCE 2.0 and below do not support 'console' functions.
 
 Author
 ======

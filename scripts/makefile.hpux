@@ -18,7 +18,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.8
+PNGMIN = 1.0.9beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # where make install puts libpng.a and png.h
@@ -67,7 +67,7 @@ install: libpng.a
 	cp libpng.a libpng.sl.$(PNGVER) $(prefix)/lib
 	chmod 644 $(prefix)/lib/libpng.a
 	chmod 755 $(prefix)/lib/libpng.sl.$(PNGVER)
-	(cd $(prefix)/lib; ln -f -s libpng.sl.$(PNGVER) libpng.sl.$(MNGMAJ); \
+	(cd $(prefix)/lib; ln -f -s libpng.sl.$(PNGVER) libpng.sl.$(PNGMAJ); \
 	ln -f -s libpng.sl.$(PNGMAJ) libpng.sl)
 
 clean:

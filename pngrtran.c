@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.8 - July 24, 2000
+ * libpng 1.0.9beta1 - November 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1090,7 +1090,12 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    if ((png_ptr->transformations & PNG_FILLER) &&
        ((info_ptr->color_type == PNG_COLOR_TYPE_RGB) ||
        (info_ptr->color_type == PNG_COLOR_TYPE_GRAY)))
+   {
       info_ptr->channels++;
+#if 0 /* if adding a true alpha channel not just filler */
+      info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
+#endif
+   }
 #endif
 
 #if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED) && \

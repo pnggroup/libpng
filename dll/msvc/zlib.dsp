@@ -101,11 +101,11 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MD /W3 /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /FD /c
-# ADD CPP /nologo /MD /W3 /O1 /I "..\..\zlib" /D "NDEBUG" /D "WIN32" /D "_WIN32" /D "_WINDOWS" /D "ZLIB_DLL" /D "DYNAMIC_CRC_TABLE" /D "ASMV" /FAcs /FD /c
+# ADD CPP /nologo /MD /W3 /O1 /I "..\..\..\zlib" /D "NDEBUG" /D "WIN32" /D "_WIN32" /D "_WINDOWS" /D "ZLIB_DLL" /D "DYNAMIC_CRC_TABLE" /D "ASMV" /FAcs /FD /c
 MTL=midl.exe
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i ".." /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -129,11 +129,11 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MDd /W3 /Zi /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Zi /Od /I "..\..\zlib" /D "_DEBUG" /D "WIN32" /D "_WIN32" /D "_WINDOWS" /D "ZLIB_DLL" /D "DYNAMIC_CRC_TABLE" /D "ASMV" /FAcs /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Zi /Od /I "..\..\..\zlib" /D "_DEBUG" /D "WIN32" /D "_WIN32" /D "_WINDOWS" /D "ZLIB_DLL" /D "DYNAMIC_CRC_TABLE" /D "ASMV" /FAcs /FD /GZ /c
 MTL=midl.exe
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /i ".." /d "_DEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -208,23 +208,23 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\..\zlib\adler32.c
+SOURCE=..\..\..\zlib\adler32.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\compress.c
+SOURCE=..\..\..\zlib\compress.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\crc32.c
+SOURCE=..\..\..\zlib\crc32.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\deflate.c
+SOURCE=..\..\..\zlib\deflate.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\contrib\asm386\gvmat32c.c
+SOURCE=..\..\..\zlib\contrib\asm386\gvmat32c.c
 
 !IF  "$(CFG)" == "zlib - Win32 DLL"
 
@@ -251,46 +251,46 @@ SOURCE=..\..\zlib\contrib\asm386\gvmat32c.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\gzio.c
+SOURCE=..\..\..\zlib\gzio.c
 # ADD CPP /Yc"zutil.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infblock.c
+SOURCE=..\..\..\zlib\infblock.c
 # ADD CPP /Yu"zutil.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infcodes.c
+SOURCE=..\..\..\zlib\infcodes.c
 # ADD CPP /Yu"zutil.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inffast.c
+SOURCE=..\..\..\zlib\inffast.c
 # ADD CPP /Yu"zutil.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inflate.c
+SOURCE=..\..\..\zlib\inflate.c
 # ADD CPP /Yu"zutil.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inftrees.c
+SOURCE=..\..\..\zlib\inftrees.c
 # ADD CPP /Yu"zutil.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infutil.c
+SOURCE=..\..\..\zlib\infutil.c
 # ADD CPP /Yu"zutil.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\trees.c
+SOURCE=..\..\..\zlib\trees.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\uncompr.c
+SOURCE=..\..\..\zlib\uncompr.c
 # End Source File
 # Begin Source File
 
@@ -317,7 +317,7 @@ SOURCE=.\zlib.def
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\msdos\zlib.rc
+SOURCE=..\..\..\zlib\msdos\zlib.rc
 
 !IF  "$(CFG)" == "zlib - Win32 DLL"
 
@@ -340,7 +340,7 @@ SOURCE=..\..\zlib\msdos\zlib.rc
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\zutil.c
+SOURCE=..\..\..\zlib\zutil.c
 # ADD CPP /Yu"zutil.h"
 # End Source File
 # End Group
@@ -349,47 +349,47 @@ SOURCE=..\..\zlib\zutil.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\..\zlib\deflate.h
+SOURCE=..\..\..\zlib\deflate.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infblock.h
+SOURCE=..\..\..\zlib\infblock.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infcodes.h
+SOURCE=..\..\..\zlib\infcodes.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inffast.h
+SOURCE=..\..\..\zlib\inffast.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inffixed.h
+SOURCE=..\..\..\zlib\inffixed.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\inftrees.h
+SOURCE=..\..\..\zlib\inftrees.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\infutil.h
+SOURCE=..\..\..\zlib\infutil.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\trees.h
+SOURCE=..\..\..\zlib\trees.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\zconf.h
+SOURCE=..\..\..\zlib\zconf.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\zlib.h
+SOURCE=..\..\..\zlib\zlib.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\zlib\zutil.h
+SOURCE=..\..\..\zlib\zutil.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

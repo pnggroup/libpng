@@ -1,25 +1,30 @@
 
-Libpng 1.0.8 - July 24, 2000
+Libpng 1.0.9beta1 - November 10, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
-Changes since the last public release (1.0.7):
+Changes since the last public release (1.0.8):
 
-  Added png_free(png_ptr, key) two places in pngpread.c to stop memory leaks.
-  Changed PNG_NO_STDIO to PNG_NO_CONSOLE_IO, several places in pngrutil.c and
-     pngwutil.c.
-  Changed PNG_EXPORT_VAR to use PNG_IMPEXP, in pngconf.h.
-  Removed unused "#include <assert.h>" from png.c
-  Added WindowsCE support.
-  Revised pnggccrd.c to work with gcc-2.95.2 and in the Cygwin environment.
-  Only set the PNG_FLAG_FREE_TRNS or PNG_FREE_TRNS flag in png_handle_tRNS()
-     for indexed-color input files to avoid potential double-freeing trans array
-     under some unusual conditions; problem was introduced in version 1.0.7.
-  Added the files pngbar.png and pngbar.jpg to the distribution.
-  Added cygwin subdirectory, makefile.cygwin, and cygwin support in pngconf.h
-  Added PNG_NO_ZALLOC_ZERO macro (makes png_zalloc skip zeroing memory)
-  Revised png_debug() macros and statements to eliminate compiler warnings.
-  Updated makefile.hpux to build a shared library.
+  Fixed typo in scripts/makefile.hpux
+  Fixed seqence-point bug in contrib/pngminus/png2pnm (Martin Zinser)
+  Updated makevms.com in scripts and contrib/* and contrib/* (Martin Zinser)
+  Changed "cdrom.com" in documentation to "libpng.org"
+  Revised pnggccrd.c to get it all working, and updated makefile.gcmmx (Greg).
+  Changed type of "params" from voidp to png_voidp in png_read|write_png().
+  Added MNG_EXTENSIONS_SUPPORTED macro and support for some proposed MNG
+     features, for testing purposes.
+  Make sure PNGAPI and PNG_IMPEXP are defined in pngconf.h.
+  Revised the 3 instances of WRITEFILE in pngtest.c.
+  Relocated "msvc" and "wince" project subdirectories into "dll" subdirectory.
+  Updated png.rc in dll/msvc project
+  Revised makefile.dec to define and use LIBPATH and INCPATH
+  Increased size of global png_libpng_ver[] array from 12 to 18 chars.
+  Made global png_libpng_ver[], png_sig[] and png_pass_*[] arrays const.
+  Removed duplicate png_crc_finish() from png_handle_bKGD() function.
+  Added a warning when application calls png_read_update_info() multiple times.
+  Revised makefile.cygwin
+  Fixed bugs in iCCP support in pngrutil.c and pngwutil.c.
+  Replaced png_set_empty_plte_permitted() with png_permit_mng_features().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

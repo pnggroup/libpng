@@ -18,6 +18,9 @@
 #  else
 #    define DLLFNAME_POSTFIX "A"
 #  endif /* !defined(DLLFNAME_POSTFIX)... */
+#  if !defined(SPECIALBUILD)
+#    define SPECIALBUILD "Use MMX instructions"
+#  endif /* SPECIALBUILD */
 #endif
 
 #if defined(PNG_DEBUG) && (PNG_DEBUG > 0)

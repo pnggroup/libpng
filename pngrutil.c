@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.8 - July 24, 2000
+ * libpng 1.0.9beta1 - November 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -976,6 +976,8 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_byte compression_type;
    png_charp profile;
    png_uint_32 skip = 0;
+   png_uint_32 profile_size = 0;
+   png_uint_32 profile_length = 0;
    png_size_t slength, prefix_length, data_length;
 
    png_debug(1, "in png_handle_iCCP\n");
@@ -1027,22 +1029,43 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    /* there should be at least one zero (the compression type byte)
       following the separator, and we should be on it  */
-   if (*profile || profile >= chunkdata + slength)
+   if ( profile >= chunkdata + slength)
    {
       png_free(png_ptr, chunkdata);
-      png_warning(png_ptr, "malformed iCCP chunk");
+      png_warning(png_ptr, "Malformed iCCP chunk");
       return;
    }
 
    /* compression_type should always be zero */
    compression_type = *profile++;
+   if (compression_type)
+   {
+      png_warning(png_ptr, "Ignoring nonzero compression type in iCCP chunk");
+      compression_type=0x00;  /* Reset it to zero (libpng-1.0.6 through 1.0.8
+                                 wrote nonzero) */
+   }
 
    prefix_length = profile - chunkdata;
    chunkdata = png_decompress_chunk(png_ptr, compression_type, chunkdata,
                                     slength, prefix_length, &data_length);
 
+   profile_length = data_length - prefix_length;
+   profile_size = ((*(chunkdata+prefix_length))<<24) |
+                  ((*(chunkdata+prefix_length+1))<<16) |
+                  ((*(chunkdata+prefix_length+2))<< 8) |
+                  ((*(chunkdata+prefix_length+3))    );
+
+   if(profile_size < profile_length)
+      profile_length = profile_size;
+
+   if(profile_size > profile_length)
+   {
+      png_warning(png_ptr, "Ignoring truncated iCCP profile.\n");
+      return;
+   }
+
    png_set_iCCP(png_ptr, info_ptr, chunkdata, compression_type,
-                chunkdata + prefix_length, data_length);
+                chunkdata + prefix_length, data_length-prefix_length);
    png_free(png_ptr, chunkdata);
 }
 #endif /* PNG_READ_iCCP_SUPPORTED */
@@ -1336,7 +1359,6 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           if(buf[0] > info_ptr->num_palette)
           {
              png_warning(png_ptr, "Incorrect bKGD chunk index value");
-             png_crc_finish(png_ptr, length);
              return;
           }
           png_ptr->background.red =

@@ -45,9 +45,9 @@ $   call make pnm2png.exe -
 $   write sys$output "Building png2pnm..."
 $   CALL MAKE png2pnm.OBJ "cc ''CCOPT' png2pnm" -
 	png2pnm.c
-$   call make pnm2png.exe -
-	"LINK pnm2png,lib.opt/opt" -
-	pnm2png.obj
+$   call make png2pnm.exe -
+	"LINK png2pnm,lib.opt/opt" -
+	png2pnm.obj
 $ exit
 $!
 $!

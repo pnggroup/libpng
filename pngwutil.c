@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.8 - July 24, 2000
+ * libpng 1.0.9beta1 - November 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -514,8 +514,8 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
 
    png_debug(1, "in png_write_PLTE\n");
    if ((
-#ifdef PNG_WRITE_EMPTY_PLTE_SUPPORTED
-        !png_ptr->empty_plte_permitted &&
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+        !(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE) &&
 #endif
         num_pal == 0) || num_pal > 256)
      {
@@ -670,6 +670,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
    /* make sure we include the NULL after the name and the compression type */
    png_write_chunk_start(png_ptr, (png_bytep)png_iCCP,
           (png_uint_32)name_len+profile_len+2);
+   new_name[name_len+1]=0x00;
    png_write_chunk_data(png_ptr, (png_bytep)new_name, name_len + 2);
 
    if (profile_len)
@@ -996,9 +997,9 @@ png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
    if (color_type == PNG_COLOR_TYPE_PALETTE)
    {
       if (
-#ifdef PNG_WRITE_EMPTY_PLTE_SUPPORTED
-          (!png_ptr->empty_plte_permitted ||
-          (png_ptr->empty_plte_permitted && png_ptr->num_palette)) &&
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+          (png_ptr->num_palette ||
+          (!(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE))) &&
 #endif
          back->index > png_ptr->num_palette)
       {
@@ -1083,7 +1084,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 
    png_debug1(2, "Keyword to be checked is '%s'\n", key);
 
-   *new_key = (png_charp)png_malloc(png_ptr, (png_uint_32)(key_len + 1));
+   *new_key = (png_charp)png_malloc(png_ptr, (png_uint_32)(key_len + 2));
 
    /* Replace non-printing characters with a blank and print a warning */
    for (kp = key, dp = *new_key; *kp != '\0'; kp++, dp++)
@@ -2553,6 +2554,7 @@ png_write_filtered_row(png_structp png_ptr, png_bytep filtered_row)
    png_debug(1, "in png_write_filtered_row\n");
    png_debug1(2, "filter = %d\n", filtered_row[0]);
    /* set up the zlib input buffer */
+
    png_ptr->zstream.next_in = filtered_row;
    png_ptr->zstream.avail_in = (uInt)png_ptr->row_info.rowbytes + 1;
    /* repeat until we have compressed all the data */

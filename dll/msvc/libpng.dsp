@@ -46,11 +46,11 @@ CFG=libpng - Win32 DLL
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MD /W3 /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /FD /c
-# ADD CPP /nologo /MD /W3 /O1 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /Yu"png.h" /FD /c
+# ADD CPP /nologo /MD /W3 /O1 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /Yu"png.h" /FD /c
 MTL=midl.exe
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i ".." /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -74,11 +74,11 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MDd /W3 /Zi /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "_DEBUG" /D PNG_DEBUG=1 /D "WIN32" /D "_WINDOWS" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /Yu"png.h" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "_DEBUG" /D PNG_DEBUG=1 /D "WIN32" /D "_WINDOWS" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /Yu"png.h" /FD /GZ /c
 MTL=midl.exe
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /i ".." /d "_DEBUG" /d PNG_DEBUG=1
+# ADD RSC /l 0x409 /i "..\.." /d "_DEBUG" /d PNG_DEBUG=1
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -101,11 +101,11 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MD /W3 /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /FD /c
-# ADD CPP /nologo /MD /W3 /O1 /I ".." /I "..\..\zlib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PNG_USE_PNGVCRD" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /Yu"png.h" /FD /c
+# ADD CPP /nologo /MD /W3 /O1 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PNG_USE_PNGVCRD" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /Yu"png.h" /FD /c
 MTL=midl.exe
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i ".." /d "NDEBUG" /d "PNG_USE_PNGVCRD"
+# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG" /d "PNG_USE_PNGVCRD"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -129,11 +129,11 @@ LINK32=link.exe
 # PROP Target_Dir ""
 CPP=cl.exe
 # ADD BASE CPP /nologo /MDd /W3 /Zi /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "_DEBUG" /D PNG_DEBUG=1 /D "WIN32" /D "_WINDOWS" /D "PNG_USE_PNGVCRD" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /Yu"png.h" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "_DEBUG" /D PNG_DEBUG=1 /D "WIN32" /D "_WINDOWS" /D "PNG_USE_PNGVCRD" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /Yu"png.h" /FD /GZ /c
 MTL=midl.exe
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /i ".." /d "_DEBUG" /d PNG_DEBUG=1  /d "PNG_USE_PNGVCRD"
+# ADD RSC /l 0x409 /i "..\.." /d "_DEBUG" /d PNG_DEBUG=1  /d "PNG_USE_PNGVCRD"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -156,10 +156,10 @@ LINK32=link.exe
 MTL=midl.exe
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /O1 /D "WIN32" /D "NDEBUG" /D "_LIB" /FD /c
-# ADD CPP /nologo /W3 /O1 /I ".." /I "..\..\zlib" /D "WIN32" /D "NDEBUG" /Yu"png.h" /FD /c
+# ADD CPP /nologo /W3 /O1 /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /Yu"png.h" /FD /c
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i ".." /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -182,7 +182,7 @@ LIB32=link.exe -lib
 MTL=midl.exe
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /Zi /Od /D "_DEBUG" /D "WIN32" /D "_LIB" /FD /GZ /c
-# ADD CPP /nologo /W3 /Zi /Od /I ".." /I "..\..\zlib" /D "DEBUG" /D "_DEBUG" /D PNG_DEBUG=1 /D "WIN32" /Yu"png.h" /FD /GZ /c
+# ADD CPP /nologo /W3 /Zi /Od /I "..\.." /I "..\..\..\zlib" /D "DEBUG" /D "_DEBUG" /D PNG_DEBUG=1 /D "WIN32" /Yu"png.h" /FD /GZ /c
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -208,7 +208,7 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\png.c
+SOURCE=..\..\png.c
 # SUBTRACT CPP /YX /Yc /Yu
 # End Source File
 # Begin Source File
@@ -259,48 +259,48 @@ SOURCE=.\png32ms.def
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngerror.c
+SOURCE=..\..\pngerror.c
 # ADD CPP /Yc"png.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngget.c
+SOURCE=..\..\pngget.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngmem.c
+SOURCE=..\..\pngmem.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngpread.c
+SOURCE=..\..\pngpread.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngread.c
+SOURCE=..\..\pngread.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngrio.c
+SOURCE=..\..\pngrio.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngrtran.c
+SOURCE=..\..\pngrtran.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngrutil.c
+SOURCE=..\..\pngrutil.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngset.c
+SOURCE=..\..\pngset.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngtrans.c
+SOURCE=..\..\pngtrans.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngvcrd.c
+SOURCE=..\..\pngvcrd.c
 
 !IF  "$(CFG)" == "libpng - Win32 DLL"
 
@@ -327,19 +327,19 @@ SOURCE=..\pngvcrd.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngwio.c
+SOURCE=..\..\pngwio.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngwrite.c
+SOURCE=..\..\pngwrite.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngwtran.c
+SOURCE=..\..\pngwtran.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngwutil.c
+SOURCE=..\..\pngwutil.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -347,11 +347,11 @@ SOURCE=..\pngwutil.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\png.h
+SOURCE=..\..\png.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\pngconf.h
+SOURCE=..\..\pngconf.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

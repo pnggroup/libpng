@@ -7,12 +7,25 @@ $!
 $!
 $!    Set locations where zlib and libpng sources live.
 $!
-$ zpath = "[-.zlib]"
-$ pngpath = "[-.libpng]"
+$ zpath   = ""
+$ pngpath = ""
+$ if f$search("[-.zlib]zlib.h").nes."" then zpath = "[-.zlib]"
+$ if f$search("[-.libpng]png.h").nes."" then pngpath = "[-.libpng]"
 $!
-$! USE THESE INSTEAD if building from libpng's [.contrib.gregbook] directory:
-$! zpath = "[---.zlib]"
-$! pngpath = "[--]"
+$ if f$search("[---.zlib]zlib.h").nes."" then zpath = "[---.zlib]"
+$ if f$search("[--]png.h").nes."" then pngpath = "[--]"
+$!
+$ if zpath .eqs. ""
+$ then
+$   write sys$output "Zlib include not found. Exiting..."
+$   exit 2
+$ endif 
+$!
+$ if pngpath .eqs. ""
+$ then
+$   write sys$output "Libpng include not found. Exiting..."
+$   exit 2
+$ endif 
 $!
 $!    Look for the compiler used.
 $!

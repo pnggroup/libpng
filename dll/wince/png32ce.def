@@ -2,17 +2,16 @@
 ; LIBPNG module definition file for Windows
 ;------------------------------------------
 
-LIBRARY
-DESCRIPTION "PNG image compression library for Windows"
+LIBRARY lpngce
 
 EXPORTS
-;Version 1.0.8
+;Version 1.0.9beta1
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
   png_chunk_warning      @4
-  png_convert_from_struct_tm   @5
-  png_convert_from_time_t    @6
+;  png_convert_from_struct_tm   @5
+;  png_convert_from_time_t    @6
   png_create_info_struct     @7
   png_create_read_struct     @8
   png_create_write_struct    @9
@@ -176,3 +175,6 @@ EXPORTS
   png_write_init_2    @167
   png_access_version_number  @168
 ;  png_sig_bytes    @169
+  png_libpng_ver    @170
+  png_init_io    @171
+  png_convert_to_rfc1123     @172

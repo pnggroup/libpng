@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.8 - July 24, 2000
+ * libpng 1.0.9beta1 - November 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -894,25 +894,25 @@ png_read_push_finish_row(png_structp png_ptr)
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* start of interlace block */
-   const int png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
+   const int FARDATA png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
 
    /* offset to next interlace block */
-   const int png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
+   const int FARDATA png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
 
    /* start of interlace block in the y direction */
-   const int png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
+   const int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
 
    /* offset to next interlace block in the y direction */
-   const int png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
+   const int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
 
    /* Width of interlace block.  This is not currently used - if you need
     * it, uncomment it here and in png.h
-   const int png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
+   const int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
    */
 
    /* Height of interlace block.  This is not currently used - if you need
     * it, uncomment it here and in png.h
-   const int png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
+   const int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
    */
 #endif
 
@@ -1429,7 +1429,8 @@ png_progressive_combine_row (png_structp png_ptr,
    png_bytep old_row, png_bytep new_row)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   const int png_pass_dsp_mask[7] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
+   const int FARDATA png_pass_dsp_mask[7] =
+      {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 #endif
    if (new_row != NULL)    /* new_row must == png_ptr->row_buf here. */
       png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);

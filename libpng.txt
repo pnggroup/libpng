@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.8 - July 24, 2000
+ libpng version 1.0.9beta1 - November 10, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -37,8 +37,7 @@ Libpng was written as a companion to the PNG specification, as a way
 of reducing the amount of time and effort it takes to support the PNG
 file format in application programs.
 
-The PNG-1.2 specification is available at <http://www.cdrom.com/pub/png>
-(will be moving to <http://www.libpng.org>)
+The PNG-1.2 specification is available at <http://www.libpng.org/pub/png>
 and at <ftp://ftp.uu.net/graphics/png/documents/>.
 
 The PNG-1.0 specification is available
@@ -49,8 +48,7 @@ documents at <ftp://ftp.uu.net/graphics/png/documents/>.
 
 Other information
 about PNG, and the latest version of libpng, can be found at the PNG home
-page, <http://www.cdrom.com/pub/png/> (will be moving to
-<http://www.libpng.org>)
+page, <http://www.libpng.org/pub/png/>
 and at <ftp://ftp.uu.net/graphics/png/>.
 
 Most users will not have to modify the library significantly; advanced
@@ -2634,13 +2632,13 @@ application:
 
 VII. Y2K Compliance in libpng
 
-July 24, 2000
+November 10, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.8 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.9beta1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

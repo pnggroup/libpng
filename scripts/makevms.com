@@ -3,6 +3,19 @@ $!
 $!
 $! Check for MMK/MMS
 $!
+$! This procedure accepts one parameter (contrib), which causes it to build
+$! the programs from the contrib directory instead of libpng.
+$!
+$ p1 = f$edit(p1,"UPCASE")
+$ if p1 .eqs. "CONTRIB"
+$ then
+$   set def [.contrib.gregbook]
+$   @makevms
+$   set def [-.pngminus]
+$   @makevms
+$   set def [--]
+$   exit 
+$ endif
 $ Make = ""
 $ If F$Search ("Sys$System:MMS.EXE") .nes. "" Then Make = "MMS"
 $ If F$Type (MMK) .eqs. "STRING" Then Make = "MMK"
@@ -83,6 +96,7 @@ $   call make pngtest.exe -
 $   write sys$output "Testing Libpng..."
 $   run pngtest
 $  else
+$   if f$search("DESCRIP.MMS") .eqs. "" then copy/nolog [.SCRIPTS]DESCRIP.MMS []
 $   'make'/macro=('comp',zlibsrc='zlibsrc')
 $  endif
 $ write sys$output "Libpng build completed"
@@ -128,4 +142,3 @@ $ VV='F$Verify(VV)
 $Exit:
 $ If V Then Set Verify
 $ENDSUBROUTINE
-
