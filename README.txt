@@ -1,8 +1,8 @@
 
- | pngcrush 1.2.0, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
+ | pngcrush 1.2.1, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.0.5a,
+ | This program was built with libpng version 1.0.5f,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1998, 1999, Glenn Randers-Pehrson,
@@ -13,6 +13,31 @@
 usage: pngcrush [options] infile.png outfile.png
        pngcrush -e ext [other options] files.png ...
        pngcrush -d dir [other options] files.png ...
+options:
+        -brute (Use brute-force, try 114 different methods)
+            -c color_type of output file [0, 2, 4, or 6]
+            -d directory_name (where output files will go)
+ -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
+            -e extension  (used for creating output filename)
+            -f user_filter [0-5]
+        -force (Write a new output file even if larger than input)
+            -g gamma_value (float, e.g., 0.45455)
+            -l zlib_compression_level [0-9]
+            -m method [0 through 200]
+          -max maximum_IDAT_size [1 through 524288]
+            -n (no save; does not do compression or write output PNG)
+            -plte_len n (truncate PLTE)
+            -q (quiet)
+          -rem chunkname (or "alla" or "allb")
+-replace_gamma gamma_value (float) even when file has a gAMA chunk.
+          -res dpi
+         -srgb [0, 1, 2, or 3]
+         -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+         -trns index red green blue gray
+      -verbose (write more detailed information)
+            -w compression_window_size [32, 16, 8, 4, 2, 1, 512, 256]
+            -h (help)
+            -p (pause)
 
 options:
         -brute (Use brute-force, try 114 different methods)
@@ -89,6 +114,11 @@ options:
 
                Useful in conjunction with -v option to get info.
 
+            -plte_len n (truncate PLTE)
+
+               Truncates the PLTE.  Be sure not to truncate it to
+
+               less than the greatest index present in IDAT.
             -q (quiet)
 
 
@@ -146,7 +176,7 @@ options:
             -z zlib_strategy [0, 1, or 2]
 
                zlib compression strategy to use with the preceding
-               preceding '-m method' argument.
+               '-m method' argument.
 
             -h (help)
 

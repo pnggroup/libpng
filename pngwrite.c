@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.5a - October 23, 1999
+ * libpng 1.0.5f - December 6, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -22,13 +22,14 @@
  * them in png_write_end(), and compressing them.
  */
 void
-png_write_info(png_structp png_ptr, png_infop info_ptr)
+png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 {
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_sPLT_SUPPORTED)
    int i;
 #endif
-
-   png_debug(1, "in png_write_info\n");
+   png_debug(1, "in png_write_info_before_PLTE\n");
+   if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
+   {
    png_write_sig(png_ptr); /* write PNG signature */
    /* write IHDR information. */
    png_write_IHDR(png_ptr, info_ptr->width, info_ptr->height,
@@ -49,6 +50,16 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_sRGB)
       png_write_sRGB(png_ptr, (int)info_ptr->srgb_intent);
 #endif
+#if defined(PNG_WRITE_iCCP_SUPPORTED)
+   if (info_ptr->valid & PNG_INFO_iCCP)
+      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_TEXT_COMPRESSION_NONE,
+                     info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
+#endif
+#if defined(PNG_WRITE_sPLT_SUPPORTED)
+   if (info_ptr->valid & PNG_INFO_sPLT)
+     for (i = 0; i < (int)info_ptr->splt_palettes_num; i++)
+       png_write_sPLT(png_ptr, info_ptr->splt_palettes + i);
+#endif
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sBIT)
       png_write_sBIT(png_ptr, &(info_ptr->sig_bit), info_ptr->color_type);
@@ -61,6 +72,21 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          info_ptr->x_green, info_ptr->y_green,
          info_ptr->x_blue, info_ptr->y_blue);
 #endif
+      png_ptr->mode |= PNG_WROTE_INFO_BEFORE_PLTE;
+   }
+}
+
+void
+png_write_info(png_structp png_ptr, png_infop info_ptr)
+{
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
+   int i;
+#endif
+
+   png_debug(1, "in png_write_info\n");
+
+   png_write_info_before_PLTE(png_ptr, info_ptr);
+
    if (info_ptr->valid & PNG_INFO_PLTE)
       png_write_PLTE(png_ptr, info_ptr->palette,
          (png_uint_32)info_ptr->num_palette);
@@ -103,6 +129,11 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          info_ptr->pcal_X1, info_ptr->pcal_type, info_ptr->pcal_nparams,
          info_ptr->pcal_units, info_ptr->pcal_params);
 #endif
+#if defined(PNG_WRITE_sCAL_SUPPORTED)
+   if (info_ptr->valid & PNG_INFO_sCAL)
+      png_write_sCAL(png_ptr, info_ptr->scal_unit, 
+          info_ptr->scal_pixel_width, info_ptr->scal_pixel_height);
+#endif
 #if defined(PNG_WRITE_pHYs_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_pHYs)
       png_write_pHYs(png_ptr, info_ptr->x_pixels_per_unit,
@@ -112,17 +143,33 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_tIME)
    {
       png_write_tIME(png_ptr, &(info_ptr->mod_time));
-      png_ptr->flags |= PNG_FLAG_WROTE_tIME;
+      png_ptr->mode |= PNG_WROTE_tIME;
    }
 #endif
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
    /* Check to see if we need to write text chunks */
    for (i = 0; i < info_ptr->num_text; i++)
    {
       png_debug2(2, "Writing header text chunk %d, type %d\n", i,
          info_ptr->text[i].compression);
+      /* an internationalized chunk? */
+      if (info_ptr->text[i].lang)
+      {
+#if defined(PNG_WRITE_iTXt_SUPPORTED)
+          /* write international chunk */
+          png_write_iTXt(png_ptr, 
+                         info_ptr->text[i].compression,
+                         info_ptr->text[i].lang,
+                         info_ptr->text[i].key,
+                         info_ptr->text[i].text);
+#else
+          png_warning(png_ptr, "Unable to write international text\n");
+#endif
+          /* Mark this chunk as written */
+          info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
+      }
       /* If we want a compressed text chunk */
-      if (info_ptr->text[i].compression >= PNG_TEXT_COMPRESSION_zTXt)
+      else if (info_ptr->text[i].compression >= PNG_TEXT_COMPRESSION_zTXt)
       {
 #if defined(PNG_WRITE_zTXt_SUPPORTED)
          /* write compressed chunk */
@@ -140,7 +187,8 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_WRITE_tEXt_SUPPORTED)
          /* write uncompressed chunk */
          png_write_tEXt(png_ptr, info_ptr->text[i].key,
-            info_ptr->text[i].text, info_ptr->text[i].text_length);
+                         info_ptr->text[i].text, 
+                         info_ptr->text[i].text_length);
 #else
          png_warning(png_ptr, "Unable to write uncompressed text\n");
 #endif
@@ -166,16 +214,16 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    /* see if user wants us to write information chunks */
    if (info_ptr != NULL)
    {
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
       int i; /* local index variable */
 #endif
 #if defined(PNG_WRITE_tIME_SUPPORTED)
       /* check to see if user has supplied a time chunk */
       if (info_ptr->valid & PNG_INFO_tIME &&
-         !(png_ptr->flags & PNG_FLAG_WROTE_tIME))
+         !(png_ptr->mode & PNG_WROTE_tIME))
          png_write_tIME(png_ptr, &(info_ptr->mod_time));
 #endif
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
       /* loop through comment chunks */
       for (i = 0; i < info_ptr->num_text; i++)
       {
@@ -630,7 +678,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 
    if (info_ptr != NULL)
    {
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
    png_debug(1, "in png_info_destroy\n");
    if (info_ptr->text != NULL)
    {
@@ -641,6 +689,11 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
          {
            png_free(png_ptr, info_ptr->text[i].key);
            info_ptr->text[i].key = NULL;
+         }
+         if(info_ptr->text[i].lang != NULL)
+         {
+           png_free(png_ptr, info_ptr->text[i].lang);
+           info_ptr->text[i].lang = NULL;
          }
       }
       png_free(png_ptr, info_ptr->text);
@@ -705,16 +758,18 @@ png_write_destroy(png_structp png_ptr)
    png_free(png_ptr, png_ptr->up_row);
    png_free(png_ptr, png_ptr->avg_row);
    png_free(png_ptr, png_ptr->paeth_row);
+
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
    png_free(png_ptr, png_ptr->time_buffer);
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#endif
+
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_free(png_ptr, png_ptr->prev_filters);
    png_free(png_ptr, png_ptr->filter_weights);
    png_free(png_ptr, png_ptr->inv_filter_weights);
    png_free(png_ptr, png_ptr->filter_costs);
    png_free(png_ptr, png_ptr->inv_filter_costs);
-#endif /* PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
+#endif
 
    /* reset structure */
    png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));

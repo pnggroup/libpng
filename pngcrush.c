@@ -14,7 +14,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.2.0"
+#define PNGCRUSH_VERSION "1.2.1"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -41,12 +41,26 @@
  *    or altered from any source or altered source distribution.
  */
 
-/* Version 1.2.*: check for unused alpha channel and ok-to-reduce-depth
- *                rearrange palette to put most-used color first and
- *                transparent color second.
+/* To do:
+ *
+ * Version 1.2.*: check for unused alpha channel and ok-to-reduce-depth.
+ *   Rearrange palette to put most-used color first and
+ *   transparent color second.
+ *
+ * Version 1.2.2: Add iCCP, iTXt, sCAL, and sPLT support, which are
+ *   now supported by libpng.
+ *
+ * Change log:
+ *
+ * Version 1.2.1: Fixed -srgb parameter so it really does take an argument,
+ *   and so it continues to use "0" if an integer does not follow the -srgb.
+ *   Added "-plte_len n" argument for truncating the PLTE.  Be sure not to
+ *   truncate it to less than the greatest index actually appearing in IDAT.
  *
  * Version 1.2.0: Removed registration requirement.  Added open source
- * license.  Redefined TOO_FAR=32k in deflate.c
+ *   license.  Redefined TOO_FAR=32k in deflate.c.
+ *
+ * Changes prior to going "open source":
  *
  * Version 1.1.8: built with libpng-1.0.5a.  Runs OK with pngvcrd.c.
  *
@@ -165,6 +179,7 @@ static int z_strategy;
 static int best_of_three;
 static int methods_specified=0;
 static int intent=-1;
+static int plte_len=-1;
 static double specified_gamma=0.;
 static double force_specified_gamma=0.;
 static int double_gamma=0;
@@ -697,6 +712,11 @@ main(int argc, char *argv[])
       nosave++;
       pngcrush_mode=EXTENSION_MODE;
       }
+   else if(!strncmp(argv[i],"-plte_len",9))
+      {
+         names++;
+         plte_len=atoi(argv[++i]);
+      }
    else if(!strncmp(argv[i],"-p",2))
       {
       pauses++;
@@ -721,10 +741,19 @@ main(int argc, char *argv[])
    else if( !strncmp(argv[i],"-srgb",5) ||
             !strncmp(argv[i],"-sRGB",5))
       {
-         names++;
          specified_gamma=.45455;
          intent=0;
          i++;
+         if(!strncmp(argv[i],"0",1) ||
+            !strncmp(argv[i],"1",1) ||
+            !strncmp(argv[i],"2",1) ||
+            !strncmp(argv[i],"3",1))
+           {
+             names++;
+             intent=(int)atoi(argv[i]);
+           }
+         else
+           i--;
       }
    else if(!strncmp(argv[i],"-s",2))
       {
@@ -1054,6 +1083,16 @@ main(int argc, char *argv[])
        "\n               Useful in conjunction with -v option to get info.\n\n");
 
      fprintf(STDERR,
+       "            -plte_len n (truncate PLTE)\n");
+     if(verbose > 1)
+     {
+     fprintf(STDERR,
+       "\n               Truncates the PLTE.  Be sure not to truncate it to\n");
+     fprintf(STDERR,
+       "\n               less than the greatest index present in IDAT.\n");
+ 
+     }
+     fprintf(STDERR,
        "            -q (quiet)\n");
      if(verbose > 1)
         fprintf(STDERR,"\n");
@@ -1173,7 +1212,7 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "\n               zlib compression strategy to use with the preceding\n");
      fprintf(STDERR,
-       "               preceding '-m method' argument.\n\n");
+       "               '-m method' argument.\n\n");
      }
 #if 0
      fprintf(STDERR,
@@ -1558,7 +1597,7 @@ main(int argc, char *argv[])
         (png_bytep)png_malloc(read_ptr, (png_uint_32)read_ptr->zbuf_size);
       }
       if(nosave == 0)
-      if(write_ptr->zbuf_size < (png_size_t)max_idat_size)
+      if(write_ptr->zbuf_size > (png_size_t)max_idat_size)
       {
       if(verbose > 2)
          printf("reinitializing write zbuf.\n");
@@ -1697,6 +1736,7 @@ main(int argc, char *argv[])
 
                png_set_compression_window_bits(write_ptr, compression_window);
             }
+
             if(verbose > 1)
                 fprintf(STDERR, "   Setting IHDR\n");
 
@@ -1833,7 +1873,7 @@ main(int argc, char *argv[])
 #endif
 #if defined(PNG_READ_oFFs_SUPPORTED) && defined(PNG_WRITE_oFFs_SUPPORTED)
       {
-         png_uint_32 offset_x, offset_y;
+         png_int_32 offset_x, offset_y;
          int unit_type;
 
          if (png_get_oFFs(read_ptr, read_info_ptr,&offset_x,&offset_y,&unit_type))
@@ -1993,6 +2033,8 @@ main(int argc, char *argv[])
 
      if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
      {
+        if (plte_len > 0)
+           num_palette=plte_len;
         if(output_color_type == 3)
            png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
         else if(keep_chunk("PLTE",argv))
@@ -2477,6 +2519,10 @@ png_measure_idat(png_structp png_ptr, png_infop info_ptr)
 
    for(;;)
    {
+#ifdef PNG_USE_LOCAL_ARRAYS
+      PNG_IDAT;
+      PNG_IEND;
+#endif
       png_byte chunk_length[4];
       png_byte chunk_name[5];
       png_uint_32 length;
