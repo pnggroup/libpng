@@ -33,7 +33,7 @@ RANLIB=echo
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.3rc2
+PNGMIN = 1.2.3rc3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -127,13 +127,15 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
 	cp $(LIBNAME).so.$(PNGVER) $(DESTDIR)$(LIBPATH)
 	chmod 755 $(DESTDIR)$(LIBPATH)/$(LIBNAME).so.$(PNGVER)
 	(cd $(DESTDIR)$(LIBPATH); \
-	ln -sf $(LIBNAME).so.$(PNGVER) libpng.so; \
+	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.3; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.3.$(PNGMIN); \
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 	-@if [ ! -d $(DESTDIR)$(LIBPATH)/pkgconfig ]; then \
 	mkdir $(DESTDIR)$(LIBPATH)/pkgconfig; fi
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.12.pc
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.pc
 	cp libpng.pc $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
 	chmod 644 $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
 	(cd $(DESTDIR)$(LIBPATH)/pkgconfig; ln -f -s libpng12.pc libpng.pc)

@@ -17,7 +17,7 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.3rc2
+PNGMIN = 1.2.3rc3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
@@ -105,15 +105,17 @@ install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) libpng
 	libpng.3.$(SHARED_POSTFIX); \
 	ln -f -s $(LIBNAME).$(PNGVER).$(SHARED_POSTFIX) \
 	libpng.3.$(PNGMIN).$(SHARED_POSTFIX); \
-	ln -sf $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
+	ln -f -s $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
 	$(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX); \
-	ln -sf $(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX) \
+	ln -f -s $(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX) \
 	$(LIBNAME).$(SHAREDLIB_POSTFIX))
 	-@if [ ! -d $(DESTDIR)$(LIBPATH)/pkgconfig ]; then \
 	mkdir $(DESTDIR)$(LIBPATH)/pkgconfig; fi
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.12.pc
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.pc
 	cp libpng.pc $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
 	chmod 644 $(DESTDIR)$(LIBPATH)/pkgconfig/libpng12.pc
-	(cd $(DESTDIR)$(LIBPATH)/pkgconfig; ln -sf libpng12.pc libpng.pc)
+	(cd $(DESTDIR)$(LIBPATH)/pkgconfig; ln -f -s libpng12.pc libpng.pc)
 
 install-man: libpng.3 libpngpf.3 png.5
 	-@if [ ! -d $(MANPATH) ]; then mkdir $(MANPATH); fi

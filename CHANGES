@@ -1097,6 +1097,9 @@ version 1.2.3rc2 [May 1, 2002]
     png_default_flush(), and png_push_fill_buffer() and included them in
     module definition files.
   Added "libpng.pc" dependency to the "install-shared" target in 15 makefiles.
+version 1.2.3rc3 [May 1, 2002]
+  Revised prototype for png_default_flush()
+  Remove old libpng.pc and libpngNN.pc before installing new ones.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

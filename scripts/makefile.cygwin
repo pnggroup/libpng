@@ -52,7 +52,7 @@ CFLAGS=$(MINGW_CCFLAGS) -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 LIBNAME=libpng12
 PNGMAJ = 0
 PNGDLL = 12
-PNGMIN = 1.2.3rc2
+PNGMIN = 1.2.3rc3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(PNGDLL).dll
@@ -162,6 +162,8 @@ install-shared: $(SHAREDLIB) libpng.pc install-headers install-man
 	-@if [ ! -d $(DESTDIR)$(BINPATH) ]; then mkdir -p $(DESTDIR)$(BINPATH); fi
 	-@if [ ! -d $(DESTDIR)$(LIBPATH)/pkgconfig ]; then \
 	mkdir -p $(DESTDIR)$(LIBPATH)/pkgconfig; fi
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.12.pc
+	-@/bin/rm -f $(DESTDIR)$(LIBPATH)/pkgconfig/libpng.pc
 	install -m 644 $(IMPLIB) $(DESTDIR)$(LIBPATH)/$(LIBNAME).dll.a
 	-@rm -f $(DESTDIR)$(LIBPATH)/$(IMPLIB)
 	(cd $(DESTDIR)$(LIBPATH); ln -sf $(LIBNAME).dll.a $(IMPLIB))
