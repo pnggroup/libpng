@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.0.10 - March 30, 2001
+ * libpng version 1.0.11beta1 - April 4, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -4886,7 +4886,7 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
 
 #if defined(PNG_HAVE_ASSEMBLER_READ_FILTER_ROW)
 
-// Optimized png_read_filter_row routines
+/* Optimized png_read_filter_row routines */
 
 void /* PRIVATE */
 png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
@@ -4959,7 +4959,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
                *rp = (png_byte)(((int)(*rp) + (int)(*lp++)) & 0xff);
                rp++;
             }
-         }  //end !UseMMX_sub
+         }  /* end !UseMMX_sub */
          break;
 
       case PNG_FILTER_VALUE_UP:
@@ -4983,7 +4983,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
                *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
                rp++;
             }
-         }  //end !UseMMX_up
+         }  /* end !UseMMX_up */
          break;
 
       case PNG_FILTER_VALUE_AVG:
@@ -5017,7 +5017,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
                   ((int)(*pp++ + *lp++) >> 1)) & 0xff);
                rp++;
             }
-         }  //end !UseMMX_avg
+         }  /* end !UseMMX_avg */
          break;
 
       case PNG_FILTER_VALUE_PAETH:
@@ -5080,7 +5080,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
                *rp = (png_byte)(((int)(*rp) + p) & 0xff);
                rp++;
             }
-         }  //end !UseMMX_paeth
+         }  /* end !UseMMX_paeth */
          break;
 
       default:

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.10 - March 30, 2001
+ * libpng 1.0.11beta1 - April 4, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -715,7 +715,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.10
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.11beta1
  */
 
 void PNGAPI
@@ -764,7 +764,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.10
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.11beta1
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -1322,7 +1322,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
       info_ptr->free_me |= PNG_FREE_ROWS;
 #endif
       for (row = 0; row < (int)info_ptr->height; row++)
-         info_ptr->row_pointers[row] = png_malloc(png_ptr,
+         info_ptr->row_pointers[row] = (png_bytep)png_malloc(png_ptr,
             png_get_rowbytes(png_ptr, info_ptr));
    }
 

@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.10 - March 30, 2001
+ * libpng 1.0.11beta1 - April 4, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -247,12 +247,6 @@
 #    endif
 #  endif /* __linux__ */
 #endif /* PNG_SETJMP_SUPPORTED */
-
-#if defined(_AIX) && defined(__xlC__)
-/* This prevents "AIX/xlC" from generating an "index(s,c)" macro in strings.h
- * that conflicts with libpng's png_color_16.index */
-#  undef __STR__
-#endif
 
 #ifdef BSD
 #  include <strings.h>

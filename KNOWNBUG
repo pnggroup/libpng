@@ -1,4 +1,15 @@
 
 Known bugs in libpng-1.0.10
 
-None as of March 30, 2001.
+1. April 1, 2001: Missing type casts on png_malloc() calls (Dimitri Papadopolous)
+
+   A call to png_malloc() in pngread.c is missing the (png_bytep) type cast,
+   and four calls in pngset.c are missing type casts, (png_charp), (png_charp),
+   (png_bytep), and (png_bytep), respectively.
+
+   STATUS: fixed in libpng-1.0.11beta1.
+
+2. April 3, 2001: "//" comments cause the SGI compiler (o32) to fail to
+   compile pnggccrd.c (Richard Kettlewell).
+
+   STATUS: fixed in libpng-1.0.11beta1.
