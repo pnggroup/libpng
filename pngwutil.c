@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.9beta5 - December 15, 2000
+ * libpng 1.0.9beta6 - December 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -131,6 +131,8 @@ png_write_sig(png_structp png_ptr)
    /* write the rest of the 8 byte signature */
    png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
       (png_size_t)8 - png_ptr->sig_bytes);
+   if(png_ptr->sig_bytes < 3)
+      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
 }
 
 #if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_iCCP_SUPPORTED)
@@ -419,9 +421,21 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
       compression_type = PNG_COMPRESSION_TYPE_BASE;
    }
 
+   /* Write filter_method 64 (intrapixel differencing) only if
+    * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
+    * 2. Libpng did not write a PNG signature (this filter_method is only
+    *    used in PNG datastreams that are embedded in MNG datastreams) and
+    * 3. The application called png_permit_mng_features with a mask that
+    *    included PNG_FLAG_MNG_FILTER_64 and
+    * 4. The filter_method is 64 and
+    * 5. The color_type is RGB or RGBA
+    */
    if (
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
       !((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+      ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
+      (color_type == PNG_COLOR_TYPE_RGB || 
+       color_type == PNG_COLOR_TYPE_RGB_ALPHA) &&
       (filter_type == PNG_INTRAPIXEL_DIFFERENCING)) &&
 #endif
       filter_type != PNG_FILTER_TYPE_BASE)

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.9beta5 - December 15, 2000
+ * libpng 1.0.9beta6 - December 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -353,15 +353,31 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (compression_type != PNG_COMPRESSION_TYPE_BASE)
       png_error(png_ptr, "Unknown compression method in IHDR");
 
-   if(
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
-      !((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+   /* Accept filter_method 64 (intrapixel differencing) only if
+    * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
+    * 2. Libpng did not read a PNG signature (this filter_method is only
+    *    used in PNG datastreams that are embedded in MNG datastreams) and
+    * 3. The application called png_permit_mng_features with a mask that
+    *    included PNG_FLAG_MNG_FILTER_64 and
+    * 4. The filter_method is 64 and
+    * 5. The color_type is RGB or RGBA
+    */
+   if((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&png_ptr->mng_features_permitted)
+      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream\n");
+   if(!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
       (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
+      ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
       (color_type == PNG_COLOR_TYPE_RGB || 
        color_type == PNG_COLOR_TYPE_RGB_ALPHA)) &&
-#endif
-      filter_type != PNG_FILTER_TYPE_BASE)
+       filter_type != PNG_FILTER_TYPE_BASE)
       png_error(png_ptr, "Unknown filter method in IHDR");
+   if(filter_type != PNG_FILTER_TYPE_BASE)
+      png_warning(png_ptr, "Invalid filter method in IHDR");
+#else
+   if(filter_type != PNG_FILTER_TYPE_BASE)
+      png_error(png_ptr, "Unknown filter method in IHDR");
+#endif
 
    /* set internal variables */
    png_ptr->width = width;

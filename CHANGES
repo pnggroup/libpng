@@ -857,6 +857,11 @@ version 1.0.9beta4 [December 1, 2000]
   Increased the first part of msg buffer from 16 to 18 in png_chunk_error().
 version 1.0.9beta5 [December 15, 2000]
   Added support for filter method 64 (for PNG datastreams embedded in MNG)
+version 1.0.9beta6 [December 18, 2000]
+  Revised png_set_filter() to accept filter method 64 when appropriate.
+  Added new PNG_HAVE_PNG_SIGNATURE bit to png_ptr->mode and use it to
+    help prevent applications from using MNG features in PNG datastreams.
+  Revised libpng.3/libpng.txt.  Changed "filter type" to "filter method".
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

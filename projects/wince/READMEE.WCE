@@ -8,9 +8,9 @@ libpng for WindowsCE Rel.1.0
 
 Introduction
 ============
-This is libpng 1.0.9beta5 ported to WindowsCE 2.0 and 2.11.
-libpng 1.0.9beta5 is a PNG reference library.
-See README, a document of original libpng 1.0.9beta5.
+This is libpng 1.0.9beta6 ported to WindowsCE 2.0 and 2.11.
+libpng 1.0.9beta6 is a PNG reference library.
+See README, a document of original libpng 1.0.9beta6.
 
 zlib for WindowsCE
 ==================
@@ -23,7 +23,7 @@ This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
 arising from the use of this software.
 
-See README and LICENSE, documents of original libpng 1.0.9beta5, for conditions
+See README and LICENSE, documents of original libpng 1.0.9beta6, for conditions
 of use and distribution.
 
 Files

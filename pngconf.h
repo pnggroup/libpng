@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.9beta5 - December 15, 2000
+ * libpng 1.0.9beta6 - December 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -491,9 +491,12 @@
 #endif
 #endif
 
+/* Disable if you don't need to support PNGs that are embedded in MNG
+   datastreams */
 #ifndef PNG_NO_MNG_FEATURES
-#define PNG_MNG_FEATURES_SUPPORTED  /* Useful for MNG applications */
+#define PNG_MNG_FEATURES_SUPPORTED
 #endif
+
 /* Deprecated, will be removed */
 #ifndef PNG_NO_READ_EMPTY_PLTE
 #define PNG_READ_EMPTY_PLTE_SUPPORTED
