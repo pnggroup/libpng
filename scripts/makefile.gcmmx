@@ -15,7 +15,7 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.5rc2
+PNGMIN = 1.2.5rc3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
@@ -104,10 +104,10 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/$(LIBNAME) -DPNG_THREAD_UNSAFE_OK \
-	   -DPNG_USE_PNGGCCRD\"; \
-	echo cflags=\"\"; \
-	echo ldflags=\"-L$(LIBPATH) -Wl,-rpath,$(LIBPATH)\"; \
+	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
+	echo cppflags=\"-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD\"; \
+	echo L_opts=\"-L$(LIBPATH)\"; \
+	echo R_opts=\"-Wl,-rpath,$(LIBPATH)\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
@@ -215,9 +215,9 @@ install: install-static install-shared install-man install-config
 
 test-installed:
 	$(CC) -I$(ZLIBINC) \
-	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
+	   `$(BINPATH)/libpng12-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) \
-	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs`
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags`
 	./pngtesti pngtest.png
 
 clean:
