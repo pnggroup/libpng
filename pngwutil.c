@@ -593,10 +593,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 
    if (key == NULL || (key_len = png_strlen(key)) == 0)
    {
-      char msg[40];
-
-      sprintf(msg, "Zero length %s keyword", png_ptr->chunk_name);
-      png_warning(png_ptr, msg);
+      png_chunk_warning(png_ptr, "zero length keyword");
       return 0;
    }
 
@@ -607,13 +604,16 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    /* Replace non-printing characters with a blank and print a warning */
    for (kp = key, dp = *new_key; *kp != '\0'; kp++, dp++)
    {
-      if (*kp < 0x20 || (*kp > 0x7E && *kp < 0xA1))
+      if (*kp < 0x20 || (*kp > 0x7E && (png_byte)*kp < 0xA1))
       {
+#if !defined(PNG_NO_STDIO)
          char msg[40];
 
-         sprintf(msg, "Invalid %s keyword character 0x%02X",
-            png_ptr->chunk_name, *kp);
-         png_warning(png_ptr, msg);
+         sprintf(msg, "invalid keyword character 0x%02X", *kp);
+         png_chunk_warning(png_ptr, msg);
+#else
+         png_chunk_warning(png_ptr, "invalid character in keyword");
+#endif
          *dp = ' ';
       }
       else
@@ -627,11 +627,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    kp = *new_key + key_len - 1;
    if (*kp == ' ')
    {
-      char msg[50];
-      sprintf(msg, "Trailing spaces removed from %s keyword",
-         png_ptr->chunk_name);
-
-      png_warning(png_ptr, msg);
+      png_chunk_warning(png_ptr, "trailing spaces removed from keyword");
 
       while (*kp == ' ')
       {
@@ -644,11 +640,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    kp = *new_key;
    if (*kp == ' ')
    {
-      char msg[50];
-      sprintf(msg, "Leading spaces removed from %s keyword",
-         png_ptr->chunk_name);
-
-      png_warning(png_ptr, msg);
+      png_chunk_warning(png_ptr, "leading spaces removed from keyword");
 
       while (*kp == ' ')
       {
@@ -681,19 +673,12 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 
    if (key_len == 0)
    {
-      char msg[40];
-
-      sprintf(msg, "Zero length %s keyword", png_ptr->chunk_name);
-      png_warning(png_ptr, msg);
+      png_chunk_warning(png_ptr, "zero length keyword");
    }
 
    if (key_len > 79)
    {
-      char msg[50];
-
-      sprintf(msg, "%s keyword length must be 1 - 79 characters",
-         png_ptr->chunk_name);
-      png_warning(png_ptr, msg);
+      png_chunk_warning(png_ptr, "keyword length must be 1 - 79 characters");
       new_key[79] = '\0';
       key_len = 79;
    }
@@ -714,10 +699,7 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
    png_debug(1, "in png_write_tEXt\n");
    if (key == NULL || (key_len = png_check_keyword(png_ptr, key, &new_key))==0)
    {
-      char msg[40];
-
-      sprintf(msg, "Empty keyword in %s chunk", "tEXt");
-      png_warning(png_ptr, msg);
+      png_warning(png_ptr, "Empty keyword in tEXt chunk");
       return;
    }
 
@@ -753,10 +735,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
 
    if (key == NULL || (key_len = png_check_keyword(png_ptr, key, &new_key))==0)
    {
-      char msg[40];
-
-      sprintf(msg, "Empty keyword in %s chunk", "zTXt");
-      png_warning(png_ptr, msg);
+      png_warning(png_ptr, "Empty keyword in zTXt chunk");
       return;
    }
 
@@ -771,9 +750,13 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
 
    if (compression >= PNG_TEXT_COMPRESSION_LAST)
    {
+#if !defined(PNG_NO_STDIO)
       char msg[50];
       sprintf(msg, "Unknown zTXt compression type %d", compression);
       png_warning(png_ptr, msg);
+#else
+      png_warning(png_ptr, "Unknown zTXt compression type");
+#endif
       compression = PNG_TEXT_COMPRESSION_zTXt;
    }
 
@@ -1389,10 +1372,10 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
  * been specified by the application, and then writes the row out with the
  * chosen filter.
  */
-#define PNG_MAXSUM (~0x0UL >> 1)
+#define PNG_MAXSUM (png_uint_32)(~0x0UL >> 1)
 #define PNG_HISHIFT 10
-#define PNG_LOMASK 0xffffL
-#define PNG_HIMASK (~PNG_LOMASK >> PNG_HISHIFT)
+#define PNG_LOMASK (png_uint_32)0xffffL
+#define PNG_HIMASK (png_uint_32)(~PNG_LOMASK >> PNG_HISHIFT)
 void
 png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 {

@@ -997,8 +997,10 @@ extern PNG_EXPORT(void,png_set_compression_method) PNGARG((png_structp png_ptr,
  * more information.
  */
 
+#if !defined(PNG_NO_STDIO)
 /* Initialize the input/output for the PNG file to the default functions. */
 extern PNG_EXPORT(void,png_init_io) PNGARG((png_structp png_ptr, FILE *fp));
+#endif
 
 /* Replace the (error and abort), and warning functions with user
  * supplied functions.  If no messages are to be printed you must still
@@ -1066,8 +1068,16 @@ extern void *far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,int check));
 extern PNG_EXPORT(void,png_error) PNGARG((png_structp png_ptr,
    png_const_charp error));
 
+/* The same, but the chunk name is prepended to the error string. */
+extern PNG_EXPORT(void,png_chunk_error) PNGARG((png_structp png_ptr,
+   png_const_charp error));
+
 /* Non-fatal error in libpng.  Can continue, but may have a problem. */
 extern PNG_EXPORT(void,png_warning) PNGARG((png_structp png_ptr,
+   png_const_charp message));
+
+/* Non-fatal error in libpng, chunk name is prepended to message. */
+extern PNG_EXPORT(void,png_chunk_warning) PNGARG((png_structp png_ptr,
    png_const_charp message));
 
 /* The png_set_<chunk> functions are for storing values in the png_info_struct.
@@ -1202,7 +1212,7 @@ extern PNG_EXPORT(void,png_set_sBIT) PNGARG((png_structp png_ptr,
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
 extern PNG_EXPORT(png_uint_32,png_get_sRGB) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_byte *srgb_intent));
+   png_infop info_ptr, png_bytep srgb_intent));
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
 #if defined(PNG_READ_sRGB_SUPPORTED) || defined(PNG_WRITE_sRGB_SUPPORTED)

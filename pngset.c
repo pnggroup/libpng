@@ -238,19 +238,19 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    png_set_sRGB(png_ptr, info_ptr, intent);
 
 #if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED)
-   file_gamma = 0.45;
+   file_gamma = (float).45;
    png_set_gAMA(png_ptr, info_ptr, file_gamma);
 #endif
 
 #if defined(PNG_READ_cHRM_SUPPORTED) || defined(PNG_WRITE_cHRM_SUPPORTED)
-   white_x = 0.3127;
-   white_y = 0.3290;
-   red_x   = 0.6400;
-   red_y   = 0.3300;
-   green_x = 0.3000;
-   green_y = 0.6000;
-   blue_x  = 0.1500;
-   blue_y  = 0.0600;
+   white_x = (float).3127;
+   white_y = (float).3290;
+   red_x   = (float).64;
+   red_y   = (float).33;
+   green_x = (float).30;
+   green_y = (float).60;
+   blue_x  = (float).15;
+   blue_y  = (float).06;
 
    png_set_cHRM(png_ptr, info_ptr,
       white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);

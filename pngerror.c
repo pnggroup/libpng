@@ -51,6 +51,60 @@ png_warning(png_structp png_ptr, png_const_charp message)
       png_default_warning(png_ptr, message);
 }
 
+/* These utilities are used internally to build an error message which relates
+ * to the current chunk.  The chunk name comes from png_ptr->chunk_name,
+ * this is used to prefix the message.  The message is limited in length
+ * to 63 bytes, the name characters are output as hex digits wrapped in []
+ * if the character is invalid.
+ */
+#define isnonalpha(c) ((c) < 41 || (c) > 122 || ((c) > 90 && (c) < 97))
+static const char png_digit[16] = {
+   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+};
+
+static void
+png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp message)
+{
+   int iout = 0, iin = 0;
+
+   while (iin < 4) {
+      int c = png_ptr->chunk_name[iin++];
+      if (isnonalpha(c)) {
+         buffer[iout++] = '[';
+         buffer[iout++] = png_digit[(c & 0xf0) >> 4];
+         buffer[iout++] = png_digit[c & 0xf];
+         buffer[iout++] = ']';
+      } else {
+         buffer[iout++] = c;
+      }
+   }
+
+   if (message == NULL)
+      buffer[iout++] = 0;
+   else {
+      buffer[iout++] = ':';
+      buffer[iout++] = ' ';
+      strncpy(buffer+iout, message, 64);
+      buffer[iout+63] = 0;
+   }
+}
+
+void
+png_chunk_error(png_structp png_ptr, png_const_charp message)
+{
+   char msg[16+64];
+   png_format_buffer(png_ptr, msg, message);
+   png_error(png_ptr, msg);
+}
+
+void
+png_chunk_warning(png_structp png_ptr, png_const_charp message)
+{
+   char msg[16+64];
+   png_format_buffer(png_ptr, msg, message);
+   png_warning(png_ptr, msg);
+}
+
 /* This is the default error handling function.  Note that replacements for
  * this function MUST NOT RETURN, or the program will likely crash.  This
  * function is used by default, or if the program supplies NULL for the

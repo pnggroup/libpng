@@ -33,6 +33,7 @@ png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       png_error(png_ptr, "Call to NULL read function");
 }
 
+#if !defined(PNG_NO_STDIO)
 /* This is the function which does the actual reading of data.  If you are
    not reading from a standard C stream, you should create a replacement
    read_data function and use it at run time with png_set_read_fn(), rather
@@ -103,6 +104,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    }
 }
 #endif
+#endif
 
 /* This function allows the application to supply a new input function
    for libpng if standard C streams aren't being used.
@@ -123,10 +125,14 @@ png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
 {
    png_ptr->io_ptr = io_ptr;
 
+#if !defined(PNG_NO_STDIO)
    if (read_data_fn != NULL)
       png_ptr->read_data_fn = read_data_fn;
    else
       png_ptr->read_data_fn = png_default_read_data;
+#else
+   png_ptr->read_data_fn = read_data_fn;
+#endif
 
    /* It is an error to write to a read device */
    png_ptr->write_data_fn = NULL;

@@ -1056,10 +1056,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 len
 
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
-      char msg[40];
-
-      sprintf(msg, "Unknown critical chunk %s", png_ptr->chunk_name);
-      png_error(png_ptr, msg);
+      png_chunk_error(png_ptr, "unknown critical chunk");
    }
 
    png_push_crc_skip(png_ptr, length);

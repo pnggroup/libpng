@@ -44,19 +44,190 @@
 /*  #define STDERR stderr  */
 #define STDERR stdout   /* for DOS */
 
-/* input and output filenames */
-#ifdef RISCOS
-PNG_CONST char *inname = "pngtest_png";
-PNG_CONST char *outname = "pngout_png";
+/* START of code to validate stdio-free compilation */
+/* These copies of the default read/write functions come from pngrio.c and */
+/* pngwio.c.  They allow "don't include stdio" testing of the library. */
+#if defined(PNG_NO_STDIO)
+/* This is the function which does the actual reading of data.  If you are
+   not reading from a standard C stream, you should create a replacement
+   read_data function and use it at run time with png_set_read_fn(), rather
+   than changing the library. */
+#ifndef USE_FAR_KEYWORD
+static void
+png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+   png_size_t check;
+
+   /* fread() returns 0 on error, so it is OK to store this in a png_size_t
+    * instead of an int, which is what fread() actually returns.
+    */
+   check = (png_size_t)fread(data, (png_size_t)1, length,
+      (FILE *)png_ptr->io_ptr);
+
+   if (check != length)
+   {
+      png_error(png_ptr, "Read Error");
+   }
+}
 #else
-PNG_CONST char *inname = "pngtest.png";
-PNG_CONST char *outname = "pngout.png";
+/* this is the model-independent version. Since the standard I/O library
+   can't handle far buffers in the medium and small models, we have to copy
+   the data.
+*/
+ 
+#define NEAR_BUF_SIZE 1024
+#define MIN(a,b) (a <= b ? a : b)
+ 
+static void
+png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+   int check;
+   png_byte *n_data;
+   FILE *io_ptr;
+
+   /* Check if data really is near. If so, use usual code. */
+   n_data = (png_byte *)CVT_PTR_NOCHECK(data);
+   io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
+   if ((png_bytep)n_data == data)
+   {
+      check = fread(n_data, 1, length, io_ptr);
+   }
+   else
+   {
+      png_byte buf[NEAR_BUF_SIZE];
+      png_size_t read, remaining, err;
+      check = 0;
+      remaining = length;
+      do
+      {
+         read = MIN(NEAR_BUF_SIZE, remaining);
+         err = fread(buf, (png_size_t)1, read, io_ptr);
+         png_memcpy(data, buf, read); /* copy far buffer to near buffer */
+         if(err != read)
+            break;
+         else
+            check += err;
+         data += read;
+         remaining -= read;
+      }
+      while (remaining != 0);
+   }
+   if (check != length)
+   {
+      png_error(png_ptr, "read Error");
+   }
+}
 #endif
 
-char inbuf[256], outbuf[256];
+#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+static void
+png_default_flush(png_structp png_ptr)
+{
+   FILE *io_ptr;
+   io_ptr = (FILE *)CVT_PTR((png_ptr->io_ptr));
+   if (io_ptr != NULL)
+      fflush(io_ptr);
+}
+#endif
 
-int
-main(int argc, char *argv[])
+/* This is the function which does the actual writing of data.  If you are
+   not writing to a standard C stream, you should create a replacement
+   write_data function and use it at run time with png_set_write_fn(), rather
+   than changing the library. */
+#ifndef USE_FAR_KEYWORD
+static void
+png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+   png_uint_32 check;
+
+   check = fwrite(data, 1, length, (FILE *)(png_ptr->io_ptr));
+   if (check != length)
+   {
+      png_error(png_ptr, "Write Error");
+   }
+}
+#else
+/* this is the model-independent version. Since the standard I/O library
+   can't handle far buffers in the medium and small models, we have to copy
+   the data.
+*/
+
+#define NEAR_BUF_SIZE 1024
+#define MIN(a,b) (a <= b ? a : b)
+
+static void
+png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+   png_uint_32 check;
+   png_byte *near_data;  /* Needs to be "png_byte *" instead of "png_bytep" */
+   FILE *io_ptr;
+
+   /* Check if data really is near. If so, use usual code. */
+   near_data = (png_byte *)CVT_PTR_NOCHECK(data);
+   io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
+   if ((png_bytep)near_data == data)
+   {
+      check = fwrite(near_data, 1, length, io_ptr);
+   }
+   else
+   {
+      png_byte buf[NEAR_BUF_SIZE];
+      png_size_t written, remaining, err;
+      check = 0;
+      remaining = length;
+      do
+      {
+         written = MIN(NEAR_BUF_SIZE, remaining);
+         png_memcpy(buf, data, written); /* copy far buffer to near buffer */
+         err = fwrite(buf, 1, written, io_ptr);
+         if (err != written)
+            break;
+         else
+            check += err;
+         data += written;
+         remaining -= written;
+      }
+      while (remaining != 0);
+   }
+   if (check != length)
+   {
+      png_error(png_ptr, "Write Error");
+   }
+}
+
+#endif
+
+/* This function is called when there is a warning, but the library thinks
+ * it can continue anyway.  Replacement functions don't have to do anything
+ * here if you don't want to.  In the default configuration, png_ptr is
+ * not used, but it is passed in case it may be useful.
+ */
+static void
+png_default_warning(png_structp png_ptr, png_const_charp message)
+{
+   PNG_CONST char *name = "UNKNOWN (ERROR!)";
+   if (png_ptr != NULL && png_ptr->error_ptr != NULL)
+      name = png_ptr->error_ptr;
+   fprintf(STDERR, "%s: libpng warning: %s\n", name, message);
+}
+
+/* This is the default error handling function.  Note that replacements for
+ * this function MUST NOT RETURN, or the program will likely crash.  This
+ * function is used by default, or if the program supplies NULL for the
+ * error function pointer in png_set_error_fn().
+ */
+static void
+png_default_error(png_structp png_ptr, png_const_charp message)
+{
+   png_default_warning(png_ptr, message);
+   /* We can return because png_error calls the default handler which is
+    * actually ok in this case. */
+}
+#endif
+/* END of code to validate stdio-free compilation */
+
+/* Test one file */
+int test(PNG_CONST char *inname, PNG_CONST char *outname)
 {
    FILE *fpin, *fpout;
    png_structp read_ptr, write_ptr;
@@ -69,29 +240,10 @@ main(int argc, char *argv[])
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;
 #endif   
+   
+   char inbuf[256], outbuf[256];
+
    row_buf = (png_bytep)NULL;
-
-   fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
-
-   if (strcmp(png_libpng_ver, PNG_LIBPNG_VER_STRING))
-   {
-      fprintf(STDERR,
-         "Warning: versions are different between png.h and png.c\n");
-      fprintf(STDERR, "  png.h version: %s\n", PNG_LIBPNG_VER_STRING);
-      fprintf(STDERR, "  png.c version: %s\n\n", png_libpng_ver);
-   }
-
-   if (argc > 1)
-     inname = argv[1];
-
-   if (argc > 2)
-     outname = argv[2];
-
-   if (argc > 3)
-   {
-     fprintf(stderr, "usage: %s [infile.png] [outfile.png]\n", argv[0]);
-     exit(1);
-   }
 
    if ((fpin = fopen(inname, "rb")) == NULL)
    {
@@ -109,8 +261,14 @@ main(int argc, char *argv[])
    png_debug(0, "Allocating read and write structures\n");
    read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)NULL, (png_error_ptr)NULL);
+#if defined(PNG_NO_STDIO)
+   png_set_error_fn(read_ptr, (png_voidp)inname, png_default_error, png_default_warning);
+#endif
    write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)NULL, (png_error_ptr)NULL);
+#if defined(PNG_NO_STDIO)
+   png_set_error_fn(write_ptr, (png_voidp)inname, png_default_error, png_default_warning);
+#endif
    png_debug(0, "Allocating read_info, write_info and end_info structures\n");
    read_info_ptr = png_create_info_struct(read_ptr);
    write_info_ptr = png_create_info_struct(read_ptr);
@@ -123,7 +281,7 @@ main(int argc, char *argv[])
    if (setjmp(read_ptr->jmpbuf))
 #endif
    {
-      fprintf(STDERR, "libpng read error\n");
+      fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       fclose(fpin);
@@ -139,7 +297,7 @@ main(int argc, char *argv[])
    if (setjmp(write_ptr->jmpbuf))
 #endif
    {
-      fprintf(STDERR, "libpng write error\n");
+      fprintf(STDERR, "%s -> %s: libpng write error\n", inname, outname);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       fclose(fpin);
@@ -151,8 +309,18 @@ main(int argc, char *argv[])
    png_memcpy(write_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
 #endif
    png_debug(0, "Initializing input and output streams\n");
+#if !defined(PNG_NO_STDIO)
    png_init_io(read_ptr, fpin);
    png_init_io(write_ptr, fpout);
+#else
+   png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
+   png_set_write_fn(write_ptr, (png_voidp)fpout,  png_default_write_data,
+#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+      png_default_flush);
+#else
+      NULL);
+#endif
+#endif
 
    png_debug(0, "Reading info struct\n");
    png_read_info(read_ptr, read_info_ptr);
@@ -398,8 +566,70 @@ main(int argc, char *argv[])
 
    fclose(fpin);
    fclose(fpout);
-   fprintf(STDERR, "libpng passes test\n");
 
    return 0;
 }
 
+/* input and output filenames */
+#ifdef RISCOS
+PNG_CONST char *inname = "pngtest_png";
+PNG_CONST char *outname = "pngout_png";
+#else
+PNG_CONST char *inname = "pngtest.png";
+PNG_CONST char *outname = "pngout.png";
+#endif
+
+int
+main(int argc, char *argv[])
+{
+   int multiple = 0;
+   int ierror = 0;
+
+   fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
+
+   if (strcmp(png_libpng_ver, PNG_LIBPNG_VER_STRING))
+   {
+      fprintf(STDERR,
+         "Warning: versions are different between png.h and png.c\n");
+      fprintf(STDERR, "  png.h version: %s\n", PNG_LIBPNG_VER_STRING);
+      fprintf(STDERR, "  png.c version: %s\n\n", png_libpng_ver);
+      ++ierror;
+   }
+
+   if (argc > 1)
+   {
+   if (strcmp(argv[1], "-m") == 0)
+      multiple = 1;
+   else
+      inname = argv[1];
+   }
+
+   if (!multiple && argc == 3)
+     outname = argv[2];
+
+   if (!multiple && argc > 3 || multiple && argc < 2)
+   {
+     fprintf(STDERR, "usage: %s [infile.png] [outfile.png]\n\t%s -m {infile.png}\n",
+        argv[0], argv[0]);
+     fprintf(STDERR, "  reads/writes one PNG file (without -m) or multiple files (-m)\n");
+     fprintf(STDERR, "  with -m %s is used as a temporary file\n", outname);
+     exit(1);
+   }
+
+   if (multiple)
+   {
+      int i;
+      for (i=2; i<argc; ++i)
+         ierror += test(argv[i], outname);
+   }
+   else
+   {
+      ierror += test(inname, outname);
+   }
+
+   if (ierror == 0)
+      fprintf(STDERR, "libpng passes test\n");
+   else
+      fprintf(STDERR, "libpng FAILS test\n");
+   return ierror != 0;
+}

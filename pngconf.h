@@ -21,7 +21,7 @@
  * an IDAT chunk.  Make this whatever size you feel is best for your
  * machine.  One of these will be allocated per png_struct.  When this
  * is full, it writes the data to the disk, and does some other
- * calculations.  Making this an extreamly small size will slow
+ * calculations.  Making this an extremely small size will slow
  * the library down, but you may want to experiment to determine
  * where it becomes significant, if you are concerned with memory
  * usage.  Note that zlib allocates at least 32Kb also.  For readers,
@@ -30,7 +30,9 @@
  * it should not make much difference how big this is.
  */
 
+#ifndef PNG_ZBUF_SIZE
 #define PNG_ZBUF_SIZE 8192
+#endif
 
 /* If you are running on a machine where you cannot allocate more
  * than 64K of memory at once, uncomment this.  While libpng will not
@@ -54,8 +56,9 @@
 
 /* We still need stdio.h for FILE even when PNG_NO_STDIO is defined.
  */
-
+#ifndef PNG_NO_STDIO 
 #include <stdio.h>
+#endif
 
 /* This macro protects us against machines that don't have function
  * prototypes (ie K&R style headers).  If your compiler does not handle
@@ -170,9 +173,15 @@ __dont__ include it again
  * a largish chunk of memory (32K), those who are not as concerned
  * with dithering quality can decrease some or all of these.
  */
+#ifndef PNG_DITHER_RED_BITS
 #define PNG_DITHER_RED_BITS 5
+#endif
+#ifndef PNG_DITHER_GREEN_BITS
 #define PNG_DITHER_GREEN_BITS 5
+#endif
+#ifndef PNG_DITHER_BLUE_BITS
 #define PNG_DITHER_BLUE_BITS 5
+#endif
 
 /* This controls how fine the gamma correction becomes when you
  * are only interested in 8 bits anyway.  Increasing this value
@@ -235,7 +244,6 @@ __dont__ include it again
 #ifdef PNG_READ_FULLY_SUPPORTED
 #define PNG_PROGRESSIVE_READ_SUPPORTED
 #define PNG_READ_OPT_PLTE_SUPPORTED
-#define PNG_READ_INTERLACING_SUPPORTED
 #define PNG_READ_EXPAND_SUPPORTED
 #define PNG_READ_SHIFT_SUPPORTED
 #define PNG_READ_PACK_SUPPORTED
@@ -252,6 +260,7 @@ __dont__ include it again
 #define PNG_READ_SWAP_ALPHA_SUPPORTED
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
 #endif /* PNG_READ_FULLY_SUPPORTED */
+#define PNG_READ_INTERLACING_SUPPORTED
 
 #ifdef PNG_WRITE_FULLY_SUPPORTED
 #define PNG_WRITE_INTERLACING_SUPPORTED
@@ -267,7 +276,9 @@ __dont__ include it again
 #define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif /*PNG_WRITE_FULLY_SUPPORTED */
 
+#if !defined(PNG_NO_STDIO)
 #define PNG_TIME_RFC1152_SUPPORTED
+#endif
 
 /* These are currently experimental features */
 #undef PNG_READ_16_TO_8_ACCURATE_SHIFT_SUPPORTED /* very little testing */

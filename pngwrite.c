@@ -24,7 +24,9 @@
 void
 png_write_info(png_structp png_ptr, png_infop info_ptr)
 {
+#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
    int i;
+#endif
 
    png_debug(1, "in png_write_info\n");
    png_write_sig(png_ptr); /* write PNG signature */
@@ -146,7 +148,9 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    /* see if user wants us to write information chunks */
    if (info_ptr != NULL)
    {
+#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
       int i; /* local index variable */
+#endif
 #if defined(PNG_WRITE_tIME_SUPPORTED)
       /* check to see if user has supplied a time chunk */
       if (info_ptr->valid & PNG_INFO_tIME &&
@@ -210,9 +214,22 @@ png_convert_to_rfc1152(png_structp png_ptr, png_timep ptime)
       png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, 29*sizeof(char));
    }
 
+#ifdef USE_FAR_KEYWORD
+   {
+      char near_time_buf[29];
+      sprintf(near_time_buf, "%d %s %d %02d:%02d:%02d +0000",
+               ptime->day % 31, short_months[ptime->month],
+               ptime->year, ptime->hour % 24, ptime->minute % 60,
+               ptime->second % 61);
+      png_memcpy(png_ptr->time_buffer, near_time_buf,
+      29*sizeof(char));
+   }
+#else
    sprintf(png_ptr->time_buffer, "%d %s %d %02d:%02d:%02d +0000",
-               ptime->day % 31, short_months[ptime->month], ptime->year,
-               ptime->hour % 24, ptime->minute % 60, ptime->second % 61);
+               ptime->day % 31, short_months[ptime->month],
+               ptime->year, ptime->hour % 24, ptime->minute % 60,
+               ptime->second % 61);
+#endif
    return png_ptr->time_buffer;
 }
 #endif /* PNG_TIME_RFC1152_SUPPORTED */
@@ -732,7 +749,9 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
    int num_weights, png_doublep filter_weights,
    png_doublep filter_costs)
 {
+#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
    int i;
+#endif
 
    png_debug(1, "in png_set_filter_heuristics\n");
    if (heuristic_method >= PNG_FILTER_HEURISTIC_LAST)

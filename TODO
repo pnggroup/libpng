@@ -3,8 +3,9 @@ pngtodo.txt - list of things to do for libpng
 add "grayscale->palette" transformation and "palette->grayscale" detection
 improved dithering
 multi-lingual error and warning message support
+sPLT chunk handling
 cHRM transformation
-sRGB chunk handling
+complete sRGB transformation (presently it simply uses gamma=0.5)
 man pages for function calls
 high-level API for reading images
 final bug fixes

@@ -88,20 +88,16 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
 
    if (png_crc_error(png_ptr))
    {
-      char msg[80];
-
-      sprintf(msg,"CRC error in %s", png_ptr->chunk_name);
-
       if ((png_ptr->chunk_name[0] & 0x20 &&                /* Ancillary */
            !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)) ||
           (!(png_ptr->chunk_name[0] & 0x20) &&             /* Critical  */
            png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE))
       {
-         png_warning(png_ptr, msg);
+         png_chunk_warning(png_ptr, "CRC error");
       }
       else
       {
-         png_error(png_ptr, msg);
+         png_chunk_error(png_ptr, "CRC error");
       }
       return 1;
    }
@@ -307,10 +303,6 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
    {
-      char msg[80];
-
-      sprintf(msg,"CRC error in %s", png_ptr->chunk_name);
-
       /* If we don't want to use the data from an ancillary chunk,
          we have two options: an error abort, or a warning and we
          ignore the data in this chunk (which should be OK, since
@@ -319,11 +311,11 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          if (png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)
          {
-            png_error(png_ptr, msg);
+            png_chunk_error(png_ptr, "CRC error");
          }
          else
          {
-            png_warning(png_ptr, msg);
+            png_chunk_warning(png_ptr, "CRC error");
             png_ptr->flags &= ~PNG_FLAG_FREE_PALETTE;
             png_free(png_ptr, palette);
             return;
@@ -332,7 +324,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Otherwise, we (optionally) emit a warning and use the chunk. */
       else if (!(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN))
       {
-         png_warning(png_ptr, msg);
+         png_chunk_warning(png_ptr, "CRC error");
       }
    }
 
@@ -406,7 +398,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if ((png_ptr->mode & PNG_HAVE_sRGB))
-      if(igamma != 50000)
+      if(igamma != (png_uint_32)50000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -416,7 +408,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if (png_ptr->mode & PNG_HAVE_sRGB)
-      if(igamma != 50000)
+      if(igamma != (png_uint_32)50000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -585,8 +577,8 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    val = png_get_uint_32(buf);
    blue_y = (float)val / (float)100000.0;
 
-   if (blue_x < 0 || blue_x > 0.8 || blue_y < 0 || blue_y > 0.8 ||
-       blue_x + blue_y > 1.0)
+   if (blue_x < (float)0 || blue_x > (float)0.8 || blue_y < (float)0 ||
+       blue_y > (float)0.8 || blue_x + blue_y > (float)1.0)
    {
       png_warning(png_ptr, "Invalid cHRM blue point");
       png_crc_finish(png_ptr, 0);
@@ -597,12 +589,20 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
-   if ((png_ptr->mode & PNG_HAVE_sRGB))
-      if(white_x != .3127 || white_y != .329 || red_x != .64 || red_y != .33 ||
-         green_x != .3 || green_y != .6 || blue_x != .15 || blue_y != .06)
+   if (png_ptr->mode & PNG_HAVE_sRGB)
       {
-         png_warning(png_ptr,
-           "Ignoring incorrect cHRM value when sRGB is also present");
+      if (fabs(white_x - (float).3127) > (float).001 ||
+          fabs(white_y - (float).3290) > (float).001 ||
+          fabs(  red_x - (float).6400) > (float).001 ||
+          fabs(  red_y - (float).3300) > (float).001 ||
+          fabs(green_x - (float).3000) > (float).001 ||
+          fabs(green_y - (float).6000) > (float).001 ||
+          fabs( blue_x - (float).1500) > (float).001 ||
+          fabs( blue_y - (float).6000) > (float).001)
+         {
+            png_warning(png_ptr,
+              "Ignoring incorrect cHRM value when sRGB is also present");
+         }
          return;
       }
 #endif /* PNG_READ_sRGB_SUPPORTED */
@@ -664,17 +664,17 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       already defined gamma and chrm with values that are
       inconsistent with sRGB -- for now, just ignore them */
 
-   file_gamma = 0.45;
+   file_gamma = (float)45000./(float)100000.;
    png_set_gAMA(png_ptr, info_ptr, file_gamma);
 
-   white_x = 0.3127;
-   white_y = 0.3290;
-   red_x   = 0.6400;
-   red_y   = 0.3300;
-   green_x = 0.3000;
-   green_y = 0.6000;
-   blue_x  = 0.1500;
-   blue_y  = 0.0600;
+   white_x = (float)31270./(float)100000.;
+   white_y = (float)32900./(float)100000.;
+   red_x   = (float)64000./(float)100000.;
+   red_y   = (float)33000./(float)100000.;
+   green_x = (float)30000./(float)100000.;
+   green_y = (float)60000./(float)100000.;
+   blue_x  = (float)15000./(float)100000.;
+   blue_y  = (float) 6000./(float)100000.;
 
    png_set_cHRM(png_ptr, info_ptr,
       white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
@@ -1342,10 +1342,14 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else /* if (comp_type >= PNG_TEXT_COMPRESSION_LAST) */
    {
       png_size_t text_size;
+#if !defined(PNG_NO_STDIO)
       char umsg[50];
 
       sprintf(umsg, "Unknown zTXt compression type %d", comp_type);
       png_warning(png_ptr, umsg);
+#else
+      png_warning(png_ptr, "Unknown zTXt compression type");
+#endif
 
       /* Copy what we can of the error message into the text chunk */
       text_size = (png_size_t)length - (text - key) - 1;
@@ -1380,10 +1384,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
-      char msg[40];
-
-      sprintf(msg, "Unknown critical chunk %s", png_ptr->chunk_name);
-      png_error(png_ptr, msg);
+      png_chunk_error(png_ptr, "unknown critical chunk");
    }
 
    if (png_ptr->mode & PNG_HAVE_IDAT)
@@ -1407,11 +1408,7 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    if (isnonalpha(chunk_name[0]) || isnonalpha(chunk_name[1]) ||
        isnonalpha(chunk_name[2]) || isnonalpha(chunk_name[3]))
    {
-      char msg[45];
-
-      sprintf(msg, "Invalid chunk type 0x%02X 0x%02X 0x%02X 0x%02X",
-         chunk_name[0], chunk_name[1], chunk_name[2], chunk_name[3]);
-      png_error(png_ptr, msg);
+      png_chunk_error(png_ptr, "invalid chunk type");
    }
 }
 

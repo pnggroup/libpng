@@ -111,13 +111,14 @@ png_get_gAMA(png_structp png_ptr, png_infop info_ptr, double *file_gamma)
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
 png_uint_32
-png_get_sRGB(png_structp png_ptr, png_infop info_ptr, png_byte *file_srgb_intent)
+png_get_sRGB(png_structp png_ptr, png_infop info_ptr, png_bytep
+    file_srgb_intent)
 {
    if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sRGB &&
-      *file_srgb_intent != NULL)
+      file_srgb_intent != NULL)
    {
       png_debug1(1, "in %s retrieval function\n", "sRGB");
-      *file_srgb_intent = (png_byte)info_ptr->srgb_intent;
+      *file_srgb_intent = info_ptr->srgb_intent;
       return (PNG_INFO_sRGB);
    }
    return (0);
