@@ -54,7 +54,7 @@ static int status_dots=1;
 void read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
 void read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
-    if(png_ptr == NULL || row_number > 0x3fffffff) return;
+    if(png_ptr == NULL || row_number > 0x3fffffffL) return;
     if(status_pass != pass)
     {
        fprintf(stdout,"\n Pass %d: ",pass);
@@ -72,7 +72,7 @@ void read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 void write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
 void write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
-    if(png_ptr == NULL || row_number > 0x3fffffff || pass > 7) return;
+    if(png_ptr == NULL || row_number > 0x3fffffffL || pass > 7) return;
     fprintf(stdout, "w");
 }
 
@@ -106,7 +106,7 @@ void count_black_pixels(png_structp png_ptr, png_row_infop row_info,
     {
        int pos=0;
        png_uint_32 n;
-       for (n=0; n<(int)row_info->width; n++)
+       for (n=0; n<row_info->width; n++)
        {
           if(row_info->bit_depth == 1)
              if(((*dp << pos++ )& 0x80) == 0) black_pixels++;
@@ -869,8 +869,8 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 PNG_CONST char *inname = "pngtest/png";
 PNG_CONST char *outname = "pngout/png";
 #else
-static char *inname = "pngtest.png";
-static char *outname = "pngout.png";
+static PNG_CONST char *inname = "pngtest.png";
+static PNG_CONST char *outname = "pngout.png";
 #endif
 
 int

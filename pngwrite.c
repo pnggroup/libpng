@@ -834,10 +834,10 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 
       if (png_ptr->filter_weights == NULL)
       {
-         png_ptr->filter_weights = png_malloc(png_ptr,
+         png_ptr->filter_weights = (png_uint_16p) png_malloc(png_ptr,
             (png_uint_32)(sizeof(png_uint_16) * num_weights));
 
-         png_ptr->inv_filter_weights = png_malloc(png_ptr,
+         png_ptr->inv_filter_weights = (png_uint_16p) png_malloc(png_ptr,
             (png_uint_32)(sizeof(png_uint_16) * num_weights));
 
          for (i = 0; i < num_weights; i++)
@@ -869,10 +869,10 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
     */
    if (png_ptr->filter_costs == NULL)
    {
-      png_ptr->filter_costs = png_malloc(png_ptr,
+      png_ptr->filter_costs = (png_uint_16p) png_malloc(png_ptr,
          (png_uint_32)(sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
 
-      png_ptr->inv_filter_costs = (png_uint_16p)png_malloc(png_ptr,
+      png_ptr->inv_filter_costs = (png_uint_16p) png_malloc(png_ptr,
          (png_uint_32)(sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
 
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
