@@ -56,7 +56,7 @@ libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
 	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
 
 libpng.so.$(PNGVER): $(OBJSDLL)
-	gcc -shared -Wl,-soname,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
+	$(CC) -shared -Wl,-soname,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
 	 $(OBJSDLL)
 
 pngtest: pngtest.o libpng.so

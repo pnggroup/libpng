@@ -1,5 +1,6 @@
 TODO - list of things to do for libpng
 
+fix problem with C++ and EXTERN "C"
 add "grayscale->palette" transformation and "palette->grayscale" detection
 improved dithering
 multi-lingual error and warning message support

@@ -262,3 +262,8 @@ version 0.99h [March 6, 1998, evening]
 version 1.00 [March 7, 1998]
    Changed several typedefs in pngrutil.c
    Added makefile.wat (Pawel Mrochen), updated makefile.tc3 (Willem van Schaik)
+   replaced "while(1)" with "for(;;)"
+   added PNGARG() to prototypes in pngtest.c and removed some prototypes
+   updated some of the makefiles (Tom Lane)
+   changed some typedefs (s_start, etc.) in pngrutil.c
+   fixed dimensions of "short_months" array in pngwrite.c

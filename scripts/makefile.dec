@@ -29,7 +29,7 @@ libpng.a: $(OBJS)
 	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a
-	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest

@@ -34,8 +34,8 @@ libpng.a: ansi2knr $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
-pngtest: pngtest.o libpng.a ansi2knr
-	cc -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+pngtest: pngtest.o libpng.a
+	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest

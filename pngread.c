@@ -154,7 +154,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       }
    }
 
-   while (1)
+   for(;;)
    {
       png_byte chunk_length[4];
       png_uint_32 length;

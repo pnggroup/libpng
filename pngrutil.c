@@ -2059,7 +2059,7 @@ png_read_finish_row(png_structp png_ptr)
 
       png_ptr->zstream.next_out = (Byte *)&extra;
       png_ptr->zstream.avail_out = (uInt)1;
-      do
+      for(;;)
       {
          if (!(png_ptr->zstream.avail_in))
          {
@@ -2102,7 +2102,7 @@ png_read_finish_row(png_structp png_ptr)
          if (!(png_ptr->zstream.avail_out))
             png_error(png_ptr, "Extra compressed data");
 
-      } while (1);
+      }
       png_ptr->zstream.avail_out = 0;
    }
 

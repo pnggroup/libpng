@@ -19,11 +19,11 @@
 /* The following "hides" PNG_MALLOC and PNG_FREE thus allowing the pngtest
    application to put a wrapper on top of them. */
 #ifdef PNGTEST_MEMORY_DEBUG
-   #define PNG_MALLOC png_debug_malloc
-   #define PNG_FREE   png_debug_free
+#define PNG_MALLOC png_debug_malloc
+#define PNG_FREE   png_debug_free
 #else
-   #define PNG_MALLOC png_malloc
-   #define PNG_FREE   png_free
+#define PNG_MALLOC png_malloc
+#define PNG_FREE   png_free
 #endif
 
 /* Borland DOS special memory handler */

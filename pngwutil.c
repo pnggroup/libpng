@@ -1383,10 +1383,10 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
  * been specified by the application, and then writes the row out with the
  * chosen filter.
  */
-#define PNG_MAXSUM (png_uint_32)(~0x0UL >> 1)
+#define PNG_MAXSUM (~((png_uint_32)0) >> 1)
 #define PNG_HISHIFT 10
-#define PNG_LOMASK (png_uint_32)0xffffL
-#define PNG_HIMASK (png_uint_32)(~PNG_LOMASK >> PNG_HISHIFT)
+#define PNG_LOMASK ((png_uint_32)0xffffL)
+#define PNG_HIMASK ((png_uint_32)(~PNG_LOMASK >> PNG_HISHIFT))
 void
 png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 {

@@ -225,8 +225,9 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 png_charp
 png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 {
-   const char *short_months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+   static const char *short_months[12][4] =
+	{"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
    if (png_ptr->time_buffer == NULL)
    {
