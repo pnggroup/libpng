@@ -19,7 +19,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
 LDSHARED=cc -lz -dynamiclib -compatibility_version $(VER) -current_version $(VER)
 
 PNGMAJ = 3
-PNGMIN = 1.2.1beta3
+PNGMIN = 1.2.1beta4
 VER = $(PNGMAJ).$(PNGMIN)
 SHAREDLIB=libpng
 SHAREDLIB_POSTFIX=dylib

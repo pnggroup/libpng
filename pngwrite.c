@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.1beta3 - October 27, 2001
+ * libpng 1.2.1beta4 - November 7, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -502,7 +502,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
              user_png_ver);
           png_warning(png_ptr, msg);
         }
-        sprintf(msg, "Application  is running with png.c from libpng-%.20s",
+        sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
            png_libpng_ver);
         png_warning(png_ptr, msg);
 #endif
@@ -556,7 +556,7 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
            user_png_ver);
         png_warning(png_ptr, msg);
       }
-      sprintf(msg, "Application  is running with png.c from libpng-%.20s",
+      sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
          png_libpng_ver);
       png_warning(png_ptr, msg);
    }
@@ -705,6 +705,11 @@ png_write_row(png_structp png_ptr, png_bytep row)
    /* initialize transformations and other stuff if first time */
    if (png_ptr->row_number == 0 && png_ptr->pass == 0)
    {
+   /* make sure we wrote the header info */
+   if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
+      png_error(png_ptr,
+         "png_write_info was never called before png_write_row.");
+
    /* check for transforms that have been set but were defined out */
 #if !defined(PNG_WRITE_INVERT_SUPPORTED) && defined(PNG_READ_INVERT_SUPPORTED)
    if (png_ptr->transformations & PNG_INVERT_MONO)

@@ -1,5 +1,5 @@
 
-Libpng 1.2.1beta3 - October 27, 2001
+Libpng 1.2.1beta4 - November 7, 2001
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -18,6 +18,11 @@ version 1.2.1beta2 [October 25, 2001]
 version 1.2.1beta3 [October 27, 2001]
   Removed type casts from all NULLs.
   Simplified png_create_struct_2().
+version 1.2.1beta4 [November 7, 2001]
+  Revised png_create_info_struct() and png_creat_struct_2().
+  Added error message if png_write_info() was omitted.
+  Type cast NULLs appearing in function calls when _NO_PROTO or
+    PNG_TYPECAST_NULL is defined.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.2.1beta3 - October 27, 2001
+ * libpng version 1.2.1beta4 - November 7, 2001
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_1beta3 Your_png_h_is_not_version_1_2_1beta3;
+typedef version_1_2_1beta4 Your_png_h_is_not_version_1_2_1beta4;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = "1.2.1beta3";
+const char png_libpng_ver[18] = "1.2.1beta4";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -212,14 +212,13 @@ png_create_info_struct(png_structp png_ptr)
    png_debug(1, "in png_create_info_struct\n");
    if(png_ptr == NULL) return (NULL);
 #ifdef PNG_USER_MEM_SUPPORTED
-   if ((info_ptr = (png_infop)png_create_struct_2(PNG_STRUCT_INFO,
-      png_ptr->malloc_fn, png_ptr->mem_ptr)) != NULL)
+   info_ptr = (png_infop)png_create_struct_2(PNG_STRUCT_INFO,
+      png_ptr->malloc_fn, png_ptr->mem_ptr);
 #else
-   if ((info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO)) != NULL)
+   info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO);
 #endif
-   {
+   if (info_ptr != NULL)
       png_info_init_3(&info_ptr, sizeof(png_info));
-   }
 
    return (info_ptr);
 }
@@ -646,7 +645,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ((png_charp) "\n libpng version 1.2.1beta3 - October 27, 2001\n\
+   return ((png_charp) "\n libpng version 1.2.1beta4 - November 7, 2001\n\
    Copyright (c) 1998-2001 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -664,8 +663,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) "1.2.1beta3");
-   return((png_charp) "1.2.1beta3");
+      return((png_charp) "1.2.1beta4");
+   return((png_charp) "1.2.1beta4");
 }
 
 png_charp PNGAPI
