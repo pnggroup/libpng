@@ -1,6 +1,7 @@
 # Commodore Amiga Makefile
 # makefile for libpng and SAS C V6.55 compiler
 # Copyright (C) 1995 Wolf Faust
+# For conditions of distribution and use, see copyright notice in png.h
 
 #compiler
 CC=sc

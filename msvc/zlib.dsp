@@ -19,9 +19,9 @@ CFG=zlib - Win32 DLL
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "zlib - Win32 DLL" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "zlib - Win32 DLL Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "zlib - Win32 Debug DLL" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "zlib - Win32 LIB" (based on "Win32 (x86) Static Library")
-!MESSAGE "zlib - Win32 LIB Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "zlib - Win32 Debug LIB" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -57,7 +57,7 @@ LINK32=link.exe
 # ADD LINK32 /nologo /dll /machine:I386
 # SUBTRACT LINK32 /pdb:none
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug"
+!ELSEIF  "$(CFG)" == "zlib - Win32 Debug DLL"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -110,7 +110,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
+!ELSEIF  "$(CFG)" == "zlib - Win32 Debug LIB"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -141,9 +141,9 @@ LIB32=link.exe -lib
 # Begin Target
 
 # Name "zlib - Win32 DLL"
-# Name "zlib - Win32 DLL Debug"
+# Name "zlib - Win32 Debug DLL"
 # Name "zlib - Win32 LIB"
-# Name "zlib - Win32 LIB Debug"
+# Name "zlib - Win32 Debug LIB"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -212,13 +212,13 @@ SOURCE=.\zlib.def
 
 !IF  "$(CFG)" == "zlib - Win32 DLL"
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug"
+!ELSEIF  "$(CFG)" == "zlib - Win32 Debug DLL"
 
 !ELSEIF  "$(CFG)" == "zlib - Win32 LIB"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
+!ELSEIF  "$(CFG)" == "zlib - Win32 Debug LIB"
 
 # PROP Exclude_From_Build 1
 
@@ -231,13 +231,13 @@ SOURCE=..\..\zlib\msdos\zlib.rc
 
 !IF  "$(CFG)" == "zlib - Win32 DLL"
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug"
+!ELSEIF  "$(CFG)" == "zlib - Win32 Debug DLL"
 
 !ELSEIF  "$(CFG)" == "zlib - Win32 LIB"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
+!ELSEIF  "$(CFG)" == "zlib - Win32 Debug LIB"
 
 # PROP Exclude_From_Build 1
 

@@ -1,5 +1,5 @@
 
-Libpng 1.0.7beta15 - May 29, 2000
+Libpng 1.0.7beta16 - June 4, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -81,6 +81,14 @@ Changes since the last public release (1.0.6):
   Worked around a problem in pngconf.h; AIX's strings.h defines an "index"
     macro that conflicts with libpng's png_color_16.index. (Dimitri Papadapoulos)
   Added "msvc" directory with MSVC++ project files (Simon-Pierre Cadieux).
+  Added PNG_NO_POINTER_INDEXING macro to use array-indexing instead of pointer
+    indexing in pngrutil.c and pngwutil.c to accommodate a buggy compiler.
+  Added a check for overlength PLTE chunk in pngrutil.c.
+  Added PNG_NO_POINTER_INDEXING macro to use array-indexing instead of pointer
+    indexing in pngrutil.c and pngwutil.c to accommodate a buggy compiler.
+  Added a warning in png_decompress_chunk() when it runs out of data.
+  Added PNG_USE_DLL macro.
+  Revised the copyright/disclaimer/license notice.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

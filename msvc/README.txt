@@ -1,5 +1,5 @@
 Microsoft Developer Studio Build File, Format Version 6.00 for
-libpng 1.0.7beta15 (May 29, 2000) and zlib
+libpng 1.0.7beta16 (June 4, 2000) and zlib
 
 Copyright (C) 2000 Simon-Pierre Cadieux
 For conditions of distribution and use, see copyright notice in png.h
@@ -25,14 +25,23 @@ This project will build the PNG Development Group's "official" versions of
 libpng and zlib libraries:
 
    libpng1.dll          (default version, currently C code only)
+   libpng1a.dll         (C + Assembler version)
+   libpng1b.dll         (C + Assembler debug version)
    libpng1d.dll         (C code debug version)
-   libpng1[a-c,e-m].dll (reserved for official versions)
+   libpng1[c,e-m].dll   (reserved for official versions) 
    libpng1[n-z].dll     (available for private versions)
-   zlib.dll             (default version)
+   zlib.dll             (default version, currently C code only)
    zlibd.dll            (debug version)
 
 If you change anything in libpng, or select different compiler settings,
 please change the library name to an unreserved name, and define
-PRIVATEBUILD or SPECIALBUILD accordingly.
+DLLFNAME_POSTFIX and (PRIVATEBUILD or SPECIALBUILD) accordingly. DLLFNAME_POSTFIX
+should correspond to a string in the range of "N" to "Z" depending on the letter 
+you choose for your private version.
 
+All DLLs built by this project use the Microsoft dynamic C runtime library
+MSVCRT.DLL (MSVCRTD.DLL for debug versions). If you distribute any of the
+above mentioned libraries you should also include this DLL in your package.
+For a list of files that are redistributable in Visual C++ 6.0, see
+Common\Redist\Redist.txt on Disc 1 of the Visual C++ 6.0 product CDs. 
 

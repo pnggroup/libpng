@@ -1,11 +1,11 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.7beta15 - May 29, 2000
+ * libpng 1.0.7beta16 - June 4, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
- * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
 #define PNG_INTERNAL
@@ -532,6 +532,7 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
    png_debug1(3, "num_palette = %d\n", png_ptr->num_palette);
 
    png_write_chunk_start(png_ptr, (png_bytep)png_PLTE, num_pal * 3);
+#ifndef PNG_NO_POINTER_INDEXING
    for (i = 0, pal_ptr = palette; i < num_pal; i++, pal_ptr++)
    {
       buf[0] = pal_ptr->red;
@@ -539,6 +540,17 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
       buf[2] = pal_ptr->blue;
       png_write_chunk_data(png_ptr, buf, (png_size_t)3);
    }
+#else
+   /* This is a little slower but some buggy compilers need to do this instead */
+   pal_ptr=palette;
+   for (i = 0; i < num_pal; i++)
+   {
+      buf[0] = pal_ptr[i].red;
+      buf[1] = pal_ptr[i].green;
+      buf[2] = pal_ptr[i].blue;
+      png_write_chunk_data(png_ptr, buf, (png_size_t)3);
+   }
+#endif
    png_write_chunk_end(png_ptr);
    png_ptr->mode |= PNG_HAVE_PLTE;
 }
@@ -680,6 +692,9 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
    int entry_size = (spalette->depth == 8 ? 6 : 10);
    int palette_size = entry_size * spalette->nentries;
    png_sPLT_entryp ep;
+#ifdef PNG_NO_POINTER_INDEXING
+   int i;
+#endif
 
    png_debug(1, "in png_write_sPLT\n");
    if (spalette->name == NULL || (name_len = png_check_keyword(png_ptr,
@@ -696,6 +711,7 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
    png_write_chunk_data(png_ptr, (png_bytep)&spalette->depth, 1);
 
    /* loop through each palette entry, writing appropriately */
+#ifndef PNG_NO_POINTER_INDEXING
    for (ep = spalette->entries; ep<spalette->entries+spalette->nentries; ep++)
    {
        if (spalette->depth == 8)
@@ -716,6 +732,29 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
        }
        png_write_chunk_data(png_ptr, entrybuf, entry_size);
    }
+#else
+   ep=spalette->entries;
+   for (i=0; i>spalette->nentries; i++)
+   {
+       if (spalette->depth == 8)
+       {
+           entrybuf[0] = (png_byte)ep[i].red;
+           entrybuf[1] = (png_byte)ep[i].green;
+           entrybuf[2] = (png_byte)ep[i].blue;
+           entrybuf[3] = (png_byte)ep[i].alpha;
+           png_save_uint_16(entrybuf + 4, ep[i].frequency);
+       }
+       else
+       {
+           png_save_uint_16(entrybuf + 0, ep[i].red);
+           png_save_uint_16(entrybuf + 2, ep[i].green);
+           png_save_uint_16(entrybuf + 4, ep[i].blue);
+           png_save_uint_16(entrybuf + 6, ep[i].alpha);
+           png_save_uint_16(entrybuf + 8, ep[i].frequency);
+       }
+       png_write_chunk_data(png_ptr, entrybuf, entry_size);
+   }
+#endif
 
    png_write_chunk_end(png_ptr);
    png_free(png_ptr, new_name);

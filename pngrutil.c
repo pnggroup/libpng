@@ -1,11 +1,11 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.7beta15 - May 29, 2000
+ * libpng 1.0.7beta16 - June 4, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
- * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
  * This file contains routines that are only called from within
  * libpng itself during the course of reading an image.
@@ -152,6 +152,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
    if (comp_type == PNG_TEXT_COMPRESSION_zTXt)
    {
+      int ret = Z_OK;
       png_ptr->zstream.next_in = (png_bytep)(chunkdata + prefix_size);
       png_ptr->zstream.avail_in = (uInt)(chunklength - prefix_size);
       png_ptr->zstream.next_out = png_ptr->zbuf;
@@ -162,7 +163,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
       while (png_ptr->zstream.avail_in)
       {
-         int ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
+         ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
          if (ret != Z_OK && ret != Z_STREAM_END)
          {
             if (png_ptr->zstream.msg != NULL)
@@ -222,6 +223,9 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             }
          }
       }
+      if (ret != Z_STREAM_END)
+         png_warning(png_ptr,
+         "End of datastream not found in a compressed chunk (other than IDAT)");
 
       inflateReset(&png_ptr->zstream);
       png_ptr->zstream.avail_in = 0;
@@ -354,6 +358,9 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_colorp palette;
    int num, i;
+#ifndef PNG_NO_POINTER_INDEXING
+   png_colorp pal_ptr;
+#endif
 
    png_debug(1, "in png_handle_PLTE\n");
 
@@ -378,7 +385,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif
 
-   if (length % 3)
+   if (length > 768 || length % 3)
    {
       if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
       {
@@ -396,6 +403,17 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    palette = (png_colorp)png_zalloc(png_ptr, (uInt)num, sizeof (png_color));
 
+#ifndef PNG_NO_POINTER_INDEXING
+   for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
+   {
+      png_byte buf[3];
+
+      png_crc_read(png_ptr, buf, 3);
+      pal_ptr->red = buf[0];
+      pal_ptr->green = buf[1];
+      pal_ptr->blue = buf[2];
+   }
+#else
    for (i = 0; i < num; i++)
    {
       png_byte buf[3];
@@ -406,6 +424,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       palette[i].green = buf[1];
       palette[i].blue = buf[2];
    }
+#endif
 
    /* If we actually NEED the PLTE chunk (ie for a paletted image), we do
       whatever the normal CRC configuration tells us.  However, if we
@@ -962,18 +981,19 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    for (profile = chunkdata; *profile; profile++)
       /* empty loop to find end of name */ ;
+
    ++profile;
 
-   /* there should be at least one NUL (the compression type byte)
+   /* there should be at least one zero (the compression type byte)
       following the separator, and we should be on it  */
-   if (profile >= chunkdata + slength)
+   if (*profile || profile >= chunkdata + slength)
    {
       png_free(png_ptr, chunkdata);
       png_warning(png_ptr, "malformed iCCP chunk");
       return;
    }
 
-   /* compression should always be zero */
+   /* compression_type should always be zero */
    compression_type = *profile++;
 
    prefix_length = profile - chunkdata;
@@ -994,6 +1014,9 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_bytep chunkdata;
    png_bytep entry_start;
    png_sPLT_t new_palette;
+#ifdef PNG_NO_POINTER_INDEXING
+   png_sPLT_entryp pp;
+#endif
    int data_length, entry_size, i;
    png_uint_32 skip = 0;
    png_size_t slength;
@@ -1057,6 +1080,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    new_palette.entries = (png_sPLT_entryp)png_malloc(
        png_ptr, new_palette.nentries * sizeof(png_sPLT_entry));
 
+#ifndef PNG_NO_POINTER_INDEXING
    for (i = 0; i < new_palette.nentries; i++)
    {
       png_sPLT_entryp pp = new_palette.entries + i;
@@ -1077,6 +1101,28 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
       pp->frequency = png_get_uint_16(entry_start); entry_start += 2;
    }
+#else
+   pp = new_palette.entries;
+   for (i = 0; i < new_palette.nentries; i++)
+   {
+
+      if (new_palette.depth == 8)
+      {
+          pp[i].red   = *entry_start++;
+          pp[i].green = *entry_start++;
+          pp[i].blue  = *entry_start++;
+          pp[i].alpha = *entry_start++;
+      }
+      else
+      {
+          pp[i].red   = png_get_uint_16(entry_start); entry_start += 2;
+          pp[i].green = png_get_uint_16(entry_start); entry_start += 2;
+          pp[i].blue  = png_get_uint_16(entry_start); entry_start += 2;
+          pp[i].alpha = png_get_uint_16(entry_start); entry_start += 2;
+      }
+      pp->frequency = png_get_uint_16(entry_start); entry_start += 2;
+   }
+#endif
 
    /* discard all chunk data except the name and stash that */
    new_palette.name = (png_charp)chunkdata;

@@ -1,11 +1,11 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.7beta15 - May 29, 2000
+ * libpng 1.0.7beta16 - June 4, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
- * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -1392,4 +1392,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7beta15 your_png_h_is_not_version_1_0_7beta15;
+typedef version_1_0_7beta16 your_png_h_is_not_version_1_0_7beta16;

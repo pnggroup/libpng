@@ -1,5 +1,5 @@
 
-Installing libpng version 1.0.7beta15 - May 29, 2000
+Installing libpng version 1.0.7beta16 - June 4, 2000
 
 Before installing libpng, you must first install zlib.  zlib
 can usually be found wherever you got libpng.  zlib can be
@@ -10,7 +10,7 @@ zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.0.7beta15" or "lpng106" and "zlib-1.1.3"
+might be called "libpng-1.0.7beta16" or "lpng106" and "zlib-1.1.3"
 or "zlib113") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -23,8 +23,10 @@ Your directory structure should look like this:
           *.c
           contrib
              gregbook
+             msvctest
              pngminus
              pngsuite
+          msvc
           scripts
              makefile.*
           pngtest.png
@@ -40,15 +42,18 @@ If the line endings in the files look funny, you may wish to get the other
 distribution of libpng.  It is available in both tar.gz (UNIX style line
 endings) and zip (DOS style line endings) formats.
 
-First enter the zlib directory and follow the instructions in zlib/README.
+If you are building libpng with MSVC, you can enter the msvc directory and
+follow the instructions in msvc/README.txt.
+
+Else enter the zlib directory and follow the instructions in zlib/README.
 Then come back here and choose the appropriate makefile.sys in the scripts
 directory.  
 The files that are presently available in the scripts directory
 include
 
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
- makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.7beta15)
- makefile.gcmmx    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.7beta15,
+ makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.7beta16)
+ makefile.gcmmx    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.7beta16,
                        uses assembler code tuned for Intel MMX platform)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
@@ -60,9 +65,9 @@ include
  makefile.intel    =>  Intel C/C++ version 4.0 and later
  libpng.icc        =>  Project file for IBM VisualAge/C++ version 4.0 or later
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
- makefile.sggcc    =>  Silicon Graphics (gcc, creates libpng.so.2.1.0.7beta15)
+ makefile.sggcc    =>  Silicon Graphics (gcc, creates libpng.so.2.1.0.7beta16)
  makefile.sunos    =>  Sun makefile
- makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0.7beta15)
+ makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0.7beta16)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.mips     =>  MIPS makefile
  makefile.acorn    =>  Acorn makefile

@@ -1,10 +1,10 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.7beta15 - May 29, 2000
+ * libpng 1.0.7beta16 - June 4, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
- * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -153,15 +153,16 @@
 #  endif /* __linux__ */
 #endif /* PNG_SETJMP_SUPPORTED */
 
+#if defined(_AIX) && defined(__xlC__)
+/* This prevents "AIX/xlC" from generating an "index(s,c)" macro in strings.h
+ * that conflicts with libpng's png_color_16.index */
+#undef __STR__
+#endif
+
 #ifdef BSD
 #include <strings.h>
 #else
 #include <string.h>
-#endif
-
-#ifdef _AIX
-/* "index" macro in AIX strings.h conflicts with libpng's png_color_16.index */
-#undef index
 #endif
 
 /* Other defines for things like memory and the like can go here.  */
@@ -527,6 +528,11 @@ defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 /* some testing */
 /*
 #define PNG_READ_BIG_ENDIAN_SUPPORTED
+*/
+
+/* Buggy compilers (e.g., gcc 2.7.2.2) need this */
+/*
+#define PNG_NO_POINTER_INDEXING
 */
 
 /* These functions are turned off by default, as they will be phased out. */
@@ -922,13 +928,13 @@ typedef z_stream FAR *  png_zstreamp;
  * Define PNG_BUILD_DLL if the module being built is a Windows
  * LIBPNG DLL.
  *
- * Define PNG_DLL if you want to *link* to the Windows LIBPNG DLL.
+ * Define PNG_USE_DLL if you want to *link* to the Windows LIBPNG DLL.
  * It is equivalent to Microsoft predefined macro _DLL which is
  * automatically defined when you compile using the share
  * version of the CRT (C Run-Time library)
  */
 
-#if !defined(PNG_DLL) && defined(PNG_BUILD_DLL)
+#if !defined(PNG_DLL) && (defined(PNG_BUILD_DLL) || defined(PNG_USE_DLL))
 #  define PNG_DLL
 #endif
 
