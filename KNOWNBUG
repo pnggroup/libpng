@@ -74,3 +74,10 @@ Known bugs and suggested enhancements in libpng-1.0.5
    The new pnggccrd.c has syntax errors when compiled with gcc.
 
    STATUS: Under investigation.
+
+8. February 2000 -- BUG
+
+   When an RGBA file is expanded, only 24 or 48 bits per pixel are reserved
+   in rowbytes.
+
+   STATUS: Fixed in libpng-1.0.5s

@@ -24,8 +24,8 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) \
-	-funroll-loops -fomit-frame-pointer	# $(WARNMORE) -g -DPNG_DEBUG=5
+CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
+        -fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
 
 RANLIB=ranlib
@@ -34,7 +34,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.5q
+PNGMIN = 1.0.5s
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -74,7 +74,8 @@ test: pngtest
 	./pngtest
 
 install: libpng.a libpng.so.$(PNGVER)
-	-@mkdir $(INCPATH) $(LIBPATH)
+ 	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
+ 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	cp png.h pngconf.h $(INCPATH)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
 	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)

@@ -1,6 +1,6 @@
 /* pngasmrd.h - assembler version of utilities to read a PNG file
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1999, 2000 Glenn Randers-Pehrson
  *
@@ -9,24 +9,27 @@
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 
 /* Set this in the makefile for VC++ on Pentium, not in pngconf.h */
-#ifdef PNG_USE_PNGVCRD
 /* Platform must be Pentium.  Makefile must assemble and load pngvcrd.c .
  * MMX will be detected at run time and used if present.
  */
-#define PNG_HAVE_ASSEMBLER_COMBINE_ROW
-#define PNG_HAVE_ASSEMBLER_READ_INTERLACE
-#define PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+#ifdef PNG_USE_PNGVCRD
+#  define PNG_HAVE_ASSEMBLER_COMBINE_ROW
+#  define PNG_HAVE_ASSEMBLER_READ_INTERLACE
+#  define PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
 #endif
 
-/* Set this in the makefile for gcc on Pentium, not in pngconf.h */
-#ifdef PNG_USE_PNGGCCRD
-/* Platform must be Pentium.  Makefile must assemble and load pnggccrd.c
- * (not available in libpng 1.0.5q).
+/* Set this in the makefile for gcc/as on Pentium, not in pngconf.h */
+/* Platform must be Pentium.  Makefile must assemble and load pnggccrd.c .
  * MMX will be detected at run time and used if present.
  */
-#define PNG_HAVE_ASSEMBLER_COMBINE_ROW
-#define PNG_HAVE_ASSEMBLER_READ_INTERLACE
-#define PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+#ifdef PNG_USE_PNGGCCRD
+#  define PNG_HAVE_ASSEMBLER_COMBINE_ROW
+#  define PNG_HAVE_ASSEMBLER_READ_INTERLACE
+#  define PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
 #endif
+/*
+    GRR notes:
+      - see pnggccrd.c for info about what is currently enabled
+ */
 
 #endif

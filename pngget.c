@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -28,6 +28,17 @@ png_get_rowbytes(png_structp png_ptr, png_infop info_ptr)
    else
       return(0);
 }
+
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+png_bytepp
+png_get_rows(png_structp png_ptr, png_infop info_ptr)
+{
+   if (png_ptr != NULL && info_ptr != NULL)
+      return(info_ptr->row_pointers);
+   else
+      return(0);
+}
+#endif
 
 #ifdef PNG_EASY_ACCESS_SUPPORTED
 /* easy access to info, added in libpng-0.99 */
@@ -239,35 +250,35 @@ png_uint_32
 png_get_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
    return ((png_uint_32)((float)png_get_pixels_per_meter(png_ptr, info_ptr)
-     *.03937 +.5)
+     *.0254 +.5);
 }
 
 png_uint_32
 png_get_x_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
    return ((png_uint_32)((float)png_get_x_pixels_per_meter(png_ptr, info_ptr)
-     *.03937 +.5)
+     *.0254 +.5);
 }
 
 png_uint_32
 png_get_y_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
    return ((png_uint_32)((float)png_get_y_pixels_per_meter(png_ptr, info_ptr)
-     *.03937 +.5)
+     *.0254 +.5);
 }
 
 float
 png_get_x_offset_inches(png_structp png_ptr, png_infop info_ptr)
 {
    return ((float)png_get_x_offset_microns(png_ptr, info_ptr)
-     *.03937/1000000. +.5)
+     *.00003937);
 }
 
 float
 png_get_y_offset_inches(png_structp png_ptr, png_infop info_ptr)
 {
    return ((float)png_get_y_offset_microns(png_ptr, info_ptr)
-     *.03937/1000000. +.5)
+     *.00003937)
 }
 
 #if defined(PNG_READ_pHYs_SUPPORTED)
@@ -296,8 +307,8 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
          retval |= PNG_INFO_pHYs;
          if(unit_type == 1)
          {
-            if (res_x != NULL) *res_x = (png_uint_32)(*res_x * 39.37 + .50);
-            if (res_y != NULL) *res_y = (png_uint_32)(*res_y * 39.37 + .50);
+            if (res_x != NULL) *res_x = (png_uint_32)(*res_x * .0254 + .50);
+            if (res_y != NULL) *res_y = (png_uint_32)(*res_y * .0254 + .50);
          }
       }
    }
@@ -477,7 +488,7 @@ png_get_iCCP(png_structp png_ptr, png_infop info_ptr,
 
 #if defined(PNG_READ_sPLT_SUPPORTED)
 png_uint_32
-png_get_spalettes(png_structp png_ptr, png_infop info_ptr,
+png_get_sPLT(png_structp png_ptr, png_infop info_ptr,
              png_spalette_pp spalettes)
 {
    if (png_ptr != NULL && info_ptr != NULL && spalettes != NULL)
@@ -703,6 +714,8 @@ png_get_text(png_structp png_ptr, png_infop info_ptr, png_textp *text_ptr,
          *num_text = info_ptr->num_text;
       return ((png_uint_32)info_ptr->num_text);
    }
+   if (num_text != NULL)
+     *num_text = 0;
    return(0);
 }
 #endif

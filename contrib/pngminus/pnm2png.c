@@ -386,7 +386,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
   }
 
   /* setjmp() must be called in every function that calls a PNG-reading libpng function */
-  if (setjmp (png_ptr->jmpbuf))
+  if (setjmp (png_jmp_env(png_ptr)))
   {
     png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
     return FALSE;

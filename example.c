@@ -111,7 +111,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     * the normal method of doing things with libpng).  REQUIRED unless you
     * set up your own error handlers in the png_create_read_struct() earlier.
     */
-   if (setjmp(png_ptr->jmpbuf))
+   if (setjmp(png_jmp_env(png_ptr)))
    {
       /* Free all of the memory associated with the png_ptr and info_ptr */
       png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
@@ -405,7 +405,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
       return ERROR;
    }
 
-   if (setjmp((*png_ptr)->jmpbuf))
+   if (setjmp(png_jmp_env((*png_ptr))))
    {
       png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
       return ERROR;
@@ -433,7 +433,7 @@ int
 process_data(png_structp *png_ptr, png_infop *info_ptr,
    png_bytep buffer, png_uint_32 length)
 {
-   if (setjmp((*png_ptr)->jmpbuf))
+   if (setjmp(png_jmp_env((*png_ptr))))
    {
       /* Free the png_ptr and info_ptr memory on error */
       png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
@@ -515,6 +515,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    FILE *fp;
    png_structp png_ptr;
    png_infop info_ptr;
+   png_colorp palette;
 
    /* open the file */
    fp = fopen(file_name, "wb");
@@ -592,11 +593,9 @@ void write_png(char *file_name /* , ... other image information ... */)
    palette = (png_colorp)png_malloc(png_ptr, 256 * sizeof (png_color));
    /* ... set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, 256);
-   /* You can free the palette here if you like, since libpng has made its
-      own copy.  In versions of libpng earlier than version 1.0.5n, it was
-      necessary to keep the palette until after png_write_end(), because
-      libpng was using the caller's copy. */
-   free(palette);
+   /* You must not free palette here, because png_set_PLTE only makes a link to
+      the palette that you malloced.  Wait until you are about to destroy
+      the png structure. */
 
    /* optional significant bit chunk */
    /* if we are dealing with a grayscale image then */
@@ -699,10 +698,10 @@ void write_png(char *file_name /* , ... other image information ... */)
     * use the first method if you aren't handling interlacing yourself.
     */
    png_uint_32 k, height, width;
-   png_byte image[height][width];
+   png_byte image[height][width*bytes_per_pixel];
    png_bytep row_pointers[height];
    for (k = 0; k < height; k++)
-     row_pointers[k] = image + k*width;
+     row_pointers[k] = image + k*width*bytes_per_pixel;
 
    /* One of the following output methods is REQUIRED */
 #ifdef entire /* write out the entire image data in one call */
@@ -737,11 +736,17 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_write_end(png_ptr, info_ptr);
 #endif hilevel
 
-   /* if you malloced a palette and have not already freed it, free it
-      here (do *not* free libpng's copy of the palette in info_ptr->palette,
-      as recommended in versions 1.0.5m and earlier of this example; libpng
-      now takes care of that automatically). */
-   free(palette);
+   /* If you png_malloced a palette, free it here (don't free info_ptr->palette,
+      as recommended in versions 1.0.5m and earlier of this example; if
+      libpng mallocs info_ptr->palette, libpng will free it).  If you
+      allocated it with malloc() instead of png_malloc(), use free() instead
+      of png_free(). */
+   png_free(png_ptr, palette);
+
+   /* Similarly, if you png_malloced any data that you passed in with
+      png_set_something(), such as a hist or trans array, free it here,
+      when you can be sure that libpng is through with it. */
+   png_free(png_ptr, trans);
 
    /* clean up after the write, and free any memory allocated */
    png_destroy_write_struct(&png_ptr, (png_infopp)NULL);

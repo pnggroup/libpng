@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -524,7 +524,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    int bit_depth, color_type;
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
-   jmp_buf jmpbuf;
+   jmp_buf jmp_env;
 #endif
 #endif
 
@@ -579,11 +579,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
-   png_debug(0, "Setting jmpbuf for read struct\n");
+   png_debug(0, "Setting jmp_env for read struct\n");
 #ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
+   if (setjmp(jmp_env))
 #else
-   if (setjmp(read_ptr->jmpbuf))
+   if (setjmp(png_jmp_env(read_ptr)))
 #endif
    {
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
@@ -595,14 +595,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(read_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+   png_memcpy(png_jmp_env(read_ptr),jmp_env,sizeof(jmp_buf));
 #endif
 
-   png_debug(0, "Setting jmpbuf for write struct\n");
+   png_debug(0, "Setting jmp_env for write struct\n");
 #ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
+   if (setjmp(jmp_env))
 #else
-   if (setjmp(write_ptr->jmpbuf))
+   if (setjmp(png_jmp_env(write_ptr)))
 #endif
    {
       fprintf(STDERR, "%s -> %s: libpng write error\n", inname, outname);
@@ -614,7 +614,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(write_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+   png_memcpy(write_ptr->jmpbuf,jmp_env,sizeof(jmp_buf));
 #endif
 #endif
 
@@ -949,10 +949,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
-   png_free_unknown_chunks(read_ptr, end_info_ptr, -1);
+   png_free_data(read_ptr, read_info_ptr, PNG_FREE_UNKN, -1);
 #endif
 #if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
-   png_free_unknown_chunks(write_ptr, write_info_ptr, -1);
+   png_free_data(write_ptr, write_info_ptr, PNG_FREE_UNKN, -1);
 #endif
 
    png_debug(0, "Reading and writing end_info data\n");
@@ -1341,7 +1341,7 @@ main(int argc, char *argv[])
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_pngtest_version
-   (version_1_0_5q png_h_is_not_version_1_0_5q)
+   (version_1_0_5s png_h_is_not_version_1_0_5s)
 {
-   if(png_h_is_not_version_1_0_5q == NULL) return;
+   if(png_h_is_not_version_1_0_5s == NULL) return;
 }

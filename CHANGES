@@ -611,3 +611,26 @@ version 1.0.5q [February 5, 2000]
   Fixed pngvcrd.c bug by pushing/popping registers in mmxsupport (Bruce Oberg)
   Revised makefile.gcmmx
   Added PNG_SETJMP_SUPPORTED, PNG_SETJMP_NOT_SUPPORTED, and PNG_ABORT() macros
+version 1.0.5r [February 7, 2000]
+  Removed superfluous prototype for png_get_itxt from png.h
+  Fixed a bug in pngrtran.c that improperly expanded the background color.
+  Return *num_text=0 from png_get_text() when appropriate, and fix documentation
+    of png_get_text() in libpng.txt/libpng.3.
+version 1.0.5s [February 18, 2000]
+  Added "png_jmp_env()" macro to pngconf.h, to help people migrate to the
+    new error handler that's planned for the next libpng release, and changed
+    example.c, pngtest.c, and contrib programs to use this macro.
+  Revised some of the DLL-export macros in pngconf.h (Greg Roelofs)
+  Fixed a bug in png_read_png() that caused it to fail to expand some images
+    that it should have expanded.
+  Fixed some mistakes in the unused and undocumented INCH_CONVERSIONS functions
+    in pngget.c
+  Changed the allocation of palette, history, and trans arrays back to
+    the version 1.0.5 method (linking instead of copying) which restores
+    backward compatibility with version 1.0.5.  Added some remarks about
+    that in example.c.  Added "free_me" member to info_ptr and png_ptr.
+  Updated makefile.linux and makefile.gccmmx to make directories conditionally.
+  Made cosmetic changes to pngasmrd.h
+  Added png_set_rows() and png_get_rows(), for use with png_read|write_png().
+  Modified png_read_png() to allocate info_ptr->row_pointers only if it
+    hasn't already been allocated.

@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -658,7 +658,8 @@ png_init_read_transformations(png_structp png_ptr)
 #endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if (png_ptr->transformations & PNG_BACKGROUND_EXPAND)
+   if ((png_ptr->transformations & PNG_BACKGROUND_EXPAND) &&
+       (png_ptr->transformations & PNG_EXPAND))
    {
       if (!(color_type & PNG_COLOR_MASK_COLOR))  /* i.e., GRAY or GRAY_ALPHA */
       {

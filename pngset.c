@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -135,9 +135,7 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   info_ptr->hist = png_malloc(png_ptr, sizeof(png_uint_16) *
-      info_ptr->num_palette);
-   png_memcpy(info_ptr->hist, hist, sizeof(png_uint_16) * info_ptr->num_palette);
+   info_ptr->hist = hist;
    info_ptr->valid |= PNG_INFO_hIST;
 }
 #endif
@@ -309,7 +307,6 @@ void
 png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
    png_colorp palette, int num_palette)
 {
-   png_size_t length = (png_size_t)(3*num_palette);
 
    png_debug1(1, "in %s storage function\n", "PLTE");
    if (png_ptr == NULL || info_ptr == NULL)
@@ -317,13 +314,10 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
 
    png_debug1(3, "allocating PLTE for info (%d bytes)\n", length);
 
-   info_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)num_palette,
-      sizeof (png_color));
-
-   png_memcpy(info_ptr->palette, palette, length);
+   info_ptr->palette = palette;
 
    info_ptr->num_palette = (png_uint_16)num_palette;
-   info_ptr->valid |= (PNG_INFO_PLTE|PNG_ALLOCATED_INFO_PLTE);
+   info_ptr->valid |= PNG_INFO_PLTE;
 }
 
 #if defined(PNG_sBIT_SUPPORTED)
@@ -441,6 +435,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
    /* Compression is always zero but is here so the API and info structure
     * does not have to change * if we introduce multiple compression types */
    info_ptr->iccp_compression = (png_byte)compression_type;
+   info_ptr->free_me |= PNG_FREE_ICCP;
    info_ptr->valid |= PNG_INFO_iCCP;
 }
 #endif
@@ -526,8 +521,6 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
       textp->key = (png_charp)png_malloc(png_ptr,
          (png_uint_32)(key_len + lang_len + lang_key_len + text_length + 4));
-      /* Caution: the calling program, not libpng, is responsible for
-         freeing this, if libpng wasn't the caller. */
       png_debug2(2, "Allocated %d bytes at %x in png_set_text\n",
          key_len + lang_len + lang_key_len + text_length + 4, textp->key);
 
@@ -573,6 +566,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
       info_ptr->text[info_ptr->num_text]= *textp;
       info_ptr->num_text++;
+      info_ptr->free_me |= PNG_FREE_TEXT;
       png_debug1(3, "transferred text chunk %d\n", info_ptr->num_text);
    }
 }
@@ -602,10 +596,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
       return;
 
    if (trans != NULL)
-   {
-      info_ptr->trans = png_malloc(png_ptr, num_trans);
-      png_memcpy(info_ptr->trans, trans, num_trans);
-   }
+      info_ptr->trans = trans;
 
    if (trans_values != NULL)
    {
@@ -621,7 +612,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 
 #if defined(PNG_sPLT_SUPPORTED)
 void
-png_set_spalettes(png_structp png_ptr,
+png_set_sPLT(png_structp png_ptr,
              png_infop info_ptr, png_spalette_p entries, int nentries)
 {
     png_spalette_p        np;
@@ -653,6 +644,7 @@ png_set_spalettes(png_structp png_ptr,
     info_ptr->splt_palettes = np;
     info_ptr->splt_palettes_num += nentries;
     info_ptr->valid |= PNG_INFO_sPLT;
+    info_ptr->free_me |= PNG_FREE_SPLT;
 }
 #endif /* PNG_sPLT_SUPPORTED */
 
@@ -691,6 +683,7 @@ png_set_unknown_chunks(png_structp png_ptr,
 
     info_ptr->unknown_chunks = np;
     info_ptr->unknown_chunks_num += num_unknowns;
+    info_ptr->free_me |= PNG_FREE_UNKN;
 }
 #endif
 
@@ -732,13 +725,14 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
     if(png_ptr->chunk_list != (png_bytep)NULL)
     {
        png_memcpy(new_list, png_ptr->chunk_list, 5*old_num_chunks);
-       png_free_chunk_list(png_ptr);
+       png_free(png_ptr, png_ptr->chunk_list);
     }
     png_memcpy(new_list+5*old_num_chunks, chunk_list, 5*num_chunks);
     for (p=new_list+5*old_num_chunks+4, i=0; i<num_chunks; i++, p+=5)
        *p=(png_byte)keep;
     png_ptr->num_chunk_list=old_num_chunks+num_chunks;
     png_ptr->chunk_list=new_list;
+    png_ptr->free_me |= PNG_FREE_LIST;
 }
 #endif
 
@@ -750,6 +744,19 @@ png_set_read_user_chunk_fn(png_structp png_ptr, png_voidp user_chunk_ptr,
    png_debug(1, "in png_set_read_user_chunk_fn\n");
    png_ptr->read_user_chunk_fn = read_user_chunk_fn;
    png_ptr->user_chunk_ptr = user_chunk_ptr;
+}
+#endif
+
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+void
+png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
+{
+   png_debug1(1, "in %s storage function\n", "rows");
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
+   info_ptr->row_pointers = row_pointers;
+   info_ptr->free_me |= PNG_FREE_ROWS;
 }
 #endif
 

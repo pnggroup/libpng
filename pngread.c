@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -641,7 +641,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5q.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5s.
  */
 
 void
@@ -690,7 +690,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5q.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5s.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -943,7 +943,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    if (info_ptr != NULL)
    {
 #if defined(PNG_TEXT_SUPPORTED)
-      png_free(png_ptr, info_ptr->text);
+      png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, -1);
 #endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -957,7 +957,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    if (end_info_ptr != NULL)
    {
 #if defined(PNG_READ_TEXT_SUPPORTED)
-      png_free(png_ptr, end_info_ptr->text);
+      png_free_data(png_ptr, end_info_ptr, PNG_FREE_TEXT, -1);
 #endif
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)end_info_ptr, free_fn);
@@ -1014,16 +1014,19 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_from_1);
    png_free(png_ptr, png_ptr->gamma_to_1);
 #endif
-   if (png_ptr->flags & PNG_FLAG_FREE_PALETTE)
+   if (png_ptr->free_me & PNG_FREE_PLTE)
       png_zfree(png_ptr, png_ptr->palette);
+   png_ptr->free_me &= ~PNG_FREE_PLTE;
 #if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if (png_ptr->flags & PNG_FLAG_FREE_TRANS)
+   if (png_ptr->free_me & PNG_FREE_TRNS)
       png_free(png_ptr, png_ptr->trans);
+   png_ptr->free_me &= ~PNG_FREE_TRNS;
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)
-   if (png_ptr->flags & PNG_FLAG_FREE_HIST)
+   if (png_ptr->free_me & PNG_FREE_HIST)
       png_free(png_ptr, png_ptr->hist);
+   png_ptr->free_me &= ~PNG_FREE_HIST;
 #endif
 #if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->gamma_16_table != NULL)
@@ -1140,7 +1143,7 @@ void png_read_png(png_structp png_ptr, png_infop info_ptr,
        png_set_strip_alpha(png_ptr);
 #endif
 
-#if defined(PNG_READ_PACK_SUPPORTED)
+#if defined(PNG_READ_PACK_SUPPORTED) && !defined(PNG_READ_EXPAND_SUPPORTED)
    /* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
     * byte into separate bytes (useful for paletted and grayscale images).
     */
@@ -1162,8 +1165,10 @@ void png_read_png(png_structp png_ptr, png_infop info_ptr,
     * channels so the data will be available as RGBA quartets.
     */
    if (transforms & PNG_TRANSFORM_EXPAND)
-       if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
-           png_set_expand(png_ptr);
+       if ((png_ptr->bit_depth < 8) ||
+           (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ||
+           (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)))
+         png_set_expand(png_ptr);
 #endif
 
    /* We don't handle background color or gamma transformation or dithering. */
@@ -1217,8 +1222,12 @@ void png_read_png(png_structp png_ptr, png_infop info_ptr,
 
    /* -------------- image transformations end here ------------------- */
 
-   info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
+   if(info_ptr->row_pointers == NULL)
+   {
+      info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
                                          info_ptr->height * sizeof(png_bytep));
+      info_ptr->free_me |= PNG_FREE_ROWS;
+   }
    for (row = 0; row < (int)info_ptr->height; row++)
        info_ptr->row_pointers[row] = png_malloc(png_ptr,
                                       png_get_rowbytes(png_ptr, info_ptr));

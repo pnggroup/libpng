@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -13,10 +13,6 @@
 
 #define PNG_INTERNAL
 #include "png.h"
-
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
-#include "pngasmrd.h"
-#endif
 
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
@@ -398,7 +394,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    num = (int)length / 3;
    palette = (png_colorp)png_zalloc(png_ptr, (uInt)num, sizeof (png_color));
-   png_ptr->flags |= PNG_FLAG_FREE_PALETTE;
+   png_ptr->free_me |= PNG_FREE_PLTE;
    for (i = 0; i < num; i++)
    {
       png_byte buf[3];
@@ -436,7 +432,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          else
          {
             png_chunk_warning(png_ptr, "CRC error");
-            png_ptr->flags &= ~PNG_FLAG_FREE_PALETTE;
+            png_ptr->free_me &= ~PNG_FREE_PLTE;
             png_zfree(png_ptr, palette);
             return;
          }
@@ -928,6 +924,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
    chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
+   png_ptr->free_me |= PNG_FREE_ICCP;
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)chunkdata, slength);
 
@@ -1058,7 +1055,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* discard all chunk data except the name and stash that */
    new_palette.name = (png_charp)chunkdata;
 
-   png_set_spalettes(png_ptr, info_ptr, &new_palette, 1);
+   png_set_sPLT(png_ptr, info_ptr, &new_palette, 1);
 
    png_free(png_ptr, chunkdata);
    png_free(png_ptr, new_palette.entries);
@@ -1107,7 +1104,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
 
       png_ptr->trans = (png_bytep)png_malloc(png_ptr, length);
-      png_ptr->flags |= PNG_FLAG_FREE_TRANS;
+      png_ptr->free_me |= PNG_FREE_TRNS;
       png_crc_read(png_ptr, png_ptr->trans, (png_size_t)length);
       png_ptr->num_trans = (png_uint_16)length;
    }
@@ -1287,7 +1284,7 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    num = (int)length / 2 ;
    png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
       (png_uint_32)(num * sizeof (png_uint_16)));
-   png_ptr->flags |= PNG_FLAG_FREE_HIST;
+   png_ptr->free_me |= PNG_FREE_HIST;
    for (i = 0; i < num; i++)
    {
       png_byte buf[2];
@@ -2802,7 +2799,14 @@ png_read_start_row(png_structp png_ptr)
       else
       {
          if (max_pixel_depth <= 8)
-            max_pixel_depth = 24;
+           {
+             if (png_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+               max_pixel_depth = 32;
+             else
+               max_pixel_depth = 24;
+           }
+         else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+            max_pixel_depth = 64;
          else
             max_pixel_depth = 48;
       }

@@ -223,7 +223,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL a
     return FALSE;   /* out of memory */
   }
 
-  if (setjmp (png_ptr->jmpbuf))
+  if (setjmp (png_jmp_env(png_ptr)))
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return FALSE;

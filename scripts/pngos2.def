@@ -31,6 +31,7 @@ EXPORTS
   png_set_bgr
   png_set_gray_to_rgb
   png_set_rgb_to_gray
+  png_set_rows
   png_build_grayscale_palette
   png_set_strip_alpha
   png_set_swap_alpha
@@ -120,6 +121,7 @@ EXPORTS
   png_get_pixels_per_meter
   png_get_pixel_aspect_ratio
   png_get_rgb_to_gray_status
+  png_get_rows
   png_get_x_offset_pixels
   png_get_y_offset_pixels
   png_get_x_offset_microns
@@ -291,17 +293,10 @@ EXPORTS
 ; png_pass_height
   png_get_iCCP 
   png_get_sCAL
-  png_get_spalettes 
+  png_get_sPLT 
   png_set_iCCP 
-  png_set_spalettes 
-  png_free_hIST 
-  png_free_iCCP 
-  png_free_pCAL 
-  png_free_PLTE 
-  png_free_sCAL
-  png_free_sPLT 
-  png_free_text 
-  png_free_tRNS 
+  png_set_sPLT 
+  png_free_data
 
   png_IHDR
   png_IDAT

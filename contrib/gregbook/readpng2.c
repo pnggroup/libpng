@@ -98,7 +98,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
      * but compatible error handlers must either use longjmp() themselves
      * (as in this program) or exit immediately, so here we are: */
 
-    if (setjmp(mainprog_ptr->jmpbuf)) {
+    if (setjmp(png_jmp_env(mainprog_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return 2;
     }
@@ -136,7 +136,7 @@ int readpng2_decode_data(mainprog_info *mainprog_ptr, uch *rawbuf, ulg length)
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if (setjmp(mainprog_ptr->jmpbuf)) {
+    if (setjmp(png_jmp_env(mainprog_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         mainprog_ptr->png_ptr = NULL;
         mainprog_ptr->info_ptr = NULL;

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -799,35 +799,13 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 
    if (info_ptr != NULL)
    {
-#if defined(PNG_WRITE_TEXT_SUPPORTED)
-      png_free_text(png_ptr, info_ptr, -1);
-#endif
-#if defined(PNG_WRITE_tRNS_SUPPORTED)
-   png_free_tRNS(png_ptr, info_ptr);
-#endif
-#if defined(PNG_WRITE_sCAL_SUPPORTED)
-      png_free_sCAL(png_ptr, info_ptr);
-#endif
-#if defined(PNG_WRITE_pCAL_SUPPORTED)
-      png_free_pCAL(png_ptr, info_ptr);
-#endif
-#if defined(PNG_WRITE_iCCP_SUPPORTED)
-      png_free_iCCP(png_ptr, info_ptr);
-#endif
-#if defined(PNG_WRITE_sPLT_SUPPORTED)
-      png_free_spalettes(png_ptr, info_ptr, -1);
-#endif
-#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
-      png_free_unknown_chunks(png_ptr, info_ptr, -1);
-      png_free_chunk_list(png_ptr);
-#endif
-#if defined(PNG_hIST_SUPPORTED)
-      png_free_hIST(png_ptr, info_ptr);
-#endif
-      png_free_PLTE(png_ptr, info_ptr);
-#if defined(PNG_INFO_IMAGE_SUPPORTED)
-   png_free_pixels(png_ptr, info_ptr);
-#endif
+      png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
+
+      if (png_ptr->num_chunk_list)
+      {
+         png_free(png_ptr, png_ptr->chunk_list);
+         png_ptr->num_chunk_list=0;
+      }
 
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)info_ptr, free_fn);

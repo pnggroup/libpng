@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.5q - February 5, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -133,6 +133,8 @@ png_default_error(png_structp png_ptr, png_const_charp message)
    longjmp(png_ptr->jmpbuf, 1);
 # endif
 #else
+   if (png_ptr == NULL)
+     /* make compiler happy */ ;
    PNG_ABORT();
 #endif
 }

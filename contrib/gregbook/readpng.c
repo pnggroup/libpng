@@ -89,7 +89,7 @@ int readpng_init(FILE *infile, long *pWidth, long *pHeight)
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if (setjmp(png_ptr->jmpbuf)) {
+    if (setjmp(png_jmp_env(png_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return 2;
     }
@@ -130,7 +130,7 @@ int readpng_get_bgcolor(uch *red, uch *green, uch *blue)
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if (setjmp(png_ptr->jmpbuf)) {
+    if (setjmp(png_jmp_env(png_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return 2;
     }
@@ -184,7 +184,7 @@ uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if (setjmp(png_ptr->jmpbuf)) {
+    if (setjmp(png_jmp_env(png_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return NULL;
     }
