@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.6i - May 1, 2000
+ * libpng 1.0.6j - May 4, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -16,37 +16,6 @@
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
-
-/* The following support, added at version 1.0.6, will be turned on by
- * default in version 2.0.0.
- * They have been turned off here in case you need binary compatibility
- * with old applications that require the length of png_struct and
- * png_info to remain at the old length.
- */
-
-
-#ifdef PNG_LEGACY_SUPPORTED
-#define PNG_NO_FREE_ME
-#define PNG_NO_READ_UNKNOWN_CHUNKS
-#define PNG_NO_WRITE_UNKNOWN_CHUNKS
-#define PNG_NO_READ_USER_CHUNKS
-#define PNG_NO_READ_iCCP
-#define PNG_NO_WRITE_iCCP
-#define PNG_NO_READ_sCAL
-#define PNG_NO_WRITE_sCAL
-#define PNG_NO_READ_sPLT
-#define PNG_NO_WRITE_sPLT
-#define PNG_NO_INFO_IMAGE
-#define PNG_NO_READ_RGB_TO_GRAY
-#define PNG_NO_READ_USER_TRANSFORM
-#define PNG_NO_WRITE_USER_TRANSFORM
-#define PNG_NO_USER_MEM
-#define PNG_NO_READ_EMPTY_PLTE
-#endif
-
-#ifndef PNG_NO_FREE_ME
-#define PNG_FREE_ME_SUPPORTED
-#endif
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your
@@ -298,6 +267,31 @@
    1.0.1c, for consistency)
  */
 
+/* The following support, added after version 1.0.0, can be turned off here en
+ * masse by defining PNG_LEGACY_SUPPORTED in case you need binary compatibility
+ * with old applications that require the length of png_struct and png_info
+ * to remain unchanged.
+ */
+
+#ifdef PNG_LEGACY_SUPPORTED
+#define PNG_NO_FREE_ME
+#define PNG_NO_READ_UNKNOWN_CHUNKS
+#define PNG_NO_WRITE_UNKNOWN_CHUNKS
+#define PNG_NO_READ_USER_CHUNKS
+#define PNG_NO_READ_iCCP
+#define PNG_NO_WRITE_iCCP
+#define PNG_NO_READ_sCAL
+#define PNG_NO_WRITE_sCAL
+#define PNG_NO_READ_sPLT
+#define PNG_NO_WRITE_sPLT
+#define PNG_NO_INFO_IMAGE
+#define PNG_NO_READ_RGB_TO_GRAY
+#define PNG_NO_READ_USER_TRANSFORM
+#define PNG_NO_WRITE_USER_TRANSFORM
+#define PNG_NO_USER_MEM
+#define PNG_NO_READ_EMPTY_PLTE
+#endif
+
 #ifndef PNG_NO_FLOATING_POINT_SUPPORTED 
 #define PNG_FLOATING_POINT_SUPPORTED
 #endif
@@ -306,6 +300,10 @@
 
 #ifndef PNG_FLOATING_POINT_SUPPORTED
 #define PNG_FIXED_POINT_SUPPORTED
+#endif
+
+#ifndef PNG_NO_FREE_ME
+#define PNG_FREE_ME_SUPPORTED
 #endif
 
 #if !defined(PNG_READ_TRANSFORMS_NOT_SUPPORTED) && \
@@ -381,8 +379,10 @@
               /* still have interlacing unless you change the following line: */
 #define PNG_READ_INTERLACING_SUPPORTED /* required for PNG-compliant decoders */
 
-#ifndef PNG_NO_READ_COMPOSITED_NODIV
+#ifndef PNG_NO_READ_COMPOSITE_NODIV
+#ifndef PNG_NO_READ_COMPOSITED_NODIV  /* libpng-1.0.x misspelling */
 #define PNG_READ_COMPOSITE_NODIV_SUPPORTED    /* well tested on Intel and SGI */
+#endif
 #endif
 
 #ifndef PNG_NO_READ_EMPTY_PLTE
@@ -604,7 +604,9 @@ defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #endif
 #ifndef PNG_NO_READ_UNKNOWN_CHUNKS
 #  define PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
-#  define PNG_UNKNOWN_CHUNKS_SUPPORTED
+#  ifndef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#    define PNG_UNKNOWN_CHUNKS_SUPPORTED
+#  endif
 #  ifndef PNG_NO_HANDLE_AS_UNKNOWN
 #    define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 #  endif

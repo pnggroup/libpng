@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.6i - May 1, 2000
+ * libpng 1.0.6j - May 4, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -468,6 +468,19 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
          "Incompatible libpng version in application and library");
    }
 
+   /* Libpng 1.0.6 was not binary compatible, due to insertion of the
+      info_ptr->free_me member.  Note to maintainer: this test can be
+      removed from version 2.0.0 and beyond because the previous test
+      would have already rejected it. */
+
+   if (user_png_ver[4] == '6' && user_png_ver[2] == '0' && 
+       user_png_ver[0] == '1' && user_png_ver[5] == '\0')
+   {
+      png_error(png_ptr,
+         "Application must be recompiled; version 1.0.6 was incompatible");
+   }
+
+
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
@@ -486,14 +499,43 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 }
 
 /* Initialize png_ptr structure, and allocate any memory needed */
+#undef png_write_init
 void
 png_write_init(png_structp png_ptr)
+{
+   /* We only come here via pre-1.0.7-compiled applications */
+   png_write_init_2(png_ptr, "1.0.0", 10000, 10000);
+}
+
+void
+png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
+   png_size_t png_struct_size, png_size_t png_info_size)
 {
 #ifdef PNG_SETJMP_SUPPORTED
    jmp_buf tmp_jmp; /* to save current jump buffer */
 #endif
+#ifndef PNG_LEGACY_SUPPORTED
+   int i = 0;
+   do
+   {
+     if (user_png_ver[i] != png_libpng_ver[i])
+     {
+       png_ptr->error_fn=(png_error_ptr)NULL;
+       png_error(png_ptr,
+       "Application uses deprecated png_write_init() and must be recompiled.");
+     }
+   } while (png_libpng_ver[i++]);
+#endif
+   if (sizeof(png_struct) > png_struct_size ||
+      sizeof(png_info) > png_info_size)
+     {
+       png_ptr->error_fn=(png_error_ptr)NULL;
+       png_error(png_ptr,
+      "Application and library have different sized structs. Please recompile.");
+     }
 
-   png_debug(1, "in png_write_init\n");
+   png_debug(1, "in png_write_init_2\n");
+
 #ifdef PNG_SETJMP_SUPPORTED
    /* save jump buffer and error functions */
    png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
@@ -507,15 +549,6 @@ png_write_init(png_structp png_ptr)
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
 #endif
 
-#ifndef PNG_LEGACY_SUPPORTED
-   if(!(png_ptr->mode & PNG_CREATED_WRITE_STRUCT))
-   {
-      png_ptr->error_fn=NULL;
-      png_error(png_ptr,
-        "Write struct not properly created; use a legacy-supporting libpng.");
-   }
-#endif
-
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
@@ -525,6 +558,11 @@ png_write_init(png_structp png_ptr)
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_set_filter_heuristics(png_ptr, PNG_FILTER_HEURISTIC_DEFAULT,
       1, NULL, NULL);
+#endif
+
+#ifdef PNG_LEGACY_SUPPORTED
+   if (user_png_ver)
+      return;
 #endif
 }
 

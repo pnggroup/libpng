@@ -16,7 +16,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
    Applications that use png_create_*() instead of png_ptr=malloc(...)
    are immune to this problem.
 
-   STATUS:  Fixed in libpng-1.0.6ad, libpng-1.0.6i, and patch-d
+   STATUS:  Fixed in libpng-1.0.6ad, libpng-1.0.6j, and patch-d
    which are currently being tested by the PNG group.
    The fix necessarily reintroduces a binary incompatibility with any
    application that makes direct access to the png_info and
@@ -41,7 +41,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
    png_info structures, so libpng-1.0.6 will be patched to work around
    this problem.
 
-   STATUS:  Fixed in libpng-1.0.6g and patch-d, which are currently being
+   STATUS:  Fixed in libpng-1.0.6j and patch-d, which are currently being
    tested by the PNG group.  Users can work around the problem without
    patching libpng by recompiling their applications.
 

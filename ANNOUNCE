@@ -1,5 +1,5 @@
 
-Libpng 1.0.6i - May 1, 2000
+Libpng 1.0.6j - May 4, 2000
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -43,7 +43,8 @@ version 1.0.6g [April 24, 2000]
 version 1.0.6h [April 24, 2000]
   Changed shared library so-number pattern from 2.x.y.z to xy.z (this builds
     libpng.so.10 & libpng.so.10.6h instead of libpng.so.2 & libpng.so.2.1.0.6h)
-version 1.0.6i [May 1, 2000]
+    This is a temporary change for test purposes.
+version 1.0.6i [May 3, 2000]
   Added documentation of user memory functions in libpng.txt/libpng.3
   Modified png_read_png so that it will use user_allocated row_pointers
     if present, unless free_me directs that it be freed, and added description
@@ -58,6 +59,11 @@ version 1.0.6i [May 1, 2000]
     directly instead of using png_create_*(), as authors were instructed to
     do in libpng-0.88 and earlier.
   Added makefile.intel and updated makefile.watcom (Pawel Mrochen)
+version 1.0.6j [May 4, 2000]
+  Overloaded png_read_init() and png_write_init() with macros that convert
+    calls to png_read_init_2() or png_write_init_2() that check the version
+    and structure sizes.
+  Restored original shared library so-number pattern (2.x.y.z)
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
