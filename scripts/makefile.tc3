@@ -3,7 +3,7 @@
 
 # To use, do "make -fmakefile.tc3"
 
-# ------ Turbo C 3.00 (can be modified to work with earlier versions)------
+# ------ Turbo C 3.00 (can be modified to work with earlier versions) -----
 
 MODEL=l
 CFLAGS=-O2 -Z -m$(MODEL) -I..\zlib
