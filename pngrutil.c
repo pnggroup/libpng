@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.11 - April 27, 2001
+ * libpng 1.0.12 - June 8, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -339,7 +339,9 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->bit_depth = (png_byte)bit_depth;
    png_ptr->interlaced = (png_byte)interlace_type;
    png_ptr->color_type = (png_byte)color_type;
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
    png_ptr->filter_type = (png_byte)filter_type;
+#endif
 
    /* find number of channels */
    switch (png_ptr->color_type)
@@ -396,6 +398,13 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_ptr->mode |= PNG_HAVE_PLTE;
 
+   if (!(png_ptr->color_type&PNG_COLOR_MASK_COLOR))
+   {
+      png_warning(png_ptr,
+        "Ignoring PLTE chunk in grayscale PNG");
+      png_crc_finish(png_ptr, length);
+      return;
+   }
 #if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
    if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
    {
@@ -512,9 +521,7 @@ png_handle_IEND(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       png_error(png_ptr, "No image in file");
 
-      /* to quiet compiler warnings about unused info_ptr */
-      if (info_ptr == NULL)
-         return;
+      info_ptr = info_ptr; /* quiet compiler warnings about unused info_ptr */
    }
 
    png_ptr->mode |= (PNG_AFTER_IDAT | PNG_HAVE_IEND);
@@ -1022,6 +1029,13 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    profile_length = data_length - prefix_length;
 
+   if ( profile_length < 4)
+   {
+      png_free(png_ptr, chunkdata);
+      png_warning(png_ptr, "Profile size field missing from iCCP chunk");
+      return;
+   }
+
    /* Check the profile_size recorded in the first 32 bits of the ICC profile */
    profile_size = ((*(chunkdata+prefix_length))<<24) |
                   ((*(chunkdata+prefix_length+1))<<16) |
@@ -1033,6 +1047,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if(profile_size > profile_length)
    {
+      png_free(png_ptr, chunkdata);
       png_warning(png_ptr, "Ignoring truncated iCCP profile.\n");
       return;
    }
@@ -2083,8 +2098,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_crc_finish(png_ptr, skip);
 
 #if !defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-   if (info_ptr == NULL)
-     /* quiet compiler warnings about unused info_ptr */ ;
+   info_ptr = info_ptr; /* quiet compiler warnings about unused info_ptr */
 #endif
 }
 
@@ -2545,9 +2559,7 @@ png_do_read_interlace(png_structp png_ptr)
          (png_uint_32)row_info->pixel_depth + 7) >> 3);
    }
 #if !defined(PNG_READ_PACKSWAP_SUPPORTED)
-   /* silence compiler warning */
-   if (transformations)
-      return;
+   transformations = transformations; /* silence compiler warning */
 #endif
 }
 #endif /* !PNG_HAVE_ASSEMBLER_READ_INTERLACE */
@@ -2964,7 +2976,9 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, row_bytes);
+#if defined(PNG_DEBUG) && defined(PNG_USE_PNGGCCRD)
    png_ptr->row_buf_size = row_bytes;
+#endif
 
 #ifdef PNG_MAX_MALLOC_64K
    if ((png_uint_32)png_ptr->rowbytes + 1 > (png_uint_32)65536L)

@@ -35,6 +35,11 @@
  *
  * The switch statement in inflate.c was rearranged so that case BLOCKS is
  * checked first.  Glenn Randers-Pehrson, April 2001.
+ *
+ * Added tests for Windows platforms at line 136 in zutil.h, since some
+ * emulators will use MSC compiler on other platforms.  Glenn Randers-Pehrson,
+ * May 2001.  Suggested by Emmanuel Blot.
+ *
  */
 
 #ifndef _ZLIB_H

@@ -25,7 +25,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.5.4"
+#define PNGCRUSH_VERSION "1.5.5"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -66,6 +66,14 @@
  */
 
 /* Change log:
+ *
+ * Version 1.5.5 (built with libpng-1.0.12)
+ *
+ *   Reset reduce_to_gray and it_is_opaque flags prior to processing each
+ *   image.
+ *
+ *   Enable removal of safe-to-copy chunks that are being handled as unknown
+ *   e.g., "-rem time".
  *
  * Version 1.5.4 (built with libpng-1.0.11)
  *
@@ -787,7 +795,8 @@ png_voidp
 png_debug_malloc(png_structp png_ptr, png_uint_32 size) {
 
    /* png_malloc has already tested for NULL; png_create_struct calls
-      png_debug_malloc directly, with png_ptr == NULL which is OK */
+      png_debug_malloc directly (with png_ptr == NULL prior to libpng-1.2.0
+      which is OK since we are not using a user mem_ptr) */
 
    if (size == 0)
       return (png_voidp)(NULL);
@@ -806,7 +815,8 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size) {
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
       if(verbose > 2)
-         fprintf(STDERR, "Pointer %x allocated\n", (int)pinfo->pointer);
+         fprintf(STDERR, "Pointer %x allocated %lu bytes\n",
+           (int)pinfo->pointer, size);
       return (png_voidp)(pinfo->pointer);
    }
 }
@@ -837,9 +847,10 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
-            png_free_default(png_ptr, pinfo);
             if(verbose > 2)
-               fprintf(STDERR, "Pointer %x freed\n", (int)ptr);
+               fprintf(STDERR, "Pointer %x freed %lu bytes\n", (int)ptr,
+                  pinfo->size);
+            png_free_default(png_ptr, pinfo);
             break;
          }
          if (pinfo->next == NULL) {
@@ -2124,6 +2135,7 @@ main(int argc, char *argv[])
        "               The program will use a smaller window anyway when\n");
      fprintf(STDERR,
        "               the uncompressed file is smaller than 16k.\n\n");
+     }
      fprintf(STDERR,
        "            -z zlib_strategy [0, 1, or 2]\n");
      if(verbose > 1)
@@ -2147,6 +2159,7 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "         -ztxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
+     {
      fprintf(STDERR,
        "\n               zTXt chunk to insert (see -text).\n\n");
      png_crush_pause();
@@ -2360,6 +2373,8 @@ main(int argc, char *argv[])
          idat_length[0]=1;
 
 #ifdef PNGCRUSH_COUNT_COLORS
+      reduce_to_gray=0;
+      it_is_opaque=0;
       output_color_type = input_color_type;
       if (do_color_count)
       {
@@ -2720,32 +2735,39 @@ main(int argc, char *argv[])
 /* Process the following chunks as if safe-to-copy since it is known that
    recompressing the IDAT chunks has no effect on them */
 #if !defined(PNG_cHRM_SUPPORTED)
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
-            (png_bytep)png_cHRM, 1);
+          if(keep_chunk("cHRM",argv))
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+              (png_bytep)png_cHRM, 1);
 #endif
 #if !defined(PNG_hIST_SUPPORTED)
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
-            (png_bytep)png_hIST, 1);
+          if(keep_chunk("hIST",argv))
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+              (png_bytep)png_hIST, 1);
 #endif
 #if !defined(PNG_iCCP_SUPPORTED)
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
-            (png_bytep)png_iCCP, 1);
+          if(keep_chunk("iCCP",argv))
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+              (png_bytep)png_iCCP, 1);
 #endif
 #if !defined(PNG_sCAL_SUPPORTED)
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
-            (png_bytep)png_sCAL, 1);
+          if(keep_chunk("sCAL",argv))
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+              (png_bytep)png_sCAL, 1);
 #endif
 #if !defined(PNG_pCAL_SUPPORTED)
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
-            (png_bytep)png_pCAL, 1);
+          if(keep_chunk("pCAL",argv))
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+              (png_bytep)png_pCAL, 1);
 #endif
 #if !defined(PNG_sPLT_SUPPORTED)
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
-            (png_bytep)png_sPLT, 1);
+          if(keep_chunk("sPLT",argv))
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+              (png_bytep)png_sPLT, 1);
 #endif
 #if !defined(PNG_tIME_SUPPORTED)
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
-            (png_bytep)png_tIME, 1);
+          if(keep_chunk("tIME",argv))
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+              (png_bytep)png_tIME, 1);
 #endif
 
 #else   /* PNG_UINT_IHDR is defined; we are using libpng newer than 1.0.6 */
@@ -2761,39 +2783,60 @@ main(int argc, char *argv[])
           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE,
             NULL, 0);
 #if !defined(PNG_cHRM_SUPPORTED)
-          png_save_uint_32(chunk_name, PNG_UINT_cHRM);
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
-            chunk_name, 1);
+          if(keep_chunk("cHRM",argv))
+          {
+            png_save_uint_32(chunk_name, PNG_UINT_cHRM);
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+              chunk_name, 1);
+          }
 #endif
 #if !defined(PNG_hIST_SUPPORTED)
-          png_save_uint_32(chunk_name, PNG_UINT_hIST);
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
-            chunk_name, 1);
+          if(keep_chunk("hIST",argv))
+          {
+            png_save_uint_32(chunk_name, PNG_UINT_hIST);
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+              chunk_name, 1);
+          }
 #endif
 #if !defined(PNG_iCCP_SUPPORTED)
-          png_save_uint_32(chunk_name, PNG_UINT_iCCP);
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
-            chunk_name, 1);
+          if(keep_chunk("iCCP",argv))
+          {
+            png_save_uint_32(chunk_name, PNG_UINT_iCCP);
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+              chunk_name, 1);
+          }
 #endif
 #if !defined(PNG_sCAL_SUPPORTED)
-          png_save_uint_32(chunk_name, PNG_UINT_sCAL);
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
-            chunk_name, 1);
+          if(keep_chunk("sCAL",argv))
+          {
+            png_save_uint_32(chunk_name, PNG_UINT_sCAL);
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+              chunk_name, 1);
+          }
 #endif
 #if !defined(PNG_pCAL_SUPPORTED)
-          png_save_uint_32(chunk_name, PNG_UINT_pCAL);
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
-            chunk_name, 1);
+          if(keep_chunk("pCAL",argv))
+          {
+            png_save_uint_32(chunk_name, PNG_UINT_pCAL);
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+              chunk_name, 1);
+          }
 #endif
 #if !defined(PNG_sPLT_SUPPORTED)
-          png_save_uint_32(chunk_name, PNG_UINT_sPLT);
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
-            chunk_name, 1);
+          if(keep_chunk("sPLT",argv))
+          {
+            png_save_uint_32(chunk_name, PNG_UINT_sPLT);
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+              chunk_name, 1);
+          }
 #endif
 #if !defined(PNG_tIME_SUPPORTED)
-          png_save_uint_32(chunk_name, PNG_UINT_tIME);
-          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
-            chunk_name, 1);
+          if(keep_chunk("tIME",argv))
+          {
+            png_save_uint_32(chunk_name, PNG_UINT_tIME);
+            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+              chunk_name, 1);
+          }
 #endif
 #endif  /* PNG_UINT_IHDR */
           }
@@ -4466,7 +4509,7 @@ count_colors(FILE *fpin)
    png_debug(0, "Allocating read_info structure\n");
    read_info_ptr = png_create_info_struct(read_ptr);
    if (read_info_ptr == NULL)
-      png_destroy_read_struct(&read_ptr, NULL, NULL);
+      png_destroy_read_struct(&read_ptr, (png_infop)NULL, (png_infop)NULL);
    }
    else
       read_info_ptr = NULL;
@@ -4839,7 +4882,7 @@ count_colors(FILE *fpin)
 
    png_free (read_ptr, row_buf); row_buf = (png_bytep)NULL;
    png_debug(0, "Destroying data structs\n");
-   png_destroy_read_struct(&read_ptr, &read_info_ptr, NULL);
+   png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infop)NULL);
    }
    else
       result=2;
@@ -4849,7 +4892,7 @@ count_colors(FILE *fpin)
       fprintf(STDERR, "\nWhile checking alphas in %s ", inname);
       fprintf(STDERR,"pngcrush caught libpng error:\n   %s\n\n",msg);
       png_free (read_ptr, row_buf); row_buf = (png_bytep)NULL;
-      png_destroy_read_struct(&read_ptr, &read_info_ptr, NULL);
+      png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infop)NULL);
       png_debug(0, "Destroyed data structs\n");
       result=2;
    }

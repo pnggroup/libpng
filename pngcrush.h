@@ -18,7 +18,8 @@
 #define PNGCRUSH_LIBPNG_VER 10007
 #endif
 
-#if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD)
+#if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD) && \
+    !defined(PNG_NO_ASSEMBLER_CODE)
 #define PNG_NO_ASSEMBLER_CODE
 #endif
 

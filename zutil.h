@@ -8,6 +8,8 @@
    subject to change. Applications should only use zlib.h.
  */
 
+/* Added tests for Windows platforms at line 136.  glennrp, May 2001 */
+
 /* @(#) $Id$ */
 
 #ifndef _Z_UTIL_H
@@ -133,7 +135,9 @@ extern const char *z_errmsg[10]; /* indexed by 2-zlib_error */
 #  define fdopen(fd,mode) NULL /* No fdopen() */
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER > 600))
+#if (defined(_MSC_VER) && (_MSC_VER > 600)) && (defined(WIN32) || \
+    defined(_Windows) || defined(_WINDOWS)  || defined(_WIN32) || \
+    defined(__WIN32__))
 #  define fdopen(fd,type)  _fdopen(fd,type)
 #endif
 

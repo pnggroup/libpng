@@ -41,12 +41,13 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
 This is the output of "pngcrush" and "pngcrush -help":
 
 
- | pngcrush 1.5.4, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+
+ | pngcrush 1.5.5, Copyright (C) 1998-2001 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
- | This program was built with libpng version 1.0.11, and is
- | running with  libpng version 1.0.11 - April 27, 2001 (header)
+ | This program was built with libpng version 1.0.12, and is
+ | running with  libpng version 1.0.12 - June 8, 2001 (header)
  |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -88,16 +89,20 @@ options:
             -v (display more detailed information)
       -version (display the pngcrush version)
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
+            -z zlib_strategy [0, 1, or 2]
+         -zmem zlib_compression_mem_level [1-9, default 9]
+        -zitxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+         -ztxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
             -h (help and legal notices)
             -p (pause)
 
 
- | pngcrush 1.5.4, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+ | pngcrush 1.5.5, Copyright (C) 1998-2001 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
- | This program was built with libpng version 1.0.11, and is
- | running with  libpng version 1.0.11 - April 27, 2001 (header)
+ | This program was built with libpng version 1.0.12, and is
+ | running with  libpng version 1.0.12 - June 8, 2001 (header)
  |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -309,5 +314,4 @@ options (Note: any option can be spelled out for clarity, e.g.,
                Wait for [enter] key before continuing display.
                e.g., type 'pngcrush -pause -help', if the help
                screen scrolls out of sight.
-
 

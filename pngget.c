@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.11 - April 27, 2001
+ * libpng 1.0.12 - June 8, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -825,4 +825,5 @@ png_get_compression_buffer_size(png_structp png_ptr)
 {
    return (png_uint_32)(png_ptr? png_ptr->zbuf_size : 0L);
 }
+
 

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.11 - April 27, 2001
+ * libpng 1.0.12 - June 8, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -654,8 +654,9 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
       textp->key = (png_charp)png_malloc(png_ptr,
          (png_uint_32)(key_len + text_length + lang_len + lang_key_len + 4));
-      png_debug2(2, "Allocated %d bytes at %x in png_set_text\n",
-         key_len + lang_len + lang_key_len + text_length + 4, (int)textp->key);
+      png_debug2(2, "Allocated %lu bytes at %x in png_set_text\n",
+         (png_uint_32)(key_len + lang_len + lang_key_len + text_length + 4),
+         (int)textp->key);
 
       png_memcpy(textp->key, text_ptr[i].key,
          (png_size_t)(key_len));
@@ -967,4 +968,5 @@ png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
    if (png_ptr && info_ptr)
       info_ptr->valid &= ~(mask);
 }
+
 

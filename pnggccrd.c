@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.0.11 - April 27, 2001
+ * libpng version 1.0.12 - June 8, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -333,6 +333,34 @@ static int          _dif;
 static int          _patemp;	// temp variables for Paeth routine
 static int          _pbtemp;
 static int          _pctemp;
+
+static void /* PRIVATE */
+png_squelch_warnings(void)
+{
+   _dif = _dif;
+   _patemp = _patemp;
+   _pbtemp = _pbtemp;
+   _pctemp = _pctemp;
+   _const4  = _const4;
+   _const6  = _const6;
+   _MMXLength = _MMXLength;
+   _mask8_0  = _mask8_0;
+   _mask16_1 = _mask16_1;
+   _mask16_0 = _mask16_0;
+   _mask24_2 = _mask24_2;
+   _mask24_1 = _mask24_1;
+   _mask24_0 = _mask24_0;
+   _mask32_3 = _mask32_3;
+   _mask32_2 = _mask32_2;
+   _mask32_1 = _mask32_1;
+   _mask32_0 = _mask32_0;
+   _mask48_5 = _mask48_5;
+   _mask48_4 = _mask48_4;
+   _mask48_3 = _mask48_3;
+   _mask48_2 = _mask48_2;
+   _mask48_1 = _mask48_1;
+   _mask48_0 = _mask48_0;
+}
 #endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
 
 static int _mmx_supported = 2;
