@@ -1024,12 +1024,20 @@ version 1.2.2beta1 [February 22, 2002]
   Revised calls to png_create_read_struct() and png_create_write_struct()
     for simpler debugging.
   Revised png_zalloc() so zlib handles errors (uses PNG_FLAG_MALLOC_NULL_MEM_OK)
-version 1.2.2beta2 [February 24, 2002]
+version 1.2.2beta2 [February 23, 2002]
   Check chunk_length and idat_size for invalid (over PNG_MAX_UINT) lengths.
   Check for invalid image dimensions in png_get_IHDR.
   Added missing "fi;" in the install target of the SGI makefiles.
   Added install-static to all makefiles that make shared libraries.
   Always do gamma compensation when image is partially transparent.
+version 1.2.2beta3 [March 7, 2002]
+  Modified shared-library makefiles to install pkgconfig/libpngNN.pc.
+  Export (with PNGAPI) png_zalloc, png_zfree, and png_handle_as_unknown
+  Removed unused png_write_destroy_info prototype from png.h
+  Eliminated incorrect use of width_mmx from pnggccrd.c in pixel_bytes == 8 case
+  Added install-shared target to all makefiles that make shared libraries.
+  Stopped a double free of palette, hist, and trans when not using free_me.
+  Added makefile.32sunu for Sun Ultra 32 and makefile.64sunu for Sun Ultra 64.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

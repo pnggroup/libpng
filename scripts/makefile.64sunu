@@ -1,14 +1,16 @@
 # makefile for libpng on Solaris 2.x with gcc
-# Copyright (C) 2002 Glenn Randers-Pehrson
 # Contributed by William L. Sebok, based on makefile.linux
+# Copyright (C) 2002 Glenn Randers-Pehrson
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=gcc
+CC=cc
+SUN_CC_FLAGS=-fast -xtarget=ultra -xarch=v9
+SUN_LD_FLAGS=-fast -xtarget=ultra -xarch=v9
 
-# Where make install puts libpng.a, libpng12.so*, and png.h
-prefix=/usr/local
+# where make install puts libpng.a, libpng12.so and libpng12/png.h
+prefix=/a
 
 # Where the zlib library and include files are located
 # Changing these to ../zlib poses a security risk.  If you want
@@ -16,25 +18,23 @@ prefix=/usr/local
 #ZLIBLIB=../zlib
 #ZLIBINC=../zlib
 
-ZLIBLIB=/usr/local/lib
-ZLIBINC=/usr/local/include
+ZLIBLIB=/usr/lib
+ZLIBINC=/usr/include
 
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
-CFLAGS=-I$(ZLIBINC) -Wall -O3 \
+CFLAGS=-I$(ZLIBINC) $(SUN_CC_FLAGS) \
 	# $(WARNMORE) -g -DPNG_DEBUG=5
-LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS=-L. -R. $(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng12 -lz -lm
 
 #RANLIB=ranlib
 RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
-# have to change it.
+LIBNAME=libpng12
 PNGMAJ = 0
 PNGMIN = 1.2.2beta3
 PNGVER = $(PNGMAJ).$(PNGMIN)
-LIBNAME = libpng12
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
@@ -48,7 +48,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .SUFFIXES:      .c .o .pic.o
 
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
+	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
 
 all: libpng.a $(LIBNAME).so pngtest
 
@@ -114,11 +114,8 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER)
 	cp libpng.pc $(LIBPATH)/pkgconfig/libpng12.pc
 	chmod 644 $(LIBPATH)/pkgconfig/libpng12.pc
 
-install: install-static install-shared
-
 clean:
-	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* \
-	pngtest pngout.png
+	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

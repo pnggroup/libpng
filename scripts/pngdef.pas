@@ -1,13 +1,13 @@
 unit pngdef;
 
 // Caution: this file has fallen out of date since version 1.0.5.  Write to
-// png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu about bringing
-// it up to date.
+// png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu about volunteering
+// to it up to date.
 
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.2.2beta2';
+  PNG_LIBPNG_VER_STRING = '1.2.2beta3';
   PNG_LIBPNG_VER        =  10202;
 
 type

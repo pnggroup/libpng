@@ -25,7 +25,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2beta2
+PNGMIN = 1.2.2beta3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -65,33 +65,38 @@ pngtest: pngtest.o $(LIBNAME).so
 test: pngtest
 	./pngtest
 
-install-static: libpng.a
-	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
-	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	cp png.h pngconf.h $(INCPATH)
-	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.a $(LIBPATH)
-	chmod 644 $(LIBPATH)/libpng.a
 
-install: libpng.a $(LIBNAME).so.$(PNGVER)
+install-headers: png.h pngconf.h
 	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
-	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
 	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
 	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
 	ln -f -s $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)
 	ln -f -s $(INCPATH)/$(LIBNAME)/pngconf.h $(INCPATH)
+
+install-static: install-headers libpng.a
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	cp libpng.a $(LIBPATH)/$(LIBNAME).a
 	chmod 644 $(LIBPATH)/$(LIBNAME).a
 	-@/bin/rm -f $(LIBPATH)/libpng.a
 	ln -f -s $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+
+install-shared: install-headers $(LIBNAME).so.$(PNGVER)
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@/bin/rm -f $(LIBPATH)/libpng.so.3*
 	cp $(LIBNAME).so.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
 	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
-	(cd $(LIBPATH); \
+	(cd $(LIBPATH);
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
+	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi
+	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
+	cp libpng.pc $(LIBPATH)/pkgconfig/libpng12.pc
+	chmod 644 $(LIBPATH)/pkgconfig/libpng12.pc
+
+install: install-static install-shared
 
 clean:
 	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest pngout.png

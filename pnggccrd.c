@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.2beta2 - February 24, 2002
+ * libpng version 1.2.2beta3 - March 7, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -219,6 +219,9 @@
  *
  * 20010310:
  *  - fixed buffer-overrun bug in png_combine_row() C code (non-MMX)
+ *
+ * 20020304:
+ *  - eliminated incorrect use of width_mmx in pixel_bytes == 8 case
  *
  * STILL TO DO:
  *     - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
@@ -2464,9 +2467,8 @@ png_do_read_interlace(png_structp png_ptr)
                   {
                      // source is 8-byte RRGGBBAA
                      // dest is 32-byte RRGGBBAA RRGGBBAA RRGGBBAA RRGGBBAA
-                     int width_mmx = ((width >> 1) << 1) ;
-                     width -= width_mmx;
-                     if (width_mmx)
+                     // (recall that expansion is _in place_:  sptr and dp
+                     //  both point at locations within same row buffer)
                      {
                         int dummy_value_c;  // fix 'forbidden register spilled'
                         int dummy_value_S;
@@ -2505,9 +2507,6 @@ png_do_read_interlace(png_structp png_ptr)
                   {
                      // source is 8-byte RRGGBBAA
                      // dest is 16-byte RRGGBBAA RRGGBBAA
-                     int width_mmx = ((width >> 1) << 1) ;
-                     width -= width_mmx;
-                     if (width_mmx)
                      {
                         int dummy_value_c;  // fix 'forbidden register spilled'
                         int dummy_value_S;

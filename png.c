@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.2.2beta2 - February 24, 2002
+ * libpng version 1.2.2beta3 - March 7, 2002
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_2beta2 Your_png_h_is_not_version_1_2_2beta2;
+typedef version_1_2_2beta3 Your_png_h_is_not_version_1_2_2beta3;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = "1.2.2beta2";
+const char png_libpng_ver[18] = "1.2.2beta3";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -135,7 +135,7 @@ png_check_sig(png_bytep sig, int num)
 }
 
 /* Function to allocate memory for zlib and clear it to 0. */
-voidpf /* PRIVATE */
+voidpf PNGAPI
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
    png_uint_32 num_bytes = (png_uint_32)items * size;
@@ -163,7 +163,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 }
 
 /* function to free memory for zlib */
-void /* PRIVATE */
+void PNGAPI
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
    png_free((png_structp)png_ptr, (png_voidp)ptr);
@@ -351,6 +351,9 @@ if ((mask & PNG_FREE_TRNS) && (png_ptr->flags & PNG_FLAG_FREE_TRNS))
 {
     png_free(png_ptr, info_ptr->trans);
     info_ptr->valid &= ~PNG_INFO_tRNS;
+#ifndef PNG_FREE_ME_SUPPORTED
+    png_ptr->flags &= ~PNG_FLAG_FREE_TRNS;
+#endif
     info_ptr->trans = NULL;
 }
 #endif
@@ -494,6 +497,9 @@ if ((mask & PNG_FREE_HIST) && (png_ptr->flags & PNG_FLAG_FREE_HIST))
     png_free(png_ptr, info_ptr->hist);
     info_ptr->hist = NULL;
     info_ptr->valid &= ~PNG_INFO_hIST;
+#ifndef PNG_FREE_ME_SUPPORTED
+    png_ptr->flags &= ~PNG_FLAG_FREE_HIST;
+#endif
 }
 #endif
 
@@ -507,6 +513,9 @@ if ((mask & PNG_FREE_PLTE) && (png_ptr->flags & PNG_FLAG_FREE_PLTE))
     png_zfree(png_ptr, info_ptr->palette);
     info_ptr->palette = NULL;
     info_ptr->valid &= ~PNG_INFO_PLTE;
+#ifndef PNG_FREE_ME_SUPPORTED
+    png_ptr->flags &= ~PNG_FLAG_FREE_PLTE;
+#endif
     info_ptr->num_palette = 0;
 }
 
@@ -651,7 +660,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ((png_charp) "\n libpng version 1.2.2beta2 - February 24, 2002\n\
+   return ((png_charp) "\n libpng version 1.2.2beta3 - March 7, 2002\n\
    Copyright (c) 1998-2002 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -669,8 +678,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) "1.2.2beta2");
-   return((png_charp) "1.2.2beta2");
+      return((png_charp) "1.2.2beta3");
+   return((png_charp) "1.2.2beta3");
 }
 
 png_charp PNGAPI
@@ -692,7 +701,7 @@ png_get_header_version(png_structp png_ptr)
 }
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-int /* PRIVATE */
+int PNGAPI
 png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
 {
    /* check chunk_name and return "keep" value if it's on the list, else 0 */
