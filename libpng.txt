@@ -1,10 +1,13 @@
 libpng.txt - a description on how to use and modify libpng
 
-   libpng version 1.00 version 0.97
+   libpng version 0.98
+   Updated and distributed by Glenn Randers-Pehrson <randeg@alumni.rpi.edu>
+   Copyright (c) 1998, Glenn Randers-Pehrson
+   January 16, 1998
 
       based on:
 
-   libpng version 1.00 version 0.96
+   libpng 1.0 beta 6  version 0.96
    Updated and distributed by Andreas Dilger <adilger@enel.ucalgary.ca>,
    Copyright (c) 1996, 1997 Andreas Dilger
    May 28, 1997
@@ -29,7 +32,7 @@ it is heavily commented and should include everything most people
 will need.
 
 Libpng was written as a companion to the PNG specification, as a way
-to reduce the amount of time and effort it takes to support the PNG
+of reducing the amount of time and effort it takes to support the PNG
 file format in application programs.  The PNG specification is available
 as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/> and as a
 W3C Recommendation <http://www.w3.org/pub/WWW/TR/REC.png.html>. Some
@@ -49,12 +52,14 @@ machines (ANSI, K&R, 16-, 32-, and 64-bit) available, and to be easy
 to use.  The ultimate goal of libpng is to promote the acceptance of
 the PNG file format in whatever way possible.  While there is still
 work to be done (see the TODO file), libpng should cover the
-majority of the needs of it's users.
+majority of the needs of its users.
 
 Libpng uses zlib for its compression and decompression of PNG files.
 The zlib compression utility is a general purpose utility that is
 useful for more than PNG files, and can be used without libpng.
 See the documentation delivered with zlib for more details.
+You can usually find the source files for the zlib utility wherever you
+find the libpng source files.
 
 Libpng is thread safe, provided the threads are using different
 instances of the structures.  Each thread should have its own
@@ -69,13 +74,15 @@ II. Structures
 There are two main structures that are important to libpng, png_struct
 and png_info.  The first, png_struct, is an internal structure that
 will not, for the most part, be used by a user except as the first
-variable passed to every libpng function call.
+variable passed to every libpng function call.  It is not actually
+used in many of the functions; do not be alarmed about compiler
+warnings that say something to the effect that "png_ptr is not used."
 
 The png_info structure is designed to provide information about the
 PNG file.  At one time, the fields of png_info were intended to be
 directly accessible to the user.  However, this tended to cause problems
 with applications using dynamically loaded libraries, and as a result
-a set of interface functions for png_info were delevoped.  The fields
+a set of interface functions for png_info was developed.  The fields
 of png_info are still available for older applications, but it is
 suggested that applications use the new interfaces if at all possible.
 
@@ -193,6 +200,19 @@ libpng know that there are some bytes missing from the start of the file.
 
     png_set_sig_bytes(png_ptr, number);
 
+In PNG files, the alpha channel in an image is the level of opacity.
+If you need the alpha channel in an image to be the level of transparency
+instead of opacity, you can invert the alpha channel (or the tRNS chunk
+data) after it's read, so that 0 is fully opaque and 255 (in 8-bit or
+paletted images) or 65535 (in 16-bit images) is fully transparent, with
+
+    png_set_invert_alpha(png_ptr);
+
+This has to appear here rather than later with the other transformations
+because the tRNS chunk data must be modified in the case of paletted images.
+If your image is not a paletted image, the tRNS data (which in such cases
+represents a single color to be rendered as transparent) won't be changed.
+
 You are now ready to read all the file information up to the actual
 image data.  You do this with a call to png_read_info().
 
@@ -252,6 +272,12 @@ into the info_ptr is returned for any complex types.
     png_get_gAMA(png_ptr, info_ptr, &gamma);
     gamma          - the gamma the file is written at (PNG_INFO_gAMA)
 
+    png_get_sRGB(png_ptr, info_ptr, &srgb_intent);
+    srgb_intent    - the rendering intent (PNG_INFO_sRGB)
+                     The presence of the sRGB chunk means that the pixel
+                     data is in the sRGB color space.  This chunk also
+                     implies specific values of gAMA and cHRM.
+
     png_get_sBIT(png_ptr, info_ptr, &sig_bit);
     sig_bit        - the number of significant bits for (PNG_INFO_sBIT)
                      the gray, red, green, and blue channels, whichever
@@ -301,9 +327,9 @@ keyword/text pairs, one pair per chunk, with no limit on the number
 of text chunks, and a 2^31 byte limit on their size.  While there are
 suggested keywords, there is no requirement to restrict the use to these
 strings.  It is strongly suggested that keywords and text be sensible
-to humans (that's the point), so don't use abbreviations or non-printing
-symbols.  See the PNG specification for more details.  There is also
-no requirement to have text after the keyword.
+to humans (that's the point), so don't use abbreviations.  Non-printing
+symbols are not allowed.  See the PNG specification for more details.
+There is also no requirement to have text after the keyword.
 
 Keywords should be limited to 79 Latin-1 characters without leading or
 trailing spaces, but non-consecutive spaces are allowed within the
@@ -381,7 +407,7 @@ values of the pixels:
         png_set_packing(png_ptr);
 
 PNG files have possible bit depths of 1, 2, 4, 8, and 16.  All pixels
-stored in a PNG image whave been "scaled" or "shifted" up to the next
+stored in a PNG image have been "scaled" or "shifted" up to the next
 higher possible bit depth (eg from 5 bits/sample in the range [0,31] to
 8 bits/sample in the range [0, 255]).  However, it is also possible to
 convert the PNG pixel data back to the original bit depth of the image.
@@ -429,7 +455,7 @@ color.  If the PNG file contains a bKGD chunk (PNG_INFO_bKGD valid),
 you may use this color, or supply another color more suitable for
 the current display (e.g., the background color from a web page).  You
 need to tell libpng whether the color is in the gamma space of the
-dispay (PNG_BACKGROUND_GAMMA_SCREEN for colors you supply), the file
+display (PNG_BACKGROUND_GAMMA_SCREEN for colors you supply), the file
 (PNG_BACKGROUND_GAMMA_FILE for colors from the bKGD chunk), or one
 that is neither of these gammas (PNG_BACKGROUND_GAMMA_UNIQUE - I don't
 know why anyone would use this, but it's here).
@@ -457,28 +483,39 @@ To properly display PNG images on any kind of system, the application needs
 to know what the display gamma is.  Ideally, the user will know this, and
 the application will allow them to set it.  One method of allowing the user
 to set the display gamma separately for each system is to check for the
-DISPLAY_GAMMA environment variable, which will hopefully be correctly set.
+DISPLAY_GAMMA and VIEWING_GAMMA environment variables or for a SCREEN_GAMMA
+environment variable, which will hopefully be correctly set.
+
+Note that display_gamma is the gamma of your display, while screen_gamma is
+the overall gamma correction required to produce pleasing results,
+which depends on the lighting conditions in the surrounding environment.
+Screen_gamma is display_gamma/viewing_gamma, where viewing_gamma is
+the amount of additional gamma correction needed to compensate for
+a dim (viewing_gamma=1.125) or dark (viewing_gamma=1.25) environment.
+In a brightly lit room, no compensation other than the display_gamma
+is needed (viewing_gamma=1.0).
 
    if (/* We have a user-defined screen gamma value */)
    {
       screen_gamma = user_defined_screen_gamma;
    }
    /* One way that applications can share the same screen gamma value */
-   else if ((gamma_str = getenv("DISPLAY_GAMMA")) != NULL)
+   else if ((gamma_str = getenv("SCREEN_GAMMA")) != NULL)
    {
       screen_gamma = atof(gamma_str);
    }
    /* If we don't have another value */
    else
    {
-      screen_gamma = 2.2;  /* A good guess for PC monitors */
+      screen_gamma = 2.2; /* A good guess for a PC monitor in a bright office */
+      screen_gamma = 1.956; /* A good guess for a PC monitor in a dim room */
       screen_gamma = 1.7 or 1.0;  /* A good guess for Mac systems */
    }
 
 The png_set_gamma() function handles gamma transformations of the data.
 Pass both the file gamma and the current screen_gamma.  If the file does
 not have a gamma value, you can pass one anyway if you have an idea what
-it is (usually 0.45 is a good guess for GIF images on PCs).  Note
+it is (usually 0.51 is a good guess for GIF images on PCs).  Note
 that file gammas are inverted from screen gammas.  See the discussions
 on gamma in the PNG specification for an excellent description of what
 gamma is, and why all applications should support it.  It is strongly
@@ -487,7 +524,7 @@ recommended that PNG viewers support gamma correction.
    if (png_get_gAMA(png_ptr, info_ptr, &gamma))
       png_set_gamma(png_ptr, screen_gamma, gamma);
    else
-      png_set_gamma(png_ptr, screen_gamma, 0.45);
+      png_set_gamma(png_ptr, screen_gamma, 0.51);
 
 If you need to reduce an RGB file to a paletted file, or if a paletted
 file has more entries then will fit on your screen, png_set_dither()
@@ -544,7 +581,7 @@ need to change the order the pixels are packed into bytes, you can use:
 The last thing to handle is interlacing; this is covered in detail below,
 but you must call the function here.
 
-    number_passes = png_set_interlace_handling(png_ptr);
+    number_of_passes = png_set_interlace_handling(png_ptr);
 
 After setting the transformations, libpng can update your png_info
 structure to reflect any transformations you've requested with this
@@ -582,7 +619,7 @@ where row_pointers is:
 
 You can point to void or char or whatever you use for pixels.
 
-If you don't want to read int the whole image at once, you can
+If you don't want to read in the whole image at once, you can
 use png_read_rows() instead.  If there is no interlacing (check
 interlace_type == PNG_INTERLACE_TYPE_NONE), this is simple:
 
@@ -599,24 +636,24 @@ row_pointers:
 If the file is interlaced (info_ptr->interlace_type != 0), things get
 somewhat harder.  The only current (PNG Specification version 1.0)
 interlacing type for PNG is (interlace_type == PNG_INTERLACE_TYPE_ADAM7)
-is a someewhat complicated 2D interlace scheme, known as Adam7, that
+is a somewhat complicated 2D interlace scheme, known as Adam7, that
 breaks down an image into seven smaller images of varying size, based
 on an 8x8 grid.
 
 libpng can fill out those images or it can give them to you "as is".
 If you want them filled out, there are two ways to do that.  The one
 mentioned in the PNG specification is to expand each pixel to cover
-those pixels that have not been read yet.  This results in a blocky
-image for the first pass, which gradually smoothes out as more pixels
-are read.  The other method is the "sparkle" method, where pixels are
-draw only in their final locations, with the rest of the image remaining
-whatever colors they were initialized to before the start of the read.
-The first method usually looks better, but tends to be slower, as there
-are more pixels to put in the rows.
+those pixels that have not been read yet (the "rectangle" method).
+This results in a blocky image for the first pass, which gradually
+smooths out as more pixels are read.  The other method is the "sparkle"
+method, where pixels are drawn only in their final locations, with the
+rest of the image remaining whatever colors they were initialized to
+before the start of the read.  The first method usually looks better,
+but tends to be slower, as there are more pixels to put in the rows.
 
 If you don't want libpng to handle the interlacing details, just call
 png_read_rows() seven times to read in all seven images.  Each of the
-images are valid images by themselves, or they can be combined on an
+images is a valid image by itself, or they can all be combined on an
 8x8 grid to form a single image (although if you intend to combine them
 you would be far better off using the libpng interlace handling).
 
@@ -638,7 +675,7 @@ If you want libpng to expand the images, call this before calling
 png_start_read_image() or png_read_update_info():
 
     if (interlace_type == PNG_INTERLACE_TYPE_ADAM7)
-        number_passes = png_set_interlace_handling(png_ptr);
+        number_of_passes = png_set_interlace_handling(png_ptr);
 
 This will return the number of passes needed.  Currently, this
 is seven, but may change if another interlace type is added.
@@ -649,12 +686,12 @@ If you are not going to display the image after each pass, but are
 going to wait until the entire image is read in, use the sparkle
 effect.  This effect is faster and the end result of either method
 is exactly the same.  If you are planning on displaying the image
-after each pass, the rectangle effect is generally considered the
+after each pass, the "rectangle" effect is generally considered the
 better looking one.
 
 If you only want the "sparkle" effect, just call png_read_rows() as
 normal, with the third parameter NULL.  Make sure you make pass over
-the image number_passes times, and you don't change the data in the
+the image number_of_passes times, and you don't change the data in the
 rows between calls.  You can change the locations of the data, just
 not the data.  Each pass only writes the pixels appropriate for that
 pass, and assumes the data from previous passes is still valid.
@@ -963,6 +1000,19 @@ Some of the more important parts of the png_info are:
     png_set_gAMA(png_ptr, info_ptr, gamma);
     gamma          - the gamma the image was created at (PNG_INFO_gAMA)
 
+    png_set_sRGB(png_ptr, info_ptr, srgb_intent);
+    srgb_intent    - the rendering intent (PNG_INFO_sRGB)
+                     The presence of the sRGB chunk means that the pixel
+                     data is in the sRGB color space.  This chunk also
+                     implies specific values of gAMA and cHRM.
+
+    png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr, srgb_intent);
+    srgb_intent    - the rendering intent (PNG_INFO_sRGB)
+                     The presence of the sRGB chunk means that the pixel
+                     data is in the sRGB color space.  This chunk also
+                     causes gAMA and cHRM chunks with the specific values
+                     that are consistent with sRGB to be written.
+
     png_set_sBIT(png_ptr, info_ptr, sig_bit);
     sig_bit        - the number of significant bits for (PNG_INFO_sBIT)
                      the gray, red, green, and blue channels, whichever
@@ -996,10 +1046,24 @@ Some of the more important parts of the png_info are:
     offset_y       - positive offset from the top edge of the screen
     unit_type      - PNG_OFFSET_PIXEL, PNG_OFFSET_MICROMETER
 
-    png_get_pHYs(png_ptr, info_ptr, res_x, res_y, unit_type);
+    png_set_pHYs(png_ptr, info_ptr, res_x, res_y, unit_type);
     res_x          - pixels/unit physical resolution in x direction
     res_y          - pixels/unit physical resolution in x direction
     unit_type      - PNG_RESOLUTION_UNKOWN, PNG_RESOLUTION_METER
+
+In PNG files, the alpha channel in an image is the level of opacity.
+If your data is supplied as a level of transparency, you can invert the
+alpha channel before you write it, so that 0 is fully transparent and 255
+(in 8-bit or paletted images) or 65535 (in 16-bit images) is fully opaque,
+with
+
+    png_set_invert_alpha(png_ptr);
+
+This must appear here instead of later with the other transformations
+because in the case of paletted images the tRNS chunk data has to
+be inverted before the tRNS chunk is written.  If your image is not a
+paletted image, the tRNS data (which in such cases represents a single
+color to be rendered as transparent) won't be changed.
 
 A quick word about text and num_text.  text is an array of png_text
 structures.  num_text is the number of valid structures in the array.
@@ -1072,8 +1136,8 @@ tEXt chunk use RFC 1123 format dates (eg 22 May 1997 18:07:10 GMT"),
 although this isn't a requirement.  Unlike the tIME chunk, the
 "Creation Time" tEXt chunk is not expected to be automatically changed
 by the software.  To facilitate the use of RFC 1123 dates, a function
-png_convert_to_rfc1152(png_timep) is provided to convert from PNG
-time to an RFC 1152 format string.
+png_convert_to_rfc1123(png_timep) is provided to convert from PNG
+time to an RFC 1123 format string.
 
 You are now ready to write all the file information up to the actual
 image data.  You do this with a call to png_write_info().
@@ -1229,12 +1293,12 @@ correct number of times to write all seven sub-images.
 If you want libpng to build the sub-images, call this before you start
 writing any rows:
 
-    number_passes = png_set_interlace_handling(png_ptr);
+    number_of_passes = png_set_interlace_handling(png_ptr);
 
 This will return the number of passes needed.  Currently, this
 is seven, but may change if another interlace type is added.
 
-Then write the complete image number_passes times.
+Then write the complete image number_of_passes times.
 
     png_write_rows(png_ptr, row_pointers, number_of_rows);
 
@@ -1280,7 +1344,7 @@ MAXSEG_64K in zlib.h.  Since it is unlikely that the method of handling
 memory allocation on a platform will change between applications, these
 functions must be modified in the library at compile time.
 
-Input/Output in libpng is done throught png_read() and png_write(),
+Input/Output in libpng is done through png_read() and png_write(),
 which currently just call fread() and fwrite().  The FILE * is stored in
 png_struct and is initialized via png_init_io().  If you wish to change
 the method of I/O, the library supplies callbacks that you can set
@@ -1378,7 +1442,7 @@ call.  See zlib.h or zconf.h in the zlib library for more information.
 Configuring for Medium Model:
 
 Libpng's support for medium model has been tested on most of the popular
-complers.  Make sure MAXSEG_64K gets defined, USE_FAR_KEYWORD gets
+compilers.  Make sure MAXSEG_64K gets defined, USE_FAR_KEYWORD gets
 defined, and FAR gets defined to far in pngconf.h, and you should be
 all set.  Everything in the library (except for zlib's structure) is
 expecting far data.  You must use the typedefs with the p or pp on
@@ -1410,8 +1474,8 @@ most useful one changes the compression level, which currently uses
 input compression values in the range 0 - 9.  The library normally
 uses the default compression level (Z_DEFAULT_COMPRESSION = 6).  Tests
 have shown that for a large majority of images, compression values in
-the range 3-6 compress as well as higher levels, and do so much faster.
-For online applications it may be desirable to have maximum speed
+the range 3-6 compress nearly as well as higher levels, and do so much
+faster.  For online applications it may be desirable to have maximum speed
 (Z_BEST_SPEED = 1).  With versions of zlib after v0.99, you can also
 specify no compression (Z_NO_COMPRESSION = 0), but this would create
 files larger than just storing the raw bitmap.  You can specify the
@@ -1495,8 +1559,13 @@ Removing unwanted object code:
 There are a bunch of #define's in pngconf.h that control what parts of
 libpng are compiled.  All the defines end in _SUPPORTED.  If you are
 never going to use an ability, you can change the #define to #undef
-before recompiling libpng and save yourself code and data space.  All
-the reading and writing specific code are in seperate files, so the
+before recompiling libpng and save yourself code and data space.
+You can also turn them off en masse with a compiler directive to
+define PNG_READ_NOT_FULLY_SUPPORTED or PNG_WRITE_NOT_FULLY_SUPPORTED,
+along with directives to turn on any of the capabilities that you do
+want.
+
+All the reading and writing specific code are in separate files, so the
 linker should only grab the files it needs.  However, if you want to
 make sure, or if you are building a stand alone library, all the
 reading files start with pngr and all the writing files start with
@@ -1514,10 +1583,12 @@ those sections which are actually used will be loaded into memory.
 
 Changes to Libpng from version 0.88
 
-It should be noted that versions of libpng later than 0.88 are not
-distributed by the original libpng author, Guy Schalnat, but rather
-another member of the original PNG Group, Andreas Dilger.  Guy is still
-alive and well, but he has moved on to other things.
+It should be noted that versions of libpng later than 0.96 are not
+distributed by the original libpng author, Guy Schalnat, nor by
+Andreas Dilger, who had taken over from Guy during 1996 and 1997, and
+distributed versions 0.89 through 0.96, but rather by another member
+of the original PNG Group, Glenn Randers-Pehrson.  Guy and Andreas are
+still alive and well, but they have moved on to other things.
 
 The old libpng functions png_read_init(), png_write_init(),
 png_info_init(), png_read_destroy(), and png_write_destory() have been

@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  */
 
 #define PNG_INTERNAL
@@ -346,7 +346,7 @@ png_write_gAMA(png_structp png_ptr, double file_gamma)
 #if defined(PNG_WRITE_sRGB_SUPPORTED)
 /* write a sRGB chunk */
 void
-png_write_sRGB(png_structp png_ptr, png_byte srgb_intent)
+png_write_sRGB(png_structp png_ptr, int srgb_intent)
 {
    png_byte buf[1];
 
@@ -354,7 +354,7 @@ png_write_sRGB(png_structp png_ptr, png_byte srgb_intent)
    if(srgb_intent > 3)
          png_warning(png_ptr,
             "Invalid sRGB rendering intent specified");
-   buf[0]=srgb_intent;
+   buf[0]=(png_byte)srgb_intent;
    png_write_chunk(png_ptr, png_sRGB, buf, (png_size_t)1);
 }
 #endif
@@ -506,7 +506,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
    }
    else
    {
-      png_warning(png_ptr, "Can't write tRNS with and alpha channel");
+      png_warning(png_ptr, "Can't write tRNS with an alpha channel");
    }
 }
 #endif
@@ -992,6 +992,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
          (png_size_t)params_len[i]);
    }
 
+   png_free(png_ptr, params_len);
    png_write_chunk_end(png_ptr);
 }
 #endif
@@ -1395,7 +1396,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
     * smallest value when summing the absolute values of the distances
     * from zero using anything >= 128 as negative numbers.  This is known
     * as the "minimum sum of absolute differences" heuristic.  Other
-    * heruistics are the "weighted minumum sum of absolute differences"
+    * heuristics are the "weighted minumum sum of absolute differences"
     * (experimental and can in theory improve compression), and the "zlib
     * predictive" method (not implemented in libpng 0.95), which does test
     * compressions of lines using different filter methods, and then chooses

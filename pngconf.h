@@ -1,12 +1,12 @@
 
 /* pngconf.c - machine configurable file for libpng
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -191,24 +191,25 @@ __dont__ include it again
  * less then 8, and even that may not work (I haven't tested it).
  */
 
+#ifndef PNG_MAX_GAMMA_8
 #define PNG_MAX_GAMMA_8 11
+#endif
 
 /* This controls how much a difference in gamma we can tolerate before
  * we actually start doing gamma conversion.
  */
+#ifndef PNG_GAMMA_THRESHOLD
 #define PNG_GAMMA_THRESHOLD 0.05
+#endif
 
 #endif /* PNG_INTERNAL */
 
 /* The following uses const char * instead of char * for error
  * and warning message functions, so some compilers won't complain.
- * If you want to use const, define PNG_USE_CONST here.  It is not
- * normally defined to make configuration easier, as it is not a
- * critical part of the code.
+ * If you do not want to use const, define PNG_NO_CONST here.
  */
-#define PNG_USE_CONST
 
-#ifdef PNG_USE_CONST
+#ifndef PNG_NO_CONST
 #  define PNG_CONST const
 #else
 #  define PNG_CONST
@@ -259,6 +260,7 @@ __dont__ include it again
 #define PNG_READ_GAMMA_SUPPORTED
 #define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #define PNG_READ_SWAP_ALPHA_SUPPORTED
+#define PNG_READ_INVERT_ALPHA_SUPPORTED
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
 #define PNG_READ_COMPOSITE_NODIV_SUPPORTED        /* well tested on Intel */
 #endif /* PNG_READ_FULLY_SUPPORTED */
@@ -275,22 +277,32 @@ __dont__ include it again
 #define PNG_WRITE_FILLER_SUPPORTED  /* This is the same as WRITE_STRIP_ALPHA */
 #define PNG_WRITE_FLUSH_SUPPORTED
 #define PNG_WRITE_SWAP_ALPHA_SUPPORTED
+#define PNG_WRITE_INVERT_ALPHA_SUPPORTED
 #define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif /* PNG_WRITE_FULLY_SUPPORTED */
 
 #if !defined(PNG_NO_STDIO)
-#define PNG_TIME_RFC1152_SUPPORTED
+#define PNG_TIME_RFC1123_SUPPORTED
 #endif
 
-/* These are currently experimental features */
-#undef PNG_READ_16_TO_8_ACCURATE_SHIFT_SUPPORTED /* very little testing */
+/* These are currently experimental features, define them if you want */
+
+/* very little testing */
+/*
+#define PNG_READ_16_TO_8_ACCURATE_SHIFT_SUPPORTED
+*/
 
 /* This is only for PowerPC big-endian and 680x0 systems */
-#undef PNG_READ_BIG_ENDIAN_SUPPORTED             /* some testing */
+/* some testing */
+/*
+#define PNG_READ_BIG_ENDIAN_SUPPORTED
+*/
 
 /* These functions are turned off by default, as they will be phased out. */
-#undef  PNG_USELESS_TESTS_SUPPORTED
-#undef  PNG_CORRECT_PALETTE_SUPPORTED
+/*
+#define  PNG_USELESS_TESTS_SUPPORTED
+#define  PNG_CORRECT_PALETTE_SUPPORTED
+*/
 
 /* Any chunks you are not interested in, you can undef here.  The
  * ones that allocate memory may be expecially important (hIST,

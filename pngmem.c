@@ -1,12 +1,11 @@
-
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  *
  * This file provides a location for all memory allocation.  Users which
  * need special memory handling are expected to modify the code in this file
@@ -15,6 +14,16 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+
+/* The following "hides" PNG_MALLOC and PNG_FREE thus allowing the pngtest
+   application to put a wrapper on top of them. */
+#ifdef PNGTEST_MEMORY_DEBUG
+   #define PNG_MALLOC png_debug_malloc
+   #define PNG_FREE   png_debug_free
+#else
+   #define PNG_MALLOC png_malloc
+   #define PNG_FREE   png_free
+#endif
 
 /* Borland DOS special memory handler */
 #if defined(__TURBOC__) && !defined(_Windows) && !defined(__FLAT__)
@@ -72,7 +81,7 @@ png_destroy_struct(png_voidp struct_ptr)
  * (which should cause a fatal error) and introducing major problems.
  */
 png_voidp
-png_malloc(png_structp png_ptr, png_uint_32 size)
+PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
    if (png_ptr == NULL || size == 0)
@@ -166,11 +175,11 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
    return ret;
 }
 
-/* free a pointer allocated by png_malloc().  In the default
+/* free a pointer allocated by PNG_MALLOC().  In the default
    configuration, png_ptr is not used, but is passed in case it
    is needed.  If ptr is NULL, return without taking any action. */
 void
-png_free(png_structp png_ptr, png_voidp ptr)
+PNG_FREE(png_structp png_ptr, png_voidp ptr)
 {
    if (png_ptr == NULL || ptr == NULL)
       return;
@@ -260,7 +269,7 @@ png_destroy_struct(png_voidp struct_ptr)
    have the ability to do that. */
 
 png_voidp
-png_malloc(png_structp png_ptr, png_uint_32 size)
+PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
    if (png_ptr == NULL || size == 0)
@@ -289,11 +298,11 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
    return ret;
 }
 
-/* Free a pointer allocated by png_malloc().  In the default
+/* Free a pointer allocated by PNG_MALLOC().  In the default
   configuration, png_ptr is not used, but is passed in case it
   is needed.  If ptr is NULL, return without taking any action. */
 void
-png_free(png_structp png_ptr, png_voidp ptr)
+PNG_FREE(png_structp png_ptr, png_voidp ptr)
 {
    if (png_ptr == NULL || ptr == NULL)
       return;

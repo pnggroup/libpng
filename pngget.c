@@ -1,12 +1,12 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  */
 
 #define PNG_INTERNAL
@@ -112,14 +112,13 @@ png_get_gAMA(png_structp png_ptr, png_infop info_ptr, double *file_gamma)
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
 png_uint_32
-png_get_sRGB(png_structp png_ptr, png_infop info_ptr, png_bytep
-    file_srgb_intent)
+png_get_sRGB(png_structp png_ptr, png_infop info_ptr, int *file_srgb_intent)
 {
    if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sRGB &&
       file_srgb_intent != NULL)
    {
       png_debug1(1, "in %s retrieval function\n", "sRGB");
-      *file_srgb_intent = info_ptr->srgb_intent;
+      *file_srgb_intent = (int)info_ptr->srgb_intent;
       return (PNG_INFO_sRGB);
    }
    return (0);
@@ -272,7 +271,8 @@ png_get_text(png_structp png_ptr, png_infop info_ptr, png_textp *text_ptr,
    if ((info_ptr != NULL) || (info_ptr->num_text > 0))
    {
       png_debug1(1, "in %s retrieval function\n",
-         (png_ptr->chunk_name[0] == '\0' ? "text" : png_ptr->chunk_name));
+         (png_ptr->chunk_name[0] == '\0' ? "text"
+             : (png_const_charp)png_ptr->chunk_name));
       if (text_ptr != NULL)
          *text_ptr = info_ptr->text;
       if (num_text != NULL)

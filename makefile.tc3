@@ -1,7 +1,7 @@
 # Makefile for libpng
 # TurboC++ 3.0 (Note: All modules are compiled in C mode)
 
-# To use, do "make -fmakefile.tc"
+# To use, do "make -fmakefile.tc3"
 
 # ------------- Turbo C++ 3.0 -------------
 MODEL=-ml

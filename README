@@ -1,4 +1,4 @@
-[NOTE:  this is still beta version 0.97c; the text below has already
+[NOTE:  this is still beta version 0.97d; the text below has already
  been updated in anticipation of the imminent 1.0 release.]
 
 
@@ -6,7 +6,7 @@ README for libpng 1.0
 
 This is the first official release of libpng.  Don't let the fact that
 it's the first release fool you.  The libpng library has been in
-extensive use and testing for about two years.  However, it's
+extensive use and testing for about two and a half years.  However, it's
 finally gotten to the stage where there haven't been significant
 changes to the API in some time, and people have a bad feeling about
 libraries with versions < 1.0.
@@ -77,7 +77,7 @@ If not, it should be at ftp.uu.net in /graphics/png
 Eventually, it will be at ftp.uu.net in /pub/archiving/zip/zlib
 
 You may also want a copy of the PNG specification.  It is available
-as an Internet Draft, and RFC, and a W3C Recommendation.  Failing
+as an RFC and a W3C Recommendation.  Failing
 these resources you can try ftp.uu.net in the /graphics/png directory.
 
 This code is currently being archived at ftp.uu.net in the
@@ -97,19 +97,19 @@ Finally, if you get any warning messages when compiling libpng
 fix.  Please mention "libpng" somewhere in the subject line.  Thanks.
 
 This release was created and will be supported by myself (of course
-based in a large way on Guy's earlier work), and the PNG group.
+based in a large way on Guy's and Andreas' earlier work), and the PNG group.
 
 adilger@enel.ucalgary.ca
 png-implement@dworkin.wustl.edu
 
-You can reach Guy, the original libpng author, at (internet preferred):
-
-internet: schalnat@group42.com
-CompuServe: 75501,1625
+You can't reach Guy, the original libpng author, at the addresses
+given in previous versions of this document.  He will read mail
+addressed to the png-implement list, however.
 
 Please do not send general questions about PNG.  Send them to
-the address in the specification.  At the same time, please do
-not send libpng questions to that address, send them to me.  I'll
+the address in the specification (png-group@w3.org).  At the same
+time, please do not send libpng questions to that address, send them to me
+or to png-implement@dworkin.wustl.edu.  I'll
 get them in the end anyway.  If you have a question about something
 in the PNG specification that is related to using libpng, send it
 to me.  Send me any questions that start with "I was using libpng,
@@ -132,18 +132,20 @@ Files in this distribution:
       descrip.mms   =>  VMS project file
       example.c     =>  Example code for using libpng functions
       libpng.txt    =>  Description of libpng and its functions
-      makefile      =>  Default Unixish makefile
       makefile.aco  =>  ACORN makefile
       makefile.ama  =>  Amiga makefile
       makefile.atr  =>  Atari makefile
       makefile.bor  =>  Borland makefile
+      makefile.dec  =>  DEC makefile
       makefile.dj2  =>  DJGPP 2 makefile
       makefile.elf  =>  Unix ELF makefile
       makefile.knr  =>  Makefile which calls ansi2knr to convert files
       makefile.mip  =>  MIPS makefile
       makefile.msc  =>  Microsoft C makefile
+      makefile.sgi  =>  Silicon Graphics Irix makefile
       makefile.std  =>  Standard Unix makefile
-      makefile.tc   =>  Turbo C makefile
+      makefile.sun  =>  SUN makefile
+      makefile.tc3  =>  Turbo C 3.0 makefile
       makevms.com   =>  VMS make program
       png.c         =>  Basic interface functions common to library
       png.h         =>  Library function and interface declarations
@@ -166,13 +168,15 @@ Files in this distribution:
 
 Good luck, and happy coding.
 
+-Glenn Randers-Pehrson
+ Internet: randeg@alumni.rpi.edu
+ Web: http://www.rpi.edu/~randeg/index.html
+
 -Andreas Eric Dilger
  Internet: adilger@enel.ucalgary.ca
  Web: http://www-mddsp.enel.ucalgary.ca/People/adilger/
 
 -Guy Eric Schalnat
- Group 42, Inc.
- Internet: schalnat@group42.com
- CompuServe: 75501,1625
+ (formerly of Group 42, Inc)
  Web: http://www.group42.com/
 

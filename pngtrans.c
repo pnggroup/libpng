@@ -1,12 +1,12 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  */
 
 #define PNG_INTERNAL
@@ -115,6 +115,16 @@ png_set_swap_alpha(png_structp png_ptr)
 {
    png_debug(1, "in png_set_swap_alpha\n");
    png_ptr->transformations |= PNG_SWAP_ALPHA;
+}
+#endif
+
+#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED) || \
+    defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
+void
+png_set_invert_alpha(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_invert_alpha\n");
+   png_ptr->transformations |= PNG_INVERT_ALPHA;
 }
 #endif
 

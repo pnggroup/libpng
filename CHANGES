@@ -170,20 +170,33 @@ version 0.96 [May, 1997]
 version 0.97 [January, 1998]
    removed PNG_USE_OWN_CRC capability
    relocated png_set_crc_action from pngrutil.c to pngrtran.c
-   fixed typecasts of "new_key", etc.
-   added RFC 1152 date support
+   fixed typecasts of "new_key", etc. (Andreas Dilger)
+   added RFC 1152 [sic] date support
    fixed bug in gamma handling of 4-bit grayscale
-   added more typecasts. 65536L becomes (png_uint_32)65536L, etc.
+   added 2-bit grayscale gamma handling (Glenn R-P)
+   added more typecasts. 65536L becomes (png_uint_32)65536L, etc. (Glenn R-P)
    minor corrections in libpng.txt
-   added simple sRGB support
-   make it simpler to do conditional compiling: PNG_READ_NOT_FULLY_SUPPORTED
-   fixed memory leak in pngwrite.c (free info_ptr->text)
+   added simple sRGB support (Glenn R-P)
+   easier conditional compiling, e.g. define PNG_READ/WRITE_NOT_FULLY_SUPPORTED;
+      all configurable options can be selected from command-line instead
+      of having to edit pngconf.h (Glenn R-P)
+   fixed memory leak in pngwrite.c (free info_ptr->text) (Glenn R-P)
    added more conditions for png_do_background, to avoid changing
       black pixels to background when a background is supplied and
       no pixels are transparent
    repaired PNG_NO_STDIO behaviour
-   tested NODIV support and made it default behaviour
-   added "-m" option to pngtest
-   [anything else?  2-bit grayscale gamma bug?]
+   tested NODIV support and made it default behaviour (Greg Roelofs)
+   added "-m" option and PNGTEST_DEBUG_MEMORY to pngtest (John Bowler)
    regularized version numbering scheme and bumped shared-library major
-      version number to 2 to avoid potential problems with libpng 0.89 apps
+      version number to 2 to avoid problems with libpng 0.89 apps (Greg Roelofs)
+version 0.98 [January, 1998]
+   cleaned up some typos in libpng.txt and in code documentation
+   fixed memory leaks in pCAL chunk processing (Glenn R-P and John Bowler)
+   cosmetic change "display_gamma" to "screen_gamma" in pngrtran.c
+   changed recommendation about file_gamma for PC images to .51 from .45,
+      in example.c and libpng.txt, added comments to distinguish between
+      screen_gamma, viewing_gamma, and display_gamma.
+   changed all references to RFC1152 to read RFC1123 and changed the
+      PNG_TIME_RFC1152_SUPPORTED macro to PNG_TIME_RFC1123_SUPPORTED
+   added png_invert_alpha capability (Glenn R-P -- suggestion by Jon Vincent)
+   changed srgb_intent from png_byte to int to avoid compiler bugs

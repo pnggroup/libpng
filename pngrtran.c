@@ -1,12 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -549,13 +549,13 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
  * also needlessly introduces small errors.
  */
 void
-png_set_gamma(png_structp png_ptr, double screen_gamma, double file_gamma)
+png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 {
    png_debug(1, "in png_set_gamma\n");
-   if (fabs(screen_gamma * file_gamma - 1.0) > PNG_GAMMA_THRESHOLD)
+   if (fabs(scrn_gamma * file_gamma - 1.0) > PNG_GAMMA_THRESHOLD)
       png_ptr->transformations |= PNG_GAMMA;
    png_ptr->gamma = (float)file_gamma;
-   png_ptr->display_gamma = (float)screen_gamma;
+   png_ptr->screen_gamma = (float)scrn_gamma;
 }
 #endif
 
@@ -592,6 +592,7 @@ png_set_rgb_to_gray(png_structp png_ptr, int gray_bits)
    png_debug(1, "in png_set_rgb_to_gray\n");
    png_ptr->transformations |= PNG_RGB_TO_GRAY;
    /* Need to do something with gray_bits here. */
+   png_warning(png_ptr, "RGB to GRAY transformation is not yet implemented.");
 }
 #endif
 
@@ -644,6 +645,23 @@ png_init_read_transformations(png_structp png_ptr)
             png_ptr->palette[png_ptr->background.index].green;
          png_ptr->background.blue  =
             png_ptr->palette[png_ptr->background.index].blue;
+
+#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
+        if (png_ptr->transformations & PNG_INVERT_ALPHA)
+        {
+#if defined(PNG_READ_EXPAND_SUPPORTED)
+           if (png_ptr->transformations & !PNG_EXPAND)
+#endif
+           {
+           /* invert the alpha channel (in tRNS) unless the pixels are 
+              going to be expanded, in which case leave it for later */
+              int i;
+              for (i=0; i<png_ptr->num_trans; i++)
+                 png_ptr->trans[i] = 255 - png_ptr->trans[i];
+           }
+        }
+#endif
+
       }
    }
 #endif
@@ -681,7 +699,7 @@ png_init_read_transformations(png_structp png_ptr)
             {
                double g;
 
-               g = 1.0 / (png_ptr->background_gamma * png_ptr->display_gamma);
+               g = 1.0 / (png_ptr->background_gamma * png_ptr->screen_gamma);
 
                if (png_ptr->background_gamma_type==PNG_BACKGROUND_GAMMA_SCREEN||
                    fabs(g - 1.0) < PNG_GAMMA_THRESHOLD)
@@ -761,17 +779,17 @@ png_init_read_transformations(png_structp png_ptr)
             switch (png_ptr->background_gamma_type)
             {
                case PNG_BACKGROUND_GAMMA_SCREEN:
-                  g = (png_ptr->display_gamma);
+                  g = (png_ptr->screen_gamma);
                   gs = 1.0;
                   break;
                case PNG_BACKGROUND_GAMMA_FILE:
                   g = 1.0 / (png_ptr->gamma);
-                  gs = 1.0 / (png_ptr->gamma * png_ptr->display_gamma);
+                  gs = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
                   break;
                case PNG_BACKGROUND_GAMMA_UNIQUE:
                   g = 1.0 / (png_ptr->background_gamma);
                   gs = 1.0 / (png_ptr->background_gamma *
-                     png_ptr->display_gamma);
+                     png_ptr->screen_gamma);
                   break;
             }
 
@@ -954,7 +972,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    else
       info_ptr->channels = 1;
 
-#if defined(PNG_STRIP_ALPHA_SUPPORTED)
+#if defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
    if ((png_ptr->transformations & PNG_STRIP_ALPHA) &&
        info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
    {
@@ -1110,6 +1128,11 @@ png_do_read_transformations(png_structp png_ptr)
 #if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
    if (png_ptr->transformations & PNG_SWAP_ALPHA)
       png_do_read_swap_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
+#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
+   if (png_ptr->transformations & PNG_INVERT_ALPHA)
+      png_do_read_invert_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED)
@@ -1468,6 +1491,87 @@ png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
 }
 #endif
 
+#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
+void
+png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
+{
+   png_debug(1, "in png_do_read_invert_alpha\n");
+#if defined(PNG_USELESS_TESTS_SUPPORTED)
+   if (row != NULL && row_info != NULL)
+#endif
+   {
+      if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+      {
+         /* This inverts the alpha channel in RGBA */
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp, dp;
+            png_uint_32 i;
+
+            for (i = 0, sp = dp = row + row_info->rowbytes;
+               i < row_info->width; i++)
+            {
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = 255 - *(--sp);
+            }
+         }
+         /* This inverts the alpha channel in RRGGBBAA */
+         else
+         {
+            png_bytep sp, dp;
+            png_uint_32 i;
+
+            for (i = 0, sp = dp = row + row_info->rowbytes;
+               i < row_info->width; i++)
+            {
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = 255 - *(--sp);
+               *(--dp) = 255 - *(--sp);
+            }
+         }
+      }
+      else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+      {
+         /* This inverts the alpha channel in AG */
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp, dp;
+            png_uint_32 i;
+
+            for (i = 0, sp = dp = row + row_info->rowbytes;
+               i < row_info->width; i++)
+            {
+               *(--dp) = *(--sp);
+               *(--dp) = 255 - *(--sp);
+            }
+         }
+         /* This inverts the alpha channel in AAGG */
+         else
+         {
+            png_bytep sp, dp;
+            png_uint_32 i;
+
+            for (i = 0, sp = dp = row + row_info->rowbytes;
+               i < row_info->width; i++)
+            {
+               *(--dp) = *(--sp);
+               *(--dp) = *(--sp);
+               *(--dp) = 255 - *(--sp);
+               *(--dp) = 255 - *(--sp);
+            }
+         }
+      }
+   }
+}
+#endif
+
 #if defined(PNG_READ_FILLER_SUPPORTED)
 /* Add filler channel if we have RGB color */
 void
@@ -1693,7 +1797,7 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
       {
          double g;
 
-         g = 1.0 / (png_ptr->background_gamma * png_ptr->display_gamma);
+         g = 1.0 / (png_ptr->background_gamma * png_ptr->screen_gamma);
 
          if (png_ptr->background_gamma_type == PNG_BACKGROUND_GAMMA_SCREEN ||
              fabs(g - 1.0) < PNG_GAMMA_THRESHOLD)
@@ -3082,7 +3186,7 @@ png_build_gamma_table(png_structp png_ptr)
       int i;
       double g;
 
-      g = 1.0 / (png_ptr->gamma * png_ptr->display_gamma);
+      g = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
 
       png_ptr->gamma_table = (png_bytep)png_malloc(png_ptr,
          (png_uint_32)256);
@@ -3107,7 +3211,7 @@ png_build_gamma_table(png_structp png_ptr)
                g) * 255.0 + .5);
          }
 
-         g = 1.0 / (png_ptr->display_gamma);
+         g = 1.0 / (png_ptr->screen_gamma);
 
          png_ptr->gamma_from_1 = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)256);
@@ -3160,7 +3264,7 @@ png_build_gamma_table(png_structp png_ptr)
 
       num = (1 << (8 - shift));
 
-      g = 1.0 / (png_ptr->gamma * png_ptr->display_gamma);
+      g = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
 
       png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
          num * sizeof (png_uint_16p));
@@ -3238,7 +3342,7 @@ png_build_gamma_table(png_structp png_ptr)
                      65535.0, g) * 65535.0 + .5);
             }
          }
-         g = 1.0 / (png_ptr->display_gamma);
+         g = 1.0 / (png_ptr->screen_gamma);
 
          png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
             num * sizeof (png_uint_16p));

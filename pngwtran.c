@@ -1,12 +1,12 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  */
 
 #define PNG_INTERNAL
@@ -41,6 +41,10 @@ png_do_write_transformations(png_structp png_ptr)
 #if defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
    if (png_ptr->transformations & PNG_SWAP_ALPHA)
       png_do_write_swap_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+#if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
+   if (png_ptr->transformations & PNG_INVERT_ALPHA)
+      png_do_write_invert_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 #if defined(PNG_WRITE_BGR_SUPPORTED)
    if (png_ptr->transformations & PNG_BGR)
@@ -394,3 +398,79 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
 }
 #endif
 
+#if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
+void
+png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
+{
+   png_debug(1, "in png_do_write_invert_alpha\n");
+#if defined(PNG_USELESS_TESTS_SUPPORTED)
+   if (row != NULL && row_info != NULL)
+#endif
+   {
+      if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+      {
+         /* This inverts the alpha channel in RGBA */
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp, dp;
+            png_uint_32 i;
+
+            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            {
+               *(dp++) = *(sp++);
+               *(dp++) = *(sp++);
+               *(dp++) = *(sp++);
+               *(dp++) = 255 - *(sp++);
+            }
+         }
+         /* This inverts the alpha channel in RRGGBBAA */
+         else
+         {
+            png_bytep sp, dp;
+            png_uint_32 i;
+
+            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            {
+               *(dp++) = *(sp++);
+               *(dp++) = *(sp++);
+               *(dp++) = *(sp++);
+               *(dp++) = *(sp++);
+               *(dp++) = *(sp++);
+               *(dp++) = *(sp++);
+               *(dp++) = 255 - *(sp++);
+               *(dp++) = 255 - *(sp++);
+            }
+         }
+      }
+      else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+      {
+         /* This inverts the alpha channel in GA */
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp, dp;
+            png_uint_32 i;
+
+            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            {
+               *(dp++) = *(sp++);
+               *(dp++) = 255 - *(sp++);
+            }
+         }
+         /* This inverts the alpha channel in GGAA */
+         else
+         {
+            png_bytep sp, dp;
+            png_uint_32 i;
+
+            for (i = 0, sp = dp = row; i < row_info->width; i++)
+            {
+               *(dp++) = *(sp++);
+               *(dp++) = *(sp++);
+               *(dp++) = 255 - *(sp++);
+               *(dp++) = 255 - *(sp++);
+            }
+         }
+      }
+   }
+}
+#endif

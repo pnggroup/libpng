@@ -1,12 +1,37 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 0.97 beta
+ * libpng 0.98 beta
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
+ *
+ * Note about libpng version numbers:
+ *
+ *    Due to various miscommunications, unforeseen code incompatibilities
+ *    and occasional factors outside the authors' control, version numbering
+ *    on the library has not always been consistent and straightforward.
+ *    The following table summarizes matters since version 0.89c, which was
+ *    the first widely used release:
+ *
+ *      source                    png.h     shared-lib
+ *      version                   string    version
+ *      -------                   ------    ----------
+ *      0.89c ("1.0 beta 3")      0.89      1.0.89
+ *      0.90  ("1.0 beta 4")      0.90      0.90  [should have been 2.0.90]
+ *      0.95  ("1.0 beta 5")      0.95      0.95  [should have been 2.0.95]
+ *      0.96  ("1.0 beta 6")      0.96      0.96  [should have been 2.0.96]
+ *      0.97b ("1.00.97 beta 7")  1.00.97   1.0.0 [should have been 2.0.97]
+ *      0.97c                     0.97      2.0.97
+ *      0.98                      0.98      2.0.98
+ *      0.99                      0.99      2.0.99
+ *      1.0                       1.00      2.1.0
+ *
+ *    Henceforth the source version will match the shared-library minor
+ *    and patch numbers; the shared-library major version number will be
+ *    used for changes in backward compatibility, as it is intended.
  *
  * BETA NOTICE:
  *    This is a beta version.  It reads and writes valid files on the
@@ -94,12 +119,12 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "0.97"
+#define PNG_LIBPNG_VER_STRING "0.98"
 
 /* careful here.  At one time, I wanted to use 082, but that would be octal.
  * Version 1.0 will be 100 here, etc.
  */
-#define PNG_LIBPNG_VER  97
+#define PNG_LIBPNG_VER  98
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #ifndef PNG_NO_EXTERN
@@ -108,33 +133,6 @@ extern "C" {
  */
 extern char png_libpng_ver[];
 
-/*
- * Note about libpng version numbers:
- *
- *    Due to various miscommunications, unforeseen code incompatibilities
- *    and occasional factors outside the authors' control, version numbering
- *    on the library has not always been consistent and straightforward.
- *    The following table summarizes matters since version 0.89c, which was
- *    the first widely used release:
- *
- *      source                    png.h     shared-lib
- *      version                   string    version
- *      -------                   ------    ----------
- *      0.89c ("1.0 beta 3")      0.89      1.0.89
- *      0.90  ("1.0 beta 4")      0.90      0.90  [should have been 2.0.90]
- *      0.95  ("1.0 beta 5")      0.95      0.95  [should have been 2.0.95]
- *      0.96  ("1.0 beta 6")      0.96      0.96  [should have been 2.0.96]
- *      0.97b ("1.00.97 beta 7")  1.00.97   1.0.0 [should have been 2.0.97]
- *      0.97c                     0.97      2.0.97
- *      0.98                      0.98      2.0.98
- *      0.99                      0.99      2.0.99
- *      1.0                       1.00      2.1.0
- *
- *    Henceforth the source version will match the shared-library minor
- *    and patch numbers; the shared-library major version number will be
- *    used for changes in backward compatibility, as it is intended.
- */
- 
 /* Structures to facilitate easy interlacing.  See png.c for more details */
 extern int FARDATA png_pass_start[];
 extern int FARDATA png_pass_inc[];
@@ -582,9 +580,9 @@ struct png_struct_def
    png_uint_32 flush_rows;    /* number of rows written since last flush */
 #endif /* PNG_WRITE_FLUSH_SUPPORTED */
 #if defined(PNG_READ_GAMMA_SUPPORTED)
-   int gamma_shift;           /* number of "insignificant" bits 16-bit gamma */
-   float gamma;               /* file gamma value */
-   float display_gamma;       /* display gamma value */
+   int gamma_shift;      /* number of "insignificant" bits 16-bit gamma */
+   float gamma;          /* file gamma value */
+   float screen_gamma;   /* screen gamma value (display_gamma/viewing_gamma */
 #endif /* PNG_READ_GAMMA_SUPPORTED */
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_bytep gamma_table;     /* gamma table for 8 bit depth files */
@@ -626,6 +624,7 @@ struct png_struct_def
    png_charp current_text;           /* current text chunk buffer */
    png_charp current_text_ptr;       /* current location in current_text */
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED && PNG_READ_tEXt/zTXt_SUPPORTED */
+#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 #if defined(__TURBOC__) && !defined(_Windows) && !defined(__FLAT__)
 /* for the Borland special 64K segment handler */
    png_bytepp offset_table_ptr;
@@ -633,8 +632,7 @@ struct png_struct_def
    png_uint_16 offset_table_number;
    png_uint_16 offset_table_count;
    png_uint_16 offset_table_count_free;
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED&&__TURBOC__&&!_Windows&&!__FLAT__ */
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+#endif /* __TURBOC__&&!_Windows&&!__FLAT__ */
 #if defined(PNG_READ_DITHER_SUPPORTED)
    png_bytep palette_lookup;         /* lookup table for dithering */
    png_bytep dither_index;           /* index translation for palette files */
@@ -649,9 +647,9 @@ struct png_struct_def
    png_uint_16p filter_costs;        /* relative filter calculation cost */
    png_uint_16p inv_filter_costs;    /* 1/relative filter calculation cost */
 #endif /* PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
-#if defined(PNG_TIME_RFC1152_SUPPORTED)
-   png_charp time_buffer;            /* String to hold RFC 1152 time text */
-#endif /* PNG_TIME_RFC1152_SUPPORTED */
+#if defined(PNG_TIME_RFC1123_SUPPORTED)
+   png_charp time_buffer;            /* String to hold RFC 1123 time text */
+#endif /* PNG_TIME_RFC1123_SUPPORTED */
 };
 
 typedef png_struct FAR * FAR * png_structpp;
@@ -706,10 +704,10 @@ extern PNG_EXPORT(void,png_write_info) PNGARG((png_structp png_ptr,
 extern PNG_EXPORT(void,png_read_info) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 
-#if defined(PNG_TIME_RFC1152_SUPPORTED)
-extern PNG_EXPORT(png_charp,png_convert_to_rfc1152)
+#if defined(PNG_TIME_RFC1123_SUPPORTED)
+extern PNG_EXPORT(png_charp,png_convert_to_rfc1123)
    PNGARG((png_structp png_ptr, png_timep ptime));
-#endif /* PNG_TIME_RFC1152_SUPPORTED */
+#endif /* PNG_TIME_RFC1123_SUPPORTED */
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
 /* convert from a struct tm to png_time */
@@ -752,6 +750,11 @@ extern PNG_EXPORT(void,png_set_strip_alpha) PNGARG((png_structp png_ptr));
     defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
 extern PNG_EXPORT(void,png_set_swap_alpha) PNGARG((png_structp png_ptr));
 #endif /* PNG_READ_SWAP_ALPHA_SUPPORTED || PNG_WRITE_SWAP_ALPHA_SUPPORTED */
+
+#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED) || \
+    defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
+extern PNG_EXPORT(void,png_set_invert_alpha) PNGARG((png_structp png_ptr));
+#endif /* PNG_READ_INVERT_ALPHA_SUPPORTED || PNG_WRITE_INVERT_ALPHA_SUPPORTED */
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
 /* Add a filler byte to 24-bit RGB images. */
@@ -819,7 +822,7 @@ extern PNG_EXPORT(void,png_set_dither) PNGARG((png_structp png_ptr,
 #endif /* PNG_READ_DITHER_SUPPORTED */
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
-/* Handle gamma correction. */
+/* Handle gamma correction. Screen_gamma=(display_gamma/viewing_gamma) */
 extern PNG_EXPORT(void,png_set_gamma) PNGARG((png_structp png_ptr,
    double screen_gamma, double default_file_gamma));
 #endif /* PNG_READ_GAMMA_SUPPORTED */
@@ -1240,14 +1243,14 @@ extern PNG_EXPORT(void,png_set_sBIT) PNGARG((png_structp png_ptr,
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
 extern PNG_EXPORT(png_uint_32,png_get_sRGB) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_bytep srgb_intent));
+   png_infop info_ptr, int *intent));
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
 #if defined(PNG_READ_sRGB_SUPPORTED) || defined(PNG_WRITE_sRGB_SUPPORTED)
 extern PNG_EXPORT(void,png_set_sRGB) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_byte srgb_intent));
+   png_infop info_ptr, int intent));
 extern PNG_EXPORT(void,png_set_sRGB_gAMA_and_cHRM) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_byte srgb_intent));
+   png_infop info_ptr, int intent));
 #endif /* PNG_READ_sRGB_SUPPORTED || PNG_WRITE_sRGB_SUPPORTED */
 
 #if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
@@ -1361,6 +1364,7 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_PACKSWAP          0x10000
 #define PNG_SWAP_ALPHA        0x20000
 #define PNG_STRIP_ALPHA       0x40000
+#define PNG_INVERT_ALPHA      0x80000
 
 /* flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
@@ -1585,7 +1589,7 @@ PNG_EXTERN void png_write_cHRM PNGARG((png_structp png_ptr,
 
 #if defined(PNG_WRITE_sRGB_SUPPORTED)
 PNG_EXTERN void png_write_sRGB PNGARG((png_structp png_ptr,
-   png_byte srgb_intent));
+   int intent));
 #endif
 
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
@@ -1699,6 +1703,16 @@ PNG_EXTERN void png_do_read_swap_alpha PNGARG((png_row_infop row_info,
 
 #if defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
 PNG_EXTERN void png_do_write_swap_alpha PNGARG((png_row_infop row_info,
+   png_bytep row));
+#endif
+
+#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
+PNG_EXTERN void png_do_read_invert_alpha PNGARG((png_row_infop row_info,
+   png_bytep row));
+#endif
+
+#if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
+PNG_EXTERN void png_do_write_invert_alpha PNGARG((png_row_infop row_info,
    png_bytep row));
 #endif
 

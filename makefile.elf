@@ -1,6 +1,6 @@
 # makefile for libpng on Linux ELF with gcc
 # Copyright (C) 1996, 1997 Andreas Dilger
-# Copyright (C) 1998 Glenn Randers-Pehrson
+# Copyright (C) 1998 Greg Roelofs
 # For conditions of distribution and use, see copyright notice in png.h
 
 CC=gcc
@@ -22,7 +22,7 @@ RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 2
-PNGMIN = 0.97
+PNGMIN = 0.98
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # where make install puts libpng.a, libpng.so*, and png.h

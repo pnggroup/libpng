@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -655,12 +655,18 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 
    if (info_ptr != NULL)
    {
+#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
+      png_free(png_ptr, info_ptr->text);
+#endif
       png_destroy_struct((png_voidp)info_ptr);
       *info_ptr_ptr = (png_infop)NULL;
    }
 
    if (end_info_ptr != NULL)
    {
+#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
+      png_free(png_ptr, info_ptr->text);
+#endif
       png_destroy_struct((png_voidp)end_info_ptr);
       *end_info_ptr_ptr = (png_infop)NULL;
    }

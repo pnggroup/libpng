@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  */
 
 /* get internal access to png.h */
@@ -43,7 +43,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_WRITE_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
-      png_write_sRGB(png_ptr, info_ptr->srgb_intent);
+      png_write_sRGB(png_ptr, (int)info_ptr->srgb_intent);
 #endif
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sBIT)
@@ -62,10 +62,23 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          (png_uint_32)info_ptr->num_palette);
    else if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       png_error(png_ptr, "Valid palette required for paletted images\n");
+
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_tRNS)
+      {
+#if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
+         /* invert the alpha channel (in tRNS) */
+         if (png_ptr->transformations & PNG_INVERT_ALPHA &&
+            info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+         {
+            int i;
+            for (i=0; i<info_ptr->num_trans; i++)
+               info_ptr->trans[i] = 255 - info_ptr->trans[i];
+         }
+#endif
       png_write_tRNS(png_ptr, info_ptr->trans, &(info_ptr->trans_values),
          info_ptr->num_trans, info_ptr->color_type);
+      }
 #endif
 #if defined(PNG_WRITE_bKGD_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_bKGD)
@@ -200,12 +213,12 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    png_write_IEND(png_ptr);
 }
 
-#if defined(PNG_TIME_RFC1152_SUPPORTED)
-/* Convert the supplied time into an RFC 1152 string suitable for use in
+#if defined(PNG_TIME_RFC1123_SUPPORTED)
+/* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
  */
 png_charp
-png_convert_to_rfc1152(png_structp png_ptr, png_timep ptime)
+png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 {
    const char *short_months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -233,7 +246,7 @@ png_convert_to_rfc1152(png_structp png_ptr, png_timep ptime)
 #endif
    return png_ptr->time_buffer;
 }
-#endif /* PNG_TIME_RFC1152_SUPPORTED */
+#endif /* PNG_TIME_RFC1123_SUPPORTED */
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
 void
@@ -583,6 +596,19 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 #ifdef PNG_WRITE_tEXt_SUPPORTED
       png_free(png_ptr, info_ptr->text);
 #endif
+#if defined(PNG_READ_pCAL_SUPPORTED)
+      png_free(png_ptr, info_ptr->pcal_purpose);
+      png_free(png_ptr, info_ptr->pcal_units);
+      if (info_ptr->pcal_params != NULL)
+      {
+         int i;
+         for (i = 0; i < info_ptr->pcal_nparams; i++)
+         {
+            png_free(png_ptr, info_ptr->pcal_params[i]);
+         }
+         png_free(png_ptr, info_ptr->pcal_params);
+      }
+#endif
       png_destroy_struct((png_voidp)info_ptr);
       *info_ptr_ptr = (png_infop)NULL;
    }
@@ -617,9 +643,9 @@ png_write_destroy(png_structp png_ptr)
    png_free(png_ptr, png_ptr->up_row);
    png_free(png_ptr, png_ptr->avg_row);
    png_free(png_ptr, png_ptr->paeth_row);
-#if defined(PNG_TIME_RFC1152_SUPPORTED)
+#if defined(PNG_TIME_RFC1123_SUPPORTED)
    png_free(png_ptr, png_ptr->time_buffer);
-#endif /* PNG_TIME_RFC1152_SUPPORTED */
+#endif /* PNG_TIME_RFC1123_SUPPORTED */
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_free(png_ptr, png_ptr->prev_filters);
    png_free(png_ptr, png_ptr->filter_weights);

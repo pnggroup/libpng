@@ -190,19 +190,22 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
                          PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
 
    /* Some suggestions as to how to get a screen gamma value */
+
+   /* Note that screen gamma is (display_gamma/viewing_gamma)
    if (/* We have a user-defined screen gamma value */)
    {
       screen_gamma = user-defined screen_gamma;
    }
    /* This is one way that applications share the same screen gamma value */
-   else if ((gamma_str = getenv("DISPLAY_GAMMA")) != NULL)
+   else if ((gamma_str = getenv("SCREEN_GAMMA")) != NULL)
    {
       screen_gamma = atof(gamma_str);
    }
    /* If we don't have another value */
    else
    {
-      screen_gamma = 2.2;  /* A good guess for PC monitors */
+      screen_gamma = 2.2;  /* A good guess for a PC monitors in a brightly
+                              lit room */
       screen_gamma = 1.7 or 1.0;  /* A good guess for Mac systems */
    }
 
@@ -211,13 +214,16 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     * by the user at run time by the user.  It is strongly suggested that
     * your application support gamma correction.
     */
-   if (png_get_sRGB(png_ptr, info_ptr, &srgb_intent)
-      png_set_sRGB(png_ptr, srgb_intent, 0);
+
+   int intent;
+
+   if (png_get_sRGB(png_ptr, info_ptr, &intent)
+      png_set_sRGB(png_ptr, intent, 0);
    else 
       if (png_get_gAMA(png_ptr, info_ptr, &image_gamma)
          png_set_gamma(png_ptr, screen_gamma, image_gamma);
       else
-         png_set_gamma(png_ptr, screen_gamma, 0.45);
+         png_set_gamma(png_ptr, screen_gamma, 0.51);
 
    /* Dither RGB files down to 8 bit palette or reduce palettes
     * to the number of colors available on your screen.

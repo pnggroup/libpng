@@ -5,7 +5,7 @@ improved dithering
 multi-lingual error and warning message support
 sPLT chunk handling
 cHRM transformation
-complete sRGB transformation (presently it simply uses gamma=0.5)
+complete sRGB transformation (presently it simply uses gamma=0.51)
 man pages for function calls
 high-level API for reading images
 final bug fixes

@@ -1,12 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 0.97
+ * libpng 0.98
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * January 7, 1998
+ * January 16, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -106,7 +106,7 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
    return 0;
 }
 
-/* Compare the CRC stored in the PNG file with that calulated by libpng from
+/* Compare the CRC stored in the PNG file with that calculated by libpng from
    the data it has read thus far. */
 int
 png_crc_error(png_structp png_ptr)
@@ -281,7 +281,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    num = (int)length / 3;
-   palette = (png_colorp)png_zalloc(png_ptr, num, sizeof (png_color));
+   palette = (png_colorp)png_zalloc(png_ptr, (uInt)num, sizeof (png_color));
    png_ptr->flags |= PNG_FLAG_FREE_PALETTE;
    for (i = 0; i < num; i++)
    {
@@ -318,7 +318,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          {
             png_chunk_warning(png_ptr, "CRC error");
             png_ptr->flags &= ~PNG_FLAG_FREE_PALETTE;
-            png_free(png_ptr, palette);
+            png_zfree(png_ptr, palette);
             return;
          }
       }
@@ -404,7 +404,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
-      if(igamma != (png_uint_32)45000L)
+      if(igamma != (png_uint_32)51000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
@@ -626,7 +626,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void
 png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_byte intent;
+   int intent;
    png_byte buf[1];
 
    png_debug(1, "in png_handle_sRGB\n");
@@ -671,7 +671,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #ifdef PNG_READ_gAMA_SUPPORTED
    if ((info_ptr->valid & PNG_INFO_gAMA))
-      if((png_uint_32)(png_ptr->gamma*(float)100000.+.5) != (png_uint_32)45000L)
+      if((png_uint_32)(png_ptr->gamma*(float)100000.+.5) != (png_uint_32)51000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
