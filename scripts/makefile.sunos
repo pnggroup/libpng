@@ -29,13 +29,11 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow -Wconversion \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes
 CC=gcc
-AR=ar
-ARFLAGS=rc
-RANLIB=ranlib
-#RANLIB=echo
-
 CFLAGS=-I$(ZLIBINC) -O # $(WARNMORE) -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+
+RANLIB=ranlib
+#RANLIB=echo
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -44,7 +42,7 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 all: libpng.a pngtest
 
 libpng.a: $(OBJS)
-	$(AR) $(ARFLAGS) $@  $(OBJS)
+	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a

@@ -1,9 +1,9 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.6beta2 - November 1, 2002
+ * libpng 1.2.6beta3 - July 18, 2004
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2002 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -105,7 +105,8 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
        {
          int keep=png_handle_as_unknown(png_ptr, up->name);
          if (keep != HANDLE_CHUNK_NEVER &&
-            up->location && (!(up->location & PNG_HAVE_PLTE)) &&
+            up->location && !(up->location & PNG_HAVE_PLTE) &&
+            !(up->location & PNG_HAVE_IDAT) &&
             ((up->name[3] & 0x20) || keep == HANDLE_CHUNK_ALWAYS ||
             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {

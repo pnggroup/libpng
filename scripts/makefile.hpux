@@ -16,17 +16,15 @@ ZLIBINC=/opt/zlib/include
 #   SHAREDLIB=libz.sl
 
 CC=cc
-AR=ar
-ARFLAGS=rc
-RANLIB=ranlib
-
 CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
 # Caution: be sure you have built zlib with the same CFLAGS.
 CCFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
-LDFLAGS=-L$(ZLIBLIB) libpng.a -lz -lm
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+
+RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.6beta2
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -66,7 +64,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a $(LIBNAME).sl pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
-	$(AR) $(ARFLAGS) $@ $(OBJS)
+	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:

@@ -10,8 +10,6 @@ INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 
 CC=gcc
-AR=ar
-ARFLAGS=rc
 CFLAGS=-I../zlib -O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
@@ -24,7 +22,7 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 all: libpng.a pngtest
 
 libpng.a: $(OBJS)
-	$(AR) $(ARFLAGS) $@  $(OBJS)
+	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a

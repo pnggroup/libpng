@@ -1,11 +1,11 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.2.6beta2 - November 1, 2002
- * Copyright (c) 1998-2002 Glenn Randers-Pehrson
+ * libpng version 1.2.6beta3 - July 18, 2004
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
- *
  */
 
 #define PNG_INTERNAL
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_6beta2 Your_png_h_is_not_version_1_2_6beta2;
+typedef version_1_2_6beta3 Your_png_h_is_not_version_1_2_6beta3;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = "1.2.6beta2";
+const char png_libpng_ver[18] = PNG_LIBPNG_VER_STRING;
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -670,8 +670,9 @@ png_sig_bytes(void)
 png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
-   if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ((png_charp) "\n libpng version 1.2.6beta2 - November 1, 2002\n\
+   if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
+   return ((png_charp) "\n libpng version 1.2.6beta3 - July 18, 2004\n\
+   Copyright (c) 2003-2004 Cosmin Truta\n\
    Copyright (c) 1998-2002 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -679,36 +680,38 @@ png_get_copyright(png_structp png_ptr)
 }
 
 /* The following return the library version as a short string in the
- * format 1.0.0 through 99.99.99zz.  To get the version of *.h files used
- * with your application, print out PNG_LIBPNG_VER_STRING, which is defined
- * in png.h.
+ * format 1.0.0 through 99.99.99zz.  To get the version of *.h files
+ * used with your application, print out PNG_LIBPNG_VER_STRING, which
+ * is defined in png.h.
+ * Note: now there is no difference between png_get_libpng_ver() and
+ * png_get_header_ver().  Due to the version_nn_nn_nn typedef guard,
+ * it is guaranteed that png.c uses the correct version of png.h.
  */
-
 png_charp PNGAPI
 png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
-   if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) "1.2.6beta2");
-   return((png_charp) "1.2.6beta2");
+   if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
+      return ((png_charp) PNG_LIBPNG_VER_STRING);
+   return ((png_charp) "");
 }
 
 png_charp PNGAPI
 png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
-   if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) PNG_LIBPNG_VER_STRING);
-   return((png_charp) PNG_LIBPNG_VER_STRING);
+   if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
+      return ((png_charp) PNG_LIBPNG_VER_STRING);
+   return ((png_charp) "");
 }
 
 png_charp PNGAPI
 png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
-   if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) PNG_HEADER_VERSION_STRING);
-   return((png_charp) PNG_HEADER_VERSION_STRING);
+   if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
+      return ((png_charp) PNG_HEADER_VERSION_STRING);
+   return ((png_charp) "");
 }
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
@@ -740,7 +743,7 @@ png_uint_32 PNGAPI
 png_access_version_number(void)
 {
    /* Version of *.c files used when building libpng */
-   return((png_uint_32) 10206L);
+   return((png_uint_32) PNG_LIBPNG_VER);
 }
 
 

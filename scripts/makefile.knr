@@ -24,8 +24,6 @@ LIBPATH=$(prefix)/lib
 DESTDIR=
 
 CC=cc
-AR=ar
-ARFLAGS=rc
 CFLAGS=-I../zlib -O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 # flags for ansi2knr
@@ -51,7 +49,7 @@ ansi2knr: ansi2knr.c
 	$(CC) $(CFLAGS) $(ANSI2KNRFLAGS) -o ansi2knr ansi2knr.c
 
 libpng.a: ansi2knr $(OBJS)
-	$(AR) $(ARFLAGS) $@  $(OBJS)
+	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a

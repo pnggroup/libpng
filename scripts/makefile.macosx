@@ -15,17 +15,13 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CC=cc
-AR=ar
-ARFLAGS=rc
-#RANLIB=echo
-RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.6beta2
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
-LDFLAGS=-L$(ZLIBLIB) libpng.a -lz
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
 
 LIBNAME=libpng12
 SHAREDLIB_POSTFIX=dylib
@@ -49,6 +45,9 @@ DI=$(DESTDIR)$(INCPATH)
 DL=$(DESTDIR)$(LIBPATH)
 DM=$(DESTDIR)$(MANPATH)
 
+#RANLIB=echo
+RANLIB=ranlib
+
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
@@ -71,7 +70,7 @@ libpng-config:
 	chmod +x libpng-config
 
 libpng.a: $(OBJS)
-	$(AR) $(ARFLAGS) $@  $(OBJS)
+	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
 $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX): $(OBJS)
@@ -109,21 +108,21 @@ install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
 	-@/bin/rm -f \
 	$(DL)/$(LIBNAME).$(PNGVER)*.$(SHAREDLIB_POSTFIX)
 	-@/bin/rm -f $(DL)/$(LIBNAME).$(SHAREDLIB_POSTFIX)
-	-@/bin/rm -f libpng.$(SHARED_POSTFIX)
-	-@/bin/rm -f libpng.3.$(SHARED_POSTFIX)
-	-@/bin/rm -f libpng.3.$(PNGMIN)*.$(SHARED_POSTFIX)
+	-@/bin/rm -f libpng.$(SHAREDLIB_POSTFIX)
+	-@/bin/rm -f libpng.3.$(SHAREDLIB_POSTFIX)
+	-@/bin/rm -f libpng.3.$(PNGMIN)*.$(SHAREDLIB_POSTFIX)
 	cp libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX) $(DL)
 	cp $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) $(DL)
 	chmod 755 $(DL)/$(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
 	chmod 755 $(DL)/libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX)
 	(cd $(DL); \
-	ln -f -s libpng.3.$(PNGMIN).$(SHARED_POSTFIX) \
-	libpng.3.$(SHARED_POSTFIX); \
-	ln -f -s libpng.3.$(SHARED_POSTFIX) libpng.$(SHARED_POSTFIX); \
-	ln -f -s $(LIBNAME).$(PNGVER).$(SHARED_POSTFIX) \
-	libpng.$(SHARED_POSTFIX); \
-	ln -f -s libpng.3.$(PNGMIN).$(SHARED_POSTFIX) \
-	libpng.3.$(SHARED_POSTFIX); \
+	ln -f -s libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX) \
+	libpng.3.$(SHAREDLIB_POSTFIX); \
+	ln -f -s libpng.3.$(SHAREDLIB_POSTFIX) libpng.$(SHAREDLIB_POSTFIX); \
+	ln -f -s $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
+	libpng.$(SHAREDLIB_POSTFIX); \
+	ln -f -s libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX) \
+	libpng.3.$(SHAREDLIB_POSTFIX); \
 	ln -f -s $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
 	$(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX); \
 	ln -f -s $(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX) \

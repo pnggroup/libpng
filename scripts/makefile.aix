@@ -12,14 +12,13 @@ ZLIBLIB = ../zlib
 # Compiler, linker, lib and other tools
 CC = gcc
 LD = $(CC)
-AR=ar
-ARFLAGS=rcs
+AR = ar rcs
 RANLIB = ranlib
 RM = rm -f
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.6beta2
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -61,7 +60,7 @@ OBJS = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
 all: $(LIBNAME)$(A) pngtest$(E)
 
 $(LIBNAME)$(A): $(OBJS)
-	$(AR) $(ARFLAGS) $@ $(OBJS)
+	$(AR) $@ $(OBJS)
 	$(RANLIB) $@
 
 test: pngtest$(E)

@@ -1,17 +1,20 @@
 /*===
-cexcept.h 1.0.0 (2000-Jun-21-Wed)
+cexcept.h 2.0.0 (2001-Jul-12-Thu)
 Adam M. Costello <amc@cs.berkeley.edu>
 
-An interface for exception-handling in ANSI C, developed jointly with
-Cosmin Truta <cosmin@cs.toronto.edu>.
+An interface for exception-handling in ANSI C (C89 and subsequent ISO
+standards), developed jointly with Cosmin Truta <cosmin@cs.toronto.edu>.
 
-    Copyright (c) 2000 Adam M. Costello and Cosmin Truta.  Everyone
+    Copyright (c) 2001 Adam M. Costello and Cosmin Truta.  Everyone
     is hereby granted permission to do whatever they like with this
     file, provided that if they modify it they take reasonable steps to
     avoid confusing or misleading people about the authors, version,
     and terms of use of the derived file.  The copyright holders make
-    no guarantees about the correctness of this file, and are not
-    responsible for any damage resulting from its use.
+    no guarantees regarding this file, and are not responsible for any
+    damage resulting from its use.
+
+Only user-defined exceptions are supported, not "real" exceptions like
+division by zero or memory segmentation violations.
 
 If this interface is used by multiple .c files, they shouldn't include
 this header file directly.  Instead, create a wrapper header file that
@@ -36,6 +39,10 @@ define_exception_type(type_name);
 
         struct exception { int code; const char *msg; };
         define_exception_type(struct exception);
+
+    Because throwing an exception causes the object to be copied (not
+    just once, but twice), programmers may wish to consider size when
+    choosing the exception type.
 
 
 struct exception_context;
@@ -62,7 +69,7 @@ struct exception_context *the_exception_context;
     application may declare a variable of this name anywhere it likes
     (inside a function, in a parameter list, or externally), and may
     use whatever storage class specifiers (static, extern, etc) or type
-    qualifiers (const, volatile) it likes.  Examples:
+    qualifiers (const, volatile, etc) it likes.  Examples:
 
         static struct exception_context
           * const the_exception_context = &foo;
@@ -107,15 +114,15 @@ Catch (expression) statement
     confusion with the C++ keywords, which have subtly different
     semantics.
 
-    A Try/Catch statement has a syntax similar to an if/else
-    statement, except that the parenthesized expression goes after
-    the second keyword rather than the first.  As with if/else,
-    there are two clauses, each of which may be a simple statement
-    ending with a semicolon or a brace-enclosed compound statement.
-    But whereas the else clause is optional, the Catch clause is
-    required.  The expression must be a modifiable lvalue (something
-    capable of being assigned to) of the exact same type passed to
-    define_exception_type().
+    A Try/Catch statement has a syntax similar to an if/else statement,
+    except that the parenthesized expression goes after the second
+    keyword rather than the first.  As with if/else, there are two
+    clauses, each of which may be a simple statement ending with a
+    semicolon or a brace-enclosed compound statement.  But whereas
+    the else clause is optional, the Catch clause is required.  The
+    expression must be a modifiable lvalue (something capable of being
+    assigned to) of the same type (disregarding type qualifiers) that
+    was passed to define_exception_type().
 
     If a Throw that uses the same exception context as the Try/Catch is
     executed within the Try clause (typically within a function called
@@ -125,9 +132,8 @@ Catch (expression) statement
     such Throw is executed, then the assignment is not performed, and
     the Catch clause is not executed.
 
-    Regardless of whether an exception is caught, the expression is
-    always evaluated exactly once, which is significant if it has side
-    effects, for example:
+    The expression is not evaluated unless and until the exception is
+    caught, which is significant if it has side effects, for example:
 
         Try foo();
         Catch (p[++i].e) { ... }
@@ -183,62 +189,55 @@ is subject to change.
 #include <setjmp.h>
 
 #define define_exception_type(etype) \
-struct exception__state { \
-  etype *exception; \
-  jmp_buf env; \
+struct exception_context { \
+  jmp_buf *penv; \
+  int caught; \
+  volatile struct { etype etmp; } v; \
 }
 
-struct exception_context { \
-  struct exception__state *last; \
-  int caught; \
-};
+/* etmp must be volatile because the application might use automatic */
+/* storage for the_exception_context, and etmp is modified between   */
+/* the calls to setjmp() and longjmp().  A wrapper struct is used to */
+/* avoid warnings about a duplicate volatile qualifier in case etype */
+/* already includes it.                                              */
 
-#define init_exception_context(ec) ((void)((ec)->last = 0))
-
-#define Catch(e) exception__catch(&(e))
-#define Catch_anonymous exception__catch(0)
+#define init_exception_context(ec) ((void)((ec)->penv = 0))
 
 #define Try \
   { \
-    struct exception__state *exception__p, exception__s; \
-    int exception__i; \
-    exception__p = the_exception_context->last; \
-    the_exception_context->last = &exception__s; \
-    for (exception__i = 0; ; exception__i = 1) \
-      if (exception__i) { \
-        if (setjmp(exception__s.env) == 0) { \
-          if (&exception__s)
+    jmp_buf *exception__prev, exception__env; \
+    exception__prev = the_exception_context->penv; \
+    the_exception_context->penv = &exception__env; \
+    if (setjmp(exception__env) == 0) { \
+      if (&exception__prev)
 
-#define exception__catch(e_addr) \
-          else { } \
-          the_exception_context->caught = 0; \
-        } \
-        else the_exception_context->caught = 1; \
-        the_exception_context->last = exception__p; \
-        break; \
-      } \
-      else exception__s.exception = e_addr; \
+#define exception__catch(action) \
+      else { } \
+      the_exception_context->caught = 0; \
+    } \
+    else { \
+      the_exception_context->caught = 1; \
+    } \
+    the_exception_context->penv = exception__prev; \
   } \
-  if (!the_exception_context->caught) { } \
+  if (!the_exception_context->caught || action) { } \
   else
+
+#define Catch(e) exception__catch(((e) = the_exception_context->v.etmp, 0))
+#define Catch_anonymous exception__catch(0)
 
 /* Try ends with if(), and Catch begins and ends with else.  This     */
 /* ensures that the Try/Catch syntax is really the same as the        */
 /* if/else syntax.                                                    */
 /*                                                                    */
-/* We use &exception__s instead of 1 to appease compilers that        */
+/* We use &exception__prev instead of 1 to appease compilers that     */
 /* warn about constant expressions inside if().  Most compilers       */
-/* should still recognize that &exception__s is never zero and avoid  */
-/* generating test code.                                              */
-/*                                                                    */
-/* We use the variable exception__i to start the loop at the bottom,  */
-/* rather than jump into the loop using a switch statement, to        */
-/* appease compilers that warn about jumping into loops.              */
+/* should still recognize that &exception__prev is never zero and     */
+/* avoid generating test code.                                        */
 
 #define Throw \
-  for (;; longjmp(the_exception_context->last->env, 1)) \
-    if (the_exception_context->last->exception) \
-      *the_exception_context->last->exception =
+  for (;; longjmp(*the_exception_context->penv, 1)) \
+    the_exception_context->v.etmp =
 
 
 #endif /* CEXCEPT_H */

@@ -8,10 +8,6 @@
 CC=cc
 SUN_CC_FLAGS=-fast -xtarget=ultra
 SUN_LD_FLAGS=-fast -xtarget=ultra
-AR=ar
-ARFLAGS=rc
-#RANLIB=ranlib
-RANLIB=echo
 
 # where make install puts libpng.a, libpng12.so and libpng12/png.h
 prefix=/a
@@ -32,9 +28,12 @@ CFLAGS=-I$(ZLIBINC) $(SUN_CC_FLAGS) \
 	# $(WARNMORE) -g -DPNG_DEBUG=5
 LDFLAGS=$(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) libpng.a -lz -lm
 
+#RANLIB=ranlib
+RANLIB=echo
+
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.6beta2
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -71,7 +70,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a $(LIBNAME).so pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
-	$(AR) $(ARFLAGS) $@ $(OBJS)
+	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:
@@ -178,7 +177,7 @@ install-config: libpng-config
 	-@/bin/rm -f $(DB)/libpng12-config
 	cp libpng-config $(DB)/libpng12-config
 	chmod 755 $(DB)/libpng12-config
-	(cd $(DB); ln -sf libpng12-config libpng-config)
+	(cd $(DB); ln -f -s libpng12-config libpng-config)
 
 install: install-static install-shared install-man install-config
 

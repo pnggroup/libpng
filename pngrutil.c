@@ -1,9 +1,9 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.2.6beta2 - November 1, 2002
+ * libpng version 1.2.6beta3 - July 18, 2004
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2002 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -171,7 +171,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                               png_size_t prefix_size, png_size_t *newlength)
 {
    static char msg[] = "Error decoding compressed text";
-   png_charp text = NULL;
+   png_charp text;
    png_size_t text_size;
 
    if (comp_type == PNG_COMPRESSION_TYPE_BASE)
@@ -364,6 +364,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
    png_ptr->filter_type = (png_byte)filter_type;
 #endif
+   png_ptr->compression_type = (png_byte)compression_type;
 
    /* find number of channels */
    switch (png_ptr->color_type)
@@ -920,12 +921,12 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
    if ((info_ptr->valid & PNG_INFO_gAMA))
    {
-   int igamma;
+   png_fixed_point igamma;
 #ifdef PNG_FIXED_POINT_SUPPORTED
-      igamma=(int)info_ptr->int_gamma;
+      igamma=info_ptr->int_gamma;
 #else
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
-      igamma=(int)(info_ptr->gamma * 100000.);
+      igamma=(png_fixed_point)(info_ptr->gamma * 100000.);
 #  endif
 #endif
       if(igamma < 45000L || igamma > 46000L)
@@ -977,8 +978,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_bytep pC;
    png_charp profile;
    png_uint_32 skip = 0;
-   png_uint_32 profile_size = 0;
-   png_uint_32 profile_length = 0;
+   png_uint_32 profile_size, profile_length;
    png_size_t slength, prefix_length, data_length;
 
    png_debug(1, "in png_handle_iCCP\n");
@@ -2203,7 +2203,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    functions to handle unknown critical chunks after we check that
    the chunk name itself is valid. */
 
-#define isnonalpha(c) ((c) < 41 || (c) > 122 || ((c) > 90 && (c) < 97))
+#define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
 
 void /* PRIVATE */
 png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)

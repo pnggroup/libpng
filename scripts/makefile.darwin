@@ -16,16 +16,14 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CC=cc
-AR=ar
-ARFLAGS=rc
-#RANLIB=echo
-RANLIB=ranlib
-
 CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 
+#RANLIB=echo
+RANLIB=ranlib
+
 PNGMAJ = 0
-PNGMIN = 1.2.6beta2
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -63,7 +61,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a $(LIBNAME).dylib pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
-	$(AR) $(ARFLAGS) $@ $(OBJS)
+	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:

@@ -1,9 +1,9 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.2.6beta2 - November 1, 2002
+ * libpng version 1.2.6beta3 - July 18, 2004
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2002 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -43,7 +43,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    else if (type == PNG_STRUCT_PNG)
      size = sizeof(png_struct);
    else
-     return (png_get_copyright());
+     return (png_get_copyright(NULL));
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(malloc_fn != NULL)
@@ -55,7 +55,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    }
    else
 #endif /* PNG_USER_MEM_SUPPORTED */
-      struct_ptr = (png_voidp)farmalloc(size));
+      struct_ptr = (png_voidp)farmalloc(size);
    if (struct_ptr != NULL)
       png_memset(struct_ptr, 0, size);
    return (struct_ptr);
@@ -177,7 +177,7 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
             if (table == NULL)
             {
-               if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+               if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
                   png_error(png_ptr, "Out Of Memory."); /* Note "O" and "M" */
                else
                   png_warning(png_ptr, "Out Of Memory.");
@@ -186,7 +186,7 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
             if ((png_size_t)table & 0xfff0)
             {
-               if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+               if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
                   png_error(png_ptr,
                     "Farmalloc didn't return normalized pointer");
                else
@@ -201,7 +201,7 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
             if (png_ptr->offset_table_ptr == NULL)
             {
-               if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+               if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
                   png_error(png_ptr, "Out Of memory."); /* Note "O" and "M" */
                else
                   png_warning(png_ptr, "Out Of memory.");
@@ -228,7 +228,7 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
       if (png_ptr->offset_table_count >= png_ptr->offset_table_number)
       {
-         if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+         if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
             png_error(png_ptr, "Out of Memory."); /* Note "o" and "M" */
          else
             png_warning(png_ptr, "Out of Memory.");
@@ -242,7 +242,7 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
    if (ret == NULL)
    {
-      if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+      if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
          png_error(png_ptr, "Out of memory."); /* Note "o" and "m" */
       else
          png_warning(png_ptr, "Out of memory."); /* Note "o" and "m" */
