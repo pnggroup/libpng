@@ -1,12 +1,12 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 0.99e
+ * libpng 1.00
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 28, 1998
+ * March 7, 1998
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -32,8 +32,8 @@
 
 /* Makes pngtest verbose so we can find problems (needs to be before png.h) */
 #ifndef PNG_DEBUG
-#define PNG_DEBUG 0
 #endif
+#define PNG_DEBUG 0
 
 #include "png.h"
 
@@ -46,6 +46,126 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname);
 /* defined so I can write to a file on gui/windowing platforms */
 /*  #define STDERR stderr  */
 #define STDERR stdout   /* for DOS */
+
+/* example of using row callbacks to make a simple progress meter */
+static int status_pass=1;
+static int status_dots_requested=0;
+static int status_dots=1;
+void read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
+void read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
+{
+    if(png_ptr == NULL || row_number > 0x3fffffff) return;
+    if(status_pass != pass)
+    {
+       fprintf(stdout,"\n Pass %d: ",pass);
+       status_pass = pass;
+       status_dots = 30;
+    }
+    status_dots--;
+    if(status_dots == 0)
+    {
+       fprintf(stdout, "\n         ");
+       status_dots=30;
+    }
+    fprintf(stdout, "r");
+}
+void write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
+void write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
+{
+    if(png_ptr == NULL || row_number > 0x3fffffff || pass > 7) return;
+    fprintf(stdout, "w");
+}
+
+
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+/* example of using user transform callback (we don't transform anything,
+   but merely count the black pixels) */
+
+static png_uint_32 black_pixels;
+void count_black_pixels(png_structp png_ptr, png_row_infop row_info,
+   png_bytep data);
+void count_black_pixels(png_structp png_ptr, png_row_infop row_info,
+   png_bytep data)
+{
+   png_bytep dp = data;
+   if(png_ptr == NULL)return; 
+
+   /* contents of row_info:
+    *  png_uint_32 width      width of row
+    *  png_uint_32 rowbytes   number of bytes in row
+    *  png_byte color_type    color type of pixels
+    *  png_byte bit_depth     bit depth of samples
+    *  png_byte channels      number of channels (1-4)
+    *  png_byte pixel_depth   bits per pixel (depth*channels)
+    */
+
+    /* counts the number of black pixels (or zero pixels if color_type is 3 */
+
+    if(row_info->color_type == 0 || row_info->color_type == 3)
+    {
+       int pos=0;
+       png_uint_32 n;
+       for (n=0; n<(int)row_info->width; n++)
+       {
+          if(row_info->bit_depth == 1)
+             if(((*dp << pos++ )& 0x80) == 0) black_pixels++;
+             if(pos == 8)
+             {
+                pos=0;
+                dp++;
+             }
+          if(row_info->bit_depth == 2)
+             if(((*dp << (pos+=2))& 0xc0) == 0) black_pixels++;
+             if(pos == 8)
+             {
+                pos=0;
+                dp++;
+             }
+          if(row_info->bit_depth == 4)
+             if(((*dp << (pos+=4))& 0xf0) == 0) black_pixels++;
+             if(pos == 8)
+             {
+                pos=0;
+                dp++;
+             }
+          if(row_info->bit_depth == 8)
+             if(*dp++ == 0) black_pixels++;
+          if(row_info->bit_depth == 16)
+          {
+             if((*dp | *(dp+1)) == 0) black_pixels++;
+             dp+=2;
+          }
+       }
+    }
+    else /* other color types */
+    {
+       png_uint_32 n;
+       int channel;
+       int color_channels = row_info->channels;
+       if(row_info->color_type > 3)color_channels--;
+
+       for (n=0; n<row_info->width; n++)
+       {
+          for (channel = 0; channel < color_channels; channel++)
+          {
+             if(row_info->bit_depth == 8)
+                if(*dp++ == 0) black_pixels++;
+             if(row_info->bit_depth == 16)
+             {
+                if((*dp | *(dp+1)) == 0) black_pixels++;
+                dp+=2;
+             }
+          }
+          if(row_info->color_type > 3)
+          {
+             dp++;
+             if(row_info->bit_depth == 16)dp++;
+          }
+       }
+    }
+}
+#endif /* PNG_READ|WRITE_USER_TRANSFORM_SUPPORTED */
 
 static int verbose = 0;
 static int wrote_question = 0;
@@ -440,6 +560,22 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       NULL);
 #endif
 #endif
+   if(status_dots_requested == 1)
+   {
+      png_set_write_status_fn(write_ptr, write_row_callback);
+      png_set_read_status_fn(read_ptr, read_row_callback);
+   }
+   else
+   {
+      png_set_write_status_fn(write_ptr, NULL);
+      png_set_read_status_fn(read_ptr, NULL);
+   }
+
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+   black_pixels=0;
+   png_set_write_user_transform_fn(write_ptr, count_black_pixels);
+#endif
 
    png_debug(0, "Reading info struct\n");
    png_read_info(read_ptr, read_info_ptr);
@@ -730,8 +866,8 @@ int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
 /* input and output filenames */
 #ifdef RISCOS
-PNG_CONST char *inname = "pngtest_png";
-PNG_CONST char *outname = "pngout_png";
+PNG_CONST char *inname = "pngtest/png";
+PNG_CONST char *outname = "pngout/png";
 #else
 static char *inname = "pngtest.png";
 static char *outname = "pngout.png";
@@ -770,20 +906,28 @@ main(int argc, char *argv[])
    if (argc > 1)
    {
       if (strcmp(argv[1], "-m") == 0)
+      {
          multiple = 1;
+         status_dots_requested = 0;
+      }
       else if (strcmp(argv[1], "-mv") == 0 ||
                strcmp(argv[1], "-vm") == 0 )
       {
          multiple = 1;
          verbose = 1;
+         status_dots_requested = 1;
       }
       else if (strcmp(argv[1], "-v") == 0)
       {
          verbose = 1;
+         status_dots_requested = 1;
          inname = argv[2];
       }
       else
+      {
          inname = argv[1];
+         status_dots_requested = 0;
+      }
    }
 
    if (!multiple && argc == 3+verbose)
@@ -813,7 +957,12 @@ main(int argc, char *argv[])
          fprintf(STDERR, "Testing %s:",argv[i]);
          kerror = test_one_file(argv[i], outname);
          if (kerror == 0) 
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+            fprintf(STDERR, " PASS (%lu black pixels)\n",black_pixels);
+#else
             fprintf(STDERR, " PASS\n");
+#endif
          else {
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
@@ -847,12 +996,20 @@ main(int argc, char *argv[])
 #ifdef PNGTEST_MEMORY_DEBUG
          int allocation_now = current_allocation;
 #endif
+         if (i == 1) status_dots_requested = 1;
+         else if(verbose == 0)status_dots_requested = 0;
          if (i == 0 || verbose == 1 || ierror != 0)
             fprintf(STDERR, "Testing %s:",inname);
          kerror = test_one_file(inname, outname);
          if(kerror == 0)
          {
-            if(verbose == 1 || i == 2) fprintf(STDERR, " PASS\n");
+            if(verbose == 1 || i == 2)
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+                fprintf(STDERR, " PASS (%lu black pixels)\n",black_pixels);
+#else
+                fprintf(STDERR, " PASS\n");
+#endif
          }
          else
          {

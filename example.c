@@ -1,3 +1,4 @@
+
 /* example.c - an example of using libpng */
 
 /* This is an example of how to use libpng to read and write PNG files.

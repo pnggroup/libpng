@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "February 28, 1998"
+.TH LIBPNG 3 "March 7, 1998"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library
 .SH SYNOPSIS
@@ -301,6 +301,12 @@ png_colorp palette, int num_palette);
 void png_set_read_fn (png_structp png_ptr, png_voidp io_ptr,
 png_rw_ptr read_data_fn);
 
+void png_set_read_status_fn (png_structp png_ptr, png_read_status_ptr
+   read_row_fn);
+
+void png_set_read_user_transform_fn (png_structp png_ptr,
+   png_user_transform_ptr read_user_transform_fn);
+
 void png_set_rgb_to_gray (png_structp png_ptr);
 
 void png_set_sBIT (png_structp png_ptr, png_infop info_ptr,
@@ -336,6 +342,12 @@ png_bytep trans, int num_trans, png_color_16p trans_values);
 
 void png_set_write_fn (png_structp png_ptr, png_voidp io_ptr,
 png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn);
+
+void png_set_write_status_fn (png_structp png_ptr, png_write_status_ptr
+   write_row_fn);
+
+void png_set_write_user_transform_fn (png_structp png_ptr,
+   png_user_transform_ptr write_user_transform_fn);
 
 int png_sig_cmp (png_bytep sig, png_size_t start, png_size_t
 num_to_check);
@@ -384,23 +396,23 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 0.99e
+ libpng version 1.00 March 7, 1998
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alumni.rpi.edu>
  Copyright (c) 1998, Glenn Randers-Pehrson
- February 28, 1998
+ For conditions of distribution and use, see copyright
+ notice in png.h.
 
  based on:
 
- libpng 1.0 beta 6  version 0.96
+ libpng 1.0 beta 6  version 0.96 May 28, 1997
  Updated and distributed by Andreas Dilger 
  Copyright (c) 1996, 1997 Andreas Dilger
- May 28, 1997
 
- libpng 1.0 beta 2 - version 0.88
+ libpng 1.0 beta 2 - version 0.88  January 26, 1996
  For conditions of distribution and use, see copyright
  notice in png.h. Copyright (c) 1995, 1996 Guy Eric
- Schalnat, Group 42, Inc.  January 26, 1996
+ Schalnat, Group 42, Inc.
 
  Updated/rewritten per request in the libpng FAQ
  Copyright (c) 1995 Frank J. T. Wojcik
@@ -414,7 +426,8 @@ file: introduction, structures, reading, writing, and modification and
 configuration notes for various special platforms.  In addition to this
 file, example.c is a good starting point for using the library, as
 it is heavily commented and should include everything most people
-will need.
+will need.  We assume that libpng is already installed; see the
+INSTALL file for instructions on how to install libpng.
 
 Libpng was written as a companion to the PNG specification, as a way
 of reducing the amount of time and effort it takes to support the PNG
@@ -586,6 +599,22 @@ libpng know that there are some bytes missing from the start of the file.
 
     png_set_sig_bytes(png_ptr, number);
 
+At this point, you can set up a callback function that will be
+called after each row has been read, which you can use to control
+a progress meter or the like.  It's demonstrated in pngtest.c.
+You must supply a function
+
+    void read_row_callback(png_ptr, png_uint_32 row, int pass);
+    {
+      /* put your code here */
+    }
+
+(You can give it another name that you like instead of "read_row_callback")
+
+To inform libpng about your function, use
+
+    png_set_read_status_fn(png_ptr, read_row_callback);
+
 In PNG files, the alpha channel in an image is the level of opacity.
 If you need the alpha channel in an image to be the level of transparency
 instead of opacity, you can invert the alpha channel (or the tRNS chunk
@@ -598,6 +627,21 @@ This has to appear here rather than later with the other transformations
 because the tRNS chunk data must be modified in the case of paletted images.
 If your image is not a paletted image, the tRNS data (which in such cases
 represents a single color to be rendered as transparent) won't be changed.
+
+Finally, you can write your own transformation function if none of
+the existing ones meets your needs.  This is done by setting a callback
+with
+
+    png_set_read_user_transform_fn(png_ptr,
+       read_transform_fn);
+
+You must supply the function
+
+    void read_transform_fn(png_ptr ptr, row_info_ptr
+       row_info, png_bytep data) 
+
+See pngtest.c for a working example.  Your function will be called
+after all of the other transformations have been processed.
 
 You are now ready to read all the file information up to the actual
 image data.  You do this with a call to png_read_info().
@@ -958,9 +1002,8 @@ the overall gamma correction required to produce pleasing results,
 which depends on the lighting conditions in the surrounding environment.
 Screen_gamma is display_gamma/viewing_gamma, where viewing_gamma is
 the amount of additional gamma correction needed to compensate for
-a dark (viewing_gamma=1.25) environment.
-In a dim or brightly lit room, no compensation other than the display_gamma
-is needed (viewing_gamma=1.0).
+a (viewing_gamma=1.25) environment.  In a dim or brightly lit room, no
+compensation other than the display_gamma is needed (viewing_gamma=1.0).
 
    if (/* We have a user-defined screen
        gamma value */)
@@ -1299,6 +1342,7 @@ png_infop info_ptr;
     read.
  */
  void
+ info_callback(png_structp png_ptr, png_infop info)
  {
     /* Do any setup here, including setting any of
        the transformations mentioned in the Reading
@@ -1368,8 +1412,6 @@ png_infop info_ptr;
      */
  }
 
-
-
 .SH IV. Writing
 
 Much of this is very similar to reading.  However, everything of
@@ -1390,7 +1432,10 @@ custom writing functions.  See the discussion under Customizing libpng.
 Next, png_struct and png_info need to be allocated and initialized.
 As these can be both relatively large, you may not want to store these
 on the stack, unless you have stack space to spare.  Of course, you
-will want to check if they return NULL.
+will want to check if they return NULL.  If you are also reading,
+you won't want to name your read structure and your write structure
+both "png_ptr"; you can call them anything you like, such as
+"read_ptr" and "write_ptr".  Look at pngtest.c, for example.
 
     png_structp png_ptr = png_create_write_struct
        (PNG_LIBPNG_VER_STRING, (void *)user_error_ptr,
@@ -1432,6 +1477,22 @@ another way, see the discussion on libpng I/O handling in the Customizing
 Libpng section below.
 
     png_init_io(png_ptr, fp);
+
+At this point, you can set up a callback function that will be
+called after each row has been written, which you can use to control
+a progress meter or the like.  It's demonstrated in pngtest.c.
+You must supply a function
+
+    void write_row_callback(png_ptr, png_uint_32 row, int pass);
+    {
+      /* put your code here */
+    }
+
+(You can give it another name that you like instead of "write_row_callback")
+
+To inform libpng about your function, use
+
+    png_set_write_status_fn(png_ptr, write_row_callback);
 
 You now have the option of modifying how the compression library will
 run.  The following functions are mainly for testing, but may be useful
@@ -1789,6 +1850,21 @@ one. This code would be used if the pixels are supplied with this reversed
 
     png_set_invert_mono(png_ptr);
 
+Finally, you can write your own transformation function if none of
+the existing ones meets your needs.  This is done by setting a callback
+with
+
+    png_set_write_user_transform_fn(png_ptr,
+       write_transform_fn);
+
+You must supply the function
+
+    void write_transform_fn(png_ptr ptr, row_info_ptr
+       row_info, png_bytep data) 
+
+See pngtest.c for a working example.  Your function will be called
+before any of the other transformations have been processed.
+
 It is possible to have libpng flush any pending output, either manually,
 or automatically after a certain number of lines have been written.  To
 flush the output stream a single time call:
@@ -2143,15 +2219,18 @@ There are a bunch of #define's in pngconf.h that control what parts of
 libpng are compiled.  All the defines end in _SUPPORTED.  If you are
 never going to use an ability, you can change the #define to #undef
 before recompiling libpng and save yourself code and data space.
-You can also turn them off en masse with a compiler directive that
-defines PNG_READ[or WRITE]_NOT_FULLY_SUPPORTED, or
+You can also turn a number of them off en masse with a compiler directive
+that defines PNG_READ[or WRITE]_TRANSFORMS_NOT_SUPPORTED, or
 PNG_READ[or WRITE]_ANCILLARY_CHUNKS_NOT_SUPPORTED, or all four,
 along with directives to turn on any of the capabilities that you do
-want.  The NOT_FULLY_SUPPORTED directives disable the extra
-transformations but still leave the library fully capable of reading
+want.  The PNG_READ[or WRITE]_TRANSFORMS_NOT_SUPPORTED directives disable
+the extra transformations but still leave the library fully capable of reading
 and writing PNG files with all known public chunks [except for sPLT].
 Use of the PNG_READ[or WRITE]_ANCILLARY_CHUNKS_NOT_SUPPORTED directive
 produces a library that is incapable of reading or writing ancillary chunks.
+If you are not using the progressive reading capability, you can
+turn that off with PNG_PROGRESSIVE_READ_NOT_SUPPORTED (don't confuse
+this with the INTERLACING capability, which you'll still have).
 
 All the reading and writing specific code are in separate files, so the
 linker should only grab the files it needs.  However, if you want to
@@ -2227,9 +2306,7 @@ the first widely used release:
  0.97c                     0.97      2.0.97
  0.98                      0.98      2.0.98
  0.99                      0.99      2.0.99
- 0.99a                     0.99      2.0.99
- 0.99b                     0.99      2.0.99
- 0.99e                     0.99      2.0.99
+ 0.99a-g                   0.99      2.0.99
  1.0                       1.00      2.1.0
 
 Henceforth the source version will match the shared-library minor
@@ -2288,24 +2365,13 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
   
-Libpng version 0.99e (February 28, 1998):
+Libpng version 1.00 (March 7, 1998):
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (randeg@alumni.rpi.edu).
 
 Supported by the PNG development group
 .br
 (png-implement@dworkin.wustl.edu).
-
-.SH BETA NOTICE
-This is a beta version.  It reads and writes valid files on the
-platforms I have, and has had a wide testing program.  You may
-have to modify the includes in png.h to get it to work on your
-system, and you may have to supply the correct compiler flags in
-the makefile if you can't find a makefile suitable for your
-operating system/compiler combination.  Please contact the authors
-via the mailing list png-implement@dworkin.wustl.edu if you have any
-problems, or if you want your compiler/platform to be supported in
-the next official libpng release.
 
 .SH COPYRIGHT NOTICE:
 

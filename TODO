@@ -1,4 +1,4 @@
-pngtodo.txt - list of things to do for libpng
+TODO - list of things to do for libpng
 
 add "grayscale->palette" transformation and "palette->grayscale" detection
 improved dithering

@@ -9,18 +9,22 @@ CFLAGS=-O2 -Z $(MODEL) -I..\zlib
 CC=tcc
 LD=tcc
 LIB=tlib
-LDFLAGS=$(MODEL)
+LDFLAGS=$(MODEL) -L..\zlib
 O=.obj
+E=.exe
 
 # variables
-OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O)
+OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O)
+pngwutil$(O)
 OBJS2 = pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O)
 OBJS3 = pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
 OBJSL1 = +png$(O) +pngset$(O) +pngget$(O) +pngrutil$(O) +pngtrans$(O)
-OBJSL2 = +pngwutil$(O) +pngmem$(O) +pngpread$(O) +pngread$(O) +pngerror$(O)
-OBJSL3 = +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O) +pngwio$(O)
+OBJSL2 = +pngwutil$(O) +pngmem$(O) +pngpread$(O) +pngread$(O)
++pngerror$(O)
+OBJSL3 = +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O)
++pngwio$(O)
 
-all: libpng.lib
+all: libpng.lib pngtest.exe
 
 png$(O): png.h pngconf.h
 		  $(CC) -c $(CFLAGS) $*.c
@@ -74,5 +78,8 @@ libpng.lib: $(OBJS1) $(OBJS2) $(OBJS3)
         $(LIB) libpng +$(OBJSL1)
         $(LIB) libpng +$(OBJSL2)
         $(LIB) libpng +$(OBJSL3)
+
+pngtest$(E): pngtest$(O) libpng.lib
+        $(CC) $(LDFLAGS) pngtest.obj libpng.lib zlib.lib
 
 # End of makefile for libpng

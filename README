@@ -1,8 +1,7 @@
-[NOTE:  this is still beta version 0.99e; the text below has already
- been updated in anticipation of the imminent 1.0 release.]
+README for libpng 1.00 (shared library 2.1)
+See the note about version numbers near the top of png.h
 
-
-README for libpng 1.0
+See INSTALL for instructions on how to install libpng.
 
 This is the first official release of libpng.  Don't let the fact that
 it's the first release fool you.  The libpng library has been in
@@ -117,7 +116,7 @@ and ...".  If in doubt, send questions to me.  I'll bounce them
 to others, if necessary.
 
 Please do not send suggestions on how to change PNG.  We have
-been discussing PNG for a couple years now, and it is official and
+been discussing PNG for three years now, and it is official and
 finished.  If you have suggestions for libpng, however, I'll
 gladly listen.  Even if your suggestion is not used for version
 1.0, it may be used later.
@@ -135,21 +134,6 @@ Files in this distribution:
       libpng.3      =>  manual page for libpng
       libpng.txt    =>  Description of libpng and its functions
       libpngpf.3    =>  manual page for libpng's private functions
-      makefile.aco  =>  ACORN makefile
-      makefile.ama  =>  Amiga makefile
-      makefile.atr  =>  Atari makefile
-      makefile.bor  =>  Borland makefile
-      makefile.dec  =>  DEC makefile
-      makefile.dj2  =>  DJGPP 2 makefile
-      makefile.knr  =>  Makefile which calls ansi2knr to convert files
-      makefile.lnx  =>  Unix Linux/ELF makefile
-      makefile.mip  =>  MIPS makefile
-      makefile.msc  =>  Microsoft C makefile
-      makefile.sgi  =>  Silicon Graphics Irix makefile
-      makefile.std  =>  Standard Unix makefile
-      makefile.sun  =>  SUN makefile
-      makefile.tc3  =>  Turbo C 3.0 makefile
-      makevms.com   =>  VMS make program
       png.5         =>  manual page for the PNG format
       png.c         =>  Basic interface functions common to library
       png.h         =>  Library function and interface declarations
@@ -170,6 +154,28 @@ Files in this distribution:
       pngwrite.c    =>  High-level write functions
       pngwtran.c    =>  Write data transformations
       pngwutil.c    =>  Write utility functions
+      scripts       =>  Directory containing scripts for building libpng:
+        descrip.mms   =>  VMS makefile for MMS or MMK
+        makefile.std  =>  Generic UNIX makefile
+        makefile.knr  =>  Archaic UNIX Makefile that converts files with ansi2knr
+        makefile.dec  =>  DEC Alpha UNIX makefile
+        makefile.sgi  =>  Silicon Graphics IRIX makefile
+        makefile.sun  =>  Sun makefile
+        makefile.s2x  =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.00)
+        makefile.lnx  =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.00)
+        makefile.mip  =>  MIPS makefile
+        makefile.aco  =>  Acorn makefile
+        makefile.ama  =>  Amiga makefile
+        makefile.atr  =>  Atari makefile
+        makefile.bor  =>  Borland makefile
+        build.bat     =>  MS-DOS batch file for Borland compiler
+        makefile.dj2  =>  DJGPP 2 makefile
+        makefile.msc  =>  Microsoft C makefile
+        makefile.tc3  =>  Turbo C 3.0 makefile
+        makefile.os2  =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
+        makefile.wat  =>  Watcom 10a+ Makefile, 32-bit flat memory model
+        pngos2.def    =>  OS/2 module definition file used by makefile.os2
+        makevms.com   =>  VMS build script
 
 Good luck, and happy coding.
 

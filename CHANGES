@@ -1,4 +1,4 @@
-pngchange.txt - changes for libpng
+CHANGES - changes for libpng
 
 version 0.2
    added reader into png.h
@@ -244,3 +244,21 @@ version 0.99e [February 28, 1998]
    Replaced pngtest.png with one created with zlib 1.1.1
    Changed pngtest to report PASS even when file size is different (Jean-loup G.)
    Corrected some logic errors in png_do_invert_alpha() (Chris Patterson)
+version 0.99f [March 5, 1998]
+   Corrected a bug in pngpread() introduced in version 99c (Kevin Bracey)
+   Moved makefiles into a "scripts" directory, and added INSTALL instruction file
+   Added makefile.os2 and pngos2.def (A. Zabolotny) and makefile.s2x (W. Sebok)
+   Added pointers to "note on libpng versions" in makefile.lnx and README
+   Added row callback feature when reading and writing nonprogressive rows
+      and added a test of this feature in pngtest.c
+   Added user transform callbacks, with test of the feature in pngtest.c
+version 0.99g [March 6, 1998, morning]
+   Minor changes to pngtest.c to suppress compiler warnings.
+   Removed "beta" language from documentation.
+version 0.99h [March 6, 1998, evening]
+   Minor changes to previous minor changes to pngtest.c 
+   Changed PNG_READ_NOT_FULLY_SUPPORTED to PNG_READ_TRANSFORMS_NOT_SUPPORTED
+   and added PNG_PROGRESSIVE_READ_NOT_SUPPORTED macro
+version 1.00 [March 7, 1998]
+   Changed several typedefs in pngrutil.c
+   Added makefile.wat (Pawel Mrochen), updated makefile.tc3 (Willem van Schaik)

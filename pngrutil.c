@@ -6,7 +6,7 @@
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 28, 1998
+ * March 7, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -1305,7 +1305,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_ptr->zstream.next_in = (png_bytep)text;
       png_ptr->zstream.avail_in = (uInt)(length - (text - key));
       png_ptr->zstream.next_out = png_ptr->zbuf;
-      png_ptr->zstream.avail_out = png_ptr->zbuf_size;
+      png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
 
       key_size = (png_size_t)(text - key);
       text_size = 0;
@@ -1704,7 +1704,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
          case 1:
          {
             png_bytep sp, dp;
-            int sshift, dshift;
+            png_uint_32 sshift, dshift;
             int s_start, s_end, s_inc;
             png_byte v;
             png_uint_32 i;
@@ -1715,8 +1715,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-                sshift = (int)((row_info->width + 7) & 7);
-                dshift = (int)((final_width + 7) & 7);
+                sshift = (png_uint_32)((row_info->width + 7) & 7);
+                dshift = (png_uint_32)((final_width + 7) & 7);
                 s_start = 7;
                 s_end = 0;
                 s_inc = -1;
@@ -1724,8 +1724,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
             else
 #endif
             {
-                sshift = 7 - (int)((row_info->width + 7) & 7);
-                dshift = 7 - (int)((final_width + 7) & 7);
+                sshift = 7 - (png_uint_32)((row_info->width + 7) & 7);
+                dshift = 7 - (png_uint_32)((final_width + 7) & 7);
                 s_start = 0;
                 s_end = 7;
                 s_inc = 1;
@@ -1759,17 +1759,17 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
          case 2:
          {
             png_bytep sp, dp;
-            int sshift, dshift;
+            png_uint_32 sshift, dshift;
             int s_start, s_end, s_inc;
             png_uint_32 i;
 
-            sp = row + (png_size_t)((row_info->width - 1) >> 2);
-            dp = row + (png_size_t)((final_width - 1) >> 2);
+            sp = row + (png_uint_32)((row_info->width - 1) >> 2);
+            dp = row + (png_uint_32)((final_width - 1) >> 2);
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-               sshift = (png_size_t)(((row_info->width + 3) & 3) << 1);
-               dshift = (png_size_t)(((final_width + 3) & 3) << 1);
+               sshift = (png_uint_32)(((row_info->width + 3) & 3) << 1);
+               dshift = (png_uint_32)(((final_width + 3) & 3) << 1);
                s_start = 6;
                s_end = 0;
                s_inc = -2;
@@ -1777,8 +1777,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
             else
 #endif
             {
-               sshift = (png_size_t)((3 - ((row_info->width + 3) & 3)) << 1);
-               dshift = (png_size_t)((3 - ((final_width + 3) & 3)) << 1);
+               sshift = (png_uint_32)((3 - ((row_info->width + 3) & 3)) << 1);
+               dshift = (png_uint_32)((3 - ((final_width + 3) & 3)) << 1);
                s_start = 0;
                s_end = 6;
                s_inc = 2;
@@ -1815,7 +1815,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
          case 4:
          {
             png_bytep sp, dp;
-            int sshift, dshift;
+            png_uint_32 sshift, dshift;
             int s_start, s_end, s_inc;
             png_uint_32 i;
 
@@ -1824,8 +1824,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
             if (transformations & PNG_PACKSWAP)
             {
-               sshift = (png_size_t)(((row_info->width + 1) & 1) << 2);
-               dshift = (png_size_t)(((final_width + 1) & 1) << 2);
+               sshift = (png_uint_32)(((row_info->width + 1) & 1) << 2);
+               dshift = (png_uint_32)(((final_width + 1) & 1) << 2);
                s_start = 4;
                s_end = 0;
                s_inc = -4;
@@ -1833,8 +1833,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
             else
 #endif
             {
-               sshift = (png_size_t)((1 - ((row_info->width + 1) & 1)) << 2);
-               dshift = (png_size_t)((1 - ((final_width + 1) & 1)) << 2);
+               sshift = (png_uint_32)((1 - ((row_info->width + 1) & 1)) << 2);
+               dshift = (png_uint_32)((1 - ((final_width + 1) & 1)) << 2);
                s_start = 0;
                s_end = 4;
                s_inc = 4;

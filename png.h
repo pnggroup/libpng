@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 0.99e beta
+ * libpng 1.00
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * February 28, 1998
+ * March 7, 1998
  *
  * Note about libpng version numbers:
  *
@@ -27,26 +27,12 @@
  *      0.97c                     0.97      2.0.97
  *      0.98                      0.98      2.0.98
  *      0.99                      0.99      2.0.99
- *      0.99a                     0.99      2.0.99
- *      0.99b                     0.99      2.0.99
- *      0.99c                     0.99      2.0.99
- *      0.99e                     0.99      2.0.99
- *      1.0                       1.00      2.1.0
+ *      0.99a-i                   0.99      2.0.99
+ *      1.00                      1.00      2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
  *    used for changes in backward compatibility, as it is intended.
- *
- * BETA NOTICE:
- *    This is a beta version.  It reads and writes valid files on the
- *    platforms I have, and has had a wide testing program.  You may
- *    have to modify the includes below to get it to work on your
- *    system, and you may have to supply the correct compiler flags in
- *    the makefile if you can't find a makefile suitable for your
- *    operating system/compiler combination.  Read libpng.txt for more
- *    information, including how to contact the authors if you have any
- *    problems, or if you want your compiler/platform to be supported in
- *    the next official libpng release.
  *
  * See libpng.txt for more information.  The PNG specification is available
  * as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
@@ -126,12 +112,12 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "0.99"
+#define PNG_LIBPNG_VER_STRING "1.00"
 
 /* careful here.  At one time, I wanted to use 082, but that would be octal.
  * Version 1.0 will be 100 here, etc.
  */
-#define PNG_LIBPNG_VER  99
+#define PNG_LIBPNG_VER  100
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
@@ -508,12 +494,20 @@ typedef png_struct FAR * png_structp;
 typedef void (*png_error_ptr) PNGARG((png_structp, png_const_charp));
 typedef void (*png_rw_ptr) PNGARG((png_structp, png_bytep, png_size_t));
 typedef void (*png_flush_ptr) PNGARG((png_structp));
+typedef void (*png_read_status_ptr) PNGARG((png_structp, png_uint_32, int));
+typedef void (*png_write_status_ptr) PNGARG((png_structp, png_uint_32, int));
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef void (*png_progressive_info_ptr) PNGARG((png_structp, png_infop));
 typedef void (*png_progressive_end_ptr) PNGARG((png_structp, png_infop));
 typedef void (*png_progressive_row_ptr) PNGARG((png_structp, png_bytep,
    png_uint_32, int));
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+typedef void (*png_user_transform_ptr) PNGARG((png_structp,
+    png_row_infop, png_bytep));
+#endif /* PNG_READ|WRITE_USER_TRANSFORM_SUPPORTED */
 
 /* The structure that holds the information to read and write PNG files.
  * The only people who need to care about what is inside of this are the
@@ -531,9 +525,14 @@ struct png_struct_def
    png_voidp error_ptr;       /* user supplied struct for error functions */
    png_rw_ptr write_data_fn;  /* function for writing output data */
    png_rw_ptr read_data_fn;   /* function for reading input data */
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+   png_user_transform_ptr read_user_transform_fn; /* user read transform */
+   png_user_transform_ptr write_user_transform_fn; /* user write transform */
+#endif
    png_voidp io_ptr;          /* ptr to application struct for I/O functions*/
 
-   png_uint_32 mode;          /* tells us whre we are in the PNG file */
+   png_uint_32 mode;          /* tells us where we are in the PNG file */
    png_uint_32 flags;         /* flags indicating various things to libpng */
    png_uint_32 transformations; /* which transformations to perform */
 
@@ -620,9 +619,11 @@ struct png_struct_def
    png_bytep trans;           /* transparency values for paletted files */
    png_color_16 trans_values; /* transparency values for non-paletted files */
 #endif /* PNG_READ_tRNS_SUPPORTED || PNG_READ_BACKGROUND_SUPPORTED */
+   png_read_status_ptr read_row_fn;   /* called after each row is decoded */
+   png_write_status_ptr write_row_fn; /* called after each row is encoded */
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
    png_progressive_info_ptr info_fn; /* called after header data fully read */
-   png_progressive_row_ptr row_fn;   /* called after each row is decoded */
+   png_progressive_row_ptr row_fn;   /* called after each prog. row is decoded */
    png_progressive_end_ptr end_fn;   /* called after image is complete */
    png_bytep save_buffer_ptr;        /* current location in save_buffer */
    png_bytep save_buffer;            /* buffer for previously read data */
@@ -1096,6 +1097,22 @@ extern PNG_EXPORT(void,png_set_read_fn) PNGARG((png_structp png_ptr,
 /* Return the user pointer associated with the I/O functions */
 extern PNG_EXPORT(png_voidp,png_get_io_ptr) PNGARG((png_structp png_ptr));
 
+extern PNG_EXPORT(void,png_set_read_status_fn) PNGARG((png_structp png_ptr,
+   png_read_status_ptr read_row_fn));
+
+extern PNG_EXPORT(void,png_set_write_status_fn) PNGARG((png_structp png_ptr,
+   png_write_status_ptr write_row_fn));
+
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
+extern PNG_EXPORT(void,png_set_read_user_transform_fn) PNGARG((png_structp
+   png_ptr, png_user_transform_ptr read_user_transform_fn));
+#endif
+
+#ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
+extern PNG_EXPORT(void,png_set_write_user_transform_fn) PNGARG((png_structp
+   png_ptr, png_user_transform_ptr write_user_transform_fn));
+#endif
+
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 /* Sets the function callbacks for the push reader, and a pointer to a
  * user-defined structure available to the callback functions.
@@ -1470,6 +1487,7 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_SWAP_ALPHA        0x20000L
 #define PNG_STRIP_ALPHA       0x40000L
 #define PNG_INVERT_ALPHA      0x80000L
+#define PNG_USER_TRANSFORM   0x100000L
 
 /* flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001

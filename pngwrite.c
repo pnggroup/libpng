@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 0.99e
+ * libpng 1.00
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 28, 1998
+ * March 7, 1998
  */
 
 /* get internal access to png.h */
@@ -527,6 +527,9 @@ png_write_row(png_structp png_ptr, png_bytep row)
 
    /* Find a filter if necessary, filter the row and write it out. */
    png_write_find_filter(png_ptr, &(png_ptr->row_info));
+
+   if (png_ptr->write_row_fn != NULL)
+      (*(png_ptr->write_row_fn))(png_ptr, png_ptr->row_number, png_ptr->pass);
 }
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
@@ -946,4 +949,21 @@ png_set_compression_method(png_structp png_ptr, int method)
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_METHOD;
    png_ptr->zlib_method = method;
 }
+
+void
+png_set_write_status_fn(png_structp png_ptr, png_write_status_ptr write_row_fn)
+{
+   png_ptr->write_row_fn = write_row_fn;
+}
+
+#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+void
+png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
+   write_user_transform_fn)
+{
+   png_debug(1, "in png_set_write_user_transform_fn\n");
+   png_ptr->transformations |= PNG_USER_TRANSFORM;
+   png_ptr->write_user_transform_fn = write_user_transform_fn;
+}
+#endif
 

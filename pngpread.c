@@ -1,12 +1,12 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 0.99e
+ * libpng 1.00
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 28, 1998
+ * March 7, 1998
  */
 
 #define PNG_INTERNAL
@@ -785,7 +785,10 @@ png_read_push_finish_row(png_structp png_ptr)
             png_pass_inc[png_ptr->pass] - 1 -
             png_pass_start[png_ptr->pass]) /
             png_pass_inc[png_ptr->pass];
-         png_ptr->irowbytes = ((png_ptr->pixel_depth + 7) >> 3) + 1;
+
+         png_ptr->irowbytes = ((png_ptr->iwidth *
+            png_ptr->pixel_depth + 7) >> 3) + 1;
+
          if (!(png_ptr->transformations & PNG_INTERLACE))
          {
             png_ptr->num_rows = (png_ptr->height +
@@ -978,7 +981,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
       png_ptr->zstream.avail_in = (uInt)(png_ptr->current_text_size -
          (text - key));
       png_ptr->zstream.next_out = png_ptr->zbuf;
-      png_ptr->zstream.avail_out = png_ptr->zbuf_size;
+      png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
 
       key_size = text - key;
       text_size = 0;

@@ -1,12 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 0.99e
+ * libpng 1.00
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 28, 1998
+ * March 7, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -600,6 +600,17 @@ png_set_rgb_to_gray(png_structp png_ptr, int gray_bits)
 }
 #endif
 
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+void
+png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
+   read_user_transform_fn)
+{
+   png_debug(1, "in png_set_read_user_transform_fn\n");
+   png_ptr->transformations |= PNG_USER_TRANSFORM;
+   png_ptr->read_user_transform_fn = read_user_transform_fn;
+}
+#endif
+
 /* Initialize everything needed for the read.  This includes modifying
  * the palette.
  */
@@ -1078,7 +1089,7 @@ png_do_read_transformations(png_structp png_ptr)
          png_ptr->gamma_shift);
 #endif
 
-#if defined(PNG_RGB_TO_GRAY_SUPPORTED)
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
    if (png_ptr->transformations & PNG_RGB_TO_GRAY)
       png_do_rgb_to_gray(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
@@ -1149,6 +1160,22 @@ png_do_read_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_SWAP_BYTES)
       png_do_swap(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
+
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+   if (png_ptr->transformations & PNG_USER_TRANSFORM)
+      if(png_ptr->read_user_transform_fn != NULL)
+        (*(png_ptr->read_user_transform_fn)) /* user read transform function */
+          (png_ptr,                    /* png_ptr */
+           &(png_ptr->row_info),       /* row_info:     */
+             /*  png_uint_32 width;          width of row */
+             /*  png_uint_32 rowbytes;       number of bytes in row */
+             /*  png_byte color_type;        color type of pixels */
+             /*  png_byte bit_depth;         bit depth of samples */
+             /*  png_byte channels;          number of channels (1-4) */
+             /*  png_byte pixel_depth;       bits per pixel (depth*channels) */
+           png_ptr->row_buf + 1);      /* start of pixel data for row */
+#endif
+
 }
 
 #if defined(PNG_READ_PACK_SUPPORTED)
