@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.2.0rc1 - August 25, 2001
+ * libpng 1.2.0 - September 1, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1499,6 +1499,4 @@ png_get_progressive_ptr(png_structp png_ptr)
 {
    return png_ptr->io_ptr;
 }
-
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
-

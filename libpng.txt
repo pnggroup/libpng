@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.0rc1 - August 25, 2001
+ libpng version 1.2.0 - September 1, 2001
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998-2001 Glenn Randers-Pehrson
@@ -2746,6 +2746,27 @@ and png_get_asm_flagmask() all may be called without allocating and ini-
 tializing any PNG structures (for example, as part of a usage screen or
 "about" box).
 
+The following code can be used to prevent an application from using the
+thread_unsafe features, even if libpng was built with PNG_THREAD_UNSAFE_OK
+defined:
+
+#if defined(PNG_USE_PNGGCCRD) && defined(PNG_ASSEMBLER_CODE_SUPPORTED) \
+  && defined(PNG_THREAD_UNSAFE_OK)
+    /* Disable thread-unsafe features of pnggccrd */
+    if (png_access_version() >= 10200)
+    {
+      png_uint_32 mmx_disable_mask = 0;
+      png_uint_32 asm_flags;
+
+      mmx_disable_mask |= ( PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  \
+                          | PNG_ASM_FLAG_MMX_READ_FILTER_SUB   \
+                          | PNG_ASM_FLAG_MMX_READ_FILTER_AVG   \
+                          | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH );
+      asm_flags = png_get_asm_flags(png_ptr);
+      png_set_asm_flags(png_ptr, asm_flags & ~mmx_disable_mask);
+    }
+#endif
+
 For more extensive examples of runtime querying, enabling and disabling
 of optimized features, see contrib/gregbook/readpng2.c in the libpng
 source-code distribution.
@@ -2827,13 +2848,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-August 25, 2001
+September 1, 2001
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.0rc1 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.0 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
