@@ -15,7 +15,7 @@
 
 LIBNAME = libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.15rc3
+PNGMIN = 1.0.15
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc

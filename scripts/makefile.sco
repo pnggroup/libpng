@@ -24,7 +24,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng10 -lz -lm
 RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.0.15rc3
+PNGMIN = 1.0.15
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 

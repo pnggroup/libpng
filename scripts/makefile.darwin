@@ -23,7 +23,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng10 -lz
 RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.0.15rc3
+PNGMIN = 1.0.15
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 
@@ -86,14 +86,15 @@ $(LIBNAME).$(PNGMAJ).dylib: $(LIBNAME).$(PNGVER).dylib
 $(LIBNAME).$(PNGVER).dylib: $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(DL)/$(LIBNAME).$(PNGMAJ).dylib \
-	 -current_version $(PNGMIN) -compatibility_version $(PNGMIN) \
+	 -flat_namespace -undefined suppress \
 	 -o $(LIBNAME).$(PNGVER).dylib \
 	 $(OBJSDLL)
 
 libpng.2.$(PNGMIN).dylib: $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(DL)/libpng.2.dylib \
-	 -current_version $(PNGMIN) -compatibility_version $(PNGMIN) \
+	 -current_version 2 -compatibility_version 2 \
+	 -flat_namespace -undefined suppress \
 	 -o libpng.2.$(PNGMIN).dylib \
 	 $(OBJSDLL)
 
