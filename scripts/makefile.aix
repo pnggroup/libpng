@@ -18,7 +18,7 @@ RM = rm -f
 # read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
 # have to change it.
 PNGMAJ = 3
-PNGMIN = 1.2.1rc2
+PNGMIN = 1.2.1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local

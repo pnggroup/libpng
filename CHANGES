@@ -1012,6 +1012,8 @@ version 1.2.1rc2 [December 4, 2001]
   Always allocate 256-entry internal palette, hist, and trans arrays, to
     avoid out-of-bounds memory reference caused by invalid PNG datastreams.
   Added a check for prefix_length > data_length in iCCP chunk handler.
+version 1.2.1 [December 12, 2001]
+  None.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
