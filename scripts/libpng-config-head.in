@@ -8,11 +8,14 @@
 
 # Modeled after libxml-config.
 
-version=1.0.15rc2
+version=1.0.15rc3
 prefix=""
-cppflags=""
-cflags=""
-ldflags=""
+libdir=""
 libs=""
-rpath=""
+I_opts=""
+L_opts=""
+R_opts=""
+cppflags=""
+ccopts=""
+ldopts=""
 

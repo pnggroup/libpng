@@ -33,7 +33,7 @@ RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.0.15rc2
+PNGMIN = 1.0.15rc3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 
@@ -80,9 +80,7 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo cflags=\"\"; \
-	echo ldflags=\"\"; \
+	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo libs=\"-lpng10 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
@@ -175,9 +173,9 @@ test-installed:
 	echo
 	echo Testing installed dynamic shared library.
 	$(CC) -I$(ZLIBINC) \
-	   `$(BINPATH)/libpng10-config --cppflags --cflags` pngtest.c \
+	   `$(BINPATH)/libpng10-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) \
-	   -o pngtesti `$(BINPATH)/libpng10-config --ldflags --libs`
+	   -o pngtesti `$(BINPATH)/libpng10-config --ldflags`
 	./pngtesti pngtest.png
 
 clean:

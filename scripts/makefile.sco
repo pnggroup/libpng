@@ -24,7 +24,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng10 -lz -lm
 RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.0.15rc2
+PNGMIN = 1.0.15rc3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 
@@ -71,9 +71,9 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo cflags=\"-belf\"; \
-	echo ldflags=\"-L$(LIBPATH)\"; \
+	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
+	echo ccopts=\"-belf\"; \
+	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo libs=\"-lpng10 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
@@ -165,9 +165,9 @@ install: install-static install-shared install-man install-config
 
 test-installed:
 	$(CC) $(CFLAGS) \
-	   `$(BINPATH)/libpng10-config --cppflags --cflags` pngtest.c \
+	   `$(BINPATH)/libpng10-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) \
-	   -o pngtesti `$(BINPATH)/libpng10-config --ldflags --libs`
+	   -o pngtesti `$(BINPATH)/libpng10-config --ldflags`
 	./pngtesti pngtest.png
 
 clean:

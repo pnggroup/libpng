@@ -30,7 +30,7 @@ LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng10 -lz -lm
 RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.0.15rc2
+PNGMIN = 1.0.15rc3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 
@@ -77,10 +77,10 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo cppflags=\"-I$(INCPATH)/$(LIBNAME) -DPNG_USE_PNGGCCRD \
-		-DPNG_NO_ASSEMBLER_CODE\"; \
-	echo cflags=\"$(ABI)\"; \
-	echo ldflags=\"-L$(LIBPATH) -R$(LIBPATH)\"; \
+	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
+	echo cppflags=\"-DPNG_USE_PNGGCCRD -DPNG_NO_ASSEMBLER_CODE\"; \
+	echo L_opts=\"-L$(LIBPATH)\"; \
+	echo R_opts=\"-R$(LIBPATH)\"; \
 	echo libs=\"-lpng10 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
@@ -184,8 +184,8 @@ test-installed:
 	echo
 	echo Testing installed dynamic shared library.
 	$(CC) -I$(ZLIBINC) \
-	   `$(BINPATH)/libpng10-config --cppflags --cflags` pngtest.c \
-	   -o pngtesti `$(BINPATH)/libpng10-config --ldflags --libs` \
+	   `$(BINPATH)/libpng10-config --cflags` pngtest.c \
+	   -o pngtesti `$(BINPATH)/libpng10-config --ldflags` \
 	   -L$(ZLIBLIB) -R$(ZLIBLIB)
 	./pngtesti pngtest.png
 
