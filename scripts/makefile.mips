@@ -14,7 +14,7 @@ LIBPATH=$(prefix)/lib
 #    make install DESTDIR=/tmp/build/libpng
 #
 # If you're going to install into a temporary location
-# via DESTDIR, that location must already exist before
+# via DESTDIR, $(DESTDIR)$(prefix) must already exist before
 # you execute make install.
 DESTDIR=
 

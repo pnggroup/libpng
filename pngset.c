@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.3 - May 21, 2002
+ * libpng 1.2.4beta1 - May 25, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -216,8 +216,13 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
    png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
 #endif
    /* Changed from info->num_palette to 256 in version 1.2.1 */
-   png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
+   png_ptr->hist = (png_uint_16p)png_malloc_warn(png_ptr,
       (png_uint_32)(256 * sizeof (png_uint_16)));
+   if (png_ptr->hist == NULL)
+     {
+       png_warning(png_ptr, "Insufficient memory for hIST chunk data.");
+       return;
+     }
 
    for (i = 0; i < info_ptr->num_palette; i++)
        png_ptr->hist[i] = hist[i];
@@ -358,7 +363,12 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
 
    length = png_strlen(purpose) + 1;
    png_debug1(3, "allocating purpose for info (%lu bytes)\n", length);
-   info_ptr->pcal_purpose = (png_charp)png_malloc(png_ptr, length);
+   info_ptr->pcal_purpose = (png_charp)png_malloc_warn(png_ptr, length);
+   if (info_ptr->pcal_purpose == NULL)
+     {
+       png_warning(png_ptr, "Insufficient memory for pCAL purpose.");
+       return;
+     }
    png_memcpy(info_ptr->pcal_purpose, purpose, (png_size_t)length);
 
    png_debug(3, "storing X0, X1, type, and nparams in info\n");
@@ -369,11 +379,21 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
 
    length = png_strlen(units) + 1;
    png_debug1(3, "allocating units for info (%lu bytes)\n", length);
-   info_ptr->pcal_units = (png_charp)png_malloc(png_ptr, length);
+   info_ptr->pcal_units = (png_charp)png_malloc_warn(png_ptr, length);
+   if (info_ptr->pcal_units == NULL)
+     {
+       png_warning(png_ptr, "Insufficient memory for pCAL units.");
+       return;
+     }
    png_memcpy(info_ptr->pcal_units, units, (png_size_t)length);
 
-   info_ptr->pcal_params = (png_charpp)png_malloc(png_ptr,
+   info_ptr->pcal_params = (png_charpp)png_malloc_warn(png_ptr,
       (png_uint_32)((nparams + 1) * sizeof(png_charp)));
+   if (info_ptr->pcal_params == NULL)
+     {
+       png_warning(png_ptr, "Insufficient memory for pCAL params.");
+       return;
+     }
 
    info_ptr->pcal_params[nparams] = NULL;
 
@@ -381,7 +401,12 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    {
       length = png_strlen(params[i]) + 1;
       png_debug2(3, "allocating parameter %d for info (%lu bytes)\n", i, length);
-      info_ptr->pcal_params[i] = (png_charp)png_malloc(png_ptr, length);
+      info_ptr->pcal_params[i] = (png_charp)png_malloc_warn(png_ptr, length);
+      if (info_ptr->pcal_params[i] == NULL)
+        {
+          png_warning(png_ptr, "Insufficient memory for pCAL parameter.");
+          return;
+        }
       png_memcpy(info_ptr->pcal_params[i], params[i], (png_size_t)length);
    }
 
@@ -628,13 +653,23 @@ void PNGAPI
 png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
    int num_text)
 {
+   int ret;
+   ret=png_set_text_2(png_ptr, info_ptr, text_ptr, num_text);
+   if (ret)
+     png_error(png_ptr, "Insufficient memory to store text");
+}
+
+int /* PRIVATE */
+png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
+   int num_text)
+{
    int i;
 
    png_debug1(1, "in %s storage function\n", (png_ptr->chunk_name[0] == '\0' ?
       "text" : (png_const_charp)png_ptr->chunk_name));
 
    if (png_ptr == NULL || info_ptr == NULL || num_text == 0)
-      return;
+      return(0);
 
    /* Make sure we have enough space in the "text" array in info_struct
     * to hold all of the incoming text_ptr objects.
@@ -649,8 +684,13 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          old_max = info_ptr->max_text;
          info_ptr->max_text = info_ptr->num_text + num_text + 8;
          old_text = info_ptr->text;
-         info_ptr->text = (png_textp)png_malloc(png_ptr,
+         info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
             (png_uint_32)(info_ptr->max_text * sizeof (png_text)));
+         if (info_ptr->text == NULL)
+           {
+             png_free(png_ptr, old_text);
+             return(1);
+           }
          png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max *
             sizeof(png_text)));
          png_free(png_ptr, old_text);
@@ -659,8 +699,10 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       {
          info_ptr->max_text = num_text + 8;
          info_ptr->num_text = 0;
-         info_ptr->text = (png_textp)png_malloc(png_ptr,
+         info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
             (png_uint_32)(info_ptr->max_text * sizeof (png_text)));
+         if (info_ptr->text == NULL)
+           return(1);
 #ifdef PNG_FREE_ME_SUPPORTED
          info_ptr->free_me |= PNG_FREE_TEXT;
 #endif
@@ -720,8 +762,10 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          textp->compression = text_ptr[i].compression;
       }
 
-      textp->key = (png_charp)png_malloc(png_ptr,
+      textp->key = (png_charp)png_malloc_warn(png_ptr,
          (png_uint_32)(key_len + text_length + lang_len + lang_key_len + 4));
+      if (textp->key == NULL)
+        return(1);
       png_debug2(2, "Allocated %lu bytes at %x in png_set_text\n",
          (png_uint_32)(key_len + lang_len + lang_key_len + text_length + 4),
          (int)textp->key);
@@ -772,6 +816,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       info_ptr->num_text++;
       png_debug1(3, "transferred text chunk %d\n", info_ptr->num_text);
    }
+   return(0);
 }
 #endif
 
@@ -839,8 +884,13 @@ png_set_sPLT(png_structp png_ptr,
     png_sPLT_tp np;
     int i;
 
-    np = (png_sPLT_tp)png_malloc(png_ptr,
+    np = (png_sPLT_tp)png_malloc_warn(png_ptr,
         (info_ptr->splt_palettes_num + nentries) * sizeof(png_sPLT_t));
+    if (np == NULL)
+    {
+      png_warning(png_ptr, "No memory for splt palettes.");
+      return;
+    }
 
     png_memcpy(np, info_ptr->splt_palettes,
            info_ptr->splt_palettes_num * sizeof(png_sPLT_t));
@@ -883,9 +933,14 @@ png_set_unknown_chunks(png_structp png_ptr,
     if (png_ptr == NULL || info_ptr == NULL || num_unknowns == 0)
         return;
 
-    np = (png_unknown_chunkp)png_malloc(png_ptr,
+    np = (png_unknown_chunkp)png_malloc_warn(png_ptr,
         (info_ptr->unknown_chunks_num + num_unknowns) *
         sizeof(png_unknown_chunk));
+    if (np == NULL)
+    {
+       png_warning(png_ptr, "Out of memory while processing unknown chunk.");
+       return;
+    }
 
     png_memcpy(np, info_ptr->unknown_chunks,
            info_ptr->unknown_chunks_num * sizeof(png_unknown_chunk));
@@ -899,11 +954,16 @@ png_set_unknown_chunks(png_structp png_ptr,
 
         png_strcpy((png_charp)to->name, (png_charp)from->name);
         to->data = (png_bytep)png_malloc(png_ptr, from->size);
-        png_memcpy(to->data, from->data, from->size);
-        to->size = from->size;
+        if (to->data == NULL)
+           png_warning(png_ptr, "Out of memory while processing unknown chunk.");
+        else
+        {
+          png_memcpy(to->data, from->data, from->size);
+          to->size = from->size;
 
-        /* note our location in the read or write sequence */
-        to->location = (png_byte)(png_ptr->mode & 0xff);
+          /* note our location in the read or write sequence */
+          to->location = (png_byte)(png_ptr->mode & 0xff);
+        }
     }
 
     info_ptr->unknown_chunks = np;

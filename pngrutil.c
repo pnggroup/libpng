@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.2.3 - May 21, 2002
+ * libpng 1.2.4beta1 - May 25, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -200,7 +200,12 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             if (text ==  NULL)
             {
                text_size = prefix_size + sizeof(msg) + 1;
-               text = (png_charp)png_malloc(png_ptr, text_size);
+               text = (png_charp)png_malloc_warn(png_ptr, text_size);
+               if (text ==  NULL)
+                 {
+                    png_free(png_ptr,chunkdata);
+                    png_error(png_ptr,"Not enough memory to decompress chunk");
+                 }
                png_memcpy(text, chunkdata, prefix_size);
             }
 
@@ -218,7 +223,12 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             {
                text_size = prefix_size +
                    png_ptr->zbuf_size - png_ptr->zstream.avail_out;
-               text = (png_charp)png_malloc(png_ptr, text_size + 1);
+               text = (png_charp)png_malloc_warn(png_ptr, text_size + 1);
+               if (text ==  NULL)
+                 {
+                    png_free(png_ptr,chunkdata);
+                    png_error(png_ptr,"Not enough memory to decompress chunk.");
+                 }
                png_memcpy(text + prefix_size, png_ptr->zbuf,
                     text_size - prefix_size);
                png_memcpy(text, chunkdata, prefix_size);
@@ -229,8 +239,15 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                png_charp tmp;
 
                tmp = text;
-               text = (png_charp)png_malloc(png_ptr, (png_uint_32)(text_size +
+               text = (png_charp)png_malloc_warn(png_ptr,
+                  (png_uint_32)(text_size +
                   png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1));
+               if (text == NULL)
+               {
+                  png_free(png_ptr, tmp);
+                  png_free(png_ptr, chunkdata);
+                  png_error(png_ptr,"Not enough memory to decompress chunk..");
+               }
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
                png_memcpy(text + text_size, png_ptr->zbuf,
@@ -269,7 +286,12 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          text_size=prefix_size;
          if (text ==  NULL)
          {
-            text = (png_charp)png_malloc(png_ptr, text_size+1);
+            text = (png_charp)png_malloc_warn(png_ptr, text_size+1);
+            if (text == NULL)
+              {
+                png_free(png_ptr, chunkdata);
+                png_error(png_ptr,"Not enough memory for text.");
+              }
             png_memcpy(text, chunkdata, prefix_size);
          }
          *(text + text_size) = 0x00;
@@ -1542,7 +1564,12 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug1(2, "Allocating and reading pCAL chunk data (%lu bytes)\n",
       length + 1);
-   purpose = (png_charp)png_malloc(png_ptr, length + 1);
+   purpose = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   if (purpose == NULL)
+     {
+       png_warning(png_ptr, "No memory for pCAL purpose.");
+       return;
+     }
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)purpose, slength);
 
@@ -1597,8 +1624,14 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Empty loop to move past the units string. */ ;
 
    png_debug(3, "Allocating pCAL parameters array\n");
-   params = (png_charpp)png_malloc(png_ptr, (png_uint_32)(nparams
+   params = (png_charpp)png_malloc_warn(png_ptr, (png_uint_32)(nparams
       *sizeof(png_charp))) ;
+   if (params == NULL)
+     {
+       png_free(png_ptr, purpose);
+       png_warning(png_ptr, "No memory for pCAL params.");
+       return;
+     }
 
    /* Get pointers to the start of each parameter string. */
    for (i = 0; i < (int)nparams; i++)
@@ -1662,7 +1695,12 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug1(2, "Allocating and reading sCAL chunk data (%lu bytes)\n",
       length + 1);
-   buffer = (png_charp)png_malloc(png_ptr, length + 1);
+   buffer = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   if (buffer == NULL)
+     {
+       png_warning(png_ptr, "Out of memory while processing sCAL chunk");
+       return;
+     }
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)buffer, slength);
 
@@ -1685,7 +1723,12 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   swidth = (png_charp)png_malloc(png_ptr, png_strlen(ep) + 1);
+   swidth = (png_charp)png_malloc_warn(png_ptr, png_strlen(ep) + 1);
+   if (swidth == NULL)
+     {
+       png_warning(png_ptr, "Out of memory while processing sCAL chunk width");
+       return;
+     }
    png_memcpy(swidth, ep, (png_size_t)png_strlen(ep));
 #endif
 #endif
@@ -1703,7 +1746,12 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   sheight = (png_charp)png_malloc(png_ptr, png_strlen(ep) + 1);
+   sheight = (png_charp)png_malloc_warn(png_ptr, png_strlen(ep) + 1);
+   if (swidth == NULL)
+     {
+       png_warning(png_ptr, "Out of memory while processing sCAL chunk height");
+       return;
+     }
    png_memcpy(sheight, ep, (png_size_t)png_strlen(ep));
 #endif
 #endif
@@ -1793,6 +1841,7 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_charp text;
    png_uint_32 skip = 0;
    png_size_t slength;
+   int ret;
 
    png_debug(1, "in png_handle_tEXt\n");
 
@@ -1811,7 +1860,12 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif
 
-   key = (png_charp)png_malloc(png_ptr, length + 1);
+   key = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   if (key == NULL)
+   {
+     png_warning(png_ptr, "No memory to process text chunk.");
+     return;
+   }
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)key, slength);
 
@@ -1829,7 +1883,13 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (text != key + slength)
       text++;
 
-   text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr, (png_uint_32)sizeof(png_text));
+   if (text_ptr == NULL)
+   {
+     png_warning(png_ptr, "Not enough memory to process text chunk.");
+     png_free(png_ptr, key);
+     return;
+   }
    text_ptr->compression = PNG_TEXT_COMPRESSION_NONE;
    text_ptr->key = key;
 #ifdef PNG_iTXt_SUPPORTED
@@ -1840,10 +1900,12 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    text_ptr->text = text;
    text_ptr->text_length = png_strlen(text);
 
-   png_set_text(png_ptr, info_ptr, text_ptr, 1);
+   ret=png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
 
    png_free(png_ptr, key);
    png_free(png_ptr, text_ptr);
+   if (ret)
+     png_warning(png_ptr, "Insufficient memory to process text chunk.");
 }
 #endif
 
@@ -1856,6 +1918,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_charp chunkdata;
    png_charp text;
    int comp_type;
+   int ret;
    png_size_t slength, prefix_len, data_len;
 
    png_debug(1, "in png_handle_zTXt\n");
@@ -1876,8 +1939,13 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif
 
-   chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
-     slength = (png_size_t)length;
+   chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   if (chunkdata == NULL)
+   {
+     png_warning(png_ptr,"Out of memory processing zTXt chunk.");
+     return;
+   }
+   slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)chunkdata, slength);
    if (png_crc_finish(png_ptr, 0))
    {
@@ -1911,7 +1979,13 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    chunkdata = (png_charp)png_decompress_chunk(png_ptr, comp_type, chunkdata,
                                     (png_size_t)length, prefix_len, &data_len);
 
-   text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr, (png_uint_32)sizeof(png_text));
+   if (text_ptr == NULL)
+   {
+     png_warning(png_ptr,"Not enough memory to process zTXt chunk.");
+     png_free(png_ptr, chunkdata);
+     return;
+   }
    text_ptr->compression = comp_type;
    text_ptr->key = chunkdata;
 #ifdef PNG_iTXt_SUPPORTED
@@ -1922,10 +1996,12 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    text_ptr->text = chunkdata + prefix_len;
    text_ptr->text_length = data_len;
 
-   png_set_text(png_ptr, info_ptr, text_ptr, 1);
+   ret=png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
 
    png_free(png_ptr, text_ptr);
    png_free(png_ptr, chunkdata);
+   if (ret)
+     png_error(png_ptr, "Insufficient memory to store zTXt chunk.");
 }
 #endif
 
@@ -1939,6 +2015,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_charp key, lang, text, lang_key;
    int comp_flag;
    int comp_type = 0;
+   int ret;
    png_size_t slength, prefix_len, data_len;
 
    png_debug(1, "in png_handle_iTXt\n");
@@ -1960,7 +2037,12 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif
 
-   chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
+   chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   if (chunkdata == NULL)
+   {
+     png_warning(png_ptr, "No memory to process iTXt chunk.");
+     return;
+   }
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)chunkdata, slength);
    if (png_crc_finish(png_ptr, 0))
@@ -2006,7 +2088,13 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           (size_t)length, prefix_len, &data_len);
    else
        data_len=png_strlen(chunkdata + prefix_len);
-   text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr, (png_uint_32)sizeof(png_text));
+   if (text_ptr == NULL)
+   {
+     png_warning(png_ptr,"Not enough memory to process iTXt chunk.");
+     png_free(png_ptr, chunkdata);
+     return;
+   }
    text_ptr->compression = (int)comp_flag + 1;
    text_ptr->lang_key = chunkdata+(lang_key-key);
    text_ptr->lang = chunkdata+(lang-key);
@@ -2015,10 +2103,12 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    text_ptr->key = chunkdata;
    text_ptr->text = chunkdata + prefix_len;
 
-   png_set_text(png_ptr, info_ptr, text_ptr, 1);
+   ret=png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
 
    png_free(png_ptr, text_ptr);
    png_free(png_ptr, chunkdata);
+   if (ret)
+     png_error(png_ptr, "Insufficient memory to store iTXt chunk.");
 }
 #endif
 
@@ -2084,7 +2174,10 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
              if (!(png_ptr->chunk_name[0] & 0x20))
                 if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
                      HANDLE_CHUNK_ALWAYS)
+                 {
+                   png_free(png_ptr, chunk.data);
                    png_chunk_error(png_ptr, "unknown critical chunk");
+                 }
              png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
           }
        }

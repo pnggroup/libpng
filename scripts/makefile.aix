@@ -17,7 +17,7 @@ RANLIB = ranlib
 RM = rm -f
 
 PNGMAJ = 0
-PNGMIN = 1.2.3
+PNGMIN = 1.2.4beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -30,7 +30,7 @@ LIBPATH=$(prefix)/lib
 #    make install DESTDIR=/tmp/build/libpng
 #
 # If you're going to install into a temporary location
-# via DESTDIR, that location must already exist before
+# via DESTDIR, $(DESTDIR)$(prefix) must already exist before
 # you execute make install.
 DESTDIR=
 

@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.2.3 - May 21, 2002
+ * libpng 1.2.4beta1 - May 25, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1051,6 +1051,7 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
       png_textp text_ptr;
       png_charp text;
       png_charp key;
+      int ret;
 
       if (png_ptr->buffer_size < 4)
       {
@@ -1083,10 +1084,13 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
 #endif
       text_ptr->text = text;
 
-      png_set_text(png_ptr, info_ptr, text_ptr, 1);
+      ret = png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
 
       png_free(png_ptr, key);
       png_free(png_ptr, text_ptr);
+
+      if (ret)
+        png_warning(png_ptr, "Insufficient memory to store text chunk.");
    }
 }
 #endif
@@ -1268,10 +1272,13 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 #endif
       text_ptr->text = text;
 
-      png_set_text(png_ptr, info_ptr, text_ptr, 1);
+      ret = png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
 
       png_free(png_ptr, key);
       png_free(png_ptr, text_ptr);
+
+      if (ret)
+        png_warning(png_ptr, "Insufficient memory to store text chunk.");
    }
 }
 #endif
@@ -1332,6 +1339,7 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
       png_charp lang;
       png_charp lang_key;
       png_charp text;
+      int ret;
 
       if (png_ptr->buffer_size < 4)
       {
@@ -1377,9 +1385,11 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
       text_ptr->text_length = 0;
       text_ptr->itxt_length = png_strlen(text);
 
-      png_set_text(png_ptr, info_ptr, text_ptr, 1);
+      ret = png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
 
       png_free(png_ptr, text_ptr);
+      if (ret)
+        png_warning(png_ptr, "Insufficient memory to store iTXt chunk.");
    }
 }
 #endif

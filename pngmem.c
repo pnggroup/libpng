@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.2.3 - May 21, 2002
+ * libpng 1.2.4beta1 - May 25, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -110,12 +110,12 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * result, we would be truncating potentially larger memory requests
  * (which should cause a fatal error) and introducing major problems.
  */
+
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
 {
-#ifndef PNG_USER_MEM_SUPPORTED
    png_voidp ret;
-#endif
+
    if (png_ptr == NULL || size == 0)
       return (NULL);
 
@@ -399,7 +399,6 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
    }
 }
 
-
 /* Allocate memory.  For reasonable files, size should never exceed
    64K.  However, zlib may allocate more then 64K if you don't tell
    it not to.  See zconf.h and png.h for more information.  zlib does
@@ -410,13 +409,14 @@ png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
+
    if (png_ptr == NULL || size == 0)
       return (NULL);
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(png_ptr->malloc_fn != NULL)
    {
-       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
+       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
        if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
           png_error(png_ptr, "Out of Memory!");
        return (ret);
@@ -424,6 +424,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
    else
        return (png_malloc_default(png_ptr, size));
 }
+
 png_voidp PNGAPI
 png_malloc_default(png_structp png_ptr, png_uint_32 size)
 {
@@ -492,6 +493,22 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 }
 
 #endif /* Not Borland DOS special memory handler */
+
+/* This function was added at libpng version 1.3.0.  The png_malloc_warn()
+ * function will issue a png_warning and return NULL instead of issuing a
+ * png_error, if it fails to allocate the requested memory.
+ */
+png_voidp PNGAPI
+png_malloc_warn(png_structp png_ptr, png_uint_32 size)
+{
+   png_voidp ptr;
+   png_uint_32 save_flags=png_ptr->flags;
+
+   png_ptr->flags|=PNG_FLAG_MALLOC_NULL_MEM_OK;
+   ptr = (png_voidp)png_malloc((png_structp)png_ptr, size);
+   png_ptr->flags=save_flags;
+   return(ptr);
+}
 
 png_voidp PNGAPI
 png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,

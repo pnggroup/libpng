@@ -31,7 +31,7 @@ LDSHARED=cc $(ABI) -shared
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.3
+PNGMIN = 1.2.4beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 RANLIB=echo
@@ -50,20 +50,20 @@ BINPATH=$(prefix)/bin
 #    make install DESTDIR=/tmp/build/libpng
 #
 # If you're going to install into a temporary location
-# via DESTDIR, that location must already exist before
+# via DESTDIR, $(DESTDIR)$(prefix) must already exist before
 # you execute make install.
 DESTDIR=
 
-DB=$(DESTDIR)/$(BINPATH)
-DI=$(DESTDIR)/$(INCPATH)
-DL=$(DESTDIR)/$(LIBPATH)
-DM=$(DESTDIR)/$(MANPATH)
+DB=$(DESTDIR)$(BINPATH)
+DI=$(DESTDIR)$(INCPATH)
+DL=$(DESTDIR)$(LIBPATH)
+DM=$(DESTDIR)$(MANPATH)
 
 OBJS = pnggccrd.o png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.a pngtest shared
+all: libpng.a pngtest shared libpng.pc libpng-config
 
 shared: $(LIBNAME).so.$(PNGVER)
 
@@ -105,8 +105,7 @@ install-headers: png.h pngconf.h
 	$(DI)/$(LIBNAME)/pngconf.h
 	-@/bin/rm -f $(DI)/png.h $(DI)/pngconf.h
 	-@/bin/rm -f $(DI)/libpng
-	(cd $(DI); ln -sf $(LIBNAME) libpng; \
-	ln -sf $(LIBNAME)/* .)
+	(cd $(DI); ln -sf $(LIBNAME) libpng; ln -sf $(LIBNAME)/* .)
 
 install-static: install-headers libpng.a
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
@@ -117,8 +116,7 @@ install-static: install-headers libpng.a
 
 install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
-	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)* \
-	$(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)* $(DL)/$(LIBNAME).so
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.3
 	-@/bin/rm -f $(DL)/libpng.so.3.*

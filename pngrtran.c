@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.2.3 - May 21, 2002
+ * libpng 1.2.4beta1 - May 25, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -167,15 +167,14 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             Perhaps not the best solution, but good enough. */
 
          int i;
-         png_bytep sort;
 
          /* initialize an array to sort colors */
-         sort = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_palette
-            * sizeof (png_byte)));
+         png_ptr->dither_sort = (png_bytep)png_malloc(png_ptr,
+            (png_uint_32)(num_palette * sizeof (png_byte)));
 
-         /* initialize the sort array */
+         /* initialize the dither_sort array */
          for (i = 0; i < num_palette; i++)
-            sort[i] = (png_byte)i;
+            png_ptr->dither_sort[i] = (png_byte)i;
 
          /* Find the least used palette entries by starting a
             bubble sort, and running it until we have sorted
@@ -191,13 +190,14 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             done = 1;
             for (j = 0; j < i; j++)
             {
-               if (histogram[sort[j]] < histogram[sort[j + 1]])
+               if (histogram[png_ptr->dither_sort[j]]
+                   < histogram[png_ptr->dither_sort[j + 1]])
                {
                   png_byte t;
 
-                  t = sort[j];
-                  sort[j] = sort[j + 1];
-                  sort[j + 1] = t;
+                  t = png_ptr->dither_sort[j];
+                  png_ptr->dither_sort[j] = png_ptr->dither_sort[j + 1];
+                  png_ptr->dither_sort[j + 1] = t;
                   done = 0;
                }
             }
@@ -214,11 +214,11 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                move the others */
             for (i = 0; i < maximum_colors; i++)
             {
-               if ((int)sort[i] >= maximum_colors)
+               if ((int)png_ptr->dither_sort[i] >= maximum_colors)
                {
                   do
                      j--;
-                  while ((int)sort[j] >= maximum_colors);
+                  while ((int)png_ptr->dither_sort[j] >= maximum_colors);
                   palette[i] = palette[j];
                }
             }
@@ -232,13 +232,13 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             for (i = 0; i < maximum_colors; i++)
             {
                /* only move the colors we need to */
-               if ((int)sort[i] >= maximum_colors)
+               if ((int)png_ptr->dither_sort[i] >= maximum_colors)
                {
                   png_color tmp_color;
 
                   do
                      j--;
-                  while ((int)sort[j] >= maximum_colors);
+                  while ((int)png_ptr->dither_sort[j] >= maximum_colors);
 
                   tmp_color = palette[j];
                   palette[j] = palette[i];
@@ -276,7 +276,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                }
             }
          }
-         png_free(png_ptr, sort);
+         png_free(png_ptr, png_ptr->dither_sort);
+         png_ptr->dither_sort=NULL;
       }
       else
       {
@@ -291,23 +292,22 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
          int i;
          int max_d;
          int num_new_palette;
+         png_dsortp t;
          png_dsortpp hash;
-         png_bytep index_to_palette;
-            /* where the original index currently is in the palette */
-         png_bytep palette_to_index;
-            /* which original index points to this palette color */
+
+         t=NULL;
 
          /* initialize palette index arrays */
-         index_to_palette = (png_bytep)png_malloc(png_ptr,
+         png_ptr->index_to_palette = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)(num_palette * sizeof (png_byte)));
-         palette_to_index = (png_bytep)png_malloc(png_ptr,
+         png_ptr->palette_to_index = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)(num_palette * sizeof (png_byte)));
 
          /* initialize the sort array */
          for (i = 0; i < num_palette; i++)
          {
-            index_to_palette[i] = (png_byte)i;
-            palette_to_index[i] = (png_byte)i;
+            png_ptr->index_to_palette[i] = (png_byte)i;
+            png_ptr->palette_to_index[i] = (png_byte)i;
          }
 
          hash = (png_dsortpp)png_malloc(png_ptr, (png_uint_32)(769 *
@@ -342,18 +342,22 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
                   if (d <= max_d)
                   {
-                     png_dsortp t;
 
-                     t = (png_dsortp)png_malloc(png_ptr, (png_uint_32)(sizeof
-                         (png_dsort)));
+                     t = (png_dsortp)png_malloc_warn(png_ptr,
+                         (png_uint_32)(sizeof(png_dsort)));
+                     if (t == NULL)
+                         break;
                      t->next = hash[d];
                      t->left = (png_byte)i;
                      t->right = (png_byte)j;
                      hash[d] = t;
                   }
                }
+               if (t == NULL)
+                  break;
             }
 
+            if (t != NULL)
             for (i = 0; i <= max_d; i++)
             {
                if (hash[i] != NULL)
@@ -362,8 +366,10 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
                   for (p = hash[i]; p; p = p->next)
                   {
-                     if ((int)index_to_palette[p->left] < num_new_palette &&
-                        (int)index_to_palette[p->right] < num_new_palette)
+                     if ((int)png_ptr->index_to_palette[p->left]
+                        < num_new_palette &&
+                        (int)png_ptr->index_to_palette[p->right]
+                        < num_new_palette)
                      {
                         int j, next_j;
 
@@ -379,7 +385,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                         }
 
                         num_new_palette--;
-                        palette[index_to_palette[j]] = palette[num_new_palette];
+                        palette[png_ptr->index_to_palette[j]]
+                          = palette[num_new_palette];
                         if (!full_dither)
                         {
                            int k;
@@ -387,23 +394,23 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                            for (k = 0; k < num_palette; k++)
                            {
                               if (png_ptr->dither_index[k] ==
-                                 index_to_palette[j])
+                                 png_ptr->index_to_palette[j])
                                  png_ptr->dither_index[k] =
-                                    index_to_palette[next_j];
+                                    png_ptr->index_to_palette[next_j];
                               if ((int)png_ptr->dither_index[k] ==
                                  num_new_palette)
                                  png_ptr->dither_index[k] =
-                                    index_to_palette[j];
+                                    png_ptr->index_to_palette[j];
                            }
                         }
 
-                        index_to_palette[palette_to_index[num_new_palette]] =
-                           index_to_palette[j];
-                        palette_to_index[index_to_palette[j]] =
-                           palette_to_index[num_new_palette];
+                        png_ptr->index_to_palette[png_ptr->palette_to_index
+                           [num_new_palette]] = png_ptr->index_to_palette[j];
+                        png_ptr->palette_to_index[png_ptr->index_to_palette[j]]
+                           = png_ptr->palette_to_index[num_new_palette];
 
-                        index_to_palette[j] = (png_byte)num_new_palette;
-                        palette_to_index[num_new_palette] = (png_byte)j;
+                        png_ptr->index_to_palette[j] = (png_byte)num_new_palette;
+                        png_ptr->palette_to_index[num_new_palette] = (png_byte)j;
                      }
                      if (num_new_palette <= maximum_colors)
                         break;
@@ -420,8 +427,6 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                   png_dsortp p = hash[i];
                   while (p)
                   {
-                     png_dsortp t;
-
                      t = p->next;
                      png_free(png_ptr, p);
                      p = t;
@@ -432,8 +437,10 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             max_d += 96;
          }
          png_free(png_ptr, hash);
-         png_free(png_ptr, palette_to_index);
-         png_free(png_ptr, index_to_palette);
+         png_free(png_ptr, png_ptr->palette_to_index);
+         png_free(png_ptr, png_ptr->index_to_palette);
+         png_ptr->palette_to_index=NULL;
+         png_ptr->index_to_palette=NULL;
       }
       num_palette = maximum_colors;
    }

@@ -1,37 +1,17 @@
 
-Libpng 1.2.3 - May 21, 2002
+Libpng 1.2.4beta1 - May 25, 2002
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
-Changes since the last public release (1.2.2):
+Changes since the last public release (1.2.3):
 
-  Changed ${PNGMAJ}.${PNGVER} bug to ${PNGVER} in makefile.sgi and makefile.sggcc
-  Fixed VER -> PNGVER typo in makefile.macosx and added install-static to install
-  Added install: target to makefile.32sunu and makefile.64sunu
-  Revised 15 makefiles to link libpng.a to libpngNN.a and the include libpng
-    subdirectory to libpngNN subdirectory without the full pathname.
-  Moved generation of libpng.pc from "install" to "all" in 15 makefiles.
-  Added install-man target to 15 makefiles (Dimitri Papadopolous-Orfanos).
-  Added $(DESTDIR) feature to 24 makefiles (Tim Mooney)
-  Fixed bug with $prefix, should be $(prefix) in makefile.hpux.
-  Updated cygwin-specific portion of pngconf.h and revised makefile.cygwin
-  Added a link from libpngNN.pc to libpng.pc in 15 makefiles.
-  Added links from include/libpngNN/*.h to include/*.h in 24 makefiles.
-  Revised makefile.darwin to make relative links without full pathname.
-  Added setjmp() at the end of png_create_*_struct_2() in case user forgets
-    to put one in their application.
-  Fixed bug in reporting number of channels in pngget.c, introduced in
-    version 1.2.2
-  Added "libpng.pc" dependency to the "install-shared" target in 15 makefiles.
-  Remove old libpng.pc and libpngNN.pc before installing new ones.
-  Revised 15 makefiles to build libpng-config and libpngNN-config from
-    libpng-config-*.in.
-  Added "Win32 DLL VB" configuration to projects/msvc/libpng.dsp
-  Changed "error" and "message" in prototypes to "error_message" and
-    "warning_message" to avoid namespace conflict.
-  Restored png_zalloc and png_zfree to nonexported form as in libpng-1.2.1.
-  Removed description of png_set_mem_fn() from documentation.
-  Revised projects/msvc/README.txt
+version 1.2.4beta1 [May 25, 2002]
+  Added libpng.pc and libpng-config to "all:" target in 16 makefiles.
+  Fixed bug in 16 makefiles: $(DESTDIR)/$(LIBPATH) to $(DESTDIR)$(LIBPATH)
+  Added missing "\" before closing double quote in makefile.gcmmx.
+  Plugged various memory leaks; added png_malloc_warn() and png_set_text_2()
+    functions.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
