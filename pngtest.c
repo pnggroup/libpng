@@ -1,12 +1,30 @@
 
 /* pngtest.c - a simple test program to test libpng
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ *
+ * This program reads in a PNG image, writes it out again, and then
+ * compares the two files.  If the files are identical, this shows that
+ * the basic chunk handling, filtering, and (de)compression code is working
+ * properly.  It does not currently test all of the transforms, although
+ * it probably should.
+ *
+ * The program will fail in certain legitimate cases:
+ * 1) when the compression level or filter selection method is changed.
+ * 2) when the chunk size is smaller than 8K.
+ * 3) unknown ancillary chunks exist in the input file.
+ * 4) others not listed here...
+ * In these cases, it is best to check with another tool such as "pngcheck"
+ * to see what the differences between the two images are.
+ *
+ * If a filename is given on the command-line, then this file is used
+ * for the input, rather than the default "pngtest.png".  This allows
+ * testing a wide variety of files easily.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,11 +46,11 @@
 
 /* input and output filenames */
 #ifdef RISCOS
-char *inname = "pngtest_png";
-char *outname = "pngout_png";
+PNG_CONST char *inname = "pngtest_png";
+PNG_CONST char *outname = "pngout_png";
 #else
-char *inname = "pngtest.png";
-char *outname = "pngout.png";
+PNG_CONST char *inname = "pngtest.png";
+PNG_CONST char *outname = "pngout.png";
 #endif
 
 char inbuf[256], outbuf[256];
@@ -179,6 +197,16 @@ main(int argc, char *argv[])
       if (png_get_gAMA(read_ptr, read_info_ptr, &gamma))
       {
          png_set_gAMA(write_ptr, write_info_ptr, gamma);
+      }
+   }
+#endif
+#if defined(PNG_READ_sRGB_SUPPORTED) && defined(PNG_WRITE_sRGB_SUPPORTED)
+   {
+      png_byte intent;
+
+      if (png_get_sRGB(read_ptr, read_info_ptr, &intent))
+      {
+         png_set_sRGB(write_ptr, write_info_ptr, intent);
       }
    }
 #endif

@@ -1,15 +1,16 @@
 
 /* pngmem.c - stub functions for memory allocation
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-
-   This file provides a location for all memory allocation.  Users which
-   need special memory handling are expected to modify the code in this file
-   to meet their needs.  See the instructions at each function. */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ *
+ * This file provides a location for all memory allocation.  Users which
+ * need special memory handling are expected to modify the code in this file
+ * to meet their needs.  See the instructions at each function.
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -81,7 +82,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
       png_error(png_ptr, "Cannot Allocate > 64K");
 #endif
 
-   if (size == (png_uint_32)(65536L))
+   if (size == (png_uint_32)65536L)
    {
       if (png_ptr->offset_table == NULL)
       {
@@ -139,7 +140,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
             for (i = 0; i < num_blocks; i++)
             {
                png_ptr->offset_table_ptr[i] = (png_bytep)hptr;
-               hptr += 65536L;
+               hptr += (png_uint_32)65536L;
             }
 
             png_ptr->offset_table_number = num_blocks;

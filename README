@@ -1,9 +1,16 @@
-README for libpng 0.96
+README for libpng 1.10
 
-This is the sixth (and hopefully last) beta release of libpng 1.0.
-The changes from libpng-0.90 include bug fixes, a C++ wrapper for
-png.h, some additions to the API, as well as internal changes to
-the library.  See "CHANGES" for a detailed list of differences.
+This first official release of libpng.  Don't let the fact that
+it's the first release fool you.  The libpng library has been in
+extensive use and testing for about two years.  However, it's
+finally gotten to the stage where there haven't been significant
+changes to the API in some time, and people have a bad feeling about
+libraries with versions < 1.0.
+
+Note that the version number is 1.10 to avoid potential problems
+with shared libraries created for Linux ELF under version 0.89,
+which mistakenly used 1.0.89 as the library version number in
+false anticipation of an imminent 1.0 release.
 
 ****
 Note that some of the changes to the png_info structure render this
@@ -19,6 +26,12 @@ access to info_ptr.  These functions are the png_set_<chunk> and
 png_get_<chunk> functions.  These functions should be used when
 accessing/storing the info_struct data, rather than manipulating it
 directly, to avoid such problems in the future.
+
+It is important to note that the APIs do not make current programs
+which access the info struct directly incompatible with the new
+library.  However, it is strongly suggested that new programs use
+the new APIs (as shown in example.c), and older programs be converted
+to the new format, to facilitate upgrades in the future.
 ****
 
 Additions since 0.90 include the ability to compile libpng as a

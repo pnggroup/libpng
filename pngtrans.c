@@ -1,12 +1,12 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ */
 
 #define PNG_INTERNAL
 #include "png.h"

@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ */
 
 /* get internal access to png.h */
 #define PNG_INTERNAL
@@ -37,6 +37,10 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_WRITE_gAMA_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_gAMA)
       png_write_gAMA(png_ptr, info_ptr->gamma);
+#endif
+#if defined(PNG_WRITE_sRGB_SUPPORTED)
+   if (info_ptr->valid & PNG_INFO_sRGB)
+      png_write_sRGB(png_ptr, info_ptr->srgb_intent);
 #endif
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sBIT)
@@ -128,9 +132,10 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
 }
 
 /* Writes the end of the PNG file.  If you don't want to write comments or
-   time information, you can pass NULL for info.  If you already wrote these
-   in png_write_info(), do not write them again here.  If you have long
-   comments, I suggest writing them here, and compressing them. */
+ * time information, you can pass NULL for info.  If you already wrote these
+ * in png_write_info(), do not write them again here.  If you have long
+ * comments, I suggest writing them here, and compressing them.
+ */
 void
 png_write_end(png_structp png_ptr, png_infop info_ptr)
 {
@@ -189,6 +194,28 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    /* write end of PNG file */
    png_write_IEND(png_ptr);
 }
+
+#if defined(PNG_TIME_RFC1152_SUPPORTED)
+/* Convert the supplied time into an RFC 1152 string suitable for use in
+ * a "Creation Time" or other text-based time string.
+ */
+png_charp
+png_convert_to_rfc1152(png_structp png_ptr, png_timep ptime)
+{
+   const char *short_months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+   if (png_ptr->time_buffer == NULL)
+   {
+      png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, 29*sizeof(char));
+   }
+
+   sprintf(png_ptr->time_buffer, "%d %s %d %02d:%02d:%02d +0000",
+               ptime->day % 31, short_months[ptime->month], ptime->year,
+               ptime->hour % 24, ptime->minute % 60, ptime->second % 61);
+   return png_ptr->time_buffer;
+}
+#endif /* PNG_TIME_RFC1152_SUPPORTED */
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
 void
@@ -261,6 +288,11 @@ png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
 
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
+#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+   png_set_filter_heuristics(png_ptr, PNG_FILTER_HEURISTIC_DEFAULT,
+      1, NULL, NULL);
+#endif
+
    return (png_ptr);
 }
 
@@ -292,10 +324,11 @@ png_write_init(png_structp png_ptr)
 #endif
 }
 
-/* write a few rows of image data.  If the image is interlaced,
-   either you will have to write the 7 sub images, or, if you
-   have called png_set_interlace_handling(), you will have to
-   "write" the image seven times */
+/* Write a few rows of image data.  If the image is interlaced,
+ * either you will have to write the 7 sub images, or, if you
+ * have called png_set_interlace_handling(), you will have to
+ * "write" the image seven times.
+ */
 void
 png_write_rows(png_structp png_ptr, png_bytepp row,
    png_uint_32 num_rows)
@@ -311,8 +344,9 @@ png_write_rows(png_structp png_ptr, png_bytepp row,
    }
 }
 
-/* write the image.  You only need to call this function once, even
-   if you are writing an interlaced image. */
+/* Write the image.  You only need to call this function once, even
+ * if you are writing an interlaced image.
+ */
 void
 png_write_image(png_structp png_ptr, png_bytepp image)
 {
@@ -339,7 +373,8 @@ png_write_image(png_structp png_ptr, png_bytepp image)
 void
 png_write_row(png_structp png_ptr, png_bytep row)
 {
-   png_debug(1, "in png_write_row\n");
+   png_debug2(1, "in png_write_row (row %ld, pass %d)\n",
+      png_ptr->row_number, png_ptr->pass);
    /* initialize transformations and other stuff if first time */
    if (png_ptr->row_number == 0 && png_ptr->pass == 0)
    {
@@ -415,12 +450,12 @@ png_write_row(png_structp png_ptr, png_bytep row)
    png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
       (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
-   png_debug1(4, "row_info->color_type = %d\n", png_ptr->row_info.color_type);
-   png_debug1(4, "row_info->width = %d\n", png_ptr->row_info.width);
-   png_debug1(4, "row_info->channels = %d\n", png_ptr->row_info.channels);
-   png_debug1(4, "row_info->bit_depth = %d\n", png_ptr->row_info.bit_depth);
-   png_debug1(4, "row_info->pixel_depth = %d\n", png_ptr->row_info.pixel_depth);
-   png_debug1(4, "row_info->rowbytes = %d\n", png_ptr->row_info.rowbytes);
+   png_debug1(3, "row_info->color_type = %d\n", png_ptr->row_info.color_type);
+   png_debug1(3, "row_info->width = %d\n", png_ptr->row_info.width);
+   png_debug1(3, "row_info->channels = %d\n", png_ptr->row_info.channels);
+   png_debug1(3, "row_info->bit_depth = %d\n", png_ptr->row_info.bit_depth);
+   png_debug1(3, "row_info->pixel_depth = %d\n", png_ptr->row_info.pixel_depth);
+   png_debug1(3, "row_info->rowbytes = %d\n", png_ptr->row_info.rowbytes);
 
    /* Copy user's row into buffer, leaving room for filter byte. */
    png_memcpy(png_ptr->row_buf + 1, row, png_ptr->row_info.rowbytes);
@@ -527,6 +562,9 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 
    if (info_ptr != NULL)
    {
+#ifdef PNG_WRITE_tEXt_SUPPORTED
+      png_free(png_ptr, info_ptr->text);
+#endif
       png_destroy_struct((png_voidp)info_ptr);
       *info_ptr_ptr = (png_infop)NULL;
    }
@@ -561,6 +599,9 @@ png_write_destroy(png_structp png_ptr)
    png_free(png_ptr, png_ptr->up_row);
    png_free(png_ptr, png_ptr->avg_row);
    png_free(png_ptr, png_ptr->paeth_row);
+#if defined(PNG_TIME_RFC1152_SUPPORTED)
+   png_free(png_ptr, png_ptr->time_buffer);
+#endif /* PNG_TIME_RFC1152_SUPPORTED */
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_free(png_ptr, png_ptr->prev_filters);
    png_free(png_ptr, png_ptr->filter_weights);
@@ -683,7 +724,8 @@ png_set_filter(png_structp png_ptr, int method, int filters)
  * differences metric is relatively fast and effective, there is some
  * question as to whether it can be improved upon by trying to keep the
  * filtered data going to zlib more consistent, hopefully resulting in
- * better compression. */
+ * better compression.
+ */
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)      /* GRR 970116 */
 void
 png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,

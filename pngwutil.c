@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -26,8 +26,9 @@ png_save_uint_32(png_bytep buf, png_uint_32 i)
 
 #if defined(PNG_WRITE_pCAL_SUPPORTED)
 /* The png_save_int_32 function assumes integers are stored in two's
-   complement format.  If this isn't the case, then this routine needs to
-   be modified to write data in two's complement format. */
+ * complement format.  If this isn't the case, then this routine needs to
+ * be modified to write data in two's complement format.
+ */
 void
 png_save_int_32(png_bytep buf, png_int_32 i)
 {
@@ -38,22 +39,26 @@ png_save_int_32(png_bytep buf, png_int_32 i)
 }
 #endif
 
-/* Place a 16-bit number into a buffer in PNG byte order. */
+/* Place a 16-bit number into a buffer in PNG byte order.
+ * The parameter is declared unsigned int, not png_uint_16,
+ * just to avoid potential problems on pre-ANSI C compilers.
+ */
 void
-png_save_uint_16(png_bytep buf, png_uint_16 i)
+png_save_uint_16(png_bytep buf, unsigned int i)
 {
    buf[0] = (png_byte)((i >> 8) & 0xff);
    buf[1] = (png_byte)(i & 0xff);
 }
 
 /* Write a PNG chunk all at once.  The type is an array of ASCII characters
-   representing the chunk name.  The array must be at least 4 bytes in
-   length, and does not need to be null terminated.  To be safe, pass the
-   pre-defined chunk names here, and if you need a new one, define it
-   where the others are defined.  The length is the length of the data.
-   All the data must be present.  If that is not possible, use the
-   png_write_chunk_start(), png_write_chunk_data(), and png_write_chunk_end()
-   functions instead.  */
+ * representing the chunk name.  The array must be at least 4 bytes in
+ * length, and does not need to be null terminated.  To be safe, pass the
+ * pre-defined chunk names here, and if you need a new one, define it
+ * where the others are defined.  The length is the length of the data.
+ * All the data must be present.  If that is not possible, use the
+ * png_write_chunk_start(), png_write_chunk_data(), and png_write_chunk_end()
+ * functions instead.
+ */
 void
 png_write_chunk(png_structp png_ptr, png_bytep chunk_name,
    png_bytep data, png_size_t length)
@@ -64,8 +69,9 @@ png_write_chunk(png_structp png_ptr, png_bytep chunk_name,
 }
 
 /* Write the start of a PNG chunk.  The type is the chunk type.
-   The total_length is the sum of the lengths of all the data you will be
-   passing in png_write_chunk_data() */
+ * The total_length is the sum of the lengths of all the data you will be
+ * passing in png_write_chunk_data().
+ */
 void
 png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
    png_uint_32 length)
@@ -85,9 +91,10 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
 }
 
 /* Write the data of a PNG chunk started with png_write_chunk_start().
-   Note that multiple calls to this function are allowed, and that the
-   sum of the lengths from these calls *must* add up to the total_length
-   given to png_write_chunk_start(). */
+ * Note that multiple calls to this function are allowed, and that the
+ * sum of the lengths from these calls *must* add up to the total_length
+ * given to png_write_chunk_start().
+ */
 void
 png_write_chunk_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -106,11 +113,7 @@ png_write_chunk_end(png_structp png_ptr)
    png_byte buf[4];
 
    /* write the crc */
-#ifdef PNG_USE_OWN_CRC
-   png_save_uint_32(buf, ~png_ptr->crc);
-#else
    png_save_uint_32(buf, png_ptr->crc);
-#endif
 
    png_write_data(png_ptr, buf, (png_size_t)4);
 }
@@ -119,7 +122,8 @@ png_write_chunk_end(png_structp png_ptr)
  * the magic bytes of the signature, or more likely, the PNG stream is
  * being embedded into another stream and doesn't need its own signature,
  * we should call png_set_sig_bytes() to tell libpng how many of the
- * bytes have already been written. */
+ * bytes have already been written.
+ */
 void
 png_write_sig(png_structp png_ptr)
 {
@@ -129,8 +133,9 @@ png_write_sig(png_structp png_ptr)
 }
 
 /* Write the IHDR chunk, and update the png_struct with the necessary
-   information.  Note that the rest of this code depends upon this
-   information being correct.  */
+ * information.  Note that the rest of this code depends upon this
+ * information being correct.
+ */
 void
 png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    int bit_depth, int color_type, int compression_type, int filter_type,
@@ -264,8 +269,9 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
 }
 
 /* write the palette.  We are careful not to trust png_color to be in the
-   correct order for PNG, so people can redefine it to any convient
-   structure. */
+ * correct order for PNG, so people can redefine it to any convient
+ * structure.
+ */
 void
 png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
 {
@@ -333,6 +339,22 @@ png_write_gAMA(png_structp png_ptr, double file_gamma)
    igamma = (png_uint_32)(file_gamma * 100000.0 + 0.5);
    png_save_uint_32(buf, igamma);
    png_write_chunk(png_ptr, png_gAMA, buf, (png_size_t)4);
+}
+#endif
+
+#if defined(PNG_WRITE_sRGB_SUPPORTED)
+/* write a sRGB chunk */
+void
+png_write_sRGB(png_structp png_ptr, png_byte srgb_intent)
+{
+   png_byte buf[1];
+
+   png_debug(1, "in png_write_sRGB\n");
+   if(srgb_intent > 3)
+         png_warning(png_ptr,
+            "Invalid sRGB rendering intent specified");
+   buf[0]=srgb_intent;
+   png_write_chunk(png_ptr, png_sRGB, buf, (png_size_t)1);
 }
 #endif
 
@@ -560,11 +582,10 @@ png_write_hIST(png_structp png_ptr, png_uint_16p hist, png_uint_32 num_hist)
  * static keywords without having to have duplicate copies of the strings.
  */
 png_size_t
-png_check_keyword(png_structp png_ptr, png_charp key, png_bytepp new_key)
+png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 {
    png_size_t key_len;
-   png_charp kp;
-   png_bytep dp;
+   png_charp kp, dp;
    int kflag;
 
    png_debug(1, "in png_check_keyword\n");
@@ -581,12 +602,12 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_bytepp new_key)
 
    png_debug1(2, "Keyword to be checked is '%s'\n", key);
 
-   *new_key = (png_bytep)png_malloc(png_ptr, key_len + 1);
+   *new_key = (png_charp)png_malloc(png_ptr, key_len + 1);
 
    /* Replace non-printing characters with a blank and print a warning */
    for (kp = key, dp = *new_key; *kp != '\0'; kp++, dp++)
    {
-      if (*kp < 0x20 || ((png_byte)*kp > 0x7E && (png_byte)*kp < 0xA1))
+      if (*kp < 0x20 || (*kp > 0x7E && *kp < 0xA1))
       {
          char msg[40];
 
@@ -688,7 +709,7 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
    png_size_t text_len)
 {
    png_size_t key_len;
-   png_bytep new_key;
+   png_charp new_key;
 
    png_debug(1, "in png_write_tEXt\n");
    if (key == NULL || (key_len = png_check_keyword(png_ptr, key, &new_key))==0)
@@ -705,7 +726,7 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
 
    /* make sure we include the 0 after the key */
    png_write_chunk_start(png_ptr, png_tEXt, (png_uint_32)key_len+text_len+1);
-   png_write_chunk_data(png_ptr, new_key, key_len + 1);
+   png_write_chunk_data(png_ptr, (png_bytep)new_key, key_len + 1);
    if (text_len)
       png_write_chunk_data(png_ptr, (png_bytep)text, text_len);
 
@@ -722,7 +743,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
 {
    png_size_t key_len;
    char buf[1];
-   png_bytep new_key;
+   png_charp new_key;
    int i, ret;
    png_charpp output_ptr = NULL; /* array of pointers to output */
    int num_output_ptr = 0; /* number of output pointers used */
@@ -945,7 +966,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    png_size_t purpose_len, units_len, total_len; 
    png_uint_32p params_len;
    png_byte buf[10];
-   png_bytep new_purpose;
+   png_charp new_purpose;
    int i;
 
    png_debug1(1, "in png_write_pCAL (%d parameters)\n", nparams);
@@ -971,7 +992,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
 
    png_debug1(3, "pCAL total length = %d\n", total_len);
    png_write_chunk_start(png_ptr, png_pCAL, total_len);
-   png_write_chunk_data(png_ptr, new_purpose, purpose_len);
+   png_write_chunk_data(png_ptr, (png_bytep)new_purpose, purpose_len);
    png_save_int_32(buf, X0);
    png_save_int_32(buf + 4, X1);
    buf[8] = (png_byte)type;
@@ -1013,8 +1034,9 @@ png_write_pHYs(png_structp png_ptr, png_uint_32 x_pixels_per_unit,
 #endif
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
-/* write the tIME chunk.  Use either png_convert_from_struct_tm()
-   or png_convert_from_time_t(), or fill in the structure yourself */
+/* Write the tIME chunk.  Use either png_convert_from_struct_tm()
+ * or png_convert_from_time_t(), or fill in the structure yourself.
+ */
 void
 png_write_tIME(png_structp png_ptr, png_timep mod_time)
 {
@@ -1206,14 +1228,13 @@ png_write_finish_row(png_structp png_ptr)
 }
 
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)
-/* pick out the correct pixels for the interlace pass.
-
-   The basic idea here is to go through the row with a source
-   pointer and a destination pointer (sp and dp), and copy the
-   correct pixels for the pass.  As the row gets compacted,
-   sp will always be >= dp, so we should never overwrite anything.
-   See the default: case for the easiest code to understand.
-   */
+/* Pick out the correct pixels for the interlace pass.
+ * The basic idea here is to go through the row with a source
+ * pointer and a destination pointer (sp and dp), and copy the
+ * correct pixels for the pass.  As the row gets compacted,
+ * sp will always be >= dp, so we should never overwrite anything.
+ * See the default: case for the easiest code to understand.
+ */
 void
 png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 {
@@ -1366,7 +1387,8 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 
 /* This filters the row, chooses which filter to use, if it has not already
  * been specified by the application, and then writes the row out with the
- * chosen filter. */
+ * chosen filter.
+ */
 #define PNG_MAXSUM (~0x0UL >> 1)
 #define PNG_HISHIFT 10
 #define PNG_LOMASK 0xffffL

@@ -1,19 +1,22 @@
 
 /* pngread.c - read a PNG file
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ *
+ * This file contains routines that an application calls directly to
+ * read a PNG file or stream.
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
 png_structp
-png_create_read_struct(png_charp user_png_ver, png_voidp error_ptr,
+png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn)
 {
    png_structp png_ptr;
@@ -75,7 +78,6 @@ png_create_read_struct(png_charp user_png_ver, png_voidp error_ptr,
 
    return (png_ptr);
 }
-
 
 /* Initialize PNG structure for reading, and allocate any memory needed.
    This interface is depreciated in favour of the png_create_read_struct(),
@@ -215,6 +217,10 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       else if (!png_memcmp(png_ptr->chunk_name, png_sBIT, 4))
          png_handle_sBIT(png_ptr, info_ptr, length);
 #endif
+#if defined(PNG_READ_sRGB_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_sRGB, 4))
+         png_handle_sRGB(png_ptr, info_ptr, length);
+#endif
 #if defined(PNG_READ_tEXt_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_tEXt, 4))
          png_handle_tEXt(png_ptr, info_ptr, length);
@@ -247,10 +253,11 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
    png_read_transform_info(png_ptr, info_ptr);
 }
 
-/* initialize palette, background, etc, after transformations
-   are set, but before any reading takes place.  This allows
-   the user to obtail a gamma corrected palette, for example.
-   If the user doesn't call this, we will do it ourselves. */
+/* Initialize palette, background, etc, after transformations
+ * are set, but before any reading takes place.  This allows
+ * the user to obtail a gamma corrected palette, for example.
+ * If the user doesn't call this, we will do it ourselves.
+ */
 void
 png_start_read_image(png_structp png_ptr)
 {
@@ -439,23 +446,26 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 }
 
 /* Read one or more rows of image data.  If the image is interlaced,
-   and png_set_interlace_handling() has been called, the rows need to
-   to contain the contents of the rows from the previous pass.  If
-   the image has alpha or transparency, and png_handle_alpha() has been
-   called, the rows contents must be initialized to the contents of the
-   screen.  "row" holds the actual image, and pixels are placed in it
-   as they arrive.  If the image is displayed after each pass, it will
-   appear to "sparkle" in.  "display_row" can be used to display a
-   "chunky" progressive image, with finer detail added as it becomes
-   available.  If you do not want this "chunky" display, you may pass
-   NULL for display_row.  If you do not want the sparkle display, and
-   you have not called png_handle_alpha(), you may pass NULL for rows.
-   If you have called png_handle_alpha(), and the image has either an
-   alpha channel or a transparency chunk, you must provide a buffer for
-   rows.  In this case, you do not have to provide a display_row buffer
-   also, but you may.  If the image is not interlaced, or if you have
-   not called png_set_interlace_handling(), the display_row buffer will
-   be ignored, so pass NULL to it. */
+ * and png_set_interlace_handling() has been called, the rows need to
+ * contain the contents of the rows from the previous pass.  If the
+ * image has alpha or transparency, and png_handle_alpha() has been
+ * called, the rows contents must be initialized to the contents of the
+ * screen.
+ * 
+ * "row" holds the actual image, and pixels are placed in it
+ * as they arrive.  If the image is displayed after each pass, it will
+ * appear to "sparkle" in.  "display_row" can be used to display a
+ * "chunky" progressive image, with finer detail added as it becomes
+ * available.  If you do not want this "chunky" display, you may pass
+ * NULL for display_row.  If you do not want the sparkle display, and
+ * you have not called png_handle_alpha(), you may pass NULL for rows.
+ * If you have called png_handle_alpha(), and the image has either an
+ * alpha channel or a transparency chunk, you must provide a buffer for
+ * rows.  In this case, you do not have to provide a display_row buffer
+ * also, but you may.  If the image is not interlaced, or if you have
+ * not called png_set_interlace_handling(), the display_row buffer will
+ * be ignored, so pass NULL to it.
+ */
 
 void
 png_read_rows(png_structp png_ptr, png_bytepp row,
@@ -491,14 +501,15 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
 }
 
 /* Read the entire image.  If the image has an alpha channel or a tRNS
-   chunk, and you have called png_handle_alpha(), you will need to
-   initialize the image to the current image that PNG will be overlaying.
-   We set the num_rows again here, in case it was incorrectly set in
-   png_read_start_row() by a call to png_read_update_info() or
-   png_start_read_image() if png_set_interlace_handling() wasn't called
-   prior to either of these functions like it should have been.  You can
-   only call this function once.  If you desire to have an image for
-   each pass of a interlaced image, use png_read_rows() instead */
+ * chunk, and you have called png_handle_alpha(), you will need to
+ * initialize the image to the current image that PNG will be overlaying.
+ * We set the num_rows again here, in case it was incorrectly set in
+ * png_read_start_row() by a call to png_read_update_info() or
+ * png_start_read_image() if png_set_interlace_handling() wasn't called
+ * prior to either of these functions like it should have been.  You can
+ * only call this function once.  If you desire to have an image for
+ * each pass of a interlaced image, use png_read_rows() instead.
+ */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
 {
@@ -524,8 +535,9 @@ png_read_image(png_structp png_ptr, png_bytepp image)
 }
 
 /* Read the end of the PNG file.  Will not read past the end of the
-   file, will verify the end is accurate, and will read any comments
-   or time information at the end of the file, if info is not NULL. */
+ * file, will verify the end is accurate, and will read any comments
+ * or time information at the end of the file, if info is not NULL.
+ */
 void
 png_read_end(png_structp png_ptr, png_infop info_ptr)
 {
@@ -594,6 +606,10 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       else if (!png_memcmp(png_ptr->chunk_name, png_sBIT, 4))
          png_handle_sBIT(png_ptr, info_ptr, length);
 #endif
+#if defined(PNG_READ_sRGB_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_sRGB, 4))
+         png_handle_sRGB(png_ptr, info_ptr, length);
+#endif
 #if defined(PNG_READ_tEXt_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_tEXt, 4))
          png_handle_tEXt(png_ptr, info_ptr, length);
@@ -659,7 +675,6 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 void
 png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr)
 {
-   int i;
    jmp_buf tmp_jmp;
    png_error_ptr error_fn;
    png_error_ptr warning_fn;
@@ -700,6 +715,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
 #if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->gamma_16_table != NULL)
    {
+      int i;
       for (i = 0; i < (1 << (8 - png_ptr->gamma_shift)); i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_table[i]);
@@ -710,6 +726,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_16_table);
    if (png_ptr->gamma_16_from_1 != NULL)
    {
+      int i;
       for (i = 0; i < (1 << (8 - png_ptr->gamma_shift)); i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_from_1[i]);
@@ -718,6 +735,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_16_from_1);
    if (png_ptr->gamma_16_to_1 != NULL)
    {
+      int i;
       for (i = 0; i < (1 << (8 - png_ptr->gamma_shift)); i++)
       {
          png_free(png_ptr, png_ptr->gamma_16_to_1[i]);

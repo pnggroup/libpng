@@ -1,66 +1,69 @@
 
 /* pngconf.c - machine configurable file for libpng
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ */
 
 /* Any machine specific code is near the front of this file, so if you
-   are configuring libpng for a machine, you may want to read the section
-   starting here down to where it starts to typedef png_color, png_text,
-   and png_info */
+ * are configuring libpng for a machine, you may want to read the section
+ * starting here down to where it starts to typedef png_color, png_text,
+ * and png_info.
+ */
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
 /* This is the size of the compression buffer, and thus the size of
-   an IDAT chunk.  Make this whatever size you feel is best for your
-   machine.  One of these will be allocated per png_struct.  When this
-   is full, it writes the data to the disk, and does some other
-   calculations.  Making this an extreamly small size will slow
-   the library down, but you may want to experiment to determine
-   where it becomes significant, if you are concerned with memory
-   usage.  Note that zlib allocates at least 32Kb also.  For readers,
-   this describes the size of the buffer available to read the data in.
-   Unless this gets smaller then the size of a row (compressed),
-   it should not make much difference how big this is.  */
+ * an IDAT chunk.  Make this whatever size you feel is best for your
+ * machine.  One of these will be allocated per png_struct.  When this
+ * is full, it writes the data to the disk, and does some other
+ * calculations.  Making this an extreamly small size will slow
+ * the library down, but you may want to experiment to determine
+ * where it becomes significant, if you are concerned with memory
+ * usage.  Note that zlib allocates at least 32Kb also.  For readers,
+ * this describes the size of the buffer available to read the data in.
+ * Unless this gets smaller then the size of a row (compressed),
+ * it should not make much difference how big this is.
+ */
 
 #define PNG_ZBUF_SIZE 8192
 
 /* If you are running on a machine where you cannot allocate more
-   than 64K of memory at once, uncomment this.  While libpng will not
-   normally need that much memory in a chunk (unless you load up a very
-   large file), zlib needs to know how big of a chunk it can use, and
-   libpng thus makes sure to check any memory allocation to verify it
-   will fit into memory.
+ * than 64K of memory at once, uncomment this.  While libpng will not
+ * normally need that much memory in a chunk (unless you load up a very
+ * large file), zlib needs to know how big of a chunk it can use, and
+ * libpng thus makes sure to check any memory allocation to verify it
+ * will fit into memory.
 #define PNG_MAX_MALLOC_64K
-*/
+ */
 #if defined(MAXSEG_64K) && !defined(PNG_MAX_MALLOC_64K)
 #define PNG_MAX_MALLOC_64K
 #endif
 
 /* This protects us against compilers which run on a windowing system
-   and thus don't have or would rather us not use the stdio types:
-   stdin, stdout, and stderr.  The only one currently used is stderr
-   in png_error() and png_warning().  #defining PNG_NO_STDIO will
-   prevent these from being compiled and used. */
+ * and thus don't have or would rather us not use the stdio types:
+ * stdin, stdout, and stderr.  The only one currently used is stderr
+ * in png_error() and png_warning().  #defining PNG_NO_STDIO will
+ * prevent these from being compiled and used.
+ * #define PNG_NO_STDIO
+ */
 
-/* #define PNG_NO_STDIO */
+/* We still need stdio.h for FILE even when PNG_NO_STDIO is defined.
+ */
 
-/* for FILE.  If you are not using standard io, you don't need this */
-#ifndef PNG_NO_STDIO
 #include <stdio.h>
-#endif
 
 /* This macro protects us against machines that don't have function
-   prototypes (ie K&R style headers).  If your compiler does not handle
-   function prototypes, define this macro and use the included ansi2knr.
-   I've always been able to use _NO_PROTO as the indicator, but you may
-   need to drag the empty declaration out in front of here, or change the
-   ifdef to suit your own needs. */
+ * prototypes (ie K&R style headers).  If your compiler does not handle
+ * function prototypes, define this macro and use the included ansi2knr.
+ * I've always been able to use _NO_PROTO as the indicator, but you may
+ * need to drag the empty declaration out in front of here, or change the
+ * ifdef to suit your own needs.
+ */
 #ifndef PNGARG
 
 #ifdef OF /* zlib prototype munger */
@@ -77,8 +80,12 @@
 
 #endif /* PNGARG */
 
-/* Try to determine if we are compiling on a Mac */
-#if defined(__MWERKS__) ||defined(applec) ||defined(THINK_C) ||defined(__SC__)
+/* Try to determine if we are compiling on a Mac.  Note that testing for
+ * just __MWERKS__ is not good enough, because the Codewarrior is now used
+ * on non-Mac platforms.
+ */
+#if (defined(__MWERKS__) && defined(macintosh)) || defined(applec) || \
+    defined(THINK_C) || defined(__SC__)
 #define MACOS
 #endif
 
@@ -88,27 +95,28 @@
 #endif
 
 /* This is an attempt to force a single setjmp behaviour on Linux.  If
-   the X config stuff didn't define _BSD_SOURCE we wouldn't need this. */
-#ifdef linux
+ * the X config stuff didn't define _BSD_SOURCE we wouldn't need this.
+ */
+#ifdef __linux__
 #ifdef _BSD_SOURCE
 #define _PNG_SAVE_BSD_SOURCE
 #undef _BSD_SOURCE
 #endif
 #ifdef _SETJMP_H
-#error  __png_h_already_includes_setjmp_h__
-#error  __dont_include_it_again__
+__png.h__ already includes setjmp.h
+__dont__ include it again
 #endif
-#endif /* linux */
+#endif /* __linux__ */
 
 /* include setjmp.h for error handling */
 #include <setjmp.h>
 
-#ifdef linux
+#ifdef __linux__
 #ifdef _PNG_SAVE_BSD_SOURCE
 #define _BSD_SOURCE
 #undef _PNG_SAVE_BSD_SOURCE
 #endif
-#endif /* linux */
+#endif /* __linux__ */
 
 #ifdef BSD
 #include <strings.h>
@@ -119,9 +127,6 @@
 /* Other defines for things like memory and the like can go here.  */
 #ifdef PNG_INTERNAL
 #include <stdlib.h>
-/* Where do we need this???
-#include <ctype.h>
-*/
 
 /* The functions exported by PNG_EXTERN are PNG_INTERNAL functions, which
  * aren't usually used outside the library (as far as I know), so it is
@@ -133,12 +138,14 @@
 #define PNG_EXTERN
 
 /* Other defines specific to compilers can go here.  Try to keep
-   them inside an appropriate ifdef/endif pair for portability */
+ * them inside an appropriate ifdef/endif pair for portability.
+ */
 
 #if defined(MACOS)
 /* We need to check that <math.h> hasn't already been included earlier
-   as it seems it doesn't agree with <fp.h>, yet we should really use
-   <fp.h> if possible. */
+ * as it seems it doesn't agree with <fp.h>, yet we should really use
+ * <fp.h> if possible.
+ */
 #if !defined(__MATH_H__) && !defined(__MATH_H) && !defined(__cmath__)
 #include <fp.h>
 #endif
@@ -147,8 +154,9 @@
 #endif
 
 /* For some reason, Borland C++ defines memcmp, etc. in mem.h, not
-   stdlib.h like it should (I think).  Or perhaps this is a C++
-   "feature"? */
+ * stdlib.h like it should (I think).  Or perhaps this is a C++
+ * "feature"?
+ */
 #ifdef __TURBOC__
 #include <mem.h>
 #include "alloc.h"
@@ -159,34 +167,36 @@
 #endif
 
 /* This controls how fine the dithering gets.  As this allocates
-   a largish chunk of memory (32K), those who are not as concerned
-   with dithering quality can decrease some or all of these. */
+ * a largish chunk of memory (32K), those who are not as concerned
+ * with dithering quality can decrease some or all of these.
+ */
 #define PNG_DITHER_RED_BITS 5
 #define PNG_DITHER_GREEN_BITS 5
 #define PNG_DITHER_BLUE_BITS 5
 
 /* This controls how fine the gamma correction becomes when you
-   are only interested in 8 bits anyway.  Increasing this value
-   results in more memory being used, and more pow() functions
-   being called to fill in the gamma tables.  Don't set this
-   value less then 8, and even that may not work (I haven't tested
-   it). */
+ * are only interested in 8 bits anyway.  Increasing this value
+ * results in more memory being used, and more pow() functions
+ * being called to fill in the gamma tables.  Don't set this value
+ * less then 8, and even that may not work (I haven't tested it).
+ */
 
 #define PNG_MAX_GAMMA_8 11
 
 /* This controls how much a difference in gamma we can tolerate before
-   we actually start doing gamma conversion.  */
+ * we actually start doing gamma conversion.
+ */
 #define PNG_GAMMA_THRESHOLD 0.05
 
 #endif /* PNG_INTERNAL */
 
 /* The following uses const char * instead of char * for error
-   and warning message functions, so some compilers won't complain.
-   If you want to use const, define PNG_USE_CONST here.  It is not
-   normally defined to make configuration easier, as it is not a
-   critical part of the code.
-   */
-#undef PNG_USE_CONST
+ * and warning message functions, so some compilers won't complain.
+ * If you want to use const, define PNG_USE_CONST here.  It is not
+ * normally defined to make configuration easier, as it is not a
+ * critical part of the code.
+ */
+#define PNG_USE_CONST
 
 #ifdef PNG_USE_CONST
 #  define PNG_CONST const
@@ -195,19 +205,34 @@
 #endif
 
 /* The following defines give you the ability to remove code from the
-   library that you will not be using.  I wish I could figure out how to
-   automate this, but I can't do that without making it seriously hard
-   on the users.  So if you are not using an ability, change the #define
-   to and #undef, and that part of the library will not be compiled.  If
-   your linker can't find a function, you may want to make sure the
-   ability is defined here.  Some of these depend upon some others being
-   defined.  I haven't figured out all the interactions here, so you may
-   have to experiment awhile to get everything to compile.  If you are
-   creating or using a shared library, you probably shouldn't touch this,
-   as it will affect the size of the structures, and this will cause bad
-   things to happen if the library and/or application ever change. */
+ * library that you will not be using.  I wish I could figure out how to
+ * automate this, but I can't do that without making it seriously hard
+ * on the users.  So if you are not using an ability, change the #define
+ * to and #undef, and that part of the library will not be compiled.  If
+ * your linker can't find a function, you may want to make sure the
+ * ability is defined here.  Some of these depend upon some others being
+ * defined.  I haven't figured out all the interactions here, so you may
+ * have to experiment awhile to get everything to compile.  If you are
+ * creating or using a shared library, you probably shouldn't touch this,
+ * as it will affect the size of the structures, and this will cause bad
+ * things to happen if the library and/or application ever change.
+ */
 
 /* Any transformations you will not be using can be undef'ed here */
+
+/* GR-P, 0.96a: Set "*FULLY_SUPPORTED as default but allow user
+   to turn it off with "*NOT_FULLY_SUPPORTED" on the compile line,
+   then pick and choose which ones to define without having to edit
+   this file */
+
+#ifndef PNG_READ_NOT_FULLY_SUPPORTED
+#define PNG_READ_FULLY_SUPPORTED
+#endif
+#ifndef PNG_WRITE_NOT_FULLY_SUPPORTED
+#define PNG_WRITE_FULLY_SUPPORTED
+#endif
+
+#ifdef PNG_READ_FULLY_SUPPORTED
 #define PNG_PROGRESSIVE_READ_SUPPORTED
 #define PNG_READ_OPT_PLTE_SUPPORTED
 #define PNG_READ_INTERLACING_SUPPORTED
@@ -226,7 +251,9 @@
 #define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #define PNG_READ_SWAP_ALPHA_SUPPORTED
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
+#endif /* PNG_READ_FULLY_SUPPORTED */
 
+#ifdef PNG_WRITE_FULLY_SUPPORTED
 #define PNG_WRITE_INTERLACING_SUPPORTED
 #define PNG_WRITE_SHIFT_SUPPORTED
 #define PNG_WRITE_PACK_SUPPORTED
@@ -238,6 +265,9 @@
 #define PNG_WRITE_FLUSH_SUPPORTED
 #define PNG_WRITE_SWAP_ALPHA_SUPPORTED
 #define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+#endif /*PNG_WRITE_FULLY_SUPPORTED */
+
+#define PNG_TIME_RFC1152_SUPPORTED
 
 /* These are currently experimental features */
 #undef PNG_READ_16_TO_8_ACCURATE_SHIFT_SUPPORTED /* very little testing */
@@ -247,7 +277,6 @@
 #undef PNG_READ_BIG_ENDIAN_SUPPORTED             /* some testing */
 
 /* These functions are turned off by default, as they will be phased out. */
-#undef  PNG_USE_OWN_CRC
 #undef  PNG_USELESS_TESTS_SUPPORTED
 #undef  PNG_CORRECT_PALETTE_SUPPORTED
 
@@ -258,6 +287,7 @@
  * and RGBA images.
  */
 
+#ifdef PNG_READ_FULLY_SUPPORTED
 #define PNG_READ_bKGD_SUPPORTED
 #define PNG_READ_cHRM_SUPPORTED
 #define PNG_READ_gAMA_SUPPORTED
@@ -266,11 +296,14 @@
 #define PNG_READ_pCAL_SUPPORTED
 #define PNG_READ_pHYs_SUPPORTED
 #define PNG_READ_sBIT_SUPPORTED
+#define PNG_READ_sRGB_SUPPORTED
 #define PNG_READ_tEXt_SUPPORTED
 #define PNG_READ_tIME_SUPPORTED
 #define PNG_READ_tRNS_SUPPORTED
 #define PNG_READ_zTXt_SUPPORTED
+#endif /* PNG_READ_FULLY_SUPPORTED */
 
+#ifdef PNG_WRITE_FULLY_SUPPORTED
 #define PNG_WRITE_bKGD_SUPPORTED
 #define PNG_WRITE_cHRM_SUPPORTED
 #define PNG_WRITE_gAMA_SUPPORTED
@@ -279,10 +312,12 @@
 #define PNG_WRITE_pCAL_SUPPORTED
 #define PNG_WRITE_pHYs_SUPPORTED
 #define PNG_WRITE_sBIT_SUPPORTED
+#define PNG_WRITE_sRGB_SUPPORTED
 #define PNG_WRITE_tEXt_SUPPORTED
 #define PNG_WRITE_tIME_SUPPORTED
 #define PNG_WRITE_tRNS_SUPPORTED
 #define PNG_WRITE_zTXt_SUPPORTED
+#endif /* PNG_WRITE_FULLY_SUPPORTED */
 
 /* need the time information for reading tIME chunks */
 #if defined(PNG_READ_tIME_SUPPORTED) || defined(PNG_WRITE_tIME_SUPPORTED)
@@ -336,18 +371,19 @@ typedef size_t png_size_t;
 #endif   /* LDATA != 1 */
 
 /* Possibly useful for moving data out of default segment.
-   Uncomment it if you want. Could also define FARDATA as
-   const if your compiler supports it. (SJT)
+ * Uncomment it if you want. Could also define FARDATA as
+ * const if your compiler supports it. (SJT)
 #  define FARDATA FAR
-*/
+ */
 #endif  /* __WIN32__, __FLAT__ */
 
 #endif   /* __BORLANDC__ */
 
 
 /* Suggest testing for specific compiler first before testing for
-   FAR.  The Watcom compiler defines both __MEDIUM__ and M_I86MM,
-   making reliance oncertain keywords suspect. (SJT) */
+ * FAR.  The Watcom compiler defines both __MEDIUM__ and M_I86MM,
+ * making reliance oncertain keywords suspect. (SJT)
+ */
 
 /* MSC Medium model */
 #if defined(FAR)
@@ -400,9 +436,19 @@ typedef charf *         png_zcharp;
 typedef charf * FAR *   png_zcharpp;
 typedef z_stream FAR *  png_zstreamp; 
 
-/* allow for compilation as dll under windows */
+/* allow for compilation as dll under MS Windows */
 #ifdef __WIN32DLL__
 #define PNG_EXPORT(type,symbol) __declspec(dllexport) type symbol
+#endif
+
+/* allow for compilation as dll with BORLAND C++ 5.0 */
+#if defined(__BORLANDC__) && defined(_Windows) && defined(__DLL__)
+#   define PNG_EXPORT(t,s) t _export s
+#endif
+
+/* allow for compilation as shared lib under BeOS */
+#ifdef __BEOSDLL__
+#define PNG_EXPORT(type,symbol) __declspec(export) type symbol
 #endif
 
 #ifndef PNG_EXPORT
@@ -411,7 +457,8 @@ typedef z_stream FAR *  png_zstreamp;
 
 
 /* User may want to use these so not in PNG_INTERNAL. Any library functions
-   that are passed far data must be model independent. */
+ * that are passed far data must be model independent.
+ */
 
 #if defined(USE_FAR_KEYWORD)  /* memory model independent fns */
 /* use this to make far-to-near assignments */

@@ -1,67 +1,71 @@
 
 /* png.h - header file for PNG reference library
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-
-   BETA NOTICE:
-      This is a beta version.  It reads and writes valid files on the
-      platforms I have, and has had a wide testing program.  You may
-      have to modify the includes below to get it to work on your
-      system, and you may have to supply the correct compiler flags in
-      the makefile if you can't find a makefile suitable for your
-      operating system/compiler combination.  Read libpng.txt for more
-      information, including how to contact the authors if you have any
-      problems, or if you want your compiler/platform to be supported in
-      the next official libpng release.
-
-   See libpng.txt for more information.
-
-   Contributing Authors:
-      John Bowler
-      Sam Bushell
-      Kevin Bracey
-      Andreas Dilger
-      Magnus Holmgren
-      Dave Martindale
-      Greg Roelofs
-      Guy Eric Schalnat
-      Paul Schmidt
-      Tom Tanner
-      Tim Wegner
-
-   The contributing authors would like to thank all those who helped
-   with testing, bug fixes, and patience.  This wouldn't have been
-   possible without all of you.
-
-   Thanks to Frank J. T. Wojcik for helping with the documentation.
-
-   The PNG Reference Library is supplied "AS IS".  The Contributing Authors
-   and Group 42, Inc. disclaim all warranties, expressed or implied,
-   including, without limitation, the warranties of merchantability and of
-   fitness for any purpose.  The Contributing Authors and Group 42, Inc.
-   assume no liability for direct, indirect, incidental, special, exemplary,
-   or consequential damages, which may result from the use of the PNG
-   Reference Library, even if advised of the possibility of such damage.
-
-   Permission is hereby granted to use, copy, modify, and distribute this
-   source code, or portions hereof, for any purpose, without fee, subject
-   to the following restrictions:
-   1. The origin of this source code must not be misrepresented.
-   2. Altered versions must be plainly marked as such and must not be
-      misrepresented as being the original source.
-   3. This Copyright notice may not be removed or altered from any source or
-      altered source distribution.
-
-   The Contributing Authors and Group 42, Inc. specifically permit, without
-   fee, and encourage the use of this source code as a component to
-   supporting the PNG file format in commercial products.  If you use this
-   source code in a product, acknowledgment is not required but would be
-   appreciated.
-*/
+ *
+ * libpng 1.00.97 beta 7
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * Dec 31, 1997
+ *
+ * BETA NOTICE:
+ *    This is a beta version.  It reads and writes valid files on the
+ *    platforms I have, and has had a wide testing program.  You may
+ *    have to modify the includes below to get it to work on your
+ *    system, and you may have to supply the correct compiler flags in
+ *    the makefile if you can't find a makefile suitable for your
+ *    operating system/compiler combination.  Read libpng.txt for more
+ *    information, including how to contact the authors if you have any
+ *    problems, or if you want your compiler/platform to be supported in
+ *    the next official libpng release.
+ *
+ * See libpng.txt for more information.  The PNG specification is available
+ * as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
+ * and as a W3C Recommendation <http://www.w3.org/pub/WWW/TR/REC.png.html>
+ *
+ * Contributing Authors:
+ *    John Bowler
+ *    Sam Bushell
+ *    Kevin Bracey
+ *    Andreas Dilger
+ *    Magnus Holmgren
+ *    Tom Lane
+ *    Dave Martindale
+ *    Glenn Randers-Pehrson
+ *    Greg Roelofs
+ *    Guy Eric Schalnat
+ *    Paul Schmidt
+ *    Tom Tanner
+ *    Tim Wegner
+ *
+ * The contributing authors would like to thank all those who helped
+ * with testing, bug fixes, and patience.  This wouldn't have been
+ * possible without all of you.
+ *
+ * Thanks to Frank J. T. Wojcik for helping with the documentation.
+ *
+ * The PNG Reference Library is supplied "AS IS".  The Contributing Authors
+ * and Group 42, Inc. disclaim all warranties, expressed or implied,
+ * including, without limitation, the warranties of merchantability and of
+ * fitness for any purpose.  The Contributing Authors and Group 42, Inc.
+ * assume no liability for direct, indirect, incidental, special, exemplary,
+ * or consequential damages, which may result from the use of the PNG
+ * Reference Library, even if advised of the possibility of such damage.
+ *
+ * Permission is hereby granted to use, copy, modify, and distribute this
+ * source code, or portions hereof, for any purpose, without fee, subject
+ * to the following restrictions:
+ * 1. The origin of this source code must not be misrepresented.
+ * 2. Altered versions must be plainly marked as such and must not be
+ *    misrepresented as being the original source.
+ * 3. This Copyright notice may not be removed or altered from any source or
+ *    altered source distribution.
+ *
+ * The Contributing Authors and Group 42, Inc. specifically permit, without
+ * fee, and encourage the use of this source code as a component to
+ * supporting the PNG file format in commercial products.  If you use this
+ * source code in a product, acknowledgment is not required but would be
+ * appreciated.
+ */
 
 #ifndef _PNG_H
 #define _PNG_H
@@ -89,12 +93,12 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "0.96"
+#define PNG_LIBPNG_VER_STRING "1.00.97"
 
 /* careful here.  At one time, I wanted to use 082, but that would be octal.
  * Version 1.0 will be 100 here, etc.
  */
-#define PNG_LIBPNG_VER 96
+#define PNG_LIBPNG_VER  97
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #ifndef PNG_NO_EXTERN
@@ -172,10 +176,11 @@ typedef png_text FAR * FAR * png_textpp;
 #define PNG_TEXT_COMPRESSION_LAST     1  /* Not a valid value */
 
 /* png_time is a way to hold the time in an machine independent way.
-   Two conversions are provided, both from time_t and struct tm.  There
-   is no portable way to convert to either of these structures, as far
-   as I know.  If you know of a portable way, send it to me.  As a side
-   note - PNG is Year 2000 compliant! */
+ * Two conversions are provided, both from time_t and struct tm.  There
+ * is no portable way to convert to either of these structures, as far
+ * as I know.  If you know of a portable way, send it to me.  As a side
+ * note - PNG is Year 2000 compliant!
+ */
 typedef struct png_time_struct
 {
    png_uint_16 year; /* full year, as in, 1995 */
@@ -244,6 +249,13 @@ typedef struct png_info_struct
     */
    float gamma; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
 #endif /* PNG_READ_gAMA_SUPPORTED || PNG_WRITE_gAMA_SUPPORTED */
+
+#if defined(PNG_READ_sRGB_SUPPORTED) || defined(PNG_WRITE_sRGB_SUPPORTED)
+    /* GR-P, 0.96a */
+    /* Data valid if (valid & PNG_INFO_sRGB) non-zero. */
+   png_byte srgb_intent; /* sRGB rendering intent [0, 1, 2, or 3] */
+#endif /* PNG_READ_sRGB_SUPPORTED || PNG_WRITE_sRGB_SUPPORTED */
+
 #if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_WRITE_tEXt_SUPPORTED) || \
     defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
    /* The tEXt and zTXt chunks contain human-readable textual data in
@@ -422,6 +434,7 @@ typedef png_info FAR * FAR * png_infopp;
 #define PNG_INFO_oFFs 0x0100
 #define PNG_INFO_tIME 0x0200
 #define PNG_INFO_pCAL 0x0400
+#define PNG_INFO_sRGB 0x0800   /* GR-P, 0.96a */
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -524,7 +537,6 @@ struct png_struct_def
    png_byte usr_channels;     /* channels at start of write */
    png_byte sig_bytes;        /* magic bytes read/written from start of file */
 
-
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
    png_byte filler;           /* filler byte for 24->32-bit pixel expansion */
 #endif /* PNG_READ_FILLER_SUPPORTED */
@@ -609,6 +621,9 @@ struct png_struct_def
    png_uint_16p filter_costs;        /* relative filter calculation cost */
    png_uint_16p inv_filter_costs;    /* 1/relative filter calculation cost */
 #endif /* PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
+#if defined(PNG_TIME_RFC1152_SUPPORTED)
+   png_charp time_buffer;            /* String to hold RFC 1152 time text */
+#endif /* PNG_TIME_RFC1152_SUPPORTED */
 };
 
 typedef png_struct FAR * FAR * png_structpp;
@@ -640,8 +655,8 @@ extern PNG_EXPORT(int,png_check_sig) PNGARG((png_bytep sig, int num));
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
 extern PNG_EXPORT(png_structp,png_create_read_struct)
-   PNGARG((png_charp user_png_ver, voidp error_ptr, png_error_ptr error_fn,
-   png_error_ptr warn_fn));
+   PNGARG((png_const_charp user_png_ver, voidp error_ptr,
+   png_error_ptr error_fn, png_error_ptr warn_fn));
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory */
 extern PNG_EXPORT(png_structp,png_create_write_struct)
@@ -662,6 +677,11 @@ extern PNG_EXPORT(void,png_write_info) PNGARG((png_structp png_ptr,
 /* read the information before the actual image data. */
 extern PNG_EXPORT(void,png_read_info) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
+
+#if defined(PNG_TIME_RFC1152_SUPPORTED)
+extern PNG_EXPORT(png_charp,png_convert_to_rfc1152)
+   PNGARG((png_structp png_ptr, png_timep ptime));
+#endif /* PNG_TIME_RFC1152_SUPPORTED */
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
 /* convert from a struct tm to png_time */
@@ -840,6 +860,9 @@ extern void png_read_destroy PNGARG((png_structp png_ptr, png_infop info_ptr,
 extern PNG_EXPORT(void,png_destroy_write_struct)
    PNGARG((png_structpp png_ptr_ptr, png_infopp info_ptr_ptr));
 
+/* free any memory used in info_ptr struct (old method - NOT DLL EXPORTED) */
+extern void png_write_destroy_info PNGARG((png_infop info_ptr));
+
 /* free any memory used in png_ptr struct (old method - NOT DLL EXPORTED) */
 extern void png_write_destroy PNGARG((png_structp png_ptr));
 
@@ -868,10 +891,12 @@ extern PNG_EXPORT(void,png_set_crc_action) PNGARG((png_structp png_ptr,
  * mainly useful for testing, as the defaults should work with most users.
  * Those users who are tight on memory or want faster performance at the
  * expense of compression can modify them.  See the compression library
- * header file (zlib.h) for an explination of the compression functions. */
+ * header file (zlib.h) for an explination of the compression functions.
+ */
 
 /* set the filtering method(s) used by libpng.  Currently, the only valid
- * value for "method" is 0 */
+ * value for "method" is 0.
+ */
 extern PNG_EXPORT(void,png_set_filter) PNGARG((png_structp png_ptr, int method,
    int filters));
 
@@ -1030,7 +1055,7 @@ extern PNG_EXPORT(void,png_progressive_combine_row) PNGARG((png_structp png_ptr,
 extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
    png_uint_32 size));
 
-/* free's a pointer allocated by png_malloc() */
+/* frees a pointer allocated by png_malloc() */
 extern PNG_EXPORT(void,png_free) PNGARG((png_structp png_ptr, png_voidp ptr));
 
 #if defined(USE_FAR_KEYWORD)  /* memory model conversion function */
@@ -1175,6 +1200,18 @@ extern PNG_EXPORT(void,png_set_sBIT) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_color_8p sig_bit));
 #endif /* PNG_READ_sBIT_SUPPORTED || PNG_WRITE_sBIT_SUPPORTED */
 
+#if defined(PNG_READ_sRGB_SUPPORTED)
+extern PNG_EXPORT(png_uint_32,png_get_sRGB) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_byte *srgb_intent));
+#endif /* PNG_READ_sRGB_SUPPORTED */
+
+#if defined(PNG_READ_sRGB_SUPPORTED) || defined(PNG_WRITE_sRGB_SUPPORTED)
+extern PNG_EXPORT(void,png_set_sRGB) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_byte srgb_intent));
+extern PNG_EXPORT(void,png_set_sRGB_gAMA_and_cHRM) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_byte srgb_intent));
+#endif /* PNG_READ_sRGB_SUPPORTED || PNG_WRITE_sRGB_SUPPORTED */
+
 #if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
 /* png_get_text also returns the number of text chunks in text_ptr */
 extern PNG_EXPORT(png_uint_32,png_get_text) PNGARG((png_structp png_ptr,
@@ -1244,13 +1281,17 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #if defined(PNG_INTERNAL)
 
 /* Various modes of operation.  Note that after an init, mode is set to
-   zero automatically when the structure is created. */
+ * zero automatically when the structure is created.
+ */
 #define PNG_BEFORE_IHDR       0x00
 #define PNG_HAVE_IHDR         0x01
 #define PNG_HAVE_PLTE         0x02
 #define PNG_HAVE_IDAT         0x04
 #define PNG_AFTER_IDAT        0x08
 #define PNG_HAVE_IEND         0x10
+#define PNG_HAVE_gAMA         0x20
+#define PNG_HAVE_cHRM         0x40
+#define PNG_HAVE_sRGB         0x80
 
 /* push model modes */
 #define PNG_READ_SIG_MODE   0
@@ -1331,10 +1372,11 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 /* place to hold the signiture string for a PNG file. */
 extern png_byte FARDATA png_sig[];
 
-/* constant strings for known chunk types.  If you need to add a chunk,
-   add a string holding the name here.  See png.c for more details.  We
-   can't selectively include these, since we still check for chunk in the
-   wrong locations with these labels. */
+/* Constant strings for known chunk types.  If you need to add a chunk,
+ * add a string holding the name here.  See png.c for more details.  We
+ * can't selectively include these, since we still check for chunk in the
+ * wrong locations with these labels.
+ */
 extern png_byte FARDATA png_IHDR[];
 extern png_byte FARDATA png_IDAT[];
 extern png_byte FARDATA png_IEND[];
@@ -1347,6 +1389,7 @@ extern png_byte FARDATA png_oFFs[];
 extern png_byte FARDATA png_pCAL[];
 extern png_byte FARDATA png_pHYs[];
 extern png_byte FARDATA png_sBIT[];
+extern png_byte FARDATA png_sRGB[];
 extern png_byte FARDATA png_tEXt[];
 extern png_byte FARDATA png_tIME[];
 extern png_byte FARDATA png_tRNS[];
@@ -1376,12 +1419,14 @@ PNG_EXTERN png_uint_32 png_get_uint_32 PNGARG((png_bytep buf));
 PNG_EXTERN png_uint_16 png_get_uint_16 PNGARG((png_bytep buf));
 #endif /* PNG_BIG_ENDIAN_GET_SUPPORTED */
 
-/* Initialize png_ptr struct for reading, and allocate any other memory
- * (old interface - NOT DLL EXPORTED) */
+/* Initialize png_ptr struct for reading, and allocate any other memory.
+ * (old interface - NOT DLL EXPORTED).
+ */
 extern void png_read_init PNGARG((png_structp png_ptr));
 
-/* Initialize png_ptr struct for writing, and allocate any other memory
- * (old interface - NOT DLL EXPORTED) */
+/* Initialize png_ptr struct for writing, and allocate any other memory.
+ * (old interface - NOT DLL EXPORTED).
+ */
 extern void png_write_init PNGARG((png_structp png_ptr));
 
 /* allocate memory for an internal libpng struct */
@@ -1433,7 +1478,7 @@ PNG_EXTERN void png_flush PNGARG((png_structp png_ptr));
 #endif
 
 /* Place a 32-bit number into a buffer in PNG byte order (big-endian).
- * The only currently known PNG chunk that uses unsigned numbers is
+ * The only currently known PNG chunk that uses signed numbers is
  * the ancillary extension chunk, pCAL.
  */
 PNG_EXTERN void png_save_uint_32 PNGARG((png_bytep buf, png_uint_32 i));
@@ -1442,8 +1487,11 @@ PNG_EXTERN void png_save_uint_32 PNGARG((png_bytep buf, png_uint_32 i));
 PNG_EXTERN void png_save_int_32 PNGARG((png_bytep buf, png_int_32 i));
 #endif
 
-/* place a 16 bit number into a buffer in PNG byte order */
-PNG_EXTERN void png_save_uint_16 PNGARG((png_bytep buf, png_uint_16 i));
+/* Place a 16 bit number into a buffer in PNG byte order.
+ * The parameter is declared unsigned int, not png_uint_16,
+ * just to avoid potential problems on pre-ANSI C compilers.
+ */
+PNG_EXTERN void png_save_uint_16 PNGARG((png_bytep buf, unsigned int i));
 
 /* Write a PNG chunk - size, type, (optional) data, CRC. */
 PNG_EXTERN void png_write_chunk PNGARG((png_structp png_ptr,
@@ -1466,7 +1514,8 @@ PNG_EXTERN void png_write_sig PNGARG((png_structp png_ptr));
 /* write various chunks */
 
 /* Write the IHDR chunk, and update the png_struct with the necessary
-   information. */
+ * information.
+ */
 PNG_EXTERN void png_write_IHDR PNGARG((png_structp png_ptr, png_uint_32 width,
    png_uint_32 height,
    int bit_depth, int color_type, int compression_type, int filter_type,
@@ -1496,6 +1545,11 @@ PNG_EXTERN void png_write_cHRM PNGARG((png_structp png_ptr,
    double blue_x, double blue_y));
 #endif
 
+#if defined(PNG_WRITE_sRGB_SUPPORTED)
+PNG_EXTERN void png_write_sRGB PNGARG((png_structp png_ptr,
+   png_byte srgb_intent));
+#endif
+
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
 PNG_EXTERN void png_write_tRNS PNGARG((png_structp png_ptr, png_bytep trans,
    png_color_16p values, int number, int color_type));
@@ -1513,7 +1567,7 @@ PNG_EXTERN void png_write_hIST PNGARG((png_structp png_ptr, png_uint_16p hist,
 
 #if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
 PNG_EXTERN png_size_t png_check_keyword PNGARG((png_structp png_ptr,
-   png_charp key, png_bytepp new_key));
+   png_charp key, png_charpp new_key));
 #endif
 
 #if defined(PNG_WRITE_tEXt_SUPPORTED)
@@ -1698,7 +1752,8 @@ PNG_EXTERN void png_do_expand PNGARG((png_row_infop row_info,
 #endif
 
 /* The following decodes the appropriate chunks, and does error correction,
- * then calls the appropriate callback for the chunk if it is valid */
+ * then calls the appropriate callback for the chunk if it is valid.
+ */
 
 /* decode the IHDR chunk */
 PNG_EXTERN void png_handle_IHDR PNGARG((png_structp png_ptr, png_infop info_ptr,
@@ -1720,6 +1775,11 @@ PNG_EXTERN void png_handle_sBIT PNGARG((png_structp png_ptr, png_infop info_ptr,
 
 #if defined(PNG_READ_cHRM_SUPPORTED)
 PNG_EXTERN void png_handle_cHRM PNGARG((png_structp png_ptr, png_infop info_ptr,
+   png_uint_32 length));
+#endif
+
+#if defined(PNG_READ_sRGB_SUPPORTED)
+PNG_EXTERN void png_handle_sRGB PNGARG((png_structp png_ptr, png_infop info_ptr,
    png_uint_32 length));
 #endif
 

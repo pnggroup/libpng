@@ -1,12 +1,17 @@
 
 /* pngset.c - storage of image information into info struct
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ *
+ * The functions here are used during reads to store data from the file
+ * into the info struct, and during writes to store application data
+ * into the info struct for writing into the file.  This abstracts the
+ * info struct and allows us to change the structure in the future.
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -205,8 +210,57 @@ png_set_sBIT(png_structp png_ptr, png_infop info_ptr,
 }
 #endif
 
-#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED) || \
-    defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_READ_sRGB_SUPPORTED) || defined(PNG_WRITE_sRGB_SUPPORTED)
+void
+png_set_sRGB(png_structp png_ptr, png_infop info_ptr, png_byte intent)
+{
+   png_debug1(1, "in %s storage function\n", "sRGB");
+   if (info_ptr == NULL)
+      return;
+
+   info_ptr->srgb_intent = intent;
+   info_ptr->valid |= PNG_INFO_sRGB;
+}
+void
+png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
+   png_byte intent)
+{
+#if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED)
+   float file_gamma;
+#endif
+#if defined(PNG_READ_cHRM_SUPPORTED) || defined(PNG_WRITE_cHRM_SUPPORTED)
+   float white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
+#endif
+   png_debug1(1, "in %s storage function\n", "sRGB_gAMA_and_cHRM");
+   if (info_ptr == NULL)
+      return;
+
+   png_set_sRGB(png_ptr, info_ptr, intent);
+
+#if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED)
+   file_gamma = 0.45;
+   png_set_gAMA(png_ptr, info_ptr, file_gamma);
+#endif
+
+#if defined(PNG_READ_cHRM_SUPPORTED) || defined(PNG_WRITE_cHRM_SUPPORTED)
+   white_x = 0.3127;
+   white_y = 0.3290;
+   red_x   = 0.6400;
+   red_y   = 0.3300;
+   green_x = 0.3000;
+   green_y = 0.6000;
+   blue_x  = 0.1500;
+   blue_y  = 0.0600;
+
+   png_set_cHRM(png_ptr, info_ptr,
+      white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
+
+#endif
+}
+#endif
+
+#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_WRITE_tEXt_SUPPORTED) || \
+    defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
 void
 png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
    int num_text)
@@ -304,6 +358,8 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
    {
       png_memcpy(&(info_ptr->trans_values), trans_values,
          sizeof(png_color_16));
+      if (num_trans == 0)
+        num_trans = 1;
    }
    info_ptr->num_trans = (png_uint_16)num_trans;
    info_ptr->valid |= PNG_INFO_tRNS;

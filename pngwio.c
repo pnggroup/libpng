@@ -1,18 +1,19 @@
 
 /* pngwio.c - functions for data output
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-
-   This file provides a location for all output.  Users which need
-   special handling are expected to write functions which have the same
-   arguments as these, and perform similar functions, but possibly use
-   different output methods.  Note that you shouldn't change these
-   functions, but rather write replacement functions and then change
-   them at run time with png_set_write_fn(...) */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ *
+ * This file provides a location for all output.  Users which need
+ * special handling are expected to write functions which have the same
+ * arguments as these, and perform similar functions, but possibly use
+ * different output methods.  Note that you shouldn't change these
+ * functions, but rather write replacement functions and then change
+ * them at run time with png_set_write_fn(...).
+ */
 
 #define PNG_INTERNAL
 #include "png.h"

@@ -1,18 +1,19 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
 
-/* transform the data according to the users wishes.  The order of
-   transformations is significant. */
+/* Transform the data according to the users wishes.  The order of
+ * transformations is significant.
+ */
 void
 png_do_write_transformations(png_structp png_ptr)
 {
@@ -51,9 +52,10 @@ png_do_write_transformations(png_structp png_ptr)
 }
 
 #if defined(PNG_WRITE_PACK_SUPPORTED)
-/* pack pixels into bytes.  Pass the true bit depth in bit_depth.  The
-   row_info bit depth should be 8 (one pixel per byte).  The channels
-   should be 1 (this only happens on grayscale and paletted images) */
+/* Pack pixels into bytes.  Pass the true bit depth in bit_depth.  The
+ * row_info bit depth should be 8 (one pixel per byte).  The channels
+ * should be 1 (this only happens on grayscale and paletted images).
+ */
 void
 png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 {
@@ -169,12 +171,13 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 #endif
 
 #if defined(PNG_WRITE_SHIFT_SUPPORTED)
-/* shift pixel values to take advantage of whole range.  Pass the
-   true number of bits in bit_depth.  The row should be packed
-   according to row_info->bit_depth.  Thus, if you had a row of
-   bit depth 4, but the pixels only had values from 0 to 7, you
-   would pass 3 as bit_depth, and this routine would translate the
-   data to 0 to 15. */
+/* Shift pixel values to take advantage of whole range.  Pass the
+ * true number of bits in bit_depth.  The row should be packed
+ * according to row_info->bit_depth.  Thus, if you had a row of
+ * bit depth 4, but the pixels only had values from 0 to 7, you
+ * would pass 3 as bit_depth, and this routine would translate the
+ * data to 0 to 15.
+ */
 void
 png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 {
@@ -252,7 +255,7 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 
          for (bp = row, i = 0; i < row_info->width; i++)
          {
-            int c;
+            png_uint_32 c;
 
             for (c = 0; c < channels; c++, bp++)
             {
@@ -278,7 +281,7 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 
          for (bp = row, i = 0; i < row_info->width * row_info->channels; i++)
          {
-            int c;
+            png_uint_32 c;
 
             for (c = 0; c < channels; c++, bp += 2)
             {

@@ -1,12 +1,15 @@
 
 /* pngrutil.c - utilities to read a PNG file
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ *
+ * This file contains routines which are only called from within
+ * libpng itself during the course of reading an image.
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -56,59 +59,6 @@ png_get_uint_16(png_bytep buf)
    return i;
 }
 #endif /* PNG_READ_BIG_ENDIAN_SUPPORTED */
-
-/* Set the action on getting a CRC error for an ancillary or critical chunk. */
-void
-png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
-{
-   png_debug(1, "in png_set_crc_action\n");
-   /* Tell libpng how we react to CRC errors in critical chunks */
-   switch (crit_action)
-   {
-      case PNG_CRC_NO_CHANGE:                        /* leave setting as is */
-         break;
-      case PNG_CRC_WARN_USE:                               /* warn/use data */
-         png_ptr->flags &= ~PNG_FLAG_CRC_CRITICAL_MASK;
-         png_ptr->flags |= PNG_FLAG_CRC_CRITICAL_USE;
-         break;
-      case PNG_CRC_QUIET_USE:                             /* quiet/use data */
-         png_ptr->flags &= ~PNG_FLAG_CRC_CRITICAL_MASK;
-         png_ptr->flags |= PNG_FLAG_CRC_CRITICAL_USE |
-                           PNG_FLAG_CRC_CRITICAL_IGNORE;
-         break;
-      case PNG_CRC_WARN_DISCARD:    /* not a valid action for critical data */
-         png_warning(png_ptr, "Can't discard critical data on CRC error.");
-      case PNG_CRC_ERROR_QUIT:                                /* error/quit */
-      case PNG_CRC_DEFAULT:
-      default:
-         png_ptr->flags &= ~PNG_FLAG_CRC_CRITICAL_MASK;
-         break;
-   }
-
-   switch (ancil_action)
-   {
-      case PNG_CRC_NO_CHANGE:                       /* leave setting as is */
-         break;
-      case PNG_CRC_WARN_USE:                              /* warn/use data */
-         png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
-         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_USE;
-         break;
-      case PNG_CRC_QUIET_USE:                            /* quiet/use data */
-         png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
-         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_USE |
-                           PNG_FLAG_CRC_ANCILLARY_NOWARN;
-         break;
-      case PNG_CRC_ERROR_QUIT:                               /* error/quit */
-         png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
-         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_NOWARN;
-         break;
-      case PNG_CRC_WARN_DISCARD:                      /* warn/discard data */
-      case PNG_CRC_DEFAULT:
-      default:
-         png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
-         break;
-   }
-}
 
 /* Read data, and (optionally) run it through the CRC. */
 void
@@ -185,11 +135,7 @@ png_crc_error(png_structp png_ptr)
    if (need_crc)
    {
       crc = png_get_uint_32(crc_bytes);
-#ifdef PNG_USE_OWN_CRC
-      return (((crc^0xffffffffL)&0xffffffffL) != (png_ptr->crc&0xffffffffL));
-#else
       return (crc != png_ptr->crc);
-#endif
    }
    else
       return 0;
@@ -228,7 +174,8 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    interlace_type = buf[12];
 
    /* check for width and height valid values */
-   if (width == 0 || width > 2147483647 || height == 0 || height > 2147483647)
+   if (width == 0 || width > (png_uint_32)2147483647L || height == 0 ||
+        height > (png_uint_32)2147483647L)
       png_error(png_ptr, "Invalid image size in IHDR");
 
    /* check other values */
@@ -246,7 +193,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          color_type == PNG_COLOR_TYPE_RGB_ALPHA) && bit_depth < 8))
       png_error(png_ptr, "Invalid color type/bit depth combination in IHDR");
 
-   if (interlace_type > PNG_INTERLACE_ADAM7)
+   if (interlace_type >= PNG_INTERLACE_LAST)
       png_error(png_ptr, "Unknown interlace method in IHDR");
 
    if (compression_type != PNG_COMPRESSION_TYPE_BASE)
@@ -337,7 +284,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    num = (int)length / 3;
-   palette = (png_colorp)png_malloc(png_ptr, num * sizeof (png_color));
+   palette = (png_colorp)png_zalloc(png_ptr, num, sizeof (png_color));
    png_ptr->flags |= PNG_FLAG_FREE_PALETTE;
    for (i = 0; i < num; i++)
    {
@@ -457,6 +404,26 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (igamma == 0)
       return;
 
+#if defined(PNG_READ_sRGB_SUPPORTED)
+   if ((png_ptr->mode & PNG_HAVE_sRGB))
+      if(igamma != 50000)
+      {
+         png_warning(png_ptr,
+           "Ignoring incorrect gAMA value when sRGB is also present");
+         return;
+      }
+#endif /* PNG_READ_sRGB_SUPPORTED */
+
+#if defined(PNG_READ_sRGB_SUPPORTED)
+   if (png_ptr->mode & PNG_HAVE_sRGB)
+      if(igamma != 50000)
+      {
+         png_warning(png_ptr,
+           "Ignoring incorrect gAMA value when sRGB is also present");
+         return;
+      }
+#endif /* PNG_READ_sRGB_SUPPORTED */
+
    file_gamma = (float)igamma / (float)100000.0;
    png_ptr->gamma = file_gamma;
    png_set_gAMA(png_ptr, info_ptr, file_gamma);
@@ -483,8 +450,10 @@ png_handle_sBIT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
    else if (png_ptr->mode & PNG_HAVE_PLTE)
+   {
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place sBIT chunk");
+   }
    else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sBIT)
    {
       png_warning(png_ptr, "Duplicate sBIT chunk");
@@ -545,7 +514,8 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else if (png_ptr->mode & PNG_HAVE_PLTE)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Missing PLTE before cHRM");
-   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_cHRM)
+   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_cHRM
+      && !(info_ptr->valid & PNG_INFO_sRGB))
    {
       png_warning(png_ptr, "Duplicate cHRM chunk");
       png_crc_finish(png_ptr, length);
@@ -626,11 +596,92 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
+#if defined(PNG_READ_sRGB_SUPPORTED)
+   if ((png_ptr->mode & PNG_HAVE_sRGB))
+      if(white_x != .3127 || white_y != .329 || red_x != .64 || red_y != .33 ||
+         green_x != .3 || green_y != .6 || blue_x != .15 || blue_y != .06)
+      {
+         png_warning(png_ptr,
+           "Ignoring incorrect cHRM value when sRGB is also present");
+         return;
+      }
+#endif /* PNG_READ_sRGB_SUPPORTED */
+
    png_set_cHRM(png_ptr, info_ptr,
       white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
 }
 #endif
 
+#if defined(PNG_READ_sRGB_SUPPORTED)
+void
+png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
+{
+   png_byte intent;
+   png_byte buf[1];
+   float file_gamma;
+   float white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
+
+   png_debug(1, "in png_handle_sRGB\n");
+
+   if (!(png_ptr->mode & PNG_HAVE_IHDR))
+      png_error(png_ptr, "Missing IHDR before sRGB");
+   else if (png_ptr->mode & PNG_HAVE_IDAT)
+   {
+      png_warning(png_ptr, "Invalid sRGB after IDAT");
+      png_crc_finish(png_ptr, length);
+      return;
+   }
+   else if (png_ptr->mode & PNG_HAVE_PLTE)
+      /* Should be an error, but we can cope with it */
+      png_warning(png_ptr, "Out of place sRGB chunk");
+   else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sRGB)
+   {
+      png_warning(png_ptr, "Duplicate sRGB chunk");
+      png_crc_finish(png_ptr, length);
+      return;
+   }
+
+   if (length != 1)
+   {
+      png_warning(png_ptr, "Incorrect sRGB chunk length");
+      png_crc_finish(png_ptr, length);
+      return;
+   }
+
+   png_crc_read(png_ptr, buf, 1);
+   if (png_crc_finish(png_ptr, 0))
+      return;
+
+   intent = buf[0];
+   /* check for bad intent */
+   if (intent > 3)
+   {
+      png_warning(png_ptr, "Unknown sRGB intent");
+      return;
+   }
+
+   /* if we really want to be paranoid we could check for
+      already defined gamma and chrm with values that are
+      inconsistent with sRGB -- for now, just ignore them */
+
+   file_gamma = 0.45;
+   png_set_gAMA(png_ptr, info_ptr, file_gamma);
+
+   white_x = 0.3127;
+   white_y = 0.3290;
+   red_x   = 0.6400;
+   red_y   = 0.3300;
+   green_x = 0.3000;
+   green_y = 0.6000;
+   blue_x  = 0.1500;
+   blue_y  = 0.0600;
+
+   png_set_cHRM(png_ptr, info_ptr,
+      white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
+
+   png_set_sRGB(png_ptr, info_ptr, intent);
+}
+#endif
 #if defined(PNG_READ_tRNS_SUPPORTED)
 void
 png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
@@ -683,7 +734,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
 
       png_crc_read(png_ptr, buf, (png_size_t)length);
-      png_ptr->num_trans = 3;
+      png_ptr->num_trans = 1;
       png_ptr->trans_values.red = png_get_uint_16(buf);
       png_ptr->trans_values.green = png_get_uint_16(buf + 2);
       png_ptr->trans_values.blue = png_get_uint_16(buf + 4);
@@ -1113,11 +1164,11 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
 #ifdef PNG_MAX_MALLOC_64K
-   if (length > 65535L)
+   if (length > (png_uint_32)65535L)
    {
       png_warning(png_ptr, "tEXt chunk too large to fit in memory");
-      skip = length - 65535L;
-      length = 65535L;
+      skip = length - (png_uint_32)65535L;
+      length = (png_uint_32)65535L;
    }
 #endif
 
@@ -1171,7 +1222,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_MAX_MALLOC_64K
    /* We will no doubt have problems with chunks even half this size, but
       there is no hard and fast rule to tell us where to stop. */
-   if (length > 65535L)
+   if (length > (png_uint_32)65535L)
    {
      png_warning(png_ptr,"zTXt chunk too large to fit in memory");
      png_crc_finish(png_ptr, length);
@@ -2113,13 +2164,13 @@ png_read_start_row(png_structp png_ptr)
    rowbytes = ((rowbytes * (png_uint_32)max_pixel_depth + 7) >> 3) +
       1 + ((max_pixel_depth + 7) >> 3);
 #ifdef PNG_MAX_MALLOC_64K
-   if (rowbytes > 65536L)
+   if (rowbytes > (png_uint_32)65536L)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, rowbytes);
 
 #ifdef PNG_MAX_MALLOC_64K
-   if (png_ptr->rowbytes + 1 > 65536L)
+   if ((png_uint_32)png_ptr->rowbytes + 1 > (png_uint_32)65536L)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
    png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, png_ptr->rowbytes + 1);

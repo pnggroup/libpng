@@ -1,36 +1,36 @@
 /* example.c - an example of using libpng */
 
 /* This is an example of how to use libpng to read and write PNG files.
-   The file libpng.txt is much more verbose then this.  If you have not
-   read it, do so first.  This was designed to be a starting point of an
-   implementation.  This is not officially part of libpng, and therefore
-   does not require a copyright notice.
-
-   This file does not currently compile, because it is missing certain
-   parts, like allocating memory to hold an image.  You will have to
-   supply these parts to get it to compile.  For an example of a minimal
-   working PNG reader/writer, see pngtest.c, included in this distribution.
-*/
+ * The file libpng.txt is much more verbose then this.  If you have not
+ * read it, do so first.  This was designed to be a starting point of an
+ * implementation.  This is not officially part of libpng, and therefore
+ * does not require a copyright notice.
+ *
+ * This file does not currently compile, because it is missing certain
+ * parts, like allocating memory to hold an image.  You will have to
+ * supply these parts to get it to compile.  For an example of a minimal
+ * working PNG reader/writer, see pngtest.c, included in this distribution.
+ */
 
 #include <png.h>
 
 /* Check to see if a file is a PNG file using png_check_sig().  Returns
-   non-zero if the image is a PNG, and 0 if it isn't a PNG.
-
-   If this call is successful, and you are going to keep the file open,
-   you should call png_set_sig_bytes(png_ptr, PNG_BYTES_TO_CHECK); once
-   you have created the png_ptr, so that libpng knows your application
-   has read that many bytes from the start of the file.  Make sure you
-   don't call png_set_sig_bytes() with more than 8 bytes read or give it
-   an incorrect number of bytes read, or you will either have read too
-   many bytes (your fault), or you are telling libpng to read the wrong
-   number of magic bytes (also your fault).
-
-   Many applications already read the first 2 or 4 bytes from the start
-   of the image to determine the file type, so it would be easiest just
-   to pass the bytes to png_check_sig() or even skip that if you know
-   you have a PNG file, and call png_set_sig_bytes().
-*/
+ * non-zero if the image is a PNG, and 0 if it isn't a PNG.
+ *
+ * If this call is successful, and you are going to keep the file open,
+ * you should call png_set_sig_bytes(png_ptr, PNG_BYTES_TO_CHECK); once
+ * you have created the png_ptr, so that libpng knows your application
+ * has read that many bytes from the start of the file.  Make sure you
+ * don't call png_set_sig_bytes() with more than 8 bytes read or give it
+ * an incorrect number of bytes read, or you will either have read too
+ * many bytes (your fault), or you are telling libpng to read the wrong
+ * number of magic bytes (also your fault).
+ *
+ * Many applications already read the first 2 or 4 bytes from the start
+ * of the image to determine the file type, so it would be easiest just
+ * to pass the bytes to png_check_sig() or even skip that if you know
+ * you have a PNG file, and call png_set_sig_bytes().
+ */
 #define PNG_BYTES_TO_CHECK 4
 int check_if_png(char *file_name, FILE **fp)
 {
@@ -49,10 +49,11 @@ int check_if_png(char *file_name, FILE **fp)
 }
 
 /* Read a PNG file.  You may want to return an error code if the read
-   fails (depending upon the failure).  There are two "prototypes" given
-   here - one where we are given the filename, and we need to open the
-   file, and the other where we are given an open file (possibly with
-   some or all of the magic bytes read - see comments above). */
+ * fails (depending upon the failure).  There are two "prototypes" given
+ * here - one where we are given the filename, and we need to open the
+ * file, and the other where we are given an open file (possibly with
+ * some or all of the magic bytes read - see comments above).
+ */
 **** prototype 1 ****
 void read_png(char *file_name)  /* We need to open the file */
 {
@@ -118,7 +119,8 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
 **** PNG file I/O method 2 ****
    /* If you are using replacement read functions, instead of calling
-    * png_init_io() here you would call */
+    * png_init_io() here you would call:
+    */
    png_set_read_fn(png_ptr, (void *)user_io_ptr, user_read_fn);
    /* where user_io_ptr is a structure you want available to the callbacks */
 **** Use only one I/O method! ****
@@ -143,29 +145,31 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* tell libpng to strip 16 bit/color files down to 8 bits/color */
    png_set_strip_16(png_ptr);
 
-   /* strip alpha bytes from the input data without combining with th
-    * background (not recommended) */
+   /* Strip alpha bytes from the input data without combining with th
+    * background (not recommended).
+    */
    png_set_strip_alpha(png_ptr);
 
-   /* extract multiple pixels with bit depths of 1, 2, and 4 from a single
+   /* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
     * byte into separate bytes (useful for paletted and grayscale images).
     */
    png_set_packing(png_ptr);
 
-   /* change the order of packed pixels to least significant bit first
+   /* Change the order of packed pixels to least significant bit first
     * (not useful if you are using png_set_packing). */
    png_set_packswap(png_ptr);
 
-   /* expand paletted colors into true RGB triplets */
+   /* Expand paletted colors into true RGB triplets */
    if (color_type == PNG_COLOR_TYPE_PALETTE)
       png_set_expand(png_ptr);
 
-   /* expand grayscale images to the full 8 bits from 1, 2, or 4 bits/pixel */
+   /* Expand grayscale images to the full 8 bits from 1, 2, or 4 bits/pixel */
    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
       png_set_expand(png_ptr);
 
-   /* expand paletted or RGB images with transparency to full alpha channels
-    * so the data will be available as RGBA quartets */
+   /* Expand paletted or RGB images with transparency to full alpha channels
+    * so the data will be available as RGBA quartets.
+    */
    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
       png_set_expand(png_ptr);
 
@@ -207,13 +211,17 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     * by the user at run time by the user.  It is strongly suggested that
     * your application support gamma correction.
     */
-   if (png_get_gAMA(png_ptr, info_ptr, &image_gamma);
-      png_set_gamma(png_ptr, screen_gamma, image_gamma);
-   else
-      png_set_gamma(png_ptr, screen_gamma, 0.45);
+   if (png_get_sRGB(png_ptr, info_ptr, &srgb_intent)
+      png_set_sRGB(png_ptr, srgb_intent, 0);
+   else 
+      if (png_get_gAMA(png_ptr, info_ptr, &image_gamma)
+         png_set_gamma(png_ptr, screen_gamma, image_gamma);
+      else
+         png_set_gamma(png_ptr, screen_gamma, 0.45);
 
    /* Dither RGB files down to 8 bit palette or reduce palettes
-      to the number of colors available on your screen */
+    * to the number of colors available on your screen.
+    */
    if (color_type & PNG_COLOR_MASK_COLOR)
    {
       png_uint_32 num_palette;
@@ -269,19 +277,19 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    /* Turn on interlace handling.  REQUIRED if you are not using
     * png_read_image().  To see how to handle interlacing passes,
-    * see the png_read_row() method below.
+    * see the png_read_row() method below:
     */
    number_passes = png_set_interlace_handling(png_ptr);
 
-   /* optional call to gamma correct and add the background to the palette
+   /* Optional call to gamma correct and add the background to the palette
     * and update info structure.  REQUIRED if you are expecting libpng to
     * update the palette for you (ie you selected such a transform above).
     */
    png_read_update_info(png_ptr, info_ptr);
 
-   /* allocate the memory to hold the image using the fields of info_ptr. */
+   /* Allocate the memory to hold the image using the fields of info_ptr. */
 
-   /* the easiest way to read the image */
+   /* The easiest way to read the image: */
    png_bytep row_pointers[height];
 
    for (row = 0; row < height; row++)
@@ -294,7 +302,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    png_read_image(png_ptr, row_pointers);
 
 **** Read the image one or more scanlines at a time ****
-   /* the other way to read images - deal with interlacing */
+   /* The other way to read images - deal with interlacing: */
 
    for (pass = 0; pass < number_passes; pass++)
    {
@@ -552,7 +560,8 @@ void write_png(char *file_name, ... other image information ...)
 
   
    /* Optional gamma chunk is strongly suggested if you have any guess
-    * as to the correct gamma of the image. */
+    * as to the correct gamma of the image.
+    */
    png_set_gAMA(png_ptr, info_ptr, gamma);
 
    /* Optionally write comments into the image */
@@ -568,6 +577,8 @@ void write_png(char *file_name, ... other image information ...)
    png_set_text(png_ptr, info_ptr, text_ptr, 2);
 
    /* other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs, */
+   /* note that if sRGB is present the cHRM chunk must be ignored
+    * on read and must be written in accordance with the sRGB profile */
 
    /* Write the file header information.  REQUIRED */
    png_write_info(png_ptr, info_ptr);
@@ -579,13 +590,15 @@ void write_png(char *file_name, ... other image information ...)
     */
 
    /* set up the transformations you want.  Note that these are
-    * all optional.  Only call them if you want them. */
+    * all optional.  Only call them if you want them.
+    */
 
    /* invert monocrome pixels */
    png_set_invert(png_ptr);
 
    /* Shift the pixels up to a legal bit depth and fill in
-    * as appropriate to correctly scale the image */
+    * as appropriate to correctly scale the image.
+    */
    png_set_shift(png_ptr, &sig_bit);
 
    /* pack pixels into bytes */
@@ -595,7 +608,8 @@ void write_png(char *file_name, ... other image information ...)
    png_set_swap_alpha(png_ptr);
 
    /* Get rid of filler (OR ALPHA) bytes, pack XRGB/RGBX/ARGB/RGBA into
-    * RGB (4 channels -> 3 channels). The second parameter is not used. */
+    * RGB (4 channels -> 3 channels). The second parameter is not used.
+    */
    png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
 
    /* flip BGR pixels to RGB */

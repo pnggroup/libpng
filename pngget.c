@@ -1,12 +1,12 @@
 
 /* pngget.c - retrieval of values from info struct
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -109,6 +109,21 @@ png_get_gAMA(png_structp png_ptr, png_infop info_ptr, double *file_gamma)
 }
 #endif
 
+#if defined(PNG_READ_sRGB_SUPPORTED)
+png_uint_32
+png_get_sRGB(png_structp png_ptr, png_infop info_ptr, png_byte *file_srgb_intent)
+{
+   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_sRGB &&
+      *file_srgb_intent != NULL)
+   {
+      png_debug1(1, "in %s retrieval function\n", "sRGB");
+      *file_srgb_intent = (png_byte)info_ptr->srgb_intent;
+      return (PNG_INFO_sRGB);
+   }
+   return (0);
+}
+#endif
+
 #if defined(PNG_READ_hIST_SUPPORTED)
 png_uint_32
 png_get_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p *hist)
@@ -196,14 +211,23 @@ png_uint_32
 png_get_pHYs(png_structp png_ptr, png_infop info_ptr,
    png_uint_32 *res_x, png_uint_32 *res_y, int *unit_type)
 {
-   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_pHYs &&
-      res_x != NULL && res_y != NULL && unit_type != NULL)
+   png_uint_32 retval = 0;
+
+   if (info_ptr != NULL && info_ptr->valid & PNG_INFO_pHYs)
    {
       png_debug1(1, "in %s retrieval function\n", "pHYs");
-      *res_x = info_ptr->x_pixels_per_unit;
-      *res_y = info_ptr->y_pixels_per_unit;
-      *unit_type = (int)info_ptr->phys_unit_type;
-      return (PNG_INFO_pHYs);
+      if (res_x != NULL && res_y != NULL)
+      {
+         *res_x = info_ptr->x_pixels_per_unit;
+         *res_y = info_ptr->y_pixels_per_unit;
+         retval |= PNG_INFO_pHYs;
+      }
+      if (unit_type != NULL)
+      {
+         *unit_type = (int)info_ptr->phys_unit_type;
+         retval |= PNG_INFO_pHYs;
+      }
+      return (retval);
    }
    return (0);
 }
@@ -251,7 +275,7 @@ png_get_text(png_structp png_ptr, png_infop info_ptr, png_textp *text_ptr,
          *text_ptr = info_ptr->text;
       if (num_text != NULL)
          *num_text = info_ptr->num_text;
-      return (info_ptr->num_text);
+      return ((png_uint_32)info_ptr->num_text);
    }
    return(0);
 }

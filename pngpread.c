@@ -1,12 +1,12 @@
 
 /* pngpread.c - read a png file in push mode
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -116,10 +116,11 @@ void
 png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 {
    /* First we make sure we have enough data for the 4 byte chunk name
-      and the 4 byte chunk length before proceeding with decoding the
-      chunk data.  To fully decode each of these chunks, we also make
-      sure we have enough data in the buffer for the 4 byte CRC at the
-      end of every chunk (except IDAT, which is handled separately). */
+    * and the 4 byte chunk length before proceeding with decoding the
+    * chunk data.  To fully decode each of these chunks, we also make
+    * sure we have enough data in the buffer for the 4 byte CRC at the
+    * end of every chunk (except IDAT, which is handled separately).
+    */
    if (!(png_ptr->flags & PNG_FLAG_HAVE_CHUNK_HEADER))
    {
       png_byte chunk_length[4];
@@ -160,8 +161,9 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
    else if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
    {
       /* If we reach an IDAT chunk, this means we have read all of the
-         header chunks, and we can start reading the image (or if this
-         is called after the image has been read - we have an error). */
+       * header chunks, and we can start reading the image (or if this
+       * is called after the image has been read - we have an error).
+       */
       if (png_ptr->mode & PNG_HAVE_IDAT)
       {
          if (png_ptr->push_length == 0)
@@ -225,6 +227,18 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       }
 
       png_handle_cHRM(png_ptr, info_ptr, png_ptr->push_length);
+   }
+#endif
+#if defined(PNG_READ_sRGB_SUPPORTED)
+   else if (!png_memcmp(png_ptr->chunk_name, png_sRGB, 4))
+   {
+      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
+      {
+         png_push_save_buffer(png_ptr);
+         return;
+      }
+
+      png_handle_sRGB(png_ptr, info_ptr, png_ptr->push_length);
    }
 #endif
 #if defined(PNG_READ_tRNS_SUPPORTED)
@@ -783,11 +797,11 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
 #ifdef PNG_MAX_MALLOC_64K
    png_ptr->skip_length = 0;  /* This may not be necessary */
 
-   if (length > 65535L)  /* We can't hold the entire string in memory */
+   if (length > (png_uint_32)65535L) /* Can't hold the entire string in memory */
    {
       png_warning(png_ptr, "tEXt chunk too large to fit in memory");
-      png_ptr->skip_length = length - 65535L;
-      length = 65535L;
+      png_ptr->skip_length = length - (png_uint_32)65535L;
+      length = (png_uint_32)65535L;
    }
 #endif
 
@@ -866,7 +880,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
     * to be able to store the uncompressed data.  Actually, the threshold
     * is probably around 32K, but it isn't as definite as 64K is.
     */
-   if (length > 65535L)
+   if (length > (png_uint_32)65535L)
    {
       png_warning(png_ptr, "zTXt chunk too large to fit in memory");
       png_push_crc_skip(png_ptr, length);
@@ -1029,11 +1043,12 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 /* This function is called when we haven't found a handler for this
-   chunk.  In the future we will have code here which can handle
-   user-defined callback functions for unknown chunks before they are
-   ignored or cause an error.  If there isn't a problem with the
-   chunk itself (ie a bad chunk name or a critical chunk), the chunk
-   is (currently) silently ignored. */
+ * chunk.  In the future we will have code here which can handle
+ * user-defined callback functions for unknown chunks before they are
+ * ignored or cause an error.  If there isn't a problem with the
+ * chunk itself (ie a bad chunk name or a critical chunk), the chunk
+ * is (currently) silently ignored.
+ */
 void
 png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {

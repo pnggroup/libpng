@@ -1,10 +1,13 @@
 libpng.txt - a description on how to use and modify libpng
 
-   libpng 1.0 beta 5 - version 0.95
+   libpng version 1.00 version 0.97
+
+      based on:
+
+   libpng version 1.00 version 0.96
    Updated and distributed by Andreas Dilger <adilger@enel.ucalgary.ca>,
    Copyright (c) 1996, 1997 Andreas Dilger
-   March 15, 1997
-      based on:
+   May 28, 1997
 
    libpng 1.0 beta 2 - version 0.88
    For conditions of distribution and use, see copyright notice in png.h
@@ -27,11 +30,18 @@ will need.
 
 Libpng was written as a companion to the PNG specification, as a way
 to reduce the amount of time and effort it takes to support the PNG
-file format in application programs.  Most users will not have to
-modify the library significantly; advanced users may want to modify it
-more.  All attempts were made to make it as complete as possible,
-while keeping the code easy to understand.  Currently, this library
-only supports C.  Support for other languages is being considered.
+file format in application programs.  The PNG specification is available
+as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/> and as a
+W3C Recommendation <http://www.w3.org/pub/WWW/TR/REC.png.html>. Some
+additional chunks are described in the special-purpose public chunks
+documents at <ftp://ftp.uu.net/graphics/png/documents/>.  Other information
+about PNG can be found at the PNG home page, <http://www.cdrom.com/pub/png/>.
+
+Most users will not have to modify the library significantly; advanced
+users may want to modify it more.  All attempts were made to make it as
+complete as possible, while keeping the code easy to understand.
+Currently, this library only supports C.  Support for other languages
+is being considered.
 
 Libpng has been designed to handle multiple sessions at one time,
 to be easily modifiable, to be portable to the vast majority of
@@ -341,7 +351,7 @@ transparency information in a tRNS chunk.  This is most useful on
 grayscale images with bit depths of 2 or 4 or if there is a multiple-image
 viewing application that wishes to treat all images in the same way.
 
-    if (color_type == PNG_COLOR_TYPE_PALETTE && bit_depth < 8)
+    if (color_type == PNG_COLOR_TYPE_PALETTE && bit_depth <= 8)
         png_set_expand(png_ptr);
 
     if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
@@ -614,7 +624,7 @@ The first pass will return an image 1/8 as wide as the entire image
 (every 8th column starting in column 0) and 1/8 as high as the original
 (every 8th row starting in row 0), the second will be 1/8 as wide
 (starting in column 4) and 1/8 as high (also starting in row 0).  The
-third pass will be 1/4 as wide (every 4th pixel starting in row 0) and
+third pass will be 1/4 as wide (every 4th pixel starting in column 0) and
 1/8 as high (every 8th row starting in row 4), and the fourth pass will
 be 1/4 as wide and 1/4 as high (every 4th column starting in column 2,
 and every 4th row starting in row 0).  The fifth pass will return an
@@ -1013,7 +1023,8 @@ The keywords that are given in the PNG Specification are:
             Author           Name of image's creator
             Description      Description of image (possibly long)
             Copyright        Copyright notice
-            Creation Time    Time of original image creation
+            Creation Time    Time of original image creation (usually
+                             RFC 1123 format, see below)
             Software         Software used to create the image
             Disclaimer       Legal disclaimer
             Warning          Warning of nature of content
@@ -1049,6 +1060,20 @@ you should provide the time in universal time (GMT) if possible
 instead of your local time.  Note that the year number is the full
 year (ie 1996, rather than 96 - PNG is year 2000 compliant!), and
 that months start with 1.
+
+If you want to store the time of the original image creation, you should
+use a plain tEXt chunk with the "Creation Time" keyword.  This is
+necessary because the "creation time" of a PNG image is somewhat vague,
+depending on whether you mean the PNG file, the time the image was
+created in a non-PNG format, a still photo from which the image was
+scanned, or possibly the subject matter itself.  In order to facilitate
+machine-readable dates, it is recommended that the "Creation Time"
+tEXt chunk use RFC 1123 format dates (eg 22 May 1997 18:07:10 GMT"),
+although this isn't a requirement.  Unlike the tIME chunk, the
+"Creation Time" tEXt chunk is not expected to be automatically changed
+by the software.  To facilitate the use of RFC 1123 dates, a function
+png_convert_to_rfc1152(png_timep) is provided to convert from PNG
+time to an RFC 1152 format string.
 
 You are now ready to write all the file information up to the actual
 image data.  You do this with a call to png_write_info().
@@ -1307,8 +1332,8 @@ default function will be used, calling fprintf() and/or longjmp() if a
 problem is encountered.  The replacement error functions should have
 parameters as follows:
 
-    void user_error_fn(png_struct png_ptr, png_const_charp error_msg);
-    void user_warning_fn(png_struct png_ptr, png_const_charp warning_msg);
+    void user_error_fn(png_structp png_ptr, png_const_charp error_msg);
+    void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg);
 
 The motivation behind using setjmp() and longjmp() is the C++ throw and
 catch exception handling methods.  This makes the code much easier to write,

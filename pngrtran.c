@@ -1,22 +1,28 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
-
-   libpng 1.0 beta 6 - version 0.96
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 12, 1997
-   */
+ *
+ * libpng 1.00.97
+ * For conditions of distribution and use, see copyright notice in png.h
+ * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1996, 1997 Andreas Dilger
+ * May 28, 1997
+ *
+ * This file contains functions optionally called by an application 
+ * in order to tell libpng how to handle data when reading a PNG.
+ * Transformations which are used in both reading and writing are
+ * in pngtrans.c.
+ */
 
 #define PNG_INTERNAL
 #include "png.h"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines, we avoid an integer divide, which will be slower on
-   many machines.  However, it does take more operations than the corresponding
-   divide method, so it may be slower on some RISC systems.  There are two
-   shifts (by 8 or 16 bits) and an addition, versus a single integer divide.
-   The results may also be off by one for certain values. */
+ * many machines.  However, it does take more operations than the corresponding
+ * divide method, so it may be slower on some RISC systems.  There are two
+ * shifts (by 8 or 16 bits) and an addition, versus a single integer divide.
+ * The results may also be off by one for certain values.
+ */
 
 /* pixel and background should be in gamma 1.0 space */
 #define png_composite(composite, pixel, trans, background) \
@@ -42,8 +48,61 @@
 #define png_composite_16(composite, pixel, trans, background) \
    (composite) = (png_uint_16)(((png_uint_32)(pixel) * (png_uint_32)(trans) + \
      (png_uint_32)(background)*(png_uint_32)(65535L - (png_uint_32)(trans)) + \
-     (png_uint_32)32767) / 65535L)
+     (png_uint_32)32767) / (png_uint_32)65535L)
 #endif
+
+/* Set the action on getting a CRC error for an ancillary or critical chunk. */
+void
+png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
+{
+   png_debug(1, "in png_set_crc_action\n");
+   /* Tell libpng how we react to CRC errors in critical chunks */
+   switch (crit_action)
+   {
+      case PNG_CRC_NO_CHANGE:                        /* leave setting as is */
+         break;
+      case PNG_CRC_WARN_USE:                               /* warn/use data */
+         png_ptr->flags &= ~PNG_FLAG_CRC_CRITICAL_MASK;
+         png_ptr->flags |= PNG_FLAG_CRC_CRITICAL_USE;
+         break;
+      case PNG_CRC_QUIET_USE:                             /* quiet/use data */
+         png_ptr->flags &= ~PNG_FLAG_CRC_CRITICAL_MASK;
+         png_ptr->flags |= PNG_FLAG_CRC_CRITICAL_USE |
+                           PNG_FLAG_CRC_CRITICAL_IGNORE;
+         break;
+      case PNG_CRC_WARN_DISCARD:    /* not a valid action for critical data */
+         png_warning(png_ptr, "Can't discard critical data on CRC error.");
+      case PNG_CRC_ERROR_QUIT:                                /* error/quit */
+      case PNG_CRC_DEFAULT:
+      default:
+         png_ptr->flags &= ~PNG_FLAG_CRC_CRITICAL_MASK;
+         break;
+   }
+
+   switch (ancil_action)
+   {
+      case PNG_CRC_NO_CHANGE:                       /* leave setting as is */
+         break;
+      case PNG_CRC_WARN_USE:                              /* warn/use data */
+         png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
+         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_USE;
+         break;
+      case PNG_CRC_QUIET_USE:                            /* quiet/use data */
+         png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
+         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_USE |
+                           PNG_FLAG_CRC_ANCILLARY_NOWARN;
+         break;
+      case PNG_CRC_ERROR_QUIT:                               /* error/quit */
+         png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
+         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_NOWARN;
+         break;
+      case PNG_CRC_WARN_DISCARD:                      /* warn/discard data */
+      case PNG_CRC_DEFAULT:
+      default:
+         png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
+         break;
+   }
+}
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
 /* handle alpha and tRNS via a background color */
@@ -89,12 +148,13 @@ png_set_strip_alpha(png_structp png_ptr)
 
 #if defined(PNG_READ_DITHER_SUPPORTED)
 /* Dither file to 8 bit.  Supply a palette, the current number
-   of elements in the palette, the maximum number of elements
-   allowed, and a histogram if possible.  If the current number
-   of colors is greater then the maximum number, the palette will be
-   modified to fit in the maximum number.  "full_dither" indicates
-   whether we need a dithering cube set up for RGB images, or if we
-   simply are reducing the number of colors in a paletted image. */
+ * of elements in the palette, the maximum number of elements
+ * allowed, and a histogram if possible.  If the current number
+ * of colors is greater then the maximum number, the palette will be
+ * modified to fit in the maximum number.  "full_dither" indicates
+ * whether we need a dithering cube set up for RGB images, or if we
+ * simply are reducing the number of colors in a paletted image.
+ */
 
 typedef struct png_dsort_struct
 {
@@ -478,9 +538,10 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
 /* Transform the image from the file_gamma to the screen_gamma.  We
-   only do transformations on images where the file_gamma and screen_gamma
-   are not close reciprocals, otherwise it slows things down slightly, and
-   also needlessly introduces small errors. */
+ * only do transformations on images where the file_gamma and screen_gamma
+ * are not close reciprocals, otherwise it slows things down slightly, and
+ * also needlessly introduces small errors.
+ */
 void
 png_set_gamma(png_structp png_ptr, double screen_gamma, double file_gamma)
 {
@@ -494,8 +555,9 @@ png_set_gamma(png_structp png_ptr, double screen_gamma, double file_gamma)
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
 /* Expand paletted images to rgb, expand grayscale images of
-   less then 8 bit depth to 8 bit depth, and expand tRNS chunks
-   to alpha channels. */
+ * less then 8 bit depth to 8 bit depth, and expand tRNS chunks
+ * to alpha channels.
+ */
 void
 png_set_expand(png_structp png_ptr)
 {
@@ -515,8 +577,9 @@ png_set_gray_to_rgb(png_structp png_ptr)
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
 /* Convert a RGB image to a grayscale of the given width.  This would
-   allow us, for example, to convert a 24 bpp RGB image into an 8 or
-   16 bpp grayscale image. (Not yet implemented.) */
+ * allow us, for example, to convert a 24 bpp RGB image into an 8 or
+ * 16 bpp grayscale image. (Not yet implemented.)
+ */
 void
 png_set_rgb_to_gray(png_structp png_ptr, int gray_bits)
 {
@@ -527,7 +590,8 @@ png_set_rgb_to_gray(png_structp png_ptr, int gray_bits)
 #endif
 
 /* Initialize everything needed for the read.  This includes modifying
-   the palette */
+ * the palette.
+ */
 void
 png_init_read_transformations(png_structp png_ptr)
 {
@@ -810,8 +874,9 @@ png_init_read_transformations(png_structp png_ptr)
 }
 
 /* Modify the info structure to reflect the transformations.  The
-   info should be updated so a PNG file could be written with it,
-   assuming the transformations result in valid PNG data. */
+ * info should be updated so a PNG file could be written with it,
+ * assuming the transformations result in valid PNG data.
+ */
 void
 png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 {
@@ -910,9 +975,10 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       (png_size_t)((info_ptr->width * info_ptr->pixel_depth + 7) >> 3);
 }
 
-/* transform the row.  The order of transformations is significant,
-   and is very touchy.  If you add a transformation, take care to
-   decide how it fits in with the other transformations here. */
+/* Transform the row.  The order of transformations is significant,
+ * and is very touchy.  If you add a transformation, take care to
+ * decide how it fits in with the other transformations here.
+ */
 void
 png_do_read_transformations(png_structp png_ptr)
 {
@@ -955,7 +1021,9 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if (png_ptr->transformations & PNG_BACKGROUND)
+   if ((png_ptr->transformations & PNG_BACKGROUND) &&
+      ((png_ptr->num_trans != 0 ) ||
+      (png_ptr->color_type & PNG_COLOR_MASK_ALPHA)))
       png_do_background(&(png_ptr->row_info), png_ptr->row_buf + 1,
          &(png_ptr->trans_values), &(png_ptr->background),
          &(png_ptr->background_1),
@@ -1041,11 +1109,12 @@ png_do_read_transformations(png_structp png_ptr)
 }
 
 #if defined(PNG_READ_PACK_SUPPORTED)
-/* unpack pixels of 1, 2, or 4 bits per pixel into 1 byte per pixel,
-   without changing the actual values.  Thus, if you had a row with
-   a bit depth of 1, you would end up with bytes that only contained
-   the numbers 0 or 1.  If you would rather they contain 0 and 255, use
-   png_do_shift() after this. */
+/* Unpack pixels of 1, 2, or 4 bits per pixel into 1 byte per pixel,
+ * without changing the actual values.  Thus, if you had a row with
+ * a bit depth of 1, you would end up with bytes that only contained
+ * the numbers 0 or 1.  If you would rather they contain 0 and 255, use
+ * png_do_shift() after this.
+ */
 void
 png_do_unpack(png_row_infop row_info, png_bytep row)
 {
@@ -1131,10 +1200,11 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_SHIFT_SUPPORTED)
-/* reverse the effects of png_do_shift.  This routine merely shifts the
-   pixels back to their significant bits values.  Thus, if you have
-   a row of bit depth 8, but only 5 are significant, this will shift
-   the values back to 0 through 31 */
+/* Reverse the effects of png_do_shift.  This routine merely shifts the
+ * pixels back to their significant bits values.  Thus, if you have
+ * a row of bit depth 8, but only 5 are significant, this will shift
+ * the values back to 0 through 31.
+ */
 void
 png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
 {
@@ -1268,7 +1338,7 @@ png_do_chop(png_row_infop row_info, png_bytep row)
           *
           * What the ideal calculation should be:
          *dp = (((((png_uint_32)(*sp) << 8) |
-                   (png_uint_32)(*(sp + 1))) * 255 + 127) / 65535;
+                   (png_uint_32)(*(sp + 1))) * 255 + 127) / (png_uint_32)65535L;
 
           * Approximate calculation with shift/add instead of multiply/divide:
          *dp = ((((png_uint_32)(*sp) << 8) |
@@ -1527,10 +1597,11 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 }
 #endif
 
-/* build a grayscale palette.  Palette is assumed to be 1 << bit_depth
-   large of png_color.  This lets grayscale images be treated as
-   paletted.  Most useful for gamma correction and simplification
-   of code. */
+/* Build a grayscale palette.  Palette is assumed to be 1 << bit_depth
+ * large of png_color.  This lets grayscale images be treated as
+ * paletted.  Most useful for gamma correction and simplification
+ * of code.
+ */
 void
 png_build_grayscale_palette(int bit_depth, png_colorp palette)
 {
@@ -1762,8 +1833,9 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
 /* Replace any alpha or transparency with the supplied background color.
-   "background" is already in the screen gamma, while "background_1" is
-   at a gamma of 1.0.  Paletted files have already been taken care of. */
+ * "background" is already in the screen gamma, while "background_1" is
+ * at a gamma of 1.0.  Paletted files have already been taken care of.
+ */
 void
 png_do_background(png_row_infop row_info, png_bytep row,
    png_color_16p trans_values, png_color_16p background,
@@ -2330,7 +2402,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         png_composite_16(v, g, a, background->green);
                         *(dp + 2) = (png_byte)((v >> 8) & 0xff);
                         *(dp + 3) = (png_byte)(v & 0xff);
-                        png_composite_16(v, g, a, background->green);
+                        png_composite_16(v, b, a, background->blue);
                         *(dp + 4) = (png_byte)((v >> 8) & 0xff);
                         *(dp + 5) = (png_byte)(v & 0xff);
                      }
@@ -2356,10 +2428,11 @@ png_do_background(png_row_infop row_info, png_bytep row,
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
 /* Gamma correct the image, avoiding the alpha channel.  Make sure
-   you do this after you deal with the trasparency issue on grayscale
-   or rgb images. If your bit depth is 8, use gamma_table, if it
-   is 16, use gamma_16_table and gamma_shift.  Build these with
-   build_gamma_table(). */
+ * you do this after you deal with the trasparency issue on grayscale
+ * or rgb images. If your bit depth is 8, use gamma_table, if it
+ * is 16, use gamma_16_table and gamma_shift.  Build these with
+ * build_gamma_table().
+ */
 void
 png_do_gamma(png_row_infop row_info, png_bytep row,
    png_bytep gamma_table, png_uint_16pp gamma_16_table,
@@ -2488,8 +2561,8 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
                   int msb = *sp & 0xf0;
                   int lsb = *sp & 0x0f;
 
-                  *sp = (((int)gamma_table[msb | msb >> 4] + 8) & 0xf0) |
-                        (((int)gamma_table[lsb << 4 | lsb] + 8) >> 4);
+                  *sp = (((int)gamma_table[msb | (msb >> 4)]) & 0xf0) |
+                        (((int)gamma_table[(lsb << 4) | lsb]) >> 4);
                   sp++;
                }
             }
@@ -2521,8 +2594,9 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
 #endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
-/* expands a palette row to an rgb or rgba row depending
-   upon whether you supply trans and num_trans */
+/* Expands a palette row to an rgb or rgba row depending
+ * upon whether you supply trans and num_trans.
+ */
 void
 png_do_expand_palette(png_row_infop row_info, png_bytep row,
    png_colorp palette, png_bytep trans, int num_trans)
@@ -2662,8 +2736,9 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
    }
 }
 
-/* if the bit depth < 8, it is expanded to 8.  Also, if the
-   transparency value is supplied, an alpha channel is built. */
+/* If the bit depth < 8, it is expanded to 8.  Also, if the
+ * transparency value is supplied, an alpha channel is built.
+ */
 void
 png_do_expand(png_row_infop row_info, png_bytep row,
    png_color_16p trans_value)
@@ -2958,9 +3033,10 @@ static int png_gamma_shift[] =
    {0x10, 0x21, 0x42, 0x84, 0x110, 0x248, 0x550, 0xff0};
 
 /* We build the 8- or 16-bit gamma tables here.  Note that for 16-bit
-   tables, we don't make a full table if we are reducing to 8-bit in
-   the future.  Note also how the gamma_16 tables are segmented so that
-   we don't need to allocate > 64K chunks for a full 16-bit table. */
+ * tables, we don't make a full table if we are reducing to 8-bit in
+ * the future.  Note also how the gamma_16 tables are segmented so that
+ * we don't need to allocate > 64K chunks for a full 16-bit table.
+ */
 void
 png_build_gamma_table(png_structp png_ptr)
 {
