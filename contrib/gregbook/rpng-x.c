@@ -5,8 +5,8 @@
    This program decodes and displays PNG images, with gamma correction and
    optionally with a user-specified background color (in case the image has
    transparency).  It is very nearly the most basic PNG viewer possible.
-   This version is for the X Window System (tested under Unix, but may work
-   under VMS or OS/2 with a little tweaking).
+   This version is for the X Window System (tested by author under Unix and
+   by Martin Zinser under OpenVMS; may work under OS/2 with some tweaking).
 
    to do:
     - 8-bit support
@@ -14,7 +14,17 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+   Changelog:
+    - 1.01:  initial public release
+    - 1.02:  modified to allow abbreviated options; fixed long/ulong mis-
+              match; switched to png_jmpbuf() macro
+    - 1.10:  added support for non-default visuals; fixed X pixel-conversion
+    - 1.11:  added extra set of parentheses to png_jmpbuf() macro; fixed
+              command-line parsing bug
+
+  ---------------------------------------------------------------------------
+
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -41,7 +51,7 @@
 
 #define PROGNAME  "rpng-x"
 #define LONGNAME  "Simple PNG Viewer for X"
-#define VERSION   "1.01 of 31 March 1999"
+#define VERSION   "1.11 of 19 March 2000"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +64,7 @@
 
 /* #define DEBUG  :  this enables the Trace() macros */
 
-#include "readpng.h" /* typedefs, common macros, readpng prototypes */
+#include "readpng.h"   /* typedefs, common macros, readpng prototypes */
 
 
 /* could just include png.h, but this macro is the only thing we need
@@ -95,15 +105,16 @@ static uch *image_data;
 static char *displayname;
 static XImage *ximage;
 static Display *display;
-static int bitmap_order;
 static int depth;
 static Visual *visual;
-static int RPixelShift, GPixelShift, BPixelShift;
-static ulg RedMask, GreenMask, BlueMask;
+static XVisualInfo *visual_list;
+static int RShift, GShift, BShift;
+static ulg RMask, GMask, BMask;
 static Window window;
 static GC gc;
 static Colormap colormap;
 
+static int have_nondefault_visual = FALSE;
 static int have_colormap = FALSE;
 static int have_window = FALSE;
 /*
@@ -123,9 +134,9 @@ int main(int argc, char **argv)
     int rc, alen, flen;
     int error = 0;
     int have_bg = FALSE;
-    double LUT_exponent;             /* just the lookup table */
-    double CRT_exponent = 2.2;       /* just the monitor */
-    double default_display_exponent; /* whole display system */
+    double LUT_exponent;               /* just the lookup table */
+    double CRT_exponent = 2.2;         /* just the monitor */
+    double default_display_exponent;   /* whole display system */
     XEvent e;
     KeySym k;
 
@@ -188,24 +199,29 @@ int main(int argc, char **argv)
     /* Now parse the command line for options and the PNG filename. */
 
     while (*++argv && !error) {
-        if (!strcmp(*argv, "-display")) {
+        if (!strncmp(*argv, "-display", 2)) {
             if (!*++argv)
-                ++error;
-            displayname = *argv;
-        } else if (!strcmp(*argv, "-gamma")) {
-            if (!*++argv)
-                ++error;
-            display_exponent = atof(*argv);
-            if (display_exponent <= 0.0)
-                ++error;
-        } else if (!strcmp(*argv, "-bgcolor")) {
-            if (!*++argv)
-                ++error;
-            bgstr = *argv;
-            if (strlen(bgstr) != 7 || bgstr[0] != '#')
                 ++error;
             else
-                have_bg = TRUE;
+                displayname = *argv;
+        } else if (!strncmp(*argv, "-gamma", 2)) {
+            if (!*++argv)
+                ++error;
+            else {
+                display_exponent = atof(*argv);
+                if (display_exponent <= 0.0)
+                    ++error;
+            }
+        } else if (!strncmp(*argv, "-bgcolor", 2)) {
+            if (!*++argv)
+                ++error;
+            else {
+                bgstr = *argv;
+                if (strlen(bgstr) != 7 || bgstr[0] != '#')
+                    ++error; 
+                else 
+                    have_bg = TRUE;
+            }
         } else {
             if (**argv != '-') {
                 filename = *argv;
@@ -222,8 +238,7 @@ int main(int argc, char **argv)
         fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
         ++error;
     } else {
-        if ((rc = readpng_init(infile, (long *)(&image_width),
-                               (long *)(&image_height))) != 0) {
+        if ((rc = readpng_init(infile, &image_width, &image_height)) != 0) {
             switch (rc) {
                 case 1:
                     fprintf(stderr, PROGNAME
@@ -257,21 +272,25 @@ int main(int argc, char **argv)
             fclose(infile);
     }
 
+
+    /* usage screen */
+
     if (error) {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
         readpng_version_info();
         fprintf(stderr, "\n"
-         "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg] file.png\n"
-         "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"
-         "    exp \ttransfer-function exponent (``gamma'') of the display\n"
-         "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
-         "\t\t  to the product of the lookup-table exponent (varies)\n"
-         "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
-         "    bg  \tdesired background color in 7-character hex RGB format\n"
-         "\t\t  (e.g., ``#ff7f00'' for orange:  same as HTML colors);\n"
-         "\t\t  used with transparent images\n"
-         "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
-         "\n", PROGNAME, default_display_exponent);
+          "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg] file.png\n"
+          "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"
+          "    exp \ttransfer-function exponent (``gamma'') of the display\n"
+          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
+          "\t\t  to the product of the lookup-table exponent (varies)\n"
+          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
+          "    bg  \tdesired background color in 7-character hex RGB format\n"
+          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
+          "\t\t  used with transparent images\n"
+          "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
+          "is displayed) to quit.\n"
+          "\n", PROGNAME, default_display_exponent);
         exit(1);
     }
 
@@ -344,6 +363,10 @@ int main(int argc, char **argv)
 
     /* wait for the user to tell us when to quit */
 
+    printf(
+      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n");
+    fflush(stdout);
+
     do
         XNextEvent(display, &e);
     while (!(e.type == ButtonPress && e.xbutton.button == Button1) &&
@@ -362,11 +385,13 @@ int main(int argc, char **argv)
 
 
 
-static int rpng_x_create_window()
+static int rpng_x_create_window(void)
 {
     uch *xdata;
+    int need_colormap = FALSE;
     int screen, pad;
     ulg bg_pixel = 0L;
+    ulg attrmask;
     Window root;
     XEvent e;
     XGCValues gcvalues;
@@ -378,11 +403,15 @@ static int rpng_x_create_window()
     XWMHints *wm_hints;
 
 
-    bitmap_order = BitmapBitOrder(display);
     screen = DefaultScreen(display);
     depth = DisplayPlanes(display, screen);
     root = RootWindow(display, screen);
 
+#ifdef DEBUG
+    XSynchronize(display, True);
+#endif
+
+#if 0
 /* GRR:  add 8-bit support */
     if (/* depth != 8 && */ depth != 16 && depth != 24 && depth != 32) {
         fprintf(stderr,
@@ -394,27 +423,73 @@ static int rpng_x_create_window()
     XMatchVisualInfo(display, screen, depth,
       (depth == 8)? PseudoColor : TrueColor, &visual_info);
     visual = visual_info.visual;
+#else
+    if (depth != 16 && depth != 24 && depth != 32) {
+        int visuals_matched = 0;
 
-    RedMask   = visual->red_mask;
-    GreenMask = visual->green_mask;
-    BlueMask  = visual->blue_mask;
+        Trace((stderr, "default depth is %d:  checking other visuals\n",
+          depth))
+
+        /* 24-bit first */
+        visual_info.screen = screen;
+        visual_info.depth = 24;
+        visual_list = XGetVisualInfo(display,
+          VisualScreenMask | VisualDepthMask, &visual_info, &visuals_matched);
+        if (visuals_matched == 0) {
+/* GRR:  add 15-, 16- and 32-bit TrueColor visuals (also DirectColor?) */
+            fprintf(stderr, "default screen depth %d not supported, and no"
+              " 24-bit visuals found\n", depth);
+            return 2;
+        }
+        Trace((stderr, "XGetVisualInfo() returned %d 24-bit visuals\n",
+          visuals_matched))
+        visual = visual_list[0].visual;
+        depth = visual_list[0].depth;
+/*
+        colormap_size = visual_list[0].colormap_size;
+        visual_class = visual->class;
+        visualID = XVisualIDFromVisual(visual);
+ */
+        have_nondefault_visual = TRUE;
+        need_colormap = TRUE;
+    } else {
+        XMatchVisualInfo(display, screen, depth, TrueColor, &visual_info);
+        visual = visual_info.visual;
+    }
+#endif
+
+    RMask = visual->red_mask;
+    GMask = visual->green_mask;
+    BMask = visual->blue_mask;
 
 /* GRR:  add/check 8-bit support */
-    if (depth == 8) {
+    if (depth == 8 || need_colormap) {
         colormap = XCreateColormap(display, root, visual, AllocNone);
         if (!colormap) {
             fprintf(stderr, "XCreateColormap() failed\n");
             return 2;
         }
         have_colormap = TRUE;
-    } else if (depth == 16) {
-        RPixelShift = 15 - rpng_x_msb(RedMask); /* these are right-shifts */
-        GPixelShift = 15 - rpng_x_msb(GreenMask);
-        BPixelShift = 15 - rpng_x_msb(BlueMask);
-    } else /* if (depth > 16) */ {
-        RPixelShift = rpng_x_msb(RedMask) - 7; /* these are left-shifts */
-        GPixelShift = rpng_x_msb(GreenMask) - 7;
-        BPixelShift = rpng_x_msb(BlueMask) - 7;
+    }
+    if (depth == 15 || depth == 16) {
+        RShift = 15 - rpng_x_msb(RMask);    /* these are right-shifts */
+        GShift = 15 - rpng_x_msb(GMask);
+        BShift = 15 - rpng_x_msb(BMask);
+    } else if (depth > 16) {
+#define NO_24BIT_MASKS
+#ifdef NO_24BIT_MASKS
+        RShift = rpng_x_msb(RMask) - 7;     /* these are left-shifts */
+        GShift = rpng_x_msb(GMask) - 7;
+        BShift = rpng_x_msb(BMask) - 7;
+#else
+        RShift = 7 - rpng_x_msb(RMask);     /* these are right-shifts, too */
+        GShift = 7 - rpng_x_msb(GMask);
+        BShift = 7 - rpng_x_msb(BMask);
+#endif
+    }
+    if (depth >= 15 && (RShift < 0 || GShift < 0 || BShift < 0)) {
+        fprintf(stderr, "rpng internal logic error:  negative X shift(s)!\n");
+        return 2;
     }
 
 /*---------------------------------------------------------------------------
@@ -423,9 +498,16 @@ static int rpng_x_create_window()
 
     attr.backing_store = Always;
     attr.event_mask = ExposureMask | KeyPressMask | ButtonPressMask;
+    attrmask = CWBackingStore | CWEventMask;
+    if (have_nondefault_visual) {
+        attr.colormap = colormap;
+        attr.background_pixel = 0;
+        attr.border_pixel = 1;
+        attrmask |= CWColormap | CWBackPixel | CWBorderPixel;
+    }
 
-    window = XCreateWindow(display, root, 0, 0, image_width, image_height,
-      0, depth, InputOutput, visual, CWBackingStore | CWEventMask, &attr);
+    window = XCreateWindow(display, root, 0, 0, image_width, image_height, 0,
+      depth, InputOutput, visual, attrmask, &attr);
 
     if (window == None) {
         fprintf(stderr, "XCreateWindow() failed\n");
@@ -446,8 +528,8 @@ static int rpng_x_create_window()
     if ((size_hints = XAllocSizeHints()) != NULL) {
         /* window will not be resizable */
         size_hints->flags = PMinSize | PMaxSize;
-        size_hints->min_width = size_hints->max_width = image_width;
-        size_hints->min_height = size_hints->max_height = image_height;
+        size_hints->min_width = size_hints->max_width = (int)image_width;
+        size_hints->min_height = size_hints->max_height = (int)image_height;
     }
 
     if ((wm_hints = XAllocWMHints()) != NULL) {
@@ -469,13 +551,13 @@ static int rpng_x_create_window()
   ---------------------------------------------------------------------------*/
 
     if (depth == 24 || depth == 32) {
-        bg_pixel = ((ulg)bg_red   << RPixelShift) |
-                   ((ulg)bg_green << GPixelShift) |
-                   ((ulg)bg_blue  << BPixelShift);
+        bg_pixel = ((ulg)bg_red   << RShift) |
+                   ((ulg)bg_green << GShift) |
+                   ((ulg)bg_blue  << BShift);
     } else if (depth == 16) {
-        bg_pixel = ((((ulg)bg_red   << 8) >> RPixelShift) & RedMask)   |
-                   ((((ulg)bg_green << 8) >> GPixelShift) & GreenMask) |
-                   ((((ulg)bg_blue  << 8) >> BPixelShift) & BlueMask);
+        bg_pixel = ((((ulg)bg_red   << 8) >> RShift) & RMask) |
+                   ((((ulg)bg_green << 8) >> GShift) & GMask) |
+                   ((((ulg)bg_blue  << 8) >> BShift) & BMask);
     } else /* depth == 8 */ {
 
         /* GRR:  add 8-bit support */
@@ -524,7 +606,7 @@ static int rpng_x_create_window()
         return 3;
     }
 
-    /* to avoid testing the bitmap_order every pixel (or doubling the size of
+    /* to avoid testing the byte order every pixel (or doubling the size of
      * the drawing routine with a giant if-test), we arbitrarily set the byte
      * order to MSBFirst and let Xlib worry about inverting things on little-
      * endian machines (like Linux/x86, old VAXen, etc.)--this is not the most
@@ -541,20 +623,24 @@ static int rpng_x_create_window()
 
 
 
-static int rpng_x_display_image()
+static int rpng_x_display_image(void)
 {
     uch *src;
     char *dest;
     uch r, g, b, a;
-    int ximage_rowbytes = ximage->bytes_per_line;
     ulg i, row, lastrow = 0;
     ulg pixel;
+    int ximage_rowbytes = ximage->bytes_per_line;
+/*  int bpp = ximage->bits_per_pixel;  */
 
 
     Trace((stderr, "beginning display loop (image_channels == %d)\n",
       image_channels))
-    Trace((stderr, "(width = %ld, rowbytes = %ld, ximage_rowbytes = %d)\n",
+    Trace((stderr, "   (width = %ld, rowbytes = %ld, ximage_rowbytes = %d)\n",
       image_width, image_rowbytes, ximage_rowbytes))
+    Trace((stderr, "   (bpp = %d)\n", ximage->bits_per_pixel))
+    Trace((stderr, "   (byte_order = %s)\n", ximage->byte_order == MSBFirst?
+      "MSBFirst" : (ximage->byte_order == LSBFirst? "LSBFirst" : "unknown")))
 
     if (depth == 24 || depth == 32) {
         ulg red, green, blue;
@@ -567,14 +653,27 @@ static int rpng_x_display_image()
                     red   = *src++;
                     green = *src++;
                     blue  = *src++;
-                    pixel = (red   << RPixelShift) |
-                            (green << GPixelShift) |
-                            (blue  << BPixelShift);
+#ifdef NO_24BIT_MASKS
+                    pixel = (red   << RShift) |
+                            (green << GShift) |
+                            (blue  << BShift);
                     /* recall that we set ximage->byte_order = MSBFirst above */
-                    *dest++ = ((uch *)&pixel)[3];
-                    *dest++ = ((uch *)&pixel)[2];
-                    *dest++ = ((uch *)&pixel)[1];
-                    *dest++ = ((uch *)&pixel)[0];
+                    /* GRR BUG:  this assumes bpp == 32, but may be 24: */
+                    *dest++ = (char)((pixel >> 24) & 0xff);
+                    *dest++ = (char)((pixel >> 16) & 0xff);
+                    *dest++ = (char)((pixel >>  8) & 0xff);
+                    *dest++ = (char)( pixel        & 0xff);
+#else
+                    red   = (RShift < 0)? red   << (-RShift) : red   >> RShift;
+                    green = (GShift < 0)? green << (-GShift) : green >> GShift;
+                    blue  = (BShift < 0)? blue  << (-BShift) : blue  >> BShift;
+                    pixel = (red & RMask) | (green & GMask) | (blue & BMask);
+                    /* recall that we set ximage->byte_order = MSBFirst above */
+                    *dest++ = (char)((pixel >> 24) & 0xff);
+                    *dest++ = (char)((pixel >> 16) & 0xff);
+                    *dest++ = (char)((pixel >>  8) & 0xff);
+                    *dest++ = (char)( pixel        & 0xff);
+#endif
                 }
             } else /* if (image_channels == 4) */ {
                 for (i = image_width;  i > 0;  --i) {
@@ -598,20 +697,20 @@ static int rpng_x_display_image()
                         alpha_composite(green, g, a, bg_green);
                         alpha_composite(blue,  b, a, bg_blue);
                     }
-                    pixel = (red   << RPixelShift) |
-                            (green << GPixelShift) |
-                            (blue  << BPixelShift);
+                    pixel = (red   << RShift) |
+                            (green << GShift) |
+                            (blue  << BShift);
                     /* recall that we set ximage->byte_order = MSBFirst above */
-                    *dest++ = ((uch *)&pixel)[3];
-                    *dest++ = ((uch *)&pixel)[2];
-                    *dest++ = ((uch *)&pixel)[1];
-                    *dest++ = ((uch *)&pixel)[0];
+                    *dest++ = (char)((pixel >> 24) & 0xff);
+                    *dest++ = (char)((pixel >> 16) & 0xff);
+                    *dest++ = (char)((pixel >>  8) & 0xff);
+                    *dest++ = (char)( pixel        & 0xff);
                 }
             }
             /* display after every 16 lines */
             if (((row+1) & 0xf) == 0) {
-                XPutImage(display, window, gc, ximage, 0, lastrow, 0, lastrow,
-                  image_width, 16);
+                XPutImage(display, window, gc, ximage, 0, (int)lastrow, 0,
+                  (int)lastrow, image_width, 16);
                 XFlush(display);
                 lastrow = row + 1;
             }
@@ -631,12 +730,12 @@ static int rpng_x_display_image()
                     ++src;
                     blue  = ((ush)(*src) << 8);
                     ++src;
-                    pixel = ((red   >> RPixelShift) & RedMask)   |
-                            ((green >> GPixelShift) & GreenMask) |
-                            ((blue  >> BPixelShift) & BlueMask);
+                    pixel = ((red   >> RShift) & RMask) |
+                            ((green >> GShift) & GMask) |
+                            ((blue  >> BShift) & BMask);
                     /* recall that we set ximage->byte_order = MSBFirst above */
-                    *dest++ = ((uch *)&pixel)[1];
-                    *dest++ = ((uch *)&pixel)[0];
+                    *dest++ = (char)((pixel >>  8) & 0xff);
+                    *dest++ = (char)( pixel        & 0xff);
                 }
             } else /* if (image_channels == 4) */ {
                 for (i = image_width;  i > 0;  --i) {
@@ -663,18 +762,18 @@ static int rpng_x_display_image()
                         green = ((ush)g << 8);
                         blue  = ((ush)b << 8);
                     }
-                    pixel = ((red   >> RPixelShift) & RedMask)   |
-                            ((green >> GPixelShift) & GreenMask) |
-                            ((blue  >> BPixelShift) & BlueMask);
+                    pixel = ((red   >> RShift) & RMask) |
+                            ((green >> GShift) & GMask) |
+                            ((blue  >> BShift) & BMask);
                     /* recall that we set ximage->byte_order = MSBFirst above */
-                    *dest++ = ((uch *)&pixel)[1];
-                    *dest++ = ((uch *)&pixel)[0];
+                    *dest++ = (char)((pixel >>  8) & 0xff);
+                    *dest++ = (char)( pixel        & 0xff);
                 }
             }
             /* display after every 16 lines */
             if (((row+1) & 0xf) == 0) {
-                XPutImage(display, window, gc, ximage, 0, lastrow, 0, lastrow,
-                  image_width, 16);
+                XPutImage(display, window, gc, ximage, 0, (int)lastrow, 0,
+                  (int)lastrow, image_width, 16);
                 XFlush(display);
                 lastrow = row + 1;
             }
@@ -688,8 +787,8 @@ static int rpng_x_display_image()
 
     Trace((stderr, "calling final XPutImage()\n"))
     if (lastrow < image_height) {
-        XPutImage(display, window, gc, ximage, 0, lastrow, 0, lastrow,
-          image_width, image_height-lastrow);
+        XPutImage(display, window, gc, ximage, 0, (int)lastrow, 0,
+          (int)lastrow, image_width, image_height-lastrow);
         XFlush(display);
     }
 
@@ -699,7 +798,7 @@ static int rpng_x_display_image()
 
 
 
-static void rpng_x_cleanup()
+static void rpng_x_cleanup(void)
 {
     if (image_data) {
         free(image_data);
@@ -722,6 +821,9 @@ static void rpng_x_cleanup()
 
     if (have_colormap)
         XFreeColormap(display, colormap);
+
+    if (have_nondefault_visual)
+        XFree(visual_list);
 }
 
 

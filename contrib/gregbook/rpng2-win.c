@@ -22,10 +22,13 @@
    Changelog:
     - 1.01:  initial public release
     - 1.02:  fixed cut-and-paste error in usage screen (oops...)
+    - 1.03:  modified to allow abbreviated options
+    - 1.04:  removed bogus extra argument from usage fprintf() [Glenn R-P?];
+              fixed command-line parsing bug
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -52,14 +55,14 @@
 
 #define PROGNAME  "rpng2-win"
 #define LONGNAME  "Progressive PNG Viewer for Windows"
-#define VERSION   "1.02 of 22 September 1999"
+#define VERSION   "1.04 of 19 March 2000"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h>   /* for jmpbuf declaration in readpng2.h */
+#include <setjmp.h>    /* for jmpbuf declaration in readpng2.h */
 #include <time.h>
-#include <math.h>     /* only for PvdM background code */
+#include <math.h>      /* only for PvdM background code */
 #include <windows.h>
 
 /* all for PvdM background code: */
@@ -80,9 +83,9 @@
 #define rgb2_max   bg_bsat
 #define rgb2_min   bg_brot
 
-/* #define DEBUG */      /* this enables the Trace() macros */
+/* #define DEBUG */     /* this enables the Trace() macros */
 
-#include "readpng2.h"    /* typedefs, common macros, readpng2 prototypes */
+#include "readpng2.h"   /* typedefs, common macros, readpng2 prototypes */
 
 
 /* could just include png.h, but this macro is the only thing we need
@@ -90,18 +93,18 @@
  * only happen with alpha (which could easily be avoided with
  * "ush acopy = (alpha);") */
 
-#define alpha_composite(composite, fg, alpha, bg) {              \
-    ush temp = ((ush)(fg)*(ush)(alpha) +                         \
-                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128); \
-    (composite) = (uch)((temp + (temp >> 8)) >> 8);              \
+#define alpha_composite(composite, fg, alpha, bg) {               \
+    ush temp = ((ush)(fg)*(ush)(alpha) +                          \
+                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128);  \
+    (composite) = (uch)((temp + (temp >> 8)) >> 8);               \
 }
 
 
-#define INBUFSIZE 4096 /* with pseudo-timing on (1 sec delay/block), this
-                        *  block size corresponds roughly to a download
-                        *  speed 10% faster than theoretical 33.6K maximum
-                        *  (assuming 8 data bits, 1 stop bit and no other
-                        *  overhead) */
+#define INBUFSIZE 4096   /* with pseudo-timing on (1 sec delay/block), this
+                          *  block size corresponds roughly to a download
+                          *  speed 10% faster than theoretical 33.6K maximum
+                          *  (assuming 8 data bits, 1 stop bit and no other
+                          *  overhead) */
 
 /* local prototypes */
 static void       rpng2_win_init(void);
@@ -116,7 +119,7 @@ LRESULT CALLBACK  rpng2_win_wndproc(HWND, UINT, WPARAM, LPARAM);
 static char titlebar[1024], *window_name = titlebar;
 static char *progname = PROGNAME;
 static char *appname = LONGNAME;
-static char *icon_name = PROGNAME; /* GRR:  not (yet) used */
+static char *icon_name = PROGNAME;    /* GRR:  not (yet) used */
 static char *filename;
 static FILE *infile;
 
@@ -125,7 +128,7 @@ static mainprog_info rpng2_info;
 static uch inbuf[INBUFSIZE];
 static int incount;
 
-static int pat = 6;       /* must be less than num_bgpat */
+static int pat = 6;         /* must be less than num_bgpat */
 static int bg_image = 0;
 static int bgscale = 16;
 static ulg bg_rowbytes;
@@ -134,22 +137,22 @@ static uch *bg_data;
 static struct rgb_color {
     uch r, g, b;
 } rgb[] = {
-    {  0,   0,   0},   /*  0:  black */
-    {255, 255, 255},   /*  1:  white */
-    {173, 132,  57},   /*  2:  tan */
-    { 64, 132,   0},   /*  3:  medium green */
-    {189, 117,   1},   /*  4:  gold */
-    {253, 249,   1},   /*  5:  yellow */
-    {  0,   0, 255},   /*  6:  blue */
-    {  0,   0, 120},   /*  7:  medium blue */
-    {255,   0, 255},   /*  8:  magenta */
-    { 64,   0,  64},   /*  9:  dark magenta */
-    {255,   0,   0},   /* 10:  red */
-    { 64,   0,   0},   /* 11:  dark red */
-    {255, 127,   0},   /* 12:  orange */
-    {192,  96,   0},   /* 13:  darker orange */
-    { 24,  60,   0},   /* 14:  dark green-yellow */
-    { 85, 125, 200}    /* 15:  ice blue */
+    {  0,   0,   0},    /*  0:  black */
+    {255, 255, 255},    /*  1:  white */
+    {173, 132,  57},    /*  2:  tan */
+    { 64, 132,   0},    /*  3:  medium green */
+    {189, 117,   1},    /*  4:  gold */
+    {253, 249,   1},    /*  5:  yellow */
+    {  0,   0, 255},    /*  6:  blue */
+    {  0,   0, 120},    /*  7:  medium blue */
+    {255,   0, 255},    /*  8:  magenta */
+    { 64,   0,  64},    /*  9:  dark magenta */
+    {255,   0,   0},    /* 10:  red */
+    { 64,   0,   0},    /* 11:  dark red */
+    {255, 127,   0},    /* 12:  orange */
+    {192,  96,   0},    /* 13:  darker orange */
+    { 24,  60,   0},    /* 14:  dark green-yellow */
+    { 85, 125, 200}     /* 15:  ice blue */
 };
 /* not used for now, but should be for error-checking:
 static int num_rgb = sizeof(rgb) / sizeof(struct rgb_color);
@@ -174,25 +177,25 @@ static int num_rgb = sizeof(rgb) / sizeof(struct rgb_color);
  */
 static struct background_pattern {
     ush type;
-    int rgb1_max, rgb1_min;   /* or bg_freq, bg_gray */
-    int rgb2_max, rgb2_min;   /* or bg_bsat, bg_brot (both scaled by 10)*/
+    int rgb1_max, rgb1_min;     /* or bg_freq, bg_gray */
+    int rgb2_max, rgb2_min;     /* or bg_bsat, bg_brot (both scaled by 10)*/
 } bg[] = {
-    {0+8,   2,0,  1,15},       /* checkered:  tan/black vs. white/ice blue */
-    {0+24,  2,0,  1,0},        /* checkered:  tan/black vs. white/black */
-    {0+8,   4,5,  0,2},        /* checkered:  gold/yellow vs. black/tan */
-    {0+8,   4,5,  0,6},        /* checkered:  gold/yellow vs. black/blue */
-    {0,     7,0,  8,9},        /* checkered:  deep blue/black vs. magenta */
-    {0+8,  13,0,  5,14},       /* checkered:  orange/black vs. yellow */
-    {0+8,  12,0, 10,11},       /* checkered:  orange/black vs. red */
-    {1,     7,0,  8,0},        /* diamonds:  deep blue/black vs. magenta */
-    {1,    12,0, 11,0},        /* diamonds:  orange vs. dark red */
-    {1,    10,0,  7,0},        /* diamonds:  red vs. medium blue */
-    {1,     4,0,  5,0},        /* diamonds:  gold vs. yellow */
-    {1,     3,0,  0,0},        /* diamonds:  medium green vs. black */
-    {2,    16, 100,  20,   0}, /* radial:  ~hard radial color-beams */
-    {2,    18, 100,  10,   2}, /* radial:  soft, curved radial color-beams */
-    {2,    16, 256, 100, 250}, /* radial:  very tight spiral */
-    {2, 10000, 256,  11,   0}  /* radial:  dipole-moire' (almost fractal) */
+    {0+8,   2,0,  1,15},        /* checkered:  tan/black vs. white/ice blue */
+    {0+24,  2,0,  1,0},         /* checkered:  tan/black vs. white/black */
+    {0+8,   4,5,  0,2},         /* checkered:  gold/yellow vs. black/tan */
+    {0+8,   4,5,  0,6},         /* checkered:  gold/yellow vs. black/blue */
+    {0,     7,0,  8,9},         /* checkered:  deep blue/black vs. magenta */
+    {0+8,  13,0,  5,14},        /* checkered:  orange/black vs. yellow */
+    {0+8,  12,0, 10,11},        /* checkered:  orange/black vs. red */
+    {1,     7,0,  8,0},         /* diamonds:  deep blue/black vs. magenta */
+    {1,    12,0, 11,0},         /* diamonds:  orange vs. dark red */
+    {1,    10,0,  7,0},         /* diamonds:  red vs. medium blue */
+    {1,     4,0,  5,0},         /* diamonds:  gold vs. yellow */
+    {1,     3,0,  0,0},         /* diamonds:  medium green vs. black */
+    {2,    16, 100,  20,   0},  /* radial:  ~hard radial color-beams */
+    {2,    18, 100,  10,   2},  /* radial:  soft, curved radial color-beams */
+    {2,    16, 256, 100, 250},  /* radial:  very tight spiral */
+    {2, 10000, 256,  11,   0}   /* radial:  dipole-moire' (almost fractal) */
 };
 static int num_bgpat = sizeof(bg) / sizeof(struct background_pattern);
 
@@ -212,16 +215,17 @@ static int global_showmode;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
 {
-    char *args[1024];   /* arbitrary limit, but should suffice */
-    char *p, *q, *bgstr = NULL, **argv = args;
+    char *args[1024];                 /* arbitrary limit, but should suffice */
+    char **argv = args;
+    char *p, *q, *bgstr = NULL;
     int argc = 0;
     int rc, alen, flen;
     int error = 0;
     int timing = FALSE;
     int have_bg = FALSE;
-    double LUT_exponent;             /* just the lookup table */
-    double CRT_exponent = 2.2;       /* just the monitor */
-    double default_display_exponent; /* whole display system */
+    double LUT_exponent;              /* just the lookup table */
+    double CRT_exponent = 2.2;        /* just the monitor */
+    double default_display_exponent;  /* whole display system */
     MSG msg;
 
 
@@ -316,33 +320,39 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     /* Now parse the command line for options and the PNG filename. */
 
     while (*++argv && !error) {
-        if (!strcmp(*argv, "-gamma")) {
+        if (!strncmp(*argv, "-gamma", 2)) {
             if (!*++argv)
-                ++error;
-            rpng2_info.display_exponent = atof(*argv);
-            if (rpng2_info.display_exponent <= 0.0)
-                ++error;
-        } else if (!strcmp(*argv, "-bgcolor")) {
-            if (!*++argv)
-                ++error;
-            bgstr = *argv;
-            if (strlen(bgstr) != 7 || bgstr[0] != '#')
                 ++error;
             else {
-                have_bg = TRUE;
-                bg_image = FALSE;
+                rpng2_info.display_exponent = atof(*argv);
+                if (rpng2_info.display_exponent <= 0.0)
+                    ++error;
             }
-        } else if (!strcmp(*argv, "-bgpat")) {
+        } else if (!strncmp(*argv, "-bgcolor", 4)) {
             if (!*++argv)
                 ++error;
-            pat = atoi(*argv) - 1;
-            if (pat < 0 || pat >= num_bgpat)
+            else {
+                bgstr = *argv;
+                if (strlen(bgstr) != 7 || bgstr[0] != '#')
+                    ++error;
+                else {
+                    have_bg = TRUE;
+                    bg_image = FALSE;
+                }
+            }
+        } else if (!strncmp(*argv, "-bgpat", 4)) {
+            if (!*++argv)
                 ++error;
             else {
-                bg_image = TRUE;
-                have_bg = FALSE;
+                pat = atoi(*argv) - 1;
+                if (pat < 0 || pat >= num_bgpat)
+                    ++error;
+                else {
+                    bg_image = TRUE;
+                    have_bg = FALSE;
+                }
             }
-        } else if (!strcmp(*argv, "-timing")) {
+        } else if (!strncmp(*argv, "-timing", 2)) {
             timing = TRUE;
         } else {
             if (**argv != '-') {
@@ -387,6 +397,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             fclose(infile);
     }
 
+
+    /* usage screen */
+
     if (error) {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
         readpng2_version_info();
@@ -398,14 +411,14 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
           "\t\t  to the product of the lookup-table exponent (varies)\n"
           "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
           "    bg  \tdesired background color in 7-character hex RGB format\n"
-          "\t\t  (e.g., ``#ff7f00'' for orange:  same as HTML colors);\n"
+          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
           "\t\t  used with transparent images; overrides -bgpat\n"
           "    pat \tdesired background pattern number (1-%d); used with\n"
           "\t\t  transparent images; overrides -bgcolor\n"
           "    -timing\tenables delay for every block read, to simulate modem\n"
           "\t\t  download of image (~36 Kbps)\n"
           "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
-          "\n", PROGNAME, " ", default_display_exponent, num_bgpat);
+          "\n", PROGNAME, default_display_exponent, num_bgpat);
         exit(1);
     }
 
@@ -560,7 +573,7 @@ static int rpng2_win_create_window()
     if (!(dib = (uch *)malloc(sizeof(BITMAPINFOHEADER) +
                               wimage_rowbytes*rpng2_info.height)))
     {
-        return 4; /* fail */
+        return 4;   /* fail */
     }
 
 /*---------------------------------------------------------------------------
@@ -655,7 +668,7 @@ static int rpng2_win_create_window()
         TextOut(hdc, ((x < 0)? 0 : x), ((y < 0)? 0 : y), msg, len);
         ReleaseDC(global_hwnd, hdc);
 
-        rpng2_win_load_bg_image(); /* resets bg_image if fails */
+        rpng2_win_load_bg_image();   /* resets bg_image if fails */
     }
 
     if (!bg_image) {
@@ -753,7 +766,7 @@ static int rpng2_win_load_bg_image()
                 even_odd = even_odd_vert ^ even_odd_horiz;
                 invert_column =
                   (even_odd_horiz && (bg[pat].type & 0x10));
-                if (even_odd == 0) {   /* gradient #1 */
+                if (even_odd == 0) {         /* gradient #1 */
                     if (invert_column) {
                         *dest++ = r1_inv;
                         *dest++ = g1_inv;
@@ -763,16 +776,16 @@ static int rpng2_win_load_bg_image()
                         *dest++ = g1;
                         *dest++ = b1;
                     }
-                } else {                /* gradient #2 */
+                } else {                     /* gradient #2 */
                     if ((invert_column && invert_gradient2) ||
                         (!invert_column && !invert_gradient2))
                     {
-                        *dest++ = r2;      /* not inverted or */
-                        *dest++ = g2;      /*  doubly inverted */
+                        *dest++ = r2;        /* not inverted or */
+                        *dest++ = g2;        /*  doubly inverted */
                         *dest++ = b2;
                     } else {
                         *dest++ = r2_inv;
-                        *dest++ = g2_inv;  /* singly inverted */
+                        *dest++ = g2_inv;    /* singly inverted */
                         *dest++ = b2_inv;
                     }
                 }
@@ -908,7 +921,7 @@ static int rpng2_win_load_bg_image()
             g1 = *src++;
             b1 = *src++;
             *dest++ = b1;
-            *dest++ = g1; /* note reverse order */
+            *dest++ = g1;   /* note reverse order */
             *dest++ = r1;
         }
     }
@@ -962,7 +975,7 @@ static void rpng2_win_display_row(ulg row)
             g = *src++;
             b = *src++;
             *dest++ = b;
-            *dest++ = g; /* note reverse order */
+            *dest++ = g;   /* note reverse order */
             *dest++ = r;
         }
     } else /* if (rpng2_info.channels == 4) */ {
@@ -1028,7 +1041,9 @@ static void rpng2_win_finish_display()
      * that the image is done */
 
     rpng2_info.done = TRUE;
-    printf("Done.  Press Q, Esc or mouse button 1 to quit.\n");
+    printf(
+      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n");
+    fflush(stdout);
 }
 
 
@@ -1084,15 +1099,15 @@ LRESULT CALLBACK rpng2_win_wndproc(HWND hwnd, UINT iMsg, WPARAM wP, LPARAM lP)
 
         /* wait for the user to tell us when to quit */
         case WM_CHAR:
-            switch (wP) { /* only need one, so ignore repeat count */
+            switch (wP) {       /* only need one, so ignore repeat count */
                 case 'q':
                 case 'Q':
-                case 0x1B: /* Esc key */
+                case 0x1B:      /* Esc key */
                     PostQuitMessage(0);
             }
             return 0;
 
-        case WM_LBUTTONDOWN: /* another way of quitting */
+        case WM_LBUTTONDOWN:    /* another way of quitting */
         case WM_DESTROY:
             PostQuitMessage(0);
             return 0;

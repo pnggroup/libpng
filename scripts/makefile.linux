@@ -34,7 +34,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.5s
+PNGMIN = 1.0.6
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -74,8 +74,8 @@ test: pngtest
 	./pngtest
 
 install: libpng.a libpng.so.$(PNGVER)
- 	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
- 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	cp png.h pngconf.h $(INCPATH)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
 	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)

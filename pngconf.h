@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.5s - February 18, 2000
+ * libpng 1.0.6 - March 21, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -441,9 +441,14 @@
  * but might be required for some pre-1.0.5c applications.
  */
 #ifdef PNG_NO_GLOBAL_ARRAYS
-#define PNG_USE_LOCAL_ARRAYS
+#  define PNG_USE_LOCAL_ARRAYS
 #else
-#define PNG_USE_GLOBAL_ARRAYS
+#  if defined(__GNUC__) && defined(WIN32)
+#    define PNG_NO_GLOBAL_ARRAYS
+#    define PNG_USE_LOCAL_ARRAYS
+#  else
+#    define PNG_USE_GLOBAL_ARRAYS
+#  endif
 #endif
 
 /* These are currently experimental features, define them if you want */
@@ -913,7 +918,10 @@ typedef z_stream FAR *  png_zstreamp;
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
-#   define png_jmp_env(png_ptr) png_ptr->jmpbuf   
+#   define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#else
+#   define png_jmpbuf(png_ptr) \
+    (LIBPNG_WAS_COMPILED_WITH__PNG_SETJMP_NOT_SUPPORTED)
 #endif
 
 #if defined(USE_FAR_KEYWORD)  /* memory model independent fns */

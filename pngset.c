@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.5s - February 18, 2000
+ * libpng 1.0.6 - March 21, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -312,8 +312,6 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   png_debug1(3, "allocating PLTE for info (%d bytes)\n", length);
-
    info_ptr->palette = palette;
 
    info_ptr->num_palette = (png_uint_16)num_palette;
@@ -613,30 +611,30 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 #if defined(PNG_sPLT_SUPPORTED)
 void
 png_set_sPLT(png_structp png_ptr,
-             png_infop info_ptr, png_spalette_p entries, int nentries)
+             png_infop info_ptr, png_sPLT_tp entries, int nentries)
 {
-    png_spalette_p        np;
+    png_sPLT_tp np;
     int i;
 
-    np = (png_spalette_p)png_malloc(png_ptr,
-        (info_ptr->splt_palettes_num + nentries) * sizeof(png_spalette));
+    np = (png_sPLT_tp)png_malloc(png_ptr,
+        (info_ptr->splt_palettes_num + nentries) * sizeof(png_sPLT_t));
 
     png_memcpy(np, info_ptr->splt_palettes,
-           info_ptr->splt_palettes_num * sizeof(png_spalette));
+           info_ptr->splt_palettes_num * sizeof(png_sPLT_t));
     png_free(png_ptr, info_ptr->splt_palettes);
 
     for (i = 0; i < nentries; i++)
     {
-        png_spalette_p to = np + info_ptr->splt_palettes_num + i;
-        png_spalette_p from = entries + i;
+        png_sPLT_tp to = np + info_ptr->splt_palettes_num + i;
+        png_sPLT_tp from = entries + i;
 
         to->name = (png_charp)png_malloc(png_ptr,
                                         png_strlen(from->name) + 1);
         png_strcpy(to->name, from->name);
-        to->entries = (png_spalette_entryp)png_malloc(png_ptr,
-                                 from->nentries * sizeof(png_spalette));
+        to->entries = (png_sPLT_entryp)png_malloc(png_ptr,
+                                 from->nentries * sizeof(png_sPLT_t));
         png_memcpy(to->entries, from->entries,
-               from->nentries * sizeof(png_spalette));
+               from->nentries * sizeof(png_sPLT_t));
         to->nentries = from->nentries;
         to->depth = from->depth;
     }
@@ -687,7 +685,8 @@ png_set_unknown_chunks(png_structp png_ptr,
 }
 #endif
 
-#if defined(PNG_READ_EMPTY_PLTE_SUPPORTED)
+#if defined(PNG_READ_EMPTY_PLTE_SUPPORTED) || \
+    defined(PNG_WRITE_EMPTY_PLTE_SUPPORTED)
 void
 png_permit_empty_plte (png_structp png_ptr, int empty_plte_permitted)
 {

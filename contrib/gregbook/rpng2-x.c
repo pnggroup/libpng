@@ -6,9 +6,11 @@
    a web browser (though the front end is only set up to read from files).
    It supports gamma correction, user-specified background colors, and user-
    specified background patterns (for transparent images).  This version is
-   for the X Window System (tested under Unix, but may work under VMS or OS/2
-   with a little tweaking).  Thanks to Adam Costello and Pieter S. van der
-   Meulen for the "diamond" and "radial waves" patterns, respectively.
+   for the X Window System (tested by the author under Unix and by Martin
+   Zinser under OpenVMS; may work under OS/2 with a little tweaking).
+
+   Thanks to Adam Costello and Pieter S. van der Meulen for the "diamond"
+   and "radial waves" patterns, respectively.
 
    to do:
     - 8-bit support
@@ -17,7 +19,16 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+   Changelog:
+    - 1.01:  initial public release
+    - 1.02:  modified to allow abbreviated options; fixed char/uchar mismatch
+    - 1.10:  added support for non-default visuals; fixed X pixel-conversion
+    - 1.11:  added -usleep option for demos; fixed command-line parsing bug
+    - 1.12:  added -pause option for demos and testing
+
+  ---------------------------------------------------------------------------
+
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -44,21 +55,21 @@
 
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
-#define VERSION   "1.01 of 31 March 1999"
+#define VERSION   "1.12 of 19 March 2000"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h> /* for jmpbuf declaration in readpng2.h */
+#include <setjmp.h>       /* for jmpbuf declaration in readpng2.h */
 #include <time.h>
-#include <math.h>   /* only for PvdM background code */
+#include <math.h>         /* only for PvdM background code */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
-#include <X11/keysym.h> /* defines XK_* macros */
+#include <X11/keysym.h>   /* defines XK_* macros */
 
 #ifdef VMS
-#include <unistd.h>
+#  include <unistd.h>
 #endif
 
 /* all for PvdM background code: */
@@ -79,9 +90,9 @@
 #define rgb2_max   bg_bsat
 #define rgb2_min   bg_brot
 
-/* #define DEBUG */ /* this enables the Trace() macros */
+/* #define DEBUG */     /* this enables the Trace() macros */
 
-#include "readpng2.h" /* typedefs, common macros, readpng2 prototypes */
+#include "readpng2.h"   /* typedefs, common macros, readpng2 prototypes */
 
 
 /* could just include png.h, but this macro is the only thing we need
@@ -89,18 +100,18 @@
  * only happen with alpha (which could easily be avoided with
  * "ush acopy = (alpha);") */
 
-#define alpha_composite(composite, fg, alpha, bg) {              \
-    ush temp = ((ush)(fg)*(ush)(alpha) +                         \
-                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128); \
-    (composite) = (uch)((temp + (temp >> 8)) >> 8);              \
+#define alpha_composite(composite, fg, alpha, bg) {               \
+    ush temp = ((ush)(fg)*(ush)(alpha) +                          \
+                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128);  \
+    (composite) = (uch)((temp + (temp >> 8)) >> 8);               \
 }
 
 
-#define INBUFSIZE 4096 /* with pseudo-timing on (1 sec delay/block), this
-                        *  block size corresponds roughly to a download
-                        *  speed 10% faster than theoretical 33.6K maximum
-                        *  (assuming 8 data bits, 1 stop bit and no other
-                        *  overhead) */
+#define INBUFSIZE 4096   /* with pseudo-timing on (1 sec delay/block), this
+                          *  block size corresponds roughly to a download
+                          *  speed 10% faster than theoretical 33.6K maximum
+                          *  (assuming 8 data bits, 1 stop bit and no other
+                          *  overhead) */
 
 /* local prototypes */
 static void rpng2_x_init(void);
@@ -123,11 +134,15 @@ static mainprog_info rpng2_info;
 static uch inbuf[INBUFSIZE];
 static int incount;
 
-static int pat = 6;  /* must be less than num_bgpat */
+static int pat = 6;        /* must be less than num_bgpat */
 static int bg_image = 0;
 static int bgscale = 16;
 static ulg bg_rowbytes;
 static uch *bg_data;
+
+int pause_after_pass = FALSE;
+int demo_timing = FALSE;
+ulg usleep_duration = 0L;
 
 static struct rgb_color {
     uch r, g, b;
@@ -201,12 +216,14 @@ static XImage *ximage;
 static Display *display;
 static int depth;
 static Visual *visual;
-static int RPixelShift, GPixelShift, BPixelShift;
-static ulg RedMask, GreenMask, BlueMask;
+static XVisualInfo *visual_list;
+static int RShift, GShift, BShift;
+static ulg RMask, GMask, BMask;
 static Window window;
 static GC gc;
 static Colormap colormap;
 
+static int have_nondefault_visual = FALSE;
 static int have_colormap = FALSE;
 static int have_window = FALSE;
 
@@ -294,37 +311,53 @@ int main(int argc, char **argv)
     /* Now parse the command line for options and the PNG filename. */
 
     while (*++argv && !error) {
-        if (!strcmp(*argv, "-display")) {
+        if (!strncmp(*argv, "-display", 2)) {
             if (!*++argv)
                 ++error;
-            displayname = *argv;
-        } else if (!strcmp(*argv, "-gamma")) {
+            else
+                displayname = *argv;
+        } else if (!strncmp(*argv, "-gamma", 2)) {
             if (!*++argv)
-                ++error;
-            rpng2_info.display_exponent = atof(*argv);
-            if (rpng2_info.display_exponent <= 0.0)
-                ++error;
-        } else if (!strcmp(*argv, "-bgcolor")) {
-            if (!*++argv)
-                ++error;
-            bgstr = *argv;
-            if (strlen(bgstr) != 7 || bgstr[0] != '#')
                 ++error;
             else {
-                have_bg = TRUE;
-                bg_image = FALSE;
+                rpng2_info.display_exponent = atof(*argv);
+                if (rpng2_info.display_exponent <= 0.0)
+                    ++error;
             }
-        } else if (!strcmp(*argv, "-bgpat")) {
+        } else if (!strncmp(*argv, "-bgcolor", 4)) {
             if (!*++argv)
                 ++error;
-            pat = atoi(*argv) - 1;
-            if (pat < 0 || pat >= num_bgpat)
+            else {
+                bgstr = *argv;
+                if (strlen(bgstr) != 7 || bgstr[0] != '#')
+                    ++error;
+                else {
+                    have_bg = TRUE;
+                    bg_image = FALSE;
+                }
+            }
+        } else if (!strncmp(*argv, "-bgpat", 4)) {
+            if (!*++argv)
                 ++error;
             else {
-                bg_image = TRUE;
-                have_bg = FALSE;
+                pat = atoi(*argv) - 1;
+                if (pat < 0 || pat >= num_bgpat)
+                    ++error;
+                else {
+                    bg_image = TRUE;
+                    have_bg = FALSE;
+                }
             }
-        } else if (!strcmp(*argv, "-timing")) {
+        } else if (!strncmp(*argv, "-usleep", 2)) {
+            if (!*++argv)
+                ++error;
+            else {
+                usleep_duration = (ulg)atol(*argv);
+                demo_timing = TRUE;
+            }
+        } else if (!strncmp(*argv, "-pause", 2)) {
+            pause_after_pass = TRUE;
+        } else if (!strncmp(*argv, "-timing", 2)) {
             timing = TRUE;
         } else {
             if (**argv != '-') {
@@ -377,25 +410,32 @@ int main(int argc, char **argv)
             fclose(infile);
     }
 
+
+    /* usage screen */
+
     if (error) {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
         readpng2_version_info();
         fprintf(stderr, "\n"
           "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg | -bgpat pat]\n"
-          "        %*s [-timing] file.png\n\n"
+          "        %*s [-usleep dur | -timing] [-pause] file.png\n\n"
           "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"
           "    exp \ttransfer-function exponent (``gamma'') of the display\n"
           "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
           "\t\t  to the product of the lookup-table exponent (varies)\n"
           "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
           "    bg  \tdesired background color in 7-character hex RGB format\n"
-          "\t\t  (e.g., ``#ff7f00'' for orange:  same as HTML colors);\n"
+          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
           "\t\t  used with transparent images; overrides -bgpat\n"
           "    pat \tdesired background pattern number (1-%d); used with\n"
           "\t\t  transparent images; overrides -bgcolor\n"
+          "    dur \tduration in microseconds to wait after displaying each\n"
+          "\t\t  row (for demo purposes)\n"
           "    -timing\tenables delay for every block read, to simulate modem\n"
           "\t\t  download of image (~36 Kbps)\n"
-          "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
+          "    -pause\tpauses after displaying each pass until key pressed\n"
+          "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
+          "is displayed) to quit.\n"
           "\n", PROGNAME, strlen(PROGNAME), " ", default_display_exponent,
           num_bgpat);
         exit(1);
@@ -489,7 +529,7 @@ int main(int argc, char **argv)
  * in turn is called by libpng after all of the pre-IDAT chunks have been
  * read and processed--i.e., we now have enough info to finish initializing */
 
-static void rpng2_x_init()
+static void rpng2_x_init(void)
 {
     ulg i;
     ulg rowbytes = rpng2_info.rowbytes;
@@ -531,12 +571,14 @@ static void rpng2_x_init()
 
 
 
-static int rpng2_x_create_window()
+static int rpng2_x_create_window(void)
 {
     ulg bg_red   = rpng2_info.bg_red;
     ulg bg_green = rpng2_info.bg_green;
     ulg bg_blue  = rpng2_info.bg_blue;
     ulg bg_pixel = 0L;
+    ulg attrmask;
+    int need_colormap = FALSE;
     int screen, pad;
     uch *xdata;
     Window root;
@@ -556,39 +598,70 @@ static int rpng2_x_create_window()
     depth = DisplayPlanes(display, screen);
     root = RootWindow(display, screen);
 
-/* GRR:  add 8-bit support */
-    if (/* depth != 8 && */ depth != 16 && depth != 24 && depth != 32) {
-        fprintf(stderr,
-          "screen depth %d not supported (only 16-, 24- or 32-bit TrueColor)\n",
-          depth);
-        return 2;
+#ifdef DEBUG
+    XSynchronize(display, True);
+#endif
+
+    if (depth != 16 && depth != 24 && depth != 32) {
+        int visuals_matched = 0;
+
+        Trace((stderr, "default depth is %d:  checking other visuals\n",
+          depth))
+
+        /* 24-bit first */
+        visual_info.screen = screen;
+        visual_info.depth = 24;
+        visual_list = XGetVisualInfo(display,
+          VisualScreenMask | VisualDepthMask, &visual_info, &visuals_matched);
+        if (visuals_matched == 0) {
+/* GRR:  add 15-, 16- and 32-bit TrueColor visuals (also DirectColor?) */
+            fprintf(stderr, "default screen depth %d not supported, and no"
+              " 24-bit visuals found\n", depth);
+            return 2;
+        }
+        Trace((stderr, "XGetVisualInfo() returned %d 24-bit visuals\n",
+          visuals_matched))
+        visual = visual_list[0].visual;
+        depth = visual_list[0].depth;
+/*
+        colormap_size = visual_list[0].colormap_size;
+        visual_class = visual->class;
+        visualID = XVisualIDFromVisual(visual);
+ */
+        have_nondefault_visual = TRUE;
+        need_colormap = TRUE;
+    } else {
+        XMatchVisualInfo(display, screen, depth, TrueColor, &visual_info);
+        visual = visual_info.visual;
     }
 
-    XMatchVisualInfo(display, screen, depth,
-      (depth == 8)? PseudoColor : TrueColor, &visual_info);
-    visual = visual_info.visual;
-
-    RedMask   = visual->red_mask;
-    GreenMask = visual->green_mask;
-    BlueMask  = visual->blue_mask;
+    RMask = visual->red_mask;
+    GMask = visual->green_mask;
+    BMask = visual->blue_mask;
 
 /* GRR:  add/check 8-bit support */
-    if (depth == 8) {
+    if (depth == 8 || need_colormap) {
         colormap = XCreateColormap(display, root, visual, AllocNone);
         if (!colormap) {
             fprintf(stderr, "XCreateColormap() failed\n");
             return 2;
         }
         have_colormap = TRUE;
-        bg_image = FALSE; /* gradient just wastes palette entries */
-    } else if (depth == 16) {
-        RPixelShift = 15 - rpng2_x_msb(RedMask);   /* these are right-shifts */
-        GPixelShift = 15 - rpng2_x_msb(GreenMask);
-        BPixelShift = 15 - rpng2_x_msb(BlueMask);
-    } else /* if (depth > 16) */ {
-        RPixelShift = rpng2_x_msb(RedMask) - 7;    /* these are left-shifts */
-        GPixelShift = rpng2_x_msb(GreenMask) - 7;
-        BPixelShift = rpng2_x_msb(BlueMask) - 7;
+        if (depth == 8)
+            bg_image = FALSE;   /* gradient just wastes palette entries */
+    }
+    if (depth == 15 || depth == 16) {
+        RShift = 15 - rpng2_x_msb(RMask);    /* these are right-shifts */
+        GShift = 15 - rpng2_x_msb(GMask);
+        BShift = 15 - rpng2_x_msb(BMask);
+    } else if (depth > 16) {
+        RShift = rpng2_x_msb(RMask) - 7;     /* these are left-shifts */
+        GShift = rpng2_x_msb(GMask) - 7;
+        BShift = rpng2_x_msb(BMask) - 7;
+    }
+    if (depth >= 15 && (RShift < 0 || GShift < 0 || BShift < 0)) {
+        fprintf(stderr, "rpng2 internal logic error:  negative X shift(s)!\n");
+        return 2;
     }
 
 /*---------------------------------------------------------------------------
@@ -597,10 +670,16 @@ static int rpng2_x_create_window()
 
     attr.backing_store = Always;
     attr.event_mask = ExposureMask | KeyPressMask | ButtonPressMask;
+    attrmask = CWBackingStore | CWEventMask;
+    if (have_nondefault_visual) {
+        attr.colormap = colormap;
+        attr.background_pixel = 0;
+        attr.border_pixel = 1;
+        attrmask |= CWColormap | CWBackPixel | CWBorderPixel;
+    }
 
     window = XCreateWindow(display, root, 0, 0, rpng2_info.width,
-      rpng2_info.height, 0, depth, InputOutput, visual,
-      CWBackingStore | CWEventMask, &attr);
+      rpng2_info.height, 0, depth, InputOutput, visual, attrmask, &attr);
 
     if (window == None) {
         fprintf(stderr, "XCreateWindow() failed\n");
@@ -621,8 +700,9 @@ static int rpng2_x_create_window()
     if ((size_hints = XAllocSizeHints()) != NULL) {
         /* window will not be resizable */
         size_hints->flags = PMinSize | PMaxSize;
-        size_hints->min_width = size_hints->max_width = rpng2_info.width;
-        size_hints->min_height = size_hints->max_height = rpng2_info.height;
+        size_hints->min_width = size_hints->max_width = (int)rpng2_info.width;
+        size_hints->min_height = size_hints->max_height =
+          (int)rpng2_info.height;
     }
 
     if ((wm_hints = XAllocWMHints()) != NULL) {
@@ -668,7 +748,7 @@ static int rpng2_x_create_window()
         return 3;
     }
 
-    /* to avoid testing the bitmap order every pixel (or doubling the size of
+    /* to avoid testing the byte order every pixel (or doubling the size of
      * the drawing routine with a giant if-test), we arbitrarily set the byte
      * order to MSBFirst and let Xlib worry about inverting things on little-
      * endian machines (e.g., Linux/x86, old VAXen, etc.)--this is not the
@@ -684,17 +764,17 @@ static int rpng2_x_create_window()
   ---------------------------------------------------------------------------*/
 
     if (bg_image)
-        rpng2_x_load_bg_image(); /* resets bg_image if fails */
+        rpng2_x_load_bg_image();    /* resets bg_image if fails */
 
     if (!bg_image) {
         if (depth == 24 || depth == 32) {
-            bg_pixel = (bg_red   << RPixelShift) |
-                       (bg_green << GPixelShift) |
-                       (bg_blue  << BPixelShift);
+            bg_pixel = (bg_red   << RShift) |
+                       (bg_green << GShift) |
+                       (bg_blue  << BShift);
         } else if (depth == 16) {
-            bg_pixel = (((bg_red   << 8) >> RPixelShift) & RedMask)   |
-                       (((bg_green << 8) >> GPixelShift) & GreenMask) |
-                       (((bg_blue  << 8) >> BPixelShift) & BlueMask);
+            bg_pixel = (((bg_red   << 8) >> RShift) & RMask) |
+                       (((bg_green << 8) >> GShift) & GMask) |
+                       (((bg_blue  << 8) >> BShift) & BMask);
         } else /* depth == 8 */ {
 
             /* GRR:  add 8-bit support */
@@ -723,7 +803,7 @@ static int rpng2_x_create_window()
 
 
 
-static int rpng2_x_load_bg_image()
+static int rpng2_x_load_bg_image(void)
 {
     uch *src;
     char *dest;
@@ -772,8 +852,8 @@ static int rpng2_x_load_bg_image()
         int b2_diff = rgb[bg[pat].rgb2_max].b - b2_min;
 
         for (row = 0;  row < rpng2_info.height;  ++row) {
-            yidx = row % bgscale;
-            even_odd_vert = (row / bgscale) & 1;
+            yidx = (int)(row % bgscale);
+            even_odd_vert = (int)((row / bgscale) & 1);
 
             r1 = r1_min + (r1_diff * yidx) / yidx_max;
             g1 = g1_min + (g1_diff * yidx) / yidx_max;
@@ -789,13 +869,13 @@ static int rpng2_x_load_bg_image()
             g2_inv = g2_min + (g2_diff * (yidx_max-yidx)) / yidx_max;
             b2_inv = b2_min + (b2_diff * (yidx_max-yidx)) / yidx_max;
 
-            dest = (char *)(bg_data + row*bg_rowbytes);
+            dest = (char *)bg_data + row*bg_rowbytes;
             for (i = 0;  i < rpng2_info.width;  ++i) {
-                even_odd_horiz = (i / bgscale) & 1;
+                even_odd_horiz = (int)((i / bgscale) & 1);
                 even_odd = even_odd_vert ^ even_odd_horiz;
                 invert_column =
                   (even_odd_horiz && (bg[pat].type & 0x10));
-                if (even_odd == 0) { /* gradient #1 */
+                if (even_odd == 0) {        /* gradient #1 */
                     if (invert_column) {
                         *dest++ = r1_inv;
                         *dest++ = g1_inv;
@@ -805,16 +885,16 @@ static int rpng2_x_load_bg_image()
                         *dest++ = g1;
                         *dest++ = b1;
                     }
-                } else {              /* gradient #2 */
+                } else {                    /* gradient #2 */
                     if ((invert_column && invert_gradient2) ||
                         (!invert_column && !invert_gradient2))
                     {
-                        *dest++ = r2;      /* not inverted or */
-                        *dest++ = g2;      /*  doubly inverted */
+                        *dest++ = r2;       /* not inverted or */
+                        *dest++ = g2;       /*  doubly inverted */
                         *dest++ = b2;
                     } else {
                         *dest++ = r2_inv;
-                        *dest++ = g2_inv;  /* singly inverted */
+                        *dest++ = g2_inv;   /* singly inverted */
                         *dest++ = b2_inv;
                     }
                 }
@@ -839,12 +919,12 @@ static int rpng2_x_load_bg_image()
         b2 = rgb[bg[pat].rgb2_max].b;
 
         for (row = 0;  row < rpng2_info.height;  ++row) {
-            yidx = row % bgscale;
+            yidx = (int)(row % bgscale);
             if (yidx > hmax)
                 yidx = bgscale-1 - yidx;
-            dest = (char *)(bg_data + row*bg_rowbytes);
+            dest = (char *)bg_data + row*bg_rowbytes;
             for (i = 0;  i < rpng2_info.width;  ++i) {
-                xidx = i % bgscale;
+                xidx = (int)(i % bgscale);
                 if (xidx > hmax)
                     xidx = bgscale-1 - xidx;
                 k = xidx + yidx;
@@ -871,8 +951,8 @@ static int rpng2_x_load_bg_image()
           PROGNAME);
         fflush(stderr);
 
-        hh = rpng2_info.height / 2;
-        hw = rpng2_info.width / 2;
+        hh = (int)(rpng2_info.height / 2);
+        hw = (int)(rpng2_info.width / 2);
 
         /* variables for radial waves:
          *   aoffset:  number of degrees to rotate hue [CURRENTLY NOT USED]
@@ -891,10 +971,10 @@ static int rpng2_x_load_bg_image()
         maxDist = (double)((hw*hw) + (hh*hh));
 
         for (row = 0;  row < rpng2_info.height;  ++row) {
-            y = row - hh;
-            dest = (char *)(bg_data + row*bg_rowbytes);
+            y = (int)(row - hh);
+            dest = (char *)bg_data + row*bg_rowbytes;
             for (i = 0;  i < rpng2_info.width;  ++i) {
-                x = i - hw;
+                x = (int)(i - hw);
                 angle = (x == 0)? PI_2 : atan((double)y / (double)x);
                 gray = (double)MAX(ABS(y), ABS(x)) / grayspot;
                 gray = MIN(1.0, gray);
@@ -951,14 +1031,15 @@ static int rpng2_x_load_bg_image()
                 red   = *src++;
                 green = *src++;
                 blue  = *src++;
-                pixel = (red   << RPixelShift) |
-                        (green << GPixelShift) |
-                        (blue  << BPixelShift);
+                pixel = (red   << RShift) |
+                        (green << GShift) |
+                        (blue  << BShift);
                 /* recall that we set ximage->byte_order = MSBFirst above */
-                *dest++ = ((uch *)&pixel)[3];
-                *dest++ = ((uch *)&pixel)[2];
-                *dest++ = ((uch *)&pixel)[1];
-                *dest++ = ((uch *)&pixel)[0];
+                /* GRR BUG:  this assumes bpp == 32, but may be 24: */
+                *dest++ = (char)((pixel >> 24) & 0xff);
+                *dest++ = (char)((pixel >> 16) & 0xff);
+                *dest++ = (char)((pixel >>  8) & 0xff);
+                *dest++ = (char)( pixel        & 0xff);
             }
         }
 
@@ -969,18 +1050,15 @@ static int rpng2_x_load_bg_image()
             src = bg_data + row*bg_rowbytes;
             dest = ximage->data + row*ximage_rowbytes;
             for (i = rpng2_info.width;  i > 0;  --i) {
-                red   = ((ush)(*src) << 8);
-                ++src;
-                green = ((ush)(*src) << 8);
-                ++src;
-                blue  = ((ush)(*src) << 8);
-                ++src;
-                pixel = ((red   >> RPixelShift) & RedMask)   |
-                        ((green >> GPixelShift) & GreenMask) |
-                        ((blue  >> BPixelShift) & BlueMask);
+                red   = ((ush)(*src) << 8);  ++src;
+                green = ((ush)(*src) << 8);  ++src;
+                blue  = ((ush)(*src) << 8);  ++src;
+                pixel = ((red   >> RShift) & RMask) |
+                        ((green >> GShift) & GMask) |
+                        ((blue  >> BShift) & BMask);
                 /* recall that we set ximage->byte_order = MSBFirst above */
-                *dest++ = ((uch *)&pixel)[1];
-                *dest++ = ((uch *)&pixel)[0];
+                *dest++ = (char)((pixel >>  8) & 0xff);
+                *dest++ = (char)( pixel        & 0xff);
             }
         }
 
@@ -1011,7 +1089,7 @@ static void rpng2_x_display_row(ulg row)
     uch r, g, b, a;
     int ximage_rowbytes = ximage->bytes_per_line;
     ulg i, pixel;
-    static int rows=0;
+    static int rows=0, prevpass=(-1);
     static ulg firstrow;
 
 /*---------------------------------------------------------------------------
@@ -1022,8 +1100,28 @@ static void rpng2_x_display_row(ulg row)
 
     Trace((stderr, "beginning rpng2_x_display_row()\n"))
 
+    if (rpng2_info.pass != prevpass) {
+        if (pause_after_pass && rpng2_info.pass > 0) {
+            XEvent e;
+            KeySym k;
+
+            fprintf(stderr,
+              "%s:  end of pass %d of 7; click in image window to continue\n",
+              PROGNAME, prevpass + 1);
+            do
+                XNextEvent(display, &e);
+            while (!(e.type == ButtonPress && e.xbutton.button == Button1)
+                   && !(e.type == KeyPress &&
+                   ((k = XLookupKeysym(&e.xkey, 0)) == XK_q
+                    || k == XK_Escape) )) ;
+        }
+        fprintf(stderr, "%s:  pass %d of 7\r", PROGNAME, rpng2_info.pass + 1);
+        fflush(stderr);
+        prevpass = rpng2_info.pass;
+    }
+
     if (rows == 0)
-        firstrow = row;   /* first row not yet displayed */
+        firstrow = row;   /* first row that is not yet displayed */
 
     ++rows;   /* count of rows received but not yet displayed */
 
@@ -1046,14 +1144,15 @@ static void rpng2_x_display_row(ulg row)
                 red   = *src++;
                 green = *src++;
                 blue  = *src++;
-                pixel = (red   << RPixelShift) |
-                        (green << GPixelShift) |
-                        (blue  << BPixelShift);
-                /* recall that we set ximage->byte_order = MSBFirst */
-                *dest++ = ((uch *)&pixel)[3];
-                *dest++ = ((uch *)&pixel)[2];
-                *dest++ = ((uch *)&pixel)[1];
-                *dest++ = ((uch *)&pixel)[0];
+                pixel = (red   << RShift) |
+                        (green << GShift) |
+                        (blue  << BShift);
+                /* recall that we set ximage->byte_order = MSBFirst above */
+                /* GRR BUG:  this assumes bpp == 32, but may be 24: */
+                *dest++ = (char)((pixel >> 24) & 0xff);
+                *dest++ = (char)((pixel >> 16) & 0xff);
+                *dest++ = (char)((pixel >>  8) & 0xff);
+                *dest++ = (char)( pixel        & 0xff);
             }
         } else /* if (rpng2_info.channels == 4) */ {
             for (i = rpng2_info.width;  i > 0;  --i) {
@@ -1082,14 +1181,15 @@ static void rpng2_x_display_row(ulg row)
                     alpha_composite(green, g, a, bg_green);
                     alpha_composite(blue,  b, a, bg_blue);
                 }
-                pixel = (red   << RPixelShift) |
-                        (green << GPixelShift) |
-                        (blue  << BPixelShift);
-                /* recall that we set ximage->byte_order = MSBFirst */
-                *dest++ = ((uch *)&pixel)[3];
-                *dest++ = ((uch *)&pixel)[2];
-                *dest++ = ((uch *)&pixel)[1];
-                *dest++ = ((uch *)&pixel)[0];
+                pixel = (red   << RShift) |
+                        (green << GShift) |
+                        (blue  << BShift);
+                /* recall that we set ximage->byte_order = MSBFirst above */
+                /* GRR BUG:  this assumes bpp == 32, but may be 24: */
+                *dest++ = (char)((pixel >> 24) & 0xff);
+                *dest++ = (char)((pixel >> 16) & 0xff);
+                *dest++ = (char)((pixel >>  8) & 0xff);
+                *dest++ = (char)( pixel        & 0xff);
             }
         }
 
@@ -1108,12 +1208,12 @@ static void rpng2_x_display_row(ulg row)
                 ++src;
                 blue  = ((ush)(*src) << 8);
                 ++src;
-                pixel = ((red   >> RPixelShift) & RedMask)   |
-                        ((green >> GPixelShift) & GreenMask) |
-                        ((blue  >> BPixelShift) & BlueMask);
-                /* recall that we set ximage->byte_order = MSBFirst */
-                *dest++ = ((uch *)&pixel)[1];
-                *dest++ = ((uch *)&pixel)[0];
+                pixel = ((red   >> RShift) & RMask) |
+                        ((green >> GShift) & GMask) |
+                        ((blue  >> BShift) & BMask);
+                /* recall that we set ximage->byte_order = MSBFirst above */
+                *dest++ = (char)((pixel >>  8) & 0xff);
+                *dest++ = (char)( pixel        & 0xff);
             }
         } else /* if (rpng2_info.channels == 4) */ {
             for (i = rpng2_info.width;  i > 0;  --i) {
@@ -1145,12 +1245,12 @@ static void rpng2_x_display_row(ulg row)
                     green = ((ush)g << 8);
                     blue  = ((ush)b << 8);
                 }
-                pixel = ((red   >> RPixelShift) & RedMask)   |
-                        ((green >> GPixelShift) & GreenMask) |
-                        ((blue  >> BPixelShift) & BlueMask);
-                /* recall that we set ximage->byte_order = MSBFirst */
-                *dest++ = ((uch *)&pixel)[1];
-                *dest++ = ((uch *)&pixel)[0];
+                pixel = ((red   >> RShift) & RMask) |
+                        ((green >> GShift) & GMask) |
+                        ((blue  >> BShift) & BMask);
+                /* recall that we set ximage->byte_order = MSBFirst above */
+                *dest++ = (char)((pixel >>  8) & 0xff);
+                *dest++ = (char)( pixel        & 0xff);
             }
         }
 
@@ -1162,13 +1262,23 @@ static void rpng2_x_display_row(ulg row)
 
 
 /*---------------------------------------------------------------------------
-    Display after every 16 rows or when on last row.  (Region may include
-    previously displayed lines due to interlacing--i.e., not contiguous.)
+    Display after every 16 rows or when on one of last two rows.  (Region
+    may include previously displayed lines due to interlacing--i.e., not
+    contiguous.  Also, second-to-last row is final one in interlaced images
+    with odd number of rows.)  For demos, flush (and delay) after every 16th
+    row so "sparse" passes don't go twice as fast.
   ---------------------------------------------------------------------------*/
 
-    if ((rows & 0xf) == 0 || row == rpng2_info.height-1) {
-        XPutImage(display, window, gc, ximage, 0, firstrow, 0, firstrow,
-          rpng2_info.width, row - firstrow + 1);
+    if (demo_timing && (row - firstrow >= 16 || row >= rpng2_info.height-2)) {
+        XPutImage(display, window, gc, ximage, 0, (int)firstrow, 0,
+          (int)firstrow, rpng2_info.width, row - firstrow + 1);
+        XFlush(display);
+        rows = 0;
+        usleep(usleep_duration);
+    } else
+    if (!demo_timing && ((rows & 0xf) == 0 || row >= rpng2_info.height-2)) {
+        XPutImage(display, window, gc, ximage, 0, (int)firstrow, 0,
+          (int)firstrow, rpng2_info.width, row - firstrow + 1);
         XFlush(display);
         rows = 0;
     }
@@ -1179,7 +1289,7 @@ static void rpng2_x_display_row(ulg row)
 
 
 
-static void rpng2_x_finish_display()
+static void rpng2_x_finish_display(void)
 {
     Trace((stderr, "beginning rpng2_x_finish_display()\n"))
 
@@ -1188,14 +1298,16 @@ static void rpng2_x_finish_display()
      * the image is done */
 
     rpng2_info.done = TRUE;
-    printf("Done.  Press Q, Esc or mouse button 1 to quit.\n");
+    printf(
+      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n");
+    fflush(stdout);
 }
 
 
 
 
 
-static void rpng2_x_cleanup()
+static void rpng2_x_cleanup(void)
 {
     if (bg_image && bg_data) {
         free(bg_data);
@@ -1228,6 +1340,9 @@ static void rpng2_x_cleanup()
 
     if (have_colormap)
         XFreeColormap(display, colormap);
+
+    if (have_nondefault_visual)
+        XFree(visual_list);
 }
 
 

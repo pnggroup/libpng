@@ -10,14 +10,14 @@
 # Invoke this makefile from a DOS prompt window via:
 #
 #	%devstudio%\vc\bin\vcvars32.bat
-#	nmake -nologo -f makefile.w32
+#	nmake -nologo -f Makefile.w32
 #
 # where %devstudio% is the installation directory for MSVC / DevStudio.  If
 # you get "environment out of space" errors, create a desktop shortcut with
 # "c:\windows\command.com /e:4096" as the program command line and set the
 # working directory to this directory.  Then double-click to open the new
 # DOS-prompt window with a bigger environment and retry the commands above.
-#
+# 
 # This makefile assumes libpng and zlib have already been built or downloaded
 # and are in subdirectories at the same level as the current subdirectory
 # (as indicated by the PNGPATH and ZPATH macros below).  Edit as appropriate.
@@ -32,12 +32,12 @@
 
 # macros --------------------------------------------------------------------
 
-PNGPATH = ../libpng
+PNGPATH = ../..
 PNGINC = -I$(PNGPATH)
 #PNGLIB = $(PNGPATH)/pngdll.lib
 PNGLIB = $(PNGPATH)/libpng.lib
 
-ZPATH = ../zlib
+ZPATH = ../../../zlib
 ZINC = -I$(ZPATH)
 #ZLIB = $(ZPATH)/zlibdll.lib
 ZLIB = $(ZPATH)/zlibstat.lib

@@ -3,7 +3,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.5n';
+  PNG_LIBPNG_VER_STRING = '1.0.6';
   PNG_LIBPNG_VER        =  10006;
 
 type
@@ -450,6 +450,10 @@ procedure png_set_cHRM(png_ptr: png_structp; info_ptr: png_infop;
              white_x, white_y, red_x, red_y, green_x, green_y,
              blue_x, blue_y: double);
              stdcall;
+procedure png_set_cHRM_fixed(png_ptr: png_structp; info_ptr: png_infop;
+             white_x, white_y, red_x, red_y, green_x, green_y,
+             blue_x, blue_y: png_fixed_point);
+             stdcall;
 procedure png_set_compression_level(png_ptr: png_structp; level: int);
              stdcall;
 procedure png_set_compression_mem_level(png_ptr: png_structp;
@@ -488,6 +492,9 @@ procedure png_set_flush(png_ptr: png_structp; nrows: int);
              stdcall;
 procedure png_set_gAMA(png_ptr: png_structp; info_ptr: png_infop;
              file_gamma: double);
+             stdcall;
+procedure png_set_gAMA_fixed(png_ptr: png_structp; info_ptr: png_infop;
+             file_gamma: png_fixed_point);
              stdcall;
 procedure png_set_gamma(png_ptr: png_structp; screen_gamma,
              default_file_gamma: double);
@@ -540,7 +547,11 @@ procedure png_set_read_user_chunk_fn(png_ptr: png_structp;
 procedure png_set_read_user_transform_fn(png_ptr: png_structp;
              read_user_transform_fn: png_user_transform_ptr);
              stdcall;
-procedure png_set_rgb_to_gray(png_ptr: png_structp; int: error_action);
+procedure png_set_rgb_to_gray(png_ptr: png_structp; int: error_action;
+             red_weight, green_weight: double);
+             stdcall;
+procedure png_set_rgb_to_gray_fixed(png_ptr: png_structp; int: error_action;
+             red_weight, green_weight: png_fixed_point);
              stdcall;
 procedure png_set_rows(png_ptr: png_structp; info_ptr: png_infop;
              row_pointers: png_bytepp);
@@ -705,6 +716,7 @@ procedure png_set_bKGD; external pngDLL;
 procedure png_set_background; external pngDLL;
 procedure png_set_bgr; external pngDLL;
 procedure png_set_cHRM; external pngDLL;
+procedure png_set_cHRM_fixed; external pngDLL;
 procedure png_set_compression_level; external pngDLL;
 procedure png_set_compression_mem_level; external pngDLL;
 procedure png_set_compression_method; external pngDLL;
@@ -719,6 +731,7 @@ procedure png_set_filter; external pngDLL;
 procedure png_set_filter_heuristics; external pngDLL;
 procedure png_set_flush; external pngDLL;
 procedure png_set_gAMA; external pngDLL;
+procedure png_set_gAMA_fixed; external pngDLL;
 procedure png_set_gamma; external pngDLL;
 procedure png_set_gray_to_rgb; external pngDLL;
 procedure png_set_hIST; external pngDLL;
@@ -734,6 +747,8 @@ procedure png_set_progressive_read_fn; external pngDLL;
 procedure png_set_read_fn; external pngDLL;
 procedure png_set_read_status_fn; external pngDLL;
 procedure png_set_read_user_transform_fn; external pngDLL;
+procedure png_set_rgb_to_gray; external pngDLL;
+procedure png_set_rgb_to_gray_fixed; external pngDLL;
 procedure png_set_rows; external pngDLL;
 procedure png_set_sBIT; external pngDLL;
 procedure png_set_sRGB; external pngDLL;

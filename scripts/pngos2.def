@@ -31,6 +31,7 @@ EXPORTS
   png_set_bgr
   png_set_gray_to_rgb
   png_set_rgb_to_gray
+  png_set_rgb_to_gray_fixed
   png_set_rows
   png_build_grayscale_palette
   png_set_strip_alpha
@@ -131,8 +132,10 @@ EXPORTS
   png_set_bKGD
   png_get_cHRM
   png_set_cHRM
+  png_set_cHRM_fixed
   png_get_gAMA
   png_set_gAMA
+  png_set_gAMA_fixed
   png_get_hIST
   png_set_hIST
   png_get_IHDR

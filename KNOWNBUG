@@ -1,5 +1,5 @@
 
-Known bugs and suggested enhancements in libpng-1.0.5
+Known bugs and suggested enhancements in libpng-1.0.6
 
 
 1. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
@@ -41,43 +41,3 @@ Known bugs and suggested enhancements in libpng-1.0.5
    Much of this was completed in libpng-1.0.5h, but gamma compensation
    is not yet done in fixed-point arithmetic.
 
-4. October 1999 -- BUG
-
-   pngvcrd.c is failing for interlaced PNGs that have empty passes.
-
-   STATUS: A check for "width != 0" is required in several places.
-   Fixed in libpng-1.0.5a/1.1.0
-
-5. October 1999 -- BUG
-
-   Under MSVC++6.0 with debugging enabled, heap corruption was detected
-   while destroying the png_write_ptr.
-
-   STATUS:  This was fixed by modifying png_set_text (in pngset.c) to
-   refrain from writing into the user's text_ptr.  With this fix, however,
-   pngwrite.c, while destroying the info_ptr, was failing to free the
-   text->key strings.  Fix for the latter problem is to duplicate code
-   from png.c.
-
-   Fixed in libpng-1.0.5a/1.1.0
-
-6. December 1999 -- new BUG
-
-   The png_text structure was modified in libpng-1.0.5e in a manner that
-   is not backward compatible (the lang member was added, and the
-   translated_key member was added to libpng-1.0.5g)
-
-   STATUS: Fixed in libpng-1.0.5j/1.1.0
-
-7. December 1999 -- BUG
-
-   The new pnggccrd.c has syntax errors when compiled with gcc.
-
-   STATUS: Under investigation.
-
-8. February 2000 -- BUG
-
-   When an RGBA file is expanded, only 24 or 48 bits per pixel are reserved
-   in rowbytes.
-
-   STATUS: Fixed in libpng-1.0.5s

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.5s - February 18, 2000
+ * libpng 1.0.6 - March 21, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -147,7 +147,7 @@ png_charp png_decompress_chunk(png_structp png_ptr, int comp_type,
 {
    static char msg[] = "Error decoding compressed text";
    png_charp text = NULL;
-   png_size_t text_size = (chunklength - prefix_size);
+   png_size_t text_size;
 
    if (comp_type == PNG_TEXT_COMPRESSION_zTXt)
    {
@@ -161,9 +161,7 @@ png_charp png_decompress_chunk(png_structp png_ptr, int comp_type,
 
       while (png_ptr->zstream.avail_in)
       {
-         int ret;
-
-         ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
+         int ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
          if (ret != Z_OK && ret != Z_STREAM_END)
          {
             if (png_ptr->zstream.msg != NULL)
@@ -262,7 +260,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_IHDR\n");
 
-   if (png_ptr->mode != PNG_BEFORE_IHDR)
+   if (png_ptr->mode & PNG_HAVE_IHDR)
       png_error(png_ptr, "Out of place IHDR");
 
    /* check the length */
@@ -968,7 +966,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_bytep chunkdata;
    png_bytep entry_start;
-   png_spalette new_palette;
+   png_sPLT_t new_palette;
    int data_length, entry_size, i;
    png_uint_32 skip = 0;
    png_size_t slength;
@@ -1028,12 +1026,12 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    new_palette.nentries = data_length / entry_size;
-   new_palette.entries = (png_spalette_entryp)png_malloc(
-       png_ptr, new_palette.nentries * sizeof(png_spalette_entry));
+   new_palette.entries = (png_sPLT_entryp)png_malloc(
+       png_ptr, new_palette.nentries * sizeof(png_sPLT_entry));
 
    for (i = 0; i < new_palette.nentries; i++)
    {
-      png_spalette_entryp pp = new_palette.entries + i;
+      png_sPLT_entryp pp = new_palette.entries + i;
 
       if (new_palette.depth == 8)
       {
@@ -1090,7 +1088,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          /* Should be an error, but we can cope with it */
          png_warning(png_ptr, "Missing PLTE before tRNS");
       }
-      else if (length > png_ptr->num_palette)
+      else if (length > (png_uint_32)png_ptr->num_palette)
       {
          png_warning(png_ptr, "Incorrect tRNS chunk length");
          png_crc_finish(png_ptr, length);
@@ -1510,7 +1508,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_charp buffer, ep;
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   double width=0., height=0.;
+   double width, height;
    png_charp vp;
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
@@ -1723,7 +1721,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_textp text_ptr;
    png_charp chunkdata;
    png_charp text;
-   int comp_type = PNG_TEXT_COMPRESSION_NONE;
+   int comp_type;
    png_size_t slength, prefix_len;
 
    png_debug(1, "in png_handle_zTXt\n");
@@ -1798,7 +1796,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_textp text_ptr;
    png_charp chunkdata;
    png_charp key, lang, text, lang_key;
-   int comp_flag = PNG_TEXT_COMPRESSION_NONE;
+   int comp_flag;
    int comp_type = 0;
    png_size_t slength, prefix_len;
 

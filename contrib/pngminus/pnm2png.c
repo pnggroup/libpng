@@ -40,6 +40,11 @@
 
 #include "png.h"
 
+/* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
+#ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#endif
+
 /* function prototypes */
 
 int  main (int argc, char *argv[]);
@@ -386,7 +391,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
   }
 
   /* setjmp() must be called in every function that calls a PNG-reading libpng function */
-  if (setjmp (png_jmp_env(png_ptr)))
+  if (setjmp (png_jmpbuf(png_ptr)))
   {
     png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
     return FALSE;

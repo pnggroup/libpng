@@ -42,6 +42,11 @@
 
 #include "png.h"
 
+/* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
+#ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#endif
+
 /* function prototypes */
 
 int  main (int argc, char *argv[]);
@@ -223,7 +228,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL a
     return FALSE;   /* out of memory */
   }
 
-  if (setjmp (png_jmp_env(png_ptr)))
+  if (setjmp (png_jmpbuf(png_ptr)))
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return FALSE;

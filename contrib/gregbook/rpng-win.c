@@ -16,7 +16,16 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+   Changelog:
+    - 1.00:  initial public release
+    - 1.01:  modified to allow abbreviated options; fixed long/ulong mis-
+              match; switched to png_jmpbuf() macro
+    - 1.02:  added extra set of parentheses to png_jmpbuf() macro; fixed
+              command-line parsing bug
+
+  ---------------------------------------------------------------------------
+
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -43,7 +52,7 @@
 
 #define PROGNAME  "rpng-win"
 #define LONGNAME  "Simple PNG Viewer for Windows"
-#define VERSION   "1.0 of 20 February 1999"
+#define VERSION   "1.02 of 19 March 2000"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +62,7 @@
 
 /* #define DEBUG  :  this enables the Trace() macros */
 
-#include "readpng.h" /* typedefs, common macros, readpng prototypes */
+#include "readpng.h"    /* typedefs, common macros, readpng prototypes */
 
 
 /* could just include png.h, but this macro is the only thing we need
@@ -61,10 +70,10 @@
  * only happen with alpha (which could easily be avoided with
  * "ush acopy = (alpha);") */
 
-#define alpha_composite(composite, fg, alpha, bg) {              \
-    ush temp = ((ush)(fg)*(ush)(alpha) +                         \
-                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128); \
-    (composite) = (uch)((temp + (temp >> 8)) >> 8);              \
+#define alpha_composite(composite, fg, alpha, bg) {               \
+    ush temp = ((ush)(fg)*(ush)(alpha) +                          \
+                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128);  \
+    (composite) = (uch)((temp + (temp >> 8)) >> 8);               \
 }
 
 
@@ -78,7 +87,7 @@ LRESULT CALLBACK  rpng_win_wndproc(HWND, UINT, WPARAM, LPARAM);
 static char titlebar[1024], *window_name = titlebar;
 static char *progname = PROGNAME;
 static char *appname = LONGNAME;
-static char *icon_name = PROGNAME;    /* GRR:  not (yet) used */
+static char *icon_name = PROGNAME;     /* GRR:  not (yet) used */
 static char *filename;
 static FILE *infile;
 
@@ -104,15 +113,15 @@ static HWND global_hwnd;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
 {
-    char *args[1024];                /* arbitrary limit, but should suffice */
+    char *args[1024];                 /* arbitrary limit, but should suffice */
     char *p, *q, **argv = args;
     int argc = 0;
     int rc, alen, flen;
     int error = 0;
     int have_bg = FALSE;
-    double LUT_exponent;             /* just the lookup table */
-    double CRT_exponent = 2.2;       /* just the monitor */
-    double default_display_exponent; /* whole display system */
+    double LUT_exponent;              /* just the lookup table */
+    double CRT_exponent = 2.2;        /* just the monitor */
+    double default_display_exponent;  /* whole display system */
     MSG msg;
 
 
@@ -199,20 +208,24 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     /* Now parse the command line for options and the PNG filename. */
 
     while (*++argv && !error) {
-        if (!strcmp(*argv, "-gamma")) {
+        if (!strncmp(*argv, "-gamma", 2)) {
             if (!*++argv)
                 ++error;
-            display_exponent = atof(*argv);
-            if (display_exponent <= 0.0)
-                ++error;
-        } else if (!strcmp(*argv, "-bgcolor")) {
+            else {
+                display_exponent = atof(*argv);
+                if (display_exponent <= 0.0)
+                    ++error;
+            }
+        } else if (!strncmp(*argv, "-bgcolor", 2)) {
             if (!*++argv)
                 ++error;
-            bgstr = *argv;
-            if (strlen(bgstr) != 7 || bgstr[0] != '#')
-                ++error;
-            else
-                have_bg = TRUE;
+            else {
+                bgstr = *argv;
+                if (strlen(bgstr) != 7 || bgstr[0] != '#')
+                    ++error;
+                else
+                    have_bg = TRUE;
+            }
         } else {
             if (**argv != '-') {
                 filename = *argv;
@@ -255,6 +268,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             fclose(infile);
     }
 
+
+    /* usage screen */
+
     if (error) {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
         readpng_version_info();
@@ -265,7 +281,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
          "\t\t  to the product of the lookup-table exponent (varies)\n"
          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
          "    bg  \tdesired background color in 7-character hex RGB format\n"
-         "\t\t  (e.g., ``#ff7f00'' for orange:  same as HTML colors);\n"
+         "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
          "\t\t  used with transparent images\n"
          "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
          "\n", PROGNAME, default_display_exponent);
@@ -336,6 +352,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
 
     /* wait for the user to tell us when to quit */
 
+    printf(
+      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n");
+    fflush(stdout);
+
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -371,7 +391,7 @@ static int rpng_win_create_window(HINSTANCE hInst, int showmode)
     if (!(dib = (uch *)malloc(sizeof(BITMAPINFOHEADER) +
                               wimage_rowbytes*image_height)))
     {
-        return 4; /* fail */
+        return 4;   /* fail */
     }
 
 /*---------------------------------------------------------------------------
@@ -477,7 +497,7 @@ static int rpng_win_display_image()
                 g = *src++;
                 b = *src++;
                 *dest++ = b;
-                *dest++ = g; /* note reverse order */
+                *dest++ = g;   /* note reverse order */
                 *dest++ = r;
             }
         } else /* if (image_channels == 4) */ {
@@ -582,15 +602,15 @@ LRESULT CALLBACK rpng_win_wndproc(HWND hwnd, UINT iMsg, WPARAM wP, LPARAM lP)
 
         /* wait for the user to tell us when to quit */
         case WM_CHAR:
-            switch (wP) { /* only need one, so ignore repeat count */
+            switch (wP) {      /* only need one, so ignore repeat count */
                 case 'q':
                 case 'Q':
-                case 0x1B: /* Esc key */
+                case 0x1B:     /* Esc key */
                     PostQuitMessage(0);
             }
             return 0;
 
-        case WM_LBUTTONDOWN: /* another way of quitting */
+        case WM_LBUTTONDOWN:   /* another way of quitting */
         case WM_DESTROY:
             PostQuitMessage(0);
             return 0;

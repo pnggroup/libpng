@@ -628,9 +628,35 @@ version 1.0.5s [February 18, 2000]
   Changed the allocation of palette, history, and trans arrays back to
     the version 1.0.5 method (linking instead of copying) which restores
     backward compatibility with version 1.0.5.  Added some remarks about
-    that in example.c.  Added "free_me" member to info_ptr and png_ptr.
+    that in example.c.  Added "free_me" member to info_ptr and png_ptr
+    and added png_free_data() function.
   Updated makefile.linux and makefile.gccmmx to make directories conditionally.
   Made cosmetic changes to pngasmrd.h
   Added png_set_rows() and png_get_rows(), for use with png_read|write_png().
   Modified png_read_png() to allocate info_ptr->row_pointers only if it
     hasn't already been allocated.
+version 1.0.5t [March 4, 2000]
+  Changed png_jmp_env() migration aiding macro to png_jmpbuf().
+  Fixed "interlace" typo (should be "interlaced") in contrib/gregbook/read2-x.c
+  Fixed bug with use of PNG_BEFORE_IHDR bit in png_ptr->mode, introduced when
+    PNG_FLAG_HAVE_CHUNK_HEADER was moved into png_ptr->mode in version 1.0.5b
+  Files in contrib/gregbook were revised to use png_jmpbuf() and to select
+    a 24-bit visual if one is available, and to allow abbreviated options.
+  Files in contrib/pngminus were revised to use the png_jmpbuf() macro.
+  Removed spaces in makefile.linux and makefile.gcmmx, introduced in 1.0.5s
+version 1.0.5u [March 5, 2000]
+  Simplified the code that detects old png.h in png.c and pngtest.c
+  Renamed png_spalette (_p, _pp) to png_sPLT_t (_tp, _tpp)
+  Increased precision of rgb_to_gray calculations from 8 to 15 bits and
+    added png_set_rgb_to_gray_fixed() function.
+  Added makefile.bc32 (32-bit Borland C++, C mode)
+version 1.0.5v [March 11, 2000]
+  Added some parentheses to the png_jmpbuf macro definition.
+  Updated references to the zlib home page, which has moved to freesoftware.com.
+  Corrected bugs in documentation regarding png_read_row() and png_write_row().
+  Updated documentation of png_rgb_to_gray calculations in libpng.3/libpng.txt.
+  Renamed makefile.borland,turboc3 back to makefile.bor,tc3 as in version 1.0.3,
+    revised borland makefiles; added makefile.ibmvac3 and makefile.gcc (Cosmin)
+version 1.0.6 [March 21, 2000]
+  Minor revisions of makefile.bor, libpng.txt, and gregbook/rpng2-win.c
+  Added makefile.sggcc (SGI IRIX with gcc)

@@ -4,7 +4,7 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors

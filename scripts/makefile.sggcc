@@ -1,4 +1,4 @@
-# makefile for libpng on DEC Alpha Unix
+# makefile for libpng, SGI IRIX with gcc
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
@@ -6,43 +6,42 @@
 prefix=/usr/local
 
 # Where the zlib library and include files are located
-#ZLIBLIB=/usr/local/lib
-#ZLIBINC=/usr/local/include
-ZLIBLIB=../zlib
-ZLIBINC=../zlib
+ZLIBLIB=/usr/local/lib32
+ZLIBINC=/usr/local/include
+#ZLIBLIB=../zlib
+#ZLIBINC=../zlib
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
-# have to change it.
-PNGMAJ = 2
-PNGMIN = 1.0.6
-PNGVER = $(PNGMAJ).$(PNGMIN)
+CC=gcc
 
-CC=cc
-CFLAGS=-std -w1 -I$(ZLIBINC) -O # -g -DPNG_DEBUG=1
+WARNMORE=
+CFLAGS=-I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32 # -g -DPNG_DEBUG=5
+# zlib must also be compiled with n32
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+LDSHARED=gcc -shared
 
-#RANLIB=echo
-RANLIB=ranlib
+VER=1.0.6
+LIBS=libpng.so.1.0.6
+SHAREDLIB=libpng.so
+libdir=$(prefix)/lib32
 
+RANLIB=echo
+#RANLIB=ranlib
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.so libpng.a pngtest
+all: libpng.a $(SHAREDLIB).$(VER) pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
-libpng.so: libpng.so.$(PNGMAJ)
-	ln -f -s libpng.so.$(PNGMAJ) libpng.so
-
-libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
-
-libpng.so.$(PNGVER): $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB) -lz -lm
+$(SHAREDLIB).$(VER): $(OBJS)
+	$(LDSHARED) -o $@ $(OBJS)
+	rm -f $(SHAREDLIB) $(SHAREDLIB).1
+	ln -s $@ $(SHAREDLIB)
+	ln -s $@ $(SHAREDLIB).1
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -50,7 +49,7 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 
-install: libpng.a libpng.so.$(PNGVER)
+install: libpng.a
 	-@mkdir $(prefix)/include
 	-@mkdir $(prefix)/lib
 	cp png.h $(prefix)/include
@@ -58,15 +57,17 @@ install: libpng.a libpng.so.$(PNGVER)
 	chmod 644 $(prefix)/include/png.h
 	chmod 644 $(prefix)/include/pngconf.h
 	cp libpng.a $(prefix)/lib
-	cp libpng.so.$(PNGVER) $(prefix)/lib
 	chmod 644 $(prefix)/lib/libpng.a
-	chmod 644 $(prefix)/lib/libpng.so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -f -s libpng.so.$(PNGMAJ) libpng.so)
+	cp $(SHAREDLIB).$(VER) $(libdir); chmod 755 $(SHAREDLIB).$(VER)
+	cd $(libdir); if test -f $(SHAREDLIB).$(VER); then \
+	rm -f $(SHAREDLIB) $(SHAREDLIB).1; \
+	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB); \
+	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB).1; \
+	(ldconfig || true)  >/dev/null 2>&1; \
+	fi
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png libpng.so*
+	rm -f *.o libpng.a pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

@@ -19,7 +19,15 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+   Changelog:
+    - 1.01:  initial public release
+    - 1.02:  modified to allow abbreviated options
+    - 1.03:  removed extraneous character from usage screen; fixed bug in
+              command-line parsing
+
+  ---------------------------------------------------------------------------
+
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -45,7 +53,7 @@
   ---------------------------------------------------------------------------*/
 
 #define PROGNAME  "wpng"
-#define VERSION   "1.01 of 31 March 1999"
+#define VERSION   "1.03 of 19 March 2000"
 #define APPNAME   "Simple PGM/PPM/PAM to PNG Converter"
 
 #if defined(__MSDOS__) || defined(__OS2__)
@@ -57,27 +65,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h>  /* for jmpbuf declaration in writepng.h */
+#include <setjmp.h>     /* for jmpbuf declaration in writepng.h */
 #include <time.h>
 
 #ifdef DOS_OS2_W32
-#  include <io.h>    /* for isatty(), setmode() prototypes */
-#  include <fcntl.h> /* O_BINARY for fdopen() without text translation */
+#  include <io.h>       /* for isatty(), setmode() prototypes */
+#  include <fcntl.h>    /* O_BINARY for fdopen() without text translation */
 #  ifdef __EMX__
 #    ifndef getch
-#      define getch() _read_kbd(0, 1, 0) /* need getche() */
+#      define getch() _read_kbd(0, 1, 0)    /* need getche() */
 #    endif
 #  else /* !__EMX__ */
 #    ifdef __GO32__
 #      include <pc.h>
-#      define getch() getkey() /* GRR:  need getche() */
+#      define getch() getkey()  /* GRR:  need getche() */
 #    else
-#      include <conio.h> /* for getche() console input */
+#      include <conio.h>        /* for getche() console input */
 #    endif
 #  endif /* ?__EMX__ */
 #  define FGETS(buf,len,stream)  dos_kbd_gets(buf,len)
 #else
-#  include <unistd.h>  /* for isatty() prototype */
+#  include <unistd.h>           /* for isatty() prototype */
 #  define FGETS fgets
 #endif
 
@@ -87,7 +95,7 @@
    text that includes control characters discouraged by the PNG spec; text
    that includes an escape character (27) must be re-entered regardless */
 
-#include "writepng.h" /* typedefs, common macros, writepng prototypes */
+#include "writepng.h"   /* typedefs, common macros, writepng prototypes */
 
 
 
@@ -112,7 +120,7 @@ int main(int argc, char **argv)
     FILE *keybd;
 #endif
 #ifdef sgi
-    FILE *tmpfile; /* or we could just use keybd, since no overlap */
+    FILE *tmpfile;      /* or we could just use keybd, since no overlap */
     char tmpline[80];
 #endif
     char *inname = NULL, outname[256];
@@ -204,36 +212,40 @@ int main(int argc, char **argv)
     /* Now parse the command line for options and the PNM filename. */
 
     while (*++argv && !error) {
-        if (!strcmp(*argv, "-interlaced")) {
+        if (!strncmp(*argv, "-i", 2)) {
             wpng_info.interlaced = TRUE;
-        } else if (!strcmp(*argv, "-time")) {
+        } else if (!strncmp(*argv, "-time", 3)) {
             wpng_info.modtime = time(NULL);
             wpng_info.have_time = TRUE;
-        } else if (!strcmp(*argv, "-text")) {
+        } else if (!strncmp(*argv, "-text", 3)) {
             text = TRUE;
-        } else if (!strcmp(*argv, "-gamma")) {
+        } else if (!strncmp(*argv, "-gamma", 2)) {
             if (!*++argv)
-                ++error;
-            wpng_info.gamma = atof(*argv);
-            if (wpng_info.gamma <= 0.0)
-                ++error;
-            else if (wpng_info.gamma > 1.01)
-                fprintf(stderr, PROGNAME
-                  " warning:  file gammas are usually less than 1.0\n");
-        } else if (!strcmp(*argv, "-bgcolor")) {
-            if (!*++argv)
-                ++error;
-            bgstr = *argv;
-            if (strlen(bgstr) != 7 || bgstr[0] != '#')
                 ++error;
             else {
-                unsigned r, g, b;  /* this approach quiets compiler warnings */
+                wpng_info.gamma = atof(*argv);
+                if (wpng_info.gamma <= 0.0)
+                    ++error;
+                else if (wpng_info.gamma > 1.01)
+                    fprintf(stderr, PROGNAME
+                      " warning:  file gammas are usually less than 1.0\n");
+            }
+        } else if (!strncmp(*argv, "-bgcolor", 4)) {
+            if (!*++argv)
+                ++error;
+            else {
+                bgstr = *argv;
+                if (strlen(bgstr) != 7 || bgstr[0] != '#')
+                    ++error;
+                else {
+                    unsigned r, g, b;  /* this way quiets compiler warnings */
 
-                sscanf(bgstr+1, "%2x%2x%2x", &r, &g, &b);
-                wpng_info.bg_red   = (uch)r;
-                wpng_info.bg_green = (uch)g;
-                wpng_info.bg_blue  = (uch)b;
-                wpng_info.have_bg = TRUE;
+                    sscanf(bgstr+1, "%2x%2x%2x", &r, &g, &b);
+                    wpng_info.bg_red   = (uch)r;
+                    wpng_info.bg_green = (uch)g;
+                    wpng_info.bg_blue  = (uch)b;
+                    wpng_info.have_bg = TRUE;
+                }
             }
         } else {
             if (**argv != '-') {
@@ -362,7 +374,7 @@ int main(int argc, char **argv)
          "\t\t  (where LUT = lookup-table exponent and CRT = CRT exponent;\n"
          "\t\t  first varies, second is usually 2.2, all are positive)\n"
          "    bg  \tdesired background color for alpha-channel images, in\n"
-         "\t\t  7-character hex RGB format (e.g., ``#ff7f00'' for orange:\n"
+         "\t\t  7-character hex RGB format (e.g., ``#ff7700'' for orange:\n"
          "\t\t  same as HTML colors)\n"
          "    -text\tprompt interactively for text info (tEXt chunks)\n"
          "    -time\tinclude a tIME chunk (last modification time)\n"
@@ -419,7 +431,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_TITLE;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) { /* escape character */
+                    if (p[result] == 27) {    /* escape character */
                         wpng_info.have_text &= ~TEXT_TITLE;
                         valid = FALSE;
                     }
@@ -449,7 +461,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_AUTHOR;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) { /* escape character */
+                    if (p[result] == 27) {    /* escape character */
                         wpng_info.have_text &= ~TEXT_AUTHOR;
                         valid = FALSE;
                     }
@@ -489,7 +501,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_DESC;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) { /* escape character */
+                    if (p[result] == 27) {    /* escape character */
                         wpng_info.have_text &= ~TEXT_DESC;
                         valid = FALSE;
                     }
@@ -519,7 +531,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_COPY;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) { /* escape character */
+                    if (p[result] == 27) {    /* escape character */
                         wpng_info.have_text &= ~TEXT_COPY;
                         valid = FALSE;
                     }
@@ -549,7 +561,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_EMAIL;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) { /* escape character */
+                    if (p[result] == 27) {    /* escape character */
                         wpng_info.have_text &= ~TEXT_EMAIL;
                         valid = FALSE;
                     }
@@ -579,7 +591,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_URL;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) { /* escape character */
+                    if (p[result] == 27) {    /* escape character */
                         wpng_info.have_text &= ~TEXT_URL;
                         valid = FALSE;
                     }
@@ -755,7 +767,7 @@ static int wpng_isvalid_latin1(uch *p, int len)
 
 
 
-static void wpng_cleanup()
+static void wpng_cleanup(void)
 {
     if (wpng_info.outfile) {
         fclose(wpng_info.outfile);
@@ -791,11 +803,11 @@ static char *dos_kbd_gets(char *buf, int len)
         buf[count++] = ch = getche();
     } while (ch != '\r' && count < len-1);
 
-    buf[count--] = '\0';     /* terminate string */
-    if (buf[count] == '\r')  /* Enter key makes CR, so change to newline */
+    buf[count--] = '\0';        /* terminate string */
+    if (buf[count] == '\r')     /* Enter key makes CR, so change to newline */
         buf[count] = '\n';
 
-    fprintf(stderr, "\n");   /* Enter key does *not* cause a newline */
+    fprintf(stderr, "\n");      /* Enter key does *not* cause a newline */
     fflush(stderr);
 
     return buf;

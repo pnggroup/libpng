@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.5s - February 18, 2000
+ * libpng 1.0.6 - March 21, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -25,14 +25,15 @@
  *        is required to assemble the newer MMX instructions such as movq.
  *        For djgpp, see
  *
- *           ftp://ftp.cdrom.com/pub/simtelnet/gnu/djgpp/v2gnu/bnu281b.zip
+ *           ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/bnu281b.zip
  *
  *        (or a later version in the same directory).  For Linux, check your
  *        distribution's web site(s) or try these links:
  *
  *           http://rufus.w3.org/linux/RPM/binutils.html
  *           http://www.debian.org/Packages/stable/devel/binutils.html
- *           ftp://ftp.cdrom.com/pub/linux/slackware/slakware/d1/binutils.tgz
+ *           ftp://ftp.slackware.com/pub/linux/slackware/slackware/slakware/d1/
+ *             binutils.tgz
  *
  *        For other platforms, see the main GNU site:
  *
@@ -40,85 +41,92 @@
  *
  *        Version 2.5.2l.15 is definitely too old...
  */
-#if 0
-// GRR NOTES
-//
-// 19991006:
-//  - fixed sign error in post-MMX cleanup code (16- & 32-bit cases)
-//
-// 19991007:
-//  - additional optimizations (possible or definite):
-//     x [DONE] write MMX code for 64-bit case (pixel_bytes == 8) [not tested]
-//     - write MMX code for 48-bit case (pixel_bytes == 6)
-//     - figure out what's up with 24-bit case (pixel_bytes == 3):
-//        why subtract 8 from width_mmx in the pass 4/5 case?
-//        (only width_mmx case)
-//     x [DONE] replace pixel_bytes within each block with the true
-//        constant value (or are compilers smart enough to do that?)
-//     - rewrite all MMX interlacing code so it's aligned with
-//        the *beginning* of the row buffer, not the end.  This
-//        would not only allow one to eliminate half of the memory
-//        writes for odd passes (i.e., pass == odd), it may also
-//        eliminate some unaligned-data-access exceptions (assuming
-//        there's a penalty for not aligning 64-bit accesses on
-//        64-bit boundaries).  The only catch is that the "leftover"
-//        pixel(s) at the end of the row would have to be saved,
-//        but there are enough unused MMX registers in every case,
-//        so this is not a problem.  A further benefit is that the
-//        post-MMX cleanup code (C code) in at least some of the
-//        cases could be done within the assembler block.
-//  x [DONE] the "v3 v2 v1 v0 v7 v6 v5 v4" comments are confusing,
-//     inconsistent, and don't match the MMX Programmer's Reference
-//     Manual conventions anyway.  They should be changed to
-//     "b7 b6 b5 b4 b3 b2 b1 b0," where b0 indicates the byte that
-//     was lowest in memory (e.g., corresponding to a left pixel)
-//     and b7 is the byte that was highest (e.g., a right pixel).
-//
-// 19991016:
-//  - Brennan's Guide notwithstanding, gcc under Linux does *not*
-//     want globals prefixed by underscores when referencing them--
-//     i.e., if the variable is const4, then refer to it as const4,
-//     not _const4.  This seems to be a djgpp-specific requirement.
-//     Also, such variables apparently *must* be declared outside
-//     of functions; neither static nor automatic variables work if
-//     defined within the scope of a single function, but both
-//     static and truly global (multi-module) variables work fine.
-//
-// 19991023:
-//  - fixed png_combine_row() non-MMX replication bug (odd passes only?)
-//  - switched from string-concatenation-with-macros to cleaner method of
-//     renaming global variables for djgpp--i.e., always use prefixes in
-//     inlined assembler code (== strings) and conditionally rename the
-//     variables, not the other way around.  Hence _const4, _mask8_0, etc.
-//
-// 19991024:
-//  - fixed mmxsupport()/png_do_interlace() first-row bug
-//     This one was severely weird:  even though mmxsupport() doesn't touch
-//     ebx (where "row" pointer was stored), it nevertheless managed to zero
-//     the register (even in static/non-fPIC code--see below), which in turn
-//     caused png_do_interlace() to return prematurely on the first row of
-//     interlaced images (i.e., without expanding the interlaced pixels).
-//     Inspection of the generated assembly code didn't turn up any clues,
-//     although it did point at a minor optimization (i.e., get rid of
-//     mmx_supported_local variable and just use eax).  Possibly the CPUID
-//     instruction is more destructive than it looks?  (Not yet checked.)
-//  - "info gcc" was next to useless, so compared fPIC and non-fPIC assembly
-//     listings...  Apparently register spillage has to do with ebx, since
-//     it's used to index the global offset table.  Commenting it out of the
-//     input-reg lists in png_combine_row() eliminated compiler barfage, so
-//     ifdef'd with __PIC__ macro:  if defined, use a global for unmask
-//
-// 19991107:
-//  - verified CPUID clobberage:  12-char string constant ("GenuineIntel",
-//     "AuthenticAMD", etc.) placed in EBX:ECX:EDX.  Still need to polish.
-//
-// 19991120:
-//  - made "diff" variable (now "_dif") global to simplify conversion of
-//     filtering routines (running out of regs, sigh).  "diff" is still used
-//     in interlacing routines, however.
-//  - fixed up both versions of mmxsupport() (ORIG_THAT_USED_TO_CLOBBER_EBX
-//     macro determines which is used); original not yet tested.
-#endif
+
+/*
+ * GRR NOTES
+ * =========
+ *
+ * 19991006:
+ *  - fixed sign error in post-MMX cleanup code (16- & 32-bit cases)
+ *
+ * 19991007:
+ *  - additional optimizations (possible or definite):
+ *     x [DONE] write MMX code for 64-bit case (pixel_bytes == 8) [not tested]
+ *     - write MMX code for 48-bit case (pixel_bytes == 6)
+ *     - figure out what's up with 24-bit case (pixel_bytes == 3):
+ *        why subtract 8 from width_mmx in the pass 4/5 case?
+ *        (only width_mmx case)
+ *     x [DONE] replace pixel_bytes within each block with the true
+ *        constant value (or are compilers smart enough to do that?)
+ *     - rewrite all MMX interlacing code so it's aligned with
+ *        the *beginning* of the row buffer, not the end.  This
+ *        would not only allow one to eliminate half of the memory
+ *        writes for odd passes (i.e., pass == odd), it may also
+ *        eliminate some unaligned-data-access exceptions (assuming
+ *        there's a penalty for not aligning 64-bit accesses on
+ *        64-bit boundaries).  The only catch is that the "leftover"
+ *        pixel(s) at the end of the row would have to be saved,
+ *        but there are enough unused MMX registers in every case,
+ *        so this is not a problem.  A further benefit is that the
+ *        post-MMX cleanup code (C code) in at least some of the
+ *        cases could be done within the assembler block.
+ *  x [DONE] the "v3 v2 v1 v0 v7 v6 v5 v4" comments are confusing,
+ *     inconsistent, and don't match the MMX Programmer's Reference
+ *     Manual conventions anyway.  They should be changed to
+ *     "b7 b6 b5 b4 b3 b2 b1 b0," where b0 indicates the byte that
+ *     was lowest in memory (e.g., corresponding to a left pixel)
+ *     and b7 is the byte that was highest (e.g., a right pixel).
+ *
+ * 19991016:
+ *  - Brennan's Guide notwithstanding, gcc under Linux does *not*
+ *     want globals prefixed by underscores when referencing them--
+ *     i.e., if the variable is const4, then refer to it as const4,
+ *     not _const4.  This seems to be a djgpp-specific requirement.
+ *     Also, such variables apparently *must* be declared outside
+ *     of functions; neither static nor automatic variables work if
+ *     defined within the scope of a single function, but both
+ *     static and truly global (multi-module) variables work fine.
+ *
+ * 19991023:
+ *  - fixed png_combine_row() non-MMX replication bug (odd passes only?)
+ *  - switched from string-concatenation-with-macros to cleaner method of
+ *     renaming global variables for djgpp--i.e., always use prefixes in
+ *     inlined assembler code (== strings) and conditionally rename the
+ *     variables, not the other way around.  Hence _const4, _mask8_0, etc.
+ *
+ * 19991024:
+ *  - fixed mmxsupport()/png_do_interlace() first-row bug
+ *     This one was severely weird:  even though mmxsupport() doesn't touch
+ *     ebx (where "row" pointer was stored), it nevertheless managed to zero
+ *     the register (even in static/non-fPIC code--see below), which in turn
+ *     caused png_do_interlace() to return prematurely on the first row of
+ *     interlaced images (i.e., without expanding the interlaced pixels).
+ *     Inspection of the generated assembly code didn't turn up any clues,
+ *     although it did point at a minor optimization (i.e., get rid of
+ *     mmx_supported_local variable and just use eax).  Possibly the CPUID
+ *     instruction is more destructive than it looks?  (Not yet checked.)
+ *  - "info gcc" was next to useless, so compared fPIC and non-fPIC assembly
+ *     listings...  Apparently register spillage has to do with ebx, since
+ *     it's used to index the global offset table.  Commenting it out of the
+ *     input-reg lists in png_combine_row() eliminated compiler barfage, so
+ *     ifdef'd with __PIC__ macro:  if defined, use a global for unmask
+ *
+ * 19991107:
+ *  - verified CPUID clobberage:  12-char string constant ("GenuineIntel",
+ *     "AuthenticAMD", etc.) placed in EBX:ECX:EDX.  Still need to polish.
+ *
+ * 19991120:
+ *  - made "diff" variable (now "_dif") global to simplify conversion of
+ *     filtering routines (running out of regs, sigh).  "diff" is still used
+ *     in interlacing routines, however.
+ *  - fixed up both versions of mmxsupport() (ORIG_THAT_USED_TO_CLOBBER_EBX
+ *     macro determines which is used); original not yet tested.
+ *
+ * 20000319:
+ *  - fixed a register-name typo in png_do_read_interlace(), default (MMX) case,
+ *     pass == 4 or 5, that caused visible corruption of interlaced images
+ */
+
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -1524,17 +1532,20 @@ fflush(stderr);
                      width -= width_mmx;        // 8 or 9 pix, 24 or 27 bytes
                      if (width_mmx)
                      {
+                        // png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
+                        // sptr points at last pixel in pre-expanded row
+                        // dp points at last pixel position in expanded row
                         __asm__ (
                            "subl $3, %%esi          \n\t"
                            "subl $9, %%edi          \n\t"
-                                        // (png_pass_inc[pass] - 1)*pixel_bytes
+                                        // (png_pass_inc[pass] + 1)*pixel_bytes
 
                         ".loop3_pass4:              \n\t"
                            "movq (%%esi), %%mm0     \n\t" // x x 5 4 3 2 1 0
                            "movq %%mm0, %%mm1       \n\t" // x x 5 4 3 2 1 0
                            "movq %%mm0, %%mm2       \n\t" // x x 5 4 3 2 1 0
                            "psllq $24, %%mm0        \n\t" // 4 3 2 1 0 z z z
-                           "pand _const4, %%mm0     \n\t" // z z z z z 2 1 0
+                           "pand _const4, %%mm1     \n\t" // z z z z z 2 1 0
                            "psrlq $24, %%mm2        \n\t" // z z z x x 5 4 3
                            "por %%mm1, %%mm0        \n\t" // 4 3 2 1 0 2 1 0
                            "movq %%mm2, %%mm3       \n\t" // z z z x x 5 4 3

@@ -7,7 +7,6 @@
 # ---------- Microsoft Visual C++ 4.0 and later, no assembler code------
 # If you want to use assembler code, use makefile.vcawin32 instead.
 
-MODEL=- 
 CFLAGS= -Ox -GA3s -nologo -W3 -I..\zlib
 
 CC=cl

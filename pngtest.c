@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.5s - February 18, 2000
+ * libpng 1.0.6 - March 21, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -50,6 +50,11 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #endif
 
 #include "png.h"
+
+/* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
+#ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
+#endif
 
 #ifdef PNGTEST_TIMING
 static float t_start, t_stop, t_decode, t_encode, t_misc;
@@ -524,7 +529,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    int bit_depth, color_type;
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
-   jmp_buf jmp_env;
+   jmp_buf jmpbuf;
 #endif
 #endif
 
@@ -579,11 +584,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
-   png_debug(0, "Setting jmp_env for read struct\n");
+   png_debug(0, "Setting jmpbuf for read struct\n");
 #ifdef USE_FAR_KEYWORD
-   if (setjmp(jmp_env))
+   if (setjmp(jmpbuf))
 #else
-   if (setjmp(png_jmp_env(read_ptr)))
+   if (setjmp(png_jmpbuf(read_ptr)))
 #endif
    {
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
@@ -595,14 +600,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmp_env(read_ptr),jmp_env,sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(read_ptr),jmpbuf,sizeof(jmp_buf));
 #endif
 
-   png_debug(0, "Setting jmp_env for write struct\n");
+   png_debug(0, "Setting jmpbuf for write struct\n");
 #ifdef USE_FAR_KEYWORD
-   if (setjmp(jmp_env))
+   if (setjmp(jmpbuf))
 #else
-   if (setjmp(png_jmp_env(write_ptr)))
+   if (setjmp(png_jmpbuf(write_ptr)))
 #endif
    {
       fprintf(STDERR, "%s -> %s: libpng write error\n", inname, outname);
@@ -614,7 +619,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(write_ptr->jmpbuf,jmp_env,sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(write_ptr),jmpbuf,sizeof(jmp_buf));
 #endif
 #endif
 
@@ -1339,9 +1344,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-void
-png_check_pngtest_version
-   (version_1_0_5s png_h_is_not_version_1_0_5s)
-{
-   if(png_h_is_not_version_1_0_5s == NULL) return;
-}
+typedef version_1_0_6 your_png_h_is_not_version_1_0_6;

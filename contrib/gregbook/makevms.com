@@ -1,11 +1,22 @@
 $!------------------------------------------------------------------------------
-$! make Contrib programs of libpng under OpenVMS
+$! make "PNG: The Definitive Guide" demo programs (for X) under OpenVMS
+$!
+$! Script created by Martin Zinser for libpng; modified by Greg Roelofs
+$! for standalone pngbook source distribution.
 $!
 $!
-$! Look for the compiler used
+$!    Set locations where zlib and libpng sources live.
 $!
-$ zlibsrc = "[---.zlib]"
-$ ccopt="/include=(''zlibsrc',[--])"
+$ zpath = "[-.zlib]"
+$ pngpath = "[-.libpng]"
+$!
+$! USE THESE INSTEAD if building from libpng's [.contrib.gregbook] directory:
+$! zpath = "[---.zlib]"
+$! pngpath = "[--]"
+$!
+$!    Look for the compiler used.
+$!
+$ ccopt="/include=(''zpath',''pngpath')"
 $ if f$getsyi("HW_MODEL").ge.1024
 $ then
 $  ccopt = "/prefix=all"+ccopt
@@ -29,13 +40,16 @@ $    comp  = "__decc__=1"
 $  endif
 $ endif
 $ open/write lopt lib.opt
-$ write lopt "[--]libpng.olb/lib"
-$ write lopt "''zlibsrc'libz.olb/lib"
+$ write lopt "''pngpath'libpng.olb/lib"
+$ write lopt "''zpath'libz.olb/lib"
 $ close lopt
 $ open/write xopt x11.opt
 $ write xopt "sys$library:decw$xlibshr.exe/share"
 $ close xopt
-$ write sys$output "Compiling PNG contrib programs ..."
+$!
+$!    Build 'em.
+$!
+$ write sys$output "Compiling PNG book programs ..."
 $   CALL MAKE readpng.OBJ "cc ''CCOPT' readpng" -
 	readpng.c readpng.h
 $   CALL MAKE readpng2.OBJ "cc ''CCOPT' readpng2" -

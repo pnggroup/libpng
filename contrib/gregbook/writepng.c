@@ -4,7 +4,7 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -30,10 +30,10 @@
   ---------------------------------------------------------------------------*/
 
 
-#include <stdlib.h>   /* for exit() prototype */
+#include <stdlib.h>     /* for exit() prototype */
 
-#include "png.h"      /* libpng header; includes zlib.h and setjmp.h */
-#include "writepng.h" /* typedefs, common macros, public prototypes */
+#include "png.h"        /* libpng header; includes zlib.h and setjmp.h */
+#include "writepng.h"   /* typedefs, common macros, public prototypes */
 
 
 /* local prototype */
@@ -42,7 +42,7 @@ static void writepng_error_handler(png_structp png_ptr, png_const_charp msg);
 
 
 
-void writepng_version_info()
+void writepng_version_info(void)
 {
   fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
     PNG_LIBPNG_VER_STRING, png_libpng_ver);
@@ -82,7 +82,7 @@ int writepng_init(mainprog_info *mainprog_ptr)
      * but compatible error handlers must either use longjmp() themselves
      * (as in this program) or exit immediately, so here we go: */
 
-    if (setjmp(png_jmp_env(mainprog_ptr))) {
+    if (setjmp(mainprog_ptr->jmpbuf)) {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         return 2;
     }
@@ -239,7 +239,7 @@ int writepng_encode_image(mainprog_info *mainprog_ptr)
     /* as always, setjmp() must be called in every function that calls a
      * PNG-writing libpng function */
 
-    if (setjmp(png_jmp_env(mainprog_ptr))) {
+    if (setjmp(mainprog_ptr->jmpbuf)) {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         mainprog_ptr->png_ptr = NULL;
         mainprog_ptr->info_ptr = NULL;
@@ -277,7 +277,7 @@ int writepng_encode_row(mainprog_info *mainprog_ptr)  /* NON-interlaced only! */
     /* as always, setjmp() must be called in every function that calls a
      * PNG-writing libpng function */
 
-    if (setjmp(png_jmp_env(mainprog_ptr))) {
+    if (setjmp(mainprog_ptr->jmpbuf)) {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         mainprog_ptr->png_ptr = NULL;
         mainprog_ptr->info_ptr = NULL;
@@ -307,7 +307,7 @@ int writepng_encode_finish(mainprog_info *mainprog_ptr)   /* NON-interlaced! */
     /* as always, setjmp() must be called in every function that calls a
      * PNG-writing libpng function */
 
-    if (setjmp(png_jmp_env(mainprog_ptr))) {
+    if (setjmp(mainprog_ptr->jmpbuf)) {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         mainprog_ptr->png_ptr = NULL;
         mainprog_ptr->info_ptr = NULL;

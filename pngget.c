@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.5s - February 18, 2000
+ * libpng 1.0.6 - March 21, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -489,7 +489,7 @@ png_get_iCCP(png_structp png_ptr, png_infop info_ptr,
 #if defined(PNG_READ_sPLT_SUPPORTED)
 png_uint_32
 png_get_sPLT(png_structp png_ptr, png_infop info_ptr,
-             png_spalette_pp spalettes)
+             png_sPLT_tpp spalettes)
 {
    if (png_ptr != NULL && info_ptr != NULL && spalettes != NULL)
      *spalettes = info_ptr->splt_palettes;

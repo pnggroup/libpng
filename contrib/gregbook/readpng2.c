@@ -4,7 +4,7 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -30,10 +30,10 @@
   ---------------------------------------------------------------------------*/
 
 
-#include <stdlib.h>    /* for exit() prototype */
+#include <stdlib.h>     /* for exit() prototype */
 
-#include "png.h"       /* libpng header; includes zlib.h and setjmp.h */
-#include "readpng2.h"  /* typedefs, common macros, public prototypes */
+#include "png.h"        /* libpng header; includes zlib.h and setjmp.h */
+#include "readpng2.h"   /* typedefs, common macros, public prototypes */
 
 
 /* local prototypes */
@@ -47,7 +47,7 @@ static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg);
 
 
 
-void readpng2_version_info()
+void readpng2_version_info(void)
 {
     fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
       PNG_LIBPNG_VER_STRING, png_libpng_ver);
@@ -70,7 +70,7 @@ int readpng2_check_sig(uch *sig, int num)
 
 int readpng2_init(mainprog_info *mainprog_ptr)
 {
-    png_structp  png_ptr; /* note:  temporary variables! */
+    png_structp  png_ptr;       /* note:  temporary variables! */
     png_infop  info_ptr;
 
 
@@ -98,7 +98,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
      * but compatible error handlers must either use longjmp() themselves
      * (as in this program) or exit immediately, so here we are: */
 
-    if (setjmp(png_jmp_env(mainprog_ptr))) {
+    if (setjmp(mainprog_ptr->jmpbuf)) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return 2;
     }
@@ -136,7 +136,7 @@ int readpng2_decode_data(mainprog_info *mainprog_ptr, uch *rawbuf, ulg length)
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if (setjmp(png_jmp_env(mainprog_ptr))) {
+    if (setjmp(mainprog_ptr->jmpbuf)) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         mainprog_ptr->png_ptr = NULL;
         mainprog_ptr->info_ptr = NULL;
@@ -176,7 +176,7 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 
     mainprog_ptr = png_get_progressive_ptr(png_ptr);
 
-    if (mainprog_ptr == NULL) { /* we be hosed */
+    if (mainprog_ptr == NULL) {         /* we be hosed */
         fprintf(stderr,
           "readpng2 error:  main struct not recoverable in info_callback.\n");
         fflush(stderr);
@@ -283,7 +283,7 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 
     png_read_update_info(png_ptr, info_ptr);
 
-    mainprog_ptr->rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+    mainprog_ptr->rowbytes = (int)png_get_rowbytes(png_ptr, info_ptr);
     mainprog_ptr->channels = png_get_channels(png_ptr, info_ptr);
 
 
@@ -321,6 +321,11 @@ static void readpng2_row_callback(png_structp png_ptr, png_bytep new_row,
      * the old rows and image-display callback function */
 
     mainprog_ptr = png_get_progressive_ptr(png_ptr);
+
+
+    /* save the pass number for optional use by the front end */
+
+    mainprog_ptr->pass = pass;
 
 
     /* have libpng either combine the new row data with the existing row data
@@ -408,7 +413,7 @@ static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg)
     fflush(stderr);
 
     mainprog_ptr = png_get_error_ptr(png_ptr);
-    if (mainprog_ptr == NULL) { /* we are completely hosed now */
+    if (mainprog_ptr == NULL) {         /* we are completely hosed now */
         fprintf(stderr,
           "readpng2 severe error:  jmpbuf not recoverable; terminating.\n");
         fflush(stderr);

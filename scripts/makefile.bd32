@@ -1,5 +1,5 @@
 # Makefile for png32bd.dll
-# ------------- Borland C++ 4.5 -------------
+# ------------- 32-bit Borland C++ -------------
 
 # This makefile expects to find zlib.h and zlib32bd.lib in the
 # $(ZLIBDIR) directory.
@@ -12,42 +12,65 @@
 # compress and uncompress functions, nor any of the gz... functions,
 # since libpng does not call them.
 
-ZLIBDIR=..\zlib112
+.AUTODEPEND
+
+ZLIBDIR=..\zlib
 ZLIB=zlib32bd.lib
 PNGDLL=png32bd.dll
+PNGLIB=png32bd.lib
 
-CFLAGS= -ps -O2 -C -K -N- -k- -d -3 -r- -w-par -w-aus -WDE -I$(ZLIBDIR)
-CC=f:\bc45\bin\bcc32
-LINKFLAGS= -Tpd -aa -c
-LINK=f:\bc45\bin\tlink32
-LIBDIR=f:\bc45\lib
-IMPLIB=f:\bc45\bin\implib
+CC=bcc32
+CFLAGS= -ps -O2 -N- -k- -d -r- -w-par -w-aus -I$(ZLIBDIR) \
+  -DPNG_NO_GLOBAL_ARRAYS #-DPNG_DEBUG=5
+#LINK=tlink32
+#LINK=ilink32
+LINK=bcc32
+#LINKFLAGS= -Tpd -aa -c
+LINKFLAGS= -WDE
+IMPLIB=implib
 
-.autodepend
+# Use this if you don't want Borland's fancy exception handling
+NOEHLIB=noeh32.lib
+
 .c.obj:
-        $(CC) -c $(CFLAGS) $<
- 
-OBJ1=png.obj pngerror.obj pngget.obj pngmem.obj pngpread.obj 
-OBJ2=pngread.obj pngrio.obj pngrtran.obj pngrutil.obj pngset.obj 
+	$(CC) -c $(CFLAGS) $<
+
+.c.exe:
+	$(CC) $(CFLAGS) $< $(PNGLIB) $(NOEHLIB)
+
+
+OBJ1=png.obj pngerror.obj pngget.obj pngmem.obj pngpread.obj
+OBJ2=pngread.obj pngrio.obj pngrtran.obj pngrutil.obj pngset.obj
 OBJ3=pngtrans.obj pngwio.obj pngwrite.obj pngwtran.obj pngwutil.obj
 
 all: $(PNGDLL)
 
+test: pngtest.exe
+	pngtest
+
+
 $(PNGDLL): $(OBJ1) $(OBJ2) $(OBJ3) $(ZLIBDIR)\$(ZLIB)
-        $(LINK) @&&|
-$(LINKFLAGS) $(LIBDIR)\c0d32 +
-$(OBJ1) +
-$(OBJ2) +
+	$(LINK) @&&|
+$(LINKFLAGS)
+-e$(PNGDLL)
+$(OBJ1)
+$(OBJ2)
 $(OBJ3)
-$@
--x
-$(ZLIBDIR)\$(ZLIB) $(LIBDIR)\import32 $(LIBDIR)\cw32
-|,&&|
-LIBRARY $(@B)
-EXETYPE WINDOWS
-CODE PRELOAD MOVEABLE DISCARDABLE
-DATA PRELOAD MOVEABLE MULTIPLE
+$(ZLIBDIR)\$(ZLIB)
+$(NOEHLIB)
 |
-        $(IMPLIB) -c $(@R).lib $@
+	$(IMPLIB) -c $(@R).lib $@
+
+
+# Clean up anything else you want
+clean:
+	-del *.obj
+	-del *.dll
+	-del *.exe
+	-del *.lib
+	-del *.lst
+	-del *.map
+	-del *.tds
+
 
 # End of makefile for png32bd.dll

@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.5s - February 18, 2000
+ * libpng 1.0.6 - March 21, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -952,7 +952,7 @@ png_read_push_finish_row(png_structp png_ptr)
 void
 png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   if (png_ptr->mode == PNG_BEFORE_IHDR || png_ptr->mode & PNG_HAVE_IEND)
+   if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place tEXt");
          /* to quiet some compiler warnings */
@@ -1040,7 +1040,7 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
 void
 png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   if (png_ptr->mode == PNG_BEFORE_IHDR || png_ptr->mode & PNG_HAVE_IEND)
+   if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place zTXt");
          /* to quiet some compiler warnings */
@@ -1221,7 +1221,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 void
 png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   if (png_ptr->mode == PNG_BEFORE_IHDR || png_ptr->mode & PNG_HAVE_IEND)
+   if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place iTXt");
          /* to quiet some compiler warnings */
@@ -1268,7 +1268,7 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
    {
       png_textp text_ptr;
       png_charp key;
-      int comp_flag = 0;
+      int comp_flag;
       png_charp lang;
       png_charp lang_key;
       png_charp text;

@@ -4,7 +4,7 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-1999 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -32,8 +32,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "png.h"      /* libpng header; includes zlib.h */
-#include "readpng.h"  /* typedefs, common macros, public prototypes */
+#include "png.h"        /* libpng header; includes zlib.h */
+#include "readpng.h"    /* typedefs, common macros, public prototypes */
+
+/* future versions of libpng will provide this macro: */
+#ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr)   ((png_ptr)->jmpbuf)
+#endif
 
 
 static png_structp png_ptr = NULL;
@@ -44,7 +49,7 @@ int  bit_depth, color_type;
 uch  *image_data = NULL;
 
 
-void readpng_version_info()
+void readpng_version_info(void)
 {
     fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
       PNG_LIBPNG_VER_STRING, png_libpng_ver);
@@ -55,7 +60,7 @@ void readpng_version_info()
 
 /* return value = 0 for success, 1 for bad sig, 2 for bad IHDR, 4 for no mem */
 
-int readpng_init(FILE *infile, long *pWidth, long *pHeight)
+int readpng_init(FILE *infile, ulg *pWidth, ulg *pHeight)
 {
     uch sig[8];
 
@@ -89,7 +94,7 @@ int readpng_init(FILE *infile, long *pWidth, long *pHeight)
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if (setjmp(png_jmp_env(png_ptr))) {
+    if (setjmp(png_jmpbuf(png_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return 2;
     }
@@ -130,7 +135,7 @@ int readpng_get_bgcolor(uch *red, uch *green, uch *blue)
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if (setjmp(png_jmp_env(png_ptr))) {
+    if (setjmp(png_jmpbuf(png_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return 2;
     }
@@ -184,7 +189,7 @@ uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if (setjmp(png_jmp_env(png_ptr))) {
+    if (setjmp(png_jmpbuf(png_ptr))) {
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return NULL;
     }

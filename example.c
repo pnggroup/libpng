@@ -6,16 +6,27 @@
 /* This is an example of how to use libpng to read and write PNG files.
  * The file libpng.txt is much more verbose then this.  If you have not
  * read it, do so first.  This was designed to be a starting point of an
- * implementation.  This is not officially part of libpng, and therefore
- * does not require a copyright notice.
+ * implementation.  This is not officially part of libpng, is hereby placed
+ * in the public domain, and therefore does not require a copyright notice.
  *
  * This file does not currently compile, because it is missing certain
  * parts, like allocating memory to hold an image.  You will have to
  * supply these parts to get it to compile.  For an example of a minimal
- * working PNG reader/writer, see pngtest.c, included in this distribution.
+ * working PNG reader/writer, see pngtest.c, included in this distribution;
+ * see also the programs in the contrib directory.
  */
 
 #include "png.h"
+
+ /* The png_jmpbuf() macro, used in error handling, became available in
+  * libpng version 1.0.6.  If you want to be able to run your code with older
+  * versions of libpng, you must define the macro yourself (but only if it
+  * is not already defined by libpng!).
+  */
+
+#ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#endif
 
 /* Check to see if a file is a PNG file using png_sig_cmp().  png_sig_cmp()
  * returns zero if the image is a PNG and nonzero if it isn't a PNG.
@@ -111,7 +122,8 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     * the normal method of doing things with libpng).  REQUIRED unless you
     * set up your own error handlers in the png_create_read_struct() earlier.
     */
-   if (setjmp(png_jmp_env(png_ptr)))
+
+   if (setjmp(png_jmpbuf(png_ptr)))
    {
       /* Free all of the memory associated with the png_ptr and info_ptr */
       png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
@@ -231,7 +243,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       screen_gamma = 1.7 or 1.0;  /* A good guess for Mac systems */
    }
 
-   /* Tell libpng to handle the gamma conversion for you.  The second call
+   /* Tell libpng to handle the gamma conversion for you.  The final call
     * is a good guess for PC generated images, but it should be configurable
     * by the user at run time by the user.  It is strongly suggested that
     * your application support gamma correction.
@@ -240,7 +252,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    int intent;
 
    if (png_get_sRGB(png_ptr, info_ptr, &intent))
-      png_set_sRGB(png_ptr, info_ptr, intent);
+      png_set_gamma(png_ptr, screen_gamma, 0.45455);
    else
    {
       double image_gamma;
@@ -405,7 +417,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
       return ERROR;
    }
 
-   if (setjmp(png_jmp_env((*png_ptr))))
+   if (setjmp(png_jmpbuf((*png_ptr))))
    {
       png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
       return ERROR;
@@ -433,7 +445,7 @@ int
 process_data(png_structp *png_ptr, png_infop *info_ptr,
    png_bytep buffer, png_uint_32 length)
 {
-   if (setjmp(png_jmp_env((*png_ptr))))
+   if (setjmp(png_jmpbuf((*png_ptr))))
    {
       /* Free the png_ptr and info_ptr memory on error */
       png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
@@ -549,7 +561,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    /* Set error handling.  REQUIRED if you aren't supplying your own
     * error handling functions in the png_create_write_struct() call.
     */
-   if (setjmp(png_ptr->jmpbuf))
+   if (setjmp(png_jmpbuf(png_ptr)))
    {
       /* If we get here, we had a problem reading the file */
       fclose(fp);
@@ -632,7 +644,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_set_text(png_ptr, info_ptr, text_ptr, 3);
 
    /* other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs, */
-   /* note that if sRGB is present the cHRM chunk must be ignored
+   /* note that if sRGB is present the gAMA and cHRM chunks must be ignored
     * on read and must be written in accordance with the sRGB profile */
 
    /* Write the file header information.  REQUIRED */
