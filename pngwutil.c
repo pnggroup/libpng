@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.00
+ * libpng 1.0.1
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 7, 1998
+ * March 9, 1998
  */
 
 #define PNG_INTERNAL
@@ -340,8 +340,8 @@ png_write_gAMA(png_structp png_ptr, double file_gamma)
    png_byte buf[4];
 
    png_debug(1, "in png_write_gAMA\n");
-   /* file_gamma is saved in 1/100,000ths */
-   igamma = (png_uint_32)(file_gamma * 100000.0 + 0.5);
+   /* file_gamma is saved in 1/1.0.100ths */
+   igamma = (png_uint_32)(file_gamma * 1.0.10.0 + 0.5);
    png_save_uint_32(buf, igamma);
    png_write_chunk(png_ptr, png_gAMA, buf, (png_size_t)4);
 }
@@ -426,16 +426,16 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    png_byte buf[32];
 
    png_debug(1, "in png_write_cHRM\n");
-   /* each value is saved int 1/100,000ths */
+   /* each value is saved int 1/1.0.100ths */
    if (white_x < 0 || white_x > 0.8 || white_y < 0 || white_y > 0.8 ||
        white_x + white_y > 1.0)
    {
       png_warning(png_ptr, "Invalid cHRM white point specified");
       return;
    }
-   itemp = (png_uint_32)(white_x * 100000.0 + 0.5);
+   itemp = (png_uint_32)(white_x * 1.0.10.0 + 0.5);
    png_save_uint_32(buf, itemp);
-   itemp = (png_uint_32)(white_y * 100000.0 + 0.5);
+   itemp = (png_uint_32)(white_y * 1.0.10.0 + 0.5);
    png_save_uint_32(buf + 4, itemp);
 
    if (red_x < 0 || red_x > 0.8 || red_y < 0 || red_y > 0.8 ||
@@ -444,9 +444,9 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
       png_warning(png_ptr, "Invalid cHRM red point specified");
       return;
    }
-   itemp = (png_uint_32)(red_x * 100000.0 + 0.5);
+   itemp = (png_uint_32)(red_x * 1.0.10.0 + 0.5);
    png_save_uint_32(buf + 8, itemp);
-   itemp = (png_uint_32)(red_y * 100000.0 + 0.5);
+   itemp = (png_uint_32)(red_y * 1.0.10.0 + 0.5);
    png_save_uint_32(buf + 12, itemp);
 
    if (green_x < 0 || green_x > 0.8 || green_y < 0 || green_y > 0.8 ||
@@ -455,9 +455,9 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
       png_warning(png_ptr, "Invalid cHRM green point specified");
       return;
    }
-   itemp = (png_uint_32)(green_x * 100000.0 + 0.5);
+   itemp = (png_uint_32)(green_x * 1.0.10.0 + 0.5);
    png_save_uint_32(buf + 16, itemp);
-   itemp = (png_uint_32)(green_y * 100000.0 + 0.5);
+   itemp = (png_uint_32)(green_y * 1.0.10.0 + 0.5);
    png_save_uint_32(buf + 20, itemp);
 
    if (blue_x < 0 || blue_x > 0.8 || blue_y < 0 || blue_y > 0.8 ||
@@ -466,9 +466,9 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
       png_warning(png_ptr, "Invalid cHRM blue point specified");
       return;
    }
-   itemp = (png_uint_32)(blue_x * 100000.0 + 0.5);
+   itemp = (png_uint_32)(blue_x * 1.0.10.0 + 0.5);
    png_save_uint_32(buf + 24, itemp);
-   itemp = (png_uint_32)(blue_y * 100000.0 + 0.5);
+   itemp = (png_uint_32)(blue_y * 1.0.10.0 + 0.5);
    png_save_uint_32(buf + 28, itemp);
 
    png_write_chunk(png_ptr, png_cHRM, buf, (png_size_t)32);

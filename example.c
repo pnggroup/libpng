@@ -15,7 +15,7 @@
 
 #include "png.h"
 
-/* Check to see if a file is a PNG file using png_check_sig().  Returns
+/* Check to see if a file is a PNG file using png_sig_cmp().  Returns
  * non-zero if the image is a PNG, and 0 if it isn't a PNG.
  *
  * If this call is successful, and you are going to keep the file open,
@@ -29,7 +29,7 @@
  *
  * Many applications already read the first 2 or 4 bytes from the start
  * of the image to determine the file type, so it would be easiest just
- * to pass the bytes to png_check_sig() or even skip that if you know
+ * to pass the bytes to png_sig_cmp() or even skip that if you know
  * you have a PNG file, and call png_set_sig_bytes().
  */
 #define PNG_BYTES_TO_CHECK 4
@@ -46,7 +46,7 @@ int check_if_png(char *file_name, FILE **fp)
       return 0;
 
    /* Compare the first PNG_BYTES_TO_CHECK bytes of the signature. */
-   return(png_check_sig(buf, PNG_BYTES_TO_CHECK));
+   return(png_sig_cmp(buf, (png_size_t)0, PNG_BYTES_TO_CHECK));
 }
 
 /* Read a PNG file.  You may want to return an error code if the read
@@ -92,7 +92,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    }
 
    /* Allocate/initialize the memory for image information.  REQUIRED. */
-   info_ptr = png_create_info_struct();
+   info_ptr = png_create_info_struct(png_ptr);
    if (info_ptr == NULL)
    {
       fclose(fp);
@@ -127,7 +127,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 #endif no_streams /* Use only one I/O method! */
 
    /* If we have already read some of the signature */
-   png_set_sig_bytes_read(png_ptr, sig_read);
+   png_set_sig_bytes(png_ptr, sig_read);
 
    /* The call to png_read_info() gives us all of the information from the
     * PNG file before the first IDAT (image data chunk).  REQUIRED

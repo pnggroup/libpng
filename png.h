@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 1.00
+ * libpng 1.0.1
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * March 7, 1998
+ * March 9, 1998
  *
  * Note about libpng version numbers:
  *
@@ -23,12 +23,12 @@
  *      0.90  ("1.0 beta 4")      0.90      0.90  [should have been 2.0.90]
  *      0.95  ("1.0 beta 5")      0.95      0.95  [should have been 2.0.95]
  *      0.96  ("1.0 beta 6")      0.96      0.96  [should have been 2.0.96]
- *      0.97b ("1.00.97 beta 7")  1.00.97   1.0.0 [should have been 2.0.97]
+ *      0.97b ("1.00.97 beta 7")  1.00.97   1.0.1 [should have been 2.0.97]
  *      0.97c                     0.97      2.0.97
  *      0.98                      0.98      2.0.98
  *      0.99                      0.99      2.0.99
  *      0.99a-m                   0.99      2.0.99
- *      1.00                      1.00      2.1.0
+ *      1.0.1                     1.00      2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
@@ -112,19 +112,20 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.00"
+#define PNG_LIBPNG_VER_STRING "1.0.1"
 
 /* careful here.  At one time, I wanted to use 082, but that would be octal.
- * Version 1.0 will be 100 here, etc.
- */
-#define PNG_LIBPNG_VER  100
+ * We must not include leading blanks.
+ * Versions 0.7 through 1.0.0 were in the range 0 to 100 here.  From
+ * version 1.0.1 it's   xxxyyyzzzzL, where x=major, y=minor, z-bugfix*/
+#define PNG_LIBPNG_VER    10000001L
 
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
 /* Version information for C files, stored in png.c.  This had better match
  * the version above.
  */
-extern char png_libpng_ver[5];
+extern char png_libpng_ver[6];
 
 /* Structures to facilitate easy interlacing.  See png.c for more details */
 extern int FARDATA png_pass_start[7];
@@ -1483,11 +1484,11 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_GAMMA              0x2000
 #define PNG_GRAY_TO_RGB        0x4000
 #define PNG_FILLER             0x8000
-#define PNG_PACKSWAP          0x10000L
+#define PNG_PACKSWAP          0x1.0.1L
 #define PNG_SWAP_ALPHA        0x20000L
 #define PNG_STRIP_ALPHA       0x40000L
 #define PNG_INVERT_ALPHA      0x80000L
-#define PNG_USER_TRANSFORM   0x100000L
+#define PNG_USER_TRANSFORM   0x1.0.10L
 
 /* flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
@@ -1516,7 +1517,7 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_FLAG_FREE_TRANS               0x2000
 #define PNG_FLAG_FREE_HIST                0x4000
 #define PNG_FLAG_HAVE_CHUNK_HEADER        0x8000L
-#define PNG_FLAG_WROTE_tIME              0x10000L
+#define PNG_FLAG_WROTE_tIME              0x1.0.1L
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
                                      PNG_FLAG_CRC_ANCILLARY_NOWARN)

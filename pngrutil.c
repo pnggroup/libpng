@@ -1,12 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.00
+ * libpng 1.0.1
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 7, 1998
+ * March 9, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -436,7 +436,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
-   file_gamma = (float)igamma / (float)100000.0;
+   file_gamma = (float)igamma / (float)1.0.10.0;
 #ifdef PNG_READ_GAMMA_SUPPORTED
    png_ptr->gamma = file_gamma;
 #endif
@@ -549,11 +549,11 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_crc_read(png_ptr, buf, 4);
    val = png_get_uint_32(buf);
-   white_x = (float)val / (float)100000.0;
+   white_x = (float)val / (float)1.0.10.0;
 
    png_crc_read(png_ptr, buf, 4);
    val = png_get_uint_32(buf);
-   white_y = (float)val / (float)100000.0;
+   white_y = (float)val / (float)1.0.10.0;
 
    if (white_x < 0 || white_x > 0.8 || white_y < 0 || white_y > 0.8 ||
        white_x + white_y > 1.0)
@@ -565,11 +565,11 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_crc_read(png_ptr, buf, 4);
    val = png_get_uint_32(buf);
-   red_x = (float)val / (float)100000.0;
+   red_x = (float)val / (float)1.0.10.0;
 
    png_crc_read(png_ptr, buf, 4);
    val = png_get_uint_32(buf);
-   red_y = (float)val / (float)100000.0;
+   red_y = (float)val / (float)1.0.10.0;
 
    if (red_x < 0 || red_x > 0.8 || red_y < 0 || red_y > 0.8 ||
        red_x + red_y > 1.0)
@@ -581,11 +581,11 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_crc_read(png_ptr, buf, 4);
    val = png_get_uint_32(buf);
-   green_x = (float)val / (float)100000.0;
+   green_x = (float)val / (float)1.0.10.0;
 
    png_crc_read(png_ptr, buf, 4);
    val = png_get_uint_32(buf);
-   green_y = (float)val / (float)100000.0;
+   green_y = (float)val / (float)1.0.10.0;
 
    if (green_x < 0 || green_x > 0.8 || green_y < 0 || green_y > 0.8 ||
        green_x + green_y > 1.0)
@@ -597,11 +597,11 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_crc_read(png_ptr, buf, 4);
    val = png_get_uint_32(buf);
-   blue_x = (float)val / (float)100000.0;
+   blue_x = (float)val / (float)1.0.10.0;
 
    png_crc_read(png_ptr, buf, 4);
    val = png_get_uint_32(buf);
-   blue_y = (float)val / (float)100000.0;
+   blue_y = (float)val / (float)1.0.10.0;
 
    if (blue_x < (float)0 || blue_x > (float)0.8 || blue_y < (float)0 ||
        blue_y > (float)0.8 || blue_x + blue_y > (float)1.0)
@@ -694,7 +694,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
    if ((info_ptr->valid & PNG_INFO_gAMA))
-      if((png_uint_32)(png_ptr->gamma*(float)100000.+.5) != (png_uint_32)45000L)
+      if((png_uint_32)(png_ptr->gamma*(float)1.0.10.+.5) != (png_uint_32)45000L)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");

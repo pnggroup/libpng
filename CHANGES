@@ -268,3 +268,11 @@ version 1.00 [March 7, 1998]
    changed some typedefs (s_start, etc.) in pngrutil.c
    fixed dimensions of "short_months" array in pngwrite.c
    Replaced ansi2knr.c with the one from jpeg-v6
+version 1.0.0 [March 8, 1998]
+   Changed name from 1.00 to 1.0.0 (Adam Costello)
+   Added smakefile.ppc (with SCOPTIONS.ppc) for Amiga PPC (Andreas Kleinert)
+version 1.0.1 [March 9, 1998]
+   Fixed three bugs in pngrtran.c to make gamma+background handling consistent
+   (Greg Roelofs)
+   Changed format of the PNG_LIBPNG_VER integer to xyyyzzzz instead of xyz
+   for major, minor, and bugfix releases.  This is 10000001L. (Adam Costello)
