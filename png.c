@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.4 - September 17, 1999
+ * libpng version 1.0.4 - September 18, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -352,7 +352,7 @@ png_get_copyright(png_structp png_ptr)
 {
    if(png_ptr == NULL)
      /* silence compiler warning about unused png_ptr */ ;
-   return("\n libpng version 1.0.4 - September 17, 1999\n\
+   return("\n libpng version 1.0.4 - September 18, 1999\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999 Glenn Randers-Pehrson\n");

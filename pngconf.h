@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.4 - September 17, 1999
+ * libpng 1.0.4 - September 18, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -658,23 +658,31 @@ typedef charf *         png_zcharp;
 typedef charf * FAR *   png_zcharpp;
 typedef z_stream FAR *  png_zstreamp;
 
-/* allow for compilation as dll under MS Windows */
-#ifdef __WIN32DLL__
-#define PNG_EXPORT(type,symbol) __declspec(dllexport) type symbol
-#endif
 
-/* allow for compilation as dll with BORLAND C++ 5.0 */
-#if defined(__BORLANDC__) && defined(_Windows) && defined(__DLL__)
-#   define PNG_EXPORT(type,symbol) type _export symbol
-#endif
+#ifndef PNG_EXPORT
+   /* allow for compilation as dll under MS Windows */
+#  ifdef __WIN32DLL__
+#    define PNG_EXPORT(type,symbol) __declspec(dllexport) type symbol
+#  endif
 
-/* allow for compilation as shared lib under BeOS */
-#ifdef __BEOSDLL__
-#define PNG_EXPORT(type,symbol) __declspec(export) type symbol
+   /* this variant is used in Mozilla; may correspond to MSVC++ 6.0 changes */
+#  ifdef ALT_WIN32_DLL
+#    define PNG_EXPORT(type,symbol) type __attribute__((dllexport)) symbol
+#  endif
+
+   /* allow for compilation as dll with Borland C++ 5.0 */
+#  if defined(__BORLANDC__) && defined(_Windows) && defined(__DLL__)
+#    define PNG_EXPORT(type,symbol) type _export symbol
+#  endif
+
+   /* allow for compilation as shared lib under BeOS */
+#  ifdef __BEOSDLL__
+#    define PNG_EXPORT(type,symbol) __declspec(export) type symbol
+#  endif
 #endif
 
 #ifndef PNG_EXPORT
-#define PNG_EXPORT(type,symbol) type symbol
+#  define PNG_EXPORT(type,symbol) type symbol
 #endif
 
 

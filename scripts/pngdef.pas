@@ -3,8 +3,8 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.3b';
-  PNG_LIBPNG_VER        =  10001;
+  PNG_LIBPNG_VER_STRING = '1.0.4';
+  PNG_LIBPNG_VER        =  10004;
 
 type
   png_uint_32 = Cardinal;

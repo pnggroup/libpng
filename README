@@ -1,4 +1,4 @@
-README for libpng 1.0.4 - September 17, 1999 (shared library 2.1)
+README for libpng 1.0.4 - September 18, 1999 (shared library 2.1)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -153,37 +153,41 @@ Files in this distribution:
       pngwtran.c    =>  Write data transformations
       pngwutil.c    =>  Write utility functions
       scripts       =>  Directory containing scripts for building libpng:
-        descrip.mms   => VMS makefile for MMS or MMK
-        makefile.std  => Generic UNIX makefile
-        makefile.knr  => Archaic UNIX Makefile that converts files with ansi2knr
-                        (Requires ansi2knr.c from ftp://ftp.cs.wisc.edu/ghost)
-        makefile.dec  => DEC Alpha UNIX makefile
-        makefile.hux  => HPUX (10.20 and 11.00) makefile
-        makefile.sgi  => Silicon Graphics IRIX makefile
-        makefile.sun  => Sun makefile
-        makefile.s2x  => Solaris 2.X makefile (gcc, creates libpng.so.2.1.0)
-        makefile.lnx  => Linux/ELF makefile (gcc, creates libpng.so.2.1.0)
-        makefile.sco  => For SCO OSr5  ELF and Unixware 7 with Native cc
-        makefile.mip  => MIPS makefile
-        makefile.aco  => Acorn makefile
-        makefile.ama  => Amiga makefile
-        smakefile.ppc => AMIGA smakefile for SAS C V6.58/7.00 PPC compiler
-                         (Requires SCOPTIONS, copied from scripts/SCOPTIONS.ppc)
-        makefile.atr  => Atari makefile
-        makefile.beo  => BEOS makefile for X86
-        makefile.bor  => Borland makefile
-        build.bat     => MS-DOS batch file for Borland compiler
-        makefile.dj2  => DJGPP 2 makefile
-        makefile.msc  => Microsoft C makefile
-        makefile.w32  => makefile for Microsoft Visual C++ 4.0 and later
-        makefile.tc3  => Turbo C 3.0 makefile
-        makefile.os2  => OS/2 Makefile (gcc and emx, requires pngos2.def)
-        pngos2.def    => OS/2 module definition file used by makefile.os2
-        makefile.wat  => Watcom 10a+ Makefile, 32-bit flat memory model
-        makevms.com   => VMS build script
-        pngdll.mak    => To make a png32bd.dll with Borland C++ 4.5
-        pngdef.pas    => Defines for a png32bd.dll with Borland C++ 4.5
-        SCOPTIONS.ppc => Used with smakefile.ppc
+       descrip.mms      =>  VMS makefile for MMS or MMK
+       makefile.std     =>  Generic UNIX makefile
+       makefile.knr     =>  Archaic UNIX Makefile that converts files with
+                            ansi2knr (Requires ansi2knr.c from
+                            ftp://ftp.cs.wisc.edu/ghost)
+       makefile.dec     =>  DEC Alpha UNIX makefile
+       makefile.hpux    =>  HPUX (10.20 and 11.00) makefile
+       makefile.sgi     =>  Silicon Graphics IRIX makefile
+       makefile.sunos   =>  Sun makefile
+       makefile.solaris =>  Solaris 2.X makefile
+                            (gcc, creates libpng.so.2.1.0.4)
+       makefile.linux   =>  Linux/ELF makefile
+                            (gcc, creates libpng.so.2.1.0.4)
+       makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc
+       makefile.mips    =>  MIPS makefile
+       makefile.acorn   =>  Acorn makefile
+       makefile.amiga   =>  Amiga makefile
+       smakefile.ppc    =>  AMIGA smakefile for SAS C V6.58/7.00 PPC
+                            compiler (Requires SCOPTIONS, copied from
+                            scripts/SCOPTIONS.ppc)
+       makefile.atari   =>  Atari makefile
+       makefile.beos    =>  BEOS makefile for X86
+       makefile.borland =>  Borland makefile
+       build.bat        =>  MS-DOS batch file for Borland compiler
+       makefile.dj2     =>  DJGPP 2 makefile
+       makefile.msc     =>  Microsoft C makefile
+       makefile.win32vc =>  makefile for Microsoft Visual C++ 4.0 and later
+       makefile.turboc3 =>  Turbo C 3.0 makefile
+       makefile.os2     =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
+       pngos2.def       =>  OS/2 module definition file used by makefile.os2
+       makefile.watcom  =>  Watcom 10a+ Makefile, 32-bit flat memory model
+       makevms.com      =>  VMS build script
+       pngdll.mak       =>  To make a png32bd.dll with Borland C++ 4.5
+       pngdef.pas       =>  Defines for a png32bd.dll with Borland C++ 4.5
+       SCOPTIONS.ppc    =>  Used with smakefile.ppc
 
 Good luck, and happy coding.
 

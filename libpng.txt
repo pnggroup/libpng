@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.4 - September 17, 1999
+ libpng version 1.0.4 - September 18, 1999
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999 Glenn Randers-Pehrson

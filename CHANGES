@@ -436,7 +436,8 @@ version 1.0.3d [September 4, 1999]
   Fixed type casting of igamma in pngrutil.c
   Added new png_expand functions to scripts/pngdef.pas and pngos2.def
   Added a demo read_user_transform_fn that examines the row filters in pngtest.c
-version 1.0.4 [September 17, 1999]
+version 1.0.4 [September 18, 1999]
   Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
   Delete #define PNG_INTERNAL and include "png.h" from pngasmrd.h
   Made several minor corrections to pngtest.c
+  Renamed the makefiles with longer but more user friendly extensions
