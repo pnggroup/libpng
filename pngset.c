@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.4rc1 - July 2, 2002
+ * libpng 1.2.4 - July 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -322,7 +322,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
 
    /* check for overflow */
    rowbytes_per_pixel = (info_ptr->pixel_depth + 7) >> 3;
-   if (( width > PNG_MAX_UINT/rowbytes_per_pixel))
+   if ( width > PNG_MAX_UINT/rowbytes_per_pixel - 64)
    {
       png_warning(png_ptr,
          "Width too large to process image data; rowbytes will overflow.");
@@ -888,7 +888,7 @@ png_set_sPLT(png_structp png_ptr,
         (info_ptr->splt_palettes_num + nentries) * sizeof(png_sPLT_t));
     if (np == NULL)
     {
-      png_warning(png_ptr, "No memory for splt palettes.");
+      png_warning(png_ptr, "No memory for sPLT palettes.");
       return;
     }
 

@@ -1,33 +1,28 @@
 
-Libpng 1.2.4rc1 - July 2, 2002
+Libpng 1.2.4 - July 8, 2002
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Changes since the last public release (1.2.3):
 
-version 1.2.4beta1 [May 24, 2002]
   Added libpng.pc and libpng-config to "all:" target in 16 makefiles.
   Fixed bug in 16 makefiles: $(DESTDIR)/$(LIBPATH) to $(DESTDIR)$(LIBPATH)
   Added missing "\" before closing double quote in makefile.gcmmx.
   Plugged various memory leaks; added png_malloc_warn() and png_set_text_2()
     functions.
-version 1.2.4beta2 [June 25, 2002]
   Plugged memory leak of png_ptr->current_text (Matt Holgate).
   Check for buffer overflow before reading CRC in pngpread.c (Warwick Allison)
   Added -soname to the loader flags in makefile.dec, makefile.sgi, and
     makefile.sggcc.
   Added "test-installed" targets to makefile.linux, makefile.gcmmx,
-    makefile.sgi, and makefile.sggcc.
-version 1.2.4beta3 [June 28, 2002]
+    makefile.sgi, makefile.sggcc, makefile.32sunu, makefile.64sunu,
+    makefile.beos, makefile.darwin, makefile.dec, makefile.macosx, 
+    makefile.solaris, makefile.sco, makefile.cygwin, makefile.hpux,
+    makefile.hpgcc, and makefile.so9.
   Plugged memory leak of row_buf in pngtest.c when there is a png_error().
   Detect buffer overflow in pngpread.c when IDAT is corrupted with extra data.
-  Added "test-installed" target to makefile.32sunu, makefile.64sunu,
-    makefile.beos, makefile.darwin, makefile.dec, makefile.macosx, 
-    makefile.solaris, makefile.hpux, makefile.hpgcc, and makefile.so9.
-version 1.2.4rc1 [July 2, 2002]
-  Added "test-installed" target to makefile.cygwin and makefile.sco.
   Revised pnggccrd.c to be able to back out version 1.0.x via PNG_1_0_X macro.
+  Changed png_warning() to png_error() when width is too large to process.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1147,6 +1147,8 @@ version 1.2.4beta3 [June 28, 2002]
 version 1.2.4rc1 [July 2, 2002]
   Added "test-installed" target to makefile.cygwin and makefile.sco.
   Revised pnggccrd.c to be able to back out version 1.0.x via PNG_1_0_X macro.
+version 1.2.4 [July 8, 2002]
+  Changed png_warning() to png_error() when width is too large to process.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
