@@ -33,15 +33,14 @@ This is the copyright notice, disclaimer, and license:
 This is the output of "pngcrush" and "pngcrush -help":
 
 
-
- | pngcrush 1.4.4, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
+ | pngcrush 1.4.5, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.0.6i,
+ | This program was built with libpng version 1.0.7rc2,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
- | and zlib version 1.1.3, Copyright (C) 1998,
+ | and zlib version 1.1.3pc, Copyright (C) 1998,
  |    Jean-loup Gailly and Mark Adler.
 
 
@@ -55,17 +54,18 @@ options:
  -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
             -e extension  (used for creating output filename)
             -f user_filter [0-5]
+          -fix (fix otherwise fatal conditions such as bad CRCs)
         -force (Write a new output file even if larger than input)
-            -g gamma (float, e.g., 0.45455)
+            -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)
          -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
             -l zlib_compression_level [0-9]
             -m method [0 through 200]
-          -max maximum_IDAT_size [1 through 8192]
+          -max maximum_IDAT_size [1 through 524288]
             -n (no save; does not do compression or write output PNG)
             -plte_len n (truncate PLTE)
             -q (quiet)
           -rem chunkname (or "alla" or "allb")
--replace_gamma gamma (float, e.g. 0.45455) even if gAMA is present.
+-replace_gamma gamma (float or fixed*100000) even if gAMA is present.
           -res dpi
          -srgb [0, 1, 2, or 3]
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
@@ -75,6 +75,11 @@ options:
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
             -h (help)
             -p (pause)
+
+
+usage: pngcrush [options] infile.png outfile.png
+       pngcrush -e ext [other options] files.png ...
+       pngcrush -d dir [other options] files.png ...
 
 options:
         -brute (Use brute-force, try 114 different methods [11-124])
@@ -119,13 +124,15 @@ options:
                preceding '-m method' or '-brute_force' argument.
                0: none; 1-4: use specified filter; 5: adaptive.
 
+          -fix (fix otherwise fatal conditions such as bad CRCs)
+
         -force (Write a new output file even if larger than input)
 
                Otherwise the input file will be copied to output
                if it is smaller than any generated file and no chunk
                additions, removals, or changes were requested.
 
-            -g gamma (float, e.g., 0.45455)
+            -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)
 
                Value to insert in gAMA chunk, only if the input
                file has no gAMA chunk.  To replace an existing
@@ -151,7 +158,7 @@ options:
                1, 4, and 7 use no filtering; methods 11 and up use 
                specified filter, compression level, and strategy.
 
-          -max maximum_IDAT_size [1 through 8192]
+          -max maximum_IDAT_size [1 through 524288]
 
             -n (no save; does not do compression or write output PNG)
 
@@ -181,7 +188,7 @@ options:
                all known ancillary chunks except for tRNS, and
                "-rem allb" removes all but tRNS and gAMA.
 
--replace_gamma gamma (float, e.g. 0.45455) even if gAMA is present.
+-replace_gamma gamma (float or fixed*100000) even if gAMA is present.
 
           -res dpi
 

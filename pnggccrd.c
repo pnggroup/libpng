@@ -6,10 +6,10 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.6i - May 1, 2000
+ * libpng 1.0.7rc2 - June 28, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * Copyright (c) 1998, Intel Corporation
  *
  * Based on MSVC code contributed by Nirav Chhatrapati, Intel Corp., 1998.
  * Interface to libpng contributed by Gilles Vollant, 1999.
@@ -43,8 +43,8 @@
  */
 
 /*
- * GRR NOTES
- * =========
+ * NOTES (mostly by Greg Roelofs)
+ * =====
  *
  * 19991006:
  *  - fixed sign error in post-MMX cleanup code (16- & 32-bit cases)
@@ -125,8 +125,9 @@
  * 20000319:
  *  - fixed a register-name typo in png_do_read_interlace(), default (MMX) case,
  *     pass == 4 or 5, that caused visible corruption of interlaced images
+ *
+ *  - When compiling with gcc, be sure to use  -fomit-frame-pointer
  */
-
 
 #define PNG_INTERNAL
 #include "png.h"
@@ -143,8 +144,9 @@ static const int png_pass_inc[7]   = {8, 8, 4, 4, 2, 2, 1};
 static const int png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #endif
 
-// djgpp adds its own underscores to global variables, so define them without:
-#ifdef __DJGPP__
+// djgpp and Win32 add their own underscores to global variables,
+// so define them without:
+#if (defined __DJGPP__) || defined (WIN32)
 #  define _unmask      unmask
 #  define _const4      const4
 #  define _const6      const6
@@ -209,7 +211,7 @@ static png_uint_32  _MMXLength;
 static int          _dif;
 
 
-void
+void /* PRIVATE */
 png_read_filter_row_c(png_structp png_ptr, png_row_infop row_info,
    png_bytep row, png_bytep prev_row, int filter);
 
@@ -230,7 +232,7 @@ png_read_filter_row_c(png_structp png_ptr, png_row_infop row_info,
 /* Use this routine for the x86 platform - it uses a faster MMX routine
    if the machine supports MMX. */
 
-void
+void /* PRIVATE */
 png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1,"in png_combine_row_asm\n");
@@ -1210,7 +1212,7 @@ fflush(stderr);
  * has taken place.  [GRR: what other steps come before and/or after?]
  */
 
-void
+void /* PRIVATE */
 png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
    png_uint_32 transformations)
 {
@@ -2401,7 +2403,7 @@ union uAll {
 
 
 // Optimized code for PNG Average filter decoder
-void
+void /* PRIVATE */
 png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
                             png_bytep prev_row)
 {
@@ -2901,7 +2903,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 }
 
 // Optimized code for PNG Paeth filter decoder
-void
+void /* PRIVATE */
 png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
                               png_bytep prev_row)
 {
@@ -3833,7 +3835,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 }
 
 // Optimized code for PNG Sub filter decoder
-void
+void /* PRIVATE */
 png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 {
 #ifdef GRR_GCC_MMX_CONVERTED
@@ -4183,7 +4185,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 }
 
 // Optimized code for PNG Up filter decoder
-void
+void /* PRIVATE */
 png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
                            png_bytep prev_row)
 {
@@ -4310,7 +4312,7 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
 
 // Optimized png_read_filter_row routines
 
-void
+void /* PRIVATE */
 png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    row, png_bytep prev_row, int filter)
 {
@@ -4500,7 +4502,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       default:
-         png_error(png_ptr, "#103 Bad adaptive filter type");
+         png_warning(png_ptr, "Ignoring bad adaptive filter type");
+         *row=0;
          break;
    }
 }

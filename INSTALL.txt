@@ -1,6 +1,6 @@
 
-There's a sample Makefile.gcc for pngcrush, which you can use
-by typing
+There are sample Makefile.gcc and Makefile.msc for pngcrush, which you can use
+by typing, for example
 
     make -f Makefile.gcc
 

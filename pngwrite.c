@@ -1,11 +1,11 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.6i - May 1, 2000
+ * libpng 1.0.7rc2 - June 28, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
- * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
 /* get internal access to png.h */
@@ -21,7 +21,7 @@
  * write a plain PNG file.  If you have long comments, I suggest writing
  * them in png_write_end(), and compressing them.
  */
-void
+void PNGAPI
 png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_write_info_before_PLTE\n");
@@ -57,7 +57,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_WRITE_iCCP_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_iCCP)
-      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_TEXT_COMPRESSION_NONE,
+      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_TEXT_COMPRESSION_zTXt,
                      info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
 #endif
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
@@ -110,7 +110,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
    }
 }
 
-void
+void PNGAPI
 png_write_info(png_structp png_ptr, png_infop info_ptr)
 {
 #if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
@@ -277,7 +277,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
  * in png_write_info(), do not write them again here.  If you have long
  * comments, I suggest writing them here, and compressing them.
  */
-void
+void PNGAPI
 png_write_end(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_write_end\n");
@@ -378,7 +378,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 }
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
-void
+void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
 {
    png_debug(1, "in png_convert_from_struct_tm\n");
@@ -390,7 +390,7 @@ png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
    ptime->second = (png_byte)ttime->tm_sec;
 }
 
-void
+void PNGAPI
 png_convert_from_time_t(png_timep ptime, time_t ttime)
 {
    struct tm *tbuf;
@@ -402,7 +402,7 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
 #endif
 
 /* Initialize png_ptr structure, and allocate any memory needed */
-png_structp
+png_structp PNGAPI
 png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn)
 {
@@ -412,7 +412,7 @@ png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 }
 
 /* Alternate initialize png_ptr structure, and allocate any memory needed */
-png_structp
+png_structp PNGAPI
 png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
    png_malloc_ptr malloc_fn, png_free_ptr free_fn)
@@ -424,6 +424,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    jmp_buf jmpbuf;
 #endif
 #endif
+   int i;
    png_debug(1, "in png_create_write_struct\n");
 #ifdef PNG_USER_MEM_SUPPORTED
    if ((png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
@@ -456,16 +457,38 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif /* PNG_USER_MEM_SUPPORTED */
    png_set_error_fn(png_ptr, error_ptr, error_fn, warn_fn);
 
-   /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
-    * we must recompile any applications that use any older library version.
-    * For versions after libpng 1.0, we will be compatible, so we need
-    * only check the first digit.
-    */
-   if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
-       (png_libpng_ver[0] == '0' && user_png_ver[2] < '9'))
+   i=0;
+   do
    {
-      png_error(png_ptr,
-         "Incompatible libpng version in application and library");
+     if(user_png_ver[i] != png_libpng_ver[i])
+        png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
+   } while (png_libpng_ver[i++]);
+
+   if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
+   {
+     /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
+      * we must recompile any applications that use any older library version.
+      * For versions after libpng 1.0, we will be compatible, so we need
+      * only check the first digit.
+      */
+     if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
+         (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
+     {
+        png_error(png_ptr,
+           "Incompatible libpng version in application and library");
+     }
+
+     /* Libpng 1.0.6 was not binary compatible, due to insertion of the
+        info_ptr->free_me member.  Note to maintainer: this test can be
+        removed from version 2.0.0 and beyond because the previous test
+        would have already rejected it. */
+
+     if (user_png_ver[4] == '6' && user_png_ver[2] == '0' && 
+         user_png_ver[0] == '1' && user_png_ver[5] == '\0')
+     {
+        png_error(png_ptr,
+           "Application must be recompiled; version 1.0.6 was incompatible");
+     }
    }
 
    /* initialize zbuf - compression buffer */
@@ -480,20 +503,50 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       1, NULL, NULL);
 #endif
 
-   png_ptr->mode |= PNG_CREATED_WRITE_STRUCT;
-
    return ((png_structp)png_ptr);
 }
 
 /* Initialize png_ptr structure, and allocate any memory needed */
-void
+#undef png_write_init
+void PNGAPI
 png_write_init(png_structp png_ptr)
+{
+   /* We only come here via pre-1.0.7-compiled applications */
+   png_write_init_2(png_ptr, "1.0.0", 10000, 10000);
+}
+
+void PNGAPI
+png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
+   png_size_t png_struct_size, png_size_t png_info_size)
 {
 #ifdef PNG_SETJMP_SUPPORTED
    jmp_buf tmp_jmp; /* to save current jump buffer */
 #endif
+   int i = 0;
+   do
+   {
+     if (user_png_ver[i] != png_libpng_ver[i])
+     {
+#ifdef PNG_LEGACY_SUPPORTED
+       png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
+#else
+       png_ptr->error_fn=(png_error_ptr)NULL;
+       png_error(png_ptr,
+       "Application uses deprecated png_write_init() and must be recompiled.");
+#endif
+     }
+   } while (png_libpng_ver[i++]);
 
-   png_debug(1, "in png_write_init\n");
+   if (sizeof(png_struct) > png_struct_size ||
+      sizeof(png_info) > png_info_size)
+     {
+       png_ptr->error_fn=(png_error_ptr)NULL;
+       png_error(png_ptr,
+      "Application and library have different sized structs. Please recompile.");
+     }
+
+   png_debug(1, "in png_write_init_2\n");
+
 #ifdef PNG_SETJMP_SUPPORTED
    /* save jump buffer and error functions */
    png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
@@ -505,15 +558,6 @@ png_write_init(png_structp png_ptr)
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
-#endif
-
-#ifndef PNG_LEGACY_SUPPORTED
-   if(!(png_ptr->mode & PNG_CREATED_WRITE_STRUCT))
-   {
-      png_ptr->error_fn=NULL;
-      png_error(png_ptr,
-        "Write struct not properly created; use a legacy-supporting libpng.");
-   }
 #endif
 
    /* initialize zbuf - compression buffer */
@@ -533,7 +577,7 @@ png_write_init(png_structp png_ptr)
  * have called png_set_interlace_handling(), you will have to
  * "write" the image seven times.
  */
-void
+void PNGAPI
 png_write_rows(png_structp png_ptr, png_bytepp row,
    png_uint_32 num_rows)
 {
@@ -551,7 +595,7 @@ png_write_rows(png_structp png_ptr, png_bytepp row,
 /* Write the image.  You only need to call this function once, even
  * if you are writing an interlaced image.
  */
-void
+void PNGAPI
 png_write_image(png_structp png_ptr, png_bytepp image)
 {
    png_uint_32 i; /* row index */
@@ -578,7 +622,7 @@ png_write_image(png_structp png_ptr, png_bytepp image)
 }
 
 /* called by user to write a row of image data */
-void
+void PNGAPI
 png_write_row(png_structp png_ptr, png_bytep row)
 {
    png_debug2(1, "in png_write_row (row %ld, pass %d)\n",
@@ -729,7 +773,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
 /* Set the automatic flush interval or 0 to turn flushing off */
-void
+void PNGAPI
 png_set_flush(png_structp png_ptr, int nrows)
 {
    png_debug(1, "in png_set_flush\n");
@@ -737,7 +781,7 @@ png_set_flush(png_structp png_ptr, int nrows)
 }
 
 /* flush the current output buffers now */
-void
+void PNGAPI
 png_write_flush(png_structp png_ptr)
 {
    int wrote_IDAT;
@@ -790,7 +834,7 @@ png_write_flush(png_structp png_ptr)
 #endif /* PNG_WRITE_FLUSH_SUPPORTED */
 
 /* free all memory used by the write */
-void
+void PNGAPI
 png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 {
    png_structp png_ptr = NULL;
@@ -845,7 +889,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 
 
 /* Free any memory used in png_ptr struct (old method) */
-void
+void PNGAPI
 png_write_destroy(png_structp png_ptr)
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -910,7 +954,7 @@ png_write_destroy(png_structp png_ptr)
 }
 
 /* Allow the application to select one or more row filters to use. */
-void
+void PNGAPI
 png_set_filter(png_structp png_ptr, int method, int filters)
 {
    png_debug(1, "in png_set_filter\n");
@@ -1010,7 +1054,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
  * better compression.
  */
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)      /* GRR 970116 */
-void
+void PNGAPI
 png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
    int num_weights, png_doublep filter_weights,
    png_doublep filter_costs)
@@ -1127,7 +1171,7 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 }
 #endif /* PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
 
-void
+void PNGAPI
 png_set_compression_level(png_structp png_ptr, int level)
 {
    png_debug(1, "in png_set_compression_level\n");
@@ -1135,7 +1179,7 @@ png_set_compression_level(png_structp png_ptr, int level)
    png_ptr->zlib_level = level;
 }
 
-void
+void PNGAPI
 png_set_compression_mem_level(png_structp png_ptr, int mem_level)
 {
    png_debug(1, "in png_set_compression_mem_level\n");
@@ -1143,7 +1187,7 @@ png_set_compression_mem_level(png_structp png_ptr, int mem_level)
    png_ptr->zlib_mem_level = mem_level;
 }
 
-void
+void PNGAPI
 png_set_compression_strategy(png_structp png_ptr, int strategy)
 {
    png_debug(1, "in png_set_compression_strategy\n");
@@ -1151,7 +1195,7 @@ png_set_compression_strategy(png_structp png_ptr, int strategy)
    png_ptr->zlib_strategy = strategy;
 }
 
-void
+void PNGAPI
 png_set_compression_window_bits(png_structp png_ptr, int window_bits)
 {
    if (window_bits > 15)
@@ -1170,7 +1214,7 @@ png_set_compression_window_bits(png_structp png_ptr, int window_bits)
    png_ptr->zlib_window_bits = window_bits;
 }
 
-void
+void PNGAPI
 png_set_compression_method(png_structp png_ptr, int method)
 {
    png_debug(1, "in png_set_compression_method\n");
@@ -1180,14 +1224,14 @@ png_set_compression_method(png_structp png_ptr, int method)
    png_ptr->zlib_method = method;
 }
 
-void
+void PNGAPI
 png_set_write_status_fn(png_structp png_ptr, png_write_status_ptr write_row_fn)
 {
    png_ptr->write_row_fn = write_row_fn;
 }
 
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-void
+void PNGAPI
 png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    write_user_transform_fn)
 {
@@ -1199,9 +1243,9 @@ png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
 
 
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
-void png_write_png(png_structp png_ptr, png_infop info_ptr,
-                           int transforms,
-                           voidp params)
+void PNGAPI
+png_write_png(png_structp png_ptr, png_infop info_ptr,
+              int transforms, voidp params)
 {
 #if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
    /* invert the alpha channel from opacity to transparency */

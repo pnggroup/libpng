@@ -1,4 +1,5 @@
 /* pngcrush.c - a simple program to recompress png files
+ * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * This program reads in a PNG image, and writes it out again, with the
  * optimum filter_type and zlib_level.  It uses brute force (trying
@@ -15,7 +16,11 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.4.4"
+#define PNGCRUSH_VERSION "1.4.5"
+
+/*
+#define PNGCRUSH_COUNT_COLORS
+*/
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -25,12 +30,18 @@
  *
  * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
- * The pngcrush program is supplied "AS IS".  The Author disclaims all
+ * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
  * warranties of merchantability and of fitness for any purpose.  The
  * Author assumes no liability for direct, indirect, incidental, special,
  * exemplary, or consequential damages, which may result from the use of
- * the pngcrush program, even if advised of the possibility of such damage.
+ * the computer program, even if advised of the possibility of such damage.
+ * There is no warranty against interference with your enjoyment of the
+ * computer program or against infringement.  There is no warranty that my
+ * efforts or the computer program will fulfill any of your particular purposes
+ * or needs.  This computer program is provided with all faults, and the entire
+ * risk of satisfactory quality, performance, accuracy, and effort is with
+ * the user.
  *
  * Permission is hereby granted to anyone to use, copy, modify, and distribute
  * this source code, or portions hereof, for any purpose, without fee, subject
@@ -47,9 +58,33 @@
 
 /* Change log:
  *
+ * Version 1.4.5 (built with libpng-1.0.7rc2 and cexcept-1.0.0)
+ *
+ *   Added color-counting and palette-building capability (enable by
+ *   defining PNGCRUSH_COUNT_COLORS).  In a future version, this will
+ *   give pngcrush the ability to reduce RGBA images to indexed-color
+ *   or grayscale when fewer than 257 RGBA combinations are present,
+ *   and no color is present that requires 16-bit precision.  For now,
+ *   it only reports the frequencies.
+ *   
+ *   Added "-fix" option, for fixing bad CRC's and other correctable
+ *   conditions.
+ *
+ *   Write sBIT.alpha=1 when adding an opaque alpha channel and sBIT
+ *   is present.
+ *
+ *   Identify the erroneous 2615-byte sRGB monitor profile being written
+ *   by Photoshop 5.5, which causes many apps to crash, and replace it with
+ *   an sRGB chunk.
+ *
+ *   Added a check for input and output on different devices before rejecting
+ *   the output file as being the same as the input file based on inode.
+ *
+ *   Added some UCITA language to the disclaimer.
+ *
  * Version 1.4.4 (built with libpng-1.0.6i and cexcept-0.6.3)
  *
- *   Can be built on RISCOS platforms.
+ *   Can be built on RISC OS platforms.
  *
  * Version 1.4.3 (built with libpng-1.0.6h and cexcept-0.6.3)
  *
@@ -210,7 +245,31 @@
  * Version 1.4.*: Remove text-handling and color-handling features and put
  *   those in a separate program or programs, to avoid unnecessary
  *   recompressing.
+ *
+ *   add "-time" directive
  */
+
+#define PNG_INTERNAL
+#include "png.h"
+
+#ifndef PNGCRUSH_LIBPNG_VER
+#  define PNGCRUSH_LIBPNG_VER PNG_LIBPNG_VER
+#endif
+
+#if PNGCRUSH_LIBPNG_VER != PNG_LIBPNG_VER
+main()
+{
+  printf("Sorry, but version numbers in pngcrush.h and png.h must match\n");
+}
+
+#else
+#if PNG_LIBPNG_VER < 96
+main()
+{
+  printf("Sorry, but pngcrush needs libpng version 0.96 or later\n");
+}
+
+#else
 
 #if defined(__DJGPP__)
 #  if ((__DJGPP__ == 2) && (__DJGPP_MINOR__ == 0))
@@ -227,7 +286,8 @@
 #  define DOT "."
 # endif
 #endif
-#if !defined(__TURBOC__) && !defined(_MSC_VER) && !defined(_MBCS) && !defined(__riscos)
+#if !defined(__TURBOC__) && !defined(_MSC_VER) && !defined(_MBCS) && \
+    !defined(__riscos)
 #  include <unistd.h>
 #endif
 #ifndef __riscos
@@ -253,8 +313,6 @@
 /* we don't need the extra libpng transformations
  * so they are ifdef'ed out in a special version of pngconf.h */
 
-#define PNG_INTERNAL
-#include "png.h"
 
 #if (PNG_LIBPNG_VER > 95)
 
@@ -305,6 +363,7 @@
 #endif
 #if defined(PNG_READ_tRNS_SUPPORTED) || defined(PNG_WRITE_tRNS_SUPPORTED)
 #define PNG_tRNS_SUPPORTED
+#endif
 #endif
 #endif
 
@@ -383,6 +442,7 @@ static int trial;
 static int first_trial=0;
 static int verbose=1;
 static int help=0;
+static int fix=0;
 static int things_have_changed=0;
 static int default_compression_window=15;
 static int force_compression_window=0;
@@ -397,6 +457,7 @@ static int brute_force_strategies[3]={1,1,1};
 static int method=10;
 static int pauses=0;
 static int nosave=0;
+static int nointerlace=0;
 static png_bytep row_buf;
 static int z_strategy;
 static int best_of_three;
@@ -441,6 +502,9 @@ static png_infop end_info_ptr;
 static png_infop write_end_info_ptr;
 static FILE *fpin, *fpout;
 png_uint_32 measure_idats(FILE *fpin);
+#ifdef PNGCRUSH_COUNT_COLORS
+int count_colors(FILE *fpin);
+#endif
 png_uint_32 png_measure_idat(png_structp png_ptr);
 # define MAX_METHODS   200
 # define MAX_METHODSP1 201
@@ -458,20 +522,16 @@ int ia;
  * Making direct access to the png_ptr or info_ptr is frowned upon because
  * it incurs a risk of binary incompatibility with otherwise compatible
  * versions of libpng, so all such accesses are collected here.  These
- * functions could be candidates for inclusion in some future version of
- * libpng.
+ * functions all exist in later versions of libpng.
  */
 
 #if (PNG_LIBPNG_VER < 95)
 png_uint_32
 png_get_rowbytes(png_structp png_ptr, png_infop info_ptr)
 {
-   if (png_ptr != NULL && info_ptr != NULL)
-      return(info_ptr->rowbytes);
-   else
-      return(0);
+   return ((png_ptr && info_ptr) ? info_ptr->rowbytes : 0);
 }
-#endif
+#endif  /* (PNG_LIBPNG_VER < 95) */
 
 #if (PNG_LIBPNG_VER < 10007)
 /* This is binary incompatible with versions earlier than 0.99h because of the
@@ -508,12 +568,11 @@ static void
 png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
    int chunk, int location)
 {
-   if(png_ptr != NULL && info_ptr != NULL && chunk >= 0 && chunk < 
-         info_ptr->unknown_chunks_num)
+   if(png_ptr && info_ptr && chunk >= 0 && chunk < info_ptr->unknown_chunks_num)
       info_ptr->unknown_chunks[chunk].location = (png_byte)location;
 }
 #endif
-#endif
+#endif /* (PNG_LIBPNG_VER < 10007) */
 
 /************* end of direct access functions *****************************/
 
@@ -590,7 +649,7 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size) {
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
       if(verbose > 2)
-         fprintf(STDERR, "Pointer %x allocated\n", pinfo->pointer);
+         fprintf(STDERR, "Pointer %x allocated\n", (int)pinfo->pointer);
       return (png_voidp)(pinfo->pointer);
    }
 }
@@ -623,11 +682,11 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
             memset(ptr, 0x55, pinfo->size);
             png_free_default(png_ptr, pinfo);
             if(verbose > 2)
-               fprintf(STDERR, "Pointer %x freed\n", ptr);
+               fprintf(STDERR, "Pointer %x freed\n", (int)ptr);
             break;
          }
          if (pinfo->next == NULL) {
-            fprintf(STDERR, "Pointer %x not found\n", ptr);
+            fprintf(STDERR, "Pointer %x not found\n", (int)ptr);
             break;
          }
          ppinfo = &pinfo->next;
@@ -794,12 +853,13 @@ show_result(void)
    fprintf(STDERR," other %.3f seconds)\n\n",
       t_misc/(float)CLOCKS_PER_SEC);
 #ifdef PNG_USER_MEM_SUPPORTED
-   if (current_allocation != 0) {
+   if (current_allocation) {
       memory_infop pinfo = pinformation;
       fprintf(STDERR, "MEMORY ERROR: %d bytes still allocated\n",
          current_allocation);
       while (pinfo != NULL) {
-         fprintf(STDERR, " %8d bytes at %x\n", pinfo->size, pinfo->pointer);
+         fprintf(STDERR, " %8lu bytes at %x\n", pinfo->size,
+            (int)pinfo->pointer);
          free(pinfo->pointer);
          pinfo = pinfo->next;
          }
@@ -970,9 +1030,9 @@ main(int argc, char *argv[])
          extension= argv[names++];
       }
    else if(!strncmp(argv[i],"-force",6))
-      {
          things_have_changed=1;
-      }
+   else if(!strncmp(argv[i],"-fix",4))
+      fix++;
    else if(!strncmp(argv[i],"-f",2))
       {
          int specified_filter=atoi(argv[++i]);
@@ -1066,7 +1126,7 @@ main(int argc, char *argv[])
                         {
                            nzeroes=5;
                         }
-                     else if (nzeroes != 0)
+                     else if (nzeroes)
                         {
                            *n++=*(argv[i]+c);
                            nzeroes--;
@@ -1103,6 +1163,10 @@ main(int argc, char *argv[])
          brute_force=0;
          try_method[method]=0;
       }
+#if 0
+   else if(!strncmp(argv[i],"-ni",3))
+      nointerlace++;
+#endif
    else if(!strncmp(argv[i],"-nosave",2))
       {
       /* no save; I just use this for testing decode speed */
@@ -1145,7 +1209,7 @@ main(int argc, char *argv[])
                      {
                         nzeroes=5;
                      }
-                  else if (nzeroes != 0)
+                  else if (nzeroes)
                      {
                         *n++=*(argv[i]+c);
                         nzeroes--;
@@ -1178,7 +1242,6 @@ main(int argc, char *argv[])
       }
    else if( !strncmp(argv[i],"-save",5))
          all_chunks_are_safe++;
-#ifdef PNG_sRGB_SUPPORTED
    else if( !strncmp(argv[i],"-srgb",5) ||
             !strncmp(argv[i],"-sRGB",5))
       {
@@ -1202,7 +1265,6 @@ main(int argc, char *argv[])
          else
            i--;
       }
-#endif
    else if(!strncmp(argv[i],"-s",2))
          verbose=0;
    else if( !strncmp(argv[i],"-text",5) || !strncmp(argv[i],"-tEXt",5) ||
@@ -1512,6 +1574,10 @@ main(int argc, char *argv[])
        "               0: none; 1-4: use specified filter; 5: adaptive.\n\n");
      }
      fprintf(STDERR,
+       "          -fix (fix otherwise fatal conditions such as bad CRCs)\n");
+     if(verbose > 1)
+        fprintf(STDERR, "\n");
+     fprintf(STDERR,
        "        -force (Write a new output file even if larger than input)\n");
      if(verbose > 1)
      {
@@ -1582,7 +1648,12 @@ main(int argc, char *argv[])
        "          -max maximum_IDAT_size [1 through %d]\n",PNG_ZBUF_SIZE);
      if(verbose > 1)
         fprintf(STDERR,"\n");
-
+#if 0
+     fprintf(STDERR,
+       "           -ni (no interlace)\n");
+     if(verbose > 1)
+        fprintf(STDERR,"\n");
+#endif
      fprintf(STDERR,
        "            -n (no save; does not do compression or write output PNG)\n");
      if(verbose > 1)
@@ -1653,7 +1724,7 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "\n               Write a pHYs chunk with the given resolution.\n\n");
      }
-#if 0
+#if 0  /* TO DO */
      fprintf(STDERR,
        "         -save (keep all copy-unsafe chunks)\n");
      if(verbose > 1)
@@ -1766,7 +1837,7 @@ main(int argc, char *argv[])
          exit(1);
    }
 
-   for (ia=0; ia<255; ia++)
+   for (ia=0; ia<256; ia++)
       trns_array[ia]=255;
 
   for(;;)  /* loop on input files */
@@ -1824,13 +1895,13 @@ main(int argc, char *argv[])
           if(fileexists(directory_name) & 2)
 #else
           struct stat stat_buf;
-          if(stat(directory_name, &stat_buf) != 0)
+          if(stat(directory_name, &stat_buf))
 #endif
           {
 #if defined(_MBCS) || defined(WIN32) || defined(__WIN32__)
-             if(_mkdir(directory_name) != 0)
+             if(_mkdir(directory_name))
 #else
-             if(mkdir(directory_name, 0x1ed) != 0)
+             if(mkdir(directory_name, 0x1ed))
 #endif
              {
                 fprintf(STDERR,"could not create directory %s\n",directory_name);
@@ -1890,10 +1961,42 @@ main(int argc, char *argv[])
       else
          idat_length[0]=1;
 
-      if (input_color_type == 4 || input_color_type == 6)
-      /* check for unused alpha channel */
+#ifdef PNGCRUSH_COUNT_COLORS
+      if (input_color_type == 2 || input_color_type == 4 || input_color_type == 6)
+      /* check for unused alpha channel or single transparent color */
       {
+         int alpha_status;
+         png_debug1(0, "Opening file %s for alpha check\n",inname);
+
+         if ((fpin = FOPEN(inname, "rb")) == NULL)
+         {
+            fprintf(STDERR, "Could not find file: %s\n", inname);
+            continue;
+         }
+         number_of_open_files++;
+
+         alpha_status=count_colors(fpin);
+
+         FCLOSE(fpin);
+
+         if(alpha_status)
+            /* TO DO */;
       }
+
+#if 0  /* TO DO */
+      if (input_color_type == 2)
+      /* check for 256 or fewer colors */
+      {
+        /* TO DO */
+      }
+
+      if (input_color_type == 3)
+      /* check for unused palette entries */
+      {
+        /* TO DO */
+      }
+#endif
+#endif /* PNGCRUSH_COUNT_COLORS */
 
       if(!methods_specified || try_method[0] == 0)
       {
@@ -1947,13 +2050,17 @@ main(int argc, char *argv[])
             number_of_open_files++;
             P2("copying input to output...");
 
-#ifndef __riscos
-            stat(inname, &stat_in);
-            stat(outname, &stat_out);
-            if((stat_in.st_ino != stat_out.st_ino) || 
-               (stat_in.st_size != stat_out.st_size))
-#else
+#ifdef __riscos
             /* (brokenly) assume that they're different */
+#else
+            if ((stat(inname, &stat_in) == 0) ||
+                (stat(outname, &stat_out) != 0) ||
+#ifdef _MSC_VER /* maybe others? */
+                (stat_in.st_size != stat_out.st_size) ||
+#else
+                (stat_in.st_ino != stat_out.st_ino) || 
+#endif
+                (stat_in.st_dev != stat_out.st_dev))
 #endif
             {
                for(;;)
@@ -2027,16 +2134,20 @@ main(int argc, char *argv[])
             update or output
           */
          struct stat stat_in, stat_out;
-         stat(inname, &stat_in);
-         stat(outname, &stat_out);
-         if(stat_in.st_ino == stat_out.st_ino)
-            if((stat_in.st_ino == stat_out.st_ino) && 
-               (stat_in.st_size == stat_out.st_size))
-         {
-            /* MSVC++6.0 will erroneously return 0 for both files, so
-               it is possible that we will erroneously reject the attempt
-               when inputsize and outputsize are equal, for different files
+         if ((stat(inname, &stat_in) == 0) &&
+             (stat(outname, &stat_out) == 0) &&
+#ifdef _MSC_VER /* maybe others? */
+            /* MSVC++6.0 will erroneously return 0 for both files, so we
+               simply check the size instead.  It is possible that we will
+               erroneously reject the attempt when inputsize and outputsize
+               are equal, for different files
              */
+             (stat_in.st_size == stat_out.st_size) &&
+#else
+             (stat_in.st_ino == stat_out.st_ino) && 
+#endif
+             (stat_in.st_dev == stat_out.st_dev))
+         {
             fprintf(STDERR, "\n   Cannot overwrite input file %s\n", inname);
             P1("   st_ino=%d, st_size=%d\n\n", (int)stat_in.st_ino,
                (int)stat_in.st_size);
@@ -2068,6 +2179,8 @@ main(int argc, char *argv[])
    read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
 #endif
+   if (read_ptr == NULL)
+      Throw "pngcrush could not create read_ptr";
 
    if(nosave == 0)
    {
@@ -2079,15 +2192,25 @@ main(int argc, char *argv[])
    write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
 #endif
+   if (write_ptr == NULL)
+      Throw "pngcrush could not create write_ptr";
 
    }
       png_debug(0, "Allocating read_info, write_info and end_info structures\n");
       read_info_ptr = png_create_info_struct(read_ptr);
+      if (read_info_ptr == NULL)
+         Throw "pngcrush could not create read_info_ptr";
       end_info_ptr = png_create_info_struct(read_ptr);
+      if (end_info_ptr == NULL)
+         Throw "pngcrush could not create end_info_ptr";
    if(nosave == 0)
    {
       write_info_ptr = png_create_info_struct(write_ptr);
+      if (write_info_ptr == NULL)
+         Throw "pngcrush could not create write_info_ptr";
       write_end_info_ptr = png_create_info_struct(write_ptr);
+      if (write_end_info_ptr == NULL)
+         Throw "pngcrush could not create write_end_info_ptr";
    }
 
       P2("structures created.\n");
@@ -2144,7 +2267,7 @@ main(int argc, char *argv[])
 #if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
       if(nosave == 0)
         {
-        if(all_chunks_are_safe != 0)
+        if(all_chunks_are_safe)
            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
             (png_bytep)NULL, 0);
         else
@@ -2271,8 +2394,11 @@ main(int argc, char *argv[])
          {
             int compression_window;
             int need_expand = 0;
+            int output_interlace_type=interlace_type;
             input_color_type=color_type;
             input_bit_depth=bit_depth;
+            if(nointerlace)
+               output_interlace_type=0;
             if(verbose > 1 && first_trial)
             {
                fprintf(STDERR, "   IHDR chunk data:\n");
@@ -2343,7 +2469,7 @@ main(int argc, char *argv[])
                 need_expand = 1;
             }
 
-            if(output_color_type != 0 && output_color_type != 3 &&
+            if(output_color_type && output_color_type != 3 &&
                output_bit_depth < 8) output_bit_depth = 8;
 
             if((output_color_type == 2 || output_color_type == 6) &&
@@ -2384,7 +2510,7 @@ main(int argc, char *argv[])
                else if(required_window <=  2048)compression_window = 11;
                else if(required_window <=  4096)compression_window = 12;
                else if(required_window <=  8192)compression_window = 13;
-               else if(required_window <= 16386)compression_window = 14;
+               else if(required_window <= 16384)compression_window = 14;
                else compression_window = 15;
                if(compression_window > default_compression_window ||
                    force_compression_window)
@@ -2402,7 +2528,7 @@ main(int argc, char *argv[])
                 fprintf(STDERR, "   Setting IHDR\n");
 
             png_set_IHDR(write_ptr, write_info_ptr, width, height,
-              output_bit_depth, output_color_type, interlace_type,
+              output_bit_depth, output_color_type, output_interlace_type,
               compression_type, filter_type);
 
             if(output_color_type != input_color_type) things_have_changed++;
@@ -2544,7 +2670,10 @@ main(int argc, char *argv[])
          if (png_get_sRGB(read_ptr, read_info_ptr, &file_intent))
          {
             if(keep_chunk("sRGB",argv))
-            png_set_sRGB(write_ptr, write_info_ptr, file_intent);
+            {
+              png_set_sRGB(write_ptr, write_info_ptr, file_intent);
+              intent=file_intent;
+            }
          }
          else if(intent >= 0)
          {
@@ -2583,6 +2712,7 @@ main(int argc, char *argv[])
       }
 #endif
 #if defined(PNG_READ_iCCP_SUPPORTED) && defined(PNG_WRITE_iCCP_SUPPORTED)
+   if(intent < 0)  /* ignore iCCP if sRGB is being written */
    {
       png_charp name;
       png_charp profile;
@@ -2668,7 +2798,7 @@ main(int argc, char *argv[])
      {
         if (plte_len > 0)
            num_palette=plte_len;
-        if (do_pplt != 0)
+        if (do_pplt)
         {
            printf("PPLT: %s\n",pplt_string);
         }
@@ -2819,6 +2949,10 @@ main(int argc, char *argv[])
                   (output_color_type == 0 || output_color_type == 4))
                     sig_bit->gray = sig_bit->green;
 
+               if((input_color_type == 0 || input_color_type == 2) &&
+                  (output_color_type == 4 || output_color_type == 6))
+                    sig_bit->alpha=1;
+
                png_set_sBIT(write_ptr, write_info_ptr, sig_bit);
             }
          }
@@ -2872,7 +3006,7 @@ main(int argc, char *argv[])
          int num_text=0;
 
          if (png_get_text(read_ptr, read_info_ptr, &text_ptr, &num_text) > 0 ||
-             text_inputs != 0)
+             text_inputs)
          {
             int ntext;
             png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
@@ -2882,10 +3016,10 @@ main(int argc, char *argv[])
                for (ntext = 0; ntext < num_text; ntext++)
                {
                   fprintf(STDERR,"%d  %s",ntext,text_ptr[ntext].key);
-                  if(text_ptr[ntext].text_length != 0)
+                  if(text_ptr[ntext].text_length)
                      fprintf(STDERR,": %s\n",text_ptr[ntext].text);
 #ifdef PNG_iTXt_SUPPORTED
-                  else if (text_ptr[ntext].itxt_length != 0)
+                  else if (text_ptr[ntext].itxt_length)
                   {
                      fprintf(STDERR," (%s: %s): \n",
                           text_ptr[ntext].lang,
@@ -3033,10 +3167,6 @@ main(int argc, char *argv[])
       if(output_bit_depth < input_bit_depth)
       {
           png_color_8 true_bits;
-#if 0
-          /* why did we need this? */
-          write_ptr->bit_depth=(png_byte)output_bit_depth;
-#endif
           true_bits.gray = (png_byte)(8 - (input_bit_depth - output_bit_depth));
           png_set_shift(read_ptr, &true_bits);
           png_set_packing(write_ptr);
@@ -3137,7 +3267,7 @@ main(int argc, char *argv[])
       }
 #endif
 
-#ifdef PNG_FREE_UNKN 
+#ifdef PNG_FREE_UNKN
 #  if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_free_data(read_ptr, read_info_ptr, PNG_FREE_UNKN, -1);
 #  endif
@@ -3164,7 +3294,7 @@ main(int argc, char *argv[])
          int num_text=0;
 
          if (png_get_text(read_ptr, end_info_ptr, &text_ptr, &num_text) > 0 ||
-             text_inputs != 0)
+             text_inputs)
          {
             int ntext;
             png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
@@ -3174,10 +3304,10 @@ main(int argc, char *argv[])
                for (ntext = 0; ntext < num_text; ntext++)
                {
                   fprintf(STDERR,"%d  %s",ntext,text_ptr[ntext].key);
-                  if(text_ptr[ntext].text_length != 0)
+                  if(text_ptr[ntext].text_length)
                      fprintf(STDERR,": %s\n",text_ptr[ntext].text);
 #ifdef PNG_iTXt_SUPPORTED
-                  else if (text_ptr[ntext].itxt_length != 0)
+                  else if (text_ptr[ntext].itxt_length)
                   {
                      fprintf(STDERR," (%s: %s): \n",
                           text_ptr[ntext].lang,
@@ -3318,10 +3448,10 @@ main(int argc, char *argv[])
           fprintf(stderr, "  pngcrush caught libpng error:\n   %s\n\n",msg);
           if(row_buf != NULL)png_free(read_ptr, row_buf);
           row_buf = (png_bytep)NULL;
-          png_destroy_info_struct(write_ptr, &write_end_info_ptr);
-          png_destroy_write_struct(&write_ptr, &write_info_ptr);
           if(nosave == 0)
           {
+             png_destroy_info_struct(write_ptr, &write_end_info_ptr);
+             png_destroy_write_struct(&write_ptr, &write_info_ptr);
              FCLOSE(fpout);
              setfiletype(outname);
           }
@@ -3341,7 +3471,7 @@ main(int argc, char *argv[])
          setfiletype(outname);
       }
 
-      if(nosave != 0)
+      if(nosave)
          break;
 
       if (nosave == 0)
@@ -3433,11 +3563,8 @@ main(int argc, char *argv[])
 png_uint_32
 measure_idats(FILE *fpin)
 {
-#if (PNG_LIBPNG_VER > 96)
-   png_const_charp msg;
-#else
-   const char *msg;
-#endif
+   /* Copyright (C) 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+      See notice in pngcrush.c for conditions of use and distribution */
    P2("measure_idats:\n");
    png_debug(0, "Allocating read structure\n");
    Try
@@ -3474,6 +3601,8 @@ measure_idats(FILE *fpin)
 png_uint_32
 png_measure_idat(png_structp png_ptr)
 {
+   /* Copyright (C) 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+      See notice in pngcrush.c for conditions of use and distribution */
    png_uint_32 sum_idat_length=0;
    png_debug(1, "in png_read_info\n");
 
@@ -3492,6 +3621,11 @@ png_measure_idat(png_structp png_ptr)
       }
    }
 
+#ifdef PNG_CRC_WARN_USE
+   if(fix)
+      png_set_crc_action(png_ptr, PNG_CRC_WARN_USE, PNG_CRC_WARN_USE);
+#endif
+
    for(;;)
    {
 #ifndef PNG_UINT_IDAT
@@ -3499,11 +3633,12 @@ png_measure_idat(png_structp png_ptr)
       PNG_IDAT;
       PNG_IEND;
       PNG_IHDR;
+      PNG_iCCP;
 #endif
 #endif
       png_byte chunk_name[5];
       png_byte chunk_length[4];
-      png_byte buffer[16];
+      png_byte buffer[32];
       png_uint_32 length;
 
       png_read_data(png_ptr, chunk_length, 4);
@@ -3537,8 +3672,35 @@ png_measure_idat(png_structp png_ptr)
          input_color_type=buffer[9];
       }
 
-      png_crc_finish(png_ptr, length);
+      /* check for bad photoshop iccp chunk */
+#ifdef PNG_UINT_IDAT
+      if (png_get_uint_32(chunk_name) == PNG_UINT_iCCP)
+#else
+      if (!png_memcmp(chunk_name, png_iCCP, 4))
+#endif
+      {
+         if (length == 2615)
+         {
+             png_crc_read(png_ptr, buffer, 22);
+             length-=22;
+             buffer[23]=0;
+             if(!strncmp((png_const_charp)buffer, "Photoshop ICC profile",21))
+             {
+                printf(
+                "   Replacing bad Photoshop ICCP chunk with an sRGB chunk\n");
+#ifdef PNG_gAMA_SUPPORTED
+#ifdef PNG_FIXED_POINT_SUPPORTED
+                specified_gamma=45455L;
+#else
+                specified_gamma=0.45455;
+#endif
+#endif
+                intent=0;
+             }
+         }
+      }
 
+      png_crc_finish(png_ptr, length);
 
 #ifdef PNG_UINT_IEND
       if (png_get_uint_32(chunk_name) == PNG_UINT_IEND)
@@ -3548,9 +3710,420 @@ png_measure_idat(png_structp png_ptr)
          return sum_idat_length;
    }
 }
-#else /* !PNG_LIBPNG_VER > 95 */
-main()
+
+#ifdef PNGCRUSH_COUNT_COLORS
+#define USE_HASHCODE
+static int result, num_rgba;
+static int it_is_gray, it_is_opaque;
+static int hashmiss, hashinserts;
+int
+count_colors(FILE *fpin)
 {
-  printf("Sorry, but pngcrush needs libpng version 0.96 or later\n");
-}
+   /* Copyright (C) 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+      See notice in pngcrush.c for conditions of use and distribution */
+   int bit_depth, color_type, interlace_type, filter_type, compression_type;
+   png_uint_32 width, height, rowbytes, channels;
+
+   int i;
+   int pass, num_pass;
+
+   int total;
+   png_uint_32 rgba_frequency[257];
+   png_uint_32 rgba_hi[257]; /* Actually contains ARGB not RGBA */
+#if 0
+   png_uint_32 rgba_lo[257]; /* Low bytes of ARGB in 16-bit PNGs */
 #endif
+
+   /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
+
+   /* start of interlace block */
+   int png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
+
+   /* offset to next interlace block */
+   int png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
+
+   /* start of interlace block in the y direction */
+   int png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
+
+   /* offset to next interlace block in the y direction */
+   int png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
+
+   result=0;
+   it_is_gray=1;
+   it_is_opaque=1;
+   hashmiss=0;
+   hashinserts=0;
+
+   num_rgba=0;
+   for (i=0; i<257; i++)
+      rgba_frequency[i]=0;
+
+   P2("Checking alphas:\n");
+   png_debug(0, "Allocating read structure\n");
+   Try
+   {
+   read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
+      (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
+   if (read_ptr)
+   {
+   png_debug(0, "Allocating read_info structure\n");
+   read_info_ptr = png_create_info_struct(read_ptr);
+   if (read_info_ptr == NULL)
+      png_destroy_read_struct(&read_ptr, NULL, NULL);
+   }
+   else
+      read_info_ptr = NULL;
+   if(read_info_ptr)
+   {
+
+#ifdef USE_HASHCODE
+   int hash[16385];
+   for (i=0; i<16385; i++)
+      hash[i]=-1;
+#endif
+
+   end_info_ptr = NULL;
+
+#if !defined(PNG_NO_STDIO)
+   png_init_io(read_ptr, fpin);
+#else
+   png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
+#endif
+
+   png_read_info(read_ptr, read_info_ptr);
+
+#ifdef PNG_CRC_QUIET_USE
+   png_set_crc_action(read_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
+#endif
+
+   png_get_IHDR(read_ptr, read_info_ptr, &width, &height, &bit_depth,
+             &color_type, &interlace_type, &compression_type, &filter_type);
+
+   if (color_type == 2)
+      channels = 3;
+   else if (color_type == 4)
+      channels = 2;
+   else if (color_type == 6)
+      channels = 4;
+   else
+      channels=1;
+
+   if(bit_depth == 8)
+   {
+      if(interlace_type)
+         num_pass=7;
+      else
+         num_pass = 1;
+
+      rowbytes = png_get_rowbytes(read_ptr, read_info_ptr);
+
+      row_buf  = png_malloc(read_ptr, rowbytes+2);
+
+      for (pass = 0; pass < num_pass; pass++)
+      {
+            
+         png_byte *rp;
+         png_uint_32 pass_height, pass_width, y;
+         png_debug(0, "\nBegin Pass\n");
+
+         pass_height = (height - png_pass_ystart[pass]
+                       + png_pass_yinc[pass] - 1) / png_pass_yinc[pass];
+         pass_width = (width - png_pass_start[pass]
+                       + png_pass_inc[pass] - 1) / png_pass_inc[pass];
+
+         for (y = 0; y < pass_height; y++)
+         {
+            png_uint_32 x;
+            png_read_row(read_ptr, row_buf, (png_bytep)NULL);
+            if(result < 2)
+            {
+              if(color_type==2)
+              {
+                for (rp=row_buf, x = 0; x < pass_width; x++, rp+=channels)
+                {
+#ifdef USE_HASHCODE
+                   int hashcode;
+#endif
+                   png_uint_32 rgba_high = (255<<24)|(*(rp)<<16)|(*(rp+1)<<8)|
+                                           *(rp+2);
+                   rgba_hi[num_rgba]=rgba_high;         
+#ifdef USE_HASHCODE
+                   if(it_is_gray &&
+                     ((*(rp)) != (*(rp+1)) || (*(rp)) != (*(rp+2))))
+                        it_is_gray=0;
+                   /*
+                    *      R      G      B     mask
+                    *  11,111  0,0000, 0000   0x3e00
+                    *  00,000  1,1111, 0000   0x01f0
+                    *  00,000  0,0000, 1111   0x000f
+                    *  
+                    */
+
+                   hashcode=(int)(((rgba_high>>10)&0x3e00)|
+                            ((rgba_high>> 7)&0x01f0)|
+                            ((rgba_high>> 4)&0x000f));
+                   if (hash[hashcode] < 0)
+                   {
+                      hash[hashcode] = i = num_rgba;
+                      if (i > 256)
+                         result=2;
+                      else
+                         num_rgba++;
+                   }
+                   else
+                   {
+                      int start=hash[hashcode];
+                      for(i=start; i<=num_rgba; i++)
+                          if(rgba_high == rgba_hi[i])
+                             break;
+                      hashmiss += (i-start);
+                      if(i == num_rgba)
+                      {
+                         int j;
+                         if (i > 256)
+                            result=2;
+                         else
+                         {
+                            for(j=num_rgba; j>start+1; j--)
+                            {
+                               rgba_hi[j]=rgba_hi[j-1];
+                               rgba_frequency[j]=rgba_frequency[j-1];
+                            }
+                            rgba_hi[start+1]=rgba_high;
+                            rgba_frequency[start+1]=0;
+                            for(j=0; j<16384; j++)
+                               if(hash[j]>start)
+                                  hash[j]++;
+                            i=start+1;
+                            hashinserts++;
+                            num_rgba++;
+                         }
+                      }
+                   }
+#else
+                   for(i=0; i<=num_rgba; i++)
+                       if(rgba_high == rgba_hi[i])
+                          break;
+                   hashmiss += i;
+                   if (i > 256)
+                      result=2;
+                   else if(i == num_rgba)
+                      num_rgba++;
+#endif
+                   ++rgba_frequency[i];
+                }
+              }
+              else if(color_type==6)
+              {
+                for (rp=row_buf, x = 0; x < pass_width; x++, rp+=channels)
+                {
+#ifdef USE_HASHCODE
+                   int hashcode;
+#endif
+                   png_uint_32 rgba_high = (*(rp+3)<<24)|(*(rp)<<16)|
+                      (*(rp+1)<<8)|*(rp+2);
+                   rgba_hi[num_rgba]=rgba_high;         
+#ifdef USE_HASHCODE
+                   if(it_is_gray &&
+                     ((*(rp)) != (*(rp+1)) || (*(rp)) != (*(rp+2))))
+                        it_is_gray=0;
+                   if(it_is_opaque && (*(rp+3)) != 255)
+                      it_is_opaque=0;
+                   /*
+                    *  A     R     G    B    mask
+                    * 11,1 000,0 000,0 000   0x3800
+                    * 00,0 111,1 000,0 000   0x0780
+                    * 00,0 000,0 111,1 000   0x0078
+                    * 00,0 000,0 000,0 111   0x0007
+                    *  
+                    */
+
+                   hashcode=(int)(((rgba_high>>18)&0x3800)|
+                            ((rgba_high>>12)&0x0780)|
+                            ((rgba_high>> 8)&0x0078)|
+                            ((rgba_high>> 4)&0x0007));
+                   if (hash[hashcode] < 0)
+                   {
+                      hash[hashcode] = i = num_rgba;
+                      if (i > 256)
+                         result=2;
+                      else
+                         num_rgba++;
+                   }
+                   else
+                   {
+                      int start=hash[hashcode];
+                      for(i=start; i<=num_rgba; i++)
+                          if(rgba_high == rgba_hi[i])
+                             break;
+                      hashmiss += (i-start);
+                      if(i == num_rgba)
+                      {
+                         int j;
+                         if (i > 256)
+                            result=2;
+                         else
+                         {
+                            for(j=num_rgba; j>start+1; j--)
+                            {
+                               rgba_hi[j]=rgba_hi[j-1];
+                               rgba_frequency[j]=rgba_frequency[j-1];
+                            }
+                            rgba_hi[start+1]=rgba_high;
+                            rgba_frequency[start+1]=0;
+                            for(j=0; j<16384; j++)
+                               if(hash[j]>start)
+                                  hash[j]++;
+                            i=start+1;
+                            hashinserts++;
+                            num_rgba++;
+                         }
+                      }
+                   }
+#else
+                   for(i=0; i<=num_rgba; i++)
+                       if(rgba_high == rgba_hi[i])
+                          break;
+                   hashmiss += i;
+                   if (i > 256)
+                      result=2;
+                   else if(i == num_rgba)
+                      num_rgba++;
+#endif
+                   ++rgba_frequency[i];
+                }
+              }
+              else if(color_type==4)
+              {
+                for (rp=row_buf, x = 0; x < pass_width; x++, rp+=channels)
+                {
+#ifdef USE_HASHCODE
+                   int hashcode;
+#endif
+                   png_uint_32 rgba_high = (*(rp+1)<<24)|(*(rp)<<16)|
+                      (*(rp)<<8)|(*rp);
+                   rgba_hi[num_rgba]=rgba_high;         
+#ifdef USE_HASHCODE
+                   if(it_is_opaque && (*(rp+1)) != 255)
+                      it_is_opaque=0;
+                   /*
+                    *    A          G          mask
+                    * 11,1111,  0000,0000    0x3f00
+                    * 00,0000,  1111,1111    0x00ff
+                    *  
+                    */
+
+                   hashcode=(int)(((rgba_high>>18)&0x3f00)|
+                            ((rgba_high>> 4)&0x00ff));
+                   if (hash[hashcode] < 0)
+                   {
+                      hash[hashcode] = i = num_rgba;
+                      if (i > 256)
+                         result=2;
+                      else
+                         num_rgba++;
+                   }
+                   else
+                   {
+                      int start=hash[hashcode];
+                      for(i=start; i<=num_rgba; i++)
+                          if(rgba_high == rgba_hi[i])
+                             break;
+                      hashmiss += (i-start);
+                      if(i == num_rgba)
+                      {
+                         int j;
+                         if (i > 256)
+                            result=2;
+                         else
+                         {
+                            for(j=num_rgba; j>start+1; j--)
+                            {
+                               rgba_hi[j]=rgba_hi[j-1];
+                               rgba_frequency[j]=rgba_frequency[j-1];
+                            }
+                            rgba_hi[start+1]=rgba_high;
+                            rgba_frequency[start+1]=0;
+                            for(j=0; j<16384; j++)
+                               if(hash[j]>start)
+                                  hash[j]++;
+                            i=start+1;
+                            hashinserts++;
+                            num_rgba++;
+                         }
+                      }
+                   }
+#else
+                   for(i=0; i<=num_rgba; i++)
+                       if(rgba_high == rgba_hi[i])
+                          break;
+                   hashmiss += i;
+                   if (i > 256)
+                      result=2;
+                   else if(i == num_rgba)
+                      num_rgba++;
+#endif
+                   ++rgba_frequency[i];
+                }
+              }
+              else /* other color type */
+              {
+                  result=2;
+              }
+            }
+         }
+         png_debug(0, "\nEnd Pass\n");
+      }
+   }
+   else
+   {
+      /* TO DO: 16-bit support */
+      result=0;
+   }
+
+   png_free (read_ptr, row_buf);
+   png_debug(0, "Destroying data structs\n");
+   png_destroy_read_struct(&read_ptr, &read_info_ptr, NULL);
+   }
+   else
+      result=2;
+   }
+   Catch (msg)
+   {
+      fprintf(STDERR, "\nWhile checking alphas in %s ", inname);
+      fprintf(STDERR,"pngcrush caught libpng error:\n   %s\n\n",msg);
+      png_free (read_ptr, row_buf);
+      png_destroy_read_struct(&read_ptr, &read_info_ptr, NULL);
+      png_debug(0, "Destroyed data structs\n");
+      result=2;
+   }
+   if(verbose > 1)
+   {
+      total=0;
+      if(num_rgba && num_rgba < 257)
+      {
+        for(i=0; i<num_rgba; i++)
+        {
+           printf("RGBA=(%3.3d,%3.3d,%3.3d,%3.3d), frequency=%d\n",
+              (int)(rgba_hi[i]>>16) & 0xff,
+              (int)(rgba_hi[i]>>8) & 0xff,
+              (int)(rgba_hi[i]) & 0xff,
+              (int)(rgba_hi[i]>>24) & 0xff,
+              (int)rgba_frequency[i]);
+           total+=rgba_frequency[i];
+        }
+        P2 ("num_rgba=%d, total pixels=%d\n",num_rgba, total);
+        P2 ("hashcode misses=%d, inserts=%d\n",hashmiss,
+           hashinserts);
+      }
+   P2 ("Finished checking alphas, result=%d\n",result);
+   if(it_is_gray)
+     P1 ("The image is all gray.\n");
+   if(it_is_opaque)
+     P1 ("The image is opaque.\n");
+   }
+   return (result);
+}
+#endif /* PNGCRUSH_COUNT_COLORS */
+#endif /* PNG_LIBPNG_VER < 96 */
+#endif /* PNGCRUSH_LIBPNG_VER != PNG_LIBPNG_VER */

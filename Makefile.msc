@@ -14,7 +14,7 @@
 CC = cl -nologo
 LD = link -nologo
 RM = del
-CFLAGS = -DPNG_ZBUF_SIZE=0x080000 -DWIN32 -O2
+CFLAGS = -I. -DPNG_ZBUF_SIZE=0x080000 -DWIN32 -O2
 LDFLAGS =
 O = .obj
 E = .exe

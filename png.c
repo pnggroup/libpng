@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.6i - May 1, 2000
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
- * Copyright (c) 1996, 1997 Andreas Dilger
+ * libpng version 1.0.7rc2 - June 28, 2000
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
  */
 
@@ -14,14 +14,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_6i Your_png_h_is_not_version_1_0_6i;
+typedef version_1_0_7rc2 Your_png_h_is_not_version_1_0_7rc2;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.6i";
+char png_libpng_ver[12] = "1.0.7rc2";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -88,7 +88,7 @@ int FARDATA png_pass_dsp_mask[] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
  * or write any of the magic bytes before it starts on the IHDR.
  */
 
-void
+void PNGAPI
 png_set_sig_bytes(png_structp png_ptr, int num_bytes)
 {
    png_debug(1, "in png_set_sig_bytes\n");
@@ -106,7 +106,7 @@ png_set_sig_bytes(png_structp png_ptr, int num_bytes)
  * respectively, to be less than, to match, or be greater than the correct
  * PNG signature (this is the same behaviour as strcmp, memcmp, etc).
  */
-int
+int PNGAPI
 png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -128,14 +128,14 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
  * to check a partial signature.  This function might be removed in the
  * future - use png_sig_cmp().  Returns true (nonzero) if the file is a PNG.
  */
-int
+int PNGAPI
 png_check_sig(png_bytep sig, int num)
 {
   return ((int)!png_sig_cmp(sig, (png_size_t)0, (png_size_t)num));
 }
 
 /* Function to allocate memory for zlib and clear it to 0. */
-voidpf
+voidpf PNGAPI
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
    png_uint_32 num_bytes = (png_uint_32)items * size;
@@ -155,7 +155,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 }
 
 /* function to free memory for zlib */
-void
+void PNGAPI
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
    png_free((png_structp)png_ptr, (png_voidp)ptr);
@@ -164,7 +164,7 @@ png_zfree(voidpf png_ptr, voidpf ptr)
 /* Reset the CRC variable to 32 bits of 1's.  Care must be taken
  * in case CRC is > 32 bits to leave the top bits 0.
  */
-void
+void /* PRIVATE */
 png_reset_crc(png_structp png_ptr)
 {
    png_ptr->crc = crc32(0, Z_NULL, 0);
@@ -175,7 +175,7 @@ png_reset_crc(png_structp png_ptr)
  * also check that this data will actually be used before going to the
  * trouble of calculating it.
  */
-void
+void /* PRIVATE */
 png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length)
 {
    int need_crc = 1;
@@ -202,7 +202,7 @@ png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length)
  * and png_info_init() so that applications that want to use a shared
  * libpng don't have to be recompiled if png_info changes size.
  */
-png_infop
+png_infop PNGAPI
 png_create_info_struct(png_structp png_ptr)
 {
    png_infop info_ptr;
@@ -227,7 +227,7 @@ png_create_info_struct(png_structp png_ptr)
  * png_destroy_write_struct() to free an info struct, but this may be
  * useful for some applications.
  */
-void
+void PNGAPI
 png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
 {
    png_infop info_ptr = NULL;
@@ -253,7 +253,7 @@ png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
  * and applications using it are urged to use png_create_info_struct()
  * instead.
  */
-void
+void PNGAPI
 png_info_init(png_infop info_ptr)
 {
    png_debug(1, "in png_info_init\n");
@@ -262,7 +262,7 @@ png_info_init(png_infop info_ptr)
 }
 
 #ifdef PNG_FREE_ME_SUPPORTED
-void
+void PNGAPI
 png_data_freer(png_structp png_ptr, png_infop info_ptr,
    int freer, png_uint_32 mask)
 {
@@ -279,7 +279,7 @@ png_data_freer(png_structp png_ptr, png_infop info_ptr,
 }
 #endif
 
-void
+void PNGAPI
 png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask, int num)
 {
    png_debug(1, "in png_free_data\n");
@@ -289,108 +289,120 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask, int num
 #if defined(PNG_TEXT_SUPPORTED)
 /* free text item num or (if num == -1) all text items */
 #ifdef PNG_FREE_ME_SUPPORTED
-if (mask & info_ptr->free_me & PNG_FREE_TEXT)
+if ((mask & PNG_FREE_TEXT) & info_ptr->free_me)
+#else
+if (mask & PNG_FREE_TEXT)
 #endif
 {
    if (num != -1)
    {
-     if (info_ptr->text[num].key)
+     if (info_ptr->text && info_ptr->text[num].key)
      {
          png_free(png_ptr, info_ptr->text[num].key);
          info_ptr->text[num].key = NULL;
      }
    }
-   else if (info_ptr->text != NULL)
+   else
    {
-     int i;
-     for (i = 0; i < info_ptr->num_text; i++)
-         png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, i);
-     png_free(png_ptr, info_ptr->text);
-     info_ptr->text = NULL;
-     info_ptr->num_text=0;
+       int i;
+       for (i = 0; i < info_ptr->num_text; i++)
+           png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, i);
+       png_free(png_ptr, info_ptr->text);
+       info_ptr->text = NULL;
+       info_ptr->num_text=0;
    }
 }
 #endif
 
 #if defined(PNG_tRNS_SUPPORTED)
 /* free any tRNS entry */
-if (mask & PNG_FREE_TRNS)
-{
-   if (info_ptr->valid & PNG_INFO_tRNS)
-   {
 #ifdef PNG_FREE_ME_SUPPORTED
-       if (info_ptr->free_me & PNG_FREE_TRNS)
+if ((mask & PNG_FREE_TRNS) & info_ptr->free_me)
 #else
-       if (png_ptr->flags & PNG_FLAG_FREE_TRNS)
+if ((mask & PNG_FREE_TRNS) && (png_ptr->flags & PNG_FLAG_FREE_TRNS))
 #endif
-         png_free(png_ptr, info_ptr->trans);
-       info_ptr->valid &= ~PNG_INFO_tRNS;
-   }
+{
+    png_free(png_ptr, info_ptr->trans);
+    info_ptr->valid &= ~PNG_INFO_tRNS;
+    info_ptr->trans = NULL;
 }
 #endif
 
 #if defined(PNG_sCAL_SUPPORTED)
 /* free any sCAL entry */
-{
-   if (info_ptr->valid & PNG_INFO_sCAL)
-   {
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
-       png_free(png_ptr, info_ptr->scal_s_width);
-       png_free(png_ptr, info_ptr->scal_s_height);
+#ifdef PNG_FREE_ME_SUPPORTED
+if ((mask & PNG_FREE_SCAL) & info_ptr->free_me)
+#else
+if (mask & PNG_FREE_SCAL)
 #endif
-          info_ptr->valid &= ~PNG_INFO_sCAL;
-   }
+{
+#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
+    png_free(png_ptr, info_ptr->scal_s_width);
+    png_free(png_ptr, info_ptr->scal_s_height);
+    info_ptr->scal_s_width = NULL;
+    info_ptr->scal_s_height = NULL;
+#endif
+    info_ptr->valid &= ~PNG_INFO_sCAL;
 }
 #endif
 
 #if defined(PNG_pCAL_SUPPORTED)
 /* free any pCAL entry */
+#ifdef PNG_FREE_ME_SUPPORTED
+if ((mask & PNG_FREE_PCAL) & info_ptr->free_me)
+#else
+if (mask & PNG_FREE_PCAL)
+#endif
 {
-   if (info_ptr->valid & PNG_INFO_pCAL)
-   {
-       png_free(png_ptr, info_ptr->pcal_purpose);
-       png_free(png_ptr, info_ptr->pcal_units);
-       if (info_ptr->pcal_params != NULL)
-       {
-           int i;
-           for (i = 0; i < (int)info_ptr->pcal_nparams; i++)
-             {
-             png_free(png_ptr, info_ptr->pcal_params[i]);
-             }
-           png_free(png_ptr, info_ptr->pcal_params);
-       }
-       info_ptr->valid &= ~PNG_INFO_pCAL;
-   }
+    png_free(png_ptr, info_ptr->pcal_purpose);
+    png_free(png_ptr, info_ptr->pcal_units);
+    info_ptr->pcal_purpose = NULL;
+    info_ptr->pcal_units = NULL;
+    if (info_ptr->pcal_params != NULL)
+    {
+        int i;
+        for (i = 0; i < (int)info_ptr->pcal_nparams; i++)
+          png_free(png_ptr, info_ptr->pcal_params[i]);
+        png_free(png_ptr, info_ptr->pcal_params);
+        info_ptr->pcal_params = NULL;
+    }
+    info_ptr->valid &= ~PNG_INFO_pCAL;
 }
 #endif
 
 #if defined(PNG_iCCP_SUPPORTED)
 /* free any iCCP entry */
-if (mask & PNG_FREE_ICCP)
-{
-   if (info_ptr->valid & PNG_INFO_iCCP)
-   {
 #ifdef PNG_FREE_ME_SUPPORTED
-       if (info_ptr->free_me & PNG_FREE_ICCP)
+if ((mask & PNG_FREE_ICCP) & info_ptr->free_me)
+#else
+if (mask & PNG_FREE_ICCP)
 #endif
-       {
-         png_free(png_ptr, info_ptr->iccp_name);
-         png_free(png_ptr, info_ptr->iccp_profile);
-       }
-       info_ptr->valid &= ~PNG_INFO_iCCP;
-   }
+{
+    png_free(png_ptr, info_ptr->iccp_name);
+    png_free(png_ptr, info_ptr->iccp_profile);
+    info_ptr->iccp_name = NULL;
+    info_ptr->iccp_profile = NULL;
+    info_ptr->valid &= ~PNG_INFO_iCCP;
 }
 #endif
 
 #if defined(PNG_sPLT_SUPPORTED)
 /* free a given sPLT entry, or (if num == -1) all sPLT entries */
+#ifdef PNG_FREE_ME_SUPPORTED
+if ((mask & PNG_FREE_SPLT) & info_ptr->free_me)
+#else
 if (mask & PNG_FREE_SPLT)
+#endif
 {
    if (num != -1)
    {
-       png_free(png_ptr, info_ptr->splt_palettes[num].name);
-       png_free(png_ptr, info_ptr->splt_palettes[num].entries);
-       info_ptr->valid &= ~PNG_INFO_sPLT;
+      if(info_ptr->splt_palettes)
+      {
+          png_free(png_ptr, info_ptr->splt_palettes[num].name);
+          png_free(png_ptr, info_ptr->splt_palettes[num].entries);
+          info_ptr->splt_palettes[num].name = NULL;
+          info_ptr->splt_palettes[num].entries = NULL;
+      }
    }
    else
    {
@@ -401,19 +413,28 @@ if (mask & PNG_FREE_SPLT)
             png_free_data(png_ptr, info_ptr, PNG_FREE_SPLT, i);
 
          png_free(png_ptr, info_ptr->splt_palettes);
+         info_ptr->splt_palettes = NULL;
          info_ptr->splt_palettes_num = 0;
        }
+       info_ptr->valid &= ~PNG_INFO_sPLT;
    }
 }
 #endif
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_FREE_ME_SUPPORTED
+if ((mask & PNG_FREE_UNKN) & info_ptr->free_me)
+#else
 if (mask & PNG_FREE_UNKN)
+#endif
 {
    if (num != -1)
    {
-       png_free(png_ptr, info_ptr->unknown_chunks[num].data);
-       info_ptr->unknown_chunks[num].data = NULL;
+       if(info_ptr->unknown_chunks)
+       {
+          png_free(png_ptr, info_ptr->unknown_chunks[num].data);
+          info_ptr->unknown_chunks[num].data = NULL;
+       }
    }
    else
    {
@@ -425,6 +446,7 @@ if (mask & PNG_FREE_UNKN)
             png_free_data(png_ptr, info_ptr, PNG_FREE_UNKN, i);
 
          png_free(png_ptr, info_ptr->unknown_chunks);
+         info_ptr->unknown_chunks = NULL;
          info_ptr->unknown_chunks_num = 0;
        }
    }
@@ -433,56 +455,56 @@ if (mask & PNG_FREE_UNKN)
 
 #if defined(PNG_hIST_SUPPORTED)
 /* free any hIST entry */
-if (mask & PNG_FREE_HIST)
-{
-   if (info_ptr->valid & PNG_INFO_hIST)
-   {
 #ifdef PNG_FREE_ME_SUPPORTED
-       if (info_ptr->free_me & PNG_FREE_HIST)
+if ((mask & PNG_FREE_HIST)  & info_ptr->free_me)
 #else
-       if (png_ptr->flags & PNG_FLAG_FREE_HIST)
+if ((mask & PNG_FREE_HIST) && (png_ptr->flags & PNG_FLAG_FREE_HIST))
 #endif
-         png_free(png_ptr, info_ptr->hist);
-       info_ptr->valid &= ~PNG_INFO_hIST;
-   }
+{
+    png_free(png_ptr, info_ptr->hist);
+    info_ptr->hist = NULL;
+    info_ptr->valid &= ~PNG_INFO_hIST;
 }
 #endif
 
 /* free any PLTE entry that was internally allocated */
-if (mask & PNG_FREE_PLTE)
-{
-   if (info_ptr->valid & PNG_INFO_PLTE)
-   {
 #ifdef PNG_FREE_ME_SUPPORTED
-       if (info_ptr->free_me & PNG_FREE_PLTE)
+if ((mask & PNG_FREE_PLTE) & info_ptr->free_me)
 #else
-       if (png_ptr->flags & PNG_FLAG_FREE_PLTE)
+if ((mask & PNG_FREE_PLTE) && (png_ptr->flags & PNG_FLAG_FREE_PLTE))
 #endif
-          png_zfree(png_ptr, info_ptr->palette);
-       info_ptr->valid &= ~(PNG_INFO_PLTE);
-       info_ptr->num_palette = 0;
-   }
+{
+    png_zfree(png_ptr, info_ptr->palette);
+    info_ptr->palette = NULL;
+    info_ptr->valid &= ~PNG_INFO_PLTE;
+    info_ptr->num_palette = 0;
 }
 
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
 /* free any image bits attached to the info structure */
-if (mask & PNG_FREE_ROWS)
-{
 #ifdef PNG_FREE_ME_SUPPORTED
-   if (info_ptr->free_me & PNG_FREE_ROWS)
+if ((mask & PNG_FREE_ROWS) & info_ptr->free_me)
+#else
+if (mask & PNG_FREE_ROWS)
 #endif
-   {
+{
+    if(info_ptr->row_pointers)
+    {
        int row;
-
        for (row = 0; row < (int)info_ptr->height; row++)
           png_free(png_ptr, info_ptr->row_pointers[row]);
        png_free(png_ptr, info_ptr->row_pointers);
-   }
+       info_ptr->row_pointers=NULL;
+    }
+    info_ptr->valid &= ~PNG_INFO_IDAT;
 }
 #endif
+
 #ifdef PNG_FREE_ME_SUPPORTED
    if(num == -1)
      info_ptr->free_me &= ~mask;
+   else
+     info_ptr->free_me &= ~(mask & ~PNG_FREE_MUL);
 #endif
 }
 
@@ -490,7 +512,7 @@ if (mask & PNG_FREE_ROWS)
  * pointing to before re-using it or freeing the struct itself.  Recall
  * that png_free() checks for NULL pointers for us.
  */
-void
+void /* PRIVATE */
 png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_info_destroy\n");
@@ -512,7 +534,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
  * functions.  The application should free any memory associated with this
  * pointer before png_write_destroy() or png_read_destroy() are called.
  */
-png_voidp
+png_voidp PNGAPI
 png_get_io_ptr(png_structp png_ptr)
 {
    return (png_ptr->io_ptr);
@@ -525,7 +547,7 @@ png_get_io_ptr(png_structp png_ptr)
  * PNG_NO_STDIO, you must use a function of your own because "FILE *" isn't
  * necessarily available.
  */
-void
+void PNGAPI
 png_init_io(png_structp png_ptr, FILE *fp)
 {
    png_debug(1, "in png_init_io\n");
@@ -537,7 +559,7 @@ png_init_io(png_structp png_ptr, FILE *fp)
 /* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
  */
-png_charp
+png_charp PNGAPI
 png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 {
    static PNG_CONST char short_months[12][4] =
@@ -572,21 +594,21 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 
 #if 0
 /* Signature string for a PNG file. */
-png_bytep
+png_bytep PNGAPI
 png_sig_bytes(void)
 {
    return ((png_bytep)"\211\120\116\107\015\012\032\012");
 }
 #endif
 
-png_charp
+png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.6i - May 1, 2000\n\
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
+   return ("\n libpng version 1.0.7rc2 - June 28, 2000\n\
+   Copyright (c) 1998-2000 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
-   Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson\n");
+   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
    return ("");
 }
 
@@ -596,16 +618,16 @@ png_get_copyright(png_structp png_ptr)
  * in png.h.
  */
 
-png_charp
+png_charp PNGAPI
 png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.6i");
-   return("1.0.6i");
+      return("1.0.7rc2");
+   return("1.0.7rc2");
 }
 
-png_charp
+png_charp PNGAPI
 png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
@@ -614,7 +636,7 @@ png_get_header_ver(png_structp png_ptr)
    return(PNG_LIBPNG_VER_STRING);
 }
 
-png_charp
+png_charp PNGAPI
 png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
@@ -624,7 +646,7 @@ png_get_header_version(png_structp png_ptr)
 }
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-int
+int PNGAPI
 png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
 {
    /* check chunk_name and return "keep" value if it's on the list, else 0 */
@@ -641,8 +663,15 @@ png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
 #endif
 
 /* This function, added to libpng-1.0.6g, is untested. */
-int
+int PNGAPI
 png_reset_zstream(png_structp png_ptr)
 {
    return (inflateReset(&png_ptr->zstream));
+}
+
+png_uint_32 PNGAPI
+png_access_version_number(void)
+{
+   /* Version of *.c files used when building libpng */
+   return((png_uint_32) 10007L);
 }

@@ -13,7 +13,7 @@
 CC = gcc
 LD = gcc
 RM = rm -f
-CFLAGS = -O -Wall
+CFLAGS = -I. -O -Wall
 # [note that -Wall is a gcc-specific compilation flag ("all warnings on")]
 LDFLAGS =
 O = .o
@@ -27,7 +27,7 @@ OBJS  = $(PNGCRUSH)$(O) adler32$(O) crc32$(O) deflate$(O) gzio$(O) \
 	infblock$(O) infcodes$(O) inffast$(O) inflate$(O) inftrees$(O) \
 	infutil$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
 	pngpread$(O) pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) \
-	pngset$(O) pngtrans$(O) pngvcrd$(O) pngwio$(O) pngwrite$(O) \
+	pngset$(O) pngtrans$(O) pngwio$(O) pngwrite$(O) pnggccrd$(O) \
 	pngwtran$(O) pngwutil$(O) trees$(O) zutil$(O)
 
 EXES = $(PNGCRUSH)$(E)

@@ -1,5 +1,5 @@
 /* zlib.h -- interface of the 'zlib' general purpose compression library
-  version 1.1.3, July 9th, 1998
+  version 1.1.3pc, May 2000
 
   Copyright (C) 1995-1998 Jean-loup Gailly and Mark Adler
 
@@ -28,6 +28,12 @@
   (zlib format), rfc1951.txt (deflate format) and rfc1952.txt (gzip format).
 */
 
+/* Changes from version 1.1.3 to version 1.1.3pc
+ *
+ * The default value of TOO_FAR has been changed to 32767 in deflate.c
+ * Glenn Randers-Pehrson, February 2000.
+ */
+
 #ifndef _ZLIB_H
 #define _ZLIB_H
 
@@ -37,7 +43,7 @@
 extern "C" {
 #endif
 
-#define ZLIB_VERSION "1.1.3"
+#define ZLIB_VERSION "1.1.3pc"
 
 /* 
      The 'zlib' compression library provides in-memory compression and
