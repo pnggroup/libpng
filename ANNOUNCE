@@ -1,5 +1,5 @@
 
-Libpng 1.2.0beta5 - August 8, 2001
+Libpng 1.2.0rc1 - August 25, 2001
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -12,19 +12,19 @@ Changes since the last public release (1.0.12):
   Enabled user memory function by default.
   Increased png_mng_features flag from png_byte to png_uint_32.
   Bumped shared-library (so-number) and dll-number to 3.
-  Updated contrib/gregbook
-  Updated makefile.ibmc
+  Updated makefile.ibmc, makefile.gcmmx
   Added some typecasts to eliminate gcc 3.0 warnings.  Changed prototypes
      of png_write_oFFS width and height from png_uint_32 to png_int_32.
   Updated example.c
   Revised prototypes for png_debug_malloc and png_debug_free in pngtest.c
-  Revised makefile.gcmmx
   Revised pnggccrd.c to conditionally compile some thread-unsafe code only
      when PNG_THREAD_UNSAFE_OK is defined.
   Added tests to prevent pngwutil.c from writing a bKGD or tRNS chunk with
      value exceeding 2^bit_depth-1
-  Replaced calls to fprintf(stderr,...) with png_warning() in pnggccrd.c
   Removed restriction that do_invert_mono only operate on 1-bit opaque files
+  Replaced calls to fprintf(stderr,...) with png_warning() or png_debug()
+     in pnggccrd.c
+  Fixed contrib/gregbook/rpng-x.c, rpng2-x.c to avoid crash with XFreeGC().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

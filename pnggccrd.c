@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.0beta5 - August 8, 2001
+ * libpng version 1.2.0rc1 - August 25, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -2637,12 +2637,12 @@ png_do_read_interlace(png_structp png_ptr)
                      for (j = 0; j < png_pass_inc[pass]; j++)
                      {
 #ifdef PNG_DEBUG
-               if (dp < row || dp+3 > row+png_ptr->row_buf_size)
-                 {
-                  printf("dp out of bounds: row=%d, dp=%d, rp=%d\n",row, dp,
-                    row+png_ptr->row_buf_size);
-                  printf("row_buf=%d\n",png_ptr->row_buf_size);
-                 }
+                        if (dp < row || dp+3 > row+png_ptr->row_buf_size)
+                        {
+                           printf("dp out of bounds: row=%d, dp=%d, rp=%d\n",
+                             row, dp, row+png_ptr->row_buf_size);
+                           printf("row_buf=%d\n",png_ptr->row_buf_size);
+                        }
 #endif
                         png_memcpy(dp, v, 4);
                         dp -= 4;
@@ -2849,53 +2849,76 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
          "avg_3lp:                        \n\t"
             "movq (%%edi,%%ecx,), %%mm0   \n\t" // load mm0 with Avg(x)
             "movq %%mm5, %%mm3            \n\t"
-            "psrlq _ShiftRem, %%mm2       \n\t" // correct position Raw(x-bpp) data
+            "psrlq _ShiftRem, %%mm2       \n\t" // correct position Raw(x-bpp)
+                                                // data
             "movq (%%esi,%%ecx,), %%mm1   \n\t" // load mm1 with Prior(x)
             "movq %%mm7, %%mm6            \n\t"
             "pand %%mm1, %%mm3            \n\t" // get lsb for each prev_row byte
             "psrlq $1, %%mm1              \n\t" // divide prev_row bytes by 2
-            "pand  %%mm4, %%mm1           \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm0           \n\t" // add (Prev_row/2) to Avg for each byte
+            "pand  %%mm4, %%mm1           \n\t" // clear invalid bit 7 of each
+                                                // byte
+            "paddb %%mm1, %%mm0           \n\t" // add (Prev_row/2) to Avg for
+                                                // each byte
             // add 1st active group (Raw(x-bpp)/2) to average with LBCarry
-            "movq %%mm3, %%mm1            \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1            \n\t" // get LBCarrys for each byte where both
+            "movq %%mm3, %%mm1            \n\t" // now use mm1 for getting
+                                                // LBCarrys
+            "pand %%mm2, %%mm1            \n\t" // get LBCarrys for each byte
+                                                // where both
                                // lsb's were == 1 (only valid for active group)
             "psrlq $1, %%mm2              \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2           \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2           \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm6, %%mm2            \n\t" // leave only Active Group 1 bytes to add to Avg
-            "paddb %%mm2, %%mm0           \n\t" // add (Raw/2) + LBCarrys to Avg for each Active
+            "pand  %%mm4, %%mm2           \n\t" // clear invalid bit 7 of each
+                                                // byte
+            "paddb %%mm1, %%mm2           \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                                // for each byte
+            "pand %%mm6, %%mm2            \n\t" // leave only Active Group 1
+                                                // bytes to add to Avg
+            "paddb %%mm2, %%mm0           \n\t" // add (Raw/2) + LBCarrys to
+                                                // Avg for each Active
                                //  byte
             // add 2nd active group (Raw(x-bpp)/2) to average with _LBCarry
-            "psllq _ShiftBpp, %%mm6       \n\t" // shift the mm6 mask to cover bytes 3-5
+            "psllq _ShiftBpp, %%mm6       \n\t" // shift the mm6 mask to cover
+                                                // bytes 3-5
             "movq %%mm0, %%mm2            \n\t" // mov updated Raws to mm2
             "psllq _ShiftBpp, %%mm2       \n\t" // shift data to pos. correctly
-            "movq %%mm3, %%mm1            \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1            \n\t" // get LBCarrys for each byte where both
+            "movq %%mm3, %%mm1            \n\t" // now use mm1 for getting
+                                                // LBCarrys
+            "pand %%mm2, %%mm1            \n\t" // get LBCarrys for each byte
+                                                // where both
                                // lsb's were == 1 (only valid for active group)
             "psrlq $1, %%mm2              \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2           \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2           \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm6, %%mm2            \n\t" // leave only Active Group 2 bytes to add to Avg
-            "paddb %%mm2, %%mm0           \n\t" // add (Raw/2) + LBCarrys to Avg for each Active
+            "pand  %%mm4, %%mm2           \n\t" // clear invalid bit 7 of each
+                                                // byte
+            "paddb %%mm1, %%mm2           \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                                // for each byte
+            "pand %%mm6, %%mm2            \n\t" // leave only Active Group 2
+                                                // bytes to add to Avg
+            "paddb %%mm2, %%mm0           \n\t" // add (Raw/2) + LBCarrys to
+                                                // Avg for each Active
                                //  byte
 
             // add 3rd active group (Raw(x-bpp)/2) to average with _LBCarry
-            "psllq _ShiftBpp, %%mm6       \n\t" // shift mm6 mask to cover last two
+            "psllq _ShiftBpp, %%mm6       \n\t" // shift mm6 mask to cover last
+                                                // two
                                  // bytes
             "movq %%mm0, %%mm2            \n\t" // mov updated Raws to mm2
             "psllq _ShiftBpp, %%mm2       \n\t" // shift data to pos. correctly
                               // Data only needs to be shifted once here to
                               // get the correct x-bpp offset.
-            "movq %%mm3, %%mm1            \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1            \n\t" // get LBCarrys for each byte where both
+            "movq %%mm3, %%mm1            \n\t" // now use mm1 for getting
+                                                // LBCarrys
+            "pand %%mm2, %%mm1            \n\t" // get LBCarrys for each byte
+                                                // where both
                               // lsb's were == 1 (only valid for active group)
             "psrlq $1, %%mm2              \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2           \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2           \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm6, %%mm2            \n\t" // leave only Active Group 2 bytes to add to Avg
+            "pand  %%mm4, %%mm2           \n\t" // clear invalid bit 7 of each
+                                                // byte
+            "paddb %%mm1, %%mm2           \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                                // for each byte
+            "pand %%mm6, %%mm2            \n\t" // leave only Active Group 2
+                                                // bytes to add to Avg
             "addl $8, %%ecx               \n\t"
-            "paddb %%mm2, %%mm0           \n\t" // add (Raw/2) + LBCarrys to Avg for each Active
+            "paddb %%mm2, %%mm0           \n\t" // add (Raw/2) + LBCarrys to
+                                                // Avg for each Active
                                                 // byte
             // now ready to write back to memory
             "movq %%mm0, -8(%%edi,%%ecx,) \n\t"
@@ -2933,7 +2956,8 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
             "movq _HBClearMask, %%mm4    \n\t"
 
             // re-init address pointers and offset
-            "movl _dif, %%ecx            \n\t" // ecx:  x = offset to alignment boundary
+            "movl _dif, %%ecx            \n\t" // ecx:  x = offset to
+                                               // alignment boundary
 
             // load _ActiveMask and clear all bytes except for 1st active group
             "movq _ActiveMask, %%mm7     \n\t"
@@ -2942,7 +2966,8 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 // preload  "movl prev_row, %%esi        \n\t" // esi:  Prior(x)
             "movq %%mm7, %%mm6           \n\t"
             "movq _LBCarryMask, %%mm5    \n\t"
-            "psllq _ShiftBpp, %%mm6      \n\t" // create mask for 2nd active group
+            "psllq _ShiftBpp, %%mm6      \n\t" // create mask for 2nd active
+                                               // group
 
             // prime the pump:  load the first Raw(x-bpp) data set
             "movq -8(%%edi,%%ecx,), %%mm2 \n\t" // load previous aligned 8 bytes
@@ -2955,30 +2980,44 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
             "movq %%mm5, %%mm3           \n\t"
             "pand %%mm1, %%mm3           \n\t" // get lsb for each prev_row byte
             "psrlq $1, %%mm1             \n\t" // divide prev_row bytes by 2
-            "pand  %%mm4, %%mm1          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm0          \n\t" // add (Prev_row/2) to Avg for each byte
+            "pand  %%mm4, %%mm1          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm1, %%mm0          \n\t" // add (Prev_row/2) to Avg for
+                                               // each byte
             // add 1st active group (Raw(x-bpp)/2) to average with _LBCarry
-            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte where both
+            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting
+                                               // LBCarrys
+            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte
+                                               // where both
                               // lsb's were == 1 (only valid for active group)
             "psrlq $1, %%mm2             \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm7, %%mm2           \n\t" // leave only Active Group 1 bytes to add to Avg
-            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to Avg for each Active
+            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                               // for each byte
+            "pand %%mm7, %%mm2           \n\t" // leave only Active Group 1
+                                               // bytes to add to Avg
+            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to Avg
+                                               // for each Active
                               // byte
             // add 2nd active group (Raw(x-bpp)/2) to average with _LBCarry
             "movq %%mm0, %%mm2           \n\t" // mov updated Raws to mm2
             "psllq _ShiftBpp, %%mm2      \n\t" // shift data to pos. correctly
             "addl $8, %%ecx              \n\t"
-            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte where both
+            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting
+                                               // LBCarrys
+            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte
+                                               // where both
                               // lsb's were == 1 (only valid for active group)
             "psrlq $1, %%mm2             \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 2 bytes to add to Avg
-            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to Avg for each Active
+            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                               // for each byte
+            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 2
+                                               // bytes to add to Avg
+            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to
+                                               // Avg for each Active
                               // byte
             "cmpl _MMXLength, %%ecx      \n\t"
             // now ready to write back to memory
@@ -3012,7 +3051,8 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
             // load _ActiveMask
             "movq _ActiveMask, %%mm7     \n\t"
             // re-init address pointers and offset
-            "movl _dif, %%ecx            \n\t" // ecx:  x = offset to alignment boundary
+            "movl _dif, %%ecx            \n\t" // ecx:  x = offset to alignment
+                                               // boundary
             "movq _LBCarryMask, %%mm5    \n\t"
 // preload  "movl row, %%edi             \n\t" // edi:  Avg(x)
             "movq _HBClearMask, %%mm4    \n\t"
@@ -3029,59 +3069,91 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
             "movq %%mm5, %%mm3           \n\t"
             "pand %%mm1, %%mm3           \n\t" // get lsb for each prev_row byte
             "psrlq $1, %%mm1             \n\t" // divide prev_row bytes by 2
-            "pand  %%mm4, %%mm1          \n\t" // clear invalid bit 7 of each byte
+            "pand  %%mm4, %%mm1          \n\t" // clear invalid bit 7 of each
+                                               // byte
             "movq %%mm7, %%mm6           \n\t"
-            "paddb %%mm1, %%mm0          \n\t" // add (Prev_row/2) to Avg for each byte
+            "paddb %%mm1, %%mm0          \n\t" // add (Prev_row/2) to Avg for
+                                               // each byte
 
             // add 1st active group (Raw(x-bpp)/2) to average with _LBCarry
-            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte where both
-                                               // lsb's were == 1 (only valid for active group)
+            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting
+                                               // LBCarrys
+            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte
+                                               // where both
+                                               // lsb's were == 1 (only valid
+                                               // for active group)
             "psrlq $1, %%mm2             \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 1 bytes to add to Avg
-            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to Avg for each Active byte
+            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                               // for each byte
+            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 1
+                                               // bytes to add to Avg
+            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to Avg
+                                               // for each Active byte
 
             // add 2nd active group (Raw(x-bpp)/2) to average with _LBCarry
-            "psllq _ShiftBpp, %%mm6      \n\t" // shift the mm6 mask to cover bytes 2 & 3
+            "psllq _ShiftBpp, %%mm6      \n\t" // shift the mm6 mask to cover
+                                               // bytes 2 & 3
             "movq %%mm0, %%mm2           \n\t" // mov updated Raws to mm2
             "psllq _ShiftBpp, %%mm2      \n\t" // shift data to pos. correctly
-            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte where both
-                                               // lsb's were == 1 (only valid for active group)
+            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting
+                                               // LBCarrys
+            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte
+                                               // where both
+                                               // lsb's were == 1 (only valid
+                                               // for active group)
             "psrlq $1, %%mm2             \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 2 bytes to add to Avg
-            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to Avg for each Active byte
+            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                               // for each byte
+            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 2
+                                               // bytes to add to Avg
+            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to
+                                               // Avg for each Active byte
 
             // add 3rd active group (Raw(x-bpp)/2) to average with _LBCarry
-            "psllq _ShiftBpp, %%mm6      \n\t" // shift the mm6 mask to cover bytes 4 & 5
+            "psllq _ShiftBpp, %%mm6      \n\t" // shift the mm6 mask to cover
+                                               // bytes 4 & 5
             "movq %%mm0, %%mm2           \n\t" // mov updated Raws to mm2
             "psllq _ShiftBpp, %%mm2      \n\t" // shift data to pos. correctly
-            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte where both
-                                               // lsb's were == 1 (only valid for active group)
+            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting
+                                               // LBCarrys
+            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte
+                                               // where both lsb's were == 1
+                                               // (only valid for active group)
             "psrlq $1, %%mm2             \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 2 bytes to add to Avg
-            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to Avg for each Active byte
+            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                               // for each byte
+            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 2
+                                               // bytes to add to Avg
+            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to
+                                               // Avg for each Active byte
 
             // add 4th active group (Raw(x-bpp)/2) to average with _LBCarry
-            "psllq _ShiftBpp, %%mm6      \n\t" // shift the mm6 mask to cover bytes 6 & 7
+            "psllq _ShiftBpp, %%mm6      \n\t" // shift the mm6 mask to cover
+                                               // bytes 6 & 7
             "movq %%mm0, %%mm2           \n\t" // mov updated Raws to mm2
             "psllq _ShiftBpp, %%mm2      \n\t" // shift data to pos. correctly
             "addl $8, %%ecx              \n\t"
-            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting LBCarrys
-            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte where both
-                                               // lsb's were == 1 (only valid for active group)
+            "movq %%mm3, %%mm1           \n\t" // now use mm1 for getting
+                                               // LBCarrys
+            "pand %%mm2, %%mm1           \n\t" // get LBCarrys for each byte
+                                               // where both
+                                               // lsb's were == 1 (only valid
+                                               // for active group)
             "psrlq $1, %%mm2             \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2) for each byte
-            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 2 bytes to add to Avg
-            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to Avg for each Active byte
+            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm1, %%mm2          \n\t" // add LBCarrys to (Raw(x-bpp)/2)
+                                               // for each byte
+            "pand %%mm6, %%mm2           \n\t" // leave only Active Group 2
+                                               // bytes to add to Avg
+            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) + LBCarrys to
+                                               // Avg for each Active byte
 
             "cmpl _MMXLength, %%ecx      \n\t"
             // now ready to write back to memory
@@ -3112,7 +3184,8 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 #ifdef __PIC__
             "pushl %%ebx                 \n\t" // save Global Offset Table index
 #endif
-            "movl _dif, %%ebx            \n\t" // ebx:  x = offset to alignment boundary
+            "movl _dif, %%ebx            \n\t" // ebx:  x = offset to alignment
+                                               // boundary
 // preload  "movl row, %%edi             \n\t" // edi:  Avg(x)
             "cmpl _FullLength, %%ebx     \n\t" // test if offset at end of array
             "jnb avg_1end                \n\t"
@@ -3131,7 +3204,8 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
             "addw %%cx, %%ax             \n\t"
             "incl %%ebx                  \n\t"
             "shrw %%ax                   \n\t" // divide by 2
-            "addb -1(%%edi,%%ebx,), %%al \n\t" // add Avg(x); -1 to offset inc ebx
+            "addb -1(%%edi,%%ebx,), %%al \n\t" // add Avg(x); -1 to offset
+                                               // inc ebx
             "cmpl _FullLength, %%ebx     \n\t" // check if at end of array
             "movb %%al, -1(%%edi,%%ebx,) \n\t" // write back Raw(x);
                          // mov does not affect flags; -1 to offset inc ebx
@@ -3210,15 +3284,18 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       default:                  // bpp greater than 8 (!= 1,2,3,4,[5],6,[7],8)
       {
 
+#ifdef PNG_DEBUG
          // GRR:  PRINT ERROR HERE:  SHOULD NEVER BE REACHED
-        png_warning(png_ptr,
-          "Internal logic error in pnggccrd (png_read_filter_row_mmx_avg())");
+        png_debug(1,
+        "Internal logic error in pnggccrd (png_read_filter_row_mmx_avg())\n");
+#endif
 
 #if 0
         __asm__ __volatile__ (
             "movq _LBCarryMask, %%mm5    \n\t"
             // re-init address pointers and offset
-            "movl _dif, %%ebx            \n\t" // ebx:  x = offset to alignment boundary
+            "movl _dif, %%ebx            \n\t" // ebx:  x = offset to
+                                               // alignment boundary
             "movl row, %%edi             \n\t" // edi:  Avg(x)
             "movq _HBClearMask, %%mm4    \n\t"
             "movl %%edi, %%edx           \n\t"
@@ -3231,15 +3308,20 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
             "pand %%mm1, %%mm3           \n\t" // get lsb for each prev_row byte
             "movq (%%edx,%%ebx,), %%mm2  \n\t"
             "psrlq $1, %%mm1             \n\t" // divide prev_row bytes by 2
-            "pand %%mm2, %%mm3           \n\t" // get LBCarrys for each byte where both
-                                // lsb's were == 1
+            "pand %%mm2, %%mm3           \n\t" // get LBCarrys for each byte
+                                               // where both lsb's were == 1
             "psrlq $1, %%mm2             \n\t" // divide raw bytes by 2
-            "pand  %%mm4, %%mm1          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm3, %%mm0          \n\t" // add LBCarrys to Avg for each byte
-            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each byte
-            "paddb %%mm1, %%mm0          \n\t" // add (Prev_row/2) to Avg for each byte
+            "pand  %%mm4, %%mm1          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm3, %%mm0          \n\t" // add LBCarrys to Avg for each
+                                               // byte
+            "pand  %%mm4, %%mm2          \n\t" // clear invalid bit 7 of each
+                                               // byte
+            "paddb %%mm1, %%mm0          \n\t" // add (Prev_row/2) to Avg for
+                                               // each byte
             "addl $8, %%ebx              \n\t"
-            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) to Avg for each byte
+            "paddb %%mm2, %%mm0          \n\t" // add (Raw/2) to Avg for each
+                                               // byte
             "cmpl _MMXLength, %%ebx      \n\t"
             "movq %%mm0, -8(%%edi,%%ebx,) \n\t"
             "jb avg_Alp                  \n\t"
@@ -3358,9 +3440,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       "movl %%edi, _dif            \n\t" // take start of row
       "addl %%ebx, _dif            \n\t" // add bpp
       "xorl %%ecx, %%ecx           \n\t"
-      "addl $0xf, _dif             \n\t" // add 7 + 8 to incr past alignment boundary
+      "addl $0xf, _dif             \n\t" // add 7 + 8 to incr past alignment
+                                         // boundary
       "andl $0xfffffff8, _dif      \n\t" // mask to alignment boundary
-      "subl %%edi, _dif            \n\t" // subtract from start ==> value ebx at alignment
+      "subl %%edi, _dif            \n\t" // subtract from start ==> value ebx
+                                         // at alignment
       "jz paeth_go                 \n\t"
       // fix alignment
 
@@ -3478,12 +3562,14 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
             // prime the pump:  load the first Raw(x-bpp) data set
             "movq -8(%%edi,%%ecx,), %%mm1 \n\t"
          "paeth_3lp:                     \n\t"
-            "psrlq _ShiftRem, %%mm1      \n\t" // shift last 3 bytes to 1st 3 bytes
+            "psrlq _ShiftRem, %%mm1      \n\t" // shift last 3 bytes to 1st
+                                               // 3 bytes
             "movq (%%esi,%%ecx,), %%mm2  \n\t" // load b=Prior(x)
             "punpcklbw %%mm0, %%mm1      \n\t" // unpack High bytes of a
             "movq -8(%%esi,%%ecx,), %%mm3 \n\t" // prep c=Prior(x-bpp) bytes
             "punpcklbw %%mm0, %%mm2      \n\t" // unpack High bytes of b
-            "psrlq _ShiftRem, %%mm3      \n\t" // shift last 3 bytes to 1st 3 bytes
+            "psrlq _ShiftRem, %%mm3      \n\t" // shift last 3 bytes to 1st
+                                               // 3 bytes
             // pav = p - a = (a + b - c) - a = b - c
             "movq %%mm2, %%mm4           \n\t"
             "punpcklbw %%mm0, %%mm3      \n\t" // unpack High bytes of c
@@ -3538,7 +3624,8 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
             "paddb (%%edi,%%ecx,), %%mm7 \n\t" // add Paeth predictor with Raw(x)
             "punpcklbw %%mm0, %%mm3      \n\t" // unpack High bytes of c
             "movq %%mm7, (%%edi,%%ecx,)  \n\t" // write back updated value
-            "movq %%mm7, %%mm1           \n\t" // now mm1 will be used as Raw(x-bpp)
+            "movq %%mm7, %%mm1           \n\t" // now mm1 will be used as
+                                               // Raw(x-bpp)
             // now do Paeth for 2nd set of bytes (3-5)
             "psrlq _ShiftBpp, %%mm2      \n\t" // load b=Prior(x) step 2
             "punpcklbw %%mm0, %%mm1      \n\t" // unpack High bytes of a
@@ -3595,7 +3682,8 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
             "movq %%mm2, %%mm3           \n\t" // load c=Prior(x-bpp) step 1
             "pand _ActiveMask, %%mm7     \n\t"
             "punpckhbw %%mm0, %%mm2      \n\t" // unpack High bytes of b
-            "psllq _ShiftBpp, %%mm7      \n\t" // shift bytes to 2nd group of 3 bytes
+            "psllq _ShiftBpp, %%mm7      \n\t" // shift bytes to 2nd group of
+                                               // 3 bytes
              // pav = p - a = (a + b - c) - a = b - c
             "movq %%mm2, %%mm4           \n\t"
             "paddb (%%edi,%%ecx,), %%mm7 \n\t" // add Paeth predictor with Raw(x)
@@ -3655,7 +3743,8 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
             // step ecx to next set of 8 bytes and repeat loop til done
             "addl $8, %%ecx              \n\t"
             "pand _ActiveMaskEnd, %%mm1  \n\t"
-            "paddb -8(%%edi,%%ecx,), %%mm1 \n\t" // add Paeth predictor with Raw(x)
+            "paddb -8(%%edi,%%ecx,), %%mm1 \n\t" // add Paeth predictor with
+                                                 // Raw(x)
 
             "cmpl _MMXLength, %%ecx      \n\t"
             "pxor %%mm0, %%mm0           \n\t" // pxor does not affect flags

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.2.0beta5 - August 8, 2001
+ * libpng 1.2.0rc1 - August 25, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -769,7 +769,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.0beta5
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.0rc1
  */
 
 void PNGAPI
@@ -818,7 +818,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.0beta5
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.0rc1
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -1133,7 +1133,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
       png_info_destroy(png_ptr, end_info_ptr);
 
    png_free(png_ptr, png_ptr->zbuf);
-   png_free(png_ptr, png_ptr->row_buf);
+   png_free(png_ptr, png_ptr->big_row_buf);
    png_free(png_ptr, png_ptr->prev_row);
 #if defined(PNG_READ_DITHER_SUPPORTED)
    png_free(png_ptr, png_ptr->palette_lookup);

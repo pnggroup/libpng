@@ -27,6 +27,7 @@
     - 1.12:  added -pause option for demos and testing
     - 1.20:  added runtime MMX-enabling/disabling and new -mmx* options
     - 1.21:  fixed small X memory leak (thanks to Francois Petitjean)
+    - 1.22:  fixed XFreeGC() crash bug
 
   ---------------------------------------------------------------------------
 
@@ -57,7 +58,7 @@
 
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
-#define VERSION   "1.21 of 30 May 2001"
+#define VERSION   "1.22 of 16 August 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -228,6 +229,7 @@ static Colormap colormap;
 static int have_nondefault_visual = FALSE;
 static int have_colormap = FALSE;
 static int have_window = FALSE;
+static int have_gc = FALSE;
 
 
 
@@ -759,6 +761,7 @@ static int rpng2_x_create_window(void)
     XMapWindow(display, window);
 
     gc = XCreateGC(display, window, 0, &gcvalues);
+    have_gc = TRUE;
 
 /*---------------------------------------------------------------------------
     Allocate memory for the X- and display-specific version of the image.
@@ -1374,7 +1377,8 @@ static void rpng2_x_cleanup(void)
         ximage = NULL;
     }
 
-    XFreeGC(display, gc);
+    if (have_gc)
+        XFreeGC(display, gc);
 
     if (have_window)
         XDestroyWindow(display, window);

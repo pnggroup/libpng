@@ -977,6 +977,9 @@ version 1.2.0beta5 [August 8, 2001]
   Revised makefile.sgi and makefile.sggcc
   Replaced calls to fprintf(stderr,...) with png_warning() in pnggccrd.c
   Removed restriction that do_invert_mono only operate on 1-bit opaque files
+version 1.2.0rc1 [August 25, 2001]
+  Changed a png_warning() to png_debug() in pnggccrd.c
+  Fixed contrib/gregbook/rpng-x.c, rpng2-x.c to avoid crash with XFreeGC().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

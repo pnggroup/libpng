@@ -22,6 +22,7 @@
     - 1.11:  added extra set of parentheses to png_jmpbuf() macro; fixed
               command-line parsing bug
     - 1.12:  fixed small X memory leak (thanks to Francois Petitjean)
+    - 1.13:  fixed XFreeGC() crash bug
 
   ---------------------------------------------------------------------------
 
@@ -52,7 +53,7 @@
 
 #define PROGNAME  "rpng-x"
 #define LONGNAME  "Simple PNG Viewer for X"
-#define VERSION   "1.12 of 28 May 2001"
+#define VERSION   "1.13 of 16 August 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -118,6 +119,7 @@ static Colormap colormap;
 static int have_nondefault_visual = FALSE;
 static int have_colormap = FALSE;
 static int have_window = FALSE;
+static int have_gc = FALSE;
 /*
 ulg numcolors=0, pixels[256];
 ush reds[256], greens[256], blues[256];
@@ -556,6 +558,7 @@ static int rpng_x_create_window(void)
     XMapWindow(display, window);
 
     gc = XCreateGC(display, window, 0, &gcvalues);
+    have_gc = TRUE;
 
 /*---------------------------------------------------------------------------
     Fill window with the specified background color.
@@ -825,7 +828,8 @@ static void rpng_x_cleanup(void)
         ximage = NULL;
     }
 
-    XFreeGC(display, gc);
+    if (have_gc)
+        XFreeGC(display, gc);
 
     if (have_window)
         XDestroyWindow(display, window);
