@@ -1,5 +1,5 @@
 echo "
-  There is no \"configure\" script for Libpng-1.2.2beta3.  Instead, please
+  There is no \"configure\" script for Libpng-1.2.2beta4.  Instead, please
   copy the appropriate makefile for your system from the \"scripts\"
   directory.  Read the INSTALL file for more details.
 "

@@ -20,7 +20,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
 LDSHARED=cc -lz -dynamiclib -compatibility_version $(VER) -current_version $(VER)
 
 PNGMAJ = 0
-PNGMIN = 1.2.2beta3
+PNGMIN = 1.2.2beta4
 VER = $(PNGMAJ).$(PNGMIN)
 LIBNAME=libpng12
 SHAREDLIB_POSTFIX=dylib
@@ -71,10 +71,10 @@ install-static: install-headers libpng.a
 install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	-@/bin/rm -f $(LIBPATH)/libpng.3*$(SHAREDLIB_POSTFIX)
-	cp $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) $(LIBPATH)
-	chmod 755 $(LIBPATH)/$(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
 	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).$(PNGMAJ)*.$(SHAREDLIB_POSTFIX)
 	-@/bin/rm -f$(LIBPATH)/$(LIBNAME).$(SHAREDLIB_POSTFIX)
+	cp $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
 	(cd $(LIBPATH); ln -sf $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
 	$(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX); \
 	ln -sf $(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX) \

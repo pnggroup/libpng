@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.2beta3 - March 7, 2002
+ * libpng 1.2.2beta4 - March 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1042,6 +1042,7 @@ png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
 }
 
 
+#ifndef PNG_1_0_X
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 /* this function was added to libpng 1.2.0 and should always exist by default */
 void PNGAPI
@@ -1096,3 +1097,4 @@ png_set_mmx_thresholds (png_structp png_ptr,
     png_ptr->mmx_rowbytes_threshold = mmx_rowbytes_threshold;
 }
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
+#endif /* ?PNG_1_0_X */

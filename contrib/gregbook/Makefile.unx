@@ -1,6 +1,6 @@
 # Sample makefile for rpng-x / rpng2-x / wpng using gcc and make.
 # Greg Roelofs
-# Last modified:  7 February 2001
+# Last modified:  7 March 2002
 #
 #	The programs built by this makefile are described in the book,
 #	"PNG:  The Definitive Guide," by Greg Roelofs (O'Reilly and
@@ -23,9 +23,9 @@
 
 # macros --------------------------------------------------------------------
 
-PNGINC = -I/usr/local/include
-#PNGLIB = -L/usr/local/lib -lpng	# dynamically linked against libpng
-PNGLIB = /usr/local/lib/libpng.a	# statically linked against libpng
+PNGINC = -I/usr/local/include/libpng12
+#PNGLIB = -L/usr/local/lib -lpng12 # dynamically linked against libpng
+PNGLIB = /usr/local/lib/libpng12.a # statically linked against libpng
 # or:
 #PNGINC = -I../libpng
 #PNGLIB = -L../libpng -lpng

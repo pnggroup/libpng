@@ -1,5 +1,5 @@
 
-Libpng 1.2.2beta3 - March 7, 2002
+Libpng 1.2.2beta4 - March 8, 2002
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -30,6 +30,11 @@ version 1.2.2beta3 [March 7, 2002]
   Added install-shared target to all makefiles that make shared libraries.
   Stopped a double free of palette, hist, and trans when not using free_me.
   Added makefile.32sunu for Sun Ultra 32 and makefile.64sunu for Sun Ultra 64.
+version 1.2.2beta4 [March 8, 2002]
+  Compute background.gray and background_1.gray even when color_type is RGB
+    in case image gets reduced to gray later.
+  Relocated a misplaced /bin/rm in the "install-shared" makefile targets
+  Added PNG_1_0_X macro which can be used to build a 1.0.x-compatible library.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

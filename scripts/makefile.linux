@@ -5,7 +5,7 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.2beta3
+PNGMIN = 1.2.2beta4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
@@ -105,10 +105,10 @@ install-static: install-headers libpng.a
 install-shared: install-headers $(LIBNAME).so.$(PNGVER)
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	-@/bin/rm -f $(LIBPATH)/libpng.so.3*
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
 	cp $(LIBNAME).so.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
-	(cd $(LIBPATH);
+	(cd $(LIBPATH); \
 	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi

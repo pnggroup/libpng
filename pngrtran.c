@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.2.2beta3 - March 7, 2002
+ * libpng 1.2.2beta4 - March 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -897,6 +897,11 @@ png_init_read_transformations(png_structp png_ptr)
                   break;
             }
 
+            png_ptr->background_1.gray = (png_uint_16)(pow(
+               (double)png_ptr->background.gray / m, g) * m + .5);
+            png_ptr->background.gray = (png_uint_16)(pow(
+               (double)png_ptr->background.gray / m, gs) * m + .5);
+
             if (color_type & PNG_COLOR_MASK_COLOR)
             {
                /* RGB or RGBA */
@@ -916,10 +921,12 @@ png_init_read_transformations(png_structp png_ptr)
             else
             {
                /* GRAY or GRAY ALPHA */
-               png_ptr->background_1.gray = (png_uint_16)(pow(
-                  (double)png_ptr->background.gray / m, g) * m + .5);
-               png_ptr->background.gray = (png_uint_16)(pow(
-                  (double)png_ptr->background.gray / m, gs) * m + .5);
+               png_ptr->background_1.red = png_ptr->background_1.gray;
+               png_ptr->background_1.green = png_ptr->background_1.gray;
+               png_ptr->background_1.blue = png_ptr->background_1.gray;
+               png_ptr->background.red = png_ptr->background.gray;
+               png_ptr->background.green = png_ptr->background.gray;
+               png_ptr->background.blue = png_ptr->background.gray;
             }
          }
       }
