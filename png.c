@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.2b - January 6, 1999
+ * libpng version 1.0.3 - January 14, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
- * Copyright (c) 1998, 1999, Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
  * 
  */
 
@@ -16,7 +16,7 @@
  * string defined in png.h.
  */
 
-char png_libpng_ver[12] = "1.0.2b";
+char png_libpng_ver[12] = "1.0.3";
 
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -352,7 +352,7 @@ png_get_copyright(png_structp png_ptr)
 {
    if(png_ptr == NULL)
      /* silence compiler warning about unused png_ptr */ ;
-   return("\n libpng version 1.0.2b - January 6, 1999\n\
+   return("\n libpng version 1.0.3 - January 14, 1999\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999, Glenn Randers-Pehrson\n");

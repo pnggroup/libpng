@@ -1,5 +1,5 @@
 
-Known bugs and suggested enhancements in libpng-1.0.2
+Known bugs and suggested enhancements in libpng-1.0.3
 
 
 1. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
@@ -14,33 +14,10 @@ Known bugs and suggested enhancements in libpng-1.0.2
    Question whether i-- or --i is better.
 
    STATUS: Under investigation, postponed until after
-   libpng-1.0.2.  About 160 loops will be turned around
+   libpng-1.0.3.  About 160 loops will be turned around
    in libpng-1.0.Nn, for testing.
 
-2. June 15, 1998 -- BUG -- Evan Light
-
-   Under some conditions, 16-bit grayscale images aren't properly
-   expanded to rgb, because png_read_start_row() returns too small a
-   value of max_pixel_depth when png_set_filler() has also been called.
-
-   STATUS: Fixed in libpng-1.0.2a
-
-3. June 16, 1998 -- BUG -- Matt McConnell
-
-   When reading interlaced images with a progressive reader, in some
-   cases (interlaced images less than 3 pixels high) some passes are
-   not skipped that should be.
-
-   STATUS: Fixed in libpng-1.0.2a
-
-4. July 3, 1998 -- ENHANCEMENT -- Glenn R-P
-
-   Added png_set_rgb_to_gray() and png_get_rgb_to_gray_status() functions.
-
-   STATUS: Done in libpng-1.0.2a, awaiting comment on resulting test
-   images.
-
-5. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
+2. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
 
    libpng-1.0.2 and earlier transform colors to gamma=1.0 space for
    merging with background, and then back to the image's gamma.  The
@@ -52,39 +29,4 @@ Known bugs and suggested enhancements in libpng-1.0.2
 
    STATUS: under development.
 
-6. August 20, 1998 -- BUG -- Kevin Bracey
-
-   When using the filler transformation, the filler isn't written
-   into the leftmost pixel of each row.
-
-   Also, the filler operation isn't being done right when writing
-   files.  Some code that was removed from png_set_filler() in
-   libpng 1.0.1a shouldn't have been removed.
-
-   STATUS: Fixed in libpng-1.0.2a
-
-7. August 23, 1998 -- BUG -- Duncan Simpson
-
-   "static pngcharp tIME_string" should be changed to
-   "static char tIME_string[30]" in pngtest.c
-
-   Also -- December 30, 1998 -- there are some misplaced brackets in
-   pngtest.c that cause pngtest to try to write a tIME chunk
-   even when no tIME chunk was present in the source file.
-
-   STATUS: Fixed in libpng-1.0.2a
-
-8. August 24, 1998 -- BUG -- John Cromer
-
-   Order of byte-swap and shift operations seems to be incorrect in
-   png_do_write_transformations()
-
-   STATUS: Under investigation.
-
-9. September 11, 1998 -- ENHANCEMENT -- L. Peter Deutsch
-
-   The PNG_NO_STDIO macro should be split into PNG_NO_STDIO
-   and PNG_NO_CONSOLE_STDIO.
-
-   STATUS: Done in libpng-1.0.2a
 

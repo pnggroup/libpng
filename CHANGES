@@ -378,9 +378,12 @@ version 1.0.2a [December 30, 1998]
   Removed lines after Dynamic Dependencies" in makefile.aco .
   Revised makefile.dec to make a shared library (Jeremie Petit).
   Removed trailing blanks from all files. 
-version 1.0.2b [January 6, 1999]
+version 1.0.2a [January 6, 1999]
   Removed misplaced #endif and #ifdef PNG_NO_EXTERN near the end of png.h
   Added "if" tests to silence complaints about unused png_ptr in png.h and png.c
   Changed "check_if_png" function in example.c to return true (nonzero) if PNG.
   Changed libpng.txt to demonstrate png_sig_cmp() instead of png_check_sig()
     which is obsolete.
+version 1.0.3 [January 14, 1999]
+  Added makefile.hux, for Hewlett Packard HPUX 10.20 and 11.00 (Jim Rice)
+  Added a statement of Y2K compliance in png.h, libpng.1, and Y2KINFO.

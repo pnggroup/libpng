@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.2b - January 6, 1999
+ * libpng 1.0.3 - January 14, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
