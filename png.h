@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.5f - December 6, 1999
+ * libpng version 1.0.5j - December 21, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -9,34 +9,34 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.5f - December 6, 1999: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.5j - December 21, 1999: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
- *    
- *    December 6, 1999
- *    
+ *
+ *    December 21, 1999
+ *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
- *    
+ *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.5f are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.5j are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
- *    
+ *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
  *    that will hold years up to 65535.  The other two hold the date in text
  *    format, and will hold years up to 9999.
- *    
+ *
  *    The integer is
  *        "png_uint_16 year" in png_time_struct.
- *    
+ *
  *    The strings are
  *        "png_charp time_buffer" in png_struct and
  *        "near_time_buffer", which is a local character string in png.c.
- *    
+ *
  *    There are seven time-related functions:
- *        png.c: png_convert_to_rfc_1123() in png.c 
+ *        png.c: png_convert_to_rfc_1123() in png.c
  *          (formerly png_convert_to_rfc_1152() in error)
  *        png_convert_from_struct_tm() in pngwrite.c, called in pngwrite.c
  *        png_convert_from_time_t() in pngwrite.c
@@ -44,8 +44,8 @@
  *        png_handle_tIME() in pngrutil.c, called in pngread.c
  *        png_set_tIME() in pngset.c
  *        png_write_tIME() in pngwutil.c, called in pngwrite.c
- *    
- *    All handle dates properly in a Y2K environment.  The 
+ *
+ *    All handle dates properly in a Y2K environment.  The
  *    png_convert_from_time_t() function calls gmtime() to convert from system
  *    clock time, which returns (year - 1900), which we properly convert to
  *    the full 4-digit year.  There is a possibility that applications using
@@ -55,19 +55,19 @@
  *    but this is not under our control.  The libpng documentation has always
  *    stated that it works with 4-digit years, and the APIs have been
  *    documented as such.
- *    
+ *
  *    The tIME chunk itself is also Y2K compliant.  It uses a 2-byte unsigned
  *    integer to hold the year, and can hold years as large as 65535.
- *    
+ *
  *    zlib, upon which libpng depends, is also Y2K compliant.  It contains
  *    no date-related code.
- *    
+ *
  *       Glenn Randers-Pehrson
  *       libpng maintainer
  *       PNG Development Group
- * 
+ *
  * Note about libpng version numbers:
- * 
+ *
  *    Due to various miscommunications, unforeseen code incompatibilities
  *    and occasional factors outside the authors' control, version numbering
  *    on the library has not always been consistent and straightforward.
@@ -98,7 +98,7 @@
  *    1.0.4a-f                 1.0.4a-f 10005  2.1.0.4a-f
  *    1.0.5                    1.0.5    10005  2.1.0.5
  *    1.0.5a-d                 1.0.5a-d 10006  2.1.0.5a-d
- *    1.0.5e-f                 1.0.5e-f 10100  2.1.0.5e-f
+ *    1.0.5e-j                 1.0.5e-j 10100  2.1.0.5e-j
  *    1.1.0                    1.1.0    10100  3.1.0.0
  *
  *    Henceforth the source version will match the shared-library minor
@@ -123,7 +123,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.5f, December 6, 1999)
+ * (libpng versions 0.97, January 1998, through 1.0.5j, December 21, 1999)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -177,9 +177,9 @@
 /*
  * A "png_get_copyright" function is available, for convenient use in "about"
  * boxes and the like:
- * 
+ *
  * printf("%s",png_get_copyright(NULL));
- * 
+ *
  * Also, the PNG logo (in PNG format, of course) is supplied in the
  * file "pngnow.png".
  */
@@ -224,7 +224,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.5f"
+#define PNG_LIBPNG_VER_STRING "1.0.5j"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -324,17 +324,23 @@ typedef png_spalette FAR * png_spalette_p;
 typedef png_spalette FAR * FAR * png_spalette_pp;
 
 #ifdef PNG_TEXT_SUPPORTED
-/* png_text holds the contents of a text chunk in a PNG file, and whether 
- * that contents is compressed or not.  The "keyword" field points to a
- * regular C string.  */
+/* png_text holds the contents of a text/ztxt/itxt chunk in a PNG file,
+ * and whether that contents is compressed or not.  The "key" field
+ * points to a regular C string.  */
 typedef struct png_text_struct
 {
-   int compression;        /* compression value, see PNG_TEXT_COMPRESSION_ */
+   int  compression; /* compression value:
+                       -1: tEXt, none
+                        0: zTXt, deflate
+                        1: iTXt, none
+                        2: iTXt, deflate  */
    png_charp key;          /* keyword, 1-79 character description of "text" */
-   png_charp lang;         /* language code, 1-79 characters */
    png_charp text;         /* comment, may be an empty string (ie "") */
-   /* text_length is no longer used, and now present for compatibility only */
-   png_size_t text_length; /* length of "text" field (not used any more) */
+   png_size_t text_length; /* length of the text string */
+   png_size_t itxt_length; /* length of the itxt string */
+   png_charp lang;         /* language code, 1-79 characters */
+   png_charp lang_key;     /* keyword translated UTF-8 string, 0 or more
+                              chars */
 } png_text;
 typedef png_text FAR * png_textp;
 typedef png_text FAR * FAR * png_textpp;
@@ -346,7 +352,9 @@ typedef png_text FAR * FAR * png_textpp;
 #define PNG_TEXT_COMPRESSION_zTXt_WR -2
 #define PNG_TEXT_COMPRESSION_NONE    -1
 #define PNG_TEXT_COMPRESSION_zTXt     0
-#define PNG_TEXT_COMPRESSION_LAST     1  /* Not a valid value */
+#define PNG_ITXT_COMPRESSION_NONE     1
+#define PNG_ITXT_COMPRESSION_zTXt     2
+#define PNG_TEXT_COMPRESSION_LAST     3  /* Not a valid value */
 
 /* png_time is a way to hold the time in an machine independent way.
  * Two conversions are provided, both from time_t and struct tm.  There
@@ -365,6 +373,26 @@ typedef struct png_time_struct
 } png_time;
 typedef png_time FAR * png_timep;
 typedef png_time FAR * FAR * png_timepp;
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+/* png_unknown_chunk is a structure to hold queued chunks for which there is
+ * no specific support.  The idea is that we can use this to queue
+ * up private chunks for output even though the library doesn't actually
+ * know about their semantics.
+ */
+typedef struct png_unknown_chunk_t
+{
+    png_byte name[5];
+    png_byte *data;
+    png_size_t size;
+
+    /* libpng-using applications should NOT directly modify this byte. */
+    png_byte location; /* mode of operation at read time */
+}
+png_unknown_chunk;
+typedef png_unknown_chunk FAR * png_unknown_chunkp;
+typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
+#endif
 
 /* png_info is a structure that holds the information in a PNG file so
  * that the application can find out the characteristics of the image.
@@ -389,16 +417,16 @@ typedef png_time FAR * FAR * png_timepp;
  *
  * The following members may have allocated storage attached that should be
  * cleaned up before the structure is discarded: palette, text, pcal_purpose,
- * pcal_units, pcal_params, iccp_name, iccp_profile, splt_palettes, and 
- * scal_unit.  Of these, the text, pcal_*, iccp_*, splt_*, and scal_unit
- * members are automatically freed when the info structure is deallocated. 
+ * pcal_units, pcal_params, hist, iccp_name, iccp_profile, splt_palettes, and
+ * scal_unit.  Of these, the text, pcal_*, hist, iccp_*, splt_*, and scal_unit
+ * members are automatically freed when the info structure is deallocated.
  * The palette member is not.
  *
  * More allocation details: all the chunk-reading functions that change these
  * members go through the corresponding png_set_* functions.  Functions to
  * clear these members are available: see png_free_*.  The png_set_* functions
- * do not depend on being able to point info structure members to any of the 
- * storage they are passed (they make their own copies), EXCEPT that the 
+ * do not depend on being able to point info structure members to any of the
+ * storage they are passed (they make their own copies), EXCEPT that the
  * png_set_text function uses the same storage passed to them
  * in the text_ptr or itxt_ptr structure argument.
  */
@@ -435,7 +463,12 @@ typedef struct png_info_struct
     * on which the image was created, normally in the range [1.0, 2.5].
     * Data is valid if (valid & PNG_INFO_gAMA) is non-zero.
     */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
    float gamma; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+   png_fixed_point int_gamma; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
+#endif
 #endif
 
 #if defined(PNG_sRGB_SUPPORTED)
@@ -447,7 +480,7 @@ typedef struct png_info_struct
 #if defined(PNG_TEXT_SUPPORTED)
    /* The tEXt, and zTXt chunks contain human-readable textual data in
     * uncompressed, compressed, and optionally compressed forms, respectively.
-    * The data in "text" is an array of pointers to uncompressed, 
+    * The data in "text" is an array of pointers to uncompressed,
     * null-terminated C strings. Each chunk has a keyword that describes the
     * textual data contained in that chunk.  Keywords are not required to be
     * unique, and the text string may be empty.  Any number of text chunks may
@@ -456,6 +489,9 @@ typedef struct png_info_struct
    int num_text; /* number of comments read/to write */
    int max_text; /* current size of text array */
    png_textp text; /* array of comments read/to write */
+   int num_text_old; /* number of comments read/to write */
+   png_textp text_old; /* array of comments read/to write, backward
+                          compatible  with libpng-1.0.5 and earlier */
 #endif /* PNG_TEXT_SUPPORTED */
 
 #if defined(PNG_tIME_SUPPORTED)
@@ -538,6 +574,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * colors in the image as the creator.  Values are in the range
     * [0.0, 0.8].  Data valid if (valid & PNG_INFO_cHRM) non-zero.
     */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
    float x_white;
    float y_white;
    float x_red;
@@ -546,6 +583,17 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    float y_green;
    float x_blue;
    float y_blue;
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+   png_fixed_point int_x_white;
+   png_fixed_point int_y_white;
+   png_fixed_point int_x_red;
+   png_fixed_point int_y_red;
+   png_fixed_point int_x_green;
+   png_fixed_point int_y_green;
+   png_fixed_point int_x_blue;
+   png_fixed_point int_y_blue;
+#endif
 #endif
 
 #if defined(PNG_pCAL_SUPPORTED)
@@ -585,18 +633,30 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #endif
 
 #if defined(PNG_sCAL_SUPPORTED)
-   /* The sCAL chunk describes the actual physical dimensions of the 
+   /* The sCAL chunk describes the actual physical dimensions of the
     * subject matter of the graphic.  The chunk contains a unit specification
-    * (an ASCII string), and two ASCII strings representing floating-point
+    * a byte value, and two ASCII strings representing floating-point
     * values.  The values are width and height corresponsing to one pixel
     * in the image.  This external representation is converted to double
     * here.  Data values are valid if (valid & PNG_INFO_sCAL) is non-zero.
     */
-   png_charp scal_unit;        /* unit of physical scale */
+   png_byte scal_unit;         /* unit of physical scale */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
    double scal_pixel_width;    /* width of one pixel */
    double scal_pixel_height;   /* height of one pixel */
+#else
+#ifdef PNG_FIXED_POINT_SUPPORTED
+   png_charp scal_s_width;     /* string containing height */
+   png_charp scal_s_height;    /* string containing width */
+#endif
+#endif
 #endif
 
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+   /* storage for unknown chunks that the library doesn't recognize. */
+   png_unknown_chunkp unknown_chunks;
+   png_size_t unknown_chunks_num;
+#endif
 } png_info;
 
 typedef png_info FAR * png_infop;
@@ -642,6 +702,12 @@ typedef png_info FAR * FAR * png_infopp;
 #define PNG_EQUATION_ARBITRARY    2 /* Arbitrary base exponential transform */
 #define PNG_EQUATION_HYPERBOLIC   3 /* Hyperbolic sine transformation */
 #define PNG_EQUATION_LAST         4 /* Not a valid value */
+
+/* These are for the sCAL chunk.  These values should NOT be changed. */
+#define PNG_SCALE_UNKNOWN         0 /* unknown unit (image scale) */
+#define PNG_SCALE_METER           1 /* meters per pixel */
+#define PNG_SCALE_RADIAN          2 /* radians per pixel */
+#define PNG_SCALE_LAST            3 /* Not a valid value */
 
 /* These are for the pHYs chunk.  These values should NOT be changed. */
 #define PNG_RESOLUTION_UNKNOWN    0 /* pixels/unknown unit (aspect ratio) */
@@ -815,7 +881,9 @@ struct png_struct_def
 
 #if defined(PNG_READ_bKGD_SUPPORTED)
    png_byte background_gamma_type;
+#ifdef PNG_FLOATING_POINT_SUPPORTED
    float background_gamma;
+#endif
    png_color_16 background;   /* background color in screen gamma space */
 #  if defined(PNG_READ_GAMMA_SUPPORTED)
      png_color_16 background_1; /* background normalized to gamma 1.0 */
@@ -830,8 +898,13 @@ struct png_struct_def
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    int gamma_shift;      /* number of "insignificant" bits 16-bit gamma */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
    float gamma;          /* file gamma value */
    float screen_gamma;   /* screen gamma value (display_exponent) */
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+   png_fixed_point int_gamma;
+#endif
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
@@ -937,9 +1010,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.5f
+and png.h are both at * version 1.0.5j
  */
-typedef png_structp version_1_0_5f;
+typedef png_structp version_1_0_5j;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1056,8 +1129,10 @@ extern PNG_EXPORT(void,png_set_gray_to_rgb) PNGARG((png_structp png_ptr));
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
 /* Reduce RGB to grayscale. */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_rgb_to_gray) PNGARG((png_structp png_ptr,
    int error_action, double red, double green ));
+#endif
 extern PNG_EXPORT(png_byte,png_get_rgb_to_gray_status) PNGARG((png_structp
    png_ptr));
 #endif
@@ -1122,9 +1197,11 @@ extern PNG_EXPORT(void,png_set_invert_mono) PNGARG((png_structp png_ptr));
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
 /* Handle alpha and tRNS by replacing with a background color. */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_background) PNGARG((png_structp png_ptr,
    png_color_16p background_color, int background_gamma_code,
    int need_expand, double background_gamma));
+#endif
 #define PNG_BACKGROUND_GAMMA_UNKNOWN 0
 #define PNG_BACKGROUND_GAMMA_SCREEN  1
 #define PNG_BACKGROUND_GAMMA_FILE    2
@@ -1145,8 +1222,10 @@ extern PNG_EXPORT(void,png_set_dither) PNGARG((png_structp png_ptr,
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
 /* Handle gamma correction. Screen_gamma=(display_exponent) */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_gamma) PNGARG((png_structp png_ptr,
    double screen_gamma, double default_file_gamma));
+#endif
 #endif
 
 #if defined(PNG_READ_EMPTY_PLTE_SUPPORTED) || \
@@ -1312,9 +1391,11 @@ extern PNG_EXPORT(void,png_set_filter) PNGARG((png_structp png_ptr, int method,
  * the weights and costs are set to 1.0, this degenerates the WEIGHTED method
  * to the UNWEIGHTED method, but with added encoding time/computation.
  */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_filter_heuristics) PNGARG((png_structp png_ptr,
    int heuristic_method, int num_weights, png_doublep filter_weights,
    png_doublep filter_costs));
+#endif
 #endif /*  PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
 
 /* Heuristic used for row filter selection.  These defines should NOT be
@@ -1550,8 +1631,10 @@ extern PNG_EXPORT(png_uint_32, png_get_y_pixels_per_meter) PNGARG((png_structp
 png_ptr, png_infop info_ptr));
 
 /* Returns pixel aspect ratio, computed from pHYs chunk data.  */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(float, png_get_pixel_aspect_ratio) PNGARG((png_structp
 png_ptr, png_infop info_ptr));
+#endif
 
 /* Returns image x, y offset in pixels or microns, from oFFs chunk data. */
 extern PNG_EXPORT(png_uint_32, png_get_x_offset_pixels) PNGARG((png_structp
@@ -1580,26 +1663,56 @@ extern PNG_EXPORT(void,png_set_bKGD) PNGARG((png_structp png_ptr,
 #endif
 
 #if defined(PNG_READ_cHRM_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(png_uint_32,png_get_cHRM) PNGARG((png_structp png_ptr,
    png_infop info_ptr, double *white_x, double *white_y, double *red_x,
    double *red_y, double *green_x, double *green_y, double *blue_x,
    double *blue_y));
 #endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+extern PNG_EXPORT(png_uint_32,png_get_cHRM_fixed) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_fixed_point *int_white_x, png_fixed_point
+   *int_white_y, png_fixed_point *int_red_x, png_fixed_point *int_red_y,
+   png_fixed_point *int_green_x, png_fixed_point *int_green_y, png_fixed_point
+   *int_blue_x, png_fixed_point *int_blue_y));
+#endif
+#endif
 
 #if defined(PNG_cHRM_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_cHRM) PNGARG((png_structp png_ptr,
    png_infop info_ptr, double white_x, double white_y, double red_x,
    double red_y, double green_x, double green_y, double blue_x, double blue_y));
 #endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+extern PNG_EXPORT(void,png_set_cHRM_fixed) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_fixed_point int_white_x, png_fixed_point int_white_y,
+   png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
+   int_green_x, png_fixed_point int_green_y, png_fixed_point int_blue_x,
+   png_fixed_point int_blue_y));
+#endif
+#endif
 
 #if defined(PNG_READ_gAMA_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(png_uint_32,png_get_gAMA) PNGARG((png_structp png_ptr,
    png_infop info_ptr, double *file_gamma));
 #endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+extern PNG_EXPORT(png_uint_32,png_get_gAMA_fixed) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_fixed_point *int_file_gamma));
+#endif
+#endif
 
 #if defined(PNG_gAMA_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_gAMA) PNGARG((png_structp png_ptr,
    png_infop info_ptr, double file_gamma));
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+extern PNG_EXPORT(void,png_set_gAMA_fixed) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_fixed_point int_file_gamma));
+#endif
 #endif
 
 #if defined(PNG_READ_hIST_SUPPORTED)
@@ -1698,6 +1811,8 @@ extern PNG_EXPORT(png_uint_32,png_get_iCCP) PNGARG((png_structp png_ptr,
 extern PNG_EXPORT(void,png_set_iCCP) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_charp name, int compression_type,
    png_charp profile, int proflen));
+extern PNG_EXPORT(void,png_free_iCCP) PNGARG((png_structp png_ptr,
+   png_infop info_ptr));
 #endif
 
 #if defined(PNG_READ_sPLT_SUPPORTED)
@@ -1708,14 +1823,23 @@ extern PNG_EXPORT(png_uint_32,png_get_spalettes) PNGARG((png_structp png_ptr,
 #if defined(PNG_sPLT_SUPPORTED)
 extern PNG_EXPORT(void,png_set_spalettes) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_spalette_p entries, int nentries));
-#endif
-
-#if defined(PNG_sPLT_SUPPORTED)
-extern PNG_EXPORT(void,png_free_spallettes) PNGARG((png_structp png_ptr,
+extern PNG_EXPORT(void,png_free_spalettes) PNGARG((png_structp png_ptr,
    png_infop info_ptr, int num));
 #endif
 
+#if defined(PNG_READ_iTXt_SUPPORTED)
+/* png_get_itxt also returns the number of text chunks in *num_text */
+extern PNG_EXPORT(png_uint_32,png_get_itxt) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_textp *text_ptr, int *num_text));
+#endif
+
+#if defined(PNG_TEXT_SUPPORTED)
+extern PNG_EXPORT(void,png_set_itxt) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_textp text_ptr, int num_text));
+#endif
+
 #if defined(PNG_READ_TEXT_SUPPORTED)
+/* Old interface; apps should use png_get_itxt instead */
 /* png_get_text also returns the number of text chunks in *num_text */
 extern PNG_EXPORT(png_uint_32,png_get_text) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_textp *text_ptr, int *num_text));
@@ -1725,7 +1849,7 @@ extern PNG_EXPORT(png_uint_32,png_get_text) PNGARG((png_structp png_ptr,
 extern PNG_EXPORT(void,png_set_text) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_textp text_ptr, int num_text));
 extern PNG_EXPORT(void,png_free_text) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, int num_text));
+   png_infop info_ptr, int num_text_old));
 #endif
 
 #if defined(PNG_READ_tIME_SUPPORTED)
@@ -1751,19 +1875,43 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #endif
 
 #if defined(PNG_READ_sCAL_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(png_uint_32,png_get_sCAL) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_charpp unit, double *width, double *height));
+   png_infop info_ptr, int *unit, double *width, double *height));
+#else 
+#ifdef PNG_FIXED_POINT_SUPPORTED
+extern PNG_EXPORT(png_uint_32,png_get_sCAL_s) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, int *unit, png_charpp swidth, png_charpp sheight));
+#endif
+#endif
 #endif /* PNG_READ_sCAL_SUPPORTED */
 
-#if defined(PNG_READ_sCAL_SUPPORTED) || defined(PNG_WRITE_sCAL_SUPPORTED)
+#if defined(PNG_sCAL_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_sCAL) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_charp unit, double width, double height));
+   png_infop info_ptr, int unit, double width, double height));
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+extern PNG_EXPORT(void,png_set_sCAL_s) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, int unit, png_charp swidth, png_charp sheight));
+#endif
 #endif /* PNG_READ_sCAL_SUPPORTED || PNG_WRITE_sCAL_SUPPORTED */
 
 #if defined(PNG_READ_sCAL_SUPPORTED) || defined(PNG_WRITE_sCAL_SUPPORTED)
 extern PNG_EXPORT(void,png_free_sCAL) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 #endif /* PNG_READ_sCAL_SUPPORTED || PNG_WRITE_sCAL_SUPPORTED */
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+extern PNG_EXPORT(void, png_set_keep_unknown_chunks) PNGARG((png_structp
+   png_ptr, int keep, png_bytep chunk_list, int num_chunks));
+extern PNG_EXPORT(void, png_set_unknown_chunks) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_unknown_chunkp unknowns, int num_unknowns));
+extern PNG_EXPORT(void,png_free_unknown_chunks) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, int num));
+extern PNG_EXPORT(png_uint_32,png_get_unknown_chunks) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, png_unknown_chunkpp entries));
+#endif
 
 /* Define PNG_DEBUG at compile time for debugging information.  Higher
  * numbers for PNG_DEBUG mean more debugging information.  This has
@@ -1804,7 +1952,7 @@ extern PNG_EXPORT(png_charp,png_get_header_ver) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
-#define PNG_HEADER_VERSION_STRING " libpng version 1.0.5f - December 6, 1999 (header)\n"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.0.5j - December 21, 1999 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -1888,7 +2036,7 @@ extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 #define PNG_EXPAND             0x1000
 #define PNG_GAMMA              0x2000
 #define PNG_GRAY_TO_RGB        0x4000
-#define PNG_FILLER             0x8000
+#define PNG_FILLER             0x8000L
 #define PNG_PACKSWAP          0x10000L
 #define PNG_SWAP_ALPHA        0x20000L
 #define PNG_STRIP_ALPHA       0x40000L
@@ -1924,6 +2072,8 @@ extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 #define PNG_FLAG_FREE_PALETTE             0x1000
 #define PNG_FLAG_FREE_TRANS               0x2000
 #define PNG_FLAG_FREE_HIST                0x4000
+#define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000L
+#define PNG_FLAG_KEEP_UNSAFE_CHUNKS      0x10000L
 
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
@@ -1948,6 +2098,7 @@ extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 #else
 #define png_sig png_sig_bytes(NULL)
 #endif
+#endif /* PNG_NO_EXTERN */
 
 /* Constant strings for known chunk types.  If you need to add a chunk,
  * define the name here, and add an invocation of the macro in png.c and
@@ -1999,7 +2150,6 @@ PNG_EXPORT_VAR (const png_byte FARDATA) png_tRNS[5];
 PNG_EXPORT_VAR (const png_byte FARDATA) png_zTXt[5];
 #endif /* PNG_USE_GLOBAL_ARRAYS */
 
-#endif /* PNG_NO_EXTERN */
 
 /* Inline macros to do direct reads of bytes from the input buffer.  These
  * require that you are using an architecture that uses PNG byte ordering
@@ -2132,7 +2282,13 @@ PNG_EXTERN void png_write_IDAT PNGARG((png_structp png_ptr, png_bytep data,
 PNG_EXTERN void png_write_IEND PNGARG((png_structp png_ptr));
 
 #if defined(PNG_WRITE_gAMA_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_EXTERN void png_write_gAMA PNGARG((png_structp png_ptr, double file_gamma));
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+PNG_EXTERN void png_write_gAMA_fixed PNGARG((png_structp png_ptr, png_fixed_point
+    file_gamma));
+#endif
 #endif
 
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
@@ -2141,10 +2297,19 @@ PNG_EXTERN void png_write_sBIT PNGARG((png_structp png_ptr, png_color_8p sbit,
 #endif
 
 #if defined(PNG_WRITE_cHRM_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_EXTERN void png_write_cHRM PNGARG((png_structp png_ptr,
    double white_x, double white_y,
    double red_x, double red_y, double green_x, double green_y,
    double blue_x, double blue_y));
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+PNG_EXTERN void png_write_cHRM_fixed PNGARG((png_structp png_ptr,
+   png_fixed_point int_white_x, png_fixed_point int_white_y,
+   png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
+   int_green_x, png_fixed_point int_green_y, png_fixed_point int_blue_x,
+   png_fixed_point int_blue_y));
+#endif
 #endif
 
 #if defined(PNG_WRITE_sRGB_SUPPORTED)
@@ -2159,8 +2324,8 @@ PNG_EXTERN void png_write_iCCP PNGARG((png_structp png_ptr,
 #endif
 
 #if defined(PNG_WRITE_sPLT_SUPPORTED)
-PNG_EXTERN void png_write_sPLT PNGARG((png_structp png_ptr, 
-                                       png_spalette_p palette));
+PNG_EXTERN void png_write_sPLT PNGARG((png_structp png_ptr,
+   png_spalette_p palette));
 #endif
 
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
@@ -2176,6 +2341,11 @@ PNG_EXTERN void png_write_bKGD PNGARG((png_structp png_ptr,
 #if defined(PNG_WRITE_hIST_SUPPORTED)
 PNG_EXTERN void png_write_hIST PNGARG((png_structp png_ptr, png_uint_16p hist,
    int num_hist));
+#endif
+
+#if defined(PNG_hIST_SUPPORTED)
+extern PNG_EXPORT(void,png_free_hIST) PNGARG((png_structp png_ptr,
+   png_infop info_ptr));
 #endif
 
 #if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
@@ -2195,8 +2365,9 @@ PNG_EXTERN void png_write_zTXt PNGARG((png_structp png_ptr, png_charp key,
 #endif
 
 #if defined(PNG_WRITE_iTXt_SUPPORTED)
-PNG_EXTERN void png_write_iTXt PNGARG((png_structp png_ptr, 
-   int compression, png_charp key, png_charp lang, png_charp text));
+PNG_EXTERN void png_write_iTXt PNGARG((png_structp png_ptr,
+   int compression, png_charp key, png_charp lang, png_charp lang_key,
+   png_charp text));
 #endif
 
 #if defined(PNG_WRITE_oFFs_SUPPORTED)
@@ -2222,8 +2393,15 @@ PNG_EXTERN void png_write_tIME PNGARG((png_structp png_ptr,
 #endif
 
 #if defined(PNG_WRITE_sCAL_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_EXTERN void png_write_sCAL PNGARG((png_structp png_ptr,
-   png_charp unit, double width, double height));
+   int unit, double width, double height));
+#else
+#ifdef PNG_FIXED_POINT_SUPPORTED
+PNG_EXTERN void png_write_sCAL_s PNGARG((png_structp png_ptr,
+   int unit, png_charp width, png_charp height));
+#endif
+#endif
 #endif
 
 /* Called when finished processing a row of data */

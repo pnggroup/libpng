@@ -101,7 +101,7 @@ local  void check_match OF((deflate_state *s, IPos start, IPos match,
 /* Tail of hash chains */
 
 #ifndef TOO_FAR
-#  define TOO_FAR 32767   /* changed from 4096 for pngcrush */
+#  define TOO_FAR 4096
 #endif
 /* Matches of length 3 are discarded if their distance exceeds TOO_FAR */
 
@@ -261,8 +261,10 @@ int ZEXPORT deflateInit2_(strm, level, method, windowBits, memLevel, strategy,
     s->hash_mask = s->hash_size - 1;
     s->hash_shift =  ((s->hash_bits+MIN_MATCH-1)/MIN_MATCH);
 
-    s->window = (Bytef *) ZALLOC(strm, s->w_size, 2*sizeof(Byte));
-    s->prev   = (Posf *)  ZALLOC(strm, s->w_size, sizeof(Pos));
+    s->window = (Bytef *) ZALLOC(strm, (windowBits == 8 ? 264 : s->w_size),
+        2*sizeof(Byte));
+    s->prev   = (Posf *)  ZALLOC(strm, (windowBits == 8 ? 264 : s->w_size),
+        sizeof(Pos));
     s->head   = (Posf *)  ZALLOC(strm, s->hash_size, sizeof(Pos));
 
     s->lit_bufsize = 1 << (memLevel + 6); /* 16K elements by default */
@@ -1277,12 +1279,9 @@ local block_state deflate_slow(s, flush)
             }
             /* longest_match() sets match_start */
 
-            if (s->match_length <= 5 && (s->strategy == Z_FILTERED
-#if (TOO_FAR <= 32767)
-                 || (s->match_length == MIN_MATCH &&
-                  s->strstart - s->match_start > TOO_FAR)
-#endif
-                 )) {
+            if (s->match_length <= 5 && (s->strategy == Z_FILTERED ||
+                 (s->match_length == MIN_MATCH &&
+                  s->strstart - s->match_start > TOO_FAR))) {
 
                 /* If prev_match is also MIN_MATCH, match_start is garbage
                  * but we will ignore the current match anyway.

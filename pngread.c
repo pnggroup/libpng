@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.5f - December 6, 1999
+ * libpng 1.0.5j - December 21, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -214,7 +214,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_sBIT_SUPPORTED)
       PNG_sBIT;
 #endif
-#if defined(PNG_READ_pCAL_SUPPORTED)
+#if defined(PNG_READ_sCAL_SUPPORTED)
       PNG_sCAL;
 #endif
 #if defined(PNG_READ_sPLT_SUPPORTED)
@@ -607,7 +607,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5f.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5j.
  */
 
 void
@@ -656,7 +656,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5f.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5j.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -743,7 +743,7 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_sBIT_SUPPORTED)
       PNG_sBIT;
 #endif
-#if defined(PNG_READ_pCAL_SUPPORTED)
+#if defined(PNG_READ_sCAL_SUPPORTED)
       PNG_sCAL;
 #endif
 #if defined(PNG_READ_sPLT_SUPPORTED)

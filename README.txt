@@ -1,8 +1,8 @@
 
- | pngcrush 1.2.1, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
+ | pngcrush 1.3.0, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.0.5f,
+ | This program was built with libpng version 1.0.5j,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1998, 1999, Glenn Randers-Pehrson,
@@ -35,9 +35,24 @@ options:
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
          -trns index red green blue gray
       -verbose (write more detailed information)
-            -w compression_window_size [32, 16, 8, 4, 2, 1, 512, 256]
+            -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
             -h (help)
             -p (pause)
+
+ | pngcrush 1.3.0, Copyright (C) 1998, 1999, Glenn Randers-Pehrson
+ | This is a free, open-source program.  Permission is
+ | granted to everyone to use pngcrush without fee.
+ | This program was built with libpng version 1.0.5j,
+ |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
+ |    Copyright (C) 1996, 1997 Andreas Dilger,
+ |    Copyright (C) 1998, 1999, Glenn Randers-Pehrson,
+ | and zlib version 1.1.3, Copyright (c) 1998,
+ |    Jean-loup Gailly and Mark Adler.
+
+
+usage: pngcrush [options] infile.png outfile.png
+       pngcrush -e ext [other options] files.png ...
+       pngcrush -d dir [other options] files.png ...
 
 options:
         -brute (Use brute-force, try 114 different methods)
@@ -78,7 +93,7 @@ options:
             -f user_filter [0-5]
 
                filter to use with the method specified in the
-               preceding '-m method' argument.
+               preceding '-m method' or '-brute_force' argument.
                0: none; 1-4: use specified filter; 5: adaptive.
 
         -force (Write a new output file even if larger than input)
@@ -96,7 +111,8 @@ options:
             -l zlib_compression_level [0-9]
 
                zlib compression level to use with method specified
-               with the preceding '-m method' argument.
+               with the preceding '-m method' or '-brute_force'
+               argument.
 
             -m method [0 through 200]
 
@@ -165,10 +181,10 @@ options:
 
                Repeat the option (use "-v -v") for even more.
 
-            -w compression_window_size [32, 16, 8, 4, 2, 1, 512, 256]
+            -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
 
                Size of the sliding compression window, in kbytes
-               (or bytes, in case of 512 or 256).  It's best to
+               (or bytes, in case of 512).  It's best to
                use the default (32) unless you run out of memory.
                The program will use a smaller window anyway when
                the uncompressed file is smaller than 16k.
