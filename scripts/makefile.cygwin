@@ -1,15 +1,39 @@
 # makefile for cygwin on x86
-#   builds both dll (with import lib) and static lib versions
+#   Builds both dll (with import lib) and static lib versions
 #   of the library, and builds two copies of pngtest: one
 #   statically linked and one dynamically linked.
 #
+# Copyright (C) 2002 Soren Anderson, Charles Wilson, and Glenn Randers-Pehrson
 #   based on makefile for linux-elf w/mmx by:
 # Copyright (C) 1998-2000 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
 
+# This makefile intends to support building outside the src directory
+# if desired. When invoking it, specify an argument to SRCDIR on the
+# command line that points to the top of the directory where your source
+# is located.
+
+ifdef SRCDIR
+VPATH = $(SRCDIR)
+else
+SRCDIR = .
+endif
+
+# Override DESTDIR= on the make install command line to easily support
+# installing into a temporary location.  Example:
+#
+#    make install DESTDIR=/tmp/build/libpng
+#
+# If you're going to install into a temporary location
+# via DESTDIR, $(DESTDIR)$(prefix) must already exist before
+# you execute make install.
+
+DESTDIR=
+
 # To enable assembler optimizations, add '-DPNG_USE_PNGGCCRD' to
-# $CFLAGS, and include pnggccrd.o in $OBJS, below.
+# $CFLAGS, and include pnggccrd.o in $OBJS, below, and in the dependency
+# list at the bottom of this makefile.
 
 CC=gcc
 ifdef MINGW
@@ -17,12 +41,15 @@ MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
 MINGW_LDFLAGS=-mno-cygwin -L/usr/lib/mingw
 endif
 
-# where "make install" puts libpng.a, libpng.so*, png.h, and pngconf.h
+# Where "make install" puts libpng*.a, *png*.dll, png.h, and pngconf.h
+ifndef prefix
 prefix=/usr
+$(warning You haven't specified a 'prefix=' location. Defaulting to "/usr")
+endif
 
 # Where the zlib library and include files are located
-ZLIBLIB=${prefix}/lib
-ZLIBINC=${prefix}/include
+ZLIBLIB= /usr/lib
+ZLIBINC=
 #ZLIBLIB=../zlib
 #ZLIBINC=../zlib
 
@@ -34,15 +61,25 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 
-#CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
-#        -fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
-CFLAGS=$(MINGW_CCFLAGS) -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
-	-fomit-frame-pointer
+### if you use the asm, add pnggccrd.o to the OBJS list
+###
+### if you don't need thread safety, but want the asm accel
+#CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD \
+#	$(addprefix -I,$(ZLIBINC)) -Wall -O3 $(ALIGN) -funroll-loops \
+#	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
+### if you need thread safety and want (minimal) asm accel
+#CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_USE_PNGGCCRD $(addprefix -I,$(ZLIBINC)) \
+#	-Wall -O3 $(ALIGN) -funroll-loops \
+#	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
+### Normal (non-asm) compilation
+CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
+        -Wall -O3 $(ALIGN) -funroll-loops \
+	-fomit-frame-pointer) # $(WARNMORE) -g -DPNG_DEBUG=5
 
+LIBNAME = libpng10
 PNGMAJ = 0
-#PNGDLL = $10
-PNGMIN = 1.0.13
-PNGMIN_BASE = 1.0.13
+PNGDLL = 10
+PNGMIN = 1.0.14
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(PNGDLL).dll
@@ -52,19 +89,28 @@ SHAREDDEF=libpng.def
 LIBS=$(SHAREDLIB) $(STATLIB)
 EXE=.exe
 
-LDFLAGS=-L. $(MINGW_LDFLAGS) -L$(ZLIBLIB) -lpng -lz
-LDSFLAGS=-shared -L.  $(MINGW_LDFLAGS) -Wl,--enable-auto-image-base
-LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(SHAREDDEF)
+LDFLAGS=$(strip -L. $(MINGW_LDFLAGS) -lpng $(addprefix -L,$(ZLIBLIB)) -lz)
+LDSFLAGS=$(strip -shared -L.  $(MINGW_LDFLAGS) -Wl,--export-all)
+LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(addprefix -L,$(ZLIBLIB)) -lz
 
+MKDIR=/bin/mkdir -pv
 RANLIB=ranlib
 #RANLIB=echo
 
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
+
 BINPATH=$(prefix)/bin
 MANPATH=$(prefix)/man
 MAN3PATH=$(MANPATH)/man3
-DOCPATH=$(prefix)/doc/libpng-$(PNGMIN_BASE)
+MAN5PATH=$(MANPATH)/man5
+
+# cosmetic: shortened strings:
+S =$(SRCDIR)
+D =$(DESTDIR)
+DB =$(D)$(BINPATH)
+DI =$(D)$(INCPATH)
+DL =$(D)$(LIBPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -72,37 +118,60 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
-.SUFFIXES:      .c .o .pic.o
+.SUFFIXES: .c .o .pic.o
 
 %.o : %.c
-	$(CC) -c $(CFLAGS) -DPNG_STATIC -DZLIB_STATIC -o $@ $<
-
+	$(CC) -c $(CFLAGS) -o $@ $<
+%.pic.o : CFLAGS += -DPNG_BUILD_DLL
 %.pic.o : %.c
-	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
-all: all-static all-shared
+all: all-static all-shared libpng.pc libpng-config libpng.pc libpng-config
+
+# Make this to verify that "make [...] install" will do what you want.
+buildsetup-tell:
+	@echo  VPATH is set to: \"$(VPATH)\"
+	@echo  prefix is set to: \"$(prefix)\"
+	@echo -e INCPATH,LIBPATH, etc. are set to:'\n' \
+ $(addprefix $(D),$(INCPATH)'\n' $(LIBPATH)'\n' $(BINPATH)'\n' \
+   $(MANPATH)'\n' $(MAN3PATH)'\n' $(MAN5PATH)'\n')'\n'
+
+libpng.pc: scripts/libpng.pc.in
+	@echo -e Making pkg-config file for this libpng installation..'\n' \
+           using PREFIX=\"$(prefix)\"'\n'
+	cat $(S)/scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! | \
+	   sed -e s/-lm// > libpng.pc
+
+libpng-config: scripts/libpng-config-head.in scripts/libpng-config-body.in
+	@echo -e Making $(LIBNAME) libpng-config file for this libpng \
+ installation..'\n' using PREFIX=\"$(prefix)\"'\n'
+	( cat $(S)/scripts/libpng-config-head.in; \
+	echo prefix=\"$(prefix)\"; \
+	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
+	echo cflags=\"\"; \
+	echo ldflags=\"-L$(LIBPATH)\"; \
+	echo libs=\"-lpng$(PNGMAJ) -lz\"; \
+	cat $(S)/scripts/libpng-config-body.in ) > libpng-config
+	chmod +x libpng-config
 
 static: all-static
-
 shared: all-shared
-
 all-static: $(STATLIB) pngtest-stat$(EXE)
-
 all-shared: $(SHAREDLIB) pngtest$(EXE)
 
-pnggccrd.o:	png.h pngconf.h
+pnggccrd.o: pnggccrd.c png.h pngconf.h
 	@echo ""
-	@echo '    You can ignore the single "control reaches end of non-void function"'
-	@echo '    warning and multiple "<variable> defined but not used" warnings:'
+	@echo '    You can ignore the "control reaches end of non-void function"'
+	@echo '    warning and "<variable> defined but not used" warnings:'
 	@echo ""
-	$(CC) -c $(CFLAGS) -DPNG_STATIC -DZLIB_STATIC -o $@ $*.c
+	$(CC) -c $(CFLAGS) -o $@ $<
 
-pnggccrd.pic.o:	png.h pngconf.h
+pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
 	@echo ""
-	@echo '    You can ignore the single "control reaches end of non-void function"'
-	@echo '    warning and multiple "<variable> defined but not used" warnings:'
+	@echo '    You can ignore the "control reaches end of non-void function"'
+	@echo '    warning and "<variable> defined but not used" warnings:'
 	@echo ""
-	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ pnggccrd.c
+	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
 
 $(STATLIB): $(OBJS)
 	ar rc $@ $(OBJS)
@@ -113,7 +182,7 @@ $(SHAREDDEF): projects/msvc/png32ms.def
 	sed -e 's/\([^;]*\);/;/' > $@
 
 $(SHAREDLIB): $(OBJSDLL) $(SHAREDDEF)
-	$(CC) $(LDSFLAGS) -o $@ $(LDEXTRA) $(OBJSDLL) -L. -L$(ZLIBLIB) -lz
+	$(CC) $(LDSFLAGS) -o $@ $(OBJSDLL) -L. $(LDEXTRA)
 
 pngtest$(EXE): pngtest.pic.o $(SHAREDLIB)
 	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
@@ -125,50 +194,92 @@ pngtest.pic.o: pngtest.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 pngtest.o: pngtest.c
-	$(CC) $(CFLAGS) -DPNG_STATIC -DZLIB_STATIC -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 test: test-static test-shared
 
 test-static: pngtest-stat$(EXE)
-	./pngtest-stat
+	./pngtest-stat $(S)/pngtest.png
 
 test-shared: pngtest$(EXE)
-	./pngtest
+	./pngtest $(S)/pngtest.png
 
-install: install-static install-shared
+install-static: $(STATLIB) install-headers install-man
+	-@if [ ! -d $(DL) ]; then $(MKDIR) $(DL); fi
+	install -m 644 $(STATLIB) $(DL)/$(LIBNAME).a
+	-@rm -f $(DL)/$(STATLIB)
+	(cd $(DL); ln -sf $(LIBNAME).a $(STATLIB))
 
-install-static: $(STATLIB) install-headers install-docs install-man
-	-@if [ ! -d $(LIBPATH) ]; then mkdir -p $(LIBPATH); fi
-	install -m 755 $(STATLIB) $(LIBPATH)
-
-install-shared: $(SHAREDLIB) install-headers install-docs install-man
-	-@if [ ! -d $(LIBPATH) ]; then mkdir -p $(LIBPATH); fi
-	-@if [ ! -d $(BINPATH) ]; then mkdir -p $(BINPATH); fi
-	install -m 755 $(IMPLIB) $(LIBPATH)
-	install -s -m 755 $(SHAREDLIB) $(BINPATH)
+install-shared: $(SHAREDLIB) libpng.pc libpng-config install-headers install-man
+	-@if [ ! -d $(DL) ]; then $(MKDIR) $(DL); fi
+	-@if [ ! -d $(DB) ]; then $(MKDIR) $(DB); fi
+	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR) $(DL)/pkgconfig; fi
+	-@/bin/rm -f $(DL)/pkgconfig/$(LIBNAME).pc
+	-@/bin/rm -f $(DL)/pkgconfig/libpng.pc
+	install -m 644 $(IMPLIB) $(DL)/$(LIBNAME).dll.a
+	-@rm -f $(DL)/$(IMPLIB)
+	(cd $(DL); ln -sf $(LIBNAME).dll.a $(IMPLIB))
+	install -s -m 755 $(SHAREDLIB) $(DB)
+	install -m 644 libpng.pc $(DL)/pkgconfig/$(LIBNAME).pc
+	(cd $(DL)/pkgconfig; ln -sf $(LIBNAME).pc libpng.pc)
 
 install-headers:
-	-@if [ ! -d $(INCPATH)]; then mkdir -p $(INCPATH); fi
-	-@if [ ! -d $(INCPATH)/libpng  ]; then mkdir -p $(INCPATH)/libpng; fi
-	-@rm -f ${INCPATH)/png.h
-	-@rm -f ${INCPATH)/pngconf.h
-	install -m 644 png.h pngconf.h $(INCPATH)
-
-install-docs:
-	-@if [ ! -d $(DOCPATH) ]; then mkdir -p $(DOCPATH); fi
-	install -m 644 $(DOCS) $(DOCPATH)
+	-@if [ ! -d $(DI) ]; then $(MKDIR) $(DI); fi
+	-@if [ ! -d $(DI)/$(LIBNAME) ]; then $(MKDIR) $(DI)/$(LIBNAME); fi
+	-@rm -f $(DI)/png.h
+	-@rm -f $(DI)/pngconf.h
+	install -m 644 $(S)/png.h $(S)/pngconf.h $(DI)/$(LIBNAME)
+	-@rm -f $(DI)/libpng
+	(cd $(DI); ln -sf $(LIBNAME) libpng; ln -sf $(LIBNAME)/* .)
 
 install-man:
-	-@if [ ! -d $(MAN3PATH) ]; then mkdir -p $(MAN3PATH); fi
-	install -m 644 libpngpf.3 libpng.3 $(MAN3PATH)
+	-@if [ ! -d $(D)$(MAN3PATH) ]; then $(MKDIR) $(D)$(MAN3PATH); fi
+	-@if [ ! -d $(D)$(MAN5PATH) ]; then $(MKDIR) $(D)$(MAN5PATH); fi
+	install -m 644 $(S)/libpngpf.3 $(S)/libpng.3 $(D)$(MAN3PATH)
+	install -m 644 $(S)/png.5 $(D)$(MAN5PATH)
+
+install-config: libpng-config
+	-@if [ ! -d $(DB) ]; then mkdir $(DB); fi
+	-@/bin/rm -f $(DB)/libpng-config
+	-@/bin/rm -f $(DB)/$(LIBNAME)-config
+	cp libpng-config $(DB)/$(LIBNAME)-config
+	chmod 755 $(DB)/$(LIBNAME)-config
+	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
+
+# Run this to verify that a future `configure' run will pick up the settings
+# you want.
+test-config-install: SHELL=/bin/bash
+test-config-install: $(DB)/libpng-config
+	@echo -e Testing libpng-config functions...'\n'
+	@ for TYRA in LDFLAGS CPPFLAGS CFLAGS LIBS VERSION; \
+   do \
+    printf "(%d)\t %10s =%s\n" $$(($$gytiu + 1)) $$TYRA \
+    "$$($(DB)/libpng-config `echo --$$TYRA |tr '[:upper:]' '[:lower:]'`)"; \
+    gytiu=$$(( $$gytiu + 1 )); \
+   done
+
+install: install-static install-shared install-man install-config
+
+# If you installed in $(DESTDIR), test-installed won't work until you
+# move the library to its final location.
+
+test-installed:
+	$(CC) $(CFLAGS) \
+	   `$(BINPATH)/libpng10-config --cppflags --cflags` pngtest.c \
+	   -L$(ZLIBLIB) \
+	   -o pngtesti$(EXE) `$(BINPATH)/libpng10-config --ldflags --libs`
+	./pngtesti$(EXE) pngtest.png
 
 clean:
 	/bin/rm -f *.pic.o *.o $(STATLIB) $(IMPLIB) $(SHAREDLIB) \
-	pngtest-stat$(EXE) pngtest$(EXE) pngout.png $(SHAREDDEF)
+	pngtest-stat$(EXE) pngtest$(EXE) pngout.png $(SHAREDDEF) \
+	libpng-config libpng.pc pngtesti$(EXE)
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
 	chmod a-w *.[ch35] $(DOCS) scripts/*
+
+.PHONY: buildsetup-tell libpng.pc libpng-config test-config-install clean
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
@@ -190,3 +301,6 @@ pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
 
 pngtest.o:			png.h pngconf.h pngtest.c
 pngtest-stat.o:			png.h pngconf.h pngtest.c
+
+
+

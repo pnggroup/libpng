@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.13 - April 15, 2002
+ * libpng 1.0.14 - July 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -560,7 +560,9 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
          *interlace_type = info_ptr->interlace_type;
 
       /* check for potential overflow of rowbytes */
-      if (*color_type & PNG_COLOR_MASK_COLOR)
+      if (*color_type == PNG_COLOR_TYPE_PALETTE)
+         channels = 1;
+      else if (*color_type & PNG_COLOR_MASK_COLOR)
          channels = 3;
       else
          channels = 1;
@@ -572,9 +574,9 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
         png_error(png_ptr, "Invalid image width");
       if (height == 0 || *height > PNG_MAX_UINT)
         png_error(png_ptr, "Invalid image height");
-      if ((*width > PNG_MAX_UINT/rowbytes_per_pixel))
+      if (*width > PNG_MAX_UINT/rowbytes_per_pixel - 64)
       {
-         png_warning(png_ptr,
+         png_error(png_ptr,
             "Width too large for libpng to process image data.");
       }
       return (1);
@@ -835,7 +837,7 @@ png_get_compression_buffer_size(png_structp png_ptr)
 
 #ifndef PNG_1_0_X
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
-/* this function was added to libpng 1.2.0 and should exist by default*/
+/* this function was added to libpng 1.2.0 and should exist by default */
 png_uint_32 PNGAPI
 png_get_asm_flags (png_structp png_ptr)
 {

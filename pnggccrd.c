@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.0.13 - April 15, 2002
+ * libpng version 1.0.14 - July 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -338,7 +338,7 @@ static unsigned long long _const6   = 0x00000000000000FFLL;
 static png_uint_32  _FullLength;
 static png_uint_32  _MMXLength;
 static int          _dif;
-static int          _patemp;	// temp variables for Paeth routine
+static int          _patemp; // temp variables for Paeth routine
 static int          _pbtemp;
 static int          _pctemp;
 #endif
@@ -386,9 +386,9 @@ static int _mmx_supported = 2;
 #if defined(PNG_HAVE_ASSEMBLER_COMBINE_ROW)
 
 #define BPP2  2
-#define BPP3  3		/* bytes per pixel (a.k.a. pixel_bytes) */
+#define BPP3  3 /* bytes per pixel (a.k.a. pixel_bytes) */
 #define BPP4  4
-#define BPP6  6		/* (defined only to help avoid cut-and-paste errors) */
+#define BPP6  6 /* (defined only to help avoid cut-and-paste errors) */
 #define BPP8  8
 
 /* Combines the row recently read in with the previous row.
@@ -1504,8 +1504,10 @@ png_do_read_interlace(png_structp png_ptr)
 
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
    if (_mmx_supported == 2) {
+#if !defined(PNG_1_0_X)
        /* this should have happened in png_init_mmx_flags() already */
        png_warning(png_ptr, "asm_flags may not have been initialized");
+#endif
        png_mmx_support();
    }
 #endif
@@ -4825,7 +4827,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
       }
       break;
 
-      default:                // bpp greater than 8 bytes	GRR BOGUS
+      default:                // bpp greater than 8 bytes   GRR BOGUS
       {
          __asm__ __volatile__ (
             "movl _dif, %%edx             \n\t"
@@ -5135,11 +5137,11 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
-#else
-         if (
-#endif
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
              (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+         if (_mmx_supported)
+#endif
          {
             png_read_filter_row_mmx_sub(row_info, row);
          }
@@ -5164,11 +5166,11 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP) &&
-#else
-         if (
-#endif
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
              (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+         if (_mmx_supported)
+#endif
          {
             png_read_filter_row_mmx_up(row_info, row, prev_row);
          }
@@ -5192,11 +5194,11 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG) &&
-#else
-         if (
-#endif
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
              (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+         if (_mmx_supported)
+#endif
          {
             png_read_filter_row_mmx_avg(row_info, row, prev_row);
          }
@@ -5230,11 +5232,11 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH) &&
-#else
-         if (
-#endif
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
              (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+         if (_mmx_supported)
+#endif
          {
             png_read_filter_row_mmx_paeth(row_info, row, prev_row);
          }

@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.13 - April 15, 2002
+ * libpng 1.0.14 - July 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -80,12 +80,12 @@
  *   (no define)   -- building static library, or building an
  *                    application and linking to the static lib
  * 'Cygwin' defines/defaults:
- *   PNG_BUILD_DLL -- building the dll
- *   (no define)   -- building an application, linking to the dll
- *   PNG_STATIC    -- building the static lib, or building an application
- *                    that links to the static lib.
- *   ALL_STATIC    -- building various static libs, or building an application
- *                    that links to the static libs.
+ *   PNG_BUILD_DLL -- (ignored) building the dll
+ *   (no define)   -- (ignored) building an application, linking to the dll
+ *   PNG_STATIC    -- (ignored) building the static lib, or building an 
+ *                    application that links to the static lib.
+ *   ALL_STATIC    -- (ignored) building various static libs, or building an 
+ *                    application that links to the static libs.
  * Thus,
  * a cygwin user should define either PNG_BUILD_DLL or PNG_STATIC, and
  * this bit of #ifdefs will define the 'correct' config variables based on
@@ -96,7 +96,15 @@
  *   ALL_STATIC (since we can't #undef something outside our namespace)
  *   PNG_BUILD_DLL
  *   PNG_STATIC
- *   (nothing) == PNG_USE_DLL 
+ *   (nothing) == PNG_USE_DLL
+ * 
+ * CYGWIN (2002-01-20): The preceding is now obsolete. With the advent
+ *   of auto-import in binutils, we no longer need to worry about 
+ *   __declspec(dllexport) / __declspec(dllimport) and friends.  Therefore,
+ *   we don't need to worry about PNG_STATIC or ALL_STATIC when it comes
+ *   to __declspec() stuff.  However, we DO need to worry about 
+ *   PNG_BUILD_DLL and PNG_STATIC because those change some defaults
+ *   such as CONSOLE_IO and whether GLOBAL_ARRAYS are allowed.
  */
 #if defined(__CYGWIN__)
 #  if defined(ALL_STATIC)
@@ -1151,10 +1159,23 @@ typedef z_stream FAR *  png_zstreamp;
 #  endif
 #endif
 
+#if defined(__CYGWIN__)
+#  undef PNGAPI
+#  define PNGAPI __cdecl
+#  undef PNG_IMPEXP
+#  define PNG_IMPEXP
+#endif  
+
+/* If you define PNGAPI, e.g., with compiler option "-DPNGAPI=__stdcall",
+ * you may get warnings regarding the linkage of png_zalloc and png_zfree.
+ * Don't ignore those warnings; you must also reset the default calling
+ * convention in your compiler to match your PNGAPI, and you must build
+ * zlib and your applications the same way you build libpng.
+ */
 
 #ifndef PNGAPI
 
-#if defined(__MINGW32__) || defined(__CYGWIN__) && !defined(PNG_MODULEDEF)
+#if defined(__MINGW32__) && !defined(PNG_MODULEDEF)
 #  ifndef PNG_NO_MODULEDEF
 #    define PNG_NO_MODULEDEF
 #  endif
@@ -1166,8 +1187,7 @@ typedef z_stream FAR *  png_zstreamp;
 
 #if defined(PNG_DLL) || defined(_DLL) || defined(__DLL__ ) || \
     (( defined(_Windows) || defined(_WINDOWS) || \
-       defined(WIN32) || defined(_WIN32) || defined(__WIN32__) \
-	  ) && !defined(__CYGWIN__))
+       defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ))
 
 #  if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
 #    define PNGAPI __cdecl
@@ -1194,8 +1214,8 @@ typedef z_stream FAR *  png_zstreamp;
 #           if defined(PNG_BUILD_DLL)
 #              define PNG_IMPEXP __export
 #           else
-#              define PNG_IMPEXP /*__import*/ /* doesn't exist AFAIK in
-                                                 VC++*/
+#              define PNG_IMPEXP /*__import */ /* doesn't exist AFAIK in
+                                                 VC++ */
 #           endif                             /* Exists in Borland C++ for
                                                  C++ classes (== huge) */
 #        endif
@@ -1210,12 +1230,6 @@ typedef z_stream FAR *  png_zstreamp;
 #     endif
 #  endif  /* PNG_IMPEXP */
 #else /* !(DLL || non-cygwin WINDOWS) */
-#  if defined(__CYGWIN__) && !defined(PNG_DLL)
-#    if !defined(PNG_IMPEXP)
-#      define PNG_IMPEXP
-#    endif
-#    define PNGAPI __cdecl
-#  else
 #    if (defined(__IBMC__) || defined(IBMCPP__)) && defined(__OS2__)
 #      define PNGAPI _System
 #      define PNG_IMPEXP
@@ -1226,7 +1240,6 @@ typedef z_stream FAR *  png_zstreamp;
 #        define PNG_IMPEXP
 #      endif
 #    endif
-#  endif
 #endif
 #endif
 

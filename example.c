@@ -169,11 +169,11 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
        &interlace_type, int_p_NULL, int_p_NULL);
 
-/**** Set up the data transformations you want.  Note that these are all
- **** optional.  Only call them if you want/need them.  Many of the
- **** transformations only work on specific types of images, and many
- **** are mutually exclusive.
- ****/
+/* Set up the data transformations you want.  Note that these are all
+ * optional.  Only call them if you want/need them.  Many of the
+ * transformations only work on specific types of images, and many
+ * are mutually exclusive.
+ */
 
    /* tell libpng to strip 16 bit/color files down to 8 bits/color */
    png_set_strip_16(png_ptr);

@@ -1,6 +1,7 @@
 # makefile for SCO OSr5  ELF and Unixware 7 with Native cc
 # Contributed by Mike Hopkirk (hops@sco.com) modified from Makefile.lnx
 #   force ELF build dynamic linking, SONAME setting in lib and RPATH in app
+# Copyright (C) 2002 Glenn Randers-Pehrson
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
@@ -17,20 +18,35 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CFLAGS= -dy -belf -I$(ZLIBINC) -O3
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng10 -lz -lm
 
 #RANLIB=ranlib
 RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
-# have to change it.
 PNGMAJ = 0
-PNGMIN = 1.0.13
+PNGMIN = 1.0.14
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 
 INCPATH=$(prefix)/include/libpng
 LIBPATH=$(prefix)/lib
+MANPATH=$(prefix)/man
+BINPATH=$(prefix)/bin
+
+# override DESTDIR= on the make install command line to easily support
+# installing into a temporary location.  Example:
+#
+#    make install DESTDIR=/tmp/build/libpng
+#
+# If you're going to install into a temporary location
+# via DESTDIR, $(DESTDIR)$(prefix) must already exist before
+# you execute make install.
+DESTDIR=
+
+DB=$(DESTDIR)$(BINPATH)
+DI=$(DESTDIR)$(INCPATH)
+DL=$(DESTDIR)$(LIBPATH)
+DM=$(DESTDIR)$(MANPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -43,11 +59,24 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
 
-all: libpng.a $(LIBNAME).so pngtest
+all: libpng.a $(LIBNAME).so pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
+
+libpng.pc:
+	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
+
+libpng-config:
+	( cat scripts/libpng-config-head.in; \
+	echo prefix=\"$(prefix)\"; \
+	echo cppflags=\"-I$(INCPATH)/$(LIBNAME)\"; \
+	echo cflags=\"-belf\"; \
+	echo ldflags=\"-L$(LIBPATH)\"; \
+	echo libs=\"-lpng10 -lz -lm\"; \
+	cat scripts/libpng-config-body.in ) > libpng-config
+	chmod +x libpng-config
 
 $(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
@@ -65,45 +94,80 @@ pngtest: pngtest.o $(LIBNAME).so
 test: pngtest
 	./pngtest
 
-
 install-headers: png.h pngconf.h
-	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
-	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
-	-@/bin/rm -f $(INCPATH)/png.h
-	-@/bin/rm -f $(INCPATH)/pngconf.h
-	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
-	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
-	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	-@/bin/rm -f $(INCPATH)/libpng
-	ln -f -s $(INCPATH)/$(LIBNAME) $(INCPATH)/libpng
+	-@if [ ! -d $(DI) ]; then mkdir $(DI); fi
+	-@if [ ! -d $(DI)/$(LIBNAME) ]; then mkdir $(DI)/$(LIBNAME); fi
+	-@/bin/rm -f $(DI)/png.h
+	-@/bin/rm -f $(DI)/pngconf.h
+	cp png.h pngconf.h $(DI)/$(LIBNAME)
+	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h
+	-@/bin/rm -f $(DI)/png.h $(DI)/pngconf.h
+	-@/bin/rm -f $(DI)/libpng
+	(cd $(DI); ln -f -s $(LIBNAME) libpng; ln -f -s $(LIBNAME)/* .)
 
 install-static: install-headers libpng.a
-	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	cp libpng.a $(LIBPATH)/$(LIBNAME).a
-	chmod 644 $(LIBPATH)/$(LIBNAME).a
-	-@/bin/rm -f $(LIBPATH)/libpng.a
-	ln -f -s $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
+	cp libpng.a $(DL)/$(LIBNAME).a
+	chmod 644 $(DL)/$(LIBNAME).a
+	-@/bin/rm -f $(DL)/libpng.a
+	(cd $(DL); ln -f -s $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).so.$(PNGVER)
-	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
-	-@/bin/rm -f $(LIBPATH)/libpng.so
-	-@/bin/rm -f $(LIBPATH)/libpng.so.2
-	-@/bin/rm -f $(LIBPATH)/libpng.so.2.*
-	cp $(LIBNAME).so.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
-	(cd $(LIBPATH); \
+install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
+	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)* $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/libpng.so
+	-@/bin/rm -f $(DL)/libpng.so.2
+	-@/bin/rm -f $(DL)/libpng.so.2.*
+	cp $(LIBNAME).so.$(PNGVER) $(DL)
+	chmod 755 $(DL)/$(LIBNAME).so.$(PNGVER)
+	(cd $(DL); \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.2; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.2.$(PNGMIN); \
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
-	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi
-	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
-	cp libpng.pc $(LIBPATH)/pkgconfig/libpng10.pc
-	chmod 644 $(LIBPATH)/pkgconfig/libpng10.pc
+	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
+	-@/bin/rm -f $(DL)/pkgconfig/$(LIBNAME).pc
+	-@/bin/rm -f $(DL)/pkgconfig/libpng.pc
+	cp libpng.pc $(DL)/pkgconfig/$(LIBNAME).pc
+	chmod 644 $(DL)/pkgconfig/$(LIBNAME).pc
+	(cd $(DL)/pkgconfig; ln -f -s $(LIBNAME).pc libpng.pc)
 
-install: install-static install-shared
+install-man: libpng.3 libpngpf.3 png.5
+	-@if [ ! -d $(DM) ]; then mkdir $(DM); fi
+	-@if [ ! -d $(DM)/man3 ]; then mkdir $(DM)/man3; fi
+	-@/bin/rm -f $(DM)/man3/libpng.3
+	-@/bin/rm -f $(DM)/man3/libpngpf.3
+	cp libpng.3 $(DM)/man3
+	cp libpngpf.3 $(DM)/man3
+	-@if [ ! -d $(DM)/man5 ]; then mkdir $(DM)/man5; fi
+	-@/bin/rm -f $(DM)/man5/png.5
+	cp png.5 $(DM)/man5
+
+install-config: libpng-config
+	-@if [ ! -d $(DB) ]; then mkdir $(DB); fi
+	-@/bin/rm -f $(DB)/libpng-config
+	-@/bin/rm -f $(DB)/$(LIBNAME)-config
+	cp libpng-config $(DB)/$(LIBNAME)-config
+	chmod 755 $(DB)/$(LIBNAME)-config
+	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
+
+install: install-static install-shared install-man install-config
+
+# If you installed in $(DESTDIR), test-installed won't work until you
+# move the library to its final location.
+
+test-installed:
+	$(CC) $(CFLAGS) \
+	   `$(BINPATH)/libpng10-config --cppflags --cflags` pngtest.c \
+	   -L$(ZLIBLIB) \
+	   -o pngtesti `$(BINPATH)/libpng10-config --ldflags --libs`
+	./pngtesti pngtest.png
+
+clean:
+	/bin/rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
+	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest-static pngtesti
+
 
 clean:
 	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest pngout.png
