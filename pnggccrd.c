@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng version 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -122,11 +122,33 @@
  *  - fixed up both versions of mmxsupport() (ORIG_THAT_USED_TO_CLOBBER_EBX
  *     macro determines which is used); original not yet tested.
  *
+ * 20000213:
+ *  - When compiling with gcc, be sure to use  -fomit-frame-pointer
+ *
  * 20000319:
  *  - fixed a register-name typo in png_do_read_interlace(), default (MMX) case,
  *     pass == 4 or 5, that caused visible corruption of interlaced images
  *
- *  - When compiling with gcc, be sure to use  -fomit-frame-pointer
+ * 20000623:
+ *  -  Various problems were reported with gcc 2.95.2 in the Cygwin environment,
+ *     many of the form "forbidden register 0 (ax) was spilled for class AREG."
+ *     This is explained at http://gcc.gnu.org/fom_serv/cache/23.html, and
+ *     Chuck Wilson supplied a patch involving dummy output registers.  See
+ *     http://sourceforge.net/bugs/?func=detailbug&bug_id=108741&group_id=5624
+ *     for the original (anonymous) SourceForge bug report.
+ *
+ * 20000706:
+ *  - Chuck Wilson passed along these remaining gcc 2.95.2 errors:
+ *       pnggccrd.c: In function `png_combine_row':
+ *       pnggccrd.c:525: more than 10 operands in `asm'
+ *       pnggccrd.c:669: more than 10 operands in `asm'
+ *       pnggccrd.c:828: more than 10 operands in `asm'
+ *       pnggccrd.c:994: more than 10 operands in `asm'
+ *       pnggccrd.c:1177: more than 10 operands in `asm'
+ *     They are all the same problem and can be worked around by using the
+ *     global _unmask variable unconditionally, not just in the -fPIC case.
+ *     Apparently earlier versions of gcc also have the problem with more than
+ *     10 operands; they just don't report it.  Much strangeness ensues, etc.
  */
 
 #define PNG_INTERNAL
@@ -174,9 +196,13 @@ static const int png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 /* These constants are used in the inlined MMX assembly code.
    Ignore gcc's "At top level: defined but not used" warnings. */
 
-#ifdef __PIC__
-static int _unmask;     // not enough regs when compiling with -fPIC, so...
-#endif
+/* GRR 20000706:  originally _unmask was needed only when compiling with -fPIC,
+ *  since that case uses the %ebx register for indexing the Global Offset Table
+ *  and there were no other registers available.  But gcc 2.95 and later emit
+ *  "more than 10 operands in `asm'" errors when %ebx is used to preload unmask
+ *  in the non-PIC case, so we'll just use the global unconditionally now.
+ */
+static int _unmask;
 
 static unsigned long long _mask8_0  = 0x0102040810204080LL;
 
@@ -430,23 +456,19 @@ fflush(stderr);
             {
                png_uint_32 len;
                int diff;
-#ifndef __PIC__
-               int unmask = ~mask;
-#else
+               int dummy_value_a;   // fix 'forbidden register spilled' error
+               int dummy_value_d;
+               int dummy_value_c;
+               int dummy_value_S;
+               int dummy_value_D;
                _unmask = ~mask;            // global variable for -fPIC version
-#endif
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
                len  = png_ptr->width &~7;  // reduce to multiple of 8
                diff = png_ptr->width & 7;  // amount lost
 
-               __asm__ (
-#ifdef __PIC__
+               __asm__ __volatile__ (
                   "movd      _unmask, %%mm7  \n\t" // load bit pattern
-#else
-// preload        "movd      unmask, %%mm7   \n\t" // (unmask is in ebx)
-                  "movd      %%ebx, %%mm7    \n\t" // load bit pattern (unmask)
-#endif
                   "psubb     %%mm6, %%mm6    \n\t" // zero mm6
                   "punpcklbw %%mm7, %%mm7    \n\t"
                   "punpcklwd %%mm7, %%mm7    \n\t"
@@ -498,21 +520,22 @@ fflush(stderr);
                 "end8:                       \n\t"
                   "EMMS                      \n\t"  // DONE
 
-                  :                                 // output regs (none)
+                  : "=a" (dummy_value_a),           // output regs (dummy)
+                    "=d" (dummy_value_d),
+                    "=c" (dummy_value_c),
+                    "=S" (dummy_value_S),
+                    "=D" (dummy_value_D)
 
-                  : "S" (srcptr),      // esi       // input regs
-                    "D" (dstptr),      // edi
-                    "a" (diff),        // eax
-#ifndef __PIC__
-                    "b" (unmask),      // ebx       // Global Offset Table idx
-#endif
-                    "c" (len),         // ecx
-                    "d" (mask)         // edx
+                  : "3" (srcptr),      // esi       // input regs
+                    "4" (dstptr),      // edi
+                    "0" (diff),        // eax
+// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
+                    "2" (len),         // ecx
+                    "1" (mask)         // edx
 
-                  : "%esi", "%edi", "%eax",         // clobber list
-                    "%ecx", "%edx"
+//                  :          // clobber list
 #if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
-                  , "%mm0", "%mm4", "%mm6", "%mm7"
+                  : "%mm0", "%mm4", "%mm6", "%mm7"
 #endif
                );
             }
@@ -550,23 +573,19 @@ fflush(stderr);
             {
                png_uint_32 len;
                int diff;
-#ifndef __PIC__
-               int unmask = ~mask;
-#else
+               int dummy_value_a;   // fix 'forbidden register spilled' error
+               int dummy_value_d;
+               int dummy_value_c;
+               int dummy_value_S;
+               int dummy_value_D;
                _unmask = ~mask;            // global variable for -fPIC version
-#endif
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
                len  = png_ptr->width &~7;  // reduce to multiple of 8
                diff = png_ptr->width & 7;  // amount lost
 
-               __asm__ (
-#ifdef __PIC__
+               __asm__ __volatile__ (
                   "movd      _unmask, %%mm7   \n\t" // load bit pattern
-#else
-// preload        "movd      unmask, %%mm7    \n\t" // (unmask is in ebx)
-                  "movd      %%ebx, %%mm7     \n\t" // load bit pattern (unmask)
-#endif
                   "psubb     %%mm6, %%mm6     \n\t" // zero mm6
                   "punpcklbw %%mm7, %%mm7     \n\t"
                   "punpcklwd %%mm7, %%mm7     \n\t"
@@ -633,21 +652,22 @@ fflush(stderr);
                 "end16:                       \n\t"
                   "EMMS                       \n\t" // DONE
 
-                  :                                 // output regs (none)
+                  : "=a" (dummy_value_a),              // output regs (dummy)
+                    "=d" (dummy_value_d),
+                    "=c" (dummy_value_c),
+                    "=S" (dummy_value_S),
+                    "=D" (dummy_value_D)
 
-                  : "S" (srcptr),      // esi       // input regs
-                    "D" (dstptr),      // edi
-                    "a" (diff),        // eax
-#ifndef __PIC__
-                    "b" (unmask),      // ebx       // Global Offset Table idx
-#endif
-                    "c" (len),         // ecx
-                    "d" (mask)         // edx
+                  : "3" (srcptr),      // esi       // input regs
+                    "4" (dstptr),      // edi
+                    "0" (diff),        // eax
+// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
+                    "2" (len),         // ecx
+                    "1" (mask)         // edx
 
-                  : "%esi", "%edi", "%eax",         // clobber list
-                    "%ecx", "%edx"
+//                  :          // clobber list
 #if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
-                  , "%mm0", "%mm1",
+                  : "%mm0", "%mm1",
                     "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
                );
@@ -686,23 +706,19 @@ fflush(stderr);
             {
                png_uint_32 len;
                int diff;
-#ifndef __PIC__
-               int unmask = ~mask;
-#else
+               int dummy_value_a;   // fix 'forbidden register spilled' error
+               int dummy_value_d;
+               int dummy_value_c;
+               int dummy_value_S;
+               int dummy_value_D;
                _unmask = ~mask;            // global variable for -fPIC version
-#endif
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
                len  = png_ptr->width &~7;  // reduce to multiple of 8
                diff = png_ptr->width & 7;  // amount lost
 
-               __asm__ (
-#ifdef __PIC__
+               __asm__ __volatile__ (
                   "movd      _unmask, %%mm7   \n\t" // load bit pattern
-#else
-// preload        "movd      unmask, %%mm7    \n\t" // (unmask is in ebx)
-                  "movd      %%ebx, %%mm7     \n\t" // load bit pattern (unmask)
-#endif
                   "psubb     %%mm6, %%mm6     \n\t" // zero mm6
                   "punpcklbw %%mm7, %%mm7     \n\t"
                   "punpcklwd %%mm7, %%mm7     \n\t"
@@ -784,21 +800,22 @@ fflush(stderr);
                 "end24:                       \n\t"
                   "EMMS                       \n\t" // DONE
 
-                  :                                 // output regs (none)
+                  : "=a" (dummy_value_a),              // output regs (dummy)
+                    "=d" (dummy_value_d),
+                    "=c" (dummy_value_c),
+                    "=S" (dummy_value_S),
+                    "=D" (dummy_value_D)
 
-                  : "S" (srcptr),      // esi       // input regs
-                    "D" (dstptr),      // edi
-                    "a" (diff),        // eax
-#ifndef __PIC__
-                    "b" (unmask),      // ebx       // Global Offset Table idx
-#endif
-                    "c" (len),         // ecx
-                    "d" (mask)         // edx
+                  : "3" (srcptr),      // esi       // input regs
+                    "4" (dstptr),      // edi
+                    "0" (diff),        // eax
+// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
+                    "2" (len),         // ecx
+                    "1" (mask)         // edx
 
-                  : "%esi", "%edi", "%eax",         // clobber list
-                    "%ecx", "%edx"
+//                  :          // clobber list
 #if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
-                  , "%mm0", "%mm1", "%mm2",
+                  : "%mm0", "%mm1", "%mm2",
                     "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
                );
@@ -837,23 +854,19 @@ fflush(stderr);
             {
                png_uint_32 len;
                int diff;
-#ifndef __PIC__
-               int unmask = ~mask;
-#else
+               int dummy_value_a;   // fix 'forbidden register spilled' error
+               int dummy_value_d;
+               int dummy_value_c;
+               int dummy_value_S;
+               int dummy_value_D;
                _unmask = ~mask;            // global variable for -fPIC version
-#endif
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
                len  = png_ptr->width &~7;  // reduce to multiple of 8
                diff = png_ptr->width & 7;  // amount lost
 
-               __asm__ (
-#ifdef __PIC__
+               __asm__ __volatile__ (
                   "movd      _unmask, %%mm7   \n\t" // load bit pattern
-#else
-// preload        "movd      unmask, %%mm7    \n\t" // (unmask is in ebx)
-                  "movd      %%ebx, %%mm7     \n\t" // load bit pattern (unmask)
-#endif
                   "psubb     %%mm6, %%mm6     \n\t" // zero mm6
                   "punpcklbw %%mm7, %%mm7     \n\t"
                   "punpcklwd %%mm7, %%mm7     \n\t"
@@ -942,21 +955,22 @@ fflush(stderr);
                 "end32:                       \n\t"
                   "EMMS                       \n\t" // DONE
 
-                  :                                 // output regs (none)
+                  : "=a" (dummy_value_a),              // output regs (dummy)
+                    "=d" (dummy_value_d),
+                    "=c" (dummy_value_c),
+                    "=S" (dummy_value_S),
+                    "=D" (dummy_value_D)
 
-                  : "S" (srcptr),      // esi       // input regs
-                    "D" (dstptr),      // edi
-                    "a" (diff),        // eax
-#ifndef __PIC__
-                    "b" (unmask),      // ebx       // Global Offset Table idx
-#endif
-                    "c" (len),         // ecx
-                    "d" (mask)         // edx
+                  : "3" (srcptr),      // esi       // input regs
+                    "4" (dstptr),      // edi
+                    "0" (diff),        // eax
+// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
+                    "2" (len),         // ecx
+                    "1" (mask)         // edx
 
-                  : "%esi", "%edi", "%eax",         // clobber list
-                    "%ecx", "%edx"
+//                  :          // clobber list
 #if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
-                  , "%mm0", "%mm1", "%mm2", "%mm3",
+                  : "%mm0", "%mm1", "%mm2", "%mm3",
                     "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
                );
@@ -995,23 +1009,19 @@ fflush(stderr);
             {
                png_uint_32 len;
                int diff;
-#ifndef __PIC__
-               int unmask = ~mask;
-#else
+               int dummy_value_a;   // fix 'forbidden register spilled' error
+               int dummy_value_d;
+               int dummy_value_c;
+               int dummy_value_S;
+               int dummy_value_D;
                _unmask = ~mask;            // global variable for -fPIC version
-#endif
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
                len  = png_ptr->width &~7;  // reduce to multiple of 8
                diff = png_ptr->width & 7;  // amount lost
 
-               __asm__ (
-#ifdef __PIC__
+               __asm__ __volatile__ (
                   "movd      _unmask, %%mm7   \n\t" // load bit pattern
-#else
-// preload        "movd      unmask, %%mm7    \n\t" // (unmask is in ebx)
-                  "movd      %%ebx, %%mm7     \n\t" // load bit pattern (unmask)
-#endif
                   "psubb     %%mm6, %%mm6     \n\t" // zero mm6
                   "punpcklbw %%mm7, %%mm7     \n\t"
                   "punpcklwd %%mm7, %%mm7     \n\t"
@@ -1117,21 +1127,22 @@ fflush(stderr);
                 "end48:                       \n\t"
                   "EMMS                       \n\t" // DONE
 
-                  :                                 // output regs (none)
+                  : "=a" (dummy_value_a),              // output regs (dummy)
+                    "=d" (dummy_value_d),
+                    "=c" (dummy_value_c),
+                    "=S" (dummy_value_S),
+                    "=D" (dummy_value_D)
 
-                  : "S" (srcptr),      // esi       // input regs
-                    "D" (dstptr),      // edi
-                    "a" (diff),        // eax
-#ifndef __PIC__
-                    "b" (unmask),      // ebx       // Global Offset Table idx
-#endif
-                    "c" (len),         // ecx
-                    "d" (mask)         // edx
+                  : "3" (srcptr),      // esi       // input regs
+                    "4" (dstptr),      // edi
+                    "0" (diff),        // eax
+// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
+                    "2" (len),         // ecx
+                    "1" (mask)         // edx
 
-                  : "%esi", "%edi", "%eax",         // clobber list
-                    "%ecx", "%edx"
+//                  :         // clobber list
 #if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
-                  , "%mm0", "%mm1", "%mm2", "%mm3",
+                  : "%mm0", "%mm1", "%mm2", "%mm3",
                     "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
                );
@@ -1453,7 +1464,10 @@ fflush(stderr);
                {
                   if (((pass == 0) || (pass == 1)) && width)
                   {
-                     __asm__ (
+                     int dummy_value_c;   // fix 'forbidden register spilled'
+                     int dummy_value_S;
+                     int dummy_value_D;
+                     __asm__ __volatile__ (
                         "subl $21, %%edi         \n\t"
                                      // (png_pass_inc[pass] - 1)*pixel_bytes
 
@@ -1482,22 +1496,27 @@ fflush(stderr);
                         "jnz .loop3_pass0        \n\t"
                         "EMMS                    \n\t" // DONE
 
-                        :                              // output regs (none)
+                        : "=c" (dummy_value_c),           // output regs (dummy)
+                          "=S" (dummy_value_S),
+                          "=D" (dummy_value_D)
 
-                        : "S" (sptr),      // esi      // input regs
-                          "D" (dp),        // edi
-                          "c" (width)      // ecx
+                        : "1" (sptr),      // esi      // input regs
+                          "2" (dp),        // edi
+                          "0" (width)      // ecx
 // doesn't work           "i" (0x0000000000FFFFFFLL)   // %1 (a.k.a. _const4)
 
-                        : "%esi", "%edi", "%ecx"       // clobber list
+//                        :        // clobber list
 #if 0  /* %mm0, ..., %mm4 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                        , "%mm0", "%mm1", "%mm2", "%mm3", "%mm4"
+                        : "%mm0", "%mm1", "%mm2", "%mm3", "%mm4"
 #endif
                      );
                   }
                   else if (((pass == 2) || (pass == 3)) && width)
                   {
-                     __asm__ (
+                     int dummy_value_c;   // fix 'forbidden register spilled'
+                     int dummy_value_S;
+                     int dummy_value_D;
+                     __asm__ __volatile__ (
                         "subl $9, %%edi          \n\t"
                                      // (png_pass_inc[pass] - 1)*pixel_bytes
 
@@ -1520,15 +1539,17 @@ fflush(stderr);
                         "jnz .loop3_pass2        \n\t"
                         "EMMS                    \n\t" // DONE
 
-                        :                              // output regs (none)
+                        : "=c" (dummy_value_c),           // output regs (dummy)
+                          "=S" (dummy_value_S),
+                          "=D" (dummy_value_D)
 
-                        : "S" (sptr),      // esi      // input regs
-                          "D" (dp),        // edi
-                          "c" (width)      // ecx
+                        : "1" (sptr),      // esi      // input regs
+                          "2" (dp),        // edi
+                          "0" (width)      // ecx
 
-                        : "%esi", "%edi", "%ecx"       // clobber list
+//                        :        // clobber list
 #if 0  /* %mm0, ..., %mm2 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                        , "%mm0", "%mm1", "%mm2"
+                        : "%mm0", "%mm1", "%mm2"
 #endif
                      );
                   }
@@ -1543,7 +1564,10 @@ fflush(stderr);
                         // png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
                         // sptr points at last pixel in pre-expanded row
                         // dp points at last pixel position in expanded row
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $3, %%esi          \n\t"
                            "subl $9, %%edi          \n\t"
                                         // (png_pass_inc[pass] + 1)*pixel_bytes
@@ -1569,15 +1593,17 @@ fflush(stderr);
                            "jnz .loop3_pass4        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0, ..., %mm3 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1", "%mm2", "%mm3"
+                           : "%mm0", "%mm1", "%mm2", "%mm3"
 #endif
                         );
                      }
@@ -1609,7 +1635,10 @@ fflush(stderr);
                      width -= width_mmx;        // 0-3 pixels => 0-3 bytes
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $3, %%esi          \n\t"
                            "subl $31, %%edi         \n\t"
 
@@ -1636,15 +1665,17 @@ fflush(stderr);
                            "jnz .loop1_pass0        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :       // clobber list
 #if 0  /* %mm0, ..., %mm4 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1", "%mm2", "%mm3", "%mm4"
+                           : "%mm0", "%mm1", "%mm2", "%mm3", "%mm4"
 #endif
                         );
                      }
@@ -1684,7 +1715,10 @@ fflush(stderr);
                      width -= width_mmx;        // 0-3 pixels => 0-3 bytes
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $3, %%esi          \n\t"
                            "subl $15, %%edi         \n\t"
 
@@ -1702,15 +1736,17 @@ fflush(stderr);
                            "jnz .loop1_pass2        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1"
+                           : "%mm0", "%mm1"
 #endif
                         );
                      }
@@ -1732,7 +1768,10 @@ fflush(stderr);
                      width -= width_mmx;        // 0-3 pixels => 0-3 bytes
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $7, %%esi          \n\t"
                            "subl $15, %%edi         \n\t"
 
@@ -1749,15 +1788,17 @@ fflush(stderr);
                            "jnz .loop1_pass4        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (none)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1"
+                           : "%mm0", "%mm1"
 #endif
                         );
                      }
@@ -1784,7 +1825,10 @@ fflush(stderr);
                      width -= width_mmx;        // 0,1 pixels => 0,2 bytes
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $2, %%esi          \n\t"
                            "subl $30, %%edi         \n\t"
 
@@ -1804,15 +1848,17 @@ fflush(stderr);
                            "jnz .loop2_pass0        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1"
+                           : "%mm0", "%mm1"
 #endif
                         );
                      }
@@ -1838,7 +1884,10 @@ fflush(stderr);
                      width -= width_mmx;        // 0,1 pixels => 0,2 bytes
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $2, %%esi          \n\t"
                            "subl $14, %%edi         \n\t"
 
@@ -1856,15 +1905,17 @@ fflush(stderr);
                            "jnz .loop2_pass2        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1"
+                           : "%mm0", "%mm1"
 #endif
                         );
                      }
@@ -1890,7 +1941,10 @@ fflush(stderr);
                      width -= width_mmx;        // 0,1 pixels => 0,2 bytes
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $2, %%esi          \n\t"
                            "subl $6, %%edi          \n\t"
 
@@ -1904,15 +1958,17 @@ fflush(stderr);
                            "jnz .loop2_pass4        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0"
+                           : "%mm0"
 #endif
                         );
                      }
@@ -1948,12 +2004,15 @@ fflush(stderr);
  */
                      if (width_mmx)
                      {
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
 #ifdef GRR_DEBUG
                         FILE *junk = fopen("junk.4bytes", "wb");
                         if (junk)
                            fclose(junk);
 #endif /* GRR_DEBUG */
-                        __asm__ (
+                        __asm__ __volatile__ (
                            "subl $4, %%esi          \n\t"
                            "subl $60, %%edi         \n\t"
 
@@ -1976,15 +2035,17 @@ fflush(stderr);
                            "jnz .loop4_pass0        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
+ 
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
-
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1"
+                           : "%mm0", "%mm1"
 #endif
                         );
                      }
@@ -2010,7 +2071,10 @@ fflush(stderr);
                      width -= width_mmx;        // 0,1 pixels => 0,4 bytes
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $4, %%esi          \n\t"
                            "subl $28, %%edi         \n\t"
 
@@ -2029,15 +2093,17 @@ fflush(stderr);
                            "jnz .loop4_pass2        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
+ 
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
-
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1"
+                           : "%mm0", "%mm1"
 #endif
                         );
                      }
@@ -2063,7 +2129,10 @@ fflush(stderr);
                      width -= width_mmx;        // 0,1 pixels => 0,4 bytes
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $4, %%esi          \n\t"
                            "subl $12, %%edi         \n\t"
 
@@ -2080,15 +2149,17 @@ fflush(stderr);
                            "jnz .loop4_pass4        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width_mmx)  // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width_mmx)  // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0", "%mm1"
+                           : "%mm0", "%mm1"
 #endif
                         );
                      }
@@ -2122,12 +2193,15 @@ fflush(stderr);
                   {
                      // source is 8-byte RRGGBBAA
                      // dest is 64-byte RRGGBBAA RRGGBBAA RRGGBBAA RRGGBBAA ...
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
 #ifdef GRR_DEBUG
                         FILE *junk = fopen("junk.8bytes", "wb");
                         if (junk)
                             fclose(junk);
 #endif /* GRR_DEBUG */
-                        __asm__ (
+                        __asm__ __volatile__ (
                            "subl $56, %%edi         \n\t" // start of last block
 
                         ".loop8_pass0:              \n\t"
@@ -2146,15 +2220,17 @@ fflush(stderr);
                            "jnz .loop8_pass0        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width)      // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width)      // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0"
+                           : "%mm0"
 #endif
                         );
                   }
@@ -2166,7 +2242,10 @@ fflush(stderr);
                      width -= width_mmx;
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $24, %%edi         \n\t" // start of last block
 
                         ".loop8_pass2:              \n\t"
@@ -2181,15 +2260,17 @@ fflush(stderr);
                            "jnz .loop8_pass2        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width)      // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width)      // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0"
+                           : "%mm0"
 #endif
                         );
                      }
@@ -2202,7 +2283,10 @@ fflush(stderr);
                      width -= width_mmx;
                      if (width_mmx)
                      {
-                        __asm__ (
+                        int dummy_value_c;  // fix 'forbidden register spilled'
+                        int dummy_value_S;
+                        int dummy_value_D;
+                        __asm__ __volatile__ (
                            "subl $8, %%edi          \n\t" // start of last block
 
                         ".loop8_pass4:              \n\t"
@@ -2215,15 +2299,17 @@ fflush(stderr);
                            "jnz .loop8_pass4        \n\t"
                            "EMMS                    \n\t" // DONE
 
-                           :                              // output regs (none)
+                           : "=c" (dummy_value_c),           // output regs (dummy)
+                             "=S" (dummy_value_S),
+                             "=D" (dummy_value_D)
 
-                           : "S" (sptr),      // esi      // input regs
-                             "D" (dp),        // edi
-                             "c" (width)      // ecx
+                           : "1" (sptr),      // esi      // input regs
+                             "2" (dp),        // edi
+                             "0" (width)      // ecx
 
-                           : "%esi", "%edi", "%ecx"       // clobber list
+//                           :        // clobber list
 #if 0  /* %mm0 not supported by gcc 2.7.2.3 or egcs 1.1 */
-                           , "%mm0"
+                           : "%mm0"
 #endif
                         );
                      }
@@ -2408,11 +2494,14 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
                             png_bytep prev_row)
 {
    int bpp;
+   int dummy_value_c;   // fix 'forbidden register 2 (cx) was spilled' error
+   int dummy_value_S;
+   int dummy_value_D;
 // int diff;  GRR: global now (shortened to dif/_dif)
 
    bpp = (row_info->pixel_depth + 7) >> 3;  // Get # bytes per pixel
    _FullLength  = row_info->rowbytes;        // # of bytes to filter
-   __asm__ (
+   __asm__ __volatile__ (
       // Init address pointers and offset
 //GRR "movl row, %%edi             \n\t" // edi ==> Avg(x)
       "xorl %%ebx, %%ebx           \n\t" // ebx ==> x
@@ -2467,14 +2556,16 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       "subl %%eax, %%ecx           \n\t" // drop over bytes from original length
       "movl %%ecx, _MMXLength      \n\t"
 
-      : // output regs/vars here, e.g., "=m" (_MMXLength) instead of final instr
+      : "=c" (dummy_value_c), // output regs/vars here, e.g., "=m" (_MMXLength) instead of final instr
+        "=S" (dummy_value_S),
+        "=D" (dummy_value_D)
 
-      : "S" (prev_row),  // esi          // input regs
-        "D" (row),       // edi
-        "c" (bpp)        // ecx
+      : "1" (prev_row),  // esi          // input regs
+        "2" (row),       // edi
+        "0" (bpp)        // ecx
 
-      : "%eax", "%ebx", "%ecx",          // clobber list
-        "%edx", "%edi", "%esi"
+      : "%eax", "%ebx",          // clobber list
+        "%edx"
 // GRR: INCLUDE "memory" as clobbered? (_dif, _MMXLength)     PROBABLY
    );
 

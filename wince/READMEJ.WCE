@@ -1,0 +1,44 @@
+libpng for WindowsCE Rel.1.0
+============================
+ Copyright (c) 2000 Glenn Randers-Pehrson
+ Copyright (c) 2000 Tenik Co.,Ltd.
+
+ Porting for WindowsCE by Tenik Co.,Ltd.(Kazuo Adachi)
+
+
+はじめに
+========
+libpng for WindowsCEは PNG形式の画像データライブラリ libpngのWindowsCE
+版です。libpngについての詳しい説明は、付属の README をお読みください。
+
+zlib for WindowsCE
+==================
+libpngでは、データ圧縮ライブラリとして zlibを使用しています。libpngを
+利用するためには、別途 zlibを用意する必要があります。
+
+なお、このパッケージで利用できる zlibは私の作成した zlibce.dllです。
+
+使用条件
+========
+このソフトウェアは無保証です。このソフトウェアが原因で利用者が被ること
+になったいかなる被害についても、作者、配布者、その他利用者以外の人物、
+団体に責任をとる義務はないものとします。
+
+その他、このソフトウェアの利用条件については、原版である libpng 1.0.7に
+準拠するものとします。詳しくは、付属の README,LICENSE をお読みください。
+
+収録内容
+========
+
+ READMEJ.WCE - このファイル
+ READMEE.WCE - このファイル(英語)
+ png32ce.def - DLL作成用 定義ファイル
+
+付属サンプル・プログラムは、メッセージ出力の都合上、WindowsCE 2.11以降
+でのみ使用可能です。
+
+配布者
+======
+テニック株式会社 開発部
+足立 和雄
+adachi@tenik.co.jp

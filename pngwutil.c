@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -172,7 +172,7 @@ png_text_compress(png_structp png_ptr,
 
    if (compression >= PNG_TEXT_COMPRESSION_LAST)
    {
-#if !defined(PNG_NO_STDIO)
+#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
       char msg[50];
       sprintf(msg, "Unknown compression type %d", compression);
       png_warning(png_ptr, msg);
@@ -837,8 +837,8 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
        white_x + white_y > 1.0)
    {
       png_warning(png_ptr, "Invalid cHRM white point specified");
-#if !defined(PNG_NO_STDIO)
-      printf("white_x=%f, white_y=%f\n",white_x, white_y);
+#if !defined(PNG_NO_CONSOLE_IO)
+      fprintf(stderr,"white_x=%f, white_y=%f\n",white_x, white_y);
 #endif
       return;
    }
@@ -900,8 +900,8 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    if (white_x > 80000L || white_y > 80000L || white_x + white_y > 100000L)
    {
       png_warning(png_ptr, "Invalid fixed cHRM white point specified");
-#if !defined(PNG_NO_STDIO)
-      printf("white_x=%ld, white_y=%ld\n",white_x, white_y);
+#if !defined(PNG_NO_CONSOLE_IO)
+      fprintf(stderr,"white_x=%ld, white_y=%ld\n",white_x, white_y);
 #endif
       return;
    }
@@ -1088,7 +1088,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    {
       if (*kp < 0x20 || (*kp > 0x7E && (png_byte)*kp < 0xA1))
       {
-#if !defined(PNG_NO_STDIO)
+#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
          char msg[40];
 
          sprintf(msg, "invalid keyword character 0x%02X", *kp);
@@ -1441,8 +1441,19 @@ png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
 
    png_debug(1, "in png_write_sCAL\n");
 
+#if defined(_WIN32_WCE)
+/* sprintf() function is not supported on WindowsCE */
+   {
+      wchar_t wc_buf[32];
+      swprintf(wc_buf, TEXT("%12.12e"), width);
+      WideCharToMultiByte(CP_ACP, 0, wc_buf, -1, wbuf, 32, NULL, NULL);
+      swprintf(wc_buf, TEXT("%12.12e"), height);
+      WideCharToMultiByte(CP_ACP, 0, wc_buf, -1, hbuf, 32, NULL, NULL);
+   }
+#else
    sprintf(wbuf, "%12.12e", width);
    sprintf(hbuf, "%12.12e", height);
+#endif
    total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
 
    png_debug1(3, "sCAL total length = %d\n", total_len);

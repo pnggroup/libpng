@@ -1,0 +1,43 @@
+libpng for WindowsCE Rel.1.0
+============================
+ Copyright (c) 2000 Glenn Randers-Pehrson
+ Copyright (c) 2000 Tenik Co.,Ltd.
+
+ Porting for WindowsCE by Tenik Co.,Ltd.(Kazuo Adachi)
+
+
+Introduction
+============
+This is libpng 1.0.7 ported to WindowsCE 2.0 and 2.11.
+libpng 1.0.7 is a PNG reference library.
+See README, a document of original libpng 1.0.7.
+
+zlib for WindowsCE
+==================
+This library requires zlib for WindowsCE.  You can use the supplied
+zlib.diff and zlibce.def files to add WindowsCE support to libpng-1.1.3.
+
+Copyright notice
+================
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+See README and LICENSE, documents of original libpng 1.0.7, for conditions
+of use and distribution.
+
+Files
+=====
+
+ READMEE.WCE - this file(in English)
+ READMEJ.WCE - this file(in Japanese)
+ png32ce.def - module definition file to make DLLs
+
+Sample programs(../pngtest.c and ../contrib/*) can build on WindowsCE 2.11.
+WindowsCE 2.0 and below do not support 'console' functions.
+
+Author
+======
+Tenik Co.,Ltd.
+Kazuo Adachi
+adachi@tenik.co.jp

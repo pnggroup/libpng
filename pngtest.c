@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -27,9 +27,27 @@
  * of files at once by typing "pngtest -m file1.png file2.png ..."
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#if defined(_WIN32_WCE)
+#  if _WIN32_WCE < 211
+     __error__ (f|w)printf functions are not supported on old WindowsCE.;
+#  endif
+#  include <windows.h>
+#  include <stdlib.h>
+#  define READFILE(file, data, length, check) \
+     ReadFile(file, data, length, &check,NULL)
+#  define WRITEFILE(file, data, length, check) \
+     WriteFile(file, data, length, &check, NULL);
+#  define FCLOSE(file) CloseHandle(file)
+#else
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include <assert.h>
+#  define READFILE(file, data, length, check) \
+     check=(png_size_t)fread(data,(png_size_t)1,length,file)
+#  define WRITEFILE(file, data, length, check) \
+     check = (png_size_t)fwrite(data, (png_size_t)1, length, file);
+#  define FCLOSE(file) fclose(file)
+#endif
 
 /* Makes pngtest verbose so we can find problems (needs to be before png.h) */
 #ifndef PNG_DEBUG
@@ -239,8 +257,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    /* fread() returns 0 on error, so it is OK to store this in a png_size_t
     * instead of an int, which is what fread() actually returns.
     */
-   check = (png_size_t)fread(data, (png_size_t)1, length,
-      (FILE *)png_ptr->io_ptr);
+   READFILE((png_FILE_p)png_ptr->io_ptr, data, length, check);
 
    if (check != length)
    {
@@ -261,14 +278,14 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    int check;
    png_byte *n_data;
-   FILE *io_ptr;
+   png_FILE_p io_ptr;
 
    /* Check if data really is near. If so, use usual code. */
    n_data = (png_byte *)CVT_PTR_NOCHECK(data);
-   io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
+   io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)n_data == data)
    {
-      check = fread(n_data, 1, length, io_ptr);
+      READFILE(io_ptr, n_data, length, check);
    }
    else
    {
@@ -279,7 +296,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       do
       {
          read = MIN(NEAR_BUF_SIZE, remaining);
-         err = fread(buf, (png_size_t)1, read, io_ptr);
+         READFILE(io_ptr, buf, 1, err);
          png_memcpy(data, buf, read); /* copy far buffer to near buffer */
          if(err != read)
             break;
@@ -301,10 +318,12 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 static void
 pngtest_flush(png_structp png_ptr)
 {
-   FILE *io_ptr;
-   io_ptr = (FILE *)CVT_PTR((png_ptr->io_ptr));
+#if !defined(_WIN32_WCE)
+   png_FILE_p io_ptr;
+   io_ptr = (png_FILE_p)CVT_PTR((png_ptr->io_ptr));
    if (io_ptr != NULL)
       fflush(io_ptr);
+#endif
 }
 #endif
 
@@ -318,7 +337,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
 
-   check = fwrite(data, 1, length, (FILE *)(png_ptr->io_ptr));
+   WRITEFILE((png_FILE_p)png_ptr->io_ptr,  data, 1, check);
    if (check != length)
    {
       png_error(png_ptr, "Write Error");
@@ -338,14 +357,14 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
    png_byte *near_data;  /* Needs to be "png_byte *" instead of "png_bytep" */
-   FILE *io_ptr;
+   png_FILE_p io_ptr;
 
    /* Check if data really is near. If so, use usual code. */
    near_data = (png_byte *)CVT_PTR_NOCHECK(data);
-   io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
+   io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)near_data == data)
    {
-      check = fwrite(near_data, 1, length, io_ptr);
+      WRITEFILE(io_ptr, near_data, 1, check);
    }
    else
    {
@@ -357,7 +376,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
       {
          written = MIN(NEAR_BUF_SIZE, remaining);
          png_memcpy(buf, data, written); /* copy far buffer to near buffer */
-         err = fwrite(buf, 1, written, io_ptr);
+         WRITEFILE(io_ptr, written, 1, err);
          if (err != written)
             break;
          else
@@ -417,7 +436,7 @@ pngtest_error(png_structp png_ptr, png_const_charp message)
    by setting MAXSEG_64K in zlib zconf.h *or* PNG_MAX_MALLOC_64K. */
 typedef struct memory_information
 {
-   png_uint_32                    size;
+   png_uint_32               size;
    png_voidp                 pointer;
    struct memory_information FAR *next;
 } memory_information;
@@ -463,7 +482,7 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       if(verbose)
          printf("png_malloc %d bytes at %x\n",size,pinfo->pointer);
 #endif
-      assert(pinfo->size != 12345);
+      assert(pinfo->size != 12345678);
       return (png_voidp)(pinfo->pointer);
    }
 }
@@ -523,7 +542,8 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 int
 test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 {
-   static FILE *fpin, *fpout;  /* "static" prevents setjmp corruption */
+   static png_FILE_p fpin;
+   static png_FILE_p fpout;  /* "static" prevents setjmp corruption */
    png_structp read_ptr, write_ptr;
    png_infop read_info_ptr, write_info_ptr, end_info_ptr, write_end_info_ptr;
    png_bytep row_buf;
@@ -1083,8 +1103,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_size_t num_in, num_out;
 
-      num_in = fread(inbuf, 1, 1, fpin);
-      num_out = fread(outbuf, 1, 1, fpout);
+      READFILE(fpin, inbuf, 1, num_in);
+      READFILE(fpout, outbuf, 1, num_out);
 
       if (num_in != num_out)
       {
@@ -1392,4 +1412,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7 your_png_h_is_not_version_1_0_7;
+typedef version_1_0_8beta1 your_png_h_is_not_version_1_0_8beta1;

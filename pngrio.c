@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -48,7 +48,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
     * instead of an int, which is what fread() actually returns.
     */
    check = (png_size_t)fread(data, (png_size_t)1, length,
-      (FILE *)png_ptr->io_ptr);
+      (png_FILE_p)png_ptr->io_ptr);
 
    if (check != length)
    {
@@ -69,11 +69,11 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    int check;
    png_byte *n_data;
-   FILE *io_ptr;
+   png_FILE_p io_ptr;
 
    /* Check if data really is near. If so, use usual code. */
    n_data = (png_byte *)CVT_PTR_NOCHECK(data);
-   io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
+   io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)n_data == data)
    {
       check = fread(n_data, 1, length, io_ptr);

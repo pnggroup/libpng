@@ -1,5 +1,5 @@
 
-Libpng 1.0.7 - July 1, 2000
+Libpng 1.0.8beta1 - July 8, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -96,6 +96,14 @@ Changes since the last public release (1.0.6):
   Removed leading underscores from "_PNG_H" and "_PNG_SAVE_BSD_SOURCE" macros.
   Fixed bugs in pngwrite.c and pngwutil.c that prevented writing iCCP chunks.
   Revised the definition of "trans_values" in libpng.3/libpng.txt
+  Added png_free(png_ptr, key) two places in pngpread.c to stop memory leaks.
+  Changed PNG_NO_STDIO to PNG_NO_CONSOLE_IO, several places in pngrutil.c and
+     pngwutil.c.
+  Changed PNG_EXPORT_VAR to use PNG_IMPEXP, in pngconf.h.
+  Removed unused "#include <assert.h>" from png.c
+  Added WindowsCE support.
+  Revised pnggccrd.c to work with gcc-2.95.2 and in the Cygwin environment.
+
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,6 +13,30 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+
+#if defined(_WIN32_WCE)
+/* strtod() function is not supported on WindowsCE */
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
+__inline double strtod(const char *nptr, char **endptr)
+{
+   double result = 0;
+   int len;
+   wchar_t *str, *end;
+
+   len = MultiByteToWideChar(CP_ACP, 0, nptr, -1, NULL, 0);
+   str = (wchar_t *)malloc(len * sizeof(wchar_t));
+   if ( NULL != str )
+   {
+      MultiByteToWideChar(CP_ACP, 0, nptr, -1, str, len);
+      result = wcstod(str, &end);
+      len = WideCharToMultiByte(CP_ACP, 0, end, -1, NULL, 0, NULL, NULL);
+      *endptr = (char *)nptr + (strlen(nptr) - len + 1);
+      free(str);
+   }
+   return result;
+}
+#  endif
+#endif
 
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
@@ -225,11 +249,18 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       }
       if (ret != Z_STREAM_END)
       {
-#if !defined(PNG_NO_STDIO)
+#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
          char umsg[50];
 
-         sprintf(umsg,"Incomplete compressed datastream in %s chunk",
-             png_ptr->chunk_name);
+         if (ret == Z_BUF_ERROR)
+            sprintf(umsg,"Buffer error in compressed datastream in %s chunk",
+                png_ptr->chunk_name);
+         else if (ret == Z_DATA_ERROR)
+            sprintf(umsg,"Data error in compressed datastream in %s chunk",
+                png_ptr->chunk_name);
+         else
+            sprintf(umsg,"Incomplete compressed datastream in %s chunk",
+                png_ptr->chunk_name);
          png_warning(png_ptr, umsg);
 #else
          png_warning(png_ptr,
@@ -246,7 +277,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    }
    else /* if (comp_type != PNG_TEXT_COMPRESSION_zTXt) */
    {
-#if !defined(PNG_NO_STDIO)
+#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
       char umsg[50];
 
       sprintf(umsg, "Unknown zTXt compression type %d", comp_type);
@@ -585,7 +616,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-#ifndef PNG_NO_STDIO
+#ifndef PNG_NO_CONSOLE_IO
          fprintf(stderr, "gamma = (%d/100000)\n", (int)igamma);
 #endif
          return;
@@ -795,7 +826,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
-#ifndef PNG_NO_STDIO
+#ifndef PNG_NO_CONSOLE_IO
 #ifdef PNG_FLOATING_POINT_SUPPORTED
             fprintf(stderr,"wx=%f, wy=%f, rx=%f, ry=%f\n",
                white_x, white_y, red_x, red_y);
@@ -807,7 +838,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
             fprintf(stderr,"gx=%ld, gy=%ld, bx=%ld, by=%ld\n",
                int_x_green, int_y_green, int_x_blue, int_y_blue);
 #endif
-#endif /* PNG_NO_STDIO */
+#endif /* PNG_NO_CONSOLE_IO */
          }
          png_crc_finish(png_ptr, 0);
          return;
@@ -901,7 +932,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-#ifndef PNG_NO_STDIO
+#ifndef PNG_NO_CONSOLE_IO
 #  ifdef PNG_FIXED_POINT_SUPPORTED
          fprintf(stderr,"incorrect gamma=(%d/100000)\n",(int)png_ptr->int_gamma);
 #  else

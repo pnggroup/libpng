@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -378,6 +378,8 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 }
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
+#if !defined(_WIN32_WCE)
+/* "time.h" functions are not supported on WindowsCE */
 void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
 {
@@ -399,6 +401,7 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
    tbuf = gmtime(&ttime);
    png_convert_from_struct_tm(ptime, tbuf);
 }
+#endif
 #endif
 
 /* Initialize png_ptr structure, and allocate any memory needed */

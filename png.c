@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.7 - July 1, 2000
+ * libpng version 1.0.8beta1 - July 8, 2000
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -10,18 +10,17 @@
 
 #define PNG_INTERNAL
 #define PNG_NO_EXTERN
-#include <assert.h>
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7 Your_png_h_is_not_version_1_0_7;
+typedef version_1_0_8beta1 Your_png_h_is_not_version_1_0_8beta1;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.7";
+char png_libpng_ver[12] = "1.0.8beta1";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -548,7 +547,7 @@ png_get_io_ptr(png_structp png_ptr)
  * necessarily available.
  */
 void PNGAPI
-png_init_io(png_structp png_ptr, FILE *fp)
+png_init_io(png_structp png_ptr, png_FILE_p fp)
 {
    png_debug(1, "in png_init_io\n");
    png_ptr->io_ptr = (png_voidp)fp;
@@ -572,6 +571,17 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
          sizeof(char)));
    }
 
+#if defined(_WIN32_WCE)
+  {
+     wchar_t time_buf[29];
+     wsprintf(time_buf, TEXT("%d %S %d %02d:%02d:%02d +0000"),
+              ptime->day % 32, short_months[(ptime->month - 1) % 12],
+              ptime->year, ptime->hour % 24, ptime->minute % 60,
+              ptime->second % 61);
+     WideCharToMultiByte(CP_ACP, 0, time_buf, -1, png_ptr->time_buffer, 29,
+        NULL, NULL);
+  }
+#else
 #ifdef USE_FAR_KEYWORD
    {
       char near_time_buf[29];
@@ -588,6 +598,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
                ptime->year, ptime->hour % 24, ptime->minute % 60,
                ptime->second % 61);
 #endif
+#endif /* _WIN32_WCE */
    return ((png_charp)png_ptr->time_buffer);
 }
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
@@ -605,7 +616,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.7 - July 1, 2000\n\
+   return ("\n libpng version 1.0.8beta1 - July 8, 2000\n\
    Copyright (c) 1998-2000 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -623,8 +634,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.7");
-   return("1.0.7");
+      return("1.0.8beta1");
+   return("1.0.8beta1");
 }
 
 png_charp PNGAPI
@@ -673,5 +684,5 @@ png_uint_32 PNGAPI
 png_access_version_number(void)
 {
    /* Version of *.c files used when building libpng */
-   return((png_uint_32) 10007L);
+   return((png_uint_32) 10008L);
 }

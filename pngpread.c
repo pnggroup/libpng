@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1036,6 +1036,7 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
 
       png_set_text(png_ptr, info_ptr, text_ptr, 1);
 
+      png_free(png_ptr, key);
       png_free(png_ptr, text_ptr);
    }
 }
@@ -1219,6 +1220,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 
       png_set_text(png_ptr, info_ptr, text_ptr, 1);
 
+      png_free(png_ptr, key);
       png_free(png_ptr, text_ptr);
    }
 }

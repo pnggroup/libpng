@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -62,6 +62,15 @@
  * #define PNG_NO_STDIO
  */
 
+#if defined(_WIN32_WCE)
+#include <windows.h>
+/* Console I/O functions are not supported on WindowsCE */
+#define PNG_NO_CONSOLE_IO
+#ifdef PNG_DEBUG
+#  undef PNG_DEBUG
+#endif
+#endif
+
 #ifdef PNG_BUILD_DLL
 #  ifndef PNG_CONSOLE_IO_SUPPORTED
 #    ifndef PNG_NO_CONSOLE_IO
@@ -80,7 +89,10 @@
 #      endif
 #    endif
 #  else
-#    include <stdio.h>
+#    if !defined(_WIN32_WCE)
+/* "stdio.h" functions are not supported on WindowsCE */
+#      include <stdio.h>
+#    endif
 #  endif
 
 /* This macro protects us against machines that don't have function
@@ -118,7 +130,7 @@
 #endif
 
 /* enough people need this for various reasons to include it here */
-#if !defined(MACOS) && !defined(RISCOS)
+#if !defined(MACOS) && !defined(RISCOS) && !defined(_WIN32_WCE)
 #include <sys/types.h>
 #endif
 
@@ -799,7 +811,10 @@ defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 
 /* need the time information for reading tIME chunks */
 #if defined(PNG_tIME_SUPPORTED)
-#  include <time.h>
+#  if !defined(_WIN32_WCE)
+     /* "time.h" functions are not supported on WindowsCE */
+#    include <time.h>
+#  endif
 #endif
 
 /* Some typedefs to get us started.  These should be safe on most of the
@@ -896,6 +911,11 @@ typedef png_int_16      FAR * png_int_16p;
 typedef PNG_CONST char  FAR * png_const_charp;
 typedef char            FAR * png_charp;
 typedef png_fixed_point FAR * png_fixed_point_p;
+#if defined(_WIN32_WCE)
+typedef HANDLE                png_FILE_p;
+#else
+typedef FILE                * png_FILE_p;
+#endif
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 typedef double          FAR * png_doublep;
 #endif
@@ -1021,7 +1041,7 @@ typedef z_stream FAR *  png_zstreamp;
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 #ifndef PNG_EXPORT_VAR
-#  define PNG_EXPORT_VAR(type) extern type
+#  define PNG_EXPORT_VAR(type) extern PNG_IMPEXP type
 #endif
 #endif
 

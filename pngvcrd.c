@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.7 - July 1, 2000
+ * libpng 1.0.8beta1 - July 8, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -3671,11 +3671,11 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
 #ifdef PNG_DEBUG
    png_debug(1, "in png_read_filter_row\n");
-#if (UseMMX == 1)
+#  if (UseMMX == 1)
    png_debug1(0,"%s, ", "MMX");
-#else
+#  else
    png_debug1(0,"%s, ", "x86");
-#endif
+#  endif
    switch (filter)
    {
       case 0: sprintf(filnm, "None ");
