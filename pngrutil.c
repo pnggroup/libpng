@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.6e - April 10, 2000
+ * libpng 1.0.6f - April 14, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -133,7 +133,7 @@ png_crc_error(png_structp png_ptr)
 }
 
 #if defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_READ_iTXt_SUPPORTED) || \
-    defined(PNG_READ_iCCP_SUPPORTED) || defined(PNG_READ_sPLT_SUPPORTED)
+    defined(PNG_READ_iCCP_SUPPORTED)
 /*
  * Decompress trailing data in a chunk.  The assumption is that chunkdata
  * points at an allocated area holding the contents of a chunk with a
@@ -951,7 +951,8 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (profile >= chunkdata + slength)
    {
       png_free(png_ptr, chunkdata);
-      png_error(png_ptr, "malformed iCCP chunk");
+      png_warning(png_ptr, "malformed iCCP chunk");
+      return;
    }
 
    /* compression should always be zero */
@@ -1019,7 +1020,8 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (entry_start > chunkdata + slength)
    {
       png_free(png_ptr, chunkdata);
-      png_error(png_ptr, "malformed sPLT chunk");
+      png_warning(png_ptr, "malformed sPLT chunk");
+      return;
    }
 
    new_palette.depth = *entry_start++;
@@ -1563,7 +1565,10 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    width = strtod(ep, &vp);
    if (*vp)
-       png_error(png_ptr, "malformed width string in sCAL chunk");
+   {
+       png_warning(png_ptr, "malformed width string in sCAL chunk");
+       return;
+   }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
    swidth = (png_charp)png_malloc(png_ptr, strlen(ep) + 1);
@@ -1578,7 +1583,10 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    height = strtod(ep, &vp);
    if (*vp)
-       png_error(png_ptr, "malformed height string in sCAL chunk");
+   {
+       png_warning(png_ptr, "malformed height string in sCAL chunk");
+       return;
+   }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
    sheight = (png_charp)png_malloc(png_ptr, strlen(ep) + 1);

@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.6e - April 10, 2000
+ libpng version 1.0.6f - April 14, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -118,10 +118,10 @@ You will want to do the I/O initialization(*) before you get into libpng,
 so if it doesn't work, you don't have much to undo.  Of course, you
 will also want to insure that you are, in fact, dealing with a PNG
 file.  Libpng provides a simple check to see if a file is a PNG file.
-To use it, pass in the first 1 to 8 bytes of the file, and it will
-return true or false (1 or 0) depending on whether the bytes could be
-part of a PNG file.  Of course, the more bytes you pass in, the
-greater the accuracy of the prediction.
+To use it, pass in the first 1 to 8 bytes of the file to the function
+png_sig_cmp(), and it will return 0 if the bytes match the corresponding
+bytes of the PNG signature, or nonzero otherwise.  Of course, the more bytes
+you pass in, the greater the accuracy of the prediction.
 
 If you are intending to keep the file pointer open for use in libpng,
 you must ensure you don't read more than 8 bytes from the beginning
@@ -492,7 +492,7 @@ into the info_ptr is returned for any complex types.
     png_get_hIST(png_ptr, info_ptr, &hist);
                      (PNG_INFO_hIST)
     hist           - histogram of palette (array of
-                     png_color_16)
+                     png_uint_16)
 
     png_get_tIME(png_ptr, info_ptr, &mod_time);
     mod_time       - time image was last modified
@@ -508,26 +508,34 @@ into the info_ptr is returned for any complex types.
     num_comments   - number of comments
     text_ptr       - array of png_text holding image
                      comments
-    text_ptr[i]->compression - type of compression used
+    text_ptr[i].compression - type of compression used
                  on "text" PNG_TEXT_COMPRESSION_NONE
                            PNG_TEXT_COMPRESSION_zTXt
                            PNG_ITXT_COMPRESSION_NONE
                            PNG_ITXT_COMPRESSION_zTXt
-    text_ptr[i]->key   - keyword for comment.
-    text_ptr[i]->text  - text comments for current
-                         keyword.
-    text_ptr[i]->text_length - length of text string,
+    text_ptr[i].key   - keyword for comment.  Must contain
+                         1-79 characters.
+    text_ptr[i].text  - text comments for current
+                         keyword.  Can empty.
+    text_ptr[i].text_length - length of text string,
                  after decompression, 0 for iTXt
-    text_ptr[i]->itxt_length - length of itxt string,
+    text_ptr[i].itxt_length - length of itxt string,
                  after decompression, 0 for tEXt/zTXt
-    text_ptr[i]->lang  - language of comment (NULL for unknown).
-    text_ptr[i]->translated_keyword  - keyword in UTF-8 (NULL
-                         for unknown).
+    text_ptr[i].lang  - language of comment (empty
+                         string for unknown).
+    text_ptr[i].translated_keyword  - keyword in UTF-8
+                         (empty string for unknown).
     num_text       - number of comments (same as num_comments;
                      you can put NULL here to avoid the duplication)
-    num_spalettes = png_get_spalettes(png_ptr, info_ptr, &palette_ptr);
-    palette_ptr    - array of png_spalette structures holding contents
-                     of one or more sPLT chunks read.
+    Note while png_set_text() will accept text, language, and 
+    translated keywords that can be NULL pointers, the structure
+    returned by png_get_text will always contain regular
+    zero-terminated C strings.  They might be empty strings but
+    they will never be NULL pointers.
+
+    num_spalettes = png_get_sPLT(png_ptr, info_ptr, &palette_ptr);
+    palette_ptr    - array of palette structures holding
+                     contents of one or more sPLT chunks read.
     num_spalettes  - number of sPLT chunks read.
 
     png_get_oFFs(png_ptr, info_ptr, &offset_x, &offset_y,
@@ -548,9 +556,16 @@ into the info_ptr is returned for any complex types.
                      PNG_RESOLUTION_METER
 
     png_get_sCAL(png_ptr, info_ptr, &unit, &width, &height)
-    unit        - physical scale units (a string)
+    unit        - physical scale units (an integer)
     width       - width of a pixel in physical scale units
     height      - height of a pixel in physical scale units
+                 (width and height are doubles)
+
+    png_get_sCAL_s(png_ptr, info_ptr, &unit, &width, &height)
+    unit        - physical scale units (an integer)
+    width       - width of a pixel in physical scale units
+    height      - height of a pixel in physical scale units
+                 (width and height are strings like "2.54")
 
     num_unknown_chunks = png_get_unknown_chunks(png_ptr, info_ptr,
                             &unknowns)
@@ -558,8 +573,11 @@ into the info_ptr is returned for any complex types.
                         unknown chunks
     unknowns[i].name  - name of unknown chunk
     unknowns[i].data  - data of unknown chunk
-    unknowns[i].size  - size of unknown chunk
+    unknowns[i].size  - size of unknown chunk's data
     unknowns[i].location - position of chunk in file
+
+    The value of "i" corresponds to the order in which the chunks were read
+    from the PNG file or inserted with the png_set_unknown_chunks() function.
 
 The data from the pHYs chunk can be retrieved in several convenient
 forms:
@@ -570,12 +588,30 @@ forms:
                   info_ptr)
     res_x_and_y = png_get_pixels_per_meter(png_ptr,
                   info_ptr)
+    res_x = png_get_x_pixels_per_inch(png_ptr,
+                  info_ptr)
+    res_y = png_get_y_pixels_per_inch(png_ptr,
+                  info_ptr)
+    res_x_and_y = png_get_pixels_per_inch(png_ptr,
+                  info_ptr)
     aspect_ratio = png_get_pixel_aspect_ratio(png_ptr,
                   info_ptr)
 
    (Each of these returns 0 [signifying "unknown"] if
        the data is not present or if res_x is 0;
        res_x_and_y is 0 if res_x != res_y)
+
+The data from the oFFs chunk can be retrieved in several convenient
+forms:
+
+    x_offset = png_get_x_offset_microns(png_ptr, info_ptr);
+    y_offset = png_get_y_offset_microns(png_ptr, info_ptr);
+    x_offset = png_get_x_offset_inches(png_ptr, info_ptr);
+    y_offset = png_get_y_offset_inches(png_ptr, info_ptr);
+
+   (Each of these returns 0 [signifying "unknown" if both
+       x and y are 0] if the data is not present or if the chunk
+       is present but the unit is the pixel)
 
 For more information, see the png_info definition in png.h and the
 PNG specification for chunk contents.  Be careful with trusting
@@ -597,7 +633,8 @@ trailing spaces, but non-consecutive spaces are allowed within the
 keyword.  It is possible to have the same keyword any number of times.
 The text_ptr is an array of png_text structures, each holding a
 pointer to a language string, a pointer to a keyword and a pointer to
-a text string.  Only the text string may be null.  The keyword/text
+a text string.  The text string, language code, and translated
+keyword may be empty or NULL pointers.  The keyword/text
 pairs are put into the array in the order that they are received.
 However, some or all of the text chunks may be after the image, so, to
 make sure you have read all the text chunks, don't mess with these
@@ -1015,8 +1052,8 @@ a single row_pointer instead of an array of row_pointers:
     png_bytep row_pointer = row;
     png_read_row(png_ptr, row_pointers, NULL);
 
-If the file is interlaced (info_ptr->interlace_type != 0), things get
-somewhat harder.  The only current (PNG Specification version 1.2)
+If the file is interlaced (interlace_type != 0 in the IHDR chunk), things
+get somewhat harder.  The only current (PNG Specification version 1.2)
 interlacing type for PNG is (interlace_type == PNG_INTERLACE_ADAM7)
 is a somewhat complicated 2D interlace scheme, known as Adam7, that
 breaks down an image into seven smaller images of varying size, based
@@ -1363,7 +1400,7 @@ both "png_ptr"; you can call them anything you like, such as
 
 If you want to use your own memory allocation routines,
 define PNG_USER_MEM_SUPPORTED and use
-png_create_write_struct_2() instead of png_create_read_struct():
+png_create_write_struct_2() instead of png_create_write_struct():
 
     png_structp png_ptr = png_create_write_struct_2
        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
@@ -1578,7 +1615,7 @@ Some of the more important parts of the png_info are:
     png_set_hIST(png_ptr, info_ptr, hist);
                     (PNG_INFO_hIST)
     hist           - histogram of palette (array of
-                     png_color_16)
+                     png_uint_16)
 
     png_set_tIME(png_ptr, info_ptr, mod_time);
     mod_time       - time image was last modified
@@ -1590,26 +1627,29 @@ Some of the more important parts of the png_info are:
     png_set_text(png_ptr, info_ptr, text_ptr, num_text);
     text_ptr       - array of png_text holding image
                      comments
-    text_ptr[i]->compression - type of compression used
+    text_ptr[i].compression - type of compression used
                  on "text" PNG_TEXT_COMPRESSION_NONE
                            PNG_TEXT_COMPRESSION_zTXt
                            PNG_ITXT_COMPRESSION_NONE
                            PNG_ITXT_COMPRESSION_zTXt
-    text_ptr[i]->key   - keyword for comment.
-    text_ptr[i]->text  - text comments for current
-                         keyword.
-    text_ptr[i]->text_length - length of text string,
+    text_ptr[i].key   - keyword for comment.  Must contain
+                 1-79 characters.
+    text_ptr[i].text  - text comments for current
+                         keyword.  Can be NULL or empty.
+    text_ptr[i].text_length - length of text string,
                  after decompression, 0 for iTXt
-    text_ptr[i]->itxt_length - length of itxt string,
+    text_ptr[i].itxt_length - length of itxt string,
                  after decompression, 0 for tEXt/zTXt
-    text_ptr[i]->lang  - language of comment (NULL for unknown).
-    text_ptr[i]->translated_keyword  - keyword in UTF-8 (NULL
-                         for unknown).
+    text_ptr[i].lang  - language of comment (NULL or
+                         empty for unknown).
+    text_ptr[i].translated_keyword  - keyword in UTF-8 (NULL
+                         or empty for unknown).
     num_text       - number of comments
 
-    png_set_spalettes(png_ptr, info_ptr, &palette_ptr, num_spalettes);
-    palette_ptr    - array of png_spalette structures to be added to
-                     the list of palettes in the info structure.
+    png_set_sPLT(png_ptr, info_ptr, &palette_ptr, num_spalettes);
+    palette_ptr    - array of png_sPLT_struct structures to be
+                     added to the list of palettes in the info
+                     structure.
     num_spalettes  - number of palette structures to be added.
 
     png_set_oFFs(png_ptr, info_ptr, offset_x, offset_y,
@@ -1630,16 +1670,23 @@ Some of the more important parts of the png_info are:
                   PNG_RESOLUTION_METER
 
     png_set_sCAL(png_ptr, info_ptr, unit, width, height)
-    unit        - physical scale units (a string)
+    unit        - physical scale units (an integer)
     width       - width of a pixel in physical scale units
     height      - height of a pixel in physical scale units
+                  (width and height are doubles)
+
+    png_set_sCAL_s(png_ptr, info_ptr, unit, width, height)
+    unit        - physical scale units (an integer)
+    width       - width of a pixel in physical scale units
+    height      - height of a pixel in physical scale units
+                 (width and height are strings like "2.54")
 
     png_set_unknown_chunks(png_ptr, info_ptr, &unknowns, num_unknowns)
     unknowns          - array of png_unknown_chunk structures holding
                         unknown chunks
     unknowns[i].name  - name of unknown chunk
     unknowns[i].data  - data of unknown chunk
-    unknowns[i].size  - size of unknown chunk
+    unknowns[i].size  - size of unknown chunk's data
     unknowns[i].location - position to write chunk in file
                            0: do not write chunk
                            PNG_HAVE_IHDR: before PLTE
@@ -1648,7 +1695,11 @@ Some of the more important parts of the png_info are:
     The "location" member is set automatically according to
     what part of the output file has already been written.
     You can change its value after calling png_set_unknown_chunks()
-    as demonstrated in pngtest.c.
+    as demonstrated in pngtest.c.  Within each of the "locations",
+    the chunks are sequenced according to their position in the
+    structure (that is, the value of "i", which is the order in which
+    the chunk was either read from the input file or defined with
+    png_set_unknown_chunks).
 
 A quick word about text and num_text.  text is an array of png_text
 structures.  num_text is the number of valid structures in the array.
@@ -2444,13 +2495,13 @@ the old method.
 
 VII. Y2K Compliance in libpng
 
-April 10, 2000
+April 14, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.6e are Y2K compliant.  It is my belief that earlier
+upward through 1.0.6f are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

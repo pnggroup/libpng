@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.6e - April 10, 2000
+ * libpng 1.0.6f - April 14, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -641,7 +641,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.6e.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.6f.
  */
 
 void
@@ -690,7 +690,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.6e.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.6f.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -834,8 +834,7 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
           */
          if (length > 0 || png_ptr->mode & PNG_AFTER_IDAT)
             png_error(png_ptr, "Too many IDAT's found");
-         else
-            png_crc_finish(png_ptr, 0);
+         png_crc_finish(png_ptr, length);
       }
       else if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))
          png_handle_PLTE(png_ptr, info_ptr, length);

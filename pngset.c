@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.6e - April 10, 2000
+ * libpng 1.0.6f - April 14, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -421,18 +421,25 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
              png_charp name, int compression_type,
              png_charp profile, png_uint_32 proflen)
 {
+   png_charp new_iccp_name;
+   png_charp new_iccp_profile;
+
    png_debug1(1, "in %s storage function\n", "iCCP");
    if (png_ptr == NULL || info_ptr == NULL || name == NULL || profile == NULL)
       return;
 
+   new_iccp_name = png_malloc(png_ptr, png_strlen(name)+1);
+   strcpy(new_iccp_name, name);
+   new_iccp_profile = png_malloc(png_ptr, proflen);
+   png_memcpy(new_iccp_profile, profile, (png_size_t)proflen);
+
    png_free_data(png_ptr, info_ptr, PNG_FREE_ICCP, 0);
-   info_ptr->iccp_name = png_malloc(png_ptr, png_strlen(name)+1);
-   strcpy(info_ptr->iccp_name, name);
-   info_ptr->iccp_profile = png_malloc(png_ptr, proflen);
-   png_memcpy(info_ptr->iccp_profile, profile, (png_size_t)proflen);
+
    info_ptr->iccp_proflen = proflen;
+   info_ptr->iccp_name = new_iccp_name;
+   info_ptr->iccp_profile = new_iccp_profile;
    /* Compression is always zero but is here so the API and info structure
-    * does not have to change * if we introduce multiple compression types */
+    * does not have to change if we introduce multiple compression types */
    info_ptr->iccp_compression = (png_byte)compression_type;
    info_ptr->free_me |= PNG_FREE_ICCP;
    info_ptr->valid |= PNG_INFO_iCCP;
@@ -495,8 +502,14 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       if(text_ptr[i].compression > 0)
       {
         /* set iTXt data */
-        lang_len = png_strlen(text_ptr[i].lang);
-        lang_key_len = png_strlen(text_ptr[i].lang_key);
+        if (text_ptr[i].key != (png_charp)NULL)
+          lang_len = png_strlen(text_ptr[i].lang);
+        else
+          lang_len = 0;
+        if (text_ptr[i].lang_key != (png_charp)NULL)
+          lang_key_len = png_strlen(text_ptr[i].lang_key);
+        else
+          lang_key_len = 0;
       }
       else
       {
@@ -504,7 +517,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
         lang_key_len = 0;
       }
 
-      if (text_ptr[i].text[0] == '\0')
+      if (text_ptr[i].text == (png_charp)NULL || text_ptr[i].text[0] == '\0')
       {
          text_length = 0;
          if(text_ptr[i].compression > 0)
@@ -538,19 +551,15 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       }
       else
       {
-         textp->lang=NULL;
-         textp->lang_key=NULL;
+         textp->lang=(png_charp)NULL;
+         textp->lang_key=(png_charp)NULL;
          textp->text=textp->key + key_len + 1;
       }
 
       if(text_length)
-      {
          png_memcpy(textp->text, text_ptr[i].text,
             (png_size_t)(text_length));
-         *(textp->text+text_length) = '\0';
-      }
-      else
-         textp->text--;
+      *(textp->text+text_length) = '\0';
 
       if(textp->compression > 0)
       {
@@ -755,8 +764,11 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   png_free_data(png_ptr, info_ptr, PNG_FREE_ROWS, 0);
-   info_ptr->row_pointers = row_pointers;
+   if(info_ptr->row_pointers != row_pointers)
+   {
+      png_free_data(png_ptr, info_ptr, PNG_FREE_ROWS, 0);
+      info_ptr->row_pointers = row_pointers;
+   }
 }
 #endif
 

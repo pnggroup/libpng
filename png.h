@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.6e - April 10, 2000
+ * libpng version 1.0.6f - April 14, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.6e - April 10, 2000: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.6f - April 14, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -47,7 +47,7 @@
  *    1.0.5e-r                 1.0.5e-r 10100  2.1.0.5e-r (not compatible)
  *    1.0.5s-v                 1.0.5s-v 10006  2.1.0.5s-v (compatible)
  *    1.0.6 (+ 3 patches)      1.0.6    10006  2.1.0.6
- *    1.0.6d-e                 1.0.6d-e 10007  2.1.0.6d-e
+ *    1.0.6d-f                 1.0.6d-f 10007  2.1.0.6d-f
  *    1.0.7                    1.0.7    10007  2.1.0.7    (still compatible)
  *
  *    Henceforth the source version will match the shared-library minor
@@ -73,7 +73,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.89c, June 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.6e, April 10, 2000)
+ * (libpng versions 0.97, January 1998, through 1.0.6f, April 14, 2000)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -148,13 +148,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    April 10, 2000
+ *    April 14, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.6e are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.6f are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -232,7 +232,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.6e"
+#define PNG_LIBPNG_VER_STRING "1.0.6f"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -323,12 +323,17 @@ typedef struct png_sPLT_entry_struct
 typedef png_sPLT_entry FAR * png_sPLT_entryp;
 typedef png_sPLT_entry FAR * FAR * png_sPLT_entrypp;
 
+/*  When the depth of the sPLT palette is 8 bits, the color and alpha samples
+ *  occupy the LSB of their respective members, and the MSB of each member
+ *  is zero-filled.  The frequency member always occupies the full 16 bits.
+ */
+
 typedef struct png_sPLT_struct
 {
-   png_charp name;                /* palette name */
-   png_byte depth;                /* depth of palette samples */
-   png_sPLT_entryp entries;        /* palette entries */
-   png_int_32 nentries;                /* number of palette entries */
+   png_charp name;           /* palette name */
+   png_byte depth;           /* depth of palette samples */
+   png_sPLT_entryp entries;  /* palette entries */
+   png_int_32 nentries;      /* number of palette entries */
 } png_sPLT_t;
 typedef png_sPLT_t FAR * png_sPLT_tp;
 typedef png_sPLT_t FAR * FAR * png_sPLT_tpp;
@@ -336,21 +341,28 @@ typedef png_sPLT_t FAR * FAR * png_sPLT_tpp;
 #ifdef PNG_TEXT_SUPPORTED
 /* png_text holds the contents of a text/ztxt/itxt chunk in a PNG file,
  * and whether that contents is compressed or not.  The "key" field
- * points to a regular C string.  */
+ * points to a regular zero-terminated C string.  The "text", "lang", and
+ * "lang_key" fields can be regular C strings, empty strings, or NULL pointers.
+ * However, the * structure returned by png_get_text() will always contain
+ * regular zero-terminated C strings (possibly empty), never NULL pointers,
+ * so they can be safely used in printf() and other string-handling functions.
+ */
 typedef struct png_text_struct
 {
-   int  compression; /* compression value:
-                       -1: tEXt, none
-                        0: zTXt, deflate
-                        1: iTXt, none
-                        2: iTXt, deflate  */
+   int  compression;       /* compression value:
+                             -1: tEXt, none
+                              0: zTXt, deflate
+                              1: iTXt, none
+                              2: iTXt, deflate  */
    png_charp key;          /* keyword, 1-79 character description of "text" */
-   png_charp text;         /* comment, may be an empty string (ie "") */
+   png_charp text;         /* comment, may be an empty string (ie "")
+                              or a NULL pointer */
    png_size_t text_length; /* length of the text string */
    png_size_t itxt_length; /* length of the itxt string */
-   png_charp lang;         /* language code, 1-79 characters */
+   png_charp lang;         /* language code, 0-79 characters
+                              or a NULL pointer */
    png_charp lang_key;     /* keyword translated UTF-8 string, 0 or more
-                              chars */
+                              chars or a NULL pointer */
 } png_text;
 typedef png_text FAR * png_textp;
 typedef png_text FAR * FAR * png_textpp;
@@ -1061,9 +1073,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.6e
+and png.h are both at * version 1.0.6f
  */
-typedef png_structp version_1_0_6e;
+typedef png_structp version_1_0_6f;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1910,17 +1922,19 @@ extern PNG_EXPORT(void,png_set_sPLT) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_sPLT_tp entries, int nentries));
 #endif
 
-#if defined(PNG_TEXT_SUPPORTED)
-extern PNG_EXPORT(void,png_set_itxt) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_textp text_ptr, int num_text));
-#endif
-
 #if defined(PNG_READ_TEXT_SUPPORTED)
-/* Old interface; apps should use png_get_itxt instead */
 /* png_get_text also returns the number of text chunks in *num_text */
 extern PNG_EXPORT(png_uint_32,png_get_text) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_textp *text_ptr, int *num_text));
 #endif
+
+/*
+ *  Note while png_set_text() will accept a structure whose text,
+ *  language, and  translated keywords are NULL pointers, the structure
+ *  returned by png_get_text will always contain regular
+ *  zero-terminated C strings.  They might be empty strings but
+ *  they will never be NULL pointers.
+ */
 
 #if defined(PNG_TEXT_SUPPORTED)
 extern PNG_EXPORT(void,png_set_text) PNGARG((png_structp png_ptr,
@@ -2044,7 +2058,7 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.6e - April 10, 2000 (header)\n"
+   " libpng version 1.0.6f - April 14, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on

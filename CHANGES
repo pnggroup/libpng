@@ -669,7 +669,7 @@ version 1.0.6d [April 7, 2000]
   Renamed makefile.ibmvac3 to makefile.ibmc, added libpng.icc IBM project file
   Added a check for info_ptr->free_me&PNG_FREE_TEXT when free'ing text in png.c
   Simplify png_sig_bytes() function to remove use of non-ISO-C strdup().
-version 1.0.6e [April 10, 2000]
+version 1.0.6e [April 9, 2000]
   Added png_data_freer() function.
   In the code that checks for over-length tRNS chunks, added check of
     info_ptr->num_trans as well as png_ptr->num_trans (Matthias Benckmann)
@@ -680,6 +680,13 @@ version 1.0.6e [April 10, 2000]
     is defined.
   Changed several instances of PNG_NO_CONSOLE_ID to PNG_NO_STDIO in pngrutil.c
     and mentioned the purposes of the two macros in libpng.txt/libpng.3.
+version 1.0.6f [April 14, 2000]
+  Revised png_set_iCCP() and png_set_rows() to avoid prematurely freeing data.
+  Add checks in png_set_text() for NULL members of the input text structure.
+  Revised libpng.txt/libpng.3.
+  Removed superfluous prototype for png_set_itxt from png.h
+  Removed "else" from pngread.c, after png_error(), and changed "0" to "length".
+  Changed several png_errors about malformed ancillary chunks to png_warnings.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
