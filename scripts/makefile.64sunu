@@ -33,7 +33,7 @@ RANLIB=echo
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.5rc3
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -84,7 +84,7 @@ libpng-config:
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo R_opts=\"-R$(LIBPATH)\"; \
 	echo ccopts=\"-xtarget=ultra -xarch=v9\"; \
-	echo ldopts=\"-xtarget=ultra -xarch=v9 \"; \
+	echo ldopts=\"-xtarget=ultra -xarch=v9\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config

@@ -1,4 +1,4 @@
-# makefile for libpng on HP-UX using GCC
+# makefile for libpng on HP-UX using GCC with the HP ANSI/C linker.
 # Copyright (C) 2002, Glenn Randers-Pehrson
 # Copyright (C) 2001, Laurent faillie
 # Copyright (C) 1998, 1999 Greg Roelofs
@@ -6,6 +6,7 @@
 # For conditions of distribution and use, see copyright notice in png.h
 
 CC=gcc
+LD=ld
 
 # where "make install" puts libpng.a, libpng.sl*, png.h and pngconf.h
 prefix=/usr/local
@@ -13,6 +14,13 @@ prefix=/usr/local
 # Where the zlib library and include files are located
 ZLIBLIB=/opt/zlib/lib
 ZLIBINC=/opt/zlib/include
+
+# Note that if you plan to build a libpng shared library, zlib must also
+# be a shared library, which zlib's configure does not do.  After running
+# zlib's configure, edit the appropriate lines of makefile to read:
+#   CFLAGS=-O1 -DHAVE_UNISTD -DUSE_MAP -fPIC \
+#   LDSHARED=ld -b
+#   SHAREDLIB=libz.sl
 
 ALIGN=
 # for i386:
@@ -33,7 +41,7 @@ RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.5rc3
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -92,11 +100,11 @@ $(LIBNAME).sl.$(PNGMAJ): $(LIBNAME).sl.$(PNGVER)
 	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ)
 
 $(LIBNAME).sl.$(PNGVER): $(OBJSDLL)
-	$(LD) +s \
+	$(LD) -b +s \
 	+h $(LIBNAME).sl.$(PNGMAJ) -o $(LIBNAME).sl.$(PNGVER) $(OBJSDLL)
 
 libpng.sl.3.$(PNGMIN): $(OBJSDLL)
-	$(LD) +s \
+	$(LD) -b +s \
 	+h libpng.sl.3 -o libpng.sl.3.$(PNGMIN) $(OBJSDLL)
 
 pngtest: pngtest.o $(LIBNAME).sl

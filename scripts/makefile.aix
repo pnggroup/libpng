@@ -16,8 +16,9 @@ AR = ar rcs
 RANLIB = ranlib
 RM = rm -f
 
+LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.5rc3
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -41,7 +42,8 @@ CDEBUG = -g -DPNG_DEBUG=5
 LDDEBUG =
 CRELEASE = -O2
 LDRELEASE = -s
-CFLAGS = -I$(ZLIBINC) -Wall $(CRELEASE)
+WARNMORE=-Wall
+CFLAGS = -I$(ZLIBINC) $(WARNMORE) $(CRELEASE)
 LDFLAGS = -L. -L$(ZLIBLIB) -lpng -lz -lm $(LDRELEASE)
 
 # File extensions
@@ -57,17 +59,17 @@ OBJS = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
 # Targets
 all: libpng$(A) pngtest$(E)
 
-libpng$(A): $(OBJS)
+$(LIBNAME)$(A): $(OBJS)
 	$(AR) $@ $(OBJS)
 	$(RANLIB) $@
 
 test: pngtest$(E)
 	./pngtest$(E)
 
-pngtest$(E): pngtest$(O) libpng$(A)
+pngtest$(E): pngtest$(O) $(LIBNAME)$(A)
 	$(LD) -o $@ pngtest$(O) $(LDFLAGS)
 
-install: libpng.a
+install: $(LIBNAME)$(A)
 	-@if [ ! -d $(DI)  ]; then mkdir $(DI); fi
 	-@if [ ! -d $(DI)/libpng  ]; then mkdir $(DI)/libpng; fi
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
@@ -75,12 +77,13 @@ install: libpng.a
 	-@rm $(DI)/pngconf.h
 	cp png.h pngconf.h $(DI)/libpng
 	chmod 644 $(DI)/libpng/png.h \
+	cp $(LIBNAME)$(A) $(DL)
+	(cd $(DL); ln -f -s $(LIBNAME)$(A) libpng$(A))
 	$(DI)/libpng/pngconf.h
-	(cd $(DI); ln -f -s libpng/* .)
-	cp libpng.a $(DL)
+	(cd $(DI); ln -f -s libpng/* .;)
 
 clean:
-	/bin/rm -f *.o libpng.a pngtest pngout.png
+	/bin/rm -f *.o $(LIBNAME)$(A) pngtest pngout.png
 
 png$(O): png.h pngconf.h
 pngerror$(O): png.h pngconf.h

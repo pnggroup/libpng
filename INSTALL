@@ -1,5 +1,5 @@
 
-Installing libpng version 1.2.5rc3 - September 18, 2002
+Installing libpng version 1.2.5 - October 3, 2002
 
 Before installing libpng, you must first install zlib.  zlib
 can usually be found wherever you got libpng.  zlib can be
@@ -10,7 +10,7 @@ zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.2.5rc3" or "lpng109" and "zlib-1.1.4"
+might be called "libpng-1.2.5" or "lpng109" and "zlib-1.1.4"
 or "zlib114") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -36,9 +36,6 @@ Your directory structure should look like this:
           scripts
              makefile.*
              libpng*.in
-          mangle
-             makefile.*
-             mangle.in
           pngtest.png
           etc.
       zlib
@@ -68,14 +65,14 @@ The files that are presently available in the scripts directory
 include
 
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
- makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng12.so.0.1.2.5rc3)
- makefile.gcmmx    =>  Linux/ELF makefile (gcc, creates libpng12.so.0.1.2.5rc3,
+ makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng12.so.0.1.2.5)
+ makefile.gcmmx    =>  Linux/ELF makefile (gcc, creates libpng12.so.0.1.2.5,
                        uses assembler code tuned for Intel MMX platform)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
                        ftp://ftp.cs.wisc.edu/ghost)
- makefile.aix      =>  AIX makefile
+ makefile.aix      =>  AIX/gcc makefile
  makefile.cygwin   =>  Cygwin/gcc makefile
  makefile.darwin   =>  Darwin makefile
  makefile.dec      =>  DEC Alpha UNIX makefile
@@ -90,10 +87,10 @@ include
  makefile.ne0bsd  =>  NetBSD/cc makefile, uses PNGGCCRD, makes libpng0.so
  makefile.openbsd  =>  OpenBSD makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
- makefile.sggcc    =>  Silicon Graphics (gcc, creates libpng12.so.0.1.2.5rc3)
+ makefile.sggcc    =>  Silicon Graphics (gcc, creates libpng12.so.0.1.2.5)
  makefile.sunos    =>  Sun makefile
- makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng12.so.0.1.2.5rc3)
- makefile.so9      =>  Solaris 9 makefile (gcc, creates libpng12.so.0.1.2.5rc3)
+ makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng12.so.0.1.2.5)
+ makefile.so9      =>  Solaris 9 makefile (gcc, creates libpng12.so.0.1.2.5)
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
@@ -147,23 +144,7 @@ Most of the makefiles will allow you to run "make install" to
 put the library in its final resting place (if you want to
 do that, run "make install" in the zlib directory first if necessary).
 Some also allow you to run "make test-installed" after you have
-run "make install".  This will build and run executables called "pngtesti"
-and "mangle/pngtestm".
-
-The files that are presently available in the mangle directory include the
-following.  The makefiles are automatically run by the corresponding makefiles
-in the scripts directory when you run "make", "make install", or
-"make test-installed".
-
- mangle.in        =>  Function-decoration macros added to png.h by the
-                      makefiles.
- makefile.linux   =>  Linux/ELF makefile
-                      (gcc, creates libpng12m.so.0.1.2.5rc3)
- makefile.gcmmx   =>  Linux/ELF makefile (gcc, creates
-                      libpng12.so.0m.1.2.5rc3, uses assembler code
-                      tuned for Intel MMX platform)
- makefile.sgi     =>  Silicon Graphics (cc, creates libpng12m.so)
- makefile.sggcc   =>  Silicon Graphics (gcc, creates libpng12m.so)
+run "make install".
 
 Further information can be found in the README and libpng.txt
 files, in the individual makefiles, in png.h, in the README files in

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.5rc3 - September 18, 2002
+ * libpng 1.2.5 - October 3, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -121,10 +121,10 @@ void
 PNGAPI
 #endif
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
+void
 #ifdef PNG_1_0_X
 PNGAPI
 #endif
-void
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
     if(png_ptr == NULL || row_number > PNG_MAX_UINT) return;
@@ -143,15 +143,15 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
     fprintf(stdout, "r");
 }
 
+void
 #ifdef PNG_1_0_X
 PNGAPI
 #endif
-void
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
+void
 #ifdef PNG_1_0_X
 PNGAPI
 #endif
-void
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
     if(png_ptr == NULL || row_number > PNG_MAX_UINT || pass > 7) return;
@@ -1538,4 +1538,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_5rc3 your_png_h_is_not_version_1_2_5rc3;
+typedef version_1_2_5 your_png_h_is_not_version_1_2_5;

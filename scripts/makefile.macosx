@@ -17,13 +17,11 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.5rc3
+PNGMIN = 1.2.5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
-LDSHARED=cc -lz -dynamiclib -compatibility_version $(PNGVER) \
--current_version $(PNGVER)
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -current_version $(PNGVER)
 
 LIBNAME=libpng12
 SHAREDLIB_POSTFIX=dylib
@@ -76,10 +74,11 @@ libpng.a: $(OBJS)
 	$(RANLIB) $@
 
 $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX): $(OBJS)
-	cc -dynamiclib -compatibility_version $(PNGMAJ) -o $@ $(OBJS)
+	cc -dynamiclib -flat_namespace -undefined suppress -o $@ $(OBJS)
 
 libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX): $(OBJS)
-	cc -dynamiclib -compatibility_version 3 -o $@ $(OBJS)
+	cc -dynamiclib -compatibility_version 3 -flat_namespace \
+	-undefined suppress -o $@ $(OBJS)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
