@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.4 - September 18, 1999
+ * libpng version 1.0.4 - September 19, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.4 - September 18, 1999: Glenn R-P
+ *  libpng versions 0.97, January 1998, through 1.0.4 - September 19, 1999: Glenn R-P
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
@@ -137,7 +137,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.4 - September 18, 1999)
+ * (libpng versions 0.97, January 1998, through 1.0.4, September 19, 1999)
  *
  * The PNG Reference Library is supplied "AS IS".  The Contributing Authors
  * and Group 42, Inc. disclaim all warranties, expressed or implied,
@@ -150,11 +150,17 @@
  * Permission is hereby granted to use, copy, modify, and distribute this
  * source code, or portions hereof, for any purpose, without fee, subject
  * to the following restrictions:
- * 1. The origin of this source code must not be misrepresented.
- * 2. Altered versions must be plainly marked as such and must not be
- *    misrepresented as being the original source.
- * 3. This Copyright notice may not be removed or altered from any source or
- *    altered source distribution.
+ *
+ * 1. The origin of this source code must not be
+ *     misrepresented.
+ *
+ * 2. Altered versions must be plainly marked as such
+ *    and must not be misrepresented as being the
+ *    original source.
+ *
+ * 3. This Copyright notice may not be removed or
+ *    altered from any source or altered source
+ *    distribution.
  *
  * The Contributing Authors and Group 42, Inc. specifically permit, without
  * fee, and encourage the use of this source code as a component to
@@ -162,7 +168,6 @@
  * source code in a product, acknowledgment is not required but would be
  * appreciated.
  */
-
 
 #ifndef _PNG_H
 #define _PNG_H
@@ -1605,7 +1610,7 @@ png_get_header_version(png_structp png_ptr)
 {
    if(png_ptr == NULL)
      /* silence compiler warning about unused png_ptr */ ;
-   return("\n libpng version 1.0.4 - September 18, 1999 (header)\n");
+   return("\n libpng version 1.0.4 - September 19, 1999 (header)\n");
 }
 #endif
 

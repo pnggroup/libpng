@@ -2,7 +2,7 @@
  *
  * For Intel CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.4 - September 18, 1999
+ * libpng 1.0.4 - September 19, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson

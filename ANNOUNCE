@@ -1,5 +1,5 @@
 
-Libpng 1.0.4 - September 18, 1999
+Libpng 1.0.4 - September 19, 1999
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -49,7 +49,8 @@ Changes since the last public release (1.0.3):
   Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
   Made several minor corrections to pngtest.c
   Changed "hptr += 16L" to "hptr = hptr + 16L" in pngmem.c for Turbo 3.0
-  Renamed the makefiles with longer but more user friendly extensions
+  Renamed the makefiles with longer but more user friendly extensions.
+  Copied the PNG copyright and license to a separate LICENSE file.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
