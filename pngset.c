@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.2beta5 - March 26, 2002
+ * libpng 1.2.2beta6 - March 31, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -100,10 +100,10 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
         "Ignoring attempt to set negative chromaticity value");
       return;
    }
-   if (white_x > PNG_MAX_UINT || white_y > PNG_MAX_UINT ||
-         red_x > PNG_MAX_UINT ||   red_y > PNG_MAX_UINT ||
-       green_x > PNG_MAX_UINT || green_y > PNG_MAX_UINT ||
-        blue_x > PNG_MAX_UINT ||  blue_y > PNG_MAX_UINT)
+   if (white_x > (double) PNG_MAX_UINT || white_y > (double) PNG_MAX_UINT ||
+         red_x > (double) PNG_MAX_UINT ||   red_y > (double) PNG_MAX_UINT ||
+       green_x > (double) PNG_MAX_UINT || green_y > (double) PNG_MAX_UINT ||
+        blue_x > (double) PNG_MAX_UINT ||  blue_y > (double) PNG_MAX_UINT)
    {
       png_warning(png_ptr,
         "Ignoring attempt to set chromaticity value exceeding 21474.83");
@@ -169,7 +169,7 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   if (int_gamma > PNG_MAX_UINT)
+   if (int_gamma > (png_fixed_point) PNG_MAX_UINT)
    {
      png_warning(png_ptr, "Limiting gamma to 21474.83");
      gamma=PNG_MAX_UINT;

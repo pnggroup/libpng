@@ -1,5 +1,5 @@
 
-Installing libpng version 1.2.2beta5 - March 26, 2002
+Installing libpng version 1.2.2beta6 - March 31, 2002
 
 Before installing libpng, you must first install zlib.  zlib
 can usually be found wherever you got libpng.  zlib can be
@@ -10,7 +10,7 @@ zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.2.2beta5" or "lpng109" and "zlib-1.1.3"
+might be called "libpng-1.2.2beta6" or "lpng109" and "zlib-1.1.3"
 or "zlib113") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -64,8 +64,8 @@ The files that are presently available in the scripts directory
 include
 
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
- makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng12.so.0.1.2.2beta5)
- makefile.gcmmx    =>  Linux/ELF makefile (gcc, creates libpng12.so.0.1.2.2beta5,
+ makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng12.so.0.1.2.2beta6)
+ makefile.gcmmx    =>  Linux/ELF makefile (gcc, creates libpng12.so.0.1.2.2beta6,
                        uses assembler code tuned for Intel MMX platform)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
@@ -84,10 +84,10 @@ include
  makefile.netbsd   =>  NetBSD/cc makefile, uses PNGGCCRD
  makefile.openbsd  =>  OpenBSD makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
- makefile.sggcc    =>  Silicon Graphics (gcc, creates libpng12.so.0.1.2.2beta5)
+ makefile.sggcc    =>  Silicon Graphics (gcc, creates libpng12.so.0.1.2.2beta6)
  makefile.sunos    =>  Sun makefile
- makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng12.so.0.1.2.2beta5)
- makefile.so9      =>  Solaris 9 makefile (gcc, creates libpng12.so.0.1.2.2beta5)
+ makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng12.so.0.1.2.2beta6)
+ makefile.so9      =>  Solaris 9 makefile (gcc, creates libpng12.so.0.1.2.2beta6)
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc

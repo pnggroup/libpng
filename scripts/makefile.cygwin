@@ -39,7 +39,7 @@ CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 # have to change it.
 PNGMAJ = 0
 #PNGDLL = $12
-PNGMIN = 1.2.2beta5
+PNGMIN = 1.2.2beta6
 PNGMIN_BASE = 1.2.2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
