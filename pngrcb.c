@@ -1,9 +1,9 @@
 /* pngrcb.c - callbacks while reading a png file
 
-   libpng 1.0 beta 3 - version 0.89
+   libpng 1.0 beta 4 - version 0.90
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   May 25, 1996
+   January 10, 1997
    */
 
 #define PNG_INTERNAL
@@ -15,7 +15,7 @@ png_read_IHDR(png_structp png_ptr, png_infop info,
    int color_type, int compression_type, int filter_type,
    int interlace_type)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    info->width = width;
@@ -41,7 +41,7 @@ void
 png_read_PLTE(png_structp png_ptr, png_infop info,
    png_colorp palette, int num)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    info->palette = palette;
@@ -53,10 +53,10 @@ png_read_PLTE(png_structp png_ptr, png_infop info,
 void
 png_read_gAMA(png_structp png_ptr, png_infop info, double gamma)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
-   info->gamma = gamma;
+   info->gamma = (float)gamma;
    info->valid |= PNG_INFO_gAMA;
 }
 #endif
@@ -66,7 +66,7 @@ void
 png_read_sBIT(png_structp png_ptr, png_infop info,
    png_color_8p sig_bit)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    png_memcpy(&(info->sig_bit), sig_bit, sizeof (png_color_8));
@@ -80,17 +80,17 @@ png_read_cHRM(png_structp png_ptr, png_infop info,
    double white_x, double white_y, double red_x, double red_y,
    double green_x, double green_y, double blue_x, double blue_y)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
-   info->x_white = white_x;
-   info->y_white = white_y;
-   info->x_red = red_x;
-   info->y_red = red_y;
-   info->x_green = green_x;
-   info->y_green = green_y;
-   info->x_blue = blue_x;
-   info->y_blue = blue_y;
+   info->x_white = (float)white_x;
+   info->y_white = (float)white_y;
+   info->x_red   = (float)red_x;
+   info->y_red   = (float)red_y;
+   info->x_green = (float)green_x;
+   info->y_green = (float)green_y;
+   info->x_blue  = (float)blue_x;
+   info->y_blue  = (float)blue_y;
    info->valid |= PNG_INFO_cHRM;
 }
 #endif
@@ -100,7 +100,7 @@ void
 png_read_tRNS(png_structp png_ptr, png_infop info,
    png_bytep trans, int num_trans,   png_color_16p trans_values)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    if (trans)
@@ -122,7 +122,7 @@ void
 png_read_bKGD(png_structp png_ptr, png_infop info,
    png_color_16p background)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    png_memcpy(&(info->background), background, sizeof(png_color_16));
@@ -134,7 +134,7 @@ png_read_bKGD(png_structp png_ptr, png_infop info,
 void
 png_read_hIST(png_structp png_ptr, png_infop info, png_uint_16p hist)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    info->hist = hist;
@@ -147,7 +147,7 @@ void
 png_read_pHYs(png_structp png_ptr, png_infop info,
    png_uint_32 res_x, png_uint_32 res_y, int unit_type)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    info->x_pixels_per_unit = res_x;
@@ -162,7 +162,7 @@ void
 png_read_oFFs(png_structp png_ptr, png_infop info,
    png_uint_32 offset_x, png_uint_32 offset_y, int unit_type)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    info->x_offset = offset_x;
@@ -177,7 +177,7 @@ void
 png_read_tIME(png_structp png_ptr, png_infop info,
    png_timep mod_time)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    png_memcpy(&(info->mod_time), mod_time, sizeof (png_time));
@@ -190,7 +190,7 @@ void
 png_read_zTXt(png_structp png_ptr, png_infop info,
    png_charp key, png_charp text, png_uint_32 text_len, int compression)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    if (info->max_text <= info->num_text)
@@ -205,18 +205,18 @@ png_read_zTXt(png_structp png_ptr, png_infop info,
             png_textp old_text;
 
             old_text = info->text;
-            info->text = (png_textp)png_large_malloc(png_ptr,
+            info->text = (png_textp)png_malloc(png_ptr,
                info->max_text * sizeof (png_text));
             png_memcpy(info->text, old_text,
                (png_size_t)(old_max * sizeof (png_text)));
-            png_large_free(png_ptr, old_text);
+            png_free(png_ptr, old_text);
          }
       }
       else
       {
          info->max_text = 16;
          info->num_text = 0;
-         info->text = (png_textp)png_large_malloc(png_ptr,
+         info->text = (png_textp)png_malloc(png_ptr,
             info->max_text * sizeof (png_text));
       }
    }
@@ -234,7 +234,7 @@ void
 png_read_tEXt(png_structp png_ptr, png_infop info,
    png_charp key, png_charp text, png_uint_32 text_len)
 {
-   if (!png_ptr || !info)
+   if (!info)
       return;
 
    png_read_zTXt(png_ptr, info, key, text, text_len, -1);

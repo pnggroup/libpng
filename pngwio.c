@@ -1,10 +1,10 @@
 
 /* pngwio.c - functions for data output
 
-   libpng 1.0 beta 3 - version 0.89
+   libpng 1.0 beta 4 - version 0.90
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   May 25, 1996
+   January 10, 1997
 
    This file provides a location for all output.  Users which need
    special handling are expected to write functions which have the same
@@ -57,29 +57,19 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
 
-#ifdef _MSC_VER
-/* for FP_OFF */
-#include <dos.h>
-#endif
-
 static void
 png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 {
    png_uint_32 check;
    png_byte *n_data;
+   FILE *io_ptr;
 
    /* Check if data really is near. If so, use usual code. */
-#ifdef _MSC_VER
-   /* do it this way just to quiet warning */
-   FP_OFF(n_data) = FP_OFF(data);
-   if (FP_SEG(n_data) == FP_SEG(data))
-#else
-   /* this works in MSC also but with lost segment warning */
-   n_data = (png_byte *)data;
+   n_data = (png_byte *)CVT_PTR_NOCHECK(data);
+   io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)n_data == data)
-#endif
    {
-      check = fwrite(n_data, 1, (png_size_t)length, (FILE *)(png_ptr->io_ptr));
+      check = fwrite(n_data, 1, (png_size_t)length, io_ptr);
    }
    else
    {
@@ -91,7 +81,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
       {
          written = MIN(NEAR_BUF_SIZE, remaining);
          png_memcpy(buf, data, written); /* copy far buffer to near buffer */
-         err = fwrite(buf, 1, written, (FILE *)(png_ptr->io_ptr));
+         err = fwrite(buf, 1, written, io_ptr);
          if (err != written)
             break;
          else
@@ -123,8 +113,10 @@ png_flush(png_structp png_ptr)
 static void
 png_default_flush(png_structp png_ptr)
 {
-   if ((FILE *)(png_ptr->io_ptr))
-      fflush((FILE *)(png_ptr->io_ptr));
+   FILE *io_ptr;
+   io_ptr = (FILE *)CVT_PTR((png_ptr->io_ptr));
+   if (io_ptr)
+      fflush(io_ptr);
 }
 #endif
 
@@ -172,3 +164,30 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    png_ptr->read_data_fn = NULL;
 }
 
+#if defined(USE_FAR_KEYWORD) 
+#if defined(_MSC_VER)   
+void *far_to_near(png_structp png_ptr,png_voidp ptr, int check)
+{
+   void *near_ptr;   
+   void FAR *far_ptr;
+   FP_OFF(near_ptr) = FP_OFF(ptr);
+   far_ptr = (void FAR *)near_ptr;
+   if(check != 0)
+      if(FP_SEG(ptr) != FP_SEG(far_ptr))
+         png_error(png_ptr,"segment lost in conversion");
+   return(near_ptr);
+}
+#  else
+void *far_to_near(png_structp png_ptr,png_voidp ptr, int check)
+{
+   void *near_ptr;   
+   void FAR *far_ptr;
+   near_ptr = (void FAR *)ptr;
+   far_ptr = (void FAR *)near_ptr;
+   if(check != 0)
+      if(far_ptr != ptr)
+         png_error(png_ptr,"segment lost in conversion");
+   return(near_ptr);
+}
+#   endif
+#   endif

@@ -5,21 +5,19 @@ for 0.9
    final bug fixes
    cHRM transformation
    better documentation
+   multi-lingual message support
 
 after 1.0
    overlaying one image on top of another
    optional palette creation
    histogram creation
    text conversion between different code types
-   support for other chunks being defined (sCAl, the gIF series,
-      and others that people come up with).
+   support for application-defined chunk handlers
+   support for embedded PNG usage (MNG)
    pull writer
    better dithering
    keep up with public chunks
-   other compression libraries
-   more exotic interlace handling
-   better filtering (counting huffman bits?  filter type inertia?)
+   better filter selection (counting huffman bits?  filter type inertia?)
    C++ wrapper
    other languages (pascal, for one)
-   comments of > 64K
-
+   comments of > 64K for DOS

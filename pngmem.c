@@ -1,10 +1,10 @@
 
 /* pngmem.c - stub functions for memory allocation
 
-   libpng 1.0 beta 3 - version 0.89
+   libpng 1.0 beta 4 - version 0.90
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   May 25, 1996
+   January 10, 1997
 
    This file provides a location for all memory allocation.  Users which
    need special memory handling are expected to modify the code in this file
@@ -18,12 +18,11 @@
 /* if you change this, be sure to change the one in png.h also */
 
 /* Allocate memory for a png_struct.  The malloc and memset can be replaced
- * by a single call to calloc() if this is thought to improve performance.
- */
+   by a single call to calloc() if this is thought to improve performance. */
 png_voidp
-png_create_struct(uInt type)
+png_create_struct(int type)
 {
-   png_size_t type;
+   png_size_t size;
    png_voidp struct_ptr;
 
    if (type == PNG_STRUCT_INFO)
@@ -66,7 +65,7 @@ png_destroy_struct(png_voidp struct_ptr)
 */
 
 png_voidp
-png_large_malloc(png_structp png_ptr, png_uint_32 size)
+png_malloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
    if (!png_ptr || !size)
@@ -160,11 +159,11 @@ png_large_malloc(png_structp png_ptr, png_uint_32 size)
    return ret;
 }
 
-/* free a pointer allocated by png_large_malloc().  In the default
-  configuration, png_ptr is not used, but is passed in case it
-  is needed.  If ptr is NULL, return without taking any action. */
+/* free a pointer allocated by png_malloc().  In the default
+   configuration, png_ptr is not used, but is passed in case it
+   is needed.  If ptr is NULL, return without taking any action. */
 void
-png_large_free(png_structp png_ptr, png_voidp ptr)
+png_free(png_structp png_ptr, png_voidp ptr)
 {
    if (!png_ptr)
       return;
@@ -201,11 +200,10 @@ png_large_free(png_structp png_ptr, png_voidp ptr)
 #else /* Not the Borland DOS special memory handler */
 
 /* Allocate memory for a png_struct or a png_info.  The malloc and
- * memset can be replaced by a single call to calloc() if this is thought
- * to improve performance noticably.
- */
+   memset can be replaced by a single call to calloc() if this is thought
+   to improve performance noticably.*/
 png_voidp
-png_create_struct(uInt type)
+png_create_struct(int type)
 {
    size_t size;
    png_voidp struct_ptr;
@@ -257,8 +255,9 @@ png_destroy_struct(png_voidp struct_ptr)
    need to allocate exactly 64K, so whatever you call here must
    have the ability to do that. */
 
+#ifndef FORTIFY
 png_voidp
-png_large_malloc(png_structp png_ptr, png_uint_32 size)
+png_malloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
    if (!png_ptr || !size)
@@ -287,11 +286,11 @@ png_large_malloc(png_structp png_ptr, png_uint_32 size)
    return ret;
 }
 
-/* free a pointer allocated by png_large_malloc().  In the default
+/* free a pointer allocated by png_malloc().  In the default
   configuration, png_ptr is not used, but is passed in case it
   is needed.  If ptr is NULL, return without taking any action. */
 void
-png_large_free(png_structp png_ptr, png_voidp ptr)
+png_free(png_structp png_ptr, png_voidp ptr)
 {
    if (!png_ptr)
       return;
@@ -310,76 +309,6 @@ png_large_free(png_structp png_ptr, png_voidp ptr)
    }
 }
 
+#endif /* FORTIFY */
 #endif /* Not Borland DOS special memory handler */
-
-/* Allocate memory.  This is called for smallish blocks only  It
-   should not get anywhere near 64K.  On segmented machines, this
-   must come from the local heap (for zlib).  Currently, zlib is
-   the only one that uses this, so you should only get one call
-   to this, and that a small block. */
-void *
-png_malloc(png_structp png_ptr, png_uint_32 size)
-{
-   void *ret;
-
-   if (!png_ptr || !size)
-   {
-      return ((void *)0);
-   }
-
-#ifdef PNG_MAX_MALLOC_64K
-   if (size > (png_uint_32)65536L)
-      png_error(png_ptr, "Cannot Allocate > 64K");
-#endif
-
-
-   ret = malloc((png_size_t)size);
-
-   if (!ret)
-   {
-      png_error(png_ptr, "Out of Memory");
-   }
-
-   return ret;
-}
-
-/* Reallocate memory.  This will not get near 64K on a
-   even marginally reasonable file.  This is not used in
-   the current version of the library. */
-void *
-png_realloc(png_structp png_ptr, void * ptr, png_uint_32 size,
-   png_uint_32 old_size)
-{
-   void *ret;
-
-   if (!png_ptr || !old_size || !ptr || !size)
-      return ((void *)0);
-
-#ifdef PNG_MAX_MALLOC_64K
-   if (size > (png_uint_32)65536L)
-      png_error(png_ptr, "Cannot Allocate > 64K");
-#endif
-
-   ret = realloc(ptr, (png_size_t)size);
-
-   if (!ret)
-   {
-      png_error(png_ptr, "Out of Memory 7");
-   }
-
-   return ret;
-}
-
-/* free a pointer allocated by png_malloc().  In the default
-  configuration, png_ptr is not used, but is passed incase it
-  is needed.  If ptr is NULL, return without taking any action. */
-void
-png_free(png_structp png_ptr, void * ptr)
-{
-   if (!png_ptr)
-      return;
-
-   if (ptr != (void *)0)
-      free(ptr);
-}
 

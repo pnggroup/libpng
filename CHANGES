@@ -93,11 +93,30 @@ version 0.89
    fixed gamma and background correction for paletted images, so
       png_correct_palette is not needed unless you are correcting an
       external palette (you will need to #define PNG_CORRECT_PALETTE_SUPPORTED
-      in pngconf.h)
+      in pngconf.h) - if nobody uses this, it may disappear in the future.
    fixed bug with Borland 64K memory allocation (Alexander Lehmann)
-   fixed bug in interlace handling (Smaraderagd, I think)
+   fixed bug in interlace handling (Smarasderagd, I think)
    added more error checking for writing and image to reduce invalid files
    separated read and write functions so that they won't both be linked
       into a binary when only reading or writing functionality is used
    new pngtest image also has interlacing and zTXt
-   updated dcumentation to reflect new API
+   updated documentation to reflect new API
+version 0.90
+   made CRC errors/warnings on critical and ancillary chunks configurable
+   libpng will use the zlib CRC routines by (compile-time) default
+   changed DOS small/medium model memory support - needs zlib 1.04 (Tim Wegner)
+   added external C++ wrapper statements to png.h (Gilles Dauphin)
+   allow PNG file to be read when some or all of file signature has already
+      been read from the beginning of the stream (this affects the size of
+      info_struct and invalidates all programs that use a shared libpng)
+   fixed png_filler() declarations
+   fixed? background color conversions
+   fixed order of error function pointers to match documentation
+   current chunk name is now available in png_struct to reduce the number
+      of nearly identical error messages (will simplify multi-lingual
+      support when available)
+   try to get ready for unknown-chunk callback functions:
+      - previously read critical chunks are flagged, so the chunk handling
+        routines can determine if the chunk is in the right place
+      - all chunk handling routines have the same prototypes, so we will
+        be able to handle all chunks via a callback mechanism

@@ -1,10 +1,10 @@
 
 /* pngrio.c - functions for data input
 
-   libpng 1.0 beta 3 - version 0.89
+   libpng 1.0 beta 4 - version 0.90
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   May 25, 1996
+   January 10, 1997
 
    This file provides a location for all input.  Users which need
    special handling are expected to write a function which has the same
@@ -56,29 +56,19 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
  
-#ifdef _MSC_VER
-/* for FP_OFF */
-#include <dos.h>
-#endif
- 
 static void
 png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 {
    png_uint_32 check;
    png_byte *n_data;
+   FILE *io_ptr;
 
    /* Check if data really is near. If so, use usual code. */
-#ifdef _MSC_VER
-   /* do it this way just to quiet warning */
-   FP_OFF(n_data) = FP_OFF(data);
-   if (FP_SEG(n_data) == FP_SEG(data))
-#else
-   /* this works in MSC also but with lost segment warning */
-   n_data = (png_byte *)data;
+   n_data = (png_byte *)CVT_PTR_NOCHECK(data);
+   io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)n_data == data)
-#endif
    {
-      check = fread(n_data, 1, (size_t)length, (FILE *)png_ptr->io_ptr);
+      check = fread(n_data, 1, (size_t)length, io_ptr);
    }
    else
    {
@@ -89,7 +79,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
       do
       {
          read = MIN(NEAR_BUF_SIZE, remaining);
-         err = fread(buf, 1, read, (FILE *)png_ptr->io_ptr);
+         err = fread(buf, 1, read, io_ptr);
          png_memcpy(data, buf, read); /* copy far buffer to near buffer */
          if(err != read)
             break;

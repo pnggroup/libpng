@@ -56,14 +56,14 @@ II. Structures
 There are two main structures that are important to libpng, png_struct
 and png_info.  The first, png_struct, is an internal structure that
 will not, for the most part, be used by a user except as the first
-variable passed to every png function call.
+variable passed to every libpng function call.
 
 The png_info structure is designed to provide information about the
 png file.  All of its fields are intended to be examined or modified
 by the user.  See png.h for a good description of the png_info fields.
 png.h is also an invaluable reference for programming with libpng.
 
-And while I'm on the topic, make sure you include the png header file:
+And while I'm on the topic, make sure you include the libpng header file:
 
 #include <png.h>
 
@@ -86,11 +86,13 @@ file.  Libpng provides a simple check to see if a file is a PNG file.
 To use it, pass in the first 1 to 8 bytes of the file, and it will
 return true or false (1 or 0) depending on whether the bytes could be
 part of a PNG file.  Of course, the more bytes you pass in, the
-greater the accuracy of the prediction.  If you pass in more then
-eight bytes, libpng will only look at the first eight bytes.  However,
-because libpng automatically checks the file header, this is not often
-necessary, and you should pass a newly opened file pointer to libpng
-when reading a file.
+greater the accuracy of the prediction.
+
+If you are intending to keep the file pointer open for use in libpng,
+you must ensure you don't read more than 8 bytes from the beginning
+of the file, and you also have to make a call to png_set_sig_bytes_read()
+with the number of bytes you read from the beginning.  Libpng will
+then only check the bytes (if any) that your program didn't read.
 
 (*): If you are not using the standard I/O functions, you will need
 to replace them with custom functions.  See the discussion under
@@ -102,12 +104,11 @@ Customizing libpng.
         return;
     }
     fread(header, 1, number, fp);
-    is_png = png_check_sig(header, number);
+    is_png = png_check_sig(header, 0, number);
     if (!is_png)
     {
         return;
     }
-    fclose(fp);
 
 Next, png_struct and png_info need to be allocated and initialized.
 In order to ensure that the size of these structures is correct even
@@ -134,20 +135,20 @@ Changes to Libpng below regarding the old initialization functions.
         return;
     }
 
-The error handling routines passed to png_create_read_struct()
-are only necessary if you are not using the libpng supplied
-error handling functions.  When libpng encounters an error,
-it expects to longjmp back to your routine.  Therefore, you
-will need to call setjmp and pass the jmpbuf field of your
-png_struct.  If you read the file from different routines, you
-will need to update the jmpbuf field every time you enter a new
-routine that will call a png_ function.  See your documentation
-of setjmp/longjmp for your compiler for more information on
-setjmp/longjmp.  See the discussion on libpng error handling
-in the Customizing Libpng section below for more information on
-the libpng error handling.  If an error occurs, and libpng
-longjmp's back to your setjmp, you will want to call
-png_destroy_read_struct() to free any memory.
+The error handling routines passed to png_create_read_struct() are only
+necessary if you are not using the libpng supplied error handling
+functions.  When libpng encounters an error, it expects to longjmp back
+to your routine.  Therefore, you will need to call setjmp and pass the
+jmpbuf field of your png_struct.  If you read the file from different
+routines, you will need to update the jmpbuf field every time you enter
+a new routine that will call a png_ function.
+
+See your documentation of setjmp/longjmp for your compiler for more
+information on setjmp/longjmp.  See the discussion on libpng error
+handling in the Customizing Libpng section below for more information on
+the libpng error handling.  If an error occurs, and libpng longjmp's
+back to your setjmp, you will want to call png_destroy_read_struct() to
+free any memory.
 
     if (setjmp(png_ptr->jmpbuf))
     {
@@ -165,10 +166,16 @@ Libpng section below.
 
     png_init_io(png_ptr, fp);
 
+If you had previously opened the file and read any of the signature from
+the beginning in order to see if this was a PNG file, you need to let
+libpng know that there are some bytes missing from the start of the file.
+
+    png_set_sig_bytes(png_ptr, number);
+
 You are now ready to read all the file information up to the actual
 image data.  You do this with a call to png_read_info().
 
-   png_read_info(png_ptr, info_ptr);
+    png_read_info(png_ptr, info_ptr);
 
 The png_info structure is now filled in with all the data necessary
 to read the file.  Some of the more important parts of the info_ptr are:
@@ -183,8 +190,13 @@ to read the file.  Some of the more important parts of the info_ptr are:
                      bit_depth times the channels
     rowbytes       - number of bytes needed to hold a row
     interlace_type - currently 0 for none, 1 for interlaced
+    signature      - holds the signature read from the file (if any).  The
+                     data is kept in the same offset it would be if the
+                     whole signature were read (ie if you had already read
+                     in 4 bytes of signature, the remaining 4 bytes would
+                     be in signature[4] through signature[7]).
     valid          - this details which optional chunks were found in the
-                     file to see if a chunk was present, AND '&' valid with
+                     file.  To see if a chunk was present, AND '&' valid with
                      the appropriate PNG_INFO_<chunk name> define.
 
 These are also important, but their validity depends on whether a
@@ -217,7 +229,7 @@ keyword/text pairs, one pair per chunk.  While there are suggested
 keywords, there is no requirement to restrict the use to these
 strings.  There is a requirement to have at least one character for a
 keyword.  It is strongly suggested that keywords be sensible to humans
-(that's the point), so don't use abbreviations.  See the png
+(that's the point), so don't use abbreviations.  See the PNG
 specification for more details.  There is also no requirement to have
 text after the keyword.
 
@@ -242,6 +254,13 @@ certain color types and bit depths.  Even though each transformation
 checks to see if it has data that it can do somthing with, you should
 make sure to only enable a transformation if it will be valid for the
 data.  For example, don't swap red and blue on grayscale data.
+
+The colors used for the background and transparency values should be
+supplied in the same format/depth as the current image data.  They
+are stored in the same format/depth as the image data in a bKGD or tRNS
+chunk, so this is what libpng expects for this data.  The colors are
+transformed to keep in sync with the image data when an application
+calls the png_update_info() routine (see below).
 
 Data will be decoded into the supplied row buffers packed into bytes
 unless the library has been told to transform it into another format.
@@ -747,7 +766,7 @@ Libpng section below.
 
 You now have the option of modifying how the compression library will
 run.  The following functions are mainly for testing, but may be useful
-in some cases, like if you need to write png files extremely fast and
+in some cases, like if you need to write PNG files extremely fast and
 are willing to give up some compression, or if you want to get the
 maximum possible compression at the expense of slower writing.  If you
 have no special needs in this area, let the library do what it wants by

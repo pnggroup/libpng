@@ -14,45 +14,61 @@
 
 #include <png.h>
 
-/* check to see if a file is a png file using png_check_sig() */
-int check_png(char * file_name)
+/* Check to see if a file is a png file using png_check_sig().
+
+   If this call is successful, and you are going to keep the file
+   open, you should call png_set_sig_bytes_read(png_ptr, 8);
+   once you have created the png_ptr, so that libpng knows it
+   doesn't have to read the signature again.  Make sure you don't
+   call png_set_sig_bytes_read() with more than 8 bytes read or
+   give it an incorrect number of bytes read, or you will either
+   have read too many bytes (your fault), or you are telling libpng
+   to read the wrong number of magic bytes (also your fault). */
+int check_png(char *file_name, FILE **fp)
 {
-   FILE *fp;
    char buf[8];
    int ret;
 
-   fp = fopen(file_name, "rb");
+   *fp = fopen(file_name, "rb");
    if (!fp)
       return 0;
-   ret = fread(buf, 1, 8, fp);
-   fclose(fp);
+   ret = fread(buf, 1, 8, *fp);
 
    if (ret != 8)
       return 0;
 
-   ret = png_check_sig(buf, 8);
+   /* Check the signature starting at byte 0, and check all 8 bytes */
+   ret = png_check_sig(buf, 0, 8);
 
    return (ret);
 }
 
 /* read a png file.  You may want to return an error code if the read
-   fails (depending upon the failure). */
-void read_png(char *file_name)
+   fails (depending upon the failure).  There are two "prototypes" given
+   here - one where we are given the filename, and we need to open the
+   file, and the other where we are given an open file (possibly with
+   some or all of the magic bytes read - see above) and an opened file
+   for reading. */
+------- prototype 1 ----------
+void read_png(char *file_name)  /* We need to open the file */
 {
-   FILE *fp;
    png_structp png_ptr;
    png_infop info_ptr;
+   FILE *fp;
 
-   /* open the file */
-   fp = fopen(file_name, "rb");
-   if (!fp)
+   if ((fp = fopen(file_name, "rb")) == NULL)
       return;
+------- prototype 2 ----------
+void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
+{
+   png_structp png_ptr;
+   png_infop info_ptr;
+------- only use one! --------
 
    /* Create and initialize the png_struct with the desired error handler
       functions.  If you want to use the default stderr and longjump method,
       you can supply NULL for the last three parameters.  We also check that
-      the header file is compatible with the library version.
-    */
+      the header file is compatible with the library version.  */
    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
       (void *)user_error_ptr, user_error_fn, user_warning_fn);
 
@@ -88,7 +104,11 @@ void read_png(char *file_name)
    png_set_read_fn(png_ptr, (void *)user_io_ptr, user_read_fn);
    /* where user_io_ptr is a structure you want available to the callbacks */
 
-   /* read the file information */
+   /* if we have already read some of the signature from the beginning call */
+   png_set_sig_bytes_read(png_ptr, sig_read);
+
+   /* The call to png_read_info() gives us all of the information
+      from the PNG file before the first IDAT (image data chunk). */
    png_read_info(png_ptr, info_ptr);
 
    /* set up the transformations you want.  Note that these are
@@ -120,7 +140,10 @@ void read_png(char *file_name)
       png_set_background(png_ptr, &my_background,
                          PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
 
-   /* tell libpng to handle the gamma conversion for you */
+   /* tell libpng to handle the gamma conversion for you.  We only
+      need the second call if the screen_gamma isn't the usual 2.2
+      or if it is controllable by the user.  It may also be a good
+      idea to allow the user to set the file gamma if it is unknown. */
    if (info_ptr->valid & PNG_INFO_gAMA)
       png_set_gamma(png_ptr, screen_gamma, info_ptr->gamma);
    else
@@ -397,10 +420,6 @@ void write_png(char *file_name, ... other image information ...)
 
    /* set up the output control if you are using standard C streams */
    png_init_io(png_ptr, fp);
-
-   /* if you are using replacement message functions, here you would call */
-   png_set_message_fn(png_ptr, (void *)msg_ptr, user_error_fn, user_warning_fn);
-   /* where msg_ptr is a structure you want available to the callbacks */
 
    /* set the file information here */
    info_ptr->width = ;

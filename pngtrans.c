@@ -2,10 +2,10 @@
 /* pngtrans.c - transforms the data in a row
    routines used by both readers and writers
 
-   libpng 1.0 beta 3 - version 0.89
+   libpng 1.0 beta 4 - version 0.90
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   May 25, 1996
+   January 10, 1997
    */
 
 #define PNG_INTERNAL
@@ -68,10 +68,10 @@ png_set_interlace_handling(png_structp png_ptr)
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
 void
-png_set_filler(png_structp png_ptr, int filler, int filler_loc)
+png_set_filler(png_structp png_ptr, png_byte filler, int filler_loc)
 {
    png_ptr->transformations |= PNG_FILLER;
-   png_ptr->filler = (png_byte)filler;
+   png_ptr->filler = filler;
    if (filler_loc == PNG_FILLER_AFTER)
       png_ptr->flags |= PNG_FLAG_FILLER_AFTER;
    else
@@ -82,17 +82,20 @@ png_set_filler(png_structp png_ptr, int filler, int filler_loc)
       png_ptr->usr_channels = 4;
 }
 
-/* old functions kept around for compatability purposes */
+/* Old functions kept around for compatability purposes.  They will be
+ * removed at some time in the future, so don't use them.  You should
+ * use png_set_filler() above instead.  We set filler bytes to 0xff in
+ * case they are mistakenly used as PNG alpha (0xff is fully opaque). */
 void
 png_set_rgbx(png_structp png_ptr)
 {
-   png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+   png_set_filler(png_ptr, (png_byte)0xff, PNG_FILLER_AFTER);
 }
 
 void
 png_set_xrgb(png_structp png_ptr)
 {
-   png_set_filler(png_ptr, 0xff, PNG_FILLER_BEFORE);
+   png_set_filler(png_ptr, (png_byte)0xff, PNG_FILLER_BEFORE);
 }
 #endif
 

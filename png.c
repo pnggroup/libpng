@@ -1,10 +1,10 @@
 
 /* png.c - location for general purpose png functions
 
-   libpng 1.0 beta 3 - version 0.89
+   libpng 1.0 beta 4 - version 0.90
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   May 25, 1996
+   January 10, 1997
    */
 
 #define PNG_INTERNAL
@@ -13,7 +13,7 @@
 
 /* version information for c files.  This better match the version
    string defined in png.h */
-char png_libpng_ver[] = "0.89";
+char png_libpng_ver[] = "0.90";
 
 /* place to hold the signiture string for a png file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -70,15 +70,52 @@ int FARDATA png_pass_mask[] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
 int FARDATA png_pass_dsp_mask[] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 
 
+/* Tells libpng that we have already handled the first "num_bytes" bytes
+ * of the PNG file signature.  If the PNG data is embedded into another
+ * stream we can set num_bytes = 8 so that libpng will not attempt to read
+ * or write any of the magic bytes before it starts on the IHDR.
+ */
+void
+png_set_sig_bytes(png_structp png_ptr, int num_bytes)
+{
+   if (num_bytes > 8)
+      png_error(png_ptr, "Too many bytes for PNG signature.");
+
+   png_ptr->sig_bytes = num_bytes < 0 ? 0 : num_bytes;
+}
+
+/* Checks whether the supplied bytes match the PNG signature.  We allow
+ * checking less than the full 8-byte signature so that those apps that
+ * already read the first few bytes of a file to determine the file type
+ * can simply check the remaining bytes for extra assurance.  Returns
+ * an integer less than, equal to, or greater than zero if sig is found,
+ * respectively, to be less than, to match, or be greater than the correct
+ * PNG signature (this is the same behaviour as strcmp, memcmp, etc).
+ */
+int
+png_sig_cmp(png_bytep sig, int start, int num_to_check)
+{
+   if (num_to_check > 8)
+      num_to_check = 8;
+   else if (num_to_check < 1)
+      return 0;
+
+   if (start > 7 || start < 0)
+      return 0;
+
+   if (start + num_to_check > 8)
+      num_to_check = 8 - start;
+
+   return (png_memcmp(sig, &png_sig[start], (unsigned int)num_to_check));
+}
+
+/* (Obsolete) function to check signature bytes.  It does not allow one
+   to check a partial signature.  This function will be removed in the
+   future - use png_sig_cmp(). */
 int
 png_check_sig(png_bytep sig, int num)
 {
-   if (num > 8)
-      num = 8;
-   if (num < 1)
-      return 0;
-
-   return (!png_memcmp(sig, png_sig, num));
+  return !png_sig_cmp(sig, 0, num);
 }
 
 /* Function to allocate memory for zlib. */
@@ -88,7 +125,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
    png_voidp ptr;
    png_uint_32 num_bytes;
 
-   ptr = png_large_malloc((png_structp)png_ptr,
+   ptr = png_malloc((png_structp)png_ptr,
       (png_uint_32)items * (png_uint_32)size);
    num_bytes = (png_uint_32)items * (png_uint_32)size;
    if (num_bytes > (png_uint_32)0x7fff)
@@ -108,26 +145,27 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 void
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
-   png_large_free((png_structp)png_ptr, (png_voidp)ptr);
+   png_free((png_structp)png_ptr, (png_voidp)ptr);
 }
 
-/* reset the crc variable to 32 bits of 1's.  Care must be taken
-   in case crc is > 32 bits to leave the top bits 0 */
+/* Reset the CRC variable to 32 bits of 1's.  Care must be taken
+   in case CRC is > 32 bits to leave the top bits 0. */
 void
 png_reset_crc(png_structp png_ptr)
 {
    /* set crc to all 1's */
+#ifdef PNG_USE_OWN_CRC
    png_ptr->crc = 0xffffffffL;
+#else
+   png_ptr->crc = crc32(0, Z_NULL, 0);
+#endif
 }
 
-/* Note: the crc code below was copied from the sample code in the
-   PNG spec, with appropriate modifications made to ensure the
-   variables are large enough */
-
-/* table of crc's of all 8-bit messages.  If you wish to png_malloc this
-   table, turn this into a pointer, and png_malloc it in make_crc_table().
+#ifdef PNG_USE_OWN_CRC
+/* Table of CRC's of all 8-bit messages.  If you wish to png_malloc this
+   table, turn this into a pointer, and png_malloc() it in make_crc_table().
    You may then want to hook it into png_struct and free it with the
-   destroy functions. */
+   destroy functions.  Another alternative is to pre-fill the table.  */
 static png_uint_32 crc_table[256];
 
 /* Flag: has the table been computed? Initially false. */
@@ -150,9 +188,9 @@ make_crc_table(void)
   crc_table_computed = 1;
 }
 
-/* update a running crc with the bytes buf[0..len-1]--the crc should be
+/* Update a running CRC with the bytes buf[0..len-1]--the crc should be
    initialized to all 1's, and the transmitted value is the 1's complement
-   of the final running crc. */
+   of the final running CRC. */
 static png_uint_32
 update_crc(png_uint_32 crc, png_bytep buf, png_uint_32 len)
 {
@@ -176,8 +214,9 @@ update_crc(png_uint_32 crc, png_bytep buf, png_uint_32 len)
 
   return c;
 }
+#endif /* PNG_USE_OWN_CRC */
 
-/* calculate the crc over a section of data.  Note that while we
+/* Calculate the crc over a section of data.  Note that while we
    are passing in a 32 bit value for length, on 16 bit machines, you
    would need to use huge pointers to access all that data.  If you
    need this, put huge here and above. */
@@ -185,9 +224,18 @@ void
 png_calculate_crc(png_structp png_ptr, png_bytep ptr,
    png_uint_32 length)
 {
+#ifdef PNG_USE_OWN_CRC
    png_ptr->crc = update_crc(png_ptr->crc, ptr, length);
+#else
+   png_ptr->crc = crc32(png_ptr->crc, ptr, length);
+#endif
 }
 
+/* Allocate the memory for an info_struct for the application.  We don't
+   really need the png_ptr, but it could potentially be useful in the
+   future.  This should be used in favour of malloc(sizeof(png_info))
+   and png_info_init() so that applications that want to use a shared
+   libpng don't have to be recompiled if png_info changes size. */
 png_infop
 png_create_info_struct(png_structp png_ptr)
 {
@@ -195,23 +243,65 @@ png_create_info_struct(png_structp png_ptr)
 
    if ((info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO)) != NULL)
    {
-      png_memset(info_ptr, 0, sizeof(png_info));
-      png_ptr->do_free |= PNG_FREE_INFO;
+      png_info_init(info_ptr);
    }
 
    return info_ptr;
 }
 
+/* This function frees the memory associated with a single info struct.
+   Normally, one would use either png_destroy_read_struct() or 
+   png_destroy_write_struct() to free an info struct, but this may be
+   useful for some applications. */
 void
-png_info_init(png_infop info)
+png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
+{
+   png_infop info_ptr = NULL;
+
+   if (info_ptr_ptr)
+      info_ptr = *info_ptr_ptr;
+
+   if (info_ptr)
+   {
+      png_info_destroy(png_ptr, info_ptr);
+
+      png_destroy_struct((png_voidp)info_ptr);
+      *info_ptr_ptr = (png_infop)NULL;
+   }
+}
+
+/* Initialize the info structure.  This is now an internal function (0.89)
+   and applications using it are urged to use png_create_info_struct()
+   instead. */
+void
+png_info_init(png_infop info_ptr)
 {
    /* set everything to 0 */
-   png_memset(info, 0, sizeof (png_info));
+   png_memset(info_ptr, 0, sizeof (png_info));
+}
+
+/* This is an internal routine to free any memory that the info struct is
+   pointing to before re-using it or freeing the struct itself. */
+void
+png_info_destroy(png_structp png_ptr, png_infop info_ptr)
+{
+#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
+   int i;
+
+   for (i = 0; i < info_ptr->num_text; i++)
+   {
+      png_free(png_ptr, info_ptr->text[i].key);
+   }
+
+   png_free(png_ptr, info_ptr->text);
+#endif
+
+   png_info_init(info_ptr);
 }
 
 /* This function returns a pointer to the io_ptr associated with the user
    functions.  The application should free any memory associated with this
-   pointer before png_write_destroy and png_read_destroy are called. */
+   pointer before png_write_destroy() or png_read_destroy() are called. */
 png_voidp
 png_get_io_ptr(png_structp png_ptr)
 {

@@ -1,10 +1,10 @@
 
 /* pngwrite.c - general routines to write a png file
 
-   libpng 1.0 beta 3 - version 0.89
+   libpng 1.0 beta 4 - version 0.90
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   May 25, 1996
+   January 10, 1997
    */
 
 /* get internal access to png.h */
@@ -16,87 +16,87 @@
    write it, and put it in the correct location here.  If you want
    the chunk written after the image data, put it in png_write_end().
    I strongly encurage you to supply a PNG_INFO_ flag, and check
-   info->valid before writing the chunk, as that will keep the code
+   info_ptr->valid before writing the chunk, as that will keep the code
    from breaking if you want to just write a plain png file.
    If you have long comments, I suggest writing them in png_write_end(),
    and compressing them. */
 void
-png_write_info(png_structp png_ptr, png_infop info)
+png_write_info(png_structp png_ptr, png_infop info_ptr)
 {
    png_write_sig(png_ptr); /* write PNG signature */
    /* write IHDR information. */
-   png_write_IHDR(png_ptr, info->width, info->height, info->bit_depth,
-      info->color_type, info->compression_type, info->filter_type,
-      info->interlace_type);
+   png_write_IHDR(png_ptr, info_ptr->width, info_ptr->height,
+      info_ptr->bit_depth, info_ptr->color_type, info_ptr->compression_type,
+      info_ptr->filter_type, info_ptr->interlace_type);
    /* the rest of these check to see if the valid field has the appropriate
       flag set, and if it does, writes the chunk. */
 #if defined(PNG_WRITE_gAMA_SUPPORTED)
-   if (info->valid & PNG_INFO_gAMA)
-      png_write_gAMA(png_ptr, info->gamma);
+   if (info_ptr->valid & PNG_INFO_gAMA)
+      png_write_gAMA(png_ptr, info_ptr->gamma);
 #endif
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
-   if (info->valid & PNG_INFO_sBIT)
-      png_write_sBIT(png_ptr, &(info->sig_bit), info->color_type);
+   if (info_ptr->valid & PNG_INFO_sBIT)
+      png_write_sBIT(png_ptr, &(info_ptr->sig_bit), info_ptr->color_type);
 #endif
 #if defined(PNG_WRITE_cHRM_SUPPORTED)
-   if (info->valid & PNG_INFO_cHRM)
+   if (info_ptr->valid & PNG_INFO_cHRM)
       png_write_cHRM(png_ptr,
-         info->x_white, info->y_white,
-         info->x_red, info->y_red,
-         info->x_green, info->y_green,
-         info->x_blue, info->y_blue);
+         info_ptr->x_white, info_ptr->y_white,
+         info_ptr->x_red, info_ptr->y_red,
+         info_ptr->x_green, info_ptr->y_green,
+         info_ptr->x_blue, info_ptr->y_blue);
 #endif
-   if (info->valid & PNG_INFO_PLTE)
-      png_write_PLTE(png_ptr, info->palette, info->num_palette);
-   else if (info->color_type == PNG_COLOR_TYPE_PALETTE)
+   if (info_ptr->valid & PNG_INFO_PLTE)
+      png_write_PLTE(png_ptr, info_ptr->palette, info_ptr->num_palette);
+   else if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       png_error(png_ptr, "Valid palette required for paletted images\n");
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
-   if (info->valid & PNG_INFO_tRNS)
-      png_write_tRNS(png_ptr, info->trans, &(info->trans_values),
-         info->num_trans, info->color_type);
+   if (info_ptr->valid & PNG_INFO_tRNS)
+      png_write_tRNS(png_ptr, info_ptr->trans, &(info_ptr->trans_values),
+         info_ptr->num_trans, info_ptr->color_type);
 #endif
 #if defined(PNG_WRITE_bKGD_SUPPORTED)
-   if (info->valid & PNG_INFO_bKGD)
-      png_write_bKGD(png_ptr, &(info->background), info->color_type);
+   if (info_ptr->valid & PNG_INFO_bKGD)
+      png_write_bKGD(png_ptr, &(info_ptr->background), info_ptr->color_type);
 #endif
 #if defined(PNG_WRITE_hIST_SUPPORTED)
-   if (info->valid & PNG_INFO_hIST)
-      png_write_hIST(png_ptr, info->hist, info->num_palette);
+   if (info_ptr->valid & PNG_INFO_hIST)
+      png_write_hIST(png_ptr, info_ptr->hist, info_ptr->num_palette);
 #endif
 #if defined(PNG_WRITE_pHYs_SUPPORTED)
-   if (info->valid & PNG_INFO_pHYs)
-      png_write_pHYs(png_ptr, info->x_pixels_per_unit,
-         info->y_pixels_per_unit, info->phys_unit_type);
+   if (info_ptr->valid & PNG_INFO_pHYs)
+      png_write_pHYs(png_ptr, info_ptr->x_pixels_per_unit,
+         info_ptr->y_pixels_per_unit, info_ptr->phys_unit_type);
 #endif
 #if defined(PNG_WRITE_oFFs_SUPPORTED)
-   if (info->valid & PNG_INFO_oFFs)
-      png_write_oFFs(png_ptr, info->x_offset, info->y_offset,
-         info->offset_unit_type);
+   if (info_ptr->valid & PNG_INFO_oFFs)
+      png_write_oFFs(png_ptr, info_ptr->x_offset, info_ptr->y_offset,
+         info_ptr->offset_unit_type);
 #endif
 #if defined(PNG_WRITE_tIME_SUPPORTED)
-   if (info->valid & PNG_INFO_tIME)
+   if (info_ptr->valid & PNG_INFO_tIME)
    {
-      png_write_tIME(png_ptr, &(info->mod_time));
+      png_write_tIME(png_ptr, &(info_ptr->mod_time));
       png_ptr->flags |= PNG_FLAG_WROTE_tIME;
    }
 #endif
 #if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
    /* Check to see if we need to write text chunks */
-   if (info->num_text)
+   if (info_ptr->num_text)
    {
       int i; /* local counter */
 
       /* loop through the text chunks */
-      for (i = 0; i < info->num_text; i++)
+      for (i = 0; i < info_ptr->num_text; i++)
       {
          /* if chunk is compressed */
-         if (info->text[i].compression >= 0)
+         if (info_ptr->text[i].compression >= 0)
          {
 #if defined(PNG_WRITE_zTXt_SUPPORTED)
             /* write compressed chunk */
-            png_write_zTXt(png_ptr, info->text[i].key,
-               info->text[i].text, info->text[i].text_length,
-               info->text[i].compression);
+            png_write_zTXt(png_ptr, info_ptr->text[i].key,
+               info_ptr->text[i].text, info_ptr->text[i].text_length,
+               info_ptr->text[i].compression);
 #else
             png_warning(png_ptr, "Unable to write compressed text\n");
 #endif
@@ -105,8 +105,8 @@ png_write_info(png_structp png_ptr, png_infop info)
          {
 #if defined(PNG_WRITE_tEXt_SUPPORTED)
             /* write uncompressed chunk */
-            png_write_tEXt(png_ptr, info->text[i].key,
-               info->text[i].text, info->text[i].text_length);
+            png_write_tEXt(png_ptr, info_ptr->text[i].key,
+               info_ptr->text[i].text, info_ptr->text[i].text_length);
 #else
             png_warning(png_ptr, "Unable to write uncompressed text\n");
 #endif
@@ -121,37 +121,37 @@ png_write_info(png_structp png_ptr, png_infop info)
    in png_write_info(), do not write them again here.  If you have long
    comments, I suggest writing them here, and compressing them. */
 void
-png_write_end(png_structp png_ptr, png_infop info)
+png_write_end(png_structp png_ptr, png_infop info_ptr)
 {
    if (!(png_ptr->mode & PNG_HAVE_IDAT))
       png_error(png_ptr, "No IDATs written into file");
 
    /* see if user wants us to write information chunks */
-   if (info)
+   if (info_ptr)
    {
 #if defined(PNG_WRITE_tIME_SUPPORTED)
       /* check to see if user has supplied a time chunk */
-      if (info->valid & PNG_INFO_tIME &&
+      if (info_ptr->valid & PNG_INFO_tIME &&
          !(png_ptr->flags & PNG_FLAG_WROTE_tIME))
-         png_write_tIME(png_ptr, &(info->mod_time));
+         png_write_tIME(png_ptr, &(info_ptr->mod_time));
 #endif
 #if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
       /* check to see if we need to write comment chunks */
-      if (info->num_text)
+      if (info_ptr->num_text)
       {
          int i; /* local index variable */
 
          /* loop through comment chunks */
-         for (i = 0; i < info->num_text; i++)
+         for (i = 0; i < info_ptr->num_text; i++)
          {
 #if defined(PNG_WRITE_zTXt_SUPPORTED)
             /* check to see if comment is to be compressed */
-            if (info->text[i].compression >= 0)
+            if (info_ptr->text[i].compression >= 0)
             {
                /* write compressed chunk */
-               png_write_zTXt(png_ptr, info->text[i].key,
-                  info->text[i].text, info->text[i].text_length,
-                  info->text[i].compression);
+               png_write_zTXt(png_ptr, info_ptr->text[i].key,
+                  info_ptr->text[i].text, info_ptr->text[i].text_length,
+                  info_ptr->text[i].compression);
             }
 #if defined(PNG_WRITE_tEXt_SUPPORTED)
             else
@@ -160,8 +160,8 @@ png_write_end(png_structp png_ptr, png_infop info)
 #if defined(PNG_WRITE_tEXt_SUPPORTED)
             {
                /* write uncompressed chunk */
-               png_write_tEXt(png_ptr, info->text[i].key,
-                  info->text[i].text, info->text[i].text_length);
+               png_write_tEXt(png_ptr, info_ptr->text[i].key,
+                  info_ptr->text[i].text, info_ptr->text[i].text_length);
             }
 #endif
          }
@@ -200,26 +200,32 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
 /* initialize png structure, and allocate any memory needed */
 png_structp
 png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
-   png_error_ptr warn_fn, png_error_ptr error_fn)
+   png_error_ptr error_fn, png_error_ptr warn_fn)
 {
    png_structp png_ptr;
-
+#ifdef USE_FAR_KEYWORD
+   jmp_buf jmpbuf;
+#endif
    if ((png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG)) == NULL)
    {
       return (png_structp)NULL;
    }
-
+#ifdef USE_FAR_KEYWORD
+   if (setjmp(jmpbuf))
+#else
    if (setjmp(png_ptr->jmpbuf))
+#endif
    {
-      png_large_free(png_ptr, png_ptr->zbuf);
-      png_free(png_ptr, png_ptr->zstream);
+      png_free(png_ptr, png_ptr->zbuf);
       png_destroy_struct(png_ptr);
       return (png_structp)NULL;
    }
+#ifdef USE_FAR_KEYWORD
+   png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+#endif
+   png_set_error_fn(png_ptr, error_ptr, error_fn, warn_fn);
 
-   png_set_error_fn(png_ptr, error_ptr, warn_fn, error_fn);
-
-   if (user_png_ver == NULL || strcmp(user_png_ver, png_libpng_ver))
+   if (user_png_ver == NULL || png_strcmp(user_png_ver, png_libpng_ver))
    {
       if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0])
       {
@@ -233,11 +239,9 @@ png_create_write_struct(png_const_charp user_png_ver, voidp error_ptr,
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = png_large_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = png_malloc(png_ptr, png_ptr->zbuf_size);
 
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
-
-   png_ptr->do_free |= PNG_FREE_STRUCT;
 
    return (png_ptr);
 }
@@ -260,7 +264,7 @@ png_write_init(png_structp png_ptr)
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = png_large_malloc(png_ptr, png_ptr->zbuf_size);
+   png_ptr->zbuf = png_malloc(png_ptr, png_ptr->zbuf_size);
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 }
 
@@ -434,37 +438,37 @@ png_write_flush(png_structp png_ptr)
       int ret;
 
       /* compress the data */
-      ret = deflate(png_ptr->zstream, Z_SYNC_FLUSH);
+      ret = deflate(&png_ptr->zstream, Z_SYNC_FLUSH);
       wrote_IDAT = 0;
 
       /* check for compression errors */
       if (ret != Z_OK)
       {
-         if (png_ptr->zstream->msg)
-            png_error(png_ptr, png_ptr->zstream->msg);
+         if (png_ptr->zstream.msg)
+            png_error(png_ptr, png_ptr->zstream.msg);
          else
             png_error(png_ptr, "zlib error");
       }
 
-      if (!png_ptr->zstream->avail_out)
+      if (!png_ptr->zstream.avail_out)
       {
          /* write the IDAT and reset the zlib output buffer */
          png_write_IDAT(png_ptr, png_ptr->zbuf,
                         png_ptr->zbuf_size);
-         png_ptr->zstream->next_out = png_ptr->zbuf;
-         png_ptr->zstream->avail_out = (uInt)png_ptr->zbuf_size;
+         png_ptr->zstream.next_out = png_ptr->zbuf;
+         png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
          wrote_IDAT = 1;
       }
    } while(wrote_IDAT == 1);
 
    /* If there is any data left to be output, write it into a new IDAT */
-   if (png_ptr->zbuf_size != png_ptr->zstream->avail_out)
+   if (png_ptr->zbuf_size != png_ptr->zstream.avail_out)
    {
       /* write the IDAT and reset the zlib output buffer */
       png_write_IDAT(png_ptr, png_ptr->zbuf,
-                     png_ptr->zbuf_size - png_ptr->zstream->avail_out);
-      png_ptr->zstream->next_out = png_ptr->zbuf;
-      png_ptr->zstream->avail_out = (uInt)png_ptr->zbuf_size;
+                     png_ptr->zbuf_size - png_ptr->zstream.avail_out);
+      png_ptr->zstream.next_out = png_ptr->zbuf;
+      png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
    }
    png_ptr->flush_rows = 0;
    png_flush(png_ptr);
@@ -473,24 +477,33 @@ png_write_flush(png_structp png_ptr)
 
 /* free all memory used by the write */
 void
-png_destroy_write_struct(png_structpp png_ptr, png_infopp info_ptr)
+png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 {
-   if (info_ptr && *info_ptr)
+   png_structp png_ptr = NULL;
+   png_infop info_ptr = NULL;
+
+   if (png_ptr_ptr)
+      png_ptr = *png_ptr_ptr;
+
+   if (info_ptr_ptr)
+      info_ptr = *info_ptr_ptr;
+
+   if (info_ptr)
    {
-      png_destroy_struct((voidp)*info_ptr);
-      *info_ptr = (png_infop)NULL;
+      png_destroy_struct((png_voidp)info_ptr);
+      *info_ptr_ptr = (png_infop)NULL;
    }
 
-   if (png_ptr && *png_ptr)
+   if (png_ptr)
    {
-      png_write_destroy(*png_ptr);
-      png_destroy_struct((voidp)*png_ptr);
-      *png_ptr = (png_structp)NULL;
+      png_write_destroy(png_ptr);
+      png_destroy_struct((png_voidp)png_ptr);
+      *png_ptr_ptr = (png_structp)NULL;
    }
 }
 
 
-/* free any memory used in png struct (old) */
+/* free any memory used in png struct (old method) */
 void
 png_write_destroy(png_structp png_ptr)
 {
@@ -500,17 +513,16 @@ png_write_destroy(png_structp png_ptr)
    png_voidp error_ptr;
 
    /* free any memory zlib uses */
-   deflateEnd(png_ptr->zstream);
-   png_free(png_ptr, png_ptr->zstream);
+   deflateEnd(&png_ptr->zstream);
 
    /* free our memory.  png_free checks NULL for us. */
-   png_large_free(png_ptr, png_ptr->zbuf);
-   png_large_free(png_ptr, png_ptr->row_buf);
-   png_large_free(png_ptr, png_ptr->prev_row);
-   png_large_free(png_ptr, png_ptr->sub_row);
-   png_large_free(png_ptr, png_ptr->up_row);
-   png_large_free(png_ptr, png_ptr->avg_row);
-   png_large_free(png_ptr, png_ptr->paeth_row);
+   png_free(png_ptr, png_ptr->zbuf);
+   png_free(png_ptr, png_ptr->row_buf);
+   png_free(png_ptr, png_ptr->prev_row);
+   png_free(png_ptr, png_ptr->sub_row);
+   png_free(png_ptr, png_ptr->up_row);
+   png_free(png_ptr, png_ptr->avg_row);
+   png_free(png_ptr, png_ptr->paeth_row);
 
    /* reset structure */
    png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
@@ -555,7 +567,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
       {
          if (png_ptr->do_filter & PNG_FILTER_SUB && !(png_ptr->sub_row))
          {
-            png_ptr->sub_row = (png_bytep )png_large_malloc(png_ptr,
+            png_ptr->sub_row = (png_bytep )png_malloc(png_ptr,
                png_ptr->rowbytes + 1);
             png_ptr->sub_row[0] = 1;  /* Set the row filter type */
          }
@@ -569,7 +581,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             }
             else
             {
-               png_ptr->up_row = (png_bytep )png_large_malloc(png_ptr,
+               png_ptr->up_row = (png_bytep )png_malloc(png_ptr,
                   png_ptr->rowbytes + 1);
                png_ptr->up_row[0] = 2;  /* Set the row filter type */
             }
@@ -584,7 +596,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             }
             else
             {
-               png_ptr->up_row = (png_bytep )png_large_malloc(png_ptr,
+               png_ptr->up_row = (png_bytep )png_malloc(png_ptr,
                   png_ptr->rowbytes + 1);
                png_ptr->up_row[0] = 3;  /* Set the row filter type */
             }
@@ -599,7 +611,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             }
             else
             {
-               png_ptr->paeth_row = (png_bytep )png_large_malloc(png_ptr,
+               png_ptr->paeth_row = (png_bytep )png_malloc(png_ptr,
                   png_ptr->rowbytes + 1);
                png_ptr->paeth_row[0] = 4;  /* Set the row filter type */
             }

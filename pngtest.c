@@ -1,9 +1,10 @@
+
 /* pngtest.c - a simple test program to test libpng
 
-   libpng 1.0 beta 3 - version 0.89
+   libpng 1.0 beta 4 - version 0.90
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   May 25, 1996
+   January 10, 1997
 */
 
 #include <stdio.h>
@@ -20,7 +21,7 @@
 
 /* input and output filenames */
 #ifdef RISCOS
-char *inname = "pngtest_pn";
+char *inname = "pngtest_png";
 char *outname = "pngout_png";
 #else
 char *inname = "pngtest.png";
@@ -41,7 +42,9 @@ int main(int argc, char *argv[])
    png_uint_32 rowbytes;
    png_uint_32 y;
    int channels, num_pass, pass;
-
+#ifdef USE_FAR_KEYWORD
+   jmp_buf jmpbuf;
+#endif   
    row_buf = (png_bytep)NULL;
    near_row_buf = (png_byte *)NULL;
 
@@ -82,14 +85,18 @@ int main(int argc, char *argv[])
       return 1;
    }
 
-   read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (void *)NULL,
+   read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)NULL,  (png_error_ptr)NULL);
-   write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (void *)NULL,
+   write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)NULL, (png_error_ptr)NULL);
    info_ptr = png_create_info_struct(read_ptr);
    end_info = png_create_info_struct(read_ptr);
 
+#ifdef USE_FAR_KEYWORD
+   if (setjmp(jmpbuf))
+#else
    if (setjmp(read_ptr->jmpbuf))
+#endif
    {
       fprintf(STDERR, "libpng read error\n");
       png_destroy_read_struct(&read_ptr, &info_ptr, &end_info);
@@ -98,8 +105,12 @@ int main(int argc, char *argv[])
       fclose(fpout);
       return 1;
    }
-
+#ifdef USE_FAR_KEYWORD
+   png_memcpy(read_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+   if (setjmp(jmpbuf))
+#else
    if (setjmp(write_ptr->jmpbuf))
+#endif
    {
       fprintf(STDERR, "libpng write error\n");
       png_destroy_read_struct(&read_ptr, &info_ptr, &end_info);
@@ -108,7 +119,9 @@ int main(int argc, char *argv[])
       fclose(fpout);
       return 1;
    }
-
+#ifdef USE_FAR_KEYWORD
+   png_memcpy(write_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+#endif
    png_init_io(read_ptr, fpin);
    png_init_io(write_ptr, fpout);
 
@@ -166,7 +179,7 @@ int main(int argc, char *argv[])
    fclose(fpin);
    fclose(fpout);
 
-   free((void *)near_row_buf);
+   free((png_byte *)near_row_buf);
 
    fpin = fopen(inname, "rb");
 
@@ -183,13 +196,12 @@ int main(int argc, char *argv[])
       fclose(fpin);
       return 1;
    }
-
    while (1)
    {
       int num_in, num_out;
 
-      num_in = fread(inbuf, 1, 256, fpin);
-      num_out = fread(outbuf, 1, 256, fpout);
+      num_in = fread(inbuf, 1, 1, fpin);
+      num_out = fread(outbuf, 1, 1, fpout);
 
       if (num_in != num_out)
       {
