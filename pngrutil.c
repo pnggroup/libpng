@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.7beta16 - June 4, 2000
+ * libpng 1.0.7beta17 - June 24, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -224,8 +224,18 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          }
       }
       if (ret != Z_STREAM_END)
+      {
+#if !defined(PNG_NO_STDIO)
+         char umsg[50];
+
+         sprintf(umsg,"Incomplete compressed datastream in %s chunk",
+             png_ptr->chunk_name);
+         png_warning(png_ptr, umsg);
+#else
          png_warning(png_ptr,
-         "End of datastream not found in a compressed chunk (other than IDAT)");
+            "Incomplete compressed datastream in chunk other than IDAT");
+#endif
+      }
 
       inflateReset(&png_ptr->zstream);
       png_ptr->zstream.avail_in = 0;
@@ -234,7 +244,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       chunkdata = text;
       *newlength=text_size;
    }
-   else /* if (comp_type >= PNG_TEXT_COMPRESSION_LAST) */
+   else /* if (comp_type != PNG_TEXT_COMPRESSION_zTXt) */
    {
 #if !defined(PNG_NO_STDIO)
       char umsg[50];

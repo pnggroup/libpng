@@ -19,9 +19,11 @@ CFG=zlib - Win32 DLL
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "zlib - Win32 DLL" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "zlib - Win32 Debug DLL" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "zlib - Win32 DLL Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "zlib - Win32 DLL ASM" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "zlib - Win32 DLL Debug ASM" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "zlib - Win32 LIB" (based on "Win32 (x86) Static Library")
-!MESSAGE "zlib - Win32 Debug LIB" (based on "Win32 (x86) Static Library")
+!MESSAGE "zlib - Win32 LIB Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -53,11 +55,11 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
+# ADD BASE LINK32 /nologo /dll /machine:I386
 # ADD LINK32 /nologo /dll /machine:I386
 # SUBTRACT LINK32 /pdb:none
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 Debug DLL"
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -81,8 +83,63 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
+# ADD BASE LINK32 /nologo /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 /nologo /dll /debug /machine:I386 /out:".\win32\zlib\dll_dbg\zlibd.dll"
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL ASM"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "Release"
+# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir ".\win32\zlib\dll_asm"
+# PROP Intermediate_Dir ".\win32\zlib\dll_asm"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+CPP=cl.exe
+# ADD BASE CPP /nologo /MD /W3 /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /FD /c
+# ADD CPP /nologo /MD /W3 /O1 /I "..\..\zlib" /D "NDEBUG" /D "WIN32" /D "_WIN32" /D "_WINDOWS" /D "ZLIB_DLL" /D "DYNAMIC_CRC_TABLE" /D "ASMV" /FAcs /FD /c
+MTL=midl.exe
+RSC=rc.exe
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /i ".." /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 /nologo /dll /machine:I386
+# ADD LINK32 gvmat32.obj /nologo /dll /machine:I386 /out:".\win32\zlib\dll_asm\zliba.dll"
+# SUBTRACT LINK32 /pdb:none
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug ASM"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "Debug"
+# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir ".\win32\zlib\dll_dbga"
+# PROP Intermediate_Dir ".\win32\zlib\dll_dbga"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+CPP=cl.exe
+# ADD BASE CPP /nologo /MDd /W3 /Zi /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Zi /Od /I "..\..\zlib" /D "_DEBUG" /D "WIN32" /D "_WIN32" /D "_WINDOWS" /D "ZLIB_DLL" /D "DYNAMIC_CRC_TABLE" /D "ASMV" /FAcs /FD /GZ /c
+MTL=midl.exe
+RSC=rc.exe
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /i ".." /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 /nologo /dll /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 gvmat32d.obj /nologo /dll /debug /machine:I386 /out:".\win32\zlib\dll_dbga\zlibb.dll"
 
 !ELSEIF  "$(CFG)" == "zlib - Win32 LIB"
 
@@ -110,7 +167,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 Debug LIB"
+!ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -141,9 +198,11 @@ LIB32=link.exe -lib
 # Begin Target
 
 # Name "zlib - Win32 DLL"
-# Name "zlib - Win32 Debug DLL"
+# Name "zlib - Win32 DLL Debug"
+# Name "zlib - Win32 DLL ASM"
+# Name "zlib - Win32 DLL Debug ASM"
 # Name "zlib - Win32 LIB"
-# Name "zlib - Win32 Debug LIB"
+# Name "zlib - Win32 LIB Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -162,6 +221,33 @@ SOURCE=..\..\zlib\crc32.c
 # Begin Source File
 
 SOURCE=..\..\zlib\deflate.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\zlib\contrib\asm386\gvmat32c.c
+
+!IF  "$(CFG)" == "zlib - Win32 DLL"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL ASM"
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug ASM"
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 LIB"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -212,13 +298,17 @@ SOURCE=.\zlib.def
 
 !IF  "$(CFG)" == "zlib - Win32 DLL"
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 Debug DLL"
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug"
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL ASM"
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug ASM"
 
 !ELSEIF  "$(CFG)" == "zlib - Win32 LIB"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 Debug LIB"
+!ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
 
 # PROP Exclude_From_Build 1
 
@@ -231,13 +321,17 @@ SOURCE=..\..\zlib\msdos\zlib.rc
 
 !IF  "$(CFG)" == "zlib - Win32 DLL"
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 Debug DLL"
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug"
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL ASM"
+
+!ELSEIF  "$(CFG)" == "zlib - Win32 DLL Debug ASM"
 
 !ELSEIF  "$(CFG)" == "zlib - Win32 LIB"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zlib - Win32 Debug LIB"
+!ELSEIF  "$(CFG)" == "zlib - Win32 LIB Debug"
 
 # PROP Exclude_From_Build 1
 

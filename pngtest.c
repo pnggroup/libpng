@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.7beta16 - June 4, 2000
+ * libpng 1.0.7beta17 - June 24, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1159,7 +1159,7 @@ main(int argc, char *argv[])
    fprintf(STDERR," library (%lu):%s", png_access_version_number(),
       png_get_header_version(NULL));
    /* Show the version of libpng used in building the application */
-   fprintf(STDERR," pngtest (%lu):%s", PNG_LIBPNG_VER,
+   fprintf(STDERR," pngtest (%lu):%s", (unsigned long)PNG_LIBPNG_VER,
       PNG_HEADER_VERSION_STRING);
    fprintf(STDERR," sizeof(png_struct)=%d, sizeof(png_info)=%d\n",
                     sizeof(png_struct), sizeof(png_info));
@@ -1392,4 +1392,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7beta16 your_png_h_is_not_version_1_0_7beta16;
+typedef version_1_0_7beta17 your_png_h_is_not_version_1_0_7beta17;

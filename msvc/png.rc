@@ -12,6 +12,14 @@
 #  error PRIVATEBUILD or SPECIALBUILD must be defined as a string describing the type of change brought to the standard library
 #endif /* defined(DLLFNAME_POSTFIX)... */
 
+#if !defined(DLLFNAME_POSTFIX) && defined(PNG_USE_PNGVCRD)
+#  if defined(PNG_DEBUG) && (PNG_DEBUG > 0)
+#    define DLLFNAME_POSTFIX "B"
+#  else
+#    define DLLFNAME_POSTFIX "A"
+#  endif /* !defined(DLLFNAME_POSTFIX)... */
+#endif
+
 #if defined(PNG_DEBUG) && (PNG_DEBUG > 0)
 #  define VS_DEBUG VS_FF_DEBUG
 #  ifndef DLLFNAME_POSTFIX
@@ -22,7 +30,9 @@
 #  endif /* COMMENTS */
 #else
 #  define VS_DEBUG 0
-#  define DLLFNAME_POSTFIX
+#  ifndef DLLFNAME_POSTFIX
+#     define DLLFNAME_POSTFIX
+#  endif /* DLLFNAME_POSTFIX */
 #endif /* defined(DEBUG)... */
 
 #ifdef PRIVATEBUILD
@@ -54,7 +64,7 @@ BEGIN
       VALUE "FileDescription", "PNG image compression library\000"
       VALUE "FileVersion", PNG_LIBPNG_VER_STRING "\000"
       VALUE "InternalName", PNG_LIBPNG_DLLFNAME QUOTE(PNG_LIBPNG_VER_MAJOR) DLLFNAME_POSTFIX " (Windows 32 bit)\000"
-      VALUE "LegalCopyright", "Copyright 1998-2000 Glenn Randers-Pehrson\000"
+      VALUE "LegalCopyright", "\251 1998-2000 Glenn Randers-Pehrson\000"
       VALUE "OriginalFilename", PNG_LIBPNG_DLLFNAME QUOTE(PNG_LIBPNG_VER_MAJOR) DLLFNAME_POSTFIX ".DLL\000"
 #ifdef PRIVATEBUILD
       VALUE "PrivateBuild", PRIVATEBUILD
