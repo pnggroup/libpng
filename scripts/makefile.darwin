@@ -23,7 +23,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 RANLIB=ranlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.5beta1
+PNGMIN = 1.2.5beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -91,6 +91,13 @@ $(LIBNAME).$(PNGVER).dylib: $(OBJSDLL)
 	 -o $(LIBNAME).$(PNGVER).dylib \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
+libpng.3.$(PNGMIN).dylib: $(OBJSDLL)
+	$(CC) -dynamiclib \
+	 -install_name $(DL)/libpng.3.dylib \
+	 -current_version $(PNGMIN) -compatibility_version $(PNGMIN) \
+	 -o libpng.3.$(PNGMIN).dylib \
+	 $(OBJSDLL) -L$(ZLIBLIB) -lz
+
 pngtest: pngtest.o $(LIBNAME).dylib
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
@@ -113,7 +120,8 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DL)/libpng.a
 	(cd $(DL); ln -sf $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).dylib libpng.pc
+install-shared: install-headers $(LIBNAME).dylib libpng.pc \
+	libpng.3.$(PNGMIN).dylib
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).$(PNGMAJ)*.dylib
 	-@/bin/rm -f $(DL)/$(LIBNAME).dylib
@@ -121,11 +129,12 @@ install-shared: install-headers $(LIBNAME).dylib libpng.pc
 	-@/bin/rm -f $(DL)/libpng.3.dylib
 	-@/bin/rm -f $(DL)/libpng.3.*.dylib
 	cp $(LIBNAME).$(PNGVER).dylib $(DL)
+	cp libpng.3.$(PNGMIN).dylib $(DL)
 	chmod 755 $(DL)/$(LIBNAME).$(PNGVER).dylib
+	chmod 755 $(DL)/libpng.3.$(PNGMIN).dylib
 	(cd $(DL); \
 	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.dylib; \
-	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.3.dylib; \
-	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.3.$(PNGMIN).dylib; \
+	ln -sf libpng.3.$(PNGMIN).dylib libpng.3.dylib; \
 	ln -sf $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib; \
 	ln -sf $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib)
 	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
@@ -168,7 +177,7 @@ test-installed:
 
 clean:
 	rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
-	$(LIBNAME).*dylib pngtesti
+	$(LIBNAME).*dylib pngtesti libpng.3.$(PNGMIN).dylib
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

@@ -1,5 +1,5 @@
 
-Libpng 1.2.5beta1 - August 6, 2002
+Libpng 1.2.5beta2 - August 16, 2002
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -17,6 +17,10 @@ version 1.2.5beta1 [August 6, 2002]
   Prevent png_ptr->pass from exceeding 7 in png_push_finish_row().
   Updated makefile.hggcc
   Updated png.c and pnggccrd.c handling of return from png_mmx_support()
+version 1.2.5beta2 [August 16, 2002]
+  Only issue png_warning() about "Too much data" in pngpread.c when avail_in
+    is nonzero.
+  Updated makefiles to install a separate libpng.so.3 with its own rpath.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

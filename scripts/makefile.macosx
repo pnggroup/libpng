@@ -17,7 +17,7 @@ ZLIBINC=../zlib
 CC=cc
 
 PNGMAJ = 0
-PNGMIN = 1.2.5beta1
+PNGMIN = 1.2.5beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
@@ -79,6 +79,9 @@ libpng.a: $(OBJS)
 $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX): $(OBJS)
 	$(LDSHARED) -o $@ $(OBJS)
 
+libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX): $(OBJS)
+	$(LDSHARED) -o $@ $(OBJS)
+
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
@@ -101,7 +104,8 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DL)/libpng.a
 	(cd $(DL); ln -f -s $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) libpng.pc
+install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
+	libpng.pc libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f \
 	$(DL)/$(LIBNAME).$(PNGMAJ)*.$(SHAREDLIB_POSTFIX)
@@ -109,15 +113,15 @@ install-shared: install-headers $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) libpng
 	-@/bin/rm -f libpng.$(SHARED_POSTFIX)
 	-@/bin/rm -f libpng.3.$(SHARED_POSTFIX)
 	-@/bin/rm -f libpng.3.*.$(SHARED_POSTFIX)
+	cp libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX) $(DL)
 	cp $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) $(DL)
 	chmod 755 $(DL)/$(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX)
+	chmod 755 $(DL)/libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX)
 	(cd $(DL); \
 	ln -f -s $(LIBNAME).$(PNGVER).$(SHARED_POSTFIX) \
 	libpng.$(SHARED_POSTFIX); \
-	ln -f -s $(LIBNAME).$(PNGVER).$(SHARED_POSTFIX) \
+	ln -f -s libpng.3.$(PNGMIN).$(SHARED_POSTFIX) \
 	libpng.3.$(SHARED_POSTFIX); \
-	ln -f -s $(LIBNAME).$(PNGVER).$(SHARED_POSTFIX) \
-	libpng.3.$(PNGMIN).$(SHARED_POSTFIX); \
 	ln -f -s $(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
 	$(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX); \
 	ln -f -s $(LIBNAME).$(PNGMAJ).$(SHAREDLIB_POSTFIX) \
@@ -163,7 +167,8 @@ test-installed:
 clean:
 	rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
 	$(LIBNAME).$(PNGVER).$(SHAREDLIB_POSTFIX) \
-	$(LIBNAME).$(SHAREDLIB_POSTFIX)
+	$(LIBNAME).$(SHAREDLIB_POSTFIX) \
+	libpng.3.$(PNGMIN).$(SHAREDLIB_POSTFIX)
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

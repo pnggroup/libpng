@@ -30,7 +30,7 @@ LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng12 -lz -lm
 RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.5beta1
+PNGMIN = 1.2.5beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -107,6 +107,10 @@ $(LIBNAME).so.$(PNGVER): $(OBJSDLL)
 	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h $(LIBNAME).so.$(PNGMAJ) \
 	 -o $(LIBNAME).so.$(PNGVER) $(OBJSDLL) -lz
 
+libpng.so.3.$(PNGMIN): $(OBJS)
+	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h libpng.so.3 \
+	 -o libpng.so.3.$(PNGMIN) $(OBJSDLL) -lz
+
 pngtest: pngtest.o $(LIBNAME).so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
@@ -129,18 +133,20 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DL)/libpng.a
 	(cd $(DL); ln -f -s $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc
+install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
+	libpng.so.3.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)* $(DL)/$(LIBNAME).so
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.3
 	-@/bin/rm -f $(DL)/libpng.so.3.*
 	cp $(LIBNAME).so.$(PNGVER) $(DL)
+	cp libpng.so.3.$(PNGMIN) $(DL)
 	chmod 755 $(DL)/$(LIBNAME).so.$(PNGVER)
+	chmod 755 $(DL)/libpng.so.3.$(PNGMIN)
 	(cd $(DL); \
 	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so; \
-	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.3; \
-	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.3.$(PNGMIN); \
+	ln -f -s libpng.so.3.$(PNGMIN) libpng.so.3; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so; \
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ))
 	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
@@ -185,7 +191,8 @@ test-installed:
 
 clean:
 	/bin/rm -f *.o libpng.a pngtest pngtesti pngout.png libpng.pc \
-	libpng-config $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)*
+	libpng-config $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* \
+	libpng.so.3.$(PNGMIN)
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
