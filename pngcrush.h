@@ -3,9 +3,6 @@
 /* Special defines for pngcrush, mostly just to reduce the size of the
    static executable. */
 
-#ifndef PNG_FLOATING_POINT_SUPPORTED      /* define this if you want to be */
-#  define PNG_NO_FLOATING_POINT_SUPPORTED /* able to reduce color to gray  */
-#endif
 #define PNG_NO_READ_cHRM
 #define PNG_NO_WRITE_cHRM
 #define PNG_NO_READ_hIST
@@ -24,6 +21,7 @@
 #define PNG_NO_INFO_IMAGE
 #define PNG_NO_READ_USER_CHUNKS
 #define PNG_NO_EASY_ACCESS
+#define PNG_NO_READ_DITHER
 #define PNG_NO_READ_EMPTY_PLTE
 #define PNG_NO_WRITE_TRANSFORMS
 #define PNG_NO_PROGRESSIVE_READ
@@ -32,9 +30,9 @@
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
 #define PNG_READ_EXPAND_SUPPORTED
 #define PNG_READ_FILLER_SUPPORTED
+#define PNG_READ_RGB_TO_GRAY_SUPPORTED
 #ifndef PNG_NO_FLOATING_POINT_SUPPORTED
 #  define PNG_READ_GRAY_TO_RGB_SUPPORTED
-#  define PNG_READ_RGB_TO_GRAY_SUPPORTED
 #  define PNG_READ_BACKGROUND_SUPPORTED
 #  define PNG_READ_GAMMA_SUPPORTED
 #else

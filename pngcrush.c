@@ -15,12 +15,12 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.3.5"
+#define PNGCRUSH_VERSION "1.3.6"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
  *
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+ * Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * The pngcrush program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
@@ -45,14 +45,34 @@
 /* To do:
  *
  * Version 1.3.*: check for unused alpha channel and ok-to-reduce-depth.
- *   Rearrange palette to put most-used color first and
- *   transparent color second.  Finish pplt (partial palette) feature.
+ *   Rearrange palette to put most-used color first and transparent color
+ *   second (see ImageMagick 5.1.1 and later).
+ *   Finish pplt (partial palette) feature.
  *
  * Version 1.3.*: Use an alternate write function for the trial passes, that
  *   simply counts bytes rather than actually writing to a file, to save wear
  *   and tear on disk drives.
  *
+ * Version 1.4.*: Allow in-place file replacement or as a filter, as in
+ *    "pngcrush -overwrite file.png"
+ *    "pngcreator | pngcrush > output.png"
+ *
+ * Version 1.4.*: Remove text-handling and color-handling features and put
+ *   those in a separate program or programs, to avoid unnecessary
+ *   recompressing.
+ *
  * Change log:
+ *
+ * Version 1.3.6 (built with libpng-1.0.5v)
+ *
+ *   RGB to Grayscale conversion is more accurate (15-bit instead of 8-bit)
+ *   and now uses only integer arithmetic.
+ *
+ *   #ifdef'ed out PNG_READ_DITHER
+ *
+ *   Changed "Compressed" to "Uncompressed" in help for -itxt.
+ *
+ *   Stifled some compiler warnings
  *
  * Version 1.3.5 (built with libpng-1.0.5s)
  *
@@ -180,6 +200,7 @@
 #define EXTENSION_MODE 2
 #define FOPEN(file, how) fopen(file, how)
 #define FCLOSE(file) {fclose(file); file=NULL;--number_of_open_files;};
+#define P1 if(verbose > 1)printf
 #define P2 if(verbose > 2)printf
 
 /* we don't need the extra libpng tranformations
@@ -187,6 +208,11 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+
+/* so we can load pngcrush with pre-1.0.6 versions of libpng */
+#ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#endif
 
 #ifdef __TURBOC__
 #include <mem.h>
@@ -422,7 +448,7 @@ void png_crush_pause(void)
       fprintf(STDERR, "Press [ENTER] key to continue.\n");
       keystroke=(char)getc(stdin);
       if (keystroke)
-        /* stifle compiler warning */ ;
+        /* stifle compiler warning */ return;
    }
 }
 #define PNG_CRUSH_CLEANUP \
@@ -438,7 +464,7 @@ void png_crush_pause(void)
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr); \
       FCLOSE(fpin); \
       if(verbose > 1) \
-         fprintf(STDERR, "returning after longjump\n");
+        fprintf(STDERR, "returning after longjump\n");
 
 int keep_chunk(png_const_charp name, char *argv[]);
 
@@ -1067,7 +1093,7 @@ main(int argc, char *argv[])
       fprintf(STDERR,
         " |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,\n");
       fprintf(STDERR, 
-        " | and zlib version %s, Copyright (c) 1998,\n",
+        " | and zlib version %s, Copyright (C) 1998,\n",
             ZLIB_VERSION);
       fprintf(STDERR,
         " |    Jean-loup Gailly and Mark Adler.\n");
@@ -1077,12 +1103,12 @@ main(int argc, char *argv[])
          __VERSION__, "2.81");
       /* is there a macro for "as" versions? */
       fprintf(STDERR,
-        " | under DJGPP %d.%d, Copyright (c) 1995, D. J. Delorie\n",
+        " | under DJGPP %d.%d, Copyright (C) 1995, D. J. Delorie\n",
         __DJGPP__,__DJGPP_MINOR__);
       fprintf(STDERR,
         " | and loaded with PMODE/DJ, by Thomas Pytel and Matthias Grimrath\n");
       fprintf(STDERR,
-        " |    Copyright (c) 1996, Matthias Grimrath.\n");
+        " |    Copyright (C) 1996, Matthias Grimrath.\n");
 #endif
       fprintf(STDERR,"\n");
       }
@@ -1157,6 +1183,8 @@ main(int argc, char *argv[])
        "               4 and 6 are padded with an opaque alpha channel if\n");
      fprintf(STDERR,
        "               the input file does not have alpha information.\n");
+     fprintf(STDERR,
+       "               You can use 0 or 4 to convert color to grayscale.\n");
      fprintf(STDERR,
        "               Use 0 or 2 to delete an unwanted alpha channel.\n");
      fprintf(STDERR,
@@ -1234,7 +1262,7 @@ main(int argc, char *argv[])
        "         -itxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
      fprintf(STDERR,
-       "\n               Compressed iTXt chunk to insert (see -text).\n\n");
+       "\n               Uncompressed iTXt chunk to insert (see -text).\n\n");
      fprintf(STDERR,
        "            -l zlib_compression_level [0-9]\n");
      if(verbose > 1)
@@ -1689,7 +1717,9 @@ main(int argc, char *argv[])
                it is possible that we will erroneously reject the attempt
                when inputsize and outputsize are equal, for different files
              */
-            fprintf(STDERR, "Cannot overwrite input file %s\n", inname);
+            fprintf(STDERR, "\n   Cannot overwrite input file %s\n", inname);
+            P1("   st_ino=%d, st_size=%d\n\n", (int)stat_in.st_ino,
+               (int)stat_in.st_size);
             FCLOSE(fpin);
             return 1;
          }
@@ -1757,7 +1787,7 @@ main(int argc, char *argv[])
 #  else
 #    ifdef PNG_JMPBUF_SUPPORTED
    /* New setjmp interface */
-   if (setjmp(png_jmp_env(read_ptr)))
+   if (setjmp(png_jmpbuf(read_ptr)))
 #    else
    /* old interface */
    if (setjmp(read_ptr->jmpbuf))
@@ -1769,7 +1799,7 @@ main(int argc, char *argv[])
       }
 
 #if defined(USE_FAR_KEYWORD)
-      png_memcpy(png_jmp_env(read_ptr),jmpbuf,sizeof(jmp_buf));
+      png_memcpy(png_jmpbuf(read_ptr),jmpbuf,sizeof(jmp_buf));
 #endif
    if(nosave == 0)
 #  ifdef USE_FAR_KEYWORD
@@ -1777,7 +1807,7 @@ main(int argc, char *argv[])
 #  else
 #    ifdef PNG_JMPBUF_SUPPORTED
    /* New setjmp interface */
-   if (setjmp(png_jmp_env(write_ptr)))
+   if (setjmp(png_jmpbuf(write_ptr)))
 #    else
    /* Old interface */
    if (setjmp(write_ptr->jmpbuf))
@@ -1788,7 +1818,7 @@ main(int argc, char *argv[])
              continue;
          }
 #if defined(USE_FAR_KEYWORD)
-      png_memcpy(png_jmp_env(write_ptr),jmpbuf,sizeof(jmp_buf));
+      png_memcpy(png_jmpbuf(write_ptr),jmpbuf,sizeof(jmp_buf));
 #endif
       P2("jmp_buf has been set.\n");
       png_crush_pause();
@@ -1910,8 +1940,13 @@ main(int argc, char *argv[])
 #endif
 #else   /* !PNG_UINT_IHDR */
 
+#if !defined(PNG_cHRM_SUPPORTED) || !defined(PNG_hIST_SUPPORTED) || \
+    !defined(PNG_iCCP_SUPPORTED) || !defined(PNG_sCAL_SUPPORTED) || \
+    !defined(PNG_pCAL_SUPPORTED) || !defined(PNG_sPLT_SUPPORTED) || \
+    !defined(PNG_tIME_SUPPORTED)
           png_byte chunk_name[5];
           chunk_name[4]='\0';
+#endif
 
           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE,
             NULL, 0);
@@ -1965,7 +2000,7 @@ main(int argc, char *argv[])
          if (png_get_IHDR(read_ptr, read_info_ptr, &width, &height, &bit_depth,
              &color_type, &interlace_type, &compression_type, &filter_type))
          {
-            int compression_window=default_compression_window;
+            int compression_window;
             int need_expand = 0;
             input_color_type=color_type;
             input_bit_depth=bit_depth;
@@ -1995,15 +2030,10 @@ main(int argc, char *argv[])
             if((color_type == 2 || color_type == 6 || color_type == 3) &&
               (output_color_type == 0 || output_color_type == 4))
             {
-#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED) && \
-    defined(PNG_FLOATING_POINT_SUPPORTED)
-               png_set_rgb_to_gray(read_ptr, 1, 54./255., 183./255.);
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+               png_set_rgb_to_gray_fixed(read_ptr, 1, -1, -1);
                if(output_bit_depth < 8)output_bit_depth=8;
                if(color_type == 3) need_expand = 1;
-#else
-               printf("  Cannot reduce color image to grayscale unless\n");
-               printf("  pngcrush is rebuilt with floating point support \n");
-               output_color_type=input_color_type;
 #endif
             }
            
@@ -2416,7 +2446,7 @@ main(int argc, char *argv[])
          }
          else
          {
-            for (i=0 ; ia<256; ia++)
+            for (ia=0 ; ia<256; ia++)
                trns_array[ia]=255;
          }
          if (verbose > 1 && first_trial)
@@ -2494,12 +2524,12 @@ main(int argc, char *argv[])
       png_sPLT_tp entries;
       int num_entries;
 
-      num_entries = (int)png_get_spalettes(read_ptr, read_info_ptr, &entries);
+      num_entries = (int)png_get_sPLT(read_ptr, read_info_ptr, &entries);
       if (num_entries)
       {
          if(keep_chunk("sPLT",argv))
-            png_set_spalettes(write_ptr, write_info_ptr, entries, num_entries);
-         png_free_spalettes(read_ptr, read_info_ptr, num_entries);
+            png_set_sPLT(write_ptr, write_info_ptr, entries, num_entries);
+         png_free_data(read_ptr, read_info_ptr, PNG_FREE_SPLT, num_entries);
       }
    }
 #endif
@@ -2737,13 +2767,13 @@ main(int argc, char *argv[])
          png_debug(0, "\nBegin Pass\n");
          for (y = 0; y < height; y++)
          {
-            png_read_rows(read_ptr, (png_bytepp)&row_buf, (png_bytepp)NULL, 1);
+            png_read_row(read_ptr, row_buf, (png_bytep)NULL);
             if(nosave == 0)
             {
                t_stop = (float)clock();
                t_decode += (t_stop - t_start);
                t_start = t_stop;
-               png_write_rows(write_ptr, (png_bytepp)&row_buf, 1);
+               png_write_row(write_ptr, row_buf);
                t_stop = (float)clock();
                t_encode += (t_stop - t_start);
                t_start = t_stop;
@@ -3044,7 +3074,7 @@ measure_idats(FILE *fpin)
 #  else
 #    ifdef PNG_JMPBUF_SUPPORTED
    /* New setjmp interface */
-   if (setjmp(png_jmp_env(read_ptr)))
+   if (setjmp(png_jmpbuf(read_ptr)))
 #    else
    /* old interface */
    if (setjmp(read_ptr->jmpbuf))
@@ -3057,7 +3087,7 @@ measure_idats(FILE *fpin)
       }
 
 #  if defined(USE_FAR_KEYWORD)
-   png_memcpy(png_jmp_env(read_ptr),jmpbuf,sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(read_ptr),jmpbuf,sizeof(jmp_buf));
 #  endif
 #endif
 
@@ -3067,7 +3097,6 @@ measure_idats(FILE *fpin)
    png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
 #endif
 
-   measured_idat_length=0;
    read_ptr->sig_bytes=0;
    measured_idat_length=png_measure_idat(read_ptr, read_info_ptr);
    P2("measure_idats: IDAT length=%lu\n",measured_idat_length);

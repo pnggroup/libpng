@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.5s - February 18, 2000
+ * libpng version 1.0.5v - March 11, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -9,19 +9,19 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.5s - February 18, 2000: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.5v - March 11, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
  *
- *    February 18, 2000
+ *    March 11, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.5s are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.5v are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -99,7 +99,8 @@
  *    1.0.5                    1.0.5    10005  2.1.0.5
  *    1.0.5a-d                 1.0.5a-d 10006  2.1.0.5a-d
  *    1.0.5e-r                 1.0.5e-r 10100  2.1.0.5e-r (not compatible)
- *    1.0.5s                   1.0.5s   10006  2.1.0.5s   (compatible)
+ *    1.0.5s-v                 1.0.5s-v 10006  2.1.0.5s-v (compatible)
+ *    1.0.6                    1.0.6    10006  2.1.0.6
  *    1.3.0                    1.3.0    10300  3.1.3.0
  *
  *    Henceforth the source version will match the shared-library minor
@@ -124,7 +125,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.5s, February 18, 2000)
+ * (libpng versions 0.97, January 1998, through 1.0.5v, March 11, 2000)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -157,16 +158,13 @@
  * source code, or portions hereof, for any purpose, without fee, subject
  * to the following restrictions:
  *
- * 1. The origin of this source code must not be
- *     misrepresented.
+ * 1. The origin of this source code must not be misrepresented.
  *
- * 2. Altered versions must be plainly marked as such
- *    and must not be misrepresented as being the
- *    original source.
+ * 2. Altered versions must be plainly marked as such and must not
+ *    be misrepresented as being the original source.
  *
- * 3. This Copyright notice may not be removed or
- *    altered from any source or altered source
- *    distribution.
+ * 3. This Copyright notice may not be removed or altered from any
+ *    source or altered source distribution.
  *
  * The Contributing Authors and Group 42, Inc. specifically permit, without
  * fee, and encourage the use of this source code as a component to
@@ -230,7 +228,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.5s"
+#define PNG_LIBPNG_VER_STRING "1.0.5v"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -310,26 +308,26 @@ typedef png_color_8 FAR * FAR * png_color_8pp;
  * The following two structures are used for the in-core representation
  * of sPLT chunks.
  */
-typedef struct png_spalette_entry_struct
+typedef struct png_sPLT_entry_struct
 {
    png_uint_16 red;
    png_uint_16 green;
    png_uint_16 blue;
    png_uint_16 alpha;
    png_uint_16 frequency;
-} png_spalette_entry;
-typedef png_spalette_entry FAR * png_spalette_entryp;
-typedef png_spalette_entry FAR * FAR * png_spalette_entrypp;
+} png_sPLT_entry;
+typedef png_sPLT_entry FAR * png_sPLT_entryp;
+typedef png_sPLT_entry FAR * FAR * png_sPLT_entrypp;
 
-typedef struct png_spalette_struct
+typedef struct png_sPLT_struct
 {
    png_charp name;                /* palette name */
    png_byte depth;                /* depth of palette samples */
-   png_spalette_entryp entries;        /* palette entries */
+   png_sPLT_entryp entries;        /* palette entries */
    png_int_32 nentries;                /* number of palette entries */
-} png_spalette;
-typedef png_spalette FAR * png_spalette_p;
-typedef png_spalette FAR * FAR * png_spalette_pp;
+} png_sPLT_t;
+typedef png_sPLT_t FAR * png_sPLT_tp;
+typedef png_sPLT_t FAR * FAR * png_sPLT_tpp;
 
 #ifdef PNG_TEXT_SUPPORTED
 /* png_text holds the contents of a text/ztxt/itxt chunk in a PNG file,
@@ -635,7 +633,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 
 #if defined(PNG_sPLT_SUPPORTED)
    /* data on sPLT chunks (there may be more than one). */
-   png_spalette_p splt_palettes;
+   png_sPLT_tp splt_palettes;
    png_uint_32 splt_palettes_num;
 #endif
 
@@ -1039,9 +1037,9 @@ struct png_struct_def
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
    png_byte rgb_to_gray_status;
-   png_byte rgb_to_gray_red_coeff;
-   png_byte rgb_to_gray_green_coeff;
-   png_byte rgb_to_gray_blue_coeff;
+   png_uint_16 rgb_to_gray_red_coeff;
+   png_uint_16 rgb_to_gray_green_coeff;
+   png_uint_16 rgb_to_gray_blue_coeff;
 #endif
 
 #if defined(PNG_READ_EMPTY_PLTE_SUPPORTED) || \
@@ -1056,9 +1054,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.5s
+and png.h are both at * version 1.0.5v
  */
-typedef png_structp version_1_0_5s;
+typedef png_structp version_1_0_5v;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1179,6 +1177,8 @@ extern PNG_EXPORT(void,png_set_gray_to_rgb) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(void,png_set_rgb_to_gray) PNGARG((png_structp png_ptr,
    int error_action, double red, double green ));
 #endif
+extern PNG_EXPORT(void,png_set_rgb_to_gray_fixed) PNGARG((png_structp png_ptr,
+   int error_action, png_fixed_point red, png_fixed_point green ));
 extern PNG_EXPORT(png_byte,png_get_rgb_to_gray_status) PNGARG((png_structp
    png_ptr));
 #endif
@@ -1887,12 +1887,12 @@ extern PNG_EXPORT(void,png_set_iCCP) PNGARG((png_structp png_ptr,
 
 #if defined(PNG_READ_sPLT_SUPPORTED)
 extern PNG_EXPORT(png_uint_32,png_get_sPLT) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_spalette_pp entries));
+   png_infop info_ptr, png_sPLT_tpp entries));
 #endif
 
 #if defined(PNG_sPLT_SUPPORTED)
 extern PNG_EXPORT(void,png_set_sPLT) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_spalette_p entries, int nentries));
+   png_infop info_ptr, png_sPLT_tp entries, int nentries));
 #endif
 
 #if defined(PNG_TEXT_SUPPORTED)
@@ -2029,7 +2029,7 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.5s - February 18, 2000 (header)\n"
+   " libpng version 1.0.5v - March 11, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -2083,7 +2083,6 @@ extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 /* Various modes of operation.  Note that after an init, mode is set to
  * zero automatically when the structure is created.
  */
-#define PNG_BEFORE_IHDR             0x00
 #define PNG_HAVE_IHDR               0x01
 #define PNG_HAVE_PLTE               0x02
 #define PNG_HAVE_IDAT               0x04
@@ -2404,7 +2403,7 @@ PNG_EXTERN void png_write_iCCP PNGARG((png_structp png_ptr,
 
 #if defined(PNG_WRITE_sPLT_SUPPORTED)
 PNG_EXTERN void png_write_sPLT PNGARG((png_structp png_ptr,
-   png_spalette_p palette));
+   png_sPLT_tp palette));
 #endif
 
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
