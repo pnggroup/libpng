@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.6 - March 21, 2000
+ * libpng version 1.0.6a - April 2, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -14,14 +14,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_6 Your_png_h_is_not_version_1_0_6;
+typedef version_1_0_6a Your_png_h_is_not_version_1_0_6a;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.6";
+char png_libpng_ver[12] = "1.0.6a";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -269,7 +269,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask, int num
 
 #if defined(PNG_TEXT_SUPPORTED)
 /* free text item num or (if num == -1) all text items */
-if (mask & PNG_FREE_TEXT)
+if (mask & PNG_FREE_TEXT & info_ptr->free_me & PNG_FREE_TEXT)
 {
    if (num != -1)
    {
@@ -535,17 +535,16 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 png_bytep
 png_sig_bytes(png_structp png_ptr)
 {
-   const png_byte png_sig_numbers[9] = {137, 80, 78, 71, 13, 10, 26, 10, 0};
-   if (png_ptr == NULL) /* silence compiler warning */
-     return ((png_bytep) strdup((png_const_charp)png_sig_numbers));
-   return ((png_bytep) strdup((png_const_charp)png_sig_numbers));
+   if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
+     return ("\212\120\116\107\015\012\032\012");
+   return ("");
 }
 
 png_charp
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.6 - March 21, 2000\n\
+   return ("\n libpng version 1.0.6a - April 2, 2000\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson\n");
@@ -563,8 +562,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.6");
-   return("1.0.6");
+      return("1.0.6a");
+   return("1.0.6a");
 }
 
 png_charp

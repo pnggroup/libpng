@@ -1,85 +1,20 @@
 
-Libpng 1.0.6 - March 21, 2000
+Libpng 1.0.6a - April 2, 2000
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
-Changes since the last public release (1.0.5):
+Changes since the last public release (1.0.6):
 
-  Added contrib/pngsuite and contrib/pngminus (Willem van Schaik)
-  Fixed a typo in the png_set_sRGB() function call in example.c (Jan Nijtmans)
-  Further optimization and bugfix of pngvcrd.c
-  Revised pngset.c so that it does not allocate or free memory in the user's
-    text_ptr structure.  Instead, it makes its own copy.
-  Added code in pngwrite.c to free info_ptr->text[i].key to stop a memory leak.
-  Created separate write_end_info_struct in pngtest.c for a more severe test.
-  Moved PNG_FLAG_HAVE_CHUNK_HEADER, PNG_FLAG_BACKGROUND_IS_GRAY and
-    PNG_FLAG_WROTE_tIME from flags to mode.
-  Added png_write_info_before_PLTE() function.
-  Fixed some typecasting in contrib/gregbook/*.c
-  Updated scripts/makevms.com (Martin Zinser)
-  Moved png_get_header_version from png.h to png.c, to accomodate ansi2knr.
-  Removed all global arrays (according to PNG_NO_GLOBAL_ARRAYS macro), to
-    accomodate making DLL's: Moved usr_png_ver from global variable to function
-    png_get_header_ver() in png.c.  Moved png_sig to png_sig_bytes in png.c and
-    eliminated use of png_sig in pngwutil.c.  Moved the various png_CHNK arrays
-    into local arrays.  Eliminated use of global png_pass arrays.  Declared the
-    png_CHNK and png_pass arrays to be "const".  Made the global arrays
-    available to applications when PNG_NO_GLOBAL_ARRAYS is not defined or
-    when PNG_USE_GLOBAL_ARRAYS is defined.  Made available to applications a
-    macro "PNG_USE_LOCAL_ARRAYS".
-  Changed the PNG_sRGB_INTENT macros in png.h to be consistent with PNG-1.2.
-  Change PNG_SRGB_INTENT to PNG_sRGB_INTENT in libpng.txt and libpng.3
-  Added PNG_EXPORT_VAR macro to accommodate making DLL's.
-  Refactored the inflate/deflate support to make adding new chunks with
-    trailing compressed parts easier in the future (Eric S. Raymond).
-  Added iCCP, iTXt, sCAL, and sPLT support; added "lang", "lang_key", and
-    itxt_length" members to the png_text structure (Eric S. Raymond, Glenn R-P)
-  Changed png_get_oFFs() and png_set_oFFs() to use signed rather than unsigned
-    offsets (Eric S. Raymond).
-  Combined PNG_READ_cHNK_SUPPORTED and PNG_WRITE_cHNK_SUPPORTED macros into
-    PNG_cHNK_SUPPORTED and combined the three types of PNG_text_SUPPORTED
-    macros, leaving the separate macros also available.
-  Removed comments on #endifs at the end of many short, non-nested #if-blocks.
-  Changed makefile.solaris to issue a warning about potential problems when
-    the ucb "ld" is in the path ahead of the ccs "ld".
-  Removed "- [date]" from the "synopsis" line in libpng.3 and libpngpf.3.
-  Added code in pngwrite.c to work around a newly discovered zlib bug.
-  Unknown chunk handling is now supported (Eric S. Raymond).
-  Option to eliminate all floating point support was added.  Some new
-    fixed-point functions such as png_set_gAMA_fixed() were added.
-  Added new type "png_fixed_point" for integers that hold float*100000 values
-  Added many parentheses, e.g., "if (a && b & c)" becomes "if (a && (b & c))"
-  Added png_handle_as_unknown()
-  Added chunk_list and num_chunk_list members of png_ptr.
-  Define png_get_int_32 when oFFs chunk is supported as well as when pCAL is.
-  Added functions png_set_read_user_chunk_fn() and png_get_user_chunk_ptr()
-    for setting a callback function to handle unknown chunks and for
-    retrieving the associated user pointer (Glenn).
-  Added png_free_data() function.
-  Added high-level functions png_read_png() and png_write_png() (ESR).
-  Renamed pngdll.mak to makefile.bd32
-  Cosmetic changes in pngtest.c
-  Fixed pngvcrd.c bug by pushing/popping registers in mmxsupport (Bruce Oberg)
-  Revised makefile.gcmmx
-  Fixed a bug in pngrtran.c that improperly expanded the background color.
-  Return *num_text=0 from png_get_text() when appropriate, and fix documentation
-    of png_get_text() in libpng.txt/libpng.3.
-  Added PNG_SETJMP_SUPPORTED, PNG_SETJMP_NOT_SUPPORTED, and PNG_ABORT() and
-    "png_jmpbuf()" macros to pngconf.h, to help people migrate to the new error
-    handler that's planned for the next libpng release, and changed example.c,
-    pngtest.c, and contrib programs to use this macro.
-  Revised some of the DLL-export macros in pngconf.h (Greg Roelofs)
-  Fixed some mistakes in the unused and undocumented INCH_CONVERSIONS functions
-    in pngget.c
-  Updated makefile.linux and makefile.gccmmx to make directories conditionally.
-  Increased precision of rgb_to_gray calculations from 8 to 15 bits and
-    added png_set_rgb_to_gray_fixed() function.
-  Added makefile.bc32 (32-bit Borland C++, C mode)
-  Updated references to the zlib home page, which has moved to freesoftware.com.
-  Corrected bugs in documentation regarding png_read_row() and png_write_row().
-  Renamed makefile.borland,turboc3 back to makefile.bor,tc3 as in version 1.0.3,
-    revised borland makefiles; added makefile.ibmvac3 and makefile.gcc (Cosmin)
-  Added makefile.sggcc (SGI IRIX with gcc)
+version 1.0.6a [April 2, 2000]
+  Changed sprintf() to strcpy() in png_write_sCAL_s() to work without STDIO
+  Added data_length parameter to png_decompress_chunk() function
+  Revised documentation to remove reference to abandoned png_free_chnk functions
+  Fixed an error in png_rgb_to_gray_fixed()
+  Revised example.c, usage of png_destroy_write_struct().
+  Renamed makefile.ibmvac3 to makefile.ibmc, added libpng.icc IBM project file
+  Added a check for info_ptr->free_me&PNG_FREE_TEXT when free'ing text in png.c
+  Simplify png_sig_bytes() function to remove use of non-ISO-C strdup().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

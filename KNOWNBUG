@@ -1,8 +1,47 @@
 
 Known bugs and suggested enhancements in libpng-1.0.6
 
+1. April 1, 2000 -- BUG
 
-1. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
+   Under some circumstances old applications that make direct access to
+   the info_ptr->text and its members might free the same memory that
+   is also free'ed by libpng during the png_destroy_struct process.
+
+   Fixed in libpng-1.0.6-patch-c and libpng-1.0.6a.  The PNG_FREE_TEXT flag
+   bit in info_ptr->free_me is now checked to make sure libpng is responsible
+   for freeing the memory.
+
+2. April 1, 2000 -- BUG
+
+   The non-ISO-C "strdup()" function is used in png.c
+
+   STATUS: The function has been simplified and no longer uses strdup()
+   in libpng-1.0.6-patch-c and libpng-1.0.6a.
+
+3. March 24, 2000 -- BUG
+
+   The png_set_rgb_to_gray_fixed() function is setting incorrect weighting
+   factors.
+
+   STATUS: Fixed in libpng-1.0.6-patch-b and libpng-1.0.6a.
+
+4. March 22, 2000 -- BUG
+
+   There are some printf() and fprintf() statements active in pngwutil.c
+   when PNG_NO_STDIO and PNG_sCAL_SUPPORTED are both defined.
+
+   STATUS: Fixed in libpng-1.0.6-patch-a and libpng-1.0.6a.  The strcpy()
+   function is used instead.
+
+5. March 22, 2000 -- BUG
+
+   The length of the iCCP chunk data is calculated incorrectly; because
+   it can contain zeroes, strlen() doesn't work.
+
+   STATUS: Fixed in libpng-1.0.6-patch-a by adding a data_length parameter
+   to the png_decompress_chunk() function.
+
+6. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
 
    Loops need to be optimized everywhere
 
@@ -17,7 +56,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
    libpng-1.1.0.  About 160 loops will be turned around
    in libpng-1.1.Nn, for testing.
 
-2. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
+7. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
 
    libpng-1.0.5 and earlier transform colors to gamma=1.0 space for
    merging with background, and then back to the image's gamma.  The
@@ -29,7 +68,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
 
    STATUS: under development.
 
-3. September 1999 -- ENHANCEMENT --
+8. September 1999 -- ENHANCEMENT --
 
    It should be possible to use libpng without floating-point aritmetic.
 
@@ -38,6 +77,6 @@ Known bugs and suggested enhancements in libpng-1.0.6
    for the png_set_gAMA(), png_set_cHRM(), and corresponding png_get_()
    functions will be needed.
 
-   Much of this was completed in libpng-1.0.5h, but gamma compensation
+   Much of this was completed in libpng-1.0.6, but gamma compensation
    is not yet done in fixed-point arithmetic.
 

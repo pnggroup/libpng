@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.6 - March 21, 2000
+ * libpng 1.0.6a - April 2, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -795,7 +795,9 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
        white_x + white_y > 1.0)
    {
       png_warning(png_ptr, "Invalid cHRM white point specified");
+#if !defined(PNG_NO_STDIO)
       printf("white_x=%f, white_y=%f\n",white_x, white_y);
+#endif
       return;
    }
    itemp = (png_uint_32)(white_x * 100000.0 + 0.5);
@@ -856,7 +858,9 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    if (white_x > 80000L || white_y > 80000L || white_x + white_y > 100000L)
    {
       png_warning(png_ptr, "Invalid fixed cHRM white point specified");
+#if !defined(PNG_NO_STDIO)
       printf("white_x=%ld, white_y=%ld\n",white_x, white_y);
+#endif
       return;
    }
    png_save_uint_32(buf, white_x);
@@ -1381,7 +1385,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
 
 #if defined(PNG_WRITE_sCAL_SUPPORTED)
 /* write the sCAL chunk */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && !defined(PNG_NO_STDIO)
 void
 png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
 {
@@ -1417,10 +1421,10 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
    png_size_t total_len;
    char wbuf[32], hbuf[32];
 
-   png_debug(1, "in png_write_sCAL\n");
+   png_debug(1, "in png_write_sCAL_s\n");
 
-   sprintf(wbuf, "%s", width);
-   sprintf(hbuf, "%s", height);
+   strcpy(wbuf,(const char *)width);
+   strcpy(hbuf,(const char *)height);
    total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
 
    png_debug1(3, "sCAL total length = %d\n", total_len);

@@ -54,7 +54,7 @@ int check_if_png(char *file_name, FILE **fp)
    char buf[PNG_BYTES_TO_CHECK];
 
    /* Open the prospective PNG file. */
-   if ((*fp = fopen(file_name, "rb")) != NULL);
+   if ((*fp = fopen(file_name, "rb")) == NULL)
       return 0;
 
    /* Read in some of the signature bytes */
@@ -565,7 +565,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    {
       /* If we get here, we had a problem reading the file */
       fclose(fp);
-      png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
+      png_destroy_write_struct(&png_ptr,  (png_infopp)info_ptr);
       return;
    }
 
@@ -761,7 +761,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_free(png_ptr, trans);
 
    /* clean up after the write, and free any memory allocated */
-   png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+   png_destroy_write_struct(&png_ptr, (png_infopp)info_ptr);
 
    /* close the file */
    fclose(fp);

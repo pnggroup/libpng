@@ -1,15 +1,15 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.6 - March 21, 2000
+ * libpng version 1.0.6a - April 2, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  *
  * Authors and maintainers:
- *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
- *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.6 - March 21, 2000: Glenn
+ *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
+ *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
+ *  libpng versions 0.97, January 1998, through 1.0.6a - April 2, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -45,8 +45,9 @@
  *    1.0.5                    1.0.5    10005  2.1.0.5
  *    1.0.5a-d                 1.0.5a-d 10006  2.1.0.5a-d
  *    1.0.5e-r                 1.0.5e-r 10100  2.1.0.5e-r (not compatible)
- *    1.0.5s-v                 1.0.5s-v 10006  2.1.0.5s-w (compatible)
+ *    1.0.5s-v                 1.0.5s-v 10006  2.1.0.5s-v (compatible)
  *    1.0.6                    1.0.6    10006  2.1.0.6
+ *    1.0.6a                   1.0.6a   10007  2.1.0.6a
  *    1.3.0                    1.3.0    10300  3.1.3.0
  *
  *    Henceforth the source version will match the shared-library minor
@@ -64,14 +65,16 @@
  */
 
 /*
- * COPYRIGHT NOTICE:
+ * COPYRIGHT NOTICE, DISCLAIMER, and LICENSE:
+ *
+ * If you modify libpng you may insert additional notices after this sentence.
  *
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
- * (libpng versions 0.5, May 1995, through 0.89c, May 1996)
+ * (libpng versions 0.5, May 1995, through 0.88, January 1996)
  * Copyright (c) 1996, 1997 Andreas Dilger
- * (libpng versions 0.90, December 1996, through 0.96, May 1997)
+ * (libpng versions 0.89c, June 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.6, March 21, 2000)
+ * (libpng versions 0.97, January 1998, through 1.0.6a, April 2, 2000)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -146,13 +149,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 21, 2000
+ *    April 2, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.6 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.6a are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -230,14 +233,14 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.6"
+#define PNG_LIBPNG_VER_STRING "1.0.6a"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
  * Versions 0.7 through 1.0.0 were in the range 0 to 100 here (only
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=bugfix */
-#define PNG_LIBPNG_VER    10006  /* 1.0.6 */
+#define PNG_LIBPNG_VER    10007  /* 1.0.7 */
 
 /* Note to maintainer: update this number in scripts/pngdef.pas as well */
 
@@ -651,11 +654,10 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    double scal_pixel_width;    /* width of one pixel */
    double scal_pixel_height;   /* height of one pixel */
-#else
+#endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
    png_charp scal_s_width;     /* string containing height */
    png_charp scal_s_height;    /* string containing width */
-#endif
 #endif
 #endif
 
@@ -1056,9 +1058,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.6
+and png.h are both at * version 1.0.6a
  */
-typedef png_structp version_1_0_6;
+typedef png_structp version_1_0_6a;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -2031,7 +2033,7 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.6 - March 21, 2000 (header)\n"
+   " libpng version 1.0.6a - April 2, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -2304,7 +2306,7 @@ PNG_EXTERN void png_crc_read PNGARG((png_structp png_ptr, png_bytep buf,
     defined(PNG_READ_iCCP_SUPPORTED) || defined(PNG_READ_sPLT_SUPPORTED)
 PNG_EXTERN png_charp png_decompress_chunk PNGARG((png_structp png_ptr,
    int comp_type, png_charp chunkdata, png_size_t chunklength,
-   png_size_t prefix_size));
+   png_size_t prefix_length, png_size_t *data_length));
 #endif
 
 /* Read "skip" bytes, read the file crc, and (optionally) verify png_ptr->crc */
@@ -2468,7 +2470,7 @@ PNG_EXTERN void png_write_tIME PNGARG((png_structp png_ptr,
 #endif
 
 #if defined(PNG_WRITE_sCAL_SUPPORTED)
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && !defined(PNG_NO_STDIO)
 PNG_EXTERN void png_write_sCAL PNGARG((png_structp png_ptr,
    int unit, double width, double height));
 #else

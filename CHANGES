@@ -657,6 +657,20 @@ version 1.0.5v [March 11, 2000]
   Updated documentation of png_rgb_to_gray calculations in libpng.3/libpng.txt.
   Renamed makefile.borland,turboc3 back to makefile.bor,tc3 as in version 1.0.3,
     revised borland makefiles; added makefile.ibmvac3 and makefile.gcc (Cosmin)
-version 1.0.6 [March 21, 2000]
+version 1.0.6 [March 20, 2000]
   Minor revisions of makefile.bor, libpng.txt, and gregbook/rpng2-win.c
   Added makefile.sggcc (SGI IRIX with gcc)
+version 1.0.6a [April 2, 2000]
+  Changed sprintf() to strcpy() in png_write_sCAL_s() to work without STDIO
+  Added data_length parameter to png_decompress_chunk() function
+  Revised documentation to remove reference to abandoned png_free_chnk functions
+  Fixed an error in png_rgb_to_gray_fixed()
+  Revised example.c, usage of png_destroy_write_struct().
+  Renamed makefile.ibmvac3 to makefile.ibmc, added libpng.icc IBM project file
+  Added a check for info_ptr->free_me&PNG_FREE_TEXT when free'ing text in png.c
+  Simplify png_sig_bytes() function to remove use of non-ISO-C strdup().
+
+Send comments/corrections/commendations to
+png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
+
+Glenn R-P

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.6 - March 21, 2000
+ * libpng 1.0.6a - April 2, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -143,7 +143,7 @@ png_crc_error(png_structp png_ptr)
  */
 png_charp png_decompress_chunk(png_structp png_ptr, int comp_type,
                               png_charp chunkdata, png_size_t chunklength,
-                              png_size_t prefix_size)
+                              png_size_t prefix_size, png_size_t *newlength)
 {
    static char msg[] = "Error decoding compressed text";
    png_charp text = NULL;
@@ -227,6 +227,7 @@ png_charp png_decompress_chunk(png_structp png_ptr, int comp_type,
 
       png_free(png_ptr, chunkdata);
       chunkdata = text;
+      *newlength=text_size;
    }
    else /* if (comp_type >= PNG_TEXT_COMPRESSION_LAST) */
    {
@@ -889,7 +890,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_byte compression_type;
    png_charp profile;
    png_uint_32 skip = 0;
-   png_size_t slength, prefix_length;
+   png_size_t slength, prefix_length, data_length;
 
    png_debug(1, "in png_handle_iCCP\n");
 
@@ -951,10 +952,10 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    prefix_length = profile - chunkdata;
    chunkdata = png_decompress_chunk(png_ptr, compression_type, chunkdata,
-                                    slength, prefix_length);
+                                    slength, prefix_length, &data_length);
 
    png_set_iCCP(png_ptr, info_ptr, chunkdata, compression_type,
-                chunkdata + prefix_length, png_strlen(chunkdata + prefix_length));
+                chunkdata + prefix_length, data_length);
    png_free(png_ptr, chunkdata);
 }
 #endif /* PNG_READ_iCCP_SUPPORTED */
@@ -1722,7 +1723,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_charp chunkdata;
    png_charp text;
    int comp_type;
-   png_size_t slength, prefix_len;
+   png_size_t slength, prefix_len, data_len;
 
    png_debug(1, "in png_handle_zTXt\n");
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
@@ -1770,7 +1771,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    prefix_len = text - chunkdata;
 
    chunkdata = (png_charp)png_decompress_chunk(png_ptr, comp_type, chunkdata,
-                                    (png_size_t)length, prefix_len);
+                                    (png_size_t)length, prefix_len, &data_len);
 
    text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
    text_ptr->compression = comp_type;
@@ -1778,7 +1779,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    text_ptr->key = chunkdata;
    text_ptr->lang_key = NULL;
    text_ptr->text = chunkdata + prefix_len;
-   text_ptr->text_length = png_strlen(text);
+   text_ptr->text_length = data_len;
    text_ptr->itxt_length = 0;
 
    png_set_text(png_ptr, info_ptr, text_ptr, 1);
@@ -1798,7 +1799,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_charp key, lang, text, lang_key;
    int comp_flag;
    int comp_type = 0;
-   png_size_t slength, prefix_len;
+   png_size_t slength, prefix_len, data_len;
 
    png_debug(1, "in png_handle_iTXt\n");
 
@@ -1862,7 +1863,9 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    key=chunkdata;
    if (comp_flag)
        chunkdata = png_decompress_chunk(png_ptr, comp_type, chunkdata,
-          (size_t)length, prefix_len);
+          (size_t)length, prefix_len, &data_len);
+   else
+       data_len=png_strlen(chunkdata + prefix_len);
    text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
    text_ptr->compression = (int)comp_flag + 1;
    text_ptr->lang_key = chunkdata+(lang_key-key);
@@ -1870,7 +1873,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    text_ptr->key = chunkdata;
    text_ptr->text = chunkdata + prefix_len;
    text_ptr->text_length = 0;
-   text_ptr->itxt_length = png_strlen(text_ptr->text);
+   text_ptr->itxt_length = data_len;
 
    png_set_text(png_ptr, info_ptr, text_ptr, 1);
 
