@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.5 - October 15, 1999
+ * libpng 1.0.5a - October 23, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -317,9 +317,10 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
    for (i = 0; i < num_text; i++)
    {
       png_textp textp = &(info_ptr->text[info_ptr->num_text]);
+      png_charp key,text;
 
-      if (text_ptr[i].text == NULL)
-         text_ptr[i].text = (png_charp)"";
+      if (text_ptr[i].key == (png_charp)NULL)
+         continue;
 
       if (text_ptr[i].text[0] == '\0')
       {
@@ -331,8 +332,30 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          textp->text_length = png_strlen(text_ptr[i].text);
          textp->compression = text_ptr[i].compression;
       }
-      textp->text = text_ptr[i].text;
-      textp->key = text_ptr[i].key;
+      key=text_ptr[i].key;
+      for (text = key; *text++;)
+        /* empty loop to find the byte after the zero byte after the
+           end of key */ ;
+
+      textp->key = (png_charp)png_malloc(png_ptr,
+         (png_uint_32)(text+textp->text_length - key)+1);
+      /* Caution: the calling program, not libpng, is responsible for
+         freeing this, if libpng wasn't the caller. */
+      png_debug2(2, "Allocated %d bytes at %x in png_set_text\n",
+         text+textp->text_length-key+1, textp->key);
+
+      png_memcpy(textp->key, text_ptr[i].key,
+         (png_size_t)(text - key));  /* includes the zero-byte separator */
+      textp->text = textp->key + (text-key);
+      if(textp->text_length)
+      {
+         png_memcpy(textp->text, text_ptr[i].text,
+            (png_size_t)(textp->text_length));
+         *(textp->text+textp->text_length) = '\0';
+      }
+      else
+         textp->text--;
+      info_ptr->text[info_ptr->num_text]= *textp;
       info_ptr->num_text++;
       png_debug1(3, "transferred text chunk %d\n", info_ptr->num_text);
    }

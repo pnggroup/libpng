@@ -227,7 +227,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    int intent;
 
    if (png_get_sRGB(png_ptr, info_ptr, &intent))
-      png_set_sRGB(png_ptr, intent, 0);
+      png_set_sRGB(png_ptr, info_ptr, intent);
    else
    {
       double image_gamma;

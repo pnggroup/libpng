@@ -1,4 +1,4 @@
-README for libpng 1.0.5 - October 15, 1999 (shared library 2.1)
+README for libpng 1.0.5a - October 23, 1999 (shared library 2.1)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -158,6 +158,8 @@ Files in this distribution:
        gregbook         =>  source code for PNG reading and writing, from
                             Greg Roelofs' "PNG: The Definitive Guide",
                             O'Reilly, 1999
+       pngminus     =>  Simple pnm2png and png2pnm programs
+       pngsuite     =>  Test images
       scripts       =>  Directory containing scripts for building libpng:
        descrip.mms      =>  VMS makefile for MMS or MMK
        makefile.std     =>  Generic UNIX makefile
@@ -169,9 +171,9 @@ Files in this distribution:
        makefile.sgi     =>  Silicon Graphics IRIX makefile
        makefile.sunos   =>  Sun makefile
        makefile.solaris =>  Solaris 2.X makefile
-                            (gcc, creates libpng.so.2.1.0.5)
+                            (gcc, creates libpng.so.2.1.0.5a)
        makefile.linux   =>  Linux/ELF makefile
-                            (gcc, creates libpng.so.2.1.0.5)
+                            (gcc, creates libpng.so.2.1.0.5a)
        makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc
        makefile.mips    =>  MIPS makefile
        makefile.acorn   =>  Acorn makefile

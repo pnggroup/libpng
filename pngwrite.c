@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.5 - October 15, 1999
+ * libpng 1.0.5a - October 23, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -630,8 +630,22 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 
    if (info_ptr != NULL)
    {
-#ifdef PNG_WRITE_tEXt_SUPPORTED
+#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+   png_debug(1, "in png_info_destroy\n");
+   if (info_ptr->text != NULL)
+   {
+      int i;
+      for (i = 0; i < info_ptr->num_text; i++)
+      {
+         if(info_ptr->text[i].key != NULL)
+         {
+           png_free(png_ptr, info_ptr->text[i].key);
+           info_ptr->text[i].key = NULL;
+         }
+      }
       png_free(png_ptr, info_ptr->text);
+      info_ptr->text = NULL;
+   }
 #endif
 #if defined(PNG_READ_pCAL_SUPPORTED)
       png_free(png_ptr, info_ptr->pcal_purpose);

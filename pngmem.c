@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.5 - October 15, 1999
+ * libpng 1.0.5a - October 23, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -433,6 +433,9 @@ png_free(png_structp png_ptr, png_voidp ptr)
 void
 png_free_default(png_structp png_ptr, png_voidp ptr)
 {
+   if (png_ptr == NULL || ptr == NULL)
+      return;
+
 #endif /* PNG_USER_MEM_SUPPORTED */
 
 #if defined(__TURBOC__) && !defined(__FLAT__)

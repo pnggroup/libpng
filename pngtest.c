@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.5 - October 15, 1999
+ * libpng 1.0.5a - October 23, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -443,6 +443,10 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size) {
       pinformation = pinfo;
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
+#if PNG_DEBUG
+      if(verbose)
+         printf("png_malloc %d bytes at %x\n",size,pinfo->pointer);
+#endif
       return (png_voidp)(pinfo->pointer);
    }
 }
@@ -485,6 +489,10 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    }
 
    /* Finally free the data. */
+#if PNG_DEBUG
+   if(verbose)
+      printf("Freeing %x\n",ptr);
+#endif
    png_free_default(png_ptr, ptr);
 }
 #endif /* PNG_USER_MEM_SUPPORTED */
@@ -496,7 +504,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 {
    static FILE *fpin, *fpout;  /* "static" prevents setjmp corruption */
    png_structp read_ptr, write_ptr;
-   png_infop read_info_ptr, write_info_ptr, end_info_ptr;
+   png_infop read_info_ptr, write_info_ptr, end_info_ptr, write_end_info_ptr;
    png_bytep row_buf;
    png_uint_32 y;
    png_uint_32 width, height;
@@ -552,6 +560,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    read_info_ptr = png_create_info_struct(read_ptr);
    write_info_ptr = png_create_info_struct(write_ptr);
    end_info_ptr = png_create_info_struct(read_ptr);
+   write_end_info_ptr = png_create_info_struct(write_ptr);
 #ifdef PNG_USER_MEM_SUPPORTED
 #endif
 
@@ -564,6 +573,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
+      png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       fclose(fpin);
       fclose(fpout);
@@ -582,6 +592,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       fprintf(STDERR, "%s -> %s: libpng write error\n", inname, outname);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
+      png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       fclose(fpin);
       fclose(fpout);
@@ -762,6 +773,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
       if (png_get_text(read_ptr, read_info_ptr, &text_ptr, &num_text) > 0)
       {
+         int i;
          png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
          png_set_text(write_ptr, write_info_ptr, text_ptr, num_text);
       }
@@ -809,6 +821,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       fprintf(STDERR, "No memory to allocate row buffer\n");
       png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infopp)NULL);
+      png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       fclose(fpin);
       fclose(fpout);
@@ -851,7 +864,38 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
    png_debug(0, "Reading and writing end_info data\n");
    png_read_end(read_ptr, end_info_ptr);
-   png_write_end(write_ptr, end_info_ptr);
+#if (defined(PNG_READ_tEXt_SUPPORTED) && defined(PNG_WRITE_tEXt_SUPPORTED)) || \
+    (defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED))
+   {
+      png_textp text_ptr;
+      int num_text;
+
+      if (png_get_text(read_ptr, end_info_ptr, &text_ptr, &num_text) > 0)
+      {
+         int i;
+         png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
+         png_set_text(write_ptr, write_end_info_ptr, text_ptr, num_text);
+      }
+   }
+#endif
+#if defined(PNG_READ_tIME_SUPPORTED) && defined(PNG_WRITE_tIME_SUPPORTED)
+   {
+      png_timep mod_time;
+
+      if (png_get_tIME(read_ptr, end_info_ptr, &mod_time))
+      {
+         png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
+#if defined(PNG_TIME_RFC1123_SUPPORTED)
+         /* we have to use png_strcpy instead of "=" because the string
+            pointed to by png_convert_to_rfc1123() gets free'ed before
+            we use it */
+         png_strcpy(tIME_string,png_convert_to_rfc1123(read_ptr, mod_time));
+         tIME_chunk_present++;
+#endif /* PNG_TIME_RFC1123_SUPPORTED */
+      }
+   }
+#endif
+   png_write_end(write_ptr, write_end_info_ptr);
 
 #ifdef PNG_EASY_ACCESS_SUPPORTED
    if(verbose)
@@ -867,6 +911,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_debug(0, "Destroying data structs\n");
    png_free(read_ptr, row_buf);
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
+   png_destroy_info_struct(write_ptr, &write_end_info_ptr);
    png_destroy_write_struct(&write_ptr, &write_info_ptr);
 
    fclose(fpin);
@@ -1038,7 +1083,7 @@ main(int argc, char *argv[])
          if (kerror == 0)
          {
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-            fprintf(STDERR, " PASS (%lu zero samples)\n",zero_samples);
+            fprintf(STDERR, "\n PASS (%lu zero samples)\n",zero_samples);
 #else
             fprintf(STDERR, " PASS\n");
 #endif
@@ -1101,7 +1146,7 @@ main(int argc, char *argv[])
             {
                 int k;
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-                fprintf(STDERR, " PASS (%lu zero samples)\n",zero_samples);
+                fprintf(STDERR, "\n PASS (%lu zero samples)\n",zero_samples);
 #else
                 fprintf(STDERR, " PASS\n");
 #endif
@@ -1172,7 +1217,7 @@ main(int argc, char *argv[])
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_pngtest_version
-   (version_1_0_5 png_h_is_not_version_1_0_5)
+   (version_1_0_5a png_h_is_not_version_1_0_5a)
 {
-   if(png_h_is_not_version_1_0_5 == NULL) return;
+   if(png_h_is_not_version_1_0_5a == NULL) return;
 }

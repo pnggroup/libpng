@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.5 - October 15, 1999
+ * libpng version 1.0.5a - October 23, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -9,19 +9,19 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.5 - October 15, 1999: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.5a - October 23, 1999: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
  *    
- *    October 15, 1999
+ *    October 23, 1999
  *    
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *    
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.5 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.5a are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *    
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -97,6 +97,8 @@
  *    1.0.4                    1.0.4    10004  2.1.0.4
  *    1.0.4a-f                 1.0.4a-f 10005  2.1.0.4a-f
  *    1.0.5                    1.0.5    10005  2.1.0.5
+ *    1.0.5a                   1.0.5a   10006  2.1.0.5a
+ *    1.0.6                    1.0.6    10006  2.1.0.6
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
@@ -104,7 +106,8 @@
  *    PNG_PNGLIB_VER macro, which is not used within libpng but is available
  *    for applications, is an unsigned integer of the form xyyzz corresponding
  *    to the source version x.y.z (leading zeros in y and z).  Internal
- *    png-group versions (x.y.z[a-z]) will be given the next higher number.
+ *    png-group beta versions (x.y.z[a-z]) will be given the next higher
+ *    number.
  *
  * See libpng.txt or libpng.3 for more information.  The PNG specification
  * is available as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
@@ -119,7 +122,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.5, October 15, 1999)
+ * (libpng versions 0.97, January 1998, through 1.0.5a, October 23, 1999)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -219,14 +222,14 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.5"
+#define PNG_LIBPNG_VER_STRING "1.0.5a"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
  * Versions 0.7 through 1.0.0 were in the range 0 to 100 here (only
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=bugfix */
-#define PNG_LIBPNG_VER    10005  /* 1.0.5 */
+#define PNG_LIBPNG_VER    10006  /* 1.0.6 */
 
 /* Note to maintainer: update this number in scripts/pngdef.pas as well */
 
@@ -817,9 +820,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.5
+and png.h are both at * version 1.0.5a
  */
-typedef png_structp version_1_0_5;
+typedef png_structp version_1_0_5a;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1641,8 +1644,8 @@ png_charp \
 png_get_header_version(png_structp png_ptr) \
 { \
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */ \
-      return("\n libpng version 1.0.5 - October 15, 1999 (header)\n"); \
-   return("\n libpng version 1.0.5 - October 15, 1999 (header)\n"); \
+      return("\n libpng version 1.0.5a - October 23, 1999 (header)\n"); \
+   return("\n libpng version 1.0.5a - October 23, 1999 (header)\n"); \
 }
 #endif
 

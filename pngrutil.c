@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.5 - October 15, 1999
+ * libpng 1.0.5a - October 23, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1263,6 +1263,7 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_set_text(png_ptr, info_ptr, text_ptr, 1);
 
+   png_free(png_ptr, key);
    png_free(png_ptr, text_ptr);
 }
 #endif
@@ -1280,7 +1281,6 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_size_t slength;
 
    png_debug(1, "in png_handle_zTXt\n");
-
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Missing IHDR before zTXt");
 
@@ -1432,6 +1432,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_set_text(png_ptr, info_ptr, text_ptr, 1);
 
+   png_free(png_ptr, text_ptr->key);
    png_free(png_ptr, text_ptr);
 }
 #endif

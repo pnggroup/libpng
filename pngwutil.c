@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.5 - October 15, 1999
+ * libpng 1.0.5a - October 23, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -688,6 +688,8 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 
    if (key_len == 0)
    {
+      png_free(png_ptr, *new_key);
+      *new_key=NULL;
       png_chunk_warning(png_ptr, "zero length keyword");
    }
 

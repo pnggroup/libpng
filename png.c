@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.5 - October 15, 1999
+ * libpng version 1.0.5a - October 23, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -18,7 +18,7 @@ PNG_GET_HEADER
  * string defined in png.h.
  */
 
-char png_libpng_ver[12] = "1.0.5";
+char png_libpng_ver[12] = "1.0.5a";
 
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -267,9 +267,14 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
       int i;
       for (i = 0; i < info_ptr->num_text; i++)
       {
-         png_free(png_ptr, info_ptr->text[i].key);
+         if(info_ptr->text[i].key != NULL)
+         {
+           png_free(png_ptr, info_ptr->text[i].key);
+           info_ptr->text[i].key = NULL;
+         }
       }
       png_free(png_ptr, info_ptr->text);
+      info_ptr->text = NULL;
    }
 #endif
 #if defined(PNG_READ_pCAL_SUPPORTED)
@@ -281,8 +286,10 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
       for (i = 0; i < (int)info_ptr->pcal_nparams; i++)
       {
          png_free(png_ptr, info_ptr->pcal_params[i]);
+         info_ptr->pcal_params[i]=NULL;
       }
       png_free(png_ptr, info_ptr->pcal_params);
+      info_ptr->pcal_params = NULL;
    }
 #endif
 
@@ -353,7 +360,7 @@ png_charp
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.5 - October 15, 1999\n\
+   return ("\n libpng version 1.0.5a - October 23, 1999\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999 Glenn Randers-Pehrson\n");
@@ -363,8 +370,8 @@ png_get_copyright(png_structp png_ptr)
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_version
-   (version_1_0_5 png_h_is_not_version_1_0_5)
+   (version_1_0_5a png_h_is_not_version_1_0_5a)
 {
-   if(png_h_is_not_version_1_0_5 == NULL)
+   if(png_h_is_not_version_1_0_5a == NULL)
      return;
 }

@@ -467,10 +467,20 @@ version 1.0.4d [October 6, 1999]
 version 1.0.4e [October 10, 1999]
   Fixed sign error in pngvcrd.c (Greg Roelofs)
   Replaced some instances of memcpy with simple assignments in pngvcrd (GR-P)
-version 1.0.5 [October 15, 1999]
+version 1.0.4f [October 15, 1999]
   Surrounded example.c code with #if 0 .. #endif to prevent people from
     inadvertently trying to compile it.
   Changed png_get_header_version() from a function to a macro in png.h
   Added type casting mostly in pngrtran.c and pngwtran.c
   Removed some pointless "ptr = NULL" in pngmem.c
   Added a "contrib" directory containing the source code from Greg's book.
+version 1.0.5 [October 15, 1999]
+  Minor editing of the INSTALL and README files.
+version 1.0.5a [October 23, 1999]
+  Added contrib/pngsuite and contrib/pngminus (Willem van Schaik)
+  Fixed a typo in the png_set_sRGB() function call in example.c (Jan Nijtmans)
+  Further optimization and bugfix of pngvcrd.c
+  Revised pngset.c so that it does not allocate or free memory in the user's
+    text_ptr structure.  Instead, it makes its own copy.
+  Created separate write_end_info_struct in pngtest.c for a more severe test.
+  Added code in pngwrite.c to free info_ptr->text[i].key to stop a memory leak.

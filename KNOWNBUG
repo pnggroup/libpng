@@ -1,5 +1,5 @@
 
-Known bugs and suggested enhancements in libpng-1.0.4
+Known bugs and suggested enhancements in libpng-1.0.5
 
 
 1. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
@@ -38,21 +38,22 @@ Known bugs and suggested enhancements in libpng-1.0.4
    for the png_set_gAMA(), png_set_cHRM(), and corresponding png_get_()
    functions will be needed.
 
-4. September 1999 -- BUG [FIXED] --
+4. October 1999 -- BUG
 
-   Portions of the new MMX code in pngvcrd.c were ifdef'd out because they
-   didn't work properly, but the bug appears to have been found and fixed.
-   As a result, all parts of the code are once again enabled.  If you think
-   there's still a problem, you can recompile with one of the following two
-   macros defined and see if the problem goes away:
+   pngvcrd.c is failing for interlaced PNGs that have empty passes.
 
-	DISABLE_PNGVCRD_COMBINE
-	DISABLE_PNGVCRD_INTERLACE
+   STATUS: A check for "width != 0" is required in several places.
+   Fixed in libpng-1.0.5a/1.0.6
 
-   The second one is in the function where the bug was; as far as we are
-   aware, there was never any bug in the other function.  Please notify us
-   if you find any problems in libpng, regardless of whether the two macros
-   make any difference:  png-implement@ccrc.wustl.edu
+5. October 1999 -- BUG
 
-   Again, we believe the MMX code in pngvcrd.c is 100% correct, but it has
-   not yet been tested extensively.
+   Under MSVC++6.0 with debugging enabled, heap corruption was detected
+   while destroying the png_write_ptr.
+
+   STATUS:  This was fixed by modifying png_set_text (in pngset.c) to
+   refrain from writing into the user's text_ptr.  With this fix, however,
+   pngwrite.c, while destroying the info_ptr, was failing to free the
+   text->key strings.  Fix for the latter problem is to duplicate code
+   from png.c.
+
+   Fixed in libpng-1.0.5a/1.0.6

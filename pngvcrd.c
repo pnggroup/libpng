@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.5 - October 15, 1999
+ * libpng 1.0.5a - October 23, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -16,6 +16,12 @@
 #include "png.h"
 
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD)
+
+/*
+   One of these might need to be defined.
+#define DISABLE_PNGVCRD_COMBINE
+#define DISABLE_PNGVCRD_INTERLACE
+*/
 
 static int mmx_supported=2;
 
@@ -1182,7 +1188,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
             {
                if (pixel_bytes == 3)
                {
-                  if ((pass == 0) || (pass == 1))
+                  if (((pass == 0) || (pass == 1)) && width)
                   {
                      _asm
                      {
@@ -1217,7 +1223,7 @@ loop_pass0:
                         EMMS
                      }
                   }
-                  else if ((pass == 2) || (pass == 3))
+                  else if (((pass == 2) || (pass == 3)) && width)
                   {
                      _asm
                      {
@@ -1245,10 +1251,12 @@ loop_pass2:
                         EMMS
                      }
                   }
-                  else /* if ((pass == 4) || (pass == 5)) */
+                  else if (width) /* && ((pass == 4) || (pass == 5)) */
                   {
                      int width_mmx = ((width >> 1) << 1) - 8;
-                     width -= width_mmx;
+                     if (width_mmx < 0)
+                         width_mmx = 0;
+                     width -= width_mmx;        // 8 or 9 pix, 24 or 27 bytes
                      if (width_mmx)
                      {
                         _asm
@@ -1288,20 +1296,20 @@ loop_pass4:
                         png_byte v[8];
                         int j;
 
-                        png_memcpy(v, sptr, pixel_bytes);
+                        png_memcpy(v, sptr, 3);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           png_memcpy(dp, v, pixel_bytes);
-                           dp -= pixel_bytes;
+                           png_memcpy(dp, v, 3);
+                           dp -= 3;
                         }
-                        sptr -= pixel_bytes;
+                        sptr -= 3;
                      }
                   }
                } /* end of pixel_bytes == 3 */
 
                else if (pixel_bytes == 1)
                {
-                  if ((pass == 0) || (pass == 1))
+                  if (((pass == 0) || (pass == 1)) && width)
                   {
                      int width_mmx = ((width >> 2) << 2);
                      width -= width_mmx;
@@ -1368,7 +1376,7 @@ loop1_pass0:
                         sptr--;
                      }
                   }
-                  else if ((pass == 2) || (pass == 3))
+                  else if (((pass == 2) || (pass == 3)) && width)
                   {
                      int width_mmx = ((width >> 2) << 2);
                      width -= width_mmx;
@@ -1410,7 +1418,7 @@ loop1_pass2:
                         sptr --;
                      }
                   }
-                  else //if ((pass == 4) || (pass == 5))
+                  else if (width) /* && ((pass == 4) || (pass == 5))) */
                   {
                      int width_mmx = ((width >> 3) << 3);
                      width -= width_mmx;
@@ -1457,7 +1465,7 @@ loop1_pass4:
 
                else if (pixel_bytes == 2)
                {
-                  if ((pass == 0) || (pass == 1))
+                  if (((pass == 0) || (pass == 1)) && width)
                   {
                      int width_mmx = ((width >> 1) << 1);
                      width -= width_mmx;
@@ -1494,17 +1502,16 @@ loop2_pass0:
                      {
                         png_byte v[8];
                         int j;
-                        sptr -= pixel_bytes;
-                        png_memcpy(v, sptr, pixel_bytes);
+                        sptr -= 2;
+                        png_memcpy(v, sptr, 2);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           dp -= pixel_bytes;
-                           png_memcpy(dp, v, pixel_bytes);
+                           dp -= 2;
+                           png_memcpy(dp, v, 2);
                         }
                      }
                   }
-
-                  else if ((pass == 2) || (pass == 3))
+                  else if (((pass == 2) || (pass == 3)) && width)
                   {
                      int width_mmx = ((width >> 1) << 1) ;
                      width -= width_mmx;
@@ -1540,17 +1547,16 @@ loop2_pass2:
                      {
                         png_byte v[8];
                         int j;
-                        sptr -= pixel_bytes;
-                        png_memcpy(v, sptr, pixel_bytes);
+                        sptr -= 2;
+                        png_memcpy(v, sptr, 2);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           dp -= pixel_bytes;
-                           png_memcpy(dp, v, pixel_bytes);
+                           dp -= 2;
+                           png_memcpy(dp, v, 2);
                         }
                      }
                   }
-
-                  else // pass == 4 or 5
+                  else if (width)  // pass == 4 or 5
                   {
                      int width_mmx = ((width >> 1) << 1) ;
                      width -= width_mmx;
@@ -1581,12 +1587,12 @@ loop2_pass4:
                      {
                         png_byte v[8];
                         int j;
-                        sptr -= pixel_bytes;
-                        png_memcpy(v, sptr, pixel_bytes);
+                        sptr -= 2;
+                        png_memcpy(v, sptr, 2);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           dp -= pixel_bytes;
-                           png_memcpy(dp, v, pixel_bytes);
+                           dp -= 2;
+                           png_memcpy(dp, v, 2);
                         }
                      }
                   }
@@ -1594,7 +1600,7 @@ loop2_pass4:
 
                else if (pixel_bytes == 4)
                {
-                  if ((pass == 0) || (pass == 1))
+                  if (((pass == 0) || (pass == 1)) && width)
                   {
                      int width_mmx = ((width >> 1) << 1) ;
                      width -= width_mmx;
@@ -1634,17 +1640,16 @@ loop4_pass0:
                      {
                         png_byte v[8];
                         int j;
-                        sptr -= pixel_bytes;
-                        png_memcpy(v, sptr, pixel_bytes);
+                        sptr -= 4;
+                        png_memcpy(v, sptr, 4);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           dp -= pixel_bytes;
-                           png_memcpy(dp, v, pixel_bytes);
+                           dp -= 4;
+                           png_memcpy(dp, v, 4);
                         }
                      }
                   }
-
-                  else if ((pass == 2) || (pass == 3))
+                  else if (((pass == 2) || (pass == 3)) && width)
                   {
                      int width_mmx = ((width >> 1) << 1) ;
                      width -= width_mmx;
@@ -1680,17 +1685,16 @@ loop4_pass2:
                      {
                         png_byte v[8];
                         int j;
-                        sptr -= pixel_bytes;
-                        png_memcpy(v, sptr, pixel_bytes);
+                        sptr -= 4;
+                        png_memcpy(v, sptr, 4);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           dp -= pixel_bytes;
-                           png_memcpy(dp, v, pixel_bytes);
+                           dp -= 4;
+                           png_memcpy(dp, v, 4);
                         }
                      }
                   }
-
-                  else // pass == 4 or 5
+                  else if (width)  // pass == 4 or 5
                   {
                      int width_mmx = ((width >> 1) << 1) ;
                      width -= width_mmx;
@@ -1724,12 +1728,12 @@ loop4_pass4:
                      {
                         png_byte v[8];
                         int j;
-                        sptr -= pixel_bytes;
-                        png_memcpy(v, sptr, pixel_bytes);
+                        sptr -= 4;
+                        png_memcpy(v, sptr, 4);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           dp -= pixel_bytes;
-                           png_memcpy(dp, v, pixel_bytes);
+                           dp -= 4;
+                           png_memcpy(dp, v, 4);
                         }
                      }
                   }
@@ -1742,13 +1746,13 @@ loop4_pass4:
                   {
                      png_byte v[8];
                      int j;
-                     png_memcpy(v, sptr, pixel_bytes);
+                     png_memcpy(v, sptr, 6);
                      for (j = 0; j < png_pass_inc[pass]; j++)
                      {
-                        png_memcpy(dp, v, pixel_bytes);
-                        dp -= pixel_bytes;
+                        png_memcpy(dp, v, 6);
+                        dp -= 6;
                      }
-                     sptr -= pixel_bytes;
+                     sptr -= 6;
                   }
                } /* end of pixel_bytes == 6 */
 
