@@ -1,5 +1,5 @@
 
-Libpng 1.0.5 - October 5, 1999
+Libpng 1.0.5 - October 15, 1999
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -60,6 +60,11 @@ Changes since the last public release (1.0.3):
   Added a "png_check_version" function in png.c and pngtest.c that will generate
     a helpful compiler error if an old png.h is found in the search path.
   Added a copy of pngnow.png to the distribution.
+  Surrounded example.c code with #if 0 .. #endif to prevent people from
+    inadvertently trying to compile it.
+  Added type casting mostly in pngrtran.c and pngwtran.c
+  Removed some pointless "ptr = NULL" in pngmem.c
+  Added a "contrib" directory containing the source code from Greg's book.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

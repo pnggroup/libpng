@@ -1,6 +1,6 @@
 /* pngasmrd.h - assembler version of utilities to read a PNG file
  *
- * libpng 1.0.5 - October 5, 1999
+ * libpng 1.0.5 - October 15, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1999 Glenn Randers-Pehrson
  *

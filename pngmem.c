@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.5 - October 5, 1999
+ * libpng 1.0.5 - October 15, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -82,12 +82,10 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn)
          png_struct dummy_struct;
          png_structp png_ptr = &dummy_struct;
          (*(free_fn))(png_ptr, struct_ptr);
-         struct_ptr = NULL;
          return;
       }
 #endif /* PNG_USER_MEM_SUPPORTED */
       farfree (struct_ptr);
-      struct_ptr = NULL;
    }
 }
 
@@ -236,7 +234,6 @@ png_free(png_structp png_ptr, png_voidp ptr)
    if (png_ptr->free_fn != NULL)
    {
       (*(png_ptr->free_fn))(png_ptr, ptr);
-      ptr = NULL;
       return;
    }
    else png_free_default(png_ptr, ptr);
@@ -272,7 +269,6 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
    if (ptr != NULL)
    {
       farfree(ptr);
-      ptr = NULL;
    }
 }
 
@@ -352,20 +348,16 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn)
          png_struct dummy_struct;
          png_structp png_ptr = &dummy_struct;
          (*(free_fn))(png_ptr, struct_ptr);
-         struct_ptr = NULL;
          return;
       }
 #endif /* PNG_USER_MEM_SUPPORTED */
 #if defined(__TURBOC__) && !defined(__FLAT__)
       farfree(struct_ptr);
-      struct_ptr = NULL;
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
       hfree(struct_ptr);
-      struct_ptr = NULL;
 # else
       free(struct_ptr);
-      struct_ptr = NULL;
 # endif
 #endif
    }
@@ -434,7 +426,6 @@ png_free(png_structp png_ptr, png_voidp ptr)
    if (png_ptr->free_fn != NULL)
    {
       (*(png_ptr->free_fn))(png_ptr, ptr);
-      ptr = NULL;
       return;
    }
    else png_free_default(png_ptr, ptr);
@@ -446,14 +437,11 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 
 #if defined(__TURBOC__) && !defined(__FLAT__)
    farfree(ptr);
-   ptr = NULL;
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
    hfree(ptr);
-   ptr = NULL;
 # else
    free(ptr);
-   ptr = NULL;
 # endif
 #endif
 }

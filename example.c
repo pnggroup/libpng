@@ -1,4 +1,6 @@
 
+#if 0 /* in case someone actually tries to compile this */
+
 /* example.c - an example of using libpng */
 
 /* This is an example of how to use libpng to read and write PNG files.
@@ -701,3 +703,4 @@ void write_png(char *file_name /* , ... other image information ... */)
    return;
 }
 
+#endif /* if 0 */

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.5 - October 5, 1999
+ * libpng 1.0.5 - October 15, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -465,10 +465,8 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    png_ptr->row_info.channels = png_ptr->channels;
    png_ptr->row_info.bit_depth = png_ptr->bit_depth;
    png_ptr->row_info.pixel_depth = png_ptr->pixel_depth;
-   {
-      png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
-         (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
-   }
+   png_ptr->row_info.rowbytes = ((png_ptr->row_info.width *
+      (png_uint_32)png_ptr->row_info.pixel_depth + 7) >> 3);
 
    png_read_filter_row(png_ptr, &(png_ptr->row_info),
       png_ptr->row_buf + 1, png_ptr->prev_row + 1,

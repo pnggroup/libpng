@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.5 - October 5, 1999
+ * libpng version 1.0.5 - October 15, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -9,13 +9,13 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.5 - October 5, 1999: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.5 - October 15, 1999: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
  *    
- *    October 5, 1999
+ *    October 15, 1999
  *    
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -95,7 +95,7 @@
  *    1.0.3                    1.0.3    10003  2.1.0.3
  *    1.0.3a-d                 1.0.3a-d 10004  2.1.0.3a-d
  *    1.0.4                    1.0.4    10004  2.1.0.4
- *    1.0.4a-c                 1.0.4a-c 10005  2.1.0.4a-c
+ *    1.0.4a-f                 1.0.4a-f 10005  2.1.0.4a-f
  *    1.0.5                    1.0.5    10005  2.1.0.5
  *
  *    Henceforth the source version will match the shared-library minor
@@ -109,7 +109,9 @@
  * See libpng.txt or libpng.3 for more information.  The PNG specification
  * is available as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
  * and as a W3C Recommendation <http://www.w3.org/TR/REC.png.html>
- *
+ */
+
+/*
  * COPYRIGHT NOTICE:
  *
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
@@ -117,7 +119,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.5, October 5, 1999)
+ * (libpng versions 0.97, January 1998, through 1.0.5, October 15, 1999)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -168,7 +170,16 @@
  */
 
 /*
- *
+ * A "png_get_copyright" function is available, for convenient use in "about"
+ * boxes and the like:
+ * 
+ * printf("%s",png_get_copyright(NULL));
+ * 
+ * Also, the PNG logo (in PNG format, of course) is supplied in the
+ * file "pngnow.png".
+ */
+
+/*
  * Libpng is OSI Certified Open Source Software.  OSI Certified is a
  * certification mark of the Open Source Initiative.
  */
@@ -1624,12 +1635,14 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 
 #ifdef PNG_NO_EXTERN
 /* this only gets included in png.c */
-png_charp
-png_get_header_version(png_structp png_ptr)
-{
-   if(png_ptr == NULL)
-     /* silence compiler warning about unused png_ptr */ ;
-   return("\n libpng version 1.0.5 - October 5, 1999 (header)\n");
+
+#define PNG_GET_HEADER \
+png_charp \
+png_get_header_version(png_structp png_ptr) \
+{ \
+   if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */ \
+      return("\n libpng version 1.0.5 - October 15, 1999 (header)\n"); \
+   return("\n libpng version 1.0.5 - October 15, 1999 (header)\n"); \
 }
 #endif
 
@@ -1649,14 +1662,14 @@ png_get_header_version(png_structp png_ptr)
  /* fg and bg should be in `gamma 1.0' space; alpha is the opacity          */
 
 #  define png_composite(composite, fg, alpha, bg)                            \
-     { png_uint_16 temp = ((png_uint_16)(fg) * (png_uint_16)(alpha) +        \
-                        (png_uint_16)(bg)*(png_uint_16)(255 -                \
+     { png_uint_16 temp = (png_uint_16)((png_uint_16)(fg) * (png_uint_16)(alpha) \
+                        +        (png_uint_16)(bg)*(png_uint_16)(255 -       \
                         (png_uint_16)(alpha)) + (png_uint_16)128);           \
        (composite) = (png_byte)((temp + (temp >> 8)) >> 8); }
 
 #  define png_composite_16(composite, fg, alpha, bg)                         \
-     { png_uint_32 temp = ((png_uint_32)(fg) * (png_uint_32)(alpha) +        \
-                        (png_uint_32)(bg)*(png_uint_32)(65535L -             \
+     { png_uint_32 temp = (png_uint_32)((png_uint_32)(fg) * (png_uint_32)(alpha) \
+                        + (png_uint_32)(bg)*(png_uint_32)(65535L -           \
                         (png_uint_32)(alpha)) + (png_uint_32)32768L);        \
        (composite) = (png_uint_16)((temp + (temp >> 16)) >> 16); }
 

@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.5 - October 5, 1999
+ * libpng 1.0.5 - October 15, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -75,7 +75,7 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp message
          buffer[iout++] = png_digit[c & 0xf];
          buffer[iout++] = ']';
       } else {
-         buffer[iout++] = c;
+         buffer[iout++] = (png_byte)c;
       }
    }
 
