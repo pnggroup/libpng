@@ -1,5 +1,5 @@
 
-Libpng 1.2.8beta1 - November 1, 2004
+Libpng 1.2.8beta2 - November 2, 2004
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -7,7 +7,7 @@ within a few weeks by a public version or by another test version.
 Changes since the last public release (1.2.7):
 
   Fixed bug in png_text_compress() that would fail to complete a large block.
-version 1.2.8beta1 [November 1, 2004]
+version 1.2.8beta1 [November 2, 2004]
   Fixed bug in png_text_compress() that would fail to complete a large block.
   Fixed bug, introduced in libpng-1.2.7, that overruns a buffer during
     strip alpha operation in png_do_strip_filler().
