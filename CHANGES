@@ -1404,6 +1404,8 @@ version 1.2.8rc3 [November 28, 2004]
   Reverted pngrutil.c to version libpng-1.2.8beta5.
   Added scripts/makefile.elf with supporting code in pngconf.h for symbol
     versioning (John Bowler).
+version 1.2.8rc4 [November 29, 2004]
+  Added projects/visualc7 (Simon-pierre).
 
 Send comments/corrections/commendations to
 png-implement at ccrc.wustl.edu (subscription required; write to

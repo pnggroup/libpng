@@ -32,7 +32,7 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 PNGMAJ = 0
-PNGMIN = 1.2.8rc3
+PNGMIN = 1.2.8rc4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
