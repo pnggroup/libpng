@@ -19,8 +19,8 @@ CFLAGS=-I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=gcc -shared
 
-VER=1.0.9
-LIBS=libpng.so.1.0.9
+VER=1.0.10beta1
+LIBS=libpng.so.1.0.10beta1
 SHAREDLIB=libpng.so
 libdir=$(prefix)/lib32
 
@@ -59,12 +59,12 @@ install: libpng.a
 	cp libpng.a $(prefix)/lib
 	chmod 644 $(prefix)/lib/libpng.a
 	cp $(SHAREDLIB).$(VER) $(libdir); chmod 755 $(SHAREDLIB).$(VER)
-	cd $(libdir); if test -f $(SHAREDLIB).$(VER); then \
+	(cd $(libdir); if test -f $(SHAREDLIB).$(VER); then \
 	rm -f $(SHAREDLIB) $(SHAREDLIB).1; \
 	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB); \
 	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB).1; \
 	(ldconfig || true)  >/dev/null 2>&1; \
-	fi
+	fi)
 
 clean:
 	rm -f *.o libpng.a pngtest pngout.png

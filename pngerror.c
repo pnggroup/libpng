@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.9 - January 31, 2001
+ * libpng 1.0.10beta1 - March 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -107,7 +107,7 @@ png_chunk_error(png_structp png_ptr, png_const_charp message)
 void PNGAPI
 png_chunk_warning(png_structp png_ptr, png_const_charp message)
 {
-   char msg[16+64];
+   char msg[18+64];
    png_format_buffer(png_ptr, msg, message);
    png_warning(png_ptr, msg);
 }

@@ -893,6 +893,19 @@ version 1.0.9rc2 [January 22, 2001]
 version 1.0.9 [January 31, 2001]
   Added check of cygwin's ALL_STATIC in pngconf.h
   Added "-nommx" parameter to contrib/gregbook/rpng2-win and rpng2-x demos.
+version 1.0.10beta1 [March 14, 2001]
+  Revised makefile.dec, makefile.sgi, and makefile.sggcc; added makefile.hpgcc.
+  Reformatted libpng.3 to eliminate bad line breaks.
+  Added checks for _mmx_supported in the read_filter_row function of pnggccrd.c
+  Added prototype for png_mmx_support() near the top of pnggccrd.c
+  Moved some error checking from png_handle_IHDR to png_set_IHDR.
+  Added PNG_NO_READ_SUPPORTED and PNG_NO_WRITE_SUPPORTED macros.
+  Revised png_mmx_support() function in pnggccrd.c
+  Restored version 1.0.8 PNG_WRITE_EMPTY_PLTE_SUPPORTED behavior in pngwutil.c
+  Fixed memory leak in contrib/visupng/PngFile.c
+  Fixed bugs in png_combine_row() in pnggccrd.c and pngvcrd.c (C version)
+  Added warnings when retrieving or setting gamma=0.
+  Increased the first part of msg buffer from 16 to 18 in png_chunk_warning().
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

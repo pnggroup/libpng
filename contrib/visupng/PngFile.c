@@ -370,14 +370,14 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
         
         // clean up after the write, and free any memory allocated
         
-        png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+        png_destroy_write_struct(&png_ptr, &info_ptr);
         
         // yepp, done
     }
 
     Catch (msg)
     {
-        png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+        png_destroy_write_struct(&png_ptr, &info_ptr);
 
         if(ppbRowPointers)
             free (ppbRowPointers);

@@ -1,26 +1,35 @@
-# makefile for SCO OSr5  ELF and Unixware 7 with Native cc
-# Contributed by Mike Hopkirk (hops@sco.com) modified from Makefile.lnx
-#   force ELF build dynamic linking, SONAME setting in lib and RPATH in app
-# Copyright (C) 1998 Greg Roelofs
+# makefile for libpng on HP-UX using GCC
+# Copyright (C) 2001, Laurent faillie
+# Copyright (C) 1998, 1999 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=cc
+CC=gcc
 
-# where make install puts libpng.a, libpng.so*, and png.h
+# where "make install" puts libpng.a, libpng.so*, png.h and pngconf.h
 prefix=/usr/local
 
 # Where the zlib library and include files are located
-#ZLIBLIB=/usr/local/lib
-#ZLIBINC=/usr/local/include
-ZLIBLIB=../zlib
-ZLIBINC=../zlib
+ZLIBLIB=/opt/zlib/lib
+ZLIBINC=/opt/zlib/include
 
-CFLAGS= -dy -belf -I$(ZLIBINC) -O3
+ALIGN=
+# for i386:
+#ALIGN=-malign-loops=2 -malign-functions=2
+
+WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
+	-Wmissing-declarations -Wtraditional -Wcast-align \
+	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
+
+# for pgcc version 2.95.1, -O3 is buggy; don't use it.
+
+CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops \
+	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
+#LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
-#RANLIB=ranlib
-RANLIB=echo
+RANLIB=ranlib
+#RANLIB=echo
 
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
@@ -40,42 +49,43 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .SUFFIXES:      .c .o .pic.o
 
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
+	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a libpng.so pngtest
+all: libpng.a libpng.sl pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-libpng.so: libpng.so.$(PNGMAJ)
-	ln -f -s libpng.so.$(PNGMAJ) libpng.so
+libpng.sl: libpng.sl.$(PNGMAJ)
+	ln -f -s libpng.sl.$(PNGMAJ) libpng.sl
 
-libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+libpng.sl.$(PNGMAJ): libpng.sl.$(PNGVER)
+	ln -f -s libpng.sl.$(PNGVER) libpng.sl.$(PNGMAJ)
 
-libpng.so.$(PNGVER): $(OBJSDLL)
-	$(CC) -G  -Wl,-h,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
-	 $(OBJSDLL)
+libpng.sl.$(PNGVER): $(OBJSDLL)
+	$(LD) -b -L$(ZLIBLIB) +s +b $(ZLIBLIB) \
+	+h libpng.sl.$(PNGMAJ) -o libpng.sl.$(PNGVER) $(OBJSDLL) -lz
 
-pngtest: pngtest.o libpng.so
-	LD_RUN_PATH=.:$(ZLIBLIB) $(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
+pngtest: pngtest.o libpng.sl
+	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
-install: libpng.a libpng.so.$(PNGVER)
-	-@mkdir $(INCPATH) $(LIBPATH)
+install: libpng.a libpng.sl.$(PNGVER)
+	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
 	cp png.h pngconf.h $(INCPATH)
 	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -f -s libpng.so.$(PNGMAJ) libpng.so)
+	cp libpng.a libpng.sl.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/libpng.sl.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/libpng.sl.$(PNGMAJ) $(LIBPATH)/libpng.sl
+	(cd $(LIBPATH); ln -sf libpng.sl.$(PNGVER) libpng.sl.$(PNGMAJ); \
+	 ln -sf libpng.sl.$(PNGMAJ) libpng.sl)
 
 clean:
-	/bin/rm -f *.o libpng.a libpng.so* pngtest pngout.png
+	/bin/rm -f *.o libpng.a libpng.sl* pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.9 - January 31, 2001
+ * libpng 1.0.10beta1 - March 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -10,6 +10,7 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+#ifdef PNG_WRITE_SUPPORTED
 
 /* Place a 32-bit number into a buffer in PNG byte order.  We work
  * with unsigned numbers for convenience, although one supported
@@ -534,7 +535,8 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
 
    png_debug(1, "in png_write_PLTE\n");
    if ((
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
+#if defined(PNG_MNG_FEATURES_SUPPORTED) || \
+    defined (PNG_WRITE_EMPTY_PLTE_SUPPORTED)
         !(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE) &&
 #endif
         num_pal == 0) || num_pal > 256)
@@ -1017,7 +1019,8 @@ png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
    if (color_type == PNG_COLOR_TYPE_PALETTE)
    {
       if (
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
+#if defined(PNG_MNG_FEATURES_SUPPORTED) || \
+    defined (PNG_WRITE_EMPTY_PLTE_SUPPORTED)
           (png_ptr->num_palette ||
           (!(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE))) &&
 #endif
@@ -2631,3 +2634,4 @@ png_write_filtered_row(png_structp png_ptr, png_bytep filtered_row)
    }
 #endif
 }
+#endif /* PNG_WRITE_SUPPORTED */

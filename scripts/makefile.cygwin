@@ -39,9 +39,9 @@ CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 # have to change it.
 PNGMAJ = 2
 #PNGDLL = $%DLLNUM% # msvc
-PNGDLL = 2 # cygwin 1.0.9
-PNGMIN = 1.0.9
-PNGMIN_BASE = 1.0.9
+PNGDLL = 2 # cygwin 1.0.10beta1
+PNGMIN = 1.0.10beta1
+PNGMIN_BASE = 1.0.10
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(PNGDLL).dll

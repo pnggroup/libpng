@@ -10,6 +10,7 @@ ZLIBINC=/opt/zlib/include
 
 CC=cc
 CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
+# Caution: be sure you have built zlib with the same CFLAGS.
 CCFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
@@ -18,7 +19,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.9
+PNGMIN = 1.0.10beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # where make install puts libpng.a and png.h

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.9 - January 31, 2001
+ * libpng 1.0.10beta1 - March 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -109,8 +109,9 @@ png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
    info_ptr->int_gamma = (int)(file_gamma*100000.+.5);
 #endif
    info_ptr->valid |= PNG_INFO_gAMA;
+   if(file_gamma == 0.0)
+      png_warning(png_ptr, "Setting gamma=0");
 }
-#endif
 #endif
 void PNGAPI
 png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
@@ -127,7 +128,10 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
    info_ptr->int_gamma = int_gamma;
 #endif
    info_ptr->valid |= PNG_INFO_gAMA;
+   if(int_gamma == 0)
+      png_warning(png_ptr, "Setting gamma=0");
 }
+#endif
 
 #if defined(PNG_hIST_SUPPORTED)
 void PNGAPI
@@ -171,6 +175,61 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    png_debug1(1, "in %s storage function\n", "IHDR");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
+
+   /* check for width and height valid values */
+   if (width == 0 || height == 0)
+      png_error(png_ptr, "Image width or height is zero in IHDR");
+   if (width > PNG_MAX_UINT || height > PNG_MAX_UINT)
+      png_error(png_ptr, "Invalid image size in IHDR");
+
+   /* check other values */
+   if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&
+      bit_depth != 8 && bit_depth != 16)
+      png_error(png_ptr, "Invalid bit depth in IHDR");
+
+   if (color_type < 0 || color_type == 1 ||
+      color_type == 5 || color_type > 6)
+      png_error(png_ptr, "Invalid color type in IHDR");
+
+   if (((color_type == PNG_COLOR_TYPE_PALETTE) && bit_depth > 8) ||
+       ((color_type == PNG_COLOR_TYPE_RGB ||
+         color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
+         color_type == PNG_COLOR_TYPE_RGB_ALPHA) && bit_depth < 8))
+      png_error(png_ptr, "Invalid color type/bit depth combination in IHDR");
+
+   if (interlace_type >= PNG_INTERLACE_LAST)
+      png_error(png_ptr, "Unknown interlace method in IHDR");
+
+   if (compression_type != PNG_COMPRESSION_TYPE_BASE)
+      png_error(png_ptr, "Unknown compression method in IHDR");
+
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+   /* Accept filter_method 64 (intrapixel differencing) only if
+    * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
+    * 2. Libpng did not read a PNG signature (this filter_method is only
+    *    used in PNG datastreams that are embedded in MNG datastreams) and
+    * 3. The application called png_permit_mng_features with a mask that
+    *    included PNG_FLAG_MNG_FILTER_64 and
+    * 4. The filter_method is 64 and
+    * 5. The color_type is RGB or RGBA
+    */
+   if((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&png_ptr->mng_features_permitted)
+      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream\n");
+   if(filter_type != PNG_FILTER_TYPE_BASE)
+   {
+     if(!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+        (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
+        ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
+        (color_type == PNG_COLOR_TYPE_RGB || 
+         color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
+        png_error(png_ptr, "Unknown filter method in IHDR");
+     if(png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)
+        png_warning(png_ptr, "Invalid filter method in IHDR");
+   }
+#else
+   if(filter_type != PNG_FILTER_TYPE_BASE)
+      png_error(png_ptr, "Unknown filter method in IHDR");
+#endif
 
    info_ptr->width = width;
    info_ptr->height = height;
@@ -738,7 +797,7 @@ png_set_sPLT(png_structp png_ptr,
 }
 #endif /* PNG_sPLT_SUPPORTED */
 
-#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
 void PNGAPI
 png_set_unknown_chunks(png_structp png_ptr,
    png_infop info_ptr, png_unknown_chunkp unknowns, int num_unknowns)
@@ -883,7 +942,6 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
    info_ptr->row_pointers = row_pointers;
    if(row_pointers)
       info_ptr->valid |= PNG_INFO_IDAT;
-
 }
 #endif
 

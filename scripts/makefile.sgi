@@ -20,11 +20,12 @@ CC=cc
 WARNMORE=-fullwarn
 # You can add the -n32 option; then zlib must also be compiled with -n32
 # Note: -KPIC is the default anyhow
-CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) -KPIC # -g -DPNG_DEBUG=5
+#CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) -KPIC -DPNG_USE_PNGGCCRD # -g -DPNG_DEBUG=5
+CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) -DPNG_USE_PNGGCCRD -DPNG_NO_ASSEMBLER_CODE
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=cc -shared
 
-VER=1.0.9
+VER=1.0.10beta1
 SONUM=2
 SHAREDLIB=libpng.so
 libdir=$(prefix)
@@ -33,7 +34,7 @@ libdir=$(prefix)
 RANLIB=echo
 #RANLIB=ranlib
 
-OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
+OBJS = pnggccrd.o png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
@@ -68,15 +69,15 @@ install: libpng.a
 	chmod 644 $(prefix)/lib/libpng.a
 
 install-shared: $(SHAREDLIB).$(SONUM).$(VER)
-	cp $(SHAREDLIB).$(SONUM).$(VER) $(libdir); 
+	cp $(SHAREDLIB).$(SONUM).$(VER) $(libdir)
 	chmod 755 $(SHAREDLIB).$(SONUM).$(VER)
-	cd $(libdir);
-	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM);
-	ln -s $(SHAREDLIB).$(SONUM).$(VER) $(SHAREDLIB).$(SONUM);
-	ln -s $(SHAREDLIB).$(SONUM) $(SHAREDLIB);
+	(cd $(libdir)
+	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM)
+	ln -s $(SHAREDLIB).$(SONUM).$(VER) $(SHAREDLIB).$(SONUM)
+	ln -s $(SHAREDLIB).$(SONUM) $(SHAREDLIB))
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png $(SHAREDLIB).* 
+	rm -f *.o libpng.a pngtest pngout.png $(SHAREDLIB).*
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
@@ -100,4 +101,5 @@ pngwrite.o: png.h pngconf.h
 pngwtran.o: png.h pngconf.h
 pngwutil.o: png.h pngconf.h
 pngpread.o: png.h pngconf.h
+pnggccrd.o: png.h pngconf.h
 

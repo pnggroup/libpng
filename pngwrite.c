@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.9 - January 31, 2001
+ * libpng 1.0.10beta1 - March 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -11,6 +11,7 @@
 /* get internal access to png.h */
 #define PNG_INTERNAL
 #include "png.h"
+#ifdef PNG_WRITE_SUPPORTED
 
 /* Writes all the PNG information.  This is the suggested way to use the
  * library.  If you have a new chunk to add, make a function to write it,
@@ -1363,3 +1364,4 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
       /* quiet compiler warnings */ return;
 }
 #endif
+#endif /* PNG_WRITE_SUPPORTED */

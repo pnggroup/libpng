@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.9 - January 31, 2001
+ * libpng 1.0.10beta1 - March 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -51,16 +51,20 @@
 #endif
 
 #if defined(PNG_NO_STDIO)
-#if defined(_WIN32_WCE)
-typedef HANDLE                png_FILE_p;
-#else
-typedef FILE                * png_FILE_p;
-#endif
+#  if defined(_WIN32_WCE)
+     typedef HANDLE                png_FILE_p;
+#  else
+     typedef FILE                * png_FILE_p;
+#  endif
 #endif
 
 /* Makes pngtest verbose so we can find problems (needs to be before png.h) */
 #ifndef PNG_DEBUG
-#define PNG_DEBUG 0
+#  define PNG_DEBUG 0
+#endif
+
+#if !PNG_DEBUG
+#  define SINGLE_ROWBUF_ALLOC	/* makes buffer overruns easier to nail */
 #endif
 
 /* Turn on CPU timing
@@ -279,7 +283,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
    if (check != length)
    {
-      png_error(png_ptr, "Read Error");
+      png_error(png_ptr, "Read Error!");
    }
 }
 #else
@@ -564,8 +568,17 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 {
    static png_FILE_p fpin;
    static png_FILE_p fpout;  /* "static" prevents setjmp corruption */
-   png_structp read_ptr, write_ptr;
-   png_infop read_info_ptr, write_info_ptr, end_info_ptr, write_end_info_ptr;
+   png_structp read_ptr;
+   png_infop read_info_ptr, end_info_ptr;
+#ifdef PNG_WRITE_SUPPORTED
+   png_structp write_ptr;
+   png_infop write_info_ptr;
+   png_infop write_end_info_ptr;
+#else
+   png_structp write_ptr = NULL;
+   png_infop write_info_ptr = NULL;
+   png_infop write_end_info_ptr = NULL;
+#endif
    png_bytep row_buf;
    png_uint_32 y;
    png_uint_32 width, height;
@@ -620,6 +633,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_set_error_fn(read_ptr, (png_voidp)inname, pngtest_error,
        pngtest_warning);
 #endif
+#ifdef PNG_WRITE_SUPPORTED
 #ifdef PNG_USER_MEM_SUPPORTED
    write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)NULL, (png_error_ptr)NULL, (png_voidp)NULL,
@@ -632,12 +646,13 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_set_error_fn(write_ptr, (png_voidp)inname, pngtest_error,
        pngtest_warning);
 #endif
+#endif
    png_debug(0, "Allocating read_info, write_info and end_info structures\n");
    read_info_ptr = png_create_info_struct(read_ptr);
-   write_info_ptr = png_create_info_struct(write_ptr);
    end_info_ptr = png_create_info_struct(read_ptr);
+#ifdef PNG_WRITE_SUPPORTED
+   write_info_ptr = png_create_info_struct(write_ptr);
    write_end_info_ptr = png_create_info_struct(write_ptr);
-#ifdef PNG_USER_MEM_SUPPORTED
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -650,8 +665,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
+#ifdef PNG_WRITE_SUPPORTED
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
+#endif
       FCLOSE(fpin);
       FCLOSE(fpout);
       return (1);
@@ -660,6 +677,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_memcpy(png_jmpbuf(read_ptr),jmpbuf,sizeof(jmp_buf));
 #endif
 
+#ifdef PNG_WRITE_SUPPORTED
    png_debug(0, "Setting jmpbuf for write struct\n");
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
@@ -670,7 +688,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       fprintf(STDERR, "%s -> %s: libpng write error\n", inname, outname);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
+#ifdef PNG_WRITE_SUPPORTED
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
+#endif
       FCLOSE(fpin);
       FCLOSE(fpout);
       return (1);
@@ -679,28 +699,37 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_memcpy(png_jmpbuf(write_ptr),jmpbuf,sizeof(jmp_buf));
 #endif
 #endif
+#endif
 
    png_debug(0, "Initializing input and output streams\n");
 #if !defined(PNG_NO_STDIO)
    png_init_io(read_ptr, fpin);
+#  ifdef PNG_WRITE_SUPPORTED
    png_init_io(write_ptr, fpout);
+#  endif
 #else
    png_set_read_fn(read_ptr, (png_voidp)fpin, pngtest_read_data);
+#ifdef PNG_WRITE_SUPPORTED
    png_set_write_fn(write_ptr, (png_voidp)fpout,  pngtest_write_data,
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
       pngtest_flush);
 #else
+#endif
       NULL);
 #endif
 #endif
    if(status_dots_requested == 1)
    {
+#ifdef PNG_WRITE_SUPPORTED
       png_set_write_status_fn(write_ptr, write_row_callback);
+#endif
       png_set_read_status_fn(read_ptr, read_row_callback);
    }
    else
    {
+#ifdef PNG_WRITE_SUPPORTED
       png_set_write_status_fn(write_ptr, NULL);
+#endif
       png_set_read_status_fn(read_ptr, NULL);
    }
 
@@ -984,32 +1013,41 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 #endif
 
+#ifdef PNG_WRITE_SUPPORTED
    png_debug(0, "\nWriting info struct\n");
 
 /* If we wanted, we could write info in two steps:
    png_write_info_before_PLTE(write_ptr, write_info_ptr);
  */
    png_write_info(write_ptr, write_info_ptr);
+#endif
 
-   png_debug(0, "\nAllocating row buffer \n");
+#ifdef SINGLE_ROWBUF_ALLOC
+   png_debug(0, "\nAllocating row buffer...");
    row_buf = (png_bytep)png_malloc(read_ptr,
       png_get_rowbytes(read_ptr, read_info_ptr));
+   png_debug1(0, "0x%08lx\n\n", (unsigned long)row_buf);
    if (row_buf == NULL)
    {
       fprintf(STDERR, "No memory to allocate row buffer\n");
       png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infopp)NULL);
+#ifdef PNG_WRITE_SUPPORTED
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
+#endif
       FCLOSE(fpin);
       FCLOSE(fpout);
       return (1);
    }
+#endif /* SINGLE_ROWBUF_ALLOC */
    png_debug(0, "Writing row data\n");
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED) || \
   defined(PNG_WRITE_INTERLACING_SUPPORTED)
    num_pass = png_set_interlace_handling(read_ptr);
+#  ifdef PNG_WRITE_SUPPORTED
    png_set_interlace_handling(write_ptr);
+#  endif
 #else
    num_pass=1;
 #endif
@@ -1024,7 +1062,16 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_debug1(0, "Writing row data for pass %d\n",pass);
       for (y = 0; y < height; y++)
       {
+#ifndef SINGLE_ROWBUF_ALLOC
+         png_debug2(0, "\nAllocating row buffer (pass %d, y = %ld)...", pass,y);
+         row_buf = (png_bytep)png_malloc(read_ptr,
+            png_get_rowbytes(read_ptr, read_info_ptr));
+         png_debug2(0, "0x%08lx (%ld bytes)\n", (unsigned long)row_buf,
+            png_get_rowbytes(read_ptr, read_info_ptr));
+#endif /* !SINGLE_ROWBUF_ALLOC */
          png_read_rows(read_ptr, (png_bytepp)&row_buf, (png_bytepp)NULL, 1);
+
+#ifdef PNG_WRITE_SUPPORTED
 #ifdef PNGTEST_TIMING
          t_stop = (float)clock();
          t_decode += (t_stop - t_start);
@@ -1036,6 +1083,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          t_encode += (t_stop - t_start);
          t_start = t_stop;
 #endif
+#endif /* PNG_WRITE_SUPPORTED */
+
+#ifndef SINGLE_ROWBUF_ALLOC
+         png_debug2(0, "Freeing row buffer (pass %d, y = %ld)\n\n", pass, y);
+         png_free(read_ptr, row_buf);
+#endif /* !SINGLE_ROWBUF_ALLOC */
       }
    }
 
@@ -1098,7 +1151,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+#ifdef PNG_WRITE_SUPPORTED
    png_write_end(write_ptr, write_end_info_ptr);
+#endif
 
 #ifdef PNG_EASY_ACCESS_SUPPORTED
    if(verbose)
@@ -1112,11 +1167,20 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
    png_debug(0, "Destroying data structs\n");
+#ifdef SINGLE_ROWBUF_ALLOC
+   png_debug(1, "destroying row_buf for read_ptr\n");
    png_free(read_ptr, row_buf);
    row_buf=NULL;
+#endif /* SINGLE_ROWBUF_ALLOC */
+   png_debug(1, "destroying read_ptr, read_info_ptr, end_info_ptr\n");
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
+#ifdef PNG_WRITE_SUPPORTED
+   png_debug(1, "destroying write_end_info_ptr\n");
    png_destroy_info_struct(write_ptr, &write_end_info_ptr);
+   png_debug(1, "destroying write_ptr, write_info_ptr\n");
    png_destroy_write_struct(&write_ptr, &write_info_ptr);
+#endif
+   png_debug(0, "Destruction complete.\n");
 
    FCLOSE(fpin);
    FCLOSE(fpout);
@@ -1458,4 +1522,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_9 your_png_h_is_not_version_1_0_9;
+typedef version_1_0_10beta1 your_png_h_is_not_version_1_0_10beta1;

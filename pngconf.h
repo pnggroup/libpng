@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.9 - January 31, 2001
+ * libpng 1.0.10beta1 - March 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -33,8 +33,32 @@
 #  define PNG_ZBUF_SIZE 8192
 #endif
 
+/* Enable if you want a write-only libpng */
+
+#ifndef PNG_NO_READ_SUPPORTED
+#  define PNG_READ_SUPPORTED
+#endif
+
+/* Enable if you want a read-only libpng */
+
+#ifndef PNG_NO_WRITE_SUPPORTED
+#  define PNG_WRITE_SUPPORTED
+#endif
+
+/* Enable if you need to support PNGs that are embedded in MNG
+   datastreams */
+/*
+#ifndef PNG_NO_MNG_FEATURES
+#  ifndef PNG_MNG_FEATURES_SUPPORTED
+#    define PNG_MNG_FEATURES_SUPPORTED
+#  endif
+#endif
+*/
+
 #ifndef PNG_NO_FLOATING_POINT_SUPPORTED
-#  define PNG_FLOATING_POINT_SUPPORTED
+#  ifndef PNG_FLOATING_POINT_SUPPORTED
+#    define PNG_FLOATING_POINT_SUPPORTED
+#  endif
 #endif
 
 /* If you are running on a machine where you cannot allocate more
@@ -367,7 +391,7 @@
  * iTXt is supported.  It is turned off by default, to support old apps
  * that malloc the png_text structure instead of calling png_set_text()
  * and letting libpng malloc it.  It will be turned on by default in
- * libpng-2.0.0.
+ * libpng-1.3.0.
  */
 
 #ifndef PNG_iTXt_SUPPORTED
@@ -418,13 +442,11 @@
 #  define PNG_FREE_ME_SUPPORTED
 #endif
 
+#if defined(PNG_READ_SUPPORTED)
+
 #if !defined(PNG_READ_TRANSFORMS_NOT_SUPPORTED) && \
-    !defined(PNG_NO_READ_TRANSFORMS)
+      !defined(PNG_NO_READ_TRANSFORMS)
 #  define PNG_READ_TRANSFORMS_SUPPORTED
-#endif
-#if !defined(PNG_WRITE_TRANSFORMS_NOT_SUPPORTED) && \
-    !defined(PNG_NO_WRITE_TRANSFORMS)
-#  define PNG_WRITE_TRANSFORMS_SUPPORTED
 #endif
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
@@ -498,17 +520,19 @@
 #  endif
 #endif
 
-/* Enable if you need to support PNGs that are embedded in MNG
-   datastreams */
-/*
-#ifndef PNG_NO_MNG_FEATURES
-#  define PNG_MNG_FEATURES_SUPPORTED
-#endif
-*/
-
-/* Deprecated, will be removed from version 2.0.0 */
+/* Deprecated, will be removed from version 2.0.0.
+   Use PNG_MNG_FEATURES_SUPPORTED instead. */
 #ifndef PNG_NO_READ_EMPTY_PLTE
 #  define PNG_READ_EMPTY_PLTE_SUPPORTED
+#endif
+
+#endif /* PNG_READ_SUPPORTED */
+
+#if defined(PNG_WRITE_SUPPORTED)
+
+# if !defined(PNG_WRITE_TRANSFORMS_NOT_SUPPORTED) && \
+    !defined(PNG_NO_WRITE_TRANSFORMS)
+#  define PNG_WRITE_TRANSFORMS_SUPPORTED
 #endif
 
 #ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
@@ -569,6 +593,8 @@
 #  define PNG_WRITE_EMPTY_PLTE_SUPPORTED
 #endif
 
+#endif /* PNG_WRITE_SUPPORTED */
+
 #ifndef PNG_NO_STDIO
 #  define PNG_TIME_RFC1123_SUPPORTED
 #endif
@@ -595,10 +621,14 @@
 
 /* PNG_ASSEMBLER_CODE will be enabled by default in version 1.2.0 
    even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined */
-#ifndef PNG_NO_ASSEMBLER_CODE
+#if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
 #  if defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD)
-#    define PNG_ASSEMBLER_CODE_SUPPORTED
-#    define PNG_MMX_CODE_SUPPORTED
+#    ifndef PNG_ASSEMBLER_CODE_SUPPORTED
+#      define PNG_ASSEMBLER_CODE_SUPPORTED
+#    endif
+#    if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
+#      define PNG_MMX_CODE_SUPPORTED
+#    endif
 #  endif
 #endif
 
@@ -606,7 +636,11 @@
 
 /* very little testing */
 /*
-#define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#ifdef PNG_READ_SUPPORTED
+#  ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#    define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#  endif
+#endif
 #ifndef PNG_NO_USER_MEM
 #  define PNG_USER_MEM_SUPPORTED
 #endif
@@ -618,7 +652,11 @@
 /* This is only for PowerPC big-endian and 680x0 systems */
 /* some testing */
 /*
-#define PNG_READ_BIG_ENDIAN_SUPPORTED
+#ifdef PNG_READ_SUPPORTED
+#  ifndef PNG_PNG_READ_BIG_ENDIAN_SUPPORTED
+#    define PNG_READ_BIG_ENDIAN_SUPPORTED
+#  endif
+#endif
 */
 
 /* Buggy compilers (e.g., gcc 2.7.2.2) need this */
@@ -638,11 +676,14 @@
  * a bit smaller.
  */
 
-#if !defined(PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED) && \
+#if defined(PNG_READ_SUPPORTED) && \
+    !defined(PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED) && \
     !defined(PNG_NO_READ_ANCILLARY_CHUNKS)
 #  define PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
 #endif
-#if !defined(PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED) && \
+
+#if defined(PNG_WRITE_SUPPORTED) && \
+    !defined(PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED) && \
     !defined(PNG_NO_WRITE_ANCILLARY_CHUNKS)
 #  define PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
 #endif
@@ -1221,8 +1262,9 @@ typedef z_stream FAR *  png_zstreamp;
 #  define PNG_ZBUF_SIZE 65536
 #endif
 
+#ifdef PNG_READ_SUPPORTED
 /* Prior to libpng-1.0.9, this block was in pngasmrd.h */
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_INTERNAL)
+#if defined(PNG_INTERNAL)
 
 /* These are the default thresholds before the MMX code kicks in; if either
  * rowbytes or bitdepth is below the threshold, plain C code is used.  These
@@ -1258,7 +1300,8 @@ typedef z_stream FAR *  png_zstreamp;
 #endif
 /* - see pnggccrd.c for info about what is currently enabled */
 
-#endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
+#endif /* PNG_INTERNAL */
+#endif /* PNG_READ_SUPPORTED */
 
 #endif /* PNGCONF_H */
 

@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.9 - January 31, 2001
+ * libpng 1.0.10beta1 - March 14, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -382,6 +382,8 @@ end8:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
+                  if (pixel_bytes > (png_size_t)(final_val-i))
+                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -493,6 +495,8 @@ end16:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
+                  if (pixel_bytes > (png_size_t)(final_val-i))
+                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -623,6 +627,8 @@ end24:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
+                  if (pixel_bytes > (png_size_t)(final_val-i))
+                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -762,6 +768,8 @@ end32:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
+                  if (pixel_bytes > (png_size_t)(final_val-i))
+                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -919,6 +927,8 @@ end48:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
+                  if (pixel_bytes > (png_size_t)(final_val-i))
+                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -947,6 +957,8 @@ end48:
             incr1 = (disp)*pixel_bytes;
             for (i = initial_val; i < final_val; i += incr1)
             {
+               if (pixel_bytes > (png_size_t)(final_val-i))
+                 pixel_bytes = (png_size_t)(final_val-i);
                png_memcpy(dp, sptr, pixel_bytes);
                sptr += incr1;
                dp += incr1;

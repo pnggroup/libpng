@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.9 - January 31, 2001
+ libpng version 1.0.10beta1 - March 14, 2001
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -257,10 +257,11 @@ input stream. You must supply the function
            png_byte name[5];
            png_byte *data;
            png_size_t size;
-       /* Note that libpng has already taken care of the
-          CRC handling */
+       /* Note that libpng has already taken care of
+          the CRC handling */
 
-       /* put your code here.  Return one of the following: */
+       /* put your code here.  Return one of the
+          following: */
 
        return (-n); /* chunk had an error */
        return (0); /* did not recognize */
@@ -331,16 +332,23 @@ the entire image into memory, and (b) the input transformations
 you want to do are limited to the following set:
 
     PNG_TRANSFORM_IDENTITY      No transformation
-    PNG_TRANSFORM_STRIP_16      Strip 16-bit samples to 8 bits
+    PNG_TRANSFORM_STRIP_16      Strip 16-bit samples to
+                                8 bits
     PNG_TRANSFORM_STRIP_ALPHA   Discard the alpha channel
-    PNG_TRANSFORM_PACKING       Expand 1, 2 and 4-bit samples to bytes
-    PNG_TRANSFORM_PACKSWAP      Change order of packed pixels to LSB first
+    PNG_TRANSFORM_PACKING       Expand 1, 2 and 4-bit
+                                samples to bytes
+    PNG_TRANSFORM_PACKSWAP      Change order of packed
+                                pixels to LSB first
     PNG_TRANSFORM_EXPAND        Perform set_expand()
     PNG_TRANSFORM_INVERT_MONO   Invert monochrome images
-    PNG_TRANSFORM_SHIFT         Normalize pixels to the sBIT depth
-    PNG_TRANSFORM_BGR           Flip RGB to BGR, RGBA to BGRA
-    PNG_TRANSFORM_SWAP_ALPHA    Flip RGBA to ARGB or GA to AG
-    PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity to transparency
+    PNG_TRANSFORM_SHIFT         Normalize pixels to the
+                                sBIT depth
+    PNG_TRANSFORM_BGR           Flip RGB to BGR, RGBA
+                                to BGRA
+    PNG_TRANSFORM_SWAP_ALPHA    Flip RGBA to ARGB or GA
+                                to AG
+    PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity
+                                to transparency
     PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
 
 (This excludes setting a background color, doing gamma transformation,
@@ -368,9 +376,11 @@ where row_pointers is an array of pointers to the pixel data for each row:
 If you know your image size and pixel size ahead of time, you can allocate
 row_pointers prior to calling png_read_png() with
 
-   row_pointers = png_malloc(png_ptr, height*sizeof(png_bytep));
+   row_pointers = png_malloc(png_ptr,
+      height*sizeof(png_bytep));
    for (int i=0; i<height, i++)
-      row_pointers[i]=png_malloc(png_ptr, width*pixel_size);
+      row_pointers[i]=png_malloc(png_ptr,
+         width*pixel_size);
    png_set_rows(png_ptr, info_ptr, &row_pointers);
 
 Alternatively you could allocate your image in one big block and define
@@ -438,8 +448,8 @@ in until png_read_end() has read the chunk data following the image.
     interlace_type - (PNG_INTERLACE_NONE or
                      PNG_INTERLACE_ADAM7)
     Any or all of interlace_type, compression_type, of
-                     filter_method can be NULL if you are
-                     not interested in their values.
+    filter_method can be NULL if you are
+    not interested in their values.
 
     channels = png_get_channels(png_ptr, info_ptr);
     channels       - number of channels of info for the
@@ -502,14 +512,15 @@ into the info_ptr is returned for any complex types.
                      implies specific values of gAMA and
                      cHRM.
 
-    png_get_iCCP(png_ptr, info_ptr, &name, &compression_type,
-                      &profile, &proflen);
+    png_get_iCCP(png_ptr, info_ptr, &name,
+       &compression_type, &profile, &proflen);
     name            - The profile name.
-    compression     - The compression type; always PNG_COMPRESSION_TYPE_BASE
-                      for PNG 1.0.  You may give NULL to this argument
-                      to ignore it.
-    profile         - International Color Consortium color profile
-                      data. May contain NULs.
+    compression     - The compression type; always
+                      PNG_COMPRESSION_TYPE_BASE for PNG 1.0.
+                      You may give NULL to this argument to
+                      ignore it.
+    profile         - International Color Consortium color
+                      profile data. May contain NULs.
     proflen         - length of profile data in bytes.
 
     png_get_sBIT(png_ptr, info_ptr, &sig_bit);
@@ -565,21 +576,24 @@ into the info_ptr is returned for any complex types.
                          string for unknown).
     text_ptr[i].translated_keyword  - keyword in UTF-8
                          (empty string for unknown).
-    num_text       - number of comments (same as num_comments;
-                     you can put NULL here to avoid the duplication)
-    Note while png_set_text() will accept text, language, and
-    translated keywords that can be NULL pointers, the structure
-    returned by png_get_text will always contain regular
-    zero-terminated C strings.  They might be empty strings but
-    they will never be NULL pointers.
+    num_text       - number of comments (same as
+                     num_comments; you can put NULL here
+                     to avoid the duplication)
+    Note while png_set_text() will accept text, language,
+    and translated keywords that can be NULL pointers, the
+    structure returned by png_get_text will always contain
+    regular zero-terminated C strings.  They might be
+    empty strings but they will never be NULL pointers.
 
-    num_spalettes = png_get_sPLT(png_ptr, info_ptr, &palette_ptr);
+    num_spalettes = png_get_sPLT(png_ptr, info_ptr,
+       &palette_ptr);
     palette_ptr    - array of palette structures holding
-                     contents of one or more sPLT chunks read.
+                     contents of one or more sPLT chunks
+                     read.
     num_spalettes  - number of sPLT chunks read.
 
     png_get_oFFs(png_ptr, info_ptr, &offset_x, &offset_y,
-                     &unit_type);
+       &unit_type);
     offset_x       - positive offset from the left edge
                      of the screen
     offset_y       - positive offset from the top edge
@@ -587,7 +601,7 @@ into the info_ptr is returned for any complex types.
     unit_type      - PNG_OFFSET_PIXEL, PNG_OFFSET_MICROMETER
 
     png_get_pHYs(png_ptr, info_ptr, &res_x, &res_y,
-                     &unit_type);
+       &unit_type);
     res_x          - pixels/unit physical resolution in
                      x direction
     res_y          - pixels/unit physical resolution in
@@ -595,47 +609,50 @@ into the info_ptr is returned for any complex types.
     unit_type      - PNG_RESOLUTION_UNKNOWN,
                      PNG_RESOLUTION_METER
 
-    png_get_sCAL(png_ptr, info_ptr, &unit, &width, &height)
+    png_get_sCAL(png_ptr, info_ptr, &unit, &width,
+       &height)
     unit        - physical scale units (an integer)
     width       - width of a pixel in physical scale units
     height      - height of a pixel in physical scale units
                  (width and height are doubles)
 
-    png_get_sCAL_s(png_ptr, info_ptr, &unit, &width, &height)
+    png_get_sCAL_s(png_ptr, info_ptr, &unit, &width,
+       &height)
     unit        - physical scale units (an integer)
     width       - width of a pixel in physical scale units
     height      - height of a pixel in physical scale units
                  (width and height are strings like "2.54")
 
-    num_unknown_chunks = png_get_unknown_chunks(png_ptr, info_ptr,
-                            &unknowns)
-    unknowns          - array of png_unknown_chunk structures holding
-                        unknown chunks
+    num_unknown_chunks = png_get_unknown_chunks(png_ptr,
+       info_ptr, &unknowns)
+    unknowns          - array of png_unknown_chunk
+                        structures holding unknown chunks
     unknowns[i].name  - name of unknown chunk
     unknowns[i].data  - data of unknown chunk
     unknowns[i].size  - size of unknown chunk's data
     unknowns[i].location - position of chunk in file
 
-    The value of "i" corresponds to the order in which the chunks were read
-    from the PNG file or inserted with the png_set_unknown_chunks() function.
+    The value of "i" corresponds to the order in which the
+    chunks were read from the PNG file or inserted with the
+    png_set_unknown_chunks() function.
 
 The data from the pHYs chunk can be retrieved in several convenient
 forms:
 
     res_x = png_get_x_pixels_per_meter(png_ptr,
-                  info_ptr)
+       info_ptr)
     res_y = png_get_y_pixels_per_meter(png_ptr,
-                  info_ptr)
+       info_ptr)
     res_x_and_y = png_get_pixels_per_meter(png_ptr,
-                  info_ptr)
+       info_ptr)
     res_x = png_get_x_pixels_per_inch(png_ptr,
-                  info_ptr)
+       info_ptr)
     res_y = png_get_y_pixels_per_inch(png_ptr,
-                  info_ptr)
+       info_ptr)
     res_x_and_y = png_get_pixels_per_inch(png_ptr,
-                  info_ptr)
+       info_ptr)
     aspect_ratio = png_get_pixel_aspect_ratio(png_ptr,
-                  info_ptr)
+       info_ptr)
 
    (Each of these returns 0 [signifying "unknown"] if
        the data is not present or if res_x is 0;
@@ -650,8 +667,8 @@ forms:
     y_offset = png_get_y_offset_inches(png_ptr, info_ptr);
 
    (Each of these returns 0 [signifying "unknown" if both
-       x and y are 0] if the data is not present or if the chunk
-       is present but the unit is the pixel)
+       x and y are 0] if the data is not present or if the
+       chunk is present but the unit is the pixel)
 
 For more information, see the png_info definition in png.h and the
 PNG specification for chunk contents.  Be careful with trusting
@@ -1185,7 +1202,7 @@ When you are done, you can free all memory allocated by libpng like this:
 It is also possible to individually free the info_ptr members that
 point to libpng-allocated storage with the following function:
 
-    png_free_data(png_ptr, info_ptr, mask, n)
+    png_free_data(png_ptr, info_ptr, mask, seq)
     mask - identifies data to be freed, a mask
            containing the logical OR of one or
            more of
@@ -1195,16 +1212,17 @@ point to libpng-allocated storage with the following function:
              PNG_FREE_SCAL, PNG_FREE_SPLT,
              PNG_FREE_TEXT, PNG_FREE_UNKN,
            or simply PNG_FREE_ALL
-    n    - sequence number of item to be freed
+    seq  - sequence number of item to be freed
            (-1 for all items)
 
 This function may be safely called when the relevant storage has
 already been freed, or has not yet been allocated, or was allocated
 by the user and not by libpng,  and will in those
-cases do nothing.  The "n" parameter is ignored if only one item
-of the selected data type, such as PLTE, is allowed.  If "n" is not
+cases do nothing.  The "seq" parameter is ignored if only one item
+of the selected data type, such as PLTE, is allowed.  If "seq" is not
 -1, and multiple items are allowed for the data type identified in
-the mask, such as text or sPLT, only the n'th item is freed.
+the mask, such as text or sPLT, only the n'th item in the structure
+is freed, where n is "seq".
 
 The default behavior is only to free data that was allocated internally
 by libpng.  This can be changed, so that libpng will not free the data,
@@ -1377,9 +1395,10 @@ png_infop info_ptr;
 
  /* This function is called when each row of image
     data is complete */
+
  void
  row_callback(png_structp png_ptr, png_bytep new_row,
-    png_uint_32 row_num, int pass)
+ png_uint_32 row_num, int pass)
  {
     /* If the image is interlaced, and you turned
        on the interlace handler, this function will
@@ -1523,7 +1542,8 @@ called after each row has been written, which you can use to control
 a progress meter or the like.  It's demonstrated in pngtest.c.
 You must supply a function
 
-    void write_row_callback(png_ptr, png_uint_32 row, int pass);
+    void write_row_callback(png_ptr, png_uint_32 row,
+       int pass);
     {
       /* put your code here */
     }
@@ -1551,8 +1571,9 @@ types.
 
 
     /* turn on or off filtering, and/or choose
-       specific filters.  You can use either a single PNG_FILTER_VALUE_NAME
-       or the logical OR of one or more PNG_FILTER_NAME masks. */
+       specific filters.  You can use either a single
+       PNG_FILTER_VALUE_NAME or the logical OR of one
+       or more PNG_FILTER_NAME masks. */
     png_set_filter(png_ptr, 0,
        PNG_FILTER_NONE  | PNG_FILTER_VALUE_NONE |
        PNG_FILTER_SUB   | PNG_FILTER_VALUE_SUB  |
@@ -1688,11 +1709,12 @@ Some of the more important parts of the png_info are:
     png_set_iCCP(png_ptr, info_ptr, name, compression_type,
                       profile, proflen);
     name            - The profile name.
-    compression     - The compression type; always PNG_COMPRESSION_TYPE_BASE
-                      for PNG 1.0.  You may give NULL to this argument
-                      to ignore it.
-    profile         - International Color Consortium color profile
-                      data. May contain NULs.
+    compression     - The compression type; always
+                      PNG_COMPRESSION_TYPE_BASE for PNG 1.0.
+                      You may give NULL to this argument to
+                      ignore it.
+    profile         - International Color Consortium color
+                      profile data. May contain NULs.
     proflen         - length of profile data in bytes.
 
     png_set_sBIT(png_ptr, info_ptr, sig_bit);
@@ -1746,11 +1768,13 @@ Some of the more important parts of the png_info are:
                          or empty for unknown).
     num_text       - number of comments
 
-    png_set_sPLT(png_ptr, info_ptr, &palette_ptr, num_spalettes);
-    palette_ptr    - array of png_sPLT_struct structures to be
-                     added to the list of palettes in the info
-                     structure.
-    num_spalettes  - number of palette structures to be added.
+    png_set_sPLT(png_ptr, info_ptr, &palette_ptr,
+       num_spalettes);
+    palette_ptr    - array of png_sPLT_struct structures
+                     to be added to the list of palettes
+                     in the info structure.
+    num_spalettes  - number of palette structures to be
+                     added.
 
     png_set_oFFs(png_ptr, info_ptr, offset_x, offset_y,
         unit_type);
@@ -1781,9 +1805,10 @@ Some of the more important parts of the png_info are:
     height      - height of a pixel in physical scale units
                  (width and height are strings like "2.54")
 
-    png_set_unknown_chunks(png_ptr, info_ptr, &unknowns, num_unknowns)
-    unknowns          - array of png_unknown_chunk structures holding
-                        unknown chunks
+    png_set_unknown_chunks(png_ptr, info_ptr, &unknowns,
+       num_unknowns)
+    unknowns          - array of png_unknown_chunk
+                        structures holding unknown chunks
     unknowns[i].name  - name of unknown chunk
     unknowns[i].data  - data of unknown chunk
     unknowns[i].size  - size of unknown chunk's data
@@ -1792,14 +1817,15 @@ Some of the more important parts of the png_info are:
                            PNG_HAVE_IHDR: before PLTE
                            PNG_HAVE_PLTE: before IDAT
                            PNG_AFTER_IDAT: after IDAT
-    The "location" member is set automatically according to
-    what part of the output file has already been written.
-    You can change its value after calling png_set_unknown_chunks()
-    as demonstrated in pngtest.c.  Within each of the "locations",
-    the chunks are sequenced according to their position in the
-    structure (that is, the value of "i", which is the order in which
-    the chunk was either read from the input file or defined with
-    png_set_unknown_chunks).
+
+The "location" member is set automatically according to
+what part of the output file has already been written.
+You can change its value after calling png_set_unknown_chunks()
+as demonstrated in pngtest.c.  Within each of the "locations",
+the chunks are sequenced according to their position in the
+structure (that is, the value of "i", which is the order in which
+the chunk was either read from the input file or defined with
+png_set_unknown_chunks).
 
 A quick word about text and num_text.  text is an array of png_text
 structures.  num_text is the number of valid structures in the array.
@@ -1900,12 +1926,17 @@ transformations are permitted, enabled by the following masks.
 
     PNG_TRANSFORM_IDENTITY      No transformation
     PNG_TRANSFORM_PACKING       Pack 1, 2 and 4-bit samples
-    PNG_TRANSFORM_PACKSWAP      Change order of packed pixels to LSB first
+    PNG_TRANSFORM_PACKSWAP      Change order of packed
+                                pixels to LSB first
     PNG_TRANSFORM_INVERT_MONO   Invert monochrome images
-    PNG_TRANSFORM_SHIFT         Normalize pixels to the sBIT depth
-    PNG_TRANSFORM_BGR           Flip RGB to BGR, RGBA to BGRA
-    PNG_TRANSFORM_SWAP_ALPHA    Flip RGBA to ARGB or GA to AG
-    PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity to transparency
+    PNG_TRANSFORM_SHIFT         Normalize pixels to the
+                                sBIT depth
+    PNG_TRANSFORM_BGR           Flip RGB to BGR, RGBA
+                                to BGRA
+    PNG_TRANSFORM_SWAP_ALPHA    Flip RGBA to ARGB or GA
+                                to AG
+    PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity
+                                to transparency
     PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
     PNG_TRANSFORM_STRIP_FILLER  Strip out filler bytes.
 
@@ -2169,7 +2200,7 @@ When you are done, you can free all memory used by libpng like this:
 It is also possible to individually free the info_ptr members that
 point to libpng-allocated storage with the following function:
 
-    png_free_data(png_ptr, info_ptr, mask, n)
+    png_free_data(png_ptr, info_ptr, mask, seq)
     mask  - identifies data to be freed, a mask
             containing the logical OR of one or
             more of
@@ -2179,16 +2210,17 @@ point to libpng-allocated storage with the following function:
               PNG_FREE_SCAL, PNG_FREE_SPLT,
               PNG_FREE_TEXT, PNG_FREE_UNKN,
             or simply PNG_FREE_ALL
-    n     - sequence number of item to be freed
+    seq   - sequence number of item to be freed
             (-1 for all items)
 
 This function may be safely called when the relevant storage has
 already been freed, or has not yet been allocated, or was allocated
 by the user  and not by libpng,  and will in those
-cases do nothing.  The "n" parameter is ignored if only one item
-of the selected data type, such as PLTE, is allowed.  If "n" is not
+cases do nothing.  The "seq" parameter is ignored if only one item
+of the selected data type, such as PLTE, is allowed.  If "seq" is not
 -1, and multiple items are allowed for the data type identified in
-the mask, such as text or sPLT, only the n'th item is freed.
+the mask, such as text or sPLT, only the n'th item in the structure
+is freed, where n is "seq".
 
 If you allocated data such as a palette that you passed
 in to libpng with png_set_*, you must not free it until just before the call to
@@ -2269,8 +2301,8 @@ memory allocation on a platform will change between applications, these
 functions must be modified in the library at compile time.  If you prefer
 to use a different method of allocating and freeing data, you can use
 
-    png_set_mem_fn(png_structp png_ptr, png_voidp mem_ptr, png_malloc_ptr
-      malloc_fn, png_free_ptr free_fn)
+    png_set_mem_fn(png_structp png_ptr, png_voidp mem_ptr,
+       png_malloc_ptr malloc_fn, png_free_ptr free_fn)
 
 This function also provides a void pointer that can be retrieved via
 
@@ -2278,7 +2310,8 @@ This function also provides a void pointer that can be retrieved via
 
 Your replacement memory functions must have prototypes as follows:
 
-    png_voidp malloc_fn(png_structp png_ptr, png_uint_32 size);
+    png_voidp malloc_fn(png_structp png_ptr,
+       png_uint_32 size);
     void free_fn(png_structp png_ptr, png_voidp ptr);
 
 Input/Output in libpng is done through png_read() and png_write(),
@@ -2490,10 +2523,12 @@ structures appropriately for all of the filter types.
 
     png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE,
        filters);
-              The second parameter can also be PNG_INTRAPIXEL_DIFFERENCING
-              if you are writing a PNG to be embedded in a MNG
-              datastream.  This parameter must be the same as the
-              value of filter_method used in png_set_IHDR().
+              The second parameter can also be
+              PNG_INTRAPIXEL_DIFFERENCING if you are
+              writing a PNG to be embedded in a MNG
+              datastream.  This parameter must be the
+              same as the value of filter_method used
+              in png_set_IHDR().
 
 It is also possible to influence how libpng chooses from among the
 available filters.  This is done in two ways - by telling it how
@@ -2682,13 +2717,13 @@ application:
 
 VIII. Y2K Compliance in libpng
 
-January 31, 2001
+March 14, 2001
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.9 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.10beta1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -2706,7 +2741,8 @@ There are seven time-related functions:
 
     png_convert_to_rfc_1123() in png.c
       (formerly png_convert_to_rfc_1152() in error)
-    png_convert_from_struct_tm() in pngwrite.c, called in pngwrite.c
+    png_convert_from_struct_tm() in pngwrite.c, called
+      in pngwrite.c
     png_convert_from_time_t() in pngwrite.c
     png_get_tIME() in pngget.c
     png_handle_tIME() in pngrutil.c, called in pngread.c
