@@ -314,6 +314,9 @@ AC_ARG_ENABLE([hardware-optimizations],
          enable_mips_msa=no
          AC_DEFINE([PNG_MIPS_MSA_OPT], [0],
            [Disable MIPS_MSA optimizations])
+         enable_loongson_mmi=no
+         AC_DEFINE([PNG_LOONGSON_MMI_OPT], [0],
+           [Disable LOONGSON_MMI optimizations])
          enable_powerpc_vsx=no
          AC_DEFINE([PNG_POWERPC_VSX_OPT], [0],
            [Disable POWERPC VSX optimizations])
@@ -328,6 +331,11 @@ AC_ARG_ENABLE([hardware-optimizations],
               enable_arm_neon=yes
               AC_DEFINE([PNG_ARM_NEON_OPT], [0],
                 [Enable ARM_NEON optimizations])
+              ;;
+            mips64el*)
+              enable_loongson_mmi=yes
+              AC_DEFINE([PNG_LOONGSON_MMI_OPT], [0],
+                [Enable LOONGSON_MMI optimizations])
               ;;
             mipsel*|mips64el*)
               enable_mips_msa=yes
@@ -437,6 +445,53 @@ AM_CONDITIONAL([PNG_MIPS_MSA],
    [test "$enable_mips_msa" != 'no' &&
     case "$host_cpu" in
       mipsel*|mips64el*) :;;
+      *)    test "$enable_mips_msa" != '';;
+    esac])
+
+# MIPS
+# ===
+#
+# LOONGSON MMI (SIMD) support.
+
+AC_ARG_ENABLE([loongson-mmi],
+   AS_HELP_STRING([[[--enable-loongson-mmi]]],
+      [Enable LOONGSON MMI optimizations: =no/off, check, api, yes/on:]
+      [no/off: disable the optimizations; check: use internal checking code]
+      [(deprecated and poorly supported); api: disable by default, enable by]
+      [a call to png_set_option; yes/on: turn on unconditionally.]
+      [If not specified: determined by the compiler.]),
+   [case "$enableval" in
+      no|off)
+         # disable the default enabling on __loongson_mmi systems:
+         AC_DEFINE([PNG_LOONGSON_MMI_OPT], [0],
+                   [Disable LOONGSON MMI optimizations])
+         # Prevent inclusion of the assembler files below:
+         enable_loongson_mmi=no;;
+      check)
+         AC_DEFINE([PNG_LOONGSON_MMI_CHECK_SUPPORTED], [],
+                   [Check for LOONGSON MMI support at run-time]);;
+      api)
+         AC_DEFINE([PNG_LOONGSON_MMI_API_SUPPORTED], [],
+                   [Turn on LOONGSON MMI optimizations at run-time]);;
+      yes|on)
+         AC_DEFINE([PNG_LOONGSON_MMI_OPT], [2],
+                   [Enable LOONGSON MMI optimizations])
+         AC_MSG_WARN([--enable-loongson-mmi: please specify 'check' or 'api', if]
+            [you want the optimizations unconditionally pass '-march=loongson3a']
+            [to the compiler.]);;
+      *)
+         AC_MSG_ERROR([--enable-loongson-mmi=${enable_loongson_mmi}: invalid value])
+   esac])
+
+# Add MIPS specific files to all builds where the host_cpu is mips ('mips*') or
+# where MIPS optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'mips*')
+
+AM_CONDITIONAL([PNG_LOONGSON_MMI],
+   [test "$enable_loongson_mmi" != 'no' &&
+    case "$host_cpu" in
+      mips64el*) :;;
+      *)    test "$enable_loongson_mmi" != '';;
     esac])
 
 # INTEL
@@ -519,6 +574,7 @@ AM_CONDITIONAL([PNG_POWERPC_VSX],
    [test "$enable_powerpc_vsx" != 'no' &&
     case "$host_cpu" in
       powerpc*|ppc64*) :;;
+      *)  test "$enable_powerpc_vsx" != '';;
     esac])
 
 
