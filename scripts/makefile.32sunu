@@ -26,14 +26,14 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 CFLAGS=-I$(ZLIBINC) $(SUN_CC_FLAGS) \
 	# $(WARNMORE) -g -DPNG_DEBUG=5
-LDFLAGS=-L. -R. $(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng10 -lz -lm
+LDFLAGS=$(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) libpng.a -lz -lm
 
 #RANLIB=ranlib
 RANLIB=echo
 
 LIBNAME=libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.15
+PNGMIN = 1.0.16
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -138,9 +138,10 @@ install-static: install-headers libpng.a
 	(cd $(DL); ln -f -s $(LIBNAME).a libpng.a)
 
 install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
-	libpng.so.2
+	libpng.so.2.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.2
 	-@/bin/rm -f $(DL)/libpng.so.2.$(PNGVER)*
@@ -177,7 +178,7 @@ install-config: libpng-config
 	-@/bin/rm -f $(DB)/libpng10-config
 	cp libpng-config $(DB)/libpng10-config
 	chmod 755 $(DB)/libpng10-config
-	(cd $(DB); ln -sf libpng10-config libpng-config)
+	(cd $(DB); ln -f -s libpng10-config libpng-config)
 
 install: install-static install-shared install-man install-config
 

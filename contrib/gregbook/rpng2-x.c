@@ -594,6 +594,7 @@ static void rpng2_x_init(void)
          * If we/it segfault instead, seems like a libpng bug... */
 
         /* we're here via libpng callback, so if window fails, clean and bail */
+printf("readpng2_cleanup.\n");
         readpng2_cleanup(&rpng2_info);
         rpng2_x_cleanup();
         exit(2);

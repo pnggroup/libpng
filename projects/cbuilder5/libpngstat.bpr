@@ -11,7 +11,7 @@
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
-    <LIBFILES value="zlibstat.lib"/>
+    <LIBFILES value="..\..\..\zlib\zlib.lib"/>
     <LIBRARIES value=""/>
     <PACKAGES value=""/>
     <PATHCPP value=".;..\.."/>

@@ -32,13 +32,13 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 PNGMAJ = 0
-PNGMIN = 1.0.15
+PNGMIN = 1.0.16
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 
 CC=cc
 CFLAGS=-std -w1 -I$(ZLIBINC) -O # -g -DPNG_DEBUG=1
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+LDFLAGS=-L$(ZLIBLIB) -rpath $(ZLIBLIB) libpng.a -lz -lm
 
 #RANLIB=echo
 RANLIB=ranlib
@@ -73,11 +73,11 @@ $(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
 $(LIBNAME).so.$(PNGVER): $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB)
+	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB) \
 	-soname $(LIBNAME).so.$(PNGMAJ)
 
 libpng.so.2.$(PNGMIN): $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB)
+	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB) \
 	-soname libpng.so.2
 
 pngtest: pngtest.o libpng.a
@@ -106,6 +106,7 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	libpng.so.2.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.2
 	-@/bin/rm -f $(DL)/libpng.so.2.$(PNGMIN)*

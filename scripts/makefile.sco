@@ -24,7 +24,7 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng10 -lz -lm
 RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.0.15
+PNGMIN = 1.0.16
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng10
 
@@ -120,6 +120,7 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	libpng.so.2.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.2
 	-@/bin/rm -f $(DL)/libpng.so.2.$(PNGMIN)*
@@ -156,7 +157,7 @@ install-config: libpng-config
 	-@/bin/rm -f $(DB)/$(LIBNAME)-config
 	cp libpng-config $(DB)/$(LIBNAME)-config
 	chmod 755 $(DB)/$(LIBNAME)-config
-	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
+	(cd $(DB); ln -f -s $(LIBNAME)-config libpng-config)
 
 install: install-static install-shared install-man install-config
 

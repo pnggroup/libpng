@@ -4,7 +4,13 @@
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
+   Changelog:
+    - 1.01:  initial public release
+    - 1.02:  added code to skip unused chunks (GR-P)
+
+  ---------------------------------------------------------------------------
+
+      Copyright (c) 1998-2002 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -173,6 +179,40 @@ int readpng2_init(mainprog_info *mainprog_ptr)
         return 2;
     }
 
+    /* prepare the reader to ignore all recognized chunks whose data isn't
+     * going to be used, i.e., all chunks recognized by libpng except for
+     * IHDR, PLTE, IDAT, IEND, tRNS, bKGD, gAMA, and sRGB : */
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+    {
+#ifndef HANDLE_CHUNK_NEVER
+/* prior to libpng-1.2.5, this macro was internal, so we define it here. */
+# define HANDLE_CHUNK_NEVER 1
+#endif
+       /* these byte strings were copied from png.h.
+        * If a future libpng version recognizes more chunks, add them
+        * to this list.  If a future version of readpng2.c recognizes
+        * more chunks, delete them from this list. */
+       png_byte png_chunk_types_to_ignore[]=
+          { 99,  72,  82,  77, '\0', /* cHRM */
+           104,  73,  83,  84, '\0', /* hIST */
+           105,  67,  67,  80, '\0', /* iCCP */
+           105,  84,  88, 116, '\0', /* iTXt */
+           111,  70,  70, 115, '\0', /* oFFs */
+           112,  67,  65,  76, '\0', /* pCAL */
+           115,  67,  65,  76, '\0', /* sCAL */
+           112,  72,  89, 115, '\0', /* pHYs */
+           115,  66,  73,  84, '\0', /* sBIT */
+           115,  80,  76,  84, '\0', /* sPLT */
+           116,  69,  88, 116, '\0', /* tEXt */
+           116,  73,  77,  69, '\0', /* tIME */
+           122,  84,  88, 116, '\0'}; /* zTXt */
+#define NUM_PNG_CHUNK_TYPES_TO_IGNORE 13
+
+    png_set_keep_unknown_chunks(png_ptr, HANDLE_CHUNK_NEVER,
+        png_chunk_types_to_ignore, NUM_PNG_CHUNK_TYPES_TO_IGNORE);
+    }
+#endif
 
     /* instead of doing png_init_io() here, now we set up our callback
      * functions for progressive decoding */

@@ -23,9 +23,9 @@
 
 # macros --------------------------------------------------------------------
 
-PNGINC = -I/usr/local/include/libpng10
-PNGLIB = -L/usr/local/lib -lpng10	  # dynamically linked against libpng
-#PNGLIB = /usr/local/lib/libpng10.a # statically linked against libpng
+PNGINC = -I/usr/local/include/libpng12
+PNGLIB = -L/usr/local/lib -lpng12	  # dynamically linked against libpng
+#PNGLIB = /usr/local/lib/libpng12.a # statically linked against libpng
 # or:
 #PNGINC = -I../..
 #PNGLIB = -L../.. -lpng
@@ -52,8 +52,10 @@ WLIBS = $(PNGLIB) $(ZLIB)
 CC = cc
 LD = cc
 RM = rm -f
-CFLAGS = -O -fullwarn $(INCS)
-LDFLAGS =
+# ABI must be the same as that used to build libpng.
+ABI=
+CFLAGS = $(ABI) -O -fullwarn $(INCS)
+LDFLAGS = $(ABI)
 O = .o
 E =
 

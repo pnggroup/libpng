@@ -1,9 +1,9 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.15 - October 3, 2002
+ libpng version 1.0.16 - August 15, 2004
  Updated and distributed by Glenn Randers-Pehrson
- <randeg@alum.rpi.edu>
- Copyright (c) 1998-2002 Glenn Randers-Pehrson
+ <glennrp@users.sourceforge.net>
+ Copyright (c) 1998-2004 Glenn Randers-Pehrson
  For conditions of distribution and use, see copyright
  notice in png.h.
 
@@ -308,23 +308,31 @@ behavior is that known chunks will be parsed into information in
 various info_ptr members; unknown chunks will be discarded. To change
 this, you can call:
 
-    png_set_keep_unknown_chunks(png_ptr, info_ptr, keep,
+    png_set_keep_unknown_chunks(png_ptr, keep,
         chunk_list, num_chunks);
-    keep       - 0: do not keep
-                 1: keep only if safe-to-copy
-                 2: keep even if unsafe-to-copy
+    keep       - 0: do not handle as unknown
+                 1: do not keep
+                 2: keep only if safe-to-copy
+                 3: keep even if unsafe-to-copy
+               You can use these definitions:
+                 PNG_HANDLE_CHUNK_AS_DEFAULT   0
+                 PNG_HANDLE_CHUNK_NEVER        1
+                 PNG_HANDLE_CHUNK_IF_SAFE      2
+                 PNG_HANDLE_CHUNK_ALWAYS       3
     chunk_list - list of chunks affected (a byte string,
                  five bytes per chunk, NULL or '\0' if
                  num_chunks is 0)
     num_chunks - number of chunks affected; if 0, all
-                 unknown chunks are affected
+                 unknown chunks are affected.  If nonzero,
+                 only the chunks in the list are affected
 
 Unknown chunks declared in this way will be saved as raw data onto a
 list of png_unknown_chunk structures.  If a chunk that is normally
 known to libpng is named in the list, it will be handled as unknown,
 according to the "keep" directive.  If a chunk is named in successive
 instances of png_set_keep_unknown_chunks(), the final instance will
-take precedence.
+take precedence.  The IHDR and IEND chunks should not be named in
+chunk_list; if they are, libpng will process them normally anyway.
 
 The high-level read interface
 
@@ -379,8 +387,14 @@ where row_pointers is an array of pointers to the pixel data for each row:
 If you know your image size and pixel size ahead of time, you can allocate
 row_pointers prior to calling png_read_png() with
 
+   if (height > PNG_UINT_32_MAX/png_sizeof(png_byte))
+      png_error (png_ptr,
+         "Image is too tall to process in memory");
+   if (width > PNG_UINT_32_MAX/pixel_size)
+      png_error (png_ptr,
+         "Image is too wide to process in memory");
    row_pointers = png_malloc(png_ptr,
-      height*sizeof(png_bytep));
+      height*png_sizeof(png_bytep));
    for (int i=0; i<height, i++)
       row_pointers[i]=png_malloc(png_ptr,
          width*pixel_size);
@@ -2320,9 +2334,9 @@ Your replacement memory functions must have prototypes as follows:
        png_size_t size);
     void free_fn(png_structp png_ptr, png_voidp ptr);
 
-Your malloc_fn() should return NULL in case of failure.  The png_malloc()
-function will call png_error() if it receives a NULL from the system
-memory allocator or from your replacement malloc_fn().
+Your malloc_fn() must return NULL in case of failure.  The png_malloc()
+function will normally call png_error() if it receives a NULL from the
+system memory allocator or from your replacement malloc_fn().
 
 Input/Output in libpng is done through png_read() and png_write(),
 which currently just call fread() and fwrite().  The FILE * is stored in
@@ -2666,7 +2680,7 @@ png_permit_mng_features() function:
         PNG_FLAG_MNG_EMPTY_PLTE
         PNG_FLAG_MNG_FILTER_64
         PNG_ALL_MNG_FEATURES
-   feature_set is a png_byte that is the logical AND of
+   feature_set is a png_uint_32 that is the logical AND of
       your mask with the set of MNG features that is
       supported by the version of libpng that you are using.
 
@@ -2729,13 +2743,13 @@ application:
 
 VII. Y2K Compliance in libpng
 
-October 3, 2002
+August 15, 2004
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.15 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.16 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

@@ -5,7 +5,7 @@
 
 LIBNAME=libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.15
+PNGMIN = 1.0.16
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Where make install puts libpng.a, libpng10.so, and libpng10/png.h
@@ -37,7 +37,7 @@ LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=cc $(ABI) -shared -soname $(LIBNAME).so.$(PNGMAJ) \
   -set_version sgi$(PNGMAJ).0
 LDLEGACY=cc $(ABI) -shared -soname libpng.so.2 \
-  -set_version sgi$2.0
+  -set_version sgi$3.0
 # See "man dso" for info about shared objects
 
 RANLIB=echo
@@ -133,6 +133,7 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	libpng.so.2.$(PNGMIN)
 	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
 	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
+	-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)
 	-@/bin/rm -f $(DL)/libpng.so
 	-@/bin/rm -f $(DL)/libpng.so.2
 	-@/bin/rm -f $(DL)/libpng.so.2.$(PNGMIN)*

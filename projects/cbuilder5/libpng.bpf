@@ -1,7 +1,7 @@
-USELIB("zlibstat.lib");
-USEUNIT("..\..\pngerror.c");
+USEUNIT("libpng.cpp");
 USEUNIT("..\..\png.c");
-USEUNIT("..\..\pngwutil.c");
+USEUNIT("..\..\pngerror.c");
+USEUNIT("..\..\pngget.c");
 USEUNIT("..\..\pngmem.c");
 USEUNIT("..\..\pngpread.c");
 USEUNIT("..\..\pngread.c");
@@ -13,10 +13,10 @@ USEUNIT("..\..\pngtrans.c");
 USEUNIT("..\..\pngwio.c");
 USEUNIT("..\..\pngwrite.c");
 USEUNIT("..\..\pngwtran.c");
-USEUNIT("..\..\pngget.c");
+USEUNIT("..\..\pngwutil.c");
+USELIB("..\..\..\zlib\zlib.lib");
 //---------------------------------------------------------------------------
-#define Library
+This file is used by the project manager only and should be treated like the project file
 
-// To add a file to the library use the Project menu 'Add to Project'.
 
- 
+DllEntryPoint

@@ -11,7 +11,7 @@
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
-    <LIBFILES value="zlib.lib"/>
+    <LIBFILES value="..\..\..\zlib\zlib.lib"/>
     <LIBRARIES value="bcbsmp50.lib dclocx50.lib NMFast50.lib Tee50.lib Vclx50.lib Vcl50.lib"/>
     <SPARELIBS value="Vcl50.lib Vclx50.lib Tee50.lib NMFast50.lib dclocx50.lib bcbsmp50.lib"/>
     <PACKAGES value="Vcl50.bpi Vclx50.bpi bcbsmp50.bpi Qrpt50.bpi Vcldb50.bpi Vclbde50.bpi 
@@ -25,7 +25,7 @@
     <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
     <RELEASELIBPATH value="$(BCB)\lib\release"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="ZLIB_DLL;Z_PREFIX;PNG_BUILD_DLL;PNG_NO_MODULEDEF"/>
+    <USERDEFINES value="PNG_BUILD_DLL;PNG_NO_MODULEDEF"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="libpng.bpf"/>
     <INCLUDEPATH value="..\..;..\..\..\zlib;$(BCB)\include"/>
