@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.5c - November 27, 1999
+ * libpng 1.0.5d - November 29, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -116,7 +116,51 @@ png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
 void
 png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 {
-#include "pngtypes.h"
+#ifdef PNG_USE_LOCAL_ARRAYS
+      PNG_IHDR;
+      PNG_IDAT;
+      PNG_IEND;
+      PNG_PLTE;
+#if defined(PNG_READ_bKGD_SUPPORTED)
+      PNG_bKGD;
+#endif
+#if defined(PNG_READ_cHRM_SUPPORTED)
+      PNG_cHRM;
+#endif
+#if defined(PNG_READ_gAMA_SUPPORTED)
+      PNG_gAMA;
+#endif
+#if defined(PNG_READ_hIST_SUPPORTED)
+      PNG_hIST;
+#endif
+#if defined(PNG_READ_oFFs_SUPPORTED)
+      PNG_oFFs;
+#endif
+#if defined(PNG_READ_pCAL_SUPPORTED)
+      PNG_pCAL;
+#endif
+#if defined(PNG_READ_pHYs_SUPPORTED)
+      PNG_pHYs;
+#endif
+#if defined(PNG_READ_sBIT_SUPPORTED)
+      PNG_sBIT;
+#endif
+#if defined(PNG_READ_sRGB_SUPPORTED)
+      PNG_sRGB;
+#endif
+#if defined(PNG_READ_tEXt_SUPPORTED)
+      PNG_tEXt;
+#endif
+#if defined(PNG_READ_tIME_SUPPORTED)
+      PNG_tIME;
+#endif
+#if defined(PNG_READ_tRNS_SUPPORTED)
+      PNG_tRNS;
+#endif
+#if defined(PNG_READ_zTXt_SUPPORTED)
+      PNG_zTXt;
+#endif
+#endif /* PNG_USE_LOCAL_ARRAYS */
    /* First we make sure we have enough data for the 4 byte chunk name
     * and the 4 byte chunk length before proceeding with decoding the
     * chunk data.  To fully decode each of these chunks, we also make
@@ -497,7 +541,9 @@ png_push_restore_buffer(png_structp png_ptr, png_bytep buffer,
 void
 png_push_read_IDAT(png_structp png_ptr)
 {
-   const png_byte png_IDAT[5] = { 73,  68,  65,  84, '\0'};
+#ifdef PNG_USE_LOCAL_ARRAYS
+   PNG_IDAT;
+#endif
    if (!(png_ptr->mode & PNG_HAVE_CHUNK_HEADER))
    {
       png_byte chunk_length[4];
@@ -769,6 +815,7 @@ png_push_process_row(png_structp png_ptr)
 void
 png_read_push_finish_row(png_structp png_ptr)
 {
+#ifdef PNG_USE_LOCAL_ARRAYS
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    
    /* start of interlace block */
@@ -792,6 +839,7 @@ png_read_push_finish_row(png_structp png_ptr)
     * it, uncomment it here and in png.h
    const int png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
    */
+#endif
    
    png_ptr->row_number++;
    if (png_ptr->row_number < png_ptr->num_rows)
@@ -1141,7 +1189,9 @@ void
 png_progressive_combine_row (png_structp png_ptr,
    png_bytep old_row, png_bytep new_row)
 {
+#ifdef PNG_USE_LOCAL_ARRAYS
    const int png_pass_dsp_mask[7] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
+#endif
    if (new_row != NULL)    /* new_row must == png_ptr->row_buf here. */
       png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);
 }

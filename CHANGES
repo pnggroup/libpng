@@ -491,7 +491,7 @@ version 1.0.5b [November 23, 1999]
   Fixed some typecasting in contrib/gregbook/*.c
   Updated scripts/makevms.com and added makevms.com to contrib/gregbook
     and contrib/pngminus (Martin Zinser)
-version 1.0.5c [November 27, 1999]
+version 1.0.5c [November 26, 1999]
   Moved png_get_header_version from png.h to png.c, to accomodate ansi2knr.
   Removed all global arrays (according to PNG_NO_GLOBAL_ARRAYS macro), to
     accomodate making DLL's: Moved usr_png_ver from global variable to function
@@ -504,3 +504,10 @@ version 1.0.5c [November 27, 1999]
   Removed some extraneous "-I" from contrib/pngminus/makefile.std
   Changed the PNG_sRGB_INTENT macros in png.h to be consistent with PNG-1.2.
   Change PNG_SRGB_INTENT to PNG_sRGB_INTENT in libpng.txt and libpng.3 
+version 1.0.5d [November 29, 1999]
+  Add type cast (png_const_charp) two places in png.c
+  Eliminated pngtypes.h; use macros instead to declare PNG_CHNK arrays.
+  Renamed "PNG_GLOBAL_ARRAYS" to "PNG_USE_GLOBAL_ARRAYS" and made available
+    to applications a macro "PNG_USE_LOCAL_ARRAYS".
+  #ifdef out all the new declarations when PNG_USE_GLOBAL_ARRAYS is defined.
+  Added PNG_EXPORT_VAR macro to accommodate making DLL's.

@@ -1,4 +1,4 @@
-README for libpng 1.0.5c - November 27, 1999 (shared library 2.1)
+README for libpng 1.0.5d - November 29, 1999 (shared library 2.1)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -171,9 +171,9 @@ Files in this distribution:
        makefile.sgi     =>  Silicon Graphics IRIX makefile
        makefile.sunos   =>  Sun makefile
        makefile.solaris =>  Solaris 2.X makefile
-                            (gcc, creates libpng.so.2.1.0.5c)
+                            (gcc, creates libpng.so.2.1.0.5d)
        makefile.linux   =>  Linux/ELF makefile
-                            (gcc, creates libpng.so.2.1.0.5c)
+                            (gcc, creates libpng.so.2.1.0.5d)
        makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc
        makefile.mips    =>  MIPS makefile
        makefile.acorn   =>  Acorn makefile

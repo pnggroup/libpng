@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.5c - November 27, 1999
+ * libpng 1.0.5d - November 29, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -156,7 +156,6 @@ png_read_init(png_structp png_ptr)
 void
 png_read_info(png_structp png_ptr, png_infop info_ptr)
 {
-#include "pngtypes.h"
    png_debug(1, "in png_read_info\n");
    /* save jump buffer and error functions */
    /* If we haven't checked all of the PNG signature bytes, do so now. */
@@ -180,6 +179,51 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 
    for(;;)
    {
+#ifdef PNG_USE_LOCAL_ARRAYS
+      PNG_IHDR;
+      PNG_IDAT;
+      PNG_IEND;
+      PNG_PLTE;
+#if defined(PNG_READ_bKGD_SUPPORTED)
+      PNG_bKGD;
+#endif
+#if defined(PNG_READ_cHRM_SUPPORTED)
+      PNG_cHRM;
+#endif
+#if defined(PNG_READ_gAMA_SUPPORTED)
+      PNG_gAMA;
+#endif
+#if defined(PNG_READ_hIST_SUPPORTED)
+      PNG_hIST;
+#endif
+#if defined(PNG_READ_oFFs_SUPPORTED)
+      PNG_oFFs;
+#endif
+#if defined(PNG_READ_pCAL_SUPPORTED)
+      PNG_pCAL;
+#endif
+#if defined(PNG_READ_pHYs_SUPPORTED)
+      PNG_pHYs;
+#endif
+#if defined(PNG_READ_sBIT_SUPPORTED)
+      PNG_sBIT;
+#endif
+#if defined(PNG_READ_sRGB_SUPPORTED)
+      PNG_sRGB;
+#endif
+#if defined(PNG_READ_tEXt_SUPPORTED)
+      PNG_tEXt;
+#endif
+#if defined(PNG_READ_tIME_SUPPORTED)
+      PNG_tIME;
+#endif
+#if defined(PNG_READ_tRNS_SUPPORTED)
+      PNG_tRNS;
+#endif
+#if defined(PNG_READ_zTXt_SUPPORTED)
+      PNG_zTXt;
+#endif
+#endif /* PNG_GLOBAL_ARRAYS */
       png_byte chunk_length[4];
       png_uint_32 length;
 
@@ -298,9 +342,11 @@ png_start_read_image(png_structp png_ptr)
 void
 png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 {
-   const png_byte png_IDAT[5] = { 73,  68,  65,  84, '\0'};
+#ifdef PNG_USE_LOCAL_ARRAYS
+   PNG_IDAT;
    const int png_pass_dsp_mask[7] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
    const int png_pass_mask[7] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
+#endif
    int ret;
    png_debug2(1, "in png_read_row (row %d, pass %d)\n",
       png_ptr->row_number, png_ptr->pass);
@@ -533,7 +579,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5c.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5d.
  */
 
 void
@@ -582,7 +628,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5c.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5d.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -625,7 +671,6 @@ png_read_image(png_structp png_ptr, png_bytepp image)
 void
 png_read_end(png_structp png_ptr, png_infop info_ptr)
 {
-#include "pngtypes.h"
    png_byte chunk_length[4];
    png_uint_32 length;
 
@@ -635,6 +680,52 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 
    do
    {
+#ifdef PNG_USE_LOCAL_ARRAYS
+      PNG_IHDR;
+      PNG_IDAT;
+      PNG_IEND;
+      PNG_PLTE;
+#if defined(PNG_READ_bKGD_SUPPORTED)
+      PNG_bKGD;
+#endif
+#if defined(PNG_READ_cHRM_SUPPORTED)
+      PNG_cHRM;
+#endif
+#if defined(PNG_READ_gAMA_SUPPORTED)
+      PNG_gAMA;
+#endif
+#if defined(PNG_READ_hIST_SUPPORTED)
+      PNG_hIST;
+#endif
+#if defined(PNG_READ_oFFs_SUPPORTED)
+      PNG_oFFs;
+#endif
+#if defined(PNG_READ_pCAL_SUPPORTED)
+      PNG_pCAL;
+#endif
+#if defined(PNG_READ_pHYs_SUPPORTED)
+      PNG_pHYs;
+#endif
+#if defined(PNG_READ_sBIT_SUPPORTED)
+      PNG_sBIT;
+#endif
+#if defined(PNG_READ_sRGB_SUPPORTED)
+      PNG_sRGB;
+#endif
+#if defined(PNG_READ_tEXt_SUPPORTED)
+      PNG_tEXt;
+#endif
+#if defined(PNG_READ_tIME_SUPPORTED)
+      PNG_tIME;
+#endif
+#if defined(PNG_READ_tRNS_SUPPORTED)
+      PNG_tRNS;
+#endif
+#if defined(PNG_READ_zTXt_SUPPORTED)
+      PNG_zTXt;
+#endif
+#endif /* PNG_GLOBAL_ARRAYS */
+
       png_read_data(png_ptr, chunk_length, 4);
       length = png_get_uint_32(chunk_length);
 

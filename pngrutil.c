@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.5c - November 27, 1999
+ * libpng 1.0.5d - November 29, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1713,10 +1713,12 @@ png_do_read_interlace
    (png_row_infop row_info, png_bytep row, int pass,
    png_uint_32 transformations)
 {
+#ifdef PNG_USE_LOCAL_ARRAYS
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    
    /* offset to next interlace block */
    const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+#endif
    
    png_debug(1,"in png_do_read_interlace\n");
    if (row != NULL && row_info != NULL)
@@ -2056,6 +2058,7 @@ png_read_filter_row
 void
 png_read_finish_row(png_structp png_ptr)
 {
+#ifdef PNG_USE_LOCAL_ARRAYS
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    
    /* start of interlace block */
@@ -2069,6 +2072,7 @@ png_read_finish_row(png_structp png_ptr)
    
    /* offset to next interlace block in the y direction */
    const int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+#endif
    
    png_debug(1, "in png_read_finish_row\n");
    png_ptr->row_number++;
@@ -2110,7 +2114,9 @@ png_read_finish_row(png_structp png_ptr)
 
    if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
    {
-      const png_byte png_IDAT[5] = { 73,  68,  65,  84, '\0'};
+#ifdef PNG_USE_LOCAL_ARRAYS
+      PNG_IDAT;
+#endif
       char extra;
       int ret;
 
@@ -2174,6 +2180,7 @@ png_read_finish_row(png_structp png_ptr)
 void
 png_read_start_row(png_structp png_ptr)
 {
+#ifdef PNG_USE_LOCAL_ARRAYS
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    
    /* start of interlace block */
@@ -2187,6 +2194,7 @@ png_read_start_row(png_structp png_ptr)
    
    /* offset to next interlace block in the y direction */
    const int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+#endif
    
    int max_pixel_depth;
    png_uint_32 row_bytes;

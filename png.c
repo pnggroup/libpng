@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.5c - November 27, 1999
+ * libpng version 1.0.5d - November 29, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -16,39 +16,32 @@
  * string defined in png.h.
  */
 
-#ifdef PNG_GLOBAL_ARRAYS
+#ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.5c";
+char png_libpng_ver[12] = "1.0.5d";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
 png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
  
-/* This was moved to pngtypes.h and other places in version 1.0.5c.
- * It was nicer having them all in one place, but it interfered with
- * people building DLL's. */
-
-/* Constant strings for known chunk types.  If you need to add a chunk,
- * add a string holding the name here.  If you want to make the code
- * portable to EBCDIC machines, use ASCII numbers, not characters.
- */
-png_byte FARDATA png_IHDR[5] = { 73,  72,  68,  82, '\0'};
-png_byte FARDATA png_IDAT[5] = { 73,  68,  65,  84, '\0'};
-png_byte FARDATA png_IEND[5] = { 73,  69,  78,  68, '\0'};
-png_byte FARDATA png_PLTE[5] = { 80,  76,  84,  69, '\0'};
-png_byte FARDATA png_bKGD[5] = { 98,  75,  71,  68, '\0'};
-png_byte FARDATA png_cHRM[5] = { 99,  72,  82,  77, '\0'};
-png_byte FARDATA png_gAMA[5] = {103,  65,  77,  65, '\0'};
-png_byte FARDATA png_hIST[5] = {104,  73,  83,  84, '\0'};
-png_byte FARDATA png_oFFs[5] = {111,  70,  70, 115, '\0'};
-png_byte FARDATA png_pCAL[5] = {112,  67,  65,  76, '\0'};
-png_byte FARDATA png_pHYs[5] = {112,  72,  89, 115, '\0'};
-png_byte FARDATA png_sBIT[5] = {115,  66,  73,  84, '\0'};
-png_byte FARDATA png_sRGB[5] = {115,  82,  71,  66, '\0'};
-png_byte FARDATA png_tEXt[5] = {116,  69,  88, 116, '\0'};
-png_byte FARDATA png_tIME[5] = {116,  73,  77,  69, '\0'};
-png_byte FARDATA png_tRNS[5] = {116,  82,  78,  83, '\0'};
-png_byte FARDATA png_zTXt[5] = {122,  84,  88, 116, '\0'};
+/* Invoke global declarations for constant strings for known chunk types */
+PNG_IHDR;
+PNG_IDAT;
+PNG_IEND;
+PNG_PLTE;
+PNG_bKGD;
+PNG_cHRM;
+PNG_gAMA;
+PNG_hIST;
+PNG_oFFs;
+PNG_pCAL;
+PNG_pHYs;
+PNG_sBIT;
+PNG_sRGB;
+PNG_tEXt;
+PNG_tIME;
+PNG_tRNS;
+PNG_zTXt;
 
 /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
@@ -370,15 +363,15 @@ png_sig_bytes(png_structp png_ptr)
 {
    const png_byte png_sig_numbers[9] = {137, 80, 78, 71, 13, 10, 26, 10, 0};
    if (png_ptr == NULL) /* silence compiler warning */
-     return ((png_bytep) strdup(png_sig_numbers));
-   return ((png_bytep) strdup(png_sig_numbers));
+     return ((png_bytep) strdup((png_const_charp)png_sig_numbers));
+   return ((png_bytep) strdup((png_const_charp)png_sig_numbers));
 }
 
 png_charp
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.5c - November 27, 1999\n\
+   return ("\n libpng version 1.0.5d - November 29, 1999\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999 Glenn Randers-Pehrson\n");
@@ -396,8 +389,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.5c");
-   return("1.0.5c");
+      return("1.0.5d");
+   return("1.0.5d");
 }
 
 png_charp
@@ -421,8 +414,8 @@ png_get_header_version(png_structp png_ptr)
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_version
-   (version_1_0_5c png_h_is_not_version_1_0_5c)
+   (version_1_0_5d png_h_is_not_version_1_0_5d)
 {
-   if(png_h_is_not_version_1_0_5c == NULL)
+   if(png_h_is_not_version_1_0_5d == NULL)
      return;
 }

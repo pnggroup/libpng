@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.5c - November 27, 1999
+ libpng version 1.0.5d - November 29, 1999
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -1805,7 +1805,7 @@ a first level of understanding of how it works.  Pay particular attention
 to the sections that describe chunk names, and look at how other chunks
 were designed, so you can do things similarly.  Second, check out the
 sections of libpng that read and write chunks.  Try to find a chunk that
-is similar to yours and copy off of it.  More details can be found in the
+is similar to yours and use it as a template.  More details can be found in the
 comments inside the code.  A way of handling unknown chunks in a generic
 method, potentially via callback functions, would be best.
 
@@ -2066,13 +2066,13 @@ the old method.
 
 VII. Y2K Compliance in libpng
 
-November 27, 1999
+November 29, 1999
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.5c are Y2K compliant.  It is my belief that earlier
+upward through 1.0.5d are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

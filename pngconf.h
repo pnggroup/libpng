@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.5c - November 27, 1999
+ * libpng 1.0.5d - November 29, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -422,8 +422,10 @@ __dont__ include it again
  * They are no longer used in libpng itself, since version 1.0.5c,
  * but might be required for some pre-1.0.5c applications.
  */
-#ifndef PNG_NO_GLOBAL_ARRAYS
-#define PNG_GLOBAL_ARRAYS
+#ifdef PNG_NO_GLOBAL_ARRAYS
+#define PNG_USE_LOCAL_ARRAYS
+#else
+#define PNG_USE_GLOBAL_ARRAYS
 #endif
 
 /* These are currently experimental features, define them if you want */
@@ -692,6 +694,28 @@ typedef z_stream FAR *  png_zstreamp;
 #  define PNG_EXPORT(type,symbol) type symbol
 #endif
 
+#if defined(__MINGW32__) || defined(__CYGWIN32__)
+#  define PNG_ATTR_DLLIMP
+#endif
+
+#ifndef PNG_EXPORT_VAR
+#  ifdef PNG_DECL_DLLEXP
+#    define PNG_EXPORT_VAR(type) extern __declspec(dllexport) type
+#  endif
+#  ifdef PNG_ATTR_DLLEXP
+#    define PNG_EXPORT_VAR(type) extern type __attribute__((dllexport)) 
+#  endif
+#  ifdef PNG_DECL_DLLIMP
+#    define PNG_EXPORT_VAR(type) extern __declspec(dllimport) type
+#  endif
+#  ifdef PNG_ATTR_DLLIMP
+#    define PNG_EXPORT_VAR(type) extern type __attribute__((dllimport))
+#  endif
+#endif
+
+#ifndef PNG_EXPORT_VAR
+#    define PNG_EXPORT_VAR(type) extern type
+#endif
 
 /* User may want to use these so not in PNG_INTERNAL. Any library functions
  * that are passed far data must be model independent.

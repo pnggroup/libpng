@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.5c - November 27, 1999
+ * libpng version 1.0.5d - November 29, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -9,19 +9,19 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.5c - November 27, 1999: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.5d - November 29, 1999: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
  *    
- *    November 27, 1999
+ *    November 29, 1999
  *    
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *    
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.5c are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.5d are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *    
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -122,7 +122,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.5c, November 27, 1999)
+ * (libpng versions 0.97, January 1998, through 1.0.5d, November 29, 1999)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -222,7 +222,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.5c"
+#define PNG_LIBPNG_VER_STRING "1.0.5d"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -238,24 +238,24 @@ extern "C" {
 /* Version information for C files, stored in png.c.  This had better match
  * the version above.
  */
-#ifdef PNG_GLOBAL_ARRAYS
-extern char png_libpng_ver[12];   /* need room for 99.99.99aa */
+#ifdef PNG_USE_GLOBAL_ARRAYS
+PNG_EXPORT_VAR (char) png_libpng_ver[12];   /* need room for 99.99.99aa */
 #else
 #define png_libpng_ver png_get_header_ver(NULL)
 #endif
 
-#ifdef PNG_GLOBAL_ARRAYS
+#ifdef PNG_USE_GLOBAL_ARRAYS
 /* This was removed in version 1.0.5c */
 /* Structures to facilitate easy interlacing.  See png.c for more details */
-extern int FARDATA png_pass_start[7];
-extern int FARDATA png_pass_inc[7];
-extern int FARDATA png_pass_ystart[7];
-extern int FARDATA png_pass_yinc[7];
-extern int FARDATA png_pass_mask[7];
-extern int FARDATA png_pass_dsp_mask[7];
+PNG_EXPORT_VAR (int FARDATA) png_pass_start[7];
+PNG_EXPORT_VAR (int FARDATA) png_pass_inc[7];
+PNG_EXPORT_VAR (int FARDATA) png_pass_ystart[7];
+PNG_EXPORT_VAR (int FARDATA) png_pass_yinc[7];
+PNG_EXPORT_VAR (int FARDATA) png_pass_mask[7];
+PNG_EXPORT_VAR (int FARDATA) png_pass_dsp_mask[7];
 /* These aren't currently used.  If you need them, see png.c for more details
-extern int FARDATA png_pass_width[7];
-extern int FARDATA png_pass_height[7];
+PNG_EXPORT_VAR (int FARDATA) png_pass_width[7];
+PNG_EXPORT_VAR (int FARDATA) png_pass_height[7];
 */
 #endif
 
@@ -827,9 +827,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.5c
+and png.h are both at * version 1.0.5d
  */
-typedef png_structp version_1_0_5c;
+typedef png_structp version_1_0_5d;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1649,7 +1649,7 @@ extern PNG_EXPORT(png_charp,png_get_header_ver) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
-#define PNG_HEADER_VERSION_STRING " libpng version 1.0.5c - November 27, 1999 (header)\n"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.0.5d - November 29, 1999 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -1798,36 +1798,53 @@ extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 /* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
 /* place to hold the signature string for a PNG file. */
-#ifdef PNG_GLOBAL_ARRAYS
-   extern png_byte FARDATA png_sig[8];
+#ifdef PNG_USE_GLOBAL_ARRAYS
+   PNG_EXPORT_VAR (png_byte FARDATA) png_sig[8];
 #else
 #define png_sig png_sig_bytes(NULL)
 #endif
 
-#ifdef PNG_GLOBAL_ARRAYS
 /* Constant strings for known chunk types.  If you need to add a chunk,
- * add a string holding the name here.  See png.c for more details.  We
- * can't selectively include these, since we still check for chunk in the
- * wrong locations with these labels.
+ * define the name here, and add an invocation of the macro in png.c and
+ * wherever it's needed.
  */
-extern png_byte FARDATA png_IHDR[5];
-extern png_byte FARDATA png_IDAT[5];
-extern png_byte FARDATA png_IEND[5];
-extern png_byte FARDATA png_PLTE[5];
-extern png_byte FARDATA png_bKGD[5];
-extern png_byte FARDATA png_cHRM[5];
-extern png_byte FARDATA png_gAMA[5];
-extern png_byte FARDATA png_hIST[5];
-extern png_byte FARDATA png_oFFs[5];
-extern png_byte FARDATA png_pCAL[5];
-extern png_byte FARDATA png_pHYs[5];
-extern png_byte FARDATA png_sBIT[5];
-extern png_byte FARDATA png_sRGB[5];
-extern png_byte FARDATA png_tEXt[5];
-extern png_byte FARDATA png_tIME[5];
-extern png_byte FARDATA png_tRNS[5];
-extern png_byte FARDATA png_zTXt[5];
-#endif /* PNG_GLOBAL_ARRAYS */
+#define PNG_IHDR const png_byte png_IHDR[5] = { 73,  72,  68,  82, '\0'}
+#define PNG_IDAT const png_byte png_IDAT[5] = { 73,  68,  65,  84, '\0'}
+#define PNG_IEND const png_byte png_IEND[5] = { 73,  69,  78,  68, '\0'}
+#define PNG_PLTE const png_byte png_PLTE[5] = { 80,  76,  84,  69, '\0'}
+#define PNG_bKGD const png_byte png_bKGD[5] = { 98,  75,  71,  68, '\0'}
+#define PNG_cHRM const png_byte png_cHRM[5] = { 99,  72,  82,  77, '\0'}
+#define PNG_gAMA const png_byte png_gAMA[5] = {103,  65,  77,  65, '\0'}
+#define PNG_hIST const png_byte png_hIST[5] = {104,  73,  83,  84, '\0'}
+#define PNG_oFFs const png_byte png_oFFs[5] = {111,  70,  70, 115, '\0'}
+#define PNG_pCAL const png_byte png_pCAL[5] = {112,  67,  65,  76, '\0'}
+#define PNG_pHYs const png_byte png_pHYs[5] = {112,  72,  89, 115, '\0'}
+#define PNG_sBIT const png_byte png_sBIT[5] = {115,  66,  73,  84, '\0'}
+#define PNG_sRGB const png_byte png_sRGB[5] = {115,  82,  71,  66, '\0'}
+#define PNG_tEXt const png_byte png_tEXt[5] = {116,  69,  88, 116, '\0'}
+#define PNG_tIME const png_byte png_tIME[5] = {116,  73,  77,  69, '\0'}
+#define PNG_tRNS const png_byte png_tRNS[5] = {116,  82,  78,  83, '\0'}
+#define PNG_zTXt const png_byte png_zTXt[5] = {122,  84,  88, 116, '\0'}
+
+#ifdef PNG_USE_GLOBAL_ARRAYS
+PNG_EXPORT_VAR (const png_byte FARDATA) png_IHDR[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_IDAT[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_IEND[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_PLTE[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_bKGD[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_cHRM[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_gAMA[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_hIST[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_oFFs[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_pCAL[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_pHYs[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_sBIT[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_sRGB[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_tEXt[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_tIME[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_tRNS[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_zTXt[5];
+#endif /* PNG_USE_GLOBAL_ARRAYS */
 
 #endif /* PNG_NO_EXTERN */
 
