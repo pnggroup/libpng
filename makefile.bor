@@ -74,7 +74,8 @@ OBJS = \
  pngerror.$(O) \
  pngmem.$(O) \
  pngpread.$(O) \
- pngrcb.$(O) \
+ pngset.$(O) \
+ pngget.$(O) \
  pngread.$(O) \
  pngrio.$(O) \
  pngrtran.$(O) \
@@ -91,7 +92,8 @@ LIBOBJS = \
  +pngmem.$(O) \
  +pngpread.$(O) \
  +pngread.$(O) \
- +pngrcb.$(O) \
+ +pngset.$(O) \
+ +pngget.$(O) \
  +pngrio.$(O) \
  +pngrtran.$(O) \
  +pngrutil.$(O) \
@@ -126,7 +128,8 @@ test:
 ## Minor Targets
 
 png.obj: png.c
-pngrcb.obj: pngrcb.c
+pngset.obj: pngset.c
+pngget.obj: pngget.c
 pngread.obj: pngread.c
 pngpread.obj: pngpread.c
 pngrtran.obj: pngrtran.c

@@ -3,21 +3,32 @@
 # For conditions of distribution and use, see copyright notice in png.h
 
 CC=gcc
-CFLAGS=-I../zlib -Wall -Wwrite-strings -Wpointer-arith \
-       -Wstrict-prototypes -Wmissing-prototypes -O2 -fPIC
-LDFLAGS=-L. -Wl,-rpath,. -L../zlib/ -Wl,-rpath,../zlib/ -lpng -lz -lm
+
+# Where the zlib library and include files are located
+#ZLIBLIB=/usr/local/lib
+#ZLIBINC=/usr/local/include
+ZLIBLIB=../zlib
+ZLIBINC=../zlib
+
+WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
+         -Wmissing-declarations -Wtraditional -Wcast-align \
+         -Wstrict-prototypes -Wmissing-prototypes #-Wconversion
+CFLAGS=-I$(ZLIBINC) -Wall -O2 -fPIC # $(WARNMORE) # -g -DPNG_DEBUG=3
+LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 90
+PNGMIN = 96
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # where make install puts libpng.a, libpng.so*, and png.h
 prefix=/usr/local
+INCPATH=$(prefix)/include
+LIBPATH=$(prefix)/lib
 
-OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o \
+OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
        pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
        pngwtran.o pngmem.o pngerror.o pngpread.o
 
@@ -37,22 +48,19 @@ libpng.so.$(PNGVER): $(OBJS)
 	gcc -shared -Wl,-soname,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) $(OBJS)
 
 pngtest: pngtest.o libpng.so
-	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+	$(CC) -o pngtest pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
 install: libpng.so.$(PNGVER)
-	-@mkdir $(prefix)/include
-	-@mkdir $(prefix)/lib
-	cp png.h $(prefix)/include
-	cp pngconf.h $(prefix)/include
-	chmod 644 $(prefix)/include/png.h
-	chmod 644 $(prefix)/include/pngconf.h
-	cp libpng.so.$(PNGVER) $(prefix)/lib
-	chmod 755 $(prefix)/lib/libpng.so.$(PNGVER)
-	-@/bin/rm $(prefix)/lib/libpng.so.$(PNGMAJ) $(prefix)/lib/libpng.so
-	(cd $(prefix)/lib; ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
+	-@mkdir $(INCPATH) $(LIBPATH)
+	cp png.h pngconf.h $(INCPATH)
+	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	cp libpng.so.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
+	-@/bin/rm $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
+	(cd $(LIBPATH); ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
 	 ln -sf libpng.so.$(PNGMAJ) libpng.so)
 
 clean:
@@ -65,7 +73,8 @@ pngerror.o: png.h pngconf.h
 pngrio.o: png.h pngconf.h
 pngwio.o: png.h pngconf.h
 pngmem.o: png.h pngconf.h
-pngrcb.o: png.h pngconf.h
+pngset.o: png.h pngconf.h
+pngget.o: png.h pngconf.h
 pngread.o: png.h pngconf.h
 pngrtran.o: png.h pngconf.h
 pngrutil.o: png.h pngconf.h

@@ -1,55 +1,54 @@
-readme.txt - for libpng 0.90
+README for libpng 0.96
 
-This is the fourth beta version of libpng 1.0.  The changes from
-libpng-0.89 include bug fixes, a C++ wrapper for png.h, some
-additions to the API, as well as internal changes to the library.
+This is the sixth (and hopefully last) beta release of libpng 1.0.
+The changes from libpng-0.90 include bug fixes, a C++ wrapper for
+png.h, some additions to the API, as well as internal changes to
+the library.  See "CHANGES" for a detailed list of differences.
 
-**
-Note that some of the changes to the png_info structure render
-this version of the library binary incompatible with libpng-0.89
-if you are using a shared library.  Re-compiling the application
-should be enough to remove this problem.
-**
+****
+Note that some of the changes to the png_info structure render this
+version of the library binary incompatible with libpng-0.89 or
+earlier versions if you are using a shared library.  The type of the
+"filler" parameter for png_set_filler() has changed from png_byte to
+png_uint_32, which will affect shared-library applications which use
+this function.
 
-The additions to 0.89 include the ability to read from a PNG stream
-which has had some (or all) of the signature bytes read by the
-calling application.  This also allows the reading of embedded PNG
-streams that do not have the PNG file signature.  As well, it is
-now possible to set the library action on the detection of chunk
-CRC errors.  It is possible to set different actions based on
-whether the error occurred in a critical or an ancillary chunk.
+To avoid problems with changes to the internals of png_info_struct,
+new APIs have been made available in 0.95 to avoid direct application
+access to info_ptr.  These functions are the png_set_<chunk> and
+png_get_<chunk> functions.  These functions should be used when
+accessing/storing the info_struct data, rather than manipulating it
+directly, to avoid such problems in the future.
+****
 
-The callback functions for the error/warning messages have changed
-since the 0.88 release because their implementation was broken,
-and it was thought best to change the API itself (which was only
-introduced in libpng-0.88 itself) to alert the user to the change,
-rather than mislead the user into thinking their application was
-OK after re-compiling.  This means that calls to png_set_message_fn()
-no longer exist, because the previously suggested method of calling
-them before png_read_init() or png_write_init() is now ineffective.
+Additions since 0.90 include the ability to compile libpng as a
+Windows DLL, and new APIs for accessing data in the info struct.
+Experimental functions include the ability to set weighting and cost
+factors for row filter selection, direct reads of integers from buffers
+on big-endian processors that support misaligned data access, faster
+methods of doing alpha composition, and more accurate 16->8 bit color
+conversion.
 
-The preferred method of setting the error and warning callbacks
-has been incorporated into the allocation of the png_struct and
-info_struct itself, which allow them to be safely used during the
-initialization of the structure, as well as to keep the size of
-the png_struct internal to the library, rather than at compile time
-of the application.  This will hopefully remove any problems with
-dynamically linked libraries, and should be considered the preferred
-method of creating these structures, although the previous
-initialization API is still available for compatibility.  See libpng.txt
-for more information on the new API.
+The additions since 0.89 include the ability to read from a PNG stream
+which has had some (or all) of the signature bytes read by the calling
+application.  This also allows the reading of embedded PNG streams that
+do not have the PNG file signature.  As well, it is now possible to set
+the library action on the detection of chunk CRC errors.  It is possible
+to set different actions based on whether the CRC error occurred in a
+critical or an ancillary chunk.
 
 The changes made to the library, and bugs fixed are based on discussions
 on the PNG implementation mailing list <png-implement@dworking.wustl.edu>
 and not on material submitted to Guy.
 
 For a detailed description on using libpng, read libpng.txt.  For
-usage information and restrictions (what little they are) on libpng,
-see png.h.  For a description on using zlib (the compression library
-used by libpng) and zlib's restrictions, see zlib.h
+examples of libpng in a program, see example.c and pngtest.c.  For usage
+information and restrictions (what little they are) on libpng, see
+png.h.  For a description on using zlib (the compression library used by
+libpng) and zlib's restrictions, see zlib.h
 
-I have included a general makefile, as well as several machine and compiler
-specific ones, but you may have to modify one for your own needs.
+I have included a general makefile, as well as several machine and
+compiler specific ones, but you may have to modify one for your own needs.
 
 You should use zlib 1.0.4 or later to run this, but it MAY work with
 versions as old as zlib 0.95.  Even so, there are bugs in older zlib
@@ -113,7 +112,7 @@ gladly listen.  Even if your suggestion is not used for version
 
 Files in this distribution:
 
-      CHANGES.txt   =>  Description of changes between libpng versions
+      CHANGES       =>  Description of changes between libpng versions
       README        =>  This file
       TODO          =>  Things not implemented in the current library
       ansi2knr.c    =>  Converts files to K&R style function declarations
@@ -121,7 +120,7 @@ Files in this distribution:
       descrip.mms   =>  VMS project file
       example.c     =>  Example code for using libpng functions
       libpng.txt    =>  Description of libpng and its functions
-      makefile      =>  Defualt makefile
+      makefile      =>  Default Unixish makefile
       makefile.aco  =>  ACORN makefile
       makefile.ama  =>  Amiga makefile
       makefile.atr  =>  Atari makefile
@@ -140,11 +139,11 @@ Files in this distribution:
       pngerror.c    =>  Error/warning message I/O functions
       pngmem.c      =>  Memory handling functions
       pngpread.c    =>  Progressive reading functions
-      pngrcb.c      =>  Read callback (data handling) low-level functions
       pngread.c     =>  Read data/helper high-level functions
       pngrio.c      =>  Lowest-level data read I/O functions
       pngrtran.c    =>  Read data transformation functions
       pngrutil.c    =>  Read data utility functions
+      pngset.c      =>  Functions for storing data into the info_struct
       pngtest.c     =>  Library test program
       pngtest.png   =>  Library test sample image
       pngtrans.c    =>  Common data transformation functions
@@ -156,13 +155,12 @@ Files in this distribution:
 Good luck, and happy coding.
 
 -Andreas Eric Dilger
- University of Calgary
  Internet: adilger@enel.ucalgary.ca
- Web: www-mddsp.enel.ucalgary.ca/People/adilger/
+ Web: http://www-mddsp.enel.ucalgary.ca/People/adilger/
 
 -Guy Eric Schalnat
  Group 42, Inc.
  Internet: schalnat@group42.com
  CompuServe: 75501,1625
- Web: www.group42.com
+ Web: http://www.group42.com/
 

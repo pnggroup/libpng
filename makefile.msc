@@ -16,15 +16,19 @@ O=.obj
 ERRFILE= >> pngerrs
 
 # variables
-OBJS1 = png$(O) pngrcb$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O) pngmem$(O) pngpread$(O)
-OBJS2 = pngread$(O) pngerror$(O) pngwrite$(O) pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
+OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O)
+OBJS2 = pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O)
+OBJS3 = pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
 
 all: libpng.lib
 
 png$(O): png.h pngconf.h
 		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngrcb$(O): png.h pngconf.h
+pngset$(O): png.h pngconf.h
+        $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+pngget$(O): png.h pngconf.h
         $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngread$(O): png.h pngconf.h
@@ -66,10 +70,11 @@ pngwtran$(O): png.h pngconf.h
 pngwutil$(O): png.h pngconf.h
         $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-libpng.lib: $(OBJS1) $(OBJS2)
+libpng.lib: $(OBJS1) $(OBJS2) $(OBJS3)
         del libpng.lib
 	lib libpng $(OBJS1);
 	lib libpng $(OBJS2);
+	lib libpng $(OBJS3);
 
 pngtest.exe: pngtest.obj libpng.lib 
 	$(LD) $(LDFLAGS) pngtest.obj,,,libpng.lib ..\zlib\zlib.lib ;

@@ -10,7 +10,7 @@ LDFLAGS=-lpng -lz -lm
 
 # where make install puts libpng.a and png.h
 
-OBJS = $(LBR)(png.o) $(LBR)(pngrcb.o) $(LBR)(pngrutil.o)\
+OBJS = $(LBR)(png.o) $(LBR)(pngset.o) $(LBR)(pngget.o) $(LBR)(pngrutil.o)\
 	$(LBR)(pngtrans.o) $(LBR)(pngwutil.o)\
 	$(LBR)(pngread.o) $(LBR)(pngerror.o) $(LBR)(pngwrite.o)\
 	$(LBR)(pngrtran.o) $(LBR)(pngwtran.o)\

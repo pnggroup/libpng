@@ -1,10 +1,11 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
 
-   libpng 1.0 beta 4 - version 0.90
+   libpng 1.0 beta 6 - version 0.96
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1997
+   Copyright (c) 1996, 1997 Andreas Dilger
+   May 12, 1997
 
    This file provides a location for all error handling.  Users which
    need special error handling are expected to write replacement functions
@@ -26,7 +27,7 @@ static void png_default_warning PNGARG((png_structp png_ptr,
 void
 png_error(png_structp png_ptr, png_const_charp message)
 {
-   if (png_ptr->error_fn)
+   if (png_ptr->error_fn != NULL)
       (*(png_ptr->error_fn))(png_ptr, message);
 
    /* if the following returns or doesn't exist, use the default function,
@@ -41,7 +42,7 @@ png_error(png_structp png_ptr, png_const_charp message)
 void
 png_warning(png_structp png_ptr, png_const_charp message)
 {
-   if (png_ptr->warning_fn)
+   if (png_ptr->warning_fn != NULL)
       (*(png_ptr->warning_fn))(png_ptr, message);
    else
       png_default_warning(png_ptr, message);
@@ -76,7 +77,7 @@ png_default_error(png_structp png_ptr, png_const_charp message)
 static void
 png_default_warning(png_structp png_ptr, png_const_charp message)
 {
-   if (!png_ptr)
+   if (png_ptr == NULL)
       return;
 
 #ifndef PNG_NO_STDIO

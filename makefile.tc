@@ -13,17 +13,22 @@ LDFLAGS=$(MODEL)
 O=.obj
 
 # variables
-OBJS1 = png$(O) pngrcb$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O) pngmem$(O) pngpread$(O)
-OBJS2 = pngread$(O) pngerror$(O) pngwrite$(O) pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
-OBJSL1 = +png$(O) +pngrcb$(O) +pngrutil$(O) +pngtrans$(O) +pngwutil$(O) +pngmem$(O) +pngpread$(O)
-OBJSL2 = +pngread$(O) +pngerror$(O) +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O) +pngwio$(O)
+OBJS1 = png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O)
+OBJS2 = pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O)
+OBJS3 = pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
+OBJSL1 = +png$(O) +pngset$(O) +pngget$(O) +pngrutil$(O) +pngtrans$(O)
+OBJSL2 = +pngwutil$(O) +pngmem$(O) +pngpread$(O) +pngread$(O) +pngerror$(O)
+OBJSL3 = +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O) +pngwio$(O)
 
 all: libpng.lib
 
 png$(O): png.h pngconf.h
 		  $(CC) -c $(CFLAGS) $*.c
 
-pngrcb$(O): png.h pngconf.h
+pngset$(O): png.h pngconf.h
+		  $(CC) -c $(CFLAGS) $*.c
+
+pngget$(O): png.h pngconf.h
 		  $(CC) -c $(CFLAGS) $*.c
 
 pngread$(O): png.h pngconf.h
@@ -65,8 +70,9 @@ pngwtran$(O): png.h pngconf.h
 pngwutil$(O): png.h pngconf.h
         $(CC) -c $(CFLAGS) $*.c
 
-libpng.lib: $(OBJS1) $(OBJS2)
+libpng.lib: $(OBJS1) $(OBJS2) $(OBJS3)
         $(LIB) libpng +$(OBJSL1)
         $(LIB) libpng +$(OBJSL2)
+        $(LIB) libpng +$(OBJSL3)
 
 # End of makefile for libpng

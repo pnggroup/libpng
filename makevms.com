@@ -38,8 +38,10 @@ $   CALL MAKE png.OBJ "cc ''CCOPT' png" -
                 png.c png.h pngconf.h   
 $   CALL MAKE pngpread.OBJ "cc ''CCOPT' pngpread" -
 					 pngpread.c png.h pngconf.h
-$   CALL MAKE pngrcb.OBJ "cc ''CCOPT' pngrcb" -
-                pngrcb.c png.h pngconf.h
+$   CALL MAKE pngset.OBJ "cc ''CCOPT' pngset" -
+                pngset.c png.h pngconf.h
+$   CALL MAKE pngget.OBJ "cc ''CCOPT' pngget" -
+                pngget.c png.h pngconf.h
 $   CALL MAKE pngread.OBJ "cc ''CCOPT' pngread" -
                 pngread.c png.h pngconf.h
 $   CALL MAKE pngpread.OBJ "cc ''CCOPT' pngpread" -

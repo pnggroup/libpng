@@ -1,10 +1,11 @@
 
 /* pngconf.c - machine configurable file for libpng
 
-   libpng 1.0 beta 4 - version 0.90
+   libpng 1.0 beta 6 - version 0.96
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   December 3, 1996
+   Copyright (c) 1996, 1997 Andreas Dilger
+   May 12, 1997
    */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -29,16 +30,16 @@
 
 #define PNG_ZBUF_SIZE 8192
 
-/* If you are running on a machine where you cannot allocate more then
-   64K of memory, uncomment this.  While libpng will not normally need
-   that much memory in a chunk (unless you load up a very large file),
-   zlib needs to know how big of a chunk it can use, and libpng thus
-   makes sure to check any memory allocation to verify it will fit
-   into memory.
-#define PNG_MAX_ALLOC_64K
+/* If you are running on a machine where you cannot allocate more
+   than 64K of memory at once, uncomment this.  While libpng will not
+   normally need that much memory in a chunk (unless you load up a very
+   large file), zlib needs to know how big of a chunk it can use, and
+   libpng thus makes sure to check any memory allocation to verify it
+   will fit into memory.
+#define PNG_MAX_MALLOC_64K
 */
-#ifdef MAXSEG_64K
-#define PNG_MAX_ALLOC_64K
+#if defined(MAXSEG_64K) && !defined(PNG_MAX_MALLOC_64K)
+#define PNG_MAX_MALLOC_64K
 #endif
 
 /* This protects us against compilers which run on a windowing system
@@ -56,12 +57,13 @@
 
 /* This macro protects us against machines that don't have function
    prototypes (ie K&R style headers).  If your compiler does not handle
-   function prototypes, define this macro.  I've always been able to use
-   _NO_PROTO as the indicator, but you may need to drag the empty declaration
-   out in front of here, or change the ifdef to suit your own needs. */
+   function prototypes, define this macro and use the included ansi2knr.
+   I've always been able to use _NO_PROTO as the indicator, but you may
+   need to drag the empty declaration out in front of here, or change the
+   ifdef to suit your own needs. */
 #ifndef PNGARG
 
-#ifdef OF /* Zlib prototype munger */
+#ifdef OF /* zlib prototype munger */
 #define PNGARG(arglist) OF(arglist)
 #else
 
@@ -85,17 +87,16 @@
 #include <sys/types.h>
 #endif
 
-/* need the time information for reading tIME chunks */
-#include <time.h>
-
-/* This is an attempt to force a single setjmp behaviour on Linux */
+/* This is an attempt to force a single setjmp behaviour on Linux.  If
+   the X config stuff didn't define _BSD_SOURCE we wouldn't need this. */
 #ifdef linux
 #ifdef _BSD_SOURCE
 #define _PNG_SAVE_BSD_SOURCE
 #undef _BSD_SOURCE
 #endif
 #ifdef _SETJMP_H
-error: png.h already includes setjmp.h
+#error  __png_h_already_includes_setjmp_h__
+#error  __dont_include_it_again__
 #endif
 #endif /* linux */
 
@@ -115,25 +116,39 @@ error: png.h already includes setjmp.h
 #include <string.h>
 #endif
 
-/* Other defines for things like memory and the like can go here.  These
-   are the only files included in libpng, so if you need to change them,
-   change them here.  They are only included if PNG_INTERNAL is defined. */
+/* Other defines for things like memory and the like can go here.  */
 #ifdef PNG_INTERNAL
 #include <stdlib.h>
+/* Where do we need this???
 #include <ctype.h>
+*/
+
+/* The functions exported by PNG_EXTERN are PNG_INTERNAL functions, which
+ * aren't usually used outside the library (as far as I know), so it is
+ * debatable if they should be exported at all.  In the future, when it is
+ * possible to have run-time registry of chunk-handling functions, some of
+ * these will be made available again.
+#define PNG_EXTERN extern
+ */
+#define PNG_EXTERN
 
 /* Other defines specific to compilers can go here.  Try to keep
    them inside an appropriate ifdef/endif pair for portability */
 
-#ifdef MACOS
+#if defined(MACOS)
+/* We need to check that <math.h> hasn't already been included earlier
+   as it seems it doesn't agree with <fp.h>, yet we should really use
+   <fp.h> if possible. */
+#if !defined(__MATH_H__) && !defined(__MATH_H) && !defined(__cmath__)
 #include <fp.h>
+#endif
 #else
 #include <math.h>
 #endif
 
 /* For some reason, Borland C++ defines memcmp, etc. in mem.h, not
    stdlib.h like it should (I think).  Or perhaps this is a C++
-   feature? */
+   "feature"? */
 #ifdef __TURBOC__
 #include <mem.h>
 #include "alloc.h"
@@ -159,6 +174,10 @@ error: png.h already includes setjmp.h
 
 #define PNG_MAX_GAMMA_8 11
 
+/* This controls how much a difference in gamma we can tolerate before
+   we actually start doing gamma conversion.  */
+#define PNG_GAMMA_THRESHOLD 0.05
+
 #endif /* PNG_INTERNAL */
 
 /* The following uses const char * instead of char * for error
@@ -167,8 +186,7 @@ error: png.h already includes setjmp.h
    normally defined to make configuration easier, as it is not a
    critical part of the code.
    */
-
-#define PNG_USE_CONST
+#undef PNG_USE_CONST
 
 #ifdef PNG_USE_CONST
 #  define PNG_CONST const
@@ -191,12 +209,14 @@ error: png.h already includes setjmp.h
 
 /* Any transformations you will not be using can be undef'ed here */
 #define PNG_PROGRESSIVE_READ_SUPPORTED
+#define PNG_READ_OPT_PLTE_SUPPORTED
 #define PNG_READ_INTERLACING_SUPPORTED
 #define PNG_READ_EXPAND_SUPPORTED
 #define PNG_READ_SHIFT_SUPPORTED
 #define PNG_READ_PACK_SUPPORTED
 #define PNG_READ_BGR_SUPPORTED
 #define PNG_READ_SWAP_SUPPORTED
+#define PNG_READ_PACKSWAP_SUPPORTED
 #define PNG_READ_INVERT_SUPPORTED
 #define PNG_READ_DITHER_SUPPORTED
 #define PNG_READ_BACKGROUND_SUPPORTED
@@ -204,55 +224,79 @@ error: png.h already includes setjmp.h
 #define PNG_READ_FILLER_SUPPORTED
 #define PNG_READ_GAMMA_SUPPORTED
 #define PNG_READ_GRAY_TO_RGB_SUPPORTED
+#define PNG_READ_SWAP_ALPHA_SUPPORTED
+#define PNG_READ_STRIP_ALPHA_SUPPORTED
 
 #define PNG_WRITE_INTERLACING_SUPPORTED
 #define PNG_WRITE_SHIFT_SUPPORTED
 #define PNG_WRITE_PACK_SUPPORTED
 #define PNG_WRITE_BGR_SUPPORTED
 #define PNG_WRITE_SWAP_SUPPORTED
+#define PNG_WRITE_PACKSWAP_SUPPORTED
 #define PNG_WRITE_INVERT_SUPPORTED
-#define PNG_WRITE_FILLER_SUPPORTED
+#define PNG_WRITE_FILLER_SUPPORTED  /* This is the same as WRITE_STRIP_ALPHA */
 #define PNG_WRITE_FLUSH_SUPPORTED
+#define PNG_WRITE_SWAP_ALPHA_SUPPORTED
+#define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+
+/* These are currently experimental features */
+#undef PNG_READ_16_TO_8_ACCURATE_SHIFT_SUPPORTED /* very little testing */
+#undef PNG_READ_COMPOSITE_NODIV_SUPPORTED        /* very little testing */
+
+/* This is only for PowerPC big-endian and 680x0 systems */
+#undef PNG_READ_BIG_ENDIAN_SUPPORTED             /* some testing */
 
 /* These functions are turned off by default, as they will be phased out. */
 #undef  PNG_USE_OWN_CRC
+#undef  PNG_USELESS_TESTS_SUPPORTED
 #undef  PNG_CORRECT_PALETTE_SUPPORTED
 
-/* any chunks you are not interested in, you can undef here.  The
-   ones that allocate memory may be expecially important (hIST,
-   tEXt, zTXt, tRNS) Others will just save time and make png_info
-   smaller.  OPT_PLTE only disables the optional palette in RGB
-   and RGB Alpha images. */
+/* Any chunks you are not interested in, you can undef here.  The
+ * ones that allocate memory may be expecially important (hIST,
+ * tEXt, zTXt, tRNS, pCAL).  Others will just save time and make png_info
+ * a bit smaller.  OPT_PLTE only disables the optional palette in RGB
+ * and RGBA images.
+ */
 
-#define PNG_READ_gAMA_SUPPORTED
-#define PNG_READ_sBIT_SUPPORTED
-#define PNG_READ_cHRM_SUPPORTED
-#define PNG_READ_tRNS_SUPPORTED
 #define PNG_READ_bKGD_SUPPORTED
+#define PNG_READ_cHRM_SUPPORTED
+#define PNG_READ_gAMA_SUPPORTED
 #define PNG_READ_hIST_SUPPORTED
-#define PNG_READ_pHYs_SUPPORTED
 #define PNG_READ_oFFs_SUPPORTED
-#define PNG_READ_tIME_SUPPORTED
+#define PNG_READ_pCAL_SUPPORTED
+#define PNG_READ_pHYs_SUPPORTED
+#define PNG_READ_sBIT_SUPPORTED
 #define PNG_READ_tEXt_SUPPORTED
+#define PNG_READ_tIME_SUPPORTED
+#define PNG_READ_tRNS_SUPPORTED
 #define PNG_READ_zTXt_SUPPORTED
-#define PNG_READ_OPT_PLTE_SUPPORTED
 
-#define PNG_WRITE_gAMA_SUPPORTED
-#define PNG_WRITE_sBIT_SUPPORTED
-#define PNG_WRITE_cHRM_SUPPORTED
-#define PNG_WRITE_tRNS_SUPPORTED
 #define PNG_WRITE_bKGD_SUPPORTED
+#define PNG_WRITE_cHRM_SUPPORTED
+#define PNG_WRITE_gAMA_SUPPORTED
 #define PNG_WRITE_hIST_SUPPORTED
-#define PNG_WRITE_pHYs_SUPPORTED
 #define PNG_WRITE_oFFs_SUPPORTED
-#define PNG_WRITE_tIME_SUPPORTED
+#define PNG_WRITE_pCAL_SUPPORTED
+#define PNG_WRITE_pHYs_SUPPORTED
+#define PNG_WRITE_sBIT_SUPPORTED
 #define PNG_WRITE_tEXt_SUPPORTED
+#define PNG_WRITE_tIME_SUPPORTED
+#define PNG_WRITE_tRNS_SUPPORTED
 #define PNG_WRITE_zTXt_SUPPORTED
 
+/* need the time information for reading tIME chunks */
+#if defined(PNG_READ_tIME_SUPPORTED) || defined(PNG_WRITE_tIME_SUPPORTED)
+#include <time.h>
+#endif
+
 /* Some typedefs to get us started.  These should be safe on most of the
-   common platforms.  The typedefs should be at least as large as the
-   numbers suggest (a png_uint_32 must be at least 32 bits long), but they
-   don't have to be exactly that size. */
+ * common platforms.  The typedefs should be at least as large as the
+ * numbers suggest (a png_uint_32 must be at least 32 bits long), but they
+ * don't have to be exactly that size.  Some compilers dislike passing
+ * unsigned shorts as function parameters, so you may be better off using
+ * unsigned int for png_uint_16.  Likewise, for 64-bit systems, you may
+ * want to have unsigned int for png_uint_32 instead of unsigned long.
+ */
 
 typedef unsigned long png_uint_32;
 typedef long png_int_32;
@@ -264,14 +308,14 @@ typedef unsigned char png_byte;
    change (I'm not sure if you will or not, so I thought I'd be safe) */
 typedef size_t png_size_t;
 
-/* The following is needed for medium model support. It cannot be in the
-   PNG_INTERNAL section. Needs modification for other compilers besides
-   MSC. Model independent support declares all arrays that might be very
-   large using the far keyword. The Zlib version used must also support
-   model independent data. As of version Zlib .95, the necessary changes
-   have been made in Zlib. The USE_FAR_KEYWORD define triggers other
-   changes that are needed. Most of the far keyword changes are hidden
-   inside typedefs with suffix "f". (Tim Wegner) */
+/* The following is needed for medium model support.  It cannot be in the
+ * PNG_INTERNAL section.  Needs modification for other compilers besides
+ * MSC.  Model independent support declares all arrays and pointers to be
+ * large using the far keyword.  The zlib version used must also support
+ * model independent data.  As of version zlib 1.0.4, the necessary changes
+ * have been made in zlib.  The USE_FAR_KEYWORD define triggers other
+ * changes that are needed. (Tim Wegner)
+ */
 
 /* Separate compiler dependencies (problem here is that zlib.h always
    defines FAR. (SJT) */
@@ -319,17 +363,12 @@ typedef size_t png_size_t;
 #   define FAR
 #endif
 
-/* SJT: At this point FAR is always defined */
-
-/* SJT: */
+/* At this point FAR is always defined */
 #ifndef FARDATA
 #define FARDATA
 #endif
 
-/* Not used anymore (as of 0.88), but kept for compatability (for now). */
-typedef unsigned char FAR png_bytef;
-
-/* SJT: Add typedefs for pointers */
+/* Add typedefs for pointers */
 typedef void            FAR * png_voidp;
 typedef png_byte        FAR * png_bytep;
 typedef png_uint_32     FAR * png_uint_32p;
@@ -338,8 +377,9 @@ typedef png_uint_16     FAR * png_uint_16p;
 typedef png_int_16      FAR * png_int_16p;
 typedef PNG_CONST char  FAR * png_const_charp;
 typedef char            FAR * png_charp;
+typedef double          FAR * png_doublep;
 
-/*  SJT: Pointers to pointers; i.e. arrays */
+/* Pointers to pointers; i.e. arrays */
 typedef png_byte        FAR * FAR * png_bytepp;
 typedef png_uint_32     FAR * FAR * png_uint_32pp;
 typedef png_int_32      FAR * FAR * png_int_32pp;
@@ -347,15 +387,28 @@ typedef png_uint_16     FAR * FAR * png_uint_16pp;
 typedef png_int_16      FAR * FAR * png_int_16pp;
 typedef PNG_CONST char  FAR * FAR * png_const_charpp;
 typedef char            FAR * FAR * png_charpp;
+typedef double          FAR * FAR * png_doublepp;
 
+/* Pointers to pointers to pointers; i.e. pointer to array */
+typedef char            FAR * FAR * FAR * png_charppp;
 
-/* SJT: libpng typedefs for types in zlib. If Zlib changes
-   or another compression library is used, then change these.
-   Eliminates need to change all the source files.
-*/
+/* libpng typedefs for types in zlib. If zlib changes
+ * or another compression library is used, then change these.
+ * Eliminates need to change all the source files.
+ */
 typedef charf *         png_zcharp;
 typedef charf * FAR *   png_zcharpp;
 typedef z_stream FAR *  png_zstreamp; 
+
+/* allow for compilation as dll under windows */
+#ifdef __WIN32DLL__
+#define PNG_EXPORT(type,symbol) __declspec(dllexport) type symbol
+#endif
+
+#ifndef PNG_EXPORT
+#define PNG_EXPORT(t,s) t s
+#endif
+
 
 /* User may want to use these so not in PNG_INTERNAL. Any library functions
    that are passed far data must be model independent. */
@@ -366,25 +419,27 @@ typedef z_stream FAR *  png_zstreamp;
 #   define NOCHECK 0
 #   define CVT_PTR(ptr) (far_to_near(png_ptr,ptr,CHECK))
 #   define CVT_PTR_NOCHECK(ptr) (far_to_near(png_ptr,ptr,NOCHECK))
-#   define png_strcpy _fstrcpy
-#   define png_strcat _fstrcat
 #   define png_strlen _fstrlen
-#   define png_strcmp _fstrcmp
 #   define png_memcmp _fmemcmp      /* SJT: added */
 #   define png_memcpy _fmemcpy
 #   define png_memset _fmemset
 #else /* use the usual functions */
 #   define CVT_PTR(ptr)         (ptr)
 #   define CVT_PTR_NOCHECK(ptr) (ptr)
-#   define png_strcpy strcpy
-#   define png_strcat strcat
 #   define png_strlen strlen
-#   define png_strcmp strcmp
 #   define png_memcmp memcmp     /* SJT: added */
 #   define png_memcpy memcpy
 #   define png_memset memset
 #endif
 /* End of memory model independent support */
+
+/* Just a double check that someone hasn't tried to define something
+ * contradictory. 
+ */
+#if (PNG_ZBUF_SIZE > 65536) && defined(PNG_MAX_MALLOC_64K)
+#undef PNG_ZBUF_SIZE
+#define PNG_ZBUF_SIZE 65536
+#endif
 
 #endif /* PNGCONF_H */
 

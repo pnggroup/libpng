@@ -1,10 +1,11 @@
 
 /* pngrio.c - functions for data input
 
-   libpng 1.0 beta 4 - version 0.90
+   libpng 1.0 beta 6 - version 0.96
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1997
+   Copyright (c) 1996, 1997 Andreas Dilger
+   May 12, 1997
 
    This file provides a location for all input.  Users which need
    special handling are expected to write a function which has the same
@@ -20,12 +21,12 @@
    reads from a file pointer.  Note that this routine sometimes gets called
    with very small lengths, so you should implement some kind of simple
    buffering if you are using unbuffered reads.  This should never be asked
-   to read more then 64K on a 16 bit machine.  The cast to png_size_t is
-   there to quiet some compilers */
+   to read more then 64K on a 16 bit machine. */
 void
-png_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
+png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   if (png_ptr->read_data_fn)
+   png_debug1(4,"reading %d bytes\n", length);
+   if (png_ptr->read_data_fn != NULL)
       (*(png_ptr->read_data_fn))(png_ptr, data, length);
    else
       png_error(png_ptr, "Call to NULL read function");
@@ -37,11 +38,16 @@ png_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
 static void
-png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
+png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   png_uint_32 check;
+   png_size_t check;
 
-   check = fread(data, 1, (size_t)length, (FILE *)png_ptr->io_ptr);
+   /* fread() returns 0 on error, so it is OK to store this in a png_size_t
+    * instead of an int, which is what fread() actually returns.
+    */
+   check = (png_size_t)fread(data, (png_size_t)1, length,
+      (FILE *)png_ptr->io_ptr);
+
    if (check != length)
    {
       png_error(png_ptr, "Read Error");
@@ -57,9 +63,9 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 #define MIN(a,b) (a <= b ? a : b)
  
 static void
-png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
+png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   png_uint_32 check;
+   int check;
    png_byte *n_data;
    FILE *io_ptr;
 
@@ -68,18 +74,18 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
    io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)n_data == data)
    {
-      check = fread(n_data, 1, (size_t)length, io_ptr);
+      check = fread(n_data, 1, length, io_ptr);
    }
    else
    {
       png_byte buf[NEAR_BUF_SIZE];
       png_size_t read, remaining, err;
       check = 0;
-      remaining = (png_size_t)length;
+      remaining = length;
       do
       {
          read = MIN(NEAR_BUF_SIZE, remaining);
-         err = fread(buf, 1, read, io_ptr);
+         err = fread(buf, (png_size_t)1, read, io_ptr);
          png_memcpy(data, buf, read); /* copy far buffer to near buffer */
          if(err != read)
             break;
@@ -116,7 +122,7 @@ png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
 {
    png_ptr->io_ptr = io_ptr;
 
-   if (read_data_fn)
+   if (read_data_fn != NULL)
       png_ptr->read_data_fn = read_data_fn;
    else
       png_ptr->read_data_fn = png_default_read_data;

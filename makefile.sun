@@ -2,11 +2,19 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=cc
-CFLAGS=-I../zlib -O
-LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
-# flags for ansi2knr
-ANSI2KNRFLAGS=
+# Where the zlib library and include files are located
+#ZLIBLIB=/usr/local/lib
+#ZLIBINC=/usr/local/include
+ZLIBLIB=../zlib
+ZLIBINC=../zlib
+
+
+WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow -Wconversion \
+         -Wmissing-declarations -Wtraditional -Wcast-align \
+         -Wstrict-prototypes -Wmissing-prototypes
+CC=gcc
+CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) -DPNG_DEBUG=4
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
 RANLIB=ranlib
 #RANLIB=echo
@@ -18,24 +26,14 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: ansi2knr libpng.a pngtest
+all: libpng.a pngtest
 
-# general rule to allow ansi2knr to work
-.c.o:
-	./ansi2knr $*.c T$*.c
-	$(CC) $(CFLAGS) -c T$*.c
-	rm -f T$*.c $*.o
-	mv T$*.o $*.o
-
-ansi2knr: ansi2knr.c
-	$(CC) $(CFLAGS) $(ANSI2KNRFLAGS) -o ansi2knr ansi2knr.c
-
-libpng.a: ansi2knr $(OBJS)
+libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
-pngtest: pngtest.o libpng.a ansi2knr
-	cc -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+pngtest: pngtest.o libpng.a
+	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
@@ -51,7 +49,7 @@ install: libpng.a
 	chmod 644 $(prefix)/lib/libpng.a
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png ansi2knr
+	rm -f *.o libpng.a pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
@@ -63,7 +61,6 @@ pngmem.o: png.h pngconf.h
 pngset.o: png.h pngconf.h
 pngget.o: png.h pngconf.h
 pngread.o: png.h pngconf.h
-pngpread.o: png.h pngconf.h
 pngrtran.o: png.h pngconf.h
 pngrutil.o: png.h pngconf.h
 pngtest.o: png.h pngconf.h
@@ -71,3 +68,5 @@ pngtrans.o: png.h pngconf.h
 pngwrite.o: png.h pngconf.h
 pngwtran.o: png.h pngconf.h
 pngwutil.o: png.h pngconf.h
+pngpread.o: png.h pngconf.h
+

@@ -1,10 +1,11 @@
 
 /* pngmem.c - stub functions for memory allocation
 
-   libpng 1.0 beta 4 - version 0.90
+   libpng 1.0 beta 6 - version 0.96
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1997
+   Copyright (c) 1996, 1997 Andreas Dilger
+   May 12, 1997
 
    This file provides a location for all memory allocation.  Users which
    need special memory handling are expected to modify the code in this file
@@ -45,30 +46,34 @@ png_create_struct(int type)
 void
 png_destroy_struct(png_voidp struct_ptr)
 {
-   if (struct_ptr)
+   if (struct_ptr != NULL)
       farfree (struct_ptr);
 }
 
 /* Allocate memory.  For reasonable files, size should never exceed
-   64K.  However, zlib may allocate more then 64K if you don't tell
-   it not to.  See zconf.h and png.h for more information. zlib does
-   need to allocate exactly 64K, so whatever you call here must
-   have the ability to do that. */
-
-/* Borland seems to have a problem in DOS mode for exactly 64K.
-   It gives you a segment with an offset of 8 (perhaps to store it's
-   memory stuff).  zlib doesn't like this at all, so we have to
-   detect and deal with it.  This code should not be needed in
-   Windows or OS/2 modes, and only in 16 bit mode.  This code has
-   been updated by Alexander Lehmann for version 0.89 to waste less
-   memory.
-*/
-
+ * 64K.  However, zlib may allocate more then 64K if you don't tell
+ * it not to.  See zconf.h and png.h for more information. zlib does
+ * need to allocate exactly 64K, so whatever you call here must
+ * have the ability to do that.
+ *
+ * Borland seems to have a problem in DOS mode for exactly 64K.
+ * It gives you a segment with an offset of 8 (perhaps to store it's
+ * memory stuff).  zlib doesn't like this at all, so we have to
+ * detect and deal with it.  This code should not be needed in
+ * Windows or OS/2 modes, and only in 16 bit mode.  This code has
+ * been updated by Alexander Lehmann for version 0.89 to waste less
+ * memory.
+ *
+ * Note that we can't use png_size_t for the "size" declaration,
+ * since on some systems a png_size_t is a 16-bit quantity, and as a
+ * result, we would be truncating potentially larger memory requests
+ * (which should cause a fatal error) and introducing major problems.
+ */
 png_voidp
 png_malloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
-   if (!png_ptr || !size)
+   if (png_ptr == NULL || size == 0)
       return ((voidp)NULL);
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -78,11 +83,11 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
 
    if (size == (png_uint_32)(65536L))
    {
-      if (!png_ptr->offset_table)
+      if (png_ptr->offset_table == NULL)
       {
          /* try to see if we need to do any of this fancy stuff */
          ret = farmalloc(size);
-         if (!ret || ((long)ret & 0xffff))
+         if (ret == NULL || ((png_size_t)ret & 0xffff))
          {
             int num_blocks;
             png_uint_32 total_size;
@@ -90,7 +95,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
             int i;
             png_byte huge * hptr;
 
-            if (ret)
+            if (ret != NULL)
                farfree(ret);
             ret = NULL;
 
@@ -106,27 +111,27 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
 
             table = farmalloc(total_size);
 
-            if (!table)
+            if (table == NULL)
             {
                png_error(png_ptr, "Out of Memory");
             }
 
-            if ((long)table & 0xfff0)
+            if ((png_size_t)table & 0xfff0)
             {
                png_error(png_ptr, "Farmalloc didn't return normalized pointer");
             }
 
             png_ptr->offset_table = table;
-            png_ptr->offset_table_ptr = farmalloc(
-               num_blocks * sizeof (png_bytep));
+            png_ptr->offset_table_ptr = farmalloc(num_blocks *
+               sizeof (png_bytep));
 
-            if (!png_ptr->offset_table_ptr)
+            if (png_ptr->offset_table_ptr == NULL)
             {
                png_error(png_ptr, "Out of memory");
             }
 
             hptr = (png_byte huge *)table;
-            if ((long)hptr & 0xf)
+            if ((png_size_t)hptr & 0xf)
             {
                hptr = (png_byte huge *)((long)(hptr) & 0xfffffff0L);
                hptr += 16L;
@@ -165,36 +170,33 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
 void
 png_free(png_structp png_ptr, png_voidp ptr)
 {
-   if (!png_ptr)
+   if (png_ptr == NULL || ptr == NULL)
       return;
 
-   if (ptr != NULL)
+   if (png_ptr->offset_table != NULL)
    {
-      if (png_ptr->offset_table)
-      {
-         int i;
+      int i;
 
-         for (i = 0; i < png_ptr->offset_table_count; i++)
+      for (i = 0; i < png_ptr->offset_table_count; i++)
+      {
+         if (ptr == png_ptr->offset_table_ptr[i])
          {
-            if (ptr == png_ptr->offset_table_ptr[i])
-            {
-               ptr = 0;
-               png_ptr->offset_table_count_free++;
-               break;
-            }
-         }
-         if (png_ptr->offset_table_count_free == png_ptr->offset_table_count)
-         {
-            farfree(png_ptr->offset_table);
-            farfree(png_ptr->offset_table_ptr);
-            png_ptr->offset_table = 0;
-            png_ptr->offset_table_ptr = 0;
+            ptr = NULL;
+            png_ptr->offset_table_count_free++;
+            break;
          }
       }
-
-      if (ptr)
-         farfree(ptr);
+      if (png_ptr->offset_table_count_free == png_ptr->offset_table_count)
+      {
+         farfree(png_ptr->offset_table);
+         farfree(png_ptr->offset_table_ptr);
+         png_ptr->offset_table = NULL;
+         png_ptr->offset_table_ptr = NULL;
+      }
    }
+
+   if (ptr != NULL)
+      farfree(ptr);
 }
 
 #else /* Not the Borland DOS special memory handler */
@@ -205,15 +207,15 @@ png_free(png_structp png_ptr, png_voidp ptr)
 png_voidp
 png_create_struct(int type)
 {
-   size_t size;
+   png_size_t size;
    png_voidp struct_ptr;
 
    if (type == PNG_STRUCT_INFO)
-     size = sizeof(png_info);
+      size = sizeof(png_info);
    else if (type == PNG_STRUCT_PNG)
-     size = sizeof(png_struct);
+      size = sizeof(png_struct);
    else
-     return (png_voidp)NULL;
+      return (png_voidp)NULL;
 
 #if defined(__TURBOC__) && !defined(__FLAT__)
    if ((struct_ptr = (png_voidp)farmalloc(size)) != NULL)
@@ -236,7 +238,7 @@ png_create_struct(int type)
 void
 png_destroy_struct(png_voidp struct_ptr)
 {
-   if (struct_ptr)
+   if (struct_ptr != NULL)
 #if defined(__TURBOC__) && !defined(__FLAT__)
       farfree(struct_ptr);
 #else
@@ -251,17 +253,16 @@ png_destroy_struct(png_voidp struct_ptr)
 
 /* Allocate memory.  For reasonable files, size should never exceed
    64K.  However, zlib may allocate more then 64K if you don't tell
-   it not to.  See zconf.h and png.h for more information. zlib does
+   it not to.  See zconf.h and png.h for more information.  zlib does
    need to allocate exactly 64K, so whatever you call here must
    have the ability to do that. */
 
-#ifndef FORTIFY
 png_voidp
 png_malloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
-   if (!png_ptr || !size)
-      return ((voidp)0);
+   if (png_ptr == NULL || size == 0)
+      return (NULL);
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
@@ -269,7 +270,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
 #endif
 
 #if defined(__TURBOC__) && !defined(__FLAT__)
-   ret = farmalloc(size);
+   ret = farmalloc((png_size_t)size);
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
    ret = halloc(size, 1);
@@ -286,29 +287,25 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
    return ret;
 }
 
-/* free a pointer allocated by png_malloc().  In the default
+/* Free a pointer allocated by png_malloc().  In the default
   configuration, png_ptr is not used, but is passed in case it
   is needed.  If ptr is NULL, return without taking any action. */
 void
 png_free(png_structp png_ptr, png_voidp ptr)
 {
-   if (!png_ptr)
+   if (png_ptr == NULL || ptr == NULL)
       return;
 
-   if (ptr != NULL)
-   {
 #if defined(__TURBOC__) && !defined(__FLAT__)
-      farfree(ptr);
+   farfree(ptr);
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
-      hfree(ptr);
+   hfree(ptr);
 # else
-      free(ptr);
+   free(ptr);
 # endif
 #endif
-   }
 }
 
-#endif /* FORTIFY */
 #endif /* Not Borland DOS special memory handler */
 

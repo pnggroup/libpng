@@ -2,17 +2,23 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=cc
-CFLAGS=-I../zlib -O
-LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
+# Where the zlib library and include files are located
+#ZLIBLIB=/usr/local/lib
+#ZLIBINC=/usr/local/include
+ZLIBLIB=../zlib
+ZLIBINC=../zlib
 
-#RANLIB=ranlib
-RANLIB=echo
+CC=cc
+CFLAGS=-I$(ZLIBINC) -O # -g -DPNG_DEBUG=1
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
+
+#RANLIB=echo
+RANLIB=ranlib
 
 # where make install puts libpng.a and png.h
 prefix=/usr/local
 
-OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o \
+OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
@@ -48,7 +54,8 @@ pngerror.o: png.h pngconf.h
 pngrio.o: png.h pngconf.h
 pngwio.o: png.h pngconf.h
 pngmem.o: png.h pngconf.h
-pngrcb.o: png.h pngconf.h
+pngset.o: png.h pngconf.h
+pngget.o: png.h pngconf.h
 pngread.o: png.h pngconf.h
 pngrtran.o: png.h pngconf.h
 pngrutil.o: png.h pngconf.h

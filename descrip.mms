@@ -8,9 +8,9 @@ pref = /prefix=all
 
 
 
-OBJS = png.obj, pngrcb.obj, pngrutil.obj, pngtrans.obj, pngwutil.obj,\
-	pngread.obj, pngmem.obj, pngwrite.obj, pngrtran.obj, pngwtran.obj,\
-	pngrio.obj, pngwio.obj, pngerror.obj, pngpread.obj
+OBJS = png.obj, pngset.obj, pngget.obj, pngrutil.obj, pngtrans.obj,\
+	pngwutil.obj, pngread.obj, pngmem.obj, pngwrite.obj, pngrtran.obj,\
+	pngwtran.obj, pngrio.obj, pngwio.obj, pngerror.obj, pngpread.obj
 
 
 CFLAGS= $(C_DEB) $(CC_DEFS) $(PREF)
@@ -35,7 +35,8 @@ clean :
 # Other dependencies.
 png.obj : png.h, pngconf.h
 pngpread.obj : png.h, pngconf.h
-pngrcb.obj : png.h, pngconf.h
+pngset.obj : png.h, pngconf.h
+pngget.obj : png.h, pngconf.h
 pngread.obj : png.h, pngconf.h
 pngrtran.obj : png.h, pngconf.h
 pngrutil.obj : png.h, pngconf.h

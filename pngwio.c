@@ -1,10 +1,11 @@
 
 /* pngwio.c - functions for data output
 
-   libpng 1.0 beta 4 - version 0.90
+   libpng 1.0 beta 6 - version 0.96
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 10, 1997
+   Copyright (c) 1996, 1997 Andreas Dilger
+   May 12, 1997
 
    This file provides a location for all output.  Users which need
    special handling are expected to write functions which have the same
@@ -20,13 +21,12 @@
    writes to a file pointer.  Note that this routine sometimes gets called
    with very small lengths, so you should implement some kind of simple
    buffering if you are using unbuffered writes.  This should never be asked
-   to write more then 64K on a 16 bit machine.  The cast to png_size_t is
-   there to quiet warnings of certain compilers. */
+   to write more then 64K on a 16 bit machine.  */
 
 void
-png_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
+png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   if (png_ptr->write_data_fn)
+   if (png_ptr->write_data_fn != NULL )
       (*(png_ptr->write_data_fn))(png_ptr, data, length);
    else
       png_error(png_ptr, "Call to NULL write function");
@@ -38,11 +38,11 @@ png_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
 static void
-png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
+png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
 
-   check = fwrite(data, 1, (png_size_t)length, (FILE *)(png_ptr->io_ptr));
+   check = fwrite(data, 1, length, (FILE *)(png_ptr->io_ptr));
    if (check != length)
    {
       png_error(png_ptr, "Write Error");
@@ -58,25 +58,25 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 #define MIN(a,b) (a <= b ? a : b)
 
 static void
-png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
+png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
-   png_byte *n_data;
+   png_byte *near_data;  /* Needs to be "png_byte *" instead of "png_bytep" */
    FILE *io_ptr;
 
    /* Check if data really is near. If so, use usual code. */
-   n_data = (png_byte *)CVT_PTR_NOCHECK(data);
+   near_data = (png_byte *)CVT_PTR_NOCHECK(data);
    io_ptr = (FILE *)CVT_PTR(png_ptr->io_ptr);
-   if ((png_bytep)n_data == data)
+   if ((png_bytep)near_data == data)
    {
-      check = fwrite(n_data, 1, (png_size_t)length, io_ptr);
+      check = fwrite(near_data, 1, length, io_ptr);
    }
    else
    {
       png_byte buf[NEAR_BUF_SIZE];
       png_size_t written, remaining, err;
       check = 0;
-      remaining = (png_size_t)length;
+      remaining = length;
       do
       {
          written = MIN(NEAR_BUF_SIZE, remaining);
@@ -106,7 +106,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_uint_32 length)
 void
 png_flush(png_structp png_ptr)
 {
-   if (png_ptr->output_flush_fn)
+   if (png_ptr->output_flush_fn != NULL)
       (*(png_ptr->output_flush_fn))(png_ptr);
 }
 
@@ -115,7 +115,7 @@ png_default_flush(png_structp png_ptr)
 {
    FILE *io_ptr;
    io_ptr = (FILE *)CVT_PTR((png_ptr->io_ptr));
-   if (io_ptr)
+   if (io_ptr != NULL)
       fflush(io_ptr);
 }
 #endif
@@ -148,13 +148,13 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 {
    png_ptr->io_ptr = io_ptr;
 
-   if (write_data_fn)
+   if (write_data_fn != NULL)
       png_ptr->write_data_fn = write_data_fn;
    else
       png_ptr->write_data_fn = png_default_write_data;
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
-   if (output_flush_fn)
+   if (output_flush_fn != NULL)
       png_ptr->output_flush_fn = output_flush_fn;
    else
       png_ptr->output_flush_fn = png_default_flush;
