@@ -1,7 +1,7 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 1.0.6j - May 4, 2000
+ * libpng 1.0.7beta11 - May 6, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -24,7 +24,7 @@
    buffering if you are using unbuffered writes.  This should never be asked
    to write more than 64K on a 16 bit machine.  */
 
-void
+void /* PRIVATE */
 png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    if (png_ptr->write_data_fn != NULL )
@@ -39,7 +39,7 @@ png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    write_data function and use it at run time with png_set_write_fn(), rather
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
-static void
+static void /* PRIVATE */
 png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
@@ -59,7 +59,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
 
-static void
+static void /* PRIVATE */
 png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
@@ -106,7 +106,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    to disk).  After png_flush is called, there should be no data pending
    writing in any buffers. */
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
-void
+void /* PRIVATE */
 png_flush(png_structp png_ptr)
 {
    if (png_ptr->output_flush_fn != NULL)
@@ -114,7 +114,7 @@ png_flush(png_structp png_ptr)
 }
 
 #if !defined(PNG_NO_STDIO)
-static void
+static void /* PRIVATE */
 png_default_flush(png_structp png_ptr)
 {
    FILE *io_ptr;
@@ -147,7 +147,7 @@ png_default_flush(png_structp png_ptr)
                    PNG_WRITE_FLUSH_SUPPORTED is not defined at libpng compile
                    time, output_flush_fn will be ignored, although it must be
                    supplied for compatibility. */
-void
+void PNGAPI
 png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn)
 {

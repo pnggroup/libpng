@@ -717,19 +717,26 @@ version 1.0.6i [May 2, 2000]
     (new in version 1.0.2), rgb_to_gray (new in 1.0.5), iCCP, sCAL, sPLT,
     the high-level interface, and unknown chunks support (all new in 1.0.6).
     This was necessary because of old applications that allocate the structs
-    directly instead of using png_create_*(), as authors were instructed to
-    do in libpng-0.88 and earlier.
+    directly as authors were instructed to do in libpng-0.88 and earlier,
+    instead of using png_create_*(). 
   Added modes PNG_CREATED_READ_STRUCT and PNG_CREATED_WRITE_STRUCT which
     can be used to detect codes that directly allocate the structs, and
     code to check these modes in png_read_init() and png_write_init() and
     generate a libpng error if the modes aren't set and PNG_LEGACY_SUPPORTED
     was not defined.
   Added makefile.intel and updated makefile.watcom (Pawel Mrochen)
-version 1.0.6j [May 4, 2000]
+version 1.0.6j [May 3, 2000]
   Overloaded png_read_init() and png_write_init() with macros that convert
     calls to png_read_init_2() or png_write_init_2() that check the version
     and structure sizes.
-
+version 1.0.7beta11 [May 6, 2000]
+  Removed the new PNG_CREATED_READ_STRUCT and PNG_CREATED_WRITE_STRUCT modes
+    which are no longer used.
+  Eliminated the three new members of png_text when PNG_NO_iTXt_SUPPORTED
+    or PNG_LEGACY_SUPPORTED is defined.
+  In png_set_text, check if old application had allocated the png_text structure;
+    if so, only allow one text chunk to be processed to avoid memory overrun.
+  Added PNGAPI macro, and added it to the definitions of all exported functions.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

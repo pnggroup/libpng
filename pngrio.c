@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * libpng 1.0.6j - May 4, 2000
+ * libpng 1.0.7beta11 - May 6, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -23,7 +23,7 @@
    with very small lengths, so you should implement some kind of simple
    buffering if you are using unbuffered reads.  This should never be asked
    to read more then 64K on a 16 bit machine. */
-void
+void /* PRIVATE */
 png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_debug1(4,"reading %d bytes\n", length);
@@ -39,7 +39,7 @@ png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    read_data function and use it at run time with png_set_read_fn(), rather
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
-static void
+static void /* PRIVATE */
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;
@@ -64,7 +64,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
 
-static void
+static void /* PRIVATE */
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    int check;
@@ -119,7 +119,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
                   unsigned int that is the number of bytes to be read.
                   To exit and output any fatal error messages the new write
                   function should call png_error(png_ptr, "Error msg"). */
-void
+void PNGAPI
 png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
    png_rw_ptr read_data_fn)
 {

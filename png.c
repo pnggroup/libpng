@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.6j - May 4, 2000
+ * libpng version 1.0.7beta11 - May 6, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -14,14 +14,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_6j Your_png_h_is_not_version_1_0_6j;
+typedef version_1_0_7beta11 Your_png_h_is_not_version_1_0_7beta11;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.6j";
+char png_libpng_ver[12] = "1.0.7beta11";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -88,7 +88,7 @@ int FARDATA png_pass_dsp_mask[] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
  * or write any of the magic bytes before it starts on the IHDR.
  */
 
-void
+void PNGAPI
 png_set_sig_bytes(png_structp png_ptr, int num_bytes)
 {
    png_debug(1, "in png_set_sig_bytes\n");
@@ -106,7 +106,7 @@ png_set_sig_bytes(png_structp png_ptr, int num_bytes)
  * respectively, to be less than, to match, or be greater than the correct
  * PNG signature (this is the same behaviour as strcmp, memcmp, etc).
  */
-int
+int PNGAPI
 png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -128,14 +128,14 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
  * to check a partial signature.  This function might be removed in the
  * future - use png_sig_cmp().  Returns true (nonzero) if the file is a PNG.
  */
-int
+int PNGAPI
 png_check_sig(png_bytep sig, int num)
 {
   return ((int)!png_sig_cmp(sig, (png_size_t)0, (png_size_t)num));
 }
 
 /* Function to allocate memory for zlib and clear it to 0. */
-voidpf
+voidpf PNGAPI
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
    png_uint_32 num_bytes = (png_uint_32)items * size;
@@ -155,7 +155,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 }
 
 /* function to free memory for zlib */
-void
+void PNGAPI
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
    png_free((png_structp)png_ptr, (png_voidp)ptr);
@@ -164,7 +164,7 @@ png_zfree(voidpf png_ptr, voidpf ptr)
 /* Reset the CRC variable to 32 bits of 1's.  Care must be taken
  * in case CRC is > 32 bits to leave the top bits 0.
  */
-void
+void /* PRIVATE */
 png_reset_crc(png_structp png_ptr)
 {
    png_ptr->crc = crc32(0, Z_NULL, 0);
@@ -175,7 +175,7 @@ png_reset_crc(png_structp png_ptr)
  * also check that this data will actually be used before going to the
  * trouble of calculating it.
  */
-void
+void /* PRIVATE */
 png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length)
 {
    int need_crc = 1;
@@ -202,7 +202,7 @@ png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length)
  * and png_info_init() so that applications that want to use a shared
  * libpng don't have to be recompiled if png_info changes size.
  */
-png_infop
+png_infop PNGAPI
 png_create_info_struct(png_structp png_ptr)
 {
    png_infop info_ptr;
@@ -227,7 +227,7 @@ png_create_info_struct(png_structp png_ptr)
  * png_destroy_write_struct() to free an info struct, but this may be
  * useful for some applications.
  */
-void
+void PNGAPI
 png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
 {
    png_infop info_ptr = NULL;
@@ -253,7 +253,7 @@ png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
  * and applications using it are urged to use png_create_info_struct()
  * instead.
  */
-void
+void PNGAPI
 png_info_init(png_infop info_ptr)
 {
    png_debug(1, "in png_info_init\n");
@@ -262,7 +262,7 @@ png_info_init(png_infop info_ptr)
 }
 
 #ifdef PNG_FREE_ME_SUPPORTED
-void
+void PNGAPI
 png_data_freer(png_structp png_ptr, png_infop info_ptr,
    int freer, png_uint_32 mask)
 {
@@ -279,7 +279,7 @@ png_data_freer(png_structp png_ptr, png_infop info_ptr,
 }
 #endif
 
-void
+void PNGAPI
 png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask, int num)
 {
    png_debug(1, "in png_free_data\n");
@@ -490,7 +490,7 @@ if (mask & PNG_FREE_ROWS)
  * pointing to before re-using it or freeing the struct itself.  Recall
  * that png_free() checks for NULL pointers for us.
  */
-void
+void /* PRIVATE */
 png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_info_destroy\n");
@@ -512,7 +512,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
  * functions.  The application should free any memory associated with this
  * pointer before png_write_destroy() or png_read_destroy() are called.
  */
-png_voidp
+png_voidp PNGAPI
 png_get_io_ptr(png_structp png_ptr)
 {
    return (png_ptr->io_ptr);
@@ -525,7 +525,7 @@ png_get_io_ptr(png_structp png_ptr)
  * PNG_NO_STDIO, you must use a function of your own because "FILE *" isn't
  * necessarily available.
  */
-void
+void PNGAPI
 png_init_io(png_structp png_ptr, FILE *fp)
 {
    png_debug(1, "in png_init_io\n");
@@ -537,7 +537,7 @@ png_init_io(png_structp png_ptr, FILE *fp)
 /* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
  */
-png_charp
+png_charp PNGAPI
 png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 {
    static PNG_CONST char short_months[12][4] =
@@ -572,18 +572,18 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 
 #if 0
 /* Signature string for a PNG file. */
-png_bytep
+png_bytep PNGAPI
 png_sig_bytes(void)
 {
    return ((png_bytep)"\211\120\116\107\015\012\032\012");
 }
 #endif
 
-png_charp
+png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.6j - May 4, 2000\n\
+   return ("\n libpng version 1.0.7beta11 - May 6, 2000\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson\n");
@@ -596,16 +596,16 @@ png_get_copyright(png_structp png_ptr)
  * in png.h.
  */
 
-png_charp
+png_charp PNGAPI
 png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.6j");
-   return("1.0.6j");
+      return("1.0.7beta11");
+   return("1.0.7beta11");
 }
 
-png_charp
+png_charp PNGAPI
 png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
@@ -614,7 +614,7 @@ png_get_header_ver(png_structp png_ptr)
    return(PNG_LIBPNG_VER_STRING);
 }
 
-png_charp
+png_charp PNGAPI
 png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
@@ -624,7 +624,7 @@ png_get_header_version(png_structp png_ptr)
 }
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-int
+int PNGAPI
 png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
 {
    /* check chunk_name and return "keep" value if it's on the list, else 0 */
@@ -641,7 +641,7 @@ png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
 #endif
 
 /* This function, added to libpng-1.0.6g, is untested. */
-int
+int PNGAPI
 png_reset_zstream(png_structp png_ptr)
 {
    return (inflateReset(&png_ptr->zstream));

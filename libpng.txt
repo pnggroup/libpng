@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.6j - May 4, 2000
+ libpng version 1.0.7beta11 - May 6, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -94,9 +94,20 @@ The png_info structure is designed to provide information about the
 PNG file.  At one time, the fields of png_info were intended to be
 directly accessible to the user.  However, this tended to cause problems
 with applications using dynamically loaded libraries, and as a result
-a set of interface functions for png_info was developed.  The fields
-of png_info are still available for older applications, but it is
-suggested that applications use the new interfaces if at all possible.
+a set of interface functions for png_info (the png_get_*() and png_set_*()
+functions) was developed.  The fields of png_info are still available for
+older applications, but it is suggested that applications use the new
+interfaces if at all possible.
+
+Applications that do make direct access to the members of png_struct (except
+for png_ptr->jmpbuf) must be recompiled whenever the library is updated,
+and applications that make direct access to the members of png_info must
+be recompiled if they were compiled or loaded with libpng version 1.0.6,
+in which the members were in a different order.  In version 1.0.7, the
+members of the png_info structure reverted to the old order, as they were
+in versions 0.97c through 1.0.5.  Starting with version 2.0.0, both
+structures are going to be hidden, and the contents of the structures will
+only be accessible through the png_get/png_set functions.
 
 The png.h header file is an invaluable reference for programming with libpng.
 And while I'm on the topic, make sure you include the libpng header file:
@@ -2538,8 +2549,10 @@ still alive and well, but they have moved on to other things.
 
 The old libpng functions png_read_init(), png_write_init(),
 png_info_init(), png_read_destroy(), and png_write_destory() have been
-moved to PNG_INTERNAL in version 0.95 to discourage their use.  The
-preferred method of creating and initializing the libpng structures is
+moved to PNG_INTERNAL in version 0.95 to discourage their use.  These
+functions will be removed from libpng version 2.0.0.
+
+The preferred method of creating and initializing the libpng structures is
 via the png_create_read_struct(), png_create_write_struct(), and
 png_create_info_struct() because they isolate the size of the structures
 from the application, allow version error checking, and also allow the
@@ -2556,19 +2569,19 @@ png_read_init() as was suggested in libpng-0.88 is no longer supported
 because this caused applications that do not use custom error functions
 to fail if the png_ptr was not initialized to zero.  It is still possible
 to set the error callbacks AFTER png_read_init(), or to change them with
-png_set_error_fn(), which is essentially the same function, but with a
-new name to force compilation errors with applications that try to use
-the old method.
+png_set_error_fn(), which is essentially the same function, but with a new
+name to force compilation errors with applications that try to use the old
+method.
 
 VII. Y2K Compliance in libpng
 
-May 4, 2000
+May 6, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.6j are Y2K compliant.  It is my belief that earlier
+upward through 1.0.7beta11 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

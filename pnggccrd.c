@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng 1.0.6j - May 4, 2000
+ * libpng 1.0.7beta11 - May 6, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -209,7 +209,7 @@ static png_uint_32  _MMXLength;
 static int          _dif;
 
 
-void
+void /* PRIVATE */
 png_read_filter_row_c(png_structp png_ptr, png_row_infop row_info,
    png_bytep row, png_bytep prev_row, int filter);
 
@@ -230,7 +230,7 @@ png_read_filter_row_c(png_structp png_ptr, png_row_infop row_info,
 /* Use this routine for the x86 platform - it uses a faster MMX routine
    if the machine supports MMX. */
 
-void
+void PNGAPI
 png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1,"in png_combine_row_asm\n");
@@ -1210,7 +1210,7 @@ fflush(stderr);
  * has taken place.  [GRR: what other steps come before and/or after?]
  */
 
-void
+void /* PRIVATE */
 png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
    png_uint_32 transformations)
 {
@@ -2401,7 +2401,7 @@ union uAll {
 
 
 // Optimized code for PNG Average filter decoder
-void
+void /* PRIVATE */
 png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
                             png_bytep prev_row)
 {
@@ -2901,7 +2901,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 }
 
 // Optimized code for PNG Paeth filter decoder
-void
+void /* PRIVATE */
 png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
                               png_bytep prev_row)
 {
@@ -3833,7 +3833,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 }
 
 // Optimized code for PNG Sub filter decoder
-void
+void /* PRIVATE */
 png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 {
 #ifdef GRR_GCC_MMX_CONVERTED
@@ -4183,7 +4183,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 }
 
 // Optimized code for PNG Up filter decoder
-void
+void /* PRIVATE */
 png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
                            png_bytep prev_row)
 {
@@ -4310,7 +4310,7 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
 
 // Optimized png_read_filter_row routines
 
-void
+void PNGAPI
 png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    row, png_bytep prev_row, int filter)
 {

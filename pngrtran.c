@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.6j - May 4, 2000
+ * libpng 1.0.7beta11 - May 6, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -17,7 +17,7 @@
 #include "png.h"
 
 /* Set the action on getting a CRC error for an ancillary or critical chunk. */
-void
+void PNGAPI
 png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
 {
    png_debug(1, "in png_set_crc_action\n");
@@ -72,7 +72,7 @@ png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) && \
     defined(PNG_FLOATING_POINT_SUPPORTED)
 /* handle alpha and tRNS via a background color */
-void
+void PNGAPI
 png_set_background(png_structp png_ptr,
    png_color_16p background_color, int background_gamma_code,
    int need_expand, double background_gamma)
@@ -105,7 +105,7 @@ png_set_background(png_structp png_ptr,
 
 #if defined(PNG_READ_16_TO_8_SUPPORTED)
 /* strip 16 bit depth files to 8 bit depth */
-void
+void PNGAPI
 png_set_strip_16(png_structp png_ptr)
 {
    png_debug(1, "in png_set_strip_16\n");
@@ -114,7 +114,7 @@ png_set_strip_16(png_structp png_ptr)
 #endif
 
 #if defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
-void
+void PNGAPI
 png_set_strip_alpha(png_structp png_ptr)
 {
    png_debug(1, "in png_set_strip_alpha\n");
@@ -141,7 +141,7 @@ typedef struct png_dsort_struct
 typedef png_dsort FAR *       png_dsortp;
 typedef png_dsort FAR * FAR * png_dsortpp;
 
-void
+void PNGAPI
 png_set_dither(png_structp png_ptr, png_colorp palette,
    int num_palette, int maximum_colors, png_uint_16p histogram,
    int full_dither)
@@ -511,7 +511,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
  * are not close reciprocals, otherwise it slows things down slightly, and
  * also needlessly introduces small errors.
  */
-void
+void PNGAPI
 png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 {
    png_debug(1, "in png_set_gamma\n");
@@ -527,7 +527,7 @@ png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
  * less than 8-bit depth to 8-bit depth, and expand tRNS chunks
  * to alpha channels.
  */
-void
+void PNGAPI
 png_set_expand(png_structp png_ptr)
 {
    png_debug(1, "in png_set_expand\n");
@@ -549,7 +549,7 @@ png_set_expand(png_structp png_ptr)
  */
 
 /* Expand paletted images to RGB. */
-void
+void PNGAPI
 png_set_palette_to_rgb(png_structp png_ptr)
 {
    png_debug(1, "in png_set_expand\n");
@@ -557,7 +557,7 @@ png_set_palette_to_rgb(png_structp png_ptr)
 }
 
 /* Expand grayscale images of less than 8-bit depth to 8 bits. */
-void
+void PNGAPI
 png_set_gray_1_2_4_to_8(png_structp png_ptr)
 {
    png_debug(1, "in png_set_expand\n");
@@ -565,7 +565,7 @@ png_set_gray_1_2_4_to_8(png_structp png_ptr)
 }
 
 /* Expand tRNS chunks to alpha channels. */
-void
+void PNGAPI
 png_set_tRNS_to_alpha(png_structp png_ptr)
 {
    png_debug(1, "in png_set_expand\n");
@@ -574,7 +574,7 @@ png_set_tRNS_to_alpha(png_structp png_ptr)
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
-void
+void PNGAPI
 png_set_gray_to_rgb(png_structp png_ptr)
 {
    png_debug(1, "in png_set_gray_to_rgb\n");
@@ -588,7 +588,7 @@ png_set_gray_to_rgb(png_structp png_ptr)
  * for example, to convert a 24 bpp RGB image into an 8 bpp grayscale image.
  */
 
-void
+void PNGAPI
 png_set_rgb_to_gray(png_structp png_ptr, int error_action, double red,
    double green)
 {
@@ -598,7 +598,7 @@ png_set_rgb_to_gray(png_structp png_ptr, int error_action, double red,
 }
 #endif
 
-void
+void PNGAPI
 png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
    png_fixed_point red, png_fixed_point green)
 {
@@ -648,7 +648,7 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_LEGACY_SUPPORTED)
-void
+void PNGAPI
 png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    read_user_transform_fn)
 {
@@ -668,7 +668,7 @@ png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
 /* Initialize everything needed for the read.  This includes modifying
  * the palette.
  */
-void
+void /* PRIVATE */
 png_init_read_transformations(png_structp png_ptr)
 {
    png_debug(1, "in png_init_read_transformations\n");
@@ -985,7 +985,7 @@ png_init_read_transformations(png_structp png_ptr)
  * info should be updated so a PNG file could be written with it,
  * assuming the transformations result in valid PNG data.
  */
-void
+void /* PRIVATE */
 png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_read_transform_info\n");
@@ -1109,7 +1109,7 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
  * and is very touchy.  If you add a transformation, take care to
  * decide how it fits in with the other transformations here.
  */
-void
+void /* PRIVATE */
 png_do_read_transformations(png_structp png_ptr)
 {
    png_debug(1, "in png_do_read_transformations\n");
@@ -1339,7 +1339,7 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
  * the numbers 0 or 1.  If you would rather they contain 0 and 255, use
  * png_do_shift() after this.
  */
-void
+void /* PRIVATE */
 png_do_unpack(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_unpack\n");
@@ -1429,7 +1429,7 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
  * a row of bit depth 8, but only 5 are significant, this will shift
  * the values back to 0 through 31.
  */
-void
+void /* PRIVATE */
 png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
 {
    png_debug(1, "in png_do_unshift\n");
@@ -1535,7 +1535,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
 
 #if defined(PNG_READ_16_TO_8_SUPPORTED)
 /* chop rows of bit depth 16 down to 8 */
-void
+void /* PRIVATE */
 png_do_chop(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_chop\n");
@@ -1589,7 +1589,7 @@ png_do_chop(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
-void
+void /* PRIVATE */
 png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_read_swap_alpha\n");
@@ -1681,7 +1681,7 @@ png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
-void
+void /* PRIVATE */
 png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_read_invert_alpha\n");
@@ -1780,7 +1780,7 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 
 #if defined(PNG_READ_FILLER_SUPPORTED)
 /* Add filler channel if we have RGB color */
-void
+void /* PRIVATE */
 png_do_read_filler(png_row_infop row_info, png_bytep row,
    png_uint_32 filler, png_uint_32 flags)
 {
@@ -1956,7 +1956,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
 
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
 /* expand grayscale files to RGB, with or without alpha */
-void
+void /* PRIVATE */
 png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 {
    png_uint_32 i;
@@ -2058,7 +2058,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
  *
  *  Other integer coefficents can be used via png_set_rgb_to_gray().
  */
-int
+int /* PRIVATE */
 png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
 
 {
@@ -2298,7 +2298,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
  * paletted.  Most useful for gamma correction and simplification
  * of code.
  */
-void
+void /* PRIVATE */
 png_build_grayscale_palette(int bit_depth, png_colorp palette)
 {
    int num_palette;
@@ -2344,7 +2344,7 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
 
 /* This function is currently unused.  Do we really need it? */
 #if defined(PNG_READ_DITHER_SUPPORTED) && defined(PNG_CORRECT_PALETTE_SUPPORTED)
-void
+void /* PRIVATE */
 png_correct_palette(png_structp png_ptr, png_colorp palette,
    int num_palette)
 {
@@ -2529,7 +2529,7 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
  * "background" is already in the screen gamma, while "background_1" is
  * at a gamma of 1.0.  Paletted files have already been taken care of.
  */
-void
+void /* PRIVATE */
 png_do_background(png_row_infop row_info, png_bytep row,
    png_color_16p trans_values, png_color_16p background,
    png_color_16p background_1,
@@ -3200,7 +3200,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
  * is 16, use gamma_16_table and gamma_shift.  Build these with
  * build_gamma_table().
  */
-void
+void /* PRIVATE */
 png_do_gamma(png_row_infop row_info, png_bytep row,
    png_bytep gamma_table, png_uint_16pp gamma_16_table,
    int gamma_shift)
@@ -3382,7 +3382,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
 /* Expands a palette row to an RGB or RGBA row depending
  * upon whether you supply trans and num_trans.
  */
-void
+void /* PRIVATE */
 png_do_expand_palette(png_row_infop row_info, png_bytep row,
    png_colorp palette, png_bytep trans, int num_trans)
 {
@@ -3525,7 +3525,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
 /* If the bit depth < 8, it is expanded to 8.  Also, if the
  * transparency value is supplied, an alpha channel is built.
  */
-void
+void /* PRIVATE */
 png_do_expand(png_row_infop row_info, png_bytep row,
    png_color_16p trans_value)
 {
@@ -3724,7 +3724,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 #endif
 
 #if defined(PNG_READ_DITHER_SUPPORTED)
-void
+void /* PRIVATE */
 png_do_dither(png_row_infop row_info, png_bytep row,
     png_bytep palette_lookup, png_bytep dither_lookup)
 {
@@ -3826,7 +3826,7 @@ static int png_gamma_shift[] =
  * the future.  Note also how the gamma_16 tables are segmented so that
  * we don't need to allocate > 64K chunks for a full 16-bit table.
  */
-void
+void /* PRIVATE */
 png_build_gamma_table(png_structp png_ptr)
 {
   png_debug(1, "in png_build_gamma_table\n");

@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.6j - May 4, 2000
+ * libpng 1.0.7beta11 - May 6, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -24,7 +24,7 @@
 #define PNG_READ_iTXt_MODE  7
 #define PNG_ERROR_MODE      8
 
-void
+void PNGAPI
 png_process_data(png_structp png_ptr, png_infop info_ptr,
    png_bytep buffer, png_size_t buffer_size)
 {
@@ -39,7 +39,7 @@ png_process_data(png_structp png_ptr, png_infop info_ptr,
 /* What we do with the incoming data depends on what we were previously
  * doing before we ran out of data...
  */
-void
+void /* PRIVATE */
 png_process_some_data(png_structp png_ptr, png_infop info_ptr)
 {
    switch (png_ptr->process_mode)
@@ -99,7 +99,7 @@ png_process_some_data(png_structp png_ptr, png_infop info_ptr)
  * checked by the calling application, or because of multiple calls to this
  * routine.
  */
-void
+void /* PRIVATE */
 png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
 {
    png_size_t num_checked = png_ptr->sig_bytes,
@@ -131,7 +131,7 @@ png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
    }
 }
 
-void
+void /* PRIVATE */
 png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
@@ -463,14 +463,14 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
    png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
 }
 
-void
+void /* PRIVATE */
 png_push_crc_skip(png_structp png_ptr, png_uint_32 skip)
 {
    png_ptr->process_mode = PNG_SKIP_MODE;
    png_ptr->skip_length = skip;
 }
 
-void
+void /* PRIVATE */
 png_push_crc_finish(png_structp png_ptr)
 {
    if (png_ptr->skip_length && png_ptr->save_buffer_size)
@@ -518,7 +518,7 @@ png_push_crc_finish(png_structp png_ptr)
    }
 }
 
-void
+void /* PRIVATE */
 png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
 {
    png_bytep ptr;
@@ -556,7 +556,7 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
    }
 }
 
-void
+void /* PRIVATE */
 png_push_save_buffer(png_structp png_ptr)
 {
    if (png_ptr->save_buffer_size)
@@ -600,7 +600,7 @@ png_push_save_buffer(png_structp png_ptr)
    png_ptr->buffer_size = 0;
 }
 
-void
+void /* PRIVATE */
 png_push_restore_buffer(png_structp png_ptr, png_bytep buffer,
    png_size_t buffer_length)
 {
@@ -610,7 +610,7 @@ png_push_restore_buffer(png_structp png_ptr, png_bytep buffer,
    png_ptr->current_buffer_ptr = png_ptr->current_buffer;
 }
 
-void
+void /* PRIVATE */
 png_push_read_IDAT(png_structp png_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
@@ -700,7 +700,7 @@ png_push_read_IDAT(png_structp png_ptr)
    }
 }
 
-void
+void /* PRIVATE */
 png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
    png_size_t buffer_length)
 {
@@ -742,7 +742,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
    }
 }
 
-void
+void /* PRIVATE */
 png_push_process_row(png_structp png_ptr)
 {
    png_ptr->row_info.color_type = png_ptr->color_type;
@@ -884,7 +884,7 @@ png_push_process_row(png_structp png_ptr)
    }
 }
 
-void
+void /* PRIVATE */
 png_read_push_finish_row(png_structp png_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
@@ -949,7 +949,7 @@ png_read_push_finish_row(png_structp png_ptr)
 }
 
 #if defined(PNG_READ_tEXt_SUPPORTED)
-void
+void /* PRIVATE */
 png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
@@ -979,7 +979,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
    png_ptr->process_mode = PNG_READ_tEXt_MODE;
 }
 
-void
+void /* PRIVATE */
 png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr->buffer_size && png_ptr->current_text_left)
@@ -1024,9 +1024,11 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
 
       text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
       text_ptr->compression = PNG_TEXT_COMPRESSION_NONE;
-      text_ptr->lang = (char *)NULL;
       text_ptr->key = key;
+#ifdef PNG_iTXt_SUPPORTED
+      text_ptr->lang = (char *)NULL;
       text_ptr->lang_key = (char *)NULL;
+#endif
       text_ptr->text = text;
 
       png_set_text(png_ptr, info_ptr, text_ptr, 1);
@@ -1037,7 +1039,7 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 #if defined(PNG_READ_zTXt_SUPPORTED)
-void
+void /* PRIVATE */
 png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
@@ -1069,7 +1071,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
    png_ptr->process_mode = PNG_READ_zTXt_MODE;
 }
 
-void
+void /* PRIVATE */
 png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr->buffer_size && png_ptr->current_text_left)
@@ -1206,8 +1208,10 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
       text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
       text_ptr->compression = PNG_TEXT_COMPRESSION_zTXt;
       text_ptr->key = key;
+#ifdef PNG_iTXt_SUPPORTED
       text_ptr->lang = (char *)NULL;
       text_ptr->lang_key = (char *)NULL;
+#endif
       text_ptr->text = text;
 
       png_set_text(png_ptr, info_ptr, text_ptr, 1);
@@ -1218,7 +1222,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 #if defined(PNG_READ_iTXt_SUPPORTED)
-void
+void /* PRIVATE */
 png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
@@ -1248,7 +1252,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length
    png_ptr->process_mode = PNG_READ_iTXt_MODE;
 }
 
-void
+void /* PRIVATE */
 png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
 {
 
@@ -1328,7 +1332,7 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
  * chunk.  If there isn't a problem with the chunk itself (ie a bad chunk
  * name or a critical chunk), the chunk is (currently) silently ignored.
  */
-void
+void /* PRIVATE */
 png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_uint_32 skip=0;
@@ -1393,21 +1397,21 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 len
    png_push_crc_skip(png_ptr, skip);
 }
 
-void
+void /* PRIVATE */
 png_push_have_info(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr->info_fn != NULL)
       (*(png_ptr->info_fn))(png_ptr, info_ptr);
 }
 
-void
+void /* PRIVATE */
 png_push_have_end(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr->end_fn != NULL)
       (*(png_ptr->end_fn))(png_ptr, info_ptr);
 }
 
-void
+void /* PRIVATE */
 png_push_have_row(png_structp png_ptr, png_bytep row)
 {
    if (png_ptr->row_fn != NULL)
@@ -1415,7 +1419,7 @@ png_push_have_row(png_structp png_ptr, png_bytep row)
          (int)png_ptr->pass);
 }
 
-void
+void PNGAPI
 png_progressive_combine_row (png_structp png_ptr,
    png_bytep old_row, png_bytep new_row)
 {
@@ -1426,7 +1430,7 @@ png_progressive_combine_row (png_structp png_ptr,
       png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);
 }
 
-void
+void PNGAPI
 png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
    png_progressive_info_ptr info_fn, png_progressive_row_ptr row_fn,
    png_progressive_end_ptr end_fn)
@@ -1438,7 +1442,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
    png_set_read_fn(png_ptr, progressive_ptr, png_push_fill_buffer);
 }
 
-png_voidp
+png_voidp PNGAPI
 png_get_progressive_ptr(png_structp png_ptr)
 {
    return png_ptr->io_ptr;
