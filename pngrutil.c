@@ -6,7 +6,7 @@
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -345,6 +345,10 @@ png_handle_IEND(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || !(png_ptr->mode & PNG_HAVE_IDAT))
    {
       png_error(png_ptr, "No image in file");
+
+      /* to quiet compiler warnings about unused info_ptr */
+      if (info_ptr == NULL)
+         return;
    }
 
    png_ptr->mode |= PNG_AFTER_IDAT | PNG_HAVE_IEND;
@@ -722,7 +726,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    else if (info_ptr != NULL && info_ptr->valid & PNG_INFO_tRNS)
    {
-      png_warning(png_ptr, "Duplcate tRNS chunk");
+      png_warning(png_ptr, "Duplicate tRNS chunk");
       png_crc_finish(png_ptr, length);
       return;
    }
@@ -1022,6 +1026,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_byte type, nparams;
    png_charp buf, units, endptr;
    png_charpp params;
+   png_size_t slength;
    int i;
 
    png_debug(1, "in png_handle_pCAL\n");
@@ -1044,7 +1049,8 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_debug1(2, "Allocating and reading pCAL chunk data (%d bytes)\n",
       length + 1);
    purpose = (png_charp)png_malloc(png_ptr, length + 1);
-   png_crc_read(png_ptr, (png_bytep)purpose, (png_size_t)length);
+   slength = (png_size_t)length;
+   png_crc_read(png_ptr, (png_bytep)purpose, slength);
 
    if (png_crc_finish(png_ptr, 0))
    {
@@ -1052,13 +1058,13 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   purpose[length] = '\0'; /* null terminate the last string */
+   purpose[slength] = 0x00; /* null terminate the last string */
 
    png_debug(3, "Finding end of pCAL purpose string\n");
    for (buf = purpose; *buf != '\0'; buf++)
       /* empty loop */;
 
-   endptr = purpose + length;
+   endptr = purpose + slength;
 
    /* We need to have at least 12 bytes after the purpose string
       in order to get the parameter information. */
@@ -1094,7 +1100,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    /* Empty loop to move past the units string. */
-   for (buf = units; *buf != '\0'; buf++);
+   for (buf = units; *buf != 0x00; buf++);
 
    png_debug(3, "Allocating pCAL parameters array\n");
    params = (png_charpp)png_malloc(png_ptr, (png_uint_32)(nparams
@@ -1107,7 +1113,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
       png_debug1(3, "Reading pCAL parameter %d\n", i);
       /* Empty loop to move past each paramter string */
-      for (params[i] = buf; *buf != '\0' && buf <= endptr; buf++);
+      for (params[i] = buf; *buf != 0x00 && buf <= endptr; buf++);
 
       /* Make sure we haven't run out of data yet */
       if (buf > endptr)
@@ -1179,6 +1185,7 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_charp key;
    png_charp text;
    png_uint_32 skip = 0;
+   png_size_t slength;
 
    png_debug(1, "in png_handle_tEXt\n");
 
@@ -1198,7 +1205,8 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
    key = (png_charp)png_malloc(png_ptr, length + 1);
-   png_crc_read(png_ptr, (png_bytep)key, (png_size_t)length);
+   slength = (png_size_t)length;
+   png_crc_read(png_ptr, (png_bytep)key, slength);
 
    if (png_crc_finish(png_ptr, skip))
    {
@@ -1206,12 +1214,12 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   key[length] = '\0';
+   key[slength] = 0x00;
 
    for (text = key; *text; text++)
       /* empty loop to find end of key */ ;
 
-   if (text != key + (png_size_t)length)
+   if (text != key + slength)
       text++;
 
    text_ptr = (png_textp)png_malloc(png_ptr, (png_uint_32)sizeof(png_text));
@@ -1235,6 +1243,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_charp key;
    png_charp text;
    int comp_type = PNG_TEXT_COMPRESSION_NONE;
+   png_size_t slength;
 
    png_debug(1, "in png_handle_zTXt\n");
 
@@ -1256,20 +1265,21 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
    key = (png_charp)png_malloc(png_ptr, length + 1);
-   png_crc_read(png_ptr, (png_bytep)key, (png_size_t)length);
+   slength = (png_size_t)length;
+   png_crc_read(png_ptr, (png_bytep)key, slength);
    if (png_crc_finish(png_ptr, 0))
    {
       png_free(png_ptr, key);
       return;
    }
 
-   key[length] = '\0';
+   key[slength] = 0x00;
 
    for (text = key; *text; text++)
       /* empty loop */ ;
 
    /* zTXt must have some text after the keyword */
-   if (text == key + (png_size_t)length)
+   if (text == key + slength)
    {
       png_warning(png_ptr, "Zero length zTXt chunk");
    }
@@ -1283,7 +1293,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_ptr->zstream.next_out = png_ptr->zbuf;
       png_ptr->zstream.avail_out = png_ptr->zbuf_size;
 
-      key_size = text - key;
+      key_size = (png_size_t)(text - key);
       text_size = 0;
       text = NULL;
 
@@ -1308,10 +1318,10 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                png_memcpy(text, key, key_size);
             }
 
-            text[text_size - 1] = '\0';
+            text[text_size - 1] = 0x00;
 
             /* Copy what we can of the error message into the text chunk */
-            text_size = (png_size_t)length - (text - key) - 1;
+            text_size = (png_size_t)(slength - (text - key) - 1);
             text_size = sizeof(msg) > text_size ? text_size : sizeof(msg);
             png_memcpy(text + key_size, msg, text_size + 1);
             break;
@@ -1328,7 +1338,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                png_memcpy(text, key, key_size);
                text_size = key_size + png_ptr->zbuf_size -
                   png_ptr->zstream.avail_out;
-               *(text + text_size) = '\0';
+               *(text + text_size) = 0x00;
             }
             else
             {
@@ -1342,7 +1352,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                png_memcpy(text + text_size, png_ptr->zbuf,
                   (png_ptr->zbuf_size - png_ptr->zstream.avail_out));
                text_size += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
-               *(text + text_size) = '\0';
+               *(text + text_size) = 0x00;
             }
             if (ret != Z_STREAM_END)
             {
@@ -1376,7 +1386,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
       /* Copy what we can of the error message into the text chunk */
-      text_size = (png_size_t)length - (text - key) - 1;
+      text_size = (png_size_t)(slength - (text - key) - 1);
       text_size = sizeof(msg) > text_size ? text_size : sizeof(msg);
       png_memcpy(text, msg, text_size + 1);
    }
@@ -1409,12 +1419,17 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
       png_chunk_error(png_ptr, "unknown critical chunk");
+      /* to quiet compiler warnings about unused info_ptr */
+
+      if (info_ptr == NULL)
+         return;
    }
 
    if (png_ptr->mode & PNG_HAVE_IDAT)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
    png_crc_finish(png_ptr, length);
+
 }
 
 /* This function is called to verify that a chunk name is valid.
@@ -1847,8 +1862,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
             pixel_bytes = (row_info->pixel_depth >> 3);
 
-            sp = row + (row_info->width - 1) * pixel_bytes;
-            dp = row + (final_width - 1) * pixel_bytes;
+            sp = row + (png_size_t)(row_info->width - 1) * pixel_bytes;
+            dp = row + (png_size_t)(final_width - 1) * pixel_bytes;
             for (i = row_info->width; i; i--)
             {
                png_byte v[8];
@@ -1993,7 +2008,7 @@ png_read_finish_row(png_structp png_ptr)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
-      png_buffered_memset(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+      png_memset_check(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
       do
       {
          png_ptr->pass++;
@@ -2203,7 +2218,7 @@ png_read_start_row(png_structp png_ptr)
    png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
       png_ptr->rowbytes + 1));
 
-   png_buffered_memset(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+   png_memset_check(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
    png_debug1(3, "width = %d,\n", png_ptr->width);
    png_debug1(3, "height = %d,\n", png_ptr->height);

@@ -1,12 +1,12 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  */
 
 #define PNG_INTERNAL
@@ -1358,7 +1358,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                i += png_pass_inc[pass])
             {
                /* find out where the original pixel is */
-               sp = row + i * pixel_bytes;
+               sp = row + (png_size_t)i * pixel_bytes;
                /* move the pixel */
                if (dp != sp)
                   png_memcpy(dp, sp, pixel_bytes);

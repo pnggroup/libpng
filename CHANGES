@@ -223,5 +223,13 @@ version 0.99b [February 4, 1998]
 version 0.99c [February 7, 1998]
    More type casting.  Removed erroneous overflow test in pngmem.c.
    Added png_buffered_memcpy() and png_buffered_memset(), apply them to rowbytes.
-   Added UNIX manual pages libpng.3, initially created by R. P. C. Rodgers,
-      U.S. National Library of Medicine (rodgers@nlm.nih.gov), and png.5.
+   Added UNIX manual pages libpng.3 (incorporating libpng.txt) and  png.5.
+version 0.99d [February 8, 1998]
+   Renamed "far_to_near()" "png_far_to_near()"
+   Revised libpng.3
+   Version 99c "buffered" operations didn't work as intended.  Replaced them
+   with png_memcpy_check() and png_memset_check().
+version 0.99e [February 9, 1998]
+   Fixed a bug with background compositing of paletted images in pngrtran.c
+   Added many "if (png_ptr == NULL) return" to quell compiler warnings about
+      unused png_ptr, mostly in pngget.c and pngset.c.

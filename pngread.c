@@ -1,12 +1,12 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  *
  * This file contains routines that an application calls directly to
  * read a PNG file or stream.
@@ -418,7 +418,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       png_ptr->row_buf + 1, png_ptr->prev_row + 1,
       (int)(png_ptr->row_buf[0]));
 
-   png_buffered_memcpy(png_ptr, png_ptr->prev_row, png_ptr->row_buf,
+   png_memcpy_check(png_ptr, png_ptr->prev_row, png_ptr->row_buf,
       png_ptr->rowbytes + 1);
 
    if (png_ptr->transformations)

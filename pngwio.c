@@ -1,12 +1,12 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  *
  * This file provides a location for all output.  Users which need
  * special handling are expected to write functions which have the same
@@ -180,7 +180,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 
 #if defined(USE_FAR_KEYWORD) 
 #if defined(_MSC_VER)   
-void *far_to_near(png_structp png_ptr,png_voidp ptr, int check)
+void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
 {
    void *near_ptr;   
    void FAR *far_ptr;
@@ -192,7 +192,7 @@ void *far_to_near(png_structp png_ptr,png_voidp ptr, int check)
    return(near_ptr);
 }
 #  else
-void *far_to_near(png_structp png_ptr,png_voidp ptr, int check)
+void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
 {
    void *near_ptr;   
    void FAR *far_ptr;

@@ -1,12 +1,12 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  */
 
 #define PNG_INTERNAL
@@ -200,6 +200,7 @@ png_create_info_struct(png_structp png_ptr)
    png_infop info_ptr;
 
    png_debug(1, "in png_create_info_struct\n");
+   if(png_ptr == NULL) return (NULL);
    if ((info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO)) != NULL)
    {
       png_info_init(info_ptr);

@@ -1,12 +1,12 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that
@@ -39,7 +39,6 @@
 
 #ifdef PNGTEST_MEMORY_DEBUG
 #include <unistd.h>
-void *sbrk (ssize_t incr);
 #endif
 
 int test_one_file(PNG_CONST char *inname, PNG_CONST char *outname);
@@ -857,7 +856,6 @@ main(int argc, char *argv[])
                 pinfo = pinfo->next;
              }
           }
-         fprintf(STDERR, "sbrk(0)=%d\n",sbrk(0));
 #endif
        }
 #ifdef PNGTEST_MEMORY_DEBUG

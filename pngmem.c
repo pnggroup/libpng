@@ -1,11 +1,11 @@
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  *
  * This file provides a location for all memory allocation.  Users which
  * need special memory handling are expected to modify the code in this file
@@ -282,27 +282,22 @@ png_voidp
 PNG_MALLOC(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
-   png_size_t length;
 
    if (png_ptr == NULL || size == 0)
       return ((png_voidp)NULL);
 
 #ifdef PNG_MAX_MALLOC_64K
-   if (png_size > (png_uint_32)65536L)
+   if (size > (png_uint_32)65536L)
       png_error(png_ptr, "Cannot Allocate > 64K");
 #endif
 
-   length = (png_size_t)size;
-   if ((png_uint_32)length != size)
-      png_error(png_ptr, "Cannot Allocate > size_t");
-
 #if defined(__TURBOC__) && !defined(__FLAT__)
-   ret = farmalloc(length);
+   ret = farmalloc(size);
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
-   ret = halloc(length, 1);
+   ret = halloc(size, 1);
 # else
-   ret = malloc(length);
+   ret = malloc(size);
 # endif
 #endif
 
@@ -336,32 +331,29 @@ PNG_FREE(png_structp png_ptr, png_voidp ptr)
 
 #endif /* Not Borland DOS special memory handler */
 
-void
-png_buffered_memcpy (png_structp png_ptr, png_voidp s1, png_voidp s2,
+png_voidp
+png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,
    png_uint_32 length)
 {
    png_size_t size;
-   png_uint_32 i;
-   for (i=0; i<length; i+=65530)
-   {
-      size = (png_size_t)(length - i);
-      if (size > (png_size_t)65530L)
-         size=(png_size_t)65530L;
-      png_memcpy (s1, s2, size);
-   }
+
+   size = (png_size_t)length;
+   if ((png_uint_32)size != length)
+      png_error(png_ptr,"Overflow in png_memcpy_check.");
+  
+   return(png_memcpy (s1, s2, size));
 }
 
-void
-png_buffered_memset (png_structp png_ptr, png_voidp s1, int value,
+png_voidp
+png_memset_check (png_structp png_ptr, png_voidp s1, int value,
    png_uint_32 length)
 {
    png_size_t size;
-   png_uint_32 i;
-   for (i=0; i<length; i+=65530)
-   {
-      size = length - i;
-      if (size > 65530)
-         size=65530;
-      png_memset (s1, value, size);
-   }
+
+   size = (png_size_t)length;
+   if ((png_uint_32)size != length)
+      png_error(png_ptr,"Overflow in png_memset_check.");
+
+   return (png_memset (s1, value, size));
+
 }

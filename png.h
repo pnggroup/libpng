@@ -1,12 +1,12 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng 0.99c beta
+ * libpng 0.99d beta
  * For conditions of distribution and use, see the COPYRIGHT NOTICE below.
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998 Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  *
  * Note about libpng version numbers:
  *
@@ -30,6 +30,7 @@
  *      0.99a                     0.99      2.0.99
  *      0.99b                     0.99      2.0.99
  *      0.99c                     0.99      2.0.99
+ *      0.99d                     0.99      2.0.99
  *      1.0                       1.00      2.1.0
  *
  *    Henceforth the source version will match the shared-library minor
@@ -1109,10 +1110,10 @@ extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
 /* frees a pointer allocated by png_malloc() */
 extern PNG_EXPORT(void,png_free) PNGARG((png_structp png_ptr, png_voidp ptr));
 
-extern PNG_EXPORT(void,png_buffered_memcpy) PNGARG((png_structp png_ptr,
+extern PNG_EXPORT(png_voidp,png_memcpy_check) PNGARG((png_structp png_ptr,
    png_voidp s1, png_voidp s2, png_uint_32 size));
 
-extern PNG_EXPORT(void,png_buffered_memset) PNGARG((png_structp png_ptr,
+extern PNG_EXPORT(png_voidp,png_memset_check) PNGARG((png_structp png_ptr,
    png_voidp s1, int value, png_uint_32 size));
 
 #ifdef PNGTEST_MEMORY_DEBUG
@@ -1123,7 +1124,8 @@ extern PNG_EXPORT(void,png_debug_free) PNGARG((png_structp png_ptr,
    png_voidp ptr));
 #endif
 #if defined(USE_FAR_KEYWORD)  /* memory model conversion function */
-extern void *far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,int check));
+extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
+   int check));
 #endif /* USE_FAR_KEYWORD */
 
 /* Fatal error in PNG image of libpng - can't continue */
@@ -1475,8 +1477,8 @@ extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
 #define PNG_FLAG_FREE_PALETTE             0x1000
 #define PNG_FLAG_FREE_TRANS               0x2000
 #define PNG_FLAG_FREE_HIST                0x4000
-#define PNG_FLAG_HAVE_CHUNK_HEADER        0x8000
-#define PNG_FLAG_WROTE_tIME              0x10000
+#define PNG_FLAG_HAVE_CHUNK_HEADER        0x8000L
+#define PNG_FLAG_WROTE_tIME              0x10000L
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
                                      PNG_FLAG_CRC_ANCILLARY_NOWARN)

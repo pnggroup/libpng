@@ -1,12 +1,12 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  *
  * The functions here are used during reads to store data from the file
  * into the info struct, and during writes to store application data
@@ -22,7 +22,7 @@ void
 png_set_bKGD(png_structp png_ptr, png_infop info_ptr, png_color_16p background)
 {
    png_debug1(1, "in %s storage function\n", "bKGD");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    png_memcpy(&(info_ptr->background), background, sizeof(png_color_16));
@@ -37,7 +37,7 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
    double green_x, double green_y, double blue_x, double blue_y)
 {
    png_debug1(1, "in %s storage function\n", "cHRM");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    info_ptr->x_white = (float)white_x;
@@ -57,7 +57,7 @@ void
 png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
 {
    png_debug1(1, "in %s storage function\n", "gAMA");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    info_ptr->gamma = (float)file_gamma;
@@ -70,7 +70,7 @@ void
 png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
 {
    png_debug1(1, "in %s storage function\n", "hIST");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    info_ptr->hist = hist;
@@ -86,7 +86,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
 {
    int rowbytes_per_pixel;
    png_debug1(1, "in %s storage function\n", "IHDR");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    info_ptr->width = width;
@@ -123,7 +123,7 @@ png_set_oFFs(png_structp png_ptr, png_infop info_ptr,
    png_uint_32 offset_x, png_uint_32 offset_y, int unit_type)
 {
    png_debug1(1, "in %s storage function\n", "oFFs");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    info_ptr->x_offset = offset_x;
@@ -140,10 +140,10 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    png_charp units, png_charpp params)
 {
    png_uint_32 length;
-   png_uint_32 i;
+   int i;
 
    png_debug1(1, "in %s storage function\n", "pCAL");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    length = png_strlen(purpose) + 1;
@@ -184,7 +184,7 @@ png_set_pHYs(png_structp png_ptr, png_infop info_ptr,
    png_uint_32 res_x, png_uint_32 res_y, int unit_type)
 {
    png_debug1(1, "in %s storage function\n", "pHYs");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    info_ptr->x_pixels_per_unit = res_x;
@@ -199,7 +199,7 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
    png_colorp palette, int num_palette)
 {
    png_debug1(1, "in %s storage function\n", "PLTE");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    info_ptr->palette = palette;
@@ -213,7 +213,7 @@ png_set_sBIT(png_structp png_ptr, png_infop info_ptr,
    png_color_8p sig_bit)
 {
    png_debug1(1, "in %s storage function\n", "sBIT");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    png_memcpy(&(info_ptr->sig_bit), sig_bit, sizeof (png_color_8));
@@ -226,7 +226,7 @@ void
 png_set_sRGB(png_structp png_ptr, png_infop info_ptr, int intent)
 {
    png_debug1(1, "in %s storage function\n", "sRGB");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    info_ptr->srgb_intent = (png_byte)intent;
@@ -243,7 +243,7 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    float white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
 #endif
    png_debug1(1, "in %s storage function\n", "sRGB_gAMA_and_cHRM");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    png_set_sRGB(png_ptr, info_ptr, intent);
@@ -281,7 +281,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
    png_debug1(1, "in %s storage function\n", (png_ptr->chunk_name[0] == '\0' ?
       "text" : (png_const_charp)png_ptr->chunk_name));
 
-   if (info_ptr == NULL || num_text == 0)
+   if (png_ptr == NULL || info_ptr == NULL || num_text == 0)
       return;
 
    /* Make sure we have enough space in the "text" array in info_struct
@@ -298,7 +298,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          info_ptr->max_text = info_ptr->num_text + num_text + 8;
          old_text = info_ptr->text;
          info_ptr->text = (png_textp)png_malloc(png_ptr,
-            info_ptr->max_text * sizeof (png_text));
+            (png_uint_32)(info_ptr->max_text * sizeof (png_text)));
          png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max *
             sizeof(png_text)));
          png_free(png_ptr, old_text);
@@ -344,7 +344,7 @@ void
 png_set_tIME(png_structp png_ptr, png_infop info_ptr, png_timep mod_time)
 {
    png_debug1(1, "in %s storage function\n", "tIME");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    png_memcpy(&(info_ptr->mod_time), mod_time, sizeof (png_time));
@@ -358,7 +358,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
    png_bytep trans, int num_trans, png_color_16p trans_values)
 {
    png_debug1(1, "in %s storage function\n", "tRNS");
-   if (info_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    if (trans != NULL)

@@ -1,25 +1,25 @@
-libpng.txt - a description on how to use and modify libpng
+libpng.txt - A description on how to use and modify libpng
 
-   libpng version 0.99c
-   Updated and distributed by Glenn Randers-Pehrson <randeg@alumni.rpi.edu>
-   Copyright (c) 1998, Glenn Randers-Pehrson
-   February 7, 1998
+libpng version 0.99d
+Updated and distributed by Glenn Randers-Pehrson <randeg@alumni.rpi.edu>
+Copyright (c) 1998, Glenn Randers-Pehrson
+February 8, 1998
 
-      based on:
+based on:
 
-   libpng 1.0 beta 6  version 0.96
-   Updated and distributed by Andreas Dilger 
-   Copyright (c) 1996, 1997 Andreas Dilger
-   May 28, 1997
+libpng 1.0 beta 6  version 0.96
+Updated and distributed by Andreas Dilger 
+Copyright (c) 1996, 1997 Andreas Dilger
+May 28, 1997
 
-   libpng 1.0 beta 2 - version 0.88
-   For conditions of distribution and use, see copyright notice in png.h
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
-   January 26, 1996
+libpng 1.0 beta 2 - version 0.88
+For conditions of distribution and use, see copyright notice in png.h
+Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+January 26, 1996
 
-   Updated/rewritten per request in the libpng FAQ
-   Copyright (c) 1995 Frank J. T. Wojcik
-   December 18, 1995 && January 20, 1996
+Updated/rewritten per request in the libpng FAQ
+Copyright (c) 1995 Frank J. T. Wojcik
+December 18, 1995 && January 20, 1996
 
 I. Introduction
 
@@ -68,7 +68,6 @@ Libpng does not protect itself against two threads using the
 same instance of a structure.
 
 
-
 II. Structures
 
 There are two main structures that are important to libpng, png_struct
@@ -90,8 +89,6 @@ The png.h header file is an invaluable reference for programming with libpng.
 And while I'm on the topic, make sure you include the libpng header file:
 
 #include <png.h>
-
-
 
 III. Reading
 
@@ -122,6 +119,7 @@ then only check the bytes (if any) that your program didn't read.
 to replace them with custom functions.  See the discussion under
 Customizing libpng.
 
+
     FILE *fp = fopen(file_name, "rb");
     if (!fp)
     {
@@ -134,6 +132,7 @@ Customizing libpng.
         return;
     }
 
+
 Next, png_struct and png_info need to be allocated and initialized.  In
 order to ensure that the size of these structures is correct even with a
 dynamically linked libpng, there are functions to initialize and
@@ -143,24 +142,28 @@ use by the error functions, if necessary (the pointer and functions can
 be NULL if the default error handlers are to be used).  See the section
 on Changes to Libpng below regarding the old initialization functions.
 
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-       (void *)user_error_ptr, user_error_fn, user_warning_fn);
+    png_structp png_ptr = png_create_read_struct
+       (PNG_LIBPNG_VER_STRING, (void *)user_error_ptr,
+        user_error_fn, user_warning_fn);
     if (!png_ptr)
         return;
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)
     {
-        png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
+        png_destroy_read_struct(&png_ptr,
+           (png_infopp)NULL, (png_infopp)NULL);
         return;
     }
 
     png_infop end_info = png_create_info_struct(png_ptr);
     if (!end_info)
     {
-        png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&png_ptr, &info_ptr,
+          (png_infopp)NULL);
         return;
     }
+
 
 The error handling routines passed to png_create_read_struct() are only
 necessary if you are not using the libpng supplied error handling
@@ -171,7 +174,6 @@ routines, you will need to update the jmpbuf field every time you enter
 a new routine that will call a png_ function.
 
 See your documentation of setjmp/longjmp for your compiler for more
-information on setjmp/longjmp.  See the discussion on libpng error
 handling in the Customizing Libpng section below for more information on
 the libpng error handling.  If an error occurs, and libpng longjmp's
 back to your setjmp, you will want to call png_destroy_read_struct() to
@@ -179,7 +181,8 @@ free any memory.
 
     if (setjmp(png_ptr->jmpbuf))
     {
-        png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+        png_destroy_read_struct(&png_ptr, &info_ptr,
+           &end_info);
         fclose(fp);
         return;
     }
@@ -220,55 +223,80 @@ image data.  You do this with a call to png_read_info().
 
 Functions are used to get the information from the info_ptr:
 
-    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
-       &interlace_type, &compression_type, &filter_type);
+    png_get_IHDR(png_ptr, info_ptr, &width, &height,
+       &bit_depth, &color_type, &interlace_type,
+       &compression_type, &filter_type);
 
-    width          - holds the width of the image in pixels (up to 2^31).
-    height         - holds the height of the image in pixels (up to 2^31).
-    bit_depth      - holds the bit depth of one of the image channels.
-                     (valid values are 1, 2, 4, 8, 16 and depend also on the
-                      color_type.  See also significant bits (sBIT) below).
-    color_type     - describes which color/alpha channels are present.
-                     PNG_COLOR_TYPE_GRAY        (bit depths 1, 2, 4, 8, 16)
-                     PNG_COLOR_TYPE_GRAY_ALPHA  (bit depths 8, 16)
-                     PNG_COLOR_TYPE_PALETTE     (bit depths 1, 2, 4, 8)
-                     PNG_COLOR_TYPE_RGB         (bit_depths 8, 16)
-                     PNG_COLOR_TYPE_RGB_ALPHA   (bit_depths 8, 16)
+    width          - holds the width of the image
+                     in pixels (up to 2^31).
+    height         - holds the height of the image
+                     in pixels (up to 2^31).
+    bit_depth      - holds the bit depth of one of the
+                     image channels.  (valid values are
+                     1, 2, 4, 8, 16 and depend also on
+                     the color_type.  See also
+                     significant bits (sBIT) below).
+    color_type     - describes which color/alpha channels
+                         are present.
+                     PNG_COLOR_TYPE_GRAY
+                        (bit depths 1, 2, 4, 8, 16)
+                     PNG_COLOR_TYPE_GRAY_ALPHA  
+                        (bit depths 8, 16)
+                     PNG_COLOR_TYPE_PALETTE
+                        (bit depths 1, 2, 4, 8)
+                     PNG_COLOR_TYPE_RGB
+                        (bit_depths 8, 16)
+                     PNG_COLOR_TYPE_RGB_ALPHA
+                        (bit_depths 8, 16)
 
                      PNG_COLOR_MASK_PALETTE
                      PNG_COLOR_MASK_COLOR
                      PNG_COLOR_MASK_ALPHA
 
-    filter_type    - (must be PNG_FILTER_TYPE_BASE for PNG 1.0)
-    compression_type - (must be PNG_COMPRESSION_TYPE_BASE for PNG 1.0)
-    interlace_type - (PNG_INTERLACE_TYPE_NONE or PNG_INTERLACE_TYPE_ADAM7)
-    Any or all of interlace_type, compression_type, of filter_type can be
+    filter_type    - (must be PNG_FILTER_TYPE_BASE
+                     for PNG 1.0)
+    compression_type - (must be PNG_COMPRESSION_TYPE_BASE
+                     for PNG 1.0)
+    interlace_type - (PNG_INTERLACE_TYPE_NONE or
+                     PNG_INTERLACE_TYPE_ADAM7)
+    Any or all of interlace_type, compression_type, of
+                     filter_type can be
     NULL if you are not interested in their values.
 
     channels = png_get_channels(png_ptr, info_ptr);
-    channels       - number of channels of info for the color type
-                     (valid values are 1 (GRAY, PALETTE), 2 (GRAY_ALPHA),
-                      3 (RGB), 4 (RGB_ALPHA or RGB + filler byte))
+    channels       - number of channels of info for the
+                     color type (valid values are 1 (GRAY,
+                     PALETTE), 2 (GRAY_ALPHA), 3 (RGB),
+                     4 (RGB_ALPHA or RGB + filler byte))
     rowbytes = png_get_rowbytes(png_ptr, info_ptr);
     rowbytes       - number of bytes needed to hold a row
 
     signature = png_get_signature(png_ptr, info_ptr);
-    signature      - holds the signature read from the file (if any).  The
-                     data is kept in the same offset it would be if the
-                     whole signature were read (ie if an application had
-                     already read in 4 bytes of signature before staring
-                     libpng, the remaining 4 bytes would be in signature[4]
-                     through signature[7] (see png_set_sig_bytes())).
-    
-Information from each if the IHDR fields can be retrieve separately as well:
+    signature      - holds the signature read from the
+                     file (if any).  The data is kept in
+                     the same offset it would be if the
+                     whole signature were read (ie if an
+                     application had already read in 4
+                     bytes of signature before starting
+                     libpng, the remaining 4 bytes would
+                     be in signature[4] through signature[7]
+                     (see png_set_sig_bytes())).
 
-    width            = png_get_image_width(png_ptr, info_ptr);
-    height           = png_get_image_height(png_ptr, info_ptr);
-    bit_depth        = png_get_bit_depth(png_ptr, info_ptr);
-    color_type       = png_get_color_type(png_ptr, info_ptr);
-    filter_type      = png_get_filter_type(png_ptr, info_ptr);
-    compression_type = png_get_compression_type(png_ptr, info_ptr);
-    interlace_type   = png_get_interlace_type(png_ptr, info_ptr);
+
+    width            = png_get_image_width(png_ptr,
+                         info_ptr);
+    height           = png_get_image_height(png_ptr,
+                         info_ptr);
+    bit_depth        = png_get_bit_depth(png_ptr,
+                         info_ptr);
+    color_type       = png_get_color_type(png_ptr,
+                         info_ptr);
+    filter_type      = png_get_filter_type(png_ptr,
+                         info_ptr);
+    compression_type = png_get_compression_type(png_ptr,
+                         info_ptr);
+    interlace_type   = png_get_interlace_type(png_ptr,
+                         info_ptr);
 
 
 These are also important, but their validity depends on whether the chunk
@@ -278,65 +306,91 @@ data has been read, or zero if it is missing.  The parameters to the
 png_get_<chunk> are set directly if they are simple data types, or a pointer
 into the info_ptr is returned for any complex types.
 
-    png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette);
-    palette        - the palette for the file (array of png_color)
+    png_get_PLTE(png_ptr, info_ptr, &palette,
+                     &num_palette);
+    palette        - the palette for the file
+                     (array of png_color)
     num_palette    - number of entries in the palette
 
     png_get_gAMA(png_ptr, info_ptr, &gamma);
-    gamma          - the gamma the file is written at (PNG_INFO_gAMA)
+    gamma          - the gamma the file is written
+                     at (PNG_INFO_gAMA)
 
     png_get_sRGB(png_ptr, info_ptr, &srgb_intent);
     srgb_intent    - the rendering intent (PNG_INFO_sRGB)
-                     The presence of the sRGB chunk means that the pixel
-                     data is in the sRGB color space.  This chunk also
-                     implies specific values of gAMA and cHRM.
+                     The presence of the sRGB chunk
+                     means that the pixel data is in the
+                     sRGB color space.  This chunk also
+                     implies specific values of gAMA and
+                     cHRM.
 
     png_get_sBIT(png_ptr, info_ptr, &sig_bit);
-    sig_bit        - the number of significant bits for (PNG_INFO_sBIT)
-                     the gray, red, green, and blue channels, whichever
-                     are appropriate for the given color type (png_color_16)
+    sig_bit        - the number of significant bits for
+                     (PNG_INFO_sBIT) each of the gray,
+                     red, green, and blue channels,
+                     whichever are appropriate for the
+                     given color type (png_color_16)
 
-    png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans, &trans_values);
-    trans          - array of transparent entries for palette (PNG_INFO_tRNS)
-    trans_values   - transparent pixel for non-paletted images (PNG_INFO_tRNS)
-    num_trans      - number of transparent entries (PNG_INFO_tRNS)
+    png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans,
+                     &trans_values);
+    trans          - array of transparent entries for
+                     palette (PNG_INFO_tRNS)
+    trans_values   - transparent pixel for non-paletted
+                     images (PNG_INFO_tRNS)
+    num_trans      - number of transparent entries
+                     (PNG_INFO_tRNS)
 
-    png_get_hIST(png_ptr, info_ptr, &hist);        (PNG_INFO_hIST)
-    hist           - histogram of palette (array of png_color_16)
+    png_get_hIST(png_ptr, info_ptr, &hist);
+                     (PNG_INFO_hIST)
+    hist           - histogram of palette (array of
+                     png_color_16)
 
     png_get_tIME(png_ptr, info_ptr, &mod_time);
-    mod_time       - time image was last modified (PNG_VALID_tIME)
+    mod_time       - time image was last modified
+                    (PNG_VALID_tIME)
 
     png_get_bKGD(png_ptr, info_ptr, &background);
     background     - background color (PNG_VALID_bKGD)
 
     num_text = png_get_text(png_ptr, info_ptr, &text_ptr);
-    text_ptr       - array of png_text holding image comments
-    text_ptr[i]->key         - keyword for comment.
-    text_ptr[i]->text        - text comments for current keyword.
-    text_ptr[i]->compression - type of compression used on "text"
-                               PNG_TEXT_COMPRESSION_NONE or
-                               PNG_TEXT_COMPRESSION_zTXt
+    text_ptr       - array of png_text holding image
+                     comments
+    text_ptr[i]->key   - keyword for comment.
+    text_ptr[i]->text  - text comments for current
+                         keyword.
+    text_ptr[i]->compression - type of compression used
+                     on "text" PNG_TEXT_COMPRESSION_NONE
+                     or PNG_TEXT_COMPRESSION_zTXt
     num_text       - number of comments
 
-    png_get_oFFs(png_ptr, info_ptr, &offset_x, &offset_y, &unit_type);
-    offset_x       - positive offset from the left edge of the screen
-    offset_y       - positive offset from the top edge of the screen
+    png_get_oFFs(png_ptr, info_ptr, &offset_x, &offset_y,
+                     &unit_type);
+    offset_x       - positive offset from the left edge
+                     of the screen
+    offset_y       - positive offset from the top edge
+                     of the screen
     unit_type      - PNG_OFFSET_PIXEL, PNG_OFFSET_MICROMETER
 
-    png_get_pHYs(png_ptr, info_ptr, &res_x, &res_y, &unit_type);
-    res_x          - pixels/unit physical resolution in x direction
-    res_y          - pixels/unit physical resolution in x direction
-    unit_type      - PNG_RESOLUTION_UNKOWN, PNG_RESOLUTION_METER
+    png_get_pHYs(png_ptr, info_ptr, &res_x, &res_y,
+                     &unit_type);
+    res_x          - pixels/unit physical resolution in
+                     x direction
+    res_y          - pixels/unit physical resolution in
+                     x direction
+    unit_type      - PNG_RESOLUTION_UNKOWN,
+                     PNG_RESOLUTION_METER
 
 The data from the pHYs chunk can be retrieved in several convenient
 forms:
 
-    res_x_and_y = png_get_pixels_per_meter(png_ptr, info_ptr)
-    aspect_ratio = png_get_pixel_aspect_ratio(png_ptr, info_ptr)
+    res_x_and_y = png_get_pixels_per_meter(png_ptr,
+                  info_ptr)
+    aspect_ratio = png_get_pixel_aspect_ratio(png_ptr,
+                  info_ptr)
 
-   (Each of these returns 0 [signifying "unknown"] if the data is not
-     present or if res_x is 0; res_x_and_y is 0 if res_x != res_y)
+   (Each of these returns 0 [signifying "unknown"] if
+       the data is not present or if res_x is 0;
+       res_x_and_y is 0 if res_x != res_y)
 
 For more information, see the png_info definition in png.h and the
 PNG specification for chunk contents.  Be careful with trusting
@@ -399,14 +453,14 @@ transparency information in a tRNS chunk.  This is most useful on
 grayscale images with bit depths of 2 or 4 or if there is a multiple-image
 viewing application that wishes to treat all images in the same way.
 
-    if (color_type == PNG_COLOR_TYPE_PALETTE && bit_depth <= 8)
-        png_set_expand(png_ptr);
+    if (color_type == PNG_COLOR_TYPE_PALETTE &&
+        bit_depth <= 8) png_set_expand(png_ptr);
 
-    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
-        png_set_expand(png_ptr);
+    if (color_type == PNG_COLOR_TYPE_GRAY &&
+        bit_depth < 8) png_set_expand(png_ptr);
 
-    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
-        png_set_expand(png_ptr);
+    if (png_get_valid(png_ptr, info_ptr,
+        PNG_INFO_tRNS)) png_set_expand(png_ptr);
 
 PNG can have files with 16 bits per channel.  If you only can handle
 8 bits per channel, this will strip the pixels down to 8 bit.
@@ -463,8 +517,9 @@ changes the storage of the pixels to blue, green, red:
 PNG files store RGB pixels packed into 3 bytes. This code expands them
 into 4 bytes for windowing systems that need them in this format:
 
-    if (bit_depth == 8 && color_type == PNG_COLOR_TYPE_RGB)
-        png_set_filler(png_ptr, filler, PNG_FILLER_BEFORE);
+    if (bit_depth == 8 && color_type ==
+        PNG_COLOR_TYPE_RGB) png_set_filler(png_ptr,
+        filler, PNG_FILLER_BEFORE);
 
 where "filler" is the number to fill with, and the location is
 either PNG_FILLER_BEFORE or PNG_FILLER_AFTER, depending upon whether
@@ -496,9 +551,10 @@ background for a paletted image.
     png_color_16 my_background;
     png_color_16p image_background;
 
-    if (png_get_bKGD(png_ptr, info_ptr, &image_background))
+    if (png_get_bKGD(png_ptr, info_ptr,
+        &image_background))
         png_set_background(png_ptr, image_background),
-             PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
+        PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
     else
         png_set_background(png_ptr, &my_background,
           PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
@@ -519,22 +575,29 @@ a dim (viewing_gamma=1.125) or dark (viewing_gamma=1.25) environment.
 In a brightly lit room, no compensation other than the display_gamma
 is needed (viewing_gamma=1.0).
 
-   if (/* We have a user-defined screen gamma value */)
+   if (/* We have a user-defined screen
+       gamma value */)
    {
       screen_gamma = user_defined_screen_gamma;
    }
-   /* One way that applications can share the same screen gamma value */
-   else if ((gamma_str = getenv("SCREEN_GAMMA")) != NULL)
+   /* One way that applications can share the same
+      screen gamma value */
+   else if ((gamma_str = getenv("SCREEN_GAMMA"))
+      != NULL)
    {
       screen_gamma = atof(gamma_str);
    }
    /* If we don't have another value */
    else
    {
-      screen_gamma = 2.5; /* A good guess for a PC monitor in a bright office */
-      screen_gamma = 2.2; /* A good guess for a PC monitor in a dim room */
-      screen_gamma = 2.0; /* A good guess for a PC monitor in a dark room */
-      screen_gamma = 1.7 or 1.0;  /* A good guess for Mac systems */
+      screen_gamma = 2.5; /* A good guess for a
+           PC monitor in a bright office */
+      screen_gamma = 2.2; /* A good guess for a
+           PC monitor in a dim room */
+      screen_gamma = 2.0; /* A good guess for a
+           PC monitor in a dark room */
+      screen_gamma = 1.7 or 1.0;  /* A good
+           guess for Mac systems */
    }
 
 The png_set_gamma() function handles gamma transformations of the data.
@@ -564,21 +627,24 @@ histogram, it may not do as good a job.
 
    if (color_type & PNG_COLOR_MASK_COLOR)
    {
-      if (png_get_valid(png_ptr, info_ptr, PNG_INFO_PLTE))
+      if (png_get_valid(png_ptr, info_ptr,
+         PNG_INFO_PLTE))
       {
          png_color_16p histogram;
 
-         png_get_hIST(png_ptr, info_ptr, &histogram);
-         png_set_dither(png_ptr, palette, num_palette, max_screen_colors,
-            histogram, 1);
+         png_get_hIST(png_ptr, info_ptr,
+            &histogram);
+         png_set_dither(png_ptr, palette, num_palette,
+            max_screen_colors, histogram, 1);
       }
       else
       {
          png_color std_color_cube[MAX_SCREEN_COLORS] =
             { ... colors ... };
 
-         png_set_dither(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
-            MAX_SCREEN_COLORS, NULL,0);
+         png_set_dither(png_ptr, std_color_cube,
+            MAX_SCREEN_COLORS, MAX_SCREEN_COLORS,
+            NULL,0);
       }
    }
 
@@ -649,7 +715,8 @@ If you don't want to read in the whole image at once, you can
 use png_read_rows() instead.  If there is no interlacing (check
 interlace_type == PNG_INTERLACE_TYPE_NONE), this is simple:
 
-    png_read_rows(png_ptr, row_pointers, NULL, number_of_rows);
+    png_read_rows(png_ptr, row_pointers, NULL,
+       number_of_rows);
 
 where row_pointers is the same as in the png_read_image() call.
 
@@ -701,7 +768,8 @@ If you want libpng to expand the images, call this before calling
 png_start_read_image() or png_read_update_info():
 
     if (interlace_type == PNG_INTERLACE_TYPE_ADAM7)
-        number_of_passes = png_set_interlace_handling(png_ptr);
+        number_of_passes
+           = png_set_interlace_handling(png_ptr);
 
 This will return the number of passes needed.  Currently, this
 is seven, but may change if another interlace type is added.
@@ -722,18 +790,19 @@ rows between calls.  You can change the locations of the data, just
 not the data.  Each pass only writes the pixels appropriate for that
 pass, and assumes the data from previous passes is still valid.
 
-    png_read_rows(png_ptr, row_pointers, NULL, number_of_rows);
+    png_read_rows(png_ptr, row_pointers, NULL,
+       number_of_rows);
 
 If you only want the first effect (the rectangles), do the same as
 before except pass the row buffer in the third parameter, and leave
 the second parameter NULL.
 
-    png_read_rows(png_ptr, NULL, row_pointers, number_of_rows);
+    png_read_rows(png_ptr, NULL, row_pointers,
+       number_of_rows);
 
 After you are finished reading the image, you can finish reading
 the file.  If you are interested in comments or time, which may be
 stored either before or after the image data, you should pass the
-info_ptr pointer from the png_read_info() call, or you can pass a
 separate png_info struct if you want to keep the comments from
 before and after the image separate.  If you are not interested, you
 can pass NULL.
@@ -742,7 +811,8 @@ can pass NULL.
 
 When you are done, you can free all memory allocated by libpng like this:
 
-   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+   png_destroy_read_struct(&png_ptr, &info_ptr,
+       &end_info);
 
 For a more compact example of reading a PNG image, see the file example.c.
 
@@ -763,128 +833,155 @@ all of the code).
 png_structp png_ptr;
 png_infop info_ptr;
 
-/*  An example code fragment of how you would initialize the progressive
-    reader in your application. */
-int
-initialize_png_reader()
-{
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-        (void *)user_error_ptr, user_error_fn, user_warning_fn);
+ /*  An example code fragment of how you would
+     initialize the progressive reader in your
+     application. */
+ int
+ initialize_png_reader()
+ {
+    png_ptr = png_create_read_struct
+        (PNG_LIBPNG_VER_STRING, (void *)user_error_ptr,
+         user_error_fn, user_warning_fn);
     if (!png_ptr)
         return -1;
     info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)
     {
-        png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
+        png_destroy_read_struct(&png_ptr, (png_infopp)NULL,
+           (png_infopp)NULL);
         return -1;
     }
 
     if (setjmp(png_ptr->jmpbuf))
     {
-        png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&png_ptr, &info_ptr,
+           (png_infopp)NULL);
         return -1;
     }
 
-    /* This one's new.  You can provide functions to be called
-       when the header info is valid, when each row is completed,
-       and when the image is finished.  If you aren't using all
-       functions, you can specify a NULL parameter.  You can use
-       any struct as the user_ptr (cast to a void pointer for the
-       function call), and retrieve the pointer from inside the
-       callbacks using the function png_get_progressive_ptr(png_ptr);        
-       which will return a void pointer, which you have to cast
-       appropriately.
+    /* This one's new.  You can provide functions
+       to be called when the header info is valid,
+       when each row is completed, and when the image
+       is finished.  If you aren't using all functions,
+       you can specify a NULL parameter.  You can use
+       any struct as the user_ptr (cast to a void pointer
+       for the function call), and retrieve the pointer
+       from inside the callbacks using the function
+
+          png_get_progressive_ptr(png_ptr);
+
+       which will return a void pointer, which you have
+       to cast appropriately.
      */
     png_set_progressive_read_fn(png_ptr, (void *)user_ptr,
         info_callback, row_callback, end_callback);
 
     return 0;
-}
+ }
 
-/* A code fragment that you call as you recieve blocks of data */
-int
-process_data(png_bytep buffer, png_uint_32 length)
-{
+ /* A code fragment that you call as you receive blocks
+   of data */
+ int
+ process_data(png_bytep buffer, png_uint_32 length)
+ {
     if (setjmp(png_ptr->jmpbuf))
     {
-        png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&png_ptr, &info_ptr,
+           (png_infopp)NULL);
         return -1;
     }
 
-    /* This one's new also.  Simply give it a chunk of data
-       from the file stream (in order, of course).  On machines
-       with segmented memory models machines, don't give it any 
-       more than 64K.  The library seems to run fine with sizes 
-       of 4K. Although you can give it much less if necessary 
-       (I assume you can give it chunks of 1 byte, I haven't
-       tried less then 256 bytes yet).  When this function returns,
-       you may want to display any rows that were generated in the
-       row callback if you don't already do so there. 
+    /* This one's new also.  Simply give it a chunk
+       of data from the file stream (in order, of
+       course).  On machines with segmented memory
+       models machines, don't give it any more than
+       64K.  The library seems to run fine with sizes 
+       of 4K. Although you can give it much less if
+       necessary (I assume you can give it chunks of
+       1 byte, I haven't tried less then 256 bytes
+       yet).  When this function returns, you may
+       want to display any rows that were generated
+       in the row callback if you don't already do
+       so there. 
      */
     png_process_data(png_ptr, info_ptr, buffer, length);
     return 0;
-}
+ }
 
-/* This function is called (as set by png_set_progressive_fn() above)
-   when enough data has been supplied so all of the header has been read.
+ /* This function is called (as set by
+    png_set_progressive_fn() above) when enough data
+    has been supplied so all of the header has been
+    read.
  */
-void
-info_callback(png_structp png_ptr, png_infop info)
-{
-    /* Do any setup here, including setting any of the transformations
-       mentioned in the Reading PNG files section.  For now, you _must_
-       call either png_start_read_image() or png_read_update_info()
-       after all the transformations are set (even if you don't set
-       any).  You may start getting rows before png_process_data()
-       returns, so this is your last chance to prepare for that.
+ void
+ {
+    /* Do any setup here, including setting any of
+       the transformations mentioned in the Reading
+       PNG files section.  For now, you _must_ call
+       either png_start_read_image() or
+       png_read_update_info() after all the
+       transformations are set (even if you don't set
+       any).  You may start getting rows before
+       png_process_data() returns, so this is your
+       last chance to prepare for that.
      */
-}
+ }
 
-/* This function is called when each row of image data is complete */
-void
-row_callback(png_structp png_ptr, png_bytep new_row,
+ /* This function is called when each row of image
+    data is complete */
+ void
+ row_callback(png_structp png_ptr, png_bytep new_row,
     png_uint_32 row_num, int pass)
-{
-    /* If the image is interlaced, and you turned on the interlace
-       handler, this function will be called for every row in every pass.
-       Some of these rows will not be changed from the previous pass.
-       When the row is not changed, the new_row variable will be NULL.
-       The rows and passes are called in order, so you don't really
-       need the row_num and pass, but I'm supplying them because it
-       may make your life easier.
+ {
+    /* If the image is interlaced, and you turned
+       on the interlace handler, this function will
+       be called for every row in every pass.  Some
+       of these rows will not be changed from the
+       previous pass.  When the row is not changed,
+       the new_row variable will be NULL.  The rows
+       and passes are called in order, so you don't
+       really need the row_num and pass, but I'm
+       supplying them because it may make your life
+       easier.
 
-       For the non-NULL rows of interlaced images, you must call
-       png_progressive_combine_row() passing in the row and the
-       old row.  You can call this function for NULL rows (it will
-       just return) and for non-interlaced images (it just does the
-       memcpy for you) if it will make the code easier.  Thus, you
-       can just do this for all cases:
+       For the non-NULL rows of interlaced images,
+       you must call png_progressive_combine_row()
+       passing in the row and the old row.  You can
+       call this function for NULL rows (it will just
+       return) and for non-interlaced images (it just
+       does the memcpy for you) if it will make the
+       code easier.  Thus, you can just do this for
+       all cases:
      */
 
-        png_progressive_combine_row(png_ptr, old_row, new_row);
+        png_progressive_combine_row(png_ptr, old_row,
+          new_row);
 
-    /* where old_row is what was displayed for previous rows.  Note
-       that the first pass (pass == 0, really) will completely cover
-       the old row, so the rows do not have to be initialized.  After
-       the first pass (and only for interlaced images), you will have
-       to pass the current row, and the function will combine the
-       old row and the new row.
+    /* where old_row is what was displayed for
+       previous rows.  Note that the first pass
+       (pass == 0, really) will completely cover
+       the old row, so the rows do not have to be
+       initialized.  After the first pass (and only
+       for interlaced images), you will have to pass
+       the current row, and the function will combine
+       the old row and the new row.
     */  
-}
+ }
 
-void
-end_callback(png_structp png_ptr, png_infop info)
-{
-    /* This function is called after the whole image has been read,
-       including any chunks after the image (up to and including
-       the IEND).  You will usually have the same info chunk as you
-       had in the header, although some data may have been added
-       to the comments and time fields.
+ void
+ end_callback(png_structp png_ptr, png_infop info)
+ {
+    /* This function is called after the whole image
+       has been read, including any chunks after the
+       image (up to and including the IEND).  You
+       will usually have the same info chunk as you
+       had in the header, although some data may have
+       been added to the comments and time fields.
 
-       Most people won't do much here, perhaps setting a flag that
-       marks the image as finished.
+       Most people won't do much here, perhaps setting
+       a flag that marks the image as finished.
      */
-}
+ }
 
 
 
@@ -910,15 +1007,17 @@ As these can be both relatively large, you may not want to store these
 on the stack, unless you have stack space to spare.  Of course, you
 will want to check if they return NULL.
 
-    png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-       (void *)user_error_ptr, user_error_fn, user_warning_fn);
+    png_structp png_ptr = png_create_write_struct
+       (PNG_LIBPNG_VER_STRING, (void *)user_error_ptr,
+        user_error_fn, user_warning_fn);
     if (!png_ptr)
        return;
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)
     {
-       png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+       png_destroy_write_struct(&png_ptr,
+         (png_infopp)NULL);
        return;
     }
 
@@ -963,9 +1062,11 @@ which filter type(s) are to be tested for each scanline.  See the
 Compression Library for details on the specific filter types.
 
     
-    /* turn on or off filtering, and/or choose specific filters */
+    /* turn on or off filtering, and/or choose
+       specific filters */
     png_set_filter(png_ptr, 0,
-       PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_PAETH);
+       PNG_FILTER_NONE | PNG_FILTER_SUB |
+       PNG_FILTER_PAETH);
 
 The png_set_compression_???() functions interface to the zlib compression
 library, and should mostly be ignored unless you really know what you are
@@ -974,11 +1075,13 @@ which changes how much time zlib spends on trying to compress the image
 data.  See the Compression Library for details on the compression levels.
 
     /* set the zlib compression level */
-    png_set_compression_level(png_ptr, Z_BEST_COMPRESSION);
+    png_set_compression_level(png_ptr,
+        Z_BEST_COMPRESSION);
 
     /* set other zlib parameters */
     png_set_compression_mem_level(png_ptr, 8);
-    png_set_compression_strategy(png_ptr, Z_DEFAULT_STRATEGY);
+    png_set_compression_strategy(png_ptr,
+        Z_DEFAULT_STRATEGY);
     png_set_compression_window_bits(png_ptr, 15);
     png_set_compression_method(png_ptr, 8);
 
@@ -995,91 +1098,136 @@ contain, see the PNG specification.
 
 Some of the more important parts of the png_info are:
 
-    png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, color_type,
-       interlace_type, compression_type, filter_type)
-    width          - holds the width of the image in pixels (up to 2^31).
-    height         - holds the height of the image in pixels (up to 2^31).
-    bit_depth      - holds the bit depth of one of the image channels.
-                     (valid values are 1, 2, 4, 8, 16 and depend also on the
-                      color_type.  See also significant bits (sBIT) below).
-    color_type     - describes which color/alpha channels are present.
-                     PNG_COLOR_TYPE_GRAY        (bit depths 1, 2, 4, 8, 16)
-                     PNG_COLOR_TYPE_GRAY_ALPHA  (bit depths 8, 16)
-                     PNG_COLOR_TYPE_PALETTE     (bit depths 1, 2, 4, 8)
-                     PNG_COLOR_TYPE_RGB         (bit_depths 8, 16)
-                     PNG_COLOR_TYPE_RGB_ALPHA   (bit_depths 8, 16)
+    png_set_IHDR(png_ptr, info_ptr, width, height,
+       bit_depth, color_type, interlace_type,
+       compression_type, filter_type)
+    width          - holds the width of the image
+                     in pixels (up to 2^31).
+    height         - holds the height of the image
+                     in pixels (up to 2^31).
+    bit_depth      - holds the bit depth of one of the
+                     image channels.
+                     (valid values are 1, 2, 4, 8, 16
+                     and depend also on the
+                     color_type.  See also significant
+                     bits (sBIT) below).
+    color_type     - describes which color/alpha
+                     channels are present.
+                     PNG_COLOR_TYPE_GRAY
+                        (bit depths 1, 2, 4, 8, 16)
+                     PNG_COLOR_TYPE_GRAY_ALPHA
+                        (bit depths 8, 16)
+                     PNG_COLOR_TYPE_PALETTE
+                        (bit depths 1, 2, 4, 8)
+                     PNG_COLOR_TYPE_RGB
+                        (bit_depths 8, 16)
+                     PNG_COLOR_TYPE_RGB_ALPHA
+                        (bit_depths 8, 16)
 
                      PNG_COLOR_MASK_PALETTE
                      PNG_COLOR_MASK_COLOR
                      PNG_COLOR_MASK_ALPHA
 
-    interlace_type - PNG_INTERLACE_TYPE_NONE or PNG_INTERLACE_TYPE_ADAM7
-    compression_type - (must be PNG_COMPRESSION_TYPE_DEFAULT for PNG 1.0)
-    filter_type    - (must be PNG_FILTER_TYPE_DEFAULT for PNG 1.0)
+    interlace_type - PNG_INTERLACE_TYPE_NONE or
+                     PNG_INTERLACE_TYPE_ADAM7
+    compression_type - (must be
+                     PNG_COMPRESSION_TYPE_DEFAULT)
+    filter_type    - (must be PNG_FILTER_TYPE_DEFAULT)
 
-    png_set_PLTE(png_ptr, info_ptr, palette, num_palette);
-    palette        - the palette for the file (array of png_color)
+    png_set_PLTE(png_ptr, info_ptr, palette,
+       num_palette);
+    palette        - the palette for the file
+                     (array of png_color)
     num_palette    - number of entries in the palette
 
     png_set_gAMA(png_ptr, info_ptr, gamma);
-    gamma          - the gamma the image was created at (PNG_INFO_gAMA)
+    gamma          - the gamma the image was created
+                     at (PNG_INFO_gAMA)
 
     png_set_sRGB(png_ptr, info_ptr, srgb_intent);
-    srgb_intent    - the rendering intent (PNG_INFO_sRGB)
-                     The presence of the sRGB chunk means that the pixel
-                     data is in the sRGB color space.  This chunk also
-                     implies specific values of gAMA and cHRM.
-                     Rendering intent is the CSS-1 property that has been
-                     defined by the International Color Consortium
-                     (http://www.color.org).  It can be one of
-                     PNG_SRGB_INTENT_SATURATION, PNG_SRGB_INTENT_PERCEPTUAL,
-                     PNG_SRGB_INTENT_ABSOLUTE, or PNG_SRGB_INTENT_RELATIVE.
+    srgb_intent    - the rendering intent
+                     (PNG_INFO_sRGB) The presence of
+                     the sRGB chunk means that the pixel
+                     data is in the sRGB color space.
+                     This chunk also implies specific
+                     values of gAMA and cHRM.  Rendering
+                     intent is the CSS-1 property that
+                     has been defined by the International
+                     Color Consortium
+                     (http://www.color.org).
+                     It can be one of
+                     PNG_SRGB_INTENT_SATURATION,
+                     PNG_SRGB_INTENT_PERCEPTUAL,
+                     PNG_SRGB_INTENT_ABSOLUTE, or
+                     PNG_SRGB_INTENT_RELATIVE.
                         
 
-    png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr, srgb_intent);
-    srgb_intent    - the rendering intent (PNG_INFO_sRGB)
-                     The presence of the sRGB chunk means that the pixel
-                     data is in the sRGB color space.  This chunk also
-                     causes gAMA and cHRM chunks with the specific values
-                     that are consistent with sRGB to be written.
+    png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr,
+       srgb_intent);
+    srgb_intent    - the rendering intent
+                     (PNG_INFO_sRGB) The presence of the
+                     sRGB chunk means that the pixel
+                     data is in the sRGB color space.
+                     This function also causes gAMA and
+                     cHRM chunks with the specific values
+                     that are consistent with sRGB to be
+                     written.
 
     png_set_sBIT(png_ptr, info_ptr, sig_bit);
-    sig_bit        - the number of significant bits for (PNG_INFO_sBIT)
-                     the gray, red, green, and blue channels, whichever
-                     are appropriate for the given color type (png_color_16)
+    sig_bit        - the number of significant bits for
+                     (PNG_INFO_sBIT) each of the gray, red,
+                     green, and blue channels, whichever are
+                     appropriate for the given color type
+                     (png_color_16)
 
-    png_set_tRNS(png_ptr, info_ptr, trans, num_trans, trans_values);
-    trans          - array of transparent entries for palette (PNG_INFO_tRNS)
-    trans_values   - transparent pixel for non-paletted images (PNG_INFO_tRNS)
-    num_trans      - number of transparent entries (PNG_INFO_tRNS)
+    png_set_tRNS(png_ptr, info_ptr, trans, num_trans,
+       trans_values);
+    trans          - array of transparent entries for
+                     palette (PNG_INFO_tRNS)
+    trans_values   - transparent pixel for non-paletted
+                     images (PNG_INFO_tRNS)
+    num_trans      - number of transparent entries
+                     (PNG_INFO_tRNS)
 
-    png_set_hIST(png_ptr, info_ptr, hist);        (PNG_INFO_hIST)
-    hist           - histogram of palette (array of png_color_16)
+    png_set_hIST(png_ptr, info_ptr, hist);
+                    (PNG_INFO_hIST)
+    hist           - histogram of palette (array of
+                     png_color_16)
 
     png_set_tIME(png_ptr, info_ptr, mod_time);
-    mod_time       - time image was last modified (PNG_VALID_tIME)
+    mod_time       - time image was last modified
+                     (PNG_VALID_tIME)
 
     png_set_bKGD(png_ptr, info_ptr, background);
     background     - background color (PNG_VALID_bKGD)
 
     png_set_text(png_ptr, info_ptr, text_ptr, num_text);
-    text_ptr       - array of png_text holding image comments
-    text_ptr[i]->key         - keyword for comment.
-    text_ptr[i]->text        - text comments for current keyword.
-    text_ptr[i]->compression - type of compression used on "text"
-                               PNG_TEXT_COMPRESSION_NONE or
-                               PNG_TEXT_COMPRESSION_zTXt
-    num_text       - number of comments in text_ptr
+    text_ptr       - array of png_text holding image
+                     comments
+    text_ptr[i]->key   - keyword for comment.
+    text_ptr[i]->text  - text comments for current
+                         keyword.
+    text_ptr[i]->compression - type of compression used
+         on "text" PNG_TEXT_COMPRESSION_NONE or
+         PNG_TEXT_COMPRESSION_zTXt
+    num_text    - number of comments in text_ptr
 
-    png_set_oFFs(png_ptr, info_ptr, offset_x, offset_y, unit_type);
-    offset_x       - positive offset from the left edge of the screen
-    offset_y       - positive offset from the top edge of the screen
-    unit_type      - PNG_OFFSET_PIXEL, PNG_OFFSET_MICROMETER
+    png_set_oFFs(png_ptr, info_ptr, offset_x, offset_y,
+        unit_type);
+    offset_x  - positive offset from the left
+                     edge of the screen
+    offset_y  - positive offset from the top
+                     edge of the screen
+    unit_type - PNG_OFFSET_PIXEL, PNG_OFFSET_MICROMETER
 
-    png_set_pHYs(png_ptr, info_ptr, res_x, res_y, unit_type);
-    res_x          - pixels/unit physical resolution in x direction
-    res_y          - pixels/unit physical resolution in x direction
-    unit_type      - PNG_RESOLUTION_UNKOWN, PNG_RESOLUTION_METER
+    png_set_pHYs(png_ptr, info_ptr, res_x, res_y,
+        unit_type);
+    res_x       - pixels/unit physical resolution
+                  in x direction
+    res_y       - pixels/unit physical resolution
+                  in y direction
+    unit_type   - PNG_RESOLUTION_UNKOWN,
+                  PNG_RESOLUTION_METER
 
 In PNG files, the alpha channel in an image is the level of opacity.
 If your data is supplied as a level of transparency, you can invert the
@@ -1113,18 +1261,19 @@ png_write_end() with the same struct.
 
 The keywords that are given in the PNG Specification are:
 
-            Title            Short (one line) title or caption for image
-            Author           Name of image's creator
-            Description      Description of image (possibly long)
-            Copyright        Copyright notice
-            Creation Time    Time of original image creation (usually
-                             RFC 1123 format, see below)
-            Software         Software used to create the image
-            Disclaimer       Legal disclaimer
-            Warning          Warning of nature of content
-            Source           Device used to create the image
-            Comment          Miscellaneous comment; conversion from other
-                             image format
+    Title            Short (one line) title or
+                     caption for image
+    Author           Name of image's creator
+    Description      Description of image (possibly long)
+    Copyright        Copyright notice
+    Creation Time    Time of original image creation
+                    (usually RFC 1123 format, see below)
+    Software         Software used to create the image
+    Disclaimer       Legal disclaimer
+    Warning          Warning of nature of content
+    Source           Device used to create the image
+    Comment          Miscellaneous comment; conversion
+                     from other image format
 
 The keyword-text pairs work like this.  Keywords should be short
 simple descriptions of what the comment is about.  Some typical
@@ -1296,7 +1445,8 @@ If you can't want to write the whole image at once, you can
 use png_write_rows() instead.  If the file is not interlaced,
 this is simple:
 
-    png_write_rows(png_ptr, row_pointers, number_of_rows);
+    png_write_rows(png_ptr, row_pointers,
+       number_of_rows);
 
 row_pointers is the same as in the png_write_image() call.
 
@@ -1323,14 +1473,16 @@ correct number of times to write all seven sub-images.
 If you want libpng to build the sub-images, call this before you start
 writing any rows:
 
-    number_of_passes = png_set_interlace_handling(png_ptr);
+    number_of_passes =
+       png_set_interlace_handling(png_ptr);
 
 This will return the number of passes needed.  Currently, this
 is seven, but may change if another interlace type is added.
 
 Then write the complete image number_of_passes times.
 
-    png_write_rows(png_ptr, row_pointers, number_of_rows);
+    png_write_rows(png_ptr, row_pointers,
+       number_of_rows);
 
 As some of these rows are not used, and thus return immediately,
 you may want to read about interlacing in the PNG specification,
@@ -1383,20 +1535,21 @@ time, instead of calling the png_init_io() function.  These functions
 also provide a void pointer that can be retrieved via the function
 png_get_io_ptr().  For example:
 
-    png_set_read_fn(png_structp png_ptr, voidp io_ptr,
-        png_rw_ptr read_data_fn)
+    png_set_read_fn(png_structp png_ptr,
+        voidp io_ptr, png_rw_ptr read_data_fn)
 
-    png_set_write_fn(png_structp png_ptr, voidp io_ptr,
-        png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn);
+    png_set_write_fn(png_structp png_ptr,
+        voidp io_ptr, png_rw_ptr write_data_fn,
+        png_flush_ptr output_flush_fn);
 
     voidp io_ptr = png_get_io_ptr(png_ptr);
 
 The replacement I/O functions should have prototypes as follows:
 
-    void user_read_data(png_structp png_ptr, png_bytep data,
-        png_uint_32 length);
-    void user_write_data(png_structp png_ptr, png_bytep data,
-        png_uint_32 length);
+    void user_read_data(png_structp png_ptr,
+        png_bytep data, png_uint_32 length);
+    void user_write_data(png_structp png_ptr,
+        png_bytep data, png_uint_32 length);
     void user_flush_data(png_structp png_ptr);
 
 Supplying NULL for the read, write, or flush functions sets them back
@@ -1416,8 +1569,9 @@ set up your own message callbacks.  These functions are normally supplied
 at the time that the png_struct is created.  It is also possible to change
 these functions after png_create_???_struct() has been called by calling:
 
-    png_set_error_fn(png_structp png_ptr, png_voidp error_ptr,
-        png_error_ptr error_fn, png_error_ptr warning_fn);
+    png_set_error_fn(png_structp png_ptr,
+        png_voidp error_ptr, png_error_ptr error_fn,
+        png_error_ptr warning_fn);
 
     png_voidp error_ptr = png_get_error_ptr(png_ptr);
 
@@ -1426,8 +1580,10 @@ default function will be used, calling fprintf() and/or longjmp() if a
 problem is encountered.  The replacement error functions should have
 parameters as follows:
 
-    void user_error_fn(png_structp png_ptr, png_const_charp error_msg);
-    void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg);
+    void user_error_fn(png_structp png_ptr,
+        png_const_charp error_msg);
+    void user_warning_fn(png_structp png_ptr,
+        png_const_charp warning_msg);
 
 The motivation behind using setjmp() and longjmp() is the C++ throw and
 catch exception handling methods.  This makes the code much easier to write,
@@ -1523,8 +1679,10 @@ The other functions are for configuring zlib.  They are not recommended
 for normal use and may result in writing an invalid PNG file.  See
 zlib.h for more information on what these mean.
 
-    png_set_compression_strategy(png_ptr, strategy);
-    png_set_compression_window_bits(png_ptr, window_bits);
+    png_set_compression_strategy(png_ptr,
+        strategy);
+    png_set_compression_window_bits(png_ptr,
+        window_bits);
     png_set_compression_method(png_ptr, method);
 
 Controlling row filtering:
@@ -1553,8 +1711,10 @@ the image, you should start with flags set for all of the filters
 you intend to use so that libpng can initialize its internal
 structures appropriately for all of the filter types.
 
-    filters = PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_UP;
-    png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, filters);
+    filters = PNG_FILTER_NONE | PNG_FILTER_SUB
+       | PNG_FILTER_UP;
+    png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE,
+       filters);
 
 It is also possible to influence how libpng chooses from among the
 available filters.  This is done in two ways - by telling it how
@@ -1562,10 +1722,12 @@ important it is to keep the same filter for successive rows, and
 by telling it the relative computational costs of the filters.
 
     double weights[3] = {1.5, 1.3, 1.1},
-           costs[PNG_FILTER_VALUE_LAST] = {1.0, 1.3, 1.3, 1.5, 1.7};
+       costs[PNG_FILTER_VALUE_LAST] =
+       {1.0, 1.3, 1.3, 1.5, 1.7};
 
-    png_set_filter_selection(png_ptr, PNG_FILTER_SELECTION_WEIGHTED,
-       3, weights, costs);
+    png_set_filter_selection(png_ptr,
+       PNG_FILTER_SELECTION_WEIGHTED, 3,
+       weights, costs);
 
 The weights are multiplying factors which indicate to libpng that row
 should be the same for successive rows unless another row filter is that
@@ -1653,3 +1815,16 @@ to set the error callbacks AFTER png_read_init(), or to change them with
 png_set_error_fn(), which is essentially the same function, but with a
 new name to force compilation errors with applications that try to use
 the old method.
+.SH AUTHORS
+This man page: Glenn Randers-Pehrson
+
+Libpng version 0.99d (February 8, 1998):
+Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
+Currently maintained by Glenn Randers-Pehrson (randeg@alumni.rpi.edu).
+
+Supported by the PNG development group
+.br
+(png-implement@dworkin.wustl.edu).
+
+.\" end of man page
+

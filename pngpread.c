@@ -1,12 +1,12 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  */
 
 #define PNG_INTERNAL
@@ -638,7 +638,7 @@ png_push_process_row(png_structp png_ptr)
       png_ptr->row_buf + 1, png_ptr->prev_row + 1,
       (int)(png_ptr->row_buf[0]));
 
-   png_buffered_memcpy(png_ptr, png_ptr->prev_row, png_ptr->row_buf,
+   png_memcpy_check(png_ptr, png_ptr->prev_row, png_ptr->row_buf,
       png_ptr->rowbytes + 1);
 
    if (png_ptr->transformations)
@@ -774,8 +774,8 @@ png_read_push_finish_row(png_structp png_ptr)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
-      png_buffered_memset(png_ptr, png_ptr->prev_row, 0,
-         (png_size_t)png_ptr->rowbytes + 1);
+      png_memset_check(png_ptr, png_ptr->prev_row, 0,
+         png_ptr->rowbytes + 1);
       do
       {
          png_ptr->pass++;
@@ -806,7 +806,11 @@ void
 png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    if (png_ptr->mode == PNG_BEFORE_IHDR || png_ptr->mode & PNG_HAVE_IEND)
-      png_error(png_ptr, "Out of place tEXt");
+      {
+         png_error(png_ptr, "Out of place tEXt");
+         /* to quiet some compiler warnings */
+         if(info_ptr == NULL) return;
+      }
 
 #ifdef PNG_MAX_MALLOC_64K
    png_ptr->skip_length = 0;  /* This may not be necessary */
@@ -888,7 +892,11 @@ void
 png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    if (png_ptr->mode == PNG_BEFORE_IHDR || png_ptr->mode & PNG_HAVE_IEND)
-      png_error(png_ptr, "Out of place zTXt");
+      {
+         png_error(png_ptr, "Out of place zTXt");
+         /* to quiet some compiler warnings */
+         if(info_ptr == NULL) return;
+      }
 
 #ifdef PNG_MAX_MALLOC_64K
    /* We can't handle zTXt chunks > 64K, since we don't have enough space
@@ -1073,6 +1081,8 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 len
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
       png_chunk_error(png_ptr, "unknown critical chunk");
+      /* to quiet some compiler warnings */
+      if(info_ptr == NULL) return;
    }
 
    png_push_crc_skip(png_ptr, length);

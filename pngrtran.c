@@ -1,12 +1,12 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  *
  * This file contains functions optionally called by an application 
  * in order to tell libpng how to handle data when reading a PNG.
@@ -1913,24 +1913,21 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
    {
       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
-         int i;
          png_color back;
 
          back.red   = (png_byte)png_ptr->background.red;
          back.green = (png_byte)png_ptr->background.green;
          back.blue  = (png_byte)png_ptr->background.blue;
 
-         for (i = 0; i < num_palette; i++)
+         for (i = 0; i < (int)png_ptr->num_trans && i < num_palette; i++)
          {
-            if (i >= (int)png_ptr->num_trans ||
-               png_ptr->trans[i] == 0)
+            if (png_ptr->trans[i] == 0)
             {
                palette[i].red = back.red;
                palette[i].green = back.green;
                palette[i].blue = back.blue;
             }
-            else if (i < (int)png_ptr->num_trans ||
-               png_ptr->trans[i] != 0xff)
+            else if (png_ptr->trans[i] != 0xff)
             {
                png_composite(palette[i].red, png_ptr->palette[i].red,
                   png_ptr->trans[i], back.red);

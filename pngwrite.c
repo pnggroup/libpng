@@ -1,12 +1,12 @@
    
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  */
 
 /* get internal access to png.h */
@@ -502,7 +502,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
    png_debug1(3, "row_info->rowbytes = %d\n", png_ptr->row_info.rowbytes);
 
    /* Copy user's row into buffer, leaving room for filter byte. */
-   png_buffered_memcpy(png_ptr, png_ptr->row_buf + 1, row,
+   png_memcpy_check(png_ptr, png_ptr->row_buf + 1, row,
       png_ptr->row_info.rowbytes);
 
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)
@@ -831,10 +831,10 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 
       if (png_ptr->filter_weights == NULL)
       {
-         png_ptr->filter_weights = (png_uint_16p)png_malloc(png_ptr,
+         png_ptr->filter_weights = png_malloc(png_ptr,
             (png_uint_32)(sizeof(png_uint_16) * num_weights));
 
-         png_ptr->inv_filter_weights = (png_uint_16p)png_malloc(png_ptr,
+         png_ptr->inv_filter_weights = png_malloc(png_ptr,
             (png_uint_32)(sizeof(png_uint_16) * num_weights));
 
          for (i = 0; i < num_weights; i++)
@@ -866,7 +866,7 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
     */
    if (png_ptr->filter_costs == NULL)
    {
-      png_ptr->filter_costs = (png_uint_16p)png_malloc(png_ptr,
+      png_ptr->filter_costs = png_malloc(png_ptr,
          (png_uint_32)(sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
 
       png_ptr->inv_filter_costs = (png_uint_16p)png_malloc(png_ptr,

@@ -1,12 +1,12 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 0.99c
+ * libpng 0.99d
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * February 7, 1998
+ * February 8, 1998
  */
 
 /* Any machine specific code is near the front of this file, so if you
@@ -525,8 +525,8 @@ typedef z_stream FAR *  png_zstreamp;
 /* use this to make far-to-near assignments */
 #   define CHECK   1
 #   define NOCHECK 0
-#   define CVT_PTR(ptr) (far_to_near(png_ptr,ptr,CHECK))
-#   define CVT_PTR_NOCHECK(ptr) (far_to_near(png_ptr,ptr,NOCHECK))
+#   define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
+#   define CVT_PTR_NOCHECK(ptr) (png_far_to_near(png_ptr,ptr,NOCHECK))
 #   define png_strlen _fstrlen
 #   define png_memcmp _fmemcmp      /* SJT: added */
 #   define png_memcpy _fmemcpy
