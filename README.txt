@@ -40,13 +40,12 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
 
 This is the output of "pngcrush" and "pngcrush -help":
 
-
- | pngcrush 1.5.2, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
+ | pngcrush 1.5.3, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | irrevocably granted to everyone to use this version
  | of pngcrush without payment of any fee.
- | This program was built with libpng version 1.0.9beta2,
- | and is running with  libpng version 1.0.9beta2 - November 19, 2000 (header)
+ | This program was built with libpng version 1.0.9beta5,
+ | and is running with  libpng version 1.0.9beta5 - December 14, 2000 (header)
  |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -83,6 +82,7 @@ options:
 -replace_gamma gamma (float or fixed*100000) even if gAMA is present.
           -res dpi
          -srgb [0, 1, 2, or 3]
+         -loco ("loco crush" truecolor PNGs)
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
          -trns index red green blue gray
             -v (display more detailed information)
@@ -229,6 +229,15 @@ options (Note: any option can be spelled out for clarity, e.g.,
 
                Value of 'rendering intent' for sRGB chunk.
 
+         -loco ("loco crush" truecolor PNGs)
+
+               Make the file more compressible by performing a
+               lossless reversible color transformation.
+               The resulting file is a MNG, not a PNG, and should
+               be given the ".mng" file extension.  The
+               "loco" option has no effect on grayscale or
+               indexed-color PNG files.
+
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
 
                tEXt chunk to insert.  keyword < 80 chars,
@@ -285,3 +294,31 @@ options (Note: any option can be spelled out for clarity, e.g.,
                screen scrolls out of sight.
 
 
+Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+
+
+DISCLAIMER: The pngcrush computer program is supplied "AS IS".
+The Author disclaims all warranties, expressed or implied, including,
+without limitation, the warranties of merchantability and of fitness
+for  any purpose.  The Author assumes no liability for direct, indirect,
+incidental, special, exemplary, or consequential damages, which may
+result from the use of the computer program, even if advised of the
+possibility of such damage.  There is no warranty against interference
+with your enjoyment of the computer program or against infringement.
+There is no warranty that my efforts or the computer program will
+fulfill any of your particular purposes or needs.  This computer
+program is provided with all faults, and the entire risk of satisfactory
+quality, performance, accuracy, and effort is with the user.
+
+LICENSE: Permission is hereby irrevocably granted to everyone to use,
+copy, modify, and distribute this computer program, or portions hereof,
+purpose, without payment of any fee, subject to the following
+restrictions:
+
+1. The origin of this binary or source code must not be misrepresented.
+
+2. Altered versions must be plainly marked as such and must not be
+misrepresented as being the original binary or source.
+
+3. The Copyright notice, disclaimer, and license may not be removed
+or altered from any source, binary, or altered source distribution.

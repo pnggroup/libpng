@@ -26,7 +26,7 @@
 #  define PNG_USER_MEM_SUPPORTED
 #endif
 
-#define MNG_EXTENSIONS_SUPPORTED /* extra filter types */
+#define PNG_MNG_FEATURES_SUPPORTED /* extra filter types */
 
 #ifndef PNG_NO_LEGACY_SUPPORTED
 #  define PNG_NO_LEGACY_SUPPORTED

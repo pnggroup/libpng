@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.9beta2 - November 19, 2000
+ * libpng 1.0.9beta5 - December 14, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -419,7 +419,12 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
       compression_type = PNG_COMPRESSION_TYPE_BASE;
    }
 
-   if (filter_type != PNG_FILTER_TYPE_BASE)
+   if (
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+      !((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+      (filter_type == PNG_INTRAPIXEL_DIFFERENCING)) &&
+#endif
+      filter_type != PNG_FILTER_TYPE_BASE)
    {
       png_warning(png_ptr, "Invalid filter type specified");
       filter_type = PNG_FILTER_TYPE_BASE;
@@ -440,6 +445,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->bit_depth = (png_byte)bit_depth;
    png_ptr->color_type = (png_byte)color_type;
    png_ptr->interlaced = (png_byte)interlace_type;
+   png_ptr->filter_type = (png_byte)filter_type;
    png_ptr->width = width;
    png_ptr->height = height;
 
@@ -1072,13 +1078,14 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    png_size_t key_len;
    png_charp kp, dp;
    int kflag;
+   int kwarn=0;
 
    png_debug(1, "in png_check_keyword\n");
    *new_key = NULL;
 
    if (key == NULL || (key_len = png_strlen(key)) == 0)
    {
-      png_chunk_warning(png_ptr, "zero length keyword");
+      png_warning(png_ptr, "zero length keyword");
       return ((png_size_t)0);
    }
 
@@ -1095,9 +1102,9 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
          char msg[40];
 
          sprintf(msg, "invalid keyword character 0x%02X", *kp);
-         png_chunk_warning(png_ptr, msg);
+         png_warning(png_ptr, msg);
 #else
-         png_chunk_warning(png_ptr, "invalid character in keyword");
+         png_warning(png_ptr, "invalid character in keyword");
 #endif
          *dp = ' ';
       }
@@ -1112,7 +1119,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    kp = *new_key + key_len - 1;
    if (*kp == ' ')
    {
-      png_chunk_warning(png_ptr, "trailing spaces removed from keyword");
+      png_warning(png_ptr, "trailing spaces removed from keyword");
 
       while (*kp == ' ')
       {
@@ -1125,7 +1132,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    kp = *new_key;
    if (*kp == ' ')
    {
-      png_chunk_warning(png_ptr, "leading spaces removed from keyword");
+      png_warning(png_ptr, "leading spaces removed from keyword");
 
       while (*kp == ' ')
       {
@@ -1147,6 +1154,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
       else if (*kp == ' ')
       {
          key_len--;
+         kwarn=1;
       }
       else
       {
@@ -1155,17 +1163,19 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
       }
    }
    *dp = '\0';
+   if(kwarn)
+      png_warning(png_ptr, "extra interior spaces removed from keyword");
 
    if (key_len == 0)
    {
       png_free(png_ptr, *new_key);
       *new_key=NULL;
-      png_chunk_warning(png_ptr, "Zero length keyword");
+      png_warning(png_ptr, "Zero length keyword");
    }
 
    if (key_len > 79)
    {
-      png_chunk_warning(png_ptr, "keyword length must be 1 - 79 characters");
+      png_warning(png_ptr, "keyword length must be 1 - 79 characters");
       new_key[79] = '\0';
       key_len = 79;
    }

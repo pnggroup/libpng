@@ -232,9 +232,10 @@ int ZEXPORT deflateInit2_(strm, level, method, windowBits, memLevel, strategy,
     }
     if (strm->zfree == Z_NULL) strm->zfree = zcfree;
 
-    if (level == Z_DEFAULT_COMPRESSION) level = 6;
 #ifdef FASTEST
     level = 1;
+#else
+    if (level == Z_DEFAULT_COMPRESSION) level = 6;
 #endif
 
     if (windowBits < 0) { /* undocumented feature: suppress zlib header */

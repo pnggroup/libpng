@@ -23,7 +23,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.5.2"
+#define PNGCRUSH_VERSION "1.5.3"
 
 /*
 */
@@ -65,6 +65,13 @@
 
 /* Change log:
  *
+ * Version 1.5.3 (built with libpng-1.0.9beta5)
+ *
+ *   Added "-loco" option (writes MNG files with filter_method 64)
+ *
+ *   "-dir" and "-ext" options are no longer mutually exclusive, e.g.:
+ *   pngcrush -loco -dir Crushed -ext .mng *.png
+ *
  * Version 1.5.2 (built with libpng-1.0.9beta1)
  *
  *   Added "-iccp" option.
@@ -76,6 +83,11 @@
  *   exceeds the default 1/2 megabyte size.
  *
  *   Added missing "png_ptr" argument to png_error() call
+ *
+ *   Added "-loco" option, to enable the LOCO color transformation
+ *   (R->R-G, G, B->B-G) while writing a MNG with filter_method 64. Undo
+ *   the transformation and write the regular PNG filter_method (0) if the
+ *   MNG filter_method 64 is detected.
  *
  *   Revised the "-help" output slightly and improved the "-version" output.
  *
@@ -299,6 +311,11 @@
 
 /* To do:
  *
+ *   Add a "pcRu" ancillary chunk that keeps track of the best method,
+ *   methods already tried, and whether "loco crushing" was effective.
+ *
+ *   Try both transformed and untransformed colors when "-loco" is used.
+ *
  *   Check for unused alpha channel and ok-to-reduce-depth.
  *   Take care that sBIT and bKGD data aren't lost when reducing images
  *   from truecolor to grayscale.
@@ -362,6 +379,10 @@ main()
 
 #else
 
+#ifdef PNG_MNG_FEATURES_SUPPORTED
+# define PNGCRUSH_LOCO
+#endif
+
 #if defined(__DJGPP__)
 #  if ((__DJGPP__ == 2) && (__DJGPP_MINOR__ == 0))
 #    include <libc/dosio.h>      /* for _USE_LFN, djgpp 2.0 only */
@@ -396,6 +417,7 @@ main()
 #define DEFAULT_MODE   0
 #define DIRECTORY_MODE 1
 #define EXTENSION_MODE 2
+#define DIREX_MODE 3
 #define FOPEN(file, how) fopen(file, how)
 #define FCLOSE(file) {fclose(file); file=NULL;--number_of_open_files;};
 #define P1 if(verbose > 1)printf
@@ -498,9 +520,6 @@ char text_keyword[800];
 #ifdef PNG_iTXt_SUPPORTED
 char text_lang[800];
 char text_lang_key[800];
-#endif
-#if (PNG_LIBPNG_VER < 10009)
-#undef PNG_iCCP_SUPPORTED
 #endif
 #ifdef PNG_iCCP_SUPPORTED
 int iccp_length = 0;
@@ -606,6 +625,11 @@ static png_infop end_info_ptr;
 static png_infop write_end_info_ptr;
 static FILE *fpin, *fpout;
 png_uint_32 measure_idats(FILE *fpin);
+#ifdef PNGCRUSH_LOCO
+static int do_loco=0;
+#endif
+static int input_format=0;  /* 0: PNG  1: MNG */
+static int output_format=0;
 static int do_color_count;
 static int reduction_ok=0;
 #ifdef PNGCRUSH_COUNT_COLORS
@@ -621,11 +645,7 @@ static int filter_type, zlib_level;
 static png_bytep png_row_filters=NULL;
 static TIME_T t_start, t_stop, t_decode, t_encode, t_misc;
 
-#if (PNG_LIBPNG_VER >= 10000)
-static png_uint_32 max_idat_size = 524288;
-#else
 static png_uint_32 max_idat_size = PNG_ZBUF_SIZE;
-#endif
 static png_uint_32 crushed_idat_size = 0x3ffffffL;
 static int already_crushed = 0;
 int ia;
@@ -1152,7 +1172,10 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-d",2))
       {
          BUMP_I;
-         pngcrush_mode=DIRECTORY_MODE;
+         if(pngcrush_mode==EXTENSION_MODE)
+            pngcrush_mode=DIREX_MODE;
+         else
+            pngcrush_mode=DIRECTORY_MODE;
          directory_name= argv[names++];
       }
    else if(!strncmp(argv[i],"-exit",5))
@@ -1160,7 +1183,10 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-e",2))
       {
          BUMP_I;
-         pngcrush_mode=EXTENSION_MODE;
+         if(pngcrush_mode==DIRECTORY_MODE)
+            pngcrush_mode=DIREX_MODE;
+         else
+            pngcrush_mode=EXTENSION_MODE;
          extension= argv[names++];
       }
    else if(!strncmp(argv[i],"-force",6))
@@ -1204,6 +1230,10 @@ main(int argc, char *argv[])
             brute_force_filter++;
          }
       }
+#ifdef PNGCRUSH_LOCO
+   else if(!strncmp(argv[i],"-loco",5))
+        do_loco=1;
+#endif
    else if(!strncmp(argv[i],"-l",2))
       {
          int lev, strat, filt;
@@ -1281,9 +1311,9 @@ main(int argc, char *argv[])
          help++;
          verbose++;
       }
+#ifdef PNG_iCCP_SUPPORTED
    else if(!strncmp(argv[i],"-iccp",5))
       {
-#ifdef PNG_iCCP_SUPPORTED
          FILE *iccp_fn;
          if(iccp_length)
             free(iccp_text);
@@ -1299,8 +1329,7 @@ main(int argc, char *argv[])
          else
          {
             int ic;
-            iccp_text=malloc(iccp_length+1);
-            iccp_text[iccp_length]=(char)0x00;
+            iccp_text=malloc(iccp_length);
             for (ic=0; ic<iccp_length; ic++)
             {
                   png_size_t num_in;
@@ -1310,17 +1339,16 @@ main(int argc, char *argv[])
                   iccp_text[ic]=buffer[0];
             }
          }
-#else
-         names+=3;
-         i+=3;
-         fprintf(STDERR, "libpng-1.0.9 or later is required to support iCCP.\n");
-#endif
       }
+#endif
    else if(!strncmp(argv[i],"-max",4))
       {
          names++;
          BUMP_I;
          max_idat_size = (png_uint_32)atoi(argv[i]);
+#if 0
+         if (max_idat_size > PNG_ZBUF_SIZE) max_idat_size=PNG_ZBUF_SIZE;
+#endif
       }
    else if(!strncmp(argv[i],"-m",2))
       {
@@ -1987,6 +2015,25 @@ main(int argc, char *argv[])
      if(verbose > 1)
      fprintf(STDERR,
        "\n               Value of 'rendering intent' for sRGB chunk.\n\n");
+#ifdef PNGCRUSH_LOCO
+     fprintf(STDERR,
+       "         -loco (\"loco crush\" truecolor PNGs)\n");
+     if(verbose > 1)
+     {
+     fprintf(STDERR,
+       "\n               Make the file more compressible by performing a\n");
+     fprintf(STDERR,
+       "               lossless reversible color transformation.\n");
+     fprintf(STDERR,
+       "               The resulting file is a MNG, not a PNG, and should\n");
+     fprintf(STDERR,
+       "               be given the \".mng\" file extension.  The\n");
+     fprintf(STDERR,
+       "               \"loco\" option has no effect on grayscale or\n");
+     fprintf(STDERR,
+       "               indexed-color PNG files.\n\n");
+     }
+#endif
      fprintf(STDERR,
        "         -text b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\"\n");
      if(verbose > 1)
@@ -2159,38 +2206,7 @@ main(int argc, char *argv[])
          exit(0);
       }
 
-      if(pngcrush_mode == EXTENSION_MODE)
-      {
-          ip=in_string;
-          in_string[0]='\0';
-          str_return = strcat(in_string,inname);
-          ip = in_string;
-          op = dot = out_string;
-          while(*ip != '\0')
-          {
-             *op++ = *ip++;
-#ifdef __riscos
-             if(*ip == '/')dot=op;
-#else
-             if(*ip == '.')dot=op;
-#endif
-          }
-          *op = '\0';
-
-          if(dot != out_string)
-             *dot = '\0';
-
-          in_extension[0]='\0';
-          if(dot != out_string)
-          {
-             str_return = strcat(in_extension,++dot);
-          }
-
-          str_return = strcat(out_string,extension);
-          outname=out_string;
-      }
-
-      if(pngcrush_mode == DIRECTORY_MODE)
+      if(pngcrush_mode == DIRECTORY_MODE || pngcrush_mode == DIREX_MODE)
       {
 #ifdef __riscos
           if(fileexists(directory_name) & 2)
@@ -2228,6 +2244,40 @@ main(int argc, char *argv[])
 #endif
 
           str_return = strcat(out_string,op);
+          outname=out_string;
+      }
+
+      if(pngcrush_mode == EXTENSION_MODE || pngcrush_mode == DIREX_MODE)
+      {
+          ip=in_string;
+          in_string[0]='\0';
+          if(pngcrush_mode == EXTENSION_MODE)
+             str_return = strcat(in_string,inname);
+          else
+             str_return = strcat(in_string,outname);
+          ip = in_string;
+          op = dot = out_string;
+          while(*ip != '\0')
+          {
+             *op++ = *ip++;
+#ifdef __riscos
+             if(*ip == '/')dot=op;
+#else
+             if(*ip == '.')dot=op;
+#endif
+          }
+          *op = '\0';
+
+          if(dot != out_string)
+             *dot = '\0';
+
+          in_extension[0]='\0';
+          if(dot != out_string)
+          {
+             str_return = strcat(in_extension,++dot);
+          }
+
+          str_return = strcat(out_string,extension);
           outname=out_string;
       }
 
@@ -2478,7 +2528,7 @@ main(int argc, char *argv[])
          struct stat stat_in, stat_out;
          if ((stat(inname, &stat_in) == 0) &&
              (stat(outname, &stat_out) == 0) &&
-#ifdef _MSC_VER /* maybe others? */
+#if defined(_MSC_VER) || defined(__MINGW32__) /* maybe others? */
             /* MSVC++6.0 will erroneously return 0 for both files, so we
                simply check the size instead.  It is possible that we will
                erroneously reject the attempt when inputsize and outputsize
@@ -2729,11 +2779,25 @@ main(int argc, char *argv[])
 
       png_debug(0, "Reading info struct\n");
    {
+#if defined(PNGCRUSH_LOCO)
+      png_byte mng_signature[8] = {138, 77, 78, 71, 13, 10, 26, 10};
+#endif
       png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
       png_read_data(read_ptr, png_signature, 8);
       png_set_sig_bytes(read_ptr, 8);
 
+#if defined(PNGCRUSH_LOCO)
+      if (!(int)(png_memcmp(mng_signature, png_signature, 8)))
+      {
+         png_byte buffer[40];
+         /* Skip the MHDR */
+         png_permit_mng_features (read_ptr, PNG_FLAG_MNG_FILTER_64);
+         png_read_data(read_ptr, buffer, 40);
+         input_format=1;
+      }
+      else 
+#endif
       if (png_sig_cmp(png_signature, 0, 8))
       {
          if (png_sig_cmp(png_signature, 0, 4))
@@ -2906,6 +2970,22 @@ main(int argc, char *argv[])
             if(verbose > 1)
                 fprintf(STDERR, "   Setting IHDR\n");
 
+#if defined(PNGCRUSH_LOCO)
+            output_format=0;
+            if(do_loco)
+            {
+                if(output_color_type == 2 || output_color_type == 6)
+                {
+                   output_format=1;
+                   filter_method = 64;
+                   png_permit_mng_features (write_ptr, PNG_FLAG_MNG_FILTER_64);
+                }
+            }
+            else
+                filter_method=0;
+            if(input_format != output_format)
+                things_have_changed = 1;
+#endif
             png_set_IHDR(write_ptr, write_info_ptr, width, height,
               output_bit_depth, output_color_type, output_interlace_method,
               compression_method, filter_method);
@@ -3561,6 +3641,39 @@ main(int argc, char *argv[])
       }
 #endif
 
+#ifdef PNGCRUSH_LOCO
+      if(do_loco)
+      {
+      png_byte buffer[30];
+      const png_byte png_MHDR[5] = { 77,  72,  68,  82, '\0'};
+      png_byte mng_signature[8] = {138, 77, 78, 71, 13, 10, 26, 10};
+      /* write the MNG 8 byte signature */
+      if(outname[strlen(outname)-3] == 'p')
+         png_warning(read_ptr, "  Writing a MNG file with a .png extension");
+      png_write_data(write_ptr, &mng_signature[0], (png_size_t)8);
+      png_set_sig_bytes(write_ptr, 8);
+
+      /* Write a MHDR chunk */
+
+      buffer[0]=(png_byte)((width>>24) & 0xff);
+      buffer[1]=(png_byte)((width>>16) & 0xff);
+      buffer[2]=(png_byte)((width>> 8) & 0xff);
+      buffer[3]=(png_byte)((width    ) & 0xff);
+      buffer[4]=(png_byte)((height>>24) & 0xff);
+      buffer[5]=(png_byte)((height>>16) & 0xff);
+      buffer[6]=(png_byte)((height>> 8) & 0xff);
+      buffer[7]=(png_byte)((height    ) & 0xff);
+      for (i=8; i<27; i++)
+         buffer[i]=0x00;
+      buffer[15]=1; /* frame count */
+      buffer[19]=2; /* layer count */
+      if(output_color_type == 6)
+        buffer[27]=0x09; /* simplicity profile: MNG-VLC with transparency */
+      else
+        buffer[27]=0x01; /* simplicity profile: MNG-VLC */
+      png_write_chunk(write_ptr, (png_bytep)png_MHDR, buffer, (png_size_t)28);
+      }
+#endif
       P2("writing info structure.\n");
       png_crush_pause();
       png_debug(0, "\nWriting info struct\n");
@@ -3888,6 +4001,14 @@ main(int argc, char *argv[])
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
       if(nosave == 0)
       {
+#ifdef PNGCRUSH_LOCO
+         if(do_loco)
+         {
+            const png_byte png_MEND[5] = { 77,  69,  78,  68, '\0'};
+            /* write the MNG MEND chunk */
+            png_write_chunk(write_ptr, (png_bytep)png_MEND, NULL, (png_size_t)0);
+         }
+#endif
          png_destroy_info_struct(write_ptr, &write_end_info_ptr);
          png_destroy_write_struct(&write_ptr, &write_info_ptr);
       }
@@ -4076,10 +4197,23 @@ png_measure_idat(png_structp png_ptr)
 
    {
       png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+#if defined(PNGCRUSH_LOCO)
+      png_byte mng_signature[8] = {138, 77, 78, 71, 13, 10, 26, 10};
+#endif
 
       png_read_data(png_ptr, png_signature, 8);
       png_set_sig_bytes(png_ptr, 8);
 
+#if defined(PNGCRUSH_LOCO)
+      if (!(int)(png_memcmp(mng_signature, png_signature, 8)))
+      {
+         png_byte buffer[40];
+         /* skip the MHDR */
+         png_read_data(read_ptr, buffer, 40);
+         input_format=1;
+      }
+      else 
+#endif
       if (png_sig_cmp(png_signature, 0, 8))
       {
          if (png_sig_cmp(png_signature, 0, 4))
@@ -4280,11 +4414,25 @@ count_colors(FILE *fpin)
 #endif
 
    {
+#if defined(PNGCRUSH_LOCO)
+      png_byte mng_signature[8] = {138, 77, 78, 71, 13, 10, 26, 10};
+#endif
       png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
       png_read_data(read_ptr, png_signature, 8);
       png_set_sig_bytes(read_ptr, 8);
 
+#if defined(PNGCRUSH_LOCO)
+      if (!(int)(png_memcmp(mng_signature, png_signature, 8)))
+      {
+         png_byte buffer[40];
+         /* skip the MHDR */
+         png_read_data(read_ptr, buffer, 40);
+         png_permit_mng_features (read_ptr, PNG_FLAG_MNG_FILTER_64);
+         input_format=1;
+      }
+      else
+#endif
       if (png_sig_cmp(png_signature, 0, 8))
       {
          if (png_sig_cmp(png_signature, 0, 4))
@@ -4454,7 +4602,6 @@ count_colors(FILE *fpin)
                         reduce_to_gray=0;
                    if(it_is_opaque && (*(rp+3)) != 255)
                       it_is_opaque=0;
-
                    if (result > 1)
                       continue;
 #ifdef USE_HASHCODE
@@ -4672,7 +4819,6 @@ count_colors(FILE *fpin)
    }
    P2 ("Finished checking alphas, result=%d\n",result);
    }
-
    ret=result;
    return (ret);
 }
