@@ -278,3 +278,6 @@ version 1.0.0a [March 9, 1998]
    for major, minor, and bugfix releases.  This is 10001. (Adam Costello,
    Tom Lane)
    Make months range from 1-12 in png_convert_to_rfc1123
+version 1.0.0b [March 13, 1998]
+   Quieted compiler complaints about two empty "for" loops in pngrutil.c
+   Minor changes to makefile.s2x

@@ -1,4 +1,4 @@
- makefile for libpng on Solaris 2.x with gcc
+# makefile for libpng on Solaris 2.x with gcc
 # Contributed by William L. Sebok, based on makefile.lnx
 # Copyright (C) 1996, 1997 Andreas Dilger
 # Copyright (C) 1998 Greg Roelofs
@@ -7,8 +7,11 @@
 CC=gcc
 
 # Where the zlib library and include files are located
-ZLIBLIB=/usr/local/lib
-ZLIBINC=/usr/local/include
+# ZLIBLIB=/usr/local/lib
+# ZLIBINC=/usr/local/include
+ZLIBLIB=../zlib
+ZLIBINC=../zlib
+
 
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
          -Wmissing-declarations -Wtraditional -Wcast-align \
@@ -27,7 +30,7 @@ PNGMIN = 1.0
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # where make install puts libpng.a, libpng.so*, and png.h
-prefix=/local
+prefix=/usr/local
 INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 
@@ -55,7 +58,7 @@ libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
 	ln -sf libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
 
 libpng.so.$(PNGVER): $(OBJSDLL)
-	$(LD) -G -L$(LIBPATH) -R$(LIBPATH) -h libpng.so.$(PNGMAJ) \
+	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h libpng.so.$(PNGMAJ) \
 	 -o libpng.so.$(PNGVER) $(OBJSDLL) -lz
 
 pngtest: pngtest.o libpng.so

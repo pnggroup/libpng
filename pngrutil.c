@@ -1,12 +1,12 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.0a
+ * libpng 1.0.0b
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, Glenn Randers-Pehrson
- * March 9, 1998
+ * March 13, 1998
  *
  * This file contains routines which are only called from within
  * libpng itself during the course of reading an image.
@@ -1076,7 +1076,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(3, "Finding end of pCAL purpose string\n");
    for (buf = purpose; *buf != '\0'; buf++)
-      /* empty loop */;
+      /* empty loop */ ;
 
    endptr = purpose + slength;
 
@@ -1113,8 +1113,8 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_warning(png_ptr, "Unrecognized equation type for pCAL chunk");
    }
 
-   /* Empty loop to move past the units string. */
-   for (buf = units; *buf != 0x00; buf++);
+   for (buf = units; *buf != 0x00; buf++)
+   /* Empty loop to move past the units string. */ ;
 
    png_debug(3, "Allocating pCAL parameters array\n");
    params = (png_charpp)png_malloc(png_ptr, (png_uint_32)(nparams
@@ -1126,8 +1126,8 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       buf++; /* Skip the null string terminator from previous parameter. */
 
       png_debug1(3, "Reading pCAL parameter %d\n", i);
-      /* Empty loop to move past each paramter string */
-      for (params[i] = buf; *buf != 0x00 && buf <= endptr; buf++);
+      for (params[i] = buf; *buf != 0x00 && buf <= endptr; buf++)
+      /* Empty loop to move past each parameter string */ ;
 
       /* Make sure we haven't run out of data yet */
       if (buf > endptr)
