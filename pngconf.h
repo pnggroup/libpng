@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.6d - April 7, 2000
+ * libpng 1.0.6e - April 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -255,7 +255,7 @@
  * things to happen if the library and/or application ever change.
  */
 
-/* Any transformations you will not be using can be undef'ed here */
+/* Any features you will not be using can be undef'ed here */
 
 /* GR-P, 0.96a: Set "*TRANSFORMS_SUPPORTED as default but allow user
    to turn it off with "*TRANSFORMS_NOT_SUPPORTED" or *PNG_NO_*_TRANSFORMS
@@ -267,7 +267,13 @@
    1.0.1c, for consistency)
  */
 
+#ifndef PNG_NO_FLOATING_POINT_SUPPORTED
+#define PNG_FLOATING_POINT_SUPPORTED
+#endif
 
+#ifndef PNG_NO_FIXED_POINT_SUPPORTED
+#define PNG_FIXED_POINT_SUPPORTED
+#endif
 
 #if !defined(PNG_READ_TRANSFORMS_NOT_SUPPORTED) && \
     !defined(PNG_NO_READ_TRANSFORMS)
@@ -387,7 +393,8 @@
                                             encoders, but can cause trouble
                                             if left undefined */
 
-#ifndef PNG_NO_WRITE_WEIGHTED_FILTER
+#if !defined(PNG_NO_WRITE_WEIGHTED_FILTER) && \
+     defined(PNG_FLOATING_POINT_SUPPORTED)
 #define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif
 
@@ -426,14 +433,6 @@
 #if defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD) && \
   !defined(PNG_NO_ASSEMBLER_CODE)
 #define PNG_ASSEMBLER_CODE_SUPPORTED
-#endif
-
-#ifndef PNG_NO_FLOATING_POINT_SUPPORTED
-#define PNG_FLOATING_POINT_SUPPORTED
-#endif
-
-#ifndef PNG_NO_FIXED_POINT_SUPPORTED
-#define PNG_FIXED_POINT_SUPPORTED
 #endif
 
 /* Do not use global arrays (helps with building DLL's)

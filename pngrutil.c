@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.6d - April 7, 2000
+ * libpng 1.0.6e - April 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -392,8 +392,9 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    num = (int)length / 3;
+
    palette = (png_colorp)png_zalloc(png_ptr, (uInt)num, sizeof (png_color));
-   png_ptr->free_me |= PNG_FREE_PLTE;
+
    for (i = 0; i < num; i++)
    {
       png_byte buf[3];
@@ -431,7 +432,6 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          else
          {
             png_chunk_warning(png_ptr, "CRC error");
-            png_ptr->free_me &= ~PNG_FREE_PLTE;
             png_zfree(png_ptr, palette);
             return;
          }
@@ -445,6 +445,9 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
    png_ptr->palette = palette;
    png_ptr->num_palette = (png_uint_16)num;
+
+   png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
+   png_ptr->free_me |= PNG_FREE_PLTE;
    png_set_PLTE(png_ptr, info_ptr, palette, num);
 
 #if defined (PNG_READ_tRNS_SUPPORTED)
@@ -452,10 +455,15 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS))
       {
-         if (png_ptr->num_trans > png_ptr->num_palette)
+         if (png_ptr->num_trans > (png_uint_16)num)
          {
             png_warning(png_ptr, "Truncating incorrect tRNS chunk length");
-            png_ptr->num_trans = png_ptr->num_palette;
+            png_ptr->num_trans = (png_uint_16)num;
+         }
+         if (info_ptr->num_trans > (png_uint_16)num)
+         {
+            png_warning(png_ptr, "Truncating incorrect info tRNS chunk length");
+            info_ptr->num_trans = (png_uint_16)num;
          }
       }
    }
@@ -543,7 +551,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-#ifndef PNG_NO_CONSOLE_IO
+#ifndef PNG_NO_STDIO
          fprintf(stderr, "gamma = (%d/100000)\n", (int)igamma);
 #endif
          return;
@@ -753,7 +761,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
-#ifndef PNG_NO_CONSOLE_IO
+#ifndef PNG_NO_STDIO
 #ifdef PNG_FLOATING_POINT_SUPPORTED
             fprintf(stderr,"wx=%f, wy=%f, rx=%f, ry=%f\n",
                white_x, white_y, red_x, red_y);
@@ -765,7 +773,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
             fprintf(stderr,"gx=%ld, gy=%ld, bx=%ld, by=%ld\n",
                int_x_green, int_y_green, int_x_blue, int_y_blue);
 #endif
-#endif /* PNG_NO_CONSOLE_IO */
+#endif /* PNG_NO_STDIO */
          }
          png_crc_finish(png_ptr, 0);
          return;
@@ -848,7 +856,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-#ifndef PNG_NO_CONSOLE_IO
+#ifndef PNG_NO_STDIO
 #  ifdef PNG_FIXED_POINT_SUPPORTED
          fprintf(stderr,"incorrect gamma=(%d/100000)\n",(int)png_ptr->int_gamma);
 #  else
@@ -923,7 +931,6 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
    chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
-   png_ptr->free_me |= PNG_FREE_ICCP;
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)chunkdata, slength);
 
@@ -1103,7 +1110,6 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
 
       png_ptr->trans = (png_bytep)png_malloc(png_ptr, length);
-      png_ptr->free_me |= PNG_FREE_TRNS;
       png_crc_read(png_ptr, png_ptr->trans, (png_size_t)length);
       png_ptr->num_trans = (png_uint_16)length;
    }
@@ -1149,6 +1155,8 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
+   png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
+   png_ptr->free_me |= PNG_FREE_TRNS;
    png_set_tRNS(png_ptr, info_ptr, png_ptr->trans, png_ptr->num_trans,
       &(png_ptr->trans_values));
 }
@@ -1283,7 +1291,6 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    num = (int)length / 2 ;
    png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
       (png_uint_32)(num * sizeof (png_uint_16)));
-   png_ptr->free_me |= PNG_FREE_HIST;
    for (i = 0; i < num; i++)
    {
       png_byte buf[2];
@@ -1295,6 +1302,8 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
+   png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
+   png_ptr->free_me |= PNG_FREE_HIST;
    png_set_hIST(png_ptr, info_ptr, png_ptr->hist);
 }
 #endif

@@ -669,6 +669,17 @@ version 1.0.6d [April 7, 2000]
   Renamed makefile.ibmvac3 to makefile.ibmc, added libpng.icc IBM project file
   Added a check for info_ptr->free_me&PNG_FREE_TEXT when free'ing text in png.c
   Simplify png_sig_bytes() function to remove use of non-ISO-C strdup().
+version 1.0.6e [April 10, 2000]
+  Added png_data_freer() function.
+  In the code that checks for over-length tRNS chunks, added check of
+    info_ptr->num_trans as well as png_ptr->num_trans (Matthias Benckmann)
+  Minor revisions of libpng.txt/libpng.3.
+  Check for existing data and free it if the free_me flag is set, in png_set_*()
+    and png_handle_*().
+  Only define PNG_WEIGHTED_FILTERS_SUPPORTED when PNG_FLOATING_POINT_SUPPORTED
+    is defined.
+  Changed several instances of PNG_NO_CONSOLE_ID to PNG_NO_STDIO in pngrutil.c
+    and mentioned the purposes of the two macros in libpng.txt/libpng.3.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

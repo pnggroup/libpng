@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.6d - April 7, 2000
+ * libpng version 1.0.6e - April 10, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -14,14 +14,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_6d Your_png_h_is_not_version_1_0_6d;
+typedef version_1_0_6e Your_png_h_is_not_version_1_0_6e;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-char png_libpng_ver[12] = "1.0.6d";
+char png_libpng_ver[12] = "1.0.6e";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -262,8 +262,25 @@ png_info_init(png_infop info_ptr)
 }
 
 void
+png_data_freer(png_structp png_ptr, png_infop info_ptr,
+   int freer, png_uint_32 mask)
+{
+   png_debug(1, "in png_data_freer\n");
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+   if(freer == PNG_DESTROY_WILL_FREE_DATA)
+      info_ptr->free_me |= mask;
+   else if(freer == PNG_USER_WILL_FREE_DATA)
+      info_ptr->free_me &= ~mask;
+   else
+      png_warning(png_ptr,
+         "Unknown freer parameter in png_data_freer.");
+}
+
+void
 png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask, int num)
 {
+   png_debug(1, "in png_free_data\n");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -306,7 +323,6 @@ if (mask & PNG_FREE_TRNS)
 
 #if defined(PNG_sCAL_SUPPORTED)
 /* free any sCAL entry */
-if (mask & PNG_FREE_SCAL)
 {
    if (info_ptr->valid & PNG_INFO_sCAL)
    {
@@ -321,7 +337,6 @@ if (mask & PNG_FREE_SCAL)
 
 #if defined(PNG_pCAL_SUPPORTED)
 /* free any pCAL entry */
-if (mask & PNG_FREE_PCAL)
 {
    if (info_ptr->valid & PNG_INFO_pCAL)
    {
@@ -484,7 +499,9 @@ png_get_io_ptr(png_structp png_ptr)
 #if !defined(PNG_NO_STDIO)
 /* Initialize the default input/output functions for the PNG file.  If you
  * use your own read or write routines, you can call either png_set_read_fn()
- * or png_set_write_fn() instead of png_init_io().
+ * or png_set_write_fn() instead of png_init_io().  If you have defined
+ * PNG_NO_STDIO, you must use a function of your own because "FILE *" isn't
+ * necessarily available.
  */
 void
 png_init_io(png_structp png_ptr, FILE *fp)
@@ -544,7 +561,7 @@ png_charp
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ("\n libpng version 1.0.6d - April 7, 2000\n\
+   return ("\n libpng version 1.0.6e - April 10, 2000\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson\n");
@@ -562,8 +579,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return("1.0.6d");
-   return("1.0.6d");
+      return("1.0.6e");
+   return("1.0.6e");
 }
 
 png_charp

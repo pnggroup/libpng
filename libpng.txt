@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.6d - April 7, 2000
+ libpng version 1.0.6e - April 10, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -341,7 +341,7 @@ where png_transforms is an integer containing the logical-or of some set of
 transformation flags.  This call is equivalent to png_read_info(),
 followed the set of transformations indicated by the transform mask,
 followed by png_update_info(), followed by a read of the image bytes
-to the info member `rowpointers', followed by png_read_end().
+to the info_ptr, followed by png_read_end().
 
 (The final parameter of this call is not yet used.  Someday it
 will point to transformation parameters.)
@@ -1114,7 +1114,6 @@ point to libpng-allocated storage with the following functions:
                    PNG_FREE_PLTE, PNG_FREE_TRNS,
                    PNG_FREE_HIST, PNG_FREE_ICCP,
                    PNG_FREE_SPLT, PNG_FREE_ROWS,
-                   PNG_FREE_PCAL, PNG_FREE_SCAL,
                    PNG_FREE_TEXT, PNG_FREE_UNKN,
                    or simply PNG_FREE_ALL
     n            - sequence number of item to be freed
@@ -1127,6 +1126,26 @@ cases do nothing.  The "n" parameter is ignored if only one item
 of the selected data type, such as PLTE, is allowed.  If "n" is not
 -1, and multiple items are allowed for the data type identified in
 the mask, such as text or splt, only the n'th item is freed.
+
+The default behavior is only to free data that was allocated internally
+by libpng.  This can be changed, so that libpng will not free the data,
+or so that it will also free data that was passed in via a png_set_*()
+function, with
+
+    png_data_freer(png_ptr, info_ptr, freer, mask)
+    mask     - which data elements are affected
+               same choices as in png_free_data()
+    freer    - one of
+                 PNG_DESTROY_WILL_FREE_DATA
+                 PNG_SET_WILL_FREE_DATA
+                 PNG_USER_WILL_FREE_DATA
+
+This function only affects data that has already been allocated.
+You can call this function after reading the PNG data but before calling
+any png_set_*() functions, to control whether the user or the png_set_*()
+function is responsible for freeing any existing data that might be present,
+and again after the png_set_*() functions to control whether the user
+or png_destroy_*() is supposed to free the data..
 
 For a more compact example of reading a PNG image, see the file example.c.
 
@@ -1726,7 +1745,7 @@ The high-level write interface
 At this point there are two ways to proceed; through the high-level
 write interface, or through a sequence of low-level write operations.
 You can use the high-level interface if your image data is present
-on the rowpointers member of the info structure.  All defined output
+in the info structure.  All defined output
 transformations are permitted, enabled by the following masks.
 
     PNG_TRANSFORM_IDENTITY      No transformation
@@ -1740,15 +1759,15 @@ transformations are permitted, enabled by the following masks.
     PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
     PNG_TRANSFORM_STRIP_FILLER  Strip out filler bytes.
 
-If you have valid image data on the rowpointers member, simply do this:
+If you have valid image data in the info structure, simply do this:
 
     png_write_png(png_ptr, info_ptr, png_transforms, NULL)
 
 where png_transforms is an integer containing the logical-or of some set of
 transformation flags.  This call is equivalent to png_write_info(),
 followed by the set of transformations indicated by the transform
-mask, followed by followed by a write of the image bytes from the info
-member `rowpointers', followed by png_write_end().
+mask, followed by followed by a write of the image bytes from the
+info_ptr, followed by png_write_end().
 
 (The final parameter of this call is not yet used.  Someday it
 may point to output transformation parameters.)
@@ -2006,7 +2025,6 @@ point to libpng-allocated storage with the following functions:
                    PNG_FREE_PLTE, PNG_FREE_TRNS,
                    PNG_FREE_HIST, PNG_FREE_ICCP,
                    PNG_FREE_SPLT, PNG_FREE_ROWS,
-                   PNG_FREE_PCAL, PNG_FREE_SCAL,
                    PNG_FREE_TEXT, PNG_FREE_UNKN,
                    or simply PNG_FREE_ALL
     n            - sequence number of item to be freed
@@ -2022,6 +2040,35 @@ the mask, such as text or splt, only the n'th item is freed.
 If you allocated data such as a palette that you passed in to libpng with
 png_set_*, you must not free it until just before the call to
 png_destroy_write_struct().
+
+The default behavior is only to free data that was allocated internally
+by libpng.  This can be changed, so that libpng will not free the data,
+or so that it will free data that was passed in via a png_set_*() function,
+with
+
+    png_data_freer(png_ptr, info_ptr, freer, mask)
+    mask     - which data elements are affected
+               same choices as in png_free_data()
+    freer    - one of
+                 PNG_DESTROY_WILL_FREE_DATA
+                 PNG_SET_WILL_FREE_DATA
+                 PNG_USER_WILL_FREE_DATA
+
+For example, to transfer responsibility for some data from a read structure
+to a write structure, you could use
+
+    png_data_freer(read_ptr, read_info_ptr,
+       PNG_USER_WILL_FREE_DATA,
+       PNG_FREE_PLTE|PNG_FREE_tRNS|PNG_FREE_hIST)
+    png_data_freer(write_ptr, write_info_ptr,
+       PNG_DESTROY_WILL_FREE_DATA,
+       PNG_FREE_PLTE|PNG_FREE_tRNS|PNG_FREE_hIST)
+
+Thereby briefly reassigning responsibility for freeing to the user but
+immediately afterwards reassigning it once more to the write_destroy
+function.  Having done this, it would then be safe to destroy the read
+structure and continue to use the PLTE, tRNS, and hIST data in the write
+structure.
 
 For a more compact example of writing a PNG image, see the file example.c.
 
@@ -2088,11 +2135,13 @@ but you could change this to do things like exit() if you should wish.
 On non-fatal errors, png_warning() is called
 to print a warning message, and then control returns to the calling code.
 By default png_error() and png_warning() print a message on stderr via
-fprintf() unless the library is compiled with PNG_NO_STDIO defined.  If
-you wish to change the behavior of the error functions, you will need to
-set up your own message callbacks.  These functions are normally supplied
-at the time that the png_struct is created.  It is also possible to change
-these functions after png_create_*_struct() has been called by calling:
+fprintf() unless the library is compiled with PNG_NO_CONSOLE_IO defined
+(because you don't want the messages) or PNG_NO_STDIO defined (because
+fprintf() isn't available).  If you wish to change the behavior of the error
+functions, you will need to set up your own message callbacks.  These
+functions are normally supplied at the time that the png_struct is created.
+It is also possible to change these functions after png_create_*_struct()
+has been called by calling:
 
     png_set_error_fn(png_structp png_ptr,
         png_voidp error_ptr, png_error_ptr error_fn,
@@ -2395,13 +2444,13 @@ the old method.
 
 VII. Y2K Compliance in libpng
 
-April 7, 2000
+April 10, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.6d are Y2K compliant.  It is my belief that earlier
+upward through 1.0.6e are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

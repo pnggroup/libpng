@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.6d - April 7, 2000
+ * libpng version 1.0.6e - April 10, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.6d - April 7, 2000: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.6e - April 10, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -47,7 +47,7 @@
  *    1.0.5e-r                 1.0.5e-r 10100  2.1.0.5e-r (not compatible)
  *    1.0.5s-v                 1.0.5s-v 10006  2.1.0.5s-v (compatible)
  *    1.0.6 (+ 3 patches)      1.0.6    10006  2.1.0.6
- *    1.0.6d                   1.0.6d   10007  2.1.0.6d
+ *    1.0.6d-e                 1.0.6d-e 10007  2.1.0.6d-e
  *    1.0.7                    1.0.7    10007  2.1.0.7    (still compatible)
  *
  *    Henceforth the source version will match the shared-library minor
@@ -73,7 +73,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.89c, June 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.6d, April 7, 2000)
+ * (libpng versions 0.97, January 1998, through 1.0.6e, April 10, 2000)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -148,13 +148,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    April 7, 2000
+ *    April 10, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.6d are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.6e are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -232,7 +232,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.6d"
+#define PNG_LIBPNG_VER_STRING "1.0.6e"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -428,16 +428,20 @@ typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
  * The following members may have allocated storage attached that should be
  * cleaned up before the structure is discarded: palette, trans, text,
  * pcal_purpose, pcal_units, pcal_params, hist, iccp_name, iccp_profile,
- * splt_palettes, scal_unit, and row_pointers.   These are automatically
- * freed when the info structure is deallocated.
+ * splt_palettes, scal_unit, row_pointers, and unknowns.   By default, these are
+ * automatically freed when the info structure is deallocated, if they were
+ * allocated internally by libpng.  This behavior can be changed by means
+ * of the png_data_freer() function.
  *
  * More allocation details: all the chunk-reading functions that change these
- * members go through the corresponding png_set_* functions.  Functions to
- * clear these members are available: see png_free_*.  The png_set_* functions
- * do not depend on being able to point info structure members to any of the
- * storage they are passed (they make their own copies), EXCEPT that the
- * png_set_text function uses the same storage passed to them
- * in the text_ptr or itxt_ptr structure argument.
+ * members go through the corresponding png_set_* functions.  A function to
+ * clear these members is available: see png_free_data().   Some of the
+ * png_set_* functions do not depend on being able to point info structure
+ * members to any of the storage they are passed (they make their own copies),
+ * EXCEPT that the png_set_text functions use the same storage passed to them
+ * in the text_ptr or itxt_ptr structure argument, and the png_set_tRNS,
+ * png_set_PLTE, png_set_hIST, png_set_iCCP, png_set_rows, png_set_sPLT,
+ * and png_set_unknowns do not make their own copies.
  */
 typedef struct png_info_struct
 {
@@ -1057,9 +1061,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.6d
+and png.h are both at * version 1.0.6e
  */
-typedef png_structp version_1_0_6d;
+typedef png_structp version_1_0_6e;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1591,10 +1595,18 @@ extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
 /* frees a pointer allocated by png_malloc() */
 extern PNG_EXPORT(void,png_free) PNGARG((png_structp png_ptr, png_voidp ptr));
 
-/* free data that was allocated internally */
+/* Free data that was allocated internally */
 extern PNG_EXPORT(void,png_free_data) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 free_me, int num));
-/* flags for png_ptr->free_me and info_ptr->free_me */
+/* Reassign responsibility for freeing existing data, whether allocated
+ * by libpng or by the application */
+extern PNG_EXPORT(void,png_data_freer) PNGARG((png_structp png_ptr,
+   png_infop info_ptr, int freer, png_uint_32 mask));
+/* assignments for png_data_freer */
+#define PNG_DESTROY_WILL_FREE_DATA 1
+#define PNG_SET_WILL_FREE_DATA 1
+#define PNG_USER_WILL_FREE_DATA 2
+/* Flags for png_ptr->free_me and info_ptr->free_me */
 #define PNG_FREE_PLTE 0x0001
 #define PNG_FREE_TRNS 0x0002
 #define PNG_FREE_TEXT 0x0004
@@ -1602,8 +1614,8 @@ extern PNG_EXPORT(void,png_free_data) PNGARG((png_structp png_ptr,
 #define PNG_FREE_ICCP 0x0010
 #define PNG_FREE_SPLT 0x0020
 #define PNG_FREE_ROWS 0x0040
-#define PNG_FREE_PCAL 0x0080
-#define PNG_FREE_SCAL 0x0100
+#define PNG_FREE_PCAL 0x0080 /* not used any more */
+#define PNG_FREE_SCAL 0x0100 /* not used any more */
 #define PNG_FREE_UNKN 0x0200
 #define PNG_FREE_LIST 0x0400
 #define PNG_FREE_ALL  0x07ff
@@ -2032,7 +2044,7 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.6d - April 7, 2000 (header)\n"
+   " libpng version 1.0.6e - April 10, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
