@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.2.2beta4 - March 8, 2002
+ * libpng 1.2.2beta5 - March 26, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -698,23 +698,23 @@ png_init_read_transformations(png_structp png_ptr)
          {
             case 1:
                png_ptr->background.gray *= (png_uint_16)0xff;
-               png_ptr->background.red = png_ptr->background.green =
-               png_ptr->background.blue = png_ptr->background.gray;
+               png_ptr->background.red = png_ptr->background.green
+                 =  png_ptr->background.blue = png_ptr->background.gray;
                break;
             case 2:
                png_ptr->background.gray *= (png_uint_16)0x55;
-               png_ptr->background.red = png_ptr->background.green =
-               png_ptr->background.blue = png_ptr->background.gray;
+               png_ptr->background.red = png_ptr->background.green
+                 = png_ptr->background.blue = png_ptr->background.gray;
                break;
             case 4:
                png_ptr->background.gray *= (png_uint_16)0x11;
-               png_ptr->background.red = png_ptr->background.green =
-               png_ptr->background.blue = png_ptr->background.gray;
+               png_ptr->background.red = png_ptr->background.green
+                 = png_ptr->background.blue = png_ptr->background.gray;
                break;
             case 8:
             case 16:
-               png_ptr->background.red = png_ptr->background.green =
-               png_ptr->background.blue = png_ptr->background.gray;
+               png_ptr->background.red = png_ptr->background.green
+                 = png_ptr->background.blue = png_ptr->background.gray;
                break;
          }
       }
@@ -902,9 +902,11 @@ png_init_read_transformations(png_structp png_ptr)
             png_ptr->background.gray = (png_uint_16)(pow(
                (double)png_ptr->background.gray / m, gs) * m + .5);
 
-            if (color_type & PNG_COLOR_MASK_COLOR)
+            if ((png_ptr->background.red != png_ptr->background.green) ||
+                (png_ptr->background.red != png_ptr->background.blue) ||
+                (png_ptr->background.red != png_ptr->background.gray))
             {
-               /* RGB or RGBA */
+               /* RGB or RGBA with color background */
                png_ptr->background_1.red = (png_uint_16)(pow(
                   (double)png_ptr->background.red / m, g) * m + .5);
                png_ptr->background_1.green = (png_uint_16)(pow(
@@ -920,13 +922,11 @@ png_init_read_transformations(png_structp png_ptr)
             }
             else
             {
-               /* GRAY or GRAY ALPHA */
-               png_ptr->background_1.red = png_ptr->background_1.gray;
-               png_ptr->background_1.green = png_ptr->background_1.gray;
-               png_ptr->background_1.blue = png_ptr->background_1.gray;
-               png_ptr->background.red = png_ptr->background.gray;
-               png_ptr->background.green = png_ptr->background.gray;
-               png_ptr->background.blue = png_ptr->background.gray;
+               /* GRAY, GRAY ALPHA, RGB, or RGBA with gray background */
+               png_ptr->background_1.red = png_ptr->background_1.green
+                 = png_ptr->background_1.blue = png_ptr->background_1.gray;
+               png_ptr->background.red = png_ptr->background.green
+                 = png_ptr->background.blue = png_ptr->background.gray;
             }
          }
       }
@@ -2346,7 +2346,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
  * paletted.  Most useful for gamma correction and simplification
  * of code.
  */
-void /* PRIVATE */
+void PNGAPI
 png_build_grayscale_palette(int bit_depth, png_colorp palette)
 {
    int num_palette;

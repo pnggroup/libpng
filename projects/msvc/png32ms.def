@@ -6,7 +6,7 @@ LIBRARY
 DESCRIPTION "PNG image compression library for Windows"
 
 EXPORTS
-;Version 1.2.2beta4
+;Version 1.2.2beta5
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3

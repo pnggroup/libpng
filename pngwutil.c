@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.2.2beta4 - March 8, 2002
+ * libpng 1.2.2beta5 - March 26, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1349,21 +1349,27 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
       png_warning(png_ptr, "Empty keyword in iTXt chunk");
       return;
    }
-   if (lang == NULL || (lang_len = png_check_keyword(png_ptr, lang,
-      &new_lang))==0)
+   if (lang == NULL || (lang_len = png_check_keyword(png_ptr, lang, &new_lang))==0)
    {
       png_warning(png_ptr, "Empty language field in iTXt chunk");
-      return;
+      new_lang = NULL;
+      lang_len = 0;      
    }
-   lang_key_len = png_strlen(lang_key);
-   text_len = png_strlen(text);
 
-   if (text == NULL || *text == '\0')
+   if (lang_key == NULL)
+     lang_key_len = 0;
+   else
+     lang_key_len = png_strlen(lang_key);
+
+   if (text == NULL)
       text_len = 0;
+   else
+     text_len = png_strlen(text);
 
    /* compute the compressed data; do it now for the length */
    text_len = png_text_compress(png_ptr, text, text_len, compression-2,
       &comp);
+
 
    /* make sure we include the compression flag, the compression byte,
     * and the NULs after the key, lang, and lang_key parts */
@@ -1394,15 +1400,15 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
    cbuf[1] = 0;
    png_write_chunk_data(png_ptr, cbuf, 2);
 
-   png_write_chunk_data(png_ptr, (png_bytep)new_lang, lang_len + 1);
-   png_write_chunk_data(png_ptr, (png_bytep)lang_key, lang_key_len+1);
-   png_write_chunk_data(png_ptr, '\0', 1);
-
+   cbuf[0] = 0;
+   png_write_chunk_data(png_ptr, (new_lang ? (png_bytep)new_lang : cbuf), lang_len + 1);
+   png_write_chunk_data(png_ptr, (lang_key ? (png_bytep)lang_key : cbuf), lang_key_len + 1);
    png_write_compressed_data_out(png_ptr, &comp);
 
    png_write_chunk_end(png_ptr);
    png_free(png_ptr, new_key);
-   png_free(png_ptr, new_lang);
+   if (new_lang)
+     png_free(png_ptr, new_lang);
 }
 #endif
 

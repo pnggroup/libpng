@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.2beta4 - March 8, 2002
+ * libpng 1.2.2beta5 - March 26, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -451,9 +451,11 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    if (png_ptr == NULL)
       return (NULL);
 
+#if !defined(PNG_1_0_X)
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
    png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
 #endif
+#endif /* PNG_1_0_X */
 
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
@@ -625,9 +627,11 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    /* reset all variables to 0 */
    png_memset(png_ptr, 0, sizeof (png_struct));
 
+#if !defined(PNG_1_0_X)
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
    png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
 #endif
+#endif /* PNG_1_0_X */
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */

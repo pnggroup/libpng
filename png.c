@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.2.2beta4 - March 8, 2002
+ * libpng version 1.2.2beta5 - March 26, 2002
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_2beta4 Your_png_h_is_not_version_1_2_2beta4;
+typedef version_1_2_2beta5 Your_png_h_is_not_version_1_2_2beta5;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = "1.2.2beta4";
+const char png_libpng_ver[18] = "1.2.2beta5";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -660,10 +660,10 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ((png_charp) "\n libpng version 1.2.2beta4 - March 8, 2002\n\
+   return ((png_charp) "\n libpng version 1.2.2beta5 - March 26, 2002\n\
    Copyright (c) 1998-2002 Glenn Randers-Pehrson\n\
-   Copyright (c) 1996, 1997 Andreas Dilger\n\
-   Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
+   Copyright (c) 1996-1997 Andreas Dilger\n\
+   Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
    return ((png_charp) "");
 }
 
@@ -678,8 +678,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) "1.2.2beta4");
-   return((png_charp) "1.2.2beta4");
+      return((png_charp) "1.2.2beta5");
+   return((png_charp) "1.2.2beta5");
 }
 
 png_charp PNGAPI
@@ -733,13 +733,13 @@ png_access_version_number(void)
 }
 
 
+#if !defined(PNG_1_0_X)
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
     /* GRR:  could add this:   && defined(PNG_MMX_CODE_SUPPORTED) */
 /* this INTERNAL function was added to libpng 1.2.0 */
 void /* PRIVATE */
 png_init_mmx_flags (png_structp png_ptr)
 {
-#if !defined(PNG_1_0_X)
     png_ptr->mmx_rowbytes_threshold = 0;
     png_ptr->mmx_bitdepth_threshold = 0;
 
@@ -778,7 +778,6 @@ png_init_mmx_flags (png_structp png_ptr)
     png_ptr->asm_flags &= ~( PNG_MMX_FLAGS );
 
 #  endif /* ?(PNGVCRD || PNGGCCRD) */
-#endif /* PNG_1_0_X */
 }
 
 #endif /* !(PNG_ASSEMBLER_CODE_SUPPORTED) */
@@ -792,3 +791,4 @@ png_mmx_support(void)
     return -1;
 }
 #endif
+#endif /* PNG_1_0_X */

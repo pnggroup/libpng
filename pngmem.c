@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.2.2beta4 - March 8, 2002
+ * libpng 1.2.2beta5 - March 26, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -43,7 +43,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    else if (type == PNG_STRUCT_PNG)
      size = sizeof(png_struct);
    else
-     return (NULL);
+     return (png_get_copyright());
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(malloc_fn != NULL)
@@ -424,7 +424,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
    else
        return (png_malloc_default(png_ptr, size));
 }
-png_voidp /* PRIVATE */
+png_voidp PNGAPI
 png_malloc_default(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
@@ -472,7 +472,7 @@ png_free(png_structp png_ptr, png_voidp ptr)
    }
    else png_free_default(png_ptr, ptr);
 }
-void /* PRIVATE */
+void PNGAPI
 png_free_default(png_structp png_ptr, png_voidp ptr)
 {
    if (png_ptr == NULL || ptr == NULL)
@@ -493,7 +493,7 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 
 #endif /* Not Borland DOS special memory handler */
 
-png_voidp /* PRIVATE */
+png_voidp PNGAPI
 png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,
    png_uint_32 length)
 {
@@ -506,7 +506,7 @@ png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,
    return(png_memcpy (s1, s2, size));
 }
 
-png_voidp /* PRIVATE */
+png_voidp PNGAPI
 png_memset_check (png_structp png_ptr, png_voidp s1, int value,
    png_uint_32 length)
 {

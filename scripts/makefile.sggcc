@@ -24,7 +24,7 @@ LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=CC $(ABI) -shared
 
 PNGMAJ = 0
-PNGMIN = 1.2.2beta4
+PNGMIN = 1.2.2beta5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 # See "man dso" for info about shared objects
 LIBS=libpng12.so.$(PNGMAJ).$(PNGVER)
@@ -63,8 +63,8 @@ install-headers: png.h pngconf.h
 	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
 	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	ln -f -s $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)
-	ln -f -s $(INCPATH)/$(LIBNAME)/pngconf.h $(INCPATH)
+	-@/bin/rm -f $(INCPATH)/libpng
+	ln -f -s $(INCPATH)/$(LIBNAME) $(INCPATH)/libpng
 
 install-static: install-headers libpng.a
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
@@ -75,11 +75,16 @@ install-static: install-headers libpng.a
 
 install-shared: install-headers $(LIBNAME).so.$(PNGVER)
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	-@/bin/rm -f $(LIBPATH)/libpng.so.3*
 	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
+	-@/bin/rm -f $(LIBPATH)/libpng.so
+	-@/bin/rm -f $(LIBPATH)/libpng.so.3
+	-@/bin/rm -f $(LIBPATH)/libpng.so.3.*
 	cp $(LIBNAME).so.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
 	(cd $(LIBPATH); \
+	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so; \
+	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.3; \
+	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.3.$(PNGMIN); \
 	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
 	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi

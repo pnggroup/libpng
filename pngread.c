@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.2.2beta4 - March 8, 2002
+ * libpng 1.2.2beta5 - March 26, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -53,9 +53,11 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    if (png_ptr == NULL)
       return (NULL);
 
+#if !defined(PNG_1_0_X)
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
    png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
 #endif
+#endif /* PNG_1_0_X */
 
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
@@ -774,7 +776,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.2beta4
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.2beta5
  */
 
 void PNGAPI
@@ -823,7 +825,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.2beta4
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.2beta5
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)

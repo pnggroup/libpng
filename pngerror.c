@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.2.2beta4 - March 8, 2002
+ * libpng 1.2.2beta5 - March 26, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -277,7 +277,7 @@ png_get_error_ptr(png_structp png_ptr)
 
 
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-void
+void PNGAPI
 png_set_strip_error_numbers(png_structp png_ptr, png_uint_32 strip_mode)
 {
    if(png_ptr != NULL)

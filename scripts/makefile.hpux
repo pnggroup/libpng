@@ -19,7 +19,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
 PNGMAJ = 0
-PNGMIN = 1.2.2beta4
+PNGMIN = 1.2.2beta5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -68,8 +68,8 @@ install-headers: png.h pngconf.h
 	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
 	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
 	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	ln -sf $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)
-	ln -sf $(INCPATH)/$(LIBNAME)/pngconf.h $(INCPATH)
+	-@/bin/rm -f $(INCPATH)/libpng
+	ln -sf $(INCPATH)/$(LIBNAME) $(INCPATH)/libpng
 
 install-static: install-headers libpng.a
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
@@ -80,11 +80,16 @@ install-static: install-headers libpng.a
 
 install-shared: install-headers $(LIBNAME).sl.$(PNGVER)
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	-@/bin/rm -f $(LIBPATH)/libpng.sl.3*
 	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).sl.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).sl
+	-@/bin/rm -f $(LIBPATH)/libpng.sl
+	-@/bin/rm -f $(LIBPATH)/libpng.sl.3
+	-@/bin/rm -f $(LIBPATH)/libpng.sl.3.*
 	cp $(LIBNAME).sl.$(PNGVER) $(LIBPATH)
 	chmod 755 $(LIBPATH)/$(LIBNAME).sl.$(PNGVER)
 	(cd $(LIBPATH); \
+	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl; \
+	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl.3; \
+	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl.3.$(PNGMIN); \
 	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ); \
 	ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl)
 	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi

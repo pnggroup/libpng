@@ -1,5 +1,5 @@
 
-Libpng 1.2.2beta4 - March 8, 2002
+Libpng 1.2.2beta5 - March 26, 2002
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,8 +8,8 @@ Changes since the last public release (1.2.1):
 
 version 1.2.2beta1 [February 22, 2002]
   Fixed a bug with reading the length of iCCP profiles (Larry Reeves).
-  Revised makefile.linux, makefile.gcmmx, and makefile.sgi to generate
-    libpng.a, libpng12.so (not libpng.so.3), and libpng12/png.h
+  Revised makefile.linux, makefile.gcmmx, and others to generate
+    libpng.a, libpngNN.so (not libpng.so.3), and libpngNN/png.h
   Revised makefile.darwin to remove "-undefined suppress" option.
   Added checks for gamma and chromaticity values over 21474.83, which exceed
     the limit for PNG unsigned 32-bit integers when encoded.
@@ -32,9 +32,18 @@ version 1.2.2beta3 [March 7, 2002]
   Added makefile.32sunu for Sun Ultra 32 and makefile.64sunu for Sun Ultra 64.
 version 1.2.2beta4 [March 8, 2002]
   Compute background.gray and background_1.gray even when color_type is RGB
-    in case image gets reduced to gray later.
+    in case image gets reduced to gray later (Jason Summers).
   Relocated a misplaced /bin/rm in the "install-shared" makefile targets
   Added PNG_1_0_X macro which can be used to build a 1.0.x-compatible library.
+version 1.2.2beta5 [March 26, 2002]
+  Added missing PNGAPI to several function definitions.
+  Check for invalid bit_depth or color_type in png_get_IHDR(), and
+    check for missing PLTE or IHDR in png_push_read_chunk() (Matthias Clasen).
+  Revised iTXt support to accept NULL for lang and lang_key.
+  Compute gamma for color components of background even when color_type is gray.
+  Changed "()" to "{}" in pkgconfig/libpngNN.pc.
+  Revised makefiles to put png.h and pngconf.h only in $prefix/include/libpngNN
+  Revised makefiles to make symlink to libpng.so.NN in addition to libpngNN.so
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

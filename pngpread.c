@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.2.2beta4 - March 8, 2002
+ * libpng 1.2.2beta5 - March 26, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -240,6 +240,12 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
        * header chunks, and we can start reading the image (or if this
        * is called after the image has been read - we have an error).
        */
+     if (!(png_ptr->mode & PNG_HAVE_IHDR))
+       png_error(png_ptr, "Missing IHDR before IDAT");
+     else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+	      !(png_ptr->mode & PNG_HAVE_PLTE))
+       png_error(png_ptr, "Missing PLTE before IDAT");
+
       if (png_ptr->mode & PNG_HAVE_IDAT)
       {
          if (png_ptr->push_length == 0)
@@ -1491,7 +1497,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
    png_ptr->row_fn = row_fn;
    png_ptr->end_fn = end_fn;
 
-   png_set_read_fn(png_ptr, progressive_ptr, png_push_fill_buffer);
+   png_set_read_fn(png_ptr, progressive_ptr, (png_rw_ptr)png_push_fill_buffer);
 }
 
 png_voidp PNGAPI

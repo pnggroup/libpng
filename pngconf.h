@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.2.2beta4 - March 8, 2002
+ * libpng 1.2.2beta5 - March 26, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -591,9 +591,11 @@
 #  define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif
 
+#ifndef PNG_1_0_X
 #ifndef PNG_NO_ERROR_NUMBERS
 #define PNG_ERROR_NUMBERS_SUPPORTED
 #endif
+#endif /* PNG_1_0_X */
 
 #ifndef PNG_NO_WRITE_FLUSH
 #  define PNG_WRITE_FLUSH_SUPPORTED
