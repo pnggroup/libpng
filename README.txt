@@ -40,12 +40,14 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
 
 This is the output of "pngcrush" and "pngcrush -help":
 
- | pngcrush 1.5.6, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+
+ | pngcrush 1.5.7, Copyright (C) 1998-2001 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
- | This program was built with libpng version 1.0.12, and is
- | running with  libpng version 1.0.12 - June 8, 2001 (header)
+ | Executable name is pngcrush
+ | It was built with libpng version 1.2.0, and is
+ | running with  libpng version 1.2.0 - September 1, 2001 (header)
  |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -61,6 +63,7 @@ options:
     -bit_depth depth (bit_depth to use in output file)
         -brute (Use brute-force, try 114 different methods [11-124])
             -c color_type of output file [0, 2, 4, or 6]
+           -cc (do color counting)
             -d directory_name (where output files will go)
  -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
             -e extension  (used for creating output filename)
@@ -74,6 +77,8 @@ options:
          -loco ("loco crush" truecolor PNGs)
             -m method [0 through 200]
           -max maximum_IDAT_size [default 8192]
+        -no_cc (no color counting)
+        -nofilecheck (do not check for infile.png == outfile.png)
             -n (no save; does not do compression or write output PNG)
      -plte_len n (truncate PLTE)
             -q (quiet)
@@ -81,6 +86,7 @@ options:
           -rem chunkname (or "alla" or "allb")
 -replace_gamma gamma (float or fixed*100000) even if gAMA is present.
           -res dpi
+         -save (keep all copy-unsafe chunks)
          -srgb [0, 1, 2, or 3]
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
          -trns index red green blue gray
@@ -95,12 +101,13 @@ options:
             -p (pause)
 
 
- | pngcrush 1.5.6, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+ | pngcrush 1.5.7, Copyright (C) 1998-2001 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
- | This program was built with libpng version 1.0.12, and is
- | running with  libpng version 1.0.12 - June 8, 2001 (header)
+ | Executable name is pngcrush
+ | It was built with libpng version 1.2.0, and is
+ | running with  libpng version 1.2.0 - September 1, 2001 (header)
  |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -144,6 +151,8 @@ options (Note: any option can be spelled out for clarity, e.g.,
                You can use 0 or 4 to convert color to grayscale.
                Use 0 or 2 to delete an unwanted alpha channel.
                Default is to use same color type as the input file.
+
+           -cc (do color counting)
 
             -d directory_name (where output files will go)
 
@@ -210,13 +219,22 @@ options (Note: any option can be spelled out for clarity, e.g.,
 
                pngcrush method to try (0 means try all of 1-10).
                Can be repeated as in '-m 1 -m 4 -m 7'.
-               This can be useful if you run out of memory when pngcrush
-               tries methods 2, 3, 5, 6, 8, 9, or 10 which use 
-               filtering and are memory intensive.  Methods
+               This can be useful if pngcrush runs out of memory
+               when it tries methods 2, 3, 5, 6, 8, 9, or 10 which
+               use filtering and are memory intensive.  Methods
                1, 4, and 7 use no filtering; methods 11 and up use 
                specified filter, compression level, and strategy.
 
           -max maximum_IDAT_size [default 8192]
+
+        -no_cc (no color counting)
+
+        -nofilecheck (do not check for infile.png == outfile.png)
+
+               To avoid false hits from MSVC-compiled code.  Note
+               that if you use this option, you are responsible for
+               ensuring that the input file is not the output file.
+
             -n (no save; does not do compression or write output PNG)
 
                Useful in conjunction with -v option to get info.
@@ -253,6 +271,12 @@ options (Note: any option can be spelled out for clarity, e.g.,
           -res dpi
 
                Write a pHYs chunk with the given resolution.
+
+         -save (keep all copy-unsafe chunks)
+
+               Save otherwise unknown ancillary chunks that would
+               be considered copy-unsafe.  This option makes
+               chunks 'known' to pngcrush, so they can be copied.
 
          -srgb [0, 1, 2, or 3]
 
@@ -312,4 +336,3 @@ options (Note: any option can be spelled out for clarity, e.g.,
                Wait for [enter] key before continuing display.
                e.g., type 'pngcrush -pause -help', if the help
                screen scrolls out of sight.
-

@@ -25,7 +25,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.5.6"
+#define PNGCRUSH_VERSION "1.5.7"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -66,6 +66,17 @@
  */
 
 /* Change log:
+ *
+ * Version 1.5.7 (built with libpng-1.2.0)
+ *
+ *   Added setargv.obj to Makefile.msc to expand wildcards, e.g., *.png
+ *
+ *   Use constant string "pngcrush" instead of argv[0] when appropriate.
+ *
+ *   Only check stats for infile==outfile once per input file, or not at all
+ *   if "-nofilecheck" option is present or if a directory was created.
+ *
+ *   Fixed bugs with changing bit_depth of grayscale images.
  *
  * Version 1.5.6 (built with libpng-1.0.12)
  *
@@ -139,7 +150,7 @@
  *   Disabled color counting by default and made it controllable with new
  *   -cc and -no_cc commandline arguments.
  *
- *   Added some #ifdef PNG_COUNT_COLORS around code that needs it.
+ *   Added some #ifdef PNGCRUSH_COUNT_COLORS around code that needs it.
  *
  *   Revised count_colors() attempting to avoid stack corruption that has
  *   been observed on RedHat 6.2
@@ -381,7 +392,6 @@
  *   Move the Photoshop-fixing stuff into a separate program.
  *
  *   add "-time" directive
- *
  */
 
 #define PNG_INTERNAL
@@ -529,7 +539,7 @@ main()
 #endif
 
 /* input and output filenames */
-static PNG_CONST char *progname = "pngtest" DOT "png";
+static PNG_CONST char *progname = "pngtest" DOT "exe";
 static PNG_CONST char *inname = "pngtest" DOT "png";
 static PNG_CONST char *outname = "pngout" DOT "png";
 static PNG_CONST char *directory_name = "pngcrush" DOT "bak";
@@ -617,7 +627,7 @@ static int brute_force_strategies[3]={1,1,1};
 static int method=10;
 static int pauses=0;
 static int nosave=0;
-static int nointerlace=0;
+static int nofilecheck=0;
 static png_bytep row_buf;
 #ifdef PNGCRUSH_MULTIPLE_ROWS
 static png_bytepp row_pointers;
@@ -940,7 +950,7 @@ static void setfiletype(const char *name)
   _kernel_swi(8 | 1<<31, &r, &r);
 # endif
 }
-#else
+#else  /* !defined(__riscos) */
 #  define setfiletype(x)
 #endif
 
@@ -1444,10 +1454,8 @@ main(int argc, char *argv[])
          brute_force=0;
          try_method[method]=0;
       }
-#if 0
-   else if(!strncmp(argv[i],"-ni",3))
-      nointerlace++;
-#endif
+   else if(!strncmp(argv[i],"-nofilecheck",5))
+      nofilecheck++; 
    else if(!strncmp(argv[i],"-nosave",2))
       {
       /* no save; I just use this for testing decode speed */
@@ -1476,7 +1484,8 @@ main(int argc, char *argv[])
          verbose=0;
    else if(!strncmp(argv[i],"-reduce",7))
       {
-        reduction_ok++;
+         reduction_ok++;
+         do_color_count=1;
       }
 #ifdef PNG_gAMA_SUPPORTED
    else if(!strncmp(argv[i],"-rep",4))
@@ -1719,8 +1728,8 @@ main(int argc, char *argv[])
  /* If you have modified this source, you may insert additional notices
   * immediately after this sentence. */
       fprintf(STDERR, 
-        "\n | %s %s, Copyright (C) 1998-2001 Glenn Randers-Pehrson\n",
-        progname, PNGCRUSH_VERSION);
+        "\n | pngcrush %s, Copyright (C) 1998-2001 Glenn Randers-Pehrson\n",
+        PNGCRUSH_VERSION);
       fprintf(STDERR,
       " | This is a free, open-source program.  Permission is irrevocably\n");
       fprintf(STDERR,
@@ -1728,7 +1737,9 @@ main(int argc, char *argv[])
       fprintf(STDERR,
       " | payment of any fee.\n");
       fprintf(STDERR, 
-      " | This program was built with libpng version %s, and is\n",
+      " | Executable name is %s\n",progname);
+      fprintf(STDERR, 
+      " | It was built with libpng version %s, and is\n",
             PNG_LIBPNG_VER_STRING);
 #if PNG_LIBPNG_VER > 10001
       fprintf(STDERR,
@@ -2003,16 +2014,15 @@ main(int argc, char *argv[])
      if(verbose > 1)
      {
      fprintf(STDERR,
-       "\n               %s method to try (0 means try all of 1-10).\n",progname);
+       "\n               pngcrush method to try (0 means try all of 1-10).\n");
      fprintf(STDERR,
        "               Can be repeated as in '-m 1 -m 4 -m 7'.\n");
      fprintf(STDERR,
-       "               This can be useful if you run out of memory when %s\n",
-                       progname);
+       "               This can be useful if pngcrush runs out of memory\n");
      fprintf(STDERR,
-       "               tries methods 2, 3, 5, 6, 8, 9, or 10 which use \n");
+       "               when it tries methods 2, 3, 5, 6, 8, 9, or 10 which\n");
      fprintf(STDERR,
-       "               filtering and are memory intensive.  Methods\n");
+       "               use filtering and are memory intensive.  Methods\n");
      fprintf(STDERR,
        "               1, 4, and 7 use no filtering; methods 11 and up use \n");
      fprintf(STDERR,
@@ -2022,18 +2032,25 @@ main(int argc, char *argv[])
 
      fprintf(STDERR,
        "          -max maximum_IDAT_size [default %d]\n",PNG_ZBUF_SIZE);
-#if 0
-     fprintf(STDERR,
-       "           -ni (no interlace)\n");
      if(verbose > 1)
         fprintf(STDERR,"\n");
-#endif
 #ifdef PNGCRUSH_COUNT_COLORS
      fprintf(STDERR,
        "        -no_cc (no color counting)\n");
      if(verbose > 1)
         fprintf(STDERR,"\n");
 #endif
+     fprintf(STDERR,
+       "        -nofilecheck (do not check for infile.png == outfile.png)\n");
+     if(verbose > 1)
+     {
+        fprintf(STDERR,
+       "\n               To avoid false hits from MSVC-compiled code.  Note\n");
+     fprintf(STDERR,
+       "               that if you use this option, you are responsible for\n");
+     fprintf(STDERR,
+       "               ensuring that the input file is not the output file.\n\n");
+     }
      fprintf(STDERR,
        "            -n (no save; does not do compression or write output PNG)\n");
      if(verbose > 1)
@@ -2106,20 +2123,17 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "\n               Write a pHYs chunk with the given resolution.\n\n");
      }
-#if 0  /* TO DO */
      fprintf(STDERR,
        "         -save (keep all copy-unsafe chunks)\n");
      if(verbose > 1)
      {
      fprintf(STDERR,
-       "\n               Save otherwise unknown ancillary chunks that\n");
+       "\n               Save otherwise unknown ancillary chunks that would\n");
      fprintf(STDERR,
-       "               would be considered copy-unsafe.  This option makes\n");
+       "               be considered copy-unsafe.  This option makes\n");
      fprintf(STDERR,
-       "               all chunks 'known' to %s, so they can be copied.\n\n",
-                       progname);
+       "               chunks 'known' to pngcrush, so they can be copied.\n\n");
      }
-#endif
       png_crush_pause();
 
      fprintf(STDERR,
@@ -2279,15 +2293,12 @@ main(int argc, char *argv[])
    for (ia=0; ia<256; ia++)
       trns_array[ia]=255;
 
-  P2 (" gthc=%d\n",global_things_have_changed);
-
   for(;;)  /* loop on input files */
 
   {
       first_trial = 1;
 
       things_have_changed=global_things_have_changed;
-      P2 (" thc=%d\n",things_have_changed);
 
       if(png_row_filters != NULL)
       {
@@ -2322,6 +2333,7 @@ main(int argc, char *argv[])
                 fprintf(STDERR,"could not create directory %s\n",directory_name);
                 exit(1);
              }
+             nofilecheck=1;
           }
           out_string[0] = '\0'; 
           str_return = strcat(out_string,directory_name);
@@ -2467,6 +2479,11 @@ main(int argc, char *argv[])
       }
 
 #if 0  /* TO DO */
+      if (output_color_type == 0)
+      /* see if bit depth can be reduced */
+      {
+      }
+
       if (input_color_type == 2)
       /* check for 256 or fewer colors */
       {
@@ -2520,9 +2537,6 @@ main(int argc, char *argv[])
          if(idat_length[best] == idat_length[0] && things_have_changed == 0
             && best != final_method && nosave == 0)
          {
-#ifndef __riscos
-            struct stat stat_in, stat_out;
-#endif
             /* just copy input to output */
 
             P2("prepare to copy input to output\n");
@@ -2545,29 +2559,14 @@ main(int argc, char *argv[])
             number_of_open_files++;
             P2("copying input to output... tc=%d ...",things_have_changed);
 
-#ifdef __riscos
-            /* (brokenly) assume that they're different */
-#else
-            if ((stat(inname, &stat_in) == 0) ||
-                (stat(outname, &stat_out) != 0) ||
-#ifdef _MSC_VER /* maybe others? */
-                (stat_in.st_size != stat_out.st_size) ||
-#else
-                (stat_in.st_ino != stat_out.st_ino) || 
-#endif
-                (stat_in.st_dev != stat_out.st_dev))
-#endif
+            for(;;)
             {
-               for(;;)
-               {
-                  png_size_t num_in;
+               png_size_t num_in;
 
-                  num_in = fread(buffer, 1, 1, fpin);
-                  if (!num_in)
-                     break;
-                  fwrite(buffer, 1, 1, fpout);
-
-               }
+               num_in = fread(buffer, 1, 1, fpin);
+               if (!num_in)
+                  break;
+               fwrite(buffer, 1, 1, fpout);
             }
             P2("copy complete.\n");
             png_crush_pause();
@@ -2629,7 +2628,7 @@ main(int argc, char *argv[])
             update or output
           */
          struct stat stat_in, stat_out;
-         if ((stat(inname, &stat_in) == 0) &&
+         if (first_trial && !nofilecheck && (stat(inname, &stat_in) == 0) &&
              (stat(outname, &stat_out) == 0) &&
 #if defined(_MSC_VER) || defined(__MINGW32__) /* maybe others? */
             /* MSVC++6.0 will erroneously return 0 for both files, so we
@@ -2643,7 +2642,7 @@ main(int argc, char *argv[])
 #endif
              (stat_in.st_dev == stat_out.st_dev))
          {
-            fprintf(STDERR, "\n   Cannot overwrite input file %s\n", inname);
+            fprintf(STDERR, "\n   Cannot overwrite input file %s\n", outname);
             P1("   st_ino=%d, st_size=%d\n\n", (int)stat_in.st_ino,
                (int)stat_in.st_size);
             FCLOSE(fpin);
@@ -2941,24 +2940,26 @@ main(int argc, char *argv[])
              &color_type, &interlace_method, &compression_method, &filter_method))
          {
             int need_expand = 0;
-            int output_interlace_method=interlace_method;
             input_color_type=color_type;
             input_bit_depth=bit_depth;
-            if(nointerlace)
-               output_interlace_method=0;
+
+            if(output_color_type > 7)
+            {
+               output_color_type=input_color_type;
+            }
+
             if(verbose > 1 && first_trial)
             {
                fprintf(STDERR, "   IHDR chunk data:\n");
                fprintf(STDERR, "      Width=%ld, height=%ld\n", width, height);
                fprintf(STDERR, "      Bit depth =%d\n", bit_depth);
                fprintf(STDERR, "      Color type=%d\n", color_type);
+               if (output_color_type != color_type)
+                 fprintf(STDERR, "      Output color type=%d\n",
+                   output_color_type);
                fprintf(STDERR, "      Interlace =%d\n", interlace_method);
             }
 
-            if(output_color_type > 7)
-            {
-               output_color_type=input_color_type;
-            }
 
 #ifndef PNG_WRITE_PACK_SUPPORTED
             if(output_bit_depth == 0)
@@ -2968,8 +2969,9 @@ main(int argc, char *argv[])
             {
                output_bit_depth=input_bit_depth;
             }
-            if(output_bit_depth != input_bit_depth)
-               need_expand = 1;
+            if((output_color_type != 3 || output_bit_depth > 8) && 
+              output_bit_depth >= 8 && output_bit_depth != input_bit_depth)
+                need_expand = 1;
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
             if((color_type == 2 || color_type == 6 || color_type == 3) &&
@@ -3052,6 +3054,18 @@ main(int argc, char *argv[])
                 png_set_expand(read_ptr);
 #endif
 
+#ifdef PNG_READ_PACK_SUPPORTED
+            if(input_bit_depth < 8)
+            {
+                png_set_packing(read_ptr);
+            }
+            if(output_color_type == 0 && output_bit_depth < 8)
+            {
+               png_color_8 true_bits;
+               true_bits.gray = (png_byte)(output_bit_depth);
+               png_set_shift(read_ptr, &true_bits);
+            }
+#endif
 
             if(verbose > 1)
                 fprintf(STDERR, "   Setting IHDR\n");
@@ -3074,10 +3088,11 @@ main(int argc, char *argv[])
 #endif
 
             png_set_IHDR(write_ptr, write_info_ptr, width, height,
-              output_bit_depth, output_color_type, output_interlace_method,
+              output_bit_depth, output_color_type, interlace_method,
               compression_method, filter_method);
 
             if(output_color_type != input_color_type) things_have_changed=1;
+
          }
       }
 #if defined(PNG_READ_bKGD_SUPPORTED) && defined(PNG_WRITE_bKGD_SUPPORTED)
@@ -3780,7 +3795,7 @@ main(int argc, char *argv[])
       png_crush_pause();
       png_debug(0, "\nWriting info struct\n");
 
-#if 0
+#if 0 /* doesn't work; compression level has to be the same as in IDAT */
       /* if zTXt other compressed chunk */
       png_set_compression_level(write_ptr, 9);
       png_set_compression_window_bits(write_ptr, 15);
@@ -3848,19 +3863,19 @@ main(int argc, char *argv[])
       png_write_info(write_ptr, write_info_ptr);
       png_debug(0, "\nWrote info struct\n");
       P2("wrote info structure.\n");
-
-#if (PNG_LIBPNG_VER > 90)
 #ifdef PNG_WRITE_PACK_SUPPORTED
-      if(output_bit_depth < input_bit_depth)
+      if(output_bit_depth < 8)
       {
-          png_color_8 true_bits;
-          true_bits.gray = (png_byte)(8 - (input_bit_depth - output_bit_depth));
-          png_set_shift(read_ptr, &true_bits);
+         if(output_color_type == 0)
+         {
+            png_color_8 true_bits;
+            true_bits.gray = (png_byte)(output_bit_depth);
+            png_set_shift(write_ptr, &true_bits);
+         }
+         png_set_packing(write_ptr);
       }
-      if(output_bit_depth != input_bit_depth && output_bit_depth < 8)
-          png_set_packing(write_ptr);
 #endif
-#endif  /* PNG_LIBPNG_VER > 90 */
+
       }  /* no save */
 
 #define LARGE_PNGCRUSH
@@ -3886,10 +3901,7 @@ main(int argc, char *argv[])
             row_buf = png_malloc(read_ptr, rowbytes+16);
 #endif
          else
-         {
-            fprintf(STDERR, "rowbytes= %d\n",rowbytes);
             row_buf = NULL;
-         }
       }
 #else
       {
@@ -4153,7 +4165,7 @@ main(int argc, char *argv[])
 
       if(nosave == 0)
       {
-#if 0
+#if 0 /* doesn't work; compression level has to be the same as in IDAT */
          /* if zTXt other compressed chunk */
          png_set_compression_level(write_ptr, 9);
          png_set_compression_window_bits(write_ptr, 15);
@@ -4291,17 +4303,17 @@ main(int argc, char *argv[])
          total_input_length += input_length + output_length;
          if(input_length == output_length)
             fprintf(STDERR,
-               "   Best %s method = %d for %s (no change)\n\n",
-                progname, best, outname);
+               "   Best pngcrush method = %d for %s (no change)\n\n",
+                best, outname);
          else if(input_length > output_length)
             fprintf(STDERR,
-               "   Best %s method = %d for %s (%4.2f%% reduction)\n\n",
-                progname, best, outname,
+               "   Best pngcrush method = %d for %s (%4.2f%% reduction)\n\n",
+                best, outname,
                (100.0 - (100.0*output_length)/input_length));
          else
             fprintf(STDERR,
-               "   Best %s method = %d for %s (%4.2f%% increase)\n\n",
-                progname, best, outname,
+               "   Best pngcrush method = %d for %s (%4.2f%% increase)\n\n",
+                best, outname,
                -(100.0 - (100.0*output_length)/input_length));
          if(verbose > 2)
             fprintf(STDERR, "   Number of open files=%d\n",number_of_open_files);
@@ -4566,7 +4578,7 @@ count_colors(FILE *fpin)
    png_debug(0, "Allocating read_info structure\n");
    read_info_ptr = png_create_info_struct(read_ptr);
    if (read_info_ptr == NULL)
-      png_destroy_read_struct(&read_ptr, (png_infop)NULL, (png_infop)NULL);
+      png_destroy_read_struct(&read_ptr, (png_infopp)NULL, (png_infopp)NULL);
    }
    else
       read_info_ptr = NULL;
@@ -4939,7 +4951,7 @@ count_colors(FILE *fpin)
 
    png_free (read_ptr, row_buf); row_buf = (png_bytep)NULL;
    png_debug(0, "Destroying data structs\n");
-   png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infop)NULL);
+   png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infopp)NULL);
    }
    else
       result=2;
@@ -4949,7 +4961,7 @@ count_colors(FILE *fpin)
       fprintf(STDERR, "\nWhile checking alphas in %s ", inname);
       fprintf(STDERR,"pngcrush caught libpng error:\n   %s\n\n",msg);
       png_free (read_ptr, row_buf); row_buf = (png_bytep)NULL;
-      png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infop)NULL);
+      png_destroy_read_struct(&read_ptr, &read_info_ptr, (png_infopp)NULL);
       png_debug(0, "Destroyed data structs\n");
       result=2;
    }

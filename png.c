@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.12 - June 8, 2001
+ * libpng version 1.2.0 - September 1, 2001
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_12 Your_png_h_is_not_version_1_0_12;
+typedef version_1_2_0 Your_png_h_is_not_version_1_2_0;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = "1.0.12";
+const char png_libpng_ver[18] = "1.2.0";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -551,7 +551,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
    if (png_ptr->num_chunk_list)
    {
        png_free(png_ptr, png_ptr->chunk_list);
-       png_ptr->chunk_list=NULL;
+       png_ptr->chunk_list=(png_bytep)NULL;
        png_ptr->num_chunk_list=0;
    }
 #endif
@@ -646,7 +646,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ((png_charp) "\n libpng version 1.0.12 - June 8, 2001\n\
+   return ((png_charp) "\n libpng version 1.2.0 - September 1, 2001\n\
    Copyright (c) 1998-2001 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -664,8 +664,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) "1.0.12");
-   return((png_charp) "1.0.12");
+      return((png_charp) "1.2.0");
+   return((png_charp) "1.2.0");
 }
 
 png_charp PNGAPI
@@ -715,8 +715,57 @@ png_uint_32 PNGAPI
 png_access_version_number(void)
 {
    /* Version of *.c files used when building libpng */
-   return((png_uint_32) 10012L);
+   return((png_uint_32) 10200L);
 }
+
+
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+    /* GRR:  could add this:   && defined(PNG_MMX_CODE_SUPPORTED) */
+/* this INTERNAL function was added to libpng 1.2.0 */
+void /* PRIVATE */
+png_init_mmx_flags (png_structp png_ptr)
+{
+    png_ptr->mmx_rowbytes_threshold = 0;
+    png_ptr->mmx_bitdepth_threshold = 0;
+
+#  if (defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD))
+
+    png_ptr->asm_flags |= PNG_ASM_FLAG_MMX_SUPPORT_COMPILED;
+
+    if (png_mmx_support()) {
+        png_ptr->asm_flags |= PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU
+#    ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+                              | PNG_ASM_FLAG_MMX_READ_COMBINE_ROW
+#    endif
+#    ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
+                              | PNG_ASM_FLAG_MMX_READ_INTERLACE
+#    endif
+#    ifndef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+                              ;
+#    else
+                              | PNG_ASM_FLAG_MMX_READ_FILTER_SUB
+                              | PNG_ASM_FLAG_MMX_READ_FILTER_UP
+                              | PNG_ASM_FLAG_MMX_READ_FILTER_AVG
+                              | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH ;
+
+        png_ptr->mmx_rowbytes_threshold = PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT;
+        png_ptr->mmx_bitdepth_threshold = PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT;
+#    endif
+    } else {
+        png_ptr->asm_flags &= ~( PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU
+                               | PNG_MMX_READ_FLAGS
+                               | PNG_MMX_WRITE_FLAGS );
+    }
+
+#  else /* !((PNGVCRD || PNGGCCRD) && PNG_ASSEMBLER_CODE_SUPPORTED)) */
+
+    /* clear all MMX flags; no support is compiled in */
+    png_ptr->asm_flags &= ~( PNG_MMX_FLAGS );
+
+#  endif /* ?(PNGVCRD || PNGGCCRD) */
+}
+
+#endif /* !(PNG_ASSEMBLER_CODE_SUPPORTED) */
 
 /* this function was added to libpng 1.2.0 */
 #if !defined(PNG_USE_PNGGCCRD) && \

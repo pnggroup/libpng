@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.12 - June 8, 2001
+ * libpng version 1.2.0 - September 1, 2001
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.12 - June 8, 2001: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.0 - September 1, 2001: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -70,7 +70,12 @@
  *    1.0.11beta1-3            1    10011  2.1.0.11beta1-3
  *    1.0.11rc1                1    10011  2.1.0.11rc1
  *    1.0.11                   1    10011  2.1.0.11
- *    1.0.12beta1-2            2    10012  2.1.0.11beta1-2
+ *    1.0.12beta1-2            2    10012  2.1.0.12beta1-2
+ *    1.0.12rc1                2    10012  2.1.0.12rc1
+ *    1.0.12                   2    10012  2.1.0.12
+ *    1.1.0a-f                 -    10100  2.1.1.0a-f (branch abandoned)
+ *    1.2.0beta1-2             2    10200  2.1.2.0beta1-2
+ *    1.2.0beta3-4             3    10200  3.1.2.0beta3-4
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -100,7 +105,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.0.7, July 1, 2000, through  1.0.12, June 8, 2001, are
+ * libpng versions 1.0.7, July 1, 2000, through  1.2.0, September 1, 2001, are
  * Copyright (c) 2000, 2001 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors
@@ -205,13 +210,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    June 8, 2001
+ *    September 1, 2001
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.12 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.2.0 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -267,15 +272,15 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.12"
+#define PNG_LIBPNG_VER_STRING "1.2.0"
 
-#define PNG_LIBPNG_VER_SONUM   2
+#define PNG_LIBPNG_VER_SONUM   3
 #define PNG_LIBPNG_VER_DLLNUM  %DLLNUM%
 
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
-#define PNG_LIBPNG_VER_MINOR   0
-#define PNG_LIBPNG_VER_RELEASE 12
+#define PNG_LIBPNG_VER_MINOR   2
+#define PNG_LIBPNG_VER_RELEASE 0
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
@@ -294,7 +299,7 @@
  * Versions 0.7 through 1.0.0 were in the range 0 to 100 here (only
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=release */
-#define PNG_LIBPNG_VER 10012 /* 1.0.12 */
+#define PNG_LIBPNG_VER 10200 /* 1.2.0 */
 
 #ifndef PNG_VERSION_INFO_ONLY
 
@@ -1171,7 +1176,7 @@ struct png_struct_def
     defined(PNG_READ_EMPTY_PLTE_SUPPORTED) || \
     defined(PNG_WRITE_EMPTY_PLTE_SUPPORTED)
 /* changed from png_byte to png_uint_32 at version 1.2.0 */
-   png_byte mng_features_permitted;
+   png_uint_32 mng_features_permitted;
 #endif
 
 /* New member added in libpng-1.0.7 */
@@ -1203,13 +1208,15 @@ struct png_struct_def
    png_free_ptr free_fn;             /* function for freeing memory */
 #endif
 
+   png_bytep big_row_buf;         /* buffer to save current (unfiltered) row */
+
 };
 
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-   and png.h are both at version 1.0.12
+   and png.h are both at version 1.2.0
  */
-typedef png_structp version_1_0_12;
+typedef png_structp version_1_2_0;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -2253,11 +2260,68 @@ extern PNG_EXPORT(png_uint_32,png_permit_mng_features) PNGARG((png_structp
    png_ptr, png_uint_32 mng_features_permitted));
 #endif
 
-/* png_mmx_support will be included unconditionally starting in version 1.2.0 */
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) || defined(PNG_USE_PNGGCCRD)
+/* Added to version 1.2.0 */
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#define PNG_ASM_FLAG_MMX_SUPPORT_COMPILED  0x01		/* not user-settable */
+#define PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU    0x02		/* not user-settable */
+#define PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  0x04
+#define PNG_ASM_FLAG_MMX_READ_INTERLACE    0x08
+#define PNG_ASM_FLAG_MMX_READ_FILTER_SUB   0x10
+#define PNG_ASM_FLAG_MMX_READ_FILTER_UP    0x20
+#define PNG_ASM_FLAG_MMX_READ_FILTER_AVG   0x40
+#define PNG_ASM_FLAG_MMX_READ_FILTER_PAETH 0x80
+#define PNG_ASM_FLAGS_INITIALIZED          0x80000000	/* not user-settable */
+
+#define PNG_MMX_READ_FLAGS ( PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  \
+                           | PNG_ASM_FLAG_MMX_READ_INTERLACE    \
+                           | PNG_ASM_FLAG_MMX_READ_FILTER_SUB   \
+                           | PNG_ASM_FLAG_MMX_READ_FILTER_UP    \
+                           | PNG_ASM_FLAG_MMX_READ_FILTER_AVG   \
+                           | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH )
+#define PNG_MMX_WRITE_FLAGS ( 0 )
+
+#define PNG_MMX_FLAGS ( PNG_ASM_FLAG_MMX_SUPPORT_COMPILED \
+                      | PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU   \
+                      | PNG_MMX_READ_FLAGS                \
+                      | PNG_MMX_WRITE_FLAGS )
+
+#define PNG_SELECT_READ   1
+#define PNG_SELECT_WRITE  2
+
+
+/* pngget.c */
+extern PNG_EXPORT(png_uint_32,png_get_mmx_flagmask)
+   PNGARG((int flag_select, int *compilerID));
+
+/* pngget.c */
+extern PNG_EXPORT(png_uint_32,png_get_asm_flagmask)
+   PNGARG((int flag_select));
+
+/* pngget.c */
+extern PNG_EXPORT(png_uint_32,png_get_asm_flags)
+   PNGARG((png_structp png_ptr));
+
+/* pngget.c */
+extern PNG_EXPORT(png_byte,png_get_mmx_bitdepth_threshold)
+   PNGARG((png_structp png_ptr));
+
+/* pngget.c */
+extern PNG_EXPORT(png_uint_32,png_get_mmx_rowbytes_threshold)
+   PNGARG((png_structp png_ptr));
+
+/* pngset.c */
+extern PNG_EXPORT(void,png_set_asm_flags)
+   PNGARG((png_structp png_ptr, png_uint_32 asm_flags));
+
+/* pngset.c */
+extern PNG_EXPORT(void,png_set_mmx_thresholds)
+   PNGARG((png_structp png_ptr, png_byte mmx_bitdepth_threshold,
+   png_uint_32 mmx_rowbytes_threshold));
+
+#endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
+
 /* png.c, pnggccrd.c, or pngvcrd.c */
 extern PNG_EXPORT(int,png_mmx_support) PNGARG((void));
-#endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
 
 /* Strip the prepended error numbers ("#nnn ") from error and warning
  * messages before passing them to the error or warning handler. */
@@ -2269,7 +2333,7 @@ extern PNG_EXPORT(void,png_set_strip_error_numbers) PNGARG((png_structp
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project defs */
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.12 - June 8, 2001 (header)\n"
+   " libpng version 1.2.0 - September 1, 2001 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
@@ -2589,7 +2653,7 @@ PNG_EXTERN void png_flush PNGARG((png_structp png_ptr));
  */
 PNG_EXTERN void png_save_uint_32 PNGARG((png_bytep buf, png_uint_32 i));
 
-#if defined(PNG_WRITE_pCAL_SUPPORTED)
+#if defined(PNG_WRITE_pCAL_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
 PNG_EXTERN void png_save_int_32 PNGARG((png_bytep buf, png_int_32 i));
 #endif
 
@@ -2707,7 +2771,7 @@ PNG_EXTERN void png_write_iTXt PNGARG((png_structp png_ptr,
 
 #if defined(PNG_WRITE_oFFs_SUPPORTED)
 PNG_EXTERN void png_write_oFFs PNGARG((png_structp png_ptr,
-   png_uint_32 x_offset, png_uint_32 y_offset, int unit_type));
+   png_int_32 x_offset, png_int_32 y_offset, int unit_type));
 #endif
 
 #if defined(PNG_WRITE_pCAL_SUPPORTED)
@@ -3075,6 +3139,10 @@ PNG_EXTERN void png_do_write_intrapixel PNGARG((png_row_infop row_info,
    png_bytep row));
 #endif
 
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+/* png.c */ /* PRIVATE */
+PNG_EXTERN void png_init_mmx_flags PNGARG((png_structp png_ptr));
+#endif
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
 #endif /* PNG_INTERNAL */

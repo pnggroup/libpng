@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.12 - June 8, 2001
+ * libpng 1.2.0 - September 1, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -452,6 +452,10 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       return ((png_structp)NULL);
    }
 
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+   png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
+#endif
+
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
@@ -509,35 +513,6 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif
         png_error(png_ptr,
            "Incompatible libpng version in application and library");
-     }
-
-     /* Libpng 1.0.6 was not binary compatible, due to insertion of the
-        info_ptr->free_me member.  Libpng-1.0.1 and earlier were not
-        compatible due to insertion of the user transform function. Note
-        to maintainer: this test can be removed from version 1.2.0 and
-        beyond because the previous test would have already rejected it. */
-
-     if (user_png_ver[0] == '1' && user_png_ver[2] == '0' &&
-         (user_png_ver[4] <  '2' || user_png_ver[4] == '6') &&
-         user_png_ver[5] == '\0')
-     {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
-        char msg[80];
-        if (user_png_ver)
-        {
-          sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
-             user_png_ver);
-          png_warning(png_ptr, msg);
-        }
-        sprintf(msg, "Application  is running with png.c from libpng-%.20s",
-           png_libpng_ver);
-        png_warning(png_ptr, msg);
-#endif
-#ifdef PNG_ERROR_NUMBERS_SUPPORTED
-        png_ptr->flags=0;
-#endif
-        png_error(png_ptr,
-        "Application must be recompiled; versions <= 1.0.6 were incompatible");
      }
    }
 
@@ -649,6 +624,10 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
 
    /* reset all variables to 0 */
    png_memset(png_ptr, 0, sizeof (png_struct));
+
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+   png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
+#endif
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */

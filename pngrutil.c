@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.12 - June 8, 2001
+ * libpng 1.2.0 - September 1, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -794,12 +794,12 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
       if (abs(int_x_white - 31270L) > 1000 ||
           abs(int_y_white - 32900L) > 1000 ||
-          abs(  int_x_red - 64000L) > 1000 ||
-          abs(  int_y_red - 33000L) > 1000 ||
+          abs(int_x_red   - 64000L) > 1000 ||
+          abs(int_y_red   - 33000L) > 1000 ||
           abs(int_x_green - 30000L) > 1000 ||
           abs(int_y_green - 60000L) > 1000 ||
-          abs( int_x_blue - 15000L) > 1000 ||
-          abs( int_y_blue -  6000L) > 1000)
+          abs(int_x_blue  - 15000L) > 1000 ||
+          abs(int_y_blue  -  6000L) > 1000)
          {
 
             png_warning(png_ptr,
@@ -928,12 +928,12 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (info_ptr->valid & PNG_INFO_cHRM)
       if (abs(info_ptr->int_x_white - 31270L) > 1000 ||
           abs(info_ptr->int_y_white - 32900L) > 1000 ||
-          abs(  info_ptr->int_x_red - 64000L) > 1000 ||
-          abs(  info_ptr->int_y_red - 33000L) > 1000 ||
+          abs(info_ptr->int_x_red   - 64000L) > 1000 ||
+          abs(info_ptr->int_y_red   - 33000L) > 1000 ||
           abs(info_ptr->int_x_green - 30000L) > 1000 ||
           abs(info_ptr->int_y_green - 60000L) > 1000 ||
-          abs( info_ptr->int_x_blue - 15000L) > 1000 ||
-          abs( info_ptr->int_y_blue -  6000L) > 1000)
+          abs(info_ptr->int_x_blue  - 15000L) > 1000 ||
+          abs(info_ptr->int_y_blue  -  6000L) > 1000)
          {
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
@@ -2975,7 +2975,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (row_bytes > (png_uint_32)65536L)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
-   png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, row_bytes);
+   png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes+64);
+   png_ptr->row_buf = png_ptr->big_row_buf+32;
 #if defined(PNG_DEBUG) && defined(PNG_USE_PNGGCCRD)
    png_ptr->row_buf_size = row_bytes;
 #endif

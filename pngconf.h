@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.12 - June 8, 2001
+ * libpng 1.2.0 - September 1, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -49,13 +49,11 @@
 
 /* Enabled by default in 1.2.0.  You can disable this if you don't need to
    support PNGs that are embedded in MNG datastreams */
-/*
 #ifndef PNG_NO_MNG_FEATURES
 #  ifndef PNG_MNG_FEATURES_SUPPORTED
 #    define PNG_MNG_FEATURES_SUPPORTED
 #  endif
 #endif
-*/
 
 #ifndef PNG_NO_FLOATING_POINT_SUPPORTED
 #  ifndef PNG_FLOATING_POINT_SUPPORTED
@@ -230,7 +228,7 @@
 #  include <sys/types.h>
 #endif
 
-#ifndef PNG_SETJMP_NOT_SUPPORTED
+#if !defined(PNG_SETJMP_NOT_SUPPORTED) && !defined(PNG_NO_SETJMP_SUPPORTED)
 #  define PNG_SETJMP_SUPPORTED
 #endif
 
@@ -592,12 +590,9 @@
 #  define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif
 
-/* Will be enabled in libpng-1.2.0 */
-/*
 #ifndef PNG_NO_ERROR_NUMBERS
 #define PNG_ERROR_NUMBERS_SUPPORTED
 #endif
-*/
 
 #ifndef PNG_NO_WRITE_FLUSH
 #  define PNG_WRITE_FLUSH_SUPPORTED
@@ -636,7 +631,6 @@
 
 /* PNG_ASSEMBLER_CODE was enabled by default in version 1.2.0 
    even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined */
-/*
 #if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
 #  ifndef PNG_ASSEMBLER_CODE_SUPPORTED
 #    define PNG_ASSEMBLER_CODE_SUPPORTED
@@ -645,24 +639,16 @@
 #    define PNG_MMX_CODE_SUPPORTED
 #  endif
 #endif
-*/
-#if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
-#  if defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD)
-#    ifndef PNG_ASSEMBLER_CODE_SUPPORTED
-#      define PNG_ASSEMBLER_CODE_SUPPORTED
-#    endif
-#    if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
-#      define PNG_MMX_CODE_SUPPORTED
-#    endif
-#  endif
-#endif
 
-/* This will be enabled by default in libpng-1.2.0 */
-/*
+/* If you are sure that you don't need thread safety and you are compiling
+   with PNG_USE_PNGCCRD for an MMX application, you can define this for
+   faster execution.  See pnggccrd.c.
+#define PNG_THREAD_UNSAFE_OK
+*/
+
 #if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
 #  define PNG_USER_MEM_SUPPORTED
 #endif
-*/
 
 /* These are currently experimental features, define them if you want */
 
