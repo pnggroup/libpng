@@ -221,7 +221,7 @@ png_create_struct(uInt type)
    if ((struct_ptr = (png_voidp)farmalloc(size)) != NULL)
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
-   if ((struct_ptr = (png_voidp)halloc(size)) != NULL)
+   if ((struct_ptr = (png_voidp)halloc(size,1)) != NULL)
 # else
    if ((struct_ptr = (png_voidp)malloc(size)) != NULL)
 # endif

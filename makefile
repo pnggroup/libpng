@@ -13,7 +13,7 @@ RANLIB=echo
 prefix=/usr/local
 
 OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o \
-	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o
+	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
 all: libpng.a pngtest

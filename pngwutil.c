@@ -912,6 +912,7 @@ png_write_finish_row(png_structp png_ptr)
 
    /* next row */
    png_ptr->row_number++;
+
    /* see if we are done */
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
@@ -947,13 +948,15 @@ png_write_finish_row(png_structp png_ptr)
       }
 
       /* reset the row above the image for the next pass */
-      if (png_ptr->prev_row)
-         png_memset(png_ptr->prev_row, 0, (((png_uint_32)png_ptr->usr_channels *
-            (png_uint_32)png_ptr->usr_bit_depth * png_ptr->width + 7) >> 3) + 1);
-
-      /* if we have more data to get, go get it */
       if (png_ptr->pass < 7)
+      {
+         if (png_ptr->prev_row)
+            png_memset(png_ptr->prev_row, 0,
+               (((png_uint_32)png_ptr->usr_channels *
+               (png_uint_32)png_ptr->usr_bit_depth *
+               png_ptr->width + 7) >> 3) + 1);
          return;
+      }
    }
 
    /* if we get here, we've just written the last row, so we need
@@ -1344,6 +1347,16 @@ png_write_filtered_row(png_structp png_ptr, png_bytep filtered_row)
       }
    /* repeat until all data has been compressed */
    } while (png_ptr->zstream->avail_in);
+
+   /* swap the current and previous rows */
+   if (png_ptr->prev_row)
+   {
+      png_bytep tptr;
+
+      tptr = png_ptr->prev_row;
+      png_ptr->prev_row = png_ptr->row_buf;
+      png_ptr->row_buf = tptr;
+   }
 
    /* finish row - updates counters and flushes zlib if last row */
    png_write_finish_row(png_ptr);

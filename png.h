@@ -5,15 +5,16 @@
    May 25, 1996
 
    Note: This is a beta version.  It reads and writes valid files
-   on the platforms I have, but it has had limited portability
-   testing.  Furthermore, you may have to modify the
-   includes below to get it to work on your system, and you
-   may have to supply the correct compiler flags in the makefile.
-   Read the readme.txt for more information, and how to contact
-   me if you have any problems, or if you want your compiler/
-   platform to be supported in the next official libpng release.
+   on the platforms I have, and has had a wide testing program.
+   You may have to modify the includes below to get it to work on
+   your system, and you may have to supply the correct compiler
+   flags in the makefile, if you can't find a makefile suitable for
+   your operating system/compiler combination.  Read the libpng.txt
+   for more information, and how to contact me if you have any
+   problems, or if you want your compiler/platform to be supported
+   in the next official libpng release.
 
-   See readme.txt for more information
+   See libpng.txt for more information
 
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
    Contributing Authors:
@@ -33,17 +34,18 @@
    and Group 42, Inc. disclaim all warranties, expressed or implied,
    including, without limitation, the warranties of merchantability and of
    fitness for any purpose. The Contributing Authors and Group 42, Inc.
-   assume no liability for damages, direct or consequential, which may
-   result from the use of the PNG Reference Library.
+   assume no liability for direct, indirect, incidental, special, exemplary,
+   or consequential damages, which may result from the use of the PNG
+   Reference Library, even if advised of the possibility of such damage.
 
    Permission is hereby granted to use, copy, modify, and distribute this
    source code, or portions hereof, for any purpose, without fee, subject
    to the following restrictions:
    1. The origin of this source code must not be misrepresented.
    2. Altered versions must be plainly marked as such and must not be
-     misrepresented as being the original source.
+      misrepresented as being the original source.
    3. This Copyright notice may not be removed or altered from any source or
-     altered source distribution.
+      altered source distribution.
 
    The Contributing Authors and Group 42, Inc. specifically permit, without
    fee, and encourage the use of this source code as a component to
@@ -763,7 +765,7 @@ extern void * png_realloc PNGARG((png_structp png_ptr, void * ptr,
 extern void png_free PNGARG((png_structp png_ptr, void * ptr));
 
 /* allocate memory for an internal libpng struct */
-extern voidp png_create_struct PNGARG((uInt type));
+extern png_voidp png_create_struct PNGARG((uInt type));
 
 /* free memory from internal libpng struct */
 extern void png_destroy_struct PNGARG((voidp struct_ptr));

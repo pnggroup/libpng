@@ -1,4 +1,4 @@
-# gcc/DOS makefile for libpng
+# DJGPP (DOS gcc) makefile for libpng
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 

@@ -409,16 +409,6 @@ png_write_row(png_structp png_ptr, png_bytep row)
 
    /* find a filter if necessary, filter the row and write it out */
    png_write_find_filter(png_ptr, &(png_ptr->row_info));
-
-   /* trade current and prev rows so next filter references are correct */
-   if (png_ptr->prev_row)
-   {
-      png_bytep tptr;
-
-      tptr = png_ptr->prev_row;
-      png_ptr->prev_row = png_ptr->row_buf;
-      png_ptr->row_buf = tptr;
-   }
 }
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
