@@ -1,9 +1,9 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 1.0.9beta10 - January 16, 2001
+ * libpng 1.0.9beta2 - November 19, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -606,4 +606,3 @@ png_get_user_transform_ptr(png_structp png_ptr)
    return (NULL);
 #endif
 }
-

@@ -16,7 +16,7 @@ prefix=/usr/local
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-CFLAGS= -dy -belf -I$(ZLIBINC) -O3
+CFLAGS= -dy -belf -I$(ZLIBINC) -O3 
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
 #RANLIB=ranlib
@@ -25,7 +25,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.9beta10
+PNGMIN = 1.0.9beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include

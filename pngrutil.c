@@ -1,9 +1,9 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.9beta10 - January 16, 2001
+ * libpng 1.0.9beta2 - November 19, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -174,7 +174,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    png_charp text = NULL;
    png_size_t text_size;
 
-   if (comp_type == PNG_COMPRESSION_TYPE_BASE)
+   if (comp_type == PNG_TEXT_COMPRESSION_zTXt)
    {
       int ret = Z_OK;
       png_ptr->zstream.next_in = (png_bytep)(chunkdata + prefix_size);
@@ -266,13 +266,6 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          png_warning(png_ptr,
             "Incomplete compressed datastream in chunk other than IDAT");
 #endif
-         text_size=prefix_size;
-         if (text ==  NULL)
-         {
-            text = (png_charp)png_malloc(png_ptr, text_size+1);
-            png_memcpy(text, chunkdata, prefix_size);
-         }
-         *(text + text_size) = 0x00;
       }
 
       inflateReset(&png_ptr->zstream);
@@ -282,7 +275,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       chunkdata = text;
       *newlength=text_size;
    }
-   else /* if (comp_type != PNG_COMPRESSION_TYPE_BASE) */
+   else /* if (comp_type != PNG_TEXT_COMPRESSION_zTXt) */
    {
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
       char umsg[50];
@@ -293,8 +286,10 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       png_warning(png_ptr, "Unknown zTXt compression type");
 #endif
 
-      *(chunkdata + prefix_size) = 0x00;
-      *newlength=prefix_size;
+      /* Copy what we can of the error message into the text chunk */
+      text_size = (png_size_t)(chunklength - (text - chunkdata));
+      text_size = sizeof(msg) > text_size ? text_size : sizeof(msg);
+      png_memcpy(text, msg, text_size);
    }
 
    return chunkdata;
@@ -358,33 +353,8 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (compression_type != PNG_COMPRESSION_TYPE_BASE)
       png_error(png_ptr, "Unknown compression method in IHDR");
 
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
-   /* Accept filter_method 64 (intrapixel differencing) only if
-    * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
-    * 2. Libpng did not read a PNG signature (this filter_method is only
-    *    used in PNG datastreams that are embedded in MNG datastreams) and
-    * 3. The application called png_permit_mng_features with a mask that
-    *    included PNG_FLAG_MNG_FILTER_64 and
-    * 4. The filter_method is 64 and
-    * 5. The color_type is RGB or RGBA
-    */
-   if((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&png_ptr->mng_features_permitted)
-      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream\n");
-   if(filter_type != PNG_FILTER_TYPE_BASE)
-   {
-     if(!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
-        (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
-        ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
-        (color_type == PNG_COLOR_TYPE_RGB || 
-         color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
-        png_error(png_ptr, "Unknown filter method in IHDR");
-     if(png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)
-        png_warning(png_ptr, "Invalid filter method in IHDR");
-   }
-#else
-   if(filter_type != PNG_FILTER_TYPE_BASE)
+   if (filter_type != PNG_FILTER_TYPE_BASE)
       png_error(png_ptr, "Unknown filter method in IHDR");
-#endif
 
    /* set internal variables */
    png_ptr->width = width;
@@ -392,7 +362,6 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->bit_depth = (png_byte)bit_depth;
    png_ptr->interlaced = (png_byte)interlace_type;
    png_ptr->color_type = (png_byte)color_type;
-   png_ptr->filter_type = (png_byte)filter_type;
 
    /* find number of channels */
    switch (png_ptr->color_type)
@@ -428,7 +397,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_color palette[PNG_MAX_PALETTE_LENGTH];
+   png_colorp palette;
    int num, i;
 #ifndef PNG_NO_POINTER_INDEXING
    png_colorp pal_ptr;
@@ -457,7 +426,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif
 
-   if (length > 3*PNG_MAX_PALETTE_LENGTH || length % 3)
+   if (length > 768 || length % 3)
    {
       if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
       {
@@ -472,6 +441,8 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    num = (int)length / 3;
+
+   palette = (png_colorp)png_zalloc(png_ptr, (uInt)num, sizeof (png_color));
 
 #ifndef PNG_NO_POINTER_INDEXING
    for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
@@ -522,6 +493,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          else
          {
             png_chunk_warning(png_ptr, "CRC error");
+            png_zfree(png_ptr, palette);
             return;
          }
       }
@@ -532,7 +504,15 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
    }
 #endif
+   png_ptr->palette = palette;
+   png_ptr->num_palette = (png_uint_16)num;
 
+#ifdef PNG_FREE_ME_SUPPORTED
+   png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
+   png_ptr->free_me |= PNG_FREE_PLTE;
+#else
+   png_ptr->flags |= PNG_FLAG_FREE_PLTE;
+#endif
    png_set_PLTE(png_ptr, info_ptr, palette, num);
 
 #if defined(PNG_READ_tRNS_SUPPORTED)
@@ -1070,8 +1050,6 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                                     slength, prefix_length, &data_length);
 
    profile_length = data_length - prefix_length;
-
-   /* Check the profile_size recorded in the first 32 bits of the ICC profile */
    profile_size = ((*(chunkdata+prefix_length))<<24) |
                   ((*(chunkdata+prefix_length+1))<<16) |
                   ((*(chunkdata+prefix_length+2))<< 8) |
@@ -1087,7 +1065,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    png_set_iCCP(png_ptr, info_ptr, chunkdata, compression_type,
-                chunkdata + prefix_length, profile_length);
+                chunkdata + prefix_length, data_length-prefix_length);
    png_free(png_ptr, chunkdata);
 }
 #endif /* PNG_READ_iCCP_SUPPORTED */
@@ -1224,8 +1202,6 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_byte	readbuf[PNG_MAX_PALETTE_LENGTH];
-
    png_debug(1, "in png_handle_tRNS\n");
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
@@ -1263,7 +1239,8 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          return;
       }
 
-      png_crc_read(png_ptr, readbuf, (png_size_t)length);
+      png_ptr->trans = (png_bytep)png_malloc(png_ptr, length);
+      png_crc_read(png_ptr, png_ptr->trans, (png_size_t)length);
       png_ptr->num_trans = (png_uint_16)length;
    }
    else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
@@ -1308,7 +1285,15 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
-   png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
+#ifdef PNG_FREE_ME_SUPPORTED
+   png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+      png_ptr->free_me |= PNG_FREE_TRNS;
+#else
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+      png_ptr->flags |= PNG_FLAG_FREE_TRNS;
+#endif
+   png_set_tRNS(png_ptr, info_ptr, png_ptr->trans, png_ptr->num_trans,
       &(png_ptr->trans_values));
 }
 #endif
@@ -1407,7 +1392,6 @@ void /* PRIVATE */
 png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    int num, i;
-   png_uint_16	readbuf[PNG_MAX_PALETTE_LENGTH];
 
    png_debug(1, "in png_handle_hIST\n");
 
@@ -1432,26 +1416,34 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   num = (int)length / 2 ;
-   if (num != png_ptr->num_palette)
+   if (length != (png_uint_32)(2 * png_ptr->num_palette))
    {
       png_warning(png_ptr, "Incorrect hIST chunk length");
       png_crc_finish(png_ptr, length);
       return;
    }
 
+   num = (int)length / 2 ;
+   png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
+      (png_uint_32)(num * sizeof (png_uint_16)));
    for (i = 0; i < num; i++)
    {
       png_byte buf[2];
 
       png_crc_read(png_ptr, buf, 2);
-      readbuf[i] = png_get_uint_16(buf);
+      png_ptr->hist[i] = png_get_uint_16(buf);
    }
 
    if (png_crc_finish(png_ptr, 0))
       return;
 
-   png_set_hIST(png_ptr, info_ptr, readbuf);
+#ifdef PNG_FREE_ME_SUPPORTED
+   png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
+   png_ptr->free_me |= PNG_FREE_HIST;
+#else
+   png_ptr->flags |= PNG_FLAG_FREE_HIST;
+#endif
+   png_set_hIST(png_ptr, info_ptr, png_ptr->hist);
 }
 #endif
 
@@ -1930,11 +1922,6 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    else
    {
        comp_type = *(++text);
-       if (comp_type != PNG_TEXT_COMPRESSION_zTXt)
-       {
-          png_warning(png_ptr, "Unknown compression type in zTXt chunk");
-          comp_type = PNG_TEXT_COMPRESSION_zTXt;
-       }
        text++;        /* skip the compression_method byte */
    }
    prefix_len = text - chunkdata;
@@ -2165,9 +2152,13 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    a zero indicates the pixel is to be skipped.  This is in addition
    to any alpha or transparency value associated with the pixel.  If
    you want all pixels to be combined, pass 0xff (255) in mask.  */
-#ifndef PNG_HAVE_ASSEMBLER_COMBINE_ROW
 void /* PRIVATE */
-png_combine_row(png_structp png_ptr, png_bytep row, int mask)
+#ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+png_combine_row_c
+#else
+png_combine_row
+#endif /* PNG_HAVE_ASSEMBLER_COMBINE_ROW */
+   (png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1,"in png_combine_row\n");
    if (mask == 0xff)
@@ -2367,24 +2358,25 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
       }
    }
 }
-#endif /* !PNG_HAVE_ASSEMBLER_COMBINE_ROW */
 
-#ifdef PNG_READ_INTERLACING_SUPPORTED
-#ifndef PNG_HAVE_ASSEMBLER_READ_INTERLACE   /* else in pngvcrd.c, pnggccrd.c */
+#if defined(PNG_READ_INTERLACING_SUPPORTED)
 void /* PRIVATE */
-png_do_read_interlace(png_structp png_ptr)
+#ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
+png_do_read_interlace_c
+#else
+png_do_read_interlace
+#endif /* PNG_HAVE_ASSEMBLER_READ_INTERLACE */
+   (png_row_infop row_info, png_bytep row, int pass,
+   png_uint_32 transformations)
 {
-   png_row_infop row_info = &(png_ptr->row_info);
-   png_bytep row = png_ptr->row_buf + 1;
-   int pass = png_ptr->pass;
-   png_uint_32 transformations = png_ptr->transformations;
 #ifdef PNG_USE_LOCAL_ARRAYS
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
+
    /* offset to next interlace block */
    const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 #endif
 
-   png_debug(1,"in png_do_read_interlace (stock C version)\n");
+   png_debug(1,"in png_do_read_interlace\n");
    if (row != NULL && row_info != NULL)
    {
       png_uint_32 final_width;
@@ -2594,12 +2586,15 @@ png_do_read_interlace(png_structp png_ptr)
       return;
 #endif
 }
-#endif /* !PNG_HAVE_ASSEMBLER_READ_INTERLACE */
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif
 
-#ifndef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
 void /* PRIVATE */
-png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
+#ifdef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+png_read_filter_row_c
+#else
+png_read_filter_row
+#endif /* PNG_HAVE_ASSEMBLER_READ_FILTER_ROW */
+   (png_structp png_ptr, png_row_infop row_info, png_bytep row,
    png_bytep prev_row, int filter)
 {
    png_debug(1, "in png_read_filter_row\n");
@@ -2720,7 +2715,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
          break;
    }
 }
-#endif /* !PNG_HAVE_ASSEMBLER_READ_FILTER_ROW */
 
 void /* PRIVATE */
 png_read_finish_row(png_structp png_ptr)

@@ -1,9 +1,9 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.9beta10 - January 16, 2001
+ * libpng 1.0.9beta2 - November 19, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -772,29 +772,18 @@ png_push_process_row(png_structp png_ptr)
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
-/*       old interface (pre-1.0.9):
          png_do_read_interlace(&(png_ptr->row_info),
             png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
- */
-         png_do_read_interlace(png_ptr);
 
-    switch (png_ptr->pass)
-    {
+      switch (png_ptr->pass)
+      {
          case 0:
          {
             int i;
             for (i = 0; i < 8 && png_ptr->pass == 0; i++)
             {
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
-               png_read_push_finish_row(png_ptr); /* updates png_ptr->pass */
-            }
-            if (png_ptr->pass == 2) /* pass 1 might be empty */
-            {
-               for (i = 0; i < 4 && png_ptr->pass == 2; i++)
-               {
-                  png_push_have_row(png_ptr, NULL);
-                  png_read_push_finish_row(png_ptr);
-               }
+               png_read_push_finish_row(png_ptr);
             }
             break;
          }
@@ -806,7 +795,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 2) /* skip top 4 generated rows */
+            if (png_ptr->pass == 2)
             {
                for (i = 0; i < 4 && png_ptr->pass == 2; i++)
                {
@@ -829,14 +818,6 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 4) /* pass 3 might be empty */
-            {
-               for (i = 0; i < 2 && png_ptr->pass == 4; i++)
-               {
-                  png_push_have_row(png_ptr, NULL);
-                  png_read_push_finish_row(png_ptr);
-               }
-            }
             break;
          }
          case 3:
@@ -847,7 +828,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 4) /* skip top two generated rows */
+            if (png_ptr->pass == 4)
             {
                for (i = 0; i < 2 && png_ptr->pass == 4; i++)
                {
@@ -870,11 +851,6 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 6) /* pass 5 might be empty */
-            {
-               png_push_have_row(png_ptr, NULL);
-               png_read_push_finish_row(png_ptr);
-            }
             break;
          }
          case 5:
@@ -885,7 +861,7 @@ png_push_process_row(png_structp png_ptr)
                png_push_have_row(png_ptr, png_ptr->row_buf + 1);
                png_read_push_finish_row(png_ptr);
             }
-            if (png_ptr->pass == 6) /* skip top generated row */
+            if (png_ptr->pass == 6)
             {
                png_push_have_row(png_ptr, NULL);
                png_read_push_finish_row(png_ptr);
@@ -952,11 +928,6 @@ png_read_push_finish_row(png_structp png_ptr)
       do
       {
          png_ptr->pass++;
-         if ((png_ptr->pass == 1 && png_ptr->width < 5) ||
-             (png_ptr->pass == 3 && png_ptr->width < 3) ||
-             (png_ptr->pass == 5 && png_ptr->width < 2))
-           png_ptr->pass++;
-
          if (png_ptr->pass >= 7)
             break;
 

@@ -11,6 +11,7 @@
    Meulen for the "diamond" and "radial waves" patterns, respectively.
 
    to do:
+    - stdout/stderr don't work!  need message window (maybe scrollable?)
     - handle quoted command-line args (especially filenames with spaces)
     - finish resizable checkerboard-gradient (sizes 4-128?)
     - use %.1023s to simplify truncation of title-bar string?
@@ -24,12 +25,10 @@
     - 1.03:  modified to allow abbreviated options
     - 1.04:  removed bogus extra argument from usage fprintf() [Glenn R-P?];
               fixed command-line parsing bug
-    - 1.10:  enabled "message window" (console), thanks to David Geldreich
-    - 1.20:  added runtime MMX-enabling/disabling and new -mmx* options
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -56,7 +55,7 @@
 
 #define PROGNAME  "rpng2-win"
 #define LONGNAME  "Progressive PNG Viewer for Windows"
-#define VERSION   "1.20 of 4 January 2001"
+#define VERSION   "1.04 of 19 March 2000"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,7 +64,6 @@
 #include <time.h>
 #include <math.h>      /* only for PvdM background code */
 #include <windows.h>
-#include <conio.h>     /* only for _getch() */
 
 /* all for PvdM background code: */
 #ifndef PI
@@ -241,16 +239,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     memset(&rpng2_info, 0, sizeof(mainprog_info));
 
 
-    /* Next reenable console output, which normally goes to the bit bucket
-     * for windowed apps.  Closing the console window will terminate the
-     * app.  Thanks to David.Geldreich@realviz.com for supplying the magical
-     * incantation. */
-
-    AllocConsole();
-    freopen("CONOUT$", "a", stderr);
-    freopen("CONOUT$", "a", stdout);
-
-
     /* Set the default value for our display-system exponent, i.e., the
      * product of the CRT exponent and the exponent corresponding to
      * the frame-buffer's lookup table (LUT), if any.  This is not an
@@ -366,14 +354,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             }
         } else if (!strncmp(*argv, "-timing", 2)) {
             timing = TRUE;
-#if (defined(__i386__) || defined(_M_IX86))
-        } else if (!strncmp(*argv, "-nommxfilters", 7)) {
-            rpng2_info.nommxfilters = TRUE;
-        } else if (!strncmp(*argv, "-nommxcombine", 7)) {
-            rpng2_info.nommxcombine = TRUE;
-        } else if (!strncmp(*argv, "-nommxinterlace", 7)) {
-            rpng2_info.nommxinterlace = TRUE;
-#endif
         } else {
             if (**argv != '-') {
                 filename = *argv;
@@ -421,47 +401,25 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     /* usage screen */
 
     if (error) {
-        int ch;
-
-        fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
+        fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
         readpng2_version_info();
         fprintf(stderr, "\n"
-          "Usage:  %s [-gamma exp] [-bgcolor bg | -bgpat pat] [-timing]\n"
-#if (defined(__i386__) || defined(_M_IX86))
-          "        %*s [-nommxfilters] [-nommxcombine] [-nommxinterlace]\n"
-#endif
-          "        %*s file.png\n\n"
+          "Usage:  %s [-gamma exp] [-bgcolor bg | -bgpat pat] [-timing]"
+          " file.png\n\n"
           "    exp \ttransfer-function exponent (``gamma'') of the display\n"
           "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
           "\t\t  to the product of the lookup-table exponent (varies)\n"
           "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
           "    bg  \tdesired background color in 7-character hex RGB format\n"
           "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
-          "\t\t  used with transparent images; overrides -bgpat option\n"
+          "\t\t  used with transparent images; overrides -bgpat\n"
           "    pat \tdesired background pattern number (1-%d); used with\n"
-          "\t\t  transparent images; overrides -bgcolor option\n"
+          "\t\t  transparent images; overrides -bgcolor\n"
           "    -timing\tenables delay for every block read, to simulate modem\n"
           "\t\t  download of image (~36 Kbps)\n"
-#if (defined(__i386__) || defined(_M_IX86))
-          "    -nommx*\tdisable optimized MMX routines for decoding row filters,\n"
-          "\t\t  combining rows, and expanding interlacing, respectively\n"
-#endif
           "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
-          "Press Q or Esc to quit this usage screen.\n"
-          "\n", PROGNAME,
-#if (defined(__i386__) || defined(_M_IX86))
-          strlen(PROGNAME), " ",
-#endif
-          strlen(PROGNAME), " ", default_display_exponent, num_bgpat);
-        do
-            ch = _getch();
-        while (ch != 'q' && ch != 'Q' && ch != 0x1B);
+          "\n", PROGNAME, default_display_exponent, num_bgpat);
         exit(1);
-    } else {
-        fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
-        fprintf(stderr,
-          "\n   [console window:  closing this window will terminate %s]\n\n",
-          PROGNAME);
     }
 
 

@@ -1,9 +1,9 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.9beta10 - January 16, 2001
+ * libpng 1.0.9beta2 - November 19, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -133,31 +133,12 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
 void PNGAPI
 png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
 {
-   int	i;
-
    png_debug1(1, "in %s storage function\n", "hIST");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
-   if (info_ptr->num_palette == 0)
-       png_warning(png_ptr,
-		   "Palette size 0, hIST allocation skipped.");
 
-#ifdef PNG_FREE_ME_SUPPORTED
-   png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
-#endif
-   png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
-      (png_uint_32)(info_ptr->num_palette * sizeof (png_uint_16)));
-
-   for (i = 0; i < info_ptr->num_palette; i++)
-       png_ptr->hist[i] = hist[i];
-   info_ptr->hist = png_ptr->hist;
+   info_ptr->hist = hist;
    info_ptr->valid |= PNG_INFO_hIST;
-
-#ifdef PNG_FREE_ME_SUPPORTED
-   info_ptr->free_me |= PNG_FREE_HIST;
-#else
-   png_ptr->flags |= PNG_FLAG_FREE_HIST;
-#endif
 }
 #endif
 
@@ -339,26 +320,9 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   /*
-    * It may not actually be necessary to set png_ptr->palette here;
-    * we do it for backward compatibility with the way the png_handle_tRNS
-    * function used to do the allocation.
-    */
-#ifdef PNG_FREE_ME_SUPPORTED
-   png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
-#endif
-   png_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)num_palette,
-      sizeof (png_color));
-   memcpy(png_ptr->palette, palette, num_palette * sizeof (png_color));
-   info_ptr->palette = png_ptr->palette;
-   info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
+   info_ptr->palette = palette;
 
-#ifdef PNG_FREE_ME_SUPPORTED
-   info_ptr->free_me |= PNG_FREE_PLTE;
-#else
-   png_ptr->flags |= PNG_FLAG_FREE_PLTE;
-#endif
-
+   info_ptr->num_palette = (png_uint_16)num_palette;
    info_ptr->valid |= PNG_INFO_PLTE;
 }
 
@@ -667,23 +631,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
       return;
 
    if (trans != NULL)
-   {
-       /*
-	* It may not actually be necessary to set png_ptr->trans here;
-	* we do it for backward compatibility with the way the png_handle_tRNS
-	* function used to do the allocation.
-	*/
-#ifdef PNG_FREE_ME_SUPPORTED
-       png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
-#endif
-       png_ptr->trans = info_ptr->trans = png_malloc(png_ptr, num_trans);
-       memcpy(info_ptr->trans, trans, num_trans);
-#ifdef PNG_FREE_ME_SUPPORTED
-       info_ptr->free_me |= PNG_FREE_TRNS;
-#else
-       png_ptr->flags |= PNG_FLAG_FREE_TRNS;
-#endif
-   }
+      info_ptr->trans = trans;
 
    if (trans_values != NULL)
    {
@@ -782,7 +730,7 @@ void PNGAPI
 png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
    int chunk, int location)
 {
-   if(png_ptr != NULL && info_ptr != NULL && chunk >= 0 && chunk <
+   if(png_ptr != NULL && info_ptr != NULL && chunk >= 0 && chunk < 
          (int)info_ptr->unknown_chunks_num)
       info_ptr->unknown_chunks[chunk].location = (png_byte)location;
 }
@@ -906,4 +854,3 @@ png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
    if (png_ptr && info_ptr)
       info_ptr->valid &= ~(mask);
 }
-

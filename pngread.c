@@ -1,9 +1,9 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.9beta10 - January 16, 2001
+ * libpng 1.0.9beta2 - November 19, 2000
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -103,7 +103,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
         removed from version 2.0.0 and beyond because the previous test
         would have already rejected it. */
 
-     if (user_png_ver[4] == '6' && user_png_ver[2] == '0' &&
+     if (user_png_ver[4] == '6' && user_png_ver[2] == '0' && 
          user_png_ver[0] == '1' && user_png_ver[5] == '\0')
      {
         png_error(png_ptr,
@@ -246,8 +246,6 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
          else
             png_error(png_ptr, "PNG file corrupted by ASCII conversion");
       }
-      if (num_checked < 3)
-         png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
    }
 
    for(;;)
@@ -648,15 +646,6 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 
    png_memcpy_check(png_ptr, png_ptr->prev_row, png_ptr->row_buf,
       png_ptr->rowbytes + 1);
-   
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
-   if((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
-      (png_ptr->filter_type == PNG_INTRAPIXEL_DIFFERENCING))
-   {
-      /* Intrapixel differencing */
-      png_do_read_intrapixel(&(png_ptr->row_info), png_ptr->row_buf + 1);
-   }
-#endif
 
    if (png_ptr->transformations)
       png_do_read_transformations(png_ptr);
@@ -667,11 +656,8 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
-/*       old interface (pre-1.0.9):
          png_do_read_interlace(&(png_ptr->row_info),
             png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
- */
-         png_do_read_interlace(png_ptr);
 
       if (dsp_row != NULL)
          png_combine_row(png_ptr, dsp_row,
@@ -715,7 +701,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta10
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta2
  */
 
 void PNGAPI
@@ -764,7 +750,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta10
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.9beta2
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
