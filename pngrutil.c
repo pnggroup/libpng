@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.9rc1 - December 23, 2000
+ * libpng 1.0.9beta7 - December 28, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -174,7 +174,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    png_charp text = NULL;
    png_size_t text_size;
 
-   if (comp_type == PNG_TEXT_COMPRESSION_zTXt)
+   if (comp_type == PNG_COMPRESSION_TYPE_BASE)
    {
       int ret = Z_OK;
       png_ptr->zstream.next_in = (png_bytep)(chunkdata + prefix_size);
@@ -275,7 +275,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       chunkdata = text;
       *newlength=text_size;
    }
-   else /* if (comp_type != PNG_TEXT_COMPRESSION_zTXt) */
+   else /* if (comp_type != PNG_COMPRESSION_TYPE_BASE) */
    {
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
       char umsg[50];
@@ -421,7 +421,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_colorp palette;
+   png_color palette[PNG_MAX_PALETTE_LENGTH];
    int num, i;
 #ifndef PNG_NO_POINTER_INDEXING
    png_colorp pal_ptr;
@@ -450,7 +450,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif
 
-   if (length > 768 || length % 3)
+   if (length > 3*PNG_MAX_PALETTE_LENGTH || length % 3)
    {
       if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
       {
@@ -465,8 +465,6 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    num = (int)length / 3;
-
-   palette = (png_colorp)png_zalloc(png_ptr, (uInt)num, sizeof (png_color));
 
 #ifndef PNG_NO_POINTER_INDEXING
    for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
@@ -517,7 +515,6 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          else
          {
             png_chunk_warning(png_ptr, "CRC error");
-            png_zfree(png_ptr, palette);
             return;
          }
       }
@@ -528,15 +525,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
    }
 #endif
-   png_ptr->palette = palette;
-   png_ptr->num_palette = (png_uint_16)num;
 
-#ifdef PNG_FREE_ME_SUPPORTED
-   png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
-   png_ptr->free_me |= PNG_FREE_PLTE;
-#else
-   png_ptr->flags |= PNG_FLAG_FREE_PLTE;
-#endif
    png_set_PLTE(png_ptr, info_ptr, palette, num);
 
 #if defined(PNG_READ_tRNS_SUPPORTED)
@@ -1089,7 +1078,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    png_set_iCCP(png_ptr, info_ptr, chunkdata, compression_type,
-                chunkdata + prefix_length, data_length-prefix_length);
+                chunkdata + prefix_length, profile_length);
    png_free(png_ptr, chunkdata);
 }
 #endif /* PNG_READ_iCCP_SUPPORTED */
@@ -1226,6 +1215,8 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
+   png_byte	readbuf[PNG_MAX_PALETTE_LENGTH];
+
    png_debug(1, "in png_handle_tRNS\n");
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
@@ -1263,8 +1254,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          return;
       }
 
-      png_ptr->trans = (png_bytep)png_malloc(png_ptr, length);
-      png_crc_read(png_ptr, png_ptr->trans, (png_size_t)length);
+      png_crc_read(png_ptr, readbuf, (png_size_t)length);
       png_ptr->num_trans = (png_uint_16)length;
    }
    else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
@@ -1309,15 +1299,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
-#ifdef PNG_FREE_ME_SUPPORTED
-   png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
-   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-      png_ptr->free_me |= PNG_FREE_TRNS;
-#else
-   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-      png_ptr->flags |= PNG_FLAG_FREE_TRNS;
-#endif
-   png_set_tRNS(png_ptr, info_ptr, png_ptr->trans, png_ptr->num_trans,
+   png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
       &(png_ptr->trans_values));
 }
 #endif
@@ -1416,6 +1398,7 @@ void /* PRIVATE */
 png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    int num, i;
+   png_uint_16	readbuf[PNG_MAX_PALETTE_LENGTH];
 
    png_debug(1, "in png_handle_hIST\n");
 
@@ -1440,34 +1423,26 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   if (length != (png_uint_32)(2 * png_ptr->num_palette))
+   num = (int)length / 2 ;
+   if (num != png_ptr->num_palette)
    {
       png_warning(png_ptr, "Incorrect hIST chunk length");
       png_crc_finish(png_ptr, length);
       return;
    }
 
-   num = (int)length / 2 ;
-   png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
-      (png_uint_32)(num * sizeof (png_uint_16)));
    for (i = 0; i < num; i++)
    {
       png_byte buf[2];
 
       png_crc_read(png_ptr, buf, 2);
-      png_ptr->hist[i] = png_get_uint_16(buf);
+      readbuf[i] = png_get_uint_16(buf);
    }
 
    if (png_crc_finish(png_ptr, 0))
       return;
 
-#ifdef PNG_FREE_ME_SUPPORTED
-   png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
-   png_ptr->free_me |= PNG_FREE_HIST;
-#else
-   png_ptr->flags |= PNG_FLAG_FREE_HIST;
-#endif
-   png_set_hIST(png_ptr, info_ptr, png_ptr->hist);
+   png_set_hIST(png_ptr, info_ptr, readbuf);
 }
 #endif
 

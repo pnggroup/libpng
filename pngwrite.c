@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.9rc1 - December 23, 2000
+ * libpng 1.0.9beta7 - December 28, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -64,7 +64,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_WRITE_iCCP_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_iCCP)
-      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_TEXT_COMPRESSION_zTXt,
+      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_COMPRESSION_TYPE_BASE,
                      info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
 #endif
 #if defined(PNG_WRITE_sBIT_SUPPORTED)

@@ -866,6 +866,11 @@ version 1.0.9rc1 [December 23, 2000]
   Revised test for PNG_HAVE_PNG_SIGNATURE in pngrutil.c
   Fixed error handling of unknown compression type in png_decompress_chunk().
   In pngconf.h, define __cdecl when _MSC_VER is defined.
+version 1.0.9beta7 [December 28, 2000]
+  Changed PNG_TEXT_COMPRESSION_zTXt to PNG_COMPRESSION_TYPE_BASE several places.
+  Revised memory management in png_set_hIST and png_handle_hIST in a backward
+    compatible manner.  PLTE and tRNS were revised similarly.
+  Revised the iCCP chunk reader to ignore trailing garbage.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,5 +1,5 @@
 
-Libpng 1.0.9rc1 - December 23, 2000
+Libpng 1.0.9beta7 - December 28, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -41,6 +41,10 @@ Changes since the last public release (1.0.8):
   Revised libpng.3/libpng.txt.  Changed "filter type" to "filter method".
   Fixed error handling of unknown compression type in png_decompress_chunk().
   In pngconf.h, define __cdecl when _MSC_VER is defined.
+  Changed PNG_TEXT_COMPRESSION_zTXt to PNG_COMPRESSION_TYPE_BASE several places.
+  Revised memory management in png_set_hIST and png_handle_hIST in a backward
+    compatible manner.  PLTE and tRNS were revised similarly.
+  Revised the iCCP chunk reader to ignore trailing garbage.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
