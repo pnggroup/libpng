@@ -1,5 +1,5 @@
 
-Libpng 1.0.6h - April 24, 2000
+Libpng 1.0.6i - May 1, 2000
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -33,13 +33,31 @@ version 1.0.6f [April 14, 2000]
   Removed superfluous prototype for png_set_itxt from png.h
   Removed "else" from pngread.c, after png_error(), and changed "0" to "length".
   Changed several png_errors about malformed ancillary chunks to png_warnings.
-version 1.0.6h [April 24, 2000]
+version 1.0.6g [April 24, 2000]
   Added png_pass-* arrays to pnggccrd.c when PNG_USE_LOCAL_ARRAYS is defined.
   Relocated paragraph about png_set_background() in libpng.3/libpng.txt
     and other revisions (Matthias Benckmann)
   Relocated info_ptr->free_me, png_ptr->free_me, and other info_ptr and
     png_ptr members to restore binary compatibility with libpng-1.0.5
     (breaks compatibility with libpng-1.0.6).
+version 1.0.6h [April 24, 2000]
+  Changed shared library so-number pattern from 2.x.y.z to xy.z (this builds
+    libpng.so.10 & libpng.so.10.6h instead of libpng.so.2 & libpng.so.2.1.0.6h)
+version 1.0.6i [May 1, 2000]
+  Added documentation of user memory functions in libpng.txt/libpng.3
+  Modified png_read_png so that it will use user_allocated row_pointers
+    if present, unless free_me directs that it be freed, and added description
+    of the use of png_set_rows() and png_get_rows() in libpng.txt/libpng.3.
+  Added PNG_LEGACY_SUPPORTED macro, and #ifdef out all new (since version
+    1.00) members of png_struct and png_info, to regain binary compatibility
+    when you define this macro.  Capabilities lost in this event
+    are user transforms (new in version 1.0.0),the user transform pointer
+    (new in version 1.0.2), rgb_to_gray (new in 1.0.5), iCCP, sCAL, sPLT,
+    the high-level interface, and unknown chunks support (all new in 1.0.6).
+    This was necessary because of old applications that allocate the structs
+    directly instead of using png_create_*(), as authors were instructed to
+    do in libpng-0.88 and earlier.
+  Added makefile.intel and updated makefile.watcom (Pawel Mrochen)
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

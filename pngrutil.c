@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -446,11 +446,15 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->palette = palette;
    png_ptr->num_palette = (png_uint_16)num;
 
+#ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
    png_ptr->free_me |= PNG_FREE_PLTE;
+#else
+   png_ptr->flags |= PNG_FLAG_FREE_PLTE;
+#endif
    png_set_PLTE(png_ptr, info_ptr, palette, num);
 
-#if defined (PNG_READ_tRNS_SUPPORTED)
+#if defined(PNG_READ_tRNS_SUPPORTED)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
       if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS))
@@ -849,8 +853,19 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       igamma=(int)info_ptr->int_gamma;
 #else
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
-      igamma=info_ptr->gamma * 100000.;
+      igamma=(int)(info_ptr->gamma * 100000.);
 #  endif
+#endif
+#if 0 && defined(PNG_cHRM_SUPPORTED) && !defined(PNG_FIXED_POINT_SUPPORTED)
+/* We need to define these here because they aren't in png.h */
+   png_fixed_point int_x_white;
+   png_fixed_point int_y_white;
+   png_fixed_point int_x_red;
+   png_fixed_point int_y_red;
+   png_fixed_point int_x_green;
+   png_fixed_point int_y_green;
+   png_fixed_point int_x_blue;
+   png_fixed_point int_y_blue;
 #endif
       if(igamma < 45000L || igamma > 46000L)
       {
@@ -870,6 +885,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif /* PNG_READ_gAMA_SUPPORTED */
 
 #ifdef PNG_READ_cHRM_SUPPORTED
+#ifdef PNG_FIXED_POINT_SUPPORTED
    if (info_ptr->valid & PNG_INFO_cHRM)
       if (abs(info_ptr->int_x_white - 31270L) > 1000 ||
           abs(info_ptr->int_y_white - 32900L) > 1000 ||
@@ -883,6 +899,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
          }
+#endif /* PNG_FIXED_POINT_SUPPORTED */
 #endif /* PNG_READ_cHRM_SUPPORTED */
 
    png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr, intent);
@@ -1157,8 +1174,12 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
+#ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
    png_ptr->free_me |= PNG_FREE_TRNS;
+#else
+   png_ptr->flags |= PNG_FLAG_FREE_TRNS;
+#endif
    png_set_tRNS(png_ptr, info_ptr, png_ptr->trans, png_ptr->num_trans,
       &(png_ptr->trans_values));
 }
@@ -1304,8 +1325,12 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
+#ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
    png_ptr->free_me |= PNG_FREE_HIST;
+#else
+   png_ptr->flags |= PNG_FLAG_FREE_HIST;
+#endif
    png_set_hIST(png_ptr, info_ptr, png_ptr->hist);
 }
 #endif
@@ -1924,12 +1949,14 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
+#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
       if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
            HANDLE_CHUNK_ALWAYS
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
            && png_ptr->read_user_chunk_fn == (png_user_chunk_ptr)NULL
 #endif
         )
+#endif
           png_chunk_error(png_ptr, "unknown critical chunk");
    }
 
@@ -2831,7 +2858,8 @@ png_read_start_row(png_structp png_ptr)
    }
 #endif
 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) && \
+defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if(png_ptr->transformations & PNG_USER_TRANSFORM)
      {
        int user_pixel_depth=png_ptr->user_transform_depth*

@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -645,14 +645,23 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
 }
 #endif
 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED) || \
+    defined(PNG_LEGACY_SUPPORTED)
 void
 png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    read_user_transform_fn)
 {
    png_debug(1, "in png_set_read_user_transform_fn\n");
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    png_ptr->transformations |= PNG_USER_TRANSFORM;
    png_ptr->read_user_transform_fn = read_user_transform_fn;
+#endif
+#ifdef PNG_LEGACY_SUPPORTED
+   if(read_user_transform_fn)
+      png_warning(png_ptr,
+        "This version of libpng does not support user transforms");
+#endif
 }
 #endif
 
@@ -1079,7 +1088,8 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       info_ptr->channels++;
 #endif
 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED) && \
+defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    if(png_ptr->transformations & PNG_USER_TRANSFORM)
      {
        if(info_ptr->bit_depth < png_ptr->user_transform_depth)
@@ -1307,10 +1317,12 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
              /*  png_byte channels;          number of channels (1-4) */
              /*  png_byte pixel_depth;       bits per pixel (depth*channels) */
            png_ptr->row_buf + 1);      /* start of pixel data for row */
+#if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       if(png_ptr->user_transform_depth)
          png_ptr->row_info.bit_depth = png_ptr->user_transform_depth;
       if(png_ptr->user_transform_channels)
          png_ptr->row_info.channels = png_ptr->user_transform_channels;
+#endif
       png_ptr->row_info.pixel_depth = (png_byte)(png_ptr->row_info.bit_depth *
          png_ptr->row_info.channels);
       png_ptr->row_info.rowbytes = (png_ptr->row_info.width *

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -123,7 +123,9 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    info_ptr->gamma = (float)(int_gamma/100000.);
 #endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
    info_ptr->int_gamma = int_gamma;
+#endif
    info_ptr->valid |= PNG_INFO_gAMA;
 }
 
@@ -441,7 +443,9 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
    /* Compression is always zero but is here so the API and info structure
     * does not have to change if we introduce multiple compression types */
    info_ptr->iccp_compression = (png_byte)compression_type;
+#ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_ICCP;
+#endif
    info_ptr->valid |= PNG_INFO_iCCP;
 }
 #endif
@@ -574,7 +578,9 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
       info_ptr->text[info_ptr->num_text]= *textp;
       info_ptr->num_text++;
+#ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_TEXT;
+#endif
       png_debug1(3, "transferred text chunk %d\n", info_ptr->num_text);
    }
 }
@@ -652,7 +658,9 @@ png_set_sPLT(png_structp png_ptr,
     info_ptr->splt_palettes = np;
     info_ptr->splt_palettes_num += nentries;
     info_ptr->valid |= PNG_INFO_sPLT;
+#ifdef PNG_FREE_ME_SUPPORTED
     info_ptr->free_me |= PNG_FREE_SPLT;
+#endif
 }
 #endif /* PNG_sPLT_SUPPORTED */
 
@@ -691,7 +699,9 @@ png_set_unknown_chunks(png_structp png_ptr,
 
     info_ptr->unknown_chunks = np;
     info_ptr->unknown_chunks_num += num_unknowns;
+#ifdef PNG_FREE_ME_SUPPORTED
     info_ptr->free_me |= PNG_FREE_UNKN;
+#endif
 }
 void
 png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
@@ -749,7 +759,9 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
        *p=(png_byte)keep;
     png_ptr->num_chunk_list=old_num_chunks+num_chunks;
     png_ptr->chunk_list=new_list;
+#ifdef PNG_FREE_ME_SUPPORTED
     png_ptr->free_me |= PNG_FREE_LIST;
+#endif
 }
 #endif
 
@@ -779,7 +791,6 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
    }
 }
 #endif
-
 
 void
 png_set_compression_buffer_size(png_structp png_ptr, png_uint_32 size)

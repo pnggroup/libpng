@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -687,11 +687,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
       }
    }
+#if defined(PNG_FIXED_POINT_SUPPORTED)
 #if defined(PNG_cHRM_SUPPORTED)
    {
       png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
          blue_y;
-
       if (png_get_cHRM_fixed(read_ptr, read_info_ptr, &white_x, &white_y, &red_x,
          &red_y, &green_x, &green_y, &blue_x, &blue_y))
       {
@@ -710,6 +710,32 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+#else /* Use floating point versions */
+#if defined(PNG_FLOATING_POINT_SUPPORTED)
+#if defined(PNG_cHRM_SUPPORTED)
+   {
+      double white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
+         blue_y;
+      if (png_get_cHRM(read_ptr, read_info_ptr, &white_x, &white_y, &red_x,
+         &red_y, &green_x, &green_y, &blue_x, &blue_y))
+      {
+         png_set_cHRM(write_ptr, write_info_ptr, white_x, white_y, red_x,
+            red_y, green_x, green_y, blue_x, blue_y);
+      }
+   }
+#endif
+#if defined(PNG_gAMA_SUPPORTED)
+   {
+      double gamma;
+
+      if (png_get_gAMA(read_ptr, read_info_ptr, &gamma))
+      {
+         png_set_gAMA(write_ptr, write_info_ptr, gamma);
+      }
+   }
+#endif
+#endif /* floating point */
+#endif /* fixed point */
 #if defined(PNG_iCCP_SUPPORTED)
    {
       png_charp name;
@@ -1129,6 +1155,8 @@ main(int argc, char *argv[])
    fprintf(STDERR," library:%s",png_get_header_version(NULL));
    /* Show the version of libpng used in building the application */
    fprintf(STDERR," pngtest:%s",PNG_HEADER_VERSION_STRING);
+   fprintf(STDERR," sizeof(png_struct)=%d, sizeof(png_info)=%d\n",
+                    sizeof(png_struct), sizeof(png_info));
 
    /* Do some consistency checking on the memory allocation settings, I'm
       not sure this matters, but it is nice to know, the first of these
@@ -1201,7 +1229,10 @@ main(int argc, char *argv[])
 #endif
       for (i=2; i<argc; ++i)
       {
-         int k, kerror;
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+         int k;
+#endif
+         int kerror;
          fprintf(STDERR, "Testing %s:",argv[i]);
          kerror = test_one_file(argv[i], outname);
          if (kerror == 0)
@@ -1271,7 +1302,9 @@ main(int argc, char *argv[])
          {
             if(verbose == 1 || i == 2)
             {
+#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
                 int k;
+#endif
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
                 fprintf(STDERR, "\n PASS (%lu zero samples)\n",zero_samples);
 #else
@@ -1345,4 +1378,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_6h your_png_h_is_not_version_1_0_6h;
+typedef version_1_0_6i your_png_h_is_not_version_1_0_6i;

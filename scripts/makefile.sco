@@ -25,7 +25,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 10.  You should not
 # have to change it.
 PNGMAJ = 10
-PNGMIN = 6h
+PNGMIN = 6i
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include

@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "April 24, 2000"
+.TH LIBPNG 3 "May 1, 2000"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.0.6h
+libpng \- Portable Network Graphics (PNG) Reference Library 1.0.6i
 .SH SYNOPSIS
 \fI\fB
 
@@ -725,7 +725,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.6h - April 24, 2000
+ libpng version 1.0.6i - May 1, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -1062,14 +1062,39 @@ dithering, and setting filler.)  If this is the case, simply do this:
 
     png_read_png(png_ptr, info_ptr, png_transforms, NULL)
 
-where png_transforms is an integer containing the logical-or of some set of
-transformation flags.  This call is equivalent to png_read_info(),
+where png_transforms is an integer containing the logical OR of
+some set of transformation flags.  This call is equivalent to png_read_info(),
 followed the set of transformations indicated by the transform mask,
-followed by png_update_info(), followed by a read of the image bytes
-to the info_ptr, followed by png_read_end().
+then png_read_image(), and finally png_read_end().
 
-(The final parameter of this call is not yet used.  Someday it
-will point to transformation parameters.)
+(The final parameter of this call is not yet used.  Someday it might point
+to transformation parameters required by some future input transform.)
+
+After you have called png_read_png(), you can retrieve the image data
+with
+
+   row_pointers = png_get_rows(png_ptr, info_ptr);
+
+where row_pointers is an array of pointers to the pixel data for each row:
+
+   png_bytep row_pointers[height];
+
+If you know your image size and pixel size ahead of time, you can allocate
+row_pointers prior to calling png_read_png() with
+
+   row_pointers = png_malloc(png_ptr, height*sizeof(png_bytep));
+   for (int i=0; i<height, i++)
+      row_pointers[i]=png_malloc(png_ptr, width*pixel_size);
+   png_set_rows(png_ptr, info_ptr, &row_pointers); 
+
+Alternatively you could allocate your image in one big block and define
+row_pointers[i] to point into the proper places in your block.
+
+If you use png_set_rows(), the application is responsible for freeing
+row_pointers (and row_pointers[i], if they were separately allocated).
+
+If you don't allocate row_pointers ahead of time, png_read_png() will
+do it, and it'll be free'ed when you call png_destroy_*().
 
 .SS The low-level read interface
 
@@ -1124,8 +1149,8 @@ in until png_read_end() has read the chunk data following the image.
     interlace_type - (PNG_INTERLACE_NONE or
                      PNG_INTERLACE_ADAM7)
     Any or all of interlace_type, compression_type, of
-                     filter_type can be
-    NULL if you are not interested in their values.
+                     filter_type can be NULL if you are not
+                     interested in their values.
 
     channels = png_get_channels(png_ptr, info_ptr);
     channels       - number of channels of info for the
@@ -1872,7 +1897,7 @@ point to libpng-allocated storage with the following functions:
 
     png_free_data(png_ptr, info_ptr, mask, n)
     mask         - identifies data to be freed, a mask
-                   made up by the OR one or more of
+                   containing the logical OR of one or more of
                    PNG_FREE_PLTE, PNG_FREE_TRNS,
                    PNG_FREE_HIST, PNG_FREE_ICCP,
                    PNG_FREE_SPLT, PNG_FREE_ROWS,
@@ -1887,12 +1912,12 @@ by the user and not by libpng,  and will in those
 cases do nothing.  The "n" parameter is ignored if only one item
 of the selected data type, such as PLTE, is allowed.  If "n" is not
 -1, and multiple items are allowed for the data type identified in
-the mask, such as text or splt, only the n'th item is freed.
+the mask, such as text or sPLT, only the n'th item is freed.
 
 The default behavior is only to free data that was allocated internally
 by libpng.  This can be changed, so that libpng will not free the data,
-or so that it will also free data that was passed in via a png_set_*()
-function, with
+or so that it will free data that was allocated by the user with png_malloc()
+or png_zalloc() and passed in via a png_set_*() function, with
 
     png_data_freer(png_ptr, info_ptr, freer, mask)
     mask     - which data elements are affected
@@ -1907,7 +1932,14 @@ You can call this function after reading the PNG data but before calling
 any png_set_*() functions, to control whether the user or the png_set_*()
 function is responsible for freeing any existing data that might be present,
 and again after the png_set_*() functions to control whether the user
-or png_destroy_*() is supposed to free the data..
+or png_destroy_*() is supposed to free the data.  When the user assumes
+responsibility for libpng-allocated data, the application must use
+png_free() to free it.
+
+If you allocated your row_pointers in a single block, as suggested above in
+the description of the high level read interface, you must not transfer
+responsibility for freeing it to the png_set_rows or png_read_destroy function,
+because they would also try to free the individual row_pointers[i].
 
 For a more compact example of reading a PNG image, see the file example.c.
 
@@ -2200,7 +2232,7 @@ types.
 
     /* turn on or off filtering, and/or choose
        specific filters.  You can use either a single PNG_FILTER_VALUE_NAME
-       or the "OR" of one or more PNG_FILTER_NAME masks. */
+       or the logical OR of one or more PNG_FILTER_NAME masks. */
     png_set_filter(png_ptr, 0,
        PNG_FILTER_NONE  | PNG_FILTER_VALUE_NONE |
        PNG_FILTER_SUB   | PNG_FILTER_VALUE_SUB  |
@@ -2497,7 +2529,7 @@ Compressed pairs must have a text string, as only the text string
 is compressed anyway, so the compression would be meaningless.
 
 PNG supports modification time via the png_time structure.  Two
-conversion routines are proved, png_convert_from_time_t() for
+conversion routines are provided, png_convert_from_time_t() for
 time_t and png_convert_from_struct_tm() for struct tm.  The
 time_t routine uses gmtime().  You don't have to use either of
 these, but if you wish to fill in the png_time structure directly,
@@ -2553,14 +2585,13 @@ If you have valid image data in the info structure, simply do this:
 
     png_write_png(png_ptr, info_ptr, png_transforms, NULL)
 
-where png_transforms is an integer containing the logical-or of some set of
+where png_transforms is an integer containing the logical OR of some set of
 transformation flags.  This call is equivalent to png_write_info(),
-followed by the set of transformations indicated by the transform
-mask, followed by followed by a write of the image bytes from the
-info_ptr, followed by png_write_end().
+followed the set of transformations indicated by the transform mask,
+then png_write_image(), and finally png_write_end().
 
-(The final parameter of this call is not yet used.  Someday it
-may point to output transformation parameters.)
+(The final parameter of this call is not yet used.  Someday it might point
+to transformation parameters required by some future output transform.)
 
 .SS The low-level write interface
 
@@ -2811,7 +2842,7 @@ point to libpng-allocated storage with the following functions:
 
     png_free_data(png_ptr, info_ptr, mask, n)
     mask         - identifies data to be freed, a mask
-                   made up by the OR one or more of
+                   containing the logical OR of one or more of
                    PNG_FREE_PLTE, PNG_FREE_TRNS,
                    PNG_FREE_HIST, PNG_FREE_ICCP,
                    PNG_FREE_SPLT, PNG_FREE_ROWS,
@@ -2821,20 +2852,21 @@ point to libpng-allocated storage with the following functions:
                    (-1 for all items)
 
 These functions may be safely called when the relevant storage has
-already been freed, or has not yet been allocated, and will in that
-case do nothing.  The "n" parameter is ignored if only one item
+already been freed, or has not yet been allocated, or was allocated
+by the user  and not by libpng,  and will in those
+cases do nothing.  The "n" parameter is ignored if only one item
 of the selected data type, such as PLTE, is allowed.  If "n" is not
 -1, and multiple items are allowed for the data type identified in
-the mask, such as text or splt, only the n'th item is freed.
+the mask, such as text or sPLT, only the n'th item is freed.
 
-If you allocated data such as a palette that you passed in to libpng with
-png_set_*, you must not free it until just before the call to
+If you allocated data such as a palette that you passed
+in to libpng with png_set_*, you must not free it until just before the call to
 png_destroy_write_struct().
 
 The default behavior is only to free data that was allocated internally
 by libpng.  This can be changed, so that libpng will not free the data,
-or so that it will free data that was passed in via a png_set_*() function,
-with
+or so that it will free data that was allocated by the user with png_malloc()
+or png_zalloc() and passed in via a png_set_*() function, with
 
     png_data_freer(png_ptr, info_ptr, freer, mask)
     mask     - which data elements are affected
@@ -2860,6 +2892,12 @@ function.  Having done this, it would then be safe to destroy the read
 structure and continue to use the PLTE, tRNS, and hIST data in the write
 structure.
 
+This function only affects data that has already been allocated.
+You can call this function before calling after the png_set_*() functions
+to control whether the user or png_destroy_*() is supposed to free the data.
+When the user assumes responsibility for libpng-allocated data, the
+application must use png_free() to free it.
+
 For a more compact example of writing a PNG image, see the file example.c.
 
 .SH V. Modifying/Customizing libpng:
@@ -2874,20 +2912,32 @@ goes through callbacks that are user settable.  The default routines are
 in pngmem.c, pngrio.c, pngwio.c, and pngerror.c, respectively.  To change
 these functions, call the appropriate png_set_*_fn() function.
 
-Memory allocation is done through the functions png_malloc() and png_free().
-These currently just call the standard C functions.  If
+Memory allocation is done through the functions png_malloc(), png_zalloc(),
+and png_free().  These currently just call the standard C functions.  If
 your pointers can't access more then 64K at a time, you will want to set
 MAXSEG_64K in zlib.h.  Since it is unlikely that the method of handling
 memory allocation on a platform will change between applications, these
-functions must be modified in the library at compile time.
+functions must be modified in the library at compile time.  If you prefer
+to use a different method of allocating and freeing data, you can use
+
+    png_set_mem_fn(png_structp png_ptr, png_voidp mem_ptr, png_malloc_ptr
+      malloc_fn, png_free_ptr free_fn)
+
+This function also provides a void pointer that can be retrieved via
+
+    mem_ptr=png_get_mem_ptr(png_ptr);
+
+Your replacement memory functions must have prototypes as follows:
+
+    png_voidp malloc_fn(png_structp png_ptr, png_uint_32 size);
+    void free_fn(png_structp png_ptr, png_voidp ptr);
 
 Input/Output in libpng is done through png_read() and png_write(),
 which currently just call fread() and fwrite().  The FILE * is stored in
 png_struct and is initialized via png_init_io().  If you wish to change
 the method of I/O, the library supplies callbacks that you can set
 through the function png_set_read_fn() and png_set_write_fn() at run
-time, instead of calling the png_init_io() function.
-These functions
+time, instead of calling the png_init_io() function.  These functions
 also provide a void pointer that can be retrieved via the function
 png_get_io_ptr().  For example:
 
@@ -2901,7 +2951,7 @@ png_get_io_ptr().  For example:
     voidp read_io_ptr = png_get_io_ptr(read_ptr);
     voidp write_io_ptr = png_get_io_ptr(write_ptr);
 
-The replacement I/O functions should have prototypes as follows:
+The replacement I/O functions must have prototypes as follows:
 
     void user_read_data(png_structp png_ptr,
         png_bytep data, png_uint_32 length);
@@ -3074,8 +3124,8 @@ to turn filtering on and off, respectively.
 
 Individual filter types are PNG_FILTER_NONE, PNG_FILTER_SUB,
 PNG_FILTER_UP, PNG_FILTER_AVG, PNG_FILTER_PAETH, which can be bitwise
-ORed together '|' to specify one or more filters to use.  These
-filters are described in more detail in the PNG specification.  If
+ORed together with '|' to specify one or more filters to use.
+These filters are described in more detail in the PNG specification.  If
 you intend to change the filter type during the course of writing
 the image, you should start with flags set for all of the filters
 you intend to use so that libpng can initialize its internal
@@ -3237,13 +3287,13 @@ the old method.
 
 .SH VII. Y2K Compliance in libpng
 
-April 24, 2000
+May 1, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.6h are Y2K compliant.  It is my belief that earlier
+upward through 1.0.6i are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3384,7 +3434,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.0.6h - April 24, 2000:
+Libpng version 1.0.6i - May 1, 2000:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (randeg@alum.rpi.edu).
 
@@ -3399,7 +3449,7 @@ Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
 Copyright (c) 1996, 1997 Andreas Dilger
 (libpng versions 0.89c, May 1996, through 0.96, May 1997)
 Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
-(libpng versions 0.97, January 1998, through 1.0.6h, April 24, 2000)
+(libpng versions 0.97, January 1998, through 1.0.6i, May 1, 2000)
 
 For the purposes of this copyright and license, "Contributing Authors"
 is defined as the following set of individuals:

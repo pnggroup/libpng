@@ -307,7 +307,8 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    }
 
    /* flip the RGB pixels to BGR (or RGBA to BGRA) */
-   png_set_bgr(png_ptr);
+   if (color_type & PNG_COLOR_MASK_COLOR)
+      png_set_bgr(png_ptr);
 
    /* swap the RGBA or GA data to ARGB or AG (or BGRA to ABGR) */
    png_set_swap_alpha(png_ptr);

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.6h - April 24, 2000
+ * libpng 1.0.6i - May 1, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -480,6 +480,8 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       1, NULL, NULL);
 #endif
 
+   png_ptr->mode |= PNG_CREATED_WRITE_STRUCT;
+
    return ((png_structp)png_ptr);
 }
 
@@ -503,6 +505,15 @@ png_write_init(png_structp png_ptr)
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
+#endif
+
+#ifndef PNG_LEGACY_SUPPORTED
+   if(!(png_ptr->mode & PNG_CREATED_WRITE_STRUCT))
+   {
+      png_ptr->error_fn=NULL;
+      png_error(png_ptr,
+        "Write struct not properly created; use a legacy-supporting libpng.");
+   }
 #endif
 
    /* initialize zbuf - compression buffer */
@@ -804,11 +815,13 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
    {
       png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
 
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
       if (png_ptr->num_chunk_list)
       {
          png_free(png_ptr, png_ptr->chunk_list);
          png_ptr->num_chunk_list=0;
       }
+#endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)info_ptr, free_fn);

@@ -699,6 +699,31 @@ version 1.0.6g [April 24, 2000]
 version 1.0.6h [April 24, 2000]
   Changed shared library so-number pattern from 2.x.y.z to xy.z (this builds
     libpng.so.10 & libpng.so.10.6h instead of libpng.so.2 & libpng.so.2.1.0.6h)
+version 1.0.6i [May 1, 2000]
+  Rearranged some members at the end of png_info and png_struct, to put
+    unknown_chunks_num and free_me within the original size of the png_structs
+    and free_me, png_read_user_fn, and png_free_fn within the original png_info,
+    because some old applications allocate the structs directly instead of
+    using png_create_*().
+  Added documentation of user memory functions in libpng.txt/libpng.3
+  Modified png_read_png so that it will use user_allocated row_pointers
+    if present, unless free_me directs that it be freed, and added description
+    of the use of png_set_rows() and png_get_rows() in libpng.txt/libpng.3.
+  Added PNG_LEGACY_SUPPORTED macro, and #ifdef out all new (since version
+    1.00) members of png_struct and png_info, to regain binary compatibility
+    when you define this macro.  Capabilities lost in this event
+    are user transforms (new in version 1.0.0),the user transform pointer
+    (new in version 1.0.2), rgb_to_gray (new in 1.0.5), iCCP, sCAL, sPLT,
+    the high-level interface, and unknown chunks support (all new in 1.0.6).
+    This was necessary because of old applications that allocate the structs
+    directly instead of using png_create_*(), as authors were instructed to
+    do in libpng-0.88 and earlier.
+  Added modes PNG_CREATED_READ_STRUCT and PNG_CREATED_WRITE_STRUCT which
+    can be used to detect codes that directly allocate the structs, and
+    code to check these modes in png_read_init() and png_write_init() and
+    generate a libpng error if the modes aren't set and PNG_LEGACY_SUPPORTED
+    was not defined.
+  Added makefile.intel and updated makefile.watcom (Pawel Mrochen)
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,21 +1,57 @@
 
 Known bugs and suggested enhancements in libpng-1.0.6
 
-1. April 23, 2000 -- BUG -- binary incompatibility
+1. April 24, 2000 -- BUG -- binary incompatibility
+
+   Libpng-1.0.6 is binary incompatible with old applications that
+   allocate the png_struct and png_info structures themselves instead
+   of using png_create_*().  They do not allocate enough space for
+   the structures because they have an incorrect notion of
+   sizeof(png_struct) and sizeof(png_info).  Although such applications
+   should be considered broken rather than considering libpng to be broken,
+   they are numerous and include products of the PNG group, such
+   as gif2png and pnmtopng-2.36 (pnmtopng-2.37 is OK), so libpng will
+   be fixed in version 1.0.7 to work around this problem.
+
+   Applications that use png_create_*() instead of png_ptr=malloc(...)
+   are immune to this problem.
+
+   STATUS:  Fixed in libpng-1.0.6ad, libpng-1.0.6i, and patch-d
+   which are currently being tested by the PNG group.
+   The fix necessarily reintroduces a binary incompatibility with any
+   application that makes direct access to the png_info and
+   png_struct members that deal with the pCAL chunk, palette_lookup,
+   dither_index, time_buffer, or weighted filtering, i.e., any members
+   coming after the new "free_me" member of either structure.  It
+   is believed that applications affected by this reintroduced binary
+   incompatibility are rare (none are known to the PNG group). An
+   effective  workaround for this and the next bug is to recompile the
+   old applications with the installed version of libpng.
+
+2. April 23, 2000 -- BUG -- binary incompatibility
 
    Libpng-1.0.6 introduced binary incompatibility for applications that
-   make direct access to the info_ptr and png_ptr, due to the insertion
-   of the free_me member ahead of some previously existing members.
+   make direct access to members of the png_struct and png_info structures,
+   due to the insertion of the free_me member ahead of some previously
+   existing members.
 
-   STATUS:  Fixed in libpng-1.0.6g
+   Applications that use png_set_*(), png_get_*() are immune to this
+   problem, but people are still to this day writing applications that
+   make ill-advised direct access to members of the png_struct and
+   png_info structures, so libpng-1.0.6 will be patched to work around
+   this problem.
 
-2. April 15, 2000 -- BUG -- pnggccrd.c
+   STATUS:  Fixed in libpng-1.0.6g and patch-d, which are currently being
+   tested by the PNG group.  Users can work around the problem without
+   patching libpng by recompiling their applications.
+
+3. April 15, 2000 -- BUG -- pnggccrd.c
 
    If PNG_NO_GLOBAL_ARRAYS is defined, pnggccrd.c will not compile.
 
    STATUS: Fixed in libpng-1.0.6g
 
-3. April 1, 2000 -- BUG
+4. April 1, 2000 -- BUG
 
    Under some circumstances old applications that make direct access to
    the info_ptr->text and its members might free the same memory that
@@ -25,21 +61,21 @@ Known bugs and suggested enhancements in libpng-1.0.6
    bit in info_ptr->free_me is now checked to make sure libpng is responsible
    for freeing the memory.
 
-4. April 1, 2000 -- BUG
+5. April 1, 2000 -- BUG
 
    The non-ISO-C "strdup()" function is used in png.c
 
    STATUS: The function has been simplified and no longer uses strdup()
    in libpng-1.0.6-patch-c and libpng-1.0.6d.
 
-5. March 24, 2000 -- BUG
+6. March 24, 2000 -- BUG
 
    The png_set_rgb_to_gray_fixed() function is setting incorrect weighting
    factors.
 
    STATUS: Fixed in libpng-1.0.6-patch-b and libpng-1.0.6d.
 
-6. March 22, 2000 -- BUG
+7. March 22, 2000 -- BUG
 
    There are some printf() and fprintf() statements active in pngwutil.c
    when PNG_NO_STDIO and PNG_sCAL_SUPPORTED are both defined.
@@ -47,7 +83,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
    STATUS: Fixed in libpng-1.0.6-patch-a and libpng-1.0.6d.  The strcpy()
    function is used instead.
 
-7. March 22, 2000 -- BUG
+8. March 22, 2000 -- BUG
 
    The length of the iCCP chunk data is calculated incorrectly; because
    it can contain zeroes, strlen() doesn't work.
@@ -55,7 +91,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
    STATUS: Fixed in libpng-1.0.6-patch-a and libpng-1.0.6d by adding a
    data_length parameter to the png_decompress_chunk() function.
 
-8. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
+9. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
 
    Loops need to be optimized everywhere
 
@@ -70,7 +106,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
    libpng-1.1.0.  About 160 loops will be turned around
    in libpng-1.1.Nn, for testing.
 
-9. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
+10. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
 
    libpng-1.0.5 and earlier transform colors to gamma=1.0 space for
    merging with background, and then back to the image's gamma.  The
@@ -82,7 +118,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
 
    STATUS: under development.
 
-10. September 1999 -- ENHANCEMENT --
+11. September 1999 -- ENHANCEMENT --
 
    It should be possible to use libpng without floating-point aritmetic.
 
