@@ -15,11 +15,12 @@
 #endif
 
 /* defined so I can write to a file on gui/windowing platforms */
-#define STDERR stderr
+/*  #define STDERR stderr  */
+#define STDERR stdout	/* for DOS */
 
 /* input and output filenames */
 char inname[] = "pngtest.png";
-char outname[] = "testout.png";
+char outname[] = "pngout.png";
 
 png_struct read_ptr;
 png_struct write_ptr;
@@ -31,12 +32,12 @@ char inbuf[256], outbuf[256];
 int main()
 {
    FILE *fpin, *fpout;
-   png_byte *row_buf;
+   png_bytep row_buf;
    png_uint_32 rowbytes;
    png_uint_32 y;
    int channels, num_pass, pass;
 
-   row_buf = (png_byte *)0;
+   row_buf = (png_bytep )0;
 
    fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
 
@@ -79,10 +80,10 @@ int main()
       return 1;
    }
 
-   png_info_init(&info_ptr);
-   png_info_init(&end_info);
    png_read_init(&read_ptr);
    png_write_init(&write_ptr);
+   png_info_init(&info_ptr);
+   png_info_init(&end_info);
 
    png_init_io(&read_ptr, fpin);
    png_init_io(&write_ptr, fpout);
@@ -97,15 +98,12 @@ int main()
    if (info_ptr.color_type & 4)
       channels++;
 
-   png_set_flush(&write_ptr, 20);
-   png_set_compression_level(&write_ptr, 9);
-
    rowbytes = ((info_ptr.width * info_ptr.bit_depth * channels + 7) >> 3);
-   row_buf = (png_byte *)malloc((size_t)rowbytes);
+   row_buf = (png_bytep )malloc((size_t)rowbytes);
    if (!row_buf)
    {
       fprintf(STDERR, "no memory to allocate row buffer\n");
-      png_read_destroy(&read_ptr, &info_ptr, (png_info *)0);
+      png_read_destroy(&read_ptr, &info_ptr, (png_infop )0);
       png_write_destroy(&write_ptr);
       fclose(fpin);
       fclose(fpout);
@@ -126,8 +124,8 @@ int main()
    {
       for (y = 0; y < info_ptr.height; y++)
       {
-         png_read_rows(&read_ptr, (png_bytef **)&row_buf, (png_bytef **)0, 1);
-         png_write_rows(&write_ptr, (png_bytef **)&row_buf, 1);
+         png_read_rows(&read_ptr, (png_bytepp )&row_buf, (png_bytepp )0, 1);
+         png_write_rows(&write_ptr, (png_bytepp )&row_buf, 1);
       }
    }
 
@@ -140,7 +138,7 @@ int main()
    fclose(fpin);
    fclose(fpout);
 
-   free(row_buf);
+   free((void *)row_buf);
 
    fpin = fopen(inname, "rb");
 

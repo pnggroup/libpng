@@ -1,10 +1,10 @@
 
 /* pngwtran.c - transforms the data in a row for png writers
 
-   libpng 1.0 beta 2 - version 0.81
+	libpng 1.0 beta 2 - version 0.85
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   August 24, 1995
+   December 19, 1995
    */
 
 #define PNG_INTERNAL
@@ -13,10 +13,10 @@
 /* transform the data according to the users wishes.  The order of
    transformations is significant. */
 void
-png_do_write_transformations(png_struct *png_ptr)
+png_do_write_transformations(png_structp png_ptr)
 {
 #if defined(PNG_WRITE_FILLER_SUPPORTED)
-   if (png_ptr->transformations & PNG_RGBA)
+   if (png_ptr->transformations & PNG_FILLER)
       png_do_write_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
          png_ptr->filler_loc);
 #endif
@@ -49,7 +49,7 @@ png_do_write_transformations(png_struct *png_ptr)
    row_info bit depth should be 8 (one pixel per byte).  The channels
    should be 1 (this only happens on grayscale and paletted images) */
 void
-png_do_pack(png_row_info *row_info, png_bytef *row, png_byte bit_depth)
+png_do_pack(png_row_infop row_info, png_bytep row, png_byte bit_depth)
 {
    if (row_info && row && row_info->bit_depth == 8 &&
       row_info->channels == 1)
@@ -58,10 +58,10 @@ png_do_pack(png_row_info *row_info, png_bytef *row, png_byte bit_depth)
       {
          case 1:
          {
-            png_bytef *sp;
-            png_bytef *dp;
-            int mask;
-            png_int_32 i;
+            png_bytep sp;
+            png_bytep dp;
+				int mask;
+				png_int_32 i;
             int v;
 
             sp = row;
@@ -79,7 +79,7 @@ png_do_pack(png_row_info *row_info, png_bytef *row, png_byte bit_depth)
                {
                   mask = 0x80;
                   *dp = v;
-                  dp++;
+						dp++;
                   v = 0;
                }
             }
@@ -89,8 +89,8 @@ png_do_pack(png_row_info *row_info, png_bytef *row, png_byte bit_depth)
          }
          case 2:
          {
-            png_bytef *sp;
-            png_bytef *dp;
+            png_bytep sp;
+            png_bytep dp;
             int shift;
             png_int_32 i;
             int v;
@@ -121,8 +121,8 @@ png_do_pack(png_row_info *row_info, png_bytef *row, png_byte bit_depth)
          }
          case 4:
          {
-            png_bytef *sp;
-            png_bytef *dp;
+            png_bytep sp;
+            png_bytep dp;
             int shift;
             png_int_32 i;
             int v;
@@ -170,7 +170,7 @@ png_do_pack(png_row_info *row_info, png_bytef *row, png_byte bit_depth)
    would pass 3 as bit_depth, and this routine would translate the
    data to 0 to 15. */
 void
-png_do_shift(png_row_info *row_info, png_bytef *row, png_color_8 *bit_depth)
+png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 {
    if (row && row_info &&
       row_info->color_type != PNG_COLOR_TYPE_PALETTE)
@@ -207,7 +207,7 @@ png_do_shift(png_row_info *row_info, png_bytef *row, png_color_8 *bit_depth)
       /* with low row dephts, could only be grayscale, so one channel */
       if (row_info->bit_depth < 8)
       {
-         png_bytef *bp;
+         png_bytep bp;
          png_uint_32 i;
          int j;
          png_byte mask;
@@ -236,7 +236,7 @@ png_do_shift(png_row_info *row_info, png_bytef *row, png_color_8 *bit_depth)
       }
       else if (row_info->bit_depth == 8)
       {
-         png_bytef *bp;
+         png_bytep bp;
          png_uint_32 i;
          int j;
 
@@ -262,7 +262,7 @@ png_do_shift(png_row_info *row_info, png_bytef *row, png_color_8 *bit_depth)
       }
       else
       {
-         png_bytef *bp;
+         png_bytep bp;
          png_uint_32 i;
          int j;
 
@@ -297,7 +297,7 @@ png_do_shift(png_row_info *row_info, png_bytef *row, png_color_8 *bit_depth)
 #ifdef PNG_WRITE_FILLER_SUPPORTED
 /* remove filler byte */
 void
-png_do_write_filler(png_row_info *row_info, png_bytef *row,
+png_do_write_filler(png_row_infop row_info, png_bytep row,
    png_byte filler_loc)
 {
    if (row && row_info && row_info->color_type == PNG_COLOR_TYPE_RGB &&
@@ -305,7 +305,8 @@ png_do_write_filler(png_row_info *row_info, png_bytef *row,
    {
       if (filler_loc == PNG_FILLER_AFTER)
       {
-      png_bytef *sp, *dp;
+         png_bytep sp, dp;
+
          png_uint_32 i;
 
          for (i = 1, sp = row + 4, dp = row + 3;
@@ -323,10 +324,10 @@ png_do_write_filler(png_row_info *row_info, png_bytef *row,
       }
       else
       {
-      png_bytef *sp, *dp;
+			png_bytep sp, dp;
          png_uint_32 i;
 
-         for (i = 1, sp = row + 4, dp = row + 3;
+         for (i = 0, sp = row, dp = row;
             i < row_info->width;
             i++)
          {

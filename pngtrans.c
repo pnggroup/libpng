@@ -2,10 +2,10 @@
 /* pngtrans.c - transforms the data in a row
    routines used by both readers and writers
 
-   libpng 1.0 beta 2 - version 0.81
+	libpng 1.0 beta 2 - version 0.85
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   August 24, 1995
+   December 19, 1995
    */
 
 #define PNG_INTERNAL
@@ -14,7 +14,7 @@
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* turn on bgr to rgb mapping */
 void
-png_set_bgr(png_struct *png_ptr)
+png_set_bgr(png_structp png_ptr)
 {
    png_ptr->transformations |= PNG_BGR;
 }
@@ -23,7 +23,7 @@ png_set_bgr(png_struct *png_ptr)
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* turn on 16 bit byte swapping */
 void
-png_set_swap(png_struct *png_ptr)
+png_set_swap(png_structp png_ptr)
 {
    if (png_ptr->bit_depth == 16)
       png_ptr->transformations |= PNG_SWAP_BYTES;
@@ -33,7 +33,7 @@ png_set_swap(png_struct *png_ptr)
 #if defined(PNG_READ_PACK_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
 /* turn on pixel packing */
 void
-png_set_packing(png_struct *png_ptr)
+png_set_packing(png_structp png_ptr)
 {
    if (png_ptr->bit_depth < 8)
    {
@@ -45,7 +45,7 @@ png_set_packing(png_struct *png_ptr)
 
 #if defined(PNG_READ_SHIFT_SUPPORTED) || defined(PNG_WRITE_SHIFT_SUPPORTED)
 void
-png_set_shift(png_struct *png_ptr, png_color_8 *true_bits)
+png_set_shift(png_structp png_ptr, png_color_8p true_bits)
 {
    png_ptr->transformations |= PNG_SHIFT;
    png_ptr->shift = *true_bits;
@@ -54,7 +54,7 @@ png_set_shift(png_struct *png_ptr, png_color_8 *true_bits)
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED) || defined(PNG_WRITE_INTERLACING_SUPPORTED)
 int
-png_set_interlace_handling(png_struct *png_ptr)
+png_set_interlace_handling(png_structp png_ptr)
 {
    if (png_ptr->interlaced)
    {
@@ -68,7 +68,7 @@ png_set_interlace_handling(png_struct *png_ptr)
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
 void
-png_set_filler(png_struct *png_ptr, int filler, int filler_loc)
+png_set_filler(png_structp png_ptr, int filler, int filler_loc)
 {
    png_ptr->transformations |= PNG_FILLER;
    png_ptr->filler = (png_byte)filler;
@@ -80,13 +80,13 @@ png_set_filler(png_struct *png_ptr, int filler, int filler_loc)
 
 /* old functions kept around for compatability purposes */
 void
-png_set_rgbx(png_struct *png_ptr)
+png_set_rgbx(png_structp png_ptr)
 {
    png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 }
 
 void
-png_set_xrgb(png_struct *png_ptr)
+png_set_xrgb(png_structp png_ptr)
 {
    png_set_filler(png_ptr, 0xff, PNG_FILLER_BEFORE);
 }
@@ -94,19 +94,19 @@ png_set_xrgb(png_struct *png_ptr)
 
 #if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
 void
-png_set_invert_mono(png_struct *png_ptr)
+png_set_invert_mono(png_structp png_ptr)
 {
    png_ptr->transformations |= PNG_INVERT_MONO;
 }
 
 /* invert monocrome grayscale data */
 void
-png_do_invert(png_row_info *row_info, png_bytef *row)
+png_do_invert(png_row_infop row_info, png_bytep row)
 {
    if (row && row_info && row_info->bit_depth == 1 &&
       row_info->color_type == PNG_COLOR_TYPE_GRAY)
    {
-      png_bytef *rp;
+      png_bytep rp;
       png_uint_32 i;
 
       for (i = 0, rp = row;
@@ -122,11 +122,11 @@ png_do_invert(png_row_info *row_info, png_bytef *row)
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* swaps byte order on 16 bit depth images */
 void
-png_do_swap(png_row_info *row_info, png_bytef *row)
+png_do_swap(png_row_infop row_info, png_bytep row)
 {
    if (row && row_info && row_info->bit_depth == 16)
    {
-      png_bytef *rp;
+      png_bytep rp;
       png_byte t;
       png_uint_32 i;
 
@@ -145,13 +145,13 @@ png_do_swap(png_row_info *row_info, png_bytef *row)
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* swaps red and blue */
 void
-png_do_bgr(png_row_info *row_info, png_bytef *row)
+png_do_bgr(png_row_infop row_info, png_bytep row)
 {
    if (row && row_info && (row_info->color_type & 2))
    {
       if (row_info->color_type == 2 && row_info->bit_depth == 8)
       {
-         png_bytef *rp;
+         png_bytep rp;
          png_byte t;
          png_uint_32 i;
 
@@ -166,7 +166,7 @@ png_do_bgr(png_row_info *row_info, png_bytef *row)
       }
       else if (row_info->color_type == 6 && row_info->bit_depth == 8)
       {
-         png_bytef *rp;
+         png_bytep rp;
          png_byte t;
          png_uint_32 i;
 
@@ -181,7 +181,7 @@ png_do_bgr(png_row_info *row_info, png_bytef *row)
       }
       else if (row_info->color_type == 2 && row_info->bit_depth == 16)
       {
-         png_bytef *rp;
+         png_bytep rp;
          png_byte t[2];
          png_uint_32 i;
 
@@ -199,7 +199,7 @@ png_do_bgr(png_row_info *row_info, png_bytef *row)
       }
       else if (row_info->color_type == 6 && row_info->bit_depth == 16)
       {
-         png_bytef *rp;
+			png_bytep rp;
          png_byte t[2];
          png_uint_32 i;
 

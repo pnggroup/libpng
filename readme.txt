@@ -1,30 +1,27 @@
-readme.txt - for libpng 0.8
+readme.txt - for libpng 0.85
 
-This is the second beta version of libpng 1.0.  I've updated most
-of the stuff I want to before the final 1.0 version.  Remaining
-to do are the medium memory model support (which I'll put in
-as soon as we test this version), better dithering, and any bug
-fixes and makefile/include additions.  I expect a third (and
-perhaps final) beta after zlib is officially 1.0.
+This is a bug fix for the second beta version of libpng 1.0, and
+a first try at a progressive (push) reader.  It hasn't been
+tested very much, but I'm not going to have time to test it for
+a few days, and I wanted to give an advanced look at the
+progressive reader to everyone.  Please report bugs back
+(and fixes, if you find them), and I'll release a new version
+in a week or two.  Thanks.
+
+I've implemented the callback functions for the error/warning
+messages and the input/output.  See the libpng.txt
+for details.  I've also added defines to support medium memory
+models, so every type now has pointer defines.  For example,
+a pointer to the png_struct is now png_structp, while a double
+pointer is now png_structpp.  The old way should work, but I'll
+be using the new way from now on in all my examples.  Those of
+you doing medium memory model or changing the error/warning
+or input/output functions should try these and report back to
+me any problems.
 
 I've tried to incorporate all the changes and makefiles everyone
 sent me.  However, I may of lost some in the flood.  If you sent
 me a change and I didn't put it in, send it again.  Sorry.
-
-Updates from libpng 0.71 include a new transformation,
-png_set_filler(), which replaces png_set_rgbx() and
-png_set_xrgb().  The old functions will be supported for
-awhile, but I'd suggest changing to the new function.  Also,
-I've added defines in png.h to remove unwanted code from the
-compiled library.  I've added a new field to png_realloc(), and
-fixed various bugs.  I've also split up pngstub.c into pngmem.c,
-pngio.c, and pngerror.c, in case you need to just change some of
-these.  I've pulled pngconf.h out of png.h, so you don't have to
-remake your changes every new release.  I've added a function to
-update the png_info structure after you're done setting up your
-transformations (png_read_update_info()).  The complete list of
-changes is in pngchang.txt.  Most of you won't be much affected
-by any of this.  Some of you will want to use the new features.
 
 For a detailed description on using libpng, read libpng.txt.  For
 usage information and restrictions (what little they are) on libpng,

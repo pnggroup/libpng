@@ -1,9 +1,9 @@
 libpng.txt - a description on how to use and modify libpng
 
-   libpng 1.0 beta 2 - version 0.8
+   libpng 1.0 beta 2 - version 0.85
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   August 20, 1995
+	December 19, 1995
 
 This file describes how to use and modify the PNG reference library
 (known as libpng) for your own use.  There are four sections to this
@@ -45,60 +45,60 @@ The structures:
 There are two main structures that are important to libpng, png_struct
 and png_info.  The first, png_struct, is an internal structure that
 will not, for the most part, be used by the general user except as
-the first variable passed to every PNG function call.
+the first variable passed to every png function call.
 
 The png_info structure is designed to provide information about the
 png file.  All of it's fields are intended to be examined or modified
 by the user.  See png.h for a good description of the png_info fields.
 
-And while I'm on the topic, make sure you include the PNG header file:
+And while I'm on the topic, make sure you include the png header file:
 
 #include <png.h>
 
 Checking PNG files:
 
-Libpng provides a simple check to see if a file is a PNG file.  To
+Libpng provides a simple check to see if a file is a png file.  To
 use it, pass in the first 1 to 8 bytes of the file, and it will return
 true or false (1 or 0) depending on whether the bytes could be part
-of a PNG file.  Of course, the more bytes you pass in, the greater
-the accuracy of the prediction.
+of a png file.  Of course, the more bytes you pass in, the greater
+the accuracy of the prediction.  If you pass in more then eight bytes,
+libpng will only look at the first eight bytes.
 
-   fread(header, 1, number, fp);
-   is_png = png_check_sig(header, number);
+	fread(header, 1, number, fp);
+	is_png = png_check_sig(header, number);
 
 Reading PNG files:
+
+This section covers reading png files row by row.  Progressive reading
+is covered in the next section (although you still need to read this
+section, as much of the information is still needed).
 
 The first thing you need to do while reading a PNG file is to allocate
 and initialize png_struct and png_info.  As these are both large, you
 may not want to store these on the stack, unless you have stack space
 to spare.  Of course, you will want to check if malloc returns NULL.
 
-   png_struct *png_ptr = malloc(sizeof (png_struct));
-   if (!png_ptr)
-      return;
-   png_info *info_ptr = malloc(sizeof (png_info));
-   if (!info_ptr)
-   {
-      free(png_ptr);
-      return;
-   }
+	png_structp png_ptr = malloc(sizeof (png_struct));
+	if (!png_ptr)
+		return;
+	png_infop info_ptr = malloc(sizeof (png_info));
+	if (!info_ptr)
+	{
+		free(png_ptr);
+		return;
+	}
 
 You may also want to do any i/o initialization here, before
 you get into libpng, so if it doesn't work, you don't have
 much to undo.
 
-   FILE *fp = fopen(file_name, "rb");
-   if (!fp)
-   {
-      free(png_ptr);
-      free(info_ptr);
-      return;
-   }
-
-If you are not using the standard IO functions to do input and
-output, and/or not using stderr for your output messages, you will
-have the ability to change the functions that libpng uses once
-you have allocated the libpng data structures below.
+	FILE *fp = fopen(file_name, "rb");
+	if (!fp)
+	{
+		free(png_ptr);
+		free(info_ptr);
+		return;
+	}
 
 After you have these structures, you will need to set up the
 error handling.  When libpng encounters an error, it expects to
@@ -108,21 +108,20 @@ read the file from different routines, you will need to update
 the jmpbuf field every time you enter a new routine that will
 call a png_ function.  See your documentation of setjmp/longjmp
 for your compiler for more information on setjmp/longjmp.  See
-the discussion on libpng error handling in the Customizing Libpng
-section below for more information on how to change the behaviour
-of libpng error handling.  If an error occurs, and libpng longjmp's
-back to your setjmp, you will want to call png_read_destroy() to
-free any memory.
+the discussion on png error handling in the Customizing Libpng
+section below for more information on the png error handling.
+If an error occurs, and libpng longjmp's back to your setjmp,
+you will want to call png_read_destroy() to free any memory.
 
-   if (setjmp(png_ptr->jmpbuf))
-   {
-      png_read_destroy(png_ptr, info_ptr, (png_info *)0);
-      /* free pointers before returning, if necessary */
-      free(png_ptr);
-      free(info_ptr);
-      fclose(fp);
-      return;
-   }
+	if (setjmp(png_ptr->jmpbuf))
+	{
+		png_read_destroy(png_ptr, info_ptr, (png_info *)0);
+		/* free pointers before returning, if necessary */
+		free(png_ptr);
+		free(info_ptr);
+		fclose(fp);
+		return;
+	}
 
 Next, you will need to call png_read_init() and png_info_init().
 These functions make sure all the fields are initialized to useful
@@ -138,10 +137,11 @@ would be bad.
 Now you need to set up the input code.  The default for libpng is
 to use the C function fread().  If you use this, you will need to
 pass a valid FILE * in the function png_init_io().  Be sure that
-the file is opened in binary mode.  Otherwise, you should see the
-section below on Customizing libpng I/O functions.
+the file is opened in binary mode.  If you wish to handle reading
+data in another way, see the discussion on png i/o handling in the
+Customizing Libpng section below.
 
-   png_init_io(png_ptr, fp);
+	png_init_io(png_ptr, fp);
 
 You are now ready to read all the file information up to the actual
 image data.  You do this with a call to png_read_info().
@@ -150,7 +150,7 @@ image data.  You do this with a call to png_read_info().
 
 The png_info structure is now filled in with all the data necessary
 to read the file.  Some of the more important parts of the png_info are:
-   width - holds the width of the file
+	width - holds the width of the file
    height - holds the height of the file
    bit_depth - holds the bit depth of one of the image channels
    color_type - describes the channels and what they mean
@@ -158,13 +158,13 @@ to read the file.  Some of the more important parts of the png_info are:
    channels - number of channels of info for the color type
    pixel_depth - bits per pixel
    rowbytes - number of bytes needed to hold a row
-   interlace_type - currently 0 for none, 1 for interlaced
-   valid - this details which optional chunks were found in the file
-      to see if a chunk was present, OR valid with the appropriate
+	interlace_type - currently 0 for none, 1 for interlaced
+	valid - this details which optional chunks were found in the file
+		to see if a chunk was present, OR valid with the appropriate
       PNG_INFO_<chunk name> define.
    palette and num_palette - the palette for the file
    gamma - the gamma the file is written at
-   sig_bit - the number of significant bits for red, green, blue, grey, alpha
+   sig_bit and sig_bit_number - the number of significant bits
    trans, trans_values, and number_trans - transparency info
    hist - histogram of palette
    text and num_text - text comments in the file.
@@ -179,26 +179,13 @@ suggested keywords, there is no requirement to restrict the use
 to these strings.  There is a requirement to have at least one
 character for a keyword.  It is strongly suggested that keywords
 be sensible to humans (that's the point), so don't use abbreviations.
-Some suggested keywords for tEXT (or zTXt) chunks are:
+See the png specification for more details.  There is no requirement
+to have text after the keyword.
 
-   Title            Short (one line) title or caption for image
-   Author           Name of image's creator
-   Copyright        Copyright notice (possibly long)
-   Description      Description of image (possibly long)
-   Software         Software used to create the image
-   Disclaimer       Legal disclaimer (possibly long)
-   Warning          Warning of nature of content
-   Source           Device used to create the image
-   Comment          Miscellaneous comment; conversion from GIF comment
-   Created          When the image or source file was created
-
-There is no requirement to have text after the keyword on tEXt chunks.
-However, you must have text after the keyword on zTXt chunks, as only
-the text gets compressed, and compressing nothing will result in an error.
-
-The maximum length of the keyword is limited to 80 characters.  It is
-possible to use the same keyword any number of times.  The text field
-is an array of png_text structures, each holding pointer to a keyword
+Keywords are restricted to 80 characters without leading or trailing
+spaces, but spaces are allowed within the keyword  Nothing
+prevents you from duplicating the keyword.  The text field is an
+array of png_text structures, each holding pointer to a keyword
 and a pointer to a text string.  Only the text string may be null.
 The keyword/text pairs are put into the array in the order that
 they are received.  However, some or all of the text chunks may be
@@ -217,16 +204,16 @@ check to see if it has data that it can do somthing with, you should
 make sure to only enable a transformation if it will be valid for
 the data.  For example, don't swap red and blue on grayscale data.
 
-This transforms bit depths of less than 8 to 8 bits, changes paletted
+This transforms bit depths of less then 8 to 8 bits, changes paletted
 images to rgb, and adds an alpha channel if there is transparency
 information in a tRNS chunk.  This is probably most useful on grayscale
 images with bit depths of 2 or 4 and tRNS chunks.
 
    if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
       info_ptr->bit_depth < 8)
-      png_set_expand(png_ptr);
+		png_set_expand(png_ptr);
 
-   if (info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
+	if (info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
       info_ptr->bit_depth < 8)
       png_set_expand(png_ptr);
 
@@ -243,26 +230,25 @@ If you are modifying the color data with png_set_expand(), you must
 indicate whether the background needs to be expanded.  See the
 function definition in png.h for more details.
 
-   png_color_16 my_background;
+	png_color_16 my_background;
 
    if (info_ptr->valid & PNG_INFO_bKGD)
       png_set_backgrond(png_ptr, &(info_ptr->background),
-         PNG_GAMMA_FILE, 1, 1.0);
+			PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
    else
       png_set_background(png_ptr, &my_background,
-         PNG_GAMMA_SCREEN, 0, 1.0);
+         PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
 
 This handles gamma transformations of the data.  Pass both the file
 gamma and the desired screen gamma.  If the file does not have a
 gamma value, you can pass one anyway if you wish.  Note that file
 gammas are inverted from screen gammas.  See the discussions on
-gamma in the PNG specification for more information.  It is strongly
-reccommended that viewers support gamma correction.
+gamma in the PNG specification for more information.
 
    if (info_ptr->valid & PNG_INFO_gAMA)
       png_set_gamma(png_ptr, screen_gamma, info_ptr->gamma);
-   else
-      png_set_gamma(png_ptr, screen_gamma, 0.45);
+	else
+		png_set_gamma(png_ptr, screen_gamma, 0.45);
 
 PNG can have files with 16 bits per channel.  If you only can handle
 8 bits per channel, this will strip the pixels down to 8 bit.
@@ -281,7 +267,7 @@ will fit into maximum_colors.  If there is an histogram, it will
 use it to make intelligent choises when reducing the palette.  If
 there is no histogram, it may not do a good job.
 
-   if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
+	if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
    {
       if (info_ptr->valid & PNG_INFO_PLTE)
          png_set_dither(png_ptr, info_ptr->palette,
@@ -289,7 +275,7 @@ there is no histogram, it may not do a good job.
                info_ptr->histogram);
       else
       {
-         png_color std_color_cube[MAX_SCREEN_COLORS] =
+			png_color std_color_cube[MAX_SCREEN_COLORS] =
             { ... colors ... };
 
          png_set_dither(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
@@ -325,7 +311,7 @@ PNG files store 3 color pixels in red, green, blue order.  If you would
 rather have the pixels as blue, green, red, call this.
 
    if (info_ptr->color_type == PNG_COLOR_TYPE_RGB ||
-      info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+		info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       png_set_bgr(png_ptr);
 
 For some uses, you may want a grayscale image to be represented as
@@ -333,7 +319,7 @@ rgb.  If you need this, call this:
 
    if (info_ptr->color_type == PNG_COLOR_TYPE_GRAY ||
       info_ptr->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-      png_set_gray_to_rgb(png_ptr);
+		png_set_gray_to_rgb(png_ptr);
 
 PNG files store 16 bit pixels in network byte order (most significant
 bit first).  If you would rather store them the other way, (the way
@@ -365,7 +351,7 @@ who need an updated palette before they read the image data.  If you
 don't call this function, the library will automatically call it
 before it reads the first row.
 
-   png_start_read_image(png_ptr);
+	png_start_read_image(png_ptr);
 
 If you want, libpng will update your png_info structure to reflect
 any transformations you've requested with this call.  This is most
@@ -373,7 +359,7 @@ useful to update the info structures rowbytes field, so you can
 use it to allocate your image memory.  This function calls
 png_start_read_image(), so you don't have to call both of them.
 
-   png_read_update_info(png_ptr, info_ptr);
+	png_read_update_info(png_ptr, info_ptr);
 
 After you call png_read_update_info(), you can allocate any
 memory you need to hold the image.  As the actual allocation
@@ -397,7 +383,7 @@ times, or any of that other stuff necessary with png_read_rows().
 
 where row_pointers is:
 
-   void *row_pointers[height];
+	png_bytep row_pointers[height];
 
 You can point to void or char or whatever you use for pixels.
 
@@ -412,7 +398,7 @@ row_pointers is the same as in the png_read_image() call.
 If you are just calling one row at a time, you can do this for
 row_pointers:
 
-   char *row_pointers = row;
+   png_bytep row_pointers = row;
 
    png_read_rows(png_ptr, &row_pointers, NULL, 1);
 
@@ -460,7 +446,7 @@ rows between calls.  You can change the locations of the data, just
 not the data.  Each pass only writes the pixels appropriate for that
 pass, and assumes the data from previous passes is still valid.
 
-   png_read_rows(png_ptr, row_pointers, NULL, number_of_rows);
+	png_read_rows(png_ptr, row_pointers, NULL, number_of_rows);
 
 If you only want the first effect (the rectangles), do the same as
 before except pass the row buffer in the third parameter, and leave
@@ -484,6 +470,133 @@ read or write.  For a more compact example of reading a PNG image,
 see the file example.c.
 
 
+Reading PNG files progressively:
+
+The progressive reader is slightly different then the non-progressive
+reader.  Instead of calling png_read_info(), png_read_rows(), and
+png_read_end(), you make one call to png_process_data(), which calls
+callbacks when it has the info, a row, or the end of the image.  You
+set up these callbacks with png_set_progressive_read_fn().  You don't
+have to worry about the input/output functions of libpng, as you are
+giving the library the data directly in png_process_data().  I will
+assume that you have read the second on reading PNG files above,
+so I will only highlight the differences (although I will show
+all of the code).
+
+png_structp png_ptr;
+png_infop info_ptr;
+
+int
+initialize_png_reader()
+{
+	png_ptr = malloc(sizeof (png_struct));
+	if (!png_ptr)
+		return -1;
+	info_ptr = malloc(sizeof (png_info));
+	if (!info_ptr)
+	{
+		free(png_ptr);
+		return -1;
+	}
+
+	if (setjmp(png_ptr->jmpbuf))
+	{
+		png_read_destroy(png_ptr, info_ptr, (png_info *)0);
+		/* free pointers before returning, if necessary */
+		free(png_ptr);
+		free(info_ptr);
+		return -1;
+	}
+
+	png_info_init(info_ptr);
+	png_read_init(png_ptr);
+
+	/* this one's new.  You will need to provide all three
+		function callbacks, even if you aren't using them all.
+		You can put a void pointer in place of the NULL, and
+		retrieve the pointer from inside the callbacks using
+      the function png_get_progressive_ptr(png_ptr); */
+	png_set_progressive_read_fn(png_ptr, NULL,
+		info_callback, row_callback, end_callback);
+
+	return 0;
+}
+
+int
+process_data(png_bytep buffer, png_uint_32 length)
+{
+	if (setjmp(png_ptr->jmpbuf))
+	{
+		png_read_destroy(png_ptr, info_ptr, (png_info *)0);
+		free(png_ptr);
+		free(info_ptr);
+		return -1;
+	}
+
+	/* this one's new also.  Simply give it a chunk of data
+		from the file stream (in order, of course).  On Segmented
+		machines, don't give it any more then 64K.  The library
+		seems to run fine with sizes of 4K, although you can give
+		it much less if necessary (I assume you can give it chunks
+		of 1 byte, but I haven't tried less then 256 bytes yet).
+		When this function returns, you may want to display any
+		rows that were generated in the row callback. */
+	png_process_data(png_ptr, info_ptr, buffer, length);
+	return 0;
+}
+
+info_callback(png_structp png_ptr, png_infop info)
+{
+	do any setup here, including setting any of the transformations
+	mentioned in the Reading PNG files section.  For now, you _must_
+	call either png_start_read_image() or png_read_update_info()
+	after all the transformations are set (even if you don't set
+	any).  You may start getting rows before png_process_data()
+	returns, so this is your last chance to prepare for that.
+}
+
+row_callback(png_structp png_ptr, png_bytep new_row,
+	png_uint_32 row_num, int pass)
+{
+	this function is called for every row in the image.  If the
+	image is interlacing, and you turned on the interlace handler,
+	this function will be called for every row in every pass.
+	Some of these rows will not be changed from the previous pass.
+	When the row is not changed, the new_row variable will be NULL.
+	The rows and passes are called in order, so you don't really
+	need the row_num and pass, but I'm supplying them because it
+	may make your life easier.
+
+	For the non-NULL rows of interlaced images, you must call
+	png_progressive_combine_row() passing in the row and the
+	old row.  You can call this function for NULL rows (it will
+	just return) and for non-interlaced images (it just does the
+	memcpy for you) if it will make the code easier.  Thus, you
+	can just do this for all cases:
+
+	png_progressive_combine_row(png_ptr, old_row, new_row);
+
+	where old_row is what was displayed for previous rows.  Note
+	that the first pass (pass == 0 really) will completely cover
+	the old row, so the rows do not have to be initialized.  After
+	the first pass (and only for interlaced images), you will have
+	to pass the current row, and the function will combine the
+	old row and the new row.
+}
+
+end_callback(png_structp png_ptr, png_infop info)
+{
+	this function is called when the whole image has been read,
+	including any chunks after the image (up to and including
+	the IEND).  You will usually have the same info chunk as you
+	had in the header, although some data may have been added
+	to the comments and time fields.
+
+	Most people won't do much here, perhaps setting a flag that
+	marks the image as finished.
+}
+
+
 Writing PNG files:
 
 Much of this is very similar to reading.  However, everything of
@@ -495,11 +608,11 @@ and initialize png_struct and png_info.  As these are both large, you
 may not want to store these on the stack, unless you have stack space
 to spare.
 
-   png_struct *png_ptr = malloc(sizeof (png_struct));
-   if (!png_ptr)
-      return;
-   png_info *info_ptr = malloc(sizeof (png_info));
-   if (!info_ptr)
+	png_structp png_ptr = malloc(sizeof (png_struct));
+	if (!png_ptr)
+		return;
+   png_infop info_ptr = malloc(sizeof (png_info));
+	if (!info_ptr)
    {
       free(png_ptr);
       return;
@@ -513,7 +626,7 @@ much to undo.
    if (!fp)
    {
       free(png_ptr);
-      free(info_ptr);
+		free(info_ptr);
       return;
    }
 
@@ -524,20 +637,18 @@ setjmp and pass the jmpbuf field of your png_struct.  If you
 write the file from different routines, you will need to update
 the jmpbuf field every time you enter a new routine that will
 call a png_ function.  See your documentation of setjmp/longjmp
-for your compiler for more information on setjmp/longjmp.  If you
-don't want to use stderr for error output, or you want to use a
-method other than setjmp()/longjmp() to handle errors, see the
-Customizing Libpng section below for more information on libpng
-error handling.
+for your compiler for more information on setjmp/longjmp.  See
+the discussion on png error handling in the Customizing Libpng
+section below for more information on the png error handling.
 
    if (setjmp(png_ptr->jmpbuf))
    {
       png_write_destroy(png_ptr);
-      /* free pointers before returning.  Make sure you clean up
+		/* free pointers before returning.  Make sure you clean up
          anything else you've done. */
       free(png_ptr);
       free(info_ptr);
-      fclose(fp);
+		fclose(fp);
       return;
    }
 
@@ -555,7 +666,7 @@ Now you need to set up the input code.  The default for libpng is
 to use the C function fwrite().  If you use this, you will need to
 pass a valid FILE * in the function png_init_io().  Be sure that
 the file is opened in binary mode.  If you wish to handle writing
-data in another way, see the discussion on PNG I/O handling in the
+data in another way, see the discussion on png i/o handling in the
 Customizing Libpng section below.
 
    png_init_io(png_ptr, fp);
@@ -563,7 +674,7 @@ Customizing Libpng section below.
 You now have the option of modifying how the compression library
 will run.  The following functions are mainly for testing, but
 may be useful in certain special cases, like if you need to
-write PNG files extremely fast and are willing to give up some
+write png files extremely fast and are willing to give up some
 compression, or if you want to get the maximum possible compression
 at the expense of slower writing.  If you have no special needs
 in this area, let the library do what it wants, as it has been
@@ -571,36 +682,14 @@ carefully tuned to deliver the best speed/compression ratio.
 See the compression library for more details.
 
    /* turn on or off filtering (1 or 0) */
-   png_set_filtering(png_struct *png_ptr, 1);
+   png_set_filtering(png_ptr, 1);
 
-   /* compression level (0 - none, 6 - default, 9 - maximum) */
-   png_set_compression_level(png_ptr, Z_DEFAULT_COMPRESSION);
+	png_set_compression_level(png_ptr, Z_DEFAULT_COMPRESSION);
    png_set_compression_mem_level(png_ptr, 8);
    png_set_compression_strategy(png_ptr, Z_DEFAULT_STRATEGY);
    png_set_compression_window_bits(png_ptr, 15);
    png_set_compression_method(png_ptr, 8);
 
-It is possible to have libpng flush any pending output, either manually,
-or automatically after a certain number of lines have been written.  To
-flush the output stream a single time call:
-
-   png_write_flush(png_ptr);
-
-and to have libpng flush the output stream after a certain number of
-scanlines have been written, call:
-
-   png_set_flush(png_ptr, nrows);
-
-Note that the distance between rows is from the last time png_write_flush
-was called, or the first row of the image if it has never been called.
-So if you write 50 lines, and then png_set_flush 25, it will flush the
-output on the next scanline, and on line 75, unless png_write_flush is
-called earlier.  If nrows is too small (less than about 10 lines) the
-image compression may decrease dramatically (although this may be
-acceptable for real-time applications).  Infrequent flushing will only
-degrade the compression performance by a few percent over images that
-do not use flushing.
-   
 You now need to fill in the png_info structure with all the data
 you wish to write before the actual image.  Note that the only thing
 you are allowed to write after the image is the text chunks and the
@@ -613,7 +702,7 @@ parts of the png_info are:
    width - holds the width of the file
    height - holds the height of the file
    bit_depth - holds the bit depth of one of the image channels
-   color_type - describes the channels and what they mean
+	color_type - describes the channels and what they mean
       see the PNG_COLOR_TYPE_ defines for more information
    interlace_type - currently 0 for none, 1 for interlaced
    valid - this describes which optional chunks to write to the
@@ -623,7 +712,7 @@ parts of the png_info are:
       appropriate PNG_INFO_<chunk name> define.
    palette and num_palette - the palette for the file
    gamma - the gamma the file is written at
-   sig_bit - the number of significant bits for red, green, blue, grey, alpha
+   sig_bit and sig_bit_number - the number of significant bits
    trans, trans_values, and number_trans - transparency info
    hist - histogram of palette
    text and num_text - text comments in the file.
@@ -656,25 +745,18 @@ you can leave off the text string on non-compressed pairs.
 Compressed pairs must have a text string, as only the text string
 is compressed anyway, so the compression would be meaningless.
 
-PNG supports MODIFICATION time via the png_time structure.  Two
+PNG supports modification time via the png_time structure.  Two
 conversion routines are proved, png_convert_from_time_t() for
 time_t and png_convert_from_struct_tm() for struct tm.  The
 time_t routine uses gmtime().  You don't have to use either of
 these, but if you wish to fill in the png_time structure directly,
 you should provide the time in universal time (GMT) if possible
-instead of your local time.  Note that the year number is the full
-year number (ie 1995 rather than 95).
-
-Since the CREATION time of an image is somewhat ambiguous, it is not
-sensible to store an exact time like the tIME chunk above (ie when was
-a scanned photo of neanderthal art created?).  However, a text chunk
-with a "Created" keyword can hold this information, in a form which is
-useful (ie "Painted circa 40000 BC, photographed 1971, scanned 1996").
+instead of your local time.
 
 You are now ready to write all the file information up to the actual
 image data.  You do this with a call to png_write_info().
 
-   png_write_info(png_ptr, info_ptr);
+	png_write_info(png_ptr, info_ptr);
 
 After you've read the file information, you can set up the library to
 handle any special transformations of the image data.  The various
@@ -746,7 +828,7 @@ PNG files describe moncrome as black is zero and white is one.  If you
 would rather supply the pixels with this reversed (black is one and
 white is zero), call this:
 
-   png_set_invert(png_ptr);
+	png_set_invert(png_ptr);
 
 That's it for the transformations.  Now you can write the image data.
 The simplest way to do this is in one function call.  If have the
@@ -760,7 +842,7 @@ times, or any of that other stuff necessary with png_write_rows().
 
 where row_pointers is:
 
-   void *row_pointers[height];
+   png_bytef *row_pointers[height];
 
 You can point to void or char or whatever you use for pixels.
 
@@ -775,7 +857,7 @@ row_pointers is the same as in the png_write_image() call.
 If you are just calling one row at a time, you can do this for
 row_pointers:
 
-   char *row_pointers = row;
+	png_bytep row_pointers = row;
 
    png_write_rows(png_ptr, &row_pointers, 1);
 
@@ -811,7 +893,7 @@ pass the an appropriately filled png_info pointer.  If you
 are not interested, you can pass NULL.  Be careful that you don't
 write the same text or time chunks here as you did in png_write_info().
 
-   png_write_end(png_ptr, info_ptr);
+	png_write_end(png_ptr, info_ptr);
 
 When you are done, you can free all memory used by libpng like this:
 
@@ -831,43 +913,41 @@ standard things like memory allocation, input/output, and error handling.
 The second deals with more complicated things like adding new chunks,
 adding new transformations, and generally changing how libpng works.
 
-All of the memory allocation in libpng is done in pngmem.c.  Memory
-allocation is done through the functions png_large_malloc(), png_malloc(),
-png_realloc(), png_large_free(), and png_free().  These currently just
-call the standard C functions.  The large functions must handle at least
-64K, but they don't have to handle more then that.  If your pointers can't
-access more then 64K at a time, you will want to set MAXSEG_64K in zlib.h.
+All of the memory allocation, input/output, and error handling in libpng
+goes through callbacks which are user setable.  The default routines
+are in pngerror.c, pngmem.c, and pngio.c.  To change these functions,
+call the approprate fn function.
 
-Since it is unlikely that the method of handling memory allocation on a
-platform will change between applications, these functions must be modified
-or replaced to change their behaviour.  If you only need to add new tests or
-flags to have the compiler choose the correct function calls, please forward
-these changes to the libpng author, so they can be added into the library
-for the benefit of others.
+Memory allocation is done through the functions png_large_malloc(),
+png_malloc(), png_realloc(), png_large_free(), and png_free().
+These currently just call the standard C functions.  The large
+functions must handle exactly 64K, but they don't have to handle
+more then that.  If your pointers can't access more then 64K at a
+time, you will want to set MAXSEG_64K in zlib.h.
 
-All of the input/output, and error handling in libpng go through the
-routines in pngio.c by default.  The file has plenty of comments describing
-each function and how it expects to work.  It is possible to supply different
-I/O and error handling methods at run time with the png_set_msg_fn(),
-png_set_read_fn(), and png_set_write_fn() calls.
+Input/Output in libpng is done throught png_read() and png_write(), which
+currently just call fread() and fwrite().  The FILE * is stored in
+png_struct, and is initialized via png_init_io().  If you wish to change
+this, the library supplies callbacks that you can set through the
+function png_set_read_fn() and png_set_write_fn().  These functions
+also provide a void pointer that can be retrieved via the function
+png_get_io_ptr().  For example:
 
-Input/Output in libpng is done throught png_read_data() and png_write_data(),
-which currently just call fread() and fwrite().  The error and warning
-functions png_error() and png_warning() use stderr to output any messages,
-and png_error() uses longjmp to return from an error.  These default
-functions are set by via png_init_io().
+	png_set_read_fn(png_structp png_ptr, voidp io_ptr,
+		png_rw_ptr read_data_fn)
 
-If you wish to change some or all of these functions, it is possible to
-do so at runtime, and without modifying the libpng library code.  The
-application must supply replacement functions which have the same arguments
-and are functionally equivalent to the default functions.  If you are
-replacing both the I/O and message functions, the call to png_init_io()
-is not needed.
+	png_set_write_fn(png_structp png_ptr, voidp io_ptr,
+		png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn);
 
-Error handling in libpng is done through png_error() and png_warning() by
-default.  Errors handled through png_error() are fatal, meaning that
-png_error() should never return to it's caller.  Currently, this is handled
-via setjmp() and longjmp(), but you could change this to do things like
+	voidp io_ptr = png_get_io_ptr(png_ptr);
+
+Note that you can pass NULL for the flush function if you are not doing
+flushing.
+
+Error handling in libpng is done through png_error() and png_warning().
+Errors handled through png_error() are fatal, meaning that png_error()
+should never return to it's caller.  Currently, this is handled via
+setjmp() and longjmp(), but you could change this to do things like
 exit() if you should wish.  Similarly, both png_error() and png_warning()
 print a message on stderr, but that can also be changed.  The motivation
 behind using setjmp() and longjmp() is the C++ throw and catch exception
@@ -876,72 +956,14 @@ is no need to check every return code of every function call.  However,
 there are some uncertainties about the status of local variables after
 a longjmp, so the user may want to be careful about doing anything after
 setjmp returns non zero besides returning itself.  Consult your compiler
-documentation for more details.
+documentation for more details.  If you wish to change this behavior,
+you will need to set up your own message callbacks.  You do this like
+the io callbacks above.
 
-The replacement message functions should have parameters as follows:
+	png_set_message_fn(png_structp png_ptr, png_voidp msg_ptr,
+		png_msg_ptr error_fn, png_msg_ptr warning_fn);
 
-   void user_error_fn(png_struct png_ptr, char *error_msg);
-   void user_warning_fn(png_struct png_ptr, char *warning_msg);
-
-These functions can be attached to a PNG stream with a call
-
-   png_set_msg_fn(png_ptr, msg_ptr, user_error_fn, user_warning_fn);
-
-If NULL is supplied for user_error_fn, then the error function will not
-print any error messages, and will return via longjmp(png_ptr->jmpbuf,1) to
-the last location setjmp(png_ptr->jmpbuf) was previously called.  If NULL is
-supplied for user_warning_fn then no warning messages will be printed.
-
-In order to make it possible to have multiple PNG files open at the same
-time, the replacement message functions should not modify any global
-variables.  In order to have any message information available to the
-libpng streams, there is a pointer available to for a user variable or
-structure.  If more than one variable or structure of needs to be kept
-with each stream, then you must create a structure which holds all the
-relevant data.  The pointer to this data is set in the initial png_set_msg_fn
-call, and can be accessed with:
-
-   msg_ptr = (user_msg_type *)png_get_msg_ptr(png_ptr);
-
-The replacement I/O functions should have prototypes as follows:
-
-   void user_read_data(png_struct *png_ptr,png_bytef *data,png_uint_32 length);
-   void user_write_data(png_struct *png_ptr,png_bytef *data,png_uint_32 length);
-
-where the routine will read or write "length" bytes into or out of "data".
-If the routines are unable to read or write the correct number of bytes, they
-should call (*(png_ptr->error_fn))(png_ptr, "Error message"); to abort.
-
-   void user_output_flush(png_struct *png_ptr);
-
-will flush any data from the buffer used by the output device.  Note that
-the flush function is purely to output any data being stored by the write
-function, and has no control over any data buffered inside the compressor.
-
-These functions can be attached to a PNG stream by calling one of
-
-   png_set_read_fn(png_ptr, io_ptr, user_read_data);
-   png_set_write_fn(png_ptr, io_ptr, user_write_data, user_output_flush);
-
-You should only call one of these two functions for a single PNG stream.
-It is a fatal error to read from a write stream, and vice-versa.  If the
-output method you are using does not buffer any data, or you have chosen
-not to compile libpng with PNG_WRITE_FLUSH_SUPPORTED, NULL may be supplied
-instead of a function name for user_output_flush, and an empty function will
-be used.  Note that even if the output method being used does not buffer
-output, during compression data is buffered by the compressor.  If an
-application wants to guarantee that all pending output data has been written,
-it should call png_write_flush, which will flush the compression buffers,
-and in turn call the user_output_flush function.
-
-As with the message functions, the replacement I/O functions should not
-modify any global variables.  Therse is a separate pointer available to for
-an I/O variable or structure.  If more than one variable or structure of
-needs to be kept with each stream, then you must create a structure which
-holds all the relevant data.  The pointer to this data is set in the initial
-set_xxx_fn call, and can be accessed with:
-
-   io_ptr = (user_io_type *)png_get_io_ptr(png_ptr);
+	png_voidp msg_ptr = png_get_msg_ptr(png_ptr);
 
 If you need to read or write custom chunks, you will need to get deeper
 into the libpng code.  First, read the PNG specification, and have
@@ -950,9 +972,7 @@ attention to the sections that describe chunk names, and look
 at how other chunks were designed, so you can do things similar.
 Second, check out the sections of libpng that read and write chunks.
 Try to find a chunk that is similar to yours, and copy off of it.
-More details can be found in the comments inside the code.  If you are
-truly ambitious, you can modify the libpng code to handle unknown chunks
-in a general way and send the code to the libpng author.
+More details can be found in the comments inside the code.
 
 If you wish to write your own transformation for the data, look
 through the part of the code that does the transformations, and check
@@ -963,21 +983,32 @@ itself.
 
 Configuring for 16 bit platforms:
 
-You will probably need to change the png_large_malloc() and
-png_large_free() routines in pngmem.c, as these are required
+You will may need to change the png_large_malloc() and
+png_large_free() routines in pngmem.c, as these are requred
 to allocate 64K.  Also, you will want to look into zconf.h to tell
 zlib (and thus libpng) that it cannot allocate more then 64K at a
 time.  Even if you can, the memory won't be accessable.  So limit zlib
 and libpng to 64K by defining MAXSEG_64K.
 
+Configuring for Medium Model:
+
+Libpng's support for medium model has been tested on most of the popular
+complers.  Make sure MAXSEG_64K get's defined, USE_FAR_KEYWORD get's
+defined, and FAR get's defined to far in pngconf.h, and you should be
+all set.  Everything in the library (except for zlib's structure) is
+expecting far data.  You must use the typedefs with the p or pp on
+the end for pointers (or at least look at them and be careful).  Make
+note that the row's of data are defined as png_bytepp which is a
+unsigned char far * far *
+
 Configuring for gui/windowing platforms:
 
-You will need to supply new message display functions for png_error() and
-png_warning() (through png_set_message_fn() to display a message in a window
-instead of fprinting it to stderr.  You may want to write a single function
-to do this and call it something like png_message() (although the error
-function should still call longjmp or otherwise handle the error without
-returning).
+You will need to change the error message display in png_error() and
+png_warning() to display a message instead of fprinting it to stderr.
+You may want to write a single function to do this and call it something
+like png_message().  On some compliers, you may have to change the
+memory allocators (png_malloc, etc.).
+
 
 Configuring for compiler xxx:
 
@@ -989,13 +1020,15 @@ files in libpng proper only include png.h.
 
 Removing unwanted object code:
 
-There are a bunch of #define's in pngconf.h that control what parts of
+There are a bunch of #define's in png.h that control what parts of
 libpng are compiled.  All the defines end in _SUPPORT.  If you are
-never going to use an ability, you can change the #define to #undef and
+not using an ability, you can change the #define to #undef and
 save yourself code and data space.  All the reading and writing
 specific code are in seperate files, so the linker should only grab
 the files it needs.  However, if you want to make sure, or if you
 are building a stand alone library, all the reading files start with
 pngr and all the writing files start with pngw.  The files that
 don't match either (like png.c, pngtrans.c, etc.) are used for
-both reading and writing, and always need to be included.
+both reading and writing, and always need to be included.  The
+progressive reader is in pngpread.c
+

@@ -2,26 +2,25 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=gcc
-CFLAGS=-I../zlib -O2 -Wall -ansi -pedantic
+CC=cc
+CFLAGS=-I../zlib -O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
-RANLIB=ranlib
-#RANLIB=echo
+#RANLIB=ranlib
+RANLIB=echo
 
 # where make install puts libpng.a and png.h
-prefix=/home/munet-d2/sun/local
+prefix=/usr/local
 
 OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngio.o pngwrite.o pngrtran.o pngwtran.o \
-   pngmem.o
+   pngmem.o pngerror.o pngpread.o
 
 all: libpng.a pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
-	rcp libpng.a vlsi:bin/lib/libpng.a
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
@@ -45,6 +44,7 @@ clean:
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
 png.o: png.h pngconf.h
+pngerror.o: png.h pngconf.h
 pngio.o: png.h pngconf.h
 pngmem.o: png.h pngconf.h
 pngrcb.o: png.h pngconf.h
@@ -56,3 +56,4 @@ pngtrans.o: png.h pngconf.h
 pngwrite.o: png.h pngconf.h
 pngwtran.o: png.h pngconf.h
 pngwutil.o: png.h pngconf.h
+pngpread.o: png.h pngconf.h
