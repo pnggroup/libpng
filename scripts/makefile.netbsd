@@ -1,89 +1,42 @@
-# makefile for libpng on NetBSD
-# Copyright (C) 2001 Glenn Randers-Pehrson
-# Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+# makefile for libpng for NetBSD for the standard
+# make obj && make depend && make && make test
+# make includes && make install
+# Copyright (C) 2001 Patrick R.L. Welche
 # For conditions of distribution and use, see copyright notice in png.h
 
-# where make install puts libpng.a and png.h
-# pkgsrc will want prefix=${PREFIX}
-prefix=/usr/local
-INCPATH=$(prefix)/include
-LIBPATH=$(prefix)/lib
+LOCALBASE?=/usr/local
+LIBDIR=	${LOCALBASE}/lib
+MANDIR= ${LOCALBASE}/man
+INCSDIR=${LOCALBASE}/include
 
-# The zlib library and include files are part of the standard system
+LIB=png
+SHLIB_MAJOR= 2
+SHLIB_MINOR= 1.0.11
+SRCS=	pnggccrd.c png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
+	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
+	pngwtran.c pngmem.c pngerror.c pngpread.c
+INCS=	png.h pngconf.h
+MAN=	libpng.3 libpngpf.3 png.5
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
-# have to change it.
-PNGMAJ = 2
-PNGMIN = 1.0.11rc1
-PNGVER = $(PNGMAJ).$(PNGMIN)
+CPPFLAGS+=-I${.CURDIR} -DPNG_USE_PNGGCCRD
 
-CC=cc
-# You can define PNG_ASSEMBLER_CODE_SUPPORTED if building for Intel x86
-CFLAGS=-O2 -DPNG_USE_PNGGCCRD # -DPNG_ASSEMBLER_CODE_SUPPORTED  -g -DPNG_DEBUG=1
-LDFLAGS=-Wl,-R${LIBPATH} -L. -lpng -lz -lm
+CPPFLAGS+=-DPNG_NO_ASSEMBLER_CODE
+# something like this for mmx assembler, but it core dumps for me at the moment
+# .if ${MACHINE_ARCH} == "i386"
+#   MKLINT= no
+# .else
+#   CPPFLAGS+=-DPNG_NO_ASSEMBLER_CODE
+# .endif
 
-#RANLIB=echo
-RANLIB=ranlib
+CLEANFILES+=pngtest.o pngtest
 
-OBJS = pnggccrd.o png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
-	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-	pngwtran.o pngmem.o pngerror.o pngpread.o
+pngtest.o:	pngtest.c
+	${CC} -c ${CPPFLAGS} ${CFLAGS} ${.ALLSRC} -o ${.TARGET}
 
-all: libpng.so libpng.a pngtest
+pngtest:	pngtest.o libpng.a
+	${CC} ${LDFLAGS} ${.ALLSRC} -o${.TARGET} -lz -lm
 
-libpng.a: $(OBJS)
-	ar rc $@  $(OBJS)
-	$(RANLIB) $@
+test:	pngtest
+	cd ${.CURDIR} && ${.OBJDIR}/pngtest
 
-libpng.so: libpng.so.$(PNGMAJ)
-	ln -f -s libpng.so.$(PNGMAJ) libpng.so
-
-libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
-
-libpng.so.$(PNGVER): $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB) -lz -lm
-
-pngtest: pngtest.o libpng.a
-	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
-
-test: pngtest
-	./pngtest
-
-install: libpng.a libpng.so.$(PNGVER)
-	-@mkdir $(INCPATH)
-	-@mkdir $(LIBPATH)
-	cp png.h $(INCPATH)
-	cp pngconf.h $(INCPATH)
-	chmod 644 $(INCPATH)/png.h
-	chmod 644 $(INCPATH)/pngconf.h
-	cp libpng.a $(LIBPATH)
-	cp libpng.so.$(PNGVER) $(LIBPATH)
-	chmod 644 $(LIBPATH)/libpng.a
-	chmod 644 $(LIBPATH)/libpng.so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -f -s libpng.so.$(PNGMAJ) libpng.so)
-
-clean:
-	rm -f *.o libpng.a pngtest pngout.png libpng.so*
-
-# DO NOT DELETE THIS LINE -- make depend depends on it.
-
-pnggccrd.o: png.h pngconf.h
-png.o: png.h pngconf.h
-pngerror.o: png.h pngconf.h
-pngrio.o: png.h pngconf.h
-pngwio.o: png.h pngconf.h
-pngmem.o: png.h pngconf.h
-pngset.o: png.h pngconf.h
-pngget.o: png.h pngconf.h
-pngread.o: png.h pngconf.h
-pngrtran.o: png.h pngconf.h
-pngrutil.o: png.h pngconf.h
-pngtest.o: png.h pngconf.h
-pngtrans.o: png.h pngconf.h
-pngwrite.o: png.h pngconf.h
-pngwtran.o: png.h pngconf.h
-pngwutil.o: png.h pngconf.h
-pngpread.o: png.h pngconf.h
+.include <bsd.lib.mk>

@@ -923,11 +923,13 @@ version 1.0.11beta2 [April 11, 2001]
   Updated scripts/pngos2.def
 version 1.0.11beta3 [April 14, 2001]
   Added checking the results of many instances of png_malloc() for NULL
-version 1.0.11rc1 [April 20, 2001]
+version 1.0.11beta4 [April 20, 2001]
   Undid the changes from version 1.0.11beta3.  Added a check for NULL return
     from user's malloc_fn().
   Removed some useless type casts of the NULL pointer.
-  Added makefile.netbsd .
+  Added makefile.netbsd
+version 1.0.11 [April 27, 2001]
+  Revised makefile.netbsd
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

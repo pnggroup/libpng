@@ -1,5 +1,5 @@
 
-Libpng 1.0.11rc1 - April 20, 2001
+Libpng 1.0.11 - April 27, 2001
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -10,9 +10,9 @@ Changes since the last public release (1.0.10):
   Changed several "//" single-line comments to C-style in pnggccrd.c
   Removed PNGAPI from private functions whose prototypes did not have PNGAPI.
   Updated scripts/pngos2.def
-  Added makefile.netbsd
   Added a check for NULL return from user's malloc_fn().
   Removed some useless type casts of the NULL pointer.
+  Added makefile.netbsd
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
