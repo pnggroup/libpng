@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.2.0beta3 - May 18, 2001
+ * libpng 1.2.0beta4 - June 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -226,7 +226,7 @@
 #  include <sys/types.h>
 #endif
 
-#ifndef PNG_SETJMP_NOT_SUPPORTED
+#if !defined(PNG_SETJMP_NOT_SUPPORTED) && !defined(PNG_NO_SETJMP_SUPPORTED)
 #  define PNG_SETJMP_SUPPORTED
 #endif
 
@@ -650,9 +650,6 @@
 #  ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #    define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #  endif
-#endif
-#ifndef PNG_NO_ZALLOC_ZERO
-#  define PNG_ZALLOC_ZERO
 #endif
 */
 

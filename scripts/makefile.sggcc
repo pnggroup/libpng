@@ -11,16 +11,21 @@ ZLIBINC=/usr/local/include
 #ZLIBLIB=../zlib
 #ZLIBINC=../zlib
 
+# ABI can be blank to use default for your system, -32, -o32, -n32, or -64
+# See "man abi".  zlib must be built with the same ABI.
+ABI=
+
 CC=gcc
 
 WARNMORE= # -g -DPNG_DEBUG=5
-CFLAGS=-I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
-# zlib must also be compiled with n32
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
-LDSHARED=gcc -shared
+CFLAGS=$(ABI) -I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
+LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
+LDSHARED=CC $(ABI) -shared
 
-VER=1.2.0beta3
-LIBS=libpng.so.1.2.0beta3
+VER=1.2.0beta4
+# See "man dso" for info about shared objects
+SONUM=3
+LIBS=libpng.so.$(SONUM).$(VER)
 SHAREDLIB=libpng.so
 libdir=$(prefix)/lib32
 
@@ -39,9 +44,9 @@ libpng.a: $(OBJS)
 
 $(SHAREDLIB).$(VER): $(OBJS)
 	$(LDSHARED) -o $@ $(OBJS)
-	rm -f $(SHAREDLIB) $(SHAREDLIB).1
+	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM)
 	ln -s $@ $(SHAREDLIB)
-	ln -s $@ $(SHAREDLIB).1
+	ln -s $@ $(SHAREDLIB).$(SONUM)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -60,9 +65,9 @@ install: libpng.a
 	chmod 644 $(prefix)/lib/libpng.a
 	cp $(SHAREDLIB).$(VER) $(libdir); chmod 755 $(SHAREDLIB).$(VER)
 	(cd $(libdir); if test -f $(SHAREDLIB).$(VER); then \
-	rm -f $(SHAREDLIB) $(SHAREDLIB).1; \
+	rm -f $(SHAREDLIB) $(SHAREDLIB).$(SONUM); \
 	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB); \
-	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB).1; \
+	ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB).$(SONUM); \
 	(ldconfig || true)  >/dev/null 2>&1; \
 	fi)
 

@@ -9,7 +9,6 @@
    with a little tweaking (or maybe not).
 
    to do:
-    - stdout/stderr don't work!  need message window (maybe scrollable?)
     - handle quoted command-line args (especially filenames with spaces)
     - have minimum window width:  oh well
     - use %.1023s to simplify truncation of title-bar string?
@@ -22,10 +21,11 @@
               match; switched to png_jmpbuf() macro
     - 1.02:  added extra set of parentheses to png_jmpbuf() macro; fixed
               command-line parsing bug
+    - 1.10:  enabled "message window"/console (thanks to David Geldreich)
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -52,13 +52,14 @@
 
 #define PROGNAME  "rpng-win"
 #define LONGNAME  "Simple PNG Viewer for Windows"
-#define VERSION   "1.02 of 19 March 2000"
+#define VERSION   "1.20 of 28 May 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <windows.h>
+#include <conio.h>      /* only for _getch() */
 
 /* #define DEBUG  :  this enables the Trace() macros */
 
@@ -128,7 +129,17 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     filename = (char *)NULL;
 
 
-    /* First set the default value for our display-system exponent, i.e.,
+    /* First reenable console output, which normally goes to the bit bucket
+     * for windowed apps.  Closing the console window will terminate the
+     * app.  Thanks to David.Geldreich@realviz.com for supplying the magical
+     * incantation. */
+
+    AllocConsole();
+    freopen("CONOUT$", "a", stderr);
+    freopen("CONOUT$", "a", stdout);
+
+
+    /* Next set the default value for our display-system exponent, i.e.,
      * the product of the CRT exponent and the exponent corresponding to
      * the frame-buffer's lookup table (LUT), if any.  This is not an
      * exhaustive list of LUT values (e.g., OpenStep has a lot of weird
@@ -272,20 +283,31 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     /* usage screen */
 
     if (error) {
-        fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
+        int ch;
+
+        fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
         readpng_version_info();
         fprintf(stderr, "\n"
-         "Usage:  %s [-gamma exp] [-bgcolor bg] file.png\n"
-         "    exp \ttransfer-function exponent (``gamma'') of the display\n"
-         "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
-         "\t\t  to the product of the lookup-table exponent (varies)\n"
-         "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
-         "    bg  \tdesired background color in 7-character hex RGB format\n"
-         "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
-         "\t\t  used with transparent images\n"
-         "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
-         "\n", PROGNAME, default_display_exponent);
+          "Usage:  %s [-gamma exp] [-bgcolor bg] file.png\n"
+          "    exp \ttransfer-function exponent (``gamma'') of the display\n"
+          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
+          "\t\t  to the product of the lookup-table exponent (varies)\n"
+          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
+          "    bg  \tdesired background color in 7-character hex RGB format\n"
+          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
+          "\t\t  used with transparent images\n"
+          "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
+          "Press Q or Esc to quit this usage screen.\n"
+          "\n", PROGNAME, default_display_exponent);
+        do
+            ch = _getch();
+        while (ch != 'q' && ch != 'Q' && ch != 0x1B);
         exit(1);
+    } else {
+        fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
+        fprintf(stderr,
+          "\n   [console window:  closing this window will terminate %s]\n\n",
+          PROGNAME);
     }
 
 

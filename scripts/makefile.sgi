@@ -7,7 +7,6 @@
 prefix=/usr/local
 
 # Where the zlib library and include files are located
-# You can add the -n32 option; then zlib must also be compiled with -n32
 #ZLIBLIB=/usr/local/lib32
 #ZLIBINC=/usr/local/include
 #ZLIBLIB=/usr/local/lib
@@ -17,16 +16,20 @@ ZLIBINC=../zlib
 
 CC=cc
 
-WARNMORE=-fullwarn
-# You can add the -n32 option; then zlib must also be compiled with -n32
-# Note: -KPIC is the default anyhow
-#CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) -KPIC -DPNG_USE_PNGGCCRD # -g -DPNG_DEBUG=5
-CFLAGS=-I$(ZLIBINC) -O $(WARNMORE) -DPNG_USE_PNGGCCRD -DPNG_NO_ASSEMBLER_CODE
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
-LDSHARED=cc -shared
+# ABI can be blank to use default for your system, -32, -o32, -n32, or -64
+# See "man abi".  zlib must be built with the same ABI.
+ABI=
 
-VER=1.2.0beta3
-SONUM=2
+WARNMORE=-fullwarn
+# Note: -KPIC is the default anyhow
+#CFLAGS= $(ABI) -I$(ZLIBINC) -O $(WARNMORE) -KPIC -DPNG_USE_PNGGCCRD # -g -DPNG_DEBUG=5
+CFLAGS=$(ABI) -I$(ZLIBINC) -O $(WARNMORE) -DPNG_USE_PNGGCCRD -DPNG_NO_ASSEMBLER_CODE
+LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
+LDSHARED=cc $(ABI) -shared
+
+VER=1.2.0beta4
+# See "man dso" for info about shared objects
+SONUM=3
 SHAREDLIB=libpng.so
 libdir=$(prefix)
 #libdir=$(prefix)/lib32

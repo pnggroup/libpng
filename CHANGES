@@ -948,11 +948,25 @@ version 1.2.0beta1 [May 6, 2001]
 version 1.2.0beta2 [May 7, 2001]
   Finished merging 1.2.0beta1 with version 1.0.11
   Added a check for attempts to read or write PLTE in grayscale PNG datastreams.
-version 1.2.0beta3 [May 18, 2001]
+version 1.2.0beta3 [May 17, 2001]
   Enabled user memory function by default.
   Modified png_create_struct so it passes user mem_ptr to user memory allocator.
   Increased png_mng_features flag from png_byte to png_uint_32.
   Bumped shared-library (so-number) and dll-number to 3.
+version 1.2.0beta4 [June 23, 2001]
+  Check for missing profile length field in iCCP chunk and free chunk_data
+     in case of truncated iCCP chunk.
+  Bumped shared-library number to 3 in makefile.sgi and makefile.sggcc
+  Bumped dll-number from 2 to 3 in makefile.cygwin
+  Revised contrib/gregbook/rpng*-x.c to avoid a memory leak and to exit cleanly
+     if user attempts to run it on an 8-bit display.
+  Updated contrib/gregbook
+  Use png_malloc instead of png_zalloc to allocate palette in pngset.c
+  Updated makefile.ibmc
+  Added some typecasts to eliminate gcc 3.0 warnings.  Changed prototypes
+     of png_write_oFFS width and height from png_uint_32 to png_int_32.
+  Updated example.c
+  Revised prototypes for png_debug_malloc and png_debug_free in pngtest.c
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

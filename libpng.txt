@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.0beta3 - May 18, 2001
+ libpng version 1.2.0beta4 - June 23, 2001
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998-2001 Glenn Randers-Pehrson
@@ -1247,8 +1247,7 @@ or png_destroy_*() is supposed to free the data.  When the user assumes
 responsibility for libpng-allocated data, the application must use
 png_free() to free it, and when the user transfers responsibility to libpng
 for data that the user has allocated, the user must have used png_malloc()
-or png_zalloc() to allocate it (the png_zalloc() function is the same
-as png_malloc() except that it also zeroes the newly-allocated memory).
+or png_zalloc() to allocate it.
 
 If you allocated your row_pointers in a single block, as suggested above in
 the description of the high level read interface, you must not transfer
@@ -2819,13 +2818,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-May 18, 2001
+June 23, 2001
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.0beta3 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.0beta4 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

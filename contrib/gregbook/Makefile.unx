@@ -1,6 +1,6 @@
 # Sample makefile for rpng-x / rpng2-x / wpng using gcc and make.
 # Greg Roelofs
-# Last modified:  28 February 2000
+# Last modified:  7 February 2001
 #
 #	The programs built by this makefile are described in the book,
 #	"PNG:  The Definitive Guide," by Greg Roelofs (O'Reilly and
@@ -27,20 +27,20 @@ PNGINC = -I/usr/local/include
 #PNGLIB = -L/usr/local/lib -lpng	# dynamically linked against libpng
 PNGLIB = /usr/local/lib/libpng.a	# statically linked against libpng
 # or:
-#PNGINC = -I../..
-#PNGLIB = -L../.. -lpng
-#PNGLIB = ../../libpng.a
+#PNGINC = -I../libpng
+#PNGLIB = -L../libpng -lpng
+#PNGLIB = ../libpng/libpng.a
 
 ZINC = -I/usr/local/include
 #ZLIB = -L/usr/local/lib -lz		# dynamically linked against zlib
 ZLIB = /usr/local/lib/libz.a		# statically linked against zlib
 #ZINC = -I../zlib
 #ZLIB = -L../zlib -lz
-#ZLIB = ../../../zlib/libz.a
+#ZLIB = ../zlib/libz.a
 
-#XINC = -I/usr/include/X11		# old-style, stock X distributions
+#XINC = -I/usr/include			# old-style, stock X distributions
 #XLIB = -L/usr/lib/X11 -lX11
-#XINC = -I/usr/openwin/include    	# Sun workstations (OpenWindows)
+#XINC = -I/usr/openwin/include		# Sun workstations (OpenWindows)
 #XLIB = -L/usr/openwin/lib -lX11
 XINC = -I/usr/X11R6/include		# new X distributions (XFree86, etc.)
 XLIB = -L/usr/X11R6/lib -lX11

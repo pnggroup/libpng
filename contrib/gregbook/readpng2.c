@@ -117,8 +117,8 @@ void readpng2_version_info(void)
         }
     }
 #else
-    fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
-      PNG_LIBPNG_VER_STRING, png_libpng_ver);
+    fprintf(stderr, "   Compiled with libpng %s; using libpng %s "
+      "without MMX support.\n", PNG_LIBPNG_VER_STRING, png_libpng_ver);
 #endif
 
     fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
@@ -530,7 +530,6 @@ static void readpng2_end_callback(png_structp png_ptr, png_infop info_ptr)
 
     (*mainprog_ptr->mainprog_finish_display)();
 
-    info_ptr = info_ptr; /* without this the compiler whines about info_ptr */
 
     /* all done */
 

@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "May 18, 2001"
+.TH LIBPNG 3 "June 23, 2001"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.2.0beta3
+libpng \- Portable Network Graphics (PNG) Reference Library 1.2.0beta4
 .SH SYNOPSIS
 \fI\fB
 
@@ -787,7 +787,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.0beta3 - May 18, 2001
+ libpng version 1.2.0beta4 - June 23, 2001
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998-2001 Glenn Randers-Pehrson
@@ -2034,8 +2034,7 @@ or png_destroy_*() is supposed to free the data.  When the user assumes
 responsibility for libpng-allocated data, the application must use
 png_free() to free it, and when the user transfers responsibility to libpng
 for data that the user has allocated, the user must have used png_malloc()
-or png_zalloc() to allocate it (the png_zalloc() function is the same
-as png_malloc() except that it also zeroes the newly-allocated memory).
+or png_zalloc() to allocate it.
 
 If you allocated your row_pointers in a single block, as suggested above in
 the description of the high level read interface, you must not transfer
@@ -3606,13 +3605,13 @@ application:
 
 .SH IX. Y2K Compliance in libpng
 
-May 18, 2001
+June 23, 2001
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.0beta3 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.0beta4 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3724,10 +3723,12 @@ the first widely used release:
  1.0.11beta1-3        1    10011  2.1.0.11beta1-3
  1.0.11rc1            1    10011  2.1.0.11rc1
  1.0.11               1    10011  2.1.0.11
- 1.0.12a              2    10012  2.1.0.12a
- 1.1.0a-f                  10100  2.1.1.0a-f abandoned
+ 1.0.12beta1-2        2    10012  2.1.0.12beta1-2
+ 1.0.12rc1            2    10012  2.1.0.12rc1
+ 1.0.12               2    10012  2.1.0.12
+ 1.1.0a-f             -    10100  2.1.1.0a-f abandoned
  1.2.0beta1-2         2    10200  2.1.2.0beta1-2
- 1.2.0beta3           3    10200  3.1.2.0beta3
+ 1.2.0beta3-4         3    10200  3.1.2.0beta3-4
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -3785,7 +3786,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.2.0beta3 - May 18, 2001:
+Libpng version 1.2.0beta4 - June 23, 2001:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (randeg@alum.rpi.edu).
 
@@ -3802,7 +3803,7 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.0.7, July 1, 2000, through  1.2.0beta3, May 18, 2001, are
+libpng versions 1.0.7, July 1, 2000, through  1.2.0beta4, June 23, 2001, are
 Copyright (c) 2000-2001 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.0.6
 with the following individuals added to the list of Contributing Authors
@@ -3894,7 +3895,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 randeg@alum.rpi.edu
-May 18, 2001
+June 23, 2001
 
 .\" end of man page
 

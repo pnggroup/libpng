@@ -194,17 +194,17 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    /* Expand paletted colors into true RGB triplets */
    if (color_type == PNG_COLOR_TYPE_PALETTE)
-      png_set_expand(png_ptr);
+      png_set_palette_rgb(png_ptr);
 
    /* Expand grayscale images to the full 8 bits from 1, 2, or 4 bits/pixel */
    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
-      png_set_expand(png_ptr);
+      png_set_gray_1_2_4_to_8(png_ptr);
 
    /* Expand paletted or RGB images with transparency to full alpha channels
     * so the data will be available as RGBA quartets.
     */
    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
-      png_set_expand(png_ptr);
+      png_set_tRNS_to_alpha(png_ptr);
 
    /* Set the background color to draw transparent and alpha images over.
     * It is possible to set the red, green, and blue components directly
@@ -362,8 +362,6 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       {
 #ifdef sparkle /* Read the image using the "sparkle" effect. */
          png_read_rows(png_ptr, &row_pointers[y], NULL, number_of_rows);
-
-         png_read_rows(png_ptr, NULL, row_pointers[y], number_of_rows);
 #else no_sparkle /* Read the image using the "rectangle" effect */
          png_read_rows(png_ptr, NULL, &row_pointers[y], number_of_rows);
 #endif no_sparkle /* use only one of these two methods */

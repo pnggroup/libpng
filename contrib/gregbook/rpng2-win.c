@@ -24,7 +24,7 @@
     - 1.03:  modified to allow abbreviated options
     - 1.04:  removed bogus extra argument from usage fprintf() [Glenn R-P?];
               fixed command-line parsing bug
-    - 1.10:  enabled "message window" (console), thanks to David Geldreich
+    - 1.10:  enabled "message window"/console (thanks to David Geldreich)
     - 1.20:  added runtime MMX-enabling/disabling and new -mmx* options
 
   ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@
 
 #define PROGNAME  "rpng2-win"
 #define LONGNAME  "Progressive PNG Viewer for Windows"
-#define VERSION   "1.20 of 29 January 2001"
+#define VERSION   "1.20 of 28 May 2001"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -38,9 +38,8 @@ CFLAGS=-I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
 # read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
 # have to change it.
 PNGMAJ = 3
-#PNGDLL = $3# msvc
-PNGDLL = 2# cygwin 1.2.0beta3
-PNGMIN = 1.2.0beta3
+#PNGDLL = $3
+PNGMIN = 1.2.0beta4
 PNGMIN_BASE = 1.2.0
 PNGVER = $(PNGMAJ).$(PNGMIN)
 

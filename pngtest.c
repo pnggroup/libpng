@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.0beta3 - May 18, 2001
+ * libpng 1.2.0beta4 - June 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -470,10 +470,8 @@ static int maximum_allocation = 0;
 static int total_allocation = 0;
 static int num_allocations = 0;
 
-extern PNG_EXPORT(png_voidp,png_debug_malloc) PNGARG((png_structp png_ptr,
-   png_uint_32 size));
-extern PNG_EXPORT(void,png_debug_free) PNGARG((png_structp png_ptr,
-   png_voidp ptr));
+png_voidp png_debug_malloc PNGARG((png_structp png_ptr, png_uint_32 size));
+void png_debug_free PNGARG((png_structp png_ptr, png_voidp ptr));
 
 png_voidp
 png_debug_malloc(png_structp png_ptr, png_uint_32 size)
@@ -503,7 +501,7 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
 #if PNG_DEBUG
       if(verbose)
-         printf("png_malloc %d bytes at %x\n",size,pinfo->pointer);
+         printf("png_malloc %lu bytes at %x\n",size,pinfo->pointer);
 #endif
       assert(pinfo->size != 12345678);
       return (png_voidp)(pinfo->pointer);
@@ -545,7 +543,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
          }
          if (pinfo->next == NULL)
          {
-            fprintf(STDERR, "Pointer %x not found\n", ptr);
+            fprintf(STDERR, "Pointer %x not found\n", (unsigned int)ptr);
             break;
          }
          ppinfo = &pinfo->next;
@@ -1280,7 +1278,7 @@ main(int argc, char *argv[])
    /* Show the version of libpng used in building the application */
    fprintf(STDERR," pngtest (%lu):%s", (unsigned long)PNG_LIBPNG_VER,
       PNG_HEADER_VERSION_STRING);
-   fprintf(STDERR," sizeof(png_struct)=%d, sizeof(png_info)=%d\n",
+   fprintf(STDERR," sizeof(png_struct)=%ld, sizeof(png_info)=%ld\n",
                     sizeof(png_struct), sizeof(png_info));
 
    /* Do some consistency checking on the memory allocation settings, I'm
@@ -1396,7 +1394,8 @@ main(int argc, char *argv[])
                current_allocation);
             while (pinfo != NULL)
             {
-               fprintf(STDERR, " %d bytes at %x\n", pinfo->size, pinfo->pointer);
+               fprintf(STDERR, " %lu bytes at %x\n", pinfo->size, 
+                 (unsigned int) pinfo->pointer);
                pinfo = pinfo->next;
             }
          }
@@ -1470,8 +1469,8 @@ main(int argc, char *argv[])
                 current_allocation);
              while (pinfo != NULL)
              {
-                fprintf(STDERR," %d bytes at %x\n",
-                   pinfo->size, pinfo->pointer);
+                fprintf(STDERR," %lu bytes at %x\n",
+                   pinfo->size, (unsigned int)pinfo->pointer);
                 pinfo = pinfo->next;
              }
           }
@@ -1511,4 +1510,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_0beta3 your_png_h_is_not_version_1_2_0beta3;
+typedef version_1_2_0beta4 your_png_h_is_not_version_1_2_0beta4;

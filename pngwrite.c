@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.0beta3 - May 18, 2001
+ * libpng 1.2.0beta4 - June 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -496,22 +496,23 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
          (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
          (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
      {
+#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+        char msg[80];
+        if (user_png_ver)
+        {
+          sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
+             user_png_ver);
+          png_warning(png_ptr, msg);
+        }
+        sprintf(msg, "Application  is running with png.c from libpng-%.20s",
+           png_libpng_ver);
+        png_warning(png_ptr, msg);
+#endif
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+        png_ptr->flags=0;
+#endif
         png_error(png_ptr,
            "Incompatible libpng version in application and library");
-     }
-
-     /* Libpng 1.0.6 was not binary compatible, due to insertion of the
-        info_ptr->free_me member.  Libpng-1.0.1 and earlier were not
-        compatible due to insertion of the user transform function. Note
-        to maintainer: this test can be removed from version 1.2.0 and
-        beyond because the previous test would have already rejected it. */
-
-     if (user_png_ver[0] == '1' && user_png_ver[2] == '0' &&
-         (user_png_ver[4] <  '2' || user_png_ver[4] == '6') &&
-         user_png_ver[5] == '\0')
-     {
-        png_error(png_ptr,
-        "Application must be recompiled; versions <= 1.0.6 were incompatible");
      }
    }
 
@@ -536,7 +537,7 @@ void PNGAPI
 png_write_init(png_structp png_ptr)
 {
    /* We only come here via pre-1.0.7-compiled applications */
-   png_write_init_2(png_ptr, "1.0.0", 0, 0);
+   png_write_init_2(png_ptr, "1.0.6 or earlier", 0, 0);
 }
 
 #undef png_write_init_2
@@ -545,17 +546,39 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
    png_size_t png_struct_size, png_size_t png_info_size)
 {
    /* We only come here via pre-1.0.12-compiled applications */
+#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+   if(sizeof(png_struct) > png_struct_size || sizeof(png_info) > png_info_size)
+   {
+      char msg[80];
+      png_ptr->warning_fn=(png_error_ptr)NULL;
+      if (user_png_ver)
+      {
+        sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
+           user_png_ver);
+        png_warning(png_ptr, msg);
+      }
+      sprintf(msg, "Application  is running with png.c from libpng-%.20s",
+         png_libpng_ver);
+      png_warning(png_ptr, msg);
+   }
+#endif
    if(sizeof(png_struct) > png_struct_size)
      {
        png_ptr->error_fn=(png_error_ptr)NULL;
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+       png_ptr->flags=0;
+#endif
        png_error(png_ptr,
-         "The png struct allocated by the application is too small.");
+       "The png struct allocated by the application for writing is too small.");
      }
    if(sizeof(png_info) > png_info_size)
      {
        png_ptr->error_fn=(png_error_ptr)NULL;
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+       png_ptr->flags=0;
+#endif
        png_error(png_ptr,
-         "The info struct allocated by the application is too small.");
+       "The info struct allocated by the application for writing is too small.");
      }
    png_write_init_3(&png_ptr, user_png_ver, png_struct_size);
 }

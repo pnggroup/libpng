@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.0beta3 - May 18, 2001
+ * libpng 1.2.0beta4 - June 23, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -741,8 +741,8 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 #endif
        png_ptr->trans = info_ptr->trans = (png_bytep)png_malloc(png_ptr,
-           num_trans);
-       png_memcpy(info_ptr->trans, trans, num_trans);
+           (png_uint_32)num_trans);
+       png_memcpy(info_ptr->trans, trans, (png_size_t)num_trans);
 #ifdef PNG_FREE_ME_SUPPORTED
        info_ptr->free_me |= PNG_FREE_TRNS;
 #else
@@ -905,14 +905,17 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
     if (chunk_list == NULL)
       return;
     old_num_chunks=png_ptr->num_chunk_list;
-    new_list=(png_bytep)png_malloc(png_ptr,5*(num_chunks+old_num_chunks));
+    new_list=(png_bytep)png_malloc(png_ptr,
+       (png_uint_32)(5*(num_chunks+old_num_chunks)));
     if(png_ptr->chunk_list != NULL)
     {
-       png_memcpy(new_list, png_ptr->chunk_list, 5*old_num_chunks);
+       png_memcpy(new_list, png_ptr->chunk_list,
+          (png_size_t)(5*old_num_chunks));
        png_free(png_ptr, png_ptr->chunk_list);
        png_ptr->chunk_list=NULL;
     }
-    png_memcpy(new_list+5*old_num_chunks, chunk_list, 5*num_chunks);
+    png_memcpy(new_list+5*old_num_chunks, chunk_list,
+       (png_size_t)(5*num_chunks));
     for (p=new_list+5*old_num_chunks+4, i=0; i<num_chunks; i++, p+=5)
        *p=(png_byte)keep;
     png_ptr->num_chunk_list=old_num_chunks+num_chunks;
