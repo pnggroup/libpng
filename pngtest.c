@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.6rc3 - August 10, 2004
+ * libpng 1.2.6rc4 - August 10, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -511,8 +511,9 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       buffer and once to get a new free list entry. */
    {
       /* Disable malloc_fn and free_fn */
+      memory_infop pinfo;
       png_set_mem_fn(png_ptr, NULL, NULL, NULL);
-      memory_infop pinfo = (memory_infop)png_malloc(png_ptr,
+      pinfo = (memory_infop)png_malloc(png_ptr,
          (png_uint_32)png_sizeof (*pinfo));
       pinfo->size = size;
       current_allocation += size;
@@ -1554,4 +1555,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_6rc3 your_png_h_is_not_version_1_2_6rc3;
+typedef version_1_2_6rc4 your_png_h_is_not_version_1_2_6rc4;

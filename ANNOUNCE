@@ -1,5 +1,5 @@
 
-Libpng 1.2.6rc3 - August 10, 2004
+Libpng 1.2.6rc4 - August 10, 2004
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -115,6 +115,9 @@ version 1.2.6rc3 [August 10, 2004]
   Check handle_as_unknown status in pngpread.c, as in pngread.c previously.
   Restore "HANDLE_CHUNK_*" macros, but deprecated, for apps that use them.
   Added "rim" definitions for CONST4 and CONST6 in pnggccrd.c
+version 1.2.6rc4 [August 10, 2004]
+  Fixed mistake in pngtest.c introduced in 1.2.6rc2 (declaration of
+    "pinfo" was out of place).
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net

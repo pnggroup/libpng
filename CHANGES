@@ -1291,13 +1291,16 @@ version 1.2.6rc2 [August 7, 2004]
   Changed "HANDLE_CHUNK_*" to "PNG_HANDLE_CHUNK_*" (Cosmin)
   Added "-@/bin/rm -f $(DL)/$(LIBNAME).so.$(PNGMAJ)" to 15 *NIX makefiles.
   Added code to update the row_info->colortype in png_do_read_filler() (MSB).
-version 1.2.6rc3 [August 10, 2004]
+version 1.2.6rc3 [August 9, 2004]
   Eliminated use of "abs()" in testing cHRM and gAMA values, to avoid
     trouble with some 64-bit compilers.  Created PNG_OUT_OF_RANGE() macro.
   Revised documentation of png_set_keep_unknown_chunks().
   Check handle_as_unknown status in pngpread.c, as in pngread.c previously.
   Moved  "PNG_HANDLE_CHUNK_*" macros out of PNG_INTERNAL section of png.h
   Added "rim" definitions for CONST4 and CONST6 in pnggccrd.c
+version 1.2.6rc4 [August 10, 2004]
+  Fixed mistake in pngtest.c introduced in 1.2.6rc2 (declaration of
+    "pinfo" was out of place).
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to glennrp@users.sourceforge.net
