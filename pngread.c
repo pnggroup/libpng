@@ -1,10 +1,10 @@
 
 /* pngread.c - read a png file
 
-   libpng 1.0 beta 1 - version 0.71
+   libpng 1.0 beta 2 - version 0.81
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   June 26, 1995
+   August 24, 1995
    */
 
 #define PNG_INTERNAL
@@ -16,9 +16,9 @@ png_read_init(png_struct *png_ptr)
 {
    jmp_buf tmp_jmp;
 
-   memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
-   memset(png_ptr, 0, sizeof (png_struct));
-   memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
+   png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
+   png_memset(png_ptr, 0, sizeof (png_struct));
+   png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
 
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = png_large_malloc(png_ptr, png_ptr->zbuf_size);
@@ -63,9 +63,28 @@ png_read_info(png_struct *png_ptr, png_info *info)
          if (png_ptr->mode != PNG_HAVE_IHDR)
             png_error(png_ptr, "Missing IHDR");
 
-         png_handle_PLTE(png_ptr, info, length);
+#if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
+         if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
+            png_crc_skip(png_ptr, length);
+         else
+#else
+         {
+            png_handle_PLTE(png_ptr, info, length);
+         }
+#endif
          png_ptr->mode = PNG_HAVE_PLTE;
       }
+      else if (!memcmp(chunk_start + 4, png_IDAT, 4))
+      {
+         png_ptr->idat_size = length;
+         png_ptr->mode = PNG_HAVE_IDAT;
+         break;
+      }
+      else if (!memcmp(chunk_start + 4, png_IEND, 4))
+      {
+         png_error(png_ptr, "No Image in File");
+      }
+#if defined(PNG_READ_gAMA_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_gAMA, 4))
       {
          if (png_ptr->mode != PNG_HAVE_IHDR)
@@ -73,6 +92,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_gAMA(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_sBIT_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_sBIT, 4))
       {
          if (png_ptr->mode != PNG_HAVE_IHDR)
@@ -80,6 +101,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_sBIT(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_cHRM_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_cHRM, 4))
       {
          if (png_ptr->mode != PNG_HAVE_IHDR)
@@ -87,6 +110,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_cHRM(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_tRNS_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_tRNS, 4))
       {
          if (png_ptr->mode != PNG_HAVE_IHDR &&
@@ -95,6 +120,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_tRNS(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_bKGD_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_bKGD, 4))
       {
          if (png_ptr->mode != PNG_HAVE_IHDR &&
@@ -103,6 +130,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_bKGD(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_hIST_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_hIST, 4))
       {
          if (png_ptr->mode != PNG_HAVE_PLTE)
@@ -110,12 +139,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_hIST(png_ptr, info, length);
       }
-      else if (!memcmp(chunk_start + 4, png_IDAT, 4))
-      {
-         png_ptr->idat_size = length;
-         png_ptr->mode = PNG_HAVE_IDAT;
-         break;
-      }
+#endif
+#if defined(PNG_READ_pHYs_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_pHYs, 4))
       {
          if (png_ptr->mode != PNG_HAVE_IHDR &&
@@ -124,6 +149,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_pHYs(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_oFFs_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_oFFs, 4))
       {
          if (png_ptr->mode != PNG_HAVE_IHDR &&
@@ -132,6 +159,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_oFFs(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_tIME_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_tIME, 4))
       {
          if (png_ptr->mode == PNG_BEFORE_IHDR ||
@@ -140,6 +169,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_tIME(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_tEXt_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_tEXt, 4))
       {
          if (png_ptr->mode == PNG_BEFORE_IHDR ||
@@ -148,6 +179,8 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_tEXt(png_ptr, info, length);
       }
+#endif
+#if defined(PNG_READ_zTXt_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_zTXt, 4))
       {
          if (png_ptr->mode == PNG_BEFORE_IHDR ||
@@ -156,13 +189,10 @@ png_read_info(png_struct *png_ptr, png_info *info)
 
          png_handle_zTXt(png_ptr, info, length);
       }
-      else if (!memcmp(chunk_start + 4, png_IEND, 4))
-      {
-         png_error(png_ptr, "No Image in File");
-      }
+#endif
       else
       {
-         if (isupper(chunk_start[4]))
+         if ((chunk_start[4] & 0x20) == 0)
             png_error(png_ptr, "Unknown Critical Chunk");
 
          png_crc_skip(png_ptr, length);
@@ -175,6 +205,15 @@ png_read_info(png_struct *png_ptr, png_info *info)
    }
 }
 
+/* optional call to update the users info structure */
+void
+png_read_update_info(png_struct *png_ptr, png_info *info_ptr)
+{
+   if (!(png_ptr->row_init))
+      png_read_start_row(png_ptr);
+   png_read_transform_info(png_ptr, info_ptr);
+}
+
 /* initialize palette, background, etc, after transformations
    are set, but before any reading takes place.  This allows
    the user to obtail a gamma corrected palette, for example.
@@ -182,17 +221,18 @@ png_read_info(png_struct *png_ptr, png_info *info)
 void
 png_start_read_image(png_struct *png_ptr)
 {
-   png_read_start_row(png_ptr);
+   if (!(png_ptr->row_init))
+      png_read_start_row(png_ptr);
 }
 
 void
-png_read_row(png_struct *png_ptr, png_byte *row, png_byte *dsp_row)
+png_read_row(png_struct *png_ptr, png_bytef *row, png_byte *dsp_row)
 {
    int ret;
-
    if (!(png_ptr->row_init))
       png_read_start_row(png_ptr);
 
+#if defined(PNG_READ_INTERLACING_SUPPORTED)
    /* if interlaced and we do not need a new row, combine row and return */
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
    {
@@ -267,6 +307,7 @@ png_read_row(png_struct *png_ptr, png_byte *row, png_byte *dsp_row)
             break;
       }
    }
+#endif
 
    if (png_ptr->mode != PNG_HAVE_IDAT)
       png_error(png_ptr, "invalid attempt to read row data");
@@ -334,11 +375,12 @@ png_read_row(png_struct *png_ptr, png_byte *row, png_byte *dsp_row)
          png_ptr->row_buf + 1, png_ptr->prev_row + 1,
          (int)(png_ptr->row_buf[0]));
 
-   memcpy(png_ptr->prev_row, png_ptr->row_buf, (png_size_t)png_ptr->rowbytes + 1);
+   png_memcpy(png_ptr->prev_row, png_ptr->row_buf, (png_size_t)png_ptr->rowbytes + 1);
 
    if (png_ptr->transformations)
       png_do_read_transformations(png_ptr);
 
+#if defined(PNG_READ_INTERLACING_SUPPORTED)
    /* blow up interlaced rows to full size */
    if (png_ptr->interlaced &&
       (png_ptr->transformations & PNG_INTERLACE))
@@ -355,6 +397,7 @@ png_read_row(png_struct *png_ptr, png_byte *row, png_byte *dsp_row)
             png_pass_mask[png_ptr->pass]);
    }
    else
+#endif
    {
       if (row)
          png_combine_row(png_ptr, row, 0xff);
@@ -383,18 +426,18 @@ png_read_row(png_struct *png_ptr, png_byte *row, png_byte *dsp_row)
    not called png_set_interlace_handling(), the display_row buffer will
    be ignored, so pass NULL to it. */
 void
-png_read_rows(png_struct *png_ptr, png_byte **row,
+png_read_rows(png_struct *png_ptr, png_bytef **row,
    png_byte **display_row, png_uint_32 num_rows)
 {
    png_uint_32 i;
-   png_byte **rp;
+   png_bytef **rp;
    png_byte **dp;
 
 	rp = row;
 	dp = display_row;
 	for (i = 0; i < num_rows; i++)
 	{
-		png_byte *rptr;
+		png_bytef *rptr;
 		png_byte *dptr;
 
 		if (rp)
@@ -420,11 +463,11 @@ png_read_rows(png_struct *png_ptr, png_byte **row,
    You only need to call this function once.  If you desire to have
    an image for each pass of a interlaced image, use png_read_rows() */
 void
-png_read_image(png_struct *png_ptr, png_byte **image)
+png_read_image(png_struct *png_ptr, png_bytef **image)
 {
    png_uint_32 i;
    int pass, j;
-   png_byte **rp;
+   png_bytef **rp;
 
    pass = png_set_interlace_handling(png_ptr);
    for (j = 0; j < pass; j++)
@@ -506,6 +549,7 @@ png_read_end(png_struct *png_ptr, png_info *info)
       {
          png_error(png_ptr, "invalid chunk after IDAT");
       }
+#if defined(PNG_READ_tIME_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_tIME, 4))
       {
          if (png_ptr->mode == PNG_BEFORE_IHDR ||
@@ -517,6 +561,8 @@ png_read_end(png_struct *png_ptr, png_info *info)
          else
             png_crc_skip(png_ptr, length);
       }
+#endif
+#if defined(PNG_READ_tEXt_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_tEXt, 4))
       {
          if (png_ptr->mode == PNG_BEFORE_IHDR ||
@@ -528,6 +574,8 @@ png_read_end(png_struct *png_ptr, png_info *info)
          else
             png_crc_skip(png_ptr, length);
       }
+#endif
+#if defined(PNG_READ_zTXt_SUPPORTED)
       else if (!memcmp(chunk_start + 4, png_zTXt, 4))
       {
          if (png_ptr->mode == PNG_BEFORE_IHDR ||
@@ -539,13 +587,14 @@ png_read_end(png_struct *png_ptr, png_info *info)
          else
             png_crc_skip(png_ptr, length);
       }
+#endif
       else if (!memcmp(chunk_start + 4, png_IEND, 4))
       {
          png_ptr->mode = PNG_AFTER_IEND;
       }
       else
       {
-         if (isupper(chunk_start[4]))
+         if ((chunk_start[4] & 0x20) == 0)
             png_error(png_ptr, "Unknown Critical Chunk");
 
          png_crc_skip(png_ptr, length);
@@ -569,40 +618,58 @@ png_read_destroy(png_struct *png_ptr, png_info *info, png_info *end_info)
 
    if (info)
    {
+/* I'm not sure I should be freeing this */
       if (info->palette != png_ptr->palette)
          png_free(png_ptr, info->palette);
+/* I'm not sure I should be freeing this */
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) && defined(PNG_READ_bKGD_SUPPORTED)
       if (info->trans != png_ptr->trans)
          png_free(png_ptr, info->trans);
+#endif
+/* I'm not sure I should be freeing this */
+#if defined(PNG_READ_hIST_SUPPORTED)
       if (info->hist != png_ptr->hist)
          png_free(png_ptr, info->hist);
+#endif
+#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
       for (i = 0; i < info->num_text; i++)
       {
          png_large_free(png_ptr, info->text[i].key);
       }
 
       png_free(png_ptr, info->text);
-      memset(info, 0, sizeof(png_info));
+#endif
+      png_memset(info, 0, sizeof(png_info));
    }
 
    if (end_info)
    {
+#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
       for (i = 0; i < end_info->num_text; i++)
       {
          png_large_free(png_ptr, end_info->text[i].key);
       }
 
       png_free(png_ptr, end_info->text);
-      memset(end_info, 0, sizeof(png_info));
+#endif
+      png_memset(end_info, 0, sizeof(png_info));
    }
 
    png_large_free(png_ptr, png_ptr->zbuf);
    png_large_free(png_ptr, png_ptr->row_buf);
    png_large_free(png_ptr, png_ptr->prev_row);
+#if defined(PNG_READ_DITHER_SUPPORTED)
    png_large_free(png_ptr, png_ptr->palette_lookup);
    png_free(png_ptr, png_ptr->dither_index);
+#endif
+#if defined(PNG_READ_GAMMA_SUPPORTED)
    png_free(png_ptr, png_ptr->gamma_table);
+#endif
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_free(png_ptr, png_ptr->gamma_from_1);
    png_free(png_ptr, png_ptr->gamma_to_1);
+#endif
+#if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->gamma_16_table)
    {
       for (i = 0; i < (1 << (8 - png_ptr->gamma_shift)); i++)
@@ -610,6 +677,8 @@ png_read_destroy(png_struct *png_ptr, png_info *info, png_info *end_info)
          png_free(png_ptr, png_ptr->gamma_16_table[i]);
       }
    }
+#endif
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_free(png_ptr, png_ptr->gamma_16_table);
    if (png_ptr->gamma_16_from_1)
    {
@@ -627,16 +696,20 @@ png_read_destroy(png_struct *png_ptr, png_info *info, png_info *end_info)
       }
    }
    png_free(png_ptr, png_ptr->gamma_16_to_1);
+#endif
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_free(png_ptr, png_ptr->trans);
+#endif
+#if defined(PNG_READ_DITHER_SUPPORTED)
    png_free(png_ptr, png_ptr->hist);
+#endif
    if (!png_ptr->user_palette)
       png_free(png_ptr, png_ptr->palette);
 
    inflateEnd(png_ptr->zstream);
 
-   memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
-   memset(png_ptr, 0, sizeof (png_struct));
-   memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
+   png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
+   png_memset(png_ptr, 0, sizeof (png_struct));
+   png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
 }
-
 

@@ -1,15 +1,19 @@
 
 /* png.c - location for general purpose png functions
 
-   libpng 1.0 beta 1 - version 0.71
+   libpng 1.0 beta 2 - version 0.81
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   June 26, 1995
+   August 24, 1995
    */
 
 #define PNG_INTERNAL
 #define PNG_NO_EXTERN
 #include "png.h"
+
+/* version information for c files.  This better match the version
+   string defined in png.h */
+char png_libpng_ver[] = "0.81";
 
 /* place to hold the signiture string for a png file. */
 png_byte png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -21,17 +25,39 @@ png_byte png_IHDR[4] = { 73,  72,  68,  82};
 png_byte png_IDAT[4] = { 73,  68,  65,  84};
 png_byte png_IEND[4] = { 73,  69,  78,  68};
 png_byte png_PLTE[4] = { 80,  76,  84,  69};
+#if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_WRITE_gAMA_SUPPORTED)
 png_byte png_gAMA[4] = {103,  65,  77,  65};
+#endif
+#if defined(PNG_READ_sBIT_SUPPORTED) || defined(PNG_WRITE_sBIT_SUPPORTED)
 png_byte png_sBIT[4] = {115,  66,  73,  84};
+#endif
+#if defined(PNG_READ_cHRM_SUPPORTED) || defined(PNG_WRITE_cHRM_SUPPORTED)
 png_byte png_cHRM[4] = { 99,  72,  82,  77};
+#endif
+#if defined(PNG_READ_tRNS_SUPPORTED) || defined(PNG_WRITE_tRNS_SUPPORTED)
 png_byte png_tRNS[4] = {116,  82,  78,  83};
+#endif
+#if defined(PNG_READ_bKGD_SUPPORTED) || defined(PNG_WRITE_bKGD_SUPPORTED)
 png_byte png_bKGD[4] = { 98,  75,  71,  68};
+#endif
+#if defined(PNG_READ_hIST_SUPPORTED) || defined(PNG_WRITE_hIST_SUPPORTED)
 png_byte png_hIST[4] = {104,  73,  83,  84};
+#endif
+#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_WRITE_tEXt_SUPPORTED)
 png_byte png_tEXt[4] = {116,  69,  88, 116};
+#endif
+#if defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
 png_byte png_zTXt[4] = {122,  84,  88, 116};
+#endif
+#if defined(PNG_READ_pHYs_SUPPORTED) || defined(PNG_WRITE_pHYs_SUPPORTED)
 png_byte png_pHYs[4] = {112,  72,  89, 115};
+#endif
+#if defined(PNG_READ_oFFs_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
 png_byte png_oFFs[4] = {111,  70,  70, 115};
+#endif
+#if defined(PNG_READ_tIME_SUPPORTED) || defined(PNG_WRITE_tIME_SUPPORTED)
 png_byte png_tIME[4] = {116,  73,  77,  69};
+#endif
 
 /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
@@ -78,18 +104,18 @@ png_check_sig(png_byte *sig, int num)
 }
 
 /* Function to allocate memory for zlib. */
-voidp
-png_zalloc(voidp png_ptr, uInt items, uInt size)
+voidpf
+png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
-   return ((voidp)png_large_malloc((png_struct *)png_ptr,
+   return ((voidpf)png_large_malloc((png_struct FAR *)png_ptr,
       (png_uint_32)items * (png_uint_32)size));
 }
 
 /* function to free memory for zlib */
 void
-png_zfree(voidp png_ptr, voidp ptr)
+png_zfree(voidpf png_ptr, voidpf ptr)
 {
-   png_large_free((png_struct *)png_ptr, (void *)ptr);
+   png_large_free((png_struct FAR *)png_ptr, (voidpf)ptr);
 }
 
 /* reset the crc variable to 32 bits of 1's.  Care must be taken
@@ -135,10 +161,10 @@ make_crc_table(void)
    initialized to all 1's, and the transmitted value is the 1's complement
    of the final running crc. */
 static png_uint_32
-update_crc(png_uint_32 crc, png_byte *buf, png_uint_32 len)
+update_crc(png_uint_32 crc, png_bytef *buf, png_uint_32 len)
 {
   png_uint_32 c;
-  png_byte *p;
+  png_bytef *p;
   png_uint_32 n;
 
   c = crc;
@@ -163,10 +189,15 @@ update_crc(png_uint_32 crc, png_byte *buf, png_uint_32 len)
    would need to use huge pointers to access all that data.  If you
    need this, put huge here and above. */
 void
-png_calculate_crc(png_struct *png_ptr, png_byte *ptr,
+png_calculate_crc(png_struct *png_ptr, png_bytef *ptr,
    png_uint_32 length)
 {
    png_ptr->crc = update_crc(png_ptr->crc, ptr, length);
 }
-
+void
+png_info_init(png_info *info)
+{
+   /* set everything to 0 */
+   memset(info, 0, sizeof (png_info));
+}
 

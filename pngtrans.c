@@ -2,22 +2,25 @@
 /* pngtrans.c - transforms the data in a row
    routines used by both readers and writers
 
-   libpng 1.0 beta 1 - version 0.71
+   libpng 1.0 beta 2 - version 0.81
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   June 26, 1995
+   August 24, 1995
    */
 
 #define PNG_INTERNAL
 #include "png.h"
 
+#if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* turn on bgr to rgb mapping */
 void
 png_set_bgr(png_struct *png_ptr)
 {
    png_ptr->transformations |= PNG_BGR;
 }
+#endif
 
+#if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* turn on 16 bit byte swapping */
 void
 png_set_swap(png_struct *png_ptr)
@@ -25,7 +28,9 @@ png_set_swap(png_struct *png_ptr)
    if (png_ptr->bit_depth == 16)
       png_ptr->transformations |= PNG_SWAP_BYTES;
 }
+#endif
 
+#if defined(PNG_READ_PACK_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
 /* turn on pixel packing */
 void
 png_set_packing(png_struct *png_ptr)
@@ -36,14 +41,18 @@ png_set_packing(png_struct *png_ptr)
       png_ptr->usr_bit_depth = 8;
    }
 }
+#endif
 
+#if defined(PNG_READ_SHIFT_SUPPORTED) || defined(PNG_WRITE_SHIFT_SUPPORTED)
 void
 png_set_shift(png_struct *png_ptr, png_color_8 *true_bits)
 {
    png_ptr->transformations |= PNG_SHIFT;
    png_ptr->shift = *true_bits;
 }
+#endif
 
+#if defined(PNG_READ_INTERLACING_SUPPORTED) || defined(PNG_WRITE_INTERLACING_SUPPORTED)
 int
 png_set_interlace_handling(png_struct *png_ptr)
 {
@@ -55,25 +64,35 @@ png_set_interlace_handling(png_struct *png_ptr)
 
    return 1;
 }
+#endif
 
+#if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
 void
-png_set_rgbx(png_struct *png_ptr)
+png_set_filler(png_struct *png_ptr, int filler, int filler_loc)
 {
-   png_ptr->transformations |= PNG_RGBA;
+   png_ptr->transformations |= PNG_FILLER;
+   png_ptr->filler = (png_byte)filler;
+   png_ptr->filler_loc = (png_byte)filler_loc;
    if (png_ptr->color_type == PNG_COLOR_TYPE_RGB &&
       png_ptr->bit_depth == 8)
       png_ptr->usr_channels = 4;
+}
+
+/* old functions kept around for compatability purposes */
+void
+png_set_rgbx(png_struct *png_ptr)
+{
+   png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 }
 
 void
 png_set_xrgb(png_struct *png_ptr)
 {
-   png_ptr->transformations |= PNG_XRGB;
-   if (png_ptr->color_type == PNG_COLOR_TYPE_RGB &&
-      png_ptr->bit_depth == 8)
-      png_ptr->usr_channels = 4;
+   png_set_filler(png_ptr, 0xff, PNG_FILLER_BEFORE);
 }
+#endif
 
+#if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
 void
 png_set_invert_mono(png_struct *png_ptr)
 {
@@ -82,12 +101,12 @@ png_set_invert_mono(png_struct *png_ptr)
 
 /* invert monocrome grayscale data */
 void
-png_do_invert(png_row_info *row_info, png_byte *row)
+png_do_invert(png_row_info *row_info, png_bytef *row)
 {
    if (row && row_info && row_info->bit_depth == 1 &&
       row_info->color_type == PNG_COLOR_TYPE_GRAY)
    {
-      png_byte *rp;
+      png_bytef *rp;
       png_uint_32 i;
 
       for (i = 0, rp = row;
@@ -98,14 +117,17 @@ png_do_invert(png_row_info *row_info, png_byte *row)
       }
    }
 }
+#endif
 
+#if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* swaps byte order on 16 bit depth images */
 void
-png_do_swap(png_row_info *row_info, png_byte *row)
+png_do_swap(png_row_info *row_info, png_bytef *row)
 {
    if (row && row_info && row_info->bit_depth == 16)
    {
-      png_byte *rp, t;
+      png_bytef *rp;
+      png_byte t;
       png_uint_32 i;
 
       for (i = 0, rp = row;
@@ -118,16 +140,19 @@ png_do_swap(png_row_info *row_info, png_byte *row)
       }
    }
 }
+#endif
 
+#if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* swaps red and blue */
 void
-png_do_bgr(png_row_info *row_info, png_byte *row)
+png_do_bgr(png_row_info *row_info, png_bytef *row)
 {
    if (row && row_info && (row_info->color_type & 2))
    {
       if (row_info->color_type == 2 && row_info->bit_depth == 8)
       {
-         png_byte *rp, t;
+         png_bytef *rp;
+         png_byte t;
          png_uint_32 i;
 
          for (i = 0, rp = row;
@@ -141,7 +166,8 @@ png_do_bgr(png_row_info *row_info, png_byte *row)
       }
       else if (row_info->color_type == 6 && row_info->bit_depth == 8)
       {
-         png_byte *rp, t;
+         png_bytef *rp;
+         png_byte t;
          png_uint_32 i;
 
          for (i = 0, rp = row;
@@ -155,7 +181,8 @@ png_do_bgr(png_row_info *row_info, png_byte *row)
       }
       else if (row_info->color_type == 2 && row_info->bit_depth == 16)
       {
-         png_byte *rp, t[2];
+         png_bytef *rp;
+         png_byte t[2];
          png_uint_32 i;
 
          for (i = 0, rp = row;
@@ -172,7 +199,8 @@ png_do_bgr(png_row_info *row_info, png_byte *row)
       }
       else if (row_info->color_type == 6 && row_info->bit_depth == 16)
       {
-         png_byte *rp, t[2];
+         png_bytef *rp;
+         png_byte t[2];
          png_uint_32 i;
 
          for (i = 0, rp = row;
@@ -189,4 +217,5 @@ png_do_bgr(png_row_info *row_info, png_byte *row)
       }
    }
 }
+#endif
 

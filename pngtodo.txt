@@ -1,7 +1,13 @@
 pngtodo.txt - list of things to do for libpng
 
-   allow user to #define out unused transformations
-   medium memory model support
+for 0.9
+   medium memory model
+   improved dithering?
+
+for 1.1
+	push reader
+
+for 1.1 or later
    overlaying one image on top of another
 	optional palette creation
 	histogram creation
@@ -9,14 +15,13 @@ pngtodo.txt - list of things to do for libpng
    cHRM transformation
    support for other chunks being defined (sCAl, the gIF series,
       and others that people come up with).
-	push reader
    pull writer
    better dithering
    keep up with public chunks
    other compression libraries
    more exotic interlace handling
-   better filtering
+   better filtering (counting huffman bits?  filter type inertia?)
    C++ wrapper
-   other languages
+   other languages (pascal, for one)
    comments of > 64K
 

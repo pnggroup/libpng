@@ -1,10 +1,10 @@
 
 /* pngwutil.c - utilities to write a png file
 
-   libpng 1.0 beta 1 - version 0.71
+   libpng 1.0 beta 2 - version 0.81
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   June 26, 1995
+   August 24, 1995
    */
 #define PNG_INTERNAL
 #include "png.h"
@@ -63,7 +63,7 @@ png_write_uint_16(png_struct *png_ptr, png_uint_16 i)
    functions instead.  */
 void
 png_write_chunk(png_struct *png_ptr, png_byte *type,
-   png_byte *data, png_uint_32 length)
+   png_bytef *data, png_uint_32 length)
 {
    /* write length */
    png_write_uint_32(png_ptr, length);
@@ -103,7 +103,7 @@ png_write_chunk_start(png_struct *png_ptr, png_byte *type,
    sum of the lengths from these calls *must* add up to the total_length
    given to png_write_chunk_start() */
 void
-png_write_chunk_data(png_struct *png_ptr, png_byte *data, png_uint_32 length)
+png_write_chunk_data(png_struct *png_ptr, png_bytef *data, png_uint_32 length)
 {
    /* write the data, and run the crc over it */
    if (length)
@@ -178,7 +178,43 @@ png_write_IHDR(png_struct *png_ptr, png_uint_32 width, png_uint_32 height,
     png_ptr->usr_channels = png_ptr->channels;
 
    /* write the chunk */
-   png_write_chunk(png_ptr, png_IHDR, buf, (png_uint_32)13);
+    png_write_chunk(png_ptr, png_IHDR, buf, (png_uint_32)13);
+
+   /* initialize zlib with png info */
+   png_ptr->zstream = &(png_ptr->zstream_struct);
+   png_ptr->zstream->zalloc = png_zalloc;
+   png_ptr->zstream->zfree = png_zfree;
+   png_ptr->zstream->opaque = (voidp)png_ptr;
+   if (!png_ptr->do_custom_filter)
+   {
+      if (png_ptr->color_type == 3 || png_ptr->bit_depth < 8)
+         png_ptr->do_filter = 0;
+      else
+         png_ptr->do_filter = 1;
+   }
+   if (!png_ptr->zlib_custom_strategy)
+   {
+      if (png_ptr->do_filter)
+         png_ptr->zlib_strategy = Z_FILTERED;
+      else
+         png_ptr->zlib_strategy = Z_DEFAULT_STRATEGY;
+   }
+   if (!png_ptr->zlib_custom_level)
+      png_ptr->zlib_level = Z_DEFAULT_COMPRESSION;
+   if (!png_ptr->zlib_custom_mem_level)
+      png_ptr->zlib_mem_level = 8;
+   if (!png_ptr->zlib_custom_window_bits)
+      png_ptr->zlib_window_bits = 15;
+   if (!png_ptr->zlib_custom_method)
+      png_ptr->zlib_method = 8;
+   deflateInit2(png_ptr->zstream, png_ptr->zlib_level,
+      png_ptr->zlib_method,
+      png_ptr->zlib_window_bits,
+      png_ptr->zlib_mem_level,
+      png_ptr->zlib_strategy);
+   png_ptr->zstream->next_out = png_ptr->zbuf;
+   png_ptr->zstream->avail_out = (uInt)png_ptr->zbuf_size;
+
 }
 
 /* write the palette.  We are careful not to trust png_color to be in the
@@ -206,18 +242,8 @@ png_write_PLTE(png_struct *png_ptr, png_color *palette, int number)
 
 /* write an IDAT chunk */
 void
-png_write_IDAT(png_struct *png_ptr, png_byte *data, png_uint_32 length)
+png_write_IDAT(png_struct *png_ptr, png_bytef *data, png_uint_32 length)
 {
-#ifdef zlibinout
-/* temp zlib problem */
-{
-   extern FILE *fpzlibout;
-
-   fwrite(data, 1, length, fpzlibout);
-}
-/* end temp zlib problem */
-#endif
-
    png_write_chunk(png_ptr, png_IDAT, data, length);
 }
 
@@ -228,6 +254,7 @@ png_write_IEND(png_struct *png_ptr)
    png_write_chunk(png_ptr, png_IEND, NULL, (png_uint_32)0);
 }
 
+#if defined(PNG_WRITE_gAMA_SUPPORTED)
 /* write a gAMA chunk */
 void
 png_write_gAMA(png_struct *png_ptr, float gamma)
@@ -240,7 +267,9 @@ png_write_gAMA(png_struct *png_ptr, float gamma)
    png_save_uint_32(buf, igamma);
    png_write_chunk(png_ptr, png_gAMA, buf, (png_uint_32)4);
 }
+#endif
 
+#if defined(PNG_WRITE_sBIT_SUPPORTED)
 /* write the sBIT chunk */
 void
 png_write_sBIT(png_struct *png_ptr, png_color_8 *sbit, int color_type)
@@ -269,7 +298,9 @@ png_write_sBIT(png_struct *png_ptr, png_color_8 *sbit, int color_type)
 
    png_write_chunk(png_ptr, png_sBIT, buf, (png_uint_32)size);
 }
+#endif
 
+#if defined(PNG_WRITE_cHRM_SUPPORTED)
 /* write the cHRM chunk */
 void
 png_write_cHRM(png_struct *png_ptr, float white_x, float white_y,
@@ -298,7 +329,9 @@ png_write_cHRM(png_struct *png_ptr, float white_x, float white_y,
    png_save_uint_32(buf + 28, itemp);
    png_write_chunk(png_ptr, png_cHRM, buf, (png_uint_32)32);
 }
+#endif
 
+#if defined(PNG_WRITE_tRNS_SUPPORTED)
 /* write the tRNS chunk */
 void
 png_write_tRNS(png_struct *png_ptr, png_byte *trans, png_color_16 *tran,
@@ -326,7 +359,9 @@ png_write_tRNS(png_struct *png_ptr, png_byte *trans, png_color_16 *tran,
       png_write_chunk(png_ptr, png_tRNS, buf, (png_uint_32)6);
    }
 }
+#endif
 
+#if defined(PNG_WRITE_bKGD_SUPPORTED)
 /* write the background chunk */
 void
 png_write_bKGD(png_struct *png_ptr, png_color_16 *back, int color_type)
@@ -351,7 +386,9 @@ png_write_bKGD(png_struct *png_ptr, png_color_16 *back, int color_type)
       png_write_chunk(png_ptr, png_bKGD, buf, (png_uint_32)2);
    }
 }
+#endif
 
+#if defined(PNG_WRITE_hIST_SUPPORTED)
 /* write the histogram */
 void
 png_write_hIST(png_struct *png_ptr, png_uint_16 *hist, int number)
@@ -367,38 +404,42 @@ png_write_hIST(png_struct *png_ptr, png_uint_16 *hist, int number)
    }
    png_write_chunk_end(png_ptr);
 }
+#endif
 
+#if defined(PNG_WRITE_tEXt_SUPPORTED)
 /* write a tEXt chunk */
 void
-png_write_tEXt(png_struct *png_ptr, char *key, char *text,
+png_write_tEXt(png_struct *png_ptr, charf *key, charf *text,
    png_uint_32 text_len)
 {
    int key_len;
 
-   key_len = strlen(key);
+   key_len = png_strlen(key);
    /* make sure we count the 0 after the key */
    png_write_chunk_start(png_ptr, png_tEXt,
       (png_uint_32)(key_len + text_len + 1));
    /* key has an 0 at the end.  How nice */
-   png_write_chunk_data(png_ptr, (png_byte *)key, (png_uint_32)(key_len + 1));
+   png_write_chunk_data(png_ptr, (png_bytef *)key, (png_uint_32)(key_len + 1));
    if (text && text_len)
-      png_write_chunk_data(png_ptr, (png_byte *)text, (png_uint_32)text_len);
+      png_write_chunk_data(png_ptr, (png_bytef *)text, (png_uint_32)text_len);
    png_write_chunk_end(png_ptr);
 }
+#endif
 
+#if defined(PNG_WRITE_zTXt_SUPPORTED)
 /* write a compressed chunk */
 void
-png_write_zTXt(png_struct *png_ptr, char *key, char *text,
+png_write_zTXt(png_struct *png_ptr, charf *key, charf *text,
    png_uint_32 text_len, int compression)
 {
    int key_len;
    char buf[1];
    int i, ret;
-   char **output_ptr = NULL; /* array of pointers to output */
+   charf **output_ptr = NULL; /* array of pointers to output */
    int num_output_ptr = 0; /* number of output pointers used */
    int max_output_ptr = 0; /* size of output_ptr */
 
-   key_len = strlen(key);
+   key_len = png_strlen(key);
 
    /* we can't write the chunk until we find out how much data we have,
       which means we need to run the compresser first, and save the
@@ -408,9 +449,9 @@ png_write_zTXt(png_struct *png_ptr, char *key, char *text,
 
    /* set up the compression buffers */
    png_ptr->zstream->avail_in = (uInt)text_len;
-   png_ptr->zstream->next_in = (Byte *)text;
+   png_ptr->zstream->next_in = (Bytef *)text;
    png_ptr->zstream->avail_out = (uInt)png_ptr->zbuf_size;
-   png_ptr->zstream->next_out = (Byte *)png_ptr->zbuf;
+   png_ptr->zstream->next_out = (Bytef *)png_ptr->zbuf;
 
    /* this is the same compression loop as in png_write_row() */
    do
@@ -431,10 +472,14 @@ png_write_zTXt(png_struct *png_ptr, char *key, char *text,
          /* make sure the output array has room */
          if (num_output_ptr >= max_output_ptr)
          {
+            png_uint_32 old_max;
+
+            old_max = max_output_ptr;
             max_output_ptr = num_output_ptr + 4;
             if (output_ptr)
                output_ptr = png_realloc(png_ptr, output_ptr,
-                  max_output_ptr * sizeof (char *));
+                  max_output_ptr * sizeof (char *),
+                  old_max * sizeof (char *));
             else
                output_ptr = png_malloc(png_ptr,
                   max_output_ptr * sizeof (char *));
@@ -443,7 +488,7 @@ png_write_zTXt(png_struct *png_ptr, char *key, char *text,
          /* save the data */
          output_ptr[num_output_ptr] = png_large_malloc(png_ptr,
             png_ptr->zbuf_size);
-         memcpy(output_ptr[num_output_ptr], png_ptr->zbuf,
+         png_memcpy(output_ptr[num_output_ptr], png_ptr->zbuf,
             (png_size_t)png_ptr->zbuf_size);
          num_output_ptr++;
 
@@ -474,10 +519,14 @@ png_write_zTXt(png_struct *png_ptr, char *key, char *text,
          /* check to make sure our output array has room */
          if (num_output_ptr >= max_output_ptr)
          {
+            png_uint_32 old_max;
+
+            old_max = max_output_ptr;
             max_output_ptr = num_output_ptr + 4;
             if (output_ptr)
                output_ptr = png_realloc(png_ptr, output_ptr,
-                  max_output_ptr * sizeof (char *));
+                  max_output_ptr * sizeof (char *),
+                  old_max * sizeof (char *));
             else
                output_ptr = png_malloc(png_ptr,
                   max_output_ptr * sizeof (char *));
@@ -486,7 +535,7 @@ png_write_zTXt(png_struct *png_ptr, char *key, char *text,
          /* save off the data */
          output_ptr[num_output_ptr] = png_large_malloc(png_ptr,
             png_ptr->zbuf_size);
-         memcpy(output_ptr[num_output_ptr], png_ptr->zbuf,
+         png_memcpy(output_ptr[num_output_ptr], png_ptr->zbuf,
             (png_size_t)png_ptr->zbuf_size);
          num_output_ptr++;
 
@@ -506,7 +555,7 @@ png_write_zTXt(png_struct *png_ptr, char *key, char *text,
    png_write_chunk_start(png_ptr, png_zTXt,
       (png_uint_32)(key_len + text_len + 2));
    /* write key */
-   png_write_chunk_data(png_ptr, (png_byte *)key, (png_uint_32)(key_len + 1));
+   png_write_chunk_data(png_ptr, (png_bytef *)key, (png_uint_32)(key_len + 1));
    buf[0] = compression;
    /* write compression */
    png_write_chunk_data(png_ptr, (png_byte *)buf, (png_uint_32)1);
@@ -514,7 +563,7 @@ png_write_zTXt(png_struct *png_ptr, char *key, char *text,
    /* write saved output buffers, if any */
    for (i = 0; i < num_output_ptr; i++)
    {
-      png_write_chunk_data(png_ptr, (png_byte *)output_ptr[i], png_ptr->zbuf_size);
+      png_write_chunk_data(png_ptr, (png_bytef *)output_ptr[i], png_ptr->zbuf_size);
       png_large_free(png_ptr, output_ptr[i]);
    }
    if (max_output_ptr)
@@ -527,11 +576,11 @@ png_write_zTXt(png_struct *png_ptr, char *key, char *text,
    png_write_chunk_end(png_ptr);
 
    /* reset zlib for another zTXt or the image data */
-/*   deflateReset(png_ptr->zstream); */
-   deflateEnd(png_ptr->zstream);
-   deflateInit(png_ptr->zstream, -1);
+   deflateReset(png_ptr->zstream);
 }
+#endif
 
+#if defined(PNG_WRITE_pHYs_SUPPORTED)
 /* write the pHYs chunk */
 void
 png_write_pHYs(png_struct *png_ptr, png_uint_32 x_pixels_per_unit,
@@ -546,7 +595,9 @@ png_write_pHYs(png_struct *png_ptr, png_uint_32 x_pixels_per_unit,
 
    png_write_chunk(png_ptr, png_pHYs, buf, (png_uint_32)9);
 }
+#endif
 
+#if defined(PNG_WRITE_oFFs_SUPPORTED)
 /* write the oFFs chunk */
 void
 png_write_oFFs(png_struct *png_ptr, png_uint_32 x_offset,
@@ -561,9 +612,11 @@ png_write_oFFs(png_struct *png_ptr, png_uint_32 x_offset,
 
    png_write_chunk(png_ptr, png_oFFs, buf, (png_uint_32)9);
 }
+#endif
 
-/* two time chunks are given.  This chunk assumes you have a gmtime()
-   function.  If you don't have that, use the other tIME function */
+#if defined(PNG_WRITE_tIME_SUPPORTED)
+/* write the tIME chunk.  Use either png_convert_from_struct_tm()
+   or png_convert_from_time_t(), or fill in the structure yourself */
 void
 png_write_tIME(png_struct *png_ptr, png_time *mod_time)
 {
@@ -578,25 +631,26 @@ png_write_tIME(png_struct *png_ptr, png_time *mod_time)
 
    png_write_chunk(png_ptr, png_tIME, buf, (png_uint_32)7);
 }
+#endif
 
 /* initializes the row writing capability of libpng */
 void
 png_write_start_row(png_struct *png_ptr)
 {
    /* set up row buffer */
-   png_ptr->row_buf = (png_byte *)png_large_malloc(png_ptr,
+   png_ptr->row_buf = (png_bytef *)png_large_malloc(png_ptr,
       (((png_uint_32)png_ptr->usr_channels *
       (png_uint_32)png_ptr->usr_bit_depth *
       png_ptr->width) >> 3) + 1);
    /* set up filtering buffers, if filtering */
-   if (png_ptr->bit_depth >= 8 && png_ptr->color_type != 3)
+   if (png_ptr->do_filter)
    {
-      png_ptr->prev_row = (png_byte *)png_large_malloc(png_ptr,
+      png_ptr->prev_row = (png_bytef *)png_large_malloc(png_ptr,
          png_ptr->rowbytes + 1);
-      memset(png_ptr->prev_row, 0, (png_size_t)png_ptr->rowbytes + 1);
-      png_ptr->save_row = (png_byte *)png_large_malloc(png_ptr,
+      png_memset(png_ptr->prev_row, 0, (png_size_t)png_ptr->rowbytes + 1);
+      png_ptr->save_row = (png_bytef *)png_large_malloc(png_ptr,
          png_ptr->rowbytes + 1);
-      memset(png_ptr->save_row, 0, (png_size_t)png_ptr->rowbytes + 1);
+      png_memset(png_ptr->save_row, 0, (png_size_t)png_ptr->rowbytes + 1);
    }
 
    /* if interlaced, we need to set up width and height of pass */
@@ -662,13 +716,15 @@ png_write_finish_row(png_struct *png_ptr)
                png_pass_yinc[png_ptr->pass] - 1 -
                png_pass_ystart[png_ptr->pass]) /
                png_pass_yinc[png_ptr->pass];
+            if (png_ptr->transformations & PNG_INTERLACE)
+               break;
          } while (png_ptr->usr_width == 0 || png_ptr->num_rows == 0);
 
       }
 
       /* reset filter row */
       if (png_ptr->prev_row)
-         memset(png_ptr->prev_row, 0, (png_size_t)png_ptr->rowbytes + 1);
+         png_memset(png_ptr->prev_row, 0, (png_size_t)png_ptr->rowbytes + 1);
       /* if we have more data to get, go get it */
       if (png_ptr->pass < 7)
          return;
@@ -704,12 +760,10 @@ png_write_finish_row(png_struct *png_ptr)
          png_ptr->zstream->avail_out);
    }
 
-/*   deflateReset(png_ptr->zstream); */
-   deflateEnd(png_ptr->zstream);
-   deflateInit(png_ptr->zstream, -1);
-
+   deflateReset(png_ptr->zstream);
 }
 
+#if defined(PNG_WRITE_INTERLACING_SUPPORTED)
 /* pick out the correct pixels for the interlace pass.
 
    The basic idea here is to go through the row with a source
@@ -719,7 +773,7 @@ png_write_finish_row(png_struct *png_ptr)
    See the default: case for the easiest code to understand.
    */
 void
-png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
+png_do_write_interlace(png_row_info *row_info, png_bytef *row, int pass)
 {
    /* we don't have to do anything on the last pass (6) */
    if (row && row_info && pass < 6)
@@ -729,8 +783,8 @@ png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
       {
          case 1:
          {
-            png_byte *sp;
-            png_byte *dp;
+            png_bytef *sp;
+            png_bytef *dp;
             int shift;
             int d;
             int value;
@@ -763,8 +817,8 @@ png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
          }
          case 2:
          {
-            png_byte *sp;
-            png_byte *dp;
+            png_bytef *sp;
+            png_bytef *dp;
             int shift;
             int d;
             int value;
@@ -796,8 +850,8 @@ png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
          }
          case 4:
          {
-            png_byte *sp;
-            png_byte *dp;
+            png_bytef *sp;
+            png_bytef *dp;
             int shift;
             int d;
             int value;
@@ -829,8 +883,8 @@ png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
          }
          default:
          {
-            png_byte *sp;
-            png_byte *dp;
+            png_bytef *sp;
+            png_bytef *dp;
             png_uint_32 i;
             int pixel_bytes;
 
@@ -848,7 +902,7 @@ png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
                sp = row + (png_size_t)(i * pixel_bytes);
                /* move the pixel */
                if (dp != sp)
-                  memcpy(dp, sp, pixel_bytes);
+                  png_memcpy(dp, sp, pixel_bytes);
                /* next pixel */
                dp += pixel_bytes;
             }
@@ -865,17 +919,18 @@ png_do_write_interlace(png_row_info *row_info, png_byte *row, int pass)
 
    }
 }
+#endif
 
 /* this filters the row.  Both row and prev_row have space at the
    first byte for the filter byte. */
 void
-png_write_filter_row(png_row_info *row_info, png_byte *row,
-   png_byte *prev_row)
+png_write_filter_row(png_row_info *row_info, png_bytef *row,
+   png_bytef *prev_row)
 {
    int minf, bpp;
    png_uint_32 i, v;
-   png_uint_32 s, mins;
-   png_byte *rp, *pp, *cp, *lp;
+   png_uint_32 s0, s1, s2, s3, s4, mins;
+   png_bytef *rp, *pp, *cp, *lp;
 
    /* find out how many bytes offset each pixel is */
    bpp = (row_info->pixel_depth + 7) / 8;
@@ -885,95 +940,79 @@ png_write_filter_row(png_row_info *row_info, png_byte *row,
    /* the prediction method we use is to find which method provides
       the smallest value when summing the abs of the distances from
       zero using anything >= 128 as negitive numbers. */
-   for (i = 0, s = 0, rp = row + 1; i < row_info->rowbytes; i++, rp++)
+   s0 = s1 = s2 = s3 = s4 = 0;
+
+   for (i = 0, rp = row + 1, pp = prev_row + 1, lp = row + 1 - bpp,
+         cp = prev_row + 1 - bpp;
+      i < bpp; i++, rp++, pp++, lp++, cp++)
    {
+      /* check none filter */
       v = *rp;
       if (v < 128)
-         s += v;
+         s0 += v;
       else
-         s += 256 - (png_int_32)v;
-   }
+         s0 += 256 - v;
 
-   mins = s;
-   minf = 0;
-
-   /* check sub filter */
-   for (i = 0, s = 0, rp = row + 1, lp = row + 1 - bpp;
-      i < row_info->rowbytes; i++, rp++, lp++)
-   {
-      if (i >= bpp)
-         v = (png_byte)(((int)*rp - (int)*lp) & 0xff);
-      else
-         v = *rp;
-
-      if (v < 128)
-         s += v;
-      else
-         s += 256 - v;
-   }
-
-   if (s < mins)
-   {
-      mins = s;
-      minf = 1;
-   }
-
-   /* check up filter */
-   for (i = 0, s = 0, rp = row + 1, pp = prev_row + 1;
-      i < row_info->rowbytes; i++, rp++, pp++)
-   {
+      /* check up filter */
       v = (png_byte)(((int)*rp - (int)*pp) & 0xff);
 
       if (v < 128)
-         s += v;
+         s2 += v;
       else
-         s += 256 - v;
-   }
+         s2 += 256 - v;
 
-   if (s < mins)
-   {
-      mins = s;
-      minf = 2;
-   }
-
-   /* check avg filter */
-   for (i = 0, s = 0, rp = row + 1, pp = prev_row + 1, lp = row + 1 - bpp;
-      i < row_info->rowbytes; i++, rp++, pp++, lp++)
-   {
-      if (i >= bpp)
-         v = (png_byte)(((int)*rp - (((int)*pp + (int)*lp) / 2)) & 0xff);
-      else
-         v = (png_byte)(((int)*rp - ((int)*pp / 2)) & 0xff);
+      /* check avg filter */
+      v = (png_byte)(((int)*rp - ((int)*pp / 2)) & 0xff);
 
       if (v < 128)
-         s += v;
+         s3 += v;
       else
-         s += 256 - v;
+         s3 += 256 - v;
    }
 
-   if (s < mins)
-   {
-      mins = s;
-      minf = 3;
-   }
+   /* some filters are same until we get past bpp */
+   s1 = s0;
+   s4 = s2;
 
-   /* check paeth filter */
-   for (i = 0, s = 0, rp = row + 1, pp = prev_row + 1, lp = row + 1 - bpp,
-         cp = prev_row + 1 - bpp;
-      i < row_info->rowbytes; i++, rp++, pp++, lp++, cp++)
+   for (; i < row_info->rowbytes; i++, rp++, pp++, lp++, cp++)
    {
       int a, b, c, pa, pb, pc, p;
 
-      b = *pp;
-      if (i >= bpp)
-      {
-         c = *cp;
-         a = *lp;
-      }
+      /* check none filter */
+      v = *rp;
+      if (v < 128)
+         s0 += v;
       else
-      {
-         a = c = 0;
-      }
+         s0 += 256 - v;
+
+      /* check sub filter */
+      v = (png_byte)(((int)*rp - (int)*lp) & 0xff);
+
+      if (v < 128)
+         s1 += v;
+      else
+         s1 += 256 - v;
+
+      /* check up filter */
+      v = (png_byte)(((int)*rp - (int)*pp) & 0xff);
+
+      if (v < 128)
+         s2 += v;
+      else
+         s2 += 256 - v;
+
+      /* check avg filter */
+      v = (png_byte)(((int)*rp - (((int)*pp + (int)*lp) / 2)) & 0xff);
+
+      if (v < 128)
+         s3 += v;
+      else
+         s3 += 256 - v;
+
+      /* check paeth filter */
+      b = *pp;
+      c = *cp;
+      a = *lp;
       p = a + b - c;
       pa = abs(p - a);
       pb = abs(p - b);
@@ -989,14 +1028,35 @@ png_write_filter_row(png_row_info *row_info, png_byte *row,
       v = (png_byte)(((int)*rp - p) & 0xff);
 
       if (v < 128)
-         s += v;
+         s4 += v;
       else
-         s += 256 - v;
+         s4 += 256 - v;
    }
 
-   if (s < mins)
+   mins = s0;
+   minf = 0;
+
+   if (s1 < mins)
    {
-      mins = s;
+      mins = s1;
+      minf = 1;
+   }
+
+   if (s2 < mins)
+   {
+      mins = s2;
+      minf = 2;
+   }
+
+   if (s3 < mins)
+   {
+      mins = s3;
+      minf = 3;
+   }
+
+   if (s4 < mins)
+   {
+      mins = s4;
       minf = 4;
    }
 
@@ -1078,3 +1138,4 @@ png_write_filter_row(png_row_info *row_info, png_byte *row,
          break;
    }
 }
+

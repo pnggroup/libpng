@@ -1,9 +1,9 @@
 /* pngtest.c - a simple test program to test libpng 
 
-   libpng 1.0 beta 1 - version 0.71
+   libpng 1.0 beta 2 - version 0.81
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   June 26, 1995
+   August 24, 1995
    */
 
 #include <stdio.h>
@@ -38,19 +38,29 @@ int main()
 
 	row_buf = (png_byte *)0;
 
+   fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
+
+   if (strcmp(png_libpng_ver, PNG_LIBPNG_VER_STRING))
+   {
+      fprintf(STDERR,
+         "Warning: versions are different between png.h and png.c\n");
+      fprintf(STDERR, "  png.h version: %s\n", PNG_LIBPNG_VER_STRING);
+      fprintf(STDERR, "  png.c version: %s\n\n", png_libpng_ver);
+   }
+
 	fpin = fopen(inname, "rb");
 	if (!fpin)
 	{
 		fprintf(STDERR, "Could not find input file %s\n", inname);
-		return -1;
+		return 1;
 	}
 
 	fpout = fopen(outname, "wb");
-	if (!fpin)
+	if (!fpout)
 	{
 		fprintf(STDERR, "could not open output file %s\n", outname);
 		fclose(fpin);
-		return -1;
+		return 1;
 	}
 
 	if (setjmp(read_ptr.jmpbuf))
@@ -58,7 +68,7 @@ int main()
 		fprintf(STDERR, "libpng read error\n");
 		fclose(fpin);
 		fclose(fpout);
-		return -1;
+		return 1;
 	}
 
 	if (setjmp(write_ptr.jmpbuf))
@@ -66,7 +76,7 @@ int main()
 		fprintf(STDERR, "libpng write error\n");
 		fclose(fpin);
 		fclose(fpout);
-		return -1;
+		return 1;
 	}
 
 	png_read_init(&read_ptr);
@@ -96,7 +106,7 @@ int main()
 		png_write_destroy(&write_ptr);
 		fclose(fpin);
 		fclose(fpout);
-		return -1;
+		return 1;
 	}
 
 	if (info_ptr.interlace_type)
@@ -113,8 +123,8 @@ int main()
 	{
 		for (y = 0; y < info_ptr.height; y++)
 		{
-			png_read_rows(&read_ptr, &row_buf, (png_byte **)0, 1);
-			png_write_rows(&write_ptr, &row_buf, 1);
+			png_read_rows(&read_ptr, (png_bytef **)&row_buf, (png_bytef **)0, 1);
+			png_write_rows(&write_ptr, (png_bytef **)&row_buf, 1);
 		}
 	}
 
@@ -134,7 +144,7 @@ int main()
 	if (!fpin)
 	{
 		fprintf(STDERR, "could not find file %s\n", inname);
-		return -1;
+		return 1;
 	}
 
 	fpout = fopen(outname, "rb");
@@ -142,7 +152,7 @@ int main()
 	{
 		fprintf(STDERR, "could not find file %s\n", outname);
 		fclose(fpin);
-		return -1;
+		return 1;
 	}
 
 	while (1)
@@ -157,7 +167,7 @@ int main()
 			fprintf(STDERR, "files are of a different size\n");
 			fclose(fpin);
 			fclose(fpout);
-			return -1;
+			return 1;
 		}
 
 		if (!num_in)
@@ -168,7 +178,7 @@ int main()
 			fprintf(STDERR, "files are different\n");
 			fclose(fpin);
 			fclose(fpout);
-			return -1;
+			return 1;
 		}
 	}
 
@@ -178,3 +188,4 @@ int main()
 
    return 0;
 }
+

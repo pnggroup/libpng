@@ -40,5 +40,21 @@ version 0.7
 version 0.71
    changed pngtest.png for zlib 0.93
    fixed error in libpng.txt and example.c
+version 0.8
+   cleaned up some bugs
+   added png_set_filler()
+   split up pngstub.c into pngmem.c, pngio.c, and pngerror.c
+   added #define's to remove unwanted code
+   moved png_info_init() to png.c
+   added old_size into png_realloc()
+   added functions to manually set filtering and compression info
+   changed compression parameters based on image type
+   optimized filter selection code
+   added version info
+   changed external functions passing floats to doubles (k&r problems?)
+   put all the configurable stuff in pngconf.h
+   enabled png_set_shift to work with paletted images on read
+   added png_read_update_info() - updates info structure with transformations
+
 
 

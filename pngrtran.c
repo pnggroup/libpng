@@ -1,36 +1,41 @@
 
 /* pngrtran.c - transforms the data in a row for png readers
 
-   libpng 1.0 beta 1 - version 0.71
+   libpng 1.0 beta 2 - version 0.8
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   June 26, 1995
+   August 20, 1995
    */
 
 #define PNG_INTERNAL
 #include "png.h"
 
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
 /* handle alpha and tRNS via a background color */
 void
 png_set_background(png_struct *png_ptr,
    png_color_16 *background_color, int background_gamma_code,
-   int need_expand, float background_gamma)
+   int need_expand, double background_gamma)
 {
    png_ptr->transformations |= PNG_BACKGROUND;
-   memcpy(&(png_ptr->background), background_color,
+   png_memcpy(&(png_ptr->background), background_color,
       sizeof(png_color_16));
-   png_ptr->background_gamma = background_gamma;
+   png_ptr->background_gamma = (float)background_gamma;
    png_ptr->background_gamma_type = background_gamma_code;
    png_ptr->background_expand = need_expand;
 }
+#endif
 
+#if defined(PNG_READ_16_TO_8_SUPPORTED)
 /* strip 16 bit depth files to 8 bit depth */
 void
 png_set_strip_16(png_struct *png_ptr)
 {
    png_ptr->transformations |= PNG_16_TO_8;
 }
+#endif
 
+#if defined(PNG_READ_DITHER_SUPPORTED)
 /* dither file to 8 bit.  Supply a palette, the current number
    of elements in the palette, the maximum number of elements
    allowed, and a histogram, if possible.  If the current number
@@ -217,7 +222,7 @@ png_set_dither(png_struct *png_ptr, png_color *palette,
          hash = (dsort **)png_malloc(png_ptr, 769 * sizeof (dsort *));
          for (i = 0; i < 769; i++)
             hash[i] = (dsort *)0;
-/*         memset(hash, 0, 769 * sizeof (dsort *)); */
+/*         png_memset(hash, 0, 769 * sizeof (dsort *)); */
 
          num_new_palette = num_palette;
 
@@ -354,7 +359,7 @@ png_set_dither(png_struct *png_ptr, png_color *palette,
       int i;
       int total_bits, num_red, num_green, num_blue;
       png_uint_32 num_entries;
-      png_byte *distance;
+      png_bytef *distance;
 
       total_bits = PNG_DITHER_RED_BITS + PNG_DITHER_GREEN_BITS +
          PNG_DITHER_BLUE_BITS;
@@ -364,15 +369,15 @@ png_set_dither(png_struct *png_ptr, png_color *palette,
       num_blue = (1 << PNG_DITHER_BLUE_BITS);
       num_entries = ((png_uint_32)1 << total_bits);
 
-      png_ptr->palette_lookup = (png_byte *)png_large_malloc(png_ptr,
+      png_ptr->palette_lookup = (png_bytef *)png_large_malloc(png_ptr,
          (png_size_t)num_entries * sizeof (png_byte));
 
-      memset(png_ptr->palette_lookup, 0, (png_size_t)num_entries * sizeof (png_byte));
+      png_memset(png_ptr->palette_lookup, 0, (png_size_t)num_entries * sizeof (png_byte));
 
-      distance = (png_byte *)png_large_malloc(png_ptr,
+      distance = (png_bytef *)png_large_malloc(png_ptr,
          (png_size_t)num_entries * sizeof (png_byte));
 
-      memset(distance, 0xff, (png_size_t)num_entries * sizeof (png_byte));
+      png_memset(distance, 0xff, (png_size_t)num_entries * sizeof (png_byte));
 
       for (i = 0; i < num_palette; i++)
       {
@@ -417,67 +422,22 @@ png_set_dither(png_struct *png_ptr, png_color *palette,
 
       png_large_free(png_ptr, distance);
    }
-#ifdef oldway
-      d = TABLE_COLOR_DISTANCE(index, palette[i]);
-      dt = TABLE_DISTANCE(index);
-      if (d < dt)
-         png_ptr->palette_lookup[index] = i;
-
-      for (ir = r + 1, index2 = index; ir < num_red; ir++)
-      {
-         index2 += (1 << (PNG_DITHER_GREEN_BITS + PNG_DITHER_BLUE_BITS));
-         d = RGB_COLOR_DISTANCE(r, g, b, palette[i]);
-         dt = TABLE_DISTANCE(index2);
-         if (d < dt)
-            png_ptr->palette_lookup[index2] = i;
-         else
-            break;
-      }
-
-
-
-   i = 0;
-   for (ir = 0; ir < num_red; ir++)
-   {
-      r = (ir * 255) / (num_red - 1);
-      for (ig = 0; ig < num_green; ig++)
-      {
-         g = (ig * 255) / (num_green - 1);
-         for (ib = 0; ib < num_blue; ib++)
-         {
-            int min_d, j, k, d;
-
-            b = (ib * 255) / (num_blue - 1);
-            min_d = 1024;
-            k = 0;
-            for (j = 0; j < png_ptr->num_palette; j++)
-            {
-               d = abs(r - (int)png_ptr->palette[j].red) +
-                  abs(g - (int)png_ptr->palette[j].green) +
-                  abs(b - (int)png_ptr->palette[j].blue);
-               if (d < min_d)
-               {
-                  min_d = d;
-                  k = j;
-               }
-            }
-            png_ptr->palette_lookup[i++] = k;
-         }
-      }
-   }
-#endif
 }
+#endif
 
+#if defined(PNG_READ_GAMMA_SUPPORTED)
 /* transform the image from the file_gamma to the screen_gamma */
 void
-png_set_gamma(png_struct *png_ptr, float screen_gamma,
-   float file_gamma)
+png_set_gamma(png_struct *png_ptr, double screen_gamma,
+   double file_gamma)
 {
    png_ptr->transformations |= PNG_GAMMA;
-   png_ptr->gamma = file_gamma;
-   png_ptr->display_gamma = screen_gamma;
+   png_ptr->gamma = (float)file_gamma;
+   png_ptr->display_gamma = (float)screen_gamma;
 }
+#endif
 
+#if defined(PNG_READ_EXPAND_SUPPORTED)
 /* expand paletted images to rgb, expand grayscale images of
    less then 8 bit depth to 8 bit depth, and expand tRNS chunks
    to alpha channels */
@@ -486,12 +446,15 @@ png_set_expand(png_struct *png_ptr)
 {
    png_ptr->transformations |= PNG_EXPAND;
 }
+#endif
 
+#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
 void
 png_set_gray_to_rgb(png_struct *png_ptr)
 {
    png_ptr->transformations |= PNG_GRAY_TO_RGB;
 }
+#endif
 
 /* initialize everything needed for the read.  This includes modifying
    the palette */
@@ -502,12 +465,16 @@ png_init_read_transformations(png_struct *png_ptr)
 
    color_type = png_ptr->color_type;
 
+#if defined(PNG_READ_EXPAND_SUPPORTED) && \
+    defined(PNG_READ_BACKGROUND_SUPPORTED)
    if (png_ptr->transformations & PNG_EXPAND)
    {
       if (color_type == PNG_COLOR_TYPE_GRAY &&
          png_ptr->bit_depth < 8 &&
-         (!(png_ptr->transformations & PNG_BACKGROUND) ||
-         png_ptr->background_expand))
+         (png_ptr->transformations & PNG_BACKGROUND) &&
+         png_ptr->background_expand)
+/*         (!(png_ptr->transformations & PNG_BACKGROUND) ||
+         png_ptr->background_expand)) */
       {
          /* expand background chunk.  While this may not be
             the fastest way to do this, it only happens once
@@ -539,11 +506,16 @@ png_init_read_transformations(png_struct *png_ptr)
          color_type = PNG_COLOR_TYPE_RGB;
       }
    }
+#endif
 
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_ptr->background_1 = png_ptr->background;
+#endif
+#if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->transformations & PNG_GAMMA)
    {
       png_build_gamma_table(png_ptr);
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
       if ((png_ptr->transformations & PNG_BACKGROUND) &&
          (color_type != PNG_COLOR_TYPE_PALETTE))
       {
@@ -596,7 +568,109 @@ png_init_read_transformations(png_struct *png_ptr)
             }
          }
       }
+#endif
    }
+#endif
+
+#if defined(PNG_READ_SHIFT_SUPPORTED)
+   if ((png_ptr->transformations & PNG_SHIFT) &&
+      png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+   {
+      png_uint_16 i;
+      int sr, sg, sb;
+
+      sr = 8 - png_ptr->sig_bit.red;
+      if (sr < 0 || sr > 8)
+         sr = 0;
+      sg = 8 - png_ptr->sig_bit.green;
+      if (sg < 0 || sg > 8)
+         sg = 0;
+      sb = 8 - png_ptr->sig_bit.blue;
+      if (sb < 0 || sb > 8)
+         sb = 0;
+      for (i = 0; i < png_ptr->num_palette; i++)
+      {
+         png_ptr->palette[i].red >>= sr;
+         png_ptr->palette[i].green >>= sg;
+         png_ptr->palette[i].blue >>= sb;
+      }
+   }
+#endif
+}
+
+/* modify the info structure to reflect the transformations.  The
+   info should be updated so a png file could be written with it,
+   assuming the transformations result in valid png data */
+void
+png_read_transform_info(png_struct *png_ptr, png_info *info_ptr)
+{
+#if defined(PNG_READ_EXPAND_SUPPORTED)
+   if ((png_ptr->transformations & PNG_EXPAND) &&
+      info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+   {
+      if (png_ptr->num_trans)
+         info_ptr->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+      else
+         info_ptr->color_type = PNG_COLOR_TYPE_RGB;
+      info_ptr->bit_depth = 8;
+      info_ptr->num_trans = 0;
+   }
+   else if (png_ptr->transformations & PNG_EXPAND)
+   {
+      if (png_ptr->num_trans)
+         info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
+      if (info_ptr->bit_depth < 8)
+         info_ptr->bit_depth = 8;
+      info_ptr->num_trans = 0;
+   }
+#endif
+
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+   if (png_ptr->transformations & PNG_BACKGROUND)
+   {
+      info_ptr->color_type &= ~PNG_COLOR_MASK_ALPHA;
+      info_ptr->num_trans = 0;
+      info_ptr->background = png_ptr->background;
+   }
+#endif
+
+#if defined(PNG_READ_16_TO_8_SUPPORTED)
+   if ((png_ptr->transformations & PNG_16_TO_8) && info_ptr->bit_depth == 16)
+      info_ptr->bit_depth = 8;
+#endif
+
+#if defined(PNG_READ_DITHER_SUPPORTED)
+   if (png_ptr->transformations & PNG_DITHER)
+   {
+      if (((info_ptr->color_type == PNG_COLOR_TYPE_RGB) ||
+         (info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)) &&
+         png_ptr->palette_lookup && info_ptr->bit_depth == 8)
+      {
+         info_ptr->color_type = PNG_COLOR_TYPE_PALETTE;
+      }
+   }
+#endif
+
+#if defined(PNG_READ_PACK_SUPPORTED)
+   if ((png_ptr->transformations & PNG_PACK) && info_ptr->bit_depth < 8)
+      info_ptr->bit_depth = 8;
+#endif
+
+#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
+   if ((png_ptr->transformations & PNG_GRAY_TO_RGB) &&
+      !(info_ptr->color_type & PNG_COLOR_MASK_COLOR))
+      info_ptr->color_type |= PNG_COLOR_MASK_COLOR;
+#endif
+   if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+      info_ptr->channels = 1;
+   else if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
+      info_ptr->channels = 3;
+   else
+      info_ptr->channels = 1;
+   if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+      info_ptr->channels++;
+   info_ptr->pixel_depth = info_ptr->channels * info_ptr->bit_depth;
+   info_ptr->rowbytes = ((info_ptr->width * info_ptr->pixel_depth + 7) >> 3);
 }
 
 /* transform the row.  The order of transformations is significant,
@@ -605,6 +679,7 @@ png_init_read_transformations(png_struct *png_ptr)
 void
 png_do_read_transformations(png_struct *png_ptr)
 {
+#if defined(PNG_READ_EXPAND_SUPPORTED)
    if ((png_ptr->transformations & PNG_EXPAND) &&
       png_ptr->row_info.color_type == PNG_COLOR_TYPE_PALETTE)
    {
@@ -620,6 +695,9 @@ png_do_read_transformations(png_struct *png_ptr)
          png_do_expand(&(png_ptr->row_info), png_ptr->row_buf + 1,
             NULL);
    }
+#endif
+
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
    if (png_ptr->transformations & PNG_BACKGROUND)
       png_do_background(&(png_ptr->row_info), png_ptr->row_buf + 1,
          &(png_ptr->trans_values), &(png_ptr->background),
@@ -628,53 +706,88 @@ png_do_read_transformations(png_struct *png_ptr)
          png_ptr->gamma_to_1, png_ptr->gamma_16_table,
          png_ptr->gamma_16_from_1, png_ptr->gamma_16_to_1,
          png_ptr->gamma_shift);
-   else if (png_ptr->transformations & PNG_GAMMA) 
+#endif
+
+#if defined(PNG_READ_GAMMA_SUPPORTED)
+   if ((png_ptr->transformations & PNG_GAMMA) &&
+      !(png_ptr->transformations & PNG_BACKGROUND))
       png_do_gamma(&(png_ptr->row_info), png_ptr->row_buf + 1,
          png_ptr->gamma_table, png_ptr->gamma_16_table,
          png_ptr->gamma_shift);
+#endif
+
+#if defined(PNG_READ_16_TO_8_SUPPORTED)
    if (png_ptr->transformations & PNG_16_TO_8)
       png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
+#if defined(PNG_READ_DITHER_SUPPORTED)
    if (png_ptr->transformations & PNG_DITHER)
-      png_do_dither(&(png_ptr->row_info), png_ptr->row_buf + 1,
-         png_ptr->palette_lookup, png_ptr->dither_index);
+   {
+      png_do_dither((png_row_info *)&(png_ptr->row_info), 
+         png_ptr->row_buf + 1,
+         png_ptr->palette_lookup, 
+         png_ptr->dither_index);
+   }      
+#endif
+
+#if defined(PNG_READ_INVERT_SUPPORTED)
    if (png_ptr->transformations & PNG_INVERT_MONO)
       png_do_invert(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
+#if defined(PNG_READ_SHIFT_SUPPORTED)
    if (png_ptr->transformations & PNG_SHIFT)
       png_do_unshift(&(png_ptr->row_info), png_ptr->row_buf + 1,
          &(png_ptr->shift));
+#endif
+
+#if defined(PNG_READ_PACK_SUPPORTED)
    if (png_ptr->transformations & PNG_PACK)
       png_do_unpack(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
+#if defined(PNG_READ_BGR_SUPPORTED)
    if (png_ptr->transformations & PNG_BGR)
       png_do_bgr(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
+#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
    if (png_ptr->transformations & PNG_GRAY_TO_RGB)
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
+#if defined(PNG_READ_SWAP_SUPPORTED)
    if (png_ptr->transformations & PNG_SWAP_BYTES)
       png_do_swap(&(png_ptr->row_info), png_ptr->row_buf + 1);
-   if (png_ptr->transformations & PNG_RGBA)
-      png_do_read_rgbx(&(png_ptr->row_info), png_ptr->row_buf + 1);
-   if (png_ptr->transformations & PNG_XRGB)
-      png_do_read_xrgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
+#if defined(PNG_READ_FILLER_SUPPORTED)
+   if (png_ptr->transformations & PNG_FILLER)
+      png_do_read_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
+         png_ptr->filler, png_ptr->filler_loc);
+#endif
 }
 
+#if defined(PNG_READ_PACK_SUPPORTED)
 /* unpack pixels of 1, 2, or 4 bits per pixel into 1 byte per pixel,
    without changing the actual values.  Thus, if you had a row with
    a bit depth of 1, you would end up with bytes that only contained
    the numbers 0 or 1.  If you would rather they contain 0 and 255, use
    png_do_shift() after this. */
 void
-png_do_unpack(png_row_info *row_info, png_byte *row)
+png_do_unpack(png_row_info *row_info, png_bytef *row)
 {
+   int shift;
+   png_bytef *sp, *dp;
+   png_uint_32 i;
+   
    if (row && row_info && row_info->bit_depth < 8)
    {
       switch (row_info->bit_depth)
       {
          case 1:
          {
-            png_byte *sp;
-            png_byte *dp;
-            int shift;
-            png_uint_32 i;
-
             sp = row + (png_size_t)((row_info->width - 1) >> 3);
             dp = row + (png_size_t)row_info->width - 1;
             shift = 7 - (int)((row_info->width + 7) & 7);
@@ -695,10 +808,6 @@ png_do_unpack(png_row_info *row_info, png_byte *row)
          }
          case 2:
          {
-            png_byte *sp;
-            png_byte *dp;
-            int shift;
-            png_uint_32 i;
 
             sp = row + (png_size_t)((row_info->width - 1) >> 2);
             dp = row + (png_size_t)row_info->width - 1;
@@ -720,11 +829,6 @@ png_do_unpack(png_row_info *row_info, png_byte *row)
          }
          case 4:
          {
-            png_byte *sp;
-            png_byte *dp;
-            int shift;
-            png_uint_32 i;
-
             sp = row + (png_size_t)((row_info->width - 1) >> 1);
             dp = row + (png_size_t)row_info->width - 1;
             shift = (int)((1 - ((row_info->width + 1) & 1)) << 4);
@@ -749,16 +853,22 @@ png_do_unpack(png_row_info *row_info, png_byte *row)
       row_info->rowbytes = row_info->width * row_info->channels;
    }
 }
+#endif
 
+#if defined(PNG_READ_SHIFT_SUPPORTED)
 /* reverse the effects of png_do_shift.  This routine merely shifts the
    pixels back to their significant bits values.  Thus, if you have
    a row of bit depth 8, but only 5 are significant, this will shift
    the values back to 0 through 31 */
 void
-png_do_unshift(png_row_info *row_info, png_byte *row,
+png_do_unshift(png_row_info *row_info, png_bytef *row,
    png_color_8 *sig_bits)
 {
-   if (row && row_info && sig_bits)
+   png_bytef *bp;
+   png_uint_16 value;
+   png_uint_32 i;
+   if (row && row_info && sig_bits &&
+      row_info->color_type != PNG_COLOR_TYPE_PALETTE)
    {
       int shift[4];
       int channels;
@@ -783,9 +893,6 @@ png_do_unshift(png_row_info *row_info, png_byte *row,
       {
          case 2:
          {
-            png_byte *bp;
-            png_uint_32 i;
-
             for (bp = row, i = 0;
                i < row_info->rowbytes;
                i++, bp++)
@@ -797,9 +904,7 @@ png_do_unshift(png_row_info *row_info, png_byte *row,
          }
          case 4:
          {
-            png_byte *bp, mask;
-            png_uint_32 i;
-
+            png_byte  mask;
             mask = (png_byte)(((int)0xf0 >> shift[0]) & (int)0xf0) |
                ((int)0xf >> shift[0]);
             for (bp = row, i = 0;
@@ -813,9 +918,6 @@ png_do_unshift(png_row_info *row_info, png_byte *row,
          }
          case 8:
          {
-            png_byte *bp;
-            png_uint_32 i;
-
             for (bp = row, i = 0;
                i < row_info->width; i++)
             {
@@ -830,10 +932,6 @@ png_do_unshift(png_row_info *row_info, png_byte *row,
          }
          case 16:
          {
-            png_byte *bp;
-            png_uint_16 value;
-            png_uint_32 i;
-
             for (bp = row, i = 0;
                i < row_info->width; i++)
             {
@@ -852,16 +950,17 @@ png_do_unshift(png_row_info *row_info, png_byte *row,
       }
    }
 }
+#endif
 
+#if defined(PNG_READ_16_TO_8_SUPPORTED)
 /* chop rows of bit depth 16 down to 8 */
 void
-png_do_chop(png_row_info *row_info, png_byte *row)
+png_do_chop(png_row_info *row_info, png_bytef *row)
 {
+   png_bytef *sp, *dp;
+   png_uint_32 i;
    if (row && row_info && row_info->bit_depth == 16)
    {
-      png_byte *sp, *dp;
-      png_uint_32 i;
-
       sp = row + 2;
       dp = row + 1;
       for (i = 1; i < row_info->width * row_info->channels; i++)
@@ -875,64 +974,63 @@ png_do_chop(png_row_info *row_info, png_byte *row)
       row_info->rowbytes = row_info->width * row_info->channels;
    }
 }
+#endif
 
-/* add filler byte after rgb */
+#if defined(PNG_READ_FILLER_SUPPORTED)
+/* add filler byte */
 void
-png_do_read_rgbx(png_row_info *row_info, png_byte *row)
+png_do_read_filler(png_row_info *row_info, png_bytef *row,
+   png_byte filler, png_byte filler_loc)
 {
+   png_bytef *sp, *dp;
+   png_uint_32 i;
    if (row && row_info && row_info->color_type == 2 &&
       row_info->bit_depth == 8)
    {
-      png_byte *sp, *dp;
-      png_uint_32 i;
-
-      for (i = 1, sp = row + (png_size_t)row_info->width * 3,
-         dp = row + (png_size_t)row_info->width * 4;
-         i < row_info->width;
-         i++)
+      if (filler_loc == PNG_FILLER_AFTER)
       {
-         *(--dp) = 0xff;
-         *(--dp) = *(--sp);
-         *(--dp) = *(--sp);
-         *(--dp) = *(--sp);
+         for (i = 1, sp = row + (png_size_t)row_info->width * 3,
+            dp = row + (png_size_t)row_info->width * 4;
+            i < row_info->width;
+            i++)
+         {
+            *(--dp) = filler;
+            *(--dp) = *(--sp);
+            *(--dp) = *(--sp);
+            *(--dp) = *(--sp);
+         }
+         *(--dp) = filler;
+         row_info->channels = 4;
+         row_info->pixel_depth = 32;
+         row_info->rowbytes = row_info->width * 4;
       }
-      *(--dp) = 0xff;
-      row_info->channels = 4;
-      row_info->pixel_depth = 32;
-      row_info->rowbytes = row_info->width * 4;
+      else
+      {
+         for (i = 0, sp = row + (png_size_t)row_info->width * 3,
+            dp = row + (png_size_t)row_info->width * 4;
+            i < row_info->width;
+            i++)
+         {
+            *(--dp) = *(--sp);
+            *(--dp) = *(--sp);
+            *(--dp) = *(--sp);
+            *(--dp) = filler;
+         }
+         row_info->channels = 4;
+         row_info->pixel_depth = 32;
+         row_info->rowbytes = row_info->width * 4;
+      }
    }
 }
+#endif
 
-/* add filler byte before rgb */
-void
-png_do_read_xrgb(png_row_info *row_info, png_byte *row)
-{
-   if (row && row_info && row_info->color_type == 2 &&
-      row_info->bit_depth == 8)
-   {
-      png_byte *sp, *dp;
-      png_uint_32 i;
-
-      for (i = 0, sp = row + (png_size_t)row_info->width * 3,
-         dp = row + (png_size_t)row_info->width * 4;
-         i < row_info->width;
-         i++)
-      {
-         *(--dp) = *(--sp);
-         *(--dp) = *(--sp);
-         *(--dp) = *(--sp);
-         *(--dp) = 0xff;
-      }
-      row_info->channels = 4;
-      row_info->pixel_depth = 32;
-      row_info->rowbytes = row_info->width * 4;
-   }
-}
-
+#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
 /* expand grayscale files to rgb, with or without alpha */
 void
-png_do_gray_to_rgb(png_row_info *row_info, png_byte *row)
+png_do_gray_to_rgb(png_row_info *row_info, png_bytef *row)
 {
+   png_bytef *sp, *dp;
+   png_uint_32 i;
    if (row && row_info && row_info->bit_depth >= 8 &&
       !(row_info->color_type & PNG_COLOR_MASK_COLOR))
    {
@@ -940,9 +1038,6 @@ png_do_gray_to_rgb(png_row_info *row_info, png_byte *row)
       {
          if (row_info->bit_depth == 8)
          {
-            png_byte *sp, *dp;
-            png_uint_32 i;
-
             for (i = 0, sp = row + (png_size_t)row_info->width - 1,
                dp = row + (png_size_t)row_info->width * 3 - 1;
                i < row_info->width;
@@ -956,9 +1051,6 @@ png_do_gray_to_rgb(png_row_info *row_info, png_byte *row)
          }
          else
          {
-            png_byte *sp, *dp;
-            png_uint_32 i;
-
             for (i = 0, sp = row + (png_size_t)row_info->width * 2 - 1,
                dp = row + (png_size_t)row_info->width * 6 - 1;
                i < row_info->width;
@@ -979,9 +1071,6 @@ png_do_gray_to_rgb(png_row_info *row_info, png_byte *row)
       {
          if (row_info->bit_depth == 8)
          {
-            png_byte *sp, *dp;
-            png_uint_32 i;
-
             for (i = 0, sp = row + (png_size_t)row_info->width * 2 - 1,
                dp = row + (png_size_t)row_info->width * 4 - 1;
                i < row_info->width;
@@ -996,9 +1085,6 @@ png_do_gray_to_rgb(png_row_info *row_info, png_byte *row)
          }
          else
          {
-            png_byte *sp, *dp;
-            png_uint_32 i;
-
             for (i = 0, sp = row + (png_size_t)row_info->width * 4 - 1,
                dp = row + (png_size_t)row_info->width * 8 - 1;
                i < row_info->width;
@@ -1024,6 +1110,7 @@ png_do_gray_to_rgb(png_row_info *row_info, png_byte *row)
          row_info->pixel_depth + 7) >> 3);
    }
 }
+#endif
 
 /* build a grayscale palette.  Palette is assumed to be 1 << bit_depth
    large of png_color.  This lets grayscale images be treated as
@@ -1071,6 +1158,7 @@ png_build_grayscale_palette(int bit_depth, png_color *palette)
    }
 }
 
+#if defined(PNG_READ_DITHER_SUPPORTED)
 void
 png_correct_palette(png_struct *png_ptr, png_color *palette,
    int num_palette)
@@ -1235,18 +1323,23 @@ png_correct_palette(png_struct *png_ptr, png_color *palette,
       }
    }
 }
+#endif
 
+#if defined(PNG_READ_BACKGROUND_SUPPORTED)
 /* replace any alpha or transparency with the supplied background color.
    background is the color (in rgb or grey or palette index, as
    appropriate).  note that paletted files are taken care of elsewhere */
 void
-png_do_background(png_row_info *row_info, png_byte *row,
+png_do_background(png_row_info *row_info, png_bytef *row,
    png_color_16 *trans_values, png_color_16 *background,
    png_color_16 *background_1,
    png_byte *gamma_table, png_byte *gamma_from_1, png_byte *gamma_to_1,
    png_uint_16 **gamma_16, png_uint_16 **gamma_16_from_1,
    png_uint_16 **gamma_16_to_1, int gamma_shift)
 {
+   png_bytef *sp, *dp;
+   png_uint_32 i;
+   int shift;
    if (row && row_info && background &&
       (!(row_info->color_type & PNG_COLOR_MASK_ALPHA) ||
       (row_info->color_type != PNG_COLOR_TYPE_PALETTE &&
@@ -1260,10 +1353,6 @@ png_do_background(png_row_info *row_info, png_byte *row,
             {
                case 1:
                {
-                  png_byte *sp;
-                  int shift;
-                  png_uint_32 i;
-
                   sp = row;
                   shift = 7;
                   for (i = 0; i < row_info->width; i++)
@@ -1286,10 +1375,6 @@ png_do_background(png_row_info *row_info, png_byte *row,
                }
                case 2:
                {
-                  png_byte *sp;
-                  int shift;
-                  png_uint_32 i;
-
                   sp = row;
                   shift = 6;
                   for (i = 0; i < row_info->width; i++)
@@ -1312,10 +1397,6 @@ png_do_background(png_row_info *row_info, png_byte *row,
                }
                case 4:
                {
-                  png_byte *sp;
-                  int shift;
-                  png_uint_32 i;
-
                   sp = row + 1;
                   shift = 4;
                   for (i = 0; i < row_info->width; i++)
@@ -1338,10 +1419,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
                }
                case 8:
                {
+#if defined(PNG_READ_GAMMA_SUPPORTED)
                   if (gamma_table)
                   {
-                     png_byte *sp;
-                     png_uint_32 i;
 
                      for (i = 0, sp = row;
                         i < row_info->width; i++, sp++)
@@ -1357,10 +1437,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                      }
                   }
                   else
+#endif
                   {
-                     png_byte *sp;
-                     png_uint_32 i;
-
                      for (i = 0, sp = row;
                         i < row_info->width; i++, sp++)
                      {
@@ -1374,11 +1452,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
                }
                case 16:
                {
+#if defined(PNG_READ_GAMMA_SUPPORTED)
                   if (gamma_16)
                   {
-                     png_byte *sp;
-                     png_uint_32 i;
-
                      for (i = 0, sp = row;
                         i < row_info->width; i++, sp += 2)
                      {
@@ -1401,10 +1477,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                      }
                   }
                   else
+#endif
                   {
-                     png_byte *sp;
-                     png_uint_32 i;
-
                      for (i = 0, sp = row;
                         i < row_info->width; i++, sp += 2)
                      {
@@ -1428,11 +1502,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
          {
             if (row_info->bit_depth == 8)
             {
+#if defined(PNG_READ_GAMMA_SUPPORTED)
                if (gamma_table)
                {
-                  png_byte *sp;
-                  png_uint_32 i;
-
                   for (i = 0, sp = row;
                      i < row_info->width; i++, sp += 3)
                   {
@@ -1453,10 +1525,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                   }
                }
                else
+#endif
                {
-                  png_byte *sp;
-                  png_uint_32 i;
-
                   for (i = 0, sp = row;
                      i < row_info->width; i++, sp += 3)
                   {
@@ -1473,11 +1543,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
             }
             else if (row_info->bit_depth == 16)
             {
+#if defined(PNG_READ_GAMMA_SUPPORTED)
                if (gamma_16)
                {
-                  png_byte *sp;
-                  png_uint_32 i;
-
                   for (i = 0, sp = row;
                      i < row_info->width; i++, sp += 6)
                   {
@@ -1519,10 +1587,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                   }
                }
                else
+#endif
                {
-                  png_byte *sp;
-                  png_uint_32 i;
-
                   for (i = 0, sp = row;
                      i < row_info->width; i++, sp += 6)
                   {
@@ -1556,11 +1622,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
             {
                case 8:
                {
+#if defined(PNG_READ_GAMMA_SUPPORTED)
                   if (gamma_to_1 && gamma_from_1 && gamma_table)
                   {
-                     png_byte *sp, *dp;
-                     png_uint_32 i;
-
                      for (i = 0, sp = row,
                         dp = row;
                         i < row_info->width; i++, sp += 2, dp++)
@@ -1589,10 +1653,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                      }
                   }
                   else
+#endif
                   {
-                     png_byte *sp, *dp;
-                     png_uint_32 i;
-
                      for (i = 0, sp = row,
                         dp = row;
                         i < row_info->width; i++, sp += 2, dp++)
@@ -1620,11 +1682,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
                }
                case 16:
                {
+#if defined(PNG_READ_GAMMA_SUPPORTED)
                   if (gamma_16 && gamma_16_from_1 && gamma_16_to_1)
                   {
-                     png_byte *sp, *dp;
-                     png_uint_32 i;
-
                      for (i = 0, sp = row,
                         dp = row;
                         i < row_info->width; i++, sp += 4, dp += 2)
@@ -1655,8 +1715,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                               *(sp + 1) >> gamma_shift][*sp];
                            v = (g * (png_uint_32)a +
                               (png_uint_32)background_1->gray *
-                              (png_uint_32)((png_uint_16)65535 - a) +
-                              (png_uint_16)32767) / (png_uint_16)65535;
+                              (png_uint_32)((png_uint_16)65535L - a) +
+                              (png_uint_16)32767) / (png_uint_16)65535L;
                            v = gamma_16_from_1[(size_t)(
                               (v & 0xff) >> gamma_shift)][(size_t)(v >> 8)];
                            *dp = (png_byte)((v >> 8) & 0xff);
@@ -1665,10 +1725,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                      }
                   }
                   else
+#endif
                   {
-                     png_byte *sp, *dp;
-                     png_uint_32 i;
-
                      for (i = 0, sp = row,
                         dp = row;
                         i < row_info->width; i++, sp += 4, dp += 2)
@@ -1679,7 +1737,7 @@ png_do_background(png_row_info *row_info, png_byte *row,
                            (png_uint_16)(*(sp + 3));
                         if (a == (png_uint_16)0xffff)
                         {
-                           memcpy(dp, sp, 2);
+                           png_memcpy(dp, sp, 2);
                         }
                         else if (a == 0)
                         {
@@ -1694,8 +1752,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                               (png_uint_32)(*(sp + 1));
                            v = (g * (png_uint_32)a +
                               (png_uint_32)background_1->gray *
-                              (png_uint_32)((png_uint_16)65535 - a) +
-                              (png_uint_16)32767) / (png_uint_16)65535;
+                              (png_uint_32)((png_uint_16)65535L - a) +
+                              (png_uint_16)32767) / (png_uint_16)65535L;
                            *dp = (png_byte)((v >> 8) & 0xff);
                            *(dp + 1) = (png_byte)(v & 0xff);
                         }
@@ -1710,11 +1768,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
          {
             if (row_info->bit_depth == 8)
             {
+#if defined(PNG_READ_GAMMA_SUPPORTED)
                if (gamma_to_1 && gamma_from_1 && gamma_table)
                {
-                  png_byte *sp, *dp;
-                  png_uint_32 i;
-
                   for (i = 0, sp = row,
                      dp = row;
                      i < row_info->width; i++, sp += 4, dp += 3)
@@ -1757,10 +1813,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                   }
                }
                else
+#endif
                {
-                  png_byte *sp, *dp;
-                  png_uint_32 i;
-
                   for (i = 0, sp = row,
                      dp = row;
                      i < row_info->width; i++, sp += 4, dp += 3)
@@ -1797,11 +1851,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
             }
             else if (row_info->bit_depth == 16)
             {
+#if defined(PNG_READ_GAMMA_SUPPORTED)
                if (gamma_16 && gamma_16_from_1 && gamma_16_to_1)
                {
-                  png_byte *sp, *dp;
-                  png_uint_32 i;
-
                   for (i = 0, sp = row,
                      dp = row;
                      i < row_info->width; i++, sp += 8, dp += 6)
@@ -1844,8 +1896,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                            *(sp + 1) >> gamma_shift][*sp];
                         v = (v * (png_uint_32)a +
                            (png_uint_32)background->red *
-                           (png_uint_32)((png_uint_16)65535 - a) +
-                           (png_uint_16)32767) / (png_uint_16)65535;
+                           (png_uint_32)((png_uint_16)65535L - a) +
+                           (png_uint_16)32767) / (png_uint_16)65535L;
                         v = gamma_16_from_1[(size_t)(
                            (v & 0xff) >> gamma_shift)][(size_t)(v >> 8)];
                         *dp = (png_byte)((v >> 8) & 0xff);
@@ -1854,8 +1906,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                            *(sp + 3) >> gamma_shift][*(sp + 2)];
                         v = (v * (png_uint_32)a +
                            (png_uint_32)background->green *
-                           (png_uint_32)((png_uint_16)65535 - a) +
-                           (png_uint_16)32767) / (png_uint_16)65535;
+                           (png_uint_32)((png_uint_16)65535L - a) +
+                           (png_uint_16)32767) / (png_uint_16)65535L;
                         v = gamma_16_from_1[(size_t)(
                            (v & 0xff) >> gamma_shift)][(size_t)(v >> 8)];
                         *(dp + 2) = (png_byte)((v >> 8) & 0xff);
@@ -1864,8 +1916,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                            *(sp + 5) >> gamma_shift][*(sp + 4)];
                         v = (v * (png_uint_32)a +
                            (png_uint_32)background->blue *
-                           (png_uint_32)((png_uint_16)65535 - a) +
-                           (png_uint_16)32767) / (png_uint_16)65535;
+                           (png_uint_32)((png_uint_16)65535L - a) +
+                           (png_uint_16)32767) / (png_uint_16)65535L;
                         v = gamma_16_from_1[(size_t)(
                            (v & 0xff) >> gamma_shift)][(size_t)(v >> 8)];
                         *(dp + 4) = (png_byte)((v >> 8) & 0xff);
@@ -1874,10 +1926,8 @@ png_do_background(png_row_info *row_info, png_byte *row,
                   }
                }
                else
+#endif
                {
-                  png_byte *sp, *dp;
-                  png_uint_32 i;
-
                   for (i = 0, sp = row,
                      dp = row;
                      i < row_info->width; i++, sp += 8, dp += 6)
@@ -1888,7 +1938,7 @@ png_do_background(png_row_info *row_info, png_byte *row,
                         (png_uint_16)(*(sp + 7));
                      if (a == (png_uint_16)0xffff)
                      {
-                        memcpy(dp, sp, 6);
+                        png_memcpy(dp, sp, 6);
                      }
                      else if (a == 0)
                      {
@@ -1911,20 +1961,20 @@ png_do_background(png_row_info *row_info, png_byte *row,
                            (png_uint_32)(*(sp + 5));
                         v = (r * (png_uint_32)a +
                            (png_uint_32)background->red *
-                           (png_uint_32)((png_uint_32)65535 - a) +
-                           (png_uint_32)32767) / (png_uint_32)65535;
+                           (png_uint_32)((png_uint_32)65535L - a) +
+                           (png_uint_32)32767) / (png_uint_32)65535L;
                         *dp = (png_byte)((v >> 8) & 0xff);
                         *(dp + 1) = (png_byte)(v & 0xff);
                         v = (g * (png_uint_32)a +
                            (png_uint_32)background->green *
-                           (png_uint_32)((png_uint_32)65535 - a) +
-                           (png_uint_32)32767) / (png_uint_32)65535;
+                           (png_uint_32)((png_uint_32)65535L - a) +
+                           (png_uint_32)32767) / (png_uint_32)65535L;
                         *(dp + 2) = (png_byte)((v >> 8) & 0xff);
                         *(dp + 3) = (png_byte)(v & 0xff);
                         v = (b * (png_uint_32)a +
                            (png_uint_32)background->blue *
-                           (png_uint_32)((png_uint_32)65535 - a) +
-                           (png_uint_32)32767) / (png_uint_32)65535;
+                           (png_uint_32)((png_uint_32)65535L - a) +
+                           (png_uint_32)32767) / (png_uint_32)65535L;
                         *(dp + 4) = (png_byte)((v >> 8) & 0xff);
                         *(dp + 5) = (png_byte)(v & 0xff);
                      }
@@ -1945,7 +1995,9 @@ png_do_background(png_row_info *row_info, png_byte *row,
       }
    }
 }
+#endif
 
+#if defined(PNG_READ_GAMMA_SUPPORTED)
 /* gamma correct the image, avoiding the alpha channel.  Make sure
    you do this after you deal with the trasparency issue on grayscale
    or rgb images. If your bit depth is 8, use gamma_table, if it is 16,
@@ -1953,10 +2005,12 @@ png_do_background(png_row_info *row_info, png_byte *row,
    build_gamma_table().  If your bit depth < 8, gamma correct a
    palette, not the data.  */
 void
-png_do_gamma(png_row_info *row_info, png_byte *row,
+png_do_gamma(png_row_info *row_info, png_bytef *row,
    png_byte *gamma_table, png_uint_16 **gamma_16_table,
    int gamma_shift)
 {
+   png_bytef *sp;
+   png_uint_32 i;
    if (row && row_info && ((row_info->bit_depth <= 8 && gamma_table) ||
       (row_info->bit_depth == 16 && gamma_16_table)))
    {
@@ -1966,9 +2020,6 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
          {
             if (row_info->bit_depth == 8)
             {
-               png_byte *sp;
-               png_uint_32 i;
-
                for (i = 0, sp = row;
                   i < row_info->width; i++)
                {
@@ -1982,9 +2033,6 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
             }
             else if (row_info->bit_depth == 16)
             {
-               png_byte *sp;
-               png_uint_32 i;
-
                for (i = 0, sp = row;
                   i < row_info->width; i++)
                {
@@ -2013,9 +2061,6 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
          {
             if (row_info->bit_depth == 8)
             {
-               png_byte *sp;
-               png_uint_32 i;
-
                for (i = 0, sp = row;
                   i < row_info->width; i++)
                {
@@ -2030,9 +2075,6 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
             }
             else if (row_info->bit_depth == 16)
             {
-               png_byte *sp;
-               png_uint_32 i;
-
                for (i = 0, sp = row;
                   i < row_info->width; i++)
                {
@@ -2061,9 +2103,6 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
          {
             if (row_info->bit_depth == 8)
             {
-               png_byte *sp;
-               png_uint_32 i;
-
                for (i = 0, sp = row;
                   i < row_info->width; i++)
                {
@@ -2074,9 +2113,6 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
             }
             else if (row_info->bit_depth == 16)
             {
-               png_byte *sp;
-               png_uint_32 i;
-
                for (i = 0, sp = row;
                   i < row_info->width; i++)
                {
@@ -2095,9 +2131,6 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
          {
             if (row_info->bit_depth == 8)
             {
-               png_byte *sp;
-               png_uint_32 i;
-
                for (i = 0, sp = row;
                   i < row_info->width; i++)
                {
@@ -2107,9 +2140,6 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
             }
             else if (row_info->bit_depth == 16)
             {
-               png_byte *sp;
-               png_uint_32 i;
-
                for (i = 0, sp = row;
                   i < row_info->width; i++)
                {
@@ -2127,14 +2157,19 @@ png_do_gamma(png_row_info *row_info, png_byte *row,
       }
    }
 }
+#endif
 
+#if defined(PNG_READ_EXPAND_SUPPORTED)
 /* expands a palette row to an rgb or rgba row depending
    upon whether you supply trans and num_trans */
 void
-png_do_expand_palette(png_row_info *row_info, png_byte *row,
+png_do_expand_palette(png_row_info *row_info, png_bytef *row,
    png_color *palette,
    png_byte *trans, int num_trans)
 {
+   int shift, value;
+   png_bytef *sp, *dp;
+   png_uint_32 i;
    if (row && row_info && row_info->color_type == PNG_COLOR_TYPE_PALETTE)
    {
       if (row_info->bit_depth < 8)
@@ -2143,11 +2178,6 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
          {
             case 1:
             {
-               png_byte *sp;
-               png_byte *dp;
-               int shift;
-               png_uint_32 i;
-
                sp = row + (png_size_t)((row_info->width - 1) >> 3);
                dp = row + (png_size_t)row_info->width - 1;
                shift = 7 - (int)((row_info->width + 7) & 7);
@@ -2171,11 +2201,6 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
             }
             case 2:
             {
-               png_byte *sp;
-               png_byte *dp;
-               int shift, value;
-               png_uint_32 i;
-
                sp = row + (png_size_t)((row_info->width - 1) >> 2);
                dp = row + (png_size_t)row_info->width - 1;
                shift = (int)((3 - ((row_info->width + 3) & 3)) << 1);
@@ -2197,11 +2222,6 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
             }
             case 4:
             {
-               png_byte *sp;
-               png_byte *dp;
-               int shift, value;
-               png_uint_32 i;
-
                sp = row + (png_size_t)((row_info->width - 1) >> 1);
                dp = row + (png_size_t)row_info->width - 1;
                shift = (int)((row_info->width & 1) << 2);
@@ -2232,9 +2252,6 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
          {
             if (trans)
             {
-               png_byte *sp, *dp;
-               png_uint_32 i;
-
                sp = row + (png_size_t)row_info->width - 1;
                dp = row + (png_size_t)(row_info->width << 2) - 1;
 
@@ -2257,9 +2274,6 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
             }
             else
             {
-               png_byte *sp, *dp;
-               png_uint_32 i;
-
                sp = row + (png_size_t)row_info->width - 1;
                dp = row + (png_size_t)(row_info->width * 3) - 1;
 
@@ -2285,9 +2299,12 @@ png_do_expand_palette(png_row_info *row_info, png_byte *row,
 /* if the bit depth < 8, it is expanded to 8.  Also, if the
    transparency value is supplied, an alpha channel is built. */
 void
-png_do_expand(png_row_info *row_info, png_byte *row,
+png_do_expand(png_row_info *row_info, png_bytef *row,
    png_color_16 *trans_value)
 {
+   int shift, value;
+   png_bytef *sp, *dp;
+   png_uint_32 i;
    if (row && row_info)
    {
       if (row_info->color_type == PNG_COLOR_TYPE_GRAY &&
@@ -2297,11 +2314,6 @@ png_do_expand(png_row_info *row_info, png_byte *row,
          {
             case 1:
             {
-               png_byte *sp;
-               png_byte *dp;
-               int shift;
-               png_uint_32 i;
-
                sp = row + (png_size_t)((row_info->width - 1) >> 3);
                dp = row + (png_size_t)row_info->width - 1;
                shift = 7 - (int)((row_info->width + 7) & 7);
@@ -2325,11 +2337,6 @@ png_do_expand(png_row_info *row_info, png_byte *row,
             }
             case 2:
             {
-               png_byte *sp;
-               png_byte *dp;
-               int shift, value;
-               png_uint_32 i;
-
                sp = row + (png_size_t)((row_info->width - 1) >> 2);
                dp = row + (png_size_t)row_info->width - 1;
                shift = (int)((3 - ((row_info->width + 3) & 3)) << 1);
@@ -2352,11 +2359,6 @@ png_do_expand(png_row_info *row_info, png_byte *row,
             }
             case 4:
             {
-               png_byte *sp;
-               png_byte *dp;
-               int shift, value;
-               png_uint_32 i;
-
                sp = row + (png_size_t)((row_info->width - 1) >> 1);
                dp = row + (png_size_t)row_info->width - 1;
                shift = (int)((1 - ((row_info->width + 1) & 1)) << 2);
@@ -2385,9 +2387,6 @@ png_do_expand(png_row_info *row_info, png_byte *row,
       {
          if (row_info->bit_depth == 8)
          {
-            png_byte *sp, *dp;
-            png_uint_32 i;
-
             sp = row + (png_size_t)row_info->width - 1;
             dp = row + (png_size_t)(row_info->width << 1) - 1;
             for (i = 0; i < row_info->width; i++)
@@ -2401,9 +2400,6 @@ png_do_expand(png_row_info *row_info, png_byte *row,
          }
          else if (row_info->bit_depth == 16)
          {
-            png_byte *sp, *dp;
-            png_uint_32 i;
-
             sp = row + (png_size_t)row_info->rowbytes - 1;
             dp = row + (png_size_t)(row_info->rowbytes << 1) - 1;
             for (i = 0; i < row_info->width; i++)
@@ -2433,9 +2429,6 @@ png_do_expand(png_row_info *row_info, png_byte *row,
       {
          if (row_info->bit_depth == 8)
          {
-            png_byte *sp, *dp;
-            png_uint_32 i;
-
             sp = row + (png_size_t)row_info->rowbytes - 1;
             dp = row + (png_size_t)(row_info->width << 2) - 1;
             for (i = 0; i < row_info->width; i++)
@@ -2453,9 +2446,6 @@ png_do_expand(png_row_info *row_info, png_byte *row,
          }
          else if (row_info->bit_depth == 16)
          {
-            png_byte *sp, *dp;
-            png_uint_32 i;
-
             sp = row + (png_size_t)row_info->rowbytes - 1;
             dp = row + (png_size_t)(row_info->width << 3) - 1;
             for (i = 0; i < row_info->width; i++)
@@ -2491,20 +2481,21 @@ png_do_expand(png_row_info *row_info, png_byte *row,
       }
    }
 }
+#endif
 
+#if defined(PNG_READ_DITHER_SUPPORTED)
 void
-png_do_dither(png_row_info *row_info, png_byte *row,
+png_do_dither(png_row_info *row_info, png_bytef *row,
    png_byte *palette_lookup, png_byte *dither_lookup)
 {
+   png_bytef *sp, *dp;
+   png_uint_32 i;
    if (row && row_info)
    {
       if (row_info->color_type == PNG_COLOR_TYPE_RGB &&
          palette_lookup && row_info->bit_depth == 8)
       {
          int r, g, b, p;
-         png_byte *sp, *dp;
-         png_uint_32 i;
-
          sp = row;
          dp = row;
          for (i = 0; i < row_info->width; i++)
@@ -2541,9 +2532,6 @@ png_do_dither(png_row_info *row_info, png_byte *row,
          palette_lookup && row_info->bit_depth == 8)
       {
          int r, g, b, p;
-         png_byte *sp, *dp;
-         png_uint_32 i;
-
          sp = row;
          dp = row;
          for (i = 0; i < row_info->width; i++)
@@ -2573,9 +2561,6 @@ png_do_dither(png_row_info *row_info, png_byte *row,
       else if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
          dither_lookup && row_info->bit_depth == 8)
       {
-         png_byte *sp;
-         png_uint_32 i;
-
          sp = row;
          for (i = 0; i < row_info->width; i++, sp++)
          {
@@ -2584,7 +2569,9 @@ png_do_dither(png_row_info *row_info, png_byte *row,
       }
    }
 }
+#endif
 
+#if defined(PNG_READ_GAMMA_SUPPORTED)
 static int png_gamma_shift[] =
    {0x10, 0x21, 0x42, 0x84, 0x110, 0x248, 0x550, 0xff0};
 
@@ -2707,7 +2694,7 @@ png_build_gamma_table(png_struct *png_ptr)
       	while (last < (num << 8))
          {
 		      png_ptr->gamma_16_table[(int)(last >> 8)][(int)(last & 0xff)] =
-               (png_uint_16)65535;
+               (png_uint_16)65535L;
             last++;
          }
       }
@@ -2772,3 +2759,5 @@ png_build_gamma_table(png_struct *png_ptr)
       }
    }
 }
+#endif
+

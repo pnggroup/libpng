@@ -1,9 +1,9 @@
 libpng.txt - a description on how to use and modify libpng
 
-   libpng 1.0 beta 1 - version 0.71
+   libpng 1.0 beta 2 - version 0.8
    For conditions of distribution and use, see copyright notice in png.h
    Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-   June 26, 1995
+   August 20, 1995
 
 This file describes how to use and modify the PNG reference library
 (known as libpng) for your own use.  There are four sections to this
@@ -325,17 +325,21 @@ PC's store them, for example), call this:
       png_set_swap(png_ptr);
 
 PNG files store rgb pixels packed into 3 bytes.  If you would rather
-pack them into 4 bytes, with the filler byte last, call this:
+pack them into 4 bytes, call this:
 
    if (info_ptr->bit_depth == 8 &&
       info_ptr->color_type == PNG_COLOR_TYPE_RGB)
-      png_set_rgbx(png_ptr);
+      png_set_filler(png_ptr, filler_byte, PNG_FILLER_BEFORE);
 
-If you need the filler byte first, call this:
+where filler_byte is the number to fill with, and the location is
+either PNG_FILLER_BEFORE or PNG_FILLER_AFTER, depending upon whether
+you want the filler before the rgb or after.
 
-   if (info_ptr->bit_depth == 8 &&
-      info_ptr->color_type == PNG_COLOR_TYPE_RGB)
-      png_set_xrgb(png_ptr);
+Finally, if you need the interlacing as discussed below, call
+this here:
+
+   if (info_ptr->interlace_type)
+      number_passes = png_set_interlace_handling(png_ptr);
 
 After setting the transformations, you can update your palette by
 calling png_start_read_image().  This function is provided for those
@@ -345,7 +349,22 @@ before it reads the first row.
 
    png_start_read_image(png_ptr);
 
-That's it for the transformations.  Now you can read the image data.
+If you want, libpng will update your png_info structure to reflect
+any transformations you've requested with this call.  This is most
+useful to update the info structures rowbytes field, so you can
+use it to allocate your image memory.  This function calls
+png_start_read_image(), so you don't have to call both of them.
+
+   png_read_update_info(png_ptr, info_ptr);
+
+After you call png_read_update_info(), you can allocate any
+memory you need to hold the image.  As the actual allocation
+varies among applications, no example will be given.  If you
+are allocating one large chunk, you may find it useful to
+build an array of pointers to each row, as it will be needed
+for some of the functions below.
+
+After you've allocated memory, you can read the image data.
 The simplest way to do this is in one function call.  If you are
 allocating enough memory to hold the whole image, you can just
 call png_read_image() and libpng will read in all the image data
@@ -399,7 +418,7 @@ call png_read_rows() the correct number of times to read in all
 seven images.  See the PNG specification for more details on the
 interlacing scheme.
 
-If you want libpng to expand the images, call this:
+If you want libpng to expand the images, call this above:
 
    if (info_ptr->interlace_type)
       number_passes = png_set_interlace_handling(png_ptr);
@@ -521,6 +540,25 @@ Customizing Libpng section below.
 
    png_init_io(png_ptr, fp);
 
+You now have the option of modifying how the compression library
+will run.  The following functions are mainly for testing, but
+may be useful in certain special cases, like if you need to
+write png files extremely fast and are willing to give up some
+compression, or if you want to get the maximum possible compression
+at the expense of slower writing.  If you have no special needs
+in this area, let the library do what it wants, as it has been
+carefully tuned to deliver the best speed/compression ratio.
+See the compression library for more details.
+
+   /* turn on or off filtering (1 or 0) */
+   png_set_filtering(png_struct *png_ptr, 1);
+
+   png_set_compression_level(png_ptr, Z_DEFAULT_COMPRESSION);
+   png_set_compression_mem_level(png_ptr, 8);
+   png_set_compression_strategy(png_ptr, Z_DEFAULT_STRATEGY);
+   png_set_compression_window_bits(png_ptr, 15);
+   png_set_compression_method(png_ptr, 8);
+
 You now need to fill in the png_info structure with all the data
 you wish to write before the actual image.  Note that the only thing
 you are allowed to write after the image is the text chunks and the
@@ -600,14 +638,13 @@ make sure to only enable a transformation if it will be valid for
 the data.  For example, don't swap red and blue on grayscale data.
 
 PNG files store rgb pixels packed into 3 bytes.  If you would rather
-supply the pixels as 4 bytes per pixel, with the filler byte last,
-call this:
+supply the pixels as 4 bytes per pixel, call this:
 
-   png_set_rgbx(png_ptr);
+   png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
 
-If your filler byte goes first, call this:
-
-   png_set_xrgb(png_ptr);
+where the 0 is not used for writing, and the location is either
+PNG_FILLER_BEFORE or PNG_FILLER_AFTER, depending upon whether you
+want the filler before the rgb or after.
 
 PNG files pack pixels of bit depths 1, 2, and 4 into bytes as small as
 they can, resulting in, for example, 8 pixels per byte for 1 bit files.
@@ -818,4 +855,17 @@ an include, this is the place to do it.  The includes that are not
 needed outside libpng are protected by the PNG_INTERNAL definition,
 which is only defined for those routines inside libpng itself.  The
 files in libpng proper only include png.h.
+
+Removing unwanted object code:
+
+There are a bunch of #define's in png.h that control what parts of
+libpng are compiled.  All the defines end in _SUPPORT.  If you are
+not using an ability, you can change the #define to #undef and
+save yourself code and data space.  All the reading and writing
+specific code are in seperate files, so the linker should only grab
+the files it needs.  However, if you want to make sure, or if you
+are building a stand alone library, all the reading files start with
+pngr and all the writing files start with pngw.  The files that
+don't match either (like png.c, pngtrans.c, etc.) are used for
+both reading and writing, and always need to be included.
 

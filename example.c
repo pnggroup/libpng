@@ -6,6 +6,10 @@
    designed to be a starting point of an implementation.
    This is not officially part of libpng, and therefore
    does not require a copyright notice.
+
+   This file does not currently compile, because it is missing
+   certain parts, like allocating memory to hold an image.
+   You will have to supply these parts to get it to compile.
    */
 
 #include <png.h>
@@ -81,15 +85,11 @@ void read_png(char *file_name)
    /* read the file information */
    png_read_info(png_ptr, info_ptr);
 
-   /* allocate the memory to hold the image using the fields
-      of png_info. */
-
    /* set up the transformations you want.  Note that these are
       all optional.  Only call them if you want them */
 
    /* expand paletted colors into true rgb */
-   if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
-      info_ptr->bit_depth < 8)
+   if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       png_set_expand(png_ptr);
 
    /* expand grayscale images to the full 8 bits */
@@ -163,25 +163,31 @@ void read_png(char *file_name)
    if (info_ptr->bit_depth == 16)
       png_set_swap(png_ptr);
 
-   /* add a filler byte to store rgb files as rgbx */
+   /* add a filler byte to rgb files */
    if (info_ptr->bit_depth == 8 &&
       info_ptr->color_type == PNG_COLOR_TYPE_RGB)
-      png_set_rgbx(png_ptr);
+      png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 
-   /* optional call to update palette with transformations */
-   png_start_read_image(png_ptr);
-
-   /* the easiest way to read the image */
-   void *row_pointers[height];
-   png_read_image(png_ptr, row_pointers);
-
-   /* the other way to read images - deal with interlacing */
-
-   /* turn on interlace handling */
+   /* turn on interlace handling if you are not using png_read_image() */
    if (info_ptr->interlace_type)
       number_passes = png_set_interlace_handling(png_ptr);
    else
       number_passes = 1;
+
+   /* optional call to update palette with transformations */
+   png_start_read_image(png_ptr);
+
+   /* optional call to update the info structure */
+   png_read_update_info(png_ptr, info_ptr);
+
+   /* allocate the memory to hold the image using the fields
+      of png_info. */
+
+   /* the easiest way to read the image */
+   png_bytef *row_pointers[height];
+   png_read_image(png_ptr, row_pointers);
+
+   /* the other way to read images - deal with interlacing */
 
    for (pass = 0; pass < number_passes; pass++)
    {
@@ -191,7 +197,7 @@ void read_png(char *file_name)
       /* If you are only reading on row at a time, this works */
       for (y = 0; y < height; y++)
       {
-         char *row_pointers = row[y];
+         png_bytef *row_pointers = row[y];
          png_read_rows(png_ptr, &row_pointers, NULL, 1);
       }
 
@@ -309,20 +315,21 @@ void write_png(char *file_name, ... other image information ...)
    /* swap bytes of 16 bit files to most significant bit first */
    png_set_swap(png_ptr);
 
-   /* get rid of filler bytes, pack rgb into 3 bytes */
-   png_set_rgbx(png_ptr);
+   /* get rid of filler bytes, pack rgb into 3 bytes.  The
+      filler number is not used. */
+   png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
 
-   /* the easiest way to write the image */
-   void *row_pointers[height];
-   png_write_image(png_ptr, row_pointers);
-
-   /* the other way to write the image - deal with interlacing */
-
-   /* turn on interlace handling */
+   /* turn on interlace handling if you are not using png_write_image() */
    if (interlacing)
       number_passes = png_set_interlace_handling(png_ptr);
    else
       number_passes = 1;
+
+   /* the easiest way to write the image */
+   png_bytef *row_pointers[height];
+   png_write_image(png_ptr, row_pointers);
+
+   /* the other way to write the image - deal with interlacing */
 
    for (pass = 0; pass < number_passes; pass++)
    {
@@ -332,7 +339,7 @@ void write_png(char *file_name, ... other image information ...)
       /* If you are only writing one row at a time, this works */
       for (y = 0; y < height; y++)
       {
-         char *row_pointers = row[y];
+         png_bytef *row_pointers = row[y];
          png_write_rows(png_ptr, &row_pointers, 1);
       }
    }

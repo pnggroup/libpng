@@ -2,18 +2,19 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=gcc
-CFLAGS=-I../zlib -O3
-LDFLAGS=-L. -L../zlib/ -lpng -lgz -lm
+CC=cc
+CFLAGS=-I../zlib -O
+LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
-RANLIB=ranlib
-#RANLIB=echo
+#RANLIB=ranlib
+RANLIB=echo
 
 # where make install puts libpng.a and png.h
 prefix=/usr/local
 
 OBJS = png.o pngrcb.o pngrutil.o pngtrans.o pngwutil.o \
-	pngread.o pngstub.o pngwrite.o pngrtran.o pngwtran.o
+	pngread.o pngio.o pngwrite.o pngrtran.o pngwtran.o \
+   pngmem.o pngerror.o
 
 all: libpng.a pngtest
 
@@ -22,13 +23,18 @@ libpng.a: $(OBJS)
 	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a
-	cc -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+
+test: pngtest
+	./pngtest
 
 install: libpng.a
 	-@mkdir $(prefix)/include
 	-@mkdir $(prefix)/lib
 	cp png.h $(prefix)/include
+	cp pngconf.h $(prefix)/include
 	chmod 644 $(prefix)/include/png.h
+	chmod 644 $(prefix)/include/pngconf.h
 	cp libpng.a $(prefix)/lib
 	chmod 644 $(prefix)/lib/libpng.a
 
@@ -37,13 +43,16 @@ clean:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-pngrcb.o: png.h
-pngread.o: png.h
-pngrtran.o: png.h
-pngrutil.o: png.h
-pngstub.o: png.h
-pngtest.o: png.h
-pngtrans.o: png.h
-pngwrite.o: png.h
-pngwtran.o: png.h
-pngwutil.o: png.h
+png.o: png.h pngconf.h
+pngerror.o: png.h pngconf.h
+pngio.o: png.h pngconf.h
+pngmem.o: png.h pngconf.h
+pngrcb.o: png.h pngconf.h
+pngread.o: png.h pngconf.h
+pngrtran.o: png.h pngconf.h
+pngrutil.o: png.h pngconf.h
+pngtest.o: png.h pngconf.h
+pngtrans.o: png.h pngconf.h
+pngwrite.o: png.h pngconf.h
+pngwtran.o: png.h pngconf.h
+pngwutil.o: png.h pngconf.h
