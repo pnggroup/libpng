@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.4d - October 6, 1999
+ * libpng version 1.0.4e - October 10, 1999
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -9,19 +9,19 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.89c, May 1996: Guy Schalnat
  *  libpng versions 0.90, December 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.4d - October 6, 1999: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.4e - October 10, 1999: Glenn
  *  See also "Contributing Authors", below.
  *
  * Y2K compliance in libpng:
  * =========================
  *    
- *    October 6, 1999
+ *    October 10, 1999
  *    
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *    
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.4d are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.4e are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *    
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -95,7 +95,7 @@
  *    1.0.3                    1.0.3    10003  2.1.0.3
  *    1.0.3a-d                 1.0.3a-d 10004  2.1.0.3a-d
  *    1.0.4                    1.0.4    10004  2.1.0.4
- *    1.0.4a-c                 1.0.4a-c 10005  2.1.0.4a-c
+ *    1.0.4a-e                 1.0.4a-e 10005  2.1.0.4a-e
  *    1.0.5                    1.0.5    10005  2.1.0.5
  *
  *    Henceforth the source version will match the shared-library minor
@@ -117,7 +117,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.90, December 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.4d, October 6, 1999)
+ * (libpng versions 0.97, January 1998, through 1.0.4e, October 10, 1999)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -208,7 +208,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.4d"
+#define PNG_LIBPNG_VER_STRING "1.0.4e"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -806,9 +806,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.4d
+and png.h are both at * version 1.0.4e
  */
-typedef png_structp version_1_0_4d;
+typedef png_structp version_1_0_4e;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1629,7 +1629,7 @@ png_get_header_version(png_structp png_ptr)
 {
    if(png_ptr == NULL)
      /* silence compiler warning about unused png_ptr */ ;
-   return("\n libpng version 1.0.4d - October 6, 1999 (header)\n");
+   return("\n libpng version 1.0.4e - October 10, 1999 (header)\n");
 }
 #endif
 

@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.4d - October 6, 1999
+ * libpng 1.0.4e - October 10, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -26,7 +26,6 @@ png_read_filter_row_c(png_structp png_ptr, png_row_infop row_info,
 static int mmxsupport()
 {
   int mmx_supported_local = 0;
-
   _asm {
     pushfd            //Save Eflag to stack
     pop eax           //Get Eflag from stack into eax
@@ -968,11 +967,13 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
    png_debug(1,"in png_do_read_interlace\n");
 
 #ifdef DISABLE_PNGVCRD_INTERLACE
-   /* A sign error in the post-MMX cleanup code for each pixel_depth resulted
+   /* In libpng versions 1.0.3a through 1.0.4d,
+    * a sign error in the post-MMX cleanup code for each pixel_depth resulted
     * in bad pixels at the beginning of some rows of some images, and also
     * (due to out-of-range memory reads and writes) caused heap corruption
-    * when compiled with MSVC 6.0.  The error is now fixed, and the code
-    * appears to work completely correctly, so it is enabled by default.
+    * when compiled with MSVC 6.0.  The error was fixed in version 1.0.4e,
+    * and the code appears to work completely correctly, so it is enabled
+    * by default.
     */
    if (1)  /* all passes caused a heap problem in the old code */
       mmx_supported = 0;
@@ -1342,16 +1343,29 @@ loop1_pass0:
                      dp -= width_mmx*8;
                      for (i = width; i; i--)
                      {
-                        png_byte v[8];
                         int j;
 
-                        png_memcpy(v, sptr, pixel_bytes);
+                       /* I simplified this part in version 1.0.4e
+                        * here and in several other instances where
+                        * pixel_bytes == 1  -- GR-P
+                        *
+                        * Original code:
+                        *
+                        * png_byte v[8];
+                        * png_memcpy(v, sptr, pixel_bytes);
+                        * for (j = 0; j < png_pass_inc[pass]; j++)
+                        * {
+                        *    png_memcpy(dp, v, pixel_bytes);
+                        *    dp -= pixel_bytes;
+                        * }
+                        * sptr -= pixel_bytes;
+                        *
+                        * Replacement code is in the next three lines:
+                        */
+
                         for (j = 0; j < png_pass_inc[pass]; j++)
-                        {
-                           png_memcpy(dp, v, pixel_bytes);
-                           dp -= pixel_bytes;
-                        }
-                        sptr -= pixel_bytes;
+                           *dp-- = *sptr;
+                        sptr--;
                      }
                   }
                   else if ((pass == 2) || (pass == 3))
@@ -1387,16 +1401,13 @@ loop1_pass2:
                      dp -= width_mmx*4;
                      for (i = width; i; i--)
                      {
-                        png_byte v[8];
                         int j;
 
-                        png_memcpy(v, sptr, pixel_bytes);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           png_memcpy(dp, v, pixel_bytes);
-                           dp -= pixel_bytes;
+                           *dp-- = *sptr;
                         }
-                        sptr -= pixel_bytes;
+                        sptr --;
                      }
                   }
                   else //if ((pass == 4) || (pass == 5))
@@ -1433,16 +1444,13 @@ loop1_pass4:
                      dp -= width_mmx*2;
                      for (i = width; i; i--)
                      {
-                        png_byte v[8];
                         int j;
 
-                        png_memcpy(v, sptr, pixel_bytes);
                         for (j = 0; j < png_pass_inc[pass]; j++)
                         {
-                           png_memcpy(dp, v, pixel_bytes);
-                           dp -= pixel_bytes;
+                           *dp-- = *sptr;
                         }
-                        sptr -= pixel_bytes;
+                        sptr --;
                      }
                   }
                } /* end of pixel_bytes == 1 */
@@ -1768,16 +1776,10 @@ loop4_pass4:
                {
                   for (i = width; i; i--)
                   {
-                     png_byte v[8];
                      int j;
-
-                     png_memcpy(v, sptr, pixel_bytes);
                      for (j = 0; j < png_pass_inc[pass]; j++)
-                     {
-                        png_memcpy(dp, v, pixel_bytes);
-                        dp -= pixel_bytes;
-                     }
-                     sptr -= pixel_bytes;
+                        *dp-- = *sptr;
+                     sptr--;
                   }
                }
                else if (pixel_bytes == 3)
