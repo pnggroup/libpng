@@ -1,5 +1,5 @@
 
-Libpng 1.0.7beta14 - May 17, 2000
+Libpng 1.0.7beta15 - May 29, 2000
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -75,6 +75,12 @@ Changes since the last public release (1.0.6):
   Removed info_ptr->valid tests from png_free_data(), as in version 1.0.5.
   Added png_set_invalid() function.
   Fixed incorrect illustrations of png_destroy_write_struct() in example.c.
+  Revised the deliberately erroneous Linux setjmp code in pngconf.h to produce
+    fewer error messages.
+  Set each pointer to NULL after freeing it in png_free_data().
+  Worked around a problem in pngconf.h; AIX's strings.h defines an "index"
+    macro that conflicts with libpng's png_color_16.index. (Dimitri Papadapoulos)
+  Added "msvc" directory with MSVC++ project files (Simon-Pierre Cadieux).
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -392,7 +392,7 @@ version 1.0.3 [January 14, 1999]
 version 1.0.3a [August 12, 1999]
   Added check for PNG_READ_INTERLACE_SUPPORTED in pngread.c; issue a warning
      if an attempt is made to read an interlaced image when it's not supported.
-  Added check if png_ptr->trans is defined before free'ing it in pngread.c
+  Added check if png_ptr->trans is defined before freeing it in pngread.c
   Modified the Y2K statement to include versions back to version 0.71
   Fixed a bug in the check for valid IHDR bit_depth/color_types in pngrutil.c
   Modified makefile.wat (added -zp8 flag, ".symbolic", changed some comments)
@@ -669,7 +669,7 @@ version 1.0.6d [April 7, 2000]
   Fixed an error in png_rgb_to_gray_fixed()
   Revised example.c, usage of png_destroy_write_struct().
   Renamed makefile.ibmvac3 to makefile.ibmc, added libpng.icc IBM project file
-  Added a check for info_ptr->free_me&PNG_FREE_TEXT when free'ing text in png.c
+  Added a check for info_ptr->free_me&PNG_FREE_TEXT when freeing text in png.c
   Simplify png_sig_bytes() function to remove use of non-ISO-C strdup().
 version 1.0.6e [April 9, 2000]
   Added png_data_freer() function.
@@ -745,19 +745,32 @@ version 1.0.7beta12 [May 12, 2000]
   Added png_access_version_number() function.
   Check for mask&PNG_FREE_CHNK (for TEXT, SCAL, PCAL) in png_free_data().
   Expanded libpng.3/libpng.txt information about png_data_freer().
-version 1.0.7beta13 [May 16, 2000]
+version 1.0.7beta14 [May 17, 2000] (beta13 was not published)
   Changed pnggccrd.c and pngvcrd.c to handle bad adaptive filter types as
     warnings instead of errors, as pngrutil.c does.
   Set the PNG_INFO_IDAT valid flag in png_set_rows() so png_write_png()
     will actually write IDATs.
   Made the default PNG_USE_LOCAL_ARRAYS depend on PNG_DLL instead of WIN32.
-  Make png_free_data() ignore its final parameter when freeing data that can
-    have multiple instances (text, sPLT, unknowns).
-version 1.0.7beta14 [May 17, 2000]
+  Make png_free_data() ignore its final parameter except when freeing data
+    that can have multiple instances (text, sPLT, unknowns).
   Fixed a new bug in png_set_rows().
   Removed info_ptr->valid tests from png_free_data(), as in version 1.0.5.
   Added png_set_invalid() function.
   Fixed incorrect illustrations of png_destroy_write_struct() in example.c.
+version 1.0.7beta15 [May 29, 2000]
+  Revised the deliberately erroneous Linux setjmp code in pngconf.h to produce
+    fewer error messages.
+  Rearranged checks for Z_OK to check the most likely path first in pngpread.c
+    and pngwutil.c.
+  Added checks in pngtest.c for png_create_*() returning NULL, and mentioned
+    in libpng.txt/libpng.3 the need for applications to check this.
+  Changed names of png_default_*() functions in pngtest to pngtest_*().
+  Changed return type of png_get_x|y_offset_*() from png_uint_32 to png_int_32.
+  Fixed some bugs in the unused PNG_INCH_CONVERSIONS functions in pngget.c
+  Set each pointer to NULL after freeing it in png_free_data().
+  Worked around a problem in pngconf.h; AIX's strings.h defines an "index"
+    macro that conflicts with libpng's png_color_16.index. (Dimitri Papadapoulos)
+  Added "msvc" directory with MSVC++ project files (Simon-Pierre Cadieux).
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

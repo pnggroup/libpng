@@ -5,7 +5,7 @@ Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
 Copyright (c) 1996, 1997 Andreas Dilger
 (libpng versions 0.90, December 1996, through 0.96, May 1997)
 Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
-(libpng versions 0.97, January 1998, through 1.0.7beta14, May 17, 2000)
+(libpng versions 0.97, January 1998, through 1.0.7beta15, May 29, 2000)
 
 For the purposes of this copyright and license, "Contributing Authors"
 is defined as the following set of individuals:
@@ -68,4 +68,4 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 randeg@alum.rpi.edu
-May 17, 2000
+May 29, 2000

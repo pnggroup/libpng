@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.7beta14 - May 17, 2000
+ * libpng 1.0.7beta15 - May 29, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -232,7 +232,7 @@ static int wrote_question = 0;
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
 static void
-png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;
 
@@ -257,7 +257,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define MIN(a,b) (a <= b ? a : b)
 
 static void
-png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    int check;
    png_byte *n_data;
@@ -299,7 +299,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
 static void
-png_default_flush(png_structp png_ptr)
+pngtest_flush(png_structp png_ptr)
 {
    FILE *io_ptr;
    io_ptr = (FILE *)CVT_PTR((png_ptr->io_ptr));
@@ -314,7 +314,7 @@ png_default_flush(png_structp png_ptr)
    than changing the library. */
 #ifndef USE_FAR_KEYWORD
 static void
-png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
+pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
 
@@ -334,7 +334,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define MIN(a,b) (a <= b ? a : b)
 
 static void
-png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
+pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
    png_byte *near_data;  /* Needs to be "png_byte *" instead of "png_bytep" */
@@ -381,7 +381,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
  * not used, but it is passed in case it may be useful.
  */
 static void
-png_default_warning(png_structp png_ptr, png_const_charp message)
+pngtest_warning(png_structp png_ptr, png_const_charp message)
 {
    PNG_CONST char *name = "UNKNOWN (ERROR!)";
    if (png_ptr != NULL && png_ptr->error_ptr != NULL)
@@ -395,9 +395,9 @@ png_default_warning(png_structp png_ptr, png_const_charp message)
  * error function pointer in png_set_error_fn().
  */
 static void
-png_default_error(png_structp png_ptr, png_const_charp message)
+pngtest_error(png_structp png_ptr, png_const_charp message)
 {
-   png_default_warning(png_ptr, message);
+   pngtest_warning(png_ptr, message);
    /* We can return because png_error calls the default handler, which is
     * actually OK in this case. */
 }
@@ -426,6 +426,8 @@ typedef memory_information FAR *memory_infop;
 static memory_infop pinformation = NULL;
 static int current_allocation = 0;
 static int maximum_allocation = 0;
+static int total_allocation = 0;
+static int num_allocations = 0;
 
 extern PNG_EXPORT(png_voidp,png_debug_malloc) PNGARG((png_structp png_ptr,
    png_uint_32 size));
@@ -448,6 +450,8 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       memory_infop pinfo = png_malloc_default(png_ptr, sizeof *pinfo);
       pinfo->size = size;
       current_allocation += size;
+      total_allocation += size;
+      num_allocations ++;
       if (current_allocation > maximum_allocation)
          maximum_allocation = current_allocation;
       pinfo->pointer = png_malloc_default(png_ptr, size);
@@ -560,8 +564,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       (png_error_ptr)NULL, (png_error_ptr)NULL);
 #endif
 #if defined(PNG_NO_STDIO)
-   png_set_error_fn(read_ptr, (png_voidp)inname, png_default_error,
-       png_default_warning);
+   png_set_error_fn(read_ptr, (png_voidp)inname, pngtest_error,
+       pngtest_warning);
 #endif
 #ifdef PNG_USER_MEM_SUPPORTED
    write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
@@ -572,8 +576,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       (png_error_ptr)NULL, (png_error_ptr)NULL);
 #endif
 #if defined(PNG_NO_STDIO)
-   png_set_error_fn(write_ptr, (png_voidp)inname, png_default_error,
-       png_default_warning);
+   png_set_error_fn(write_ptr, (png_voidp)inname, pngtest_error,
+       pngtest_warning);
 #endif
    png_debug(0, "Allocating read_info, write_info and end_info structures\n");
    read_info_ptr = png_create_info_struct(read_ptr);
@@ -628,10 +632,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_init_io(read_ptr, fpin);
    png_init_io(write_ptr, fpout);
 #else
-   png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
-   png_set_write_fn(write_ptr, (png_voidp)fpout,  png_default_write_data,
+   png_set_read_fn(read_ptr, (png_voidp)fpin, pngtest_read_data);
+   png_set_write_fn(write_ptr, (png_voidp)fpout,  pngtest_write_data,
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
-      png_default_flush);
+      pngtest_flush);
 #else
       NULL);
 #endif
@@ -1280,10 +1284,14 @@ main(int argc, char *argv[])
 #endif
       }
 #ifdef PNG_USER_MEM_SUPPORTED
-         fprintf(STDERR, " Current memory allocation: %d bytes\n",
+         fprintf(STDERR, " Current memory allocation: %10d bytes\n",
             current_allocation);
-         fprintf(STDERR, " Maximum memory allocation: %d bytes\n",
+         fprintf(STDERR, " Maximum memory allocation: %10d bytes\n",
             maximum_allocation);
+         fprintf(STDERR, " Total   memory allocation: %10d bytes\n",
+            total_allocation);
+         fprintf(STDERR, "     Number of allocations: %10d\n",
+            num_allocations);
 #endif
    }
    else
@@ -1351,10 +1359,14 @@ main(int argc, char *argv[])
 #endif
        }
 #ifdef PNG_USER_MEM_SUPPORTED
-       fprintf(STDERR, " Current memory allocation: %d bytes\n",
+       fprintf(STDERR, " Current memory allocation: %10d bytes\n",
           current_allocation);
-       fprintf(STDERR, " Maximum memory allocation: %d bytes\n",
+       fprintf(STDERR, " Maximum memory allocation: %10d bytes\n",
           maximum_allocation);
+       fprintf(STDERR, " Total   memory allocation: %10d bytes\n",
+          total_allocation);
+       fprintf(STDERR, "     Number of allocations: %10d\n",
+            num_allocations);
 #endif
    }
 
@@ -1380,4 +1392,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_7beta14 your_png_h_is_not_version_1_0_7beta14;
+typedef version_1_0_7beta15 your_png_h_is_not_version_1_0_7beta15;

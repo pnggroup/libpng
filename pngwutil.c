@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.7beta14 - May 17, 2000
+ * libpng 1.0.7beta15 - May 29, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -260,52 +260,55 @@ png_text_compress(png_structp png_ptr,
    {
       /* tell zlib we are finished */
       ret = deflate(&png_ptr->zstream, Z_FINISH);
-      if (ret != Z_OK && ret != Z_STREAM_END)
+
+      if (ret == Z_OK)
+      {
+         /* check to see if we need more room */
+         if (!(png_ptr->zstream.avail_out))
+         {
+            /* check to make sure our output array has room */
+            if (comp->num_output_ptr >= comp->max_output_ptr)
+            {
+               int old_max;
+
+               old_max = comp->max_output_ptr;
+               comp->max_output_ptr = comp->num_output_ptr + 4;
+               if (comp->output_ptr != NULL)
+               {
+                  png_charpp old_ptr;
+
+                  old_ptr = comp->output_ptr;
+                  /* This could be optimized to realloc() */
+                  comp->output_ptr = (png_charpp)png_malloc(png_ptr,
+                     (png_uint_32)(comp->max_output_ptr * sizeof (png_charpp)));
+                  png_memcpy(comp->output_ptr, old_ptr,
+              old_max * sizeof (png_charp));
+                  png_free(png_ptr, old_ptr);
+               }
+               else
+                  comp->output_ptr = (png_charpp)png_malloc(png_ptr,
+                     (png_uint_32)(comp->max_output_ptr * sizeof (png_charp)));
+            }
+
+            /* save off the data */
+            comp->output_ptr[comp->num_output_ptr] =
+               (png_charp)png_malloc(png_ptr, (png_uint_32)png_ptr->zbuf_size);
+            png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
+               png_ptr->zbuf_size);
+            comp->num_output_ptr++;
+
+            /* and reset the buffer pointers */
+            png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+            png_ptr->zstream.next_out = png_ptr->zbuf;
+         }
+      }
+      else if (ret != Z_STREAM_END)
       {
          /* we got an error */
          if (png_ptr->zstream.msg != NULL)
             png_error(png_ptr, png_ptr->zstream.msg);
          else
             png_error(png_ptr, "zlib error");
-      }
-
-      /* check to see if we need more room */
-      if (!(png_ptr->zstream.avail_out) && ret == Z_OK)
-      {
-         /* check to make sure our output array has room */
-         if (comp->num_output_ptr >= comp->max_output_ptr)
-         {
-            int old_max;
-
-            old_max = comp->max_output_ptr;
-            comp->max_output_ptr = comp->num_output_ptr + 4;
-            if (comp->output_ptr != NULL)
-            {
-               png_charpp old_ptr;
-
-               old_ptr = comp->output_ptr;
-               /* This could be optimized to realloc() */
-               comp->output_ptr = (png_charpp)png_malloc(png_ptr,
-                  (png_uint_32)(comp->max_output_ptr * sizeof (png_charpp)));
-               png_memcpy(comp->output_ptr, old_ptr,
-           old_max * sizeof (png_charp));
-               png_free(png_ptr, old_ptr);
-            }
-            else
-               comp->output_ptr = (png_charpp)png_malloc(png_ptr,
-                  (png_uint_32)(comp->max_output_ptr * sizeof (png_charp)));
-         }
-
-         /* save off the data */
-         comp->output_ptr[comp->num_output_ptr] = (png_charp)png_malloc(png_ptr,
-            (png_uint_32)png_ptr->zbuf_size);
-         png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
-            png_ptr->zbuf_size);
-         comp->num_output_ptr++;
-
-         /* and reset the buffer pointers */
-         png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-         png_ptr->zstream.next_out = png_ptr->zbuf;
       }
    } while (ret != Z_STREAM_END);
 
@@ -1672,19 +1675,22 @@ png_write_finish_row(png_structp png_ptr)
       /* tell the compressor we are done */
       ret = deflate(&png_ptr->zstream, Z_FINISH);
       /* check for an error */
-      if (ret != Z_OK && ret != Z_STREAM_END)
+      if (ret == Z_OK)
+      {
+         /* check to see if we need more room */
+         if (!(png_ptr->zstream.avail_out))
+         {
+            png_write_IDAT(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
+            png_ptr->zstream.next_out = png_ptr->zbuf;
+            png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+         }
+      }
+      else if (ret != Z_STREAM_END)
       {
          if (png_ptr->zstream.msg != NULL)
             png_error(png_ptr, png_ptr->zstream.msg);
          else
             png_error(png_ptr, "zlib error");
-      }
-      /* check to see if we need more room */
-      if (!(png_ptr->zstream.avail_out) && ret == Z_OK)
-      {
-         png_write_IDAT(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
-         png_ptr->zstream.next_out = png_ptr->zbuf;
-         png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
       }
    } while (ret != Z_STREAM_END);
 

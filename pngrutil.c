@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.7beta14 - May 17, 2000
+ * libpng 1.0.7beta15 - May 29, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1347,16 +1347,16 @@ png_handle_pHYs(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_debug(1, "in png_handle_pHYs\n");
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
-      png_error(png_ptr, "Missing IHDR before pHYS");
+      png_error(png_ptr, "Missing IHDR before pHYs");
    else if (png_ptr->mode & PNG_HAVE_IDAT)
    {
-      png_warning(png_ptr, "Invalid pHYS after IDAT");
+      png_warning(png_ptr, "Invalid pHYs after IDAT");
       png_crc_finish(png_ptr, length);
       return;
    }
    else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs))
    {
-      png_warning(png_ptr, "Duplicate pHYS chunk");
+      png_warning(png_ptr, "Duplicate pHYs chunk");
       png_crc_finish(png_ptr, length);
       return;
    }
@@ -2469,6 +2469,11 @@ png_do_read_interlace
       row_info->rowbytes = ((final_width *
          (png_uint_32)row_info->pixel_depth + 7) >> 3);
    }
+#if !defined(PNG_READ_PACKSWAP_SUPPORTED)
+   /* silence compiler warning */
+   if (transformations)
+      return;
+#endif
 }
 #endif
 

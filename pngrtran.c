@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.7beta14 - May 17, 2000
+ * libpng 1.0.7beta15 - May 29, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -979,6 +979,11 @@ png_init_read_transformations(png_structp png_ptr)
    }
 #endif
  }
+#if !defined(PNG_READ_GAMMA_SUPPORTED) && !defined(PNG_READ_SHIFT_SUPPORTED) \
+ && !defined(PNG_READ_BACKGROUND_SUPPORTED)
+   if(png_ptr)
+      return;
+#endif
 }
 
 /* Modify the info structure to reflect the transformations.  The
@@ -1103,6 +1108,10 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
       info_ptr->bit_depth);
    info_ptr->rowbytes = ((info_ptr->width * info_ptr->pixel_depth + 7) >> 3);
 
+#if !defined(PNG_READ_EXPAND_SUPPORTED)
+   if(png_ptr)
+      return;
+#endif
 }
 
 /* Transform the row.  The order of transformations is significant,

@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.7beta14 - May 17, 2000
+ * libpng 1.0.7beta15 - May 29, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -31,6 +31,10 @@
 
 #ifndef PNG_ZBUF_SIZE
 #define PNG_ZBUF_SIZE 8192
+#endif
+
+#ifndef PNG_NO_FLOATING_POINT_SUPPORTED 
+#define PNG_FLOATING_POINT_SUPPORTED
 #endif
 
 /* If you are running on a machine where you cannot allocate more
@@ -126,14 +130,15 @@
 /* This is an attempt to force a single setjmp behaviour on Linux.  If
  * the X config stuff didn't define _BSD_SOURCE we wouldn't need this.
  */
+
 #  ifdef __linux__
 #    ifdef _BSD_SOURCE
 #      define _PNG_SAVE_BSD_SOURCE
 #      undef _BSD_SOURCE
 #    endif
 #    ifdef _SETJMP_H
-      __png.h__ already includes setjmp.h
-      __dont__ include it again
+      __png.h__ already includes setjmp.h;
+      __dont__ include it again.;
 #    endif
 #endif /* __linux__ */
 
@@ -154,6 +159,11 @@
 #include <string.h>
 #endif
 
+#ifdef _AIX
+/* "index" macro in AIX strings.h conflicts with libpng's png_color_16.index */
+#undef index
+#endif
+
 /* Other defines for things like memory and the like can go here.  */
 #ifdef PNG_INTERNAL
 #include <stdlib.h>
@@ -171,7 +181,7 @@
  * them inside an appropriate ifdef/endif pair for portability.
  */
 
-#if !defined(PNG_NO_FLOATING_POINT_SUPPORTED)
+#if defined(PNG_FLOATING_POINT_SUPPORTED)
 #if defined(MACOS)
 /* We need to check that <math.h> hasn't already been included earlier
  * as it seems it doesn't agree with <fp.h>, yet we should really use
@@ -182,6 +192,12 @@
 #endif
 #else
 #include <math.h>
+#endif
+#if defined(_AMIGA) && defined(__SASC) && defined(_M68881)
+/* Amiga SAS/C: We must include builtin FPU functions when compiling using
+ * MATH=68881
+ */
+#include <m68881.h>
 #endif
 #endif
 
@@ -318,12 +334,7 @@
 #define PNG_NO_FIXED_POINT_SUPPORTED
 #endif
 
-#ifndef PNG_NO_FLOATING_POINT_SUPPORTED 
-#define PNG_FLOATING_POINT_SUPPORTED
-#endif
-
 /* Ignore attempt to turn off both floating and fixed point support */
-
 #if !defined(PNG_FLOATING_POINT_SUPPORTED) || \
  !defined(PNG_NO_FIXED_POINT_SUPPORTED)
 #define PNG_FIXED_POINT_SUPPORTED

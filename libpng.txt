@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.7beta14 - May 17, 2000
+ libpng version 1.0.7beta15 - May 29, 2000
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -148,13 +148,13 @@ Customizing libpng.
     FILE *fp = fopen(file_name, "rb");
     if (!fp)
     {
-        return;
+        return (ERROR);
     }
     fread(header, 1, number, fp);
     is_png = !png_sig_cmp(header, 0, number);
     if (!is_png)
     {
-        return;
+        return (NOT_PNG);
     }
 
 
@@ -166,19 +166,21 @@ pointers to error handling functions, and a pointer to a data struct for
 use by the error functions, if necessary (the pointer and functions can
 be NULL if the default error handlers are to be used).  See the section
 on Changes to Libpng below regarding the old initialization functions.
+The structure allocation functions quietly return NULL if they fail to
+create the structure, so your application should check for that.
 
     png_structp png_ptr = png_create_read_struct
        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn);
     if (!png_ptr)
-        return;
+        return (ERROR);
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)
     {
         png_destroy_read_struct(&png_ptr,
            (png_infopp)NULL, (png_infopp)NULL);
-        return;
+        return (ERROR);
     }
 
     png_infop end_info = png_create_info_struct(png_ptr);
@@ -186,7 +188,7 @@ on Changes to Libpng below regarding the old initialization functions.
     {
         png_destroy_read_struct(&png_ptr, &info_ptr,
           (png_infopp)NULL);
-        return;
+        return (ERROR);
     }
 
 If you want to use your own memory allocation routines,
@@ -221,7 +223,7 @@ free any memory.
         png_destroy_read_struct(&png_ptr, &info_ptr,
            &end_info);
         fclose(fp);
-        return;
+        return (ERROR);
     }
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
@@ -1284,20 +1286,20 @@ png_infop info_ptr;
         (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
          user_error_fn, user_warning_fn);
     if (!png_ptr)
-        return -1;
+        return (ERROR);
     info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)
     {
         png_destroy_read_struct(&png_ptr, (png_infopp)NULL,
            (png_infopp)NULL);
-        return -1;
+        return (ERROR);
     }
 
     if (setjmp(png_jmpbuf(png_ptr)))
     {
         png_destroy_read_struct(&png_ptr, &info_ptr,
            (png_infopp)NULL);
-        return -1;
+        return (ERROR);
     }
 
     /* This one's new.  You can provide functions
@@ -1331,7 +1333,7 @@ png_infop info_ptr;
     {
         png_destroy_read_struct(&png_ptr, &info_ptr,
            (png_infopp)NULL);
-        return -1;
+        return (ERROR);
     }
 
     /* This one's new also.  Simply give it a chunk
@@ -1445,7 +1447,7 @@ custom writing functions.  See the discussion under Customizing libpng.
     FILE *fp = fopen(file_name, "wb");
     if (!fp)
     {
-       return;
+       return (ERROR);
     }
 
 Next, png_struct and png_info need to be allocated and initialized.
@@ -1460,14 +1462,14 @@ both "png_ptr"; you can call them anything you like, such as
        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn);
     if (!png_ptr)
-       return;
+       return (ERROR);
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)
     {
        png_destroy_write_struct(&png_ptr,
          (png_infopp)NULL);
-       return;
+       return (ERROR);
     }
 
 If you want to use your own memory allocation routines,
@@ -1492,9 +1494,9 @@ section below for more information on the libpng error handling.
 
     if (setjmp(png_jmpbuf(png_ptr)))
     {
-        png_destroy_write_struct(&png_ptr, &info_ptr);
-        fclose(fp);
-        return;
+       png_destroy_write_struct(&png_ptr, &info_ptr);
+       fclose(fp);
+       return (ERROR);
     }
     ...
     return;
@@ -2630,13 +2632,13 @@ application:
 
 VII. Y2K Compliance in libpng
 
-May 17, 2000
+May 29, 2000
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.7beta14 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.7beta15 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.7beta14 - May 17, 2000
+ * libpng 1.0.7beta15 - May 29, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -714,23 +714,26 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
    for(;;)
    {
       ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
-      if (ret == Z_STREAM_END)
+      if (ret != Z_OK)
       {
-         if (png_ptr->zstream.avail_in)
-            png_error(png_ptr, "Extra compressed data");
-         if (!(png_ptr->zstream.avail_out))
+         if (ret == Z_STREAM_END)
          {
-            png_push_process_row(png_ptr);
-         }
+            if (png_ptr->zstream.avail_in)
+               png_error(png_ptr, "Extra compressed data");
+            if (!(png_ptr->zstream.avail_out))
+            {
+               png_push_process_row(png_ptr);
+            }
 
-         png_ptr->mode |= PNG_AFTER_IDAT;
-         png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
-         break;
+            png_ptr->mode |= PNG_AFTER_IDAT;
+            png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
+            break;
+         }
+         else if (ret == Z_BUF_ERROR)
+            break;
+         else
+            png_error(png_ptr, "Decompression Error");
       }
-      else if (ret == Z_BUF_ERROR)
-         break;
-      else if (ret != Z_OK)
-         png_error(png_ptr, "Decompression Error");
       if (!(png_ptr->zstream.avail_out))
       {
          png_push_process_row(png_ptr);

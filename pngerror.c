@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng 1.0.7beta14 - May 17, 2000
+ * libpng 1.0.7beta15 - May 29, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -122,6 +122,9 @@ png_default_error(png_structp png_ptr, png_const_charp message)
 {
 #ifndef PNG_NO_CONSOLE_IO
    fprintf(stderr, "libpng error: %s\n", message);
+#else
+   if (message)
+     /* make compiler happy */ ;
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -135,7 +138,7 @@ png_default_error(png_structp png_ptr, png_const_charp message)
    longjmp(png_ptr->jmpbuf, 1);
 # endif
 #else
-   if (png_ptr == NULL)
+   if (png_ptr)
      /* make compiler happy */ ;
    PNG_ABORT();
 #endif
@@ -151,8 +154,11 @@ png_default_warning(png_structp png_ptr, png_const_charp message)
 {
 #ifndef PNG_NO_CONSOLE_IO
    fprintf(stderr, "libpng warning: %s\n", message);
+#else
+   if (message)
+     /* appease compiler */ ;
 #endif
-   if (png_ptr == NULL)
+   if (png_ptr)
       return;
 }
 

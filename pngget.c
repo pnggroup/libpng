@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.0.7beta14 - May 17, 2000
+ * libpng 1.0.7beta15 - May 29, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -115,15 +115,17 @@ png_get_compression_type(png_structp png_ptr, png_infop info_ptr)
 png_uint_32 PNGAPI
 png_get_x_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
 {
+   if (png_ptr != NULL && info_ptr != NULL)
 #if defined(PNG_pHYs_SUPPORTED)
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs))
+   if (info_ptr->valid & PNG_INFO_pHYs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_x_pixels_per_meter");
       if(info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
           return (0);
       else return (info_ptr->x_pixels_per_unit);
    }
-   else
+#else
+   return (0);
 #endif
    return (0);
 }
@@ -131,15 +133,17 @@ png_get_x_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
 png_uint_32 PNGAPI
 png_get_y_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
 {
+   if (png_ptr != NULL && info_ptr != NULL)
 #if defined(PNG_pHYs_SUPPORTED)
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs))
+   if (info_ptr->valid & PNG_INFO_pHYs)
    {
-      png_debug1(1, "in %s retrieval function\n", "png_get_y_pixels_per_meter");
+       png_debug1(1, "in %s retrieval function\n", "png_get_y_pixels_per_meter");
       if(info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
           return (0);
       else return (info_ptr->y_pixels_per_unit);
    }
-   else
+#else
+   return (0);
 #endif
    return (0);
 }
@@ -147,8 +151,9 @@ png_get_y_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
 png_uint_32 PNGAPI
 png_get_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
 {
+   if (png_ptr != NULL && info_ptr != NULL)
 #if defined(PNG_pHYs_SUPPORTED)
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs))
+   if (info_ptr->valid & PNG_INFO_pHYs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_pixels_per_meter");
       if(info_ptr->phys_unit_type != PNG_RESOLUTION_METER ||
@@ -156,7 +161,8 @@ png_get_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
           return (0);
       else return (info_ptr->x_pixels_per_unit);
    }
-   else
+#else
+   return (0);
 #endif
    return (0);
 }
@@ -165,82 +171,92 @@ png_get_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
 float PNGAPI
 png_get_pixel_aspect_ratio(png_structp png_ptr, png_infop info_ptr)
    {
+   if (png_ptr != NULL && info_ptr != NULL)
 #if defined(PNG_pHYs_SUPPORTED)
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs))
+   if (info_ptr->valid & PNG_INFO_pHYs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_aspect_ratio");
       if (info_ptr->x_pixels_per_unit == 0)
          return ((float)0.0);
       else
-         return ((float)info_ptr->y_pixels_per_unit
-            /(float)info_ptr->x_pixels_per_unit);
+         return ((float)((float)info_ptr->y_pixels_per_unit
+            /(float)info_ptr->x_pixels_per_unit));
    }
-   else
+#else
+   return (0.0);
 #endif
-      return ((float)0.0);
+   return ((float)0.0);
 }
 #endif
 
-png_uint_32 PNGAPI
+png_int_32 PNGAPI
 png_get_x_offset_microns(png_structp png_ptr, png_infop info_ptr)
 {
+   if (png_ptr != NULL && info_ptr != NULL)
 #if defined(PNG_oFFs_SUPPORTED)
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_oFFs))
+   if (info_ptr->valid & PNG_INFO_oFFs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_x_offset_microns");
       if(info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
           return (0);
       else return (info_ptr->x_offset);
    }
-   else
+#else
+   return (0);
 #endif
    return (0);
 }
 
-png_uint_32 PNGAPI
+png_int_32 PNGAPI
 png_get_y_offset_microns(png_structp png_ptr, png_infop info_ptr)
 {
+   if (png_ptr != NULL && info_ptr != NULL)
 #if defined(PNG_oFFs_SUPPORTED)
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_oFFs))
+   if (info_ptr->valid & PNG_INFO_oFFs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_y_offset_microns");
       if(info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
           return (0);
       else return (info_ptr->y_offset);
    }
-   else
+#else
+   return (0);
 #endif
    return (0);
 }
 
-png_uint_32 PNGAPI
+png_int_32 PNGAPI
 png_get_x_offset_pixels(png_structp png_ptr, png_infop info_ptr)
 {
+   if (png_ptr != NULL && info_ptr != NULL)
 #if defined(PNG_oFFs_SUPPORTED)
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_oFFs))
+   if (info_ptr->valid & PNG_INFO_oFFs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_x_offset_microns");
       if(info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
           return (0);
       else return (info_ptr->x_offset);
    }
-   else
+#else
+   return (0);
 #endif
    return (0);
 }
 
-png_uint_32 PNGAPI
+png_int_32 PNGAPI
 png_get_y_offset_pixels(png_structp png_ptr, png_infop info_ptr)
 {
+   if (png_ptr != NULL && info_ptr != NULL)
 #if defined(PNG_oFFs_SUPPORTED)
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_oFFs))
+   if (info_ptr->valid & PNG_INFO_oFFs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_y_offset_microns");
       if(info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
           return (0);
       else return (info_ptr->y_offset);
    }
-   else
+#else
+   return (0);
 #endif
    return (0);
 }
@@ -250,21 +266,21 @@ png_uint_32 PNGAPI
 png_get_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
    return ((png_uint_32)((float)png_get_pixels_per_meter(png_ptr, info_ptr)
-     *.0254 +.5);
+     *.0254 +.5));
 }
 
 png_uint_32 PNGAPI
 png_get_x_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
    return ((png_uint_32)((float)png_get_x_pixels_per_meter(png_ptr, info_ptr)
-     *.0254 +.5);
+     *.0254 +.5));
 }
 
 png_uint_32 PNGAPI
 png_get_y_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
    return ((png_uint_32)((float)png_get_y_pixels_per_meter(png_ptr, info_ptr)
-     *.0254 +.5);
+     *.0254 +.5));
 }
 
 float PNGAPI
@@ -278,7 +294,7 @@ float PNGAPI
 png_get_y_offset_inches(png_structp png_ptr, png_infop info_ptr)
 {
    return ((float)png_get_y_offset_microns(png_ptr, info_ptr)
-     *.00003937)
+     *.00003937);
 }
 
 #if defined(PNG_READ_pHYs_SUPPORTED)
@@ -305,7 +321,7 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
       {
          *unit_type = (int)info_ptr->phys_unit_type;
          retval |= PNG_INFO_pHYs;
-         if(unit_type == 1)
+         if(*unit_type == 1)
          {
             if (res_x != NULL) *res_x = (png_uint_32)(*res_x * .0254 + .50);
             if (res_y != NULL) *res_y = (png_uint_32)(*res_y * .0254 + .50);

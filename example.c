@@ -84,7 +84,7 @@ void read_png(char *file_name)  /* We need to open the file */
    FILE *fp;
 
    if ((fp = fopen(file_name, "rb")) == NULL)
-      return;
+      return (ERROR);
 #else no_open_file /* prototype 2 */
 void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 {
@@ -106,7 +106,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    if (png_ptr == NULL)
    {
       fclose(fp);
-      return;
+      return (ERROR);
    }
 
    /* Allocate/initialize the memory for image information.  REQUIRED. */
@@ -115,7 +115,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    {
       fclose(fp);
       png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
-      return;
+      return (ERROR);
    }
 
    /* Set error handling if you are using the setjmp/longjmp method (this is
@@ -129,7 +129,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
       fclose(fp);
       /* If we get here, we had a problem reading the file */
-      return;
+      return (ERROR);
    }
 
    /* One of the following I/O initialization methods is REQUIRED */
@@ -282,7 +282,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       /* This reduces the image to the palette supplied in the file */
       else if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette))
       {
-         png_color16p histogram;
+         png_uint_16p histogram;
 
          png_get_hIST(png_ptr, info_ptr, &histogram);
 
@@ -291,7 +291,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       }
    }
 
-   /* invert monocrome files to have 0 as white and 1 as black */
+   /* invert monochrome files to have 0 as white and 1 as black */
    png_set_invert_mono(png_ptr);
 
    /* If you want to shift the pixel values from the range [0,255] or
@@ -387,7 +387,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    fclose(fp);
 
    /* that's it */
-   return;
+   return (OK);
 }
 
 /* progressively read a file */
@@ -407,7 +407,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
    if (*png_ptr == NULL)
    {
       *info_ptr = NULL;
-      return ERROR;
+      return (ERROR);
    }
 
    *info_ptr = png_create_info_struct(png_ptr);
@@ -415,13 +415,13 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
    if (*info_ptr == NULL)
    {
       png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
-      return ERROR;
+      return (ERROR);
    }
 
    if (setjmp(png_jmpbuf((*png_ptr))))
    {
       png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
-      return ERROR;
+      return (ERROR);
    }
 
    /* This one's new.  You will need to provide all three
@@ -439,7 +439,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
    png_set_progressive_read_fn(*png_ptr, (void *)stream_data,
       info_callback, row_callback, end_callback);
 
-   return OK;
+   return (OK);
 }
 
 int
@@ -450,7 +450,7 @@ process_data(png_structp *png_ptr, png_infop *info_ptr,
    {
       /* Free the png_ptr and info_ptr memory on error */
       png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
-      return ERROR;
+      return (ERROR);
    }
 
    /* This one's new also.  Simply give it chunks of data as
@@ -464,7 +464,7 @@ process_data(png_structp *png_ptr, png_infop *info_ptr,
     * callback, if you aren't already displaying them there.
     */
    png_process_data(*png_ptr, *info_ptr, buffer, length);
-   return OK;
+   return (OK);
 }
 
 info_callback(png_structp png_ptr, png_infop info)
@@ -533,7 +533,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    /* open the file */
    fp = fopen(file_name, "wb");
    if (fp == NULL)
-      return;
+      return (ERROR);
 
    /* Create and initialize the png_struct with the desired error handler
     * functions.  If you want to use the default stderr and longjump method,
@@ -547,7 +547,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    if (png_ptr == NULL)
    {
       fclose(fp);
-      return;
+      return (ERROR);
    }
 
    /* Allocate/initialize the image information data.  REQUIRED */
@@ -556,7 +556,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    {
       fclose(fp);
       png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
-      return;
+      return (ERROR);
    }
 
    /* Set error handling.  REQUIRED if you aren't supplying your own
@@ -567,7 +567,7 @@ void write_png(char *file_name /* , ... other image information ... */)
       /* If we get here, we had a problem reading the file */
       fclose(fp);
       png_destroy_write_struct(&png_ptr, &info_ptr);
-      return;
+      return (ERROR);
    }
 
    /* One of the following I/O initialization functions is REQUIRED */
@@ -672,7 +672,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * all optional.  Only call them if you want them.
     */
 
-   /* invert monocrome pixels */
+   /* invert monochrome pixels */
    png_set_invert_mono(png_ptr);
 
    /* Shift the pixels up to a legal bit depth and fill in
@@ -768,7 +768,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    fclose(fp);
 
    /* that's it */
-   return;
+   return (OK);
 }
 
 #endif /* if 0 */
