@@ -15,10 +15,10 @@ AR = ar rcs
 RANLIB = ranlib
 RM = rm -f
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
-PNGMAJ = 2
-PNGMIN = 1.0.12beta1
+PNGMAJ = 0
+PNGMIN = 1.0.13
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -57,13 +57,16 @@ pngtest$(E): pngtest$(O) libpng$(A)
 
 install: libpng.a
 	-@if [ ! -d $(INCPATH)  ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(INCPATH)/libpng  ]; then mkdir $(INCPATH)/libpng; fi
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	cp png.h pngconf.h $(INCPATH)
-	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	-@rm $(INCPATH)/png.h
+	-@rm $(INCPATH)/pngconf.h
+	cp png.h pngconf.h $(INCPATH)/libpng
+	chmod 644 $(INCPATH)/libpng/png.h $(INCPATH)/libpng/pngconf.h
 	cp libpng.a $(LIBPATH)
 
 clean:
-	/bin/rm -f *.o libpng.a libpng.so* pngtest pngout.png
+	/bin/rm -f *.o libpng.a pngtest pngout.png
 
 png$(O): png.h pngconf.h
 pngerror$(O): png.h pngconf.h

@@ -1,8 +1,8 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.12beta1 - May 14, 2001
+ * libpng 1.0.13 - April 15, 2002
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -15,6 +15,8 @@
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
+
+#define PNG_1_0_X
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your
@@ -47,13 +49,11 @@
 
 /* Enabled by default in 1.2.0.  You can disable this if you don't need to
    support PNGs that are embedded in MNG datastreams */
-/*
-#ifndef PNG_NO_MNG_FEATURES
+#if !defined(PNG_1_0_X) && !defined(PNG_NO_MNG_FEATURES)
 #  ifndef PNG_MNG_FEATURES_SUPPORTED
 #    define PNG_MNG_FEATURES_SUPPORTED
 #  endif
 #endif
-*/
 
 #ifndef PNG_NO_FLOATING_POINT_SUPPORTED
 #  ifndef PNG_FLOATING_POINT_SUPPORTED
@@ -204,6 +204,9 @@
 
 #ifdef _NO_PROTO
 #  define PNGARG(arglist) ()
+#  ifndef PNG_TYPECAST_NULL
+#     define PNG_TYPECAST_NULL
+#  endif
 #else
 #  define PNGARG(arglist) arglist
 #endif /* _NO_PROTO */
@@ -228,7 +231,7 @@
 #  include <sys/types.h>
 #endif
 
-#ifndef PNG_SETJMP_NOT_SUPPORTED
+#if !defined(PNG_SETJMP_NOT_SUPPORTED) && !defined(PNG_NO_SETJMP_SUPPORTED)
 #  define PNG_SETJMP_SUPPORTED
 #endif
 
@@ -401,10 +404,10 @@
  */
 
 #ifndef PNG_iTXt_SUPPORTED
-#  ifndef PNG_READ_iTXt_SUPPORTED
+#  if !defined(PNG_READ_iTXt_SUPPORTED) && !defined(PNG_NO_READ_iTXt)
 #    define PNG_NO_READ_iTXt
 #  endif
-#  ifndef PNG_WRITE_iTXt_SUPPORTED
+#  if !defined(PNG_WRITE_iTXt_SUPPORTED) && !defined(PNG_NO_WRITE_iTXt)
 #    define PNG_NO_WRITE_iTXt
 #  endif
 #endif
@@ -590,12 +593,11 @@
 #  define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif
 
-/* Will be enabled in libpng-1.2.0 */
-/*
+#ifndef PNG_1_0_X
 #ifndef PNG_NO_ERROR_NUMBERS
 #define PNG_ERROR_NUMBERS_SUPPORTED
 #endif
-*/
+#endif /* PNG_1_0_X */
 
 #ifndef PNG_NO_WRITE_FLUSH
 #  define PNG_WRITE_FLUSH_SUPPORTED
@@ -634,7 +636,6 @@
 
 /* PNG_ASSEMBLER_CODE was enabled by default in version 1.2.0 
    even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined */
-/*
 #if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
 #  ifndef PNG_ASSEMBLER_CODE_SUPPORTED
 #    define PNG_ASSEMBLER_CODE_SUPPORTED
@@ -643,24 +644,18 @@
 #    define PNG_MMX_CODE_SUPPORTED
 #  endif
 #endif
-*/
-#if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
-#  if defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD)
-#    ifndef PNG_ASSEMBLER_CODE_SUPPORTED
-#      define PNG_ASSEMBLER_CODE_SUPPORTED
-#    endif
-#    if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
-#      define PNG_MMX_CODE_SUPPORTED
-#    endif
-#  endif
-#endif
 
-/* This will be enabled by default in libpng-1.2.0 */
-/*
+/* If you are sure that you don't need thread safety and you are compiling
+   with PNG_USE_PNGCCRD for an MMX application, you can define this for
+   faster execution.  See pnggccrd.c.
+#define PNG_THREAD_UNSAFE_OK
+*/
+
+#if !defined(PNG_1_0_X)
 #if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
 #  define PNG_USER_MEM_SUPPORTED
 #endif
-*/
+#endif /* PNG_1_0_X */
 
 /* These are currently experimental features, define them if you want */
 
@@ -670,9 +665,6 @@
 #  ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #    define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #  endif
-#endif
-#ifndef PNG_NO_ZALLOC_ZERO
-#  define PNG_ZALLOC_ZERO
 #endif
 */
 
@@ -743,8 +735,12 @@
 #  define PNG_iCCP_SUPPORTED
 #endif
 #ifndef PNG_NO_READ_iTXt
-#  define PNG_READ_iTXt_SUPPORTED
-#  define PNG_iTXt_SUPPORTED
+#  ifndef PNG_READ_iTXt_SUPPORTED
+#    define PNG_READ_iTXt_SUPPORTED
+#  endif
+#  ifndef PNG_iTXt_SUPPORTED
+#    define PNG_iTXt_SUPPORTED
+#  endif
 #endif
 #ifndef PNG_NO_READ_oFFs
 #  define PNG_READ_oFFs_SUPPORTED
@@ -859,7 +855,9 @@
 #  endif
 #endif
 #ifndef PNG_NO_WRITE_iTXt
-#  define PNG_WRITE_iTXt_SUPPORTED
+#  ifndef PNG_WRITE_iTXt_SUPPORTED
+#    define PNG_WRITE_iTXt_SUPPORTED
+#  endif
 #  ifndef PNG_iTXt_SUPPORTED
 #    define PNG_iTXt_SUPPORTED
 #  endif

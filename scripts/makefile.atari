@@ -26,8 +26,11 @@ pngtest.ttp: pngtest.o $(LBR)
 
 install: libpng.a
 	-@mkdir $(prefix)/include
+	-@mkdir $(prefix)/include/libpng
 	-@mkdir $(prefix)/lib
-	cp png.h $(prefix)/include
-	cp pngconf.h $(prefix)/include
-	chmod 644 $(prefix)/include/png.h
-	chmod 644 $(prefix)/include/pngconf.h
+	-@rm -f $(prefix)/include/png.h
+	-@rm -f $(prefix)/include/pngconf.h
+	cp png.h $(prefix)/include/libpng
+	cp pngconf.h $(prefix)/include/libpng
+	chmod 644 $(prefix)/include/libpng/png.h
+	chmod 644 $(prefix)/include/libpng/pngconf.h

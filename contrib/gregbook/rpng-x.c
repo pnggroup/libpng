@@ -21,10 +21,12 @@
     - 1.10:  added support for non-default visuals; fixed X pixel-conversion
     - 1.11:  added extra set of parentheses to png_jmpbuf() macro; fixed
               command-line parsing bug
+    - 1.12:  fixed small X memory leak (thanks to Francois Petitjean)
+    - 1.13:  fixed XFreeGC() crash bug
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -51,7 +53,7 @@
 
 #define PROGNAME  "rpng-x"
 #define LONGNAME  "Simple PNG Viewer for X"
-#define VERSION   "1.11 of 19 March 2000"
+#define VERSION   "1.13 of 16 August 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -117,6 +119,7 @@ static Colormap colormap;
 static int have_nondefault_visual = FALSE;
 static int have_colormap = FALSE;
 static int have_window = FALSE;
+static int have_gc = FALSE;
 /*
 ulg numcolors=0, pixels[256];
 ush reds[256], greens[256], blues[256];
@@ -542,9 +545,20 @@ static int rpng_x_create_window(void)
     XSetWMProperties(display, window, pWindowName, pIconName, NULL, 0,
       size_hints, wm_hints, NULL);
 
+    /* various properties and hints no longer needed; free memory */
+    if (pWindowName)
+       XFree(pWindowName->value);
+    if (pIconName)
+       XFree(pIconName->value);
+    if (size_hints)
+        XFree(size_hints);
+    if (wm_hints)
+       XFree(wm_hints);
+
     XMapWindow(display, window);
 
     gc = XCreateGC(display, window, 0, &gcvalues);
+    have_gc = TRUE;
 
 /*---------------------------------------------------------------------------
     Fill window with the specified background color.
@@ -814,7 +828,8 @@ static void rpng_x_cleanup(void)
         ximage = NULL;
     }
 
-    XFreeGC(display, gc);
+    if (have_gc)
+        XFreeGC(display, gc);
 
     if (have_window)
         XDestroyWindow(display, window);

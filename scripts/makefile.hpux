@@ -1,5 +1,5 @@
 # makefile for libpng, HPUX (10.20 and 11.00)
-# Copyright (C) 1999, 2000 Glenn Randers-Pehrson
+# Copyright (C) 1999-2002 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42
 # contributed by Jim Rice and updated by Chris Schleicher, Hewlett Packard
 # For conditions of distribution and use, see copyright notice in png.h
@@ -16,14 +16,17 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
 RANLIB=ranlib
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
-PNGMAJ = 2
-PNGMIN = 1.0.12beta1
+PNGMAJ = 0
+PNGMIN = 1.0.13
 PNGVER = $(PNGMAJ).$(PNGMIN)
+LIBNAME = libpng10
 
-# where make install puts libpng.a and png.h
+# where make install puts libpng.a, libpng10.sl, and png.h
 prefix=/opt/libpng
+LIBPATH=$prefix/lib
+INCPATH=$prefix/include
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -36,21 +39,22 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) +z -o $@ $*.c
 
-all: libpng.a libpng.sl pngtest
+all: libpng.a $(LIBNAME).sl pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
 	$(RANLIB) $@
 
-libpng.sl: libpng.sl.$(PNGMAJ)
-	ln -f -s libpng.sl.$(PNGMAJ) libpng.sl
+$(LIBNAME).sl: $(LIBNAME).sl.$(PNGMAJ)
+	ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl
 
-libpng.sl.$(PNGMAJ): libpng.sl.$(PNGVER)
-	ln -f -s libpng.sl.$(PNGVER) libpng.sl.$(PNGMAJ)
+$(LIBNAME).sl.$(PNGMAJ): $(LIBNAME).sl.$(PNGVER)
+	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ)
 
-libpng.sl.$(PNGVER): $(OBJSDLL)
+$(LIBNAME).sl.$(PNGVER): $(OBJSDLL)
 	$(LD) -b -L$(ZLIBLIB) +s +b $(ZLIBLIB) \
-	+h libpng.sl.$(PNGMAJ) -o libpng.sl.$(PNGVER) $(OBJSDLL) -lz
+	+h $(LIBNAME).sl.$(PNGMAJ) -o $(LIBNAME).sl.$(PNGVER) \
+	$(OBJSDLL) -lz
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
@@ -58,21 +62,46 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 
-install: libpng.a
-	-@mkdir $(prefix)/include
-	-@mkdir $(prefix)/lib
-	cp png.h $(prefix)/include
-	cp pngconf.h $(prefix)/include
-	chmod 644 $(prefix)/include/png.h
-	chmod 644 $(prefix)/include/pngconf.h
-	cp libpng.a libpng.sl.$(PNGVER) $(prefix)/lib
-	chmod 644 $(prefix)/lib/libpng.a
-	chmod 755 $(prefix)/lib/libpng.sl.$(PNGVER)
-	(cd $(prefix)/lib; ln -f -s libpng.sl.$(PNGVER) libpng.sl.$(PNGMAJ); \
-	ln -f -s libpng.sl.$(PNGMAJ) libpng.sl)
+install-headers: png.h pngconf.h
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	-@/bin/rm -f $(INCPATH)/libpng
+	ln -sf $(INCPATH)/$(LIBNAME) $(INCPATH)/libpng
+
+install-static: install-headers libpng.a
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	cp libpng.a $(LIBPATH)/$(LIBNAME).a
+	chmod 644 $(LIBPATH)/$(LIBNAME).a
+	-@/bin/rm -f $(LIBPATH)/libpng.a
+	ln -sf $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+
+install-shared: install-headers $(LIBNAME).sl.$(PNGVER)
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).sl.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).sl
+	-@/bin/rm -f $(LIBPATH)/libpng.sl
+	-@/bin/rm -f $(LIBPATH)/libpng.sl.2
+	-@/bin/rm -f $(LIBPATH)/libpng.sl.2.*
+	cp $(LIBNAME).sl.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).sl.$(PNGVER)
+	(cd $(LIBPATH); \
+	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl; \
+	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl.2; \
+	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl.2.$(PNGMIN); \
+	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ); \
+	ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl)
+	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi
+	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
+	cp libpng.pc $(LIBPATH)/pkgconfig/libpng10.pc
+	chmod 644 $(LIBPATH)/pkgconfig/libpng10.pc
+
+install: install-static install-shared
 
 clean:
-	rm -f *.o libpng.a libpng.sl* pngtest pngout.png
+	/bin/rm -f *.o libpng.a $(LIBNAME).sl $(LIBNAME).sl.$(PNGMAJ)* \
+	pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

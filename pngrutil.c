@@ -1,9 +1,9 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.12beta1 - May 14, 2001
+ * libpng 1.0.13 - April 15, 2002
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -691,6 +691,8 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_fixed_point int_x_white, int_y_white, int_x_red, int_y_red, int_x_green,
       int_y_green, int_x_blue, int_y_blue;
 
+   png_uint_32 uint_x, uint_y;
+
    png_debug(1, "in png_handle_cHRM\n");
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
@@ -724,60 +726,69 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    png_crc_read(png_ptr, buf, 4);
-   int_x_white = (png_fixed_point)png_get_uint_32(buf);
+   uint_x = png_get_uint_32(buf);
 
    png_crc_read(png_ptr, buf, 4);
-   int_y_white = (png_fixed_point)png_get_uint_32(buf);
+   uint_y = png_get_uint_32(buf);
 
-   if (int_x_white > 80000L || int_y_white > 80000L ||
-      int_x_white + int_y_white > 100000L)
+   if (uint_x > 80000L || uint_y > 80000L ||
+      uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM white point");
       png_crc_finish(png_ptr, 24);
       return;
    }
+   int_x_white = (png_fixed_point)uint_x;
+   int_y_white = (png_fixed_point)uint_y;
 
    png_crc_read(png_ptr, buf, 4);
-   int_x_red = (png_fixed_point)png_get_uint_32(buf);
+   uint_x = png_get_uint_32(buf);
 
    png_crc_read(png_ptr, buf, 4);
-   int_y_red = (png_fixed_point)png_get_uint_32(buf);
+   uint_y = png_get_uint_32(buf);
 
-   if (int_x_red > 80000L || int_y_red > 80000L ||
-      int_x_red + int_y_red > 100000L)
+   if (uint_x > 80000L || uint_y > 80000L ||
+      uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM red point");
       png_crc_finish(png_ptr, 16);
       return;
    }
+   int_x_red = (png_fixed_point)uint_x;
+   int_y_red = (png_fixed_point)uint_y;
 
    png_crc_read(png_ptr, buf, 4);
-   int_x_green = (png_fixed_point)png_get_uint_32(buf);
+   uint_x = png_get_uint_32(buf);
 
    png_crc_read(png_ptr, buf, 4);
-   int_y_green = (png_fixed_point)png_get_uint_32(buf);
+   uint_y = png_get_uint_32(buf);
 
-   if (int_x_green > 80000L || int_y_green > 80000L ||
-      int_x_green + int_y_green > 100000L)
+   if (uint_x > 80000L || uint_y > 80000L ||
+      uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM green point");
       png_crc_finish(png_ptr, 8);
       return;
    }
+   int_x_green = (png_fixed_point)uint_x;
+   int_y_green = (png_fixed_point)uint_y;
 
    png_crc_read(png_ptr, buf, 4);
-   int_x_blue = (png_fixed_point)png_get_uint_32(buf);
+   uint_x = png_get_uint_32(buf);
 
    png_crc_read(png_ptr, buf, 4);
-   int_y_blue = (png_fixed_point)png_get_uint_32(buf);
+   uint_y = png_get_uint_32(buf);
 
-   if (int_x_blue > 80000L || int_y_blue > 80000L ||
-      int_x_blue + int_y_blue > 100000L)
+   if (uint_x > 80000L || uint_y > 80000L ||
+      uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM blue point");
       png_crc_finish(png_ptr, 0);
       return;
    }
+   int_x_blue = (png_fixed_point)uint_x;
+   int_y_blue = (png_fixed_point)uint_y;
+
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    white_x = (float)int_x_white / (float)100000.0;
    white_y = (float)int_y_white / (float)100000.0;
@@ -794,12 +805,12 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
       if (abs(int_x_white - 31270L) > 1000 ||
           abs(int_y_white - 32900L) > 1000 ||
-          abs(  int_x_red - 64000L) > 1000 ||
-          abs(  int_y_red - 33000L) > 1000 ||
+          abs(int_x_red   - 64000L) > 1000 ||
+          abs(int_y_red   - 33000L) > 1000 ||
           abs(int_x_green - 30000L) > 1000 ||
           abs(int_y_green - 60000L) > 1000 ||
-          abs( int_x_blue - 15000L) > 1000 ||
-          abs( int_y_blue -  6000L) > 1000)
+          abs(int_x_blue  - 15000L) > 1000 ||
+          abs(int_y_blue  -  6000L) > 1000)
          {
 
             png_warning(png_ptr,
@@ -895,17 +906,6 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       igamma=(int)(info_ptr->gamma * 100000.);
 #  endif
 #endif
-#if 0 && defined(PNG_cHRM_SUPPORTED) && !defined(PNG_FIXED_POINT_SUPPORTED)
-/* We need to define these here because they aren't in png.h */
-   png_fixed_point int_x_white;
-   png_fixed_point int_y_white;
-   png_fixed_point int_x_red;
-   png_fixed_point int_y_red;
-   png_fixed_point int_x_green;
-   png_fixed_point int_y_green;
-   png_fixed_point int_x_blue;
-   png_fixed_point int_y_blue;
-#endif
       if(igamma < 45000L || igamma > 46000L)
       {
          png_warning(png_ptr,
@@ -928,12 +928,12 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (info_ptr->valid & PNG_INFO_cHRM)
       if (abs(info_ptr->int_x_white - 31270L) > 1000 ||
           abs(info_ptr->int_y_white - 32900L) > 1000 ||
-          abs(  info_ptr->int_x_red - 64000L) > 1000 ||
-          abs(  info_ptr->int_y_red - 33000L) > 1000 ||
+          abs(info_ptr->int_x_red   - 64000L) > 1000 ||
+          abs(info_ptr->int_y_red   - 33000L) > 1000 ||
           abs(info_ptr->int_x_green - 30000L) > 1000 ||
           abs(info_ptr->int_y_green - 60000L) > 1000 ||
-          abs( info_ptr->int_x_blue - 15000L) > 1000 ||
-          abs( info_ptr->int_y_blue -  6000L) > 1000)
+          abs(info_ptr->int_x_blue  - 15000L) > 1000 ||
+          abs(info_ptr->int_y_blue  -  6000L) > 1000)
          {
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
@@ -952,6 +952,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_charp chunkdata;
    png_byte compression_type;
+   png_bytep pC;
    png_charp profile;
    png_uint_32 skip = 0;
    png_uint_32 profile_size = 0;
@@ -1029,17 +1030,26 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    profile_length = data_length - prefix_length;
 
+   if ( prefix_length > data_length || profile_length < 4)
+   {
+      png_free(png_ptr, chunkdata);
+      png_warning(png_ptr, "Profile size field missing from iCCP chunk");
+      return;
+   }
+
    /* Check the profile_size recorded in the first 32 bits of the ICC profile */
-   profile_size = ((*(chunkdata+prefix_length))<<24) |
-                  ((*(chunkdata+prefix_length+1))<<16) |
-                  ((*(chunkdata+prefix_length+2))<< 8) |
-                  ((*(chunkdata+prefix_length+3))    );
+   pC = (png_bytep)(chunkdata+prefix_length);
+   profile_size = ((*(pC  ))<<24) |
+                  ((*(pC+1))<<16) |
+                  ((*(pC+2))<< 8) |
+                  ((*(pC+3))    );
 
    if(profile_size < profile_length)
       profile_length = profile_size;
 
    if(profile_size > profile_length)
    {
+      png_free(png_ptr, chunkdata);
       png_warning(png_ptr, "Ignoring truncated iCCP profile.\n");
       return;
    }
@@ -2967,7 +2977,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (row_bytes > (png_uint_32)65536L)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
-   png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, row_bytes);
+   png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes+64);
+   png_ptr->row_buf = png_ptr->big_row_buf+32;
 #if defined(PNG_DEBUG) && defined(PNG_USE_PNGGCCRD)
    png_ptr->row_buf_size = row_bytes;
 #endif

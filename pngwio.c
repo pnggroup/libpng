@@ -1,9 +1,9 @@
 
 /* pngwio.c - functions for data output
  *
- * libpng 1.0.12beta1 - May 14, 2001
+ * libpng 1.0.13 - April 15, 2002
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -171,7 +171,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    if (write_data_fn != NULL)
       png_ptr->write_data_fn = write_data_fn;
    else
-      png_ptr->write_data_fn = png_default_write_data;
+      png_ptr->write_data_fn = (png_rw_ptr)png_default_write_data;
 #else
    png_ptr->write_data_fn = write_data_fn;
 #endif
@@ -181,7 +181,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    if (output_flush_fn != NULL)
       png_ptr->output_flush_fn = output_flush_fn;
    else
-      png_ptr->output_flush_fn = png_default_flush;
+      png_ptr->output_flush_fn = (png_flush_ptr)png_default_flush;
 #else
    png_ptr->output_flush_fn = output_flush_fn;
 #endif

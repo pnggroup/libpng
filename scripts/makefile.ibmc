@@ -5,7 +5,7 @@
 # Notes:
 #   Derived from makefile.std
 #   All modules are compiled in C mode
-#   Tested with IBM C 3.6.5 under Win32, expected to work under OS/2 too
+#   Tested under Win32, expected to work under OS/2
 #   Can be easily adapted for IBM VisualAge/C++ for AIX
 
 # Location of the zlib library and include files
@@ -18,7 +18,7 @@ LD = ilink
 AR = ilib
 RM = del
 
-CFLAGS = -I$(ZLIBINC) -O2 -W3
+CFLAGS = -I$(ZLIBINC) -Mc -O2 -W3
 LDFLAGS =
 
 # File extensions

@@ -1,3 +1,4 @@
+
 CHANGES - changes for libpng
 
 version 0.2
@@ -732,10 +733,11 @@ version 1.0.6j [May 3, 2000]
 version 1.0.7beta11 [May 7, 2000]
   Removed the new PNG_CREATED_READ_STRUCT and PNG_CREATED_WRITE_STRUCT modes
     which are no longer used.
-  Eliminated the three new members of png_text when PNG_NO_iTXt_SUPPORTED
-    or PNG_LEGACY_SUPPORTED is defined.
-  Made PNG_NO_ITXT_SUPPORTED the default setting, to avoid memory overrun
-    when old applications fill the info_ptr->text structure directly.
+  Eliminated the three new members of png_text when PNG_LEGACY_SUPPORTED is
+    defined or when neither PNG_READ_iTXt_SUPPORTED nor PNG_WRITE_iTXT_SUPPORTED
+    is defined.
+  Made PNG_NO_READ|WRITE_iTXt the default setting, to avoid memory
+    overrun when old applications fill the info_ptr->text structure directly.
   Added PNGAPI macro, and added it to the definitions of all exported functions.
   Relocated version macro definitions ahead of the includes of zlib.h and
     pngconf.h in png.h.
@@ -934,13 +936,138 @@ version 1.0.12beta1 [May 14, 2001]
   Test for Windows platform in pngconf.h when including malloc.h (Emmanuel Blot)
   Updated makefile.cygwin and handling of Cygwin's ALL_STATIC in pngconf.h
   Added some never-to-be-executed code in pnggccrd.c to quiet compiler warnings.
-  Bumped DLLNUM to 2.
-  Added a check for attempts to read or write PLTE in grayscale PNG datastreams.
   Eliminated the png_error about apps using png_read|write_init().  Instead,
     libpng will reallocate the png_struct and info_struct if they are too small.
-    This achieves future binary compatibility for old applications written for
+    This retains future binary compatibility for old applications written for
     libpng-0.88 and earlier.
+version 1.2.0beta1 [May 6, 2001]
+  Bumped DLLNUM to 2.
+  Re-enabled PNG_MNG_FEATURES_SUPPORTED and enabled PNG_ASSEMBLER_CODE_SUPPORTED
+    by default.
+  Added runtime selection of MMX features.
+  Added png_set_strip_error_numbers function and related macros.
+version 1.2.0beta2 [May 7, 2001]
+  Finished merging 1.2.0beta1 with version 1.0.11
+  Added a check for attempts to read or write PLTE in grayscale PNG datastreams.
+version 1.2.0beta3 [May 17, 2001]
+  Enabled user memory function by default.
   Modified png_create_struct so it passes user mem_ptr to user memory allocator.
+  Increased png_mng_features flag from png_byte to png_uint_32.
+  Bumped shared-library (so-number) and dll-number to 3.
+version 1.2.0beta4 [June 23, 2001]
+  Check for missing profile length field in iCCP chunk and free chunk_data
+     in case of truncated iCCP chunk.
+  Bumped shared-library number to 3 in makefile.sgi and makefile.sggcc
+  Bumped dll-number from 2 to 3 in makefile.cygwin
+  Revised contrib/gregbook/rpng*-x.c to avoid a memory leak and to exit cleanly
+     if user attempts to run it on an 8-bit display.
+  Updated contrib/gregbook
+  Use png_malloc instead of png_zalloc to allocate palette in pngset.c
+  Updated makefile.ibmc
+  Added some typecasts to eliminate gcc 3.0 warnings.  Changed prototypes
+     of png_write_oFFS width and height from png_uint_32 to png_int_32.
+  Updated example.c
+  Revised prototypes for png_debug_malloc and png_debug_free in pngtest.c
+version 1.2.0beta5 [August 8, 2001]
+  Revised contrib/gregbook
+  Revised makefile.gcmmx
+  Revised pnggccrd.c to conditionally compile some thread-unsafe code only
+     when PNG_THREAD_UNSAFE_OK is defined.
+  Added tests to prevent pngwutil.c from writing a bKGD or tRNS chunk with
+     value exceeding 2^bit_depth-1
+  Revised makefile.sgi and makefile.sggcc
+  Replaced calls to fprintf(stderr,...) with png_warning() in pnggccrd.c
+  Removed restriction that do_invert_mono only operate on 1-bit opaque files
+version 1.2.0 [September 1, 2001]
+  Changed a png_warning() to png_debug() in pnggccrd.c
+  Fixed contrib/gregbook/rpng-x.c, rpng2-x.c to avoid crash with XFreeGC().
+version 1.2.1beta1 [October 19, 2001]
+  Revised makefile.std in contrib/pngminus
+  Include background_1 in png_struct regardless of gamma support.
+  Revised makefile.netbsd and makefile.macosx, added makefile.darwin.
+  Revised example.c to provide more details about using row_callback().
+version 1.2.1beta2 [October 25, 2001]
+  Added type cast to each NULL appearing in a function call, except for
+    WINCE functions.
+  Added makefile.so9.
+version 1.2.1beta3 [October 27, 2001]
+  Removed type casts from all NULLs.
+  Simplified png_create_struct_2().
+version 1.2.1beta4 [November 7, 2001]
+  Revised png_create_info_struct() and png_creat_struct_2().
+  Added error message if png_write_info() was omitted.
+  Type cast NULLs appearing in function calls when _NO_PROTO or
+    PNG_TYPECAST_NULL is defined.
+version 1.2.1rc1 [November 24, 2001]
+  Type cast NULLs appearing in function calls except when PNG_NO_TYPECAST_NULL
+    is defined.
+  Changed typecast of "size" argument to png_size_t in pngmem.c calls to
+    the user malloc_fn, to agree with the prototype in png.h
+  Added a pop/push operation to pnggccrd.c, to preserve Eflag (Maxim Sobolev)
+  Updated makefile.sgi to recognize LIBPATH and INCPATH.
+  Updated various makefiles so "make clean" does not remove previous major
+    version of the shared library.
+version 1.2.1rc2 [December 4, 2001]
+  Added a pop/push operation to pngvcrd.c, to preserve Eflag.
+  Always allocate 256-entry internal palette, hist, and trans arrays, to
+    avoid out-of-bounds memory reference caused by invalid PNG datastreams.
+  Added a check for prefix_length > data_length in iCCP chunk handler.
+version 1.2.1 [December 7, 2001]
+  None.
+version 1.2.2beta1 [February 22, 2002]
+  Fixed a bug with reading the length of iCCP profiles (Larry Reeves).
+  Revised makefile.linux, makefile.gcmmx, and makefile.sgi to generate
+    libpng.a, libpng12.so (not libpng.so.3), and libpng12/png.h
+  Revised makefile.darwin to remove "-undefined suppress" option.
+  Added checks for gamma and chromaticity values over 21474.83, which exceed
+    the limit for PNG unsigned 32-bit integers when encoded.
+  Revised calls to png_create_read_struct() and png_create_write_struct()
+    for simpler debugging.
+  Revised png_zalloc() so zlib handles errors (uses PNG_FLAG_MALLOC_NULL_MEM_OK)
+version 1.2.2beta2 [February 23, 2002]
+  Check chunk_length and idat_size for invalid (over PNG_MAX_UINT) lengths.
+  Check for invalid image dimensions in png_get_IHDR.
+  Added missing "fi;" in the install target of the SGI makefiles.
+  Added install-static to all makefiles that make shared libraries.
+  Always do gamma compensation when image is partially transparent.
+version 1.2.2beta3 [March 7, 2002]
+  Compute background.gray and background_1.gray even when color_type is RGB
+    in case image gets reduced to gray later.
+  Modified shared-library makefiles to install pkgconfig/libpngNN.pc.
+  Export (with PNGAPI) png_zalloc, png_zfree, and png_handle_as_unknown
+  Removed unused png_write_destroy_info prototype from png.h
+  Eliminated incorrect use of width_mmx from pnggccrd.c in pixel_bytes == 8 case
+  Added install-shared target to all makefiles that make shared libraries.
+  Stopped a double free of palette, hist, and trans when not using free_me.
+  Added makefile.32sunu for Sun Ultra 32 and makefile.64sunu for Sun Ultra 64.
+version 1.2.2beta4 [March 8, 2002]
+  Compute background.gray and background_1.gray even when color_type is RGB
+    in case image gets reduced to gray later (Jason Summers).
+  Relocated a misplaced /bin/rm in the "install-shared" makefile targets
+  Added PNG_1_0_X macro which can be used to build a 1.0.x-compatible library.
+version 1.2.2beta5 [March 26, 2002]
+  Added missing PNGAPI to several function definitions.
+  Check for invalid bit_depth or color_type in png_get_IHDR(), and
+    check for missing PLTE or IHDR in png_push_read_chunk() (Matthias Clasen).
+  Revised iTXt support to accept NULL for lang and lang_key.
+  Compute gamma for color components of background even when color_type is gray.
+  Changed "()" to "{}" in scripts/libpng.pc.in.
+  Revised makefiles to put png.h and pngconf.h only in $prefix/include/libpngNN
+  Revised makefiles to make symlink to libpng.so.NN in addition to libpngNN.so
+version 1.2.2beta6 [March 31, 2002]
+version 1.0.13beta1 [March 31, 2002]
+  Prevent png_zalloc() from trying to memset memory that it failed to acquire.
+  Add typecasts of PNG_MAX_UINT in pngset_cHRM_fixed() (Matt Holgate).
+  Ensure that the right function (user or default) is used to free the
+    png_struct after an error in png_create_read_struct_2().
+version 1.2.2rc1 [April 7, 2002]
+version 1.0.13rc1 [April 7, 2002]
+  Save the ebx register in pnggccrd.c (Sami Farin)
+  Add "mem_ptr = png_ptr->mem_ptr" in png_destroy_write_struct() (Paul Gardner).
+  Updated makefiles to put headers in include/libpng and remove old include/*.h.
+version 1.0.13 [April 15, 2002]
+  Revised description of png_set_filter() in libpng.3/libpng.txt.
+  Revised makefile.netbsd and added makefile.neNNbsd and makefile.freebsd
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,9 +1,9 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.0.12beta1 - May 14, 2001
+ * libpng 1.0.13 - April 15, 2002
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -40,6 +40,25 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (white_x < 0.0 || white_y < 0.0 ||
+         red_x < 0.0 ||   red_y < 0.0 ||
+       green_x < 0.0 || green_y < 0.0 ||
+        blue_x < 0.0 ||  blue_y < 0.0)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set negative chromaticity value");
+      return;
+   }
+   if (white_x > 21474.83 || white_y > 21474.83 ||
+         red_x > 21474.83 ||   red_y > 21474.83 ||
+       green_x > 21474.83 || green_y > 21474.83 ||
+        blue_x > 21474.83 ||  blue_y > 21474.83)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set chromaticity value exceeding 21474.83");
+      return;
+   }
+
    info_ptr->x_white = (float)white_x;
    info_ptr->y_white = (float)white_y;
    info_ptr->x_red   = (float)red_x;
@@ -51,12 +70,12 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FIXED_POINT_SUPPORTED
    info_ptr->int_x_white = (png_fixed_point)(white_x*100000.+0.5);
    info_ptr->int_y_white = (png_fixed_point)(white_y*100000.+0.5);
-   info_ptr->int_x_red   = (png_fixed_point)(red_x*100000.+0.5);
-   info_ptr->int_y_red   = (png_fixed_point)(red_y*100000.+0.5);
+   info_ptr->int_x_red   = (png_fixed_point)(  red_x*100000.+0.5);
+   info_ptr->int_y_red   = (png_fixed_point)(  red_y*100000.+0.5);
    info_ptr->int_x_green = (png_fixed_point)(green_x*100000.+0.5);
    info_ptr->int_y_green = (png_fixed_point)(green_y*100000.+0.5);
-   info_ptr->int_x_blue  = (png_fixed_point)(blue_x*100000.+0.5);
-   info_ptr->int_y_blue  = (png_fixed_point)(blue_y*100000.+0.5);
+   info_ptr->int_x_blue  = (png_fixed_point)( blue_x*100000.+0.5);
+   info_ptr->int_y_blue  = (png_fixed_point)( blue_y*100000.+0.5);
 #endif
    info_ptr->valid |= PNG_INFO_cHRM;
 }
@@ -72,6 +91,24 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (white_x < 0 || white_y < 0 ||
+         red_x < 0 ||   red_y < 0 ||
+       green_x < 0 || green_y < 0 ||
+        blue_x < 0 ||  blue_y < 0)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set negative chromaticity value");
+      return;
+   }
+   if (white_x > (double) PNG_MAX_UINT || white_y > (double) PNG_MAX_UINT ||
+         red_x > (double) PNG_MAX_UINT ||   red_y > (double) PNG_MAX_UINT ||
+       green_x > (double) PNG_MAX_UINT || green_y > (double) PNG_MAX_UINT ||
+        blue_x > (double) PNG_MAX_UINT ||  blue_y > (double) PNG_MAX_UINT)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set chromaticity value exceeding 21474.83");
+      return;
+   }
    info_ptr->int_x_white = white_x;
    info_ptr->int_y_white = white_y;
    info_ptr->int_x_red   = red_x;
@@ -83,12 +120,12 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    info_ptr->x_white = (float)(white_x/100000.);
    info_ptr->y_white = (float)(white_y/100000.);
-   info_ptr->x_red   = (float)(red_x/100000.);
-   info_ptr->y_red   = (float)(red_y/100000.);
+   info_ptr->x_red   = (float)(  red_x/100000.);
+   info_ptr->y_red   = (float)(  red_y/100000.);
    info_ptr->x_green = (float)(green_x/100000.);
    info_ptr->y_green = (float)(green_y/100000.);
-   info_ptr->x_blue  = (float)(blue_x/100000.);
-   info_ptr->y_blue  = (float)(blue_y/100000.);
+   info_ptr->x_blue  = (float)( blue_x/100000.);
+   info_ptr->y_blue  = (float)( blue_y/100000.);
 #endif
    info_ptr->valid |= PNG_INFO_cHRM;
 }
@@ -100,16 +137,25 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
 void PNGAPI
 png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
 {
+   double gamma;
    png_debug1(1, "in %s storage function\n", "gAMA");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   info_ptr->gamma = (float)file_gamma;
+   /* Check for overflow */
+   if (file_gamma > 21474.83)
+   {
+      png_warning(png_ptr, "Limiting gamma to 21474.83");
+      gamma=21474.83;
+   }
+   else
+      gamma=file_gamma;
+   info_ptr->gamma = (float)gamma;
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   info_ptr->int_gamma = (int)(file_gamma*100000.+.5);
+   info_ptr->int_gamma = (int)(gamma*100000.+.5);
 #endif
    info_ptr->valid |= PNG_INFO_gAMA;
-   if(file_gamma == 0.0)
+   if(gamma == 0.0)
       png_warning(png_ptr, "Setting gamma=0");
 }
 #endif
@@ -117,18 +163,35 @@ void PNGAPI
 png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
    int_gamma)
 {
+   png_fixed_point gamma;
+
    png_debug1(1, "in %s storage function\n", "gAMA");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (int_gamma > (png_fixed_point) PNG_MAX_UINT)
+   {
+     png_warning(png_ptr, "Limiting gamma to 21474.83");
+     gamma=PNG_MAX_UINT;
+   }
+   else
+   {
+     if (int_gamma < 0)
+     {
+       png_warning(png_ptr, "Setting negative gamma to zero");
+       gamma=0;
+     }
+     else
+       gamma=int_gamma;
+   }
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   info_ptr->gamma = (float)(int_gamma/100000.);
+   info_ptr->gamma = (float)(gamma/100000.);
 #endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   info_ptr->int_gamma = int_gamma;
+   info_ptr->int_gamma = gamma;
 #endif
    info_ptr->valid |= PNG_INFO_gAMA;
-   if(int_gamma == 0)
+   if(gamma == 0)
       png_warning(png_ptr, "Setting gamma=0");
 }
 #endif
@@ -152,8 +215,9 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
 #ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
 #endif
+   /* Changed from info->num_palette to 256 in version 1.2.1 */
    png_ptr->hist = (png_uint_16p)png_malloc(png_ptr,
-      (png_uint_32)(info_ptr->num_palette * sizeof (png_uint_16)));
+      (png_uint_32)(256 * sizeof (png_uint_16)));
 
    for (i = 0; i < info_ptr->num_palette; i++)
        png_ptr->hist[i] = hist[i];
@@ -241,9 +305,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    info_ptr->compression_type = (png_byte)compression_type;
    info_ptr->filter_type = (png_byte)filter_type;
    info_ptr->interlace_type = (png_byte)interlace_type;
-   if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-      info_ptr->channels = 1;
-   else if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
+   if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
       info_ptr->channels = 3;
    else
       info_ptr->channels = 1;
@@ -410,8 +472,12 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
 #endif
-   png_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)num_palette,
+   /* Changed in libpng-1.2.1 to allocate 256 instead of num_palette entries,
+      in case of an invalid PNG file that has too-large sample values. */
+   png_ptr->palette = (png_colorp)png_zalloc(png_ptr, (uInt)256,
       sizeof (png_color));
+   if (png_ptr->palette == NULL)
+      png_error(png_ptr, "Unable to malloc palette");
    png_memcpy(png_ptr->palette, palette, num_palette * sizeof (png_color));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
@@ -620,7 +686,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 #ifdef PNG_iTXt_SUPPORTED
       {
         /* set iTXt data */
-        if (text_ptr[i].key != NULL)
+        if (text_ptr[i].lang != NULL)
           lang_len = png_strlen(text_ptr[i].lang);
         else
           lang_len = 0;
@@ -676,8 +742,8 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 #endif
       {
 #ifdef PNG_iTXt_SUPPORTED
-         textp->lang=(png_charp)NULL;
-         textp->lang_key=(png_charp)NULL;
+         textp->lang=NULL;
+         textp->lang_key=NULL;
 #endif
          textp->text=textp->key + key_len + 1;
       }
@@ -740,9 +806,10 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FREE_ME_SUPPORTED
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 #endif
+       /* Changed from num_trans to 256 in version 1.2.1 */
        png_ptr->trans = info_ptr->trans = (png_bytep)png_malloc(png_ptr,
-           num_trans);
-       png_memcpy(info_ptr->trans, trans, num_trans);
+           (png_uint_32)256);
+       png_memcpy(info_ptr->trans, trans, (png_size_t)num_trans);
 #ifdef PNG_FREE_ME_SUPPORTED
        info_ptr->free_me |= PNG_FREE_TRNS;
 #else
@@ -905,14 +972,17 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
     if (chunk_list == NULL)
       return;
     old_num_chunks=png_ptr->num_chunk_list;
-    new_list=(png_bytep)png_malloc(png_ptr,5*(num_chunks+old_num_chunks));
+    new_list=(png_bytep)png_malloc(png_ptr,
+       (png_uint_32)(5*(num_chunks+old_num_chunks)));
     if(png_ptr->chunk_list != NULL)
     {
-       png_memcpy(new_list, png_ptr->chunk_list, 5*old_num_chunks);
+       png_memcpy(new_list, png_ptr->chunk_list,
+          (png_size_t)(5*old_num_chunks));
        png_free(png_ptr, png_ptr->chunk_list);
        png_ptr->chunk_list=NULL;
     }
-    png_memcpy(new_list+5*old_num_chunks, chunk_list, 5*num_chunks);
+    png_memcpy(new_list+5*old_num_chunks, chunk_list,
+       (png_size_t)(5*num_chunks));
     for (p=new_list+5*old_num_chunks+4, i=0; i<num_chunks; i++, p+=5)
        *p=(png_byte)keep;
     png_ptr->num_chunk_list=old_num_chunks+num_chunks;
@@ -970,6 +1040,7 @@ png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
 }
 
 
+#ifndef PNG_1_0_X
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 /* this function was added to libpng 1.2.0 and should always exist by default */
 void PNGAPI
@@ -1024,3 +1095,4 @@ png_set_mmx_thresholds (png_structp png_ptr,
     png_ptr->mmx_rowbytes_threshold = mmx_rowbytes_threshold;
 }
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
+#endif /* ?PNG_1_0_X */

@@ -16,13 +16,12 @@ of PBMPLUS/NetPBM) and converts them to PNG.
 The source code for all three demo programs currently compiles under
 Unix, OpenVMS, and 32-bit Windows.  (Special thanks to Martin Zinser,
 zinser@decus.de, for making the necessary changes for OpenVMS and for
-providing an appropriate build script.)  Build instructions can be
-found below.
+providing an appropriate build script.)  Build instructions can be found
+below.
 
 Files:
 
    README             this file
-   README.w32         additional Windows-specific information
    LICENSE            terms of distribution and reuse (BSD-like)
 
    Makefile.unx       Unix makefile
@@ -45,26 +44,27 @@ Files:
 
    toucan.png         transparent PNG for testing (by Stefan Schneider)
 
-Note that the programs are designed to be functional, but their primary
-purpose is to demonstrate how to use libpng to add PNG support to other
-programs.  As such, their user interfaces are crude and definitely not
-intended for everyday use.
+Note that, although the programs are designed to be functional, their
+primary purpose is to illustrate how to use libpng to add PNG support to
+other programs.  As such, their user interfaces are crude and definitely
+are not intended for everyday use.
 
-Please see http://www.cdrom.com/pub/png/pngbook.html for further infor-
+Please see http://www.libpng.org/pub/png/pngbook.html for further infor-
 mation and links to the latest version of the source code, and Chapters
 13-15 of the book for detailed discussion of the three programs.
 
 Greg Roelofs
-19 March 2000
+newt@pobox.com
+30 June 2001
 
 
 BUILD INSTRUCTIONS
 
- - Prerequisites:
+ - Prerequisites (in order of compilation):
 
-      - zlib		ftp://ftp.cdrom.com/pub/infozip/zlib/zlib.html
-      - libpng		http://www.cdrom.com/pub/png/pngcode.html
-      - pngbook		http://www.cdrom.com/pub/png/book/sources.html
+      - zlib		http://www.gzip.org/zlib/
+      - libpng		http://www.libpng.org/pub/png/libpng.html
+      - pngbook		http://www.libpng.org/pub/png/book/sources.html
 
      The pngbook demo programs are explicitly designed to demonstrate proper
      coding techniques for using the libpng reference library.  As a result,
@@ -128,11 +128,13 @@ BUILD INSTRUCTIONS
 
      The result should be three executables:  rpng-win.exe, rpng2-win.exe,
      and wpng.exe.  Copy them somewhere in your PATH or run them from the
-     current folder.  Unlike the Unix versions, the two windowed programs
-     (rpng and rpng2) do not display a usage screen when invoked without
-     command-line arguments; see README.w32 for brief help or the book for
-     details.  Note that the programs use the Unix-style "-" character to
-     specify options, instead of the more common DOS/Windows "/" character.
+     current folder.  Like the Unix versions, the two windowed programs
+     (rpng and rpng2) now display a usage screen in a console window when
+     invoked without command-line arguments; this is new behavior as of
+     the June 2001 release.  Note that the programs use the Unix-style "-"
+     character to specify options, instead of the more common DOS/Windows
+     "/" character.  (For example:  "rpng2-win -bgpat 4 foo.png", not
+     "rpng2-win /bgpat 4 foo.png")
 
 
  - OpenVMS:

@@ -26,6 +26,8 @@
     - 1.11:  added -usleep option for demos; fixed command-line parsing bug
     - 1.12:  added -pause option for demos and testing
     - 1.20:  added runtime MMX-enabling/disabling and new -mmx* options
+    - 1.21:  fixed small X memory leak (thanks to Francois Petitjean)
+    - 1.22:  fixed XFreeGC() crash bug
 
   ---------------------------------------------------------------------------
 
@@ -56,7 +58,7 @@
 
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
-#define VERSION   "1.20 of 29 January 2001"
+#define VERSION   "1.22 of 16 August 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -227,6 +229,7 @@ static Colormap colormap;
 static int have_nondefault_visual = FALSE;
 static int have_colormap = FALSE;
 static int have_window = FALSE;
+static int have_gc = FALSE;
 
 
 
@@ -585,8 +588,15 @@ static void rpng2_x_init(void)
      * pattern */
 
     if (rpng2_x_create_window()) {
+
+        /* GRR TEMPORARY HACK:  this is fundamentally no different from cases
+         * above; libpng should longjmp() back to us when png_ptr goes away.
+         * If we/it segfault instead, seems like a libpng bug... */
+
+        /* we're here via libpng callback, so if window fails, clean and bail */
         readpng2_cleanup(&rpng2_info);
-        return;
+        rpng2_x_cleanup();
+        exit(2);
     }
 }
 
@@ -738,9 +748,20 @@ static int rpng2_x_create_window(void)
     XSetWMProperties(display, window, pWindowName, pIconName, NULL, 0,
       size_hints, wm_hints, NULL);
 
+    /* various properties and hints no longer needed; free memory */
+    if (pWindowName)
+       XFree(pWindowName->value);
+    if (pIconName)
+       XFree(pIconName->value);
+    if (size_hints)
+        XFree(size_hints);
+    if (wm_hints)
+       XFree(wm_hints);
+
     XMapWindow(display, window);
 
     gc = XCreateGC(display, window, 0, &gcvalues);
+    have_gc = TRUE;
 
 /*---------------------------------------------------------------------------
     Allocate memory for the X- and display-specific version of the image.
@@ -1356,7 +1377,8 @@ static void rpng2_x_cleanup(void)
         ximage = NULL;
     }
 
-    XFreeGC(display, gc);
+    if (have_gc)
+        XFreeGC(display, gc);
 
     if (have_window)
         XDestroyWindow(display, window);

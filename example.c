@@ -114,7 +114,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    if (info_ptr == NULL)
    {
       fclose(fp);
-      png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
+      png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
       return (ERROR);
    }
 
@@ -126,7 +126,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    if (setjmp(png_jmpbuf(png_ptr)))
    {
       /* Free all of the memory associated with the png_ptr and info_ptr */
-      png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+      png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
       fclose(fp);
       /* If we get here, we had a problem reading the file */
       return (ERROR);
@@ -157,7 +157,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     * adjustment), then you can read the entire image (including
     * pixels) into the info structure with this call:
     */
-   png_read_png(png_ptr, info_ptr, png_transforms, NULL);
+   png_read_png(png_ptr, info_ptr, png_transforms, png_voidp_NULL);
 #else
    /* OK, you're doing it the hard way, with the lower-level functions */
 
@@ -167,7 +167,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    png_read_info(png_ptr, info_ptr);
 
    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
-       &interlace_type, NULL, NULL);
+       &interlace_type, int_p_NULL, int_p_NULL);
 
 /**** Set up the data transformations you want.  Note that these are all
  **** optional.  Only call them if you want/need them.  Many of the
@@ -194,17 +194,17 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    /* Expand paletted colors into true RGB triplets */
    if (color_type == PNG_COLOR_TYPE_PALETTE)
-      png_set_expand(png_ptr);
+      png_set_palette_rgb(png_ptr);
 
    /* Expand grayscale images to the full 8 bits from 1, 2, or 4 bits/pixel */
    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
-      png_set_expand(png_ptr);
+      png_set_gray_1_2_4_to_8(png_ptr);
 
    /* Expand paletted or RGB images with transparency to full alpha channels
     * so the data will be available as RGBA quartets.
     */
    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
-      png_set_expand(png_ptr);
+      png_set_tRNS_to_alpha(png_ptr);
 
    /* Set the background color to draw transparent and alpha images over.
     * It is possible to set the red, green, and blue components directly
@@ -277,7 +277,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
          png_color std_color_cube[MAX_SCREEN_COLORS];
 
          png_set_dither(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
-            MAX_SCREEN_COLORS, NULL, 0);
+            MAX_SCREEN_COLORS, png_uint_16p_NULL, 0);
       }
       /* This reduces the image to the palette supplied in the file */
       else if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette))
@@ -354,18 +354,18 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 #ifdef single /* Read the image a single row at a time */
       for (y = 0; y < height; y++)
       {
-         png_read_rows(png_ptr, &row_pointers[y], NULL, 1);
+         png_read_rows(png_ptr, &row_pointers[y], png_bytepp_NULL, 1);
       }
 
 #else no_single /* Read the image several rows at a time */
       for (y = 0; y < height; y += number_of_rows)
       {
 #ifdef sparkle /* Read the image using the "sparkle" effect. */
-         png_read_rows(png_ptr, &row_pointers[y], NULL, number_of_rows);
-
-         png_read_rows(png_ptr, NULL, row_pointers[y], number_of_rows);
+         png_read_rows(png_ptr, &row_pointers[y], png_bytepp_NULL,
+            number_of_rows);
 #else no_sparkle /* Read the image using the "rectangle" effect */
-         png_read_rows(png_ptr, NULL, &row_pointers[y], number_of_rows);
+         png_read_rows(png_ptr, png_bytepp_NULL, &row_pointers[y],
+            number_of_rows);
 #endif no_sparkle /* use only one of these two methods */
       }
 
@@ -382,7 +382,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* At this point you have read the entire image */
 
    /* clean up after the read, and free any memory allocated - REQUIRED */
-   png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+   png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
 
    /* close the file */
    fclose(fp);
@@ -415,13 +415,13 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
 
    if (*info_ptr == NULL)
    {
-      png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
+      png_destroy_read_struct(png_ptr, info_ptr, png_infopp_NULL);
       return (ERROR);
    }
 
    if (setjmp(png_jmpbuf((*png_ptr))))
    {
-      png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
+      png_destroy_read_struct(png_ptr, info_ptr, png_infopp_NULL);
       return (ERROR);
    }
 
@@ -450,7 +450,7 @@ process_data(png_structp *png_ptr, png_infop *info_ptr,
    if (setjmp(png_jmpbuf((*png_ptr))))
    {
       /* Free the png_ptr and info_ptr memory on error */
-      png_destroy_read_struct(png_ptr, info_ptr, (png_infopp)NULL);
+      png_destroy_read_struct(png_ptr, info_ptr, png_infopp_NULL);
       return (ERROR);
    }
 
@@ -482,21 +482,47 @@ info_callback(png_structp png_ptr, png_infop info)
 row_callback(png_structp png_ptr, png_bytep new_row,
    png_uint_32 row_num, int pass)
 {
-/* this function is called for every row in the image.  If the
- * image is interlacing, and you turned on the interlace handler,
+/*
+ * This function is called for every row in the image.  If the
+ * image is interlaced, and you turned on the interlace handler,
  * this function will be called for every row in every pass.
- * Some of these rows will not be changed from the previous pass.
- * When the row is not changed, the new_row variable will be NULL.
+ *
+ * In this function you will receive a pointer to new row data from
+ * libpng called new_row that is to replace a corresponding row (of
+ * the same data format) in a buffer allocated by your application.
+ * 
+ * The new row data pointer new_row may be NULL, indicating there is
+ * no new data to be replaced (in cases of interlace loading).
+ * 
+ * If new_row is not NULL then you need to call
+ * png_progressive_combine_row() to replace the corresponding row as
+ * shown below:
+ */
+   /* Check if row_num is in bounds. */
+   if((row_num >= 0) && (row_num < height))
+   {
+     /* Get pointer to corresponding row in our
+      * PNG read buffer.
+      */
+     png_bytep old_row = ((png_bytep *)our_data)[row_num];
+
+     /* If both rows are allocated then copy the new row
+      * data to the corresponding row data.
+      */
+     if((old_row != NULL) && (new_row != NULL))
+     png_progressive_combine_row(png_ptr, old_row, new_row);
+   }
+/*
  * The rows and passes are called in order, so you don't really
  * need the row_num and pass, but I'm supplying them because it
  * may make your life easier.
  *
  * For the non-NULL rows of interlaced images, you must call
- * png_progressive_combine_row() passing in the row and the
- * old row.  You can call this function for NULL rows (it will
- * just return) and for non-interlaced images (it just does the
- * png_memcpy for you) if it will make the code easier.  Thus, you
- * can just do this for all cases:
+ * png_progressive_combine_row() passing in the new row and the
+ * old row, as demonstrated above.  You can call this function for
+ * NULL rows (it will just return) and for non-interlaced images
+ * (it just does the png_memcpy for you) if it will make the code
+ * easier.  Thus, you can just do this for all cases:
  */
 
    png_progressive_combine_row(png_ptr, old_row, new_row);
@@ -505,8 +531,8 @@ row_callback(png_structp png_ptr, png_bytep new_row,
  * that the first pass (pass == 0 really) will completely cover
  * the old row, so the rows do not have to be initialized.  After
  * the first pass (and only for interlaced images), you will have
- * to pass the current row, and the function will combine the
- * old row and the new row.
+ * to pass the current row as new_row, and the function will combine
+ * the old row and the new row.
  */
 }
 
@@ -556,7 +582,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    if (info_ptr == NULL)
    {
       fclose(fp);
-      png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
+      png_destroy_write_struct(&png_ptr,  png_infopp_NULL);
       return (ERROR);
    }
 
@@ -588,7 +614,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * image info living info in the structure.  You could "|" many
     * PNG_TRANSFORM flags into the png_transforms integer here.
     */
-   png_write_png(png_ptr, info_ptr, png_transforms, NULL);
+   png_write_png(png_ptr, info_ptr, png_transforms, png_voidp_NULL);
 #else
    /* This is the hard way */
 

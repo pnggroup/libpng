@@ -22,13 +22,14 @@ LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 #RANLIB=ranlib
 RANLIB=echo
 
-# read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
+# read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
-PNGMAJ = 2
-PNGMIN = 1.0.12beta1
+PNGMAJ = 0
+PNGMIN = 1.0.13
 PNGVER = $(PNGMAJ).$(PNGMIN)
+LIBNAME = libpng10
 
-INCPATH=$(prefix)/include
+INCPATH=$(prefix)/include/libpng
 LIBPATH=$(prefix)/lib
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
@@ -42,40 +43,70 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
 
-all: libpng.a libpng.so pngtest
+all: libpng.a $(LIBNAME).so pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-libpng.so: libpng.so.$(PNGMAJ)
-	ln -f -s libpng.so.$(PNGMAJ) libpng.so
+$(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
+	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
 
-libpng.so.$(PNGMAJ): libpng.so.$(PNGVER)
-	ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ)
+$(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
+	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
-libpng.so.$(PNGVER): $(OBJSDLL)
-	$(CC) -G  -Wl,-h,libpng.so.$(PNGMAJ) -o libpng.so.$(PNGVER) \
+$(LIBNAME).so.$(PNGVER): $(OBJSDLL)
+	$(CC) -G  -Wl,-h,$(LIBNAME).so.$(PNGMAJ) -o $(LIBNAME).so.$(PNGVER) \
 	 $(OBJSDLL)
 
-pngtest: pngtest.o libpng.so
+pngtest: pngtest.o $(LIBNAME).so
 	LD_RUN_PATH=.:$(ZLIBLIB) $(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
-install: libpng.a libpng.so.$(PNGVER)
-	-@mkdir $(INCPATH) $(LIBPATH)
-	cp png.h pngconf.h $(INCPATH)
-	chmod 644 $(INCPATH)/png.h $(INCPATH)/pngconf.h
-	cp libpng.a libpng.so.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/libpng.so.$(PNGVER)
-	-@/bin/rm -f $(LIBPATH)/libpng.so.$(PNGMAJ) $(LIBPATH)/libpng.so
-	(cd $(LIBPATH); ln -f -s libpng.so.$(PNGVER) libpng.so.$(PNGMAJ); \
-	 ln -f -s libpng.so.$(PNGMAJ) libpng.so)
+
+install-headers: png.h pngconf.h
+	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
+	-@if [ ! -d $(INCPATH)/$(LIBNAME) ]; then mkdir $(INCPATH)/$(LIBNAME); fi
+	-@/bin/rm -f $(INCPATH)/png.h
+	-@/bin/rm -f $(INCPATH)/pngconf.h
+	cp png.h pngconf.h $(INCPATH)/$(LIBNAME)
+	chmod 644 $(INCPATH)/$(LIBNAME)/png.h $(INCPATH)/$(LIBNAME)/pngconf.h
+	-@/bin/rm -f $(INCPATH)/png.h $(INCPATH)/pngconf.h
+	-@/bin/rm -f $(INCPATH)/libpng
+	ln -f -s $(INCPATH)/$(LIBNAME) $(INCPATH)/libpng
+
+install-static: install-headers libpng.a
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	cp libpng.a $(LIBPATH)/$(LIBNAME).a
+	chmod 644 $(LIBPATH)/$(LIBNAME).a
+	-@/bin/rm -f $(LIBPATH)/libpng.a
+	ln -f -s $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
+
+install-shared: install-headers $(LIBNAME).so.$(PNGVER)
+	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).so.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).so
+	-@/bin/rm -f $(LIBPATH)/libpng.so
+	-@/bin/rm -f $(LIBPATH)/libpng.so.2
+	-@/bin/rm -f $(LIBPATH)/libpng.so.2.*
+	cp $(LIBNAME).so.$(PNGVER) $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).so.$(PNGVER)
+	(cd $(LIBPATH); \
+	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so; \
+	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.2; \
+	ln -f -s $(LIBNAME).so.$(PNGVER) libpng.so.2.$(PNGMIN); \
+	ln -f -s $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
+	ln -f -s $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
+	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi
+	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
+	cp libpng.pc $(LIBPATH)/pkgconfig/libpng10.pc
+	chmod 644 $(LIBPATH)/pkgconfig/libpng10.pc
+
+install: install-static install-shared
 
 clean:
-	/bin/rm -f *.o libpng.a libpng.so* pngtest pngout.png
+	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

@@ -24,8 +24,9 @@
     - 1.03:  modified to allow abbreviated options
     - 1.04:  removed bogus extra argument from usage fprintf() [Glenn R-P?];
               fixed command-line parsing bug
-    - 1.10:  enabled "message window" (console), thanks to David Geldreich
+    - 1.10:  enabled "message window"/console (thanks to David Geldreich)
     - 1.20:  added runtime MMX-enabling/disabling and new -mmx* options
+    - 1.21:  made minor tweak to usage screen to fit within 25-line console
 
   ---------------------------------------------------------------------------
 
@@ -56,7 +57,7 @@
 
 #define PROGNAME  "rpng2-win"
 #define LONGNAME  "Progressive PNG Viewer for Windows"
-#define VERSION   "1.20 of 29 January 2001"
+#define VERSION   "1.21 of 29 June 2001"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -451,12 +452,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
           "\t\t  combining rows, and expanding interlacing, respectively\n"
 #endif
           "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
-          "Press Q or Esc to quit this usage screen.\n"
-          "\n", PROGNAME,
+          "Press Q or Esc to quit this usage screen. ",
+          PROGNAME,
 #if (defined(__i386__) || defined(_M_IX86))
           strlen(PROGNAME), " ",
 #endif
           strlen(PROGNAME), " ", default_display_exponent, num_bgpat);
+        fflush(stderr);
         do
             ch = _getch();
         while (ch != 'q' && ch != 'Q' && ch != 0x1B);
@@ -466,6 +468,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         fprintf(stderr,
           "\n   [console window:  closing this window will terminate %s]\n\n",
           PROGNAME);
+        fflush(stderr);
     }
 
 

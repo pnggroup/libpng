@@ -32,12 +32,12 @@
 
 # macros --------------------------------------------------------------------
 
-PNGPATH = ../..
+PNGPATH = ../libpng
 PNGINC = -I$(PNGPATH)
 #PNGLIB = $(PNGPATH)/pngdll.lib
 PNGLIB = $(PNGPATH)/libpng.lib
 
-ZPATH = ../../../zlib
+ZPATH = ../zlib
 ZINC = -I$(ZPATH)
 #ZLIB = $(ZPATH)/zlibdll.lib
 ZLIB = $(ZPATH)/zlibstat.lib

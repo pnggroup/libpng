@@ -1,36 +1,26 @@
-# makefile for libpng on HP-UX using GCC
-# Copyright (C) 2002, Glenn Randers-Pehrson
-# Copyright (C) 2001, Laurent faillie
-# Copyright (C) 1998, 1999 Greg Roelofs
-# Copyright (C) 1996, 1997 Andreas Dilger
+# makefile for libpng on Darwin / Mac OS X
+# Copyright (C) 2002 Glenn Randers-Pehrson
+# Copyright (C) 2001 Christoph Pfisterer
+# derived from makefile.linux:
+#  Copyright (C) 1998, 1999 Greg Roelofs
+#  Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=gcc
-
-# where "make install" puts libpng.a, libpng.so*, png.h and pngconf.h
+# where "make install" puts libpng.a, libpng10.dylib, png.h and pngconf.h
 prefix=/usr/local
 
 # Where the zlib library and include files are located
-ZLIBLIB=/opt/zlib/lib
-ZLIBINC=/opt/zlib/include
+#ZLIBLIB=/usr/local/lib
+#ZLIBINC=/usr/local/include
+ZLIBLIB=../zlib
+ZLIBINC=../zlib
 
-ALIGN=
-# for i386:
-#ALIGN=-malign-loops=2 -malign-functions=2
+CC=cc
+CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
 
-WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
-	-Wmissing-declarations -Wtraditional -Wcast-align \
-	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
-
-# for pgcc version 2.95.1, -O3 is buggy; don't use it.
-
-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops \
-	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
-#LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
-
-RANLIB=ranlib
 #RANLIB=echo
+RANLIB=ranlib
 
 # read libpng.txt or png.h to see why PNGMAJ is 0.  You should not
 # have to change it.
@@ -51,30 +41,32 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .SUFFIXES:      .c .o .pic.o
 
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
+	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
 
-all: libpng.a $(LIBNAME).sl pngtest
+all: libpng.a $(LIBNAME).dylib pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-$(LIBNAME).sl: $(LIBNAME).sl.$(PNGMAJ)
-	ln -f -s $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl
+$(LIBNAME).dylib: $(LIBNAME).$(PNGMAJ).dylib
+	ln -sf $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib
 
-$(LIBNAME).sl.$(PNGMAJ): $(LIBNAME).sl.$(PNGVER)
-	ln -f -s $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ)
+$(LIBNAME).$(PNGMAJ).dylib: $(LIBNAME).$(PNGVER).dylib
+	ln -sf $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib
 
-$(LIBNAME).sl.$(PNGVER): $(OBJSDLL)
-	$(LD) -b -L$(ZLIBLIB) +s +b $(ZLIBLIB) \
-	+h libpng.sl.$(PNGMAJ) -o libpng.sl.$(PNGVER) $(OBJSDLL) -lz
+$(LIBNAME).$(PNGVER).dylib: $(OBJSDLL)
+	$(CC) -dynamiclib \
+	 -install_name $(LIBPATH)/$(LIBNAME).$(PNGMAJ).dylib \
+	 -current_version $(PNGMIN) -compatibility_version $(PNGMIN) \
+	 -o $(LIBNAME).$(PNGVER).dylib \
+	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
-pngtest: pngtest.o $(LIBNAME).sl
+pngtest: pngtest.o $(LIBNAME).dylib
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
-
 
 install-headers: png.h pngconf.h
 	-@if [ ! -d $(INCPATH) ]; then mkdir $(INCPATH); fi
@@ -92,20 +84,21 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(LIBPATH)/libpng.a
 	ln -sf $(LIBPATH)/$(LIBNAME).a $(LIBPATH)/libpng.a
 
-install-shared: install-headers $(LIBNAME).sl.$(PNGVER)
+install-shared: install-headers $(LIBNAME).dylib
 	-@if [ ! -d $(LIBPATH) ]; then mkdir $(LIBPATH); fi
-	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).sl.$(PNGMAJ)* $(LIBPATH)/$(LIBNAME).sl
-	-@/bin/rm -f $(LIBPATH)/libpng.so
-	-@/bin/rm -f $(LIBPATH)/libpng.so.2
-	-@/bin/rm -f $(LIBPATH)/libpng.so.2.*
-	cp $(LIBNAME).sl.$(PNGVER) $(LIBPATH)
-	chmod 755 $(LIBPATH)/$(LIBNAME).sl.$(PNGVER)
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).$(PNGMAJ)*.dylib
+	-@/bin/rm -f $(LIBPATH)/$(LIBNAME).dylib
+	-@/bin/rm -f $(LIBPATH)/libpng.dylib
+	-@/bin/rm -f $(LIBPATH)/libpng.2.dylib
+	-@/bin/rm -f $(LIBPATH)/libpng.2.*.dylib
+	cp $(LIBNAME).$(PNGVER).dylib $(LIBPATH)
+	chmod 755 $(LIBPATH)/$(LIBNAME).$(PNGVER).dylib
 	(cd $(LIBPATH); \
-	ln -sf $(LIBNAME).so.$(PNGVER) libpng.so; \
-	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl.2; \
-	ln -sf $(LIBNAME).sl.$(PNGVER) libpng.sl.2.$(PNGMIN); \
-	ln -sf $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ); \
-	ln -sf $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl)
+	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.dylib; \
+	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.2.dylib; \
+	ln -sf $(LIBNAME).$(PNGVER).dylib libpng.2.$(PNGMIN).dylib; \
+	ln -sf $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib; \
+	ln -sf $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib)
 	-@if [ ! -d $(LIBPATH)/pkgconfig ]; then mkdir $(LIBPATH)/pkgconfig; fi
 	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
 	cp libpng.pc $(LIBPATH)/pkgconfig/libpng10.pc
@@ -114,8 +107,7 @@ install-shared: install-headers $(LIBNAME).sl.$(PNGVER)
 install: install-static install-shared
 
 clean:
-	/bin/rm -f *.o libpng.a $(SHAREDLIB).sl $(SHAREDLIB).sl.$(PNGMAJ)* \
-	pngtest pngout.png
+	rm -f *.o libpng.a $(LIBNAME).*dylib pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
