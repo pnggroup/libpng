@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.2.0beta4 - June 23, 2001
+ * libpng 1.2.0beta5 - August 8, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -996,6 +996,12 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
    else if (color_type == PNG_COLOR_TYPE_GRAY)
    {
       /* one 16 bit value */
+      if(tran->gray >= (1 << png_ptr->bit_depth))
+      {
+         png_warning(png_ptr,
+           "Ignoring attempt to write tRNS chunk out-of-range for bit_depth");
+         return;
+      }
       png_save_uint_16(buf, tran->gray);
       png_write_chunk(png_ptr, (png_bytep)png_tRNS, buf, (png_size_t)2);
    }
@@ -1005,6 +1011,12 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
       png_save_uint_16(buf, tran->red);
       png_save_uint_16(buf + 2, tran->green);
       png_save_uint_16(buf + 4, tran->blue);
+      if(png_ptr->bit_depth == 8 && (buf[0] | buf[2] | buf[4]))
+         {
+            png_warning(png_ptr,
+              "Ignoring attempt to write 16-bit tRNS chunk when bit_depth is 8");
+            return;
+         }
       png_write_chunk(png_ptr, (png_bytep)png_tRNS, buf, (png_size_t)6);
    }
    else
@@ -1045,10 +1057,22 @@ png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
       png_save_uint_16(buf, back->red);
       png_save_uint_16(buf + 2, back->green);
       png_save_uint_16(buf + 4, back->blue);
+      if(png_ptr->bit_depth == 8 && (buf[0] | buf[2] | buf[4]))
+         {
+            png_warning(png_ptr,
+              "Ignoring attempt to write 16-bit bKGD chunk when bit_depth is 8");
+            return;
+         }
       png_write_chunk(png_ptr, (png_bytep)png_bKGD, buf, (png_size_t)6);
    }
    else
    {
+      if(back->gray >= (1 << png_ptr->bit_depth))
+      {
+         png_warning(png_ptr,
+           "Ignoring attempt to write bKGD chunk out-of-range for bit_depth");
+         return;
+      }
       png_save_uint_16(buf, back->gray);
       png_write_chunk(png_ptr, (png_bytep)png_bKGD, buf, (png_size_t)2);
    }

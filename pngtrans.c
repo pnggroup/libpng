@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 1.2.0beta4 - June 23, 2001
+ * libpng 1.2.0beta5 - August 8, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -153,11 +153,14 @@ void /* PRIVATE */
 png_do_invert(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_invert\n");
-   if (row_info->bit_depth == 1 &&
+  /* This test removed from libpng version 1.0.13 and 1.2.0:
+   *   if (row_info->bit_depth == 1 &&
+   */
 #if defined(PNG_USELESS_TESTS_SUPPORTED)
-       row != NULL && row_info != NULL &&
+   if (row == NULL || row_info == NULL)
+     return;
 #endif
-       row_info->color_type == PNG_COLOR_TYPE_GRAY)
+   if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
    {
       png_bytep rp = row;
       png_uint_32 i;
@@ -167,6 +170,33 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       {
          *rp = (png_byte)(~(*rp));
          rp++;
+      }
+   }
+   else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
+      row_info->bit_depth == 8)
+   {
+      png_bytep rp = row;
+      png_uint_32 i;
+      png_uint_32 istop = row_info->rowbytes;
+
+      for (i = 0; i < istop; i+=2)
+      {
+         *rp = (png_byte)(~(*rp));
+         rp+=2;
+      }
+   }
+   else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
+      row_info->bit_depth == 16)
+   {
+      png_bytep rp = row;
+      png_uint_32 i;
+      png_uint_32 istop = row_info->rowbytes;
+
+      for (i = 0; i < istop; i+=4)
+      {
+         *rp = (png_byte)(~(*rp));
+         *(rp+1) = (png_byte)(~(*(rp+1)));
+         rp+=4;
       }
    }
 }

@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.0beta4 - June 23, 2001
+ * libpng version 1.2.0beta5 - August 8, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -252,7 +252,6 @@ static const int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
  * so define them without: */
 #if defined(__DJGPP__) || defined(WIN32) || defined(__CYGWIN__)
 #  define _mmx_supported  mmx_supported
-#  define _unmask         unmask
 #  define _const4         const4
 #  define _const6         const6
 #  define _mask8_0        mask8_0
@@ -271,9 +270,6 @@ static const int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #  define _mask48_2       mask48_2
 #  define _mask48_1       mask48_1
 #  define _mask48_0       mask48_0
-#  define _FullLength     FullLength
-#  define _MMXLength      MMXLength
-#  define _dif            dif
 #  define _LBCarryMask    LBCarryMask
 #  define _HBClearMask    HBClearMask
 #  define _ActiveMask     ActiveMask
@@ -281,9 +277,15 @@ static const int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #  define _ActiveMaskEnd  ActiveMaskEnd
 #  define _ShiftBpp       ShiftBpp
 #  define _ShiftRem       ShiftRem
+#ifdef PNG_THREAD_UNSAFE_OK
+#  define _unmask         unmask
+#  define _FullLength     FullLength
+#  define _MMXLength      MMXLength
+#  define _dif            dif
 #  define _patemp         patemp
 #  define _pbtemp         pbtemp
 #  define _pctemp         pctemp
+#endif
 #endif
 
 
@@ -296,7 +298,9 @@ static const int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
  *  "more than 10 operands in `asm'" errors when %ebx is used to preload unmask
  *  in the non-PIC case, so we'll just use the global unconditionally now.
  */
+#ifdef PNG_THREAD_UNSAFE_OK
 static int _unmask;
+#endif
 
 static unsigned long long _mask8_0  = 0x0102040810204080LL;
 
@@ -325,24 +329,29 @@ static unsigned long long _const6   = 0x00000000000000FFLL;
 
 // These are used in the row-filter routines and should/would be local
 //  variables if not for gcc addressing limitations.
+// WARNING: Their presence probably defeats the thread safety of libpng.
 
+#ifdef PNG_THREAD_UNSAFE_OK
 static png_uint_32  _FullLength;
 static png_uint_32  _MMXLength;
 static int          _dif;
 static int          _patemp;	// temp variables for Paeth routine
 static int          _pbtemp;
 static int          _pctemp;
+#endif
 
-static void /* PRIVATE */
+void /* PRIVATE */
 png_squelch_warnings(void)
 {
+#ifdef PNG_THREAD_UNSAFE_OK
    _dif = _dif;
    _patemp = _patemp;
    _pbtemp = _pbtemp;
    _pctemp = _pctemp;
+   _MMXLength = _MMXLength;
+#endif
    _const4  = _const4;
    _const6  = _const6;
-   _MMXLength = _MMXLength;
    _mask8_0  = _mask8_0;
    _mask16_1 = _mask16_1;
    _mask16_0 = _mask16_0;
@@ -587,7 +596,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
             {
@@ -721,7 +730,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
             {
@@ -870,7 +879,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
             {
@@ -1034,7 +1043,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
             {
@@ -1205,7 +1214,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
             {
@@ -1431,10 +1440,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
          default: /* png_ptr->row_info.pixel_depth != 1,2,4,8,16,24,32,48,64 */
          {
             /* this should never happen */
-            fprintf(stderr,
-              "libpng internal error:  png_ptr->row_info.pixel_depth = %d\n",
-              png_ptr->row_info.pixel_depth);
-            fflush(stderr);
+            png_warning(png_ptr, "Invalid row_info.pixel_depth in pnggccrd");
             break;
          }
       } /* end switch (png_ptr->row_info.pixel_depth) */
@@ -2720,6 +2726,7 @@ union uAll {
   _HBClearMask = {0x7f7f7f7f7f7f7f7fLL},
   _ActiveMask, _ActiveMask2, _ActiveMaskEnd, _ShiftBpp, _ShiftRem;
 
+#ifdef PNG_THREAD_UNSAFE_OK
 //===========================================================================//
 //                                                                           //
 //           P N G _ R E A D _ F I L T E R _ R O W _ M M X _ A V G           //
@@ -3204,8 +3211,8 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       {
 
          // GRR:  PRINT ERROR HERE:  SHOULD NEVER BE REACHED
-         fprintf(stderr,
-           "libpng:  internal logic error (png_read_filter_row_mmx_avg())\n");
+        png_warning(png_ptr,
+          "Internal logic error in pnggccrd (png_read_filter_row_mmx_avg())");
 
 #if 0
         __asm__ __volatile__ (
@@ -3301,10 +3308,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
    );
 
 } /* end png_read_filter_row_mmx_avg() */
+#endif
 
 
 
-
+#ifdef PNG_THREAD_UNSAFE_OK
 //===========================================================================//
 //                                                                           //
 //         P N G _ R E A D _ F I L T E R _ R O W _ M M X _ P A E T H         //
@@ -4347,10 +4355,12 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
    );
 
 } /* end png_read_filter_row_mmx_paeth() */
+#endif
 
 
 
 
+#ifdef PNG_THREAD_UNSAFE_OK
 //===========================================================================//
 //                                                                           //
 //           P N G _ R E A D _ F I L T E R _ R O W _ M M X _ S U B           //
@@ -4769,6 +4779,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
    );
 
 } // end of png_read_filter_row_mmx_sub()
+#endif
 
 
 
@@ -4956,7 +4967,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
       case 0: sprintf(filnm, "none");
          break;
       case 1: sprintf(filnm, "sub-%s",
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
         (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB)? "MMX" : 
 #endif
 "x86");
@@ -4968,13 +4979,13 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
  "x86");
          break;
       case 3: sprintf(filnm, "avg-%s",
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
         (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG)? "MMX" :
 #endif
  "x86");
          break;
       case 4: sprintf(filnm, "Paeth-%s",
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
         (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH)? "MMX":
 #endif
 "x86");
@@ -4995,7 +5006,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_SUB:
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
              (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
@@ -5044,7 +5055,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_AVG:
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
              (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
@@ -5078,7 +5089,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_PAETH:
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
              (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))

@@ -31,7 +31,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
 # have to change it.
 PNGMAJ = 3
-PNGMIN = 1.2.0beta4
+PNGMIN = 1.2.0beta5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include

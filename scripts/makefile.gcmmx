@@ -5,6 +5,8 @@
 
 # CAUTION: Do not use this makefile with gcc versions 2.7.2.2 and earlier.
 
+# WARNING: The assembler code in pnggccrd.c may not be thread safe.
+
 # NOTE:  When testing MMX performance on a multitasking system, make sure
 #        there are no floating-point programs (e.g., SETI@Home) running in
 #        the background!  Context switches between MMX and FPU are expensive.
@@ -30,15 +32,17 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
+# Remove -DPNG_THREAD_UNSAFE_OK if you need thread safety
 ### for generic gcc:
-CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 $(ALIGN) -funroll-loops \
+CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall \
+       	-O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### for gcc 2.95.2 on 686:
-#CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \
+#CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \
 #	-mcpu=i686 -malign-double -ffast-math -fstrict-aliasing \
 #	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
 ### for gcc 2.7.2.3 on 486 and up:
-#CFLAGS=-DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \
+#CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \
 #	-m486 -malign-double -ffast-math \
 #	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
 
@@ -51,7 +55,7 @@ RANLIB=ranlib
 # read libpng.txt or png.h to see why PNGMAJ is 3.  You should not
 # have to change it.
 PNGMAJ = 3
-PNGMIN = 1.2.0beta4
+PNGMIN = 1.2.0beta5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -71,20 +75,10 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a libpng.so pngtest pngtest-static
 
 pnggccrd.o:	pnggccrd.c png.h pngconf.h
-	@echo ""
-	@echo '    You can ignore the single "control reaches end of non-void function"'
-	@echo '    warning and multiple "<variable> defined but not used" warnings:'
-	@echo ""
 	$(CC) -c $(CFLAGS) -o $@ $*.c
-	@echo ""
 
 pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
-	@echo ""
-	@echo '    You can ignore the single "control reaches end of non-void function"'
-	@echo '    warning and multiple "<variable> defined but not used" warnings:'
-	@echo ""
 	$(CC) -c $(CFLAGS) -fPIC -o $@ pnggccrd.c
-	@echo ""
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)

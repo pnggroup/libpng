@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.2.0beta4 - June 23, 2001
+ * libpng 1.2.0beta5 - August 8, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -637,6 +637,12 @@
 #    define PNG_MMX_CODE_SUPPORTED
 #  endif
 #endif
+
+/* If you are sure that you don't need thread safety and you are compiling
+   with PNG_USE_PNGCCRD for an MMX application, you can define this for
+   faster execution.  See pnggccrd.c.
+#define PNG_THREAD_UNSAFE_OK
+*/
 
 #if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
 #  define PNG_USER_MEM_SUPPORTED

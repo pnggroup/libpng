@@ -44,10 +44,10 @@ Files:
 
    toucan.png         transparent PNG for testing (by Stefan Schneider)
 
-Note that the programs are designed to be functional, but their primary
-purpose is to illustrate how to use libpng to add PNG support to other
-programs.  As such, their user interfaces are crude and definitely not
-intended for everyday use.
+Note that, although the programs are designed to be functional, their
+primary purpose is to illustrate how to use libpng to add PNG support to
+other programs.  As such, their user interfaces are crude and definitely
+are not intended for everyday use.
 
 Please see http://www.libpng.org/pub/png/pngbook.html for further infor-
 mation and links to the latest version of the source code, and Chapters
@@ -55,7 +55,7 @@ mation and links to the latest version of the source code, and Chapters
 
 Greg Roelofs
 newt@pobox.com
-30 May 2001
+30 June 2001
 
 
 BUILD INSTRUCTIONS
@@ -131,7 +131,7 @@ BUILD INSTRUCTIONS
      current folder.  Like the Unix versions, the two windowed programs
      (rpng and rpng2) now display a usage screen in a console window when
      invoked without command-line arguments; this is new behavior as of
-     the May 2001 release.  Note that the programs use the Unix-style "-"
+     the June 2001 release.  Note that the programs use the Unix-style "-"
      character to specify options, instead of the more common DOS/Windows
      "/" character.  (For example:  "rpng2-win -bgpat 4 foo.png", not
      "rpng2-win /bgpat 4 foo.png")

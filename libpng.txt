@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.0beta4 - June 23, 2001
+ libpng version 1.2.0beta5 - August 8, 2001
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998-2001 Glenn Randers-Pehrson
@@ -78,7 +78,9 @@ Libpng is thread safe, provided the threads are using different
 instances of the structures.  Each thread should have its own
 png_struct and png_info instances, and thus its own image.
 Libpng does not protect itself against two threads using the
-same instance of a structure.
+same instance of a structure.  Note: thread safety may be defeated
+by use of some of the MMX assembler code in pnggccrd.c, which is only
+compiled when the user defines PNG_THREAD_UNSAFE_OK.
 
 
 II. Structures
@@ -790,7 +792,7 @@ higher possible bit depth (e.g. from 5 bits/sample in the range [0,31] to
 convert the PNG pixel data back to the original bit depth of the image.
 This call reduces the pixels back down to the original bit depth:
 
-    png_color_16p sig_bit;
+    png_color_8p sig_bit;
 
     if (png_get_sBIT(png_ptr, info_ptr, &sig_bit))
         png_set_shift(png_ptr, sig_bit);
@@ -1002,7 +1004,13 @@ PNG files describe monochrome as black being zero and white being one.
 The following code will reverse this (make black be one and white be
 zero):
 
-   if (bit_depth == 1 && color_type == PNG_COLOR_GRAY)
+   if (bit_depth == 1 && color_type == PNG_COLOR_TYPE_GRAY)
+      png_set_invert_mono(png_ptr);
+
+This function can also be used to invert grayscale and gray-alpha images:
+
+   if (color_type == PNG_COLOR_TYPE_GRAY ||
+        color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       png_set_invert_mono(png_ptr);
 
 PNG files store 16 bit pixels in network byte order (big-endian,
@@ -2818,13 +2826,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-June 23, 2001
+August 8, 2001
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.0beta4 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.0beta5 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
