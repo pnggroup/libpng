@@ -41,13 +41,14 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
 This is the output of "pngcrush" and "pngcrush -help":
 
 
- | pngcrush 1.5.7, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+
+ | pngcrush 1.5.8, Copyright (C) 1998-2001 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
  | Executable name is pngcrush
- | It was built with libpng version 1.2.0, and is
- | running with  libpng version 1.2.0 - September 1, 2001 (header)
+ | It was built with libpng version 1.2.1, and is
+ | running with  libpng version 1.2.1 - December 12, 2001 (header)
  |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -63,7 +64,6 @@ options:
     -bit_depth depth (bit_depth to use in output file)
         -brute (Use brute-force, try 114 different methods [11-124])
             -c color_type of output file [0, 2, 4, or 6]
-           -cc (do color counting)
             -d directory_name (where output files will go)
  -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
             -e extension  (used for creating output filename)
@@ -77,7 +77,6 @@ options:
          -loco ("loco crush" truecolor PNGs)
             -m method [0 through 200]
           -max maximum_IDAT_size [default 8192]
-        -no_cc (no color counting)
         -nofilecheck (do not check for infile.png == outfile.png)
             -n (no save; does not do compression or write output PNG)
      -plte_len n (truncate PLTE)
@@ -89,6 +88,7 @@ options:
          -save (keep all copy-unsafe chunks)
          -srgb [0, 1, 2, or 3]
          -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+   -trns_array n trns[0] trns[1] .. trns[n-1]
          -trns index red green blue gray
             -v (display more detailed information)
       -version (display the pngcrush version)
@@ -101,13 +101,13 @@ options:
             -p (pause)
 
 
- | pngcrush 1.5.7, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+ | pngcrush 1.5.8, Copyright (C) 1998-2001 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
  | Executable name is pngcrush
- | It was built with libpng version 1.2.0, and is
- | running with  libpng version 1.2.0 - September 1, 2001 (header)
+ | It was built with libpng version 1.2.1, and is
+ | running with  libpng version 1.2.1 - December 12, 2001 (header)
  |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
@@ -151,8 +151,6 @@ options (Note: any option can be spelled out for clarity, e.g.,
                You can use 0 or 4 to convert color to grayscale.
                Use 0 or 2 to delete an unwanted alpha channel.
                Default is to use same color type as the input file.
-
-           -cc (do color counting)
 
             -d directory_name (where output files will go)
 
@@ -227,8 +225,6 @@ options (Note: any option can be spelled out for clarity, e.g.,
 
           -max maximum_IDAT_size [default 8192]
 
-        -no_cc (no color counting)
-
         -nofilecheck (do not check for infile.png == outfile.png)
 
                To avoid false hits from MSVC-compiled code.  Note
@@ -289,6 +285,11 @@ options (Note: any option can be spelled out for clarity, e.g.,
                text < 2048 chars. For now, you can only add ten
                tEXt, iTXt, or zTXt chunks per pngcrush run.
 
+   -trns_array n trns[0] trns[1] .. trns[n-1]
+
+               Insert a tRNS chunk, if no tRNS chunk found in file.
+               Values are for the tRNS array in indexed-color PNG.
+
          -trns index red green blue gray
 
                Insert a tRNS chunk, if no tRNS chunk found in file.
@@ -302,7 +303,7 @@ options (Note: any option can be spelled out for clarity, e.g.,
       -version (display the pngcrush version)
 
                Look for the most recent version of pngcrush at
-               http://pmt.sourceforge.net
+               http://pmt.sf.net
 
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
 
@@ -336,3 +337,4 @@ options (Note: any option can be spelled out for clarity, e.g.,
                Wait for [enter] key before continuing display.
                e.g., type 'pngcrush -pause -help', if the help
                screen scrolls out of sight.
+

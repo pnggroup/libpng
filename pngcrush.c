@@ -1,8 +1,8 @@
 /* pngcrush.c - recompresses png files
  * Copyright (C) 1998-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
- * The most recent version of pngcrush can be found at
- * http://pmt.sourceforge.net/pngcrush/
+ * The most recent version of pngcrush can be found at SourceForge in
+ * http://pmt.sf.net/pngcrush/
  *
  * This program reads in a PNG image, and writes it out again, with the
  * optimum filter_method and zlib_level.  It uses brute force (trying
@@ -25,7 +25,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.5.7"
+#define PNGCRUSH_VERSION "1.5.8"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -66,6 +66,10 @@
  */
 
 /* Change log:
+ *
+ * Version 1.5.8 (built with libpng-1.2.1)
+ *
+ *   Added -trns_a option for entering a tRNS array.
  *
  * Version 1.5.7 (built with libpng-1.2.0)
  *
@@ -239,7 +243,7 @@
  * Version 1.4.1 (built with libpng-1.0.6e and cexcept-0.6.0)
  *
  *   Uses cexcept.h for error handling instead of libpng's built-in
- *   setjmp/longjmp mechanism.  See http://cexcept.sourceforge.net/
+ *   setjmp/longjmp mechanism.  See http://cexcept.sf.net/
  *
  *   Pngcrush.c will now run when compiled with old versions of libpng back
  *   to version 0.96, although some features will not be available.
@@ -659,6 +663,8 @@ static png_uint_16 trns_blue=0;
 static png_uint_16 trns_gray=0;
 #endif
 static png_byte trns_array[256];
+static png_byte trans_in[256];
+static png_uint_16 num_trans_in;
 static int have_bkgd=0;
 static png_uint_16 bkgd_red=0;
 static png_uint_16 bkgd_green=0;
@@ -1645,6 +1651,15 @@ main(int argc, char *argv[])
          }
       }
 #ifdef PNG_tRNS_SUPPORTED
+   else if( !strncmp(argv[i],"-trns_a",7) ||
+            !strncmp(argv[i],"-tRNS_a",7))
+      {
+         num_trans_in=(png_uint_16)atoi(argv[++i]);
+         have_trns=1;
+         for (ia=0; ia<num_trans_in; ia++)
+            trans_in[ia]=(png_byte)atoi(argv[++i]);
+         names+=1+num_trans_in;
+      }
    else if( !strncmp(argv[i],"-trns",5) ||
             !strncmp(argv[i],"-tRNS",5))
       {
@@ -1665,7 +1680,7 @@ main(int argc, char *argv[])
          fprintf(STDERR, PNG_LIBPNG_VER_STRING );
          fprintf(STDERR,"and zlib ");
          fprintf(STDERR, ZLIB_VERSION );
-         fprintf(STDERR, "\n Check http://pmt.sourceforge.net\n");
+         fprintf(STDERR, "\n Check http://pmt.sf.net\n");
          fprintf(STDERR, " for the most recent version.\n");
       }
    else if(!strncmp(argv[i],"-v",2))
@@ -2154,6 +2169,15 @@ main(int argc, char *argv[])
      }
 #ifdef PNG_tRNS_SUPPORTED
      fprintf(STDERR,
+       "   -trns_array n trns[0] trns[1] .. trns[n-1]\n");
+     if(verbose > 1)
+     {
+     fprintf(STDERR,
+       "\n               Insert a tRNS chunk, if no tRNS chunk found in file.\n");
+     fprintf(STDERR,
+       "               Values are for the tRNS array in indexed-color PNG.\n\n");
+     }
+     fprintf(STDERR,
        "         -trns index red green blue gray\n");
      if(verbose > 1)
      {
@@ -2177,7 +2201,7 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "\n               Look for the most recent version of pngcrush at\n");
      fprintf(STDERR,
-       "               http://pmt.sourceforge.net\n\n");
+       "               http://pmt.sf.net\n\n");
      }
      fprintf(STDERR,
        "            -w compression_window_size [32, 16, 8, 4, 2, 1, 512]\n");
@@ -2291,7 +2315,7 @@ main(int argc, char *argv[])
    }
 
    for (ia=0; ia<256; ia++)
-      trns_array[ia]=255;
+      trans_in[ia]=trns_array[ia]=255;
 
   for(;;)  /* loop on input files */
 
@@ -2417,8 +2441,10 @@ main(int argc, char *argv[])
 
          if(verbose > 0)
          {
-            fprintf(STDERR,"   %s IDAT length in input file = %8lu\n",
-               inname,idat_length[0]);
+            fprintf(STDERR,"   Recompressing %s\n",inname);
+            fprintf(STDERR,
+            "   Total length of data found in IDAT chunks   = %8lu\n",
+                idat_length[0]);
             fflush(STDERR);
          }
 
@@ -3395,35 +3421,6 @@ main(int argc, char *argv[])
       }
 #endif
 
-     if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
-     {
-        if (plte_len > 0)
-           num_palette=plte_len;
-        if (do_pplt)
-        {
-           printf("PPLT: %s\n",pplt_string);
-        }
-        if(output_color_type == 3)
-           png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
-        else if(keep_chunk("PLTE",argv))
-           png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
-        if(verbose > 1 && first_trial)
-        {
-           int i;
-           png_colorp p = palette;
-           fprintf(STDERR, "   Palette:\n");
-           fprintf(STDERR, "      I    R    G    B ( color )    A\n");
-           for (i=0; i<num_palette; i++)
-           {
-              fprintf(STDERR, "   %4d %4d %4d %4d (#%2.2x%2.2x%2.2x) %4d\n",
-                  i, p->red, p->green, p->blue,
-                     p->red, p->green, p->blue,
-                     trns_array[i]);
-              p++;
-           }
-        }
-     }
-
 #if defined(PNG_READ_hIST_SUPPORTED) && defined(PNG_WRITE_hIST_SUPPORTED)
       {
          png_uint_16p hist;
@@ -3490,6 +3487,16 @@ main(int argc, char *argv[])
             num_trans = index_data+1;
             if(verbose > 1)
               fprintf(STDERR,"Have_tRNS, num_trans=%d\n",num_trans);
+            if (output_color_type == 3)
+            {
+              trans_values=NULL;
+              for (ia=0;ia<num_trans;ia++)
+                 trns_array[ia]=trans_in[ia];
+              for ( ; ia<256; ia++)
+                 trns_array[ia]=255;
+            }
+            else
+            {
             for (ia=0;ia<256;ia++)
                 trns_array[ia]=255;
             trns_array[index_data]=0;
@@ -3500,6 +3507,7 @@ main(int argc, char *argv[])
             trans_data.blue  = trns_blue;
             trans_data.gray  = trns_gray;
             trans_values = &trans_data;
+            }
 
             P0 ("  Adding a tRNS chunk\n");
             png_set_tRNS(write_ptr, write_info_ptr, trns_array, num_trans,
@@ -3532,6 +3540,38 @@ main(int argc, char *argv[])
          }
       }
 #endif
+
+     if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
+     {
+        if (plte_len > 0)
+           num_palette=plte_len;
+        if (do_pplt)
+        {
+           printf("PPLT: %s\n",pplt_string);
+           printf("Sorry, PPLT is not implemented yet.\n");
+        }
+        if(output_color_type == 3)
+           png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
+        else if(keep_chunk("PLTE",argv))
+           png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
+        if(verbose > 1 && first_trial)
+        {
+           int i;
+           png_colorp p = palette;
+           fprintf(STDERR, "   Palette:\n");
+           fprintf(STDERR, "      I    R    G    B ( color )    A\n");
+           for (i=0; i<num_palette; i++)
+           {
+              fprintf(STDERR, "   %4d %4d %4d %4d (#%2.2x%2.2x%2.2x) %4d\n",
+                  i, p->red, p->green, p->blue,
+                     p->red, p->green, p->blue,
+                     trns_array[i]);
+              p++;
+           }
+        }
+     }
+
+
 
 #if defined(PNG_READ_sBIT_SUPPORTED) && defined(PNG_WRITE_sBIT_SUPPORTED)
       {

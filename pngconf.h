@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.2.0 - September 1, 2001
+ * libpng 1.2.1 - December 12, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -204,6 +204,9 @@
 
 #ifdef _NO_PROTO
 #  define PNGARG(arglist) ()
+#  ifndef PNG_TYPECAST_NULL
+#     define PNG_TYPECAST_NULL
+#  endif
 #else
 #  define PNGARG(arglist) arglist
 #endif /* _NO_PROTO */
@@ -401,10 +404,10 @@
  */
 
 #ifndef PNG_iTXt_SUPPORTED
-#  ifndef PNG_READ_iTXt_SUPPORTED
+#  if !defined(PNG_READ_iTXt_SUPPORTED) && !defined(PNG_NO_READ_iTXt)
 #    define PNG_NO_READ_iTXt
 #  endif
-#  ifndef PNG_WRITE_iTXt_SUPPORTED
+#  if !defined(PNG_WRITE_iTXt_SUPPORTED) && !defined(PNG_NO_WRITE_iTXt)
 #    define PNG_NO_WRITE_iTXt
 #  endif
 #endif
@@ -728,8 +731,12 @@
 #  define PNG_iCCP_SUPPORTED
 #endif
 #ifndef PNG_NO_READ_iTXt
-#  define PNG_READ_iTXt_SUPPORTED
-#  define PNG_iTXt_SUPPORTED
+#  ifndef PNG_READ_iTXt_SUPPORTED
+#    define PNG_READ_iTXt_SUPPORTED
+#  endif
+#  ifndef PNG_iTXt_SUPPORTED
+#    define PNG_iTXt_SUPPORTED
+#  endif
 #endif
 #ifndef PNG_NO_READ_oFFs
 #  define PNG_READ_oFFs_SUPPORTED
@@ -844,7 +851,9 @@
 #  endif
 #endif
 #ifndef PNG_NO_WRITE_iTXt
-#  define PNG_WRITE_iTXt_SUPPORTED
+#  ifndef PNG_WRITE_iTXt_SUPPORTED
+#    define PNG_WRITE_iTXt_SUPPORTED
+#  endif
 #  ifndef PNG_iTXt_SUPPORTED
 #    define PNG_iTXt_SUPPORTED
 #  endif
