@@ -54,18 +54,18 @@
 
 /* #define DEBUG  :  this enables the Trace() macros */
 
-#include "readpng.h"	/* typedefs, common macros, readpng prototypes */
+#include "readpng.h" /* typedefs, common macros, readpng prototypes */
 
 
 /* could just include png.h, but this macro is the only thing we need
- * (name and typedefs changed to local versions); note that side effects 
- * only happen with alpha (which could easily be avoided with 
+ * (name and typedefs changed to local versions); note that side effects
+ * only happen with alpha (which could easily be avoided with
  * "ush acopy = (alpha);") */
 
-#define alpha_composite(composite, fg, alpha, bg) {			\
-    ush temp = ((ush)(fg)*(ush)(alpha) +				\
-                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128);	\
-    (composite) = (uch)((temp + (temp >> 8)) >> 8);			\
+#define alpha_composite(composite, fg, alpha, bg) {               \
+    ush temp = ((ush)(fg)*(ush)(alpha) +                          \
+                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128);  \
+    (composite) = (uch)((temp + (temp >> 8)) >> 8);               \
 }
 
 
@@ -123,9 +123,9 @@ int main(int argc, char **argv)
     int rc, alen, flen;
     int error = 0;
     int have_bg = FALSE;
-    double LUT_exponent;		/* just the lookup table */
-    double CRT_exponent = 2.2;		/* just the monitor */
-    double default_display_exponent;	/* whole display system */
+    double LUT_exponent;             /* just the lookup table */
+    double CRT_exponent = 2.2;       /* just the monitor */
+    double default_display_exponent; /* whole display system */
     XEvent e;
     KeySym k;
 
@@ -222,7 +222,7 @@ int main(int argc, char **argv)
         fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
         ++error;
     } else {
-        if ((rc = readpng_init(infile, (long *)(&image_width), 
+        if ((rc = readpng_init(infile, (long *)(&image_width),
                                (long *)(&image_height))) != 0) {
             switch (rc) {
                 case 1:
@@ -408,11 +408,11 @@ static int rpng_x_create_window()
         }
         have_colormap = TRUE;
     } else if (depth == 16) {
-        RPixelShift = 15 - rpng_x_msb(RedMask);	/* these are right-shifts */
+        RPixelShift = 15 - rpng_x_msb(RedMask); /* these are right-shifts */
         GPixelShift = 15 - rpng_x_msb(GreenMask);
         BPixelShift = 15 - rpng_x_msb(BlueMask);
     } else /* if (depth > 16) */ {
-        RPixelShift = rpng_x_msb(RedMask) - 7;	/* these are left-shifts */
+        RPixelShift = rpng_x_msb(RedMask) - 7; /* these are left-shifts */
         GPixelShift = rpng_x_msb(GreenMask) - 7;
         BPixelShift = rpng_x_msb(BlueMask) - 7;
     }

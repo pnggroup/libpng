@@ -53,7 +53,7 @@
 
 /* #define DEBUG  :  this enables the Trace() macros */
 
-#include "readpng.h"	/* typedefs, common macros, readpng prototypes */
+#include "readpng.h" /* typedefs, common macros, readpng prototypes */
 
 
 /* could just include png.h, but this macro is the only thing we need
@@ -61,10 +61,10 @@
  * only happen with alpha (which could easily be avoided with
  * "ush acopy = (alpha);") */
 
-#define alpha_composite(composite, fg, alpha, bg) {			\
-    ush temp = ((ush)(fg)*(ush)(alpha) +				\
-                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128);	\
-    (composite) = (uch)((temp + (temp >> 8)) >> 8);			\
+#define alpha_composite(composite, fg, alpha, bg) {              \
+    ush temp = ((ush)(fg)*(ush)(alpha) +                         \
+                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128); \
+    (composite) = (uch)((temp + (temp >> 8)) >> 8);              \
 }
 
 
@@ -78,7 +78,7 @@ LRESULT CALLBACK  rpng_win_wndproc(HWND, UINT, WPARAM, LPARAM);
 static char titlebar[1024], *window_name = titlebar;
 static char *progname = PROGNAME;
 static char *appname = LONGNAME;
-static char *icon_name = PROGNAME;	/* GRR:  not (yet) used */
+static char *icon_name = PROGNAME;    /* GRR:  not (yet) used */
 static char *filename;
 static FILE *infile;
 
@@ -104,15 +104,15 @@ static HWND global_hwnd;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
 {
-    char *args[1024];		/* arbitrary limit, but should suffice */
+    char *args[1024];                /* arbitrary limit, but should suffice */
     char *p, *q, **argv = args;
     int argc = 0;
     int rc, alen, flen;
     int error = 0;
     int have_bg = FALSE;
-    double LUT_exponent;		/* just the lookup table */
-    double CRT_exponent = 2.2;		/* just the monitor */
-    double default_display_exponent;	/* whole display system */
+    double LUT_exponent;             /* just the lookup table */
+    double CRT_exponent = 2.2;       /* just the monitor */
+    double default_display_exponent; /* whole display system */
     MSG msg;
 
 
@@ -150,7 +150,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     LUT_exponent = 1.8 / 2.61;
     /*
     if (some_mac_function_that_returns_gamma(&mac_gamma))
-        LUT_exponent = mac_gamma / 2.61;                 
+        LUT_exponent = mac_gamma / 2.61;
      */
 #else
     LUT_exponent = 1.0;   /* assume no LUT:  most PCs */
@@ -371,7 +371,7 @@ static int rpng_win_create_window(HINSTANCE hInst, int showmode)
     if (!(dib = (uch *)malloc(sizeof(BITMAPINFOHEADER) +
                               wimage_rowbytes*image_height)))
     {
-        return 4;	/* fail */
+        return 4; /* fail */
     }
 
 /*---------------------------------------------------------------------------
@@ -477,7 +477,7 @@ static int rpng_win_display_image()
                 g = *src++;
                 b = *src++;
                 *dest++ = b;
-                *dest++ = g;	/* note reverse order */
+                *dest++ = g; /* note reverse order */
                 *dest++ = r;
             }
         } else /* if (image_channels == 4) */ {
@@ -582,15 +582,15 @@ LRESULT CALLBACK rpng_win_wndproc(HWND hwnd, UINT iMsg, WPARAM wP, LPARAM lP)
 
         /* wait for the user to tell us when to quit */
         case WM_CHAR:
-            switch (wP) {	/* only need one, so ignore repeat count */
+            switch (wP) { /* only need one, so ignore repeat count */
                 case 'q':
                 case 'Q':
-                case 0x1B:	/* Esc key */
+                case 0x1B: /* Esc key */
                     PostQuitMessage(0);
             }
             return 0;
 
-        case WM_LBUTTONDOWN:	/* another way of quitting */
+        case WM_LBUTTONDOWN: /* another way of quitting */
         case WM_DESTROY:
             PostQuitMessage(0);
             return 0;

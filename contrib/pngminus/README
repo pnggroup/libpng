@@ -1,4 +1,4 @@
-PngMinus 
+PngMinus
 --------
 (copyright Willem van Schaik, 1999)
 
@@ -19,7 +19,7 @@ Some history
 Soon after the creation of PNG in 1995, the need was felt for a set of
 pnmtopng / pngtopnm utilities. Independantly Alexander Lehmann and I
 (Willem van Schaik) started such a project. Luckily we discovered this
-and merged the two together into pnmtopng.tar.gz, which is available 
+and merged the two together into pnmtopng.tar.gz, which is available
 from a/o ftp://swrinde.nde.swri.edu/pub/png/.
 
 These two utilities have many, many options and make use of most of the

@@ -39,14 +39,14 @@ $ write sys$output "Compiling PNG contrib programs ..."
 $   write sys$output "Building pnm2png..."
 $   CALL MAKE pnm2png.OBJ "cc ''CCOPT' pnm2png" -
 	pnm2png.c
-$   call make pnm2png.exe - 
-	"LINK pnm2png,lib.opt/opt" - 
+$   call make pnm2png.exe -
+	"LINK pnm2png,lib.opt/opt" -
 	pnm2png.obj
 $   write sys$output "Building png2pnm..."
 $   CALL MAKE png2pnm.OBJ "cc ''CCOPT' png2pnm" -
 	png2pnm.c
-$   call make pnm2png.exe - 
-	"LINK pnm2png,lib.opt/opt" - 
+$   call make pnm2png.exe -
+	"LINK pnm2png,lib.opt/opt" -
 	pnm2png.obj
 $ exit
 $!

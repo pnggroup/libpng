@@ -30,10 +30,10 @@
   ---------------------------------------------------------------------------*/
 
 
-#include <stdlib.h>	/* for exit() prototype */
+#include <stdlib.h>    /* for exit() prototype */
 
-#include "png.h"	/* libpng header; includes zlib.h and setjmp.h */
-#include "readpng2.h"	/* typedefs, common macros, public prototypes */
+#include "png.h"       /* libpng header; includes zlib.h and setjmp.h */
+#include "readpng2.h"  /* typedefs, common macros, public prototypes */
 
 
 /* local prototypes */
@@ -53,7 +53,7 @@ void readpng2_version_info()
       PNG_LIBPNG_VER_STRING, png_libpng_ver);
     fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
       ZLIB_VERSION, zlib_version);
-} 
+}
 
 
 
@@ -70,7 +70,7 @@ int readpng2_check_sig(uch *sig, int num)
 
 int readpng2_init(mainprog_info *mainprog_ptr)
 {
-    png_structp  png_ptr;	/* note:  temporary variables! */
+    png_structp  png_ptr; /* note:  temporary variables! */
     png_infop  info_ptr;
 
 
@@ -176,7 +176,7 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 
     mainprog_ptr = png_get_progressive_ptr(png_ptr);
 
-    if (mainprog_ptr == NULL) {		/* we be hosed */
+    if (mainprog_ptr == NULL) { /* we be hosed */
         fprintf(stderr,
           "readpng2 error:  main struct not recoverable in info_callback.\n");
         fflush(stderr);
@@ -408,7 +408,7 @@ static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg)
     fflush(stderr);
 
     mainprog_ptr = png_get_error_ptr(png_ptr);
-    if (mainprog_ptr == NULL) {		/* we are completely hosed now */
+    if (mainprog_ptr == NULL) { /* we are completely hosed now */
         fprintf(stderr,
           "readpng2 severe error:  jmpbuf not recoverable; terminating.\n");
         fflush(stderr);

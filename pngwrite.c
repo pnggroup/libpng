@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.0.5d - November 29, 1999
+ * libpng 1.0.5h - December 10, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -24,6 +24,9 @@
 void
 png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 {
+#if defined(PNG_WRITE_sPLT_SUPPORTED)
+   int i;
+#endif
    png_debug(1, "in png_write_info_before_PLTE\n");
    if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
    {
@@ -41,11 +44,29 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
       flag set, and if it does, writes the chunk. */
 #if defined(PNG_WRITE_gAMA_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_gAMA)
+   {
+#ifdef PNG_FIXED_POINT_SUPPORTED
+      png_write_gAMA_fixed(png_ptr, info_ptr->int_gamma);
+#else
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
       png_write_gAMA(png_ptr, info_ptr->gamma);
+#  endif
+#endif
+   }
 #endif
 #if defined(PNG_WRITE_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
       png_write_sRGB(png_ptr, (int)info_ptr->srgb_intent);
+#endif
+#if defined(PNG_WRITE_iCCP_SUPPORTED)
+   if (info_ptr->valid & PNG_INFO_iCCP)
+      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_TEXT_COMPRESSION_NONE,
+                     info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
+#endif
+#if defined(PNG_WRITE_sPLT_SUPPORTED)
+   if (info_ptr->valid & PNG_INFO_sPLT)
+     for (i = 0; i < (int)info_ptr->splt_palettes_num; i++)
+       png_write_sPLT(png_ptr, info_ptr->splt_palettes + i);
 #endif
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sBIT)
@@ -53,11 +74,37 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_WRITE_cHRM_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_cHRM)
+   {
+#ifdef PNG_FIXED_POINT_SUPPORTED
+      png_write_cHRM_fixed(png_ptr,
+         info_ptr->int_x_white, info_ptr->int_y_white,
+         info_ptr->int_x_red, info_ptr->int_y_red,
+         info_ptr->int_x_green, info_ptr->int_y_green,
+         info_ptr->int_x_blue, info_ptr->int_y_blue);
+#else
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
       png_write_cHRM(png_ptr,
          info_ptr->x_white, info_ptr->y_white,
          info_ptr->x_red, info_ptr->y_red,
          info_ptr->x_green, info_ptr->y_green,
          info_ptr->x_blue, info_ptr->y_blue);
+#  endif
+#endif
+   }
+#endif
+#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+   if (info_ptr->unknown_chunks_num)
+   {
+       png_unknown_chunk *up;
+
+       png_debug(5, "writing extra chunks\n");
+
+       for (up = info_ptr->unknown_chunks;
+            up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
+            up++)
+         if (!(up->location & PNG_HAVE_PLTE))
+            png_write_chunk(png_ptr, up->name, up->data, up->size);
+   }
 #endif
       png_ptr->mode |= PNG_WROTE_INFO_BEFORE_PLTE;
    }
@@ -66,7 +113,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 void
 png_write_info(png_structp png_ptr, png_infop info_ptr)
 {
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
    int i;
 #endif
 
@@ -116,6 +163,11 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          info_ptr->pcal_X1, info_ptr->pcal_type, info_ptr->pcal_nparams,
          info_ptr->pcal_units, info_ptr->pcal_params);
 #endif
+#if defined(PNG_WRITE_sCAL_SUPPORTED)
+   if (info_ptr->valid & PNG_INFO_sCAL)
+      png_write_sCAL_s(png_ptr, info_ptr->scal_unit,
+          info_ptr->scal_s_width, info_ptr->scal_s_height);
+#endif
 #if defined(PNG_WRITE_pHYs_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_pHYs)
       png_write_pHYs(png_ptr, info_ptr->x_pixels_per_unit,
@@ -128,14 +180,31 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
       png_ptr->mode |= PNG_WROTE_tIME;
    }
 #endif
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
    /* Check to see if we need to write text chunks */
    for (i = 0; i < info_ptr->num_text; i++)
    {
       png_debug2(2, "Writing header text chunk %d, type %d\n", i,
          info_ptr->text[i].compression);
+      /* an internationalized chunk? */
+      if (info_ptr->text[i].lang)
+      {
+#if defined(PNG_WRITE_iTXt_SUPPORTED)
+          /* write international chunk */
+          png_write_iTXt(png_ptr,
+                         info_ptr->text[i].compression,
+                         info_ptr->text[i].lang,
+                         info_ptr->text[i].key,
+                         info_ptr->text[i].translated_key,
+                         info_ptr->text[i].text);
+#else
+          png_warning(png_ptr, "Unable to write international text\n");
+#endif
+          /* Mark this chunk as written */
+          info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
+      }
       /* If we want a compressed text chunk */
-      if (info_ptr->text[i].compression >= PNG_TEXT_COMPRESSION_zTXt)
+      else if (info_ptr->text[i].compression >= PNG_TEXT_COMPRESSION_zTXt)
       {
 #if defined(PNG_WRITE_zTXt_SUPPORTED)
          /* write compressed chunk */
@@ -153,13 +222,28 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_WRITE_tEXt_SUPPORTED)
          /* write uncompressed chunk */
          png_write_tEXt(png_ptr, info_ptr->text[i].key,
-            info_ptr->text[i].text, info_ptr->text[i].text_length);
+                         info_ptr->text[i].text,
+                         info_ptr->text[i].text_length);
 #else
          png_warning(png_ptr, "Unable to write uncompressed text\n");
 #endif
          /* Mark this chunk as written */
          info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
       }
+   }
+#endif
+#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+   if (info_ptr->unknown_chunks_num)
+   {
+       png_unknown_chunk *up;
+
+       png_debug(5, "writing extra chunks\n");
+
+       for (up = info_ptr->unknown_chunks;
+            up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
+            up++)
+         if ((up->location& PNG_HAVE_PLTE) && !(up->location& PNG_HAVE_IDAT))
+       png_write_chunk(png_ptr, up->name, up->data, up->size);
    }
 #endif
 }
@@ -179,7 +263,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    /* see if user wants us to write information chunks */
    if (info_ptr != NULL)
    {
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
       int i; /* local index variable */
 #endif
 #if defined(PNG_WRITE_tIME_SUPPORTED)
@@ -188,7 +272,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
          !(png_ptr->mode & PNG_WROTE_tIME))
          png_write_tIME(png_ptr, &(info_ptr->mod_time));
 #endif
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
       /* loop through comment chunks */
       for (i = 0; i < info_ptr->num_text; i++)
       {
@@ -221,6 +305,20 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
             info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
          }
       }
+#endif
+#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+   if (info_ptr->unknown_chunks_num)
+   {
+       png_unknown_chunk *up;
+
+       png_debug(5, "writing extra chunks\n");
+
+       for (up = info_ptr->unknown_chunks;
+            up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
+            up++)
+         if (up->location & PNG_HAVE_IDAT)
+            png_write_chunk(png_ptr, up->name, up->data, up->size);
+   }
 #endif
    }
 
@@ -643,36 +741,25 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 
    if (info_ptr != NULL)
    {
-#if defined(PNG_WRITE_tEXt_SUPPORTED) || defined(PNG_WRITE_zTXt_SUPPORTED)
-   png_debug(1, "in png_info_destroy\n");
-   if (info_ptr->text != NULL)
-   {
-      int i;
-      for (i = 0; i < info_ptr->num_text; i++)
-      {
-         if(info_ptr->text[i].key != NULL)
-         {
-           png_free(png_ptr, info_ptr->text[i].key);
-           info_ptr->text[i].key = NULL;
-         }
-      }
-      png_free(png_ptr, info_ptr->text);
-      info_ptr->text = NULL;
-   }
+#if defined(PNG_WRITE_TEXT_SUPPORTED)
+      png_free_text(png_ptr, info_ptr, -1);
 #endif
-#if defined(PNG_READ_pCAL_SUPPORTED)
-      png_free(png_ptr, info_ptr->pcal_purpose);
-      png_free(png_ptr, info_ptr->pcal_units);
-      if (info_ptr->pcal_params != NULL)
-      {
-         int i;
-         for (i = 0; i < (int)info_ptr->pcal_nparams; i++)
-         {
-            png_free(png_ptr, info_ptr->pcal_params[i]);
-         }
-         png_free(png_ptr, info_ptr->pcal_params);
-      }
+#if defined(PNG_WRITE_sCAL_SUPPORTED)
+      png_free_sCAL(png_ptr, info_ptr);
 #endif
+#if defined(PNG_WRITE_pCAL_SUPPORTED)
+      png_free_pCAL(png_ptr, info_ptr);
+#endif
+#if defined(PNG_WRITE_iCCP_SUPPORTED)
+      png_free_iCCP(png_ptr, info_ptr);
+#endif
+#if defined(PNG_WRITE_sPLT_SUPPORTED)
+      png_free_spalette(png_ptr, info_ptr, -1);
+#endif
+#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+      png_free_unknown_chunk(png_ptr, info_ptr, -1);
+#endif
+
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)info_ptr, free_fn);
 #else
@@ -718,16 +805,18 @@ png_write_destroy(png_structp png_ptr)
    png_free(png_ptr, png_ptr->up_row);
    png_free(png_ptr, png_ptr->avg_row);
    png_free(png_ptr, png_ptr->paeth_row);
+
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
    png_free(png_ptr, png_ptr->time_buffer);
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#endif
+
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_free(png_ptr, png_ptr->prev_filters);
    png_free(png_ptr, png_ptr->filter_weights);
    png_free(png_ptr, png_ptr->inv_filter_weights);
    png_free(png_ptr, png_ptr->filter_costs);
    png_free(png_ptr, png_ptr->inv_filter_costs);
-#endif /* PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
+#endif
 
    /* reset structure */
    png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
@@ -1000,6 +1089,14 @@ png_set_compression_window_bits(png_structp png_ptr, int window_bits)
       png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
    else if (window_bits < 8)
       png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
+#ifndef WBITS_8_OK
+   /* avoid libpng bug with 256-byte windows */
+   if (window_bits == 8)
+     {
+       png_warning(png_ptr, "Compression window is being reset to 512");
+       window_bits=9;
+     }
+#endif
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_WINDOW_BITS;
    png_ptr->zlib_window_bits = window_bits;
 }

@@ -45,20 +45,20 @@ $   CALL MAKE writepng.OBJ "cc ''CCOPT' writepng" -
 $   write sys$output "Building rpng-x..."
 $   CALL MAKE rpng-x.OBJ "cc ''CCOPT' rpng-x" -
 	rpng-x.c readpng.h
-$   call make rpng-x.exe - 
-	"LINK rpng-x,readpng,lib.opt/opt,x11.opt/opt" - 
+$   call make rpng-x.exe -
+	"LINK rpng-x,readpng,lib.opt/opt,x11.opt/opt" -
 	rpng-x.obj readpng.obj
 $   write sys$output "Building rpng2-x..."
 $   CALL MAKE rpng2-x.OBJ "cc ''CCOPT' rpng2-x" -
 	rpng2-x.c readpng2.h
-$   call make rpng2-x.exe - 
-	"LINK rpng2-x,readpng2,lib.opt/opt,x11.opt/opt" - 
+$   call make rpng2-x.exe -
+	"LINK rpng2-x,readpng2,lib.opt/opt,x11.opt/opt" -
 	rpng2-x.obj readpng2.obj
 $   write sys$output "Building wpng..."
 $   CALL MAKE wpng.OBJ "cc ''CCOPT' wpng" -
 	wpng.c writepng.h
-$   call make wpng.exe - 
-	"LINK wpng,writepng,lib.opt/opt" - 
+$   call make wpng.exe -
+	"LINK wpng,writepng,lib.opt/opt" -
 	wpng.obj writepng.obj
 $ exit
 $!

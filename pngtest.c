@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.5d - November 29, 1999
+ * libpng 1.0.5h - December 10, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -39,6 +39,10 @@
 #define PNGTEST_TIMING
 */
 
+#ifdef PNG_NO_FLOATING_POINT_SUPPORTED
+#undef PNGTEST_TIMING
+#endif
+
 #ifdef PNGTEST_TIMING
 static float t_start, t_stop, t_decode, t_encode, t_misc;
 #include <time.h>
@@ -48,7 +52,7 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 
 #ifdef PNGTEST_TIMING
 static float t_start, t_stop, t_decode, t_encode, t_misc;
-#if !defined(PNG_READ_tIME_SUPPORTED) && !defined(PNG_WRITE_tIME_SUPPORTED)
+#if !defined(PNG_tIME_SUPPORTED)
 #include <time.h>
 #endif
 #endif
@@ -56,7 +60,7 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
 static int tIME_chunk_present=0;
 static char tIME_string[30] = "no tIME chunk present in file";
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#endif
 
 static int verbose = 0;
 
@@ -512,7 +516,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    int bit_depth, color_type;
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;
-#endif   
+#endif
 
    char inbuf[256], outbuf[256];
 
@@ -657,39 +661,45 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
       }
    }
-#if defined(PNG_READ_bKGD_SUPPORTED) && defined(PNG_WRITE_bKGD_SUPPORTED)
+#if defined(PNG_cHRM_SUPPORTED)
    {
-      png_color_16p background;
+      png_uint_32 white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
+         blue_y;
 
-      if (png_get_bKGD(read_ptr, read_info_ptr, &background))
-      {
-         png_set_bKGD(write_ptr, write_info_ptr, background);
-      }
-   }
-#endif
-#if defined(PNG_READ_cHRM_SUPPORTED) && defined(PNG_WRITE_cHRM_SUPPORTED)
-   {
-      double white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
-
-      if (png_get_cHRM(read_ptr, read_info_ptr, &white_x, &white_y, &red_x,
+      if (png_get_cHRM_fixed(read_ptr, read_info_ptr, &white_x, &white_y, &red_x,
          &red_y, &green_x, &green_y, &blue_x, &blue_y))
       {
-         png_set_cHRM(write_ptr, write_info_ptr, white_x, white_y, red_x,
+         png_set_cHRM_fixed(write_ptr, write_info_ptr, white_x, white_y, red_x,
             red_y, green_x, green_y, blue_x, blue_y);
       }
    }
 #endif
-#if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_WRITE_gAMA_SUPPORTED)
+#if defined(PNG_gAMA_SUPPORTED)
    {
-      double gamma;
+      png_uint_32 gamma;
 
-      if (png_get_gAMA(read_ptr, read_info_ptr, &gamma))
+      if (png_get_gAMA_fixed(read_ptr, read_info_ptr, &gamma))
       {
-         png_set_gAMA(write_ptr, write_info_ptr, gamma);
+         png_set_gAMA_fixed(write_ptr, write_info_ptr, gamma);
       }
    }
 #endif
-#if defined(PNG_READ_sRGB_SUPPORTED) && defined(PNG_WRITE_sRGB_SUPPORTED)
+#if defined(PNG_iCCP_SUPPORTED)
+   {
+      png_charp name;
+      png_charp profile;
+      png_int_32 proflen;
+      int compression_type;
+
+      if (png_get_iCCP(read_ptr, read_info_ptr, &name, &compression_type,
+                      &profile, &proflen))
+      {
+         png_set_iCCP(write_ptr, write_info_ptr, name, compression_type,
+                      profile, proflen);
+      }
+   }
+#endif
+#if defined(PNG_sRGB_SUPPORTED)
    {
       int intent;
 
@@ -699,7 +709,26 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_READ_hIST_SUPPORTED) && defined(PNG_WRITE_hIST_SUPPORTED)
+   {
+      png_colorp palette;
+      int num_palette;
+
+      if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
+      {
+         png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
+      }
+   }
+#if defined(PNG_bKGD_SUPPORTED)
+   {
+      png_color_16p background;
+
+      if (png_get_bKGD(read_ptr, read_info_ptr, &background))
+      {
+         png_set_bKGD(write_ptr, write_info_ptr, background);
+      }
+   }
+#endif
+#if defined(PNG_hIST_SUPPORTED)
    {
       png_uint_16p hist;
 
@@ -709,9 +738,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_READ_oFFs_SUPPORTED) && defined(PNG_WRITE_oFFs_SUPPORTED)
+#if defined(PNG_oFFs_SUPPORTED)
    {
-      png_uint_32 offset_x, offset_y;
+      long offset_x, offset_y;
       int unit_type;
 
       if (png_get_oFFs(read_ptr, read_info_ptr,&offset_x,&offset_y,&unit_type))
@@ -720,7 +749,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_READ_pCAL_SUPPORTED) && defined(PNG_WRITE_pCAL_SUPPORTED)
+#if defined(PNG_pCAL_SUPPORTED)
    {
       png_charp purpose, units;
       png_charpp params;
@@ -735,7 +764,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_READ_pHYs_SUPPORTED) && defined(PNG_WRITE_pHYs_SUPPORTED)
+#if defined(PNG_pHYs_SUPPORTED)
    {
       png_uint_32 res_x, res_y;
       int unit_type;
@@ -746,16 +775,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-   {
-      png_colorp palette;
-      int num_palette;
-
-      if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
-      {
-         png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
-      }
-   }
-#if defined(PNG_READ_sBIT_SUPPORTED) && defined(PNG_WRITE_sBIT_SUPPORTED)
+#if defined(PNG_sBIT_SUPPORTED)
    {
       png_color_8p sig_bit;
 
@@ -765,20 +785,41 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if (defined(PNG_READ_tEXt_SUPPORTED) && defined(PNG_WRITE_tEXt_SUPPORTED)) || \
-    (defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED))
+#if defined(PNG_sCAL_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+   {
+      png_charp unit;
+      double width, height;
+
+      if (png_get_sCAL(read_ptr, read_info_ptr, &unit, &width, &height))
+      {
+         png_set_sCAL(write_ptr, write_info_ptr, unit, width, height);
+      }
+   }
+#else
+#endif
+   {
+      png_charp unit, width, height;
+
+      if (png_get_sCAL_s(read_ptr, read_info_ptr, &unit, &width, &height))
+      {
+         png_set_sCAL_s(write_ptr, write_info_ptr, unit, width, height);
+      }
+   }
+#endif
+#if defined(PNG_TEXT_SUPPORTED)
    {
       png_textp text_ptr;
       int num_text;
 
       if (png_get_text(read_ptr, read_info_ptr, &text_ptr, &num_text) > 0)
       {
-         png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
+         png_debug1(0, "Handling %d iTXt/tEXt/zTXt chunks\n", num_text);
          png_set_text(write_ptr, write_info_ptr, text_ptr, num_text);
       }
    }
 #endif
-#if defined(PNG_READ_tIME_SUPPORTED) && defined(PNG_WRITE_tIME_SUPPORTED)
+#if defined(PNG_tIME_SUPPORTED)
    {
       png_timep mod_time;
 
@@ -795,7 +836,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_READ_tRNS_SUPPORTED) && defined(PNG_WRITE_tRNS_SUPPORTED)
+#if defined(PNG_tRNS_SUPPORTED)
    {
       png_bytep trans;
       int num_trans;
@@ -867,20 +908,19 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
    png_debug(0, "Reading and writing end_info data\n");
    png_read_end(read_ptr, end_info_ptr);
-#if (defined(PNG_READ_tEXt_SUPPORTED) && defined(PNG_WRITE_tEXt_SUPPORTED)) || \
-    (defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED))
+#if defined(PNG_TEXT_SUPPORTED)
    {
       png_textp text_ptr;
       int num_text;
 
       if (png_get_text(read_ptr, end_info_ptr, &text_ptr, &num_text) > 0)
       {
-         png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
+         png_debug1(0, "Handling %d iTXt/tEXt/zTXt chunks\n", num_text);
          png_set_text(write_ptr, write_end_info_ptr, text_ptr, num_text);
       }
    }
 #endif
-#if defined(PNG_READ_tIME_SUPPORTED) && defined(PNG_WRITE_tIME_SUPPORTED)
+#if defined(PNG_tIME_SUPPORTED)
    {
       png_timep mod_time;
 
@@ -1223,7 +1263,7 @@ main(int argc, char *argv[])
 /* Generate a compiler error if there is an old png.h in the search path. */
 void
 png_check_pngtest_version
-   (version_1_0_5d png_h_is_not_version_1_0_5d)
+   (version_1_0_5h png_h_is_not_version_1_0_5h)
 {
-   if(png_h_is_not_version_1_0_5d == NULL) return;
+   if(png_h_is_not_version_1_0_5h == NULL) return;
 }

@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------
 
-   rpng2 - progressive-model PNG display program                  rpng2-x.c 
+   rpng2 - progressive-model PNG display program                  rpng2-x.c
 
    This program decodes and displays PNG files progressively, as if it were
    a web browser (though the front end is only set up to read from files).
@@ -49,13 +49,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h>	/* for jmpbuf declaration in readpng2.h */
+#include <setjmp.h> /* for jmpbuf declaration in readpng2.h */
 #include <time.h>
-#include <math.h>	/* only for PvdM background code */
+#include <math.h>   /* only for PvdM background code */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
-#include <X11/keysym.h>	/* defines XK_* macros */
+#include <X11/keysym.h> /* defines XK_* macros */
 
 #ifdef VMS
 #include <unistd.h>
@@ -79,9 +79,9 @@
 #define rgb2_max   bg_bsat
 #define rgb2_min   bg_brot
 
-/* #define DEBUG */	/* this enables the Trace() macros */
+/* #define DEBUG */ /* this enables the Trace() macros */
 
-#include "readpng2.h"	/* typedefs, common macros, readpng2 prototypes */
+#include "readpng2.h" /* typedefs, common macros, readpng2 prototypes */
 
 
 /* could just include png.h, but this macro is the only thing we need
@@ -89,18 +89,18 @@
  * only happen with alpha (which could easily be avoided with
  * "ush acopy = (alpha);") */
 
-#define alpha_composite(composite, fg, alpha, bg) {			\
-    ush temp = ((ush)(fg)*(ush)(alpha) +				\
-                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128);	\
-    (composite) = (uch)((temp + (temp >> 8)) >> 8);			\
+#define alpha_composite(composite, fg, alpha, bg) {              \
+    ush temp = ((ush)(fg)*(ush)(alpha) +                         \
+                (ush)(bg)*(ush)(255 - (ush)(alpha)) + (ush)128); \
+    (composite) = (uch)((temp + (temp >> 8)) >> 8);              \
 }
 
 
-#define INBUFSIZE 4096	/* with pseudo-timing on (1 sec delay/block), this
-			 *  block size corresponds roughly to a download
-			 *  speed 10% faster than theoretical 33.6K maximum
-			 *  (assuming 8 data bits, 1 stop bit and no other
-			 *  overhead) */
+#define INBUFSIZE 4096 /* with pseudo-timing on (1 sec delay/block), this
+                        *  block size corresponds roughly to a download
+                        *  speed 10% faster than theoretical 33.6K maximum
+                        *  (assuming 8 data bits, 1 stop bit and no other
+                        *  overhead) */
 
 /* local prototypes */
 static void rpng2_x_init(void);
@@ -123,7 +123,7 @@ static mainprog_info rpng2_info;
 static uch inbuf[INBUFSIZE];
 static int incount;
 
-static int pat = 6;		/* must be less than num_bgpat */
+static int pat = 6;  /* must be less than num_bgpat */
 static int bg_image = 0;
 static int bgscale = 16;
 static ulg bg_rowbytes;
@@ -132,22 +132,22 @@ static uch *bg_data;
 static struct rgb_color {
     uch r, g, b;
 } rgb[] = {
-    {  0,   0,   0},	/*  0:  black */
-    {255, 255, 255},	/*  1:  white */
-    {173, 132,  57},	/*  2:  tan */
-    { 64, 132,   0},	/*  3:  medium green */
-    {189, 117,   1},	/*  4:  gold */
-    {253, 249,   1},	/*  5:  yellow */
-    {  0,   0, 255},	/*  6:  blue */
-    {  0,   0, 120},	/*  7:  medium blue */
-    {255,   0, 255},	/*  8:  magenta */
-    { 64,   0,  64},	/*  9:  dark magenta */
-    {255,   0,   0},	/* 10:  red */
-    { 64,   0,   0},	/* 11:  dark red */
-    {255, 127,   0},	/* 12:  orange */
-    {192,  96,   0},	/* 13:  darker orange */
-    { 24,  60,   0},	/* 14:  dark green-yellow */
-    { 85, 125, 200} 	/* 15:  ice blue */
+    {  0,   0,   0},    /*  0:  black */
+    {255, 255, 255},    /*  1:  white */
+    {173, 132,  57},    /*  2:  tan */
+    { 64, 132,   0},    /*  3:  medium green */
+    {189, 117,   1},    /*  4:  gold */
+    {253, 249,   1},    /*  5:  yellow */
+    {  0,   0, 255},    /*  6:  blue */
+    {  0,   0, 120},    /*  7:  medium blue */
+    {255,   0, 255},    /*  8:  magenta */
+    { 64,   0,  64},    /*  9:  dark magenta */
+    {255,   0,   0},    /* 10:  red */
+    { 64,   0,   0},    /* 11:  dark red */
+    {255, 127,   0},    /* 12:  orange */
+    {192,  96,   0},    /* 13:  darker orange */
+    { 24,  60,   0},    /* 14:  dark green-yellow */
+    { 85, 125, 200}     /* 15:  ice blue */
 };
 /* not used for now, but should be for error-checking:
 static int num_rgb = sizeof(rgb) / sizeof(struct rgb_color);
@@ -172,21 +172,21 @@ static int num_rgb = sizeof(rgb) / sizeof(struct rgb_color);
  */
 static struct background_pattern {
     ush type;
-    int rgb1_max, rgb1_min;	/* or bg_freq, bg_gray */
-    int rgb2_max, rgb2_min;	/* or bg_bsat, bg_brot (both scaled by 10)*/
+    int rgb1_max, rgb1_min;     /* or bg_freq, bg_gray */
+    int rgb2_max, rgb2_min;     /* or bg_bsat, bg_brot (both scaled by 10)*/
 } bg[] = {
-    {0+8,   2,0,  1,15},  	/* checkered:  tan/black vs. white/ice blue */
-    {0+24,  2,0,  1,0},  	/* checkered:  tan/black vs. white/black */
-    {0+8,   4,5,  0,2},  	/* checkered:  gold/yellow vs. black/tan */
-    {0+8,   4,5,  0,6},  	/* checkered:  gold/yellow vs. black/blue */
-    {0,     7,0,  8,9},  	/* checkered:  deep blue/black vs. magenta */
-    {0+8,  13,0,  5,14},  	/* checkered:  orange/black vs. yellow */
-    {0+8,  12,0, 10,11},  	/* checkered:  orange/black vs. red */
-    {1,     7,0,  8,0},  	/* diamonds:  deep blue/black vs. magenta */
-    {1,    12,0, 11,0},  	/* diamonds:  orange vs. dark red */
-    {1,    10,0,  7,0},  	/* diamonds:  red vs. medium blue */
-    {1,     4,0,  5,0},  	/* diamonds:  gold vs. yellow */
-    {1,     3,0,  0,0},  	/* diamonds:  medium green vs. black */
+    {0+8,   2,0,  1,15},        /* checkered:  tan/black vs. white/ice blue */
+    {0+24,  2,0,  1,0},         /* checkered:  tan/black vs. white/black */
+    {0+8,   4,5,  0,2},         /* checkered:  gold/yellow vs. black/tan */
+    {0+8,   4,5,  0,6},         /* checkered:  gold/yellow vs. black/blue */
+    {0,     7,0,  8,9},         /* checkered:  deep blue/black vs. magenta */
+    {0+8,  13,0,  5,14},        /* checkered:  orange/black vs. yellow */
+    {0+8,  12,0, 10,11},        /* checkered:  orange/black vs. red */
+    {1,     7,0,  8,0},         /* diamonds:  deep blue/black vs. magenta */
+    {1,    12,0, 11,0},         /* diamonds:  orange vs. dark red */
+    {1,    10,0,  7,0},         /* diamonds:  red vs. medium blue */
+    {1,     4,0,  5,0},         /* diamonds:  gold vs. yellow */
+    {1,     3,0,  0,0},         /* diamonds:  medium green vs. black */
     {2,    16, 100,  20,   0},  /* radial:  ~hard radial color-beams */
     {2,    18, 100,  10,   2},  /* radial:  soft, curved radial color-beams */
     {2,    16, 256, 100, 250},  /* radial:  very tight spiral */
@@ -580,7 +580,7 @@ static int rpng2_x_create_window()
             return 2;
         }
         have_colormap = TRUE;
-        bg_image = FALSE;	/* gradient just wastes palette entries */
+        bg_image = FALSE; /* gradient just wastes palette entries */
     } else if (depth == 16) {
         RPixelShift = 15 - rpng2_x_msb(RedMask);   /* these are right-shifts */
         GPixelShift = 15 - rpng2_x_msb(GreenMask);
@@ -684,7 +684,7 @@ static int rpng2_x_create_window()
   ---------------------------------------------------------------------------*/
 
     if (bg_image)
-        rpng2_x_load_bg_image();	/* resets bg_image if fails */
+        rpng2_x_load_bg_image(); /* resets bg_image if fails */
 
     if (!bg_image) {
         if (depth == 24 || depth == 32) {
@@ -795,7 +795,7 @@ static int rpng2_x_load_bg_image()
                 even_odd = even_odd_vert ^ even_odd_horiz;
                 invert_column =
                   (even_odd_horiz && (bg[pat].type & 0x10));
-                if (even_odd == 0) {		/* gradient #1 */
+                if (even_odd == 0) { /* gradient #1 */
                     if (invert_column) {
                         *dest++ = r1_inv;
                         *dest++ = g1_inv;
@@ -805,7 +805,7 @@ static int rpng2_x_load_bg_image()
                         *dest++ = g1;
                         *dest++ = b1;
                     }
-                } else {			/* gradient #2 */
+                } else {              /* gradient #2 */
                     if ((invert_column && invert_gradient2) ||
                         (!invert_column && !invert_gradient2))
                     {
@@ -828,8 +828,8 @@ static int rpng2_x_load_bg_image()
 
     } else if ((bg[pat].type & 0x07) == 1) {
 
-        hmax = (bgscale-1)/2;	/* half the max weight of a color */
-        max = 2*hmax;		/* the max weight of a color */
+        hmax = (bgscale-1)/2;   /* half the max weight of a color */
+        max = 2*hmax;           /* the max weight of a color */
 
         r1 = rgb[bg[pat].rgb1_max].r;
         g1 = rgb[bg[pat].rgb1_max].g;

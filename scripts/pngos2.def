@@ -279,6 +279,16 @@ EXPORTS
   png_pass_dsp_mask
 ; png_pass_width
 ; png_pass_height
+  png_get_iCCP 
+  png_get_sCAL
+  png_get_spalettes 
+  png_free_pCAL 
+  png_set_iCCP 
+  png_free_iCCP 
+  png_free_text 
+  png_free_sCAL
+  png_set_spalettes 
+  png_free_sPLT 
 
   png_IHDR
   png_IDAT
@@ -288,10 +298,14 @@ EXPORTS
   png_cHRM
   png_gAMA
   png_hIST
+  png_iCCP
+  png_iTXt
   png_oFFs
   png_pCAL
   png_pHYs
   png_sBIT
+  png_sCAL
+  png_sPLT
   png_sRGB
   png_tEXt
   png_tIME

@@ -25,7 +25,7 @@ RANLIB=echo
 # read libpng.txt or png.h to see why PNGMAJ is 2.  You should not
 # have to change it.
 PNGMAJ = 2
-PNGMIN = 1.0.5d
+PNGMIN = 1.0.5h
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 INCPATH=$(prefix)/include
@@ -76,6 +76,10 @@ install: libpng.a libpng.so.$(PNGVER)
 
 clean:
 	/bin/rm -f *.o libpng.a libpng.so* pngtest pngout.png
+
+DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
+writelock:
+	chmod a-w *.[ch35] $(DOCS) scripts/*
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

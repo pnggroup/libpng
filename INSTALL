@@ -1,5 +1,5 @@
 
-Installing libpng version 1.0.5d - November 29, 1999
+Installing libpng version 1.0.5h - December 10, 1999
 
 Before installing libpng, you must first install zlib.  zlib
 can usually be found wherever you got libpng.  zlib can be
@@ -10,7 +10,7 @@ zlib.h and zconf.h include files that correspond to the
 version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.0.5d" or "lpng103" and "zlib-1.1.3"
+might be called "libpng-1.0.5h" or "lpng103" and "zlib-1.1.3"
 or "zlib113") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -51,8 +51,8 @@ include
  makefile.hpux     =>  HPUX (10.20 and 11.00) makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile
  makefile.sunos    =>  Sun makefile
- makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0.5d)
- makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.5d)
+ makefile.solaris  =>  Solaris 2.X makefile (gcc, creates libpng.so.2.1.0.5h)
+ makefile.linux    =>  Linux/ELF makefile (gcc, creates libpng.so.2.1.0.5h)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.mips     =>  MIPS makefile
  makefile.acorn    =>  Acorn makefile

@@ -30,10 +30,10 @@
   ---------------------------------------------------------------------------*/
 
 
-#include <stdlib.h>	/* for exit() prototype */
+#include <stdlib.h>   /* for exit() prototype */
 
-#include "png.h"	/* libpng header; includes zlib.h and setjmp.h */
-#include "writepng.h"	/* typedefs, common macros, public prototypes */
+#include "png.h"      /* libpng header; includes zlib.h and setjmp.h */
+#include "writepng.h" /* typedefs, common macros, public prototypes */
 
 
 /* local prototype */
@@ -48,7 +48,7 @@ void writepng_version_info()
     PNG_LIBPNG_VER_STRING, png_libpng_ver);
   fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
     ZLIB_VERSION, zlib_version);
-} 
+}
 
 
 

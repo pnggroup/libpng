@@ -42,6 +42,10 @@ install: libpng.a
 clean:
 	rm -f *.o libpng.a pngtest pngout.png
 
+DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
+writelock:
+	chmod a-w *.[ch35] $(DOCS) scripts/*
+
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
 png.o: png.h pngconf.h

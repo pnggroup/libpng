@@ -3,7 +3,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.5d';
+  PNG_LIBPNG_VER_STRING = '1.0.5h';
   PNG_LIBPNG_VER        =  10006;
 
 type
@@ -179,10 +179,10 @@ const
   PNG_RESOLUTION_METER   = 1;   // pixels/meter
 
 // These are for the sRGB chunk.  These values should NOT be changed.
-  PNG_sRGB_INTENT_SATURATION = 0;
-  PNG_sRGB_INTENT_PERCEPTUAL = 1;
-  PNG_sRGB_INTENT_ABSOLUTE   = 2;
-  PNG_sRGB_INTENT_RELATIVE   = 3;
+ PNG_sRGB_INTENT_PERCEPTUAL = 0;
+ PNG_sRGB_INTENT_RELATIVE   = 1;
+ PNG_sRGB_INTENT_SATURATION = 2;
+ PNG_sRGB_INTENT_ABSOLUTE   = 3;
 
 // Handle alpha and tRNS by replacing with a background color.
   PNG_BACKGROUND_GAMMA_UNKNOWN = 0;
@@ -334,6 +334,10 @@ function png_get_oFFs(png_ptr: png_structp; info_ptr: png_infop;
              var offset_x, offset_y: png_uint_32;
              var unit_type: int): png_uint_32;
              stdcall;
+function png_get_sCAL(png_ptr: png_structp; info_ptr: png_infop;
+             var unit:int; var width: png_uint_32; height: png_uint_32): 
+             png_uint_32;
+             stdcall
 function png_get_pCAL(png_ptr: png_structp; info_ptr: png_infop;
              var purpose: png_charp; var X0, X1: png_int_32;
              var typ, nparams: int; var units: png_charp;
@@ -600,6 +604,28 @@ procedure png_write_row(png_ptr: png_structp; row: png_bytep);
 procedure png_write_rows(png_ptr: png_structp; row: png_bytepp;
              num_rows: png_uint_32);
              stdcall;
+procedure png_get_iCCP(png_ptr: png_structp; info_ptr: png_infop;
+             name: png_charpp; compression_type: int *; profile: png_charpp;
+             proflen: png_int_32): png_bytep;
+             stdcall;
+procedure png_get_spalettes(png_ptr: png_structp;
+             info_ptr: png_infop;  entries: png_spalette_pp): png_uint_32;
+             stdcall;
+procedure png_free_pCAL(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
+procedure png_set_iCCP(png_ptr: png_structp; info_ptr: png_infop;
+             name: png_charp; compression_type: int; profile: png_charp;
+             proflen: int);
+             stdcall;
+procedure png_free_iCCP(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
+procedure png_free_text(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
+procedure png_set_spalettes(png_ptr: png_structp; info_ptr: png_infop;
+             entries: png_spalette_p; nentries: int);
+             stdcall;
+procedure png_free_sPLT(png_ptr: png_structp; info_ptr: png_infop);
+             stdcall;
 
 implementation
 
@@ -725,5 +751,13 @@ procedure png_write_info; external pngDLL;
 procedure png_write_info_before_PLTE; external pngDLL;
 procedure png_write_row; external pngDLL;
 procedure png_write_rows; external pngDLL;
+procedure png_get_iCCP; external pngDLL;
+procedure png_get_spalettes; external pngDLL;
+procedure png_free_pCAL; external pngDLL;
+procedure png_set_iCCP; external pngDLL;
+procedure png_free_iCCP; external pngDLL;
+procedure png_free_text; external pngDLL;
+procedure png_set_spalettes; external pngDLL;
+procedure png_free_sPLT; external pngDLL;
 
 end.

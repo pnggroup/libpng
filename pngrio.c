@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * libpng 1.0.5d - November 29, 1999
+ * libpng 1.0.5h - December 10, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -146,6 +146,6 @@ png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
    png_ptr->output_flush_fn = NULL;
-#endif /* PNG_WRITE_FLUSH_SUPPORTED */
+#endif
 }
 

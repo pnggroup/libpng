@@ -14,8 +14,8 @@ Known bugs and suggested enhancements in libpng-1.0.5
    Question whether i-- or --i is better.
 
    STATUS: Under investigation, postponed until after
-   libpng-1.0.5.  About 160 loops will be turned around
-   in libpng-1.0.Nn, for testing.
+   libpng-1.1.0.  About 160 loops will be turned around
+   in libpng-1.1.Nn, for testing.
 
 2. July 4, 1998 -- ENHANCEMENT -- Glenn R-P
 
@@ -43,7 +43,7 @@ Known bugs and suggested enhancements in libpng-1.0.5
    pngvcrd.c is failing for interlaced PNGs that have empty passes.
 
    STATUS: A check for "width != 0" is required in several places.
-   Fixed in libpng-1.0.5a/1.0.6
+   Fixed in libpng-1.0.5a/1.1.0
 
 5. October 1999 -- BUG
 
@@ -56,4 +56,12 @@ Known bugs and suggested enhancements in libpng-1.0.5
    text->key strings.  Fix for the latter problem is to duplicate code
    from png.c.
 
-   Fixed in libpng-1.0.5a/1.0.6
+   Fixed in libpng-1.0.5a/1.1.0
+
+6. December 1999 -- new BUG
+
+   The png_text structure was modified in libpng-1.0.5e in a manner that
+   is not backward compatible (the lang member was added, and the
+   translated_key member was added to libpng-1.0.5g)
+
+   STATUS: Will be fixed before the next public release.

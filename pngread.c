@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.5d - November 29, 1999
+ * libpng 1.0.5h - December 10, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -63,7 +63,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
 #ifdef PNG_USER_MEM_SUPPORTED
    png_set_mem_fn(png_ptr, mem_ptr, malloc_fn, free_fn);
-#endif /* PNG_USER_MEM_SUPPORTED */
+#endif
 
    png_set_error_fn(png_ptr, error_ptr, error_fn, warn_fn);
 
@@ -196,6 +196,12 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_hIST_SUPPORTED)
       PNG_hIST;
 #endif
+#if defined(PNG_READ_iCCP_SUPPORTED)
+      PNG_iCCP;
+#endif
+#if defined(PNG_READ_iTXt_SUPPORTED)
+      PNG_iTXt;
+#endif
 #if defined(PNG_READ_oFFs_SUPPORTED)
       PNG_oFFs;
 #endif
@@ -207,6 +213,12 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_READ_sBIT_SUPPORTED)
       PNG_sBIT;
+#endif
+#if defined(PNG_READ_pCAL_SUPPORTED)
+      PNG_sCAL;
+#endif
+#if defined(PNG_READ_sPLT_SUPPORTED)
+      PNG_sPLT;
 #endif
 #if defined(PNG_READ_sRGB_SUPPORTED)
       PNG_sRGB;
@@ -281,6 +293,10 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       else if (!png_memcmp(png_ptr->chunk_name, png_pCAL, 4))
          png_handle_pCAL(png_ptr, info_ptr, length);
 #endif
+#if defined(PNG_READ_sCAL_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_sCAL, 4))
+         png_handle_sCAL(png_ptr, info_ptr, length);
+#endif
 #if defined(PNG_READ_pHYs_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_pHYs, 4))
          png_handle_pHYs(png_ptr, info_ptr, length);
@@ -292,6 +308,14 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_sRGB_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_sRGB, 4))
          png_handle_sRGB(png_ptr, info_ptr, length);
+#endif
+#if defined(PNG_READ_iCCP_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_iCCP, 4))
+         png_handle_iCCP(png_ptr, info_ptr, length);
+#endif
+#if defined(PNG_READ_sPLT_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_sPLT, 4))
+         png_handle_sPLT(png_ptr, info_ptr, length);
 #endif
 #if defined(PNG_READ_tEXt_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_tEXt, 4))
@@ -308,6 +332,10 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_zTXt_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_zTXt, 4))
          png_handle_zTXt(png_ptr, info_ptr, length);
+#endif
+#if defined(PNG_READ_iTXt_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_iTXt, 4))
+         png_handle_iTXt(png_ptr, info_ptr, length);
 #endif
       else
          png_handle_unknown(png_ptr, info_ptr, length);
@@ -579,7 +607,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5d.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5h.
  */
 
 void
@@ -628,7 +656,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5d.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5h.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -697,6 +725,12 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_hIST_SUPPORTED)
       PNG_hIST;
 #endif
+#if defined(PNG_READ_iCCP_SUPPORTED)
+      PNG_iCCP;
+#endif
+#if defined(PNG_READ_iTXt_SUPPORTED)
+      PNG_iTXt;
+#endif
 #if defined(PNG_READ_oFFs_SUPPORTED)
       PNG_oFFs;
 #endif
@@ -708,6 +742,12 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 #endif
 #if defined(PNG_READ_sBIT_SUPPORTED)
       PNG_sBIT;
+#endif
+#if defined(PNG_READ_pCAL_SUPPORTED)
+      PNG_sCAL;
+#endif
+#if defined(PNG_READ_sPLT_SUPPORTED)
+      PNG_sPLT;
 #endif
 #if defined(PNG_READ_sRGB_SUPPORTED)
       PNG_sRGB;
@@ -774,6 +814,10 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       else if (!png_memcmp(png_ptr->chunk_name, png_pCAL, 4))
          png_handle_pCAL(png_ptr, info_ptr, length);
 #endif
+#if defined(PNG_READ_sCAL_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_sCAL, 4))
+         png_handle_sCAL(png_ptr, info_ptr, length);
+#endif
 #if defined(PNG_READ_pHYs_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_pHYs, 4))
          png_handle_pHYs(png_ptr, info_ptr, length);
@@ -785,6 +829,14 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_sRGB_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_sRGB, 4))
          png_handle_sRGB(png_ptr, info_ptr, length);
+#endif
+#if defined(PNG_READ_iCCP_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_iCCP, 4))
+         png_handle_iCCP(png_ptr, info_ptr, length);
+#endif
+#if defined(PNG_READ_sPLT_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_sPLT, 4))
+         png_handle_sPLT(png_ptr, info_ptr, length);
 #endif
 #if defined(PNG_READ_tEXt_SUPPORTED)
       else if (!png_memcmp(png_ptr->chunk_name, png_tEXt, 4))
@@ -802,6 +854,10 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       else if (!png_memcmp(png_ptr->chunk_name, png_zTXt, 4))
          png_handle_zTXt(png_ptr, info_ptr, length);
 #endif
+#if defined(PNG_READ_iTXt_SUPPORTED)
+      else if (!png_memcmp(png_ptr->chunk_name, png_iTXt, 4))
+         png_handle_iTXt(png_ptr, info_ptr, length);
+#endif
       else
          png_handle_unknown(png_ptr, info_ptr, length);
    } while (!(png_ptr->mode & PNG_HAVE_IEND));
@@ -816,7 +872,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    png_infop info_ptr = NULL, end_info_ptr = NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
    png_free_ptr free_fn = NULL;
-#endif /* PNG_USER_MEM_SUPPORTED */
+#endif
 
    png_debug(1, "in png_destroy_read_struct\n");
    /* save jump buffer and error functions */
@@ -837,7 +893,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 
    if (info_ptr != NULL)
    {
-#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
+#if defined(PNG_TEXT_SUPPORTED)
       png_free(png_ptr, info_ptr->text);
 #endif
 
@@ -851,7 +907,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 
    if (end_info_ptr != NULL)
    {
-#if defined(PNG_READ_tEXt_SUPPORTED) || defined(PNG_READ_zTXt_SUPPORTED)
+#if defined(PNG_READ_TEXT_SUPPORTED)
       png_free(png_ptr, end_info_ptr->text);
 #endif
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -909,7 +965,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
 #endif
    if (png_ptr->flags & PNG_FLAG_FREE_PALETTE)
       png_zfree(png_ptr, png_ptr->palette);
-#if defined(PNG_READ_tRNS_SUPPORTED) || defined(PNG_WRITE_tRNS_SUPPORTED) || \
+#if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    if (png_ptr->flags & PNG_FLAG_FREE_TRANS)
       png_free(png_ptr, png_ptr->trans);
@@ -954,7 +1010,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
 #endif
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
    png_free(png_ptr, png_ptr->time_buffer);
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#endif
 
    inflateEnd(&png_ptr->zstream);
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED

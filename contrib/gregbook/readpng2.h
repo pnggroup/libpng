@@ -61,7 +61,7 @@ typedef struct _mainprog_info {
     uch *image_data;
     uch **row_pointers;
     jmp_buf jmpbuf;
-    int passes;			/* not used */
+    int passes;    /* not used */
     int rowbytes;
     int channels;
     int need_bgcolor;

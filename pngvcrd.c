@@ -2,7 +2,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.5d - November 29, 1999
+ * libpng 1.0.5h - December 10, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, Intel Corporation
  * Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -1502,8 +1502,8 @@ loop2_pass0:
                         }
                      }
 
-                     sptr -= (width_mmx*2 - 2);	// sign fixed
-                     dp -= (width_mmx*16 - 2);	// sign fixed
+                     sptr -= (width_mmx*2 - 2);            // sign fixed
+                     dp -= (width_mmx*16 - 2);            // sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1547,8 +1547,8 @@ loop2_pass2:
                         }
                      }
 
-                     sptr -= (width_mmx*2 - 2);	// sign fixed
-                     dp -= (width_mmx*8 - 2);	// sign fixed
+                     sptr -= (width_mmx*2 - 2);            // sign fixed
+                     dp -= (width_mmx*8 - 2);            // sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1587,8 +1587,8 @@ loop2_pass4:
                         }
                      }
 
-                     sptr -= (width_mmx*2 - 2);	// sign fixed
-                     dp -= (width_mmx*4 - 2);	// sign fixed
+                     sptr -= (width_mmx*2 - 2);            // sign fixed
+                     dp -= (width_mmx*4 - 2);            // sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1640,8 +1640,8 @@ loop4_pass0:
                         }
                      }
 
-                     sptr -= (width_mmx*4 - 4);	// sign fixed
-                     dp -= (width_mmx*32 - 4);	// sign fixed
+                     sptr -= (width_mmx*4 - 4);            // sign fixed
+                     dp -= (width_mmx*32 - 4);            // sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1685,8 +1685,8 @@ loop4_pass2:
                         }
                      }
 
-                     sptr -= (width_mmx*4 - 4);	// sign fixed
-                     dp -= (width_mmx*16 - 4);	// sign fixed
+                     sptr -= (width_mmx*4 - 4);            // sign fixed
+                     dp -= (width_mmx*16 - 4);            // sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];
@@ -1728,8 +1728,8 @@ loop4_pass4:
                         }
                      }
 
-                     sptr -= (width_mmx*4 - 4);	// sign fixed
-                     dp -= (width_mmx*8 - 4);	// sign fixed
+                     sptr -= (width_mmx*4 - 4);          // sign fixed
+                     dp -= (width_mmx*8 - 4);            // sign fixed
                      for (i = width; i; i--)
                      {
                         png_byte v[8];

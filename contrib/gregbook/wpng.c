@@ -57,27 +57,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h>	/* for jmpbuf declaration in writepng.h */
+#include <setjmp.h>  /* for jmpbuf declaration in writepng.h */
 #include <time.h>
 
 #ifdef DOS_OS2_W32
-#  include <io.h>	/* for isatty(), setmode() prototypes */
-#  include <fcntl.h>	/* O_BINARY for fdopen() without text translation */
+#  include <io.h>    /* for isatty(), setmode() prototypes */
+#  include <fcntl.h> /* O_BINARY for fdopen() without text translation */
 #  ifdef __EMX__
 #    ifndef getch
-#      define getch() _read_kbd(0, 1, 0)	/* need getche() */
+#      define getch() _read_kbd(0, 1, 0) /* need getche() */
 #    endif
 #  else /* !__EMX__ */
 #    ifdef __GO32__
 #      include <pc.h>
-#      define getch() getkey()	/* GRR:  need getche() */
+#      define getch() getkey() /* GRR:  need getche() */
 #    else
-#      include <conio.h>	/* for getche() console input */
+#      include <conio.h> /* for getche() console input */
 #    endif
 #  endif /* ?__EMX__ */
 #  define FGETS(buf,len,stream)  dos_kbd_gets(buf,len)
 #else
-#  include <unistd.h>		/* for isatty() prototype */
+#  include <unistd.h>  /* for isatty() prototype */
 #  define FGETS fgets
 #endif
 
@@ -87,7 +87,7 @@
    text that includes control characters discouraged by the PNG spec; text
    that includes an escape character (27) must be re-entered regardless */
 
-#include "writepng.h"	/* typedefs, common macros, writepng prototypes */
+#include "writepng.h" /* typedefs, common macros, writepng prototypes */
 
 
 
@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     FILE *keybd;
 #endif
 #ifdef sgi
-    FILE *tmpfile;	/* or we could just use keybd, since no overlap */
+    FILE *tmpfile; /* or we could just use keybd, since no overlap */
     char tmpline[80];
 #endif
     char *inname = NULL, outname[256];
@@ -269,7 +269,7 @@ int main(int argc, char **argv)
                   ":  unable to reopen stdout in binary mode\n");
                 fclose(wpng_info.infile);
                 ++error;
-            } else 
+            } else
                 wpng_info.filter = TRUE;
         }
     } else if ((len = strlen(inname)) > 250) {
@@ -419,7 +419,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_TITLE;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) {	/* escape character */
+                    if (p[result] == 27) { /* escape character */
                         wpng_info.have_text &= ~TEXT_TITLE;
                         valid = FALSE;
                     }
@@ -449,7 +449,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_AUTHOR;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) {	/* escape character */
+                    if (p[result] == 27) { /* escape character */
                         wpng_info.have_text &= ~TEXT_AUTHOR;
                         valid = FALSE;
                     }
@@ -489,7 +489,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_DESC;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) {	/* escape character */
+                    if (p[result] == 27) { /* escape character */
                         wpng_info.have_text &= ~TEXT_DESC;
                         valid = FALSE;
                     }
@@ -519,7 +519,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_COPY;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) {	/* escape character */
+                    if (p[result] == 27) { /* escape character */
                         wpng_info.have_text &= ~TEXT_COPY;
                         valid = FALSE;
                     }
@@ -549,7 +549,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_EMAIL;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) {	/* escape character */
+                    if (p[result] == 27) { /* escape character */
                         wpng_info.have_text &= ~TEXT_EMAIL;
                         valid = FALSE;
                     }
@@ -579,7 +579,7 @@ int main(int argc, char **argv)
                     wpng_info.have_text &= ~TEXT_URL;
                     valid = FALSE;
 #else
-                    if (p[result] == 27) {	/* escape character */
+                    if (p[result] == 27) { /* escape character */
                         wpng_info.have_text &= ~TEXT_URL;
                         valid = FALSE;
                     }
@@ -743,10 +743,10 @@ static int wpng_isvalid_latin1(uch *p, int len)
 
     for (i = 0;  i < len;  ++i) {
         if (p[i] == 10 || (p[i] > 31 && p[i] < 127) || p[i] > 160)
-            continue;		/* character is completely OK */
+            continue;           /* character is completely OK */
         if (result < 0 || (p[result] != 27 && p[i] == 27))
-            result = i;		/* mark location of first questionable one */
-    }                  		/*  or of first escape character (bad) */
+            result = i;         /* mark location of first questionable one */
+    }                           /*  or of first escape character (bad) */
 
     return result;
 }
@@ -791,11 +791,11 @@ static char *dos_kbd_gets(char *buf, int len)
         buf[count++] = ch = getche();
     } while (ch != '\r' && count < len-1);
 
-    buf[count--] = '\0';	/* terminate string */
-    if (buf[count] == '\r')	/* Enter key makes CR, so change to newline */
+    buf[count--] = '\0';     /* terminate string */
+    if (buf[count] == '\r')  /* Enter key makes CR, so change to newline */
         buf[count] = '\n';
 
-    fprintf(stderr, "\n");	/* Enter key does *not* cause a newline */
+    fprintf(stderr, "\n");   /* Enter key does *not* cause a newline */
     fflush(stderr);
 
     return buf;

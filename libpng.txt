@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.5d - November 29, 1999
+ libpng version 1.0.5h - December 10, 1999
  Updated and distributed by Glenn Randers-Pehrson
  <randeg@alum.rpi.edu>
  Copyright (c) 1998, 1999 Glenn Randers-Pehrson
@@ -288,6 +288,17 @@ image data.  You do this with a call to png_read_info().
 
     png_read_info(png_ptr, info_ptr);
 
+This will read all chunks up to but not including the image data.
+Both known and unknown chunks will be read.  Known chunks will be
+parsed into information in various info_ptr members; unknown chunks
+will be discarded, unless you previously called
+
+    png_set_keep_unknown_chunks();
+
+in which case they will be saved as raw data onto a list of
+png_unknown_chunk structures (and written out if you subsequently
+call png_write_info and friends).
+
 Functions are used to get the information from the info_ptr:
 
     png_get_IHDR(png_ptr, info_ptr, &width, &height,
@@ -391,6 +402,16 @@ into the info_ptr is returned for any complex types.
                      implies specific values of gAMA and
                      cHRM.
 
+    png_get_iCCP(png_ptr, info_ptr, &name, &compression_type,
+                      &profile, &proflen);
+    name            - The profile name.
+    compression     - The compression type; always PNG_COMPRESSION_TYPE_BASE
+                      for PNG 1.0.  You may give NULL to this argument
+                      to ignore it.
+    profile         - International Color Consortium color profile
+                      data. May contain NULs.
+    proflen         - length of profile data in bytes.
+
     png_get_sBIT(png_ptr, info_ptr, &sig_bit);
     sig_bit        - the number of significant bits for
                      (PNG_INFO_sBIT) each of the gray,
@@ -422,13 +443,20 @@ into the info_ptr is returned for any complex types.
     num_text = png_get_text(png_ptr, info_ptr, &text_ptr);
     text_ptr       - array of png_text holding image
                      comments
+    text_ptr[i]->lang  - language of comment (NULL for unknown).
     text_ptr[i]->key   - keyword for comment.
+    text_ptr[i]->translated_keyword  - keyword in UTF-8 (NULL for unknown).
     text_ptr[i]->text  - text comments for current
                          keyword.
     text_ptr[i]->compression - type of compression used
                      on "text" PNG_TEXT_COMPRESSION_NONE
                      or PNG_TEXT_COMPRESSION_zTXt
     num_text       - number of comments
+
+    num_spalettes = png_get_spalettes(png_ptr, info_ptr, &palette_ptr);
+    palette_ptr    - array of png_spalette structures holding contents
+                     of one or more sPLT chunks read.
+    num_spalettes  - number of sPLT chunks read.
 
     png_get_oFFs(png_ptr, info_ptr, &offset_x, &offset_y,
                      &unit_type);
@@ -446,6 +474,19 @@ into the info_ptr is returned for any complex types.
                      x direction
     unit_type      - PNG_RESOLUTION_UNKNOWN,
                      PNG_RESOLUTION_METER
+
+    png_get_sCAL(png_ptr, info_ptr, &unit, &width, &height)
+    unit        - physical scale units (a string)
+    width       - width of a pixel in physical scale units
+    height      - height of a pixel in physical scale units
+
+    num_unknown_chunks = png_get_unknown_chunks(png_ptr, info_ptr,
+                            &unknowns)
+    unknowns          - array of png_unknown_chunk structures holding
+                        unknown chunks
+    unknowns[i].name  - name of unknown chunk
+    unknowns[i].data  - data of unknown chunk
+    unknowns[i].size  - size of unknown chunk
 
 The data from the pHYs chunk can be retrieved in several convenient
 forms:
@@ -481,14 +522,14 @@ There is also no requirement to have text after the keyword.
 Keywords should be limited to 79 Latin-1 characters without leading or
 trailing spaces, but non-consecutive spaces are allowed within the
 keyword.  It is possible to have the same keyword any number of times.
-The text_ptr is an array of png_text structures, each holding pointer
-to a keyword and a pointer to a text string.  Only the text string may
-be null.  The keyword/text pairs are put into the array in the order
-that they are received.  However, some or all of the text chunks may be
-after the image, so, to make sure you have read all the text chunks,
-don't mess with these until after you read the stuff after the image.
-This will be mentioned again below in the discussion that goes with
-png_read_end().
+The text_ptr is an array of png_text structures, each holding a
+pointer to a language string, a pointer to a keyword and a pointer to
+a text string.  Only the text string may be null.  The keyword/text
+pairs are put into the array in the order that they are received.
+However, some or all of the text chunks may be after the image, so, to
+make sure you have read all the text chunks, don't mess with these
+until after you read the stuff after the image.  This will be
+mentioned again below in the discussion that goes with png_read_end().
 
 After you've read the header information, you can set up the library
 to handle any special transformations of the image data.  The various
@@ -946,6 +987,30 @@ When you are done, you can free all memory allocated by libpng like this:
    png_destroy_read_struct(&png_ptr, &info_ptr,
        &end_info);
 
+It is also possible to individually free the info_ptr members that
+point to allocated storage with the following functions:
+
+    png_free_text(png_ptr, info_ptr, num)
+    num          - number of text item to be freed (-1 for all items)
+
+    png_free_iCCP(png_ptr, info_ptr)
+
+    png_free_pCAL(png_ptr, info_ptr)
+
+    png_free_sCAL(png_ptr, info_ptr)
+
+    png_free_spalette(png_ptr, info_ptr, num)
+    num          - number of suggested-paletted entry to be freed
+                   (-1 for all suggested palettes)
+
+    png_free_unknown_chunk(png_ptr, info_ptr, num)
+    num          - number of unknown chunk to be freed
+                   (-1 for all suggested palettes)
+
+These functions may be safely called when the relevant storage has
+already been freed, or has not yet been allocated, and will in that
+case do nothing.
+
 For a more compact example of reading a PNG image, see the file example.c.
 
 
@@ -1339,6 +1404,16 @@ Some of the more important parts of the png_info are:
                      that are consistent with sRGB to be
                      written.
 
+    png_set_iCCP(png_ptr, info_ptr, name, compression_type,
+                      profile, proflen);
+    name            - The profile name.
+    compression     - The compression type; always PNG_COMPRESSION_TYPE_BASE
+                      for PNG 1.0.  You may give NULL to this argument
+                      to ignore it.
+    profile         - International Color Consortium color profile
+                      data. May contain NULs.
+    proflen         - length of profile data in bytes.
+
     png_set_sBIT(png_ptr, info_ptr, sig_bit);
     sig_bit        - the number of significant bits for
                      (PNG_INFO_sBIT) each of the gray, red,
@@ -1370,13 +1445,20 @@ Some of the more important parts of the png_info are:
     png_set_text(png_ptr, info_ptr, text_ptr, num_text);
     text_ptr       - array of png_text holding image
                      comments
+    text_ptr[i]->lang  - language of comment (NULL for unknown).
     text_ptr[i]->key   - keyword for comment.
+    text_ptr[i]->translated_keyword  - keyword in UTF-8 (NULL for unknown).
     text_ptr[i]->text  - text comments for current
                          keyword.
     text_ptr[i]->compression - type of compression used
          on "text" PNG_TEXT_COMPRESSION_NONE or
          PNG_TEXT_COMPRESSION_zTXt
     num_text    - number of comments in text_ptr
+
+    png_set_spalettes(png_ptr, info_ptr, &palette_ptr, num_spalettes);
+    palette_ptr    - array of png_spalette structures to be added to
+                     the list of palettes in the info structure.
+    num_spalettes  - number of palette structures to be added.
 
     png_set_oFFs(png_ptr, info_ptr, offset_x, offset_y,
         unit_type);
@@ -1394,6 +1476,18 @@ Some of the more important parts of the png_info are:
                   in y direction
     unit_type   - PNG_RESOLUTION_UNKNOWN,
                   PNG_RESOLUTION_METER
+
+    png_set_sCAL(png_ptr, info_ptr, unit, width, height)
+    unit        - physical scale units (a string)
+    width       - width of a pixel in physical scale units
+    height      - height of a pixel in physical scale units
+
+    png_set_unknown_chunks(png_ptr, info_ptr, &unknowns, num_unknowns)
+    unknowns          - array of png_unknown_chunk structures holding
+                        unknown chunks
+    unknowns[i].name  - name of unknown chunk
+    unknowns[i].data  - data of unknown chunk
+    unknowns[i].size  - size of unknown chunk
 
 In PNG files, the alpha channel in an image is the level of opacity.
 If your data is supplied as a level of transparency, you can invert the
@@ -1413,12 +1507,17 @@ A quick word about text and num_text.  text is an array of png_text
 structures.  num_text is the number of valid structures in the array.
 If you want, you can use max_text to hold the size of the array, but
 libpng ignores it for writing (it does use it for reading).  Each
-png_text structure holds a keyword-text value, and a compression type.
+png_text structure holds a language code, a keyword, a text value, and
+a compression type.
+
 The compression types have the same valid numbers as the compression
 types of the image data.  Currently, the only valid number is zero.
 However, you can store text either compressed or uncompressed, unlike
 images, which always have to be compressed.  So if you don't want the
 text compressed, set the compression type to PNG_TEXT_COMPRESSION_NONE.
+Because compressed-text chunks don't have a language field, if you
+specify compression any language code will not be written out.
+
 Until text gets around 1000 bytes, it is not worth compressing it.
 After the text has been written out to the file, the compression type
 is set to PNG_TEXT_COMPRESSION_NONE_WR or PNG_TEXT_COMPRESSION_zTXt_WR,
@@ -1484,6 +1583,14 @@ by the software.  To facilitate the use of RFC 1123 dates, a function
 png_convert_to_rfc1123(png_timep) is provided to convert from PNG
 time to an RFC 1123 format string.
 
+You can use the png_set_unknown_chunks function to queue up chunks
+for writing.  You give it a chunk name, raw data, and a size; that's
+all there is to it.  The chunks will be written by the next following
+png_write_info_before_PLTE, png_write_info, or png_write_end function.
+Any chunks previously read into the info structure's unknown-chunk
+list will also be written out in a sequence that satisfies the PNG
+specification's ordering rules.
+
 You are now ready to write all the file information up to the actual
 image data.  You do this with a call to png_write_info().
 
@@ -1494,7 +1601,7 @@ the PLTE chunk when PLTE is present, you can write the PNG info in
 two steps, and insert code to write your own chunk between them:
 
     png_write_info_before_PLTE(png_ptr, info_ptr);
-    write_my_private_chunks();
+    png_set_unknown_chunks(png_ptr, info_ptr, ...);
     png_write_info(png_ptr, info_ptr);
 
 After you've written the file information, you can set up the library
@@ -1702,6 +1809,30 @@ you can pass NULL.
 When you are done, you can free all memory used by libpng like this:
 
     png_destroy_write_struct(&png_ptr, &info_ptr);
+
+It is also possible to individually free the info_ptr members that
+point to allocated storage with the following functions:
+
+    png_free_text(png_ptr, info_ptr, num)
+    num          - number of text item to be freed (-1 for all items)
+
+    png_free_iCCP(png_ptr, info_ptr)
+
+    png_free_pCAL(png_ptr, info_ptr)
+
+    png_free_sCAL(png_ptr, info_ptr)
+
+    png_free_spalette(png_ptr, info_ptr, num)
+    num          - number of suggested-paletted entry to be freed
+                   (-1 for all suggested palettes)
+
+    png_free_unknown_chunk(png_ptr, info_ptr, num)
+    num          - number of unknown chunk entry to be freed
+                   (-1 for all suggested palettes)
+
+These functions may be safely called when the relevant storage has
+already been freed, or has not yet been allocated, and will in that
+case do nothing.
 
 You must free any data you allocated for info_ptr, such as comments,
 palette, or histogram, before the call to png_destroy_write_struct();
@@ -1972,7 +2103,7 @@ or all four,
 along with directives to turn on any of the capabilities that you do
 want.  The PNG_NO_READ[or WRITE]_TRANSFORMS directives disable
 the extra transformations but still leave the library fully capable of reading
-and writing PNG files with all known public chunks [except for sPLT].
+and writing PNG files with all known public chunks
 Use of the PNG_NO_READ[or WRITE]_ANCILLARY_CHUNKS directive
 produces a library that is incapable of reading or writing ancillary chunks.
 If you are not using the progressive reading capability, you can
@@ -2066,13 +2197,13 @@ the old method.
 
 VII. Y2K Compliance in libpng
 
-November 29, 1999
+December 10, 1999
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.5d are Y2K compliant.  It is my belief that earlier
+upward through 1.0.5h are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -2088,7 +2219,7 @@ The strings are
 
 There are seven time-related functions:
 
-    png_convert_to_rfc_1123() in png.c 
+    png_convert_to_rfc_1123() in png.c
       (formerly png_convert_to_rfc_1152() in error)
     png_convert_from_struct_tm() in pngwrite.c, called in pngwrite.c
     png_convert_from_time_t() in pngwrite.c
@@ -2097,7 +2228,7 @@ There are seven time-related functions:
     png_set_tIME() in pngset.c
     png_write_tIME() in pngwutil.c, called in pngwrite.c
 
-All appear to handle dates properly in a Y2K environment.  The 
+All appear to handle dates properly in a Y2K environment.  The
 png_convert_from_time_t() function calls gmtime() to convert from system
 clock time, which returns (year - 1900), which we properly convert to
 the full 4-digit year.  There is a possibility that applications using

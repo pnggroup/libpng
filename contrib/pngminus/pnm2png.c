@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
 
   for (argi = 1; argi < argc; argi++)
   {
-    if (argv[argi][0] == '-') 
+    if (argv[argi][0] == '-')
     {
-      switch (argv[argi][1]) 
+      switch (argv[argi][1])
       {
         case 'i':
           interlace = TRUE;
@@ -405,7 +405,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
   /* if needed we will allocate memory for an new array of row-pointers */
   if (row_pointers == (unsigned char**) NULL)
   {
-    if ((row_pointers = (png_byte **) malloc (height * sizeof (png_bytep))) == NULL) 
+    if ((row_pointers = (png_byte **) malloc (height * sizeof (png_bytep))) == NULL)
     {
       png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
       return FALSE;
@@ -418,13 +418,13 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
 
   /* write out the entire image data in one call */
   png_write_image (png_ptr, row_pointers);
-    
+
   /* write the additional chuncks to the PNG file (not really needed) */
   png_write_end (png_ptr, info_ptr);
-    
-  /* clean up after the write, and free any memory allocated */    
+
+  /* clean up after the write, and free any memory allocated */
   png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
-        
+
   if (row_pointers != (unsigned char**) NULL)
     free (row_pointers);
   if (png_pixels != (unsigned char*) NULL)

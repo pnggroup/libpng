@@ -32,8 +32,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "png.h"	/* libpng header; includes zlib.h */
-#include "readpng.h"	/* typedefs, common macros, public prototypes */
+#include "png.h"      /* libpng header; includes zlib.h */
+#include "readpng.h"  /* typedefs, common macros, public prototypes */
 
 
 static png_structp png_ptr = NULL;
@@ -50,7 +50,7 @@ void readpng_version_info()
       PNG_LIBPNG_VER_STRING, png_libpng_ver);
     fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
       ZLIB_VERSION, zlib_version);
-} 
+}
 
 
 /* return value = 0 for success, 1 for bad sig, 2 for bad IHDR, 4 for no mem */

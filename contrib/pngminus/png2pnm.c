@@ -183,7 +183,7 @@ void usage()
 BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL alpha)
 {
   png_struct    *png_ptr = NULL;
-  png_info		*info_ptr = NULL;
+  png_info	*info_ptr = NULL;
   png_byte      buf[8];
   png_byte      *png_pixels = NULL;
   png_byte      **row_pointers = NULL;
@@ -217,13 +217,13 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL a
     return FALSE;   /* out of memory */
 
   info_ptr = png_create_info_struct (png_ptr);
-  if (!info_ptr) 
+  if (!info_ptr)
   {
     png_destroy_read_struct (&png_ptr, NULL, NULL);
     return FALSE;   /* out of memory */
   }
 
-  if (setjmp (png_ptr->jmpbuf)) 
+  if (setjmp (png_ptr->jmpbuf))
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return FALSE;
@@ -237,7 +237,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL a
   png_read_info (png_ptr, info_ptr);
 
   /* get size and bit-depth of the PNG-image */
-  png_get_IHDR (png_ptr, info_ptr, 
+  png_get_IHDR (png_ptr, info_ptr,
     &width, &height, &bit_depth, &color_type,
     NULL, NULL, NULL);
 
@@ -294,7 +294,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL a
   else if (color_type == PNG_COLOR_TYPE_RGB_ALPHA)
     channels = 4;
   else
-    channels = 0; /* should never happen */    
+    channels = 0; /* should never happen */
   alpha_present = (channels - 1) % 2;
 
   /* check if alpha is expected to be present in file */
@@ -313,7 +313,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL a
     return FALSE;
   }
 
-  if ((row_pointers = (png_byte **) malloc (height * sizeof (png_bytep))) == NULL) 
+  if ((row_pointers = (png_byte **) malloc (height * sizeof (png_bytep))) == NULL)
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     free (png_pixels);

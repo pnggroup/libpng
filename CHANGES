@@ -503,7 +503,7 @@ version 1.0.5c [November 26, 1999]
     PNG_NO_GLOBAL_ARRAYS is not defined or when PNG_GLOBAL_ARRAYS is defined.
   Removed some extraneous "-I" from contrib/pngminus/makefile.std
   Changed the PNG_sRGB_INTENT macros in png.h to be consistent with PNG-1.2.
-  Change PNG_SRGB_INTENT to PNG_sRGB_INTENT in libpng.txt and libpng.3 
+  Change PNG_SRGB_INTENT to PNG_sRGB_INTENT in libpng.txt and libpng.3
 version 1.0.5d [November 29, 1999]
   Add type cast (png_const_charp) two places in png.c
   Eliminated pngtypes.h; use macros instead to declare PNG_CHNK arrays.
@@ -511,3 +511,42 @@ version 1.0.5d [November 29, 1999]
     to applications a macro "PNG_USE_LOCAL_ARRAYS".
   #ifdef out all the new declarations when PNG_USE_GLOBAL_ARRAYS is defined.
   Added PNG_EXPORT_VAR macro to accommodate making DLL's.
+version 1.0.5e [November 30, 1999]
+  Added iCCP, iTXt, and sPLT support; added "lang" member to the png_text
+    structure; refactored the inflate/deflate support to make adding new chunks
+    with trailing compressed parts easier in the future, and added new functions
+    png_free_iCCP, png_free_pCAL, png_free_sPLT, png_free_text, png_get_iCCP,
+    png_get_spalettes, png_set_iCCP, png_set_spalettes (Eric S. Raymond).
+  NOTE: Applications that write text chunks MUST define png_text->lang and
+    before calling png_set_text(). It must be set to NULL if you want to
+    write tEXt or zTXt chunks.  If you want your application to be able to
+    run with older versions of libpng, use
+
+      #ifdef PNG_iTXt_SUPPORTED
+         png_text[i].lang = NULL;
+      #endif
+
+  Changed png_get_oFFs() and png_set_oFFs() to use signed rather than unsigned
+    offsets (Eric S. Raymond).
+  Combined PNG_READ_cHNK_SUPPORTED and PNG_WRITE_cHNK_SUPPORTED macros into
+    PNG_cHNK_SUPPORTED and combined the three types of PNG_text_SUPPORTED
+    macros, leaving the separate macros also available.
+  Removed comments on #endifs at the end of many short, non-nested #if-blocks.
+version 1.0.5f [December 6, 1999]
+  Changed makefile.solaris to issue a warning about potential problems when
+    the ucb "ld" is in the path ahead of the ccs "ld".
+  Removed "- [date]" from the "synopsis" line in libpng.3 and libpngpf.3.
+  Added sCAL chunk support (Eric S. Raymond).
+version 1.0.5g [December 7, 1999]
+  Fixed "png_free_spallettes" typo in png.h
+  Added code to handle new chunks in pngpread.c
+  Moved PNG_CHNK string macro definitions outside of PNG_NO_EXTERN block
+  Added "translated_key" to png_text structure and png_write_iTXt().
+  Added code in pngwrite.c to work around a newly discovered zlib bug.
+version 1.0.5h [December 10, 1999]
+  NOTE: regarding the not for version 1.0.5e, the following must also
+    be included in your code:
+        png_text[i].translated_key = NULL;
+  Unknown chunk handling is now supported.
+  Option to eliminate all floating point support was added.  Some new
+    fixed-point functions such as png_set_gAMA_fixed() were added.

@@ -1,6 +1,6 @@
 /* pngtypes.h - array of chunk-types for libpng
  *
- * libpng 1.0.5d - November 29, 1999
+ * libpng 1.0.5h - December 10, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -19,10 +19,13 @@ PNG_bKGD;
 PNG_cHRM;
 PNG_gAMA;
 PNG_hIST;
+PNG_iCCP;
+PNG_iTXt;
 PNG_oFFs;
 PNG_pCAL;
 PNG_pHYs;
 PNG_sBIT;
+PNG_sPLT;
 PNG_sRGB;
 PNG_tEXt;
 PNG_tIME;

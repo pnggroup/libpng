@@ -595,6 +595,11 @@ void write_png(char *file_name /* , ... other image information ... */)
    text_ptr[2].key = "Description";
    text_ptr[2].text = "<long text>";
    text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
+#ifdef PNG_iTXt_SUPPORTED
+   text_ptr[0].lang = NULL;
+   text_ptr[1].lang = NULL;
+   text_ptr[2].lang = NULL;
+#endif
    png_set_text(png_ptr, info_ptr, text_ptr, 3);
 
    /* other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs, */
@@ -698,8 +703,6 @@ void write_png(char *file_name /* , ... other image information ... */)
 
    /* if you malloced the palette, free it here */
    free(info_ptr->palette);
-
-   /* if you allocated any text comments, free them here */
 
    /* clean up after the write, and free any memory allocated */
    png_destroy_write_struct(&png_ptr, (png_infopp)NULL);

@@ -1,6 +1,6 @@
-.TH LIBPNGPF 3 November 29, 1999
+.TH LIBPNGPF 3 December 10, 1999
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5d - November 29, 1999
+libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5h
 (private functions)
 .SH SYNOPSIS
 \fB#include <png.h>\fP
@@ -211,6 +211,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5d - November 29
 
 \fI\fB
 
+\fBvoid png_handle_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fIlength\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_handle_iTXt (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fIlength\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_handle_oFFs (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fIlength\fP\fB);\fP
 
 \fI\fB
@@ -228,6 +236,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5d - November 29
 \fI\fB
 
 \fBvoid png_handle_sBIT (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fIlength\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_handle_sCAL (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fIlength\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_handle_sPLT (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fIlength\fP\fB);\fP
 
 \fI\fB
 
@@ -399,6 +415,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5d - November 29
 
 \fI\fB
 
+\fBvoid png_write_cHRM_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fP\fIwhite_x\fP\fB, png_uint_32 \fP\fIwhite_y\fP\fB, png_uint_32 \fP\fIred_x\fP\fB, png_uint_32 \fP\fIred_y\fP\fB, png_uint_32 \fP\fIgreen_x\fP\fB, png_uint_32 \fP\fIgreen_y\fP\fB, png_uint_32 \fP\fIblue_x\fP\fB, png_uint_32 \fIblue_y\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_write_data (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fP\fIdata\fP\fB, png_size_t \fIlength\fP\fB);\fP
 
 \fBvoid png_write_filtered_row (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIfiltered_row\fP\fB);\fP
@@ -417,11 +437,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5d - November 29
 
 \fI\fB
 
+\fBvoid png_write_gAMA_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIint_file_gamma\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_write_hIST (png_structp \fP\fIpng_ptr\fP\fB, png_uint_16p \fP\fIhist\fP\fB, int \fInum_hist\fP\fB);\fP
 
 \fI\fB
 
-\fBvoid png_write_init (png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_write_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_charp \fP\fIprofile\fP\fB, int \fIproflen\fP\fB);\fP
 
 \fI\fB
 
@@ -434,6 +458,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5d - November 29
 \fI\fB
 
 \fBvoid png_write_IHDR (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fP\fIwidth\fP\fB, png_uint_32 \fP\fIheight\fP\fB, int \fP\fIbit_depth\fP\fB, int \fP\fIcolor_type\fP\fB, int \fP\fIcompression_type\fP\fB, int \fP\fIfilter_type\fP\fB, int \fIinterlace_type\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_write_init (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_write_iTXt (png_structp \fP\fIpng_ptr\fP\fB, int \fP\fIcompression\fP\fB, png_charp \fP\fIkey\fP\fB, png_charp \fP\fIlang\fP\fB, png_charp \fP\fItranslated_key\fP\fB, png_charp \fItext)\fP\fB);\fP
 
 \fI\fB
 
@@ -457,11 +489,25 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.0.5d - November 29
 
 \fI\fB
 
+\fBvoid png_write_sCAL (png_structp \fP\fIpng_ptr\fP\fB, png_charp \fP\fIunit\fP\fB, double \fP\fIwidth\fP\fB, double \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_write_sCAL_s (png_structp \fP\fIpng_ptr\fP\fB, png_charp \fP\fIunit\fP\fB, png_charp \fP\fIwidth\fP\fB, png_charp \fIheight\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_write_sig (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
 \fBvoid png_write_sRGB (png_structp \fP\fIpng_ptr\fP\fB, int \fIintent\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_write_sPLT (png_structp \fP\fIpng_ptr\fP\fB, \fIpng_spalette_p
+
+\fI\fBpalette\fP\fB);\fP
 
 \fI\fB
 

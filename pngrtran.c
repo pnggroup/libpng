@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.5d - November 29, 1999
+ * libpng 1.0.5h - December 10, 1999
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -69,7 +69,8 @@ png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
    }
 }
 
-#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) && \
+    defined(PNG_FLOATING_POINT_SUPPORTED)
 /* handle alpha and tRNS via a background color */
 void
 png_set_background(png_structp png_ptr,
@@ -504,7 +505,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 }
 #endif
 
-#if defined(PNG_READ_GAMMA_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
 /* Transform the image from the file_gamma to the screen_gamma.  We
  * only do transformations on images where the file_gamma and screen_gamma
  * are not close reciprocals, otherwise it slows things down slightly, and
@@ -581,7 +582,8 @@ png_set_gray_to_rgb(png_structp png_ptr)
 }
 #endif
 
-#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED) && \
+    defined(PNG_FLOATING_POINT_SUPPORTED)
 /* Convert a RGB image to a grayscale of the same width.  This allows us,
  * for example, to convert a 24 bpp RGB image into an 8 bpp grayscale image.
  */
@@ -718,7 +720,7 @@ png_init_read_transformations(png_structp png_ptr)
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_ptr->background_1 = png_ptr->background;
 #endif
-#if defined(PNG_READ_GAMMA_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
    if (png_ptr->transformations & (PNG_GAMMA | PNG_RGB_TO_GRAY))
    {
       png_build_gamma_table(png_ptr);
@@ -731,7 +733,6 @@ png_init_read_transformations(png_structp png_ptr)
             png_colorp palette = png_ptr->palette;
             int num_palette = png_ptr->num_palette;
             int i;
-
             if (png_ptr->background_gamma_type == PNG_BACKGROUND_GAMMA_FILE)
             {
                back.red = png_ptr->gamma_table[png_ptr->background.red];
@@ -789,7 +790,6 @@ png_init_read_transformations(png_structp png_ptr)
                back_1.blue = (png_byte)(pow(
                   (double)png_ptr->background.blue/255, g) * 255.0 + .5);
             }
-
             for (i = 0; i < num_palette; i++)
             {
                if (i < (int)png_ptr->num_trans && png_ptr->trans[i] != 0xff)
@@ -998,7 +998,14 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 
 #if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->transformations & PNG_GAMMA)
+   {
+#ifdef PNG_FLOATING_POINT_SUPPORTED
       info_ptr->gamma = png_ptr->gamma;
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+      info_ptr->int_gamma = png_ptr->int_gamma;
+#endif
+   }
 #endif
 
 #if defined(PNG_READ_16_TO_8_SUPPORTED)
@@ -1290,7 +1297,7 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
          png_ptr->row_info.channels = png_ptr->user_transform_channels;
       png_ptr->row_info.pixel_depth = (png_byte)(png_ptr->row_info.bit_depth *
          png_ptr->row_info.channels);
-      png_ptr->row_info.rowbytes = (png_ptr->row_info.width * 
+      png_ptr->row_info.rowbytes = (png_ptr->row_info.width *
          png_ptr->row_info.pixel_depth+7)>>3;
    }
 #endif
@@ -1988,7 +1995,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-/* reduce RGB files to grayscale, with or without alpha 
+/* reduce RGB files to grayscale, with or without alpha
  * using the equation given in Poynton's ColorFAQ at
  * <http://www.inforamp.net/~poynton/>
  * Copyright (c) 1998-01-04 Charles Poynton poynton@inforamp.net
@@ -1996,7 +2003,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
  *     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
  *
  *  We approximate this with
- * 
+ *
  *     Y = 0.211 * R    + 0.715 * G    + 0.074 * B
  *
  *  which can be expressed with integers as
@@ -2072,7 +2079,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                }
             }
          }
- 
+
          else /* RGB bit_depth == 16 */
          {
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
@@ -2097,7 +2104,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                                   png_ptr->gamma_shift][red>>8];
                      png_uint_16 green_1 = png_ptr->gamma_16_to_1[(green&0xff) >>
                                   png_ptr->gamma_shift][green>>8];
-                     png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff) >> 
+                     png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff) >>
                                   png_ptr->gamma_shift][blue>>8];
                      png_uint_16 gray16  = (png_uint_16)((rc*red_1 + gc*green_1
                                   + bc*blue_1)>>8);
@@ -2105,7 +2112,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                          png_ptr->gamma_shift][gray16 >> 8];
                      rgb_error |= 1;
                   }
-                  
+
                   *(dp++) = (png_byte)((w>>8) & 0xff);
                   *(dp++) = (png_byte)(w & 0xff);
                }
@@ -2194,7 +2201,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                                   png_ptr->gamma_shift][red>>8];
                      png_uint_16 green_1 = png_ptr->gamma_16_to_1[(green&0xff) >>
                                   png_ptr->gamma_shift][green>>8];
-                     png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff) >> 
+                     png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff) >>
                                   png_ptr->gamma_shift][blue>>8];
                      png_uint_16 gray16  = (png_uint_16)((rc * red_1
                                   + gc * green_1 + bc * blue_1)>>8);
@@ -2202,7 +2209,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                          png_ptr->gamma_shift][gray16 >> 8];
                      rgb_error |= 1;
                   }
-                  
+
                   *(dp++) = (png_byte)((w>>8) & 0xff);
                   *(dp++) = (png_byte)(w & 0xff);
                   *(dp++) = *(sp++);  /* alpha */
@@ -2298,7 +2305,8 @@ png_correct_palette(png_structp png_ptr, png_colorp palette,
    int num_palette)
 {
    png_debug(1, "in png_correct_palette\n");
-#if defined(PNG_READ_BACKGROUND_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) && \
+    defined(PNG_READ_GAMMA_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
    if (png_ptr->transformations & (PNG_GAMMA | PNG_BACKGROUND))
    {
       png_color back, back_1;
@@ -3764,6 +3772,7 @@ png_do_dither(png_row_infop row_info, png_bytep row,
 }
 #endif
 
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 #if defined(PNG_READ_GAMMA_SUPPORTED)
 static int png_gamma_shift[] =
    {0x10, 0x21, 0x42, 0x84, 0x110, 0x248, 0x550, 0xff0};
@@ -3814,7 +3823,7 @@ png_build_gamma_table(png_structp png_ptr)
                g) * 255.0 + .5);
          }
 
-         
+
          png_ptr->gamma_from_1 = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)256);
 
@@ -3982,5 +3991,7 @@ png_build_gamma_table(png_structp png_ptr)
    }
  }
 }
+#endif
+/* To do: install integer version of png_build_gamma_table here */
 #endif
 
