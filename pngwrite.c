@@ -1,9 +1,9 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.1 - December 12, 2001
+ * libpng 1.2.4 - July 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -443,16 +443,19 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    int i;
    png_debug(1, "in png_create_write_struct\n");
 #ifdef PNG_USER_MEM_SUPPORTED
-   if ((png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
-      (png_malloc_ptr)malloc_fn, (png_voidp)mem_ptr)) == NULL)
+   png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
+      (png_malloc_ptr)malloc_fn, (png_voidp)mem_ptr);
 #else
-   if ((png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG)) == NULL)
+   png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG);
 #endif /* PNG_USER_MEM_SUPPORTED */
+   if (png_ptr == NULL)
       return (NULL);
 
+#if !defined(PNG_1_0_X)
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
    png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
 #endif
+#endif /* PNG_1_0_X */
 
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
@@ -527,7 +530,20 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       1, png_doublep_NULL, png_doublep_NULL);
 #endif
 
-   return ((png_structp)png_ptr);
+#ifdef PNG_SETJMP_SUPPORTED
+/* Applications that neglect to set up their own setjmp() and then encounter
+   a png_error() will longjmp here.  Since the jmpbuf is then meaningless we
+   abort instead of returning. */
+#ifdef USE_FAR_KEYWORD
+   if (setjmp(jmpbuf))
+      PNG_ABORT();
+   png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+#else
+   if (setjmp(png_ptr->jmpbuf))
+      PNG_ABORT();
+#endif
+#endif
+   return (png_ptr);
 }
 
 /* Initialize png_ptr structure, and allocate any memory needed */
@@ -539,7 +555,6 @@ png_write_init(png_structp png_ptr)
    png_write_init_2(png_ptr, "1.0.6 or earlier", 0, 0);
 }
 
-#undef png_write_init_2
 void PNGAPI
 png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
    png_size_t png_struct_size, png_size_t png_info_size)
@@ -624,9 +639,11 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    /* reset all variables to 0 */
    png_memset(png_ptr, 0, sizeof (png_struct));
 
+#if !defined(PNG_1_0_X)
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
    png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
 #endif
+#endif /* PNG_1_0_X */
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */
@@ -948,6 +965,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
       png_ptr = *png_ptr_ptr;
 #ifdef PNG_USER_MEM_SUPPORTED
       free_fn = png_ptr->free_fn;
+      mem_ptr = png_ptr->mem_ptr;
 #endif
    }
 

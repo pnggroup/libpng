@@ -1,9 +1,9 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * libpng 1.2.1 - December 12, 2001
+ * libpng 1.2.4 - July 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -547,7 +547,11 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
       *width = info_ptr->width;
       *height = info_ptr->height;
       *bit_depth = info_ptr->bit_depth;
+      if (info_ptr->bit_depth < 1 || info_ptr->bit_depth > 16)
+        png_error(png_ptr, "Invalid bit depth");
       *color_type = info_ptr->color_type;
+      if (info_ptr->color_type > 6)
+        png_error(png_ptr, "Invalid color type");
       if (compression_type != NULL)
          *compression_type = info_ptr->compression_type;
       if (filter_type != NULL)
@@ -566,9 +570,13 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
          channels++;
       pixel_depth = *bit_depth * channels;
       rowbytes_per_pixel = (pixel_depth + 7) >> 3;
-      if ((*width > PNG_MAX_UINT/rowbytes_per_pixel))
+      if (width == 0 || *width > PNG_MAX_UINT)
+        png_error(png_ptr, "Invalid image width");
+      if (height == 0 || *height > PNG_MAX_UINT)
+        png_error(png_ptr, "Invalid image height");
+      if (*width > PNG_MAX_UINT/rowbytes_per_pixel - 64)
       {
-         png_warning(png_ptr,
+         png_error(png_ptr,
             "Width too large for libpng to process image data.");
       }
       return (1);
@@ -827,8 +835,9 @@ png_get_compression_buffer_size(png_structp png_ptr)
 }
 
 
+#ifndef PNG_1_0_X
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
-/* this function was added to libpng 1.2.0 and should exist by default*/
+/* this function was added to libpng 1.2.0 and should exist by default */
 png_uint_32 PNGAPI
 png_get_asm_flags (png_structp png_ptr)
 {
@@ -915,3 +924,4 @@ png_get_mmx_rowbytes_threshold (png_structp png_ptr)
     return (png_uint_32)(png_ptr? png_ptr->mmx_rowbytes_threshold : 0L);
 }
 #endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
+#endif /* PNG_1_0_X */

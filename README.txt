@@ -10,7 +10,7 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
  * If you have modified this source, you may insert additional notices
  * immediately after this sentence.
  *
- * Copyright (C) 1998-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+ * Copyright (C) 1998-2002 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
@@ -40,19 +40,17 @@ case of any discrepancy, the copy in pngcrush.c shall prevail):
 
 This is the output of "pngcrush" and "pngcrush -help":
 
-
-
- | pngcrush 1.5.8, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+ | pngcrush 1.5.9, Copyright (C) 1998-2002 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
  | Executable name is pngcrush
- | It was built with libpng version 1.2.1, and is
- | running with  libpng version 1.2.1 - December 12, 2001 (header)
- |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
+ | It was built with libpng version 1.2.4, and is
+ | running with  libpng version 1.2.4 - July 8, 2002 (header)
+ |    Copyright (C) 1998-2002 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
- | and zlib version 1.1.3pc, Copyright (C) 1998,
+ | and zlib version 1.1.4pc, Copyright (C) 1998,
  |    Jean-loup Gailly and Mark Adler.
 
 
@@ -101,17 +99,166 @@ options:
             -p (pause)
 
 
- | pngcrush 1.5.8, Copyright (C) 1998-2001 Glenn Randers-Pehrson
+
+ | pngcrush 1.5.9, Copyright (C) 1998-2002 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is irrevocably
  | granted to everyone to use this version of pngcrush without
  | payment of any fee.
  | Executable name is pngcrush
- | It was built with libpng version 1.2.1, and is
- | running with  libpng version 1.2.1 - December 12, 2001 (header)
- |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,
+ | It was built with libpng version 1.2.4, and is
+ | running with  libpng version 1.2.4 - July 8, 2002 (header)
+ |    Copyright (C) 1998-2002 Glenn Randers-Pehrson,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
- | and zlib version 1.1.3pc, Copyright (C) 1998,
+ | and zlib version 1.1.4pc, Copyright (C) 1998,
+ |    Jean-loup Gailly and Mark Adler.
+
+
+usage: pngcrush [options] infile.png outfile.png
+       pngcrush -e ext [other options] files.png ...
+       pngcrush -d dir [other options] files.png ...
+options:
+      -already already_crushed_size [e.g., 8192]
+    -bit_depth depth (bit_depth to use in output file)
+        -brute (Use brute-force, try 114 different methods [11-124])
+            -c color_type of output file [0, 2, 4, or 6]
+            -d directory_name (where output files will go)
+ -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
+            -e extension  (used for creating output filename)
+            -f user_filter [0-5]
+          -fix (fix otherwise fatal conditions such as bad CRCs)
+        -force (Write a new output file even if larger than input)
+            -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)
+         -iccp length "Profile Name" iccp_file
+         -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+            -l zlib_compression_level [0-9]
+         -loco ("loco crush" truecolor PNGs)
+            -m method [0 through 200]
+          -max maximum_IDAT_size [default 8192]
+        -nofilecheck (do not check for infile.png == outfile.png)
+            -n (no save; does not do compression or write output PNG)
+     -plte_len n (truncate PLTE)
+            -q (quiet)
+       -reduce (do lossless color type or bit depth reduction)
+          -rem chunkname (or "alla" or "allb")
+-replace_gamma gamma (float or fixed*100000) even if gAMA is present.
+          -res dpi
+         -save (keep all copy-unsafe chunks)
+         -srgb [0, 1, 2, or 3]
+         -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+   -trns_array n trns[0] trns[1] .. trns[n-1]
+         -trns index red green blue gray
+            -v (display more detailed information)
+      -version (display the pngcrush version)
+            -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
+            -z zlib_strategy [0, 1, or 2]
+         -zmem zlib_compression_mem_level [1-9, default 9]
+        -zitxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+         -ztxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+            -h (help and legal notices)
+            -p (pause)
+
+Copyright (C) 1998-2002 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+
+
+DISCLAIMER: The pngcrush computer program is supplied "AS IS".
+The Author disclaims all warranties, expressed or implied, including,
+without limitation, the warranties of merchantability and of fitness
+for  any purpose.  The Author assumes no liability for direct, indirect,
+incidental, special, exemplary, or consequential damages, which may
+result from the use of the computer program, even if advised of the
+possibility of such damage.  There is no warranty against interference
+with your enjoyment of the computer program or against infringement.
+There is no warranty that my efforts or the computer program will
+fulfill any of your particular purposes or needs.  This computer
+program is provided with all faults, and the entire risk of satisfactory
+quality, performance, accuracy, and effort is with the user.
+
+LICENSE: Permission is hereby irrevocably granted to everyone to use,
+copy, modify, and distribute this computer program, or portions hereof,
+purpose, without payment of any fee, subject to the following
+restrictions:
+
+1. The origin of this binary or source code must not be misrepresented.
+
+2. Altered versions must be plainly marked as such and must not be
+misrepresented as being the original binary or source.
+
+3. The Copyright notice, disclaimer, and license may not be removed
+or altered from any source, binary, or altered source distribution.
+
+
+
+ | pngcrush 1.5.9, Copyright (C) 1998-2002 Glenn Randers-Pehrson
+ | This is a free, open-source program.  Permission is irrevocably
+ | granted to everyone to use this version of pngcrush without
+ | payment of any fee.
+ | Executable name is pngcrush
+ | It was built with libpng version 1.2.4, and is
+ | running with  libpng version 1.2.4 - July 8, 2002 (header)
+ |    Copyright (C) 1998-2002 Glenn Randers-Pehrson,
+ |    Copyright (C) 1996, 1997 Andreas Dilger,
+ |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
+ | and zlib version 1.1.4pc, Copyright (C) 1998,
+ |    Jean-loup Gailly and Mark Adler.
+
+
+usage: pngcrush [options] infile.png outfile.png
+       pngcrush -e ext [other options] files.png ...
+       pngcrush -d dir [other options] files.png ...
+options:
+      -already already_crushed_size [e.g., 8192]
+    -bit_depth depth (bit_depth to use in output file)
+        -brute (Use brute-force, try 114 different methods [11-124])
+            -c color_type of output file [0, 2, 4, or 6]
+            -d directory_name (where output files will go)
+ -double_gamma (used for fixing gamma in PhotoShop 5.0/5.02 files)
+            -e extension  (used for creating output filename)
+            -f user_filter [0-5]
+          -fix (fix otherwise fatal conditions such as bad CRCs)
+        -force (Write a new output file even if larger than input)
+            -g gamma (float or fixed*100000, e.g., 0.45455 or 45455)
+         -iccp length "Profile Name" iccp_file
+         -itxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+            -l zlib_compression_level [0-9]
+         -loco ("loco crush" truecolor PNGs)
+            -m method [0 through 200]
+          -max maximum_IDAT_size [default 8192]
+        -nofilecheck (do not check for infile.png == outfile.png)
+            -n (no save; does not do compression or write output PNG)
+     -plte_len n (truncate PLTE)
+            -q (quiet)
+       -reduce (do lossless color type or bit depth reduction)
+          -rem chunkname (or "alla" or "allb")
+-replace_gamma gamma (float or fixed*100000) even if gAMA is present.
+          -res dpi
+         -save (keep all copy-unsafe chunks)
+         -srgb [0, 1, 2, or 3]
+         -text b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+   -trns_array n trns[0] trns[1] .. trns[n-1]
+         -trns index red green blue gray
+            -v (display more detailed information)
+      -version (display the pngcrush version)
+            -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
+            -z zlib_strategy [0, 1, or 2]
+         -zmem zlib_compression_mem_level [1-9, default 9]
+        -zitxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+         -ztxt b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+            -h (help and legal notices)
+            -p (pause)
+
+
+ | pngcrush 1.5.9, Copyright (C) 1998-2002 Glenn Randers-Pehrson
+ | This is a free, open-source program.  Permission is irrevocably
+ | granted to everyone to use this version of pngcrush without
+ | payment of any fee.
+ | Executable name is pngcrush
+ | It was built with libpng version 1.2.4, and is
+ | running with  libpng version 1.2.4 - July 8, 2002 (header)
+ |    Copyright (C) 1998-2002 Glenn Randers-Pehrson,
+ |    Copyright (C) 1996, 1997 Andreas Dilger,
+ |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
+ | and zlib version 1.1.4pc, Copyright (C) 1998,
  |    Jean-loup Gailly and Mark Adler.
 
 
@@ -337,4 +484,5 @@ options (Note: any option can be spelled out for clarity, e.g.,
                Wait for [enter] key before continuing display.
                e.g., type 'pngcrush -pause -help', if the help
                screen scrolls out of sight.
+
 

@@ -1,9 +1,9 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.2.1 - December 12, 2001
+ * libpng 1.2.4 - July 8, 2002
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2001 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -43,7 +43,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    else if (type == PNG_STRUCT_PNG)
      size = sizeof(png_struct);
    else
-     return (NULL);
+     return (png_get_copyright());
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(malloc_fn != NULL)
@@ -110,12 +110,12 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * result, we would be truncating potentially larger memory requests
  * (which should cause a fatal error) and introducing major problems.
  */
+
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
 {
-#ifndef PNG_USER_MEM_SUPPORTED
    png_voidp ret;
-#endif
+
    if (png_ptr == NULL || size == 0)
       return (NULL);
 
@@ -123,7 +123,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
    if(png_ptr->malloc_fn != NULL)
    {
        ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
-       if (ret == NULL)
+       if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
           png_error(png_ptr, "Out of memory!");
        return (ret);
    }
@@ -177,12 +177,22 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
             if (table == NULL)
             {
-               png_error(png_ptr, "Out Of Memory."); /* Note "O" and "M" */
+               if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+                  png_error(png_ptr, "Out Of Memory."); /* Note "O" and "M" */
+               else
+                  png_warning(png_ptr, "Out Of Memory.");
+               return (NULL);
             }
 
             if ((png_size_t)table & 0xfff0)
             {
-               png_error(png_ptr, "Farmalloc didn't return normalized pointer");
+               if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+                  png_error(png_ptr,
+                    "Farmalloc didn't return normalized pointer");
+               else
+                  png_warning(png_ptr,
+                    "Farmalloc didn't return normalized pointer");
+               return (NULL);
             }
 
             png_ptr->offset_table = table;
@@ -191,7 +201,11 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
             if (png_ptr->offset_table_ptr == NULL)
             {
-               png_error(png_ptr, "Out Of memory.");
+               if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+                  png_error(png_ptr, "Out Of memory."); /* Note "O" and "M" */
+               else
+                  png_warning(png_ptr, "Out Of memory.");
+               return (NULL);
             }
 
             hptr = (png_byte huge *)table;
@@ -213,7 +227,13 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
       }
 
       if (png_ptr->offset_table_count >= png_ptr->offset_table_number)
-         png_error(png_ptr, "Out of Memory.");
+      {
+         if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+            png_error(png_ptr, "Out of Memory."); /* Note "o" and "M" */
+         else
+            png_warning(png_ptr, "Out of Memory.");
+         return (NULL);
+      }
 
       ret = png_ptr->offset_table_ptr[png_ptr->offset_table_count++];
    }
@@ -222,7 +242,10 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
    if (ret == NULL)
    {
-      png_error(png_ptr, "Out of memory."); /* Note "o" and "m" */
+      if (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+         png_error(png_ptr, "Out of memory."); /* Note "o" and "m" */
+      else
+         png_warning(png_ptr, "Out of memory."); /* Note "o" and "m" */
    }
 
    return (ret);
@@ -283,7 +306,7 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 
 /* Allocate memory for a png_struct or a png_info.  The malloc and
    memset can be replaced by a single call to calloc() if this is thought
-   to improve performance noticably.*/
+   to improve performance noticably. */
 png_voidp /* PRIVATE */
 png_create_struct(int type)
 {
@@ -293,7 +316,7 @@ png_create_struct(int type)
 
 /* Allocate memory for a png_struct or a png_info.  The malloc and
    memset can be replaced by a single call to calloc() if this is thought
-   to improve performance noticably.*/
+   to improve performance noticably. */
 png_voidp /* PRIVATE */
 png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
 {
@@ -376,7 +399,6 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
    }
 }
 
-
 /* Allocate memory.  For reasonable files, size should never exceed
    64K.  However, zlib may allocate more then 64K if you don't tell
    it not to.  See zconf.h and png.h for more information.  zlib does
@@ -387,21 +409,23 @@ png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
+
    if (png_ptr == NULL || size == 0)
       return (NULL);
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(png_ptr->malloc_fn != NULL)
    {
-       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
-       if (ret == NULL)
+       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
+       if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
           png_error(png_ptr, "Out of Memory!");
        return (ret);
    }
    else
        return (png_malloc_default(png_ptr, size));
 }
-png_voidp /* PRIVATE */
+
+png_voidp PNGAPI
 png_malloc_default(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
@@ -409,7 +433,12 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
-      png_error(png_ptr, "Cannot Allocate > 64K");
+   {
+      if(png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
+         png_error(png_ptr, "Cannot Allocate > 64K");
+      else
+         return NULL;
+   }
 #endif
 
 #if defined(__TURBOC__) && !defined(__FLAT__)
@@ -422,7 +451,7 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 # endif
 #endif
 
-   if (ret == NULL)
+   if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
       png_error(png_ptr, "Out of Memory");
 
    return (ret);
@@ -444,7 +473,7 @@ png_free(png_structp png_ptr, png_voidp ptr)
    }
    else png_free_default(png_ptr, ptr);
 }
-void /* PRIVATE */
+void PNGAPI
 png_free_default(png_structp png_ptr, png_voidp ptr)
 {
    if (png_ptr == NULL || ptr == NULL)
@@ -465,7 +494,27 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 
 #endif /* Not Borland DOS special memory handler */
 
-png_voidp /* PRIVATE */
+#if defined(PNG_1_0_X)
+#  define png_malloc_warn png_malloc
+#else
+/* This function was added at libpng version 1.2.3.  The png_malloc_warn()
+ * function will issue a png_warning and return NULL instead of issuing a
+ * png_error, if it fails to allocate the requested memory.
+ */
+png_voidp PNGAPI
+png_malloc_warn(png_structp png_ptr, png_uint_32 size)
+{
+   png_voidp ptr;
+   png_uint_32 save_flags=png_ptr->flags;
+
+   png_ptr->flags|=PNG_FLAG_MALLOC_NULL_MEM_OK;
+   ptr = (png_voidp)png_malloc((png_structp)png_ptr, size);
+   png_ptr->flags=save_flags;
+   return(ptr);
+}
+#endif
+
+png_voidp PNGAPI
 png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,
    png_uint_32 length)
 {
@@ -478,7 +527,7 @@ png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,
    return(png_memcpy (s1, s2, size));
 }
 
-png_voidp /* PRIVATE */
+png_voidp PNGAPI
 png_memset_check (png_structp png_ptr, png_voidp s1, int value,
    png_uint_32 length)
 {

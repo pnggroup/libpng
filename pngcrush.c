@@ -1,5 +1,5 @@
 /* pngcrush.c - recompresses png files
- * Copyright (C) 1998-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+ * Copyright (C) 1998-2002 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * The most recent version of pngcrush can be found at SourceForge in
  * http://pmt.sf.net/pngcrush/
@@ -25,7 +25,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.5.8"
+#define PNGCRUSH_VERSION "1.5.9"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -37,7 +37,7 @@
  * If you have modified this source, you may insert additional notices
  * immediately after this sentence.
  *
- * Copyright (C) 1998-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+ * Copyright (C) 1998-2002 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
  *
  * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
@@ -53,8 +53,9 @@
  * the user.
  *
  * Permission is hereby irrevocably granted to everyone to use, copy, modify,
- * and distribute this source code, or portions hereof, for any purpose,
- * without payment of any fee, subject to the following restrictions:
+ * and distribute this source code, or portions hereof, or executable programs
+ * compiled from it, for any purpose, without payment of any fee, subject to
+ * the following restrictions:
  *
  * 1. The origin of this source code must not be misrepresented.
  *
@@ -66,6 +67,16 @@
  */
 
 /* Change log:
+ *
+ * Version 1.5.9 (built with libpng-1.2.4beta3 and zlib-1.1.4pc)
+ *
+ *   Work around CPU timer wraparound at 2G microseconds.
+ *
+ *   Upgraded zlib from 1.1.3 to 1.1.4.  Pngcrush is believed not to
+ *   be vulnerable to the zlib-1.1.3 buffer-overflow bug.
+ *
+ *   Choose the first instance of smallest IDAT instead of the last,
+ *   for faster final recompression, suggested by TSamuel.
  *
  * Version 1.5.8 (built with libpng-1.2.1)
  *
@@ -701,7 +712,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr);
 static png_uint_32 idat_length[MAX_METHODSP1];
 static int filter_type, zlib_level;
 static png_bytep png_row_filters=NULL;
-static TIME_T t_start, t_stop, t_decode, t_encode, t_misc;
+static float t_start, t_stop, t_decode, t_encode, t_misc;
 
 static png_uint_32 max_idat_size = 524288L;  /* increases the IDAT size */
 static png_uint_32 crushed_idat_size = 0x3ffffffL;
@@ -1071,6 +1082,12 @@ show_result(void)
    }
    t_stop = (TIME_T)clock();
    t_misc += (t_stop - t_start);
+   if (t_stop < t_start)
+     {
+       t_misc+= PNG_MAX_UINT;
+       if (t_stop < 0)
+         t_misc+= PNG_MAX_UINT;
+     }
    t_start = t_stop;
    fprintf(STDERR,"   CPU time used = %.3f seconds",
       (t_misc+t_decode+t_encode)/(float)CLOCKS_PER_SEC);
@@ -1678,10 +1695,11 @@ main(int argc, char *argv[])
          fprintf(STDERR, PNGCRUSH_VERSION );
          fprintf(STDERR,", uses libpng ");
          fprintf(STDERR, PNG_LIBPNG_VER_STRING );
-         fprintf(STDERR,"and zlib ");
+         fprintf(STDERR," and zlib ");
          fprintf(STDERR, ZLIB_VERSION );
          fprintf(STDERR, "\n Check http://pmt.sf.net\n");
          fprintf(STDERR, " for the most recent version.\n");
+         verbose=0;
       }
    else if(!strncmp(argv[i],"-v",2))
       {
@@ -1743,7 +1761,7 @@ main(int argc, char *argv[])
  /* If you have modified this source, you may insert additional notices
   * immediately after this sentence. */
       fprintf(STDERR, 
-        "\n | pngcrush %s, Copyright (C) 1998-2001 Glenn Randers-Pehrson\n",
+        "\n | pngcrush %s, Copyright (C) 1998-2002 Glenn Randers-Pehrson\n",
         PNGCRUSH_VERSION);
       fprintf(STDERR,
       " | This is a free, open-source program.  Permission is irrevocably\n");
@@ -1762,7 +1780,7 @@ main(int argc, char *argv[])
 #endif
 #if PNG_LIBPNG_VER > 96
       fprintf(STDERR,
-        " |    Copyright (C) 1998-2001 Glenn Randers-Pehrson,\n");
+        " |    Copyright (C) 1998-2002 Glenn Randers-Pehrson,\n");
 #endif
 #if PNG_LIBPNG_VER > 89
       fprintf(STDERR,
@@ -1820,8 +1838,8 @@ main(int argc, char *argv[])
       inname= argv[names];
    }
 
-   if((nosave == 0 && pngcrush_mode == DEFAULT_MODE && argc - names != 2) ||
-       help > 0)
+   if((verbose && nosave == 0 && pngcrush_mode == DEFAULT_MODE
+       && argc - names != 2) || help > 0)
    {
      fprintf(STDERR,
        "\nusage: %s [options] infile.png outfile.png\n",progname);
@@ -2265,7 +2283,7 @@ main(int argc, char *argv[])
  /* If you have modified this source, you may insert additional notices
   * immediately after this sentence. */
      fprintf (STDERR,
-     "\nCopyright (C) 1998-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)\n\n");
+     "\nCopyright (C) 1998-2002 Glenn Randers-Pehrson (randeg@alum.rpi.edu)\n\n");
      fprintf(STDERR,
      "\nDISCLAIMER: The pngcrush computer program is supplied \"AS IS\".\n");
      fprintf(STDERR,
@@ -2554,14 +2572,14 @@ main(int argc, char *argv[])
          best=0;
          best_length=(png_uint_32)0xffffffff;
          for (ntrial=things_have_changed; ntrial<MAX_METHODS; ntrial++)
-           if(idat_length[ntrial]<=best_length)
+           if(idat_length[ntrial]<best_length)
            {
                best_length=idat_length[ntrial];
                best=ntrial;
            }
 
          if(idat_length[best] == idat_length[0] && things_have_changed == 0
-            && best != final_method && nosave == 0)
+            && idat_length[best] != idat_length[final_method] && nosave == 0)
          {
             /* just copy input to output */
 
@@ -2743,9 +2761,9 @@ main(int argc, char *argv[])
       if(nosave == 0)
          png_init_io(write_ptr, fpout);
 #else
-      png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
+      png_set_read_fn(read_ptr, (png_voidp)fpin, (png_rw_ptr)NULL);
       if(nosave == 0)
-         png_set_write_fn(write_ptr, (png_voidp)fpout,  png_default_write_data,
+         png_set_write_fn(write_ptr, (png_voidp)fpout,  (png_rw_ptr)NULL,
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
             png_default_flush);
 #else
@@ -3989,6 +4007,12 @@ main(int argc, char *argv[])
 
       t_stop = (TIME_T)clock();
       t_misc += (t_stop - t_start);
+      if (t_stop < t_start)
+        {
+          t_misc+= PNG_MAX_UINT;
+          if (t_stop < 0)
+            t_misc+= PNG_MAX_UINT;
+        }
       t_start = t_stop;
       for (pass = 0; pass < num_pass; pass++)
       {
@@ -4013,6 +4037,12 @@ main(int argc, char *argv[])
             {
                t_stop = (TIME_T)clock();
                t_decode += (t_stop - t_start);
+               if (t_stop < t_start)
+                 {
+                   t_decode+= PNG_MAX_UINT;
+                   if (t_stop < 0)
+                     t_decode+= PNG_MAX_UINT;
+                 }
                t_start = t_stop;
 #ifdef PNGCRUSH_MULTIPLE_ROWS
                png_write_rows(write_ptr, row_pointers, num_rows);
@@ -4021,6 +4051,12 @@ main(int argc, char *argv[])
 #endif
                t_stop = (TIME_T)clock();
                t_encode += (t_stop - t_start);
+               if (t_stop < t_start)
+                 {
+                   t_encode+= PNG_MAX_UINT;
+                   if (t_stop < 0)
+                     t_encode+= PNG_MAX_UINT;
+                 }
                t_start = t_stop;
             }
          }
@@ -4030,6 +4066,12 @@ main(int argc, char *argv[])
       {
           t_stop = (TIME_T)clock();
           t_decode += (t_stop -  t_start);
+          if (t_stop < t_start)
+            {
+              t_decode+= PNG_MAX_UINT;
+              if (t_stop < 0)
+                t_decode+= PNG_MAX_UINT;
+            }
           t_start = t_stop;
       }
 
@@ -4380,7 +4422,7 @@ main(int argc, char *argv[])
 png_uint_32
 measure_idats(FILE *fpin)
 {
-   /* Copyright (C) 1999-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+   /* Copyright (C) 1999-2002 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
       See notice in pngcrush.c for conditions of use and distribution */
    P2("measure_idats:\n");
    png_debug(0, "Allocating read structure\n");
@@ -4395,7 +4437,7 @@ measure_idats(FILE *fpin)
 #if !defined(PNG_NO_STDIO)
    png_init_io(read_ptr, fpin);
 #else
-   png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
+   png_set_read_fn(read_ptr, (png_voidp)fpin, (png_rw_ptr)NULL);
 #endif
 
    png_set_sig_bytes(read_ptr, 0);
@@ -4419,7 +4461,7 @@ measure_idats(FILE *fpin)
 png_uint_32
 png_measure_idat(png_structp png_ptr)
 {
-   /* Copyright (C) 1999-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+   /* Copyright (C) 1999-2002 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
       See notice in pngcrush.c for conditions of use and distribution */
    png_uint_32 sum_idat_length=0;
 
@@ -4562,7 +4604,7 @@ png_measure_idat(png_structp png_ptr)
 int
 count_colors(FILE *fpin)
 {
-   /* Copyright (C) 2000-2001 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
+   /* Copyright (C) 2000-2002 Glenn Randers-Pehrson (randeg@alum.rpi.edu)
       See notice in pngcrush.c for conditions of use and distribution */
    int bit_depth, color_type, interlace_method, filter_method, compression_method;
    png_uint_32 rowbytes;
@@ -4638,7 +4680,7 @@ count_colors(FILE *fpin)
 #if !defined(PNG_NO_STDIO)
    png_init_io(read_ptr, fpin);
 #else
-   png_set_read_fn(read_ptr, (png_voidp)fpin, png_default_read_data);
+   png_set_read_fn(read_ptr, (png_voidp)fpin, (png_rw_ptr)NULL);
 #endif
 
    {
