@@ -1,10 +1,12 @@
-# makefile for libpng on Solaris 2.x with gcc
+# makefile for libpng on Solaris 9 (beta) with Forte cc
+# Updated by Chad Schrock for Solaris 9
 # Contributed by William L. Sebok, based on makefile.linux
-# Copyright (C) 1998 Greg Roelofs
-# Copyright (C) 1996, 1997 Andreas Dilger
+# Copyright (C) 1998-2001 Greg Roelofs
+# Copyright (C) 1996-1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
 
-CC=gcc
+# gcc 2.95 doesn't work.
+CC=cc
 
 # Where make install puts libpng.a, libpng.so*, and png.h
 prefix=/usr/local
@@ -14,15 +16,17 @@ prefix=/usr/local
 # to have zlib in an adjacent directory, specify the full path instead of "..".
 #ZLIBLIB=../zlib
 #ZLIBINC=../zlib
+#ZLIBLIB=/usr/local/lib
+#ZLIBINC=/usr/local/include
+#Use the preinstalled zlib that comes with Solaris 9:
+ZLIBLIB=/usr/lib
+ZLIBINC=/usr/include
 
-ZLIBLIB=/usr/local/lib
-ZLIBINC=/usr/local/include
-
-WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
+#WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
-CFLAGS=-I$(ZLIBINC) -Wall -O3 \
-	# $(WARNMORE) -g -DPNG_DEBUG=5
+#CFLAGS=-I$(ZLIBINC) -Wall -O3 $(WARNMORE) -g -DPNG_DEBUG=5
+CFLAGS=-I$(ZLIBINC) -O3
 LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng -lz -lm
 
 #RANLIB=ranlib
@@ -46,7 +50,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .SUFFIXES:      .c .o .pic.o
 
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
+	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
 
 all: libpng.a libpng.so pngtest
 

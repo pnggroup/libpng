@@ -986,6 +986,9 @@ version 1.2.1beta1 [October 19, 2001]
   Include background_1 in png_struct regardless of gamma support.
   Revised makefile.netbsd and makefile.macosx, added makefile.darwin.
   Revised example.c to provide more details about using row_callback().
+version 1.2.1beta2 [October 25, 2001]
+  Added type cast to each NULL appearing in a function call, except for
+    WINCE functions.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

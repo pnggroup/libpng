@@ -157,7 +157,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     * adjustment), then you can read the entire image (including
     * pixels) into the info structure with this call:
     */
-   png_read_png(png_ptr, info_ptr, png_transforms, NULL);
+   png_read_png(png_ptr, info_ptr, png_transforms, (png_voidp)NULL);
 #else
    /* OK, you're doing it the hard way, with the lower-level functions */
 
@@ -167,7 +167,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    png_read_info(png_ptr, info_ptr);
 
    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
-       &interlace_type, NULL, NULL);
+       &interlace_type, (int *)NULL, (int *)NULL);
 
 /**** Set up the data transformations you want.  Note that these are all
  **** optional.  Only call them if you want/need them.  Many of the
@@ -277,7 +277,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
          png_color std_color_cube[MAX_SCREEN_COLORS];
 
          png_set_dither(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
-            MAX_SCREEN_COLORS, NULL, 0);
+            MAX_SCREEN_COLORS, (png_uint_16p)NULL, 0);
       }
       /* This reduces the image to the palette supplied in the file */
       else if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette))
@@ -354,16 +354,18 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 #ifdef single /* Read the image a single row at a time */
       for (y = 0; y < height; y++)
       {
-         png_read_rows(png_ptr, &row_pointers[y], NULL, 1);
+         png_read_rows(png_ptr, &row_pointers[y], (png_bytepp)NULL, 1);
       }
 
 #else no_single /* Read the image several rows at a time */
       for (y = 0; y < height; y += number_of_rows)
       {
 #ifdef sparkle /* Read the image using the "sparkle" effect. */
-         png_read_rows(png_ptr, &row_pointers[y], NULL, number_of_rows);
+         png_read_rows(png_ptr, &row_pointers[y], (png_bytepp)NULL,
+            number_of_rows);
 #else no_sparkle /* Read the image using the "rectangle" effect */
-         png_read_rows(png_ptr, NULL, &row_pointers[y], number_of_rows);
+         png_read_rows(png_ptr, (png_bytepp)NULL, &row_pointers[y],
+            number_of_rows);
 #endif no_sparkle /* use only one of these two methods */
       }
 
@@ -612,7 +614,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * image info living info in the structure.  You could "|" many
     * PNG_TRANSFORM flags into the png_transforms integer here.
     */
-   png_write_png(png_ptr, info_ptr, png_transforms, NULL);
+   png_write_png(png_ptr, info_ptr, png_transforms, (png_voidp)NULL);
 #else
    /* This is the hard way */
 

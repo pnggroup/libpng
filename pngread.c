@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.2.1beta1 - October 19, 2001
+ * libpng 1.2.1beta2 - October 25, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -22,7 +22,7 @@ png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 
 #ifdef PNG_USER_MEM_SUPPORTED
    return (png_create_read_struct_2(user_png_ver, error_ptr, error_fn,
-      warn_fn, NULL, NULL, NULL));
+      warn_fn, (png_voidp)NULL, (png_malloc_ptr)NULL, (png_free_ptr)NULL));
 }
 
 /* Alternate create PNG structure for reading, and allocate any memory needed. */
@@ -139,7 +139,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->zstream.next_out = png_ptr->zbuf;
    png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
 
-   png_set_read_fn(png_ptr, NULL, NULL);
+   png_set_read_fn(png_ptr, (png_voidp)NULL, (png_rw_ptr)NULL);
 
    return (png_ptr);
 }
@@ -267,7 +267,7 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    png_ptr->zstream.next_out = png_ptr->zbuf;
    png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
 
-   png_set_read_fn(png_ptr, NULL, NULL);
+   png_set_read_fn(png_ptr, (png_voidp)NULL, (png_rw_ptr)NULL);
 }
 
 /* Read the information before the actual image data.  This has been
@@ -769,7 +769,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.1beta1
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.1beta2
  */
 
 void PNGAPI
@@ -796,14 +796,14 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
       for (i = 0; i < num_rows; i++)
       {
          png_bytep rptr = *rp;
-         png_read_row(png_ptr, rptr, NULL);
+         png_read_row(png_ptr, rptr, (png_bytep)NULL);
          rp++;
       }
    else if(dp != NULL)
       for (i = 0; i < num_rows; i++)
       {
          png_bytep dptr = *dp;
-         png_read_row(png_ptr, NULL, dptr);
+         png_read_row(png_ptr, (png_bytep)NULL, dptr);
          dp++;
       }
 }
@@ -818,7 +818,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.1beta1
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.1beta2
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -848,7 +848,7 @@ png_read_image(png_structp png_ptr, png_bytepp image)
       rp = image;
       for (i = 0; i < image_height; i++)
       {
-         png_read_row(png_ptr, *rp, NULL);
+         png_read_row(png_ptr, *rp, (png_bytep)NULL);
          rp++;
       }
    }

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.1beta1 - October 19, 2001
+ * libpng 1.2.1beta2 - October 25, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -424,7 +424,7 @@ png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 {
 #ifdef PNG_USER_MEM_SUPPORTED
    return (png_create_write_struct_2(user_png_ver, error_ptr, error_fn,
-      warn_fn, NULL, NULL, NULL));
+      warn_fn, (png_voidp)NULL, (png_malloc_ptr)NULL, (png_free_ptr)NULL));
 }
 
 /* Alternate initialize png_ptr structure, and allocate any memory needed */
@@ -521,11 +521,12 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
       (png_uint_32)png_ptr->zbuf_size);
 
-   png_set_write_fn(png_ptr, NULL, NULL, NULL);
+   png_set_write_fn(png_ptr, (png_voidp)NULL, (png_rw_ptr)NULL,
+      (png_flush_ptr)NULL);
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_set_filter_heuristics(png_ptr, PNG_FILTER_HEURISTIC_DEFAULT,
-      1, NULL, NULL);
+      1, (png_doublep)NULL, (png_doublep)NULL);
 #endif
 
    return ((png_structp)png_ptr);
@@ -634,7 +635,8 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
 #endif
 
-   png_set_write_fn(png_ptr, NULL, NULL, NULL);
+   png_set_write_fn(png_ptr, (png_voidp)NULL, (png_rw_ptr)NULL,
+      (png_flush_ptr)NULL);
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
@@ -643,7 +645,7 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
 
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    png_set_filter_heuristics(png_ptr, PNG_FILTER_HEURISTIC_DEFAULT,
-      1, NULL, NULL);
+      1, (png_doublep)NULL, (png_doublep)NULL);
 #endif
 }
 

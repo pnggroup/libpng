@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.1beta1 - October 19, 2001
+ * libpng 1.2.1beta2 - October 25, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -727,9 +727,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    else
    {
 #ifdef PNG_WRITE_SUPPORTED
-      png_set_write_status_fn(write_ptr, NULL);
+      png_set_write_status_fn(write_ptr, (png_write_status_ptr)NULL);
 #endif
-      png_set_read_status_fn(read_ptr, NULL);
+      png_set_read_status_fn(read_ptr, (png_read_status_ptr)NULL);
    }
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
@@ -748,10 +748,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #define HANDLE_CHUNK_IF_SAFE      2
 #define HANDLE_CHUNK_ALWAYS       3
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
-   png_set_keep_unknown_chunks(read_ptr, HANDLE_CHUNK_ALWAYS, NULL, 0);
+   png_set_keep_unknown_chunks(read_ptr, HANDLE_CHUNK_ALWAYS,
+      (png_bytep)NULL, 0);
 #endif
 #if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
-   png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE, NULL, 0);
+   png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE,
+      (png_bytep)NULL, 0);
 #endif
 
    png_debug(0, "Reading info struct\n");
@@ -1510,4 +1512,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_1beta1 your_png_h_is_not_version_1_2_1beta1;
+typedef version_1_2_1beta2 your_png_h_is_not_version_1_2_1beta2;

@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.2.1beta1 - October 19, 2001
+ * libpng 1.2.1beta2 - October 25, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -608,7 +608,8 @@ png_write_IEND(png_structp png_ptr)
    PNG_IEND;
 #endif
    png_debug(1, "in png_write_IEND\n");
-   png_write_chunk(png_ptr, (png_bytep)png_IEND, NULL, (png_size_t)0);
+   png_write_chunk(png_ptr, (png_bytep)png_IEND, (png_bytep)NULL,
+     (png_size_t)0);
    png_ptr->mode |= PNG_HAVE_IEND;
 }
 

@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.2.1beta1 - October 19, 2001
+ * libpng 1.2.1beta2 - October 25, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -27,7 +27,7 @@ png_voidp /* PRIVATE */
 png_create_struct(int type)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   return (png_create_struct_2(type, NULL, NULL));
+   return (png_create_struct_2(type, (png_malloc_ptr)NULL, (png_voidp)NULL));
 }
 
 /* Alternate version of png_create_struct, for use with user-defined malloc. */
@@ -56,7 +56,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
          struct_ptr = (*(malloc_fn))(png_ptr, size);
       }
       else
-         struct_ptr = (*(malloc_fn))(NULL, size);
+         struct_ptr = (*(malloc_fn))((png_structp)NULL, size);
       if (struct_ptr != NULL)
          png_memset(struct_ptr, 0, size);
       return (struct_ptr);
@@ -297,7 +297,7 @@ png_voidp /* PRIVATE */
 png_create_struct(int type)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   return (png_create_struct_2(type, NULL, NULL));
+   return (png_create_struct_2(type, (png_malloc_ptr)NULL, (png_voidp)NULL));
 }
 
 /* Allocate memory for a png_struct or a png_info.  The malloc and
@@ -328,7 +328,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
          struct_ptr = (*(malloc_fn))(png_ptr, size);
       }
       else
-         struct_ptr = (*(malloc_fn))(NULL, size);
+         struct_ptr = (*(malloc_fn))((png_structp)NULL, size);
       if (struct_ptr != NULL)
          png_memset(struct_ptr, 0, size);
       return (struct_ptr);
