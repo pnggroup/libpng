@@ -33,7 +33,7 @@ RANLIB=ranlib
 #RANLIB=echo
 
 PNGMAJ = 0
-PNGMIN = 1.2.4beta2
+PNGMIN = 1.2.4beta3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -162,6 +162,22 @@ install-config: libpng-config
 	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
 
 install: install-static install-shared install-man install-config
+
+# If you installed in $(DESTDIR), test-installed won't work until you
+# move the library to its final location.
+
+test-installed:
+	echo
+	echo Testing installed dynamic shared library.
+	$(CC) -I$(ZLIBINC) \
+	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
+	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) \
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs`
+	pngtesti pngtest.png
+
+clean:
+	/bin/rm -f *.o libpng.a pngtest pngtesti pngout.png libpng.pc \
+	libpng-config $(LIBNAME).sl $(LIBNAME).sl.$(PNGMAJ)*
 
 clean:
 	/bin/rm -f *.o libpng.a $(SHAREDLIB).sl $(SHAREDLIB).sl.$(PNGMAJ)* \

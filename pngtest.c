@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.4beta2 - June 20, 2002
+ * libpng 1.2.4beta3 - June 28, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -663,6 +663,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
    {
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
+      if (row_buf)
+         png_free(read_ptr, row_buf);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
 #ifdef PNG_WRITE_SUPPORTED
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
@@ -1512,4 +1514,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_4beta2 your_png_h_is_not_version_1_2_4beta2;
+typedef version_1_2_4beta3 your_png_h_is_not_version_1_2_4beta3;

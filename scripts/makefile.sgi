@@ -5,7 +5,7 @@
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.4beta2
+PNGMIN = 1.2.4beta3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Where make install puts libpng.a, libpng12.so, and libpng12/png.h
@@ -170,8 +170,8 @@ test-installed:
 	echo Testing installed dynamic shared library.
 	$(CC) -I$(ZLIBINC) \
 	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
-	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs` \
-	   -L$(ZLIBLIB) -rpath $(ZLIBLIB)
+	   -L$(ZLIBLIB) -rpath $(ZLIBLIB) \
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs`
 	pngtesti pngtest.png
 
 clean:

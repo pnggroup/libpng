@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.2.4beta2 - June 20, 2002
+ * libpng 1.2.4beta3 - June 28, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -746,6 +746,13 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
       }
       if (!(png_ptr->zstream.avail_out))
       {
+         if ((
+#if defined(PNG_READ_INTERLACING_SUPPORTED)
+             png_ptr->interlaced && png_ptr->pass > 6) ||
+             (!png_ptr->interlaced &&
+#endif
+             png_ptr->row_number == png_ptr->num_rows-1))
+           png_error(png_ptr, "Too much data in IDAT chunks");
          png_push_process_row(png_ptr);
          png_ptr->zstream.avail_out = (uInt)png_ptr->irowbytes;
          png_ptr->zstream.next_out = png_ptr->row_buf;

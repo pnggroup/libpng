@@ -1,5 +1,5 @@
 
-Known bugs in libpng version 1.2.4beta2
+Known bugs in libpng version 1.2.4beta3
 
 1. May 28, 2002:  Makefile.so9 has bugs.  The last line under the
    install-headers target should be

@@ -18,7 +18,7 @@ ZLIBINC=../zlib
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.4beta2
+PNGMIN = 1.2.4beta3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 CC=gcc
 
@@ -165,8 +165,8 @@ install: install-static install-shared install-man install-config
 test-installed:
 	$(CC) -I$(ZLIBINC) \
 	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
-	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs` \
-	   -L$(ZLIBLIB) -rpath $(ZLIBLIB)
+	   -L$(ZLIBLIB) -rpath $(ZLIBLIB) \
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs`
 	echo
 	echo Testing installed dynamic shared library.
 	pngtesti pngtest.png

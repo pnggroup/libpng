@@ -15,7 +15,7 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.4beta2
+PNGMIN = 1.2.4beta3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
@@ -203,11 +203,14 @@ install-config: libpng-config
 
 install: install-static install-shared install-man install-config
 
+# If you installed in $(DESTDIR), test-installed won't work until you
+# move the library to its final location.
+
 test-installed:
 	$(CC) -I$(ZLIBINC) \
 	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
-	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs` \
-	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB)
+	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) \
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs`
 	pngtesti pngtest.png
 
 clean:

@@ -1,5 +1,5 @@
 
-Libpng 1.2.4beta2 - June 20, 2002
+Libpng 1.2.4beta3 - June 28, 2002
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -12,13 +12,19 @@ version 1.2.4beta1 [May 24, 2002]
   Added missing "\" before closing double quote in makefile.gcmmx.
   Plugged various memory leaks; added png_malloc_warn() and png_set_text_2()
     functions.
-version 1.2.4beta2 [June 20, 2002]
+version 1.2.4beta2 [June 25, 2002]
   Plugged memory leak of png_ptr->current_text (Matt Holgate).
   Check for buffer overflow before reading CRC in pngpread.c (Warwick Allison)
   Added -soname to the loader flags in makefile.dec, makefile.sgi, and
     makefile.sggcc.
   Added "test-installed" targets to makefile.linux, makefile.gcmmx,
     makefile.sgi, and makefile.sggcc.
+version 1.2.4beta3 [June 28, 2002]
+  Plug memory leak of row_buf in pngtest.c when there is a png_error().
+  Detect buffer overflow in pngpread.c when IDAT is corrupted with extra data.
+  Added "test-installed" target to makefile.32sunu, makefile.64sunu,
+    makefile.beos, makefile.darwin, makefile.dec, makefile.macosx, 
+    makefile.solaris, and makefile.so9.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
