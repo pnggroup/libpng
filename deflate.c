@@ -101,7 +101,7 @@ local  void check_match OF((deflate_state *s, IPos start, IPos match,
 /* Tail of hash chains */
 
 #ifndef TOO_FAR
-#  define TOO_FAR 4096
+#  define TOO_FAR 32767
 #endif
 /* Matches of length 3 are discarded if their distance exceeds TOO_FAR */
 
@@ -1279,9 +1279,12 @@ local block_state deflate_slow(s, flush)
             }
             /* longest_match() sets match_start */
 
-            if (s->match_length <= 5 && (s->strategy == Z_FILTERED ||
-                 (s->match_length == MIN_MATCH &&
-                  s->strstart - s->match_start > TOO_FAR))) {
+            if (s->match_length <= 5 && (s->strategy == Z_FILTERED
+#if (TOO_FAR > 0 && TOO_FAR < 32767)
+                 || (s->match_length == MIN_MATCH &&
+                  s->strstart - s->match_start > TOO_FAR)
+#endif
+                  )) {
 
                 /* If prev_match is also MIN_MATCH, match_start is garbage
                  * but we will ignore the current match anyway.

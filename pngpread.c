@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * libpng 1.0.5m - January 7, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1325,15 +1325,13 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 /* This function is called when we haven't found a handler for this
- * chunk.  In the future we will have code here that can handle
- * user-defined callback functions for unknown chunks before they are
- * ignored or cause an error.  If there isn't a problem with the
- * chunk itself (ie a bad chunk name or a critical chunk), the chunk
- * is (currently) silently ignored.
+ * chunk.  If there isn't a problem with the chunk itself (ie a bad chunk
+ * name or a critical chunk), the chunk is (currently) silently ignored.
  */
 void
 png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
+   png_uint_32 skip=0;
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
 
    if (!(png_ptr->chunk_name[0] & 0x20))
@@ -1389,8 +1387,8 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 len
    }
    else
 #endif
-
-   png_push_crc_skip(png_ptr, length);
+      skip=length;
+   png_push_crc_skip(png_ptr, skip);
 }
 
 void

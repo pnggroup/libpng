@@ -3,8 +3,9 @@
 /* Special defines for pngcrush, mostly just to reduce the size of the
    static executable. */
 
-#define PNG_NO_FLOATING_POINT_SUPPORTED /* undef this if you want to be able
-                                           to reduce color to gray */
+#ifndef PNG_FLOATING_POINT_SUPPORTED      /* define this if you want to be */
+#  define PNG_NO_FLOATING_POINT_SUPPORTED /* able to reduce color to gray  */
+#endif
 #define PNG_NO_READ_cHRM
 #define PNG_NO_WRITE_cHRM
 #define PNG_NO_READ_hIST
@@ -39,6 +40,6 @@
 #else
 #  define PNG_NO_READ_RGB_TO_GRAY
 #endif
-#define PNG_ZBUF_SIZE 524288       /* increases the IDAT size */
-#define PNG_NO_GLOBAL_ARRAYS
-#define TOO_FAR 32767     /* Improves zlib/deflate compression */
+#ifndef PNG_ZBUF_SIZE
+#  define PNG_ZBUF_SIZE 524288       /* increases the IDAT size */
+#endif

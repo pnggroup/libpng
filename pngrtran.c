@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng 1.0.5m - January 7, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -658,7 +658,8 @@ png_init_read_transformations(png_structp png_ptr)
 #endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if (png_ptr->transformations & PNG_BACKGROUND_EXPAND)
+   if ((png_ptr->transformations & PNG_BACKGROUND_EXPAND) &&
+       (png_ptr->transformations & PNG_EXPAND))
    {
       if (!(color_type & PNG_COLOR_MASK_COLOR))  /* i.e., GRAY or GRAY_ALPHA */
       {
@@ -1674,9 +1675,15 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                *(--dp) = (png_byte)(255 - *(--sp));
+
+/*             This does nothing:
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
+               We can replace it with:
+*/
+               sp-=3;
+               dp=sp;
             }
          }
          /* This inverts the alpha channel in RRGGBBAA */
@@ -1690,12 +1697,18 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             {
                *(--dp) = (png_byte)(255 - *(--sp));
                *(--dp) = (png_byte)(255 - *(--sp));
+
+/*             This does nothing:
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
+               We can replace it with:
+*/
+               sp-=6;
+               dp=sp;
             }
          }
       }
@@ -1725,8 +1738,12 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             {
                *(--dp) = (png_byte)(255 - *(--sp));
                *(--dp) = (png_byte)(255 - *(--sp));
+/*
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
+*/
+               sp-=2;
+               dp=sp;
             }
          }
       }

@@ -1,0 +1,57 @@
+# Sample makefile for pngcrush using Microsoft (Visual) C compiler.
+# Author: Cosmin Truta
+# Derived from Makefile.gcc by Glenn Randers-Pehrson
+# Last modified: 14 January 2000
+#
+# Invoke this makefile from a console prompt in the usual way; for example:
+#
+#	nmake -f Makefile.msc
+#
+# This makefile builds a statically linked executable.
+
+# macros --------------------------------------------------------------------
+
+CC = cl -nologo
+LD = link -nologo
+RM = del
+CFLAGS = -DPNG_ZBUF_SIZE=0x080000 -DWIN32 -O2
+LDFLAGS =
+O = .obj
+E = .exe
+
+PNGCRUSH = pngcrush
+
+LIBS =
+
+OBJS  = $(PNGCRUSH)$(O) adler32$(O) crc32$(O) deflate$(O) gzio$(O) \
+	infblock$(O) infcodes$(O) inffast$(O) inflate$(O) inftrees$(O) \
+	infutil$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
+	pngpread$(O) pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) \
+	pngset$(O) pngtrans$(O) pngvcrd$(O) pngwio$(O) pngwrite$(O) \
+	pngwtran$(O) pngwutil$(O) trees$(O) zutil$(O)
+
+EXES = $(PNGCRUSH)$(E)
+
+
+# implicit make rules -------------------------------------------------------
+
+.c$(O):
+	$(CC) -c $(CFLAGS) $<
+
+
+# dependencies --------------------------------------------------------------
+
+all: $(EXES)
+
+
+$(PNGCRUSH)$(E): $(OBJS)
+	$(LD) $(LDFLAGS) -out:$@ $(OBJS) $(LIBS)
+
+$(PNGCRUSH)$(O): $(PNGCRUSH).c png.h pngconf.h zlib.h pngcrush.h
+
+# maintenance ---------------------------------------------------------------
+
+clean:
+	$(RM) *$(O)
+	$(RM) $(PNGCRUSH)$(E)
+

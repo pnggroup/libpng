@@ -15,7 +15,7 @@
  * occasionally creating Linux executables.
  */
 
-#define PNGCRUSH_VERSION "1.3.4"
+#define PNGCRUSH_VERSION "1.3.5"
 
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
@@ -53,6 +53,26 @@
  *   and tear on disk drives.
  *
  * Change log:
+ *
+ * Version 1.3.5 (built with libpng-1.0.5s)
+ *
+ *   Add test on stat_buf.st_size to verify fpin==fpout, because stat in
+ *   MSVC++6.0 standard version returns stat_buf.st_ino=0 for all files.
+ *
+ *   Revised pngcrush.h to make it easier to control PNG_ZBUF_SIZE and
+ *   PNG_NO_FLOATING_POINT_SUPPORTED from a makefile.
+ *
+ *   Restored ability to enter "replace_gamma" value as a float even when
+ *   floating point arithmetic is not enabled.
+ *
+ *   Enabled removing tEXt, zTXt, or iTXt chunks by chunk type, i.e.,
+ *   "-rem tEXt" only removes tEXt chunks, while "-rem text" removes all
+ *   three types of text chunk.
+ *
+ *   Removed definition of TOO_FAR from pngcrush.h
+ *
+ *   Uses new libpng error handler; if a file has errors, pngcrush now will
+ *   continue on and compress the remaining files instead of bailing out.
  *
  * Version 1.3.4 (built with libpng-1.0.5m)
  *
@@ -142,7 +162,7 @@
 #else
 #  define SLASH "/"
 #endif
-#if !defined(__BORLANDC__) && !defined(_MBCS)
+#if !defined(__TURBOC__) && !defined(_MSC_VER) && !defined(_MBCS)
 #  include <unistd.h>
 #endif
 #include <sys/types.h>
@@ -151,7 +171,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
-#ifdef _MBCS
+#if defined(_MBCS) || defined(WIN32) || defined(__WIN32__)
 #  include <direct.h>
 #endif
 
@@ -160,6 +180,7 @@
 #define EXTENSION_MODE 2
 #define FOPEN(file, how) fopen(file, how)
 #define FCLOSE(file) {fclose(file); file=NULL;--number_of_open_files;};
+#define P2 if(verbose > 2)printf
 
 /* we don't need the extra libpng tranformations
  * so they are ifdef'ed out in a special version of pngconf.h */
@@ -179,9 +200,6 @@
 static PNG_CONST char *progname = "pngtest.png";
 static PNG_CONST char *inname = "pngtest.png";
 static PNG_CONST char *outname = "pngout.png";
-#if 0
-static PNG_CONST char *tmpname = "pngtmp.png";
-#endif
 static PNG_CONST char *directory_name = "pngcrush.bak";
 static PNG_CONST char *extension = "_C.png";
 
@@ -210,7 +228,12 @@ int best;
 char buffer[256];
 char *str_return;
 
+#ifndef PNG_JMPBUF_SUPPORTED
+#ifndef PNG_SETJMP_NOT_SUPPORTED
+/* Old setjmp interface */
 jmp_buf jmpbuf;
+#endif
+#endif
 
 static png_uint_32 total_input_length = 0;
 static png_uint_32 total_output_length = 0;
@@ -224,6 +247,7 @@ static int force_output_bit_depth=0;
 static int input_color_type;
 static int input_bit_depth;
 static int trial;
+static int first_trial=0;
 static int verbose=1;
 static int help=0;
 static int things_have_changed=0;
@@ -414,18 +438,17 @@ void png_crush_pause(void)
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr); \
       FCLOSE(fpin); \
       if(verbose > 1) \
-         fprintf(STDERR, "returning after longjump\n"); \
-      exit(1);
+         fprintf(STDERR, "returning after longjump\n");
 
 int keep_chunk(png_const_charp name, char *argv[]);
 
 int keep_chunk(png_const_charp name, char *argv[])
 {
     int i;
-    if(verbose > 2 && trial == 1)
+    if(verbose > 2 && first_trial)
        fprintf(STDERR, "   Read the %s chunk.\n", name);
     if(remove_chunks == 0) return 1;
-    if(verbose > 1 && trial == 1)
+    if(verbose > 1 && first_trial)
        fprintf(STDERR, "     Check for removal of the %s chunk.\n", name);
     for (i=1; i<=remove_chunks; i++)
     {
@@ -462,13 +485,13 @@ int keep_chunk(png_const_charp name, char *argv[])
            (!strncmp(name,"zTXt",4) && (!strncmp(argv[i],"text",4)        )))
          {
            things_have_changed=1;
-           if(verbose > 0 && trial == 1)
+           if(verbose > 0 && first_trial)
               fprintf(STDERR, "   Removed the %s chunk.\n", name);
            return 0;
          }
       }
     }
-    if(verbose > 1 && trial == 1)
+    if(verbose > 1 && first_trial)
        fprintf(STDERR, "   Preserving the %s chunk.\n", name);
     return 1;
 }
@@ -534,10 +557,6 @@ main(int argc, char *argv[])
    png_fixed_point file_gamma=0;
 #endif
    char *cp;
-#if 0
-   FILE *tmpfile (void);
-#endif
-
    int i;
    row_buf = (png_bytep)NULL;
    number_of_open_files=0;
@@ -593,7 +612,7 @@ main(int argc, char *argv[])
            }
         }
      }
-
+#define BUMP_I i++;if(i >= argc) {printf("insufficient parameters\n");exit(1);}
    names=1;
    for (i=1; i<argc; i++)
    {
@@ -647,12 +666,14 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-bit_depth",10))
       {
          names++;
-         force_output_bit_depth=atoi(argv[++i]);
+         BUMP_I;
+         force_output_bit_depth=atoi(argv[i]);
       }
    else if(!strncmp(argv[i],"-c",2))
       {
          names++;
-         force_output_color_type=atoi(argv[++i]);
+         BUMP_I;
+         force_output_color_type=atoi(argv[i]);
       }
 #ifdef PNG_gAMA_SUPPORTED
    else if(!strncmp(argv[i],"-dou",4))
@@ -663,13 +684,13 @@ main(int argc, char *argv[])
 #endif
    else if(!strncmp(argv[i],"-d",2))
       {
-         i++;
+         BUMP_I;
          pngcrush_mode=DIRECTORY_MODE;
          directory_name= argv[names++];
       }
    else if(!strncmp(argv[i],"-e",2))
       {
-         i++;
+         BUMP_I;
          pngcrush_mode=EXTENSION_MODE;
          extension= argv[names++];
       }
@@ -755,7 +776,7 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-g",2))
       {
          names++;
-         i++;
+         BUMP_I;
          if (intent < 0)
             {
                int c;
@@ -790,13 +811,15 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-max",4))
       {
          names++;
-         max_idat_size = atoi(argv[++i]);
+         BUMP_I;
+         max_idat_size = atoi(argv[i]);
          if (max_idat_size > PNG_ZBUF_SIZE) max_idat_size=PNG_ZBUF_SIZE;
       }
    else if(!strncmp(argv[i],"-m",2))
       {
          names++;
-         method=atoi(argv[++i]);
+         BUMP_I;
+         method=atoi(argv[i]);
          methods_specified=1;
          brute_force=0;
          try_method[method]=0;
@@ -810,13 +833,15 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-plte_len",9))
       {
          names++;
-         plte_len=atoi(argv[++i]);
+         BUMP_I;
+         plte_len=atoi(argv[i]);
       }
-   else if(!strncmp(argv[i],"-pplt",9))
+   else if(!strncmp(argv[i],"-pplt",3))
       {
          names++;
          do_pplt++;
-         strcpy(pplt_string,argv[++i]);
+         BUMP_I;
+         strcpy(pplt_string,argv[i]);
          things_have_changed=1;
       }
    else if(!strncmp(argv[i],"-p",2))
@@ -827,7 +852,30 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-rep",4))
       {
          names++;
-         force_specified_gamma=atoi(argv[++i]);
+         BUMP_I;
+         {
+            int c;
+            char number[16];
+            char *n=number;
+            int nzeroes=-1;
+            int length=strlen(argv[i]);
+            for (c=0; c<length; c++)
+               {
+                  if( *(argv[i]+c) == '.')
+                     {
+                        nzeroes=5;
+                     }
+                  else if (nzeroes != 0)
+                     {
+                        *n++=*(argv[i]+c);
+                        nzeroes--;
+                     }
+               }
+            for (c=0; c<nzeroes; c++)
+               *n++='0';
+            *n='\0';
+            force_specified_gamma=atoi(number);
+         }
          things_have_changed=1;
       }
 #endif
@@ -835,14 +883,15 @@ main(int argc, char *argv[])
    else if(!strncmp(argv[i],"-res",4))
       {
          names++;
-         resolution=atoi(argv[++i]);
+         BUMP_I;
+         resolution=atoi(argv[i]);
       }
 #endif
    else if(!strncmp(argv[i],"-r",2))
       {
          remove_chunks=i;
          names++;
-         i++;
+         BUMP_I;
       }
    else if( !strncmp(argv[i],"-save",5))
          all_chunks_are_safe++;
@@ -854,7 +903,7 @@ main(int argc, char *argv[])
          specified_gamma=45455L;
 #endif
          intent=0;
-         i++;
+         BUMP_I;
          if(!strncmp(argv[i],"0",1) ||
             !strncmp(argv[i],"1",1) ||
             !strncmp(argv[i],"2",1) ||
@@ -874,6 +923,7 @@ main(int argc, char *argv[])
             !strncmp(argv[i],"-zitxt",6) || !strncmp(argv[i],"-ziTXt",6) ||
             !strncmp(argv[i],"-itxt",5) || !strncmp(argv[i],"-iTXt",5))
       {
+         i+=2; BUMP_I; i-=3;
          if(strlen(argv[i+2]) < 80 && strlen(argv[i+3]) < 2048 &&
             text_inputs < 10)
          {
@@ -925,7 +975,8 @@ main(int argc, char *argv[])
             names+=3;
             if( !strncmp(argv[i],"-i",2) || !strncmp(argv[i],"-zi",3))
             {
-              i+=2;
+              i++;
+              BUMP_I;
               names+=2;
             }
          }
@@ -1264,13 +1315,13 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "               document) can be named with all lower-case letters,\n");
      fprintf(STDERR,
-       "               so \"-rem bkgd\" is equivalent to \"-rem bKGD\".\n");
+       "               so \"-rem bkgd\" is equivalent to \"-rem bKGD\".  But\n");
+     fprintf(STDERR,
+       "               note: \"-rem text\" removes all forms of text chunks;\n");
      fprintf(STDERR,
        "               Exact case is required to remove unknown chunks.\n");
      fprintf(STDERR,
-       "               \"-rem text\" also removes zTXt.  If you like to do\n");
-     fprintf(STDERR,
-       "               surgery with a chain-saw, \"-rem alla\" removes\n");
+       "               To do surgery with a chain-saw, \"-rem alla\" removes\n");
      fprintf(STDERR,
        "               all known ancillary chunks except for tRNS, and\n");
      fprintf(STDERR,
@@ -1278,7 +1329,7 @@ main(int argc, char *argv[])
      }
       png_crush_pause();
      fprintf(STDERR,
-       "-replace_gamma gamma_value (float) even when file has a gAMA chunk.\n");
+       "-replace_gamma gamma (float or fixed*100000) even if gAMA is present.\n");
      if(verbose > 1)
         fprintf(STDERR,"\n");
      fprintf(STDERR,
@@ -1288,7 +1339,7 @@ main(int argc, char *argv[])
      fprintf(STDERR,
        "\n               Write a pHYs chunk with the given resolution.\n\n");
      }
-/*
+#if 0
      fprintf(STDERR,
        "         -save (keep all copy-unsafe chunks)\n");
      if(verbose > 1)
@@ -1301,7 +1352,7 @@ main(int argc, char *argv[])
        "               all chunks 'known' to %s, so they can be copied.\n\n",
                        progname);
      }
-*/
+#endif
       png_crush_pause();
 
      fprintf(STDERR,
@@ -1400,20 +1451,17 @@ main(int argc, char *argv[])
    for (ia=0; ia<255; ia++)
       trns_array[ia]=255;
 
-   for(;;)
+   for(;;)  /* loop on input files */
 
    {
+      first_trial = 1;
 
       if(png_row_filters != NULL)
       {
          free(png_row_filters); png_row_filters=NULL;
       }
 
-      output_color_type=force_output_color_type;
-      output_bit_depth=force_output_bit_depth;
-
-      if(pngcrush_mode == DIRECTORY_MODE || pngcrush_mode == EXTENSION_MODE)
-          inname=argv[names++];
+      inname=argv[names++];
 
       if(inname == NULL) 
       {
@@ -1453,7 +1501,7 @@ main(int argc, char *argv[])
           struct stat stat_buf;
           if(stat(directory_name, &stat_buf) != 0)
           {
-#if defined(_MBCS) || defined(__WIN32__)
+#if defined(_MBCS) || defined(WIN32) || defined(__WIN32__)
              if(_mkdir(directory_name) != 0)
 #else
              if(mkdir(directory_name, 0x1ed) != 0)
@@ -1480,6 +1528,8 @@ main(int argc, char *argv[])
           outname=out_string;
       }
 
+      output_color_type=force_output_color_type;
+      output_bit_depth=force_output_bit_depth;
 
       if(nosave < 2)
       {
@@ -1488,7 +1538,7 @@ main(int argc, char *argv[])
          if ((fpin = FOPEN(inname, "rb")) == NULL)
          {
             fprintf(STDERR, "Could not find file: %s\n", inname);
-            return 1;
+            continue;
          }
          number_of_open_files++;
 
@@ -1503,13 +1553,7 @@ main(int argc, char *argv[])
             fflush(STDERR);
          }
 
-         if(idat_length[0] == 0) return 1;
-
-#if 0
-         fpin = FOPEN(inname, "rb");
-         number_of_open_files++;
-#endif
-
+         if(idat_length[0] == 0) continue;
       }
       else
          idat_length[0]=1;
@@ -1544,14 +1588,13 @@ main(int argc, char *argv[])
             struct stat stat_in, stat_out;
             /* just copy input to output */
 
-            if(verbose > 2)
-               printf("prepare to copy input to output\n");
+            P2("prepare to copy input to output\n");
             png_crush_pause();
 
             if ((fpin = FOPEN(inname, "rb")) == NULL)
             {
                fprintf(STDERR, "Could not find input file %s\n", inname);
-               return 1;
+               continue;
             }
 
             number_of_open_files++;
@@ -1563,12 +1606,12 @@ main(int argc, char *argv[])
             }
 
             number_of_open_files++;
-            if(verbose > 2)
-               printf("copying input to output...");
+            P2("copying input to output...");
 
             stat(inname, &stat_in);
             stat(outname, &stat_out);
-            if(stat_in.st_ino != stat_out.st_ino)
+            if((stat_in.st_ino != stat_out.st_ino) || 
+               (stat_in.st_size != stat_out.st_size))
             {
                for(;;)
                {
@@ -1581,8 +1624,7 @@ main(int argc, char *argv[])
 
                }
             }
-            if(verbose > 2)
-               printf("copy complete.\n");
+            P2("copy complete.\n");
             png_crush_pause();
             FCLOSE(fpin);
             FCLOSE(fpout);
@@ -1620,19 +1662,18 @@ main(int argc, char *argv[])
           if(zs[trial] == 1)z_strategy=Z_FILTERED;
           if(zs[trial] == 2)z_strategy=Z_HUFFMAN_ONLY;
           final_method=trial;
-          if(verbose > 2 && nosave == 0)
-          printf("   Begin trial %d, filter %d, strategy %d, level %d\n",
+          if(nosave == 0)
+            P2("   Begin trial %d, filter %d, strategy %d, level %d\n",
               trial, filter_method, z_strategy, zlib_level);
       }
 
-      if(verbose > 2)
-         printf("prepare to open files.\n");
+      P2("prepare to open files.\n");
          png_crush_pause();
 
       if ((fpin = FOPEN(inname, "rb")) == NULL)
       {
          fprintf(STDERR, "Could not find input file %s\n", inname);
-         return 1;
+         continue;
       }
       number_of_open_files++;
       if(nosave == 0)
@@ -1641,7 +1682,13 @@ main(int argc, char *argv[])
          stat(inname, &stat_in);
          stat(outname, &stat_out);
          if(stat_in.st_ino == stat_out.st_ino)
+            if((stat_in.st_ino == stat_out.st_ino) && 
+               (stat_in.st_size == stat_out.st_size))
          {
+            /* MSVC++6.0 will erroneously return 0 for both files, so
+               it is possible that we will erroneously reject the attempt
+               when inputsize and outputsize are equal, for different files
+             */
             fprintf(STDERR, "Cannot overwrite input file %s\n", inname);
             FCLOSE(fpin);
             return 1;
@@ -1657,8 +1704,7 @@ main(int argc, char *argv[])
          number_of_open_files++;
         }
 
-      if(verbose > 2)
-         printf("files are opened.\n");
+      P2("files are opened.\n");
             png_crush_pause();
 
       png_debug(0, "Allocating read and write structures\n");
@@ -1701,31 +1747,52 @@ main(int argc, char *argv[])
       write_end_info_ptr = png_create_info_struct(write_ptr);
    }
 
-      if(verbose > 2)
-      printf("structures created.\n");
+      P2("structures created.\n");
             png_crush_pause();
 
       png_debug(0, "Setting jmpbuf for read and write structs\n");
-#if defined(USE_FAR_KEYWORD)
-      if (setjmp(jmpbuf))
-#else
-      if (setjmp(read_ptr->jmpbuf))
-#endif
+#ifndef PNG_SETJMP_NOT_SUPPORTED
+#  ifdef USE_FAR_KEYWORD
+   if (setjmp(jmpbuf))
+#  else
+#    ifdef PNG_JMPBUF_SUPPORTED
+   /* New setjmp interface */
+   if (setjmp(png_jmp_env(read_ptr)))
+#    else
+   /* old interface */
+   if (setjmp(read_ptr->jmpbuf))
+#    endif
+#  endif
       {
           PNG_CRUSH_CLEANUP
+          continue;
       }
 
 #if defined(USE_FAR_KEYWORD)
-      png_memcpy(read_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+      png_memcpy(png_jmp_env(read_ptr),jmpbuf,sizeof(jmp_buf));
 #endif
-
-      if(nosave == 0)
-         png_memcpy(write_ptr->jmpbuf,read_ptr->jmpbuf,sizeof(jmp_buf));
-
-      if(verbose > 2)
-         printf("jmp_buf has been set.\n");
-
+   if(nosave == 0)
+#  ifdef USE_FAR_KEYWORD
+   if (setjmp(jmpbuf))
+#  else
+#    ifdef PNG_JMPBUF_SUPPORTED
+   /* New setjmp interface */
+   if (setjmp(png_jmp_env(write_ptr)))
+#    else
+   /* Old interface */
+   if (setjmp(write_ptr->jmpbuf))
+#    endif
+#  endif
+         {
+             PNG_CRUSH_CLEANUP
+             continue;
+         }
+#if defined(USE_FAR_KEYWORD)
+      png_memcpy(png_jmp_env(write_ptr),jmpbuf,sizeof(jmp_buf));
+#endif
+      P2("jmp_buf has been set.\n");
       png_crush_pause();
+#endif
 
       png_debug(0, "Initializing input and output streams\n");
 #if !defined(PNG_NO_STDIO)
@@ -1743,8 +1810,7 @@ main(int argc, char *argv[])
 #endif
 #endif
 
-      if(verbose > 2)
-         printf("io has been initialized.\n");
+      P2("io has been initialized.\n");
       png_crush_pause();
 
      /* We don't need to check CRC's because they were already checked
@@ -1758,36 +1824,37 @@ main(int argc, char *argv[])
 
       if(read_ptr->zbuf_size < (png_size_t)max_idat_size)
       {
-      if(verbose > 2)
-         printf("reinitializing read zbuf.\n");
+      P2("reinitializing read zbuf.\n");
       png_free(read_ptr, read_ptr->zbuf);
       read_ptr->zbuf_size = (png_size_t)max_idat_size;
       read_ptr->zbuf = 
         (png_bytep)png_malloc(read_ptr, (png_uint_32)read_ptr->zbuf_size);
       }
       if(nosave == 0)
+       {
          if(write_ptr->zbuf_size > (png_size_t)max_idat_size)
          {
-            if (verbose > 2)
-            printf("reinitializing write zbuf.\n");
+            P2("reinitializing write zbuf.\n");
             png_free(write_ptr, write_ptr->zbuf);
             write_ptr->zbuf_size = (png_size_t)max_idat_size;
             write_ptr->zbuf =
               (png_bytep)png_malloc(write_ptr,
                  (png_uint_32)write_ptr->zbuf_size);
          }
-
+       }
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
       png_set_keep_unknown_chunks(read_ptr, HANDLE_CHUNK_ALWAYS,
          (png_bytep)NULL, 0);
 #endif
 #if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
       if(nosave == 0)
+        {
         if(all_chunks_are_safe != 0)
            png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
             (png_bytep)NULL, 0);
         else
         {
+#ifndef PNG_UINT_IHDR
 #ifdef PNG_USE_LOCAL_ARRAYS
 #if !defined(PNG_cHRM_SUPPORTED)
           PNG_cHRM;
@@ -1841,7 +1908,51 @@ main(int argc, char *argv[])
           png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
             (png_bytep)png_tIME, 1);
 #endif
+#else   /* !PNG_UINT_IHDR */
+
+          png_byte chunk_name[5];
+          chunk_name[4]='\0';
+
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_IF_SAFE,
+            NULL, 0);
+#if !defined(PNG_cHRM_SUPPORTED)
+          png_save_uint_32(chunk_name, PNG_UINT_cHRM);
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+            chunk_name, 1);
+#endif
+#if !defined(PNG_hIST_SUPPORTED)
+          png_save_uint_32(chunk_name, PNG_UINT_hIST);
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+            chunk_name, 1);
+#endif
+#if !defined(PNG_iCCP_SUPPORTED)
+          png_save_uint_32(chunk_name, PNG_UINT_iCCP);
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS, 
+            chunk_name, 1);
+#endif
+#if !defined(PNG_sCAL_SUPPORTED)
+          png_save_uint_32(chunk_name, PNG_UINT_sCAL);
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            chunk_name, 1);
+#endif
+#if !defined(PNG_pCAL_SUPPORTED)
+          png_save_uint_32(chunk_name, PNG_UINT_pCAL);
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            chunk_name, 1);
+#endif
+#if !defined(PNG_sPLT_SUPPORTED)
+          png_save_uint_32(chunk_name, PNG_UINT_sPLT);
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            chunk_name, 1);
+#endif
+#if !defined(PNG_tIME_SUPPORTED)
+          png_save_uint_32(chunk_name, PNG_UINT_tIME);
+          png_set_keep_unknown_chunks(write_ptr, HANDLE_CHUNK_ALWAYS,
+            chunk_name, 1);
+#endif
+#endif  /* !PNG_UINT_IHDR */
           }
+        }
 #endif
 
       png_debug(0, "Reading info struct\n");
@@ -1858,7 +1969,7 @@ main(int argc, char *argv[])
             int need_expand = 0;
             input_color_type=color_type;
             input_bit_depth=bit_depth;
-            if(verbose > 1 && trial == 1)
+            if(verbose > 1 && first_trial)
             {
                fprintf(STDERR, "   IHDR chunk data:\n");
                fprintf(STDERR, "      Width=%ld, height=%ld\n", width, height);
@@ -1911,7 +2022,7 @@ main(int argc, char *argv[])
             if((color_type == 4 || color_type == 6) &&
                (output_color_type != 4 && output_color_type != 6))
             {
-                if(verbose > 0 && trial == 1)
+                if(verbose > 0 && first_trial)
                    fprintf(STDERR, "   Stripping existing alpha channel.\n");
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
                 png_set_strip_alpha(read_ptr);
@@ -1921,7 +2032,7 @@ main(int argc, char *argv[])
             if((output_color_type == 4 || output_color_type == 6) &&
                (color_type != 4 && color_type != 6))
             {
-                if(verbose > 0 && trial == 1)
+                if(verbose > 0 && first_trial)
                    fprintf(STDERR, "   Adding an alpha channel.\n");
 #ifdef PNG_READ_FILLER_SUPPORTED
                 png_set_filler(read_ptr, (png_uint_32)65535, PNG_FILLER_AFTER);
@@ -1935,7 +2046,7 @@ main(int argc, char *argv[])
             if((output_color_type == 2 || output_color_type == 6) &&
                color_type == 3)
             {
-                if(verbose > 0 && trial == 1)
+                if(verbose > 0 && first_trial)
                    fprintf(STDERR, "   Expanding indexed color file.\n");
                 need_expand = 1;
             }
@@ -1977,7 +2088,7 @@ main(int argc, char *argv[])
                    force_compression_window)
                  compression_window = default_compression_window;
 
-               if(verbose > 1 && trial == 1 && (compression_window != 15 ||
+               if(verbose > 1 && first_trial && (compression_window != 15 ||
                      force_compression_window))
                   fprintf(STDERR, "   Compression window for output= %d\n",
                      1 << compression_window);
@@ -2039,7 +2150,7 @@ main(int argc, char *argv[])
       {
          if(force_specified_gamma > 0)
          {
-            if(trial == 1)
+            if(first_trial)
             {
                things_have_changed=1;
                if(verbose > 0)
@@ -2055,7 +2166,7 @@ main(int argc, char *argv[])
          {
             if(keep_chunk("gAMA",argv))
             {
-               if(verbose > 1 && trial == 1)
+               if(verbose > 1 && first_trial)
                  fprintf(STDERR, "   gamma=(%d/100000)\n", (int)file_gamma);
                if(double_gamma)
                  file_gamma+=file_gamma;
@@ -2064,7 +2175,7 @@ main(int argc, char *argv[])
          }
          else if(specified_gamma > 0)
          {
-            if(trial == 1)
+            if(first_trial)
             {
                things_have_changed=1;
                if(verbose > 0)
@@ -2092,7 +2203,7 @@ main(int argc, char *argv[])
             if(file_gamma > 45000L && file_gamma < 46000L)
             {
                things_have_changed=1;
-               if(trial == 1)
+               if(first_trial)
                fprintf(STDERR, "   Inserting sRGB chunk with intent=%d\n",intent);
                png_set_sRGB(write_ptr, write_info_ptr, intent);
             }
@@ -2103,7 +2214,7 @@ main(int argc, char *argv[])
             }
             else
             {
-               if(trial == 1)
+               if(first_trial)
                {
                   fprintf(STDERR,
           "   Ignoring sRGB request; gamma=(%lu/100000) is not approx. 0.455\n",
@@ -2139,7 +2250,7 @@ main(int argc, char *argv[])
          {
             if(offset_x == 0 && offset_y == 0)
             {
-               if(verbose > 0 && trial == 1)
+               if(verbose > 0 && first_trial)
                   fprintf(STDERR, "   Deleting useless oFFs 0 0 chunk\n");
             }
             else
@@ -2186,7 +2297,7 @@ main(int argc, char *argv[])
             unit_type=1;
             res_x = res_y = (png_uint_32)((resolution/.0254 + 0.5));
             png_set_pHYs(write_ptr, write_info_ptr, res_x, res_y, unit_type);
-            if(verbose > 0 && trial == 1)
+            if(verbose > 0 && first_trial)
                fprintf(STDERR, "   Added pHYs %lu %lu 1 chunk\n",res_x,res_y);
          }
       }
@@ -2204,7 +2315,7 @@ main(int argc, char *argv[])
            png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
         else if(keep_chunk("PLTE",argv))
            png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
-        if(verbose > 1 && trial == 1)
+        if(verbose > 1 && first_trial)
         {
            int i;
            png_colorp p = palette;
@@ -2308,7 +2419,7 @@ main(int argc, char *argv[])
             for (i=0 ; ia<256; ia++)
                trns_array[ia]=255;
          }
-         if (verbose > 1 && trial == 1)
+         if (verbose > 1 && first_trial)
          {
             int last=-1;
             for (i=0 ; ia<num_palette; ia++)
@@ -2380,7 +2491,7 @@ main(int argc, char *argv[])
 #endif
 #if defined(PNG_sPLT_SUPPORTED)
    {
-      png_spalette_p entries;
+      png_sPLT_tp entries;
       int num_entries;
 
       num_entries = (int)png_get_spalettes(read_ptr, read_info_ptr, &entries);
@@ -2404,7 +2515,7 @@ main(int argc, char *argv[])
             int ntext;
             png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
 
-            if (verbose > 1 && trial == 1 && num_text > 0)
+            if (verbose > 1 && first_trial && num_text > 0)
             {
                for (ntext = 0; ntext < num_text; ntext++)
                {
@@ -2426,7 +2537,43 @@ main(int argc, char *argv[])
             if(num_text > 0)
             {
                if(keep_chunk("text",argv))
-                  png_set_text(write_ptr, write_info_ptr, text_ptr, num_text);
+                 {
+                   int num_to_write=num_text;
+                   for (ntext = 0; ntext < num_text; ntext++)
+                   {
+                     if (first_trial)
+                       P2("Text chunk before IDAT, compression=%d\n",
+                         text_ptr[ntext].compression);
+                     if(text_ptr[ntext].compression==PNG_TEXT_COMPRESSION_NONE)
+                       {
+                         if(!keep_chunk("tEXt",argv))
+                           {
+                             text_ptr[ntext].key[0]='\0';
+                             num_to_write--;
+                           }
+                       }
+                     if(text_ptr[ntext].compression==PNG_TEXT_COMPRESSION_zTXt)
+                       {
+                         if(!keep_chunk("zTXt",argv))
+                           {
+                             text_ptr[ntext].key[0]='\0';
+                             num_to_write--;
+                           }
+                       }
+                     if(text_ptr[ntext].compression==PNG_ITXT_COMPRESSION_NONE
+                       ||text_ptr[ntext].compression==PNG_ITXT_COMPRESSION_zTXt)
+                       {
+                         if(!keep_chunk("iTXt",argv))
+                           {
+                             text_ptr[ntext].key[0]='\0';
+                             num_to_write--;
+                           }
+                       }
+                   }
+                   if (num_to_write > 0)
+                      png_set_text(write_ptr, write_info_ptr, text_ptr,
+                         num_text);
+                 }
             }
             for (ntext=0; ntext<text_inputs; ntext++)
               {
@@ -2441,7 +2588,6 @@ main(int argc, char *argv[])
                     added_text[0].text = &text_text[ntext*2048];
                     added_text[0].compression = text_compression[ntext];
                     png_set_text(write_ptr, write_info_ptr, added_text, 1);
-                    png_free(write_ptr,added_text);
                     if(added_text[0].compression < 0)
                        printf("   Added a tEXt chunk.\n");
                     else if(added_text[0].compression == 0)
@@ -2450,6 +2596,7 @@ main(int argc, char *argv[])
                        printf("   Added an uncompressed iTXt chunk.\n");
                     else
                        printf("   Added a compressed iTXt chunk.\n");
+                    png_free(write_ptr,added_text);
                   }
               }
          }
@@ -2499,15 +2646,13 @@ main(int argc, char *argv[])
       }
 #endif
 
-      if(verbose > 2)
-      printf("writing info structure.\n");
+      P2("writing info structure.\n");
       png_crush_pause();
       png_debug(0, "\nWriting info struct\n");
       png_write_info(write_ptr, write_info_ptr);
       png_debug(0, "\nWrote info struct\n");
 
-      if(verbose > 2)
-      printf("wrote info structure.\n");
+      P2("wrote info structure.\n");
       png_crush_pause();
 
 #ifdef PNG_WRITE_PACK_SUPPORTED
@@ -2577,7 +2722,7 @@ main(int argc, char *argv[])
        */
       }
 
-      if(verbose > 2) printf("allocated rowbuf.\n");
+      P2("allocated rowbuf.\n");
       png_crush_pause();
 
       num_pass = png_set_interlace_handling(read_ptr);
@@ -2620,16 +2765,25 @@ main(int argc, char *argv[])
           (output_color_type == 0 || output_color_type == 4))
       {
           png_byte rgb_error = png_get_rgb_to_gray_status(read_ptr);
-          if((trial == 1) && rgb_error)
+          if((first_trial) && rgb_error)
             printf("   **** Converted non-gray image to gray. **** \n");
       }
 #endif
 
-#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_FREE_UNKN 
+#  if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+   png_free_data(read_ptr, read_info_ptr, PNG_FREE_UNKN, -1);
+#  endif
+#  if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+   png_free_data(write_ptr, write_info_ptr, PNG_FREE_UNKN, -1);
+#  endif
+#else
+#  if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_free_unknown_chunks(read_ptr, read_info_ptr, -1);
-#endif
-#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+#  endif
+#  if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
    png_free_unknown_chunks(write_ptr, write_info_ptr, -1);
+#  endif
 #endif
 
       png_debug(0, "Reading and writing end_info data\n");
@@ -2647,7 +2801,7 @@ main(int argc, char *argv[])
             int ntext;
             png_debug1(0, "Handling %d tEXt/zTXt chunks\n", num_text);
 
-            if (verbose > 1 && trial == 1 && num_text > 0)
+            if (verbose > 1 && first_trial && num_text > 0)
             {
                for (ntext = 0; ntext < num_text; ntext++)
                {
@@ -2669,8 +2823,43 @@ main(int argc, char *argv[])
             if(num_text > 0)
             {
                if(keep_chunk("text",argv))
-                  png_set_text(write_ptr, write_end_info_ptr, text_ptr,
-                      num_text);
+                 {
+                   int num_to_write=num_text;
+                   for (ntext = 0; ntext < num_text; ntext++)
+                   {
+                     if (first_trial)
+                       P2("Text chunk after IDAT, compression=%d\n",
+                          text_ptr[ntext].compression);
+                     if(text_ptr[ntext].compression==PNG_TEXT_COMPRESSION_NONE)
+                       {
+                         if(!keep_chunk("tEXt",argv))
+                           {
+                             text_ptr[ntext].key[0]='\0';
+                             num_to_write--;
+                           }
+                       }
+                     if(text_ptr[ntext].compression==PNG_TEXT_COMPRESSION_zTXt)
+                       {
+                         if(!keep_chunk("zTXt",argv))
+                           {
+                             text_ptr[ntext].key[0]='\0';
+                             num_to_write--;
+                           }
+                       }
+                     if(text_ptr[ntext].compression==PNG_ITXT_COMPRESSION_NONE
+                       ||text_ptr[ntext].compression==PNG_ITXT_COMPRESSION_zTXt)
+                       {
+                         if(!keep_chunk("iTXt",argv))
+                           {
+                             text_ptr[ntext].key[0]='\0';
+                             num_to_write--;
+                           }
+                       }
+                   }
+                   if (num_to_write > 0)
+                      png_set_text(write_ptr, write_end_info_ptr, text_ptr,
+                          num_text);
+                 }
             }
             for (ntext=0; ntext<text_inputs; ntext++)
               {
@@ -2678,23 +2867,22 @@ main(int argc, char *argv[])
                   {
                     png_textp added_text;
                     added_text = (png_textp)
-                      png_malloc(write_ptr, (png_uint_32)sizeof(png_text));
+                       png_malloc(write_ptr, (png_uint_32)sizeof(png_text));
                     added_text[0].key = &text_keyword[ntext*80];
                     added_text[0].lang = &text_lang[ntext*80];
                     added_text[0].lang_key = &text_lang_key[ntext*80];
                     added_text[0].text = &text_text[ntext*2048];
                     added_text[0].compression = text_compression[ntext];
                     png_set_text(write_ptr, write_end_info_ptr, added_text, 1);
-                    png_free(write_ptr,added_text);
                     if(added_text[0].compression < 0)
-                       printf("   Added a tEXt chunk after IDAT.\n");
+                       printf("   Added a tEXt chunk.\n");
                     else if(added_text[0].compression == 0)
-                       printf("   Added a zTXt chunk after IDAT.\n");
+                       printf("   Added a zTXt chunk.\n");
                     else if(added_text[0].compression == 1)
-                       printf(
-                       "   Added an uncompressed iTXt chunk after IDAT.\n");
+                       printf("   Added an uncompressed iTXt chunk.\n");
                     else
-                       printf("   Added a compressed iTXt chunk after IDAT.\n");
+                       printf("   Added a compressed iTXt chunk.\n");
+                    png_free(write_ptr,added_text);
                   }
               }
          }
@@ -2780,6 +2968,7 @@ main(int argc, char *argv[])
          fflush(STDERR);
          }
 
+         first_trial=0;
       } /* end of trial-loop */
 
       if (fpin)
@@ -2830,15 +3019,14 @@ main(int argc, char *argv[])
          if(verbose > 0) show_result();
          return 0;
       }
-   }
+   }  /* end of loop on input files */
 }
 
 png_uint_32
 measure_idats(FILE *fpin)
 {
    png_uint_32 measured_idat_length;
-   if(verbose > 2)
-     printf("measure_idats:\n");
+   P2("measure_idats:\n");
    png_debug(0, "Allocating read structure\n");
    read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL,
       (png_error_ptr)NULL, (png_error_ptr)NULL);
@@ -2849,19 +3037,28 @@ measure_idats(FILE *fpin)
    read_info_ptr = png_create_info_struct(read_ptr);
    end_info_ptr = png_create_info_struct(read_ptr);
    png_debug(0, "Setting jmpbuf for read struct\n");
-#if defined(USE_FAR_KEYWORD)
+
+#ifndef PNG_SETJMP_NOT_SUPPORTED
+#  ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
-#else
+#  else
+#    ifdef PNG_JMPBUF_SUPPORTED
+   /* New setjmp interface */
+   if (setjmp(png_jmp_env(read_ptr)))
+#    else
+   /* old interface */
    if (setjmp(read_ptr->jmpbuf))
-#endif
-   {
-      PNG_CRUSH_CLEANUP
-      if(verbose > 2)
-         fprintf(STDERR, "returning from measure_idats after longjump\n");
-      return 0;
-   }
-#if defined(USE_FAR_KEYWORD)
-      png_memcpy(read_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+#    endif
+#  endif
+      {
+          PNG_CRUSH_CLEANUP
+          P2("returning from measure_idats after longjump\n");
+          return 0;
+      }
+
+#  if defined(USE_FAR_KEYWORD)
+   png_memcpy(png_jmp_env(read_ptr),jmpbuf,sizeof(jmp_buf));
+#  endif
 #endif
 
 #if !defined(PNG_NO_STDIO)
@@ -2873,8 +3070,7 @@ measure_idats(FILE *fpin)
    measured_idat_length=0;
    read_ptr->sig_bytes=0;
    measured_idat_length=png_measure_idat(read_ptr, read_info_ptr);
-   if(verbose > 2)
-      printf("measure_idats: IDAT length=%lu\n",measured_idat_length);
+   P2("measure_idats: IDAT length=%lu\n",measured_idat_length);
    png_debug(0, "Destroying data structs\n");
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
    return measured_idat_length;
@@ -2908,12 +3104,14 @@ png_measure_idat(png_structp png_ptr, png_infop info_ptr)
 
    for(;;)
    {
+#ifndef PNG_UINT_IDAT
 #ifdef PNG_USE_LOCAL_ARRAYS
       PNG_IDAT;
       PNG_IEND;
 #endif
-      png_byte chunk_length[4];
+#endif
       png_byte chunk_name[5];
+      png_byte chunk_length[4];
       png_uint_32 length;
 
       png_read_data(png_ptr, chunk_length, 4);
@@ -2922,7 +3120,12 @@ png_measure_idat(png_structp png_ptr, png_infop info_ptr)
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, chunk_name, 4);
 
+
+#ifdef PNG_UINT_IDAT
+      if (png_get_uint_32(chunk_name) == PNG_UINT_IDAT)
+#else
       if (!png_memcmp(chunk_name, png_IDAT, 4))
+#endif
          sum_idat_length += length;
 
       if(verbose > 1)
@@ -2932,7 +3135,11 @@ png_measure_idat(png_structp png_ptr, png_infop info_ptr)
       }
       png_crc_finish(png_ptr, length);
 
+#ifdef PNG_UINT_IEND
+      if (png_get_uint_32(chunk_name) == PNG_UINT_IEND)
+#else
       if (!png_memcmp(chunk_name, png_IEND, 4))
+#endif
          return sum_idat_length;
    }
 }

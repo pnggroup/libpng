@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.0.5m - January 7, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -34,9 +34,13 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif /* PNG_USER_MEM_SUPPORTED */
 
    png_structp png_ptr;
+
+#ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;
 #endif
+#endif
+
    png_debug(1, "in png_create_read_struct\n");
 #ifdef PNG_USER_MEM_SUPPORTED
    if ((png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
@@ -47,6 +51,8 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    {
       return (png_structp)NULL;
    }
+
+#ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
 #else
@@ -59,6 +65,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    }
 #ifdef USE_FAR_KEYWORD
    png_memcpy(png_ptr->jmpbuf,jmpbuf,sizeof(jmp_buf));
+#endif
 #endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -110,17 +117,24 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 void
 png_read_init(png_structp png_ptr)
 {
+#ifdef PNG_SETJMP_SUPPORTED
    jmp_buf tmp_jmp;  /* to save current jump buffer */
+#endif
 
    png_debug(1, "in png_read_init\n");
+
+#ifdef PNG_SETJMP_SUPPORTED
    /* save jump buffer and error functions */
    png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
+#endif
 
    /* reset all variables to 0 */
    png_memset(png_ptr, 0, sizeof (png_struct));
 
+#ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
+#endif
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
@@ -627,7 +641,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5m.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5s.
  */
 
 void
@@ -676,7 +690,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5m.
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.0.5s.
  */
 void
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -802,10 +816,10 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       else if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name))
       {
          if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
-	 {
+         {
             if (length > 0 || png_ptr->mode & PNG_AFTER_IDAT)
                png_error(png_ptr, "Too many IDAT's found");
-	 }
+         }
          else
             png_ptr->mode |= PNG_AFTER_IDAT;
          png_handle_unknown(png_ptr, info_ptr, length);
@@ -929,7 +943,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    if (info_ptr != NULL)
    {
 #if defined(PNG_TEXT_SUPPORTED)
-      png_free(png_ptr, info_ptr->text);
+      png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, -1);
 #endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -943,7 +957,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    if (end_info_ptr != NULL)
    {
 #if defined(PNG_READ_TEXT_SUPPORTED)
-      png_free(png_ptr, end_info_ptr->text);
+      png_free_data(png_ptr, end_info_ptr, PNG_FREE_TEXT, -1);
 #endif
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)end_info_ptr, free_fn);
@@ -968,7 +982,9 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 void
 png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr)
 {
+#ifdef PNG_SETJMP_SUPPORTED
    jmp_buf tmp_jmp;
+#endif
    png_error_ptr error_fn;
    png_error_ptr warning_fn;
    png_voidp error_ptr;
@@ -998,16 +1014,19 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_from_1);
    png_free(png_ptr, png_ptr->gamma_to_1);
 #endif
-   if (png_ptr->flags & PNG_FLAG_FREE_PALETTE)
+   if (png_ptr->free_me & PNG_FREE_PLTE)
       png_zfree(png_ptr, png_ptr->palette);
+   png_ptr->free_me &= ~PNG_FREE_PLTE;
 #if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if (png_ptr->flags & PNG_FLAG_FREE_TRANS)
+   if (png_ptr->free_me & PNG_FREE_TRNS)
       png_free(png_ptr, png_ptr->trans);
+   png_ptr->free_me &= ~PNG_FREE_TRNS;
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)
-   if (png_ptr->flags & PNG_FLAG_FREE_HIST)
+   if (png_ptr->free_me & PNG_FREE_HIST)
       png_free(png_ptr, png_ptr->hist);
+   png_ptr->free_me &= ~PNG_FREE_HIST;
 #endif
 #if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->gamma_16_table != NULL)
@@ -1055,7 +1074,9 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    /* Save the important info out of the png_struct, in case it is
     * being used again.
     */
+#ifdef PNG_SETJMP_SUPPORTED
    png_memcpy(tmp_jmp, png_ptr->jmpbuf, sizeof (jmp_buf));
+#endif
 
    error_fn = png_ptr->error_fn;
    warning_fn = png_ptr->warning_fn;
@@ -1073,7 +1094,10 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_ptr->free_fn = free_fn;
 #endif
 
+#ifdef PNG_SETJMP_SUPPORTED
    png_memcpy(png_ptr->jmpbuf, tmp_jmp, sizeof (jmp_buf));
+#endif
+
 }
 
 void
@@ -1084,8 +1108,8 @@ png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
 
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
 void png_read_png(png_structp png_ptr, png_infop info_ptr,
-			   int transforms,
-			   voidp params)
+                           int transforms,
+                           voidp params)
 {
    int row;
 
@@ -1119,7 +1143,7 @@ void png_read_png(png_structp png_ptr, png_infop info_ptr,
        png_set_strip_alpha(png_ptr);
 #endif
 
-#if defined(PNG_READ_PACK_SUPPORTED)
+#if defined(PNG_READ_PACK_SUPPORTED) && !defined(PNG_READ_EXPAND_SUPPORTED)
    /* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
     * byte into separate bytes (useful for paletted and grayscale images).
     */
@@ -1141,8 +1165,10 @@ void png_read_png(png_structp png_ptr, png_infop info_ptr,
     * channels so the data will be available as RGBA quartets.
     */
    if (transforms & PNG_TRANSFORM_EXPAND)
-       if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
-	   png_set_expand(png_ptr);
+       if ((png_ptr->bit_depth < 8) ||
+           (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ||
+           (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)))
+         png_set_expand(png_ptr);
 #endif
 
    /* We don't handle background color or gamma transformation or dithering. */
@@ -1196,11 +1222,15 @@ void png_read_png(png_structp png_ptr, png_infop info_ptr,
 
    /* -------------- image transformations end here ------------------- */
 
-   info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
-					 info_ptr->height * sizeof(png_bytep));
+   if(info_ptr->row_pointers == NULL)
+   {
+      info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
+                                         info_ptr->height * sizeof(png_bytep));
+      info_ptr->free_me |= PNG_FREE_ROWS;
+   }
    for (row = 0; row < (int)info_ptr->height; row++)
-       info_ptr->row_pointers[row] = png_malloc(png_ptr, 
-				      png_get_rowbytes(png_ptr, info_ptr));
+       info_ptr->row_pointers[row] = png_malloc(png_ptr,
+                                      png_get_rowbytes(png_ptr, info_ptr));
 
    png_read_image(png_ptr, info_ptr->row_pointers);
    info_ptr->valid |= PNG_INFO_IDAT;

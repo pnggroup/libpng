@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng 1.0.5m - January 7, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -1194,7 +1194,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
       png_free(png_ptr, new_key);
       return;
    }
-   
+
    text_len = png_strlen(text);
 
    png_free(png_ptr, new_key);

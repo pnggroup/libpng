@@ -30,13 +30,14 @@ This is the copyright notice, disclaimer, and license:
 This is the output of "pngcrush" and "pngcrush -help":
 
 
- | pngcrush 1.3.4, Copyright (C) 1998, 1999, 2000, Glenn Randers-Pehrson
+
+ | pngcrush 1.3.5, Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson
  | This is a free, open-source program.  Permission is
  | granted to everyone to use pngcrush without fee.
- | This program was built with libpng version 1.0.5m,
+ | This program was built with libpng version 1.1.0a,
  |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,
  |    Copyright (C) 1996, 1997 Andreas Dilger,
- |    Copyright (C) 1998, 1999, Glenn Randers-Pehrson,
+ |    Copyright (C) 1998, 1999, 2000 Glenn Randers-Pehrson,
  | and zlib version 1.1.3, Copyright (c) 1998,
  |    Jean-loup Gailly and Mark Adler.
 
@@ -44,7 +45,6 @@ This is the output of "pngcrush" and "pngcrush -help":
 usage: pngcrush [options] infile.png outfile.png
        pngcrush -e ext [other options] files.png ...
        pngcrush -d dir [other options] files.png ...
-
 options:
         -brute (Use brute-force, try 114 different methods [11-124])
             -c color_type of output file [0, 2, 4, or 6]
@@ -72,6 +72,11 @@ options:
             -w compression_window_size [32, 16, 8, 4, 2, 1, 512]
             -h (help)
             -p (pause)
+
+
+usage: pngcrush [options] infile.png outfile.png
+       pngcrush -e ext [other options] files.png ...
+       pngcrush -d dir [other options] files.png ...
 
 options:
         -brute (Use brute-force, try 114 different methods [11-124])

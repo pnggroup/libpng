@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.0.5m - January 7, 2000
+ * libpng 1.0.5s - February 18, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
@@ -113,29 +113,35 @@
 #include <sys/types.h>
 #endif
 
+#ifndef PNG_SETJMP_NOT_SUPPORTED
+#  define PNG_SETJMP_SUPPORTED
+#endif
+
+#ifdef PNG_SETJMP_SUPPORTED
 /* This is an attempt to force a single setjmp behaviour on Linux.  If
  * the X config stuff didn't define _BSD_SOURCE we wouldn't need this.
  */
-#ifdef __linux__
-#ifdef _BSD_SOURCE
-#define _PNG_SAVE_BSD_SOURCE
-#undef _BSD_SOURCE
-#endif
-#ifdef _SETJMP_H
-__png.h__ already includes setjmp.h
-__dont__ include it again
-#endif
+#  ifdef __linux__
+#    ifdef _BSD_SOURCE
+#      define _PNG_SAVE_BSD_SOURCE
+#      undef _BSD_SOURCE
+#    endif
+#    ifdef _SETJMP_H
+      __png.h__ already includes setjmp.h
+      __dont__ include it again
+#    endif
 #endif /* __linux__ */
 
 /* include setjmp.h for error handling */
 #include <setjmp.h>
 
-#ifdef __linux__
-#ifdef _PNG_SAVE_BSD_SOURCE
-#define _BSD_SOURCE
-#undef _PNG_SAVE_BSD_SOURCE
-#endif
-#endif /* __linux__ */
+#  ifdef __linux__
+#    ifdef _PNG_SAVE_BSD_SOURCE
+#      define _BSD_SOURCE
+#      undef _PNG_SAVE_BSD_SOURCE
+#    endif
+#  endif /* __linux__ */
+#endif /* PNG_SETJMP_SUPPORTED */
 
 #ifdef BSD
 #include <strings.h>
@@ -419,7 +425,8 @@ __dont__ include it again
 #define PNG_EASY_ACCESS_SUPPORTED
 #endif
 
-#ifndef PNG_NO_ASSEMBLER_CODE
+#if defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD) && \
+  !defined(PNG_NO_ASSEMBLER_CODE)
 #define PNG_ASSEMBLER_CODE_SUPPORTED
 #endif
 
@@ -706,8 +713,8 @@ __dont__ include it again
 #endif
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
 
-/* Turn this off to disable png_read_png() and 
- * png_write_png() and leave the image_bits member
+/* Turn this off to disable png_read_png() and
+ * png_write_png() and leave the row_pointers member
  * out of the info structure.
  */
 #ifndef PNG_NO_INFO_IMAGE
@@ -843,8 +850,13 @@ typedef z_stream FAR *  png_zstreamp;
 
 
 #ifndef PNG_EXPORT
-   /* allow for compilation as dll under MS Windows */
-#  ifdef __WIN32DLL__
+   /* GRR 20000206:  based on zconf.h and MSVC 5.0 docs */
+#  if defined(_MSC_VER) && defined(_DLL)
+#    define PNG_EXPORT(type,symbol)        type __declspec(dllexport) symbol
+#  endif
+
+   /* allow for compilation as a DLL under MS Windows */
+#  ifdef __WIN32DLL__	/* Borland? */
 #    define PNG_EXPORT(type,symbol) __declspec(dllexport) type symbol
 #  endif
 
@@ -853,7 +865,7 @@ typedef z_stream FAR *  png_zstreamp;
 #    define PNG_EXPORT(type,symbol) type __attribute__((dllexport)) symbol
 #  endif
 
-   /* allow for compilation as dll with Borland C++ 5.0 */
+   /* allow for compilation as a DLL with Borland C++ 5.0 */
 #  if defined(__BORLANDC__) && defined(_Windows) && defined(__DLL__)
 #    define PNG_EXPORT(type,symbol) type _export symbol
 #  endif
@@ -873,6 +885,9 @@ typedef z_stream FAR *  png_zstreamp;
 #endif
 
 #ifndef PNG_EXPORT_VAR
+#  if defined(_MSC_VER) && defined(_DLL)	/* GRR 20000206 */
+#    define PNG_EXPORT_VAR(type) extern type __declspec(dllexport)
+#  endif
 #  ifdef PNG_DECL_DLLEXP
 #    define PNG_EXPORT_VAR(type) extern __declspec(dllexport) type
 #  endif
@@ -894,6 +909,14 @@ typedef z_stream FAR *  png_zstreamp;
 /* User may want to use these so not in PNG_INTERNAL. Any library functions
  * that are passed far data must be model independent.
  */
+
+#ifndef PNG_ABORT
+#   define PNG_ABORT() abort()
+#endif
+
+#ifdef PNG_SETJMP_SUPPORTED
+#   define png_jmp_env(png_ptr) png_ptr->jmpbuf   
+#endif
 
 #if defined(USE_FAR_KEYWORD)  /* memory model independent fns */
 /* use this to make far-to-near assignments */
