@@ -797,6 +797,7 @@ version 1.0.7rc2 [June 28, 2000]
   Fixed "DJBPP" typo in pnggccrd.c introduced in beta18.
 version 1.0.7 [July 1, 2000]
   Revised the definition of "trans_values" in libpng.3/libpng.txt
+version 1.0.8beta2 [July 10, 2000]
 version 1.0.8beta1 [July 8, 2000]
   Added png_free(png_ptr, key) two places in pngpread.c to stop memory leaks.
   Changed PNG_NO_STDIO to PNG_NO_CONSOLE_IO, several places in pngrutil.c and
@@ -805,6 +806,9 @@ version 1.0.8beta1 [July 8, 2000]
   Removed unused "#include <assert.h>" from png.c
   Added WindowsCE support.
   Revised pnggccrd.c to work with gcc-2.95.2 and in the Cygwin environment.
+version 1.0.8beta2 [July 10, 2000]
+  Added project files to the wince directory and made further revisions
+     of pngtest.c, pngrio.c, and pngwio.c in support of WindowsCE.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

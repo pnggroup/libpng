@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.8beta1 - July 8, 2000
+ * libpng version 1.0.8beta2 - July 10, 2000
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.8beta1 - July 8, 2000: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.8beta2 - July 10, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -55,6 +55,7 @@
  *    1.0.7beta11-18                10007  2.1.0.7beta11-18 (binary compatible)
  *    1.0.7rc1-2                    10007  2.1.0.7rc1-2 (binary compatible)
  *    1.0.7                         10007  (still compatible)
+ *    1.0.7beta1-2                  10008  2.1.0.8beta1-2
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -81,7 +82,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng version 1.0.8beta1, July 8, 2000, is
+ * libpng version 1.0.8beta2, July 10, 2000, is
  * Copyright (c) 2000 Glenn Randers-Pehrson
  * Distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors
@@ -186,13 +187,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 8, 2000
+ *    July 10, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.8beta1 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.8beta2 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -248,7 +249,7 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.8beta1"
+#define PNG_LIBPNG_VER_STRING "1.0.8beta2"
 
 #define PNG_LIBPNG_VER_SONUM   2
 
@@ -258,7 +259,7 @@
 #define PNG_LIBPNG_VER_RELEASE 8
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
-#define PNG_LIBPNG_VER_BUILD   1
+#define PNG_LIBPNG_VER_BUILD   2
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -1147,9 +1148,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.8beta1
+and png.h are both at * version 1.0.8beta2
  */
-typedef png_structp version_1_0_8beta1;
+typedef png_structp version_1_0_8beta2;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1593,7 +1594,7 @@ extern PNG_EXPORT(void,png_set_compression_method) PNGARG((png_structp png_ptr,
 
 #if !defined(PNG_NO_STDIO)
 /* Initialize the input/output for the PNG file to the default functions. */
-extern PNG_EXPORT(void,png_init_io) PNGARG((png_structp png_ptr, FILE *fp));
+extern PNG_EXPORT(void,png_init_io) PNGARG((png_structp png_ptr, png_FILE_p fp));
 #endif
 
 /* Replace the (error and abort), and warning functions with user
@@ -2171,7 +2172,7 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.8beta1 - July 8, 2000 (header)\n"
+   " libpng version 1.0.8beta2 - July 10, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on

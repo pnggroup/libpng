@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.8beta1 - July 8, 2000
+ * libpng 1.0.8beta2 - July 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -34,9 +34,9 @@
 #  include <windows.h>
 #  include <stdlib.h>
 #  define READFILE(file, data, length, check) \
-     ReadFile(file, data, length, &check,NULL)
-#  define WRITEFILE(file, data, length, check) \
-     WriteFile(file, data, length, &check, NULL);
+     if (ReadFile(file, data, length, &check,NULL)) check = 0
+#  define WRITEFILE(file, data, length, check)) \
+     if (WriteFile(file, data, length, &check, NULL)) check = 0
 #  define FCLOSE(file) CloseHandle(file)
 #else
 #  include <stdio.h>
@@ -45,7 +45,7 @@
 #  define READFILE(file, data, length, check) \
      check=(png_size_t)fread(data,(png_size_t)1,length,file)
 #  define WRITEFILE(file, data, length, check) \
-     check = (png_size_t)fwrite(data, (png_size_t)1, length, file);
+     check=(png_size_t)fwrite(data,(png_size_t)1, length, file)
 #  define FCLOSE(file) fclose(file)
 #endif
 
@@ -1412,4 +1412,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_8beta1 your_png_h_is_not_version_1_0_8beta1;
+typedef version_1_0_8beta2 your_png_h_is_not_version_1_0_8beta2;

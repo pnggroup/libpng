@@ -1,5 +1,5 @@
 Microsoft Developer Studio Build File, Format Version 6.00 for
-libpng 1.0.8beta1 (July 8, 2000) and zlib
+libpng 1.0.8beta2 (July 10, 2000) and zlib
 
 Copyright (C) 2000 Simon-Pierre Cadieux
 For conditions of distribution and use, see copyright notice in png.h

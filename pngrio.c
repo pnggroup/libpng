@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * libpng 1.0.8beta1 - July 8, 2000
+ * libpng 1.0.8beta2 - July 10, 2000
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -47,13 +47,16 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    /* fread() returns 0 on error, so it is OK to store this in a png_size_t
     * instead of an int, which is what fread() actually returns.
     */
+#if defined(_WIN32_WCE)
+   if ( !ReadFile((HANDLE)(png_ptr->io_ptr), data, length, &check, NULL) )
+      check = 0;
+#else
    check = (png_size_t)fread(data, (png_size_t)1, length,
       (png_FILE_p)png_ptr->io_ptr);
+#endif
 
    if (check != length)
-   {
       png_error(png_ptr, "Read Error");
-   }
 }
 #else
 /* this is the model-independent version. Since the standard I/O library
@@ -76,7 +79,12 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)n_data == data)
    {
+#if defined(_WIN32_WCE)
+      if ( !ReadFile((HANDLE)(png_ptr->io_ptr), data, length, &check, NULL) )
+         check = 0;
+#else
       check = fread(n_data, 1, length, io_ptr);
+#endif
    }
    else
    {
@@ -87,7 +95,12 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       do
       {
          read = MIN(NEAR_BUF_SIZE, remaining);
+#if defined(_WIN32_WCE)
+         if ( !ReadFile((HANDLE)(io_ptr), buf, read, &err, NULL) )
+            err = 0;
+#else
          err = fread(buf, (png_size_t)1, read, io_ptr);
+#endif
          png_memcpy(data, buf, read); /* copy far buffer to near buffer */
          if(err != read)
             break;
@@ -99,9 +112,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       while (remaining != 0);
    }
    if ((png_uint_32)check != (png_uint_32)length)
-   {
       png_error(png_ptr, "read Error");
-   }
 }
 #endif
 #endif
