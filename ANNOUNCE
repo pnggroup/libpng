@@ -1,12 +1,12 @@
 
-Libpng 1.0.6a - April 2, 2000
+Libpng 1.0.6d - April 7, 2000
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
 
 Changes since the last public release (1.0.6):
 
-version 1.0.6a [April 2, 2000]
+version 1.0.6d [April 7, 2000]
   Changed sprintf() to strcpy() in png_write_sCAL_s() to work without STDIO
   Added data_length parameter to png_decompress_chunk() function
   Revised documentation to remove reference to abandoned png_free_chnk functions

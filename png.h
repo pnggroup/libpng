@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.6a - April 2, 2000
+ * libpng version 1.0.6d - April 7, 2000
  * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  * Copyright (c) 1996, 1997 Andreas Dilger
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.6a - April 2, 2000: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.6d - April 7, 2000: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -42,22 +42,21 @@
  *    1.0.3a-d                 1.0.3a-d 10004  2.1.0.3a-d
  *    1.0.4                    1.0.4    10004  2.1.0.4
  *    1.0.4a-f                 1.0.4a-f 10005  2.1.0.4a-f
- *    1.0.5                    1.0.5    10005  2.1.0.5
+ *    1.0.5 (+ 2 patches)      1.0.5    10005  2.1.0.5
  *    1.0.5a-d                 1.0.5a-d 10006  2.1.0.5a-d
  *    1.0.5e-r                 1.0.5e-r 10100  2.1.0.5e-r (not compatible)
  *    1.0.5s-v                 1.0.5s-v 10006  2.1.0.5s-v (compatible)
- *    1.0.6                    1.0.6    10006  2.1.0.6
- *    1.0.6a                   1.0.6a   10007  2.1.0.6a
- *    1.3.0                    1.3.0    10300  3.1.3.0
+ *    1.0.6 (+ 3 patches)      1.0.6    10006  2.1.0.6
+ *    1.0.6d                   1.0.6d   10007  2.1.0.6d
+ *    1.0.7                    1.0.7    10007  2.1.0.7    (still compatible)
  *
  *    Henceforth the source version will match the shared-library minor
  *    and patch numbers; the shared-library major version number will be
  *    used for changes in backward compatibility, as it is intended.  The
  *    PNG_PNGLIB_VER macro, which is not used within libpng but is available
  *    for applications, is an unsigned integer of the form xyyzz corresponding
- *    to the source version x.y.z (leading zeros in y and z).  Internal
- *    png-group beta versions (x.y.z[a-z]) will be given the next higher
- *    number.
+ *    to the source version x.y.z (leading zeros in y and z).  Beta versions
+ *    are given the previous public release number plus a letter or two.
  *
  * See libpng.txt or libpng.3 for more information.  The PNG specification
  * is available as RFC 2083 <ftp://ftp.uu.net/graphics/png/documents/>
@@ -74,7 +73,7 @@
  * Copyright (c) 1996, 1997 Andreas Dilger
  * (libpng versions 0.89c, June 1996, through 0.96, May 1997)
  * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson
- * (libpng versions 0.97, January 1998, through 1.0.6a, April 2, 2000)
+ * (libpng versions 0.97, January 1998, through 1.0.6d, April 7, 2000)
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -149,13 +148,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    April 2, 2000
+ *    April 7, 2000
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.6a are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.6d are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -233,7 +232,7 @@ extern "C" {
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.6a"
+#define PNG_LIBPNG_VER_STRING "1.0.6d"
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -1058,9 +1057,9 @@ struct png_struct_def
 };
 
 /* This prevents a compiler error in png_get_copyright() in png.c if png.c
-and png.h are both at * version 1.0.6a
+and png.h are both at * version 1.0.6d
  */
-typedef png_structp version_1_0_6a;
+typedef png_structp version_1_0_6d;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -2025,7 +2024,7 @@ extern PNG_EXPORT(void, png_write_png) PNGARG((png_structp png_ptr,
 #define png_debug2(l, m, p1, p2)
 #endif
 
-extern PNG_EXPORT(png_bytep,png_sig_bytes) PNGARG((png_structp png_ptr));
+extern PNG_EXPORT(png_bytep,png_sig_bytes) PNGARG((void));
 
 extern PNG_EXPORT(png_charp,png_get_copyright) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_charp,png_get_header_ver) PNGARG((png_structp png_ptr));
@@ -2033,7 +2032,7 @@ extern PNG_EXPORT(png_charp,png_get_header_version) PNGARG((png_structp png_ptr)
 extern PNG_EXPORT(png_charp,png_get_libpng_ver) PNGARG((png_structp png_ptr));
 
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.6a - April 2, 2000 (header)\n"
+   " libpng version 1.0.6d - April 7, 2000 (header)\n"
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on

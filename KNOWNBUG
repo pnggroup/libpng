@@ -7,7 +7,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
    the info_ptr->text and its members might free the same memory that
    is also free'ed by libpng during the png_destroy_struct process.
 
-   Fixed in libpng-1.0.6-patch-c and libpng-1.0.6a.  The PNG_FREE_TEXT flag
+   Fixed in libpng-1.0.6-patch-03 and libpng-1.0.6d.  The PNG_FREE_TEXT flag
    bit in info_ptr->free_me is now checked to make sure libpng is responsible
    for freeing the memory.
 
@@ -16,21 +16,21 @@ Known bugs and suggested enhancements in libpng-1.0.6
    The non-ISO-C "strdup()" function is used in png.c
 
    STATUS: The function has been simplified and no longer uses strdup()
-   in libpng-1.0.6-patch-c and libpng-1.0.6a.
+   in libpng-1.0.6-patch-03 and libpng-1.0.6d.
 
 3. March 24, 2000 -- BUG
 
    The png_set_rgb_to_gray_fixed() function is setting incorrect weighting
    factors.
 
-   STATUS: Fixed in libpng-1.0.6-patch-b and libpng-1.0.6a.
+   STATUS: Fixed in libpng-1.0.6-patch-02 and libpng-1.0.6d.
 
 4. March 22, 2000 -- BUG
 
    There are some printf() and fprintf() statements active in pngwutil.c
    when PNG_NO_STDIO and PNG_sCAL_SUPPORTED are both defined.
 
-   STATUS: Fixed in libpng-1.0.6-patch-a and libpng-1.0.6a.  The strcpy()
+   STATUS: Fixed in libpng-1.0.6-patch-01 and libpng-1.0.6d.  The strcpy()
    function is used instead.
 
 5. March 22, 2000 -- BUG
@@ -38,8 +38,8 @@ Known bugs and suggested enhancements in libpng-1.0.6
    The length of the iCCP chunk data is calculated incorrectly; because
    it can contain zeroes, strlen() doesn't work.
 
-   STATUS: Fixed in libpng-1.0.6-patch-a by adding a data_length parameter
-   to the png_decompress_chunk() function.
+   STATUS: Fixed in libpng-1.0.6-patch-01 and libpng-1.0.6d by adding a
+   data_length parameter to the png_decompress_chunk() function.
 
 6. March 15, 1998 -- OPTIMIZATION -- Kevin Bracey
 
@@ -73,7 +73,7 @@ Known bugs and suggested enhancements in libpng-1.0.6
    It should be possible to use libpng without floating-point aritmetic.
 
    STATUS: Under investigation, implementation postponed until after
-   libpng-1.0.5.  The application interface will change because replacements
+   libpng-1.0.6.  The application interface will change because replacements
    for the png_set_gAMA(), png_set_cHRM(), and corresponding png_get_()
    functions will be needed.
 

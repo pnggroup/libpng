@@ -3,7 +3,7 @@ unit pngdef;
 interface
 
 const
-  PNG_LIBPNG_VER_STRING = '1.0.6a';
+  PNG_LIBPNG_VER_STRING = '1.0.6d';
   PNG_LIBPNG_VER        =  10007;
 
 type

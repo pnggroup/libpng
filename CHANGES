@@ -660,7 +660,7 @@ version 1.0.5v [March 11, 2000]
 version 1.0.6 [March 20, 2000]
   Minor revisions of makefile.bor, libpng.txt, and gregbook/rpng2-win.c
   Added makefile.sggcc (SGI IRIX with gcc)
-version 1.0.6a [April 2, 2000]
+version 1.0.6d [April 7, 2000]
   Changed sprintf() to strcpy() in png_write_sCAL_s() to work without STDIO
   Added data_length parameter to png_decompress_chunk() function
   Revised documentation to remove reference to abandoned png_free_chnk functions
