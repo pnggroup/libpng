@@ -6,7 +6,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.4beta1 - May 25, 2002
+ * libpng version 1.2.4beta2 - June 20, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -338,7 +338,7 @@ static unsigned long long _const6   = 0x00000000000000FFLL;
 static png_uint_32  _FullLength;
 static png_uint_32  _MMXLength;
 static int          _dif;
-static int          _patemp;	// temp variables for Paeth routine
+static int          _patemp; // temp variables for Paeth routine
 static int          _pbtemp;
 static int          _pctemp;
 #endif
@@ -386,9 +386,9 @@ static int _mmx_supported = 2;
 #if defined(PNG_HAVE_ASSEMBLER_COMBINE_ROW)
 
 #define BPP2  2
-#define BPP3  3		/* bytes per pixel (a.k.a. pixel_bytes) */
+#define BPP3  3 /* bytes per pixel (a.k.a. pixel_bytes) */
 #define BPP4  4
-#define BPP6  6		/* (defined only to help avoid cut-and-paste errors) */
+#define BPP6  6 /* (defined only to help avoid cut-and-paste errors) */
 #define BPP8  8
 
 /* Combines the row recently read in with the previous row.
@@ -4825,7 +4825,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
       }
       break;
 
-      default:                // bpp greater than 8 bytes	GRR BOGUS
+      default:                // bpp greater than 8 bytes   GRR BOGUS
       {
          __asm__ __volatile__ (
             "movl _dif, %%edx             \n\t"

@@ -1,6 +1,6 @@
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng 1.2.4beta1 - May 25, 2002
+ * libpng 1.2.4beta2 - June 20, 2002
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2002 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1185,8 +1185,7 @@ typedef z_stream FAR *  png_zstreamp;
 
 #if defined(PNG_DLL) || defined(_DLL) || defined(__DLL__ ) || \
     (( defined(_Windows) || defined(_WINDOWS) || \
-       defined(WIN32) || defined(_WIN32) || defined(__WIN32__) \
-	  ))
+       defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ))
 
 #  if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
 #    define PNGAPI __cdecl
@@ -1213,8 +1212,8 @@ typedef z_stream FAR *  png_zstreamp;
 #           if defined(PNG_BUILD_DLL)
 #              define PNG_IMPEXP __export
 #           else
-#              define PNG_IMPEXP /*__import*/ /* doesn't exist AFAIK in
-                                                 VC++*/
+#              define PNG_IMPEXP /*__import */ /* doesn't exist AFAIK in
+                                                 VC++ */
 #           endif                             /* Exists in Borland C++ for
                                                  C++ classes (== huge) */
 #        endif

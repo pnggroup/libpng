@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386
-# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll\libpng12.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll\libpng13.lib /nologo /subsystem:console /machine:I386
 # Begin Special Build Tool
 OutDir=.\dll
 SOURCE="$(InputPath)"
@@ -84,7 +84,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_dbg\libpng12d.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_dbg\libpng13d.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 OutDir=.\dll_dbg
 SOURCE="$(InputPath)"
@@ -114,7 +114,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386
-# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_asm\libpng12a.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_asm\libpng13a.lib /nologo /subsystem:console /machine:I386
 # Begin Special Build Tool
 OutDir=.\dll_asm
 SOURCE="$(InputPath)"
@@ -144,7 +144,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_dbga\libpng12b.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ..\..\projects\msvc\win32\libpng\dll_dbga\libpng13b.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 OutDir=.\dll_dbga
 SOURCE="$(InputPath)"

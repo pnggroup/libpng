@@ -15,16 +15,17 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.4beta1
+PNGMIN = 1.2.4beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
 
-# where "make install" puts libpng.a, libpng12/libpng12.so*,
-# $(LIBNAME)/png.h and $(LIBNAME)/pngconf.h
+# where "make install" puts libpng12.a, libpng12.so*,
+# libpng12/png.h and libpng12/pngconf.h
+# Prefix must be a full pathname.
 prefix=/usr/local
 
-# Where the zlib library and include files are located
+# Where the zlib library and include files are located.
 #ZLIBLIB=/usr/local/lib
 #ZLIBINC=/usr/local/include
 ZLIBLIB=../zlib
@@ -93,6 +94,10 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 
 all: libpng.a $(LIBNAME).so pngtest pngtest-static libpng.pc libpng-config
 
+libpng.a: $(OBJS)
+	ar rc $@ $(OBJS)
+	$(RANLIB) $@
+
 libpng.pc:
 	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
 
@@ -102,7 +107,7 @@ libpng-config:
 	echo cppflags=\"-I$(INCPATH)/$(LIBNAME) -DPNG_THREAD_UNSAFE_OK \
 	   -DPNG_USE_PNGGCCRD\"; \
 	echo cflags=\"\"; \
-	echo ldflags=\"\"; \
+	echo ldflags=\"-L$(LIBPATH) -Wl,-rpath,$(LIBPATH)\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
@@ -113,10 +118,6 @@ pnggccrd.o:	pnggccrd.c png.h pngconf.h
 pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
 	$(CC) -c $(CFLAGS) -fPIC -o $@ pnggccrd.c
 
-libpng.a: $(OBJS)
-	ar rc $@ $(OBJS)
-	$(RANLIB) $@
-
 $(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
 	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
 
@@ -124,8 +125,9 @@ $(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
 	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
 $(LIBNAME).so.$(PNGVER): $(OBJSDLL)
-	$(CC) -shared -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) -o $(LIBNAME).so.$(PNGVER) \
-	 $(OBJSDLL) -L$(ZLIBLIB) -lz -lm -lc
+	$(CC) -shared -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) \
+	-o $(LIBNAME).so.$(PNGVER) \
+	$(OBJSDLL) -L$(ZLIBLIB) -lz -lm -lc
 
 pngtest: pngtest.o $(LIBNAME).so
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -201,9 +203,16 @@ install-config: libpng-config
 
 install: install-static install-shared install-man install-config
 
+test-installed:
+	$(CC) -I$(ZLIBINC) \
+	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs` \
+	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB)
+	pngtesti pngtest.png
+
 clean:
-	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* \
-	pngtest pngout.png
+	/bin/rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
+	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest-static pngtesti
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

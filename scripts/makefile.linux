@@ -5,16 +5,17 @@
 
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.4beta1
+PNGMIN = 1.2.4beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 CC=gcc
 
-# where "make install" puts libpng12.a, libpng12/libpng12.so*,
+# where "make install" puts libpng12.a, libpng12.so*,
 # libpng12/png.h and libpng12/pngconf.h
+# Prefix must be a full pathname.
 prefix=/usr/local
 
-# Where the zlib library and include files are located
+# Where the zlib library and include files are located.
 #ZLIBLIB=/usr/local/lib
 #ZLIBINC=/usr/local/include
 ZLIBLIB=../zlib
@@ -70,7 +71,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a $(LIBNAME).so pngtest libpng.pc libpng-config
+all: libpng.a $(LIBNAME).so pngtest pngtest-static libpng.pc libpng-config
 
 libpng.a: $(OBJS)
 	ar rc $@ $(OBJS)
@@ -108,7 +109,7 @@ pngtest-static: pngtest.o libpng.a
 
 test: pngtest pngtest-static
 	@echo ""
-	@echo "   Running pngtest dynamically linked with libpng12.so:"
+	@echo "   Running pngtest dynamically linked with $(LIBNAME).so:"
 	@echo ""
 	./pngtest
 	@echo ""
@@ -174,9 +175,16 @@ install-config: libpng-config
 
 install: install-static install-shared install-man install-config
 
+test-installed:
+	$(CC) -I$(ZLIBINC) \
+	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs` \
+	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB)
+	pngtesti pngtest.png
+
 clean:
-	/bin/rm -f *.o libpng.a $(LIBNAME).so $(LIBNAME).so.$(PNMAJ)* \
-	pngtest pngout.png
+	/bin/rm -f *.o libpng.a pngtest pngout.png libpng.pc libpng-config \
+	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest-static pngtesti
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

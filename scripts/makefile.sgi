@@ -3,7 +3,14 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
-# where make install puts libpng.a, libpng12.so and libpng12/png.h
+LIBNAME=libpng12
+PNGMAJ = 0
+PNGMIN = 1.2.4beta2
+PNGVER = $(PNGMAJ).$(PNGMIN)
+
+# Where make install puts libpng.a, libpng12.so, and libpng12/png.h
+# Prefix must be a full pathname.
+
 prefix=/usr/local
 
 # Where the zlib library and include files are located
@@ -26,13 +33,8 @@ WARNMORE=-fullwarn
 CFLAGS=$(ABI) -I$(ZLIBINC) -O $(WARNMORE) -DPNG_USE_PNGGCCRD -DPNG_NO_ASSEMBLER_CODE
 LDFLAGS_A=$(ABI) -L. -L$(ZLIBLIB) -lpng12 -lz -lm
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
-LDSHARED=cc $(ABI) -shared
+LDSHARED=cc $(ABI) -shared -soname $(LIBNAME).so.$(PNGMAJ)
 # See "man dso" for info about shared objects
-
-LIBNAME=libpng12
-PNGMAJ = 0
-PNGMIN = 1.2.4beta1
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 RANLIB=echo
 #RANLIB=ranlib
@@ -41,7 +43,6 @@ INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 #LIBPATH=$(prefix)/lib32
 MANPATH=$(prefix)/man
-BINPATH=$(prefix)/bin
 BINPATH=$(prefix)/bin
 
 # override DESTDIR= on the make install command line to easily support
@@ -65,6 +66,10 @@ OBJS = pnggccrd.o png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 
 all: libpng.a pngtest shared libpng.pc libpng-config
 
+libpng.a: $(OBJS)
+	ar rc $@ $(OBJS)
+	$(RANLIB) $@
+
 shared: $(LIBNAME).so.$(PNGVER)
 
 libpng.pc:
@@ -76,33 +81,34 @@ libpng-config:
 	echo cppflags=\"-I$(INCPATH)/$(LIBNAME) -DPNG_USE_PNGGCCRD \
 		-DPNG_NO_ASSEMBLER_CODE\"; \
 	echo cflags=\"$(ABI)\"; \
-	echo ldflags=\"-L$(LIBPATH)\"; \
+	echo ldflags=\"-L$(LIBPATH) -rpath $(LIBPATH) \"; \
 	echo libs=\"-lpng12 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
-libpng.a: $(OBJS)
-	ar rc $@  $(OBJS)
-	$(RANLIB) $@
+$(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
+	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
+
+$(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
+	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
 $(LIBNAME).so.$(PNGVER): $(OBJS)
 	$(LDSHARED) -o $@ $(OBJS)
 	rm -f $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)
-	ln -s -f $@ $(LIBNAME).so
-	ln -s -f $@ $(LIBNAME).so.$(PNGMAJ)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
+	echo
+	echo Testing local static library.
 	./pngtest
 
 install-headers: png.h pngconf.h
 	-@if [ ! -d $(DI) ]; then mkdir $(DI); fi
 	-@if [ ! -d $(DI)/$(LIBNAME) ]; then mkdir $(DI)/$(LIBNAME); fi
 	cp png.h pngconf.h $(DI)/$(LIBNAME)
-	chmod 644 $(DI)/$(LIBNAME)/png.h \
-	$(DI)/$(LIBNAME)/pngconf.h
+	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h
 	-@/bin/rm -f $(DI)/png.h $(DI)/pngconf.h
 	-@/bin/rm -f $(DI)/libpng
 	(cd $(DI); ln -sf $(LIBNAME) libpng; ln -sf $(LIBNAME)/* .)
@@ -156,9 +162,21 @@ install-config: libpng-config
 
 install: install-static install-shared install-man install-config
 
+# If you installed in $(DESTDIR), test-installed won't work until you
+# move the library to its final location.
+
+test-installed:
+	echo
+	echo Testing installed dynamic shared library.
+	$(CC) -I$(ZLIBINC) \
+	   `$(BINPATH)/libpng12-config --cppflags --cflags` pngtest.c \
+	   -o pngtesti `$(BINPATH)/libpng12-config --ldflags --libs` \
+	   -L$(ZLIBLIB) -rpath $(ZLIBLIB)
+	pngtesti pngtest.png
+
 clean:
-	rm -f *.o libpng.a pngtest pngout.png $(LIBNAME).so \
-	$(LIBNAME).so.$(PNGMAJ)*
+	rm -f *.o libpng.a pngtest pngtesti pngout.png libpng.pc libpng-config \
+	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* so_locations
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

@@ -57,7 +57,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386
-# ADD LINK32 /nologo /dll /machine:I386 /out:".\win32\libpng\dll\libpng12.dll"
+# ADD LINK32 /nologo /dll /machine:I386 /out:".\win32\libpng\dll\libpng13.dll"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL Debug"
@@ -85,7 +85,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 /nologo /dll /debug /machine:I386 /out:".\win32\libpng\dll_dbg\libpng12d.dll"
+# ADD LINK32 /nologo /dll /debug /machine:I386 /out:".\win32\libpng\dll_dbg\libpng13d.dll"
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL ASM"
 
@@ -112,7 +112,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386
-# ADD LINK32 /nologo /dll /machine:I386 /out:".\win32\libpng\dll_asm\libpng12a.dll"
+# ADD LINK32 /nologo /dll /machine:I386 /out:".\win32\libpng\dll_asm\libpng13a.dll"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL Debug ASM"
@@ -140,7 +140,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 /nologo /dll /debug /machine:I386 /out:".\win32\libpng\dll_dbga\libpng12b.dll"
+# ADD LINK32 /nologo /dll /debug /machine:I386 /out:".\win32\libpng\dll_dbga\libpng13b.dll"
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 LIB"
 
@@ -219,9 +219,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /dll /machine:I386 /out:".\win32\libpng\dll\libpng12.dll"
+# ADD BASE LINK32 /nologo /dll /machine:I386 /out:".\win32\libpng\dll\libpng13.dll"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 /nologo /dll /machine:I386 /out:".\win32\libpng\dll_vb\libpngvb12.dll"
+# ADD LINK32 /nologo /dll /machine:I386 /out:".\win32\libpng\dll_vb\libpngvb13.dll"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 

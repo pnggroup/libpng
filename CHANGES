@@ -1125,12 +1125,19 @@ version 1.2.3 [May 22, 2002]
   Minor cosmetic changes to 15 makefiles, e.g., $(DI) = $(DESTDIR)/$(INCDIR).
   Revised projects/msvc/README.txt
   Changed -lpng to -lpngNN in LDFLAGS in several makefiles.
-version 1.2.4beta1 [May 25, 2002]
+version 1.2.4beta1 [May 24, 2002]
   Added libpng.pc and libpng-config to "all:" target in 16 makefiles.
   Fixed bug in 16 makefiles: $(DESTDIR)/$(LIBPATH) to $(DESTDIR)$(LIBPATH)
   Added missing "\" before closing double quote in makefile.gcmmx.
   Plugged various memory leaks; added png_malloc_warn() and png_set_text_2()
     functions.
+version 1.2.4beta2 [June 20, 2002]
+  Plugged memory leak of png_ptr->current_text (Matt Holgate).
+  Check for buffer overflow before reading CRC in pngpread.c (Warwick Allison)
+  Added -soname to the loader flags in makefile.dec, makefile.sgi, and
+    makefile.sggcc.
+  Added "test-installed" targets to makefile.linux, makefile.gcmmx,
+    makefile.sgi, and makefile.sggcc.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu
