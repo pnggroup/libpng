@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * libpng 1.0.12beta1 - May 14, 2001
+ * libpng 1.2.0beta1 - May 6, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -27,12 +27,12 @@ png_voidp /* PRIVATE */
 png_create_struct(int type)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   return (png_create_struct_2(type, NULL, NULL));
+   return (png_create_struct_2(type, NULL));
 }
 
 /* Alternate version of png_create_struct, for use with user-defined malloc. */
 png_voidp /* PRIVATE */
-png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
+png_create_struct_2(int type, png_malloc_ptr malloc_fn)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
    png_size_t size;
@@ -48,18 +48,9 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
 #ifdef PNG_USER_MEM_SUPPORTED
    if(malloc_fn != NULL)
    {
-      if (mem_ptr != NULL)
-      {
-         png_struct dummy_struct;
-         png_structp png_ptr = &dummy_struct;
-         png_ptr->mem_ptr=mem_ptr;
-         struct_ptr = (*(malloc_fn))(png_ptr, size);
-      }
-      else
-         struct_ptr = (*(malloc_fn))(NULL, size);
-      if (struct_ptr != NULL)
+      if ((struct_ptr = (*(malloc_fn))(NULL, size)) != NULL)
          png_memset(struct_ptr, 0, size);
-      return (struct_ptr);
+         return (struct_ptr);
    }
 #endif /* PNG_USER_MEM_SUPPORTED */
    if ((struct_ptr = (png_voidp)farmalloc(size)) != NULL)
@@ -75,13 +66,12 @@ void /* PRIVATE */
 png_destroy_struct(png_voidp struct_ptr)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   png_destroy_struct_2(struct_ptr, (png_free_ptr)NULL, (png_voidp)NULL);
+   png_destroy_struct_2(struct_ptr, (png_free_ptr)NULL);
 }
 
 /* Free memory allocated by a png_create_struct() call */
 void /* PRIVATE */
-png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
-    png_voidp mem_ptr)
+png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn)
 {
 #endif
    if (struct_ptr != NULL)
@@ -91,7 +81,6 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
       {
          png_struct dummy_struct;
          png_structp png_ptr = &dummy_struct;
-         png_ptr->mem_ptr=mem_ptr;
          (*(free_fn))(png_ptr, struct_ptr);
          return;
       }
@@ -130,12 +119,7 @@ png_malloc(png_structp png_ptr, png_uint_32 size)
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(png_ptr->malloc_fn != NULL)
-   {
-       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
-       if (ret == NULL)
-          png_error(png_ptr, "Out of memory!");
-       return (ret);
-   }
+       return ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
    else
        return png_malloc_default(png_ptr, size);
 }
@@ -297,14 +281,14 @@ png_voidp /* PRIVATE */
 png_create_struct(int type)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   return (png_create_struct_2(type, NULL, NULL));
+   return (png_create_struct_2(type, NULL));
 }
 
 /* Allocate memory for a png_struct or a png_info.  The malloc and
    memset can be replaced by a single call to calloc() if this is thought
    to improve performance noticably.*/
 png_voidp /* PRIVATE */
-png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
+png_create_struct_2(int type, png_malloc_ptr malloc_fn)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
    png_size_t size;
@@ -320,16 +304,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
 #ifdef PNG_USER_MEM_SUPPORTED
    if(malloc_fn != NULL)
    {
-      if (mem_ptr != NULL)
-      {
-         png_struct dummy_struct;
-         png_structp png_ptr = &dummy_struct;
-         png_ptr->mem_ptr=mem_ptr;
-         struct_ptr = (*(malloc_fn))(png_ptr, size);
-      }
-      else
-         struct_ptr = (*(malloc_fn))(NULL, size);
-      if (struct_ptr != NULL)
+      if ((struct_ptr = (*(malloc_fn))(NULL, size)) != NULL)
          png_memset(struct_ptr, 0, size);
       return (struct_ptr);
    }
@@ -357,13 +332,12 @@ void /* PRIVATE */
 png_destroy_struct(png_voidp struct_ptr)
 {
 #ifdef PNG_USER_MEM_SUPPORTED
-   png_destroy_struct_2(struct_ptr, (png_free_ptr)NULL, (png_voidp)NULL);
+   png_destroy_struct_2(struct_ptr, (png_free_ptr)NULL);
 }
 
 /* Free memory allocated by a png_create_struct() call */
 void /* PRIVATE */
-png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
-    png_voidp mem_ptr)
+png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
    if (struct_ptr != NULL)
@@ -373,7 +347,6 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
       {
          png_struct dummy_struct;
          png_structp png_ptr = &dummy_struct;
-         png_ptr->mem_ptr=mem_ptr;
          (*(free_fn))(png_ptr, struct_ptr);
          return;
       }
@@ -400,18 +373,15 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
 {
+#ifndef PNG_USER_MEM_SUPPORTED
    png_voidp ret;
+#endif
    if (png_ptr == NULL || size == 0)
       return ((png_voidp)NULL);
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if(png_ptr->malloc_fn != NULL)
-   {
-       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
-       if (ret == NULL)
-          png_error(png_ptr, "Out of Memory!");
-       return (ret);
-   }
+       return ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, size));
    else
        return (png_malloc_default(png_ptr, size));
 }
@@ -437,7 +407,9 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 #endif
 
    if (ret == NULL)
+   {
       png_error(png_ptr, "Out of Memory");
+   }
 
    return (ret);
 }

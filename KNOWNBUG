@@ -1,7 +1,8 @@
 
-Known bugs in libpng-1.0.11
+Known bugs in libpng-1.2.0
 
 1. April 22, 2001: pnggccrd.c has been reported to crash on NetBSD when
    reading interlaced PNG files, when assembler code is enabled.
 
    STATUS: Under investigation.
+

@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * libpng version 1.0.12beta1 - May 14, 2001
+ * libpng version 1.2.0beta1 - May 6, 2001
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -13,14 +13,14 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_12beta1 Your_png_h_is_not_version_1_0_12beta1;
+typedef version_1_2_0beta1 Your_png_h_is_not_version_1_2_0beta1;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = "1.0.12beta1";
+const char png_libpng_ver[18] = "1.2.0beta1";
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
@@ -213,12 +213,12 @@ png_create_info_struct(png_structp png_ptr)
    if(png_ptr == NULL) return (NULL);
 #ifdef PNG_USER_MEM_SUPPORTED
    if ((info_ptr = (png_infop)png_create_struct_2(PNG_STRUCT_INFO,
-      png_ptr->malloc_fn, png_ptr->mem_ptr)) != NULL)
+      png_ptr->malloc_fn)) != NULL)
 #else
    if ((info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO)) != NULL)
 #endif
    {
-      png_info_init_3(&info_ptr, sizeof(png_info));
+      png_info_init(info_ptr);
    }
 
    return (info_ptr);
@@ -243,8 +243,7 @@ png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
       png_info_destroy(png_ptr, info_ptr);
 
 #ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)info_ptr, png_ptr->free_fn,
-          png_ptr->mem_ptr);
+      png_destroy_struct_2((png_voidp)info_ptr, png_ptr->free_fn);
 #else
       png_destroy_struct((png_voidp)info_ptr);
 #endif
@@ -256,28 +255,10 @@ png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
  * and applications using it are urged to use png_create_info_struct()
  * instead.
  */
-#undef png_info_init
-void PNGAPI
+void /* PRIVATE */
 png_info_init(png_infop info_ptr)
 {
-   /* We only come here via pre-1.0.12-compiled applications */
-   png_info_init_3(&info_ptr, 0);
-}
-
-void PNGAPI
-png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
-{
-   png_infop info_ptr = *ptr_ptr;
-
-   png_debug(1, "in png_info_init_3\n");
-
-   if(sizeof(png_info) > png_info_struct_size)
-     {
-       png_destroy_struct(info_ptr);
-       info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO);
-       *ptr_ptr = info_ptr;
-     }
-
+   png_debug(1, "in png_info_init\n");
    /* set everything to 0 */
    png_memset(info_ptr, 0, sizeof (png_info));
 }
@@ -556,7 +537,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
    }
 #endif
 
-   png_info_init_3(&info_ptr, sizeof(png_info));
+   png_info_init(info_ptr);
 }
 
 /* This function returns a pointer to the io_ptr associated with the user
@@ -646,7 +627,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (png_ptr != NULL || png_ptr == NULL)  /* silence compiler warning */
-   return ((png_charp) "\n libpng version 1.0.12beta1 - May 14, 2001\n\
+   return ((png_charp) "\n libpng version 1.2.0beta1 - May 6, 2001\n\
    Copyright (c) 1998-2001 Glenn Randers-Pehrson\n\
    Copyright (c) 1996, 1997 Andreas Dilger\n\
    Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -664,8 +645,8 @@ png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    if(png_ptr != NULL) /* silence compiler warning about unused png_ptr */
-      return((png_charp) "1.0.12beta1");
-   return((png_charp) "1.0.12beta1");
+      return((png_charp) "1.2.0beta1");
+   return((png_charp) "1.2.0beta1");
 }
 
 png_charp PNGAPI
@@ -715,8 +696,57 @@ png_uint_32 PNGAPI
 png_access_version_number(void)
 {
    /* Version of *.c files used when building libpng */
-   return((png_uint_32) 10012L);
+   return((png_uint_32) 10200L);
 }
+
+
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
+    /* GRR:  could add this:   && defined(PNG_MMX_CODE_SUPPORTED) */
+/* this INTERNAL function was added to libpng 1.2.0 */
+void /* PRIVATE */
+png_init_mmx_flags (png_structp png_ptr)
+{
+    png_ptr->mmx_rowbytes_threshold = 0;
+    png_ptr->mmx_bitdepth_threshold = 0;
+
+#if (defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD))
+
+    png_ptr->asm_flags |= PNG_ASM_FLAG_MMX_SUPPORT_COMPILED;
+
+    if (png_mmx_support()) {
+        png_ptr->asm_flags |= PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU
+#ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+                              | PNG_ASM_FLAG_MMX_READ_COMBINE_ROW
+#endif
+#ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
+                              | PNG_ASM_FLAG_MMX_READ_INTERLACE
+#endif
+#ifndef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+                              ;
+#else
+                              | PNG_ASM_FLAG_MMX_READ_FILTER_SUB
+                              | PNG_ASM_FLAG_MMX_READ_FILTER_UP
+                              | PNG_ASM_FLAG_MMX_READ_FILTER_AVG
+                              | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH ;
+
+        png_ptr->mmx_rowbytes_threshold = PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT;
+        png_ptr->mmx_bitdepth_threshold = PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT;
+#endif
+    } else {
+        png_ptr->asm_flags &= ~( PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU
+                               | PNG_MMX_READ_FLAGS
+                               | PNG_MMX_WRITE_FLAGS );
+    }
+
+#else /* !((PNGVCRD || PNGGCCRD) && PNG_ASSEMBLER_CODE_SUPPORTED)) */
+
+    /* clear all MMX flags; no support is compiled in */
+    png_ptr->asm_flags &= ~( PNG_MMX_FLAGS );
+
+#endif /* ?(PNGVCRD || PNGGCCRD) */
+}
+
+#endif /* !(PNG_ASSEMBLER_CODE_SUPPORTED) */
 
 /* this function was added to libpng 1.2.0 */
 #if !defined(PNG_USE_PNGGCCRD) && \

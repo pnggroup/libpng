@@ -2,14 +2,14 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * libpng 1.0.12beta1 - May 14, 2001
+ * libpng 1.2.0beta1 - May 6, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
  *
  * Contributed by Nirav Chhatrapati, Intel Corporation, 1998
  * Interface to libpng contributed by Gilles Vollant, 1999
- * Debugging and cleanup by Greg Roelofs, 2000, 2001
+ *
  *
  * In png_do_read_interlace() in libpng versions 1.0.3a through 1.0.4d,
  * a sign error in the post-MMX cleanup code for each pixel_depth resulted
@@ -18,6 +18,8 @@
  * when compiled with MSVC 6.0.  The error was fixed in version 1.0.4e.
  *
  * [png_read_filter_row_mmx_avg() bpp == 2 bugfix, GRR 20000916]
+ *
+ * [runtime MMX configuration, GRR 20010102]
  *
  */
 
@@ -110,6 +112,8 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
    png_debug(1,"in png_combine_row_asm\n");
 
    if (mmx_supported == 2) {
+       /* this should have happened in png_init_mmx_flags() already */
+       png_warning(png_ptr, "asm_flags may not have been initialized");
        png_mmx_support();
    }
 
@@ -300,7 +304,8 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 
             __int64 mask0=0x0102040810204080;
 
-            if ( mmx_supported )
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
+                /* && mmx_supported */ )
             {
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
@@ -382,8 +387,6 @@ end8:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
-                  if (pixel_bytes > (png_size_t)(final_val-i))
-                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -402,7 +405,8 @@ end8:
             __int64 mask1=0x0101020204040808,
                     mask0=0x1010202040408080;
 
-            if ( mmx_supported )
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
+                /* && mmx_supported */ )
             {
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
@@ -495,8 +499,6 @@ end16:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
-                  if (pixel_bytes > (png_size_t)(final_val-i))
-                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -524,7 +526,8 @@ end16:
             len     = (png_ptr->width)&~7;
             diff = (png_ptr->width)&7;
 
-            if ( mmx_supported )
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
+                /* && mmx_supported */ )
             {
                _asm
                {
@@ -627,8 +630,6 @@ end24:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
-                  if (pixel_bytes > (png_size_t)(final_val-i))
-                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -657,7 +658,8 @@ end24:
             len     = (png_ptr->width)&~7;
             diff = (png_ptr->width)&7;
 
-            if ( mmx_supported )
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
+                /* && mmx_supported */ )
             {
                _asm
                {
@@ -768,8 +770,6 @@ end32:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
-                  if (pixel_bytes > (png_size_t)(final_val-i))
-                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -793,7 +793,8 @@ end32:
                     mask1=0x2020202040404040,
                     mask0=0x4040808080808080;
 
-            if ( mmx_supported )
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
+                /* && mmx_supported */ )
             {
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
@@ -927,8 +928,6 @@ end48:
                incr1 = (disp)*pixel_bytes;
                for (i = initial_val; i < final_val; i += incr1)
                {
-                  if (pixel_bytes > (png_size_t)(final_val-i))
-                    pixel_bytes = (png_size_t)(final_val-i);
                   png_memcpy(dstptr, srcptr, pixel_bytes);
                   srcptr += incr1;
                   dstptr += incr1;
@@ -957,8 +956,6 @@ end48:
             incr1 = (disp)*pixel_bytes;
             for (i = initial_val; i < final_val; i += incr1)
             {
-               if (pixel_bytes > (png_size_t)(final_val-i))
-                 pixel_bytes = (png_size_t)(final_val-i);
                png_memcpy(dp, sptr, pixel_bytes);
                sptr += incr1;
                dp += incr1;
@@ -987,6 +984,8 @@ png_do_read_interlace(png_structp png_ptr)
    png_debug(1,"in png_do_read_interlace\n");
 
    if (mmx_supported == 2) {
+       /* this should have happened in png_init_mmx_flags() already */
+       png_warning(png_ptr, "asm_flags may not have been initialized");
        png_mmx_support();
    }
 
@@ -1187,7 +1186,8 @@ png_do_read_interlace(png_structp png_ptr)
             // NOTE:  there is NO MMX code for 48-bit and 64-bit images
 
             // use MMX routine if machine supports it
-            if ( mmx_supported )
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_INTERLACE)
+                /* && mmx_supported */ )
             {
                if (pixel_bytes == 3)
                {
@@ -1777,7 +1777,7 @@ loop4_pass4:
             } /* end of mmx_supported */
 
             else /* MMX not supported:  use modified C code - takes advantage
-                  * of inlining of png_memcpy for a constant */
+                  * of inlining of memcpy for a constant */
             {
                if (pixel_bytes == 1)
                {
@@ -3649,6 +3649,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #endif
 
    if (mmx_supported == 2) {
+       /* this should have happened in png_init_mmx_flags() already */
+       png_warning(png_ptr, "asm_flags may not have been initialized");
        png_mmx_support();
    }
 
@@ -3658,13 +3660,17 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    {
       case 0: sprintf(filnm, "none");
          break;
-      case 1: sprintf(filnm, "sub-%s", "MMX");
+      case 1: sprintf(filnm, "sub-%s",
+        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB)? "MMX" : "x86");
          break;
-      case 2: sprintf(filnm, "up-%s", "MMX");
+      case 2: sprintf(filnm, "up-%s",
+        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP)? "MMX" : "x86");
          break;
-      case 3: sprintf(filnm, "avg-%s", "MMX");
+      case 3: sprintf(filnm, "avg-%s",
+        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG)? "MMX" : "x86");
          break;
-      case 4: sprintf(filnm, "Paeth-%s", "MMX");
+      case 4: sprintf(filnm, "Paeth-%s",
+        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH)? "MMX":"x86");
          break;
       default: sprintf(filnm, "unknw");
          break;
@@ -3682,9 +3688,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
       case PNG_FILTER_VALUE_SUB:
       {
-         if (
-             (row_info->pixel_depth >= PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT) &&
-             (row_info->rowbytes >= PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT))
+         if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
+             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+             (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
          {
             png_read_filter_row_mmx_sub(row_info, row);
          }
@@ -3707,9 +3713,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
       case PNG_FILTER_VALUE_UP:
       {
-         if (
-             (row_info->pixel_depth >= PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT) &&
-             (row_info->rowbytes >= PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT))
+         if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP) &&
+             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+             (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
          {
             png_read_filter_row_mmx_up(row_info, row, prev_row);
          }
@@ -3731,9 +3737,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
       case PNG_FILTER_VALUE_AVG:
       {
-         if (
-             (row_info->pixel_depth >= PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT) &&
-             (row_info->rowbytes >= PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT))
+         if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG) &&
+             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+             (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
          {
             png_read_filter_row_mmx_avg(row_info, row, prev_row);
          }
@@ -3765,9 +3771,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
       case PNG_FILTER_VALUE_PAETH:
       {
-         if (
-             (row_info->pixel_depth >= PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT) &&
-             (row_info->rowbytes >= PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT))
+         if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH) &&
+             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+             (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
          {
             png_read_filter_row_mmx_paeth(row_info, row, prev_row);
          }

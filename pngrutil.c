@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng 1.0.12beta1 - May 14, 2001
+ * libpng 1.2.0beta1 - May 6, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -30,7 +30,7 @@ __inline double strtod(const char *nptr, char **endptr)
       MultiByteToWideChar(CP_ACP, 0, nptr, -1, str, len);
       result = wcstod(str, &end);
       len = WideCharToMultiByte(CP_ACP, 0, end, -1, NULL, 0, NULL, NULL);
-      *endptr = (char *)nptr + (png_strlen(nptr) - len + 1);
+      *endptr = (char *)nptr + (strlen(nptr) - len + 1);
       free(str);
    }
    return result;
@@ -220,7 +220,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                    png_ptr->zbuf_size - png_ptr->zstream.avail_out;
                text = (png_charp)png_malloc(png_ptr, text_size + 1);
                png_memcpy(text + prefix_size, png_ptr->zbuf,
-                    text_size - prefix_size);
+                          text_size - prefix_size);
                png_memcpy(text, chunkdata, prefix_size);
                *(text + text_size) = 0x00;
             }
@@ -332,6 +332,59 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    filter_type = buf[11];
    interlace_type = buf[12];
 
+   /* check for width and height valid values */
+   if (width == 0 || width > PNG_MAX_UINT || height == 0 ||
+        height > PNG_MAX_UINT)
+      png_error(png_ptr, "Invalid image size in IHDR");
+
+   /* check other values */
+   if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&
+      bit_depth != 8 && bit_depth != 16)
+      png_error(png_ptr, "Invalid bit depth in IHDR");
+
+   if (color_type < 0 || color_type == 1 ||
+      color_type == 5 || color_type > 6)
+      png_error(png_ptr, "Invalid color type in IHDR");
+
+   if (((color_type == PNG_COLOR_TYPE_PALETTE) && bit_depth > 8) ||
+       ((color_type == PNG_COLOR_TYPE_RGB ||
+         color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
+         color_type == PNG_COLOR_TYPE_RGB_ALPHA) && bit_depth < 8))
+      png_error(png_ptr, "Invalid color type/bit depth combination in IHDR");
+
+   if (interlace_type >= PNG_INTERLACE_LAST)
+      png_error(png_ptr, "Unknown interlace method in IHDR");
+
+   if (compression_type != PNG_COMPRESSION_TYPE_BASE)
+      png_error(png_ptr, "Unknown compression method in IHDR");
+
+#if defined(PNG_MNG_FEATURES_SUPPORTED)
+   /* Accept filter_method 64 (intrapixel differencing) only if
+    * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
+    * 2. Libpng did not read a PNG signature (this filter_method is only
+    *    used in PNG datastreams that are embedded in MNG datastreams) and
+    * 3. The application called png_permit_mng_features with a mask that
+    *    included PNG_FLAG_MNG_FILTER_64 and
+    * 4. The filter_method is 64 and
+    * 5. The color_type is RGB or RGBA
+    */
+   if((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&png_ptr->mng_features_permitted)
+      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream\n");
+   if(filter_type != PNG_FILTER_TYPE_BASE)
+   {
+     if(!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+        (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
+        ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
+        (color_type == PNG_COLOR_TYPE_RGB || 
+         color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
+        png_error(png_ptr, "Unknown filter method in IHDR");
+     if(png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)
+        png_warning(png_ptr, "Invalid filter method in IHDR");
+   }
+#else
+   if(filter_type != PNG_FILTER_TYPE_BASE)
+      png_error(png_ptr, "Unknown filter method in IHDR");
+#endif
 
    /* set internal variables */
    png_ptr->width = width;
@@ -339,9 +392,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->bit_depth = (png_byte)bit_depth;
    png_ptr->interlaced = (png_byte)interlace_type;
    png_ptr->color_type = (png_byte)color_type;
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
    png_ptr->filter_type = (png_byte)filter_type;
-#endif
 
    /* find number of channels */
    switch (png_ptr->color_type)
@@ -398,13 +449,6 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_ptr->mode |= PNG_HAVE_PLTE;
 
-   if (!(png_ptr->color_type&PNG_COLOR_MASK_COLOR))
-   {
-      png_warning(png_ptr,
-        "Ignoring PLTE chunk in grayscale PNG");
-      png_crc_finish(png_ptr, length);
-      return;
-   }
 #if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
    if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
    {
@@ -582,11 +626,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    igamma = (png_fixed_point)png_get_uint_32(buf);
    /* check for zero gamma */
    if (igamma == 0)
-      {
-         png_warning(png_ptr,
-           "Ignoring gAMA chunk with gamma=0");
-         return;
-      }
+      return;
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sRGB)
@@ -1087,7 +1127,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    chunkdata = (png_bytep)png_malloc(png_ptr, length + 1);
    slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)chunkdata, slength);
+   png_crc_read(png_ptr, chunkdata, slength);
 
    if (png_crc_finish(png_ptr, skip))
    {
@@ -1117,8 +1157,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (data_length % entry_size)
    {
       png_free(png_ptr, chunkdata);
-      png_warning(png_ptr, "sPLT chunk has bad length");
-      return;
+      png_error(png_ptr, "sPLT chunk has bad length");
    }
 
    new_palette.nentries = data_length / entry_size;
@@ -1675,8 +1714,8 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   swidth = (png_charp)png_malloc(png_ptr, png_strlen(ep) + 1);
-   png_memcpy(swidth, ep, (png_size_t)png_strlen(ep));
+   swidth = (png_charp)png_malloc(png_ptr, strlen(ep) + 1);
+   png_memcpy(swidth, ep, (png_size_t)strlen(ep));
 #endif
 #endif
 
@@ -1693,8 +1732,8 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   sheight = (png_charp)png_malloc(png_ptr, png_strlen(ep) + 1);
-   png_memcpy(sheight, ep, (png_size_t)png_strlen(ep));
+   sheight = (png_charp)png_malloc(png_ptr, strlen(ep) + 1);
+   png_memcpy(sheight, ep, (png_size_t)strlen(ep));
 #endif
 #endif
 
@@ -1867,7 +1906,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
    chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
-     slength = (png_size_t)length;
+   slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)chunkdata, slength);
    if (png_crc_finish(png_ptr, 0))
    {
@@ -2041,7 +2080,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
            HANDLE_CHUNK_ALWAYS
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-           && png_ptr->read_user_chunk_fn == NULL
+           && png_ptr->read_user_chunk_fn == (png_user_chunk_ptr)NULL
 #endif
         )
 #endif
@@ -2061,12 +2100,12 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
            length = (png_uint_32)65535L;
        }
 #endif
-       png_strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
+       strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
        chunk.data = (png_bytep)png_malloc(png_ptr, length);
-       chunk.size = (png_size_t)length;
-       png_crc_read(png_ptr, (png_bytep)chunk.data, length);
+       png_crc_read(png_ptr, chunk.data, length);
+       chunk.size = length;
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-       if(png_ptr->read_user_chunk_fn != NULL)
+       if(png_ptr->read_user_chunk_fn != (png_user_chunk_ptr)NULL)
        {
           /* callback to user unknown chunk handler */
           if ((*(png_ptr->read_user_chunk_fn)) (png_ptr, &chunk) <= 0)
@@ -2329,10 +2368,6 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
 #ifndef PNG_HAVE_ASSEMBLER_READ_INTERLACE   /* else in pngvcrd.c, pnggccrd.c */
-/* OLD pre-1.0.9 interface:
-void png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
-   png_uint_32 transformations)
- */
 void /* PRIVATE */
 png_do_read_interlace(png_structp png_ptr)
 {
@@ -2968,9 +3003,6 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, row_bytes);
-#if defined(PNG_DEBUG) && defined(PNG_USE_PNGGCCRD)
-   png_ptr->row_buf_size = row_bytes;
-#endif
 
 #ifdef PNG_MAX_MALLOC_64K
    if ((png_uint_32)png_ptr->rowbytes + 1 > (png_uint_32)65536L)

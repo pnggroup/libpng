@@ -1,3 +1,4 @@
+
 CHANGES - changes for libpng
 
 version 0.2
@@ -930,17 +931,15 @@ version 1.0.11beta4 [April 20, 2001]
   Added makefile.netbsd
 version 1.0.11 [April 27, 2001]
   Revised makefile.netbsd
-version 1.0.12beta1 [May 14, 2001]
+version 1.2.0beta1 [May 6, 2001]
   Test for Windows platform in pngconf.h when including malloc.h (Emmanuel Blot)
   Updated makefile.cygwin and handling of Cygwin's ALL_STATIC in pngconf.h
   Added some never-to-be-executed code in pnggccrd.c to quiet compiler warnings.
   Bumped DLLNUM to 2.
-  Added a check for attempts to read or write PLTE in grayscale PNG datastreams.
-  Eliminated the png_error about apps using png_read|write_init().  Instead,
-    libpng will reallocate the png_struct and info_struct if they are too small.
-    This achieves future binary compatibility for old applications written for
-    libpng-0.88 and earlier.
-  Modified png_create_struct so it passes user mem_ptr to user memory allocator.
+  Re-enabled PNG_MNG_FEATURES_SUPPORTED and enabled PNG_ASSEMBLER_CODE_SUPPORTED
+    by default.
+  Added runtime selection of MMX features.
+  Added png_set_strip_error_numbers function and related macros.
 
 Send comments/corrections/commendations to
 png-implement@ccrc.wustl.edu or to randeg@alum.rpi.edu

@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng 1.0.12beta1 - May 14, 2001
+ * libpng 1.2.0beta1 - May 6, 2001
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2001 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -392,12 +392,11 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
                sp += 8; dp += 6;
                for (i = 1; i < row_width; i++)
                {
-                  /* This could be (although png_memcpy is probably slower):
+                  /* This could be (although memcpy is probably slower):
                   png_memcpy(dp, sp, 6);
                   sp += 8;
                   dp += 6;
                   */
-
                   *dp++ = *sp++;
                   *dp++ = *sp++;
                   *dp++ = *sp++;
@@ -412,12 +411,11 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
                /* This converts from XXRRGGBB or AARRGGBB to RRGGBB */
                for (i = 0; i < row_width; i++)
                {
-                  /* This could be (although png_memcpy is probably slower):
+                  /* This could be (although memcpy is probably slower):
                   png_memcpy(dp, sp, 6);
                   sp += 8;
                   dp += 6;
                   */
-
                   sp+=2;
                   *dp++ = *sp++;
                   *dp++ = *sp++;
