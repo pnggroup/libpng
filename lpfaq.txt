@@ -1,0 +1,190 @@
+libpng FAQ - August 20, 1995
+
+Maintainer:
+
+Guy Eric Schalnat: schalnat@group42.com  CompuServe: 75501,1625
+
+
+Contents:
+
+1) General Questions
+1.1) How official is this FAQ?
+1.2) How often is this FAQ posted?
+1.3) Where can I get this FAQ, libpng, zlib, the PNG
+     specification, test images, etc.?
+1.4) How ready is libpng?
+1.5) How portable is libpng?
+1.6) When will libpng be out of Beta?
+1.7) What remains to be done in libpng for the 1.0 release?
+1.8) Can I help?
+1.9) Why don't you answer your mail?
+
+2) Libpng questions
+2.1) Does the order of functions calls matter?
+2.2) When I try to read/write a png image, it doesn't work.
+2.3) Do I have to start with example.c?
+2.4) What things should I be careful of?
+2.5) Why doesn't example.c compile?
+
+3) Critical Patches
+No known bugs (for now :-).
+
+4) Non-critical patches
+No known bugs (for now :-).
+
+
+Questions:
+
+1) General Questions
+
+1.1) How official is this FAQ?
+
+As it was written by the author of libpng (that's me :), it's
+about offical as one can get.  However, it is not ready for
+prime time yet, as libpng is still in beta, and thus its
+users are of the sort that are willing to deal with beta
+software.  Thus, I assume all of you reading this have a
+basic familiarity with PNG, libpng, and C programming.  I'll
+write a basic section for libpng later, as well as some quick
+stuff on PNG itself (but this will not be the PNG FAQ.  I just
+don't have that kind of time).
+
+1.2) How often is this FAQ posted?
+
+As often as events warrant.  I doubt it'll get stale, and as
+it is not (and may never be) actually posted to a newsgroup,
+I feel no need to make monthy postings.
+
+1.3) Where can I get this FAQ, libpng, zlib, the PNG 
+specification, test images, etc.?
+
+Everything should be at ftp://ftp.uu.net/graphics/png and
+mirror sites.  On CompuServe, it should be at GO GRAPHSUPPORT
+in the Png Development library (lib 20).  Failing that, try
+my ftp site at ftp://ftp.group42.com/pub/png or web site at
+http://www.group42.com/  If you have trouble getting to these,
+the numerical address is 204.94.158.25
+
+1.4) How ready is libpng?
+
+In its current incarnation (0.8), it still may have a few bugs.
+I think I got all of the bugs this time, but one never knows.
+Also, the dithering currently in libpng is horrid, so that
+needs work.  Finally, I have yet to implement medium model
+support.
+
+1.5) How portable is libpng?
+
+As portable as I can make it.  It needs int's of at least
+16 bits, and longs of at least 32 bits.  It has not been
+tried for char's larger then 8 bits.  It should support
+any reasonable K&R C compiler, as well as any ANSI C
+compiler.  The most you should need to do is change the
+includes in pngconf.h.  So far, I know of no compiler in use
+that libpng will not compile on.
+
+1.6) When will libpng be out of Beta?
+
+That depends on my workload here.  I'm writing libpng for
+free, which generates tons of good will, but doesn't help
+put food on the table, so there are times I just can't do
+any real work on it.  There is still some work to be done
+(see question 1.7), so don't expect the official version
+before September (and that may be pushing it).  I'll try
+to get the next (last?) beta version out my early
+September.  Be warned, I always seem to take twice as
+long as I think I will.
+
+1.7) What remains to be done in libpng for the 1.0 release?
+
+Add Tim Wegner's medium memory model support. (Thanks, Tim).
+Improve the dithering.
+Rewrite libpng.txt, and comment the code better.
+Test with a final zlib.
+
+1.8) Can I help?
+
+Sweet words.  The most helpful thing you can do for the
+1.0 release is help testing on your compiler.  After this
+release, though, there is a large list of things that ought
+to be done to make libpng be more full featured.  We'll
+talk about this later, as I don't want to add tons of new
+code until after 1.0 gets out the door.  Please send me
+any makefile changes and/or other changes needed to support
+your compiler (with a #ifdef for the code changes).
+
+If any of you are good at technical writing, take a look at
+libpng.txt and correct it (or rewrite it) as necessary.  I
+am not a writer, I'm a programmer.  It shows.
+
+1.9) Why don't you answer your mail?
+
+I've been busy.  I'm sorry about that, and I've got to get
+into the habit of at least replying that I got the message.
+Also, some of you have sent me problems that I haven't gotten
+back to you yet.  If it is still a problem, you may want to
+give me a short message and remind me that I need to look into
+it.  Libpng is being tested by more people than I dared hope
+(which is a good thing), and I was unprepared to deal with so
+many problems so soon.
+
+
+2) Libpng questions
+
+2.1) Does the order of functions calls matter?
+
+In general, yes.  If you stick with the order I used in libpng.txt
+and example.c, you should be safe.  Be warned, however, that I
+messed up the order of png_set_interlace_handling().  It needs
+to be called *before* png_start_read_image(), not after.  Oops.
+The exceptions to this rule are all the png_set ... calls.
+They can be done in any order, but they all have to be done
+in the area indicated by libpng.txt/example.c.
+
+2.2) When I try to read/write a png image, it doesn't work.
+
+Does zlib's test program work (example.c)?  Does libpng's test
+program work (testpng.c)?  Have you installed the patches at
+the end of this FAQ?  After all that, if the problem continues,
+e-mail me, and we'll try to fix it.  If you don't have much 
+programming experience, be patient about the fix.  Code
+fragments help, as do *small* images (uuencoded please).  If
+I don't get back to you right away, give me some time.  Thanks.
+
+2.3) Do I have to start with example.c?
+
+No, but most people have had much better luck doing that.  Seems
+I didn't explain things well in libpng.txt, so things are not
+intuitive to people (which could be an api design problem also).
+Sometime in the future, we'll revisit the api design, and try
+to make it easier to use.  I'll rewrite libpng.txt before the
+1.0 release.
+
+2.4) What things should I be careful of?
+
+The main gotcha is calling png_read_init() before png_info_init().
+Also, always make sure you have a correct setjmp buffer.  That's
+all I can think of for now.
+
+2.5) Why doesn't example.c compile?
+
+I wrote example.c as a staring point for using libpng.  It doesn't
+compile because I don't know how you want to do things like allocating
+memory to hold the image, so I left that code out.  If you go in and
+finish it up, it should work fine.  The file pngtest.c gives a
+very simple example of reading and writing png files.
+
+
+3) Critical Patches
+
+No known bugs (for now :-).
+
+
+4) Non-critical patches
+
+No known bugs (for now :-).
+
+
+That's it so far as I know.  If I missed something, yell.
+
+-Guy

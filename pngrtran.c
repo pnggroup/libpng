@@ -572,7 +572,7 @@ png_init_read_transformations(png_struct *png_ptr)
    }
 #endif
 
-#if defined(PNG_READ_SHIFT_SUPPORTED)
+#if defined(PNG_READ_SHIFT_SUPPORTED) && defined(PNG_READ_sBIT_SUPPORTED)
    if ((png_ptr->transformations & PNG_SHIFT) &&
       png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
@@ -876,18 +876,32 @@ png_do_unshift(png_row_info *row_info, png_bytef *row,
       channels = 0;
       if (row_info->color_type & PNG_COLOR_MASK_COLOR)
       {
-         shift[channels++] = row_info->bit_depth - sig_bits->red;
-         shift[channels++] = row_info->bit_depth - sig_bits->green;
-         shift[channels++] = row_info->bit_depth - sig_bits->blue;
+         shift[channels++] = row_info->bit_depth - sig_bits->red < 0 ?
+                             0 : row_info->bit_depth - sig_bits->red;
+         shift[channels++] = row_info->bit_depth - sig_bits->green < 0 ?
+                             0 : row_info->bit_depth - sig_bits->green;
+         shift[channels++] = row_info->bit_depth - sig_bits->blue < 0 ?
+                             0 : row_info->bit_depth - sig_bits->blue;
       }
       else
       {
-         shift[channels++] = row_info->bit_depth - sig_bits->gray;
+         shift[channels++] = row_info->bit_depth - sig_bits->gray < 0 ?
+                             0 : row_info->bit_depth - sig_bits->gray;
       }
       if (row_info->color_type & PNG_COLOR_MASK_ALPHA)
       {
-         shift[channels++] = row_info->bit_depth - sig_bits->alpha;
+         shift[channels++] = row_info->bit_depth - sig_bits->alpha < 0 ?
+                             0 : row_info->bit_depth - sig_bits->alpha;
       }
+
+      value = 1;
+
+      for (i = 0; i < channels; i++)
+      {
+        if (shift[i] != 0) value = 0;
+      }
+
+      if (value == 1) return;
 
       switch (row_info->bit_depth)
       {
@@ -905,6 +919,7 @@ png_do_unshift(png_row_info *row_info, png_bytef *row,
          case 4:
          {
             png_byte  mask;
+
             mask = (png_byte)(((int)0xf0 >> shift[0]) & (int)0xf0) |
                ((int)0xf >> shift[0]);
             for (bp = row, i = 0;
@@ -957,17 +972,15 @@ png_do_unshift(png_row_info *row_info, png_bytef *row,
 void
 png_do_chop(png_row_info *row_info, png_bytef *row)
 {
-   png_bytef *sp, *dp;
-   png_uint_32 i;
    if (row && row_info && row_info->bit_depth == 16)
    {
-      sp = row + 2;
-      dp = row + 1;
-      for (i = 1; i < row_info->width * row_info->channels; i++)
+      png_bytef *sp = row, *dp = row;
+      png_uint_32 i;
+
+      for (i = 0; i < row_info->width * row_info->channels; i++)
       {
-         *dp = *sp;
-         sp += 2;
-         dp++;
+         *dp++ = ((((*sp << 8 | *(sp + 1)) - *sp) + 0x7F) >> 8) & 0xFF;
+	 sp += 2;
       }
       row_info->bit_depth = 8;
       row_info->pixel_depth = 8 * row_info->channels;
@@ -1147,6 +1160,7 @@ png_build_grayscale_palette(int bit_depth, png_color *palette)
          break;
       default:
          num_palette = 0;
+         color_inc = 0;
          break;
    }
 
@@ -2002,7 +2016,7 @@ png_do_background(png_row_info *row_info, png_bytef *row,
    you do this after you deal with the trasparency issue on grayscale
    or rgb images. If your bit depth is 8, use gamma_table, if it is 16,
    use gamma_16_table and gamma_shift.  Build these with
-   build_gamma_table().  If your bit depth < 8, gamma correct a
+   build_gamma_table().  If your bit depth <= 8, gamma correct a
    palette, not the data.  */
 void
 png_do_gamma(png_row_info *row_info, png_bytef *row,
@@ -2623,8 +2637,9 @@ png_build_gamma_table(png_struct *png_ptr)
    {
       double g;
       int i, j, shift, num;
-      int sig_bit;
       png_uint_32 ig;
+#if defined(PNG_READ_sBIT_SUPPORTED)
+      int sig_bit;
 
       if (png_ptr->color_type & PNG_COLOR_MASK_COLOR)
       {
@@ -2642,6 +2657,7 @@ png_build_gamma_table(png_struct *png_ptr)
       if (sig_bit > 0)
          shift = 16 - sig_bit;
       else
+#endif /* PNG_READ_sBIT_SUPPORTED */
          shift = 0;
 
       if (png_ptr->transformations & PNG_16_TO_8)
@@ -2677,26 +2693,25 @@ png_build_gamma_table(png_struct *png_ptr)
          }
 
          g = 1.0 / g;
-      	last = 0;
-      	for (i = 0; i < 256; i++)
+         last = 0;
+         for (i = 0; i < 256; i++)
          {
-		      fout = ((double)i + 0.5) / 256.0;
-      		fin = pow(fout, g);
-		      max = (png_uint_32)(fin * (double)(num << 8));
-      		while (last <= max)
+            fout = ((double)i + 0.5) / 256.0;
+            fin = pow(fout, g);
+            max = (png_uint_32)(fin * (double)(num << 8));
+            while (last <= max)
             {
-		      	png_ptr->gamma_16_table[(int)(last >> 8)]
-                  [(int)(last & 0xff)] =
+               png_ptr->gamma_16_table[(int)(last >> 8)][(int)(last & 0xff)] =
                   (png_uint_16)i | ((png_uint_16)i << 8);
                last++;
             }
-      	}
-      	while (last < (num << 8))
-         {
-		      png_ptr->gamma_16_table[(int)(last >> 8)][(int)(last & 0xff)] =
-               (png_uint_16)65535L;
-            last++;
-         }
+        }
+        while (last < (num << 8))
+        {
+           png_ptr->gamma_16_table[(int)(last >> 8)][(int)(last & 0xff)] =
+              (png_uint_16)65535L;
+           last++;
+        }
       }
       else
       {

@@ -55,6 +55,16 @@ version 0.8
    put all the configurable stuff in pngconf.h
    enabled png_set_shift to work with paletted images on read
    added png_read_update_info() - updates info structure with transformations
+version 0.81
+   added support for medium memory model
+version 0.82
+   added ability to flush output stream automatically or manually
+   added ability to change I/O and error functions dynamically
+   moved pngerror.c into pngio.c to make all the default functions static
+   when freeing memory in png_read_destroy don't free memory we didn't allocate
+   added warnings when reading blocks of incorrect length
+   limit tEXt and zTXt keywords to 80 chars
+
 
 
 

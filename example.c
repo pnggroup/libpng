@@ -79,8 +79,18 @@ void read_png(char *file_name)
    png_info_init(info_ptr);
    png_read_init(png_ptr);
 
-   /* set up the input control */
+   /* set up the input control for the default input and message functions.
+    * If we were to replace both the input and message functions we don't
+    * need to call png_init_io first. */
    png_init_io(png_ptr, fp);
+
+   /* if you are using replacement read functions, here you would call */
+   io_ptr = (user_io_struct *)malloc(sizeof(user_io_struct));
+   png_set_read_fn(png_ptr, (void *)io_ptr, user_read_fn);
+
+   /* if you are using replacement message functions, here you would call */
+   msg_ptr = (user_msg_struct *)malloc(sizeof(user_msg_struct));
+   png_set_read_fn(png_ptr, (void *)msg_ptr, user_error_fn, user_warning_fn);
 
    /* read the file information */
    png_read_info(png_ptr, info_ptr);
@@ -146,8 +156,7 @@ void read_png(char *file_name)
       png_set_invert(png_ptr);
 
    /* shift the pixels down to their true bit depth */
-   if (info_ptr->valid & PNG_INFO_sBIT &&
-      info_ptr->bit_depth > info_ptr->sig_bit)
+   if (info_ptr->valid & PNG_INFO_sBIT)
       png_set_shift(png_ptr, &(info_ptr->sig_bit));
 
    /* pack pixels into bytes */
@@ -212,6 +221,11 @@ void read_png(char *file_name)
       in info_ptr */
    png_read_end(png_ptr, info_ptr);
 
+   /* if you had allocated any memory structures for custom input or
+      messaging routines you need to free them before png_read_destroy */
+   free(png_get_io_ptr(png_ptr));
+   free(png_get_msg_ptr(png_ptr));
+
    /* clean up after the read, and free any memory allocated */
    png_read_destroy(png_ptr, info_ptr, (png_info *)0);
 
@@ -269,8 +283,18 @@ void write_png(char *file_name, ... other image information ...)
    png_info_init(info_ptr);
    png_write_init(png_ptr);
 
-   /* set up the output control */
+   /* set up the output control for the default output and message functions.
+    * If we were to replace both the output and message functions we don't
+    * need to call png_init_io first. */
    png_init_io(png_ptr, fp);
+
+   /* if you are using replacement write functions, here you would call */
+   io_ptr = (user_io_struct *)malloc(sizeof(user_io_struct));
+   png_set_write_fn(png_ptr, (void *)io_ptr, user_write_fn, user_flush_fn);
+
+   /* if you are using replacement message functions, here you would call */
+   msg_ptr = (user_msg_struct *)malloc(sizeof(user_msg_struct));
+   png_set_read_fn(png_ptr, (void *)msg_ptr, user_error_fn, user_warning_fn);
 
    /* set the file information here */
    info_ptr->width = ;
@@ -285,9 +309,16 @@ void write_png(char *file_name, ... other image information ...)
 
    /* optional significant bit chunk */
    info_ptr->valid |= PNG_INFO_sBIT;
-   info_ptr->sig_bit = true_bit_depth;
+   /* if we are dealing with a grayscale image then */
+   info_ptr->sig_bit.gray = true_bit_depth;
+   /* otherwise, if we are dealing with a color image then */
+   info_ptr->sig_bit.red = true_red_bit_depth;
+   info_ptr->sig_bit.green = true_green_bit_depth;
+   info_ptr->sig_bit.blue = true_blue_bit_depth;
+   /* if the image has an alpha channel then */
+   info_ptr->sig_bit.alpha = true_alpha_bit_depth;
 
-   /* optional gamma chunk */
+   /* optional gamma chunk is a good idea if you can write one */
    info_ptr->valid |= PNG_INFO_gAMA;
    info_ptr->gamma = gamma;
 
@@ -346,6 +377,11 @@ void write_png(char *file_name, ... other image information ...)
 
    /* write the rest of the file */
    png_write_end(png_ptr, info_ptr);
+
+   /* if you had allocated any memory structures for custom output or
+      messaging routines you need to free them before png_write_destroy */
+   free(png_get_io_ptr(png_ptr));
+   free(png_get_msg_ptr(png_ptr));
 
    /* clean up after the write, and free any memory allocated */
    png_write_destroy(png_ptr);

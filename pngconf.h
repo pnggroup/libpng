@@ -27,7 +27,7 @@
    Unless this gets smaller then the size of a row (compressed),
    it should not make much difference how big this is.  */
 
-#define PNG_ZBUF_SIZE 8192
+#define PNG_ZBUF_SIZE 32768
 
 /* While libpng currently uses zlib for it's compression, it has been designed
    to stand on it's own.  Towards this end, there are two defines that are
@@ -166,6 +166,7 @@
 #define PNG_WRITE_SWAP_SUPPORTED
 #define PNG_WRITE_INVERT_SUPPORTED
 #define PNG_WRITE_FILLER_SUPPORTED
+#define PNG_WRITE_FLUSH_SUPPORTED
 
 /* any chunks you are not interested in, you can undef here.  The
    ones that allocate memory may be expecially important (hIST,

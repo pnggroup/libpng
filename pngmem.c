@@ -1,5 +1,5 @@
 
-/* pngstub.c - stub functions for i/o and memory allocation
+/* pngmem.c - stub functions for memory allocation
 
    libpng 1.0 beta 2 - version 0.81
    For conditions of distribution and use, see copyright notice in png.h
@@ -61,7 +61,7 @@ png_large_malloc(png_structf *png_ptr, png_uint_32 size)
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
-      png_error(png_ptr, "Cannot Allocate > 64K");
+      (*(png_ptr->error_fn))(png_ptr, "Cannot Allocate > 64K");
 #endif
 
 #ifdef __TURBOC__
@@ -99,11 +99,11 @@ png_large_malloc(png_structf *png_ptr, png_uint_32 size)
             num_save_array = 1;
             save_array = malloc(num_save_array * sizeof (borland_seg));
             if (!save_array)
-               png_error(png_ptr, "Out of Memory 1");
+               (*(png_ptr->error_fn))(png_ptr, "Out of Memory 1");
             save_array->mem_ptr = farmalloc(
                (unsigned long)(NUM_SEG) * 65536L + 65532L);
             if (!save_array->mem_ptr)
-               png_error(png_ptr, "Out of Memory 2");
+               (*(png_ptr->error_fn))(png_ptr, "Out of Memory 2");
             offset = (unsigned long)(ret);
             offset &= 0xffffL;
             ptr = save_array->mem_ptr;
@@ -141,11 +141,11 @@ png_large_malloc(png_structf *png_ptr, png_uint_32 size)
             save_array = realloc(save_array,
                (num_save_array + 1) * sizeof (borland_seg));
             if (!save_array)
-               png_error(png_ptr, "Out of Memory 3");
+               (*(png_ptr->error_fn))(png_ptr, "Out of Memory 3");
             save_array[num_save_array].mem_ptr = farmalloc(
                (unsigned long)(NUM_SEG) * 65536L + 65532L);
             if (!save_array[num_save_array].mem_ptr)
-               png_error(png_ptr, "Out of Memory 4");
+               (*(png_ptr->error_fn))(png_ptr, "Out of Memory 4");
             offset = (unsigned long)(ret);
             offset &= 0xffffL;
             ptr = save_array[num_save_array].mem_ptr;
@@ -180,7 +180,7 @@ png_large_malloc(png_structf *png_ptr, png_uint_32 size)
 
    if (ret == NULL)
    {
-      png_error(png_ptr, "Out of Memory");
+      (*(png_ptr->error_fn))(png_ptr, "Out of Memory");
    }
 
    return ret;
@@ -259,14 +259,14 @@ png_malloc(png_struct *png_ptr, png_uint_32 size)
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
-      png_error(png_ptr, "Cannot Allocate > 64K");
+      (*(png_ptr->error_fn))(png_ptr, "Cannot Allocate > 64K");
 #endif
 
    ret = malloc((png_size_t)size);
 
    if (!ret)
    {
-      png_error(png_ptr, "Out of Memory 6");
+      (*(png_ptr->error_fn))(png_ptr, "Out of Memory 6");
    }
 
    return ret;
@@ -285,14 +285,14 @@ png_realloc(png_struct *png_ptr, void *ptr, png_uint_32 size,
 
 #ifdef PNG_MAX_MALLOC_64K
    if (size > (png_uint_32)65536L)
-      png_error(png_ptr, "Cannot Allocate > 64K");
+      (*(png_ptr->error_fn))(png_ptr, "Cannot Allocate > 64K");
 #endif
 
    ret = realloc(ptr, (png_size_t)size);
 
    if (!ret)
    {
-      png_error(png_ptr, "Out of Memory 7");
+      (*(png_ptr->error_fn))(png_ptr, "Out of Memory 7");
    }
 
    return ret;

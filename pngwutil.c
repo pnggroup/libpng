@@ -39,7 +39,7 @@ png_write_uint_32(png_struct *png_ptr, png_uint_32 i)
    buf[1] = (png_byte)((i >> 16) & 0xff);
    buf[2] = (png_byte)((i >> 8) & 0xff);
    buf[3] = (png_byte)(i & 0xff);
-   png_write_data(png_ptr, buf, 4);
+   (*(png_ptr->write_data_fn))(png_ptr, buf, 4);
 }
 
 /* write a 16 bit number */
@@ -50,7 +50,7 @@ png_write_uint_16(png_struct *png_ptr, png_uint_16 i)
 
    buf[0] = (png_byte)((i >> 8) & 0xff);
    buf[1] = (png_byte)(i & 0xff);
-   png_write_data(png_ptr, buf, 2);
+   (*(png_ptr->write_data_fn))(png_ptr, buf, 2);
 }
 
 /* Write a png chunk all at once.  The type is an array of ASCII characters
@@ -68,7 +68,7 @@ png_write_chunk(png_struct *png_ptr, png_byte *type,
    /* write length */
    png_write_uint_32(png_ptr, length);
    /* write chunk name */
-   png_write_data(png_ptr, type, (png_uint_32)4);
+   (*(png_ptr->write_data_fn))(png_ptr, type, (png_uint_32)4);
    /* reset the crc and run the chunk name over it */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, type, (png_uint_32)4);
@@ -76,7 +76,7 @@ png_write_chunk(png_struct *png_ptr, png_byte *type,
    if (length)
    {
       png_calculate_crc(png_ptr, data, length);
-      png_write_data(png_ptr, data, length);
+      (*(png_ptr->write_data_fn))(png_ptr, data, length);
    }
    /* write the crc */
    png_write_uint_32(png_ptr, ~png_ptr->crc);
@@ -92,7 +92,7 @@ png_write_chunk_start(png_struct *png_ptr, png_byte *type,
    /* write the length */
    png_write_uint_32(png_ptr, total_length);
    /* write the chunk name */
-   png_write_data(png_ptr, type, (png_uint_32)4);
+   (*(png_ptr->write_data_fn))(png_ptr, type, (png_uint_32)4);
    /* reset the crc and run it over the chunk name */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, type, (png_uint_32)4);
@@ -109,7 +109,7 @@ png_write_chunk_data(png_struct *png_ptr, png_bytef *data, png_uint_32 length)
    if (length)
    {
       png_calculate_crc(png_ptr, data, length);
-      png_write_data(png_ptr, data, length);
+      (*(png_ptr->write_data_fn))(png_ptr, data, length);
    }
 }
 
@@ -126,7 +126,7 @@ void
 png_write_sig(png_struct *png_ptr)
 {
    /* write the 8 byte signature */
-   png_write_data(png_ptr, png_sig, (png_uint_32)8);
+   (*(png_ptr->write_data_fn))(png_ptr, png_sig, (png_uint_32)8);
 }
 
 /* Write the IHDR chunk, and update the png_struct with the necessary
@@ -175,10 +175,10 @@ png_write_IHDR(png_struct *png_ptr, png_uint_32 width, png_uint_32 height,
    /* set the usr info, so any transformations can modify it */
    png_ptr->usr_width = png_ptr->width;
    png_ptr->usr_bit_depth = png_ptr->bit_depth;
-    png_ptr->usr_channels = png_ptr->channels;
+   png_ptr->usr_channels = png_ptr->channels;
 
    /* write the chunk */
-    png_write_chunk(png_ptr, png_IHDR, buf, (png_uint_32)13);
+   png_write_chunk(png_ptr, png_IHDR, buf, (png_uint_32)13);
 
    /* initialize zlib with png info */
    png_ptr->zstream = &(png_ptr->zstream_struct);
@@ -462,9 +462,9 @@ png_write_zTXt(png_struct *png_ptr, charf *key, charf *text,
       {
          /* error */
          if (png_ptr->zstream->msg)
-            png_error(png_ptr, png_ptr->zstream->msg);
+            (*(png_ptr->error_fn))(png_ptr, png_ptr->zstream->msg);
          else
-            png_error(png_ptr, "zlib error");
+            (*(png_ptr->error_fn))(png_ptr, "zlib error");
       }
       /* check to see if we need more room */
       if (!png_ptr->zstream->avail_out && png_ptr->zstream->avail_in)
@@ -508,9 +508,9 @@ png_write_zTXt(png_struct *png_ptr, charf *key, charf *text,
       {
          /* we got an error */
          if (png_ptr->zstream->msg)
-            png_error(png_ptr, png_ptr->zstream->msg);
+            (*(png_ptr->error_fn))(png_ptr, png_ptr->zstream->msg);
          else
-            png_error(png_ptr, "zlib error");
+            (*(png_ptr->error_fn))(png_ptr, "zlib error");
       }
 
       /* check to see if we need more room */
@@ -689,7 +689,7 @@ png_write_finish_row(png_struct *png_ptr)
    /* next row */
    png_ptr->row_number++;
    /* see if we are done */
-   if (png_ptr->row_number < png_ptr->num_rows)
+   if (png_ptr->row_number < png_ptr->num_rows || png_ptr->mode > PNG_HAVE_IDAT)
       return;
 
    /* if interlaced, go to next pass */
@@ -740,9 +740,9 @@ png_write_finish_row(png_struct *png_ptr)
       if (ret != Z_OK && ret != Z_STREAM_END)
       {
          if (png_ptr->zstream->msg)
-            png_error(png_ptr, png_ptr->zstream->msg);
+            (*(png_ptr->error_fn))(png_ptr, png_ptr->zstream->msg);
          else
-            png_error(png_ptr, "zlib error");
+            (*(png_ptr->error_fn))(png_ptr, "zlib error");
       }
       /* check to see if we need more room */
       if (!png_ptr->zstream->avail_out && ret == Z_OK)
@@ -761,6 +761,7 @@ png_write_finish_row(png_struct *png_ptr)
    }
 
    deflateReset(png_ptr->zstream);
+   png_ptr->mode = PNG_AFTER_IDAT;
 }
 
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)

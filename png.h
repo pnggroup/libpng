@@ -267,7 +267,19 @@ typedef struct png_row_info_struct
    The only people who need to care about what is inside of this are the
    people who will be modifying the library for their own special needs.
    */
-typedef struct png_struct_def
+typedef struct png_struct_def png_struct;
+typedef png_struct FAR png_structf;
+
+/* These are the function types for the I/O functions, and the functions which
+ * modify the default I/O functions to user I/O functions.  The png_msg_ptr
+ * type should match that of user supplied warning and error functions, while
+ * the png_rw_ptr type should match that of the user read/write data functions.
+ */
+typedef void (*png_msg_ptr) PNGARG((png_struct *, char *));
+typedef void (*png_rw_ptr) PNGARG((png_struct *, png_bytef *, png_uint_32));
+typedef void (*png_flush_ptr) PNGARG((png_struct *));
+
+struct png_struct_def
 {
    jmp_buf jmpbuf; /* used in png_error */
    png_byte mode; /* used to determine where we are in the png file */
@@ -314,6 +326,10 @@ typedef struct png_struct_def
    png_uint_32 width; /* width of file */
    png_uint_32 height; /* height of file */
    png_uint_32 num_rows; /* number of rows in current pass */
+#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+   png_uint_32 flush_dist;  /* how many rows apart to flush, 0 for no flush */
+   png_uint_32 flush_rows;  /* number of rows written since last flush */
+#endif /* PNG_WRITE_FLUSH_SUPPORTED */
    png_uint_32 rowbytes; /* size of row in bytes */
    png_uint_32 usr_width; /* width of row at start of write */
    png_uint_32 iwidth; /* interlaced width */
@@ -322,13 +338,14 @@ typedef struct png_struct_def
    png_uint_32 idat_size; /* current idat size for read */
    png_uint_32 zbuf_size; /* size of zbuf */
    png_color *palette; /* files palette */
+   png_uint_32 do_free; /* flags indicating if libpng should free memory */
 #if defined(PNG_READ_DITHER_SUPPORTED)
    png_bytef *palette_lookup; /* lookup table for dithering */
 #endif
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_byte *gamma_table; /* gamma table for 8 bit depth files */
 #endif
-#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED)
    png_byte *gamma_from_1; /* converts from 1.0 to screen */
    png_byte *gamma_to_1; /* converts from file to 1.0 */
 #endif
@@ -363,7 +380,7 @@ typedef struct png_struct_def
 #if defined(PNG_READ_SHIFT_SUPPORTED) || defined(PNG_WRITE_SHIFT_SUPPORTED)
    png_color_8 shift; /* shift for significant bit tranformation */
 #endif
-#if defined(PNG_READ_GAMMA_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined (PNG_READ_sBIT_SUPPORTED)
    png_color_8 sig_bit; /* significant bits in file */
 #endif
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
@@ -375,10 +392,17 @@ typedef struct png_struct_def
 #endif
    png_row_info row_info; /* used for transformation routines */
    z_stream zstream_struct; /* decompression structure */
-   FILE *fp; /* used for png_read and png_write */
-} png_struct;
-
-typedef png_struct FAR png_structf;
+   FILE *fp; /* used for default png_read and png_write */
+   png_msg_ptr error_fn;         /* Function for printing errors and aborting */
+   png_msg_ptr warning_fn;       /* Function for printing warnings */
+   png_rw_ptr write_data_fn;     /* Function for writing output data */
+   png_rw_ptr read_data_fn;      /* Function for reading input data */
+#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+   png_flush_ptr output_flush_fn;/* Function for flushing output */
+#endif /* PNG_WRITE_FLUSH_SUPPORTED */
+   void *io_ptr;  /* Pointer to user supplied struct for I/O functions */
+   void *msg_ptr;  /* Pointer to user supplied struct for message functions */
+};
 
 /* Here are the function definitions most commonly used.  This is not
    the place to find out how to use libpng.  See libpng.txt for the
@@ -403,7 +427,7 @@ extern void png_write_info PNGARG((png_struct *png_ptr, png_info *info));
 /* read the information before the actual image data. */
 extern void png_read_info PNGARG((png_struct *png_ptr, png_info *info));
 
-#if defined(PNG_READ_tIME_SUPPORTED)
+#if defined(PNG_WRITE_tIME_SUPPORTED)
 /* convert from a struct tm to png_time */
 extern void png_convert_from_struct_tm PNGARG((png_time *ptime,
    struct tm *ttime));
@@ -500,6 +524,14 @@ extern void png_set_gamma PNGARG((png_struct *png_ptr, double screen_gamma,
    double default_file_gamma));
 #endif
 
+#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+/* Set how many lines between output flushes - 0 for no flushing */
+extern void png_set_flush PNGARG((png_struct *png_ptr, int nrows));
+
+/* Flush the current PNG output buffer */
+extern void png_write_flush PNGARG((png_struct *png_ptr));
+#endif /* PNG_WRITE_FLUSH_SUPPORTED */
+
 /* optional update palette with requested transformations */
 extern void png_start_read_image PNGARG((png_struct *png_ptr));
 
@@ -570,21 +602,8 @@ extern void png_set_compression_window_bits PNGARG((png_struct *png_ptr,
 extern void png_set_compression_method PNGARG((png_struct *png_ptr,
    int method));
 
-/* These next functions are stubs of typical c functions for input/output,
-   memory, and error handling.  They are in the file pngstub.c, and are
-   set up to be easily modified for users that need to.  See the file
-   pngstub.c for more information */
-
-/* Write the data to whatever output you are using. */
-extern void png_write_data PNGARG((png_struct *png_ptr, png_bytef *data,
-   png_uint_32 length));
-
-/* Read data from whatever input you are using */
-extern void png_read_data PNGARG((png_struct *png_ptr, png_bytef *data,
-   png_uint_32 length));
-
-/* Initialize the input/output for the png file. */
-extern void png_init_io PNGARG((png_struct *png_ptr, FILE *fp));
+/* These next functions are prototypes of the functions libpng uses for
+   memory allocation. */
 
 /* Allocate memory in larger chunks. */
 extern voidpf png_large_malloc PNGARG((png_structf *png_ptr, png_uint_32 size));
@@ -602,12 +621,32 @@ extern void *png_realloc PNGARG((png_struct *png_ptr, void *ptr,
 /* free's a pointer allocated by png_malloc() */
 extern void png_free PNGARG((png_struct *png_ptr, void *ptr));
 
-/* Fatal error in libpng - can't continue */
-extern void png_error PNGARG((png_structf *png_ptr, char *error));
+/* Initialize the I/O and message handling for the png file to the defaults. */
+extern void png_init_io PNGARG((png_struct *png_ptr, FILE *fp));
 
-/* Non-fatal error in libpng.  Can continue, but may have a problem. */
-extern void png_warning PNGARG((png_struct *png_ptr, char *message));
+/* Replace the error message and abort, and warning functions with user
+   supplied functions.   If no messages are to be printed, NULL can be
+   supplied for error_fn and warning_fn, although error_fn will still do
+   a longjmp to the last setjmp location. */
+extern void png_set_msg_fn PNGARG((png_struct *png_ptr, void *msg_ptr,
+   png_msg_ptr error_fn, png_msg_ptr warning_fn));
 
+/* Return the user pointer associated with the message functions */
+extern void *png_get_msg_ptr PNGARG((png_struct *png_ptr));
+
+/* Replace the default data output functions with a user supplied one(s).
+   If buffered output is not used, then output_flush_fn can be set to NULL.
+   if PNG_WRITE_FLUSH_SUPPORTED is not defined at libpng compile time
+   output_flush_fn will be ignored (but must be supplied for compatability). */
+extern void png_set_write_fn PNGARG((png_struct *png_ptr, void *io_ptr,
+   png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn));
+
+/* Replace the default data input function with a user supplied one. */
+extern void png_set_read_fn PNGARG((png_struct *png_ptr, void *io_ptr,
+   png_rw_ptr read_data_fn));
+
+/* Return the user pointer associated with the I/O functions */
+extern void *png_get_io_ptr PNGARG((png_struct *png_ptr));
 
 /* These next functions are used internally in the code.  If you use
    them, make sure you read and understand the png spec.  More information
@@ -645,6 +684,11 @@ extern void png_warning PNGARG((png_struct *png_ptr, char *message));
 #define PNG_GAMMA 0x1000
 #define PNG_GRAY_TO_RGB 0x2000
 #define PNG_FILLER 0x4000
+
+/* defines for memory alloced by libpng which should be freed */
+#define PNG_FREE_TRANS   0x0001
+#define PNG_FREE_HIST    0x0002
+#define PNG_FREE_PALETTE 0x0004
 
 /* save typing and make code easier to understand */
 #define PNG_COLOR_DIST(c1, c2) (abs((int)((c1).red) - (int)((c2).red)) + \
