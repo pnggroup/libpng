@@ -113,4 +113,152 @@
    an error. */
 #define PNG_ABORT()
 
+/* GRR 20050220:  added these, which apparently aren't defined anywhere else */
+#ifndef PNG_UINT_IHDR
+#  define PNG_UINT_IHDR (((png_uint_32)  73<<24) | \
+                         ((png_uint_32)  72<<16) | \
+                         ((png_uint_32)  68<< 8) | \
+                         ((png_uint_32)  82    ))
 #endif
+
+#ifndef PNG_UINT_IDAT
+#  define PNG_UINT_IDAT (((png_uint_32)  73<<24) | \
+                         ((png_uint_32)  68<<16) | \
+                         ((png_uint_32)  65<< 8) | \
+                         ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_IEND
+#  define PNG_UINT_IEND (((png_uint_32)  73<<24) | \
+                         ((png_uint_32)  69<<16) | \
+                         ((png_uint_32)  78<< 8) | \
+                         ((png_uint_32)  68    ))
+#endif
+
+#ifndef PNG_UINT_PLTE
+#  define PNG_UINT_PLTE (((png_uint_32)  80<<24) | \
+                         ((png_uint_32)  76<<16) | \
+                         ((png_uint_32)  84<< 8) | \
+                         ((png_uint_32)  69    ))
+#endif
+
+#ifndef PNG_UINT_bKGD
+#  define PNG_UINT_bKGD (((png_uint_32)  98<<24) | \
+                         ((png_uint_32)  75<<16) | \
+                         ((png_uint_32)  71<< 8) | \
+                         ((png_uint_32)  68    ))
+#endif
+
+#ifndef PNG_UINT_cHRM
+#  define PNG_UINT_cHRM (((png_uint_32)  99<<24) | \
+                         ((png_uint_32)  72<<16) | \
+                         ((png_uint_32)  82<< 8) | \
+                         ((png_uint_32)  77    ))
+#endif
+
+#ifndef PNG_UINT_gAMA
+#  define PNG_UINT_gAMA (((png_uint_32) 103<<24) | \
+                         ((png_uint_32)  65<<16) | \
+                         ((png_uint_32)  77<< 8) | \
+                         ((png_uint_32)  65    ))
+#endif
+
+#ifndef PNG_UINT_hIST
+#  define PNG_UINT_hIST (((png_uint_32) 104<<24) | \
+                         ((png_uint_32)  73<<16) | \
+                         ((png_uint_32)  83<< 8) | \
+                         ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_iCCP
+#  define PNG_UINT_iCCP (((png_uint_32) 105<<24) | \
+                         ((png_uint_32)  67<<16) | \
+                         ((png_uint_32)  67<< 8) | \
+                         ((png_uint_32)  80    ))
+#endif
+
+#ifndef PNG_UINT_iTXt
+#  define PNG_UINT_iTXt (((png_uint_32) 105<<24) | \
+                         ((png_uint_32)  84<<16) | \
+                         ((png_uint_32)  88<< 8) | \
+                         ((png_uint_32) 116    ))
+#endif
+
+#ifndef PNG_UINT_oFFs
+#  define PNG_UINT_oFFs (((png_uint_32) 111<<24) | \
+                         ((png_uint_32)  70<<16) | \
+                         ((png_uint_32)  70<< 8) | \
+                         ((png_uint_32) 115    ))
+#endif
+
+#ifndef PNG_UINT_pCAL
+#  define PNG_UINT_pCAL (((png_uint_32) 112<<24) | \
+                         ((png_uint_32)  67<<16) | \
+                         ((png_uint_32)  65<< 8) | \
+                         ((png_uint_32)  76    ))
+#endif
+
+#ifndef PNG_UINT_sCAL
+#  define PNG_UINT_sCAL (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  67<<16) | \
+                         ((png_uint_32)  65<< 8) | \
+                         ((png_uint_32)  76    ))
+#endif
+
+#ifndef PNG_UINT_pHYs
+#  define PNG_UINT_pHYs (((png_uint_32) 112<<24) | \
+                         ((png_uint_32)  72<<16) | \
+                         ((png_uint_32)  89<< 8) | \
+                         ((png_uint_32) 115    ))
+#endif
+
+#ifndef PNG_UINT_sBIT
+#  define PNG_UINT_sBIT (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  66<<16) | \
+                         ((png_uint_32)  73<< 8) | \
+                         ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_sPLT
+#  define PNG_UINT_sPLT (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  80<<16) | \
+                         ((png_uint_32)  76<< 8) | \
+                         ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_sRGB
+#  define PNG_UINT_sRGB (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  82<<16) | \
+                         ((png_uint_32)  71<< 8) | \
+                         ((png_uint_32)  66    ))
+#endif
+
+#ifndef PNG_UINT_tEXt
+#  define PNG_UINT_tEXt (((png_uint_32) 116<<24) | \
+                         ((png_uint_32)  69<<16) | \
+                         ((png_uint_32)  88<< 8) | \
+                         ((png_uint_32) 116    ))
+#endif
+
+#ifndef PNG_UINT_tIME
+#  define PNG_UINT_tIME (((png_uint_32) 116<<24) | \
+                         ((png_uint_32)  73<<16) | \
+                         ((png_uint_32)  77<< 8) | \
+                         ((png_uint_32)  69    ))
+#endif
+
+#ifndef PNG_UINT_tRNS
+#  define PNG_UINT_tRNS (((png_uint_32) 116<<24) | \
+                         ((png_uint_32)  82<<16) | \
+                         ((png_uint_32)  78<< 8) | \
+                         ((png_uint_32)  83    ))
+#endif
+
+#ifndef PNG_UINT_zTXt
+#  define PNG_UINT_zTXt (((png_uint_32) 122<<24) | \
+                         ((png_uint_32)  84<<16) | \
+                         ((png_uint_32)  88<< 8) | \
+                         ((png_uint_32) 116    ))
+#endif
+
+#endif /* !PNGCRUSH_H */
