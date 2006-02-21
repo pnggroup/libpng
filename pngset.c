@@ -1,9 +1,9 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.8 - December 3, 2004
+ * libpng 1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -15,6 +15,8 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+
+#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
 #if defined(PNG_bKGD_SUPPORTED)
 void PNGAPI
@@ -100,6 +102,7 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
         "Ignoring attempt to set negative chromaticity value");
       return;
    }
+#ifdef PNG_FLOATING_POINT_SUPPORTED
    if (white_x > (double) PNG_UINT_31_MAX ||
        white_y > (double) PNG_UINT_31_MAX ||
          red_x > (double) PNG_UINT_31_MAX ||
@@ -108,6 +111,16 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
        green_y > (double) PNG_UINT_31_MAX ||
         blue_x > (double) PNG_UINT_31_MAX ||
         blue_y > (double) PNG_UINT_31_MAX)
+#else
+   if (white_x > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
+       white_y > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
+         red_x > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
+         red_y > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
+       green_x > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
+       green_y > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
+        blue_x > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
+        blue_y > (png_fixed_point) PNG_UINT_31_MAX/100000L)
+#endif
    {
       png_warning(png_ptr,
         "Ignoring attempt to set chromaticity value exceeding 21474.83");
@@ -209,19 +222,21 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
    png_debug1(1, "in %s storage function\n", "hIST");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
-   if (info_ptr->num_palette == 0)
+   if (info_ptr->num_palette <= 0 || info_ptr->num_palette
+       > PNG_MAX_PALETTE_LENGTH)
    {
        png_warning(png_ptr,
-          "Palette size 0, hIST allocation skipped.");
+          "Invalid palette size, hIST allocation skipped.");
        return;
    }
 
 #ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
 #endif
-   /* Changed from info->num_palette to 256 in version 1.2.1 */
+   /* Changed from info->num_palette to PNG_MAX_PALETTE_LENGTH in version
+      1.2.1 */
    png_ptr->hist = (png_uint_16p)png_malloc_warn(png_ptr,
-      (png_uint_32)(256 * png_sizeof (png_uint_16)));
+      (png_uint_32)(PNG_MAX_PALETTE_LENGTH * png_sizeof (png_uint_16)));
    if (png_ptr->hist == NULL)
      {
        png_warning(png_ptr, "Insufficient memory for hIST chunk data.");
@@ -517,6 +532,17 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (num_palette < 0 || num_palette > PNG_MAX_PALETTE_LENGTH)
+     {
+       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+         png_error(png_ptr, "Invalid palette length");
+       else
+       {
+         png_warning(png_ptr, "Invalid palette length");
+         return;
+       }
+     }
+
    /*
     * It may not actually be necessary to set png_ptr->palette here;
     * we do it for backward compatibility with the way the png_handle_tRNS
@@ -526,11 +552,13 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
    png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
 #endif
 
-   /* Changed in libpng-1.2.1 to allocate 256 instead of num_palette entries,
+   /* Changed in libpng-1.2.1 to allocate PNG_MAX_PALETTE_LENGTH instead
+      of num_palette entries,
       in case of an invalid PNG file that has too-large sample values. */
    png_ptr->palette = (png_colorp)png_malloc(png_ptr,
-      256 * png_sizeof(png_color));
-   png_memset(png_ptr->palette, 0, 256 * png_sizeof(png_color));
+      PNG_MAX_PALETTE_LENGTH * png_sizeof(png_color));
+   png_memset(png_ptr->palette, 0, PNG_MAX_PALETTE_LENGTH *
+      png_sizeof(png_color));
    png_memcpy(png_ptr->palette, palette, num_palette * png_sizeof (png_color));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
@@ -890,10 +918,11 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FREE_ME_SUPPORTED
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 #endif
-       /* Changed from num_trans to 256 in version 1.2.1 */
+       /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1 */
        png_ptr->trans = info_ptr->trans = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)256);
-       png_memcpy(info_ptr->trans, trans, (png_size_t)num_trans);
+           (png_uint_32)PNG_MAX_PALETTE_LENGTH);
+       if (num_trans <= PNG_MAX_PALETTE_LENGTH)
+         png_memcpy(info_ptr->trans, trans, (png_size_t)num_trans);
 #ifdef PNG_FREE_ME_SUPPORTED
        info_ptr->free_me |= PNG_FREE_TRNS;
 #else
@@ -1217,3 +1246,4 @@ png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 
 #endif /* ?PNG_1_0_X */
+#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

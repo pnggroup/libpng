@@ -1,9 +1,9 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * libpng  1.2.8 - December 3, 2004
+ * libpng  1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -11,6 +11,7 @@
 #define PNG_INTERNAL
 #include "png.h"
 
+#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* turn on BGR-to-RGB mapping */
 void PNGAPI
@@ -648,3 +649,4 @@ png_get_user_transform_ptr(png_structp png_ptr)
    return (NULL);
 #endif
 }
+#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.2.8
+;Version 1.2.9beta1
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -184,7 +184,7 @@ EXPORTS
   png_convert_to_rfc1123     @172
   png_set_invalid  @173
 ; Added at version 1.0.12
-; For compatiblity with 1.0.7-1.0.11
+; For compatibility with 1.0.7-1.0.11
   png_info_init @174
   png_read_init_3    @175
   png_write_init_3    @176

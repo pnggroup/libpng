@@ -1,9 +1,9 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng version  1.2.8 - December 3, 2004
+ * libpng version  1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -15,6 +15,8 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+
+#if defined(PNG_READ_SUPPORTED)
 
 /* Set the action on getting a CRC error for an ancillary or critical chunk. */
 void PNGAPI
@@ -780,7 +782,8 @@ png_init_read_transformations(png_structp png_ptr)
       png_ptr->transformations &= (~PNG_GAMMA);
    }
 
-   if (png_ptr->transformations & (PNG_GAMMA | PNG_RGB_TO_GRAY))
+   if ((png_ptr->transformations & (PNG_GAMMA | PNG_RGB_TO_GRAY)) &&
+        png_ptr->gamma != 0.0)
    {
       png_build_gamma_table(png_ptr);
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
@@ -3906,210 +3909,208 @@ void /* PRIVATE */
 png_build_gamma_table(png_structp png_ptr)
 {
   png_debug(1, "in png_build_gamma_table\n");
-  if(png_ptr->gamma != 0.0)
+
+  if (png_ptr->bit_depth <= 8)
   {
-   if (png_ptr->bit_depth <= 8)
-   {
-      int i;
-      double g;
+     int i;
+     double g;
 
-      if (png_ptr->screen_gamma > .000001)
-         g = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
-      else
-         g = 1.0;
+     if (png_ptr->screen_gamma > .000001)
+        g = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
+     else
+        g = 1.0;
 
-      png_ptr->gamma_table = (png_bytep)png_malloc(png_ptr,
-         (png_uint_32)256);
+     png_ptr->gamma_table = (png_bytep)png_malloc(png_ptr,
+        (png_uint_32)256);
 
-      for (i = 0; i < 256; i++)
-      {
-         png_ptr->gamma_table[i] = (png_byte)(pow((double)i / 255.0,
-            g) * 255.0 + .5);
-      }
+     for (i = 0; i < 256; i++)
+     {
+        png_ptr->gamma_table[i] = (png_byte)(pow((double)i / 255.0,
+           g) * 255.0 + .5);
+     }
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
-    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-      if (png_ptr->transformations & ((PNG_BACKGROUND) | PNG_RGB_TO_GRAY))
-      {
+   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+     if (png_ptr->transformations & ((PNG_BACKGROUND) | PNG_RGB_TO_GRAY))
+     {
 
-         g = 1.0 / (png_ptr->gamma);
+        g = 1.0 / (png_ptr->gamma);
 
-         png_ptr->gamma_to_1 = (png_bytep)png_malloc(png_ptr,
-            (png_uint_32)256);
+        png_ptr->gamma_to_1 = (png_bytep)png_malloc(png_ptr,
+           (png_uint_32)256);
 
-         for (i = 0; i < 256; i++)
-         {
-            png_ptr->gamma_to_1[i] = (png_byte)(pow((double)i / 255.0,
-               g) * 255.0 + .5);
-         }
+        for (i = 0; i < 256; i++)
+        {
+           png_ptr->gamma_to_1[i] = (png_byte)(pow((double)i / 255.0,
+              g) * 255.0 + .5);
+        }
 
 
-         png_ptr->gamma_from_1 = (png_bytep)png_malloc(png_ptr,
-            (png_uint_32)256);
+        png_ptr->gamma_from_1 = (png_bytep)png_malloc(png_ptr,
+           (png_uint_32)256);
 
-         if(png_ptr->screen_gamma > 0.000001)
-            g = 1.0 / png_ptr->screen_gamma;
-         else
-            g = png_ptr->gamma;   /* probably doing rgb_to_gray */
+        if(png_ptr->screen_gamma > 0.000001)
+           g = 1.0 / png_ptr->screen_gamma;
+        else
+           g = png_ptr->gamma;   /* probably doing rgb_to_gray */
 
-         for (i = 0; i < 256; i++)
-         {
-            png_ptr->gamma_from_1[i] = (png_byte)(pow((double)i / 255.0,
-               g) * 255.0 + .5);
+        for (i = 0; i < 256; i++)
+        {
+           png_ptr->gamma_from_1[i] = (png_byte)(pow((double)i / 255.0,
+              g) * 255.0 + .5);
 
-         }
-      }
+        }
+     }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_RGB_TO_GRAY_SUPPORTED */
-   }
-   else
-   {
-      double g;
-      int i, j, shift, num;
-      int sig_bit;
-      png_uint_32 ig;
+  }
+  else
+  {
+     double g;
+     int i, j, shift, num;
+     int sig_bit;
+     png_uint_32 ig;
 
-      if (png_ptr->color_type & PNG_COLOR_MASK_COLOR)
-      {
-         sig_bit = (int)png_ptr->sig_bit.red;
-         if ((int)png_ptr->sig_bit.green > sig_bit)
-            sig_bit = png_ptr->sig_bit.green;
-         if ((int)png_ptr->sig_bit.blue > sig_bit)
-            sig_bit = png_ptr->sig_bit.blue;
-      }
-      else
-      {
-         sig_bit = (int)png_ptr->sig_bit.gray;
-      }
+     if (png_ptr->color_type & PNG_COLOR_MASK_COLOR)
+     {
+        sig_bit = (int)png_ptr->sig_bit.red;
+        if ((int)png_ptr->sig_bit.green > sig_bit)
+           sig_bit = png_ptr->sig_bit.green;
+        if ((int)png_ptr->sig_bit.blue > sig_bit)
+           sig_bit = png_ptr->sig_bit.blue;
+     }
+     else
+     {
+        sig_bit = (int)png_ptr->sig_bit.gray;
+     }
 
-      if (sig_bit > 0)
-         shift = 16 - sig_bit;
-      else
-         shift = 0;
+     if (sig_bit > 0)
+        shift = 16 - sig_bit;
+     else
+        shift = 0;
 
-      if (png_ptr->transformations & PNG_16_TO_8)
-      {
-         if (shift < (16 - PNG_MAX_GAMMA_8))
-            shift = (16 - PNG_MAX_GAMMA_8);
-      }
+     if (png_ptr->transformations & PNG_16_TO_8)
+     {
+        if (shift < (16 - PNG_MAX_GAMMA_8))
+           shift = (16 - PNG_MAX_GAMMA_8);
+     }
 
-      if (shift > 8)
-         shift = 8;
-      if (shift < 0)
-         shift = 0;
+     if (shift > 8)
+        shift = 8;
+     if (shift < 0)
+        shift = 0;
 
-      png_ptr->gamma_shift = (png_byte)shift;
+     png_ptr->gamma_shift = (png_byte)shift;
 
-      num = (1 << (8 - shift));
+     num = (1 << (8 - shift));
 
-      if (png_ptr->screen_gamma > .000001)
-         g = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
-      else
-         g = 1.0;
+     if (png_ptr->screen_gamma > .000001)
+        g = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
+     else
+        g = 1.0;
 
-      png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
-         (png_uint_32)(num * png_sizeof (png_uint_16p)));
+     png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
+        (png_uint_32)(num * png_sizeof (png_uint_16p)));
 
-      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
-      {
-         double fin, fout;
-         png_uint_32 last, max;
+     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
+     {
+        double fin, fout;
+        png_uint_32 last, max;
 
-         for (i = 0; i < num; i++)
-         {
-            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
-               (png_uint_32)(256 * png_sizeof (png_uint_16)));
-         }
+        for (i = 0; i < num; i++)
+        {
+           png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
+              (png_uint_32)(256 * png_sizeof (png_uint_16)));
+        }
 
-         g = 1.0 / g;
-         last = 0;
-         for (i = 0; i < 256; i++)
-         {
-            fout = ((double)i + 0.5) / 256.0;
-            fin = pow(fout, g);
-            max = (png_uint_32)(fin * (double)((png_uint_32)num << 8));
-            while (last <= max)
-            {
-               png_ptr->gamma_16_table[(int)(last & (0xff >> shift))]
-                  [(int)(last >> (8 - shift))] = (png_uint_16)(
-                  (png_uint_16)i | ((png_uint_16)i << 8));
-               last++;
-            }
-         }
-         while (last < ((png_uint_32)num << 8))
-         {
-            png_ptr->gamma_16_table[(int)(last & (0xff >> shift))]
-               [(int)(last >> (8 - shift))] = (png_uint_16)65535L;
-            last++;
-         }
-      }
-      else
-      {
-         for (i = 0; i < num; i++)
-         {
-            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
-               (png_uint_32)(256 * png_sizeof (png_uint_16)));
+        g = 1.0 / g;
+        last = 0;
+        for (i = 0; i < 256; i++)
+        {
+           fout = ((double)i + 0.5) / 256.0;
+           fin = pow(fout, g);
+           max = (png_uint_32)(fin * (double)((png_uint_32)num << 8));
+           while (last <= max)
+           {
+              png_ptr->gamma_16_table[(int)(last & (0xff >> shift))]
+                 [(int)(last >> (8 - shift))] = (png_uint_16)(
+                 (png_uint_16)i | ((png_uint_16)i << 8));
+              last++;
+           }
+        }
+        while (last < ((png_uint_32)num << 8))
+        {
+           png_ptr->gamma_16_table[(int)(last & (0xff >> shift))]
+              [(int)(last >> (8 - shift))] = (png_uint_16)65535L;
+           last++;
+        }
+     }
+     else
+     {
+        for (i = 0; i < num; i++)
+        {
+           png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
+              (png_uint_32)(256 * png_sizeof (png_uint_16)));
 
-            ig = (((png_uint_32)i * (png_uint_32)png_gamma_shift[shift]) >> 4);
-            for (j = 0; j < 256; j++)
-            {
-               png_ptr->gamma_16_table[i][j] =
-                  (png_uint_16)(pow((double)(ig + ((png_uint_32)j << 8)) /
-                     65535.0, g) * 65535.0 + .5);
-            }
-         }
-      }
+           ig = (((png_uint_32)i * (png_uint_32)png_gamma_shift[shift]) >> 4);
+           for (j = 0; j < 256; j++)
+           {
+              png_ptr->gamma_16_table[i][j] =
+                 (png_uint_16)(pow((double)(ig + ((png_uint_32)j << 8)) /
+                    65535.0, g) * 65535.0 + .5);
+           }
+        }
+     }
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
-    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-      if (png_ptr->transformations & (PNG_BACKGROUND | PNG_RGB_TO_GRAY))
-      {
+   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+     if (png_ptr->transformations & (PNG_BACKGROUND | PNG_RGB_TO_GRAY))
+     {
 
-         g = 1.0 / (png_ptr->gamma);
+        g = 1.0 / (png_ptr->gamma);
 
-         png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
-            (png_uint_32)(num * png_sizeof (png_uint_16p )));
+        png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
+           (png_uint_32)(num * png_sizeof (png_uint_16p )));
 
-         for (i = 0; i < num; i++)
-         {
-            png_ptr->gamma_16_to_1[i] = (png_uint_16p)png_malloc(png_ptr,
-               (png_uint_32)(256 * png_sizeof (png_uint_16)));
+        for (i = 0; i < num; i++)
+        {
+           png_ptr->gamma_16_to_1[i] = (png_uint_16p)png_malloc(png_ptr,
+              (png_uint_32)(256 * png_sizeof (png_uint_16)));
 
-            ig = (((png_uint_32)i *
-               (png_uint_32)png_gamma_shift[shift]) >> 4);
-            for (j = 0; j < 256; j++)
-            {
-               png_ptr->gamma_16_to_1[i][j] =
-                  (png_uint_16)(pow((double)(ig + ((png_uint_32)j << 8)) /
-                     65535.0, g) * 65535.0 + .5);
-            }
-         }
+           ig = (((png_uint_32)i *
+              (png_uint_32)png_gamma_shift[shift]) >> 4);
+           for (j = 0; j < 256; j++)
+           {
+              png_ptr->gamma_16_to_1[i][j] =
+                 (png_uint_16)(pow((double)(ig + ((png_uint_32)j << 8)) /
+                    65535.0, g) * 65535.0 + .5);
+           }
+        }
 
-         if(png_ptr->screen_gamma > 0.000001)
-            g = 1.0 / png_ptr->screen_gamma;
-         else
-            g = png_ptr->gamma;   /* probably doing rgb_to_gray */
+        if(png_ptr->screen_gamma > 0.000001)
+           g = 1.0 / png_ptr->screen_gamma;
+        else
+           g = png_ptr->gamma;   /* probably doing rgb_to_gray */
 
-         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
-            (png_uint_32)(num * png_sizeof (png_uint_16p)));
+        png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
+           (png_uint_32)(num * png_sizeof (png_uint_16p)));
 
-         for (i = 0; i < num; i++)
-         {
-            png_ptr->gamma_16_from_1[i] = (png_uint_16p)png_malloc(png_ptr,
-               (png_uint_32)(256 * png_sizeof (png_uint_16)));
+        for (i = 0; i < num; i++)
+        {
+           png_ptr->gamma_16_from_1[i] = (png_uint_16p)png_malloc(png_ptr,
+              (png_uint_32)(256 * png_sizeof (png_uint_16)));
 
-            ig = (((png_uint_32)i *
-               (png_uint_32)png_gamma_shift[shift]) >> 4);
-            for (j = 0; j < 256; j++)
-            {
-               png_ptr->gamma_16_from_1[i][j] =
-                  (png_uint_16)(pow((double)(ig + ((png_uint_32)j << 8)) /
-                     65535.0, g) * 65535.0 + .5);
-            }
-         }
-      }
+           ig = (((png_uint_32)i *
+              (png_uint_32)png_gamma_shift[shift]) >> 4);
+           for (j = 0; j < 256; j++)
+           {
+              png_ptr->gamma_16_from_1[i][j] =
+                 (png_uint_16)(pow((double)(ig + ((png_uint_32)j << 8)) /
+                    65535.0, g) * 65535.0 + .5);
+           }
+        }
+     }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_RGB_TO_GRAY_SUPPORTED */
-   }
- }
+  }
 }
 #endif
 /* To do: install integer version of png_build_gamma_table here */
@@ -4175,3 +4176,4 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
    }
 }
 #endif /* PNG_MNG_FEATURES_SUPPORTED */
+#endif /* PNG_READ_SUPPORTED */

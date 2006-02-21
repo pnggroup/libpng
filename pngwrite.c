@@ -1,9 +1,9 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.8 - December 3, 2004
+ * libpng 1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -554,6 +554,8 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 }
 
 /* Initialize png_ptr structure, and allocate any memory needed */
+#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
+/* Deprecated. */
 #undef png_write_init
 void PNGAPI
 png_write_init(png_structp png_ptr)
@@ -604,6 +606,7 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
      }
    png_write_init_3(&png_ptr, user_png_ver, png_struct_size);
 }
+#endif /* PNG_1_0_X || PNG_1_2_X */
 
 
 void PNGAPI

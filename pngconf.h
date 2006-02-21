@@ -1,9 +1,9 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.8 - December 3, 2004
+ * libpng version 1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2005 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -453,18 +453,22 @@
  */
 
 /* The size of the png_text structure changed in libpng-1.0.6 when
- * iTXt is supported.  It is turned off by default, to support old apps
- * that malloc the png_text structure instead of calling png_set_text()
- * and letting libpng malloc it.  It will be turned on by default in
- * libpng-1.3.0.
+ * iTXt support was added.  iTXt support was turned off by default through
+ * libpng-1.2.x, to support old apps that malloc the png_text structure
+ * instead of calling png_set_text() and letting libpng malloc it.  It
+ * was turned on by default in libpng-1.3.0.
  */
 
-#ifndef PNG_iTXt_SUPPORTED
+#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
+#  define PNG_NO_iTXt_SUPPORTED
+#endif
+
+#if !defined(PNG_NO_iTXt_SUPPORTED)
 #  if !defined(PNG_READ_iTXt_SUPPORTED) && !defined(PNG_NO_READ_iTXt)
-#    define PNG_NO_READ_iTXt
+#    define PNG_READ_iTXt
 #  endif
 #  if !defined(PNG_WRITE_iTXt_SUPPORTED) && !defined(PNG_NO_WRITE_iTXt)
-#    define PNG_NO_WRITE_iTXt
+#    define PNG_WRITE_iTXt
 #  endif
 #endif
 
@@ -585,10 +589,12 @@
 #  endif
 #endif
 
+#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
 /* Deprecated, will be removed from version 2.0.0.
    Use PNG_MNG_FEATURES_SUPPORTED instead. */
 #ifndef PNG_NO_READ_EMPTY_PLTE
 #  define PNG_READ_EMPTY_PLTE_SUPPORTED
+#endif
 #endif
 
 #endif /* PNG_READ_SUPPORTED */
@@ -633,11 +639,15 @@
 #  endif
 #endif /* PNG_WRITE_TRANSFORMS_SUPPORTED */
 
+#if !defined(PNG_NO_WRITE_INTERLACING_SUPPORTED) && \
+    !defined(PNG_WRITE_INTERLACING_SUPPORTED)
 #define PNG_WRITE_INTERLACING_SUPPORTED  /* not required for PNG-compliant
                                             encoders, but can cause trouble
                                             if left undefined */
+#endif
 
 #if !defined(PNG_NO_WRITE_WEIGHTED_FILTER) && \
+    !defined(PNG_WRITE_WEIGHTED_FILTER) && \
      defined(PNG_FLOATING_POINT_SUPPORTED)
 #  define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #endif
@@ -646,9 +656,11 @@
 #  define PNG_WRITE_FLUSH_SUPPORTED
 #endif
 
+#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
 /* Deprecated, see PNG_MNG_FEATURES_SUPPORTED, above */
 #ifndef PNG_NO_WRITE_EMPTY_PLTE
 #  define PNG_WRITE_EMPTY_PLTE_SUPPORTED
+#endif
 #endif
 
 #endif /* PNG_WRITE_SUPPORTED */

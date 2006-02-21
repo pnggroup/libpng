@@ -79,7 +79,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 CYGDLL = 12
-PNGMIN = 1.2.8
+PNGMIN = 1.2.9beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
@@ -176,7 +176,7 @@ $(STATLIB): $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-$(SHAREDDEF): scripts/png32ms.def
+$(SHAREDDEF): scripts/pngw32.def
 	cat $< | sed -e '1{G;s/^\(.*\)\(\n\)/EXPORTS/;};2,/^EXPORTS/d' | \
 	sed -e 's/\([^;]*\);/;/' > $@
 

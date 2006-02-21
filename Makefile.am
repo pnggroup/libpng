@@ -15,8 +15,10 @@ libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
 	png.h pngconf.h 
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
-libpng12_la_LDFLAGS = -export-dynamic -version-info $(LIBPNG12_VERSION_INFO)
-libpng_la_LDFLAGS = -export-dynamic -version-info $(LIBPNG3_VERSION_INFO)
+libpng12_la_LDFLAGS = -no-undefined -export-dynamic -version-info \
+$(LIBPNG12_VERSION_INFO)
+libpng_la_LDFLAGS = -no-undefined -export-dynamic -version-info \
+$(LIBPNG3_VERSION_INFO)
 
 #distribute headers in /usr/include/libpng/*
 pkginclude_HEADERS= png.h pngconf.h
@@ -24,7 +26,8 @@ pkginclude_HEADERS= png.h pngconf.h
 #extra source distribution files.
 EXTRA_DIST= ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/projects/cbuilder5/* ${srcdir}/projects/beos/* ${srcdir}/projects/visualc6/* \
+	${srcdir}/projects/cbuilder5/* ${srcdir}/projects/beos/* \
+	${srcdir}/projects/visualc6/* ${srcdir}/projects/visualc71 \
 	${srcdir}/projects/wince.txt ${srcdir}/projects/netware.txt \
 	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \

@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script.
-m4_define(PNGPKG_VERSION,[1.2.8-automake])
+m4_define(PNGPKG_VERSION,[1.2.9beta1-automake])
 AC_INIT([libpng], PNGPKG_VERSION, png-implement@ccrc.wustl.edu)
 AM_INIT_AUTOMAKE([libpng], PNGPKG_VERSION)
 AC_CONFIG_SRCDIR([pngget.c])

@@ -1,32 +1,38 @@
 
-Libpng 1.2.8 - December 3, 2004
+Libpng 1.2.9beta1 - February 21, 2006
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
-Changes since the last public release (1.2.7):
+Changes since the last public release (1.2.8):
 
-  Fixed bug in png_text_compress() that would fail to complete a large block.
-  Fixed bug, introduced in libpng-1.2.7, that overruns a buffer during
-    strip alpha operation in png_do_strip_filler().
-  Added PNG_1_2_X definition in pngconf.h
-  #ifdef out png_info_init in png.c and png_read_init in pngread.c (as of 1.3.0)
-  Reduce color_type to a nonalpha type after strip alpha operation in
-    png_do_strip_filler().
-  Revised definitions of PNG_MAX_UINT_32, PNG_MAX_SIZE, and PNG_MAXSUM
-  Fixed (again) definition of PNG_LIBPNG_VER_DLLNUM in png.h (Cosmin).
-  Added PNG_LIBPNG_BUILD_PRIVATE in png.h (Cosmin).
-  Set png_ptr->zstream.data_type to Z_BINARY, to avoid unnecessary detection
-    of data type in deflate (Cosmin).
-  Deprecated but continue to support SPECIALBUILD and PRIVATEBUILD in favor of
-    PNG_LIBPNG_BUILD_SPECIAL_STRING and PNG_LIBPNG_BUILD_PRIVATE_STRING.
-  Despammed mailing addresses by masking "@" with "at".
-  Added scripts/makefile.elf with supporting code in pngconf.h for symbol
-    versioning (John Bowler).
-  Added projects/visualc71 (Simon-pierre).
+version 1.2.9beta1 [February 21, 2006]
+  Initialized some structure members in pngwutil.c to avoid gcc-4.0.0 complaints
+  Revised man page and libpng.txt to make it clear that one should not call
+    png_read_end or png_write_end after png_read_png or png_write_png.
+  Updated references to png-mng-implement mailing list.
+  Fixed an incorrect typecast in pngrutil.c
+  Added PNG_READ_SUPPORTED conditionals for making a write-only library.
+  Added PNG_NO_WRITE_INTERLACING_SUPPORTED conditional.
+  Optimized alpha-inversion loops in pngwtran.c
+  Moved test for nonzero gamma outside of png_build_gamma_table() in pngrtran.c
+  Make sure num_trans is <= 256 before copying data in png_set_tRNS().
+  Make sure num_palette is <= 256 before copying data in png_set_PLTE().
+  Interchanged order of write_swap_alpha and write_invert_alpha transforms.
+  Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
+  Optimized zlib window flag (CINFO) in contrib/pngsuite/*.png (Cosmin).
+  Updated scripts/makefile.bc32 for Borland C++ 5.6 (Cosmin).
+  Fixed inconsistency in definition of png_default_read_data()
+  Exported png_get_uint_32, png_save_uint_32, png_get_uint_16, png_save_uint_16,
+    png_get_int_32, png_save_int_32, png_get_uint_31 (Cosmin).
+  Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
+  Updated scripts/pngos2.def, scripts/pngw32.def (Cosmin).
+  Added type cast (png_byte) in png_write_sCAL() (Cosmin).
+  Fixed scripts/makefile.cygwin (Cosmin).
 
-Send comments/corrections/commendations to
-png-implement at ccrc.wustl.edu (subscription required; write to
-majordomo at ccrc.wustl.edu with "subscribe png-implement" in the message)
-or to glennrp at users.sourceforge.net
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+(subscription required; visit 
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe) or to glennrp at users.sourceforge.net
 
 Glenn R-P

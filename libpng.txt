@@ -1,9 +1,9 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.8 - December 3, 2004
+ libpng version 1.2.9beta1 - February 21, 2006
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
- Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ Copyright (c) 1998-2005 Glenn Randers-Pehrson
  For conditions of distribution and use, see copyright
  notice in png.h.
 
@@ -1248,8 +1248,8 @@ the second parameter NULL.
 
 Finishing a sequential read
 
-After you are finished reading the image through either the high- or
-low-level interfaces, you can finish reading the file.  If you are
+After you are finished reading the image through the
+low-level interface, you can finish reading the file.  If you are
 interested in comments or time, which may be stored either before or
 after the image data, you should pass the separate png_info struct if
 you want to keep the comments from before and after the image
@@ -2459,7 +2459,7 @@ Custom chunks
 If you need to read or write custom chunks, you may need to get deeper
 into the libpng code.  The library now has mechanisms for storing
 and writing chunks of unknown type; you can even declare callbacks
-for custom chunks.  Hoewver, this may not be good enough if the
+for custom chunks.  However, this may not be good enough if the
 library code itself needs to know about interactions between your
 chunk and existing `intrinsic' chunks.
 
@@ -2904,13 +2904,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-December 3, 2004
+February 21, 2006
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.8 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.9beta1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

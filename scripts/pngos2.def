@@ -2,7 +2,7 @@
 ; PNG.LIB module definition file for OS/2
 ;----------------------------------------
 
-; Version 1.2.8
+; Version 1.2.9beta1
 
 LIBRARY		PNG
 DESCRIPTION	"PNG image compression library for OS/2"
@@ -212,6 +212,15 @@ EXPORTS
   png_get_user_width_max
 ; Added at version 1.2.7
   png_set_add_alpha
+
+; Added at version 1.2.9
+  png_get_uint_32
+  png_save_uint_32
+  png_get_uint_16
+  png_save_uint_16
+  png_get_int_32
+  png_save_int_32
+  png_get_uint_31
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
   png_libpng_ver

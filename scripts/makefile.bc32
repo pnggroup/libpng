@@ -17,14 +17,14 @@ CC=bcc32
 LD=bcc32
 LIB=tlib
 
-#TARGET_CPU=6
-# 3 = 386, 4 = 486, 5 = Pentium etc.
+# -3 = 386, -4 = 486, -5 = Pentium etc.
 !ifndef TARGET_CPU
-TARGET_CPU=5
+#TARGET_CPU=-6
 !endif
 
 # Use this if you don't want Borland's fancy exception handling
-NOEHLIB=noeh32.lib
+# (Caution: doesn't work with CBuilderX)
+#NOEHLIB=noeh32.lib
 
 !ifdef DEBUG
 CDEBUG=-v
@@ -40,14 +40,14 @@ CDEBUG=$(CDEBUG) -N
 LDEBUG=$(LDEBUG) -N
 !endif
 
-# -X- turn on dependency generation in the object file
-# -w  set all warnings on
 # -O2 optimize for speed
-# -Z  global optimization
-CFLAGS=-O2 -Z -X- -w -I$(ZLIB_DIR) -$(TARGET_CPU) $(CDEBUG)
+# -d  merge duplicate strings
+# -k- turn off standard stack frame
+# -w  display all warnings
+CFLAGS=-I$(ZLIB_DIR) -O2 -d -k- -w $(TARGET_CPU) $(CDEBUG)
 
 # -M  generate map file
-LDFLAGS=-M -L$(ZLIB_DIR) $(LDEBUG)
+LDFLAGS=-L$(ZLIB_DIR) -M $(LDEBUG)
 
 
 ## Variables
@@ -138,14 +138,15 @@ $(LIBOBJS), libpng
 |
 
 
-# Clean up anything else you want
+# Cleanup
 clean:
 	-del *.obj
-	-del *.exe
-	-del *.lib
+	-del $(LIBNAME)
+	-del pngtest.exe
 	-del *.lst
 	-del *.map
 	-del *.tds
+	-del pngout.png
 
 
 # End of makefile for libpng

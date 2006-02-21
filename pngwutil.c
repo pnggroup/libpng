@@ -1,9 +1,9 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng version 1.2.8 - December 3, 2004
+ * libpng version 1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -16,7 +16,7 @@
  * with unsigned numbers for convenience, although one supported
  * ancillary chunk uses signed (two's complement) numbers.
  */
-void /* PRIVATE */
+void PNGAPI
 png_save_uint_32(png_bytep buf, png_uint_32 i)
 {
    buf[0] = (png_byte)((i >> 24) & 0xff);
@@ -30,7 +30,7 @@ png_save_uint_32(png_bytep buf, png_uint_32 i)
  * complement format.  If this isn't the case, then this routine needs to
  * be modified to write data in two's complement format.
  */
-void /* PRIVATE */
+void PNGAPI
 png_save_int_32(png_bytep buf, png_int_32 i)
 {
    buf[0] = (png_byte)((i >> 24) & 0xff);
@@ -44,7 +44,7 @@ png_save_int_32(png_bytep buf, png_int_32 i)
  * The parameter is declared unsigned int, not png_uint_16,
  * just to avoid potential problems on pre-ANSI C compilers.
  */
-void /* PRIVATE */
+void PNGAPI
 png_save_uint_16(png_bytep buf, unsigned int i)
 {
    buf[0] = (png_byte)((i >> 8) & 0xff);
@@ -161,9 +161,11 @@ png_text_compress(png_structp png_ptr,
 {
    int ret;
 
-   comp->num_output_ptr = comp->max_output_ptr = 0;
+   comp->num_output_ptr = 0;
+   comp->max_output_ptr = 0;
    comp->output_ptr = NULL;
    comp->input = NULL;
+   comp->input_len = 0;
 
    /* we may just want to pass the text right through */
    if (compression == PNG_TEXT_COMPRESSION_NONE)
@@ -730,6 +732,13 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
    compression_state comp;
 
    png_debug(1, "in png_write_iCCP\n");
+
+   comp.num_output_ptr = 0;
+   comp.max_output_ptr = 0;
+   comp.output_ptr = NULL;
+   comp.input = NULL;
+   comp.input_len = 0;
+
    if (name == NULL || (name_len = png_check_keyword(png_ptr, name,
       &new_name)) == 0)
    {
@@ -1344,6 +1353,12 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
 
    png_debug(1, "in png_write_zTXt\n");
 
+   comp.num_output_ptr = 0;
+   comp.max_output_ptr = 0;
+   comp.output_ptr = NULL;
+   comp.input = NULL;
+   comp.input_len = 0;
+
    if (key == NULL || (key_len = png_check_keyword(png_ptr, key, &new_key))==0)
    {
       png_warning(png_ptr, "Empty keyword in zTXt chunk");
@@ -1396,6 +1411,11 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
    compression_state comp;
 
    png_debug(1, "in png_write_iTXt\n");
+
+   comp.num_output_ptr = 0;
+   comp.max_output_ptr = 0;
+   comp.output_ptr = NULL;
+   comp.input = NULL;
 
    if (key == NULL || (key_len = png_check_keyword(png_ptr, key, &new_key))==0)
    {
@@ -1559,7 +1579,7 @@ png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
 #endif
    png_size_t total_len;
    char wbuf[32], hbuf[32];
-   png_byte bunit = unit;
+   png_byte bunit = (png_byte)unit;
 
    png_debug(1, "in png_write_sCAL\n");
 

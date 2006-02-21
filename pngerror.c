@@ -1,9 +1,9 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * libpng version 1.2.8 - December 3, 2004
+ * libpng version 1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -16,6 +16,7 @@
 #define PNG_INTERNAL
 #include "png.h"
 
+#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 static void /* PRIVATE */
 png_default_error PNGARG((png_structp png_ptr,
   png_const_charp error_message));
@@ -293,3 +294,4 @@ png_set_strip_error_numbers(png_structp png_ptr, png_uint_32 strip_mode)
    }
 }
 #endif
+#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

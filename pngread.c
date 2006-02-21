@@ -1,9 +1,9 @@
 
 /* pngread.c - read a PNG file
  *
- * libpng 1.2.8 - December 3, 2004
+ * libpng 1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -13,6 +13,8 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+
+#if defined(PNG_READ_SUPPORTED)
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
 png_structp PNGAPI
@@ -169,10 +171,10 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    return (png_ptr);
 }
 
+#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
 /* Initialize PNG structure for reading, and allocate any memory needed.
    This interface is deprecated in favour of the png_create_read_struct(),
-   and it will eventually disappear. */
-#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
+   and it will disappear as of libpng-1.3.0. */
 #undef png_read_init
 void PNGAPI
 png_read_init(png_structp png_ptr)
@@ -180,7 +182,6 @@ png_read_init(png_structp png_ptr)
    /* We only come here via pre-1.0.7-compiled applications */
    png_read_init_2(png_ptr, "1.0.6 or earlier", 0, 0);
 }
-#endif
 
 void PNGAPI
 png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
@@ -224,6 +225,7 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
      }
    png_read_init_3(&png_ptr, user_png_ver, png_struct_size);
 }
+#endif /* PNG_1_0_X || PNG_1_2_X */
 
 void PNGAPI
 png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
@@ -806,7 +808,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  * not called png_set_interlace_handling(), the display_row buffer will
  * be ignored, so pass NULL to it.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.8
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.9beta1
  */
 
 void PNGAPI
@@ -856,7 +858,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * only call this function once.  If you desire to have an image for
  * each pass of a interlaced image, use png_read_rows() instead.
  *
- * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.8
+ * [*] png_handle_alpha() does not exist yet, as of libpng version 1.2.9beta1
  */
 void PNGAPI
 png_read_image(png_structp png_ptr, png_bytepp image)
@@ -1452,5 +1454,6 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
       /* quiet compiler warnings */ return;
 
 }
-#endif
+#endif /* PNG_INFO_IMAGE_SUPPORTED */
 #endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
+#endif /* PNG_READ_SUPPORTED */

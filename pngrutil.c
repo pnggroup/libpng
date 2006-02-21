@@ -1,8 +1,8 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng version 1.2.8 - December 3, 2004
+ * libpng version 1.2.9beta1 - February 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -12,6 +12,8 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+
+#if defined(PNG_READ_SUPPORTED)
 
 #if defined(_WIN32_WCE)
 /* strtod() function is not supported on WindowsCE */
@@ -37,7 +39,7 @@ __inline double strtod(const char *nptr, char **endptr)
 #  endif
 #endif
 
-png_uint_32 /* PRIVATE */
+png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_bytep buf)
 {
    png_uint_32 i = png_get_uint_32(buf);
@@ -47,7 +49,7 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
 }
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
-png_uint_32 /* PRIVATE */
+png_uint_32 PNGAPI
 png_get_uint_32(png_bytep buf)
 {
    png_uint_32 i = ((png_uint_32)(*buf) << 24) +
@@ -62,7 +64,7 @@ png_get_uint_32(png_bytep buf)
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
  * data is stored in the PNG file in two's complement format, and it is
  * assumed that the machine format for signed integers is the same. */
-png_int_32 /* PRIVATE */
+png_int_32 PNGAPI
 png_get_int_32(png_bytep buf)
 {
    png_int_32 i = ((png_int_32)(*buf) << 24) +
@@ -75,7 +77,7 @@ png_get_int_32(png_bytep buf)
 #endif /* PNG_READ_pCAL_SUPPORTED */
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
-png_uint_16 /* PRIVATE */
+png_uint_16 PNGAPI
 png_get_uint_16(png_bytep buf)
 {
    png_uint_16 i = (png_uint_16)(((png_uint_16)(*buf) << 8) +
@@ -1160,7 +1162,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   new_palette.nentries = (png_uint_32) (data_length / entry_size);
+   new_palette.nentries = (png_int_32) ( data_length / entry_size);
    if ((png_uint_32) new_palette.nentries > (png_uint_32) (PNG_SIZE_MAX /
        png_sizeof(png_sPLT_entry)))
    {
@@ -2170,7 +2172,8 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
-   if (png_ptr->flags & PNG_FLAG_KEEP_UNKNOWN_CHUNKS)
+   if ((png_ptr->flags & PNG_FLAG_KEEP_UNKNOWN_CHUNKS) ||
+       (png_ptr->read_user_chunk_fn != NULL))
    {
        png_unknown_chunk chunk;
 
@@ -3122,3 +3125,4 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }
+#endif /* PNG_READ_SUPPORTED */
