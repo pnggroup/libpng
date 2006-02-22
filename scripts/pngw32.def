@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.2.9beta1
+;Version 1.2.9beta2
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -224,3 +224,11 @@ EXPORTS
   png_set_user_limits @198
 ; Added at version 1.2.7
   png_set_add_alpha @199
+; Added at version 1.2.9
+  png_get_uint_32 @200
+  png_save_uint_32 @201
+  png_get_uint_16 @202
+  png_save_uint_16 @203
+  png_get_int_32 @204
+  png_save_int_32 @205
+  png_get_uint_31 @206

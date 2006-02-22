@@ -1420,7 +1420,7 @@ version 1.2.9beta1 [February 21, 2006]
     png_read_end or png_write_end after png_read_png or png_write_png.
   Updated references to png-mng-implement mailing list.
   Fixed an incorrect typecast in pngrutil.c
-  Added PNG_READ_SUPPORTED conditionals for making a write-only library.
+  Added PNG_NO_READ_SUPPORTED conditional for making a write-only library.
   Added PNG_NO_WRITE_INTERLACING_SUPPORTED conditional.
   Optimized alpha-inversion loops in pngwtran.c
   Moved test for nonzero gamma outside of png_build_gamma_table() in pngrtran.c
@@ -1433,10 +1433,23 @@ version 1.2.9beta1 [February 21, 2006]
   Fixed inconsistency in definition of png_default_read_data()
   Exported png_get_uint_32, png_save_uint_32, png_get_uint_16, png_save_uint_16,
     png_get_int_32, png_save_int_32, png_get_uint_31 (Cosmin).
-  Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
   Updated scripts/pngos2.def, scripts/pngw32.def (Cosmin).
   Added type cast (png_byte) in png_write_sCAL() (Cosmin).
   Fixed scripts/makefile.cygwin (Cosmin).
+
+version 1.2.9beta2 [February 22, 2006]
+
+  Check for png_rgb_to_gray and png_gray_to_rgb read transformations before
+    checking for png_read_dither in pngrtran.c
+  Revise checking of chromaticity limits to accommodate extended RGB
+    colorspace (John Denker).
+  Changed line endings in some of the project files to CRLF, even in the
+    "Unix" tar distributions (Cosmin).
+  Make png_get_uint_16 and png_write_uint_16 always available (Cosmin).
+  Updated scripts/pngw32.def and projects/wince/png32ce.def  with the
+    newly exported functions.
+  Eliminated distributions without the "configure" script.
+  Updated INSTALL instructions.
 
 version 1.3.0beta1 [future]
   Enable iTXt support (changes png_struct, thus requires so-number change).

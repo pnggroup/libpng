@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * libpng version  1.2.9beta1 - February 21, 2006
+ * libpng version  1.2.9beta2 - February 22, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1089,6 +1089,16 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       info_ptr->bit_depth = 8;
 #endif
 
+#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
+   if (png_ptr->transformations & PNG_GRAY_TO_RGB)
+      info_ptr->color_type |= PNG_COLOR_MASK_COLOR;
+#endif
+
+#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+   if (png_ptr->transformations & PNG_RGB_TO_GRAY)
+      info_ptr->color_type &= ~PNG_COLOR_MASK_COLOR;
+#endif
+
 #if defined(PNG_READ_DITHER_SUPPORTED)
    if (png_ptr->transformations & PNG_DITHER)
    {
@@ -1104,16 +1114,6 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_PACK_SUPPORTED)
    if ((png_ptr->transformations & PNG_PACK) && (info_ptr->bit_depth < 8))
       info_ptr->bit_depth = 8;
-#endif
-
-#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
-   if (png_ptr->transformations & PNG_GRAY_TO_RGB)
-      info_ptr->color_type |= PNG_COLOR_MASK_COLOR;
-#endif
-
-#if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-   if (png_ptr->transformations & PNG_RGB_TO_GRAY)
-      info_ptr->color_type &= ~PNG_COLOR_MASK_COLOR;
 #endif
 
    if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)

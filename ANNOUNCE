@@ -1,18 +1,41 @@
 
-Libpng 1.2.9beta1 - February 21, 2006
+Libpng 1.2.9beta2 - February 22, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
+
+Files available for download:
+
+Source files with LF line endings (for Unix/Linux) and with a
+"configure" script
+
+   1.2.9beta2.tar.gz
+   1.2.9beta2.tar.bz2
+
+Source files with CRLF line endings (for Windows), without the
+"configure" script
+
+   lp129b02.zip
+   lp129b02.tar.bz2
+
+Project files
+
+   1.2.9beta2-project-netware.zip
+   1.2.9beta2-project-wince.zip
+
+Other information:
+
+   1.2.9beta2-README.txt
+   1.2.9beta2-KNOWNBUGS.txt
+   1.2.9beta2-LICENSE.txt
+   1.2.9beta2-Y2K-compliance.txt
 
 Changes since the last public release (1.2.8):
 
 version 1.2.9beta1 [February 21, 2006]
   Initialized some structure members in pngwutil.c to avoid gcc-4.0.0 complaints
-  Revised man page and libpng.txt to make it clear that one should not call
-    png_read_end or png_write_end after png_read_png or png_write_png.
-  Updated references to png-mng-implement mailing list.
   Fixed an incorrect typecast in pngrutil.c
-  Added PNG_READ_SUPPORTED conditionals for making a write-only library.
+  Added PNG_NO_READ_SUPPORTED conditionals for making a write-only library.
   Added PNG_NO_WRITE_INTERLACING_SUPPORTED conditional.
   Optimized alpha-inversion loops in pngwtran.c
   Moved test for nonzero gamma outside of png_build_gamma_table() in pngrtran.c
@@ -20,15 +43,32 @@ version 1.2.9beta1 [February 21, 2006]
   Make sure num_palette is <= 256 before copying data in png_set_PLTE().
   Interchanged order of write_swap_alpha and write_invert_alpha transforms.
   Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
-  Optimized zlib window flag (CINFO) in contrib/pngsuite/*.png (Cosmin).
-  Updated scripts/makefile.bc32 for Borland C++ 5.6 (Cosmin).
   Fixed inconsistency in definition of png_default_read_data()
   Exported png_get_uint_32, png_save_uint_32, png_get_uint_16, png_save_uint_16,
     png_get_int_32, png_save_int_32, png_get_uint_31 (Cosmin).
   Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
-  Updated scripts/pngos2.def, scripts/pngw32.def (Cosmin).
   Added type cast (png_byte) in png_write_sCAL() (Cosmin).
   Fixed scripts/makefile.cygwin (Cosmin).
+  Updated scripts/makefile.bc32 for Borland C++ 5.6 (Cosmin).
+  Updated scripts/pngos2.def, scripts/pngw32.def (Cosmin).
+  Updated references to png-mng-implement mailing list.
+  Revised man page and libpng.txt to make it clear that one should not call
+    png_read_end or png_write_end after png_read_png or png_write_png.
+  Optimized zlib window flag (CINFO) in contrib/pngsuite/*.png (Cosmin).
+
+version 1.2.9beta2 [February 22, 2006]
+
+  Check for png_rgb_to_gray and png_gray_to_rgb read transformations before
+    checking for png_read_dither in pngrtran.c
+  Revise checking of chromaticity limits to accommodate extended RGB
+    colorspace (John Denker).
+  Changed line endings in some of the project files to CRLF, even in the
+    "Unix" tar distributions (Cosmin).
+  Make png_get_uint_16 and png_write_uint_16 always available (Cosmin).
+  Updated scripts/pngw32.def and projects/wince/png32ce.def  with the
+    newly exported functions.
+  Eliminated tarball distributions without a "configure" script.
+  Updated INSTALL instructions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

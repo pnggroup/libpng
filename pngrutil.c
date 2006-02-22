@@ -1,6 +1,6 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng version 1.2.9beta1 - February 21, 2006
+ * libpng version 1.2.9beta2 - February 22, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -60,7 +60,6 @@ png_get_uint_32(png_bytep buf)
    return (i);
 }
 
-#if defined(PNG_READ_pCAL_SUPPORTED) || defined(PNG_READ_oFFs_SUPPORTED)
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
  * data is stored in the PNG file in two's complement format, and it is
  * assumed that the machine format for signed integers is the same. */
@@ -74,7 +73,6 @@ png_get_int_32(png_bytep buf)
 
    return (i);
 }
-#endif /* PNG_READ_pCAL_SUPPORTED */
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 PNGAPI
@@ -779,8 +777,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_crc_read(png_ptr, buf, 4);
    uint_y = png_get_uint_32(buf);
 
-   if (uint_x > 80000L || uint_y > 80000L ||
-      uint_x + uint_y > 100000L)
+   if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM red point");
       png_crc_finish(png_ptr, 16);
@@ -795,8 +792,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_crc_read(png_ptr, buf, 4);
    uint_y = png_get_uint_32(buf);
 
-   if (uint_x > 80000L || uint_y > 80000L ||
-      uint_x + uint_y > 100000L)
+   if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM green point");
       png_crc_finish(png_ptr, 8);
@@ -811,8 +807,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_crc_read(png_ptr, buf, 4);
    uint_y = png_get_uint_32(buf);
 
-   if (uint_x > 80000L || uint_y > 80000L ||
-      uint_x + uint_y > 100000L)
+   if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM blue point");
       png_crc_finish(png_ptr, 0);

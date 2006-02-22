@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * libpng version 1.2.9beta1 - February 21, 2006
+ * libpng version 1.2.9beta2 - February 22, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -25,7 +25,6 @@ png_save_uint_32(png_bytep buf, png_uint_32 i)
    buf[3] = (png_byte)(i & 0xff);
 }
 
-#if defined(PNG_WRITE_pCAL_SUPPORTED) || defined(PNG_WRITE_oFFs_SUPPORTED)
 /* The png_save_int_32 function assumes integers are stored in two's
  * complement format.  If this isn't the case, then this routine needs to
  * be modified to write data in two's complement format.
@@ -38,7 +37,6 @@ png_save_int_32(png_bytep buf, png_int_32 i)
    buf[2] = (png_byte)((i >> 8) & 0xff);
    buf[3] = (png_byte)(i & 0xff);
 }
-#endif
 
 /* Place a 16-bit number into a buffer in PNG byte order.
  * The parameter is declared unsigned int, not png_uint_16,
@@ -939,8 +937,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    itemp = (png_uint_32)(white_y * 100000.0 + 0.5);
    png_save_uint_32(buf + 4, itemp);
 
-   if (red_x < 0 || red_x > 0.8 || red_y < 0 || red_y > 0.8 ||
-       red_x + red_y > 1.0)
+   if (red_x < 0 ||  red_y < 0 || red_x + red_y > 1.0)
    {
       png_warning(png_ptr, "Invalid cHRM red point specified");
       return;
@@ -950,8 +947,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    itemp = (png_uint_32)(red_y * 100000.0 + 0.5);
    png_save_uint_32(buf + 12, itemp);
 
-   if (green_x < 0 || green_x > 0.8 || green_y < 0 || green_y > 0.8 ||
-       green_x + green_y > 1.0)
+   if (green_x < 0 || green_y < 0 || green_x + green_y > 1.0)
    {
       png_warning(png_ptr, "Invalid cHRM green point specified");
       return;
@@ -961,8 +957,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    itemp = (png_uint_32)(green_y * 100000.0 + 0.5);
    png_save_uint_32(buf + 20, itemp);
 
-   if (blue_x < 0 || blue_x > 0.8 || blue_y < 0 || blue_y > 0.8 ||
-       blue_x + blue_y > 1.0)
+   if (blue_x < 0 || blue_y < 0 || blue_x + blue_y > 1.0)
    {
       png_warning(png_ptr, "Invalid cHRM blue point specified");
       return;
@@ -1000,7 +995,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    png_save_uint_32(buf, (png_uint_32)white_x);
    png_save_uint_32(buf + 4, (png_uint_32)white_y);
 
-   if (red_x > 80000L || red_y > 80000L || red_x + red_y > 100000L)
+   if (red_x + red_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM fixed red point specified");
       return;
@@ -1008,7 +1003,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    png_save_uint_32(buf + 8, (png_uint_32)red_x);
    png_save_uint_32(buf + 12, (png_uint_32)red_y);
 
-   if (green_x > 80000L || green_y > 80000L || green_x + green_y > 100000L)
+   if (green_x + green_y > 100000L)
    {
       png_warning(png_ptr, "Invalid fixed cHRM green point specified");
       return;
@@ -1016,7 +1011,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    png_save_uint_32(buf + 16, (png_uint_32)green_x);
    png_save_uint_32(buf + 20, (png_uint_32)green_y);
 
-   if (blue_x > 80000L || blue_y > 80000L || blue_x + blue_y > 100000L)
+   if (blue_x + blue_y > 100000L)
    {
       png_warning(png_ptr, "Invalid fixed cHRM blue point specified");
       return;
