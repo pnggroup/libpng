@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "February 22, 2006"
+.TH LIBPNG 3 "February 24, 2006"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.2.9beta2
+libpng \- Portable Network Graphics (PNG) Reference Library 1.2.9beta3
 .SH SYNOPSIS
 \fI\fB
 
@@ -176,6 +176,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.9beta2
 
 \fI\fB
 
+\fB#if \fI!defined(PNG_1_0_X)
+
+\fBpng_int_32 png_get_int_32 (png_bytep \fIbuf\fP\fB);\fP
+
+\fI\fB#endif
+
+\fI\fB
+
 \fBpng_byte png_get_interlace_type (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
@@ -255,6 +263,22 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.9beta2
 \fI\fB
 
 \fBpng_uint_32 png_get_tRNS (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fP\fI*trans\fP\fB, int \fP\fI*num_trans\fP\fB, png_color_16p \fI*trans_values\fP\fB);\fP
+
+\fI\fB
+
+\fB#if \fI!defined(PNG_1_0_X)
+
+\fBpng_uint_16 png_get_uint_16 (png_bytep \fIbuf\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_uint_31 (png_bytep \fIbuf\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_uint_32 (png_bytep \fIbuf\fP\fB);\fP
+
+\fI\fB#endif
 
 \fI\fB
 
@@ -403,6 +427,18 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.9beta2
 \fI\fB
 
 \fB#if \fI!defined(PNG_1_0_X)
+
+\fBpng_save_int_32 (png_bytep \fP\fIbuf\fP\fB, png_int_32 \fIi\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_save_uint_16 (png_bytep \fP\fIbuf\fP\fB, unsigned int \fIi\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_save_uint_32 (png_bytep \fP\fIbuf\fP\fB, png_uint_32 \fIi\fP\fB);\fP
+
+\fI\fB
 
 \fBvoid png_set_add_alpha (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fP\fIfiller\fP\fB, int \fIflags\fP\fB);\fP
 
@@ -781,7 +817,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.9beta2 - February 22, 2006
+ libpng version 1.2.9beta3 - February 24, 2006
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -3685,13 +3721,13 @@ application:
 
 .SH IX. Y2K Compliance in libpng
 
-February 22, 2006
+February 24, 2006
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.9beta2 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.9beta3 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3844,7 +3880,7 @@ the first widely used release:
  1.2.8rc1-5          13    10208  12.so.0.1.2.8rc1-5
  1.0.18              10    10018  12.so.0.1.0.18
  1.2.8               13    10208  12.so.0.1.2.8
- 1.2.9beta1-2        13    10209  12.so.0.1.2.9beta1-2
+ 1.2.9beta1-3        13    10209  12.so.0.1.2.9beta1-3
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -3900,7 +3936,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.2.9beta2 - February 22, 2006:
+Libpng version 1.2.9beta3 - February 24, 2006:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -3908,7 +3944,7 @@ Supported by the PNG development group
 .br
 png-mng-implement at lists.sf.net
 (subscription required; visit
-png-implement at ccrc.wustl.edu (subscription required; visit
+png-mng-implement at lists.sourceforge.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe).
 
@@ -3921,8 +3957,8 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.2.9beta2, February 22, 2006, are
-Copyright (c) 2005 Glenn Randers-Pehrson, and are
+libpng versions 1.2.6, August 15, 2004, through 1.2.9beta3, February 24, 2006, are
+Copyright (c) 2004-2006 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
 
@@ -4020,7 +4056,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-February 22, 2006
+February 24, 2006
 
 .\" end of man page
 

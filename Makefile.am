@@ -24,37 +24,44 @@ $(LIBPNG3_VERSION_INFO)
 pkginclude_HEADERS= png.h pngconf.h
 
 #extra source distribution files.
-EXTRA_DIST= ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+EXTRA_DIST= \
+	NEWS AUTHORS ChangeLog INSTALL KNOWNBUG COPYING README TODO Y2KINFO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/projects/cbuilder5/* ${srcdir}/projects/beos/* \
-	${srcdir}/projects/visualc6/* ${srcdir}/projects/visualc71 \
-	${srcdir}/projects/wince.txt ${srcdir}/projects/netware.txt \
+	${srcdir}/projects/cbuilder5/* \
+	${srcdir}/projects/beos/* \
+	${srcdir}/projects/visualc6/* \
+	${srcdir}/projects/visualc71/* \
+	${srcdir}/projects/wince.txt \
+	${srcdir}/projects/netware.txt \
 	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \
 	${srcdir}/contrib/pngminus/* \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt pngasmrd.h pnggccrd.c pngvcrd.c 
+	example.c libpng.txt pnggccrd.c pngvcrd.c 
 
 CLEANFILES= pngout.png libpng.pc libpng12.pc libpng-config libpng12-config
 
 
 libpng.pc:
 	cat ${srcdir}/scripts/libpng.pc.in | \
-	sed -e 's,[@]PREFIX[@],$(prefix),' -e 's,[@]INCLUDEDIR[@],$(includedir),' > libpng.pc
+	sed -e 's,[@]PREFIX[@],$(prefix),' \
+	  -e 's,[@]INCLUDEDIR[@],$(includedir),' \
+	  -e 's,[@]EXEC_PREFIX[@],$(exec_prefix),' > libpng.pc
 
 libpng12.pc: libpng.pc
 	cp libpng.pc libpng12.pc
 
+ 
 install-data-local: libpng.pc libpng12.pc
-	@INSTALL@ -d @PKGCONFIGDIR@
-	@INSTALL_DATA@ libpng.pc @PKGCONFIGDIR@
-	@INSTALL_DATA@ libpng12.pc @PKGCONFIGDIR@
-
+	@INSTALL@ -d $(DESTDIR)@PKGCONFIGDIR@
+	@INSTALL_DATA@ libpng.pc $(DESTDIR)@PKGCONFIGDIR@
+	@INSTALL_DATA@ libpng12.pc $(DESTDIR)@PKGCONFIGDIR@
+ 
 uninstall-local:
-	rm -f @PKGCONFIGDIR@/libpng.pc
-	rm -f @PKGCONFIGDIR@/libpng12.pc
+	rm -f $(DESTDIR)@PKGCONFIGDIR@/libpng.pc
+	rm -f $(DESTDIR)@PKGCONFIGDIR@/libpng12.pc
 
 libpng-config:
 	( cat ${srcdir}/scripts/libpng-config-head.in; \
@@ -64,6 +71,8 @@ libpng-config:
 	echo R_opts=\"-Wl,-rpath,$(libdir)\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \
 	cat ${srcdir}/scripts/libpng-config-body.in ) > libpng-config
+	chmod 755 libpng-config
 
 libpng12-config: libpng-config
 	cp libpng-config libpng12-config
+	chmod 755 libpng12-config

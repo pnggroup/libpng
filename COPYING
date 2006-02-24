@@ -8,7 +8,7 @@ COPYRIGHT NOTICE, DISCLAIMER, and LICENSE:
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.2.9beta2, February 22, 2006, are
+libpng versions 1.2.6, August 15, 2004, through 1.2.9beta3, February 24, 2006, are
 Copyright (c) 2005 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -106,4 +106,4 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-February 22, 2006
+February 24, 2006

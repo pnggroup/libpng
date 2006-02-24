@@ -146,10 +146,15 @@ libpng_la_LDFLAGS = -export-dynamic -version-info $(LIBPNG3_VERSION_INFO)
 pkginclude_HEADERS = png.h pngconf.h
 
 #extra source distribution files.
-EXTRA_DIST = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+EXTRA_DIST = \
+	NEWS AUTHORS ChangeLog INSTALL KNOWNBUG COPYING README TODO Y2KINFO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/projects/borland/* ${srcdir}/projects/beos/* ${srcdir}/projects/msvc/* \
-	${srcdir}/projects/wince.txt ${srcdir}/projects/netware.txt \
+	${srcdir}/projects/cbuilder5/* \
+	${srcdir}/projects/beos/* \
+	${srcdir}/projects/visualc6/* \
+	${srcdir}/projects/visualc71/* \
+	${srcdir}/projects/wince.txt \
+	${srcdir}/projects/netware.txt \
 	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \
 	${srcdir}/contrib/msvctest/* \
@@ -157,7 +162,7 @@ EXTRA_DIST = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt pngasmrd.h pnggccrd.c pngvcrd.c 
+	example.c libpng.txt pnggccrd.c pngvcrd.c 
 
 
 CLEANFILES = pngout.png libpng.pc libpng12.pc libpng-config libpng12-config
@@ -868,7 +873,9 @@ uninstall-man: uninstall-man3 uninstall-man5
 
 libpng.pc:
 	cat ${srcdir}/scripts/libpng.pc.in | \
-	sed -e 's,[@]PREFIX[@],$(prefix),' -e 's,[@]INCLUDEDIR[@],$(includedir),' > libpng.pc
+	sed -e 's,[@]PREFIX[@],$(prefix),' \
+	  -e 's,[@]INCLUDEDIR[@],$(includedir),' \
+	  -e 's,[@]EXEC_PREFIX[@],$(exec_prefix),' > libpng.pc
 
 libpng12.pc: libpng.pc
 	cp libpng.pc libpng12.pc
