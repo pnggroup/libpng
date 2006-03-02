@@ -1,11 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@/libpng@PNGLIB_MAJOR@
 
-prefix=@PREFIX@
-exec_prefix=@EXEC_PREFIX@
-libdir=${exec_prefix}/lib
-includedir=${prefix}/include
-
-Name: libpng12
+Name: libpng
 Description: Loads and saves PNG files
-Version: 1.2.9beta3
-Libs: -L${libdir} -lpng12 -lz -lm
-Cflags: -I${includedir}/libpng12
+Version: @PNGLIB_VERSION@
+Libs: -L${libdir} -lpng@PNGLIB_MAJOR@ -lz -lm
+Cflags: -I${includedir}

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.9beta3 - February 24, 2006
+ * libpng version 1.2.9beta4 - March 2, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2005 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -460,7 +460,15 @@
  */
 
 #if defined(PNG_1_0_X) || defined (PNG_1_2_X)
-#  define PNG_NO_iTXt_SUPPORTED
+#  ifndef PNG_NO_iTXt_SUPPORTED
+#    define PNG_NO_iTXt_SUPPORTED
+#  endif
+#  ifndef PNG_NO_READ_iTXt
+#    define PNG_NO_READ_iTXt
+#  endif
+#  ifndef PNG_NO_WRITE_iTXt
+#    define PNG_NO_WRITE_iTXt
+#  endif
 #endif
 
 #if !defined(PNG_NO_iTXt_SUPPORTED)

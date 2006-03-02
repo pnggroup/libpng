@@ -1,7 +1,6 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * libpng 1.2.9beta3 - February 24, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -32,7 +31,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
    if((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&(png_ptr->mng_features_permitted))
    {
-      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream\n");
+      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream");
       png_ptr->mng_features_permitted=0;
    }
 #endif
@@ -134,7 +133,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
       png_write_PLTE(png_ptr, info_ptr->palette,
          (png_uint_32)info_ptr->num_palette);
    else if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-      png_error(png_ptr, "Valid palette required for paletted images\n");
+      png_error(png_ptr, "Valid palette required for paletted images");
 
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_tRNS)
@@ -183,7 +182,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
           info_ptr->scal_s_width, info_ptr->scal_s_height);
 #else
       png_warning(png_ptr,
-          "png_write_sCAL not supported; sCAL chunk not written.\n");
+          "png_write_sCAL not supported; sCAL chunk not written.");
 #endif
 #endif
 #endif
@@ -222,7 +221,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
                          info_ptr->text[i].lang_key,
                          info_ptr->text[i].text);
 #else
-          png_warning(png_ptr, "Unable to write international text\n");
+          png_warning(png_ptr, "Unable to write international text");
 #endif
           /* Mark this chunk as written */
           info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
@@ -236,7 +235,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
             info_ptr->text[i].text, 0,
             info_ptr->text[i].compression);
 #else
-         png_warning(png_ptr, "Unable to write compressed text\n");
+         png_warning(png_ptr, "Unable to write compressed text");
 #endif
          /* Mark this chunk as written */
          info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_zTXt_WR;
@@ -249,7 +248,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
                          info_ptr->text[i].text,
                          0);
 #else
-         png_warning(png_ptr, "Unable to write uncompressed text\n");
+         png_warning(png_ptr, "Unable to write uncompressed text");
 #endif
          /* Mark this chunk as written */
          info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
@@ -323,7 +322,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
                          info_ptr->text[i].lang_key,
                          info_ptr->text[i].text);
 #else
-             png_warning(png_ptr, "Unable to write international text\n");
+             png_warning(png_ptr, "Unable to write international text");
 #endif
              /* Mark this chunk as written */
              info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
@@ -336,7 +335,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
                info_ptr->text[i].text, 0,
                info_ptr->text[i].compression);
 #else
-            png_warning(png_ptr, "Unable to write compressed text\n");
+            png_warning(png_ptr, "Unable to write compressed text");
 #endif
             /* Mark this chunk as written */
             info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_zTXt_WR;
@@ -348,7 +347,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
             png_write_tEXt(png_ptr, info_ptr->text[i].key,
                info_ptr->text[i].text, 0);
 #else
-            png_warning(png_ptr, "Unable to write uncompressed text\n");
+            png_warning(png_ptr, "Unable to write uncompressed text");
 #endif
 
             /* Mark this chunk as written */

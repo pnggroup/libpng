@@ -1,6 +1,5 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * libpng version 1.2.9beta3 - February 24, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -44,7 +43,7 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
 {
    png_uint_32 i = png_get_uint_32(buf);
    if (i > PNG_UINT_31_MAX)
-     png_error(png_ptr, "PNG unsigned integer out of range.\n");
+     png_error(png_ptr, "PNG unsigned integer out of range.");
    return (i);
 }
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
@@ -1076,7 +1075,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if(profile_size > profile_length)
    {
       png_free(png_ptr, chunkdata);
-      png_warning(png_ptr, "Ignoring truncated iCCP profile.\n");
+      png_warning(png_ptr, "Ignoring truncated iCCP profile.");
       return;
    }
 

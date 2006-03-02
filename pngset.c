@@ -1,7 +1,6 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * libpng 1.2.9beta3 - February 24, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -318,7 +317,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
     * 5. The color_type is RGB or RGBA
     */
    if((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&png_ptr->mng_features_permitted)
-      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream\n");
+      png_warning(png_ptr,"MNG features are not allowed in a PNG datastream");
    if(filter_type != PNG_FILTER_TYPE_BASE)
    {
      if(!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
@@ -1052,13 +1051,14 @@ png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
 }
 #endif
 
+#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
 #if defined(PNG_READ_EMPTY_PLTE_SUPPORTED) || \
     defined(PNG_WRITE_EMPTY_PLTE_SUPPORTED)
 void PNGAPI
 png_permit_empty_plte (png_structp png_ptr, int empty_plte_permitted)
 {
    /* This function is deprecated in favor of png_permit_mng_features()
-      and will be removed from libpng-2.0.0 */
+      and will be removed from libpng-1.3.0 */
    png_debug(1, "in png_permit_empty_plte, DEPRECATED.\n");
    if (png_ptr == NULL)
       return;
@@ -1066,6 +1066,7 @@ png_permit_empty_plte (png_structp png_ptr, int empty_plte_permitted)
      ((png_ptr->mng_features_permitted & (~(PNG_FLAG_MNG_EMPTY_PLTE))) |
      ((empty_plte_permitted & PNG_FLAG_MNG_EMPTY_PLTE)));
 }
+#endif
 #endif
 
 #if defined(PNG_MNG_FEATURES_SUPPORTED)

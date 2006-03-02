@@ -1,5 +1,5 @@
 
-Libpng 1.2.9beta3 - February 24, 2006
+Libpng 1.2.9beta4 - March 2, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,26 +9,26 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.9beta3.tar.gz
-   1.2.9beta3.tar.bz2
+   1.2.9beta4.tar.gz
+   1.2.9beta4.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp129b03.zip
-   lp129b03.tar.bz2
+   lp129b04.zip
+   lp129b04.tar.bz2
 
 Project files
 
-   1.2.9beta3-project-netware.zip
-   1.2.9beta3-project-wince.zip
+   1.2.9beta4-project-netware.zip
+   1.2.9beta4-project-wince.zip
 
 Other information:
 
-   1.2.9beta3-README.txt
-   1.2.9beta3-KNOWNBUGS.txt
-   1.2.9beta3-LICENSE.txt
-   1.2.9beta3-Y2K-compliance.txt
+   1.2.9beta4-README.txt
+   1.2.9beta4-KNOWNBUGS.txt
+   1.2.9beta4-LICENSE.txt
+   1.2.9beta4-Y2K-compliance.txt
 
 Changes since the last public release (1.2.8):
 
@@ -55,6 +55,7 @@ version 1.2.9beta1 [February 21, 2006]
   Revised man page and libpng.txt to make it clear that one should not call
     png_read_end or png_write_end after png_read_png or png_write_png.
   Optimized zlib window flag (CINFO) in contrib/pngsuite/*.png (Cosmin).
+  Default iTXt support was inadvertently enabled.
 
 version 1.2.9beta2 [February 22, 2006]
 
@@ -74,6 +75,24 @@ version 1.2.9beta3 [February 24, 2006]
 
   Fix CRCRLF line endings in contrib/visupng/VisualPng.dsp
   Make libpng.pc respect EXEC_PREFIX (D.P.Kreil)
+  Remove reference to pngasmrd.h from Makefile.am
+  Renamed CHANGES to ChangeLog.
+  Renamed LICENSE to COPYING.
+  Renamed ANNOUNCE to NEWS.
+  Created AUTHORS file.
+
+version 1.2.9beta4 [March 2, 2006]
+
+  Change definition of PKGCONFIG from $prefix/lib to $libdir in configure.ac
+  Reverted to filenames LICENSE and ANNOUNCE; removed AUTHORS and COPYING.
+  Removed newline from the end of some error and warning messages.
+  Removed test for sqrt() from configure.ac and configure.
+  Added "OS2" to list of systems that don't need underscores, in pnggccrd.c
+  Made swap tables in pngtrans.c PNG_CONST (Carlo Bramix).
+  Disabled default iTXt support that was inadvertently enabled in
+    libpng-1.2.9beta1.
+  Added "OS2" to list of systems that don't need underscores, in pnggccrd.c
+  Removed libpng version and date from *.c files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

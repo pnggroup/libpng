@@ -1,19 +1,47 @@
-# Process this file with autoconf to produce a configure script.
-m4_define(PNGPKG_VERSION,[1.2.9beta3])
-AC_INIT([libpng], PNGPKG_VERSION, png-mng-implement@lists.sourceforge.net)
-AM_INIT_AUTOMAKE([libpng], PNGPKG_VERSION)
+# configure.ac
+
+dnl Process this file with autoconf to produce a configure script.
+dnl
+dnl Minor upgrades (compatible ABI): increment the package version
+dnl (third field in two places below) and set the PNGLIB_MINOR
+dnl variable.
+dnl
+dnl Major upgrades (incompatible ABI): increment the package major
+dnl version (second field, or first if desired), set the minor
+dnl to 0, set PNGLIB_MAJOR below *and* follow the instructions in
+dnl Makefile.am to upgrade the package name.
+
+dnl This is here to prevent earlier autoconf from being used, it
+dnl should not be necessary to regenerate configure if the time
+dnl stamps are correct
+AC_PREREQ(2.59)
+
+dnl Version number stuff here:
+
+AC_INIT([libpng], [1.2.9beta4], [png-mng-implement@lists.sourceforge.net])
+AM_INIT_AUTOMAKE
+dnl stop configure from automagically running automake
+AM_MAINTAINER_MODE
+
+PNGLIB_VERSION=1.2.9beta4
+PNGLIB_MAJOR=12
+PNGLIB_MINOR=9
+
+dnl End of version number stuff
+
 AC_CONFIG_SRCDIR([pngget.c])
 AM_CONFIG_HEADER([config.h])
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
 # Checks for header files.
-AC_PATH_X
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h malloc.h stdlib.h string.h strings.h unistd.h])
+AC_CHECK_HEADERS([malloc.h stdlib.h string.h strings.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -23,19 +51,57 @@ AC_STRUCT_TM
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_STRTOD
+AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
+AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow,, AC_ERROR([cannot find pow])) )
+AC_CHECK_LIB(z, zlibVersion,, AC_ERROR([zlib not installed]))
 
-AC_CHECK_FUNCS([memset pow strrchr])
-AC_CHECK_FUNC(sqrt, , AC_CHECK_LIB(m, sqrt,, [cannot find sqrt]))
-AC_CHECK_LIB(z, zlibVersion,, AC_ERROR([ZLib not installed]))
+# Substitutions for .in files
+AC_SUBST(PNGLIB_VERSION)
+AC_SUBST(PNGLIB_MAJOR)
+AC_SUBST(PNGLIB_MINOR)
 
-AC_ARG_WITH(pkgconfigdir, AC_HELP_STRING([--with-pkgconfigdir],[Use the specified pkgconfig dir (default is prefix/lib/pkgconfig)]),[PKGCONFIGDIR=${withval}],[PKGCONFIGDIR='${prefix}/lib/pkgconfig'])
+# Additional arguments (and substitutions)
+# Allow the pkg-config directory to be set
+AC_ARG_WITH(pkgconfigdir,
+	AC_HELP_STRING([--with-pkgconfigdir],
+		[Use the specified pkgconfig dir (default is libdir/pkgconfig)]),
+	[pkgconfigdir=${withval}],
+	[pkgconfigdir='${libdir}/pkgconfig'])
 
-AC_MSG_CHECKING([pkgconfig directory])
-AC_MSG_RESULT([$PKGCONFIGDIR])
-AC_SUBST([PKGCONFIGDIR])
+AC_SUBST([pkgconfigdir])
+AC_MSG_NOTICE([pkgconfig directory is ${pkgconfigdir}])
 
-AC_SUBST(LIBPNG12_VERSION_INFO,0:0:0)
-AC_SUBST(LIBPNG3_VERSION_INFO,3:0:0)
+# Make the *-config binary config scripts optional
+AC_ARG_WITH(binconfigs,
+	AC_HELP_STRING([--with-binconfigs],
+		[Generate shell libpng-config scripts as well as pkg-config data]
+		[@<:@default=yes@:>@]),
+	[if test "${withval}" = no; then
+		binconfigs=
+		AC_MSG_NOTICE([libpng-config scripts will not be built])
+	else
+		binconfigs='${binconfigs}'
+	fi],
+	[binconfigs='${binconfigs}'])
+AC_SUBST([binconfigs])
 
-AC_CONFIG_FILES([Makefile])
+# Allow the old version number library, libpng.so, to be removed from
+# the build
+AC_ARG_WITH(libpng-compat,
+	AC_HELP_STRING([--with-libpng-compat],
+		[Generate the obsolete libpng.so library @<:@default=yes@:>@]),
+	[if test "${withval}" = no; then
+		compatlib=
+		AC_MSG_NOTICE([libpng.so will not be built])
+	else
+		compatlib=libpng.la
+	fi],
+	[compatlib=libpng.la])
+AC_SUBST([compatlib])
+
+# Config files, substituting as above
+AC_CONFIG_FILES([Makefile libpng.pc:scripts/libpng.pc.in])
+AC_CONFIG_FILES([libpng-config:scripts/libpng-config.in],
+		[chmod +x libpng-config])
+
 AC_OUTPUT

@@ -1435,6 +1435,7 @@ version 1.2.9beta1 [February 21, 2006]
     png_get_int_32, png_save_int_32, png_get_uint_31 (Cosmin).
   Added type cast (png_byte) in png_write_sCAL() (Cosmin).
   Fixed scripts/makefile.cygwin (Cosmin).
+  Default iTXt support was inadvertently enabled.
 
 version 1.2.9beta2 [February 21, 2006]
 
@@ -1460,8 +1461,22 @@ version 1.2.9beta3 [February 24, 2006]
   Renamed ANNOUNCE to NEWS.
   Created AUTHORS file.
 
+version 1.2.9beta4 [March 2, 2006]
+
+  Change definition of PKGCONFIG from $prefix/lib to $libdir in configure.ac
+  Reverted to filenames LICENSE and ANNOUNCE; removed AUTHORS and COPYING.
+  Removed newline from the end of some error and warning messages.
+  Removed test for sqrt() from configure.ac and configure.
+  Made swap tables in pngtrans.c PNG_CONST (Carlo Bramix).
+  Disabled default iTXt support that was inadvertently enabled in
+    libpng-1.2.9beta1.
+  Added "OS2" to list of systems that don't need underscores, in pnggccrd.c
+
 version 1.3.0beta1 [future]
   Enable iTXt support (changes png_struct, thus requires so-number change).
+  Removed deprecated functions png_read_init, png_write_init, png_info_init,
+    png_permit_empty_plte and deprecated macro PNG_MAX_UINT.
+  Removed libpng version and date from *.c files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

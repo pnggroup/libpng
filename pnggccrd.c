@@ -6,7 +6,6 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * libpng version 1.2.9beta3 - February 24, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -255,9 +254,10 @@ static const int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #endif
 
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
-/* djgpp, Win32, and Cygwin add their own underscores to global variables,
+/* djgpp, Win32, Cygwin, and OS2 add their own underscores to global variables,
  * so define them without: */
-#if defined(__DJGPP__) || defined(WIN32) || defined(__CYGWIN__)
+#if defined(__DJGPP__) || defined(WIN32) || defined(__CYGWIN__) || \
+    defined(__OS2__)
 #  define _mmx_supported  mmx_supported
 #  define _const4         const4
 #  define _const6         const6
