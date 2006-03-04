@@ -6,5 +6,5 @@ includedir=@includedir@/libpng@PNGLIB_MAJOR@
 Name: libpng
 Description: Loads and saves PNG files
 Version: @PNGLIB_VERSION@
-Libs: -L${libdir} -lpng@PNGLIB_MAJOR@ -lz -lm
+Libs: -L${libdir} -lpng@PNGLIB_MAJOR@
 Cflags: -I${includedir}

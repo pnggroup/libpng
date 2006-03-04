@@ -1441,11 +1441,11 @@ version 1.2.9beta2 [February 21, 2006]
 
   Check for png_rgb_to_gray and png_gray_to_rgb read transformations before
     checking for png_read_dither in pngrtran.c
-  Revise checking of chromaticity limits to accommodate extended RGB
+  Revised checking of chromaticity limits to accommodate extended RGB
     colorspace (John Denker).
   Changed line endings in some of the project files to CRLF, even in the
     "Unix" tar distributions (Cosmin).
-  Make png_get_int_32 and png_save_int_32 always available (Cosmin).
+  Made png_get_int_32 and png_save_int_32 always available (Cosmin).
   Updated scripts/pngos2.def, scripts/pngw32.def and projects/wince/png32ce.def
     with the newly exported functions.
   Eliminated distributions without the "configure" script.
@@ -1453,17 +1453,17 @@ version 1.2.9beta2 [February 21, 2006]
 
 version 1.2.9beta3 [February 24, 2006]
 
-  Fix CRCRLF line endings in contrib/visupng/VisualPng.dsp
-  Make libpng.pc respect EXEC_PREFIX (D. P. Kreil, J. Bowler)
-  Remove reference to pngasmrd.h from Makefile.am
+  Fixed CRCRLF line endings in contrib/visupng/VisualPng.dsp
+  Made libpng.pc respect EXEC_PREFIX (D. P. Kreil, J. Bowler)
+  Removed reference to pngasmrd.h from Makefile.am
   Renamed CHANGES to ChangeLog.
   Renamed LICENSE to COPYING.
   Renamed ANNOUNCE to NEWS.
   Created AUTHORS file.
 
-version 1.2.9beta4 [March 2, 2006]
+version 1.2.9beta4 [March 3, 2006]
 
-  Change definition of PKGCONFIG from $prefix/lib to $libdir in configure.ac
+  Changed definition of PKGCONFIG from $prefix/lib to $libdir in configure.ac
   Reverted to filenames LICENSE and ANNOUNCE; removed AUTHORS and COPYING.
   Removed newline from the end of some error and warning messages.
   Removed test for sqrt() from configure.ac and configure.
@@ -1471,12 +1471,19 @@ version 1.2.9beta4 [March 2, 2006]
   Disabled default iTXt support that was inadvertently enabled in
     libpng-1.2.9beta1.
   Added "OS2" to list of systems that don't need underscores, in pnggccrd.c
+  Removed libpng version and date from *.c files.
 
-version 1.3.0beta1 [future]
-  Enable iTXt support (changes png_struct, thus requires so-number change).
+version 1.2.9beta5 [March 4, 2006]
+  Removed trailing blanks from source files.
+  Put version and date of latest change in each source file, and changed
+    copyright year accordingly.
+  More cleanup of configure.ac, Makefile.ac, and associated scripts.
+  Restored scripts/makefile.elf which was inadvertently deleted.
+
+version 1.4.0beta1 [future]
+  Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
     png_permit_empty_plte and deprecated macro PNG_MAX_UINT.
-  Removed libpng version and date from *.c files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

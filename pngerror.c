@@ -1,6 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
+ * libpng 1.2.9 March 4, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -56,7 +57,7 @@ png_error(png_structp png_ptr, png_const_charp error_message)
      {
          if (png_ptr->flags&PNG_FLAG_STRIP_ERROR_TEXT)
          {
-            msg[0]='0';        
+            msg[0]='0';
             msg[1]='\0';
             error_message=msg;
          }

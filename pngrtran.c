@@ -1,6 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
+ * libpng 1.2.9 March 4, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -790,7 +791,7 @@ png_init_read_transformations(png_structp png_ptr)
       {
          if (color_type == PNG_COLOR_TYPE_PALETTE)
          {
-           /* could skip if no transparency and 
+           /* could skip if no transparency and
            */
             png_color back, back_1;
             png_colorp palette = png_ptr->palette;

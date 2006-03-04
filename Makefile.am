@@ -16,7 +16,7 @@ AUTOMAKE_OPTIONS = foreign
 # test programs - run on make check, make distcheck
 check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
-pngtest_LDADD = libpng.la
+pngtest_LDADD = libpng12.la
 TESTS = test-pngtest.sh
 TESTS_ENVIRONMENT= srcdir=$(srcdir) 
 
@@ -24,8 +24,8 @@ TESTS_ENVIRONMENT= srcdir=$(srcdir)
 dist_man_MANS= libpng.3 libpngpf.3 png.5
 
 # generate the -config scripts if required
-binconfigs= libpng-config libpng12-config 
-EXTRA_SCRIPTS= libpng-config libpng12-config 
+binconfigs= libpng12-config 
+EXTRA_SCRIPTS= libpng-config libpng12-config
 bin_SCRIPTS= @binconfigs@
 
 # rules to build libpng, only build the old library on request
@@ -34,7 +34,8 @@ EXTRA_LTLIBRARIES= libpng.la
 libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
-	png.h pngconf.h 
+	png.h pngconf.h libpng.sym libpng.vers
+BUILT_SOURCES = libpng.sym libpng.vers
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
@@ -42,6 +43,16 @@ libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
 	-version-number 3:@PNGLIB_MINOR@:0
+libpng12_la_LIBADD = @PNG_LIBS@
+libpng_la_LIBADD = @PNG_LIBS@
+
+if HAVE_LD_VERSION_SCRIPT
+  # Versioned symbols and restricted exports
+  libpng12_la_LDFLAGS += -Wl,--version-script=libpng.vers
+else
+  # Only restricted exports when possible
+  libpng12_la_LDFLAGS += -export-symbols libpng.sym
+endif
 
 #distribute headers in /usr/include/libpng/*
 pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
@@ -50,11 +61,11 @@ pkginclude_HEADERS= png.h pngconf.h
 # pkg-config stuff, note that libpng.pc is always required in order
 # to get the correct library
 pkgconfigdir = @pkgconfigdir@
-pkgconfig_DATA = libpng.pc libpng12.pc
+pkgconfig_DATA = libpng12.pc
 
 #extra source distribution files.
 EXTRA_DIST= \
-	ANNOUNCE ChangeLog INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/projects/cbuilder5/* \
 	${srcdir}/projects/beos/* \
@@ -70,7 +81,7 @@ EXTRA_DIST= \
 	$(TESTS) \
 	example.c libpng.txt pnggccrd.c pngvcrd.c 
 
-CLEANFILES= pngout.png libpng12.pc libpng12-config
+CLEANFILES= pngout.png libpng12.pc libpng12-config libpng.vers libpng.sym
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -78,20 +89,56 @@ $(PNGLIB_BASENAME).pc: libpng.pc
 $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
+libpng.sym: png.h pngconf.h
+	rm -f $@
+	$(CPP) $(CPPFLAGS) -DPNG_BUILDSYMS -DPNG_INTERNAL $(srcdir)/png.h | \
+	$(AWK) -F '[\t [\\]();]' '{ \
+		for (i=1;i+2<=NF;++i)\
+			if ($$(i)=="PNG_FUNCTION_EXPORT" && $$(i+2)=="END")\
+				print $$(i+1) ;\
+		for (i=1;i+1<=NF;++i)\
+			if ($$(i)=="PNG_DATA_EXPORT")\
+				print $$(i+1) ;\
+		}' > $@.new
+	mv $@.new $@
+
+libpng.vers: libpng.sym
+	rm -f $@
+	$(ECHO) PNG12_0 '{global:' > $@.new
+	$(SED) s/$$/\;/ $< >> $@.new
+	$(ECHO) 'local: *; };' >> $@.new
+	mv $@.new $@
+
 # install the .../include headers as links to the new ones
 install-data-hook:
 	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h pngconf.h
+	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
+	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
 # do evil things to libpng to cause libpng12 to be used, if
 # the compat library is not being built do nothing.
 install-exec-hook:
+	cd $(DESTDIR)$(bindir); rm -f libpng-config
+	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
 	@if test -n "@compatlib@"; then\
 		set -x;\
 		cd $(DESTDIR)$(libdir);\
 		for ext in a la so; do\
 			rm -f libpng.$$ext;\
 			$(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
+		done;\
+	fi
+
+uninstall-hook:
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
+	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
+	rm -f $(DESTDIR)$(bindir)/libpng-config
+	@if test -n "@compatlib@"; then\
+		set -x;\
+		cd $(DESTDIR)$(libdir);\
+		for ext in a la so; do\
+			rm -f libpng.$$ext;\
 		done;\
 	fi

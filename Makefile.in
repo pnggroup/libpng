@@ -49,13 +49,14 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = pngtest$(EXEEXT)
+@HAVE_LD_VERSION_SCRIPT_TRUE@am__append_1 = -Wl,--version-script=libpng.vers
+@HAVE_LD_VERSION_SCRIPT_FALSE@am__append_2 = -export-symbols libpng.sym
 DIST_COMMON = README $(am__configure_deps) $(dist_man_MANS) \
 	$(pkginclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure $(top_srcdir)/scripts/libpng-config.in \
-	$(top_srcdir)/scripts/libpng.pc.in ChangeLog INSTALL NEWS TODO \
-	config.guess config.sub depcomp install-sh ltmain.sh missing \
-	mkinstalldirs
+	$(top_srcdir)/scripts/libpng.pc.in INSTALL TODO config.guess \
+	config.sub depcomp install-sh ltmain.sh missing mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -77,13 +78,13 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(pkgincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libpng_la_LIBADD =
+libpng_la_DEPENDENCIES =
 am__objects_1 = png.lo pngset.lo pngget.lo pngrutil.lo pngtrans.lo \
 	pngwutil.lo pngread.lo pngrio.lo pngwio.lo pngwrite.lo \
 	pngrtran.lo pngwtran.lo pngmem.lo pngerror.lo pngpread.lo
 am_libpng_la_OBJECTS = $(am__objects_1)
 libpng_la_OBJECTS = $(am_libpng_la_OBJECTS)
-libpng12_la_LIBADD =
+libpng12_la_DEPENDENCIES =
 am_libpng12_la_OBJECTS = png.lo pngset.lo pngget.lo pngrutil.lo \
 	pngtrans.lo pngwutil.lo pngread.lo pngrio.lo pngwio.lo \
 	pngwrite.lo pngrtran.lo pngwtran.lo pngmem.lo pngerror.lo \
@@ -91,7 +92,7 @@ am_libpng12_la_OBJECTS = png.lo pngset.lo pngget.lo pngrutil.lo \
 libpng12_la_OBJECTS = $(am_libpng12_la_OBJECTS)
 am_pngtest_OBJECTS = pngtest.$(OBJEXT)
 pngtest_OBJECTS = $(am_pngtest_OBJECTS)
-pngtest_DEPENDENCIES = libpng.la
+pngtest_DEPENDENCIES = libpng12.la
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -162,6 +163,8 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+HAVE_LD_VERSION_SCRIPT_FALSE = @HAVE_LD_VERSION_SCRIPT_FALSE@
+HAVE_LD_VERSION_SCRIPT_TRUE = @HAVE_LD_VERSION_SCRIPT_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -187,8 +190,10 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 PNGLIB_MAJOR = @PNGLIB_MAJOR@
 PNGLIB_MINOR = @PNGLIB_MINOR@
 PNGLIB_VERSION = @PNGLIB_VERSION@
+PNG_LIBS = @PNG_LIBS@
 POW_LIB = @POW_LIB@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -198,6 +203,7 @@ ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
+ac_ct_SED = @ac_ct_SED@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -210,7 +216,7 @@ am__tar = @am__tar@
 am__untar = @am__untar@
 
 # generate the -config scripts if required
-binconfigs = libpng-config libpng12-config 
+binconfigs = libpng12-config 
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -249,13 +255,13 @@ PNGLIB_BASENAME = libpng@PNGLIB_MAJOR@
 # libpng does not follow GNU file name conventions
 AUTOMAKE_OPTIONS = foreign
 pngtest_SOURCES = pngtest.c
-pngtest_LDADD = libpng.la
+pngtest_LDADD = libpng12.la
 TESTS = test-pngtest.sh
 TESTS_ENVIRONMENT = srcdir=$(srcdir) 
 
 # man pages
 dist_man_MANS = libpng.3 libpngpf.3 png.5
-EXTRA_SCRIPTS = libpng-config libpng12-config 
+EXTRA_SCRIPTS = libpng-config libpng12-config
 bin_SCRIPTS = @binconfigs@
 
 # rules to build libpng, only build the old library on request
@@ -264,23 +270,25 @@ EXTRA_LTLIBRARIES = libpng.la
 libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
-	png.h pngconf.h 
+	png.h pngconf.h libpng.sym libpng.vers
 
+BUILT_SOURCES = libpng.sym libpng.vers
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
 # MAJOR UPGRADE: the version-number settings below must be changed.
-libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 0:@PNGLIB_MINOR@:0
-
+libpng12_la_LDFLAGS = -no-undefined -export-dynamic -version-number \
+	0:@PNGLIB_MINOR@:0 $(am__append_1) $(am__append_2)
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
 	-version-number 3:@PNGLIB_MINOR@:0
 
+libpng12_la_LIBADD = @PNG_LIBS@
+libpng_la_LIBADD = @PNG_LIBS@
 pkginclude_HEADERS = png.h pngconf.h
-pkgconfig_DATA = libpng.pc libpng12.pc
+pkgconfig_DATA = libpng12.pc
 
 #extra source distribution files.
 EXTRA_DIST = \
-	NEWS ChangeLog INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/projects/cbuilder5/* \
 	${srcdir}/projects/beos/* \
@@ -296,8 +304,8 @@ EXTRA_DIST = \
 	$(TESTS) \
 	example.c libpng.txt pnggccrd.c pngvcrd.c 
 
-CLEANFILES = pngout.png libpng12.pc libpng12-config
-all: config.h
+CLEANFILES = pngout.png libpng12.pc libpng12-config libpng.vers libpng.sym
+all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
@@ -846,14 +854,16 @@ distcleancheck: distclean
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(MANS) $(DATA) $(HEADERS) \
 		config.h
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(pkgincludedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -878,6 +888,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -938,6 +949,8 @@ ps-am:
 uninstall-am: uninstall-binSCRIPTS uninstall-info-am \
 	uninstall-libLTLIBRARIES uninstall-man uninstall-pkgconfigDATA \
 	uninstall-pkgincludeHEADERS
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
 
 uninstall-man: uninstall-man3 uninstall-man5
 
@@ -957,10 +970,13 @@ uninstall-man: uninstall-man3 uninstall-man5
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-info-am uninstall-libLTLIBRARIES uninstall-man \
-	uninstall-man3 uninstall-man5 uninstall-pkgconfigDATA \
-	uninstall-pkgincludeHEADERS
+	uninstall-hook uninstall-info-am uninstall-libLTLIBRARIES \
+	uninstall-man uninstall-man3 uninstall-man5 \
+	uninstall-pkgconfigDATA uninstall-pkgincludeHEADERS
 
+
+@HAVE_LD_VERSION_SCRIPT_TRUE@  # Versioned symbols and restricted exports
+@HAVE_LD_VERSION_SCRIPT_FALSE@  # Only restricted exports when possible
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -968,21 +984,57 @@ $(PNGLIB_BASENAME).pc: libpng.pc
 $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
+libpng.sym: png.h pngconf.h
+	rm -f $@
+	$(CPP) $(CPPFLAGS) -DPNG_BUILDSYMS -DPNG_INTERNAL $(srcdir)/png.h | \
+	$(AWK) -F '[\t [\\]();]' '{ \
+		for (i=1;i+2<=NF;++i)\
+			if ($$(i)=="PNG_FUNCTION_EXPORT" && $$(i+2)=="END")\
+				print $$(i+1) ;\
+		for (i=1;i+1<=NF;++i)\
+			if ($$(i)=="PNG_DATA_EXPORT")\
+				print $$(i+1) ;\
+		}' > $@.new
+	mv $@.new $@
+
+libpng.vers: libpng.sym
+	rm -f $@
+	$(ECHO) PNG12_0 '{global:' > $@.new
+	$(SED) s/$$/\;/ $< >> $@.new
+	$(ECHO) 'local: *; };' >> $@.new
+	mv $@.new $@
+
 # install the .../include headers as links to the new ones
 install-data-hook:
 	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h pngconf.h
+	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
+	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
-# do evil things to libpng to cause libpngMM to be used, if
+# do evil things to libpng to cause libpng12 to be used, if
 # the compat library is not being built do nothing.
 install-exec-hook:
+	cd $(DESTDIR)$(bindir); rm -f libpng-config
+	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
 	@if test -n "@compatlib@"; then\
 		set -x;\
 		cd $(DESTDIR)$(libdir);\
 		for ext in a la so; do\
 			rm -f libpng.$$ext;\
 			$(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
+		done;\
+	fi
+
+uninstall-hook:
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
+	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
+	rm -f $(DESTDIR)$(bindir)/libpng-config
+	@if test -n "@compatlib@"; then\
+		set -x;\
+		cd $(DESTDIR)$(libdir);\
+		for ext in a la so; do\
+			rm -f libpng.$$ext;\
 		done;\
 	fi
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

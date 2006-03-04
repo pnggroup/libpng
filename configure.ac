@@ -18,14 +18,14 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.2.9beta4], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.2.9beta5], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.2.9beta4
+PNGLIB_VERSION=1.2.9beta5
 PNGLIB_MAJOR=12
-PNGLIB_MINOR=9
+PNGLIB_MINOR=%RELEASE%
 
 dnl End of version number stuff
 
@@ -34,6 +34,10 @@ AM_CONFIG_HEADER([config.h])
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_LD
+AC_PROG_CPP
+AC_PROG_AWK
+AC_CHECK_TOOL(SED, sed, :)
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -52,8 +56,21 @@ AC_STRUCT_TM
 AC_FUNC_MALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
-AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow,, AC_ERROR([cannot find pow])) )
-AC_CHECK_LIB(z, zlibVersion,, AC_ERROR([zlib not installed]))
+AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, PNG_LIBS="$PNG_LIBS -lm", AC_ERROR([cannot find pow])) )
+AC_CHECK_LIB(z, zlibVersion, PNG_LIBS="$PNG_LIBS -lz", AC_ERROR([zlib not installed]))
+AC_SUBST(PNG_LIBS)
+
+AC_MSG_CHECKING([if libraries can be versioned])
+GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
+if test "$GLD"; then
+    have_ld_version_script=yes
+    AC_MSG_RESULT(yes)
+else
+    have_ld_version_script=no
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(*** You may want to rerun configure using --with-gnu-ld to enable versioned symbols.)
+fi
+AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 
 # Substitutions for .in files
 AC_SUBST(PNGLIB_VERSION)

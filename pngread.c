@@ -1,6 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
+ * libpng 1.2.9 March 4, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -76,7 +77,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       png_free(png_ptr, png_ptr->zbuf);
       png_ptr->zbuf=NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)png_ptr, 
+      png_destroy_struct_2((png_voidp)png_ptr,
          (png_free_ptr)free_fn, (png_voidp)mem_ptr);
 #else
       png_destroy_struct((png_voidp)png_ptr);
@@ -188,7 +189,7 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
 {
    /* We only come here via pre-1.0.12-compiled applications */
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
-   if(png_sizeof(png_struct) > png_struct_size || 
+   if(png_sizeof(png_struct) > png_struct_size ||
       png_sizeof(png_info) > png_info_size)
    {
       char msg[80];
@@ -737,7 +738,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 
    png_memcpy_check(png_ptr, png_ptr->prev_row, png_ptr->row_buf,
       png_ptr->rowbytes + 1);
-   
+
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
    if((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
       (png_ptr->filter_type == PNG_INTRAPIXEL_DIFFERENCING))

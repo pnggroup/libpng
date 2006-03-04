@@ -1,6 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
+ * libpng 1.2.9 March 4, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_9beta4 Your_png_h_is_not_version_1_2_9beta4;
+typedef version_1_2_9beta5 Your_png_h_is_not_version_1_2_9beta5;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -692,7 +693,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.9beta4 - March 2, 2006\n\
+   return ((png_charp) "\n libpng version 1.2.9beta5 - March 4, 2006\n\
    Copyright (c) 1998-2006 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");

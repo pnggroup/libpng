@@ -1,6 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
+ * libpng 1.2.9 March 4, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -323,7 +324,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
      if(!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
         (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
         ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
-        (color_type == PNG_COLOR_TYPE_RGB || 
+        (color_type == PNG_COLOR_TYPE_RGB ||
          color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
         png_error(png_ptr, "Unknown filter method in IHDR");
      if(png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)
