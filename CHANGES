@@ -1480,6 +1480,9 @@ version 1.2.9beta5 [March 4, 2006]
   More cleanup of configure.ac, Makefile.ac, and associated scripts.
   Restored scripts/makefile.elf which was inadvertently deleted.
 
+version 1.2.9beta6 [March 6, 2006]
+  Fix typo (9) in configuration files.
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
