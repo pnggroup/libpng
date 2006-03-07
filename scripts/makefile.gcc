@@ -10,9 +10,9 @@ ZLIBLIB = ../zlib
 # Compiler, linker, lib and other tools
 CC = gcc
 LD = $(CC)
-AR = ar rcs
+AR_RC = ar rcs
 RANLIB = ranlib
-RM = rm -f
+RM_F = rm -f
 
 CDEBUG = -g -DPNG_DEBUG=5
 LDDEBUG =
@@ -35,7 +35,7 @@ OBJS = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
 all: libpng$(A) pngtest$(E)
 
 libpng$(A): $(OBJS)
-	$(AR) $@ $(OBJS)
+	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
 
 test: pngtest$(E)
@@ -45,7 +45,7 @@ pngtest$(E): pngtest$(O) libpng$(A)
 	$(LD) -o $@ pngtest$(O) $(LDFLAGS)
 
 clean:
-	$(RM) *$(O) libpng$(A) pngtest$(E) pngout.png
+	$(RM_F) *$(O) libpng$(A) pngtest$(E) pngout.png
 
 png$(O): png.h pngconf.h
 pngerror$(O): png.h pngconf.h

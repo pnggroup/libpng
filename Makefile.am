@@ -34,8 +34,7 @@ EXTRA_LTLIBRARIES= libpng.la
 libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
-	png.h pngconf.h libpng.sym libpng.vers
-BUILT_SOURCES = libpng.sym libpng.vers
+	png.h pngconf.h
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
@@ -43,16 +42,17 @@ libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
 	-version-number 3:@PNGLIB_MINOR@:0
-libpng12_la_LIBADD = @PNG_LIBS@
-libpng_la_LIBADD = @PNG_LIBS@
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
   libpng12_la_LDFLAGS += -Wl,--version-script=libpng.vers
+  libpng12_la_DEPENDENCIES = libpng.vers
 else
   # Only restricted exports when possible
   libpng12_la_LDFLAGS += -export-symbols libpng.sym
+  libpng12_la_DEPENDENCIES = libpng.sym
 endif
+libpng_la_DEPENDENCIES = $(libpng12_la_DEPENDENCIES)
 
 #distribute headers in /usr/include/libpng/*
 pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
@@ -90,21 +90,16 @@ $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
 libpng.sym: png.h pngconf.h
-	rm -f $@
-	$(CPP) $(CPPFLAGS) -DPNG_BUILDSYMS -DPNG_INTERNAL $(srcdir)/png.h | \
-	$(AWK) -F '[\t [\\]();]' '{ \
-		for (i=1;i+2<=NF;++i)\
-			if ($$(i)=="PNG_FUNCTION_EXPORT" && $$(i+2)=="END")\
-				print $$(i+1) ;\
-		for (i=1;i+1<=NF;++i)\
-			if ($$(i)=="PNG_DATA_EXPORT")\
-				print $$(i+1) ;\
-		}' > $@.new
+	rm -f $@ $@.new
+	$(CPP) $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
+		$(SED) -n -e 's|^.*PNG_FUNCTION_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
+			-e 's|^.*PNG_DATA_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
+			>$@.new
 	mv $@.new $@
 
 libpng.vers: libpng.sym
-	rm -f $@
-	$(ECHO) PNG12_0 '{global:' > $@.new
+	rm -f $@ $@.new
+	$(ECHO) PNG@PNGLIB_MAJOR@_0 '{global:' > $@.new
 	$(SED) s/$$/\;/ $< >> $@.new
 	$(ECHO) 'local: *; };' >> $@.new
 	mv $@.new $@

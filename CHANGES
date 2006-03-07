@@ -1481,7 +1481,15 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fix typo (9) in configuration files.
+  Fixed typo (9) in configuration files.
+
+version 1.2.9beta7 [March 7, 2006]
+  Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
+  Fixed inconsistent #ifdef's around png_sig_bytes() and png_set_sCAL_s()
+    in png.h.
+  Updated makefile.elf as suggested by debian.
+  Made cosmetic changes to some makefiles, adding LN_SF and other macros.
+  Made some makefiles accept "exec_prefix".
 
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
