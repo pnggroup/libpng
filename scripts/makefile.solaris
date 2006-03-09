@@ -7,7 +7,7 @@
 
 AR_RC=ar rc
 CC=gcc
-MKDIR_P=mkdir
+MKDIR_P=mkdir -p
 LN_SF=ln -f -s
 RANLIB=echo
 RM_F=/bin/rm -f
@@ -33,7 +33,7 @@ CFLAGS=-I$(ZLIBINC) -Wall -O \
 LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng12 -lz -lm
 
 PNGMAJ = 0
-PNGMIN = 1.2.9beta7
+PNGMIN = 1.2.9beta8
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 

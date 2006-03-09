@@ -1,5 +1,5 @@
 
-Libpng 1.2.9beta7 - March 7, 2006
+Libpng 1.2.9beta8 - March 9, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,26 +9,26 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.9beta7.tar.gz
-   1.2.9beta7.tar.bz2
+   1.2.9beta8.tar.gz
+   1.2.9beta8.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp129b07.zip
-   lp129b07.tar.bz2
+   lp129b08.zip
+   lp129b08.tar.bz2
 
 Project files
 
-   1.2.9beta7-project-netware.zip
-   1.2.9beta7-project-wince.zip
+   1.2.9beta8-project-netware.zip
+   1.2.9beta8-project-wince.zip
 
 Other information:
 
-   1.2.9beta7-README.txt
-   1.2.9beta7-KNOWNBUGS.txt
-   1.2.9beta7-LICENSE.txt
-   1.2.9beta7-Y2K-compliance.txt
+   1.2.9beta8-README.txt
+   1.2.9beta8-KNOWNBUGS.txt
+   1.2.9beta8-LICENSE.txt
+   1.2.9beta8-Y2K-compliance.txt
 
 Changes since the last public release (1.2.8):
 
@@ -43,7 +43,6 @@ version 1.2.9beta1 [February 21, 2006]
   Make sure num_palette is <= 256 before copying data in png_set_PLTE().
   Interchanged order of write_swap_alpha and write_invert_alpha transforms.
   Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
-  Fixed inconsistency in definition of png_default_read_data()
   Exported png_get_uint_32, png_save_uint_32, png_get_uint_16, png_save_uint_16,
     png_get_int_32, png_save_int_32, png_get_uint_31 (Cosmin).
   Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
@@ -111,6 +110,17 @@ version 1.2.9beta7 [March 7, 2006]
   Updated makefile.elf as suggested by debian.
   Made cosmetic changes to some makefiles, adding LN_SF and other macros.
   Made some makefiles accept "exec_prefix".
+
+version 1.2.9beta8 [March 9, 2006]
+  Fixed some "#ifdef defined (..." which should be "#ifdef defined(..."
+    Bug introduced in libpng-1.2.8.
+  Fixed inconsistency in definition of png_default_read_data()
+  Restored blank that was lost from makefile.sggcc "clean" target in beta7.
+  Revised calculation of "current" and "major" for irix in ltmain.sh
+  Changed "mkdir" to "MKDIR_P" in some makefiles.
+  Separated PNG_EXPAND and PNG_EXPAND_tRNS.
+  Added png_set_expand_gray_1_2_4_to_8() and deprecated
+    png_set_gray_1_2_4_to_8() which also expands tRNS to alpha.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

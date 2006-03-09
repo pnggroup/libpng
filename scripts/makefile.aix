@@ -13,13 +13,14 @@ ZLIBLIB = ../zlib
 CC = gcc
 LD = $(CC)
 AR_RC = ar rcs
+MKDIR_P = mkdir
 RANLIB = ranlib
 RM_F = rm -f
 LN_SF = ln -f -s
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.9beta7
+PNGMIN = 1.2.9beta8
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -71,9 +72,9 @@ pngtest$(E): pngtest$(O) $(LIBNAME)$(A)
 	$(LD) -o $@ pngtest$(O) $(LDFLAGS)
 
 install: $(LIBNAME)$(A)
-	-@if [ ! -d $(DI)  ]; then mkdir $(DI); fi
-	-@if [ ! -d $(DI)/$(LIBNAME)  ]; then mkdir $(DI)/$(LIBNAME); fi
-	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
+	-@if [ ! -d $(DI)  ]; then $(MKDIR_P) $(DI); fi
+	-@if [ ! -d $(DI)/$(LIBNAME)  ]; then $(MKDIR_P) $(DI)/$(LIBNAME); fi
+	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	-@$(RM_F) $(DI)/$(LIBNAME)/png.h
 	-@$(RM_F) $(DI)/$(LIBNAME)/pngconf.h
 	-@$(RM_F) $(DI)/png.h

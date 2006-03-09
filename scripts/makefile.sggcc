@@ -19,7 +19,7 @@ ZLIBINC=../zlib
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.9beta7
+PNGMIN = 1.2.9beta8
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 AR_RC=ar rc
@@ -115,8 +115,8 @@ test: pngtest
 	./pngtest
 
 install-headers: png.h pngconf.h
-	-@if [ ! -d $(DI) ]; then mkdir $(DI); fi
-	-@if [ ! -d $(DI)/$(LIBNAME) ]; then mkdir $(DI)/$(LIBNAME); fi
+	-@if [ ! -d $(DI) ]; then $(MKDIR_P) $(DI); fi
+	-@if [ ! -d $(DI)/$(LIBNAME) ]; then $(MKDIR_P) $(DI)/$(LIBNAME); fi
 	cp png.h pngconf.h $(DI)/$(LIBNAME)
 	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h
 	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h
@@ -124,7 +124,7 @@ install-headers: png.h pngconf.h
 	(cd $(DI); ln -sf $(LIBNAME) libpng; ln -sf $(LIBNAME)/* .)
 
 install-static: install-headers libpng.a
-	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
+	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	cp libpng.a $(DL)/$(LIBNAME).a
 	chmod 644 $(DL)/$(LIBNAME).a
 	-@$(RM_F) $(DL)/libpng.a
@@ -132,7 +132,7 @@ install-static: install-headers libpng.a
 
 install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	libpng.so.0.$(PNGMIN)
-	-@if [ ! -d $(DL) ]; then mkdir $(DL); fi
+	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	-@$(RM_F) $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
 	-@$(RM_F) $(DL)/$(LIBNAME).so.$(PNGMAJ)
 	-@$(RM_F) $(DL)/libpng.so
@@ -147,7 +147,7 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	ln -sf libpng.so.0 libpng.so; \
 	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
 	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
-	-@if [ ! -d $(DL)/pkgconfig ]; then mkdir $(DL)/pkgconfig; fi
+	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
 	cp libpng.pc $(DL)/pkgconfig/$(LIBNAME).pc
@@ -155,18 +155,18 @@ install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
 	(cd $(DL)/pkgconfig; ln -sf $(LIBNAME).pc libpng.pc)
 
 install-man: libpng.3 libpngpf.3 png.5
-	-@if [ ! -d $(DM) ]; then mkdir $(DM); fi
-	-@if [ ! -d $(DM)/man3 ]; then mkdir $(DM)/man3; fi
+	-@if [ ! -d $(DM) ]; then $(MKDIR_P) $(DM); fi
+	-@if [ ! -d $(DM)/man3 ]; then $(MKDIR_P) $(DM)/man3; fi
 	-@$(RM_F) $(DM)/man3/libpng.3
 	-@$(RM_F) $(DM)/man3/libpngpf.3
 	cp libpng.3 $(DM)/man3
 	cp libpngpf.3 $(DM)/man3
-	-@if [ ! -d $(DM)/man5 ]; then mkdir $(DM)/man5; fi
+	-@if [ ! -d $(DM)/man5 ]; then $(MKDIR_P) $(DM)/man5; fi
 	-@$(RM_F) $(DM)/man5/png.5
 	cp png.5 $(DM)/man5
 
 install-config: libpng-config
-	-@if [ ! -d $(DB) ]; then mkdir $(DB); fi
+	-@if [ ! -d $(DB) ]; then $(MKDIR_P) $(DB); fi
 	-@$(RM_F) $(DB)/libpng-config
 	-@$(RM_F) $(DB)/$(LIBNAME)-config
 	cp libpng-config $(DB)/$(LIBNAME)-config
@@ -200,7 +200,7 @@ test-installed:
 	./pngtesti pngtest.png
 
 clean:
-	$(RM_F)libpng.a pngtest pngtesti pngout.png libpng.pc libpng-config \
+	$(RM_F) libpng.a pngtest pngtesti pngout.png libpng.pc libpng-config \
 	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* \
 	libpng.so.0.$(PNGMIN) \
 	so_locations

@@ -3245,7 +3245,7 @@ EOF
 	    age="0"
 	    ;;
 	  irix|nonstopux)
-	    current=`expr $number_major + $number_minor - 1`
+	    current=`expr $number_major + $number_minor`
 	    age="$number_minor"
 	    revision="$number_minor"
 	    ;;
@@ -3320,7 +3320,7 @@ EOF
 	  ;;
 
 	irix | nonstopux)
-	  major=`expr $current - $age + 1`
+	  major=`expr $current - $age`
 
 	  case $version_type in
 	    nonstopux) verstring_prefix=nonstopux ;;

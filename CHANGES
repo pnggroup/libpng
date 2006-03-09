@@ -1430,7 +1430,6 @@ version 1.2.9beta1 [February 21, 2006]
   Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
   Optimized zlib window flag (CINFO) in contrib/pngsuite/*.png (Cosmin).
   Updated scripts/makefile.bc32 for Borland C++ 5.6 (Cosmin).
-  Fixed inconsistency in definition of png_default_read_data()
   Exported png_get_uint_32, png_save_uint_32, png_get_uint_16, png_save_uint_16,
     png_get_int_32, png_save_int_32, png_get_uint_31 (Cosmin).
   Added type cast (png_byte) in png_write_sCAL() (Cosmin).
@@ -1491,10 +1490,22 @@ version 1.2.9beta7 [March 7, 2006]
   Made cosmetic changes to some makefiles, adding LN_SF and other macros.
   Made some makefiles accept "exec_prefix".
 
+version 1.2.9beta8 [March 9, 2006]
+  Fixed some "#ifdef defined (..." which should be "#ifdef defined(..."
+    Bug introduced in libpng-1.2.8.
+  Fixed inconsistency in definition of png_default_read_data()
+  Restored blank that was lost from makefile.sggcc "clean" target in beta7.
+  Revised calculation of "current" and "major" for irix in ltmain.sh
+  Changed "mkdir" to "MKDIR_P" in some makefiles.
+  Separated PNG_EXPAND and PNG_EXPAND_tRNS.
+  Added png_set_expand_gray_1_2_4_to_8() and deprecated
+    png_set_gray_1_2_4_to_8() which also expands tRNS to alpha.
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
-    png_permit_empty_plte and deprecated macro PNG_MAX_UINT.
+    png_permit_empty_plte, png_set_gray_1_2_4_to_8, and deprecated macro
+    PNG_MAX_UINT.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

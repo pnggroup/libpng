@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.2.9beta7
+;Version 1.2.9beta8
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -114,7 +114,7 @@ EXPORTS
   png_set_gAMA    @104
   png_set_gAMA_fixed  @105
   png_set_gamma    @106
-  png_set_gray_1_2_4_to_8  @107
+  png_set_gray_1_2_4_to_8  @107 ; deprecated
   png_set_gray_to_rgb  @108
   png_set_hIST    @109
   png_set_iCCP    @110
@@ -232,3 +232,4 @@ EXPORTS
   png_get_int_32 @204
   png_save_int_32 @205
   png_get_uint_31 @206
+  png_set_expand_gray_1_2_4_to_8  @207

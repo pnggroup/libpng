@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.9 March 7, 2006
+ * Last changed in libpng 1.2.9 March 9, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -551,7 +551,7 @@ void PNGAPI
 png_set_expand(png_structp png_ptr)
 {
    png_debug(1, "in png_set_expand\n");
-   png_ptr->transformations |= PNG_EXPAND;
+   png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
 
 /* GRR 19990627:  the following three functions currently are identical
@@ -566,30 +566,47 @@ png_set_expand(png_structp png_ptr)
  *
  *  More to the point, these functions make it obvious what libpng will be
  *  doing, whereas "expand" can (and does) mean any number of things.
+ *
+ *  GRP 20060307: In libpng-1.4.0, png_set_gray_1_2_4_to_8() was modified
+ *  to expand only the sample depth but not to expand the tRNS to alpha.
  */
 
 /* Expand paletted images to RGB. */
 void PNGAPI
 png_set_palette_to_rgb(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_expand\n");
-   png_ptr->transformations |= PNG_EXPAND;
+   png_debug(1, "in png_set_palette_to_rgb\n");
+   png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
 
+#if !defined(PNG_1_0_X)
 /* Expand grayscale images of less than 8-bit depth to 8 bits. */
+void PNGAPI
+png_set_expand_gray_1_2_4_to_8(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_expand_gray_1_2_4_to_8\n");
+   png_ptr->transformations |= PNG_EXPAND_tRNS;
+}
+#endif
+
+#if defined(PNG_1_0_X) || defined(PNG_1_2_X)
+/* Expand grayscale images of less than 8-bit depth to 8 bits. */
+/* Deprecated as of libpng-1.2.9 */
 void PNGAPI
 png_set_gray_1_2_4_to_8(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_expand\n");
-   png_ptr->transformations |= PNG_EXPAND;
+   png_debug(1, "in png_set_gray_1_2_4_to_8\n");
+   png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
+#endif
+
 
 /* Expand tRNS chunks to alpha channels. */
 void PNGAPI
 png_set_tRNS_to_alpha(png_structp png_ptr)
 {
    png_debug(1, "in png_set_expand\n");
-   png_ptr->transformations |= PNG_EXPAND;
+   png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
@@ -707,23 +724,41 @@ png_init_read_transformations(png_structp png_ptr)
    {
       if (!(color_type & PNG_COLOR_MASK_COLOR))  /* i.e., GRAY or GRAY_ALPHA */
       {
-         /* expand background chunk. */
+         /* expand background and tRNS chunks */
          switch (png_ptr->bit_depth)
          {
             case 1:
                png_ptr->background.gray *= (png_uint_16)0xff;
                png_ptr->background.red = png_ptr->background.green
                  =  png_ptr->background.blue = png_ptr->background.gray;
+               if (!(png_ptr->transformations & PNG_EXPAND_tRNS))
+               {
+                 png_ptr->trans_values.gray *= (png_uint_16)0xff;
+                 png_ptr->trans_values.red = png_ptr->trans_values.green
+                   = png_ptr->trans_values.blue = png_ptr->trans_values.gray;
+               }
                break;
             case 2:
                png_ptr->background.gray *= (png_uint_16)0x55;
                png_ptr->background.red = png_ptr->background.green
                  = png_ptr->background.blue = png_ptr->background.gray;
+               if (!(png_ptr->transformations & PNG_EXPAND_tRNS))
+               {
+                 png_ptr->trans_values.gray *= (png_uint_16)0x55;
+                 png_ptr->trans_values.red = png_ptr->trans_values.green
+                   = png_ptr->trans_values.blue = png_ptr->trans_values.gray;
+               }
                break;
             case 4:
                png_ptr->background.gray *= (png_uint_16)0x11;
                png_ptr->background.red = png_ptr->background.green
                  = png_ptr->background.blue = png_ptr->background.gray;
+               if (!(png_ptr->transformations & PNG_EXPAND_tRNS))
+               {
+                 png_ptr->trans_values.gray *= (png_uint_16)0x11;
+                 png_ptr->trans_values.red = png_ptr->trans_values.green
+                   = png_ptr->trans_values.blue = png_ptr->trans_values.gray;
+               }
                break;
             case 8:
             case 16:
@@ -745,7 +780,7 @@ png_init_read_transformations(png_structp png_ptr)
         if (png_ptr->transformations & PNG_INVERT_ALPHA)
         {
 #if defined(PNG_READ_EXPAND_SUPPORTED)
-           if (!(png_ptr->transformations & PNG_EXPAND))
+           if (!(png_ptr->transformations & PNG_EXPAND_tRNS))
 #endif
            {
            /* invert the alpha channel (in tRNS) unless the pixels are
@@ -1045,7 +1080,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    {
       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
-         if (png_ptr->num_trans)
+         if (png_ptr->num_trans && (png_ptr->transformations & PNG_EXPAND_tRNS))
             info_ptr->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
          else
             info_ptr->color_type = PNG_COLOR_TYPE_RGB;
@@ -1055,7 +1090,12 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       else
       {
          if (png_ptr->num_trans)
-            info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
+         {
+            if (png_ptr->transformations & PNG_EXPAND_tRNS)
+              info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
+            else
+              info_ptr->color_type |= PNG_COLOR_MASK_COLOR;
+         }
          if (info_ptr->bit_depth < 8)
             info_ptr->bit_depth = 8;
          info_ptr->num_trans = 0;
@@ -1201,7 +1241,7 @@ png_do_read_transformations(png_structp png_ptr)
       }
       else
       {
-         if (png_ptr->num_trans)
+         if (png_ptr->num_trans && (png_ptr->transformations & PNG_EXPAND_tRNS))
             png_do_expand(&(png_ptr->row_info), png_ptr->row_buf + 1,
                &(png_ptr->trans_values));
          else
@@ -3604,8 +3644,8 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
    }
 }
 
-/* If the bit depth < 8, it is expanded to 8.  Also, if the
- * transparency value is supplied, an alpha channel is built.
+/* If the bit depth < 8, it is expanded to 8.  Also, if the already
+ * expanded transparency value is supplied, an alpha channel is built.
  */
 void /* PRIVATE */
 png_do_expand(png_row_infop row_info, png_bytep row,

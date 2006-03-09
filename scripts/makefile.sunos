@@ -31,7 +31,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow -Wconversion \
 
 CC=gcc
 AR_RC=ar rc
-MKDIR_P=mkdir
+MKDIR_P=mkdir -p
 LN_SF=ln -f -s
 RANLIB=ranlib
 RM_F=/bin/rm -f
