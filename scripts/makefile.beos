@@ -7,7 +7,7 @@
 
 CC=gcc
 AR_RC=ar rc
-MKDIR_P=mkdir
+MKDIR_P=mkdir -p
 LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
@@ -17,7 +17,7 @@ ZLIBLIB=/usr/local/lib
 ZLIBINC=/usr/local/include
 
 PNGMAJ = 0
-PNGMIN = 1.2.9beta8
+PNGMIN = 1.2.9beta9
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 ALIGN=

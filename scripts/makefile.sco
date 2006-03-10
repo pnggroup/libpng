@@ -27,7 +27,7 @@ CFLAGS= -dy -belf -I$(ZLIBINC) -O3
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -lm
 
 PNGMAJ = 0
-PNGMIN = 1.2.9beta8
+PNGMIN = 1.2.9beta9
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 

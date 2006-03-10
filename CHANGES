@@ -1501,11 +1501,15 @@ version 1.2.9beta8 [March 9, 2006]
   Added png_set_expand_gray_1_2_4_to_8() and deprecated
     png_set_gray_1_2_4_to_8() which also expands tRNS to alpha.
 
+version 1.2.9beta9 [March 10, 2006]
+  Include "config.h" in pngconf.h when available.
+  Added some checks for NULL png_ptr or NULL info_ptr (Coverity)
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
-    png_permit_empty_plte, png_set_gray_1_2_4_to_8, and deprecated macro
-    PNG_MAX_UINT.
+    png_permit_empty_plte, png_set_gray_1_2_4_to_8, and removed the
+    deprecated macro PNG_MAX_UINT.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

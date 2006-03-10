@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.9 March 9, 2006
+ * Last changed in libpng 1.2.9 March 10, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -620,7 +620,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
-   if (info_ptr->valid & PNG_INFO_sRGB)
+   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sRGB))
       if (PNG_OUT_OF_RANGE(igamma, 45500L, 500))
       {
          png_warning(png_ptr,
@@ -829,7 +829,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
-   if (info_ptr->valid & PNG_INFO_sRGB)
+   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sRGB))
       {
       if (PNG_OUT_OF_RANGE(int_x_white, 31270,  1000) ||
           PNG_OUT_OF_RANGE(int_y_white, 32900,  1000) ||
@@ -924,7 +924,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
-   if ((info_ptr->valid & PNG_INFO_gAMA))
+   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_gAMA))
    {
    png_fixed_point igamma;
 #ifdef PNG_FIXED_POINT_SUPPORTED
@@ -953,7 +953,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 #ifdef PNG_READ_cHRM_SUPPORTED
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_cHRM)
+   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM))
       if (PNG_OUT_OF_RANGE(info_ptr->int_x_white, 31270,  1000) ||
           PNG_OUT_OF_RANGE(info_ptr->int_y_white, 32900,  1000) ||
           PNG_OUT_OF_RANGE(info_ptr->int_x_red,   64000L, 1000) ||

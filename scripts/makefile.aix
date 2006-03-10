@@ -13,14 +13,14 @@ ZLIBLIB = ../zlib
 CC = gcc
 LD = $(CC)
 AR_RC = ar rcs
-MKDIR_P = mkdir
+MKDIR_P = mkdir -p
 RANLIB = ranlib
 RM_F = rm -f
 LN_SF = ln -f -s
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.9beta8
+PNGMIN = 1.2.9beta9
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local

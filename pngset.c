@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.9 March 9, 2006
+ * Last changed in libpng 1.2.9 March 10, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -950,6 +950,9 @@ png_set_sPLT(png_structp png_ptr,
     png_sPLT_tp np;
     int i;
 
+    if (png_ptr == NULL || info_ptr == NULL)
+       return;
+
     np = (png_sPLT_tp)png_malloc_warn(png_ptr,
         (info_ptr->splt_palettes_num + nentries) * png_sizeof(png_sPLT_t));
     if (np == NULL)
@@ -1090,6 +1093,8 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
 {
     png_bytep new_list, p;
     int i, old_num_chunks;
+    if (png_ptr == NULL)
+       return;
     if (num_chunks == 0)
     {
       if(keep == PNG_HANDLE_CHUNK_ALWAYS || keep == PNG_HANDLE_CHUNK_IF_SAFE)
@@ -1133,6 +1138,8 @@ png_set_read_user_chunk_fn(png_structp png_ptr, png_voidp user_chunk_ptr,
    png_user_chunk_ptr read_user_chunk_fn)
 {
    png_debug(1, "in png_set_read_user_chunk_fn\n");
+   if (png_ptr == NULL)
+      return;
    png_ptr->read_user_chunk_fn = read_user_chunk_fn;
    png_ptr->user_chunk_ptr = user_chunk_ptr;
 }
@@ -1159,6 +1166,8 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
 void PNGAPI
 png_set_compression_buffer_size(png_structp png_ptr, png_uint_32 size)
 {
+    if (png_ptr == NULL)
+       return;
     if(png_ptr->zbuf)
        png_free(png_ptr, png_ptr->zbuf);
     png_ptr->zbuf_size = (png_size_t)size;
@@ -1184,6 +1193,9 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
 {
     png_uint_32 settable_asm_flags;
     png_uint_32 settable_mmx_flags;
+
+    if (png_ptr == NULL)
+       return;
 
     settable_mmx_flags =
 #ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
@@ -1227,6 +1239,8 @@ png_set_mmx_thresholds (png_structp png_ptr,
                         png_byte mmx_bitdepth_threshold,
                         png_uint_32 mmx_rowbytes_threshold)
 {
+    if (png_ptr == NULL)
+       return;
     png_ptr->mmx_bitdepth_threshold = mmx_bitdepth_threshold;
     png_ptr->mmx_rowbytes_threshold = mmx_rowbytes_threshold;
 }

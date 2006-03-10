@@ -1,5 +1,5 @@
 
-Libpng 1.2.9beta8 - March 9, 2006
+Libpng 1.2.9beta9 - March 10, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,26 +9,26 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.9beta8.tar.gz
-   1.2.9beta8.tar.bz2
+   1.2.9beta9.tar.gz
+   1.2.9beta9.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp129b08.zip
-   lp129b08.tar.bz2
+   lp129b09.zip
+   lp129b09.tar.bz2
 
 Project files
 
-   1.2.9beta8-project-netware.zip
-   1.2.9beta8-project-wince.zip
+   1.2.9beta9-project-netware.zip
+   1.2.9beta9-project-wince.zip
 
 Other information:
 
-   1.2.9beta8-README.txt
-   1.2.9beta8-KNOWNBUGS.txt
-   1.2.9beta8-LICENSE.txt
-   1.2.9beta8-Y2K-compliance.txt
+   1.2.9beta9-README.txt
+   1.2.9beta9-KNOWNBUGS.txt
+   1.2.9beta9-LICENSE.txt
+   1.2.9beta9-Y2K-compliance.txt
 
 Changes since the last public release (1.2.8):
 
@@ -121,6 +121,14 @@ version 1.2.9beta8 [March 9, 2006]
   Separated PNG_EXPAND and PNG_EXPAND_tRNS.
   Added png_set_expand_gray_1_2_4_to_8() and deprecated
     png_set_gray_1_2_4_to_8() which also expands tRNS to alpha.
+
+version 1.2.9beta9 [March 10, 2006]
+  Include "config.h" in pngconf.h when available.
+  Enabled MMX when appropriate in "configure".
+  Made pnggccrd.c PIC-compliant.
+  Added some checks for NULL png_ptr or NULL info_ptr (Coverity)
+
+version 1.2.9beta10 [March 10, 2006]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
