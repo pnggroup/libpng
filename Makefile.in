@@ -81,14 +81,15 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libpng_la_LIBADD =
 am__objects_1 = png.lo pngset.lo pngget.lo pngrutil.lo pngtrans.lo \
 	pngwutil.lo pngread.lo pngrio.lo pngwio.lo pngwrite.lo \
-	pngrtran.lo pngwtran.lo pngmem.lo pngerror.lo pngpread.lo
+	pngrtran.lo pngwtran.lo pngmem.lo pngerror.lo pngpread.lo \
+	pnggccrd.lo
 am_libpng_la_OBJECTS = $(am__objects_1)
 libpng_la_OBJECTS = $(am_libpng_la_OBJECTS)
 libpng12_la_LIBADD =
 am_libpng12_la_OBJECTS = png.lo pngset.lo pngget.lo pngrutil.lo \
 	pngtrans.lo pngwutil.lo pngread.lo pngrio.lo pngwio.lo \
 	pngwrite.lo pngrtran.lo pngwtran.lo pngmem.lo pngerror.lo \
-	pngpread.lo
+	pngpread.lo pnggccrd.lo
 libpng12_la_OBJECTS = $(am_libpng12_la_OBJECTS)
 am_pngtest_OBJECTS = pngtest.$(OBJEXT)
 pngtest_OBJECTS = $(am_pngtest_OBJECTS)
@@ -268,7 +269,7 @@ lib_LTLIBRARIES = libpng12.la @compatlib@
 EXTRA_LTLIBRARIES = libpng.la
 libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
-	pngwtran.c pngmem.c pngerror.c pngpread.c \
+	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c \
 	png.h pngconf.h
 
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
@@ -301,7 +302,7 @@ EXTRA_DIST = \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt pnggccrd.c pngvcrd.c 
+	example.c libpng.txt pngvcrd.c 
 
 CLEANFILES = pngout.png libpng12.pc libpng12-config libpng.vers libpng.sym
 all: config.h
@@ -432,6 +433,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/png.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngerror.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pnggccrd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngmem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngpread.Plo@am__quote@
@@ -991,7 +993,7 @@ libpng.sym: png.h pngconf.h
 libpng.vers: libpng.sym
 	rm -f $@ $@.new
 	$(ECHO) PNG@PNGLIB_MAJOR@_0 '{global:' > $@.new
-	$(SED) s/$$/\;/ $< >> $@.new
+	$(SED) s/$$/\;/ libpng.sym >> $@.new
 	$(ECHO) 'local: *; };' >> $@.new
 	mv $@.new $@
 

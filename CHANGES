@@ -1491,7 +1491,7 @@ version 1.2.9beta7 [March 7, 2006]
   Made some makefiles accept "exec_prefix".
 
 version 1.2.9beta8 [March 9, 2006]
-  Fixed some "#ifdef defined (..." which should be "#ifdef defined(..."
+  Fixed some "#if defined (..." which should be "#if defined(..."
     Bug introduced in libpng-1.2.8.
   Fixed inconsistency in definition of png_default_read_data()
   Restored blank that was lost from makefile.sggcc "clean" target in beta7.
@@ -1503,7 +1503,13 @@ version 1.2.9beta8 [March 9, 2006]
 
 version 1.2.9beta9 [March 10, 2006]
   Include "config.h" in pngconf.h when available.
-  Added some checks for NULL png_ptr or NULL info_ptr (Coverity)
+  Added some checks for NULL png_ptr or NULL info_ptr (timeless)
+
+version 1.2.9beta10 [March 20, 2006]
+  Removed extra CR from contrib/visualpng/VisualPng.dsw (Cosmin)
+  Made pnggccrd.c PIC-compliant (Christian Aichinger).
+  Added makefile.mingw (Wolfgang Glas).
+  Revised pngconf.h MMX checking.
 
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).

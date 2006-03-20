@@ -33,7 +33,7 @@ lib_LTLIBRARIES=libpng12.la @compatlib@
 EXTRA_LTLIBRARIES= libpng.la
 libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
-	pngwtran.c pngmem.c pngerror.c pngpread.c \
+	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c \
 	png.h pngconf.h
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
 # MAJOR UPGRADE: the version-number settings below must be changed.
@@ -79,7 +79,7 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt pnggccrd.c pngvcrd.c 
+	example.c libpng.txt pngvcrd.c 
 
 CLEANFILES= pngout.png libpng12.pc libpng12-config libpng.vers libpng.sym
 
@@ -100,7 +100,7 @@ libpng.sym: png.h pngconf.h
 libpng.vers: libpng.sym
 	rm -f $@ $@.new
 	$(ECHO) PNG@PNGLIB_MAJOR@_0 '{global:' > $@.new
-	$(SED) s/$$/\;/ $< >> $@.new
+	$(SED) s/$$/\;/ libpng.sym >> $@.new
 	$(ECHO) 'local: *; };' >> $@.new
 	mv $@.new $@
 

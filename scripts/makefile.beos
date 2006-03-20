@@ -17,7 +17,7 @@ ZLIBLIB=/usr/local/lib
 ZLIBINC=/usr/local/include
 
 PNGMAJ = 0
-PNGMIN = 1.2.9beta9
+PNGMIN = 1.2.9beta10
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 ALIGN=

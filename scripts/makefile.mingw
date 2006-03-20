@@ -1,8 +1,9 @@
-# makefile for cygwin on x86
+# makefile for mingw on x86
 #   Builds both dll (with import lib) and static lib versions
 #   of the library, and builds two copies of pngtest: one
 #   statically linked and one dynamically linked.
 #
+# Built from makefile.cygwin
 # Copyright (C) 2002, 2006 Soren Anderson, Charles Wilson,
 #    and Glenn Randers-Pehrson, based on makefile for linux-elf w/mmx by:
 # Copyright (C) 1998-2000 Greg Roelofs
@@ -36,10 +37,7 @@ DESTDIR=
 # list at the bottom of this makefile.
 
 CC=gcc
-ifdef MINGW
-MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
-MINGW_LDFLAGS=-mno-cygwin -L/usr/lib/mingw
-endif
+
 
 # Where "make install" puts libpng*.a, *png*.dll, png.h, and pngconf.h
 ifndef prefix
@@ -51,8 +49,6 @@ exec_prefix=$prefix
 # Where the zlib library and include files are located
 ZLIBLIB= /usr/lib
 ZLIBINC=
-#ZLIBLIB=../zlib
-#ZLIBINC=../zlib
 
 ALIGN=
 # for i386:
@@ -79,11 +75,11 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 
 LIBNAME = libpng12
 PNGMAJ = 0
-CYGDLL = 12
+MINGDLL = 12
 PNGMIN = 1.2.9beta10
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
-SHAREDLIB=cygpng$(CYGDLL).dll
+SHAREDLIB=libpng$(MINGDLL).dll
 STATLIB=libpng.a
 IMPLIB=libpng.dll.a
 SHAREDDEF=libpng.def
@@ -91,7 +87,7 @@ LIBS=$(SHAREDLIB) $(STATLIB)
 EXE=.exe
 
 LDFLAGS=$(strip -L. $(MINGW_LDFLAGS) -lpng $(addprefix -L,$(ZLIBLIB)) -lz)
-LDSFLAGS=$(strip -shared -L.  $(MINGW_LDFLAGS) -Wl,--export-all)
+LDSFLAGS=$(strip -shared -L.  $(MINGW_LDFLAGS))
 LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(addprefix -L,$(ZLIBLIB)) -lz
 
 MKDIR_P=/bin/mkdir -pv
@@ -150,7 +146,7 @@ libpng-config: scripts/libpng-config-head.in scripts/libpng-config-body.in
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng$(CYGDLL) -lz\"; \
+	echo libs=\"-lpng$(MINGDLL) -lz\"; \
 	cat $(S)/scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 

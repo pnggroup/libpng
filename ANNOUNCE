@@ -1,5 +1,5 @@
 
-Libpng 1.2.9beta9 - March 10, 2006
+Libpng 1.2.9beta10 - March 20, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,26 +9,26 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.9beta9.tar.gz
-   1.2.9beta9.tar.bz2
+   1.2.9beta10.tar.gz
+   1.2.9beta10.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp129b09.zip
-   lp129b09.tar.bz2
+   lp129b10.zip
+   lp129b10.tar.bz2
 
 Project files
 
-   1.2.9beta9-project-netware.zip
-   1.2.9beta9-project-wince.zip
+   1.2.9beta10-project-netware.zip
+   1.2.9beta10-project-wince.zip
 
 Other information:
 
-   1.2.9beta9-README.txt
-   1.2.9beta9-KNOWNBUGS.txt
-   1.2.9beta9-LICENSE.txt
-   1.2.9beta9-Y2K-compliance.txt
+   1.2.9beta10-README.txt
+   1.2.9beta10-KNOWNBUGS.txt
+   1.2.9beta10-LICENSE.txt
+   1.2.9beta10-Y2K-compliance.txt
 
 Changes since the last public release (1.2.8):
 
@@ -124,11 +124,13 @@ version 1.2.9beta8 [March 9, 2006]
 
 version 1.2.9beta9 [March 10, 2006]
   Include "config.h" in pngconf.h when available.
-  Enabled MMX when appropriate in "configure".
-  Made pnggccrd.c PIC-compliant.
-  Added some checks for NULL png_ptr or NULL info_ptr (Coverity)
+  Added some checks for NULL png_ptr or NULL info_ptr (timeless)
 
-version 1.2.9beta10 [March 10, 2006]
+version 1.2.9beta10 [March 20, 2006]
+  Removed extra CR from contrib/visualpng/VisualPng.dsw (Cosmin)
+  Made pnggccrd.c PIC-compliant (Christian Aichinger).
+  Added makefile.mingw (Wolfgang Glas)
+  Revised pngconf.h MMX checking.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

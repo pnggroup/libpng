@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.2.9 March 10, 2006
+ * Last changed in libpng 1.2.9 March 20, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -918,6 +918,7 @@ png_get_mmx_rowbytes_threshold (png_structp png_ptr)
     return (png_uint_32)(png_ptr? png_ptr->mmx_rowbytes_threshold : 0L);
 }
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
+#endif /* ?PNG_1_0_X */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* these functions were added to libpng 1.2.6 */
@@ -933,5 +934,4 @@ png_get_user_height_max (png_structp png_ptr)
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 
-#endif /* ?PNG_1_0_X */
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
