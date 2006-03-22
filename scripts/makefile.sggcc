@@ -3,6 +3,28 @@
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
+# Library name:
+LIBNAME=libpng12
+PNGMAJ = 0
+PNGMIN = 1.2.9beta11
+PNGVER = $(PNGMAJ).$(PNGMIN)
+
+# Shared library names:
+LIBSO=$(LIBNAME).so
+LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
+LIBSOVER=$(LIBNAME).so.$(PNGVER)
+OLDSO=libpng.so
+OLDSOMAJ=libpng.so.0
+OLDSOVER=libpng.so.0.$(PNGMIN)
+
+# Utilities:
+AR_RC=ar rc
+CC=gcc
+MKDIR_P=mkdir -p
+LN_SF=ln -sf
+RANLIB=echo
+RM_F=/bin/rm -f
+
 # Where make install puts libpng.a, libpng12.so, and libpng12/png.h
 # Prefix must be a full pathname.
 
@@ -17,18 +39,6 @@ exec_prefix=$prefix
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-LIBNAME=libpng12
-PNGMAJ = 0
-PNGMIN = 1.2.9beta10
-PNGVER = $(PNGMAJ).$(PNGMIN)
-
-AR_RC=ar rc
-CC=gcc
-MKDIR_P=mkdir -p
-LN_SF=ln -sf
-RANLIB=echo
-RM_F=/bin/rm -f
-
 # ABI can be blank to use default for your system, -32, -o32, -n32, or -64
 # See "man abi".  zlib must be built with the same ABI.
 ABI=
@@ -36,14 +46,11 @@ ABI=
 WARNMORE= # -g -DPNG_DEBUG=5
 CFLAGS=$(ABI) -I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
-LDSHARED=cc $(ABI) -shared -soname $(LIBNAME).so.$(PNGMAJ) \
+LDSHARED=cc $(ABI) -shared -soname $(LIBSOMAJ) \
   -set_version sgi$(PNGMAJ).0
-LDLEGACY=cc $(ABI) -shared -soname libpng.so.0 \
+LDLEGACY=cc $(ABI) -shared -soname $(OLDSOMAJ) \
   -set_version sgi$3.0
 # See "man dso" for info about shared objects
-
-RANLIB=echo
-#RANLIB=ranlib
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -76,7 +83,7 @@ libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
 
-shared: $(LIBNAME).so.$(PNGVER)
+shared: $(LIBSOVER)
 
 libpng.pc:
 	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! > libpng.pc
@@ -93,17 +100,17 @@ libpng-config:
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
-$(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
-	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
+$(LIBSO): $(LIBSOMAJ)
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
-	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
+$(LIBSOMAJ): $(LIBSOVER)
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
 
-$(LIBNAME).so.$(PNGVER): $(OBJS)
+$(LIBSOVER): $(OBJS)
 	$(LDSHARED) -o $@ $(OBJS)
-	$(RM_F) $(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)
+	$(RM_F) $(LIBSO) $(LIBSOMAJ)
 
-libpng.so.0.$(PNGMIN): $(OBJS)
+$(OLDSOVER): $(OBJS)
 	$(LDLEGACY) -o $@ $(OBJS)
 
 pngtest: pngtest.o libpng.a
@@ -121,38 +128,38 @@ install-headers: png.h pngconf.h
 	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h
 	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h
 	-@$(RM_F) $(DI)/libpng
-	(cd $(DI); ln -sf $(LIBNAME) libpng; ln -sf $(LIBNAME)/* .)
+	(cd $(DI); $(LN_SF) $(LIBNAME) libpng; $(LN_SF) $(LIBNAME)/* .)
 
 install-static: install-headers libpng.a
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	cp libpng.a $(DL)/$(LIBNAME).a
 	chmod 644 $(DL)/$(LIBNAME).a
 	-@$(RM_F) $(DL)/libpng.a
-	(cd $(DL); ln -sf $(LIBNAME).a libpng.a)
+	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
-	libpng.so.0.$(PNGMIN)
+install-shared: install-headers $(LIBSOVER) libpng.pc \
+	$(OLDSOVER)
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
-	-@$(RM_F) $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
-	-@$(RM_F) $(DL)/$(LIBNAME).so.$(PNGMAJ)
-	-@$(RM_F) $(DL)/libpng.so
-	-@$(RM_F) $(DL)/libpng.so.0
-	-@$(RM_F) $(DL)/libpng.so.0.$(PNGMIN)*
-	cp $(LIBNAME).so.$(PNGVER) $(DL)
-	cp libpng.so.0.$(PNGMIN) $(DL)
-	chmod 755 $(DL)/$(LIBNAME).so.$(PNGVER)
-	chmod 755 $(DL)/libpng.so.0.$(PNGMIN)
+	-@$(RM_F) $(DL)/$(LIBSOVER)* $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(LIBSOMAJ)
+	-@$(RM_F) $(DL)/$(OLDSO)
+	-@$(RM_F) $(DL)/$(OLDSOMAJ)
+	-@$(RM_F) $(DL)/$(OLDSOVER)*
+	cp $(LIBSOVER) $(DL)
+	cp $(OLDSOVER) $(DL)
+	chmod 755 $(DL)/$(LIBSOVER)
+	chmod 755 $(DL)/$(OLDSOVER)
 	(cd $(DL); \
-	ln -sf libpng.so.0.$(PNGMIN) libpng.so.0; \
-	ln -sf libpng.so.0 libpng.so; \
-	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
-	ln -sf $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
+	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
+	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
 	cp libpng.pc $(DL)/pkgconfig/$(LIBNAME).pc
 	chmod 644 $(DL)/pkgconfig/$(LIBNAME).pc
-	(cd $(DL)/pkgconfig; ln -sf $(LIBNAME).pc libpng.pc)
+	(cd $(DL)/pkgconfig; $(LN_SF) $(LIBNAME).pc libpng.pc)
 
 install-man: libpng.3 libpngpf.3 png.5
 	-@if [ ! -d $(DM) ]; then $(MKDIR_P) $(DM); fi
@@ -171,7 +178,7 @@ install-config: libpng-config
 	-@$(RM_F) $(DB)/$(LIBNAME)-config
 	cp libpng-config $(DB)/$(LIBNAME)-config
 	chmod 755 $(DB)/$(LIBNAME)-config
-	(cd $(DB); ln -sf $(LIBNAME)-config libpng-config)
+	(cd $(DB); $(LN_SF) $(LIBNAME)-config libpng-config)
 
 install: install-static install-shared install-man install-config
 
@@ -185,7 +192,7 @@ test-dd:
 	$(CC) -I$(DI) -I$(ZLIBINC) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) \
-           -rpath $(ZLIBLIB):$(DL)\
+           -rpath $(ZLIBLIB):$(DL) \
 	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
 	./pngtestd pngtest.png
 
@@ -201,8 +208,8 @@ test-installed:
 
 clean:
 	$(RM_F) libpng.a pngtest pngtesti pngout.png libpng.pc libpng-config \
-	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* \
-	libpng.so.0.$(PNGMIN) \
+	$(LIBSO) $(LIBSOMAJ)* \
+	$(OLDSOVER) \
 	so_locations
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO

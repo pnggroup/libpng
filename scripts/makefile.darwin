@@ -16,6 +16,21 @@ exec_prefix=$prefix
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
+# Library name:
+LIBNAME = libpng12
+PNGMAJ = 0
+PNGMIN = 1.2.9beta11
+PNGVER = $(PNGMAJ).$(PNGMIN)
+
+# Shared library names:
+LIBSO=$(LIBNAME).dylib
+LIBSOMAJ=$(LIBNAME).$(PNGMAJ).dylib
+LIBSOVER=$(LIBNAME).$(PNGVER).dylib
+OLDSO=libpng.dylib
+OLDSOMAJ=libpng.0.dylib
+OLDSOVER=libpng.0.$(PNGMIN).dylib
+
+# Utilities:
 CC=cc
 AR_RC=ar rc
 MKDIR_P=mkdir -p
@@ -25,11 +40,6 @@ RM_F=/bin/rm -f
 
 CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
-
-PNGMAJ = 0
-PNGMIN = 1.2.9beta10
-PNGVER = $(PNGMAJ).$(PNGMIN)
-LIBNAME = libpng12
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -62,7 +72,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
 
-all: libpng.a $(LIBNAME).dylib pngtest libpng.pc libpng-config
+all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
@@ -81,27 +91,27 @@ libpng-config:
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
-$(LIBNAME).dylib: $(LIBNAME).$(PNGMAJ).dylib
-	$(LN_SF) $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib
+$(LIBSO): $(LIBSOMAJ)
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBNAME).$(PNGMAJ).dylib: $(LIBNAME).$(PNGVER).dylib
-	$(LN_SF) $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib
+$(LIBSOMAJ): $(LIBSOVER)
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
 
-$(LIBNAME).$(PNGVER).dylib: $(OBJSDLL)
+$(LIBSOVER): $(OBJSDLL)
 	$(CC) -dynamiclib \
-	 -install_name $(LIBPATH)/$(LIBNAME).$(PNGMAJ).dylib \
+	 -install_name $(LIBPATH)/$(LIBSOMAJ) \
 	 -current_version $(PNGVER) -compatibility_version $(PNGVER) \
-	 -o $(LIBNAME).$(PNGVER).dylib \
+	 -o $(LIBSOVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
-libpng.3.$(PNGMIN).dylib: $(OBJSDLL)
+$(OLDSOVER): $(OBJSDLL)
 	$(CC) -dynamiclib \
-	 -install_name $(LIBPATH)/libpng.3.dylib \
+	 -install_name $(LIBPATH)/$(OLDSOMAJ) \
 	 -current_version 3 -compatibility_version 3 \
-	 -o libpng.3.$(PNGMIN).dylib \
+	 -o $(OLDSOVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
-pngtest: pngtest.o $(LIBNAME).dylib
+pngtest: pngtest.o $(LIBSO)
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
@@ -124,24 +134,24 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).dylib libpng.pc \
-	libpng.3.$(PNGMIN).dylib
+install-shared: install-headers $(LIBSO) libpng.pc \
+	$(OLDSOVER)
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	-@$(RM_F) $(DL)/$(LIBNAME).$(PNGVER)*.dylib
 	-@$(RM_F) $(DL)/$(LIBNAME).$(PNGMAJ)*.dylib
-	-@$(RM_F) $(DL)/$(LIBNAME).dylib
-	-@$(RM_F) $(DL)/libpng.dylib
-	-@$(RM_F) $(DL)/libpng.3.dylib
+	-@$(RM_F) $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(OLDSO)
+	-@$(RM_F) $(DL)/$(OLDSOMAJ)
 	-@$(RM_F) $(DL)/libpng.3.$(PNGMIN)*.dylib
-	cp $(LIBNAME).$(PNGVER).dylib $(DL)
-	cp libpng.3.$(PNGMIN).dylib $(DL)
-	chmod 755 $(DL)/$(LIBNAME).$(PNGVER).dylib
-	chmod 755 $(DL)/libpng.3.$(PNGMIN).dylib
+	cp $(LIBSOVER) $(DL)
+	cp $(OLDSOVER) $(DL)
+	chmod 755 $(DL)/$(LIBSOVER)
+	chmod 755 $(DL)/$(OLDSOVER)
 	(cd $(DL); \
-	$(LN_SF) libpng.3.$(PNGMIN).dylib libpng.3.dylib; \
-	$(LN_SF) libpng.3.dylib libpng.dylib; \
-	$(LN_SF) $(LIBNAME).$(PNGVER).dylib $(LIBNAME).$(PNGMAJ).dylib; \
-	$(LN_SF) $(LIBNAME).$(PNGMAJ).dylib $(LIBNAME).dylib)
+	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
+	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -192,7 +202,7 @@ test-installed:
 
 clean:
 	$(RM_F) *.o libpng.a pngtest pngout.png libpng-config \
-	libpng.3.$(PNGMIN).dylib \
+	$(OLDSOVER) \
 	libpng.pc $(LIBNAME).*dylib pngtesti
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO

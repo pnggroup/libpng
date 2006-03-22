@@ -6,14 +6,24 @@
 # Modified for Debian by Junichi Uekawa and Josselin Mouette
 # Major modifications are:
 #    * link libpng explicitly with libz and libm
-#    * libpng.so.%OLDSONUM% is a symlink rather than a different library
+#    * $(OLDSO).%OLDSONUM% is a symlink rather than a different library
 #    * versioned symbols
 
+# Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.9beta10
+PNGMIN = 1.2.9beta11
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
+# Shared library names:
+LIBSO=$(LIBNAME).so
+LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
+LIBSOVER=$(LIBNAME).so.$(PNGVER)
+OLDSO=libpng.so
+OLDSOMAJ=libpng.so.0
+OLDSOVER=libpng.so.0.$(PNGMIN)
+
+# Utilities:
 AR_RC=ar rc
 CC=gcc
 MKDIR_P=mkdir -p
@@ -82,7 +92,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a $(LIBNAME).so pngtest pngtest-static libpng.pc libpng-config
+all: libpng.a $(LIBSO) pngtest pngtest-static libpng.pc libpng-config
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
@@ -115,25 +125,25 @@ libpng-config:
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
-$(LIBNAME).so: $(LIBNAME).so.$(PNGMAJ)
-	$(LN_SF) $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so
+$(LIBSO): $(LIBSOMAJ)
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
-	$(LN_SF) $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
+$(LIBSOMAJ): $(LIBSOVER)
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
 
-$(LIBNAME).so.$(PNGVER): $(OBJSDLL) libpng.syms
-	$(CC) -shared -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) \
+$(LIBSOVER): $(OBJSDLL) libpng.syms
+	$(CC) -shared -Wl,-soname,$(LIBSOMAJ) \
 	-Wl,-version-script,libpng.syms \
-	-o $(LIBNAME).so.$(PNGVER) \
+	-o $(LIBSOVER) \
 	$(OBJSDLL)
 
-libpng.so.0.$(PNGMIN): $(OBJSDLL) libpng.syms
-	$(CC) -shared -Wl,-soname,libpng.so.0 \
+$(OLDSOVER): $(OBJSDLL) libpng.syms
+	$(CC) -shared -Wl,-soname,$(OLDSOMAJ) \
 	-Wl,-version-script,libpng.syms \
-	-o libpng.so.0.$(PNGMIN) \
+	-o $(OLDSOVER) \
 	$(OBJSDLL)
 
-pngtest: pngtest.o $(LIBNAME).so
+pngtest: pngtest.o $(LIBSO)
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 pngtest-static: pngtest.o libpng.a
@@ -141,7 +151,7 @@ pngtest-static: pngtest.o libpng.a
 
 test: pngtest pngtest-static
 	@echo ""
-	@echo "   Running pngtest dynamically linked with $(LIBNAME).so:"
+	@echo "   Running pngtest dynamically linked with $(LIBSO):"
 	@echo ""
 	LD_LIBRARY_PATH=".:${LD_LIBRARY_PATH}" ./pngtest
 	@echo ""
@@ -165,23 +175,23 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).so.$(PNGVER) libpng.pc \
-	libpng.so.0.$(PNGMIN)
+install-shared: install-headers $(LIBSOVER) libpng.pc \
+	$(OLDSOVER)
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
-	-@$(RM_F) $(DL)/$(LIBNAME).so.$(PNGVER)* $(DL)/$(LIBNAME).so
-	-@$(RM_F) $(DL)/$(LIBNAME).so.$(PNGMAJ)
-	-@$(RM_F) $(DL)/libpng.so
-	-@$(RM_F) $(DL)/libpng.so.0
-	-@$(RM_F) $(DL)/libpng.so.0.$(PNGMIN)*
-	cp $(LIBNAME).so.$(PNGVER) $(DL)
-	cp libpng.so.0.$(PNGMIN) $(DL)
-	chmod 755 $(DL)/$(LIBNAME).so.$(PNGVER)
-	chmod 755 $(DL)/libpng.so.0.$(PNGMIN)
+	-@$(RM_F) $(DL)/$(LIBSOVER)* $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(LIBSOMAJ)
+	-@$(RM_F) $(DL)/$(OLDSO)
+	-@$(RM_F) $(DL)/$(OLDSOMAJ)
+	-@$(RM_F) $(DL)/$(OLDSOVER)*
+	cp $(LIBSOVER) $(DL)
+	cp $(OLDSOVER) $(DL)
+	chmod 755 $(DL)/$(LIBSOVER)
+	chmod 755 $(DL)/$(OLDSOVER)
 	(cd $(DL); \
-	$(LN_SF) libpng.so.0.$(PNGMIN) libpng.so.0; \
-	$(LN_SF) libpng.so.0 libpng.so; \
-	$(LN_SF) $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ); \
-	$(LN_SF) $(LIBNAME).so.$(PNGMAJ) $(LIBNAME).so)
+	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
+	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -232,8 +242,8 @@ test-installed:
 
 clean:
 	$(RM_F) *.o libpng.a libpng.syms pngtest pngout.png libpng-config \
-	$(LIBNAME).so $(LIBNAME).so.$(PNGMAJ)* pngtest-static pngtesti \
-	libpng.so.0.$(PNGMIN) \
+	$(LIBSO) $(LIBSOMAJ)* pngtest-static pngtesti \
+	$(OLDSOVER) \
 	libpng.pc
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO

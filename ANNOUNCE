@@ -1,5 +1,5 @@
 
-Libpng 1.2.9beta10 - March 20, 2006
+Libpng 1.2.9beta11 - March 22, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,26 +9,26 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.9beta10.tar.gz
-   1.2.9beta10.tar.bz2
+   1.2.9beta11.tar.gz
+   1.2.9beta11.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp129b10.zip
-   lp129b10.tar.bz2
+   lp129b11.zip
+   lp129b11.tar.bz2
 
 Project files
 
-   1.2.9beta10-project-netware.zip
-   1.2.9beta10-project-wince.zip
+   1.2.9beta11-project-netware.zip
+   1.2.9beta11-project-wince.zip
 
 Other information:
 
-   1.2.9beta10-README.txt
-   1.2.9beta10-KNOWNBUGS.txt
-   1.2.9beta10-LICENSE.txt
-   1.2.9beta10-Y2K-compliance.txt
+   1.2.9beta11-README.txt
+   1.2.9beta11-KNOWNBUGS.txt
+   1.2.9beta11-LICENSE.txt
+   1.2.9beta11-Y2K-compliance.txt
 
 Changes since the last public release (1.2.8):
 
@@ -131,6 +131,10 @@ version 1.2.9beta10 [March 20, 2006]
   Made pnggccrd.c PIC-compliant (Christian Aichinger).
   Added makefile.mingw (Wolfgang Glas)
   Revised pngconf.h MMX checking.
+
+version 1.2.9beta11 [March 22, 2006]
+  Fixed out-of-order declaration in pngwrite.c that was introduced in beta9
+  Simplified some makefiles by using LIBSO, LIBSOMAJ, and LIBSOVER macros.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

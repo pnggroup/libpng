@@ -15,22 +15,27 @@ ZLIBINC=/opt/zlib/include
 #   LDSHARED=ld -b
 #   SHAREDLIB=libz.sl
 
+# Library name:
+LIBNAME = libpng12
+PNGMAJ = 0
+PNGMIN = 1.2.9beta11
+PNGVER = $(PNGMAJ).$(PNGMIN)
+
+# Shared library names:
+LIBSO=$(LIBNAME).sl
+LIBSOMAJ=$(LIBNAME).sl.$(PNGMAJ)
+LIBSOVER=$(LIBNAME).sl.$(PNGVER)
+OLDSO=libpng.sl
+OLDSOMAJ=libpng.sl.0
+OLDSOVER=libpng.sl.0.$(PNGMIN)
+
+# Utilities:
 AR_RC=ar rc
 CC=cc
 MKDIR_P=mkdir -p
 LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
-
-CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
-# Caution: be sure you have built zlib with the same CFLAGS.
-CCFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
-
-PNGMAJ = 0
-PNGMIN = 1.2.9beta10
-PNGVER = $(PNGMAJ).$(PNGMIN)
-LIBNAME = libpng12
 
 # where make install puts libpng.a, libpng12.sl, and png.h
 prefix=/opt/libpng
@@ -39,6 +44,11 @@ INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
 MANPATH=$(prefix)/man
 BINPATH=$(exec_prefix)/bin
+
+CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
+# Caution: be sure you have built zlib with the same CFLAGS.
+CCFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
 # override DESTDIR= on the make install command line to easily support
 # installing into a temporary location.  Example:
@@ -66,7 +76,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) +z -o $@ $*.c
 
-all: libpng.a $(LIBNAME).sl pngtest libpng.pc libpng-config
+all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
@@ -85,19 +95,19 @@ libpng-config:
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
-$(LIBNAME).sl: $(LIBNAME).sl.$(PNGMAJ)
-	$(LN_SF) $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl
+$(LIBSO): $(LIBSOMAJ)
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBNAME).sl.$(PNGMAJ): $(LIBNAME).sl.$(PNGVER)
-	$(LN_SF) $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ)
+$(LIBSOMAJ): $(LIBSOVER)
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
 
-$(LIBNAME).sl.$(PNGVER): $(OBJSDLL)
+$(LIBSOVER): $(OBJSDLL)
 	$(LD) -b +s \
-	+h $(LIBNAME).sl.$(PNGMAJ) -o $(LIBNAME).sl.$(PNGVER) $(OBJSDLL)
+	+h $(LIBSOMAJ) -o $(LIBSOVER) $(OBJSDLL)
 
-libpng.sl.3.$(PNGMIN): $(OBJSDLL)
+$(OLDSOVER): $(OBJSDLL)
 	$(LD) -b +s \
-	+h libpng.sl.3 -o libpng.sl.3.$(PNGMIN) $(OBJSDLL)
+	+h $(OLDSOMAJ) -o $(OLDSOVER) $(OBJSDLL)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
@@ -121,23 +131,23 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBNAME).sl.$(PNGVER) libpng.pc \
-	libpng.sl.3.$(PNGMIN)
+install-shared: install-headers $(LIBSOVER) libpng.pc \
+	$(OLDSOVER)
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
-	-@$(RM_F) $(DL)/$(LIBNAME).sl.$(PNGVER)* $(DL)/$(LIBNAME).sl
-	-@$(RM_F) $(DL)/$(LIBNAME).sl.$(PNGMAJ)
-	-@$(RM_F) $(DL)/libpng.sl
-	-@$(RM_F) $(DL)/libpng.sl.3
-	-@$(RM_F) $(DL)/libpng.sl.3.$(PNGMIN)*
-	cp $(LIBNAME).sl.$(PNGVER) $(DL)
-	cp libpng.sl.3.$(PNGMIN) $(DL)
-	chmod 755 $(DL)/$(LIBNAME).sl.$(PNGVER)
-	chmod 755 $(DL)/libpng.sl.3.$(PNGMIN)
+	-@$(RM_F) $(DL)/$(LIBSOVER)* $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(LIBSOMAJ)
+	-@$(RM_F) $(DL)/$(OLDSO)
+	-@$(RM_F) $(DL)/$(OLDSOMAJ)
+	-@$(RM_F) $(DL)/$(OLDSOVER)*
+	cp $(LIBSOVER) $(DL)
+	cp $(OLDSOVER) $(DL)
+	chmod 755 $(DL)/$(LIBSOVER)
+	chmod 755 $(DL)/$(OLDSOVER)
 	(cd $(DL); \
-	$(LN_SF) libpng.sl.3.$(PNGMIN) libpng.sl.3; \
-	$(LN_SF) libpng.sl.3 libpng.sl; \
-	$(LN_SF) $(LIBNAME).sl.$(PNGVER) $(LIBNAME).sl.$(PNGMAJ); \
-	$(LN_SF) $(LIBNAME).sl.$(PNGMAJ) $(LIBNAME).sl)
+	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
+	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -190,8 +200,8 @@ test-installed:
 
 clean:
 	$(RM_F) *.o libpng.a pngtest pngtesti pngout.png \
-	libpng-config $(LIBNAME).sl $(LIBNAME).sl.$(PNGMAJ)* \
-	libpng.sl.3.$(PNGMIN) \
+	libpng-config $(LIBSO) $(LIBSOMAJ)* \
+	$(OLDSOVER) \
 	libpng.pc
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO

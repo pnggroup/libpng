@@ -1511,6 +1511,10 @@ version 1.2.9beta10 [March 20, 2006]
   Added makefile.mingw (Wolfgang Glas).
   Revised pngconf.h MMX checking.
 
+version 1.2.9beta11 [March 22, 2006]
+  Fixed out-of-order declaration in pngwrite.c that was introduced in beta9
+  Simplified some makefiles by using LIBSO, LIBSOMAJ, and LIBSOVER macros.
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
