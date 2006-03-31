@@ -44,7 +44,6 @@
 #else
 #  include <stdio.h>
 #  include <stdlib.h>
-#  include <assert.h>
 #  define READFILE(file, data, length, check) \
      check=(png_size_t)fread(data,(png_size_t)1,length,file)
 #  define WRITEFILE(file, data, length, check) \
@@ -538,7 +537,6 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
       if(verbose)
          printf("png_malloc %lu bytes at %x\n",size,pinfo->pointer);
-      assert(pinfo->size != 12345678);
       return (png_voidp)(pinfo->pointer);
    }
 }
@@ -1551,4 +1549,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_9beta11 your_png_h_is_not_version_1_2_9beta11;
+typedef version_1_2_9rc1 your_png_h_is_not_version_1_2_9rc1;

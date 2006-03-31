@@ -1345,7 +1345,7 @@ version 1.0.16rc5 and 1.2.6rc5 [August 10, 2004]
   Moved  "PNG_HANDLE_CHUNK_*" macros out of PNG_ASSEMBLER_CODE_SUPPORTED
      section of png.h where they were inadvertently placed in version rc3.
 
-version 1.0.16 and 1.2.6 [August 15, 2004]
+version 1.2.6 and 1.0.16 [August 15, 2004]
   Revised pngtest so memory allocation testing is only done when PNG_DEBUG==1.
 version 1.2.7beta1 [August 26, 2004]
   Removed unused pngasmrd.h file.
@@ -1362,7 +1362,7 @@ version 1.2.7beta2 [August 28, 2004]
 version 1.0.17rc1 and 1.2.7rc1 [September 4, 2004]
   Revised png_set_strip_filler() to not remove alpha if color_type has alpha.
 
-version 1.0.17 and 1.2.7 [September 12, 2004]
+version 1.2.7 and 1.0.17 [September 12, 2004]
   Added makefile.hp64
   Changed projects/msvc/png32ms.def to scripts/png32ms.def in makefile.cygwin
 version 1.2.8beta1 [November 1, 2004]
@@ -1433,7 +1433,7 @@ version 1.2.9beta1 [February 21, 2006]
   Exported png_get_uint_32, png_save_uint_32, png_get_uint_16, png_save_uint_16,
     png_get_int_32, png_save_int_32, png_get_uint_31 (Cosmin).
   Added type cast (png_byte) in png_write_sCAL() (Cosmin).
-  Fixed scripts/makefile.cygwin (Cosmin).
+  Fixed scripts/makefile.cygwin (Christian Biesinger, Cosmin).
   Default iTXt support was inadvertently enabled.
 
 version 1.2.9beta2 [February 21, 2006]
@@ -1514,6 +1514,10 @@ version 1.2.9beta10 [March 20, 2006]
 version 1.2.9beta11 [March 22, 2006]
   Fixed out-of-order declaration in pngwrite.c that was introduced in beta9
   Simplified some makefiles by using LIBSO, LIBSOMAJ, and LIBSOVER macros.
+
+version 1.2.9rc1 [March 31, 2006]
+  Defined PNG_USER_PRIVATEBUILD when including "pngusr.h" (Cosmin).
+  Removed nonsensical assertion check from pngtest.c (Cosmin).
 
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).

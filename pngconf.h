@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.9beta11 - March 22, 2006
+ * libpng version 1.2.9rc1 - March 31, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2005 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -24,6 +24,9 @@
  * includes the resource compiler for Windows DLL configurations.
  */
 #ifdef PNG_USER_CONFIG
+#  ifndef PNG_USER_PRIVATEBUILD
+#    define PNG_USER_PRIVATEBUILD
+#  endif
 #include "pngusr.h"
 #endif
 
@@ -59,8 +62,8 @@
 #endif
 
 #ifdef PRIVATEBUILD
-# pragma message("PRIVATEBUILD is deprecated. Use\
- PNG_USER_PRIVATEBUILD instead.")
+# pragma message("PRIVATEBUILD is deprecated.\
+ Use PNG_USER_PRIVATEBUILD instead.")
 # define PNG_USER_PRIVATEBUILD PRIVATEBUILD
 #endif
 #endif /* __STDC__ */
