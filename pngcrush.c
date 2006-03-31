@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.2"
+#define PNGCRUSH_VERSION "1.6.3"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -119,8 +119,39 @@
  *   then double size & copy if run out of room:  still O(n) algorithm.
  */
 
-#define PNG_INTERNAL
 #include "png.h"
+
+/* internal libpng macros */
+
+#define PNG_IDAT const png_byte png_IDAT[5] = { 73,  68,  65,  84, '\0'}
+#define PNG_IHDR const png_byte png_IHDR[5] = { 73,  72,  68,  82, '\0'}
+#define PNG_iCCP const png_byte png_iCCP[5] = {105,  67,  67,  80, '\0'}
+#define PNG_IEND const png_byte png_IEND[5] = { 73,  69,  78,  68, '\0'}
+
+PNG_EXPORT_VAR (const png_byte FARDATA) png_IHDR[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_IDAT[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_IEND[5];
+PNG_EXPORT_VAR (const png_byte FARDATA) png_iCCP[5];
+
+#define PNG_FLAG_CRC_CRITICAL_USE         0x0400
+#define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
+#define PNG_FLAG_CRC_ANCILLARY_USE        0x0100
+#define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
+#define PNG_FLAG_CRC_CRITICAL_USE         0x0400
+#define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
+#define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
+                                     PNG_FLAG_CRC_ANCILLARY_NOWARN)
+#define PNG_PACK               0x0004
+#define PNG_DITHER             0x0040
+#define PNG_BACKGROUND         0x0080
+#define PNG_16_TO_8            0x0400
+#define PNG_RGBA               0x0800
+#define PNG_EXPAND             0x1000
+#define PNG_GAMMA              0x2000
+#define PNG_GRAY_TO_RGB        0x4000
+#define PNG_FILLER             0x8000L
+#define PNG_USER_TRANSFORM   0x100000L
+#define PNG_RGB_TO_GRAY      0x600000L  /* two bits, RGB_TO_GRAY_ERR|WARN */
 
 /* we don't need some of the extra libpng transformations
  * so they are ifdef'ed out in pngcrush.h, which is included by
@@ -397,6 +428,24 @@ int ia;
 /* prototypes */
 static void png_cexcept_error(png_structp png_ptr, png_const_charp msg);
 
+void PNGAPI png_default_read_data(png_structp png_ptr, png_bytep data,
+  png_size_t length);
+
+void png_read_transform_info(png_structp png_ptr, png_infop info_ptr);
+
+void PNGAPI png_default_write_data(png_structp png_ptr, png_bytep data,
+  png_size_t length);
+
+void png_reset_crc(png_structp png_ptr);
+void png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length);
+void png_crc_read(png_structp png_ptr, png_bytep buf, png_size_t length);
+int png_crc_error(png_structp png_ptr);
+int png_crc_finish(png_structp png_ptr, png_uint_32 skip);
+
+png_uint_32 png_get_uint_31(png_structp png_ptr, png_bytep buf);
+png_uint_32 png_get_uint_32(png_bytep buf);
+void png_save_uint_32(png_bytep buf, png_uint_32 i);
+
 #ifdef PNG_USER_MEM_SUPPORTED
 png_voidp png_debug_malloc(png_structp png_ptr, png_uint_32 size);
 void png_debug_free(png_structp png_ptr, png_voidp ptr);
@@ -454,6 +503,14 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
      png_error(png_ptr, "PNG unsigned integer out of range.\n");
    return (i);
 }
+void /* PRIVATE */
+png_save_uint_32(png_bytep buf, png_uint_32 i)
+{
+   buf[0] = (png_byte)((i >> 24) & 0xff);
+   buf[1] = (png_byte)((i >> 16) & 0xff);
+   buf[2] = (png_byte)((i >> 8) & 0xff);
+   buf[3] = (png_byte)(i & 0xff);
+}
 
 /* Reset the CRC variable to 32 bits of 1's.  Care must be taken
  * in case CRC is > 32 bits to leave the top bits 0.
@@ -493,7 +550,7 @@ png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length)
 void /* PRIVATE */
 png_crc_read(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
-   png_read_data(png_ptr, buf, length);
+   png_default_read_data(png_ptr, buf, length);
    png_calculate_crc(png_ptr, buf, length);
 }
 
@@ -518,7 +575,7 @@ png_crc_error(png_structp png_ptr)
          need_crc = 0;
    }
 
-   png_read_data(png_ptr, crc_bytes, 4);
+   png_default_read_data(png_ptr, crc_bytes, 4);
 
    if (need_crc)
    {
@@ -5093,7 +5150,8 @@ struct options_help pngcrush_options[] = {
 #endif
 
 #ifdef PNG_iTXt_SUPPORTED
-    {0, "         -itxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\""},
+    {0, "         -itxt b[efore_IDAT]|a[fter_IDAT] \"keyword\""},
+    {2, "               \"language_code\" \"translated_keyword\" \"text\""},
     {2, ""},
     {2, "               Uncompressed iTXt chunk to insert (see -text)."},
     {2, ""},
@@ -5276,7 +5334,8 @@ struct options_help pngcrush_options[] = {
     {2, ""},
 
 #ifdef PNG_iTXt_SUPPORTED
-    {0, "        -zitxt b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\""},
+    {0, "        -zitxt b[efore_IDAT]|a[fter_IDAT] \"keyword\""},
+    {2, "               \"language_code\" \"translated_keyword\" \"text\""},
     {2, ""},
     {2, "               Compressed iTXt chunk to insert (see -text)."},
     {2, ""},

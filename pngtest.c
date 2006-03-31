@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.2.8 - December 3, 2004
+ * Last changed in libpng 1.2.6 - August 15, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1435,7 +1435,7 @@ main(int argc, char *argv[])
                current_allocation);
             while (pinfo != NULL)
             {
-               fprintf(STDERR, " %lu bytes at %x\n", pinfo->size, 
+               fprintf(STDERR, " %lu bytes at %x\n", pinfo->size,
                  (unsigned int) pinfo->pointer);
                pinfo = pinfo->next;
             }
@@ -1551,4 +1551,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_8 your_png_h_is_not_version_1_2_8;
+typedef version_1_2_9beta11 your_png_h_is_not_version_1_2_9beta11;

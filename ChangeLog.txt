@@ -1,5 +1,11 @@
 Change log:
 
+Version 1.6.3 (built with libpng-1.2.9beta11 and zlib-1.2.3)
+
+  Fixed documentation of iTXt input (Shlomi Tal).
+  Removed #define PNG_INTERNAL and provided prototypes for some
+  internal libpng functions that are duplicated in pngcrush.c
+
 Version 1.6.2 (built with libpng-1.2.8 and zlib-1.2.3)
 
   Fixed bug with "PNG_ROWBYTES" usage, introduced in version 1.6.0.
