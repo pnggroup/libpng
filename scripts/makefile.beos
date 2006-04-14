@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.9rc1
+PNGMIN = 1.2.9
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -43,8 +43,8 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 # still here in R4.5
 CFLAGS=-I$(ZLIBINC) -Wall -O1 -funroll-loops \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
-# LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz -lm
-LDFLAGS=-L. -Wl,-soname=$(LIBSOMAJ) -L$(ZLIBLIB) -lz -lm
+# LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz
+LDFLAGS=-L. -Wl,-soname=$(LIBSOMAJ) -L$(ZLIBLIB) -lz
 
 # where make install puts libpng.a, libpng12.so*, and png.h
 prefix=/usr/local
@@ -90,7 +90,7 @@ libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo libs=\"-lpng12 -lz -lm\"; \
+	echo libs=\"-lpng12 -lz \"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -103,14 +103,14 @@ $(LIBSOMAJ): $(LIBSOVER)
 
 $(LIBSOVER): $(OBJSDLL)
 	$(CC) -nostart -Wl,-soname,$(LIBSOMAJ) -o \
-	$(LIBSOVER) $(OBJSDLL)
+	$(LIBSOVER) $(OBJSDLL) $(LDFLAGS)
 
 $(OLDSOVER): $(OBJSDLL)
 	$(CC) -nostart -Wl,-soname,$(OLDSOMAJ) -o \
-	$(OLDSOVER) $(OBJSDLL)
+	$(OLDSOVER) $(OBJSDLL) $(LDFLAGS)
 
 pngtest: pngtest.o $(LIBSO)
-	$(CC) -L$(ZLIBLIB) -lz -lpng12 -o pngtest pngtest.o
+	$(CC) -L$(ZLIBLIB) -L. -lz -lpng12 -o pngtest pngtest.o
 
 test: pngtest
 	./pngtest

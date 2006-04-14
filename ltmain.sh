@@ -3234,7 +3234,7 @@ EOF
 	  # which has an extra 1 added just for fun
 	  #
 	  case $version_type in
-	  darwin|linux|osf|windows)
+	  darwin|linux|osf|windows|none)
 	    current=`expr $number_major + $number_minor`
 	    age="$number_minor"
 	    revision="$number_revision"

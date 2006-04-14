@@ -1,44 +1,43 @@
 
-Libpng 1.2.9rc1 - March 31, 2006
+Libpng 1.2.9 - April 14, 2006
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.9rc1.tar.gz
-   1.2.9rc1.tar.bz2
+   1.2.9.tar.gz
+   1.2.9.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.2.9rc1-no-config.tar.gz
-   1.2.9rc1-no-config.tar.bz2
+   1.2.9-no-config.tar.gz
+   1.2.9-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp129r01.zip
-   lp129r01.tar.bz2
+   lpng129.zip
+   lpng129.tar.bz2
 
 Project files
 
-   1.2.9rc1-project-netware.zip
-   1.2.9rc1-project-wince.zip
+   1.2.9-project-netware.zip
+   1.2.9-project-wince.zip
 
 Other information:
 
-   1.2.9rc1-README.txt
-   1.2.9rc1-KNOWNBUGS.txt
-   1.2.9rc1-LICENSE.txt
-   1.2.9rc1-Y2K-compliance.txt
+   1.2.9-README.txt
+   1.2.9-KNOWNBUGS.txt
+   1.2.9-LICENSE.txt
+   1.2.9-Y2K-compliance.txt
 
 Changes since the last public release (1.2.8):
 
-version 1.2.9beta1 [February 21, 2006]
+version 1.2.9 [April 14, 2006]
   Initialized some structure members in pngwutil.c to avoid gcc-4.0.0 complaints
   Fixed an incorrect typecast in pngrutil.c
   Added PNG_NO_READ_SUPPORTED conditionals for making a write-only library.
@@ -60,10 +59,6 @@ version 1.2.9beta1 [February 21, 2006]
   Revised man page and libpng.txt to make it clear that one should not call
     png_read_end or png_write_end after png_read_png or png_write_png.
   Optimized zlib window flag (CINFO) in contrib/pngsuite/*.png (Cosmin).
-  Default iTXt support was inadvertently enabled.
-
-version 1.2.9beta2 [February 22, 2006]
-
   Check for png_rgb_to_gray and png_gray_to_rgb read transformations before
     checking for png_read_dither in pngrtran.c
   Revise checking of chromaticity limits to accommodate extended RGB
@@ -75,76 +70,40 @@ version 1.2.9beta2 [February 22, 2006]
     with the newly exported functions.
   Eliminated distributions without the "configure" script.
   Updated INSTALL instructions.
-
-version 1.2.9beta3 [February 24, 2006]
-
-  Fixed CRCRLF line endings in contrib/visupng/VisualPng.dsp
-  Made libpng.pc respect EXEC_PREFIX (D.P.Kreil)
-  Removed reference to pngasmrd.h from Makefile.am
-  Renamed CHANGES to ChangeLog.
-  Renamed LICENSE to COPYING.
-  Renamed ANNOUNCE to NEWS.
-  Created AUTHORS file.
-
-version 1.2.9beta4 [March 3, 2006]
-
-  Changed definition of PKGCONFIG from $prefix/lib to $libdir in configure.ac
-  Reverted to filenames LICENSE and ANNOUNCE; removed AUTHORS and COPYING.
+  Make libpng.pc respect EXEC_PREFIX (D.P.Kreil)
+  Remove reference to pngasmrd.h from Makefile.am
+  Change definition of PKGCONFIG from $prefix/lib to $libdir in configure.ac
   Removed newline from the end of some error and warning messages.
   Removed test for sqrt() from configure.ac and configure.
-  Added "OS2" to list of systems that don't need underscores, in pnggccrd.c
   Made swap tables in pngtrans.c PNG_CONST (Carlo Bramix).
-  Disabled default iTXt support that was inadvertently enabled in
-    libpng-1.2.9beta1.
   Added "OS2" to list of systems that don't need underscores, in pnggccrd.c
   Removed libpng version and date from *.c files.
-
-version 1.2.9beta5 [March 4, 2006]
   Removed trailing blanks from source files.
   Put version and date of latest change in each source file, and changed
     copyright year accordingly.
-  More cleanup of configure.ac, Makefile.ac, and associated scripts.
   Restored scripts/makefile.elf which was inadvertently deleted.
-
-version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (%RELEASE%) in configuration files.
-
-version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
   Fixed inconsistent #ifdef's around png_sig_bytes() and png_set_sCAL_s()
     in png.h.
   Updated makefile.elf as suggested by debian.
-  Made cosmetic changes to some makefiles, adding LN_SF and other macros.
+  Added LN_SF, MKDIR_P, and other macros to some of the makefiles.
   Made some makefiles accept "exec_prefix".
-
-version 1.2.9beta8 [March 9, 2006]
+  Simplified some makefiles by using LIBSO, LIBSOMAJ, and LIBSOVER macros.
   Fixed some "#ifdef defined (..." which should be "#ifdef defined(..."
     Bug introduced in libpng-1.2.8.
   Fixed inconsistency in definition of png_default_read_data()
-  Restored blank that was lost from makefile.sggcc "clean" target in beta7.
   Revised calculation of "current" and "major" for irix in ltmain.sh
-  Changed "mkdir" to "MKDIR_P" in some makefiles.
   Separated PNG_EXPAND and PNG_EXPAND_tRNS.
   Added png_set_expand_gray_1_2_4_to_8() and deprecated
     png_set_gray_1_2_4_to_8() which also expands tRNS to alpha.
-
-version 1.2.9beta9 [March 10, 2006]
   Include "config.h" in pngconf.h when available.
-  Added some checks for NULL png_ptr or NULL info_ptr (timeless)
-
-version 1.2.9beta10 [March 20, 2006]
-  Removed extra CR from contrib/visualpng/VisualPng.dsw (Cosmin)
+  Added some checks for NULL png_ptr or NULL info_ptr (Coverity)
   Made pnggccrd.c PIC-compliant (Christian Aichinger).
   Added makefile.mingw (Wolfgang Glas)
   Revised pngconf.h MMX checking.
-
-version 1.2.9beta11 [March 22, 2006]
-  Fixed out-of-order declaration in pngwrite.c that was introduced in beta9
-  Simplified some makefiles by using LIBSO, LIBSOMAJ, and LIBSOVER macros.
-
-version 1.2.9rc1 [March 31, 2006]
   Defined PNG_USER_PRIVATEBUILD when including "pngusr.h" (Cosmin).
   Removed nonsensical assertion check from pngtest.c (Cosmin).
+  Revised makefile.beos and added "none" selector in ltmain.sh
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

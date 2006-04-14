@@ -1519,6 +1519,9 @@ version 1.2.9rc1 [March 31, 2006]
   Defined PNG_USER_PRIVATEBUILD when including "pngusr.h" (Cosmin).
   Removed nonsensical assertion check from pngtest.c (Cosmin).
 
+version 1.2.9 [April 14, 2006]
+  Revised makefile.beos and added "none" selector in ltmain.sh
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
