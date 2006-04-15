@@ -1,109 +1,47 @@
 
-Libpng 1.2.9 - April 14, 2006
+Libpng 1.2.10beta1 - April 15, 2006
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.9.tar.gz
-   1.2.9.tar.bz2
+   1.2.10beta1.tar.gz
+   1.2.10beta1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.2.9-no-config.tar.gz
-   1.2.9-no-config.tar.bz2
+   1.2.10beta1-no-config.tar.gz
+   1.2.10beta1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng129.zip
-   lpng129.tar.bz2
+   lp1210b01.zip
+   lp1210b01.tar.bz2
 
 Project files
 
-   1.2.9-project-netware.zip
-   1.2.9-project-wince.zip
+   1.2.10beta1-project-netware.zip
+   1.2.10beta1-project-wince.zip
 
 Other information:
 
-   1.2.9-README.txt
-   1.2.9-KNOWNBUGS.txt
-   1.2.9-LICENSE.txt
-   1.2.9-Y2K-compliance.txt
+   1.2.10beta1-README.txt
+   1.2.10beta1-KNOWNBUGS.txt
+   1.2.10beta1-LICENSE.txt
+   1.2.10beta1-Y2K-compliance.txt
 
-Changes since the last public release (1.2.8):
+Changes since the last public release (1.2.9):
 
-version 1.2.9 [April 14, 2006]
-  Initialized some structure members in pngwutil.c to avoid gcc-4.0.0 complaints
-  Fixed an incorrect typecast in pngrutil.c
-  Added PNG_NO_READ_SUPPORTED conditionals for making a write-only library.
-  Added PNG_NO_WRITE_INTERLACING_SUPPORTED conditional.
-  Optimized alpha-inversion loops in pngwtran.c
-  Moved test for nonzero gamma outside of png_build_gamma_table() in pngrtran.c
-  Make sure num_trans is <= 256 before copying data in png_set_tRNS().
-  Make sure num_palette is <= 256 before copying data in png_set_PLTE().
-  Interchanged order of write_swap_alpha and write_invert_alpha transforms.
-  Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
-  Exported png_get_uint_32, png_save_uint_32, png_get_uint_16, png_save_uint_16,
-    png_get_int_32, png_save_int_32, png_get_uint_31 (Cosmin).
-  Added parentheses in the definition of PNG_LIBPNG_BUILD_TYPE (Cosmin).
-  Added type cast (png_byte) in png_write_sCAL() (Cosmin).
-  Fixed scripts/makefile.cygwin (Cosmin).
-  Updated scripts/makefile.bc32 for Borland C++ 5.6 (Cosmin).
-  Updated scripts/pngos2.def, scripts/pngw32.def (Cosmin).
-  Updated references to png-mng-implement mailing list.
-  Revised man page and libpng.txt to make it clear that one should not call
-    png_read_end or png_write_end after png_read_png or png_write_png.
-  Optimized zlib window flag (CINFO) in contrib/pngsuite/*.png (Cosmin).
-  Check for png_rgb_to_gray and png_gray_to_rgb read transformations before
-    checking for png_read_dither in pngrtran.c
-  Revise checking of chromaticity limits to accommodate extended RGB
-    colorspace (John Denker).
-  Changed line endings in some of the project files to CRLF, even in the
-    "Unix" tar distributions (Cosmin).
-  Make png_get_int_32 and png_save_int_32 always available (Cosmin).
-  Updated scripts/pngos2.def, scripts/pngw32.def and projects/wince/png32ce.def
-    with the newly exported functions.
-  Eliminated distributions without the "configure" script.
-  Updated INSTALL instructions.
-  Make libpng.pc respect EXEC_PREFIX (D.P.Kreil)
-  Remove reference to pngasmrd.h from Makefile.am
-  Change definition of PKGCONFIG from $prefix/lib to $libdir in configure.ac
-  Removed newline from the end of some error and warning messages.
-  Removed test for sqrt() from configure.ac and configure.
-  Made swap tables in pngtrans.c PNG_CONST (Carlo Bramix).
-  Added "OS2" to list of systems that don't need underscores, in pnggccrd.c
-  Removed libpng version and date from *.c files.
-  Removed trailing blanks from source files.
-  Put version and date of latest change in each source file, and changed
-    copyright year accordingly.
-  Restored scripts/makefile.elf which was inadvertently deleted.
-  Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
-  Fixed inconsistent #ifdef's around png_sig_bytes() and png_set_sCAL_s()
-    in png.h.
-  Updated makefile.elf as suggested by debian.
-  Added LN_SF, MKDIR_P, and other macros to some of the makefiles.
-  Made some makefiles accept "exec_prefix".
-  Simplified some makefiles by using LIBSO, LIBSOMAJ, and LIBSOVER macros.
-  Fixed some "#ifdef defined (..." which should be "#ifdef defined(..."
-    Bug introduced in libpng-1.2.8.
-  Fixed inconsistency in definition of png_default_read_data()
-  Revised calculation of "current" and "major" for irix in ltmain.sh
-  Separated PNG_EXPAND and PNG_EXPAND_tRNS.
-  Added png_set_expand_gray_1_2_4_to_8() and deprecated
-    png_set_gray_1_2_4_to_8() which also expands tRNS to alpha.
-  Include "config.h" in pngconf.h when available.
-  Added some checks for NULL png_ptr or NULL info_ptr (Coverity)
-  Made pnggccrd.c PIC-compliant (Christian Aichinger).
-  Added makefile.mingw (Wolfgang Glas)
-  Revised pngconf.h MMX checking.
-  Defined PNG_USER_PRIVATEBUILD when including "pngusr.h" (Cosmin).
-  Removed nonsensical assertion check from pngtest.c (Cosmin).
-  Revised makefile.beos and added "none" selector in ltmain.sh
+version 1.2.10beta1 [April 15, 2006]
+  Renamed "config.h" to "png_conf.h" and revised Makefile.am to add
+    -DPNG_BUILDING_LIBPNG to compile directive, and modified pngconf.h
+    to include png_conf.h only when PNG_BUILDING_LIBPNG is defined.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

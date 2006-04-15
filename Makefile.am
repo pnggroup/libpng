@@ -36,6 +36,10 @@ libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c \
 	png.h pngconf.h
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
+
+libpng_la_CFLAGS += -DPNG_BUILDING_LIBPNG
+libpng12_la_CFLAGS += -DPNG_BUILDING_LIBPNG
+
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
 	-version-number 0:@PNGLIB_MINOR@:0
