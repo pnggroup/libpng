@@ -1519,13 +1519,17 @@ version 1.2.9rc1 [March 31, 2006]
   Defined PNG_USER_PRIVATEBUILD when including "pngusr.h" (Cosmin).
   Removed nonsensical assertion check from pngtest.c (Cosmin).
 
-version 1.2.9 [April 15, 2006]
+version 1.2.9 [April 14, 2006]
   Revised makefile.beos and added "none" selector in ltmain.sh
 
 version 1.2.10beta1 [April 15, 2006]
   Renamed "config.h" to "png_conf.h" and revised Makefile.am to add
     -DPNG_BUILDING_LIBPNG to compile directive, and modified pngconf.h
     to include png_conf.h only when PNG_BUILDING_LIBPNG is defined.
+
+version 1.2.10beta2 [April 15, 2006]
+  Manually updated Makefile.in and configure.  Changed png_conf.h.in
+    back to config.h.
 
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).

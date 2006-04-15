@@ -1,5 +1,5 @@
 
-Libpng 1.2.10beta1 - April 15, 2006
+Libpng 1.2.10beta2 - April 15, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.10beta1.tar.gz
-   1.2.10beta1.tar.bz2
+   1.2.10beta2.tar.gz
+   1.2.10beta2.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.2.10beta1-no-config.tar.gz
-   1.2.10beta1-no-config.tar.bz2
+   1.2.10beta2-no-config.tar.gz
+   1.2.10beta2-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1210b01.zip
-   lp1210b01.tar.bz2
+   lp1210b02.zip
+   lp1210b02.tar.bz2
 
 Project files
 
-   1.2.10beta1-project-netware.zip
-   1.2.10beta1-project-wince.zip
+   1.2.10beta2-project-netware.zip
+   1.2.10beta2-project-wince.zip
 
 Other information:
 
-   1.2.10beta1-README.txt
-   1.2.10beta1-KNOWNBUGS.txt
-   1.2.10beta1-LICENSE.txt
-   1.2.10beta1-Y2K-compliance.txt
+   1.2.10beta2-README.txt
+   1.2.10beta2-KNOWNBUGS.txt
+   1.2.10beta2-LICENSE.txt
+   1.2.10beta2-Y2K-compliance.txt
 
 Changes since the last public release (1.2.9):
 
@@ -42,6 +42,10 @@ version 1.2.10beta1 [April 15, 2006]
   Renamed "config.h" to "png_conf.h" and revised Makefile.am to add
     -DPNG_BUILDING_LIBPNG to compile directive, and modified pngconf.h
     to include png_conf.h only when PNG_BUILDING_LIBPNG is defined.
+
+version 1.2.10beta2 [April 15, 2006]
+  Manually updated Makefile.am and configure.  Changed png_conf.h
+    back to png_conf.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
