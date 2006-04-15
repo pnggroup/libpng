@@ -1531,6 +1531,9 @@ version 1.2.10beta2 [April 15, 2006]
   Manually updated Makefile.in and configure.  Changed png_conf.h.in
     back to config.h.
 
+version 1.2.10beta3 [April 15, 2006]
+  Change png_conf.h back to config.h in pngconf.h.
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,

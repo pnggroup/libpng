@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.10beta2 - April 15, 2006
+ * libpng version 1.2.10beta3 - April 15, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2005 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -33,7 +33,7 @@
 /* PNG_CONFIGURE_LIBPNG is set by the "configure" script. */
 #ifdef PNG_CONFIGURE_LIBPNG
 #ifdef HAVE_CONFIG_H
-#include "png_conf.h"
+#include "config.h"
 #endif
 #endif
 
