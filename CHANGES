@@ -1537,6 +1537,9 @@ version 1.2.10beta3 [April 15, 2006]
 version 1.2.10beta4 [April 16, 2006]
   Change PNG_BUILDING_LIBPNG to PNG_CONFIGURE_LIBPNG in config/Makefile*.
 
+version 1.2.10beta5 [April 17, 2006]
+  Added a configure check for compiling assembler code in pnggccrd.c
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,

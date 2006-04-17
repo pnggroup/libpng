@@ -37,8 +37,8 @@ libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	png.h pngconf.h
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
 
-libpng_la_CPPFLAGS = -DPNG_CONFIGURE_LIBPNG
-libpng12_la_CPPFLAGS = -DPNG_CONFIGURE_LIBPNG
+libpng_la_CPPFLAGS = @LIBPNG_DEFINES@ -DPNG_CONFIGURE_LIBPNG
+libpng12_la_CPPFLAGS = @LIBPNG_DEFINES@ -DPNG_CONFIGURE_LIBPNG
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
