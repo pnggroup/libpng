@@ -18,12 +18,12 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.2.10beta5], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.2.10beta6], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.2.10beta5
+PNGLIB_VERSION=1.2.10beta6
 PNGLIB_MAJOR=12
 PNGLIB_MINOR=10
 
@@ -61,15 +61,16 @@ AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
 AC_MSG_CHECKING([if assembler code in pnggccrd.c can be compiled])
 AC_TRY_COMPILE(
   [#include "pnggccrd.c"],
-  [int main() { return 0; }],
-  LIBPNG_DEFINES=,LIBPNG_DEFINES=-DPNG_NO_ASSEMBLER_CODE)
-AC_SUBST(LIBPNG_DEFINES)
+  [return 0;],
+  LIBPNG_DEFINES=,
+  LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG -DPNG_NO_ASSEMBLER_CODE)
 if test "$LIBPNG_DEFINES"; then
     AC_MSG_RESULT(no)
 else
     AC_MSG_RESULT(yes)
+    LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 fi
-
+AC_SUBST(LIBPNG_DEFINES)
 
 AC_MSG_CHECKING([if libraries can be versioned])
 GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`

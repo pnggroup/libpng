@@ -37,8 +37,8 @@ libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	png.h pngconf.h
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
 
-libpng_la_CPPFLAGS = @LIBPNG_DEFINES@ -DPNG_CONFIGURE_LIBPNG
-libpng12_la_CPPFLAGS = @LIBPNG_DEFINES@ -DPNG_CONFIGURE_LIBPNG
+libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
+libpng12_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
@@ -95,7 +95,7 @@ $(PNGLIB_BASENAME)-config: libpng-config
 
 libpng.sym: png.h pngconf.h
 	rm -f $@ $@.new
-	$(CPP) $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
+	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
 		$(SED) -n -e 's|^.*PNG_FUNCTION_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
 			-e 's|^.*PNG_DATA_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
 			>$@.new
