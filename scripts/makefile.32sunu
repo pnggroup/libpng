@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.10beta6
+PNGMIN = 1.2.10beta7
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -32,7 +32,7 @@ SUN_LD_FLAGS=-fast -xtarget=ultra
 
 # where make install puts libpng.a, libpng12.so and libpng12/png.h
 prefix=/a
-exec_prefix=$prefix
+exec_prefix=$(prefix)
 
 # Where the zlib library and include files are located
 # Changing these to ../zlib poses a security risk.  If you want

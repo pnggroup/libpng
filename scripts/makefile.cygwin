@@ -46,7 +46,7 @@ ifndef prefix
 prefix=/usr
 $(warning You haven't specified a 'prefix=' location. Defaulting to "/usr")
 endif
-exec_prefix=$prefix
+exec_prefix=$(prefix)
 
 # Where the zlib library and include files are located
 ZLIBLIB= /usr/lib
@@ -80,7 +80,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 CYGDLL = 12
-PNGMIN = 1.2.10beta6
+PNGMIN = 1.2.10beta7
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll

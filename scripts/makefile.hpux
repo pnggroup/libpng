@@ -18,7 +18,7 @@ ZLIBINC=/opt/zlib/include
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.10beta6
+PNGMIN = 1.2.10beta7
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -39,7 +39,7 @@ RM_F=/bin/rm -f
 
 # where make install puts libpng.a, libpng12.sl, and png.h
 prefix=/opt/libpng
-exec_prefix=$prefix
+exec_prefix=$(prefix)
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
 MANPATH=$(prefix)/man

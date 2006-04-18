@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.10beta6
+PNGMIN = 1.2.10beta7
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -48,7 +48,7 @@ LDFLAGS=-L. -Wl,-soname=$(LIBSOMAJ) -L$(ZLIBLIB) -lz
 
 # where make install puts libpng.a, libpng12.so*, and png.h
 prefix=/usr/local
-exec_prefix=$prefix
+exec_prefix=$(prefix)
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
 MANPATH=$(prefix)/man

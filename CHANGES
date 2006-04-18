@@ -1545,6 +1545,9 @@ version 1.2.10beta6 [April 17, 2006]
   Moved -DPNG_CONFIGURE_LIBPNG into @LIBPNG_DEFINES@
   Added @LIBPNG_DEFINES@ to arguments when building libpng.sym
 
+version 1.2.10beta7 [April 18, 2006]
+  Change "exec_prefix=$prefix" to "exec_prefix=$(prefix)" in makefiles.
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,

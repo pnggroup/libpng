@@ -9,7 +9,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.10beta6
+PNGMIN = 1.2.10beta7
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -30,7 +30,7 @@ RM_F=/bin/rm -f
 
 # where make install puts libpng.a, $(OLDSO)*, and png.h
 prefix=/usr/local
-exec_prefix=$prefix
+exec_prefix=$(prefix)
 
 # Where the zlib library and include files are located
 #ZLIBLIB=/usr/local/lib

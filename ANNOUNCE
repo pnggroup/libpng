@@ -1,5 +1,5 @@
 
-Libpng 1.2.10beta6 - April 17, 2006
+Libpng 1.2.10beta7 - April 18, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.10beta6.tar.gz
-   1.2.10beta6.tar.bz2
+   1.2.10beta7.tar.gz
+   1.2.10beta7.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.2.10beta6-no-config.tar.gz
-   1.2.10beta6-no-config.tar.bz2
+   1.2.10beta7-no-config.tar.gz
+   1.2.10beta7-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1210b06.zip
-   lp1210b06.tar.bz2
+   lp1210b07.zip
+   lp1210b07.tar.bz2
 
 Project files
 
-   1.2.10beta6-project-netware.zip
-   1.2.10beta6-project-wince.zip
+   1.2.10beta7-project-netware.zip
+   1.2.10beta7-project-wince.zip
 
 Other information:
 
-   1.2.10beta6-README.txt
-   1.2.10beta6-KNOWNBUGS.txt
-   1.2.10beta6-LICENSE.txt
-   1.2.10beta6-Y2K-compliance.txt
+   1.2.10beta7-README.txt
+   1.2.10beta7-KNOWNBUGS.txt
+   1.2.10beta7-LICENSE.txt
+   1.2.10beta7-Y2K-compliance.txt
 
 Changes since the last public release (1.2.9):
 
@@ -60,6 +60,9 @@ version 1.2.10beta6 [April 17, 2006]
   Revised the configure check for pnggccrd.c
   Moved -DPNG_CONFIGURE_LIBPNG into @LIBPNG_DEFINES@
   Added @LIBPNG_DEFINES@ to arguments when building libpng.sym
+
+version 1.2.10beta7 [April 18, 2006]
+  Change "exec_prefix=$prefix" to "exec_prefix=$(prefix)" in makefiles.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
