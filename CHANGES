@@ -1548,11 +1548,18 @@ version 1.2.10beta6 [April 17, 2006]
 version 1.2.10beta7 [April 18, 2006]
   Change "exec_prefix=$prefix" to "exec_prefix=$(prefix)" in makefiles.
 
+version 1.2.10rc1 [April 19, 2006]
+  Ensure pngconf.h doesn't define both PNG_USE_PNGGCCRD and PNG_USE_PNGVCRD
+  Fixed "LN_FS" typo in makefile.sco and makefile.solaris.
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
     png_permit_empty_plte, png_set_gray_1_2_4_to_8, and removed the
     deprecated macro PNG_MAX_UINT.
+  Cleaned up PNG_ASSEMBLER_CODE_SUPPORTED vs PNG_MMX_CODE_SUPPORTED
+  Cleaned up WINCE project.
+  Moved "PNG_INTERNAL" parts of png.h into a new private header, pngintrn.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

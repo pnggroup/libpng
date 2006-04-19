@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.10beta7
+PNGMIN = 1.2.10rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -99,10 +99,10 @@ libpng-config:
 	chmod +x libpng-config
 
 $(LIBSO): $(LIBSOMAJ)
-	$(LN_FS) $(LIBSOMAJ) $(LIBSO)
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
 $(LIBSOMAJ): $(LIBSOVER)
-	$(LN_FS) $(LIBSOVER) $(LIBSOMAJ)
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
 
 $(LIBSOVER): $(OBJSDLL)
 	@case "`type ld`" in *ucb*) \
@@ -137,14 +137,14 @@ install-headers: png.h pngconf.h
 	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h
 	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h
 	-@$(RM_F) $(DI)/libpng
-	(cd $(DI); $(LN_FS) $(LIBNAME) libpng; $(LN_FS) $(LIBNAME)/* .)
+	(cd $(DI); $(LN_SF) $(LIBNAME) libpng; $(LN_SF) $(LIBNAME)/* .)
 
 install-static: install-headers libpng.a
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	cp libpng.a $(DL)/$(LIBNAME).a
 	chmod 644 $(DL)/$(LIBNAME).a
 	-@$(RM_F) $(DL)/libpng.a
-	(cd $(DL); $(LN_FS) $(LIBNAME).a libpng.a)
+	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
 install-shared: install-headers $(LIBSOVER) libpng.pc \
 	$(OLDSOVER)
@@ -159,16 +159,16 @@ install-shared: install-headers $(LIBSOVER) libpng.pc \
 	chmod 755 $(DL)/$(LIBSOVER)
 	chmod 755 $(DL)/$(OLDSOVER)
 	(cd $(DL); \
-	$(LN_FS) $(OLDSOVER) $(OLDSOMAJ); \
-	$(LN_FS) $(OLDSOMAJ) $(OLDSO); \
-	$(LN_FS) $(LIBSOVER) $(LIBSO); \
-	$(LN_FS) $(LIBSOVER) $(LIBSOMAJ))
+	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
+	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
+	$(LN_SF) $(LIBSOVER) $(LIBSO); \
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
 	cp libpng.pc $(DL)/pkgconfig/$(LIBNAME).pc
 	chmod 644 $(DL)/pkgconfig/$(LIBNAME).pc
-	(cd $(DL)/pkgconfig; $(LN_FS) $(LIBNAME).pc libpng.pc)
+	(cd $(DL)/pkgconfig; $(LN_SF) $(LIBNAME).pc libpng.pc)
 
 install-man: libpng.3 libpngpf.3 png.5
 	-@if [ ! -d $(DM) ]; then $(MKDIR_P) $(DM); fi
@@ -187,7 +187,7 @@ install-config: libpng-config
 	-@$(RM_F) $(DB)/$(LIBNAME)-config
 	cp libpng-config $(DB)/$(LIBNAME)-config
 	chmod 755 $(DB)/$(LIBNAME)-config
-	(cd $(DB); $(LN_FS) $(LIBNAME)-config libpng-config)
+	(cd $(DB); $(LN_SF) $(LIBNAME)-config libpng-config)
 
 install: install-static install-shared install-man install-config
 
