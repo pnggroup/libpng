@@ -1552,6 +1552,11 @@ version 1.2.10rc1 [April 19, 2006]
   Ensure pngconf.h doesn't define both PNG_USE_PNGGCCRD and PNG_USE_PNGVCRD
   Fixed "LN_FS" typo in makefile.sco and makefile.solaris.
 
+version 1.2.10rc2 [April 19, 2006]
+  Added a backslash between -DPNG_CONFIGURE_LIBPNG and -DPNG_NO_ASSEMBLER_CODE
+   in configure.ac and configure
+  Made the configure warning about versioned symbols less arrogant.
+
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
