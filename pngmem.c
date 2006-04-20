@@ -14,8 +14,8 @@
  * identify the replacement functions.
  */
 
-#define PNG_INTERNAL
 #include "png.h"
+#include "pngintrn.h"
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
@@ -360,15 +360,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    }
 #endif /* PNG_USER_MEM_SUPPORTED */
 
-#if defined(__TURBOC__) && !defined(__FLAT__)
-   struct_ptr = (png_voidp)farmalloc(size);
-#else
-# if defined(_MSC_VER) && defined(MAXSEG_64K)
-   struct_ptr = (png_voidp)halloc(size,1);
-# else
-   struct_ptr = (png_voidp)malloc(size);
-# endif
-#endif
+   struct_ptr = (png_voidp)png_mem_alloc(size);
    if (struct_ptr != NULL)
       png_memset(struct_ptr, 0, size);
 
@@ -402,15 +394,7 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
          return;
       }
 #endif /* PNG_USER_MEM_SUPPORTED */
-#if defined(__TURBOC__) && !defined(__FLAT__)
-      farfree(struct_ptr);
-#else
-# if defined(_MSC_VER) && defined(MAXSEG_64K)
-      hfree(struct_ptr);
-# else
-      free(struct_ptr);
-# endif
-#endif
+      png_mem_free(struct_ptr);
    }
 }
 
@@ -460,24 +444,10 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 #endif
 
  /* Check for overflow */
-#if defined(__TURBOC__) && !defined(__FLAT__)
- if (size != (unsigned long)size)
+ if (size != (png_mem_size_t)size)
    ret = NULL;
  else
-   ret = farmalloc(size);
-#else
-# if defined(_MSC_VER) && defined(MAXSEG_64K)
- if (size != (unsigned long)size)
-   ret = NULL;
- else
-   ret = halloc(size, 1);
-# else
- if (size != (size_t)size)
-   ret = NULL;
- else
-   ret = malloc((size_t)size);
-# endif
-#endif
+   ret = png_mem_alloc(size);
 
 #ifndef PNG_USER_MEM_SUPPORTED
    if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
@@ -510,23 +480,11 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
       return;
 
 #endif /* PNG_USER_MEM_SUPPORTED */
-
-#if defined(__TURBOC__) && !defined(__FLAT__)
-   farfree(ptr);
-#else
-# if defined(_MSC_VER) && defined(MAXSEG_64K)
-   hfree(ptr);
-# else
-   free(ptr);
-# endif
-#endif
+   png_mem_free(ptr);
 }
 
 #endif /* Not Borland DOS special memory handler */
 
-#if defined(PNG_1_0_X)
-#  define png_malloc_warn png_malloc
-#else
 /* This function was added at libpng version 1.2.3.  The png_malloc_warn()
  * function will set up png_malloc() to issue a png_warning and return NULL
  * instead of issuing a png_error, if it fails to allocate the requested
@@ -543,7 +501,6 @@ png_malloc_warn(png_structp png_ptr, png_uint_32 size)
    png_ptr->flags=save_flags;
    return(ptr);
 }
-#endif
 
 png_voidp PNGAPI
 png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,

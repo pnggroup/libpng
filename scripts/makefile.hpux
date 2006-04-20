@@ -16,9 +16,9 @@ ZLIBINC=/opt/zlib/include
 #   SHAREDLIB=libz.sl
 
 # Library name:
-LIBNAME = libpng12
+LIBNAME = libpng14
 PNGMAJ = 0
-PNGMIN = 1.2.10rc1
+PNGMIN = 1.4.0beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -26,8 +26,8 @@ LIBSO=$(LIBNAME).sl
 LIBSOMAJ=$(LIBNAME).sl.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).sl.$(PNGVER)
 OLDSO=libpng.sl
-OLDSOMAJ=libpng.sl.0
-OLDSOVER=libpng.sl.0.$(PNGMIN)
+OLDSOMAJ=libpng.sl.14
+OLDSOVER=libpng.sl.14.$(PNGMIN)
 
 # Utilities:
 AR_RC=ar rc
@@ -37,7 +37,7 @@ LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
 
-# where make install puts libpng.a, libpng12.sl, and png.h
+# where make install puts libpng.a, libpng14.sl, and png.h
 prefix=/opt/libpng
 exec_prefix=$(prefix)
 INCPATH=$(prefix)/include
@@ -91,7 +91,7 @@ libpng-config:
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo ccopts=\"-Ae +DA1.1 +DS2.0\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng12 -lz -lm\"; \
+	echo libs=\"-lpng14 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -210,19 +210,19 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o: png.h pngconf.h
-pngerror.o: png.h pngconf.h
-pngrio.o: png.h pngconf.h
-pngwio.o: png.h pngconf.h
-pngmem.o: png.h pngconf.h
-pngset.o: png.h pngconf.h
-pngget.o: png.h pngconf.h
-pngread.o: png.h pngconf.h
-pngrtran.o: png.h pngconf.h
-pngrutil.o: png.h pngconf.h
-pngtest.o: png.h pngconf.h
-pngtrans.o: png.h pngconf.h
-pngwrite.o: png.h pngconf.h
-pngwtran.o: png.h pngconf.h
-pngwutil.o: png.h pngconf.h
-pngpread.o: png.h pngconf.h
+png.o: png.h pngconf.h pngintrn.h
+pngerror.o: png.h pngconf.h pngintrn.h
+pngrio.o: png.h pngconf.h pngintrn.h
+pngwio.o: png.h pngconf.h pngintrn.h
+pngmem.o: png.h pngconf.h pngintrn.h
+pngset.o: png.h pngconf.h pngintrn.h
+pngget.o: png.h pngconf.h pngintrn.h
+pngread.o: png.h pngconf.h pngintrn.h
+pngrtran.o: png.h pngconf.h pngintrn.h
+pngrutil.o: png.h pngconf.h pngintrn.h
+pngtest.o: png.h pngconf.h pngintrn.h
+pngtrans.o: png.h pngconf.h pngintrn.h
+pngwrite.o: png.h pngconf.h pngintrn.h
+pngwtran.o: png.h pngconf.h pngintrn.h
+pngwutil.o: png.h pngconf.h pngintrn.h
+pngpread.o: png.h pngconf.h pngintrn.h

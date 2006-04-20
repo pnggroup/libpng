@@ -1480,7 +1480,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (10) in configuration files.
+  Fixed typo (0) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1552,14 +1552,28 @@ version 1.2.10rc1 [April 19, 2006]
   Ensure pngconf.h doesn't define both PNG_USE_PNGGCCRD and PNG_USE_PNGVCRD
   Fixed "LN_FS" typo in makefile.sco and makefile.solaris.
 
-version 1.4.0beta1 [future]
+version 1.2.10rc2 [April 19, 2006]
+  Added a backslash between -DPNG_CONFIGURE_LIBPNG and -DPNG_NO_ASSEMBLER_CODE
+   in configure.ac and configure
+  Made the configure warning about versioned symbols less arrogant.
+
+version 1.4.0beta1 [April 20, 2006]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
+  Cleaned up PNG_ASSEMBLER_CODE_SUPPORTED vs PNG_MMX_CODE_SUPPORTED
+  Eliminated PNG_1_0_X and PNG_1_2_X macros.
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
     png_permit_empty_plte, png_set_gray_1_2_4_to_8, and removed the
     deprecated macro PNG_MAX_UINT.
-  Cleaned up PNG_ASSEMBLER_CODE_SUPPORTED vs PNG_MMX_CODE_SUPPORTED
+  Moved "PNG_INTERNAL" parts of png.h and pngconf.h into pngintrn.h
+  Removed many WIN32_WCE #ifdefs (Cosmin).
+  Reduced dependency on C-runtime library when on Windows (Simon-Pierre)
+  Replaced sprintf() with png_sprintf() (Simon-Pierre)
+
+version 1.4.0betaN [future]
+  Cleaned up error and warning messages.
+  Implemented sTER chunk.
   Cleaned up WINCE project.
-  Moved "PNG_INTERNAL" parts of png.h into a new private header, pngintrn.h
+  Build shared libraries with -lz and sometimes -lm.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -13,8 +13,8 @@
  * in pngtrans.c.
  */
 
-#define PNG_INTERNAL
 #include "png.h"
+#include "pngintrn.h"
 
 #if defined(PNG_READ_SUPPORTED)
 
@@ -579,7 +579,6 @@ png_set_palette_to_rgb(png_structp png_ptr)
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
 
-#if !defined(PNG_1_0_X)
 /* Expand grayscale images of less than 8-bit depth to 8 bits. */
 void PNGAPI
 png_set_expand_gray_1_2_4_to_8(png_structp png_ptr)
@@ -587,19 +586,6 @@ png_set_expand_gray_1_2_4_to_8(png_structp png_ptr)
    png_debug(1, "in png_set_expand_gray_1_2_4_to_8\n");
    png_ptr->transformations |= PNG_EXPAND_tRNS;
 }
-#endif
-
-#if defined(PNG_1_0_X) || defined(PNG_1_2_X)
-/* Expand grayscale images of less than 8-bit depth to 8 bits. */
-/* Deprecated as of libpng-1.2.9 */
-void PNGAPI
-png_set_gray_1_2_4_to_8(png_structp png_ptr)
-{
-   png_debug(1, "in png_set_gray_1_2_4_to_8\n");
-   png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-}
-#endif
-
 
 /* Expand tRNS chunks to alpha channels. */
 void PNGAPI
@@ -1179,10 +1165,8 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    {
       info_ptr->channels++;
       /* if adding a true alpha channel not just filler */
-#if !defined(PNG_1_0_X)
       if (png_ptr->transformations & PNG_ADD_ALPHA)
         info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
-#endif
    }
 #endif
 
@@ -1219,11 +1203,11 @@ png_do_read_transformations(png_structp png_ptr)
 #if !defined(PNG_USELESS_TESTS_SUPPORTED)
    if (png_ptr->row_buf == NULL)
    {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#ifndef PNG_NO_STDIO
       char msg[50];
 
-      sprintf(msg, "NULL row buffer for row %ld, pass %d", png_ptr->row_number,
-         png_ptr->pass);
+      png_sprintf(msg, "NULL row buffer for row %ld, pass %d",
+         png_ptr->row_number, png_ptr->pass);
       png_error(png_ptr, msg);
 #else
       png_error(png_ptr, "NULL row buffer");

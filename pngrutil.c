@@ -11,34 +11,10 @@
  * libpng itself during the course of reading an image.
  */
 
-#define PNG_INTERNAL
 #include "png.h"
+#include "pngintrn.h"
 
 #if defined(PNG_READ_SUPPORTED)
-
-#if defined(_WIN32_WCE)
-/* strtod() function is not supported on WindowsCE */
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
-__inline double strtod(const char *nptr, char **endptr)
-{
-   double result = 0;
-   int len;
-   wchar_t *str, *end;
-
-   len = MultiByteToWideChar(CP_ACP, 0, nptr, -1, NULL, 0);
-   str = (wchar_t *)malloc(len * sizeof(wchar_t));
-   if ( NULL != str )
-   {
-      MultiByteToWideChar(CP_ACP, 0, nptr, -1, str, len);
-      result = wcstod(str, &end);
-      len = WideCharToMultiByte(CP_ACP, 0, end, -1, NULL, 0, NULL, NULL);
-      *endptr = (char *)nptr + (png_strlen(nptr) - len + 1);
-      free(str);
-   }
-   return result;
-}
-#  endif
-#endif
 
 png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_bytep buf)
@@ -275,17 +251,17 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       }
       if (ret != Z_STREAM_END)
       {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#ifndef PNG_NO_STDIO
          char umsg[50];
 
          if (ret == Z_BUF_ERROR)
-            sprintf(umsg,"Buffer error in compressed datastream in %s chunk",
+            png_sprintf(umsg,"Buffer error in compressed datastream in %s chunk",
                 png_ptr->chunk_name);
          else if (ret == Z_DATA_ERROR)
-            sprintf(umsg,"Data error in compressed datastream in %s chunk",
+            png_sprintf(umsg,"Data error in compressed datastream in %s chunk",
                 png_ptr->chunk_name);
          else
-            sprintf(umsg,"Incomplete compressed datastream in %s chunk",
+            png_sprintf(umsg,"Incomplete compressed datastream in %s chunk",
                 png_ptr->chunk_name);
          png_warning(png_ptr, umsg);
 #else
@@ -315,10 +291,10 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    }
    else /* if (comp_type != PNG_COMPRESSION_TYPE_BASE) */
    {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#ifndef PNG_NO_STDIO
       char umsg[50];
 
-      sprintf(umsg, "Unknown zTXt compression type %d", comp_type);
+      png_sprintf(umsg, "Unknown zTXt compression type %d", comp_type);
       png_warning(png_ptr, umsg);
 #else
       png_warning(png_ptr, "Unknown zTXt compression type");
@@ -2247,7 +2223,7 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    a zero indicates the pixel is to be skipped.  This is in addition
    to any alpha or transparency value associated with the pixel.  If
    you want all pixels to be combined, pass 0xff (255) in mask.  */
-#ifndef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+#ifndef PNG_HAVE_MMX_COMBINE_ROW
 void /* PRIVATE */
 png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
@@ -2448,10 +2424,10 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
       }
    }
 }
-#endif /* !PNG_HAVE_ASSEMBLER_COMBINE_ROW */
+#endif /* !PNG_HAVE_MMX_COMBINE_ROW */
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
-#ifndef PNG_HAVE_ASSEMBLER_READ_INTERLACE   /* else in pngvcrd.c, pnggccrd.c */
+#ifndef PNG_HAVE_MMX_READ_INTERLACE   /* else in pngvcrd.c, pnggccrd.c */
 /* OLD pre-1.0.9 interface:
 void png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
    png_uint_32 transformations)
@@ -2677,10 +2653,10 @@ png_do_read_interlace(png_structp png_ptr)
       return;
 #endif
 }
-#endif /* !PNG_HAVE_ASSEMBLER_READ_INTERLACE */
+#endif /* !PNG_HAVE_MMX_READ_INTERLACE */
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
 
-#ifndef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+#ifndef PNG_HAVE_MMX_READ_FILTER_ROW
 void /* PRIVATE */
 png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    png_bytep prev_row, int filter)
@@ -2803,7 +2779,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
          break;
    }
 }
-#endif /* !PNG_HAVE_ASSEMBLER_READ_FILTER_ROW */
+#endif /* !PNG_HAVE_MMX_READ_FILTER_ROW */
 
 void /* PRIVATE */
 png_read_finish_row(png_structp png_ptr)

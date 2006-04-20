@@ -30,7 +30,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13.dll"
+				OutputFile="$(OutDir)/libpng14.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\scripts\pngw32.def"/>
 			<Tool
@@ -78,7 +78,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13d.dll"
+				OutputFile="$(OutDir)/libpng14d.dll"
 				ModuleDefinitionFile="..\..\scripts\pngw32.def"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
@@ -126,7 +126,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13.dll"
+				OutputFile="$(OutDir)/libpng14.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\scripts\pngw32.def"/>
 			<Tool
@@ -175,7 +175,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13d.dll"
+				OutputFile="$(OutDir)/libpng14d.dll"
 				ModuleDefinitionFile="..\..\scripts\pngw32.def"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
@@ -224,7 +224,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng13vb.dll"
+				OutputFile="$(OutDir)/libpng14vb.dll"
 				LinkIncremental="1"/>
 			<Tool
 				Name="VCMIDLTool"/>

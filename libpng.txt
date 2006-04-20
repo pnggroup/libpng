@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.10rc1 - April 19, 2006
+ libpng version 1.4.0beta1 - April 20, 2006
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -799,8 +799,6 @@ things.
 
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
-At the same time, png_set_gray_1_2_4_to_8() was deprecated, and it
-will be removed from a future version.
 
 PNG can have files with 16 bits per channel.  If you only can handle
 8 bits per channel, this will strip the pixels down to 8 bit.
@@ -2812,7 +2810,7 @@ The following code can be used to prevent an application from using the
 thread_unsafe features, even if libpng was built with PNG_THREAD_UNSAFE_OK
 defined:
 
-#if defined(PNG_USE_PNGGCCRD) && defined(PNG_ASSEMBLER_CODE_SUPPORTED) \
+#if defined(PNG_USE_PNGGCCRD) && defined(PNG_MMX_CODE_SUPPORTED) \
   && defined(PNG_THREAD_UNSAFE_OK)
     /* Disable thread-unsafe features of pnggccrd */
     if (png_access_version() >= 10200)
@@ -2909,13 +2907,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-April 19, 2006
+April 20, 2006
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.10rc1 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

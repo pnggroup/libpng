@@ -8,9 +8,9 @@
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
-#define PNG_INTERNAL
 #include "png.h"
 #ifdef PNG_WRITE_SUPPORTED
+#include "pngintrn.h"
 
 /* Place a 32-bit number into a buffer in PNG byte order.  We work
  * with unsigned numbers for convenience, although one supported
@@ -175,9 +175,9 @@ png_text_compress(png_structp png_ptr,
 
    if (compression >= PNG_TEXT_COMPRESSION_LAST)
    {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#ifndef PNG_NO_STDIO
       char msg[50];
-      sprintf(msg, "Unknown compression type %d", compression);
+      png_sprintf(msg, "Unknown compression type %d", compression);
       png_warning(png_ptr, msg);
 #else
       png_warning(png_ptr, "Unknown compression type");
@@ -1205,10 +1205,10 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    {
       if (*kp < 0x20 || (*kp > 0x7E && (png_byte)*kp < 0xA1))
       {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#ifndef PNG_NO_STDIO
          char msg[40];
 
-         sprintf(msg, "invalid keyword character 0x%02X", *kp);
+         png_sprintf(msg, "invalid keyword character 0x%02X", *kp);
          png_warning(png_ptr, msg);
 #else
          png_warning(png_ptr, "invalid character in keyword");
@@ -1578,19 +1578,8 @@ png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
 
    png_debug(1, "in png_write_sCAL\n");
 
-#if defined(_WIN32_WCE)
-/* sprintf() function is not supported on WindowsCE */
-   {
-      wchar_t wc_buf[32];
-      swprintf(wc_buf, TEXT("%12.12e"), width);
-      WideCharToMultiByte(CP_ACP, 0, wc_buf, -1, wbuf, 32, NULL, NULL);
-      swprintf(wc_buf, TEXT("%12.12e"), height);
-      WideCharToMultiByte(CP_ACP, 0, wc_buf, -1, hbuf, 32, NULL, NULL);
-   }
-#else
-   sprintf(wbuf, "%12.12e", width);
-   sprintf(hbuf, "%12.12e", height);
-#endif
+   png_sprintf(wbuf, "%12.12e", width);
+   png_sprintf(hbuf, "%12.12e", height);
    total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
 
    png_debug1(3, "sCAL total length = %d\n", (int)total_len);

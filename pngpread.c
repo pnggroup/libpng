@@ -8,8 +8,8 @@
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
-#define PNG_INTERNAL
 #include "png.h"
+#include "pngintrn.h"
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 

@@ -1,4 +1,4 @@
-# makefile for libpng.a and libpng12.so on Linux ELF with gcc using MMX
+# makefile for libpng.a and libpng14.so on Linux ELF with gcc using MMX
 # assembler code
 # Copyright 2002, 2006 Greg Roelofs and Glenn Randers-Pehrson
 # Copyright 1998-2001 Greg Roelofs
@@ -14,9 +14,9 @@
 #        the background!  Context switches between MMX and FPU are expensive.
 
 # Library name:
-LIBNAME = libpng12
+LIBNAME = libpng14
 PNGMAJ = 0
-PNGMIN = 1.2.10rc1
+PNGMIN = 1.4.0beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -24,8 +24,8 @@ LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).so.$(PNGVER)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.0
-OLDSOVER=libpng.so.0.$(PNGMIN)
+OLDSOMAJ=libpng.so.14
+OLDSOVER=libpng.so.14.$(PNGMIN)
 
 # Utilities:
 CC = gcc
@@ -36,8 +36,8 @@ MKDIR_P = mkdir -p
 RANLIB = ranlib
 RM_F = /bin/rm -f
 
-# where "make install" puts libpng12.a, libpng12.so*,
-# libpng12/png.h and libpng12/pngconf.h
+# where "make install" puts libpng14.a, libpng14.so*,
+# libpng14/png.h and libpng14/pngconf.h
 # Prefix must be a full pathname.
 prefix=/usr/local
 exec_prefix=$(prefix)
@@ -72,7 +72,7 @@ CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall \
 #	-m486 -malign-double -ffast-math \
 #	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
 
-LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng12 -lz -lm
+LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng14 -lz -lm
 LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm
 
 
@@ -123,7 +123,7 @@ libpng-config:
 	echo cppflags=\"-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo R_opts=\"-Wl,-rpath,$(LIBPATH)\"; \
-	echo libs=\"-lpng12 -lz -lm\"; \
+	echo libs=\"-lpng14 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -256,20 +256,20 @@ DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
 	chmod a-w *.[ch35] $(DOCS) scripts/*
 
-png.o png.pic.o:		png.h pngconf.h png.c
-pngerror.o pngerror.pic.o:	png.h pngconf.h pngerror.c
-pngrio.o pngrio.pic.o:		png.h pngconf.h pngrio.c
-pngwio.o pngwio.pic.o:		png.h pngconf.h pngwio.c
-pngmem.o pngmem.pic.o:		png.h pngconf.h pngmem.c
-pngset.o pngset.pic.o:		png.h pngconf.h pngset.c
-pngget.o pngget.pic.o:		png.h pngconf.h pngget.c
-pngread.o pngread.pic.o:	png.h pngconf.h pngread.c
-pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngrtran.c
-pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngrutil.c
-pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngtrans.c
-pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
-pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c
-pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngwutil.c
-pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
+png.o png.pic.o:		png.h pngconf.h pngintrn.h png.c
+pngerror.o pngerror.pic.o:	png.h pngconf.h pngintrn.h pngerror.c
+pngrio.o pngrio.pic.o:		png.h pngconf.h pngintrn.h pngrio.c
+pngwio.o pngwio.pic.o:		png.h pngconf.h pngintrn.h pngwio.c
+pngmem.o pngmem.pic.o:		png.h pngconf.h pngintrn.h pngmem.c
+pngset.o pngset.pic.o:		png.h pngconf.h pngintrn.h pngset.c
+pngget.o pngget.pic.o:		png.h pngconf.h pngintrn.h pngget.c
+pngread.o pngread.pic.o:	png.h pngconf.h pngintrn.h pngread.c
+pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngintrn.h pngrtran.c
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngintrn.h pngrutil.c
+pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngintrn.h pngtrans.c
+pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngintrn.h pngwrite.c
+pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngintrn.h pngwtran.c
+pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngintrn.h pngwutil.c
+pngpread.o pngpread.pic.o:	png.h pngconf.h pngintrn.h pngpread.c
 
-pngtest.o:			png.h pngconf.h pngtest.c
+pngtest.o:			png.h pngconf.h pngintrn.h pngtest.c

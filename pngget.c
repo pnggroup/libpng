@@ -8,8 +8,8 @@
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
-#define PNG_INTERNAL
 #include "png.h"
+#include "pngintrn.h"
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
@@ -829,7 +829,6 @@ png_get_compression_buffer_size(png_structp png_ptr)
 }
 #endif
 
-#ifndef PNG_1_0_X
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 /* this function was added to libpng 1.2.0 and should exist by default */
 png_uint_32 PNGAPI
@@ -844,6 +843,7 @@ png_get_asm_flagmask (int flag_select)
 {
     png_uint_32 settable_asm_flags = 0;
 
+#ifdef PNG_MMX_CODE_SUPPORTED
     if (flag_select & PNG_SELECT_READ)
         settable_asm_flags |=
           PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  |
@@ -853,6 +853,7 @@ png_get_asm_flagmask (int flag_select)
           PNG_ASM_FLAG_MMX_READ_FILTER_AVG   |
           PNG_ASM_FLAG_MMX_READ_FILTER_PAETH ;
           /* no non-MMX flags yet */
+#endif
 
 #if 0
     /* GRR:  no write-flags yet, either, but someday... */
@@ -866,8 +867,7 @@ png_get_asm_flagmask (int flag_select)
 #endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
 
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
-    /* GRR:  could add this:   && defined(PNG_MMX_CODE_SUPPORTED) */
+#if defined(PNG_MMX_CODE_SUPPORTED)
 /* this function was added to libpng 1.2.0 */
 png_uint_32 PNGAPI
 png_get_mmx_flagmask (int flag_select, int *compilerID)
@@ -917,8 +917,7 @@ png_get_mmx_rowbytes_threshold (png_structp png_ptr)
 {
     return (png_uint_32)(png_ptr? png_ptr->mmx_rowbytes_threshold : 0L);
 }
-#endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
-#endif /* ?PNG_1_0_X */
+#endif /* ?PNG_MMX_CODE_SUPPORTED */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* these functions were added to libpng 1.2.6 */

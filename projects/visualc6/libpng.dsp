@@ -63,7 +63,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386
-# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_Release\libpng13.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Release"
+# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_Release\libpng14.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Release"
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL Debug"
 
@@ -94,7 +94,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 zlib1d.lib /nologo /dll /debug /machine:I386 /out:"Win32_DLL_Debug\libpng13d.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Debug"
+# ADD LINK32 zlib1d.lib /nologo /dll /debug /machine:I386 /out:"Win32_DLL_Debug\libpng14d.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Debug"
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL ASM Release"
 
@@ -125,7 +125,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386
-# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_ASM_Release\libpng13.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_ASM_Release"
+# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_ASM_Release\libpng14.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_ASM_Release"
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL ASM Debug"
 
@@ -156,7 +156,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 zlib1d.lib /nologo /dll /debug /machine:I386 /out:"Win32_DLL_ASM_Debug\libpng13d.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_ASM_Debug"
+# ADD LINK32 zlib1d.lib /nologo /dll /debug /machine:I386 /out:"Win32_DLL_ASM_Debug\libpng14d.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_ASM_Debug"
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL VB"
 
@@ -187,10 +187,10 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386
-# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_VB\libpng13vb.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Release"
+# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_VB\libpng14vb.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Release"
 # Begin Special Build Tool
 OutDir=.\Win32_DLL_VB
-TargetName=libpng13vb
+TargetName=libpng14vb
 SOURCE="$(InputPath)"
 PostBuild_Cmds=echo    Deleting $(targetname) import library and export file (Not required for VB projects)	del $(outdir)\$(targetname).lib	del $(outdir)\$(targetname).exp
 # End Special Build Tool

@@ -8,8 +8,8 @@
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
-#define PNG_INTERNAL
 #include "png.h"
+#include "pngintrn.h"
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
@@ -120,7 +120,6 @@ png_set_filler(png_structp png_ptr, png_uint_32 filler, int filler_loc)
    }
 }
 
-#if !defined(PNG_1_0_X)
 /* Added to libpng-1.2.7 */
 void PNGAPI
 png_set_add_alpha(png_structp png_ptr, png_uint_32 filler, int filler_loc)
@@ -129,7 +128,6 @@ png_set_add_alpha(png_structp png_ptr, png_uint_32 filler, int filler_loc)
    png_set_filler(png_ptr, filler, filler_loc);
    png_ptr->transformations |= PNG_ADD_ALPHA;
 }
-#endif
 
 #endif
 

@@ -18,14 +18,14 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.2.10rc1], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.4.0beta1], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.2.10rc1
-PNGLIB_MAJOR=12
-PNGLIB_MINOR=10
+PNGLIB_VERSION=1.4.0beta1
+PNGLIB_MAJOR=14
+PNGLIB_MINOR=0
 
 dnl End of version number stuff
 
@@ -58,12 +58,12 @@ AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )
 AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
 
-AC_MSG_CHECKING([if assembler code in pnggccrd.c can be compiled])
+AC_MSG_CHECKING([if pnggccrd.c can be compiled without -DPNG_NO_MMX_CODE])
 AC_TRY_COMPILE(
   [#include "pnggccrd.c"],
   [return 0;],
   LIBPNG_DEFINES=,
-  LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG -DPNG_NO_ASSEMBLER_CODE)
+  LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG\ -DPNG_NO_MMX_CODE)
 if test "$LIBPNG_DEFINES"; then
     AC_MSG_RESULT(no)
 else
@@ -80,7 +80,7 @@ if test "$GLD"; then
 else
     have_ld_version_script=no
     AC_MSG_RESULT(no)
-    AC_MSG_WARN(*** You may want to rerun configure using --with-gnu-ld to enable versioned symbols.)
+    AC_MSG_WARN(*** You have not enabled versioned symbols.)
 fi
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 

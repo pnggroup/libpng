@@ -9,9 +9,9 @@
  */
 
 /* get internal access to png.h */
-#define PNG_INTERNAL
 #include "png.h"
 #ifdef PNG_WRITE_SUPPORTED
+#include "pngintrn.h"
 
 /* Writes all the PNG information.  This is the suggested way to use the
  * library.  If you have a new chunk to add, make a function to write it,
@@ -399,7 +399,6 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 }
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
-#if !defined(_WIN32_WCE)
 /* "time.h" functions are not supported on WindowsCE */
 void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
@@ -422,7 +421,6 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
    tbuf = gmtime(&ttime);
    png_convert_from_struct_tm(ptime, tbuf);
 }
-#endif
 #endif
 
 /* Initialize png_ptr structure, and allocate any memory needed */
@@ -459,11 +457,9 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    if (png_ptr == NULL)
       return (NULL);
 
-#if !defined(PNG_1_0_X)
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+#ifdef PNG_MMX_CODE_SUPPORTED
    png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
 #endif
-#endif /* PNG_1_0_X */
 
    /* added at libpng-1.2.6 */
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
@@ -511,15 +507,15 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
          (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
          (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
      {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#ifndef PNG_NO_STDIO
         char msg[80];
         if (user_png_ver)
         {
-          sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
+          png_sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
              user_png_ver);
           png_warning(png_ptr, msg);
         }
-        sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
+        png_sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
            png_libpng_ver);
         png_warning(png_ptr, msg);
 #endif
@@ -559,62 +555,6 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif
    return (png_ptr);
 }
-
-/* Initialize png_ptr structure, and allocate any memory needed */
-#if defined(PNG_1_0_X) || defined(PNG_1_2_X)
-/* Deprecated. */
-#undef png_write_init
-void PNGAPI
-png_write_init(png_structp png_ptr)
-{
-   /* We only come here via pre-1.0.7-compiled applications */
-   png_write_init_2(png_ptr, "1.0.6 or earlier", 0, 0);
-}
-
-void PNGAPI
-png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
-   png_size_t png_struct_size, png_size_t png_info_size)
-{
-   /* We only come here via pre-1.0.12-compiled applications */
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
-   if(png_sizeof(png_struct) > png_struct_size ||
-      png_sizeof(png_info) > png_info_size)
-   {
-      char msg[80];
-      png_ptr->warning_fn=NULL;
-      if (user_png_ver)
-      {
-        sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
-           user_png_ver);
-        png_warning(png_ptr, msg);
-      }
-      sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
-         png_libpng_ver);
-      png_warning(png_ptr, msg);
-   }
-#endif
-   if(png_sizeof(png_struct) > png_struct_size)
-     {
-       png_ptr->error_fn=NULL;
-#ifdef PNG_ERROR_NUMBERS_SUPPORTED
-       png_ptr->flags=0;
-#endif
-       png_error(png_ptr,
-       "The png struct allocated by the application for writing is too small.");
-     }
-   if(png_sizeof(png_info) > png_info_size)
-     {
-       png_ptr->error_fn=NULL;
-#ifdef PNG_ERROR_NUMBERS_SUPPORTED
-       png_ptr->flags=0;
-#endif
-       png_error(png_ptr,
-       "The info struct allocated by the application for writing is too small.");
-     }
-   png_write_init_3(&png_ptr, user_png_ver, png_struct_size);
-}
-#endif /* PNG_1_0_X || PNG_1_2_X */
-
 
 void PNGAPI
 png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
@@ -668,11 +608,9 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
 #endif
 
-#if !defined(PNG_1_0_X)
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+#ifdef PNG_MMX_CODE_SUPPORTED
    png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
 #endif
-#endif /* PNG_1_0_X */
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */

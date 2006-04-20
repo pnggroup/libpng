@@ -8,9 +8,9 @@
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
-#define PNG_INTERNAL
 #include "png.h"
 #ifdef PNG_WRITE_SUPPORTED
+#include "pngintrn.h"
 
 /* Transform the data according to the user's wishes.  The order of
  * transformations is significant.

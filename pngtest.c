@@ -32,31 +32,15 @@
 
 #if defined(_WIN32_WCE)
 #  if _WIN32_WCE < 211
-     __error__ (f|w)printf functions are not supported on old WindowsCE.;
+     __error__ "(f|w)printf functions are not supported on old WindowsCE.";
 #  endif
-#  include <windows.h>
-#  include <stdlib.h>
-#  define READFILE(file, data, length, check) \
-     if (ReadFile(file, data, length, &check,NULL)) check = 0
-#  define WRITEFILE(file, data, length, check)) \
-     if (WriteFile(file, data, length, &check, NULL)) check = 0
-#  define FCLOSE(file) CloseHandle(file)
-#else
-#  include <stdio.h>
-#  include <stdlib.h>
-#  define READFILE(file, data, length, check) \
-     check=(png_size_t)fread(data,(png_size_t)1,length,file)
-#  define WRITEFILE(file, data, length, check) \
-     check=(png_size_t)fwrite(data,(png_size_t)1, length, file)
-#  define FCLOSE(file) fclose(file)
 #endif
 
-#if defined(PNG_NO_STDIO)
-#  if defined(_WIN32_WCE)
-     typedef HANDLE                png_FILE_p;
-#  else
-     typedef FILE                * png_FILE_p;
-#  endif
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef PNG_NO_STDIO
+   typedef FILE * png_FILE_p;
 #endif
 
 /* Makes pngtest verbose so we can find problems (needs to be before png.h) */
@@ -116,14 +100,8 @@ static int status_dots_requested=0;
 static int status_dots=1;
 
 void
-#ifdef PNG_1_0_X
-PNGAPI
-#endif
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
 void
-#ifdef PNG_1_0_X
-PNGAPI
-#endif
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
     if(png_ptr == NULL || row_number > PNG_UINT_31_MAX) return;
@@ -143,14 +121,8 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 }
 
 void
-#ifdef PNG_1_0_X
-PNGAPI
-#endif
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
 void
-#ifdef PNG_1_0_X
-PNGAPI
-#endif
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
     if(png_ptr == NULL || row_number > PNG_UINT_31_MAX || pass > 7) return;
@@ -164,14 +136,8 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
    5 in case illegal filter values are present.) */
 static png_uint_32 filters_used[256];
 void
-#ifdef PNG_1_0_X
-PNGAPI
-#endif
 count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data);
 void
-#ifdef PNG_1_0_X
-PNGAPI
-#endif
 count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
     if(png_ptr != NULL && row_info != NULL)
@@ -186,14 +152,8 @@ count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 static png_uint_32 zero_samples;
 
 void
-#ifdef PNG_1_0_X
-PNGAPI
-#endif
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data);
 void
-#ifdef PNG_1_0_X
-PNGAPI
-#endif
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    png_bytep dp = data;
@@ -302,8 +262,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    /* fread() returns 0 on error, so it is OK to store this in a png_size_t
     * instead of an int, which is what fread() actually returns.
     */
-   READFILE((png_FILE_p)png_ptr->io_ptr, data, length, check);
-
+   check = (png_size_t)fread(data, 1, length, (png_FILE_p)png_ptr->io_ptr);
    if (check != length)
    {
       png_error(png_ptr, "Read Error!");
@@ -330,7 +289,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)n_data == data)
    {
-      READFILE(io_ptr, n_data, length, check);
+      check = (png_size_t)fread(n_data, 1, length, io_ptr);
    }
    else
    {
@@ -341,7 +300,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       do
       {
          read = MIN(NEAR_BUF_SIZE, remaining);
-         READFILE(io_ptr, buf, 1, err);
+         err = (png_size_t)fread(buf, 1, 1, io_ptr);
          png_memcpy(data, buf, read); /* copy far buffer to near buffer */
          if(err != read)
             break;
@@ -363,12 +322,10 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 static void
 pngtest_flush(png_structp png_ptr)
 {
-#if !defined(_WIN32_WCE)
    png_FILE_p io_ptr;
    io_ptr = (png_FILE_p)CVT_PTR((png_ptr->io_ptr));
    if (io_ptr != NULL)
       fflush(io_ptr);
-#endif
 }
 #endif
 
@@ -382,7 +339,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_uint_32 check;
 
-   WRITEFILE((png_FILE_p)png_ptr->io_ptr,  data, length, check);
+   check = (png_size_t)fwrite(data, 1, length, (png_FILE_p)png_ptr->io_ptr);
    if (check != length)
    {
       png_error(png_ptr, "Write Error");
@@ -409,7 +366,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
    if ((png_bytep)near_data == data)
    {
-      WRITEFILE(io_ptr, near_data, length, check);
+      check = (png_size_t)fwrite(near_data, 1, length, io_ptr);
    }
    else
    {
@@ -421,7 +378,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
       {
          written = MIN(NEAR_BUF_SIZE, remaining);
          png_memcpy(buf, data, written); /* copy far buffer to near buffer */
-         WRITEFILE(io_ptr, buf, written, err);
+         err = (png_size_t)fwrite(buf, 1, written, io_ptr);
          if (err != written)
             break;
          else
@@ -620,33 +577,20 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif
 
-#if defined(_WIN32_WCE)
-   TCHAR path[MAX_PATH];
-#endif
    char inbuf[256], outbuf[256];
 
    row_buf = NULL;
 
-#if defined(_WIN32_WCE)
-   MultiByteToWideChar(CP_ACP, 0, inname, -1, path, MAX_PATH);
-   if ((fpin = CreateFile(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL)) == INVALID_HANDLE_VALUE)
-#else
    if ((fpin = fopen(inname, "rb")) == NULL)
-#endif
    {
       fprintf(STDERR, "Could not find input file %s\n", inname);
       return (1);
    }
 
-#if defined(_WIN32_WCE)
-   MultiByteToWideChar(CP_ACP, 0, outname, -1, path, MAX_PATH);
-   if ((fpout = CreateFile(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL)) == INVALID_HANDLE_VALUE)
-#else
    if ((fpout = fopen(outname, "wb")) == NULL)
-#endif
    {
       fprintf(STDERR, "Could not open output file %s\n", outname);
-      FCLOSE(fpin);
+      fclose(fpin);
       return (1);
    }
 
@@ -701,8 +645,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
 #endif
-      FCLOSE(fpin);
-      FCLOSE(fpout);
+      fclose(fpin);
+      fclose(fpout);
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
@@ -723,8 +667,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_WRITE_SUPPORTED
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
 #endif
-      FCLOSE(fpin);
-      FCLOSE(fpout);
+      fclose(fpin);
+      fclose(fpout);
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
@@ -1208,30 +1152,20 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
    png_debug(0, "Destruction complete.\n");
 
-   FCLOSE(fpin);
-   FCLOSE(fpout);
+   fclose(fpin);
+   fclose(fpout);
 
    png_debug(0, "Opening files for comparison\n");
-#if defined(_WIN32_WCE)
-   MultiByteToWideChar(CP_ACP, 0, inname, -1, path, MAX_PATH);
-   if ((fpin = CreateFile(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL)) == INVALID_HANDLE_VALUE)
-#else
    if ((fpin = fopen(inname, "rb")) == NULL)
-#endif
    {
       fprintf(STDERR, "Could not find file %s\n", inname);
       return (1);
    }
 
-#if defined(_WIN32_WCE)
-   MultiByteToWideChar(CP_ACP, 0, outname, -1, path, MAX_PATH);
-   if ((fpout = CreateFile(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL)) == INVALID_HANDLE_VALUE)
-#else
    if ((fpout = fopen(outname, "rb")) == NULL)
-#endif
    {
       fprintf(STDERR, "Could not find file %s\n", outname);
-      FCLOSE(fpin);
+      fclose(fpin);
       return (1);
    }
 
@@ -1239,8 +1173,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_size_t num_in, num_out;
 
-      READFILE(fpin, inbuf, 1, num_in);
-      READFILE(fpout, outbuf, 1, num_out);
+      num_in = (png_size_t)fread(inbuf, 1, 1, fpin);
+      num_out = (png_size_t)fread(outbuf, 1, 1, fpout);
 
       if (num_in != num_out)
       {
@@ -1258,8 +1192,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
               ZLIB_VERSION);
             wrote_question=1;
          }
-         FCLOSE(fpin);
-         FCLOSE(fpout);
+         fclose(fpin);
+         fclose(fpout);
          return (0);
       }
 
@@ -1281,14 +1215,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
               ZLIB_VERSION);
             wrote_question=1;
          }
-         FCLOSE(fpin);
-         FCLOSE(fpout);
+         fclose(fpin);
+         fclose(fpout);
          return (0);
       }
    }
 
-   FCLOSE(fpin);
-   FCLOSE(fpout);
+   fclose(fpin);
+   fclose(fpout);
 
    return (0);
 }
@@ -1549,4 +1483,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_10rc1 your_png_h_is_not_version_1_2_10rc1;
+typedef version_1_4_0beta1 your_png_h_is_not_version_1_4_0beta1;

@@ -1,5 +1,5 @@
 
-Libpng 1.2.10rc1 - April 19, 2006
+Libpng 1.4.0beta1 - April 20, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.2.10rc1.tar.gz
-   1.2.10rc1.tar.bz2
+   1.4.0beta1.tar.gz
+   1.4.0beta1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.2.10rc1-no-config.tar.gz
-   1.2.10rc1-no-config.tar.bz2
+   1.4.0beta1-no-config.tar.gz
+   1.4.0beta1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1210r01.zip
-   lp1210r01.tar.bz2
+   lp140b01.zip
+   lp140b01.tar.bz2
 
 Project files
 
-   1.2.10rc1-project-netware.zip
-   1.2.10rc1-project-wince.zip
+   1.4.0beta1-project-netware.zip
+   1.4.0beta1-project-wince.zip
 
 Other information:
 
-   1.2.10rc1-README.txt
-   1.2.10rc1-KNOWNBUGS.txt
-   1.2.10rc1-LICENSE.txt
-   1.2.10rc1-Y2K-compliance.txt
+   1.4.0beta1-README.txt
+   1.4.0beta1-KNOWNBUGS.txt
+   1.4.0beta1-LICENSE.txt
+   1.4.0beta1-Y2K-compliance.txt
 
 Changes since the last public release (1.2.9):
 
@@ -64,9 +64,26 @@ version 1.2.10beta6 [April 17, 2006]
 version 1.2.10beta7 [April 18, 2006]
   Change "exec_prefix=$prefix" to "exec_prefix=$(prefix)" in makefiles.
 
-version 1.2.10beta8 [April 19, 2006]
+version 1.2.10rc1 [April 19, 2006]
   Ensure pngconf.h doesn't define both PNG_USE_PNGGCCRD and PNG_USE_PNGVCRD
   Fixed "LN_FS" typo in makefile.sco and makefile.solaris.
+
+version 1.2.10rc2 [April 19, 2006]
+  Added a backslash between -DPNG_CONFIGURE_LIBPNG and -DPNG_NO_ASSEMBLER_CODE
+    in configure.ac
+  Made the configure warning about versioned symbols less arrogant.
+
+version 1.4.0beta1 [April 20, 2006]
+  Enabled iTXt support (changes png_struct, thus requires so-number change).
+  Cleaned up PNG_ASSEMBLER_CODE_SUPPORTED vs PNG_MMX_CODE_SUPPORTED
+  Eliminated PNG_1_0_X and PNG_1_2_X macros.
+  Removed deprecated functions png_read_init, png_write_init, png_info_init,
+    png_permit_empty_plte, png_set_gray_1_2_4_to_8, and removed the
+    deprecated macro PNG_MAX_UINT.
+  Moved "PNG_INTERNAL" parts of png.h and pngconf.h into pngintrn.h
+  Removed many WIN32_WCE #ifdefs (Cosmin).
+  Reduced dependency on C-runtime library when on Windows (Simon-Pierre)
+  Replaced sprintf() with png_sprintf() (Simon-Pierre)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

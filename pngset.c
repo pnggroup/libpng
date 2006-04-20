@@ -13,8 +13,8 @@
  * info struct and allows us to change the structure in the future.
  */
 
-#define PNG_INTERNAL
 #include "png.h"
+#include "pngintrn.h"
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
@@ -1055,24 +1055,6 @@ png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
 }
 #endif
 
-#if defined(PNG_1_0_X) || defined(PNG_1_2_X)
-#if defined(PNG_READ_EMPTY_PLTE_SUPPORTED) || \
-    defined(PNG_WRITE_EMPTY_PLTE_SUPPORTED)
-void PNGAPI
-png_permit_empty_plte (png_structp png_ptr, int empty_plte_permitted)
-{
-   /* This function is deprecated in favor of png_permit_mng_features()
-      and will be removed from libpng-1.3.0 */
-   png_debug(1, "in png_permit_empty_plte, DEPRECATED.\n");
-   if (png_ptr == NULL)
-      return;
-   png_ptr->mng_features_permitted = (png_byte)
-     ((png_ptr->mng_features_permitted & (~(PNG_FLAG_MNG_EMPTY_PLTE))) |
-     ((empty_plte_permitted & PNG_FLAG_MNG_EMPTY_PLTE)));
-}
-#endif
-#endif
-
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
 png_uint_32 PNGAPI
 png_permit_mng_features (png_structp png_ptr, png_uint_32 mng_features)
@@ -1185,7 +1167,6 @@ png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
 }
 
 
-#ifndef PNG_1_0_X
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 /* this function was added to libpng 1.2.0 and should always exist by default */
 void PNGAPI
@@ -1198,13 +1179,13 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
        return;
 
     settable_mmx_flags =
-#ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+#ifdef PNG_HAVE_MMX_COMBINE_ROW
                          PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  |
 #endif
-#ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
+#ifdef PNG_HAVE_MMX_READ_INTERLACE
                          PNG_ASM_FLAG_MMX_READ_INTERLACE    |
 #endif
-#ifdef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+#ifdef PNG_HAVE_MMX_READ_FILTER_ROW
                          PNG_ASM_FLAG_MMX_READ_FILTER_SUB   |
                          PNG_ASM_FLAG_MMX_READ_FILTER_UP    |
                          PNG_ASM_FLAG_MMX_READ_FILTER_AVG   |
@@ -1215,6 +1196,7 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
     /* could be some non-MMX ones in the future, but not currently: */
     settable_asm_flags = settable_mmx_flags;
 
+#ifdef PNG_MMX_CODE_SUPPORTED
     if (!(png_ptr->asm_flags & PNG_ASM_FLAG_MMX_SUPPORT_COMPILED) ||
         !(png_ptr->asm_flags & PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU))
     {
@@ -1222,6 +1204,7 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
         settable_asm_flags &= ~settable_mmx_flags;
         png_ptr->asm_flags &= ~settable_mmx_flags;
     }
+#endif
 
     /* we're replacing the settable bits with those passed in by the user,
      * so first zero them out of the master copy, then logical-OR in the
@@ -1232,7 +1215,7 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
 }
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
 
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+#ifdef PNG_MMX_CODE_SUPPORTED
 /* this function was added to libpng 1.2.0 */
 void PNGAPI
 png_set_mmx_thresholds (png_structp png_ptr,
@@ -1244,7 +1227,7 @@ png_set_mmx_thresholds (png_structp png_ptr,
     png_ptr->mmx_bitdepth_threshold = mmx_bitdepth_threshold;
     png_ptr->mmx_rowbytes_threshold = mmx_rowbytes_threshold;
 }
-#endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
+#endif /* ?PNG_MMX_CODE_SUPPORTED */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* this function was added to libpng 1.2.6 */
@@ -1261,5 +1244,4 @@ png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 
-#endif /* ?PNG_1_0_X */
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

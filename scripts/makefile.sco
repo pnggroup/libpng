@@ -7,9 +7,9 @@
 # For conditions of distribution and use, see copyright notice in png.h
 
 # Library name:
-LIBNAME = libpng12
+LIBNAME = libpng14
 PNGMAJ = 0
-PNGMIN = 1.2.10rc1
+PNGMIN = 1.4.0beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -17,8 +17,8 @@ LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).so.$(PNGVER)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.0
-OLDSOVER=libpng.so.0.$(PNGMIN)
+OLDSOMAJ=libpng.so.14
+OLDSOVER=libpng.so.14.$(PNGMIN)
 
 # Utilities:
 CC=cc
@@ -39,7 +39,7 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CFLAGS= -dy -belf -I$(ZLIBINC) -O3
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -lm
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz -lm
 
 INCPATH=$(prefix)/include/libpng
 LIBPATH=$(exec_prefix)/lib
@@ -87,7 +87,7 @@ libpng-config:
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo ccopts=\"-belf\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng12 -lz -lm\"; \
+	echo libs=\"-lpng14 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -206,20 +206,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h
-pngerror.o pngerror.pic.o: png.h pngconf.h
-pngrio.o pngrio.pic.o: png.h pngconf.h
-pngwio.o pngwio.pic.o: png.h pngconf.h
-pngmem.o pngmem.pic.o: png.h pngconf.h
-pngset.o pngset.pic.o: png.h pngconf.h
-pngget.o pngget.pic.o: png.h pngconf.h
-pngread.o pngread.pic.o: png.h pngconf.h
-pngrtran.o pngrtran.pic.o: png.h pngconf.h
-pngrutil.o pngrutil.pic.o: png.h pngconf.h
-pngtrans.o pngtrans.pic.o: png.h pngconf.h
-pngwrite.o pngwrite.pic.o: png.h pngconf.h
-pngwtran.o pngwtran.pic.o: png.h pngconf.h
-pngwutil.o pngwutil.pic.o: png.h pngconf.h
-pngpread.o pngpread.pic.o: png.h pngconf.h
+png.o png.pic.o: png.h pngconf.h pngintrn.h
+pngerror.o pngerror.pic.o: png.h pngconf.h pngintrn.h
+pngrio.o pngrio.pic.o: png.h pngconf.h pngintrn.h
+pngwio.o pngwio.pic.o: png.h pngconf.h pngintrn.h
+pngmem.o pngmem.pic.o: png.h pngconf.h pngintrn.h
+pngset.o pngset.pic.o: png.h pngconf.h pngintrn.h
+pngget.o pngget.pic.o: png.h pngconf.h pngintrn.h
+pngread.o pngread.pic.o: png.h pngconf.h pngintrn.h
+pngrtran.o pngrtran.pic.o: png.h pngconf.h pngintrn.h
+pngrutil.o pngrutil.pic.o: png.h pngconf.h pngintrn.h
+pngtrans.o pngtrans.pic.o: png.h pngconf.h pngintrn.h
+pngwrite.o pngwrite.pic.o: png.h pngconf.h pngintrn.h
+pngwtran.o pngwtran.pic.o: png.h pngconf.h pngintrn.h
+pngwutil.o pngwutil.pic.o: png.h pngconf.h pngintrn.h
+pngpread.o pngpread.pic.o: png.h pngconf.h pngintrn.h
 
-pngtest.o: png.h pngconf.h
+pngtest.o: png.h pngconf.h pngintrn.h
