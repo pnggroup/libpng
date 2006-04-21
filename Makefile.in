@@ -1258,19 +1258,16 @@ install-data-hook:
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
-# do evil things to libpng to cause libpng14 to be used, if
-# the compat library is not being built do nothing.
+# do evil things to libpng to cause libpng14 to be used
 install-exec-hook:
 	cd $(DESTDIR)$(bindir); rm -f libpng-config
 	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
-	@if test -n "@compatlib@"; then\
-		set -x;\
-		cd $(DESTDIR)$(libdir);\
-		for ext in a la so; do\
-			rm -f libpng.$$ext;\
-			$(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
-		done;\
-	fi
+	@set -x;\
+	cd $(DESTDIR)$(libdir);\
+	for ext in a la so; do\
+		rm -f libpng.$$ext;\
+		$(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
+	done
 
 uninstall-hook:
 	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h

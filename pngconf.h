@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta1 - April 20, 2006
+ * libpng version 1.4.0beta2 - April 21, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2005 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1330,46 +1330,6 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define PNG_ZBUF_SIZE 65536L
 #endif
 
-#ifdef PNG_READ_SUPPORTED
-/* Prior to libpng-1.0.9, this block was in pngasmrd.h */
-#if defined(PNG_INTERNAL)
-
-/* These are the default thresholds before the MMX code kicks in; if either
- * rowbytes or bitdepth is below the threshold, plain C code is used.  These
- * can be overridden at runtime via the png_set_mmx_thresholds() call in
- * libpng 1.2.0 and later.  The values below were chosen by Intel.
- */
-
-#ifndef PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT
-#  define PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT  128  /*  >=  */
-#endif
-#ifndef PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT
-#  define PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT  9    /*  >=  */   
-#endif
-
-/* Set this in the makefile for VC++ on Pentium, not here. */
-/* Platform must be Pentium.  Makefile must assemble and load pngvcrd.c .
- * MMX will be detected at run time and used if present.
- */
-#ifdef PNG_USE_PNGVCRD
-#  define PNG_HAVE_MMX_COMBINE_ROW
-#  define PNG_HAVE_MMX_READ_INTERLACE
-#  define PNG_HAVE_MMX_READ_FILTER_ROW
-#endif
-
-/* Set this in the makefile for gcc/as on Pentium, not here. */
-/* Platform must be Pentium.  Makefile must assemble and load pnggccrd.c .
- * MMX will be detected at run time and used if present.
- */
-#ifdef PNG_USE_PNGGCCRD
-#  define PNG_HAVE_MMX_COMBINE_ROW
-#  define PNG_HAVE_MMX_READ_INTERLACE
-#  define PNG_HAVE_MMX_READ_FILTER_ROW
-#endif
-/* - see pnggccrd.c for info about what is currently enabled */
-
-#endif /* PNG_INTERNAL */
-#endif /* PNG_READ_SUPPORTED */
 
 /* Added at libpng-1.2.8 */
 #endif /* PNG_VERSION_INFO_ONLY */

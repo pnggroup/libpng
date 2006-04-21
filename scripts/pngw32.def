@@ -5,9 +5,8 @@
 LIBRARY
 
 EXPORTS
-;Version 1.4.0beta1
+;Version 1.4.0beta2
   png_build_grayscale_palette  @1
-  png_check_sig        @2
   png_chunk_error      @3
   png_chunk_warning      @4
   png_convert_from_struct_tm   @5
@@ -76,15 +75,11 @@ EXPORTS
   png_malloc    @68
   png_memcpy_check    @69
   png_memset_check    @70
-; png_permit_empty_plte is deprecated
-  png_permit_empty_plte  @71
   png_process_data    @72
   png_progressive_combine_row  @73
   png_read_end    @74
   png_read_image    @75
   png_read_info    @76
-; png_read_init is deprecated
-  png_read_init    @77
   png_read_png    @78
   png_read_row    @79
   png_read_rows    @80
@@ -169,17 +164,10 @@ EXPORTS
   png_write_image    @159
   png_write_info    @160
   png_write_info_before_PLTE  @161
-; png_write_init is deprecated
-  png_write_init    @162
   png_write_png    @163
   png_write_row    @164
   png_write_rows    @165
-; png_read_init_2 and png_write_init_2 are deprecated.
-  png_read_init_2    @166
-  png_write_init_2    @167
   png_access_version_number  @168
-;  png_sig_bytes    @169
-;  png_libpng_ver    @170
   png_init_io    @171
   png_convert_to_rfc1123     @172
   png_set_invalid  @173

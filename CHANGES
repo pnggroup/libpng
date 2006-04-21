@@ -1557,6 +1557,10 @@ version 1.2.10rc2 [April 19, 2006]
    in configure.ac and configure
   Made the configure warning about versioned symbols less arrogant.
 
+version 1.2.10rc3 [April 21, 2006]
+  Added a note in libpng.txt that png_set_sig_bytes(8) can be used when
+    writing an embedded PNG without the 8-byte signature.
+
 version 1.4.0beta1 [April 20, 2006]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Cleaned up PNG_ASSEMBLER_CODE_SUPPORTED vs PNG_MMX_CODE_SUPPORTED
@@ -1568,6 +1572,11 @@ version 1.4.0beta1 [April 20, 2006]
   Removed many WIN32_WCE #ifdefs (Cosmin).
   Reduced dependency on C-runtime library when on Windows (Simon-Pierre)
   Replaced sprintf() with png_sprintf() (Simon-Pierre)
+
+version 1.4.0beta2 [April 21, 2006]
+  Revised makefiles and configure to avoid making links to libpng.so.*
+  Moved some leftover MMX-related defines from pngconf.h to pngintrn.h
+  Updated scripts/pngos2.def, pngw32.def, and projects/wince/png32ce.def
 
 version 1.4.0betaN [future]
   Cleaned up error and warning messages.

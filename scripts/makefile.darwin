@@ -19,7 +19,7 @@ ZLIBINC=../zlib
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 0
-PNGMIN = 1.4.0beta1
+PNGMIN = 1.4.0beta2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -27,8 +27,6 @@ LIBSO=$(LIBNAME).dylib
 LIBSOMAJ=$(LIBNAME).$(PNGMAJ).dylib
 LIBSOVER=$(LIBNAME).$(PNGVER).dylib
 OLDSO=libpng.dylib
-OLDSOMAJ=libpng.14.dylib
-OLDSOVER=libpng.14.$(PNGMIN).dylib
 
 # Utilities:
 CC=cc
@@ -104,13 +102,6 @@ $(LIBSOVER): $(OBJSDLL)
 	 -o $(LIBSOVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
-$(OLDSOVER): $(OBJSDLL)
-	$(CC) -dynamiclib \
-	 -install_name $(LIBPATH)/$(OLDSOMAJ) \
-	 -current_version 3 -compatibility_version 3 \
-	 -o $(OLDSOVER) \
-	 $(OBJSDLL) -L$(ZLIBLIB) -lz
-
 pngtest: pngtest.o $(LIBSO)
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
@@ -134,24 +125,19 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBSO) libpng.pc \
-	$(OLDSOVER)
+install-shared: install-headers $(LIBSO) libpng.pc
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	-@$(RM_F) $(DL)/$(LIBNAME).$(PNGVER)*.dylib
 	-@$(RM_F) $(DL)/$(LIBNAME).$(PNGMAJ)*.dylib
 	-@$(RM_F) $(DL)/$(LIBSO)
 	-@$(RM_F) $(DL)/$(OLDSO)
-	-@$(RM_F) $(DL)/$(OLDSOMAJ)
 	-@$(RM_F) $(DL)/libpng.3.$(PNGMIN)*.dylib
 	cp $(LIBSOVER) $(DL)
-	cp $(OLDSOVER) $(DL)
 	chmod 755 $(DL)/$(LIBSOVER)
-	chmod 755 $(DL)/$(OLDSOVER)
 	(cd $(DL); \
-	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
-	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
 	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
-	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO); \
+	$(LN_SF) $(OLDSO) $(LIBSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -202,7 +188,6 @@ test-installed:
 
 clean:
 	$(RM_F) *.o libpng.a pngtest pngout.png libpng-config \
-	$(OLDSOVER) \
 	libpng.pc $(LIBNAME).*dylib pngtesti
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO

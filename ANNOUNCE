@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta1 - April 20, 2006
+Libpng 1.4.0beta2 - April 21, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta1.tar.gz
-   1.4.0beta1.tar.bz2
+   1.4.0beta2.tar.gz
+   1.4.0beta2.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta1-no-config.tar.gz
-   1.4.0beta1-no-config.tar.bz2
+   1.4.0beta2-no-config.tar.gz
+   1.4.0beta2-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b01.zip
-   lp140b01.tar.bz2
+   lp140b02.zip
+   lp140b02.tar.bz2
 
 Project files
 
-   1.4.0beta1-project-netware.zip
-   1.4.0beta1-project-wince.zip
+   1.4.0beta2-project-netware.zip
+   1.4.0beta2-project-wince.zip
 
 Other information:
 
-   1.4.0beta1-README.txt
-   1.4.0beta1-KNOWNBUGS.txt
-   1.4.0beta1-LICENSE.txt
-   1.4.0beta1-Y2K-compliance.txt
+   1.4.0beta2-README.txt
+   1.4.0beta2-KNOWNBUGS.txt
+   1.4.0beta2-LICENSE.txt
+   1.4.0beta2-Y2K-compliance.txt
 
 Changes since the last public release (1.2.9):
 
@@ -73,6 +73,10 @@ version 1.2.10rc2 [April 19, 2006]
     in configure.ac
   Made the configure warning about versioned symbols less arrogant.
 
+version 1.2.10rc3 [April 21, 2006]
+  Added a note in libpng.txt that png_set_sig_bytes(8) can be used when
+    writing an embedded PNG without the 8-byte signature.
+
 version 1.4.0beta1 [April 20, 2006]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Cleaned up PNG_ASSEMBLER_CODE_SUPPORTED vs PNG_MMX_CODE_SUPPORTED
@@ -84,6 +88,11 @@ version 1.4.0beta1 [April 20, 2006]
   Removed many WIN32_WCE #ifdefs (Cosmin).
   Reduced dependency on C-runtime library when on Windows (Simon-Pierre)
   Replaced sprintf() with png_sprintf() (Simon-Pierre)
+
+version 1.4.0beta2 [April 21, 2006]
+  Revised makefiles to avoid making links to libpng.so.*
+  Moved some leftover MMX-related defines from pngconf.h to pngintrn.h
+  Updated scripts/pngos2.def, pngw32.def, and projects/wince/png32ce.def
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
