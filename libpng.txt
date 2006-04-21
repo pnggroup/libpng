@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.10rc2 - April 19, 2006
+ libpng version 1.2.10rc3 - April 21, 2006
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -1601,6 +1601,14 @@ Libpng section below.
 
     png_init_io(png_ptr, fp);
 
+If you are embedding your PNG into a datastream such as MNG, and don't
+want libpng to write the 8-byte signature, or if you have already
+written the signature in your application, use
+
+    png_set_sig_bytes(png_ptr, 8);
+
+to inform libpng that it should not write a signature.
+
 Write callbacks
 
 At this point, you can set up a callback function that will be
@@ -2909,13 +2917,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-April 19, 2006
+April 21, 2006
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.10rc2 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.10rc3 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

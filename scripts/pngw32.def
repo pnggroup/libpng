@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.2.10rc2
+;Version 1.2.10rc3
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -114,7 +114,8 @@ EXPORTS
   png_set_gAMA    @104
   png_set_gAMA_fixed  @105
   png_set_gamma    @106
-  png_set_gray_1_2_4_to_8  @107 ; deprecated
+; png_set_gray_1_2_4_to_8 is deprecated
+  png_set_gray_1_2_4_to_8  @107
   png_set_gray_to_rgb  @108
   png_set_hIST    @109
   png_set_iCCP    @110
@@ -178,14 +179,14 @@ EXPORTS
   png_read_init_2    @166
   png_write_init_2    @167
   png_access_version_number  @168
-;  png_sig_bytes    @169
-;  png_libpng_ver    @170
+  png_sig_bytes    @169
+  png_libpng_ver    @170
   png_init_io    @171
   png_convert_to_rfc1123     @172
   png_set_invalid  @173
 ; Added at version 1.0.12
 ; For compatibility with 1.0.7-1.0.11
-  png_info_init @174
+; png_info_init @174
   png_read_init_3    @175
   png_write_init_3    @176
   png_info_init_3 @177
@@ -201,13 +202,13 @@ EXPORTS
   png_permit_mng_features  @184
 ; MMX support
   png_mmx_support  @185
-  png_get_mmx_flagmask  @186
+; png_get_mmx_flagmask  @186
   png_get_asm_flagmask  @187
   png_get_asm_flags  @188
-  png_get_mmx_bitdepth_threshold  @189
-  png_get_mmx_rowbytes_threshold  @190
+; png_get_mmx_bitdepth_threshold  @189
+; png_get_mmx_rowbytes_threshold  @190
   png_set_asm_flags  @191
-  png_init_mmx_flags  @192
+; png_init_mmx_flags  @192
 ; Strip error numbers
   png_set_strip_error_numbers @193
 ; Added at version 1.2.2
