@@ -1557,10 +1557,13 @@ version 1.2.10rc2 [April 20, 2006]
    in configure.ac and configure
   Made the configure warning about versioned symbols less arrogant.
 
-version 1.2.10rc2 [April 21, 2006]
+version 1.2.10rc3 [April 21, 2006]
   Added a note in libpng.txt that png_set_sig_bytes(8) can be used when
     writing an embedded PNG without the 8-byte signature.
   Revised makefiles and configure to avoid making links to libpng.so.*
+
+version 1.2.10 [April 23, 2006]
+  Reverted configure to "rc2" state.
 
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
