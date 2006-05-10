@@ -1557,7 +1557,7 @@ version 1.2.10rc2 [April 19, 2006]
    in configure.ac and configure
   Made the configure warning about versioned symbols less arrogant.
 
-version 1.2.10rc3 [April 21, 2006]
+version 1.2.10rc3 [April 20, 2006]
   Added a note in libpng.txt that png_set_sig_bytes(8) can be used when
     writing an embedded PNG without the 8-byte signature.
 
@@ -1573,10 +1573,18 @@ version 1.4.0beta1 [April 20, 2006]
   Reduced dependency on C-runtime library when on Windows (Simon-Pierre)
   Replaced sprintf() with png_sprintf() (Simon-Pierre)
 
-version 1.4.0beta2 [April 21, 2006]
+version 1.4.0beta2 [April 20, 2006]
   Revised makefiles and configure to avoid making links to libpng.so.*
   Moved some leftover MMX-related defines from pngconf.h to pngintrn.h
   Updated scripts/pngos2.def, pngw32.def, and projects/wince/png32ce.def
+
+version 1.4.0beta3 [May 10, 2006]
+  Updated scripts/pngw32.def to comment out MMX functions.
+  Added PNG_NO_GET_INT_32 and PNG_NO_SAVE_INT_32 macros.
+  Scripts/libpng.pc.in contained "configure" style version info and would
+    not work with makefiles.
+  Revised pngconf.h and added pngconf.h.in so makefiles and configure can
+    pass defines to libpng and applications.
 
 version 1.4.0betaN [future]
   Cleaned up error and warning messages.

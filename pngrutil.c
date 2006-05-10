@@ -37,6 +37,7 @@ png_get_uint_32(png_bytep buf)
    return (i);
 }
 
+#if defined(PNG_GET_INT_32_SUPPORTED)
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
  * data is stored in the PNG file in two's complement format, and it is
  * assumed that the machine format for signed integers is the same. */
@@ -50,6 +51,7 @@ png_get_int_32(png_bytep buf)
 
    return (i);
 }
+#endif
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 PNGAPI

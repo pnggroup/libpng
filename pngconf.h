@@ -1,9 +1,9 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta2 - April 21, 2006
+ * libpng version 1.4.0beta3 - May 10, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2005 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -17,17 +17,11 @@
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
+/* Added at libpng-1.4.0 */
+/* Makefile-supplied defines go here: */
+/* End of Makefile-supplied defines. */
 
-/* 
- * PNG_USER_CONFIG has to be defined on the compiler command line. This
- * includes the resource compiler for Windows DLL configurations.
- */
-#ifdef PNG_USER_CONFIG
-#  ifndef PNG_USER_PRIVATEBUILD
-#    define PNG_USER_PRIVATEBUILD
-#  endif
-#include "pngusr.h"
-#endif
+/* Added at libpng-1.2.9 */
 
 /* PNG_CONFIGURE_LIBPNG is set by the "configure" script. */
 #ifdef PNG_CONFIGURE_LIBPNG
@@ -38,7 +32,18 @@
 
 /*
  * Added at libpng-1.2.8
- *  
+ * 
+ * PNG_USER_CONFIG has to be defined on the compiler command line. This
+ * includes the resource compiler for Windows DLL configurations.
+ */
+#ifdef PNG_USER_CONFIG
+#  ifndef PNG_USER_PRIVATEBUILD
+#    define PNG_USER_PRIVATEBUILD
+#  endif
+#include "pngusr.h"
+#endif
+
+/*  
  * If you create a private DLL you need to define in "pngusr.h" the followings:
  * #define PNG_USER_PRIVATEBUILD <Describes by whom and why this version of
  *        the DLL was built>
@@ -504,6 +509,13 @@
 #  endif
 #endif
 
+#if !defined(PNG_NO_GET_INT_32) || defined(PNG_READ_oFFS_SUPPORTED) || \
+    defined(PNG_READ_pCAL_SUPPORTED)
+#  ifndef PNG_GET_INT_32_SUPPORTED
+#    define PNG_GET_INT_32_SUPPORTED
+#  endif
+#endif
+
 #endif /* PNG_READ_SUPPORTED */
 
 #if defined(PNG_WRITE_SUPPORTED)
@@ -561,6 +573,13 @@
 
 #ifndef PNG_NO_WRITE_FLUSH
 #  define PNG_WRITE_FLUSH_SUPPORTED
+#endif
+
+#if !defined(PNG_NO_SAVE_INT_32) || defined(PNG_WRITE_oFFS_SUPPORTED) || \
+    defined(PNG_WRITE_pCAL_SUPPORTED)
+#  ifndef PNG_SAVE_INT_32_SUPPORTED
+#    define PNG_SAVE_INT_32_SUPPORTED
+#  endif
 #endif
 
 #endif /* PNG_WRITE_SUPPORTED */

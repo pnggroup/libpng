@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta2 - April 21, 2006
+ libpng version 1.4.0beta3 - May 10, 2006
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -2821,7 +2821,7 @@ defined:
 #if defined(PNG_USE_PNGGCCRD) && defined(PNG_MMX_CODE_SUPPORTED) \
   && defined(PNG_THREAD_UNSAFE_OK)
     /* Disable thread-unsafe features of pnggccrd */
-    if (png_access_version() >= 10200)
+    if (png_access_version_number() >= 10200)
     {
       png_uint_32 mmx_disable_mask = 0;
       png_uint_32 asm_flags;
@@ -2915,13 +2915,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-April 21, 2006
+May 10, 2006
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta2 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta3 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

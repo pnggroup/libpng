@@ -25,6 +25,7 @@ png_save_uint_32(png_bytep buf, png_uint_32 i)
    buf[3] = (png_byte)(i & 0xff);
 }
 
+#if defined(PNG_SAVE_INT_32_SUPPORTED)
 /* The png_save_int_32 function assumes integers are stored in two's
  * complement format.  If this isn't the case, then this routine needs to
  * be modified to write data in two's complement format.
@@ -37,6 +38,7 @@ png_save_int_32(png_bytep buf, png_int_32 i)
    buf[2] = (png_byte)((i >> 8) & 0xff);
    buf[3] = (png_byte)(i & 0xff);
 }
+#endif
 
 /* Place a 16-bit number into a buffer in PNG byte order.
  * The parameter is declared unsigned int, not png_uint_16,
