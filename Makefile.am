@@ -87,6 +87,16 @@ EXTRA_DIST= \
 
 CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers libpng.sym
 
+pngconf.h.in:
+	cat pngconf.h > pngconf.h.in
+
+pngconf.h:	pngconf.h.in
+	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
+	@if test -n "@LIBPNG_NO_MMX@"; then \
+	echo "#define PNG_NO_MMX_CODE" >> pngconf.h \
+	fi
+	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
+
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
 
@@ -96,9 +106,10 @@ $(PNGLIB_BASENAME)-config: libpng-config
 libpng.sym: png.h pngconf.h
 	rm -f $@ $@.new
 	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
-		$(SED) -n -e 's|^.*PNG_FUNCTION_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
-			-e 's|^.*PNG_DATA_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
-			>$@.new
+		$(SED) -n -e \
+		 's|^.*PNG_FUNCTION_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
+		-e 's|^.*PNG_DATA_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
+		>$@.new
 	mv $@.new $@
 
 libpng.vers: libpng.sym

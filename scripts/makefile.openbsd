@@ -1,5 +1,6 @@
 # makefile for libpng
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+# Copyright (C) 2006 Glenn Randers-Pehrson
 # For conditions of distribution and use, see copyright notice in png.h
 
 PREFIX?= /usr/local
@@ -7,7 +8,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.4.0beta3
+SHLIB_MINOR=	1.4.0beta4
 
 LIB=	png
 SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \
@@ -17,7 +18,23 @@ SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \
 HDRS=	png.h pngconf.h
 
 CFLAGS+= -Wall
-CPPFLAGS+= -I${.CURDIR} -DPNG_NO_MMX_CODE -DPNG_USE_PNGGCCRD
+CPPFLAGS+= -I${.CURDIR}
+
+pngconf.h.in:
+	cat pngconf.h > pngconf.h.in
+
+pngconf.h:	pngconf.h.in
+	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
+
+	/* if you want to use the intel assembler code, remove this */
+	echo "#define PNG_NO_MMX_CODE" >> pngconf.h
+	/* if you want to use the intel MMX code, also remove this */
+	echo "#define PNG_NO_ASSEMBLER_CODE" >> pngconf.h
+
+	/* if you don't need thread safety you can uncomment this */
+	# echo "#define PNG_THREAD_UNSAFE_OK" >> pngconf.h
+
+	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
 
 NOPROFILE= Yes
 

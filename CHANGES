@@ -1583,8 +1583,12 @@ version 1.4.0beta3 [May 10, 2006]
   Added PNG_NO_GET_INT_32 and PNG_NO_SAVE_INT_32 macros.
   Scripts/libpng.pc.in contained "configure" style version info and would
     not work with makefiles.
-  Revised pngconf.h and added pngconf.h.in so makefiles and configure can
+  Revised pngconf.h and added pngconf.h.in, so makefiles and configure can
     pass defines to libpng and applications.
+
+version 1.4.0beta4 [May 11, 2006]
+  Revised configure.ac, Makefile.am, and many of the makefiles to write
+    their defines in pngconf.h.
 
 version 1.4.0betaN [future]
   Cleaned up error and warning messages.

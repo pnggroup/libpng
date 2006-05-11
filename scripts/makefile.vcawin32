@@ -1,5 +1,6 @@
 # makefile for libpng
 # Copyright (C) 1998 Tim Wegner
+# Copyright (C) 2006 Glenn Randers-Pehrson
 # For conditions of distribution and use, see copyright notice in png.h
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
 # To use, do "nmake /f scripts\makefile.vcawin32"
@@ -11,7 +12,7 @@
 CC = cl
 LD = link
 AR = lib
-CFLAGS  = -DPNG_USE_PNGVCRD -nologo -MD -O2 -W3 -I..\zlib
+CFLAGS  = -nologo -MD -O2 -W3 -I..\zlib
 LDFLAGS = -nologo
 ARFLAGS = -nologo
 RM = del
@@ -31,6 +32,14 @@ OBJS  = $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)
 
 # Targets
 all: libpng.lib
+
+pngconf.h.in:
+	cat pngconf.h > pngconf.h.in
+
+pngconf.h:	pngconf.h.in
+	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
+	echo "#define PNG_USE_PNGVCRD" >> pngconf.h
+	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
 
 png$(O): png.h pngconf.h pngintrn.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)

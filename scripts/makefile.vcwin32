@@ -1,5 +1,6 @@
 # makefile for libpng
 # Copyright (C) 1998 Tim Wegner
+# Copyright (C) 2006 Glenn Randers-Pehrson
 # For conditions of distribution and use, see copyright notice in png.h
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
 # To use, do "nmake /f scripts\makefile.vcwin32"
@@ -31,10 +32,21 @@ OBJS  = $(OBJS1) $(OBJS2) $(OBJS3)
 # Targets
 all: libpng.lib
 
+pngconf.h.in:
+	cat pngconf.h > pngconf.h.in
+
+pngconf.h:	pngconf.h.in
+	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
+	echo "#define PNG_NO_MMX_CODE" >> pngconf.h
+	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
+
 png$(O): png.h pngconf.h pngintrn.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngset$(O): png.h pngconf.h pngintrn.h
+	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+pnggccrd$(O): png.h pngconf.h pngintrn.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngget$(O): png.h pngconf.h pngintrn.h

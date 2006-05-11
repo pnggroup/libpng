@@ -20,7 +20,7 @@ LN_SF = ln -f -s
 
 LIBNAME=libpng14
 PNGMAJ = 0
-PNGMIN = 1.4.0beta3
+PNGMIN = 1.4.0beta4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -56,7 +56,8 @@ E=
 # Variables
 OBJS = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
 	pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) pngset$(O) \
-	pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
+	pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O) \
+	pnggccrd$(O)
 
 # Targets
 all: $(LIBNAME)$(A) pngtest$(E)
@@ -96,6 +97,7 @@ clean:
 
 png$(O): png.h pngconf.h pngintrn.h
 pngerror$(O): png.h pngconf.h pngintrn.h
+pnggccrd$(O): png.h pngconf.h pngintrn.h
 pngget$(O): png.h pngconf.h pngintrn.h
 pngmem$(O): png.h pngconf.h pngintrn.h
 pngpread$(O): png.h pngconf.h pngintrn.h

@@ -18,12 +18,12 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.4.0beta3], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.4.0beta4], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.4.0beta3
+PNGLIB_VERSION=1.4.0beta4
 PNGLIB_MAJOR=14
 PNGLIB_MINOR=0
 
@@ -62,14 +62,16 @@ AC_MSG_CHECKING([if pnggccrd.c can be compiled without -DPNG_NO_MMX_CODE])
 AC_TRY_COMPILE(
   [#include "pnggccrd.c"],
   [return 0;],
-  LIBPNG_DEFINES=,
-  LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG\ -DPNG_NO_MMX_CODE)
-if test "$LIBPNG_DEFINES"; then
+  LIBPNG_NO_MMX=,
+  LIBPNG_NO_MMX=true)
+if test "$LIBPNG_NO_MMX"; then
     AC_MSG_RESULT(no)
 else
     AC_MSG_RESULT(yes)
-    LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 fi
+AC_SUBST(LIBPNG_NO_MMX)
+
+LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 AC_SUBST(LIBPNG_DEFINES)
 
 AC_MSG_CHECKING([if libraries can be versioned])

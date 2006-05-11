@@ -1,5 +1,5 @@
 # makefile for libpng under FreeBSD
-# Copyright (C) 2002 Glenn Randers-Pehrson and Andrey A. Chernov
+# Copyright (C) 2002, 2006 Glenn Randers-Pehrson and Andrey A. Chernov
 # For conditions of distribution and use, see copyright notice in png.h
 
 PREFIX?=        /usr/local
@@ -24,10 +24,19 @@ SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 
-CFLAGS+= -I. -DPNG_USE_PNGGCCRD
+pngconf.h.in:
+	cat pngconf.h > pngconf.h.in
+
+pngconf.h:	pngconf.h.in
+	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
 .if (${MACHINE_ARCH} != "i386")
-CFLAGS+= -DPNG_NO_MMX_CODE
+	/* uncoment this if you don't need thread safety */
+	# echo "#define PNG_THREAD_UNSAFE_OK" >> pngconf.h
+.else
+	echo "#define PNG_NO_MMX_CODE" >> pngconf.h
 .endif
+	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
+
 
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \

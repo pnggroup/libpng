@@ -1,4 +1,5 @@
 # makefile for libpng
+# Copyright (C) 2006 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
@@ -26,6 +27,9 @@ png$(O): png.h pngconf.h pngintrn.h
 		  $(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngset$(O): png.h pngconf.h pngintrn.h
+	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
+
+pnggccrd$(O): png.h pngconf.h pngintrn.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngget$(O): png.h pngconf.h pngintrn.h

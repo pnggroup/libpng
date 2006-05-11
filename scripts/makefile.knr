@@ -1,5 +1,5 @@
 # makefile for libpng
-# Copyright (C) 2002 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2006 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
@@ -87,6 +87,7 @@ pngrio.o: png.h pngconf.h pntintrn.h
 pngwio.o: png.h pngconf.h pntintrn.h
 pngmem.o: png.h pngconf.h pntintrn.h
 pngset.o: png.h pngconf.h pntintrn.h
+pnggccrd.o: png.h pngconf.h pntintrn.h
 pngget.o: png.h pngconf.h pntintrn.h
 pngread.o: png.h pngconf.h pntintrn.h
 pngpread.o: png.h pngconf.h pntintrn.h

@@ -31,10 +31,6 @@ endif
 
 DESTDIR=
 
-# To enable assembler optimizations, add '-DPNG_USE_PNGGCCRD' to
-# $CFLAGS, and include pnggccrd.o in $OBJS, below, and in the dependency
-# list at the bottom of this makefile.
-
 CC=gcc
 ifdef MINGW
 MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
@@ -62,17 +58,6 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 
-### if you use the asm, add pnggccrd.o to the OBJS list
-###
-### if you don't need thread safety, but want the asm accel
-#CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD \
-#	$(addprefix -I,$(ZLIBINC)) -Wall -O3 $(ALIGN) -funroll-loops \
-#	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
-### if you need thread safety and want (minimal) asm accel
-#CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_USE_PNGGCCRD $(addprefix -I,$(ZLIBINC)) \
-#	-Wall -O3 $(ALIGN) -funroll-loops \
-#	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
-### Normal (non-asm) compilation
 CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
         -Wall -O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer) # $(WARNMORE) -g -DPNG_DEBUG=5
@@ -80,7 +65,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng14
 PNGMAJ = 0
 CYGDLL = 14
-PNGMIN = 1.4.0beta3
+PNGMIN = 1.4.0beta4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
@@ -128,6 +113,20 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 all: all-static all-shared libpng.pc libpng-config libpng.pc libpng-config
+
+pngconf.h.in:
+	cat pngconf.h > pngconf.h.in
+
+pngconf.h:	pngconf.h.in
+	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
+
+	/* if you don't want to use the intel MMX code, uncomment this */
+	# echo "#define PNG_NO_MMX_CODE" >> pngconf.h
+
+	/* if you don't need thread safety you can uncomment this */
+	# echo "#define PNG_THREAD_UNSAFE_OK" >> pngconf.h
+
+	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
 
 # Make this to verify that "make [...] install" will do what you want.
 buildsetup-tell:
@@ -299,6 +298,7 @@ pngrio.o pngrio.pic.o:		png.h pngconf.h pngintrn.h pngrio.c
 pngwio.o pngwio.pic.o:		png.h pngconf.h pngintrn.h pngwio.c
 pngmem.o pngmem.pic.o:		png.h pngconf.h pngintrn.h pngmem.c
 pngset.o pngset.pic.o:		png.h pngconf.h pngintrn.h pngset.c
+pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pngintrn.h pngget.c
 pngget.o pngget.pic.o:		png.h pngconf.h pngintrn.h pngget.c
 pngread.o pngread.pic.o:	png.h pngconf.h pngintrn.h pngread.c
 pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngintrn.h pngrtran.c

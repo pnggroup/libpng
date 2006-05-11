@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 0
-PNGMIN = 1.4.0beta3
+PNGMIN = 1.4.0beta4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -78,6 +78,14 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 
 all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
+pngconf.h.in:
+	cat pngconf.h > pngconf.h.in
+
+pngconf.h:	pngconf.h.in
+	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
+	echo "#define PNG_NO_MMX_CODE" >> pngconf.h
+	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
+
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
@@ -89,7 +97,7 @@ libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo cppflags=\"-DPNG_USE_PNGGCCRD -DPNG_NO_MMX_CODE\"; \
+	echo cppflags=\"\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo R_opts=\"-R$(LIBPATH)\"; \
 	echo libs=\"-lpng14 -lz -lm\"; \
@@ -218,7 +226,9 @@ pngrio.o pngrio.pic.o: png.h pngconf.h pngintrn.h
 pngwio.o pngwio.pic.o: png.h pngconf.h pngintrn.h
 pngmem.o pngmem.pic.o: png.h pngconf.h pngintrn.h
 pngset.o pngset.pic.o: png.h pngconf.h pngintrn.h
+pnggccrd.o pnggccrd.pic.o: png.h pngconf.h pngintrn.h
 pngget.o pngget.pic.o: png.h pngconf.h pngintrn.h
+pnggccrd.o pngget.pic.o: png.h pngconf.h pngintrn.h
 pngread.o pngread.pic.o: png.h pngconf.h pngintrn.h
 pngrtran.o pngrtran.pic.o: png.h pngconf.h pngintrn.h
 pngrutil.o pngrutil.pic.o: png.h pngconf.h pngintrn.h
