@@ -1590,6 +1590,10 @@ version 1.4.0beta4 [May 11, 2006]
   Revised configure.ac, Makefile.am, and many of the makefiles to write
     their defines in pngconf.h.
 
+version 1.4.0beta5 [May 15, 2006]
+  Added a missing semicolon in Makefile.am and Makefile.in
+  Deleted extraneous square brackets from configure.ac
+
 version 1.4.0betaN [future]
   Cleaned up error and warning messages.
   Implemented sTER chunk.
