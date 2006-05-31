@@ -1,53 +1,91 @@
 
-Libpng 1.2.10 - April 23, 2006
+Libpng 1.2.11beta1 - May 31, 2006
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.10.tar.gz
-   libpng-1.2.10.tar.bz2
+   libpng-1.2.11beta1.tar.gz
+   libpng-1.2.11beta1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.10-no-config.tar.gz
-   libpng-1.2.10-no-config.tar.bz2
+   libpng-1.2.11beta1-no-config.tar.gz
+   libpng-1.2.11beta1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1210.zip
-   lpng1210.tar.bz2
+   lp1211b01.zip
+   lp1211b01.tar.bz2
 
 Project files
 
-   libpng-1.2.10-project-netware.zip
-   libpng-1.2.10-project-wince.zip
+   libpng-1.2.11beta1-project-netware.zip
+   libpng-1.2.11beta1-project-wince.zip
 
 Other information:
 
-   libpng-1.2.10-README.txt
-   libpng-1.2.10-KNOWNBUGS.txt
-   libpng-1.2.10-LICENSE.txt
-   libpng-1.2.10-Y2K-compliance.txt
+   libpng-1.2.11beta1-README.txt
+   libpng-1.2.11beta1-KNOWNBUGS.txt
+   libpng-1.2.11beta1-LICENSE.txt
+   libpng-1.2.11beta1-Y2K-compliance.txt
 
 Changes since the last public release (1.2.9):
 
-version 1.2.10 [April 23, 2006]
-  Revised Makefile.am to add -DPNG_CONFIGURE_LIBPNG to compile directive,
-    and modified pngconf.h to include config.h only when PNG_CONFIGURE_LIBPNG
-    is defined.
+version 1.2.10beta1 [April 15, 2006]
+  Renamed "config.h" to "png_conf.h" and revised Makefile.am to add
+    -DPNG_BUILDING_LIBPNG to compile directive, and modified pngconf.h
+    to include png_conf.h only when PNG_BUILDING_LIBPNG is defined.
+
+version 1.2.10beta2 [April 15, 2006]
+  Manually updated Makefile.in and configure.  Changed png_conf.h.in
+    back to config.h.
+
+version 1.2.10beta3 [April 15, 2006]
+  Change png_conf.h back to config.h in pngconf.h.
+
+version 1.2.10beta4 [April 16, 2006]
+  Change PNG_BUILDING_LIBPNG to PNG_CONFIGURE_LIBPNG in config/Makefile*.
+
+version 1.2.10beta5 [April 16, 2006]
   Added a configure check for compiling assembler code in pnggccrd.c
+
+version 1.2.10beta6 [April 17, 2006]
+  Revised the configure check for pnggccrd.c
+  Moved -DPNG_CONFIGURE_LIBPNG into @LIBPNG_DEFINES@
+  Added @LIBPNG_DEFINES@ to arguments when building libpng.sym
+
+version 1.2.10beta7 [April 18, 2006]
   Change "exec_prefix=$prefix" to "exec_prefix=$(prefix)" in makefiles.
+
+version 1.2.10rc1 [April 19, 2006]
   Ensure pngconf.h doesn't define both PNG_USE_PNGGCCRD and PNG_USE_PNGVCRD
   Fixed "LN_FS" typo in makefile.sco and makefile.solaris.
+
+version 1.2.10rc2 [April 20, 2006]
+  Added a backslash between -DPNG_CONFIGURE_LIBPNG and -DPNG_NO_ASSEMBLER_CODE
+    in configure.ac
   Made the configure warning about versioned symbols less arrogant.
+
+version 1.2.10rc3 [April 21, 2006]
   Added a note in libpng.txt that png_set_sig_bytes(8) can be used when
     writing an embedded PNG without the 8-byte signature.
+  Revised makefiles and configure to avoid making links to libpng.so.*
+
+version 1.2.10 [May 31, 2006]
+  Reverted configure to "rc2" state.
+
+version 1.2.11beta1 [May 31, 2006]
+  scripts/libpng.pc.in contained "configure" style version info and would
+    not work with makefiles.
+  The shared-library makefiles were linking to libpng.so.0 instead of
+    libpng.so.3 compatibility as the library.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

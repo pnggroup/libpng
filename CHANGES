@@ -1480,7 +1480,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (10) in configuration files.
+  Fixed typo (11) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1562,8 +1562,14 @@ version 1.2.10rc3 [April 21, 2006]
     writing an embedded PNG without the 8-byte signature.
   Revised makefiles and configure to avoid making links to libpng.so.*
 
-version 1.2.10 [April 23, 2006]
+version 1.2.10 [May 31, 2006]
   Reverted configure to "rc2" state.
+
+version 1.2.11beta1 [May 31, 2006]
+  scripts/libpng.pc.in contained "configure" style version info and would
+    not work with makefiles.
+  The shared-library makefiles were linking to libpng.so.0 instead of
+    libpng.so.3 compatibility as the library.
 
 version 1.4.0beta1 [future]
   Enabled iTXt support (changes png_struct, thus requires so-number change).

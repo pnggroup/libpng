@@ -6,13 +6,13 @@
 # Modified for Debian by Junichi Uekawa and Josselin Mouette
 # Major modifications are:
 #    * link libpng explicitly with libz and libm
-#    * $(OLDSO).%OLDSONUM% is a symlink rather than a different library
+#    * $(OLDSO). is a symlink rather than a different library
 #    * versioned symbols
 
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.10
+PNGMIN = 1.2.11beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -20,8 +20,8 @@ LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).so.$(PNGVER)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.0
-OLDSOVER=libpng.so.0.$(PNGMIN)
+OLDSOMAJ=libpng.so.
+OLDSOVER=libpng.so..$(PNGMIN)
 
 # Utilities:
 AR_RC=ar rc

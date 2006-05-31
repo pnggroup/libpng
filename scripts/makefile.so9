@@ -8,7 +8,7 @@
 
 # Library name:
 PNGMAJ = 0
-PNGMIN = 1.2.10
+PNGMIN = 1.2.11beta1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng12
 
@@ -17,8 +17,8 @@ LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).so.$(PNGVER)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.0
-OLDSOVER=libpng.so.0.$(PNGMIN)
+OLDSOMAJ=libpng.so.
+OLDSOVER=libpng.so..$(PNGMIN)
 
 # Utilities:
 # gcc 2.95 doesn't work.
