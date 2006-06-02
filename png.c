@@ -13,7 +13,7 @@
 #include "pngintrn.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta5 Your_png_h_is_not_version_1_4_0beta5;
+typedef version_1_4_0beta6 Your_png_h_is_not_version_1_4_0beta6;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -637,7 +637,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.4.0beta5 - May 15, 2006\n\
+   return ((png_charp) "\n libpng version 1.4.0beta6 - June 2, 2006\n\
    Copyright (c) 1998-2006 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 April 20, 2006
+ * Last changed in libpng 1.4.0 June 1, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -254,7 +254,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       if (ret != Z_STREAM_END)
       {
 #ifndef PNG_NO_STDIO
-         char umsg[50];
+         char umsg[52];
 
          if (ret == Z_BUF_ERROR)
             png_sprintf(umsg,"Buffer error in compressed datastream in %s chunk",

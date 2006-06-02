@@ -3,7 +3,7 @@
 # For conditions of distribution and use, see copyright notice in png.h
 
 PREFIX?=        /usr/local
-SHLIB_VER?=     0
+SHLIB_VER?=     1
 
 LIB=		png
 SHLIB_MAJOR=	${SHLIB_VER}

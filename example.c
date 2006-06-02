@@ -200,7 +200,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    /* Expand paletted colors into true RGB triplets */
    if (color_type == PNG_COLOR_TYPE_PALETTE)
-      png_set_palette_rgb(png_ptr);
+      png_set_palette_to_rgb(png_ptr);
 
    /* Expand grayscale images to the full 8 bits from 1, 2, or 4 bits/pixel */
    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)

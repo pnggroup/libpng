@@ -1561,13 +1561,27 @@ version 1.2.10rc3 [April 20, 2006]
   Added a note in libpng.txt that png_set_sig_bytes(8) can be used when
     writing an embedded PNG without the 8-byte signature.
 
+version 1.2.10 [April 23, 2006]
+  Reverted configure to "rc2" state.
+
+version 1.2.11beta1 [May 31, 2006]
+  scripts/libpng.pc.in contained "configure" style version info and would
+    not work with makefiles.
+  The shared-library makefiles were linking to libpng.so.0 instead of
+    libpng.so.3 compatibility as the library.
+
+version 1.2.11beta2 [June 2, 2006]
+  Increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
+    buffer overflow.
+  Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb))
+
 version 1.4.0beta1 [April 20, 2006]
   Enabled iTXt support (changes png_struct, thus requires so-number change).
   Cleaned up PNG_ASSEMBLER_CODE_SUPPORTED vs PNG_MMX_CODE_SUPPORTED
   Eliminated PNG_1_0_X and PNG_1_2_X macros.
   Removed deprecated functions png_read_init, png_write_init, png_info_init,
-    png_permit_empty_plte, png_set_gray_1_2_4_to_8, and removed the
-    deprecated macro PNG_MAX_UINT.
+    png_permit_empty_plte, png_set_gray_1_2_4_to_8, png_check_sig, and
+    removed the deprecated macro PNG_MAX_UINT.
   Moved "PNG_INTERNAL" parts of png.h and pngconf.h into pngintrn.h
   Removed many WIN32_WCE #ifdefs (Cosmin).
   Reduced dependency on C-runtime library when on Windows (Simon-Pierre)
@@ -1590,9 +1604,15 @@ version 1.4.0beta4 [May 11, 2006]
   Revised configure.ac, Makefile.am, and many of the makefiles to write
     their defines in pngconf.h.
 
-version 1.4.0beta5 [May 15, 2006]
+version 1.4.0beta5 [May 31, 2006]
   Added a missing semicolon in Makefile.am and Makefile.in
   Deleted extraneous square brackets from configure.ac
+
+version 1.4.0beta6 [June 2, 2006]
+  Increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
+    buffer overflow.
+  Changed sonum from 0 to 1.
+  Removed unused prototype for png_check_sig() from png.h
 
 version 1.4.0betaN [future]
   Cleaned up error and warning messages.

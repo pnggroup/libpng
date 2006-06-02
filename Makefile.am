@@ -42,7 +42,7 @@ libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng14_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 0:@PNGLIB_MINOR@:0
+	-version-number 1:@PNGLIB_MINOR@:0
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
 	-version-number 14:@PNGLIB_MINOR@:0
