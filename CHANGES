@@ -1576,10 +1576,14 @@ version 1.2.11beta2 [June 2, 2006]
     buffer overflow.
   Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb))
 
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-(subscription required; visit
-https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe)
-or to glennrp at users.sourceforge.net
-
-Glenn R-P
+version 1.2.11beta2-cos [June 4, 2006]
+  Prepended "#! /bin/sh" to ltmail.sh and contrib/pngminus/*.sh (Cosmin).
+  Removed the accidental leftover Makefile.in~ (Cosmin).
+  Removed the include directories and libraries from CFLAGS and LDFLAGS
+    in scripts/makefile.gcc (Nelson A. de Oliveira, Cosmin).
+  Exported png_write_sig (Cosmin).
+  Optimized buffer in png_handle_cHRM() (Cosmin).
+  Avoided potential buffer overflow and optimized buffer in
+    png_write_sCAL(), png_write_sCAL_s() (Cosmin).
+  Set pHYs = 2835 x 2835 pixels per meter, and added
+    sCAL = 0.352778e-3 x 0.352778e-3 meters, in pngtest.png (Cosmin).

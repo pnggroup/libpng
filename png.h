@@ -1434,6 +1434,9 @@ extern PNG_EXPORT(png_structp,png_create_write_struct_2)
    png_malloc_ptr malloc_fn, png_free_ptr free_fn));
 #endif
 
+/* Write the PNG file signature. */
+extern PNG_EXPORT(void,png_write_sig) PNGARG((png_structp png_ptr));
+
 /* Write a PNG chunk - size, type, (optional) data, CRC. */
 extern PNG_EXPORT(void,png_write_chunk) PNGARG((png_structp png_ptr,
    png_bytep chunk_name, png_bytep data, png_size_t length));
@@ -2954,9 +2957,6 @@ PNG_EXTERN void png_calculate_crc PNGARG((png_structp png_ptr, png_bytep ptr,
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
 PNG_EXTERN void png_flush PNGARG((png_structp png_ptr));
 #endif
-
-/* simple function to write the signature */
-PNG_EXTERN void png_write_sig PNGARG((png_structp png_ptr));
 
 /* write various chunks */
 
