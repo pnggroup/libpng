@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.2.11beta2
+;Version 1.2.11beta3
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -234,5 +234,3 @@ EXPORTS
   png_save_int_32 @205
   png_get_uint_31 @206
   png_set_expand_gray_1_2_4_to_8  @207
-; Added at version 1.2.11
-  png_write_sig @208

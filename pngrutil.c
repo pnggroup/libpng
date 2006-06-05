@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.11 June 1, 2006
+ * Last changed in libpng 1.2.11 June 4, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -715,7 +715,7 @@ png_handle_sBIT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_byte buf[32];
+   png_byte buf[4];
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    float white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
 #endif
@@ -756,46 +756,62 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   png_crc_read(png_ptr, buf, 32);
-   if (png_crc_finish(png_ptr, 0))
-      return;
-
+   png_crc_read(png_ptr, buf, 4);
    uint_x = png_get_uint_32(buf);
-   uint_y = png_get_uint_32(buf + 4);
+
+   png_crc_read(png_ptr, buf, 4);
+   uint_y = png_get_uint_32(buf);
+
    if (uint_x > 80000L || uint_y > 80000L ||
       uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM white point");
+      png_crc_finish(png_ptr, 24);
       return;
    }
    int_x_white = (png_fixed_point)uint_x;
    int_y_white = (png_fixed_point)uint_y;
 
-   uint_x = png_get_uint_32(buf + 8);
-   uint_y = png_get_uint_32(buf + 12);
+   png_crc_read(png_ptr, buf, 4);
+   uint_x = png_get_uint_32(buf);
+
+   png_crc_read(png_ptr, buf, 4);
+   uint_y = png_get_uint_32(buf);
+
    if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM red point");
+      png_crc_finish(png_ptr, 16);
       return;
    }
    int_x_red = (png_fixed_point)uint_x;
    int_y_red = (png_fixed_point)uint_y;
 
-   uint_x = png_get_uint_32(buf + 16);
-   uint_y = png_get_uint_32(buf + 20);
+   png_crc_read(png_ptr, buf, 4);
+   uint_x = png_get_uint_32(buf);
+
+   png_crc_read(png_ptr, buf, 4);
+   uint_y = png_get_uint_32(buf);
+
    if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM green point");
+      png_crc_finish(png_ptr, 8);
       return;
    }
    int_x_green = (png_fixed_point)uint_x;
    int_y_green = (png_fixed_point)uint_y;
 
-   uint_x = png_get_uint_32(buf + 24);
-   uint_y = png_get_uint_32(buf + 28);
+   png_crc_read(png_ptr, buf, 4);
+   uint_x = png_get_uint_32(buf);
+
+   png_crc_read(png_ptr, buf, 4);
+   uint_y = png_get_uint_32(buf);
+
    if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM blue point");
+      png_crc_finish(png_ptr, 0);
       return;
    }
    int_x_blue = (png_fixed_point)uint_x;
@@ -840,6 +856,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 #endif /* PNG_NO_CONSOLE_IO */
          }
+         png_crc_finish(png_ptr, 0);
          return;
       }
 #endif /* PNG_READ_sRGB_SUPPORTED */
@@ -853,6 +870,8 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       int_x_white, int_y_white, int_x_red, int_y_red, int_x_green,
       int_y_green, int_x_blue, int_y_blue);
 #endif
+   if (png_crc_finish(png_ptr, 0))
+      return;
 }
 #endif
 

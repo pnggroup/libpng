@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.9 April 14, 2006
+ * Last changed in libpng 1.2.11 June 4, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -47,23 +47,6 @@ png_save_uint_16(png_bytep buf, unsigned int i)
 {
    buf[0] = (png_byte)((i >> 8) & 0xff);
    buf[1] = (png_byte)(i & 0xff);
-}
-
-/* Simple function to write the signature.  If we have already written
- * the magic bytes of the signature, or more likely, the PNG stream is
- * being embedded into another stream and doesn't need its own signature,
- * we should call png_set_sig_bytes() to tell libpng how many of the
- * bytes have already been written.
- */
-void PNGAPI
-png_write_sig(png_structp png_ptr)
-{
-   png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
-   /* write the rest of the 8 byte signature */
-   png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
-      (png_size_t)8 - png_ptr->sig_bytes);
-   if(png_ptr->sig_bytes < 3)
-      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
 }
 
 /* Write a PNG chunk all at once.  The type is an array of ASCII characters
@@ -132,6 +115,23 @@ png_write_chunk_end(png_structp png_ptr)
    png_save_uint_32(buf, png_ptr->crc);
 
    png_write_data(png_ptr, buf, (png_size_t)4);
+}
+
+/* Simple function to write the signature.  If we have already written
+ * the magic bytes of the signature, or more likely, the PNG stream is
+ * being embedded into another stream and doesn't need its own signature,
+ * we should call png_set_sig_bytes() to tell libpng how many of the
+ * bytes have already been written.
+ */
+void /* PRIVATE */
+png_write_sig(png_structp png_ptr)
+{
+   png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+   /* write the rest of the 8 byte signature */
+   png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
+      (png_size_t)8 - png_ptr->sig_bytes);
+   if(png_ptr->sig_bytes < 3)
+      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
 }
 
 #if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_iCCP_SUPPORTED)
