@@ -1576,13 +1576,17 @@ version 1.2.11beta2 [June 2, 2006]
     buffer overflow.
   Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb))
 
-version 1.2.11beta3 [June 5, 2006]
+version 1.2.11beta3 [June 7, 2006]
   Prepended "#! /bin/sh" to ltmail.sh and contrib/pngminus/*.sh (Cosmin).
   Removed the accidental leftover Makefile.in~ (Cosmin).
   Avoided potential buffer overflow and optimized buffer in
     png_write_sCAL(), png_write_sCAL_s() (Cosmin).
   Removed the include directories and libraries from CFLAGS and LDFLAGS
     in scripts/makefile.gcc (Nelson A. de Oliveira, Cosmin).
+
+version 1.2.11beta4 [June 7, 2006]
+  Allow zero-length IDAT chunks after the entire zlib datastream, but not
+    after another intervening chunk type.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

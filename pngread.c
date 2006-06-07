@@ -413,6 +413,10 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       /* This should be a binary subdivision search or a hash for
        * matching the chunk name rather than a linear search.
        */
+      if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+        if(png_ptr->mode & PNG_AFTER_IDAT)
+          png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
+
       if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
          png_handle_IHDR(png_ptr, info_ptr, length);
       else if (!png_memcmp(png_ptr->chunk_name, png_IEND, 4))
@@ -985,11 +989,9 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       {
          if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
          {
-            if (length > 0 || png_ptr->mode & PNG_AFTER_IDAT)
+            if ((length > 0) || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
                png_error(png_ptr, "Too many IDAT's found");
          }
-         else
-            png_ptr->mode |= PNG_AFTER_IDAT;
          png_handle_unknown(png_ptr, info_ptr, length);
          if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))
             png_ptr->mode |= PNG_HAVE_PLTE;
@@ -1000,7 +1002,7 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
          /* Zero length IDATs are legal after the last IDAT has been
           * read, but not after other chunks have been read.
           */
-         if (length > 0 || png_ptr->mode & PNG_AFTER_IDAT)
+         if ((length > 0) || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
             png_error(png_ptr, "Too many IDAT's found");
          png_crc_finish(png_ptr, length);
       }

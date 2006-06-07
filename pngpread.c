@@ -214,6 +214,10 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
+   if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+     if(png_ptr->mode & PNG_AFTER_IDAT)
+        png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
+
    if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
@@ -281,8 +285,9 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 
       if (png_ptr->mode & PNG_HAVE_IDAT)
       {
-         if (png_ptr->push_length == 0)
-            return;
+         if (!(png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
+           if (png_ptr->push_length == 0)
+              return;
 
          if (png_ptr->mode & PNG_AFTER_IDAT)
             png_error(png_ptr, "Too many IDAT's found");
