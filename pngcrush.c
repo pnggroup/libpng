@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.3"
+#define PNGCRUSH_VERSION "1.6.4"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -128,10 +128,12 @@
 #define PNG_iCCP const png_byte png_iCCP[5] = {105,  67,  67,  80, '\0'}
 #define PNG_IEND const png_byte png_IEND[5] = { 73,  69,  78,  68, '\0'}
 
+#if 0
 PNG_EXPORT_VAR (const png_byte FARDATA) png_IHDR[5];
 PNG_EXPORT_VAR (const png_byte FARDATA) png_IDAT[5];
 PNG_EXPORT_VAR (const png_byte FARDATA) png_IEND[5];
 PNG_EXPORT_VAR (const png_byte FARDATA) png_iCCP[5];
+#endif
 
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
@@ -1884,6 +1886,7 @@ int main(int argc, char *argv[])
         else if (!strncmp(argv[i], "-trns_a", 7) ||
                  !strncmp(argv[i], "-tRNS_a", 7)) {
             num_trans_in = (png_uint_16) atoi(argv[++i]);
+            trns_index=num_trans_in-1;
             have_trns = 1;
             for (ia = 0; ia < num_trans_in; ia++)
                 trans_in[ia] = (png_byte) atoi(argv[++i]);
@@ -1994,7 +1997,7 @@ int main(int argc, char *argv[])
     }
 
     for (ia = 0; ia < 256; ia++)
-        trans_in[ia] = trns_array[ia] = 255;
+        trns_array[ia]=255;
 
     for (;;)  /* loop on input files */
     {
@@ -3505,17 +3508,19 @@ int main(int argc, char *argv[])
                       read_info_ptr, &unknowns);
                     P1("Found %d unknown chunks\n", num_unknowns);
 
-                    if (num_unknowns) {
+                    if (nosave == 0 && num_unknowns) {
                         png_unknown_chunkp unknowns_keep; /* allocated by us */
                         int num_unknowns_keep;
                         int i;
 
                         unknowns_keep = png_malloc(write_ptr,
                           (png_uint_32) num_unknowns*sizeof(png_unknown_chunk));
+                        P1("malloc for %d unknown chunks\n", num_unknowns);
                         num_unknowns_keep = 0;
 
                         /* make an array of only those chunks we want to keep */
                         for (i = 0; i < num_unknowns; i++) {
+                            P1("Handling unknown chunk %d\n", i);
                             /* not EBCDIC-safe, but neither is keep_chunks(): */
                             P2("   unknown[%d] = %s (%lu bytes, location %d)\n",
                               i, unknowns[i].name,
@@ -3551,6 +3556,7 @@ int main(int argc, char *argv[])
                         png_free(write_ptr, unknowns_keep);
                     }
                 }
+              P0("unknown chunk handling done.\n");
 #endif /* PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED */
                 } /* GRR added for quick %-navigation (1) */
 

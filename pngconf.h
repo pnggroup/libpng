@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.9beta11 - March 22, 2006
+ * libpng version 1.2.11beta4 - June 7, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2005 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -25,13 +25,18 @@
  * PNG_USER_CONFIG has to be defined on the compiler command line. This
  * includes the resource compiler for Windows DLL configurations.
  */
-
 #ifdef PNG_USER_CONFIG
+#  ifndef PNG_USER_PRIVATEBUILD
+#    define PNG_USER_PRIVATEBUILD
+#  endif
 #include "pngusr.h"
 #endif
 
+/* PNG_CONFIGURE_LIBPNG is set by the "configure" script. */
+#ifdef PNG_CONFIGURE_LIBPNG
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #endif
 
 /*
@@ -62,8 +67,8 @@
 #endif
 
 #ifdef PRIVATEBUILD
-# pragma message("PRIVATEBUILD is deprecated. Use\
- PNG_USER_PRIVATEBUILD instead.")
+# pragma message("PRIVATEBUILD is deprecated.\
+ Use PNG_USER_PRIVATEBUILD instead.")
 # define PNG_USER_PRIVATEBUILD PRIVATEBUILD
 #endif
 #endif /* __STDC__ */
@@ -728,7 +733,7 @@
 #    define PNG_MMX_CODE_SUPPORTED
 #  endif
 #  if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_NO_MMX_CODE) && \
-     defined(__MMX__)
+     !defined(PNG_USE_PNGVCRD) && defined(__MMX__)
 #    define PNG_USE_PNGGCCRD
 #  endif
 #endif
