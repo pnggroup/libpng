@@ -1,0 +1,140 @@
+# Makefile.am:
+#   Source file for Makefile.in (and hence Makefile)
+#
+# Makefile.am need only be changed on a major version number
+# change (e.g. libpng12 --> libpng13).  In that case seach
+# this file for every instance of the old base name (libpng12)
+# and change to the new one (libpng13), then change the
+# -version-number settings below so that the new values have
+# the correct major part (first field).
+
+PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@
+
+# libpng does not follow GNU file name conventions
+AUTOMAKE_OPTIONS = foreign
+
+# test programs - run on make check, make distcheck
+check_PROGRAMS= pngtest
+pngtest_SOURCES = pngtest.c
+pngtest_LDADD = libpng10.la
+TESTS = test-pngtest.sh
+TESTS_ENVIRONMENT= srcdir=$(srcdir) 
+
+# man pages
+dist_man_MANS= libpng.3 libpngpf.3 png.5
+
+# generate the -config scripts if required
+binconfigs= libpng10-config 
+EXTRA_SCRIPTS= libpng-config libpng10-config
+bin_SCRIPTS= @binconfigs@
+
+# rules to build libpng, only build the old library on request
+lib_LTLIBRARIES=libpng10.la @compatlib@
+EXTRA_LTLIBRARIES= libpng.la
+libpng10_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
+	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
+	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c \
+	png.h pngconf.h
+libpng_la_SOURCES = $(libpng10_la_SOURCES)
+
+libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
+libpng10_la_CPPFLAGS = @LIBPNG_DEFINES@
+
+# MAJOR UPGRADE: the version-number settings below must be changed.
+libpng10_la_LDFLAGS = -no-undefined -export-dynamic \
+	-version-number 0:@PNGLIB_MINOR@:0
+# -rpath is needed as automake doesn't know the directory
+libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
+	-version-number 3:@PNGLIB_MINOR@:0
+
+if HAVE_LD_VERSION_SCRIPT
+  # Versioned symbols and restricted exports
+  libpng10_la_LDFLAGS += -Wl,--version-script=libpng.vers
+  libpng10_la_DEPENDENCIES = libpng.vers
+else
+  # Only restricted exports when possible
+  libpng10_la_LDFLAGS += -export-symbols libpng.sym
+  libpng10_la_DEPENDENCIES = libpng.sym
+endif
+libpng_la_DEPENDENCIES = $(libpng10_la_DEPENDENCIES)
+
+#distribute headers in /usr/include/libpng/*
+pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
+pkginclude_HEADERS= png.h pngconf.h
+
+# pkg-config stuff, note that libpng.pc is always required in order
+# to get the correct library
+pkgconfigdir = @pkgconfigdir@
+pkgconfig_DATA = libpng10.pc
+
+#extra source distribution files.
+EXTRA_DIST= \
+	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
+	${srcdir}/projects/cbuilder5/* \
+	${srcdir}/projects/beos/* \
+	${srcdir}/projects/visualc6/* \
+	${srcdir}/projects/visualc71/* \
+	${srcdir}/projects/wince.txt \
+	${srcdir}/projects/netware.txt \
+	${srcdir}/scripts/* \
+	${srcdir}/contrib/gregbook/* \
+	${srcdir}/contrib/pngminus/* \
+	${srcdir}/contrib/pngsuite/* \
+	${srcdir}/contrib/visupng/* \
+	$(TESTS) \
+	example.c libpng.txt pngvcrd.c 
+
+CLEANFILES= pngout.png libpng10.pc libpng10-config libpng.vers libpng.sym
+
+$(PNGLIB_BASENAME).pc: libpng.pc
+	cp libpng.pc $@
+
+$(PNGLIB_BASENAME)-config: libpng-config
+	cp libpng-config $@
+
+libpng.sym: png.h pngconf.h
+	rm -f $@ $@.new
+	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
+		$(SED) -n -e 's|^.*PNG_FUNCTION_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
+			-e 's|^.*PNG_DATA_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
+			>$@.new
+	mv $@.new $@
+
+libpng.vers: libpng.sym
+	rm -f $@ $@.new
+	$(ECHO) PNG@PNGLIB_MAJOR@_0 '{global:' > $@.new
+	$(SED) s/$$/\;/ libpng.sym >> $@.new
+	$(ECHO) 'local: *; };' >> $@.new
+	mv $@.new $@
+
+# install the .../include headers as links to the new ones
+install-data-hook:
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h pngconf.h
+	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
+	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
+
+# do evil things to libpng to cause libpng10 to be used
+install-exec-hook:
+	cd $(DESTDIR)$(bindir); rm -f libpng-config
+	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
+	@set -x;\
+	cd $(DESTDIR)$(libdir);\
+	for ext in a la so; do\
+		rm -f libpng.$$ext;\
+		$(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
+	done
+
+uninstall-hook:
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
+	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
+	rm -f $(DESTDIR)$(bindir)/libpng-config
+	@if test -n "@compatlib@"; then\
+		set -x;\
+		cd $(DESTDIR)$(libdir);\
+		for ext in a la so; do\
+			rm -f libpng.$$ext;\
+		done;\
+	fi

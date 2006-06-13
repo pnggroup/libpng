@@ -1,31 +1,72 @@
 
-Libpng 1.0.18 - December 3, 2004
+Libpng 1.0.19rc1 - June 13, 2006
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
-Changes since the last public release (1.0.17):
+Files available for download:
 
-  Fixed bug in png_text_compress() that would fail to complete a large block.
-  Fixed bug, introduced in libpng-1.2.7, that overruns a buffer during
-    strip alpha operation in png_do_strip_filler().
-  #ifdef out png_info_init in png.c and png_read_init in pngread.c (as of 1.3.0)
-  Reduce color_type to a nonalpha type after strip alpha operation in
-    png_do_strip_filler().
-  Revised definitions of PNG_MAX_UINT_32, PNG_MAX_SIZE, and PNG_MAXSUM
-  Fixed (again) definition of PNG_LIBPNG_VER_DLLNUM in png.h (Cosmin).
-  Added PNG_LIBPNG_BUILD_PRIVATE in png.h (Cosmin).
-  Set png_ptr->zstream.data_type to Z_BINARY, to avoid unnecessary detection
-    of data type in deflate (Cosmin).
-  Deprecated but continue to support SPECIALBUILD and PRIVATEBUILD in favor of
-    PNG_LIBPNG_BUILD_SPECIAL_STRING and PNG_LIBPNG_BUILD_PRIVATE_STRING.
-  Despammed mailing addresses by masking "@" with "at".
-  Added scripts/makefile.elf with supporting code in pngconf.h for symbol
-    versioning (John Bowler).
-  Added projects/visualc71 (Simon-pierre).
+Source files with LF line endings (for Unix/Linux) and with a
+"configure" script
 
-Send comments/corrections/commendations to
-png-implement at ccrc.wustl.edu (subscription required; write to
-majordomo at ccrc.wustl.edu with "subscribe png-implement" in the message)
-or to glennrp at users.sourceforge.net
+   libpng-1.0.19rc1.tar.gz
+   libpng-1.0.19rc1.tar.bz2
+
+Source files with LF line endings (for Unix/Linux) without the
+"configure" script
+
+   libpng-1.0.19rc1-no-config.tar.gz
+   libpng-1.0.19rc1-no-config.tar.bz2
+
+Source files with CRLF line endings (for Windows), without the
+"configure" script
+
+   lp1019r01.zip
+   lp1019r01.tar.bz2
+
+Project files
+
+   libpng-1.0.19rc1-project-netware.zip
+   libpng-1.0.19rc1-project-wince.zip
+
+Other information:
+
+   libpng-1.0.19rc1-README.txt
+   libpng-1.0.19rc1-KNOWNBUGS.txt
+   libpng-1.0.19rc1-LICENSE.txt
+   libpng-1.0.19rc1-Y2K-compliance.txt
+
+Changes since the last public release (1.0.18):
+
+version 1.2.11beta1 [May 31, 2006]
+  scripts/libpng.pc.in contained "configure" style version info and would
+    not work with makefiles.
+  The shared-library makefiles were linking to libpng.so.0 instead of
+    libpng.so.3 compatibility as the library.
+
+version 1.2.11beta2 [June 2, 2006]
+  Increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
+    buffer overflow.
+  Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb)
+
+version 1.2.11beta3 [June 5, 2006]
+  Prepended "#! /bin/sh" to ltmail.sh and contrib/pngminus/*.sh (Cosmin).
+  Removed the accidental leftover Makefile.in~ (Cosmin).
+  Avoided potential buffer overflow and optimized buffer in
+    png_write_sCAL(), png_write_sCAL_s() (Cosmin).
+  Removed the include directories and libraries from CFLAGS and LDFLAGS
+    in scripts/makefile.gcc (Nelson A. de Oliveira, Cosmin).
+
+version 1.2.11beta4 [June 6, 2006]
+  Allow zero-length IDAT chunks after the entire zlib datastream, but not
+    after another intervening chunk type.
+
+version 1.2.11rc1 [June 13, 2006]
+  Deleted extraneous square brackets from [config.h] in configure.ac
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+(subscription required; visit 
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe) or to glennrp at users.sourceforge.net
 
 Glenn R-P

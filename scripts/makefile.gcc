@@ -10,42 +10,55 @@ ZLIBLIB = ../zlib
 # Compiler, linker, lib and other tools
 CC = gcc
 LD = $(CC)
-AR = ar rcs
+AR_RC = ar rcs
 RANLIB = ranlib
-RM = rm -f
+RM_F = rm -f
 
 CDEBUG = -g -DPNG_DEBUG=5
 LDDEBUG =
 CRELEASE = -O2
 LDRELEASE = -s
-CFLAGS = -I$(ZLIBINC) -Wall $(CRELEASE)
-LDFLAGS = -L. -L$(ZLIBLIB) -lpng -lz -lm $(LDRELEASE)
+#CFLAGS = -Wall $(CDEBUG)
+CFLAGS = -Wall $(CRELEASE)
+#LDFLAGS = $(LDDEBUG)
+LDFLAGS = $(LDRELEASE)
+LIBS = -lz -lm
 
 # File extensions
 O=.o
 A=.a
-E=
+EXE=
 
 # Variables
 OBJS = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
-	pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) pngset$(O) \
-	pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
+       pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) pngset$(O) \
+       pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
 
 # Targets
-all: libpng$(A) pngtest$(E)
+all: static
+
+.c$(O):
+	$(CC) -c $(CFLAGS) -I$(ZLIBINC) $<
+
+static: libpng$(A) pngtest$(EXE)
+
+shared:
+	@echo This is a generic makefile that cannot create shared libraries.
+	@echo Please use a configuration that is specific to your platform.
+	@false
 
 libpng$(A): $(OBJS)
-	$(AR) $@ $(OBJS)
+	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
 
-test: pngtest$(E)
-	./pngtest$(E)
+test: pngtest$(EXE)
+	./pngtest$(EXE)
 
-pngtest$(E): pngtest$(O) libpng$(A)
-	$(LD) -o $@ pngtest$(O) $(LDFLAGS)
+pngtest$(EXE): pngtest$(O) libpng$(A)
+	$(LD) $(LDFLAGS) -L$(ZLIBLIB) -o $@ pngtest$(O) libpng$(A) $(LIBS)
 
 clean:
-	$(RM) *$(O) libpng$(A) pngtest$(E) pngout.png
+	$(RM_F) *$(O) libpng$(A) pngtest$(EXE) pngout.png
 
 png$(O): png.h pngconf.h
 pngerror$(O): png.h pngconf.h

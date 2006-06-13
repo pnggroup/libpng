@@ -1,11 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@/libpng10
 
-prefix=@PREFIX@
-exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${exec_prefix}/include
-
-Name: libpng10
+Name: libpng
 Description: Loads and saves PNG files
-Version: 1.0.18
-Libs: -L${libdir} -lpng10 -lz -lm
-Cflags: -I${includedir}/libpng10
+Version: 1.0.19rc1
+Libs: -L${libdir} -lpng10
+Cflags: -I${includedir}

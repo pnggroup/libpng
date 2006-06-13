@@ -1,5 +1,5 @@
 # makefile for libpng
-# Copyright (C) 2002 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2006 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
@@ -28,12 +28,16 @@ ZLIBINC=../zlib
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow -Wconversion \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes
+
 CC=gcc
+AR_RC=ar rc
+MKDIR_P=mkdir -p
+LN_SF=ln -f -s
+RANLIB=ranlib
+RM_F=/bin/rm -f
+
 CFLAGS=-I$(ZLIBINC) -O # $(WARNMORE) -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
-
-RANLIB=ranlib
-#RANLIB=echo
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
@@ -42,7 +46,7 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 all: libpng.a pngtest
 
 libpng.a: $(OBJS)
-	ar rc $@  $(OBJS)
+	$(AR_RC) $@  $(OBJS)
 	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a
@@ -52,21 +56,21 @@ test: pngtest
 	./pngtest
 
 install: libpng.a
-	-@mkdir $(DESTDIR)$(INCPATH)
-	-@mkdir $(DESTDIR)$(INCPATH)/libpng
-	-@mkdir $(DESTDIR)$(LIBPATH)
-	-@rm -f $(DESTDIR)$(INCPATH)/png.h
-	-@rm -f $(DESTDIR)$(INCPATH)/pngconf.h
+	-@$(MKDIR_P) $(DESTDIR)$(INCPATH)
+	-@$(MKDIR_P) $(DESTDIR)$(INCPATH)/libpng
+	-@$(MKDIR_P) $(DESTDIR)$(LIBPATH)
+	-@$(RM_F) $(DESTDIR)$(INCPATH)/png.h
+	-@$(RM_F) $(DESTDIR)$(INCPATH)/pngconf.h
 	cp png.h $(DESTDIR)$(INCPATH)/libpng
 	cp pngconf.h $(DESTDIR)$(INCPATH)/libpng
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/png.h
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngconf.h
-	(cd $(DESTDIR)$(INCPATH); ln -f -s libpng/* .)
+	(cd $(DESTDIR)$(INCPATH); $(LN_SF) libpng/* .)
 	cp libpng.a $(DESTDIR)$(LIBPATH)
 	chmod 644 $(DESTDIR)$(LIBPATH)/libpng.a
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png
+	$(RM_F) *.o libpng.a pngtest pngout.png
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

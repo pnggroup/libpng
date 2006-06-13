@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * libpng 1.0.18 - December 3, 2004
+ * Last changed in libpng 1.2.6 - August 15, 2004
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -44,7 +44,6 @@
 #else
 #  include <stdio.h>
 #  include <stdlib.h>
-#  include <assert.h>
 #  define READFILE(file, data, length, check) \
      check=(png_size_t)fread(data,(png_size_t)1,length,file)
 #  define WRITEFILE(file, data, length, check) \
@@ -538,7 +537,6 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
       if(verbose)
          printf("png_malloc %lu bytes at %x\n",size,pinfo->pointer);
-      assert(pinfo->size != 12345678);
       return (png_voidp)(pinfo->pointer);
    }
 }
@@ -1435,7 +1433,7 @@ main(int argc, char *argv[])
                current_allocation);
             while (pinfo != NULL)
             {
-               fprintf(STDERR, " %lu bytes at %x\n", pinfo->size, 
+               fprintf(STDERR, " %lu bytes at %x\n", pinfo->size,
                  (unsigned int) pinfo->pointer);
                pinfo = pinfo->next;
             }
@@ -1551,4 +1549,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_18 your_png_h_is_not_version_1_0_18;
+typedef version_1_0_19rc1 your_png_h_is_not_version_1_0_19rc1;
