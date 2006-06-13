@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.11beta4
+PNGMIN = 1.2.11rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -16,8 +16,8 @@ LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).so.$(PNGVER)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.
-OLDSOVER=libpng.so..$(PNGMIN)
+OLDSOMAJ=libpng.so.3
+OLDSOVER=libpng.so.3.$(PNGMIN)
 
 # Utilities:
 CC=gcc

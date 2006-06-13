@@ -1,9 +1,9 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.8 - December 3, 2004
+ * Last changed in libpng 1.2.11 - June 7, 2004
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */

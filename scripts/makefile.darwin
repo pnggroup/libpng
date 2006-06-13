@@ -19,7 +19,7 @@ ZLIBINC=../zlib
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.11beta4
+PNGMIN = 1.2.11rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -27,8 +27,8 @@ LIBSO=$(LIBNAME).dylib
 LIBSOMAJ=$(LIBNAME).$(PNGMAJ).dylib
 LIBSOVER=$(LIBNAME).$(PNGVER).dylib
 OLDSO=libpng.dylib
-OLDSOMAJ=libpng..dylib
-OLDSOVER=libpng..$(PNGMIN).dylib
+OLDSOMAJ=libpng.3.dylib
+OLDSOVER=libpng.3.$(PNGMIN).dylib
 
 # Utilities:
 CC=cc

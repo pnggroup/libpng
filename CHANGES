@@ -1574,9 +1574,9 @@ version 1.2.11beta1 [May 31, 2006]
 version 1.2.11beta2 [June 2, 2006]
   Increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
     buffer overflow.
-  Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb))
+  Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb)
 
-version 1.2.11beta3 [June 7, 2006]
+version 1.2.11beta3 [June 5, 2006]
   Prepended "#! /bin/sh" to ltmail.sh and contrib/pngminus/*.sh (Cosmin).
   Removed the accidental leftover Makefile.in~ (Cosmin).
   Avoided potential buffer overflow and optimized buffer in
@@ -1584,9 +1584,12 @@ version 1.2.11beta3 [June 7, 2006]
   Removed the include directories and libraries from CFLAGS and LDFLAGS
     in scripts/makefile.gcc (Nelson A. de Oliveira, Cosmin).
 
-version 1.2.11beta4 [June 7, 2006]
+version 1.2.11beta4 [June 6, 2006]
   Allow zero-length IDAT chunks after the entire zlib datastream, but not
     after another intervening chunk type.
+
+version 1.2.11rc1 [June 13, 2006]
+  Deleted extraneous square brackets from [config.h] in configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
