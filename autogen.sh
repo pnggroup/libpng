@@ -4,6 +4,7 @@
 #
 # WARNING: if you run this you will change the versions
 # of the tools which are used and, maybe, required!
+        touch Makefile.am configure.ac
 {
 	echo "running libtoolize" >&2
 	libtoolize --copy --automake
