@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.11rc1
+PNGMIN = 1.2.11rc2
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -185,7 +185,7 @@ test-dd:
 	echo Testing installed dynamic shared library in $(DL).
 	$(CC) -I$(DI) $(CFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
-	   -L$(DL) -L$(ZLIBLIB) -W1,-rpath $(ZLIBLIB):$(DL) \
+	   -L$(DL) -L$(ZLIBLIB) -Wl,-rpath $(ZLIBLIB):$(DL) \
 	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
 	./pngtestd pngtest.png
 

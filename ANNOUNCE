@@ -1,5 +1,5 @@
 
-Libpng 1.2.11rc1 - June 13, 2006
+Libpng 1.2.11rc2 - June 14, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.11rc1.tar.gz
-   libpng-1.2.11rc1.tar.bz2
+   libpng-1.2.11rc2.tar.gz
+   libpng-1.2.11rc2.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.11rc1-no-config.tar.gz
-   libpng-1.2.11rc1-no-config.tar.bz2
+   libpng-1.2.11rc2-no-config.tar.gz
+   libpng-1.2.11rc2-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1211r01.zip
-   lp1211r01.tar.bz2
+   lp1211r02.zip
+   lp1211r02.tar.bz2
 
 Project files
 
-   libpng-1.2.11rc1-project-netware.zip
-   libpng-1.2.11rc1-project-wince.zip
+   libpng-1.2.11rc2-project-netware.zip
+   libpng-1.2.11rc2-project-wince.zip
 
 Other information:
 
-   libpng-1.2.11rc1-README.txt
-   libpng-1.2.11rc1-KNOWNBUGS.txt
-   libpng-1.2.11rc1-LICENSE.txt
-   libpng-1.2.11rc1-Y2K-compliance.txt
+   libpng-1.2.11rc2-README.txt
+   libpng-1.2.11rc2-KNOWNBUGS.txt
+   libpng-1.2.11rc2-LICENSE.txt
+   libpng-1.2.11rc2-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -61,8 +61,14 @@ version 1.2.11beta4 [June 6, 2006]
   Allow zero-length IDAT chunks after the entire zlib datastream, but not
     after another intervening chunk type.
 
-version 1.2.11rc1 [June 13, 2006]
+version 1.2.11rc1 [June 14, 2006]
   Deleted extraneous square brackets from [config.h] in configure.ac
+
+version 1.2.11rc2 [June 14, 2006]
+  Added prototypes for PNG_INCH_CONVERSIONS functions to png.h
+  Revised INSTALL and autogen.sh
+  Fixed typo in several makefiles (-W1 should be -Wl)
+  Added typedef for png_int_32 and png_uint_32 on 64-bit systems.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

@@ -1591,6 +1591,12 @@ version 1.2.11beta4 [June 6, 2006]
 version 1.2.11rc1 [June 13, 2006]
   Deleted extraneous square brackets from [config.h] in configure.ac
 
+version 1.2.11rc2 [June 14, 2006]
+  Added prototypes for PNG_INCH_CONVERSIONS functions to png.h
+  Revised INSTALL and autogen.sh
+  Fixed typo in several makefiles (-W1 should be -Wl)
+  Added typedef for png_int_32 and png_uint_32 on 64-bit systems.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

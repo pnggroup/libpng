@@ -85,7 +85,8 @@ EXTRA_DIST= \
 	$(TESTS) \
 	example.c libpng.txt pngvcrd.c 
 
-CLEANFILES= pngout.png libpng12.pc libpng12-config libpng.vers libpng.sym
+CLEANFILES= pngout.png libpng12.pc libpng12-config libpng.vers \
+libpng.sym
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -95,7 +96,7 @@ $(PNGLIB_BASENAME)-config: libpng-config
 
 libpng.sym: png.h pngconf.h
 	rm -f $@ $@.new
-	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
+	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS png.h | \
 		$(SED) -n -e 's|^.*PNG_FUNCTION_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
 			-e 's|^.*PNG_DATA_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
 			>$@.new
