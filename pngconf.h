@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.11rc2 - June 14, 2006
+ * libpng version 1.2.11rc3 - June 15, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2005 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -35,6 +35,11 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#endif
+
+/* Added at libpng-1.4.0 */
+#ifndef PNG_NO_LIMITS_H
+#include <limits.h>
 #endif
 
 /*
@@ -1082,7 +1087,7 @@
  * want to have unsigned int for png_uint_32 instead of unsigned long.
  */
 
-#if (__WORDSIZE == 64) || defined(_LP64) || (_MIPS_SZLONG == 64)
+#if defined(INT_MAX) && (INT_MAX > 0x7ffffffeL)
 typedef unsigned int png_uint_32;
 typedef int png_int_32;
 #else
