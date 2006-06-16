@@ -808,11 +808,13 @@ png_write_row(png_structp png_ptr, png_bytep row)
       png_ptr->row_info.width);
 
    png_debug1(3, "row_info->color_type = %d\n", png_ptr->row_info.color_type);
-   png_debug1(3, "row_info->width = %lu\n", png_ptr->row_info.width);
+   png_debug1(3, "row_info->width = %lu\n",
+     (unsigned long) png_ptr->row_info.width);
    png_debug1(3, "row_info->channels = %d\n", png_ptr->row_info.channels);
    png_debug1(3, "row_info->bit_depth = %d\n", png_ptr->row_info.bit_depth);
    png_debug1(3, "row_info->pixel_depth = %d\n", png_ptr->row_info.pixel_depth);
-   png_debug1(3, "row_info->rowbytes = %lu\n", png_ptr->row_info.rowbytes);
+   png_debug1(3, "row_info->rowbytes = %lu\n",
+     (unsigned long) png_ptr->row_info.rowbytes);
 
    /* Copy user's row into buffer, leaving room for filter byte. */
    png_memcpy_check(png_ptr, png_ptr->row_buf + 1, row,

@@ -106,6 +106,17 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
       png_default_warning(png_ptr, warning_message+offset);
 }
 
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
+void PNGAPI
+png_benign_error(png_structp png_ptr, png_const_charp error_message)
+{
+  if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
+    png_warning(png_ptr, error_message);
+  else
+    png_error(png_ptr, error_message);
+}
+#endif
+
 /* These utilities are used internally to build an error message that relates
  * to the current chunk.  The chunk name comes from png_ptr->chunk_name,
  * this is used to prefix the message.  The message is limited in length
@@ -170,6 +181,17 @@ png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
    png_format_buffer(png_ptr, msg, warning_message);
    png_warning(png_ptr, msg);
 }
+
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
+void PNGAPI
+png_chunk_benign_error(png_structp png_ptr, png_const_charp error_message)
+{
+  if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
+    png_chunk_warning(png_ptr, error_message);
+  else
+    png_chunk_error(png_ptr, error_message);
+}
+#endif
 
 /* This is the default error handling function.  Note that replacements for
  * this function MUST NOT RETURN, or the program will likely crash.  This

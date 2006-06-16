@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 April 20, 2006
+ * Last changed in libpng 1.2.11 June 7, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -351,11 +351,15 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
 
       png_debug2(0, "Reading %s chunk, length=%lu.\n", png_ptr->chunk_name,
-         length);
+         (unsigned long) length);
 
       /* This should be a binary subdivision search or a hash for
        * matching the chunk name rather than a linear search.
        */
+      if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+        if(png_ptr->mode & PNG_AFTER_IDAT)
+          png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
+
       if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
          png_handle_IHDR(png_ptr, info_ptr, length);
       else if (!png_memcmp(png_ptr->chunk_name, png_IEND, 4))
@@ -506,7 +510,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 #endif
    int ret;
    png_debug2(1, "in png_read_row (row %lu, pass %d)\n",
-      png_ptr->row_number, png_ptr->pass);
+      (unsigned long) png_ptr->row_number, png_ptr->pass);
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       png_read_start_row(png_ptr);
    if (png_ptr->row_number == 0 && png_ptr->pass == 0)
@@ -655,7 +659,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       {
          if (png_ptr->zstream.avail_out || png_ptr->zstream.avail_in ||
             png_ptr->idat_size)
-            png_error(png_ptr, "Extra compressed data");
+            png_benign_error(png_ptr, "Extra compressed data");
          png_ptr->mode |= PNG_AFTER_IDAT;
          png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
          break;
@@ -928,11 +932,9 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       {
          if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
          {
-            if (length > 0 || png_ptr->mode & PNG_AFTER_IDAT)
-               png_error(png_ptr, "Too many IDAT's found");
+            if ((length > 0) || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
+               png_benign_error(png_ptr, "Too many IDAT's found");
          }
-         else
-            png_ptr->mode |= PNG_AFTER_IDAT;
          png_handle_unknown(png_ptr, info_ptr, length);
          if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))
             png_ptr->mode |= PNG_HAVE_PLTE;
@@ -943,8 +945,8 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
          /* Zero length IDATs are legal after the last IDAT has been
           * read, but not after other chunks have been read.
           */
-         if (length > 0 || png_ptr->mode & PNG_AFTER_IDAT)
-            png_error(png_ptr, "Too many IDAT's found");
+         if ((length > 0) || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
+            png_benign_error(png_ptr, "Too many IDAT's found");
          png_crc_finish(png_ptr, length);
       }
       else if (!png_memcmp(png_ptr->chunk_name, png_PLTE, 4))

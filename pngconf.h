@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta6 - June 2, 2006
+ * libpng version 1.4.0beta7 - June 16, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -20,6 +20,10 @@
 /* Added at libpng-1.4.0 */
 /* Makefile-supplied defines go here: */
 /* End of Makefile-supplied defines. */
+
+#ifndef PNG_NO_LIMITS_H
+#include <limits.h>
+#endif
 
 /* Added at libpng-1.2.9 */
 
@@ -106,6 +110,17 @@
 
 #ifndef PNG_NO_WRITE_SUPPORTED
 #  define PNG_WRITE_SUPPORTED
+#endif
+
+/* Enabled in 1.4.0. */
+#ifdef PNG_ALLOW_BENIGN_ERRORS
+#  define png_benign_error png_warning
+#  define png_chunk_benign_error png_chunk_warning
+#else
+#  ifndef PNG_BENIGN_ERRORS_SUPPORTED
+#    define png_benign_error png_error
+#    define png_chunk_benign_error png_chunk_error
+#  endif
 #endif
 
 /* Enabled by default in 1.2.0.  You can disable this if you don't need to
@@ -977,8 +992,13 @@
  * want to have unsigned int for png_uint_32 instead of unsigned long.
  */
 
+#if defined(INT_MAX) && (INT_MAX > 0x7ffffffeL)
+typedef unsigned int png_uint_32;
+typedef int png_int_32;
+#else
 typedef unsigned long png_uint_32;
 typedef long png_int_32;
+#endif
 typedef unsigned short png_uint_16;
 typedef short png_int_16;
 typedef unsigned char png_byte;

@@ -1,9 +1,9 @@
 
 /* pngintrn.h - internal header file for libpng
  *
- * libpng version 1.4.0beta6 - June 2, 2006
+ * libpng version 1.4.0beta7 - June 16, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2005 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -106,7 +106,7 @@
 #define PNG_HAVE_IHDR               0x01
 #define PNG_HAVE_PLTE               0x02
 #define PNG_HAVE_IDAT               0x04
-#define PNG_AFTER_IDAT              0x08
+#define PNG_AFTER_IDAT              0x08 /* Have complete zlib datastream */
 #define PNG_HAVE_IEND               0x10
 #define PNG_HAVE_gAMA               0x20
 #define PNG_HAVE_cHRM               0x40
@@ -116,6 +116,7 @@
 #define PNG_WROTE_INFO_BEFORE_PLTE 0x400
 #define PNG_BACKGROUND_IS_GRAY     0x800
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
+#define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
 
 /* flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                0x0001
@@ -185,7 +186,7 @@
 #define PNG_FLAG_MALLOC_NULL_MEM_OK       0x100000L
 #define PNG_FLAG_ADD_ALPHA                0x200000L  /* Added to libpng-1.2.8 */
 #define PNG_FLAG_STRIP_ALPHA              0x400000L  /* Added to libpng-1.2.8 */
-                                  /*      0x800000L  unused */
+#define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000L  /* Added to libpng-1.4.0 */
                                   /*     0x1000000L  unused */
                                   /*     0x2000000L  unused */
                                   /*     0x4000000L  unused */
@@ -388,9 +389,6 @@ PNG_EXTERN void png_calculate_crc PNGARG((png_structp png_ptr, png_bytep ptr,
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
 PNG_EXTERN void png_flush PNGARG((png_structp png_ptr));
 #endif
-
-/* simple function to write the signature */
-PNG_EXTERN void png_write_sig PNGARG((png_structp png_ptr));
 
 /* write various chunks */
 

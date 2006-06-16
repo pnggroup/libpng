@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 April 20, 2006
+ * Last changed in libpng 1.4.0 June 15, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1206,8 +1206,8 @@ png_do_read_transformations(png_structp png_ptr)
 #ifndef PNG_NO_STDIO
       char msg[50];
 
-      png_sprintf(msg, "NULL row buffer for row %ld, pass %d",
-         png_ptr->row_number, png_ptr->pass);
+      png_sprintf(msg, "NULL row buffer for row %lu, pass %d",
+         (unsigned long) png_ptr->row_number, png_ptr->pass);
       png_error(png_ptr, msg);
 #else
       png_error(png_ptr, "NULL row buffer");
@@ -3922,7 +3922,7 @@ png_do_dither(png_row_infop row_info, png_bytep row,
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 #if defined(PNG_READ_GAMMA_SUPPORTED)
 static int png_gamma_shift[] =
-   {0x10, 0x21, 0x42, 0x84, 0x110, 0x248, 0x550, 0xff0};
+   {0x10, 0x21, 0x42, 0x84, 0x110, 0x248, 0x550, 0xff0, 0x000};
 
 /* We build the 8- or 16-bit gamma tables here.  Note that for 16-bit
  * tables, we don't make a full table if we are reducing to 8-bit in

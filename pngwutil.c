@@ -51,6 +51,23 @@ png_save_uint_16(png_bytep buf, unsigned int i)
    buf[1] = (png_byte)(i & 0xff);
 }
 
+/* Simple function to write the signature.  If we have already written
+ * the magic bytes of the signature, or more likely, the PNG stream is
+ * being embedded into another stream and doesn't need its own signature,
+ * we should call png_set_sig_bytes() to tell libpng how many of the
+ * bytes have already been written.
+ */
+void PNGAPI
+png_write_sig(png_structp png_ptr)
+{
+   png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+   /* write the rest of the 8 byte signature */
+   png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
+      (png_size_t)8 - png_ptr->sig_bytes);
+   if(png_ptr->sig_bytes < 3)
+      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
+}
+
 /* Write a PNG chunk all at once.  The type is an array of ASCII characters
  * representing the chunk name.  The array must be at least 4 bytes in
  * length, and does not need to be null terminated.  To be safe, pass the
@@ -78,7 +95,8 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
    png_uint_32 length)
 {
    png_byte buf[4];
-   png_debug2(0, "Writing %s chunk (%lu bytes)\n", chunk_name, length);
+   png_debug2(0, "Writing %s chunk (%lu bytes)\n", chunk_name,
+     (unsigned long) length);
 
    /* write the length */
    png_save_uint_32(buf, length);
@@ -117,23 +135,6 @@ png_write_chunk_end(png_structp png_ptr)
    png_save_uint_32(buf, png_ptr->crc);
 
    png_write_data(png_ptr, buf, (png_size_t)4);
-}
-
-/* Simple function to write the signature.  If we have already written
- * the magic bytes of the signature, or more likely, the PNG stream is
- * being embedded into another stream and doesn't need its own signature,
- * we should call png_set_sig_bytes() to tell libpng how many of the
- * bytes have already been written.
- */
-void /* PRIVATE */
-png_write_sig(png_structp png_ptr)
-{
-   png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
-   /* write the rest of the 8 byte signature */
-   png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
-      (png_size_t)8 - png_ptr->sig_bytes);
-   if(png_ptr->sig_bytes < 3)
-      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
 }
 
 #if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_iCCP_SUPPORTED)
@@ -990,7 +991,8 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    {
       png_warning(png_ptr, "Invalid fixed cHRM white point specified");
 #if !defined(PNG_NO_CONSOLE_IO)
-      fprintf(stderr,"white_x=%ld, white_y=%ld\n",white_x, white_y);
+      fprintf(stderr,"white_x=%ld, white_y=%ld\n",(unsigned long)white_x,
+        (unsigned long)white_y);
 #endif
       return;
    }
@@ -1538,7 +1540,8 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    for (i = 0; i < nparams; i++)
    {
       params_len[i] = png_strlen(params[i]) + (i == nparams - 1 ? 0 : 1);
-      png_debug2(3, "pCAL parameter %d length = %lu\n", i, params_len[i]);
+      png_debug2(3, "pCAL parameter %d length = %lu\n", i,
+        (unsigned long) params_len[i]);
       total_len += (png_size_t)params_len[i];
    }
 
@@ -1569,28 +1572,24 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
 /* write the sCAL chunk */
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && !defined(PNG_NO_STDIO)
 void /* PRIVATE */
-png_write_sCAL(png_structp png_ptr, int unit, double width,double height)
+png_write_sCAL(png_structp png_ptr, int unit, double width, double height)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
    PNG_sCAL;
 #endif
    png_size_t total_len;
-   char wbuf[32], hbuf[32];
-   png_byte bunit = (png_byte)unit;
+   char buf[64];
 
    png_debug(1, "in png_write_sCAL\n");
 
-   png_sprintf(wbuf, "%12.12e", width);
-   png_sprintf(hbuf, "%12.12e", height);
-   total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
+   buf[0] = (char)unit;
 
-   png_debug1(3, "sCAL total length = %d\n", (int)total_len);
-   png_write_chunk_start(png_ptr, (png_bytep)png_sCAL, (png_uint_32)total_len);
-   png_write_chunk_data(png_ptr, (png_bytep)&bunit, 1);
-   png_write_chunk_data(png_ptr, (png_bytep)wbuf, png_strlen(wbuf)+1);
-   png_write_chunk_data(png_ptr, (png_bytep)hbuf, png_strlen(hbuf));
-
-   png_write_chunk_end(png_ptr);
+   png_sprintf(buf + 1, "%12.12e", width);
+   total_len = 1 + png_strlen(buf + 1) + 1;
+   png_sprintf(buf + total_len, "%12.12e", height);
+   total_len += png_strlen(buf + total_len);
+   png_debug1(3, "sCAL total length = %u\n", (unsigned int)total_len);
+   png_write_chunk(png_ptr, (png_bytep)png_sCAL, (png_bytep)buf, total_len);
 }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
@@ -1601,23 +1600,26 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
 #ifdef PNG_USE_LOCAL_ARRAYS
    PNG_sCAL;
 #endif
-   png_size_t total_len;
-   char wbuf[32], hbuf[32];
-   png_byte bunit = unit;
+   png_byte buf[64];
+   png_size_t wlen, hlen, total_len;
 
    png_debug(1, "in png_write_sCAL_s\n");
 
-   png_strcpy(wbuf,(const char *)width);
-   png_strcpy(hbuf,(const char *)height);
-   total_len = 1 + png_strlen(wbuf)+1 + png_strlen(hbuf);
+   wlen = png_strlen(width);
+   hlen = png_strlen(height);
+   total_len = wlen + hlen + 2;
+   if (total_len > 64)
+   {
+      png_warning(png_ptr, "Can't write sCAL (buffer too small)");
+      return;
+   }
 
-   png_debug1(3, "sCAL total length = %d\n", total_len);
-   png_write_chunk_start(png_ptr, (png_bytep)png_sCAL, (png_uint_32)total_len);
-   png_write_chunk_data(png_ptr, (png_bytep)&bunit, 1);
-   png_write_chunk_data(png_ptr, (png_bytep)wbuf, png_strlen(wbuf)+1);
-   png_write_chunk_data(png_ptr, (png_bytep)hbuf, png_strlen(hbuf));
+   buf[0] = (png_byte)unit;
+   png_memcpy(buf + 1, width, wlen + 1);      /* append the '\0' here */
+   png_memcpy(buf + wlen + 2, height, hlen);  /* do NOT append the '\0' here */
 
-   png_write_chunk_end(png_ptr);
+   png_debug1(3, "sCAL total length = %u\n", (unsigned int)total_len);
+   png_write_chunk(png_ptr, (png_bytep)png_sCAL, buf, total_len);
 }
 #endif
 #endif

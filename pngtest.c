@@ -493,7 +493,8 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
       if(verbose)
-         printf("png_malloc %lu bytes at %x\n",size,pinfo->pointer);
+         printf("png_malloc %lu bytes at %x\n",(unsigned long) size,
+            pinfo->pointer);
       return (png_voidp)(pinfo->pointer);
    }
 }
@@ -1132,7 +1133,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       iwidth = png_get_image_width(write_ptr, write_info_ptr);
       iheight = png_get_image_height(write_ptr, write_info_ptr);
       fprintf(STDERR, "Image width = %lu, height = %lu\n",
-         iwidth, iheight);
+         (unsigned long) iwidth, (unsigned long) iheight);
    }
 #endif
 
@@ -1246,7 +1247,8 @@ main(int argc, char *argv[])
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
    fprintf(STDERR,"%s",png_get_copyright(NULL));
    /* Show the version of libpng used in building the library */
-   fprintf(STDERR," library (%lu):%s", png_access_version_number(),
+   fprintf(STDERR," library (%lu):%s",
+      (unsigned long) png_access_version_number(),
       png_get_header_version(NULL));
    /* Show the version of libpng used in building the application */
    fprintf(STDERR," pngtest (%lu):%s", (unsigned long)PNG_LIBPNG_VER,
@@ -1334,7 +1336,8 @@ main(int argc, char *argv[])
          if (kerror == 0)
          {
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-            fprintf(STDERR, "\n PASS (%lu zero samples)\n",zero_samples);
+            fprintf(STDERR, "\n PASS (%lu zero samples)\n",
+               (unsigned long) zero_samples);
 #else
             fprintf(STDERR, " PASS\n");
 #endif
@@ -1342,7 +1345,7 @@ main(int argc, char *argv[])
             for (k=0; k<256; k++)
                if(filters_used[k])
                   fprintf(STDERR, " Filter %d was used %lu times\n",
-                     k,filters_used[k]);
+                     k, (unsigned long) filters_used[k]);
 #endif
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
          if(tIME_chunk_present != 0)
@@ -1367,7 +1370,8 @@ main(int argc, char *argv[])
                current_allocation);
             while (pinfo != NULL)
             {
-               fprintf(STDERR, " %lu bytes at %x\n", pinfo->size,
+               fprintf(STDERR, " %lu bytes at %x\n",
+                 (unsigned long)  pinfo->size,
                  (unsigned int) pinfo->pointer);
                pinfo = pinfo->next;
             }
@@ -1407,7 +1411,8 @@ main(int argc, char *argv[])
                 int k;
 #endif
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-                fprintf(STDERR, "\n PASS (%lu zero samples)\n",zero_samples);
+                fprintf(STDERR, "\n PASS (%lu zero samples)\n",
+                   (unsigned long) zero_samples);
 #else
                 fprintf(STDERR, " PASS\n");
 #endif
@@ -1415,7 +1420,8 @@ main(int argc, char *argv[])
                 for (k=0; k<256; k++)
                    if(filters_used[k])
                       fprintf(STDERR, " Filter %d was used %lu times\n",
-                         k,filters_used[k]);
+                         k,
+                        (unsigned long) filters_used[k]);
 #endif
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
              if(tIME_chunk_present != 0)
@@ -1443,7 +1449,7 @@ main(int argc, char *argv[])
              while (pinfo != NULL)
              {
                 fprintf(STDERR," %lu bytes at %x\n",
-                   pinfo->size, (unsigned int)pinfo->pointer);
+                   (unsigned long) pinfo->size, (unsigned int)pinfo->pointer);
                 pinfo = pinfo->next;
              }
           }
@@ -1483,4 +1489,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta6 your_png_h_is_not_version_1_4_0beta6;
+typedef version_1_4_0beta7 your_png_h_is_not_version_1_4_0beta7;

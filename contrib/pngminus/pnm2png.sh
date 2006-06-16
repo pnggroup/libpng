@@ -1,3 +1,4 @@
+#!/bin/sh
 # -- grayscale
 ./pnm2png basn0g01.pgm basn0g01.png
 ./pnm2png basn0g02.pgm basn0g02.png

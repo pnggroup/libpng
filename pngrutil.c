@@ -102,7 +102,8 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
       }
       else
       {
-         png_chunk_error(png_ptr, "CRC error");
+         png_chunk_benign_error(png_ptr, "CRC error");
+         return (0);
       }
       return (1);
    }
@@ -376,7 +377,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,png_ptr->width);
    png_debug1(3,"bit_depth = %d\n", png_ptr->bit_depth);
    png_debug1(3,"channels = %d\n", png_ptr->channels);
-   png_debug1(3,"rowbytes = %lu\n", png_ptr->rowbytes);
+   png_debug1(3,"rowbytes = %lu\n", (unsigned long) png_ptr->rowbytes);
    png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,
       color_type, interlace_type, compression_type, filter_type);
 }
@@ -481,7 +482,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          if (png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)
          {
-            png_chunk_error(png_ptr, "CRC error");
+            png_chunk_benign_error(png_ptr, "CRC error");
          }
          else
          {
@@ -693,7 +694,7 @@ png_handle_sBIT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_byte buf[4];
+   png_byte buf[32];
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    float white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
 #endif
@@ -734,62 +735,46 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   png_crc_read(png_ptr, buf, 4);
+   png_crc_read(png_ptr, buf, 32);
+   if (png_crc_finish(png_ptr, 0))
+      return;
+
    uint_x = png_get_uint_32(buf);
-
-   png_crc_read(png_ptr, buf, 4);
-   uint_y = png_get_uint_32(buf);
-
+   uint_y = png_get_uint_32(buf + 4);
    if (uint_x > 80000L || uint_y > 80000L ||
       uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM white point");
-      png_crc_finish(png_ptr, 24);
       return;
    }
    int_x_white = (png_fixed_point)uint_x;
    int_y_white = (png_fixed_point)uint_y;
 
-   png_crc_read(png_ptr, buf, 4);
-   uint_x = png_get_uint_32(buf);
-
-   png_crc_read(png_ptr, buf, 4);
-   uint_y = png_get_uint_32(buf);
-
+   uint_x = png_get_uint_32(buf + 8);
+   uint_y = png_get_uint_32(buf + 12);
    if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM red point");
-      png_crc_finish(png_ptr, 16);
       return;
    }
    int_x_red = (png_fixed_point)uint_x;
    int_y_red = (png_fixed_point)uint_y;
 
-   png_crc_read(png_ptr, buf, 4);
-   uint_x = png_get_uint_32(buf);
-
-   png_crc_read(png_ptr, buf, 4);
-   uint_y = png_get_uint_32(buf);
-
+   uint_x = png_get_uint_32(buf + 16);
+   uint_y = png_get_uint_32(buf + 20);
    if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM green point");
-      png_crc_finish(png_ptr, 8);
       return;
    }
    int_x_green = (png_fixed_point)uint_x;
    int_y_green = (png_fixed_point)uint_y;
 
-   png_crc_read(png_ptr, buf, 4);
-   uint_x = png_get_uint_32(buf);
-
-   png_crc_read(png_ptr, buf, 4);
-   uint_y = png_get_uint_32(buf);
-
+   uint_x = png_get_uint_32(buf + 24);
+   uint_y = png_get_uint_32(buf + 28);
    if (uint_x + uint_y > 100000L)
    {
       png_warning(png_ptr, "Invalid cHRM blue point");
-      png_crc_finish(png_ptr, 0);
       return;
    }
    int_x_blue = (png_fixed_point)uint_x;
@@ -807,7 +792,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
 #if defined(PNG_READ_sRGB_SUPPORTED)
-   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sRGB))
+   if ((info_ptr != NULL) && (info_ptr->valid & PNG_INFO_sRGB))
       {
       if (PNG_OUT_OF_RANGE(int_x_white, 31270,  1000) ||
           PNG_OUT_OF_RANGE(int_y_white, 32900,  1000) ||
@@ -818,7 +803,6 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           PNG_OUT_OF_RANGE(int_x_blue,  15000,  1000) ||
           PNG_OUT_OF_RANGE(int_y_blue,   6000,  1000))
          {
-
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
 #ifndef PNG_NO_CONSOLE_IO
@@ -835,7 +819,6 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 #endif /* PNG_NO_CONSOLE_IO */
          }
-         png_crc_finish(png_ptr, 0);
          return;
       }
 #endif /* PNG_READ_sRGB_SUPPORTED */
@@ -849,8 +832,6 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       int_x_white, int_y_white, int_x_red, int_y_red, int_x_green,
       int_y_green, int_x_blue, int_y_blue);
 #endif
-   if (png_crc_finish(png_ptr, 0))
-      return;
 }
 #endif
 
@@ -1557,7 +1538,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    png_debug1(2, "Allocating and reading pCAL chunk data (%lu bytes)\n",
-      length + 1);
+      (unsigned long) (length + 1));
    purpose = (png_charp)png_malloc_warn(png_ptr, length + 1);
    if (purpose == NULL)
      {
@@ -1688,7 +1669,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    png_debug1(2, "Allocating and reading sCAL chunk data (%lu bytes)\n",
-      length + 1);
+      (unsigned long) (length + 1));
    buffer = (png_charp)png_malloc_warn(png_ptr, length + 1);
    if (buffer == NULL)
      {
@@ -2664,7 +2645,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    png_bytep prev_row, int filter)
 {
    png_debug(1, "in png_read_filter_row\n");
-   png_debug2(2,"row = %lu, filter = %d\n", png_ptr->row_number, filter);
+   png_debug2(2,"row = %lu, filter = %d\n",
+     (unsigned long) png_ptr->row_number, filter);
    switch (filter)
    {
       case PNG_FILTER_VALUE_NONE:
@@ -3090,12 +3072,12 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    png_memset_check(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
-   png_debug1(3, "width = %lu,\n", png_ptr->width);
-   png_debug1(3, "height = %lu,\n", png_ptr->height);
-   png_debug1(3, "iwidth = %lu,\n", png_ptr->iwidth);
-   png_debug1(3, "num_rows = %lu\n", png_ptr->num_rows);
-   png_debug1(3, "rowbytes = %lu,\n", png_ptr->rowbytes);
-   png_debug1(3, "irowbytes = %lu,\n", png_ptr->irowbytes);
+   png_debug1(3, "width = %lu,\n", (unsigned long) png_ptr->width);
+   png_debug1(3, "height = %lu,\n", (unsigned long) png_ptr->height);
+   png_debug1(3, "iwidth = %lu,\n", (unsigned long) png_ptr->iwidth);
+   png_debug1(3, "num_rows = %lu\n", (unsigned long) png_ptr->num_rows);
+   png_debug1(3, "rowbytes = %lu,\n", (unsigned long) png_ptr->rowbytes);
+   png_debug1(3, "irowbytes = %lu,\n", (unsigned long) png_ptr->irowbytes);
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }

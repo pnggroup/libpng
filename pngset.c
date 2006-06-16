@@ -394,7 +394,8 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
       return;
 
    length = png_strlen(purpose) + 1;
-   png_debug1(3, "allocating purpose for info (%lu bytes)\n", length);
+   png_debug1(3, "allocating purpose for info (%lu bytes)\n",
+     (unsigned long) length);
    info_ptr->pcal_purpose = (png_charp)png_malloc_warn(png_ptr, length);
    if (info_ptr->pcal_purpose == NULL)
      {
@@ -410,7 +411,8 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    info_ptr->pcal_nparams = (png_byte)nparams;
 
    length = png_strlen(units) + 1;
-   png_debug1(3, "allocating units for info (%lu bytes)\n", length);
+   png_debug1(3, "allocating units for info (%lu bytes)\n", 
+     (unsigned long)length);
    info_ptr->pcal_units = (png_charp)png_malloc_warn(png_ptr, length);
    if (info_ptr->pcal_units == NULL)
      {
@@ -432,7 +434,8 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    for (i = 0; i < nparams; i++)
    {
       length = png_strlen(params[i]) + 1;
-      png_debug2(3, "allocating parameter %d for info (%lu bytes)\n", i, length);
+      png_debug2(3, "allocating parameter %d for info (%lu bytes)\n", i,
+        (unsigned long) length);
       info_ptr->pcal_params[i] = (png_charp)png_malloc_warn(png_ptr, length);
       if (info_ptr->pcal_params[i] == NULL)
         {
@@ -832,7 +835,8 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       if (textp->key == NULL)
         return(1);
       png_debug2(2, "Allocated %lu bytes at %x in png_set_text\n",
-         (png_uint_32)(key_len + lang_len + lang_key_len + text_length + 4),
+         (unsigned long)(png_uint_32)(key_len + lang_len + lang_key_len
+         + text_length + 4),
          (int)textp->key);
 
       png_memcpy(textp->key, text_ptr[i].key,
@@ -1245,5 +1249,18 @@ png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
     png_ptr->user_height_max = user_height_max;
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
+
+
+#if defined(PNG_BENIGN_ERRORS_SUPPORTED)
+void PNGAPI
+png_set_benign_errors(png_structp png_ptr, int allowed)
+{
+   png_debug(1, "in png_set_benign_errors\n");
+   if (allowed)
+     png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
+   else
+     png_ptr->flags &= ~PNG_FLAG_BENIGN_ERRORS_WARN;
+}
+#endif /* PNG_BENIGN_ERRORS_SUPPORTED */
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

@@ -1,9 +1,9 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.4.0 April 20, 2006
+ * Last changed in libpng 1.2.11 June 7, 2006
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2004 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -214,6 +214,10 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
+   if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+     if(png_ptr->mode & PNG_AFTER_IDAT)
+        png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
+
    if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
@@ -281,11 +285,12 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 
       if (png_ptr->mode & PNG_HAVE_IDAT)
       {
-         if (png_ptr->push_length == 0)
-            return;
+         if (!(png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
+           if (png_ptr->push_length == 0)
+              return;
 
          if (png_ptr->mode & PNG_AFTER_IDAT)
-            png_error(png_ptr, "Too many IDAT's found");
+            png_benign_error(png_ptr, "Too many IDAT's found");
       }
 
       png_ptr->idat_size = png_ptr->push_length;
@@ -746,7 +751,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
    int ret;
 
    if ((png_ptr->flags & PNG_FLAG_ZLIB_FINISHED) && buffer_length)
-      png_error(png_ptr, "Extra compression data");
+      png_benign_error(png_ptr, "Extra compression data");
 
    png_ptr->zstream.next_in = buffer;
    png_ptr->zstream.avail_in = (uInt)buffer_length;
@@ -758,7 +763,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
          if (ret == Z_STREAM_END)
          {
             if (png_ptr->zstream.avail_in)
-               png_error(png_ptr, "Extra compressed data");
+               png_benign_error(png_ptr, "Extra compressed data");
             if (!(png_ptr->zstream.avail_out))
             {
                png_push_process_row(png_ptr);

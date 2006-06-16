@@ -1,16 +1,24 @@
 
-Installing libpng version 1.4.0beta6 - June 2, 2006
+Installing libpng version 1.4.0beta7 - June 16, 2006
 
 On Unix/Linux and similar systems, you can simply type
 
-    ./autogen.sh
     ./configure [--prefix=$HOME]
     make check
     make install
 
 and ignore the rest of this document.
 
-Or you can use one of the custom-built makefiles in the
+If configure does not work on your system and you have a reasonably
+up-to-date set of tools, running ./autogen.sh before running ./configure
+may fix the problem.  You can also run the individual commands in
+autogen.sh with the --force option, if supported by your version of
+the tools.  If you run 'libtoolize --force', though, this will replace
+the distributed, patched, version of ltmain.sh with an unpatched version
+and your shared library builds may fail to produce libraries with the
+correct version numbers.
+
+Instead, you can use one of the custom-built makefiles in the
 "scripts" directory
 
     cp scripts/makefile.system makefile
@@ -29,7 +37,7 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.4.0beta6" or "lpng109" and "zlib-1.2.1"
+might be called "libpng-1.4.0beta7" or "lpng109" and "zlib-1.2.1"
 or "zlib121") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -85,11 +93,11 @@ include
 
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       gcc, creates libpng14.so.1.1.4.0beta6)
+                       gcc, creates libpng14.so.1.1.4.0beta7)
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.1.1.4.0beta6)
+                       (gcc, creates libpng14.so.1.1.4.0beta7)
  makefile.gcmmx    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.1.1.4.0beta6,
+                       (gcc, creates libpng14.so.1.1.4.0beta7,
                        uses assembler code tuned for Intel MMX platform)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
@@ -112,12 +120,12 @@ include
  makefile.openbsd  =>  OpenBSD makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng14.so.1.1.4.0beta6)
+                       creates libpng14.so.1.1.4.0beta7)
  makefile.sunos    =>  Sun makefile
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng14.so.1.1.4.0beta6)
+                       creates libpng14.so.1.1.4.0beta7)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng14.so.1.1.4.0beta6)
+                       creates libpng14.so.1.1.4.0beta7)
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
