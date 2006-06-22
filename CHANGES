@@ -1647,6 +1647,10 @@ version 1.4.0beta7 [June 16, 2006]
   Added typedef for png_int_32 and png_uint_32 on 64-bit systems.
   Added "(unsigned long)" typecast on png_uint_32 variables in printf lists.
 
+version 1.4.0beta8 [June 22, 2006]
+  Added demonstration of user chunk support in pngtest.c, to support the
+    public sTER chunk and a private vpAg chunk.
+
 version 1.4.0betaN [future]
   Cleaned up error and warning messages.
   Implemented sTER chunk.

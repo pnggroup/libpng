@@ -550,6 +550,77 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 #endif /* PNG_USER_MEM_SUPPORTED && PNG_DEBUG */
 /* END of code to test memory allocation/deallocation */
 
+
+
+
+/* Demonstration of user chunk support of the sTER and vpAg chunks */
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+
+/* (sTER is a public chunk not yet understood by libpng.  vpAg is a private
+chunk used in ImageMagick to store "virtual page" size).  */
+
+static png_uint_32 user_chunk_data[4];
+
+    /* 0: stereo mode + 1
+     * 1: vpag width
+     * 2: vpag height
+     * 3: vpag units
+     */
+
+static int read_user_chunk_callback(png_struct *png_ptr,
+   png_unknown_chunkp chunk)
+{
+  png_uint_32
+    *user_chunk_data;
+
+  /* Return one of the following: */
+     /* return (-n);  chunk had an error */
+     /* return (0);  did not recognize */
+     /* return (n);  success */
+
+  /* The unknown chunk structure contains the chunk data:
+   * png_byte name[5];
+   * png_byte *data;
+   * png_size_t size;
+   *
+   *  Note that libpng has already taken care of the CRC handling.
+   */
+
+  if (chunk->name[0] == 115 && chunk->name[1] ==  84 &&     /* s  T */
+      chunk->name[2] == 69 && chunk-> name[3] ==  82)       /* E  R */
+     {
+       /* Found sTER chunk */
+       if (chunk->size != 1)
+         return (-1); /* Error return */
+       if (chunk->data[0] != 0 && chunk->data[0] != 1)
+          return (-1);  /* Invalid mode */
+       user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
+       user_chunk_data[0]=chunk->data[0]+1;
+       return (1);
+     }
+  if (chunk->name[0] != 118 || chunk->name[1] != 112 ||    /* v  p */
+      chunk->name[2] !=  65 || chunk->name[3] != 103)      /* A  g */
+    return (0); /* Did not recognize */
+
+  /* Found ImageMagick vpAg chunk */
+
+  if (chunk->size != 9)
+    return (-1); /* Error return */
+
+  user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
+
+  user_chunk_data[1]=(unsigned long) ((chunk->data[0] << 24) |
+     (chunk->data[1] << 16) | (chunk->data[2] << 8) | chunk->data[3]);
+  user_chunk_data[2]=(unsigned long) ((chunk->data[4] << 24) |
+     (chunk->data[5] << 16) | (chunk->data[6] << 8) | chunk->data[7]);
+  user_chunk_data[3]=(unsigned long) chunk->data[8];
+
+  return (1);
+
+}
+#endif
+/* END of code to demonstrate user chunk support */
+
 /* Test one file */
 int
 test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
@@ -608,6 +679,16 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_set_error_fn(read_ptr, (png_voidp)inname, pngtest_error,
        pngtest_warning);
 #endif
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+  user_chunk_data[0]=0;
+  user_chunk_data[1]=0;
+  user_chunk_data[2]=0;
+  user_chunk_data[3]=0;
+  png_set_read_user_chunk_fn(read_ptr, user_chunk_data,
+    read_user_chunk_callback);
+#endif
+
 #ifdef PNG_WRITE_SUPPORTED
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
    write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
@@ -976,6 +1057,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
    {
       png_unknown_chunkp unknowns;
@@ -1003,6 +1085,46 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_write_info_before_PLTE(write_ptr, write_info_ptr);
  */
    png_write_info(write_ptr, write_info_ptr);
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+   if (user_chunk_data[0] != 0)
+   {
+     png_byte png_sTER[5] = {115,  84,  69,  82, '\0'};
+
+     unsigned char
+       ster_chunk_data[1];
+
+     if(verbose)
+        fprintf(STDERR, "stereo mode = %lu\n",
+          (unsigned long)(user_chunk_data[0]-1));
+     ster_chunk_data[0]=(unsigned char)(user_chunk_data[0]-1);
+     png_write_chunk(write_ptr,png_sTER,ster_chunk_data,1);
+   }
+   if (user_chunk_data[1] != 0 || user_chunk_data[2] != 0)
+   {
+     png_byte png_vpAg[5] = {118, 112,  65, 103, '\0'};
+
+     unsigned char
+       vpag_chunk_data[9];
+
+     if(verbose)
+        fprintf(STDERR, "vpAg = %lu x %lu, units=%lu\n",
+          (unsigned long)user_chunk_data[1],
+          (unsigned long)user_chunk_data[2],
+          (unsigned long)user_chunk_data[3]);
+     vpag_chunk_data[0]=(user_chunk_data[1]>>24) & 0xff;
+     vpag_chunk_data[1]=(user_chunk_data[1]>>16) & 0xff;
+     vpag_chunk_data[2]=(user_chunk_data[1]>>8 ) & 0xff;
+     vpag_chunk_data[3]=(user_chunk_data[1]    ) & 0xff;
+     vpag_chunk_data[4]=(user_chunk_data[2]>>24) & 0xff;
+     vpag_chunk_data[5]=(user_chunk_data[2]>>16) & 0xff;
+     vpag_chunk_data[6]=(user_chunk_data[2]>>8 ) & 0xff;
+     vpag_chunk_data[7]=(user_chunk_data[2]    ) & 0xff;
+     vpag_chunk_data[8]=(user_chunk_data[3]    ) & 0xff;
+     png_write_chunk(write_ptr, png_vpAg,vpag_chunk_data,9);
+   }
+
+#endif
 #endif
 
 #ifdef SINGLE_ROWBUF_ALLOC
@@ -1489,4 +1611,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta7 your_png_h_is_not_version_1_4_0beta7;
+typedef version_1_4_0beta8 your_png_h_is_not_version_1_4_0beta8;

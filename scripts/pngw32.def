@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.4.0beta7
+;Version 1.4.0beta8
   png_build_grayscale_palette  @1
   png_chunk_error      @3
   png_chunk_warning      @4

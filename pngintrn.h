@@ -1,7 +1,7 @@
 
 /* pngintrn.h - internal header file for libpng
  *
- * libpng version 1.4.0beta7 - June 16, 2006
+ * libpng version 1.4.0beta8 - June 22, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -256,6 +256,7 @@
 #define PNG_sBIT const png_byte png_sBIT[5] = {115,  66,  73,  84, '\0'}
 #define PNG_sPLT const png_byte png_sPLT[5] = {115,  80,  76,  84, '\0'}
 #define PNG_sRGB const png_byte png_sRGB[5] = {115,  82,  71,  66, '\0'}
+#define PNG_sTER const png_byte png_sTER[5] = {115,  84,  69,  82, '\0'}
 #define PNG_tEXt const png_byte png_tEXt[5] = {116,  69,  88, 116, '\0'}
 #define PNG_tIME const png_byte png_tIME[5] = {116,  73,  77,  69, '\0'}
 #define PNG_tRNS const png_byte png_tRNS[5] = {116,  82,  78,  83, '\0'}
