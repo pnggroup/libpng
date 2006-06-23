@@ -1602,6 +1602,12 @@ version 1.2.11rc3 [June 15, 2006]
   Added one zero element to png_gamma_shift[] array in pngrtran.c to avoid
     reading out of bounds.
 
+version 1.2.11rc4 [June 15, 2006]
+  Really removed the new typedefs for 64-bit systems.
+
+version 1.2.11rc5 [June 23, 2006]
+  Removed png_sig_bytes entry from scripts/pngw32.def
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
