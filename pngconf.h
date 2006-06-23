@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.0.19rc2 - June 14, 2006
+ * libpng version 1.0.19rc5 - June 23, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2005 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1076,13 +1076,8 @@
  * want to have unsigned int for png_uint_32 instead of unsigned long.
  */
 
-#if (__WORDSIZE == 64) || defined(_LP64) || (_MIPS_SZLONG == 64)
-typedef unsigned int png_uint_32;
-typedef int png_int_32;
-#else
 typedef unsigned long png_uint_32;
 typedef long png_int_32;
-#endif
 typedef unsigned short png_uint_16;
 typedef short png_int_16;
 typedef unsigned char png_byte;
