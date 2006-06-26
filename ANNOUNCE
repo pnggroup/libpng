@@ -1,85 +1,64 @@
 
-Libpng 1.2.11rc5 - June 23, 2006
+Libpng 1.2.11 - June 26, 2006
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.11rc5.tar.gz
-   libpng-1.2.11rc5.tar.bz2
+   libpng-1.2.11.tar.gz
+   libpng-1.2.11.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.11rc5-no-config.tar.gz
-   libpng-1.2.11rc5-no-config.tar.bz2
+   libpng-1.2.11-no-config.tar.gz
+   libpng-1.2.11-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1211r05.zip
-   lp1211r05.tar.bz2
+   lpng1211.zip
+   lpng1211.tar.bz2
 
 Project files
 
-   libpng-1.2.11rc5-project-netware.zip
-   libpng-1.2.11rc5-project-wince.zip
+   libpng-1.2.11-project-netware.zip
+   libpng-1.2.11-project-wince.zip
 
 Other information:
 
-   libpng-1.2.11rc5-README.txt
-   libpng-1.2.11rc5-KNOWNBUGS.txt
-   libpng-1.2.11rc5-LICENSE.txt
-   libpng-1.2.11rc5-Y2K-compliance.txt
+   libpng-1.2.11-README.txt
+   libpng-1.2.11-KNOWNBUGS.txt
+   libpng-1.2.11-LICENSE.txt
+   libpng-1.2.11-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
-version 1.2.11beta1 [May 31, 2006]
+version 1.2.11 [June 26, 2006]
   scripts/libpng.pc.in contained "configure" style version info and would
-    not work with makefiles.
-  The shared-library makefiles were linking to libpng.so.0 instead of
-    libpng.so.3 compatibility as the library.
-
-version 1.2.11beta2 [June 2, 2006]
+      not work with makefiles.
+    The shared-library makefiles were linking to libpng.so.0 instead of
+      libpng.so.3 compatibility as the library.
   Increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
     buffer overflow.
   Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb)
-
-version 1.2.11beta3 [June 5, 2006]
   Prepended "#! /bin/sh" to ltmail.sh and contrib/pngminus/*.sh (Cosmin).
-  Removed the accidental leftover Makefile.in~ (Cosmin).
+    Removed the accidental leftover Makefile.in~ (Cosmin).
   Avoided potential buffer overflow and optimized buffer in
     png_write_sCAL(), png_write_sCAL_s() (Cosmin).
   Removed the include directories and libraries from CFLAGS and LDFLAGS
     in scripts/makefile.gcc (Nelson A. de Oliveira, Cosmin).
-
-version 1.2.11beta4 [June 6, 2006]
   Allow zero-length IDAT chunks after the entire zlib datastream, but not
     after another intervening chunk type.
-
-version 1.2.11rc1 [June 13, 2006]
-  Deleted extraneous square brackets from [config.h] in configure.ac
-
-version 1.2.11rc2 [June 14, 2006]
+    Deleted extraneous square brackets from [config.h] in configure.ac
   Added prototypes for PNG_INCH_CONVERSIONS functions to png.h
   Revised INSTALL and autogen.sh
   Fixed typo in several makefiles (-W1 should be -Wl)
-  Added typedef for png_int_32 and png_uint_32 on 64-bit systems.
-
-version 1.2.11rc3 [June 15, 2006]
-  Removed the new typedefs for 64-bit systems (delay until version 1.4.0)
   Added one zero element to png_gamma_shift[] array in pngrtran.c to avoid
     reading out of bounds.
-
-version 1.2.11rc4 [June 15, 2006]
-  Really removed the new typedefs for 64-bit systems.
-
-version 1.2.11    [June 22, 2006]
-  None.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

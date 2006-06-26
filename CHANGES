@@ -1605,7 +1605,7 @@ version 1.2.11rc3 [June 15, 2006]
 version 1.2.11rc4 [June 15, 2006]
   Really removed the new typedefs for 64-bit systems.
 
-version 1.2.11rc5 [June 23, 2006]
+version 1.2.11rc5 [June 26, 2006]
   Removed png_sig_bytes entry from scripts/pngw32.def
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
