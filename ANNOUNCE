@@ -1,5 +1,5 @@
 
-Libpng 1.2.11 - June 26, 2006
+Libpng 1.2.12 - June 27, 2006
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,57 +8,40 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.11.tar.gz
-   libpng-1.2.11.tar.bz2
+   libpng-1.2.12.tar.gz
+   libpng-1.2.12.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.11-no-config.tar.gz
-   libpng-1.2.11-no-config.tar.bz2
+   libpng-1.2.12-no-config.tar.gz
+   libpng-1.2.12-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1211.zip
-   lpng1211.tar.bz2
+   lpng1212.zip
+   lpng1212.tar.bz2
 
 Project files
 
-   libpng-1.2.11-project-netware.zip
-   libpng-1.2.11-project-wince.zip
+   libpng-1.2.12-project-netware.zip
+   libpng-1.2.12-project-wince.zip
 
 Other information:
 
-   libpng-1.2.11-README.txt
-   libpng-1.2.11-KNOWNBUGS.txt
-   libpng-1.2.11-LICENSE.txt
-   libpng-1.2.11-Y2K-compliance.txt
+   libpng-1.2.12-README.txt
+   libpng-1.2.12-KNOWNBUGS.txt
+   libpng-1.2.12-LICENSE.txt
+   libpng-1.2.12-Y2K-compliance.txt
 
-Changes since the last public release (1.2.10):
+Changes since the last public release (1.2.11):
 
-version 1.2.11 [June 26, 2006]
-  scripts/libpng.pc.in contained "configure" style version info and would
-      not work with makefiles.
-    The shared-library makefiles were linking to libpng.so.0 instead of
-      libpng.so.3 compatibility as the library.
-  Increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
+version 1.2.12 [June 27, 2006]
+
+version 1.0.20, 1.2.12 [June 27, 2006]
+  Really increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
     buffer overflow.
-  Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb)
-  Prepended "#! /bin/sh" to ltmail.sh and contrib/pngminus/*.sh (Cosmin).
-    Removed the accidental leftover Makefile.in~ (Cosmin).
-  Avoided potential buffer overflow and optimized buffer in
-    png_write_sCAL(), png_write_sCAL_s() (Cosmin).
-  Removed the include directories and libraries from CFLAGS and LDFLAGS
-    in scripts/makefile.gcc (Nelson A. de Oliveira, Cosmin).
-  Allow zero-length IDAT chunks after the entire zlib datastream, but not
-    after another intervening chunk type.
-    Deleted extraneous square brackets from [config.h] in configure.ac
-  Added prototypes for PNG_INCH_CONVERSIONS functions to png.h
-  Revised INSTALL and autogen.sh
-  Fixed typo in several makefiles (-W1 should be -Wl)
-  Added one zero element to png_gamma_shift[] array in pngrtran.c to avoid
-    reading out of bounds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

@@ -1480,7 +1480,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (11) in configuration files.
+  Fixed typo (12) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1588,25 +1588,32 @@ version 1.2.11beta4 [June 6, 2006]
   Allow zero-length IDAT chunks after the entire zlib datastream, but not
     after another intervening chunk type.
 
-version 1.2.11rc1 [June 13, 2006]
+version 1.0.19rc1, 1.2.11rc1 [June 13, 2006]
   Deleted extraneous square brackets from [config.h] in configure.ac
 
-version 1.2.11rc2 [June 14, 2006]
+version 1.0.19rc2, 1.2.11rc2 [June 14, 2006]
   Added prototypes for PNG_INCH_CONVERSIONS functions to png.h
   Revised INSTALL and autogen.sh
   Fixed typo in several makefiles (-W1 should be -Wl)
   Added typedef for png_int_32 and png_uint_32 on 64-bit systems.
 
-version 1.2.11rc3 [June 15, 2006]
+version 1.0.19rc3, 1.2.11rc3 [June 15, 2006]
   Removed the new typedefs for 64-bit systems (delay until version 1.4.0)
   Added one zero element to png_gamma_shift[] array in pngrtran.c to avoid
     reading out of bounds.
 
-version 1.2.11rc4 [June 15, 2006]
+version 1.0.19rc4, 1.2.11rc4 [June 15, 2006]
   Really removed the new typedefs for 64-bit systems.
 
-version 1.2.11rc5 [June 26, 2006]
+version 1.0.19rc5, 1.2.11rc5 [June 22, 2006]
   Removed png_sig_bytes entry from scripts/pngw32.def
+
+version 1.0.19, 1.2.11 [June 26, 2006]
+  None.
+
+version 1.0.20, 1.2.12 [June 27, 2006]
+  Really increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
+    buffer overflow.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
