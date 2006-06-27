@@ -1,5 +1,5 @@
 
-Libpng 1.0.19 - June 26, 2006
+Libpng 1.0.20 - June 27, 2006
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,52 +8,40 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.19.tar.gz
-   libpng-1.0.19.tar.bz2
+   libpng-1.0.20.tar.gz
+   libpng-1.0.20.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.19-no-config.tar.gz
-   libpng-1.0.19-no-config.tar.bz2
+   libpng-1.0.20-no-config.tar.gz
+   libpng-1.0.20-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1019.zip
-   lpng1019.tar.bz2
+   lpng1020.zip
+   lpng1020.tar.bz2
 
 Project files
 
-   libpng-1.0.19-project-netware.zip
-   libpng-1.0.19-project-wince.zip
+   libpng-1.0.20-project-netware.zip
+   libpng-1.0.20-project-wince.zip
 
 Other information:
 
-   libpng-1.0.19-README.txt
-   libpng-1.0.19-KNOWNBUGS.txt
-   libpng-1.0.19-LICENSE.txt
-   libpng-1.0.19-Y2K-compliance.txt
+   libpng-1.0.20-README.txt
+   libpng-1.0.20-KNOWNBUGS.txt
+   libpng-1.0.20-LICENSE.txt
+   libpng-1.0.20-Y2K-compliance.txt
 
-Changes since the last public release (1.0.18):
+Changes since the last public release (1.0.19):
 
-version 1.0.19 [June 26, 2006]
-  Sync with versions libpng-1.2.9 and 1.2.10
-  Increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
+version 1.0.20 [June 27, 2006]
+
+version 1.0.20, 1.2.12 [June 27, 2006]
+  Really increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
     buffer overflow.
-  Fixed bug in example.c (png_set_palette_rgb -> png_set_palette_to_rgb)
-  Prepended "#! /bin/sh" to ltmail.sh and contrib/pngminus/*.sh (Cosmin).
-  Avoided potential buffer overflow and optimized buffer in
-    png_write_sCAL(), png_write_sCAL_s() (Cosmin).
-  Removed the include directories and libraries from CFLAGS and LDFLAGS
-    in scripts/makefile.gcc (Nelson A. de Oliveira, Cosmin).
-  Allow zero-length IDAT chunks after the entire zlib datastream, but not
-    after another intervening chunk type.
-  Added prototypes for PNG_INCH_CONVERSIONS functions to png.h
-  Revised INSTALL and autogen.sh
-  Fixed typo in several makefiles (-W1 should be -Wl)
-  Added one zero element to png_gamma_shift[] array in pngrtran.c to avoid
-    reading out of bounds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
