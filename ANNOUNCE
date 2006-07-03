@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta8 - June 22, 2006
+Libpng 1.4.0beta9 - July 3, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta8.tar.gz
-   1.4.0beta8.tar.bz2
+   1.4.0beta9.tar.gz
+   1.4.0beta9.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta8-no-config.tar.gz
-   1.4.0beta8-no-config.tar.bz2
+   1.4.0beta9-no-config.tar.gz
+   1.4.0beta9-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b08.zip
-   lp140b08.tar.bz2
+   lp140b09.zip
+   lp140b09.tar.bz2
 
 Project files
 
-   1.4.0beta8-project-netware.zip
-   1.4.0beta8-project-wince.zip
+   1.4.0beta9-project-netware.zip
+   1.4.0beta9-project-wince.zip
 
 Other information:
 
-   1.4.0beta8-README.txt
-   1.4.0beta8-KNOWNBUGS.txt
-   1.4.0beta8-LICENSE.txt
-   1.4.0beta8-Y2K-compliance.txt
+   1.4.0beta9-README.txt
+   1.4.0beta9-KNOWNBUGS.txt
+   1.4.0beta9-LICENSE.txt
+   1.4.0beta9-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -111,7 +111,7 @@ version 1.4.0beta4 [May 11, 2006]
   Revised configure.ac, Makefile.am, and many of the makefiles to write
     their defines in pngconf.h.
 
-version 1.4.0beta5 [June 22, 2006]
+version 1.4.0beta5 [May 15, 2006]
   Added a missing semicolon in Makefile.am and Makefile.in
   Deleted extraneous square brackets from configure.ac
 
@@ -141,11 +141,11 @@ version 1.2.11rc2 [June 14, 2006]
   Revised INSTALL and autogen.sh
   Fixed typo in several makefiles (-W1 should be -Wl)
 
-version 1.2.11rc3 [June 22, 2006]
+version 1.2.11rc3 [June 15, 2006]
   Added one zero element to png_gamma_shift[] array in pngrtran.c to avoid
     reading out of bounds.
 
-version 1.4.0beta7 [June 22, 2006]
+version 1.4.0beta7 [June 16, 2006]
   Exported png_write_sig (Cosmin).
   Optimized buffer in png_handle_cHRM() (Cosmin).
   Set pHYs = 2835 x 2835 pixels per meter, and added
@@ -153,9 +153,17 @@ version 1.4.0beta7 [June 22, 2006]
   Added png_set_benign_errors(), png_benign_error(), png_chunk_benign_error().
   Added typedef for png_int_32 and png_uint_32 on 64-bit systems.
 
-version 1.4.0beta8 [June 22, 2006]
+version 1.4.0beta8 [June 21, 2006]
   Added demonstration of user chunk support in pngtest.c, to support the
     public sTER chunk and a private vpAg chunk.
+
+version 1.4.0beta9 [July 3, 2006]
+  Removed ordinals from scripts/pngw32.def and removed png_info_int and
+    png_set_gray_1_2_4_to_8 entries.
+  Inline call of png_get_uint_32() in png_get_uint_31().
+  Use png_get_uint_31() to get vpAg width and heigh in pngtest.c
+  Removed WINCE and Netware projects.
+  Removed standalone Y2KINFO file.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

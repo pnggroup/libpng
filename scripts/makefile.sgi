@@ -6,7 +6,7 @@
 # Library name:
 LIBNAME=libpng14
 PNGMAJ = 1
-PNGMIN = 1.4.0beta8
+PNGMIN = 1.4.0beta9
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -85,7 +85,7 @@ pngconf.h:	pngconf.h.in
 	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
 
 	/* if you don't want to use the intel MMX code, uncomment this */
-	# echo "#define PNG_NO_MMX_CODE" >> pngconf.h
+	echo "#define PNG_NO_MMX_CODE" >> pngconf.h
 
 	/* if you don't need thread safety you can uncomment this */
 	# echo "#define PNG_THREAD_UNSAFE_OK" >> pngconf.h
@@ -105,7 +105,7 @@ libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo cppflags=\"-DPNG_USE_PNGGCCRD -DPNG_NO_MMX_CODE\"; \
+	echo cppflags=\""; \
 	echo ccopts=\"$(ABI)\"; \
 	echo ldopts=\"$(ABI)\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \

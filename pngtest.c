@@ -561,10 +561,10 @@ chunk used in ImageMagick to store "virtual page" size).  */
 
 static png_uint_32 user_chunk_data[4];
 
-    /* 0: stereo mode + 1
-     * 1: vpag width
-     * 2: vpag height
-     * 3: vpag units
+    /* 0: sTER mode + 1
+     * 1: vpAg width
+     * 2: vpAg height
+     * 3: vpAg units
      */
 
 static int read_user_chunk_callback(png_struct *png_ptr,
@@ -587,7 +587,7 @@ static int read_user_chunk_callback(png_struct *png_ptr,
    */
 
   if (chunk->name[0] == 115 && chunk->name[1] ==  84 &&     /* s  T */
-      chunk->name[2] == 69 && chunk-> name[3] ==  82)       /* E  R */
+      chunk->name[2] ==  69 && chunk->name[3] ==  82)       /* E  R */
      {
        /* Found sTER chunk */
        if (chunk->size != 1)
@@ -609,10 +609,8 @@ static int read_user_chunk_callback(png_struct *png_ptr,
 
   user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
 
-  user_chunk_data[1]=(unsigned long) ((chunk->data[0] << 24) |
-     (chunk->data[1] << 16) | (chunk->data[2] << 8) | chunk->data[3]);
-  user_chunk_data[2]=(unsigned long) ((chunk->data[4] << 24) |
-     (chunk->data[5] << 16) | (chunk->data[6] << 8) | chunk->data[7]);
+  user_chunk_data[1]=png_get_uint_31(png_ptr,chunk->data);
+  user_chunk_data[2]=png_get_uint_31(png_ptr,chunk->data + 4);
   user_chunk_data[3]=(unsigned long) chunk->data[8];
 
   return (1);
@@ -1611,4 +1609,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta8 your_png_h_is_not_version_1_4_0beta8;
+typedef version_1_4_0beta9 your_png_h_is_not_version_1_4_0beta9;

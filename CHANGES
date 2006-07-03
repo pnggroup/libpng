@@ -1593,7 +1593,7 @@ version 1.4.0beta4 [May 11, 2006]
   Revised configure.ac, Makefile.am, and many of the makefiles to write
     their defines in pngconf.h.
 
-version 1.4.0beta5 [May 31, 2006]
+version 1.4.0beta5 [May 15, 2006]
   Added a missing semicolon in Makefile.am and Makefile.in
   Deleted extraneous square brackets from configure.ac
 
@@ -1651,10 +1651,16 @@ version 1.4.0beta8 [June 22, 2006]
   Added demonstration of user chunk support in pngtest.c, to support the
     public sTER chunk and a private vpAg chunk.
 
+version 1.4.0beta9 [July 3, 2006]
+  Removed ordinals from scripts/pngw32.def and removed png_info_int and
+    png_set_gray_1_2_4_to_8 entries.
+  Inline call of png_get_uint_32() in png_get_uint_31().
+  Use png_get_uint_31() to get vpAg width and heigh in pngtest.c
+  Removed WINCE and Netware projects.
+  Removed standalone Y2KINFO file.
+
 version 1.4.0betaN [future]
   Cleaned up error and warning messages.
-  Implemented sTER chunk.
-  Cleaned up WINCE project.
   Build shared libraries with -lz and sometimes -lm.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
