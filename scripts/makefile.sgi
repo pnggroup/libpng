@@ -6,7 +6,7 @@
 # Library name:
 LIBNAME=libpng14
 PNGMAJ = 1
-PNGMIN = 1.4.0beta9
+PNGMIN = 1.4.0beta10
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -76,12 +76,12 @@ OBJS = pnggccrd.o png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: libpng.a pngtest shared libpng.pc libpng-config
+all: libpng.a pngtest shared libpng.pc libpng-config pngconf.h
 
-pngconf.h.in:
+pngconf.h.in: pngconf.h
 	cat pngconf.h > pngconf.h.in
 
-pngconf.h:	pngconf.h.in
+pngconf.h: pngconf.h.in
 	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
 
 	/* if you don't want to use the intel MMX code, uncomment this */
@@ -238,5 +238,4 @@ pngwrite.o: png.h pngconf.h pngintrn.h
 pngwtran.o: png.h pngconf.h pngintrn.h
 pngwutil.o: png.h pngconf.h pngintrn.h
 pngpread.o: png.h pngconf.h pngintrn.h
-pnggccrd.o: png.h pngconf.h pngintrn.h
 

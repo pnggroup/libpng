@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta9 - July 3, 2006
+Libpng 1.4.0beta10 - July 12, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta9.tar.gz
-   1.4.0beta9.tar.bz2
+   1.4.0beta10.tar.gz
+   1.4.0beta10.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta9-no-config.tar.gz
-   1.4.0beta9-no-config.tar.bz2
+   1.4.0beta10-no-config.tar.gz
+   1.4.0beta10-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b09.zip
-   lp140b09.tar.bz2
-
-Project files
-
-   1.4.0beta9-project-netware.zip
-   1.4.0beta9-project-wince.zip
+   lp140b10.zip
+   lp140b10.tar.bz2
 
 Other information:
 
-   1.4.0beta9-README.txt
-   1.4.0beta9-KNOWNBUGS.txt
-   1.4.0beta9-LICENSE.txt
-   1.4.0beta9-Y2K-compliance.txt
+   1.4.0beta10-README.txt
+   1.4.0beta10-KNOWNBUGS.txt
+   1.4.0beta10-LICENSE.txt
+   1.4.0beta10-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -164,6 +159,9 @@ version 1.4.0beta9 [July 3, 2006]
   Use png_get_uint_31() to get vpAg width and heigh in pngtest.c
   Removed WINCE and Netware projects.
   Removed standalone Y2KINFO file.
+
+version 1.4.0beta10 [July 12, 2006]
+  Added "all: pngconf.h.in pngconf.h" target to Makefile.am
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

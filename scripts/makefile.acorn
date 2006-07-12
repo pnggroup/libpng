@@ -10,7 +10,6 @@ CMHGflags =
 LibFileflags = -c -l -o $@
 Squeezeflags = -o $@
 
-
 # Final targets:
 @.libpng-lib:   @.o.png @.o.pngerror @.o.pngrio @.o.pngwio @.o.pngmem \
 	@.o.pngpread @.o.pngset @.o.pngget @.o.pngread @.o.pngrtran \

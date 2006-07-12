@@ -14,7 +14,7 @@ INCSDIR=${LOCALBASE}/include/libpng14
 
 LIB=	png12
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.4.0beta9
+SHLIB_MINOR=	1.4.0beta10
 SRCS=	pnggccrd.c png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 		pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 		pngwtran.c pngmem.c pngerror.c pngpread.c
@@ -25,7 +25,9 @@ CPPFLAGS+=-I${.CURDIR}
 
 CLEANFILES+=pngtest.o pngtest
 
-pngconf.h.in:
+all: pngconf.h
+
+pngconf.h.in: pngconf.h
 	cat pngconf.h > pngconf.h.in
 
 pngconf.h:	pngconf.h.in

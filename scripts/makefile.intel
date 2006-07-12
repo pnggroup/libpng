@@ -46,9 +46,9 @@ pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O) \
 pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O) pngvcrd$(O)
 
 
-all: test
+all: test pngconf.h
 
-pngconf.h.in:
+pngconf.h.in: pngconf.h
 	cat pngconf.h > pngconf.h.in
 
 # Remove the line with #define PNG_THREAD_UNSAFE_OK if you need thread safety

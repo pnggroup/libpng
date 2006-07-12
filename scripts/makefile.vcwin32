@@ -30,12 +30,12 @@ OBJS3 = pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
 OBJS  = $(OBJS1) $(OBJS2) $(OBJS3)
 
 # Targets
-all: libpng.lib
+all: libpng.lib pngconf.h
 
-pngconf.h.in:
+pngconf.h.in: pngconf.h
 	cat pngconf.h > pngconf.h.in
 
-pngconf.h:	pngconf.h.in
+pngconf.h: pngconf.h.in
 	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
 	echo "#define PNG_NO_MMX_CODE" >> pngconf.h
 	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h

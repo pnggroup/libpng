@@ -90,12 +90,14 @@ CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers libpng.sym
 pngconf.h.in:
 	cat pngconf.h > pngconf.h.in
 
-pngconf.h:	pngconf.h.in
+pngconf.h: pngconf.h.in
 	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
 	@if test -n "@LIBPNG_NO_MMX@"; then \
 	echo "#define PNG_NO_MMX_CODE" >> pngconf.h; \
 	fi
 	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
+
+all: pngconf.h.in pngconf.h
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@

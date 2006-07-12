@@ -24,7 +24,9 @@ SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 
-pngconf.h.in:
+all: pngconf.h
+
+pngconf.h.in: pngconf.h
 	cat pngconf.h > pngconf.h.in
 
 pngconf.h:	pngconf.h.in

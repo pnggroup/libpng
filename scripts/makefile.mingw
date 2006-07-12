@@ -66,7 +66,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng14
 PNGMAJ = 1
 MINGDLL = 14
-PNGMIN = 1.4.0beta9
+PNGMIN = 1.4.0beta10
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=libpng$(MINGDLL).dll
@@ -113,9 +113,10 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 %.pic.o : %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-all: all-static all-shared libpng.pc libpng-config libpng.pc libpng-config
+all: all-static all-shared libpng.pc libpng-config libpng.pc libpng-config \
+	pngconf.h
 
-pngconf.h.in:
+pngconf.h.in: pngconf.h
 	cat pngconf.h > pngconf.h.in
 
 pngconf.h:	pngconf.h.in

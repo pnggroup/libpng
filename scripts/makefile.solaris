@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 1
-PNGMIN = 1.4.0beta9
+PNGMIN = 1.4.0beta10
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -76,12 +76,12 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
-all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
+all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config pngconf.h
 
-pngconf.h.in:
+pngconf.h.in: pngconf.h
 	cat pngconf.h > pngconf.h.in
 
-pngconf.h:	pngconf.h.in
+pngconf.h: pngconf.h.in
 	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
 	echo "#define PNG_NO_MMX_CODE" >> pngconf.h
 	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h

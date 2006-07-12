@@ -8,7 +8,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.4.0beta9
+SHLIB_MINOR=	1.4.0beta10
 
 LIB=	png
 SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \
@@ -20,10 +20,12 @@ HDRS=	png.h pngconf.h
 CFLAGS+= -Wall
 CPPFLAGS+= -I${.CURDIR}
 
-pngconf.h.in:
+all: pngconf.h
+
+pngconf.h.in: pngconf.h
 	cat pngconf.h > pngconf.h.in
 
-pngconf.h:	pngconf.h.in
+pngconf.h: pngconf.h.in
 	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
 
 	/* if you want to use the intel assembler code, remove this */

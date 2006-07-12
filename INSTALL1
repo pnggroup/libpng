@@ -1,0 +1,20 @@
+
+
+Using the ./configure script -- 16 December 2002.
+=================================================
+
+
+The ./configure script should work compatibly with what scripts/makefile.*
+did, however there are some options you need to add to configure explicitly,
+which previously was done semi-automatically (if you didn't edit
+scripts/makefile.* yourself, that is)
+
+
+CFLAGS="-Wall -O3 -funroll-loops \
+-malign-loops=2 -malign-functions=2" ./configure --prefix=/usr/include \
+--with-pkgconfigdir=/usr/lib/pkgconfig --includedir=/usr/include
+
+You can alternatively specify --includedir=/usr/include, /usr/local/include,
+/usr/include/png14, or whatever.
+
+

@@ -1659,6 +1659,13 @@ version 1.4.0beta9 [July 3, 2006]
   Removed WINCE and Netware projects.
   Removed standalone Y2KINFO file.
 
+version 1.4.0beta10 [July 12, 2006]
+  Eliminated automatic copy of pngconf.h to pngconf.h.in from configure and
+    some makefiles, because it was not working reliably.  Instead, distribute
+    pngconf.h.in along with pngconf.h and cause configure and some of the
+    makefiles to update pngconf.h from pngconf.h.in.
+  Added pngconf.h to DEPENDENCIES in Makefile.am
+
 version 1.4.0betaN [future]
   Cleaned up error and warning messages.
   Build shared libraries with -lz and sometimes -lm.
