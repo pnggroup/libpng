@@ -1655,7 +1655,7 @@ version 1.4.0beta9 [July 3, 2006]
   Removed ordinals from scripts/pngw32.def and removed png_info_int and
     png_set_gray_1_2_4_to_8 entries.
   Inline call of png_get_uint_32() in png_get_uint_31().
-  Use png_get_uint_31() to get vpAg width and heigh in pngtest.c
+  Use png_get_uint_31() to get vpAg width and height in pngtest.c
   Removed WINCE and Netware projects.
   Removed standalone Y2KINFO file.
 
@@ -1666,8 +1666,51 @@ version 1.4.0beta10 [July 12, 2006]
     makefiles to update pngconf.h from pngconf.h.in.
   Added pngconf.h to DEPENDENCIES in Makefile.am
 
+version 1.4.0beta11 [August 19, 2006]
+  Removed AC_FUNC_MALLOC from configure.ac.
+  Added a warning when writing iCCP profile with mismatched profile length.
+  Patched pnggccrd.c to assemble on x86_64 platforms.
+  Moved chunk header reading into a separate function png_read_chunk_header()
+    in pngrutil.c.  The chunk header (len+sig) is now serialized in a single
+    operation (Cosmin).
+  Implemented support for I/O states. Added png_ptr member io_state, and
+    functions png_get_io_chunk_name() and png_get_io_state() in pngget.c
+    (Cosmin).
+  Added png_get_io_chunk_name and png_get_io_state to scripts/*.def (Cosmin).
+  Renamed scripts/pngw32.* to scripts/pngwin.* (Cosmin).
+  Removed the include directories and libraries from CFLAGS and LDFLAGS
+    in scripts/makefile.gcc (Cosmin).
+  Used png_save_uint_32() to set vpAg width and height in pngtest.c (Cosmin).
+  Cast to proper type when getting/setting vpAg units in pngtest.c (Cosmin).
+  Added pngintrn.h to the Visual C++ projects (Cosmin).
+  Removed scripts/list (Cosmin).
+  Updated copyright year in scripts/pngwin.def (Cosmin).
+  Removed PNG_TYPECAST_NULL and used standard NULL consistently (Cosmin).
+  Disallowed the user to redefine png_size_t, and enforced a consistent use
+    of png_size_t across libpng (Cosmin).
+  Changed the type of png_ptr->rowbytes, PNG_ROWBYTES() and friends
+    to png_size_t (Cosmin).
+  Removed png_convert_size() and replaced png_sizeof with sizeof (Cosmin).
+  Removed some unnecessary type casts (Cosmin).
+  Changed prototype of png_get_compression_buffer_size() and
+    png_set_compression_buffer_size() to work with png_size_t instead of
+    png_uint_32 (Cosmin).
+  Removed png_memcpy_check() and png_memset_check() (Cosmin).
+  Fixed a typo (png_byte --> png_bytep) in libpng.3 and libpng.txt (Cosmin).
+  Clarified that png_zalloc() does not clear the allocated memory,
+    and png_zalloc() and png_zfree() cannot be PNGAPI (Cosmin).
+  Renamed png_mem_size_t to png_alloc_size_t, fixed its definition in
+    pngconf.h, and used it in all memory allocation functions (Cosmin).
+  Renamed pngintrn.h to pngpriv.h, added a comment at the top of the file
+    mentioning that the symbols declared in that file are private, and
+    updated the scripts and the Visual C++ projects accordingly (Cosmin).
+  Removed circular references between pngconf.h and pngconf.h.in in
+    scripts/makefile.vc*win32 (Cosmin).
+  Removing trailing '.' from the warning and error messages (Cosmin).
+  Added pngdefs.h that is built by makefile or configure, instead of
+    pngconf.h.in (Glenn).
+
 version 1.4.0betaN [future]
-  Cleaned up error and warning messages.
   Build shared libraries with -lz and sometimes -lm.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

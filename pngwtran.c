@@ -10,7 +10,7 @@
 
 #include "png.h"
 #ifdef PNG_WRITE_SUPPORTED
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 /* Transform the data according to the user's wishes.  The order of
  * transformations is significant.

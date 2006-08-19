@@ -34,7 +34,7 @@ EXTRA_LTLIBRARIES= libpng.la
 libpng14_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c \
-	png.h pngconf.h pngintrn.h
+	png.h pngconf.h pngdefs.h pngpriv.h
 libpng_la_SOURCES = $(libpng14_la_SOURCES)
 
 libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
@@ -60,7 +60,7 @@ libpng_la_DEPENDENCIES = $(libpng14_la_DEPENDENCIES)
 
 #distribute headers in /usr/include/libpng/*
 pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
-pkginclude_HEADERS= png.h pngconf.h
+pkginclude_HEADERS= png.h pngconf.h pngdefs.h
 
 # pkg-config stuff, note that libpng.pc is always required in order
 # to get the correct library
@@ -87,17 +87,13 @@ EXTRA_DIST= \
 
 CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers libpng.sym
 
-pngconf.h.in:
-	cat pngconf.h > pngconf.h.in
+all: pngdefs.h
 
-pngconf.h: pngconf.h.in
-	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
+pngdefs.h:
+	echo "/* pngdefs.h created by \"configure\". */" > pngdefs.h
 	@if test -n "@LIBPNG_NO_MMX@"; then \
-	echo "#define PNG_NO_MMX_CODE" >> pngconf.h; \
+	echo "#define PNG_NO_MMX_CODE" >> pngdefs.h; \
 	fi
-	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
-
-all: pngconf.h.in pngconf.h
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -105,7 +101,7 @@ $(PNGLIB_BASENAME).pc: libpng.pc
 $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
-libpng.sym: png.h pngconf.h
+libpng.sym: png.h pngconf.h pngdefs.h
 	rm -f $@ $@.new
 	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
 		$(SED) -n -e \
@@ -123,9 +119,10 @@ libpng.vers: libpng.sym
 
 # install the .../include headers as links to the new ones
 install-data-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pngdefs.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h pngconf.h
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngdefs.h pngdefs.h
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
@@ -141,7 +138,7 @@ install-exec-hook:
 	done
 
 uninstall-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pngdefs.h
 	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
 	rm -f $(DESTDIR)$(bindir)/libpng-config
 	@if test -n "@compatlib@"; then\

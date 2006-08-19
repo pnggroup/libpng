@@ -36,6 +36,11 @@ Test: @.pngtest
 @.pngtest:   @.o.pngtest @.libpng-lib C:o.Stubs Zlib:zlib_lib
 	Link $(Linkflags) @.o.pngtest @.libpng-lib C:o.Stubs Zlib:zlib_lib
 
+all: pngdefs.h
+
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.acorn */" > pngdefs.h
+
 .SUFFIXES: .o .mm .c
 
 .c.mm:
@@ -45,6 +50,5 @@ Test: @.pngtest
 
 
 # Static dependencies:
-
 
 # Dynamic dependencies:

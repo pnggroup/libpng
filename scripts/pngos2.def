@@ -2,7 +2,7 @@
 ; PNG.LIB module definition file for OS/2
 ;----------------------------------------
 
-; Version 1.4.0beta10
+; Version 1.4.0beta11
 
 LIBRARY		PNG
 DESCRIPTION	"PNG image compression library for OS/2"
@@ -219,6 +219,9 @@ EXPORTS
   png_save_int_32
   png_get_uint_31
   png_set_expand_gray_1_2_4_to_8
+; Added at version 1.4.0
+  png_get_io_chunk_name
+  png_get_io_state
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
   png_libpng_ver

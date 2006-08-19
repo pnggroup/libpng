@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "July 12, 2006"
+.TH LIBPNG 3 "August 19, 2006"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta10
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta11
 .SH SYNOPSIS
 \fI\fB
 
@@ -350,19 +350,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta10
 
 \fI\fB
 
-\fBDEPRECATED: void png_info_init (png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_voidp png_malloc (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
 
 \fI\fB
 
-\fBDEPRECATED: void png_info_init_2 (png_infopp \fP\fIptr_ptr\fP\fB, png_size_t \fIpng_info_struct_size\fP\fB);\fP
-
-\fI\fB
-
-\fBpng_voidp png_malloc (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
-
-\fI\fB
-
-\fBpng_voidp png_malloc_default(png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
+\fBpng_voidp png_malloc_default(png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
 
 \fI\fB
 
@@ -370,19 +362,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta10
 
 \fI\fB
 
-\fBpng_voidp png_memcpy_check (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIs1\fP\fB, png_voidp \fP\fIs2\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
-
-\fI\fB
-
 \fBvoidp png_memset (png_voidp \fP\fIs1\fP\fB, int \fP\fIvalue\fP\fB, png_size_t \fIsize\fP\fB);\fP
-
-\fI\fB
-
-\fBpng_voidp png_memset_check (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIs1\fP\fB, int \fP\fIvalue\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
-
-\fI\fB
-
-\fBDEPRECATED: void png_permit_empty_plte (png_structp \fP\fIpng_ptr\fP\fB, int \fIempty_plte_permitted\fP\fB);\fP
 
 \fI\fB
 
@@ -403,14 +383,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta10
 \fI\fB
 
 \fBvoid png_read_image (png_structp \fP\fIpng_ptr\fP\fB, png_bytepp \fIimage\fP\fB);\fP
-
-\fI\fB
-
-\fBDEPRECATED: void png_read_init (png_structp \fIpng_ptr\fP\fB);\fP
-
-\fI\fB
-
-\fBDEPRECATED: void png_read_init_2 (png_structpp \fP\fIptr_ptr\fP\fB, png_const_charp \fP\fIuser_png_ver\fP\fB, png_size_t \fP\fIpng_struct_size\fP\fB, png_size_t \fIpng_info_size\fP\fB);\fP
 
 \fI\fB
 
@@ -782,14 +754,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta10
 
 \fI\fB
 
-\fBDEPRECATED: void png_write_init (png_structp \fIpng_ptr\fP\fB);\fP
-
-\fI\fB
-
-\fBDEPRECATED: void png_write_init_2 (png_structpp \fP\fIptr_ptr\fP\fB, png_const_charp \fP\fIuser_png_ver\fP\fB, png_size_t \fP\fIpng_struct_size\fP\fB, png_size_t \fIpng_info_size\fP\fB);\fP
-
-\fI\fB
-
 \fBvoid png_write_info (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
@@ -833,7 +797,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta10 - July 12, 2006
+ libpng version 1.4.0beta11 - August 19, 2006
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -1248,14 +1212,14 @@ where row_pointers is an array of pointers to the pixel data for each row:
 If you know your image size and pixel size ahead of time, you can allocate
 row_pointers prior to calling png_read_png() with
 
-   if (height > PNG_UINT_32_MAX/png_sizeof(png_byte))
+   if (height > PNG_UINT_32_MAX/sizeof(png_bytep))
       png_error (png_ptr,
          "Image is too tall to process in memory");
    if (width > PNG_UINT_32_MAX/pixel_size)
       png_error (png_ptr,
          "Image is too wide to process in memory");
    row_pointers = png_malloc(png_ptr,
-      height*png_sizeof(png_bytep));
+      height*sizeof(png_bytep));
    for (int i=0; i<height, i++)
       row_pointers[i]=png_malloc(png_ptr,
          width*pixel_size);
@@ -3358,11 +3322,10 @@ you may also have to change the memory allocators (png_malloc, etc.).
 
 .SS Configuring for compiler xxx:
 
-All includes for libpng are in pngconf.h.  If you need to add/change/delete
-an include, this is the place to do it.  The includes that are not
-needed outside libpng are protected by the PNG_INTERNAL definition,
-which is only defined for those routines inside libpng itself.  The
-files in libpng proper only include png.h, which includes pngconf.h.
+All includes for libpng are in pngconf.h.  If you need to add, change
+or delete an include, this is the place to do it.  The includes that
+are not needed outside libpng are placed inside pngpriv.h, which is
+only used by the routines inside libpng itself.
 
 .SS Configuring zlib:
 
@@ -3748,13 +3711,13 @@ application:
 
 .SH IX. Y2K Compliance in libpng
 
-July 12, 2006
+August 19, 2006
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta10 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta11 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3919,7 +3882,7 @@ the first widely used release:
  1.4.0beta7-8        14    10400  14.so.0.0[.0]
  1.2.11              13    10211  12.so.0.10[.0]
  1.2.12              13    10212  12.so.0.10[.0]
- 1.4.0beta9-10       14    10400  14.so.0.0[.0]
+ 1.4.0beta9-11       14    10400  14.so.0.0[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -3975,7 +3938,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.4.0beta10 - July 12, 2006:
+Libpng version 1.4.0beta11 - August 19, 2006:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -3996,7 +3959,7 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.4.0beta10, July 12, 2006, are
+libpng versions 1.2.6, August 15, 2004, through 1.4.0beta11, August 19, 2006, are
 Copyright (c) 2004-2006 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4095,7 +4058,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-July 12, 2006
+August 19, 2006
 
 .\" end of man page
 

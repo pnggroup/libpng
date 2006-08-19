@@ -17,7 +17,7 @@
 
 #include "png.h"
 #ifdef PNG_WRITE_SUPPORTED
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 /* Write the data to whatever output you are using.  The default routine
    writes to a file pointer.  Note that this routine sometimes gets called
@@ -177,7 +177,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
       png_warning(png_ptr,
          "Attempted to set both read_data_fn and write_data_fn in");
       png_warning(png_ptr,
-         "the same structure.  Resetting read_data_fn to NULL.");
+         "the same structure.  Resetting read_data_fn to NULL");
    }
 }
 

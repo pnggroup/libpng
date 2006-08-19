@@ -14,7 +14,7 @@
  */
 
 #include "png.h"
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 static void /* PRIVATE */
@@ -231,7 +231,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 #  ifdef USE_FAR_KEYWORD
    {
       jmp_buf jmpbuf;
-      png_memcpy(jmpbuf,png_ptr->jmpbuf,png_sizeof(jmp_buf));
+      png_memcpy(jmpbuf, png_ptr->jmpbuf, sizeof(jmp_buf));
       longjmp(jmpbuf, 1);
    }
 #  else

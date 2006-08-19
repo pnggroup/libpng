@@ -14,31 +14,27 @@ NOOBJ=          YES
 # where make install puts libpng.a and png.h
 DESTDIR=	${PREFIX}
 LIBDIR=		/lib
-INCS=		png.h pngconf.h
+INCS=		png.h pngconf.h pngdefs.h
 INCSDIR=	/include/libpng
 INCDIR=		${INCSDIR}		# for 4.x bsd.lib.mk
 MAN=		libpng.3 libpngpf.3 png.5
 MANDIR=		/man/man
 SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 		libpng/pngconf.h ${INCSDIR}/../pngconf.h
+		libpng/pngdefs.h ${INCSDIR}/../pngdefs.h
 LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 
-all: pngconf.h
+all: pngdefs.h
 
-pngconf.h.in: pngconf.h
-	cat pngconf.h > pngconf.h.in
-
-pngconf.h:	pngconf.h.in
-	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.freebsd */" > pngdefs.h
 .if (${MACHINE_ARCH} != "i386")
-	/* uncoment this if you don't need thread safety */
-	# echo "#define PNG_THREAD_UNSAFE_OK" >> pngconf.h
+	/* uncomment this if you don't need thread safety */
+	# echo "#define PNG_THREAD_UNSAFE_OK" >> pngdefs.h
 .else
-	echo "#define PNG_NO_MMX_CODE" >> pngconf.h
+	echo "#define PNG_NO_MMX_CODE" >> pngdefs.h
 .endif
-	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
-
 
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \

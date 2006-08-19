@@ -25,7 +25,7 @@
  */
 
 #include "png.h"
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 #if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD)
 
@@ -124,8 +124,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
    if (mask == 0xff)
    {
       png_memcpy(row, png_ptr->row_buf + 1,
-       (png_size_t)PNG_ROWBYTES(png_ptr->row_info.pixel_depth,
-       png_ptr->width));
+         PNG_ROWBYTES(png_ptr->row_info.pixel_depth, png_ptr->width));
    }
    /* GRR:  add "else if (mask == 0)" case?
     *       or does png_combine_row() not even get called in that case? */

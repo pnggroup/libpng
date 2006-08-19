@@ -16,7 +16,7 @@
  */
 
 #include "png.h"
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 #if defined(PNG_READ_SUPPORTED)
 
@@ -49,8 +49,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    /* fread() returns 0 on error, so it is OK to store this in a png_size_t
     * instead of an int, which is what fread() actually returns.
     */
-   check = (png_size_t)fread(data, (png_size_t)1, length,
-      (png_FILE_p)png_ptr->io_ptr);
+   check = fread(data, 1, length, (png_FILE_p)png_ptr->io_ptr);
 
    if (check != length)
       png_error(png_ptr, "Read Error");
@@ -67,7 +66,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 static void PNGAPI
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   int check;
+   png_size_t check;
    png_byte *n_data;
    png_FILE_p io_ptr;
 
@@ -87,7 +86,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       do
       {
          read = MIN(NEAR_BUF_SIZE, remaining);
-         err = fread(buf, (png_size_t)1, read, io_ptr);
+         err = fread(buf, 1, read, io_ptr);
          png_memcpy(data, buf, read); /* copy far buffer to near buffer */
          if(err != read)
             break;
@@ -139,7 +138,7 @@ png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
       png_warning(png_ptr,
          "It's an error to set both read_data_fn and write_data_fn in the ");
       png_warning(png_ptr,
-         "same structure.  Resetting write_data_fn to NULL.");
+         "same structure.  Resetting write_data_fn to NULL");
    }
 
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)

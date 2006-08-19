@@ -36,7 +36,10 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
-all: ansi2knr libpng.a pngtest
+all: ansi2knr libpng.a pngtest pngdefs.h
+
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.knr */" > pngdefs.h
 
 # general rule to allow ansi2knr to work
 .c.o:
@@ -58,22 +61,25 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 
-install: libpng.a
+install: libpng.a png.h pngconf.h pngdefs.h
 	-@mkdir $(DESTDIR)$(INCPATH)
 	-@mkdir $(DESTDIR)$(INCPATH)/libpng
 	-@mkdir $(DESTDIR)$(LIBPATH)
 	-@rm -f $(DESTDIR)$(INCPATH)/png.h
 	-@rm -f $(DESTDIR)$(INCPATH)/pngconf.h
+	-@rm -f $(DESTDIR)$(INCPATH)/pngdefs.h
 	cp png.h $(DESTDIR)$(INCPATH)/libpng
 	cp pngconf.h $(DESTDIR)$(INCPATH)/libpng
+	cp pngdefs.h $(DESTDIR)$(INCPATH)/libpng
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/png.h
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngconf.h
+	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngdefs.h
 	(cd $(DESTDIR)$(INCPATH); ln -f -s libpng/* .)
 	cp libpng.a $(DESTDIR)$(LIBPATH)
 	chmod 644 $(DESTDIR)$(LIBPATH)/libpng.a
 
 clean:
-	rm -f *.o libpng.a pngtest pngout.png ansi2knr
+	rm -f *.o libpng.a pngtest pngout.png ansi2knr pngdefs.h
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
@@ -81,20 +87,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o: png.h pngconf.h pntintrn.h
-pngerror.o: png.h pngconf.h pntintrn.h
-pngrio.o: png.h pngconf.h pntintrn.h
-pngwio.o: png.h pngconf.h pntintrn.h
-pngmem.o: png.h pngconf.h pntintrn.h
-pngset.o: png.h pngconf.h pntintrn.h
-pnggccrd.o: png.h pngconf.h pntintrn.h
-pngget.o: png.h pngconf.h pntintrn.h
-pngread.o: png.h pngconf.h pntintrn.h
-pngpread.o: png.h pngconf.h pntintrn.h
-pngrtran.o: png.h pngconf.h pntintrn.h
-pngrutil.o: png.h pngconf.h pntintrn.h
-pngtest.o: png.h pngconf.h pntintrn.h
-pngtrans.o: png.h pngconf.h pntintrn.h
-pngwrite.o: png.h pngconf.h pntintrn.h
-pngwtran.o: png.h pngconf.h pntintrn.h
-pngwutil.o: png.h pngconf.h pntintrn.h
+png.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngerror.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngrio.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngwio.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngmem.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngset.o: png.h pngconf.h pngdefs.h pngpriv.h
+pnggccrd.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngget.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngread.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngpread.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngrtran.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngrutil.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngtrans.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngwrite.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngwtran.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngwutil.o: png.h pngconf.h pngdefs.h pngpriv.h
+pngtest.o: png.h pngconf.h pngdefs.h

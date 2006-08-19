@@ -15,8 +15,11 @@ OBJS = png.obj, pngset.obj, pngget.obj, pngrutil.obj, pngtrans.obj,\
 
 CFLAGS= $(C_DEB) $(CC_DEFS) $(PREF)
 
-all : pngtest.exe libpng.olb
+all : pngtest.exe libpng.olb pngdefs.h
 		@ write sys$output " pngtest available"
+
+pngdefs.h:
+	echo "/* pngdefs.h was built by MMS */" > pngdefs.h
 
 libpng.olb : libpng.olb($(OBJS))
 	@ write sys$output " Libpng available"
@@ -29,24 +32,23 @@ test : pngtest.exe
    run pngtest
 
 clean :
-	delete *.obj;*,*.exe;*
+	delete *.obj;*,*.exe;*,pngdefs.h
 
 
 # Other dependencies.
-png.obj : png.h, pngconf.h
-pngpread.obj : png.h, pngconf.h
-pngset.obj : png.h, pngconf.h
-pngget.obj : png.h, pngconf.h
-pngread.obj : png.h, pngconf.h
-pngrtran.obj : png.h, pngconf.h
-pngrutil.obj : png.h, pngconf.h
-pngerror.obj : png.h, pngconf.h
-pngmem.obj : png.h, pngconf.h
-pngrio.obj : png.h, pngconf.h
-pngwio.obj : png.h, pngconf.h
-pngtest.obj : png.h, pngconf.h
-pngtrans.obj : png.h, pngconf.h
-pngwrite.obj : png.h, pngconf.h
-pngwtran.obj : png.h, pngconf.h
-pngwutil.obj : png.h, pngconf.h
-
+png.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngpread.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngset.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngget.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngread.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngrtran.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngrutil.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngerror.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngmem.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngrio.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngwio.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngtrans.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngwrite.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngwtran.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngwutil.obj : png.h, pngconf.h, pngdefs.h, pngpriv.h
+pngtest.obj : png.h, pngconf.h, pngdefs.h

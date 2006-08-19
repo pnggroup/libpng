@@ -9,7 +9,7 @@
  */
 
 #include "png.h"
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
@@ -22,7 +22,7 @@ png_get_valid(png_structp png_ptr, png_infop info_ptr, png_uint_32 flag)
       return(0);
 }
 
-png_uint_32 PNGAPI
+png_size_t PNGAPI
 png_get_rowbytes(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
@@ -571,7 +571,7 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
                  - 8)       /* extra max_pixel_depth pad */
       {
          png_warning(png_ptr,
-            "Width too large for libpng to process image data.");
+            "Width too large for libpng to process image data");
       }
       return (1);
    }
@@ -822,10 +822,10 @@ png_get_user_chunk_ptr(png_structp png_ptr)
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
-png_uint_32 PNGAPI
+png_size_t PNGAPI
 png_get_compression_buffer_size(png_structp png_ptr)
 {
-   return (png_uint_32)(png_ptr? png_ptr->zbuf_size : 0L);
+   return (png_ptr ? png_ptr->zbuf_size : 0);
 }
 #endif
 
@@ -932,5 +932,19 @@ png_get_user_height_max (png_structp png_ptr)
     return (png_ptr? png_ptr->user_height_max : 0);
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
+
+#ifdef PNG_IO_STATE_SUPPORTED
+png_uint_32 PNGAPI
+png_get_io_state (png_structp png_ptr)
+{
+    return png_ptr->io_state;
+}
+
+png_bytep PNGAPI
+png_get_io_chunk_name (png_structp png_ptr)
+{
+   return png_ptr->chunk_name;
+}
+#endif /* ?PNG_IO_STATE_SUPPORTED */
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

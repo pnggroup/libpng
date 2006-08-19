@@ -1,25 +1,34 @@
 
-/* pngintrn.h - internal header file for libpng
+/* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta10 - July 12, 2006
+ * libpng version 1.4.0beta11 - August 19, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
-#ifndef PNGINTRN_H
-#define PNGINTRN_H
+/* The symbols declared in this file (including the functions declared
+ * as PNG_EXTERN) are PRIVATE.  They are not part of the libpng public
+ * interface, and are not recommended for use by regular applications.
+ * Some of them may become public in the future; others may stay private,
+ * change in an incompatible way, or even disappear.
+ * Although the libpng users are not forbidden to include this header,
+ * they should be well aware of the issues that may arise from doing so.
+ */
+
+#ifndef PNGPRIV_H
+#define PNGPRIV_H
 
 #ifndef PNG_VERSION_INFO_ONLY
 
 #include <stdlib.h>
 
-/* The functions exported by PNG_EXTERN are PNG_INTERNAL functions, which
+/* The functions exported by PNG_EXTERN are internal functions, which
  * aren't usually used outside the library (as far as I know), so it is
- * debatable if they should be exported at all.  In the future, when it is
- * possible to have run-time registry of chunk-handling functions, some of
- * these will be made available again.
+ * debatable if they should be exported at all.  In the future, when it
+ * is possible to have run-time registry of chunk-handling functions,
+ * some of these will be made available again.
 #define PNG_EXTERN extern
  */
 #define PNG_EXTERN
@@ -213,8 +222,8 @@
 /* Added to libpng-1.2.6 JB */
 #define PNG_ROWBYTES(pixel_bits, width) \
     ((pixel_bits) >= 8 ? \
-    ((width) * (((png_uint_32)(pixel_bits)) >> 3)) : \
-    (( ((width) * ((png_uint_32)(pixel_bits))) + 7) >> 3) )
+    ((png_size_t)(width) * (((png_size_t)(pixel_bits)) >> 3)) : \
+    (( ((png_size_t)(width) * ((png_size_t)(pixel_bits))) + 7) >> 3) )
 
 /* PNG_OUT_OF_RANGE returns true if value is outside the range
    ideal-delta..ideal+delta.  Each argument is evaluated twice.
@@ -320,16 +329,11 @@ PNG_EXTERN void png_destroy_struct_2 PNGARG((png_voidp struct_ptr,
 PNG_EXTERN void png_info_destroy PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 
-/* Function to allocate memory for zlib. */
+/* Function to allocate memory for zlib.  PNGAPI is disallowed. */
 PNG_EXTERN voidpf png_zalloc PNGARG((voidpf png_ptr, uInt items, uInt size));
 
-/* Function to free memory for zlib */
+/* Function to free memory for zlib.  PNGAPI is disallowed. */
 PNG_EXTERN void png_zfree PNGARG((voidpf png_ptr, voidpf ptr));
-
-#ifdef PNG_SIZE_T
-/* Function to convert a sizeof an item to png_sizeof item */
-   PNG_EXTERN png_size_t PNGAPI png_convert_size PNGARG((size_t size));
-#endif
 
 /* Next four functions are used internally as callbacks.  PNGAPI is required
  * but not PNG_EXPORT.  PNGAPI added at libpng version 1.2.3. */
@@ -354,9 +358,12 @@ PNG_EXTERN void PNGAPI png_default_flush PNGARG((png_structp png_ptr));
 /* Reset the CRC variable */
 PNG_EXTERN void png_reset_crc PNGARG((png_structp png_ptr));
 
-/* Write the "data" buffer to whatever output you are using. */
+/* Write the "data" buffer to whatever output you are using */
 PNG_EXTERN void png_write_data PNGARG((png_structp png_ptr, png_bytep data,
    png_size_t length));
+
+/* Read the chunk header (length + type name) */
+PNG_EXTERN png_uint_32 png_read_chunk_header PNGARG((png_structp png_ptr));
 
 /* Read data from whatever input you are using into the "data" buffer */
 PNG_EXTERN void png_read_data PNGARG((png_structp png_ptr, png_bytep data,
@@ -871,6 +878,7 @@ PNG_EXTERN void png_do_write_intrapixel PNGARG((png_row_infop row_info,
 /* png.c */ /* PRIVATE */
 PNG_EXTERN void png_init_mmx_flags PNGARG((png_structp png_ptr));
 #endif
+
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
 #ifdef PNG_READ_SUPPORTED
@@ -917,4 +925,4 @@ PNG_EXTERN void png_init_mmx_flags PNGARG((png_structp png_ptr));
 #endif
 
 #endif /* PNG_VERSION_INFO_ONLY */
-#endif /* PNGINTRN_H */
+#endif /* PNGPRIV_H */

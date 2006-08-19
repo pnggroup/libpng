@@ -14,7 +14,7 @@
  */
 
 #include "png.h"
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 #if defined(PNG_READ_SUPPORTED)
 
@@ -38,7 +38,7 @@ png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
                            PNG_FLAG_CRC_CRITICAL_IGNORE;
          break;
       case PNG_CRC_WARN_DISCARD:    /* not a valid action for critical data */
-         png_warning(png_ptr, "Can't discard critical data on CRC error.");
+         png_warning(png_ptr, "Can't discard critical data on CRC error");
       case PNG_CRC_ERROR_QUIT:                                /* error/quit */
       case PNG_CRC_DEFAULT:
       default:
@@ -87,8 +87,7 @@ png_set_background(png_structp png_ptr,
    }
 
    png_ptr->transformations |= PNG_BACKGROUND;
-   png_memcpy(&(png_ptr->background), background_color,
-      png_sizeof(png_color_16));
+   png_memcpy(&(png_ptr->background), background_color, sizeof(png_color_16));
    png_ptr->background_gamma = (float)background_gamma;
    png_ptr->background_gamma_type = (png_byte)(background_gamma_code);
    png_ptr->transformations |= (need_expand ? PNG_BACKGROUND_EXPAND : 0);
@@ -157,7 +156,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
       int i;
 
       png_ptr->dither_index = (png_bytep)png_malloc(png_ptr,
-         (png_uint_32)(num_palette * png_sizeof (png_byte)));
+         (png_size_t)(num_palette * sizeof(png_byte)));
       for (i = 0; i < num_palette; i++)
          png_ptr->dither_index[i] = (png_byte)i;
    }
@@ -173,7 +172,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
          /* initialize an array to sort colors */
          png_ptr->dither_sort = (png_bytep)png_malloc(png_ptr,
-            (png_uint_32)(num_palette * png_sizeof (png_byte)));
+            (png_size_t)(num_palette * sizeof(png_byte)));
 
          /* initialize the dither_sort array */
          for (i = 0; i < num_palette; i++)
@@ -302,9 +301,9 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
          /* initialize palette index arrays */
          png_ptr->index_to_palette = (png_bytep)png_malloc(png_ptr,
-            (png_uint_32)(num_palette * png_sizeof (png_byte)));
+            (png_size_t)(num_palette * sizeof(png_byte)));
          png_ptr->palette_to_index = (png_bytep)png_malloc(png_ptr,
-            (png_uint_32)(num_palette * png_sizeof (png_byte)));
+            (png_size_t)(num_palette * sizeof(png_byte)));
 
          /* initialize the sort array */
          for (i = 0; i < num_palette; i++)
@@ -313,11 +312,11 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             png_ptr->palette_to_index[i] = (png_byte)i;
          }
 
-         hash = (png_dsortpp)png_malloc(png_ptr, (png_uint_32)(769 *
-            png_sizeof (png_dsortp)));
+         hash = (png_dsortpp)png_malloc(png_ptr,
+            (png_size_t)(769 * sizeof(png_dsortp)));
          for (i = 0; i < 769; i++)
             hash[i] = NULL;
-/*         png_memset(hash, 0, 769 * png_sizeof (png_dsortp)); */
+/*         png_memset(hash, 0, 769 * sizeof(png_dsortp)); */
 
          num_new_palette = num_palette;
 
@@ -347,7 +346,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
                   {
 
                      t = (png_dsortp)png_malloc_warn(png_ptr,
-                         (png_uint_32)(png_sizeof(png_dsort)));
+                         sizeof(png_dsort));
                      if (t == NULL)
                          break;
                      t->next = hash[d];
@@ -464,16 +463,14 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
       int num_blue = (1 << PNG_DITHER_BLUE_BITS);
       png_size_t num_entries = ((png_size_t)1 << total_bits);
 
-      png_ptr->palette_lookup = (png_bytep )png_malloc(png_ptr,
-         (png_uint_32)(num_entries * png_sizeof (png_byte)));
+      png_ptr->palette_lookup = (png_bytep)png_malloc(png_ptr,
+         num_entries * sizeof(png_byte));
 
-      png_memset(png_ptr->palette_lookup, 0, num_entries *
-         png_sizeof (png_byte));
+      png_memset(png_ptr->palette_lookup, 0, num_entries * sizeof(png_byte));
 
-      distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
-         png_sizeof(png_byte)));
+      distance = (png_bytep)png_malloc(png_ptr, num_entries * sizeof(png_byte));
 
-      png_memset(distance, 0xff, num_entries * png_sizeof(png_byte));
+      png_memset(distance, 0xff, num_entries * sizeof(png_byte));
 
       for (i = 0; i < num_palette; i++)
       {
@@ -639,7 +636,7 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
       png_ptr->transformations |= PNG_EXPAND;
 #else
    {
-      png_warning(png_ptr, "Cannot do RGB_TO_GRAY without EXPAND_SUPPORTED.");
+      png_warning(png_ptr, "Cannot do RGB_TO_GRAY without EXPAND_SUPPORTED");
       png_ptr->transformations &= ~PNG_RGB_TO_GRAY;
    }
 #endif
@@ -3944,8 +3941,7 @@ png_build_gamma_table(png_structp png_ptr)
      else
         g = 1.0;
 
-     png_ptr->gamma_table = (png_bytep)png_malloc(png_ptr,
-        (png_uint_32)256);
+     png_ptr->gamma_table = (png_bytep)png_malloc(png_ptr, 256);
 
      for (i = 0; i < 256; i++)
      {
@@ -3960,8 +3956,7 @@ png_build_gamma_table(png_structp png_ptr)
 
         g = 1.0 / (png_ptr->gamma);
 
-        png_ptr->gamma_to_1 = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)256);
+        png_ptr->gamma_to_1 = (png_bytep)png_malloc(png_ptr, 256);
 
         for (i = 0; i < 256; i++)
         {
@@ -3970,8 +3965,7 @@ png_build_gamma_table(png_structp png_ptr)
         }
 
 
-        png_ptr->gamma_from_1 = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)256);
+        png_ptr->gamma_from_1 = (png_bytep)png_malloc(png_ptr, 256);
 
         if(png_ptr->screen_gamma > 0.000001)
            g = 1.0 / png_ptr->screen_gamma;
@@ -4033,7 +4027,7 @@ png_build_gamma_table(png_structp png_ptr)
         g = 1.0;
 
      png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
-        (png_uint_32)(num * png_sizeof (png_uint_16p)));
+        (png_size_t)(num * sizeof(png_uint_16p)));
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
      {
@@ -4043,7 +4037,7 @@ png_build_gamma_table(png_structp png_ptr)
         for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
-              (png_uint_32)(256 * png_sizeof (png_uint_16)));
+              256 * sizeof(png_uint_16));
         }
 
         g = 1.0 / g;
@@ -4073,7 +4067,7 @@ png_build_gamma_table(png_structp png_ptr)
         for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
-              (png_uint_32)(256 * png_sizeof (png_uint_16)));
+              256 * sizeof(png_uint_16));
 
            ig = (((png_uint_32)i * (png_uint_32)png_gamma_shift[shift]) >> 4);
            for (j = 0; j < 256; j++)
@@ -4093,12 +4087,12 @@ png_build_gamma_table(png_structp png_ptr)
         g = 1.0 / (png_ptr->gamma);
 
         png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
-           (png_uint_32)(num * png_sizeof (png_uint_16p )));
+           (png_size_t)(num * sizeof(png_uint_16p)));
 
         for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_to_1[i] = (png_uint_16p)png_malloc(png_ptr,
-              (png_uint_32)(256 * png_sizeof (png_uint_16)));
+              256 * sizeof(png_uint_16));
 
            ig = (((png_uint_32)i *
               (png_uint_32)png_gamma_shift[shift]) >> 4);
@@ -4116,12 +4110,12 @@ png_build_gamma_table(png_structp png_ptr)
            g = png_ptr->gamma;   /* probably doing rgb_to_gray */
 
         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
-           (png_uint_32)(num * png_sizeof (png_uint_16p)));
+           (png_size_t)(num * sizeof(png_uint_16p)));
 
         for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_from_1[i] = (png_uint_16p)png_malloc(png_ptr,
-              (png_uint_32)(256 * png_sizeof (png_uint_16)));
+              256 * sizeof(png_uint_16));
 
            ig = (((png_uint_32)i *
               (png_uint_32)png_gamma_shift[shift]) >> 4);

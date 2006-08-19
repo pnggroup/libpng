@@ -19,50 +19,67 @@ CDEBUG = -g -DPNG_DEBUG=5
 LDDEBUG =
 CRELEASE = -O2
 LDRELEASE = -s
-CFLAGS = -I$(ZLIBINC) -Wall $(CRELEASE)
-LDFLAGS = -L. -L$(ZLIBLIB) -lpng -lz -lm $(LDRELEASE)
+#CFLAGS = -Wall $(CDEBUG)
+CFLAGS = -Wall $(CRELEASE)
+#LDFLAGS = $(LDDEBUG)
+LDFLAGS = $(LDRELEASE)
+LIBS = -lz -lm
 
 # File extensions
 O=.o
 A=.a
-E=
+EXE=
 
 # Variables
 OBJS = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
 	pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) pngset$(O) \
-	pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
+	pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O) \
+	pnggccrd$(O)
 
 # Targets
-all: libpng$(A) pngtest$(E)
+all: static pngdefs.h
+
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.gcc */" > pngdefs.h
+
+.c$(O):
+	$(CC) -c $(CFLAGS) -I$(ZLIBINC) $<
+
+static: libpng$(A) pngtest$(EXE)
+
+shared:
+	@echo This is a generic makefile that cannot create shared libraries.
+	@echo Please use a configuration that is specific to your platform.
+	@false
 
 libpng$(A): $(OBJS)
 	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
 
-test: pngtest$(E)
-	./pngtest$(E)
+test: pngtest$(EXE)
+	./pngtest$(EXE)
 
-pngtest$(E): pngtest$(O) libpng$(A)
-	$(LD) -o $@ pngtest$(O) $(LDFLAGS)
+pngtest$(EXE): pngtest$(O) libpng$(A)
+	$(LD) $(LDFLAGS) -L$(ZLIBLIB) -o $@ pngtest$(O) libpng$(A) $(LIBS)
 
 clean:
-	$(RM_F) *$(O) libpng$(A) pngtest$(E) pngout.png
+	$(RM_F) *$(O) libpng$(A) pngtest$(EXE) pngout.png pngdefs.h
 
-png$(O): png.h pngconf.h pngintrn.h
-pngerror$(O): png.h pngconf.h pngintrn.h
-pnggccrd$(O): png.h pngconf.h pngintrn.h
-pngget$(O): png.h pngconf.h pngintrn.h
-pngmem$(O): png.h pngconf.h pngintrn.h
-pngpread$(O): png.h pngconf.h pngintrn.h
-pngread$(O): png.h pngconf.h pngintrn.h
-pngrio$(O): png.h pngconf.h pngintrn.h
-pngrtran$(O): png.h pngconf.h pngintrn.h
-pngrutil$(O): png.h pngconf.h pngintrn.h
-pngset$(O): png.h pngconf.h pngintrn.h
-pngtest$(O): png.h pngconf.h pngintrn.h
-pngtrans$(O): png.h pngconf.h pngintrn.h
-pngwio$(O): png.h pngconf.h pngintrn.h
-pngwrite$(O): png.h pngconf.h pngintrn.h
-pngwtran$(O): png.h pngconf.h pngintrn.h
-pngwutil$(O): png.h pngconf.h pngintrn.h
-
+png$(O):      png.h pngconf.h pngdefs.h pngpriv.h
+pngerror$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pnggccrd$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pngget$(O):   png.h pngconf.h pngdefs.h pngpriv.h
+pngmem$(O):   png.h pngconf.h pngdefs.h pngpriv.h
+pngpread$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pngread$(O):  png.h pngconf.h pngdefs.h pngpriv.h
+pngrio$(O):   png.h pngconf.h pngdefs.h pngpriv.h
+pngrtran$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pngrutil$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pngset$(O):   png.h pngconf.h pngdefs.h pngpriv.h
+pngtest$(O):  png.h pngconf.h pngdefs.h pngpriv.h
+pngtrans$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pngwio$(O):   png.h pngconf.h pngdefs.h pngpriv.h
+pngwrite$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pngwtran$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pngwutil$(O): png.h pngconf.h pngdefs.h pngpriv.h
+pngtest$(O):  png.h pngconf.h pngdefs.h

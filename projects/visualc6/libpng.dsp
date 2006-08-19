@@ -8,16 +8,16 @@
 CFG=libpng - Win32 DLL Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "libpng.mak".
-!MESSAGE
+!MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "libpng.mak" CFG="libpng - Win32 DLL Release"
-!MESSAGE
+!MESSAGE 
 !MESSAGE Possible choices for configuration are:
-!MESSAGE
+!MESSAGE 
 !MESSAGE "libpng - Win32 DLL Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "libpng - Win32 DLL Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "libpng - Win32 DLL ASM Release" (based on "Win32 (x86) Dynamic-Link Library")
@@ -27,7 +27,7 @@ CFG=libpng - Win32 DLL Release
 !MESSAGE "libpng - Win32 LIB Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "libpng - Win32 LIB ASM Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "libpng - Win32 LIB ASM Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE
+!MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -303,7 +303,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"Win32_LIB_ASM_Debug\libpngd.lib"
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
@@ -395,12 +395,12 @@ SOURCE=..\..\pngvcrd.c
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 LIB ASM Debug"
 
-!ENDIF
+!ENDIF 
 
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\scripts\pngw32.def
+SOURCE=..\..\scripts\pngwin.def
 
 !IF  "$(CFG)" == "libpng - Win32 DLL Release"
 
@@ -430,7 +430,7 @@ SOURCE=..\..\scripts\pngw32.def
 
 # PROP Exclude_From_Build 1
 
-!ENDIF
+!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -461,13 +461,17 @@ SOURCE=..\..\png.h
 
 SOURCE=..\..\pngconf.h
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\pngpriv.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
-SOURCE=..\..\scripts\pngw32.rc
+SOURCE=..\..\scripts\pngwin.rc
 
 !IF  "$(CFG)" == "libpng - Win32 DLL Release"
 
@@ -495,7 +499,7 @@ SOURCE=..\..\scripts\pngw32.rc
 
 # PROP Exclude_From_Build 1
 
-!ENDIF
+!ENDIF 
 
 # End Source File
 # End Group

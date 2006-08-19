@@ -46,67 +46,61 @@ pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O) \
 pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O) pngvcrd$(O)
 
 
-all: test pngconf.h
+all: test pngconf.h pngdefs.h
 
-pngconf.h.in: pngconf.h
-	cat pngconf.h > pngconf.h.in
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.intel */" > pngdefs.h
+	echo "#define PNG_USE_PNGVCRD" >> pngdefs.h
 
-# Remove the line with #define PNG_THREAD_UNSAFE_OK if you need thread safety
-### for generic gcc:
-pngconf.h:	pngconf.h.in
-	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
-	echo "#define PNG_USE_PNGVCRD" >> pngconf.h
-	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
-
-png$(O): png.h pngconf.h pngintrn.h
+png$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngset$(O): png.h pngconf.h pngintrn.h
+pngset$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngget$(O): png.h pngconf.h pngintrn.h
+pngget$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngread$(O): png.h pngconf.h pngintrn.h
+pngread$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngpread$(O): png.h pngconf.h pngintrn.h
+pngpread$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngrtran$(O): png.h pngconf.h pngintrn.h
+pngrtran$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngrutil$(O): png.h pngconf.h pngintrn.h
+pngrutil$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngvcrd$(O): png.h pngconf.h pngintrn.h
+pngvcrd$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngerror$(O): png.h pngconf.h pngintrn.h
+pngerror$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngmem$(O): png.h pngconf.h pngintrn.h
+pngmem$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngrio$(O): png.h pngconf.h pngintrn.h
+pngrio$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngwio$(O): png.h pngconf.h pngintrn.h
+pngwio$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngtest$(O): png.h pngconf.h pngintrn.h
+pngtest$(O): png.h pngconf.h pngdefs.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngtrans$(O): png.h pngconf.h pngintrn.h
+pngtrans$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngwrite$(O): png.h pngconf.h pngintrn.h
+pngwrite$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngwtran$(O): png.h pngconf.h pngintrn.h
+pngwtran$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngwutil$(O): png.h pngconf.h pngintrn.h
+pngwutil$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 libpng.lib: $(OBJS)

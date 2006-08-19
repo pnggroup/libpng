@@ -12,7 +12,7 @@
  */
 
 #include "png.h"
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 #if defined(PNG_READ_SUPPORTED)
 
@@ -29,7 +29,7 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
       (png_uint_32)(*(buf + 3));
 #endif
    if (i > PNG_UINT_31_MAX)
-     png_error(png_ptr, "PNG unsigned integer out of range.");
+     png_error(png_ptr, "PNG unsigned integer out of range");
    return (i);
 }
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
@@ -72,7 +72,47 @@ png_get_uint_16(png_bytep buf)
 }
 #endif /* PNG_READ_BIG_ENDIAN_SUPPORTED */
 
-/* Read data, and (optionally) run it through the CRC. */
+/* Read the chunk header (length + type name).
+ * Put the type name into png_ptr->chunk_name, and return the length.
+ */
+png_uint_32 /* PRIVATE */
+png_read_chunk_header(png_structp png_ptr)
+{
+   png_byte buf[8];
+   png_uint_32 length;
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that the chunk header is being read.
+    * PNG_IO_CHUNK_HDR requires a single I/O call.
+    */
+   png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_HDR;
+#endif
+
+   /* read the length and the chunk name */
+   png_read_data(png_ptr, buf, 8);
+   length = png_get_uint_31(png_ptr, buf);
+
+   /* put the chunk name into png_ptr->chunk_name */
+   png_memcpy(png_ptr->chunk_name, buf + 4, 4);
+
+   png_debug2(0, "Reading %s chunk, length = %lu\n",
+      png_ptr->chunk_name, length);
+
+   /* reset the crc and run it over the chunk name */
+   png_reset_crc(png_ptr);
+   png_calculate_crc(png_ptr, png_ptr->chunk_name, 4);
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that chunk data will (possibly) be read.
+    * PNG_IO_CHUNK_DATA does NOT require a specific number of I/O calls.
+    */
+   png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;
+#endif
+
+   return length;
+}
+
+/* Read data and run it through the CRC. */
 void /* PRIVATE */
 png_crc_read(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
@@ -94,16 +134,16 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
    {
       png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
    }
-   if (i)
+   if (i > 0)
    {
       png_crc_read(png_ptr, png_ptr->zbuf, i);
    }
 
    if (png_crc_error(png_ptr))
    {
-      if (((png_ptr->chunk_name[0] & 0x20) &&                /* Ancillary */
+      if (((png_ptr->chunk_name[0] & 0x20) &&               /* Ancillary */
            !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)) ||
-          (!(png_ptr->chunk_name[0] & 0x20) &&             /* Critical  */
+          (!(png_ptr->chunk_name[0] & 0x20) &&              /* Critical  */
           (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE)))
       {
          png_chunk_warning(png_ptr, "CRC error");
@@ -140,6 +180,11 @@ png_crc_error(png_structp png_ptr)
          need_crc = 0;
    }
 
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* inform the I/O callback that the chunk CRC is being read */
+   /* PNG_IO_CHUNK_CRC requires the I/O to be done at once */
+   png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_CRC;
+#endif
    png_read_data(png_ptr, crc_bytes, 4);
 
    if (need_crc)
@@ -194,7 +239,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
             if (text ==  NULL)
             {
-               text_size = prefix_size + png_sizeof(msg) + 1;
+               text_size = prefix_size + sizeof(msg) + 1;
                text = (png_charp)png_malloc_warn(png_ptr, text_size);
                if (text ==  NULL)
                  {
@@ -208,8 +253,8 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
             /* Copy what we can of the error message into the text chunk */
             text_size = (png_size_t)(chunklength - (text - chunkdata) - 1);
-            text_size = png_sizeof(msg) > text_size ? text_size :
-               png_sizeof(msg);
+            if (text_size > sizeof(msg))
+               text_size = sizeof(msg);
             png_memcpy(text + prefix_size, msg, text_size + 1);
             break;
          }
@@ -221,10 +266,10 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                    png_ptr->zbuf_size - png_ptr->zstream.avail_out;
                text = (png_charp)png_malloc_warn(png_ptr, text_size + 1);
                if (text ==  NULL)
-                 {
-                    png_free(png_ptr,chunkdata);
-                    png_error(png_ptr,"Not enough memory to decompress chunk.");
-                 }
+               {
+                  png_free(png_ptr,chunkdata);
+                  png_error(png_ptr, "Not enough memory to decompress chunk");
+               }
                png_memcpy(text + prefix_size, png_ptr->zbuf,
                     text_size - prefix_size);
                png_memcpy(text, chunkdata, prefix_size);
@@ -236,13 +281,13 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
                tmp = text;
                text = (png_charp)png_malloc_warn(png_ptr,
-                  (png_uint_32)(text_size +
+                  (png_size_t)(text_size +
                   png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1));
                if (text == NULL)
                {
                   png_free(png_ptr, tmp);
                   png_free(png_ptr, chunkdata);
-                  png_error(png_ptr,"Not enough memory to decompress chunk..");
+                  png_error(png_ptr,"Not enough memory to decompress chunk");
                }
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
@@ -286,7 +331,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             if (text == NULL)
               {
                 png_free(png_ptr, chunkdata);
-                png_error(png_ptr,"Not enough memory for text.");
+                png_error(png_ptr, "Not enough memory for text");
               }
             png_memcpy(text, chunkdata, prefix_size);
          }
@@ -385,7 +430,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,png_ptr->width);
    png_debug1(3,"bit_depth = %d\n", png_ptr->bit_depth);
    png_debug1(3,"channels = %d\n", png_ptr->channels);
-   png_debug1(3,"rowbytes = %lu\n", (unsigned long) png_ptr->rowbytes);
+   png_debug1(3, "rowbytes = %lu\n", (unsigned long) png_ptr->rowbytes);
    png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,
       color_type, interlace_type, compression_type, filter_type);
 }
@@ -1044,7 +1089,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if(profile_size > profile_length)
    {
       png_free(png_ptr, chunkdata);
-      png_warning(png_ptr, "Ignoring truncated iCCP profile.");
+      png_warning(png_ptr, "Ignoring truncated iCCP profile");
       return;
    }
 
@@ -1126,14 +1171,14 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    new_palette.nentries = (png_int_32) ( data_length / entry_size);
-   if ((png_uint_32) new_palette.nentries > (png_uint_32) (PNG_SIZE_MAX /
-       png_sizeof(png_sPLT_entry)))
+   if ((png_uint_32) new_palette.nentries >
+       (png_uint_32) (PNG_SIZE_MAX / sizeof(png_sPLT_entry)))
    {
        png_warning(png_ptr, "sPLT chunk too long");
        return;
    }
    new_palette.entries = (png_sPLT_entryp)png_malloc_warn(
-       png_ptr, new_palette.nentries * png_sizeof(png_sPLT_entry));
+       png_ptr, new_palette.nentries * sizeof(png_sPLT_entry));
    if (new_palette.entries == NULL)
    {
        png_warning(png_ptr, "sPLT chunk requires too much memory");
@@ -1550,7 +1595,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    purpose = (png_charp)png_malloc_warn(png_ptr, length + 1);
    if (purpose == NULL)
      {
-       png_warning(png_ptr, "No memory for pCAL purpose.");
+       png_warning(png_ptr, "No memory for pCAL purpose");
        return;
      }
    slength = (png_size_t)length;
@@ -1607,12 +1652,12 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Empty loop to move past the units string. */ ;
 
    png_debug(3, "Allocating pCAL parameters array\n");
-   params = (png_charpp)png_malloc_warn(png_ptr, (png_uint_32)(nparams
-      *png_sizeof(png_charp))) ;
+   params = (png_charpp)png_malloc_warn(png_ptr,
+      (png_size_t)(nparams * sizeof(png_charp)));
    if (params == NULL)
      {
        png_free(png_ptr, purpose);
-       png_warning(png_ptr, "No memory for pCAL params.");
+       png_warning(png_ptr, "No memory for pCAL params");
        return;
      }
 
@@ -1708,11 +1753,11 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_FIXED_POINT_SUPPORTED
    swidth = (png_charp)png_malloc_warn(png_ptr, png_strlen(ep) + 1);
    if (swidth == NULL)
-     {
-       png_warning(png_ptr, "Out of memory while processing sCAL chunk width");
-       return;
-     }
-   png_memcpy(swidth, ep, (png_size_t)png_strlen(ep));
+   {
+      png_warning(png_ptr, "Out of memory while processing sCAL chunk width");
+      return;
+   }
+   png_memcpy(swidth, ep, png_strlen(ep));
 #endif
 #endif
 
@@ -1731,11 +1776,11 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_FIXED_POINT_SUPPORTED
    sheight = (png_charp)png_malloc_warn(png_ptr, png_strlen(ep) + 1);
    if (swidth == NULL)
-     {
-       png_warning(png_ptr, "Out of memory while processing sCAL chunk height");
-       return;
-     }
-   png_memcpy(sheight, ep, (png_size_t)png_strlen(ep));
+   {
+      png_warning(png_ptr, "Out of memory while processing sCAL chunk height");
+      return;
+   }
+   png_memcpy(sheight, ep, png_strlen(ep));
 #endif
 #endif
 
@@ -1846,7 +1891,7 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    key = (png_charp)png_malloc_warn(png_ptr, length + 1);
    if (key == NULL)
    {
-     png_warning(png_ptr, "No memory to process text chunk.");
+     png_warning(png_ptr, "No memory to process text chunk");
      return;
    }
    slength = (png_size_t)length;
@@ -1866,11 +1911,10 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (text != key + slength)
       text++;
 
-   text_ptr = (png_textp)png_malloc_warn(png_ptr,
-      (png_uint_32)png_sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr, sizeof(png_text));
    if (text_ptr == NULL)
    {
-     png_warning(png_ptr, "Not enough memory to process text chunk.");
+     png_warning(png_ptr, "Not enough memory to process text chunk");
      png_free(png_ptr, key);
      return;
    }
@@ -1889,7 +1933,7 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_free(png_ptr, key);
    png_free(png_ptr, text_ptr);
    if (ret)
-     png_warning(png_ptr, "Insufficient memory to process text chunk.");
+     png_warning(png_ptr, "Insufficient memory to process text chunk");
 }
 #endif
 
@@ -1926,7 +1970,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
    if (chunkdata == NULL)
    {
-     png_warning(png_ptr,"Out of memory processing zTXt chunk.");
+     png_warning(png_ptr,"Out of memory processing zTXt chunk");
      return;
    }
    slength = (png_size_t)length;
@@ -1963,11 +2007,10 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    chunkdata = (png_charp)png_decompress_chunk(png_ptr, comp_type, chunkdata,
                                     (png_size_t)length, prefix_len, &data_len);
 
-   text_ptr = (png_textp)png_malloc_warn(png_ptr,
-     (png_uint_32)png_sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr, sizeof(png_text));
    if (text_ptr == NULL)
    {
-     png_warning(png_ptr,"Not enough memory to process zTXt chunk.");
+     png_warning(png_ptr,"Not enough memory to process zTXt chunk");
      png_free(png_ptr, chunkdata);
      return;
    }
@@ -1986,7 +2029,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_free(png_ptr, text_ptr);
    png_free(png_ptr, chunkdata);
    if (ret)
-     png_error(png_ptr, "Insufficient memory to store zTXt chunk.");
+     png_error(png_ptr, "Insufficient memory to store zTXt chunk");
 }
 #endif
 
@@ -2025,7 +2068,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
    if (chunkdata == NULL)
    {
-     png_warning(png_ptr, "No memory to process iTXt chunk.");
+     png_warning(png_ptr, "No memory to process iTXt chunk");
      return;
    }
    slength = (png_size_t)length;
@@ -2073,11 +2116,10 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           (size_t)length, prefix_len, &data_len);
    else
        data_len=png_strlen(chunkdata + prefix_len);
-   text_ptr = (png_textp)png_malloc_warn(png_ptr,
-      (png_uint_32)png_sizeof(png_text));
+   text_ptr = (png_textp)png_malloc_warn(png_ptr, sizeof(png_text));
    if (text_ptr == NULL)
    {
-     png_warning(png_ptr,"Not enough memory to process iTXt chunk.");
+     png_warning(png_ptr,"Not enough memory to process iTXt chunk");
      png_free(png_ptr, chunkdata);
      return;
    }
@@ -2094,7 +2136,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_free(png_ptr, text_ptr);
    png_free(png_ptr, chunkdata);
    if (ret)
-     png_error(png_ptr, "Insufficient memory to store iTXt chunk.");
+     png_error(png_ptr, "Insufficient memory to store iTXt chunk");
 }
 #endif
 
@@ -2800,7 +2842,7 @@ png_read_finish_row(png_structp png_ptr)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
-      png_memset_check(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+      png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
       do
       {
          png_ptr->pass++;
@@ -2855,7 +2897,7 @@ png_read_finish_row(png_structp png_ptr)
                png_ptr->idat_size = png_get_uint_31(png_ptr, chunk_length);
                png_reset_crc(png_ptr);
                png_crc_read(png_ptr, png_ptr->chunk_name, 4);
-               if (png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+               if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
                   png_error(png_ptr, "Not enough image data");
 
             }
@@ -2882,7 +2924,7 @@ png_read_finish_row(png_structp png_ptr)
 
          if (!(png_ptr->zstream.avail_out))
          {
-            png_warning(png_ptr, "Extra compressed data.");
+            png_warning(png_ptr, "Extra compressed data");
             png_ptr->mode |= PNG_AFTER_IDAT;
             png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
             break;
@@ -2920,7 +2962,7 @@ png_read_start_row(png_structp png_ptr)
 #endif
 
    int max_pixel_depth;
-   png_uint_32 row_bytes;
+   png_size_t row_bytes;
 
    png_debug(1, "in png_read_start_row\n");
    png_ptr->zstream.avail_in = 0;
@@ -2937,12 +2979,8 @@ png_read_start_row(png_structp png_ptr)
          png_pass_inc[png_ptr->pass] - 1 -
          png_pass_start[png_ptr->pass]) /
          png_pass_inc[png_ptr->pass];
-
-         row_bytes = PNG_ROWBYTES(png_ptr->pixel_depth,png_ptr->iwidth) + 1;
-
-         png_ptr->irowbytes = (png_size_t)row_bytes;
-         if((png_uint_32)png_ptr->irowbytes != row_bytes)
-            png_error(png_ptr, "Rowbytes overflow in png_read_start_row");
+         png_ptr->irowbytes =
+            PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1;
    }
    else
    {
@@ -3074,11 +3112,10 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
    if ((png_uint_32)png_ptr->rowbytes > PNG_SIZE_MAX - 1)
-      png_error(png_ptr, "Row has too many bytes to allocate in memory.");
-   png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
-      png_ptr->rowbytes + 1));
+      png_error(png_ptr, "Row has too many bytes to allocate in memory");
+   png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, png_ptr->rowbytes + 1);
 
-   png_memset_check(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+   png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
    png_debug1(3, "width = %lu,\n", (unsigned long) png_ptr->width);
    png_debug1(3, "height = %lu,\n", (unsigned long) png_ptr->height);

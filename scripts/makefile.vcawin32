@@ -31,65 +31,61 @@ OBJS4 = pngvcrd$(O)
 OBJS  = $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)
 
 # Targets
-all: libpng.lib pngconf.h
+all: libpng.lib pngdefs.h
 
-pngconf.h.in: pngconf.h
-	cat pngconf.h > pngconf.h.in
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.vcawin32 */" > pngdefs.h
+	echo "#define PNG_USE_PNGVCRD" >> pngdefs.h
 
-pngconf.h: pngconf.h.in
-	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
-	echo "#define PNG_USE_PNGVCRD" >> pngconf.h
-	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
-
-png$(O): png.h pngconf.h pngintrn.h
+png$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngset$(O): png.h pngconf.h pngintrn.h
+pngset$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngget$(O): png.h pngconf.h pngintrn.h
+pngget$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngread$(O): png.h pngconf.h pngintrn.h
+pngread$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngpread$(O): png.h pngconf.h pngintrn.h
+pngpread$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngrtran$(O): png.h pngconf.h pngintrn.h
+pngrtran$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngrutil$(O): png.h pngconf.h pngintrn.h
+pngrutil$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngerror$(O): png.h pngconf.h pngintrn.h
+pngerror$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngmem$(O): png.h pngconf.h pngintrn.h
+pngmem$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngrio$(O): png.h pngconf.h pngintrn.h
+pngrio$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngwio$(O): png.h pngconf.h pngintrn.h
+pngwio$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngtest$(O): png.h pngconf.h pngintrn.h
+pngtest$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngtrans$(O): png.h pngconf.h pngintrn.h
+pngtrans$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngwrite$(O): png.h pngconf.h pngintrn.h
+pngwrite$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngwtran$(O): png.h pngconf.h pngintrn.h
+pngwtran$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngwutil$(O): png.h pngconf.h pngintrn.h
+pngwutil$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngvcrd$(O): png.h pngconf.h pngintrn.h
+pngvcrd$(O): png.h pngconf.h pngdefs.h pngpriv.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 libpng.lib: $(OBJS)

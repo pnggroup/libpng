@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta10 - July 12, 2006
+ libpng version 1.4.0beta11 - August 19, 2006
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -415,14 +415,14 @@ where row_pointers is an array of pointers to the pixel data for each row:
 If you know your image size and pixel size ahead of time, you can allocate
 row_pointers prior to calling png_read_png() with
 
-   if (height > PNG_UINT_32_MAX/png_sizeof(png_byte))
+   if (height > PNG_UINT_32_MAX/sizeof(png_bytep))
       png_error (png_ptr,
          "Image is too tall to process in memory");
    if (width > PNG_UINT_32_MAX/pixel_size)
       png_error (png_ptr,
          "Image is too wide to process in memory");
    row_pointers = png_malloc(png_ptr,
-      height*png_sizeof(png_bytep));
+      height*sizeof(png_bytep));
    for (int i=0; i<height, i++)
       row_pointers[i]=png_malloc(png_ptr,
          width*pixel_size);
@@ -2525,11 +2525,10 @@ you may also have to change the memory allocators (png_malloc, etc.).
 
 Configuring for compiler xxx:
 
-All includes for libpng are in pngconf.h.  If you need to add/change/delete
-an include, this is the place to do it.  The includes that are not
-needed outside libpng are protected by the PNG_INTERNAL definition,
-which is only defined for those routines inside libpng itself.  The
-files in libpng proper only include png.h, which includes pngconf.h.
+All includes for libpng are in pngconf.h.  If you need to add, change
+or delete an include, this is the place to do it.  The includes that
+are not needed outside libpng are placed inside pngpriv.h, which is
+only used by the routines inside libpng itself.
 
 Configuring zlib:
 
@@ -2915,13 +2914,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-July 12, 2006
+August 19, 2006
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta10 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta11 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

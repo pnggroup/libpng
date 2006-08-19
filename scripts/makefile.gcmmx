@@ -16,7 +16,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 1
-PNGMIN = 1.4.0beta10
+PNGMIN = 1.4.0beta11
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -104,18 +104,13 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
 all: libpng.a $(LIBSO) pngtest pngtest-static libpng.pc libpng-config \
-	pngconf.h
+	pngconf.h pngdefs.h
 
-pngconf.h.in: pngconf.h
-	cat pngconf.h > pngconf.h.in
-
-# Remove the line with #define PNG_THREAD_UNSAFE_OK if you need thread safety
-### for generic gcc:
-pngconf.h:	pngconf.h.in
-	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
-	echo "#define PNG_THREAD_UNSAFE_OK" >> pngconf.h
-	echo "#define PNG_USE_PNGGCCRD" >> pngconf.h
-	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
+# Use makefile.gcmmx if you don't want to use the MMX assembler code.
+# If you don't need thread safety you can uncomment the define.
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.gcmmx */" > pngdefs.h
+	# echo "#define PNG_THREAD_UNSAFE_OK" >> pngdefs.h
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
@@ -168,12 +163,13 @@ test: pngtest pngtest-static
 	@echo ""
 	./pngtest-static
 
-install-headers: png.h pngconf.h
+install-headers: png.h pngconf.h pngdefs.h
 	-@if [ ! -d $(DI) ]; then $(MKDIR_P) $(DI); fi
 	-@if [ ! -d $(DI)/$(LIBNAME) ]; then $(MKDIR_P) $(DI)/$(LIBNAME); fi
-	cp png.h pngconf.h $(DI)/$(LIBNAME)
-	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h
-	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h
+	cp png.h pngconf.h pngdefs.h $(DI)/$(LIBNAME)
+	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h \
+		$(DI)/$(LIBNAME)/pngdefs.h
+	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h $(DI)/pngdefs.h
 	-@$(RM_F) $(DI)/libpng
 	(cd $(DI); $(LN_SF) $(LIBNAME) libpng; $(LN_SF) $(LIBNAME)/* .)
 
@@ -244,7 +240,7 @@ test-installed:
 	./pngtesti pngtest.png
 
 clean:
-	$(RM_F) *.o libpng.a pngtest pngout.png libpng-config \
+	$(RM_F) *.o libpng.a pngtest pngout.png libpng-config pngdefs.h \
 	$(LIBSO) $(LIBSOMAJ)* pngtest-static pngtesti \
 	libpng.pc
 
@@ -252,20 +248,20 @@ DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
 	chmod a-w *.[ch35] $(DOCS) scripts/*
 
-png.o png.pic.o:		png.h pngconf.h pngintrn.h png.c
-pngerror.o pngerror.pic.o:	png.h pngconf.h pngintrn.h pngerror.c
-pngrio.o pngrio.pic.o:		png.h pngconf.h pngintrn.h pngrio.c
-pngwio.o pngwio.pic.o:		png.h pngconf.h pngintrn.h pngwio.c
-pngmem.o pngmem.pic.o:		png.h pngconf.h pngintrn.h pngmem.c
-pngset.o pngset.pic.o:		png.h pngconf.h pngintrn.h pngset.c
-pngget.o pngget.pic.o:		png.h pngconf.h pngintrn.h pngget.c
-pngread.o pngread.pic.o:	png.h pngconf.h pngintrn.h pngread.c
-pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngintrn.h pngrtran.c
-pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngintrn.h pngrutil.c
-pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngintrn.h pngtrans.c
-pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngintrn.h pngwrite.c
-pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngintrn.h pngwtran.c
-pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngintrn.h pngwutil.c
-pngpread.o pngpread.pic.o:	png.h pngconf.h pngintrn.h pngpread.c
+png.o png.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h png.c
+pngerror.o pngerror.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngerror.c
+pngrio.o pngrio.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngrio.c
+pngwio.o pngwio.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngwio.c
+pngmem.o pngmem.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngmem.c
+pngset.o pngset.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngset.c
+pngget.o pngget.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngget.c
+pngread.o pngread.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngread.c
+pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngrtran.c
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngrutil.c
+pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngtrans.c
+pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwrite.c
+pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwtran.c
+pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwutil.c
+pngpread.o pngpread.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngpread.c
 
-pngtest.o:			png.h pngconf.h pngintrn.h pngtest.c
+pngtest.o:			png.h pngconf.h pngdefs.h pngtest.c

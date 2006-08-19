@@ -65,7 +65,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng14
 PNGMAJ = 1
 CYGDLL = 14
-PNGMIN = 1.4.0beta10
+PNGMIN = 1.4.0beta11
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
@@ -113,21 +113,10 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 all: all-static all-shared libpng.pc libpng-config libpng.pc libpng-config \
-	pngconf.h
+	pngconf.h pngdefs.h
 
-pngconf.h.in: pngconf.h
-	cat pngconf.h > pngconf.h.in
-
-pngconf.h: pngconf.h.in
-	sed "/Makefile-supplied defines go here:/q" pngconf.h.in > pngconf.h
-
-	/* if you don't want to use the intel MMX code, uncomment this */
-	# echo "#define PNG_NO_MMX_CODE" >> pngconf.h
-
-	/* if you don't need thread safety you can uncomment this */
-	# echo "#define PNG_THREAD_UNSAFE_OK" >> pngconf.h
-
-	sed "1,/Makefile-supplied defines go here:/d" pngconf.h.in >> pngconf.h
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.cygwin */" > pngdefs.h
 
 # Make this to verify that "make [...] install" will do what you want.
 buildsetup-tell:
@@ -159,14 +148,14 @@ shared: all-shared
 all-static: $(STATLIB) pngtest-stat$(EXE)
 all-shared: $(SHAREDLIB) pngtest$(EXE)
 
-pnggccrd.o: pnggccrd.c png.h pngconf.h
+pnggccrd.o: pnggccrd.c png.h pngconf.h pngdefs.h pngpriv.h
 	@echo ""
 	@echo '    You can ignore the "control reaches end of non-void function"'
 	@echo '    warning and "<variable> defined but not used" warnings:'
 	@echo ""
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
+pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h pngdefs.h pngpriv.h
 	@echo ""
 	@echo '    You can ignore the "control reaches end of non-void function"'
 	@echo '    warning and "<variable> defined but not used" warnings:'
@@ -177,7 +166,7 @@ $(STATLIB): $(OBJS)
 	ar rc $@ $(OBJS)
 	$(RANLIB) $@
 
-$(SHAREDDEF): scripts/pngw32.def
+$(SHAREDDEF): scripts/pngwin.def
 	cat $< | sed -e '1{G;s/^\(.*\)\(\n\)/EXPORTS/;};2,/^EXPORTS/d' | \
 	sed -e 's/\([^;]*\);/;/' > $@
 
@@ -190,10 +179,10 @@ pngtest$(EXE): pngtest.pic.o $(SHAREDLIB)
 pngtest-stat$(EXE): pngtest.o $(STATLIB)
 	$(CC) -static $(CFLAGS) $< $(LDFLAGS) -o $@
 
-pngtest.pic.o: pngtest.c
+pngtest.pic.o: pngtest.c pngconf.h pngdefs.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-pngtest.o: pngtest.c
+pngtest.o: pngtest.c pngconf.h pngdefs.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 test: test-static test-shared
@@ -228,7 +217,8 @@ install-headers:
 	-@if [ ! -d $(DI)/$(LIBNAME) ]; then $(MKDIR_P) $(DI)/$(LIBNAME); fi
 	-@rm -f $(DI)/png.h
 	-@rm -f $(DI)/pngconf.h
-	install -m 644 $(S)/png.h $(S)/pngconf.h $(DI)/$(LIBNAME)
+	-@rm -f $(DI)/pngdefs.h
+	install -m 644 $(S)/png.h $(S)/pngconf.h $(S)/pngdefs.h $(DI)/$(LIBNAME)
 	-@rm -f $(DI)/libpng
 	(cd $(DI); ln -sf $(LIBNAME) libpng; ln -sf $(LIBNAME)/* .)
 
@@ -283,7 +273,7 @@ test-installed:
 clean:
 	/bin/rm -f *.pic.o *.o $(STATLIB) $(IMPLIB) $(SHAREDLIB) \
 	pngtest-stat$(EXE) pngtest$(EXE) pngout.png $(SHAREDDEF) \
-	libpng-config libpng.pc pngtesti$(EXE)
+	libpng-config libpng.pc pngtesti$(EXE) pngdefs.h
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
@@ -293,25 +283,22 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o:		png.h pngconf.h pngintrn.h png.c
-pngerror.o pngerror.pic.o:	png.h pngconf.h pngintrn.h pngerror.c
-pngrio.o pngrio.pic.o:		png.h pngconf.h pngintrn.h pngrio.c
-pngwio.o pngwio.pic.o:		png.h pngconf.h pngintrn.h pngwio.c
-pngmem.o pngmem.pic.o:		png.h pngconf.h pngintrn.h pngmem.c
-pngset.o pngset.pic.o:		png.h pngconf.h pngintrn.h pngset.c
-pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pngintrn.h pngget.c
-pngget.o pngget.pic.o:		png.h pngconf.h pngintrn.h pngget.c
-pngread.o pngread.pic.o:	png.h pngconf.h pngintrn.h pngread.c
-pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngintrn.h pngrtran.c
-pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngintrn.h pngrutil.c
-pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngintrn.h pngtrans.c
-pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngintrn.h pngwrite.c
-pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngintrn.h pngwtran.c
-pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngintrn.h pngwutil.c
-pngpread.o pngpread.pic.o:	png.h pngconf.h pngintrn.h pngpread.c
+png.o png.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h png.c
+pngerror.o pngerror.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngerror.c
+pngrio.o pngrio.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngrio.c
+pngwio.o pngwio.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngwio.c
+pngmem.o pngmem.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngmem.c
+pngset.o pngset.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngset.c
+pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngget.c
+pngget.o pngget.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngget.c
+pngread.o pngread.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngread.c
+pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngrtran.c
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngrutil.c
+pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngtrans.c
+pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwrite.c
+pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwtran.c
+pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwutil.c
+pngpread.o pngpread.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngpread.c
 
-pngtest.o:			png.h pngconf.h pngintrn.h pngtest.c
-pngtest-stat.o:			png.h pngconf.h pngintrn.h pngtest.c
-
-
-
+pngtest.o:			png.h pngconf.h pngdefs.h pngtest.c
+pngtest-stat.o:			png.h pngconf.h pngdefs.h pngtest.c

@@ -70,7 +70,7 @@ int check_if_png(char *file_name, FILE **fp)
    /* Compare the first PNG_BYTES_TO_CHECK bytes of the signature.
       Return nonzero (true) if they match */
 
-   return(!png_sig_cmp(buf, (png_size_t)0, PNG_BYTES_TO_CHECK));
+   return(!png_sig_cmp(buf, 0, PNG_BYTES_TO_CHECK));
 }
 
 /* Read a PNG file.  You may want to return an error code if the read
@@ -120,7 +120,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    if (info_ptr == NULL)
    {
       fclose(fp);
-      png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+      png_destroy_read_struct(&png_ptr, NULL, NULL);
       return (ERROR);
    }
 
@@ -132,7 +132,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    if (setjmp(png_jmpbuf(png_ptr)))
    {
       /* Free all of the memory associated with the png_ptr and info_ptr */
-      png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       fclose(fp);
       /* If we get here, we had a problem reading the file */
       return (ERROR);
@@ -163,7 +163,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     * adjustment), then you can read the entire image (including
     * pixels) into the info structure with this call:
     */
-   png_read_png(png_ptr, info_ptr, png_transforms, png_voidp_NULL);
+   png_read_png(png_ptr, info_ptr, png_transforms, NULL);
 #else
    /* OK, you're doing it the hard way, with the lower-level functions */
 
@@ -173,7 +173,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    png_read_info(png_ptr, info_ptr);
 
    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
-       &interlace_type, int_p_NULL, int_p_NULL);
+       &interlace_type, NULL, NULL);
 
 /* Set up the data transformations you want.  Note that these are all
  * optional.  Only call them if you want/need them.  Many of the
@@ -283,7 +283,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
          png_color std_color_cube[MAX_SCREEN_COLORS];
 
          png_set_dither(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
-            MAX_SCREEN_COLORS, png_uint_16p_NULL, 0);
+            MAX_SCREEN_COLORS, NULL, 0);
       }
       /* This reduces the image to the palette supplied in the file */
       else if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette))
@@ -360,18 +360,16 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 #ifdef single /* Read the image a single row at a time */
       for (y = 0; y < height; y++)
       {
-         png_read_rows(png_ptr, &row_pointers[y], png_bytepp_NULL, 1);
+         png_read_rows(png_ptr, &row_pointers[y], NULL, 1);
       }
 
 #else no_single /* Read the image several rows at a time */
       for (y = 0; y < height; y += number_of_rows)
       {
 #ifdef sparkle /* Read the image using the "sparkle" effect. */
-         png_read_rows(png_ptr, &row_pointers[y], png_bytepp_NULL,
-            number_of_rows);
+         png_read_rows(png_ptr, &row_pointers[y], NULL, number_of_rows);
 #else no_sparkle /* Read the image using the "rectangle" effect */
-         png_read_rows(png_ptr, png_bytepp_NULL, &row_pointers[y],
-            number_of_rows);
+         png_read_rows(png_ptr, NULL, &row_pointers[y], number_of_rows);
 #endif no_sparkle /* use only one of these two methods */
       }
 
@@ -388,7 +386,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* At this point you have read the entire image */
 
    /* clean up after the read, and free any memory allocated - REQUIRED */
-   png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
    /* close the file */
    fclose(fp);
@@ -421,13 +419,13 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
 
    if (*info_ptr == NULL)
    {
-      png_destroy_read_struct(png_ptr, info_ptr, png_infopp_NULL);
+      png_destroy_read_struct(png_ptr, info_ptr, NULL);
       return (ERROR);
    }
 
    if (setjmp(png_jmpbuf((*png_ptr))))
    {
-      png_destroy_read_struct(png_ptr, info_ptr, png_infopp_NULL);
+      png_destroy_read_struct(png_ptr, info_ptr, NULL);
       return (ERROR);
    }
 
@@ -456,7 +454,7 @@ process_data(png_structp *png_ptr, png_infop *info_ptr,
    if (setjmp(png_jmpbuf((*png_ptr))))
    {
       /* Free the png_ptr and info_ptr memory on error */
-      png_destroy_read_struct(png_ptr, info_ptr, png_infopp_NULL);
+      png_destroy_read_struct(png_ptr, info_ptr, NULL);
       return (ERROR);
    }
 
@@ -588,7 +586,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    if (info_ptr == NULL)
    {
       fclose(fp);
-      png_destroy_write_struct(&png_ptr,  png_infopp_NULL);
+      png_destroy_write_struct(&png_ptr,  NULL);
       return (ERROR);
    }
 
@@ -620,7 +618,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * image info living info in the structure.  You could "|" many
     * PNG_TRANSFORM flags into the png_transforms integer here.
     */
-   png_write_png(png_ptr, info_ptr, png_transforms, png_voidp_NULL);
+   png_write_png(png_ptr, info_ptr, png_transforms, NULL);
 #else
    /* This is the hard way */
 
@@ -637,7 +635,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 
    /* set the palette if there is one.  REQUIRED for indexed-color images */
    palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH
-             * png_sizeof (png_color));
+             * sizeof (png_color));
    /* ... set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
    /* You must not free palette here, because png_set_PLTE only makes a link to
@@ -748,7 +746,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_byte image[height][width*bytes_per_pixel];
    png_bytep row_pointers[height];
 
-   if (height > PNG_UINT_32_MAX/png_sizeof(png_bytep))
+   if (height > PNG_UINT_32_MAX/sizeof(png_bytep))
      png_error (png_ptr, "Image is too tall to process in memory");
 
    for (k = 0; k < height; k++)

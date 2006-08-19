@@ -30,7 +30,10 @@ OBJS = $(LBR)(png.o) $(LBR)(pngset.o) $(LBR)(pngget.o) $(LBR)(pngrutil.o)\
 	$(LBR)(pngrtran.o) $(LBR)(pngwtran.o)\
 	$(LBR)(pngmem.o) $(LBR)(pngrio.o) $(LBR)(pngwio.o) $(LBR)(pngpread.o)
 
-all: $(LBR) pngtest.ttp
+all: $(LBR) pngtest.ttp pngdefs.h
+
+pngdefs.h:
+	echo "/* pngdefs.h was built by makefile.atari */" > pngdefs.h
 
 $(LBR): $(OBJS)
 
@@ -43,9 +46,12 @@ install: libpng.a
 	-@mkdir $(DESTDIR)$(LIBPATH)
 	-@rm -f $(DESTDIR)$(INCPATH)/png.h
 	-@rm -f $(DESTDIR)$(INCPATH)/pngconf.h
+	-@rm -f $(DESTDIR)$(INCPATH)/pngdefs.h
 	cp png.h $(DESTDIR)$(INCPATH)/libpng
 	cp pngconf.h $(DESTDIR)$(INCPATH)/libpng
+	cp pngdefs.h $(DESTDIR)$(INCPATH)/libpng
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/png.h
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngconf.h
+	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngdefs.h
 	(cd $(DESTDIR)$(INCPATH); ln -f -s $(LIBNAME) libpng; \
 	ln -f -s $(LIBNAME)/* .)

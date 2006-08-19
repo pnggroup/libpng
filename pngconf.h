@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta10 - July 12, 2006
+ * libpng version 1.4.0beta11 - August 19, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -18,8 +18,8 @@
 #define PNGCONF_H
 
 /* Added at libpng-1.4.0 */
-/* Makefile-supplied defines go here: */
-/* End of Makefile-supplied defines. */
+/* pngdefs.h is created by the makefile or the "configure" script. */
+#include "pngdefs.h"
 
 #ifndef PNG_NO_LIMITS_H
 #include <limits.h>
@@ -27,7 +27,7 @@
 
 /* Added at libpng-1.2.9 */
 
-/* PNG_CONFIGURE_LIBPNG is set by the "configure" script. */
+/* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure" script. */
 #ifdef PNG_CONFIGURE_LIBPNG
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -285,9 +285,6 @@
 
 #ifdef _NO_PROTO
 #  define PNGARG(arglist) ()
-#  ifndef PNG_TYPECAST_NULL
-#     define PNG_TYPECAST_NULL
-#  endif
 #else
 #  define PNGARG(arglist) arglist
 #endif /* _NO_PROTO */
@@ -667,7 +664,7 @@
 #endif
 #endif
 
-/* Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGS no matter
+/* Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGs no matter
  * how large, set these limits to 0x7fffffffL
  */
 #ifndef PNG_USER_WIDTH_MAX
@@ -675,6 +672,11 @@
 #endif
 #ifndef PNG_USER_HEIGHT_MAX
 #  define PNG_USER_HEIGHT_MAX 1000000L
+#endif
+
+/* Added at libpng-1.4.0 */
+#ifndef PNG_NO_IO_STATE
+#  define PNG_IO_STATE_SUPPORTED
 #endif
 
 /* These are currently experimental features, define them if you want */
@@ -988,8 +990,7 @@
  * numbers suggest (a png_uint_32 must be at least 32 bits long), but they
  * don't have to be exactly that size.  Some compilers dislike passing
  * unsigned shorts as function parameters, so you may be better off using
- * unsigned int for png_uint_16.  Likewise, for 64-bit systems, you may
- * want to have unsigned int for png_uint_32 instead of unsigned long.
+ * unsigned int for png_uint_16.
  */
 
 #if defined(INT_MAX) && (INT_MAX > 0x7ffffffeL)
@@ -1003,14 +1004,10 @@ typedef unsigned short png_uint_16;
 typedef short png_int_16;
 typedef unsigned char png_byte;
 
-/* This is usually size_t.  It is typedef'ed just in case you need it to
-   change (I'm not sure if you will or not, so I thought I'd be safe) */
-#ifdef PNG_SIZE_T
-   typedef PNG_SIZE_T png_size_t;
-#  define png_sizeof(x) png_convert_size(sizeof (x))
+#ifdef PNG_NO_SIZE_T
+   typedef unsigned int png_size_t;
 #else
    typedef size_t png_size_t;
-#  define png_sizeof(x) sizeof (x)
 #endif
 
 /* The following is needed for medium model support.  It cannot be in the
@@ -1281,8 +1278,8 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  endif
 #endif
 
-/* User may want to use these so they are not in PNG_INTERNAL. Any library
- * functions that are passed far data must be model independent.
+/* Users may want to use these so they are not private.  Any library
+ * functions that are passed far data must be model-independent.
  */
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -1338,24 +1335,33 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  endif
 #endif
 
+/* png_alloc_size_t is guaranteed to be no smaller than png_size_t,
+ * and no smaller than png_uint_32.  Casts from png_size_t or png_uint_32
+ * to png_alloc_size_t are not necessary; in fact, it is recommended
+ * not to use them at all so that the compiler can complain when something
+ * turns out to be problematic.
+ * Casts in the other direction (from png_alloc_size_t to png_size_t or
+ * png_uint_32) should be explicitly applied; however, we do not expect
+ * to encounter practical situations that require such conversions.
+ */
 #if defined(__TURBOC__) && !defined(__FLAT__)
 #  define  png_mem_alloc farmalloc
 #  define  png_mem_free  farfree
-   typedef unsigned long png_mem_size_t;
+   typedef unsigned long png_alloc_size_t;
 #else
 #  if defined(_MSC_VER) && defined(MAXSEG_64K)
 #    define  png_mem_alloc(s) halloc(s, 1)
 #    define  png_mem_free     hfree
-     typedef unsigned long    png_mem_size_t;
-#else
-#    if defined(_WINDOWS_)
+     typedef unsigned long    png_alloc_size_t;
+#  else
+#    if defined(_WINDOWS_) && (!defined(INT_MAX) || INT_MAX <= 0x7ffffffeL)
 #      define  png_mem_alloc(s) HeapAlloc(GetProcessHeap(), 0, s)
 #      define  png_mem_free(p)  HeapFree(GetProcessHeap(), 0, p)
-       typedef SIZE_T           png_mem_size_t;
+       typedef DWORD            png_alloc_size_t;
 #    else
 #      define  png_mem_alloc malloc
 #      define  png_mem_free  free
-       typedef size_t        png_mem_size_t;
+       typedef png_size_t    png_alloc_size_t;
 #    endif
 #  endif
 #endif

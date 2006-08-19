@@ -32,7 +32,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/libpng14.dll"
 				LinkIncremental="1"
-				ModuleDefinitionFile="..\..\scripts\pngw32.def"/>
+				ModuleDefinitionFile="..\..\scripts\pngwin.def"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -79,7 +79,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/libpng14d.dll"
-				ModuleDefinitionFile="..\..\scripts\pngw32.def"
+				ModuleDefinitionFile="..\..\scripts\pngwin.def"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -128,7 +128,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/libpng14.dll"
 				LinkIncremental="1"
-				ModuleDefinitionFile="..\..\scripts\pngw32.def"/>
+				ModuleDefinitionFile="..\..\scripts\pngwin.def"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -176,7 +176,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/libpng14d.dll"
-				ModuleDefinitionFile="..\..\scripts\pngw32.def"
+				ModuleDefinitionFile="..\..\scripts\pngwin.def"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -597,7 +597,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\scripts\pngw32.def">
+				RelativePath="..\..\scripts\pngwin.def">
 				<FileConfiguration
 					Name="DLL VB|Win32"
 					ExcludedFromBuild="TRUE">
@@ -651,12 +651,15 @@
 			<File
 				RelativePath="..\..\pngconf.h">
 			</File>
+			<File
+				RelativePath="..\..\pngpriv.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 			<File
-				RelativePath="..\..\scripts\pngw32.rc">
+				RelativePath="..\..\scripts\pngwin.rc">
 				<FileConfiguration
 					Name="LIB Release|Win32"
 					ExcludedFromBuild="TRUE">

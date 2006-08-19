@@ -7,7 +7,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * Last changed in libpng 1.4.0 April 20, 2006
+ * Last changed in libpng 1.4.0 August 3, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -228,6 +228,8 @@
  *   - more tinkering with clobber list at lines 4529 and 5033, to get
  *     it to compile on gcc-3.4.
  *
+ * 20060803: patch to compile on x86_64
+ *
  * STILL TO DO:
  *     - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
  *     - write MMX code for 48-bit case (pixel_bytes == 6)
@@ -243,7 +245,7 @@
  */
 
 #include "png.h"
-#include "pngintrn.h"
+#include "pngpriv.h"
 
 #if defined(PNG_USE_PNGGCCRD)
 
@@ -428,7 +430,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
    {
       png_debug(2,"mask == 0xff:  doing single png_memcpy()\n");
       png_memcpy(row, png_ptr->row_buf + 1,
-       (png_size_t)PNG_ROWBYTES(png_ptr->row_info.pixel_depth,png_ptr->width));
+         PNG_ROWBYTES(png_ptr->row_info.pixel_depth,png_ptr->width));
    }
    else   /* (png_combine_row() is never called with mask == 0) */
    {
@@ -1711,7 +1713,7 @@ png_do_read_interlace(png_structp png_ptr)
                      int dummy_value_c;   // fix 'forbidden register spilled'
                      int dummy_value_S;
                      int dummy_value_D;
-                     int dummy_value_a;
+                     long dummy_value_a;
 
                      __asm__ __volatile__ (
                         "subl $21, %%edi         \n\t"
@@ -1764,7 +1766,7 @@ png_do_read_interlace(png_structp png_ptr)
                      int dummy_value_c;   // fix 'forbidden register spilled'
                      int dummy_value_S;
                      int dummy_value_D;
-                     int dummy_value_a;
+                     long dummy_value_a;
 
                      __asm__ __volatile__ (
                         "subl $9, %%edi          \n\t"
@@ -1818,8 +1820,8 @@ png_do_read_interlace(png_structp png_ptr)
                         int dummy_value_c;  // fix 'forbidden register spilled'
                         int dummy_value_S;
                         int dummy_value_D;
-                        int dummy_value_a;
-                        int dummy_value_d;
+                        long dummy_value_a;
+                        long dummy_value_d;
 
                         __asm__ __volatile__ (
                            "subl $3, %%esi          \n\t"
@@ -2767,7 +2769,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
    __asm__ __volatile__ (
       // initialize address pointers and offset
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                 \n\t" // save index to Global Offset Table
+#else
       "pushl %%ebx                 \n\t" // save index to Global Offset Table
+#endif
 #endif
 //pre "movl row, %%edi             \n\t" // edi:  Avg(x)
       "xorl %%ebx, %%ebx           \n\t" // ebx:  x
@@ -2823,7 +2829,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       "subl %%eax, %%ecx           \n\t" // drop over bytes from original length
       "movl %%ecx, _MMXLength      \n\t"
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                  \n\t" // restore index to Global Offset Table
+#else
       "popl %%ebx                  \n\t" // restore index to Global Offset Table
+#endif
 #endif
 
       : "=c" (dummy_value_c),            // output regs (dummy)
@@ -3199,7 +3209,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
          __asm__ __volatile__ (
             // re-init address pointers and offset
 #ifdef __PIC__
+#ifdef __x86_64__
+            "pushq %%rbx                 \n\t" // save Global Offset Table index
+#else
             "pushl %%ebx                 \n\t" // save Global Offset Table index
+#endif
 #endif
             "movl _dif, %%ebx            \n\t" // ebx:  x = offset to alignment
                                                // boundary
@@ -3230,7 +3244,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 
          "avg_1end:                      \n\t"
 #ifdef __PIC__
+#ifdef __x86_64
+            "popq %%rbx                  \n\t" // Global Offset Table index
+#else
             "popl %%ebx                  \n\t" // Global Offset Table index
+#endif
 #endif
 
             : "=c" (dummy_value_c),            // output regs (dummy)
@@ -3359,7 +3377,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       // MMX acceleration complete; now do clean-up
       // check if any remaining bytes left to decode
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                 \n\t" // save index to Global Offset Table
+#else
       "pushl %%ebx                 \n\t" // save index to Global Offset Table
+#endif
 #endif
       "movl _MMXLength, %%ebx      \n\t" // ebx:  x == offset bytes after MMX
 //pre "movl row, %%edi             \n\t" // edi:  Avg(x)
@@ -3389,7 +3411,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
    "avg_end:                       \n\t"
       "EMMS                        \n\t" // end MMX; prep for poss. FP instrs.
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                  \n\t" // restore index to Global Offset Table
+#else
       "popl %%ebx                  \n\t" // restore index to Global Offset Table
+#endif
 #endif
 
       : "=c" (dummy_value_c),            // output regs (dummy)
@@ -3434,7 +3460,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 
    __asm__ __volatile__ (
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                 \n\t" // save index to Global Offset Table
+#else
       "pushl %%ebx                 \n\t" // save index to Global Offset Table
+#endif
 #endif
       "xorl %%ebx, %%ebx           \n\t" // ebx:  x offset
 //pre "movl row, %%edi             \n\t"
@@ -3544,7 +3574,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       "subl %%eax, %%ecx           \n\t" // drop over bytes from original length
       "movl %%ecx, _MMXLength      \n\t"
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                  \n\t" // restore index to Global Offset Table
+#else
       "popl %%ebx                  \n\t" // restore index to Global Offset Table
+#endif
 #endif
 
       : "=c" (dummy_value_c),            // output regs (dummy)
@@ -4244,7 +4278,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       {
          __asm__ __volatile__ (
 #ifdef __PIC__
+#ifdef __x86_64__
+            "pushq %%rbx                 \n\t" // save Global Offset Table index
+#else
             "pushl %%ebx                 \n\t" // save Global Offset Table index
+#endif
 #endif
             "movl _dif, %%ebx            \n\t"
             "cmpl _FullLength, %%ebx     \n\t"
@@ -4331,7 +4369,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 
          "paeth_dend:                    \n\t"
 #ifdef __PIC__
+#ifdef __x86_64__
+            "popq %%rbx                  \n\t" // index to Global Offset Table
+#else
             "popl %%ebx                  \n\t" // index to Global Offset Table
+#endif
 #endif
 
             : "=c" (dummy_value_c),            // output regs (dummy)
@@ -4356,7 +4398,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       // MMX acceleration complete; now do clean-up
       // check if any remaining bytes left to decode
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                 \n\t" // save index to Global Offset Table
+#else
       "pushl %%ebx                 \n\t" // save index to Global Offset Table
+#endif
 #endif
       "movl _MMXLength, %%ebx      \n\t"
       "cmpl _FullLength, %%ebx     \n\t"
@@ -4443,7 +4489,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
    "paeth_end:                     \n\t"
       "EMMS                        \n\t" // end MMX; prep for poss. FP instrs.
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                  \n\t" // restore index to Global Offset Table
+#else
       "popl %%ebx                  \n\t" // restore index to Global Offset Table
+#endif
 #endif
 
       : "=c" (dummy_value_c),            // output regs (dummy)
@@ -4912,7 +4962,11 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
 //pre "movl row, %%edi              \n\t"
       // get # of bytes to alignment
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                  \n\t"
+#else
       "pushl %%ebx                  \n\t"
+#endif
 #endif
       "movl %%edi, %%ecx            \n\t"
       "xorl %%ebx, %%ebx            \n\t"
@@ -5014,7 +5068,11 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
    "up_end:                         \n\t"
       "EMMS                         \n\t" // conversion of filtered row complete
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                   \n\t"
+#else
       "popl %%ebx                   \n\t"
+#endif
 #endif
 
       : "=d" (dummy_value_d),   // 0      // output regs (dummy)
@@ -5298,23 +5356,45 @@ png_mmx_support(void)
 #if defined(PNG_MMX_CODE_SUPPORTED)
     int result;
     __asm__ __volatile__ (
+#ifdef __x86_64__
+        "pushq %%rbx          \n\t"  // rbx gets clobbered by CPUID instruction
+        "pushq %%rcx          \n\t"  // so does rcx...
+        "pushq %%rdx          \n\t"  // ...and rdx (but rcx & rdx safe on Linux)
+#else
         "pushl %%ebx          \n\t"  // ebx gets clobbered by CPUID instruction
         "pushl %%ecx          \n\t"  // so does ecx...
         "pushl %%edx          \n\t"  // ...and edx (but ecx & edx safe on Linux)
+#endif
 //      ".byte  0x66          \n\t"  // convert 16-bit pushf to 32-bit pushfd
 //      "pushf                \n\t"  // 16-bit pushf
+#ifdef __x86_64__
+        "pushfq               \n\t"  // save Eflag to stack
+        "popq %%rax           \n\t"  // get Eflag from stack into rax
+        "movq %%rax, %%rcx    \n\t"  // make another copy of Eflag in rcx
+        "xorl $0x200000, %%eax \n\t" // toggle ID bit in Eflag (i.e., bit 21)
+        "pushq %%rax          \n\t"  // save modified Eflag back to stack
+#else
         "pushfl               \n\t"  // save Eflag to stack
         "popl %%eax           \n\t"  // get Eflag from stack into eax
         "movl %%eax, %%ecx    \n\t"  // make another copy of Eflag in ecx
         "xorl $0x200000, %%eax \n\t" // toggle ID bit in Eflag (i.e., bit 21)
         "pushl %%eax          \n\t"  // save modified Eflag back to stack
+#endif
 //      ".byte  0x66          \n\t"  // convert 16-bit popf to 32-bit popfd
 //      "popf                 \n\t"  // 16-bit popf
+#ifdef __x86_64__
+        "popfq                \n\t"  // restore modified value to Eflag reg
+        "pushfq               \n\t"  // save Eflag to stack
+        "popq %%rax           \n\t"  // get Eflag from stack
+        "pushq %%rcx          \n\t"  // save original Eflag to stack
+        "popfq                \n\t"  // restore original Eflag
+#else
         "popfl                \n\t"  // restore modified value to Eflag reg
         "pushfl               \n\t"  // save Eflag to stack
         "popl %%eax           \n\t"  // get Eflag from stack
         "pushl %%ecx          \n\t"  // save original Eflag to stack
         "popfl                \n\t"  // restore original Eflag
+#endif
         "xorl %%ecx, %%eax    \n\t"  // compare new Eflag with original Eflag
         "jz 0f                \n\t"  // if same, CPUID instr. is not supported
 
@@ -5338,9 +5418,15 @@ png_mmx_support(void)
     "0:                       \n\t"  // .NOT_SUPPORTED: target label for jump instructions
         "movl $0, %%eax       \n\t"  // set return value to 0
     "1:                       \n\t"  // .RETURN: target label for jump instructions
+#ifdef __x86_64__
+        "popq %%rdx           \n\t"  // restore rdx
+        "popq %%rcx           \n\t"  // restore rcx
+        "popq %%rbx           \n\t"  // restore rbx
+#else
         "popl %%edx           \n\t"  // restore edx
         "popl %%ecx           \n\t"  // restore ecx
         "popl %%ebx           \n\t"  // restore ebx
+#endif
 
 //      "ret                  \n\t"  // DONE:  no MMX support
                                      // (fall through to standard C "ret")
