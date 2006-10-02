@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.11 June 4, 2006
+ * Last changed in libpng 1.2.13 July 20, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -728,6 +728,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
    png_size_t name_len;
    png_charp new_name;
    compression_state comp;
+   int embedded_profile_len = 0;
 
    png_debug(1, "in png_write_iCCP\n");
 
@@ -749,6 +750,24 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
 
    if (profile == NULL)
       profile_len = 0;
+
+   if (profile_len > 3)
+      embedded_profile_len = ((*(profile  ))<<24) | ((*(profile+1))<<16) |
+          ((*(profile+2))<< 8) | ((*(profile+3))    );
+
+   if (profile_len < embedded_profile_len)
+     {
+        png_warning(png_ptr,
+          "Embedded profile length too large in iCCP chunk");
+        return;
+     }
+
+   if (profile_len > embedded_profile_len)
+     {
+        png_warning(png_ptr,
+          "Truncating profile to actual length in iCCP chunk");
+        profile_len = embedded_profile_len;
+     }
 
    if (profile_len)
        profile_len = png_text_compress(png_ptr, profile, (png_size_t)profile_len,

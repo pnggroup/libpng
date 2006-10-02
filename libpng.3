@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "June 27, 2006"
+.TH LIBPNG 3 "October 2, 2006"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.2.12
+libpng \- Portable Network Graphics (PNG) Reference Library 1.2.13beta1
 .SH SYNOPSIS
 \fI\fB
 
@@ -821,7 +821,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.12 - June 27, 2006
+ libpng version 1.2.13beta1 - October 2, 2006
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -1213,7 +1213,7 @@ dithering, and setting filler.)  If this is the case, simply do this:
 
     png_read_png(png_ptr, info_ptr, png_transforms, NULL)
 
-where png_transforms is an integer containing the logical OR of
+where png_transforms is an integer containing the bitwise OR of
 some set of transformation flags.  This call is equivalent to png_read_info(),
 followed the set of transformations indicated by the transform mask,
 then png_read_image(), and finally png_read_end().
@@ -2093,7 +2093,7 @@ point to libpng-allocated storage with the following function:
 
     png_free_data(png_ptr, info_ptr, mask, seq)
     mask - identifies data to be freed, a mask
-           containing the logical OR of one or
+           containing the bitwise OR of one or
            more of
              PNG_FREE_PLTE, PNG_FREE_TRNS,
              PNG_FREE_HIST, PNG_FREE_ICCP,
@@ -2155,7 +2155,7 @@ application instead of by libpng, you can use
 
     png_set_invalid(png_ptr, info_ptr, mask);
     mask - identifies the chunks to be made invalid,
-           containing the logical OR of one or
+           containing the bitwise OR of one or
            more of
              PNG_INFO_gAMA, PNG_INFO_sBIT,
              PNG_INFO_cHRM, PNG_INFO_PLTE,
@@ -2467,7 +2467,7 @@ types.
 
     /* turn on or off filtering, and/or choose
        specific filters.  You can use either a single
-       PNG_FILTER_VALUE_NAME or the logical OR of one
+       PNG_FILTER_VALUE_NAME or the bitwise OR of one
        or more PNG_FILTER_NAME masks. */
     png_set_filter(png_ptr, 0,
        PNG_FILTER_NONE  | PNG_FILTER_VALUE_NONE |
@@ -2840,7 +2840,7 @@ png_set_rows() to put image data in the info structure), simply do this:
 
     png_write_png(png_ptr, info_ptr, png_transforms, NULL)
 
-where png_transforms is an integer containing the logical OR of some set of
+where png_transforms is an integer containing the bitwise OR of some set of
 transformation flags.  This call is equivalent to png_write_info(),
 followed the set of transformations indicated by the transform mask,
 then png_write_image(), and finally png_write_end().
@@ -3100,7 +3100,7 @@ point to libpng-allocated storage with the following function:
 
     png_free_data(png_ptr, info_ptr, mask, seq)
     mask  - identifies data to be freed, a mask
-            containing the logical OR of one or
+            containing the bitwise OR of one or
             more of
               PNG_FREE_PLTE, PNG_FREE_TRNS,
               PNG_FREE_HIST, PNG_FREE_ICCP,
@@ -3670,12 +3670,12 @@ Libpng can support some of these extensions.  To enable them, use the
 png_permit_mng_features() function:
 
    feature_set = png_permit_mng_features(png_ptr, mask)
-   mask is a png_uint_32 containing the logical OR of the
+   mask is a png_uint_32 containing the bitwise OR of the
         features you want to enable.  These include
         PNG_FLAG_MNG_EMPTY_PLTE
         PNG_FLAG_MNG_FILTER_64
         PNG_ALL_MNG_FEATURES
-   feature_set is a png_uint_32 that is the logical AND of
+   feature_set is a png_uint_32 that is the bitwise AND of
       your mask with the set of MNG features that is
       supported by the version of libpng that you are using.
 
@@ -3738,13 +3738,13 @@ application:
 
 .SH IX. Y2K Compliance in libpng
 
-June 27, 2006
+October 2, 2006
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.12 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.13beta1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3966,7 +3966,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.2.12 - June 27, 2006:
+Libpng version 1.2.13beta1 - October 2, 2006:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -3987,7 +3987,7 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.2.12, June 27, 2006, are
+libpng versions 1.2.6, August 15, 2004, through 1.2.13beta1, October 2, 2006, are
 Copyright (c) 2004-2006 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4086,7 +4086,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-June 27, 2006
+October 2, 2006
 
 .\" end of man page
 

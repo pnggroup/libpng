@@ -18,14 +18,14 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.2.12], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.2.13beta1], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.2.12
+PNGLIB_VERSION=1.2.13beta1
 PNGLIB_MAJOR=12
-PNGLIB_MINOR=12
+PNGLIB_MINOR=13
 
 dnl End of version number stuff
 
@@ -52,7 +52,6 @@ AC_TYPE_SIZE_T
 AC_STRUCT_TM
 
 # Checks for library functions.
-AC_FUNC_MALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )

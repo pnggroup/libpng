@@ -1480,7 +1480,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (12) in configuration files.
+  Fixed typo (13) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1614,6 +1614,11 @@ version 1.0.19, 1.2.11 [June 26, 2006]
 version 1.0.20, 1.2.12 [June 27, 2006]
   Really increased sprintf buffer from 50 to 52 chars in pngrutil.c to avoid
     buffer overflow.
+
+version 1.2.13beta1 [October 2, 2006]
+  Removed AC_FUNC_MALLOC from configure.ac
+  Work around Intel-Mac compiler bug by setting PNG_NO_MMX_CODE in pngconf.h
+  Change "logical" to "bitwise" throughout documentation.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
