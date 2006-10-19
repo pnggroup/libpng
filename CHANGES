@@ -1710,6 +1710,11 @@ version 1.4.0beta11 [August 19, 2006]
   Added pngdefs.h that is built by makefile or configure, instead of
     pngconf.h.in (Glenn).
 
+version 1.4.0beta12 [October 19, 2006]
+  Changed "logical" to "bitwise" in the documentation.
+  Work around Intel-Mac compiler bug by setting PNG_NO_MMX_CODE in pngconf.h
+  Add a typecast to stifle compiler warning in pngrutil.c
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

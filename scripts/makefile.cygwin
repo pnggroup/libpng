@@ -65,7 +65,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng14
 PNGMAJ = 1
 CYGDLL = 14
-PNGMIN = 1.4.0beta11
+PNGMIN = 1.4.0beta12
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
