@@ -157,8 +157,11 @@ png_chunk_error(png_structp png_ptr, png_const_charp error_message)
    char msg[18+64];
    if (png_ptr == NULL)
      png_error(png_ptr, error_message);
-   png_format_buffer(png_ptr, msg, error_message);
-   png_error(png_ptr, msg);
+   else
+   {
+     png_format_buffer(png_ptr, msg, error_message);
+     png_error(png_ptr, msg);
+   }
 }
 
 void PNGAPI
@@ -167,8 +170,11 @@ png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
    char msg[18+64];
    if (png_ptr == NULL)
      png_warning(png_ptr, warning_message);
-   png_format_buffer(png_ptr, msg, warning_message);
-   png_warning(png_ptr, msg);
+   else
+   {
+     png_format_buffer(png_ptr, msg, warning_message);
+     png_warning(png_ptr, msg);
+   }
 }
 
 /* This is the default error handling function.  Note that replacements for

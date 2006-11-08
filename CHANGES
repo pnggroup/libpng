@@ -1620,6 +1620,11 @@ version 1.2.13beta1 [October 2, 2006]
   Work around Intel-Mac compiler bug by setting PNG_NO_MMX_CODE in pngconf.h
   Change "logical" to "bitwise" throughout documentation.
 
+version 1.0.21rc1, 1.2.13rc1 [November 8, 2006]
+  Fix potential buffer overflow in sPLT chunk handler.
+  Fix Makefile.am to not try to link to noexistent files.
+  Fix pngerror.c to not use NULL png_ptr.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

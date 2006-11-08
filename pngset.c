@@ -976,10 +976,10 @@ png_set_sPLT(png_structp png_ptr,
         /* TODO: use png_malloc_warn */
         png_strcpy(to->name, from->name);
         to->entries = (png_sPLT_entryp)png_malloc(png_ptr,
-            from->nentries * png_sizeof(png_sPLT_t));
+            from->nentries * png_sizeof(png_sPLT_entry));
         /* TODO: use png_malloc_warn */
         png_memcpy(to->entries, from->entries,
-            from->nentries * png_sizeof(png_sPLT_t));
+            from->nentries * png_sizeof(png_sPLT_entry));
         to->nentries = from->nentries;
         to->depth = from->depth;
     }
