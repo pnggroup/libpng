@@ -976,10 +976,10 @@ png_set_sPLT(png_structp png_ptr,
         /* TODO: use png_malloc_warn */
         png_strcpy(to->name, from->name);
         to->entries = (png_sPLT_entryp)png_malloc(png_ptr,
-            from->nentries * png_sizeof(png_sPLT_t));
+            from->nentries * png_sizeof(png_sPLT_entry));
         /* TODO: use png_malloc_warn */
         png_memcpy(to->entries, from->entries,
-            from->nentries * png_sizeof(png_sPLT_t));
+            from->nentries * png_sizeof(png_sPLT_entry));
         to->nentries = from->nentries;
         to->depth = from->depth;
     }
@@ -1224,7 +1224,7 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
     }
 
     /* we're replacing the settable bits with those passed in by the user,
-     * so first zero them out of the master copy, then logical-OR in the
+     * so first zero them out of the master copy, then bitwise-OR in the
      * allowed subset that was requested */
 
     png_ptr->asm_flags &= ~settable_asm_flags;               /* zero them */

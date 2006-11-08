@@ -125,7 +125,9 @@ install-exec-hook:
 	cd $(DESTDIR)$(libdir);\
 	for ext in a la so; do\
 		rm -f libpng.$$ext;\
-		$(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
+                if test -f $(PNGLIB_BASENAME).$$ext; then\
+                       $(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
+                fi;\
 	done
 
 uninstall-hook:
