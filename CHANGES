@@ -1715,6 +1715,11 @@ version 1.4.0beta12 [October 19, 2006]
   Work around Intel-Mac compiler bug by setting PNG_NO_MMX_CODE in pngconf.h
   Add a typecast to stifle compiler warning in pngrutil.c
 
+version 1.4.0beta12 [November 8, 2006]
+  Fix potential buffer overflow in sPLT chunk handler.
+  Fix Makefile.am to not try to link to noexistent files.
+  Fix pngerror.c to not use NULL png_ptr.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

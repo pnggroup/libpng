@@ -952,6 +952,13 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 void PNGAPI
 png_set_sPLT(png_structp png_ptr,
              png_infop info_ptr, png_sPLT_tp entries, int nentries)
+/*
+ *  entries        - array of png_sPLT_t structures
+ *                   to be added to the list of palettes
+ *                   in the info structure.
+ *  nentries       - number of palette structures to be
+ *                   added.
+ */
 {
     png_sPLT_tp np;
     int i;
@@ -981,10 +988,10 @@ png_set_sPLT(png_structp png_ptr,
         /* TODO: use png_malloc_warn */
         png_strcpy(to->name, from->name);
         to->entries = (png_sPLT_entryp)png_malloc(png_ptr,
-            from->nentries * sizeof(png_sPLT_t));
+            from->nentries * sizeof(png_sPLT_entry));
         /* TODO: use png_malloc_warn */
         png_memcpy(to->entries, from->entries,
-            from->nentries * sizeof(png_sPLT_t));
+            from->nentries * sizeof(png_sPLT_entry));
         to->nentries = from->nentries;
         to->depth = from->depth;
     }

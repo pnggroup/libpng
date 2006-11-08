@@ -24,7 +24,7 @@ O=.obj
 #ERRFILE= >> pngerrs.log
 
 # Variables
-OBJS1 = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O)
+OBJS1 = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) pnggccrd$(O)
 OBJS2 = pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) pngset$(O)
 OBJS3 = pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
 OBJS  = $(OBJS1) $(OBJS2) $(OBJS3)

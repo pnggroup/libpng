@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 1
-PNGMIN = 1.4.0beta12
+PNGMIN = 1.4.0beta13
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -225,7 +225,6 @@ pngmem.o pngmem.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
 pngset.o pngset.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
 pnggccrd.o pnggccrd.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
 pngget.o pngget.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pnggccrd.o pngget.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
 pngread.o pngread.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
 pngrtran.o pngrtran.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
 pngrutil.o pngrutil.pic.o: png.h pngconf.h pngdefs.h pngpriv.h

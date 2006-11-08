@@ -32,10 +32,6 @@ endif
 
 DESTDIR=
 
-# To enable assembler optimizations, add '-DPNG_USE_PNGGCCRD' to
-# $CFLAGS, and include pnggccrd.o in $OBJS, below, and in the dependency
-# list at the bottom of this makefile.
-
 CC=gcc
 
 
@@ -66,7 +62,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng14
 PNGMAJ = 1
 MINGDLL = 14
-PNGMIN = 1.4.0beta12
+PNGMIN = 1.4.0beta13
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=libpng$(MINGDLL).dll
