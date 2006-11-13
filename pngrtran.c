@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.11 June 15, 2006
+ * Last changed in libpng 1.2.13 November 13, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -24,6 +24,7 @@ png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
 {
    png_debug(1, "in png_set_crc_action\n");
    /* Tell libpng how we react to CRC errors in critical chunks */
+   if(png_ptr == NULL) return;
    switch (crit_action)
    {
       case PNG_CRC_NO_CHANGE:                        /* leave setting as is */
@@ -80,6 +81,7 @@ png_set_background(png_structp png_ptr,
    int need_expand, double background_gamma)
 {
    png_debug(1, "in png_set_background\n");
+   if(png_ptr == NULL) return;
    if (background_gamma_code == PNG_BACKGROUND_GAMMA_UNKNOWN)
    {
       png_warning(png_ptr, "Application must supply a known background gamma");
@@ -112,6 +114,7 @@ void PNGAPI
 png_set_strip_16(png_structp png_ptr)
 {
    png_debug(1, "in png_set_strip_16\n");
+   if(png_ptr == NULL) return;
    png_ptr->transformations |= PNG_16_TO_8;
 }
 #endif
@@ -121,6 +124,7 @@ void PNGAPI
 png_set_strip_alpha(png_structp png_ptr)
 {
    png_debug(1, "in png_set_strip_alpha\n");
+   if(png_ptr == NULL) return;
    png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
 }
 #endif
@@ -150,6 +154,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
    int full_dither)
 {
    png_debug(1, "in png_set_dither\n");
+   if(png_ptr == NULL) return;
    png_ptr->transformations |= PNG_DITHER;
 
    if (!full_dither)
@@ -533,6 +538,7 @@ void PNGAPI
 png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 {
    png_debug(1, "in png_set_gamma\n");
+   if(png_ptr == NULL) return;
    if ((fabs(scrn_gamma * file_gamma - 1.0) > PNG_GAMMA_THRESHOLD) ||
        (png_ptr->color_type & PNG_COLOR_MASK_ALPHA) ||
        (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE))
@@ -551,6 +557,7 @@ void PNGAPI
 png_set_expand(png_structp png_ptr)
 {
    png_debug(1, "in png_set_expand\n");
+   if(png_ptr == NULL) return;
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
 
@@ -576,6 +583,7 @@ void PNGAPI
 png_set_palette_to_rgb(png_structp png_ptr)
 {
    png_debug(1, "in png_set_palette_to_rgb\n");
+   if(png_ptr == NULL) return;
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
 
@@ -585,6 +593,7 @@ void PNGAPI
 png_set_expand_gray_1_2_4_to_8(png_structp png_ptr)
 {
    png_debug(1, "in png_set_expand_gray_1_2_4_to_8\n");
+   if(png_ptr == NULL) return;
    png_ptr->transformations |= PNG_EXPAND_tRNS;
 }
 #endif
@@ -596,6 +605,7 @@ void PNGAPI
 png_set_gray_1_2_4_to_8(png_structp png_ptr)
 {
    png_debug(1, "in png_set_gray_1_2_4_to_8\n");
+   if(png_ptr == NULL) return;
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
 #endif
@@ -631,6 +641,7 @@ png_set_rgb_to_gray(png_structp png_ptr, int error_action, double red,
 {
       int red_fixed = (int)((float)red*100000.0 + 0.5);
       int green_fixed = (int)((float)green*100000.0 + 0.5);
+      if(png_ptr == NULL) return;
       png_set_rgb_to_gray_fixed(png_ptr, error_action, red_fixed, green_fixed);
 }
 #endif
@@ -640,6 +651,7 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
    png_fixed_point red, png_fixed_point green)
 {
    png_debug(1, "in png_set_rgb_to_gray\n");
+   if(png_ptr == NULL) return;
    switch(error_action)
    {
       case 1: png_ptr->transformations |= PNG_RGB_TO_GRAY;
@@ -690,6 +702,7 @@ png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    read_user_transform_fn)
 {
    png_debug(1, "in png_set_read_user_transform_fn\n");
+   if(png_ptr == NULL) return;
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    png_ptr->transformations |= PNG_USER_TRANSFORM;
    png_ptr->read_user_transform_fn = read_user_transform_fn;
