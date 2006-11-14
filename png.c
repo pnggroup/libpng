@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 April 20, 2006
+ * Last changed in libpng 1.4.0 November 14, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta13 Your_png_h_is_not_version_1_4_0beta13;
+typedef version_1_4_0beta14 Your_png_h_is_not_version_1_4_0beta14;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -97,6 +97,7 @@ const int FARDATA png_pass_dsp_mask[]
 void PNGAPI
 png_set_sig_bytes(png_structp png_ptr, int num_bytes)
 {
+   if(png_ptr == NULL) return;
    png_debug(1, "in png_set_sig_bytes\n");
    if (num_bytes > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
@@ -144,6 +145,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
    png_uint_32 save_flags = p->flags;
    png_alloc_size_t num_bytes;
 
+   if(png_ptr == NULL) return (NULL);
    if (items > PNG_UINT_32_MAX/size)
    {
       png_warning(p, "Potential overflow in png_zalloc()");
@@ -232,6 +234,7 @@ png_create_info_struct(png_structp png_ptr)
 void PNGAPI
 png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
 {
+   if(png_ptr == NULL) return;
    png_infop info_ptr = NULL;
 
    png_debug(1, "in png_destroy_info_struct\n");
@@ -260,6 +263,8 @@ void PNGAPI
 png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
 {
    png_infop info_ptr = *ptr_ptr;
+
+   if(info_ptr == NULL) return;
 
    png_debug(1, "in png_info_init_3\n");
 
@@ -568,6 +573,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 png_voidp PNGAPI
 png_get_io_ptr(png_structp png_ptr)
 {
+   if(png_ptr == NULL) return (NULL);
    return (png_ptr->io_ptr);
 }
 
@@ -583,6 +589,7 @@ void PNGAPI
 png_init_io(png_structp png_ptr, png_FILE_p fp)
 {
    png_debug(1, "in png_init_io\n");
+   if(png_ptr == NULL) return;
    png_ptr->io_ptr = (png_voidp)fp;
 }
 #endif
@@ -598,6 +605,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
         {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
+   if(png_ptr == NULL) return (NULL);
    if (png_ptr->time_buffer == NULL)
       png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, 29*sizeof(char));
 
@@ -635,7 +643,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.4.0beta13 - November 8, 2006\n\
+   return ((png_charp) "\n libpng version 1.4.0beta14 - November 14, 2006\n\
    Copyright (c) 1998-2006 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -699,6 +707,7 @@ png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
 int PNGAPI
 png_reset_zstream(png_structp png_ptr)
 {
+   if (png_ptr == NULL) return Z_STREAM_ERROR;
    return (inflateReset(&png_ptr->zstream));
 }
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
@@ -719,6 +728,7 @@ png_access_version_number(void)
 void /* PRIVATE */
 png_init_mmx_flags (png_structp png_ptr)
 {
+    if(png_ptr == NULL) return;
     png_ptr->mmx_rowbytes_threshold = 0;
     png_ptr->mmx_bitdepth_threshold = 0;
 

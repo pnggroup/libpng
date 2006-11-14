@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta13 - November 8, 2006
+Libpng 1.4.0beta14 - November 14, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta13.tar.gz
-   1.4.0beta13.tar.bz2
+   1.4.0beta14.tar.gz
+   1.4.0beta14.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta13-no-config.tar.gz
-   1.4.0beta13-no-config.tar.bz2
+   1.4.0beta14-no-config.tar.gz
+   1.4.0beta14-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b13.zip
-   lp140b13.tar.bz2
+   lp140b14.zip
+   lp140b14.tar.bz2
 
 Other information:
 
-   1.4.0beta13-README.txt
-   1.4.0beta13-KNOWNBUGS.txt
-   1.4.0beta13-LICENSE.txt
-   1.4.0beta13-Y2K-compliance.txt
+   1.4.0beta14-README.txt
+   1.4.0beta14-KNOWNBUGS.txt
+   1.4.0beta14-LICENSE.txt
+   1.4.0beta14-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -206,16 +206,19 @@ version 1.4.0beta11 [August 19, 2006]
   Removing trailing '.' from the warning and error messages (Cosmin).
   Added pngdefs.h that is built by makefile or configure, instead of
     pngconf.h.in (Glenn).
+  Detect and fix attempt to write wrong iCCP profile length.
 
 version 1.4.0beta12 [October 19, 2006]
   Changed "logical" to "bitwise" in the documentation.
   Work around Intel-Mac compiler bug by setting PNG_NO_MMX_CODE in pngconf.h
   Add a typecast to stifle compiler warning in pngrutil.c
 
-version 1.4.0beta13 [November 8, 2006]
+version 1.4.0beta13 [November 10, 2006]
   Fix potential buffer overflow in sPLT chunk handler.
   Fix Makefile.am to not try to link to noexistent files.
-  Fix pngerror.c to not use NULL png_ptr.
+
+version 1.4.0beta14 [November 14, 2006]
+  Check all exported functions for NULL png_ptr.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

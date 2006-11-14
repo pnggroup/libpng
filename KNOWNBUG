@@ -1,5 +1,5 @@
 
-Known bugs in libpng version 1.4.0beta13
+Known bugs in libpng version 1.4.0beta14
 
 1. April 22, 2001: pnggccrd.c has been reported to crash on NetBSD when
    reading interlaced PNG files, when assembler code is enabled but running
@@ -21,3 +21,7 @@ Known bugs in libpng version 1.4.0beta13
 
    STATUS: For now, system library builders should use the custom makefiles.
 
+4. November 14, 2006: "make install" fails to build pngdefs.h.
+   "make; make install" works.
+
+   STATUS:  Under investigation.

@@ -1709,16 +1709,19 @@ version 1.4.0beta11 [August 19, 2006]
   Removing trailing '.' from the warning and error messages (Cosmin).
   Added pngdefs.h that is built by makefile or configure, instead of
     pngconf.h.in (Glenn).
+  Detect and fix attempt to write wrong iCCP profile length.
 
 version 1.4.0beta12 [October 19, 2006]
   Changed "logical" to "bitwise" in the documentation.
   Work around Intel-Mac compiler bug by setting PNG_NO_MMX_CODE in pngconf.h
   Add a typecast to stifle compiler warning in pngrutil.c
 
-version 1.4.0beta12 [November 8, 2006]
+version 1.4.0beta13 [November 10, 2006]
   Fix potential buffer overflow in sPLT chunk handler.
   Fix Makefile.am to not try to link to noexistent files.
-  Fix pngerror.c to not use NULL png_ptr.
+
+version 1.4.0beta14 [November 14, 2006]
+  Check all exported functions for NULL png_ptr.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -296,8 +296,8 @@ libpng14_la_LDFLAGS = -no-undefined -export-dynamic -version-number \
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
 	-version-number 14:@PNGLIB_MINOR@:0
 
-@HAVE_LD_VERSION_SCRIPT_FALSE@libpng14_la_DEPENDENCIES = libpng.sym
-@HAVE_LD_VERSION_SCRIPT_TRUE@libpng14_la_DEPENDENCIES = libpng.vers
+@HAVE_LD_VERSION_SCRIPT_FALSE@libpng14_la_DEPENDENCIES = libpng.sym pngdefs.h
+@HAVE_LD_VERSION_SCRIPT_TRUE@libpng14_la_DEPENDENCIES = libpng.vers pngdefs.h
 libpng_la_DEPENDENCIES = $(libpng14_la_DEPENDENCIES)
 pkginclude_HEADERS = png.h pngconf.h pngdefs.h
 pkgconfig_DATA = libpng14.pc
