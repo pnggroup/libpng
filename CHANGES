@@ -1619,13 +1619,11 @@ version 1.2.13beta1 [October 2, 2006]
   Removed AC_FUNC_MALLOC from configure.ac
   Work around Intel-Mac compiler bug by setting PNG_NO_MMX_CODE in pngconf.h
   Change "logical" to "bitwise" throughout documentation.
+  Detect and fix attempt to write wrong iCCP profile length.
 
-version 1.0.21rc1, 1.2.13rc1 [November 10, 2006]
+version 1.0.21, 1.2.13 [November 15, 2006]
   Fix potential buffer overflow in sPLT chunk handler.
   Fix Makefile.am to not try to link to noexistent files.
-  Fix pngerror.c to not use NULL png_ptr.
-
-version 1.0.21rc2, 1.2.13rc2 [November 13, 2006]
   Check all exported functions for NULL png_ptr.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
