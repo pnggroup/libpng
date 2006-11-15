@@ -291,7 +291,7 @@ libpng10_la_LDFLAGS = -no-undefined -export-dynamic -version-number \
 	0:@PNGLIB_MINOR@:0 $(am__append_1) $(am__append_2)
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number 3:@PNGLIB_MINOR@:0
+	-version-number 2:@PNGLIB_MINOR@:0
 
 @HAVE_LD_VERSION_SCRIPT_FALSE@libpng10_la_DEPENDENCIES = libpng.sym
 @HAVE_LD_VERSION_SCRIPT_TRUE@libpng10_la_DEPENDENCIES = libpng.vers
