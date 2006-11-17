@@ -1727,6 +1727,10 @@ version 1.4.0beta15 [November 17, 2006]
   Relocated two misplaced tests for NULL png_ptr.
   Built Makefile.in with automake-1.9.6 instead of 1.9.2.
   Build configure with autoconf-2.60 instead of 2.59
+  Add "install: all" in Makefile.am so "configure; make install" will work.
+
+version 1.4.0beta16 [November 17, 2006]
+  Added a typecast in png_zalloc().
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

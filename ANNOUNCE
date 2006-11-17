@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta15 - November 17, 2006
+Libpng 1.4.0beta16 - November 17, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta15.tar.gz
-   1.4.0beta15.tar.bz2
+   1.4.0beta16.tar.gz
+   1.4.0beta16.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta15-no-config.tar.gz
-   1.4.0beta15-no-config.tar.bz2
+   1.4.0beta16-no-config.tar.gz
+   1.4.0beta16-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b15.zip
-   lp140b15.tar.bz2
+   lp140b16.zip
+   lp140b16.tar.bz2
 
 Other information:
 
-   1.4.0beta15-README.txt
-   1.4.0beta15-KNOWNBUGS.txt
-   1.4.0beta15-LICENSE.txt
-   1.4.0beta15-Y2K-compliance.txt
+   1.4.0beta16-README.txt
+   1.4.0beta16-KNOWNBUGS.txt
+   1.4.0beta16-LICENSE.txt
+   1.4.0beta16-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -223,7 +223,11 @@ version 1.4.0beta14 [November 15, 2006]
 version 1.4.0beta15 [November 17, 2006]
   Relocated two misplaced tests for NULL png_ptr.
   Built Makefile.in with automake-1.9.6 instead of 1.9.2.
-  Build configure with autoconf-2.60 instead of 2.59
+  Build configure with autoconf-2.60 instead of 2.59.
+  Add "install: all" in Makefile.am so "configure; make install" will work.
+
+version 1.4.0beta16 [November 17, 2006]
+  Added a typecast in png_zalloc().
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
