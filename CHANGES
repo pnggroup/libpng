@@ -1631,6 +1631,8 @@ version 1.2.14beta1 [November 17, 2006]
   Built Makefile.in with automake-1.9.6 instead of 1.9.2.
   Build configure with autoconf-2.60 instead of 2.59
 
+version 1.2.14beta2 [November 17, 2006]
+  Added some typecasts in png_zalloc().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
