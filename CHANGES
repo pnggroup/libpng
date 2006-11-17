@@ -1480,7 +1480,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (13) in configuration files.
+  Fixed typo (14) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1621,10 +1621,16 @@ version 1.2.13beta1 [October 2, 2006]
   Change "logical" to "bitwise" throughout documentation.
   Detect and fix attempt to write wrong iCCP profile length.
 
-version 1.0.21, 1.2.13 [November 15, 2006]
+version 1.0.21, 1.2.13 [November 14, 2006]
   Fix potential buffer overflow in sPLT chunk handler.
   Fix Makefile.am to not try to link to noexistent files.
   Check all exported functions for NULL png_ptr.
+
+version 1.2.14beta1 [November 17, 2006]
+  Relocated three misplaced tests for NULL png_ptr.
+  Built Makefile.in with automake-1.9.6 instead of 1.9.2.
+  Build configure with autoconf-2.60 instead of 2.59
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

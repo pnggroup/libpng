@@ -1,52 +1,64 @@
 
-Libpng 1.2.13 - November 15, 2006
+Libpng 1.2.14beta1 - November 17, 2006
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.13.tar.gz
-   libpng-1.2.13.tar.bz2
+   libpng-1.2.14beta1.tar.gz
+   libpng-1.2.14beta1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.13-no-config.tar.gz
-   libpng-1.2.13-no-config.tar.bz2
+   libpng-1.2.14beta1-no-config.tar.gz
+   libpng-1.2.14beta1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1213.zip
-   lpng1213.tar.bz2
+   lp1214b01.zip
+   lp1214b01.tar.bz2
 
 Project files
 
-   libpng-1.2.13-project-netware.zip
-   libpng-1.2.13-project-wince.zip
+   libpng-1.2.14beta1-project-netware.zip
+   libpng-1.2.14beta1-project-wince.zip
 
 Other information:
 
-   libpng-1.2.13-README.txt
-   libpng-1.2.13-KNOWNBUGS.txt
-   libpng-1.2.13-LICENSE.txt
-   libpng-1.2.13-Y2K-compliance.txt
+   libpng-1.2.14beta1-README.txt
+   libpng-1.2.14beta1-KNOWNBUGS.txt
+   libpng-1.2.14beta1-LICENSE.txt
+   libpng-1.2.14beta1-Y2K-compliance.txt
 
 Changes since the last public release (1.2.12):
 
-version 1.2.13 [November 15, 2006]
-
-version 1.0.21 and 1.2.13 [November 15, 2006]
+version 1.2.13beta1 [October 2, 2006]
   Removed AC_FUNC_MALLOC from configure.ac
   Work around Intel-Mac compiler bug by setting PNG_NO_MMX_CODE in pngconf.h
   Change "logical" to "bitwise" throughout documentation.
-  Fix Makefile.am to not try to link to noexistent files.
   Detect and fix attempt to write wrong iCCP profile length.
+
+version 1.0.21rc1.2.13rc1 [November 10, 2006]
   Fix potential buffer overflow in sPLT chunk handler.
+  Fix Makefile.am to not try to link to noexistent files.
+  Fix pngerror.c to not use NULL png_ptr.
+
+version 1.0.21rc2, 1.2.13rc2 [November 13, 2006]
   Check all exported functions for NULL png_ptr.
+
+version 1.0.21, 1.2.13 [November 15, 2006]
+  No changes.
+
+version 1.2.14beta1 [November 17, 2006]
+  Relocated three misplaced tests for NULL png_ptr.
+  Built Makefile.in with automake-1.9.6 instead of 1.9.2.
+  Build configure with autoconf-2.60 instead of 2.59
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

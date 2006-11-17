@@ -1,5 +1,5 @@
 
-Known bugs in libpng version 1.2.13
+Known bugs in libpng version 1.2.14beta1
 
 1. April 22, 2001: pnggccrd.c has been reported to crash on NetBSD when
    reading interlaced PNG files, when assembler code is enabled but running
@@ -21,3 +21,8 @@ Known bugs in libpng version 1.2.13
 
    STATUS: For now, system library builders should use the custom makefiles.
 
+4. November 15, 2006:  On some platforms (e.g. x86_64), there are unsatisfied
+   references to some MMX functions.
+
+   STATUS:  This is fixed in libpng-1.4.0, but in libpng-1.0.x and 1.2.x
+   you have to put PNG_NO_MMX_CODE manually into pngconf.h.
