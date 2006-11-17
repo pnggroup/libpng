@@ -498,9 +498,10 @@ png_voidp PNGAPI
 png_malloc_warn(png_structp png_ptr, png_alloc_size_t size)
 {
    png_voidp ptr;
+   png_uint_32 save_flags;
    if(png_ptr == NULL) return (NULL);
-   png_uint_32 save_flags=png_ptr->flags;
 
+   save_flags=png_ptr->flags;
    png_ptr->flags|=PNG_FLAG_MALLOC_NULL_MEM_OK;
    ptr = (png_voidp)png_malloc((png_structp)png_ptr, size);
    png_ptr->flags=save_flags;

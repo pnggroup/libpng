@@ -1720,8 +1720,13 @@ version 1.4.0beta13 [November 10, 2006]
   Fix potential buffer overflow in sPLT chunk handler.
   Fix Makefile.am to not try to link to noexistent files.
 
-version 1.4.0beta14 [November 14, 2006]
+version 1.4.0beta14 [November 15, 2006]
   Check all exported functions for NULL png_ptr.
+
+version 1.4.0beta15 [November 17, 2006]
+  Relocated two misplaced tests for NULL png_ptr.
+  Built Makefile.in with automake-1.9.6 instead of 1.9.2.
+  Build configure with autoconf-2.60 instead of 2.59
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

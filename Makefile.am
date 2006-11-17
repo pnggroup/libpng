@@ -2,9 +2,9 @@
 #   Source file for Makefile.in (and hence Makefile)
 #
 # Makefile.am need only be changed on a major version number
-# change (e.g. libpng12 --> libpng13).  In that case seach
-# this file for every instance of the old base name (libpng12)
-# and change to the new one (libpng13), then change the
+# change (e.g. libpng14 --> libpng15).  In that case seach
+# this file for every instance of the old base name (libpng14)
+# and change to the new one (libpng15), then change the
 # -version-number settings below so that the new values have
 # the correct major part (first field).
 
@@ -88,6 +88,8 @@ EXTRA_DIST= \
 CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers libpng.sym
 
 all: pngdefs.h
+
+install: all
 
 pngdefs.h:
 	echo "/* pngdefs.h created by \"configure\". */" > pngdefs.h
