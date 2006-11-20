@@ -1634,6 +1634,9 @@ version 1.2.14beta1 [November 17, 2006]
 version 1.2.14beta2 [November 17, 2006]
   Added some typecasts in png_zalloc().
 
+version 1.2.14beta3 [November 20, 2006]
+  Changed "strtod" to "png_strtod" in pngrutil.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
