@@ -131,9 +131,11 @@ png_flush(png_structp png_ptr)
 void PNGAPI
 png_default_flush(png_structp png_ptr)
 {
-   if(png_ptr == NULL) return;
 #if !defined(_WIN32_WCE)
    png_FILE_p io_ptr;
+#endif
+   if(png_ptr == NULL) return;
+#if !defined(_WIN32_WCE)
    io_ptr = (png_FILE_p)CVT_PTR((png_ptr->io_ptr));
    if (io_ptr != NULL)
       fflush(io_ptr);

@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_21 Your_png_h_is_not_version_1_0_21;
+typedef version_1_0_22rc1 Your_png_h_is_not_version_1_0_22rc1;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -154,14 +154,14 @@ voidpf /* private */
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
    png_voidp ptr;
-   png_structp p=png_ptr;
+   png_structp p=(png_structp)png_ptr;
    png_uint_32 save_flags=p->flags;
    png_uint_32 num_bytes;
 
    if(png_ptr == NULL) return (NULL);
    if (items > PNG_UINT_32_MAX/size)
    {
-     png_warning (png_ptr, "Potential overflow in png_zalloc()");
+     png_warning (p, "Potential overflow in png_zalloc()");
      return (NULL);
    }
    num_bytes = (png_uint_32)items * size;
@@ -267,8 +267,8 @@ png_create_info_struct(png_structp png_ptr)
 void PNGAPI
 png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
 {
-   if(png_ptr == NULL) return;
    png_infop info_ptr = NULL;
+   if(png_ptr == NULL) return;
 
    png_debug(1, "in png_destroy_info_struct\n");
    if (info_ptr_ptr != NULL)
@@ -701,7 +701,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.0.21 - November 15, 2006\n\
+   return ((png_charp) "\n libpng version 1.0.22rc1 - November 20, 2006\n\
    Copyright (c) 1998-2006 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
