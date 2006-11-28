@@ -96,7 +96,7 @@ $(PNGLIB_BASENAME)-config: libpng-config
 
 libpng.sym: png.h pngconf.h
 	rm -f $@ $@.new
-	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS png.h | \
+	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
 		$(SED) -n -e 's|^.*PNG_FUNCTION_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
 			-e 's|^.*PNG_DATA_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
 			>$@.new
