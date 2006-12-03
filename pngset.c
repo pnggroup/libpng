@@ -1186,7 +1186,6 @@ png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
 
 
 #ifndef PNG_1_0_X
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 /* this function was added to libpng 1.2.0 and should always exist by default */
 void PNGAPI
 png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
@@ -1196,6 +1195,7 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
 
     if (png_ptr == NULL)
        return;
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 
     settable_mmx_flags =
 #ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
@@ -1229,10 +1229,9 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
 
     png_ptr->asm_flags &= ~settable_asm_flags;               /* zero them */
     png_ptr->asm_flags |= (asm_flags & settable_asm_flags);  /* set them */
-}
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
+}
 
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 /* this function was added to libpng 1.2.0 */
 void PNGAPI
 png_set_mmx_thresholds (png_structp png_ptr,
@@ -1241,10 +1240,11 @@ png_set_mmx_thresholds (png_structp png_ptr,
 {
     if (png_ptr == NULL)
        return;
+#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
     png_ptr->mmx_bitdepth_threshold = mmx_bitdepth_threshold;
     png_ptr->mmx_rowbytes_threshold = mmx_rowbytes_threshold;
-}
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
+}
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* this function was added to libpng 1.2.6 */

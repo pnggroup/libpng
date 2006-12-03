@@ -1644,6 +1644,9 @@ version 1.2.15beta1 [December 3, 2006]
   Generated configure with autoconf-2.61 instead of 2.60
   Revised configure.ac to update libpng.pc and libpng-config.
 
+version 1.2.15beta2 [December 3, 2006]
+  Always export MMX asm functions, just stubs if not building pnggccrd.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
