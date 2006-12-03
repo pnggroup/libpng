@@ -18,14 +18,14 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.2.14], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.2.15beta1], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.2.14
+PNGLIB_VERSION=1.2.15beta1
 PNGLIB_MAJOR=12
-PNGLIB_MINOR=14
+PNGLIB_MINOR=15
 
 dnl End of version number stuff
 
@@ -57,19 +57,18 @@ AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )
 AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
 
+LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 AC_MSG_CHECKING([if assembler code in pnggccrd.c can be compiled])
 AC_TRY_COMPILE(
   [#include "pnggccrd.c"],
   [return 0;],
-  LIBPNG_DEFINES=,
-  LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG\ -DPNG_NO_ASSEMBLER_CODE)
-if test "$LIBPNG_DEFINES"; then
-    AC_MSG_RESULT(no)
-else
-    AC_MSG_RESULT(yes)
-    LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
-fi
+  AC_MSG_RESULT(yes)
+  LIBPNG_NO_ASSEMBLER="",
+  AC_MSG_RESULT(no)
+  LIBPNG_NO_ASSEMBLER=-DPNG_NO_ASSEMBLER_CODE)
+LIBPNG_DEFINES=$LIBPNG_DEFINES\ $LIBPNG_NO_ASSEMBLER
 AC_SUBST(LIBPNG_DEFINES)
+AC_SUBST(LIBPNG_NO_ASSEMBLER)
 
 AC_MSG_CHECKING([if libraries can be versioned])
 GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
@@ -128,7 +127,7 @@ AC_ARG_WITH(libpng-compat,
 AC_SUBST([compatlib])
 
 # Config files, substituting as above
-AC_CONFIG_FILES([Makefile libpng.pc:scripts/libpng.pc.in])
+AC_CONFIG_FILES([Makefile libpng.pc:scripts/libpng.pc-configure.in])
 AC_CONFIG_FILES([libpng-config:scripts/libpng-config.in],
 		[chmod +x libpng-config])
 

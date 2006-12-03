@@ -56,9 +56,9 @@ DIST_COMMON = README $(am__configure_deps) $(dist_man_MANS) \
 	$(pkginclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure $(top_srcdir)/scripts/libpng-config.in \
-	$(top_srcdir)/scripts/libpng.pc.in INSTALL TODO compile \
-	config.guess config.sub depcomp install-sh ltmain.sh missing \
-	mkinstalldirs
+	$(top_srcdir)/scripts/libpng.pc-configure.in INSTALL TODO \
+	compile config.guess config.sub depcomp install-sh ltmain.sh \
+	missing mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -184,6 +184,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBPNG_DEFINES = @LIBPNG_DEFINES@
+LIBPNG_NO_ASSEMBLER = @LIBPNG_NO_ASSEMBLER@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -380,7 +381,7 @@ $(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-libpng.pc: $(top_builddir)/config.status $(top_srcdir)/scripts/libpng.pc.in
+libpng.pc: $(top_builddir)/config.status $(top_srcdir)/scripts/libpng.pc-configure.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 libpng-config: $(top_builddir)/config.status $(top_srcdir)/scripts/libpng-config.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
