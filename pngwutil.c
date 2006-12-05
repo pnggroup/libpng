@@ -757,8 +757,11 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
       profile_len = 0;
 
    if (profile_len > 3)
-      embedded_profile_len = ((*(profile  ))<<24) | ((*(profile+1))<<16) |
-          ((*(profile+2))<< 8) | ((*(profile+3))    );
+      embedded_profile_len =
+          ((*( (png_bytep)profile  ))<<24) |
+          ((*( (png_bytep)profile+1))<<16) |
+          ((*( (png_bytep)profile+2))<< 8) |
+          ((*( (png_bytep)profile+3))    );
 
    if (profile_len < embedded_profile_len)
      {
