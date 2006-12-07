@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_15beta3 Your_png_h_is_not_version_1_2_15beta3;
+typedef version_1_2_15beta4 Your_png_h_is_not_version_1_2_15beta4;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -701,7 +701,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.15beta3 - December 5, 2006\n\
+   return ((png_charp) "\n libpng version 1.2.15beta4 - December 7, 2006\n\
    Copyright (c) 1998-2006 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -779,10 +779,9 @@ png_access_version_number(void)
 }
 
 
-#if defined(PNG_READ_SUPPORTED)
+#if defined(PNG_READ_SUPPORTED) && defined(PNG_ASSEMBLER_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
-    /* GRR:  could add this:   && defined(PNG_MMX_CODE_SUPPORTED) */
+#if defined(PNG_MMX_CODE_SUPPORTED)
 /* this INTERNAL function was added to libpng 1.2.0 */
 void /* PRIVATE */
 png_init_mmx_flags (png_structp png_ptr)
@@ -820,7 +819,7 @@ png_init_mmx_flags (png_structp png_ptr)
                                | PNG_MMX_WRITE_FLAGS );
     }
 
-#  else /* !((PNGVCRD || PNGGCCRD) && PNG_ASSEMBLER_CODE_SUPPORTED)) */
+#  else /* !(PNGVCRD || PNGGCCRD) */
 
     /* clear all MMX flags; no support is compiled in */
     png_ptr->asm_flags &= ~( PNG_MMX_FLAGS );
@@ -828,18 +827,18 @@ png_init_mmx_flags (png_structp png_ptr)
 #  endif /* ?(PNGVCRD || PNGGCCRD) */
 }
 
-#endif /* !(PNG_ASSEMBLER_CODE_SUPPORTED) */
+#endif /* !(PNG_MMX_CODE_SUPPORTED) */
 
 /* this function was added to libpng 1.2.0 */
 #if !defined(PNG_USE_PNGGCCRD) && \
-    !(defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD))
+    !(defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD))
 int PNGAPI
 png_mmx_support(void)
 {
     return -1;
 }
 #endif
-#endif /* PNG_1_0_X */
+#endif /* PNG_1_0_X  && PNG_ASSEMBLER_CODE_SUPPORTED */
 #endif /* PNG_READ_SUPPORTED */
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)

@@ -1647,8 +1647,12 @@ version 1.2.15beta1 [December 3, 2006]
 version 1.2.15beta2 [December 3, 2006]
   Always export MMX asm functions, just stubs if not building pnggccrd.c
 
-version 1.2.15beta3 [December 5, 2006]
+version 1.2.15beta3 [December 4, 2006]
   Add "png_bytep" typecast to profile while calculating length in pngwutil.c
+
+version 1.2.15beta4 [December 7, 2006]
+  Added scripts/CMakeLists.txt
+  Changed PNG_NO_ASSEMBLER_CODE to PNG_NO_MMX_CODE in scripts, like 1.4.0beta
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

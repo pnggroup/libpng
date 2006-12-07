@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.15beta3
+PNGMIN = 1.2.15beta4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -91,7 +91,7 @@ libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo cppflags=\"-DPNG_USE_PNGGCCRD -DPNG_NO_ASSEMBLER_CODE\"; \
+	echo cppflags=\"-DPNG_USE_PNGGCCRD -DPNG_NO_MMX_CODE\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo R_opts=\"-R$(LIBPATH)\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \

@@ -5,6 +5,6 @@ includedir=@includedir@/libpng12
 
 Name: libpng
 Description: Loads and saves PNG files
-Version: 1.2.15beta3
+Version: 1.2.15beta4
 Libs: -L${libdir} -lpng12
-Cflags: -I${includedir} @LIBPNG_NO_ASSEMBLER@
+Cflags: -I${includedir} @LIBPNG_NO_MMX@

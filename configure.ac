@@ -18,12 +18,12 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.2.15beta3], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.2.15beta4], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.2.15beta3
+PNGLIB_VERSION=1.2.15beta4
 PNGLIB_MAJOR=12
 PNGLIB_MINOR=15
 
@@ -63,12 +63,12 @@ AC_TRY_COMPILE(
   [#include "pnggccrd.c"],
   [return 0;],
   AC_MSG_RESULT(yes)
-  LIBPNG_NO_ASSEMBLER="",
+  LIBPNG_NO_MMX="",
   AC_MSG_RESULT(no)
-  LIBPNG_NO_ASSEMBLER=-DPNG_NO_ASSEMBLER_CODE)
-LIBPNG_DEFINES=$LIBPNG_DEFINES\ $LIBPNG_NO_ASSEMBLER
+  LIBPNG_NO_MMX=-DPNG_NO_MMX_CODE)
+LIBPNG_DEFINES=$LIBPNG_DEFINES\ $LIBPNG_NO_MMX
 AC_SUBST(LIBPNG_DEFINES)
-AC_SUBST(LIBPNG_NO_ASSEMBLER)
+AC_SUBST(LIBPNG_NO_MMX)
 
 AC_MSG_CHECKING([if libraries can be versioned])
 GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
