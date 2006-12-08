@@ -1,9 +1,9 @@
 
-Installing libpng version 1.2.15beta4 - December 7, 2006
+Installing libpng version 1.2.15beta5 - December 8, 2006
 
 On Unix/Linux and similar systems, you can simply type
 
-    ./configure [--prefix=$HOME]
+    ./configure [--prefix=/path]
     make check
     make install
 
@@ -27,6 +27,13 @@ Instead, you can use one of the custom-built makefiles in the
 
 Or you can use one of the "projects" in the "projects" directory.
 
+If you want to use "cmake" (see www.cmake.org), copy CMakeLists.txt
+from the "scripts" directory to this directory and type
+
+   cmake . -DCMAKE_INSTALL_PREFIX=/path
+   make
+   make install
+
 Before installing libpng, you must first install zlib, if it
 is not already on your system.  zlib can usually be found
 wherever you got libpng.  zlib can be placed in another directory,
@@ -37,7 +44,7 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.2.15beta4" or "lpng109" and "zlib-1.2.1"
+might be called "libpng-1.2.15beta5" or "lpng109" and "zlib-1.2.1"
 or "zlib121") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -91,13 +98,14 @@ makefile.sys in the scripts directory.
 The files that are presently available in the scripts directory
 include
 
+ CMakeLists.txt    =>  "cmake" script
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       gcc, creates libpng12.so.0.1.2.15beta4)
+                       gcc, creates libpng12.so.0.1.2.15beta5)
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng12.so.0.1.2.15beta4)
+                       (gcc, creates libpng12.so.0.1.2.15beta5)
  makefile.gcmmx    =>  Linux/ELF makefile
-                       (gcc, creates libpng12.so.0.1.2.15beta4,
+                       (gcc, creates libpng12.so.0.1.2.15beta5,
                        uses assembler code tuned for Intel MMX platform)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
@@ -120,12 +128,12 @@ include
  makefile.openbsd  =>  OpenBSD makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng12.so.0.1.2.15beta4)
+                       creates libpng12.so.0.1.2.15beta5)
  makefile.sunos    =>  Sun makefile
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng12.so.0.1.2.15beta4)
+                       creates libpng12.so.0.1.2.15beta5)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng12.so.0.1.2.15beta4)
+                       creates libpng12.so.0.1.2.15beta5)
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
