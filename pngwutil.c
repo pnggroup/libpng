@@ -784,8 +784,11 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
       profile_len = 0;
 
    if (profile_len > 3)
-      embedded_profile_len = ((*(profile  ))<<24) | ((*(profile+1))<<16) |
-          ((*(profile+2))<< 8) | ((*(profile+3))    );
+      embedded_profile_len =
+          ((*( (png_bytep)profile  ))<<24) |
+          ((*( (png_bytep)profile+1))<<16) |
+          ((*( (png_bytep)profile+2))<< 8) |
+          ((*( (png_bytep)profile+3))    );
 
    if (profile_len < embedded_profile_len)
      {
@@ -1337,7 +1340,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    if (key_len > 79)
    {
       png_warning(png_ptr, "keyword length must be 1 - 79 characters");
-      new_key[79] = '\0';
+      (*new_key)[79] = '\0';
       key_len = 79;
    }
 

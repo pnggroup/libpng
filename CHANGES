@@ -1732,6 +1732,10 @@ version 1.4.0beta15 [November 17, 2006]
 version 1.4.0beta16 [November 17, 2006]
   Added a typecast in png_zalloc().
 
+version 1.4.0beta17 [December 8, 2006]
+  Changed "new_key[79] = '\0';" to "(*new_key)[79] = '\0';" in pngwutil.c
+  Add "png_bytep" typecast to profile while calculating length in pngwutil.c
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
