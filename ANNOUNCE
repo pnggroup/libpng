@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta17 - December 8, 2006
+Libpng 1.4.0beta18 - December 8, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta17.tar.gz
-   1.4.0beta17.tar.bz2
+   1.4.0beta18.tar.gz
+   1.4.0beta18.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta17-no-config.tar.gz
-   1.4.0beta17-no-config.tar.bz2
+   1.4.0beta18-no-config.tar.gz
+   1.4.0beta18-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b17.zip
-   lp140b17.tar.bz2
+   lp140b18.zip
+   lp140b18.tar.bz2
 
 Other information:
 
-   1.4.0beta17-README.txt
-   1.4.0beta17-KNOWNBUGS.txt
-   1.4.0beta17-LICENSE.txt
-   1.4.0beta17-Y2K-compliance.txt
+   1.4.0beta18-README.txt
+   1.4.0beta18-KNOWNBUGS.txt
+   1.4.0beta18-LICENSE.txt
+   1.4.0beta18-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -229,8 +229,11 @@ version 1.4.0beta15 [November 17, 2006]
 version 1.4.0beta16 [November 17, 2006]
   Added a typecast in png_zalloc().
 
-version 1.4.0beta17 [December 8, 2006]
+version 1.4.0beta17 [December 4, 2006]
   Changed "new_key[79] = '\0';" to "(*new_key)[79] = '\0';" in pngwutil.c
+
+version 1.4.0beta18 [December 8, 2006]
+  Added scripts/CMakeLists.txt
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
