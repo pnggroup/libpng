@@ -1654,9 +1654,12 @@ version 1.2.15beta4 [December 7, 2006]
   Added scripts/CMakeLists.txt
   Changed PNG_NO_ASSEMBLER_CODE to PNG_NO_MMX_CODE in scripts, like 1.4.0beta
 
-version 1.2.15beta5 [December 8, 2006]
+version 1.2.15beta5 [December 7, 2006]
   Changed some instances of PNG_ASSEMBER_* to PNG_MMX_* in pnggccrd.c
   Revised scripts/CMakeLists.txt
+
+version 1.2.15beta6 [December 14, 2006]
+  Revised scripts/CMakeLists.txt and configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

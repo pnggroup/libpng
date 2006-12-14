@@ -1,5 +1,5 @@
 
-Libpng 1.2.15beta5 - December 8, 2006
+Libpng 1.2.15beta6 - December 14, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.15beta5.tar.gz
-   libpng-1.2.15beta5.tar.bz2
+   libpng-1.2.15beta6.tar.gz
+   libpng-1.2.15beta6.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.15beta5-no-config.tar.gz
-   libpng-1.2.15beta5-no-config.tar.bz2
+   libpng-1.2.15beta6-no-config.tar.gz
+   libpng-1.2.15beta6-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1215b05.zip
-   lp1215b05.tar.bz2
+   lp1215b06.zip
+   lp1215b06.tar.bz2
 
 Project files
 
-   libpng-1.2.15beta5-project-netware.zip
-   libpng-1.2.15beta5-project-wince.zip
+   libpng-1.2.15beta6-project-netware.zip
+   libpng-1.2.15beta6-project-wince.zip
 
 Other information:
 
-   libpng-1.2.15beta5-README.txt
-   libpng-1.2.15beta5-KNOWNBUGS.txt
-   libpng-1.2.15beta5-LICENSE.txt
-   libpng-1.2.15beta5-Y2K-compliance.txt
+   libpng-1.2.15beta6-README.txt
+   libpng-1.2.15beta6-KNOWNBUGS.txt
+   libpng-1.2.15beta6-LICENSE.txt
+   libpng-1.2.15beta6-Y2K-compliance.txt
 
 Changes since the last public release (1.2.14):
 
@@ -48,13 +48,16 @@ version 1.2.15beta2 [December 3, 2006]
 version 1.2.15beta3 [December 4, 2006]
   Add "png_bytep" typecast to profile while calculating length in pngwutil.c
 
-version 1.2.15beta4 [November 7, 2006]
+version 1.2.15beta4 [December 7, 2006]
   Added scripts/CMakeLists.txt
   Changed PNG_NO_ASSEMBLER_CODE to PNG_NO_MMX_CODE in scripts, like 1.4.0beta
 
-version 1.2.15beta5 [December 8, 2006]
+version 1.2.15beta5 [December 7, 2996]
   Changed some instances of PNG_ASSEMBER_* to PNG_MMX_* in pnggccrd.c
   Revised scripts/CMakeLists.txt
+
+version 1.2.15beta6 [December 14, 2006]
+  Revised scripts/CMakeLists.txt and configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
