@@ -107,10 +107,13 @@ endif(MSVC)
 if(NOT MSVC)
  if(NOT PNG_MMX)
    add_definitions(-DLIBPNG_NO_MMX)
+   add_definitions(-DPNG_NO_MMX_CODE)
  endif(NOT PNG_MMX)
 else(NOT MSVC)
+ if(PNG_MMX)
  # maybe add this to pngconf.h ?
  add_definitions(-DPNG_MMX_CODE_SUPPORTED)
+ endif(PNG_MMX)
 endif(NOT MSVC)
 
 

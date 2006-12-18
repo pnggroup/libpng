@@ -1658,8 +1658,11 @@ version 1.2.15beta5 [December 7, 2006]
   Changed some instances of PNG_ASSEMBER_* to PNG_MMX_* in pnggccrd.c
   Revised scripts/CMakeLists.txt
 
-version 1.2.15beta6 [December 14, 2006]
+version 1.2.15beta6 [December 13, 2006]
   Revised scripts/CMakeLists.txt and configure.ac
+
+version 1.2.15rc1 [December 18, 2006]
+  Revised scripts/CMakeLists.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
