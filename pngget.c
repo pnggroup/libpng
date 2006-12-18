@@ -829,19 +829,24 @@ png_get_compression_buffer_size(png_structp png_ptr)
 }
 #endif
 
-#ifndef PNG_1_0_X
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
+#ifndef PNG_1_0_X
 /* this function was added to libpng 1.2.0 and should exist by default */
 png_uint_32 PNGAPI
 png_get_asm_flags (png_structp png_ptr)
 {
+#ifdef PNG_MMX_CODE_SUPPORTED
     return (png_uint_32)(png_ptr? png_ptr->asm_flags : 0L);
+#else
+    return (png_ptr? 0L: 0L);
+#endif
 }
 
 /* this function was added to libpng 1.2.0 and should exist by default */
 png_uint_32 PNGAPI
 png_get_asm_flagmask (int flag_select)
 {
+#ifdef PNG_MMX_CODE_SUPPORTED
     png_uint_32 settable_asm_flags = 0;
 
     if (flag_select & PNG_SELECT_READ)
@@ -862,16 +867,18 @@ png_get_asm_flagmask (int flag_select)
 #endif /* 0 */
 
     return settable_asm_flags;  /* _theoretically_ settable capabilities only */
+#else
+    return (0L);
+#endif /* PNG_MMX_CODE_SUPPORTED */
 }
-#endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
 
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
     /* GRR:  could add this:   && defined(PNG_MMX_CODE_SUPPORTED) */
 /* this function was added to libpng 1.2.0 */
 png_uint_32 PNGAPI
 png_get_mmx_flagmask (int flag_select, int *compilerID)
 {
+#if defined(PNG_MMX_CODE_SUPPORTED)
     png_uint_32 settable_mmx_flags = 0;
 
     if (flag_select & PNG_SELECT_READ)
@@ -902,23 +909,34 @@ png_get_mmx_flagmask (int flag_select, int *compilerID)
     }
 
     return settable_mmx_flags;  /* _theoretically_ settable capabilities only */
+#else
+    return (0L);
+#endif /* ?PNG_MMX_CODE_SUPPORTED */
 }
 
 /* this function was added to libpng 1.2.0 */
 png_byte PNGAPI
 png_get_mmx_bitdepth_threshold (png_structp png_ptr)
 {
+#if defined(PNG_MMX_CODE_SUPPORTED)
     return (png_byte)(png_ptr? png_ptr->mmx_bitdepth_threshold : 0);
+#else
+    return (png_ptr? 0: 0);
+#endif /* ?PNG_MMX_CODE_SUPPORTED */
 }
 
 /* this function was added to libpng 1.2.0 */
 png_uint_32 PNGAPI
 png_get_mmx_rowbytes_threshold (png_structp png_ptr)
 {
+#if defined(PNG_MMX_CODE_SUPPORTED)
     return (png_uint_32)(png_ptr? png_ptr->mmx_rowbytes_threshold : 0L);
+#else
+    return (png_ptr? 0L: 0L);
+#endif /* ?PNG_MMX_CODE_SUPPORTED */
 }
-#endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
 #endif /* ?PNG_1_0_X */
+#endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* these functions were added to libpng 1.2.6 */

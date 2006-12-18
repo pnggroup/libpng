@@ -7,4 +7,4 @@ Name: libpng
 Description: Loads and saves PNG files
 Version: 1.0.23rc1
 Libs: -L${libdir} -lpng10
-Cflags: -I${includedir}
+Cflags: -I${includedir} @LIBPNG_NO_MMX@

@@ -1,49 +1,66 @@
 
-Libpng 1.0.22 - November 28, 2006
+Libpng 1.0.23rc1 - December 18, 2006
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.22.tar.gz
-   libpng-1.0.22.tar.bz2
+   libpng-1.0.23rc1.tar.gz
+   libpng-1.0.23rc1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.22-no-config.tar.gz
-   libpng-1.0.22-no-config.tar.bz2
+   libpng-1.0.23rc1-no-config.tar.gz
+   libpng-1.0.23rc1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1022.zip
-   lpng1022.tar.bz2
+   lp1023r01.zip
+   lp1023r01.tar.bz2
 
 Project files
 
-   libpng-1.0.22-project-netware.zip
-   libpng-1.0.22-project-wince.zip
+   libpng-1.0.23rc1-project-netware.zip
+   libpng-1.0.23rc1-project-wince.zip
 
 Other information:
 
-   libpng-1.0.22-README.txt
-   libpng-1.0.22-KNOWNBUGS.txt
-   libpng-1.0.22-LICENSE.txt
-   libpng-1.0.22-Y2K-compliance.txt
+   libpng-1.0.23rc1-README.txt
+   libpng-1.0.23rc1-KNOWNBUGS.txt
+   libpng-1.0.23rc1-LICENSE.txt
+   libpng-1.0.23rc1-Y2K-compliance.txt
 
-Changes since the last public release (1.0.21):
+Changes since the last public release (1.0.22):
 
-version 1.0.22 [November 28, 2006]
+version 1.2.15beta1 [December 3, 2006]
+  Generated configure with autoconf-2.61 instead of 2.60
+  Revised configure.ac to update libpng.pc and libpng-config.
 
-  Relocated three misplaced tests for NULL png_ptr.
-  Built Makefile.in with automake-1.9.6 instead of 1.9.2.
-  Build configure with autoconf-2.60 instead of 2.59
-  Added some typecasts in png_zalloc().
-  Changed "strtod" to "png_strtod" in pngrutil.c
+version 1.2.15beta2 [December 3, 2006]
+  Always export MMX asm functions, just stubs if not building pnggccrd.c
+
+version 1.2.15beta3 [December 4, 2006]
+  Add "png_bytep" typecast to profile while calculating length in pngwutil.c
+
+version 1.2.15beta4 [December 7, 2006]
+  Added scripts/CMakeLists.txt
+  Changed PNG_NO_ASSEMBLER_CODE to PNG_NO_MMX_CODE in scripts, like 1.4.0beta
+
+version 1.2.15beta5 [December 7, 2996]
+  Changed some instances of PNG_ASSEMBER_* to PNG_MMX_* in pnggccrd.c
+  Revised scripts/CMakeLists.txt
+
+version 1.2.15beta6 [December 13, 2006]
+  Revised scripts/CMakeLists.txt and configure.ac
+
+version 1.2.15rc1 [December 18, 2006]
+  Revised scripts/CMakeLists.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

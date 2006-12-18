@@ -8,7 +8,7 @@
 # -version-number settings below so that the new values have
 # the correct major part (first field).
 
-PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@
+PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 
 # libpng does not follow GNU file name conventions
 AUTOMAKE_OPTIONS = foreign
@@ -104,7 +104,7 @@ libpng.sym: png.h pngconf.h
 
 libpng.vers: libpng.sym
 	rm -f $@ $@.new
-	$(ECHO) PNG@PNGLIB_MAJOR@_0 '{global:' > $@.new
+	$(ECHO) PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0 '{global:' > $@.new
 	$(SED) s/$$/\;/ libpng.sym >> $@.new
 	$(ECHO) 'local: *; };' >> $@.new
 	mv $@.new $@

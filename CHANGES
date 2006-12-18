@@ -1469,7 +1469,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (22) in configuration files.
+  Fixed typo (23) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1626,8 +1626,32 @@ version 1.2.14beta2 [November 17, 2006]
 version 1.2.14rc1 [November 20, 2006]
   Changed "strtod" to "png_strtod" in pngrutil.c
 
-version 1.0.22, 1.2.14    [November 28, 2006]
+version 1.0.22, 1.2.14    [November 27, 2006]
   Added missing "$(srcdir)" in Makefile.am and Makefile.in
+
+version 1.2.15beta1 [December 3, 2006]
+  Generated configure with autoconf-2.61 instead of 2.60
+  Revised configure.ac to update libpng.pc and libpng-config.
+
+version 1.2.15beta2 [December 3, 2006]
+  Always export MMX asm functions, just stubs if not building pnggccrd.c
+
+version 1.2.15beta3 [December 4, 2006]
+  Add "png_bytep" typecast to profile while calculating length in pngwutil.c
+
+version 1.2.15beta4 [December 7, 2006]
+  Added scripts/CMakeLists.txt
+  Changed PNG_NO_ASSEMBLER_CODE to PNG_NO_MMX_CODE in scripts, like 1.4.0beta
+
+version 1.2.15beta5 [December 7, 2006]
+  Changed some instances of PNG_ASSEMBER_* to PNG_MMX_* in pnggccrd.c
+  Revised scripts/CMakeLists.txt
+
+version 1.2.15beta6 [December 13, 2006]
+  Revised scripts/CMakeLists.txt and configure.ac
+
+version 1.2.15rc1 [December 18, 2006]
+  Revised scripts/CMakeLists.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
