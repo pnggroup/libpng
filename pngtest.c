@@ -81,18 +81,6 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #include <time.h>
 #endif
 
-/* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
-#ifndef png_jmpbuf
-#  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
-#endif
-
-#ifdef PNGTEST_TIMING
-static float t_start, t_stop, t_decode, t_encode, t_misc;
-#if !defined(PNG_tIME_SUPPORTED)
-#include <time.h>
-#endif
-#endif
-
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
 static int tIME_chunk_present=0;
 static char tIME_string[30] = "no tIME chunk present in file";
@@ -114,6 +102,16 @@ int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));
 static int status_pass=1;
 static int status_dots_requested=0;
 static int status_dots=1;
+
+/* In case a system header (e.g., on AIX) defined jmpbuf */
+#ifdef jmpbuf
+#  undef jmpbuf
+#endif
+
+/* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
+#ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
+#endif
 
 void
 #ifdef PNG_1_0_X
@@ -1549,4 +1547,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_15rc1 your_png_h_is_not_version_1_2_15rc1;
+typedef version_1_2_15rc2 your_png_h_is_not_version_1_2_15rc2;
