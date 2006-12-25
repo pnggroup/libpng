@@ -3,7 +3,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl
 dnl Minor upgrades (compatible ABI): increment the package version
-dnl (third field in two places below) and set the PNGLIB_MINOR
+dnl (third field in two places below) and set the PNGLIB_RELEASE
 dnl variable.
 dnl
 dnl Major upgrades (incompatible ABI): increment the package major
@@ -18,14 +18,15 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.2.15rc2], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.2.15rc3], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.2.15rc2
+PNGLIB_VERSION=1.2.15rc3
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=2
+PNGLIB_RELEASE=15
 
 dnl End of version number stuff
 
@@ -87,6 +88,7 @@ AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 AC_SUBST(PNGLIB_VERSION)
 AC_SUBST(PNGLIB_MAJOR)
 AC_SUBST(PNGLIB_MINOR)
+AC_SUBST(PNGLIB_RELEASE)
 
 # Additional arguments (and substitutions)
 # Allow the pkg-config directory to be set

@@ -1,5 +1,5 @@
 
-Libpng 1.2.15rc2 - December 21, 2006
+Libpng 1.2.15rc3 - December 25, 2006
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.15rc2.tar.gz
-   libpng-1.2.15rc2.tar.bz2
+   libpng-1.2.15rc3.tar.gz
+   libpng-1.2.15rc3.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.15rc2-no-config.tar.gz
-   libpng-1.2.15rc2-no-config.tar.bz2
+   libpng-1.2.15rc3-no-config.tar.gz
+   libpng-1.2.15rc3-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1215r02.zip
-   lp1215r02.tar.bz2
+   lp1215r03.zip
+   lp1215r03.tar.bz2
 
 Project files
 
-   libpng-1.2.15rc2-project-netware.zip
-   libpng-1.2.15rc2-project-wince.zip
+   libpng-1.2.15rc3-project-netware.zip
+   libpng-1.2.15rc3-project-wince.zip
 
 Other information:
 
-   libpng-1.2.15rc2-README.txt
-   libpng-1.2.15rc2-KNOWNBUGS.txt
-   libpng-1.2.15rc2-LICENSE.txt
-   libpng-1.2.15rc2-Y2K-compliance.txt
+   libpng-1.2.15rc3-README.txt
+   libpng-1.2.15rc3-KNOWNBUGS.txt
+   libpng-1.2.15rc3-LICENSE.txt
+   libpng-1.2.15rc3-Y2K-compliance.txt
 
 Changes since the last public release (1.2.14):
 
@@ -65,6 +65,9 @@ version 1.2.15rc1 [December 18, 2006]
 version 1.2.15rc2 [December 21, 2006]
   Added conditional #undef jmpbuf in pngtest.c to undo #define in AIX headers.
   Added scripts/makefile.nommx
+
+version 1.2.15rc3 [December 25, 2006]
+  Fixed shared library numbering error that was intruduced in 1.2.15beta6.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

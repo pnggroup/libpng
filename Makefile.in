@@ -203,6 +203,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PNGLIB_MAJOR = @PNGLIB_MAJOR@
 PNGLIB_MINOR = @PNGLIB_MINOR@
+PNGLIB_RELEASE = @PNGLIB_RELEASE@
 PNGLIB_VERSION = @PNGLIB_VERSION@
 POW_LIB = @POW_LIB@
 RANLIB = @RANLIB@
@@ -294,10 +295,10 @@ libpng12_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng12_la_LDFLAGS = -no-undefined -export-dynamic -version-number \
-	0:@PNGLIB_MINOR@:0 $(am__append_1) $(am__append_2)
+	0:@PNGLIB_RELEASE@:0 $(am__append_1) $(am__append_2)
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number 3:@PNGLIB_MINOR@:0
+	-version-number 3:@PNGLIB_RELEASE@:0
 
 @HAVE_LD_VERSION_SCRIPT_FALSE@libpng12_la_DEPENDENCIES = libpng.sym
 @HAVE_LD_VERSION_SCRIPT_TRUE@libpng12_la_DEPENDENCIES = libpng.vers

@@ -1668,6 +1668,9 @@ version 1.2.15rc2 [December 21, 2006]
   Added conditional #undef jmpbuf in pngtest.c to undo #define in AIX headers.
   Added scripts/makefile.nommx
 
+version 1.2.15rc3 [December 25, 2006]
+  Fixed shared library numbering error that was intruduced in 1.2.15beta6.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

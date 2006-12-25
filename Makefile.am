@@ -42,10 +42,10 @@ libpng12_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 0:@PNGLIB_MINOR@:0
+	-version-number 0:@PNGLIB_RELEASE@:0
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number 3:@PNGLIB_MINOR@:0
+	-version-number 3:@PNGLIB_RELEASE@:0
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
