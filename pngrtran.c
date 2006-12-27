@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.13 November 13, 2006
+ * Last changed in libpng 1.2.15 December 31, 2006
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -101,10 +101,16 @@ png_set_background(png_structp png_ptr,
     * for the current code, which uses PNG_BACKGROUND_IS_GRAY only to
     * decide when to do the png_do_gray_to_rgb() transformation.
     */
-   if ((need_expand && !(png_ptr->color_type & PNG_COLOR_MASK_COLOR)) ||
-       (!need_expand && background_color->red == background_color->green &&
-        background_color->red == background_color->blue))
+   if ((need_expand && !(png_ptr->color_type & PNG_COLOR_MASK_COLOR)))
+   {
       png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
+   } else if (!need_expand &&
+              background_color->red == background_color->green &&
+              background_color->red == background_color->blue)
+   {
+      png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
+      png_ptr->background.gray = background_color->red;
+   }
 }
 #endif
 
