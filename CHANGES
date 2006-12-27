@@ -1671,6 +1671,9 @@ version 1.2.15rc2 [December 21, 2006]
 version 1.2.15rc3 [December 25, 2006]
   Fixed shared library numbering error that was intruduced in 1.2.15beta6.
 
+version 1.2.15rc4 [December 27, 2006]
+  Fixed handling of rgb_to_gray when png_ptr->color.gray isn't set.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
