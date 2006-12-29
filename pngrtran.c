@@ -94,23 +94,6 @@ png_set_background(png_structp png_ptr,
    png_ptr->background_gamma = (float)background_gamma;
    png_ptr->background_gamma_type = (png_byte)(background_gamma_code);
    png_ptr->transformations |= (need_expand ? PNG_BACKGROUND_EXPAND : 0);
-
-   /* Note:  if need_expand is set and color_type is either RGB or RGB_ALPHA
-    * (in which case need_expand is superfluous anyway), the background color
-    * might actually be gray yet not be flagged as such. This is not a problem
-    * for the current code, which uses PNG_BACKGROUND_IS_GRAY only to
-    * decide when to do the png_do_gray_to_rgb() transformation.
-    */
-   if ((need_expand && !(png_ptr->color_type & PNG_COLOR_MASK_COLOR)))
-   {
-      png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
-   } else if (!need_expand &&
-              background_color->red == background_color->green &&
-              background_color->red == background_color->blue)
-   {
-      png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
-      png_ptr->background.gray = background_color->red;
-   }
 }
 #endif
 
@@ -738,6 +721,32 @@ png_init_read_transformations(png_structp png_ptr)
 #endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
+
+#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
+   /* Detect gray background and attempt to enable optimization
+    * for gray --> RGB case */
+   /* Note:  if PNG_BACKGROUND_EXPAND is set and color_type is either RGB or
+    * RGB_ALPHA (in which case need_expand is superfluous anyway), the
+    * background color might actually be gray yet not be flagged as such.
+    * This is not a problem for the current code, which uses
+    * PNG_BACKGROUND_IS_GRAY only to decide when to do the
+    * png_do_gray_to_rgb() transformation.
+    */
+   if ((png_ptr->transformations & PNG_BACKGROUND_EXPAND) &&
+       !(color_type & PNG_COLOR_MASK_COLOR))
+   {
+          png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
+   } else if ((png_ptr->transformations & PNG_BACKGROUND) &&
+              !(png_ptr->transformations & PNG_BACKGROUND_EXPAND) &&
+              (png_ptr->transformations & PNG_GRAY_TO_RGB) &&
+              png_ptr->background.red == png_ptr->background.green &&
+              png_ptr->background.red == png_ptr->background.blue)
+   {
+          png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
+          png_ptr->background.gray = png_ptr->background.red;
+   }
+#endif
+
    if ((png_ptr->transformations & PNG_BACKGROUND_EXPAND) &&
        (png_ptr->transformations & PNG_EXPAND))
    {
