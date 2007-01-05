@@ -7,9 +7,9 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * Last changed in libpng 1.2.15 December 31, 2006
+ * Last changed in libpng 1.2.15 January 5, 2007
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2006 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
  *
  * Based on MSVC code contributed by Nirav Chhatrapati, Intel Corp., 1998.
