@@ -2,6 +2,7 @@
 # make obj && make depend && make && make test
 # make includes && make install
 # Copyright (C) 2002 Patrick R.L. Welche
+# Copyright (C) 2007 Glenn Randers-Pehrson
 # For conditions of distribution and use, see copyright notice in png.h
 
 # You should also run makefile.ne0bsd
@@ -13,7 +14,7 @@ INCSDIR=${LOCALBASE}/include/libpng
 
 LIB=	png
 SHLIB_MAJOR=	3
-SHLIB_MINOR=	1.2.15rc5
+SHLIB_MINOR=	1.2.15
 SRCS=	pnggccrd.c png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 		pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 		pngwtran.c pngmem.c pngerror.c pngpread.c

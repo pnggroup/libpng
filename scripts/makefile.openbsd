@@ -1,5 +1,6 @@
 # makefile for libpng
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+# Copyright (C) 2007 Glenn Randers-Pehrson
 # For conditions of distribution and use, see copyright notice in png.h
 
 PREFIX?= /usr/local
@@ -7,7 +8,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.2.15rc5
+SHLIB_MINOR=	1.2.15
 
 LIB=	png
 SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \

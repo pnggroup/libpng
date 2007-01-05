@@ -1,82 +1,56 @@
 
-Libpng 1.2.15rc5 - December 29, 2006
+Libpng 1.2.15 - January 5, 2007
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.15rc5.tar.gz
-   libpng-1.2.15rc5.tar.bz2
+   libpng-1.2.15.tar.gz
+   libpng-1.2.15.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.15rc5-no-config.tar.gz
-   libpng-1.2.15rc5-no-config.tar.bz2
+   libpng-1.2.15-no-config.tar.gz
+   libpng-1.2.15-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1215r05.zip
-   lp1215r05.tar.bz2
+   lpng1215.zip
+   lpng1215.tar.bz2
 
 Project files
 
-   libpng-1.2.15rc5-project-netware.zip
-   libpng-1.2.15rc5-project-wince.zip
+   libpng-1.2.15-project-netware.zip
+   libpng-1.2.15-project-wince.zip
 
 Other information:
 
-   libpng-1.2.15rc5-README.txt
-   libpng-1.2.15rc5-KNOWNBUGS.txt
-   libpng-1.2.15rc5-LICENSE.txt
-   libpng-1.2.15rc5-Y2K-compliance.txt
+   libpng-1.2.15-README.txt
+   libpng-1.2.15-KNOWNBUGS.txt
+   libpng-1.2.15-LICENSE.txt
+   libpng-1.2.15-Y2K-compliance.txt
 
 Changes since the last public release (1.2.14):
 
-version 1.2.15beta1 [December 3, 2006]
+version 1.2.15 [January 5, 2007]
+
   Generated configure with autoconf-2.61 instead of 2.60
   Revised configure.ac to update libpng.pc and libpng-config.
-
-version 1.2.15beta2 [December 3, 2006]
   Always export MMX asm functions, just stubs if not building pnggccrd.c
-
-version 1.2.15beta3 [December 4, 2006]
   Add "png_bytep" typecast to profile while calculating length in pngwutil.c
-
-version 1.2.15beta4 [December 7, 2006]
   Added scripts/CMakeLists.txt
   Changed PNG_NO_ASSEMBLER_CODE to PNG_NO_MMX_CODE in scripts, like 1.4.0beta
-
-version 1.2.15beta5 [December 7, 2996]
-  Changed some instances of PNG_ASSEMBLER_* to PNG_MMX_* in pnggccrd.c
-  Revised scripts/CMakeLists.txt
-
-version 1.2.15beta6 [December 13, 2006]
-  Revised scripts/CMakeLists.txt and configure.ac
-
-version 1.2.15rc1 [December 18, 2006]
-  Revised scripts/CMakeLists.txt
-
-version 1.2.15rc2 [December 21, 2006]
   Added conditional #undef jmpbuf in pngtest.c to undo #define in AIX headers.
   Added scripts/makefile.nommx
-
-version 1.2.15rc3 [December 25, 2006]
-  Fixed shared library numbering error that was intruduced in 1.2.15beta6.
-
-version 1.2.15rc4 [December 27, 2006]
   Fixed handling of rgb_to_gray when png_ptr->color.gray isn't set.
-
-version 1.2.15rc5 [December 29, 2006]
-  Revised handling of rgb_to_gray.
+  Added some (unsigned long) typecasts in pngtest.c to avoid printing errors.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

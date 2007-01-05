@@ -4,7 +4,7 @@
 /* example.c - an example of using libpng
  * Last changed in libpng 1.2.1 December 7, 2001.
  * This file has been placed in the public domain by the authors.
- * Maintained 1998-2001 Glenn Randers-Pehrson
+ * Maintained 1998-2007 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
