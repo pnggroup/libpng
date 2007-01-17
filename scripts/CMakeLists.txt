@@ -66,6 +66,11 @@ if(NOT PNG_SHARED)
  set(PNG_LIB_NAME ${PNG_LIB_NAME}_static)
 endif(NOT PNG_SHARED)
 
+if(PNG_SHARED)
+ add_library(${PNG_LIB_NAME} SHARED ${libpng_sources})
+else(PNG_SHARED)
+ add_library(${PNG_LIB_NAME} STATIC ${libpng_sources})
+endif(PNG_SHARED)
 
 # OUR SOURCES
 set(libpng_sources
@@ -179,6 +184,7 @@ install_targets(/lib ${PNG_LIB_NAME})
 install(FILES png.h pngconf.h                 DESTINATION include)
 install(FILES png.h pngconf.h                 DESTINATION include/${PNGLIB_NAME})
 install(FILES libpng.3 libpngpf.3             DESTINATION man/man3)
+install(FILES png.5                           DESTINATION man/man5)
 install(FILES ${PNG_BINARY_DIR}/libpng.pc     DESTINATION lib/pkgconfig)
 install(FILES ${PNG_BINARY_DIR}/libpng-config DESTINATION bin)
 install(FILES ${PNG_BINARY_DIR}/${PNGLIB_NAME}.pc     DESTINATION lib/pkgconfig)

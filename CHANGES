@@ -1683,6 +1683,9 @@ version 1.2.15 [January 5, 2007]
 version 1.2.16beta1 [January 6, 2007]
   Fix bugs in makefile.nommx
 
+version 1.2.16beta2 [January 17, 2007]
+  Revised scripts/CMakeLists.txt
+ 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
