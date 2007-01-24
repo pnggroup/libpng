@@ -1,56 +1,54 @@
 
-Libpng 1.0.23 - January 5, 2007
+Libpng 1.0.24rc1 - January 24, 2007
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.23.tar.gz
-   libpng-1.0.23.tar.bz2
+   libpng-1.0.24rc1.tar.gz
+   libpng-1.0.24rc1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.23-no-config.tar.gz
-   libpng-1.0.23-no-config.tar.bz2
+   libpng-1.0.24rc1-no-config.tar.gz
+   libpng-1.0.24rc1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1023.zip
-   lpng1023.tar.bz2
+   lp1024r01.zip
+   lp1024r01.tar.bz2
 
 Project files
 
-   libpng-1.0.23-project-netware.zip
-   libpng-1.0.23-project-wince.zip
+   libpng-1.0.24rc1-project-netware.zip
+   libpng-1.0.24rc1-project-wince.zip
 
 Other information:
 
-   libpng-1.0.23-README.txt
-   libpng-1.0.23-KNOWNBUGS.txt
-   libpng-1.0.23-LICENSE.txt
-   libpng-1.0.23-Y2K-compliance.txt
+   libpng-1.0.24rc1-README.txt
+   libpng-1.0.24rc1-KNOWNBUGS.txt
+   libpng-1.0.24rc1-LICENSE.txt
+   libpng-1.0.24rc1-Y2K-compliance.txt
 
-Changes since the last public release (1.0.22):
+Changes since the last public release (1.0.23):
 
-version 1.0.23 [January 5, 2007]
+version 1.2.16beta1 [January 6, 2007]
+  Fix bugs in makefile.nommx
 
-  Generated configure with autoconf-2.61 instead of 2.60
-  Revised configure.ac to update libpng.pc and libpng-config.
-  Always export MMX asm functions, just stubs if not building pnggccrd.c
-  Add "png_bytep" typecast to profile while calculating length in pngwutil.c
-  Added scripts/CMakeLists.txt
-  Changed PNG_NO_ASSEMBLER_CODE to PNG_NO_MMX_CODE in scripts, like 1.4.0beta
-  Added conditional #undef jmpbuf in pngtest.c to undo #define in AIX headers.
-  Added scripts/makefile.nommx
-  Fixed handling of rgb_to_gray when png_ptr->color.gray isn't set.
-  Added some (unsigned long) typecasts in pngtest.c to avoid printing errors.
+version 1.2.16beta2 [January 16, 2007]
+  Revised scripts/CMakeLists.txt
+ 
+version 1.2.16rc1 [January 24, 2007]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

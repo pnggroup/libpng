@@ -7,7 +7,7 @@
 # Library name:
 LIBNAME = libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.23
+PNGMIN = 1.0.24rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -93,8 +93,8 @@ libpng.a: $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:
-	cat scripts/libpng.pc.in | sed -e s!@PREFIX@!$(prefix)! \|
-	sed -s s!Cflags: !Cflags: -DPNG_NO_MMX_CODE !> libpng.pc
+	cat scripts/libpng.pc.in | sed -e s!@PREFIX@!$(prefix)! \
+	| sed -e "s!Cflags: !Cflags: -DPNG_NO_MMX_CODE !"> libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
