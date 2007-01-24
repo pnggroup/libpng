@@ -1,5 +1,5 @@
 
-Libpng 1.2.16beta2 - January 17, 2007
+Libpng 1.2.16rc1 - January 24, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,40 +9,43 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.16beta2.tar.gz
-   libpng-1.2.16beta2.tar.bz2
+   libpng-1.2.16rc1.tar.gz
+   libpng-1.2.16rc1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.16beta2-no-config.tar.gz
-   libpng-1.2.16beta2-no-config.tar.bz2
+   libpng-1.2.16rc1-no-config.tar.gz
+   libpng-1.2.16rc1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1216b02.zip
-   lp1216b02.tar.bz2
+   lp1216r01.zip
+   lp1216r01.tar.bz2
 
 Project files
 
-   libpng-1.2.16beta2-project-netware.zip
-   libpng-1.2.16beta2-project-wince.zip
+   libpng-1.2.16rc1-project-netware.zip
+   libpng-1.2.16rc1-project-wince.zip
 
 Other information:
 
-   libpng-1.2.16beta2-README.txt
-   libpng-1.2.16beta2-KNOWNBUGS.txt
-   libpng-1.2.16beta2-LICENSE.txt
-   libpng-1.2.16beta2-Y2K-compliance.txt
+   libpng-1.2.16rc1-README.txt
+   libpng-1.2.16rc1-KNOWNBUGS.txt
+   libpng-1.2.16rc1-LICENSE.txt
+   libpng-1.2.16rc1-Y2K-compliance.txt
 
 Changes since the last public release (1.2.15):
 
 version 1.2.16beta1 [January 6, 2007]
   Fix bugs in makefile.nommx
 
-version 1.2.16beta2 [January 17, 2007]
+version 1.2.16beta2 [January 16, 2007]
   Revised scripts/CMakeLists.txt
+ 
+version 1.2.16rc1 [January 24, 2007]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
