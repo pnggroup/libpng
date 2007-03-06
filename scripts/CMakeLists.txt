@@ -5,7 +5,7 @@ project(PNG)
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 2)
-set(PNGLIB_RELEASE 16)
+set(PNGLIB_RELEASE 17)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -17,7 +17,8 @@ if(NOT WIN32)
      PATHS /usr/lib /usr/local/lib
  )
  if(NOT M_LIBRARY)
-   message(STATUS "math library 'libm' not found - floating point support disabled")
+   message(STATUS
+     "math library 'libm' not found - floating point support disabled")
  endif(NOT M_LIBRARY)
 else(NOT WIN32)
  # not needed on windows
@@ -27,6 +28,7 @@ endif(NOT WIN32)
 
 # COMMAND LINE OPTIONS
 option(PNG_SHARED "Build shared lib" YES)
+option(PNG_STATIC "Build static lib" YES)
 option(PNG_TESTS  "Build pngtest" YES)
 option(PNG_NO_CONSOLE_IO "FIXME" YES)
 option(PNG_NO_STDIO      "FIXME" YES)
@@ -61,16 +63,6 @@ set(PNG_LIB_NAME ${PNG_LIB_NAME}png${PNGLIB_MAJOR}${PNGLIB_MINOR})
 # to distinguish between debug and release lib
 set(CMAKE_DEBUG_POSTFIX "d")
 
-# append _static to static lib
-if(NOT PNG_SHARED)
- set(PNG_LIB_NAME ${PNG_LIB_NAME}_static)
-endif(NOT PNG_SHARED)
-
-if(PNG_SHARED)
- add_library(${PNG_LIB_NAME} SHARED ${libpng_sources})
-else(PNG_SHARED)
- add_library(${PNG_LIB_NAME} STATIC ${libpng_sources})
-endif(PNG_SHARED)
 
 # OUR SOURCES
 set(libpng_sources
@@ -95,13 +87,12 @@ set(libpng_sources
 set(pngtest_sources
        pngtest.c
 )
-
-
 # SOME NEEDED DEFINITIONS
 add_definitions(-DZLIB_DLL)
 
 if(MSVC)
- add_definitions(-DPNG_USE_PNGVCRD -DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
+ add_definitions(-DPNG_USE_PNGVCRD -DPNG_NO_MODULEDEF
+   -D_CRT_SECURE_NO_DEPRECATE)
  set(libpng_sources ${libpng_sources}
          pngvcrd.c
  )
@@ -150,11 +141,14 @@ include_directories(${PNG_SOURCE_DIR} ${ZLIB_INCLUDE_DIR})
 
 if(PNG_SHARED)
  add_library(${PNG_LIB_NAME} SHARED ${libpng_sources})
-else(PNG_SHARED)
- add_library(STATIC ${libpng_sources})
+ target_link_libraries(${PNG_LIB_NAME} ${ZLIB_LIBRARY} ${M_LIBRARY})
 endif(PNG_SHARED)
+if(PNG_STATIC)
+# does not work without changing name
+ set(PNG_LIB_NAME_STATIC ${PNG_LIB_NAME}_static)
+ add_library(${PNG_LIB_NAME_STATIC} STATIC ${libpng_sources})
+endif(PNG_STATIC)
 
-target_link_libraries(${PNG_LIB_NAME} ${ZLIB_LIBRARY} ${M_LIBRARY})
 if(PNG_SHARED AND WIN32)
  set_target_properties(${PNG_LIB_NAME} PROPERTIES DEFINE_SYMBOL PNG_BUILD_DLL)
 endif(PNG_SHARED AND WIN32)
@@ -169,25 +163,39 @@ endif(PNG_TESTS)
 
 # CREATE PKGCONFIG FILES
 # we use the same files like ./configure, so we have to set its vars
-set(prefix      ${CMAKE_INSTALL_PREFIX}/bin)
-set(exec_prefix ${CMAKE_INSTALL_PREFIX}/bin)
+set(prefix      ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix ${CMAKE_INSTALL_PREFIX})
 set(libdir      ${CMAKE_INSTALL_PREFIX}/lib)
 set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
 
-configure_file(${PNG_SOURCE_DIR}/scripts/libpng.pc.in ${PNG_BINARY_DIR}/libpng.pc)
-configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in ${PNG_BINARY_DIR}/libpng-config)
-configure_file(${PNG_SOURCE_DIR}/scripts/libpng.pc.in ${PNG_BINARY_DIR}/${PNGLIB_NAME}.pc)
-configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in ${PNG_BINARY_DIR}/${PNGLIB_NAME}-config)
+configure_file(${PNG_SOURCE_DIR}/scripts/libpng.pc.in
+  ${PNG_BINARY_DIR}/libpng.pc)
+configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
+  ${PNG_BINARY_DIR}/libpng-config)
+configure_file(${PNG_SOURCE_DIR}/scripts/libpng.pc.in
+  ${PNG_BINARY_DIR}/${PNGLIB_NAME}.pc)
+configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
+  ${PNG_BINARY_DIR}/${PNGLIB_NAME}-config)
+
+# SET UP LINKS
+set_target_properties(${PNG_LIB_NAME} PROPERTIES
+#    VERSION 0.${PNGLIB_RELEASE}.1.2.17beta1
+     VERSION 0.${PNGLIB_RELEASE}.0
+     SOVERSION 0
+     CLEAN_DIRECT_OUTPUT 1)
+set_target_properties(${PNG_LIB_NAME_STATIC} PROPERTIES
+     OUTPUT_NAME ${PNG_LIB_NAME}
+     CLEAN_DIRECT_OUTPUT 1)
 
 # INSTALL
-install_targets(/lib ${PNG_LIB_NAME})
-install(FILES png.h pngconf.h                 DESTINATION include)
-install(FILES png.h pngconf.h                 DESTINATION include/${PNGLIB_NAME})
+install_targets(/lib ${PNG_LIB_NAME} ${PNG_LIB_NAME_STATIC})
+install(FILES png.h pngconf.h         DESTINATION include)
+install(FILES png.h pngconf.h         DESTINATION include/${PNGLIB_NAME})
 install(FILES libpng.3 libpngpf.3             DESTINATION man/man3)
 install(FILES png.5                           DESTINATION man/man5)
 install(FILES ${PNG_BINARY_DIR}/libpng.pc     DESTINATION lib/pkgconfig)
-install(FILES ${PNG_BINARY_DIR}/libpng-config DESTINATION bin)
-install(FILES ${PNG_BINARY_DIR}/${PNGLIB_NAME}.pc     DESTINATION lib/pkgconfig)
+install(FILES ${PNG_BINARY_DIR}/libpng-config      DESTINATION bin)
+install(FILES ${PNG_BINARY_DIR}/${PNGLIB_NAME}.pc  DESTINATION lib/pkgconfig)
 install(FILES ${PNG_BINARY_DIR}/${PNGLIB_NAME}-config DESTINATION bin)
 
 # what's with libpng.txt and all the extra files?

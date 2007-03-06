@@ -1480,7 +1480,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (16) in configuration files.
+  Fixed typo (17) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1688,6 +1688,10 @@ version 1.2.16beta2 [January 16, 2007]
  
 version 1.2.16 [January 31, 2007]
   No changes.
+ 
+version 1.2.17beta1 [March 6, 2007]
+  Revised scripts/CMakeLists.txt to install both shared and static libraries.
+  Deleted a redundant line from pngset.c.
  
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
