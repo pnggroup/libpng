@@ -1293,9 +1293,9 @@ png_do_read_transformations(png_structp png_ptr)
       if(rgb_error)
       {
          png_ptr->rgb_to_gray_status=1;
-         if(png_ptr->transformations == PNG_RGB_TO_GRAY_WARN)
+         if(png_ptr->transformations & PNG_RGB_TO_GRAY_WARN)
             png_warning(png_ptr, "png_do_rgb_to_gray found nongray pixel");
-         if(png_ptr->transformations == PNG_RGB_TO_GRAY_ERR)
+         if(png_ptr->transformations & PNG_RGB_TO_GRAY_ERR)
             png_error(png_ptr, "png_do_rgb_to_gray found nongray pixel");
       }
    }
@@ -3965,7 +3965,7 @@ png_do_dither(png_row_infop row_info, png_bytep row,
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 #if defined(PNG_READ_GAMMA_SUPPORTED)
-static int png_gamma_shift[] =
+const static int png_gamma_shift[] =
    {0x10, 0x21, 0x42, 0x84, 0x110, 0x248, 0x550, 0xff0, 0x00};
 
 /* We build the 8- or 16-bit gamma tables here.  Note that for 16-bit

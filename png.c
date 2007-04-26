@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_17beta1 Your_png_h_is_not_version_1_2_17beta1;
+typedef version_1_2_17beta2 Your_png_h_is_not_version_1_2_17beta2;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -68,7 +68,7 @@ const int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
 const int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
 
 /* width of interlace block (used in assembler routines only) */
-#ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+#ifdef PNG_HAVE_MMX_COMBINE_ROW
 const int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
 #endif
 
@@ -701,7 +701,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.17beta1 - March 6, 2007\n\
+   return ((png_charp) "\n libpng version 1.2.17beta2 - April 26, 2007\n\
    Copyright (c) 1998-2007 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -796,13 +796,13 @@ png_init_mmx_flags (png_structp png_ptr)
 
     if (png_mmx_support() > 0) {
         png_ptr->asm_flags |= PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU
-#    ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+#    ifdef PNG_HAVE_MMX_COMBINE_ROW
                               | PNG_ASM_FLAG_MMX_READ_COMBINE_ROW
 #    endif
-#    ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
+#    ifdef PNG_HAVE_MMX_READ_INTERLACE
                               | PNG_ASM_FLAG_MMX_READ_INTERLACE
 #    endif
-#    ifndef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+#    ifndef PNG_HAVE_MMX_READ_FILTER_ROW
                               ;
 #    else
                               | PNG_ASM_FLAG_MMX_READ_FILTER_SUB

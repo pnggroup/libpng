@@ -1693,6 +1693,15 @@ version 1.2.17beta1 [March 6, 2007]
   Revised scripts/CMakeLists.txt to install both shared and static libraries.
   Deleted a redundant line from pngset.c.
  
+version 1.2.17beta2 [April 26, 2007]
+  Relocated misplaced test for png_ptr == NULL in pngpread.c
+  Change "==" to "&" for testing PNG_RGB_TO_GRAY_ERR & PNG_RGB_TO_GRAY_WARN
+    flags.
+  Changed remaining instances of PNG_ASSEMBLER_* to PNG_MMX_*
+  Added pngerror() when write_IHDR fails in deflateInit2().
+  Added "const" to some array declarations.
+  Mention examples of libpng usage in the libpng*.txt and libpng.3 documents.
+ 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

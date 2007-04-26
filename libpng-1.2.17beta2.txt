@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.17beta1 - March 6, 2007
+ libpng version 1.2.17beta2 - April 26, 2007
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -32,6 +32,10 @@ file, example.c is a good starting point for using the library, as
 it is heavily commented and should include everything most people
 will need.  We assume that libpng is already installed; see the
 INSTALL file for instructions on how to install libpng.
+
+For examples of libpng usage, see the files "example.c", "pngtest.c",
+and the files in the "contrib" directory, all of which are included in the
+libpng distribution.
 
 Libpng was written as a companion to the PNG specification, as a way
 of reducing the amount of time and effort it takes to support the PNG
@@ -2917,13 +2921,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-March 6, 2007
+April 26, 2007
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.17beta1 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.17beta2 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

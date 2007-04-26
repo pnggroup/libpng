@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.17 March 6, 2007
+ * Last changed in libpng 1.2.17 April 26, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1202,13 +1202,13 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
 #ifdef PNG_MMX_CODE_SUPPORTED
 
     settable_mmx_flags =
-#ifdef PNG_HAVE_ASSEMBLER_COMBINE_ROW
+#ifdef PNG_HAVE_MMX_COMBINE_ROW
                          PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  |
 #endif
-#ifdef PNG_HAVE_ASSEMBLER_READ_INTERLACE
+#ifdef PNG_HAVE_MMX_READ_INTERLACE
                          PNG_ASM_FLAG_MMX_READ_INTERLACE    |
 #endif
-#ifdef PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+#ifdef PNG_HAVE_MMX_READ_FILTER_ROW
                          PNG_ASM_FLAG_MMX_READ_FILTER_SUB   |
                          PNG_ASM_FLAG_MMX_READ_FILTER_UP    |
                          PNG_ASM_FLAG_MMX_READ_FILTER_AVG   |

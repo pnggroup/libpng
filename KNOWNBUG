@@ -1,5 +1,5 @@
 
-Known bugs in libpng version 1.2.17beta1
+Known bugs in libpng version 1.2.17beta2
 
 1. April 22, 2001: pnggccrd.c has been reported to crash on NetBSD when
    reading interlaced PNG files, when assembler code is enabled but running
@@ -21,3 +21,8 @@ Known bugs in libpng version 1.2.17beta1
 
    STATUS: For now, system library builders should use the custom makefiles.
 
+4. March 2007: Building 1.2.16 with PNG_ASSEMBLER_CODE_SUPPORTED;
+   PNG_MMX_CODE_SUPPORTED results in multiple definitions of png_combine_row,
+   png_do_read_interlace, and png_read_filter_row
+
+   STATUS: Investigating.
