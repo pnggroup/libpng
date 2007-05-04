@@ -1701,6 +1701,9 @@ version 1.2.17beta2 [April 26, 2007]
   Added pngerror() when write_IHDR fails in deflateInit2().
   Added "const" to some array declarations.
   Mention examples of libpng usage in the libpng*.txt and libpng.3 documents.
+
+version 1.2.17rc1 [May 4, 2007]
+  No changes.
  
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
