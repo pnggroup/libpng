@@ -1,48 +1,59 @@
 
-Libpng 1.0.24 - January 31, 2007
+Libpng 1.0.25rc1 - May 4, 2007
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.24.tar.gz
-   libpng-1.0.24.tar.bz2
+   libpng-1.0.25rc1.tar.gz
+   libpng-1.0.25rc1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.24-no-config.tar.gz
-   libpng-1.0.24-no-config.tar.bz2
+   libpng-1.0.25rc1-no-config.tar.gz
+   libpng-1.0.25rc1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1024.zip
-   lpng1024.tar.bz2
+   lp1025r01.zip
+   lp1025r01.tar.bz2
 
 Project files
 
-   libpng-1.0.24-project-netware.zip
-   libpng-1.0.24-project-wince.zip
+   libpng-1.0.25rc1-project-netware.zip
+   libpng-1.0.25rc1-project-wince.zip
 
 Other information:
 
-   libpng-1.0.24-README.txt
-   libpng-1.0.24-KNOWNBUGS.txt
-   libpng-1.0.24-LICENSE.txt
-   libpng-1.0.24-Y2K-compliance.txt
+   libpng-1.0.25rc1-README.txt
+   libpng-1.0.25rc1-KNOWNBUGS.txt
+   libpng-1.0.25rc1-LICENSE.txt
+   libpng-1.0.25rc1-Y2K-compliance.txt
 
-Changes since the last public release (1.0.23):
+Changes since the last public release (1.0.24):
 
-version 1.0.24 [January 31, 2007]
+version 1.2.17beta1 [May 4, 2007]
+  Revised scripts/CMakeLists.txt to install both shared and static libraries.
+  Deleted a redundant line from pngset.c.
 
-  Fix bugs in makefile.nommx
-  Revised scripts/CMakeLists.txt
+version 1.2.17beta2 [April 26, 2007]
+  Relocated misplaced test for png_ptr == NULL in pngpread.c
+  Use "==" to "&" for testing PNG_RGB_TO_GRAY_ERR & PNG_RGB_TO_GRAY_WARN flags.
+  Added pngerror() when write_IHDR fails in deflateInit2().
+  Added "const" to some array declarations.
+  Mention examples of libpng usage in the libpng*.txt and libpng.3 documents.
+ 
+version 1.2.17rc1 [May 4, 2007]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
