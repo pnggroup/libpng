@@ -1704,6 +1704,15 @@ version 1.2.17beta2 [April 26, 2007]
 
 version 1.2.17rc1 [May 4, 2007]
   No changes.
+
+version 1.2.17rc2 [May 9, 2007]
+  Moved several PNG_HAVE_* macros out of PNG_INTERNAL because applications
+    calling set_unknown_chunk_location() need them.
+  Changed transformation flag from PNG_EXPAND_tRNS to PNG_EXPAND in
+    png_set_expand_gray_1_2_4_to_8().
+  Added png_ptr->unknown_chunk to hold working unknown chunk data, so it
+    can be free'ed in case of error.  Revised unknown chunk handling in
+    pngrutil.c and pngpread.c to use this structure.
  
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
