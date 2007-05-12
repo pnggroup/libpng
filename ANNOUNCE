@@ -1,5 +1,5 @@
 
-Libpng 1.0.25rc1 - May 4, 2007
+Libpng 1.0.25rc2 - May 12, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.25rc1.tar.gz
-   libpng-1.0.25rc1.tar.bz2
+   libpng-1.0.25rc2.tar.gz
+   libpng-1.0.25rc2.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.25rc1-no-config.tar.gz
-   libpng-1.0.25rc1-no-config.tar.bz2
+   libpng-1.0.25rc2-no-config.tar.gz
+   libpng-1.0.25rc2-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1025r01.zip
-   lp1025r01.tar.bz2
+   lp1025r02.zip
+   lp1025r02.tar.bz2
 
 Project files
 
-   libpng-1.0.25rc1-project-netware.zip
-   libpng-1.0.25rc1-project-wince.zip
+   libpng-1.0.25rc2-project-netware.zip
+   libpng-1.0.25rc2-project-wince.zip
 
 Other information:
 
-   libpng-1.0.25rc1-README.txt
-   libpng-1.0.25rc1-KNOWNBUGS.txt
-   libpng-1.0.25rc1-LICENSE.txt
-   libpng-1.0.25rc1-Y2K-compliance.txt
+   libpng-1.0.25rc2-README.txt
+   libpng-1.0.25rc2-KNOWNBUGS.txt
+   libpng-1.0.25rc2-LICENSE.txt
+   libpng-1.0.25rc2-Y2K-compliance.txt
 
 Changes since the last public release (1.0.24):
 
-version 1.2.17beta1 [May 4, 2007]
+version 1.2.17beta1 [May 12, 2007]
   Revised scripts/CMakeLists.txt to install both shared and static libraries.
   Deleted a redundant line from pngset.c.
 
@@ -49,8 +49,23 @@ version 1.2.17beta2 [April 26, 2007]
   Added "const" to some array declarations.
   Mention examples of libpng usage in the libpng*.txt and libpng.3 documents.
  
-version 1.2.17rc1 [May 4, 2007]
+version 1.2.17rc1 [May 5, 2007]
   No changes.
+
+version 1.2.17rc2 [May 8, 2007]
+  Moved several PNG_HAVE_* macros out of PNG_INTERNAL because applications
+    calling set_unknown_chunk_location() need them.
+  Changed transformation flag from PNG_EXPAND_tRNS to PNG_EXPAND in
+    png_set_expand_gray_1_2_4_to_8().
+  Added png_ptr->unknown_chunk to hold working unknown chunk data, so it
+    can be free'ed in case of error.  Revised unknown chunk handling in
+    pngrutil.c and pngpread.c to use this structure.
+
+version 1.2.17rc3 [May 8, 2007]
+  Revised symbol-handling in configure script.
+
+version 1.2.17rc4 [May 12, 2007]
+  Revised unknown chunk handling to avoid storing unknown critical chunks.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
