@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.17 May 9, 2007
+ * Last changed in libpng 1.2.17 May 12, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2201,10 +2201,13 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                 if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
                      PNG_HANDLE_CHUNK_ALWAYS)
                    png_chunk_error(png_ptr, "unknown critical chunk");
+             png_set_unknown_chunks(png_ptr, info_ptr,
+               &png_ptr->unknown_chunk, 1);
           }
        }
-#endif
+#else
        png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
+#endif
        png_free(png_ptr, png_ptr->unknown_chunk.data);
        png_ptr->unknown_chunk.data = NULL;
    }

@@ -1,5 +1,5 @@
 
-Libpng 1.2.17rc3 - May 9, 2007
+Libpng 1.2.17rc4 - May 12, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.17rc3.tar.gz
-   libpng-1.2.17rc3.tar.bz2
+   libpng-1.2.17rc4.tar.gz
+   libpng-1.2.17rc4.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.17rc3-no-config.tar.gz
-   libpng-1.2.17rc3-no-config.tar.bz2
+   libpng-1.2.17rc4-no-config.tar.gz
+   libpng-1.2.17rc4-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1217r03.zip
-   lp1217r03.tar.bz2
+   lp1217r04.zip
+   lp1217r04.tar.bz2
 
 Project files
 
-   libpng-1.2.17rc3-project-netware.zip
-   libpng-1.2.17rc3-project-wince.zip
+   libpng-1.2.17rc4-project-netware.zip
+   libpng-1.2.17rc4-project-wince.zip
 
 Other information:
 
-   libpng-1.2.17rc3-README.txt
-   libpng-1.2.17rc3-KNOWNBUGS.txt
-   libpng-1.2.17rc3-LICENSE.txt
-   libpng-1.2.17rc3-Y2K-compliance.txt
+   libpng-1.2.17rc4-README.txt
+   libpng-1.2.17rc4-KNOWNBUGS.txt
+   libpng-1.2.17rc4-LICENSE.txt
+   libpng-1.2.17rc4-Y2K-compliance.txt
 
 Changes since the last public release (1.2.16):
 
-version 1.2.17beta1 [May 9, 2007]
+version 1.2.17beta1 [May 12, 2007]
   Revised scripts/CMakeLists.txt to install both shared and static libraries.
   Deleted a redundant line from pngset.c.
 
@@ -61,9 +61,11 @@ version 1.2.17rc2 [May 8, 2007]
     can be free'ed in case of error.  Revised unknown chunk handling in
     pngrutil.c and pngpread.c to use this structure.
 
-version 1.2.17rc3 [May 9, 2007]
+version 1.2.17rc3 [May 8, 2007]
   Revised symbol-handling in configure script.
 
+version 1.2.17rc4 [May 12, 2007]
+  Revised unknown chunk handling to avoid storing unknown critical chunks.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
