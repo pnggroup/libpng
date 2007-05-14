@@ -1717,8 +1717,13 @@ version 1.2.17rc2 [May 8, 2007]
 version 1.2.17rc3 [May 8, 2007]
   Revised symbol-handling in configure script.
 
-version 1.2.17rc4 [May 12, 2007]
+version 1.2.17rc4 [May 10, 2007]
   Revised unknown chunk handling to avoid storing unknown critical chunks.
+
+version 1.0.25 [May 15, 2007]
+version 1.2.17 [May 15, 2007]
+  Added "png_ptr->num_trans=0" before error return in png_handle_tRNS,
+    to eliminate a vulnerability (CVE-2007-2554, CERT VU#684664)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
