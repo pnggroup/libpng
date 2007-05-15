@@ -1,9 +1,9 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 April 20, 2006
+ * Last changed in libpng 1.4.0 May 15, 2007
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2006 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -52,6 +52,11 @@
 #  define SINGLE_ROWBUF_ALLOC  /* makes buffer overruns easier to nail */
 #endif
 
+#if defined(PNG_TIME_RFC1123_SUPPORTED)
+static int tIME_chunk_present=0;
+static char tIME_string[30] = "no tIME chunk present in file";
+#endif
+
 /* Turn on CPU timing
 #define PNGTEST_TIMING
 */
@@ -65,23 +70,6 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #include <time.h>
 #endif
 
-/* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
-#ifndef png_jmpbuf
-#  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
-#endif
-
-#ifdef PNGTEST_TIMING
-static float t_start, t_stop, t_decode, t_encode, t_misc;
-#if !defined(PNG_tIME_SUPPORTED)
-#include <time.h>
-#endif
-#endif
-
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
-static int tIME_chunk_present=0;
-static char tIME_string[30] = "no tIME chunk present in file";
-#endif
-
 static int verbose = 0;
 
 int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));
@@ -93,6 +81,16 @@ int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));
 /* defined so I can write to a file on gui/windowing platforms */
 /*  #define STDERR stderr  */
 #define STDERR stdout   /* for DOS */
+
+/* In case a system header (e.g., on AIX) defined jmpbuf */
+#ifdef jmpbuf
+#  undef jmpbuf
+#endif
+
+/* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
+#ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
+#endif
 
 /* example of using row callbacks to make a simple progress meter */
 static int status_pass=1;
@@ -1598,4 +1596,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta18 your_png_h_is_not_version_1_4_0beta18;
+typedef version_1_4_0beta19 your_png_h_is_not_version_1_4_0beta19;

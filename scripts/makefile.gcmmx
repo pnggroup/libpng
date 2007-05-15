@@ -16,7 +16,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 1
-PNGMIN = 1.4.0beta18
+PNGMIN = 1.4.0beta19
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -106,7 +106,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a $(LIBSO) pngtest pngtest-static libpng.pc libpng-config \
 	pngconf.h pngdefs.h
 
-# Use makefile.gcmmx if you don't want to use the MMX assembler code.
+# Use makefile.gcmmx if you want to use the MMX assembler code.
 # If you don't need thread safety you can uncomment the define.
 pngdefs.h:
 	echo "/* pngdefs.h was built by makefile.gcmmx */" > pngdefs.h

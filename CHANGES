@@ -1736,8 +1736,16 @@ version 1.4.0beta17 [December 4, 2006]
   Changed "new_key[79] = '\0';" to "(*new_key)[79] = '\0';" in pngwutil.c
   Add "png_bytep" typecast to profile while calculating length in pngwutil.c
 
-version 1.4.0beta18 [December 8, 2006]
+version 1.4.0beta18 [December 7, 2006]
   Added scripts/CMakeLists.txt
+
+version 1.4.0beta19 [May 15, 2007]
+  Revised scripts/CMakeLists.txt
+  Rebuilt configure and Makefile.in with newer tools.
+  Added conditional #undef jmpbuf in pngtest.c to undo #define in AIX headers.
+  Added scripts/makefile.nommx
+  Added "png_ptr->num_trans=0" before error return in png_handle_tRNS,
+    to eliminate a vulnerability (CVE-2007-2554, CERT VU#684664)
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

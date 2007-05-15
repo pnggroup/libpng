@@ -1,9 +1,9 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 April 20, 2006
+ * Last changed in libpng 1.4.0 May 15, 2007
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2006 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -883,7 +883,6 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          textp->itxt_length = 0;
 #endif
       }
-      info_ptr->text[info_ptr->num_text]= *textp;
       info_ptr->num_text++;
       png_debug1(3, "transferred text chunk %d\n", info_ptr->num_text);
    }

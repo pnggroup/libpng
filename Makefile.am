@@ -8,7 +8,7 @@
 # -version-number settings below so that the new values have
 # the correct major part (first field).
 
-PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@
+PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 
 # libpng does not follow GNU file name conventions
 AUTOMAKE_OPTIONS = foreign
@@ -16,7 +16,7 @@ AUTOMAKE_OPTIONS = foreign
 # test programs - run on make check, make distcheck
 check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
-pngtest_LDADD = libpng14.la
+pngtest_LDADD = $(PNGLIB_BASENAME).la
 TESTS = test-pngtest.sh
 TESTS_ENVIRONMENT= srcdir=$(srcdir) 
 
@@ -24,39 +24,39 @@ TESTS_ENVIRONMENT= srcdir=$(srcdir)
 dist_man_MANS= libpng.3 libpngpf.3 png.5
 
 # generate the -config scripts if required
-binconfigs= libpng14-config 
-EXTRA_SCRIPTS= libpng-config libpng14-config
+binconfigs= $(PNGLIB_BASENAME)-config 
+EXTRA_SCRIPTS= libpng-config $(PNGLIB_BASENAME)-config
 bin_SCRIPTS= @binconfigs@
 
 # rules to build libpng, only build the old library on request
-lib_LTLIBRARIES=libpng14.la @compatlib@
+lib_LTLIBRARIES=libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la @compatlib@
 EXTRA_LTLIBRARIES= libpng.la
-libpng14_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c \
 	png.h pngconf.h pngdefs.h pngpriv.h
-libpng_la_SOURCES = $(libpng14_la_SOURCES)
+libpng_la_SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES)
 
 libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
-libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
-libpng14_la_LDFLAGS = -no-undefined -export-dynamic \
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined -export-dynamic \
 	-version-number 1:@PNGLIB_MINOR@:0
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_MINOR@:0
+	-version-number @PNGLIB_MAJOR@@PNGLIB_MINOR@:@PNGLIB_MINOR@:0
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
-  libpng14_la_LDFLAGS += -Wl,--version-script=libpng.vers
-  libpng14_la_DEPENDENCIES = libpng.vers pngdefs.h
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -Wl,--version-script=libpng.vers
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.vers pngdefs.h
 else
   # Only restricted exports when possible
-  libpng14_la_LDFLAGS += -export-symbols libpng.sym pngdefs.h
-  libpng14_la_DEPENDENCIES = libpng.sym
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -export-symbols libpng.sym pngdefs.h
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.sym
 endif
-libpng_la_DEPENDENCIES = $(libpng14_la_DEPENDENCIES)
+libpng_la_DEPENDENCIES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES)
 
 #distribute headers in /usr/include/libpng/*
 pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
@@ -65,7 +65,7 @@ pkginclude_HEADERS= png.h pngconf.h pngdefs.h
 # pkg-config stuff, note that libpng.pc is always required in order
 # to get the correct library
 pkgconfigdir = @pkgconfigdir@
-pkgconfig_DATA = libpng14.pc
+pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 
 #extra source distribution files.
 EXTRA_DIST= \
@@ -85,7 +85,7 @@ EXTRA_DIST= \
 	$(TESTS) \
 	example.c libpng.txt pngvcrd.c 
 
-CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers libpng.sym
+CLEANFILES= pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym
 
 all: pngdefs.h
 
@@ -128,7 +128,7 @@ install-data-hook:
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
-# do evil things to libpng to cause libpng14 to be used
+# do evil things to libpng to cause libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ to be used
 install-exec-hook:
 	cd $(DESTDIR)$(bindir); rm -f libpng-config
 	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
