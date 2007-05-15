@@ -1,5 +1,5 @@
 
-Libpng 1.0.25 - May 14, 2007
+Libpng 1.0.26 - May 15, 2007
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,55 +8,38 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.25.tar.gz
-   libpng-1.0.25.tar.bz2
+   libpng-1.0.26.tar.gz
+   libpng-1.0.26.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.25-no-config.tar.gz
-   libpng-1.0.25-no-config.tar.bz2
+   libpng-1.0.26-no-config.tar.gz
+   libpng-1.0.26-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1025.zip
-   lpng1025.tar.bz2
+   lpng1026.zip
+   lpng1026.tar.bz2
 
 Project files
 
-   libpng-1.0.25-project-netware.zip
-   libpng-1.0.25-project-wince.zip
+   libpng-1.0.26-project-netware.zip
+   libpng-1.0.26-project-wince.zip
 
 Other information:
 
-   libpng-1.0.25-README.txt
-   libpng-1.0.25-KNOWNBUGS.txt
-   libpng-1.0.25-LICENSE.txt
-   libpng-1.0.25-Y2K-compliance.txt
+   libpng-1.0.26-README.txt
+   libpng-1.0.26-KNOWNBUGS.txt
+   libpng-1.0.26-LICENSE.txt
+   libpng-1.0.26-Y2K-compliance.txt
 
-Changes since the last public release (1.0.24):
+Changes since the last public release (1.0.25):
 
-version 1.0.25 [May 14, 2007]
+version 1.0.26 [May 15, 2007]
 
-  Revised scripts/CMakeLists.txt to install both shared and static libraries.
-  Deleted a redundant line from pngset.c.
-  Relocated misplaced test for png_ptr == NULL in pngpread.c
-  Use "==" to "&" for testing PNG_RGB_TO_GRAY_ERR & PNG_RGB_TO_GRAY_WARN flags.
-  Added pngerror() when write_IHDR fails in deflateInit2().
-  Added "const" to some array declarations.
-  Mention examples of libpng usage in the libpng*.txt and libpng.3 documents.
-  Moved several PNG_HAVE_* macros out of PNG_INTERNAL because applications
-    calling set_unknown_chunk_location() need them.
-  Changed transformation flag from PNG_EXPAND_tRNS to PNG_EXPAND in
-    png_set_expand_gray_1_2_4_to_8().
-  Added png_ptr->unknown_chunk to hold working unknown chunk data, so it
-    can be free'ed in case of error.  Revised unknown chunk handling in
-    pngrutil.c and pngpread.c to use this structure.
-  Revised symbol-handling in configure script.
-  Added "png_ptr->num_trans=0" before error return in png_handle_tRNS,
-    to eliminate a vulnerability (CVE-2007-2554, CERT VU#684664)
-
+  Reverted the recent change to symbol-handling in configure script
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
