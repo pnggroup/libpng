@@ -110,7 +110,7 @@ void /* PRIVATE */
 png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 #endif
 
    png_debug(1,"in png_combine_row_asm\n");
@@ -1005,7 +1005,7 @@ png_do_read_interlace(png_structp png_ptr)
    int pass = png_ptr->pass;
    png_uint_32 transformations = png_ptr->transformations;
 #ifdef PNG_USE_LOCAL_ARRAYS
-   const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 #endif
 
    png_debug(1,"in png_do_read_interlace\n");

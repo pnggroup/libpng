@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.17 May 15, 2007
+ * Last changed in libpng 1.2.19 May 18, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -990,25 +990,25 @@ png_read_push_finish_row(png_structp png_ptr)
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* start of interlace block */
-   const int FARDATA png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
+   PNG_CONST int FARDATA png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
 
    /* offset to next interlace block */
-   const int FARDATA png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int FARDATA png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
 
    /* start of interlace block in the y direction */
-   const int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
+   PNG_CONST int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
 
    /* offset to next interlace block in the y direction */
-   const int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
+   PNG_CONST int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
 
    /* Width of interlace block.  This is not currently used - if you need
     * it, uncomment it here and in png.h
-   const int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
+   PNG_CONST int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
    */
 
    /* Height of interlace block.  This is not currently used - if you need
     * it, uncomment it here and in png.h
-   const int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
    */
 #endif
 
@@ -1062,8 +1062,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place tEXt");
-         /* to quiet some compiler warnings */
-         if(info_ptr == NULL) return;
+         info_ptr = info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1159,8 +1158,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place zTXt");
-         /* to quiet some compiler warnings */
-         if(info_ptr == NULL) return;
+         info_ptr = info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1352,8 +1350,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place iTXt");
-         /* to quiet some compiler warnings */
-         if(info_ptr == NULL) return;
+         info_ptr = info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1480,9 +1477,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
          png_chunk_error(png_ptr, "unknown critical chunk");
 
-      /* to quiet compiler warnings about unused info_ptr */
-      if (info_ptr == NULL)
-         return;
+      info_ptr = info_ptr; /* to quiet some compiler warnings */
    }
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
@@ -1559,7 +1554,7 @@ png_progressive_combine_row (png_structp png_ptr,
    png_bytep old_row, png_bytep new_row)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   const int FARDATA png_pass_dsp_mask[7] =
+   PNG_CONST int FARDATA png_pass_dsp_mask[7] =
       {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 #endif
    if(png_ptr == NULL) return;

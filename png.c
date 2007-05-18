@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.17 May 15, 2007
+ * Last changed in libpng 1.2.19 May 18, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,20 +13,20 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_18 Your_png_h_is_not_version_1_2_18;
+typedef version_1_2_19beta1 Your_png_h_is_not_version_1_2_19beta1;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
 
 #ifdef PNG_USE_GLOBAL_ARRAYS
 /* png_libpng_ver was changed to a function in version 1.0.5c */
-const char png_libpng_ver[18] = PNG_LIBPNG_VER_STRING;
+PNG_CONST char png_libpng_ver[18] = PNG_LIBPNG_VER_STRING;
 
 #ifdef PNG_READ_SUPPORTED
 
 /* png_sig was changed to a function in version 1.0.5c */
 /* Place to hold the signature string for a PNG file. */
-const png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+PNG_CONST png_byte FARDATA png_sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 #endif /* PNG_READ_SUPPORTED */
 
 /* Invoke global declarations for constant strings for known chunk types */
@@ -56,32 +56,32 @@ PNG_zTXt;
 /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
 /* start of interlace block */
-const int FARDATA png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
+PNG_CONST int FARDATA png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
 
 /* offset to next interlace block */
-const int FARDATA png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
+PNG_CONST int FARDATA png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
 
 /* start of interlace block in the y direction */
-const int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
+PNG_CONST int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
 
 /* offset to next interlace block in the y direction */
-const int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
+PNG_CONST int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
 
 /* width of interlace block (used in assembler routines only) */
 #ifdef PNG_HAVE_MMX_COMBINE_ROW
-const int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
+PNG_CONST int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
 #endif
 
 /* Height of interlace block.  This is not currently used - if you need
  * it, uncomment it here and in png.h
-const int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
+PNG_CONST int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
 */
 
 /* Mask to determine which pixels are valid in a pass */
-const int FARDATA png_pass_mask[] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
+PNG_CONST int FARDATA png_pass_mask[] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
 
 /* Mask to determine which pixels to overwrite while displaying */
-const int FARDATA png_pass_dsp_mask[]
+PNG_CONST int FARDATA png_pass_dsp_mask[]
    = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 
 #endif /* PNG_READ_SUPPORTED */
@@ -705,8 +705,8 @@ png_sig_bytes(void)
 png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
-   if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.18 - May 15, 2007\n\
+   if (png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
+   return ((png_charp) "\n libpng version 1.2.19beta1 - May 18, 2007\n\
    Copyright (c) 1998-2007 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -725,7 +725,7 @@ png_charp PNGAPI
 png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
-   if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
+   if (png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
       return ((png_charp) PNG_LIBPNG_VER_STRING);
    return ((png_charp) "");
 }
@@ -734,7 +734,7 @@ png_charp PNGAPI
 png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
-   if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
+   if (png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
       return ((png_charp) PNG_LIBPNG_VER_STRING);
    return ((png_charp) "");
 }
@@ -743,7 +743,7 @@ png_charp PNGAPI
 png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
-   if (&png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
+   if (png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
       return ((png_charp) PNG_HEADER_VERSION_STRING);
    return ((png_charp) "");
 }

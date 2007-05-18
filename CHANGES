@@ -1480,7 +1480,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (18) in configuration files.
+  Fixed typo (19) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1728,6 +1728,12 @@ version 1.2.17 [May 15, 2007]
 version 1.0.26 [May 15, 2007]
 version 1.2.18 [May 15, 2007]
   Reverted the libpng-1.2.17rc3 change to symbol-handling in configure script
+
+version 1.2.19beta1 [May 18, 2007]
+  Changed "const static" to "static PNG_CONST" everywhere, mostly undoing
+    change of libpng-1.2.17beta2.  Changed other "const" to "PNG_CONST"
+  Changed some handling of unused parameters, to avoid compiler warnings.
+    "if (unused == NULL) return;" becomes "unused = unused".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

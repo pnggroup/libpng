@@ -1,47 +1,49 @@
 
-Libpng 1.2.18 - May 15, 2007
+Libpng 1.2.19beta1 - May 18, 2007
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.18.tar.gz
-   libpng-1.2.18.tar.bz2
+   libpng-1.2.19beta1.tar.gz
+   libpng-1.2.19beta1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.18-no-config.tar.gz
-   libpng-1.2.18-no-config.tar.bz2
+   libpng-1.2.19beta1-no-config.tar.gz
+   libpng-1.2.19beta1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1218.zip
-   lpng1218.tar.bz2
+   lp1219b01.zip
+   lp1219b01.tar.bz2
 
 Project files
 
-   libpng-1.2.18-project-netware.zip
-   libpng-1.2.18-project-wince.zip
+   libpng-1.2.19beta1-project-netware.zip
+   libpng-1.2.19beta1-project-wince.zip
 
 Other information:
 
-   libpng-1.2.18-README.txt
-   libpng-1.2.18-KNOWNBUGS.txt
-   libpng-1.2.18-LICENSE.txt
-   libpng-1.2.18-Y2K-compliance.txt
+   libpng-1.2.19beta1-README.txt
+   libpng-1.2.19beta1-KNOWNBUGS.txt
+   libpng-1.2.19beta1-LICENSE.txt
+   libpng-1.2.19beta1-Y2K-compliance.txt
 
-Changes since the last public release (1.2.17):
+Changes since the last public release (1.2.18):
 
-version 1.2.18 [May 15, 2007]
-
-  Reverted the recent change to symbol-handling in configure script
+version 1.2.19beta1 [May 18, 2007]
+  Changed "const static" to "static PNG_CONST" everywhere, mostly undoing
+    change of libpng-1.2.17beta2.  Changed other "const" to "PNG_CONST"
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

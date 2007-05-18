@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.2.13 November 13, 2006
+ * Last changed in libpng 1.2.19 May 18, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2006 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -113,7 +113,7 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
  * if the character is invalid.
  */
 #define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
-const static PNG_CONST char png_digit[16] = {
+static PNG_CONST char png_digit[16] = {
    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
    'A', 'B', 'C', 'D', 'E', 'F'
 };
@@ -228,9 +228,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    PNG_ABORT();
 #endif
 #ifdef PNG_NO_CONSOLE_IO
-   /* make compiler happy */ ;
-   if (&error_message != NULL)
-      return;
+   error_message = error_message; /* make compiler happy */ ;
 #endif
 }
 
@@ -267,13 +265,9 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 #  endif
      fprintf(stderr, "libpng warning: %s\n", warning_message);
 #else
-   /* make compiler happy */ ;
-   if (warning_message)
-     return;
+   warning_message = warning_message; /* make compiler happy */ ;
 #endif
-   /* make compiler happy */ ;
-   if (png_ptr)
-      return;
+   png_ptr = png_ptr; /* make compiler happy */ ;
 }
 
 /* This function is called when the application wants to use another method

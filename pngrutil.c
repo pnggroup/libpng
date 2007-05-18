@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.17 May 15, 2007
+ * Last changed in libpng 1.2.19 May 18, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -19,7 +19,7 @@
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 #  if defined(_WIN32_WCE)
 /* strtod() function is not supported on WindowsCE */
-__inline double png_strtod(png_structp png_ptr, const char *nptr, char **endptr)
+__inline double png_strtod(png_structp png_ptr, PNG_CONST char *nptr, char **endptr)
 {
    double result = 0;
    int len;
@@ -181,7 +181,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                               png_charp chunkdata, png_size_t chunklength,
                               png_size_t prefix_size, png_size_t *newlength)
 {
-   const static char msg[] = "Error decoding compressed text";
+   static PNG_CONST char msg[] = "Error decoding compressed text";
    png_charp text;
    png_size_t text_size;
 
@@ -563,7 +563,7 @@ png_handle_IEND(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    png_crc_finish(png_ptr, length);
 
-   if (&info_ptr == NULL) /* quiet compiler warnings about unused info_ptr */
+   if (info_ptr == NULL) /* quiet compiler warnings about unused info_ptr */
       return;
 }
 
@@ -2221,8 +2221,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_crc_finish(png_ptr, skip);
 
 #if !defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-   if (&info_ptr == NULL) /* quiet compiler warnings about unused info_ptr */
-      return;
+   info_ptr = info_ptr; /* quiet compiler warnings about unused info_ptr */
 #endif
 }
 
@@ -2474,7 +2473,7 @@ png_do_read_interlace(png_structp png_ptr)
 #ifdef PNG_USE_LOCAL_ARRAYS
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    /* offset to next interlace block */
-   const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 #endif
 
    png_debug(1,"in png_do_read_interlace (stock C version)\n");
@@ -2681,8 +2680,7 @@ png_do_read_interlace(png_structp png_ptr)
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,final_width);
    }
 #if !defined(PNG_READ_PACKSWAP_SUPPORTED)
-   if (&transformations == NULL) /* silence compiler warning */
-      return;
+   transformations = transformations; /* silence compiler warning */
 #endif
 }
 #endif /* !PNG_HAVE_MMX_READ_INTERLACE */
@@ -2820,16 +2818,16 @@ png_read_finish_row(png_structp png_ptr)
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* start of interlace block */
-   const int png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+   PNG_CONST int png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 
    /* offset to next interlace block */
-   const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    /* start of interlace block in the y direction */
-   const int png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
+   PNG_CONST int png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
 
    /* offset to next interlace block in the y direction */
-   const int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+   PNG_CONST int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 #endif
 
    png_debug(1, "in png_read_finish_row\n");
@@ -2947,16 +2945,16 @@ png_read_start_row(png_structp png_ptr)
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* start of interlace block */
-   const int png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+   PNG_CONST int png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 
    /* offset to next interlace block */
-   const int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    /* start of interlace block in the y direction */
-   const int png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
+   PNG_CONST int png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
 
    /* offset to next interlace block in the y direction */
-   const int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+   PNG_CONST int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 #endif
 
    int max_pixel_depth;
