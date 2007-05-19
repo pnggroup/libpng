@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta1 - May 18, 2007
+Libpng 1.2.19beta2 - May 19, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,38 +9,41 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta1.tar.gz
-   libpng-1.2.19beta1.tar.bz2
+   libpng-1.2.19beta2.tar.gz
+   libpng-1.2.19beta2.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta1-no-config.tar.gz
-   libpng-1.2.19beta1-no-config.tar.bz2
+   libpng-1.2.19beta2-no-config.tar.gz
+   libpng-1.2.19beta2-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b01.zip
-   lp1219b01.tar.bz2
+   lp1219b02.zip
+   lp1219b02.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta1-project-netware.zip
-   libpng-1.2.19beta1-project-wince.zip
+   libpng-1.2.19beta2-project-netware.zip
+   libpng-1.2.19beta2-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta1-README.txt
-   libpng-1.2.19beta1-KNOWNBUGS.txt
-   libpng-1.2.19beta1-LICENSE.txt
-   libpng-1.2.19beta1-Y2K-compliance.txt
+   libpng-1.2.19beta2-README.txt
+   libpng-1.2.19beta2-KNOWNBUGS.txt
+   libpng-1.2.19beta2-LICENSE.txt
+   libpng-1.2.19beta2-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
 version 1.2.19beta1 [May 18, 2007]
   Changed "const static" to "static PNG_CONST" everywhere, mostly undoing
     change of libpng-1.2.17beta2.  Changed other "const" to "PNG_CONST"
+
+version 1.2.19beta2 [May 19, 2007]
+  Fixed png_do_expand() to only use the appropriate bits of tRNS value.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

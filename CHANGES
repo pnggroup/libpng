@@ -1735,6 +1735,9 @@ version 1.2.19beta1 [May 18, 2007]
   Changed some handling of unused parameters, to avoid compiler warnings.
     "if (unused == NULL) return;" becomes "unused = unused".
 
+version 1.2.19beta2 [May 19, 2007]
+  Fixed png_do_expand() to only use the appropriate bits of tRNS value.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

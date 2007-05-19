@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.19 May 18, 2007
+ * Last changed in libpng 1.2.19 May 19, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_19beta1 Your_png_h_is_not_version_1_2_19beta1;
+typedef version_1_2_19beta2 Your_png_h_is_not_version_1_2_19beta2;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -705,12 +705,11 @@ png_sig_bytes(void)
 png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
-   if (png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.19beta1 - May 18, 2007\n\
+   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   return ((png_charp) "\n libpng version 1.2.19beta2 - May 19, 2007\n\
    Copyright (c) 1998-2007 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
-   return ((png_charp) "");
 }
 
 /* The following return the library version as a short string in the
@@ -725,27 +724,24 @@ png_charp PNGAPI
 png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
-   if (png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-      return ((png_charp) PNG_LIBPNG_VER_STRING);
-   return ((png_charp) "");
+   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   return ((png_charp) PNG_LIBPNG_VER_STRING);
 }
 
 png_charp PNGAPI
 png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
-   if (png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-      return ((png_charp) PNG_LIBPNG_VER_STRING);
-   return ((png_charp) "");
+   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   return ((png_charp) PNG_LIBPNG_VER_STRING);
 }
 
 png_charp PNGAPI
 png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
-   if (png_ptr != NULL)  /* silence compiler warning about unused png_ptr */
-      return ((png_charp) PNG_HEADER_VERSION_STRING);
-   return ((png_charp) "");
+   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   return ((png_charp) PNG_HEADER_VERSION_STRING);
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
@@ -756,7 +752,7 @@ png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
    /* check chunk_name and return "keep" value if it's on the list, else 0 */
    int i;
    png_bytep p;
-   if((png_ptr == NULL && chunk_name == NULL) || png_ptr->num_chunk_list<=0)
+   if(png_ptr == NULL || chunk_name == NULL || png_ptr->num_chunk_list<=0)
       return 0;
    p=png_ptr->chunk_list+png_ptr->num_chunk_list*5-5;
    for (i = png_ptr->num_chunk_list; i; i--, p-=5)
