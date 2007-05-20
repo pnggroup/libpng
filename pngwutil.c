@@ -1231,12 +1231,13 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    /* Replace non-printing characters with a blank and print a warning */
    for (kp = key, dp = *new_key; *kp != '\0'; kp++, dp++)
    {
-      if (*kp < 0x20 || (*kp > 0x7E && (png_byte)*kp < 0xA1))
+      if ((png_byte)*kp < 0x20 ||
+         ((png_byte)*kp > 0x7E && (png_byte)*kp < 0xA1))
       {
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
          char msg[40];
 
-         sprintf(msg, "invalid keyword character 0x%02X", *kp);
+         sprintf(msg, "invalid keyword character 0x%02X", (png_byte)*kp);
          png_warning(png_ptr, msg);
 #else
          png_warning(png_ptr, "invalid character in keyword");
@@ -1397,8 +1398,6 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
 
    text_len = png_strlen(text);
 
-   png_free(png_ptr, new_key);
-
    /* compute the compressed data; do it now for the length */
    text_len = png_text_compress(png_ptr, text, text_len, compression,
        &comp);
@@ -1407,7 +1406,9 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
    png_write_chunk_start(png_ptr, (png_bytep)png_zTXt, (png_uint_32)
       (key_len+text_len+2));
    /* write key */
-   png_write_chunk_data(png_ptr, (png_bytep)key, key_len + 1);
+   png_write_chunk_data(png_ptr, (png_bytep)new_key, key_len + 1);
+   png_free(png_ptr, new_key);
+
    buf[0] = (png_byte)compression;
    /* write compression */
    png_write_chunk_data(png_ptr, (png_bytep)buf, (png_size_t)1);
