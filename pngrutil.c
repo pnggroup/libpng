@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.19 May 20, 2007
+ * Last changed in libpng 1.2.19 May 21, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -282,13 +282,16 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          char umsg[52];
 
          if (ret == Z_BUF_ERROR)
-            sprintf(umsg,"Buffer error in compressed datastream in %s chunk",
+            png_snprintf(umsg, 52,
+                "Buffer error in compressed datastream in %s chunk",
                 png_ptr->chunk_name);
          else if (ret == Z_DATA_ERROR)
-            sprintf(umsg,"Data error in compressed datastream in %s chunk",
+            png_snprintf(umsg, 52,
+                "Data error in compressed datastream in %s chunk",
                 png_ptr->chunk_name);
          else
-            sprintf(umsg,"Incomplete compressed datastream in %s chunk",
+            png_snprintf(umsg, 52,
+                "Incomplete compressed datastream in %s chunk",
                 png_ptr->chunk_name);
          png_warning(png_ptr, umsg);
 #else
@@ -321,7 +324,8 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
       char umsg[50];
 
-      sprintf(umsg, "Unknown zTXt compression type %d", comp_type);
+      png_snprintf(umsg, 50,
+         "Unknown zTXt compression type %d", comp_type);
       png_warning(png_ptr, umsg);
 #else
       png_warning(png_ptr, "Unknown zTXt compression type");

@@ -1738,9 +1738,14 @@ version 1.2.19beta1 [May 18, 2007]
 version 1.2.19beta2 [May 18, 2007]
   Fixed png_do_expand() to only use the appropriate bits of tRNS value.
 
-version 1.2.19beta3 [May 20, 2007]
-  Add some "png_byte" typecasts in png_check_keyword().
-  Write new_key instead of key in zTXt chunk.
+version 1.2.19beta3 [May 19, 2007]
+  Add some "png_byte" typecasts in png_check_keyword() and write new_key
+  instead of key in zTXt chunk (Kevin Ryde).
+
+version 1.2.19beta4 [May 21, 2007]
+  Add png_snprintf() function and use it in place of sprint() for improved
+    defense against buffer overflows.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

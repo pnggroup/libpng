@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.17 May 15, 2007
+ * Last changed in libpng 1.2.19 May 21, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1250,7 +1250,8 @@ png_do_read_transformations(png_structp png_ptr)
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
       char msg[50];
 
-      sprintf(msg, "NULL row buffer for row %ld, pass %d", png_ptr->row_number,
+      png_snprintf2(msg, 50,
+         "NULL row buffer for row %ld, pass %d", png_ptr->row_number,
          png_ptr->pass);
       png_error(png_ptr, msg);
 #else

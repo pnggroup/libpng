@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.15 January 5, 2007
+ * Last changed in libpng 1.2.19 May 21, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -182,7 +182,7 @@ png_text_compress(png_structp png_ptr,
    {
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
       char msg[50];
-      sprintf(msg, "Unknown compression type %d", compression);
+      png_snprintf(msg, 50, "Unknown compression type %d", compression);
       png_warning(png_ptr, msg);
 #else
       png_warning(png_ptr, "Unknown compression type");
@@ -1237,7 +1237,8 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
          char msg[40];
 
-         sprintf(msg, "invalid keyword character 0x%02X", (png_byte)*kp);
+         png_snprintf(msg, 40,
+           "invalid keyword character 0x%02X", (png_byte)*kp);
          png_warning(png_ptr, msg);
 #else
          png_warning(png_ptr, "invalid character in keyword");
@@ -1623,9 +1624,9 @@ png_write_sCAL(png_structp png_ptr, int unit, double width, double height)
       total_len += wc_len;
    }
 #else
-   sprintf(buf + 1, "%12.12e", width);
+   png_snprintf(buf + 1, 63, "%12.12e", width);
    total_len = 1 + png_strlen(buf + 1) + 1;
-   sprintf(buf + total_len, "%12.12e", height);
+   png_snprintf(buf + total_len, 64-total_len, "%12.12e", height);
    total_len += png_strlen(buf + total_len);
 #endif
 

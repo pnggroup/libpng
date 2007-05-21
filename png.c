@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.19 May 20, 2007
+ * Last changed in libpng 1.2.19 May 21, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_19beta3 Your_png_h_is_not_version_1_2_19beta3;
+typedef version_1_2_19beta4 Your_png_h_is_not_version_1_2_19beta4;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -674,7 +674,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 #ifdef USE_FAR_KEYWORD
    {
       char near_time_buf[29];
-      sprintf(near_time_buf, "%d %s %d %02d:%02d:%02d +0000",
+      png_snprintf6(near_time_buf,29,"%d %s %d %02d:%02d:%02d +0000",
           ptime->day % 32, short_months[(ptime->month - 1) % 12],
           ptime->year, ptime->hour % 24, ptime->minute % 60,
           ptime->second % 61);
@@ -682,7 +682,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
           29*png_sizeof(char));
    }
 #else
-   sprintf(png_ptr->time_buffer, "%d %s %d %02d:%02d:%02d +0000",
+   png_snprintf6(png_ptr->time_buffer,29,"%d %s %d %02d:%02d:%02d +0000",
        ptime->day % 32, short_months[(ptime->month - 1) % 12],
        ptime->year, ptime->hour % 24, ptime->minute % 60,
        ptime->second % 61);
@@ -706,7 +706,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.19beta3 - May 20, 2007\n\
+   return ((png_charp) "\n libpng version 1.2.19beta4 - May 21, 2007\n\
    Copyright (c) 1998-2007 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");

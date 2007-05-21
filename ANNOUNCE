@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta3 - May 20, 2007
+Libpng 1.2.19beta4 - May 21, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta3.tar.gz
-   libpng-1.2.19beta3.tar.bz2
+   libpng-1.2.19beta4.tar.gz
+   libpng-1.2.19beta4.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta3-no-config.tar.gz
-   libpng-1.2.19beta3-no-config.tar.bz2
+   libpng-1.2.19beta4-no-config.tar.gz
+   libpng-1.2.19beta4-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b03.zip
-   lp1219b03.tar.bz2
+   lp1219b04.zip
+   lp1219b04.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta3-project-netware.zip
-   libpng-1.2.19beta3-project-wince.zip
+   libpng-1.2.19beta4-project-netware.zip
+   libpng-1.2.19beta4-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta3-README.txt
-   libpng-1.2.19beta3-KNOWNBUGS.txt
-   libpng-1.2.19beta3-LICENSE.txt
-   libpng-1.2.19beta3-Y2K-compliance.txt
+   libpng-1.2.19beta4-README.txt
+   libpng-1.2.19beta4-KNOWNBUGS.txt
+   libpng-1.2.19beta4-LICENSE.txt
+   libpng-1.2.19beta4-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -45,7 +45,7 @@ version 1.2.19beta1 [May 18, 2007]
 version 1.2.19beta2 [May 18, 2007]
   Fixed png_do_expand() to only use the appropriate bits of tRNS value.
 
-version 1.2.19beta3 [May 20, 2007]
+version 1.2.19beta3 [May 21, 2007]
   Add some "png_byte" typecasts in png_check_keyword().
   Write new_key instead of key in zTXt chunk.
 

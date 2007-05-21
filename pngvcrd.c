@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * Last changed in libpng 1.2.17 May 15, 2007
+ * Last changed in libpng 1.2.19 May 21, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -3693,32 +3693,32 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    png_debug(1, "in png_read_filter_row\n");
    switch (filter)
    {
-      case 0: sprintf(filnm, "none");
+      case 0: png_snprintf(filnm, 10, "none");
          break;
 #if !defined(PNG_1_0_X)
-      case 1: sprintf(filnm, "sub-%s",
+      case 1: png_snprintf(filnm, 10, "sub-%s",
         (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB)? "MMX" : "x86");
          break;
-      case 2: sprintf(filnm, "up-%s",
+      case 2: png_snprintf(filnm, 10, "up-%s",
         (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP)? "MMX" : "x86");
          break;
-      case 3: sprintf(filnm, "avg-%s",
+      case 3: png_snprintf(filnm, 10, "avg-%s",
         (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG)? "MMX" : "x86");
          break;
-      case 4: sprintf(filnm, "Paeth-%s",
+      case 4: png_snprintf(filnm, 10, "Paeth-%s",
         (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH)? "MMX":"x86");
          break;
 #else
-      case 1: sprintf(filnm, "sub");
+      case 1: png_snprintf(filnm, 10, "sub");
          break;
-      case 2: sprintf(filnm, "up");
+      case 2: png_snprintf(filnm, 10, "up");
          break;
-      case 3: sprintf(filnm, "avg");
+      case 3: png_snprintf(filnm, 10, "avg");
          break;
-      case 4: sprintf(filnm, "Paeth");
+      case 4: png_snprintf(filnm, 10, "Paeth");
          break;
 #endif
-      default: sprintf(filnm, "unknw");
+      default: png_snprintf(filnm, 10, "unknw");
          break;
    }
    png_debug2(0,"row=%5d, %s, ", png_ptr->row_number, filnm);

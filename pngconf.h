@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19beta3 - May 20, 2007
+ * libpng version 1.2.19beta4 - May 21, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1414,6 +1414,7 @@ typedef z_stream FAR *  png_zstreamp;
 #  define NOCHECK 0
 #  define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
 #  define CVT_PTR_NOCHECK(ptr) (png_far_to_near(png_ptr,ptr,NOCHECK))
+#  define png_snprintf _fsnprintf   /* Added to v 1.2.19 */
 #  define png_strcpy  _fstrcpy
 #  define png_strncpy _fstrncpy   /* Added to v 1.2.6 */
 #  define png_strlen  _fstrlen
@@ -1423,6 +1424,20 @@ typedef z_stream FAR *  png_zstreamp;
 #else /* use the usual functions */
 #  define CVT_PTR(ptr)         (ptr)
 #  define CVT_PTR_NOCHECK(ptr) (ptr)
+#  ifndef PNG_NO_SNPRINTF
+#    define png_snprintf snprintf   /* Added to v 1.2.19 */
+#    define png_snprintf2 snprintf
+#    define png_snprintf6 snprintf
+#  else
+     /* You don't have or don't want to use snprintf().  Caution: Using
+      * sprintf instead of snprintf exposes your application to accidental
+      * or malevolent buffer overflows.  If you don't have snprintf()
+      * as a general rule you should provide one. */
+#    define png_snprintf(s1,n,fmt,x1) sprintf(s1,fmt,x1)
+#    define png_snprintf2(s1,n,fmt,x1,x2) sprintf(s1,fmt,x1,x2)
+#    define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
+        sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
+#  endif
 #  define png_strcpy  strcpy
 #  define png_strncpy strncpy     /* Added to v 1.2.6 */
 #  define png_strlen  strlen
