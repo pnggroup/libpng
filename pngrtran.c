@@ -3747,7 +3747,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                }
                case 4:
                {
-                  gray = (png_uint_16)((gray&0x07)*0x11);
+                  gray = (png_uint_16)((gray&0x0f)*0x11);
                   sp = row + (png_size_t)((row_width - 1) >> 1);
                   dp = row + (png_size_t)row_width - 1;
                   shift = (int)((1 - ((row_width + 1) & 0x01)) << 2);

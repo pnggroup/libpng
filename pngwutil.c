@@ -378,7 +378,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    int interlace_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_IHDR;
+   PNG_CONST PNG_IHDR;
 #endif
    png_byte buf[13]; /* buffer to store the IHDR info */
 
@@ -578,7 +578,7 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
    png_ptr->num_palette = (png_uint_16)num_pal;
    png_debug1(3, "num_palette = %d\n", png_ptr->num_palette);
 
-   png_write_chunk_start(png_ptr, (png_bytep)png_PLTE, num_pal * 3);
+   png_write_chunk_start(png_ptr, png_PLTE, num_pal * 3);
 #ifndef PNG_NO_POINTER_INDEXING
    for (i = 0, pal_ptr = palette; i < num_pal; i++, pal_ptr++)
    {
@@ -607,7 +607,7 @@ void /* PRIVATE */
 png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_IDAT;
+   PNG_CONST PNG_IDAT;
 #endif
    png_debug(1, "in png_write_IDAT\n");
 
@@ -659,7 +659,7 @@ void /* PRIVATE */
 png_write_IEND(png_structp png_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_IEND;
+   PNG_CONST PNG_IEND;
 #endif
    png_debug(1, "in png_write_IEND\n");
    png_write_chunk(png_ptr, (png_bytep)png_IEND, png_bytep_NULL,
@@ -674,7 +674,7 @@ void /* PRIVATE */
 png_write_gAMA(png_structp png_ptr, double file_gamma)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_gAMA;
+   PNG_CONST PNG_gAMA;
 #endif
    png_uint_32 igamma;
    png_byte buf[4];
@@ -691,7 +691,7 @@ void /* PRIVATE */
 png_write_gAMA_fixed(png_structp png_ptr, png_fixed_point file_gamma)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_gAMA;
+   PNG_CONST PNG_gAMA;
 #endif
    png_byte buf[4];
 
@@ -709,7 +709,7 @@ void /* PRIVATE */
 png_write_sRGB(png_structp png_ptr, int srgb_intent)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_sRGB;
+   PNG_CONST PNG_sRGB;
 #endif
    png_byte buf[1];
 
@@ -783,7 +783,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
           PNG_COMPRESSION_TYPE_BASE, &comp);
 
    /* make sure we include the NULL after the name and the compression type */
-   png_write_chunk_start(png_ptr, (png_bytep)png_iCCP,
+   png_write_chunk_start(png_ptr, png_iCCP,
           (png_uint_32)name_len+profile_len+2);
    new_name[name_len+1]=0x00;
    png_write_chunk_data(png_ptr, (png_bytep)new_name, name_len + 2);
@@ -823,7 +823,7 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
    }
 
    /* make sure we include the NULL after the name */
-   png_write_chunk_start(png_ptr, (png_bytep)png_sPLT,
+   png_write_chunk_start(png_ptr, png_sPLT,
           (png_uint_32)(name_len + 2 + palette_size));
    png_write_chunk_data(png_ptr, (png_bytep)new_name, name_len + 1);
    png_write_chunk_data(png_ptr, (png_bytep)&spalette->depth, 1);
@@ -885,7 +885,7 @@ void /* PRIVATE */
 png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_sBIT;
+   PNG_CONST PNG_sBIT;
 #endif
    png_byte buf[4];
    png_size_t size;
@@ -944,7 +944,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    double blue_x, double blue_y)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_cHRM;
+   PNG_CONST PNG_cHRM;
 #endif
    png_byte buf[32];
    png_uint_32 itemp;
@@ -1006,7 +1006,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    png_fixed_point blue_y)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_cHRM;
+   PNG_CONST PNG_cHRM;
 #endif
    png_byte buf[32];
 
@@ -1059,7 +1059,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
    int num_trans, int color_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_tRNS;
+   PNG_CONST PNG_tRNS;
 #endif
    png_byte buf[6];
 
@@ -1113,7 +1113,7 @@ void /* PRIVATE */
 png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_bKGD;
+   PNG_CONST PNG_bKGD;
 #endif
    png_byte buf[6];
 
@@ -1180,7 +1180,7 @@ png_write_hIST(png_structp png_ptr, png_uint_16p hist, int num_hist)
       return;
    }
 
-   png_write_chunk_start(png_ptr, (png_bytep)png_hIST, (png_uint_32)(num_hist * 2));
+   png_write_chunk_start(png_ptr, png_hIST, (png_uint_32)(num_hist * 2));
    for (i = 0; i < num_hist; i++)
    {
       png_save_uint_16(buf, hist[i]);
@@ -1328,7 +1328,7 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
    png_size_t text_len)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_tEXt;
+   PNG_CONST PNG_tEXt;
 #endif
    png_size_t key_len;
    png_charp new_key;
@@ -1369,7 +1369,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
    png_size_t text_len, int compression)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_zTXt;
+   PNG_CONST PNG_zTXt;
 #endif
    png_size_t key_len;
    char buf[1];
@@ -1428,7 +1428,7 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
     png_charp lang, png_charp lang_key, png_charp text)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_iTXt;
+   PNG_CONST PNG_iTXt;
 #endif
    png_size_t lang_len, key_len, lang_key_len, text_len;
    png_charp new_lang, new_key;
@@ -1529,10 +1529,9 @@ png_write_oFFs(png_structp png_ptr, png_int_32 x_offset, png_int_32 y_offset,
    png_save_int_32(buf + 4, y_offset);
    buf[8] = (png_byte)unit_type;
 
-   png_write_chunk(png_ptr, (png_bytep)png_oFFs, buf, (png_size_t)9);
+   png_write_chunk(png_ptr, png_oFFs, buf, (png_size_t)9);
 }
 #endif
-
 #if defined(PNG_WRITE_pCAL_SUPPORTED)
 /* write the pCAL chunk (described in the PNG extensions document) */
 void /* PRIVATE */
@@ -1571,7 +1570,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    }
 
    png_debug1(3, "pCAL total length = %d\n", (int)total_len);
-   png_write_chunk_start(png_ptr, (png_bytep)png_pCAL, (png_uint_32)total_len);
+   png_write_chunk_start(png_ptr, png_pCAL, (png_uint_32)total_len);
    png_write_chunk_data(png_ptr, (png_bytep)new_purpose, purpose_len);
    png_save_int_32(buf, X0);
    png_save_int_32(buf + 4, X1);
@@ -1631,7 +1630,7 @@ png_write_sCAL(png_structp png_ptr, int unit, double width, double height)
 #endif
 
    png_debug1(3, "sCAL total length = %u\n", (unsigned int)total_len);
-   png_write_chunk(png_ptr, (png_bytep)png_sCAL, (png_bytep)buf, total_len);
+   png_write_chunk(png_ptr, png_sCAL, (png_bytep)buf, total_len);
 }
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
@@ -1661,7 +1660,7 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
    png_memcpy(buf + wlen + 2, height, hlen);  /* do NOT append the '\0' here */
 
    png_debug1(3, "sCAL total length = %u\n", (unsigned int)total_len);
-   png_write_chunk(png_ptr, (png_bytep)png_sCAL, buf, total_len);
+   png_write_chunk(png_ptr, png_sCAL, buf, total_len);
 }
 #endif
 #endif
@@ -1687,7 +1686,7 @@ png_write_pHYs(png_structp png_ptr, png_uint_32 x_pixels_per_unit,
    png_save_uint_32(buf + 4, y_pixels_per_unit);
    buf[8] = (png_byte)unit_type;
 
-   png_write_chunk(png_ptr, (png_bytep)png_pHYs, buf, (png_size_t)9);
+   png_write_chunk(png_ptr, png_pHYs, buf, (png_size_t)9);
 }
 #endif
 
@@ -1719,7 +1718,7 @@ png_write_tIME(png_structp png_ptr, png_timep mod_time)
    buf[5] = mod_time->minute;
    buf[6] = mod_time->second;
 
-   png_write_chunk(png_ptr, (png_bytep)png_tIME, buf, (png_size_t)7);
+   png_write_chunk(png_ptr, png_tIME, buf, (png_size_t)7);
 }
 #endif
 

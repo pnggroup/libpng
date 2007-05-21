@@ -567,8 +567,7 @@ png_handle_IEND(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    png_crc_finish(png_ptr, length);
 
-   if (info_ptr == NULL) /* quiet compiler warnings about unused info_ptr */
-      return;
+   info_ptr =info_ptr; /* quiet compiler warnings about unused info_ptr */
 }
 
 #if defined(PNG_READ_gAMA_SUPPORTED)
@@ -1238,8 +1237,14 @@ void /* PRIVATE */
 png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_byte readbuf[PNG_MAX_PALETTE_LENGTH];
+   int bit_mask;
 
    png_debug(1, "in png_handle_tRNS\n");
+
+   /* For non-indexed color, mask off any bits in the tRNS value that
+    * exceed the bit depth.  Some creators were writing extra bits there.
+    * This is not needed for indexed color. */
+   bit_mask = (1 << png_ptr->bit_depth) - 1;
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Missing IHDR before tRNS");
@@ -1269,7 +1274,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
       png_crc_read(png_ptr, buf, 2);
       png_ptr->num_trans = 1;
-      png_ptr->trans_values.gray = png_get_uint_16(buf);
+      png_ptr->trans_values.gray = png_get_uint_16(buf) & bit_mask;
    }
    else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
    {
@@ -1283,9 +1288,9 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
       png_crc_read(png_ptr, buf, (png_size_t)length);
       png_ptr->num_trans = 1;
-      png_ptr->trans_values.red = png_get_uint_16(buf);
-      png_ptr->trans_values.green = png_get_uint_16(buf + 2);
-      png_ptr->trans_values.blue = png_get_uint_16(buf + 4);
+      png_ptr->trans_values.red = png_get_uint_16(buf) & bit_mask;
+      png_ptr->trans_values.green = png_get_uint_16(buf + 2) & bit_mask;
+      png_ptr->trans_values.blue = png_get_uint_16(buf + 4) & bit_mask;
    }
    else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
@@ -2155,7 +2160,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_ptr->mode & PNG_HAVE_IDAT)
    {
 #ifdef PNG_USE_LOCAL_ARRAYS
-      PNG_IDAT;
+      PNG_CONST PNG_IDAT;
 #endif
       if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))  /* not an IDAT */
          png_ptr->mode |= PNG_AFTER_IDAT;
@@ -2876,7 +2881,7 @@ png_read_finish_row(png_structp png_ptr)
    if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
    {
 #ifdef PNG_USE_LOCAL_ARRAYS
-      PNG_IDAT;
+      PNG_CONST PNG_IDAT;
 #endif
       char extra;
       int ret;

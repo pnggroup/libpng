@@ -137,60 +137,60 @@ void /* PRIVATE */
 png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-      PNG_IHDR;
-      PNG_IDAT;
-      PNG_IEND;
-      PNG_PLTE;
+      PNG_CONST PNG_IHDR;
+      PNG_CONST PNG_IDAT;
+      PNG_CONST PNG_IEND;
+      PNG_CONST PNG_PLTE;
 #if defined(PNG_READ_bKGD_SUPPORTED)
-      PNG_bKGD;
+      PNG_CONST PNG_bKGD;
 #endif
 #if defined(PNG_READ_cHRM_SUPPORTED)
-      PNG_cHRM;
+      PNG_CONST PNG_cHRM;
 #endif
 #if defined(PNG_READ_gAMA_SUPPORTED)
-      PNG_gAMA;
+      PNG_CONST PNG_gAMA;
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)
-      PNG_hIST;
+      PNG_CONST PNG_hIST;
 #endif
 #if defined(PNG_READ_iCCP_SUPPORTED)
-      PNG_iCCP;
+      PNG_CONST PNG_iCCP;
 #endif
 #if defined(PNG_READ_iTXt_SUPPORTED)
-      PNG_iTXt;
+      PNG_CONST PNG_iTXt;
 #endif
 #if defined(PNG_READ_oFFs_SUPPORTED)
-      PNG_oFFs;
+      PNG_CONST PNG_oFFs;
 #endif
 #if defined(PNG_READ_pCAL_SUPPORTED)
-      PNG_pCAL;
+      PNG_CONST PNG_pCAL;
 #endif
 #if defined(PNG_READ_pHYs_SUPPORTED)
-      PNG_pHYs;
+      PNG_CONST PNG_pHYs;
 #endif
 #if defined(PNG_READ_sBIT_SUPPORTED)
-      PNG_sBIT;
+      PNG_CONST PNG_sBIT;
 #endif
 #if defined(PNG_READ_sCAL_SUPPORTED)
-      PNG_sCAL;
+      PNG_CONST PNG_sCAL;
 #endif
 #if defined(PNG_READ_sRGB_SUPPORTED)
-      PNG_sRGB;
+      PNG_CONST PNG_sRGB;
 #endif
 #if defined(PNG_READ_sPLT_SUPPORTED)
-      PNG_sPLT;
+      PNG_CONST PNG_sPLT;
 #endif
 #if defined(PNG_READ_tEXt_SUPPORTED)
-      PNG_tEXt;
+      PNG_CONST PNG_tEXt;
 #endif
 #if defined(PNG_READ_tIME_SUPPORTED)
-      PNG_tIME;
+      PNG_CONST PNG_tIME;
 #endif
 #if defined(PNG_READ_tRNS_SUPPORTED)
-      PNG_tRNS;
+      PNG_CONST PNG_tRNS;
 #endif
 #if defined(PNG_READ_zTXt_SUPPORTED)
-      PNG_zTXt;
+      PNG_CONST PNG_zTXt;
 #endif
 #endif /* PNG_USE_LOCAL_ARRAYS */
    /* First we make sure we have enough data for the 4 byte chunk name
@@ -660,7 +660,7 @@ void /* PRIVATE */
 png_push_read_IDAT(png_structp png_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_IDAT;
+   PNG_CONST PNG_IDAT;
 #endif
    if (!(png_ptr->mode & PNG_HAVE_CHUNK_HEADER))
    {

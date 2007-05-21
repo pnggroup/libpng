@@ -1736,7 +1736,7 @@ version 1.2.19beta1 [May 18, 2007]
     "if (unused == NULL) return;" becomes "unused = unused".
 
 version 1.2.19beta2 [May 18, 2007]
-  Fixed png_do_expand() to only use the appropriate bits of tRNS value.
+  Only use the valid bits of tRNS value in png_do_expand() (Brian Cartier)
 
 version 1.2.19beta3 [May 19, 2007]
   Add some "png_byte" typecasts in png_check_keyword() and write new_key
@@ -1746,6 +1746,10 @@ version 1.2.19beta4 [May 21, 2007]
   Add png_snprintf() function and use it in place of sprint() for improved
     defense against buffer overflows.
 
+version 1.2.19beta5 [May 21, 2007]
+  Fixed png_handle_tRNS() to only use the valid bits of tRNS value.
+  Changed handling of more unused parameters, to avoid compiler warnings.
+  Removed some PNG_CONST in pngwutil.c to avoid compiler warnings.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

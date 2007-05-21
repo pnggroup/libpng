@@ -1515,8 +1515,8 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
    /* It is REQUIRED to call this to finish writing the rest of the file */
    png_write_end(png_ptr, info_ptr);
 
-   if(transforms == 0 || params == NULL)
-      /* quiet compiler warnings */ return;
+   transforms = transforms; /* quiet compiler warnings */
+   params = params;
 }
 #endif
 #endif /* PNG_WRITE_SUPPORTED */
