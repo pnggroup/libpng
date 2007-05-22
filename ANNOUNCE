@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta5 - May 21, 2007
+Libpng 1.2.19beta6 - May 22, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta5.tar.gz
-   libpng-1.2.19beta5.tar.bz2
+   libpng-1.2.19beta6.tar.gz
+   libpng-1.2.19beta6.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta5-no-config.tar.gz
-   libpng-1.2.19beta5-no-config.tar.bz2
+   libpng-1.2.19beta6-no-config.tar.gz
+   libpng-1.2.19beta6-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b05.zip
-   lp1219b05.tar.bz2
+   lp1219b06.zip
+   lp1219b06.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta5-project-netware.zip
-   libpng-1.2.19beta5-project-wince.zip
+   libpng-1.2.19beta6-project-netware.zip
+   libpng-1.2.19beta6-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta5-README.txt
-   libpng-1.2.19beta5-KNOWNBUGS.txt
-   libpng-1.2.19beta5-LICENSE.txt
-   libpng-1.2.19beta5-Y2K-compliance.txt
+   libpng-1.2.19beta6-README.txt
+   libpng-1.2.19beta6-KNOWNBUGS.txt
+   libpng-1.2.19beta6-LICENSE.txt
+   libpng-1.2.19beta6-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -57,6 +57,10 @@ version 1.2.19beta5 [May 21, 2007]
   Fixed png_handle_tRNS() to only use the appropriate bits of tRNS value.
   Changed handling of more unused parameters, to avoid compiler warnings.
   Removed some PNG_CONST in pngwutil.c to avoid compiler warnings.
+
+version 1.2.19beta6 [May 22, 2007]
+  Added some #ifdef PNG_MMX_CODE_SUPPORTED where needed in pngvcrd.c
+  Added a special "_MSC_VER" case that defines png_snprintf to _snprintf
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

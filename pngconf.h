@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19beta5 - May 21, 2007
+ * libpng version 1.2.19beta6 - May 22, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1425,14 +1425,21 @@ typedef z_stream FAR *  png_zstreamp;
 #  define CVT_PTR(ptr)         (ptr)
 #  define CVT_PTR_NOCHECK(ptr) (ptr)
 #  ifndef PNG_NO_SNPRINTF
-#    define png_snprintf snprintf   /* Added to v 1.2.19 */
-#    define png_snprintf2 snprintf
-#    define png_snprintf6 snprintf
+#    ifdef _MSC_VER
+#      define png_snprintf _snprintf   /* Added to v 1.2.19 */
+#      define png_snprintf2 _snprintf
+#      define png_snprintf6 _snprintf
+#    else
+#      define png_snprintf snprintf   /* Added to v 1.2.19 */
+#      define png_snprintf2 snprintf
+#      define png_snprintf6 snprintf
+#    endif
 #  else
      /* You don't have or don't want to use snprintf().  Caution: Using
       * sprintf instead of snprintf exposes your application to accidental
       * or malevolent buffer overflows.  If you don't have snprintf()
-      * as a general rule you should provide one. */
+      * as a general rule you should provide one (you can get one from
+      * Portable OpenSSH). */
 #    define png_snprintf(s1,n,fmt,x1) sprintf(s1,fmt,x1)
 #    define png_snprintf2(s1,n,fmt,x1,x2) sprintf(s1,fmt,x1,x2)
 #    define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \

@@ -1723,7 +1723,7 @@ version 1.2.17rc4 [May 10, 2007]
 version 1.0.25 [May 15, 2007]
 version 1.2.17 [May 15, 2007]
   Added "png_ptr->num_trans=0" before error return in png_handle_tRNS,
-    to eliminate a vulnerability (CVE-2007-2554, CERT VU#684664)
+    to eliminate a vulnerability (CVE-2007-2445, CERT VU#684664)
 
 version 1.0.26 [May 15, 2007]
 version 1.2.18 [May 15, 2007]
@@ -1750,6 +1750,10 @@ version 1.2.19beta5 [May 21, 2007]
   Fixed png_handle_tRNS() to only use the valid bits of tRNS value.
   Changed handling of more unused parameters, to avoid compiler warnings.
   Removed some PNG_CONST in pngwutil.c to avoid compiler warnings.
+
+version 1.2.19beta6 [May 22, 2007]
+  Added some #ifdef PNG_MMX_CODE_SUPPORTED where needed in pngvcrd.c
+  Added a special "_MSC_VER" case that defines png_snprintf to _snprintf
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
