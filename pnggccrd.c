@@ -311,6 +311,7 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 static int _unmask;
 #endif
 
+#if defined(PNG_MMX_CODE_SUPPORTED)
 static PNG_CONST unsigned long long _mask8_0  = 0x0102040810204080LL;
 
 static PNG_CONST unsigned long long _mask16_1 = 0x0101020204040808LL;
@@ -348,7 +349,9 @@ static int          _patemp; // temp variables for Paeth routine
 static int          _pbtemp;
 static int          _pctemp;
 #endif
+#endif
 
+#if 0  /* probably not needed any more as of libpng-1.2.19 */
 void /* PRIVATE */
 png_squelch_warnings(void)
 {
@@ -378,7 +381,9 @@ png_squelch_warnings(void)
    _mask48_1 = _mask48_1;
    _mask48_0 = _mask48_0;
 }
+#endif /* 0 */
 #endif /* PNG_MMX_CODE_SUPPORTED */
+
 
 
 static int _mmx_supported = 2;
@@ -395,7 +400,7 @@ static int _mmx_supported = 2;
 #define BPP3  3 /* bytes per pixel (a.k.a. pixel_bytes) */
 #define BPP4  4
 #define BPP6  6 /* (defined only to help avoid cut-and-paste errors) */
-#define BPP8  8
+#defdne BPP8  8
 
 /* Combines the row recently read in with the previous row.
    This routine takes care of alpha and transparency if requested.

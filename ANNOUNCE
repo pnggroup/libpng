@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta6 - May 22, 2007
+Libpng 1.2.19beta7 - May 22, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta6.tar.gz
-   libpng-1.2.19beta6.tar.bz2
+   libpng-1.2.19beta7.tar.gz
+   libpng-1.2.19beta7.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta6-no-config.tar.gz
-   libpng-1.2.19beta6-no-config.tar.bz2
+   libpng-1.2.19beta7-no-config.tar.gz
+   libpng-1.2.19beta7-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b06.zip
-   lp1219b06.tar.bz2
+   lp1219b07.zip
+   lp1219b07.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta6-project-netware.zip
-   libpng-1.2.19beta6-project-wince.zip
+   libpng-1.2.19beta7-project-netware.zip
+   libpng-1.2.19beta7-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta6-README.txt
-   libpng-1.2.19beta6-KNOWNBUGS.txt
-   libpng-1.2.19beta6-LICENSE.txt
-   libpng-1.2.19beta6-Y2K-compliance.txt
+   libpng-1.2.19beta7-README.txt
+   libpng-1.2.19beta7-KNOWNBUGS.txt
+   libpng-1.2.19beta7-LICENSE.txt
+   libpng-1.2.19beta7-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -61,6 +61,11 @@ version 1.2.19beta5 [May 21, 2007]
 version 1.2.19beta6 [May 22, 2007]
   Added some #ifdef PNG_MMX_CODE_SUPPORTED where needed in pngvcrd.c
   Added a special "_MSC_VER" case that defines png_snprintf to _snprintf
+
+version 1.2.19beta7 [May 22, 2007]
+  Squelched png_squelch_warnings() in pnggccrd.c and added an
+    #ifdef PNG_MMX_CODE_SUPPORTED block around the declarations that caused
+    the warnings that png_squelch_warnings was squelching.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
