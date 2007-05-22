@@ -1755,10 +1755,13 @@ version 1.2.19beta6 [May 22, 2007]
   Added some #ifdef PNG_MMX_CODE_SUPPORTED where needed in pngvcrd.c
   Added a special "_MSC_VER" case that defines png_snprintf to _snprintf
 
-version 1.2.19beta6 [May 22, 2007]
+version 1.2.19beta7 [May 22, 2007]
   Squelched png_squelch_warnings() in pnggccrd.c and added an
     #ifdef PNG_MMX_CODE_SUPPORTED block around the declarations that caused
     the warnings that png_squelch_warnings was squelching.
+
+version 1.2.19beta8 [May 22, 2007]
+  Removed __MMX__ from test in pngconf.h.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

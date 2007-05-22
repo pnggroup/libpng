@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19beta7 - May 22, 2007
+ * libpng version 1.2.19beta8 - May 22, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -741,12 +741,11 @@
 #  endif
 #endif
 
-#  if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE) && \
-     defined(__MMX__)
+#  if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
 #    define PNG_MMX_CODE_SUPPORTED
 #  endif
 #  if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_NO_MMX_CODE) && \
-     !defined(PNG_USE_PNGVCRD) && defined(__MMX__)
+     !defined(PNG_USE_PNGVCRD)
 #    define PNG_USE_PNGGCCRD
 #  endif
 #endif

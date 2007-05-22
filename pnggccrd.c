@@ -400,7 +400,7 @@ static int _mmx_supported = 2;
 #define BPP3  3 /* bytes per pixel (a.k.a. pixel_bytes) */
 #define BPP4  4
 #define BPP6  6 /* (defined only to help avoid cut-and-paste errors) */
-#defdne BPP8  8
+#define BPP8  8
 
 /* Combines the row recently read in with the previous row.
    This routine takes care of alpha and transparency if requested.
