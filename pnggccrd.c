@@ -7,7 +7,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * Last changed in libpng 1.2.19 May 22, 2007
+ * Last changed in libpng 1.2.19 May 23, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -351,37 +351,39 @@ static int          _pctemp;
 #endif
 #endif
 
-#if 0  /* probably not needed any more as of libpng-1.2.19 */
+#ifdef PNG_SQUELCH_WARNINGS
 void /* PRIVATE */
 png_squelch_warnings(void)
 {
+   unsigned long long junk_ll;
 #ifdef PNG_THREAD_UNSAFE_OK
    _dif = _dif;
    _patemp = _patemp;
    _pbtemp = _pbtemp;
    _pctemp = _pctemp;
-   _MMXLength = _MMXLength;
+   _MMXLength= _MMXLength;
 #endif
-   _const4  = _const4;
-   _const6  = _const6;
-   _mask8_0  = _mask8_0;
-   _mask16_1 = _mask16_1;
-   _mask16_0 = _mask16_0;
-   _mask24_2 = _mask24_2;
-   _mask24_1 = _mask24_1;
-   _mask24_0 = _mask24_0;
-   _mask32_3 = _mask32_3;
-   _mask32_2 = _mask32_2;
-   _mask32_1 = _mask32_1;
-   _mask32_0 = _mask32_0;
-   _mask48_5 = _mask48_5;
-   _mask48_4 = _mask48_4;
-   _mask48_3 = _mask48_3;
-   _mask48_2 = _mask48_2;
-   _mask48_1 = _mask48_1;
-   _mask48_0 = _mask48_0;
+   junk_ll = _const4;
+   junk_ll = _const6;
+   junk_ll = _mask8_0;
+   junk_ll = _mask16_1;
+   junk_ll = _mask16_0;
+   junk_ll = _mask24_2;
+   junk_ll = _mask24_1;
+   junk_ll = _mask24_0;
+   junk_ll = _mask32_3;
+   junk_ll = _mask32_2;
+   junk_ll = _mask32_1;
+   junk_ll = _mask32_0;
+   junk_ll = _mask48_5;
+   junk_ll = _mask48_4;
+   junk_ll = _mask48_3;
+   junk_ll = _mask48_2;
+   junk_ll = _mask48_1;
+   junk_ll = _mask48_0;
+   junk_ll = junk_ll;
 }
-#endif /* 0 */
+#endif /* PNG_SQUELCH_WARNINGS */
 #endif /* PNG_MMX_CODE_SUPPORTED */
 
 

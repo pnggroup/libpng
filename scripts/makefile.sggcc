@@ -6,7 +6,7 @@
 # Library name:
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.19beta8
+PNGMIN = 1.2.19beta9
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -44,7 +44,8 @@ ZLIBINC=../zlib
 ABI=
 
 WARNMORE= # -g -DPNG_DEBUG=5
-CFLAGS=$(ABI) -I$(ZLIBINC) -O2 $(WARNMORE) -fPIC -mabi=n32
+CFLAGS=$(ABI) -I$(ZLIBINC) -O $(WARNMORE) -fPIC -mabi=n32 \
+  -DPNG_USE_PNGGCCRD -DPNG_NO_MMX_CODE
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=cc $(ABI) -shared -soname $(LIBSOMAJ) \
   -set_version sgi$(PNGMAJ).0
@@ -93,6 +94,7 @@ libpng-config:
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo ccopts=\"$(ABI)\"; \
+	echo cppflags=\"-DPNG_USE_PNGGCCRD -DPNG_NO_MMX_CODE\"; \
 	echo ldopts=\"$(ABI)\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo libdir=\"$(LIBPATH)\"; \

@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta8 - May 22, 2007
+Libpng 1.2.19beta9 - May 23, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta8.tar.gz
-   libpng-1.2.19beta8.tar.bz2
+   libpng-1.2.19beta9.tar.gz
+   libpng-1.2.19beta9.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta8-no-config.tar.gz
-   libpng-1.2.19beta8-no-config.tar.bz2
+   libpng-1.2.19beta9-no-config.tar.gz
+   libpng-1.2.19beta9-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b08.zip
-   lp1219b08.tar.bz2
+   lp1219b09.zip
+   lp1219b09.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta8-project-netware.zip
-   libpng-1.2.19beta8-project-wince.zip
+   libpng-1.2.19beta9-project-netware.zip
+   libpng-1.2.19beta9-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta8-README.txt
-   libpng-1.2.19beta8-KNOWNBUGS.txt
-   libpng-1.2.19beta8-LICENSE.txt
-   libpng-1.2.19beta8-Y2K-compliance.txt
+   libpng-1.2.19beta9-README.txt
+   libpng-1.2.19beta9-KNOWNBUGS.txt
+   libpng-1.2.19beta9-LICENSE.txt
+   libpng-1.2.19beta9-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -69,6 +69,11 @@ version 1.2.19beta7 [May 22, 2007]
 
 version 1.2.19beta8 [May 22, 2007]
   Removed __MMX__ from test in pngconf.h.
+
+version 1.2.19beta9 [May 23, 2007]
+  Made png_squelch_warnings() available via PNG_SQUELCH_WARNINGS macro.
+  Revised png_squelch_warnings() so it might work.
+  Updated makefile.sgcc and makefile.solaris; added makefile.solaris-x86.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
