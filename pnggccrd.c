@@ -7,7 +7,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * Last changed in libpng 1.2.19 May 23, 2007
+ * Last changed in libpng 1.2.19 May 22, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -225,8 +225,20 @@
  *  - eliminated incorrect use of width_mmx in pixel_bytes == 8 case
  *
  * 20040724:
- *   - more tinkering with clobber list at lines 4529 and 5033, to get
- *     it to compile on gcc-3.4.
+ *  - more tinkering with clobber list at lines 4529 and 5033 to get it to
+ *     compile with gcc 3.4
+ *
+ * 20070313:
+ *  - finally applied Giuseppe Ghibò's 64-bit patch of 20060803 (completely
+ *     overlooked Dylan Alex Simon's similar patch of 20060414, oops...)
+ *
+ * 20070524:
+ *  - fixed link failure caused by asm-only variables being optimized out
+ *     (identified by Dimitri of TrollTech) with __attribute__((used)), which
+ *     also gets rid of warnings => nuked ugly png_squelch_warnings() hack
+ *  - dropped redundant ifdef
+ *  - moved png_mmx_support() back up where originally intended (as in
+ *     pngvcrd.c), using __attribute__((noinline)) in extra prototype
  *
  * STILL TO DO:
  *     - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
@@ -256,6 +268,7 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #endif
 
 #if defined(PNG_MMX_CODE_SUPPORTED)
+
 /* djgpp, Win32, Cygwin, and OS2 add their own underscores to global variables,
  * so define them without: */
 #if defined(__DJGPP__) || defined(WIN32) || defined(__CYGWIN__) || \
@@ -295,100 +308,177 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #  define _pbtemp         pbtemp
 #  define _pctemp         pctemp
 #endif
-#endif
+#endif // djgpp, Win32, Cygwin, OS2
 
 
-/* These constants are used in the inlined MMX assembly code.
-   Ignore gcc's "At top level: defined but not used" warnings. */
+/* These constants are used in the inlined MMX assembly code. */
 
-/* GRR 20000706:  originally _unmask was needed only when compiling with -fPIC,
- *  since that case uses the %ebx register for indexing the Global Offset Table
- *  and there were no other registers available.  But gcc 2.95 and later emit
- *  "more than 10 operands in `asm'" errors when %ebx is used to preload unmask
- *  in the non-PIC case, so we'll just use the global unconditionally now.
- */
-#ifdef PNG_THREAD_UNSAFE_OK
-static int _unmask;
-#endif
+typedef unsigned long long  ull;
 
-#if defined(PNG_MMX_CODE_SUPPORTED)
-static PNG_CONST unsigned long long _mask8_0  = 0x0102040810204080LL;
+static PNG_CONST ull _mask8_0  __attribute__((used)) = 0x0102040810204080LL;
 
-static PNG_CONST unsigned long long _mask16_1 = 0x0101020204040808LL;
-static PNG_CONST unsigned long long _mask16_0 = 0x1010202040408080LL;
+static PNG_CONST ull _mask16_1 __attribute__((used)) = 0x0101020204040808LL;
+static PNG_CONST ull _mask16_0 __attribute__((used)) = 0x1010202040408080LL;
 
-static PNG_CONST unsigned long long _mask24_2 = 0x0101010202020404LL;
-static PNG_CONST unsigned long long _mask24_1 = 0x0408080810101020LL;
-static PNG_CONST unsigned long long _mask24_0 = 0x2020404040808080LL;
+static PNG_CONST ull _mask24_2 __attribute__((used)) = 0x0101010202020404LL;
+static PNG_CONST ull _mask24_1 __attribute__((used)) = 0x0408080810101020LL;
+static PNG_CONST ull _mask24_0 __attribute__((used)) = 0x2020404040808080LL;
 
-static PNG_CONST unsigned long long _mask32_3 = 0x0101010102020202LL;
-static PNG_CONST unsigned long long _mask32_2 = 0x0404040408080808LL;
-static PNG_CONST unsigned long long _mask32_1 = 0x1010101020202020LL;
-static PNG_CONST unsigned long long _mask32_0 = 0x4040404080808080LL;
+static PNG_CONST ull _mask32_3 __attribute__((used)) = 0x0101010102020202LL;
+static PNG_CONST ull _mask32_2 __attribute__((used)) = 0x0404040408080808LL;
+static PNG_CONST ull _mask32_1 __attribute__((used)) = 0x1010101020202020LL;
+static PNG_CONST ull _mask32_0 __attribute__((used)) = 0x4040404080808080LL;
 
-static PNG_CONST unsigned long long _mask48_5 = 0x0101010101010202LL;
-static PNG_CONST unsigned long long _mask48_4 = 0x0202020204040404LL;
-static PNG_CONST unsigned long long _mask48_3 = 0x0404080808080808LL;
-static PNG_CONST unsigned long long _mask48_2 = 0x1010101010102020LL;
-static PNG_CONST unsigned long long _mask48_1 = 0x2020202040404040LL;
-static PNG_CONST unsigned long long _mask48_0 = 0x4040808080808080LL;
+static PNG_CONST ull _mask48_5 __attribute__((used)) = 0x0101010101010202LL;
+static PNG_CONST ull _mask48_4 __attribute__((used)) = 0x0202020204040404LL;
+static PNG_CONST ull _mask48_3 __attribute__((used)) = 0x0404080808080808LL;
+static PNG_CONST ull _mask48_2 __attribute__((used)) = 0x1010101010102020LL;
+static PNG_CONST ull _mask48_1 __attribute__((used)) = 0x2020202040404040LL;
+static PNG_CONST ull _mask48_0 __attribute__((used)) = 0x4040808080808080LL;
 
-static PNG_CONST unsigned long long _const4   = 0x0000000000FFFFFFLL;
-//static PNG_CONST unsigned long long _const5 = 0x000000FFFFFF0000LL;     // NOT USED
-static PNG_CONST unsigned long long _const6   = 0x00000000000000FFLL;
+static PNG_CONST ull _const4   = 0x0000000000FFFFFFLL;
+//static PNG_CONST ull _const5 = 0x000000FFFFFF0000LL;     // NOT USED
+static PNG_CONST ull _const6   = 0x00000000000000FFLL;
 
 // These are used in the row-filter routines and should/would be local
-//  variables if not for gcc addressing limitations.
+//   variables if not for gcc addressing limitations (apparently lifted
+//   in either 3.x or 4.x).
 // WARNING: Their presence probably defeats the thread safety of libpng.
 
 #ifdef PNG_THREAD_UNSAFE_OK
-static png_uint_32  _FullLength;
-static png_uint_32  _MMXLength;
-static int          _dif;
-static int          _patemp; // temp variables for Paeth routine
-static int          _pbtemp;
-static int          _pctemp;
-#endif
-#endif
+// GRR 20000706:  originally _unmask was needed only when compiling with -fPIC,
+//   since that case uses the %ebx register to index the Global Offset Table,
+//   and there were no other registers available.  But gcc 2.95 and later emit
+//   "more than 10 operands in `asm'" errors when %ebx is used to preload
+//   unmask in non-PIC case, so we'll just use the global unconditionally now.
+static int          _unmask;
 
-#ifdef PNG_SQUELCH_WARNINGS
-void /* PRIVATE */
-png_squelch_warnings(void)
-{
-   unsigned long long junk_ll;
-#ifdef PNG_THREAD_UNSAFE_OK
-   _dif = _dif;
-   _patemp = _patemp;
-   _pbtemp = _pbtemp;
-   _pctemp = _pctemp;
-   _MMXLength= _MMXLength;
-#endif
-   junk_ll = _const4;
-   junk_ll = _const6;
-   junk_ll = _mask8_0;
-   junk_ll = _mask16_1;
-   junk_ll = _mask16_0;
-   junk_ll = _mask24_2;
-   junk_ll = _mask24_1;
-   junk_ll = _mask24_0;
-   junk_ll = _mask32_3;
-   junk_ll = _mask32_2;
-   junk_ll = _mask32_1;
-   junk_ll = _mask32_0;
-   junk_ll = _mask48_5;
-   junk_ll = _mask48_4;
-   junk_ll = _mask48_3;
-   junk_ll = _mask48_2;
-   junk_ll = _mask48_1;
-   junk_ll = _mask48_0;
-   junk_ll = junk_ll;
-}
-#endif /* PNG_SQUELCH_WARNINGS */
-#endif /* PNG_MMX_CODE_SUPPORTED */
+static png_uint_32  _FullLength;
+static png_uint_32  _MMXLength  __attribute__((used));
+static int          _dif        __attribute__((used));
+static int          _patemp     __attribute__((used)); // temp variables for
+static int          _pbtemp     __attribute__((used)); //  Paeth routine
+static int          _pctemp     __attribute__((used));
+#endif // PNG_THREAD_UNSAFE_OK
+
+#endif // PNG_MMX_CODE_SUPPORTED
 
 
 
 static int _mmx_supported = 2;
+
+/*===========================================================================*/
+/*                                                                           */
+/*                      P N G _ M M X _ S U P P O R T                        */
+/*                                                                           */
+/*===========================================================================*/
+
+/* GRR NOTES:  (1) the following code assumes 386 or better (pushfl/popfl)
+ *             (2) all instructions compile with gcc 2.7.2.3 and later
+ *           x (3) the function is moved down here to prevent gcc from
+ *           x      inlining it in multiple places and then barfing be-
+ *           x      cause the ".NOT_SUPPORTED" label is multiply defined
+ */
+
+// GRR 20070524:  This declaration apparently is compatible with but supersedes
+//   the one in png.h; in any case, the generated object file is slightly
+//   smaller.  It is unnecessary with gcc 4.1.2, but gcc 2.x apparently
+//   replicated the ".NOT_SUPPORTED" label in each location the function was
+//   inlined, leading to compilation errors due to the "multiply defined"
+//   label.  Old workaround was to leave the function at the end of this
+//   file; new one (still testing) is to use a gcc-specific function attribute
+//   to prevent inlining.
+int PNGAPI
+png_mmx_support(void) __attribute__((noinline));
+
+int PNGAPI
+png_mmx_support(void)
+{
+#if defined(PNG_MMX_CODE_SUPPORTED)
+    int result;
+    __asm__ __volatile__ (
+#ifdef __x86_64__
+        "pushq %%rbx          \n\t"  // rbx gets clobbered by CPUID instruction
+        "pushq %%rcx          \n\t"  // so does rcx...
+        "pushq %%rdx          \n\t"  // ...and rdx (but rcx & rdx safe on Linux)
+        "pushfq               \n\t"  // save Eflag to stack
+        "popq %%rax           \n\t"  // get Eflag from stack into rax
+        "movq %%rax, %%rcx    \n\t"  // make another copy of Eflag in rcx
+        "xorl $0x200000, %%eax \n\t" // toggle ID bit in Eflag (i.e., bit 21)
+        "pushq %%rax          \n\t"  // save modified Eflag back to stack
+        "popfq                \n\t"  // restore modified value to Eflag reg
+        "pushfq               \n\t"  // save Eflag to stack
+        "popq %%rax           \n\t"  // get Eflag from stack
+        "pushq %%rcx          \n\t"  // save original Eflag to stack
+        "popfq                \n\t"  // restore original Eflag
+#else
+        "pushl %%ebx          \n\t"  // ebx gets clobbered by CPUID instruction
+        "pushl %%ecx          \n\t"  // so does ecx...
+        "pushl %%edx          \n\t"  // ...and edx (but ecx & edx safe on Linux)
+        "pushfl               \n\t"  // save Eflag to stack
+        "popl %%eax           \n\t"  // get Eflag from stack into eax
+        "movl %%eax, %%ecx    \n\t"  // make another copy of Eflag in ecx
+        "xorl $0x200000, %%eax \n\t" // toggle ID bit in Eflag (i.e., bit 21)
+        "pushl %%eax          \n\t"  // save modified Eflag back to stack
+        "popfl                \n\t"  // restore modified value to Eflag reg
+        "pushfl               \n\t"  // save Eflag to stack
+        "popl %%eax           \n\t"  // get Eflag from stack
+        "pushl %%ecx          \n\t"  // save original Eflag to stack
+        "popfl                \n\t"  // restore original Eflag
+#endif
+        "xorl %%ecx, %%eax    \n\t"  // compare new Eflag with original Eflag
+        "jz 0f                \n\t"  // if same, CPUID instr. is not supported
+
+        "xorl %%eax, %%eax    \n\t"  // set eax to zero
+//      ".byte  0x0f, 0xa2    \n\t"  // CPUID instruction (two-byte opcode)
+        "cpuid                \n\t"  // get the CPU identification info
+        "cmpl $1, %%eax       \n\t"  // make sure eax return non-zero value
+        "jl 0f                \n\t"  // if eax is zero, MMX is not supported
+
+        "xorl %%eax, %%eax    \n\t"  // set eax to zero and...
+        "incl %%eax           \n\t"  // ...increment eax to 1.  This pair is
+                                     // faster than the instruction "mov eax, 1"
+        "cpuid                \n\t"  // get the CPU identification info again
+        "andl $0x800000, %%edx \n\t" // mask out all bits but MMX bit (23)
+        "cmpl $0, %%edx       \n\t"  // 0 = MMX not supported
+        "jz 0f                \n\t"  // non-zero = yes, MMX IS supported
+
+        "movl $1, %%eax       \n\t"  // set return value to 1
+        "jmp  1f              \n\t"  // DONE:  have MMX support
+
+    "0:                       \n\t"  // .NOT_SUPPORTED: target label for jump instructions
+        "movl $0, %%eax       \n\t"  // set return value to 0
+    "1:                       \n\t"  // .RETURN: target label for jump instructions
+#ifdef __x86_64__
+        "popq %%rdx           \n\t"  // restore rdx
+        "popq %%rcx           \n\t"  // restore rcx
+        "popq %%rbx           \n\t"  // restore rbx
+#else
+        "popl %%edx           \n\t"  // restore edx
+        "popl %%ecx           \n\t"  // restore ecx
+        "popl %%ebx           \n\t"  // restore ebx
+#endif
+
+//      "ret                  \n\t"  // DONE:  no MMX support
+                                     // (fall through to standard C "ret")
+
+        : "=a" (result)              // output list
+
+        :                            // any variables used on input (none)
+
+                                     // no clobber list
+//      , "%ebx", "%ecx", "%edx"     // GRR:  we handle these manually
+//      , "memory"   // if write to a variable gcc thought was in a reg
+//      , "cc"       // "condition codes" (flag bits)
+    );
+    _mmx_supported = result;
+#else
+    _mmx_supported = 0;
+#endif /* PNG_MMX_CODE_SUPPORTED */
+
+    return _mmx_supported;
+}
+
 
 /*===========================================================================*/
 /*                                                                           */
@@ -1746,7 +1836,7 @@ png_do_read_interlace(png_structp png_ptr)
                      int dummy_value_c;   // fix 'forbidden register spilled'
                      int dummy_value_S;
                      int dummy_value_D;
-                     int dummy_value_a;
+                     long dummy_value_a;
 
                      __asm__ __volatile__ (
                         "subl $21, %%edi         \n\t"
@@ -1799,7 +1889,7 @@ png_do_read_interlace(png_structp png_ptr)
                      int dummy_value_c;   // fix 'forbidden register spilled'
                      int dummy_value_S;
                      int dummy_value_D;
-                     int dummy_value_a;
+                     long dummy_value_a;
 
                      __asm__ __volatile__ (
                         "subl $9, %%edi          \n\t"
@@ -1853,8 +1943,8 @@ png_do_read_interlace(png_structp png_ptr)
                         int dummy_value_c;  // fix 'forbidden register spilled'
                         int dummy_value_S;
                         int dummy_value_D;
-                        int dummy_value_a;
-                        int dummy_value_d;
+                        long dummy_value_a;
+                        long dummy_value_d;
 
                         __asm__ __volatile__ (
                            "subl $3, %%esi          \n\t"
@@ -2802,7 +2892,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
    __asm__ __volatile__ (
       // initialize address pointers and offset
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                 \n\t" // save index to Global Offset Table
+#else
       "pushl %%ebx                 \n\t" // save index to Global Offset Table
+#endif
 #endif
 //pre "movl row, %%edi             \n\t" // edi:  Avg(x)
       "xorl %%ebx, %%ebx           \n\t" // ebx:  x
@@ -2858,7 +2952,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       "subl %%eax, %%ecx           \n\t" // drop over bytes from original length
       "movl %%ecx, _MMXLength      \n\t"
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                  \n\t" // restore index to Global Offset Table
+#else
       "popl %%ebx                  \n\t" // restore index to Global Offset Table
+#endif
 #endif
 
       : "=c" (dummy_value_c),            // output regs (dummy)
@@ -3234,7 +3332,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
          __asm__ __volatile__ (
             // re-init address pointers and offset
 #ifdef __PIC__
+#ifdef __x86_64__
+            "pushq %%rbx                 \n\t" // save Global Offset Table index
+#else
             "pushl %%ebx                 \n\t" // save Global Offset Table index
+#endif
 #endif
             "movl _dif, %%ebx            \n\t" // ebx:  x = offset to alignment
                                                // boundary
@@ -3265,7 +3367,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 
          "avg_1end:                      \n\t"
 #ifdef __PIC__
+#ifdef __x86_64
+            "popq %%rbx                  \n\t" // Global Offset Table index
+#else
             "popl %%ebx                  \n\t" // Global Offset Table index
+#endif
 #endif
 
             : "=c" (dummy_value_c),            // output regs (dummy)
@@ -3394,7 +3500,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       // MMX acceleration complete; now do clean-up
       // check if any remaining bytes left to decode
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                 \n\t" // save index to Global Offset Table
+#else
       "pushl %%ebx                 \n\t" // save index to Global Offset Table
+#endif
 #endif
       "movl _MMXLength, %%ebx      \n\t" // ebx:  x == offset bytes after MMX
 //pre "movl row, %%edi             \n\t" // edi:  Avg(x)
@@ -3424,7 +3534,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
    "avg_end:                       \n\t"
       "EMMS                        \n\t" // end MMX; prep for poss. FP instrs.
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                  \n\t" // restore index to Global Offset Table
+#else
       "popl %%ebx                  \n\t" // restore index to Global Offset Table
+#endif
 #endif
 
       : "=c" (dummy_value_c),            // output regs (dummy)
@@ -3469,7 +3583,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 
    __asm__ __volatile__ (
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                 \n\t" // save index to Global Offset Table
+#else
       "pushl %%ebx                 \n\t" // save index to Global Offset Table
+#endif
 #endif
       "xorl %%ebx, %%ebx           \n\t" // ebx:  x offset
 //pre "movl row, %%edi             \n\t"
@@ -3579,7 +3697,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       "subl %%eax, %%ecx           \n\t" // drop over bytes from original length
       "movl %%ecx, _MMXLength      \n\t"
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                  \n\t" // restore index to Global Offset Table
+#else
       "popl %%ebx                  \n\t" // restore index to Global Offset Table
+#endif
 #endif
 
       : "=c" (dummy_value_c),            // output regs (dummy)
@@ -4279,7 +4401,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       {
          __asm__ __volatile__ (
 #ifdef __PIC__
+#ifdef __x86_64__
+            "pushq %%rbx                 \n\t" // save Global Offset Table index
+#else
             "pushl %%ebx                 \n\t" // save Global Offset Table index
+#endif
 #endif
             "movl _dif, %%ebx            \n\t"
             "cmpl _FullLength, %%ebx     \n\t"
@@ -4366,7 +4492,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 
          "paeth_dend:                    \n\t"
 #ifdef __PIC__
+#ifdef __x86_64__
+            "popq %%rbx                  \n\t" // index to Global Offset Table
+#else
             "popl %%ebx                  \n\t" // index to Global Offset Table
+#endif
 #endif
 
             : "=c" (dummy_value_c),            // output regs (dummy)
@@ -4391,7 +4521,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       // MMX acceleration complete; now do clean-up
       // check if any remaining bytes left to decode
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                 \n\t" // save index to Global Offset Table
+#else
       "pushl %%ebx                 \n\t" // save index to Global Offset Table
+#endif
 #endif
       "movl _MMXLength, %%ebx      \n\t"
       "cmpl _FullLength, %%ebx     \n\t"
@@ -4478,7 +4612,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
    "paeth_end:                     \n\t"
       "EMMS                        \n\t" // end MMX; prep for poss. FP instrs.
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                  \n\t" // restore index to Global Offset Table
+#else
       "popl %%ebx                  \n\t" // restore index to Global Offset Table
+#endif
 #endif
 
       : "=c" (dummy_value_c),            // output regs (dummy)
@@ -4947,7 +5085,11 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
 //pre "movl row, %%edi              \n\t"
       // get # of bytes to alignment
 #ifdef __PIC__
+#ifdef __x86_64__
+      "pushq %%rbx                  \n\t"
+#else
       "pushl %%ebx                  \n\t"
+#endif
 #endif
       "movl %%edi, %%ecx            \n\t"
       "xorl %%ebx, %%ebx            \n\t"
@@ -5049,7 +5191,11 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
    "up_end:                         \n\t"
       "EMMS                         \n\t" // conversion of filtered row complete
 #ifdef __PIC__
+#ifdef __x86_64__
+      "popq %%rbx                   \n\t"
+#else
       "popl %%ebx                   \n\t"
+#endif
 #endif
 
       : "=d" (dummy_value_d),   // 0      // output regs (dummy)
@@ -5336,92 +5482,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #endif /* PNG_HAVE_MMX_READ_FILTER_ROW */
 
 
-/*===========================================================================*/
-/*                                                                           */
-/*                      P N G _ M M X _ S U P P O R T                        */
-/*                                                                           */
-/*===========================================================================*/
-
-/* GRR NOTES:  (1) the following code assumes 386 or better (pushfl/popfl)
- *             (2) all instructions compile with gcc 2.7.2.3 and later
- *             (3) the function is moved down here to prevent gcc from
- *                  inlining it in multiple places and then barfing be-
- *                  cause the ".NOT_SUPPORTED" label is multiply defined
- *             [is there a way to signal that a *single* function should
- *              not be inlined?  is there a way to modify the label for
- *              each inlined instance, e.g., by appending _1, _2, etc.?
- *              maybe if don't use leading "." in label name? (nope...sigh)]
- */
-
-int PNGAPI
-png_mmx_support(void)
-{
-#if defined(PNG_MMX_CODE_SUPPORTED)
-    int result;
-    __asm__ __volatile__ (
-        "pushl %%ebx          \n\t"  // ebx gets clobbered by CPUID instruction
-        "pushl %%ecx          \n\t"  // so does ecx...
-        "pushl %%edx          \n\t"  // ...and edx (but ecx & edx safe on Linux)
-//      ".byte  0x66          \n\t"  // convert 16-bit pushf to 32-bit pushfd
-//      "pushf                \n\t"  // 16-bit pushf
-        "pushfl               \n\t"  // save Eflag to stack
-        "popl %%eax           \n\t"  // get Eflag from stack into eax
-        "movl %%eax, %%ecx    \n\t"  // make another copy of Eflag in ecx
-        "xorl $0x200000, %%eax \n\t" // toggle ID bit in Eflag (i.e., bit 21)
-        "pushl %%eax          \n\t"  // save modified Eflag back to stack
-//      ".byte  0x66          \n\t"  // convert 16-bit popf to 32-bit popfd
-//      "popf                 \n\t"  // 16-bit popf
-        "popfl                \n\t"  // restore modified value to Eflag reg
-        "pushfl               \n\t"  // save Eflag to stack
-        "popl %%eax           \n\t"  // get Eflag from stack
-        "pushl %%ecx          \n\t"  // save original Eflag to stack
-        "popfl                \n\t"  // restore original Eflag
-        "xorl %%ecx, %%eax    \n\t"  // compare new Eflag with original Eflag
-        "jz 0f                \n\t"  // if same, CPUID instr. is not supported
-
-        "xorl %%eax, %%eax    \n\t"  // set eax to zero
-//      ".byte  0x0f, 0xa2    \n\t"  // CPUID instruction (two-byte opcode)
-        "cpuid                \n\t"  // get the CPU identification info
-        "cmpl $1, %%eax       \n\t"  // make sure eax return non-zero value
-        "jl 0f                \n\t"  // if eax is zero, MMX is not supported
-
-        "xorl %%eax, %%eax    \n\t"  // set eax to zero and...
-        "incl %%eax           \n\t"  // ...increment eax to 1.  This pair is
-                                     // faster than the instruction "mov eax, 1"
-        "cpuid                \n\t"  // get the CPU identification info again
-        "andl $0x800000, %%edx \n\t" // mask out all bits but MMX bit (23)
-        "cmpl $0, %%edx       \n\t"  // 0 = MMX not supported
-        "jz 0f                \n\t"  // non-zero = yes, MMX IS supported
-
-        "movl $1, %%eax       \n\t"  // set return value to 1
-        "jmp  1f              \n\t"  // DONE:  have MMX support
-
-    "0:                       \n\t"  // .NOT_SUPPORTED: target label for jump instructions
-        "movl $0, %%eax       \n\t"  // set return value to 0
-    "1:                       \n\t"  // .RETURN: target label for jump instructions
-        "popl %%edx           \n\t"  // restore edx
-        "popl %%ecx           \n\t"  // restore ecx
-        "popl %%ebx           \n\t"  // restore ebx
-
-//      "ret                  \n\t"  // DONE:  no MMX support
-                                     // (fall through to standard C "ret")
-
-        : "=a" (result)              // output list
-
-        :                            // any variables used on input (none)
-
-                                     // no clobber list
-//      , "%ebx", "%ecx", "%edx"     // GRR:  we handle these manually
-//      , "memory"   // if write to a variable gcc thought was in a reg
-//      , "cc"       // "condition codes" (flag bits)
-    );
-    _mmx_supported = result;
-#else
-    _mmx_supported = 0;
-#endif /* PNG_MMX_CODE_SUPPORTED */
-
-    return _mmx_supported;
-}
-
-
 #endif /* PNG_USE_PNGGCCRD */
+
+

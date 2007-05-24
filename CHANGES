@@ -1763,10 +1763,13 @@ version 1.2.19beta7 [May 22, 2007]
 version 1.2.19beta8 [May 22, 2007]
   Removed __MMX__ from test in pngconf.h.
 
-version 1.2.19beta9 [May 23, 2007]
+version 1.2.19beta9 [May 24, 2007]
   Made png_squelch_warnings() available via PNG_SQUELCH_WARNINGS macro.
   Revised png_squelch_warnings() so it might work.
   Updated makefile.sgcc and makefile.solaris; added makefile.solaris-x86.
+
+version 1.2.19beta10 [May 24, 2007]
+  Resquelched png_squelch_warnings(), use "__attribute__((used))" instead.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
