@@ -1,9 +1,9 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.2.19 May 24, 2007
+ * Last changed in libpng 1.2.19 May 28, 2007
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2006 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -106,6 +106,7 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
       png_default_warning(png_ptr, warning_message+offset);
 }
 
+
 /* These utilities are used internally to build an error message that relates
  * to the current chunk.  The chunk name comes from png_ptr->chunk_name,
  * this is used to prefix the message.  The message is limited in length
@@ -177,6 +178,7 @@ png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
    }
 }
 
+
 /* This is the default error handling function.  Note that replacements for
  * this function MUST NOT RETURN, or the program will likely crash.  This
  * function is used by default, or if the program supplies NULL for the
@@ -217,7 +219,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 #  ifdef USE_FAR_KEYWORD
    {
       jmp_buf jmpbuf;
-      png_memcpy(jmpbuf,png_ptr->jmpbuf,png_sizeof(jmp_buf));
+      png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
       longjmp(jmpbuf, 1);
    }
 #  else
@@ -228,7 +230,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    PNG_ABORT();
 #endif
 #ifdef PNG_NO_CONSOLE_IO
-   error_message = error_message; /* make compiler happy */ ;
+   error_message = error_message; /* make compiler happy */
 #endif
 }
 
@@ -265,9 +267,9 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 #  endif
      fprintf(stderr, "libpng warning: %s\n", warning_message);
 #else
-   warning_message = warning_message; /* make compiler happy */ ;
+   warning_message = warning_message; /* make compiler happy */
 #endif
-   png_ptr = png_ptr; /* make compiler happy */ ;
+   png_ptr = png_ptr; /* make compiler happy */
 }
 
 /* This function is called when the application wants to use another method

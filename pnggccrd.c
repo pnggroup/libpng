@@ -7,7 +7,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * Last changed in libpng 1.2.19 May 22, 2007
+ * Last changed in libpng 1.2.19 May 28, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -234,7 +234,7 @@
  *
  * 20070524:
  *  - fixed link failure caused by asm-only variables being optimized out
- *     (identified by Dimitri of TrollTech) with __attribute__((used)), which
+ *     (identified by Dimitri of Trolltech) with __attribute__((used)), which
  *     also gets rid of warnings => nuked ugly png_squelch_warnings() hack
  *  - dropped redundant ifdef
  *  - moved png_mmx_support() back up where originally intended (as in
@@ -365,7 +365,7 @@ static int          _pctemp     __attribute__((used));
 
 
 
-static int _mmx_supported = 2;
+static int _mmx_supported = 2; // 0: no MMX; 1: MMX supported; 2: not tested 
 
 /*===========================================================================*/
 /*                                                                           */
@@ -1614,8 +1614,8 @@ png_do_read_interlace(png_structp png_ptr)
        png_warning(png_ptr, "asm_flags may not have been initialized");
 #endif
        png_mmx_support();
-   }
 #endif
+   }
 
    if (row != NULL && row_info != NULL)
    {

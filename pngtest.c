@@ -1007,10 +1007,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_tIME(write_ptr, write_info_ptr, mod_time);
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
-         /* we have to use png_strcpy instead of "=" because the string
+         /* we have to use png_strncpy instead of "=" because the string
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
-         png_strcpy(tIME_string,png_convert_to_rfc1123(read_ptr, mod_time));
+         png_strncpy(tIME_string,png_convert_to_rfc1123(read_ptr,
+            mod_time),30);
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
       }
@@ -1147,10 +1148,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
-         /* we have to use png_strcpy instead of "=" because the string
+         /* we have to use png_strncpy instead of "=" because the string
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
-         png_strcpy(tIME_string,png_convert_to_rfc1123(read_ptr, mod_time));
+         png_strncpy(tIME_string,png_convert_to_rfc1123(read_ptr,
+            mod_time),30);
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
       }
@@ -1551,4 +1553,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_19beta10 your_png_h_is_not_version_1_2_19beta10;
+typedef version_1_2_19beta11 your_png_h_is_not_version_1_2_19beta11;

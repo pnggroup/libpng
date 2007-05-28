@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19beta10 - May 24, 2007
+ * libpng version 1.2.19beta11 - May 28, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -275,6 +275,7 @@
 #else
 #  define PNGARG(arglist) arglist
 #endif /* _NO_PROTO */
+
 
 #endif /* OF */
 

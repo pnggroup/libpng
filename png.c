@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.19 May 24, 2007
+ * Last changed in libpng 1.2.19 May 28, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_19beta10 Your_png_h_is_not_version_1_2_19beta10;
+typedef version_1_2_19beta11 Your_png_h_is_not_version_1_2_19beta11;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -134,7 +134,7 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 #if defined(PNG_1_0_X) || defined(PNG_1_2_X)
 /* (Obsolete) function to check signature bytes.  It does not allow one
  * to check a partial signature.  This function might be removed in the
- * future - use png_sig_cmp().  Returns true (nonzero) if the file is a PNG.
+ * future - use png_sig_cmp().  Returns true (nonzero) if the file is PNG.
  */
 int PNGAPI
 png_check_sig(png_bytep sig, int num)
@@ -706,7 +706,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.19beta10 - May 24, 2007\n\
+   return ((png_charp) "\n libpng version 1.2.19beta11 - May 28, 2007\n\
    Copyright (c) 1998-2007 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -839,8 +839,8 @@ png_mmx_support(void)
     return -1;
 }
 #endif
-#endif /* PNG_1_0_X  && PNG_ASSEMBLER_CODE_SUPPORTED */
-#endif /* PNG_READ_SUPPORTED */
+#endif /* PNG_1_0_X */
+#endif /* PNG_READ_SUPPORTED && PNG_ASSEMBLER_CODE_SUPPORTED */
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 #ifdef PNG_SIZE_T
