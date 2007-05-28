@@ -1776,6 +1776,9 @@ version 1.2.19beta11 [May 28, 2007]
     changed three remaining instances of png_strcpy() to png_strncpy() (David
     Hill).
 
+version 1.2.19beta12 [May 28, 2007]
+  Revised pnggccrd.c.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

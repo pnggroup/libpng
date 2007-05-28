@@ -10,6 +10,7 @@
  * Last changed in libpng 1.2.19 May 28, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1999-2002,2007 Greg Roelofs
  * Copyright (c) 1998, Intel Corporation
  *
  * Based on MSVC code contributed by Nirav Chhatrapati, Intel Corp., 1998.
@@ -44,8 +45,8 @@
  */
 
 /*
- * TEMPORARY PORTING NOTES AND CHANGELOG (mostly by Greg Roelofs)
- * =====================================
+ * PORTING NOTES AND CHANGELOG (mostly by Greg Roelofs)
+ * ===========================
  *
  * 19991006:
  *  - fixed sign error in post-MMX cleanup code (16- & 32-bit cases)
@@ -240,6 +241,51 @@
  *  - moved png_mmx_support() back up where originally intended (as in
  *     pngvcrd.c), using __attribute__((noinline)) in extra prototype
  *
+ * 20070527:
+ *  - revised png_combine_row() to reuse mask in lieu of external _unmask
+ *  - moved 32-bit (RGBA) case to top of png_combine_row():  most common
+ *  - just about ready to give up on x86_64 -fPIC mode; apparently can't even
+ *     access 16 _mask*_* constants without triggering link error on shared
+ *     library:
+ *       /usr/bin/ld: pnggccrd.pic.o: relocation R_X86_64_32S against `a local
+ *         symbol' can not be used when making a shared object; recompile with
+ *         -fPIC
+ *       pnggccrd.pic.o: could not read symbols: Bad value
+ *     [might be able to work around by doing within assembly code whatever
+ *     -fPIC does, but given problems to date, seems like long shot...]
+ *     [relevant ifdefs:  __x86_64__ && __PIC__ => C code only]
+ *  - changed #if 0 to #ifdef CLOBBER_MMX_REGS_SUPPORTED in case gcc ever
+ *     supports MMX regs (%mm0, etc.) in clobber list (not supported by gcc
+ *     2.7.2.3, 2.91.66 (egcs 1.1.2), 3.x, or 4.1.2)
+
+ *
+ * STATUS OF 64-BIT SHARED-LIBRARY BUG, 20070526:
+ *
+ * 499-1600:  png_combine_row()
+ *  - FAILS
+ *  - used to use _unmask; no longer, but still fails (new cause = _mask* vars)
+ *     (objdump -x pnggccrd.pic.o | grep rodata)
+ *
+ * 1602-2873:  png_do_read_interlace()
+ *  - WORKS
+ *  - does not use any static vars except _mmx_supported (can comment out
+ *    PNG_THREAD_UNSAFE_OK vars entirely)
+ *
+ * 2877-5241:  png_read_filter_row_mmx_avg(), png_read_filter_row_mmx_paeth(),
+ *             png_read_filter_row_mmx_sub(), png_read_filter_row_mmx_up()
+ *  - FAILS
+ *  - uses _FullLength, _MMXLength, _dif, _patemp, _pbtemp, _pctemp
+ *  - also uses other globals:
+ *
+ *      union uAll {
+ *         long long use;
+ *         double  align;
+ *      } _LBCarryMask = {0x0101010101010101LL},
+ *        _HBClearMask = {0x7f7f7f7f7f7f7f7fLL},
+ *        _ActiveMask, _ActiveMask2, _ActiveMaskEnd, _ShiftBpp, _ShiftRem;
+ *
+
+ *
  * STILL TO DO:
  *     - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
  *     - write MMX code for 48-bit case (pixel_bytes == 6)
@@ -300,7 +346,6 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #  define _ShiftBpp       ShiftBpp
 #  define _ShiftRem       ShiftRem
 #ifdef PNG_THREAD_UNSAFE_OK
-#  define _unmask         unmask
 #  define _FullLength     FullLength
 #  define _MMXLength      MMXLength
 #  define _dif            dif
@@ -346,26 +391,19 @@ static PNG_CONST ull _const6   = 0x00000000000000FFLL;
 // WARNING: Their presence probably defeats the thread safety of libpng.
 
 #ifdef PNG_THREAD_UNSAFE_OK
-// GRR 20000706:  originally _unmask was needed only when compiling with -fPIC,
-//   since that case uses the %ebx register to index the Global Offset Table,
-//   and there were no other registers available.  But gcc 2.95 and later emit
-//   "more than 10 operands in `asm'" errors when %ebx is used to preload
-//   unmask in non-PIC case, so we'll just use the global unconditionally now.
-static int          _unmask;
-
 static png_uint_32  _FullLength;
 static png_uint_32  _MMXLength  __attribute__((used));
 static int          _dif        __attribute__((used));
 static int          _patemp     __attribute__((used)); // temp variables for
 static int          _pbtemp     __attribute__((used)); //  Paeth routine
 static int          _pctemp     __attribute__((used));
-#endif // PNG_THREAD_UNSAFE_OK
+#endif
 
 #endif // PNG_MMX_CODE_SUPPORTED
 
 
 
-static int _mmx_supported = 2; // 0: no MMX; 1: MMX supported; 2: not tested 
+static int _mmx_supported = 2; // 0: no MMX; 1: MMX supported; 2: not tested
 
 /*===========================================================================*/
 /*                                                                           */
@@ -533,631 +571,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
    {
       switch (png_ptr->row_info.pixel_depth)
       {
-         case 1:        /* png_ptr->row_info.pixel_depth */
-         {
-            png_bytep sp;
-            png_bytep dp;
-            int s_inc, s_start, s_end;
-            int m;
-            int shift;
-            png_uint_32 i;
-
-            sp = png_ptr->row_buf + 1;
-            dp = row;
-            m = 0x80;
-#if defined(PNG_READ_PACKSWAP_SUPPORTED)
-            if (png_ptr->transformations & PNG_PACKSWAP)
-            {
-                s_start = 0;
-                s_end = 7;
-                s_inc = 1;
-            }
-            else
-#endif
-            {
-                s_start = 7;
-                s_end = 0;
-                s_inc = -1;
-            }
-
-            shift = s_start;
-
-            for (i = 0; i < png_ptr->width; i++)
-            {
-               if (m & mask)
-               {
-                  int value;
-
-                  value = (*sp >> shift) & 0x1;
-                  *dp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
-                  *dp |= (png_byte)(value << shift);
-               }
-
-               if (shift == s_end)
-               {
-                  shift = s_start;
-                  sp++;
-                  dp++;
-               }
-               else
-                  shift += s_inc;
-
-               if (m == 1)
-                  m = 0x80;
-               else
-                  m >>= 1;
-            }
-            break;
-         }
-
-         case 2:        /* png_ptr->row_info.pixel_depth */
-         {
-            png_bytep sp;
-            png_bytep dp;
-            int s_start, s_end, s_inc;
-            int m;
-            int shift;
-            png_uint_32 i;
-            int value;
-
-            sp = png_ptr->row_buf + 1;
-            dp = row;
-            m = 0x80;
-#if defined(PNG_READ_PACKSWAP_SUPPORTED)
-            if (png_ptr->transformations & PNG_PACKSWAP)
-            {
-               s_start = 0;
-               s_end = 6;
-               s_inc = 2;
-            }
-            else
-#endif
-            {
-               s_start = 6;
-               s_end = 0;
-               s_inc = -2;
-            }
-
-            shift = s_start;
-
-            for (i = 0; i < png_ptr->width; i++)
-            {
-               if (m & mask)
-               {
-                  value = (*sp >> shift) & 0x3;
-                  *dp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
-                  *dp |= (png_byte)(value << shift);
-               }
-
-               if (shift == s_end)
-               {
-                  shift = s_start;
-                  sp++;
-                  dp++;
-               }
-               else
-                  shift += s_inc;
-               if (m == 1)
-                  m = 0x80;
-               else
-                  m >>= 1;
-            }
-            break;
-         }
-
-         case 4:        /* png_ptr->row_info.pixel_depth */
-         {
-            png_bytep sp;
-            png_bytep dp;
-            int s_start, s_end, s_inc;
-            int m;
-            int shift;
-            png_uint_32 i;
-            int value;
-
-            sp = png_ptr->row_buf + 1;
-            dp = row;
-            m = 0x80;
-#if defined(PNG_READ_PACKSWAP_SUPPORTED)
-            if (png_ptr->transformations & PNG_PACKSWAP)
-            {
-               s_start = 0;
-               s_end = 4;
-               s_inc = 4;
-            }
-            else
-#endif
-            {
-               s_start = 4;
-               s_end = 0;
-               s_inc = -4;
-            }
-            shift = s_start;
-
-            for (i = 0; i < png_ptr->width; i++)
-            {
-               if (m & mask)
-               {
-                  value = (*sp >> shift) & 0xf;
-                  *dp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
-                  *dp |= (png_byte)(value << shift);
-               }
-
-               if (shift == s_end)
-               {
-                  shift = s_start;
-                  sp++;
-                  dp++;
-               }
-               else
-                  shift += s_inc;
-               if (m == 1)
-                  m = 0x80;
-               else
-                  m >>= 1;
-            }
-            break;
-         }
-
-         case 8:        /* png_ptr->row_info.pixel_depth */
-         {
-            png_bytep srcptr;
-            png_bytep dstptr;
-
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
-#if !defined(PNG_1_0_X)
-            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
-                /* && _mmx_supported */ )
-#else
-            if (_mmx_supported)
-#endif
-            {
-               png_uint_32 len;
-               int diff;
-               int dummy_value_a;   // fix 'forbidden register spilled' error
-               int dummy_value_d;
-               int dummy_value_c;
-               int dummy_value_S;
-               int dummy_value_D;
-               _unmask = ~mask;            // global variable for -fPIC version
-               srcptr = png_ptr->row_buf + 1;
-               dstptr = row;
-               len  = png_ptr->width &~7;  // reduce to multiple of 8
-               diff = (int) (png_ptr->width & 7);  // amount lost
-
-               __asm__ __volatile__ (
-                  "movd      _unmask, %%mm7  \n\t" // load bit pattern
-                  "psubb     %%mm6, %%mm6    \n\t" // zero mm6
-                  "punpcklbw %%mm7, %%mm7    \n\t"
-                  "punpcklwd %%mm7, %%mm7    \n\t"
-                  "punpckldq %%mm7, %%mm7    \n\t" // fill reg with 8 masks
-
-                  "movq      _mask8_0, %%mm0 \n\t"
-                  "pand      %%mm7, %%mm0    \n\t" // nonzero if keep byte
-                  "pcmpeqb   %%mm6, %%mm0    \n\t" // zeros->1s, v versa
-
-// preload        "movl      len, %%ecx      \n\t" // load length of line
-// preload        "movl      srcptr, %%esi   \n\t" // load source
-// preload        "movl      dstptr, %%edi   \n\t" // load dest
-
-                  "cmpl      $0, %%ecx       \n\t" // len == 0 ?
-                  "je        mainloop8end    \n\t"
-
-                "mainloop8:                  \n\t"
-                  "movq      (%%esi), %%mm4  \n\t" // *srcptr
-                  "pand      %%mm0, %%mm4    \n\t"
-                  "movq      %%mm0, %%mm6    \n\t"
-                  "pandn     (%%edi), %%mm6  \n\t" // *dstptr
-                  "por       %%mm6, %%mm4    \n\t"
-                  "movq      %%mm4, (%%edi)  \n\t"
-                  "addl      $8, %%esi       \n\t" // inc by 8 bytes processed
-                  "addl      $8, %%edi       \n\t"
-                  "subl      $8, %%ecx       \n\t" // dec by 8 pixels processed
-                  "ja        mainloop8       \n\t"
-
-                "mainloop8end:               \n\t"
-// preload        "movl      diff, %%ecx     \n\t" // (diff is in eax)
-                  "movl      %%eax, %%ecx    \n\t"
-                  "cmpl      $0, %%ecx       \n\t"
-                  "jz        end8            \n\t"
-// preload        "movl      mask, %%edx     \n\t"
-                  "sall      $24, %%edx      \n\t" // make low byte, high byte
-
-                "secondloop8:                \n\t"
-                  "sall      %%edx           \n\t" // move high bit to CF
-                  "jnc       skip8           \n\t" // if CF = 0
-                  "movb      (%%esi), %%al   \n\t"
-                  "movb      %%al, (%%edi)   \n\t"
-
-                "skip8:                      \n\t"
-                  "incl      %%esi           \n\t"
-                  "incl      %%edi           \n\t"
-                  "decl      %%ecx           \n\t"
-                  "jnz       secondloop8     \n\t"
-
-                "end8:                       \n\t"
-                  "EMMS                      \n\t"  // DONE
-
-                  : "=a" (dummy_value_a),           // output regs (dummy)
-                    "=d" (dummy_value_d),
-                    "=c" (dummy_value_c),
-                    "=S" (dummy_value_S),
-                    "=D" (dummy_value_D)
-
-                  : "3" (srcptr),      // esi       // input regs
-                    "4" (dstptr),      // edi
-                    "0" (diff),        // eax
-// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
-                    "2" (len),         // ecx
-                    "1" (mask)         // edx
-
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
-                  : "%mm0", "%mm4", "%mm6", "%mm7"  // clobber list
-#endif
-               );
-            }
-            else /* mmx _not supported - Use modified C routine */
-#endif /* PNG_MMX_CODE_SUPPORTED */
-            {
-               register png_uint_32 i;
-               png_uint_32 initial_val = png_pass_start[png_ptr->pass];
-                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
-               register int stride = png_pass_inc[png_ptr->pass];
-                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
-               register int rep_bytes = png_pass_width[png_ptr->pass];
-                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
-               png_uint_32 len = png_ptr->width &~7;  /* reduce to mult. of 8 */
-               int diff = (int) (png_ptr->width & 7); /* amount lost */
-               register png_uint_32 final_val = len;  /* GRR bugfix */
-
-               srcptr = png_ptr->row_buf + 1 + initial_val;
-               dstptr = row + initial_val;
-
-               for (i = initial_val; i < final_val; i += stride)
-               {
-                  png_memcpy(dstptr, srcptr, rep_bytes);
-                  srcptr += stride;
-                  dstptr += stride;
-               }
-               if (diff)  /* number of leftover pixels:  3 for pngtest */
-               {
-                  final_val+=diff /* *BPP1 */ ;
-                  for (; i < final_val; i += stride)
-                  {
-                     if (rep_bytes > (int)(final_val-i))
-                        rep_bytes = (int)(final_val-i);
-                     png_memcpy(dstptr, srcptr, rep_bytes);
-                     srcptr += stride;
-                     dstptr += stride;
-                  }
-               }
-
-            } /* end of else (_mmx_supported) */
-
-            break;
-         }       /* end 8 bpp */
-
-         case 16:       /* png_ptr->row_info.pixel_depth */
-         {
-            png_bytep srcptr;
-            png_bytep dstptr;
-
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
-#if !defined(PNG_1_0_X)
-            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
-                /* && _mmx_supported */ )
-#else
-            if (_mmx_supported)
-#endif
-            {
-               png_uint_32 len;
-               int diff;
-               int dummy_value_a;   // fix 'forbidden register spilled' error
-               int dummy_value_d;
-               int dummy_value_c;
-               int dummy_value_S;
-               int dummy_value_D;
-               _unmask = ~mask;            // global variable for -fPIC version
-               srcptr = png_ptr->row_buf + 1;
-               dstptr = row;
-               len  = png_ptr->width &~7;  // reduce to multiple of 8
-               diff = (int) (png_ptr->width & 7); // amount lost //
-
-               __asm__ __volatile__ (
-                  "movd      _unmask, %%mm7   \n\t" // load bit pattern
-                  "psubb     %%mm6, %%mm6     \n\t" // zero mm6
-                  "punpcklbw %%mm7, %%mm7     \n\t"
-                  "punpcklwd %%mm7, %%mm7     \n\t"
-                  "punpckldq %%mm7, %%mm7     \n\t" // fill reg with 8 masks
-
-                  "movq      _mask16_0, %%mm0 \n\t"
-                  "movq      _mask16_1, %%mm1 \n\t"
-
-                  "pand      %%mm7, %%mm0     \n\t"
-                  "pand      %%mm7, %%mm1     \n\t"
-
-                  "pcmpeqb   %%mm6, %%mm0     \n\t"
-                  "pcmpeqb   %%mm6, %%mm1     \n\t"
-
-// preload        "movl      len, %%ecx       \n\t" // load length of line
-// preload        "movl      srcptr, %%esi    \n\t" // load source
-// preload        "movl      dstptr, %%edi    \n\t" // load dest
-
-                  "cmpl      $0, %%ecx        \n\t"
-                  "jz        mainloop16end    \n\t"
-
-                "mainloop16:                  \n\t"
-                  "movq      (%%esi), %%mm4   \n\t"
-                  "pand      %%mm0, %%mm4     \n\t"
-                  "movq      %%mm0, %%mm6     \n\t"
-                  "movq      (%%edi), %%mm7   \n\t"
-                  "pandn     %%mm7, %%mm6     \n\t"
-                  "por       %%mm6, %%mm4     \n\t"
-                  "movq      %%mm4, (%%edi)   \n\t"
-
-                  "movq      8(%%esi), %%mm5  \n\t"
-                  "pand      %%mm1, %%mm5     \n\t"
-                  "movq      %%mm1, %%mm7     \n\t"
-                  "movq      8(%%edi), %%mm6  \n\t"
-                  "pandn     %%mm6, %%mm7     \n\t"
-                  "por       %%mm7, %%mm5     \n\t"
-                  "movq      %%mm5, 8(%%edi)  \n\t"
-
-                  "addl      $16, %%esi       \n\t" // inc by 16 bytes processed
-                  "addl      $16, %%edi       \n\t"
-                  "subl      $8, %%ecx        \n\t" // dec by 8 pixels processed
-                  "ja        mainloop16       \n\t"
-
-                "mainloop16end:               \n\t"
-// preload        "movl      diff, %%ecx      \n\t" // (diff is in eax)
-                  "movl      %%eax, %%ecx     \n\t"
-                  "cmpl      $0, %%ecx        \n\t"
-                  "jz        end16            \n\t"
-// preload        "movl      mask, %%edx      \n\t"
-                  "sall      $24, %%edx       \n\t" // make low byte, high byte
-
-                "secondloop16:                \n\t"
-                  "sall      %%edx            \n\t" // move high bit to CF
-                  "jnc       skip16           \n\t" // if CF = 0
-                  "movw      (%%esi), %%ax    \n\t"
-                  "movw      %%ax, (%%edi)    \n\t"
-
-                "skip16:                      \n\t"
-                  "addl      $2, %%esi        \n\t"
-                  "addl      $2, %%edi        \n\t"
-                  "decl      %%ecx            \n\t"
-                  "jnz       secondloop16     \n\t"
-
-                "end16:                       \n\t"
-                  "EMMS                       \n\t" // DONE
-
-                  : "=a" (dummy_value_a),           // output regs (dummy)
-                    "=c" (dummy_value_c),
-                    "=d" (dummy_value_d),
-                    "=S" (dummy_value_S),
-                    "=D" (dummy_value_D)
-
-                  : "0" (diff),        // eax       // input regs
-// was (unmask)     " "    RESERVED    // ebx       // Global Offset Table idx
-                    "1" (len),         // ecx
-                    "2" (mask),        // edx
-                    "3" (srcptr),      // esi
-                    "4" (dstptr)       // edi
-
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
-                  : "%mm0", "%mm1", "%mm4"          // clobber list
-                  , "%mm5", "%mm6", "%mm7"
-#endif
-               );
-            }
-            else /* mmx _not supported - Use modified C routine */
-#endif /* PNG_MMX_CODE_SUPPORTED */
-            {
-               register png_uint_32 i;
-               png_uint_32 initial_val = BPP2 * png_pass_start[png_ptr->pass];
-                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
-               register int stride = BPP2 * png_pass_inc[png_ptr->pass];
-                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
-               register int rep_bytes = BPP2 * png_pass_width[png_ptr->pass];
-                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
-               png_uint_32 len = png_ptr->width &~7;  /* reduce to mult. of 8 */
-               int diff = (int) (png_ptr->width & 7); /* amount lost */
-               register png_uint_32 final_val = BPP2 * len;   /* GRR bugfix */
-
-               srcptr = png_ptr->row_buf + 1 + initial_val;
-               dstptr = row + initial_val;
-
-               for (i = initial_val; i < final_val; i += stride)
-               {
-                  png_memcpy(dstptr, srcptr, rep_bytes);
-                  srcptr += stride;
-                  dstptr += stride;
-               }
-               if (diff)  /* number of leftover pixels:  3 for pngtest */
-               {
-                  final_val+=diff*BPP2;
-                  for (; i < final_val; i += stride)
-                  {
-                     if (rep_bytes > (int)(final_val-i))
-                        rep_bytes = (int)(final_val-i);
-                     png_memcpy(dstptr, srcptr, rep_bytes);
-                     srcptr += stride;
-                     dstptr += stride;
-                  }
-               }
-            } /* end of else (_mmx_supported) */
-
-            break;
-         }       /* end 16 bpp */
-
-         case 24:       /* png_ptr->row_info.pixel_depth */
-         {
-            png_bytep srcptr;
-            png_bytep dstptr;
-
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
-#if !defined(PNG_1_0_X)
-            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
-                /* && _mmx_supported */ )
-#else
-            if (_mmx_supported)
-#endif
-            {
-               png_uint_32 len;
-               int diff;
-               int dummy_value_a;   // fix 'forbidden register spilled' error
-               int dummy_value_d;
-               int dummy_value_c;
-               int dummy_value_S;
-               int dummy_value_D;
-               _unmask = ~mask;            // global variable for -fPIC version
-               srcptr = png_ptr->row_buf + 1;
-               dstptr = row;
-               len  = png_ptr->width &~7;  // reduce to multiple of 8
-               diff = (int) (png_ptr->width & 7); // amount lost //
-
-               __asm__ __volatile__ (
-                  "movd      _unmask, %%mm7   \n\t" // load bit pattern
-                  "psubb     %%mm6, %%mm6     \n\t" // zero mm6
-                  "punpcklbw %%mm7, %%mm7     \n\t"
-                  "punpcklwd %%mm7, %%mm7     \n\t"
-                  "punpckldq %%mm7, %%mm7     \n\t" // fill reg with 8 masks
-
-                  "movq      _mask24_0, %%mm0 \n\t"
-                  "movq      _mask24_1, %%mm1 \n\t"
-                  "movq      _mask24_2, %%mm2 \n\t"
-
-                  "pand      %%mm7, %%mm0     \n\t"
-                  "pand      %%mm7, %%mm1     \n\t"
-                  "pand      %%mm7, %%mm2     \n\t"
-
-                  "pcmpeqb   %%mm6, %%mm0     \n\t"
-                  "pcmpeqb   %%mm6, %%mm1     \n\t"
-                  "pcmpeqb   %%mm6, %%mm2     \n\t"
-
-// preload        "movl      len, %%ecx       \n\t" // load length of line
-// preload        "movl      srcptr, %%esi    \n\t" // load source
-// preload        "movl      dstptr, %%edi    \n\t" // load dest
-
-                  "cmpl      $0, %%ecx        \n\t"
-                  "jz        mainloop24end    \n\t"
-
-                "mainloop24:                  \n\t"
-                  "movq      (%%esi), %%mm4   \n\t"
-                  "pand      %%mm0, %%mm4     \n\t"
-                  "movq      %%mm0, %%mm6     \n\t"
-                  "movq      (%%edi), %%mm7   \n\t"
-                  "pandn     %%mm7, %%mm6     \n\t"
-                  "por       %%mm6, %%mm4     \n\t"
-                  "movq      %%mm4, (%%edi)   \n\t"
-
-                  "movq      8(%%esi), %%mm5  \n\t"
-                  "pand      %%mm1, %%mm5     \n\t"
-                  "movq      %%mm1, %%mm7     \n\t"
-                  "movq      8(%%edi), %%mm6  \n\t"
-                  "pandn     %%mm6, %%mm7     \n\t"
-                  "por       %%mm7, %%mm5     \n\t"
-                  "movq      %%mm5, 8(%%edi)  \n\t"
-
-                  "movq      16(%%esi), %%mm6 \n\t"
-                  "pand      %%mm2, %%mm6     \n\t"
-                  "movq      %%mm2, %%mm4     \n\t"
-                  "movq      16(%%edi), %%mm7 \n\t"
-                  "pandn     %%mm7, %%mm4     \n\t"
-                  "por       %%mm4, %%mm6     \n\t"
-                  "movq      %%mm6, 16(%%edi) \n\t"
-
-                  "addl      $24, %%esi       \n\t" // inc by 24 bytes processed
-                  "addl      $24, %%edi       \n\t"
-                  "subl      $8, %%ecx        \n\t" // dec by 8 pixels processed
-
-                  "ja        mainloop24       \n\t"
-
-                "mainloop24end:               \n\t"
-// preload        "movl      diff, %%ecx      \n\t" // (diff is in eax)
-                  "movl      %%eax, %%ecx     \n\t"
-                  "cmpl      $0, %%ecx        \n\t"
-                  "jz        end24            \n\t"
-// preload        "movl      mask, %%edx      \n\t"
-                  "sall      $24, %%edx       \n\t" // make low byte, high byte
-
-                "secondloop24:                \n\t"
-                  "sall      %%edx            \n\t" // move high bit to CF
-                  "jnc       skip24           \n\t" // if CF = 0
-                  "movw      (%%esi), %%ax    \n\t"
-                  "movw      %%ax, (%%edi)    \n\t"
-                  "xorl      %%eax, %%eax     \n\t"
-                  "movb      2(%%esi), %%al   \n\t"
-                  "movb      %%al, 2(%%edi)   \n\t"
-
-                "skip24:                      \n\t"
-                  "addl      $3, %%esi        \n\t"
-                  "addl      $3, %%edi        \n\t"
-                  "decl      %%ecx            \n\t"
-                  "jnz       secondloop24     \n\t"
-
-                "end24:                       \n\t"
-                  "EMMS                       \n\t" // DONE
-
-                  : "=a" (dummy_value_a),           // output regs (dummy)
-                    "=d" (dummy_value_d),
-                    "=c" (dummy_value_c),
-                    "=S" (dummy_value_S),
-                    "=D" (dummy_value_D)
-
-                  : "3" (srcptr),      // esi       // input regs
-                    "4" (dstptr),      // edi
-                    "0" (diff),        // eax
-// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
-                    "2" (len),         // ecx
-                    "1" (mask)         // edx
-
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
-                  : "%mm0", "%mm1", "%mm2"          // clobber list
-                  , "%mm4", "%mm5", "%mm6", "%mm7"
-#endif
-               );
-            }
-            else /* mmx _not supported - Use modified C routine */
-#endif /* PNG_MMX_CODE_SUPPORTED */
-            {
-               register png_uint_32 i;
-               png_uint_32 initial_val = BPP3 * png_pass_start[png_ptr->pass];
-                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
-               register int stride = BPP3 * png_pass_inc[png_ptr->pass];
-                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
-               register int rep_bytes = BPP3 * png_pass_width[png_ptr->pass];
-                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
-               png_uint_32 len = png_ptr->width &~7;  /* reduce to mult. of 8 */
-               int diff = (int) (png_ptr->width & 7); /* amount lost */
-               register png_uint_32 final_val = BPP3 * len;   /* GRR bugfix */
-
-               srcptr = png_ptr->row_buf + 1 + initial_val;
-               dstptr = row + initial_val;
-
-               for (i = initial_val; i < final_val; i += stride)
-               {
-                  png_memcpy(dstptr, srcptr, rep_bytes);
-                  srcptr += stride;
-                  dstptr += stride;
-               }
-               if (diff)  /* number of leftover pixels:  3 for pngtest */
-               {
-                  final_val+=diff*BPP3;
-                  for (; i < final_val; i += stride)
-                  {
-                     if (rep_bytes > (int)(final_val-i))
-                        rep_bytes = (int)(final_val-i);
-                     png_memcpy(dstptr, srcptr, rep_bytes);
-                     srcptr += stride;
-                     dstptr += stride;
-                  }
-               }
-            } /* end of else (_mmx_supported) */
-
-            break;
-         }       /* end 24 bpp */
-
+         // most common case:  combining 32-bit RGBA
          case 32:       /* png_ptr->row_info.pixel_depth */
          {
             png_bytep srcptr;
@@ -1173,19 +587,21 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             {
                png_uint_32 len;
                int diff;
-               int dummy_value_a;   // fix 'forbidden register spilled' error
+               int dummy_value_a;    // fix 'forbidden register spilled' error
                int dummy_value_d;
                int dummy_value_c;
                int dummy_value_S;
                int dummy_value_D;
-               _unmask = ~mask;            // global variable for -fPIC version
+
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
-               len  = png_ptr->width &~7;  // reduce to multiple of 8
-               diff = (int) (png_ptr->width & 7); // amount lost //
+               len  = png_ptr->width & ~7;          // reduce to multiple of 8
+               diff = (int) (png_ptr->width & 7);   // amount lost
 
                __asm__ __volatile__ (
-                  "movd      _unmask, %%mm7   \n\t" // load bit pattern
+                  "not       %%edx            \n\t" // mask => unmask
+                  "movd      %%edx, %%mm7     \n\t" // load bit pattern
+                  "not       %%edx            \n\t" // unmask => mask for later
                   "psubb     %%mm6, %%mm6     \n\t" // zero mm6
                   "punpcklbw %%mm7, %%mm7     \n\t"
                   "punpcklwd %%mm7, %%mm7     \n\t"
@@ -1287,7 +703,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                   : "%mm0", "%mm1", "%mm2", "%mm3"  // clobber list
                   , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -1333,6 +749,638 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             break;
          }       /* end 32 bpp */
 
+         case 1:        /* png_ptr->row_info.pixel_depth */
+         {
+            png_bytep sp;
+            png_bytep dp;
+            int s_inc, s_start, s_end;
+            int m;
+            int shift;
+            png_uint_32 i;
+
+            sp = png_ptr->row_buf + 1;
+            dp = row;
+            m = 0x80;
+#if defined(PNG_READ_PACKSWAP_SUPPORTED)
+            if (png_ptr->transformations & PNG_PACKSWAP)
+            {
+                s_start = 0;
+                s_end = 7;
+                s_inc = 1;
+            }
+            else
+#endif
+            {
+                s_start = 7;
+                s_end = 0;
+                s_inc = -1;
+            }
+
+            shift = s_start;
+
+            for (i = 0; i < png_ptr->width; i++)
+            {
+               if (m & mask)
+               {
+                  int value;
+
+                  value = (*sp >> shift) & 0x1;
+                  *dp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
+                  *dp |= (png_byte)(value << shift);
+               }
+
+               if (shift == s_end)
+               {
+                  shift = s_start;
+                  sp++;
+                  dp++;
+               }
+               else
+                  shift += s_inc;
+
+               if (m == 1)
+                  m = 0x80;
+               else
+                  m >>= 1;
+            }
+            break;
+         }       /* end 1 bpp */
+
+         case 2:        /* png_ptr->row_info.pixel_depth */
+         {
+            png_bytep sp;
+            png_bytep dp;
+            int s_start, s_end, s_inc;
+            int m;
+            int shift;
+            png_uint_32 i;
+            int value;
+
+            sp = png_ptr->row_buf + 1;
+            dp = row;
+            m = 0x80;
+#if defined(PNG_READ_PACKSWAP_SUPPORTED)
+            if (png_ptr->transformations & PNG_PACKSWAP)
+            {
+               s_start = 0;
+               s_end = 6;
+               s_inc = 2;
+            }
+            else
+#endif
+            {
+               s_start = 6;
+               s_end = 0;
+               s_inc = -2;
+            }
+
+            shift = s_start;
+
+            for (i = 0; i < png_ptr->width; i++)
+            {
+               if (m & mask)
+               {
+                  value = (*sp >> shift) & 0x3;
+                  *dp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
+                  *dp |= (png_byte)(value << shift);
+               }
+
+               if (shift == s_end)
+               {
+                  shift = s_start;
+                  sp++;
+                  dp++;
+               }
+               else
+                  shift += s_inc;
+               if (m == 1)
+                  m = 0x80;
+               else
+                  m >>= 1;
+            }
+            break;
+         }       /* end 2 bpp */
+
+         case 4:        /* png_ptr->row_info.pixel_depth */
+         {
+            png_bytep sp;
+            png_bytep dp;
+            int s_start, s_end, s_inc;
+            int m;
+            int shift;
+            png_uint_32 i;
+            int value;
+
+            sp = png_ptr->row_buf + 1;
+            dp = row;
+            m = 0x80;
+#if defined(PNG_READ_PACKSWAP_SUPPORTED)
+            if (png_ptr->transformations & PNG_PACKSWAP)
+            {
+               s_start = 0;
+               s_end = 4;
+               s_inc = 4;
+            }
+            else
+#endif
+            {
+               s_start = 4;
+               s_end = 0;
+               s_inc = -4;
+            }
+            shift = s_start;
+
+            for (i = 0; i < png_ptr->width; i++)
+            {
+               if (m & mask)
+               {
+                  value = (*sp >> shift) & 0xf;
+                  *dp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
+                  *dp |= (png_byte)(value << shift);
+               }
+
+               if (shift == s_end)
+               {
+                  shift = s_start;
+                  sp++;
+                  dp++;
+               }
+               else
+                  shift += s_inc;
+               if (m == 1)
+                  m = 0x80;
+               else
+                  m >>= 1;
+            }
+            break;
+         }       /* end 4 bpp */
+
+         case 8:        /* png_ptr->row_info.pixel_depth */
+         {
+            png_bytep srcptr;
+            png_bytep dstptr;
+
+#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if !defined(PNG_1_0_X)
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
+                /* && _mmx_supported */ )
+#else
+            if (_mmx_supported)
+#endif
+            {
+               png_uint_32 len;
+               int diff;
+               int dummy_value_a;    // fix 'forbidden register spilled' error
+               int dummy_value_d;
+               int dummy_value_c;
+               int dummy_value_S;
+               int dummy_value_D;
+
+               srcptr = png_ptr->row_buf + 1;
+               dstptr = row;
+               len  = png_ptr->width & ~7;          // reduce to multiple of 8
+               diff = (int) (png_ptr->width & 7);   // amount lost
+
+               __asm__ __volatile__ (
+                  "not       %%edx            \n\t" // mask => unmask
+                  "movd      %%edx, %%mm7     \n\t" // load bit pattern
+                  "not       %%edx            \n\t" // unmask => mask for later
+                  "psubb     %%mm6, %%mm6     \n\t" // zero mm6
+                  "punpcklbw %%mm7, %%mm7     \n\t"
+                  "punpcklwd %%mm7, %%mm7     \n\t"
+                  "punpckldq %%mm7, %%mm7     \n\t" // fill reg with 8 masks
+
+                  "movq      _mask8_0, %%mm0  \n\t"
+
+                  "pand      %%mm7, %%mm0     \n\t" // nonzero if keep byte
+                  "pcmpeqb   %%mm6, %%mm0     \n\t" // zeros->1s, v versa
+
+// preload        "movl      len, %%ecx       \n\t" // load length of line
+// preload        "movl      srcptr, %%esi    \n\t" // load source
+// preload        "movl      dstptr, %%edi    \n\t" // load dest
+
+                  "cmpl      $0, %%ecx        \n\t" // len == 0 ?
+                  "je        mainloop8end     \n\t"
+
+                "mainloop8:                   \n\t"
+                  "movq      (%%esi), %%mm4   \n\t" // *srcptr
+                  "pand      %%mm0, %%mm4     \n\t"
+                  "movq      %%mm0, %%mm6     \n\t"
+                  "pandn     (%%edi), %%mm6   \n\t" // *dstptr
+                  "por       %%mm6, %%mm4     \n\t"
+                  "movq      %%mm4, (%%edi)   \n\t"
+                  "addl      $8, %%esi        \n\t" // inc by 8 bytes processed
+                  "addl      $8, %%edi        \n\t"
+                  "subl      $8, %%ecx        \n\t" // dec by 8 pixels processed
+                  "ja        mainloop8        \n\t"
+
+                "mainloop8end:                \n\t"
+// preload        "movl      diff, %%ecx      \n\t" // (diff is in eax)
+                  "movl      %%eax, %%ecx     \n\t"
+                  "cmpl      $0, %%ecx        \n\t"
+                  "jz        end8             \n\t"
+// preload        "movl      mask, %%edx      \n\t"
+                  "sall      $24, %%edx       \n\t" // make low byte, high byte
+
+                "secondloop8:                 \n\t"
+                  "sall      %%edx            \n\t" // move high bit to CF
+                  "jnc       skip8            \n\t" // if CF = 0
+                  "movb      (%%esi), %%al    \n\t"
+                  "movb      %%al, (%%edi)    \n\t"
+
+                "skip8:                       \n\t"
+                  "incl      %%esi            \n\t"
+                  "incl      %%edi            \n\t"
+                  "decl      %%ecx            \n\t"
+                  "jnz       secondloop8      \n\t"
+
+                "end8:                        \n\t"
+                  "EMMS                       \n\t"  // DONE
+
+                  : "=a" (dummy_value_a),           // output regs (dummy)
+                    "=d" (dummy_value_d),
+                    "=c" (dummy_value_c),
+                    "=S" (dummy_value_S),
+                    "=D" (dummy_value_D)
+
+                  : "3" (srcptr),      // esi       // input regs
+                    "4" (dstptr),      // edi
+                    "0" (diff),        // eax
+// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
+                    "2" (len),         // ecx
+                    "1" (mask)         // edx
+
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
+                  : "%mm0", "%mm4", "%mm6", "%mm7"  // clobber list
+#endif
+               );
+            }
+            else /* mmx _not supported - Use modified C routine */
+#endif /* PNG_MMX_CODE_SUPPORTED */
+            {
+               register png_uint_32 i;
+               png_uint_32 initial_val = png_pass_start[png_ptr->pass];
+                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
+               register int stride = png_pass_inc[png_ptr->pass];
+                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
+               register int rep_bytes = png_pass_width[png_ptr->pass];
+                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
+               png_uint_32 len = png_ptr->width &~7;  /* reduce to mult. of 8 */
+               int diff = (int) (png_ptr->width & 7); /* amount lost */
+               register png_uint_32 final_val = len;  /* GRR bugfix */
+
+               srcptr = png_ptr->row_buf + 1 + initial_val;
+               dstptr = row + initial_val;
+
+               for (i = initial_val; i < final_val; i += stride)
+               {
+                  png_memcpy(dstptr, srcptr, rep_bytes);
+                  srcptr += stride;
+                  dstptr += stride;
+               }
+               if (diff)  /* number of leftover pixels:  3 for pngtest */
+               {
+                  final_val+=diff /* *BPP1 */ ;
+                  for (; i < final_val; i += stride)
+                  {
+                     if (rep_bytes > (int)(final_val-i))
+                        rep_bytes = (int)(final_val-i);
+                     png_memcpy(dstptr, srcptr, rep_bytes);
+                     srcptr += stride;
+                     dstptr += stride;
+                  }
+               }
+
+            } /* end of else (_mmx_supported) */
+
+            break;
+         }       /* end 8 bpp */
+
+         case 16:       /* png_ptr->row_info.pixel_depth */
+         {
+            png_bytep srcptr;
+            png_bytep dstptr;
+
+#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if !defined(PNG_1_0_X)
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
+                /* && _mmx_supported */ )
+#else
+            if (_mmx_supported)
+#endif
+            {
+               png_uint_32 len;
+               int diff;
+               int dummy_value_a;    // fix 'forbidden register spilled' error
+               int dummy_value_d;
+               int dummy_value_c;
+               int dummy_value_S;
+               int dummy_value_D;
+
+               srcptr = png_ptr->row_buf + 1;
+               dstptr = row;
+               len  = png_ptr->width & ~7;          // reduce to multiple of 8
+               diff = (int) (png_ptr->width & 7);   // amount lost
+
+               __asm__ __volatile__ (
+                  "not       %%edx            \n\t" // mask => unmask
+                  "movd      %%edx, %%mm7     \n\t" // load bit pattern
+                  "not       %%edx            \n\t" // unmask => mask for later
+                  "psubb     %%mm6, %%mm6     \n\t" // zero mm6
+                  "punpcklbw %%mm7, %%mm7     \n\t"
+                  "punpcklwd %%mm7, %%mm7     \n\t"
+                  "punpckldq %%mm7, %%mm7     \n\t" // fill reg with 8 masks
+
+                  "movq      _mask16_0, %%mm0 \n\t"
+                  "movq      _mask16_1, %%mm1 \n\t"
+
+                  "pand      %%mm7, %%mm0     \n\t"
+                  "pand      %%mm7, %%mm1     \n\t"
+
+                  "pcmpeqb   %%mm6, %%mm0     \n\t"
+                  "pcmpeqb   %%mm6, %%mm1     \n\t"
+
+// preload        "movl      len, %%ecx       \n\t" // load length of line
+// preload        "movl      srcptr, %%esi    \n\t" // load source
+// preload        "movl      dstptr, %%edi    \n\t" // load dest
+
+                  "cmpl      $0, %%ecx        \n\t"
+                  "jz        mainloop16end    \n\t"
+
+                "mainloop16:                  \n\t"
+                  "movq      (%%esi), %%mm4   \n\t"
+                  "pand      %%mm0, %%mm4     \n\t"
+                  "movq      %%mm0, %%mm6     \n\t"
+                  "movq      (%%edi), %%mm7   \n\t"
+                  "pandn     %%mm7, %%mm6     \n\t"
+                  "por       %%mm6, %%mm4     \n\t"
+                  "movq      %%mm4, (%%edi)   \n\t"
+
+                  "movq      8(%%esi), %%mm5  \n\t"
+                  "pand      %%mm1, %%mm5     \n\t"
+                  "movq      %%mm1, %%mm7     \n\t"
+                  "movq      8(%%edi), %%mm6  \n\t"
+                  "pandn     %%mm6, %%mm7     \n\t"
+                  "por       %%mm7, %%mm5     \n\t"
+                  "movq      %%mm5, 8(%%edi)  \n\t"
+
+                  "addl      $16, %%esi       \n\t" // inc by 16 bytes processed
+                  "addl      $16, %%edi       \n\t"
+                  "subl      $8, %%ecx        \n\t" // dec by 8 pixels processed
+                  "ja        mainloop16       \n\t"
+
+                "mainloop16end:               \n\t"
+// preload        "movl      diff, %%ecx      \n\t" // (diff is in eax)
+                  "movl      %%eax, %%ecx     \n\t"
+                  "cmpl      $0, %%ecx        \n\t"
+                  "jz        end16            \n\t"
+// preload        "movl      mask, %%edx      \n\t"
+                  "sall      $24, %%edx       \n\t" // make low byte, high byte
+
+                "secondloop16:                \n\t"
+                  "sall      %%edx            \n\t" // move high bit to CF
+                  "jnc       skip16           \n\t" // if CF = 0
+                  "movw      (%%esi), %%ax    \n\t"
+                  "movw      %%ax, (%%edi)    \n\t"
+
+                "skip16:                      \n\t"
+                  "addl      $2, %%esi        \n\t"
+                  "addl      $2, %%edi        \n\t"
+                  "decl      %%ecx            \n\t"
+                  "jnz       secondloop16     \n\t"
+
+                "end16:                       \n\t"
+                  "EMMS                       \n\t" // DONE
+
+                  : "=a" (dummy_value_a),           // output regs (dummy)
+                    "=c" (dummy_value_c),
+                    "=d" (dummy_value_d),
+                    "=S" (dummy_value_S),
+                    "=D" (dummy_value_D)
+
+                  : "0" (diff),        // eax       // input regs
+// was (unmask)     " "    RESERVED    // ebx       // Global Offset Table idx
+                    "1" (len),         // ecx
+                    "2" (mask),        // edx
+                    "3" (srcptr),      // esi
+                    "4" (dstptr)       // edi
+
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
+                  : "%mm0", "%mm1", "%mm4"          // clobber list
+                  , "%mm5", "%mm6", "%mm7"
+#endif
+               );
+            }
+            else /* mmx _not supported - Use modified C routine */
+#endif /* PNG_MMX_CODE_SUPPORTED */
+            {
+               register png_uint_32 i;
+               png_uint_32 initial_val = BPP2 * png_pass_start[png_ptr->pass];
+                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
+               register int stride = BPP2 * png_pass_inc[png_ptr->pass];
+                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
+               register int rep_bytes = BPP2 * png_pass_width[png_ptr->pass];
+                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
+               png_uint_32 len = png_ptr->width &~7;  /* reduce to mult. of 8 */
+               int diff = (int) (png_ptr->width & 7); /* amount lost */
+               register png_uint_32 final_val = BPP2 * len;   /* GRR bugfix */
+
+               srcptr = png_ptr->row_buf + 1 + initial_val;
+               dstptr = row + initial_val;
+
+               for (i = initial_val; i < final_val; i += stride)
+               {
+                  png_memcpy(dstptr, srcptr, rep_bytes);
+                  srcptr += stride;
+                  dstptr += stride;
+               }
+               if (diff)  /* number of leftover pixels:  3 for pngtest */
+               {
+                  final_val+=diff*BPP2;
+                  for (; i < final_val; i += stride)
+                  {
+                     if (rep_bytes > (int)(final_val-i))
+                        rep_bytes = (int)(final_val-i);
+                     png_memcpy(dstptr, srcptr, rep_bytes);
+                     srcptr += stride;
+                     dstptr += stride;
+                  }
+               }
+            } /* end of else (_mmx_supported) */
+
+            break;
+         }       /* end 16 bpp */
+
+         case 24:       /* png_ptr->row_info.pixel_depth */
+         {
+            png_bytep srcptr;
+            png_bytep dstptr;
+
+#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if !defined(PNG_1_0_X)
+            if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
+                /* && _mmx_supported */ )
+#else
+            if (_mmx_supported)
+#endif
+            {
+               png_uint_32 len;
+               int diff;
+               int dummy_value_a;    // fix 'forbidden register spilled' error
+               int dummy_value_d;
+               int dummy_value_c;
+               int dummy_value_S;
+               int dummy_value_D;
+
+               srcptr = png_ptr->row_buf + 1;
+               dstptr = row;
+               len  = png_ptr->width & ~7;          // reduce to multiple of 8
+               diff = (int) (png_ptr->width & 7);   // amount lost
+
+               __asm__ __volatile__ (
+                  "not       %%edx            \n\t" // mask => unmask
+                  "movd      %%edx, %%mm7     \n\t" // load bit pattern
+                  "not       %%edx            \n\t" // unmask => mask for later
+                  "psubb     %%mm6, %%mm6     \n\t" // zero mm6
+                  "punpcklbw %%mm7, %%mm7     \n\t"
+                  "punpcklwd %%mm7, %%mm7     \n\t"
+                  "punpckldq %%mm7, %%mm7     \n\t" // fill reg with 8 masks
+
+                  "movq      _mask24_0, %%mm0 \n\t"
+                  "movq      _mask24_1, %%mm1 \n\t"
+                  "movq      _mask24_2, %%mm2 \n\t"
+
+                  "pand      %%mm7, %%mm0     \n\t"
+                  "pand      %%mm7, %%mm1     \n\t"
+                  "pand      %%mm7, %%mm2     \n\t"
+
+                  "pcmpeqb   %%mm6, %%mm0     \n\t"
+                  "pcmpeqb   %%mm6, %%mm1     \n\t"
+                  "pcmpeqb   %%mm6, %%mm2     \n\t"
+
+// preload        "movl      len, %%ecx       \n\t" // load length of line
+// preload        "movl      srcptr, %%esi    \n\t" // load source
+// preload        "movl      dstptr, %%edi    \n\t" // load dest
+
+                  "cmpl      $0, %%ecx        \n\t"
+                  "jz        mainloop24end    \n\t"
+
+                "mainloop24:                  \n\t"
+                  "movq      (%%esi), %%mm4   \n\t"
+                  "pand      %%mm0, %%mm4     \n\t"
+                  "movq      %%mm0, %%mm6     \n\t"
+                  "movq      (%%edi), %%mm7   \n\t"
+                  "pandn     %%mm7, %%mm6     \n\t"
+                  "por       %%mm6, %%mm4     \n\t"
+                  "movq      %%mm4, (%%edi)   \n\t"
+
+                  "movq      8(%%esi), %%mm5  \n\t"
+                  "pand      %%mm1, %%mm5     \n\t"
+                  "movq      %%mm1, %%mm7     \n\t"
+                  "movq      8(%%edi), %%mm6  \n\t"
+                  "pandn     %%mm6, %%mm7     \n\t"
+                  "por       %%mm7, %%mm5     \n\t"
+                  "movq      %%mm5, 8(%%edi)  \n\t"
+
+                  "movq      16(%%esi), %%mm6 \n\t"
+                  "pand      %%mm2, %%mm6     \n\t"
+                  "movq      %%mm2, %%mm4     \n\t"
+                  "movq      16(%%edi), %%mm7 \n\t"
+                  "pandn     %%mm7, %%mm4     \n\t"
+                  "por       %%mm4, %%mm6     \n\t"
+                  "movq      %%mm6, 16(%%edi) \n\t"
+
+                  "addl      $24, %%esi       \n\t" // inc by 24 bytes processed
+                  "addl      $24, %%edi       \n\t"
+                  "subl      $8, %%ecx        \n\t" // dec by 8 pixels processed
+
+                  "ja        mainloop24       \n\t"
+
+                "mainloop24end:               \n\t"
+// preload        "movl      diff, %%ecx      \n\t" // (diff is in eax)
+                  "movl      %%eax, %%ecx     \n\t"
+                  "cmpl      $0, %%ecx        \n\t"
+                  "jz        end24            \n\t"
+// preload        "movl      mask, %%edx      \n\t"
+                  "sall      $24, %%edx       \n\t" // make low byte, high byte
+
+                "secondloop24:                \n\t"
+                  "sall      %%edx            \n\t" // move high bit to CF
+                  "jnc       skip24           \n\t" // if CF = 0
+                  "movw      (%%esi), %%ax    \n\t"
+                  "movw      %%ax, (%%edi)    \n\t"
+                  "xorl      %%eax, %%eax     \n\t"
+                  "movb      2(%%esi), %%al   \n\t"
+                  "movb      %%al, 2(%%edi)   \n\t"
+
+                "skip24:                      \n\t"
+                  "addl      $3, %%esi        \n\t"
+                  "addl      $3, %%edi        \n\t"
+                  "decl      %%ecx            \n\t"
+                  "jnz       secondloop24     \n\t"
+
+                "end24:                       \n\t"
+                  "EMMS                       \n\t" // DONE
+
+                  : "=a" (dummy_value_a),           // output regs (dummy)
+                    "=d" (dummy_value_d),
+                    "=c" (dummy_value_c),
+                    "=S" (dummy_value_S),
+                    "=D" (dummy_value_D)
+
+                  : "3" (srcptr),      // esi       // input regs
+                    "4" (dstptr),      // edi
+                    "0" (diff),        // eax
+// was (unmask)     "b"    RESERVED    // ebx       // Global Offset Table idx
+                    "2" (len),         // ecx
+                    "1" (mask)         // edx
+
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
+                  : "%mm0", "%mm1", "%mm2"          // clobber list
+                  , "%mm4", "%mm5", "%mm6", "%mm7"
+#endif
+               );
+            }
+            else /* mmx _not supported - Use modified C routine */
+#endif /* PNG_MMX_CODE_SUPPORTED */
+            {
+               register png_uint_32 i;
+               png_uint_32 initial_val = BPP3 * png_pass_start[png_ptr->pass];
+                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
+               register int stride = BPP3 * png_pass_inc[png_ptr->pass];
+                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
+               register int rep_bytes = BPP3 * png_pass_width[png_ptr->pass];
+                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
+               png_uint_32 len = png_ptr->width &~7;  /* reduce to mult. of 8 */
+               int diff = (int) (png_ptr->width & 7); /* amount lost */
+               register png_uint_32 final_val = BPP3 * len;   /* GRR bugfix */
+
+               srcptr = png_ptr->row_buf + 1 + initial_val;
+               dstptr = row + initial_val;
+
+               for (i = initial_val; i < final_val; i += stride)
+               {
+                  png_memcpy(dstptr, srcptr, rep_bytes);
+                  srcptr += stride;
+                  dstptr += stride;
+               }
+               if (diff)  /* number of leftover pixels:  3 for pngtest */
+               {
+                  final_val+=diff*BPP3;
+                  for (; i < final_val; i += stride)
+                  {
+                     if (rep_bytes > (int)(final_val-i))
+                        rep_bytes = (int)(final_val-i);
+                     png_memcpy(dstptr, srcptr, rep_bytes);
+                     srcptr += stride;
+                     dstptr += stride;
+                  }
+               }
+            } /* end of else (_mmx_supported) */
+
+            break;
+         }       /* end 24 bpp */
+
          case 48:       /* png_ptr->row_info.pixel_depth */
          {
             png_bytep srcptr;
@@ -1348,19 +1396,21 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             {
                png_uint_32 len;
                int diff;
-               int dummy_value_a;   // fix 'forbidden register spilled' error
+               int dummy_value_a;    // fix 'forbidden register spilled' error
                int dummy_value_d;
                int dummy_value_c;
                int dummy_value_S;
                int dummy_value_D;
-               _unmask = ~mask;            // global variable for -fPIC version
+
                srcptr = png_ptr->row_buf + 1;
                dstptr = row;
-               len  = png_ptr->width &~7;  // reduce to multiple of 8
-               diff = (int) (png_ptr->width & 7); // amount lost //
+               len  = png_ptr->width & ~7;          // reduce to multiple of 8
+               diff = (int) (png_ptr->width & 7);   // amount lost
 
                __asm__ __volatile__ (
-                  "movd      _unmask, %%mm7   \n\t" // load bit pattern
+                  "not       %%edx            \n\t" // mask => unmask
+                  "movd      %%edx, %%mm7     \n\t" // load bit pattern
+                  "not       %%edx            \n\t" // unmask => mask for later
                   "psubb     %%mm6, %%mm6     \n\t" // zero mm6
                   "punpcklbw %%mm7, %%mm7     \n\t"
                   "punpcklwd %%mm7, %%mm7     \n\t"
@@ -1479,7 +1529,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                   : "%mm0", "%mm1", "%mm2", "%mm3"  // clobber list
                   , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -1614,8 +1664,8 @@ png_do_read_interlace(png_structp png_ptr)
        png_warning(png_ptr, "asm_flags may not have been initialized");
 #endif
        png_mmx_support();
-#endif
    }
+#endif
 
    if (row != NULL && row_info != NULL)
    {
@@ -1878,7 +1928,7 @@ png_do_read_interlace(png_structp png_ptr)
                           "0" (width),     // ecx
                           "3" (&_const4)  // %1(?)  (0x0000000000FFFFFFLL)
 
-#if 0  /* %mm0, ..., %mm4 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                         : "%mm0", "%mm1", "%mm2"       // clobber list
                         , "%mm3", "%mm4"
 #endif
@@ -1897,7 +1947,7 @@ png_do_read_interlace(png_structp png_ptr)
 
                      ".loop3_pass2:              \n\t"
                         "movd (%%esi), %%mm0     \n\t" // x x x x x 2 1 0
-                        "pand (%3), %%mm0     \n\t" // z z z z z 2 1 0
+                        "pand (%3), %%mm0        \n\t" // z z z z z 2 1 0
                         "movq %%mm0, %%mm1       \n\t" // z z z z z 2 1 0
                         "psllq $16, %%mm0        \n\t" // z z z 2 1 0 z z
                         "movq %%mm0, %%mm2       \n\t" // z z z 2 1 0 z z
@@ -1924,7 +1974,7 @@ png_do_read_interlace(png_structp png_ptr)
                           "0" (width),     // ecx
                           "3" (&_const4)  // (0x0000000000FFFFFFLL)
 
-#if 0  /* %mm0, ..., %mm2 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                         : "%mm0", "%mm1", "%mm2"       // clobber list
 #endif
                      );
@@ -1956,14 +2006,14 @@ png_do_read_interlace(png_structp png_ptr)
                            "movq %%mm0, %%mm1       \n\t" // x x 5 4 3 2 1 0
                            "movq %%mm0, %%mm2       \n\t" // x x 5 4 3 2 1 0
                            "psllq $24, %%mm0        \n\t" // 4 3 2 1 0 z z z
-                           "pand (%3), %%mm1          \n\t" // z z z z z 2 1 0
+                           "pand (%3), %%mm1        \n\t" // z z z z z 2 1 0
                            "psrlq $24, %%mm2        \n\t" // z z z x x 5 4 3
                            "por %%mm1, %%mm0        \n\t" // 4 3 2 1 0 2 1 0
                            "movq %%mm2, %%mm3       \n\t" // z z z x x 5 4 3
                            "psllq $8, %%mm2         \n\t" // z z x x 5 4 3 z
                            "movq %%mm0, (%%edi)     \n\t"
                            "psrlq $16, %%mm3        \n\t" // z z z z z x x 5
-                           "pand (%4), %%mm3     \n\t" // z z z z z z z 5
+                           "pand (%4), %%mm3        \n\t" // z z z z z z z 5
                            "por %%mm3, %%mm2        \n\t" // z z x x 5 4 3 5
                            "subl $6, %%esi          \n\t"
                            "movd %%mm2, 8(%%edi)    \n\t"
@@ -1984,7 +2034,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "3" (&_const4), // 0x0000000000FFFFFFLL
                              "4" (&_const6)  // 0x00000000000000FFLL
 
-#if 0  /* %mm0, ..., %mm3 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
                            , "%mm2", "%mm3"
 #endif
@@ -2057,7 +2107,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0, ..., %mm4 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1", "%mm2"       // clobber list
                            , "%mm3", "%mm4"
 #endif
@@ -2131,7 +2181,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2185,7 +2235,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2247,7 +2297,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2304,7 +2354,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2357,7 +2407,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -2424,7 +2474,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2482,7 +2532,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2538,7 +2588,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#if 0  /* %mm0, %mm1 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2601,7 +2651,7 @@ png_do_read_interlace(png_structp png_ptr)
                           "2" (dp),        // edi
                           "0" (width)      // ecx
 
-#if 0  /* %mm0 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                         : "%mm0"                       // clobber list
 #endif
                      );
@@ -2640,7 +2690,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width)      // ecx
 
-#if 0  /* %mm0 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -2676,7 +2726,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width)      // ecx
 
-#if 0  /* %mm0 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -3084,7 +3134,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#if 0  /* %mm0, ..., %mm7 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3183,7 +3233,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                           // clobber list
-#if 0  /* %mm0, ..., %mm7 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3319,7 +3369,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                           // clobber list
-#if 0  /* %mm0, ..., %mm7 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3431,7 +3481,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                           // clobber list
-#if 0  /* %mm0, ..., %mm5 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2"
             , "%mm3", "%mm4", "%mm5"
 #endif
@@ -3934,7 +3984,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#if 0  /* %mm0, ..., %mm7 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4096,7 +4146,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#if 0  /* %mm0, ..., %mm7 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4241,7 +4291,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#if 0  /* %mm0, ..., %mm7 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4387,7 +4437,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#if 0  /* %mm0, ..., %mm7 not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4696,7 +4746,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 
       : "%esi", "%ecx", "%edx"            // clobber list
 
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
       , "%mm0", "%mm1", "%mm2", "%mm3"
       , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4757,7 +4807,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%edx", "%esi"                    // clobber list
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm6", "%mm7"
 #endif
          );
@@ -4838,7 +4888,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%edx", "%esi"                    // clobber list
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1"
 #endif
          );
@@ -4905,7 +4955,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%edx", "%esi"                    // clobber list
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm5", "%mm6", "%mm7"
 #endif
          );
@@ -4984,7 +5034,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%ecx", "%edx", "%esi"            // clobber list
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3", "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
          );
@@ -5017,7 +5067,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%edx", "%esi"                    // clobber list
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1"
 #endif
          );
@@ -5211,7 +5261,7 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
       , "%ebx"
 #endif
 
-#if 0  /* MMX regs (%mm0, etc.) not supported by gcc 2.7.2.3 or egcs 1.1 */
+#ifdef CLOBBER_MMX_REGS_SUPPORTED
       , "%mm0", "%mm1", "%mm2", "%mm3"
       , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -5249,8 +5299,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #define UseMMX_paeth  1   // GRR:  converted 20000828
 
    if (_mmx_supported == 2) {
-       /* this should have happened in png_init_mmx_flags() already */
 #if !defined(PNG_1_0_X)
+       /* this should have happened in png_init_mmx_flags() already */
        png_warning(png_ptr, "asm_flags may not have been initialized");
 #endif
        png_mmx_support();
@@ -5483,5 +5533,3 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
 
 #endif /* PNG_USE_PNGGCCRD */
-
-

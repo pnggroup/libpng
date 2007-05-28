@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta11 - May 28, 2007
+Libpng 1.2.19beta12 - May 28, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta11.tar.gz
-   libpng-1.2.19beta11.tar.bz2
+   libpng-1.2.19beta12.tar.gz
+   libpng-1.2.19beta12.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta11-no-config.tar.gz
-   libpng-1.2.19beta11-no-config.tar.bz2
+   libpng-1.2.19beta12-no-config.tar.gz
+   libpng-1.2.19beta12-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b11.zip
-   lp1219b11.tar.bz2
+   lp1219b12.zip
+   lp1219b12.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta11-project-netware.zip
-   libpng-1.2.19beta11-project-wince.zip
+   libpng-1.2.19beta12-project-netware.zip
+   libpng-1.2.19beta12-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta11-README.txt
-   libpng-1.2.19beta11-KNOWNBUGS.txt
-   libpng-1.2.19beta11-LICENSE.txt
-   libpng-1.2.19beta11-Y2K-compliance.txt
+   libpng-1.2.19beta12-README.txt
+   libpng-1.2.19beta12-KNOWNBUGS.txt
+   libpng-1.2.19beta12-LICENSE.txt
+   libpng-1.2.19beta12-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -82,6 +82,9 @@ version 1.2.19beta11 [May 28, 2007]
   Return 0 from png_get_sPLT() and png_get_unknown_chunks() if png_ptr is NULL;
     changed three remaining instances of png_strcpy() to png_strncpy() (David
     Hill).
+
+version 1.2.19beta12 [May 28, 2007]
+  Revised pnggccrd.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
