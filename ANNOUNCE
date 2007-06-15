@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta12 - May 28, 2007
+Libpng 1.2.19beta13 - June 15, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta12.tar.gz
-   libpng-1.2.19beta12.tar.bz2
+   libpng-1.2.19beta13.tar.gz
+   libpng-1.2.19beta13.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta12-no-config.tar.gz
-   libpng-1.2.19beta12-no-config.tar.bz2
+   libpng-1.2.19beta13-no-config.tar.gz
+   libpng-1.2.19beta13-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b12.zip
-   lp1219b12.tar.bz2
+   lp1219b13.zip
+   lp1219b13.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta12-project-netware.zip
-   libpng-1.2.19beta12-project-wince.zip
+   libpng-1.2.19beta13-project-netware.zip
+   libpng-1.2.19beta13-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta12-README.txt
-   libpng-1.2.19beta12-KNOWNBUGS.txt
-   libpng-1.2.19beta12-LICENSE.txt
-   libpng-1.2.19beta12-Y2K-compliance.txt
+   libpng-1.2.19beta13-README.txt
+   libpng-1.2.19beta13-KNOWNBUGS.txt
+   libpng-1.2.19beta13-LICENSE.txt
+   libpng-1.2.19beta13-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -82,9 +82,14 @@ version 1.2.19beta11 [May 28, 2007]
   Return 0 from png_get_sPLT() and png_get_unknown_chunks() if png_ptr is NULL;
     changed three remaining instances of png_strcpy() to png_strncpy() (David
     Hill).
+  Make test for NULL row_buf at the beginning of png_do_read_transformations
+    unconditional.
 
 version 1.2.19beta12 [May 28, 2007]
   Revised pnggccrd.c.
+
+version 1.2.19beta13 [June 15, 2007]
+  Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

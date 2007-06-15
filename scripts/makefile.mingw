@@ -6,15 +6,15 @@
 # Built from makefile.cygwin
 # Copyright (C) 2002, 2006 Soren Anderson, Charles Wilson,
 #    and Glenn Randers-Pehrson, based on makefile for linux-elf w/mmx by:
-# Copyright (C) 1998-2000 Greg Roelofs
+# Copyright (C) 1998-2000, 2007 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
+
 
 # This makefile intends to support building outside the src directory
 # if desired. When invoking it, specify an argument to SRCDIR on the
 # command line that points to the top of the directory where your source
 # is located.
-
 ifdef SRCDIR
 VPATH = $(SRCDIR)
 else
@@ -29,20 +29,25 @@ endif
 # If you're going to install into a temporary location
 # via DESTDIR, $(DESTDIR)$(prefix) must already exist before
 # you execute make install.
-
 DESTDIR=
 
-# To enable assembler optimizations, add '-DPNG_USE_PNGGCCRD' to
-# $CFLAGS, and include pnggccrd.o in $OBJS, below, and in the dependency
-# list at the bottom of this makefile.
-
+# If you're using a cross-compiler, add the appropriate prefix (e.g.,
+# "i386-mingw32msvc-") to the following three commands:
 CC=gcc
+AR=ar
+RANLIB=ranlib
+
+MKDIR_P=/bin/mkdir -pv
+
+
+# To enable assembler optimizations, add '-DPNG_USE_PNGGCCRD' to
+# $CFLAGS, and include pnggccrd.o in $OBJS, below.
 
 
 # Where "make install" puts libpng*.a, *png*.dll, png.h, and pngconf.h
 ifndef prefix
 prefix=/usr
-$(warning You haven't specified a 'prefix=' location. Defaulting to "/usr")
+$(warning "You haven't specified a 'prefix=' location. Defaulting to '/usr'")
 endif
 exec_prefix=$(prefix)
 
@@ -76,7 +81,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 MINGDLL = 12
-PNGMIN = 1.2.19beta12
+PNGMIN = 1.2.19beta13
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=libpng$(MINGDLL).dll
@@ -89,10 +94,6 @@ EXE=.exe
 LDFLAGS=$(strip -L. $(MINGW_LDFLAGS) -lpng $(addprefix -L,$(ZLIBLIB)) -lz)
 LDSFLAGS=$(strip -shared -L.  $(MINGW_LDFLAGS))
 LDEXTRA=-Wl,--out-implib=$(IMPLIB) $(addprefix -L,$(ZLIBLIB)) -lz
-
-MKDIR_P=/bin/mkdir -pv
-RANLIB=ranlib
-#RANLIB=echo
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -155,22 +156,8 @@ shared: all-shared
 all-static: $(STATLIB) pngtest-stat$(EXE)
 all-shared: $(SHAREDLIB) pngtest$(EXE)
 
-pnggccrd.o: pnggccrd.c png.h pngconf.h
-	@echo ""
-	@echo '    You can ignore the "control reaches end of non-void function"'
-	@echo '    warning and "<variable> defined but not used" warnings:'
-	@echo ""
-	$(CC) -c $(CFLAGS) -o $@ $<
-
-pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
-	@echo ""
-	@echo '    You can ignore the "control reaches end of non-void function"'
-	@echo '    warning and "<variable> defined but not used" warnings:'
-	@echo ""
-	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
-
 $(STATLIB): $(OBJS)
-	ar rc $@ $(OBJS)
+	$(AR) rc $@ $(OBJS)
 	$(RANLIB) $@
 
 $(SHAREDDEF): scripts/pngw32.def
@@ -185,12 +172,6 @@ pngtest$(EXE): pngtest.pic.o $(SHAREDLIB)
 
 pngtest-stat$(EXE): pngtest.o $(STATLIB)
 	$(CC) -static $(CFLAGS) $< $(LDFLAGS) -o $@
-
-pngtest.pic.o: pngtest.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-pngtest.o: pngtest.c
-	$(CC) $(CFLAGS) -c $< -o $@
 
 test: test-static test-shared
 
@@ -278,8 +259,8 @@ test-installed:
 
 clean:
 	/bin/rm -f *.pic.o *.o $(STATLIB) $(IMPLIB) $(SHAREDLIB) \
-	pngtest-stat$(EXE) pngtest$(EXE) pngout.png $(SHAREDDEF) \
-	libpng-config libpng.pc pngtesti$(EXE)
+	   pngtest-stat$(EXE) pngtest$(EXE) pngout.png $(SHAREDDEF) \
+	   libpng-config libpng.pc pngtesti$(EXE)
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
@@ -304,9 +285,9 @@ pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
 pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c
 pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngwutil.c
 pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
+pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pnggccrd.c
 
-pngtest.o:			png.h pngconf.h pngtest.c
-pngtest-stat.o:			png.h pngconf.h pngtest.c
+pngtest.o pngtest.pic.o:	png.h pngconf.h pngtest.c
 
 
 

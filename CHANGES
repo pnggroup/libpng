@@ -1775,9 +1775,14 @@ version 1.2.19beta11 [May 28, 2007]
   Return 0 from png_get_sPLT() and png_get_unknown_chunks() if png_ptr is NULL;
     changed three remaining instances of png_strcpy() to png_strncpy() (David
     Hill).
+  Make test for NULL row_buf at the beginning of png_do_read_transformations
+    unconditional.
 
 version 1.2.19beta12 [May 28, 2007]
   Revised pnggccrd.c.
+
+version 1.2.19beta13 [June 15, 2007]
+  Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

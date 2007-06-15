@@ -7,7 +7,7 @@
  *     and http://www.intel.com/drg/pentiumII/appnotes/923/923.htm
  *     for Intel's performance analysis of the MMX vs. non-MMX code.
  *
- * Last changed in libpng 1.2.19 May 28, 2007
+ * Last changed in libpng 1.2.19 June 15, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -254,7 +254,7 @@
  *     [might be able to work around by doing within assembly code whatever
  *     -fPIC does, but given problems to date, seems like long shot...]
  *     [relevant ifdefs:  __x86_64__ && __PIC__ => C code only]
- *  - changed #if 0 to #ifdef CLOBBER_MMX_REGS_SUPPORTED in case gcc ever
+ *  - changed #if 0 to #ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED in case gcc ever
  *     supports MMX regs (%mm0, etc.) in clobber list (not supported by gcc
  *     2.7.2.3, 2.91.66 (egcs 1.1.2), 3.x, or 4.1.2)
 
@@ -703,7 +703,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                   : "%mm0", "%mm1", "%mm2", "%mm3"  // clobber list
                   , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -1010,7 +1010,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                   : "%mm0", "%mm4", "%mm6", "%mm7"  // clobber list
 #endif
                );
@@ -1165,7 +1165,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "3" (srcptr),      // esi
                     "4" (dstptr)       // edi
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                   : "%mm0", "%mm1", "%mm4"          // clobber list
                   , "%mm5", "%mm6", "%mm7"
 #endif
@@ -1335,7 +1335,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                   : "%mm0", "%mm1", "%mm2"          // clobber list
                   , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -1529,7 +1529,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                   : "%mm0", "%mm1", "%mm2", "%mm3"  // clobber list
                   , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -1928,7 +1928,7 @@ png_do_read_interlace(png_structp png_ptr)
                           "0" (width),     // ecx
                           "3" (&_const4)  // %1(?)  (0x0000000000FFFFFFLL)
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                         : "%mm0", "%mm1", "%mm2"       // clobber list
                         , "%mm3", "%mm4"
 #endif
@@ -1974,7 +1974,7 @@ png_do_read_interlace(png_structp png_ptr)
                           "0" (width),     // ecx
                           "3" (&_const4)  // (0x0000000000FFFFFFLL)
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                         : "%mm0", "%mm1", "%mm2"       // clobber list
 #endif
                      );
@@ -2034,7 +2034,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "3" (&_const4), // 0x0000000000FFFFFFLL
                              "4" (&_const6)  // 0x00000000000000FFLL
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
                            , "%mm2", "%mm3"
 #endif
@@ -2107,7 +2107,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1", "%mm2"       // clobber list
                            , "%mm3", "%mm4"
 #endif
@@ -2181,7 +2181,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2235,7 +2235,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2297,7 +2297,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2354,7 +2354,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2407,7 +2407,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -2474,7 +2474,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2532,7 +2532,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2588,7 +2588,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2651,7 +2651,7 @@ png_do_read_interlace(png_structp png_ptr)
                           "2" (dp),        // edi
                           "0" (width)      // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                         : "%mm0"                       // clobber list
 #endif
                      );
@@ -2690,7 +2690,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width)      // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -2726,7 +2726,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width)      // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -3134,7 +3134,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3233,7 +3233,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                           // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3369,7 +3369,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                           // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3481,7 +3481,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                           // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2"
             , "%mm3", "%mm4", "%mm5"
 #endif
@@ -3984,7 +3984,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4146,7 +4146,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4291,7 +4291,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4437,7 +4437,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "1" (row)        // edi
 
             : "%ecx"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4746,7 +4746,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 
       : "%esi", "%ecx", "%edx"            // clobber list
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
       , "%mm0", "%mm1", "%mm2", "%mm3"
       , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4807,7 +4807,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%edx", "%esi"                    // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm6", "%mm7"
 #endif
          );
@@ -4888,7 +4888,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%edx", "%esi"                    // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1"
 #endif
          );
@@ -4955,7 +4955,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%edx", "%esi"                    // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm5", "%mm6", "%mm7"
 #endif
          );
@@ -5034,7 +5034,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%ecx", "%edx", "%esi"            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1", "%mm2", "%mm3", "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
          );
@@ -5067,7 +5067,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "1" (row)               // edi
 
             : "%edx", "%esi"                    // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
             , "%mm0", "%mm1"
 #endif
          );
@@ -5261,7 +5261,7 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
       , "%ebx"
 #endif
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
       , "%mm0", "%mm1", "%mm2", "%mm3"
       , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
