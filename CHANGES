@@ -1781,8 +1781,11 @@ version 1.2.19beta11 [May 28, 2007]
 version 1.2.19beta12 [May 28, 2007]
   Revised pnggccrd.c.
 
-version 1.2.19beta13 [June 15, 2007]
+version 1.2.19beta13 [June 14, 2007]
   Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
+
+version 1.2.19beta14 [June 16, 2007]
+  Fix bug with handling of 16-bit transparency, introduced in 1.2.19beta2
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

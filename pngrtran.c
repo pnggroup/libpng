@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.19 June 15, 2007
+ * Last changed in libpng 1.2.19 June 16, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -3849,12 +3849,12 @@ png_do_expand(png_row_infop row_info, png_bytep row,
             dp = row + (png_size_t)(row_width << 3) - 1;
             for (i = 0; i < row_width; i++)
             {
-               if (*(sp - 4) == red_high &&
-                  *(sp - 5) == red_low &&
-                  *(sp - 2) == green_high &&
-                  *(sp - 3) == green_low &&
-                  *(sp - 0) == blue_high &&
-                  *(sp - 1) == blue_low)
+               if (*(sp - 5) == red_high &&
+                  *(sp - 4) == red_low &&
+                  *(sp - 3) == green_high &&
+                  *(sp - 2) == green_low &&
+                  *(sp - 1) == blue_high &&
+                  *(sp    ) == blue_low)
                {
                   *dp-- = 0;
                   *dp-- = 0;

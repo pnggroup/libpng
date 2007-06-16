@@ -2,7 +2,7 @@
 ; PNG.LIB module definition file for OS/2
 ;----------------------------------------
 
-; Version 1.2.19beta13
+; Version 1.2.19beta14
 
 LIBRARY		PNG
 DESCRIPTION	"PNG image compression library for OS/2"

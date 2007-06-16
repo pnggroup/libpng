@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta13 - June 15, 2007
+Libpng 1.2.19beta14 - June 16, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta13.tar.gz
-   libpng-1.2.19beta13.tar.bz2
+   libpng-1.2.19beta14.tar.gz
+   libpng-1.2.19beta14.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta13-no-config.tar.gz
-   libpng-1.2.19beta13-no-config.tar.bz2
+   libpng-1.2.19beta14-no-config.tar.gz
+   libpng-1.2.19beta14-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b13.zip
-   lp1219b13.tar.bz2
+   lp1219b14.zip
+   lp1219b14.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta13-project-netware.zip
-   libpng-1.2.19beta13-project-wince.zip
+   libpng-1.2.19beta14-project-netware.zip
+   libpng-1.2.19beta14-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta13-README.txt
-   libpng-1.2.19beta13-KNOWNBUGS.txt
-   libpng-1.2.19beta13-LICENSE.txt
-   libpng-1.2.19beta13-Y2K-compliance.txt
+   libpng-1.2.19beta14-README.txt
+   libpng-1.2.19beta14-KNOWNBUGS.txt
+   libpng-1.2.19beta14-LICENSE.txt
+   libpng-1.2.19beta14-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -88,8 +88,11 @@ version 1.2.19beta11 [May 28, 2007]
 version 1.2.19beta12 [May 28, 2007]
   Revised pnggccrd.c.
 
-version 1.2.19beta13 [June 15, 2007]
+version 1.2.19beta13 [June 14, 2007]
   Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
+
+version 1.2.19beta14 [June 16, 2007]
+  Fix bug with handling of 16-bit transparency, introduced in 1.2.19beta2
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
