@@ -22,7 +22,8 @@ below.
 Files:
 
    README             this file
-   LICENSE            terms of distribution and reuse (BSD-like)
+   LICENSE            terms of distribution and reuse (BSD-like or GNU GPL)
+   COPYING            GNU General Public License (GPL)
 
    Makefile.unx       Unix makefile
    Makefile.w32       Windows (MSVC) makefile
@@ -54,15 +55,15 @@ mation and links to the latest version of the source code, and Chapters
 13-15 of the book for detailed discussion of the three programs.
 
 Greg Roelofs
-newt@pobox.com
-30 June 2001
+http://pobox.com/~newt/greg_contact.html
+2 June 2007
 
 
 BUILD INSTRUCTIONS
 
  - Prerequisites (in order of compilation):
 
-      - zlib		http://www.gzip.org/zlib/
+      - zlib		http://zlib.net/
       - libpng		http://www.libpng.org/pub/png/libpng.html
       - pngbook		http://www.libpng.org/pub/png/book/sources.html
 
@@ -150,9 +151,9 @@ BUILD INSTRUCTIONS
      To run the programs, they probably first need to be set up as "foreign
      symbols," with "disk" and "dir" set appropriately:
 
-     $ rpng == "$disk:[dir]rpng-x.exe"
+     $ rpng  == "$disk:[dir]rpng-x.exe"
      $ rpng2 == "$disk:[dir]rpng2-x.exe"
-     $ wpng == "$disk:[dir]wpng.exe"
+     $ wpng  == "$disk:[dir]wpng.exe"
 
      All three will print a basic usage screen when run without any command-
      line arguments; see the book for more details.  Note that the options
@@ -176,7 +177,7 @@ RUNNING THE PROGRAMS:  (VERY) BRIEF INTRO
      wpng is a purely command-line image converter from binary PBMPLUS/NetPBM
      format (.pgm or .ppm) to PNG; for example,
 
-	wpng -time < toucan.ppm > toucan.png
+	wpng -time < toucan-notrans.ppm > toucan-notrans.png
 
      would convert the specified PPM file (using redirection) to PNG, auto-
      matically setting the PNG modification-time chunk.

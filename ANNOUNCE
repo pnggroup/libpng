@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta15 - June 17, 2007
+Libpng 1.2.19beta16 - June 19, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta15.tar.gz
-   libpng-1.2.19beta15.tar.bz2
+   libpng-1.2.19beta16.tar.gz
+   libpng-1.2.19beta16.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta15-no-config.tar.gz
-   libpng-1.2.19beta15-no-config.tar.bz2
+   libpng-1.2.19beta16-no-config.tar.gz
+   libpng-1.2.19beta16-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b15.zip
-   lp1219b15.tar.bz2
+   lp1219b16.zip
+   lp1219b16.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta15-project-netware.zip
-   libpng-1.2.19beta15-project-wince.zip
+   libpng-1.2.19beta16-project-netware.zip
+   libpng-1.2.19beta16-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta15-README.txt
-   libpng-1.2.19beta15-KNOWNBUGS.txt
-   libpng-1.2.19beta15-LICENSE.txt
-   libpng-1.2.19beta15-Y2K-compliance.txt
+   libpng-1.2.19beta16-README.txt
+   libpng-1.2.19beta16-KNOWNBUGS.txt
+   libpng-1.2.19beta16-LICENSE.txt
+   libpng-1.2.19beta16-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -96,6 +96,12 @@ version 1.2.19beta14 [June 16, 2007]
 
 version 1.2.19beta15 [June 17, 2007]
   Revised pnggccrd.c.
+
+version 1.2.19beta16 [June 19, 2007]
+  Revised pnggccrd.c again.
+  Updated contrib/gregbook.
+  Changed '#include "$srcdir/pnggccrd.c"' 'include "$srcdir/pnggccrd.c"'
+    in configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

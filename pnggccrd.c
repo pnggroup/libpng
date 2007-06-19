@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 June 17, 2007
+ * Last changed in libpng 1.2.19 June 19, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -327,11 +327,14 @@
  * 20070616:
  *  - finished replacing direct _FullLength accesses with register constraints
  *     (*ugly* conditional clobber-separator macros for avg and paeth, sigh)
+ *    Changed all "ifdef *" to "if defined(*)"
  *
- *
- * [TODO:  reevaluate PNG_THREAD_UNSAFE_OK blocks for non-const global-var use]
  *
  * STILL TO DO:
+ *  - fix final thread-unsafe code using stack vars and pointer? (paeth top,
+ *     default, bottom only; default, bottom already 5 reg constraints; could
+ *     replace bpp with pointer and group bpp/patemp/pbtemp/pctemp in array)
+ *  - fix ebp/no-reg-constraint inefficiency (avg/paeth/sub top)
  *  - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
  *  - write MMX code for 48-bit case (pixel_bytes == 6)
  *  - figure out what's up with 24-bit case (pixel_bytes == 3):
@@ -354,14 +357,14 @@
 
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
 
-#if defined(__x86_64__) && defined(__PIC__)
-#  define PNG_x86_64_USE_GOTPCREL
+#if defined(__x86_64__) && defined(__PIC__)  // optionally comment out __PIC__:
+#  define PNG_x86_64_USE_GOTPCREL            // GOTPCREL => full thread-safety
 #  define PNG_CLOBBER_x86_64_REGS_SUPPORTED  // works as of gcc 3.4.3 ...
 #endif
 
 int PNGAPI png_mmx_support(void);
 
-#ifdef PNG_USE_LOCAL_ARRAYS
+#if defined(PNG_USE_LOCAL_ARRAYS)
 static PNG_CONST int FARDATA png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 static PNG_CONST int FARDATA png_pass_inc[7]   = {8, 8, 4, 4, 2, 2, 1};
 static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
@@ -400,7 +403,7 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 #  define _amask0_2_6     amask0_2_6
 #  define _amask2_3_3     amask2_3_3
 #  define _amask4_2_2     amask4_2_2
-#  ifdef PNG_THREAD_UNSAFE_OK
+#  if defined(PNG_THREAD_UNSAFE_OK)
 #    define _patemp       patemp
 #    define _pbtemp       pbtemp
 #    define _pctemp       pctemp
@@ -412,7 +415,7 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 
 typedef unsigned long long  ull;
 
-#ifdef PNG_x86_64_USE_GOTPCREL
+#if defined(PNG_x86_64_USE_GOTPCREL)
 static PNG_CONST struct {
     //ull _mask_array[26];
 
@@ -579,13 +582,13 @@ static PNG_CONST ull _amask4_2_2  __attribute__((used, aligned(8))) = 0x00000000
 
 
 #if defined(PNG_HAVE_MMX_READ_FILTER_ROW)
-#ifdef PNG_THREAD_UNSAFE_OK  // used only within thread-unsafe functions (at least for now)
 
-#ifdef PNG_x86_64_USE_GOTPCREL
+// this block is specific to png_read_filter_row_mmx_paeth()
+#if defined(PNG_x86_64_USE_GOTPCREL)
 #  define pa_TEMP                "%%r11d"
 #  define pb_TEMP                "%%r12d"
 #  define pc_TEMP                "%%r13d"
-#  ifdef PNG_CLOBBER_x86_64_REGS_SUPPORTED  // works as of gcc 3.4.3 ...
+#  if defined(PNG_CLOBBER_x86_64_REGS_SUPPORTED)  // works as of gcc 3.4.3 ...
 #    define SAVE_r11_r12_r13
 #    define RESTORE_r11_r12_r13
 #    define _CLOBBER_r11_r12_r13 ,"%r11", "%r12", "%r13"
@@ -604,33 +607,35 @@ static PNG_CONST ull _amask4_2_2  __attribute__((used, aligned(8))) = 0x00000000
                                  "movq  _c64@GOTPCREL(%%rip), %%rbp  \n\t"
 #  define RESTORE_rbp            "popq  %%rbp                        \n\t"
 #else // 32-bit and/or non-PIC
-   // These variables are used in png_read_filter_row_mmx_paeth() and would be
-   //   local variables if not for gcc-inline-assembly addressing limitations
-   //   (some apparently related to ELF format, others to CPU type).
-   //
-   // WARNING: Their presence defeats the thread-safety of libpng.
-   static int                     _patemp  __attribute__((used));
-   static int                     _pbtemp  __attribute__((used));
-   static int                     _pctemp  __attribute__((used));
-#  define pa_TEMP                "_patemp"
-#  define pb_TEMP                "_pbtemp"  // temp variables for
-#  define pc_TEMP                "_pctemp"  //  Paeth routine
-#  define SAVE_r11_r12_r13
-#  define RESTORE_r11_r12_r13
-#  define _CLOBBER_r11_r12_r13   // not using regs => not clobbering
-#  define CLOBBER_r11_r12_r13
-#  define LOAD_GOT_rbp
-#  define RESTORE_rbp
+#  if defined(PNG_THREAD_UNSAFE_OK)
+     // These variables are used in png_read_filter_row_mmx_paeth() and would be
+     //   local variables if not for gcc-inline-assembly addressing limitations
+     //   (some apparently related to ELF format, others to CPU type).
+     //
+     // WARNING: Their presence defeats the thread-safety of libpng.
+     static int                     _patemp  __attribute__((used));
+     static int                     _pbtemp  __attribute__((used));
+     static int                     _pctemp  __attribute__((used));
+#    define pa_TEMP                "_patemp"
+#    define pb_TEMP                "_pbtemp"  // temp variables for
+#    define pc_TEMP                "_pctemp"  //  Paeth routine
+#    define SAVE_r11_r12_r13
+#    define RESTORE_r11_r12_r13
+#    define _CLOBBER_r11_r12_r13   // not using regs => not clobbering
+#    define CLOBBER_r11_r12_r13
+#  endif // PNG_THREAD_UNSAFE_OK
+#    define LOAD_GOT_rbp
+#    define RESTORE_rbp
 #endif
 
-#ifdef __x86_64__
+#if defined(__x86_64__)
 #  define SAVE_ebp
 #  define RESTORE_ebp
 #  define _CLOBBER_ebp         ,"%ebp"
 #  define CLOBBER_ebp          "%ebp"
 #  define SAVE_FullLength      "movl %%eax, %%r15d  \n\t"
 #  define RESTORE_FullLength   "movl %%r15d, "     // may go into eax or ecx
-#  ifdef PNG_CLOBBER_x86_64_REGS_SUPPORTED  // works as of gcc 3.4.3 ...
+#  if defined(PNG_CLOBBER_x86_64_REGS_SUPPORTED)  // works as of gcc 3.4.3 ...
 #    define SAVE_r15
 #    define RESTORE_r15
 #    define _CLOBBER_r15       ,"%r15"
@@ -690,11 +695,10 @@ static PNG_CONST ull _amask4_2_2  __attribute__((used, aligned(8))) = 0x00000000
 #  define CLOB_COLON_ebx_ebp_r1X    : // clobbering ebp OR ebx OR r11_r12_r13
 #endif
 
-#endif // PNG_THREAD_UNSAFE_OK
 #endif // PNG_HAVE_MMX_READ_FILTER_ROW
 
-#ifdef __PIC__  // macros to save, restore index to Global Offset Table
-#  ifdef __x86_64__
+#if defined(__PIC__)  // macros to save, restore index to Global Offset Table
+#  if defined(__x86_64__)
 #    define SAVE_GOT_ebx     "pushq %%rbx \n\t"
 #    define RESTORE_GOT_ebx  "popq  %%rbx \n\t"
 #  else
@@ -747,7 +751,7 @@ png_mmx_support(void)
 #if defined(PNG_MMX_CODE_SUPPORTED)
     int result;
     __asm__ __volatile__ (
-#ifdef __x86_64__
+#if defined(__x86_64__)
         "pushq %%rbx          \n\t"  // rbx gets clobbered by CPUID instruction
         "pushq %%rcx          \n\t"  // so does rcx...
         "pushq %%rdx          \n\t"  // ...and rdx (but rcx & rdx safe on Linux)
@@ -799,7 +803,7 @@ png_mmx_support(void)
     "0:                       \n\t"  // .NOT_SUPPORTED: target label for jump instructions
         "movl $0, %%eax       \n\t"  // set return value to 0
     "1:                       \n\t"  // .RETURN: target label for jump instructions
-#ifdef __x86_64__
+#if defined(__x86_64__)
         "popq %%rdx           \n\t"  // restore rdx
         "popq %%rcx           \n\t"  // restore rcx
         "popq %%rbx           \n\t"  // restore rbx
@@ -889,7 +893,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
@@ -1017,7 +1021,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                   : "%mm0", "%mm1", "%mm2", "%mm3"  // clobber list
                   , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -1234,7 +1238,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
@@ -1326,7 +1330,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                   : "%mm0", "%mm4", "%mm6", "%mm7"  // clobber list
 #endif
                );
@@ -1377,7 +1381,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
@@ -1483,7 +1487,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "3" (srcptr),      // esi
                     "4" (dstptr)       // edi
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                   : "%mm0", "%mm1", "%mm4"          // clobber list
                   , "%mm5", "%mm6", "%mm7"
 #endif
@@ -1534,7 +1538,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
@@ -1655,7 +1659,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                   : "%mm0", "%mm1", "%mm2"          // clobber list
                   , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -1706,7 +1710,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_bytep srcptr;
             png_bytep dstptr;
 
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
                 /* && _mmx_supported */ )
@@ -1851,7 +1855,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                     "2" (len),         // ecx
                     "1" (mask)         // edx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                   : "%mm0", "%mm1", "%mm2", "%mm3"  // clobber list
                   , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -2241,13 +2245,13 @@ png_do_read_interlace(png_structp png_ptr)
                         : "1" (sptr),          // esi      // input regs
                           "2" (dp),            // edi
                           "0" (width),         // ecx
-#ifdef PNG_x86_64_USE_GOTPCREL                 // formerly _const4:
+#if defined(PNG_x86_64_USE_GOTPCREL)                // formerly _const4:
                           "3" (&_c64._amask5_3_0)  // (0x0000000000FFFFFFLL)
 #else
                           "3" (&_amask5_3_0)       // (0x0000000000FFFFFFLL)
 #endif
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                         : "%mm0", "%mm1", "%mm2"       // clobber list
                         , "%mm3", "%mm4"
 #endif
@@ -2291,13 +2295,13 @@ png_do_read_interlace(png_structp png_ptr)
                         : "1" (sptr),          // esi      // input regs
                           "2" (dp),            // edi
                           "0" (width),         // ecx
-#ifdef PNG_x86_64_USE_GOTPCREL                 // formerly _const4:
+#if defined(PNG_x86_64_USE_GOTPCREL)                // formerly _const4:
                           "3" (&_c64._amask5_3_0)  // (0x0000000000FFFFFFLL)
 #else
                           "3" (&_amask5_3_0)       // (0x0000000000FFFFFFLL)
 #endif
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
                         : "%mm0", "%mm1", "%mm2"       // clobber list
 #endif
                      );
@@ -2354,7 +2358,7 @@ png_do_read_interlace(png_structp png_ptr)
                            : "1" (sptr),          // esi      // input regs
                              "2" (dp),            // edi
                              "0" (width_mmx),     // ecx
-#ifdef PNG_x86_64_USE_GOTPCREL                 // formerly _const4 and _const6:
+#if defined(PNG_x86_64_USE_GOTPCREL)                // formerly _const4 and _const6:
                              "3" (&_c64._amask5_3_0), // (0x0000000000FFFFFFLL)
                              "4" (&_c64._amask7_1_0)  // (0x00000000000000FFLL)
 #else
@@ -2362,7 +2366,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "4" (&_amask7_1_0)       // (0x00000000000000FFLL)
 #endif
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1"               // clobber list
                            , "%mm2", "%mm3"
 #endif
@@ -2435,7 +2439,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1", "%mm2"       // clobber list
                            , "%mm3", "%mm4"
 #endif
@@ -2509,7 +2513,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2563,7 +2567,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2625,7 +2629,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2682,7 +2686,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2735,7 +2739,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -2802,7 +2806,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2860,7 +2864,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2916,7 +2920,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width_mmx)  // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0", "%mm1"               // clobber list
 #endif
                         );
@@ -2979,7 +2983,7 @@ png_do_read_interlace(png_structp png_ptr)
                           "2" (dp),        // edi
                           "0" (width)      // ecx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                         : "%mm0"                       // clobber list
 #endif
                      );
@@ -3018,7 +3022,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width)      // ecx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -3054,7 +3058,7 @@ png_do_read_interlace(png_structp png_ptr)
                              "2" (dp),        // edi
                              "0" (width)      // ecx
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
                            : "%mm0"                       // clobber list
 #endif
                         );
@@ -3156,7 +3160,7 @@ png_do_read_interlace(png_structp png_ptr)
                      png_memcpy(v, sptr, 4);
                      for (j = 0; j < png_pass_inc[pass]; j++)
                      {
-#ifdef PNG_DEBUG
+#if defined(PNG_DEBUG)
                         if (dp < row || dp+3 > row+png_ptr->row_buf_size)
                         {
                            printf("dp out of bounds: row=%d, dp=%d, rp=%d\n",
@@ -3236,7 +3240,6 @@ png_do_read_interlace(png_structp png_ptr)
 #if defined(PNG_HAVE_MMX_READ_FILTER_ROW)
 #if defined(PNG_MMX_CODE_SUPPORTED)
 
-#ifdef PNG_THREAD_UNSAFE_OK
 //===========================================================================//
 //                                                                           //
 //           P N G _ R E A D _ F I L T E R _ R O W _ M M X _ A V G           //
@@ -3261,7 +3264,6 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
    bpp = (row_info->pixel_depth + 7) >> 3;  // calc number of bytes per pixel
    FullLength = row_info->rowbytes;         // number of bytes to filter
 
-//printf("GRR DEBUG: avgtop start\n"); fflush(stdout);
    __asm__ __volatile__ (
       SAVE_GOT_ebx
       SAVE_r15
@@ -3322,7 +3324,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       "subl %%eax, %%ecx           \n\t" // drop over bytes from original length
 //out "movl %%ecx, MMXLength       \n\t"
       "movl %%ebp, %%edi           \n\t" // ebp = diff, but no reg constraint(?)
-      RESTORE_ebp
+      RESTORE_ebp                        //  (could swap ebp and ecx functions)
       RESTORE_r15
       RESTORE_GOT_ebx
 
@@ -3341,14 +3343,12 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
         _CLOBBER_ebp
         _CLOBBER_GOT_ebx
    );
-//printf("GRR DEBUG: avgtop end\n"); fflush(stdout);
 
    // now do the math for the rest of the row
    switch (bpp)
    {
       case 3:
       {
-//printf("GRR DEBUG: avg3 start\n"); fflush(stdout);
 //       _ShiftBpp = 24;    // == 3 * 8
 //       _ShiftRem = 40;    // == 64 - 24
 
@@ -3454,12 +3454,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2", "%mm3"   // clobber list
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
          );
-//printf("GRR DEBUG: avg3 end\n"); fflush(stdout);
       }
       break;  // end 3 bpp
 
@@ -3552,7 +3551,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2", "%mm3"   // clobber list
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3648,7 +3647,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2", "%mm3"   // clobber list
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3787,7 +3786,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2", "%mm3"   // clobber list
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -3903,7 +3902,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2"           // clobber list
             , "%mm3", "%mm4", "%mm5"
 #endif
@@ -3913,7 +3912,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 
       default:                // bpp != 1,2,3,4,6,8:  doesn't exist
       {
-#ifdef PNG_DEBUG
+#if defined(PNG_DEBUG)
          // ERROR:  SHOULD NEVER BE REACHED
          png_debug(1,
           "Internal libpng logic error (GCC png_read_filter_row_mmx_avg())\n");
@@ -3923,7 +3922,6 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 
    } // end switch (bpp)
 
-//printf("GRR DEBUG: avgbot start\n"); fflush(stdout);
    __asm__ __volatile__ (
       // MMX acceleration complete; now do clean-up
       // check if any remaining bytes left to decode
@@ -3980,14 +3978,13 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
         CLOB_COMMA_ebx_ebp
         CLOBBER_ebp
    );
-//printf("GRR DEBUG: avgbot end\n"); fflush(stdout);
 
 } /* end png_read_filter_row_mmx_avg() */
-#endif // PNG_THREAD_UNSAFE_OK
 
 
 
-#ifdef PNG_THREAD_UNSAFE_OK
+#if defined(PNG_x86_64_USE_GOTPCREL) || defined(PNG_THREAD_UNSAFE_OK)
+
 //===========================================================================//
 //                                                                           //
 //         P N G _ R E A D _ F I L T E R _ R O W _ M M X _ P A E T H         //
@@ -4012,7 +4009,6 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
    bpp = (row_info->pixel_depth + 7) >> 3;  // calc number of bytes per pixel
    FullLength = row_info->rowbytes;         // number of bytes to filter
 
-//printf("GRR DEBUG: paethtop start\n"); fflush(stdout);
    __asm__ __volatile__ (
       SAVE_GOT_ebx
       SAVE_r15
@@ -4131,7 +4127,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       "subl %%eax, %%ecx           \n\t" // drop over bytes from original length
 //out "movl %%ecx, MMXLength       \n\t"
       "movl %%ebp, %%edi           \n\t" // ebp = diff, but no reg constraint(?)
-      RESTORE_ebp
+      RESTORE_ebp                        //  (could swap ebp and ecx functions)
       RESTORE_r15
       RESTORE_GOT_ebx
 
@@ -4151,14 +4147,12 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
         _CLOBBER_ebp
         _CLOBBER_GOT_ebx
    );
-//printf("GRR DEBUG: paethtop end\n"); fflush(stdout);
 
    // now do the math for the rest of the row
    switch (bpp)
    {
       case 3:
       {
-//printf("GRR DEBUG: paeth3 start\n"); fflush(stdout);
 //       _ShiftBpp = 24;    // == bpp * 8
 //       _ShiftRem = 40;    // == 64 - _ShiftBpp
 
@@ -4373,12 +4367,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2", "%mm3"   // clobber list
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
          );
-//printf("GRR DEBUG: paeth3 end\n"); fflush(stdout);
       }
       break;  // end 3 bpp
 
@@ -4538,7 +4531,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2", "%mm3"   // clobber list
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4687,7 +4680,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2", "%mm3"   // clobber list
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4836,7 +4829,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
               "2" (diff),      // ecx
               "3" (MMXLength)  // eax
 
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             : "%mm0", "%mm1", "%mm2", "%mm3"   // clobber list
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -4966,7 +4959,6 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 
    } // end switch (bpp)
 
-//printf("GRR DEBUG: paethend start\n"); fflush(stdout);
    __asm__ __volatile__ (
       // MMX acceleration complete; now do clean-up
       // check if any remaining bytes left to decode
@@ -5085,15 +5077,14 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
         CLOB_COMMA_ebX_r1X
         CLOBBER_r11_r12_r13
    );
-//printf("GRR DEBUG: paethend end\n"); fflush(stdout);
 
 } /* end png_read_filter_row_mmx_paeth() */
-#endif // PNG_THREAD_UNSAFE_OK
+
+#endif // PNG_x86_64_USE_GOTPCREL || PNG_THREAD_UNSAFE_OK
 
 
 
 
-#ifdef PNG_THREAD_UNSAFE_OK
 //===========================================================================//
 //                                                                           //
 //           P N G _ R E A D _ F I L T E R _ R O W _ M M X _ S U B           //
@@ -5117,7 +5108,6 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
    FullLength = row_info->rowbytes - bpp;   // number of bytes to filter
      // (why do we subtract off bpp?  not so in avg or paeth...)
 
-//printf("GRR DEBUG: subtop start\n"); fflush(stdout);
    __asm__ __volatile__ (
       SAVE_r15
       SAVE_ebp
@@ -5166,14 +5156,12 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
         _CLOBBER_r15
         _CLOBBER_ebp
    );
-//printf("GRR DEBUG: subtop end\n"); fflush(stdout);
 
    // now do the math for the rest of the row
    switch (bpp)
    {
       case 3:
       {
-//printf("GRR DEBUG: sub3 start\n"); fflush(stdout);
 //       _ShiftBpp = 24;       // == 3 * 8
 //       _ShiftRem  = 40;      // == 64 - 24
 
@@ -5230,11 +5218,10 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "3" (MMXLength)         // eax
 
             : "%esi"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             , "%mm0", "%mm1", "%mm6", "%mm7"
 #endif
          );
-//printf("GRR DEBUG: sub3 end\n"); fflush(stdout);
       }
       break;  // end 3 bpp
 
@@ -5282,7 +5269,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "3" (MMXLength)         // eax
 
             : "%esi"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             , "%mm0", "%mm1"
 #endif
          );
@@ -5332,7 +5319,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "3" (MMXLength)         // eax
 
             : "%esi"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             , "%mm0", "%mm1"
 #endif
          );
@@ -5441,7 +5428,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "3" (MMXLength)         // eax
 
             : "%esi"                            // clobber list
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             , "%mm0", "%mm1", "%mm5", "%mm6", "%mm7"
 #endif
          );
@@ -5526,7 +5513,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 
             : "%esi"                            // clobber list
               _CLOBBER_ebp
-#ifdef CLOBBER_MMX_REGS_SUPPORTED
+#if defined(CLOBBER_MMX_REGS_SUPPORTED)
             , "%mm0", "%mm1", "%mm2", "%mm3"
             , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -5536,7 +5523,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 
       default:                // bpp != 1,2,3,4,6,8:  doesn't exist
       {
-#ifdef PNG_DEBUG
+#if defined(PNG_DEBUG)
          // ERROR:  SHOULD NEVER BE REACHED
          png_debug(1,
           "Internal libpng logic error (GCC png_read_filter_row_mmx_sub())\n");
@@ -5546,7 +5533,6 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 
    } // end switch (bpp)
 
-//printf("GRR DEBUG: subend start\n"); fflush(stdout);
    __asm__ __volatile__ (
 //pre "movl MMXLength, %%eax        \n\t"
 //pre "movl row, %%edi              \n\t"
@@ -5581,10 +5567,8 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 
       : "%esi"                            // clobber list
    );
-//printf("GRR DEBUG: subend end\n"); fflush(stdout);
 
 } // end of png_read_filter_row_mmx_sub()
-#endif // PNG_THREAD_UNSAFE_OK
 
 
 
@@ -5724,7 +5708,7 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
       : "%eax", "%ecx"            // clobber list (no input regs!)
         _CLOBBER_GOT_ebx
 
-#ifdef PNG_CLOBBER_MMX_REGS_SUPPORTED
+#if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
       , "%mm0", "%mm1", "%mm2", "%mm3"
       , "%mm4", "%mm5", "%mm6", "%mm7"
 #endif
@@ -5750,17 +5734,11 @@ void /* PRIVATE */
 png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    row, png_bytep prev_row, int filter)
 {
-#ifdef PNG_DEBUG
+#if defined(PNG_DEBUG)
    char filnm[10];
 #endif
 
 #if defined(PNG_MMX_CODE_SUPPORTED)
-/* GRR:  these are superseded by png_ptr->asm_flags: */
-#define UseMMX_sub    1   // GRR:  converted 20000730
-#define UseMMX_up     1   // GRR:  converted 20000729
-#define UseMMX_avg    1   // GRR:  converted 20000828 (+ 16-bit bugfix 20000916)
-#define UseMMX_paeth  1   // GRR:  converted 20000828
-
    if (_mmx_supported == 2) {
 #if !defined(PNG_1_0_X)
        /* this should have happened in png_init_mmx_flags() already */
@@ -5770,48 +5748,79 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    }
 #endif /* PNG_MMX_CODE_SUPPORTED */
 
-#ifdef PNG_DEBUG
+#if defined(PNG_DEBUG)
    png_debug(1, "in png_read_filter_row (pnggccrd.c)\n");
    switch (filter)
    {
-      case 0: png_snprintf(filnm, 10, "none");
+      case 0:
+         png_snprintf(filnm, 10, "none");
          break;
-      case 1: png_snprintf(filnm, 10, "sub-%s",
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+
+      case 1:
+         png_snprintf(filnm, 10, "sub-%s",
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
-        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB)? "MMX" :
+           ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
+            (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+           _mmx_supported
 #endif
+           ? "MMX" :
 #endif
-"x86");
+             "x86");
          break;
-      case 2: png_snprintf(filnm, 10, "up-%s",
-#ifdef PNG_MMX_CODE_SUPPORTED
+
+      case 2:
+         png_snprintf(filnm, 10, "up-%s",
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
-        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP)? "MMX" :
+           ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP) &&
+            (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+           _mmx_supported
 #endif
+           ? "MMX" :
 #endif
- "x86");
+             "x86");
          break;
-      case 3: png_snprintf(filnm, 10, "avg-%s",
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+
+      case 3:
+         png_snprintf(filnm, 10, "avg-%s",
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
-        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG)? "MMX" :
+           ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG) &&
+            (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+           _mmx_supported
 #endif
+           ? "MMX" :
 #endif
- "x86");
+             "x86");
          break;
-      case 4: png_snprintf(filnm, 10, "Paeth-%s",
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+
+      case 4:
+         png_snprintf(filnm, 10, "Paeth-%s",
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
-        (png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH)? "MMX":
+           ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH) &&
+            (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+           _mmx_supported
 #endif
+           ? "MMX" :
 #endif
-"x86");
+             "x86");
          break;
-      default: png_snprintf(filnm, 10, "unknw");
+
+      default:
+         png_snprintf(filnm, 10, "unknown");
          break;
    }
-   png_debug2(0, "row_number=%5ld, %5s, ", png_ptr->row_number, filnm);
+   png_debug2(0, "row_number=%5ld, %10s, ", png_ptr->row_number, filnm);
    png_debug1(0, "row=0x%08lx, ", (unsigned long)row);
    png_debug2(0, "pixdepth=%2d, bytes=%d, ", (int)row_info->pixel_depth,
       (int)((row_info->pixel_depth + 7) >> 3));
@@ -5824,7 +5833,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_SUB:
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
@@ -5881,7 +5890,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_AVG:
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
@@ -5919,7 +5928,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case PNG_FILTER_VALUE_PAETH:
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_THREAD_UNSAFE_OK)
+#if defined(PNG_MMX_CODE_SUPPORTED)
+#if defined(PNG_x86_64_USE_GOTPCREL) || defined(PNG_THREAD_UNSAFE_OK)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
@@ -5931,6 +5941,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
             png_read_filter_row_mmx_paeth(row_info, row, prev_row);
          }
          else
+#endif /* PNG_x86_64_USE_GOTPCREL || PNG_THREAD_UNSAFE_OK */
 #endif /* PNG_MMX_CODE_SUPPORTED */
          {
             png_uint_32 i;
@@ -5958,7 +5969,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
                p = b - c;
                pc = a - c;
 
-#ifdef PNG_USE_ABS
+#if defined(PNG_USE_ABS)
                pa = abs(p);
                pb = abs(pc);
                pc = abs(p + pc);
@@ -5995,4 +6006,4 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #endif /* PNG_HAVE_MMX_READ_FILTER_ROW */
 
 
-#endif /* PNG_USE_PNGGCCRD */
+#endif /* PNG_ASSEMBLER_CODE_SUPPORTED && PNG_USE_PNGGCCRD */

@@ -1790,6 +1790,12 @@ version 1.2.19beta14 [June 16, 2007]
 version 1.2.19beta15 [June 17, 2007]
   Revised pnggccrd.c.
 
+version 1.2.19beta16 [June 19, 2007]
+  Revised pnggccrd.c again.
+  Updated contrib/gregbook.
+  Changed '#include "$srcdir/pnggccrd.c"' 'include "$srcdir/pnggccrd.c"'
+    in configure.ac
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
