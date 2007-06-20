@@ -8,14 +8,6 @@
 # To use, do "nmake /f scripts\makefile.intel"
 
 
-# ------------------- Intel C/C++ Compiler 4.0 and later -------------------
-
-# Caution: the assembler code was introduced at libpng version 1.0.4 and has
-# not yet been thoroughly tested.
-
-# Use assembler code
-ASMCODE=-DPNG_USE_PNGVCRD
-
 # Where the zlib library and include files are located
 ZLIBLIB=..\zlib
 ZLIBINC=..\zlib
@@ -36,7 +28,7 @@ CALLING=r	# __fastcall
 
 
 CC=icl -c
-CFLAGS=-O2 -G$(CPU)$(CALLING) -Qip -Qunroll4 -I$(ZLIBINC) $(ASMCODE) -nologo
+CFLAGS=-O2 -G$(CPU)$(CALLING) -Qip -Qunroll4 -I$(ZLIBINC) -nologo
 LD=link
 LDFLAGS=/SUBSYSTEM:CONSOLE /NOLOGO
 
@@ -44,8 +36,7 @@ O=.obj
 
 OBJS=png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O) \
 pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O) \
-pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O) pngvcrd$(O)
-
+pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O) pngvcrd$(O) pnggccrd$(O)
 
 all: test
 
@@ -68,6 +59,9 @@ pngrtran$(O): png.h pngconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 pngrutil$(O): png.h pngconf.h
+	$(CC) $(CFLAGS) $*.c $(ERRFILE)
+
+pnggccrd$(O): png.h pngconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 pngvcrd$(O): png.h pngconf.h

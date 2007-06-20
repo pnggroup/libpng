@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.19beta16
+PNGMIN = 1.2.19beta17
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -44,7 +44,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 CFLAGS=-I$(ZLIBINC) -Wall -O \
-	-DPNG_USE_PNGGCCRD -DPNG_NO_MMX_CODE; \
+	-DPNG_NO_MMX_CODE; \
 	# $(WARNMORE) -g -DPNG_DEBUG=5
 LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng12 -lz -lm
 
@@ -92,7 +92,7 @@ libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo cppflags=\"-DPNG_USE_PNGGCCRD -DPNG_NO_MMX_CODE\"; \
+	echo cppflags=\"-DPNG_NO_MMX_CODE\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo R_opts=\"-R$(LIBPATH)\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \

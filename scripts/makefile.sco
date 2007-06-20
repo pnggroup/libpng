@@ -9,7 +9,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.19beta16
+PNGMIN = 1.2.19beta17
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -38,7 +38,7 @@ exec_prefix=$(prefix)
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-CFLAGS= -dy -belf -I$(ZLIBINC) -O3
+CFLAGS= -dy -belf -I$(ZLIBINC) -O3 -DPNG_NO_MMX_CODE
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -lm
 
 INCPATH=$(prefix)/include/libpng
@@ -221,5 +221,6 @@ pngwrite.o pngwrite.pic.o: png.h pngconf.h
 pngwtran.o pngwtran.pic.o: png.h pngconf.h
 pngwutil.o pngwutil.pic.o: png.h pngconf.h
 pngpread.o pngpread.pic.o: png.h pngconf.h
+pnggccrd.o pnggccrd.pic.o: png.h pngconf.h
 
 pngtest.o: png.h pngconf.h

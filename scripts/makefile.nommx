@@ -7,7 +7,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.19beta16
+PNGMIN = 1.2.19beta17
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -48,8 +48,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops \
-	-DPNG_NO_MMX_CODE \
+CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng12 -lz -lm
@@ -77,7 +76,7 @@ DM=$(DESTDIR)$(MANPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-	pngwtran.o pngmem.o pngerror.o pngpread.o
+	pngwtran.o pngmem.o pngerror.o pngpread.o pnggccrd.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
@@ -244,5 +243,6 @@ pngwrite.o pngwrite.pic.o: png.h pngconf.h
 pngwtran.o pngwtran.pic.o: png.h pngconf.h
 pngwutil.o pngwutil.pic.o: png.h pngconf.h
 pngpread.o pngpread.pic.o: png.h pngconf.h
+pnggccrd.o pnggccrd.pic.o: png.h pngconf.h
 
 pngtest.o: png.h pngconf.h

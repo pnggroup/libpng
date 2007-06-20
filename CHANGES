@@ -1790,11 +1790,15 @@ version 1.2.19beta14 [June 16, 2007]
 version 1.2.19beta15 [June 17, 2007]
   Revised pnggccrd.c.
 
-version 1.2.19beta16 [June 19, 2007]
+version 1.2.19beta16 [June 18, 2007]
   Revised pnggccrd.c again.
   Updated contrib/gregbook.
-  Changed '#include "$srcdir/pnggccrd.c"' 'include "$srcdir/pnggccrd.c"'
+  Changed '#include "pnggccrd.c"' to 'include "$srcdir/pnggccrd.c"'
     in configure.ac
+
+version 1.2.19beta17 [June 20, 2007]
+  Revised many of the makefiles, to set -DPNG_NO_MMX_CODE where needed
+    and to not use -O3 unless -DPNG_NO_MMX_CODE is also set.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

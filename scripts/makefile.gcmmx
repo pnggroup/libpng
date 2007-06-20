@@ -16,7 +16,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.19beta16
+PNGMIN = 1.2.19beta17
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -60,15 +60,15 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # Remove -DPNG_THREAD_UNSAFE_OK if you need thread safety
 ### for generic gcc:
-CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall \
-	-O3 $(ALIGN) -funroll-loops \
+CFLAGS=-DPNG_THREAD_UNSAFE_OK -I$(ZLIBINC) -Wall -O \
+	$(ALIGN) -funroll-loops \
 	-fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### for gcc 2.95.2 on 686:
-#CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \
+#CFLAGS=-DPNG_THREAD_UNSAFE_OK -I$(ZLIBINC) -Wall -O \
 #	-mcpu=i686 -malign-double -ffast-math -fstrict-aliasing \
 #	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
 ### for gcc 2.7.2.3 on 486 and up:
-#CFLAGS=-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD -I$(ZLIBINC) -Wall -O3 \
+#CFLAGS=-DPNG_THREAD_UNSAFE_OK -I$(ZLIBINC) -Wall -O \
 #	-m486 -malign-double -ffast-math \
 #	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
 
@@ -120,7 +120,7 @@ libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo cppflags=\"-DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD\"; \
+	echo cppflags=\"-DPNG_THREAD_UNSAFE_OK \"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo R_opts=\"-Wl,-rpath,$(LIBPATH)\"; \
 	echo libs=\"-lpng12 -lz -lm\"; \

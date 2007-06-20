@@ -91,30 +91,21 @@ set(pngtest_sources
 add_definitions(-DZLIB_DLL)
 
 if(MSVC)
- add_definitions(-DPNG_USE_PNGVCRD -DPNG_NO_MODULEDEF
+ add_definitions(-DPNG_NO_MODULEDEF
    -D_CRT_SECURE_NO_DEPRECATE)
  set(libpng_sources ${libpng_sources}
          pngvcrd.c
  )
 else(MSVC)
- add_definitions(-DPNG_USE_PNGGCCRD)
  set(libpng_sources ${libpng_sources}
          pnggccrd.c
  )
 endif(MSVC)
 
-if(NOT MSVC)
- if(NOT PNG_MMX)
-   add_definitions(-DLIBPNG_NO_MMX)
-   add_definitions(-DPNG_NO_MMX_CODE)
- endif(NOT PNG_MMX)
-else(NOT MSVC)
- if(PNG_MMX)
- # maybe add this to pngconf.h ?
- add_definitions(-DPNG_MMX_CODE_SUPPORTED)
- endif(PNG_MMX)
-endif(NOT MSVC)
-
+if(NOT PNG_MMX)
+  add_definitions(-DLIBPNG_NO_MMX)
+  add_definitions(-DPNG_NO_MMX_CODE)
+endif(NOT PNG_MMX)
 
 if(PNG_CONSOLE_IO_SUPPORTED)
  add_definitions(-DPNG_CONSOLE_IO_SUPPORTED)
@@ -179,7 +170,7 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 
 # SET UP LINKS
 set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 0.${PNGLIB_RELEASE}.1.2.19beta16
+#    VERSION 0.${PNGLIB_RELEASE}.1.2.19beta17
      VERSION 0.${PNGLIB_RELEASE}.0
      SOVERSION 0
      CLEAN_DIRECT_OUTPUT 1)
