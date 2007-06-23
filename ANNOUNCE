@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta17 - June 20, 2007
+Libpng 1.2.19beta18 - June 23, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta17.tar.gz
-   libpng-1.2.19beta17.tar.bz2
+   libpng-1.2.19beta18.tar.gz
+   libpng-1.2.19beta18.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta17-no-config.tar.gz
-   libpng-1.2.19beta17-no-config.tar.bz2
+   libpng-1.2.19beta18-no-config.tar.gz
+   libpng-1.2.19beta18-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b17.zip
-   lp1219b17.tar.bz2
+   lp1219b18.zip
+   lp1219b18.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta17-project-netware.zip
-   libpng-1.2.19beta17-project-wince.zip
+   libpng-1.2.19beta18-project-netware.zip
+   libpng-1.2.19beta18-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta17-README.txt
-   libpng-1.2.19beta17-KNOWNBUGS.txt
-   libpng-1.2.19beta17-LICENSE.txt
-   libpng-1.2.19beta17-Y2K-compliance.txt
+   libpng-1.2.19beta18-README.txt
+   libpng-1.2.19beta18-KNOWNBUGS.txt
+   libpng-1.2.19beta18-LICENSE.txt
+   libpng-1.2.19beta18-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -103,9 +103,15 @@ version 1.2.19beta16 [June 18, 2007]
   Changed '#include "pnggccrd.c"' to 'include "$srcdir/pnggccrd.c"'
     in configure.ac
 
-version 1.2.19beta17 [June 20, 2007]
+version 1.2.19beta17 [June 19, 2007]
   Revised many of the makefiles, to set -DPNG_NO_MMX_CODE where needed
     and to not use -O3 unless -DPNG_NO_MMX_CODE is also set.
+
+version 1.2.19beta18 [June 23, 2007]
+  Replaced some C++ style comments with C style comments in pnggccrd.c.
+  Copied optimized C code from pnggccrd.c to pngrutil.c, removed dependency
+    on pnggccrd.o from many makefiles.
+  Added sl and dylib to list of extensions be installed by Makefile.am
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

@@ -31,7 +31,7 @@ CFLAGS+= -DPNG_NO_MMX_CODE
 
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
-	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c
+	pngwtran.c pngmem.c pngerror.c pngpread.c
 
 pngtest: pngtest.o libpng.a
 	${CC} ${CFLAGS} -L. -static -o pngtest pngtest.o -lpng -lz -lm

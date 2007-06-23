@@ -123,7 +123,7 @@ install-exec-hook:
 	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
 	@set -x;\
 	cd $(DESTDIR)$(libdir);\
-	for ext in a la so; do\
+	for ext in a la so sl dylib; do\
 		rm -f libpng.$$ext;\
                 if test -f $(PNGLIB_BASENAME).$$ext; then\
                        $(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
@@ -137,7 +137,7 @@ uninstall-hook:
 	@if test -n "@compatlib@"; then\
 		set -x;\
 		cd $(DESTDIR)$(libdir);\
-		for ext in a la so; do\
+		for ext in a la so sl dylib; do\
 			rm -f libpng.$$ext;\
 		done;\
 	fi

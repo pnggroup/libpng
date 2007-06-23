@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19beta17 - June 20, 2007
+ * libpng version 1.2.19beta18 - June 23, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -595,16 +595,16 @@
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
 #if !defined(PNG_NO_PROGRESSIVE_READ) && \
- !defined(PNG_PROGRESSIVE_READ_NOT_SUPPORTED)  /* if you don't do progressive */
-#  define PNG_PROGRESSIVE_READ_SUPPORTED     /* reading.  This is not talking */
-#endif                               /* about interlacing capability!  You'll */
-              /* still have interlacing unless you change the following line: */
+ !defined(PNG_PROGRESSIVE_READ_NOT_SUPPORTED) /* if you don't do progressive */
+#  define PNG_PROGRESSIVE_READ_SUPPORTED    /* reading.  This is not talking */
+#endif                              /* about interlacing capability!  You'll */
+             /* still have interlacing unless you change the following line: */
 
-#define PNG_READ_INTERLACING_SUPPORTED /* required for PNG-compliant decoders */
+#define PNG_READ_INTERLACING_SUPPORTED /* required in PNG-compliant decoders */
 
 #ifndef PNG_NO_READ_COMPOSITE_NODIV
 #  ifndef PNG_NO_READ_COMPOSITED_NODIV  /* libpng-1.0.x misspelling */
-#    define PNG_READ_COMPOSITE_NODIV_SUPPORTED   /* well tested on Intel, SGI */
+#    define PNG_READ_COMPOSITE_NODIV_SUPPORTED  /* well tested on Intel, SGI */
 #  endif
 #endif
 
@@ -724,12 +724,21 @@
 /* PNG_ASSEMBLER_CODE was enabled by default in version 1.2.0 
  * even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined.
  *
- * PNG_NO_ASSEMBLER_CODE disables use of all assembler code and optimized C,
- * and removes or includes several functions in the API.
+ * PNG_NO_ASSEMBLER_CODE disables use of all assembler code,
+ * and removes several functions from the API.
  *
  * PNG_NO_MMX_CODE disables the use of MMX code without changing the API.
- * When MMX code is off, then optimized C replacement functions are used.
+ * When MMX code is off, then optimized C replacement functions are used,
+ * if PNG_NO_OPTIMIZED_CODE is not enabled.  This was added in version
+ * 1.2.19.
 */
+
+#if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_OPTIMIZED_CODE)
+#  ifndef PNG_OPTIMIZED_CODE_SUPPORTED
+#    define PNG_OPTIMIZED_CODE_SUPPORTED
+#  endif
+#endif
+
 #if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
 #  ifndef PNG_ASSEMBLER_CODE_SUPPORTED
 #    define PNG_ASSEMBLER_CODE_SUPPORTED
@@ -755,13 +764,13 @@
      !defined(PNG_USE_PNGVCRD)
 #    define PNG_USE_PNGGCCRD
 #  endif
-#endif
 
 /* If you are sure that you don't need thread safety and you are compiling
    with PNG_USE_PNGCCRD for an MMX application, you can define this for
    faster execution.  See pnggccrd.c.
 #define PNG_THREAD_UNSAFE_OK
 */
+#endif
 
 #if !defined(PNG_1_0_X)
 #if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)

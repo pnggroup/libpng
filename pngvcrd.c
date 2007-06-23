@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * Last changed in libpng 1.2.19 June 20, 2007
+ * Last changed in libpng 1.2.19 June 23, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -27,7 +27,7 @@
 #define PNG_INTERNAL
 #include "png.h"
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD)
+#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD)
 
 
 static int mmx_supported=2;
@@ -3735,7 +3735,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
       case PNG_FILTER_VALUE_SUB:
       {
-#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
@@ -3747,7 +3746,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
             png_read_filter_row_mmx_sub(row_info, row);
          }
          else
-#endif
          {
             png_uint_32 i;
             png_uint_32 istop = row_info->rowbytes;
@@ -3766,7 +3764,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
       case PNG_FILTER_VALUE_UP:
       {
-#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
@@ -3778,7 +3775,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
             png_read_filter_row_mmx_up(row_info, row, prev_row);
          }
          else
-#endif
          {
             png_uint_32 i;
             png_uint_32 istop = row_info->rowbytes;
@@ -3796,7 +3792,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
       case PNG_FILTER_VALUE_AVG:
       {
-#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
@@ -3808,7 +3803,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
             png_read_filter_row_mmx_avg(row_info, row, prev_row);
          }
          else
-#endif
          {
             png_uint_32 i;
             png_bytep rp = row;
@@ -3836,7 +3830,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 
       case PNG_FILTER_VALUE_PAETH:
       {
-#if defined(PNG_MMX_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
          if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_PAETH) &&
              (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
@@ -3848,7 +3841,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
             png_read_filter_row_mmx_paeth(row_info, row, prev_row);
          }
          else
-#endif
          {
             png_uint_32 i;
             png_bytep rp = row;
@@ -3910,4 +3902,4 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    }
 }
 
-#endif /* PNG_ASSEMBLER_CODE_SUPPORTED && PNG_USE_PNGVCRD */
+#endif /* PNG_MMX_CODE_SUPPORTED && PNG_USE_PNGVCRD */

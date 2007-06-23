@@ -1796,9 +1796,15 @@ version 1.2.19beta16 [June 18, 2007]
   Changed '#include "pnggccrd.c"' to 'include "$srcdir/pnggccrd.c"'
     in configure.ac
 
-version 1.2.19beta17 [June 20, 2007]
+version 1.2.19beta17 [June 19, 2007]
   Revised many of the makefiles, to set -DPNG_NO_MMX_CODE where needed
     and to not use -O3 unless -DPNG_NO_MMX_CODE is also set.
+
+version 1.2.19beta18 [June 23, 2007]
+  Replaced some C++ style comments with C style comments in pnggccrd.c.
+  Copied optimized C code from pnggccrd.c to pngrutil.c, removed dependency
+    on pnggccrd.o from many makefiles.
+  Added sl and dylib to list of extensions be installed by Makefile.am
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

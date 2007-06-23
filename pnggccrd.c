@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 June 20, 2007
+ * Last changed in libpng 1.2.19 June 23, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -357,9 +357,11 @@
 
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
 
-#if defined(__x86_64__) && defined(__PIC__)  // optionally comment out __PIC__:
-#  define PNG_x86_64_USE_GOTPCREL            // GOTPCREL => full thread-safety
-#  define PNG_CLOBBER_x86_64_REGS_SUPPORTED  // works as of gcc 3.4.3 ...
+#if defined(PNG_MMX_CODE_SUPPORTED)
+#if defined(__x86_64__) && defined(__PIC__) /* optionally comment __PIC__: */
+#  define PNG_x86_64_USE_GOTPCREL           /* GOTPCREL => full thread-safety */
+#  define PNG_CLOBBER_x86_64_REGS_SUPPORTED /* works as of gcc 3.4.3 ... */
+#endif
 #endif
 
 int PNGAPI png_mmx_support(void);
@@ -718,7 +720,7 @@ static PNG_CONST ull _amask4_2_2  __attribute__((used, aligned(8))) = 0x00000000
 
 
 
-static int _mmx_supported = 2; // 0: no MMX; 1: MMX supported; 2: not tested
+static int _mmx_supported = 2; /* 0: no MMX; 1: MMX supported; 2: not tested */
 
 /*===========================================================================*/
 /*                                                                           */
@@ -734,14 +736,14 @@ static int _mmx_supported = 2; // 0: no MMX; 1: MMX supported; 2: not tested
  *                  [need to retest with gcc 2.7.2.3]
  */
 
-// GRR 20070524:  This declaration apparently is compatible with but supersedes
-//   the one in png.h; in any case, the generated object file is slightly
-//   smaller.  It is unnecessary with gcc 4.1.2, but gcc 2.x apparently
-//   replicated the ".NOT_SUPPORTED" label in each location the function was
-//   inlined, leading to compilation errors due to the "multiply defined"
-//   label.  Old workaround was to leave the function at the end of this
-//   file; new one (still testing) is to use a gcc-specific function attribute
-//   to prevent inlining.
+/* GRR 20070524:  This declaration apparently is compatible with but supersedes
+ *   the one in png.h; in any case, the generated object file is slightly
+ *   smaller.  It is unnecessary with gcc 4.1.2, but gcc 2.x apparently
+ *   replicated the ".NOT_SUPPORTED" label in each location the function was
+ *   inlined, leading to compilation errors due to the "multiply defined"
+ *   label.  Old workaround was to leave the function at the end of this
+ *   file; new one (still testing) is to use a gcc-specific function attribute
+ *   to prevent inlining. */
 int PNGAPI
 png_mmx_support(void) __attribute__((noinline));
 
@@ -887,7 +889,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
    {
       switch (png_ptr->row_info.pixel_depth)
       {
-         // most common case:  combining 32-bit RGBA
+         /* most common case:  combining 32-bit RGBA */
          case 32:       /* png_ptr->row_info.pixel_depth */
          {
             png_bytep srcptr;
@@ -2947,15 +2949,15 @@ png_do_read_interlace(png_structp png_ptr)
                else if (pixel_bytes == 8)
                {
 // GRR TEST:  should work, but needs testing (special 64-bit version of rpng2?)
-                  // GRR NOTE:  no need to combine passes here!
+                  /* GRR NOTE:  no need to combine passes here! */
                   if (((pass == 0) || (pass == 1)) && width)
                   {
-                     int dummy_value_c;  // fix 'forbidden register spilled'
+                     int dummy_value_c;  /* fix 'forbidden register spilled' */
                      int dummy_value_S;
                      int dummy_value_D;
 
-                     // source is 8-byte RRGGBBAA
-                     // dest is 64-byte RRGGBBAA RRGGBBAA RRGGBBAA RRGGBBAA ...
+                     /* source is 8-byte RRGGBBAA */
+                     /* dest is 64-byte RRGGBBAA RRGGBBAA RRGGBBAA RRGGBBAA */
                      __asm__ __volatile__ (
                         "subl $56, %%edi         \n\t" // start of last block
 

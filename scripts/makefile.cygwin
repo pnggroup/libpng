@@ -32,7 +32,7 @@ endif
 DESTDIR=
 
 # To disable assembler optimizations, add '-DPNG_NO_MMX_CODE' to
-# $CFLAGS.
+# $CFLAGS.  To enable, add pnggccrd.o to the dependencies.
 
 CC=gcc
 ifdef MINGW
@@ -77,7 +77,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 CYGDLL = 12
-PNGMIN = 1.2.19beta17
+PNGMIN = 1.2.19beta18
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
@@ -112,7 +112,7 @@ DL =$(D)$(LIBPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-	pngwtran.o pngmem.o pngerror.o pngpread.o pnggccrd.o
+	pngwtran.o pngmem.o pngerror.o pngpread.o # pnggccrd.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
@@ -156,19 +156,19 @@ shared: all-shared
 all-static: $(STATLIB) pngtest-stat$(EXE)
 all-shared: $(SHAREDLIB) pngtest$(EXE)
 
-pnggccrd.o: pnggccrd.c png.h pngconf.h
-	@echo ""
-	@echo '    You can ignore the "control reaches end of non-void function"'
-	@echo '    warning and "<variable> defined but not used" warnings:'
-	@echo ""
-	$(CC) -c $(CFLAGS) -o $@ $<
+# pnggccrd.o: pnggccrd.c png.h pngconf.h
+#	@echo ""
+#	@echo '    You can ignore the "control reaches end of non-void function"'
+#	@echo '    warning and "<variable> defined but not used" warnings:'
+#	@echo ""
+#	$(CC) -c $(CFLAGS) -o $@ $<
 
-pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
-	@echo ""
-	@echo '    You can ignore the "control reaches end of non-void function"'
-	@echo '    warning and "<variable> defined but not used" warnings:'
-	@echo ""
-	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
+# pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
+#	@echo ""
+#	@echo '    You can ignore the "control reaches end of non-void function"'
+#	@echo '    warning and "<variable> defined but not used" warnings:'
+#	@echo ""
+#	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
 
 $(STATLIB): $(OBJS)
 	ar rc $@ $(OBJS)
@@ -297,7 +297,6 @@ pngwio.o pngwio.pic.o:		png.h pngconf.h pngwio.c
 pngmem.o pngmem.pic.o:		png.h pngconf.h pngmem.c
 pngset.o pngset.pic.o:		png.h pngconf.h pngset.c
 pngget.o pngget.pic.o:		png.h pngconf.h pngget.c
-pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pnggccrd.c
 pngread.o pngread.pic.o:	png.h pngconf.h pngread.c
 pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngrtran.c
 pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngrutil.c
@@ -306,6 +305,7 @@ pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
 pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c
 pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngwutil.c
 pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
+# pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pnggccrd.c
 
 pngtest.o:			png.h pngconf.h pngtest.c
 pngtest-stat.o:			png.h pngconf.h pngtest.c

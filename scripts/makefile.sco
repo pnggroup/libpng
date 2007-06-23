@@ -9,7 +9,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.19beta17
+PNGMIN = 1.2.19beta18
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -221,6 +221,5 @@ pngwrite.o pngwrite.pic.o: png.h pngconf.h
 pngwtran.o pngwtran.pic.o: png.h pngconf.h
 pngwutil.o pngwutil.pic.o: png.h pngconf.h
 pngpread.o pngpread.pic.o: png.h pngconf.h
-pnggccrd.o pnggccrd.pic.o: png.h pngconf.h
 
 pngtest.o: png.h pngconf.h
