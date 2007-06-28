@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.19 June 23, 2007
+ * Last changed in libpng 1.2.19 June 28, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2325,7 +2325,50 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
    {
       switch (png_ptr->row_info.pixel_depth)
       {
-         /* most common case:  combining 32-bit RGBA */
+         /* most common case:  combining 24-bit RGB */
+         case 24:       /* png_ptr->row_info.pixel_depth */
+         {
+            png_bytep srcptr;
+            png_bytep dstptr;
+
+            {
+               register png_uint_32 i;
+               png_uint_32 initial_val = BPP3 * png_pass_start[png_ptr->pass];
+                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
+               register int stride = BPP3 * png_pass_inc[png_ptr->pass];
+                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
+               register int rep_bytes = BPP3 * png_pass_width[png_ptr->pass];
+                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
+               png_uint_32 len = png_ptr->width &~7; /* reduce to mult of 8 */
+               int diff = (int) (png_ptr->width & 7); /* amount lost */
+               register png_uint_32 final_val = BPP3 * len;   /* GRR bugfix */
+
+               srcptr = png_ptr->row_buf + 1 + initial_val;
+               dstptr = row + initial_val;
+
+               for (i = initial_val; i < final_val; i += stride)
+               {
+                  png_memcpy(dstptr, srcptr, rep_bytes);
+                  srcptr += stride;
+                  dstptr += stride;
+               }
+               if (diff)  /* number of leftover pixels:  3 for pngtest */
+               {
+                  final_val += diff*BPP3;
+                  for (; i < final_val; i += stride)
+                  {
+                     if (rep_bytes > (int)(final_val-i))
+                        rep_bytes = (int)(final_val-i);
+                     png_memcpy(dstptr, srcptr, rep_bytes);
+                     srcptr += stride;
+                     dstptr += stride;
+                  }
+               }
+            } /* end of else (_mmx_supported) */
+
+            break;
+         }       /* end 24 bpp */
+
          case 32:       /* png_ptr->row_info.pixel_depth */
          {
             png_bytep srcptr;
@@ -2368,6 +2411,48 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 
             break;
          }       /* end 32 bpp */
+
+         case 8:        /* png_ptr->row_info.pixel_depth */
+         {
+            png_bytep srcptr;
+            png_bytep dstptr;
+            {
+               register png_uint_32 i;
+               png_uint_32 initial_val = png_pass_start[png_ptr->pass];
+                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
+               register int stride = png_pass_inc[png_ptr->pass];
+                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
+               register int rep_bytes = png_pass_width[png_ptr->pass];
+                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
+               png_uint_32 len = png_ptr->width &~7; /* reduce to mult of 8 */
+               int diff = (int) (png_ptr->width & 7); /* amount lost */
+               register png_uint_32 final_val = len;  /* GRR bugfix */
+
+               srcptr = png_ptr->row_buf + 1 + initial_val;
+               dstptr = row + initial_val;
+
+               for (i = initial_val; i < final_val; i += stride)
+               {
+                  png_memcpy(dstptr, srcptr, rep_bytes);
+                  srcptr += stride;
+                  dstptr += stride;
+               }
+               if (diff)  /* number of leftover pixels:  3 for pngtest */
+               {
+                  final_val += diff /* *BPP1 */ ;
+                  for (; i < final_val; i += stride)
+                  {
+                     if (rep_bytes > (int)(final_val-i))
+                        rep_bytes = (int)(final_val-i);
+                     png_memcpy(dstptr, srcptr, rep_bytes);
+                     srcptr += stride;
+                     dstptr += stride;
+                  }
+               }
+            }
+
+            break;
+         }       /* end 8 bpp */
 
          case 1:        /* png_ptr->row_info.pixel_depth */
          {
@@ -2535,48 +2620,6 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
             break;
          }       /* end 4 bpp */
 
-         case 8:        /* png_ptr->row_info.pixel_depth */
-         {
-            png_bytep srcptr;
-            png_bytep dstptr;
-            {
-               register png_uint_32 i;
-               png_uint_32 initial_val = png_pass_start[png_ptr->pass];
-                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
-               register int stride = png_pass_inc[png_ptr->pass];
-                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
-               register int rep_bytes = png_pass_width[png_ptr->pass];
-                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
-               png_uint_32 len = png_ptr->width &~7; /* reduce to mult of 8 */
-               int diff = (int) (png_ptr->width & 7); /* amount lost */
-               register png_uint_32 final_val = len;  /* GRR bugfix */
-
-               srcptr = png_ptr->row_buf + 1 + initial_val;
-               dstptr = row + initial_val;
-
-               for (i = initial_val; i < final_val; i += stride)
-               {
-                  png_memcpy(dstptr, srcptr, rep_bytes);
-                  srcptr += stride;
-                  dstptr += stride;
-               }
-               if (diff)  /* number of leftover pixels:  3 for pngtest */
-               {
-                  final_val += diff /* *BPP1 */ ;
-                  for (; i < final_val; i += stride)
-                  {
-                     if (rep_bytes > (int)(final_val-i))
-                        rep_bytes = (int)(final_val-i);
-                     png_memcpy(dstptr, srcptr, rep_bytes);
-                     srcptr += stride;
-                     dstptr += stride;
-                  }
-               }
-            }
-
-            break;
-         }       /* end 8 bpp */
-
          case 16:       /* png_ptr->row_info.pixel_depth */
          {
             png_bytep srcptr;
@@ -2621,48 +2664,6 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
          }       /* end 16 bpp */
 
 
-         case 24:       /* png_ptr->row_info.pixel_depth */
-         {
-            png_bytep srcptr;
-            png_bytep dstptr;
-
-            {
-               register png_uint_32 i;
-               png_uint_32 initial_val = BPP3 * png_pass_start[png_ptr->pass];
-                 /* png.c:  png_pass_start[] = {0, 4, 0, 2, 0, 1, 0}; */
-               register int stride = BPP3 * png_pass_inc[png_ptr->pass];
-                 /* png.c:  png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1}; */
-               register int rep_bytes = BPP3 * png_pass_width[png_ptr->pass];
-                 /* png.c:  png_pass_width[] = {8, 4, 4, 2, 2, 1, 1}; */
-               png_uint_32 len = png_ptr->width &~7; /* reduce to mult of 8 */
-               int diff = (int) (png_ptr->width & 7); /* amount lost */
-               register png_uint_32 final_val = BPP3 * len;   /* GRR bugfix */
-
-               srcptr = png_ptr->row_buf + 1 + initial_val;
-               dstptr = row + initial_val;
-
-               for (i = initial_val; i < final_val; i += stride)
-               {
-                  png_memcpy(dstptr, srcptr, rep_bytes);
-                  srcptr += stride;
-                  dstptr += stride;
-               }
-               if (diff)  /* number of leftover pixels:  3 for pngtest */
-               {
-                  final_val += diff*BPP3;
-                  for (; i < final_val; i += stride)
-                  {
-                     if (rep_bytes > (int)(final_val-i))
-                        rep_bytes = (int)(final_val-i);
-                     png_memcpy(dstptr, srcptr, rep_bytes);
-                     srcptr += stride;
-                     dstptr += stride;
-                  }
-               }
-            } /* end of else (_mmx_supported) */
-
-            break;
-         }       /* end 24 bpp */
 
          case 48:       /* png_ptr->row_info.pixel_depth */
          {

@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.19 June 23, 2007
+ * Last changed in libpng 1.2.19 June 28, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1293,9 +1293,11 @@ png_do_read_transformations(png_structp png_ptr)
       if(rgb_error)
       {
          png_ptr->rgb_to_gray_status=1;
-         if(png_ptr->transformations & PNG_RGB_TO_GRAY_WARN)
+         if((png_ptr->transformations & PNG_RGB_TO_GRAY) == 
+             PNG_RGB_TO_GRAY_WARN)
             png_warning(png_ptr, "png_do_rgb_to_gray found nongray pixel");
-         if(png_ptr->transformations & PNG_RGB_TO_GRAY_ERR)
+         if((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
+             PNG_RGB_TO_GRAY_ERR)
             png_error(png_ptr, "png_do_rgb_to_gray found nongray pixel");
       }
    }
