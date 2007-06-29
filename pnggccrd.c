@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 June 28, 2007
+ * Last changed in libpng 1.2.19 June 29, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -417,7 +417,6 @@
 #include "png.h"
 
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
-%14-%#include "pngpriv.h"
 
 /* if you want/need full thread-safety on x86-64 even when linking statically,
  * comment out the "&& defined(__PIC__)" part here: */
