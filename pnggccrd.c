@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 June 29, 2007
+ * Last changed in libpng 1.2.19 June 30, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -368,7 +368,7 @@
  *  - rearranged pass-related if-blocks in png_do_read_interlace() to put most
  *     frequent cases (4, 5) at top [GRP suggestion]
  *
- * 20070624-28:
+ * 20070624-29:
  *  - fixed 64-bit crash bug:  pointers -> rsi/rdi, not esi/edi (switched to
  *     %0/%1/%2/%3/%4 notation; eliminated size suffixes from relevant add/
  *     inc/sub/mov instructions; changed dummy vars to pointers)
@@ -376,15 +376,16 @@
  *     - png_do_read_interlace()
  *     - png_read_filter_row_mmx_avg()
  *     - png_read_filter_row_mmx_paeth()
+ *     - png_read_filter_row_mmx_sub()
  *  - NOTE:  this fix makes use of the fact that modifying a 32-bit reg (e.g.,
  *     %%ebx) clears the top half of its corresponding 64-bit reg (%%rbx), so
  *     it's safe to mix 32-bit operations with 64-bit base/index addressing
- *     (see new PSI/PDI/PAX/PDX/PBP/etc. "pointer-register" macros)
+ *     (see new PSI/PDI/PAX/PDX/PBP/etc. "pointer-register" macros); applies
+ *     also to clobber lists
  *
 
  * 200706xx:
  *  - continued fixing intermittent 64-bit crash bug:
- *     - png_read_filter_row_mmx_sub()
  *     - png_read_filter_row_mmx_up()
 	
  *
@@ -3231,6 +3232,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 #  define PBX  "%%rbx"
 #  define PCX  "%%rcx"
 #  define PDX  "%%rdx"
+#  define PSI  "%%rsi"
 #  define CLEAR_BOTTOM_3_BITS  "and  $0xfffffffffffffff8, "
 #else
 #  define PBP  "%%ebp"
@@ -3238,6 +3240,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 #  define PBX  "%%ebx"
 #  define PCX  "%%ecx"
 #  define PDX  "%%edx"
+#  define PSI  "%%esi"
 #  define CLEAR_BOTTOM_3_BITS  "and  $0xfffffff8, "
 #endif
    __asm__ __volatile__ (
@@ -3278,11 +3281,11 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       "sub  %2, " PBP "            \n\t" // subtract row ptr again => ebp =
       "jz avg_go                   \n\t" //  target value of ebx at alignment
 
+      "xorl %%ecx, %%ecx           \n\t"
+
       // fix alignment
       // Compute the Raw value for the bytes up to the alignment boundary
       //    Raw(x) = Avg(x) + ((Raw(x-bpp) + Prior(x))/2)
-      "xorl %%ecx, %%ecx           \n\t"
-
    "avg_lp1:                       \n\t"
       "xorl %%eax, %%eax           \n\t"
       "movb (%1," PBX ",), %%cl    \n\t" // load cl with Prior(x)
@@ -4018,11 +4021,11 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
       "sub  %2, " PBP "            \n\t" // subtract row ptr again => ebp =
       "jz paeth_go                 \n\t" //  target value of ebx at alignment
 
-      // fix alignment
       "xorl %%ecx, %%ecx           \n\t"
 
       SAVE_r11_r12_r13
 
+      // fix alignment
    "paeth_lp1:                     \n\t"
       "xorl %%eax, %%eax           \n\t"
       // pav = p - a = (a + b - c) - a = b - c
@@ -5088,7 +5091,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
    int dummy_value_a;
    int dummy_value_c;
    int dummy_value_d;
-   int dummy_value_D;
+   png_bytep dummy_value_D;
    int diff; //     __attribute__((used));
 
    bpp = (row_info->pixel_depth + 7) >> 3;  // calc number of bytes per pixel
@@ -5098,24 +5101,27 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
    __asm__ __volatile__ (
       SAVE_r15
       SAVE_ebp
-//pre "movl row, %%edi             \n\t" // edi/rdi
-      "movl %%edi, %%esi           \n\t" // lp = row
+//pre "movl row, %1             \n\t" // edi/rdi
+      "mov  %1, " PSI "           \n\t" // lp = row
 //pre "movl bpp, %%ecx             \n\t"
-      "addl %%ecx, %%edi           \n\t" // rp = row + bpp
+      "add  " PCX ", %1           \n\t" // rp = row + bpp
 //pre "movl FullLength, %%eax      \n\t" // bring in via eax...
       SAVE_FullLength                    // ...but store for later use
 
-      // get # of bytes to alignment
-      "movl %%edi, %%ebp           \n\t" // take start of row
-      "addl $0xf, %%ebp            \n\t" // add 7+8 to incr past alignment bdry
       "xorl %%eax, %%eax           \n\t"
-      "andl $0xfffffff8, %%ebp     \n\t" // mask to alignment boundary
-      "subl %%edi, %%ebp           \n\t" // subtract from start ==> value
-      "jz sub_go                   \n\t" //  eax at alignment
+
+      // get # of bytes to alignment (note:  computing _delta_ of two pointers,
+      // so hereafter %%ebp is sufficient even on 64-bit)
+      "mov  %1, " PBP "            \n\t" // take start of row
+      "add  $0xf, " PBP "          \n\t" // add 7+8 to incr past alignment bdry
+//    "andl $0xfffffff8, %%ebp     \n\t" // mask to alignment boundary (32-bit!)
+      CLEAR_BOTTOM_3_BITS  PBP    "\n\t" // mask to alignment boundary
+      "sub  %1, " PBP "            \n\t" // subtract row ptr again => ebp =
+      "jz sub_go                   \n\t" //  target value of eax at alignment
 
    "sub_lp1:                       \n\t" // fix alignment
-      "movb (%%esi,%%eax,), %%cl   \n\t"
-      "addb %%cl, (%%edi,%%eax,)   \n\t"
+      "movb (" PSI "," PAX ",), %%cl   \n\t"
+      "addb %%cl, (%1," PAX ",)   \n\t"
       "incl %%eax                  \n\t"
       "cmpl %%ebp, %%eax           \n\t"
       "jb sub_lp1                  \n\t"
@@ -5127,13 +5133,13 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
       "andl $0x00000007, %%edx     \n\t" // calc bytes over mult of 8
       "subl %%edx, %%ecx           \n\t" // drop over bytes from length
 //out "movl %%ecx, MMXLength       \n\t"
-      "movl %%ebp, %%edi           \n\t" // ebp = diff, but no reg constraint(?)
-      RESTORE_ebp                        //  (could swap ebp and ecx functions)
-      RESTORE_r15
+      "movl %%ebp, %%eax           \n\t" // ebp = diff, but no reg constraint(?)
+      RESTORE_ebp                        //  (could swap ebp and ecx functions,
+      RESTORE_r15                        //  but %%cl issues...)
 
       : "=c" (MMXLength),       // 0     // output regs
-        "=D" (diff),            // 1
-        "=a" (dummy_value_a)    // 2
+        "=D" (dummy_value_D),   // 1
+        "=a" (diff)             // 2
 
       : "0" (bpp),              // ecx   // input regs
         "1" (row),              // edi
@@ -5153,27 +5159,27 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 //       _ShiftRem  = 40;      // == 64 - 24
 
          __asm__ __volatile__ (
-// preload  "movl row, %%edi              \n\t" // edi/rdi
+// preload  "mov  row, %1              \n\t" // edi/rdi
             LOAD_GOT_rbp
             // load (former) _ActiveMask for 2nd active byte group
             "movq " AMASK2_3_3 ", %%mm7    \n\t" // _amask2_3_3
             RESTORE_rbp
 
-            "movl %%edi, %%esi            \n\t" // lp = row
+// notused  "mov  %1, " PSI "            \n\t" // lp = row
 // preload  "movl bpp, %%ecx              \n\t"
-            "addl %%ecx, %%edi            \n\t" // rp = row + bpp
+            "add  " PCX ", %1            \n\t" // rp = row + bpp
             "movq %%mm7, %%mm6            \n\t"
 // preload  "movl diff, %%edx             \n\t"
             "psllq $24, %%mm6             \n\t" // move mask in mm6 to cover
                                                 //  3rd active byte group
             // prime the pump:  load the first Raw(x-bpp) data set
-            "movq -8(%%edi,%%edx,), %%mm1 \n\t"
+            "movq -8(%1," PDX ",), %%mm1 \n\t"
 
          "sub_3lp:                        \n\t" // shift data for adding first
             "psrlq $40, %%mm1             \n\t" //  bpp bytes (no need for mask;
                                                 //  shift clears inactive bytes)
             // add 1st active group
-            "movq (%%edi,%%edx,), %%mm0   \n\t"
+            "movq (%1," PDX ",), %%mm0   \n\t"
             "paddb %%mm1, %%mm0           \n\t"
 
             // add 2nd active group
@@ -5190,7 +5196,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
             "paddb %%mm1, %%mm0           \n\t"
 
             "cmpl %%eax, %%edx            \n\t" // MMXLength
-            "movq %%mm0, -8(%%edi,%%edx,) \n\t" // write updated Raws to array
+            "movq %%mm0, -8(%1," PDX ",) \n\t" // write updated Raws to array
             "movq %%mm0, %%mm1            \n\t" // prep 1st add at top of loop
             "jb sub_3lp                   \n\t"
 
@@ -5204,9 +5210,8 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "2" (diff),             // edx
               "3" (MMXLength)         // eax
 
-            : "%esi"                            // clobber list
 #if defined(CLOBBER_MMX_REGS_SUPPORTED)
-            , "%mm0", "%mm1", "%mm6", "%mm7"
+            : "%mm0", "%mm1", "%mm6", "%mm7"    // clobber list
 #endif
          );
       }
@@ -5219,19 +5224,19 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 //       _ShiftRem = 64 - _ShiftBpp;  // 32 (psrlq)
 
          __asm__ __volatile__ (
-// preload  "movl row, %%edi              \n\t" // edi/rdi
+// preload  "mov  row, %1              \n\t" // edi/rdi
 // preload  "movl diff, %%edx             \n\t"
-            "movl %%edi, %%esi            \n\t" // lp = row
+// notused  "mov  %1, " PSI "            \n\t" // lp = row
 // preload  "movl bpp, %%ecx              \n\t"
-            "addl %%ecx, %%edi            \n\t" // rp = row + bpp
+            "add  " PCX ", %1            \n\t" // rp = row + bpp
 
             // prime the pump:  load the first Raw(x-bpp) data set
-            "movq -8(%%edi,%%edx,), %%mm1 \n\t"
+            "movq -8(%1," PDX ",), %%mm1 \n\t"
 
          "sub_4lp:                        \n\t" // shift data for adding first
             "psrlq $32, %%mm1             \n\t" //  bpp bytes (no need for mask;
                                                 //  shift clears inactive bytes)
-            "movq (%%edi,%%edx,), %%mm0   \n\t"
+            "movq (%1," PDX ",), %%mm0   \n\t"
             "paddb %%mm1, %%mm0           \n\t"
 
             // add 2nd active group
@@ -5241,7 +5246,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
             "paddb %%mm1, %%mm0           \n\t"
 
             "cmpl %%eax, %%edx            \n\t" // MMXLength
-            "movq %%mm0, -8(%%edi,%%edx,) \n\t" // write updated Raws to array
+            "movq %%mm0, -8(%1," PDX ",) \n\t" // write updated Raws to array
             "movq %%mm0, %%mm1            \n\t" // prep 1st add at top of loop
             "jb sub_4lp                   \n\t"
 
@@ -5255,9 +5260,8 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "2" (diff),             // edx
               "3" (MMXLength)         // eax
 
-            : "%esi"                            // clobber list
 #if defined(CLOBBER_MMX_REGS_SUPPORTED)
-            , "%mm0", "%mm1"
+            : "%mm0", "%mm1"                    // clobber list
 #endif
          );
       }
@@ -5267,18 +5271,18 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
       {
          __asm__ __volatile__ (
 // preload  "movl diff, %%edx            \n\t"
-// preload  "movl row, %%edi             \n\t" // edi/rdi
+// preload  "mov  row, %1             \n\t" // edi/rdi
 // preload  "cmpl FullLength, %%edx      \n\t"
             "cmpl %%eax, %%edx           \n\t"
             "jnb sub_1end                \n\t"
-            "movl %%edi, %%esi           \n\t" // lp = row
+            "mov  %1, " PSI "           \n\t" // lp = row
 // irrel.   "xorl %%ecx, %%ecx           \n\t" // (actually bug with preload)
 // preload  "movl bpp, %%ecx             \n\t"
-            "addl %%ecx, %%edi           \n\t" // rp = row + bpp
+            "add  " PCX ", %1           \n\t" // rp = row + bpp
 
          "sub_1lp:                       \n\t"
-            "movb (%%esi,%%edx,), %%cl   \n\t"
-            "addb %%cl, (%%edi,%%edx,)   \n\t"
+            "movb (" PSI "," PDX ",), %%cl   \n\t"
+            "addb %%cl, (%1," PDX ",)   \n\t"
             "incl %%edx                  \n\t"
             "cmpl %%eax, %%edx           \n\t" // compare with FullLength
             "jb sub_1lp                  \n\t"
@@ -5312,23 +5316,23 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
             RESTORE_rbp
 // preload  "movl diff, %%edx             \n\t"
             "movq %%mm7, %%mm6            \n\t"
-// preload  "movl row, %%edi              \n\t" // edi/rdi
+// preload  "mov  row, %1              \n\t" // edi/rdi
             "psllq $16, %%mm6             \n\t" // move mask in mm6 to cover
                                                 //  3rd active byte group
-            "movl %%edi, %%esi            \n\t" // lp = row
+// notused  "mov  %1, " PSI "            \n\t" // lp = row
             "movq %%mm6, %%mm5            \n\t"
 // preload  "movl bpp, %%ecx              \n\t"
-            "addl %%ecx, %%edi            \n\t" // rp = row + bpp
+            "add  " PCX ", %1            \n\t" // rp = row + bpp
             "psllq $16, %%mm5             \n\t" // move mask in mm5 to cover
                                                 //  4th active byte group
             // prime the pump:  load the first Raw(x-bpp) data set
-            "movq -8(%%edi,%%edx,), %%mm1 \n\t"
+            "movq -8(%1," PDX ",), %%mm1 \n\t"
 
          "sub_2lp:                        \n\t" // shift data for adding first
             "psrlq $48, %%mm1             \n\t" //  bpp bytes (no need for mask;
                                                 //  shift clears inactive bytes)
             // add 1st active group
-            "movq (%%edi,%%edx,), %%mm0   \n\t"
+            "movq (%1," PDX ",), %%mm0   \n\t"
             "paddb %%mm1, %%mm0           \n\t"
 
             // add 2nd active group
@@ -5350,7 +5354,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
             "addl $8, %%edx               \n\t"
             "paddb %%mm1, %%mm0           \n\t"
             "cmpl %%eax, %%edx            \n\t" // MMXLength
-            "movq %%mm0, -8(%%edi,%%edx,) \n\t" // write updated Raws to array
+            "movq %%mm0, -8(%1," PDX ",) \n\t" // write updated Raws to array
             "movq %%mm0, %%mm1            \n\t" // prep 1st add at top of loop
             "jb sub_2lp                   \n\t"
 
@@ -5364,9 +5368,9 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "2" (diff),             // edx
               "3" (MMXLength)         // eax
 
-            : "%esi"                            // clobber list
 #if defined(CLOBBER_MMX_REGS_SUPPORTED)
-            , "%mm0", "%mm1", "%mm5", "%mm6", "%mm7"
+            : "%mm0", "%mm1", "%mm5", "%mm6"    // clobber list
+            , "%mm7"
 #endif
          );
       }
@@ -5378,19 +5382,19 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 //       _ShiftRem = 64 - _ShiftBpp;  // 16 (psrlq)
 
          __asm__ __volatile__ (
-// preload  "movl row, %%edi              \n\t" // edi/rdi
+// preload  "mov  row, %1              \n\t" // edi/rdi
 // preload  "movl diff, %%edx             \n\t"
-            "movl %%edi, %%esi            \n\t" // lp = row
+// notused  "mov  %1, " PSI "            \n\t" // lp = row
 // preload  "movl bpp, %%ecx              \n\t"
-            "addl %%ecx, %%edi            \n\t" // rp = row + bpp
+            "add  " PCX ", %1            \n\t" // rp = row + bpp
 
             // prime the pump:  load the first Raw(x-bpp) data set
-            "movq -8(%%edi,%%edx,), %%mm1 \n\t"
+            "movq -8(%1," PDX ",), %%mm1 \n\t"
 
          "sub_6lp:                        \n\t" // shift data for adding first
             "psrlq $16, %%mm1             \n\t" //  bpp bytes (no need for mask;
                                                 //  shift clears inactive bytes)
-            "movq (%%edi,%%edx,), %%mm0   \n\t"
+            "movq (%1," PDX ",), %%mm0   \n\t"
             "paddb %%mm1, %%mm0           \n\t"
 
             // add 2nd active group
@@ -5400,7 +5404,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
             "paddb %%mm1, %%mm0           \n\t"
 
             "cmpl %%eax, %%edx            \n\t" // MMXLength
-            "movq %%mm0, -8(%%edi,%%edx,) \n\t" // write updated Raws to array
+            "movq %%mm0, -8(%1," PDX ",) \n\t" // write updated Raws to array
             "movq %%mm0, %%mm1            \n\t" // prep 1st add at top of loop
             "jb sub_6lp                   \n\t"
 
@@ -5414,9 +5418,8 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "2" (diff),             // edx
               "3" (MMXLength)         // eax
 
-            : "%esi"                            // clobber list
 #if defined(CLOBBER_MMX_REGS_SUPPORTED)
-            , "%mm0", "%mm1"
+            : "%mm0", "%mm1"                    // clobber list
 #endif
          );
       }
@@ -5426,23 +5429,23 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
       {
          __asm__ __volatile__ (
             SAVE_ebp
-// preload  "movl row, %%edi              \n\t" // edi/rdi
+// preload  "mov  row, %1              \n\t" // edi/rdi
 // preload  "movl diff, %%edx             \n\t"
-            "movl %%edi, %%esi            \n\t" // lp = row
+// notused  "mov  %1, " PSI "            \n\t" // lp = row
 // preload  "movl bpp, %%ecx              \n\t"
-            "addl %%ecx, %%edi            \n\t" // rp = row + bpp
+            "add  " PCX ", %1            \n\t" // rp = row + bpp
 // preload  "movl MMXLength, %%eax        \n\t"
 
             // prime the pump:  load the first Raw(x-bpp) data set
-            "movq -8(%%edi,%%edx,), %%mm7 \n\t"
+            "movq -8(%1," PDX ",), %%mm7 \n\t"
             "movl %%eax, %%ebp            \n\t" // copy of MMXLength -> ebp
             "andl $0x0000003f, %%ebp      \n\t" // calc bytes over mult of 64
 
          "sub_8lp:                        \n\t"
-            "movq (%%edi,%%edx,), %%mm0   \n\t" // load Sub(x) for 1st 8 bytes
+            "movq (%1," PDX ",), %%mm0   \n\t" // load Sub(x) for 1st 8 bytes
             "paddb %%mm7, %%mm0           \n\t"
-            "movq 8(%%edi,%%edx,), %%mm1  \n\t" // load Sub(x) for 2nd 8 bytes
-            "movq %%mm0, (%%edi,%%edx,)   \n\t" // write Raw(x) for 1st 8 bytes
+            "movq 8(%1," PDX ",), %%mm1  \n\t" // load Sub(x) for 2nd 8 bytes
+            "movq %%mm0, (%1," PDX ",)   \n\t" // write Raw(x) for 1st 8 bytes
 
             // Now mm0 will be used as Raw(x-bpp) for the 2nd group of 8 bytes.
             // This will be repeated for each group of 8 bytes with the 8th
@@ -5450,38 +5453,38 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
             // next loop.
 
             "paddb %%mm0, %%mm1           \n\t"
-            "movq 16(%%edi,%%edx,), %%mm2 \n\t" // load Sub(x) for 3rd 8 bytes
-            "movq %%mm1, 8(%%edi,%%edx,)  \n\t" // write Raw(x) for 2nd 8 bytes
+            "movq 16(%1," PDX ",), %%mm2 \n\t" // load Sub(x) for 3rd 8 bytes
+            "movq %%mm1, 8(%1," PDX ",)  \n\t" // write Raw(x) for 2nd 8 bytes
             "paddb %%mm1, %%mm2           \n\t"
-            "movq 24(%%edi,%%edx,), %%mm3 \n\t" // load Sub(x) for 4th 8 bytes
-            "movq %%mm2, 16(%%edi,%%edx,) \n\t" // write Raw(x) for 3rd 8 bytes
+            "movq 24(%1," PDX ",), %%mm3 \n\t" // load Sub(x) for 4th 8 bytes
+            "movq %%mm2, 16(%1," PDX ",) \n\t" // write Raw(x) for 3rd 8 bytes
             "paddb %%mm2, %%mm3           \n\t"
-            "movq 32(%%edi,%%edx,), %%mm4 \n\t" // load Sub(x) for 5th 8 bytes
-            "movq %%mm3, 24(%%edi,%%edx,) \n\t" // write Raw(x) for 4th 8 bytes
+            "movq 32(%1," PDX ",), %%mm4 \n\t" // load Sub(x) for 5th 8 bytes
+            "movq %%mm3, 24(%1," PDX ",) \n\t" // write Raw(x) for 4th 8 bytes
             "paddb %%mm3, %%mm4           \n\t"
-            "movq 40(%%edi,%%edx,), %%mm5 \n\t" // load Sub(x) for 6th 8 bytes
-            "movq %%mm4, 32(%%edi,%%edx,) \n\t" // write Raw(x) for 5th 8 bytes
+            "movq 40(%1," PDX ",), %%mm5 \n\t" // load Sub(x) for 6th 8 bytes
+            "movq %%mm4, 32(%1," PDX ",) \n\t" // write Raw(x) for 5th 8 bytes
             "paddb %%mm4, %%mm5           \n\t"
-            "movq 48(%%edi,%%edx,), %%mm6 \n\t" // load Sub(x) for 7th 8 bytes
-            "movq %%mm5, 40(%%edi,%%edx,) \n\t" // write Raw(x) for 6th 8 bytes
+            "movq 48(%1," PDX ",), %%mm6 \n\t" // load Sub(x) for 7th 8 bytes
+            "movq %%mm5, 40(%1," PDX ",) \n\t" // write Raw(x) for 6th 8 bytes
             "paddb %%mm5, %%mm6           \n\t"
-            "movq 56(%%edi,%%edx,), %%mm7 \n\t" // load Sub(x) for 8th 8 bytes
-            "movq %%mm6, 48(%%edi,%%edx,) \n\t" // write Raw(x) for 7th 8 bytes
+            "movq 56(%1," PDX ",), %%mm7 \n\t" // load Sub(x) for 8th 8 bytes
+            "movq %%mm6, 48(%1," PDX ",) \n\t" // write Raw(x) for 7th 8 bytes
             "addl $64, %%edx              \n\t"
             "paddb %%mm6, %%mm7           \n\t"
             "cmpl %%ebp, %%edx            \n\t" // cmp to bytes over mult of 64
-            "movq %%mm7, -8(%%edi,%%edx,) \n\t" // write Raw(x) for 8th 8 bytes
+            "movq %%mm7, -8(%1," PDX ",) \n\t" // write Raw(x) for 8th 8 bytes
             "jb sub_8lp                   \n\t"
 
             "cmpl %%eax, %%edx            \n\t" // compare to MMXLength
             "jnb sub_8lt8                 \n\t"
 
          "sub_8lpA:                       \n\t"
-            "movq (%%edi,%%edx,), %%mm0   \n\t"
+            "movq (%1," PDX ",), %%mm0   \n\t"
             "addl $8, %%edx               \n\t"
             "paddb %%mm7, %%mm0           \n\t"
             "cmpl %%eax, %%edx            \n\t" // compare to MMXLength
-            "movq %%mm0, -8(%%edi,%%edx,) \n\t" // -8 to offset early addl edx
+            "movq %%mm0, -8(%1," PDX ",) \n\t" // -8 to offset early addl edx
             "movq %%mm0, %%mm7            \n\t" // move calculated Raw(x) data
             "jb sub_8lpA                  \n\t" //  to mm7 to be new Raw(x-bpp)
                                                 //  for next loop
@@ -5498,6 +5501,8 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
               "2" (diff),             // edx
               "3" (MMXLength)         // eax
 
+// GRR FIXME:  esi not clobbered, but need to deal with COLON/COMMA issue:
+// GRR FIXME:  [or just use esi instead of ebp and lose SAVE/RESTORE/CLOBBERs]
             : "%esi"                            // clobber list
               _CLOBBER_ebp
 #if defined(CLOBBER_MMX_REGS_SUPPORTED)
@@ -5522,19 +5527,19 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 
    __asm__ __volatile__ (
 //pre "movl MMXLength, %%eax        \n\t"
-//pre "movl row, %%edi              \n\t" // edi/rdi
+//pre "mov  row, %1              \n\t" // edi/rdi
 //pre "cmpl FullLength, %%eax       \n\t"
       "cmpl %%edx, %%eax            \n\t"
       "jnb sub_end                  \n\t"
 
-      "movl %%edi, %%esi            \n\t" // lp = row
+      "mov  %1, " PSI "            \n\t" // lp = row
 //pre "movl bpp, %%ecx              \n\t"
-      "addl %%ecx, %%edi            \n\t" // rp = row + bpp
+      "add  " PCX ", %1            \n\t" // rp = row + bpp
       "xorl %%ecx, %%ecx            \n\t"
 
    "sub_lp2:                        \n\t"
-      "movb (%%esi,%%eax,), %%cl    \n\t"
-      "addb %%cl, (%%edi,%%eax,)    \n\t"
+      "movb (" PSI "," PAX ",), %%cl    \n\t"
+      "addb %%cl, (%1," PAX ",)    \n\t"
       "incl %%eax                   \n\t"
       "cmpl %%edx, %%eax            \n\t" // FullLength
       "jb sub_lp2                   \n\t"
@@ -5574,127 +5579,130 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
 {
    png_uint_32 len;
    int dummy_value_d;   // fix 'forbidden register 3 (dx) was spilled' error
-   int dummy_value_S;
-   int dummy_value_D;
+   png_bytep dummy_value_S;
+   png_bytep dummy_value_D;
 
    len = row_info->rowbytes;              // number of bytes to filter
 
    __asm__ __volatile__ (
       SAVE_GOT_ebx
-//pre "movl row, %%edi              \n\t" // edi/rdi
-      // get # of bytes to alignment
-      "movl %%edi, %%ecx            \n\t"
-      "xorl %%ebx, %%ebx            \n\t"
-      "addl $0x7, %%ecx             \n\t"
-      "xorl %%eax, %%eax            \n\t"
-      "andl $0xfffffff8, %%ecx      \n\t"
-//pre "movl prev_row, %%esi         \n\t" // esi/rsi
-      "subl %%edi, %%ecx            \n\t"
-      "jz up_go                     \n\t"
+//pre "mov  prev_row, %1           \n\t" // esi/rsi
+//pre "movl row, %2                \n\t" // edi/rdi
 
-   "up_lp1:                         \n\t" // fix alignment
-      "movb (%%edi,%%ebx,), %%al    \n\t"
-      "addb (%%esi,%%ebx,), %%al    \n\t"
-      "incl %%ebx                   \n\t"
-      "cmpl %%ecx, %%ebx            \n\t"
-      "movb %%al, -1(%%edi,%%ebx,)  \n\t" // mov does not affect flags; -1 to
-      "jb up_lp1                    \n\t" //  offset incl ebx
+      "xorl %%ebx, %%ebx           \n\t"
+      "xorl %%eax, %%eax           \n\t"
 
-   "up_go:                          \n\t"
-//pre "movl len, %%edx              \n\t"
-      "movl %%edx, %%ecx            \n\t"
-      "subl %%ebx, %%edx            \n\t" // subtract alignment fix
-      "andl $0x0000003f, %%edx      \n\t" // calc bytes over mult of 64
-      "subl %%edx, %%ecx            \n\t" // drop over bytes from length
+      // get # of bytes to alignment (note:  computing _delta_ of two pointers,
+      // so hereafter %%ecx is sufficient even on 64-bit)
+      "mov  %2, " PCX "            \n\t" // take start of row
+      "add  $0x7, " PCX "          \n\t" // add 7 to incr past alignment bdry
+//    "andl $0xfffffff8, %%ecx     \n\t" // mask to alignment boundary (32-bit!)
+      CLEAR_BOTTOM_3_BITS  PCX    "\n\t" // mask to alignment boundary
+      "sub  %2, " PCX "            \n\t" // subtract row ptr again => ebp =
+      "jz up_go                    \n\t" //  target value of ecx at alignment
+
+   "up_lp1:                        \n\t" // fix alignment
+      "movb (%2," PBX ",), %%al    \n\t"
+      "addb (%1," PBX ",), %%al    \n\t"
+      "incl %%ebx                  \n\t"
+      "cmpl %%ecx, %%ebx           \n\t"
+      "movb %%al, -1(%2," PBX ",)  \n\t" // mov does not affect flags; -1 to
+      "jb up_lp1                   \n\t" //  offset incl ebx
+
+   "up_go:                         \n\t"
+//pre "movl len, %%edx             \n\t"
+      "movl %%edx, %%ecx           \n\t"
+      "subl %%ebx, %%edx           \n\t" // subtract alignment fix
+      "andl $0x0000003f, %%edx     \n\t" // calc bytes over mult of 64
+      "subl %%edx, %%ecx           \n\t" // sub over-bytes from original length
 
       // unrolled loop - use all MMX registers and interleave to reduce
       // number of branch instructions (loops) and reduce partial stalls
-   "up_loop:                        \n\t"
-      "movq (%%esi,%%ebx,), %%mm1   \n\t"
-      "movq (%%edi,%%ebx,), %%mm0   \n\t"
-      "movq 8(%%esi,%%ebx,), %%mm3  \n\t"
-      "paddb %%mm1, %%mm0           \n\t"
-      "movq 8(%%edi,%%ebx,), %%mm2  \n\t"
-      "movq %%mm0, (%%edi,%%ebx,)   \n\t"
-      "paddb %%mm3, %%mm2           \n\t"
-      "movq 16(%%esi,%%ebx,), %%mm5 \n\t"
-      "movq %%mm2, 8(%%edi,%%ebx,)  \n\t"
-      "movq 16(%%edi,%%ebx,), %%mm4 \n\t"
-      "movq 24(%%esi,%%ebx,), %%mm7 \n\t"
-      "paddb %%mm5, %%mm4           \n\t"
-      "movq 24(%%edi,%%ebx,), %%mm6 \n\t"
-      "movq %%mm4, 16(%%edi,%%ebx,) \n\t"
-      "paddb %%mm7, %%mm6           \n\t"
-      "movq 32(%%esi,%%ebx,), %%mm1 \n\t"
-      "movq %%mm6, 24(%%edi,%%ebx,) \n\t"
-      "movq 32(%%edi,%%ebx,), %%mm0 \n\t"
-      "movq 40(%%esi,%%ebx,), %%mm3 \n\t"
-      "paddb %%mm1, %%mm0           \n\t"
-      "movq 40(%%edi,%%ebx,), %%mm2 \n\t"
-      "movq %%mm0, 32(%%edi,%%ebx,) \n\t"
-      "paddb %%mm3, %%mm2           \n\t"
-      "movq 48(%%esi,%%ebx,), %%mm5 \n\t"
-      "movq %%mm2, 40(%%edi,%%ebx,) \n\t"
-      "movq 48(%%edi,%%ebx,), %%mm4 \n\t"
-      "movq 56(%%esi,%%ebx,), %%mm7 \n\t"
-      "paddb %%mm5, %%mm4           \n\t"
-      "movq 56(%%edi,%%ebx,), %%mm6 \n\t"
-      "movq %%mm4, 48(%%edi,%%ebx,) \n\t"
-      "addl $64, %%ebx              \n\t"
-      "paddb %%mm7, %%mm6           \n\t"
-      "cmpl %%ecx, %%ebx            \n\t"
-      "movq %%mm6, -8(%%edi,%%ebx,) \n\t" // (+56)movq does not affect flags;
-      "jb up_loop                   \n\t" //  -8 to offset addl ebx
+   "up_loop:                       \n\t"
+      "movq (%1," PBX ",), %%mm1   \n\t"
+      "movq (%2," PBX ",), %%mm0   \n\t"
+      "movq 8(%1," PBX ",), %%mm3  \n\t"
+      "paddb %%mm1, %%mm0          \n\t"
+      "movq 8(%2," PBX ",), %%mm2  \n\t"
+      "movq %%mm0, (%2," PBX ",)   \n\t"
+      "paddb %%mm3, %%mm2          \n\t"
+      "movq 16(%1," PBX ",), %%mm5 \n\t"
+      "movq %%mm2, 8(%2," PBX ",)  \n\t"
+      "movq 16(%2," PBX ",), %%mm4 \n\t"
+      "movq 24(%1," PBX ",), %%mm7 \n\t"
+      "paddb %%mm5, %%mm4          \n\t"
+      "movq 24(%2," PBX ",), %%mm6 \n\t"
+      "movq %%mm4, 16(%2," PBX ",) \n\t"
+      "paddb %%mm7, %%mm6          \n\t"
+      "movq 32(%1," PBX ",), %%mm1 \n\t"
+      "movq %%mm6, 24(%2," PBX ",) \n\t"
+      "movq 32(%2," PBX ",), %%mm0 \n\t"
+      "movq 40(%1," PBX ",), %%mm3 \n\t"
+      "paddb %%mm1, %%mm0          \n\t"
+      "movq 40(%2," PBX ",), %%mm2 \n\t"
+      "movq %%mm0, 32(%2," PBX ",) \n\t"
+      "paddb %%mm3, %%mm2          \n\t"
+      "movq 48(%1," PBX ",), %%mm5 \n\t"
+      "movq %%mm2, 40(%2," PBX ",) \n\t"
+      "movq 48(%2," PBX ",), %%mm4 \n\t"
+      "movq 56(%1," PBX ",), %%mm7 \n\t"
+      "paddb %%mm5, %%mm4          \n\t"
+      "movq 56(%2," PBX ",), %%mm6 \n\t"
+      "movq %%mm4, 48(%2," PBX ",) \n\t"
+      "addl $64, %%ebx             \n\t"
+      "paddb %%mm7, %%mm6          \n\t"
+      "cmpl %%ecx, %%ebx           \n\t"
+      "movq %%mm6, -8(%2," PBX ",) \n\t" // (+56)movq does not affect flags;
+      "jb up_loop                  \n\t" //  -8 to offset addl ebx
 
-      "cmpl $0, %%edx               \n\t" // test for bytes over mult of 64
-      "jz up_end                    \n\t"
+      "cmpl $0, %%edx              \n\t" // test for bytes over mult of 64
+      "jz up_end                   \n\t"
 
-      "cmpl $8, %%edx               \n\t" // test for less than 8 bytes
-      "jb up_lt8                    \n\t" //  [added by lcreeve at netins.net]
+      "cmpl $8, %%edx              \n\t" // test for less than 8 bytes
+      "jb up_lt8                   \n\t" //  [added by lcreeve at netins.net]
 
-      "addl %%edx, %%ecx            \n\t"
-      "andl $0x00000007, %%edx      \n\t" // calc bytes over mult of 8
-      "subl %%edx, %%ecx            \n\t" // drop over bytes from length
-      "jz up_lt8                    \n\t"
+      "addl %%edx, %%ecx           \n\t"
+      "andl $0x00000007, %%edx     \n\t" // calc bytes over mult of 8
+      "subl %%edx, %%ecx           \n\t" // drop over-bytes from length
+      "jz up_lt8                   \n\t"
 
-   "up_lpA:                         \n\t" // use MMX regs to update 8 bytes sim.
-      "movq (%%esi,%%ebx,), %%mm1   \n\t"
-      "movq (%%edi,%%ebx,), %%mm0   \n\t"
-      "addl $8, %%ebx               \n\t"
-      "paddb %%mm1, %%mm0           \n\t"
-      "cmpl %%ecx, %%ebx            \n\t"
-      "movq %%mm0, -8(%%edi,%%ebx,) \n\t" // movq does not affect flags; -8 to
-      "jb up_lpA                    \n\t" //  offset add ebx
-      "cmpl $0, %%edx               \n\t" // test for bytes over mult of 8
-      "jz up_end                    \n\t"
+   "up_lpA:                        \n\t" // use MMX regs to update 8 bytes sim.
+      "movq (%1," PBX ",), %%mm1   \n\t"
+      "movq (%2," PBX ",), %%mm0   \n\t"
+      "addl $8, %%ebx              \n\t"
+      "paddb %%mm1, %%mm0          \n\t"
+      "cmpl %%ecx, %%ebx           \n\t"
+      "movq %%mm0, -8(%2," PBX ",) \n\t" // movq does not affect flags; -8 to
+      "jb up_lpA                   \n\t" //  offset add ebx
+      "cmpl $0, %%edx              \n\t" // test for bytes over mult of 8
+      "jz up_end                   \n\t"
 
-   "up_lt8:                         \n\t"
-      "xorl %%eax, %%eax            \n\t"
-      "addl %%edx, %%ecx            \n\t" // move over byte count into counter
+   "up_lt8:                        \n\t"
+      "xorl %%eax, %%eax           \n\t"
+      "addl %%edx, %%ecx           \n\t" // move over byte count into counter
 
-   "up_lp2:                         \n\t" // use x86 regs for remaining bytes
-      "movb (%%edi,%%ebx,), %%al    \n\t"
-      "addb (%%esi,%%ebx,), %%al    \n\t"
-      "incl %%ebx                   \n\t"
-      "cmpl %%ecx, %%ebx            \n\t"
-      "movb %%al, -1(%%edi,%%ebx,)  \n\t" // mov does not affect flags; -1 to
-      "jb up_lp2                    \n\t" //  offset inc ebx
+   "up_lp2:                        \n\t" // use x86 regs for remaining bytes
+      "movb (%2," PBX ",), %%al    \n\t"
+      "addb (%1," PBX ",), %%al    \n\t"
+      "incl %%ebx                  \n\t"
+      "cmpl %%ecx, %%ebx           \n\t"
+      "movb %%al, -1(%2," PBX ",)  \n\t" // mov does not affect flags; -1 to
+      "jb up_lp2                   \n\t" //  offset inc ebx
 
-   "up_end:                         \n\t"
-      "EMMS                         \n\t" // conversion of filtered row complete
+   "up_end:                        \n\t"
+      "EMMS                        \n\t" // conversion of filtered row complete
       RESTORE_GOT_ebx
 
-      : "=d" (dummy_value_d),   // 0      // output regs (dummy)
+      : "=d" (dummy_value_d),   // 0     // output regs (dummy)
         "=S" (dummy_value_S),   // 1
         "=D" (dummy_value_D)    // 2
 
-      : "0" (len),              // edx    // input regs
+      : "0" (len),              // edx   // input regs
         "1" (prev_row),         // esi
         "2" (row)               // edi
 
-      : "%eax", "%ecx"            // clobber list (no input regs!)
+      : "%eax", "%ecx"                   // clobber list (no input regs!)
         _CLOBBER_GOT_ebx
-
 #if defined(PNG_CLOBBER_MMX_REGS_SUPPORTED)
       , "%mm0", "%mm1", "%mm2", "%mm3"
       , "%mm4", "%mm5", "%mm6", "%mm7"

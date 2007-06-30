@@ -1814,6 +1814,10 @@ version 1.2.19beta20 [June 29, 2007]
   Rebuilt Makefile.in and configure using libtool-1.5.24.
   Fixed typo in pnggccrd.c
 
+version 1.2.19beta20 [June 30, 2007]
+  More revision of pnggccrd.c
+  Added "test" target to Makefile.in and Makefile.am
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

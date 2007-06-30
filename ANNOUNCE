@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta20 - June 29, 2007
+Libpng 1.2.19beta21 - June 30, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta20.tar.gz
-   libpng-1.2.19beta20.tar.bz2
+   libpng-1.2.19beta21.tar.gz
+   libpng-1.2.19beta21.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta20-no-config.tar.gz
-   libpng-1.2.19beta20-no-config.tar.bz2
+   libpng-1.2.19beta21-no-config.tar.gz
+   libpng-1.2.19beta21-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b20.zip
-   lp1219b20.tar.bz2
+   lp1219b21.zip
+   lp1219b21.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta20-project-netware.zip
-   libpng-1.2.19beta20-project-wince.zip
+   libpng-1.2.19beta21-project-netware.zip
+   libpng-1.2.19beta21-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta20-README.txt
-   libpng-1.2.19beta20-KNOWNBUGS.txt
-   libpng-1.2.19beta20-LICENSE.txt
-   libpng-1.2.19beta20-Y2K-compliance.txt
+   libpng-1.2.19beta21-README.txt
+   libpng-1.2.19beta21-KNOWNBUGS.txt
+   libpng-1.2.19beta21-LICENSE.txt
+   libpng-1.2.19beta21-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -120,6 +120,10 @@ version 1.2.19beta19 [June 28, 2007]
 version 1.2.19beta20 [June 29, 2007]
   Rebuilt Makefile.in and configure using libtool-1.5.24.
   Fixed typo in pnggccrd.c
+
+version 1.2.19beta20 [June 30, 2007]
+  More revision of pnggccrd.c
+  Added "test" target to Makefile.in and Makefile.am
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

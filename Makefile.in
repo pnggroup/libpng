@@ -1259,6 +1259,8 @@ libpng.vers: libpng.sym
 	$(ECHO) 'local: *; };' >> $@.new
 	mv $@.new $@
 
+test: check
+
 # install the .../include headers as links to the new ones
 install-data-hook:
 	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
