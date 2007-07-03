@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 June 30, 2007
+ * Last changed in libpng 1.2.19 July 3, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -383,11 +383,13 @@
  *     (see new PSI/PDI/PAX/PDX/PBP/etc. "pointer-register" macros); applies
  *     also to clobber lists
  *
-
+ *
  * 200706xx:
  *  - continued fixing intermittent 64-bit crash bug:
  *     - png_read_filter_row_mmx_up()
-	
+ *
+ * 20070703:
+ *  - changed pngbytep dummy_value_a and b to ull dummy_value_a and b.
  *
  *
  * STILL TO DO:
@@ -2244,8 +2246,8 @@ png_do_read_interlace(png_structp png_ptr)
                int dummy_value_c;        // fix 'forbidden register spilled'
                png_bytep dummy_value_S;
                png_bytep dummy_value_D;
-               png_bytep dummy_value_a;
-               png_bytep dummy_value_d;
+               ull dummy_value_a;
+               ull dummy_value_d;
 
                //--------------------------------------------------------------
                if (pixel_bytes == BPP3)
