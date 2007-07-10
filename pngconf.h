@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19beta22 - July 3, 2007
+ * libpng version 1.2.19beta23 - July 10, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -752,7 +752,15 @@
 #endif
 
 #  if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
-#    define PNG_MMX_CODE_SUPPORTED
+#      define PNG_MMX_CODE_SUPPORTED
+#    if defined(__GNUC__) && defined(__x86_64__) && !defined(PNG_NO_MMX_READ_FILTER_ROW) && \
+       ((__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR == 0))) && \
+       !defined(PNG_HAVE_MMX_READ_FILTER_ROW) 
+       /* work around 64-bit gcc compiler bugs in gcc-3.3, 3.4, 4.0.
+        * If you are using gcc-4.0 with -O2 or -O3 it may be safe to define
+        * PNG_HAVE_MMX_READ_FILTER_ROW manually */
+#      define PNG_NO_MMX_READ_FILTER_ROW
+#    endif
 #  endif
 
 #  if !defined(PNG_USE_PNGVCRD) && !defined(PNG_NO_MMX_CODE) && \
@@ -1499,9 +1507,15 @@ typedef z_stream FAR *  png_zstreamp;
  * MMX will be detected at run time and used if present.
  */
 #ifdef PNG_USE_PNGVCRD
-#  define PNG_HAVE_MMX_COMBINE_ROW
-#  define PNG_HAVE_MMX_READ_INTERLACE
-#  define PNG_HAVE_MMX_READ_FILTER_ROW
+#  ifndef PNG_NO_MMX_COMBINE_ROW
+#    define PNG_HAVE_MMX_COMBINE_ROW
+#  endif
+#  ifndef PNG_NO_MMX_READ_INTERLACE
+#    define PNG_HAVE_MMX_READ_INTERLACE
+#  endif
+#  ifndef PNG_NO_MMX_READ_FILTER_ROW
+#    define PNG_HAVE_MMX_READ_FILTER_ROW
+#  endif
 #endif
 
 /* Set this in the makefile for gcc/as on Pentium, not here. */
@@ -1509,9 +1523,15 @@ typedef z_stream FAR *  png_zstreamp;
  * MMX will be detected at run time and used if present.
  */
 #ifdef PNG_USE_PNGGCCRD
-#  define PNG_HAVE_MMX_COMBINE_ROW
-#  define PNG_HAVE_MMX_READ_INTERLACE
-#  define PNG_HAVE_MMX_READ_FILTER_ROW
+#  ifndef PNG_NO_MMX_COMBINE_ROW
+#    define PNG_HAVE_MMX_COMBINE_ROW
+#  endif
+#  ifndef PNG_NO_MMX_READ_INTERLACE
+#    define PNG_HAVE_MMX_READ_INTERLACE
+#  endif
+#  ifndef PNG_NO_MMX_READ_FILTER
+#    define PNG_HAVE_MMX_READ_FILTER_ROW
+#  endif
 #endif
 /* - see pnggccrd.c for info about what is currently enabled */
 

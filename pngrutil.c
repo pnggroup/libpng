@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.19 July 3, 2007
+ * Last changed in libpng 1.2.19 July 10, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2273,8 +2273,8 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
  *
  */
 
-#if !defined(PNG_USE_PNGGCCRD) &&  !defined(PNG_USE_PNGVCRD)
 #if defined(PNG_OPTIMIZED_CODE_SUPPORTED)
+#if !defined(PNG_HAVE_MMX_COMBINE_ROW)
 
 /*===========================================================================*/
 /*                                                                           */
@@ -2757,6 +2757,7 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
    } /* end if (non-trivial mask) */
 
 } /* end png_combine_row() */
+#endif /* PNG_HAVE_MMX_COMBINE_ROW */
 
 
 
@@ -2767,6 +2768,7 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 /*===========================================================================*/
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED)
+#if !defined(PNG_HAVE_MMX_READ_INTERLACE)
 
 /* png_do_read_interlace() is called after any 16-bit to 8-bit conversion
  * has taken place.  [GRR: what other steps come before and/or after?]
@@ -3110,10 +3112,12 @@ static PNG_CONST int FARDATA png_pass_inc[7]   = {8, 8, 4, 4, 2, 2, 1};
 
 } /* end png_do_read_interlace() */
 
+#endif /* PNG_HAVE_MMX_READ_INTERLACE */
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
 
 
 
+#if !defined(PNG_HAVE_MMX_READ_FILTER_ROW)
 /*===========================================================================*/
 /*                                                                           */
 /*                   P N G _ R E A D _ F I L T E R _ R O W                   */
@@ -3293,8 +3297,10 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
    }
 }
 
+#endif /* PNG_HAVE_MMX_READ_FILTER_ROW */
 #endif /* PNG_OPTIMIZED_CODE_SUPPORTED */
 
+#if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD)
 #if !defined(PNG_OPTIMIZED_CODE_SUPPORTED)
 /* Use the unoptimized original C code.  This might be removed from a future
  * version of libpng if testing proves it to be worthless. */

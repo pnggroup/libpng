@@ -1822,6 +1822,11 @@ version 1.2.19beta22 [July 3, 2007]
   Added info about pngrutil/pnggccrd/pngvcrd to png_get_header_version()
   Fix type definition of dummy_value_a, b in pnggccrd.c
 
+version 1.2.19beta23 [July 10, 2007]
+  Revert change to type definition of dummy_value_a, b in pnggccrd.c
+  Make sure __PIC__ is defined in pnggccrd.c when PIC is defined.
+  Require gcc-4.1 or better to use PNG_HAVE_MMX_FILTER_ROW on x86_64 platforms
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
