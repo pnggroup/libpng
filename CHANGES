@@ -1827,6 +1827,10 @@ version 1.2.19beta23 [July 10, 2007]
   Make sure __PIC__ is defined in pnggccrd.c when PIC is defined.
   Require gcc-4.1 or better to use PNG_HAVE_MMX_FILTER_ROW on x86_64 platforms
 
+version 1.2.19beta24 [July 14, 2007]
+  Added PNG_NO_READ_FILTER, PNG_NO_WRITE_FILTER, PNG_NO_WARNING macros.
+  Added contrib/pngminim to demonstrate building minimal encoder and decoder
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

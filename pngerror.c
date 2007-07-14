@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.2.19 July 10, 2007
+ * Last changed in libpng 1.2.19 July 14, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -20,9 +20,11 @@
 static void /* PRIVATE */
 png_default_error PNGARG((png_structp png_ptr,
   png_const_charp error_message));
+#ifndef PNG_NO_WARNINGS
 static void /* PRIVATE */
 png_default_warning PNGARG((png_structp png_ptr,
   png_const_charp warning_message));
+#endif /* PNG_NO_WARNINGS */
 
 /* This function is called whenever there is a fatal error.  This function
  * should not be changed.  If there is a need to handle errors differently,
@@ -76,6 +78,7 @@ png_error(png_structp png_ptr, png_const_charp error_message)
    png_default_error(png_ptr, error_message);
 }
 
+#ifndef PNG_NO_WARNINGS
 /* This function is called whenever there is a non-fatal error.  This function
  * should not be changed.  If there is a need to handle warnings differently,
  * you should supply a replacement warning function and use
@@ -105,6 +108,7 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
    else
       png_default_warning(png_ptr, warning_message+offset);
 }
+#endif /* PNG_NO_WARNINGS */
 
 
 /* These utilities are used internally to build an error message that relates
@@ -152,6 +156,7 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
    }
 }
 
+#ifdef PNG_READ_SUPPORTED
 void PNGAPI
 png_chunk_error(png_structp png_ptr, png_const_charp error_message)
 {
@@ -165,6 +170,7 @@ png_chunk_error(png_structp png_ptr, png_const_charp error_message)
    }
 }
 
+#ifndef PNG_NO_WARNINGS
 void PNGAPI
 png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
 {
@@ -177,7 +183,9 @@ png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
      png_warning(png_ptr, msg);
    }
 }
+#endif /* PNG_NO_WARNINGS */
 
+#endif /* PNG_READ_SUPPORTED */
 
 /* This is the default error handling function.  Note that replacements for
  * this function MUST NOT RETURN, or the program will likely crash.  This
@@ -234,6 +242,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 #endif
 }
 
+#ifndef PNG_NO_WARNINGS
 /* This function is called when there is a warning, but the library thinks
  * it can continue anyway.  Replacement functions don't have to do anything
  * here if you don't want them to.  In the default configuration, png_ptr is
@@ -271,6 +280,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 #endif
    png_ptr = png_ptr; /* make compiler happy */
 }
+#endif /* PNG_NO_WARNINGS */
 
 /* This function is called when the application wants to use another method
  * of handling errors and warnings.  Note that the error function MUST NOT

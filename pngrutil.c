@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.19 July 10, 2007
+ * Last changed in libpng 1.2.19 July 14, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -3144,6 +3144,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          png_snprintf(filnm, 10, "none");
          break;
 
+#ifndef PNG_NO_READ_FILTER
       case 1:
          png_snprintf(filnm, 10, "sub-%s",
              "x86");
@@ -3163,6 +3164,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          png_snprintf(filnm, 10, "Paeth-%s",
              "x86");
          break;
+#endif /* PNG_NO_READ_FILTER */
 
       default:
          png_snprintf(filnm, 10, "unknown");
@@ -3180,6 +3182,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
       case PNG_FILTER_VALUE_NONE:
          break;
 
+#ifndef PNG_NO_READ_FILTER
       case PNG_FILTER_VALUE_SUB:
          {
             png_uint_32 i;
@@ -3289,6 +3292,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
             }
          }
          break;
+#endif /* PNG_NO_READ_FILTER */
 
       default:
          png_warning(png_ptr, "Ignoring bad row-filter type");
@@ -3742,6 +3746,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    {
       case PNG_FILTER_VALUE_NONE:
          break;
+#ifndef PNG_NO_READ_FILTER
       case PNG_FILTER_VALUE_SUB:
       {
          png_uint_32 i;
@@ -3848,6 +3853,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
          }
          break;
       }
+#endif /* PNG_NO_READ_FILTER */
       default:
          png_warning(png_ptr, "Ignoring bad adaptive filter type");
          *row=0;

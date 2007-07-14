@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.19 July 10, 2007
+ * Last changed in libpng 1.2.19 July 14, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1752,6 +1752,7 @@ png_write_start_row(png_structp png_ptr)
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, (png_uint_32)buf_size);
    png_ptr->row_buf[0] = PNG_FILTER_VALUE_NONE;
 
+#ifndef PNG_NO_WRITE_FILTERING
    /* set up filtering buffer, if using this filter */
    if (png_ptr->do_filter & PNG_FILTER_SUB)
    {
@@ -1787,6 +1788,7 @@ png_write_start_row(png_structp png_ptr)
             (png_ptr->rowbytes + 1));
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
+#endif /* PNG_NO_WRITE_FILTERING */
    }
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
@@ -2122,6 +2124,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 
    prev_row = png_ptr->prev_row;
    best_row = row_buf = png_ptr->row_buf;
+#ifndef PNG_NO_WRITE_FILTER
    mins = PNG_MAXSUM;
 
    /* The prediction method we use is to find which method provides the
@@ -2696,7 +2699,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          best_row = png_ptr->paeth_row;
       }
    }
-
+#endif /* PNG_NO_WRITE_FILTER */
    /* Do the actual writing of the filtered row data from the chosen filter. */
 
    png_write_filtered_row(png_ptr, best_row);
