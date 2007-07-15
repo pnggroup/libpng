@@ -1831,6 +1831,11 @@ version 1.2.19beta24 [July 14, 2007]
   Added PNG_NO_READ_FILTER, PNG_NO_WRITE_FILTER, PNG_NO_WARNING macros.
   Added contrib/pngminim to demonstrate building minimal encoder and decoder
 
+version 1.2.19beta25 [July 15, 2007]
+  Removed the new PNG_NO_READ_FILTER macro since it would make the library
+    unable to read valid PNG files, and filtering is at the heart of the
+    PNG format.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
