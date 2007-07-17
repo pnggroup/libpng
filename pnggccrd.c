@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 July 15, 2007
+ * Last changed in libpng 1.2.19 July 17, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -5836,8 +5836,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          {
             png_read_filter_row_mmx_sub(row_info, row);
          }
-#endif
          else
+#endif
          {
             png_uint_32 i;
             png_uint_32 istop = row_info->rowbytes;

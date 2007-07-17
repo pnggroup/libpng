@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.19 July 15, 2007
+ * Last changed in libpng 1.2.19 July 17, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -33,7 +33,7 @@ __inline double png_strtod(png_structp png_ptr, PNG_CONST char *nptr, char **end
       result = wcstod(str, &end);
       len = WideCharToMultiByte(CP_ACP, 0, end, -1, NULL, 0, NULL, NULL);
       *endptr = (char *)nptr + (png_strlen(nptr) - len + 1);
-      png_free(str);
+      png_free(png_ptr, str);
    }
    return result;
 }

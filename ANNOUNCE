@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta25 - July 15, 2007
+Libpng 1.2.19beta26 - July 17, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta25.tar.gz
-   libpng-1.2.19beta25.tar.bz2
+   libpng-1.2.19beta26.tar.gz
+   libpng-1.2.19beta26.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta25-no-config.tar.gz
-   libpng-1.2.19beta25-no-config.tar.bz2
+   libpng-1.2.19beta26-no-config.tar.gz
+   libpng-1.2.19beta26-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b25.zip
-   lp1219b25.tar.bz2
+   lp1219b26.zip
+   lp1219b26.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta25-project-netware.zip
-   libpng-1.2.19beta25-project-wince.zip
+   libpng-1.2.19beta26-project-netware.zip
+   libpng-1.2.19beta26-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta25-README.txt
-   libpng-1.2.19beta25-KNOWNBUGS.txt
-   libpng-1.2.19beta25-LICENSE.txt
-   libpng-1.2.19beta25-Y2K-compliance.txt
+   libpng-1.2.19beta26-README.txt
+   libpng-1.2.19beta26-KNOWNBUGS.txt
+   libpng-1.2.19beta26-LICENSE.txt
+   libpng-1.2.19beta26-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -142,6 +142,12 @@ version 1.2.19beta25 [July 15, 2007]
   Removed the new PNG_NO_READ_FILTER macro since it would make the library
     unable to read valid PNG files, and filtering is at the heart of the
     PNG format.
+
+version 1.2.19beta26 [July 17, 2007]
+  Changed "png_free(str)" to "png_free(png_ptr,str)" in pngrutil.c WinCE
+    code (Yves Piguet).  This bug was introduced in libpng-1.2.14.
+  Updated scripts/CMakeLists.txt
+  Relocated a misplaced #endif in pnggccrd.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

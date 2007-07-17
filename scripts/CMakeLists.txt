@@ -49,6 +49,12 @@ if(NOT WIN32)
       set(png_asm_tmp "OFF")
    endif("uname_output" MATCHES "^.*i[1-9]86.*$")
  endif(uname_executable)
+else(NOT WIN32)
+ # this env var is normally only set on win64
+ SET(TEXT "ProgramFiles(x86)")
+ if("$ENV{${TEXT}}" STREQUAL "")
+  set(png_asm_tmp "ON")
+ endif("$ENV{${TEXT}}" STREQUAL "")
 endif(NOT WIN32)
 
 option(PNG_MMX "Use MMX assembler code (x86 only)" ${png_asm_tmp})
@@ -122,9 +128,9 @@ if(PNG_DEBUG)
  add_definitions(-DPNG_DEBUG)
 endif(PNG_DEBUG)
 
-if(NOT M_LIBRARY)
+if(NOT M_LIBRARY AND NOT WIN32)
  add_definitions(-DPNG_NO_FLOATING_POINT_SUPPORTED)
-endif(NOT M_LIBRARY)
+endif(NOT M_LIBRARY AND NOT WIN32)
 
 # NOW BUILD OUR TARGET
 include_directories(${PNG_SOURCE_DIR} ${ZLIB_INCLUDE_DIR})
@@ -169,7 +175,7 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 
 # SET UP LINKS
 set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 0.${PNGLIB_RELEASE}.1.2.19beta25
+#    VERSION 0.${PNGLIB_RELEASE}.1.2.19beta26
      VERSION 0.${PNGLIB_RELEASE}.0
      SOVERSION 0
      CLEAN_DIRECT_OUTPUT 1)
