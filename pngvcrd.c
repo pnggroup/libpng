@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * Last changed in libpng 1.2.19 July 17, 2007
+ * Last changed in libpng 1.2.19 July 18, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -928,9 +928,11 @@ secondloop48:
                   jnc        skip48            //if CF = 0
                   mov        eax,[esi]
                   mov        [ebx],eax
+                  mov        ax,[esi+4]       // These 2 lines added 20070717
+                  mov        [ebx+4],ax       // Glenn R-P
 skip48:
-                  add        esi,4
-                  add        ebx,4
+                  add        esi,6
+                  add        ebx,6
 
                   dec        ecx
                   jnz        secondloop48

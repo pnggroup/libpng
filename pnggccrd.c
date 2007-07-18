@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 July 17, 2007
+ * Last changed in libpng 1.2.19 July 18, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -395,7 +395,10 @@
  *
  * 20070703:
  *  - added check for (manual) PIC macro to fix OpenBSD crash bug
-
+ *
+ * 20070717:
+ *  - Copy 6 bytes per pixel, not 4, and use stride of 6, not 4, in the
+ *    second loop of interlace processing of 48-bit pixels (GR-P).
  *
  *
  * STILL TO DO:
@@ -404,7 +407,6 @@
  *     replace bpp with pointer and group bpp/patemp/pbtemp/pctemp in array)
  *  - fix ebp/no-reg-constraint inefficiency (avg/paeth/sub top)
  *  - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
- *  - write MMX code for 48-bit case (pixel_bytes == 6)
  *  - figure out what's up with 24-bit case (pixel_bytes == 3):
  *     why subtract 8 from width_mmx in the pass 4/5 case?  due to
  *     odd number of bytes? (only width_mmx case) (near line 2335)
@@ -1891,10 +1893,12 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   "jnc       skip48           \n\t" // if CF = 0
                   "movl      (%3), %%eax      \n\t"
                   "movl      %%eax, (%4)      \n\t"
+                  "movw      4(%3), %%eax     \n\t"
+                  "movw      %%eax, 4(%4)     \n\t"
 
                 "skip48:                      \n\t"
-                  "add       $4, %3           \n\t"
-                  "add       $4, %4           \n\t"
+                  "add       $6, %3           \n\t"
+                  "add       $6, %4           \n\t"
                   "decl      %%ecx            \n\t"
                   "jnz       secondloop48     \n\t"
 
@@ -3118,12 +3122,14 @@ png_do_read_interlace(png_structp png_ptr)
                      for (j = 0; j < png_pass_inc[pass]; j++)
                      {
 #if defined(PNG_DEBUG) && defined(PNG_1_0_X)  // row_buf_size gone in 1.2.x
-                    if (dp < row || dp+3 > row+png_ptr->row_buf_size)
-                    {
-                       printf("dp out of bounds: row=%10p, dp=%10p, "
-                         "rp=%10p\n", row, dp, row+png_ptr->row_buf_size);
-                       printf("row_buf_size=%lu\n", png_ptr->row_buf_size);
-                    }
+                        if (dp < row || dp+3 > row+png_ptr->row_buf_size)
+                        {
+                           printf("dp out of bounds: row=%10p, dp=%10p, "
+                             "rp=%10p\n", row, dp,
+                              row+png_ptr->row_buf_size);
+                           printf("row_buf_size=%lu\n",
+                              png_ptr->row_buf_size);
+                        }
 #endif
                         png_memcpy(dp, v, BPP4);
                         dp -= BPP4;
@@ -3962,7 +3968,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
 
 #if defined(PNG_x86_64_USE_GOTPCREL) || defined(PNG_THREAD_UNSAFE_OK)
 
-#ifdef PNG_MMX_READ_FILTER_AVG_SUPPORTED
+#ifdef PNG_MMX_READ_FILTER_PAETH_SUPPORTED
 //===========================================================================//
 //                                                                           //
 //         P N G _ R E A D _ F I L T E R _ R O W _ M M X _ P A E T H         //
