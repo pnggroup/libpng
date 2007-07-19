@@ -1842,10 +1842,16 @@ version 1.2.19beta26 [July 16, 2007]
   Updated scripts/CMakeLists.txt
   Relocated a misplaced #endif in pnggccrd.c
 
-version 1.2.19beta27 [July 18, 2007]
+version 1.2.19beta27 [July 17, 2007]
   Fixed incorrect stride and number of bytes copied (was 4 instead of
     6 bytes) in the cleanup loop of pnggccrd.c and pngvcrd.c for handling
     the end of 48-bit interlaced rows (Glenn R-P).
+
+version 1.2.19beta28 [July 19, 2007]
+  Removed requirement for gcc-4.1 or better to use PNG_HAVE_MMX_FILTER_ROW
+    on x86_64 platforms
+  Added png_warning() in pngrutil.c for short iCCP, iTXt, sPLT, or zTXT chunks.
+  Revised pngtest.c so warnings are displayed regardless of PNG_NO_STDIO.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta27 - July 18, 2007
+Libpng 1.2.19beta28 - July 19, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta27.tar.gz
-   libpng-1.2.19beta27.tar.bz2
+   libpng-1.2.19beta28.tar.gz
+   libpng-1.2.19beta28.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta27-no-config.tar.gz
-   libpng-1.2.19beta27-no-config.tar.bz2
+   libpng-1.2.19beta28-no-config.tar.gz
+   libpng-1.2.19beta28-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b27.zip
-   lp1219b27.tar.bz2
+   lp1219b28.zip
+   lp1219b28.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta27-project-netware.zip
-   libpng-1.2.19beta27-project-wince.zip
+   libpng-1.2.19beta28-project-netware.zip
+   libpng-1.2.19beta28-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta27-README.txt
-   libpng-1.2.19beta27-KNOWNBUGS.txt
-   libpng-1.2.19beta27-LICENSE.txt
-   libpng-1.2.19beta27-Y2K-compliance.txt
+   libpng-1.2.19beta28-README.txt
+   libpng-1.2.19beta28-KNOWNBUGS.txt
+   libpng-1.2.19beta28-LICENSE.txt
+   libpng-1.2.19beta28-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -149,10 +149,16 @@ version 1.2.19beta26 [July 16, 2007]
   Updated scripts/CMakeLists.txt
   Relocated a misplaced #endif in pnggccrd.c
 
-version 1.2.19beta27 [July 18, 2007]
+version 1.2.19beta27 [July 17, 2007]
   Fixed incorrect stride and number of bytes copied (was 4 instead of
     6 bytes) in the cleanup loop of pnggccrd.c and pngvcrd.c for handling
     the end of 48-bit interlaced rows (Glenn R-P).
+
+version 1.2.19beta28 [July 19, 2007]
+  Removed requirement for gcc-4.1 or better to use PNG_HAVE_MMX_FILTER_ROW
+    on x86_64 platforms
+  Added png_warning() in pngrutil.c for short iCCP, iTXt, sPLT, or zTXT chunks.
+  Revised pngtest.c so warnings are displayed regardless of PNG_NO_STDIO.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19beta27 - July 18, 2007
+ * libpng version 1.2.19beta28 - July 19, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -744,23 +744,8 @@
 #    define PNG_ASSEMBLER_CODE_SUPPORTED
 #  endif
 
-#if 0 /* we may not need this any more. */
-#  if defined(XP_MACOSX) && !defined(PNG_NO_MMX_CODE)
-     /* work around Intel-Mac compiler bug */
-#    define PNG_NO_MMX_CODE
-#  endif
-#endif
-
 #  if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
 #      define PNG_MMX_CODE_SUPPORTED
-#    if defined(__GNUC__) && defined(__x86_64__) && !defined(PNG_NO_MMX_READ_FILTER_ROW) && \
-       ((__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR == 0))) && \
-       !defined(PNG_HAVE_MMX_READ_FILTER_ROW) 
-       /* work around 64-bit gcc compiler bugs in gcc-3.3, 3.4, 4.0.
-        * If you are using gcc-4.0 with -O2 or -O3 it may be safe to define
-        * PNG_HAVE_MMX_READ_FILTER_ROW manually */
-#      define PNG_NO_MMX_READ_FILTER_ROW
-#    endif
 #  endif
 
 #  if !defined(PNG_USE_PNGVCRD) && !defined(PNG_NO_MMX_CODE) && \
@@ -1529,7 +1514,7 @@ typedef z_stream FAR *  png_zstreamp;
 #  ifndef PNG_NO_MMX_READ_INTERLACE
 #    define PNG_HAVE_MMX_READ_INTERLACE
 #  endif
-#  ifndef PNG_NO_MMX_READ_FILTER
+#  ifndef PNG_NO_MMX_READ_FILTER_ROW
 #    define PNG_HAVE_MMX_READ_FILTER_ROW
 #  endif
 #endif

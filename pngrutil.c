@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.19 July 18, 2007
+ * Last changed in libpng 1.2.19 July 19, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1040,7 +1040,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    /* there should be at least one zero (the compression type byte)
       following the separator, and we should be on it  */
-   if ( profile >= chunkdata + slength)
+   if ( profile >= chunkdata + slength - 1)
    {
       png_free(png_ptr, chunkdata);
       png_warning(png_ptr, "Malformed iCCP chunk");
@@ -1144,7 +1144,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    ++entry_start;
 
    /* a sample depth should follow the separator, and we should be on it  */
-   if (entry_start > chunkdata + slength)
+   if (entry_start > chunkdata + slength - 2)
    {
       png_free(png_ptr, chunkdata);
       png_warning(png_ptr, "malformed sPLT chunk");
@@ -1990,10 +1990,11 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* empty loop */ ;
 
    /* zTXt must have some text after the chunkdataword */
-   if (text == chunkdata + slength)
+   if (text == chunkdata + slength - 1)
    {
-      comp_type = PNG_TEXT_COMPRESSION_NONE;
-      png_warning(png_ptr, "Zero length zTXt chunk");
+      png_warning(png_ptr, "Truncated zTXt chunk");
+      png_free(png_ptr, chunkdata);
+      return;
    }
    else
    {
@@ -2093,10 +2094,11 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       translated keyword (possibly empty), and possibly some text after the
       keyword */
 
-   if (lang >= chunkdata + slength)
+   if (lang >= chunkdata + slength - 3)
    {
-      comp_flag = PNG_TEXT_COMPRESSION_NONE;
-      png_warning(png_ptr, "Zero length iTXt chunk");
+      png_warning(png_ptr, "Truncated iTXt chunk");
+      png_free(png_ptr, chunkdata);
+      return;
    }
    else
    {
@@ -2111,6 +2113,12 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    for (text = lang_key; *text; text++)
       /* empty loop */ ;
    text++;        /* skip NUL separator */
+   if (text >= chunkdata + slength)
+   {
+      png_warning(png_ptr, "Malformed iTXt chunk");
+      png_free(png_ptr, chunkdata);
+      return;
+   }
 
    prefix_len = text - chunkdata;
 
