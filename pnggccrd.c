@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 July 19, 2007
+ * Last changed in libpng 1.2.19 July 20, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -1893,8 +1893,8 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   "jnc       skip48           \n\t" // if CF = 0
                   "movl      (%3), %%eax      \n\t"
                   "movl      %%eax, (%4)      \n\t"
-                  "movw      4(%3), %%eax     \n\t"
-                  "movw      %%eax, 4(%4)     \n\t"
+                  "movw      4(%3), %%ax      \n\t"
+                  "movw      %%ax, 4(%4)      \n\t"
 
                 "skip48:                      \n\t"
                   "add       $6, %3           \n\t"
