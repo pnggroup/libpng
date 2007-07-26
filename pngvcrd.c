@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * Last changed in libpng 1.2.19 July 20, 2007
+ * Last changed in libpng 1.2.19 July 26, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -22,6 +22,8 @@
  *
  * [runtime MMX configuration, GRR 20010102]
  *
+ * [Copy 6 bytes per pixel, not 4, and use stride of 6, not 4, in the
+ *  second loop of interlace processing of 48-bit pixels, GR-P 20070717]
  */
 
 #define PNG_INTERNAL

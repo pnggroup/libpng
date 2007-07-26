@@ -1,9 +1,9 @@
 
 /* pnggccrd.c - mixed C/assembler version of utilities to read a PNG file
  *
- * For Intel x86 CPU (Pentium-MMX or later) and GNU C compiler.
+ * For Intel/AMD x86 or x86-64 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 July 20, 2007
+ * Last changed in libpng 1.2.19 July 26, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -23,6 +23,7 @@
  *
  *     http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html
  *     http://sam.zoy.org/blog/2007-04-13-shlib-with-non-pic-code-have-inline-assembly-and-pic-mix-well
+ *     http://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html
  *     http://gcc.gnu.org/onlinedocs/gcc/Variable-Attributes.html
  *     http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html
  *     AMD64 Architecture Programmer's Manual, volumes 1 and 5
@@ -224,7 +225,7 @@
  *  - fixed buffer-overrun bug in png_combine_row() C code (non-MMX)
  *
  * 20010808:
- *  - added PNG_THREAD_UNSAFE_OK around code using global variables [GRP]
+ *  - added PNG_THREAD_UNSAFE_OK around code using global variables [GR-P]
  *
  * 20011124:
  *  - fixed missing save of Eflag in png_mmx_support() [Maxim Sobolev]
@@ -237,13 +238,13 @@
  *
  * 20040724:
  *  - more tinkering with clobber list at lines 4529 and 5033 to get it to
- *     compile with gcc 3.4 [GRP]
+ *     compile with gcc 3.4 [GR-P]
  *
  * 20040809:
- *  - added "rim" definitions for CONST4 and CONST6 [GRP]
+ *  - added "rim" definitions for CONST4 and CONST6 [GR-P]
  *
  * 20060303:
- *  - added "OS2" to list of systems that don't need leading underscores [GRP]
+ *  - added "OS2" to list of systems that don't need leading underscores [GR-P]
  *
  * 20060320:
  *  - made PIC-compliant [Christian Aichinger]
@@ -356,7 +357,7 @@
  * 20070618:
  *  - fixed misplaced PNG_THREAD_UNSAFE_OK endif (was missing LOAD_GOT_rbp/
  *     RESTORE_rbp in 32-bit thread-safe case)
- *  - changed all "ifdef *" to "if defined(*)" [GRP]
+ *  - changed all "ifdef *" to "if defined(*)" [GR-P]
  *
  * 20070619:
  *  - rearranged most bitdepth-related case statements to put most frequent
@@ -369,7 +370,7 @@
  *  - removed single libpng-1.2.x PNG_DEBUG dependency on 1.0.x png_struct
  *     member (row_buf_size)
  *  - rearranged pass-related if-blocks in png_do_read_interlace() to put most
- *     frequent cases (4, 5) at top [GRP suggestion]
+ *     frequent cases (4, 5) at top [GR-P suggestion]
  *
  * 20070624-29:
  *  - fixed 64-bit crash bug:  pointers -> rsi/rdi, not esi/edi (switched to
@@ -397,16 +398,25 @@
  *  - added check for (manual) PIC macro to fix OpenBSD crash bug
  *
  * 20070717:
- *  - Copy 6 bytes per pixel, not 4, and use stride of 6, not 4, in the
- *    second loop of interlace processing of 48-bit pixels (GR-P).
+ *  - fixed 48-bit png_combine_row() bug (was acting like 32-bit):  copy 6
+ *     bytes per pixel, not 4, and use stride of 6, not 4, in the second loop
+ *     of interlace processing of 48-bit pixels [GR-P]
+ *
+ * 20070722:
+ *  - fixed 64-bit png_uint_32 bug with MMXLength/FullLength temp vars
+ *
+ * [still broken:  tops of all row-filter blocks (input/output constraints);
+ *  shows up on 64-bit dynamic (-fPIC) version with -O2, especially if debug-
+ *  printfs enabled, but at right edge of odd-width images even if disabled]
  *
  *
  * STILL TO DO:
  *  - fix final thread-unsafe code using stack vars and pointer? (paeth top,
- *     default, bottom only; default, bottom already 5 reg constraints; could
+ *     default, bottom only:  default, bottom already 5 reg constraints; could
  *     replace bpp with pointer and group bpp/patemp/pbtemp/pctemp in array)
  *  - fix ebp/no-reg-constraint inefficiency (avg/paeth/sub top)
  *  - test png_do_read_interlace() 64-bit case (pixel_bytes == 8)
+ *  - write MMX code for 48-bit case (pixel_bytes == 6)
  *  - figure out what's up with 24-bit case (pixel_bytes == 3):
  *     why subtract 8 from width_mmx in the pass 4/5 case?  due to
  *     odd number of bytes? (only width_mmx case) (near line 2335)
@@ -429,12 +439,14 @@
 
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
 
-/* for some inexplicable reason, gcc x.x.x on OpenBSD (and elsewhere?) does
+/* for some inexplicable reason, gcc 3.3.5 on OpenBSD (and elsewhere?) does
  * *not* define __PIC__ when the -fPIC option is used, so we have to rely on
  * makefiles and whatnot to define the PIC macro explicitly */
 #if defined(PIC) && !defined(__PIC__)   // (this can/should move to pngconf.h)
 #  define __PIC__
 #endif
+
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
 
 /* if you want/need full thread-safety on x86-64 even when linking statically,
  * comment out the "&& defined(__PIC__)" part here: */
@@ -662,13 +674,12 @@ static PNG_CONST ull _amask4_2_2  __attribute__((used, aligned(8))) = 0x00000000
 
 #if defined(PNG_HAVE_MMX_READ_FILTER_ROW) || defined(PNG_HAVE_MMX_COMBINE_ROW)
 
-// this block is specific to png_read_filter_row_mmx_paeth()
+// this block is specific to png_read_filter_row_mmx_paeth() except for
+// LOAD_GOT_rbp and RESTORE_rbp, which are also used in png_combine_row()
 #if defined(PNG_x86_64_USE_GOTPCREL)
-#  if defined(PNG_HAVE_MMX_READ_FILTER_ROW)
 #  define pa_TEMP                "%%r11d"
 #  define pb_TEMP                "%%r12d"
 #  define pc_TEMP                "%%r13d"
-#  endif
 #  if defined(PNG_CLOBBER_x86_64_REGS_SUPPORTED)  // works as of gcc 3.4.3 ...
 #    define SAVE_r11_r12_r13
 #    define RESTORE_r11_r12_r13
@@ -1893,12 +1904,12 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   "jnc       skip48           \n\t" // if CF = 0
                   "movl      (%3), %%eax      \n\t"
                   "movl      %%eax, (%4)      \n\t"
-                  "movw      4(%3), %%ax      \n\t"
-                  "movw      %%ax, 4(%4)      \n\t"
+                  "movw      4(%3), %%ax      \n\t" // GR-P bugfix 20070717
+                  "movw      %%ax, 4(%4)      \n\t" // GR-P bugfix 20070717
 
                 "skip48:                      \n\t"
-                  "add       $6, %3           \n\t"
-                  "add       $6, %4           \n\t"
+                  "add       $6, %3           \n\t" // GR-P bugfix 20070717
+                  "add       $6, %4           \n\t" // GR-P bugfix 20070717
                   "decl      %%ecx            \n\t"
                   "jnz       secondloop48     \n\t"
 
@@ -3121,16 +3132,14 @@ png_do_read_interlace(png_structp png_ptr)
                      png_memcpy(v, sptr, BPP4);
                      for (j = 0; j < png_pass_inc[pass]; j++)
                      {
-#if defined(PNG_DEBUG) && defined(PNG_1_0_X)  // row_buf_size gone in 1.2.x
-                        if (dp < row || dp+3 > row+png_ptr->row_buf_size)
-                        {
-                           printf("dp out of bounds: row=%10p, dp=%10p, "
-                             "rp=%10p\n", row, dp,
-                              row+png_ptr->row_buf_size);
-                           printf("row_buf_size=%lu\n",
-                              png_ptr->row_buf_size);
-                        }
-#endif
+%-12-%#if defined(PNG_DEBUG) && defined(PNG_1_0_X)  // row_buf_size gone in 1.2.x
+%-12-%                        if (dp < row || dp+3 > row+png_ptr->row_buf_size)
+%-12-%                        {
+%-12-%                           printf("dp out of bounds: row=%10p, dp=%10p, "
+%-12-%                             "rp=%10p\n", row, dp, row+png_ptr->row_buf_size);
+%-12-%                           printf("row_buf_size=%lu\n", png_ptr->row_buf_size);
+%-12-%                        }
+%-12-%#endif
                         png_memcpy(dp, v, BPP4);
                         dp -= BPP4;
                      }
@@ -3221,7 +3230,7 @@ png_do_read_interlace(png_structp png_ptr)
 
 
 #if defined(PNG_HAVE_MMX_READ_FILTER_ROW)
-#ifdef PNG_MMX_READ_FILTER_AVG_SUPPORTED
+#if defined(PNG_MMX_READ_FILTER_AVG_SUPPORTED)
 
 //===========================================================================//
 //                                                                           //
@@ -3235,7 +3244,7 @@ static void /* PRIVATE */
 png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
                             png_bytep prev_row)
 {
-   png_uint_32 FullLength, MMXLength;
+   unsigned FullLength, MMXLength;  // png_uint_32 is actually 64-bit on x86-64
    int bpp;
    int dummy_value_a;
    int dummy_value_c;   // fix 'forbidden register 2 (cx) was spilled' error
@@ -3248,14 +3257,15 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
    FullLength = row_info->rowbytes;         // number of bytes to filter
 
    __asm__ __volatile__ (
+   "avg_top:                       \n\t"
       SAVE_GOT_ebx
       SAVE_r15
       SAVE_ebp
       // initialize address pointers and offset
-//pre "movl row, %2                \n\t" // edi/rdi:  ptr to Avg(x)
+//pre "movl row, %5                \n\t" // edi/rdi:  ptr to Avg(x)
       "xorl %%ebx, %%ebx           \n\t" // ebx:  x
-//pre "movl prev_row, %1           \n\t" // esi/rsi:  ptr to Prior(x)
-      "mov  %2, " PDX "            \n\t" // copy of row ptr...
+//pre "movl prev_row, %4           \n\t" // esi/rsi:  ptr to Prior(x)
+      "mov  %5, " PDX "            \n\t" // copy of row ptr...
 //pre "subl bpp, " PDX "           \n\t" // (bpp is preloaded into ecx)
       "sub  " PCX "," PDX "        \n\t" // edx/rdx:  ptr to Raw(x-bpp)
 //pre "movl FullLength, %%eax      \n\t" // bring in via eax...
@@ -3265,24 +3275,24 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       // Compute the Raw value for the first bpp bytes
       //    Raw(x) = Avg(x) + (Prior(x)/2)
    "avg_rlp:                       \n\t"
-      "movb (%1," PBX ",), %%al    \n\t" // load al with Prior(x)
+      "movb (%4," PBX ",), %%al    \n\t" // load al with Prior(x)
       "incl %%ebx                  \n\t"
       "shrb %%al                   \n\t" // divide by 2
-      "addb -1(%2," PBX ",), %%al  \n\t" // add Avg(x); -1 to offset inc ebx
+      "addb -1(%5," PBX ",), %%al  \n\t" // add Avg(x); -1 to offset inc ebx
 //pre "cmpl bpp, %%ebx             \n\t" // (bpp is preloaded into ecx)
       "cmpl %%ecx, %%ebx           \n\t"
-      "movb %%al, -1(%2," PBX ",)  \n\t" // write Raw(x); -1 to offset inc ebx
+      "movb %%al, -1(%5," PBX ",)  \n\t" // write Raw(x); -1 to offset inc ebx
       "jb avg_rlp                  \n\t" // mov does not affect flags
 
       // get # of bytes to alignment (32-bit mask _would_ be good enough
       // [computing delta], but 32-bit ops are zero-extended on 64-bit, argh)
       // (if swapped edx and ebp, could do 8-bit or 16-bit mask...FIXME?)
-      "mov  %2, " PBP "            \n\t" // take start of row
+      "mov  %5, " PBP "            \n\t" // take start of row
       "add  " PBX "," PBP "        \n\t" // add bpp
       "add  $0xf, " PBP "          \n\t" // add 7+8 to incr past alignment bdry
 //    "andl $0xfffffff8, %%ebp     \n\t" // mask to alignment boundary (32-bit!)
       CLEAR_BOTTOM_3_BITS  PBP    "\n\t" // mask to alignment boundary
-      "sub  %2, " PBP "            \n\t" // subtract row ptr again => ebp =
+      "sub  %5, " PBP "            \n\t" // subtract row ptr again => ebp =
       "jz avg_go                   \n\t" //  target value of ebx at alignment
 
       "xorl %%ecx, %%ecx           \n\t"
@@ -3292,14 +3302,14 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       //    Raw(x) = Avg(x) + ((Raw(x-bpp) + Prior(x))/2)
    "avg_lp1:                       \n\t"
       "xorl %%eax, %%eax           \n\t"
-      "movb (%1," PBX ",), %%cl    \n\t" // load cl with Prior(x)
+      "movb (%4," PBX ",), %%cl    \n\t" // load cl with Prior(x)
       "movb (" PDX "," PBX ",), %%al \n\t" // load al with Raw(x-bpp)
       "addw %%cx, %%ax             \n\t"
       "incl %%ebx                  \n\t"
       "shrw %%ax                   \n\t" // divide by 2
-      "addb -1(%2," PBX ",), %%al  \n\t" // add Avg(x); -1 to offset inc ebx
+      "addb -1(%5," PBX ",), %%al  \n\t" // add Avg(x); -1 to offset inc ebx
       "cmpl %%ebp, %%ebx           \n\t" // check if at alignment boundary
-      "movb %%al, -1(%2," PBX ",)  \n\t" // write Raw(x); -1 to offset inc ebx
+      "movb %%al, -1(%5," PBX ",)  \n\t" // write Raw(x); -1 to offset inc ebx
       "jb avg_lp1                  \n\t" // repeat until at alignment boundary
 
    "avg_go:                        \n\t"
@@ -3314,15 +3324,32 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
       RESTORE_r15
       RESTORE_GOT_ebx
 
-      : "=c" (MMXLength),                // output regs
-        "=S" (dummy_value_S),
-        "=D" (dummy_value_D),
-        "=a" (diff)
+// "There is no way for you to specify that an input operand is modified
+// without also specifying it as an output operand."  [makes sense]
 
-      : "0" (bpp),         // ecx        // input regs
-        "1" (prev_row),    // esi/rsi
-        "2" (row),         // edi/rdi
-        "3" (FullLength)   // eax
+// "Unless an output operand has the `&' constraint modifier, GCC may
+// allocate it in the same register as an unrelated input operand, on the
+// assumption the inputs are consumed before the outputs are produced."
+// [trying to _force_ this]
+
+// "`='   Means that this operand is write-only for this instruction:
+//        the previous value is discarded and replaced by output data."
+//        [operand == variable name, presumably]
+
+      // output regs
+      // these are operands 0-1 (originally 0-3):
+      : "=c" (MMXLength),      // %0 -> %0
+        "=a" (diff)            // %3 -> %1
+//      "=S" (dummy_value_S),  // %1 -> GONE
+//      "=D" (dummy_value_D),  // %2 -> GONE
+
+      // input regs
+      // these are operands 2-5 (originally 4-7); two of their constraints say
+      // they must go in same places as operands 0-1 (originally 0-3) above:
+      : "0" (bpp),         // %4 -> %2 ecx
+        "1" (FullLength),  // %7 -> %3 eax
+        "S" (prev_row),    // %5 -> %4 esi/rsi
+        "D" (row)          // %6 -> %5 edi/rdi
 
       : "%edx"                           // clobber list
         _CLOBBER_r15
@@ -3962,13 +3989,14 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row,
    );
 
 } /* end png_read_filter_row_mmx_avg() */
+
 #endif /* PNG_MMX_READ_FILTER_AVG_SUPPORTED */
 
 
 
+#if defined(PNG_MMX_READ_FILTER_PAETH_SUPPORTED)
 #if defined(PNG_x86_64_USE_GOTPCREL) || defined(PNG_THREAD_UNSAFE_OK)
 
-#ifdef PNG_MMX_READ_FILTER_PAETH_SUPPORTED
 //===========================================================================//
 //                                                                           //
 //         P N G _ R E A D _ F I L T E R _ R O W _ M M X _ P A E T H         //
@@ -3981,7 +4009,7 @@ static void /* PRIVATE */
 png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
                               png_bytep prev_row)
 {
-   png_uint_32 FullLength, MMXLength;
+   unsigned FullLength, MMXLength;  // png_uint_32 is actually 64-bit on x86-64
    int bpp;
    int dummy_value_a;
    int dummy_value_c;   // fix 'forbidden register 2 (cx) was spilled' error
@@ -5075,14 +5103,15 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
    );
 
 } /* end png_read_filter_row_mmx_paeth() */
-#endif /* PNG_MMX_READ_FILTER_PAETH_SUPPORTED */
 
 #endif // PNG_x86_64_USE_GOTPCREL || PNG_THREAD_UNSAFE_OK
+#endif /* PNG_MMX_READ_FILTER_PAETH_SUPPORTED */
 
 
 
 
-#ifdef PNG_MMX_READ_FILTER_SUB_SUPPORTED
+#if defined(PNG_MMX_READ_FILTER_SUB_SUPPORTED)
+
 //===========================================================================//
 //                                                                           //
 //           P N G _ R E A D _ F I L T E R _ R O W _ M M X _ S U B           //
@@ -5094,7 +5123,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 static void /* PRIVATE */
 png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 {
-   png_uint_32 FullLength, MMXLength;
+   unsigned FullLength, MMXLength;  // png_uint_32 is actually 64-bit on x86-64
    int bpp;
    int dummy_value_a;
    int dummy_value_c;
@@ -5564,12 +5593,14 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
    );
 
 } // end of png_read_filter_row_mmx_sub()
+
 #endif /* PNG_MMX_READ_FILTER_SUB_SUPPORTED */
 
 
 
 
-#ifdef PNG_MMX_READ_FILTER_UP_SUPPORTED
+#if defined(PNG_MMX_READ_FILTER_UP_SUPPORTED)
+
 //===========================================================================//
 //                                                                           //
 //            P N G _ R E A D _ F I L T E R _ R O W _ M M X _ U P            //
@@ -5582,7 +5613,7 @@ static void /* PRIVATE */
 png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
                            png_bytep prev_row)
 {
-   png_uint_32 len;
+   unsigned len;        // png_uint_32 is actually 64-bit on x86-64
    int dummy_value_d;   // fix 'forbidden register 3 (dx) was spilled' error
    png_bytep dummy_value_S;
    png_bytep dummy_value_D;
@@ -5715,6 +5746,7 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
    );
 
 } // end of png_read_filter_row_mmx_up()
+
 #endif /* PNG_MMX_READ_FILTER_UP_SUPPORTED */
 
 
@@ -5725,7 +5757,6 @@ png_read_filter_row_mmx_up(png_row_infop row_info, png_bytep row,
 /*                   P N G _ R E A D _ F I L T E R _ R O W                   */
 /*                                                                           */
 /*===========================================================================*/
-
 
 /* Optimized png_read_filter_row routines */
 
