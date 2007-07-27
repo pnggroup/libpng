@@ -3,7 +3,7 @@
  *
  * For Intel/AMD x86 or x86-64 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 July 26, 2007
+ * Last changed in libpng 1.2.19 July 27, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -437,7 +437,6 @@
 #define PNG_INTERNAL
 #include "png.h"
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
 
 /* for some inexplicable reason, gcc 3.3.5 on OpenBSD (and elsewhere?) does
  * *not* define __PIC__ when the -fPIC option is used, so we have to rely on
@@ -3132,14 +3131,14 @@ png_do_read_interlace(png_structp png_ptr)
                      png_memcpy(v, sptr, BPP4);
                      for (j = 0; j < png_pass_inc[pass]; j++)
                      {
-%-12-%#if defined(PNG_DEBUG) && defined(PNG_1_0_X)  // row_buf_size gone in 1.2.x
-%-12-%                        if (dp < row || dp+3 > row+png_ptr->row_buf_size)
-%-12-%                        {
-%-12-%                           printf("dp out of bounds: row=%10p, dp=%10p, "
-%-12-%                             "rp=%10p\n", row, dp, row+png_ptr->row_buf_size);
-%-12-%                           printf("row_buf_size=%lu\n", png_ptr->row_buf_size);
-%-12-%                        }
-%-12-%#endif
+#if defined(PNG_DEBUG) && defined(PNG_1_0_X)  // row_buf_size gone in 1.2.x
+                        if (dp < row || dp+3 > row+png_ptr->row_buf_size)
+                        {
+                           printf("dp out of bounds: row=%10p, dp=%10p, "
+                             "rp=%10p\n", row, dp, row+png_ptr->row_buf_size);
+                           printf("row_buf_size=%lu\n", png_ptr->row_buf_size);
+                        }
+#endif
                         png_memcpy(dp, v, BPP4);
                         dp -= BPP4;
                      }
