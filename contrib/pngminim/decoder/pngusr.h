@@ -13,7 +13,7 @@
 #define png_warning(s1,s2) ""
 #define png_chunk_warning(s1,s2) ""
 
-#define PNG_NO_MMX_CODE
+#define PNG_NO_ASSEMBLER_CODE
 #define PNG_NO_OPTIMIZED_CODE
 #define PNG_NO_READ_GAMMA
 #define PNG_NO_READ_BACKGROUND

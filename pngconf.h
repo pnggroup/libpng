@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19beta31 - July 27, 2007
+ * libpng version 1.2.19rc1 - July 31, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -745,24 +745,24 @@
 #  endif
 
 #  if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
-#      define PNG_MMX_CODE_SUPPORTED
+#    define PNG_MMX_CODE_SUPPORTED
 #  endif
 
-#  if !defined(PNG_USE_PNGVCRD) && !defined(PNG_NO_MMX_CODE) && \
+#  if !defined(PNG_USE_PNGVCRD) && defined(PNG_MMX_CODE_SUPPORTED) && \
      defined(_MSC_VER)
 #    define PNG_USE_PNGVCRD
 #  endif
 
-#  if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_NO_MMX_CODE) && \
+#  if !defined(PNG_USE_PNGGCCRD) && defined(PNG_MMX_CODE_SUPPORTED) && \
      !defined(PNG_USE_PNGVCRD)
 #    define PNG_USE_PNGGCCRD
+     /* If you are sure that you don't need thread safety and you are compiling
+        with PNG_USE_PNGCCRD for an MMX application, you can define this for
+        faster execution.  See pnggccrd.c.
+#    define PNG_THREAD_UNSAFE_OK
+     */
 #  endif
 
-/* If you are sure that you don't need thread safety and you are compiling
-   with PNG_USE_PNGCCRD for an MMX application, you can define this for
-   faster execution.  See pnggccrd.c.
-#define PNG_THREAD_UNSAFE_OK
-*/
 #endif
 
 #if !defined(PNG_1_0_X)
@@ -1474,24 +1474,11 @@ typedef z_stream FAR *  png_zstreamp;
 /* Prior to libpng-1.0.9, this block was in pngasmrd.h */
 #if defined(PNG_INTERNAL)
 
-/* These are the default thresholds before the MMX code kicks in; if either
- * rowbytes or bitdepth is below the threshold, plain C code is used.  These
- * can be overridden at runtime via the png_set_mmx_thresholds() call in
- * libpng 1.2.0 and later.  The values below were chosen by Intel.
- */
-
-#ifndef PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT
-#  define PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT  128  /*  >=  */
-#endif
-#ifndef PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT
-#  define PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT  9    /*  >=  */   
-#endif
-
-/* Set this in the makefile for VC++ on Pentium, not here. */
-/* Platform must be Pentium.  Makefile must assemble and load pngvcrd.c .
- * MMX will be detected at run time and used if present.
- */
-#ifdef PNG_USE_PNGVCRD
+#if defined(PNG_USE_PNGGCCRD) || defined(PNG_USE_PNGVCRD)
+  /* Platform must be Pentium.  Makefile must assemble and load
+   * pnggccrd.c or  pngvcrd.c. MMX will be detected at run time and
+   * used if present.
+   */
 #  ifndef PNG_NO_MMX_COMBINE_ROW
 #    define PNG_HAVE_MMX_COMBINE_ROW
 #  endif
@@ -1500,25 +1487,35 @@ typedef z_stream FAR *  png_zstreamp;
 #  endif
 #  ifndef PNG_NO_MMX_READ_FILTER_ROW
 #    define PNG_HAVE_MMX_READ_FILTER_ROW
+#    ifndef PNG_NO_MMX_FILTER_SUB
+#      define PNG_MMX_READ_FILTER_SUB_SUPPORTED
+#    endif
+#    if !(defined(__GNUC__) && defined(__x86_64__) && (__GNUC__ < 4))
+       /* work around 64-bit gcc compiler bugs in gcc-3.x */
+#      ifndef PNG_NO_MMX_FILTER_UP
+#        define PNG_MMX_READ_FILTER_UP_SUPPORTED
+#      endif
+#      ifndef PNG_NO_MMX_FILTER_AVG
+#        define PNG_MMX_READ_FILTER_AVG_SUPPORTED
+#      endif
+#      ifndef PNG_NO_MMX_FILTER_PAETH
+#        define PNG_MMX_READ_FILTER_PAETH_SUPPORTED
+#      endif
+#    endif /* !((__x86_64__) && (GNUC < 4)) */
 #  endif
-#endif
-
-/* Set this in the makefile for gcc/as on Pentium, not here. */
-/* Platform must be Pentium.  Makefile must assemble and load pnggccrd.c .
- * MMX will be detected at run time and used if present.
- */
-#ifdef PNG_USE_PNGGCCRD
-#  ifndef PNG_NO_MMX_COMBINE_ROW
-#    define PNG_HAVE_MMX_COMBINE_ROW
+  /* These are the default thresholds before the MMX code kicks in; if either
+   * rowbytes or bitdepth is below the threshold, plain C code is used.  These
+   * can be overridden at runtime via the png_set_mmx_thresholds() call in
+   * libpng 1.2.0 and later.  The values below were chosen by Intel.
+   */
+#  ifndef PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT
+#    define PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT  128  /*  >=  */
 #  endif
-#  ifndef PNG_NO_MMX_READ_INTERLACE
-#    define PNG_HAVE_MMX_READ_INTERLACE
+#  ifndef PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT
+#    define PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT  9    /*  >=  */   
 #  endif
-#  ifndef PNG_NO_MMX_READ_FILTER_ROW
-#    define PNG_HAVE_MMX_READ_FILTER_ROW
-#  endif
-#endif
-/* - see pnggccrd.c for info about what is currently enabled */
+#endif /* PNG_USE_PNGGCCRD || PNG_USE_PNGVCRD */
+/* - see pngvcrd.c or pnggccrd.c for info about what is currently enabled */
 
 #endif /* PNG_INTERNAL */
 #endif /* PNG_READ_SUPPORTED */

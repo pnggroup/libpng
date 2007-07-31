@@ -3,7 +3,7 @@
  *
  * For Intel/AMD x86 or x86-64 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 July 27, 2007
+ * Last changed in libpng 1.2.19 July 31, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -5789,12 +5789,12 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if !defined(PNG_1_0_X)
            ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
-            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold)) ? "MMX" : 
 #else
            _mmx_supported
 #endif
 #endif
-           ? "MMX" : "C");
+           "C");
          break;
 
       case 2:
@@ -5803,12 +5803,12 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if !defined(PNG_1_0_X)
            ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP) &&
             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
-            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold)) ? "MMX" :
 #else
            _mmx_supported
 #endif
 #endif
-           ? "MMX" : "C");
+           "C");
          break;
 
       case 3:
@@ -5817,12 +5817,12 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if !defined(PNG_1_0_X)
            ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG) &&
             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
-            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold)) ? "MMX" : 
 #else
            _mmx_supported
 #endif
 #endif
-           ? "MMX" : "C");
+           "C");
          break;
 
       case 4:

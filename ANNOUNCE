@@ -1,5 +1,5 @@
 
-Libpng 1.2.19beta31 - July 27, 2007
+Libpng 1.2.19rc1 - July 31, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19beta31.tar.gz
-   libpng-1.2.19beta31.tar.bz2
+   libpng-1.2.19rc1.tar.gz
+   libpng-1.2.19rc1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19beta31-no-config.tar.gz
-   libpng-1.2.19beta31-no-config.tar.bz2
+   libpng-1.2.19rc1-no-config.tar.gz
+   libpng-1.2.19rc1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219b31.zip
-   lp1219b31.tar.bz2
+   lp1219r01.zip
+   lp1219r01.tar.bz2
 
 Project files
 
-   libpng-1.2.19beta31-project-netware.zip
-   libpng-1.2.19beta31-project-wince.zip
+   libpng-1.2.19rc1-project-netware.zip
+   libpng-1.2.19rc1-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19beta31-README.txt
-   libpng-1.2.19beta31-KNOWNBUGS.txt
-   libpng-1.2.19beta31-LICENSE.txt
-   libpng-1.2.19beta31-Y2K-compliance.txt
+   libpng-1.2.19rc1-README.txt
+   libpng-1.2.19rc1-KNOWNBUGS.txt
+   libpng-1.2.19rc1-LICENSE.txt
+   libpng-1.2.19rc1-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -160,14 +160,19 @@ version 1.2.19beta28 [July 19, 2007]
   Added png_warning() in pngrutil.c for short iCCP, iTXt, sPLT, or zTXT chunks.
   Revised pngtest.c so warnings are displayed regardless of PNG_NO_STDIO.
 
-version 1.2.19beta29 [July 20, 2007]
-  Fix typo in pnggccrd.c (%%eax should be %%ax in secondloop48)
-
-version 1.2.19beta30 [July 27, 2007]
+version 1.2.19beta30 [July 26, 2007]
   Revised pnggccrd.c
 
 version 1.2.19beta31 [July 27, 2007]
   Fix typos in pnggccrd.c
+
+version 1.2.19beta32 [July 31, 2007]
+  Disable PNG_MMX_CODE_SUPPORTED when PNG_ASSEMBLER_CODE_SUPPORTED is off.
+  Enable PNG_MMX_READ_FILTER_* by default (they were inadvertently disabled in
+    libpng-1.2.19beta23).
+  Fix some debugging statements in pnggccrd.c and pngrutil.c
+  Added information about disabling the MMX code in libpng documentation.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

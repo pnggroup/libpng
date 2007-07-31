@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * Last changed in libpng 1.2.19 July 27, 2007
+ * Last changed in libpng 1.2.19 July 31, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -933,8 +933,8 @@ secondloop48:
                   mov        ax,[esi+4]       // These 2 lines added 20070717
                   mov        [ebx+4],ax       // Glenn R-P
 skip48:
-                  add        esi,6
-                  add        ebx,6
+                  add        esi,6            // Changed 4 to 6 on these 2
+                  add        ebx,6            // lines.  Glenn R-P 20070717
 
                   dec        ecx
                   jnz        secondloop48

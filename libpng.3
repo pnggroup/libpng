@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "July 27, 2007"
+.TH LIBPNG 3 "July 31, 2007"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.2.19beta31
+libpng \- Portable Network Graphics (PNG) Reference Library 1.2.19rc1
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -410,7 +410,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.19beta31 - July 27, 2007
+ libpng version 1.2.19rc1 - July 31, 2007
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2007 Glenn Randers-Pehrson
@@ -3200,7 +3200,8 @@ this may include optimizations that did not exist at the time the code was
 written and compiled.  It is also possible, of course, to enable only known,
 specific optimizations; for example:
 
-    #if defined(PNG_LIBPNG_VER) && (PNG_LIBPNG_VER >= 10200)
+    #if defined(PNG_LIBPNG_VER) && (PNG_LIBPNG_VER >= 10200) && \
+       defined(PNG_USE_PNGGCCRD) && defined(PNG_ASSEMBLER_CODE_SUPPORTED)
        flags = PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  \
              | PNG_ASM_FLAG_MMX_READ_INTERLACE    \
              | PNG_ASM_FLAG_MMX_READ_FILTER_SUB   \
@@ -3254,6 +3255,52 @@ defined:
 For more extensive examples of runtime querying, enabling and disabling
 of optimized features, see contrib/gregbook/readpng2.c in the libpng
 source-code distribution.
+
+It is also possible to disable or enable specific optimization features
+at compile time.  To disable them entirely, which may result in slower
+but smaller and less complex and troublesome code, define
+
+     PNG_NO_ASSEMBLER_CODE
+
+If you do this, then the run-time code for setting and querying flags
+described above, and the assembler code in pnggccrd.c or pngvcrd.c will
+not be built.
+
+If you have disabled the assembler code, you can also disable the
+optimized C code, to obtain even slower but smaller code, by defining
+
+     PNG_NO_OPTIMZED_CODE
+
+To disable only the MMX assembler code, define
+
+     PNG_NO_MMX_CODE
+
+There are two versions of the MMX code: one for gcc compilers and one for
+MSVC compilers.  Pngconf.h should automatically detect which you are
+using, and it will set either PNG_USE_PNGGCCRD or PNG_USE_PNGVCRD for you.
+
+Define one or more of the following to disable specific parts of the
+assembler code:
+
+     PNG_NO_MMX_COMBINE_ROW
+     PNG_NO_MMX_READ_INTERLACE
+     PNG_NO_MMX_READ_FILTER_ROW
+
+If the latter is not disabled, you can disable one or more of the
+individual filter types by defining
+
+     PNG_NO_MMX_FILTER_SUB
+     PNG_NO_MMX_FILTER_UP
+     PNG_NO_MMX_FILTER_AVG
+     PNG_NO_MMX_FILTER_PAETH
+
+By default, libpng only enables the "sub" filter when gcc-3.x is used
+because experiments show that gcc-3.x produces bad code for the others.
+
+When you disable various MMX features, libpng will still be able to decode
+files with those features.  It will fall back upon the optimized C code
+or the unoptimized C code to decode them.
+
 
 .SH VII.  MNG support
 
@@ -3331,13 +3378,13 @@ application:
 
 .SH IX. Y2K Compliance in libpng
 
-July 27, 2007
+July 31, 2007
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.19beta31 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.19rc1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3527,6 +3574,8 @@ the first widely used release:
  1.0.26              10    10026  10.so.0.26[.0]
  1.2.18              13    10218  12.so.0.18[.0]
  1.2.19beta1-31      13    10219  12.so.0.19[.0]
+ 1.0.27rc1           10    10027  10.so.0.27[.0]
+ 1.2.19rc1           13    10219  12.so.0.19[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -3582,7 +3631,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.2.19beta31 - July 27, 2007:
+Libpng version 1.2.19rc1 - July 31, 2007:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -3603,7 +3652,7 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.2.19beta31, July 27, 2007, are
+libpng versions 1.2.6, August 15, 2004, through 1.2.19rc1, July 31, 2007, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -3702,7 +3751,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-July 27, 2007
+July 31, 2007
 
 .\" end of man page
 

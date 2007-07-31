@@ -1856,11 +1856,18 @@ version 1.2.19beta28 [July 19, 2007]
 version 1.2.19beta29 [July 20, 2007]
   Fix typo in pnggccrd.c (%%eax should be %%ax in secondloop48)
 
-version 1.2.19beta30 [July 27, 2007]
+version 1.2.19beta30 [July 26, 2007]
   Revised pnggccrd.c
 
 version 1.2.19beta31 [July 27, 2007]
   Fix typos in pnggccrd.c
+
+version 1.0.27rc1 and 1.2.19rc1 [July 31, 2007]
+  Disable PNG_MMX_CODE_SUPPORTED when PNG_ASSEMBLER_CODE_SUPPORTED is off.
+  Enable PNG_MMX_READ_FILTER_* by default, except when gcc-3.x is being
+    used (they were inadvertently disabled in libpng-1.2.19beta23).
+  Fix some debugging statements in pnggccrd.c and pngrutil.c
+  Added information about disabling the MMX code in libpng documentation.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

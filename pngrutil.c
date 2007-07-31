@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.19 July 27, 2007
+ * Last changed in libpng 1.2.19 July 31, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -3048,7 +3048,7 @@ static PNG_CONST int FARDATA png_pass_inc[7]   = {8, 8, 4, 4, 2, 2, 1};
                      png_memcpy(v, sptr, 4);
                      for (j = 0; j < png_pass_inc[pass]; j++)
                      {
-#if defined(PNG_DEBUG)
+#if defined(PNG_DEBUG) && defined(PNG_1_0_X)
                         if (dp < row || dp+3 > row+png_ptr->row_buf_size)
                         {
                            printf("dp out of bounds: row=%d, dp=%d, rp=%d\n",
@@ -4158,7 +4158,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 #endif
    png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes+64);
    png_ptr->row_buf = png_ptr->big_row_buf+32;
-#if defined(PNG_DEBUG) && defined(PNG_USE_PNGGCCRD)
+#if defined(PNG_DEBUG) && defined(PNG_USE_PNGGCCRD) && defined(PNG_1_0_X)
    png_ptr->row_buf_size = row_bytes;
 #endif
 
