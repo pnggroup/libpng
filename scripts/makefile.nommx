@@ -7,7 +7,7 @@
 # Library name:
 LIBNAME = libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.26
+PNGMIN = 1.0.27rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -48,8 +48,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops \
-	-DPNG_NO_MMX_CODE \
+CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng10 -lz -lm

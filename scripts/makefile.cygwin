@@ -3,7 +3,7 @@
 #   of the library, and builds two copies of pngtest: one
 #   statically linked and one dynamically linked.
 #
-# Copyright (C) 2002, 2006 Soren Anderson, Charles Wilson,
+# Copyright (C) 2002, 2006, 2007 Soren Anderson, Charles Wilson,
 #    and Glenn Randers-Pehrson, based on makefile for linux-elf w/mmx by:
 # Copyright (C) 1998-2000 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
@@ -31,9 +31,8 @@ endif
 
 DESTDIR=
 
-# To enable assembler optimizations, add '-DPNG_USE_PNGGCCRD' to
-# $CFLAGS, and include pnggccrd.o in $OBJS, below, and in the dependency
-# list at the bottom of this makefile.
+# To disable assembler optimizations, add '-DPNG_NO_MMX_CODE' to
+# $CFLAGS.  To enable, add pnggccrd.o to the dependencies.
 
 CC=gcc
 ifdef MINGW
@@ -62,25 +61,23 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 
-### if you use the asm, add pnggccrd.o to the OBJS list
-###
 ### if you don't need thread safety, but want the asm accel
-#CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD \
-#	$(addprefix -I,$(ZLIBINC)) -Wall -O3 $(ALIGN) -funroll-loops \
+#CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_THREAD_UNSAFE_OK \
+#	$(addprefix -I,$(ZLIBINC)) -Wall -O $(ALIGN) -funroll-loops \
 #	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### if you need thread safety and want (minimal) asm accel
-#CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_USE_PNGGCCRD $(addprefix -I,$(ZLIBINC)) \
-#	-Wall -O3 $(ALIGN) -funroll-loops \
+#CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
+#	-Wall -O $(ALIGN) -funroll-loops \
 #	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### Normal (non-asm) compilation
 CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
-        -Wall -O3 $(ALIGN) -funroll-loops \
+        -Wall -O3 $(ALIGN) -funroll-loops -DPNG_NO_MMX_CODE \
 	-fomit-frame-pointer) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LIBNAME = libpng10
 PNGMAJ = 0
 CYGDLL = 10
-PNGMIN = 1.0.26
+PNGMIN = 1.0.27rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
@@ -159,19 +156,19 @@ shared: all-shared
 all-static: $(STATLIB) pngtest-stat$(EXE)
 all-shared: $(SHAREDLIB) pngtest$(EXE)
 
-pnggccrd.o: pnggccrd.c png.h pngconf.h
-	@echo ""
-	@echo '    You can ignore the "control reaches end of non-void function"'
-	@echo '    warning and "<variable> defined but not used" warnings:'
-	@echo ""
-	$(CC) -c $(CFLAGS) -o $@ $<
+# pnggccrd.o: pnggccrd.c png.h pngconf.h
+#	@echo ""
+#	@echo '    You can ignore the "control reaches end of non-void function"'
+#	@echo '    warning and "<variable> defined but not used" warnings:'
+#	@echo ""
+#	$(CC) -c $(CFLAGS) -o $@ $<
 
-pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
-	@echo ""
-	@echo '    You can ignore the "control reaches end of non-void function"'
-	@echo '    warning and "<variable> defined but not used" warnings:'
-	@echo ""
-	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
+# pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
+#	@echo ""
+#	@echo '    You can ignore the "control reaches end of non-void function"'
+#	@echo '    warning and "<variable> defined but not used" warnings:'
+#	@echo ""
+#	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
 
 $(STATLIB): $(OBJS)
 	ar rc $@ $(OBJS)
@@ -308,6 +305,7 @@ pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
 pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c
 pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngwutil.c
 pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
+# pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pnggccrd.c
 
 pngtest.o:			png.h pngconf.h pngtest.c
 pngtest-stat.o:			png.h pngconf.h pngtest.c

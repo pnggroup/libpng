@@ -1,12 +1,12 @@
-# makefile for libpng on Solaris 2.x with cc
+# makefile for libpng on Solaris 2.x with gcc
+# Copyright (C) 2004, 2006, 2007 Glenn Randers-Pehrson
 # Contributed by William L. Sebok, based on makefile.linux
-# Copyright (C) 2002, 2006 Glenn Randers-Pehrson
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 # For conditions of distribution and use, see copyright notice in png.h
 
 # Library name:
-LIBNAME=libpng10
+LIBNAME = libpng10
 PNGMAJ = 0
 PNGMIN = 1.0.27rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
@@ -20,18 +20,15 @@ OLDSOMAJ=libpng.so.2
 OLDSOVER=libpng.so.2.$(PNGMIN)
 
 # Utilities:
-CC=cc
 AR_RC=ar rc
+CC=gcc
 MKDIR_P=mkdir -p
 LN_SF=ln -f -s
 RANLIB=echo
 RM_F=/bin/rm -f
 
-SUN_CC_FLAGS=-fast -xtarget=ultra
-SUN_LD_FLAGS=-fast -xtarget=ultra
-
-# where make install puts libpng.a, libpng10.so and libpng10/png.h
-prefix=/a
+# Where make install puts libpng.a, libpng10.so*, and png.h
+prefix=/usr/local
 exec_prefix=$(prefix)
 
 # Where the zlib library and include files are located
@@ -40,15 +37,15 @@ exec_prefix=$(prefix)
 #ZLIBLIB=../zlib
 #ZLIBINC=../zlib
 
-ZLIBLIB=/usr/lib
-ZLIBINC=/usr/include
+ZLIBLIB=/usr/local/lib
+ZLIBINC=/usr/local/include
 
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
-CFLAGS=-I$(ZLIBINC) $(SUN_CC_FLAGS) \
+CFLAGS=-I$(ZLIBINC) -Wall -O \
 	# $(WARNMORE) -g -DPNG_DEBUG=5
-LDFLAGS=$(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) libpng.a -lz -lm
+LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng10 -lz -lm
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -72,14 +69,14 @@ DM=$(DESTDIR)$(MANPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-	pngwtran.o pngmem.o pngerror.o pngpread.o
+	pngwtran.o pngmem.o pngerror.o pngpread.o pnggccrd.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
 .SUFFIXES:      .c .o .pic.o
 
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
+	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
 all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
@@ -93,12 +90,10 @@ libpng.pc:
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
-	echo libdir=\"$(LIBPATH)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
+	echo cppflags=\""; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo R_opts=\"-R$(LIBPATH)\"; \
-	echo ccopts=\"-xtarget=ultra\"; \
-	echo ldopts=\"-xtarget=ultra\"; \
 	echo libs=\"-lpng10 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
@@ -122,12 +117,12 @@ $(LIBSOVER): $(OBJSDLL)
 	echo; \
 	;; \
 	esac
-	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h $(LIBSOMAJ) \
+	$(LD) -G -h $(LIBSOMAJ) \
 	 -o $(LIBSOVER) $(OBJSDLL)
 
-$(OLDSOVER): $(OBJSDLL)
-	$(LD) -G -L$(ZLIBLIB) -R$(ZLIBLIB) -h $(OLDSOMAJ) \
-	 -o $(OLDSOVER)  $(OBJSDLL)
+$(OLDSOVER): $(OBJS)
+	$(LD) -G -h $(OLDSOMAJ) \
+	 -o $(OLDSOVER) $(OBJSDLL)
 
 pngtest: pngtest.o $(LIBSO)
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -156,10 +151,9 @@ install-shared: install-headers $(LIBSOVER) libpng.pc \
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	-@$(RM_F) $(DL)/$(LIBSOVER)* $(DL)/$(LIBSO)
 	-@$(RM_F) $(DL)/$(LIBSOMAJ)
-	-@$(RM_F) $(DL)/$(LIBSO)
 	-@$(RM_F) $(DL)/$(OLDSO)
 	-@$(RM_F) $(DL)/$(OLDSOMAJ)
-	-@$(RM_F) $(DL)/$(OLDSOMAJ).$(PNGVER)*
+	-@$(RM_F) $(DL)/$(OLDSOVER)*
 	cp $(LIBSOVER) $(DL)
 	cp $(OLDSOVER) $(DL)
 	chmod 755 $(DL)/$(LIBSOVER)
@@ -167,8 +161,8 @@ install-shared: install-headers $(LIBSOVER) libpng.pc \
 	(cd $(DL); \
 	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
 	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
-	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
+	$(LN_SF) $(LIBSOVER) $(LIBSO); \
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -204,19 +198,19 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) $(SUN_CC_FLAGS) -I$(DI) -I$(ZLIBINC) \
+	$(CC) -I$(DI) -I$(ZLIBINC) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
-	   -o pngtestd -L$(DL) -R$(DL) `$(BINPATH)/$(LIBNAME)-config --ldflags` \
-	   $(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB)
+	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags` \
+	   -L$(DL) -L$(ZLIBLIB) -R$(ZLIBLIB) -R$(DL)
 	./pngtestd pngtest.png
 
 test-installed:
 	echo
 	echo Testing installed dynamic shared library.
-	$(CC) $(SUN_CC_FLAGS) -I$(ZLIBINC) \
+	$(CC) -I$(ZLIBINC) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags` \
-	   $(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB)
+	   -L$(ZLIBLIB) -R$(ZLIBLIB)
 	./pngtesti pngtest.png
 
 clean:
@@ -238,6 +232,7 @@ pngwio.o pngwio.pic.o: png.h pngconf.h
 pngmem.o pngmem.pic.o: png.h pngconf.h
 pngset.o pngset.pic.o: png.h pngconf.h
 pngget.o pngget.pic.o: png.h pngconf.h
+pnggccrd.o pnggccrd.pic.o: png.h pngconf.h
 pngread.o pngread.pic.o: png.h pngconf.h
 pngrtran.o pngrtran.pic.o: png.h pngconf.h
 pngrutil.o pngrutil.pic.o: png.h pngconf.h

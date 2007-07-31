@@ -5,7 +5,7 @@ project(PNG)
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 0)
-set(PNGLIB_RELEASE 26)
+set(PNGLIB_RELEASE 27)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -49,6 +49,12 @@ if(NOT WIN32)
       set(png_asm_tmp "OFF")
    endif("uname_output" MATCHES "^.*i[1-9]86.*$")
  endif(uname_executable)
+else(NOT WIN32)
+ # this env var is normally only set on win64
+ SET(TEXT "ProgramFiles(x86)")
+ if("$ENV{${TEXT}}" STREQUAL "")
+  set(png_asm_tmp "ON")
+ endif("$ENV{${TEXT}}" STREQUAL "")
 endif(NOT WIN32)
 
 option(PNG_MMX "Use MMX assembler code (x86 only)" ${png_asm_tmp})
@@ -90,31 +96,21 @@ set(pngtest_sources
 # SOME NEEDED DEFINITIONS
 add_definitions(-DZLIB_DLL)
 
-if(MSVC)
- add_definitions(-DPNG_USE_PNGVCRD -DPNG_NO_MODULEDEF
-   -D_CRT_SECURE_NO_DEPRECATE)
- set(libpng_sources ${libpng_sources}
-         pngvcrd.c
- )
-else(MSVC)
- add_definitions(-DPNG_USE_PNGGCCRD)
- set(libpng_sources ${libpng_sources}
-         pnggccrd.c
- )
-endif(MSVC)
-
-if(NOT MSVC)
- if(NOT PNG_MMX)
-   add_definitions(-DLIBPNG_NO_MMX)
-   add_definitions(-DPNG_NO_MMX_CODE)
- endif(NOT PNG_MMX)
-else(NOT MSVC)
- if(PNG_MMX)
- # maybe add this to pngconf.h ?
- add_definitions(-DPNG_MMX_CODE_SUPPORTED)
- endif(PNG_MMX)
-endif(NOT MSVC)
-
+if(PNG_MMX)
+ if(MSVC)
+  add_definitions(-DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
+  set(libpng_sources ${libpng_sources}
+          pngvcrd.c
+  )
+ else(MSVC)
+  set(libpng_sources ${libpng_sources}
+          pnggccrd.c
+  )
+ endif(MSVC)
+else(PNG_MMX)
+  add_definitions(-DLIBPNG_NO_MMX)
+  add_definitions(-DPNG_NO_MMX_CODE)
+endif(PNG_MMX)
 
 if(PNG_CONSOLE_IO_SUPPORTED)
  add_definitions(-DPNG_CONSOLE_IO_SUPPORTED)
@@ -132,9 +128,9 @@ if(PNG_DEBUG)
  add_definitions(-DPNG_DEBUG)
 endif(PNG_DEBUG)
 
-if(NOT M_LIBRARY)
+if(NOT M_LIBRARY AND NOT WIN32)
  add_definitions(-DPNG_NO_FLOATING_POINT_SUPPORTED)
-endif(NOT M_LIBRARY)
+endif(NOT M_LIBRARY AND NOT WIN32)
 
 # NOW BUILD OUR TARGET
 include_directories(${PNG_SOURCE_DIR} ${ZLIB_INCLUDE_DIR})
@@ -179,7 +175,7 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 
 # SET UP LINKS
 set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 0.${PNGLIB_RELEASE}.1.0.26
+#    VERSION 0.${PNGLIB_RELEASE}.1.0.27rc1
      VERSION 0.${PNGLIB_RELEASE}.0
      SOVERSION 0
      CLEAN_DIRECT_OUTPUT 1)

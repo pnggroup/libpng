@@ -1469,7 +1469,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (26) in configuration files.
+  Fixed typo (27) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1712,11 +1712,151 @@ version 1.2.17rc4 [May 10, 2007]
 version 1.0.25 [May 15, 2007]
 version 1.2.17 [May 15, 2007]
   Added "png_ptr->num_trans=0" before error return in png_handle_tRNS,
-    to eliminate a vulnerability (CVE-2007-2554, CERT VU#684664)
+    to eliminate a vulnerability (CVE-2007-2445, CERT VU#684664)
 
 version 1.0.26 [May 15, 2007]
 version 1.2.18 [May 15, 2007]
   Reverted the libpng-1.2.17rc3 change to symbol-handling in configure script
+
+version 1.2.19beta1 [May 18, 2007]
+  Changed "const static" to "static PNG_CONST" everywhere, mostly undoing
+    change of libpng-1.2.17beta2.  Changed other "const" to "PNG_CONST"
+  Changed some handling of unused parameters, to avoid compiler warnings.
+    "if (unused == NULL) return;" becomes "unused = unused".
+
+version 1.2.19beta2 [May 18, 2007]
+  Only use the valid bits of tRNS value in png_do_expand() (Brian Cartier)
+
+version 1.2.19beta3 [May 19, 2007]
+  Add some "png_byte" typecasts in png_check_keyword() and write new_key
+  instead of key in zTXt chunk (Kevin Ryde).
+
+version 1.2.19beta4 [May 21, 2007]
+  Add png_snprintf() function and use it in place of sprint() for improved
+    defense against buffer overflows.
+
+version 1.2.19beta5 [May 21, 2007]
+  Fixed png_handle_tRNS() to only use the valid bits of tRNS value.
+  Changed handling of more unused parameters, to avoid compiler warnings.
+  Removed some PNG_CONST in pngwutil.c to avoid compiler warnings.
+
+version 1.2.19beta6 [May 22, 2007]
+  Added some #ifdef PNG_MMX_CODE_SUPPORTED where needed in pngvcrd.c
+  Added a special "_MSC_VER" case that defines png_snprintf to _snprintf
+
+version 1.2.19beta7 [May 22, 2007]
+  Squelched png_squelch_warnings() in pnggccrd.c and added an
+    #ifdef PNG_MMX_CODE_SUPPORTED block around the declarations that caused
+    the warnings that png_squelch_warnings was squelching.
+
+version 1.2.19beta8 [May 22, 2007]
+  Removed __MMX__ from test in pngconf.h.
+
+version 1.2.19beta9 [May 23, 2007]
+  Made png_squelch_warnings() available via PNG_SQUELCH_WARNINGS macro.
+  Revised png_squelch_warnings() so it might work.
+  Updated makefile.sgcc and makefile.solaris; added makefile.solaris-x86.
+
+version 1.2.19beta10 [May 24, 2007]
+  Resquelched png_squelch_warnings(), use "__attribute__((used))" instead.
+
+version 1.2.19beta11 [May 28, 2007]
+  Return 0 from png_get_sPLT() and png_get_unknown_chunks() if png_ptr is NULL;
+    changed three remaining instances of png_strcpy() to png_strncpy() (David
+    Hill).
+  Make test for NULL row_buf at the beginning of png_do_read_transformations
+    unconditional.
+
+version 1.2.19beta12 [May 28, 2007]
+  Revised pnggccrd.c.
+
+version 1.2.19beta13 [June 14, 2007]
+  Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
+
+version 1.2.19beta14 [June 16, 2007]
+  Fix bug with handling of 16-bit transparency, introduced in 1.2.19beta2
+
+version 1.2.19beta15 [June 17, 2007]
+  Revised pnggccrd.c.
+
+version 1.2.19beta16 [June 18, 2007]
+  Revised pnggccrd.c again.
+  Updated contrib/gregbook.
+  Changed '#include "pnggccrd.c"' to 'include "$srcdir/pnggccrd.c"'
+    in configure.ac
+
+version 1.2.19beta17 [June 19, 2007]
+  Revised many of the makefiles, to set -DPNG_NO_MMX_CODE where needed
+    and to not use -O3 unless -DPNG_NO_MMX_CODE is also set.
+
+version 1.2.19beta18 [June 23, 2007]
+  Replaced some C++ style comments with C style comments in pnggccrd.c.
+  Copied optimized C code from pnggccrd.c to pngrutil.c, removed dependency
+    on pnggccrd.o from many makefiles.
+  Added sl and dylib to list of extensions be installed by Makefile.am
+
+version 1.2.19beta19 [June 28, 2007]
+  Fixed testing PNG_RGB_TO_GRAY_ERR & PNG_RGB_TO_GRAY_WARN in pngrtran.c
+  More cleanup of pnggccrd.c and pngvcrd.c
+
+version 1.2.19beta20 [June 29, 2007]
+  Rebuilt Makefile.in and configure using libtool-1.5.24.
+  Fixed typo in pnggccrd.c
+
+version 1.2.19beta21 [June 30, 2007]
+  More revision of pnggccrd.c
+  Added "test" target to Makefile.in and Makefile.am
+
+version 1.2.19beta22 [July 3, 2007]
+  Added info about pngrutil/pnggccrd/pngvcrd to png_get_header_version()
+  Fix type definition of dummy_value_a, b in pnggccrd.c
+
+version 1.2.19beta23 [July 10, 2007]
+  Revert change to type definition of dummy_value_a, b in pnggccrd.c
+  Make sure __PIC__ is defined in pnggccrd.c when PIC is defined.
+  Require gcc-4.1 or better to use PNG_HAVE_MMX_FILTER_ROW on x86_64 platforms
+
+version 1.2.19beta24 [July 14, 2007]
+  Added PNG_NO_READ_FILTER, PNG_NO_WRITE_FILTER, PNG_NO_WARNING macros.
+  Added contrib/pngminim to demonstrate building minimal encoder and decoder
+
+version 1.2.19beta25 [July 15, 2007]
+  Removed the new PNG_NO_READ_FILTER macro since it would make the library
+    unable to read valid PNG files, and filtering is at the heart of the
+    PNG format.
+
+version 1.2.19beta26 [July 16, 2007]
+  Changed "png_free(str)" to "png_free(png_ptr,str)" in pngrutil.c WinCE
+    code (Yves Piguet).  This bug was introduced in libpng-1.2.14.
+  Updated scripts/CMakeLists.txt
+  Relocated a misplaced #endif in pnggccrd.c
+
+version 1.2.19beta27 [July 17, 2007]
+  Fixed incorrect stride and number of bytes copied (was 4 instead of
+    6 bytes) in the cleanup loop of pnggccrd.c and pngvcrd.c for handling
+    the end of 48-bit interlaced rows (Glenn R-P).
+
+version 1.2.19beta28 [July 19, 2007]
+  Removed requirement for gcc-4.1 or better to use PNG_HAVE_MMX_FILTER_ROW
+    on x86_64 platforms
+  Added png_warning() in pngrutil.c for short iCCP, iTXt, sPLT, or zTXT chunks.
+  Revised pngtest.c so warnings are displayed regardless of PNG_NO_STDIO.
+
+version 1.2.19beta29 [July 20, 2007]
+  Fix typo in pnggccrd.c (%%eax should be %%ax in secondloop48)
+
+version 1.2.19beta30 [July 26, 2007]
+  Revised pnggccrd.c
+
+version 1.2.19beta31 [July 27, 2007]
+  Fix typos in pnggccrd.c
+
+version 1.0.27rc1 and 1.2.19rc1 [July 31, 2007]
+  Disable PNG_MMX_CODE_SUPPORTED when PNG_ASSEMBLER_CODE_SUPPORTED is off.
+  Enable PNG_MMX_READ_FILTER_* by default, except when gcc-3.x is being
+    used (they were inadvertently disabled in libpng-1.2.19beta23).
+  Fix some debugging statements in pnggccrd.c and pngrutil.c
+  Added information about disabling the MMX code in libpng documentation.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

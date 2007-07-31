@@ -9,7 +9,7 @@
    by Martin Zinser under OpenVMS; may work under OS/2 with some tweaking).
 
    to do:
-    - 8-bit support
+    - 8-bit (colormapped) X support
     - use %.1023s to simplify truncation of title-bar string?
 
   ---------------------------------------------------------------------------
@@ -21,17 +21,26 @@
     - 1.10:  added support for non-default visuals; fixed X pixel-conversion
     - 1.11:  added extra set of parentheses to png_jmpbuf() macro; fixed
               command-line parsing bug
-    - 1.12:  fixed small X memory leak (thanks to Francois Petitjean)
-    - 1.13:  fixed XFreeGC() crash bug
+    - 1.12:  fixed some small X memory leaks (thanks to François Petitjean)
+    - 1.13:  fixed XFreeGC() crash bug (thanks to Patrick Welche)
+    - 1.14:  added support for X resources (thanks to Gerhard Niklasch)
+    - 2.00:  dual-licensed (added GNU GPL)
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2007 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
       be held liable for any damages arising in any way from the use of
       this software.
+
+      The contents of this file are DUAL-LICENSED.  You may modify and/or
+      redistribute this software according to the terms of one of the
+      following two licenses (at your option):
+
+
+      LICENSE 1 ("BSD-like with advertising clause"):
 
       Permission is granted to anyone to use this software for any purpose,
       including commercial applications, and to alter it and redistribute
@@ -49,11 +58,30 @@
             and contributors for the book, "PNG: The Definitive Guide,"
             published by O'Reilly and Associates.
 
+
+      LICENSE 2 (GNU GPL v2 or later):
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software Foundation,
+      Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
   ---------------------------------------------------------------------------*/
 
 #define PROGNAME  "rpng-x"
 #define LONGNAME  "Simple PNG Viewer for X"
-#define VERSION   "1.13 of 16 August 2001"
+#define VERSION   "2.00 of 2 June 2007"
+#define RESNAME   "rpng"	/* our X resource application name */
+#define RESCLASS  "Rpng"	/* our X resource class name */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,6 +119,8 @@ static int  rpng_x_msb(ulg u32val);
 static char titlebar[1024], *window_name = titlebar;
 static char *appname = LONGNAME;
 static char *icon_name = PROGNAME;
+static char *res_name = RESNAME;
+static char *res_class = RESCLASS;
 static char *filename;
 static FILE *infile;
 
@@ -399,11 +429,12 @@ static int rpng_x_create_window(void)
     XEvent e;
     XGCValues gcvalues;
     XSetWindowAttributes attr;
-    XSizeHints *size_hints;
     XTextProperty windowName, *pWindowName = &windowName;
     XTextProperty iconName, *pIconName = &iconName;
     XVisualInfo visual_info;
+    XSizeHints *size_hints;
     XWMHints *wm_hints;
+    XClassHint *class_hints;
 
 
     screen = DefaultScreen(display);
@@ -526,7 +557,7 @@ static int rpng_x_create_window(void)
     if (!XStringListToTextProperty(&icon_name, 1, pIconName))
         pIconName = NULL;
 
-    /* OK if either hints allocation fails; XSetWMProperties() allows NULLs */
+    /* OK if any hints allocation fails; XSetWMProperties() allows NULLs */
 
     if ((size_hints = XAllocSizeHints()) != NULL) {
         /* window will not be resizable */
@@ -542,8 +573,13 @@ static int rpng_x_create_window(void)
         wm_hints->flags = StateHint | InputHint  /* | IconPixmapHint */ ;
     }
 
+    if ((class_hints = XAllocClassHint()) != NULL) {
+        class_hints->res_name = res_name;
+        class_hints->res_class = res_class;
+    }
+
     XSetWMProperties(display, window, pWindowName, pIconName, NULL, 0,
-      size_hints, wm_hints, NULL);
+      size_hints, wm_hints, class_hints);
 
     /* various properties and hints no longer needed; free memory */
     if (pWindowName)
@@ -554,6 +590,8 @@ static int rpng_x_create_window(void)
         XFree(size_hints);
     if (wm_hints)
        XFree(wm_hints);
+    if (class_hints)
+       XFree(class_hints);
 
     XMapWindow(display, window);
 

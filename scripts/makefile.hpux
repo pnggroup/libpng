@@ -18,7 +18,7 @@ ZLIBINC=/opt/zlib/include
 # Library name:
 LIBNAME = libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.26
+PNGMIN = 1.0.27rc1
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -45,7 +45,7 @@ LIBPATH=$(exec_prefix)/lib
 MANPATH=$(prefix)/man
 BINPATH=$(exec_prefix)/bin
 
-CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
+CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0 -DPNG_NO_MMX_CODE
 # Caution: be sure you have built zlib with the same CFLAGS.
 CCFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm

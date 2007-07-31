@@ -11,7 +11,7 @@
 CC = cl
 LD = link
 AR = lib
-CFLAGS  = -nologo -MD -O2 -W3 -I..\zlib
+CFLAGS  = -nologo -DPNG_NO_MMX_CODE -MD -O2 -W3 -I..\zlib
 LDFLAGS = -nologo
 ARFLAGS = -nologo
 RM = del
