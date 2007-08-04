@@ -879,9 +879,6 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          textp->itxt_length = 0;
 #endif
       }
-#if 0 /* appears to be redundant; */
-      info_ptr->text[info_ptr->num_text]= *textp;
-#endif
       info_ptr->num_text++;
       png_debug1(3, "transferred text chunk %d\n", info_ptr->num_text);
    }
