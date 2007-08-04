@@ -391,11 +391,6 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 
    /* write end of PNG file */
    png_write_IEND(png_ptr);
-#if 0
-/* This flush, added in libpng-1.0.8,  causes some applications to crash
-   because they do not set png_ptr->output_flush_fn */
-   png_flush(png_ptr);
-#endif
 }
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)

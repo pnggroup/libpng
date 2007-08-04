@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.19 July 31, 2007
+ * Last changed in libpng 1.2.19 August 4, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1257,6 +1257,10 @@ png_do_read_transformations(png_structp png_ptr)
       png_error(png_ptr, "NULL row buffer");
 #endif
    }
+   if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
+      /* Application has failed to call either png_read_start_image()
+       * or png_read_update_info().  This check added to libpng-1.2.19 */
+      png_error(png_ptr, "Uninitialized row");
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
    if (png_ptr->transformations & PNG_EXPAND)

@@ -1869,6 +1869,12 @@ version 1.0.27rc1 and 1.2.19rc1 [July 31, 2007]
   Fix some debugging statements in pnggccrd.c and pngrutil.c
   Added information about disabling the MMX code in libpng documentation.
 
+version 1.0.27rc2 and 1.2.19rc2 [August 4, 2007]
+  Removed some "#if 0" blocks.
+  Made a global struct local in pngvcrd.c to make it thread safe.
+  Issue a png_error() if application attempts to transform a row tht
+    has not been initialized.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
