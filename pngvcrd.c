@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * Last changed in libpng 1.2.19 August 4, 2007
+ * Last changed in libpng 1.2.19 August 9, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -24,6 +24,9 @@
  *
  * [Copy 6 bytes per pixel, not 4, and use stride of 6, not 4, in the
  *  second loop of interlace processing of 48-bit pixels, GR-P 20070717]
+ *
+ * [move instances of uAll union into local, except for two constant
+ * instances, GR-P 20070805]
  */
 
 #define PNG_INTERNAL
@@ -33,7 +36,6 @@
 
 
 static int mmx_supported=2;
-
 
 int PNGAPI
 png_mmx_support(void)
@@ -1920,12 +1922,13 @@ loop4_pass0:
 
 // These global constants are declared
 // here to ensure alignment on 8-byte boundaries.
-  PNG_CONST union uAll {
+  union uAll {
      __int64 use;
      double  double_align;
      long long long_long_align;
-  } LBCarryMask = {0x0101010101010101},
-    HBClearMask = {0x7f7f7f7f7f7f7f7f};
+  } ;
+  static PNG_CONST union uAll LBCarryMask = {0x0101010101010101},
+                              HBClearMask = {0x7f7f7f7f7f7f7f7f};
 
 // Optimized code for PNG Average filter decoder
 void /* PRIVATE */
@@ -1934,11 +1937,7 @@ png_read_filter_row_mmx_avg(png_row_infop row_info, png_bytep row
 {
   // These variables are declared
   // here to ensure alignment on 8-byte boundaries.
-  union uAll {
-     __int64 use;
-     double  double_align;
-     long long long_long_align;
-  } ActiveMask, ShiftBpp, ShiftRem;
+  union uAll ActiveMask, ShiftBpp, ShiftRem;
 
    int bpp;
    png_uint_32 FullLength;
@@ -2375,11 +2374,7 @@ png_read_filter_row_mmx_paeth(png_row_infop row_info, png_bytep row,
 {
   // These variables are declared
   // here to ensure alignment on 8-byte boundaries.
-  union uAll {
-     __int64 use;
-     double  double_align;
-     long long long_long_align;
-  } ActiveMask, ActiveMask2, ActiveMaskEnd, ShiftBpp, ShiftRem;
+  union uAll  ActiveMask, ActiveMask2, ActiveMaskEnd, ShiftBpp, ShiftRem;
 
    png_uint_32 FullLength;
    png_uint_32 MMXLength;
@@ -3278,11 +3273,7 @@ png_read_filter_row_mmx_sub(png_row_infop row_info, png_bytep row)
 {
   // These variables are declared
   // here to ensure alignment on 8-byte boundaries.
-  union uAll {
-     __int64 use;
-     double  double_align;
-     long long long_long_align;
-  } ActiveMask, ShiftBpp, ShiftRem;
+  union uAll ActiveMask, ShiftBpp, ShiftRem;
 
    //int test;
    int bpp;

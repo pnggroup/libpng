@@ -3,7 +3,7 @@
  *
  * For Intel/AMD x86 or x86-64 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 August 4, 2007
+ * Last changed in libpng 1.2.19 August 9, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
