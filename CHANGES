@@ -1875,6 +1875,9 @@ version 1.0.27rc2 and 1.2.19rc2 [August 4, 2007]
   Issue a png_error() if application attempts to transform a row tht
     has not been initialized.
 
+version 1.0.27 and 1.2.19 [August 9, 2007]
+  Slightly revised pngvcrd.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
