@@ -1,3 +1,4 @@
+                                             
 project(PNG)
 
 # Copyright (C) 2007 Glenn Randers-Pehrson
@@ -29,7 +30,11 @@ endif(NOT WIN32)
 # COMMAND LINE OPTIONS
 option(PNG_SHARED "Build shared lib" YES)
 option(PNG_STATIC "Build static lib" YES)
-option(PNG_TESTS  "Build pngtest" YES)
+if(MSVC)
+  option(PNG_TESTS  "Build pngtest" NO)
+else(MSVC)
+  option(PNG_TESTS  "Build pngtest" YES)
+endif(MSVC)
 option(PNG_NO_CONSOLE_IO "FIXME" YES)
 option(PNG_NO_STDIO      "FIXME" YES)
 option(PNG_DEBUG         "Build with debug output" YES)
@@ -175,14 +180,16 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 
 # SET UP LINKS
 set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 0.${PNGLIB_RELEASE}.1.2.19rc3
+#    VERSION 0.${PNGLIB_RELEASE}.1.2.19rc4
      VERSION 0.${PNGLIB_RELEASE}.0
      SOVERSION 0
      CLEAN_DIRECT_OUTPUT 1)
-set_target_properties(${PNG_LIB_NAME_STATIC} PROPERTIES
+if(NOT WIN32)
+  # that's uncool on win32 - it overwrites our static import lib...
+  set_target_properties(${PNG_LIB_NAME_STATIC} PROPERTIES
      OUTPUT_NAME ${PNG_LIB_NAME}
      CLEAN_DIRECT_OUTPUT 1)
-
+endif(NOT WIN32)
 # INSTALL
 install_targets(/lib ${PNG_LIB_NAME} ${PNG_LIB_NAME_STATIC})
 install(FILES png.h pngconf.h         DESTINATION include)
@@ -207,3 +214,4 @@ install(FILES ${PNG_BINARY_DIR}/${PNGLIB_NAME}-config DESTINATION bin)
 # to create msvc import lib for mingw compiled shared lib
 # pexports libpng.dll > libpng.def
 # lib /def:libpng.def /machine:x86
+

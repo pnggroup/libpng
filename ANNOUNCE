@@ -1,5 +1,5 @@
 
-Libpng 1.2.19rc3 - August 9, 2007
+Libpng 1.2.19rc4 - August 10, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19rc3.tar.gz
-   libpng-1.2.19rc3.tar.bz2
+   libpng-1.2.19rc4.tar.gz
+   libpng-1.2.19rc4.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19rc3-no-config.tar.gz
-   libpng-1.2.19rc3-no-config.tar.bz2
+   libpng-1.2.19rc4-no-config.tar.gz
+   libpng-1.2.19rc4-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219r03.zip
-   lp1219r03.tar.bz2
+   lp1219r04.zip
+   lp1219r04.tar.bz2
 
 Project files
 
-   libpng-1.2.19rc3-project-netware.zip
-   libpng-1.2.19rc3-project-wince.zip
+   libpng-1.2.19rc4-project-netware.zip
+   libpng-1.2.19rc4-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19rc3-README.txt
-   libpng-1.2.19rc3-KNOWNBUGS.txt
-   libpng-1.2.19rc3-LICENSE.txt
-   libpng-1.2.19rc3-Y2K-compliance.txt
+   libpng-1.2.19rc4-README.txt
+   libpng-1.2.19rc4-KNOWNBUGS.txt
+   libpng-1.2.19rc4-LICENSE.txt
+   libpng-1.2.19rc4-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -166,7 +166,7 @@ version 1.2.19beta30 [July 26, 2007]
 version 1.2.19beta31 [July 27, 2007]
   Fix typos in pnggccrd.c
 
-version 1.2.19beta32 [August 9, 2007]
+version 1.2.19beta32 [August 10, 2007]
   Disable PNG_MMX_CODE_SUPPORTED when PNG_ASSEMBLER_CODE_SUPPORTED is off.
   Enable PNG_MMX_READ_FILTER_* by default (they were inadvertently disabled in
     libpng-1.2.19beta23).
@@ -179,8 +179,14 @@ version 1.0.27rc2 and 1.2.19rc2 [August 4, 2007]
   Issue a png_error() if application attempts to transform a row tht
     has not been initialized.
 
-version 1.0.27 and 1.2.19 [August 9, 2007]
+version 1.0.27rc3 and 1.2.19rc3 [August 9, 2007]
   Slightly revised pngvcrd.c
+
+version 1.0.27rc4 and 1.2.19rc4 [August 10, 2007]
+  Revised pnggccrd.c debugging change of rc1, which was broken.
+  Revised scripts/CMakeLists.txt
+  Change default to PNG_NO_GLOBAL_ARRAYS for MSVC.
+  Turn off PNG_FLAG_ROW_INIT flag when setting transforms that expand pixels.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

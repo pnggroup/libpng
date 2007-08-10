@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19rc3 - August 9, 2007
+ * libpng version 1.2.19rc4 - August 10, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1285,7 +1285,8 @@ typedef z_stream FAR *  png_zstreamp;
  * but might be required for some pre-1.0.5c applications.
  */
 #if !defined(PNG_USE_LOCAL_ARRAYS) && !defined(PNG_USE_GLOBAL_ARRAYS)
-#  if defined(PNG_NO_GLOBAL_ARRAYS) || (defined(__GNUC__) && defined(PNG_DLL))
+#  if defined(PNG_NO_GLOBAL_ARRAYS) || \
+      (defined(__GNUC__) && defined(PNG_DLL)) || defined(_MSC_VER)
 #    define PNG_USE_LOCAL_ARRAYS
 #  else
 #    define PNG_USE_GLOBAL_ARRAYS
