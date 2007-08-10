@@ -3,7 +3,7 @@
  *
  * For Intel/AMD x86 or x86-64 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 August 9, 2007
+ * Last changed in libpng 1.2.19 August 10, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -5784,15 +5784,32 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case 1:
+
+
+#if 0
+fdef PNG_MMX_READ_FILTER_SUB_SUPPORTED
+#if !defined(PNG_1_0_X)
+           ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
+            (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
+#else
+           _mmx_supported
+#endif
+           ? "MMX" :
+#endif
+                     "C");
+#endif /* 0 */
+
          png_snprintf(filtname, 10, "sub-%s",
 #ifdef PNG_MMX_READ_FILTER_SUB_SUPPORTED
 #if !defined(PNG_1_0_X)
            ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
-            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold)) ? "MMX" : 
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
 #else
            _mmx_supported
 #endif
+           ? "MMX" :
 #endif
            "C");
          break;
@@ -5803,10 +5820,11 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if !defined(PNG_1_0_X)
            ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_UP) &&
             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
-            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold)) ? "MMX" :
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
 #else
            _mmx_supported
 #endif
+           ? "MMX" :
 #endif
            "C");
          break;
@@ -5817,12 +5835,13 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #if !defined(PNG_1_0_X)
            ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_AVG) &&
             (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
-            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold)) ? "MMX" : 
+            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
 #else
            _mmx_supported
 #endif
+           ? "MMX" :
 #endif
-           "C");
+           C");
          break;
 
       case 4:
