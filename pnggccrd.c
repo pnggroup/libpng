@@ -5784,22 +5784,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
          break;
 
       case 1:
-
-
-#if 0
-fdef PNG_MMX_READ_FILTER_SUB_SUPPORTED
-#if !defined(PNG_1_0_X)
-           ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_FILTER_SUB) &&
-            (row_info->pixel_depth >= png_ptr->mmx_bitdepth_threshold) &&
-            (row_info->rowbytes >= png_ptr->mmx_rowbytes_threshold))
-#else
-           _mmx_supported
-#endif
-           ? "MMX" :
-#endif
-                     "C");
-#endif /* 0 */
-
          png_snprintf(filtname, 10, "sub-%s",
 #ifdef PNG_MMX_READ_FILTER_SUB_SUPPORTED
 #if !defined(PNG_1_0_X)
@@ -5841,7 +5825,7 @@ fdef PNG_MMX_READ_FILTER_SUB_SUPPORTED
 #endif
            ? "MMX" :
 #endif
-           C");
+           "C");
          break;
 
       case 4:
@@ -5858,7 +5842,7 @@ fdef PNG_MMX_READ_FILTER_SUB_SUPPORTED
            ? "MMX" :
 #endif /* PNG_x86_64_USE_GOTPCREL || PNG_THREAD_UNSAFE_OK */
 #endif
-             "C");
+           "C");
          break;
 
       default:

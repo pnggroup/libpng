@@ -1884,6 +1884,10 @@ version 1.0.27rc4 and 1.2.19rc4 [August 10, 2007]
   Change default to PNG_NO_GLOBAL_ARRAYS for MSVC.
   Turn off PNG_FLAG_ROW_INIT flag when setting transforms that expand pixels.
 
+version 1.0.27rc5 and 1.2.19rc5 [August 10, 2007]
+  Fix typo (missing '"') in pnggccrd.c
+  Revise handling of png_strtod in recent versions of WINCE
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
