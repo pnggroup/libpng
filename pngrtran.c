@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.19 August 10, 2007
+ * Last changed in libpng 1.2.19 August 15, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -548,7 +548,9 @@ png_set_expand(png_structp png_ptr)
    png_debug(1, "in png_set_expand\n");
    if(png_ptr == NULL) return;
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
+#if 0
    png_ptr->flags &= !(PNG_FLAG_ROW_INIT);
+#endif
 }
 
 /* GRR 19990627:  the following three functions currently are identical
@@ -575,7 +577,9 @@ png_set_palette_to_rgb(png_structp png_ptr)
    png_debug(1, "in png_set_palette_to_rgb\n");
    if(png_ptr == NULL) return;
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
+#if 0
    png_ptr->flags &= !(PNG_FLAG_ROW_INIT);
+#endif
 }
 
 #if !defined(PNG_1_0_X)
@@ -586,7 +590,9 @@ png_set_expand_gray_1_2_4_to_8(png_structp png_ptr)
    png_debug(1, "in png_set_expand_gray_1_2_4_to_8\n");
    if(png_ptr == NULL) return;
    png_ptr->transformations |= PNG_EXPAND;
+#if 0
    png_ptr->flags &= !(PNG_FLAG_ROW_INIT);
+#endif
 }
 #endif
 
@@ -609,7 +615,9 @@ png_set_tRNS_to_alpha(png_structp png_ptr)
 {
    png_debug(1, "in png_set_tRNS_to_alpha\n");
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
+#if 0
    png_ptr->flags &= !(PNG_FLAG_ROW_INIT);
+#endif
 }
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
@@ -619,7 +627,9 @@ png_set_gray_to_rgb(png_structp png_ptr)
 {
    png_debug(1, "in png_set_gray_to_rgb\n");
    png_ptr->transformations |= PNG_GRAY_TO_RGB;
+#if 0
    png_ptr->flags &= !(PNG_FLAG_ROW_INIT);
+#endif
 }
 #endif
 
@@ -1262,11 +1272,13 @@ png_do_read_transformations(png_structp png_ptr)
       png_error(png_ptr, "NULL row buffer");
 #endif
    }
+#if 0
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       /* Application has failed to call either png_read_start_image()
        * or png_read_update_info() after setting transforms that expand
        * pixels.  This check added to libpng-1.2.19 */
       png_error(png_ptr, "Uninitialized row");
+#endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
    if (png_ptr->transformations & PNG_EXPAND)

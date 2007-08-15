@@ -1,5 +1,5 @@
 
-Libpng 1.2.19rc5 - August 10, 2007
+Libpng 1.2.19rc6 - August 15, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19rc5.tar.gz
-   libpng-1.2.19rc5.tar.bz2
+   libpng-1.2.19rc6.tar.gz
+   libpng-1.2.19rc6.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19rc5-no-config.tar.gz
-   libpng-1.2.19rc5-no-config.tar.bz2
+   libpng-1.2.19rc6-no-config.tar.gz
+   libpng-1.2.19rc6-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1219r05.zip
-   lp1219r05.tar.bz2
+   lp1219r06.zip
+   lp1219r06.tar.bz2
 
 Project files
 
-   libpng-1.2.19rc5-project-netware.zip
-   libpng-1.2.19rc5-project-wince.zip
+   libpng-1.2.19rc6-project-netware.zip
+   libpng-1.2.19rc6-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19rc5-README.txt
-   libpng-1.2.19rc5-KNOWNBUGS.txt
-   libpng-1.2.19rc5-LICENSE.txt
-   libpng-1.2.19rc5-Y2K-compliance.txt
+   libpng-1.2.19rc6-README.txt
+   libpng-1.2.19rc6-KNOWNBUGS.txt
+   libpng-1.2.19rc6-LICENSE.txt
+   libpng-1.2.19rc6-Y2K-compliance.txt
 
 Changes since the last public release (1.2.18):
 
@@ -166,7 +166,7 @@ version 1.2.19beta30 [July 26, 2007]
 version 1.2.19beta31 [July 27, 2007]
   Fix typos in pnggccrd.c
 
-version 1.2.19beta32 [August 10, 2007]
+version 1.2.19beta32 [August 15, 2007]
   Disable PNG_MMX_CODE_SUPPORTED when PNG_ASSEMBLER_CODE_SUPPORTED is off.
   Enable PNG_MMX_READ_FILTER_* by default (they were inadvertently disabled in
     libpng-1.2.19beta23).
@@ -182,7 +182,7 @@ version 1.0.27rc2 and 1.2.19rc2 [August 4, 2007]
 version 1.0.27rc3 and 1.2.19rc3 [August 9, 2007]
   Slightly revised pngvcrd.c
 
-version 1.0.27rc4 and 1.2.19rc4 [August 10, 2007]
+version 1.0.27rc4 and 1.2.19rc4 [August 9, 2007]
   Revised pnggccrd.c debugging change of rc1, which was broken.
   Revised scripts/CMakeLists.txt
   Change default to PNG_NO_GLOBAL_ARRAYS for MSVC.
@@ -191,6 +191,10 @@ version 1.0.27rc4 and 1.2.19rc4 [August 10, 2007]
 version 1.0.27rc5 and 1.2.19rc5 [August 10, 2007]
   Fix typo (missing '"') in pnggccrd.c
   Revise handling of png_strtod in recent versions of WINCE
+
+version 1.0.27rc6 and 1.2.19rc6 [August 15, 2007]
+  Fix typo (missing ',') in contrib/gregbook/readpng2.c
+  Undid row initialization error exit added to rc2 and rc4.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

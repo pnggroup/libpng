@@ -99,7 +99,7 @@ void readpng2_version_info(void)
               (compilerID == 2? "GNU C" : "unknown"));
             fprintf(stderr, "  Processor (x86%s) %s MMX instructions.\n",
 #if defined(__x86_64__)
-              "_64"
+              "_64",
 #else
               "",
 #endif

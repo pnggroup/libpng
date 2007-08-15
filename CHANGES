@@ -1878,7 +1878,7 @@ version 1.0.27rc2 and 1.2.19rc2 [August 4, 2007]
 version 1.0.27rc3 and 1.2.19rc3 [August 9, 2007]
   Slightly revised pngvcrd.c
 
-version 1.0.27rc4 and 1.2.19rc4 [August 10, 2007]
+version 1.0.27rc4 and 1.2.19rc4 [August 9, 2007]
   Revised pnggccrd.c debugging change of rc1, which was broken.
   Revised scripts/CMakeLists.txt
   Change default to PNG_NO_GLOBAL_ARRAYS for MSVC.
@@ -1887,6 +1887,10 @@ version 1.0.27rc4 and 1.2.19rc4 [August 10, 2007]
 version 1.0.27rc5 and 1.2.19rc5 [August 10, 2007]
   Fix typo (missing '"') in pnggccrd.c
   Revise handling of png_strtod in recent versions of WINCE
+
+version 1.0.27rc6 and 1.2.19rc6 [August 15, 2007]
+  Fix typo (missing ',') in contrib/gregbook/readpng2.c
+  Undid row initialization error exit added to rc2 and rc4.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
