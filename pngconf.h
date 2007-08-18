@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.19rc6 - August 15, 2007
+ * libpng version 1.2.19 - August 18, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -74,6 +74,14 @@
 #ifndef PNG_VERSION_INFO_ONLY
 
 /* End of material added to libpng-1.2.8 */
+
+/* Added at libpng-1.2.19 */
+#ifndef PNG_NO_WARN_UNINITIALIZED_ROW
+#  ifndef PNG_WARN_UNINITIALIZED_ROW
+#    define PNG_WARN_UNINITIALIZED_ROW 1 /* 0: warning; 1: error */
+#  endif
+#endif
+/* End of material added at libpng-1.2.19 */
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your

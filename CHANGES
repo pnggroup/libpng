@@ -1892,6 +1892,9 @@ version 1.0.27rc6 and 1.2.19rc6 [August 15, 2007]
   Fix typo (missing ',') in contrib/gregbook/readpng2.c
   Undid row initialization error exit added to rc2 and rc4.
 
+version 1.0.27 and 1.2.19 [August 18, 2007]
+  Conditionally restored row initialization error exit.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
