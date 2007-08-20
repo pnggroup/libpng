@@ -14,6 +14,9 @@
 #define PNG_NO_WARNINGS
 #define png_warning(s1,s2) ""
 #define png_chunk_warning(s1,s2) ""
+#define PNG_NO_ERROR_TEXT
+#define png_error(s1,s2) png_err(s1)
+#define png_chunk_error(s1,s2) png_err(s1)
 
 #define PNG_NO_WRITE_BACKGROUND
 #define PNG_NO_WRITE_GAMMA

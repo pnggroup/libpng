@@ -1,99 +1,51 @@
 
-Libpng 1.2.19 - August 18, 2007
+Libpng 1.2.20beta01 - August 20, 2007
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.19.tar.gz
-   libpng-1.2.19.tar.bz2
+   libpng-1.2.20beta01.tar.gz
+   libpng-1.2.20beta01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.19-no-config.tar.gz
-   libpng-1.2.19-no-config.tar.bz2
+   libpng-1.2.20beta01-no-config.tar.gz
+   libpng-1.2.20beta01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1219.zip
-   lpng1219.tar.bz2
+   lp1220b01.zip
+   lp1220b01.tar.bz2
 
 Project files
 
-   libpng-1.2.19-project-netware.zip
-   libpng-1.2.19-project-wince.zip
+   libpng-1.2.20beta01-project-netware.zip
+   libpng-1.2.20beta01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.19-README.txt
-   libpng-1.2.19-KNOWNBUGS.txt
-   libpng-1.2.19-LICENSE.txt
-   libpng-1.2.19-Y2K-compliance.txt
+   libpng-1.2.20beta01-README.txt
+   libpng-1.2.20beta01-KNOWNBUGS.txt
+   libpng-1.2.20beta01-LICENSE.txt
+   libpng-1.2.20beta01-Y2K-compliance.txt
 
-Changes since the last public release (1.2.18):
+Changes since the last public release (1.2.19):
 
-version 1.2.19 [August 18, 2007]
-
-  Changed "const static" to "static PNG_CONST" everywhere, mostly undoing
-    change of libpng-1.2.17beta2.  Changed other "const" to "PNG_CONST"
-  Fixed png_do_expand() to only use the appropriate bits of tRNS value.
-  Fixed png_handle_tRNS() to only use the appropriate bits of tRNS value.
-  Add some "png_byte" typecasts in png_check_keyword().
-  Write new_key instead of key in zTXt chunk.
-  Add png_snprintf() function and use it in place of sprint() for improved
-    defense against buffer overflows.
-  Changed handling of some unused parameters, to avoid compiler warnings.
-  Removed some PNG_CONST in pngwutil.c to avoid compiler warnings.
-  Added some #ifdef PNG_MMX_CODE_SUPPORTED where needed in pngvcrd.c
-  Squelched png_squelch_warnings() in pnggccrd.c; Use "__attribute__((used))"
-    instead.
-  Removed __MMX__ from test in pngconf.h.
-  Updated makefile.sgcc and makefile.solaris; added makefile.solaris-x86.
-  Return 0 from png_get_sPLT() and png_get_unknown_chunks() if png_ptr is NULL;
-    changed three remaining instances of png_strcpy() to png_strncpy() (David
-    Hill).
-  Make test for NULL row_buf at the beginning of png_do_read_transformations
-    unconditional.
-  Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
-  Revised pnggccrd.c.
-  Updated contrib/gregbook.
-  Changed '#include "pnggccrd.c"' to 'include "$srcdir/pnggccrd.c"'
-    in configure.ac
-  Revised many of the makefiles, to set -DPNG_NO_MMX_CODE where needed
-    and to not use -O3 unless -DPNG_NO_MMX_CODE is also set.
-  Copied optimized C code from pnggccrd.c to pngrutil.c, removed dependency
-    on pnggccrd.o from many makefiles.
-  Added sl and dylib to list of extensions be installed by Makefile.am
-  Fixed testing PNG_RGB_TO_GRAY_ERR & PNG_RGB_TO_GRAY_WARN in pngrtran.c
-  Revised pngvcrd.c.
-  Rebuilt Makefile.in and configure using libtool-1.5.24.
-  Added "test" target to Makefile.in and Makefile.am
-  Added info about pngrutil/pnggccrd/pngvcrd to png_get_header_version()
-  Added PNG_NO_WRITE_FILTER and PNG_NO_WARNING macros.
-  Added contrib/pngminim to demonstrate building minimal encoder and decoder
-  Changed "png_free(str)" to "png_free(png_ptr,str)" in pngrutil.c WinCE
-    code (Yves Piguet).  This bug was introduced in libpng-1.2.14.
-  Updated scripts/CMakeLists.txt
-  Fixed incorrect stride and number of bytes copied (was 4 instead of
-    6 bytes) in the cleanup loop of pnggccrd.c and pngvcrd.c for handling
-    the end of 48-bit interlaced rows (Glenn R-P).
-  Added png_warning() in pngrutil.c for short iCCP, iTXt, sPLT, or zTXT chunks.
-  Revised pngtest.c so warnings are displayed regardless of PNG_NO_STDIO.
-  Disable PNG_MMX_CODE_SUPPORTED when PNG_ASSEMBLER_CODE_SUPPORTED is off.
-  Added information about disabling the MMX code in libpng documentation.
-  Removed some "#if 0" blocks.
-  Made a global struct local in pngvcrd.c to make it thread safe.
-  Change default to PNG_NO_GLOBAL_ARRAYS for MSVC.
-  Revise handling of png_strtod in recent versions of WINCE
-  Issue a png_error() if application attempts to transform a row tht
-    has not been initialized.
+version 1.0.28 and 1.2.20 [August 20, 2007]
+  Fixed problem with compiling pnggccrd.c on Intel-Apple platforms.
+  Added PNG_NO_ERROR_TEXT feature, with demo in contrib/pngminim
+  Removed define PNG_WARN_UNINITIALIZED_ROW 1 /* 0: warning; 1: error */
+    because it caused some trouble.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

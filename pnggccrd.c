@@ -3,7 +3,7 @@
  *
  * For Intel/AMD x86 or x86-64 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 August 18, 2007
+ * Last changed in libpng 1.2.19 August 20, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -465,7 +465,7 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 /* djgpp, Win32, Cygwin, and OS2 add their own underscores to global variables,
  * so define them without: */
 #if defined(__DJGPP__) || defined(WIN32) || defined(__CYGWIN__) || \
-    defined(__OS2__)
+    defined(__OS2__) || defined(__APPLE__)
 #  define _mmx_supported  mmx_supported
 #  define _mask8_0        mask8_0
 #  define _mask16_1       mask16_1
