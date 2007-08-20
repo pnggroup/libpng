@@ -1895,11 +1895,14 @@ version 1.0.27rc6 and 1.2.19rc6 [August 15, 2007]
 version 1.0.27 and 1.2.19 [August 18, 2007]
   Conditionally restored row initialization error exit.
 
-version 1.0.28 and 1.2.20 [August 20, 2007]
+version 1.2.20beta01 [August 19, 2007]
   Fixed problem with compiling pnggccrd.c on Intel-Apple platforms.
   Added PNG_NO_ERROR_TEXT feature, with demo in contrib/pngminim
   Removed define PNG_WARN_UNINITIALIZED_ROW 1 /* 0: warning; 1: error */
     because it caused some trouble.
+
+version 1.2.20beta02 [August 20, 2007]
+  Avoid compiling pnggccrd.c on Intel-Apple platforms.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
