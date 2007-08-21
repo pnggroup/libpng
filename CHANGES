@@ -1904,6 +1904,10 @@ version 1.2.20beta01 [August 19, 2007]
 version 1.2.20beta02 [August 20, 2007]
   Avoid compiling pnggccrd.c on Intel-Apple platforms.
 
+version 1.2.20beta03 [August 21, 2007]
+  Added "/D PNG_NO_MMX_CODE" to the non-mmx builds of projects/visualc6
+    and visualc71.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
