@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * Last changed in libpng 1.2.19 August 21, 2007
+ * Last changed in libpng 1.2.20 August 21, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -27,6 +27,8 @@
  *
  * [move instances of uAll union into local, except for two constant
  * instances, GR-P 20070805]
+ *
+ * [revised handling of static constants for efficiency, Steve Snyder 20070821]
  */
 
 #define PNG_INTERNAL
@@ -34,6 +36,9 @@
 
 #if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD)
 
+#ifdef PNG_USE_LOCAL_ARRAYS
+static PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+#endif
 
 static int mmx_supported=2;
 
@@ -114,9 +119,7 @@ NOT_SUPPORTED:
 void /* PRIVATE */
 png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
-#endif
+   static PNG_CONST int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
 
    png_debug(1,"in png_combine_row_asm\n");
 
@@ -147,9 +150,9 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             png_uint_32 len;
             int unmask, diff;
 
-            __int64 mask2=0x0101010202020404,  //24bpp
-                    mask1=0x0408080810101020,
-                    mask0=0x2020404040808080;
+            static PNG_CONST __int64 bpp24_mask2=0x0101010202020404,  //24bpp
+                                     bpp24_mask1=0x0408080810101020,
+                                     bpp24_mask0=0x2020404040808080;
 
             srcptr = png_ptr->row_buf + 1;
             dstptr = row;
@@ -173,9 +176,9 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
                   punpcklwd  mm7,mm7
                   punpckldq  mm7,mm7           //fill register with 8 masks
 
-                  movq       mm0,mask0
-                  movq       mm1,mask1
-                  movq       mm2,mask2
+                  movq       mm0,bpp24_mask0
+                  movq       mm1,bpp24_mask1
+                  movq       mm2,bpp24_mask2
 
                   pand       mm0,mm7
                   pand       mm1,mm7
@@ -255,7 +258,6 @@ end24:
                png_size_t pixel_bytes;
                png_uint_32 i;
                register int disp = png_pass_inc[png_ptr->pass];
-               int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
 
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
@@ -282,10 +284,10 @@ end24:
             png_uint_32 len;
             int unmask, diff;
 
-            __int64 mask3=0x0101010102020202,  //32bpp
-                    mask2=0x0404040408080808,
-                    mask1=0x1010101020202020,
-                    mask0=0x4040404080808080;
+            static PNG_CONST __int64 bpp32_mask3=0x0101010102020202,  //32bpp
+                                     bpp32_mask2=0x0404040408080808,
+                                     bpp32_mask1=0x1010101020202020,
+                                     bpp32_mask0=0x4040404080808080;
 
             srcptr = png_ptr->row_buf + 1;
             dstptr = row;
@@ -309,10 +311,10 @@ end24:
                   punpcklwd  mm7,mm7
                   punpckldq  mm7,mm7           //fill register with 8 masks
 
-                  movq       mm0,mask0
-                  movq       mm1,mask1
-                  movq       mm2,mask2
-                  movq       mm3,mask3
+                  movq       mm0,bpp32_mask0
+                  movq       mm1,bpp32_mask1
+                  movq       mm2,bpp32_mask2
+                  movq       mm3,bpp32_mask3
 
                   pand       mm0,mm7
                   pand       mm1,mm7
@@ -399,7 +401,6 @@ end32:
                png_size_t pixel_bytes;
                png_uint_32 i;
                register int disp = png_pass_inc[png_ptr->pass];
-               int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
 
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
@@ -427,7 +428,7 @@ end32:
             int m;
             int diff, unmask;
 
-            __int64 mask0=0x0102040810204080;
+            static PNG_CONST __int64 bpp08_mask0=0x0102040810204080;
 
 #if !defined(PNG_1_0_X)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
@@ -451,7 +452,7 @@ end32:
                   punpcklwd  mm7,mm7
                   punpckldq  mm7,mm7       //fill register with 8 masks
 
-                  movq       mm0,mask0
+                  movq       mm0,bpp08_mask0
 
                   pand       mm0,mm7       //nonzero if keep byte
                   pcmpeqb    mm0,mm6       //zeros->1s, v versa
@@ -505,7 +506,6 @@ end8:
                png_size_t pixel_bytes;
                png_uint_32 i;
                register int disp = png_pass_inc[png_ptr->pass];
-               int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
 
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
@@ -697,8 +697,8 @@ end8:
             png_bytep dstptr;
             png_uint_32 len;
             int unmask, diff;
-            __int64 mask1=0x0101020204040808,
-                    mask0=0x1010202040408080;
+            static PNG_CONST __int64 bpp16_mask1=0x0101020204040808,
+                                     bpp16_mask0=0x1010202040408080;
 
 #if !defined(PNG_1_0_X)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
@@ -721,8 +721,8 @@ end8:
                   punpcklwd  mm7,mm7
                   punpckldq  mm7,mm7           //fill register with 8 masks
 
-                  movq       mm0,mask0
-                  movq       mm1,mask1
+                  movq       mm0,bpp16_mask0
+                  movq       mm1,bpp16_mask1
 
                   pand       mm0,mm7
                   pand       mm1,mm7
@@ -787,7 +787,6 @@ end16:
                png_size_t pixel_bytes;
                png_uint_32 i;
                register int disp = png_pass_inc[png_ptr->pass];
-               int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
 
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
@@ -814,12 +813,12 @@ end16:
             png_uint_32 len;
             int unmask, diff;
 
-            __int64 mask5=0x0101010101010202,
-                    mask4=0x0202020204040404,
-                    mask3=0x0404080808080808,
-                    mask2=0x1010101010102020,
-                    mask1=0x2020202040404040,
-                    mask0=0x4040808080808080;
+            static PNG_CONST __int64 bpp48_mask5=0x0101010101010202,
+                                     bpp48_mask4=0x0202020204040404,
+                                     bpp48_mask3=0x0404080808080808,
+                                     bpp48_mask2=0x1010101010102020,
+                                     bpp48_mask1=0x2020202040404040,
+                                     bpp48_mask0=0x4040808080808080;
 
 #if !defined(PNG_1_0_X)
             if ((png_ptr->asm_flags & PNG_ASM_FLAG_MMX_READ_COMBINE_ROW)
@@ -842,12 +841,12 @@ end16:
                   punpcklwd  mm7,mm7
                   punpckldq  mm7,mm7           //fill register with 8 masks
 
-                  movq       mm0,mask0
-                  movq       mm1,mask1
-                  movq       mm2,mask2
-                  movq       mm3,mask3
-                  movq       mm4,mask4
-                  movq       mm5,mask5
+                  movq       mm0,bpp48_mask0
+                  movq       mm1,bpp48_mask1
+                  movq       mm2,bpp48_mask2
+                  movq       mm3,bpp48_mask3
+                  movq       mm4,bpp48_mask4
+                  movq       mm5,bpp48_mask5
 
                   pand       mm0,mm7
                   pand       mm1,mm7
@@ -951,7 +950,6 @@ end48:
                png_size_t pixel_bytes;
                png_uint_32 i;
                register int disp = png_pass_inc[png_ptr->pass];
-               int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
 
                pixel_bytes = (png_ptr->row_info.pixel_depth >> 3);
                srcptr = png_ptr->row_buf + 1 + offset_table[png_ptr->pass]*
@@ -976,7 +974,6 @@ end48:
             png_bytep sptr;
             png_bytep dp;
             png_size_t pixel_bytes;
-            int offset_table[7] = {0, 4, 0, 2, 0, 1, 0};
             unsigned int i;
             register int disp = png_pass_inc[png_ptr->pass];  // get the offset
             register unsigned int incr1, initial_val, final_val;
@@ -1011,9 +1008,6 @@ png_do_read_interlace(png_structp png_ptr)
    png_bytep row = png_ptr->row_buf + 1;
    int pass = png_ptr->pass;
    png_uint_32 transformations = png_ptr->transformations;
-#ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
-#endif
 
    png_debug(1,"in png_do_read_interlace\n");
 
@@ -1205,9 +1199,9 @@ png_do_read_interlace(png_structp png_ptr)
 
          default:         // This is the place where the routine is modified
          {
-            __int64 const4 = 0x0000000000FFFFFF;
-            // __int64 const5 = 0x000000FFFFFF0000;  // unused...
-            __int64 const6 = 0x00000000000000FF;
+            static PNG_CONST __int64 const4 = 0x0000000000FFFFFF;
+            // static PNG_CONST __int64 const5 = 0x000000FFFFFF0000;  // unused...
+            static PNG_CONST __int64 const6 = 0x00000000000000FF;
             png_bytep sptr, dp;
             png_uint_32 i;
             png_size_t pixel_bytes;

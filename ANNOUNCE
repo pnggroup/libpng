@@ -1,5 +1,5 @@
 
-Libpng 1.2.20beta03 - August 21, 2007
+Libpng 1.2.20beta04 - August 21, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.20beta03.tar.gz
-   libpng-1.2.20beta03.tar.bz2
+   libpng-1.2.20beta04.tar.gz
+   libpng-1.2.20beta04.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.20beta03-no-config.tar.gz
-   libpng-1.2.20beta03-no-config.tar.bz2
+   libpng-1.2.20beta04-no-config.tar.gz
+   libpng-1.2.20beta04-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1220b03.zip
-   lp1220b03.tar.bz2
+   lp1220b04.zip
+   lp1220b04.tar.bz2
 
 Project files
 
-   libpng-1.2.20beta03-project-netware.zip
-   libpng-1.2.20beta03-project-wince.zip
+   libpng-1.2.20beta04-project-netware.zip
+   libpng-1.2.20beta04-project-wince.zip
 
 Other information:
 
-   libpng-1.2.20beta03-README.txt
-   libpng-1.2.20beta03-KNOWNBUGS.txt
-   libpng-1.2.20beta03-LICENSE.txt
-   libpng-1.2.20beta03-Y2K-compliance.txt
+   libpng-1.2.20beta04-README.txt
+   libpng-1.2.20beta04-KNOWNBUGS.txt
+   libpng-1.2.20beta04-LICENSE.txt
+   libpng-1.2.20beta04-Y2K-compliance.txt
 
 Changes since the last public release (1.2.19):
 
@@ -47,9 +47,12 @@ version 1.2.20beta01 [August 19, 2007]
 version 1.2.20beta02 [August 20, 2007]
   Avoid compiling pnggccrd.c on Intel-Apple platforms.
 
-version 1.2.20beta03 [August 21, 2007]
+version 1.2.20beta03 [August 20, 2007]
   Added "/D PNG_NO_MMX_CODE" to the non-mmx builds of projects/visualc6
     and visualc71.
+
+version 1.2.20beta04 [August 21, 2007]
+  Revised pngvcrd.c for improved efficiency (Steve Snyder).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
