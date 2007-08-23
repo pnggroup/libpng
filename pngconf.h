@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.20beta04 - August 21, 2007
+ * libpng version 1.2.20rc1 - August 23, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -747,6 +747,13 @@
 #if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
 #  ifndef PNG_ASSEMBLER_CODE_SUPPORTED
 #    define PNG_ASSEMBLER_CODE_SUPPORTED
+#  endif
+
+#  if defined(__GNUC__) && defined(__x86_64__) && (__GNUC__ < 4)
+     /* work around 64-bit gcc compiler bugs in gcc-3.x */
+#    if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
+#      define PNG_NO_MMX_CODE
+#    endif
 #  endif
 
 #  if defined(__APPLE__)
@@ -1502,18 +1509,15 @@ typedef z_stream FAR *  png_zstreamp;
 #    ifndef PNG_NO_MMX_FILTER_SUB
 #      define PNG_MMX_READ_FILTER_SUB_SUPPORTED
 #    endif
-#    if !(defined(__GNUC__) && defined(__x86_64__) && (__GNUC__ < 4))
-       /* work around 64-bit gcc compiler bugs in gcc-3.x */
-#      ifndef PNG_NO_MMX_FILTER_UP
-#        define PNG_MMX_READ_FILTER_UP_SUPPORTED
-#      endif
-#      ifndef PNG_NO_MMX_FILTER_AVG
-#        define PNG_MMX_READ_FILTER_AVG_SUPPORTED
-#      endif
-#      ifndef PNG_NO_MMX_FILTER_PAETH
-#        define PNG_MMX_READ_FILTER_PAETH_SUPPORTED
-#      endif
-#    endif /* !((__x86_64__) && (GNUC < 4)) */
+#    ifndef PNG_NO_MMX_FILTER_UP
+#      define PNG_MMX_READ_FILTER_UP_SUPPORTED
+#    endif
+#    ifndef PNG_NO_MMX_FILTER_AVG
+#      define PNG_MMX_READ_FILTER_AVG_SUPPORTED
+#    endif
+#    ifndef PNG_NO_MMX_FILTER_PAETH
+#      define PNG_MMX_READ_FILTER_PAETH_SUPPORTED
+#    endif
 #  endif
   /* These are the default thresholds before the MMX code kicks in; if either
    * rowbytes or bitdepth is below the threshold, plain C code is used.  These

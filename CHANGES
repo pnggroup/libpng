@@ -1911,6 +1911,9 @@ version 1.2.20beta03 [August 20, 2007]
 version 1.2.20beta04 [August 21, 2007]
   Revised pngvcrd.c for improved efficiency (Steve Snyder).
 
+version 1.2.20beta05 [August 23, 2007]
+  Revised pngconf.h to set PNG_NO_MMX_CODE for gcc-3.x compilers.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
