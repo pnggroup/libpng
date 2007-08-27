@@ -3312,7 +3312,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep
 #endif /* PNG_HAVE_MMX_READ_FILTER_ROW */
 #endif /* PNG_OPTIMIZED_CODE_SUPPORTED */
 
-#if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD)
+#if !defined(PNG_ASSEMBLER_CODE_SUPPORTED) || \
+    !defined(PNG_MMX_CODE_SUPPORTED) || \
+    (!defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD))
 #if !defined(PNG_OPTIMIZED_CODE_SUPPORTED)
 /* Use the unoptimized original C code.  This might be removed from a future
  * version of libpng if testing proves it to be worthless. */
@@ -3867,7 +3869,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    }
 }
 #endif /* !PNG_OPTIMIZED_CODE_SUPPORTED */
-#endif /* !PNG_USE_PNGGCCRD && !PNG_USE_PNGVCRD */
+#endif /* !PNG_ASSEMBLER_CODE_SUPPORTED || !PNG_MMX_CODE_SUPPORTED || */
+       /* (!PNG_USE_PNGGCCRD && !PNG_USE_PNGVCRD) */
 
 void /* PRIVATE */
 png_read_finish_row(png_structp png_ptr)

@@ -445,7 +445,8 @@
 #  define __PIC__
 #endif
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && \
+    defined(PNG_USE_PNGGCCRD) && defined(PNG_MMX_CODE_SUPPORTED)
 
 /* if you want/need full thread-safety on x86-64 even when linking statically,
  * comment out the "&& defined(__PIC__)" part here: */
@@ -858,7 +859,6 @@ png_mmx_support(void) __attribute__((noinline));
 int PNGAPI
 png_mmx_support(void)
 {
-#if defined(PNG_MMX_CODE_SUPPORTED)  // superfluous, but what the heck
     int result;
     __asm__ __volatile__ (
 #if defined(__x86_64__)
@@ -938,7 +938,6 @@ png_mmx_support(void)
     _mmx_supported = result;
 #else
     _mmx_supported = 0;
-#endif /* PNG_MMX_CODE_SUPPORTED */
 
     return _mmx_supported;
 }

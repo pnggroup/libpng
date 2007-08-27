@@ -3,7 +3,7 @@
  *
  * For Intel x86 CPU and Microsoft Visual C++ compiler
  *
- * Last changed in libpng 1.2.20 August 23, 2007
+ * Last changed in libpng 1.2.20 August 27, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * Copyright (c) 1998, Intel Corporation
@@ -34,7 +34,8 @@
 #define PNG_INTERNAL
 #include "png.h"
 
-#if defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && \
+    defined(PNG_USE_PNGVCRD) && defined(PNG_MMX_CODE_SUPPORTED)
 
 #ifdef PNG_USE_LOCAL_ARRAYS
 static PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};

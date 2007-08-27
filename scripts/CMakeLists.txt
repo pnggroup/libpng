@@ -30,11 +30,11 @@ endif(NOT WIN32)
 # COMMAND LINE OPTIONS
 option(PNG_SHARED "Build shared lib" YES)
 option(PNG_STATIC "Build static lib" YES)
-if(MSVC)
+if(MINGW)
   option(PNG_TESTS  "Build pngtest" NO)
-else(MSVC)
+else(MINGW)
   option(PNG_TESTS  "Build pngtest" YES)
-endif(MSVC)
+endif(MINGW)
 option(PNG_NO_CONSOLE_IO "FIXME" YES)
 option(PNG_NO_STDIO      "FIXME" YES)
 option(PNG_DEBUG         "Build with debug output" YES)
@@ -180,7 +180,7 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 
 # SET UP LINKS
 set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 0.${PNGLIB_RELEASE}.1.2.20rc1
+#    VERSION 0.${PNGLIB_RELEASE}.1.2.20rc2
      VERSION 0.${PNGLIB_RELEASE}.0
      SOVERSION 0
      CLEAN_DIRECT_OUTPUT 1)
@@ -191,7 +191,11 @@ if(NOT WIN32)
      CLEAN_DIRECT_OUTPUT 1)
 endif(NOT WIN32)
 # INSTALL
-install_targets(/lib ${PNG_LIB_NAME} ${PNG_LIB_NAME_STATIC})
+install_targets(/lib ${PNG_LIB_NAME})
+if(PNG_STATIC)
+  install_targets(/lib ${PNG_LIB_NAME_STATIC})
+endif(PNG_STATIC)
+
 install(FILES png.h pngconf.h         DESTINATION include)
 install(FILES png.h pngconf.h         DESTINATION include/${PNGLIB_NAME})
 install(FILES libpng.3 libpngpf.3             DESTINATION man/man3)
