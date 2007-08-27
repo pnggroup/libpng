@@ -3,7 +3,7 @@
  *
  * For Intel/AMD x86 or x86-64 CPU (Pentium-MMX or later) and GNU C compiler.
  *
- * Last changed in libpng 1.2.19 August 18, 2007
+ * Last changed in libpng 1.2.19 August 19, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998 Intel Corporation
  * Copyright (c) 1999-2002,2007 Greg Roelofs
@@ -445,7 +445,8 @@
 #  define __PIC__
 #endif
 
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && defined(PNG_USE_PNGGCCRD)
+#if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && \
+    defined(PNG_USE_PNGGCCRD) && defined(PNG_MMX_CODE_SUPPORTED)
 
 /* if you want/need full thread-safety on x86-64 even when linking statically,
  * comment out the "&& defined(__PIC__)" part here: */
@@ -465,7 +466,7 @@ static PNG_CONST int FARDATA png_pass_width[7] = {8, 4, 4, 2, 2, 1, 1};
 /* djgpp, Win32, Cygwin, and OS2 add their own underscores to global variables,
  * so define them without: */
 #if defined(__DJGPP__) || defined(WIN32) || defined(__CYGWIN__) || \
-    defined(__OS2__)
+    defined(__OS2__) || defined(__APPLE__)
 #  define _mmx_supported  mmx_supported
 #  define _mask8_0        mask8_0
 #  define _mask16_1       mask16_1
@@ -858,7 +859,6 @@ png_mmx_support(void) __attribute__((noinline));
 int PNGAPI
 png_mmx_support(void)
 {
-#if defined(PNG_MMX_CODE_SUPPORTED)  // superfluous, but what the heck
     int result;
     __asm__ __volatile__ (
 #if defined(__x86_64__)
@@ -938,7 +938,6 @@ png_mmx_support(void)
     _mmx_supported = result;
 #else
     _mmx_supported = 0;
-#endif /* PNG_MMX_CODE_SUPPORTED */
 
     return _mmx_supported;
 }
