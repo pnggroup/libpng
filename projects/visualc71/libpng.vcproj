@@ -18,7 +18,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;PNG_NO_MMX_CODE;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL"
+				PreprocessorDefinitions="WIN32;PNG_NO_MMX_CODE;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -43,7 +43,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
+				PreprocessorDefinitions="NDEBUG";_CRT_SECURE_NO_WARNINGS
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -66,7 +66,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_NO_MMX_CODE;PNG_DEBUG=1;PNG_BUILD_DLL;ZLIB_DLL"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_NO_MMX_CODE;PNG_DEBUG=1;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="3"
@@ -91,7 +91,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1"
+				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -114,7 +114,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_USE_PNGVCRD;PNG_BUILD_DLL;ZLIB_DLL;PNG_LIBPNG_SPECIALBUILD"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_USE_PNGVCRD;PNG_BUILD_DLL;ZLIB_DLL;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -140,7 +140,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				AdditionalOptions="/d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;Use MMX instructions&quot;&quot;&quot;&quot;"
-				PreprocessorDefinitions="NDEBUG"
+				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -163,7 +163,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_USE_PNGVCRD;PNG_BUILD_DLL;ZLIB_DLL;PNG_LIBPNG_SPECIALBUILD"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_USE_PNGVCRD;PNG_BUILD_DLL;ZLIB_DLL;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="3"
@@ -189,7 +189,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				AdditionalOptions="/d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;Use MMX instructions&quot;&quot;&quot;&quot;"
-				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1"
+				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -212,7 +212,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;PNGAPI=__stdcall;PNG_NO_MMX_CODE;PNG_NO_MODULEDEF;PNG_LIBPNG_SPECIALBUILD"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;PNGAPI=__stdcall;PNG_NO_MMX_CODE;PNG_NO_MODULEDEF;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -237,7 +237,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				AdditionalOptions="/d PNG_LIBPNG_DLLFNAME_POSTFIX=&quot;&quot;&quot;&quot;VB&quot;&quot;&quot;&quot; /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;__stdcall calling convention used for exported functions&quot;&quot;&quot;&quot;"
-				PreprocessorDefinitions="NDEBUG"
+				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -260,7 +260,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="PNG_NO_MMX_CODE;WIN32;NDEBUG"
+				PreprocessorDefinitions="PNG_NO_MMX_CODE;WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -301,7 +301,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_NO_MMX_CODE;PNG_DEBUG=1"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_NO_MMX_CODE;PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="3"
@@ -342,7 +342,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..,..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_USE_PNGVCRD;PNG_LIBPNG_SPECIALBUILD"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_USE_PNGVCRD;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -383,7 +383,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..,..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_USE_PNGVCRD;PNG_LIBPNG_SPECIALBUILD"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_USE_PNGVCRD;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="3"
