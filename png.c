@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_20rc2 Your_png_h_is_not_version_1_2_20rc2;
+typedef version_1_2_20rc3 Your_png_h_is_not_version_1_2_20rc3;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -698,7 +698,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.20rc2 - August 27, 2007\n\
+   return ((png_charp) "\n libpng version 1.2.20rc3 - August 30, 2007\n\
    Copyright (c) 1998-2007 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -869,8 +869,7 @@ png_init_mmx_flags (png_structp png_ptr)
 #endif /* !(PNG_MMX_CODE_SUPPORTED) */
 
 /* this function was added to libpng 1.2.0 */
-#if !defined(PNG_USE_PNGGCCRD) && \
-    !(defined(PNG_MMX_CODE_SUPPORTED) && defined(PNG_USE_PNGVCRD))
+#if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD)
 int PNGAPI
 png_mmx_support(void)
 {

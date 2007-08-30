@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.2.20rc2
+;Version 1.2.20rc3
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -45,7 +45,7 @@ EXPORTS
   png_get_image_width  @37
   png_get_interlace_type  @38
   png_get_io_ptr    @39
-  png_get_libpng_ver  @40
+  ; png_get_libpng_ver  @40
   png_get_oFFs    @41
   png_get_pCAL    @42
   png_get_pHYs    @43

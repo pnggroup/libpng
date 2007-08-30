@@ -860,6 +860,7 @@ int PNGAPI
 png_mmx_support(void)
 {
     int result;
+#if defined(PNG_MMX_CODE_SUPPORTED)  // superfluous, but what the heck
     __asm__ __volatile__ (
 #if defined(__x86_64__)
         "pushq %%rbx          \n\t"  // rbx gets clobbered by CPUID instruction
@@ -938,6 +939,7 @@ png_mmx_support(void)
     _mmx_supported = result;
 #else
     _mmx_supported = 0;
+#endif /* PNG_MMX_CODE_SUPPORTED */
 
     return _mmx_supported;
 }
