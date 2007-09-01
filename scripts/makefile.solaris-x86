@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.20rc3
+PNGMIN = 1.2.20rc4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -69,7 +69,7 @@ DM=$(DESTDIR)$(MANPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-	pngwtran.o pngmem.o pngerror.o pngpread.o pnggccrd.o
+	pngwtran.o pngmem.o pngerror.o pngpread.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
@@ -232,7 +232,6 @@ pngwio.o pngwio.pic.o: png.h pngconf.h
 pngmem.o pngmem.pic.o: png.h pngconf.h
 pngset.o pngset.pic.o: png.h pngconf.h
 pngget.o pngget.pic.o: png.h pngconf.h
-pnggccrd.o pnggccrd.pic.o: png.h pngconf.h
 pngread.o pngread.pic.o: png.h pngconf.h
 pngrtran.o pngrtran.pic.o: png.h pngconf.h
 pngrutil.o pngrutil.pic.o: png.h pngconf.h

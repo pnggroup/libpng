@@ -26,8 +26,7 @@ O=.obj
 OBJS1 = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O)
 OBJS2 = pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) pngset$(O)
 OBJS3 = pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
-OBJS4 = pngvcrd$(O)
-OBJS  = $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4)
+OBJS  = $(OBJS1) $(OBJS2) $(OBJS3)
 
 # Targets
 all: libpng.lib
@@ -78,9 +77,6 @@ pngwtran$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngwutil$(O): png.h pngconf.h
-	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
-
-pngvcrd$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 libpng.lib: $(OBJS)

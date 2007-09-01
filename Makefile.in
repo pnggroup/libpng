@@ -87,8 +87,7 @@ am__objects_1 = libpng_la-png.lo libpng_la-pngset.lo \
 	libpng_la-pngread.lo libpng_la-pngrio.lo libpng_la-pngwio.lo \
 	libpng_la-pngwrite.lo libpng_la-pngrtran.lo \
 	libpng_la-pngwtran.lo libpng_la-pngmem.lo \
-	libpng_la-pngerror.lo libpng_la-pngpread.lo \
-	libpng_la-pnggccrd.lo
+	libpng_la-pngerror.lo libpng_la-pngpread.lo
 am_libpng_la_OBJECTS = $(am__objects_1)
 libpng_la_OBJECTS = $(am_libpng_la_OBJECTS)
 libpng12_la_LIBADD =
@@ -99,7 +98,7 @@ am_libpng12_la_OBJECTS = libpng12_la-png.lo libpng12_la-pngset.lo \
 	libpng12_la-pngwio.lo libpng12_la-pngwrite.lo \
 	libpng12_la-pngrtran.lo libpng12_la-pngwtran.lo \
 	libpng12_la-pngmem.lo libpng12_la-pngerror.lo \
-	libpng12_la-pngpread.lo libpng12_la-pnggccrd.lo
+	libpng12_la-pngpread.lo
 libpng12_la_OBJECTS = $(am_libpng12_la_OBJECTS)
 am_pngtest_OBJECTS = pngtest.$(OBJEXT)
 pngtest_OBJECTS = $(am_pngtest_OBJECTS)
@@ -184,7 +183,6 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBPNG_DEFINES = @LIBPNG_DEFINES@
-LIBPNG_NO_MMX = @LIBPNG_NO_MMX@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -286,7 +284,7 @@ lib_LTLIBRARIES = libpng12.la @compatlib@
 EXTRA_LTLIBRARIES = libpng.la
 libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
-	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c \
+	pngwtran.c pngmem.c pngerror.c pngpread.c \
 	png.h pngconf.h
 
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
@@ -322,7 +320,7 @@ EXTRA_DIST = \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt pngvcrd.c 
+	example.c libpng.txt
 
 CLEANFILES = pngout.png libpng12.pc libpng12-config libpng.vers \
 libpng.sym
@@ -455,7 +453,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng12_la-png.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng12_la-pngerror.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng12_la-pnggccrd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng12_la-pngget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng12_la-pngmem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng12_la-pngpread.Plo@am__quote@
@@ -471,7 +468,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng12_la-pngwutil.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng_la-png.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng_la-pngerror.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng_la-pnggccrd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng_la-pngget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng_la-pngmem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng_la-pngpread.Plo@am__quote@
@@ -613,13 +609,6 @@ libpng_la-pngpread.lo: pngpread.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpng_la-pngpread.lo `test -f 'pngpread.c' || echo '$(srcdir)/'`pngpread.c
 
-libpng_la-pnggccrd.lo: pnggccrd.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpng_la-pnggccrd.lo -MD -MP -MF "$(DEPDIR)/libpng_la-pnggccrd.Tpo" -c -o libpng_la-pnggccrd.lo `test -f 'pnggccrd.c' || echo '$(srcdir)/'`pnggccrd.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libpng_la-pnggccrd.Tpo" "$(DEPDIR)/libpng_la-pnggccrd.Plo"; else rm -f "$(DEPDIR)/libpng_la-pnggccrd.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pnggccrd.c' object='libpng_la-pnggccrd.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpng_la-pnggccrd.lo `test -f 'pnggccrd.c' || echo '$(srcdir)/'`pnggccrd.c
-
 libpng12_la-png.lo: png.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng12_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpng12_la-png.lo -MD -MP -MF "$(DEPDIR)/libpng12_la-png.Tpo" -c -o libpng12_la-png.lo `test -f 'png.c' || echo '$(srcdir)/'`png.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libpng12_la-png.Tpo" "$(DEPDIR)/libpng12_la-png.Plo"; else rm -f "$(DEPDIR)/libpng12_la-png.Tpo"; exit 1; fi
@@ -724,13 +713,6 @@ libpng12_la-pngpread.lo: pngpread.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pngpread.c' object='libpng12_la-pngpread.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng12_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpng12_la-pngpread.lo `test -f 'pngpread.c' || echo '$(srcdir)/'`pngpread.c
-
-libpng12_la-pnggccrd.lo: pnggccrd.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng12_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpng12_la-pnggccrd.lo -MD -MP -MF "$(DEPDIR)/libpng12_la-pnggccrd.Tpo" -c -o libpng12_la-pnggccrd.lo `test -f 'pnggccrd.c' || echo '$(srcdir)/'`pnggccrd.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libpng12_la-pnggccrd.Tpo" "$(DEPDIR)/libpng12_la-pnggccrd.Plo"; else rm -f "$(DEPDIR)/libpng12_la-pnggccrd.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pnggccrd.c' object='libpng12_la-pnggccrd.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng12_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpng12_la-pnggccrd.lo `test -f 'pnggccrd.c' || echo '$(srcdir)/'`pnggccrd.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

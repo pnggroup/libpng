@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_20rc3 Your_png_h_is_not_version_1_2_20rc3;
+typedef version_1_2_20rc4 Your_png_h_is_not_version_1_2_20rc4;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -66,11 +66,6 @@ PNG_CONST int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
 
 /* offset to next interlace block in the y direction */
 PNG_CONST int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
-
-/* width of interlace block (used in assembler routines only) */
-#if defined(PNG_HAVE_MMX_COMBINE_ROW) || defined(PNG_OPTIMIZED_CODE_SUPPORTED)
-PNG_CONST int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
-#endif
 
 /* Height of interlace block.  This is not currently used - if you need
  * it, uncomment it here and in png.h
@@ -698,7 +693,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.20rc3 - August 30, 2007\n\
+   return ((png_charp) "\n libpng version 1.2.20rc4 - September 1, 2007\n\
    Copyright (c) 1998-2007 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -825,57 +820,18 @@ png_access_version_number(void)
 void /* PRIVATE */
 png_init_mmx_flags (png_structp png_ptr)
 {
-    if(png_ptr == NULL) return;
-    png_ptr->mmx_rowbytes_threshold = 0;
-    png_ptr->mmx_bitdepth_threshold = 0;
-
-#  if (defined(PNG_USE_PNGVCRD) || defined(PNG_USE_PNGGCCRD))
-
-    png_ptr->asm_flags |= PNG_ASM_FLAG_MMX_SUPPORT_COMPILED;
-
-    if (png_mmx_support() > 0) {
-        png_ptr->asm_flags |= PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU
-#    ifdef PNG_HAVE_MMX_COMBINE_ROW
-                              | PNG_ASM_FLAG_MMX_READ_COMBINE_ROW
-#    endif
-#    ifdef PNG_HAVE_MMX_READ_INTERLACE
-                              | PNG_ASM_FLAG_MMX_READ_INTERLACE
-#    endif
-#    ifndef PNG_HAVE_MMX_READ_FILTER_ROW
-                              ;
-#    else
-                              | PNG_ASM_FLAG_MMX_READ_FILTER_SUB
-                              | PNG_ASM_FLAG_MMX_READ_FILTER_UP
-                              | PNG_ASM_FLAG_MMX_READ_FILTER_AVG
-                              | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH ;
-
-        png_ptr->mmx_rowbytes_threshold = PNG_MMX_ROWBYTES_THRESHOLD_DEFAULT;
-        png_ptr->mmx_bitdepth_threshold = PNG_MMX_BITDEPTH_THRESHOLD_DEFAULT;
-#    endif
-    } else {
-        png_ptr->asm_flags &= ~( PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU
-                               | PNG_MMX_READ_FLAGS
-                               | PNG_MMX_WRITE_FLAGS );
-    }
-
-#  else /* !(PNGVCRD || PNGGCCRD) */
-
-    /* clear all MMX flags; no support is compiled in */
-    png_ptr->asm_flags &= ~( PNG_MMX_FLAGS );
-
-#  endif /* ?(PNGVCRD || PNGGCCRD) */
+   /* obsolete, to be removed from libpng-1.4.0 */
 }
 
 #endif /* !(PNG_MMX_CODE_SUPPORTED) */
 
 /* this function was added to libpng 1.2.0 */
-#if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD)
 int PNGAPI
 png_mmx_support(void)
 {
+   /* obsolete, to be removed from libpng-1.4.0 */
     return -1;
 }
-#endif
 #endif /* PNG_1_0_X */
 #endif /* PNG_READ_SUPPORTED && PNG_ASSEMBLER_CODE_SUPPORTED */
 

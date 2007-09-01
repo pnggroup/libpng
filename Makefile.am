@@ -33,7 +33,7 @@ lib_LTLIBRARIES=libpng12.la @compatlib@
 EXTRA_LTLIBRARIES= libpng.la
 libpng12_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
-	pngwtran.c pngmem.c pngerror.c pngpread.c pnggccrd.c \
+	pngwtran.c pngmem.c pngerror.c pngpread.c \
 	png.h pngconf.h
 libpng_la_SOURCES = $(libpng12_la_SOURCES)
 
@@ -83,7 +83,7 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt pngvcrd.c 
+	example.c libpng.txt
 
 CLEANFILES= pngout.png libpng12.pc libpng12-config libpng.vers \
 libpng.sym

@@ -7,8 +7,6 @@
 
 # CAUTION: Do not use this makefile with gcc versions 2.7.2.2 and earlier.
 
-# WARNING: The assembler code in pnggccrd.c may not be thread safe.
-
 # NOTE:  When testing MMX performance on a multitasking system, make sure
 #        there are no floating-point programs (e.g., SETI@Home) running in
 #        the background!  Context switches between MMX and FPU are expensive.
@@ -16,7 +14,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.20rc3
+PNGMIN = 1.2.20rc4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -98,7 +96,7 @@ DM=$(DESTDIR)$(MANPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-	pngwtran.o pngmem.o pngerror.o pngpread.o pnggccrd.o
+	pngwtran.o pngmem.o pngerror.o pngpread.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
@@ -126,12 +124,6 @@ libpng-config:
 	echo libs=\"-lpng12 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
-
-pnggccrd.o:	pnggccrd.c png.h pngconf.h
-	$(CC) -c $(CFLAGS) -o $@ $*.c
-
-pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h
-	$(CC) -c $(CFLAGS) -fPIC -o $@ pnggccrd.c
 
 $(LIBSO): $(LIBSOMAJ)
 	$(LN_SF) $(LIBSOMAJ) $(LIBSO)

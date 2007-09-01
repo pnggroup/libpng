@@ -1926,6 +1926,9 @@ version 1.2.20rc3 [August 30, 2007]
   Restored a "superfluous" #ifdef that was removed from 1.2.20rc2 pnggccrd.c,
     breaking the png_mmx_support() function.
 
+version 1.2.20rc4 [September 1, 2007]
+  Removed Intel contributions (MMX, Optimized C).
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

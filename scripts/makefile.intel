@@ -36,7 +36,7 @@ O=.obj
 
 OBJS=png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O) \
 pngmem$(O) pngpread$(O) pngread$(O) pngerror$(O) pngwrite$(O) \
-pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O) pngvcrd$(O) pnggccrd$(O)
+pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
 
 all: test
 
@@ -59,12 +59,6 @@ pngrtran$(O): png.h pngconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 pngrutil$(O): png.h pngconf.h
-	$(CC) $(CFLAGS) $*.c $(ERRFILE)
-
-pnggccrd$(O): png.h pngconf.h
-	$(CC) $(CFLAGS) $*.c $(ERRFILE)
-
-pngvcrd$(O): png.h pngconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 pngerror$(O): png.h pngconf.h
