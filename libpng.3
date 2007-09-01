@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "August 30, 2007"
+.TH LIBPNG 3 "September 1, 2007"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.0.28rc3
+libpng \- Portable Network Graphics (PNG) Reference Library 1.0.28rc4
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -410,7 +410,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.0.28rc3 - August 30, 2007
+ libpng version 1.0.28rc4 - September 1, 2007
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2007 Glenn Randers-Pehrson
@@ -496,9 +496,7 @@ Libpng is thread safe, provided the threads are using different
 instances of the structures.  Each thread should have its own
 png_struct and png_info instances, and thus its own image.
 Libpng does not protect itself against two threads using the
-same instance of a structure.  Note: thread safety may be defeated
-by use of some of the MMX assembler code in pnggccrd.c, which is only
-compiled when the user defines PNG_THREAD_UNSAFE_OK.
+same instance of a structure.
 
 .SH II. Structures
 
@@ -2729,17 +2727,13 @@ For a more compact example of writing a PNG image, see the file example.c.
 
 .SH V. Modifying/Customizing libpng:
 
-There are three issues here.  The first is changing how libpng does
+There are two issues here.  The first is changing how libpng does
 standard things like memory allocation, input/output, and error handling.
 The second deals with more complicated things like adding new chunks,
 adding new transformations, and generally changing how libpng works.
 Both of those are compile-time issues; that is, they are generally
 determined at the time the code is written, and there is rarely a need
-to provide the user with a means of changing them.  The third is a
-run-time issue:  choosing between and/or tuning one or more alternate
-versions of computationally intensive routines; specifically, optimized
-assembly-language (and therefore compiler- and platform-dependent)
-versions.
+to provide the user with a means of changing them.
 
 Memory allocation, input/output, and error handling
 
@@ -3100,7 +3094,7 @@ When PNG_DEBUG = 1, the macros are defined, but only png_debug statements
 having level = 0 will be printed.  There aren't any such statements in
 this version of libpng, but if you insert some they will be printed.
 
-.SH VI.  MNG support
+.SH VII.  MNG support
 
 The MNG specification (available at http://www.libpng.org/pub/mng) allows
 certain extensions to PNG for PNG images that are embedded in MNG datastreams.
@@ -3176,13 +3170,13 @@ application:
 
 .SH VIII. Y2K Compliance in libpng
 
-August 30, 2007
+September 1, 2007
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.0.28rc3 are Y2K compliant.  It is my belief that earlier
+upward through 1.0.28rc4 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3377,8 +3371,8 @@ the first widely used release:
  1.0.27              10    10027  10.so.0.27[.0]
  1.2.19              13    10219  12.so.0.19[.0]
  1.2.20beta01-04     13    10220  12.so.0.20[.0]
- 1.0.28rc1-2         10    10028  10.so.0.28[.0]
- 1.2.20rc1-2         13    10220  12.so.0.20[.0]
+ 1.0.28rc1-4         10    10028  10.so.0.28[.0]
+ 1.2.20rc1-4         13    10220  12.so.0.20[.0]
  1.0.28              10    10028  10.so.0.28[.0]
  1.2.20              13    10220  12.so.0.20[.0]
 
@@ -3436,7 +3430,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.0.28rc3 - August 30, 2007:
+Libpng version 1.0.28rc4 - September 1, 2007:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -3457,7 +3451,7 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.0.28rc3, August 30, 2007, are
+libpng versions 1.2.6, August 15, 2004, through 1.0.28rc4, September 1, 2007, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -3556,7 +3550,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-August 30, 2007
+September 1, 2007
 
 .\" end of man page
 

@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.20 August 30, 2007
+ * Last changed in libpng 1.2.20 September 1, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1000,11 +1000,6 @@ png_read_push_finish_row(png_structp png_ptr)
 
    /* offset to next interlace block in the y direction */
    PNG_CONST int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
-
-   /* Width of interlace block.  This is not currently used - if you need
-    * it, uncomment it here and in png.h
-   PNG_CONST int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
-   */
 
    /* Height of interlace block.  This is not currently used - if you need
     * it, uncomment it here and in png.h

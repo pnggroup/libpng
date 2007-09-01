@@ -6,7 +6,7 @@
 # Library name:
 LIBNAME = libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.28rc3
+PNGMIN = 1.0.28rc4
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
