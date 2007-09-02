@@ -97,7 +97,7 @@ am_libpng10_la_OBJECTS = libpng10_la-png.lo libpng10_la-pngset.lo \
 	libpng10_la-pngread.lo libpng10_la-pngrio.lo \
 	libpng10_la-pngwio.lo libpng10_la-pngwrite.lo \
 	libpng10_la-pngrtran.lo libpng10_la-pngwtran.lo \
-	libpng10_la-pngmem.lo libpng12_la-pngerror.lo \
+	libpng10_la-pngmem.lo libpng10_la-pngerror.lo \
 	libpng10_la-pngpread.lo
 libpng10_la_OBJECTS = $(am_libpng10_la_OBJECTS)
 am_pngtest_OBJECTS = pngtest.$(OBJEXT)
@@ -183,6 +183,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBPNG_DEFINES = @LIBPNG_DEFINES@
+LIBPNG_NO_MMX = @LIBPNG_NO_MMX@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -320,7 +321,7 @@ EXTRA_DIST = \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt
+	example.c libpng.txt pngvcrd.c 
 
 CLEANFILES = pngout.png libpng10.pc libpng10-config libpng.vers \
 libpng.sym
