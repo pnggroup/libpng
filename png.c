@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_20rc4 Your_png_h_is_not_version_1_2_20rc4;
+typedef version_1_2_20rc5 Your_png_h_is_not_version_1_2_20rc5;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -693,7 +693,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.20rc4 - September 1, 2007\n\
+   return ((png_charp) "\n libpng version 1.2.20rc5 - September 2, 2007\n\
    Copyright (c) 1998-2007 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -730,51 +730,9 @@ png_get_header_version(png_structp png_ptr)
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
    return ((png_charp) PNG_HEADER_VERSION_STRING
 #ifdef PNG_READ_SUPPORTED
-#  ifdef PNG_USE_PNGGCCRD
-#    ifdef __x86_64__
-#      ifdef __PIC__
-   "     (PNGGCRD x86_64, PIC)\n"
-#      else
-#        ifdef PNG_THREAD_UNSAFE_OK
-   "     (PNGGCRD x86_64, Thread unsafe)\n"
-#        else
-   "     (PNGGCRD x86_64, Thread safe)\n"
-#        endif
-#      endif
-#    else
-#    ifdef PNG_THREAD_UNSAFE_OK
-   "     (PNGGCRD, Thread unsafe)\n"
-#      else
-   "     (PNGGCRD, Thread safe)\n"
-#      endif
-#    endif
-#  else
-#    ifdef PNG_USE_PNGVCRD
-#      ifdef __x86_64__
-   "     (x86_64 PNGVCRD)\n"
-#      else
-   "     (PNGVCRD)\n"
-#      endif
-#    else
-#      ifdef __x86_64__
-#        ifdef PNG_OPTIMIZED_CODE_SUPPORTED
-   "     (x86_64 OPTIMIZED)\n"
-#        else
-   "     (x86_64 NOT OPTIMIZED)\n"
-#        endif
-#      else
-#        ifdef PNG_OPTIMIZED_CODE_SUPPORTED
-   "     (OPTIMIZED)\n"
-#        else
-   "     (NOT OPTIMIZED)\n"
-#        endif
-#      endif
-#    endif
-#  endif
-#else
-   "     (NO READ SUPPORT)\n"
+   "     (NO READ SUPPORT)"
 #endif
-   );
+   "\n");
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
@@ -815,16 +773,6 @@ png_access_version_number(void)
 
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_ASSEMBLER_CODE_SUPPORTED)
 #if !defined(PNG_1_0_X)
-#if defined(PNG_MMX_CODE_SUPPORTED)
-/* this INTERNAL function was added to libpng 1.2.0 */
-void /* PRIVATE */
-png_init_mmx_flags (png_structp png_ptr)
-{
-   /* obsolete, to be removed from libpng-1.4.0 */
-}
-
-#endif /* !(PNG_MMX_CODE_SUPPORTED) */
-
 /* this function was added to libpng 1.2.0 */
 int PNGAPI
 png_mmx_support(void)

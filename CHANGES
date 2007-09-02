@@ -1929,6 +1929,10 @@ version 1.2.20rc3 [August 30, 2007]
 version 1.2.20rc4 [September 1, 2007]
   Removed Intel contributions (MMX, Optimized C).
 
+version 1.2.20rc5 [September 2, 2007]
+  Restored configure and Makefile.in to rc3 and put a snippet of code in
+    pnggccrd.c, to ensure configure makes the same PNG_NO_MMX_CODE selection
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -183,6 +183,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBPNG_DEFINES = @LIBPNG_DEFINES@
+LIBPNG_NO_MMX = @LIBPNG_NO_MMX@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -320,7 +321,7 @@ EXTRA_DIST = \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt
+	example.c libpng.txt pngvcrd.c 
 
 CLEANFILES = pngout.png libpng12.pc libpng12-config libpng.vers \
 libpng.sym

@@ -842,11 +842,7 @@ png_uint_32 PNGAPI
 png_get_asm_flags (png_structp png_ptr)
 {
     /* obsolete, to be removed from libpng-1.4.0 */
-#ifdef PNG_MMX_CODE_SUPPORTED
-    return (png_uint_32)(png_ptr? png_ptr->asm_flags : 0L);
-#else
     return (png_ptr? 0L: 0L);
-#endif
 }
 
 /* this function was added to libpng 1.2.0 and should exist by default */

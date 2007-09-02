@@ -74,7 +74,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 CYGDLL = 12
-PNGMIN = 1.2.20rc4
+PNGMIN = 1.2.20rc5
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
@@ -288,7 +288,6 @@ pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
 pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c
 pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngwutil.c
 pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
-# pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pnggccrd.c
 
 pngtest.o:			png.h pngconf.h pngtest.c
 pngtest-stat.o:			png.h pngconf.h pngtest.c
