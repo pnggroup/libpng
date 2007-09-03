@@ -1,5 +1,5 @@
 
-Known bugs in libpng version 1.0.28rc5
+Known bugs in libpng version 1.0.28rc6
 
 1. February 23, 2006: The custom makefiles don't build libpng with -lz.
 

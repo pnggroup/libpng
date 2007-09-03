@@ -365,8 +365,6 @@ SOURCE=..\..\pngtrans.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\pngvcrd.c
-
 !IF  "$(CFG)" == "libpng - Win32 DLL Release"
 
 # PROP Exclude_From_Build 1
