@@ -1933,6 +1933,10 @@ version 1.2.20rc5 [September 2, 2007]
   Restored configure and Makefile.in to rc3 and put a snippet of code in
     pnggccrd.c, to ensure configure makes the same PNG_NO_MMX_CODE selection
 
+version 1.2.20rc6 [September 3, 2007]
+  Fixed bugs in scripts/CMakeLists.txt
+  Removed pngvcrd.c references from msvc projects.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

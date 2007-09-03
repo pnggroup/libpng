@@ -97,6 +97,10 @@ set(pngtest_sources
        pngtest.c
 )
 # SOME NEEDED DEFINITIONS
+if(MSVC)
+  add_definitions(-DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
+endif(MSVC)
+
 add_definitions(-DZLIB_DLL)
 
 add_definitions(-DLIBPNG_NO_MMX)
@@ -165,7 +169,7 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 
 # SET UP LINKS
 set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 0.${PNGLIB_RELEASE}.1.2.20rc5
+#    VERSION 0.${PNGLIB_RELEASE}.1.2.20rc6
      VERSION 0.${PNGLIB_RELEASE}.0
      SOVERSION 0
      CLEAN_DIRECT_OUTPUT 1)
