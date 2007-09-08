@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.2.20rc6
+;Version 1.2.20
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -180,7 +180,9 @@ EXPORTS
   png_write_init_2    @167
   png_access_version_number  @168
 ; png_sig_bytes    @169
-  png_libpng_ver    @170
+; Removed from version 1.2.20
+; png_libpng_ver    @170
+;
   png_init_io    @171
   png_convert_to_rfc1123     @172
   png_set_invalid  @173
