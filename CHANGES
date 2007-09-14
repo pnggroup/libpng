@@ -1480,7 +1480,7 @@ version 1.2.9beta5 [March 4, 2006]
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
-  Fixed typo (20) in configuration files.
+  Fixed typo (21) in configuration files.
 
 version 1.2.9beta7 [March 7, 2006]
   Removed libpng.vers and libpng.sym from libpng12_la_SOURCES in Makefile.am
@@ -1677,7 +1677,7 @@ version 1.2.15rc4 [December 27, 2006]
 version 1.2.15rc5 [December 31, 2006]
   Revised handling of rgb_to_gray.
 
-version 1.2.15 [January 5, 2007]
+version 1.0.23, 1.2.15 [January 5, 2007]
   Added some (unsigned long) typecasts in pngtest.c to avoid printing errors.
 
 version 1.2.16beta1 [January 6, 2007]
@@ -1686,7 +1686,7 @@ version 1.2.16beta1 [January 6, 2007]
 version 1.2.16beta2 [January 16, 2007]
   Revised scripts/CMakeLists.txt
  
-version 1.2.16 [January 31, 2007]
+version 1.0.24, 1.2.16 [January 31, 2007]
   No changes.
  
 version 1.2.17beta1 [March 6, 2007]
@@ -1937,8 +1937,15 @@ version 1.2.20rc6 [September 2, 2007]
   Fixed bugs in scripts/CMakeLists.txt
   Removed pngvcrd.c references from msvc projects.
 
-version 1.0.28 and 1.2.20 [September 8, 2007]
+version 1.0.28 and 1.2.20 [September 14, 2007]
   Removed "(NO READ SUPPORT)" from png_get_header_version() string.
+
+version 1.2.21beta1 [September 14, 2007]
+  Fixed various mistakes reported by George Cook and Jeff Phillips:
+  logical vs bitwise NOT in pngrtran.c, bug introduced in 1.2.19rc2
+  16-bit cheap transparency expansion, bug introduced in 1.2.19beta2
+  errors with sizeof(unknown_chunk.name), bugs introduced in 1.2.19beta11
+  <= compare with unsigned var in pngset.c, should be ==.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
