@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.21 September 14, 2007
+ * Last changed in libpng 1.2.21 September 18, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -216,7 +216,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
-   if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+   if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
      if(png_ptr->mode & PNG_AFTER_IDAT)
         png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
 
@@ -273,7 +273,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       }
       png_handle_PLTE(png_ptr, info_ptr, png_ptr->push_length);
    }
-   else if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+   else if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
    {
       /* If we reach an IDAT chunk, this means we have read all of the
        * header chunks, and we can start reading the image (or if this
@@ -678,7 +678,7 @@ png_push_read_IDAT(png_structp png_ptr)
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
 
-      if (png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+      if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
       {
          png_ptr->process_mode = PNG_READ_CHUNK_MODE;
          if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))

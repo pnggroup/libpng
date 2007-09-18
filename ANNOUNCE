@@ -1,5 +1,5 @@
 
-Libpng 1.2.21beta1 - September 14, 2007
+Libpng 1.2.21beta2 - September 18, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.21beta1.tar.gz
-   libpng-1.2.21beta1.tar.bz2
+   libpng-1.2.21beta2.tar.gz
+   libpng-1.2.21beta2.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.21beta1-no-config.tar.gz
-   libpng-1.2.21beta1-no-config.tar.bz2
+   libpng-1.2.21beta2-no-config.tar.gz
+   libpng-1.2.21beta2-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1221b01.zip
-   lp1221b01.tar.bz2
+   lp1221b02.zip
+   lp1221b02.tar.bz2
 
 Project files
 
-   libpng-1.2.21beta1-project-netware.zip
-   libpng-1.2.21beta1-project-wince.zip
+   libpng-1.2.21beta2-project-netware.zip
+   libpng-1.2.21beta2-project-wince.zip
 
 Other information:
 
-   libpng-1.2.21beta1-README.txt
-   libpng-1.2.21beta1-KNOWNBUGS.txt
-   libpng-1.2.21beta1-LICENSE.txt
-   libpng-1.2.21beta1-Y2K-compliance.txt
+   libpng-1.2.21beta2-README.txt
+   libpng-1.2.21beta2-KNOWNBUGS.txt
+   libpng-1.2.21beta2-LICENSE.txt
+   libpng-1.2.21beta2-Y2K-compliance.txt
 
 Changes since the last public release (1.2.19):
 
@@ -62,7 +62,7 @@ version 1.2.20rc2 [August 27, 2007]
   Revised #ifdefs to ensure one and only one of pnggccrd.c, pngvcrd.c,
     or part of pngrutil.c is selected.
 
-version 1.2.20rc3 [September 14, 2007]
+version 1.2.20rc3 [September 18, 2007]
   Remove a little more code in pngwutil.c when PNG_NO_WRITE_FILTER is selected.
   Added /D _CRT_SECURE_NO_WARNINGS to visual6c and visualc71 projects.
   Compile png_mmx_support() in png.c even when PNG_NO_MMX_CODE is defined.
@@ -80,8 +80,18 @@ version 1.2.20rc6 [September 2, 2007]
   Fixed bugs in scripts/CMakeLists.txt
   Removed pngvcrd.c references from msvc projects.
 
-version 1.0.28 and 1.2.20 [September 14, 2007]
+version 1.0.28 and 1.2.20 [September 8, 2007]
   Removed "(NO READ SUPPORT)" from png_get_header_version() string.
+
+version 1.2.21beta1 [September 14, 2007]
+  Fixed various mistakes reported by George Cook and Jeff Phillips:
+  logical vs bitwise NOT in pngrtran.c, bug introduced in 1.2.19rc2
+  16-bit cheap transparency expansion, bug introduced in 1.2.19beta2
+  errors with sizeof(unknown_chunk.name), bugs introduced in 1.2.19beta11
+  <= compare with unsigned var in pngset.c, should be ==.
+
+version 1.2.21beta2 [September 18, 2007]
+  Removed some extraneous typecasts.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

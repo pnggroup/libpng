@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.21 [September 14, 2007]
+ * Last changed in libpng 1.2.21 [September 18, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2910,7 +2910,7 @@ png_read_finish_row(png_structp png_ptr)
                png_ptr->idat_size = png_get_uint_31(png_ptr, chunk_length);
                png_reset_crc(png_ptr);
                png_crc_read(png_ptr, png_ptr->chunk_name, 4);
-               if (png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+               if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
                   png_error(png_ptr, "Not enough image data");
 
             }

@@ -1937,7 +1937,7 @@ version 1.2.20rc6 [September 2, 2007]
   Fixed bugs in scripts/CMakeLists.txt
   Removed pngvcrd.c references from msvc projects.
 
-version 1.0.28 and 1.2.20 [September 14, 2007]
+version 1.0.28 and 1.2.20 [September 8, 2007]
   Removed "(NO READ SUPPORT)" from png_get_header_version() string.
 
 version 1.2.21beta1 [September 14, 2007]
@@ -1946,6 +1946,9 @@ version 1.2.21beta1 [September 14, 2007]
   16-bit cheap transparency expansion, bug introduced in 1.2.19beta2
   errors with sizeof(unknown_chunk.name), bugs introduced in 1.2.19beta11
   <= compare with unsigned var in pngset.c, should be ==.
+
+version 1.2.21beta2 [September 18, 2007]
+  Removed some extraneous typecasts.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
