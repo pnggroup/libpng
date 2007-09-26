@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.21 [September 18, 2007]
+ * Last changed in libpng 1.2.21 [September 26, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1673,7 +1673,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       buf++; /* Skip the null string terminator from previous parameter. */
 
       png_debug1(3, "Reading pCAL parameter %d\n", i);
-      for (params[i] = buf; *buf != 0x00 && buf <= endptr; buf++)
+      for (params[i] = buf; buf <= endptr && *buf != 0x00; buf++)
          /* Empty loop to move past each parameter string */ ;
 
       /* Make sure we haven't run out of data yet */
@@ -1994,7 +1994,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* empty loop */ ;
 
    /* zTXt must have some text after the chunkdataword */
-   if (text == chunkdata + slength - 1)
+   if (text >= chunkdata + slength - 2)
    {
       png_warning(png_ptr, "Truncated zTXt chunk");
       png_free(png_ptr, chunkdata);

@@ -1950,6 +1950,10 @@ version 1.2.21beta1 [September 14, 2007]
 version 1.2.21beta2 [September 18, 2007]
   Removed some extraneous typecasts.
 
+version 1.2.21rc1 [September 26, 2007]
+  Fixed potential out-of-bounds reads in png_handle_pCAL() and
+    png_handle_ztXt() ("flayer" results reported by Tavis Ormandy).
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
