@@ -415,7 +415,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       /* This should be a binary subdivision search or a hash for
        * matching the chunk name rather than a linear search.
        */
-      if (!png_memcmp(png_ptr->chunk_name, (png_bytep)png_IDAT, 4))
+      if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
         if(png_ptr->mode & PNG_AFTER_IDAT)
           png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
 
