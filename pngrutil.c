@@ -1771,6 +1771,17 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* empty loop */ ;
    ep++;
 
+   if (buffer + slength < ep)
+   {
+       png_warning(png_ptr, "Truncated sCAL chunk");
+#if defined(PNG_FIXED_POINT_SUPPORTED) && \
+    !defined(PNG_FLOATING_POINT_SUPPORTED)
+       png_free(png_ptr, swidth);
+#endif
+      png_free(png_ptr, buffer);
+       return;
+   }
+
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    height = png_strtod(png_ptr, ep, &vp);
    if (*vp)
@@ -2113,6 +2124,13 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    for (lang_key = lang; *lang_key; lang_key++)
       /* empty loop */ ;
    lang_key++;        /* skip NUL separator */
+
+   if (lang_key >= chunkdata + slength)
+   {
+      png_warning(png_ptr, "Truncated iTXt chunk");
+      png_free(png_ptr, chunkdata);
+      return;
+   }
 
    for (text = lang_key; *text; text++)
       /* empty loop */ ;
