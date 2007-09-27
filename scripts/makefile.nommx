@@ -7,7 +7,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.21rc2
+PNGMIN = 1.2.21rc3
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -96,7 +96,9 @@ libpng.pc:
 	-e s!@exec_prefix@!$(exec_prefix)! \
 	-e s!@libdir@!$(LIBPATH)! \
 	-e s!@includedir@!$(INCPATH)! \
-	-e "s!Cflags: !Cflags: -DPNG_NO_MMX_CODE !"> libpng.pc
+	-e s!@includedir@!$(INCPATH)! \
+	-e s!-lpng12!-lpng12\ -lz\ -lm! \
+	-e s!Cflags: !Cflags:\ -DPNG_NO_MMX_CODE!> libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \

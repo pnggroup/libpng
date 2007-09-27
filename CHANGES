@@ -1954,11 +1954,14 @@ version 1.2.21rc1 [September 25, 2007]
   Fixed potential out-of-bounds reads in png_handle_pCAL() and
     png_handle_ztXt() ("flayer" results reported by Tavis Ormandy).
 
-version 1.2.21rc2 [September 27, 2007]
+version 1.2.21rc2 [September 26, 2007]
   Fixed potential out-of-bounds reads in png_handle_sCAL(),
     png_handle_iTXt(), and png_push_read_tEXt().
   Remove some PNG_CONST declarations from pngwutil.c to avoid compiler warnings
-  Revised makefiles to update libpng.pc properly.
+  Revised makefiles to update paths in libpng.pc properly.
+
+version 1.2.21rc2 [September 27, 2007]
+  Revised makefiles to update "Libs" in libpng.pc properly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
