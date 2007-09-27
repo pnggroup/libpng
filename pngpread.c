@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.21 September 26, 2007
+ * Last changed in libpng 1.2.21 September 27, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1120,7 +1120,7 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
       for (text = key; *text; text++)
          /* empty loop */ ;
 
-      if (text != key + png_ptr->current_text_size)
+      if (text < key + png_ptr->current_text_size)
          text++;
 
       text_ptr = (png_textp)png_malloc(png_ptr,
@@ -1215,7 +1215,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
          /* empty loop */ ;
 
       /* zTXt can't have zero text */
-      if (text == key + png_ptr->current_text_size)
+      if (text >= key + png_ptr->current_text_size)
       {
          png_ptr->current_text = NULL;
          png_free(png_ptr, key);
@@ -1412,7 +1412,7 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
       for (lang = key; *lang; lang++)
          /* empty loop */ ;
 
-      if (lang != key + png_ptr->current_text_size)
+      if (lang < key + png_ptr->current_text_size - 3)
          lang++;
 
       comp_flag = *lang++;
@@ -1422,10 +1422,14 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
          /* empty loop */ ;
       lang_key++;        /* skip NUL separator */
 
-      for (text = lang_key; *text; text++)
-         /* empty loop */ ;
+      text=lang_key;
+      if (lang_key < key + png_ptr->current_text_size - 1)
+      {
+        for (; *text; text++)
+           /* empty loop */ ;
+      }
 
-      if (text != key + png_ptr->current_text_size)
+      if (text < key + png_ptr->current_text_size)
          text++;
 
       text_ptr = (png_textp)png_malloc(png_ptr,

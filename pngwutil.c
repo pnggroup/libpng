@@ -378,7 +378,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    int interlace_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_IHDR;
+   PNG_IHDR;
 #endif
    png_byte buf[13]; /* buffer to store the IHDR info */
 
@@ -544,7 +544,7 @@ void /* PRIVATE */
 png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_PLTE;
+   PNG_PLTE;
 #endif
    png_uint_32 i;
    png_colorp pal_ptr;
@@ -607,7 +607,7 @@ void /* PRIVATE */
 png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_IDAT;
+   PNG_IDAT;
 #endif
    png_debug(1, "in png_write_IDAT\n");
 
@@ -659,7 +659,7 @@ void /* PRIVATE */
 png_write_IEND(png_structp png_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_IEND;
+   PNG_IEND;
 #endif
    png_debug(1, "in png_write_IEND\n");
    png_write_chunk(png_ptr, png_IEND, png_bytep_NULL,
@@ -674,7 +674,7 @@ void /* PRIVATE */
 png_write_gAMA(png_structp png_ptr, double file_gamma)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_gAMA;
+   PNG_gAMA;
 #endif
    png_uint_32 igamma;
    png_byte buf[4];
@@ -691,7 +691,7 @@ void /* PRIVATE */
 png_write_gAMA_fixed(png_structp png_ptr, png_fixed_point file_gamma)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_gAMA;
+   PNG_gAMA;
 #endif
    png_byte buf[4];
 
@@ -709,7 +709,7 @@ void /* PRIVATE */
 png_write_sRGB(png_structp png_ptr, int srgb_intent)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_sRGB;
+   PNG_sRGB;
 #endif
    png_byte buf[1];
 
@@ -729,7 +729,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
    png_charp profile, int profile_len)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_iCCP;
+   PNG_iCCP;
 #endif
    png_size_t name_len;
    png_charp new_name;
@@ -802,7 +802,7 @@ void /* PRIVATE */
 png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_sPLT;
+   PNG_sPLT;
 #endif
    png_size_t name_len;
    png_charp new_name;
@@ -885,7 +885,7 @@ void /* PRIVATE */
 png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_sBIT;
+   PNG_sBIT;
 #endif
    png_byte buf[4];
    png_size_t size;
@@ -944,7 +944,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    double blue_x, double blue_y)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_cHRM;
+   PNG_cHRM;
 #endif
    png_byte buf[32];
    png_uint_32 itemp;
@@ -1006,7 +1006,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    png_fixed_point blue_y)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_cHRM;
+   PNG_cHRM;
 #endif
    png_byte buf[32];
 
@@ -1059,7 +1059,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
    int num_trans, int color_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_tRNS;
+   PNG_tRNS;
 #endif
    png_byte buf[6];
 
@@ -1113,7 +1113,7 @@ void /* PRIVATE */
 png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_bKGD;
+   PNG_bKGD;
 #endif
    png_byte buf[6];
 
@@ -1166,7 +1166,7 @@ void /* PRIVATE */
 png_write_hIST(png_structp png_ptr, png_uint_16p hist, int num_hist)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_hIST;
+   PNG_hIST;
 #endif
    int i;
    png_byte buf[3];
@@ -1328,7 +1328,7 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
    png_size_t text_len)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_tEXt;
+   PNG_tEXt;
 #endif
    png_size_t key_len;
    png_charp new_key;
@@ -1369,7 +1369,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
    png_size_t text_len, int compression)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_zTXt;
+   PNG_zTXt;
 #endif
    png_size_t key_len;
    char buf[1];
@@ -1428,7 +1428,7 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
     png_charp lang, png_charp lang_key, png_charp text)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_iTXt;
+   PNG_iTXt;
 #endif
    png_size_t lang_len, key_len, lang_key_len, text_len;
    png_charp new_lang, new_key;
@@ -1517,7 +1517,7 @@ png_write_oFFs(png_structp png_ptr, png_int_32 x_offset, png_int_32 y_offset,
    int unit_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_oFFs;
+   PNG_oFFs;
 #endif
    png_byte buf[9];
 
@@ -1539,7 +1539,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    png_int_32 X1, int type, int nparams, png_charp units, png_charpp params)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_pCAL;
+   PNG_pCAL;
 #endif
    png_size_t purpose_len, units_len, total_len;
    png_uint_32p params_len;
@@ -1599,7 +1599,7 @@ void /* PRIVATE */
 png_write_sCAL(png_structp png_ptr, int unit, double width, double height)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_sCAL;
+   PNG_sCAL;
 #endif
    char buf[64];
    png_size_t total_len;
@@ -1639,7 +1639,7 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
    png_charp height)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_sCAL;
+   PNG_sCAL;
 #endif
    png_byte buf[64];
    png_size_t wlen, hlen, total_len;
@@ -1674,7 +1674,7 @@ png_write_pHYs(png_structp png_ptr, png_uint_32 x_pixels_per_unit,
    int unit_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_pHYs;
+   PNG_pHYs;
 #endif
    png_byte buf[9];
 
@@ -1698,7 +1698,7 @@ void /* PRIVATE */
 png_write_tIME(png_structp png_ptr, png_timep mod_time)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_CONST PNG_tIME;
+   PNG_tIME;
 #endif
    png_byte buf[7];
 
