@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.21 [October 4, 2007]
+ * Last changed in libpng 1.2.22 [October 4, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -578,7 +578,6 @@ png_set_palette_to_rgb(png_structp png_ptr)
    if(png_ptr == NULL) return;
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 #ifdef PNG_WARN_UNINITIALIZED_ROW
-   png_ptr->flags &= !(PNG_FLAG_ROW_INIT);
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 #endif
 }
@@ -858,7 +857,7 @@ png_init_read_transformations(png_structp png_ptr)
         k=1; /* partial transparency is present */
     }
     if (k == 0)
-      png_ptr->transformations &= (~PNG_GAMMA);
+      png_ptr->transformations &= ~PNG_GAMMA;
    }
 
    if ((png_ptr->transformations & (PNG_GAMMA | PNG_RGB_TO_GRAY)) &&
