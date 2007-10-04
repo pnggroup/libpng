@@ -1,113 +1,58 @@
 
-Libpng 1.2.21rc3 - September 27, 2007
+Libpng 1.2.21 - October 4, 2007
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.21rc3.tar.gz
-   libpng-1.2.21rc3.tar.bz2
+   libpng-1.2.21.tar.gz
+   libpng-1.2.21.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.21rc3-no-config.tar.gz
-   libpng-1.2.21rc3-no-config.tar.bz2
+   libpng-1.2.21-no-config.tar.gz
+   libpng-1.2.21-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1221r03.zip
-   lp1221r03.tar.bz2
+   lpng1221.zip
+   lpng1221.tar.bz2
 
 Project files
 
-   libpng-1.2.21rc3-project-netware.zip
-   libpng-1.2.21rc3-project-wince.zip
+   libpng-1.2.21-project-netware.zip
+   libpng-1.2.21-project-wince.zip
 
 Other information:
 
-   libpng-1.2.21rc3-README.txt
-   libpng-1.2.21rc3-KNOWNBUGS.txt
-   libpng-1.2.21rc3-LICENSE.txt
-   libpng-1.2.21rc3-Y2K-compliance.txt
+   libpng-1.2.21-README.txt
+   libpng-1.2.21-KNOWNBUGS.txt
+   libpng-1.2.21-LICENSE.txt
+   libpng-1.2.21-Y2K-compliance.txt
 
-Changes since the last public release (1.2.19):
+Changes since the last public release (1.2.20):
 
-version 1.2.20beta01 [August 19, 2007]
-  Fixed problem with compiling pnggccrd.c on Intel-Apple platforms.
-  Added PNG_NO_ERROR_TEXT feature, with demo in contrib/pngminim
-  Removed define PNG_WARN_UNINITIALIZED_ROW 1 /* 0: warning; 1: error */
-    because it caused some trouble.
+version 1.2.21 [October 4, 2007]
 
-version 1.2.20beta02 [August 20, 2007]
-  Avoid compiling pnggccrd.c on Intel-Apple platforms.
-
-version 1.2.20beta03 [August 20, 2007]
-  Added "/D PNG_NO_MMX_CODE" to the non-mmx builds of projects/visualc6
-    and visualc71.
-
-version 1.2.20beta04 [August 21, 2007]
-  Revised pngvcrd.c for improved efficiency (Steve Snyder).
-
-version 1.2.20rc1 [August 23, 2007]
-  Revised pngconf.h to set PNG_NO_MMX_CODE for gcc-3.x compilers.
-
-version 1.2.20rc2 [August 27, 2007]
-  Revised scripts/CMakeLists.txt
-  Revised #ifdefs to ensure one and only one of pnggccrd.c, pngvcrd.c,
-    or part of pngrutil.c is selected.
-
-version 1.2.20rc3 [September 27, 2007]
-  Remove a little more code in pngwutil.c when PNG_NO_WRITE_FILTER is selected.
-  Added /D _CRT_SECURE_NO_WARNINGS to visual6c and visualc71 projects.
-  Compile png_mmx_support() in png.c even when PNG_NO_MMX_CODE is defined.
-  Restored a "superfluous" #ifdef that was removed from 1.2.20rc2 pnggccrd.c,
-    breaking the png_mmx_support() function.
-
-version 1.2.20rc4 [September 1, 2007]
-  Removed Intel contributions (MMX, Optimized C).
-
-version 1.2.20rc5 [September 2, 2007]
-  Restored configure and Makefile.in to rc3 and put a snippet of code in
-    pnggccrd.c, to ensure configure makes the same PNG_NO_MMX_CODE selection
-
-version 1.2.20rc6 [September 2, 2007]
-  Fixed bugs in scripts/CMakeLists.txt
-  Removed pngvcrd.c references from msvc projects.
-
-version 1.0.28 and 1.2.20 [September 8, 2007]
   Removed "(NO READ SUPPORT)" from png_get_header_version() string.
-
-version 1.2.21beta1 [September 14, 2007]
   Fixed various mistakes reported by George Cook and Jeff Phillips:
-  logical vs bitwise NOT in pngrtran.c, bug introduced in 1.2.19rc2
-  16-bit cheap transparency expansion, bug introduced in 1.2.19beta2
-  errors with sizeof(unknown_chunk.name), bugs introduced in 1.2.19beta11
+  logical vs bitwise NOT in pngrtran.c, bug introduced in 1.2.19
+  16-bit cheap transparency expansion, bug introduced in 1.2.19
+  errors with sizeof(unknown_chunk.name), bugs introduced in 1.2.19
   <= compare with unsigned var in pngset.c, should be ==.
-
-version 1.2.21beta2 [September 18, 2007]
   Removed some extraneous typecasts.
-
-version 1.2.21rc1 [September 25, 2007]
-  Fixed potential out-of-bounds reads in png_handle_pCAL() and
-    png_handle_ztXt() ("flayer" results reported by Tavis Ormandy).
-
-version 1.2.21rc2 [September 26, 2007]
-  Fixed potential out-of-bounds reads in png_handle_sCAL(),
-    png_handle_iTXt(), and png_push_read_tEXt().
+  Fixed potential out-of-bounds read in png_handle_pCAL(), png_handle_sCAL(),
+    png_push_read_tEXt(), png_handle_iTXt(), and png_handle_ztXt() ("flayer"
+    results reported by Tavis Ormandy).
   Remove some PNG_CONST declarations from pngwutil.c to avoid compiler warnings
-  Revised makefiles to update paths in libpng.pc properly.
-
-version 1.2.21rc2 [September 27, 2007]
-  Revised makefiles to update "Libs" in libpng.pc properly.
+  Revised makefiles to update libpng.pc properly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

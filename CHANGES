@@ -1960,8 +1960,11 @@ version 1.2.21rc2 [September 26, 2007]
   Remove some PNG_CONST declarations from pngwutil.c to avoid compiler warnings
   Revised makefiles to update paths in libpng.pc properly.
 
-version 1.2.21rc2 [September 27, 2007]
+version 1.2.21rc3 [September 27, 2007]
   Revised makefiles to update "Libs" in libpng.pc properly.
+
+version 1.0.29 and 1.2.21rc3 [October 4, 2007]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
