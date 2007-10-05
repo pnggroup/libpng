@@ -1970,6 +1970,10 @@ version 1.2.22beta1 [October 4, 2007]
   Again, fixed logical vs bitwise NOT in pngrtran.c, bug introduced
     in 1.2.19rc2
 
+version 1.2.22beta2 [October 5, 2007]
+  Fixed string length error in pngset.c 
+  Add terminating NULL after each instance of png_strncpy().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

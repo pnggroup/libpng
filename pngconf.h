@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.22beta1 - October 4, 2007
+ * libpng version 1.2.22beta2 - October 5, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -77,7 +77,10 @@
 
 /* Added at libpng-1.2.19, removed at libpng-1.2.20 because it caused trouble
    Restored at libpng-1.2.21 */
-#    define PNG_WARN_UNINITIALIZED_ROW 1
+#if !defined(PNG_NO_WARN_UNINITIALIZED_ROW) && \
+    !defined(PNG_WARN_UNINITIALIZED_ROW)
+#  define PNG_WARN_UNINITIALIZED_ROW 1
+#endif
 /* End of material added at libpng-1.2.19/1.2.21 */
 
 /* This is the size of the compression buffer, and thus the size of

@@ -1006,7 +1006,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
          png_strncpy(tIME_string,png_convert_to_rfc1123(read_ptr,
-            mod_time),30);
+            mod_time),29);
+         tIME_string[29]=0;
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
       }
@@ -1147,7 +1148,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
          png_strncpy(tIME_string,png_convert_to_rfc1123(read_ptr,
-            mod_time),30);
+            mod_time),29);
+         tIME_string[29]=0;
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
       }
@@ -1548,4 +1550,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_22beta1 your_png_h_is_not_version_1_2_22beta1;
+typedef version_1_2_22beta2 your_png_h_is_not_version_1_2_22beta2;
