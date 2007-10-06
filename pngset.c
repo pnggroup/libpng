@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.21 [October 5, 2007]
+ * Last changed in libpng 1.2.21 [October 6, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -691,7 +691,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
       return;
    }
    png_strncpy(new_iccp_name, name, png_strlen(name));
-   new_iccp_name[png_strlen(name)+1]=0;
+   new_iccp_name[png_strlen(name)]=0;
    new_iccp_profile = (png_charp)png_malloc_warn(png_ptr, proflen);
    if (new_iccp_profile == NULL)
    {
@@ -982,7 +982,7 @@ png_set_sPLT(png_structp png_ptr,
         }
         /* TODO: use png_malloc_warn */
         png_strncpy(to->name, from->name, png_strlen(from->name));
-        to->name[png_strlen(from->name)+1]=0;
+        to->name[png_strlen(from->name)]=0;
         to->entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,
             from->nentries * png_sizeof(png_sPLT_entry));
         /* TODO: use png_malloc_warn */
