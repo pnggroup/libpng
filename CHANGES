@@ -1977,6 +1977,9 @@ version 1.2.22beta2 [October 5, 2007]
 version 1.2.22beta3 [October 6, 2007]
   Fix two off-by-one terminating NULL after png_strncpy().
 
+version 1.2.22beta4 [October 7, 2007]
+  Changed some 0 to '\0'.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
