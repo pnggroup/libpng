@@ -1,5 +1,5 @@
 
-Libpng 1.2.22beta4 - October 7, 2007
+Libpng 1.2.22rc1 - October 8, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.22beta4.tar.gz
-   libpng-1.2.22beta4.tar.bz2
+   libpng-1.2.22rc1.tar.gz
+   libpng-1.2.22rc1.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.22beta4-no-config.tar.gz
-   libpng-1.2.22beta4-no-config.tar.bz2
+   libpng-1.2.22rc1-no-config.tar.gz
+   libpng-1.2.22rc1-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1222b04.zip
-   lp1222b04.tar.bz2
+   lp1222r01.zip
+   lp1222r01.tar.bz2
 
 Project files
 
-   libpng-1.2.22beta4-project-netware.zip
-   libpng-1.2.22beta4-project-wince.zip
+   libpng-1.2.22rc1-project-netware.zip
+   libpng-1.2.22rc1-project-wince.zip
 
 Other information:
 
-   libpng-1.2.22beta4-README.txt
-   libpng-1.2.22beta4-KNOWNBUGS.txt
-   libpng-1.2.22beta4-LICENSE.txt
-   libpng-1.2.22beta4-Y2K-compliance.txt
+   libpng-1.2.22rc1-README.txt
+   libpng-1.2.22rc1-KNOWNBUGS.txt
+   libpng-1.2.22rc1-LICENSE.txt
+   libpng-1.2.22rc1-Y2K-compliance.txt
 
 Changes since the last public release (1.2.19):
 
@@ -62,7 +62,7 @@ version 1.2.20rc2 [August 27, 2007]
   Revised #ifdefs to ensure one and only one of pnggccrd.c, pngvcrd.c,
     or part of pngrutil.c is selected.
 
-version 1.2.20rc3 [October 7, 2007]
+version 1.2.20rc3 [October 8, 2007]
   Remove a little more code in pngwutil.c when PNG_NO_WRITE_FILTER is selected.
   Added /D _CRT_SECURE_NO_WARNINGS to visual6c and visualc71 projects.
   Compile png_mmx_support() in png.c even when PNG_NO_MMX_CODE is defined.
@@ -122,6 +122,9 @@ version 1.2.22beta3 [October 6, 2007]
 
 version 1.2.22beta4 [October 7, 2007]
   Changed some 0 to '\0'.
+
+version 1.0.30 and 1.2.22rc1 [October 8, 2007]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
