@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.22 [October 8, 2007]
+ * Last changed in libpng 1.2.22 [October 13, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1199,7 +1199,7 @@ void PNGAPI
 png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
 {
    if (png_ptr && info_ptr)
-      info_ptr->valid &= ~(mask);
+      info_ptr->valid &= ~mask;
 }
 
 
