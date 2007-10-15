@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.2.22 - [October 13, 2007]
+ * Last changed in libpng 1.2.22 - [October 15, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2004 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -82,6 +82,7 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #endif
 
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
+#define PNG_tIME_STRING_LENGTH 29
 static int tIME_chunk_present=0;
 static char tIME_string[30] = "no tIME chunk present in file";
 #endif
@@ -1006,8 +1007,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
          png_strncpy(tIME_string,png_convert_to_rfc1123(read_ptr,
-            mod_time),29);
-         tIME_string[29] = '\0';
+            mod_time), PNG_tIME_STRING_LENGTH);
+         tIME_string[PNG_tIME_STRING_LENGTH] = '\0';
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
       }
@@ -1148,8 +1149,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
          png_strncpy(tIME_string,png_convert_to_rfc1123(read_ptr,
-            mod_time),29);
-         tIME_string[29] = '\0';
+            mod_time),PNG_tIME_STRING_LENGTH);
+         tIME_string[PNG_tIME_STRING_LENGTH] = '\0';
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
       }
@@ -1550,4 +1551,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_22 your_png_h_is_not_version_1_2_22;
+typedef version_1_2_23beta01 your_png_h_is_not_version_1_2_23beta01;

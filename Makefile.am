@@ -58,6 +58,9 @@ else
 endif
 libpng_la_DEPENDENCIES = $(libpng12_la_DEPENDENCIES)
 
+# Avoid depending upon Character Ranges.
+AN = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
 #distribute headers in /usr/include/libpng/*
 pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
 pkginclude_HEADERS= png.h pngconf.h
@@ -97,8 +100,9 @@ $(PNGLIB_BASENAME)-config: libpng-config
 libpng.sym: png.h pngconf.h
 	rm -f $@ $@.new
 	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
-		$(SED) -n -e 's|^.*PNG_FUNCTION_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
-			-e 's|^.*PNG_DATA_EXPORT[ 	]*\([a-zA-Z0-9_]*\).*$$|\1|p' \
+		$(SED) -n -e \
+                's|^.*PNG_FUNCTION_EXPORT[ 	]*\([$AN]*\).*$$|\1|p' \
+		-e 's|^.*PNG_DATA_EXPORT[ 	]*\([$AN]*\).*$$|\1|p' \
 			>$@.new
 	mv $@.new $@
 
