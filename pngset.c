@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.22 [October 15, 2007]
+ * Last changed in libpng 1.2.22 [October 16, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -692,7 +692,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
       png_warning(png_ptr, "Insufficient memory to process iCCP chunk.");
       return;
    }
-   png_strncpy(new_iccp_name, name, length);
+   png_memcpy(new_iccp_name, name, length);
    new_iccp_profile = (png_charp)png_malloc_warn(png_ptr, proflen);
    if (new_iccp_profile == NULL)
    {
@@ -983,7 +983,7 @@ png_set_sPLT(png_structp png_ptr,
              "Out of memory while processing sPLT chunk");
         }
         /* TODO: use png_malloc_warn */
-        png_strncpy(to->name, from->name, length);
+        png_memcpy(to->name, from->name, length);
         to->entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,
             from->nentries * png_sizeof(png_sPLT_entry));
         /* TODO: use png_malloc_warn */
@@ -1040,9 +1040,10 @@ png_set_unknown_chunks(png_structp png_ptr,
         png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
         png_unknown_chunkp from = unknowns + i;
 
-        png_strncpy((png_charp)to->name, (png_charp)from->name, 
-          PNG_CHUNK_NAME_LENGTH);
-        to->name[PNG_CHUNK_NAME_LENGTH] = '\0';
+        png_memcpy((png_charp)to->name, 
+                   (png_charp)from->name, 
+                   png_sizeof(from->name));
+        to->name[png_sizeof(to->name)] = '\0';
 
         to->data = (png_bytep)png_malloc_warn(png_ptr, from->size);
         if (to->data == NULL)

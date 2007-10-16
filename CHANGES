@@ -1986,9 +1986,13 @@ version 1.0.30rc1 and 1.2.22rc1 [October 8, 2007]
 version 1.0.30 and 1.2.22 [October 13, 2007]
   No changes.
 
-version 1.2.23 [October 15, 2007]
+version 1.2.23beta01 [October 15, 2007]
   Reduced number of invocations of png_strlen() in pngset.c.
   Changed [azAZ09_] to [_abcde...89] in Makefile.am for better localization.
+
+version 1.2.23beta02 [October 16, 2007]
+  Eliminated png_strncpy() and png_strcpy() (Pierre Poissinger)
+  Changed $AN to $(AN) in Makefile.am.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
