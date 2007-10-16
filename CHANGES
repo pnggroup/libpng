@@ -1994,6 +1994,10 @@ version 1.2.23beta02 [October 16, 2007]
   Eliminated png_strncpy() and png_strcpy() (Pierre Poissinger)
   Changed $AN to $(AN) in Makefile.am.
 
+version 1.2.23beta03 [October 16, 2007]
+  Fixed off-by-one error in pngset.c
+  Restore statement to set last character of buffer to \0 in pngerror.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

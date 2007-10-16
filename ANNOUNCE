@@ -1,5 +1,5 @@
 
-Libpng 1.2.23beta02 - October 16, 2007
+Libpng 1.2.23beta03 - October 16, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.23beta02.tar.gz
-   libpng-1.2.23beta02.tar.bz2
+   libpng-1.2.23beta03.tar.gz
+   libpng-1.2.23beta03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.23beta02-no-config.tar.gz
-   libpng-1.2.23beta02-no-config.tar.bz2
+   libpng-1.2.23beta03-no-config.tar.gz
+   libpng-1.2.23beta03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1223b02.zip
-   lp1223b02.tar.bz2
+   lp1223b03.zip
+   lp1223b03.tar.bz2
 
 Project files
 
-   libpng-1.2.23beta02-project-netware.zip
-   libpng-1.2.23beta02-project-wince.zip
+   libpng-1.2.23beta03-project-netware.zip
+   libpng-1.2.23beta03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.23beta02-README.txt
-   libpng-1.2.23beta02-KNOWNBUGS.txt
-   libpng-1.2.23beta02-LICENSE.txt
-   libpng-1.2.23beta02-Y2K-compliance.txt
+   libpng-1.2.23beta03-README.txt
+   libpng-1.2.23beta03-KNOWNBUGS.txt
+   libpng-1.2.23beta03-LICENSE.txt
+   libpng-1.2.23beta03-Y2K-compliance.txt
 
 Changes since the last public release (1.2.19):
 
@@ -136,6 +136,10 @@ version 1.2.23beta01 [October 15, 2007]
 version 1.2.23beta02 [October 16, 2007]
   Eliminated png_strncpy() and png_strcpy() (Pierre Poissinger)
   Changed $AN to $(AN) in Makefile.am.
+
+version 1.2.23beta03 [October 16, 2007]
+  Fixed off-by-one error in pngset.c
+  Restore statement to set last character of buffer to \0 in pngerror.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

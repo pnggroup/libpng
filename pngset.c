@@ -1043,7 +1043,7 @@ png_set_unknown_chunks(png_structp png_ptr,
         png_memcpy((png_charp)to->name, 
                    (png_charp)from->name, 
                    png_sizeof(from->name));
-        to->name[png_sizeof(to->name)] = '\0';
+        to->name[png_sizeof(to->name)-1] = '\0';
 
         to->data = (png_bytep)png_malloc_warn(png_ptr, from->size);
         if (to->data == NULL)

@@ -168,6 +168,7 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
       buffer[iout++] = ':';
       buffer[iout++] = ' ';
       png_memcpy(buffer+iout, error_message, PNG_MAX_ERROR_TEXT);
+      buffer[iout+PNG_MAX_ERROR_TEXT-1] = '\0';
    }
 }
 
