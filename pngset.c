@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.22 [October 16, 2007]
+ * Last changed in libpng 1.2.22 [October 23, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -41,7 +41,13 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
    png_debug1(1, "in %s storage function\n", "cHRM");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
-
+   if (!(white_x || white_y || red_x || red_y || green_x || green_y ||
+       blue_x || blue_y))
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set all-zero chromaticity values");
+      return;
+   }
    if (white_x < 0.0 || white_y < 0.0 ||
          red_x < 0.0 ||   red_y < 0.0 ||
        green_x < 0.0 || green_y < 0.0 ||
@@ -93,6 +99,13 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (!(white_x || white_y || red_x || red_y || green_x || green_y ||
+       blue_x || blue_y))
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set all-zero chromaticity values");
+      return;
+   }
    if (white_x < 0 || white_y < 0 ||
          red_x < 0 ||   red_y < 0 ||
        green_x < 0 || green_y < 0 ||

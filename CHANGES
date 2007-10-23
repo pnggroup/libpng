@@ -1998,6 +1998,9 @@ version 1.2.23beta03 [October 16, 2007]
   Fixed off-by-one error in pngset.c
   Restore statement to set last character of buffer to \0 in pngerror.c
 
+version 1.2.23beta04 [October 23, 2007]
+  Reject attempt to set all-zero cHRM values.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
