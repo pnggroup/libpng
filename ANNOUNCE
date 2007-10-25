@@ -1,5 +1,5 @@
 
-Libpng 1.2.23beta04 - October 23, 2007
+Libpng 1.2.23beta05 - October 25, 2007
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.23beta04.tar.gz
-   libpng-1.2.23beta04.tar.bz2
+   libpng-1.2.23beta05.tar.gz
+   libpng-1.2.23beta05.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.23beta04-no-config.tar.gz
-   libpng-1.2.23beta04-no-config.tar.bz2
+   libpng-1.2.23beta05-no-config.tar.gz
+   libpng-1.2.23beta05-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1223b04.zip
-   lp1223b04.tar.bz2
+   lp1223b05.zip
+   lp1223b05.tar.bz2
 
 Project files
 
-   libpng-1.2.23beta04-project-netware.zip
-   libpng-1.2.23beta04-project-wince.zip
+   libpng-1.2.23beta05-project-netware.zip
+   libpng-1.2.23beta05-project-wince.zip
 
 Other information:
 
-   libpng-1.2.23beta04-README.txt
-   libpng-1.2.23beta04-KNOWNBUGS.txt
-   libpng-1.2.23beta04-LICENSE.txt
-   libpng-1.2.23beta04-Y2K-compliance.txt
+   libpng-1.2.23beta05-README.txt
+   libpng-1.2.23beta05-KNOWNBUGS.txt
+   libpng-1.2.23beta05-LICENSE.txt
+   libpng-1.2.23beta05-Y2K-compliance.txt
 
 Changes since the last public release (1.2.19):
 
@@ -62,7 +62,7 @@ version 1.2.20rc2 [August 27, 2007]
   Revised #ifdefs to ensure one and only one of pnggccrd.c, pngvcrd.c,
     or part of pngrutil.c is selected.
 
-version 1.2.20rc3 [October 23, 2007]
+version 1.2.20rc3 [October 25, 2007]
   Remove a little more code in pngwutil.c when PNG_NO_WRITE_FILTER is selected.
   Added /D _CRT_SECURE_NO_WARNINGS to visual6c and visualc71 projects.
   Compile png_mmx_support() in png.c even when PNG_NO_MMX_CODE is defined.
@@ -143,6 +143,9 @@ version 1.2.23beta03 [October 16, 2007]
 
 version 1.2.23beta04 [October 23, 2007]
   Reject attempt to set all-zero cHRM values.
+
+version 1.2.23beta05 [October 25, 2007]
+  Add missing quotes in projects/visualc6, lost in version 1.2.20rc3
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
