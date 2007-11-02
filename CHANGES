@@ -2001,8 +2001,11 @@ version 1.2.23beta03 [October 16, 2007]
 version 1.2.23beta04 [October 23, 2007]
   Reject attempt to set all-zero cHRM values.
 
-version 1.2.23beta05 [October 25, 2007]
+version 1.2.23beta05 [October 26]
   Add missing quotes in projects/visualc6, lost in version 1.2.20rc3
+
+version 1.2.23rc01 [November 2, 2007]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
