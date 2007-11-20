@@ -1,51 +1,55 @@
 
-Libpng 1.2.23 - November 6, 2007
+Libpng 1.2.24beta01 - November 20, 2007
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.23.tar.gz
-   libpng-1.2.23.tar.bz2
+   libpng-1.2.24beta01.tar.gz
+   libpng-1.2.24beta01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.23-no-config.tar.gz
-   libpng-1.2.23-no-config.tar.bz2
+   libpng-1.2.24beta01-no-config.tar.gz
+   libpng-1.2.24beta01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1223.zip
-   lpng1223.tar.bz2
+   lp1224b01.zip
+   lp1224b01.tar.bz2
 
 Project files
 
-   libpng-1.2.23-project-netware.zip
-   libpng-1.2.23-project-wince.zip
+   libpng-1.2.24beta01-project-netware.zip
+   libpng-1.2.24beta01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.23-README.txt
-   libpng-1.2.23-KNOWNBUGS.txt
-   libpng-1.2.23-LICENSE.txt
-   libpng-1.2.23-Y2K-compliance.txt
+   libpng-1.2.24beta01-README.txt
+   libpng-1.2.24beta01-KNOWNBUGS.txt
+   libpng-1.2.24beta01-LICENSE.txt
+   libpng-1.2.24beta01-Y2K-compliance.txt
 
-Changes since the last public release (1.2.22):
+Changes since the last public release (1.2.23):
 
-version 1.2.23 [November 6, 2007]
 
-  Reduced number of invocations of png_strlen() in pngset.c.
-  Changed [azAZ09_] to [_abcde...89] in Makefile.am for better localization.
-  Eliminated png_strncpy() and png_strcpy() (Pierre Poissinger)
-  Reject attempt to set all-zero cHRM values.
-  Add missing quotes in projects/visualc6 that were lost in version 1.2.20
+version 1.2.24beta01 [November 20, 2007]
+  Moved misplaced test for malloc failure in png_set_sPLT().  This bug was
+    introduced in libpng-1.2.20beta01.
+  Ifdef out avg_row etc from png.h and pngwrite.c when PNG_NO_WRITE_FILTER
+  Do not use png_ptr->free_fn and png_ptr->mem_fn in png_destroy_read_struct()
+    when png_ptr is NULL (Marshall Clow).
+  Updated handling of symbol prefixes in Makefile.am and configure.ac (Mike
+    Frysinger).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

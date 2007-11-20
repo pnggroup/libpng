@@ -18,15 +18,15 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.2.23], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.2.24beta01], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.2.23
+PNGLIB_VERSION=1.2.24beta01
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=2
-PNGLIB_RELEASE=23
+PNGLIB_RELEASE=24
 
 dnl End of version number stuff
 
@@ -83,6 +83,16 @@ else
     AC_MSG_WARN(*** You have not enabled versioned symbols.)
 fi
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
+
+if test "$have_ld_version_script" = "yes"; then
+    AC_MSG_CHECKING([for symbol prefix])
+    SYMBOL_PREFIX=`echo "PREFIX=__USER_LABEL_PREFIX__" \
+                   | ${CPP-${CC-gcc} -E} - 2>&1 \
+                   | ${EGREP-grep} "^PREFIX=" \
+                   | ${SED-sed} "s:^PREFIX=::"`
+    AC_SUBST(SYMBOL_PREFIX)
+    AC_MSG_RESULT($SYMBOL_PREFIX)
+fi
 
 # Substitutions for .in files
 AC_SUBST(PNGLIB_VERSION)

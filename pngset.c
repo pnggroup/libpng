@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.22 [November 6, 2007]
+ * Last changed in libpng 1.2.24 [November 20, 2007]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -995,12 +995,8 @@ png_set_sPLT(png_structp png_ptr,
            png_warning(png_ptr,
              "Out of memory while processing sPLT chunk");
         }
-        /* TODO: use png_malloc_warn */
         png_memcpy(to->name, from->name, length);
         to->entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,
-            from->nentries * png_sizeof(png_sPLT_entry));
-        /* TODO: use png_malloc_warn */
-        png_memcpy(to->entries, from->entries,
             from->nentries * png_sizeof(png_sPLT_entry));
         if (to->entries == NULL)
         {
@@ -1009,6 +1005,8 @@ png_set_sPLT(png_structp png_ptr,
            png_free(png_ptr,to->name);
            to->name = NULL;
         }
+        png_memcpy(to->entries, from->entries,
+            from->nentries * png_sizeof(png_sPLT_entry));
         to->nentries = from->nentries;
         to->depth = from->depth;
     }
