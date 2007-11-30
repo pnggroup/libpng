@@ -2011,7 +2011,7 @@ version 1.2.23rc01 [November 2, 2007]
 version 1.2.23 [November 6, 2007]
   No changes.
 
-version 1.2.24beta01 [November 20, 2007]
+version 1.2.24beta01 [November 30, 2007]
   Moved misplaced test for malloc failure in png_set_sPLT().  This bug was
     introduced in libpng-1.2.20beta01.
   Ifdef out avg_row etc from png.h and pngwrite.c when PNG_NO_WRITE_FILTER
@@ -2019,6 +2019,10 @@ version 1.2.24beta01 [November 20, 2007]
     when png_ptr is NULL (Marshall Clow).
   Updated handling of symbol prefixes in Makefile.am and configure.ac (Mike
     Frysinger).
+
+version 1.2.24beta02 [November 30, 2007]
+  Removed a useless test and fixed incorrect test in png_set_cHRM_fixed()
+    (David Hill).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
