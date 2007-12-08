@@ -20,7 +20,7 @@ ZOBJS  = adler32$(O) crc32$(O) gzio$(O) \
 	 trees$(O) uncompr$(O) zutil$(O)
 
 OBJS  = pngm2pnm$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
-	pngpread$(O) pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) \
+	pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) \
 	pngset$(O) pngtrans$(O)  $(ZOBJS)
 
 # implicit make rules -------------------------------------------------------
