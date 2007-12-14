@@ -1,62 +1,60 @@
 
-Libpng 1.2.24rc01 - December 8, 2007
+Libpng 1.2.24 - December 14, 2007
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.24rc01.tar.gz
-   libpng-1.2.24rc01.tar.bz2
+   libpng-1.2.24.tar.gz
+   libpng-1.2.24.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.24rc01-no-config.tar.gz
-   libpng-1.2.24rc01-no-config.tar.bz2
+   libpng-1.2.24-no-config.tar.gz
+   libpng-1.2.24-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1224r01.zip
-   lp1224r01.tar.bz2
+   lpng1224.zip
+   lpng1224.tar.bz2
 
 Project files
 
-   libpng-1.2.24rc01-project-netware.zip
-   libpng-1.2.24rc01-project-wince.zip
+   libpng-1.2.24-project-netware.zip
+   libpng-1.2.24-project-wince.zip
 
 Other information:
 
-   libpng-1.2.24rc01-README.txt
-   libpng-1.2.24rc01-KNOWNBUGS.txt
-   libpng-1.2.24rc01-LICENSE.txt
-   libpng-1.2.24rc01-Y2K-compliance.txt
+   libpng-1.2.24-README.txt
+   libpng-1.2.24-KNOWNBUGS.txt
+   libpng-1.2.24-LICENSE.txt
+   libpng-1.2.24-Y2K-compliance.txt
 
 Changes since the last public release (1.2.23):
 
+version 1.2.24 [December 14, 2007]
 
-version 1.2.24beta01 [November 19, 2007]
   Moved misplaced test for malloc failure in png_set_sPLT().  This bug was
-    introduced in libpng-1.2.20beta01.
+    introduced in libpng-1.2.20.
   Ifdef out avg_row etc from png.h and pngwrite.c when PNG_NO_WRITE_FILTER
   Do not use png_ptr->free_fn and png_ptr->mem_fn in png_destroy_read_struct()
     when png_ptr is NULL (Marshall Clow).
   Updated handling of symbol prefixes in Makefile.am and configure.ac (Mike
     Frysinger).
-
-version 1.2.24beta02 [November 30, 2007]
   Removed a useless test and fixed incorrect test in png_set_cHRM_fixed()
     (David Hill).
+  Make sure not to redefine _BSD_SOURCE in pngconf.h
+  Revised gather.sh and makefile.std in contrib/pngminim to avoid compiling
+    unused files.
 
-version 1.2.24rc01 [December 8, 2007]
-  No changes.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

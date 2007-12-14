@@ -2024,8 +2024,13 @@ version 1.2.24beta02 [November 30, 2007]
   Removed a useless test and fixed incorrect test in png_set_cHRM_fixed()
     (David Hill).
 
-version 1.2.24rc01 [December 8, 2007]
+version 1.2.24rc01 [December 7, 2007]
   No changes.
+
+version 1.2.24     [December 14, 2007]
+  Make sure not to redefine _BSD_SOURCE in pngconf.h
+  Revised gather.sh and makefile.std in contrib/pngminim to avoid compiling
+    unused files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
