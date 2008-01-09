@@ -2027,10 +2027,13 @@ version 1.2.24beta02 [November 30, 2007]
 version 1.2.24rc01 [December 7, 2007]
   No changes.
 
-version 1.2.24     [December 14, 2007]
+version 1.2.24     [January 9, 2008]
   Make sure not to redefine _BSD_SOURCE in pngconf.h
   Revised gather.sh and makefile.std in contrib/pngminim to avoid compiling
     unused files.
+
+version 1.2.25beta1 [January 9, 2008]
+  Fixed bug with unknown chunk handling, introduced in version 1.2.17rc2
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
