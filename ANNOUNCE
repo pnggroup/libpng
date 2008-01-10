@@ -1,5 +1,5 @@
 
-Libpng 1.2.25beta01 - January 9, 2008
+Libpng 1.2.25beta02 - January 10, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.25beta01.tar.gz
-   libpng-1.2.25beta01.tar.bz2
+   libpng-1.2.25beta02.tar.gz
+   libpng-1.2.25beta02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.25beta01-no-config.tar.gz
-   libpng-1.2.25beta01-no-config.tar.bz2
+   libpng-1.2.25beta02-no-config.tar.gz
+   libpng-1.2.25beta02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1225b01.zip
-   lp1225b01.tar.bz2
+   lp1225b02.zip
+   lp1225b02.tar.bz2
 
 Project files
 
-   libpng-1.2.25beta01-project-netware.zip
-   libpng-1.2.25beta01-project-wince.zip
+   libpng-1.2.25beta02-project-netware.zip
+   libpng-1.2.25beta02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.25beta01-README.txt
-   libpng-1.2.25beta01-KNOWNBUGS.txt
-   libpng-1.2.25beta01-LICENSE.txt
-   libpng-1.2.25beta01-Y2K-compliance.txt
+   libpng-1.2.25beta02-README.txt
+   libpng-1.2.25beta02-KNOWNBUGS.txt
+   libpng-1.2.25beta02-LICENSE.txt
+   libpng-1.2.25beta02-Y2K-compliance.txt
 
 Changes since the last public release (1.2.23):
 
@@ -60,8 +60,12 @@ version 1.2.24     [December 14, 2007]]
   Revised gather.sh and makefile.std in contrib/pngminim to avoid compiling
     unused files.
 
-version 1.2.25beta1 [January 9, 2008]
+version 1.2.25beta01 [January 7, 2008]
   Fixed bug with unknown chunk handling, introduced in version 1.2.17rc2
+
+version 1.2.25beta02 [January 10, 2008]
+  Prevent gamma from being applied twice.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
