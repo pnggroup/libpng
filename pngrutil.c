@@ -1,9 +1,9 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.22 [October 13, 2007]
+ * Last changed in libpng 1.2.25 [January 17, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -2223,9 +2223,10 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
            length = (png_uint_32)65535L;
        }
 #endif
-       png_strncpy((png_charp)png_ptr->unknown_chunk.name,
-	 (png_charp)png_ptr->chunk_name, 4);
-       png_ptr->unknown_chunk.name[4] = '\0';
+       png_memcpy((png_charp)png_ptr->unknown_chunk.name,
+                  (png_charp)png_ptr->chunk_name, 
+                  png_sizeof(png_ptr->unknown_chunk.name));
+       png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name)-1] = '\0';
        png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr, length);
        png_ptr->unknown_chunk.size = (png_size_t)length;
        png_crc_read(png_ptr, (png_bytep)png_ptr->unknown_chunk.data, length);
@@ -2248,9 +2249,9 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                &png_ptr->unknown_chunk, 1);
           }
        }
-#else
-       png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
+       else
 #endif
+         png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
        png_free(png_ptr, png_ptr->unknown_chunk.data);
        png_ptr->unknown_chunk.data = NULL;
    }
