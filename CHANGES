@@ -2038,8 +2038,17 @@ version 1.2.25beta01 [January 7, 2008]
 version 1.2.25beta02 [January 10, 2008]
   Prevent gamma from being applied twice.
 
-version 1.2.25rc01 [January 17, 2008]
+version 1.2.25rc01 [January 17, 2001]
   No changes.
+
+version 1.2.25beta03 [January 22, 2008]
+  Fixed some continue-after-malloc-failure errors in pngset.c (David Hill)
+  Check for info_ptr == NULL in png_read_info() and png_process_data().
+  Check for possible use of NULL user_png_ver[] in png_create_read_struct().
+  Change "if (swidth == NULL)" to "if (sheight == NULL)" in png_handle_sCAL
+    (bug introduced in libpng-1.2.4/1.0.13).
+  Return from png_destroy_read_struct() if png_ptr_ptr is NULL.
+  Fix overflow of "msg" in png_decompres_chunk().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
