@@ -1,5 +1,5 @@
 
-Libpng 1.2.25beta04 - January 26, 2008
+Libpng 1.2.25beta05 - February 1, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,32 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.25beta04.tar.gz
-   libpng-1.2.25beta04.tar.bz2
+   libpng-1.2.25beta05.tar.gz
+   libpng-1.2.25beta05.tar.lzma
+     (Get the lzma codec from <http://tukaani.org/lzma>).
+   libpng-1.2.25beta05.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.25beta04-no-config.tar.gz
-   libpng-1.2.25beta04-no-config.tar.bz2
+   libpng-1.2.25beta05-no-config.tar.gz
+   libpng-1.2.25beta05-no-config.tar.lzma
+   libpng-1.2.25beta05-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1225b04.zip
-   lp1225b04.tar.bz2
+   lp1225b05.zip
+   lp1225b05.tar.bz2
 
 Project files
 
-   libpng-1.2.25beta04-project-netware.zip
-   libpng-1.2.25beta04-project-wince.zip
+   libpng-1.2.25beta05-project-netware.zip
+   libpng-1.2.25beta05-project-wince.zip
 
 Other information:
 
-   libpng-1.2.25beta04-README.txt
-   libpng-1.2.25beta04-KNOWNBUGS.txt
-   libpng-1.2.25beta04-LICENSE.txt
-   libpng-1.2.25beta04-Y2K-compliance.txt
+   libpng-1.2.25beta05-README.txt
+   libpng-1.2.25beta05-KNOWNBUGS.txt
+   libpng-1.2.25beta05-LICENSE.txt
+   libpng-1.2.25beta05-Y2K-compliance.txt
+   libpng-1.2.25beta05-[previous version]-diff.txt
 
 Changes since the last public release (1.2.23):
 
@@ -76,9 +80,14 @@ version 1.2.25beta03 [January 22, 2008]
   Return from png_destroy_read_struct() if png_ptr_ptr is NULL.
   Fix overflow of "msg" in png_decompres_chunk().
 
-version 1.2.25beta03 [January 26, 2008]
+version 1.2.25beta04 [January 26, 2008]
   Work around Coverity bug report by slightly refactoring
     png_read_push_finish_row()
+
+version 1.2.25rc02 [February 1, 2008]
+  Added libpng-1.2.25rc02.tar.lzma to distribution.  Get the lzma codec
+    from <http://tukaani.org/lzma>.
+  Fixed some broken links in the README file.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

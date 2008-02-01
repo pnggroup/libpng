@@ -2050,9 +2050,14 @@ version 1.2.25beta03 [January 22, 2008]
   Return from png_destroy_read_struct() if png_ptr_ptr is NULL.
   Fix overflow of "msg" in png_decompres_chunk().
 
-version 1.2.25beta03 [January 26, 2008]
+version 1.2.25beta04 [January 26, 2008]
   Work around Coverity bug report by slightly refactoring
     png_read_push_finish_row()
+
+version 1.2.25rc02 [February 1, 2008]
+  Added libpng-1.2.25rc02.tar.lzma to distribution.  Get the lzma codec
+    from <http://tukaani.org/lzma>.
+  Fixed some broken links in the README file.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
