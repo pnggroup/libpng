@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.25 [February 1, 2008]
+ * Last changed in libpng 1.2.25 [February 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1113,13 +1113,14 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    if (png_ptr_ptr != NULL)
    {
       png_ptr = *png_ptr_ptr;
-#ifdef PNG_USER_MEM_SUPPORTED
-      free_fn = png_ptr->free_fn;
-      mem_ptr = png_ptr->mem_ptr;
-#endif
    }
-   else
+   if (png_ptr == NULL)
       return;
+
+#ifdef PNG_USER_MEM_SUPPORTED
+   free_fn = png_ptr->free_fn;
+   mem_ptr = png_ptr->mem_ptr;
+#endif
 
    if (info_ptr_ptr != NULL)
       info_ptr = *info_ptr_ptr;
@@ -1158,16 +1159,13 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
       *end_info_ptr_ptr = NULL;
    }
 
-   if (png_ptr != NULL)
-   {
 #ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)png_ptr, (png_free_ptr)free_fn,
-          (png_voidp)mem_ptr);
+   png_destroy_struct_2((png_voidp)png_ptr, (png_free_ptr)free_fn,
+       (png_voidp)mem_ptr);
 #else
-      png_destroy_struct((png_voidp)png_ptr);
+   png_destroy_struct((png_voidp)png_ptr);
 #endif
-      *png_ptr_ptr = NULL;
-   }
+   *png_ptr_ptr = NULL;
 }
 
 /* free all memory used by the read (old method) */

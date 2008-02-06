@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.25 [February 1, 2008]
+ * Last changed in libpng 1.2.25 [February 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1018,20 +1018,22 @@ png_read_push_finish_row(png_structp png_ptr)
          png_ptr->rowbytes + 1);
       do
       {
-         png_ptr->pass++;
-         if ((png_ptr->pass == 1 && png_ptr->width < 5) ||
-             (png_ptr->pass == 3 && png_ptr->width < 3) ||
-             (png_ptr->pass == 5 && png_ptr->width < 2))
-           png_ptr->pass++;
+         png_byte pass;
+         pass = png_ptr->pass;
+         pass++;
+         if ((pass == 1 && png_ptr->width < 5) ||
+             (pass == 3 && png_ptr->width < 3) ||
+             (pass == 5 && png_ptr->width < 2))
+           pass++;
 
-         if (png_ptr->pass > 7)
-            png_ptr->pass--;
-         if (png_ptr->pass < 7)
+         if (pass > 7)
+            pass--;
+         if (pass < 7)
            {
              png_ptr->iwidth = (png_ptr->width +
-                png_pass_inc[png_ptr->pass] - 1 -
-                png_pass_start[png_ptr->pass]) /
-                png_pass_inc[png_ptr->pass];
+                png_pass_inc[pass] - 1 -
+                png_pass_start[pass]) /
+                png_pass_inc[pass];
 
              png_ptr->irowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,
                 png_ptr->iwidth) + 1;
@@ -1040,12 +1042,13 @@ png_read_push_finish_row(png_structp png_ptr)
                 break;
 
              png_ptr->num_rows = (png_ptr->height +
-                png_pass_yinc[png_ptr->pass] - 1 -
-                png_pass_ystart[png_ptr->pass]) /
-                png_pass_yinc[png_ptr->pass];
+                png_pass_yinc[pass] - 1 -
+                png_pass_ystart[pass]) /
+                png_pass_yinc[pass];
            }
          else
            break;
+         png_ptr->pass = pass;
 
       } while (png_ptr->iwidth == 0 || png_ptr->num_rows == 0);
    }

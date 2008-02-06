@@ -1,5 +1,5 @@
 
-Libpng 1.2.25beta05 - February 1, 2008
+Libpng 1.2.25beta06 - February 6, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.25beta05.tar.gz
-   libpng-1.2.25beta05.tar.lzma
+   libpng-1.2.25beta06.tar.gz
+   libpng-1.2.25beta06.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.25beta05.tar.bz2
+   libpng-1.2.25beta06.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.25beta05-no-config.tar.gz
-   libpng-1.2.25beta05-no-config.tar.lzma
-   libpng-1.2.25beta05-no-config.tar.bz2
+   libpng-1.2.25beta06-no-config.tar.gz
+   libpng-1.2.25beta06-no-config.tar.lzma
+   libpng-1.2.25beta06-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1225b05.zip
-   lp1225b05.tar.bz2
+   lp1225b06.zip
+   lp1225b06.7z
+   lp1225b06.tar.bz2
 
 Project files
 
-   libpng-1.2.25beta05-project-netware.zip
-   libpng-1.2.25beta05-project-wince.zip
+   libpng-1.2.25beta06-project-netware.zip
+   libpng-1.2.25beta06-project-wince.zip
 
 Other information:
 
-   libpng-1.2.25beta05-README.txt
-   libpng-1.2.25beta05-KNOWNBUGS.txt
-   libpng-1.2.25beta05-LICENSE.txt
-   libpng-1.2.25beta05-Y2K-compliance.txt
-   libpng-1.2.25beta05-[previous version]-diff.txt
+   libpng-1.2.25beta06-README.txt
+   libpng-1.2.25beta06-KNOWNBUGS.txt
+   libpng-1.2.25beta06-LICENSE.txt
+   libpng-1.2.25beta06-Y2K-compliance.txt
+   libpng-1.2.25beta06-[previous version]-diff.txt
 
 Changes since the last public release (1.2.23):
 
@@ -84,10 +85,20 @@ version 1.2.25beta04 [January 26, 2008]
   Work around Coverity bug report by slightly refactoring
     png_read_push_finish_row()
 
-version 1.2.25rc02 [February 1, 2008]
-  Added libpng-1.2.25rc02.tar.lzma to distribution.  Get the lzma codec
+version 1.2.25beta05 [January 31, 2008]
+  Added libpng-1.2.25beta05.tar.lzma to distribution.  Get the lzma codec
     from <http://tukaani.org/lzma>.
+  Added lp1225b05.7z to distribution.  Get the 7-zip decoder from
+    from <http://www.7-zip.org>.
   Fixed some broken links in the README file.
+
+version 1.2.25beta06 [February 6, 2008]
+  Refactored png_read_push_finish_row() again, trying to satisfy Coverity.
+  Fixed potential NULL dereference of png_ptr in png_destroy_write_struct();
+  clarified potential NULL dereference of png_ptr in png_destroy_read_struct();
+  fixed potential NULL dereference of info_ptr in png_handle_bKGD();
+  fixed potential NULL dereference of user_png_ver[] in
+    png_create_write_struct_2(). (Coverity)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
