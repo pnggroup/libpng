@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.25 [February 6, 2008]
+ * Last changed in libpng 1.2.25 [February 10, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1018,7 +1018,7 @@ png_read_push_finish_row(png_structp png_ptr)
          png_ptr->rowbytes + 1);
       do
       {
-         png_byte pass;
+         int pass;
          pass = png_ptr->pass;
          pass++;
          if ((pass == 1 && png_ptr->width < 5) ||
@@ -1028,6 +1028,7 @@ png_read_push_finish_row(png_structp png_ptr)
 
          if (pass > 7)
             pass--;
+         png_ptr->pass = (png_byte) pass;
          if (pass < 7)
            {
              png_ptr->iwidth = (png_ptr->width +
@@ -1048,7 +1049,6 @@ png_read_push_finish_row(png_structp png_ptr)
            }
          else
            break;
-         png_ptr->pass = pass;
 
       } while (png_ptr->iwidth == 0 || png_ptr->num_rows == 0);
    }

@@ -2069,6 +2069,10 @@ version 1.2.25beta06 [February 6, 2008]
   fixed potential NULL dereference of user_png_ver[] in
     png_create_write_struct_2(). (Coverity)
 
+version 1.2.25rc02 [February 10, 2008]
+  Reset png_ptr->pass in png_read_push_finish_row() before break.
+  Changed "pass" from png_byte to int.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

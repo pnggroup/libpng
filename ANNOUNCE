@@ -1,5 +1,5 @@
 
-Libpng 1.2.25beta06 - February 6, 2008
+Libpng 1.2.25rc02 - February 10, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.25beta06.tar.gz
-   libpng-1.2.25beta06.tar.lzma
+   libpng-1.2.25rc02.tar.gz
+   libpng-1.2.25rc02.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.25beta06.tar.bz2
+   libpng-1.2.25rc02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.25beta06-no-config.tar.gz
-   libpng-1.2.25beta06-no-config.tar.lzma
-   libpng-1.2.25beta06-no-config.tar.bz2
+   libpng-1.2.25rc02-no-config.tar.gz
+   libpng-1.2.25rc02-no-config.tar.lzma
+   libpng-1.2.25rc02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1225b06.zip
-   lp1225b06.7z
-   lp1225b06.tar.bz2
+   lp1225r02.zip
+   lp1225r02.7z
+   lp1225r02.tar.bz2
 
 Project files
 
-   libpng-1.2.25beta06-project-netware.zip
-   libpng-1.2.25beta06-project-wince.zip
+   libpng-1.2.25rc02-project-netware.zip
+   libpng-1.2.25rc02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.25beta06-README.txt
-   libpng-1.2.25beta06-KNOWNBUGS.txt
-   libpng-1.2.25beta06-LICENSE.txt
-   libpng-1.2.25beta06-Y2K-compliance.txt
-   libpng-1.2.25beta06-[previous version]-diff.txt
+   libpng-1.2.25rc02-README.txt
+   libpng-1.2.25rc02-KNOWNBUGS.txt
+   libpng-1.2.25rc02-LICENSE.txt
+   libpng-1.2.25rc02-Y2K-compliance.txt
+   libpng-1.2.25rc02-[previous version]-diff.txt
 
 Changes since the last public release (1.2.23):
 
@@ -99,6 +99,10 @@ version 1.2.25beta06 [February 6, 2008]
   fixed potential NULL dereference of info_ptr in png_handle_bKGD();
   fixed potential NULL dereference of user_png_ver[] in
     png_create_write_struct_2(). (Coverity)
+
+version 1.2.25rc02 [February 10, 2008]
+  Reset png_ptr->pass in png_read_push_finish_row() before break.
+  Changed "pass" from png_byte to int.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
