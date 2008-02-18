@@ -1,111 +1,68 @@
 
-Libpng 1.2.25rc02 - February 10, 2008
+Libpng 1.2.25 - February 18, 2008
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.25rc02.tar.gz
-   libpng-1.2.25rc02.tar.lzma
+   libpng-1.2.25.tar.gz
+   libpng-1.2.25.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.25rc02.tar.bz2
+   libpng-1.2.25.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.25rc02-no-config.tar.gz
-   libpng-1.2.25rc02-no-config.tar.lzma
-   libpng-1.2.25rc02-no-config.tar.bz2
+   libpng-1.2.25-no-config.tar.gz
+   libpng-1.2.25-no-config.tar.lzma
+   libpng-1.2.25-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1225r02.zip
-   lp1225r02.7z
-   lp1225r02.tar.bz2
+   lpng1225.zip
+   lpng1225.7z
+   lpng1225.tar.bz2
 
 Project files
 
-   libpng-1.2.25rc02-project-netware.zip
-   libpng-1.2.25rc02-project-wince.zip
+   libpng-1.2.25-project-netware.zip
+   libpng-1.2.25-project-wince.zip
 
 Other information:
 
-   libpng-1.2.25rc02-README.txt
-   libpng-1.2.25rc02-KNOWNBUGS.txt
-   libpng-1.2.25rc02-LICENSE.txt
-   libpng-1.2.25rc02-Y2K-compliance.txt
-   libpng-1.2.25rc02-[previous version]-diff.txt
+   libpng-1.2.25-README.txt
+   libpng-1.2.25-KNOWNBUGS.txt
+   libpng-1.2.25-LICENSE.txt
+   libpng-1.2.25-Y2K-compliance.txt
+   libpng-1.2.25-1.2.24-diff.txt
 
-Changes since the last public release (1.2.23):
+Changes since the last public release (1.2.24):
 
+version 1.2.25 [February 18, 2008]
 
-version 1.2.24beta01 [November 19, 2007]
-  Moved misplaced test for malloc failure in png_set_sPLT().  This bug was
-    introduced in libpng-1.2.20beta01.
-  Ifdef out avg_row etc from png.h and pngwrite.c when PNG_NO_WRITE_FILTER
-  Do not use png_ptr->free_fn and png_ptr->mem_fn in png_destroy_read_struct()
-    when png_ptr is NULL (Marshall Clow).
-  Updated handling of symbol prefixes in Makefile.am and configure.ac (Mike
-    Frysinger).
-
-version 1.2.24beta02 [November 30, 2007]
-  Removed a useless test and fixed incorrect test in png_set_cHRM_fixed()
-    (David Hill).
-
-version 1.2.24rc01 [December 7, 2007]
-  No changes.
-
-version 1.2.24     [December 14, 2007]]
-  Make sure not to redefine _BSD_SOURCE in pngconf.h
-  Revised gather.sh and makefile.std in contrib/pngminim to avoid compiling
-    unused files.
-
-version 1.2.25beta01 [January 7, 2008]
-  Fixed bug with unknown chunk handling, introduced in version 1.2.17rc2
-
-version 1.2.25beta02 [January 10, 2008]
+  Fixed bug with unknown chunk handling, introduced in version 1.2.17
   Prevent gamma from being applied twice.
-
-version 1.2.25rc01 [January 17, 2008]
-  No changes.
-
-version 1.2.25beta03 [January 22, 2008]
   Fixed some continue-after-malloc-failure errors in pngset.c (David Hill)
   Check for info_ptr == NULL in png_read_info() and png_process_data().
   Check for possible use of NULL user_png_ver[] in png_create_read_struct().
-  Return from png_destroy_read_struct() if png_ptr_ptr is NULL.
   Fix overflow of "msg" in png_decompres_chunk().
-
-version 1.2.25beta04 [January 26, 2008]
-  Work around Coverity bug report by slightly refactoring
-    png_read_push_finish_row()
-
-version 1.2.25beta05 [January 31, 2008]
-  Added libpng-1.2.25beta05.tar.lzma to distribution.  Get the lzma codec
+  Added libpng-1.2.25.tar.lzma to distribution.  Get the lzma codec
     from <http://tukaani.org/lzma>.
-  Added lp1225b05.7z to distribution.  Get the 7-zip decoder from
+  Added lpng1225.7z to distribution.  Get the 7-zip decoder from
     from <http://www.7-zip.org>.
   Fixed some broken links in the README file.
-
-version 1.2.25beta06 [February 6, 2008]
-  Refactored png_read_push_finish_row() again, trying to satisfy Coverity.
+  Refactored png_read_push_finish_row() slightly, trying to satisfy Coverity.
   Fixed potential NULL dereference of png_ptr in png_destroy_write_struct();
   clarified potential NULL dereference of png_ptr in png_destroy_read_struct();
   fixed potential NULL dereference of info_ptr in png_handle_bKGD();
   fixed potential NULL dereference of user_png_ver[] in
     png_create_write_struct_2(). (Coverity)
 
-version 1.2.25rc02 [February 10, 2008]
-  Reset png_ptr->pass in png_read_push_finish_row() before break.
-  Changed "pass" from png_byte to int.
-
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
