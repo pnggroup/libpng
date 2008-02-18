@@ -1,9 +1,9 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.24 [December 14, 2007]
+ * Last changed in libpng 1.2.25 [February 18, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -488,6 +488,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    {
       png_warning(png_ptr,
        "Memory allocation failed while processing sCAL.");
+      return;
    }
    png_memcpy(info_ptr->scal_s_width, swidth, (png_size_t)length);
 
@@ -499,9 +500,9 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
       png_free (png_ptr, info_ptr->scal_s_width);
       png_warning(png_ptr,
        "Memory allocation failed while processing sCAL.");
+      return;
    }
    png_memcpy(info_ptr->scal_s_height, sheight, (png_size_t)length);
-
    info_ptr->valid |= PNG_INFO_sCAL;
 #ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_SCAL;
@@ -983,6 +984,7 @@ png_set_sPLT(png_structp png_ptr,
         {
            png_warning(png_ptr,
              "Out of memory while processing sPLT chunk");
+           continue;
         }
         png_memcpy(to->name, from->name, length);
         to->entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,
@@ -993,6 +995,7 @@ png_set_sPLT(png_structp png_ptr,
              "Out of memory while processing sPLT chunk");
            png_free(png_ptr,to->name);
            to->name = NULL;
+           continue;
         }
         png_memcpy(to->entries, from->entries,
             from->nentries * png_sizeof(png_sPLT_entry));

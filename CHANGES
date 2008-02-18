@@ -2030,6 +2030,41 @@ version 1.2.25beta02 [January 10, 2008]
 version 1.2.25rc01 [January 17, 2008]
   No changes.
 
+version 1.2.25beta03 [January 22, 2008]
+  Fixed some continue-after-malloc-failure errors in pngset.c (David Hill)
+  Check for info_ptr == NULL in png_read_info() and png_process_data().
+  Check for possible use of NULL user_png_ver[] in png_create_read_struct().
+  Change "if (swidth == NULL)" to "if (sheight == NULL)" in png_handle_sCAL
+    (bug introduced in libpng-1.2.4/1.0.13).
+  Return from png_destroy_read_struct() if png_ptr_ptr is NULL.
+  Fix overflow of "msg" in png_decompres_chunk().
+
+version 1.2.25beta04 [January 26, 2008]
+  Work around Coverity bug report by slightly refactoring
+    png_read_push_finish_row()
+
+version 1.2.25beta05 [January 31, 2008]
+  Added libpng-1.2.25beta05.tar.lzma to distribution.  Get the lzma codec
+    from <http://tukaani.org/lzma>.
+  Added lp1225b05.7z to distribution.  Get the 7-zip decoder from
+    from <http://www.7-zip.org>.
+  Fixed some broken links in the README file.
+
+version 1.2.25beta06 [February 6, 2008]
+  Refactored png_read_push_finish_row() again, trying to satisfy Coverity.
+  Fixed potential NULL dereference of png_ptr in png_destroy_write_struct();
+  clarified potential NULL dereference of png_ptr in png_destroy_read_struct();
+  fixed potential NULL dereference of info_ptr in png_handle_bKGD();
+  fixed potential NULL dereference of user_png_ver[] in
+    png_create_write_struct_2(). (Coverity)
+
+version 1.2.25rc02 [February 10, 2008]
+  Reset png_ptr->pass in png_read_push_finish_row() before break.
+  Changed "pass" from png_byte to int.
+
+version 1.2.25 and 1.0.31 [February 18, 2008]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
