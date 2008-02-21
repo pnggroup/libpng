@@ -2048,7 +2048,7 @@ version 1.2.25beta03 [January 22, 2008]
   Change "if (swidth == NULL)" to "if (sheight == NULL)" in png_handle_sCAL
     (bug introduced in libpng-1.2.4/1.0.13).
   Return from png_destroy_read_struct() if png_ptr_ptr is NULL.
-  Fix overflow of "msg" in png_decompres_chunk().
+  Fix overflow of "msg" in png_decompress_chunk().
 
 version 1.2.25beta04 [January 26, 2008]
   Work around Coverity bug report by slightly refactoring
@@ -2075,6 +2075,9 @@ version 1.2.25rc02 [February 10, 2008]
 
 version 1.2.25 and 1.0.31 [February 18, 2008]
   No changes.
+
+version 1.2.26beta01 [February 21, 2008]
+  Added missing "(" in pngmem.c.  Bug introduced in libpng-1.2.2/1.0.13
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
