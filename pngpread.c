@@ -224,6 +224,8 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {
+         if (png_ptr->push_length != 13)
+            png_error(png_ptr, "Invalid IHDR length");
          png_push_save_buffer(png_ptr);
          return;
       }
