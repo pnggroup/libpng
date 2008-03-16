@@ -2079,9 +2079,13 @@ version 1.2.25 and 1.0.31 [February 18, 2008]
 version 1.2.26beta01 [February 21, 2008]
   Added missing "(" in pngmem.c.  Bug introduced in libpng-1.2.2/1.0.13
 
-version 1.2.26beta02 [March 13, 2008]
+version 1.2.26beta02 [March 12, 2008]
   Refined error message returned from deflateInit2 in pngwutil.c
   Check IHDR length in png_push_read_chunk() before saving it.
+
+version 1.2.26beta03 [March 16, 2008]
+  Revised contrib/gregbook to handle premature end-of-file and file
+    read errors correctly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -23,10 +23,11 @@
               command-line parsing bug
     - 1.10:  enabled "message window"/console (thanks to David Geldreich)
     - 2.00:  dual-licensed (added GNU GPL)
+    - 2.01:  fixed improper display of usage screen on PNG error(s)
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2007 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -77,7 +78,7 @@
 
 #define PROGNAME  "rpng-win"
 #define LONGNAME  "Simple PNG Viewer for Windows"
-#define VERSION   "2.00 of 2 June 2007"
+#define VERSION   "2.01 of 16 March 2008"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -271,40 +272,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         }
     }
 
-    if (!filename) {
+    if (!filename)
         ++error;
-    } else if (!(infile = fopen(filename, "rb"))) {
-        fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
-        ++error;
-    } else {
-        if ((rc = readpng_init(infile, &image_width, &image_height)) != 0) {
-            switch (rc) {
-                case 1:
-                    fprintf(stderr, PROGNAME
-                      ":  [%s] is not a PNG file: incorrect signature\n",
-                      filename);
-                    break;
-                case 2:
-                    fprintf(stderr, PROGNAME
-                      ":  [%s] has bad IHDR (libpng longjmp)\n",
-                      filename);
-                    break;
-                case 4:
-                    fprintf(stderr, PROGNAME ":  insufficient memory\n");
-                    break;
-                default:
-                    fprintf(stderr, PROGNAME
-                      ":  unknown readpng_init() error\n");
-                    break;
-            }
-            ++error;
-        }
-        if (error)
-            fclose(infile);
-    }
 
 
-    /* usage screen */
+    /* print usage screen if any errors up to this point */
 
     if (error) {
         int ch;
@@ -327,6 +299,47 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             ch = _getch();
         while (ch != 'q' && ch != 'Q' && ch != 0x1B);
         exit(1);
+    }
+
+
+    if (!(infile = fopen(filename, "rb"))) {
+        fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
+        ++error;
+    } else {
+        if ((rc = readpng_init(infile, &image_width, &image_height)) != 0) {
+            switch (rc) {
+                case 1:
+                    fprintf(stderr, PROGNAME
+                      ":  [%s] is not a PNG file: incorrect signature\n",
+                      filename);
+                    break;
+                case 2:
+                    fprintf(stderr, PROGNAME
+                      ":  [%s] has bad IHDR (libpng longjmp)\n", filename);
+                    break;
+                case 4:
+                    fprintf(stderr, PROGNAME ":  insufficient memory\n");
+                    break;
+                default:
+                    fprintf(stderr, PROGNAME
+                      ":  unknown readpng_init() error\n");
+                    break;
+            }
+            ++error;
+        }
+        if (error)
+            fclose(infile);
+    }
+
+
+    if (error) {
+        int ch;
+
+        fprintf(stderr, PROGNAME ":  aborting.\n");
+        do
+            ch = _getch();
+        while (ch != 'q' && ch != 'Q' && ch != 0x1B);
+        exit(2);
     } else {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
         fprintf(stderr,

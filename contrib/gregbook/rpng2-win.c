@@ -10,7 +10,7 @@
    tweaking (or maybe not).  Thanks to Adam Costello and Pieter S. van der
    Meulen for the "diamond" and "radial waves" patterns, respectively.
 
-   to do:
+   to do (someday, maybe):
     - handle quoted command-line args (especially filenames with spaces)
     - finish resizable checkerboard-gradient (sizes 4-128?)
     - use %.1023s to simplify truncation of title-bar string?
@@ -29,10 +29,13 @@
     - 1.21:  made minor tweak to usage screen to fit within 25-line console
     - 1.22:  added AMD64/EM64T support (__x86_64__)
     - 2.00:  dual-licensed (added GNU GPL)
+    - 2.01:  fixed 64-bit typo in readpng2.c
+    - 2.02:  fixed improper display of usage screen on PNG error(s); fixed
+              unexpected-EOF and file-read-error cases
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2007 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
@@ -83,7 +86,7 @@
 
 #define PROGNAME  "rpng2-win"
 #define LONGNAME  "Progressive PNG Viewer for Windows"
-#define VERSION   "2.00 of 2 June 2007"
+#define VERSION   "2.02 of 16 March 2008"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -414,41 +417,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         }
     }
 
-    if (!filename) {
+    if (!filename)
         ++error;
-    } else if (!(infile = fopen(filename, "rb"))) {
-        fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
-        ++error;
-    } else {
-        incount = fread(inbuf, 1, INBUFSIZE, infile);
-        if (incount < 8 || !readpng2_check_sig(inbuf, 8)) {
-            fprintf(stderr, PROGNAME
-              ":  [%s] is not a PNG file: incorrect signature\n",
-              filename);
-            ++error;
-        } else if ((rc = readpng2_init(&rpng2_info)) != 0) {
-            switch (rc) {
-                case 2:
-                    fprintf(stderr, PROGNAME
-                      ":  [%s] has bad IHDR (libpng longjmp)\n",
-                      filename);
-                    break;
-                case 4:
-                    fprintf(stderr, PROGNAME ":  insufficient memory\n");
-                    break;
-                default:
-                    fprintf(stderr, PROGNAME
-                      ":  unknown readpng2_init() error\n");
-                    break;
-            }
-            ++error;
-        }
-        if (error)
-            fclose(infile);
-    }
 
 
-    /* usage screen */
+    /* print usage screen if any errors up to this point */
 
     if (error) {
         int ch;
@@ -488,6 +461,48 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             ch = _getch();
         while (ch != 'q' && ch != 'Q' && ch != 0x1B);
         exit(1);
+    }
+
+
+    if (!(infile = fopen(filename, "rb"))) {
+        fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
+        ++error;
+    } else {
+        incount = fread(inbuf, 1, INBUFSIZE, infile);
+        if (incount < 8 || !readpng2_check_sig(inbuf, 8)) {
+            fprintf(stderr, PROGNAME
+              ":  [%s] is not a PNG file: incorrect signature\n",
+              filename);
+            ++error;
+        } else if ((rc = readpng2_init(&rpng2_info)) != 0) {
+            switch (rc) {
+                case 2:
+                    fprintf(stderr, PROGNAME
+                      ":  [%s] has bad IHDR (libpng longjmp)\n", filename);
+                    break;
+                case 4:
+                    fprintf(stderr, PROGNAME ":  insufficient memory\n");
+                    break;
+                default:
+                    fprintf(stderr, PROGNAME
+                      ":  unknown readpng2_init() error\n");
+                    break;
+            }
+            ++error;
+        }
+        if (error)
+            fclose(infile);
+    }
+
+
+    if (error) {
+        int ch;
+
+        fprintf(stderr, PROGNAME ":  aborting.\n");
+        do
+            ch = _getch();
+        while (ch != 'q' && ch != 'Q' && ch != 0x1B);
+        exit(2);
     } else {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
         fprintf(stderr,
@@ -519,7 +534,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     } else
         rpng2_info.need_bgcolor = TRUE;
 
-    rpng2_info.done = FALSE;
+    rpng2_info.state = kPreInit;
     rpng2_info.mainprog_init = rpng2_win_init;
     rpng2_info.mainprog_display_row = rpng2_win_display_row;
     rpng2_info.mainprog_finish_display = rpng2_win_finish_display;
@@ -539,10 +554,27 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         if (readpng2_decode_data(&rpng2_info, inbuf, incount))
             ++error;
         Trace((stderr, "done with readpng2_decode_data()\n"))
-        if (error || feof(infile) || rpng2_info.done)
+
+        if (error || incount != INBUFSIZE || rpng2_info.state == kDone) {
+            if (rpng2_info.state == kDone) {
+                Trace((stderr, "done decoding PNG image\n"))
+            } else if (ferror(infile)) {
+                fprintf(stderr, PROGNAME
+                  ":  error while reading PNG image file\n");
+                exit(3);
+            } else if (feof(infile)) {
+                fprintf(stderr, PROGNAME ":  end of file reached "
+                  "(unexpectedly) while reading PNG image file\n");
+                exit(3);
+            } else /* if (error) */ {
+                // will print error message below
+            }
             break;
+        }
+
         if (timing)
             Sleep(1000L);
+
         incount = fread(inbuf, 1, INBUFSIZE, infile);
     }
 
@@ -589,7 +621,7 @@ static void rpng2_win_init()
     ulg rowbytes = rpng2_info.rowbytes;
 
     Trace((stderr, "beginning rpng2_win_init()\n"))
-    Trace((stderr, "  rowbytes = %ld\n", rpng2_info.rowbytes))
+    Trace((stderr, "  rowbytes = %d\n", rpng2_info.rowbytes))
     Trace((stderr, "  width  = %ld\n", rpng2_info.width))
     Trace((stderr, "  height = %ld\n", rpng2_info.height))
 
@@ -619,6 +651,8 @@ static void rpng2_win_init()
         readpng2_cleanup(&rpng2_info);
         return;
     }
+
+    rpng2_info.state = kWindowInit;
 }
 
 
@@ -1114,7 +1148,7 @@ static void rpng2_win_finish_display()
      * we have nothing to do here except set a flag and let the user know
      * that the image is done */
 
-    rpng2_info.done = TRUE;
+    rpng2_info.state = kDone;
     printf(
       "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n");
     fflush(stdout);
