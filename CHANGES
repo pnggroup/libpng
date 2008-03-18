@@ -2087,6 +2087,10 @@ version 1.2.26beta03 [March 16, 2008]
   Revised contrib/gregbook to handle premature end-of-file and file
     read errors correctly.
 
+version 1.2.26beta04 [March 18, 2008]
+  Free png_ptr->big_row_buf and png_ptr->prev_row before allocating
+    new copies in png_read_start_row().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
