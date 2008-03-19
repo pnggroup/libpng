@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.25 [February 18, 2008]
+ * Last changed in libpng 1.2.26 [March 19, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -3142,8 +3142,6 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (png_ptr->big_row_buf)
       png_free(png_ptr,png_ptr->big_row_buf);
    png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes+64);
-   if (png_ptr->row_buf)
-     png_free(png_ptr,png_ptr->row_buf);
    png_ptr->row_buf = png_ptr->big_row_buf+32;
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -3153,7 +3151,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if ((png_uint_32)png_ptr->rowbytes > (png_uint_32)(PNG_SIZE_MAX - 1))
       png_error(png_ptr, "Row has too many bytes to allocate in memory.");
    if (png_ptr->prev_row)
-     png_free(png_ptr,png_ptr->prev_row);
+      png_free(png_ptr,png_ptr->prev_row);
    png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
       png_ptr->rowbytes + 1));
 

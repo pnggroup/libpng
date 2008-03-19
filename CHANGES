@@ -2089,7 +2089,10 @@ version 1.2.26beta03 [March 16, 2008]
 
 version 1.2.26beta04 [March 18, 2008]
   Free png_ptr->big_row_buf and png_ptr->prev_row before allocating
-    new copies in png_read_start_row().
+    new copies in png_read_start_row().  Bug introduced in libpng-1.2.22.
+
+version 1.2.26beta05 [March 19, 2008]
+  Removed extra png_free() added in libpng-1.2.26beta04.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
