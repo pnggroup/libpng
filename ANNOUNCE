@@ -1,5 +1,5 @@
 
-Libpng 1.2.26beta05 - March 19, 2008
+Libpng 1.2.26beta06 - March 20, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.26beta05.tar.gz
-   libpng-1.2.26beta05.tar.lzma
+   libpng-1.2.26beta06.tar.gz
+   libpng-1.2.26beta06.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.26beta05.tar.bz2
+   libpng-1.2.26beta06.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.26beta05-no-config.tar.gz
-   libpng-1.2.26beta05-no-config.tar.lzma
-   libpng-1.2.26beta05-no-config.tar.bz2
+   libpng-1.2.26beta06-no-config.tar.gz
+   libpng-1.2.26beta06-no-config.tar.lzma
+   libpng-1.2.26beta06-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1226b05.zip
-   lp1226b05.7z
-   lp1226b05.tar.bz2
+   lp1226b06.zip
+   lp1226b06.7z
+   lp1226b06.tar.bz2
 
 Project files
 
-   libpng-1.2.26beta05-project-netware.zip
-   libpng-1.2.26beta05-project-wince.zip
+   libpng-1.2.26beta06-project-netware.zip
+   libpng-1.2.26beta06-project-wince.zip
 
 Other information:
 
-   libpng-1.2.26beta05-README.txt
-   libpng-1.2.26beta05-KNOWNBUGS.txt
-   libpng-1.2.26beta05-LICENSE.txt
-   libpng-1.2.26beta05-Y2K-compliance.txt
-   libpng-1.2.26beta05-[previous version]-diff.txt
+   libpng-1.2.26beta06-README.txt
+   libpng-1.2.26beta06-KNOWNBUGS.txt
+   libpng-1.2.26beta06-LICENSE.txt
+   libpng-1.2.26beta06-Y2K-compliance.txt
+   libpng-1.2.26beta06-[previous version]-diff.txt
 
 Changes since the last public release (1.2.25):
 
@@ -60,6 +60,9 @@ version 1.2.26beta04 [March 18, 2008]
 
 version 1.2.26beta05 [March 19, 2008]
   Removed extra png_free() added in libpng-1.2.26beta04.
+
+version 1.2.26beta06 [March 20, 2008]
+  Avoid reallocating big_row_buf and prev_row when the size does not increase.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

@@ -2094,6 +2094,9 @@ version 1.2.26beta04 [March 18, 2008]
 version 1.2.26beta05 [March 19, 2008]
   Removed extra png_free() added in libpng-1.2.26beta04.
 
+version 1.2.26beta06 [March 20, 2008]
+  Avoid reallocating big_row_buf and prev_row when the size does not increase.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
