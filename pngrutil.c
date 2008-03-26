@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.26 [March 20, 2008]
+ * Last changed in libpng 1.2.26 [March 26, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2851,6 +2851,7 @@ void /* PRIVATE */
 png_read_finish_row(png_structp png_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* start of interlace block */
@@ -2864,6 +2865,7 @@ png_read_finish_row(png_structp png_ptr)
 
    /* offset to next interlace block in the y direction */
    PNG_CONST int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
 #endif
 
    png_debug(1, "in png_read_finish_row\n");
@@ -2871,6 +2873,7 @@ png_read_finish_row(png_structp png_ptr)
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
 
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
@@ -2905,6 +2908,7 @@ png_read_finish_row(png_structp png_ptr)
       if (png_ptr->pass < 7)
          return;
    }
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
 
    if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
    {
@@ -2979,6 +2983,7 @@ void /* PRIVATE */
 png_read_start_row(png_structp png_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* start of interlace block */
@@ -2993,6 +2998,7 @@ png_read_start_row(png_structp png_ptr)
    /* offset to next interlace block in the y direction */
    PNG_CONST int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 #endif
+#endif
 
    int max_pixel_depth;
    png_uint_32 row_bytes;
@@ -3000,6 +3006,7 @@ png_read_start_row(png_structp png_ptr)
    png_debug(1, "in png_read_start_row\n");
    png_ptr->zstream.avail_in = 0;
    png_init_read_transformations(png_ptr);
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    if (png_ptr->interlaced)
    {
       if (!(png_ptr->transformations & PNG_INTERLACE))
@@ -3020,6 +3027,7 @@ png_read_start_row(png_structp png_ptr)
             png_error(png_ptr, "Rowbytes overflow in png_read_start_row");
    }
    else
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
    {
       png_ptr->num_rows = png_ptr->height;
       png_ptr->iwidth = png_ptr->width;
