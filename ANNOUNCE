@@ -1,74 +1,60 @@
 
-Libpng 1.2.26rc01 - March 26, 2008
+Libpng 1.2.26 - April 2, 2008
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.26rc01.tar.gz
-   libpng-1.2.26rc01.tar.lzma
+   libpng-1.2.26.tar.gz
+   libpng-1.2.26.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.26rc01.tar.bz2
+   libpng-1.2.26.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.26rc01-no-config.tar.gz
-   libpng-1.2.26rc01-no-config.tar.lzma
-   libpng-1.2.26rc01-no-config.tar.bz2
+   libpng-1.2.26-no-config.tar.gz
+   libpng-1.2.26-no-config.tar.lzma
+   libpng-1.2.26-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1226r01.zip
-   lp1226r01.7z
-   lp1226r01.tar.bz2
+   lpng1226.zip
+   lpng1226.7z
+   lpng1226.tar.bz2
 
 Project files
 
-   libpng-1.2.26rc01-project-netware.zip
-   libpng-1.2.26rc01-project-wince.zip
+   libpng-1.2.26-project-netware.zip
+   libpng-1.2.26-project-wince.zip
 
 Other information:
 
-   libpng-1.2.26rc01-README.txt
-   libpng-1.2.26rc01-KNOWNBUGS.txt
-   libpng-1.2.26rc01-LICENSE.txt
-   libpng-1.2.26rc01-Y2K-compliance.txt
-   libpng-1.2.26rc01-[previous version]-diff.txt
+   libpng-1.2.26-README.txt
+   libpng-1.2.26-KNOWNBUGS.txt
+   libpng-1.2.26-LICENSE.txt
+   libpng-1.2.26-Y2K-compliance.txt
+   libpng-1.2.26-[previous version]-diff.txt
 
 Changes since the last public release (1.2.25):
 
-version 1.2.26beta01 [February 21, 2008]
-  Added missing "(" in pngmem.c.  Bug introduced in libpng-1.2.2/1.0.13
+version 1.2.26 [April 2, 2008]
 
-version 1.2.26beta02 [March 12, 2008]
+  Added missing "(" in pngmem.c.  Bug introduced in libpng-1.2.2/1.0.13
   Refined error message returned from deflateInit2 in pngwutil.c
   Check IHDR length in png_push_read_chunk() before saving it.
-
-version 1.2.26beta03 [March 16, 2008]
   Revised contrib/gregbook to handle premature end-of-file and file
     read errors correctly.
-
-version 1.2.26beta04 [March 18, 2008]
   Free png_ptr->big_row_buf and png_ptr->prev_row before allocating
     new copies in png_read_start_row().
-
-version 1.2.26beta05 [March 19, 2008]
-  Removed extra png_free() added in libpng-1.2.26beta04.
-
-version 1.2.26beta06 [March 19, 2008]
   Avoid reallocating big_row_buf and prev_row when the size does not increase.
-
-version 1.2.26rc01 [March 26, 2008]
   Ifdef out some code that is unused when interlacing is not supported.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

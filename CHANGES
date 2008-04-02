@@ -2097,7 +2097,7 @@ version 1.2.26beta05 [March 19, 2008]
 version 1.2.26beta06 [March 19, 2008]
   Avoid reallocating big_row_buf and prev_row when the size does not increase.
 
-version 1.2.26rc01 [March 26, 2008]
+version 1.2.26rc01 [April 2, 2008]
   Ifdef out some code that is unused when interlacing is not supported.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
