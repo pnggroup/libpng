@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.25 [February 18, 2008]
+ * Last changed in libpng 1.2.26 [April 2, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -224,6 +224,8 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {
+         if (png_ptr->push_length != 13)
+            png_error(png_ptr, "Invalid IHDR length");
          png_push_save_buffer(png_ptr);
          return;
       }
