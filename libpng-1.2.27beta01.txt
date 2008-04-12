@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.26 - April 2, 2008
+ libpng version 1.2.27beta01 - April 12, 2008
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2008 Glenn Randers-Pehrson
@@ -288,6 +288,11 @@ you can retrieve with
 
     png_get_user_chunk_ptr(png_ptr);
 
+If you call the png_set_read_user_chunk_fn() function, then all unknown
+chunks will be saved when read, in case your callback function will need
+one or more of them.  This behavior can be changed with the
+png_set_keep_unknown_chunks() function, described below.
+
 At this point, you can set up a callback function that will be
 called after each row has been read, which you can use to control
 a progress meter or the like.  It's demonstrated in pngtest.c.
@@ -360,6 +365,37 @@ according to the "keep" directive.  If a chunk is named in successive
 instances of png_set_keep_unknown_chunks(), the final instance will
 take precedence.  The IHDR and IEND chunks should not be named in
 chunk_list; if they are, libpng will process them normally anyway.
+
+Here is an example of the usage of png_set_keep_unknown_chunks(),
+where the private "vpAg" chunk will later be processed by a user chunk
+callback function:
+
+    png_byte vpAg[5]={118, 112,  65, 103, (png_byte) '\0'};
+
+    #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+      png_byte unused_chunks[]=
+      {
+        104,  73,  83,  84, (png_byte) '\0',   /* hIST */
+        105,  84,  88, 116, (png_byte) '\0',   /* iTXt */
+        112,  67,  65,  76, (png_byte) '\0',   /* pCAL */
+        115,  67,  65,  76, (png_byte) '\0',   /* sCAL */
+        115,  80,  76,  84, (png_byte) '\0',   /* sPLT */
+        116,  73,  77,  69, (png_byte) '\0',   /* tIME */
+      };
+    #endif
+
+    ...
+
+    #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+      /* ignore all unknown chunks: */
+      png_set_keep_unknown_chunks(read_ptr, 1, NULL, 0);
+      /* except for vpAg: */
+      png_set_keep_unknown_chunks(read_ptr, 2, vpAg, 1);
+      /* also ignore unused known chunks: */
+      png_set_keep_unknown_chunks(read_ptr, 1, unused_chunks,
+         (int)sizeof(unused_chunks)/5);
+    #endif
+
 
 The high-level read interface
 
@@ -2796,13 +2832,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-April 2, 2008
+April 12, 2008
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.26 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.27beta01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

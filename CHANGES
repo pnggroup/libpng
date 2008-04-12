@@ -2097,8 +2097,19 @@ version 1.2.26beta05 [March 19, 2008]
 version 1.2.26beta06 [March 19, 2008]
   Avoid reallocating big_row_buf and prev_row when the size does not increase.
 
-version 1.2.26rc01 [April 2, 2008]
+version 1.2.26rc01 [March 26, 2008]
   Ifdef out some code that is unused when interlacing is not supported.
+
+versions 1.0.32 and 1.2.26 [April 2, 2008]
+  No changes.
+
+version 1.2.27beta01 [April 12, 2008]
+  Fixed bug (introduced in libpng-1.0.5h) with handling zero-length
+    unknown chunks.
+  Added more information about png_set_keep_unknown_chunks() to the
+    documetation.
+  Reject tRNS chunk with out-of-range samples instead of masking off
+    the invalid high bits as done in since libpng-1.2.19beta5.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.25 [February 18, 2008]
+ * Last changed in libpng 1.2.27 [April 12, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -938,6 +938,18 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 
    if (trans_values != NULL)
    {
+      int sample_max = (1 << info_ptr->bit_depth);
+      if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
+          (int)trans_values->gray > sample_max) ||
+          (info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
+          ((int)trans_values->red > sample_max ||
+          (int)trans_values->green > sample_max ||
+          (int)trans_values->blue > sample_max)))
+         {
+            png_warning(png_ptr,
+              "Ignoring tRNS chunk with out-of-range samples for bit_depth");
+            return;
+          }
       png_memcpy(&(info_ptr->trans_values), trans_values,
          png_sizeof(png_color_16));
       if (num_trans == 0)
@@ -1040,28 +1052,31 @@ png_set_unknown_chunks(png_structp png_ptr,
 
     for (i = 0; i < num_unknowns; i++)
     {
-        png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
-        png_unknown_chunkp from = unknowns + i;
+       png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
+       png_unknown_chunkp from = unknowns + i;
 
-        png_memcpy((png_charp)to->name, 
-                   (png_charp)from->name, 
-                   png_sizeof(from->name));
-        to->name[png_sizeof(to->name)-1] = '\0';
+       png_memcpy((png_charp)to->name, 
+                  (png_charp)from->name, 
+                  png_sizeof(from->name));
+       to->name[png_sizeof(to->name)-1] = '\0';
+       to->size = from->size;
+       /* note our location in the read or write sequence */
+       to->location = (png_byte)(png_ptr->mode & 0xff);
 
-        to->data = (png_bytep)png_malloc_warn(png_ptr, from->size);
-        if (to->data == NULL)
-        {
-           png_warning(png_ptr,
+       if (from->size == 0)
+          to->data=NULL;
+       else
+       {
+          to->data = (png_bytep)png_malloc_warn(png_ptr, from->size);
+          if (to->data == NULL)
+          {
+             png_warning(png_ptr,
               "Out of memory while processing unknown chunk.");
-        }
-        else
-        {
-           png_memcpy(to->data, from->data, from->size);
-           to->size = from->size;
-
-           /* note our location in the read or write sequence */
-           to->location = (png_byte)(png_ptr->mode & 0xff);
-        }
+             to->size=0;
+          }
+          else
+             png_memcpy(to->data, from->data, from->size);
+       }
     }
 
     info_ptr->unknown_chunks = np;

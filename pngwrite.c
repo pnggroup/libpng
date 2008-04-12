@@ -112,6 +112,8 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
             ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
+            if (up->size == 0)
+               png_warning(png_ptr, "Writing zero-length unknown chunk");
             png_write_chunk(png_ptr, up->name, up->data, up->size);
          }
        }
