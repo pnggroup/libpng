@@ -2250,12 +2250,9 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        }
        else
 #endif
-         png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
-       if (png_ptr->unknown_chunk.data)
-       {
-         png_free(png_ptr, png_ptr->unknown_chunk.data);
-         png_ptr->unknown_chunk.data = NULL;
-       }
+       png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
+       png_free(png_ptr, png_ptr->unknown_chunk.data);
+       png_ptr->unknown_chunk.data = NULL;
    }
    else
 #endif
@@ -3151,8 +3148,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    if(row_bytes + 64 > png_ptr->old_big_row_buf_size)
    {
-     if (png_ptr->big_row_buf)
-        png_free(png_ptr,png_ptr->big_row_buf);
+     png_free(png_ptr,png_ptr->big_row_buf);
      png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes+64);
      png_ptr->row_buf = png_ptr->big_row_buf+32;
      png_ptr->old_big_row_buf_size = row_bytes+64;
@@ -3167,8 +3163,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    if(png_ptr->rowbytes+1 > png_ptr->old_prev_row_size)
    {
-     if (png_ptr->prev_row)
-        png_free(png_ptr,png_ptr->prev_row);
+     png_free(png_ptr,png_ptr->prev_row);
      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
         png_ptr->rowbytes + 1));
      png_ptr->old_prev_row_size = png_ptr->rowbytes+1;

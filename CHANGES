@@ -2111,9 +2111,16 @@ version 1.2.27beta01 [April 12, 2008]
   Reject tRNS chunk with out-of-range samples instead of masking off
     the invalid high bits as done in since libpng-1.2.19beta5.
 
-version 1.2.27beta02 [April 14, 2008]
+version 1.2.27beta02 [April 13, 2008]
   Revised documentation about unknown chunk and user chunk handling.
   Keep tRNS chunk with out-of-range samples and issue a png_warning().
+
+version 1.2.27beta03 [April 14, 2008]
+  Added check for NULL ptr in TURBOC version of png_free_default().
+  Removed several unnecessary checks for NULL before calling png_free().
+  Revised png_set_tRNS() so that calling it twice removes and invalidates
+    the previous call.
+  Revised pngtest to check for out-of-range tRNS samples.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

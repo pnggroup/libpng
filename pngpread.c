@@ -1532,11 +1532,8 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
       else
 #endif
         png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
-      if (png_ptr->unknown_chunk.data)
-      {
-        png_free(png_ptr, png_ptr->unknown_chunk.data);
-        png_ptr->unknown_chunk.data = NULL;
-      }
+      png_free(png_ptr, png_ptr->unknown_chunk.data);
+      png_ptr->unknown_chunk.data = NULL;
    }
    else
 #endif

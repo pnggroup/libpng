@@ -1,9 +1,9 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.2.23 - [November 6, 2007]
+ * Last changed in libpng 1.2.27 - [April 14, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -689,8 +689,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
    {
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
-      if (row_buf)
-         png_free(read_ptr, row_buf);
+      png_free(read_ptr, row_buf);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
 #ifdef PNG_WRITE_SUPPORTED
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
@@ -1024,8 +1023,16 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_tRNS(read_ptr, read_info_ptr, &trans, &num_trans,
          &trans_values))
       {
-         png_set_tRNS(write_ptr, write_info_ptr, trans, num_trans,
-            trans_values);
+         int sample_max = (1 << read_info_ptr->bit_depth);
+         /* libpng doesn't reject a tRNS chunk with out-of-range samples */
+         if (!((read_info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
+            (int)trans_values->gray > sample_max) ||
+            (read_info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
+            ((int)trans_values->red > sample_max ||
+            (int)trans_values->green > sample_max ||
+            (int)trans_values->blue > sample_max))))
+           png_set_tRNS(write_ptr, write_info_ptr, trans, num_trans,
+              trans_values);
       }
    }
 #endif
@@ -1553,4 +1560,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_27beta02 your_png_h_is_not_version_1_2_27beta02;
+typedef version_1_2_27beta03 your_png_h_is_not_version_1_2_27beta03;

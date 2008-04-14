@@ -1,5 +1,5 @@
 
-Libpng 1.2.27beta02 - April 14, 2008
+Libpng 1.2.27beta03 - April 14, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.27beta02.tar.gz
-   libpng-1.2.27beta02.tar.lzma
+   libpng-1.2.27beta03.tar.gz
+   libpng-1.2.27beta03.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.27beta02.tar.bz2
+   libpng-1.2.27beta03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.27beta02-no-config.tar.gz
-   libpng-1.2.27beta02-no-config.tar.lzma
-   libpng-1.2.27beta02-no-config.tar.bz2
+   libpng-1.2.27beta03-no-config.tar.gz
+   libpng-1.2.27beta03-no-config.tar.lzma
+   libpng-1.2.27beta03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1227b02.zip
-   lp1227b02.7z
-   lp1227b02.tar.bz2
+   lp1227b03.zip
+   lp1227b03.7z
+   lp1227b03.tar.bz2
 
 Project files
 
-   libpng-1.2.27beta02-project-netware.zip
-   libpng-1.2.27beta02-project-wince.zip
+   libpng-1.2.27beta03-project-netware.zip
+   libpng-1.2.27beta03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.27beta02-README.txt
-   libpng-1.2.27beta02-KNOWNBUGS.txt
-   libpng-1.2.27beta02-LICENSE.txt
-   libpng-1.2.27beta02-Y2K-compliance.txt
-   libpng-1.2.27beta02-[previous version]-diff.txt
+   libpng-1.2.27beta03-README.txt
+   libpng-1.2.27beta03-KNOWNBUGS.txt
+   libpng-1.2.27beta03-LICENSE.txt
+   libpng-1.2.27beta03-Y2K-compliance.txt
+   libpng-1.2.27beta03-[previous version]-diff.txt
 
 Changes since the last public release (1.2.26):
 
@@ -51,9 +51,16 @@ version 1.2.27beta01 [April 12, 2008]
   Reject tRNS chunk with out-of-range samples instead of masking off
     the invalid high bits as done in since libpng-1.2.19beta5.
 
-version 1.2.27rc01 [April 14, 2008]
+version 1.2.27beta02 [April 13, 2008]
   Revised documentation about unknown chunk and user chunk handling.
   Keep tRNS chunk with out-of-range samples and issue a png_warning().
+
+version 1.2.27beta03 [April 14, 2008]
+  Added check for NULL ptr in TURBOC version of png_free_default().
+  Removed several unnecessary checks for NULL before calling png_free().
+  Revised png_set_tRNS() so that calling it twice removes and invalidates
+    the previous call.
+  Revised pngtest to check for out-of-range tRNS samples.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
