@@ -2111,6 +2111,10 @@ version 1.2.27beta01 [April 12, 2008]
   Reject tRNS chunk with out-of-range samples instead of masking off
     the invalid high bits as done in since libpng-1.2.19beta5.
 
+version 1.2.27beta02 [April 14, 2008]
+  Revised documentation about unknown chunk and user chunk handling.
+  Keep tRNS chunk with out-of-range samples and issue a png_warning().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

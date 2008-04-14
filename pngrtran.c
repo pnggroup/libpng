@@ -967,7 +967,7 @@ png_init_read_transformations(png_structp png_ptr)
 	    /* Prevent the transformations being done again, and make sure
 	     * that the now spurious alpha channel is stripped - the code
 	     * has just reduced background composition and gamma correction
-	     * to a simply alpha channel strip.
+	     * to a simple alpha channel strip.
 	     */
 	    png_ptr->transformations &= ~PNG_BACKGROUND;
 	    png_ptr->transformations &= ~PNG_GAMMA;
