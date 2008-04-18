@@ -2122,6 +2122,10 @@ version 1.2.27beta03 [April 14, 2008]
     the previous call.
   Revised pngtest to check for out-of-range tRNS samples.
 
+version 1.2.27beta04 [April 18, 2008]
+  Added AC_LIBTOOL_WIN32_DLL to configure.ac
+  Rebuilt Makefile.in, aclocal.m4, and configure with autoconf-2.62
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
