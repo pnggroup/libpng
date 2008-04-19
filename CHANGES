@@ -2126,6 +2126,9 @@ version 1.2.27beta04 [April 18, 2008]
   Added AC_LIBTOOL_WIN32_DLL to configure.ac
   Rebuilt Makefile.in, aclocal.m4, and configure with autoconf-2.62
 
+version 1.2.27beta05 [April 19, 2008]
+  Added MAINTEINERCLEANFILES variable to Makefile.am
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

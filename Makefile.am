@@ -86,10 +86,13 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng.txt pngvcrd.c 
+	example.c libpng-1.2.27beta05.txt pngvcrd.c 
 
 CLEANFILES= pngout.png libpng12.pc libpng12-config libpng.vers \
 libpng.sym
+
+MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
+config.sub configure depcomp install-sh ltmain.sh missing
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
