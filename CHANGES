@@ -2129,6 +2129,10 @@ version 1.2.27beta04 [April 18, 2008]
 version 1.2.27beta05 [April 19, 2008]
   Added MAINTEINERCLEANFILES variable to Makefile.am
 
+version 1.2.27beta06 [April 21, 2008]
+  Avoid transforming color_type to RGB by png_set_expand_1_2_4_to_8().
+
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
