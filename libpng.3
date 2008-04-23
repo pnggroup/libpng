@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "April 21, 2008"
+.TH LIBPNG 3 "April 23, 2008"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.2.27beta06
+libpng \- Portable Network Graphics (PNG) Reference Library 1.2.27rc01
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -410,14 +410,18 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.27beta06 - April 21, 2008
+ libpng version 1.2.27rc01 - April 23, 2008
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2008 Glenn Randers-Pehrson
  For conditions of distribution and use, see copyright
  notice in png.h.
 
- based on:
+ Based on:
+
+ libpng versions 0.97, January 1998, through 1.2.27rc01 - April 23, 2008
+ Updated and distributed by Glenn Randers-Pehrson
+ Copyright (c) 1998-2008 Glenn Randers-Pehrson
 
  libpng 1.0 beta 6  version 0.96 May 28, 1997
  Updated and distributed by Andreas Dilger
@@ -1255,6 +1259,7 @@ As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 At the same time, png_set_gray_1_2_4_to_8() was deprecated, and it
 will be removed from a future version.
+
 
 PNG can have files with 16 bits per channel.  If you only can handle
 8 bits per channel, this will strip the pixels down to 8 bit.
@@ -3256,13 +3261,13 @@ application:
 
 .SH IX. Y2K Compliance in libpng
 
-April 21, 2008
+April 23, 2008
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.27beta06 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.27rc01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3520,7 +3525,7 @@ ftp://ftp.info-zip.org/pub/infozip/zlib
 .I libpng
 or at
 .br
-ftp://ds.internic.net/rfc/rfc2083.txt
+ftp://ftp.rfc-editor.org:/in-notes/rfc2083.txt
 .br
 or (as a W3C Recommendation) at
 .br
@@ -3540,7 +3545,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.2.27beta06 - April 21, 2008:
+Libpng version 1.2.27rc01 - April 23, 2008:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -3561,7 +3566,7 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.2.27beta06, April 21, 2008, are
+libpng versions 1.2.6, August 15, 2004, through 1.2.27rc01, April 23, 2008, are
 Copyright (c) 2004,2006-2008 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -3660,7 +3665,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-April 21, 2008
+April 23, 2008
 
 .\" end of man page
 

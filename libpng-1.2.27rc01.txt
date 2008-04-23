@@ -1,13 +1,17 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.27beta06 - April 21, 2008
+ libpng version 1.2.27rc01 - April 23, 2008
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2008 Glenn Randers-Pehrson
  For conditions of distribution and use, see copyright
  notice in png.h.
 
- based on:
+ Based on:
+
+ libpng versions 0.97, January 1998, through 1.2.27rc01 - April 23, 2008
+ Updated and distributed by Glenn Randers-Pehrson
+ Copyright (c) 1998-2008 Glenn Randers-Pehrson
 
  libpng 1.0 beta 6  version 0.96 May 28, 1997
  Updated and distributed by Andreas Dilger
@@ -845,6 +849,7 @@ As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 At the same time, png_set_gray_1_2_4_to_8() was deprecated, and it
 will be removed from a future version.
+
 
 PNG can have files with 16 bits per channel.  If you only can handle
 8 bits per channel, this will strip the pixels down to 8 bit.
@@ -2846,13 +2851,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-April 21, 2008
+April 23, 2008
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.27beta06 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.27rc01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

@@ -1,5 +1,5 @@
 
-Libpng 1.2.27beta06 - April 21, 2008
+Libpng 1.2.27rc01 - April 23, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.27beta06.tar.gz
-   libpng-1.2.27beta06.tar.lzma
+   libpng-1.2.27rc01.tar.gz
+   libpng-1.2.27rc01.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.27beta06.tar.bz2
+   libpng-1.2.27rc01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.27beta06-no-config.tar.gz
-   libpng-1.2.27beta06-no-config.tar.lzma
-   libpng-1.2.27beta06-no-config.tar.bz2
+   libpng-1.2.27rc01-no-config.tar.gz
+   libpng-1.2.27rc01-no-config.tar.lzma
+   libpng-1.2.27rc01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1227b06.zip
-   lp1227b06.7z
-   lp1227b06.tar.bz2
+   lp1227r01.zip
+   lp1227r01.7z
+   lp1227r01.tar.bz2
 
 Project files
 
-   libpng-1.2.27beta06-project-netware.zip
-   libpng-1.2.27beta06-project-wince.zip
+   libpng-1.2.27rc01-project-netware.zip
+   libpng-1.2.27rc01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.27beta06-README.txt
-   libpng-1.2.27beta06-KNOWNBUGS.txt
-   libpng-1.2.27beta06-LICENSE.txt
-   libpng-1.2.27beta06-Y2K-compliance.txt
-   libpng-1.2.27beta06-[previous version]-diff.txt
+   libpng-1.2.27rc01-README.txt
+   libpng-1.2.27rc01-KNOWNBUGS.txt
+   libpng-1.2.27rc01-LICENSE.txt
+   libpng-1.2.27rc01-Y2K-compliance.txt
+   libpng-1.2.27rc01-[previous version]-diff.txt
 
 Changes since the last public release (1.2.26):
 
@@ -70,7 +70,11 @@ version 1.2.27beta05 [April 19, 2008]
   Added MAINTEINERCLEANFILES variable to Makefile.am
 
 version 1.2.27beta06 [April 21, 2008]
-  Avoid transforming color_type to RGB by png_set_expand_1_2_4_to_8().
+  Avoid changing color_type from GRAY to RGB by
+    png_set_expand_gray_1_2_4_to_8().
+
+version 1.2.27rc01 [April 23, 2008]
+  Fix broken URL for rfc2083 in png.5 and libpng-*.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
