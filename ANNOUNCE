@@ -1,83 +1,69 @@
 
-Libpng 1.2.27rc01 - April 23, 2008
+Libpng 1.2.27 - April 30, 2008
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.27rc01.tar.gz
-   libpng-1.2.27rc01.tar.lzma
+   libpng-1.2.27.tar.gz
+   libpng-1.2.27.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.27rc01.tar.bz2
+   libpng-1.2.27.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.27rc01-no-config.tar.gz
-   libpng-1.2.27rc01-no-config.tar.lzma
-   libpng-1.2.27rc01-no-config.tar.bz2
+   libpng-1.2.27-no-config.tar.gz
+   libpng-1.2.27-no-config.tar.lzma
+   libpng-1.2.27-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1227r01.zip
-   lp1227r01.7z
-   lp1227r01.tar.bz2
+   lpng1227.zip
+   lpng1227.7z
+   lpng1227.tar.bz2
 
 Project files
 
-   libpng-1.2.27rc01-project-netware.zip
-   libpng-1.2.27rc01-project-wince.zip
+   libpng-1.2.27-project-netware.zip
+   libpng-1.2.27-project-wince.zip
 
 Other information:
 
-   libpng-1.2.27rc01-README.txt
-   libpng-1.2.27rc01-KNOWNBUGS.txt
-   libpng-1.2.27rc01-LICENSE.txt
-   libpng-1.2.27rc01-Y2K-compliance.txt
-   libpng-1.2.27rc01-[previous version]-diff.txt
+   libpng-1.2.27-README.txt
+   libpng-1.2.27-KNOWNBUGS.txt
+   libpng-1.2.27-LICENSE.txt
+   libpng-1.2.27-Y2K-compliance.txt
+   libpng-1.2.27-[previous version]-diff.txt
 
 Changes since the last public release (1.2.26):
 
-version 1.2.27beta01 [April 12, 2008]
-  Fixed bug (introduced in libpng-1.0.5h) with handling zero-length
+version 1.2.27 [April 30, 2008]
+
+  Fixed bug (introduced in libpng-1.0.6) with handling zero-length
     unknown chunks.
   Added more information about png_set_keep_unknown_chunks() to the
     documetation.
-  Reject tRNS chunk with out-of-range samples instead of masking off
-    the invalid high bits as done in since libpng-1.2.19beta5.
-
-version 1.2.27beta02 [April 13, 2008]
   Revised documentation about unknown chunk and user chunk handling.
-  Keep tRNS chunk with out-of-range samples and issue a png_warning().
-
-version 1.2.27beta03 [April 14, 2008]
+  Issue a png_warning when reading a tRNS chunk with out-of-range samples.
   Added check for NULL ptr in TURBOC version of png_free_default().
   Removed several unnecessary checks for NULL before calling png_free().
   Revised png_set_tRNS() so that calling it twice removes and invalidates
     the previous call.
   Revised pngtest to check for out-of-range tRNS samples.
-
-version 1.2.27beta04 [April 18, 2008]
   Added AC_LIBTOOL_WIN32_DLL to configure.ac
   Rebuilt Makefile.in, aclocal.m4, and configure with autoconf-2.62
-
-version 1.2.27beta05 [April 19, 2008]
   Added MAINTEINERCLEANFILES variable to Makefile.am
-
-version 1.2.27beta06 [April 21, 2008]
   Avoid changing color_type from GRAY to RGB by
     png_set_expand_gray_1_2_4_to_8().
-
-version 1.2.27rc01 [April 23, 2008]
   Fix broken URL for rfc2083 in png.5 and libpng-*.txt
 
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

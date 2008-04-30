@@ -2136,6 +2136,9 @@ version 1.2.27beta06 [April 21, 2008]
 version 1.2.27rc01 [April 23, 2008]
   Fix broken URL for rfc2083 in png.5 and libpng-*.txt
 
+version 1.0.33 and 1.2.27rc01 [April 30, 2008]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
