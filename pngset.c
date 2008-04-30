@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.25 [February 18, 2008]
+ * Last changed in libpng 1.2.27 [April 29, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -914,6 +914,8 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
+
    if (trans != NULL)
    {
        /*
@@ -921,30 +923,41 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
         * we do it for backward compatibility with the way the png_handle_tRNS
         * function used to do the allocation.
         */
-#ifdef PNG_FREE_ME_SUPPORTED
-       png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
-#endif
+
        /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1 */
        png_ptr->trans = info_ptr->trans = (png_bytep)png_malloc(png_ptr,
            (png_uint_32)PNG_MAX_PALETTE_LENGTH);
-       if (num_trans <= PNG_MAX_PALETTE_LENGTH)
+       if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
          png_memcpy(info_ptr->trans, trans, (png_size_t)num_trans);
-#ifdef PNG_FREE_ME_SUPPORTED
-       info_ptr->free_me |= PNG_FREE_TRNS;
-#else
-       png_ptr->flags |= PNG_FLAG_FREE_TRNS;
-#endif
    }
 
    if (trans_values != NULL)
    {
+      int sample_max = (1 << info_ptr->bit_depth);
+      if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
+          (int)trans_values->gray > sample_max) ||
+          (info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
+          ((int)trans_values->red > sample_max ||
+          (int)trans_values->green > sample_max ||
+          (int)trans_values->blue > sample_max)))
+        png_warning(png_ptr,
+           "tRNS chunk has out-of-range samples for bit_depth");
       png_memcpy(&(info_ptr->trans_values), trans_values,
          png_sizeof(png_color_16));
       if (num_trans == 0)
         num_trans = 1;
    }
+
    info_ptr->num_trans = (png_uint_16)num_trans;
-   info_ptr->valid |= PNG_INFO_tRNS;
+   if (num_trans != 0)
+   {
+      info_ptr->valid |= PNG_INFO_tRNS;
+#ifdef PNG_FREE_ME_SUPPORTED
+      info_ptr->free_me |= PNG_FREE_TRNS;
+#else
+      png_ptr->flags |= PNG_FLAG_FREE_TRNS;
+#endif
+   }
 }
 #endif
 
@@ -1040,28 +1053,31 @@ png_set_unknown_chunks(png_structp png_ptr,
 
     for (i = 0; i < num_unknowns; i++)
     {
-        png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
-        png_unknown_chunkp from = unknowns + i;
+       png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
+       png_unknown_chunkp from = unknowns + i;
 
-        png_memcpy((png_charp)to->name, 
-                   (png_charp)from->name, 
-                   png_sizeof(from->name));
-        to->name[png_sizeof(to->name)-1] = '\0';
+       png_memcpy((png_charp)to->name, 
+                  (png_charp)from->name, 
+                  png_sizeof(from->name));
+       to->name[png_sizeof(to->name)-1] = '\0';
+       to->size = from->size;
+       /* note our location in the read or write sequence */
+       to->location = (png_byte)(png_ptr->mode & 0xff);
 
-        to->data = (png_bytep)png_malloc_warn(png_ptr, from->size);
-        if (to->data == NULL)
-        {
-           png_warning(png_ptr,
+       if (from->size == 0)
+          to->data=NULL;
+       else
+       {
+          to->data = (png_bytep)png_malloc_warn(png_ptr, from->size);
+          if (to->data == NULL)
+          {
+             png_warning(png_ptr,
               "Out of memory while processing unknown chunk.");
-        }
-        else
-        {
-           png_memcpy(to->data, from->data, from->size);
-           to->size = from->size;
-
-           /* note our location in the read or write sequence */
-           to->location = (png_byte)(png_ptr->mode & 0xff);
-        }
+             to->size=0;
+          }
+          else
+             png_memcpy(to->data, from->data, from->size);
+       }
     }
 
     info_ptr->unknown_chunks = np;
@@ -1193,8 +1209,7 @@ png_set_compression_buffer_size(png_structp png_ptr, png_uint_32 size)
 {
     if (png_ptr == NULL)
        return;
-    if(png_ptr->zbuf)
-       png_free(png_ptr, png_ptr->zbuf);
+    png_free(png_ptr, png_ptr->zbuf);
     png_ptr->zbuf_size = (png_size_t)size;
     png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, size);
     png_ptr->zstream.next_out = png_ptr->zbuf;

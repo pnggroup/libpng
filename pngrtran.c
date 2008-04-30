@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.25 [February 18, 2008]
+ * Last changed in libpng 1.2.27 [April 29, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -548,9 +548,7 @@ png_set_expand(png_structp png_ptr)
    png_debug(1, "in png_set_expand\n");
    if(png_ptr == NULL) return;
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-#ifdef PNG_WARN_UNINITIALIZED_ROW
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-#endif
 }
 
 /* GRR 19990627:  the following three functions currently are identical
@@ -577,9 +575,7 @@ png_set_palette_to_rgb(png_structp png_ptr)
    png_debug(1, "in png_set_palette_to_rgb\n");
    if(png_ptr == NULL) return;
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-#ifdef PNG_WARN_UNINITIALIZED_ROW
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-#endif
 }
 
 #if !defined(PNG_1_0_X)
@@ -590,9 +586,7 @@ png_set_expand_gray_1_2_4_to_8(png_structp png_ptr)
    png_debug(1, "in png_set_expand_gray_1_2_4_to_8\n");
    if(png_ptr == NULL) return;
    png_ptr->transformations |= PNG_EXPAND;
-#ifdef PNG_WARN_UNINITIALIZED_ROW
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-#endif
 }
 #endif
 
@@ -615,9 +609,7 @@ png_set_tRNS_to_alpha(png_structp png_ptr)
 {
    png_debug(1, "in png_set_tRNS_to_alpha\n");
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-#ifdef PNG_WARN_UNINITIALIZED_ROW
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-#endif
 }
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
@@ -627,9 +619,7 @@ png_set_gray_to_rgb(png_structp png_ptr)
 {
    png_debug(1, "in png_set_gray_to_rgb\n");
    png_ptr->transformations |= PNG_GRAY_TO_RGB;
-#ifdef PNG_WARN_UNINITIALIZED_ROW
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-#endif
 }
 #endif
 
@@ -967,7 +957,7 @@ png_init_read_transformations(png_structp png_ptr)
 	    /* Prevent the transformations being done again, and make sure
 	     * that the now spurious alpha channel is stripped - the code
 	     * has just reduced background composition and gamma correction
-	     * to a simply alpha channel strip.
+	     * to a simple alpha channel strip.
 	     */
 	    png_ptr->transformations &= ~PNG_BACKGROUND;
 	    png_ptr->transformations &= ~PNG_GAMMA;
@@ -1138,7 +1128,8 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    {
       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
-         if (png_ptr->num_trans && (png_ptr->transformations & PNG_EXPAND_tRNS))
+         if (png_ptr->num_trans &&
+              (png_ptr->transformations & PNG_EXPAND_tRNS))
             info_ptr->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
          else
             info_ptr->color_type = PNG_COLOR_TYPE_RGB;
@@ -1151,8 +1142,10 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
          {
             if (png_ptr->transformations & PNG_EXPAND_tRNS)
               info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
+#if 0 /* Removed from libpng-1.2.27 */
             else
               info_ptr->color_type |= PNG_COLOR_MASK_COLOR;
+#endif
          }
          if (info_ptr->bit_depth < 8)
             info_ptr->bit_depth = 8;

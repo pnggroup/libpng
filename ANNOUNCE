@@ -1,5 +1,5 @@
 
-Libpng 1.0.32 - April 2, 2008
+Libpng 1.0.33 - April 30, 2008
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,50 +8,59 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.32.tar.gz
-   libpng-1.0.32.tar.lzma
+   libpng-1.0.33.tar.gz
+   libpng-1.0.33.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.0.32.tar.bz2
+   libpng-1.0.33.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.32-no-config.tar.gz
-   libpng-1.0.32-no-config.tar.lzma
-   libpng-1.0.32-no-config.tar.bz2
+   libpng-1.0.33-no-config.tar.gz
+   libpng-1.0.33-no-config.tar.lzma
+   libpng-1.0.33-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1032.zip
-   lpng1032.7z
-   lpng1032.tar.bz2
+   lpng1033.zip
+   lpng1033.7z
+   lpng1033.tar.bz2
 
 Project files
 
-   libpng-1.0.32-project-netware.zip
-   libpng-1.0.32-project-wince.zip
+   libpng-1.0.33-project-netware.zip
+   libpng-1.0.33-project-wince.zip
 
 Other information:
 
-   libpng-1.0.32-README.txt
-   libpng-1.0.32-KNOWNBUGS.txt
-   libpng-1.0.32-LICENSE.txt
-   libpng-1.0.32-Y2K-compliance.txt
+   libpng-1.0.33-README.txt
+   libpng-1.0.33-KNOWNBUGS.txt
+   libpng-1.0.33-LICENSE.txt
+   libpng-1.0.33-Y2K-compliance.txt
 
-Changes since the last public release (1.0.31):
+Changes since the last public release (1.0.32):
 
-version 1.0.32 [April 2, 2008]
+version 1.0.33 [April 30, 2008]
 
-  Added missing "(" in pngmem.c.  Bug introduced in libpng-1.2.2/1.0.13
-  Refined error message returned from deflateInit2 in pngwutil.c
-  Check IHDR length in png_push_read_chunk() before saving it.
-  Revised contrib/gregbook to handle premature end-of-file and file
-    read errors correctly.
-  Free png_ptr->big_row_buf and png_ptr->prev_row before allocating
-    new copies in png_read_start_row().
-  Avoid reallocating big_row_buf and prev_row when the size does not increase.
-  Ifdef out some code that is unused when interlacing is not supported.
+  Fixed bug (introduced in libpng-1.0.6) with handling zero-length
+    unknown chunks.
+  Added more information about png_set_keep_unknown_chunks() to the
+    documetation.
+  Revised documentation about unknown chunk and user chunk handling.
+  Issue a png_warning when reading a tRNS chunk with out-of-range samples.
+  Added check for NULL ptr in TURBOC version of png_free_default().
+  Removed several unnecessary checks for NULL before calling png_free().
+  Revised png_set_tRNS() so that calling it twice removes and invalidates
+    the previous call.
+  Revised pngtest to check for out-of-range tRNS samples.
+  Added AC_LIBTOOL_WIN32_DLL to configure.ac
+  Rebuilt Makefile.in, aclocal.m4, and configure with autoconf-2.62
+  Added MAINTEINERCLEANFILES variable to Makefile.am
+  Avoid changing color_type from GRAY to RGB by
+    png_set_expand_gray_1_2_4_to_8().
+  Fix broken URL for rfc2083 in png.5 and libpng-*.txt
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

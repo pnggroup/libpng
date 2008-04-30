@@ -2086,8 +2086,47 @@ version 1.2.26beta05 [March 19, 2008]
 version 1.2.26beta06 [March 19, 2008]
   Avoid reallocating big_row_buf and prev_row when the size does not increase.
 
-version 1.2.26rc01 [April 2, 2008]
+version 1.2.26rc01 [March 26, 2008]
   Ifdef out some code that is unused when interlacing is not supported.
+
+versions 1.0.32 and 1.2.26 [April 2, 2008]
+  No changes.
+
+version 1.2.27beta01 [April 12, 2008]
+  Fixed bug (introduced in libpng-1.0.5h) with handling zero-length
+    unknown chunks.
+  Added more information about png_set_keep_unknown_chunks() to the
+    documetation.
+  Reject tRNS chunk with out-of-range samples instead of masking off
+    the invalid high bits as done in since libpng-1.2.19beta5.
+
+version 1.2.27beta02 [April 13, 2008]
+  Revised documentation about unknown chunk and user chunk handling.
+  Keep tRNS chunk with out-of-range samples and issue a png_warning().
+
+version 1.2.27beta03 [April 14, 2008]
+  Added check for NULL ptr in TURBOC version of png_free_default().
+  Removed several unnecessary checks for NULL before calling png_free().
+  Revised png_set_tRNS() so that calling it twice removes and invalidates
+    the previous call.
+  Revised pngtest to check for out-of-range tRNS samples.
+
+version 1.2.27beta04 [April 18, 2008]
+  Added AC_LIBTOOL_WIN32_DLL to configure.ac
+  Rebuilt Makefile.in, aclocal.m4, and configure with autoconf-2.62
+
+version 1.2.27beta05 [April 19, 2008]
+  Added MAINTEINERCLEANFILES variable to Makefile.am
+
+version 1.2.27beta06 [April 21, 2008]
+  Avoid changing color_type from GRAY to RGB by
+    png_set_expand_gray_1_2_4_to_8().
+
+version 1.2.27rc01 [April 23, 2008]
+  Fix broken URL for rfc2083 in png.5 and libpng-*.txt
+
+version 1.0.33 and 1.2.27rc01 [April 30, 2008]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
