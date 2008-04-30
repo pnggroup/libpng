@@ -1,5 +1,5 @@
 
-Libpng 1.0.33 - April 30, 2008
+Libpng 1.0.34 - April 30, 2008
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,40 +8,40 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.33.tar.gz
-   libpng-1.0.33.tar.lzma
+   libpng-1.0.34.tar.gz
+   libpng-1.0.34.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.0.33.tar.bz2
+   libpng-1.0.34.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.33-no-config.tar.gz
-   libpng-1.0.33-no-config.tar.lzma
-   libpng-1.0.33-no-config.tar.bz2
+   libpng-1.0.34-no-config.tar.gz
+   libpng-1.0.34-no-config.tar.lzma
+   libpng-1.0.34-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1033.zip
-   lpng1033.7z
-   lpng1033.tar.bz2
+   lpng1034.zip
+   lpng1034.7z
+   lpng1034.tar.bz2
 
 Project files
 
-   libpng-1.0.33-project-netware.zip
-   libpng-1.0.33-project-wince.zip
+   libpng-1.0.34-project-netware.zip
+   libpng-1.0.34-project-wince.zip
 
 Other information:
 
-   libpng-1.0.33-README.txt
-   libpng-1.0.33-KNOWNBUGS.txt
-   libpng-1.0.33-LICENSE.txt
-   libpng-1.0.33-Y2K-compliance.txt
+   libpng-1.0.34-README.txt
+   libpng-1.0.34-KNOWNBUGS.txt
+   libpng-1.0.34-LICENSE.txt
+   libpng-1.0.34-Y2K-compliance.txt
 
 Changes since the last public release (1.0.32):
 
-version 1.0.33 [April 30, 2008]
+version 1.0.34 [April 30, 2008]
 
   Fixed bug (introduced in libpng-1.0.6) with handling zero-length
     unknown chunks.
@@ -55,12 +55,11 @@ version 1.0.33 [April 30, 2008]
     the previous call.
   Revised pngtest to check for out-of-range tRNS samples.
   Added AC_LIBTOOL_WIN32_DLL to configure.ac
-  Rebuilt Makefile.in, aclocal.m4, and configure with autoconf-2.62
   Added MAINTEINERCLEANFILES variable to Makefile.am
   Avoid changing color_type from GRAY to RGB by
     png_set_expand_gray_1_2_4_to_8().
   Fix broken URL for rfc2083 in png.5 and libpng-*.txt
-
+  Removed a stray object file from contrib/gregbook
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 
