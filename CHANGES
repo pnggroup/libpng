@@ -2144,6 +2144,9 @@ version 1.0.34 and 1.2.28 [April 30, 2008]
     due to backward incompatibilities.
   Removed a stray object file from contrib/gregbook
 
+version 1.2.29beta01 [May 1, 2008]
+  Removed some stray *.diff and *.orig files
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
