@@ -2151,6 +2151,12 @@ version 1.2.29beta02 [May 1, 2008]
   Reverted Makefile.in, aclocal.m4, and configure to the libpng-1.2.26
     versions.
 
+version 1.2.29beta03 [May 2, 2008]
+  Added --force to autogen libtoolize options and --force-missing to
+    automake options.
+  Changed $(ECHO) to echo in Makefile.am and Makefile.in
+  Updated all configure files to autoconf-2.62
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

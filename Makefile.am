@@ -86,7 +86,7 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.2.29beta02.txt pngvcrd.c 
+	example.c libpng-1.2.29beta03.txt pngvcrd.c 
 
 CLEANFILES= pngout.png libpng12.pc libpng12-config libpng.vers \
 libpng.sym
@@ -111,9 +111,9 @@ libpng.sym: png.h pngconf.h
 
 libpng.vers: libpng.sym
 	rm -f $@ $@.new
-	$(ECHO) PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0 '{global:' > $@.new
+	echo PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0 '{global:' > $@.new
 	$(SED) s/$$/\;/ libpng.sym >> $@.new
-	$(ECHO) 'local: *; };' >> $@.new
+	echo 'local: *; };' >> $@.new
 	mv $@.new $@
 
 test: check
