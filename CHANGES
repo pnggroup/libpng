@@ -2156,6 +2156,10 @@ version 1.2.29beta03 [May 2, 2008]
     automake options.
   Changed $(ECHO) to echo in Makefile.am and Makefile.in
   Updated all configure files to autoconf-2.62
+  #ifdef out pnggcrd.c code if using MSC_VER
+
+version 1.2.29rc01 [May 4, 2008]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
