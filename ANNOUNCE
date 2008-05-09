@@ -1,5 +1,5 @@
 
-Libpng 1.0.35 - May 8, 2008
+Libpng 1.0.37 - May 9, 2008
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,40 +8,40 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.35.tar.gz
-   libpng-1.0.35.tar.lzma
+   libpng-1.0.37.tar.gz
+   libpng-1.0.37.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.0.35.tar.bz2
+   libpng-1.0.37.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.35-no-config.tar.gz
-   libpng-1.0.35-no-config.tar.lzma
-   libpng-1.0.35-no-config.tar.bz2
+   libpng-1.0.37-no-config.tar.gz
+   libpng-1.0.37-no-config.tar.lzma
+   libpng-1.0.37-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1035.zip
-   lpng1035.7z
-   lpng1035.tar.bz2
+   lpng1037.zip
+   lpng1037.7z
+   lpng1037.tar.bz2
 
 Project files
 
-   libpng-1.0.35-project-netware.zip
-   libpng-1.0.35-project-wince.zip
+   libpng-1.0.37-project-netware.zip
+   libpng-1.0.37-project-wince.zip
 
 Other information:
 
-   libpng-1.0.35-README.txt
-   libpng-1.0.35-KNOWNBUGS.txt
-   libpng-1.0.35-LICENSE.txt
-   libpng-1.0.35-Y2K-compliance.txt
+   libpng-1.0.37-README.txt
+   libpng-1.0.37-KNOWNBUGS.txt
+   libpng-1.0.37-LICENSE.txt
+   libpng-1.0.37-Y2K-compliance.txt
 
 Changes since the last public release (1.0.34):
 
-version 1.0.35 [May 8, 2008]
+version 1.0.37 [May 9, 2008]
 
   Removed some stray *.diff and *.orig files
   Reverted Makefile.in, aclocal.m4, and configure to the libpng-1.2.26
