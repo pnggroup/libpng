@@ -1,9 +1,9 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.2.9 April 14, 2006
+ * Last changed in libpng 1.2.27 [April 29, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2006 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -112,6 +112,8 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
             ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
+            if (up->size == 0)
+               png_warning(png_ptr, "Writing zero-length unknown chunk");
             png_write_chunk(png_ptr, up->name, up->data, up->size);
          }
        }
@@ -391,11 +393,6 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 
    /* write end of PNG file */
    png_write_IEND(png_ptr);
-#if 0
-/* This flush, added in libpng-1.0.8,  causes some applications to crash
-   because they do not set png_ptr->output_flush_fn */
-   png_flush(png_ptr);
-#endif
 }
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
@@ -459,12 +456,6 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    if (png_ptr == NULL)
       return (NULL);
 
-#if !defined(PNG_1_0_X)
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
-   png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
-#endif
-#endif /* PNG_1_0_X */
-
    /* added at libpng-1.2.6 */
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
@@ -493,12 +484,15 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif /* PNG_USER_MEM_SUPPORTED */
    png_set_error_fn(png_ptr, error_ptr, error_fn, warn_fn);
 
-   i=0;
-   do
+   if(user_png_ver)
    {
-     if(user_png_ver[i] != png_libpng_ver[i])
-        png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-   } while (png_libpng_ver[i++]);
+     i=0;
+     do
+     {
+       if(user_png_ver[i] != png_libpng_ver[i])
+          png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
+     } while (png_libpng_ver[i++]);
+   }
 
    if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
    {
@@ -515,11 +509,13 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
         char msg[80];
         if (user_png_ver)
         {
-          sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
+          png_snprintf(msg, 80,
+             "Application was compiled with png.h from libpng-%.20s",
              user_png_ver);
           png_warning(png_ptr, msg);
         }
-        sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
+        png_snprintf(msg, 80,
+           "Application  is  running with png.c from libpng-%.20s",
            png_libpng_ver);
         png_warning(png_ptr, msg);
 #endif
@@ -576,6 +572,7 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
    png_size_t png_struct_size, png_size_t png_info_size)
 {
    /* We only come here via pre-1.0.12-compiled applications */
+   if(png_ptr == NULL) return;
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
    if(png_sizeof(png_struct) > png_struct_size ||
       png_sizeof(png_info) > png_info_size)
@@ -584,11 +581,13 @@ png_write_init_2(png_structp png_ptr, png_const_charp user_png_ver,
       png_ptr->warning_fn=NULL;
       if (user_png_ver)
       {
-        sprintf(msg, "Application was compiled with png.h from libpng-%.20s",
+        png_snprintf(msg, 80,
+           "Application was compiled with png.h from libpng-%.20s",
            user_png_ver);
         png_warning(png_ptr, msg);
       }
-      sprintf(msg, "Application  is  running with png.c from libpng-%.20s",
+      png_snprintf(msg, 80,
+         "Application  is  running with png.c from libpng-%.20s",
          png_libpng_ver);
       png_warning(png_ptr, msg);
    }
@@ -667,12 +666,6 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
    png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
 #endif
-
-#if !defined(PNG_1_0_X)
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
-   png_init_mmx_flags(png_ptr);   /* 1.2.0 addition */
-#endif
-#endif /* PNG_1_0_X */
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* restore jump buffer */
@@ -1012,21 +1005,32 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 #endif
    }
 
+#ifdef PNG_USER_MEM_SUPPORTED
+   if (png_ptr != NULL)
+   {
+      free_fn = png_ptr->free_fn;
+      mem_ptr = png_ptr->mem_ptr;
+   }
+#endif
+
    if (info_ptr_ptr != NULL)
       info_ptr = *info_ptr_ptr;
 
    if (info_ptr != NULL)
    {
-      png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
+      if (png_ptr != NULL)
+      {
+        png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
-      if (png_ptr->num_chunk_list)
-      {
-         png_free(png_ptr, png_ptr->chunk_list);
-         png_ptr->chunk_list=NULL;
-         png_ptr->num_chunk_list=0;
-      }
+        if (png_ptr->num_chunk_list)
+        {
+           png_free(png_ptr, png_ptr->chunk_list);
+           png_ptr->chunk_list=NULL;
+           png_ptr->num_chunk_list=0;
+        }
 #endif
+      }
 
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)info_ptr, (png_free_ptr)free_fn,
@@ -1072,11 +1076,13 @@ png_write_destroy(png_structp png_ptr)
    /* free our memory.  png_free checks NULL for us. */
    png_free(png_ptr, png_ptr->zbuf);
    png_free(png_ptr, png_ptr->row_buf);
+#ifndef PNG_NO_WRITE_FILTERING
    png_free(png_ptr, png_ptr->prev_row);
    png_free(png_ptr, png_ptr->sub_row);
    png_free(png_ptr, png_ptr->up_row);
    png_free(png_ptr, png_ptr->avg_row);
    png_free(png_ptr, png_ptr->paeth_row);
+#endif
 
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
    png_free(png_ptr, png_ptr->time_buffer);
@@ -1132,15 +1138,26 @@ png_set_filter(png_structp png_ptr, int method, int filters)
    {
       switch (filters & (PNG_ALL_FILTERS | 0x07))
       {
+#ifndef PNG_NO_WRITE_FILTER
          case 5:
          case 6:
          case 7: png_warning(png_ptr, "Unknown row filter for method 0");
-         case PNG_FILTER_VALUE_NONE:  png_ptr->do_filter=PNG_FILTER_NONE; break;
-         case PNG_FILTER_VALUE_SUB:   png_ptr->do_filter=PNG_FILTER_SUB;  break;
-         case PNG_FILTER_VALUE_UP:    png_ptr->do_filter=PNG_FILTER_UP;   break;
-         case PNG_FILTER_VALUE_AVG:   png_ptr->do_filter=PNG_FILTER_AVG;  break;
-         case PNG_FILTER_VALUE_PAETH: png_ptr->do_filter=PNG_FILTER_PAETH;break;
+#endif /* PNG_NO_WRITE_FILTER */
+         case PNG_FILTER_VALUE_NONE:
+              png_ptr->do_filter=PNG_FILTER_NONE; break;
+#ifndef PNG_NO_WRITE_FILTER
+         case PNG_FILTER_VALUE_SUB:
+              png_ptr->do_filter=PNG_FILTER_SUB; break;
+         case PNG_FILTER_VALUE_UP:
+              png_ptr->do_filter=PNG_FILTER_UP; break;
+         case PNG_FILTER_VALUE_AVG:
+              png_ptr->do_filter=PNG_FILTER_AVG; break;
+         case PNG_FILTER_VALUE_PAETH:
+              png_ptr->do_filter=PNG_FILTER_PAETH; break;
          default: png_ptr->do_filter = (png_byte)filters; break;
+#else
+         default: png_warning(png_ptr, "Unknown row filter for method 0");
+#endif /* PNG_NO_WRITE_FILTER */
       }
 
       /* If we have allocated the row_buf, this means we have already started
@@ -1154,6 +1171,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
        */
       if (png_ptr->row_buf != NULL)
       {
+#ifndef PNG_NO_WRITE_FILTER
          if ((png_ptr->do_filter & PNG_FILTER_SUB) && png_ptr->sub_row == NULL)
          {
             png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
@@ -1208,6 +1226,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
          }
 
          if (png_ptr->do_filter == PNG_NO_FILTERS)
+#endif /* PNG_NO_WRITE_FILTER */
             png_ptr->do_filter = PNG_FILTER_NONE;
       }
    }
@@ -1506,8 +1525,8 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
    /* It is REQUIRED to call this to finish writing the rest of the file */
    png_write_end(png_ptr, info_ptr);
 
-   if(transforms == 0 || params == NULL)
-      /* quiet compiler warnings */ return;
+   transforms = transforms; /* quiet compiler warnings */
+   params = params;
 }
 #endif
 #endif /* PNG_WRITE_SUPPORTED */

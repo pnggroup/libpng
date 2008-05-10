@@ -1,5 +1,5 @@
 /* pngcrush.c - recompresses png files
- * Copyright (C) 1998-2002,2006 Glenn Randers-Pehrson (glennrp@users.sf.net)
+ * Copyright (C) 1998-2002,2006-2008 Glenn Randers-Pehrson (glennrp@users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
  *
  * The most recent version of pngcrush can be found at SourceForge in
@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.4"
+#define PNGCRUSH_VERSION "1.6.5"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -38,7 +38,7 @@
  * If you have modified this source, you may insert additional notices
  * immediately after this sentence.
  *
- * Copyright (C) 1998-2002,2006 Glenn Randers-Pehrson (glennrp@users.sf.net)
+ * Copyright (C) 1998-2002,2006-2008 Glenn Randers-Pehrson (glennrp@users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
  *
  * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
@@ -128,13 +128,6 @@
 #define PNG_iCCP const png_byte png_iCCP[5] = {105,  67,  67,  80, '\0'}
 #define PNG_IEND const png_byte png_IEND[5] = { 73,  69,  78,  68, '\0'}
 
-#if 0
-PNG_EXPORT_VAR (const png_byte FARDATA) png_IHDR[5];
-PNG_EXPORT_VAR (const png_byte FARDATA) png_IDAT[5];
-PNG_EXPORT_VAR (const png_byte FARDATA) png_IEND[5];
-PNG_EXPORT_VAR (const png_byte FARDATA) png_iCCP[5];
-#endif
-
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
 #define PNG_FLAG_CRC_ANCILLARY_USE        0x0100
@@ -169,6 +162,10 @@ PNG_EXPORT_VAR (const png_byte FARDATA) png_iCCP[5];
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
 # define PNGCRUSH_LOCO
+#endif
+
+#ifndef PNG_UINT_31_MAX
+#define PNG_UINT_31_MAX ((png_uint_32)0x7fffffffL)
 #endif
 
 /* These macros were renamed in libpng-1.2.6 */
@@ -268,11 +265,14 @@ struct options_help {
 static PNG_CONST char *progname;
 static PNG_CONST char *inname = "pngtest" DOT "png";
 static PNG_CONST char *outname = "pngout" DOT "png";
+static PNG_CONST char *mngname = "mngout" DOT "mng";
 static PNG_CONST char *directory_name = "pngcrush" DOT "bak";
 static PNG_CONST char *extension = "_C" DOT "png";
 
 static png_uint_32 width, height;
 static png_uint_32 measured_idat_length;
+static int found_gAMA = 0;
+static int found_cHRM = 0;
 static int pngcrush_must_exit = 0;
 static int all_chunks_are_safe = 0;
 static int number_of_open_files;
@@ -352,6 +352,9 @@ static int method = 10;
 static int pauses = 0;
 static int nosave = 0;
 static int nofilecheck = 0;
+#ifdef PNGCRUSH_LOCO
+static int new_mng = 0;
+#endif
 static png_bytep row_buf;
 #ifdef PNGCRUSH_MULTIPLE_ROWS
 static png_bytepp row_pointers;
@@ -397,11 +400,11 @@ static int num_palette;
 static png_byte palette_reorder[256];
 #endif
 
-static png_structp read_ptr, write_ptr;
+static png_structp read_ptr, write_ptr, mng_ptr;
 static png_infop read_info_ptr, write_info_ptr;
 static png_infop end_info_ptr;
 static png_infop write_end_info_ptr;
-static FILE *fpin, *fpout;
+static FILE *fpin, *fpout, *mng_out;
 png_uint_32 measure_idats(FILE * fpin);
 #ifdef PNGCRUSH_LOCO
 static int do_loco = 0;
@@ -1017,8 +1020,8 @@ png_voidp png_debug_malloc(png_structp png_ptr, png_uint_32 size)
         /* Make sure the caller isn't assuming zeroed memory. */
         png_memset(pinfo->pointer, 0xdd, pinfo->size);
         if (verbose > 2)
-            fprintf(STDERR, "Pointer %x allocated %lu bytes\n",
-                    (int) pinfo->pointer, size);
+            fprintf(STDERR, "Pointer %lux allocated %lu bytes\n",
+                    (unsigned long) pinfo->pointer, (unsigned long)size);
         return (png_voidp) (pinfo->pointer);
     }
 }
@@ -1052,13 +1055,14 @@ void png_debug_free(png_structp png_ptr, png_voidp ptr)
                    the memory that is to be freed. */
                 memset(ptr, 0x55, pinfo->size);
                 if (verbose > 2)
-                    fprintf(STDERR, "Pointer %x freed %lu bytes\n",
-                            (int) ptr, pinfo->size);
+                    fprintf(STDERR, "Pointer %lux freed %lu bytes\n",
+                            (unsigned long) ptr, (unsigned long)pinfo->size);
                 png_free_default(png_ptr, pinfo);
                 break;
             }
             if (pinfo->next == NULL) {
-                fprintf(STDERR, "Pointer %x not found\n", (int) ptr);
+                fprintf(STDERR, "Pointer %lux not found\n",
+                    (unsigned long) ptr);
                 break;
             }
             ppinfo = &pinfo->next;
@@ -1309,23 +1313,23 @@ void show_result(void)
             fprintf(STDERR, "   Overall result: no change\n");
         else if (total_input_length > total_output_length)
             fprintf(STDERR,
-                    "   Overall result: %4.2f%% reduction, %ld bytes\n",
+                    "   Overall result: %4.2f%% reduction, %lu bytes\n",
                     (100.0 -
                      (100.0 * total_output_length) / total_input_length),
-                    total_input_length - total_output_length);
+                    (unsigned long)(total_input_length-total_output_length));
         else
             fprintf(STDERR,
-                    "   Overall result: %4.2f%% increase, %ld bytes\n",
+                    "   Overall result: %4.2f%% increase, %lu bytes\n",
                     -(100.0 -
                       (100.0 * total_output_length) / total_input_length),
-                    total_output_length - total_input_length);
+                    (unsigned long)(total_output_length - total_input_length));
     }
     t_stop = (TIME_T) clock();
     t_misc += (t_stop - t_start);
     if (t_stop < t_start) {
-        t_misc += PNG_MAX_UINT;
+        t_misc += PNG_UINT_31_MAX;
         if (t_stop < 0)
-            t_misc += PNG_MAX_UINT;
+            t_misc += PNG_UINT_31_MAX;
     }
     t_start = t_stop;
     fprintf(STDERR, "   CPU time used = %.3f seconds",
@@ -1342,8 +1346,8 @@ void show_result(void)
         fprintf(STDERR, "MEMORY ERROR: %d bytes still allocated\n",
                 current_allocation);
         while (pinfo != NULL) {
-            fprintf(STDERR, " %8lu bytes at %x\n", pinfo->size,
-                    (int) pinfo->pointer);
+            fprintf(STDERR, " %8lu bytes at %lux\n", (unsigned long)pinfo->size,
+                    (unsigned long) pinfo->pointer);
             free(pinfo->pointer);
             pinfo = pinfo->next;
         }
@@ -1551,6 +1555,7 @@ int main(int argc, char *argv[])
 #ifdef PNG_gAMA_SUPPORTED
         else if (!strncmp(argv[i], "-dou", 4)) {
             double_gamma++;
+            found_gAMA=1;
             global_things_have_changed = 1;
         }
 #endif
@@ -1646,6 +1651,7 @@ int main(int argc, char *argv[])
         else if (!strncmp(argv[i], "-g", 2)) {
             names++;
             BUMP_I;
+            found_gAMA=1;
             if (intent < 0) {
 #ifdef PNG_FIXED_POINT_SUPPORTED
                 int c;
@@ -1705,8 +1711,15 @@ int main(int argc, char *argv[])
             names++;
             BUMP_I;
             max_idat_size = (png_uint_32) atoi(argv[i]);
-            if (max_idat_size == 0 || max_idat_size > PNG_MAX_UINT)
+            if (max_idat_size == 0 || max_idat_size > PNG_UINT_31_MAX)
                 max_idat_size = PNG_ZBUF_SIZE;
+#ifdef PNGCRUSH_LOCO
+        } else if (!strncmp(argv[i], "-mng", 4)) {
+            names++;
+            BUMP_I;
+            mngname = argv[i];
+            new_mng++;
+#endif
         } else if (!strncmp(argv[i], "-m", 2)) {
             names++;
             BUMP_I;
@@ -1742,6 +1755,7 @@ int main(int argc, char *argv[])
         else if (!strncmp(argv[i], "-rep", 4)) {
             names++;
             BUMP_I;
+            found_gAMA=1;
             {
 #ifdef PNG_FIXED_POINT_SUPPORTED
                 int c;
@@ -1823,7 +1837,7 @@ int main(int argc, char *argv[])
             i += 2;
             BUMP_I;
             i -= 3;
-            if (strlen(argv[i + 2]) < 80 && strlen(argv[i + 3]) < 2048 &&
+            if (strlen(argv[i + 2]) < 180 && strlen(argv[i + 3]) < 2048 &&
                 text_inputs < 10) {
 #ifdef PNG_iTXt_SUPPORTED
                 if (!strncmp(argv[i], "-zi", 3)) {
@@ -2135,7 +2149,46 @@ int main(int argc, char *argv[])
 
             already_crushed = 0;
 
+#ifdef PNGCRUSH_LOCO
+            if (new_mng) {
+           
+#ifdef PNG_USER_MEM_SUPPORTED
+               mng_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
+                 (png_voidp) NULL, (png_error_ptr) png_cexcept_error,
+                 (png_error_ptr) NULL, (png_voidp) NULL,
+                 (png_malloc_ptr) png_debug_malloc,
+                 (png_free_ptr) png_debug_free);
+#else
+               mng_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+                 (png_voidp) NULL, (png_error_ptr) png_cexcept_error,
+                 (png_error_ptr) NULL);
+#endif
+               if (mng_ptr == NULL)
+                  fprintf(STDERR, "pngcrush could not create mng_ptr");
+                  
+               if ((mng_out = FOPEN(mngname, "wb")) == NULL) {
+                  fprintf(STDERR, "Could not open output file %s\n",
+                          mngname);
+                  FCLOSE(fpin);
+                  exit(1);
+               }
+               number_of_open_files++;
+               png_init_io(mng_ptr, mng_out);
+               png_set_write_fn(mng_ptr, (png_voidp) mng_out,
+                               (png_rw_ptr) NULL,
+                               NULL);
+#endif
+
+            }
+
             idat_length[0] = measure_idats(fpin);
+
+#ifdef PNGCRUSH_LOCO
+            if (new_mng) {
+                    png_destroy_write_struct(&mng_ptr, NULL);
+                    FCLOSE(mng_out);
+            }
+#endif
 
             FCLOSE(fpin);
 
@@ -2149,7 +2202,7 @@ int main(int argc, char *argv[])
                 fprintf(STDERR, "   Recompressing %s\n", inname);
                 fprintf(STDERR,
                   "   Total length of data found in IDAT chunks    = %8lu\n",
-                  idat_length[0]);
+                  (unsigned long)idat_length[0]);
                 fflush(STDERR);
             }
 
@@ -2612,10 +2665,17 @@ int main(int argc, char *argv[])
                     if (!(int)
                         (png_memcmp(mng_signature, png_signature, 8))) {
                         png_byte buffer[40];
+            unsigned long length;
                         /* Skip the MHDR */
                         png_permit_mng_features(read_ptr,
                                                 PNG_FLAG_MNG_FILTER_64);
-                        png_default_read_data(read_ptr, buffer, 40);
+            png_default_read_data(read_ptr, buffer, 4);
+            length=buffer[3]+(buffer[2]<<8)+(buffer[1]<<16)+(buffer[0]<<24);
+            png_default_read_data(read_ptr, buffer, 4);
+            printf("Skipping %c%c%c%c chunk.\n",buffer[0],buffer[1],
+              buffer[2],buffer[3]);
+            png_default_read_data(read_ptr, buffer, length);
+            png_default_read_data(read_ptr, buffer, 4);
                         input_format = 1;
                     } else
 #endif
@@ -2630,7 +2690,7 @@ int main(int argc, char *argv[])
 
                 png_read_info(read_ptr, read_info_ptr);
 
-                { /* GRR added for quick %-navigation (1) */
+                /* { GRR added for quick %-navigation (1) */
 
                 /* Start of chunk-copying/removal code, in order:
                  *  - IHDR
@@ -2673,8 +2733,9 @@ int main(int argc, char *argv[])
                         if (verbose > 1 && first_trial) {
                             fprintf(STDERR, "   IHDR chunk data:\n");
                             fprintf(STDERR,
-                                    "      Width=%ld, height=%ld\n", width,
-                                    height);
+                                    "      Width=%lu, height=%lu\n",
+                                    (unsigned long)width,
+                                    (unsigned long)height);
                             fprintf(STDERR, "      Bit depth =%d\n",
                                     bit_depth);
                             fprintf(STDERR, "      Color type=%d\n",
@@ -2871,7 +2932,7 @@ int main(int argc, char *argv[])
                     png_fixed_point white_x, white_y, red_x, red_y,
                         green_x, green_y, blue_x, blue_y;
 
-                    if (png_get_cHRM_fixed
+                    if (found_cHRM && png_get_cHRM_fixed
                         (read_ptr, read_info_ptr, &white_x, &white_y,
                          &red_x, &red_y, &green_x, &green_y, &blue_x,
                          &blue_y)) {
@@ -2945,10 +3006,10 @@ int main(int argc, char *argv[])
 #endif
                     }
 #ifdef PNG_FIXED_POINT_SUPPORTED
-                    else if (png_get_gAMA_fixed
+                    else if (found_gAMA && png_get_gAMA_fixed
                              (read_ptr, read_info_ptr, &file_gamma))
 #else
-                    else if (png_get_gAMA
+                    else if (found_gAMA && png_get_gAMA
                              (read_ptr, read_info_ptr, &file_gamma))
 #endif
                     {
@@ -3023,12 +3084,7 @@ int main(int argc, char *argv[])
                                   intent);
                             png_set_sRGB(write_ptr, write_info_ptr,
                                          intent);
-                        } else if (file_gamma == 0) {
-                            things_have_changed = 1;
-                            png_set_sRGB_gAMA_and_cHRM(write_ptr,
-                                                       write_info_ptr,
-                                                       intent);
-                        } else {
+                        } else if (file_gamma != 0) {
                             if (first_trial) {
                                 fprintf(STDERR, "   Ignoring sRGB request; "
 #ifdef PNG_FIXED_POINT_SUPPORTED
@@ -3036,7 +3092,8 @@ int main(int argc, char *argv[])
 #else
                                   "gamma=%f"
 #endif
-                                  " is not approx. 0.455\n", file_gamma);
+                                  " is not approx. 0.455\n",
+                                  (unsigned long)file_gamma);
                             }
                         }
 #endif /* PNG_gAMA_SUPPORTED */
@@ -3054,9 +3111,10 @@ int main(int argc, char *argv[])
                     if (png_get_iCCP
                         (read_ptr, read_info_ptr, &name,
                          &compression_method, &profile, &proflen)) {
-                        P1("Got iccp chunk, proflen=%lu\n", proflen);
+                        P1("Got iCCP chunk, proflen=%lu\n",
+                            (unsigned long)proflen);
                         if (iccp_length)
-                            P0("Will not replace existing iccp chunk.\n");
+                            P0("Will not replace existing iCCP chunk.\n");
                         if (keep_chunk("iCCP", argv))
                             png_set_iCCP(write_ptr, write_info_ptr, name,
                                          compression_method, profile,
@@ -3067,7 +3125,7 @@ int main(int argc, char *argv[])
                     else if (iccp_length) {
                         png_set_iCCP(write_ptr, write_info_ptr, iccp_name,
                                      0, iccp_text, iccp_length);
-                        P1("Wrote iccp chunk, proflen=%d\n", iccp_length);
+                        P1("Wrote iCCP chunk, proflen=%d\n", iccp_length);
                     }
 #endif
 
@@ -3141,7 +3199,8 @@ int main(int argc, char *argv[])
                                      res_y, unit_type);
                         if (verbose > 0 && first_trial)
                             fprintf(STDERR, "   Added pHYs %lu %lu 1 chunk\n",
-                              res_x, res_y);
+                            (unsigned long)res_x, 
+                            (unsigned long)res_y);
                     }
                 }
 #endif
@@ -3478,6 +3537,9 @@ int main(int argc, char *argv[])
                                       ".\n", (added_text[0].compression == 1)?
                                       "n un" : " ");
 #endif
+#if 0
+                                printf("   key=%s.\n",(added_text[0].key));
+#endif
                                 png_free(write_ptr, added_text);
                                 added_text = (png_textp) NULL;
                             }
@@ -3520,11 +3582,12 @@ int main(int argc, char *argv[])
 
                         /* make an array of only those chunks we want to keep */
                         for (i = 0; i < num_unknowns; i++) {
-                            P1("Handling unknown chunk %d\n", i);
+                            P1("Handling unknown chunk %d %s\n", i,
+                               (char *)unknowns[i].name);
                             /* not EBCDIC-safe, but neither is keep_chunks(): */
                             P2("   unknown[%d] = %s (%lu bytes, location %d)\n",
                               i, unknowns[i].name,
-                              (png_uint_32)unknowns[i].size,
+                              (unsigned long)unknowns[i].size,
                               unknowns[i].location);
                             if (keep_chunk((char *)unknowns[i].name, argv)) {
                                 memcpy(&unknowns_keep[num_unknowns_keep],
@@ -3558,8 +3621,8 @@ int main(int argc, char *argv[])
                 }
               P0("unknown chunk handling done.\n");
 #endif /* PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED */
-                } /* GRR added for quick %-navigation (1) */
 
+                /* } GRR added for quick %-navigation (1) */
 
                 png_read_transform_info(read_ptr, read_info_ptr);
 
@@ -3610,8 +3673,7 @@ int main(int argc, char *argv[])
 #ifdef PNGCRUSH_LOCO
                     if (do_loco) {
                         png_byte buffer[30];
-                        const png_byte png_MHDR[5] =
-                            { 77, 72, 68, 82, '\0' };
+                        const png_byte png_MHDR[5] = { 77, 72, 68, 82, '\0' };
                         png_byte mng_signature[8] =
                             { 138, 77, 78, 71, 13, 10, 26, 10 };
                         /* write the MNG 8-byte signature */
@@ -3691,7 +3753,7 @@ int main(int argc, char *argv[])
                             if (max_possible_size > max_idat_size)
                                 max_possible_size = max_idat_size;
                             P2("reinitializing write zbuf to %lu.\n",
-                               max_possible_size);
+                               (unsigned long)max_possible_size);
                             png_set_compression_buffer_size(write_ptr,
                                                             max_possible_size);
                         }
@@ -3833,9 +3895,9 @@ int main(int argc, char *argv[])
                 t_stop = (TIME_T) clock();
                 t_misc += (t_stop - t_start);
                 if (t_stop < t_start) {
-                    t_misc += PNG_MAX_UINT;
+                    t_misc += PNG_UINT_31_MAX;
                     if (t_stop < 0)
-                        t_misc += PNG_MAX_UINT;
+                        t_misc += PNG_UINT_31_MAX;
                 }
                 t_start = t_stop;
                 for (pass = 0; pass < num_pass; pass++) {
@@ -3862,9 +3924,9 @@ int main(int argc, char *argv[])
                             t_stop = (TIME_T) clock();
                             t_decode += (t_stop - t_start);
                             if (t_stop < t_start) {
-                                t_decode += PNG_MAX_UINT;
+                                t_decode += PNG_UINT_31_MAX;
                                 if (t_stop < 0)
-                                    t_decode += PNG_MAX_UINT;
+                                    t_decode += PNG_UINT_31_MAX;
                             }
                             t_start = t_stop;
 #ifdef PNGCRUSH_MULTIPLE_ROWS
@@ -3876,9 +3938,9 @@ int main(int argc, char *argv[])
                             t_stop = (TIME_T) clock();
                             t_encode += (t_stop - t_start);
                             if (t_stop < t_start) {
-                                t_encode += PNG_MAX_UINT;
+                                t_encode += PNG_UINT_31_MAX;
                                 if (t_stop < 0)
-                                    t_encode += PNG_MAX_UINT;
+                                    t_encode += PNG_UINT_31_MAX;
                             }
                             t_start = t_stop;
                         }
@@ -3889,9 +3951,9 @@ int main(int argc, char *argv[])
                     t_stop = (TIME_T) clock();
                     t_decode += (t_stop - t_start);
                     if (t_stop < t_start) {
-                        t_decode += PNG_MAX_UINT;
+                        t_decode += PNG_UINT_31_MAX;
                         if (t_stop < 0)
-                            t_decode += PNG_MAX_UINT;
+                            t_decode += PNG_UINT_31_MAX;
                     }
                     t_start = t_stop;
                 }
@@ -3928,7 +3990,7 @@ int main(int argc, char *argv[])
                 P1( "Reading and writing end_info data\n");
                 png_read_end(read_ptr, end_info_ptr);
 
-                { /* GRR:  added for %-navigation (2) */
+                /* { GRR:  added for %-navigation (2) */
 
 #if (defined(PNG_READ_tEXt_SUPPORTED) && defined(PNG_WRITE_tEXt_SUPPORTED)) \
  || (defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED))
@@ -4082,7 +4144,7 @@ int main(int argc, char *argv[])
                     }
                 }
 #endif
-                } /* GRR:  added for %-navigation (2) */
+                /* } GRR:  added for %-navigation (2) */
 
                 if (nosave == 0) {
 #if 0 /* doesn't work; compression level has to be the same as in IDAT */
@@ -4173,7 +4235,7 @@ int main(int argc, char *argv[])
             if (nosave == 0) {
                 P1( "Opening file for length measurement\n");
                 if ((fpin = FOPEN(outname, "rb")) == NULL) {
-                    fprintf(STDERR, "Could not find file %s\n", outname);
+                    fprintf(STDERR, "Could not find output file %s\n", outname);
                     if (png_row_filters != NULL) {
                         free(png_row_filters);
                         png_row_filters = NULL;
@@ -4191,7 +4253,7 @@ int main(int argc, char *argv[])
                 fprintf(STDERR,
                   "   IDAT length with method %3d (fm %d zl %d zs %d) = %8lu\n",
                   trial, filter_type, zlib_level, z_strategy,
-                  idat_length[trial]);
+                  (unsigned long)idat_length[trial]);
                 fflush(STDERR);
             }
 
@@ -4303,12 +4365,13 @@ png_uint_32 measure_idats(FILE * fpin)
 
         png_set_sig_bytes(read_ptr, 0);
         measured_idat_length = png_measure_idat(read_ptr);
-        P2("measure_idats: IDAT length=%lu\n", measured_idat_length);
+        P2("measure_idats: IDAT length=%lu\n",
+          (unsigned long)measured_idat_length);
         P1( "Destroying data structs\n");
         png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
     }
     Catch(msg) {
-        fprintf(STDERR, "\nWhile reading %s ", inname);
+        fprintf(STDERR, "\nWhile measuring IDATs in %s ", inname);
         fprintf(STDERR, "pngcrush caught libpng error:\n   %s\n\n", msg);
         png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
         P1( "Destroyed data structs\n");
@@ -4326,6 +4389,8 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
     /* Copyright (C) 1999-2002,2006 Glenn Randers-Pehrson (glennrp@users.sf.net)
        See notice in pngcrush.c for conditions of use and distribution */
     png_uint_32 sum_idat_length = 0;
+    png_byte *bb = NULL;
+    png_uint_32 malloced_length=0;
 
     {
         png_byte png_signature[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
@@ -4338,10 +4403,50 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 
 #if defined(PNGCRUSH_LOCO)
         if (!(int) (png_memcmp(mng_signature, png_signature, 8))) {
+            const png_byte png_MHDR[5] = { 77, 72, 68, 82, '\0' };
+
+            int b;
             png_byte buffer[40];
-            /* skip the MHDR */
-            png_default_read_data(read_ptr, buffer, 40);
+            unsigned long length;
+            /* read the MHDR */
+            png_default_read_data(read_ptr, buffer, 4);
+            length=buffer[3]+(buffer[2]<<8)+(buffer[1]<<16)+(buffer[0]<<24);
+            png_default_read_data(read_ptr, buffer, 4);
+            printf("Reading %c%c%c%c chunk.\n",buffer[0],buffer[1],
+              buffer[2],buffer[3]);
+            for (b=0; b<40; b++)
+              buffer[b]='\0';
+            png_default_read_data(read_ptr, buffer, length);
+            if (verbose) {
+            printf("  width=%lu\n",(unsigned long)(buffer[3]+(buffer[2]<<8)
+                      +(buffer[1]<<16)+(buffer[0]<<24)));
+            printf("  height=%lu\n",(unsigned long)(buffer[7]+(buffer[6]<<8)
+                      +(buffer[5]<<16)+(buffer[4]<<24)));
+            printf("  ticksps=%lu\n",(unsigned long)(buffer[11]+
+                     (buffer[10]<<8)+(buffer[9]<<16)+(buffer[8]<<24)));
+            printf("  nomlayc=%lu\n",(unsigned long)(buffer[15]+
+                     (buffer[14]<<8)+(buffer[13]<<16)+(buffer[12]<<24)));
+            printf("  nomfram=%lu\n",(unsigned long)(buffer[19]+
+                     (buffer[18]<<8)+(buffer[17]<<16)+(buffer[16]<<24)));
+            printf("  nomplay=%lu\n",(unsigned long)(buffer[23]+
+                     (buffer[22]<<8)+(buffer[21]<<16)+(buffer[20]<<24)));
+            printf("  profile=%lu\n",(unsigned long)(buffer[27]+
+                     (buffer[26]<<8)+(buffer[25]<<16)+(buffer[24]<<24)));
+            }
+
+            if (new_mng) {
+            /* write the MNG 8-byte signature */
+            png_default_write_data(mng_ptr, &mng_signature[0],
+                                  (png_size_t) 8);
+
+                        /* Write a MHDR chunk */
+            png_write_chunk(mng_ptr, (png_bytep) png_MHDR,
+                            buffer, (png_size_t) 28);
+            }
+
+            png_default_read_data(read_ptr, buffer, 4);
             input_format = 1;
+
         } else
 #endif
         if (png_sig_cmp(png_signature, 0, 8)) {
@@ -4353,10 +4458,15 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
         }
     }
 
-#ifdef PNG_CRC_WARN_USE
     if (fix)
+    {
+#ifdef PNG_CRC_WARN_USE
         png_set_crc_action(png_ptr, PNG_CRC_WARN_USE, PNG_CRC_WARN_USE);
 #endif
+#ifdef INFLATE_ALLOW_INVALID_DISTANCE_TOOFAR_ARRR
+        inflateUndermine(&png_ptr->zstream, 1);
+#endif
+    }
 
     for (;;) {
 #ifndef PNG_UINT_IDAT
@@ -4382,6 +4492,85 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
         png_reset_crc(png_ptr);
         png_crc_read(png_ptr, chunk_name, 4);
 
+        if (new_mng) {
+          const png_byte png_DHDR[5] = { 68, 72, 68, 82, '\0' };
+          const png_byte png_DEFI[5] = { 68, 69, 70, 73, '\0' };
+          const png_byte png_FRAM[5] = { 70, 82, 65, 77, '\0' };
+          const png_byte png_nEED[5] = { 110, 69, 69, 68, '\0' };
+        if (!png_memcmp(chunk_name, png_nEED, 4))
+          {
+          /* Skip the nEED chunk */
+            printf ("  skipping MNG %c%c%c%c chunk, %lu bytes\n",chunk_name[0],
+              chunk_name[1],chunk_name[2],chunk_name[3],(unsigned long)length);
+          }
+          else {
+        /* copy the chunk. */
+            printf ("  reading MNG %c%c%c%c chunk, %lu bytes\n",chunk_name[0],
+              chunk_name[1],chunk_name[2],chunk_name[3],(unsigned long)length);
+            if (length > malloced_length) {
+              png_free(mng_ptr,bb);
+              printf ("  png_malloc %lu bytes.\n",(unsigned long)length);
+              bb=png_malloc(mng_ptr, length);
+              malloced_length=length;
+            }
+            png_crc_read(png_ptr, bb, length);
+            png_write_chunk(mng_ptr, chunk_name,
+                            bb, (png_size_t) length);
+
+        if (!png_memcmp(chunk_name, png_DHDR, 4)) {
+            if (verbose > 1) {
+            printf("  objid=%lu\n",(unsigned long)(bb[1]+(bb[0]<<8)));
+            printf("  itype=%lu\n",(unsigned long)(bb[2]));
+            printf("  dtype=%lu\n",(unsigned long)(bb[3]));
+            printf("  width=%lu\n",(unsigned long)(bb[7]+(bb[6]<<8)
+                      +(bb[5]<<16)+(bb[4]<<24)));
+            printf("  height=%lu\n",(unsigned long)(bb[11]+(bb[10]<<8)
+                      +(bb[9]<<16)+(bb[8]<<24)));
+            printf("  xloc=%lu\n",(unsigned long)(bb[15]+(bb[14]<<8)
+                      +(bb[13]<<16)+(bb[12]<<24)));
+            printf("  yloc=%lu\n",(unsigned long)(bb[19]+(bb[18]<<8)
+                      +(bb[17]<<16)+(bb[16]<<24)));
+            }
+        }
+        if (!png_memcmp(chunk_name, png_DEFI, 4)) {
+            if (verbose > 1) {
+            printf("  objid=%lu\n",(unsigned long)(bb[1]+(bb[0]<<8)));
+            printf("  do_not_show=%lu\n",(unsigned long)(bb[2]));
+            printf("  concrete=%lu\n",(unsigned long)(bb[3]));
+            if (length > 4) {
+            printf("  xloc=%lu\n",(unsigned long)(bb[15]+(bb[14]<<8)
+                      +(bb[13]<<16)+(bb[12]<<24)));
+            printf("  yloc=%lu\n",(unsigned long)(bb[19]+(bb[18]<<8)
+                      +(bb[17]<<16)+(bb[16]<<24)));
+            if (length > 12) {
+            printf("  l_cb=%lu\n",(unsigned long)(bb[20]+(bb[19]<<8)
+                      +(bb[18]<<16)+(bb[17]<<24)));
+            printf("  r_cb=%lu\n",(unsigned long)(bb[24]+(bb[23]<<8)
+                      +(bb[22]<<16)+(bb[21]<<24)));
+            }
+            }
+            }
+        }
+        if (!png_memcmp(chunk_name, png_FRAM, 4)) {
+            if (verbose > 1) {
+              printf("  mode=%lu\n",(unsigned long)bb[0]);
+              if (length > 1) {
+                int ib;
+                printf("  name = ");
+                for (ib=0; bb[ib]; ib++)
+                {
+                  printf ("%c", bb[ib]);
+                }
+                printf ("\n");
+              }
+            }
+        }
+            length=0;
+        }
+        }
+
+        else {
+
 #ifdef PNG_UINT_IDAT
         if (png_get_uint_32(chunk_name) == PNG_UINT_IDAT)
 #else
@@ -4395,8 +4584,8 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 
         if (verbose > 1) {
             chunk_name[4] = '\0';
-            printf("Reading %s chunk, length = %ld.\n", chunk_name,
-                   length);
+            printf("Reading %s chunk, length = %lu.\n", chunk_name,
+                   (unsigned long)length);
         }
 #ifdef PNG_UINT_IHDR
         if (png_get_uint_32(chunk_name) == PNG_UINT_IHDR)
@@ -4409,6 +4598,17 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             length -= 13;
             input_color_type = buffer[9];
         }
+
+#ifdef PNG_gAMA_SUPPORTED
+        if (png_get_uint_32(chunk_name) == PNG_UINT_gAMA)
+          found_gAMA=1;
+#endif
+
+#ifdef PNG_cHRM_SUPPORTED
+        if (png_get_uint_32(chunk_name) == PNG_UINT_cHRM)
+          found_cHRM=1;
+#endif
+
 #ifdef PNG_iCCP_SUPPORTED
         /* check for bad Photoshop iCCP chunk */
 #ifdef PNG_UINT_iCCP
@@ -4445,8 +4645,32 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
         }
 #endif
 
+
+    }
         png_crc_finish(png_ptr, length);
 
+#ifdef PNGCRUSH_LOCO
+#ifdef PNG_UINT_MEND
+        if (png_get_uint_32(chunk_name) == PNG_UINT_MEND)
+            return sum_idat_length;
+#else
+        {
+        const png_byte png_MEND[5] =
+            { 77, 69, 78, 68, '\0' };
+        if (!png_memcmp(chunk_name, png_MEND, 4))
+          {
+            if (new_mng)
+              png_free(mng_ptr,bb);
+              return (0);
+            return sum_idat_length;
+          }
+        }
+#endif
+#endif
+
+
+if (input_format == 0)
+  {
 #ifdef PNG_UINT_IEND
         if (png_get_uint_32(chunk_name) == PNG_UINT_IEND)
 #else
@@ -4454,6 +4678,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 #endif
             return sum_idat_length;
     }
+  }
 }
 
 
@@ -4556,8 +4781,15 @@ int count_colors(FILE * fpin)
 #if defined(PNGCRUSH_LOCO)
                 if (!(int) (png_memcmp(mng_signature, png_signature, 8))) {
                     png_byte buffer[40];
+                    unsigned long length;
                     /* skip the MHDR */
-                    png_default_read_data(read_ptr, buffer, 40);
+                    png_default_read_data(read_ptr, buffer, 4);
+                    length=buffer[3]+(buffer[2]<<8)+(buffer[1]<<16)+(buffer[0]<<24);
+                    png_default_read_data(read_ptr, buffer, 4);
+                    printf("Skipping %c%c%c%c chunk.\n",buffer[0],buffer[1],
+                      buffer[2],buffer[3]);
+                    png_default_read_data(read_ptr, buffer, length);
+                    png_default_read_data(read_ptr, buffer, 4);
                     png_permit_mng_features(read_ptr,
                                             PNG_FLAG_MNG_FILTER_64);
                     input_format = 1;
@@ -4963,7 +5195,7 @@ void print_version_info(void)
       " | pngcrush %s\n"
       /* If you have modified this source, you may insert additional notices
        * immediately after this sentence: */
-      " |    Copyright (C) 1998-2002,2006 Glenn Randers-Pehrson\n"
+      " |    Copyright (C) 1998-2002,2006-2008 Glenn Randers-Pehrson\n"
       " |    Copyright (C) 2005      Greg Roelofs\n"
       " | This is a free, open-source program.  Permission is irrevocably\n"
       " | granted to everyone to use this version of pngcrush without\n"
@@ -4971,7 +5203,7 @@ void print_version_info(void)
       " | Executable name is %s\n"
       " | It was built with libpng version %s, and is\n"
       " | running with %s"
-      " |    Copyright (C) 1998-2004,2006 Glenn Randers-Pehrson,\n"
+      " |    Copyright (C) 1998-2004,2006-2008 Glenn Randers-Pehrson,\n"
       " |    Copyright (C) 1996, 1997 Andreas Dilger,\n"
       " |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,\n"
       " | and zlib version %s, Copyright (C) 1998-2002 (or later),\n"
@@ -5009,7 +5241,7 @@ static const char *pngcrush_legal[] = {
     "",
     /* If you have modified this source, you may insert additional notices
      * immediately after this sentence: */
-    "Copyright (C) 1998-2002,2006 Glenn Randers-Pehrson (glennrp@users.sf.net)",
+    "Copyright (C) 1998-2002,2006-2008 Glenn Randers-Pehrson (glennrp@users.sf.net)",
     "Copyright (C) 2005      Greg Roelofs",
     "",
     "DISCLAIMER: The pngcrush computer program is supplied \"AS IS\".",
@@ -5196,6 +5428,12 @@ struct options_help pngcrush_options[] = {
 
     {0, "          -max maximum_IDAT_size [default "STRNGIFY(PNG_ZBUF_SIZE)"]"},
     {2, ""},
+
+#ifdef PNGCRUSH_LOCO
+    {0, "          -mng (write a new MNG, do not crush embedded PNGs)"},
+    {2, ""},
+#endif
+
 
 #ifdef PNGCRUSH_COUNT_COLORS
     {0, "        -no_cc (no color counting)"},

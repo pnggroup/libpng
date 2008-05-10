@@ -18,10 +18,7 @@
 #define PNGCRUSH_LIBPNG_VER 10007
 #endif
 
-#if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_USE_PNGVCRD) && \
-    !defined(PNG_NO_ASSEMBLER_CODE)
 #define PNG_NO_ASSEMBLER_CODE
-#endif
 
 #ifndef PNG_NO_ZALLOC_ZERO
 #  define PNG_NO_ZALLOC_ZERO  /* speeds it up a little */

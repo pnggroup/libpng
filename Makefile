@@ -10,21 +10,19 @@
 
 # macros --------------------------------------------------------------------
 
-GAS_VERSION := $(shell as --version | grep "GNU assembler" | sed -e 's/GNU assembler //' -e 's/ .*//')
-
 # uncomment these 2 lines only if you are using an external copy of zlib:
 #ZINC = ../../zlib
 #ZLIB = ../../zlib
 
-CC = gcc
-LD = gcc
+# CC = gcc
+CC = gcc-4.3.0
+LD = gcc-4.3.0
+# LD = gcc
 RM = rm -f
 #CFLAGS = -I. -O -Wall
-#CFLAGS = -I. -O3 -fomit-frame-pointer -Wall -DPNG_USE_PNGGCCRD
-CFLAGS = -I. -O3 -fomit-frame-pointer -Wall -DPNG_USE_PNGGCCRD \
-         -DGAS_VERSION="\"${GAS_VERSION}\""
-#CFLAGS = -I${ZINC} -I. -O3 -fomit-frame-pointer -Wall -DPNG_USE_PNGGCCRD \
-#         -DGAS_VERSION="\"${GAS_VERSION}\""
+#CFLAGS = -I. -O3 -fomit-frame-pointer -Wall
+CFLAGS = -I. -O3 -fomit-frame-pointer -Wall
+#CFLAGS = -I${ZINC} -I. -O3 -fomit-frame-pointer -Wall
 # [note that -Wall is a gcc-specific compilation flag ("all warnings on")]
 LDFLAGS =
 O = .o
@@ -44,7 +42,7 @@ ZOBJS  = adler32$(O) compress$(O) crc32$(O) deflate$(O) gzio$(O) \
 
 OBJS  = pngcrush$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
 	pngpread$(O) pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) \
-	pngset$(O) pngtrans$(O) pngwio$(O) pngwrite$(O) pnggccrd$(O) \
+	pngset$(O) pngtrans$(O) pngwio$(O) pngwrite$(O) \
 	pngwtran$(O) pngwutil$(O) $(ZOBJS)
 
 EXES = $(PNGCRUSH)$(E)

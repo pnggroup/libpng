@@ -1,5 +1,8 @@
 Change log:
 
+Version 1.6.5 (built with libpng-1.2.29 and zlib-1.2.3.2)
+  Discontinued adding a new gAMA chunk when writing sRGB chunk.
+
 Version 1.6.4 (built with libpng-1.2.9rc1 and zlib-1.2.3)
   Fixed bug in handling of undocumented -trns_a option (Michal Politowski).
   Fixed bug with "nosave" handling of unknown chunks.
