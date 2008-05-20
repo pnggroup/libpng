@@ -1,5 +1,14 @@
 Change log:
 
+Version 1.6.6 (built with libpng-1.2.29 and zlib-1.2.3.2)
+  Added dSIG support.  Pngcrush will not rewrite an image containing
+  a dSIG chunk immediately following the IHDR chunk, unless the
+  dSIG is explicitly removed with "-rem dSIG" or explicitly kept
+  with "-keep dSIG".  In the latter case the saved dSIG chunks will
+  become invalid if any changes are made to the datastream.
+
+  Fixed bug in writing unknown chunks from the end_info_ptr.
+
 Version 1.6.5 (built with libpng-1.2.29 and zlib-1.2.3.2)
   Discontinued adding a new gAMA chunk when writing sRGB chunk.
 

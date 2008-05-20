@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.5"
+#define PNGCRUSH_VERSION "1.6.6"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -125,6 +125,7 @@
 
 #define PNG_IDAT const png_byte png_IDAT[5] = { 73,  68,  65,  84, '\0'}
 #define PNG_IHDR const png_byte png_IHDR[5] = { 73,  72,  68,  82, '\0'}
+#define PNG_dSIG const png_byte png_dSIG[5] = {100,  83,  73,  71, '\0'}
 #define PNG_iCCP const png_byte png_iCCP[5] = {105,  67,  67,  80, '\0'}
 #define PNG_IEND const png_byte png_IEND[5] = { 73,  69,  78,  68, '\0'}
 
@@ -273,6 +274,8 @@ static png_uint_32 width, height;
 static png_uint_32 measured_idat_length;
 static int found_gAMA = 0;
 static int found_cHRM = 0;
+static int found_any_chunk = 0;
+static int image_is_immutable = 0;
 static int pngcrush_must_exit = 0;
 static int all_chunks_are_safe = 0;
 static int number_of_open_files;
@@ -1192,6 +1195,8 @@ int keep_unknown_chunk(png_const_charp name, char *argv[])
                  * either "alla", "allb", or all-lowercase form of "name" */
                 || (!strncmp(name, "cHRM", 4)
                     && (!strncmp(argv[i], "chrm", 4) || allb))
+                || (!strncmp(name, "dSIG", 4)
+                    && (!strncmp(argv[i], "dsig", 4) || allb))
                 || (!strncmp(name, "gIFg", 4)
                     && (!strncmp(argv[i], "gifg", 4) || allb))
                 || (!strncmp(name, "gIFt", 4)
@@ -1252,6 +1257,8 @@ int keep_chunk(png_const_charp name, char *argv[])
                     && (!strncmp(argv[i], "bkgd", 4) || allb))
                 || (!strncmp(name, "cHRM", 4)
                     && (!strncmp(argv[i], "chrm", 4) || allb))
+                || (!strncmp(name, "dSIG", 4)
+                    && (!strncmp(argv[i], "dsig", 4) || allb))
                 || (!strncmp(name, "gAMA", 4)
                     && (!strncmp(argv[i], "gama", 4) || alla))
                 || (!strncmp(name, "gIFg", 4)
@@ -1707,6 +1714,14 @@ int main(int argc, char *argv[])
             }
         }
 #endif
+        else if (!strncmp(argv[i], "-keep", 5)) {
+            names++;
+            BUMP_I;
+            if (!strncmp(argv[i], "dSIG", 4)
+                    && (!strncmp(argv[i], "dsig", 4) ))
+              found_any_chunk=1;
+        }
+
         else if (!strncmp(argv[i], "-max", 4)) {
             names++;
             BUMP_I;
@@ -1801,6 +1816,9 @@ int main(int argc, char *argv[])
             remove_chunks = i;
             names++;
             BUMP_I;
+            if (!strncmp(argv[i], "dSIG", 4)
+                 && (!strncmp(argv[i], "dsig", 4)))
+               image_is_immutable=0;
         } else if (!strncmp(argv[i], "-save", 5)) {
             all_chunks_are_safe++;
         } else if (!strncmp(argv[i], "-srgb", 5) ||
@@ -2192,11 +2210,6 @@ int main(int argc, char *argv[])
 
             FCLOSE(fpin);
 
-            if (already_crushed) {
-                fprintf(STDERR, "File has already been crushed: %s\n", inname);
-                if (!things_have_changed)
-                    continue;
-            }
 
             if (verbose > 0) {
                 fprintf(STDERR, "   Recompressing %s\n", inname);
@@ -2212,6 +2225,14 @@ int main(int argc, char *argv[])
         } else
             idat_length[0] = 1;
 
+        if (already_crushed) {
+            fprintf(STDERR, "   File %s has already been crushed.\n", inname);
+        }
+        if (image_is_immutable) {
+            fprintf(STDERR,
+              "   Image %s has a dSIG chunk and is immutable.\n", inname);
+        }
+        if (!already_crushed && !image_is_immutable) {
 #ifdef PNGCRUSH_COUNT_COLORS
         reduce_to_gray = 0;
         it_is_opaque = 0;
@@ -2323,10 +2344,11 @@ int main(int argc, char *argv[])
                     }
                 }
 
-                if (idat_length[best] == idat_length[0]
+                if (image_is_immutable
+                    || (idat_length[best] == idat_length[0]
                     && things_have_changed == 0
                     && idat_length[best] != idat_length[final_method]
-                    && nosave == 0)
+                    && nosave == 0))
                 {
                     /* just copy input to output */
 
@@ -2564,6 +2586,10 @@ int main(int argc, char *argv[])
 #endif
 #if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
                 if (nosave == 0) {
+                    if (found_any_chunk == 1)
+                    png_set_keep_unknown_chunks(write_ptr,
+                                                PNG_HANDLE_CHUNK_ALWAYS,
+                                                (png_bytep) "dSIG", 1);
                     if (all_chunks_are_safe)
                         png_set_keep_unknown_chunks(write_ptr,
                                                     PNG_HANDLE_CHUNK_ALWAYS,
@@ -4125,7 +4151,7 @@ int main(int argc, char *argv[])
                     png_unknown_chunkp unknowns;
                     int num_unknowns =
                         (int) png_get_unknown_chunks(read_ptr,
-                                                     read_info_ptr,
+                                                     end_info_ptr,
                                                      &unknowns);
                     if (num_unknowns && nosave == 0) {
                         int i;
@@ -4258,6 +4284,7 @@ int main(int argc, char *argv[])
             }
 
         } /* end of trial-loop */
+       
         P1("\n\nFINISHED MAIN LOOP OVER %d METHODS\n\n\n", MAX_METHODS);
 
         /* ////////////////////////////////////////////////////////////////////
@@ -4265,6 +4292,7 @@ int main(int argc, char *argv[])
         //////////////////  END OF MAIN LOOP OVER METHODS  ////////////////////
         //////////////////                                 ////////////////////
         //////////////////////////////////////////////////////////////////// */
+        }
 
         if (fpin) {
             FCLOSE(fpin);
@@ -4293,8 +4321,10 @@ int main(int argc, char *argv[])
 #endif
             total_input_length += input_length + output_length;
 
+            if (!already_crushed && !image_is_immutable) {
             fprintf(STDERR, "   Best pngcrush method = %d (fm %d zl %d zs %d) "
               "for %s\n", best, fm[best], lv[best], zs[best], outname);
+            }
             if (idat_length[0] == idat_length[best])
                 fprintf(STDERR, "     (no IDAT change)\n");
             else if (idat_length[0] > idat_length[best])
@@ -4481,6 +4511,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 #endif
 #endif
 #endif
+        const png_byte png_dSIG[5] = {100,  83,  73,  71, '\0'};
         png_byte chunk_name[5];
         png_byte chunk_length[4];
         png_byte buffer[32];
@@ -4532,6 +4563,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
                       +(bb[17]<<16)+(bb[16]<<24)));
             }
         }
+
         if (!png_memcmp(chunk_name, png_DEFI, 4)) {
             if (verbose > 1) {
             printf("  objid=%lu\n",(unsigned long)(bb[1]+(bb[0]<<8)));
@@ -4597,6 +4629,22 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             png_crc_read(png_ptr, buffer, 13);
             length -= 13;
             input_color_type = buffer[9];
+        }
+        else
+        {
+#ifdef PNG_UINT_dSIG
+          if (png_get_uint_32(chunk_name) == PNG_UINT_dSIG)
+#else
+          if (!png_memcmp(chunk_name, png_dSIG, 4))
+#endif
+          {
+            if (found_any_chunk == 0 && !all_chunks_are_safe)
+            {
+               image_is_immutable=1;
+            }
+          }
+          else
+            found_any_chunk=1;
         }
 
 #ifdef PNG_gAMA_SUPPORTED
@@ -5395,6 +5443,15 @@ struct options_help pngcrush_options[] = {
     {2, ""},
 #endif
 
+    {0, "         -keep chunk_name"},
+    {2, ""},
+    {2, "               keep named chunk even when pngcrush makes"},
+    {2, "               changes to the PNG datastream that cause it"},
+    {2, "               to become invalid.  Currently only dSIG is"},
+    {2, "               recognized as a chunk to be kept."},
+    {2, ""},
+
+
     {0, "            -l zlib_compression_level [0-9]"},
     {2, ""},
     {2, "               zlib compression level to use with method specified"},
@@ -5513,6 +5570,8 @@ struct options_help pngcrush_options[] = {
     {2, "               Save otherwise unknown ancillary chunks that would"},
     {2, "               be considered copy-unsafe.  This option makes"},
     {2, "               chunks 'known' to pngcrush, so they can be copied."},
+    {2, "               It also causes the dSIG chunk to be saved, even when"},
+    {2, "               it becomes invalid due to datastream changes."},
     {2, ""},
 
     {0, FAKE_PAUSE_STRING},
