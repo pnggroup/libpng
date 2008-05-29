@@ -1,59 +1,76 @@
 
-Libpng 1.2.29 - May 8, 2008
+Libpng 1.2.30beta01 - May 29, 2008
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.29.tar.gz
-   libpng-1.2.29.tar.lzma
+   libpng-1.2.30beta01.tar.gz
+   libpng-1.2.30beta01.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.29.tar.bz2
+   libpng-1.2.30beta01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.29-no-config.tar.gz
-   libpng-1.2.29-no-config.tar.lzma
-   libpng-1.2.29-no-config.tar.bz2
+   libpng-1.2.30beta01-no-config.tar.gz
+   libpng-1.2.30beta01-no-config.tar.lzma
+   libpng-1.2.30beta01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1229.zip
-   lpng1229.7z
-   lpng1229.tar.bz2
+   lp1230b01.zip
+   lp1230b01.7z
+   lp1230b01.tar.bz2
 
 Project files
 
-   libpng-1.2.29-project-netware.zip
-   libpng-1.2.29-project-wince.zip
+   libpng-1.2.30beta01-project-netware.zip
+   libpng-1.2.30beta01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.29-README.txt
-   libpng-1.2.29-KNOWNBUGS.txt
-   libpng-1.2.29-LICENSE.txt
-   libpng-1.2.29-Y2K-compliance.txt
-   libpng-1.2.29-[previous version]-diff.txt
+   libpng-1.2.30beta01-README.txt
+   libpng-1.2.30beta01-KNOWNBUGS.txt
+   libpng-1.2.30beta01-LICENSE.txt
+   libpng-1.2.30beta01-Y2K-compliance.txt
+   libpng-1.2.30beta01-[previous version]-diff.txt
 
-Changes since the last public release (1.2.28):
+Changes since the last public release (1.2.29):
 
-version 1.2.29 [May 8, 2008]
-
+version 1.2.29beta01 [May 1, 2008]
   Removed some stray *.diff and *.orig files
+
+version 1.2.29beta02 [May 1, 2008]
   Reverted Makefile.in, aclocal.m4, and configure to the libpng-1.2.26
     versions.
+
+version 1.2.29beta03 [May 2, 2008]
   Added --force to autogen libtoolize options and --force-missing to
     automake options.
   Changed $(ECHO) to echo in Makefile.am and Makefile.in
   Updated all configure files to autoconf-2.62
   #ifdef out pnggcrd.c code if using MSC_VER
 
+version 1.2.29rc01 [May 4, 2008]
+  No changes.
+
+version 1.0.35 and 1.2.29 [May 8, 2008]
+  No changes.
+
+version 1.0.37 [May 9, 2008]
+  Updated Makefile.in and configure (omitted version 1.0.36).
+
+version 1.2.30beta01 [May 29, 2008]
+  Updated libpng.pc-configure.in and libpng-config.in per debian bug reports.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
