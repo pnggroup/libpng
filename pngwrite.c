@@ -393,6 +393,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 
    /* write end of PNG file */
    png_write_IEND(png_ptr);
+   png_flush(png_ptr);
 }
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
