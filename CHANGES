@@ -2174,6 +2174,15 @@ version 1.2.30beta02 [June 25, 2008]
   Restored png_flush(png_ptr) at the end of png_write_end(), that was
     removed from libpng-1.0.9beta03.
 
+version 1.2.30beta03 [July 6, 2008]
+  Merged some cosmetic whitespace changes from libpng-1.4.0beta19.
+  Inline call of png_get_uint_32() in png_get_uint_31(), as in 1.4.0beta19.
+  Added demo of decoding vpAg and sTER chunks to pngtest.c, from 1.4.0beta19.
+  Changed PNGMAJ from 0 to 12 in makefile.darwin, which does not like 0.
+  Added new private function png_read_chunk_header() from 1.4.0beta19.
+  Merge reading of chunk length and chunk type into a single 8-byte read.
+  Merge writing of chunk length and chunk type into a single 8-byte write.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

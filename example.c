@@ -2,9 +2,9 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.2.1 December 7, 2001.
+ * Last changed in libpng 1.2.30 [July 6, 2008]
  * This file has been placed in the public domain by the authors.
- * Maintained 1998-2007 Glenn Randers-Pehrson
+ * Maintained 1998-2008 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -637,7 +637,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 
    /* set the palette if there is one.  REQUIRED for indexed-color images */
    palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH
-             * png_sizeof (png_color));
+             * png_sizeof(png_color));
    /* ... set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
    /* You must not free palette here, because png_set_PLTE only makes a link to

@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.27 [April 29, 2008]
+ * Last changed in libpng 1.2.30 [July 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -49,6 +49,24 @@ png_save_uint_16(png_bytep buf, unsigned int i)
    buf[1] = (png_byte)(i & 0xff);
 }
 
+/* Simple function to write the signature.  If we have already written
+ * the magic bytes of the signature, or more likely, the PNG stream is
+ * being embedded into another stream and doesn't need its own signature,
+ * we should call png_set_sig_bytes() to tell libpng how many of the
+ * bytes have already been written.
+ */
+void /* PRIVATE */
+png_write_sig(png_structp png_ptr)
+{
+   png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+
+   /* write the rest of the 8 byte signature */
+   png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
+      (png_size_t)(8 - png_ptr->sig_bytes));
+   if(png_ptr->sig_bytes < 3)
+      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
+}
+
 /* Write a PNG chunk all at once.  The type is an array of ASCII characters
  * representing the chunk name.  The array must be at least 4 bytes in
  * length, and does not need to be null terminated.  To be safe, pass the
@@ -76,16 +94,18 @@ void PNGAPI
 png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
    png_uint_32 length)
 {
-   png_byte buf[4];
-   png_debug2(0, "Writing %s chunk (%lu bytes)\n", chunk_name, length);
+   png_byte buf[8];
+
+   png_debug2(0, "Writing %s chunk, length = %lu\n", chunk_name,
+      (unsigned long)length);
    if(png_ptr == NULL) return;
 
-   /* write the length */
+   /* write the length and the chunk name */
    png_save_uint_32(buf, length);
-   png_write_data(png_ptr, buf, (png_size_t)4);
-
-   /* write the chunk name */
-   png_write_data(png_ptr, chunk_name, (png_size_t)4);
+   png_memcpy(buf + 4, chunk_name, 4);
+   png_write_data(png_ptr, buf, 8);
+   /* put the chunk name into png_ptr->chunk_name */
+   png_memcpy(png_ptr->chunk_name, chunk_name, 4);
    /* reset the crc and run it over the chunk name */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, chunk_name, (png_size_t)4);
@@ -103,6 +123,9 @@ png_write_chunk_data(png_structp png_ptr, png_bytep data, png_size_t length)
    if(png_ptr == NULL) return;
    if (data != NULL && length > 0)
    {
+      /* update the CRC after writing the data,
+       * in case that the user I/O routine alters it.
+       */
       png_calculate_crc(png_ptr, data, length);
       png_write_data(png_ptr, data, length);
    }
@@ -116,27 +139,10 @@ png_write_chunk_end(png_structp png_ptr)
 
    if(png_ptr == NULL) return;
 
-   /* write the crc */
+   /* write the crc in a single operation */
    png_save_uint_32(buf, png_ptr->crc);
 
    png_write_data(png_ptr, buf, (png_size_t)4);
-}
-
-/* Simple function to write the signature.  If we have already written
- * the magic bytes of the signature, or more likely, the PNG stream is
- * being embedded into another stream and doesn't need its own signature,
- * we should call png_set_sig_bytes() to tell libpng how many of the
- * bytes have already been written.
- */
-void /* PRIVATE */
-png_write_sig(png_structp png_ptr)
-{
-   png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
-   /* write the rest of the 8 byte signature */
-   png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
-      (png_size_t)8 - png_ptr->sig_bytes);
-   if(png_ptr->sig_bytes < 3)
-      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
 }
 
 #if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_iCCP_SUPPORTED)
@@ -240,15 +246,15 @@ png_text_compress(png_structp png_ptr,
                old_ptr = comp->output_ptr;
                comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                   (png_uint_32)(comp->max_output_ptr *
-                  png_sizeof (png_charpp)));
+                  png_sizeof(png_charpp)));
                png_memcpy(comp->output_ptr, old_ptr, old_max
-                  * png_sizeof (png_charp));
+                  * png_sizeof(png_charp));
                png_free(png_ptr, old_ptr);
             }
             else
                comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                   (png_uint_32)(comp->max_output_ptr *
-                  png_sizeof (png_charp)));
+                  png_sizeof(png_charp)));
          }
 
          /* save the data */
@@ -291,15 +297,15 @@ png_text_compress(png_structp png_ptr,
                   /* This could be optimized to realloc() */
                   comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                      (png_uint_32)(comp->max_output_ptr *
-                     png_sizeof (png_charpp)));
+                     png_sizeof(png_charpp)));
                   png_memcpy(comp->output_ptr, old_ptr,
-                     old_max * png_sizeof (png_charp));
+                     old_max * png_sizeof(png_charp));
                   png_free(png_ptr, old_ptr);
                }
                else
                   comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                      (png_uint_32)(comp->max_output_ptr *
-                     png_sizeof (png_charp)));
+                     png_sizeof(png_charp)));
             }
 
             /* save off the data */
@@ -349,7 +355,7 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
    /* write saved output buffers, if any */
    for (i = 0; i < comp->num_output_ptr; i++)
    {
-      png_write_chunk_data(png_ptr,(png_bytep)comp->output_ptr[i],
+      png_write_chunk_data(png_ptr, (png_bytep)comp->output_ptr[i],
          png_ptr->zbuf_size);
       png_free(png_ptr, comp->output_ptr[i]);
       comp->output_ptr[i]=NULL;
@@ -396,7 +402,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
             case 4:
             case 8:
             case 16: png_ptr->channels = 1; break;
-            default: png_error(png_ptr,"Invalid bit depth for grayscale image");
+            default: png_error(png_ptr, "Invalid bit depth for grayscale image");
          }
          break;
       case PNG_COLOR_TYPE_RGB:
@@ -843,45 +849,45 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
 #ifndef PNG_NO_POINTER_INDEXING
    for (ep = spalette->entries; ep<spalette->entries+spalette->nentries; ep++)
    {
-       if (spalette->depth == 8)
-       {
-           entrybuf[0] = (png_byte)ep->red;
-           entrybuf[1] = (png_byte)ep->green;
-           entrybuf[2] = (png_byte)ep->blue;
-           entrybuf[3] = (png_byte)ep->alpha;
-           png_save_uint_16(entrybuf + 4, ep->frequency);
-       }
-       else
-       {
-           png_save_uint_16(entrybuf + 0, ep->red);
-           png_save_uint_16(entrybuf + 2, ep->green);
-           png_save_uint_16(entrybuf + 4, ep->blue);
-           png_save_uint_16(entrybuf + 6, ep->alpha);
-           png_save_uint_16(entrybuf + 8, ep->frequency);
-       }
-       png_write_chunk_data(png_ptr, entrybuf, (png_size_t)entry_size);
+      if (spalette->depth == 8)
+      {
+          entrybuf[0] = (png_byte)ep->red;
+          entrybuf[1] = (png_byte)ep->green;
+          entrybuf[2] = (png_byte)ep->blue;
+          entrybuf[3] = (png_byte)ep->alpha;
+          png_save_uint_16(entrybuf + 4, ep->frequency);
+      }
+      else
+      {
+          png_save_uint_16(entrybuf + 0, ep->red);
+          png_save_uint_16(entrybuf + 2, ep->green);
+          png_save_uint_16(entrybuf + 4, ep->blue);
+          png_save_uint_16(entrybuf + 6, ep->alpha);
+          png_save_uint_16(entrybuf + 8, ep->frequency);
+      }
+      png_write_chunk_data(png_ptr, entrybuf, (png_size_t)entry_size);
    }
 #else
    ep=spalette->entries;
    for (i=0; i>spalette->nentries; i++)
    {
-       if (spalette->depth == 8)
-       {
-           entrybuf[0] = (png_byte)ep[i].red;
-           entrybuf[1] = (png_byte)ep[i].green;
-           entrybuf[2] = (png_byte)ep[i].blue;
-           entrybuf[3] = (png_byte)ep[i].alpha;
-           png_save_uint_16(entrybuf + 4, ep[i].frequency);
-       }
-       else
-       {
-           png_save_uint_16(entrybuf + 0, ep[i].red);
-           png_save_uint_16(entrybuf + 2, ep[i].green);
-           png_save_uint_16(entrybuf + 4, ep[i].blue);
-           png_save_uint_16(entrybuf + 6, ep[i].alpha);
-           png_save_uint_16(entrybuf + 8, ep[i].frequency);
-       }
-       png_write_chunk_data(png_ptr, entrybuf, entry_size);
+      if (spalette->depth == 8)
+      {
+          entrybuf[0] = (png_byte)ep[i].red;
+          entrybuf[1] = (png_byte)ep[i].green;
+          entrybuf[2] = (png_byte)ep[i].blue;
+          entrybuf[3] = (png_byte)ep[i].alpha;
+          png_save_uint_16(entrybuf + 4, ep[i].frequency);
+      }
+      else
+      {
+          png_save_uint_16(entrybuf + 0, ep[i].red);
+          png_save_uint_16(entrybuf + 2, ep[i].green);
+          png_save_uint_16(entrybuf + 4, ep[i].blue);
+          png_save_uint_16(entrybuf + 6, ep[i].alpha);
+          png_save_uint_16(entrybuf + 8, ep[i].frequency);
+      }
+      png_write_chunk_data(png_ptr, entrybuf, entry_size);
    }
 #endif
 
@@ -967,7 +973,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    {
       png_warning(png_ptr, "Invalid cHRM white point specified");
 #if !defined(PNG_NO_CONSOLE_IO)
-      fprintf(stderr,"white_x=%f, white_y=%f\n",white_x, white_y);
+      fprintf(stderr, "white_x=%f, white_y=%f\n", white_x, white_y);
 #endif
       return;
    }
@@ -1027,7 +1033,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    {
       png_warning(png_ptr, "Invalid fixed cHRM white point specified");
 #if !defined(PNG_NO_CONSOLE_IO)
-      fprintf(stderr,"white_x=%ld, white_y=%ld\n",white_x, white_y);
+      fprintf(stderr, "white_x=%ld, white_y=%ld\n", white_x, white_y);
 #endif
       return;
    }
@@ -1079,7 +1085,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
    {
       if (num_trans <= 0 || num_trans > (int)png_ptr->num_palette)
       {
-         png_warning(png_ptr,"Invalid number of transparent colors specified");
+         png_warning(png_ptr, "Invalid number of transparent colors specified");
          return;
       }
       /* write the chunk out as it is */
@@ -1758,13 +1764,13 @@ png_write_start_row(png_structp png_ptr)
 
    png_debug(1, "in png_write_start_row\n");
    buf_size = (png_size_t)(PNG_ROWBYTES(
-      png_ptr->usr_channels*png_ptr->usr_bit_depth,png_ptr->width)+1);
+      png_ptr->usr_channels*png_ptr->usr_bit_depth, png_ptr->width)+1);
 
    /* set up row buffer */
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, (png_uint_32)buf_size);
    png_ptr->row_buf[0] = PNG_FILTER_VALUE_NONE;
 
-#ifndef PNG_NO_WRITE_FILTERING
+#ifndef PNG_NO_WRITE_FILTER
    /* set up filtering buffer, if using this filter */
    if (png_ptr->do_filter & PNG_FILTER_SUB)
    {
@@ -1800,7 +1806,7 @@ png_write_start_row(png_structp png_ptr)
             (png_ptr->rowbytes + 1));
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
-#endif /* PNG_NO_WRITE_FILTERING */
+#endif /* PNG_NO_WRITE_FILTER */
    }
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
@@ -1899,7 +1905,7 @@ png_write_finish_row(png_structp png_ptr)
          if (png_ptr->prev_row != NULL)
             png_memset(png_ptr->prev_row, 0,
                (png_size_t)(PNG_ROWBYTES(png_ptr->usr_channels*
-               png_ptr->usr_bit_depth,png_ptr->width))+1);
+               png_ptr->usr_bit_depth, png_ptr->width))+1);
          return;
       }
    }

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.2.27 - [April 29, 2008]
+ * Last changed in libpng 1.2.30 [July 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -37,7 +37,7 @@
 #  include <windows.h>
 #  include <stdlib.h>
 #  define READFILE(file, data, length, check) \
-     if (ReadFile(file, data, length, &check,NULL)) check = 0
+     if (ReadFile(file, data, length, &check, NULL)) check = 0
 #  define WRITEFILE(file, data, length, check)) \
      if (WriteFile(file, data, length, &check, NULL)) check = 0
 #  define FCLOSE(file) CloseHandle(file)
@@ -45,9 +45,9 @@
 #  include <stdio.h>
 #  include <stdlib.h>
 #  define READFILE(file, data, length, check) \
-     check=(png_size_t)fread(data,(png_size_t)1,length,file)
+     check=(png_size_t)fread(data, (png_size_t)1, length, file)
 #  define WRITEFILE(file, data, length, check) \
-     check=(png_size_t)fwrite(data,(png_size_t)1, length, file)
+     check=(png_size_t)fwrite(data, (png_size_t)1, length, file)
 #  define FCLOSE(file) fclose(file)
 #endif
 
@@ -99,11 +99,6 @@ int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));
 /*  #define STDERR stderr  */
 #define STDERR stdout   /* for DOS */
 
-/* example of using row callbacks to make a simple progress meter */
-static int status_pass=1;
-static int status_dots_requested=0;
-static int status_dots=1;
-
 /* In case a system header (e.g., on AIX) defined jmpbuf */
 #ifdef jmpbuf
 #  undef jmpbuf
@@ -113,6 +108,11 @@ static int status_dots=1;
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
 #endif
+
+/* example of using row callbacks to make a simple progress meter */
+static int status_pass=1;
+static int status_dots_requested=0;
+static int status_dots=1;
 
 void
 #ifdef PNG_1_0_X
@@ -128,7 +128,7 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
     if(png_ptr == NULL || row_number > PNG_UINT_31_MAX) return;
     if(status_pass != pass)
     {
-       fprintf(stdout,"\n Pass %d: ",pass);
+       fprintf(stdout, "\n Pass %d: ", pass);
        status_pass = pass;
        status_dots = 31;
     }
@@ -511,7 +511,7 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       memory_infop pinfo;
       png_set_mem_fn(png_ptr, NULL, NULL, NULL);
       pinfo = (memory_infop)png_malloc(png_ptr,
-         (png_uint_32)png_sizeof (*pinfo));
+         (png_uint_32)png_sizeof(*pinfo));
       pinfo->size = size;
       current_allocation += size;
       total_allocation += size;
@@ -534,7 +534,7 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
       if(verbose)
-         printf("png_malloc %lu bytes at %x\n",(unsigned long)size,
+         printf("png_malloc %lu bytes at %x\n", (unsigned long)size,
           pinfo->pointer);
       return (png_voidp)(pinfo->pointer);
    }
@@ -584,12 +584,79 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 
    /* Finally free the data. */
    if(verbose)
-      printf("Freeing %x\n",ptr);
+      printf("Freeing %x\n", ptr);
    png_free_default(png_ptr, ptr);
    ptr=NULL;
 }
 #endif /* PNG_USER_MEM_SUPPORTED && PNG_DEBUG */
 /* END of code to test memory allocation/deallocation */
+
+
+/* Demonstration of user chunk support of the sTER and vpAg chunks */
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+
+/* (sTER is a public chunk not yet understood by libpng.  vpAg is a private
+chunk used in ImageMagick to store "virtual page" size).  */
+
+static png_uint_32 user_chunk_data[4];
+
+    /* 0: sTER mode + 1
+     * 1: vpAg width
+     * 2: vpAg height
+     * 3: vpAg units
+     */
+
+static int read_user_chunk_callback(png_struct *png_ptr,
+   png_unknown_chunkp chunk)
+{
+  png_uint_32
+    *user_chunk_data;
+
+  /* Return one of the following: */
+     /* return (-n);  chunk had an error */
+     /* return (0);  did not recognize */
+     /* return (n);  success */
+
+  /* The unknown chunk structure contains the chunk data:
+   * png_byte name[5];
+   * png_byte *data;
+   * png_size_t size;
+   *
+   *  Note that libpng has already taken care of the CRC handling.
+   */
+
+  if (chunk->name[0] == 115 && chunk->name[1] ==  84 &&     /* s  T */
+      chunk->name[2] ==  69 && chunk->name[3] ==  82)       /* E  R */
+     {
+       /* Found sTER chunk */
+       if (chunk->size != 1)
+         return (-1); /* Error return */
+       if (chunk->data[0] != 0 && chunk->data[0] != 1)
+          return (-1);  /* Invalid mode */
+       user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
+       user_chunk_data[0]=chunk->data[0]+1;
+       return (1);
+     }
+  if (chunk->name[0] != 118 || chunk->name[1] != 112 ||    /* v  p */
+      chunk->name[2] !=  65 || chunk->name[3] != 103)      /* A  g */
+    return (0); /* Did not recognize */
+
+  /* Found ImageMagick vpAg chunk */
+
+  if (chunk->size != 9)
+    return (-1); /* Error return */
+
+  user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
+
+  user_chunk_data[1]=png_get_uint_31(png_ptr, chunk->data);
+  user_chunk_data[2]=png_get_uint_31(png_ptr, chunk->data + 4);
+  user_chunk_data[3]=(png_uint_32)chunk->data[8];
+
+  return (1);
+
+}
+#endif
+/* END of code to demonstrate user chunk support */
 
 /* Test one file */
 int
@@ -660,6 +727,16 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
    png_set_error_fn(read_ptr, (png_voidp)inname, pngtest_error,
        pngtest_warning);
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+  user_chunk_data[0]=0;
+  user_chunk_data[1]=0;
+  user_chunk_data[2]=0;
+  user_chunk_data[3]=0;
+  png_set_read_user_chunk_fn(read_ptr, user_chunk_data,
+    read_user_chunk_callback);
+
+#endif
 #ifdef PNG_WRITE_SUPPORTED
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
    write_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
@@ -700,7 +777,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(read_ptr),jmpbuf,png_sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(read_ptr), jmpbuf, png_sizeof(jmp_buf));
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
@@ -722,7 +799,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(write_ptr),jmpbuf,png_sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(write_ptr), jmpbuf, png_sizeof(jmp_buf));
 #endif
 #endif
 #endif
@@ -913,7 +990,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_int_32 offset_x, offset_y;
       int unit_type;
 
-      if (png_get_oFFs(read_ptr, read_info_ptr,&offset_x,&offset_y,&unit_type))
+      if (png_get_oFFs(read_ptr, read_info_ptr, &offset_x, &offset_y,
+         &unit_type))
       {
          png_set_oFFs(write_ptr, write_info_ptr, offset_x, offset_y, unit_type);
       }
@@ -1063,6 +1141,40 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_write_info_before_PLTE(write_ptr, write_info_ptr);
  */
    png_write_info(write_ptr, write_info_ptr);
+
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+   if (user_chunk_data[0] != 0)
+   {
+     png_byte png_sTER[5] = {115,  84,  69,  82, '\0'};
+
+     unsigned char
+       ster_chunk_data[1];
+
+     if(verbose)
+        fprintf(STDERR, "stereo mode = %lu\n",
+          (unsigned long)(user_chunk_data[0]-1));
+     ster_chunk_data[0]=(unsigned char)(user_chunk_data[0]-1);
+     png_write_chunk(write_ptr, png_sTER, ster_chunk_data, 1);
+   }
+   if (user_chunk_data[1] != 0 || user_chunk_data[2] != 0)
+   {
+     png_byte png_vpAg[5] = {118, 112,  65, 103, '\0'};
+
+     unsigned char
+       vpag_chunk_data[9];
+
+     if(verbose)
+        fprintf(STDERR, "vpAg = %lu x %lu, units=%lu\n",
+          (unsigned long)user_chunk_data[1],
+          (unsigned long)user_chunk_data[2],
+          (unsigned long)user_chunk_data[3]);
+     png_save_uint_32(vpag_chunk_data, user_chunk_data[1]);
+     png_save_uint_32(vpag_chunk_data + 4, user_chunk_data[2]);
+     vpag_chunk_data[8] = (unsigned char)(user_chunk_data[3] & 0xff);
+     png_write_chunk(write_ptr, png_vpAg, vpag_chunk_data, 9);
+   }
+
+#endif
 #endif
 
 #ifdef SINGLE_ROWBUF_ALLOC
@@ -1090,11 +1202,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
    for (pass = 0; pass < num_pass; pass++)
    {
-      png_debug1(0, "Writing row data for pass %d\n",pass);
+      png_debug1(0, "Writing row data for pass %d\n", pass);
       for (y = 0; y < height; y++)
       {
 #ifndef SINGLE_ROWBUF_ALLOC
-         png_debug2(0, "\nAllocating row buffer (pass %d, y = %ld)...", pass,y);
+         png_debug2(0, "\nAllocating row buffer (pass %d, y = %ld)...", pass, y);
          row_buf = (png_bytep)png_malloc(read_ptr,
             png_get_rowbytes(read_ptr, read_info_ptr));
          png_debug2(0, "0x%08lx (%ld bytes)\n", (unsigned long)row_buf,
@@ -1258,7 +1370,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          {
             fprintf(STDERR,
          "   Was %s written with the same maximum IDAT chunk size (%d bytes),",
-              inname,PNG_ZBUF_SIZE);
+              inname, PNG_ZBUF_SIZE);
             fprintf(STDERR,
               "\n   filtering heuristic (libpng default), compression");
             fprintf(STDERR,
@@ -1281,7 +1393,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          {
             fprintf(STDERR,
          "   Was %s written with the same maximum IDAT chunk size (%d bytes),",
-                 inname,PNG_ZBUF_SIZE);
+                 inname, PNG_ZBUF_SIZE);
             fprintf(STDERR,
               "\n   filtering heuristic (libpng default), compression");
             fprintf(STDERR,
@@ -1318,15 +1430,15 @@ main(int argc, char *argv[])
 
    fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
-   fprintf(STDERR,"%s",png_get_copyright(NULL));
+   fprintf(STDERR, "%s", png_get_copyright(NULL));
    /* Show the version of libpng used in building the library */
-   fprintf(STDERR," library (%lu):%s",
+   fprintf(STDERR, " library (%lu):%s",
       (unsigned long)png_access_version_number(),
       png_get_header_version(NULL));
    /* Show the version of libpng used in building the application */
-   fprintf(STDERR," pngtest (%lu):%s", (unsigned long)PNG_LIBPNG_VER,
+   fprintf(STDERR, " pngtest (%lu):%s", (unsigned long)PNG_LIBPNG_VER,
       PNG_HEADER_VERSION_STRING);
-   fprintf(STDERR," png_sizeof(png_struct)=%ld, png_sizeof(png_info)=%ld\n",
+   fprintf(STDERR, " sizeof(png_struct)=%ld, sizeof(png_info)=%ld\n",
                     (long)png_sizeof(png_struct), (long)png_sizeof(png_info));
 
    /* Do some consistency checking on the memory allocation settings, I'm
@@ -1404,7 +1516,7 @@ main(int argc, char *argv[])
          int k;
 #endif
          int kerror;
-         fprintf(STDERR, "Testing %s:",argv[i]);
+         fprintf(STDERR, "Testing %s:", argv[i]);
          kerror = test_one_file(argv[i], outname);
          if (kerror == 0)
          {
@@ -1418,11 +1530,11 @@ main(int argc, char *argv[])
             for (k=0; k<256; k++)
                if(filters_used[k])
                   fprintf(STDERR, " Filter %d was used %lu times\n",
-                     k,(unsigned long)filters_used[k]);
+                     k, (unsigned long)filters_used[k]);
 #endif
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
          if(tIME_chunk_present != 0)
-            fprintf(STDERR, " tIME = %s\n",tIME_string);
+            fprintf(STDERR, " tIME = %s\n", tIME_string);
          tIME_chunk_present = 0;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
          }
@@ -1473,7 +1585,7 @@ main(int argc, char *argv[])
          if (i == 1) status_dots_requested = 1;
          else if(verbose == 0)status_dots_requested = 0;
          if (i == 0 || verbose == 1 || ierror != 0)
-            fprintf(STDERR, "Testing %s:",inname);
+            fprintf(STDERR, "Testing %s:", inname);
          kerror = test_one_file(inname, outname);
          if(kerror == 0)
          {
@@ -1492,18 +1604,18 @@ main(int argc, char *argv[])
                 for (k=0; k<256; k++)
                    if(filters_used[k])
                       fprintf(STDERR, " Filter %d was used %lu times\n",
-                         k,(unsigned long)filters_used[k]);
+                         k, (unsigned long)filters_used[k]);
 #endif
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
              if(tIME_chunk_present != 0)
-                fprintf(STDERR, " tIME = %s\n",tIME_string);
+                fprintf(STDERR, " tIME = %s\n", tIME_string);
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
             }
          }
          else
          {
             if(verbose == 0 && i != 2)
-               fprintf(STDERR, "Testing %s:",inname);
+               fprintf(STDERR, "Testing %s:", inname);
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
          }
@@ -1519,7 +1631,7 @@ main(int argc, char *argv[])
                 current_allocation);
              while (pinfo != NULL)
              {
-                fprintf(STDERR," %lu bytes at %x\n",
+                fprintf(STDERR, " %lu bytes at %x\n",
                    (unsigned long)pinfo->size, (unsigned int)pinfo->pointer);
                 pinfo = pinfo->next;
              }
@@ -1542,13 +1654,13 @@ main(int argc, char *argv[])
    t_stop = (float)clock();
    t_misc += (t_stop - t_start);
    t_start = t_stop;
-   fprintf(STDERR," CPU time used = %.3f seconds",
+   fprintf(STDERR, " CPU time used = %.3f seconds",
       (t_misc+t_decode+t_encode)/(float)CLOCKS_PER_SEC);
-   fprintf(STDERR," (decoding %.3f,\n",
+   fprintf(STDERR, " (decoding %.3f,\n",
       t_decode/(float)CLOCKS_PER_SEC);
-   fprintf(STDERR,"        encoding %.3f ,",
+   fprintf(STDERR, "        encoding %.3f ,",
       t_encode/(float)CLOCKS_PER_SEC);
-   fprintf(STDERR," other %.3f seconds)\n\n",
+   fprintf(STDERR, " other %.3f seconds)\n\n",
       t_misc/(float)CLOCKS_PER_SEC);
 #endif
 
@@ -1560,4 +1672,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_30beta02 your_png_h_is_not_version_1_2_30beta02;
+typedef version_1_2_30beta03 your_png_h_is_not_version_1_2_30beta03;

@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.2.27 [April 29, 2008]
+ * Last changed in libpng 1.2.30 [July 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -16,7 +16,6 @@
 
 #define PNG_INTERNAL
 #include "png.h"
-
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
 /* Borland DOS special memory handler */
@@ -210,7 +209,7 @@ png_malloc_default(png_structp png_ptr, png_uint_32 size)
 
             png_ptr->offset_table = table;
             png_ptr->offset_table_ptr = farmalloc(num_blocks *
-               png_sizeof (png_bytep));
+               png_sizeof(png_bytep));
 
             if (png_ptr->offset_table_ptr == NULL)
             {
@@ -369,7 +368,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    struct_ptr = (png_voidp)farmalloc(size);
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
-   struct_ptr = (png_voidp)halloc(size,1);
+   struct_ptr = (png_voidp)halloc(size, 1);
 # else
    struct_ptr = (png_voidp)malloc(size);
 # endif
@@ -560,7 +559,7 @@ png_memcpy_check (png_structp png_ptr, png_voidp s1, png_voidp s2,
 
    size = (png_size_t)length;
    if ((png_uint_32)size != length)
-      png_error(png_ptr,"Overflow in png_memcpy_check.");
+      png_error(png_ptr, "Overflow in png_memcpy_check.");
 
    return(png_memcpy (s1, s2, size));
 }
@@ -573,7 +572,7 @@ png_memset_check (png_structp png_ptr, png_voidp s1, int value,
 
    size = (png_size_t)length;
    if ((png_uint_32)size != length)
-      png_error(png_ptr,"Overflow in png_memset_check.");
+      png_error(png_ptr, "Overflow in png_memset_check.");
 
    return (png_memset (s1, value, size));
 

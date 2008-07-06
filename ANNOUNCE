@@ -1,5 +1,5 @@
 
-Libpng 1.2.30beta02 - June 25, 2008
+Libpng 1.2.30beta03 - July 6, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.30beta02.tar.gz
-   libpng-1.2.30beta02.tar.lzma
+   libpng-1.2.30beta03.tar.gz
+   libpng-1.2.30beta03.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.30beta02.tar.bz2
+   libpng-1.2.30beta03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.30beta02-no-config.tar.gz
-   libpng-1.2.30beta02-no-config.tar.lzma
-   libpng-1.2.30beta02-no-config.tar.bz2
+   libpng-1.2.30beta03-no-config.tar.gz
+   libpng-1.2.30beta03-no-config.tar.lzma
+   libpng-1.2.30beta03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1230b02.zip
-   lp1230b02.7z
-   lp1230b02.tar.bz2
+   lp1230b03.zip
+   lp1230b03.7z
+   lp1230b03.tar.bz2
 
 Project files
 
-   libpng-1.2.30beta02-project-netware.zip
-   libpng-1.2.30beta02-project-wince.zip
+   libpng-1.2.30beta03-project-netware.zip
+   libpng-1.2.30beta03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.30beta02-README.txt
-   libpng-1.2.30beta02-KNOWNBUGS.txt
-   libpng-1.2.30beta02-LICENSE.txt
-   libpng-1.2.30beta02-Y2K-compliance.txt
-   libpng-1.2.30beta02-[previous version]-diff.txt
+   libpng-1.2.30beta03-README.txt
+   libpng-1.2.30beta03-KNOWNBUGS.txt
+   libpng-1.2.30beta03-LICENSE.txt
+   libpng-1.2.30beta03-Y2K-compliance.txt
+   libpng-1.2.30beta03-[previous version]-diff.txt
 
 Changes since the last public release (1.2.29):
 
@@ -70,6 +70,17 @@ version 1.2.30beta01 [May 29, 2008]
   Updated libpng.pc-configure.in and libpng-config.in per debian bug reports.
 
 version 1.2.30beta02 [June 25, 2008]
+  Restored png_flush(png_ptr) at the end of png_write_end(), that was
+    removed from libpng-1.0.9beta03.
+
+version 1.2.30beta03 [July 6, 2008]
+  Merged some cosmetic whitespace changes from libpng-1.4.0beta19.
+  Inline call of png_get_uint_32() in png_get_uint_31(), as in 1.4.0beta19.
+  Added demo of decoding vpAg and sTER chunks to pngtest.c, from 1.4.0beta19.
+  Changed PNGMAJ from 0 to 12 in makefile.darwin, which does not like 0.
+  Added new private function png_read_chunk_header() from 1.4.0beta19.
+  Merge reading of chunk length and chunk type into a single 8-byte read.
+  Merge writing of chunk length and chunk type into a single 8-byte write.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

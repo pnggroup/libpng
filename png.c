@@ -1,9 +1,9 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.21 October 4, 2007
+ * Last changed in libpng 1.2.30 [July 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -13,7 +13,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_30beta02 Your_png_h_is_not_version_1_2_30beta02;
+typedef version_1_2_30beta03 Your_png_h_is_not_version_1_2_30beta03;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -314,7 +314,7 @@ png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
      }
 
    /* set everything to 0 */
-   png_memset(info_ptr, 0, png_sizeof (png_info));
+   png_memset(info_ptr, 0, png_sizeof(png_info));
 }
 
 #ifdef PNG_FREE_ME_SUPPORTED
@@ -669,7 +669,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 #ifdef USE_FAR_KEYWORD
    {
       char near_time_buf[29];
-      png_snprintf6(near_time_buf,29,"%d %s %d %02d:%02d:%02d +0000",
+      png_snprintf6(near_time_buf, 29, "%d %s %d %02d:%02d:%02d +0000",
           ptime->day % 32, short_months[(ptime->month - 1) % 12],
           ptime->year, ptime->hour % 24, ptime->minute % 60,
           ptime->second % 61);
@@ -677,7 +677,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
           29*png_sizeof(char));
    }
 #else
-   png_snprintf6(png_ptr->time_buffer,29,"%d %s %d %02d:%02d:%02d +0000",
+   png_snprintf6(png_ptr->time_buffer, 29, "%d %s %d %02d:%02d:%02d +0000",
        ptime->day % 32, short_months[(ptime->month - 1) % 12],
        ptime->year, ptime->hour % 24, ptime->minute % 60,
        ptime->second % 61);
@@ -693,7 +693,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.30beta02 - June 25, 2008\n\
+   return ((png_charp) "\n libpng version 1.2.30beta03 - July 6, 2008\n\
    Copyright (c) 1998-2008 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");

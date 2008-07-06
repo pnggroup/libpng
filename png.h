@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.30beta02 - June 25, 2008
+ * libpng version 1.2.30beta03 - July 6, 2008
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -8,7 +8,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.30beta02 - June 25, 2008: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.30beta03 - July 6, 2008: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -193,7 +193,7 @@
  *    1.0.35                  10    10035  10.so.0.35[.0]
  *    1.2.29                  13    10229  12.so.0.29[.0]
  *    1.0.37                  10    10037  10.so.0.37[.0]
- *    1.2.30beta01-02         13    10230  12.so.0.30[.0]
+ *    1.2.30beta01-03         13    10230  12.so.0.30[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -223,7 +223,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.2.30beta02, June 25, 2008, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.2.30beta03, July 6, 2008, are
  * Copyright (c) 2004, 2006-2008 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -335,13 +335,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    June 25, 2008
+ *    July 6, 2008
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.2.30beta02 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.2.30beta03 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -397,9 +397,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.2.30beta02"
+#define PNG_LIBPNG_VER_STRING "1.2.30beta03"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.30beta02 - June 25, 2008\n"
+   " libpng version 1.2.30beta03 - July 6, 2008\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  13
@@ -411,7 +411,7 @@
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  02
+#define PNG_LIBPNG_VER_BUILD  03
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -1206,7 +1206,7 @@ struct png_struct_def
    png_uint_32 row_number;    /* current row in interlace pass */
    png_bytep prev_row;        /* buffer to save previous (unfiltered) row */
    png_bytep row_buf;         /* buffer to save current (unfiltered) row */
-#ifndef PNG_NO_WRITE_FILTERING
+#ifndef PNG_NO_WRITE_FILTER
    png_bytep sub_row;         /* buffer to save "sub" row when filtering */
    png_bytep up_row;          /* buffer to save "up" row when filtering */
    png_bytep avg_row;         /* buffer to save "avg" row when filtering */
@@ -1446,13 +1446,14 @@ struct png_struct_def
 
 /* New members added in libpng-1.2.26 */
   png_uint_32 old_big_row_buf_size, old_prev_row_size;
+
 };
 
 
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_2_30beta02;
+typedef png_structp version_1_2_30beta03;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -2647,6 +2648,7 @@ extern PNG_EXPORT(png_uint_32,png_get_user_height_max) PNGARG((png_structp
    png_ptr));
 #endif
 
+
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project defs */
 
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
@@ -3557,6 +3559,9 @@ PNG_EXTERN png_uint_32 png_get_pHYs_dpi PNGARG((png_structp png_ptr,
 png_infop info_ptr, png_uint_32 *res_x, png_uint_32 *res_y, int *unit_type));
 #endif /* PNG_pHYs_SUPPORTED */
 #endif  /* PNG_INCH_CONVERSIONS && PNG_FLOATING_POINT_SUPPORTED */
+
+/* Read the chunk header (length + type name) */
+PNG_EXTERN png_uint_32 png_read_chunk_header PNGARG((png_structp png_ptr));
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 

@@ -1,9 +1,9 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.2.22 [October 13, 2007]
+ * Last changed in libpng 1.2.30 [July 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -15,8 +15,8 @@
 
 #define PNG_INTERNAL
 #include "png.h"
-
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
+
 static void /* PRIVATE */
 png_default_error PNGARG((png_structp png_ptr,
   png_const_charp error_message));
@@ -231,7 +231,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
           error_message+offset);
      }
      else
-       fprintf(stderr, "libpng error: %s, offset=%d\n", error_message,offset);
+       fprintf(stderr, "libpng error: %s, offset=%d\n", error_message, offset);
    }
    else
 #endif

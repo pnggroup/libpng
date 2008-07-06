@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.27 [April 29, 2008]
+ * Last changed in libpng 1.2.30 [July 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -10,7 +10,6 @@
 
 #define PNG_INTERNAL
 #include "png.h"
-
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 
 /* push model modes */
@@ -210,7 +209,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       }
 
       png_push_fill_buffer(png_ptr, chunk_length, 4);
-      png_ptr->push_length = png_get_uint_31(png_ptr,chunk_length);
+      png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
@@ -606,7 +605,7 @@ png_push_save_buffer(png_structp png_ptr)
    {
       if (png_ptr->save_buffer_ptr != png_ptr->save_buffer)
       {
-         png_size_t i,istop;
+         png_size_t i, istop;
          png_bytep sp;
          png_bytep dp;
 
@@ -675,7 +674,7 @@ png_push_read_IDAT(png_structp png_ptr)
       }
 
       png_push_fill_buffer(png_ptr, chunk_length, 4);
-      png_ptr->push_length = png_get_uint_31(png_ptr,chunk_length);
+      png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
@@ -1020,37 +1019,32 @@ png_read_push_finish_row(png_structp png_ptr)
          png_ptr->rowbytes + 1);
       do
       {
-         int pass;
-         pass = png_ptr->pass;
-         pass++;
-         if ((pass == 1 && png_ptr->width < 5) ||
-             (pass == 3 && png_ptr->width < 3) ||
-             (pass == 5 && png_ptr->width < 2))
-           pass++;
+         png_ptr->pass++;
+         if ((png_ptr->pass == 1 && png_ptr->width < 5) ||
+             (png_ptr->pass == 3 && png_ptr->width < 3) ||
+             (png_ptr->pass == 5 && png_ptr->width < 2))
+           png_ptr->pass++;
 
-         if (pass > 7)
-            pass--;
-         png_ptr->pass = (png_byte) pass;
-         if (pass < 7)
-           {
-             png_ptr->iwidth = (png_ptr->width +
-                png_pass_inc[pass] - 1 -
-                png_pass_start[pass]) /
-                png_pass_inc[pass];
+         if (png_ptr->pass > 7)
+            png_ptr->pass--;
+         if (png_ptr->pass >= 7)
+            break;
 
-             png_ptr->irowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,
-                png_ptr->iwidth) + 1;
+         png_ptr->iwidth = (png_ptr->width +
+            png_pass_inc[png_ptr->pass] - 1 -
+            png_pass_start[png_ptr->pass]) /
+            png_pass_inc[png_ptr->pass];
 
-             if (png_ptr->transformations & PNG_INTERLACE)
-                break;
+         png_ptr->irowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,
+            png_ptr->iwidth) + 1;
 
-             png_ptr->num_rows = (png_ptr->height +
-                png_pass_yinc[pass] - 1 -
-                png_pass_ystart[pass]) /
-                png_pass_yinc[pass];
-           }
-         else
-           break;
+         if (png_ptr->transformations & PNG_INTERLACE)
+            break;
+
+         png_ptr->num_rows = (png_ptr->height +
+            png_pass_yinc[png_ptr->pass] - 1 -
+            png_pass_ystart[png_ptr->pass]) /
+            png_pass_yinc[png_ptr->pass];
 
       } while (png_ptr->iwidth == 0 || png_ptr->num_rows == 0);
    }
@@ -1064,7 +1058,8 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place tEXt");
-         info_ptr = info_ptr; /* to quiet some compiler warnings */
+         /* to quiet some compiler warnings */
+         if(info_ptr == NULL) return;
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1079,7 +1074,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
 
    png_ptr->current_text = (png_charp)png_malloc(png_ptr,
-         (png_uint_32)(length+1));
+      (png_uint_32)(length + 1));
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
    png_ptr->current_text_size = (png_size_t)length;
@@ -1507,7 +1502,8 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
          png_ptr->unknown_chunk.data = NULL;
       else
       {
-         png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr, length);
+         png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr,
+       (png_uint_32)length);
          png_crc_read(png_ptr, (png_bytep)png_ptr->unknown_chunk.data, length);
       }
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)

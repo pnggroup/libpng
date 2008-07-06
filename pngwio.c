@@ -1,9 +1,9 @@
 
 /* pngwio.c - functions for data output
  *
- * Last changed in libpng 1.2.13 November 13, 2006
+ * Last changed in libpng 1.2.30 [July 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2006 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -206,7 +206,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 
 #if defined(USE_FAR_KEYWORD)
 #if defined(_MSC_VER)
-void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
+void *png_far_to_near(png_structp png_ptr, png_voidp ptr, int check)
 {
    void *near_ptr;
    void FAR *far_ptr;
@@ -214,11 +214,11 @@ void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
    far_ptr = (void FAR *)near_ptr;
    if(check != 0)
       if(FP_SEG(ptr) != FP_SEG(far_ptr))
-         png_error(png_ptr,"segment lost in conversion");
+         png_error(png_ptr, "segment lost in conversion");
    return(near_ptr);
 }
 #  else
-void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
+void *png_far_to_near(png_structp png_ptr, png_voidp ptr, int check)
 {
    void *near_ptr;
    void FAR *far_ptr;
@@ -226,7 +226,7 @@ void *png_far_to_near(png_structp png_ptr,png_voidp ptr, int check)
    far_ptr = (void FAR *)near_ptr;
    if(check != 0)
       if(far_ptr != ptr)
-         png_error(png_ptr,"segment lost in conversion");
+         png_error(png_ptr, "segment lost in conversion");
    return(near_ptr);
 }
 #   endif
