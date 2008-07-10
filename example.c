@@ -2,9 +2,9 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.2.1 December 7, 2001.
+ * Last changed in libpng 1.4.0 [July 10, 2008]
  * This file has been placed in the public domain by the authors.
- * Maintained 1998-2001 Glenn Randers-Pehrson
+ * Maintained 1998-2008 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -70,7 +70,7 @@ int check_if_png(char *file_name, FILE **fp)
    /* Compare the first PNG_BYTES_TO_CHECK bytes of the signature.
       Return nonzero (true) if they match */
 
-   return(!png_sig_cmp(buf, 0, PNG_BYTES_TO_CHECK));
+   return(!png_sig_cmp(buf, (png_size_t)0, PNG_BYTES_TO_CHECK));
 }
 
 /* Read a PNG file.  You may want to return an error code if the read
@@ -367,9 +367,11 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       for (y = 0; y < height; y += number_of_rows)
       {
 #ifdef sparkle /* Read the image using the "sparkle" effect. */
-         png_read_rows(png_ptr, &row_pointers[y], NULL, number_of_rows);
+         png_read_rows(png_ptr, &row_pointers[y], NULL,
+            number_of_rows);
 #else no_sparkle /* Read the image using the "rectangle" effect */
-         png_read_rows(png_ptr, NULL, &row_pointers[y], number_of_rows);
+         png_read_rows(png_ptr, NULL, &row_pointers[y],
+            number_of_rows);
 #endif no_sparkle /* use only one of these two methods */
       }
 
@@ -503,7 +505,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
  * shown below:
  */
    /* Check if row_num is in bounds. */
-   if((row_num >= 0) && (row_num < height))
+   if ((row_num >= 0) && (row_num < height))
    {
      /* Get pointer to corresponding row in our
       * PNG read buffer.
@@ -513,7 +515,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
      /* If both rows are allocated then copy the new row
       * data to the corresponding row data.
       */
-     if((old_row != NULL) && (new_row != NULL))
+     if ((old_row != NULL) && (new_row != NULL))
      png_progressive_combine_row(png_ptr, old_row, new_row);
    }
 /*
@@ -635,7 +637,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 
    /* set the palette if there is one.  REQUIRED for indexed-color images */
    palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH
-             * sizeof (png_color));
+             * png_sizeof(png_color));
    /* ... set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
    /* You must not free palette here, because png_set_PLTE only makes a link to
@@ -746,7 +748,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_byte image[height][width*bytes_per_pixel];
    png_bytep row_pointers[height];
 
-   if (height > PNG_UINT_32_MAX/sizeof(png_bytep))
+   if (height > PNG_UINT_32_MAX/png_sizeof(png_bytep))
      png_error (png_ptr, "Image is too tall to process in memory");
 
    for (k = 0; k < height; k++)

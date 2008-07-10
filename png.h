@@ -1,15 +1,15 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.0beta19 - May 15, 2007
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * libpng version 1.4.0beta20 - July 10, 2008
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.0beta19 - May 15, 2007: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.0beta20 - July 1, 2008: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -126,7 +126,7 @@
  *    1.2.12                  13    10212  12.so.0.10[.0]
  *    1.4.0beta9-14           14    10400  14.so.0.0[.0]
  *    1.2.13                  13    10213  12.so.0.10[.0]
- *    1.4.0beta15-19          14    10400  14.so.0.0[.0]
+ *    1.4.0beta15-20          14    10400  14.so.0.0[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -156,7 +156,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta19, May 15, 2007, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta20, July 1, 2008, are
  * Copyright (c) 2004, 2006-2007 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -268,13 +268,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    May 15, 2007
+ *    July 1, 2008
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.4.0beta19 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.4.0beta20 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -330,9 +330,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.4.0beta19"
+#define PNG_LIBPNG_VER_STRING "1.4.0beta20"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.0beta19 - May 15, 2007 (header)\n"
+   " libpng version 1.4.0beta20 - July 1, 2008 (header)\n"
 
 #define PNG_LIBPNG_VER_SONUM   1
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -344,7 +344,7 @@
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  19
+#define PNG_LIBPNG_VER_BUILD  21
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -1297,13 +1297,6 @@ struct png_struct_def
 #endif
 
 /* New members added in libpng-1.2.0 */
-#if defined(PNG_MMX_CODE_SUPPORTED)
-   png_byte     mmx_bitdepth_threshold;
-   png_uint_32  mmx_rowbytes_threshold;
-#endif
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
-   png_uint_32  asm_flags;
-#endif
 
 /* New members added in libpng-1.0.2 but first enabled by default in 1.2.0 */
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -1332,18 +1325,24 @@ struct png_struct_def
    png_uint_32 user_height_max;
 #endif
 
-/* New member added in libpng-1.4.0 */
-#if defined(PNG_IO_STATE_SUPPORTED)
+/* New members added in libpng-1.2.26 */
+  png_uint_32 old_big_row_buf_size, old_prev_row_size;
+
+/* New members added in libpng-1.4.0 */
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+   /* storage for unknown chunk that the library doesn't recognize. */
+   png_unknown_chunk unknown_chunk;
+#endif
+#ifdef PNG_IO_STATE_SUPPORTED
    png_uint_32 io_state;
 #endif
-
 };
 
 
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_4_0beta19;
+typedef png_structp version_1_4_0beta20;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -2304,7 +2303,7 @@ extern PNG_EXPORT(void,png_set_sCAL_s) PNGARG((png_structp png_ptr,
    handling or default unknown chunk handling is not desired.  Any chunks not
    listed will be handled in the default manner.  The IHDR and IEND chunks
    must not be listed.
-      keep = 0: follow default behavour
+      keep = 0: follow default behaviour
            = 1: do not keep
            = 2: keep only if safe-to-copy
            = 3: keep even if unsafe-to-copy
@@ -2411,71 +2410,6 @@ extern PNG_EXPORT(png_uint_32,png_permit_mng_features) PNGARG((png_structp
 #define PNG_HANDLE_CHUNK_NEVER        1
 #define PNG_HANDLE_CHUNK_IF_SAFE      2
 #define PNG_HANDLE_CHUNK_ALWAYS       3
-
-/* Added to version 1.2.0 */
-#if defined(PNG_MMX_CODE_SUPPORTED)
-#define PNG_ASM_FLAG_MMX_SUPPORT_COMPILED  0x01  /* not user-settable */
-#define PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU    0x02  /* not user-settable */
-#define PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  0x04
-#define PNG_ASM_FLAG_MMX_READ_INTERLACE    0x08
-#define PNG_ASM_FLAG_MMX_READ_FILTER_SUB   0x10
-#define PNG_ASM_FLAG_MMX_READ_FILTER_UP    0x20
-#define PNG_ASM_FLAG_MMX_READ_FILTER_AVG   0x40
-#define PNG_ASM_FLAG_MMX_READ_FILTER_PAETH 0x80
-#define PNG_MMX_FLAGS_INITIALIZED          0x80000000  /* not user-settable */
-
-#define PNG_MMX_READ_FLAGS ( PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  \
-                           | PNG_ASM_FLAG_MMX_READ_INTERLACE    \
-                           | PNG_ASM_FLAG_MMX_READ_FILTER_SUB   \
-                           | PNG_ASM_FLAG_MMX_READ_FILTER_UP    \
-                           | PNG_ASM_FLAG_MMX_READ_FILTER_AVG   \
-                           | PNG_ASM_FLAG_MMX_READ_FILTER_PAETH )
-#define PNG_MMX_WRITE_FLAGS ( 0 )
-
-#define PNG_MMX_FLAGS ( PNG_ASM_FLAG_MMX_SUPPORT_COMPILED \
-                      | PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU   \
-                      | PNG_ASM_MMX_READ_FLAGS                \
-                      | PNG_ASM_MMX_WRITE_FLAGS )
-
-#define PNG_SELECT_READ   1
-#define PNG_SELECT_WRITE  2
-
-/* pngget.c */
-extern PNG_EXPORT(png_uint_32,png_get_mmx_flagmask)
-   PNGARG((int flag_select, int *compilerID));
-
-/* pngget.c */
-extern PNG_EXPORT(png_byte,png_get_mmx_bitdepth_threshold)
-   PNGARG((png_structp png_ptr));
-
-/* pngget.c */
-extern PNG_EXPORT(png_uint_32,png_get_mmx_rowbytes_threshold)
-   PNGARG((png_structp png_ptr));
-
-/* pngset.c */
-extern PNG_EXPORT(void,png_set_asm_flags)
-   PNGARG((png_structp png_ptr, png_uint_32 asm_flags));
-
-/* pngset.c */
-extern PNG_EXPORT(void,png_set_mmx_thresholds)
-   PNGARG((png_structp png_ptr, png_byte mmx_bitdepth_threshold,
-   png_uint_32 mmx_rowbytes_threshold));
-
-#endif /* PNG_MMX_CODE_SUPPORTED */
-
-#if defined(PNG_ASSEMBLER_CODE_SUPPORTED)
-/* pngget.c */
-extern PNG_EXPORT(png_uint_32,png_get_asm_flagmask)
-   PNGARG((int flag_select));
-
-/* pngget.c */
-extern PNG_EXPORT(png_uint_32,png_get_asm_flags)
-   PNGARG((png_structp png_ptr));
-#endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
-
-
-/* png.c, pnggccrd.c, or pngvcrd.c */
-extern PNG_EXPORT(int,png_mmx_support) PNGARG((void));
 
 /* Strip the prepended error numbers ("#nnn ") from error and warning
  * messages before passing them to the error or warning handler. */
@@ -2616,6 +2550,17 @@ extern PNG_EXPORT(void,png_save_uint_16)
 /* No png_save_int_16 -- may be added if there's a real need for it. */
 
 /* ************************************************************************* */
+
+/* Various modes of operation.  Note that after an init, mode is set to
+ * zero automatically when the structure is created.
+ */
+#define PNG_HAVE_IHDR               0x01
+#define PNG_HAVE_PLTE               0x02
+#define PNG_HAVE_IDAT               0x04
+#define PNG_AFTER_IDAT              0x08 /* Have complete zlib datastream */
+#define PNG_HAVE_IEND               0x10
+#define PNG_HAVE_gAMA               0x20
+#define PNG_HAVE_cHRM               0x40
 
 #ifdef __cplusplus
 }

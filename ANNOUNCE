@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta19 - May 15, 2007
+Libpng 1.4.0beta20 - July 10, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta19.tar.gz
-   1.4.0beta19.tar.bz2
+   1.4.0beta20.tar.gz
+   1.4.0beta20.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta19-no-config.tar.gz
-   1.4.0beta19-no-config.tar.bz2
+   1.4.0beta20-no-config.tar.gz
+   1.4.0beta20-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b19.zip
-   lp140b19.tar.bz2
+   lp140b20.zip
+   lp140b20.tar.bz2
 
 Other information:
 
-   1.4.0beta19-README.txt
-   1.4.0beta19-KNOWNBUGS.txt
-   1.4.0beta19-LICENSE.txt
-   1.4.0beta19-Y2K-compliance.txt
+   1.4.0beta20-README.txt
+   1.4.0beta20-KNOWNBUGS.txt
+   1.4.0beta20-LICENSE.txt
+   1.4.0beta20-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -235,14 +235,26 @@ version 1.4.0beta17 [December 4, 2006]
 version 1.4.0beta18 [December 7, 2006]
   Added scripts/CMakeLists.txt
 
-version 1.4.0beta19 [May 15, 2007]
+version 1.4.0beta19 [May 16, 2007]
   Revised scripts/CMakeLists.txt
   Rebuilt configure and Makefile.in with newer tools.
   Added "png_ptr->num_trans=0" before error return in png_handle_tRNS,
     to eliminate a vulnerability (CVE-2007-2554, CERT VU#684664)
 
+version 1.4.0beta20 [July 10, 2008]
+  Moved several PNG_HAVE_* macros from pngpriv.h to png.h because applications
+    calling set_unknown_chunk_location() need them.
+  Moved several macro definitions from pngpriv.h to pngconf.h
+  Added png_ptr->unknown_chunk to hold working unknown chunk data, so it
+    can be free'ed in case of error.  Revised unknown chunk handling in
+    pngrutil.c and pngpread.c to use this structure.
+  Merge with changes to the 1.2.X branch, as of 1.2.19beta10.
+  Revised makefile.mingw
+  Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
+  Revised pngvcrd.c for improved efficiency.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

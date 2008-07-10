@@ -1,17 +1,16 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.4.0 May 15, 2007
+ * Last changed in libpng 1.4.0 [July 10, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
 #include "png.h"
-#include "pngpriv.h"
-
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+#include "pngpriv.h"
 
 /* push model modes */
 #define PNG_READ_SIG_MODE   0
@@ -28,7 +27,7 @@ void PNGAPI
 png_process_data(png_structp png_ptr, png_infop info_ptr,
    png_bytep buffer, png_size_t buffer_size)
 {
-   if(png_ptr == NULL) return;
+   if (png_ptr == NULL || info_ptr == NULL) return;
    png_push_restore_buffer(png_ptr, buffer, buffer_size);
 
    while (png_ptr->buffer_size)
@@ -43,7 +42,7 @@ png_process_data(png_structp png_ptr, png_infop info_ptr,
 void /* PRIVATE */
 png_process_some_data(png_structp png_ptr, png_infop info_ptr)
 {
-   if(png_ptr == NULL) return;
+   if (png_ptr == NULL) return;
    switch (png_ptr->process_mode)
    {
       case PNG_READ_SIG_MODE:
@@ -114,7 +113,7 @@ png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
 
    png_push_fill_buffer(png_ptr, &(info_ptr->signature[num_checked]),
       num_to_check);
-   png_ptr->sig_bytes = (png_byte)(png_ptr->sig_bytes+num_to_check);
+   png_ptr->sig_bytes = (png_byte)(png_ptr->sig_bytes + num_to_check);
 
    if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
    {
@@ -137,60 +136,60 @@ void /* PRIVATE */
 png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-      PNG_IHDR;
-      PNG_IDAT;
-      PNG_IEND;
-      PNG_PLTE;
+      PNG_CONST PNG_IHDR;
+      PNG_CONST PNG_IDAT;
+      PNG_CONST PNG_IEND;
+      PNG_CONST PNG_PLTE;
 #if defined(PNG_READ_bKGD_SUPPORTED)
-      PNG_bKGD;
+      PNG_CONST PNG_bKGD;
 #endif
 #if defined(PNG_READ_cHRM_SUPPORTED)
-      PNG_cHRM;
+      PNG_CONST PNG_cHRM;
 #endif
 #if defined(PNG_READ_gAMA_SUPPORTED)
-      PNG_gAMA;
+      PNG_CONST PNG_gAMA;
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)
-      PNG_hIST;
+      PNG_CONST PNG_hIST;
 #endif
 #if defined(PNG_READ_iCCP_SUPPORTED)
-      PNG_iCCP;
+      PNG_CONST PNG_iCCP;
 #endif
 #if defined(PNG_READ_iTXt_SUPPORTED)
-      PNG_iTXt;
+      PNG_CONST PNG_iTXt;
 #endif
 #if defined(PNG_READ_oFFs_SUPPORTED)
-      PNG_oFFs;
+      PNG_CONST PNG_oFFs;
 #endif
 #if defined(PNG_READ_pCAL_SUPPORTED)
-      PNG_pCAL;
+      PNG_CONST PNG_pCAL;
 #endif
 #if defined(PNG_READ_pHYs_SUPPORTED)
-      PNG_pHYs;
+      PNG_CONST PNG_pHYs;
 #endif
 #if defined(PNG_READ_sBIT_SUPPORTED)
-      PNG_sBIT;
+      PNG_CONST PNG_sBIT;
 #endif
 #if defined(PNG_READ_sCAL_SUPPORTED)
-      PNG_sCAL;
+      PNG_CONST PNG_sCAL;
 #endif
 #if defined(PNG_READ_sRGB_SUPPORTED)
-      PNG_sRGB;
+      PNG_CONST PNG_sRGB;
 #endif
 #if defined(PNG_READ_sPLT_SUPPORTED)
-      PNG_sPLT;
+      PNG_CONST PNG_sPLT;
 #endif
 #if defined(PNG_READ_tEXt_SUPPORTED)
-      PNG_tEXt;
+      PNG_CONST PNG_tEXt;
 #endif
 #if defined(PNG_READ_tIME_SUPPORTED)
-      PNG_tIME;
+      PNG_CONST PNG_tIME;
 #endif
 #if defined(PNG_READ_tRNS_SUPPORTED)
-      PNG_tRNS;
+      PNG_CONST PNG_tRNS;
 #endif
 #if defined(PNG_READ_zTXt_SUPPORTED)
-      PNG_zTXt;
+      PNG_CONST PNG_zTXt;
 #endif
 #endif /* PNG_USE_LOCAL_ARRAYS */
    /* First we make sure we have enough data for the 4 byte chunk name
@@ -210,20 +209,22 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       }
 
       png_push_fill_buffer(png_ptr, chunk_length, 4);
-      png_ptr->push_length = png_get_uint_31(png_ptr,chunk_length);
+      png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
    if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
-     if(png_ptr->mode & PNG_AFTER_IDAT)
+     if (png_ptr->mode & PNG_AFTER_IDAT)
         png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
 
    if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {
+         if (png_ptr->push_length != 13)
+            png_error(png_ptr, "Invalid IHDR length");
          png_push_save_buffer(png_ptr);
          return;
       }
@@ -292,7 +293,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
               return;
 
          if (png_ptr->mode & PNG_AFTER_IDAT)
-            png_benign_error(png_ptr, "Too many IDAT's found");
+            png_benign_error(png_ptr, "Too many IDATs found");
       }
 
       png_ptr->idat_size = png_ptr->push_length;
@@ -563,7 +564,7 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
 {
    png_bytep ptr;
 
-   if(png_ptr == NULL) return;
+   if (png_ptr == NULL) return;
    ptr = buffer;
    if (png_ptr->save_buffer_size)
    {
@@ -604,7 +605,7 @@ png_push_save_buffer(png_structp png_ptr)
    {
       if (png_ptr->save_buffer_ptr != png_ptr->save_buffer)
       {
-         png_size_t i,istop;
+         png_size_t i, istop;
          png_bytep sp;
          png_bytep dp;
 
@@ -629,7 +630,8 @@ png_push_save_buffer(png_structp png_ptr)
       }
       new_max = png_ptr->save_buffer_size + png_ptr->current_buffer_size + 256;
       old_buffer = png_ptr->save_buffer;
-      png_ptr->save_buffer = (png_bytep)png_malloc(png_ptr, new_max);
+      png_ptr->save_buffer = (png_bytep)png_malloc(png_ptr,
+         (png_size_t)new_max);
       png_memcpy(png_ptr->save_buffer, old_buffer, png_ptr->save_buffer_size);
       png_free(png_ptr, old_buffer);
       png_ptr->save_buffer_max = new_max;
@@ -659,7 +661,7 @@ void /* PRIVATE */
 png_push_read_IDAT(png_structp png_ptr)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
-   PNG_IDAT;
+   PNG_CONST PNG_IDAT;
 #endif
    if (!(png_ptr->mode & PNG_HAVE_CHUNK_HEADER))
    {
@@ -672,7 +674,7 @@ png_push_read_IDAT(png_structp png_ptr)
       }
 
       png_push_fill_buffer(png_ptr, chunk_length, 4);
-      png_ptr->push_length = png_get_uint_31(png_ptr,chunk_length);
+      png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
@@ -695,7 +697,7 @@ png_push_read_IDAT(png_structp png_ptr)
       {
          save_size = (png_size_t)png_ptr->idat_size;
          /* check for overflow */
-         if((png_uint_32)save_size != png_ptr->idat_size)
+         if ((png_uint_32)save_size != png_ptr->idat_size)
             png_error(png_ptr, "save_size overflowed in pngpread");
       }
       else
@@ -717,7 +719,7 @@ png_push_read_IDAT(png_structp png_ptr)
       {
          save_size = (png_size_t)png_ptr->idat_size;
          /* check for overflow */
-         if((png_uint_32)save_size != png_ptr->idat_size)
+         if ((png_uint_32)save_size != png_ptr->idat_size)
             png_error(png_ptr, "save_size overflowed in pngpread");
       }
       else
@@ -757,7 +759,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 
    png_ptr->zstream.next_in = buffer;
    png_ptr->zstream.avail_in = (uInt)buffer_length;
-   for(;;)
+   for (;;)
    {
       ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
       if (ret != Z_OK)
@@ -988,25 +990,20 @@ png_read_push_finish_row(png_structp png_ptr)
    /* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* start of interlace block */
-   const int FARDATA png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
+   PNG_CONST int FARDATA png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
 
    /* offset to next interlace block */
-   const int FARDATA png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int FARDATA png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
 
    /* start of interlace block in the y direction */
-   const int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
+   PNG_CONST int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
 
    /* offset to next interlace block in the y direction */
-   const int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
-
-   /* Width of interlace block.  This is not currently used - if you need
-    * it, uncomment it here and in png.h
-   const int FARDATA png_pass_width[] = {8, 4, 4, 2, 2, 1, 1};
-   */
+   PNG_CONST int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
 
    /* Height of interlace block.  This is not currently used - if you need
     * it, uncomment it here and in png.h
-   const int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
+   PNG_CONST int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
    */
 #endif
 
@@ -1059,8 +1056,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place tEXt");
-         /* to quiet some compiler warnings */
-         if(info_ptr == NULL) return;
+         info_ptr = info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1123,10 +1119,11 @@ png_push_read_tEXt(png_structp png_ptr, png_infop info_ptr)
       for (text = key; *text; text++)
          /* empty loop */ ;
 
-      if (text != key + png_ptr->current_text_size)
+      if (text < key + png_ptr->current_text_size)
          text++;
 
-      text_ptr = (png_textp)png_malloc(png_ptr, sizeof(png_text));
+      text_ptr = (png_textp)png_malloc(png_ptr,
+         png_sizeof(png_text));
       text_ptr->compression = PNG_TEXT_COMPRESSION_NONE;
       text_ptr->key = key;
 #ifdef PNG_iTXt_SUPPORTED
@@ -1155,8 +1152,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place zTXt");
-         /* to quiet some compiler warnings */
-         if(info_ptr == NULL) return;
+         info_ptr = info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1173,7 +1169,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
 
    png_ptr->current_text = (png_charp)png_malloc(png_ptr,
-      (png_size_t)(length+1));
+      (png_size_t)(length + 1));
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
    png_ptr->current_text_size = (png_size_t)length;
@@ -1218,7 +1214,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
          /* empty loop */ ;
 
       /* zTXt can't have zero text */
-      if (text == key + png_ptr->current_text_size)
+      if (text >= key + png_ptr->current_text_size)
       {
          png_ptr->current_text = NULL;
          png_free(png_ptr, key);
@@ -1264,8 +1260,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
             if (text == NULL)
             {
                text = (png_charp)png_malloc(png_ptr,
-                  png_ptr->zbuf_size - png_ptr->zstream.avail_out
-                     + key_size + 1);
+                     (png_ptr->zbuf_size
+                     - png_ptr->zstream.avail_out + key_size + 1));
                png_memcpy(text + key_size, png_ptr->zbuf,
                   png_ptr->zbuf_size - png_ptr->zstream.avail_out);
                png_memcpy(text, key, key_size);
@@ -1279,7 +1275,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 
                tmp = text;
                text = (png_charp)png_malloc(png_ptr, text_size +
-                  png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1);
+                  (png_ptr->zbuf_size 
+                  - png_ptr->zstream.avail_out));
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
                png_memcpy(text + text_size, png_ptr->zbuf,
@@ -1318,7 +1315,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
       key = text;
       text += key_size;
 
-      text_ptr = (png_textp)png_malloc(png_ptr, sizeof(png_text));
+      text_ptr = (png_textp)png_malloc(png_ptr,
+          png_sizeof(png_text));
       text_ptr->compression = PNG_TEXT_COMPRESSION_zTXt;
       text_ptr->key = key;
 #ifdef PNG_iTXt_SUPPORTED
@@ -1346,8 +1344,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place iTXt");
-         /* to quiet some compiler warnings */
-         if(info_ptr == NULL) return;
+         info_ptr = info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1362,7 +1359,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
 
    png_ptr->current_text = (png_charp)png_malloc(png_ptr,
-      (png_size_t)(length+1));
+      (png_size_t)(length + 1));
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
    png_ptr->current_text_size = (png_size_t)length;
@@ -1414,7 +1411,7 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
       for (lang = key; *lang; lang++)
          /* empty loop */ ;
 
-      if (lang != key + png_ptr->current_text_size)
+      if (lang < key + png_ptr->current_text_size - 3)
          lang++;
 
       comp_flag = *lang++;
@@ -1424,13 +1421,18 @@ png_push_read_iTXt(png_structp png_ptr, png_infop info_ptr)
          /* empty loop */ ;
       lang_key++;        /* skip NUL separator */
 
-      for (text = lang_key; *text; text++)
-         /* empty loop */ ;
+      text=lang_key;
+      if (lang_key < key + png_ptr->current_text_size - 1)
+      {
+        for (; *text; text++)
+           /* empty loop */ ;
+      }
 
-      if (text != key + png_ptr->current_text_size)
+      if (text < key + png_ptr->current_text_size)
          text++;
 
-      text_ptr = (png_textp)png_malloc(png_ptr, sizeof(png_text));
+      text_ptr = (png_textp)png_malloc(png_ptr,
+         png_sizeof(png_text));
       text_ptr->compression = comp_flag + 2;
       text_ptr->key = key;
       text_ptr->lang = lang;
@@ -1464,55 +1466,67 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
-      if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
-           PNG_HANDLE_CHUNK_ALWAYS
+      if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
+         PNG_HANDLE_CHUNK_ALWAYS
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-           && png_ptr->read_user_chunk_fn == NULL
+         && png_ptr->read_user_chunk_fn == NULL
 #endif
          )
 #endif
          png_chunk_error(png_ptr, "unknown critical chunk");
 
-      /* to quiet compiler warnings about unused info_ptr */
-      if (info_ptr == NULL)
-         return;
+      info_ptr = info_ptr; /* to quiet some compiler warnings */
    }
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    if (png_ptr->flags & PNG_FLAG_KEEP_UNKNOWN_CHUNKS)
    {
-       png_unknown_chunk chunk;
-
 #ifdef PNG_MAX_MALLOC_64K
-       if (length > (png_uint_32)65535L)
-       {
-           png_warning(png_ptr, "unknown chunk too large to fit in memory");
-           skip = length - (png_uint_32)65535L;
-           length = (png_uint_32)65535L;
-       }
+      if (length > (png_uint_32)65535L)
+      {
+          png_warning(png_ptr, "unknown chunk too large to fit in memory");
+          skip = length - (png_uint_32)65535L;
+          length = (png_uint_32)65535L;
+      }
 #endif
+      png_memcpy((png_charp)png_ptr->unknown_chunk.name,
+                 (png_charp)png_ptr->chunk_name, 
+                 png_sizeof(png_ptr->unknown_chunk.name));
+      png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name)-1]='\0';
 
-       png_strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
-       chunk.data = (png_bytep)png_malloc(png_ptr, length);
-       png_crc_read(png_ptr, chunk.data, length);
-       chunk.size = length;
+      png_ptr->unknown_chunk.size = (png_size_t)length;
+      if (length == 0)
+         png_ptr->unknown_chunk.data = NULL;
+      else
+      {
+         png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr,
+       (png_size_t)length);
+         png_crc_read(png_ptr, (png_bytep)png_ptr->unknown_chunk.data, length);
+      }
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-       if(png_ptr->read_user_chunk_fn != NULL)
-       {
-          /* callback to user unknown chunk handler */
-          if ((*(png_ptr->read_user_chunk_fn)) (png_ptr, &chunk) <= 0)
-          {
-             if (!(png_ptr->chunk_name[0] & 0x20))
-                if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
-                     PNG_HANDLE_CHUNK_ALWAYS)
-                   png_chunk_error(png_ptr, "unknown critical chunk");
-          }
-             png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
-       }
-       else
+      if (png_ptr->read_user_chunk_fn != NULL)
+      {
+         /* callback to user unknown chunk handler */
+         int ret;
+         ret = (*(png_ptr->read_user_chunk_fn))
+           (png_ptr, &png_ptr->unknown_chunk);
+         if (ret < 0)
+            png_chunk_error(png_ptr, "error in user chunk");
+         if (ret == 0)
+         {
+            if (!(png_ptr->chunk_name[0] & 0x20))
+               if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
+                    PNG_HANDLE_CHUNK_ALWAYS)
+                  png_chunk_error(png_ptr, "unknown critical chunk");
+            png_set_unknown_chunks(png_ptr, info_ptr,
+               &png_ptr->unknown_chunk, 1);
+         }
+      }
+      else
 #endif
-          png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
-       png_free(png_ptr, chunk.data);
+        png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
+      png_free(png_ptr, png_ptr->unknown_chunk.data);
+      png_ptr->unknown_chunk.data = NULL;
    }
    else
 #endif
@@ -1546,11 +1560,11 @@ void PNGAPI
 png_progressive_combine_row (png_structp png_ptr,
    png_bytep old_row, png_bytep new_row)
 {
-   if(png_ptr == NULL) return;
 #ifdef PNG_USE_LOCAL_ARRAYS
-   const int FARDATA png_pass_dsp_mask[7] =
+   PNG_CONST int FARDATA png_pass_dsp_mask[7] =
       {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 #endif
+   if (png_ptr == NULL) return;
    if (new_row != NULL)    /* new_row must == png_ptr->row_buf here. */
       png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);
 }
@@ -1560,7 +1574,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
    png_progressive_info_ptr info_fn, png_progressive_row_ptr row_fn,
    png_progressive_end_ptr end_fn)
 {
-   if(png_ptr == NULL) return;
+   if (png_ptr == NULL) return;
    png_ptr->info_fn = info_fn;
    png_ptr->row_fn = row_fn;
    png_ptr->end_fn = end_fn;
@@ -1571,7 +1585,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
 png_voidp PNGAPI
 png_get_progressive_ptr(png_structp png_ptr)
 {
-   if(png_ptr == NULL) return (NULL);
+   if (png_ptr == NULL) return (NULL);
    return png_ptr->io_ptr;
 }
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */

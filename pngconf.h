@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta19 - May 15, 2007
+ * libpng version 1.4.0beta20 - May 15, 2007
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -351,6 +351,38 @@
 
 /* Other defines for things like memory and the like can go here.  */
 
+/* This controls how fine the dithering gets.  As this allocates
+ * a largish chunk of memory (32K), those who are not as concerned
+ * with dithering quality can decrease some or all of these.
+ */
+#ifndef PNG_DITHER_RED_BITS
+#  define PNG_DITHER_RED_BITS 5
+#endif
+#ifndef PNG_DITHER_GREEN_BITS
+#  define PNG_DITHER_GREEN_BITS 5
+#endif
+#ifndef PNG_DITHER_BLUE_BITS
+#  define PNG_DITHER_BLUE_BITS 5
+#endif
+
+/* This controls how fine the gamma correction becomes when you
+ * are only interested in 8 bits anyway.  Increasing this value
+ * results in more memory being used, and more pow() functions
+ * being called to fill in the gamma tables.  Don't set this value
+ * less then 8, and even that may not work (I haven't tested it).
+ */
+
+#ifndef PNG_MAX_GAMMA_8
+#  define PNG_MAX_GAMMA_8 11
+#endif
+
+/* This controls how much a difference in gamma we can tolerate before
+ * we actually start doing gamma conversion.
+ */
+#ifndef PNG_GAMMA_THRESHOLD
+#  define PNG_GAMMA_THRESHOLD 0.05
+#endif
+
 /* The following uses const char * instead of char * for error
  * and warning message functions, so some compilers won't complain.
  * If you do not want to use const, define PNG_NO_CONST here.
@@ -630,39 +662,6 @@
 #if !defined(PNG_NO_EASY_ACCESS) && !defined(PNG_EASY_ACCESS_SUPPORTED)
 #  define PNG_EASY_ACCESS_SUPPORTED
 #endif
-
-/* PNG_ASSEMBLER_CODE was enabled by default in version 1.2.0 
- * even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined.
- *
- * PNG_NO_ASSEMBLER_CODE disables use of all assembler code and optimized C,
- * and removes or includes several functions in the API.
- *
- * PNG_NO_MMX_CODE disables the use of MMX code without changing the API.
- * When MMX code is off, then optimized C replacement functions are used.
-*/
-#if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
-#  ifndef PNG_ASSEMBLER_CODE_SUPPORTED
-#    define PNG_ASSEMBLER_CODE_SUPPORTED
-#  endif
-#  if defined(XP_MACOSX) && !defined(PNG_NO_MMX_CODE)
-     /* work around Intel-Mac compiler bug */
-#    define PNG_NO_MMX_CODE
-#  endif
-#  if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE) && \
-     defined(__MMX__)
-#    define PNG_MMX_CODE_SUPPORTED
-#  endif
-#  if !defined(PNG_USE_PNGGCCRD) && !defined(PNG_NO_MMX_CODE) && \
-     !defined(PNG_USE_PNGVCRD) && defined(__MMX__)
-#    define PNG_USE_PNGGCCRD
-#  endif
-#endif
-
-/* If you are sure that you don't need thread safety and you are compiling
-   with PNG_USE_PNGCCRD for an MMX application, you can define this for
-   faster execution.  See pnggccrd.c.
-#define PNG_THREAD_UNSAFE_OK
-*/
 
 #if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
 #  define PNG_USER_MEM_SUPPORTED
@@ -1020,6 +1019,7 @@ typedef unsigned char png_byte;
 #else
    typedef size_t png_size_t;
 #endif
+#define png_sizeof(x) sizeof(x)
 
 /* The following is needed for medium model support.  It cannot be in the
  * PNG_INTERNAL section.  Needs modification for other compilers besides
@@ -1343,6 +1343,27 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    define png_memcpy  memcpy
 #    define png_memset  memset
 #    define png_sprintf sprintf
+#  ifndef PNG_NO_SNPRINTF
+#    ifdef _MSC_VER
+#      define png_snprintf _snprintf   /* Added to v 1.2.19 */
+#      define png_snprintf2 _snprintf
+#      define png_snprintf6 _snprintf
+#    else
+#      define png_snprintf snprintf   /* Added to v 1.2.19 */
+#      define png_snprintf2 snprintf
+#      define png_snprintf6 snprintf
+#    endif
+#  else
+     /* You don't have or don't want to use snprintf().  Caution: Using
+      * sprintf instead of snprintf exposes your application to accidental
+      * or malevolent buffer overflows.  If you don't have snprintf()
+      * as a general rule you should provide one (you can get one from
+      * Portable OpenSSH). */
+#    define png_snprintf(s1,n,fmt,x1) sprintf(s1,fmt,x1)
+#    define png_snprintf2(s1,n,fmt,x1,x2) sprintf(s1,fmt,x1,x2)
+#    define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
+        sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
+#  endif
 #  endif
 #endif
 

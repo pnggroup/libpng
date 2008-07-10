@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta19 - May 15, 2007
+ * libpng version 1.4.0beta20 - July 10, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -75,38 +75,6 @@
 #  if defined(_MSC_VER)
 #    include <malloc.h>
 #  endif
-#endif
-
-/* This controls how fine the dithering gets.  As this allocates
- * a largish chunk of memory (32K), those who are not as concerned
- * with dithering quality can decrease some or all of these.
- */
-#ifndef PNG_DITHER_RED_BITS
-#  define PNG_DITHER_RED_BITS 5
-#endif
-#ifndef PNG_DITHER_GREEN_BITS
-#  define PNG_DITHER_GREEN_BITS 5
-#endif
-#ifndef PNG_DITHER_BLUE_BITS
-#  define PNG_DITHER_BLUE_BITS 5
-#endif
-
-/* This controls how fine the gamma correction becomes when you
- * are only interested in 8 bits anyway.  Increasing this value
- * results in more memory being used, and more pow() functions
- * being called to fill in the gamma tables.  Don't set this value
- * less then 8, and even that may not work (I haven't tested it).
- */
-
-#ifndef PNG_MAX_GAMMA_8
-#  define PNG_MAX_GAMMA_8 11
-#endif
-
-/* This controls how much a difference in gamma we can tolerate before
- * we actually start doing gamma conversion.
- */
-#ifndef PNG_GAMMA_THRESHOLD
-#  define PNG_GAMMA_THRESHOLD 0.05
 #endif
 
 /* Various modes of operation.  Note that after an init, mode is set to

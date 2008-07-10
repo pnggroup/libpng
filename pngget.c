@@ -1,17 +1,16 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 May 15, 2007
+ * Last changed in libpng 1.40. [July 10, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
 
 #include "png.h"
-#include "pngpriv.h"
-
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
+#include "pngpriv.h"
 
 png_uint_32 PNGAPI
 png_get_valid(png_structp png_ptr, png_infop info_ptr, png_uint_32 flag)
@@ -122,7 +121,7 @@ png_get_x_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_pHYs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_x_pixels_per_meter");
-      if(info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
+      if (info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
           return (0);
       else return (info_ptr->x_pixels_per_unit);
    }
@@ -140,7 +139,7 @@ png_get_y_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_pHYs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_y_pixels_per_meter");
-      if(info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
+      if (info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
           return (0);
       else return (info_ptr->y_pixels_per_unit);
    }
@@ -158,7 +157,7 @@ png_get_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_pHYs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_pixels_per_meter");
-      if(info_ptr->phys_unit_type != PNG_RESOLUTION_METER ||
+      if (info_ptr->phys_unit_type != PNG_RESOLUTION_METER ||
          info_ptr->x_pixels_per_unit != info_ptr->y_pixels_per_unit)
           return (0);
       else return (info_ptr->x_pixels_per_unit);
@@ -199,7 +198,7 @@ png_get_x_offset_microns(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_oFFs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_x_offset_microns");
-      if(info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
+      if (info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
           return (0);
       else return (info_ptr->x_offset);
    }
@@ -217,7 +216,7 @@ png_get_y_offset_microns(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_oFFs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_y_offset_microns");
-      if(info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
+      if (info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
           return (0);
       else return (info_ptr->y_offset);
    }
@@ -235,7 +234,7 @@ png_get_x_offset_pixels(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_oFFs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_x_offset_microns");
-      if(info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
+      if (info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
           return (0);
       else return (info_ptr->x_offset);
    }
@@ -253,7 +252,7 @@ png_get_y_offset_pixels(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_oFFs)
    {
       png_debug1(1, "in %s retrieval function\n", "png_get_y_offset_microns");
-      if(info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
+      if (info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
           return (0);
       else return (info_ptr->y_offset);
    }
@@ -323,7 +322,7 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
       {
          *unit_type = (int)info_ptr->phys_unit_type;
          retval |= PNG_INFO_pHYs;
-         if(*unit_type == 1)
+         if (*unit_type == 1)
          {
             if (res_x != NULL) *res_x = (png_uint_32)(*res_x * .0254 + .50);
             if (res_y != NULL) *res_y = (png_uint_32)(*res_y * .0254 + .50);
@@ -512,8 +511,11 @@ png_get_sPLT(png_structp png_ptr, png_infop info_ptr,
              png_sPLT_tpp spalettes)
 {
    if (png_ptr != NULL && info_ptr != NULL && spalettes != NULL)
+   {
      *spalettes = info_ptr->splt_palettes;
-   return ((png_uint_32)info_ptr->splt_palettes_num);
+     return ((png_uint_32)info_ptr->splt_palettes_num);
+   }
+   return (0);
 }
 #endif
 
@@ -781,10 +783,10 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
              *trans_values = &(info_ptr->trans_values);
              retval |= PNG_INFO_tRNS;
           }
-          if(trans != NULL)
+          if (trans != NULL)
              *trans = NULL;
       }
-      if(num_trans != NULL)
+      if (num_trans != NULL)
       {
          *num_trans = info_ptr->num_trans;
          retval |= PNG_INFO_tRNS;
@@ -800,8 +802,11 @@ png_get_unknown_chunks(png_structp png_ptr, png_infop info_ptr,
              png_unknown_chunkpp unknowns)
 {
    if (png_ptr != NULL && info_ptr != NULL && unknowns != NULL)
+   {
      *unknowns = info_ptr->unknown_chunks;
-   return ((png_uint_32)info_ptr->unknown_chunks_num);
+     return ((png_uint_32)info_ptr->unknown_chunks_num);
+   }
+   return (0);
 }
 #endif
 
@@ -825,99 +830,10 @@ png_get_user_chunk_ptr(png_structp png_ptr)
 png_size_t PNGAPI
 png_get_compression_buffer_size(png_structp png_ptr)
 {
-   return (png_ptr ? png_ptr->zbuf_size : 0);
+   return (png_ptr ? png_ptr->zbuf_size : 0L);
 }
 #endif
 
-#ifdef PNG_ASSEMBLER_CODE_SUPPORTED
-/* this function was added to libpng 1.2.0 and should exist by default */
-png_uint_32 PNGAPI
-png_get_asm_flags (png_structp png_ptr)
-{
-    return (png_uint_32)(png_ptr? png_ptr->asm_flags : 0L);
-}
-
-/* this function was added to libpng 1.2.0 and should exist by default */
-png_uint_32 PNGAPI
-png_get_asm_flagmask (int flag_select)
-{
-    png_uint_32 settable_asm_flags = 0;
-
-#ifdef PNG_MMX_CODE_SUPPORTED
-    if (flag_select & PNG_SELECT_READ)
-        settable_asm_flags |=
-          PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  |
-          PNG_ASM_FLAG_MMX_READ_INTERLACE    |
-          PNG_ASM_FLAG_MMX_READ_FILTER_SUB   |
-          PNG_ASM_FLAG_MMX_READ_FILTER_UP    |
-          PNG_ASM_FLAG_MMX_READ_FILTER_AVG   |
-          PNG_ASM_FLAG_MMX_READ_FILTER_PAETH ;
-          /* no non-MMX flags yet */
-#endif
-
-#if 0
-    /* GRR:  no write-flags yet, either, but someday... */
-    if (flag_select & PNG_SELECT_WRITE)
-        settable_asm_flags |=
-          PNG_ASM_FLAG_MMX_WRITE_ [whatever] ;
-#endif /* 0 */
-
-    return settable_asm_flags;  /* _theoretically_ settable capabilities only */
-}
-#endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
-
-
-#if defined(PNG_MMX_CODE_SUPPORTED)
-/* this function was added to libpng 1.2.0 */
-png_uint_32 PNGAPI
-png_get_mmx_flagmask (int flag_select, int *compilerID)
-{
-    png_uint_32 settable_mmx_flags = 0;
-
-    if (flag_select & PNG_SELECT_READ)
-        settable_mmx_flags |=
-          PNG_ASM_FLAG_MMX_READ_COMBINE_ROW  |
-          PNG_ASM_FLAG_MMX_READ_INTERLACE    |
-          PNG_ASM_FLAG_MMX_READ_FILTER_SUB   |
-          PNG_ASM_FLAG_MMX_READ_FILTER_UP    |
-          PNG_ASM_FLAG_MMX_READ_FILTER_AVG   |
-          PNG_ASM_FLAG_MMX_READ_FILTER_PAETH ;
-#if 0
-    /* GRR:  no MMX write support yet, but someday... */
-    if (flag_select & PNG_SELECT_WRITE)
-        settable_mmx_flags |=
-          PNG_ASM_FLAG_MMX_WRITE_ [whatever] ;
-#endif /* 0 */
-
-    if (compilerID != NULL) {
-#ifdef PNG_USE_PNGVCRD
-        *compilerID = 1;    /* MSVC */
-#else
-#ifdef PNG_USE_PNGGCCRD
-        *compilerID = 2;    /* gcc/gas */
-#else
-        *compilerID = -1;   /* unknown (i.e., no asm/MMX code compiled) */
-#endif
-#endif
-    }
-
-    return settable_mmx_flags;  /* _theoretically_ settable capabilities only */
-}
-
-/* this function was added to libpng 1.2.0 */
-png_byte PNGAPI
-png_get_mmx_bitdepth_threshold (png_structp png_ptr)
-{
-    return (png_byte)(png_ptr? png_ptr->mmx_bitdepth_threshold : 0);
-}
-
-/* this function was added to libpng 1.2.0 */
-png_uint_32 PNGAPI
-png_get_mmx_rowbytes_threshold (png_structp png_ptr)
-{
-    return (png_uint_32)(png_ptr? png_ptr->mmx_rowbytes_threshold : 0L);
-}
-#endif /* ?PNG_MMX_CODE_SUPPORTED */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* these functions were added to libpng 1.2.6 */
@@ -932,7 +848,7 @@ png_get_user_height_max (png_structp png_ptr)
     return (png_ptr? png_ptr->user_height_max : 0);
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
-
+ 
 #ifdef PNG_IO_STATE_SUPPORTED
 png_uint_32 PNGAPI
 png_get_io_state (png_structp png_ptr)
