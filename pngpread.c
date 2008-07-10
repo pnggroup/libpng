@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.30 [July 6, 2008]
+ * Last changed in libpng 1.2.30 [July 10, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -27,7 +27,7 @@ void PNGAPI
 png_process_data(png_structp png_ptr, png_infop info_ptr,
    png_bytep buffer, png_size_t buffer_size)
 {
-   if(png_ptr == NULL || info_ptr == NULL) return;
+   if (png_ptr == NULL || info_ptr == NULL) return;
    png_push_restore_buffer(png_ptr, buffer, buffer_size);
 
    while (png_ptr->buffer_size)
@@ -42,7 +42,7 @@ png_process_data(png_structp png_ptr, png_infop info_ptr,
 void /* PRIVATE */
 png_process_some_data(png_structp png_ptr, png_infop info_ptr)
 {
-   if(png_ptr == NULL) return;
+   if (png_ptr == NULL) return;
    switch (png_ptr->process_mode)
    {
       case PNG_READ_SIG_MODE:
@@ -113,7 +113,7 @@ png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
 
    png_push_fill_buffer(png_ptr, &(info_ptr->signature[num_checked]),
       num_to_check);
-   png_ptr->sig_bytes = (png_byte)(png_ptr->sig_bytes+num_to_check);
+   png_ptr->sig_bytes = (png_byte)(png_ptr->sig_bytes + num_to_check);
 
    if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
    {
@@ -216,7 +216,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
    }
 
    if (!png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
-     if(png_ptr->mode & PNG_AFTER_IDAT)
+     if (png_ptr->mode & PNG_AFTER_IDAT)
         png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
 
    if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
@@ -564,7 +564,7 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
 {
    png_bytep ptr;
 
-   if(png_ptr == NULL) return;
+   if (png_ptr == NULL) return;
    ptr = buffer;
    if (png_ptr->save_buffer_size)
    {
@@ -697,7 +697,7 @@ png_push_read_IDAT(png_structp png_ptr)
       {
          save_size = (png_size_t)png_ptr->idat_size;
          /* check for overflow */
-         if((png_uint_32)save_size != png_ptr->idat_size)
+         if ((png_uint_32)save_size != png_ptr->idat_size)
             png_error(png_ptr, "save_size overflowed in pngpread");
       }
       else
@@ -719,7 +719,7 @@ png_push_read_IDAT(png_structp png_ptr)
       {
          save_size = (png_size_t)png_ptr->idat_size;
          /* check for overflow */
-         if((png_uint_32)save_size != png_ptr->idat_size)
+         if ((png_uint_32)save_size != png_ptr->idat_size)
             png_error(png_ptr, "save_size overflowed in pngpread");
       }
       else
@@ -759,7 +759,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 
    png_ptr->zstream.next_in = buffer;
    png_ptr->zstream.avail_in = (uInt)buffer_length;
-   for(;;)
+   for (;;)
    {
       ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
       if (ret != Z_OK)
@@ -1058,8 +1058,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
          png_error(png_ptr, "Out of place tEXt");
-         /* to quiet some compiler warnings */
-         if(info_ptr == NULL) return;
+         info_ptr = info_ptr; /* to quiet some compiler warnings */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1172,7 +1171,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
 
    png_ptr->current_text = (png_charp)png_malloc(png_ptr,
-       (png_uint_32)(length+1));
+      (png_uint_32)(length + 1));
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
    png_ptr->current_text_size = (png_size_t)length;
@@ -1263,8 +1262,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
             if (text == NULL)
             {
                text = (png_charp)png_malloc(png_ptr,
-                  (png_uint_32)(png_ptr->zbuf_size - png_ptr->zstream.avail_out
-                     + key_size + 1));
+                     (png_uint_32)(png_ptr->zbuf_size
+                     - png_ptr->zstream.avail_out + key_size + 1));
                png_memcpy(text + key_size, png_ptr->zbuf,
                   png_ptr->zbuf_size - png_ptr->zstream.avail_out);
                png_memcpy(text, key, key_size);
@@ -1278,8 +1277,8 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 
                tmp = text;
                text = (png_charp)png_malloc(png_ptr, text_size +
-                  (png_uint_32)(png_ptr->zbuf_size - png_ptr->zstream.avail_out
-                   + 1));
+                  (png_uint_32)(png_ptr->zbuf_size 
+                  - png_ptr->zstream.avail_out));
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
                png_memcpy(text + text_size, png_ptr->zbuf,
@@ -1362,7 +1361,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
 
    png_ptr->current_text = (png_charp)png_malloc(png_ptr,
-         (png_uint_32)(length+1));
+      (png_uint_32)(length + 1));
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
    png_ptr->current_text_size = (png_size_t)length;
@@ -1469,16 +1468,16 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
-     if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
-          PNG_HANDLE_CHUNK_ALWAYS
+      if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
+         PNG_HANDLE_CHUNK_ALWAYS
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-          && png_ptr->read_user_chunk_fn == NULL
+         && png_ptr->read_user_chunk_fn == NULL
 #endif
-        )
+         )
 #endif
-        png_chunk_error(png_ptr, "unknown critical chunk");
+         png_chunk_error(png_ptr, "unknown critical chunk");
 
-     info_ptr = info_ptr; /* to quiet some compiler warnings */
+      info_ptr = info_ptr; /* to quiet some compiler warnings */
    }
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
@@ -1507,7 +1506,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
          png_crc_read(png_ptr, (png_bytep)png_ptr->unknown_chunk.data, length);
       }
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
-      if(png_ptr->read_user_chunk_fn != NULL)
+      if (png_ptr->read_user_chunk_fn != NULL)
       {
          /* callback to user unknown chunk handler */
          int ret;
@@ -1518,7 +1517,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
          if (ret == 0)
          {
             if (!(png_ptr->chunk_name[0] & 0x20))
-               if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
+               if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
                     PNG_HANDLE_CHUNK_ALWAYS)
                   png_chunk_error(png_ptr, "unknown critical chunk");
             png_set_unknown_chunks(png_ptr, info_ptr,
@@ -1567,7 +1566,7 @@ png_progressive_combine_row (png_structp png_ptr,
    PNG_CONST int FARDATA png_pass_dsp_mask[7] =
       {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 #endif
-   if(png_ptr == NULL) return;
+   if (png_ptr == NULL) return;
    if (new_row != NULL)    /* new_row must == png_ptr->row_buf here. */
       png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);
 }
@@ -1577,7 +1576,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
    png_progressive_info_ptr info_fn, png_progressive_row_ptr row_fn,
    png_progressive_end_ptr end_fn)
 {
-   if(png_ptr == NULL) return;
+   if (png_ptr == NULL) return;
    png_ptr->info_fn = info_fn;
    png_ptr->row_fn = row_fn;
    png_ptr->end_fn = end_fn;
@@ -1588,7 +1587,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
 png_voidp PNGAPI
 png_get_progressive_ptr(png_structp png_ptr)
 {
-   if(png_ptr == NULL) return (NULL);
+   if (png_ptr == NULL) return (NULL);
    return png_ptr->io_ptr;
 }
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */

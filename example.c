@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.2.30 [July 6, 2008]
+ * Last changed in libpng 1.2.30 [July 10, 2008]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2008 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -505,7 +505,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
  * shown below:
  */
    /* Check if row_num is in bounds. */
-   if((row_num >= 0) && (row_num < height))
+   if ((row_num >= 0) && (row_num < height))
    {
      /* Get pointer to corresponding row in our
       * PNG read buffer.
@@ -515,7 +515,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
      /* If both rows are allocated then copy the new row
       * data to the corresponding row data.
       */
-     if((old_row != NULL) && (new_row != NULL))
+     if ((old_row != NULL) && (new_row != NULL))
      png_progressive_combine_row(png_ptr, old_row, new_row);
    }
 /*

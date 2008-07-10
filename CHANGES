@@ -2183,6 +2183,9 @@ version 1.2.30beta03 [July 6, 2008]
   Merge reading of chunk length and chunk type into a single 8-byte read.
   Merge writing of chunk length and chunk type into a single 8-byte write.
 
+version 1.2.30beta04 [July 10, 2008]
+  Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
