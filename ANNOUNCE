@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta20 - July 10, 2008
+Libpng 1.4.0beta21 - July 21, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta20.tar.gz
-   1.4.0beta20.tar.bz2
+   1.4.0beta21.tar.gz
+   1.4.0beta21.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta20-no-config.tar.gz
-   1.4.0beta20-no-config.tar.bz2
+   1.4.0beta21-no-config.tar.gz
+   1.4.0beta21-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b20.zip
-   lp140b20.tar.bz2
+   lp140b21.zip
+   lp140b21.tar.bz2
 
 Other information:
 
-   1.4.0beta20-README.txt
-   1.4.0beta20-KNOWNBUGS.txt
-   1.4.0beta20-LICENSE.txt
-   1.4.0beta20-Y2K-compliance.txt
+   1.4.0beta21-README.txt
+   1.4.0beta21-KNOWNBUGS.txt
+   1.4.0beta21-LICENSE.txt
+   1.4.0beta21-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -241,7 +241,7 @@ version 1.4.0beta19 [May 16, 2007]
   Added "png_ptr->num_trans=0" before error return in png_handle_tRNS,
     to eliminate a vulnerability (CVE-2007-2554, CERT VU#684664)
 
-version 1.4.0beta20 [July 10, 2008]
+version 1.4.0beta20 [July 9, 2008]
   Moved several PNG_HAVE_* macros from pngpriv.h to png.h because applications
     calling set_unknown_chunk_location() need them.
   Moved several macro definitions from pngpriv.h to pngconf.h
@@ -251,6 +251,10 @@ version 1.4.0beta20 [July 10, 2008]
   Merge with changes to the 1.2.X branch, as of 1.2.19beta10.
   Revised makefile.mingw
   Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
+
+version 1.4.0beta21 [July 21, 2008]
+  Moved local array "chunkdata" from pngrutil.c to the png_struct, so
+    it will be freed by png_read_destroy() in case of a read error.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

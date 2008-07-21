@@ -1917,13 +1917,17 @@ version 1.4.0beta19 [May 16, 2007]
   Added conditional #undef jmpbuf in pngtest.c to undo #define in AIX headers.
   Added scripts/makefile.nommx
 
-version 1.4.0beta20 [July 10, 2008]
+version 1.4.0beta20 [July 9, 2008]
   Moved several PNG_HAVE_* macros from pngpriv.h to png.h because applications
     calling set_unknown_chunk_location() need them.
   Moved several macro definitions from pngpriv.h to pngconf.h
-  Merge with changes to the 1.2.X branch, as of 1.2.19beta10.
+  Merge with changes to the 1.2.X branch, as of 1.2.30beta04.
+  Deleted all use of the MMX assembler code and Intel-licensed optimizations.
   Revised makefile.mingw
-  Prefer PNG_USE_PNGVCRD when _MSC_VER is defined in pngconf.h
+
+version 1.4.0beta21 [July 21, 2008]
+  Moved local array "chunkdata" from pngrutil.c to the png_struct, so
+    it will be freed by png_read_destroy() in case of a read error.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
