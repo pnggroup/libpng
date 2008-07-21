@@ -2193,6 +2193,9 @@ version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
   Moved local array "chunkdata" from pngrutil.c to the png_struct, so
     it will be freed by png_read_destroy() in case of a read error.
 
+version 1.0.38rc03, 1.2.30rc03 [July 21, 2008]
+  Change "purpose" and "buffer" to png_ptr->chunkdata to avoid memory leaking.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

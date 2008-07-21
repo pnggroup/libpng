@@ -1597,7 +1597,6 @@ png_handle_oFFs(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_charp purpose;
    png_int_32 X0, X1;
    png_byte type, nparams;
    png_charp buf, units, endptr;
@@ -1624,35 +1623,38 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug1(2, "Allocating and reading pCAL chunk data (%lu bytes)\n",
       length + 1);
-   purpose = (png_charp)png_malloc_warn(png_ptr, length + 1);
-   if (purpose == NULL)
+   png_free(png_ptr, png_ptr->chunkdata);
+   png_ptr->chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   if (png_ptr->chunkdata == NULL)
      {
        png_warning(png_ptr, "No memory for pCAL purpose.");
        return;
      }
    slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)purpose, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
 
    if (png_crc_finish(png_ptr, 0))
    {
-      png_free(png_ptr, purpose);
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
       return;
    }
 
-   purpose[slength] = 0x00; /* null terminate the last string */
+   png_ptr->chunkdata[slength] = 0x00; /* null terminate the last string */
 
    png_debug(3, "Finding end of pCAL purpose string\n");
-   for (buf = purpose; *buf; buf++)
+   for (buf = png_ptr->chunkdata; *buf; buf++)
       /* empty loop */ ;
 
-   endptr = purpose + slength;
+   endptr = png_ptr->chunkdata + slength;
 
    /* We need to have at least 12 bytes after the purpose string
       in order to get the parameter information. */
    if (endptr <= buf + 12)
    {
       png_warning(png_ptr, "Invalid pCAL data");
-      png_free(png_ptr, purpose);
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
       return;
    }
 
@@ -1672,7 +1674,8 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        (type == PNG_EQUATION_HYPERBOLIC && nparams != 4))
    {
       png_warning(png_ptr, "Invalid pCAL parameters for equation type");
-      png_free(png_ptr, purpose);
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
       return;
    }
    else if (type >= PNG_EQUATION_LAST)
@@ -1688,7 +1691,8 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       (png_uint_32)(nparams * png_sizeof(png_charp))) ;
    if (params == NULL)
      {
-       png_free(png_ptr, purpose);
+       png_free(png_ptr, png_ptr->chunkdata);
+       png_ptr->chunkdata = NULL;
        png_warning(png_ptr, "No memory for pCAL params.");
        return;
      }
@@ -1706,16 +1710,18 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       if (buf > endptr)
       {
          png_warning(png_ptr, "Invalid pCAL data");
-         png_free(png_ptr, purpose);
+         png_free(png_ptr, png_ptr->chunkdata);
+         png_ptr->chunkdata = NULL;
          png_free(png_ptr, params);
          return;
       }
    }
 
-   png_set_pCAL(png_ptr, info_ptr, purpose, X0, X1, type, nparams,
+   png_set_pCAL(png_ptr, info_ptr, png_ptr->chunkdata, X0, X1, type, nparams,
       units, params);
 
-   png_free(png_ptr, purpose);
+   png_free(png_ptr, png_ptr->chunkdata);
+   png_ptr->chunkdata = NULL;
    png_free(png_ptr, params);
 }
 #endif
@@ -1725,7 +1731,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_charp buffer, ep;
+   png_charp ep;
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    double width, height;
    png_charp vp;
@@ -1755,24 +1761,25 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug1(2, "Allocating and reading sCAL chunk data (%lu bytes)\n",
       length + 1);
-   buffer = (png_charp)png_malloc_warn(png_ptr, length + 1);
-   if (buffer == NULL)
+   png_ptr->chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   if (png_ptr->chunkdata == NULL)
    {
       png_warning(png_ptr, "Out of memory while processing sCAL chunk");
       return;
    }
    slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)buffer, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
 
    if (png_crc_finish(png_ptr, 0))
    {
-      png_free(png_ptr, buffer);
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
       return;
    }
 
-   buffer[slength] = 0x00; /* null terminate the last string */
+   png_ptr->chunkdata[slength] = 0x00; /* null terminate the last string */
 
-   ep = buffer + 1;        /* skip unit byte */
+   ep = png_ptr->chunkdata + 1;        /* skip unit byte */
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    width = png_strtod(png_ptr, ep, &vp);
@@ -1793,18 +1800,19 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 #endif
 
-   for (ep = buffer; *ep; ep++)
+   for (ep = png_ptr->chunkdata; *ep; ep++)
       /* empty loop */ ;
    ep++;
 
-   if (buffer + slength < ep)
+   if (png_ptr->chunkdata + slength < ep)
    {
       png_warning(png_ptr, "Truncated sCAL chunk");
 #if defined(PNG_FIXED_POINT_SUPPORTED) && \
     !defined(PNG_FLOATING_POINT_SUPPORTED)
       png_free(png_ptr, swidth);
 #endif
-      png_free(png_ptr, buffer);
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
       return;
    }
 
@@ -1827,14 +1835,15 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 #endif
 
-   if (buffer + slength < ep
+   if (png_ptr->chunkdata + slength < ep
 #ifdef PNG_FLOATING_POINT_SUPPORTED
       || width <= 0. || height <= 0.
 #endif
       )
    {
       png_warning(png_ptr, "Invalid sCAL data");
-      png_free(png_ptr, buffer);
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
 #if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
       png_free(png_ptr, swidth);
       png_free(png_ptr, sheight);
@@ -1844,14 +1853,15 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   png_set_sCAL(png_ptr, info_ptr, buffer[0], width, height);
+   png_set_sCAL(png_ptr, info_ptr, png_ptr->chunkdata[0], width, height);
 #else
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   png_set_sCAL_s(png_ptr, info_ptr, buffer[0], swidth, sheight);
+   png_set_sCAL_s(png_ptr, info_ptr, png_ptr->chunkdata[0], swidth, sheight);
 #endif
 #endif
 
-   png_free(png_ptr, buffer);
+   png_free(png_ptr, png_ptr->chunkdata);
+   png_ptr->chunkdata = NULL;
 #if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
    png_free(png_ptr, swidth);
    png_free(png_ptr, sheight);
