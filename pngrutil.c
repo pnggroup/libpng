@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.30 [July 21, 2008]
+ * Last changed in libpng 1.2.30 [July 22, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -252,7 +252,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                if (text ==  NULL)
                  {
                     png_free(png_ptr, chunkdata);
-                    chunkdata = NULL;
+                    png_ptr->chunkdata = NULL;
                     png_error(png_ptr, "Not enough memory to decompress chunk");
                  }
                png_memcpy(text, chunkdata, prefix_size);
@@ -277,7 +277,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                if (text ==  NULL)
                {
                   png_free(png_ptr, chunkdata);
-                  chunkdata = NULL;
+                  png_ptr->chunkdata = NULL;
                   png_error(png_ptr,
                     "Not enough memory to decompress chunk.");
                }
@@ -298,7 +298,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                {
                   png_free(png_ptr, tmp);
                   png_free(png_ptr, chunkdata);
-                  chunkdata = NULL;
+                  png_ptr->chunkdata = NULL;
                   png_error(png_ptr,
                     "Not enough memory to decompress chunk..");
                }
@@ -347,7 +347,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             if (text == NULL)
               {
                 png_free(png_ptr, chunkdata);
-                chunkdata = NULL;
+                png_ptr->chunkdata = NULL;
                 png_error(png_ptr, "Not enough memory for text.");
               }
             png_memcpy(text, chunkdata, prefix_size);
@@ -1101,7 +1101,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    /* Check the profile_size recorded in the first 32 bits of the ICC profile */
    pC = (png_bytep)(png_ptr->chunkdata + prefix_length);
-   profile_size = ((*(pC  ))<<24) |
+   profile_size = ((*(pC    ))<<24) |
                   ((*(pC + 1))<<16) |
                   ((*(pC + 2))<< 8) |
                   ((*(pC + 3))    );

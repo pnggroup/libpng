@@ -2196,6 +2196,10 @@ version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
 version 1.0.38rc03, 1.2.30rc03 [July 21, 2008]
   Change "purpose" and "buffer" to png_ptr->chunkdata to avoid memory leaking.
 
+version 1.0.38rc04, 1.2.30rc04 [July 22, 2008]
+  Change "chunkdata = NULL" to "png_ptr->chunkdata = NULL" several places in
+    png_decompress_chunk().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
