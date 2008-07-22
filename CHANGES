@@ -1932,6 +1932,10 @@ version 1.4.0beta21 [July 21, 2008]
 version 1.4.0beta22 [July 21, 2008]
   Change "purpose" and "buffer" to png_ptr->chunkdata to avoid memory leaking.
 
+version 1.4.0beta23 [July 22, 2008]
+  Change "chunkdata = NULL" to "png_ptr->chunkdata = NULL" several places in
+    png_decompress_chunk().
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
