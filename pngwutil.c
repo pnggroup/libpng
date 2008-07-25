@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.30 [July 22, 2008]
+ * Last changed in libpng 1.2.30 [July 25, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -360,11 +360,11 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
       png_write_chunk_data(png_ptr, (png_bytep)comp->output_ptr[i],
          (png_size_t)png_ptr->zbuf_size);
       png_free(png_ptr, comp->output_ptr[i]);
-      comp->output_ptr[i]=NULL;
+       comp->output_ptr[i]=NULL;
    }
    if (comp->max_output_ptr != 0)
       png_free(png_ptr, comp->output_ptr);
-      comp->output_ptr=NULL;
+       comp->output_ptr=NULL;
    /* write anything left in zbuf */
    if (png_ptr->zstream.avail_out < (png_uint_32)png_ptr->zbuf_size)
       png_write_chunk_data(png_ptr, png_ptr->zbuf,
@@ -1331,7 +1331,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    if (key_len == 0)
    {
       png_free(png_ptr, *new_key);
-      *new_key=NULL;
+       *new_key=NULL;
       png_warning(png_ptr, "Zero length keyword");
    }
 

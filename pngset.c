@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.30 [July 22, 2008]
+ * Last changed in libpng 1.2.30 [July 25, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -167,7 +167,7 @@ png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
       gamma=21474.83;
    }
    else
-      gamma=file_gamma;
+      gamma = file_gamma;
    info_ptr->gamma = (float)gamma;
 #ifdef PNG_FIXED_POINT_SUPPORTED
    info_ptr->int_gamma = (int)(gamma*100000.+.5);
@@ -200,7 +200,7 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
        gamma = 0;
      }
      else
-       gamma=int_gamma;
+       gamma = int_gamma;
    }
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    info_ptr->gamma = (float)(gamma/100000.);
@@ -502,6 +502,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    if (info_ptr->scal_s_height == NULL)
    {
       png_free (png_ptr, info_ptr->scal_s_width);
+      info_ptr->scal_s_width = NULL;
       png_warning(png_ptr,
        "Memory allocation failed while processing sCAL.");
       return;
@@ -731,7 +732,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
    int num_text)
 {
    int ret;
-   ret=png_set_text_2(png_ptr, info_ptr, text_ptr, num_text);
+   ret = png_set_text_2(png_ptr, info_ptr, text_ptr, num_text);
    if (ret)
      png_error(png_ptr, "Insufficient memory to store text");
 }
@@ -855,13 +856,13 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 #ifdef PNG_iTXt_SUPPORTED
       if (text_ptr[i].compression > 0)
       {
-         textp->lang=textp->key + key_len + 1;
+         textp->lang = textp->key + key_len + 1;
          png_memcpy(textp->lang, text_ptr[i].lang, lang_len);
          *(textp->lang + lang_len) = '\0';
-         textp->lang_key=textp->lang + lang_len + 1;
+         textp->lang_key = textp->lang + lang_len + 1;
          png_memcpy(textp->lang_key, text_ptr[i].lang_key, lang_key_len);
          *(textp->lang_key + lang_key_len) = '\0';
-         textp->text=textp->lang_key + lang_key_len + 1;
+         textp->text = textp->lang_key + lang_key_len + 1;
       }
       else
 #endif
@@ -870,7 +871,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          textp->lang=NULL;
          textp->lang_key=NULL;
 #endif
-         textp->text=textp->key + key_len + 1;
+         textp->text = textp->key + key_len + 1;
       }
       if (text_length)
          png_memcpy(textp->text, text_ptr[i].text,
@@ -1169,7 +1170,7 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
     }
     if (chunk_list == NULL)
       return;
-    old_num_chunks=png_ptr->num_chunk_list;
+    old_num_chunks = png_ptr->num_chunk_list;
     new_list=(png_bytep)png_malloc(png_ptr,
        (png_uint_32)
        (5*(num_chunks + old_num_chunks)));
@@ -1182,10 +1183,10 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
     }
     png_memcpy(new_list + 5*old_num_chunks, chunk_list,
        (png_size_t)(5*num_chunks));
-    for (p=new_list + 5*old_num_chunks + 4, i = 0; i<num_chunks; i++, p += 5)
+    for (p = new_list + 5*old_num_chunks + 4, i = 0; i<num_chunks; i++, p += 5)
        *p=(png_byte)keep;
-    png_ptr->num_chunk_list=old_num_chunks + num_chunks;
-    png_ptr->chunk_list=new_list;
+    png_ptr->num_chunk_list = old_num_chunks + num_chunks;
+    png_ptr->chunk_list = new_list;
 #ifdef PNG_FREE_ME_SUPPORTED
     png_ptr->free_me |= PNG_FREE_LIST;
 #endif

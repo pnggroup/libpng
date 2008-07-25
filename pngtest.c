@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.2.30 [July 22, 2008]
+ * Last changed in libpng 1.2.30 [July 25, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -571,7 +571,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
                the memory that is to be freed. */
             png_memset(ptr, 0x55, pinfo->size);
             png_free_default(png_ptr, pinfo);
-            pinfo=NULL;
+            pinfo = NULL;
             break;
          }
          if (pinfo->next == NULL)
@@ -587,7 +587,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    if (verbose)
       printf("Freeing %x\n", ptr);
    png_free_default(png_ptr, ptr);
-   ptr=NULL;
+   ptr = NULL;
 }
 #endif /* PNG_USER_MEM_SUPPORTED && PNG_DEBUG */
 /* END of code to test memory allocation/deallocation */
@@ -775,8 +775,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
    {
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
-      if (row_buf)
-         png_free(read_ptr, row_buf);
+      png_free(read_ptr, row_buf);
+      row_buf = NULL;
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
 #ifdef PNG_WRITE_SUPPORTED
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
@@ -1241,6 +1241,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifndef SINGLE_ROWBUF_ALLOC
          png_debug2(0, "Freeing row buffer (pass %d, y = %ld)\n\n", pass, y);
          png_free(read_ptr, row_buf);
+         row_buf = NULL;
 #endif /* !SINGLE_ROWBUF_ALLOC */
       }
    }
@@ -1326,7 +1327,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef SINGLE_ROWBUF_ALLOC
    png_debug(1, "destroying row_buf for read_ptr\n");
    png_free(read_ptr, row_buf);
-   row_buf=NULL;
+   row_buf = NULL;
 #endif /* SINGLE_ROWBUF_ALLOC */
    png_debug(1, "destroying read_ptr, read_info_ptr, end_info_ptr\n");
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
@@ -1684,4 +1685,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_30rc04 your_png_h_is_not_version_1_2_30rc04;
+typedef version_1_2_30rc05 your_png_h_is_not_version_1_2_30rc05;

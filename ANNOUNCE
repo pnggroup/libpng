@@ -1,5 +1,5 @@
 
-Libpng 1.2.30rc04 - July 22, 2008
+Libpng 1.2.30rc05 - July 25, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.30rc04.tar.gz
-   libpng-1.2.30rc04.tar.lzma
+   libpng-1.2.30rc05.tar.gz
+   libpng-1.2.30rc05.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.30rc04.tar.bz2
+   libpng-1.2.30rc05.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.30rc04-no-config.tar.gz
-   libpng-1.2.30rc04-no-config.tar.lzma
-   libpng-1.2.30rc04-no-config.tar.bz2
+   libpng-1.2.30rc05-no-config.tar.gz
+   libpng-1.2.30rc05-no-config.tar.lzma
+   libpng-1.2.30rc05-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1230r04.zip
-   lp1230r04.7z
-   lp1230r04.tar.bz2
+   lp1230r05.zip
+   lp1230r05.7z
+   lp1230r05.tar.bz2
 
 Project files
 
-   libpng-1.2.30rc04-project-netware.zip
-   libpng-1.2.30rc04-project-wince.zip
+   libpng-1.2.30rc05-project-netware.zip
+   libpng-1.2.30rc05-project-wince.zip
 
 Other information:
 
-   libpng-1.2.30rc04-README.txt
-   libpng-1.2.30rc04-KNOWNBUGS.txt
-   libpng-1.2.30rc04-LICENSE.txt
-   libpng-1.2.30rc04-Y2K-compliance.txt
-   libpng-1.2.30rc04-[previous version]-diff.txt
+   libpng-1.2.30rc05-README.txt
+   libpng-1.2.30rc05-KNOWNBUGS.txt
+   libpng-1.2.30rc05-LICENSE.txt
+   libpng-1.2.30rc05-Y2K-compliance.txt
+   libpng-1.2.30rc05-[previous version]-diff.txt
 
 Changes since the last public release (1.2.29):
 
@@ -79,18 +79,19 @@ version 1.2.30beta03 [July 6, 2008]
   Added demo of decoding vpAg and sTER chunks to pngtest.c, from 1.4.0beta19.
   Changed PNGMAJ from 0 to 12 in makefile.darwin, which does not like 0.
   Added new private function png_read_chunk_header() from 1.4.0beta19.
-  Merged reading of chunk length and chunk type into a single 8-byte read.
-  Merged writing of chunk length and chunk type into a single 8-byte write.
+  Merge reading of chunk length and chunk type into a single 8-byte read.
+  Merge writing of chunk length and chunk type into a single 8-byte write.
 
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [July 17, 2008]
+version 1.0.38rc01, 1.2.30rc01 [July 25, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
   Moved local array "chunkdata" from pngrutil.c to the png_struct, so
-    it will be freed by png_read_destroy() in case of a read error.
+    it will be freed by png_read_destroy() in case of a read error (Kurt
+    Christensen).
 
 version 1.0.38rc03, 1.2.30rc03 [July 21, 2008]
   Change "purpose" and "buffer" to png_ptr->chunkdata to avoid memory leaking.
@@ -98,6 +99,13 @@ version 1.0.38rc03, 1.2.30rc03 [July 21, 2008]
 version 1.0.38rc04, 1.2.30rc04 [July 22, 2008]
   Change "chunkdata = NULL" to "png_ptr->chunkdata = NULL" several places in
     png_decompress_chunk().
+
+version 1.0.38rc05, 1.2.30rc05 [July 25, 2008]
+  Changed all remaining "chunkdata" to "png_ptr->chunkdata" in
+    png_decompress_chunk() and remove chunkdata from parameter list.
+  Put a call to png_check_chunk_name() in png_read_chunk_header().
+  Revised png_check_chunk_name() to reject a name with a lowercase 3rd byte.
+  Removed two calls to png_check_chunk_name() occuring later in the process.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
