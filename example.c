@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.4.0 [July 22, 2008]
+ * Last changed in libpng 1.4.0 [July 25, 2008]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2008 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -793,13 +793,13 @@ void write_png(char *file_name /* , ... other image information ... */)
       allocated it with malloc() instead of png_malloc(), use free() instead
       of png_free(). */
    png_free(png_ptr, palette);
-   palette=NULL;
+   palette = NULL;
 
    /* Similarly, if you png_malloced any data that you passed in with
       png_set_something(), such as a hist or trans array, free it here,
       when you can be sure that libpng is through with it. */
    png_free(png_ptr, trans);
-   trans=NULL;
+   trans = NULL;
 
    /* clean up after the write, and free any memory allocated */
    png_destroy_write_struct(&png_ptr, &info_ptr);

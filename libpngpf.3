@@ -1,6 +1,6 @@
-.TH LIBPNGPF 3 "July 22, 2008"
+.TH LIBPNGPF 3 "July 25, 2008"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta23
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta24
 (private functions)
 .SH SYNOPSIS
 \fB#include <png.h>\fP
@@ -81,7 +81,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta23
 
 \fI\fB
 
-\fBpng_charp png_decompress_chunk (png_structp \fP\fIpng_ptr\fP\fB, int \fP\fIcomp_type\fP\fB, png_charp \fP\fIchunkdata\fP\fB, png_size_t \fP\fIchunklength\fP\fB, png_size_t \fP\fIprefix_length\fP\fB, png_size_t \fI*data_length\fP\fB);\fP
+\fBvoid png_decompress_chunk (png_structp \fP\fIpng_ptr\fP\fB, int \fP\fIcomp_type\fP\fB, png_size_t \fP\fIchunklength\fP\fB, png_size_t \fP\fIprefix_length\fP\fB, png_size_t \fI*data_length\fP\fB);\fP
 
 \fI\fB
 

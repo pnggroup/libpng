@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [July 22, 2008]
+ * Last changed in libpng 1.4.0 [July 25, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -274,7 +274,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             }
          }
          png_free(png_ptr, png_ptr->dither_sort);
-         png_ptr->dither_sort=NULL;
+         png_ptr->dither_sort = NULL;
       }
       else
       {
@@ -292,7 +292,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
          png_dsortp t;
          png_dsortpp hash;
 
-         t=NULL;
+         t = NULL;
 
          /* initialize palette index arrays */
          png_ptr->index_to_palette = (png_bytep)png_malloc(png_ptr,
@@ -436,8 +436,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
          png_free(png_ptr, hash);
          png_free(png_ptr, png_ptr->palette_to_index);
          png_free(png_ptr, png_ptr->index_to_palette);
-         png_ptr->palette_to_index=NULL;
-         png_ptr->index_to_palette=NULL;
+         png_ptr->palette_to_index = NULL;
+         png_ptr->index_to_palette = NULL;
       }
       num_palette = maximum_colors;
    }
@@ -2198,10 +2198,9 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 /* reduce RGB files to grayscale, with or without alpha
  * using the equation given in Poynton's ColorFAQ at
  * <http://www.inforamp.net/~poynton/>  (THIS LINK IS DEAD June 2008)
- * Copyright (c) 1998-01-04 Charles Poynton poynton at inforamp.net
- * New links:
+ * New link:
  * <http://www.poynton.com/notes/colour_and_gamma/>
- * Copyright (c) 2006-11-28 Charles Poynton poynton at poynton.com
+ * Charles Poynton poynton at poynton.com
  *
  *     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
  *

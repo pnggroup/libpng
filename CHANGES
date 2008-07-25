@@ -1927,7 +1927,8 @@ version 1.4.0beta20 [July 9, 2008]
 
 version 1.4.0beta21 [July 21, 2008]
   Moved local array "chunkdata" from pngrutil.c to the png_struct, so
-    it will be freed by png_read_destroy() in case of a read error.
+    it will be freed by png_read_destroy() in case of a read error (Kurt
+    Christensen).
 
 version 1.4.0beta22 [July 21, 2008]
   Change "purpose" and "buffer" to png_ptr->chunkdata to avoid memory leaking.
@@ -1935,6 +1936,14 @@ version 1.4.0beta22 [July 21, 2008]
 version 1.4.0beta23 [July 22, 2008]
   Change "chunkdata = NULL" to "png_ptr->chunkdata = NULL" several places in
     png_decompress_chunk().
+
+version 1.4.0beta24 [July 25, 2008]
+  Change all remaining "chunkdata" to "png_ptr->chunkdata" in
+    png_decompress_chunk(), and remove "chunkdata" from parameter list.
+  Put a call to png_check_chunk_name() in png_read_chunk_header().
+  Revised png_check_chunk_name() to reject a name with a lowercase 3rd byte.
+  Removed two calls to png_check_chunk_name() occuring later in the process.
+  Define PNG_NO_ERROR_NUMBERS by default in pngconf.h
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

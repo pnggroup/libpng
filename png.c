@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.30 [July 22, 2008]
+ * Last changed in libpng 1.2.30 [July 25, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta23 Your_png_h_is_not_version_1_4_0beta23;
+typedef version_1_4_0beta24 Your_png_h_is_not_version_1_4_0beta24;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -337,11 +337,11 @@ if ((mask & PNG_FREE_TRNS) && (png_ptr->flags & PNG_FLAG_FREE_TRNS))
 #endif
 {
     png_free(png_ptr, info_ptr->trans);
+    info_ptr->trans = NULL;
     info_ptr->valid &= ~PNG_INFO_tRNS;
 #ifndef PNG_FREE_ME_SUPPORTED
     png_ptr->flags &= ~PNG_FLAG_FREE_TRNS;
 #endif
-    info_ptr->trans = NULL;
 }
 #endif
 
@@ -447,6 +447,7 @@ if (mask & PNG_FREE_SPLT)
     png_free(png_ptr, png_ptr->unknown_chunk.data);
     png_ptr->unknown_chunk.data = NULL;
   }
+
 #ifdef PNG_FREE_ME_SUPPORTED
 if ((mask & PNG_FREE_UNKN) & info_ptr->free_me)
 #else
@@ -525,10 +526,8 @@ if (mask & PNG_FREE_ROWS)
        for (row = 0; row < (int)info_ptr->height; row++)
        {
           png_free(png_ptr, info_ptr->row_pointers[row]);
-          info_ptr->row_pointers[row]=NULL;
        }
        png_free(png_ptr, info_ptr->row_pointers);
-       info_ptr->row_pointers=NULL;
     }
     info_ptr->valid &= ~PNG_INFO_IDAT;
 }
@@ -557,8 +556,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
    if (png_ptr->num_chunk_list)
    {
        png_free(png_ptr, png_ptr->chunk_list);
-       png_ptr->chunk_list=NULL;
-       png_ptr->num_chunk_list=0;
+       png_ptr->num_chunk_list = 0;
    }
 #endif
 
@@ -638,7 +636,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.4.0beta23 - July 22, 2008\n\
+   return ((png_charp) "\n libpng version 1.4.0beta24 - July 25, 2008\n\
    Copyright (c) 1998-2008 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");

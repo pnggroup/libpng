@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.4.0 [July 22, 2008]
+ * Last changed in libpng 1.4.0 [July 25, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1460,8 +1460,11 @@ void /* PRIVATE */
 png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
    length)
 {
-   png_uint_32 skip=0;
+   png_uint_32 skip = 0;
+#if 0
+   /* Redundant? */
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+#endif
 
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
@@ -1492,7 +1495,8 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
       png_memcpy((png_charp)png_ptr->unknown_chunk.name,
                  (png_charp)png_ptr->chunk_name, 
                  png_sizeof(png_ptr->unknown_chunk.name));
-      png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name)-1]='\0';
+      png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name) - 1]
+        = '\0';
 
       png_ptr->unknown_chunk.size = (png_size_t)length;
       if (length == 0)
