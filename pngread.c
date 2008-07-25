@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.30 [July 22, 2008]
+ * Last changed in libpng 1.2.30 [July 25, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -68,7 +68,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif
    {
       png_free(png_ptr, png_ptr->zbuf);
-      png_ptr->zbuf=NULL;
+      png_ptr->zbuf = NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)png_ptr,
          (png_free_ptr)free_fn, (png_voidp)mem_ptr);
@@ -90,7 +90,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (user_png_ver)
    {
-     i=0;
+     i = 0;
      do
      {
        if (user_png_ver[i] != png_libpng_ver[i])
@@ -127,7 +127,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
         png_warning(png_ptr, msg);
 #endif
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-        png_ptr->flags=0;
+        png_ptr->flags = 0;
 #endif
         png_error(png_ptr,
            "Incompatible libpng version in application and library");
@@ -195,7 +195,7 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
       png_sizeof(png_info) > png_info_size)
    {
       char msg[80];
-      png_ptr->warning_fn=NULL;
+      png_ptr->warning_fn = NULL;
       if (user_png_ver)
       {
         png_snprintf(msg, 80,
@@ -211,18 +211,18 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
 #endif
    if (png_sizeof(png_struct) > png_struct_size)
      {
-       png_ptr->error_fn=NULL;
+       png_ptr->error_fn = NULL;
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-       png_ptr->flags=0;
+       png_ptr->flags = 0;
 #endif
        png_error(png_ptr,
        "The png struct allocated by the application for reading is too small.");
      }
    if (png_sizeof(png_info) > png_info_size)
      {
-       png_ptr->error_fn=NULL;
+       png_ptr->error_fn = NULL;
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-       png_ptr->flags=0;
+       png_ptr->flags = 0;
 #endif
        png_error(png_ptr,
          "The info struct allocated by application for reading is too small.");
@@ -239,7 +239,7 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    jmp_buf tmp_jmp;  /* to save current jump buffer */
 #endif
 
-   int i=0;
+   int i = 0;
 
    png_structp png_ptr=*ptr_ptr;
 
@@ -252,7 +252,7 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
 #ifdef PNG_LEGACY_SUPPORTED
        png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
 #else
-       png_ptr->warning_fn=NULL;
+       png_ptr->warning_fn = NULL;
        png_warning(png_ptr,
         "Application uses deprecated png_read_init() and should be recompiled.");
        break;
@@ -406,7 +406,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 #endif /* PNG_USE_LOCAL_ARRAYS */
       png_uint_32 length = png_read_chunk_header(png_ptr);
-      png_bytep chunk_name = png_ptr->chunk_name;
+      PNG_CONST png_bytep chunk_name = png_ptr->chunk_name;
 
       /* This should be a binary subdivision search or a hash for
        * matching the chunk name rather than a linear search.
@@ -904,9 +904,6 @@ png_read_image(png_structp png_ptr, png_bytepp image)
 void PNGAPI
 png_read_end(png_structp png_ptr, png_infop info_ptr)
 {
-   png_bytep chunk_name;
-   png_uint_32 length;
-
    png_debug(1, "in png_read_end\n");
    if (png_ptr == NULL) return;
    png_crc_finish(png_ptr, 0); /* Finish off CRC from last IDAT chunk */
@@ -970,8 +967,8 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       PNG_CONST PNG_zTXt;
 #endif
 #endif /* PNG_USE_LOCAL_ARRAYS */
-      length = png_read_chunk_header(png_ptr);
-      chunk_name = png_ptr->chunk_name;
+      png_uint_32 length = png_read_chunk_header(png_ptr);
+      PNG_CONST png_bytep chunk_name = png_ptr->chunk_name;
 
       if (!png_memcmp(chunk_name, png_IHDR, 4))
          png_handle_IHDR(png_ptr, info_ptr, length);
