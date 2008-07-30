@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.30 [July 25, 2008]
+ * Last changed in libpng 1.2.30 [July 30, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2243,11 +2243,6 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          png_ptr->mode |= PNG_AFTER_IDAT;
    }
 
-#if 0
-   /* Redundant? */
-   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
-#endif
-
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
@@ -2328,14 +2323,13 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    the chunk name itself is valid. */
 
 #define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
-#define isnonupper(c) ((c) < 65 || (c) > 90)
 
 void /* PRIVATE */
 png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
 {
    png_debug(1, "in png_check_chunk_name\n");
    if (isnonalpha(chunk_name[0]) || isnonalpha(chunk_name[1]) ||
-       isnonupper(chunk_name[2]) || isnonalpha(chunk_name[3]))
+       isnonalpha(chunk_name[2]) || isnonalpha(chunk_name[3]))
    {
       png_chunk_error(png_ptr, "invalid chunk type");
    }

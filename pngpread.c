@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.30 [July 25, 2008]
+ * Last changed in libpng 1.2.30 [July 30, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -212,6 +212,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
+      png_check_chunk_name(png_ptr, png_ptr->chunk_name);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
@@ -221,10 +222,10 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 
    if (!png_memcmp(png_ptr->chunk_name, png_IHDR, 4))
    {
+      if (png_ptr->push_length != 13)
+         png_error(png_ptr, "Invalid IHDR length");
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {
-         if (png_ptr->push_length != 13)
-            png_error(png_ptr, "Invalid IHDR length");
          png_push_save_buffer(png_ptr);
          return;
       }
@@ -597,6 +598,7 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
       png_ptr->current_buffer_ptr += save_size;
    }
 }
+
 
 void /* PRIVATE */
 png_push_save_buffer(png_structp png_ptr)
@@ -1463,10 +1465,6 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
    length)
 {
    png_uint_32 skip = 0;
-#if 0
-   /* Redundant? */
-   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
-#endif
 
    if (!(png_ptr->chunk_name[0] & 0x20))
    {

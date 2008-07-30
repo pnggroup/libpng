@@ -2107,7 +2107,7 @@ version 1.2.27beta01 [April 12, 2008]
   Fixed bug (introduced in libpng-1.0.5h) with handling zero-length
     unknown chunks.
   Added more information about png_set_keep_unknown_chunks() to the
-    documetation.
+    documentation.
   Reject tRNS chunk with out-of-range samples instead of masking off
     the invalid high bits as done in since libpng-1.2.19beta5.
 
@@ -2127,7 +2127,7 @@ version 1.2.27beta04 [April 18, 2008]
   Rebuilt Makefile.in, aclocal.m4, and configure with autoconf-2.62
 
 version 1.2.27beta05 [April 19, 2008]
-  Added MAINTEINERCLEANFILES variable to Makefile.am
+  Added MAINTAINERCLEANFILES variable to Makefile.am
 
 version 1.2.27beta06 [April 21, 2008]
   Avoid changing color_type from GRAY to RGB by
@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [July 25, 2008]
+version 1.0.38rc01, 1.2.30rc01 [July 30, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2207,6 +2207,10 @@ version 1.0.38rc05, 1.2.30rc05 [July 25, 2008]
   Put a call to png_check_chunk_name() in png_read_chunk_header().
   Revised png_check_chunk_name() to reject a name with a lowercase 3rd byte.
   Removed two calls to png_check_chunk_name() occuring later in the process.
+
+version 1.0.38rc06, 1.2.30rc06 [July 30, 2008]
+  Added a call to png_check_chunk_name() in pngpread.c
+  Reverted png_check_chunk_name() to accept a name with a lowercase 3rd byte.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
