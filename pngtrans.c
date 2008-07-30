@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.4.0 [July 25, 2008]
+ * Last changed in libpng 1.4.0 [July 30, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -179,10 +179,6 @@ png_do_invert(png_row_infop row_info, png_bytep row)
   /* This test removed from libpng version 1.0.13 and 1.2.0:
    *   if (row_info->bit_depth == 1 &&
    */
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-   if (row == NULL || row_info == NULL)
-     return;
-#endif
    if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
    {
       png_bytep rp = row;
@@ -232,9 +228,6 @@ png_do_swap(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_swap\n");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-       row != NULL && row_info != NULL &&
-#endif
        row_info->bit_depth == 16)
    {
       png_bytep rp = row;
@@ -363,9 +356,6 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_packswap\n");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-       row != NULL && row_info != NULL &&
-#endif
        row_info->bit_depth < 8)
    {
       png_bytep rp, end, table;
@@ -394,9 +384,6 @@ void /* PRIVATE */
 png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
 {
    png_debug(1, "in png_do_strip_filler\n");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-   if (row != NULL && row_info != NULL)
-#endif
    {
       png_bytep sp=row;
       png_bytep dp=row;
@@ -553,9 +540,6 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_bgr\n");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-       row != NULL && row_info != NULL &&
-#endif
        (row_info->color_type & PNG_COLOR_MASK_COLOR))
    {
       png_uint_32 row_width = row_info->width;

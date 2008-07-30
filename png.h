@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.0beta24 - July 25, 2008
+ * libpng version 1.4.0beta25 - July 30, 2008
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.0beta24 - July 25, 2008: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.0beta25 - July 30, 2008: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -156,7 +156,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta24, July 25, 2008, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta25, July 30, 2008, are
  * Copyright (c) 2004, 2006-2007 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -274,7 +274,7 @@
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.4.0beta24 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.4.0beta25 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -330,11 +330,11 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.4.0beta24"
+#define PNG_LIBPNG_VER_STRING "1.4.0beta25"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.0beta24 - July 25, 2008\n"
+   " libpng version 1.4.0beta25 - July 30, 2008\n"
 
-#define PNG_LIBPNG_VER_SONUM   1
+#define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  14
 
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
@@ -344,7 +344,7 @@
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  24
+#define PNG_LIBPNG_VER_BUILD  25
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -1347,7 +1347,7 @@ struct png_struct_def
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_4_0beta24;
+typedef png_structp version_1_4_0beta25;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1373,6 +1373,11 @@ extern PNG_EXPORT(void,png_set_sig_bytes) PNGARG((png_structp png_ptr,
  */
 extern PNG_EXPORT(int,png_sig_cmp) PNGARG((png_bytep sig, png_size_t start,
    png_size_t num_to_check));
+
+/* Simple signature checking function.  This is the same as calling
+ * png_check_sig(sig, n) := !png_sig_cmp(sig, 0, n).
+ */
+#define png_check_sig(sig,n) !png_sig_cmp((sig), 0, (n))
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
 extern PNG_EXPORT(png_structp,png_create_read_struct)
@@ -2520,23 +2525,34 @@ extern PNG_EXPORT(png_bytep,png_get_io_chunk_name)
 
 #endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
 
-/* Inline macros to do direct reads of bytes from the input buffer.  These
- * require that you are using an architecture that uses PNG byte ordering
- * (MSB first) and supports unaligned data storage.  I think that PowerPC
- * in big-endian mode and 680x0 are the only ones that will support this.
- * The x86 line of processors definitely do not.  The png_get_int_32()
- * routine also assumes we are using two's complement format for negative
- * values, which is almost certainly true.
+#ifdef PNG_USE_READ_MACROS
+/* Inline macros to do direct reads of bytes from the input buffer.
+ * The png_get_int_32() routine assumes we are using two's complement
+ * format for negative values, which is almost certainly true.
  */
-#if defined(PNG_READ_BIG_ENDIAN_SUPPORTED)
-#  define png_get_uint_32(buf) ( *((png_uint_32p) (buf)))
-#  define png_get_uint_16(buf) ( *((png_uint_16p) (buf)))
-#  define png_get_int_32(buf)  ( *((png_int_32p)  (buf)))
+/* We could make special-case BIG_ENDIAN macros that do direct reads here */
+#  define png_get_uint_32(buf) \
+     (((png_uint_32)(*(buf)) << 24) + \
+      ((png_uint_32)(*((buf) + 1)) << 16) + \
+      ((png_uint_32)(*((buf) + 2)) << 8) + \
+      ((png_uint_32)(*((buf) + 3))))
+#  define png_get_uint_16(buf) \
+     (((png_uint_32)(*(buf)) << 8) + \
+      ((png_uint_32)(*((buf) + 1))))
+#if defined(PNG_GET_INT_32_SUPPORTED)
+#  define png_get_int_32(buf) \
+     (((png_int_32)(*(buf)) << 24) + \
+      ((png_int_32)(*((buf) + 1)) << 16) + \
+      ((png_int_32)(*((buf) + 2)) << 8) + \
+      ((png_int_32)(*((buf) + 3))))
+#endif
 #else
 extern PNG_EXPORT(png_uint_32,png_get_uint_32) PNGARG((png_bytep buf));
 extern PNG_EXPORT(png_uint_16,png_get_uint_16) PNGARG((png_bytep buf));
+#if defined(PNG_GET_INT_32_SUPPORTED)
 extern PNG_EXPORT(png_int_32,png_get_int_32) PNGARG((png_bytep buf));
-#endif /* !PNG_READ_BIG_ENDIAN_SUPPORTED */
+#endif
+#endif
 extern PNG_EXPORT(png_uint_32,png_get_uint_31)
   PNGARG((png_structp png_ptr, png_bytep buf));
 /* No png_get_int_16 -- may be added if there's a real need for it. */

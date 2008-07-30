@@ -5,8 +5,10 @@
    This program converts certain NetPBM binary files (grayscale and RGB,
    maxval = 255) to PNG.  Non-interlaced PNGs are written progressively;
    interlaced PNGs are read and written in one memory-intensive blast.
+
    Thanks to Jean-loup Gailly for providing the necessary trick to read
-   interactive text from the keyboard while stdin is redirected.
+   interactive text from the keyboard while stdin is redirected.  Thanks
+   to Cosmin Truta for Cygwin fixes.
 
    NOTE:  includes provisional support for PNM type "8" (portable alphamap)
           images, presumed to be a 32-bit interleaved RGBA format; no pro-
@@ -24,15 +26,31 @@
     - 1.02:  modified to allow abbreviated options
     - 1.03:  removed extraneous character from usage screen; fixed bug in
               command-line parsing
+    - 1.04:  fixed DOS/OS2/Win32 detection, including partial Cygwin fix
+              (see http://home.att.net/~perlspinr/diffs/GregBook_cygwin.diff)
+    - 2.00:  dual-licensed (added GNU GPL)
+
+        [REPORTED BUG (win32 only):  "contrib/gregbook/wpng.c - cmd line
+         dose not work!  In order to do something useful I needed to redirect
+         both input and output, with cygwin and with bcc32 as well.  Under
+         Linux, the same wpng appears to work fine.  I don't know what is
+         the problem."]
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2000 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2007 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
       be held liable for any damages arising in any way from the use of
       this software.
+
+      The contents of this file are DUAL-LICENSED.  You may modify and/or
+      redistribute this software according to the terms of one of the
+      following two licenses (at your option):
+
+
+      LICENSE 1 ("BSD-like with advertising clause"):
 
       Permission is granted to anyone to use this software for any purpose,
       including commercial applications, and to alter it and redistribute
@@ -50,16 +68,35 @@
             and contributors for the book, "PNG: The Definitive Guide,"
             published by O'Reilly and Associates.
 
+
+      LICENSE 2 (GNU GPL v2 or later):
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software Foundation,
+      Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
   ---------------------------------------------------------------------------*/
 
 #define PROGNAME  "wpng"
-#define VERSION   "1.03 of 19 March 2000"
+#define VERSION   "2.00 of 2 June 2007"
 #define APPNAME   "Simple PGM/PPM/PAM to PNG Converter"
 
 #if defined(__MSDOS__) || defined(__OS2__)
 #  define DOS_OS2_W32
-#elif defined(_WIN32) || defined(__WIN32__)
-#  define DOS_OS2_W32
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#  ifndef __GNUC__   /* treat Win32 native ports of gcc as Unix environments */
+#    define DOS_OS2_W32
+#  endif
 #endif
 
 #include <stdio.h>

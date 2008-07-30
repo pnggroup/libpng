@@ -9,7 +9,7 @@
    by Martin Zinser under OpenVMS; may work under OS/2 with some tweaking).
 
    to do:
-    - 8-bit support
+    - 8-bit (colormapped) X support
     - use %.1023s to simplify truncation of title-bar string?
 
   ---------------------------------------------------------------------------
@@ -21,17 +21,27 @@
     - 1.10:  added support for non-default visuals; fixed X pixel-conversion
     - 1.11:  added extra set of parentheses to png_jmpbuf() macro; fixed
               command-line parsing bug
-    - 1.12:  fixed small X memory leak (thanks to Francois Petitjean)
-    - 1.13:  fixed XFreeGC() crash bug
+    - 1.12:  fixed some small X memory leaks (thanks to François Petitjean)
+    - 1.13:  fixed XFreeGC() crash bug (thanks to Patrick Welche)
+    - 1.14:  added support for X resources (thanks to Gerhard Niklasch)
+    - 2.00:  dual-licensed (added GNU GPL)
+    - 2.01:  fixed improper display of usage screen on PNG error(s)
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
       be held liable for any damages arising in any way from the use of
       this software.
+
+      The contents of this file are DUAL-LICENSED.  You may modify and/or
+      redistribute this software according to the terms of one of the
+      following two licenses (at your option):
+
+
+      LICENSE 1 ("BSD-like with advertising clause"):
 
       Permission is granted to anyone to use this software for any purpose,
       including commercial applications, and to alter it and redistribute
@@ -49,11 +59,30 @@
             and contributors for the book, "PNG: The Definitive Guide,"
             published by O'Reilly and Associates.
 
+
+      LICENSE 2 (GNU GPL v2 or later):
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software Foundation,
+      Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
   ---------------------------------------------------------------------------*/
 
 #define PROGNAME  "rpng-x"
 #define LONGNAME  "Simple PNG Viewer for X"
-#define VERSION   "1.13 of 16 August 2001"
+#define VERSION   "2.01 of 16 March 2008"
+#define RESNAME   "rpng"	/* our X resource application name */
+#define RESCLASS  "Rpng"	/* our X resource class name */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,6 +120,8 @@ static int  rpng_x_msb(ulg u32val);
 static char titlebar[1024], *window_name = titlebar;
 static char *appname = LONGNAME;
 static char *icon_name = PROGNAME;
+static char *res_name = RESNAME;
+static char *res_class = RESCLASS;
 static char *filename;
 static FILE *infile;
 
@@ -235,9 +266,33 @@ int main(int argc, char **argv)
         }
     }
 
-    if (!filename) {
+    if (!filename)
         ++error;
-    } else if (!(infile = fopen(filename, "rb"))) {
+
+
+    /* print usage screen if any errors up to this point */
+
+    if (error) {
+        fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
+        readpng_version_info();
+        fprintf(stderr, "\n"
+          "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg] file.png\n"
+          "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"
+          "    exp \ttransfer-function exponent (``gamma'') of the display\n"
+          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
+          "\t\t  to the product of the lookup-table exponent (varies)\n"
+          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
+          "    bg  \tdesired background color in 7-character hex RGB format\n"
+          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
+          "\t\t  used with transparent images\n"
+          "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
+          "is displayed) to quit.\n"
+          "\n", PROGNAME, default_display_exponent);
+        exit(1);
+    }
+
+
+    if (!(infile = fopen(filename, "rb"))) {
         fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
         ++error;
     } else {
@@ -250,8 +305,7 @@ int main(int argc, char **argv)
                     break;
                 case 2:
                     fprintf(stderr, PROGNAME
-                      ":  [%s] has bad IHDR (libpng longjmp)\n",
-                      filename);
+                      ":  [%s] has bad IHDR (libpng longjmp)\n", filename);
                     break;
                 case 4:
                     fprintf(stderr, PROGNAME ":  insufficient memory\n");
@@ -276,25 +330,9 @@ int main(int argc, char **argv)
     }
 
 
-    /* usage screen */
-
     if (error) {
-        fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
-        readpng_version_info();
-        fprintf(stderr, "\n"
-          "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg] file.png\n"
-          "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"
-          "    exp \ttransfer-function exponent (``gamma'') of the display\n"
-          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
-          "\t\t  to the product of the lookup-table exponent (varies)\n"
-          "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
-          "    bg  \tdesired background color in 7-character hex RGB format\n"
-          "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
-          "\t\t  used with transparent images\n"
-          "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
-          "is displayed) to quit.\n"
-          "\n", PROGNAME, default_display_exponent);
-        exit(1);
+        fprintf(stderr, PROGNAME ":  aborting.\n");
+        exit(2);
     }
 
 
@@ -399,11 +437,12 @@ static int rpng_x_create_window(void)
     XEvent e;
     XGCValues gcvalues;
     XSetWindowAttributes attr;
-    XSizeHints *size_hints;
     XTextProperty windowName, *pWindowName = &windowName;
     XTextProperty iconName, *pIconName = &iconName;
     XVisualInfo visual_info;
+    XSizeHints *size_hints;
     XWMHints *wm_hints;
+    XClassHint *class_hints;
 
 
     screen = DefaultScreen(display);
@@ -526,7 +565,7 @@ static int rpng_x_create_window(void)
     if (!XStringListToTextProperty(&icon_name, 1, pIconName))
         pIconName = NULL;
 
-    /* OK if either hints allocation fails; XSetWMProperties() allows NULLs */
+    /* OK if any hints allocation fails; XSetWMProperties() allows NULLs */
 
     if ((size_hints = XAllocSizeHints()) != NULL) {
         /* window will not be resizable */
@@ -542,8 +581,13 @@ static int rpng_x_create_window(void)
         wm_hints->flags = StateHint | InputHint  /* | IconPixmapHint */ ;
     }
 
+    if ((class_hints = XAllocClassHint()) != NULL) {
+        class_hints->res_name = res_name;
+        class_hints->res_class = res_class;
+    }
+
     XSetWMProperties(display, window, pWindowName, pIconName, NULL, 0,
-      size_hints, wm_hints, NULL);
+      size_hints, wm_hints, class_hints);
 
     /* various properties and hints no longer needed; free memory */
     if (pWindowName)
@@ -554,6 +598,8 @@ static int rpng_x_create_window(void)
         XFree(size_hints);
     if (wm_hints)
        XFree(wm_hints);
+    if (class_hints)
+       XFree(class_hints);
 
     XMapWindow(display, window);
 

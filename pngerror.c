@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.0 [July 25, 2008]
+ * Last changed in libpng 1.4.0 [July 30, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -44,10 +44,12 @@ png_error(png_structp png_ptr, png_const_charp error_message)
      {
        if (*error_message == '#')
        {
+       /* Strip "#nnnn " from beginning of error message. */
          /*
           *                 012345678901234567890
           *  error_message: #nnnn   text\0
           *  error_number:  nnnn\0
+          *  msg:        :  nnnn \0
           *  offset points to the first blank after nnnn
           *  In this example, offset is 5.
           */
@@ -55,14 +57,27 @@ png_error(png_structp png_ptr, png_const_charp error_message)
            for (offset = 1; offset<15; offset++)
               if (error_message[offset] == ' ')
                   break;
+          /* it is 5 because the loop iterations saw
+           * offset==1, error_message[1]=="n"; offset++.
+           * offset==2, error_message[2]=="n"; offset++.
+           * offset==3, error_message[3]=="n"; offset++.
+           * offset==4, error_message[4]=="n"; offset++.
+           * offset==5, error_message[5]==" "; break.
+           */
            if (png_ptr->flags&PNG_FLAG_STRIP_ERROR_TEXT)
            {
               int i;
+           /* Copy the "nnnn" or however many there are, plus the
+            * blank to the beginning of "msg" string.
+            */
               for (i = 0; i < offset - 1; i++)
                  msg[i] = error_message[i + 1];
-              msg[i] = '\0';
+           /* In the example, "i" ends up being 5.
+            */
+              msg[i -1] = '\0';
               error_message = msg;
            }
+           /* msg, and error_message, now contain "nnnn \0". */
            else
               error_message += offset;
        }
@@ -245,6 +260,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
    if (*error_message == '#')
    {
+     /* Strip "#nnnn " from beginning of warning message. */
      /*
       *                 012345678901234567890
       *  error_message: #nnnn   text\0
@@ -261,12 +277,23 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
          if (error_message[offset] == ' ')
              break;
      }
+        /* This is unnecessarily slightly different from above, but
+         * offset is still 5 because the loop iterations saw
+         * offset==0, error_message[0]=="#"; error_number[0]="n";offset++.
+         * offset==1, error_message[1]=="n"; error_number[1]="n";offset++
+         * offset==2, error_message[2]=="n"; error_number[2]="n";offset++
+         * offset==3, error_message[3]=="n"; error_number[3]="n";offset++
+         * offset==4, error_message[4]=="n"; error_number[4]=" ";offset++.
+         * offset==5, error_message[5]==" "; break.
+         */
      if ((offset > 1) && (offset < 15))
      {
-       error_number[offset - 1] = '\0'; /* should this be [offset + 1]? */
+       /* Replace the " " with a string-terminating NULL */
+       error_number[offset - 1] = '\0';
+       /* GRR: this should be [offset + 1] */
        /* should we update "offset" to point to the beginning of the text? */
        fprintf(stderr, "libpng error no. %s: %s\n", error_number,
-          error_message + offset);
+          error_message + offset + 1);
      }
      else
        fprintf(stderr, "libpng error: %s, offset=%d\n", error_message, offset);

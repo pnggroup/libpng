@@ -7,7 +7,7 @@
         touch Makefile.am configure.ac
 {
 	echo "running libtoolize" >&2
-	libtoolize --copy --automake
+	libtoolize --force --copy --automake
 } && {
 	echo "running aclocal" >&2
 	aclocal
@@ -16,7 +16,7 @@
 	autoheader
 } && {
 	echo "running automake" >&2
-	automake --foreign -a -c
+	automake --force-missing --foreign -a -c
 } && {
 	echo "running autoconf" >&2
 	autoconf

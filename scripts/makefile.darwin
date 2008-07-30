@@ -18,8 +18,8 @@ ZLIBINC=../zlib
 
 # Library name:
 LIBNAME = libpng14
-PNGMAJ = 1
-PNGMIN = 1.4.0beta24
+PNGMAJ = 12
+PNGMIN = 1.4.0beta25
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -27,6 +27,8 @@ LIBSO=$(LIBNAME).dylib
 LIBSOMAJ=$(LIBNAME).$(PNGMAJ).dylib
 LIBSOVER=$(LIBNAME).$(PNGVER).dylib
 OLDSO=libpng.dylib
+OLDSOMAJ=libpng.14.dylib
+OLDSOVER=libpng.14.$(PNGMIN).dylib
 
 # Utilities:
 CC=cc
@@ -36,7 +38,8 @@ LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
 
-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops
+# CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
+CFLAGS=-I$(ZLIBINC) -Wall -O -funroll-loops
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz
 
 INCPATH=$(prefix)/include
@@ -70,18 +73,18 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
 
-all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config pngdefs.h
-
-pngdefs.h:
-	echo "/* pngdefs.h was built by makefile.darwin */" > pngdefs.h
+all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:
-	cat scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! | \
-	   sed -e s/-lm// > libpng.pc
+	cat scripts/libpng.pc.in | sed -e s!@prefix@!$(prefix)! \
+	-e s!@exec_prefix@!$(exec_prefix)! \
+	-e s!@libdir@!$(LIBPATH)! \
+	-e s!@includedir@!$(INCPATH)! \
+	-e s!-lpng14!-lpng14\ -lz! > libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
@@ -105,19 +108,25 @@ $(LIBSOVER): $(OBJSDLL)
 	 -o $(LIBSOVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
+$(OLDSOVER): $(OBJSDLL)
+	$(CC) -dynamiclib \
+	 -install_name $(LIBPATH)/$(OLDSOMAJ) \
+	 -current_version 3 -compatibility_version 3 \
+	 -o $(OLDSOVER) \
+	 $(OBJSDLL) -L$(ZLIBLIB) -lz
+
 pngtest: pngtest.o $(LIBSO)
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
 
-install-headers: png.h pngconf.h pngdefs.h
+install-headers: png.h pngconf.h
 	-@if [ ! -d $(DI) ]; then $(MKDIR_P) $(DI); fi
 	-@if [ ! -d $(DI)/$(LIBNAME) ]; then $(MKDIR_P) $(DI)/$(LIBNAME); fi
-	cp png.h pngconf.h pngdefs.h $(DI)/$(LIBNAME)
+	cp png.h pngconf.h $(DI)/$(LIBNAME)
 	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h
-	chmod 644 $(DI)/$(LIBNAME)/pngdefs.h
-	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h $(DI)/pngdefs.h
+	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h
 	-@$(RM_F) $(DI)/libpng
 	(cd $(DI); $(LN_SF) $(LIBNAME) libpng; $(LN_SF) $(LIBNAME)/* .)
 
@@ -129,19 +138,24 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBSO) libpng.pc
+install-shared: install-headers $(LIBSO) libpng.pc \
+	$(OLDSOVER)
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	-@$(RM_F) $(DL)/$(LIBNAME).$(PNGVER)*.dylib
 	-@$(RM_F) $(DL)/$(LIBNAME).$(PNGMAJ)*.dylib
 	-@$(RM_F) $(DL)/$(LIBSO)
 	-@$(RM_F) $(DL)/$(OLDSO)
+	-@$(RM_F) $(DL)/$(OLDSOMAJ)
 	-@$(RM_F) $(DL)/libpng.3.$(PNGMIN)*.dylib
 	cp $(LIBSOVER) $(DL)
+	cp $(OLDSOVER) $(DL)
 	chmod 755 $(DL)/$(LIBSOVER)
+	chmod 755 $(DL)/$(OLDSOVER)
 	(cd $(DL); \
+	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
+	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
 	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
-	$(LN_SF) $(LIBSOMAJ) $(LIBSO); \
-	$(LN_SF) $(OLDSO) $(LIBSO))
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -192,7 +206,8 @@ test-installed:
 
 clean:
 	$(RM_F) *.o libpng.a pngtest pngout.png libpng-config \
-	libpng.pc $(LIBNAME).*dylib pngtesti pngdefs.h
+	$(OLDSOVER) \
+	libpng.pc $(LIBNAME).*dylib pngtesti
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
@@ -200,20 +215,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngerror.o pngerror.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrio.o pngrio.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwio.o pngwio.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngmem.o pngmem.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngset.o pngset.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngget.o pngget.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngread.o pngread.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrtran.o pngrtran.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrutil.o pngrutil.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngtrans.o pngtrans.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwrite.o pngwrite.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwtran.o pngwtran.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwutil.o pngwutil.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngpread.o pngpread.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
+png.o png.pic.o: png.h pngconf.h
+pngerror.o pngerror.pic.o: png.h pngconf.h
+pngrio.o pngrio.pic.o: png.h pngconf.h
+pngwio.o pngwio.pic.o: png.h pngconf.h
+pngmem.o pngmem.pic.o: png.h pngconf.h
+pngset.o pngset.pic.o: png.h pngconf.h
+pngget.o pngget.pic.o: png.h pngconf.h
+pngread.o pngread.pic.o: png.h pngconf.h
+pngrtran.o pngrtran.pic.o: png.h pngconf.h
+pngrutil.o pngrutil.pic.o: png.h pngconf.h
+pngtrans.o pngtrans.pic.o: png.h pngconf.h
+pngwrite.o pngwrite.pic.o: png.h pngconf.h
+pngwtran.o pngwtran.pic.o: png.h pngconf.h
+pngwutil.o pngwutil.pic.o: png.h pngconf.h
+pngpread.o pngpread.pic.o: png.h pngconf.h
 
-pngtest.o: png.h pngconf.h pngdefs.h
+pngtest.o: png.h pngconf.h

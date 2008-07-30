@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * Last changed in libpng 1.4.0 [July 25, 2008]
+ * Last changed in libpng 1.4.0 [July 30, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -88,9 +88,6 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 {
    png_debug(1, "in png_do_pack\n");
    if (row_info->bit_depth == 8 &&
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-       row != NULL && row_info != NULL &&
-#endif
       row_info->channels == 1)
    {
       switch ((int)bit_depth)
@@ -213,11 +210,7 @@ void /* PRIVATE */
 png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 {
    png_debug(1, "in png_do_shift\n");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-   if (row != NULL && row_info != NULL &&
-#else
    if (
-#endif
       row_info->color_type != PNG_COLOR_TYPE_PALETTE)
    {
       int shift_start[4], shift_dec[4];
@@ -337,9 +330,6 @@ void /* PRIVATE */
 png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_write_swap_alpha\n");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-   if (row != NULL && row_info != NULL)
-#endif
    {
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       {
@@ -425,9 +415,6 @@ void /* PRIVATE */
 png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_write_invert_alpha\n");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-   if (row != NULL && row_info != NULL)
-#endif
    {
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       {
@@ -516,9 +503,6 @@ png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_write_intrapixel\n");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-       row != NULL && row_info != NULL &&
-#endif
        (row_info->color_type & PNG_COLOR_MASK_COLOR))
    {
       int bytes_per_pixel;

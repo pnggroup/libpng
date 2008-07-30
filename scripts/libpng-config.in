@@ -3,7 +3,7 @@
 # libpng-config
 # provides configuration info for libpng.
 
-# Copyright (C) 2002, 2004, 2006 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2004, 2006, 2007 Glenn Randers-Pehrson
 # For conditions of distribution and use, see copyright notice in png.h
 
 # Modeled after libxml-config.
@@ -14,12 +14,12 @@ exec_prefix="@exec_prefix@"
 libdir="@libdir@"
 includedir="@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
 libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
-all_libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ -lz -lm"
+all_libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ @LIBS@"
 I_opts="-I${includedir}"
 L_opts="-L${libdir}"
 R_opts=""
 cppflags=""
-ccopts=""
+ccopts="@LIBPNG_NO_MMX@"
 ldopts=""
 
 usage()

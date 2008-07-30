@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta24 - July 25, 2008
+Libpng 1.4.0beta25 - July 30, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta24.tar.gz
-   1.4.0beta24.tar.bz2
+   1.4.0beta25.tar.gz
+   1.4.0beta25.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta24-no-config.tar.gz
-   1.4.0beta24-no-config.tar.bz2
+   1.4.0beta25-no-config.tar.gz
+   1.4.0beta25-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b24.zip
-   lp140b24.tar.bz2
+   lp140b25.zip
+   lp140b25.tar.bz2
 
 Other information:
 
-   1.4.0beta24-README.txt
-   1.4.0beta24-KNOWNBUGS.txt
-   1.4.0beta24-LICENSE.txt
-   1.4.0beta24-Y2K-compliance.txt
+   1.4.0beta25-README.txt
+   1.4.0beta25-KNOWNBUGS.txt
+   1.4.0beta25-LICENSE.txt
+   1.4.0beta25-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -271,6 +271,17 @@ version 1.4.0beta24 [July 25, 2008]
   Revised png_check_chunk_name() to reject a name with a lowercase 3rd byte.
   Removed two calls to png_check_chunk_name() occuring later in the process.
   Define PNG_NO_ERROR_NUMBERS by default in pngconf.h
+
+version 1.4.0beta25 [July 30, 2008]
+  Added a call to png_check_chunk_name() in pngpread.c
+  Reverted png_check_chunk_name() to accept a name with a lowercase 3rd byte.
+  Added png_push_have_buffer() function to pngpread.c
+  Eliminated PNG_BIG_ENDIAN_SUPPORTED and associated png_get_* macros.
+  Made inline expansion of png_get_*() optional with PNG_USE_READ_MACROS.
+  Eliminated all PNG_USELESS_TESTS and PNG_CORRECT_PALETTE_SUPPORTED code.
+  Synced contrib directory and configure files with libpng-1.2.30beta06.
+  Eliminated no-longer-used pngdefs.h (but it's still built in the makefiles)
+  Relocated a misplaced #endif /* PNG_NO_WRITE_FILTER */ in pngwutil.c
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

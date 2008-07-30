@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [July 25, 2008]
+ * Last changed in libpng 1.4.0 [July 30, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1833,8 +1833,8 @@ png_write_start_row(png_structp png_ptr)
            (png_size_t)(png_ptr->rowbytes + 1));
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
-#endif /* PNG_NO_WRITE_FILTER */
    }
+#endif /* PNG_NO_WRITE_FILTER */
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* if interlaced, we need to set up width and height of pass */
@@ -1998,11 +1998,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 
    png_debug(1, "in png_do_write_interlace\n");
    /* we don't have to do anything on the last pass (6) */
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
-   if (row != NULL && row_info != NULL && pass < 6)
-#else
    if (pass < 6)
-#endif
    {
       /* each pixel depth is handled separately */
       switch (row_info->pixel_depth)

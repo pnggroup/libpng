@@ -3,7 +3,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl
 dnl Minor upgrades (compatible ABI): increment the package version
-dnl (third field in two places below) and set the PNGLIB_MINOR
+dnl (third field in two places below) and set the PNGLIB_RELEASE
 dnl variable.
 dnl
 dnl Major upgrades (incompatible ABI): increment the package major
@@ -18,14 +18,15 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.4.0beta24], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.4.0beta25], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.4.0beta24
-PNGLIB_MAJOR=14
-PNGLIB_MINOR=0
+PNGLIB_VERSION=1.4.0beta25
+PNGLIB_MAJOR=1
+PNGLIB_MINOR=4
+PNGLIB_RELEASE=0
 
 dnl End of version number stuff
 
@@ -37,6 +38,7 @@ AC_PROG_CC
 AC_PROG_LD
 AC_PROG_CPP
 AC_CHECK_TOOL(SED, sed, :)
+AC_LIBTOOL_WIN32_DLL
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -57,21 +59,19 @@ AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )
 AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
 
-AC_MSG_CHECKING([if pnggccrd.c can be compiled without -DPNG_NO_MMX_CODE])
-AC_TRY_COMPILE(
-  [#include "pnggccrd.c"],
-  [return 0;],
-  LIBPNG_NO_MMX=,
-  LIBPNG_NO_MMX=true)
-if test "$LIBPNG_NO_MMX"; then
-    AC_MSG_RESULT(no)
-else
-    AC_MSG_RESULT(yes)
-fi
-AC_SUBST(LIBPNG_NO_MMX)
-
 LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
+AC_MSG_CHECKING(
+  [if assembler code in pnggccrd.c can be compiled without PNG_NO_MMX_CODE])
+AC_TRY_COMPILE(
+  [#include "$srcdir/pnggccrd.c"],
+  [return 0;],
+  AC_MSG_RESULT(yes)
+  LIBPNG_NO_MMX="",
+  AC_MSG_RESULT(no)
+  LIBPNG_NO_MMX=-DPNG_NO_MMX_CODE)
+LIBPNG_DEFINES=$LIBPNG_DEFINES\ $LIBPNG_NO_MMX
 AC_SUBST(LIBPNG_DEFINES)
+AC_SUBST(LIBPNG_NO_MMX)
 
 AC_MSG_CHECKING([if libraries can be versioned])
 GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
@@ -85,10 +85,21 @@ else
 fi
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 
+if test "$have_ld_version_script" = "yes"; then
+    AC_MSG_CHECKING([for symbol prefix])
+    SYMBOL_PREFIX=`echo "PREFIX=__USER_LABEL_PREFIX__" \
+                   | ${CPP-${CC-gcc} -E} - 2>&1 \
+                   | ${EGREP-grep} "^PREFIX=" \
+                   | ${SED-sed} "s:^PREFIX=::"`
+    AC_SUBST(SYMBOL_PREFIX)
+    AC_MSG_RESULT($SYMBOL_PREFIX)
+fi
+
 # Substitutions for .in files
 AC_SUBST(PNGLIB_VERSION)
 AC_SUBST(PNGLIB_MAJOR)
 AC_SUBST(PNGLIB_MINOR)
+AC_SUBST(PNGLIB_RELEASE)
 
 # Additional arguments (and substitutions)
 # Allow the pkg-config directory to be set
@@ -122,15 +133,15 @@ AC_ARG_WITH(libpng-compat,
 		[Generate the obsolete libpng.so library @<:@default=yes@:>@]),
 	[if test "${withval}" = no; then
 		compatlib=
+		AC_MSG_NOTICE([libpng.so will not be built])
 	else
 		compatlib=libpng.la
-		AC_MSG_NOTICE([libpng.so will be built])
 	fi],
-	[compatlib=])
+	[compatlib=libpng.la])
 AC_SUBST([compatlib])
 
 # Config files, substituting as above
-AC_CONFIG_FILES([Makefile libpng.pc:scripts/libpng.pc.in])
+AC_CONFIG_FILES([Makefile libpng.pc:scripts/libpng.pc-configure.in])
 AC_CONFIG_FILES([libpng-config:scripts/libpng-config.in],
 		[chmod +x libpng-config])
 

@@ -1,11 +1,12 @@
 # Sample makefile for rpng-win / rpng2-win / wpng using MSVC and NMAKE.
 # Greg Roelofs
-# Last modified:  16 February 1999
+# Last modified:  2 June 2007
 #
 #	The programs built by this makefile are described in the book,
 #	"PNG:  The Definitive Guide," by Greg Roelofs (O'Reilly and
-#	Associates, 1999).  Go buy a copy, eh?  Buy some for friends
-#	and family, too.  (Not that this is a blatant plug or anything.)
+#	Associates, 1999).  Go buy a copy, eh?  Well, OK, it's not
+#	generally for sale anymore, but it's the thought that counts,
+#	right?  (Hint:  http://www.libpng.org/pub/png/book/ )
 #
 # Invoke this makefile from a DOS prompt window via:
 #
@@ -53,7 +54,7 @@ CC = cl
 LD = link
 RM = del
 CFLAGS = -nologo -O -W3 $(INCS) $(cvars)
-# [note that -Wall is an MSVC-specific compilation flag ("all warnings on")]
+# [note that -W3 is an MSVC-specific compilation flag ("all warnings on")]
 # [see %devstudio%\vc\include\win32.mak for cvars macro definition]
 O = .obj
 E = .exe

@@ -4,18 +4,19 @@
 
   ---------------------------------------------------------------------------
 
-   Changelog:
-    - 1.01:  initial public release
-    - 1.02:  added code to skip unused chunks (GR-P)
-
-  ---------------------------------------------------------------------------
-
-      Copyright (c) 1998-2002 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2007 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
       be held liable for any damages arising in any way from the use of
       this software.
+
+      The contents of this file are DUAL-LICENSED.  You may modify and/or
+      redistribute this software according to the terms of one of the
+      following two licenses (at your option):
+
+
+      LICENSE 1 ("BSD-like with advertising clause"):
 
       Permission is granted to anyone to use this software for any purpose,
       including commercial applications, and to alter it and redistribute
@@ -32,6 +33,23 @@
             This product includes software developed by Greg Roelofs
             and contributors for the book, "PNG: The Definitive Guide,"
             published by O'Reilly and Associates.
+
+
+      LICENSE 2 (GNU GPL v2 or later):
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software Foundation,
+      Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
   ---------------------------------------------------------------------------*/
 
@@ -56,7 +74,7 @@ static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg);
 void readpng2_version_info(void)
 {
 #if defined(PNG_ASSEMBLER_CODE_SUPPORTED) && \
-    (defined(__i386__) || defined(_M_IX86)) && \
+    (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__)) && \
     defined(PNG_LIBPNG_VER) && (PNG_LIBPNG_VER >= 10200)
     /*
      * WARNING:  This preprocessor approach means that the following code
@@ -79,7 +97,12 @@ void readpng2_version_info(void)
               "with MMX support\n   (%s version).", PNG_LIBPNG_VER_STRING,
               png_libpng_ver, compilerID == 1? "MSVC++" :
               (compilerID == 2? "GNU C" : "unknown"));
-            fprintf(stderr, "  Processor %s MMX instructions.\n",
+            fprintf(stderr, "  Processor (x86%s) %s MMX instructions.\n",
+#if defined(__x86_64__)
+              "_64",
+#else
+              "",
+#endif
               mmxsupport? "supports" : "does not support");
             if (mmxsupport > 0) {
                 int num_optims = 0;
@@ -179,40 +202,38 @@ int readpng2_init(mainprog_info *mainprog_ptr)
         return 2;
     }
 
-    /* prepare the reader to ignore all recognized chunks whose data isn't
-     * going to be used, i.e., all chunks recognized by libpng except for
-     * IHDR, PLTE, IDAT, IEND, tRNS, bKGD, gAMA, and sRGB : */
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+    /* prepare the reader to ignore all recognized chunks whose data won't be
+     * used, i.e., all chunks recognized by libpng except for IHDR, PLTE, IDAT,
+     * IEND, tRNS, bKGD, gAMA, and sRGB (small performance improvement) */
     {
-#ifndef HANDLE_CHUNK_NEVER
-/* prior to libpng-1.2.5, this macro was internal, so we define it here. */
-# define HANDLE_CHUNK_NEVER 1
-#endif
-       /* these byte strings were copied from png.h.
-        * If a future libpng version recognizes more chunks, add them
-        * to this list.  If a future version of readpng2.c recognizes
-        * more chunks, delete them from this list. */
-       png_byte png_chunk_types_to_ignore[]=
-          { 99,  72,  82,  77, '\0', /* cHRM */
-           104,  73,  83,  84, '\0', /* hIST */
-           105,  67,  67,  80, '\0', /* iCCP */
-           105,  84,  88, 116, '\0', /* iTXt */
-           111,  70,  70, 115, '\0', /* oFFs */
-           112,  67,  65,  76, '\0', /* pCAL */
-           115,  67,  65,  76, '\0', /* sCAL */
-           112,  72,  89, 115, '\0', /* pHYs */
-           115,  66,  73,  84, '\0', /* sBIT */
-           115,  80,  76,  84, '\0', /* sPLT */
-           116,  69,  88, 116, '\0', /* tEXt */
-           116,  73,  77,  69, '\0', /* tIME */
-           122,  84,  88, 116, '\0'}; /* zTXt */
-#define NUM_PNG_CHUNK_TYPES_TO_IGNORE 13
+        /* These byte strings were copied from png.h.  If a future libpng
+         * version recognizes more chunks, add them to this list.  If a
+         * future version of readpng2.c recognizes more chunks, delete them
+         * from this list. */
+        static const png_byte chunks_to_ignore[] = {
+             99,  72,  82,  77, '\0',  /* cHRM */
+            104,  73,  83,  84, '\0',  /* hIST */
+            105,  67,  67,  80, '\0',  /* iCCP */
+            105,  84,  88, 116, '\0',  /* iTXt */
+            111,  70,  70, 115, '\0',  /* oFFs */
+            112,  67,  65,  76, '\0',  /* pCAL */
+            112,  72,  89, 115, '\0',  /* pHYs */
+            115,  66,  73,  84, '\0',  /* sBIT */
+            115,  67,  65,  76, '\0',  /* sCAL */
+            115,  80,  76,  84, '\0',  /* sPLT */
+            115,  84,  69,  82, '\0',  /* sTER */
+            116,  69,  88, 116, '\0',  /* tEXt */
+            116,  73,  77,  69, '\0',  /* tIME */
+            122,  84,  88, 116, '\0'   /* zTXt */
+        };
 
-    png_set_keep_unknown_chunks(png_ptr, HANDLE_CHUNK_NEVER,
-        png_chunk_types_to_ignore, NUM_PNG_CHUNK_TYPES_TO_IGNORE);
+        png_set_keep_unknown_chunks(png_ptr, 1 /* PNG_HANDLE_CHUNK_NEVER */,
+          chunks_to_ignore, sizeof(chunks_to_ignore)/5);
     }
-#endif
+#endif /* PNG_UNKNOWN_CHUNKS_SUPPORTED */
+
 
     /* instead of doing png_init_io() here, now we set up our callback
      * functions for progressive decoding */
@@ -237,7 +258,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
      *                  png_set_asm_flags (png_ptr, flags);
      */
 
-#if (defined(__i386__) || defined(_M_IX86)) && \
+#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__)) && \
     defined(PNG_LIBPNG_VER) && (PNG_LIBPNG_VER >= 10200)
     /*
      * WARNING:  This preprocessor approach means that the following code

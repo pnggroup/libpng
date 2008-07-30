@@ -22,15 +22,24 @@
     - 1.02:  added extra set of parentheses to png_jmpbuf() macro; fixed
               command-line parsing bug
     - 1.10:  enabled "message window"/console (thanks to David Geldreich)
+    - 2.00:  dual-licensed (added GNU GPL)
+    - 2.01:  fixed improper display of usage screen on PNG error(s)
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2001 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors
       be held liable for any damages arising in any way from the use of
       this software.
+
+      The contents of this file are DUAL-LICENSED.  You may modify and/or
+      redistribute this software according to the terms of one of the
+      following two licenses (at your option):
+
+
+      LICENSE 1 ("BSD-like with advertising clause"):
 
       Permission is granted to anyone to use this software for any purpose,
       including commercial applications, and to alter it and redistribute
@@ -48,11 +57,28 @@
             and contributors for the book, "PNG: The Definitive Guide,"
             published by O'Reilly and Associates.
 
+
+      LICENSE 2 (GNU GPL v2 or later):
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software Foundation,
+      Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
   ---------------------------------------------------------------------------*/
 
 #define PROGNAME  "rpng-win"
 #define LONGNAME  "Simple PNG Viewer for Windows"
-#define VERSION   "1.20 of 28 May 2001"
+#define VERSION   "2.01 of 16 March 2008"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,10 +111,9 @@ static void       rpng_win_cleanup(void);
 LRESULT CALLBACK  rpng_win_wndproc(HWND, UINT, WPARAM, LPARAM);
 
 
-static char titlebar[1024], *window_name = titlebar;
+static char titlebar[1024];
 static char *progname = PROGNAME;
 static char *appname = LONGNAME;
-static char *icon_name = PROGNAME;     /* GRR:  not (yet) used */
 static char *filename;
 static FILE *infile;
 
@@ -247,40 +272,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         }
     }
 
-    if (!filename) {
+    if (!filename)
         ++error;
-    } else if (!(infile = fopen(filename, "rb"))) {
-        fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
-        ++error;
-    } else {
-        if ((rc = readpng_init(infile, &image_width, &image_height)) != 0) {
-            switch (rc) {
-                case 1:
-                    fprintf(stderr, PROGNAME
-                      ":  [%s] is not a PNG file: incorrect signature\n",
-                      filename);
-                    break;
-                case 2:
-                    fprintf(stderr, PROGNAME
-                      ":  [%s] has bad IHDR (libpng longjmp)\n",
-                      filename);
-                    break;
-                case 4:
-                    fprintf(stderr, PROGNAME ":  insufficient memory\n");
-                    break;
-                default:
-                    fprintf(stderr, PROGNAME
-                      ":  unknown readpng_init() error\n");
-                    break;
-            }
-            ++error;
-        }
-        if (error)
-            fclose(infile);
-    }
 
 
-    /* usage screen */
+    /* print usage screen if any errors up to this point */
 
     if (error) {
         int ch;
@@ -303,6 +299,47 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             ch = _getch();
         while (ch != 'q' && ch != 'Q' && ch != 0x1B);
         exit(1);
+    }
+
+
+    if (!(infile = fopen(filename, "rb"))) {
+        fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
+        ++error;
+    } else {
+        if ((rc = readpng_init(infile, &image_width, &image_height)) != 0) {
+            switch (rc) {
+                case 1:
+                    fprintf(stderr, PROGNAME
+                      ":  [%s] is not a PNG file: incorrect signature\n",
+                      filename);
+                    break;
+                case 2:
+                    fprintf(stderr, PROGNAME
+                      ":  [%s] has bad IHDR (libpng longjmp)\n", filename);
+                    break;
+                case 4:
+                    fprintf(stderr, PROGNAME ":  insufficient memory\n");
+                    break;
+                default:
+                    fprintf(stderr, PROGNAME
+                      ":  unknown readpng_init() error\n");
+                    break;
+            }
+            ++error;
+        }
+        if (error)
+            fclose(infile);
+    }
+
+
+    if (error) {
+        int ch;
+
+        fprintf(stderr, PROGNAME ":  aborting.\n");
+        do
+            ch = _getch();
+        while (ch != 'q' && ch != 'Q' && ch != 0x1B);
+        exit(2);
     } else {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
         fprintf(stderr,
@@ -325,9 +362,14 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
      * check for one in the PNG file--if not, the initialized values of 0
      * (black) will be used */
 
-    if (have_bg)
-        sscanf(bgstr+1, "%2x%2x%2x", &bg_red, &bg_green, &bg_blue);
-    else if (readpng_get_bgcolor(&bg_red, &bg_green, &bg_blue) > 1) {
+    if (have_bg) {
+        unsigned r, g, b;   /* this approach quiets compiler warnings */
+
+        sscanf(bgstr+1, "%2x%2x%2x", &r, &g, &b);
+        bg_red   = (uch)r;
+        bg_green = (uch)g;
+        bg_blue  = (uch)b;
+    } else if (readpng_get_bgcolor(&bg_red, &bg_green, &bg_blue) > 1) {
         readpng_cleanup(TRUE);
         fprintf(stderr, PROGNAME
           ":  libpng error while checking for background color\n");

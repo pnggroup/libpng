@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 [July 25, 2008]
+ * Last changed in libpng 1.4.0 [July 30, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -19,20 +19,12 @@
 png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_bytep buf)
 {
-#ifdef PNG_READ_BIG_ENDIAN_SUPPORTED
    png_uint_32 i = png_get_uint_32(buf);
-#else
-   /* Avoid an extra function call by inlining the result. */
-   png_uint_32 i = ((png_uint_32)(*buf) << 24) +
-      ((png_uint_32)(*(buf + 1)) << 16) +
-      ((png_uint_32)(*(buf + 2)) << 8) +
-      (png_uint_32)(*(buf + 3));
-#endif
    if (i > PNG_UINT_31_MAX)
      png_error(png_ptr, "PNG unsigned integer out of range");
    return (i);
 }
-#ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
+#ifndef PNG_USE_READ_MACROS
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
 png_uint_32 PNGAPI
 png_get_uint_32(png_bytep buf)
@@ -45,7 +37,6 @@ png_get_uint_32(png_bytep buf)
    return (i);
 }
 
-#if defined(PNG_GET_INT_32_SUPPORTED)
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
  * data is stored in the PNG file in two's complement format, and it is
  * assumed that the machine format for signed integers is the same. */
@@ -59,7 +50,6 @@ png_get_int_32(png_bytep buf)
 
    return (i);
 }
-#endif
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 PNGAPI
@@ -70,7 +60,7 @@ png_get_uint_16(png_bytep buf)
 
    return (i);
 }
-#endif /* PNG_READ_BIG_ENDIAN_SUPPORTED */
+#endif /* PNG_USE_READ_MACROS */
 
 /* Read the chunk header (length + type name).
  * Put the type name into png_ptr->chunk_name, and return the length.
@@ -2237,11 +2227,6 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          png_ptr->mode |= PNG_AFTER_IDAT;
    }
 
-#if 0
-   /* Redundant? */
-   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
-#endif
-
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
@@ -2322,14 +2307,13 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    the chunk name itself is valid. */
 
 #define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
-#define isnonupper(c) ((c) < 65 || (c) > 90)
 
 void /* PRIVATE */
 png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
 {
    png_debug(1, "in png_check_chunk_name\n");
    if (isnonalpha(chunk_name[0]) || isnonalpha(chunk_name[1]) ||
-       isnonupper(chunk_name[2]) || isnonalpha(chunk_name[3]))
+       isnonalpha(chunk_name[2]) || isnonalpha(chunk_name[3]))
    {
       png_chunk_error(png_ptr, "invalid chunk type");
    }

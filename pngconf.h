@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta20 - May 15, 2007
+ * libpng version 1.4.0beta25 - July 30, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -16,10 +16,6 @@
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
-
-/* Added at libpng-1.4.0 */
-/* pngdefs.h is created by the makefile or the "configure" script. */
-#include "pngdefs.h"
 
 #ifndef PNG_NO_LIMITS_H
 #include <limits.h>
@@ -683,7 +679,7 @@
 #endif
 
 /* Added at libpng-1.4.0 */
-#ifndef PNG_NO_IO_STATE
+#if !defined(PNG_NO_IO_STATE) && !defined(PNG_IO_STATE_SUPPORTED)
 #  define PNG_IO_STATE_SUPPORTED
 #endif
 
@@ -706,16 +702,15 @@
 #endif
 */
 
+#if !defined(PNG_NO_USE_READ_MACROS) && !defined(PNG_USE_READ_MACROS)
+#  define PNG_USE_READ_MACROS
+#endif
+
 /* Buggy compilers (e.g., gcc 2.7.2.2) need this */
 /*
 #define PNG_NO_POINTER_INDEXING
 */
 
-/* These functions are turned off by default, as they will be phased out. */
-/*
-#define  PNG_USELESS_TESTS_SUPPORTED
-#define  PNG_CORRECT_PALETTE_SUPPORTED
-*/
 
 /* Any chunks you are not interested in, you can undef here.  The
  * ones that allocate memory may be expecially important (hIST,

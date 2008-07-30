@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta24 - July 25, 2008
+ * libpng version 1.4.0beta25 - July 30, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -795,6 +795,7 @@ PNG_EXTERN void png_push_check_crc PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_push_crc_skip PNGARG((png_structp png_ptr,
    png_uint_32 length));
 PNG_EXTERN void png_push_crc_finish PNGARG((png_structp png_ptr));
+PNG_EXTERN int png_push_have_buffer PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_push_save_buffer PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_push_restore_buffer PNGARG((png_structp png_ptr,
    png_bytep buffer, png_size_t buffer_length));
