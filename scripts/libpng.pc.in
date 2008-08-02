@@ -5,6 +5,6 @@ includedir=@includedir@/libpng10
 
 Name: libpng
 Description: Loads and saves PNG files
-Version: 1.0.38rc06
+Version: 1.0.38rc07
 Libs: -L${libdir} -lpng10
 Cflags: -I${includedir}
