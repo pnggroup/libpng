@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.30 [July 30, 2008]
+ * Last changed in libpng 1.2.30 [August 2, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1825,8 +1825,8 @@ png_write_start_row(png_structp png_ptr)
            (png_uint_32)(png_ptr->rowbytes + 1));
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
-#endif /* PNG_NO_WRITE_FILTER */
    }
+#endif /* PNG_NO_WRITE_FILTER */
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* if interlaced, we need to set up width and height of pass */

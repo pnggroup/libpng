@@ -1,5 +1,5 @@
 
-Libpng 1.2.30rc06 - July 30, 2008
+Libpng 1.2.30rc07 - August 2, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.30rc06.tar.gz
-   libpng-1.2.30rc06.tar.lzma
+   libpng-1.2.30rc07.tar.gz
+   libpng-1.2.30rc07.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.30rc06.tar.bz2
+   libpng-1.2.30rc07.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.30rc06-no-config.tar.gz
-   libpng-1.2.30rc06-no-config.tar.lzma
-   libpng-1.2.30rc06-no-config.tar.bz2
+   libpng-1.2.30rc07-no-config.tar.gz
+   libpng-1.2.30rc07-no-config.tar.lzma
+   libpng-1.2.30rc07-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1230r06.zip
-   lp1230r06.7z
-   lp1230r06.tar.bz2
+   lp1230r07.zip
+   lp1230r07.7z
+   lp1230r07.tar.bz2
 
 Project files
 
-   libpng-1.2.30rc06-project-netware.zip
-   libpng-1.2.30rc06-project-wince.zip
+   libpng-1.2.30rc07-project-netware.zip
+   libpng-1.2.30rc07-project-wince.zip
 
 Other information:
 
-   libpng-1.2.30rc06-README.txt
-   libpng-1.2.30rc06-KNOWNBUGS.txt
-   libpng-1.2.30rc06-LICENSE.txt
-   libpng-1.2.30rc06-Y2K-compliance.txt
-   libpng-1.2.30rc06-[previous version]-diff.txt
+   libpng-1.2.30rc07-README.txt
+   libpng-1.2.30rc07-KNOWNBUGS.txt
+   libpng-1.2.30rc07-LICENSE.txt
+   libpng-1.2.30rc07-Y2K-compliance.txt
+   libpng-1.2.30rc07-[previous version]-diff.txt
 
 Changes since the last public release (1.2.29):
 
@@ -85,7 +85,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [July 30, 2008]
+version 1.0.38rc01, 1.2.30rc01 [August 2, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -107,9 +107,16 @@ version 1.0.38rc05, 1.2.30rc05 [July 25, 2008]
   Revised png_check_chunk_name() to reject a name with a lowercase 3rd byte.
   Removed two calls to png_check_chunk_name() occuring later in the process.
 
-version 1.0.38rc06, 1.2.30rc06 [July 30, 2008]
+version 1.0.38rc06, 1.2.30rc06 [July 29, 2008]
   Added a call to png_check_chunk_name() in pngpread.c
   Reverted png_check_chunk_name() to accept a name with a lowercase 3rd byte.
+
+version 1.0.38r07, 1.2.30r07[August 2, 2008]
+  Relocated a misplaced "#endif /* PNG_NO_WRITE_FILTER */" in pngwutil.c
+  Changed "-Wall" to "-W -Wall" in the CFLAGS in all makefiles (Cosmin Truta)
+  Declared png_ptr "volatile" in pngread.c and pngwrite.c to avoid warnings.
+  Added code in pngset.c to quiet compiler warnings.
+  Updated contrib/visupng/cexcept.h to version 2.0.1
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

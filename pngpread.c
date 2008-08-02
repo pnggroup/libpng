@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.30 [July 30, 2008]
+ * Last changed in libpng 1.2.30 [August 2, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -598,7 +598,6 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
       png_ptr->current_buffer_ptr += save_size;
    }
 }
-
 
 void /* PRIVATE */
 png_push_save_buffer(png_structp png_ptr)
