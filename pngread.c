@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.30 [August 2, 2008]
+ * Last changed in libpng 1.2.30 [August 3, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -34,7 +34,10 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
 
-   volatile png_structp png_ptr;
+#ifdef PNG_SETJMP_SUPPORTED
+   volatile
+#endif
+   png_structp png_ptr;
 
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
