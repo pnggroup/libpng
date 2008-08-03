@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [August 2, 2008]
+version 1.0.38rc01, 1.2.30rc01 [August 3, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2218,6 +2218,9 @@ version 1.0.38r07, 1.2.30r07 [August 2, 2008]
   Added code in pngset.c to quiet compiler warnings.
   Updated contrib/visupng/cexcept.h to version 2.0.1
   Relocated a misplaced "#endif /* PNG_NO_WRITE_FILTER */" in pngwutil.c
+
+version 1.0.38r08, 1.2.30r08 [August 3, 2008]
+  Enclose "volatile" declarations in #ifdef PNG_SETJMP_SUPPORTED (Cosmin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
