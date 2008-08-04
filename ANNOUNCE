@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta25 - July 30, 2008
+Libpng 1.4.0beta26 - August 4, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta25.tar.gz
-   1.4.0beta25.tar.bz2
+   1.4.0beta26.tar.gz
+   1.4.0beta26.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta25-no-config.tar.gz
-   1.4.0beta25-no-config.tar.bz2
+   1.4.0beta26-no-config.tar.gz
+   1.4.0beta26-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b25.zip
-   lp140b25.tar.bz2
+   lp140b26.zip
+   lp140b26.tar.bz2
 
 Other information:
 
-   1.4.0beta25-README.txt
-   1.4.0beta25-KNOWNBUGS.txt
-   1.4.0beta25-LICENSE.txt
-   1.4.0beta25-Y2K-compliance.txt
+   1.4.0beta26-README.txt
+   1.4.0beta26-KNOWNBUGS.txt
+   1.4.0beta26-LICENSE.txt
+   1.4.0beta26-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -281,11 +281,18 @@ version 1.4.0beta25 [July 30, 2008]
   Eliminated all PNG_USELESS_TESTS and PNG_CORRECT_PALETTE_SUPPORTED code.
   Synced contrib directory and configure files with libpng-1.2.30beta06.
   Eliminated no-longer-used pngdefs.h (but it's still built in the makefiles)
-  Relocated a misplaced #endif /* PNG_NO_WRITE_FILTER */ in pngwutil.c
+  Relocated a misplaced "#endif /* PNG_NO_WRITE_FILTER */" in pngwutil.c
+
+version 1.4.0beta26 [August 4, 2008]
+  Removed png_push_have_buffer() function in pngpread.c.  It increased the
+    compiled library size slightly.
+  Changed "-Wall" to "-W -Wall" in the CFLAGS in all makefiles (Cosmin Truta)
+  Declared png_ptr "volatile" in pngread.c and pngwrite.c to avoid warnings.
+  Updated contrib/visupng/cexcept.h to version 2.0.1
+  Added PNG_LITERAL_CHARACTER macros for #, [, and ].
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
-  Revised pngvcrd.c for improved efficiency.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

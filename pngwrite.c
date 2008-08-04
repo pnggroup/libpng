@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [July 30, 2008]
+ * Last changed in libpng 1.4.0 [August 4, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -444,7 +444,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_malloc_ptr malloc_fn, png_free_ptr free_fn)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
-   png_structp png_ptr;
+   volatile png_structp png_ptr;
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;

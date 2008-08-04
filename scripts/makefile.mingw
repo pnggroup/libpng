@@ -67,21 +67,21 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 ###
 ### if you don't need thread safety, but want the asm accel
 #CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_THREAD_UNSAFE_OK -DPNG_USE_PNGGCCRD \
-#	$(addprefix -I,$(ZLIBINC)) -Wall -O3 $(ALIGN) -funroll-loops \
+#	$(addprefix -I,$(ZLIBINC)) -W -Wall -O3 $(ALIGN) -funroll-loops \
 #	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### if you need thread safety and want (minimal) asm accel
 #CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_USE_PNGGCCRD $(addprefix -I,$(ZLIBINC)) \
-#	-Wall -O3 $(ALIGN) -funroll-loops \
+#	-W -Wall -O3 $(ALIGN) -funroll-loops \
 #	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### Normal (non-asm) compilation
 CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
-        -Wall -O3 $(ALIGN) -funroll-loops \
+        -W -Wall -O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LIBNAME = libpng14
 PNGMAJ = 0 
 MINGDLL = 14
-PNGMIN = 1.4.0beta25
+PNGMIN = 1.4.0beta26
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=libpng$(MINGDLL).dll

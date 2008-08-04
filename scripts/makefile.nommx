@@ -16,7 +16,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 0
-PNGMIN = 1.4.0beta25
+PNGMIN = 1.4.0beta26
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -56,15 +56,15 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS= -I$(ZLIBINC) -Wall \
+CFLAGS= -I$(ZLIBINC) -W -Wall \
 	-O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### for gcc 2.95.2 on 686:
-#CFLAGS= -I$(ZLIBINC) -Wall -O3 \
+#CFLAGS= -I$(ZLIBINC) -W -Wall -O3 \
 #	-mcpu=i686 -malign-double -ffast-math -fstrict-aliasing \
 #	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
 ### for gcc 2.7.2.3 on 486 and up:
-#CFLAGS= -I$(ZLIBINC) -Wall -O3 \
+#CFLAGS= -I$(ZLIBINC) -W -Wall -O3 \
 #	-m486 -malign-double -ffast-math \
 #	$(ALIGN) -funroll-loops -funroll-all-loops -fomit-frame-pointer 
 

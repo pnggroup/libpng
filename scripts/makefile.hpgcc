@@ -8,7 +8,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 0
-PNGMIN = 1.4.0beta25
+PNGMIN = 1.4.0beta26
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -51,7 +51,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops \
+CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 #LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng14 -lz -lm
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz -lm

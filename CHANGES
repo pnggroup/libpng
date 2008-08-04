@@ -1954,7 +1954,15 @@ version 1.4.0beta25 [July 30, 2008]
   Eliminated all PNG_USELESS_TESTS and PNG_CORRECT_PALETTE_SUPPORTED code.
   Synced contrib directory and configure files with libpng-1.2.30beta06.
   Eliminated no-longer-used pngdefs.h (but it's still built in the makefiles)
-  Relocated a misplaced #endif /* PNG_NO_WRITE_FILTER */ in pngwutil.c
+  Relocated a misplaced "#endif /* PNG_NO_WRITE_FILTER */" in pngwutil.c
+
+version 1.4.0beta26 [August 4, 2008]
+  Removed png_push_have_buffer() function in pngpread.c.  It increased the
+    compiled library size slightly.
+  Changed "-Wall" to "-W -Wall" in the CFLAGS in all makefiles (Cosmin Truta)
+  Declared png_ptr "volatile" in pngread.c and pngwrite.c to avoid warnings.
+  Updated contrib/visupng/cexcept.h to version 2.0.1
+  Added PNG_LITERAL_CHARACTER macros for #, [, and ].
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -59,13 +59,13 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 
 CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
-        -Wall -O3 $(ALIGN) -funroll-loops \
+        -W -Wall -O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LIBNAME = libpng14
 PNGMAJ = 0
 CYGDLL = 14
-PNGMIN = 1.4.0beta25
+PNGMIN = 1.4.0beta26
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll

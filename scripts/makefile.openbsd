@@ -8,7 +8,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.4.0beta25
+SHLIB_MINOR=	1.4.0beta26
 
 LIB=	png
 SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \
@@ -17,7 +17,7 @@ SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \
 
 HDRS=	png.h pngconf.h pngpriv.h pngdefs.h
 
-CFLAGS+= -Wall
+CFLAGS+= -W -Wall
 CPPFLAGS+= -I${.CURDIR}
 
 all: pngconf.h pngdefs.h

@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.0 [July 30, 2008]
+ * Last changed in libpng 1.4.0 [August 4, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -42,7 +42,7 @@ png_error(png_structp png_ptr, png_const_charp error_message)
      if (png_ptr->flags&
        (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
      {
-       if (*error_message == '#')
+       if (*error_message == PNG_LITERAL_SHARP)
        {
        /* Strip "#nnnn " from beginning of error message. */
          /*
@@ -130,7 +130,7 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
      (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
 #endif
      {
-       if (*warning_message == '#')
+       if (*warning_message == PNG_LITERAL_SHARP)
        {
            for (offset = 1; offset < 15; offset++)
               if (warning_message[offset] == ' ')
@@ -182,10 +182,10 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
       int c = png_ptr->chunk_name[iin++];
       if (isnonalpha(c))
       {
-         buffer[iout++] = '[';
+         buffer[iout++] = PNG_LITERAL_LEFT_SQUARE_BRACKET;
          buffer[iout++] = png_digit[(c & 0xf0) >> 4];
          buffer[iout++] = png_digit[c & 0x0f];
-         buffer[iout++] = ']';
+         buffer[iout++] = PNG_LITERAL_RIGHT_SQUARE_BRACKET;
       }
       else
       {
@@ -258,7 +258,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 {
 #ifndef PNG_NO_CONSOLE_IO
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*error_message == '#')
+   if (*error_message == PNG_LITERAL_SHARP)
    {
      /* Strip "#nnnn " from beginning of warning message. */
      /*
@@ -335,7 +335,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 {
 #ifndef PNG_NO_CONSOLE_IO
 #  ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*warning_message == '#')
+   if (*warning_message == PNG_LITERAL_SHARP)
    {
      int offset;
      char warning_number[16];

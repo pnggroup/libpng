@@ -8,7 +8,7 @@
 
 # Modeled after libxml-config.
 
-version=1.4.0beta25
+version=1.4.0beta26
 prefix=""
 libdir=""
 libs=""
