@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * Last changed in libpng 1.4.0 [August 4, 2008]
+ * Last changed in libpng 1.4.0 [August 5, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -18,7 +18,7 @@
 void /* PRIVATE */
 png_do_write_transformations(png_structp png_ptr)
 {
-   png_debug(1, "in png_do_write_transformations\n");
+   png_debug(1, "in png_do_write_transformations");
 
    if (png_ptr == NULL)
       return;
@@ -86,7 +86,7 @@ png_do_write_transformations(png_structp png_ptr)
 void /* PRIVATE */
 png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 {
-   png_debug(1, "in png_do_pack\n");
+   png_debug(1, "in png_do_pack");
    if (row_info->bit_depth == 8 &&
       row_info->channels == 1)
    {
@@ -209,7 +209,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 void /* PRIVATE */
 png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 {
-   png_debug(1, "in png_do_shift\n");
+   png_debug(1, "in png_do_shift");
    if (
       row_info->color_type != PNG_COLOR_TYPE_PALETTE)
    {
@@ -329,7 +329,7 @@ png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 void /* PRIVATE */
 png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_write_swap_alpha\n");
+   png_debug(1, "in png_do_write_swap_alpha");
    {
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       {
@@ -414,7 +414,7 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_write_invert_alpha\n");
+   png_debug(1, "in png_do_write_invert_alpha");
    {
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       {
@@ -501,7 +501,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_write_intrapixel\n");
+   png_debug(1, "in png_do_write_intrapixel");
    if (
        (row_info->color_type & PNG_COLOR_MASK_COLOR))
    {

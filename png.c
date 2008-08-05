@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.30 [August 4, 2008]
+ * Last changed in libpng 1.2.30 [August 5, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta26 Your_png_h_is_not_version_1_4_0beta26;
+typedef version_1_4_0beta27 Your_png_h_is_not_version_1_4_0beta27;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -93,7 +93,7 @@ void PNGAPI
 png_set_sig_bytes(png_structp png_ptr, int num_bytes)
 {
    if (png_ptr == NULL) return;
-   png_debug(1, "in png_set_sig_bytes\n");
+   png_debug(1, "in png_set_sig_bytes");
    if (num_bytes > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
 
@@ -206,7 +206,7 @@ png_create_info_struct(png_structp png_ptr)
 {
    png_infop info_ptr;
 
-   png_debug(1, "in png_create_info_struct\n");
+   png_debug(1, "in png_create_info_struct");
    if (png_ptr == NULL) return (NULL);
 #ifdef PNG_USER_MEM_SUPPORTED
    info_ptr = (png_infop)png_create_struct_2(PNG_STRUCT_INFO,
@@ -231,7 +231,7 @@ png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
    png_infop info_ptr = NULL;
    if (png_ptr == NULL) return;
 
-   png_debug(1, "in png_destroy_info_struct\n");
+   png_debug(1, "in png_destroy_info_struct");
    if (info_ptr_ptr != NULL)
       info_ptr = *info_ptr_ptr;
 
@@ -261,7 +261,7 @@ png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
 
    if (info_ptr == NULL) return;
 
-   png_debug(1, "in png_info_init_3\n");
+   png_debug(1, "in png_info_init_3");
 
    if (png_sizeof(png_info) > png_info_struct_size)
      {
@@ -279,7 +279,7 @@ void PNGAPI
 png_data_freer(png_structp png_ptr, png_infop info_ptr,
    int freer, png_uint_32 mask)
 {
-   png_debug(1, "in png_data_freer\n");
+   png_debug(1, "in png_data_freer");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
    if (freer == PNG_DESTROY_WILL_FREE_DATA)
@@ -296,7 +296,7 @@ void PNGAPI
 png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    int num)
 {
-   png_debug(1, "in png_free_data\n");
+   png_debug(1, "in png_free_data");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -548,7 +548,7 @@ if (mask & PNG_FREE_ROWS)
 void /* PRIVATE */
 png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 {
-   png_debug(1, "in png_info_destroy\n");
+   png_debug(1, "in png_info_destroy");
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
 
@@ -586,7 +586,7 @@ png_get_io_ptr(png_structp png_ptr)
 void PNGAPI
 png_init_io(png_structp png_ptr, png_FILE_p fp)
 {
-   png_debug(1, "in png_init_io\n");
+   png_debug(1, "in png_init_io");
    if (png_ptr == NULL) return;
    png_ptr->io_ptr = (png_voidp)fp;
 }
@@ -636,7 +636,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.4.0beta26 - August 4, 2008\n\
+   return ((png_charp) "\n libpng version 1.4.0beta27 - August 5, 2008\n\
    Copyright (c) 1998-2008 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");

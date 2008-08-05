@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 4, 2008]
+ * Last changed in libpng 1.4.0 [August 5, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -25,7 +25,7 @@
 void PNGAPI
 png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 {
-   png_debug(1, "in png_write_info_before_PLTE\n");
+   png_debug(1, "in png_write_info_before_PLTE");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
    if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
@@ -99,7 +99,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
    {
        png_unknown_chunk *up;
 
-       png_debug(5, "writing extra chunks\n");
+       png_debug(5, "writing extra chunks");
 
        for (up = info_ptr->unknown_chunks;
             up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
@@ -130,7 +130,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    int i;
 #endif
 
-   png_debug(1, "in png_write_info\n");
+   png_debug(1, "in png_write_info");
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
@@ -215,7 +215,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    /* Check to see if we need to write text chunks */
    for (i = 0; i < info_ptr->num_text; i++)
    {
-      png_debug2(2, "Writing header text chunk %d, type %d\n", i,
+      png_debug2(2, "Writing header text chunk %d, type %d", i,
          info_ptr->text[i].compression);
       /* an internationalized chunk? */
       if (info_ptr->text[i].compression > 0)
@@ -268,7 +268,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    {
        png_unknown_chunk *up;
 
-       png_debug(5, "writing extra chunks\n");
+       png_debug(5, "writing extra chunks");
 
        for (up = info_ptr->unknown_chunks;
             up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
@@ -296,7 +296,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
 void PNGAPI
 png_write_end(png_structp png_ptr, png_infop info_ptr)
 {
-   png_debug(1, "in png_write_end\n");
+   png_debug(1, "in png_write_end");
    if (png_ptr == NULL)
       return;
    if (!(png_ptr->mode & PNG_HAVE_IDAT))
@@ -318,7 +318,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
       /* loop through comment chunks */
       for (i = 0; i < info_ptr->num_text; i++)
       {
-         png_debug2(2, "Writing trailer text chunk %d, type %d\n", i,
+         png_debug2(2, "Writing trailer text chunk %d, type %d", i,
             info_ptr->text[i].compression);
          /* an internationalized chunk? */
          if (info_ptr->text[i].compression > 0)
@@ -370,7 +370,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    {
        png_unknown_chunk *up;
 
-       png_debug(5, "writing extra chunks\n");
+       png_debug(5, "writing extra chunks");
 
        for (up = info_ptr->unknown_chunks;
             up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
@@ -407,7 +407,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
 {
-   png_debug(1, "in png_convert_from_struct_tm\n");
+   png_debug(1, "in png_convert_from_struct_tm");
    ptime->year = (png_uint_16)(1900 + ttime->tm_year);
    ptime->month = (png_byte)(ttime->tm_mon + 1);
    ptime->day = (png_byte)ttime->tm_mday;
@@ -421,7 +421,7 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
 {
    struct tm *tbuf;
 
-   png_debug(1, "in png_convert_from_time_t\n");
+   png_debug(1, "in png_convert_from_time_t");
    tbuf = gmtime(&ttime);
    png_convert_from_struct_tm(ptime, tbuf);
 }
@@ -451,7 +451,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif
 #endif
    int i;
-   png_debug(1, "in png_create_write_struct\n");
+   png_debug(1, "in png_create_write_struct");
 #ifdef PNG_USER_MEM_SUPPORTED
    png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
       (png_malloc_ptr)malloc_fn, (png_voidp)mem_ptr);
@@ -591,7 +591,7 @@ png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
      }
    } while (png_libpng_ver[i++]);
 
-   png_debug(1, "in png_write_init_3\n");
+   png_debug(1, "in png_write_init_3");
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* save jump buffer and error functions */
@@ -644,7 +644,7 @@ png_write_rows(png_structp png_ptr, png_bytepp row,
    png_uint_32 i; /* row counter */
    png_bytepp rp; /* row pointer */
 
-   png_debug(1, "in png_write_rows\n");
+   png_debug(1, "in png_write_rows");
 
    if (png_ptr == NULL)
       return;
@@ -669,7 +669,7 @@ png_write_image(png_structp png_ptr, png_bytepp image)
    if (png_ptr == NULL)
       return;
 
-   png_debug(1, "in png_write_image\n");
+   png_debug(1, "in png_write_image");
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)
    /* intialize interlace handling.  If image is not interlaced,
       this will set pass to 1 */
@@ -694,7 +694,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
 {
    if (png_ptr == NULL)
       return;
-   png_debug2(1, "in png_write_row (row %ld, pass %d)\n",
+   png_debug2(1, "in png_write_row (row %ld, pass %d)",
       png_ptr->row_number, png_ptr->pass);
 
    /* initialize transformations and other stuff if first time */
@@ -808,12 +808,12 @@ png_write_row(png_structp png_ptr, png_bytep row)
    png_ptr->row_info.rowbytes = PNG_ROWBYTES(png_ptr->row_info.pixel_depth,
       png_ptr->row_info.width);
 
-   png_debug1(3, "row_info->color_type = %d\n", png_ptr->row_info.color_type);
-   png_debug1(3, "row_info->width = %lu\n", png_ptr->row_info.width);
-   png_debug1(3, "row_info->channels = %d\n", png_ptr->row_info.channels);
-   png_debug1(3, "row_info->bit_depth = %d\n", png_ptr->row_info.bit_depth);
-   png_debug1(3, "row_info->pixel_depth = %d\n", png_ptr->row_info.pixel_depth);
-   png_debug1(3, "row_info->rowbytes = %lu\n", png_ptr->row_info.rowbytes);
+   png_debug1(3, "row_info->color_type = %d", png_ptr->row_info.color_type);
+   png_debug1(3, "row_info->width = %lu", png_ptr->row_info.width);
+   png_debug1(3, "row_info->channels = %d", png_ptr->row_info.channels);
+   png_debug1(3, "row_info->bit_depth = %d", png_ptr->row_info.bit_depth);
+   png_debug1(3, "row_info->pixel_depth = %d", png_ptr->row_info.pixel_depth);
+   png_debug1(3, "row_info->rowbytes = %lu", png_ptr->row_info.rowbytes);
 
    /* Copy user's row into buffer, leaving room for filter byte. */
    png_memcpy(png_ptr->row_buf + 1, row, png_ptr->row_info.rowbytes);
@@ -868,7 +868,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
 void PNGAPI
 png_set_flush(png_structp png_ptr, int nrows)
 {
-   png_debug(1, "in png_set_flush\n");
+   png_debug(1, "in png_set_flush");
    if (png_ptr == NULL)
       return;
    png_ptr->flush_dist = (nrows < 0 ? 0 : nrows);
@@ -880,7 +880,7 @@ png_write_flush(png_structp png_ptr)
 {
    int wrote_IDAT;
 
-   png_debug(1, "in png_write_flush\n");
+   png_debug(1, "in png_write_flush");
    if (png_ptr == NULL)
       return;
    /* We have already written out all of the data */
@@ -940,7 +940,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
    png_voidp mem_ptr = NULL;
 #endif
 
-   png_debug(1, "in png_destroy_write_struct\n");
+   png_debug(1, "in png_destroy_write_struct");
    if (png_ptr_ptr != NULL)
    {
       png_ptr = *png_ptr_ptr;
@@ -1013,7 +1013,7 @@ png_write_destroy(png_structp png_ptr)
    png_free_ptr free_fn;
 #endif
 
-   png_debug(1, "in png_write_destroy\n");
+   png_debug(1, "in png_write_destroy");
    /* free any memory zlib uses */
    deflateEnd(&png_ptr->zstream);
 
@@ -1070,7 +1070,7 @@ png_write_destroy(png_structp png_ptr)
 void PNGAPI
 png_set_filter(png_structp png_ptr, int method, int filters)
 {
-   png_debug(1, "in png_set_filter\n");
+   png_debug(1, "in png_set_filter");
    if (png_ptr == NULL)
       return;
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
@@ -1193,7 +1193,7 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 {
    int i;
 
-   png_debug(1, "in png_set_filter_heuristics\n");
+   png_debug(1, "in png_set_filter_heuristics");
    if (png_ptr == NULL)
       return;
    if (heuristic_method >= PNG_FILTER_HEURISTIC_LAST)
@@ -1307,7 +1307,7 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 void PNGAPI
 png_set_compression_level(png_structp png_ptr, int level)
 {
-   png_debug(1, "in png_set_compression_level\n");
+   png_debug(1, "in png_set_compression_level");
    if (png_ptr == NULL)
       return;
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_LEVEL;
@@ -1317,7 +1317,7 @@ png_set_compression_level(png_structp png_ptr, int level)
 void PNGAPI
 png_set_compression_mem_level(png_structp png_ptr, int mem_level)
 {
-   png_debug(1, "in png_set_compression_mem_level\n");
+   png_debug(1, "in png_set_compression_mem_level");
    if (png_ptr == NULL)
       return;
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_MEM_LEVEL;
@@ -1327,7 +1327,7 @@ png_set_compression_mem_level(png_structp png_ptr, int mem_level)
 void PNGAPI
 png_set_compression_strategy(png_structp png_ptr, int strategy)
 {
-   png_debug(1, "in png_set_compression_strategy\n");
+   png_debug(1, "in png_set_compression_strategy");
    if (png_ptr == NULL)
       return;
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
@@ -1358,7 +1358,7 @@ png_set_compression_window_bits(png_structp png_ptr, int window_bits)
 void PNGAPI
 png_set_compression_method(png_structp png_ptr, int method)
 {
-   png_debug(1, "in png_set_compression_method\n");
+   png_debug(1, "in png_set_compression_method");
    if (png_ptr == NULL)
       return;
    if (method != 8)
@@ -1380,7 +1380,7 @@ void PNGAPI
 png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    write_user_transform_fn)
 {
-   png_debug(1, "in png_set_write_user_transform_fn\n");
+   png_debug(1, "in png_set_write_user_transform_fn");
    if (png_ptr == NULL)
       return;
    png_ptr->transformations |= PNG_USER_TRANSFORM;

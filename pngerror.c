@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.0 [August 4, 2008]
+ * Last changed in libpng 1.4.0 [August 5, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -42,7 +42,7 @@ png_error(png_structp png_ptr, png_const_charp error_message)
      if (png_ptr->flags&
        (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
      {
-       if (*error_message == PNG_LITERAL_SHARP)
+       if (*error_message == 0x23)    /* '#' */
        {
        /* Strip "#nnnn " from beginning of error message. */
          /*
@@ -130,7 +130,7 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
      (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
 #endif
      {
-       if (*warning_message == PNG_LITERAL_SHARP)
+       if (*warning_message == 0x23)    /* '#' */
        {
            for (offset = 1; offset < 15; offset++)
               if (warning_message[offset] == ' ')
@@ -258,9 +258,9 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 {
 #ifndef PNG_NO_CONSOLE_IO
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*error_message == PNG_LITERAL_SHARP)
-   {
-     /* Strip "#nnnn " from beginning of warning message. */
+   if (*error_message == 0x23)    /* '#' */
+       {
+       /* Strip "#nnnn " from beginning of error message. */
      /*
       *                 012345678901234567890
       *  error_message: #nnnn   text\0
@@ -335,7 +335,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 {
 #ifndef PNG_NO_CONSOLE_IO
 #  ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*warning_message == PNG_LITERAL_SHARP)
+   if (*warning_message == 0x23)   /* '#' */
    {
      int offset;
      char warning_number[16];

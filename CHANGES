@@ -1964,6 +1964,12 @@ version 1.4.0beta26 [August 4, 2008]
   Updated contrib/visupng/cexcept.h to version 2.0.1
   Added PNG_LITERAL_CHARACTER macros for #, [, and ].
 
+version 1.4.0beta27 [August 5, 2008]
+  Revised usage of PNG_LITERAL_SHARP in pngerror.c.
+  Moved newline character from individual png_debug messages into the
+    png_debug macros.
+  Allow user to #define their own png_debug, png_debug1, and png_debug2.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
