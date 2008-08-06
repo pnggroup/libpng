@@ -1970,6 +1970,10 @@ version 1.4.0beta27 [August 5, 2008]
     png_debug macros.
   Allow user to #define their own png_debug, png_debug1, and png_debug2.
 
+version 1.4.0beta28 [August 6, 2008]
+  Revised usage of PNG_LITERAL_SHARP in pngerror.c.
+  Added PNG_STRING_NEWLINE macro
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

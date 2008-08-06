@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.30 [August 5, 2008]
+ * Last changed in libpng 1.2.30 [August 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta27 Your_png_h_is_not_version_1_4_0beta27;
+typedef version_1_4_0beta28 Your_png_h_is_not_version_1_4_0beta28;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -636,10 +636,12 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.4.0beta27 - August 5, 2008\n\
-   Copyright (c) 1998-2008 Glenn Randers-Pehrson\n\
-   Copyright (c) 1996-1997 Andreas Dilger\n\
-   Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
+   return ((png_charp) PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta28 - August 6, 2008" PNG_STRING_NEWLINE \
+     "Copyright (c) 1998-2008 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
+     "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
+     "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
+     PNG_STRING_NEWLINE);
 }
 
 /* The following return the library version as a short string in the
@@ -675,7 +677,7 @@ png_get_header_version(png_structp png_ptr)
 #ifndef PNG_READ_SUPPORTED
    "     (NO READ SUPPORT)"
 #endif
-   "\n");
+   PNG_STRING_NEWLINE);
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)

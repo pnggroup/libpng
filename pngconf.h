@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta27 - August 5, 2008
+ * libpng version 1.4.0beta28 - August 6, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -683,11 +683,17 @@
 #  define PNG_IO_STATE_SUPPORTED
 #endif
 
+#ifndef PNG_LITERAL_SHARP
+#  define PNG_LITERAL_SHARP 0x23
+#endif
 #ifndef PNG_LITERAL_LEFT_SQUARE_BRACKET
 #  define PNG_LITERAL_LEFT_SQUARE_BRACKET 0x5b
 #endif
 #ifndef PNG_LITERAL_RIGHT_SQUARE_BRACKET
 #  define PNG_LITERAL_RIGHT_SQUARE_BRACKET 0x5d
+#endif
+#ifndef PNG_STRING_NEWLINE
+#  define PNG_STRING_NEWLINE "\n"
 #endif
 
 /* These are currently experimental features, define them if you want */

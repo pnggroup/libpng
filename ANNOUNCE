@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta27 - August 5, 2008
+Libpng 1.4.0beta28 - August 6, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta27.tar.gz
-   1.4.0beta27.tar.bz2
+   1.4.0beta28.tar.gz
+   1.4.0beta28.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta27-no-config.tar.gz
-   1.4.0beta27-no-config.tar.bz2
+   1.4.0beta28-no-config.tar.gz
+   1.4.0beta28-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b27.zip
-   lp140b27.tar.bz2
+   lp140b28.zip
+   lp140b28.tar.bz2
 
 Other information:
 
-   1.4.0beta27-README.txt
-   1.4.0beta27-KNOWNBUGS.txt
-   1.4.0beta27-LICENSE.txt
-   1.4.0beta27-Y2K-compliance.txt
+   1.4.0beta28-README.txt
+   1.4.0beta28-KNOWNBUGS.txt
+   1.4.0beta28-LICENSE.txt
+   1.4.0beta28-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -296,6 +296,10 @@ version 1.4.0beta27 [August 5, 2008]
   Moved newline character from individual png_debug messages into the
     png_debug macros.
   Allow user to #define their own png_debug, png_debug1, and png_debug2.
+
+version 1.4.0beta28 [August 6, 2008]
+  Revised usage of PNG_LITERAL_SHARP in pngerror.c.
+  Added PNG_STRING_NEWLINE macro
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

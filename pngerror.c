@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.0 [August 5, 2008]
+ * Last changed in libpng 1.4.0 [August 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -42,7 +42,7 @@ png_error(png_structp png_ptr, png_const_charp error_message)
      if (png_ptr->flags&
        (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
      {
-       if (*error_message == 0x23)    /* '#' */
+       if (*error_message == PNG_LITERAL_SHARP)
        {
        /* Strip "#nnnn " from beginning of error message. */
          /*
@@ -130,7 +130,7 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
      (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
 #endif
      {
-       if (*warning_message == 0x23)    /* '#' */
+       if (*warning_message == PNG_LITERAL_SHARP)
        {
            for (offset = 1; offset < 15; offset++)
               if (warning_message[offset] == ' ')
@@ -258,7 +258,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 {
 #ifndef PNG_NO_CONSOLE_IO
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*error_message == 0x23)    /* '#' */
+   if (*error_message == PNG_LITERAL_SHARP)
        {
        /* Strip "#nnnn " from beginning of error message. */
      /*
@@ -292,15 +292,16 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
        error_number[offset - 1] = '\0';
        /* GRR: this should be [offset + 1] */
        /* should we update "offset" to point to the beginning of the text? */
-       fprintf(stderr, "libpng error no. %s: %s\n", error_number,
-          error_message + offset + 1);
+       fprintf(stderr, "libpng error no. %s: %s" PNG_STRING_NEWLINE,
+          error_number, error_message + offset + 1);
      }
      else
-       fprintf(stderr, "libpng error: %s, offset=%d\n", error_message, offset);
+       fprintf(stderr, "libpng error: %s, offset=%d" PNG_STRING_NEWLINE,
+          error_message, offset);
    }
    else
 #endif
-   fprintf(stderr, "libpng error: %s\n", error_message);
+   fprintf(stderr, "libpng error: %s" PNG_STRING_NEWLINE, error_message);
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -335,7 +336,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 {
 #ifndef PNG_NO_CONSOLE_IO
 #  ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*warning_message == 0x23)   /* '#' */
+   if (*warning_message == PNG_LITERAL_SHARP)
    {
      int offset;
      char warning_number[16];
@@ -348,15 +349,16 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
      if ((offset > 1) && (offset < 15))
      {
        warning_number[offset + 1] = '\0';
-       fprintf(stderr, "libpng warning no. %s: %s\n", warning_number,
-          warning_message + offset);
+       fprintf(stderr, "libpng warning no. %s: %s" PNG_STRING_NEWLINE,
+          warning_number, warning_message + offset);
      }
      else
-       fprintf(stderr, "libpng warning: %s\n", warning_message);
+       fprintf(stderr, "libpng warning: %s" PNG_STRING_NEWLINE,
+          warning_message);
    }
    else
 #  endif
-     fprintf(stderr, "libpng warning: %s\n", warning_message);
+     fprintf(stderr, "libpng warning: %s" PNG_STRING_NEWLINE, warning_message);
 #else
    warning_message = warning_message; /* make compiler happy */
 #endif

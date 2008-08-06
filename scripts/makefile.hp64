@@ -18,7 +18,7 @@ ZLIBINC=/opt/zlib/include
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 0
-PNGMIN = 1.4.0beta27
+PNGMIN = 1.4.0beta28
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
