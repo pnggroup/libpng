@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.30 [August 6, 2008]
+ * Last changed in libpng 1.2.30 [August 9, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta28 Your_png_h_is_not_version_1_4_0beta28;
+typedef version_1_4_0beta29 Your_png_h_is_not_version_1_4_0beta29;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -636,12 +636,23 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+#ifdef PNG_STRING_COPYRIGHT
+      return PNG_STRING_COPYRIGHT
+#else
+#ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta28 - August 6, 2008" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta29 - August 9, 2008" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2008 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
+#else
+      return ((png_charp) "libpng version 1.4.0beta29 - August 9, 2008\
+      Copyright (c) 1998-2008 Glenn Randers-Pehrson\
+      Copyright (c) 1996-1997 Andreas Dilger\
+      Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
+#endif
+#endif
 }
 
 /* The following return the library version as a short string in the
@@ -673,11 +684,15 @@ png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
    png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+#ifdef __STDC__
    return ((png_charp) PNG_HEADER_VERSION_STRING
 #ifndef PNG_READ_SUPPORTED
    "     (NO READ SUPPORT)"
 #endif
    PNG_STRING_NEWLINE);
+#else
+   return ((png_charp) PNG_HEADER_VERSION_STRING);
+#endif
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
