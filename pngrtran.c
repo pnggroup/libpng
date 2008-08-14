@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [August 9, 2008]
+ * Last changed in libpng 1.4.0 [August 14, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1442,6 +1442,11 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
          (png_uint_32)png_ptr->filler, png_ptr->flags);
 #endif
 
+#if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
+   if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
+      png_do_read_premultiply_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
    if (png_ptr->transformations & PNG_INVERT_ALPHA)
       png_do_read_invert_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
@@ -1908,6 +1913,84 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 */
                sp-=2;
                dp=sp;
+            }
+         }
+      }
+   }
+}
+#endif
+
+#if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
+void /* PRIVATE */
+png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
+{
+   png_debug(1, "in png_do_read_premultiply_alpha\n");
+   {
+      png_uint_32 row_width = row_info->width;
+      if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+      {
+         /* This premultiplies the pixels with the alpha channel in RGBA */
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp = row + row_info->rowbytes;
+            png_bytep dp = sp;
+                      png_uint_16 a = 0;
+            png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+                              a = *(--sp); --dp;
+
+               *(--dp) = (*(--sp) * a) / 255;
+               *(--dp) = (*(--sp) * a) / 255;
+               *(--dp) = (*(--sp) * a) / 255;
+            }
+         }
+         /* This premultiplies the pixels with the alpha channel in RRGGBBAA */
+         else
+         {
+            png_uint_16p sp = (png_uint_16p)(row + row_info->rowbytes);
+            png_uint_16p dp = sp;
+                      png_uint_32 a = 0;
+            png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+                              a = *(--sp); --dp;
+               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
+               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
+               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
+            }
+         }
+      }
+      else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+      {
+         /* This premultiplies the pixels with the alpha channel in GA */
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp = row + row_info->rowbytes;
+            png_bytep dp = sp;
+            png_uint_16 a = 0;
+                      png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+               a = *(--sp); --dp;
+               *(--dp) = (*(--sp) * a) / 255;
+            }
+         }
+         /* This premultiplies the pixels with the alpha channel in GGAA */
+         else
+         {
+            png_uint_16p sp  = (png_uint_16p) (row + row_info->rowbytes);
+            png_uint_16p dp  = sp;
+                      png_uint_32 a = 0;
+                      png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+                              a = *(--sp); --dp;
+               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
             }
          }
       }

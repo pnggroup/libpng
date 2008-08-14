@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta29 - August 9, 2008
+ * libpng version 1.4.0beta30 - August 14, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -96,34 +96,34 @@
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
 
 /* flags for the transformations the PNG library does on the image data */
-#define PNG_BGR                0x0001
-#define PNG_INTERLACE          0x0002
-#define PNG_PACK               0x0004
-#define PNG_SHIFT              0x0008
-#define PNG_SWAP_BYTES         0x0010
-#define PNG_INVERT_MONO        0x0020
-#define PNG_DITHER             0x0040
-#define PNG_BACKGROUND         0x0080
-#define PNG_BACKGROUND_EXPAND  0x0100
-                          /*   0x0200 unused */
-#define PNG_16_TO_8            0x0400
-#define PNG_RGBA               0x0800
-#define PNG_EXPAND             0x1000
-#define PNG_GAMMA              0x2000
-#define PNG_GRAY_TO_RGB        0x4000
-#define PNG_FILLER             0x8000L
-#define PNG_PACKSWAP          0x10000L
-#define PNG_SWAP_ALPHA        0x20000L
-#define PNG_STRIP_ALPHA       0x40000L
-#define PNG_INVERT_ALPHA      0x80000L
-#define PNG_USER_TRANSFORM   0x100000L
-#define PNG_RGB_TO_GRAY_ERR  0x200000L
-#define PNG_RGB_TO_GRAY_WARN 0x400000L
-#define PNG_RGB_TO_GRAY      0x600000L  /* two bits, RGB_TO_GRAY_ERR|WARN */
-                       /*    0x800000L     Unused */
-#define PNG_ADD_ALPHA       0x1000000L  /* Added to libpng-1.2.7 */
-#define PNG_EXPAND_tRNS     0x2000000L  /* Added to libpng-1.2.9 */
-                       /*   0x4000000L  unused */
+#define PNG_BGR                 0x0001
+#define PNG_INTERLACE           0x0002
+#define PNG_PACK                0x0004
+#define PNG_SHIFT               0x0008
+#define PNG_SWAP_BYTES          0x0010
+#define PNG_INVERT_MONO         0x0020
+#define PNG_DITHER              0x0040
+#define PNG_BACKGROUND          0x0080
+#define PNG_BACKGROUND_EXPAND   0x0100
+                          /*    0x0200 unused */
+#define PNG_16_TO_8             0x0400
+#define PNG_RGBA                0x0800
+#define PNG_EXPAND              0x1000
+#define PNG_GAMMA               0x2000
+#define PNG_GRAY_TO_RGB         0x4000
+#define PNG_FILLER              0x8000L
+#define PNG_PACKSWAP           0x10000L
+#define PNG_SWAP_ALPHA         0x20000L
+#define PNG_STRIP_ALPHA        0x40000L
+#define PNG_INVERT_ALPHA       0x80000L
+#define PNG_USER_TRANSFORM    0x100000L
+#define PNG_RGB_TO_GRAY_ERR   0x200000L
+#define PNG_RGB_TO_GRAY_WARN  0x400000L
+#define PNG_RGB_TO_GRAY       0x600000L  /* two bits, RGB_TO_GRAY_ERR|WARN */
+                       /*     0x800000L     Unused */
+#define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
+#define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
+#define PNG_PREMULTIPLY_ALPHA 0x4000000L  /* Added to libpng-1.4.0 by volker */
                        /*   0x8000000L  unused */
                        /*  0x10000000L  unused */
                        /*  0x20000000L  unused */
@@ -582,6 +582,11 @@ PNG_EXTERN void png_do_read_invert_alpha PNGARG((png_row_infop row_info,
 
 #if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
 PNG_EXTERN void png_do_write_invert_alpha PNGARG((png_row_infop row_info,
+   png_bytep row));
+#endif
+
+#if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
+PNG_EXTERN void png_do_read_premultiply_alpha PNGARG((png_row_infop row_info,
    png_bytep row));
 #endif
 

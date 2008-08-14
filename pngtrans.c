@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.4.0 [August 9, 2008]
+ * Last changed in libpng 1.4.0 [August 14, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -159,6 +159,19 @@ png_set_invert_alpha(png_structp png_ptr)
    png_debug(1, "in png_set_invert_alpha");
    if (png_ptr == NULL) return;
    png_ptr->transformations |= PNG_INVERT_ALPHA;
+}
+#endif
+
+#if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
+void PNGAPI
+png_set_premultiply_alpha(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_premultiply_alpha\n");
+   if(png_ptr == NULL) return;
+   png_ptr->transformations |= PNG_PREMULTIPLY_ALPHA;
+   png_set_palette_to_rgb(png_ptr);
+   png_set_expand_gray_1_2_4_to_8(png_ptr);
+   png_set_tRNS_to_alpha(png_ptr);
 }
 #endif
 

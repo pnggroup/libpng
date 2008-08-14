@@ -1979,6 +1979,9 @@ version 1.4.0beta29 [August 9, 2008]
   Added PNG_STRING_COPYRIGHT macro.
   Added non-ISO versions of png_debug macros.
 
+version 1.4.0beta30 [August 14, 2008]
+  Added premultiplied alpha feature (Volker Wiendl).
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

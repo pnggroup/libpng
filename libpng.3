@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "August 9, 2008"
+.TH LIBPNG 3 "August 14, 2008"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta29
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta30
 .SH SYNOPSIS
 \fI\fB
 
@@ -582,6 +582,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta29
 
 \fI\fB
 
+\fBvoid png_set_premultiply_alpha (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_set_progressive_read_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIprogressive_ptr\fP\fB, png_progressive_info_ptr \fP\fIinfo_fn\fP\fB, png_progressive_row_ptr \fP\fIrow_fn\fP\fB, png_progressive_end_ptr \fIend_fn\fP\fB);\fP
 
 \fI\fB
@@ -797,7 +801,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta29 - August 9, 2008
+ libpng version 1.4.0beta30 - August 14, 2008
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -1621,6 +1625,12 @@ fully opaque and 255 (in 8-bit or paletted images) or 65535 (in 16-bit
 images) is fully transparent, with
 
     png_set_invert_alpha(png_ptr);
+
+The PNG format only supports pixels with postmultiplied alpha.
+If you want to replace the pixels, after reading them, with pixels
+that have premultiplied color samples, you can do this with
+
+    png_set_premultiply_alpha(png_ptr);
 
 PNG files pack pixels of bit depths 1, 2, and 4 into bytes as small as
 they can, resulting in, for example, 8 pixels per byte for 1 bit
@@ -3716,13 +3726,13 @@ application:
 
 .SH IX. Y2K Compliance in libpng
 
-August 9, 2008
+August 14, 2008
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta29 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta30 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -3945,7 +3955,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.4.0beta29 - August 9, 2008:
+Libpng version 1.4.0beta30 - August 14, 2008:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -3966,7 +3976,7 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.4.0beta29, August 9, 2008, are
+libpng versions 1.2.6, August 15, 2004, through 1.4.0beta30, August 14, 2008, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4065,7 +4075,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-August 9, 2008
+August 14, 2008
 
 .\" end of man page
 

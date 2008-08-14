@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta29 - August 9, 2008
+Libpng 1.4.0beta30 - August 14, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta29.tar.gz
-   1.4.0beta29.tar.bz2
+   1.4.0beta30.tar.gz
+   1.4.0beta30.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta29-no-config.tar.gz
-   1.4.0beta29-no-config.tar.bz2
+   1.4.0beta30-no-config.tar.gz
+   1.4.0beta30-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b29.zip
-   lp140b29.tar.bz2
+   lp140b30.zip
+   lp140b30.tar.bz2
 
 Other information:
 
-   1.4.0beta29-README.txt
-   1.4.0beta29-KNOWNBUGS.txt
-   1.4.0beta29-LICENSE.txt
-   1.4.0beta29-Y2K-compliance.txt
+   1.4.0beta30-README.txt
+   1.4.0beta30-KNOWNBUGS.txt
+   1.4.0beta30-LICENSE.txt
+   1.4.0beta30-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -305,6 +305,9 @@ version 1.4.0beta29 [August 9, 2008]
   Revised usage of PNG_STRING_NEWLINE to work on non-ISO compilers.
   Added PNG_STRING_COPYRIGHT macro.
   Added non-ISO versions of png_debug macros.
+
+version 1.4.0beta30 [August 14, 2008]
+  Added premultiplied alpha feature (Volker Wiendl).
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
