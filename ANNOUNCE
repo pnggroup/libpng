@@ -1,76 +1,54 @@
 
-Libpng 1.2.30 - August 15, 2008
+Libpng 1.2.31rc01 - August 19, 2008
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.30.tar.gz
-   libpng-1.2.30.tar.lzma
+   libpng-1.2.31rc01.tar.gz
+   libpng-1.2.31rc01.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.30.tar.bz2
+   libpng-1.2.31rc01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.30-no-config.tar.gz
-   libpng-1.2.30-no-config.tar.lzma
-   libpng-1.2.30-no-config.tar.bz2
+   libpng-1.2.31rc01-no-config.tar.gz
+   libpng-1.2.31rc01-no-config.tar.lzma
+   libpng-1.2.31rc01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1230.zip
-   lpng1230.7z
-   lpng1230.tar.bz2
+   lp1231r01.zip
+   lp1231r01.7z
+   lp1231r01.tar.bz2
 
 Project files
 
-   libpng-1.2.30-project-netware.zip
-   libpng-1.2.30-project-wince.zip
+   libpng-1.2.31rc01-project-netware.zip
+   libpng-1.2.31rc01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.30-README.txt
-   libpng-1.2.30-KNOWNBUGS.txt
-   libpng-1.2.30-LICENSE.txt
-   libpng-1.2.30-Y2K-compliance.txt
-   libpng-1.2.30-[previous version]-diff.txt
+   libpng-1.2.31rc01-README.txt
+   libpng-1.2.31rc01-KNOWNBUGS.txt
+   libpng-1.2.31rc01-LICENSE.txt
+   libpng-1.2.31rc01-Y2K-compliance.txt
+   libpng-1.2.31rc01-[previous version]-diff.txt
 
-Changes since the last public release (1.2.29):
+Changes since the last public release (1.2.30):
 
-version 1.2.30 [August 15, 2008]
-
-  Updated libpng.pc-configure.in and libpng-config.in per debian bug reports.
-  Restored png_flush(png_ptr) at the end of png_write_end(), that was
-    removed from libpng-1.0.9beta03.
-  Merged some cosmetic whitespace changes from libpng-1.4.0beta19.
-  Inline call of png_get_uint_32() in png_get_uint_31(), as in 1.4.0beta19.
-  Added demo of decoding vpAg and sTER chunks to pngtest.c, from 1.4.0beta19.
-  Changed PNGMAJ from 0 to 12 in makefile.darwin, which does not like 0.
-  Added new private function png_read_chunk_header() from 1.4.0beta19.
-  Merge reading of chunk length and chunk type into a single 8-byte read.
-  Merge writing of chunk length and chunk type into a single 8-byte write.
-  Moved local array "chunkdata" from pngrutil.c to the png_struct, so
-    it will be freed by png_read_destroy() in case of a read error (Kurt
-    Christensen).
-  Change "purpose" and "buffer" to png_ptr->chunkdata to avoid memory leaking.
-  Change "chunkdata" to "png_ptr->chunkdata" in png_decompress_chunk(),
-    and remove chunkdata from parameter list.
-  Put a call to png_check_chunk_name() in png_read_chunk_header().
-  Removed two calls to png_check_chunk_name() occuring later in the process.
-  Added a call to png_check_chunk_name() in pngpread.c
-  Relocated a misplaced "#endif /* PNG_NO_WRITE_FILTER */" in pngwutil.c
-  Changed "-Wall" to "-W -Wall" in the CFLAGS in all makefiles (Cosmin Truta)
-  Declared png_ptr "volatile" in pngread.c and pngwrite.c to avoid warnings.
-  Enclose "volatile" declarations in #ifdef PNG_SETJMP_SUPPORTED (Cosmin).
-  Added code in pngset.c to quiet compiler warnings.
-  Updated contrib/visupng/cexcept.h to version 2.0.1
+version 1.2.31rc01 [August 19, 2008]
+  Removed extra crc check at the end of png_handle_cHRM().  Bug introduced
+    in libpng-1.2.30.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
