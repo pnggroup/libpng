@@ -2232,6 +2232,10 @@ version 1.2.31rc01 [August 19, 2008]
 version 1.2.31rc02 [August 19, 2008]
   Added PNG_WRITE_FLUSH_SUPPORTED block around new png_flush() call.
 
+version 1.2.31rc03 [August 19, 2008]
+  Added PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED block, off by default, around
+    new png_flush().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

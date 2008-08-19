@@ -1,5 +1,5 @@
 
-Libpng 1.2.31rc02 - August 19, 2008
+Libpng 1.2.31rc03 - August 19, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.31rc02.tar.gz
-   libpng-1.2.31rc02.tar.lzma
+   libpng-1.2.31rc03.tar.gz
+   libpng-1.2.31rc03.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.31rc02.tar.bz2
+   libpng-1.2.31rc03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.31rc02-no-config.tar.gz
-   libpng-1.2.31rc02-no-config.tar.lzma
-   libpng-1.2.31rc02-no-config.tar.bz2
+   libpng-1.2.31rc03-no-config.tar.gz
+   libpng-1.2.31rc03-no-config.tar.lzma
+   libpng-1.2.31rc03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1231r02.zip
-   lp1231r02.7z
-   lp1231r02.tar.bz2
+   lp1231r03.zip
+   lp1231r03.7z
+   lp1231r03.tar.bz2
 
 Project files
 
-   libpng-1.2.31rc02-project-netware.zip
-   libpng-1.2.31rc02-project-wince.zip
+   libpng-1.2.31rc03-project-netware.zip
+   libpng-1.2.31rc03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.31rc02-README.txt
-   libpng-1.2.31rc02-KNOWNBUGS.txt
-   libpng-1.2.31rc02-LICENSE.txt
-   libpng-1.2.31rc02-Y2K-compliance.txt
-   libpng-1.2.31rc02-[previous version]-diff.txt
+   libpng-1.2.31rc03-README.txt
+   libpng-1.2.31rc03-KNOWNBUGS.txt
+   libpng-1.2.31rc03-LICENSE.txt
+   libpng-1.2.31rc03-Y2K-compliance.txt
+   libpng-1.2.31rc03-[previous version]-diff.txt
 
 Changes since the last public release (1.2.30):
 
@@ -48,7 +48,11 @@ version 1.2.31rc01 [August 19, 2008]
     in libpng-1.2.30 (Heiko Nitzsche).
 
 version 1.2.31rc02 [August 19, 2008]
-  Added PNG_WRITE_FLUSH_SUPPORTED block around new png_flush() call.
+  Added PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED block around new png_flush().
+
+version 1.2.31rc03 [August 19, 2008]
+  Added PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED block, off by default, around
+    new png_flush().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
