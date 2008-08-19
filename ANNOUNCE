@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta30 - August 14, 2008
+Libpng 1.4.0beta31 - August 19, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta30.tar.gz
-   1.4.0beta30.tar.bz2
+   1.4.0beta31.tar.gz
+   1.4.0beta31.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta30-no-config.tar.gz
-   1.4.0beta30-no-config.tar.bz2
+   1.4.0beta31-no-config.tar.gz
+   1.4.0beta31-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b30.zip
-   lp140b30.tar.bz2
+   lp140b31.zip
+   lp140b31.tar.bz2
 
 Other information:
 
-   1.4.0beta30-README.txt
-   1.4.0beta30-KNOWNBUGS.txt
-   1.4.0beta30-LICENSE.txt
-   1.4.0beta30-Y2K-compliance.txt
+   1.4.0beta31-README.txt
+   1.4.0beta31-KNOWNBUGS.txt
+   1.4.0beta31-LICENSE.txt
+   1.4.0beta31-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -308,6 +308,9 @@ version 1.4.0beta29 [August 9, 2008]
 
 version 1.4.0beta30 [August 14, 2008]
   Added premultiplied alpha feature (Volker Wiendl).
+
+version 1.4.0beta31 [August 19, 2008]
+  Moved png_set_premultiply_alpha from pngtrans.c to pngrtran.c
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

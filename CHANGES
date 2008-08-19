@@ -1982,6 +1982,11 @@ version 1.4.0beta29 [August 9, 2008]
 version 1.4.0beta30 [August 14, 2008]
   Added premultiplied alpha feature (Volker Wiendl).
 
+version 1.4.0beta31 [August 19, 2008]
+  Moved png_set_premultiply_alpha from pngtrans.c to pngrtran.c
+  Removed extra crc check at the end of png_handle_cHRM().  Bug introduced
+    in libpng-1.4.0beta20.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

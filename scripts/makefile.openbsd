@@ -8,7 +8,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.4.0beta30
+SHLIB_MINOR=	1.4.0beta31
 
 LIB=	png
 SRCS=	png.c pngerror.c pnggccrd.c pngget.c pngmem.c pngpread.c \

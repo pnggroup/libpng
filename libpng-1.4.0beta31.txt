@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta30 - August 14, 2008
+ libpng version 1.4.0beta31 - August 19, 2008
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -830,6 +830,9 @@ If you want to replace the pixels, after reading them, with pixels
 that have premultiplied color samples, you can do this with
 
     png_set_premultiply_alpha(png_ptr);
+
+If you do this, any input with a tRNS chunk will be expanded to
+have an alpha channel.
 
 PNG files pack pixels of bit depths 1, 2, and 4 into bytes as small as
 they can, resulting in, for example, 8 pixels per byte for 1 bit
@@ -2925,13 +2928,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-August 14, 2008
+August 19, 2008
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta30 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta31 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

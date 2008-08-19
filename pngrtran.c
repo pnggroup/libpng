@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [August 14, 2008]
+ * Last changed in libpng 1.4.0 [August 19, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -115,6 +115,20 @@ png_set_strip_alpha(png_structp png_ptr)
    png_debug(1, "in png_set_strip_alpha");
    if (png_ptr == NULL) return;
    png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
+}
+#endif
+
+#if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
+void PNGAPI
+png_set_premultiply_alpha(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_premultiply_alpha\n");
+   if(png_ptr == NULL) return;
+   png_ptr->transformations |=
+     (PNG_PREMULTIPLY_ALPHA | PNG_EXPAND_tRNS);
+   png_ptr->transformations |=
+     PNG_EXPAND;  /* This shouldn't be necessary */
+   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
 #endif
 

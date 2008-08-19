@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.4.0beta30
+;Version 1.4.0beta31
   png_build_grayscale_palette
   png_chunk_error
   png_chunk_warning
@@ -225,3 +225,4 @@ EXPORTS
 ; png_set_benign_error
   png_get_io_chunk_name
   png_get_io_state
+  png_set_premultiply_alpha
