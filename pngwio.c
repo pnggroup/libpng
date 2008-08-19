@@ -119,7 +119,7 @@ png_default_flush(png_structp png_ptr)
    png_FILE_p io_ptr;
    if (png_ptr == NULL) return;
    io_ptr = (png_FILE_p)CVT_PTR((png_ptr->io_ptr));
-   if (io_ptr != NULL)
+   if (io_ptr != NULL && fileno(io_ptr)!=-1)
       fflush(io_ptr);
 }
 #endif

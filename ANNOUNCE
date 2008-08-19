@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta31 - August 19, 2008
+Libpng 1.4.0beta32 - August 19, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta31.tar.gz
-   1.4.0beta31.tar.bz2
+   1.4.0beta32.tar.gz
+   1.4.0beta32.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta31-no-config.tar.gz
-   1.4.0beta31-no-config.tar.bz2
+   1.4.0beta32-no-config.tar.gz
+   1.4.0beta32-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b31.zip
-   lp140b31.tar.bz2
+   lp140b32.zip
+   lp140b32.tar.bz2
 
 Other information:
 
-   1.4.0beta31-README.txt
-   1.4.0beta31-KNOWNBUGS.txt
-   1.4.0beta31-LICENSE.txt
-   1.4.0beta31-Y2K-compliance.txt
+   1.4.0beta32-README.txt
+   1.4.0beta32-KNOWNBUGS.txt
+   1.4.0beta32-LICENSE.txt
+   1.4.0beta32-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -309,8 +309,14 @@ version 1.4.0beta29 [August 9, 2008]
 version 1.4.0beta30 [August 14, 2008]
   Added premultiplied alpha feature (Volker Wiendl).
 
-version 1.4.0beta31 [August 19, 2008]
+version 1.4.0beta31 [August 18, 2008]
   Moved png_set_premultiply_alpha from pngtrans.c to pngrtran.c
+  Removed extra crc check at the end of png_handle_cHRM().  Bug introduced
+    in libpng-1.4.0beta20.
+
+version 1.4.0beta32 [August 19, 2008]
+  Added PNG_WRITE_FLUSH_SUPPORTED block around new png_flush() call.
+  Revised PNG_NO_STDIO version of png_write_flush()
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

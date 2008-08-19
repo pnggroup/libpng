@@ -399,7 +399,9 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
     * experiences this problem, please report the event to
     * png-mng-implement at lists.sf.net .
     */
+#if defined(PNG_WRITE_FLUSH_SUPPORTED)
    png_flush(png_ptr);
+#endif
 }
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
