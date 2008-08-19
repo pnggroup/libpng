@@ -2227,7 +2227,10 @@ version 1.0.38, 1.2.30 [August 14, 2008]
 
 version 1.2.31rc01 [August 19, 2008]
   Removed extra crc check at the end of png_handle_cHRM().  Bug introduced
-    in libpng-1.2.30.
+    in libpng-1.2.30beta03 (Heiko Nitzsche).
+
+version 1.2.31rc02 [August 19, 2008]
+  Added PNG_WRITE_FLUSH_SUPPORTED block around new png_flush() call.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
