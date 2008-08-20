@@ -1991,6 +1991,10 @@ version 1.4.0beta32 [August 19, 2008]
   Added PNG_WRITE_FLUSH_SUPPORTED block around new png_flush() call.
   Revised PNG_NO_STDIO version of png_write_flush()
 
+version 1.4.0beta33 [August 20, 2008]
+  Added png_get|set_chunk_cache_max() to limit the total number of sPLT,
+    text, and unknown chunks that can be stored.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

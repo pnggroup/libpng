@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta32 - August 19, 2008
+ libpng version 1.4.0beta33 - August 20, 2008
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -302,29 +302,6 @@ You must supply a function
 To inform libpng about your function, use
 
     png_set_read_status_fn(png_ptr, read_row_callback);
-
-Width and height limits
-
-The PNG specification allows the width and height of an image to be as
-large as 2^31-1 (0x7fffffff), or about 2.147 billion rows and columns.
-Since very few applications really need to process such large images,
-we have imposed an arbitrary 1-million limit on rows and columns.
-Larger images will be rejected immediately with a png_error() call. If
-you wish to override this limit, you can use
-
-   png_set_user_limits(png_ptr, width_max, height_max);
-
-to set your own limits, or use width_max = height_max = 0x7fffffffL
-to allow all valid dimensions (libpng may reject some very large images
-anyway because of potential buffer overflow conditions).
-
-You should put this statement after you create the PNG structure and
-before calling png_read_info(), png_read_png(), or png_process_data().
-If you need to retrieve the limits that are being applied, use
-
-   width_max = png_get_user_width_max(png_ptr);
-   height_max = png_get_user_height_max(png_ptr);
-
 Unknown-chunk handling
 
 Now you get to set the way the library processes unknown chunks in the
@@ -358,6 +335,38 @@ according to the "keep" directive.  If a chunk is named in successive
 instances of png_set_keep_unknown_chunks(), the final instance will
 take precedence.  The IHDR and IEND chunks should not be named in
 chunk_list; if they are, libpng will process them normally anyway.
+
+User limits
+
+The PNG specification allows the width and height of an image to be as
+large as 2^31-1 (0x7fffffff), or about 2.147 billion rows and columns.
+Since very few applications really need to process such large images,
+we have imposed an arbitrary 1-million limit on rows and columns.
+Larger images will be rejected immediately with a png_error() call. If
+you wish to override this limit, you can use
+
+   png_set_user_limits(png_ptr, width_max, height_max);
+
+to set your own limits, or use width_max = height_max = 0x7fffffffL
+to allow all valid dimensions (libpng may reject some very large images
+anyway because of potential buffer overflow conditions).
+
+You should put this statement after you create the PNG structure and
+before calling png_read_info(), png_read_png(), or png_process_data().
+If you need to retrieve the limits that are being applied, use
+
+   width_max = png_get_user_width_max(png_ptr);
+   height_max = png_get_user_height_max(png_ptr);
+
+The PNG specification sets no limit on the number of ancillary chunks
+allowed in a PNG datastream.  You can impose a limit on the total number
+of sPLT, tEXt, iTXt, zTXt, and unknown chunks that will be stored, with
+
+   png_set_chunk_cache_max(png_ptr, user_chunk_cache_max);
+
+where 0x7fffffffL means unlimited.  You can retrieve this limit with
+
+   chunk_cache_max = png_get_chunk_cache_max(png_ptr);
 
 The high-level read interface
 
@@ -2928,13 +2937,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-August 19, 2008
+August 20, 2008
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta32 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta33 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
