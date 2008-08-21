@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.6"
+#define PNGCRUSH_VERSION "1.6.9"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -123,11 +123,185 @@
 
 /* internal libpng macros */
 
+
+#ifdef PNG_LIBPNG_VER
+#define PNGCRUSH_LIBPNG_VER PNG_LIBPNG_VER
+#else
+/* This must agree with PNG_LIBPNG_VER; you have to define it manually
+   here if you are using libpng-1.0.6h or earlier */
+#define PNGCRUSH_LIBPNG_VER 10007
+#endif
+
+/* Changed in version 0.99 */
+#if PNGCRUSH_LIBPNG_VER < 99
+#undef PNG_CONST
+#ifndef PNG_NO_CONST
+#  define PNG_CONST const
+#else
+#  define PNG_CONST
+#endif
+#endif
+
 #define PNG_IDAT const png_byte png_IDAT[5] = { 73,  68,  65,  84, '\0'}
 #define PNG_IHDR const png_byte png_IHDR[5] = { 73,  72,  68,  82, '\0'}
 #define PNG_dSIG const png_byte png_dSIG[5] = {100,  83,  73,  71, '\0'}
 #define PNG_iCCP const png_byte png_iCCP[5] = {105,  67,  67,  80, '\0'}
 #define PNG_IEND const png_byte png_IEND[5] = { 73,  69,  78,  68, '\0'}
+
+/* GRR 20050220:  added these, which apparently aren't defined anywhere else */
+#ifndef PNG_UINT_IHDR
+#  define PNG_UINT_IHDR (((png_uint_32)  73<<24) | \
+                         ((png_uint_32)  72<<16) | \
+                         ((png_uint_32)  68<< 8) | \
+                         ((png_uint_32)  82    ))
+#endif
+
+#ifndef PNG_UINT_IDAT
+#  define PNG_UINT_IDAT (((png_uint_32)  73<<24) | \
+                         ((png_uint_32)  68<<16) | \
+                         ((png_uint_32)  65<< 8) | \
+                         ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_IEND
+#  define PNG_UINT_IEND (((png_uint_32)  73<<24) | \
+                         ((png_uint_32)  69<<16) | \
+                         ((png_uint_32)  78<< 8) | \
+                         ((png_uint_32)  68    ))
+#endif
+
+#ifndef PNG_UINT_PLTE
+#  define PNG_UINT_PLTE (((png_uint_32)  80<<24) | \
+                         ((png_uint_32)  76<<16) | \
+                         ((png_uint_32)  84<< 8) | \
+                         ((png_uint_32)  69    ))
+#endif
+
+#ifndef PNG_UINT_bKGD
+#  define PNG_UINT_bKGD (((png_uint_32)  98<<24) | \
+                         ((png_uint_32)  75<<16) | \
+                         ((png_uint_32)  71<< 8) | \
+                         ((png_uint_32)  68    ))
+#endif
+
+#ifndef PNG_UINT_cHRM
+#  define PNG_UINT_cHRM (((png_uint_32)  99<<24) | \
+                         ((png_uint_32)  72<<16) | \
+                         ((png_uint_32)  82<< 8) | \
+                         ((png_uint_32)  77    ))
+#endif
+
+#ifndef PNG_UINT_dSIG
+#  define PNG_UINT_dSIG (((png_uint_32) 100<<24) | \
+                         ((png_uint_32)  83<<16) | \
+                         ((png_uint_32)  73<< 8) | \
+                         ((png_uint_32)  71    ))
+#endif
+
+#ifndef PNG_UINT_gAMA
+#  define PNG_UINT_gAMA (((png_uint_32) 103<<24) | \
+                         ((png_uint_32)  65<<16) | \
+                         ((png_uint_32)  77<< 8) | \
+                         ((png_uint_32)  65    ))
+#endif
+
+#ifndef PNG_UINT_hIST
+#  define PNG_UINT_hIST (((png_uint_32) 104<<24) | \
+                         ((png_uint_32)  73<<16) | \
+                         ((png_uint_32)  83<< 8) | \
+                         ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_iCCP
+#  define PNG_UINT_iCCP (((png_uint_32) 105<<24) | \
+                         ((png_uint_32)  67<<16) | \
+                         ((png_uint_32)  67<< 8) | \
+                         ((png_uint_32)  80    ))
+#endif
+
+#ifndef PNG_UINT_iTXt
+#  define PNG_UINT_iTXt (((png_uint_32) 105<<24) | \
+                         ((png_uint_32)  84<<16) | \
+                         ((png_uint_32)  88<< 8) | \
+                         ((png_uint_32) 116    ))
+#endif
+
+#ifndef PNG_UINT_oFFs
+#  define PNG_UINT_oFFs (((png_uint_32) 111<<24) | \
+                         ((png_uint_32)  70<<16) | \
+                         ((png_uint_32)  70<< 8) | \
+                         ((png_uint_32) 115    ))
+#endif
+
+#ifndef PNG_UINT_pCAL
+#  define PNG_UINT_pCAL (((png_uint_32) 112<<24) | \
+                         ((png_uint_32)  67<<16) | \
+                         ((png_uint_32)  65<< 8) | \
+                         ((png_uint_32)  76    ))
+#endif
+
+#ifndef PNG_UINT_pHYs
+#  define PNG_UINT_pHYs (((png_uint_32) 112<<24) | \
+                         ((png_uint_32)  72<<16) | \
+                         ((png_uint_32)  89<< 8) | \
+                         ((png_uint_32) 115    ))
+#endif
+
+#ifndef PNG_UINT_sBIT
+#  define PNG_UINT_sBIT (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  66<<16) | \
+                         ((png_uint_32)  73<< 8) | \
+                         ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_sCAL
+#  define PNG_UINT_sCAL (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  67<<16) | \
+                         ((png_uint_32)  65<< 8) | \
+                         ((png_uint_32)  76    ))
+#endif
+
+#ifndef PNG_UINT_sPLT
+#  define PNG_UINT_sPLT (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  80<<16) | \
+                         ((png_uint_32)  76<< 8) | \
+                         ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_sRGB
+#  define PNG_UINT_sRGB (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  82<<16) | \
+                         ((png_uint_32)  71<< 8) | \
+                         ((png_uint_32)  66    ))
+#endif
+
+#ifndef PNG_UINT_tEXt
+#  define PNG_UINT_tEXt (((png_uint_32) 116<<24) | \
+                         ((png_uint_32)  69<<16) | \
+                         ((png_uint_32)  88<< 8) | \
+                         ((png_uint_32) 116    ))
+#endif
+
+#ifndef PNG_UINT_tIME
+#  define PNG_UINT_tIME (((png_uint_32) 116<<24) | \
+                         ((png_uint_32)  73<<16) | \
+                         ((png_uint_32)  77<< 8) | \
+                         ((png_uint_32)  69    ))
+#endif
+
+#ifndef PNG_UINT_tRNS
+#  define PNG_UINT_tRNS (((png_uint_32) 116<<24) | \
+                         ((png_uint_32)  82<<16) | \
+                         ((png_uint_32)  78<< 8) | \
+                         ((png_uint_32)  83    ))
+#endif
+
+#ifndef PNG_UINT_zTXt
+#  define PNG_UINT_zTXt (((png_uint_32) 122<<24) | \
+                         ((png_uint_32)  84<<16) | \
+                         ((png_uint_32)  88<< 8) | \
+                         ((png_uint_32) 116    ))
+#endif
 
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
@@ -1861,7 +2035,7 @@ int main(int argc, char *argv[])
                 if (!strncmp(argv[i], "-zi", 3)) {
                     text_compression[text_inputs] =
                         PNG_ITXT_COMPRESSION_zTXt;
-                    names += 2;
+                    /* names += 2; */
                 } else
 #endif
                 if (!strncmp(argv[i], "-z", 2))
@@ -1874,7 +2048,7 @@ int main(int argc, char *argv[])
                 else {
                     text_compression[text_inputs] =
                         PNG_ITXT_COMPRESSION_NONE;
-                    names += 2;
+                    /* names += 2; */
                 }
 #endif
                 names += 3;
@@ -1888,6 +2062,10 @@ int main(int argc, char *argv[])
                     text_lang[text_inputs * 80] = '\0';
                     text_lang_key[text_inputs * 80] = '\0';
                 } else {
+                    i += 2;
+                    BUMP_I;
+                    i -= 3;
+                    names += 2;
                     strcpy(&text_lang[text_inputs * 80], argv[++i]);
                     /* libpng-1.0.5j and later */
                     strcpy(&text_lang_key[text_inputs * 80], argv[++i]);
@@ -2306,6 +2484,28 @@ int main(int argc, char *argv[])
             printf("   color counting (-cc option) is disabled.\n");
 #endif /* PNGCRUSH_COUNT_COLORS */
 
+        if (force_output_bit_depth != 0 &&
+            force_output_bit_depth != 1 &&
+            force_output_bit_depth != 2 &&
+            force_output_bit_depth != 4 &&
+            force_output_bit_depth != 8 &&
+            force_output_bit_depth != 16)
+          {
+            fprintf(STDERR, "\n  Ignoring invalid bit_depth: %d\n",
+              force_output_bit_depth);
+            force_output_bit_depth=0;
+          }
+        if (force_output_color_type != 8 &&
+            force_output_color_type != 0 &&
+            force_output_color_type != 2 &&
+            force_output_color_type != 3 &&
+            force_output_color_type != 4 &&
+            force_output_color_type != 6)
+          {
+            fprintf(STDERR, "\n  Ignoring invalid color_type: %d\n",
+              force_output_color_type);
+            force_output_color_type=8;
+          }
         output_color_type = force_output_color_type;
         output_bit_depth = force_output_bit_depth;
 
@@ -2498,6 +2698,7 @@ int main(int argc, char *argv[])
             P2("files are opened.\n");
             png_crush_pause();
 
+/* OK to ignore any warning about the address of exception__prev in "Try" */
             Try {
                 png_uint_32 row_length;
                 P1( "Allocating read and write structures\n");
@@ -4378,6 +4579,7 @@ png_uint_32 measure_idats(FILE * fpin)
        See notice in pngcrush.c for conditions of use and distribution */
     P2("\nmeasure_idats:\n");
     P1( "Allocating read structure\n");
+/* OK to ignore any warning about the address of exception__prev in "Try" */
     Try {
         read_ptr =
             png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp) NULL,
@@ -4511,7 +4713,6 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 #endif
 #endif
 #endif
-        const png_byte png_dSIG[5] = {100,  83,  73,  71, '\0'};
         png_byte chunk_name[5];
         png_byte chunk_length[4];
         png_byte buffer[32];
@@ -4528,14 +4729,13 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
           const png_byte png_DEFI[5] = { 68, 69, 70, 73, '\0' };
           const png_byte png_FRAM[5] = { 70, 82, 65, 77, '\0' };
           const png_byte png_nEED[5] = { 110, 69, 69, 68, '\0' };
-        if (!png_memcmp(chunk_name, png_nEED, 4))
-          {
+          if (!png_memcmp(chunk_name, png_nEED, 4)) {
           /* Skip the nEED chunk */
             printf ("  skipping MNG %c%c%c%c chunk, %lu bytes\n",chunk_name[0],
               chunk_name[1],chunk_name[2],chunk_name[3],(unsigned long)length);
           }
           else {
-        /* copy the chunk. */
+          /* copy the chunk. */
             printf ("  reading MNG %c%c%c%c chunk, %lu bytes\n",chunk_name[0],
               chunk_name[1],chunk_name[2],chunk_name[3],(unsigned long)length);
             if (length > malloced_length) {
@@ -4548,57 +4748,57 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             png_write_chunk(mng_ptr, chunk_name,
                             bb, (png_size_t) length);
 
-        if (!png_memcmp(chunk_name, png_DHDR, 4)) {
-            if (verbose > 1) {
-            printf("  objid=%lu\n",(unsigned long)(bb[1]+(bb[0]<<8)));
-            printf("  itype=%lu\n",(unsigned long)(bb[2]));
-            printf("  dtype=%lu\n",(unsigned long)(bb[3]));
-            printf("  width=%lu\n",(unsigned long)(bb[7]+(bb[6]<<8)
-                      +(bb[5]<<16)+(bb[4]<<24)));
-            printf("  height=%lu\n",(unsigned long)(bb[11]+(bb[10]<<8)
-                      +(bb[9]<<16)+(bb[8]<<24)));
-            printf("  xloc=%lu\n",(unsigned long)(bb[15]+(bb[14]<<8)
-                      +(bb[13]<<16)+(bb[12]<<24)));
-            printf("  yloc=%lu\n",(unsigned long)(bb[19]+(bb[18]<<8)
-                      +(bb[17]<<16)+(bb[16]<<24)));
-            }
-        }
-
-        if (!png_memcmp(chunk_name, png_DEFI, 4)) {
-            if (verbose > 1) {
-            printf("  objid=%lu\n",(unsigned long)(bb[1]+(bb[0]<<8)));
-            printf("  do_not_show=%lu\n",(unsigned long)(bb[2]));
-            printf("  concrete=%lu\n",(unsigned long)(bb[3]));
-            if (length > 4) {
-            printf("  xloc=%lu\n",(unsigned long)(bb[15]+(bb[14]<<8)
-                      +(bb[13]<<16)+(bb[12]<<24)));
-            printf("  yloc=%lu\n",(unsigned long)(bb[19]+(bb[18]<<8)
-                      +(bb[17]<<16)+(bb[16]<<24)));
-            if (length > 12) {
-            printf("  l_cb=%lu\n",(unsigned long)(bb[20]+(bb[19]<<8)
-                      +(bb[18]<<16)+(bb[17]<<24)));
-            printf("  r_cb=%lu\n",(unsigned long)(bb[24]+(bb[23]<<8)
-                      +(bb[22]<<16)+(bb[21]<<24)));
-            }
-            }
-            }
-        }
-        if (!png_memcmp(chunk_name, png_FRAM, 4)) {
-            if (verbose > 1) {
-              printf("  mode=%lu\n",(unsigned long)bb[0]);
-              if (length > 1) {
-                int ib;
-                printf("  name = ");
-                for (ib=0; bb[ib]; ib++)
-                {
-                  printf ("%c", bb[ib]);
+            if (!png_memcmp(chunk_name, png_DHDR, 4)) {
+                if (verbose > 1) {
+                printf("  objid=%lu\n",(unsigned long)(bb[1]+(bb[0]<<8)));
+                printf("  itype=%lu\n",(unsigned long)(bb[2]));
+                printf("  dtype=%lu\n",(unsigned long)(bb[3]));
+                printf("  width=%lu\n",(unsigned long)(bb[7]+(bb[6]<<8)
+                          +(bb[5]<<16)+(bb[4]<<24)));
+                printf("  height=%lu\n",(unsigned long)(bb[11]+(bb[10]<<8)
+                          +(bb[9]<<16)+(bb[8]<<24)));
+                printf("  xloc=%lu\n",(unsigned long)(bb[15]+(bb[14]<<8)
+                          +(bb[13]<<16)+(bb[12]<<24)));
+                printf("  yloc=%lu\n",(unsigned long)(bb[19]+(bb[18]<<8)
+                          +(bb[17]<<16)+(bb[16]<<24)));
                 }
-                printf ("\n");
-              }
             }
-        }
-            length=0;
-        }
+
+            if (!png_memcmp(chunk_name, png_DEFI, 4)) {
+                if (verbose > 1) {
+                printf("  objid=%lu\n",(unsigned long)(bb[1]+(bb[0]<<8)));
+                printf("  do_not_show=%lu\n",(unsigned long)(bb[2]));
+                printf("  concrete=%lu\n",(unsigned long)(bb[3]));
+                if (length > 4) {
+                printf("  xloc=%lu\n",(unsigned long)(bb[15]+(bb[14]<<8)
+                          +(bb[13]<<16)+(bb[12]<<24)));
+                printf("  yloc=%lu\n",(unsigned long)(bb[19]+(bb[18]<<8)
+                          +(bb[17]<<16)+(bb[16]<<24)));
+                if (length > 12) {
+                printf("  l_cb=%lu\n",(unsigned long)(bb[20]+(bb[19]<<8)
+                          +(bb[18]<<16)+(bb[17]<<24)));
+                printf("  r_cb=%lu\n",(unsigned long)(bb[24]+(bb[23]<<8)
+                          +(bb[22]<<16)+(bb[21]<<24)));
+                }
+                }
+                }
+            }
+            if (!png_memcmp(chunk_name, png_FRAM, 4)) {
+                if (verbose > 1) {
+                  printf("  mode=%lu\n",(unsigned long)bb[0]);
+                  if (length > 1) {
+                    int ib;
+                    printf("  name = ");
+                    for (ib=0; bb[ib]; ib++)
+                    {
+                      printf ("%c", bb[ib]);
+                    }
+                    printf ("\n");
+                  }
+                }
+            }
+                length=0;
+            }
         }
 
         else {
@@ -4630,13 +4830,8 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             length -= 13;
             input_color_type = buffer[9];
         }
-        else
-        {
-#ifdef PNG_UINT_dSIG
+        else {
           if (png_get_uint_32(chunk_name) == PNG_UINT_dSIG)
-#else
-          if (!png_memcmp(chunk_name, png_dSIG, 4))
-#endif
           {
             if (found_any_chunk == 0 && !all_chunks_are_safe)
             {
@@ -4703,30 +4898,29 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             return sum_idat_length;
 #else
         {
-        const png_byte png_MEND[5] =
-            { 77, 69, 78, 68, '\0' };
-        if (!png_memcmp(chunk_name, png_MEND, 4))
-          {
-            if (new_mng)
-              png_free(mng_ptr,bb);
-              return (0);
-            return sum_idat_length;
+          const png_byte png_MEND[5] =
+              { 77, 69, 78, 68, '\0' };
+          if (!png_memcmp(chunk_name, png_MEND, 4)) {
+              if (new_mng) {
+                  png_free(mng_ptr,bb);
+                  return (0);
+              }
+              return sum_idat_length;
           }
         }
 #endif
 #endif
 
 
-if (input_format == 0)
-  {
+        if (input_format == 0) {
 #ifdef PNG_UINT_IEND
-        if (png_get_uint_32(chunk_name) == PNG_UINT_IEND)
+          if (png_get_uint_32(chunk_name) == PNG_UINT_IEND)
 #else
-        if (!png_memcmp(chunk_name, png_IEND, 4))
+          if (!png_memcmp(chunk_name, png_IEND, 4))
 #endif
             return sum_idat_length;
+        }
     }
-  }
 }
 
 

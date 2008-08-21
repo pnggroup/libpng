@@ -1,5 +1,16 @@
 Change log:
 
+Version 1.6.9 (built with libpng-1.2.31 and zlib-1.2.3.2)
+  Updated cexcept.h to version 2.0.1
+  Add missing curly brackets.
+
+Version 1.6.8 (built with libpng-1.2.29 and zlib-1.2.3.2)
+  Fixed bug with handling of -z and -zi options.
+
+Version 1.6.7 (built with libpng-1.2.29 and zlib-1.2.3.2)
+  Moved PNG_UINT_CHNK and some other defines from pngcrush.h to pngcrush.c
+  Reject invalid color_type or bit_depth.
+
 Version 1.6.6 (built with libpng-1.2.29 and zlib-1.2.3.2)
   Added dSIG support.  Pngcrush will not rewrite an image containing
   a dSIG chunk immediately following the IHDR chunk, unless the
