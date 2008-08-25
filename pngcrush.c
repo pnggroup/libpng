@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.9"
+#define PNGCRUSH_VERSION "1.6.10"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -266,6 +266,13 @@
                          ((png_uint_32)  80<<16) | \
                          ((png_uint_32)  76<< 8) | \
                          ((png_uint_32)  84    ))
+#endif
+
+#ifndef PNG_UINT_sTER
+#  define PNG_UINT_sTER (((png_uint_32) 115<<24) | \
+                         ((png_uint_32)  84<<16) | \
+                         ((png_uint_32)  69<< 8) | \
+                         ((png_uint_32)  82    ))
 #endif
 
 #ifndef PNG_UINT_sRGB
@@ -540,6 +547,7 @@ static int z_strategy;
 static int best_of_three;
 static int methods_specified = 0;
 static int intent = -1;
+static int ster_mode = -1;
 static int plte_len = -1;
 #ifdef PNG_FIXED_POINT_SUPPORTED
 static int specified_gamma = 0;
@@ -1459,6 +1467,8 @@ int keep_chunk(png_const_charp name, char *argv[])
                     && (!strncmp(argv[i], "scal", 4) || allb))
                 || (!strncmp(name, "sRGB", 4)
                     && (!strncmp(argv[i], "srgb", 4) || allb))
+                || (!strncmp(name, "sTER", 4)
+                    && (!strncmp(argv[i], "ster", 4) || allb))
                 || (!strncmp(name, "sPLT", 4)
                     && (!strncmp(argv[i], "splt", 4) || allb))
                 || (!strncmp(name, "tEXt", 4)
@@ -2011,6 +2021,18 @@ int main(int argc, char *argv[])
                 !strncmp(argv[i], "2", 1) || !strncmp(argv[i], "3", 1)) {
                 names++;
                 intent = (int) atoi(argv[i]);
+                global_things_have_changed = 1;
+            } else
+                i--;
+        } else if (!strncmp(argv[i], "-ster", 5) ||
+                   !strncmp(argv[i], "-sTER", 5)) {
+            BUMP_I;
+            ster_mode = -1;
+            if (!strncmp(argv[i], "0", 1) ||
+                !strncmp(argv[i], "1", 1)) {
+                names++;
+                ster_mode = (int) atoi(argv[i]);
+                global_things_have_changed = 1;
             } else
                 i--;
         } else if (!strncmp(argv[i], "-s", 2)) {
@@ -2864,6 +2886,14 @@ int main(int argc, char *argv[])
                                                         chunk_name, 1);
                         }
 #endif
+#if !defined(PNG_sTER_SUPPORTED)
+                        if (keep_unknown_chunk("sTER", argv)) {
+                            png_save_uint_32(chunk_name, PNG_UINT_sTER);
+                            png_set_keep_unknown_chunks(write_ptr,
+                                                        PNG_HANDLE_CHUNK_ALWAYS,
+                                                        chunk_name, 1);
+                        }
+#endif
 #if !defined(PNG_tIME_SUPPORTED)
                         if (keep_unknown_chunk("tIME", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_tIME);
@@ -2935,6 +2965,7 @@ int main(int argc, char *argv[])
                  *  - sBIT
                  *  - sCAL
                  *  - sPLT
+                 *  - sTER
                  *  - tEXt/zTXt/iTXt
                  *  - tIME
                  *  - unknown chunks
@@ -3793,8 +3824,29 @@ int main(int argc, char *argv[])
                     png_unknown_chunkp unknowns;   /* allocated by libpng */
                     int num_unknowns;
 
+                    if (nosave == 0 && ster_mode >= 0) {
+                      /* Add sTER chunk */
+                      png_unknown_chunkp ster;
+                      P1("Handling sTER as unknown chunk %d\n", i);
+                      ster = png_malloc(read_ptr,
+                          (png_uint_32) sizeof(png_unknown_chunk));
+                      png_memcpy((char *)ster[0].name, "sTER",5);
+                      ster[0].size = 1;
+                      ster[0].data = png_malloc(read_ptr, 1);
+                      ster[0].data[0] = (png_byte)ster_mode;
+                      png_set_unknown_chunks(read_ptr, read_info_ptr,
+                       ster, 1);
+                      png_free(read_ptr,ster[0].data);
+                      png_free(read_ptr,ster);
+                    }
+
                     num_unknowns = (int)png_get_unknown_chunks(read_ptr,
                       read_info_ptr, &unknowns);
+
+                    if (ster_mode >= 0)
+                      png_set_unknown_chunk_location(read_ptr, read_info_ptr,
+                         num_unknowns - 1, (int)PNG_HAVE_IHDR);
+
                     P1("Found %d unknown chunks\n", num_unknowns);
 
                     if (nosave == 0 && num_unknowns) {
@@ -3803,7 +3855,9 @@ int main(int argc, char *argv[])
                         int i;
 
                         unknowns_keep = png_malloc(write_ptr,
-                          (png_uint_32) num_unknowns*sizeof(png_unknown_chunk));
+                          (png_uint_32) num_unknowns
+                          *sizeof(png_unknown_chunk));
+
                         P1("malloc for %d unknown chunks\n", num_unknowns);
                         num_unknowns_keep = 0;
 
@@ -3817,7 +3871,7 @@ int main(int argc, char *argv[])
                               (unsigned long)unknowns[i].size,
                               unknowns[i].location);
                             if (keep_chunk((char *)unknowns[i].name, argv)) {
-                                memcpy(&unknowns_keep[num_unknowns_keep],
+                                png_memcpy(&unknowns_keep[num_unknowns_keep],
                                   &unknowns[i], sizeof(png_unknown_chunk));
                                 ++num_unknowns_keep;
                             }
@@ -5773,6 +5827,12 @@ struct options_help pngcrush_options[] = {
     {0, "         -srgb [0, 1, 2, or 3]"},
     {2, ""},
     {2, "               Value of 'rendering intent' for sRGB chunk."},
+    {2, ""},
+
+    {0, "         -ster [0 or 1]"},
+    {2, ""},
+    {2, "               Value of 'stereo mode' for sTER chunk."},
+    {2, "               0: cross-fused; 1: divergent-fused"},
     {2, ""},
 
     {0, "         -text b[efore_IDAT]|a[fter_IDAT] \"keyword\" \"text\""},

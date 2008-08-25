@@ -1,5 +1,8 @@
 Change log:
 
+Version 1.6.10 (built with libpng-1.2.31 and zlib-1.2.3.2)
+  Add sTER chunk support.
+
 Version 1.6.9 (built with libpng-1.2.31 and zlib-1.2.3.2)
   Updated cexcept.h to version 2.0.1
   Add missing curly brackets.

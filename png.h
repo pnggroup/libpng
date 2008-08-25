@@ -684,12 +684,12 @@ typedef png_time FAR * FAR * png_timepp;
  * up private chunks for output even though the library doesn't actually
  * know about their semantics.
  */
-#define PNG_CHUNK_NAME_LENGTH 5
+#define PNG_CHUNK_NAME_LENGTH 5      /* probably should be 4 */
 typedef struct png_unknown_chunk_t
 {
     png_byte name[PNG_CHUNK_NAME_LENGTH];
     png_byte *data;
-    png_size_t size;
+    png_size_t size;  /* length of data */
 
     /* libpng-using applications should NOT directly modify this byte. */
     png_byte location; /* mode of operation at read time */
