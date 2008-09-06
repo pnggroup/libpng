@@ -1995,6 +1995,10 @@ version 1.4.0beta33 [August 20, 2008]
   Added png_get|set_chunk_cache_max() to limit the total number of sPLT,
     text, and unknown chunks that can be stored.
 
+version 1.4.0beta34 [September 6, 2008]
+  Shortened tIME_string to 29 bytes in pngtest.c
+  Fixed off-by-one error introduced in in libpng-1.2.30beta04/pngpread.c
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

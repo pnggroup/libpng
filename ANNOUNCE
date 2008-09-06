@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta33 - August 20, 2008
+Libpng 1.4.0beta34 - September 6, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta33.tar.gz
-   1.4.0beta33.tar.bz2
+   1.4.0beta34.tar.gz
+   1.4.0beta34.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta33-no-config.tar.gz
-   1.4.0beta33-no-config.tar.bz2
+   1.4.0beta34-no-config.tar.gz
+   1.4.0beta34-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b33.zip
-   lp140b33.tar.bz2
+   lp140b34.zip
+   lp140b34.tar.bz2
 
 Other information:
 
-   1.4.0beta33-README.txt
-   1.4.0beta33-KNOWNBUGS.txt
-   1.4.0beta33-LICENSE.txt
-   1.4.0beta33-Y2K-compliance.txt
+   1.4.0beta34-README.txt
+   1.4.0beta34-KNOWNBUGS.txt
+   1.4.0beta34-LICENSE.txt
+   1.4.0beta34-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -321,6 +321,10 @@ version 1.4.0beta32 [August 19, 2008]
 version 1.4.0beta33 [August 20, 2008]
   Added png_set_chunk_cache_max() to limit the total number of sPLT,
     text, and unknown chunks that can be stored.
+
+version 1.4.0beta34 [September 6, 2008]
+  Shortened tIME_string to 29 bytes in pngtest.c
+  Fixed off-by-one error introduced in in libpng-1.2.30beta04/pngpread.c
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

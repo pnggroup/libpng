@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [August 20, 2008]
+ * Last changed in libpng 1.4.0 [September 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -62,9 +62,9 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #endif
 
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
-#define PNG_tIME_STRING_LENGTH 30
+#define PNG_tIME_STRING_LENGTH 29
 static int tIME_chunk_present = 0;
-static char tIME_string[PNG_tIME_STRING_LENGTH] = "no tIME chunk present in file";
+static char tIME_string[PNG_tIME_STRING_LENGTH] = "tIME chunk is not present";
 #endif
 
 static int verbose = 0;
@@ -1613,4 +1613,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta33 your_png_h_is_not_version_1_4_0beta33;
+typedef version_1_4_0beta34 your_png_h_is_not_version_1_4_0beta34;
