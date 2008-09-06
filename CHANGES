@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [August 21, 2008]
+version 1.0.38rc01, 1.2.30rc01 [September 6, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2238,6 +2238,10 @@ version 1.2.31rc03 [August 19, 2008]
 
 version 1.0.39, 1.2.31 [August 21, 2008]
   No changes.
+
+version 1.2.32beta01 [September 6, 2008]
+  Shortened tIME_string to 29 bytes in pngtest.c
+  Fixed off-by-one error introduced in in libpng-1.2.30beta04/pngpread.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

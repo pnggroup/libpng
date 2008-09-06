@@ -1279,7 +1279,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
                tmp = text;
                text = (png_charp)png_malloc(png_ptr, text_size +
                   (png_uint_32)(png_ptr->zbuf_size 
-                  - png_ptr->zstream.avail_out));
+                  - png_ptr->zstream.avail_out + 1));
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
                png_memcpy(text + text_size, png_ptr->zbuf,

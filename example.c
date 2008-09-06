@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.2.30 [August 15, 2008]
+ * Last changed in libpng 1.2.32 [September 6, 2008]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2008 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -608,7 +608,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    /* set up the output control if you are using standard C streams */
    png_init_io(png_ptr, fp);
 #else no_streams /* I/O initialization method 2 */
-   /* If you are using replacement read functions, instead of calling
+   /* If you are using replacement write functions, instead of calling
     * png_init_io() here you would call */
    png_set_write_fn(png_ptr, (void *)user_io_ptr, user_write_fn,
       user_IO_flush_function);
