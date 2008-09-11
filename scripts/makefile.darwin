@@ -19,7 +19,7 @@ ZLIBINC=../zlib
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 12
-PNGMIN = 1.2.32beta01
+PNGMIN = 1.2.32rc01
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -104,14 +104,14 @@ $(LIBSOMAJ): $(LIBSOVER)
 $(LIBSOVER): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(LIBSOMAJ) \
-	 -current_version $(PNGVER) -compatibility_version $(PNGVER) \
+	 -current_version $(SONUM) -compatibility_version $(SONUM) \
 	 -o $(LIBSOVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
 $(OLDSOVER): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(OLDSOMAJ) \
-	 -current_version 3 -compatibility_version 3 \
+	 -current_version %OLDSONUM% -compatibility_version %OLDSONUM% \
 	 -o $(OLDSOVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
