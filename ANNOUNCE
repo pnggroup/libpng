@@ -1,73 +1,54 @@
 
-Libpng 1.2.32rc01 - September 11, 2008
+Libpng 1.2.32 - September 18, 2008
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.32rc01.tar.gz
-   libpng-1.2.32rc01.tar.lzma
+   libpng-1.2.32.tar.gz
+   libpng-1.2.32.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.32rc01.tar.bz2
+   libpng-1.2.32.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.32rc01-no-config.tar.gz
-   libpng-1.2.32rc01-no-config.tar.lzma
-   libpng-1.2.32rc01-no-config.tar.bz2
+   libpng-1.2.32-no-config.tar.gz
+   libpng-1.2.32-no-config.tar.lzma
+   libpng-1.2.32-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1232r01.zip
-   lp1232r01.7z
-   lp1232r01.tar.bz2
+   lpng1232.zip
+   lpng1232.7z
+   lpng1232.tar.bz2
 
 Project files
 
-   libpng-1.2.32rc01-project-netware.zip
-   libpng-1.2.32rc01-project-wince.zip
+   libpng-1.2.32-project-netware.zip
+   libpng-1.2.32-project-wince.zip
 
 Other information:
 
-   libpng-1.2.32rc01-README.txt
-   libpng-1.2.32rc01-KNOWNBUGS.txt
-   libpng-1.2.32rc01-LICENSE.txt
-   libpng-1.2.32rc01-Y2K-compliance.txt
-   libpng-1.2.32rc01-[previous version]-diff.txt
+   libpng-1.2.32-README.txt
+   libpng-1.2.32-KNOWNBUGS.txt
+   libpng-1.2.32-LICENSE.txt
+   libpng-1.2.32-Y2K-compliance.txt
+   libpng-1.2.32-[previous version]-diff.txt
 
-Changes since the last public release (1.2.30):
+Changes since the last public release (1.2.31):
 
-version 1.2.31rc01 [August 19, 2008]
-  Removed extra crc check at the end of png_handle_cHRM().  Bug introduced
-    in libpng-1.2.30 (Heiko Nitzsche).
+version 1.2.32 [September 18, 2008]
 
-version 1.2.31rc02 [August 19, 2008]
-  Added PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED block around new png_flush().
-
-version 1.2.31rc03 [August 19, 2008]
-  Added PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED block, off by default, around
-    new png_flush().
-
-version 1.0.39, 1.2.31 [August 20, 2008]
-  No changes.
-
-version 1.2.32beta01 [September 6, 2008]
   Shortened tIME_string to 29 bytes in pngtest.c
   Fixed off-by-one error introduced in png_push_read_zTXt() function in
-    libpng-1.2.30beta04/pngpread.c (Harald van Dijk)
-
-version 1.0.40rc01, 1.2.32rc01 [September 11, 2008]
-  No changes.
-
+    libpng-1.2.30/pngpread.c (Harald van Dijk)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
