@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [September 6, 2008]
+ * Last changed in libpng 1.4.0 [October 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1044,21 +1044,21 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_bytep trans;
       int num_trans;
-      png_color_16p trans_values;
+      png_color_16p trans_color;
 
       if (png_get_tRNS(read_ptr, read_info_ptr, &trans, &num_trans,
-         &trans_values))
+         &trans_color))
       {
          int sample_max = (1 << read_info_ptr->bit_depth);
          /* libpng doesn't reject a tRNS chunk with out-of-range samples */
          if (!((read_info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
-            (int)trans_values->gray > sample_max) ||
+            (int)trans_color->gray > sample_max) ||
             (read_info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
-            ((int)trans_values->red > sample_max ||
-            (int)trans_values->green > sample_max ||
-            (int)trans_values->blue > sample_max))))
+            ((int)trans_color->red > sample_max ||
+            (int)trans_color->green > sample_max ||
+            (int)trans_color->blue > sample_max))))
            png_set_tRNS(write_ptr, write_info_ptr, trans, num_trans,
-              trans_values);
+              trans_color);
       }
    }
 #endif
@@ -1613,4 +1613,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta34 your_png_h_is_not_version_1_4_0beta34;
+typedef version_1_4_0beta35 your_png_h_is_not_version_1_4_0beta35;

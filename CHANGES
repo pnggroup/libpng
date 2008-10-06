@@ -1997,7 +1997,15 @@ version 1.4.0beta33 [August 20, 2008]
 
 version 1.4.0beta34 [September 6, 2008]
   Shortened tIME_string to 29 bytes in pngtest.c
-  Fixed off-by-one error introduced in in libpng-1.2.30beta04/pngpread.c
+  Fixed off-by-one error introduced in png_push_read_zTXt() function in
+    libpng-1.2.30beta04/pngpread.c (Harald van Dijk)
+
+version 1.4.0beta35 [October 6, 2008]
+  Changed "trans_values" to "trans_color".
+  Changed so-number from 0 to 14.  Some OS do not like 0.
+  Revised makefile.darwin to fix shared library numbering.
+  Change png_set_gray_1_2_4_to_8() to png_set_expand_gray_1_2_4_to_8()
+    in example.c (debian bug report)
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [September 6, 2008]
+ * Last changed in libpng 1.4.0 [October 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -156,7 +156,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
                info_ptr->trans[j] = (png_byte)(255 - info_ptr->trans[j]);
          }
 #endif
-      png_write_tRNS(png_ptr, info_ptr->trans, &(info_ptr->trans_values),
+      png_write_tRNS(png_ptr, info_ptr->trans, &(info_ptr->trans_color),
          info_ptr->num_trans, info_ptr->color_type);
       }
 #endif

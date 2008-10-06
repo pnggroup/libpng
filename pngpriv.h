@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta34 - September 6, 2008
+ * libpng version 1.4.0beta35 - October 6, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -658,14 +658,14 @@ PNG_EXTERN void png_do_shift PNGARG((png_row_infop row_info, png_bytep row,
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
 #if defined(PNG_READ_GAMMA_SUPPORTED)
 PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
-   png_color_16p trans_values, png_color_16p background,
+   png_color_16p trans_color, png_color_16p background,
    png_color_16p background_1,
    png_bytep gamma_table, png_bytep gamma_from_1, png_bytep gamma_to_1,
    png_uint_16pp gamma_16, png_uint_16pp gamma_16_from_1,
    png_uint_16pp gamma_16_to_1, int gamma_shift));
 #else
 PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
-   png_color_16p trans_values, png_color_16p background));
+   png_color_16p trans_color, png_color_16p background));
 #endif
 #endif
 

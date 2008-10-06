@@ -1,5 +1,5 @@
 # makefile for libpng on Darwin / Mac OS X
-# Copyright (C) 2002, 2004, 2006 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2004, 2006, 2008 Glenn Randers-Pehrson
 # Copyright (C) 2001 Christoph Pfisterer
 # derived from makefile.linux:
 #  Copyright (C) 1998, 1999 Greg Roelofs
@@ -19,7 +19,7 @@ ZLIBINC=../zlib
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 12
-PNGMIN = 1.4.0beta34
+PNGMIN = 1.4.0beta35
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -104,14 +104,14 @@ $(LIBSOMAJ): $(LIBSOVER)
 $(LIBSOVER): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(LIBSOMAJ) \
-	 -current_version $(PNGVER) -compatibility_version $(PNGVER) \
+	 -current_version 14 -compatibility_version 14 \
 	 -o $(LIBSOVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
 $(OLDSOVER): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(OLDSOMAJ) \
-	 -current_version 3 -compatibility_version 3 \
+	 -current_version 14 -compatibility_version 14 \
 	 -o $(OLDSOVER) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 

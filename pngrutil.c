@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 [September 6, 2008]
+ * Last changed in libpng 1.4.0 [October 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1305,7 +1305,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
       png_crc_read(png_ptr, buf, 2);
       png_ptr->num_trans = 1;
-      png_ptr->trans_values.gray = png_get_uint_16(buf);
+      png_ptr->trans_color.gray = png_get_uint_16(buf);
    }
    else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
    {
@@ -1319,9 +1319,9 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
       png_crc_read(png_ptr, buf, (png_size_t)length);
       png_ptr->num_trans = 1;
-      png_ptr->trans_values.red = png_get_uint_16(buf);
-      png_ptr->trans_values.green = png_get_uint_16(buf + 2);
-      png_ptr->trans_values.blue = png_get_uint_16(buf + 4);
+      png_ptr->trans_color.red = png_get_uint_16(buf);
+      png_ptr->trans_color.green = png_get_uint_16(buf + 2);
+      png_ptr->trans_color.blue = png_get_uint_16(buf + 4);
    }
    else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
@@ -1360,7 +1360,7 @@ png_handle_tRNS(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
-      &(png_ptr->trans_values));
+      &(png_ptr->trans_color));
 }
 #endif
 

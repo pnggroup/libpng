@@ -63,9 +63,9 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 	-fomit-frame-pointer) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LIBNAME = libpng14
-PNGMAJ = 0
+PNGMAJ = 14
 CYGDLL = 14
-PNGMIN = 1.4.0beta34
+PNGMIN = 1.4.0beta35
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll

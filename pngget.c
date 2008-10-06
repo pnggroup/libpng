@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 [September 6, 2008]
+ * Last changed in libpng 1.4.0 [October 6, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -760,7 +760,7 @@ png_get_tIME(png_structp png_ptr, png_infop info_ptr, png_timep *mod_time)
 #if defined(PNG_tRNS_SUPPORTED)
 png_uint_32 PNGAPI
 png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
-   png_bytep *trans, int *num_trans, png_color_16p *trans_values)
+   png_bytep *trans, int *num_trans, png_color_16p *trans_color)
 {
    png_uint_32 retval = 0;
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS))
@@ -773,14 +773,14 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
              *trans = info_ptr->trans;
              retval |= PNG_INFO_tRNS;
           }
-          if (trans_values != NULL)
-             *trans_values = &(info_ptr->trans_values);
+          if (trans_color != NULL)
+             *trans_color = &(info_ptr->trans_color);
       }
       else /* if (info_ptr->color_type != PNG_COLOR_TYPE_PALETTE) */
       {
-          if (trans_values != NULL)
+          if (trans_color != NULL)
           {
-             *trans_values = &(info_ptr->trans_values);
+             *trans_color = &(info_ptr->trans_color);
              retval |= PNG_INFO_tRNS;
           }
           if (trans != NULL)
