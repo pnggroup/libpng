@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.32 - September 18, 2008
+ libpng version 1.2.33beta01 - October 6, 2008
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2008 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.32 - September 18, 2008
+ libpng versions 0.97, January 1998, through 1.2.33beta01 - October 6, 2008
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2008 Glenn Randers-Pehrson
 
@@ -347,8 +347,9 @@ Unknown-chunk handling
 Now you get to set the way the library processes unknown chunks in the
 input PNG stream. Both known and unknown chunks will be read.  Normal
 behavior is that known chunks will be parsed into information in
-various info_ptr members while unknown chunks will be discarded. To change
-this, you can call:
+various info_ptr members while unknown chunks will be discarded. This
+behavior can be wasteful if your application will never use some known
+chunk types. To change this, you can call:
 
     png_set_keep_unknown_chunks(png_ptr, keep,
         chunk_list, num_chunks);
@@ -2851,13 +2852,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-September 18, 2008
+October 6, 2008
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.32 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.33beta01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [September 18, 2008]
+version 1.0.38rc01, 1.2.30rc01 [October 6, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2240,12 +2240,19 @@ version 1.0.39, 1.2.31 [August 21, 2008]
   No changes.
 
 version 1.2.32beta01 [September 6, 2008]
-  Shortened tIME_string to 29 bytes in pngtest.c
+  Shortened tIME_string to 29 bytes in pngtest.c (bug introduced in
+    libpng-1.2.22).
   Fixed off-by-one error introduced in png_push_read_zTXt() function in
     libpng-1.2.30beta04/pngpread.c (Harald van Dijk)
+  These bugs have been given the vulnerability id CVE-2008-3964.
 
-version 1.0.40, 1.2.32[September 18, 2008]
+version 1.0.40, 1.2.32 [September 18, 2008]
   No changes.
+
+version 1.2.33beta01 [October 6, 2008]
+  Revised makefile.darwin to fix shared library numbering.
+  Change png_set_gray_1_2_4_to_8() to png_set_expand_gray_1_2_4_to_8()
+    in example.c (debian bug report)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

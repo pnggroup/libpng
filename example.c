@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.2.32 [September 18, 2008]
+ * Last changed in libpng 1.2.33 [October 6, 2008]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2008 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -204,7 +204,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 
    /* Expand grayscale images to the full 8 bits from 1, 2, or 4 bits/pixel */
    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
-      png_set_gray_1_2_4_to_8(png_ptr);
+      png_set_expand_gray_1_2_4_to_8(png_ptr);
 
    /* Expand paletted or RGB images with transparency to full alpha channels
     * so the data will be available as RGBA quartets.
