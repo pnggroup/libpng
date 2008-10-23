@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [October 15, 2008]
+version 1.0.38rc01, 1.2.30rc01 [October 23, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2253,6 +2253,13 @@ version 1.2.33beta01 [October 6, 2008]
   Revised makefile.darwin to fix shared library numbering.
   Change png_set_gray_1_2_4_to_8() to png_set_expand_gray_1_2_4_to_8()
     in example.c (debian bug report)
+
+version 1.2.33rc01 [October 15, 2008]
+  No changes.
+
+version 1.2.33rc02 [October 23, 2008]
+  Changed remaining "key" to "png_ptr->chunkdata" in png_handle_tEXt()
+    to avoid memory leak after memory failure while reading tEXt chunk.`
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
