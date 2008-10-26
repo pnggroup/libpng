@@ -2007,6 +2007,9 @@ version 1.4.0beta35 [October 6, 2008]
   Change png_set_gray_1_2_4_to_8() to png_set_expand_gray_1_2_4_to_8()
     in example.c (debian bug report)
 
+version 1.4.0beta36 [October 26, 2008]
+  Sync with tEXt vulnerability fix in libpng-1.2.33rc02.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
