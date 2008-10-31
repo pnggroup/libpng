@@ -1,62 +1,56 @@
 
-Libpng 1.2.33rc02 - October 23, 2008
+Libpng 1.2.33 - October 31, 2008
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.33rc02.tar.gz
-   libpng-1.2.33rc02.tar.lzma
+   libpng-1.2.33.tar.gz
+   libpng-1.2.33.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.33rc02.tar.bz2
+   libpng-1.2.33.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.33rc02-no-config.tar.gz
-   libpng-1.2.33rc02-no-config.tar.lzma
-   libpng-1.2.33rc02-no-config.tar.bz2
+   libpng-1.2.33-no-config.tar.gz
+   libpng-1.2.33-no-config.tar.lzma
+   libpng-1.2.33-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1233r02.zip
-   lp1233r02.7z
-   lp1233r02.tar.bz2
+   lpng1233.zip
+   lpng1233.7z
+   lpng1233.tar.bz2
 
 Project files
 
-   libpng-1.2.33rc02-project-netware.zip
-   libpng-1.2.33rc02-project-wince.zip
+   libpng-1.2.33-project-netware.zip
+   libpng-1.2.33-project-wince.zip
 
 Other information:
 
-   libpng-1.2.33rc02-README.txt
-   libpng-1.2.33rc02-KNOWNBUGS.txt
-   libpng-1.2.33rc02-LICENSE.txt
-   libpng-1.2.33rc02-Y2K-compliance.txt
-   libpng-1.2.33rc02-[previous version]-diff.txt
+   libpng-1.2.33-README.txt
+   libpng-1.2.33-KNOWNBUGS.txt
+   libpng-1.2.33-LICENSE.txt
+   libpng-1.2.33-Y2K-compliance.txt
+   libpng-1.2.33-[previous version]-diff.txt
 
 Changes since the last public release (1.2.32):
 
-version 1.2.33beta01 [October 6, 2008]
+version 1.2.33 [October 31, 2008]
+
   Revised makefile.darwin to fix shared library numbering.
   Change png_set_gray_1_2_4_to_8() to png_set_expand_gray_1_2_4_to_8()
     in example.c (debian bug report)
-
-version 1.2.33rc01 [October 15, 2008]
-  No changes.
-
-version 1.2.33rc02 [October 23, 2008]
-  Changed remaining "key" to "png_ptr->chunkdata" in png_handle_tTXt()
+  Changed remaining "key" to "png_ptr->chunkdata" in png_handle_tEXt()
     to avoid memory leak after memory failure while reading tEXt chunk.`
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
