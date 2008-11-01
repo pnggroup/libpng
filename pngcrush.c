@@ -2821,7 +2821,7 @@ int main(int argc, char *argv[])
 #if !defined(PNG_cHRM_SUPPORTED) || !defined(PNG_hIST_SUPPORTED) || \
     !defined(PNG_iCCP_SUPPORTED) || !defined(PNG_sCAL_SUPPORTED) || \
     !defined(PNG_pCAL_SUPPORTED) || !defined(PNG_sPLT_SUPPORTED) || \
-    !defined(PNG_tIME_SUPPORTED)
+    !defined(PNG_sTER_SUPPORTED) || !defined(PNG_tIME_SUPPORTED)
                         png_byte chunk_name[5];
                         chunk_name[4] = '\0';
 #endif
