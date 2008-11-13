@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [October 26, 2008]
+ * Last changed in libpng 1.4.0 [November 13, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -999,51 +999,31 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
 
    png_debug(1, "in png_write_cHRM");
    /* each value is saved in 1/100,000ths */
-   if (white_x < 0 || white_x > 0.8 || white_y < 0 || white_y > 0.8 ||
-       white_x + white_y > 1.0)
+   if (png_check_cHRM(png_ptr, white_x, white_y, red_x, red_y,
+      green_x, green_y, blue_x, blue_y))
    {
-      png_warning(png_ptr, "Invalid cHRM white point specified");
-#if !defined(PNG_NO_CONSOLE_IO)
-      fprintf(stderr, "white_x=%f, white_y=%f\n", white_x, white_y);
-#endif
-      return;
-   }
    itemp = (png_uint_32)(white_x * 100000.0 + 0.5);
    png_save_uint_32(buf, itemp);
    itemp = (png_uint_32)(white_y * 100000.0 + 0.5);
    png_save_uint_32(buf + 4, itemp);
 
-   if (red_x < 0 ||  red_y < 0 || red_x + red_y > 1.0)
-   {
-      png_warning(png_ptr, "Invalid cHRM red point specified");
-      return;
-   }
    itemp = (png_uint_32)(red_x * 100000.0 + 0.5);
    png_save_uint_32(buf + 8, itemp);
    itemp = (png_uint_32)(red_y * 100000.0 + 0.5);
    png_save_uint_32(buf + 12, itemp);
 
-   if (green_x < 0 || green_y < 0 || green_x + green_y > 1.0)
-   {
-      png_warning(png_ptr, "Invalid cHRM green point specified");
-      return;
-   }
    itemp = (png_uint_32)(green_x * 100000.0 + 0.5);
    png_save_uint_32(buf + 16, itemp);
    itemp = (png_uint_32)(green_y * 100000.0 + 0.5);
    png_save_uint_32(buf + 20, itemp);
 
-   if (blue_x < 0 || blue_y < 0 || blue_x + blue_y > 1.0)
-   {
-      png_warning(png_ptr, "Invalid cHRM blue point specified");
-      return;
-   }
    itemp = (png_uint_32)(blue_x * 100000.0 + 0.5);
    png_save_uint_32(buf + 24, itemp);
    itemp = (png_uint_32)(blue_y * 100000.0 + 0.5);
    png_save_uint_32(buf + 28, itemp);
 
    png_write_chunk(png_ptr, (png_bytep)png_cHRM, buf, (png_size_t)32);
+   }
 }
 #endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
@@ -1060,43 +1040,23 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
 
    png_debug(1, "in png_write_cHRM");
    /* each value is saved in 1/100,000ths */
-   if (white_x > 80000L || white_y > 80000L || white_x + white_y > 100000L)
+   if (png_check_cHRM_fixed(png_ptr, white_x, white_y, red_x, red_y,
+      green_x, green_y, blue_x, blue_y))
    {
-      png_warning(png_ptr, "Invalid fixed cHRM white point specified");
-#if !defined(PNG_NO_CONSOLE_IO)
-      fprintf(stderr, "white_x=%ld, white_y=%ld\n", (unsigned long)white_x,
-        (unsigned long)white_y);
-#endif
-      return;
-   }
    png_save_uint_32(buf, (png_uint_32)white_x);
    png_save_uint_32(buf + 4, (png_uint_32)white_y);
 
-   if (red_x + red_y > 100000L)
-   {
-      png_warning(png_ptr, "Invalid cHRM fixed red point specified");
-      return;
-   }
    png_save_uint_32(buf + 8, (png_uint_32)red_x);
    png_save_uint_32(buf + 12, (png_uint_32)red_y);
 
-   if (green_x + green_y > 100000L)
-   {
-      png_warning(png_ptr, "Invalid fixed cHRM green point specified");
-      return;
-   }
    png_save_uint_32(buf + 16, (png_uint_32)green_x);
    png_save_uint_32(buf + 20, (png_uint_32)green_y);
 
-   if (blue_x + blue_y > 100000L)
-   {
-      png_warning(png_ptr, "Invalid fixed cHRM blue point specified");
-      return;
-   }
    png_save_uint_32(buf + 24, (png_uint_32)blue_x);
    png_save_uint_32(buf + 28, (png_uint_32)blue_y);
 
    png_write_chunk(png_ptr, (png_bytep)png_cHRM, buf, (png_size_t)32);
+   }
 }
 #endif
 #endif

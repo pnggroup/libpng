@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.4.0beta36
+;Version 1.4.0beta37
   png_build_grayscale_palette
   png_chunk_error
   png_chunk_warning
@@ -228,3 +228,5 @@ EXPORTS
   png_set_premultiply_alpha
   png_get_chunk_cache_max
   png_set_chunk_cache_max
+  png_check_cHRM
+  png_check_cHRM_fixed

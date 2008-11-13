@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.30 [October 26, 2008]
+ * Last changed in libpng 1.4.0 [November 13, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta36 Your_png_h_is_not_version_1_4_0beta36;
+typedef version_1_4_0beta37 Your_png_h_is_not_version_1_4_0beta37;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -641,13 +641,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta36 - October 26, 2008" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta37 - November 13, 2008" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2008 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta36 - October 26, 2008\
+      return ((png_charp) "libpng version 1.4.0beta37 - November 13, 2008\
       Copyright (c) 1998-2008 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -744,4 +744,133 @@ png_convert_size(size_t size)
   return ((png_size_t)size);
 }
 #endif /* PNG_SIZE_T */
+
+/* Added at libpng version 1.4.0 (moved from pngset.c) */
+#if defined(PNG_cHRM_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+int /* private */
+png_check_cHRM(png_structp png_ptr,
+   double white_x, double white_y, double red_x, double red_y,
+   double green_x, double green_y, double blue_x, double blue_y)
+{
+   int ret = 1;
+
+   png_debug(1, "in png_check_cHRM function");
+   if (png_ptr == NULL)
+      ret = 0;
+   if (!(white_x || white_y || red_x || red_y || green_x || green_y ||
+       blue_x || blue_y))
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set all-zero chromaticity values");
+      ret = 0;
+   }
+   if (white_x < 0.0 || white_y < 0.0 ||
+         red_x < 0.0 ||   red_y < 0.0 ||
+       green_x < 0.0 || green_y < 0.0 ||
+        blue_x < 0.0 ||  blue_y < 0.0)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set negative chromaticity value");
+      ret = 0;
+   }
+   if (white_x > 21474.83 || white_y > 21474.83 ||
+         red_x > 21474.83 ||   red_y > 21474.83 ||
+       green_x > 21474.83 || green_y > 21474.83 ||
+        blue_x > 21474.83 ||  blue_y > 21474.83)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set chromaticity value exceeding 21474.83");
+      ret = 0;
+   }
+   if (white_x > .8 || white_y > .8 || white_x + white_y > 1.0)
+   {
+      png_warning(png_ptr, "Invalid cHRM white point");
+      ret = 0;
+   }
+   if (red_x + red_y > 1.0)
+   {
+      png_warning(png_ptr, "Invalid cHRM red point");
+      ret = 0;
+   }
+   if (green_x + green_y > 1.0)
+   {
+      png_warning(png_ptr, "Invalid cHRM green point");
+      ret = 0;
+   }
+   if (blue_x + blue_y > 1.0)
+   {
+      png_warning(png_ptr, "Invalid cHRM blue point");
+      ret = 0;
+   }
+   return ret;
+}
+#endif /* PNG_FLOATING_POINT_SUPPORTED */
+
+#ifdef PNG_FIXED_POINT_SUPPORTED
+int /* private */
+png_check_cHRM_fixed(png_structp png_ptr,
+   png_fixed_point white_x, png_fixed_point white_y, png_fixed_point red_x,
+   png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
+   png_fixed_point blue_x, png_fixed_point blue_y)
+{
+   int ret = 1;
+
+   png_debug(1, "in function png_check_cHRM_fixed");
+   if (png_ptr == NULL)
+      return 0;
+
+   if (!(white_x || white_y || red_x || red_y || green_x || green_y ||
+       blue_x || blue_y))
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set all-zero chromaticity values");
+      ret = 0;
+   }
+   if (white_x < 0 || white_y < 0 ||
+         red_x < 0 ||   red_y < 0 ||
+       green_x < 0 || green_y < 0 ||
+        blue_x < 0 ||  blue_y < 0)
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set negative chromaticity value");
+      ret = 0;
+   }
+   if (white_x > (png_fixed_point) PNG_UINT_31_MAX ||
+       white_y > (png_fixed_point) PNG_UINT_31_MAX ||
+         red_x > (png_fixed_point) PNG_UINT_31_MAX ||
+         red_y > (png_fixed_point) PNG_UINT_31_MAX ||
+       green_x > (png_fixed_point) PNG_UINT_31_MAX ||
+       green_y > (png_fixed_point) PNG_UINT_31_MAX ||
+        blue_x > (png_fixed_point) PNG_UINT_31_MAX ||
+        blue_y > (png_fixed_point) PNG_UINT_31_MAX )
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set chromaticity value exceeding 21474.83");
+      ret = 0;
+   }
+   if (white_x > 80000L || white_y > 80000L || white_x + white_y > 100000L)
+   {
+      png_warning(png_ptr, "Invalid cHRM white point");
+      ret = 0;
+   }
+   if (red_x + red_y > 100000L)
+   {
+      png_warning(png_ptr, "Invalid cHRM red point");
+      ret = 0;
+   }
+   if (green_x + green_y > 100000L)
+   {
+      png_warning(png_ptr, "Invalid cHRM green point");
+      ret = 0;
+   }
+   if (blue_x + blue_y > 100000L)
+   {
+      png_warning(png_ptr, "Invalid cHRM blue point");
+      ret = 0;
+   }
+   return ret;
+}
+#endif /* PNG_FIXED_POINT_SUPPORTED */
+#endif /* PNG_cHRM_SUPPORTED */
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */

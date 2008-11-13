@@ -42,10 +42,10 @@ libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng14_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 0:@PNGLIB_RELEASE@:0
+	-version-number 14:@PNGLIB_RELEASE@:14
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_RELEASE@:0
+	-version-number 14:@PNGLIB_RELEASE@:14
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
@@ -86,7 +86,7 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.4.0beta36.txt pngvcrd.c 
+	example.c libpng-1.4.0beta37.txt pngvcrd.c 
 
 CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers \
 libpng.sym
@@ -122,7 +122,8 @@ test: check
 install-data-hook:
 	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
-	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h pngconf.h
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h \
+		pngconf.h
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 

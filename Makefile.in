@@ -301,10 +301,10 @@ libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng14_la_LDFLAGS = -no-undefined -export-dynamic -version-number \
-	0:@PNGLIB_RELEASE@:0 $(am__append_1) $(am__append_2)
+	14:@PNGLIB_RELEASE@:14 $(am__append_1) $(am__append_2)
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_RELEASE@:0
+	-version-number 14:@PNGLIB_RELEASE@:14
 
 @HAVE_LD_VERSION_SCRIPT_FALSE@libpng14_la_DEPENDENCIES = libpng.sym
 @HAVE_LD_VERSION_SCRIPT_TRUE@libpng14_la_DEPENDENCIES = libpng.vers
@@ -331,7 +331,7 @@ EXTRA_DIST = \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.4.0beta36.txt pngvcrd.c 
+	example.c libpng-1.4.0beta37.txt pngvcrd.c 
 
 CLEANFILES = pngout.png libpng14.pc libpng14-config libpng.vers \
 libpng.sym

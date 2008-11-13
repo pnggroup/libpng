@@ -12,13 +12,12 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0beta36
+PNGMIN = 1.4.0beta37
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
 LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
-LIBSOVER=$(LIBNAME).so.$(PNGVER)
 OLDSO=libpng.so
 
 # Utilities:
@@ -129,13 +128,10 @@ libpng-config:
 $(LIBSO): $(LIBSOMAJ)
 	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBSOMAJ): $(LIBSOVER)
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
-
-$(LIBSOVER): $(OBJSDLL) libpng.syms
+$(LIBSOMAJ): $(OBJSDLL) libpng.syms
 	$(CC) -shared -Wl,-soname,$(LIBSOMAJ) \
 	-Wl,-version-script,libpng.syms \
-	-o $(LIBSOVER) \
+	-o $(LIBSOMAJ) \
 	$(OBJSDLL)
 
 pngtest: pngtest.o $(LIBSO)
@@ -171,15 +167,12 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBSOVER) libpng.pc
+install-shared: install-headers libpng.pc
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
-	-@$(RM_F) $(DL)/$(LIBSOVER)* $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(LIBSO)
 	-@$(RM_F) $(DL)/$(LIBSOMAJ)
 	-@$(RM_F) $(DL)/$(OLDSO)
-	cp $(LIBSOVER) $(DL)
-	chmod 755 $(DL)/$(LIBSOVER)
 	(cd $(DL); \
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
 	$(LN_SF) $(LIBSOMAJ) $(LIBSO); \
 	$(LN_SF) $(OLDSO) $(LIBSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi

@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta36 - October 26, 2008
+ * libpng version 1.4.0beta37 - November 13, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -848,8 +848,24 @@ PNG_EXTERN void png_do_write_intrapixel PNGARG((png_row_infop row_info,
 #endif
 
 #if defined(PNG_MMX_CODE_SUPPORTED)
-/* png.c */ /* PRIVATE */
+/* PRIVATE */
 PNG_EXTERN void png_init_mmx_flags PNGARG((png_structp png_ptr));
+#endif
+
+/* Added at libpng version 1.4.0 */
+#if defined(PNG_cHRM_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+PNG_EXTERN int png_check_cHRM PNGARG((png_structp png_ptr,
+   double white_x, double white_y, double red_x,
+   double red_y, double green_x, double green_y, double blue_x, double blue_y));
+#endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
+PNG_EXTERN int png_check_cHRM_fixed  PNGARG((png_structp png_ptr,
+   png_fixed_point int_white_x, png_fixed_point int_white_y,
+   png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
+   int_green_x, png_fixed_point int_green_y, png_fixed_point int_blue_x,
+   png_fixed_point int_blue_y));
+#endif
 #endif
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */

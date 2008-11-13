@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 [October 26, 2008]
+ * Last changed in libpng 1.4.0 [November 13, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -796,42 +796,21 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    uint_x = png_get_uint_32(buf);
    uint_y = png_get_uint_32(buf + 4);
-   if (uint_x > 80000L || uint_y > 80000L ||
-      uint_x + uint_y > 100000L)
-   {
-      png_warning(png_ptr, "Invalid cHRM white point");
-      return;
-   }
    int_x_white = (png_fixed_point)uint_x;
    int_y_white = (png_fixed_point)uint_y;
 
    uint_x = png_get_uint_32(buf + 8);
    uint_y = png_get_uint_32(buf + 12);
-   if (uint_x + uint_y > 100000L)
-   {
-      png_warning(png_ptr, "Invalid cHRM red point");
-      return;
-   }
    int_x_red = (png_fixed_point)uint_x;
    int_y_red = (png_fixed_point)uint_y;
 
    uint_x = png_get_uint_32(buf + 16);
    uint_y = png_get_uint_32(buf + 20);
-   if (uint_x + uint_y > 100000L)
-   {
-      png_warning(png_ptr, "Invalid cHRM green point");
-      return;
-   }
    int_x_green = (png_fixed_point)uint_x;
    int_y_green = (png_fixed_point)uint_y;
 
    uint_x = png_get_uint_32(buf + 24);
    uint_y = png_get_uint_32(buf + 28);
-   if (uint_x + uint_y > 100000L)
-   {
-      png_warning(png_ptr, "Invalid cHRM blue point");
-      return;
-   }
    int_x_blue = (png_fixed_point)uint_x;
    int_y_blue = (png_fixed_point)uint_y;
 
