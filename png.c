@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [November 13, 2008]
+ * Last changed in libpng 1.4.0 [November 22, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta37 Your_png_h_is_not_version_1_4_0beta37;
+typedef version_1_4_0beta38 Your_png_h_is_not_version_1_4_0beta38;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -641,13 +641,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta37 - November 13, 2008" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta38 - November 22, 2008" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2008 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta37 - November 13, 2008\
+      return ((png_charp) "libpng version 1.4.0beta38 - November 22, 2008\
       Copyright (c) 1998-2008 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -803,11 +803,56 @@ png_check_cHRM(png_structp png_ptr,
       png_warning(png_ptr, "Invalid cHRM blue point");
       ret = 0;
    }
+   if (((green_x - red_x) * (blue_y - red_y)) == ((green_y - red_y) *
+       (blue_x - red_x)))
+   {
+      png_warning(png_ptr,
+         "Ignoring attempt to set cHRM RGB triangle with zero area");
+      ret = 0;
+   }
    return ret;
 }
 #endif /* PNG_FLOATING_POINT_SUPPORTED */
 
 #ifdef PNG_FIXED_POINT_SUPPORTED
+/*
+ Multiply two 32-bit numbers, V1 and V2, using 32-bit
+ arithmetic, to produce a 64 bit result in the HI/LO words.
+
+          A B
+        x C D
+       ------
+      AD || BD
+AC || CB || 0
+
+ where A and B are the high and low 16-bit words of V1,
+ C and D are the 16-bit words of V2, AD is the product of
+ A and D, and X || Y is (X << 16) + Y.
+*/
+
+void png_64bit_product (long v1, long v2, unsigned long *hi_product,
+   unsigned long *lo_product)
+{
+ int a, b, c, d;
+ long lo, hi, x, y;
+
+ a = (v1 >> 16) & 0xffff;
+ b = v1 & 0xffff;
+ c = (v2 >> 16) & 0xffff;
+ d = v2 & 0xffff;
+
+ lo = b * d;                   /* BD */
+ x = a * d + c * b;            /* AD + CB */
+ y = ((lo >> 16) & 0xffff) + x;
+
+ lo = (lo & 0xffff) | ((y & 0xffff) << 16);
+ hi = (y >> 16) & 0xffff;
+
+ hi += a * c;                  /* AC */
+
+ *hi_product = (unsigned long)hi;
+ *lo_product = (unsigned long)lo;
+}
 int /* private */
 png_check_cHRM_fixed(png_structp png_ptr,
    png_fixed_point white_x, png_fixed_point white_y, png_fixed_point red_x,
@@ -815,6 +860,7 @@ png_check_cHRM_fixed(png_structp png_ptr,
    png_fixed_point blue_x, png_fixed_point blue_y)
 {
    int ret = 1;
+   unsigned long xy_hi,xy_lo,yx_hi,yx_lo;
 
    png_debug(1, "in function png_check_cHRM_fixed");
    if (png_ptr == NULL)
@@ -827,6 +873,7 @@ png_check_cHRM_fixed(png_structp png_ptr,
         "Ignoring attempt to set all-zero chromaticity values");
       ret = 0;
    }
+
    if (white_x < 0 || white_y < 0 ||
          red_x < 0 ||   red_y < 0 ||
        green_x < 0 || green_y < 0 ||
@@ -869,6 +916,17 @@ png_check_cHRM_fixed(png_structp png_ptr,
       png_warning(png_ptr, "Invalid cHRM blue point");
       ret = 0;
    }
+
+   png_64bit_product(green_x - red_x, blue_y - red_y, &xy_hi, &xy_lo);
+   png_64bit_product(green_y - red_y, blue_x - red_x, &yx_hi, &yx_lo);
+
+   if (xy_hi == yx_hi && xy_lo == yx_lo)
+   {
+      png_warning(png_ptr,
+         "Ignoring attempt to set cHRM RGB triangle with zero area");
+      ret = 0;
+   }
+
    return ret;
 }
 #endif /* PNG_FIXED_POINT_SUPPORTED */

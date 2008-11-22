@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta37 - November 13, 2008
+Libpng 1.4.0beta38 - November 22, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta37.tar.gz
-   1.4.0beta37.tar.bz2
+   1.4.0beta38.tar.gz
+   1.4.0beta38.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta37-no-config.tar.gz
-   1.4.0beta37-no-config.tar.bz2
+   1.4.0beta38-no-config.tar.gz
+   1.4.0beta38-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b37.zip
-   lp140b37.tar.bz2
+   lp140b38.zip
+   lp140b38.tar.bz2
 
 Other information:
 
-   1.4.0beta37-README.txt
-   1.4.0beta37-KNOWNBUGS.txt
-   1.4.0beta37-LICENSE.txt
-   1.4.0beta37-Y2K-compliance.txt
+   1.4.0beta38-README.txt
+   1.4.0beta38-KNOWNBUGS.txt
+   1.4.0beta38-LICENSE.txt
+   1.4.0beta38-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -338,6 +338,10 @@ version 1.4.0beta36 [October 25, 2008]
 version 1.4.0beta37 [November 13, 2008]
   Added png_check_cHRM in png.c and moved checking from pngget.c, pngrutil.c,
     and pngwrite.c
+
+version 1.4.0beta38 [November 22, 2008]
+  Added check for zero-area RGB cHRM triange in png_check_cHRM() and
+    png_check_cHRM_fixed().
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
