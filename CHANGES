@@ -2018,6 +2018,10 @@ version 1.4.0beta38 [November 22, 2008]
   Added check for zero-area RGB cHRM triange in png_check_cHRM() and
     png_check_cHRM_fixed().
 
+version 1.4.0beta39 [November 23, 2008]
+  Revised png_warning() to write its message on standard output by default
+    when warning_fn is NULL.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
