@@ -2022,6 +2022,12 @@ version 1.4.0beta39 [November 23, 2008]
   Revised png_warning() to write its message on standard output by default
     when warning_fn is NULL.
 
+version 1.4.0beta40 [November 25, 2008]
+  Eliminated png_check_cHRM().  Instead, always use png_check_cHRM_fixed().
+  In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
+    check for all-zero coordinates that is detected by the triangle check.
+
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [November 23, 2008]
+ * Last changed in libpng 1.4.0 [November 25, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -995,34 +995,39 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    PNG_cHRM;
 #endif
    png_byte buf[32];
-   png_uint_32 itemp;
+
+   png_fixed_point int_white_x, int_white_y, int_red_x, int_red_y,
+      int_green_x, int_green_y, int_blue_x, int_blue_y;
 
    png_debug(1, "in png_write_cHRM");
-   /* each value is saved in 1/100,000ths */
-   if (png_check_cHRM(png_ptr, white_x, white_y, red_x, red_y,
-      green_x, green_y, blue_x, blue_y))
+
+   int_white_x = (png_uint_32)(white_x * 100000.0 + 0.5);
+   int_white_y = (png_uint_32)(white_y * 100000.0 + 0.5);
+   int_red_x   = (png_uint_32)(red_x   * 100000.0 + 0.5);
+   int_red_y   = (png_uint_32)(red_y   * 100000.0 + 0.5);
+   int_green_x = (png_uint_32)(green_x * 100000.0 + 0.5);
+   int_green_y = (png_uint_32)(green_y * 100000.0 + 0.5);
+   int_blue_x  = (png_uint_32)(blue_x  * 100000.0 + 0.5);
+   int_blue_y  = (png_uint_32)(blue_y  * 100000.0 + 0.5);
+
+   if (png_check_cHRM_fixed(png_ptr, int_white_x, int_white_y,
+      int_red_x, int_red_y, int_green_x, int_green_y, int_blue_x, int_blue_y))
    {
-   itemp = (png_uint_32)(white_x * 100000.0 + 0.5);
-   png_save_uint_32(buf, itemp);
-   itemp = (png_uint_32)(white_y * 100000.0 + 0.5);
-   png_save_uint_32(buf + 4, itemp);
+     /* each value is saved in 1/100,000ths */
+   
+     png_save_uint_32(buf, int_white_x);
+     png_save_uint_32(buf + 4, int_white_y);
 
-   itemp = (png_uint_32)(red_x * 100000.0 + 0.5);
-   png_save_uint_32(buf + 8, itemp);
-   itemp = (png_uint_32)(red_y * 100000.0 + 0.5);
-   png_save_uint_32(buf + 12, itemp);
+     png_save_uint_32(buf + 8, int_red_x);
+     png_save_uint_32(buf + 12, int_red_y);
 
-   itemp = (png_uint_32)(green_x * 100000.0 + 0.5);
-   png_save_uint_32(buf + 16, itemp);
-   itemp = (png_uint_32)(green_y * 100000.0 + 0.5);
-   png_save_uint_32(buf + 20, itemp);
+     png_save_uint_32(buf + 16, int_green_x);
+     png_save_uint_32(buf + 20, int_green_y);
 
-   itemp = (png_uint_32)(blue_x * 100000.0 + 0.5);
-   png_save_uint_32(buf + 24, itemp);
-   itemp = (png_uint_32)(blue_y * 100000.0 + 0.5);
-   png_save_uint_32(buf + 28, itemp);
+     png_save_uint_32(buf + 24, int_blue_x);
+     png_save_uint_32(buf + 28, int_blue_y);
 
-   png_write_chunk(png_ptr, (png_bytep)png_cHRM, buf, (png_size_t)32);
+     png_write_chunk(png_ptr, (png_bytep)png_cHRM, buf, (png_size_t)32);
    }
 }
 #endif
