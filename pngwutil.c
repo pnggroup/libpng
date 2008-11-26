@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [November 25, 2008]
+ * Last changed in libpng 1.4.0 [November 26, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1010,8 +1010,10 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    int_blue_x  = (png_uint_32)(blue_x  * 100000.0 + 0.5);
    int_blue_y  = (png_uint_32)(blue_y  * 100000.0 + 0.5);
 
+#if !defined(PNG_NO_CHECK_cHRM)
    if (png_check_cHRM_fixed(png_ptr, int_white_x, int_white_y,
       int_red_x, int_red_y, int_green_x, int_green_y, int_blue_x, int_blue_y))
+#endif
    {
      /* each value is saved in 1/100,000ths */
    
@@ -1045,8 +1047,10 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
 
    png_debug(1, "in png_write_cHRM");
    /* each value is saved in 1/100,000ths */
+#if !defined(PNG_NO_CHECK_cHRM)
    if (png_check_cHRM_fixed(png_ptr, white_x, white_y, red_x, red_y,
       green_x, green_y, blue_x, blue_y))
+#endif
    {
    png_save_uint_32(buf, (png_uint_32)white_x);
    png_save_uint_32(buf + 4, (png_uint_32)white_y);
@@ -1328,7 +1332,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    if (key_len > 79)
    {
       png_warning(png_ptr, "keyword length must be 1 - 79 characters");
-      new_key[79] = '\0';
+      (*new_key)[79] = '\0';
       key_len = 79;
    }
 

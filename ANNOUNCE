@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta40 - November 25, 2008
+Libpng 1.4.0beta41 - November 26, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta40.tar.gz
-   1.4.0beta40.tar.bz2
+   1.4.0beta41.tar.gz
+   1.4.0beta41.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta40-no-config.tar.gz
-   1.4.0beta40-no-config.tar.bz2
+   1.4.0beta41-no-config.tar.gz
+   1.4.0beta41-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b40.zip
-   lp140b40.tar.bz2
+   lp140b41.zip
+   lp140b41.tar.bz2
 
 Other information:
 
-   1.4.0beta40-README.txt
-   1.4.0beta40-KNOWNBUGS.txt
-   1.4.0beta40-LICENSE.txt
-   1.4.0beta40-Y2K-compliance.txt
+   1.4.0beta41-README.txt
+   1.4.0beta41-KNOWNBUGS.txt
+   1.4.0beta41-LICENSE.txt
+   1.4.0beta41-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -343,14 +343,20 @@ version 1.4.0beta38 [November 22, 2008]
   Added check for zero-area RGB cHRM triange in png_check_cHRM() and
     png_check_cHRM_fixed().
 
-version 1.4.0beta39 [November 25, 2008]
+version 1.4.0beta39 [November 26, 2008]
   Revised png_warning() to write its message on standard output by default
     when warning_fn is NULL.
 
-version 1.4.0beta40 [November 25, 2008]
+version 1.4.0beta40 [November 24, 2008]
   Eliminated png_check_cHRM().  Instead, always use png_check_cHRM_fixed().
   In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
     check for all-zero coordinates that is detected by the triangle check.
+
+version 1.4.0beta41 [November 26, 2008]
+  Fixed string vs pointer-to-string error in png_check_keyword().
+  Rearranged test expressions in png_check_cHRM_fixed() to avoid internal
+    overflows.
+  Added PNG_NO_CHECK_cHRM conditional.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

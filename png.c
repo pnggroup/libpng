@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [November 25, 2008]
+ * Last changed in libpng 1.4.0 [November 26, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -13,7 +13,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta40 Your_png_h_is_not_version_1_4_0beta40;
+typedef version_1_4_0beta41 Your_png_h_is_not_version_1_4_0beta41;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -641,13 +641,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta40 - November 25, 2008" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta41 - November 26, 2008" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2008 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta40 - November 25, 2008\
+      return ((png_charp) "libpng version 1.4.0beta41 - November 26, 2008\
       Copyright (c) 1998-2008 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -747,6 +747,7 @@ png_convert_size(size_t size)
 
 /* Added at libpng version 1.2.34 and 1.4.0 (moved from pngset.c) */
 #if defined(PNG_cHRM_SUPPORTED)
+#if !defined(PNG_NO_CHECK_cHRM)
 
 /*
  Multiply two 32-bit numbers, V1 and V2, using 32-bit
@@ -821,22 +822,22 @@ png_check_cHRM_fixed(png_structp png_ptr,
         "Ignoring attempt to set chromaticity value exceeding 21474.83");
       ret = 0;
    }
-   if (white_x + white_y > 100000L)
+   if (white_x > 100000L - white_y)
    {
       png_warning(png_ptr, "Invalid cHRM white point");
       ret = 0;
    }
-   if (red_x + red_y > 100000L)
+   if (red_x > 100000L - red_y)
    {
       png_warning(png_ptr, "Invalid cHRM red point");
       ret = 0;
    }
-   if (green_x + green_y > 100000L)
+   if (green_x > 100000L - green_y)
    {
       png_warning(png_ptr, "Invalid cHRM green point");
       ret = 0;
    }
-   if (blue_x + blue_y > 100000L)
+   if (blue_x > 100000L - blue_y)
    {
       png_warning(png_ptr, "Invalid cHRM blue point");
       ret = 0;
@@ -854,5 +855,6 @@ png_check_cHRM_fixed(png_structp png_ptr,
 
    return ret;
 }
+#endif /* NO_PNG_CHECK_cHRM */
 #endif /* PNG_cHRM_SUPPORTED */
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */

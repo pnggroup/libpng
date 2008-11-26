@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [November 25, 2008]
+ * Last changed in libpng 1.4.0 [November 26, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -74,8 +74,10 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+#if !defined(PNG_NO_CHECK_cHRM)
    if (png_check_cHRM_fixed(png_ptr,
       white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y))
+#endif
    {
      info_ptr->int_x_white = white_x;
      info_ptr->int_y_white = white_y;
@@ -616,9 +618,11 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    blue_y  = (float).06;
 #endif
 
+#if !defined(PNG_NO_CHECK_cHRM)
    if (png_check_cHRM_fixed(png_ptr,
       int_white_x, int_white_y, int_red_x, int_red_y, int_green_x,
       int_green_y, int_blue_x, int_blue_y))
+#endif
    {
 #ifdef PNG_FIXED_POINT_SUPPORTED
      png_set_cHRM_fixed(png_ptr, info_ptr,
