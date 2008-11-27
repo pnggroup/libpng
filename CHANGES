@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [October 31, 2008]
+version 1.0.38rc01, 1.2.30rc01 [November 27, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2257,9 +2257,24 @@ version 1.2.33beta01 [October 6, 2008]
 version 1.2.33rc01 [October 15, 2008]
   No changes.
 
-version 1.0.41rc01, version 1.2.33rc02 [October 31, 2008]
+version 1.0.41rc01, version 1.2.33rc02 [October 23, 2008]
   Changed remaining "key" to "png_ptr->chunkdata" in png_handle_tEXt()
     to avoid memory leak after memory failure while reading tEXt chunk.`
+
+version 1.2.33 [October 31, 2008]
+  No changes.
+
+version 1.2.34beta01 [November 27, 2008]
+  Revised png_warning() to write its message on standard output by default
+    when warning_fn is NULL. This was the behavior prior to libpng-1.2.9beta9.
+  Fixed string vs pointer-to-string error in png_check_keyword().
+  Added png_check_cHRM_fixed() in png.c and moved checking from pngget.c,
+    pngrutil.c, and pngwrite.c, and eliminated floating point cHRM checking.
+  Added check for zero-area RGB cHRM triange in png_check_cHRM_fixed().
+  In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
+    check for all-zero coordinates that is detected by the triangle check.
+  Revised png_warning() to write its message on standard output by default
+    when warning_fn is NULL.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

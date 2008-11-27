@@ -1,56 +1,77 @@
 
-Libpng 1.2.33 - October 31, 2008
+Libpng 1.2.34beta01 - November 27, 2008
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.33.tar.gz
-   libpng-1.2.33.tar.lzma
+   libpng-1.2.34beta01.tar.gz
+   libpng-1.2.34beta01.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.33.tar.bz2
+   libpng-1.2.34beta01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.33-no-config.tar.gz
-   libpng-1.2.33-no-config.tar.lzma
-   libpng-1.2.33-no-config.tar.bz2
+   libpng-1.2.34beta01-no-config.tar.gz
+   libpng-1.2.34beta01-no-config.tar.lzma
+   libpng-1.2.34beta01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1233.zip
-   lpng1233.7z
-   lpng1233.tar.bz2
+   lp1234b01.zip
+   lp1234b01.7z
+   lp1234b01.tar.bz2
 
 Project files
 
-   libpng-1.2.33-project-netware.zip
-   libpng-1.2.33-project-wince.zip
+   libpng-1.2.34beta01-project-netware.zip
+   libpng-1.2.34beta01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.33-README.txt
-   libpng-1.2.33-KNOWNBUGS.txt
-   libpng-1.2.33-LICENSE.txt
-   libpng-1.2.33-Y2K-compliance.txt
-   libpng-1.2.33-[previous version]-diff.txt
+   libpng-1.2.34beta01-README.txt
+   libpng-1.2.34beta01-KNOWNBUGS.txt
+   libpng-1.2.34beta01-LICENSE.txt
+   libpng-1.2.34beta01-Y2K-compliance.txt
+   libpng-1.2.34beta01-[previous version]-diff.txt
 
 Changes since the last public release (1.2.32):
 
-version 1.2.33 [October 31, 2008]
-
+version 1.2.33beta01 [October 6, 2008]
   Revised makefile.darwin to fix shared library numbering.
   Change png_set_gray_1_2_4_to_8() to png_set_expand_gray_1_2_4_to_8()
     in example.c (debian bug report)
-  Changed remaining "key" to "png_ptr->chunkdata" in png_handle_tEXt()
+
+version 1.2.33rc01 [October 15, 2008]
+  No changes.
+
+version 1.0.41rc01, version 1.2.33rc02 [October 23, 2008]
+  Changed remaining "key" to "png_ptr->chunkdata" in png_handle_tTXt()
     to avoid memory leak after memory failure while reading tEXt chunk.`
 
+version 1.2.33 [October 31, 2008]
+  No changes.
+
+version 1.2.34beta01 [November 27, 2008]
+  Revised png_warning() to write its message on standard output by default
+    when warning_fn is NULL. This was the behavior prior to libpng-1.2.9beta9.
+  Fixed string vs pointer-to-string error in png_check_keyword().
+  Added png_check_cHRM_fixed() in png.c and moved checking from pngget.c,
+    pngrutil.c, and pngwrite.c, and eliminated floating point cHRM checking.
+  Added check for zero-area RGB cHRM triange in png_check_cHRM_fixed().
+  In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
+    check for all-zero coordinates that is detected by the triangle check.
+  Revised png_warning() to write its message on standard output by default
+    when warning_fn is NULL.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net

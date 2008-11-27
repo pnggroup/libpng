@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.30 [August 15, 2008]
+ * Last changed in libpng 1.2.34 [November 27, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -40,31 +40,6 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
    png_debug1(1, "in %s storage function\n", "cHRM");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
-   if (!(white_x || white_y || red_x || red_y || green_x || green_y ||
-       blue_x || blue_y))
-   {
-      png_warning(png_ptr,
-        "Ignoring attempt to set all-zero chromaticity values");
-      return;
-   }
-   if (white_x < 0.0 || white_y < 0.0 ||
-         red_x < 0.0 ||   red_y < 0.0 ||
-       green_x < 0.0 || green_y < 0.0 ||
-        blue_x < 0.0 ||  blue_y < 0.0)
-   {
-      png_warning(png_ptr,
-        "Ignoring attempt to set negative chromaticity value");
-      return;
-   }
-   if (white_x > 21474.83 || white_y > 21474.83 ||
-         red_x > 21474.83 ||   red_y > 21474.83 ||
-       green_x > 21474.83 || green_y > 21474.83 ||
-        blue_x > 21474.83 ||  blue_y > 21474.83)
-   {
-      png_warning(png_ptr,
-        "Ignoring attempt to set chromaticity value exceeding 21474.83");
-      return;
-   }
 
    info_ptr->x_white = (float)white_x;
    info_ptr->y_white = (float)white_y;
@@ -94,61 +69,38 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
    png_fixed_point blue_x, png_fixed_point blue_y)
 {
-   png_debug1(1, "in %s storage function\n", "cHRM");
+   png_debug1(1, "in %s storage function\n", "cHRM fixed");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   if (!(white_x || white_y || red_x || red_y || green_x || green_y ||
-       blue_x || blue_y))
+#if !defined(PNG_NO_CHECK_cHRM)
+   if (png_check_cHRM_fixed(png_ptr,
+      white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y))
+#endif
    {
-      png_warning(png_ptr,
-        "Ignoring attempt to set all-zero chromaticity values");
-      return;
-   }
-   if (white_x < 0 || white_y < 0 ||
-         red_x < 0 ||   red_y < 0 ||
-       green_x < 0 || green_y < 0 ||
-        blue_x < 0 ||  blue_y < 0)
-   {
-      png_warning(png_ptr,
-        "Ignoring attempt to set negative chromaticity value");
-      return;
-   }
-   if (white_x > (png_fixed_point) PNG_UINT_31_MAX ||
-       white_y > (png_fixed_point) PNG_UINT_31_MAX ||
-         red_x > (png_fixed_point) PNG_UINT_31_MAX ||
-         red_y > (png_fixed_point) PNG_UINT_31_MAX ||
-       green_x > (png_fixed_point) PNG_UINT_31_MAX ||
-       green_y > (png_fixed_point) PNG_UINT_31_MAX ||
-        blue_x > (png_fixed_point) PNG_UINT_31_MAX ||
-        blue_y > (png_fixed_point) PNG_UINT_31_MAX )
-   {
-      png_warning(png_ptr,
-        "Ignoring attempt to set chromaticity value exceeding 21474.83");
-      return;
-   }
-   info_ptr->int_x_white = white_x;
-   info_ptr->int_y_white = white_y;
-   info_ptr->int_x_red   = red_x;
-   info_ptr->int_y_red   = red_y;
-   info_ptr->int_x_green = green_x;
-   info_ptr->int_y_green = green_y;
-   info_ptr->int_x_blue  = blue_x;
-   info_ptr->int_y_blue  = blue_y;
+     info_ptr->int_x_white = white_x;
+     info_ptr->int_y_white = white_y;
+     info_ptr->int_x_red   = red_x;
+     info_ptr->int_y_red   = red_y;
+     info_ptr->int_x_green = green_x;
+     info_ptr->int_y_green = green_y;
+     info_ptr->int_x_blue  = blue_x;
+     info_ptr->int_y_blue  = blue_y;
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   info_ptr->x_white = (float)(white_x/100000.);
-   info_ptr->y_white = (float)(white_y/100000.);
-   info_ptr->x_red   = (float)(  red_x/100000.);
-   info_ptr->y_red   = (float)(  red_y/100000.);
-   info_ptr->x_green = (float)(green_x/100000.);
-   info_ptr->y_green = (float)(green_y/100000.);
-   info_ptr->x_blue  = (float)( blue_x/100000.);
-   info_ptr->y_blue  = (float)( blue_y/100000.);
+     info_ptr->x_white = (float)(white_x/100000.);
+     info_ptr->y_white = (float)(white_y/100000.);
+     info_ptr->x_red   = (float)(  red_x/100000.);
+     info_ptr->y_red   = (float)(  red_y/100000.);
+     info_ptr->x_green = (float)(green_x/100000.);
+     info_ptr->y_green = (float)(green_y/100000.);
+     info_ptr->x_blue  = (float)( blue_x/100000.);
+     info_ptr->y_blue  = (float)( blue_y/100000.);
 #endif
-   info_ptr->valid |= PNG_INFO_cHRM;
+     info_ptr->valid |= PNG_INFO_cHRM;
+   }
 }
-#endif
-#endif
+#endif /* PNG_FIXED_POINT_SUPPORTED */
+#endif /* PNG_cHRM_SUPPORTED */
 
 #if defined(PNG_gAMA_SUPPORTED)
 #ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -624,12 +576,10 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    float white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
 #endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
    png_fixed_point int_white_x, int_white_y, int_red_x, int_red_y, int_green_x,
       int_green_y, int_blue_x, int_blue_y;
 #endif
-#endif
-   png_debug1(1, "in %s storage function\n", "sRGB_gAMA_and_cHRM");
+   png_debug1(1, "in %s storage function", "sRGB_gAMA_and_cHRM\n");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -647,7 +597,6 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #if defined(PNG_cHRM_SUPPORTED)
-#ifdef PNG_FIXED_POINT_SUPPORTED
    int_white_x = 31270L;
    int_white_y = 32900L;
    int_red_x   = 64000L;
@@ -657,10 +606,6 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    int_blue_x  = 15000L;
    int_blue_y  =  6000L;
 
-   png_set_cHRM_fixed(png_ptr, info_ptr,
-      int_white_x, int_white_y, int_red_x, int_red_y, int_green_x, int_green_y,
-      int_blue_x, int_blue_y);
-#endif
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    white_x = (float).3127;
    white_y = (float).3290;
@@ -670,11 +615,25 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    green_y = (float).60;
    blue_x  = (float).15;
    blue_y  = (float).06;
+#endif
 
-   png_set_cHRM(png_ptr, info_ptr,
-      white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
+#if !defined(PNG_NO_CHECK_cHRM)
+   if (png_check_cHRM_fixed(png_ptr,
+      int_white_x, int_white_y, int_red_x, int_red_y, int_green_x,
+      int_green_y, int_blue_x, int_blue_y))
 #endif
+   {
+#ifdef PNG_FIXED_POINT_SUPPORTED
+     png_set_cHRM_fixed(png_ptr, info_ptr,
+        int_white_x, int_white_y, int_red_x, int_red_y, int_green_x,
+        int_green_y, int_blue_x, int_blue_y);
 #endif
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+      png_set_cHRM(png_ptr, info_ptr,
+         white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
+#endif
+   }
+#endif /* cHRM */
 }
 #endif
 
