@@ -1,5 +1,5 @@
 
-Libpng 1.2.34beta01 - November 27, 2008
+Libpng 1.2.34beta02 - November 28, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.34beta01.tar.gz
-   libpng-1.2.34beta01.tar.lzma
+   libpng-1.2.34beta02.tar.gz
+   libpng-1.2.34beta02.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.34beta01.tar.bz2
+   libpng-1.2.34beta02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.34beta01-no-config.tar.gz
-   libpng-1.2.34beta01-no-config.tar.lzma
-   libpng-1.2.34beta01-no-config.tar.bz2
+   libpng-1.2.34beta02-no-config.tar.gz
+   libpng-1.2.34beta02-no-config.tar.lzma
+   libpng-1.2.34beta02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1234b01.zip
-   lp1234b01.7z
-   lp1234b01.tar.bz2
+   lp1234b02.zip
+   lp1234b02.7z
+   lp1234b02.tar.bz2
 
 Project files
 
-   libpng-1.2.34beta01-project-netware.zip
-   libpng-1.2.34beta01-project-wince.zip
+   libpng-1.2.34beta02-project-netware.zip
+   libpng-1.2.34beta02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.34beta01-README.txt
-   libpng-1.2.34beta01-KNOWNBUGS.txt
-   libpng-1.2.34beta01-LICENSE.txt
-   libpng-1.2.34beta01-Y2K-compliance.txt
-   libpng-1.2.34beta01-[previous version]-diff.txt
+   libpng-1.2.34beta02-README.txt
+   libpng-1.2.34beta02-KNOWNBUGS.txt
+   libpng-1.2.34beta02-LICENSE.txt
+   libpng-1.2.34beta02-Y2K-compliance.txt
+   libpng-1.2.34beta02-[previous version]-diff.txt
 
 Changes since the last public release (1.2.32):
 
@@ -69,6 +69,10 @@ version 1.2.34beta01 [November 27, 2008]
     check for all-zero coordinates that is detected by the triangle check.
   Revised png_warning() to write its message on standard output by default
     when warning_fn is NULL.
+
+version 1.2.34beta02 [November 28, 2008]
+  Corrected off-by-one error in bKGD validity check in png_write_bKGD()
+    and in png_handle_bKGD().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

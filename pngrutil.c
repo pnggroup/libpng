@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.34 [November 27, 2008]
+ * Last changed in libpng 1.2.34 [November 28, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1399,7 +1399,7 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_ptr->background.index = buf[0];
       if (info_ptr && info_ptr->num_palette)
       {
-          if (buf[0] > info_ptr->num_palette)
+          if (buf[0] > info_ptr->num_palette - 1)
           {
              png_warning(png_ptr, "Incorrect bKGD chunk index value");
              return;
