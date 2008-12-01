@@ -2270,7 +2270,7 @@ version 1.2.34beta01 [November 27, 2008]
   Fixed string vs pointer-to-string error in png_check_keyword().
   Added png_check_cHRM_fixed() in png.c and moved checking from pngget.c,
     pngrutil.c, and pngwrite.c, and eliminated floating point cHRM checking.
-  Added check for zero-area RGB cHRM triange in png_check_cHRM_fixed().
+  Added check for zero-area RGB cHRM triangle in png_check_cHRM_fixed().
   In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
     check for all-zero coordinates that is detected by the triangle check.
   Revised png_warning() to write its message on standard output by default
@@ -2280,7 +2280,7 @@ version 1.2.34beta02 [November 28, 2008]
   Corrected off-by-one error in bKGD validity check in png_write_bKGD()
     and in png_handle_bKGD().
 
-version 1.2.34beta02 [December 1, 2008]
+version 1.2.34beta03 [December 1, 2008]
   Revised bKGD validity check to use >= x instead of > x + 1
   Merged with png_debug from libpng-1.4.0 to remove newlines.
 
