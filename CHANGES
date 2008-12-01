@@ -2027,7 +2027,7 @@ version 1.4.0beta40 [November 24, 2008]
   In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
     check for all-zero coordinates that is detected by the triangle check.
 
-version 1.4.0beta41 [November 26, 2008]
+version 1.4.0beta41 [December 1, 2008]
   Fixed string vs pointer-to-string error in png_check_keyword().
   Rearranged test expressions in png_check_cHRM_fixed() to avoid internal
     overflows.
