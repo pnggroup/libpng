@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta42 - December 1, 2008
+Libpng 1.4.0beta43 - December 2, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta42.tar.gz
-   1.4.0beta42.tar.bz2
+   1.4.0beta43.tar.gz
+   1.4.0beta43.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta42-no-config.tar.gz
-   1.4.0beta42-no-config.tar.bz2
+   1.4.0beta43-no-config.tar.gz
+   1.4.0beta43-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b42.zip
-   lp140b42.tar.bz2
+   lp140b43.zip
+   lp140b43.tar.bz2
 
 Other information:
 
-   1.4.0beta42-README.txt
-   1.4.0beta42-KNOWNBUGS.txt
-   1.4.0beta42-LICENSE.txt
-   1.4.0beta42-Y2K-compliance.txt
+   1.4.0beta43-README.txt
+   1.4.0beta43-KNOWNBUGS.txt
+   1.4.0beta43-LICENSE.txt
+   1.4.0beta43-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -343,7 +343,7 @@ version 1.4.0beta38 [November 22, 2008]
   Added check for zero-area RGB cHRM triange in png_check_cHRM() and
     png_check_cHRM_fixed().
 
-version 1.4.0beta39 [December 1, 2008]
+version 1.4.0beta39 [December 2, 2008]
   Revised png_warning() to write its message on standard output by default
     when warning_fn is NULL.
 
@@ -352,11 +352,14 @@ version 1.4.0beta40 [November 24, 2008]
   In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
     check for all-zero coordinates that is detected by the triangle check.
 
-version 1.4.0beta41 [December 1, 2008]
+version 1.4.0beta41 [December 2, 2008]
   Fixed string vs pointer-to-string error in png_check_keyword().
   Rearranged test expressions in png_check_cHRM_fixed() to avoid internal
     overflows.
   Added PNG_NO_CHECK_cHRM conditional.
+
+version 1.4.0beta42, 43 [December 2, 2008]
+  Merge png_debug with version 1.2.34beta04.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

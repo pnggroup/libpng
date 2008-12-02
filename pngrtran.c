@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [December 1, 2008]
+ * Last changed in libpng 1.4.0 [December 2, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -122,7 +122,7 @@ png_set_strip_alpha(png_structp png_ptr)
 void PNGAPI
 png_set_premultiply_alpha(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_premultiply_alpha\n");
+   png_debug(1, "in png_set_premultiply_alpha");
    if(png_ptr == NULL) return;
    png_ptr->transformations |=
      (PNG_PREMULTIPLY_ALPHA | PNG_EXPAND_tRNS);
@@ -1938,7 +1938,7 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_read_premultiply_alpha\n");
+   png_debug(1, "in png_do_read_premultiply_alpha");
    {
       png_uint_32 row_width = row_info->width;
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)

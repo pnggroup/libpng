@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [December 1, 2008]
+ * Last changed in libpng 1.4.0 [December 2, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1144,7 +1144,7 @@ png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
           (png_ptr->num_palette ||
           (!(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE))) &&
 #endif
-         back->index > png_ptr->num_palette)
+         back->index >= png_ptr->num_palette)
       {
          png_warning(png_ptr, "Invalid background palette index");
          return;

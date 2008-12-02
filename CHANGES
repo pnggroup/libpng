@@ -2015,7 +2015,7 @@ version 1.4.0beta37 [November 13, 2008]
     and pngwrite.c
 
 version 1.4.0beta38 [November 22, 2008]
-  Added check for zero-area RGB cHRM triange in png_check_cHRM() and
+  Added check for zero-area RGB cHRM triangle in png_check_cHRM() and
     png_check_cHRM_fixed().
 
 version 1.4.0beta39 [November 23, 2008]
@@ -2027,11 +2027,14 @@ version 1.4.0beta40 [November 24, 2008]
   In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
     check for all-zero coordinates that is detected by the triangle check.
 
-version 1.4.0beta41 [December 1, 2008]
+version 1.4.0beta41 [December 2, 2008]
   Fixed string vs pointer-to-string error in png_check_keyword().
   Rearranged test expressions in png_check_cHRM_fixed() to avoid internal
     overflows.
   Added PNG_NO_CHECK_cHRM conditional.
+
+version 1.4.0beta42, 43 [December 2, 2008]
+  Merge png_debug with version 1.2.34beta04.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

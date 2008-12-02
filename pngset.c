@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [December 1, 2008]
+ * Last changed in libpng 1.4.0 [December 2, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -70,7 +70,7 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
    png_fixed_point blue_x, png_fixed_point blue_y)
 {
-   png_debug1(1, "in %s storage function", "cHRM_fixed");
+   png_debug1(1, "in %s storage function", "cHRM fixed");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
