@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.34 [December 1, 2008]
+ * Last changed in libpng 1.2.34 [December 5, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -764,12 +764,9 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
    comp.input = NULL;
    comp.input_len = 0;
 
-   if (name == NULL || (name_len = png_check_keyword(png_ptr, name,
+   if ((name_len = png_check_keyword(png_ptr, name,
       &new_name)) == 0)
-   {
-      png_warning(png_ptr, "Empty keyword in iCCP chunk");
       return;
-   }
 
    if (compression_type != PNG_COMPRESSION_TYPE_BASE)
       png_warning(png_ptr, "Unknown compression type in iCCP chunk");
@@ -836,12 +833,9 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
 #endif
 
    png_debug(1, "in png_write_sPLT");
-   if (spalette->name == NULL || (name_len = png_check_keyword(png_ptr,
+   if ((name_len = png_check_keyword(png_ptr,
       spalette->name, &new_name))==0)
-   {
-      png_warning(png_ptr, "Empty keyword in sPLT chunk");
-      return;
-   }
+     return;
 
    /* make sure we include the NULL after the name */
    png_write_chunk_start(png_ptr, (png_bytep)png_sPLT,
@@ -1328,11 +1322,8 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
    png_charp new_key;
 
    png_debug(1, "in png_write_tEXt");
-   if (key == NULL || (key_len = png_check_keyword(png_ptr, key, &new_key))==0)
-   {
-      png_warning(png_ptr, "Empty keyword in tEXt chunk");
+   if ((key_len = png_check_keyword(png_ptr, key, &new_key))==0)
       return;
-   }
 
    if (text == NULL || *text == '\0')
       text_len = 0;
@@ -1380,9 +1371,8 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
    comp.input = NULL;
    comp.input_len = 0;
 
-   if (key == NULL || (key_len = png_check_keyword(png_ptr, key, &new_key))==0)
+   if ((key_len = png_check_keyword(png_ptr, key, &new_key))==0)
    {
-      png_warning(png_ptr, "Empty keyword in zTXt chunk");
       png_free(png_ptr, new_key);
       return;
    }
@@ -1429,7 +1419,8 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
    PNG_iTXt;
 #endif
    png_size_t lang_len, key_len, lang_key_len, text_len;
-   png_charp new_lang, new_key;
+   png_charp new_lang;
+   png_charp new_key = NULL;
    png_byte cbuf[2];
    compression_state comp;
 
@@ -1440,12 +1431,10 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
    comp.output_ptr = NULL;
    comp.input = NULL;
 
-   if (key == NULL || (key_len = png_check_keyword(png_ptr, key, &new_key))==0)
-   {
-      png_warning(png_ptr, "Empty keyword in iTXt chunk");
+   if ((key_len = png_check_keyword(png_ptr, key, &new_key))==0)
       return;
-   }
-   if (lang == NULL || (lang_len = png_check_keyword(png_ptr, lang, &new_lang))==0)
+
+   if ((lang_len = png_check_keyword(png_ptr, lang, &new_lang))==0)
    {
       png_warning(png_ptr, "Empty language field in iTXt chunk");
       new_lang = NULL;

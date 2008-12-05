@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [December 1, 2008]
+version 1.0.38rc01, 1.2.30rc01 [December 5, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2283,6 +2283,15 @@ version 1.2.34beta02 [November 28, 2008]
 version 1.2.34beta03 [December 1, 2008]
   Revised bKGD validity check to use >= x instead of > x + 1
   Merged with png_debug from libpng-1.4.0 to remove newlines.
+
+version 1.2.34beta04 [December 2, 2008]
+  More merging with png_debug from libpng-1.4.0 to remove newlines.
+
+version 1.2.34beta05 [December 5, 2008]
+  Removed redundant check for key==NULL before calling png_check_keyword()
+    to ensure that new_key gets initialized and removed extra warning
+    (Arvan Pritchard).
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
