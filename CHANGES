@@ -2027,14 +2027,19 @@ version 1.4.0beta40 [November 24, 2008]
   In png_check_cHRM_fixed(), ensure white_y is > 0, and removed redundant
     check for all-zero coordinates that is detected by the triangle check.
 
-version 1.4.0beta41 [December 2, 2008]
+version 1.4.0beta41 [November 26, 2008]
   Fixed string vs pointer-to-string error in png_check_keyword().
   Rearranged test expressions in png_check_cHRM_fixed() to avoid internal
     overflows.
   Added PNG_NO_CHECK_cHRM conditional.
 
-version 1.4.0beta42, 43 [December 2, 2008]
+version 1.4.0beta42, 43 [December 1, 2008]
   Merge png_debug with version 1.2.34beta04.
+
+version 1.4.0beta44 [December 6, 2008]
+  Removed redundant check for key==NULL before calling png_check_keyword()
+    to ensure that new_key gets initialized and removed extra warning
+    (Merge with version 1.2.34beta05 -- Arvan Pritchard).
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
