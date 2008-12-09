@@ -1,5 +1,5 @@
 
-Libpng 1.2.34beta05 - December 5, 2008
+Libpng 1.2.34beta06 - December 9, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.34beta05.tar.gz
-   libpng-1.2.34beta05.tar.lzma
+   libpng-1.2.34beta06.tar.gz
+   libpng-1.2.34beta06.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.34beta05.tar.bz2
+   libpng-1.2.34beta06.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.34beta05-no-config.tar.gz
-   libpng-1.2.34beta05-no-config.tar.lzma
-   libpng-1.2.34beta05-no-config.tar.bz2
+   libpng-1.2.34beta06-no-config.tar.gz
+   libpng-1.2.34beta06-no-config.tar.lzma
+   libpng-1.2.34beta06-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1234b05.zip
-   lp1234b05.7z
-   lp1234b05.tar.bz2
+   lp1234b06.zip
+   lp1234b06.7z
+   lp1234b06.tar.bz2
 
 Project files
 
-   libpng-1.2.34beta05-project-netware.zip
-   libpng-1.2.34beta05-project-wince.zip
+   libpng-1.2.34beta06-project-netware.zip
+   libpng-1.2.34beta06-project-wince.zip
 
 Other information:
 
-   libpng-1.2.34beta05-README.txt
-   libpng-1.2.34beta05-KNOWNBUGS.txt
-   libpng-1.2.34beta05-LICENSE.txt
-   libpng-1.2.34beta05-Y2K-compliance.txt
-   libpng-1.2.34beta05-[previous version]-diff.txt
+   libpng-1.2.34beta06-README.txt
+   libpng-1.2.34beta06-KNOWNBUGS.txt
+   libpng-1.2.34beta06-LICENSE.txt
+   libpng-1.2.34beta06-Y2K-compliance.txt
+   libpng-1.2.34beta06-[previous version]-diff.txt
 
 Changes since the last public release (1.2.32):
 
@@ -74,7 +74,7 @@ version 1.2.34beta02 [November 28, 2008]
   Corrected off-by-one error in bKGD validity check in png_write_bKGD()
     and in png_handle_bKGD().
 
-version 1.2.34beta03 [December 5, 2008]
+version 1.2.34beta03 [December 9, 2008]
   Revised bKGD validity check to use >= x instead of > x + 1
   Merged with png_debug from libpng-1.4.0 to remove newlines.
 
@@ -90,6 +90,9 @@ version 1.2.34beta05 [December 5, 2008]
     to ensure that new_key gets initialized and removed extra warning
     (Arvan Pritchard).
 
+version 1.2.34beta06 [December 9, 2008]
+  In png_write_png(), respect the placement of the filler bytes in an earlier
+    call to png_set_filler() (Jim Barry).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

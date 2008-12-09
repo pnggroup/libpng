@@ -1506,11 +1506,11 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #if defined(PNG_WRITE_FILLER_SUPPORTED)
-   /* Get rid of filler (OR ALPHA) bytes, pack XRGB/RGBX/ARGB/RGBA into
-    * RGB (4 channels -> 3 channels). The second parameter is not used.
+   /* Pack XRGB/RGBX/ARGB/RGBA into * RGB (4 channels -> 3 channels).
     */
    if (transforms & PNG_TRANSFORM_STRIP_FILLER)
-       png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
+     if (!(png_ptr->transformations & PNG_TRANSFORM_STRIP_FILLER))
+         png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
 #endif
 
 #if defined(PNG_WRITE_BGR_SUPPORTED)
