@@ -2041,6 +2041,10 @@ version 1.4.0beta44 [December 6, 2008]
     to ensure that new_key gets initialized and removed extra warning
     (Merge with version 1.2.34beta05 -- Arvan Pritchard).
 
+version 1.4.0beta45 [December 9, 2008]
+  In png_write_png(), respect the placement of the filler bytes in an earlier
+    call to png_set_filler() (Jim Barry).
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
