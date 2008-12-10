@@ -1506,11 +1506,11 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #if defined(PNG_WRITE_FILLER_SUPPORTED)
-   /* Pack XRGB/RGBX/ARGB/RGBA into * RGB (4 channels -> 3 channels).
-    */
-   if (transforms & PNG_TRANSFORM_STRIP_FILLER)
-     if (!(png_ptr->transformations & PNG_TRANSFORM_STRIP_FILLER))
-         png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
+   /* Pack XRGB/RGBX/ARGB/RGBA into * RGB (4 channels -> 3 channels) */
+  if (transforms & PNG_TRANSFORM_STRIP_FILLER_AFTER)
+      png_set_filler(png_ptr, 0, PNG_FILLER_AFTER);
+  else if (transforms & PNG_TRANSFORM_STRIP_FILLER_BEFORE)
+      png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
 #endif
 
 #if defined(PNG_WRITE_BGR_SUPPORTED)
