@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta45 - December 9, 2008
+Libpng 1.4.0beta46 - December 10, 2008
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta45.tar.gz
-   1.4.0beta45.tar.bz2
+   1.4.0beta46.tar.gz
+   1.4.0beta46.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta45-no-config.tar.gz
-   1.4.0beta45-no-config.tar.bz2
+   1.4.0beta46-no-config.tar.gz
+   1.4.0beta46-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b45.zip
-   lp140b45.tar.bz2
+   lp140b46.zip
+   lp140b46.tar.bz2
 
 Other information:
 
-   1.4.0beta45-README.txt
-   1.4.0beta45-KNOWNBUGS.txt
-   1.4.0beta45-LICENSE.txt
-   1.4.0beta45-Y2K-compliance.txt
+   1.4.0beta46-README.txt
+   1.4.0beta46-KNOWNBUGS.txt
+   1.4.0beta46-LICENSE.txt
+   1.4.0beta46-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -343,7 +343,7 @@ version 1.4.0beta38 [November 22, 2008]
   Added check for zero-area RGB cHRM triange in png_check_cHRM() and
     png_check_cHRM_fixed().
 
-version 1.4.0beta39 [December 9, 2008]
+version 1.4.0beta39 [December 10, 2008]
   Revised png_warning() to write its message on standard output by default
     when warning_fn is NULL.
 
@@ -369,6 +369,11 @@ version 1.4.0beta44 [December 6, 2008]
 version 1.4.0beta45 [December 9, 2008]
   In png_write_png(), respect the placement of the filler bytes in an earlier
     call to png_set_filler() (Jim Barry).
+
+version 1.4.0beta46 [December 10, 2008]
+  Undid previous change and added PNG_TRANSFORM_STRIP_FILLER_BEFORE and
+    PNG_TRANSFORM_STRIP_FILLER_AFTER conditionals and deprecated
+    PNG_TRANSFORM_STRIP_FILLER (Jim Barry).
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

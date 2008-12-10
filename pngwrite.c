@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [December 9, 2008]
+ * Last changed in libpng 1.4.0 [December 10, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1439,9 +1439,10 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
 #if defined(PNG_WRITE_FILLER_SUPPORTED)
    /* Pack XRGB/RGBX/ARGB/RGBA into * RGB (4 channels -> 3 channels).
     */
-   if (transforms & PNG_TRANSFORM_STRIP_FILLER)
-     if (!(png_ptr->transformations & PNG_TRANSFORM_STRIP_FILLER))
-         png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
+  if (transforms & PNG_TRANSFORM_STRIP_FILLER_AFTER)
+      png_set_filler(png_ptr, 0, PNG_FILLER_AFTER);
+  else if (transforms & PNG_TRANSFORM_STRIP_FILLER_BEFORE)
+      png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
 #endif
 
 #if defined(PNG_WRITE_BGR_SUPPORTED)

@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta45 - December 9, 2008
+ libpng version 1.4.0beta46 - December 10, 2008
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2005 Glenn Randers-Pehrson
@@ -2028,7 +2028,13 @@ transformations are permitted, enabled by the following masks.
     PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity
                                 to transparency
     PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
-    PNG_TRANSFORM_STRIP_FILLER  Strip out filler bytes.
+
+    PNG_TRANSFORM_STRIP_FILLER        Strip out filler
+                                      bytes (deprecated).
+    PNG_TRANSFORM_STRIP_FILLER_BEFORE Strip out leading
+                                      filler bytes
+    PNG_TRANSFORM_STRIP_FILLER_AFTER  Strip out trailing
+                                      filler bytes
 
 If you have valid image data in the info structure (you can use
 png_set_rows() to put image data in the info structure), simply do this:
@@ -2816,13 +2822,13 @@ application:
 
 IX. Y2K Compliance in libpng
 
-December 9, 2008
+December 10, 2008
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta45 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta46 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

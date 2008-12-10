@@ -2045,6 +2045,11 @@ version 1.4.0beta45 [December 9, 2008]
   In png_write_png(), respect the placement of the filler bytes in an earlier
     call to png_set_filler() (Jim Barry).
 
+version 1.4.0beta46 [December 10, 2008]
+  Undid previous change and added PNG_TRANSFORM_STRIP_FILLER_BEFORE and
+    PNG_TRANSFORM_STRIP_FILLER_AFTER conditionals and deprecated
+    PNG_TRANSFORM_STRIP_FILLER (Jim Barry).
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
