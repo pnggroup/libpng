@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [December 10, 2008]
+version 1.0.38rc01, 1.2.30rc01 [December 11, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2296,10 +2296,13 @@ version 1.2.34beta06 [December 9, 2008]
   In png_write_png(), respect the placement of the filler bytes in an earlier
     call to png_set_filler() (Jim Barry).
 
-version 1.2.34beta07 [December 10, 2008]
+version 1.2.34beta07 [December 9, 2008]
   Undid previous change and added PNG_TRANSFORM_STRIP_FILLER_BEFORE and
     PNG_TRANSFORM_STRIP_FILLER_AFTER conditionals and deprecated
     PNG_TRANSFORM_STRIP_FILLER (Jim Barry).
+
+version 1.2.34rc01 [December 11, 2008]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
