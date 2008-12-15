@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta46 - December 10, 2008
+ * libpng version 1.4.0beta47 - December 15, 2008
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -503,9 +503,11 @@
 #  ifndef PNG_NO_READ_INVERT
 #    define PNG_READ_INVERT_SUPPORTED
 #  endif
+#if 0 /* removed from libpng-1.4.0 */
 #  ifndef PNG_NO_READ_DITHER
 #    define PNG_READ_DITHER_SUPPORTED
 #  endif
+#endif /* 0 */
 #  ifndef PNG_NO_READ_BACKGROUND
 #    define PNG_READ_BACKGROUND_SUPPORTED
 #  endif
