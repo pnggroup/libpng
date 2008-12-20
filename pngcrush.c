@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.10"
+#define PNGCRUSH_VERSION "1.6.12"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -632,8 +632,10 @@ void png_crc_read(png_structp png_ptr, png_bytep buf, png_size_t length);
 int png_crc_error(png_structp png_ptr);
 int png_crc_finish(png_structp png_ptr, png_uint_32 skip);
 
+#if 0
 png_uint_32 png_get_uint_31(png_structp png_ptr, png_bytep buf);
 png_uint_32 png_get_uint_32(png_bytep buf);
+#endif
 void png_save_uint_32(png_bytep buf, png_uint_32 i);
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -2412,6 +2414,7 @@ int main(int argc, char *argv[])
 
 
             if (verbose > 0) {
+                
                 fprintf(STDERR, "   Recompressing %s\n", inname);
                 fprintf(STDERR,
                   "   Total length of data found in IDAT chunks    = %8lu\n",
@@ -3183,7 +3186,6 @@ int main(int argc, char *argv[])
                     }
                 }
 #endif /* defined(PNG_READ_bKGD_SUPPORTED)&&defined(PNG_WRITE_bKGD_SUPPORTED) */
-
 #if defined(PNG_READ_cHRM_SUPPORTED) && defined(PNG_WRITE_cHRM_SUPPORTED)
 #ifdef PNG_FIXED_POINT_SUPPORTED
                 {
@@ -3195,13 +3197,6 @@ int main(int argc, char *argv[])
                          &red_x, &red_y, &green_x, &green_y, &blue_x,
                          &blue_y)) {
                         if (keep_chunk("cHRM", argv)) {
-                            if (white_x == 0 && white_y == 0 && red_x == 0
-                                && red_y == 0 && green_x == 0
-                                && green_y == 0 && blue_x == 0
-                                && blue_y == 0)
-                                png_warning(write_ptr,
-                                            "Deleting all-zero cHRM chunk");
-                            else
                                 png_set_cHRM_fixed(write_ptr,
                                                    write_info_ptr, white_x,
                                                    white_y, red_x, red_y,
@@ -3220,13 +3215,6 @@ int main(int argc, char *argv[])
                          &red_x, &red_y, &green_x, &green_y, &blue_x,
                          &blue_y)) {
                         if (keep_chunk("cHRM", argv)) {
-                            if (white_x == 0 && white_y == 0 && red_x == 0
-                                && red_y == 0 && green_x == 0
-                                && green_y == 0 && blue_x == 0
-                                && blue_y == 0)
-                                png_warning(write_ptr,
-                                            "Deleting all-zero cHRM chunk");
-                            else
                                 png_set_cHRM(write_ptr, write_info_ptr,
                                              white_x, white_y, red_x,
                                              red_y, green_x, green_y,
@@ -3235,7 +3223,7 @@ int main(int argc, char *argv[])
                     }
                 }
 #endif /* ?PNG_FIXED_POINT_SUPPORTED */
-#endif /* defined(PNG_READ_cHRM_SUPPORTED)&&defined(PNG_WRITE_cHRM_SUPPORTED) */
+#endif /* PNG_READ_cHRM_SUPPORTED) && defined(PNG_WRITE_cHRM_SUPPORTED */
 
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_WRITE_gAMA_SUPPORTED)
                 {

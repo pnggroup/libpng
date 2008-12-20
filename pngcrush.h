@@ -12,6 +12,10 @@
 
 #define PNG_NO_ASSEMBLER_CODE
 
+#define PNG_NO_ERROR_NUMBERS
+
+#define PNG_NO_CHECK_cHRM
+
 #ifndef PNG_NO_ZALLOC_ZERO
 #  define PNG_NO_ZALLOC_ZERO  /* speeds it up a little */
 #endif

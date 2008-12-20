@@ -1,7 +1,9 @@
 Change log:
 
+Version 1.6.12 (built with libpng-1.2.34 and zlib-1.2.3.2)
+
 Version 1.6.11 (built with libpng-1.2.33 and zlib-1.2.3.2)
-  Eliminated a memory leak in libpng with handling bad tEXt chunks.
+  Eliminated a memory leak in libpng with writing bad tEXt chunks.
 
 Version 1.6.10 (built with libpng-1.2.31 and zlib-1.2.3.2)
   Add sTER chunk support.

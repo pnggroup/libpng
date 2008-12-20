@@ -14,10 +14,10 @@
 #ZINC = ../../zlib
 #ZLIB = ../../zlib
 
-# CC = gcc
-CC = gcc-4.3.0
-LD = gcc-4.3.0
-# LD = gcc
+CC = gcc
+# CC = gcc-4.3.0
+# LD = gcc-4.3.0
+LD = gcc
 RM = rm -f
 #CFLAGS = -I. -O -Wall
 #CFLAGS = -I. -O3 -fomit-frame-pointer -Wall
