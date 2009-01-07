@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.12"
+#define PNGCRUSH_VERSION "1.6.13"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -87,8 +87,6 @@
  *   second (see ImageMagick 5.1.1 and later).
  *
  *   Finish pplt (partial palette) feature.
- *
- *   add "-time" directive
  *
  *   Allow in-place file replacement or as a filter, as in
  *    "pngcrush -overwrite file.png"
@@ -548,6 +546,7 @@ static int best_of_three;
 static int methods_specified = 0;
 static int intent = -1;
 static int ster_mode = -1;
+static int new_time_stamp = 0;
 static int plte_len = -1;
 #ifdef PNG_FIXED_POINT_SUPPORTED
 static int specified_gamma = 0;
@@ -2116,6 +2115,8 @@ int main(int argc, char *argv[])
 #endif
             }
         }
+        else if (!strncmp(argv[i], "-time_stamp", 5))
+            new_time_stamp++;
 #ifdef PNG_tRNS_SUPPORTED
         else if (!strncmp(argv[i], "-trns_a", 7) ||
                  !strncmp(argv[i], "-tRNS_a", 7)) {
@@ -4545,7 +4546,7 @@ int main(int argc, char *argv[])
             setfiletype(outname);
         }
 
-        if (verbose > 0 && nosave == 0) {
+        if (nosave == 0) {
             png_uint_32 input_length, output_length;
 #ifndef __riscos
             struct stat stat_buf;
@@ -4557,11 +4558,15 @@ int main(int argc, char *argv[])
             utim.modtime = stat_buf.st_mtime;
             stat(outname, &stat_buf);
             output_length = (unsigned long) stat_buf.st_size;
-            utime(outname, &utim);   /* set timestamp (no big deal if fails) */
+            if (new_time_stamp == 0) {
+              /* set file timestamp (no big deal if fails) */
+              utime(outname, &utim);
+            }
 #else
             input_length = (unsigned long) filesize(inname);
             output_length = (unsigned long) filesize(outname);
 #endif
+        if (verbose > 0) {
             total_input_length += input_length + output_length;
 
             if (!already_crushed && !image_is_immutable) {
@@ -4589,6 +4594,7 @@ int main(int argc, char *argv[])
                 fprintf(STDERR, "   Number of open files=%d\n",
                   number_of_open_files);
 
+          }
         }
 
         if (pngcrush_mode == DEFAULT_MODE) {
@@ -5828,6 +5834,12 @@ struct options_help pngcrush_options[] = {
     {2, "               tEXt chunk to insert.  keyword < 80 chars,"},
     {2, "               text < 2048 chars. For now, you can add no more than"},
     {2, "               ten tEXt, iTXt, or zTXt chunks per pngcrush run."},
+    {2, ""},
+
+    {0, "         -time_stamp"},
+    {2, ""},
+    {2, "               Reset file modification time.  Default is to"},
+    {2, "               reproduce the input file modification time."},
     {2, ""},
 
 #ifdef PNG_tRNS_SUPPORTED
