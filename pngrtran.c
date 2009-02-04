@@ -4134,6 +4134,9 @@ png_build_gamma_table(png_structp png_ptr)
         png_uint_32 last, max;
 
         for (i = 0; i < num; i++)
+           png_ptr->gamma_16_table[i] = NULL;
+
+        for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
               (png_uint_32)(256 * png_sizeof(png_uint_16)));
@@ -4187,6 +4190,9 @@ png_build_gamma_table(png_structp png_ptr)
 
         png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p )));
+
+        for (i = 0; i < num; i++)
+           png_ptr->gamma_16_to_1[i] = NULL;
 
         for (i = 0; i < num; i++)
         {
