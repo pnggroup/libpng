@@ -1,9 +1,9 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.30 [August 15, 2008]
+ * Last changed in libpng 1.2.35 [February 4, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -684,7 +684,7 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
       }
       png_ptr->rgb_to_gray_red_coeff   = red_int;
       png_ptr->rgb_to_gray_green_coeff = green_int;
-      png_ptr->rgb_to_gray_blue_coeff  = 
+      png_ptr->rgb_to_gray_blue_coeff  =
          (png_uint_16)(32768 - red_int - green_int);
    }
 }
@@ -1329,7 +1329,7 @@ png_do_read_transformations(png_structp png_ptr)
       if (rgb_error)
       {
          png_ptr->rgb_to_gray_status=1;
-         if ((png_ptr->transformations & PNG_RGB_TO_GRAY) == 
+         if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
              PNG_RGB_TO_GRAY_WARN)
             png_warning(png_ptr, "png_do_rgb_to_gray found nongray pixel");
          if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
@@ -3836,7 +3836,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                dp = row + (row_info->rowbytes << 1) - 1;
                for (i = 0; i < row_width; i++)
                {
-                  if (*(sp - 1) == gray_high && *(sp) == gray_low) 
+                  if (*(sp - 1) == gray_high && *(sp) == gray_low)
                   {
                      *dp-- = 0;
                      *dp-- = 0;
@@ -4210,6 +4210,9 @@ png_build_gamma_table(png_structp png_ptr)
 
         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p)));
+
+        for (i = 0; i < num; i++)
+           png_ptr->gamma_16_from_1[i] = NULL;
 
         for (i = 0; i < num; i++)
         {
