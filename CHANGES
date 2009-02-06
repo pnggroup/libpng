@@ -2186,7 +2186,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [February 4, 2009]
+version 1.0.38rc01, 1.2.30rc01 [February 6, 2009]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2310,8 +2310,12 @@ version 1.0.42, 1.2.34 [December 18, 2008]
 version 1.2.35beta01 [February 4, 2009]
   Zero out some arrays of pointers after png_malloc(). (Tavis Ormandy)
 
-version 1.2.35beta02 [February 4, 2009]
-  Zero out more arrays of pointers after png_malloc()
+version 1.2.35beta02 [Feburary 4, 2009]
+  Zero out more arrays of pointers after png_malloc().
+
+version 1.2.35beta03 [February 6, 2009]
+  Use png_memset() instead of a loop to intialize pointers.  We realize
+    this will not work on platforms where the NULL pointer is not all zeroes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

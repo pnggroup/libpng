@@ -1,5 +1,5 @@
 
-Libpng 1.2.35beta02 - February 4, 2009
+Libpng 1.2.35beta03 - February 6, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.35beta02.tar.gz
-   libpng-1.2.35beta02.tar.lzma
+   libpng-1.2.35beta03.tar.gz
+   libpng-1.2.35beta03.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.35beta02.tar.bz2
+   libpng-1.2.35beta03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.35beta02-no-config.tar.gz
-   libpng-1.2.35beta02-no-config.tar.lzma
-   libpng-1.2.35beta02-no-config.tar.bz2
+   libpng-1.2.35beta03-no-config.tar.gz
+   libpng-1.2.35beta03-no-config.tar.lzma
+   libpng-1.2.35beta03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1235b02.zip
-   lp1235b02.7z
-   lp1235b02.tar.bz2
+   lp1235b03.zip
+   lp1235b03.7z
+   lp1235b03.tar.bz2
 
 Project files
 
-   libpng-1.2.35beta02-project-netware.zip
-   libpng-1.2.35beta02-project-wince.zip
+   libpng-1.2.35beta03-project-netware.zip
+   libpng-1.2.35beta03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.35beta02-README.txt
-   libpng-1.2.35beta02-KNOWNBUGS.txt
-   libpng-1.2.35beta02-LICENSE.txt
-   libpng-1.2.35beta02-Y2K-compliance.txt
-   libpng-1.2.35beta02-[previous version]-diff.txt
+   libpng-1.2.35beta03-README.txt
+   libpng-1.2.35beta03-KNOWNBUGS.txt
+   libpng-1.2.35beta03-LICENSE.txt
+   libpng-1.2.35beta03-Y2K-compliance.txt
+   libpng-1.2.35beta03-[previous version]-diff.txt
 
 Changes since the last public release (1.2.34):
 
@@ -47,9 +47,12 @@ Changes since the last public release (1.2.34):
 version 1.2.35beta01 [February 4, 2009]
   Zero out some arrays of pointers after png_malloc(). (Tavis Ormandy)
 
-version 1.2.35beta02 [February 4, 2009]
-  Zero out more arrays of pointers after png_malloc()
+version 1.2.35beta02 [Feburary 4, 2009]
+  Zero out more arrays of pointers after png_malloc().
 
+version 1.2.35beta03 [February 6, 2009]
+  Use png_memset() instead of a loop to intialize pointers.  We realize
+    this will not work on platforms where the NULL pointer is not all zeroes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

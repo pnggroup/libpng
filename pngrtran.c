@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.35 [February 4, 2009]
+ * Last changed in libpng 1.2.35 [February 6, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -309,9 +309,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
          hash = (png_dsortpp)png_malloc(png_ptr, (png_uint_32)(769 *
             png_sizeof(png_dsortp)));
-         for (i = 0; i < 769; i++)
-            hash[i] = NULL;
-/*         png_memset(hash, 0, 769 * png_sizeof(png_dsortp)); */
+         png_memset(hash, 0, 769 * png_sizeof(png_dsortp));
 
          num_new_palette = num_palette;
 
@@ -4133,8 +4131,7 @@ png_build_gamma_table(png_structp png_ptr)
         double fin, fout;
         png_uint_32 last, max;
 
-        for (i = 0; i < num; i++)
-           png_ptr->gamma_16_table[i] = NULL;
+        png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p)); 
 
         for (i = 0; i < num; i++)
         {
@@ -4191,8 +4188,7 @@ png_build_gamma_table(png_structp png_ptr)
         png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p )));
 
-        for (i = 0; i < num; i++)
-           png_ptr->gamma_16_to_1[i] = NULL;
+        png_memset(png_ptr->gamma_16_to_1, 0, num * png_sizeof(png_uint_16p)); 
 
         for (i = 0; i < num; i++)
         {
@@ -4217,8 +4213,8 @@ png_build_gamma_table(png_structp png_ptr)
         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p)));
 
-        for (i = 0; i < num; i++)
-           png_ptr->gamma_16_from_1[i] = NULL;
+        png_memset(png_ptr->gamma_16_from_1, 0,
+           num * png_sizeof(png_uint_16p)); 
 
         for (i = 0; i < num; i++)
         {
