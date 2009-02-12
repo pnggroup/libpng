@@ -387,7 +387,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    info_ptr->free_me |= PNG_FREE_PCAL;
 #endif
 
-   png_memset(info_ptr->pcal_params, 0, nparams * png_sizeof(png_color));
+   png_memset(info_ptr->pcal_params, 0, (nparams + 1) * png_sizeof(png_charp));
 
    for (i = 0; i < nparams; i++)
    {
