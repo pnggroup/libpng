@@ -2313,9 +2313,15 @@ version 1.2.35beta01 [February 4, 2009]
 version 1.2.35beta02 [Feburary 4, 2009]
   Zero out more arrays of pointers after png_malloc().
 
-version 1.2.35beta03 [February 12, 2009]
+version 1.2.35beta03 [February 5, 2009]
   Use png_memset() instead of a loop to intialize pointers.  We realize
     this will not work on platforms where the NULL pointer is not all zeroes.
+
+version 1.2.35rc01 [February 11, 2009]
+  No changes.
+
+version 1.2.35rc02 [February 12, 2009]
+  Fix typo in new png_memset call in pngset.c (png_color should be png_charp)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
