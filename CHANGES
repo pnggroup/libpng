@@ -2053,6 +2053,12 @@ version 1.4.0beta46 [December 10, 2008]
 version 1.4.0beta47 [December 15, 2008]
   Turned off PNG_READ_DITHER_SUPPORTED by default.
 
+version 1.4.0beta48 [February 14, 2009]
+  Added new exported function png_calloc().
+  Combined several instances of png_malloc(); png_memset() into png_calloc().
+  Removed prototype for png_freeptr() that was added in libpng-1.4.0beta24
+    but was never defined.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

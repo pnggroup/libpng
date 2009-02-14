@@ -1,9 +1,9 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -660,7 +660,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
 #ifndef PNG_NO_CONSOLE_IO
-         fprintf(stderr, "gamma = (%d/100000)\n", (int)igamma);
+         fprintf(stderr, "gamma = (%d/100000)", (int)igamma);
 #endif
          return;
       }
@@ -1401,7 +1401,7 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_ptr->background.index = buf[0];
       if (info_ptr && info_ptr->num_palette)
       {
-          if (buf[0] > info_ptr->num_palette)
+          if (buf[0] >= info_ptr->num_palette)
           {
              png_warning(png_ptr, "Incorrect bKGD chunk index value");
              return;
@@ -3278,7 +3278,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_debug1(3, "iwidth = %lu,", png_ptr->iwidth);
    png_debug1(3, "num_rows = %lu,", png_ptr->num_rows);
    png_debug1(3, "rowbytes = %lu,", png_ptr->rowbytes);
-   png_debug1(3, "irowbytes = %lu,", png_ptr->irowbytes);
+   png_debug1(3, "irowbytes = %lu", png_ptr->irowbytes);
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }

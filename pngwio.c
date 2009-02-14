@@ -1,9 +1,9 @@
 
 /* pngwio.c - functions for data output
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -119,7 +119,7 @@ png_default_flush(png_structp png_ptr)
    png_FILE_p io_ptr;
    if (png_ptr == NULL) return;
    io_ptr = (png_FILE_p)CVT_PTR((png_ptr->io_ptr));
-   if (io_ptr != NULL && fileno(io_ptr)!=-1)
+   if (io_ptr != NULL && fileno(io_ptr) != -1)
       fflush(io_ptr);
 }
 #endif

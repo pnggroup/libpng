@@ -1,9 +1,9 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -383,7 +383,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
       return;
    }
 
-   info_ptr->pcal_params[nparams] = NULL;
+   png_memset(info_ptr->pcal_params[nparams],0,nparams*png_sizeof(png_charp));
 
    for (i = 0; i < nparams; i++)
    {
@@ -518,10 +518,8 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
    /* Changed in libpng-1.2.1 to allocate PNG_MAX_PALETTE_LENGTH instead
       of num_palette entries,
       in case of an invalid PNG file that has too-large sample values. */
-   png_ptr->palette = (png_colorp)png_malloc(png_ptr,
+   png_ptr->palette = (png_colorp)png_calloc(png_ptr,
       PNG_MAX_PALETTE_LENGTH * png_sizeof(png_color));
-   png_memset(png_ptr->palette, 0, PNG_MAX_PALETTE_LENGTH *
-      png_sizeof(png_color));
    png_memcpy(png_ptr->palette, palette, num_palette * png_sizeof(png_color));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;

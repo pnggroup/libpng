@@ -1,9 +1,9 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -34,7 +34,10 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
 
-   volatile png_structp png_ptr;
+#ifdef PNG_SETJMP_SUPPORTED
+   volatile
+#endif
+   png_structp png_ptr;
 
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
@@ -1374,7 +1377,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 #endif
    if (info_ptr->row_pointers == NULL)
    {
-      info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
+      info_ptr->row_pointers = (png_bytepp)png_calloc(png_ptr,
          info_ptr->height * png_sizeof(png_bytep));
 #ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_ROWS;

@@ -1,9 +1,9 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1083,7 +1083,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
-   png_debug(0, "\nWriting info struct");
+   png_debug(0, "Writing info struct");
 
 /* If we wanted, we could write info in two steps:
    png_write_info_before_PLTE(write_ptr, write_info_ptr);
@@ -1126,10 +1126,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
 #ifdef SINGLE_ROWBUF_ALLOC
-   png_debug(0, "\nAllocating row buffer...");
+   png_debug(0, "Allocating row buffer...");
    row_buf = (png_bytep)png_malloc(read_ptr,
       png_get_rowbytes(read_ptr, read_info_ptr));
-   png_debug1(0, "0x%08lx\n", (unsigned long)row_buf);
+   png_debug1(0, "0x%08lx", (unsigned long)row_buf);
 #endif /* SINGLE_ROWBUF_ALLOC */
    png_debug(0, "Writing row data");
 
@@ -1154,7 +1154,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       for (y = 0; y < height; y++)
       {
 #ifndef SINGLE_ROWBUF_ALLOC
-         png_debug2(0, "\nAllocating row buffer (pass %d, y = %ld)...", pass, y);
+         png_debug2(0, "Allocating row buffer (pass %d, y = %ld)...", pass, y);
          row_buf = (png_bytep)png_malloc(read_ptr,
             png_get_rowbytes(read_ptr, read_info_ptr));
          png_debug2(0, "0x%08lx (%ld bytes)", (unsigned long)row_buf,
@@ -1177,7 +1177,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif /* PNG_WRITE_SUPPORTED */
 
 #ifndef SINGLE_ROWBUF_ALLOC
-         png_debug2(0, "Freeing row buffer (pass %d, y = %ld)\n", pass, y);
+         png_debug2(0, "Freeing row buffer (pass %d, y = %ld)", pass, y);
          png_free(read_ptr, row_buf);
          row_buf = NULL;
 #endif /* !SINGLE_ROWBUF_ALLOC */
@@ -1613,4 +1613,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta47 your_png_h_is_not_version_1_4_0beta47;
+typedef version_1_4_0beta48 your_png_h_is_not_version_1_4_0beta48;

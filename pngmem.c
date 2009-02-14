@@ -1,9 +1,9 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -111,6 +111,17 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * result, we would be truncating potentially larger memory requests
  * (which should cause a fatal error) and introducing major problems.
  */
+
+png_voidp PNGAPI
+png_calloc(png_structp png_ptr, png_alloc_size_t size)
+{
+   png_voidp ret;
+
+   ret = (png_malloc(png_ptr, size));
+   if (ret != NULL)
+      png_memset(ret,0,(png_size_t)size);
+   return (ret);
+}
 
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_alloc_size_t size)
@@ -424,6 +435,17 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
    it not to.  See zconf.h and png.h for more information.  zlib does
    need to allocate exactly 64K, so whatever you call here must
    have the ability to do that. */
+
+png_voidp PNGAPI
+png_calloc(png_structp png_ptr, png_alloc_size_t size)
+{
+   png_voidp ret;
+
+   ret = (png_malloc(png_ptr, size));
+   if (ret != NULL)
+      png_memset(ret,0,(png_size_t)size);
+   return (ret);
+}
 
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_alloc_size_t size)

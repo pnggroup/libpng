@@ -1,9 +1,9 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -396,7 +396,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    /* This flush, added in libpng-1.0.8, removed from libpng-1.0.9beta03,
     * and restored again in libpng-1.2.30, may cause some applications that
     * do not set png_ptr->output_flush_fn to crash.  If your application
-    * experiences this problem, please report the event to
+    * experiences a problem, please report the event to
     * png-mng-implement at lists.sf.net .
     */
 #if defined(PNG_WRITE_FLUSH_SUPPORTED)
@@ -446,7 +446,10 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_malloc_ptr malloc_fn, png_free_ptr free_fn)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
-   volatile png_structp png_ptr;
+#ifdef PNG_SETJMP_SUPPORTED
+    volatile
+#endif
+    png_structp png_ptr;
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;

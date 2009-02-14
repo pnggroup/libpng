@@ -1,9 +1,9 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -273,7 +273,7 @@ png_text_compress(png_structp png_ptr,
 
                old_ptr = comp->output_ptr;
                comp->output_ptr = (png_charpp)png_malloc(png_ptr,
-                  (png_size_t)
+                  (png_alloc_size_t)
                   (comp->max_output_ptr * png_sizeof(png_charpp)));
                png_memcpy(comp->output_ptr, old_ptr, old_max
                   * png_sizeof(png_charp));
@@ -281,14 +281,14 @@ png_text_compress(png_structp png_ptr,
             }
             else
                comp->output_ptr = (png_charpp)png_malloc(png_ptr,
-                  (png_size_t)
+                  (png_alloc_size_t)
                   (comp->max_output_ptr * png_sizeof(png_charp)));
          }
 
          /* save the data */
          comp->output_ptr[comp->num_output_ptr] =
             (png_charp)png_malloc(png_ptr,
-            png_ptr->zbuf_size);
+            (png_alloc_size_t)png_ptr->zbuf_size);
          png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
             png_ptr->zbuf_size);
          comp->num_output_ptr++;
@@ -325,7 +325,7 @@ png_text_compress(png_structp png_ptr,
                   old_ptr = comp->output_ptr;
                   /* This could be optimized to realloc() */
                   comp->output_ptr = (png_charpp)png_malloc(png_ptr,
-                     (png_size_t)(comp->max_output_ptr *
+                     (png_alloc_size_t)(comp->max_output_ptr *
                      png_sizeof(png_charp)));
                   png_memcpy(comp->output_ptr, old_ptr,
                      old_max * png_sizeof(png_charp));
@@ -333,14 +333,14 @@ png_text_compress(png_structp png_ptr,
                }
                else
                   comp->output_ptr = (png_charpp)png_malloc(png_ptr,
-                     (png_size_t)(comp->max_output_ptr *
+                     (png_alloc_size_t)(comp->max_output_ptr *
                      png_sizeof(png_charp)));
             }
 
             /* save off the data */
             comp->output_ptr[comp->num_output_ptr] =
                (png_charp)png_malloc(png_ptr,
-               (png_size_t)png_ptr->zbuf_size);
+               (png_alloc_size_t)png_ptr->zbuf_size);
             png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
                png_ptr->zbuf_size);
             comp->num_output_ptr++;
@@ -1572,7 +1572,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    total_len = purpose_len + units_len + 10;
 
    params_len = (png_uint_32p)png_malloc(png_ptr,
-      (png_size_t)(nparams * png_sizeof(png_uint_32)));
+      (png_alloc_size_t)(nparams * png_sizeof(png_uint_32)));
 
    /* Find the length of each parameter, making sure we don't count the
       null terminator for the last parameter. */
@@ -1751,7 +1751,7 @@ png_write_start_row(png_structp png_ptr)
 
    /* set up row buffer */
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr,
-     (png_size_t)buf_size);
+     (png_alloc_size_t)buf_size);
    png_ptr->row_buf[0] = PNG_FILTER_VALUE_NONE;
 
 #ifndef PNG_NO_WRITE_FILTER
@@ -1759,7 +1759,7 @@ png_write_start_row(png_structp png_ptr)
    if (png_ptr->do_filter & PNG_FILTER_SUB)
    {
       png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
-         (png_size_t)(png_ptr->rowbytes + 1));
+         (png_alloc_size_t)(png_ptr->rowbytes + 1));
       png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
    }
 
@@ -1767,9 +1767,8 @@ png_write_start_row(png_structp png_ptr)
    if (png_ptr->do_filter & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH))
    {
      /* set up previous row buffer */
-      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr,
-        (png_size_t)buf_size);
-      png_memset(png_ptr->prev_row, 0, buf_size);
+ png_ptr->prev_row = (png_bytep)png_calloc(png_ptr,
+        (png_alloc_size_t)buf_size);
 
       if (png_ptr->do_filter & PNG_FILTER_UP)
       {
@@ -1781,7 +1780,7 @@ png_write_start_row(png_structp png_ptr)
       if (png_ptr->do_filter & PNG_FILTER_AVG)
       {
          png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
-           (png_size_t)(png_ptr->rowbytes + 1));
+           (png_alloc_size_t)(png_ptr->rowbytes + 1));
          png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
       }
 

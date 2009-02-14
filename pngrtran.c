@@ -1,9 +1,9 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [December 15, 2008]
+ * Last changed in libpng 1.4.0 [February 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -321,11 +321,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             png_ptr->palette_to_index[i] = (png_byte)i;
          }
 
-         hash = (png_dsortpp)png_malloc(png_ptr, (png_uint_32)(769 *
+         hash = (png_dsortpp)png_calloc(png_ptr, (png_uint_32)(769 *
             png_sizeof(png_dsortp)));
-         for (i = 0; i < 769; i++)
-            hash[i] = NULL;
-/*         png_memset(hash, 0, 769 * png_sizeof(png_dsortp)); */
 
          num_new_palette = num_palette;
 
@@ -472,11 +469,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
       int num_blue = (1 << PNG_DITHER_BLUE_BITS);
       png_size_t num_entries = ((png_size_t)1 << total_bits);
 
-      png_ptr->palette_lookup = (png_bytep )png_malloc(png_ptr,
+      png_ptr->palette_lookup = (png_bytep )png_calloc(png_ptr,
          (png_uint_32)(num_entries * png_sizeof(png_byte)));
-
-      png_memset(png_ptr->palette_lookup, 0, num_entries *
-         png_sizeof(png_byte));
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
          png_sizeof(png_byte)));
@@ -685,7 +679,7 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
       }
       png_ptr->rgb_to_gray_red_coeff   = red_int;
       png_ptr->rgb_to_gray_green_coeff = green_int;
-      png_ptr->rgb_to_gray_blue_coeff  = 
+      png_ptr->rgb_to_gray_blue_coeff  =
          (png_uint_16)(32768 - red_int - green_int);
    }
 }
@@ -1325,7 +1319,7 @@ png_do_read_transformations(png_structp png_ptr)
       if (rgb_error)
       {
          png_ptr->rgb_to_gray_status=1;
-         if ((png_ptr->transformations & PNG_RGB_TO_GRAY) == 
+         if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
              PNG_RGB_TO_GRAY_WARN)
             png_warning(png_ptr, "png_do_rgb_to_gray found nongray pixel");
          if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
@@ -3696,7 +3690,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                dp = row + (row_info->rowbytes << 1) - 1;
                for (i = 0; i < row_width; i++)
                {
-                  if (*(sp - 1) == gray_high && *(sp) == gray_low) 
+                  if (*(sp - 1) == gray_high && *(sp) == gray_low)
                   {
                      *dp-- = 0;
                      *dp-- = 0;
@@ -3982,7 +3976,7 @@ png_build_gamma_table(png_structp png_ptr)
      else
         g = 1.0;
 
-     png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
+     png_ptr->gamma_16_table = (png_uint_16pp)png_calloc(png_ptr,
         (png_uint_32)(num * png_sizeof(png_uint_16p)));
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
@@ -4042,7 +4036,7 @@ png_build_gamma_table(png_structp png_ptr)
 
         g = 1.0 / (png_ptr->gamma);
 
-        png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
+        png_ptr->gamma_16_to_1 = (png_uint_16pp)png_calloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p )));
 
         for (i = 0; i < num; i++)
@@ -4065,7 +4059,7 @@ png_build_gamma_table(png_structp png_ptr)
         else
            g = png_ptr->gamma;   /* probably doing rgb_to_gray */
 
-        png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
+        png_ptr->gamma_16_from_1 = (png_uint_16pp)png_calloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p)));
 
         for (i = 0; i < num; i++)

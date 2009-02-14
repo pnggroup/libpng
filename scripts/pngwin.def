@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.4.0beta47
+;Version 1.4.0beta48
   png_build_grayscale_palette
   png_chunk_error
   png_chunk_warning
@@ -202,8 +202,6 @@ EXPORTS
 ; png_zfree
 ; Added at version 1.2.4
   png_malloc_warn
-; Added at version 1.2.6
-  png_malloc_warn
   png_get_user_height_max
   png_get_user_width_max
   png_set_user_limits
@@ -229,3 +227,4 @@ EXPORTS
   png_get_chunk_cache_max
   png_set_chunk_cache_max
   png_check_cHRM_fixed
+  png_calloc
