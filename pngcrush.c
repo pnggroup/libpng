@@ -1,5 +1,5 @@
 /* pngcrush.c - recompresses png files
- * Copyright (C) 1998-2002,2006-2008 Glenn Randers-Pehrson (glennrp@users.sf.net)
+ * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson (glennrp@users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
  *
  * The most recent version of pngcrush can be found at SourceForge in
@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.13"
+#define PNGCRUSH_VERSION "1.6.14"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -38,7 +38,7 @@
  * If you have modified this source, you may insert additional notices
  * immediately after this sentence.
  *
- * Copyright (C) 1998-2002,2006-2008 Glenn Randers-Pehrson (glennrp@users.sf.net)
+ * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson (glennrp@users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
  *
  * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
@@ -5485,7 +5485,7 @@ void print_version_info(void)
       " | pngcrush %s\n"
       /* If you have modified this source, you may insert additional notices
        * immediately after this sentence: */
-      " |    Copyright (C) 1998-2002,2006-2008 Glenn Randers-Pehrson\n"
+      " |    Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson\n"
       " |    Copyright (C) 2005      Greg Roelofs\n"
       " | This is a free, open-source program.  Permission is irrevocably\n"
       " | granted to everyone to use this version of pngcrush without\n"
@@ -5493,7 +5493,7 @@ void print_version_info(void)
       " | Executable name is %s\n"
       " | It was built with libpng version %s, and is\n"
       " | running with %s"
-      " |    Copyright (C) 1998-2004,2006-2008 Glenn Randers-Pehrson,\n"
+      " |    Copyright (C) 1998-2004,2006-2009 Glenn Randers-Pehrson,\n"
       " |    Copyright (C) 1996, 1997 Andreas Dilger,\n"
       " |    Copyright (C) 1995, Guy Eric Schalnat, Group 42 Inc.,\n"
       " | and zlib version %s, Copyright (C) 1998-2002 (or later),\n"
@@ -5531,7 +5531,7 @@ static const char *pngcrush_legal[] = {
     "",
     /* If you have modified this source, you may insert additional notices
      * immediately after this sentence: */
-    "Copyright (C) 1998-2002,2006-2008 Glenn Randers-Pehrson (glennrp@users.sf.net)",
+    "Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson (glennrp@users.sf.net)",
     "Copyright (C) 2005      Greg Roelofs",
     "",
     "DISCLAIMER: The pngcrush computer program is supplied \"AS IS\".",
@@ -5838,8 +5838,7 @@ struct options_help pngcrush_options[] = {
 
     {0, "         -time_stamp"},
     {2, ""},
-    {2, "               Reset file modification time.  Default is to"},
-    {2, "               reproduce the input file modification time."},
+    {2, "               Reset file modification time."},
     {2, ""},
 
 #ifdef PNG_tRNS_SUPPORTED

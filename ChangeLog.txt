@@ -1,9 +1,6 @@
 Change log:
 
-Version 1.6.13 (built with libpng-1.2.34 and zlib-1.2.3.2)
-  Added "-time_stamp" directive, to cause pngcrush to write
-    a new timestamp on the output file instead of replicating
-    the timestame from the input file.
+Version 1.6.14 (built with libpng-1.2.35 and zlib-1.2.3.2)
 
 Version 1.6.12 (built with libpng-1.2.34 and zlib-1.2.3.2)
 

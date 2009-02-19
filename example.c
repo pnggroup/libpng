@@ -2,9 +2,9 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.2.33 [December 18, 2008]
+ * Last changed in libpng 1.2.35 [February 14, 2009]
  * This file has been placed in the public domain by the authors.
- * Maintained 1998-2008 Glenn Randers-Pehrson
+ * Maintained 1998-2009 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -342,11 +342,13 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* The easiest way to read the image: */
    png_bytep row_pointers[height];
 
+   /* Clear the pointer array */
    for (row = 0; row < height; row++)
-   {
+      row_pointers[row] = NULL;
+
+   for (row = 0; row < height; row++)
       row_pointers[row] = png_malloc(png_ptr, png_get_rowbytes(png_ptr,
          info_ptr));
-   }
 
    /* Now it's time to read the image.  One of these methods is REQUIRED */
 #ifdef entire /* Read the entire image in one go */
@@ -771,9 +773,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 
       /* If you are only writing one row at a time, this works */
       for (y = 0; y < height; y++)
-      {
          png_write_rows(png_ptr, &row_pointers[y], 1);
-      }
    }
 #endif no_entire /* use only one output method */
 
