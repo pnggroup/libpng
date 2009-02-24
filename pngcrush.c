@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.14"
+#define PNGCRUSH_VERSION "1.6.15"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -1195,7 +1195,7 @@ png_voidp png_debug_malloc(png_structp png_ptr, png_uint_32 size)
     /* This calls the library allocator twice, once to get the requested
        buffer and once to get a new free list entry. */
     {
-        memory_infop pinfo = png_malloc_default(png_ptr, sizeof *pinfo);
+        memory_infop pinfo = (memory_infop)png_malloc_default(png_ptr, sizeof *pinfo);
         pinfo->size = size;
         current_allocation += size;
         if (current_allocation > maximum_allocation)
@@ -1888,7 +1888,7 @@ int main(int argc, char *argv[])
                 iccp_length = 0;
             } else {
                 int ic;
-                iccp_text = malloc(iccp_length);
+                iccp_text = (char*)malloc(iccp_length);
                 for (ic = 0; ic < iccp_length; ic++) {
                     png_size_t num_in;
                     num_in = fread(buffer, 1, 1, iccp_fn);
@@ -3817,11 +3817,11 @@ int main(int argc, char *argv[])
                       /* Add sTER chunk */
                       png_unknown_chunkp ster;
                       P1("Handling sTER as unknown chunk %d\n", i);
-                      ster = png_malloc(read_ptr,
+                      ster = (png_unknown_chunk*)png_malloc(read_ptr,
                           (png_uint_32) sizeof(png_unknown_chunk));
                       png_memcpy((char *)ster[0].name, "sTER",5);
                       ster[0].size = 1;
-                      ster[0].data = png_malloc(read_ptr, 1);
+                      ster[0].data = (png_byte*)png_malloc(read_ptr, 1);
                       ster[0].data[0] = (png_byte)ster_mode;
                       png_set_unknown_chunks(read_ptr, read_info_ptr,
                        ster, 1);
@@ -3832,6 +3832,9 @@ int main(int argc, char *argv[])
                     num_unknowns = (int)png_get_unknown_chunks(read_ptr,
                       read_info_ptr, &unknowns);
 
+#ifndef PNG_HAVE_IHDR
+#define PNG_HAVE_IHDR 0x01
+#endif
                     if (ster_mode >= 0)
                       png_set_unknown_chunk_location(read_ptr, read_info_ptr,
                          num_unknowns - 1, (int)PNG_HAVE_IHDR);
@@ -3843,7 +3846,7 @@ int main(int argc, char *argv[])
                         int num_unknowns_keep;
                         int i;
 
-                        unknowns_keep = png_malloc(write_ptr,
+                        unknowns_keep = (png_unknown_chunk*)png_malloc(write_ptr,
                           (png_uint_32) num_unknowns
                           *sizeof(png_unknown_chunk));
 
@@ -4789,7 +4792,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             if (length > malloced_length) {
               png_free(mng_ptr,bb);
               printf ("  png_malloc %lu bytes.\n",(unsigned long)length);
-              bb=png_malloc(mng_ptr, length);
+              bb=(png_byte*)png_malloc(mng_ptr, length);
               malloced_length=length;
             }
             png_crc_read(png_ptr, bb, length);

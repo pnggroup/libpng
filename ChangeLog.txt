@@ -1,6 +1,11 @@
 Change log:
 
+Version 1.6.15 (built with libpng-1.2.35 and zlib-1.2.3.2)
+  Fixes some missing typecasts on png_malloc() calls, patch from
+    an anonymous reporter to the SourceForge bug tracker.
+
 Version 1.6.14 (built with libpng-1.2.35 and zlib-1.2.3.2)
+  Avoids CVE-2009-0040.
 
 Version 1.6.12 (built with libpng-1.2.34 and zlib-1.2.3.2)
 
