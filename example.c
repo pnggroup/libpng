@@ -599,7 +599,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     */
    if (setjmp(png_jmpbuf(png_ptr)))
    {
-      /* If we get here, we had a problem reading the file */
+      /* If we get here, we had a problem writing the file */
       fclose(fp);
       png_destroy_write_struct(&png_ptr, &info_ptr);
       return (ERROR);
@@ -694,7 +694,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     *   write_my_chunk();
     *   png_write_info(png_ptr, info_ptr);
     *
-    * However, given the level of known- and unknown-chunk support in 1.1.0
+    * However, given the level of known- and unknown-chunk support in 1.2.0
     * and up, this should no longer be necessary.
     */
 
