@@ -2059,6 +2059,15 @@ version 1.4.0beta48 [February 14, 2009]
   Removed prototype for png_freeptr() that was added in libpng-1.4.0beta24
     but was never defined.
 
+version 1.4.0beta49 [February 28, 2009]
+  Added png_fileno() macro to pngconf.h, used in pngwio.c
+  Corrected order of #ifdef's in png_debug definition in png.h
+  Fixed bug introduced in libpng-1.4.0beta48 with the memset arguments
+    for pcal_params.
+  Fixed order of #ifdef directives in the png_debug defines in png.h
+    (bug introduced in libpng-1.2.34/1.4.0beta29).
+  Revised comments in png_set_read_fn() and png_set_write_fn().
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
