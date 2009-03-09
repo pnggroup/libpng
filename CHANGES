@@ -2068,6 +2068,10 @@ version 1.4.0beta49 [February 28, 2009]
     (bug introduced in libpng-1.2.34/1.4.0beta29).
   Revised comments in png_set_read_fn() and png_set_write_fn().
 
+version 1.4.0beta50 [March 9, 2009]
+  Use png_calloc() instead of png_malloc() to allocate big_row_buf when
+    reading an interlaced file, to avoid a possible UMR.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
