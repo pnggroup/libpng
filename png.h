@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.0beta50 - March 9, 2009
+ * libpng version 1.4.0beta51 - March 21, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -9,7 +9,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.0beta50 - March 9, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.0beta51 - March 21, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -127,7 +127,7 @@
  *    1.4.0beta9-14           14    10400  14.so.0.0[.0]
  *    1.2.13                  13    10213  12.so.0.10[.0]
  *    1.4.0beta15-36          14    10400  14.so.0.0[.0]
- *    1.4.0beta37-50          14    10400  14.so.14.0[.0]
+ *    1.4.0beta37-51          14    10400  14.so.14.0[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -157,7 +157,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta50, March 9, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta51, March 21, 2009, are
  * Copyright (c) 2004, 2006-2007 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -275,7 +275,7 @@
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.4.0beta50 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.4.0beta51 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -331,9 +331,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.4.0beta50"
+#define PNG_LIBPNG_VER_STRING "1.4.0beta51"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.0beta50 - March 9, 2009\n"
+   " libpng version 1.4.0beta51 - March 21, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   14
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -345,7 +345,7 @@
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  50
+#define PNG_LIBPNG_VER_BUILD  51
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -1356,7 +1356,7 @@ struct png_struct_def
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_4_0beta50;
+typedef png_structp version_1_4_0beta51;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -1524,7 +1524,8 @@ extern PNG_EXPORT(void,png_set_invert_alpha) PNGARG((png_structp png_ptr));
 #endif
 
 #if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
-extern PNG_EXPORT(void,png_set_premultiply_alpha) PNGARG((png_structp png_ptr));
+extern PNG_EXPORT(void,png_set_premultiply_alpha)
+  PNGARG((png_structp png_ptr));
 #endif
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
@@ -1835,6 +1836,11 @@ extern PNG_EXPORT(png_voidp,png_get_error_ptr) PNGARG((png_structp png_ptr));
  * If buffered output is not used, then output_flush_fn can be set to NULL.
  * If PNG_WRITE_FLUSH_SUPPORTED is not defined at libpng compile time
  * output_flush_fn will be ignored (and thus can be NULL).
+ * It is probably a mistake to use NULL for output_flush_fn if
+ * write_data_fn is not also NULL unless you have built libpng with
+ * PNG_WRITE_FLUSH_SUPPORTED undefined, because in this case libpng's
+ * default flush function, which uses the standard *FILE structure, will
+ * be used.
  */
 extern PNG_EXPORT(void,png_set_write_fn) PNGARG((png_structp png_ptr,
    png_voidp io_ptr, png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn));

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [March 9, 2009]
+ * Last changed in libpng 1.4.0 [March 21, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1383,17 +1383,15 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 #else
       info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
          info_ptr->height * png_sizeof(png_bytep));
-      png_memset(info_ptr->row_pointers, 0,
-         info_ptr->height * png_sizeof(png_bytep));
+      png_memset(info_ptr->row_pointers, 0, info_ptr->height
+         * png_sizeof(png_bytep));
 #endif
 #ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_ROWS;
 #endif
       for (row = 0; row < (int)info_ptr->height; row++)
-      {
          info_ptr->row_pointers[row] = (png_bytep)png_malloc(png_ptr,
             png_get_rowbytes(png_ptr, info_ptr));
-      }
    }
 
    png_read_image(png_ptr, info_ptr->row_pointers);

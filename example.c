@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.4.0 [March 9, 2009]
+ * Last changed in libpng 1.4.0 [March 21, 2009]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2009 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -342,11 +342,13 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* The easiest way to read the image: */
    png_bytep row_pointers[height];
 
+   /* Clear the pointer array */
    for (row = 0; row < height; row++)
-   {
+      row_pointers[row] = NULL;
+
+   for (row = 0; row < height; row++)
       row_pointers[row] = png_malloc(png_ptr, png_get_rowbytes(png_ptr,
          info_ptr));
-   }
 
    /* Now it's time to read the image.  One of these methods is REQUIRED */
 #ifdef entire /* Read the entire image in one go */
@@ -597,7 +599,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     */
    if (setjmp(png_jmpbuf(png_ptr)))
    {
-      /* If we get here, we had a problem reading the file */
+      /* If we get here, we had a problem writing the file */
       fclose(fp);
       png_destroy_write_struct(&png_ptr, &info_ptr);
       return (ERROR);
@@ -692,7 +694,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     *   write_my_chunk();
     *   png_write_info(png_ptr, info_ptr);
     *
-    * However, given the level of known- and unknown-chunk support in 1.1.0
+    * However, given the level of known- and unknown-chunk support in 1.2.0
     * and up, this should no longer be necessary.
     */
 
@@ -771,9 +773,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 
       /* If you are only writing one row at a time, this works */
       for (y = 0; y < height; y++)
-      {
          png_write_rows(png_ptr, &row_pointers[y], 1);
-      }
    }
 #endif no_entire /* use only one output method */
 

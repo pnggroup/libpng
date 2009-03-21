@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [March 9, 2009]
+ * Last changed in libpng 1.4.0 [March 21, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1465,7 +1465,8 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
 
 #if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
    if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
-      png_do_read_premultiply_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
+      png_do_read_premultiply_alpha(&(png_ptr->row_info),
+         png_ptr->row_buf + 1);
 #endif
 
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)

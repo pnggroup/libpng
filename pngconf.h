@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta50 - March 9, 2009
+ * libpng version 1.4.0beta51 - March 21, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1339,7 +1339,6 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define NOCHECK 0
 #  define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
 #  define CVT_PTR_NOCHECK(ptr) (png_far_to_near(png_ptr,ptr,NOCHECK))
-#  define png_fileno  _fileno     /* Added to v 1.4.0 */
 #  define png_strcpy  _fstrcpy
 #  define png_strncpy _fstrncpy   /* Added to v 1.2.6 */
 #  define png_strlen  _fstrlen
@@ -1351,7 +1350,6 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  if defined(_WINDOWS_)  /* favor Windows over C runtime fns */
 #    define CVT_PTR(ptr)         (ptr)
 #    define CVT_PTR_NOCHECK(ptr) (ptr)
-#    define png_fileno  fileno
 #    define png_strcpy  lstrcpyA
 #    define png_strncpy lstrcpynA
 #    define png_strlen  lstrlenA
@@ -1362,7 +1360,6 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  else
 #    define CVT_PTR(ptr)         (ptr)
 #    define CVT_PTR_NOCHECK(ptr) (ptr)
-#    define png_fileno  fileno      /* Added to v 1.4.0 */
 #    define png_strcpy  strcpy
 #    define png_strncpy strncpy     /* Added to v 1.2.6 */
 #    define png_strlen  strlen

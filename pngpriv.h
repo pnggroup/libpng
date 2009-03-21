@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta50 - March 9, 2009
+ * libpng version 1.4.0beta51 - March 21, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -123,7 +123,8 @@
                        /*     0x800000L     Unused */
 #define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
 #define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
-#define PNG_PREMULTIPLY_ALPHA 0x4000000L  /* Added to libpng-1.4.0 by volker */
+#define PNG_PREMULTIPLY_ALPHA 0x4000000L  /* Added to libpng-1.4.0 */
+                                          /* by volker */
                        /*   0x8000000L  unused */
                        /*  0x10000000L  unused */
                        /*  0x20000000L  unused */
@@ -583,15 +584,15 @@ PNG_EXTERN void png_do_write_invert_alpha PNGARG((png_row_infop row_info,
    png_bytep row));
 #endif
 
-#if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
-PNG_EXTERN void png_do_read_premultiply_alpha PNGARG((png_row_infop row_info,
-   png_bytep row));
-#endif
-
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
 PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
    png_bytep row, png_uint_32 flags));
+#endif
+
+#if defined(PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED)
+PNG_EXTERN void png_do_read_premultiply_alpha
+   PNGARG((png_row_infop row_info, png_bytep row));
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
