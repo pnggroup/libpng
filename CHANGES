@@ -2334,6 +2334,15 @@ version 1.2.36beta01 [February 28, 2009]
   Revised order of #ifdef's and indentation in png_debug definitions of png.h
     bug introduced in libpng-1.2.34.
 
+version 1.2.36beta02 [March 21, 2009]
+  Use png_memset() after png_malloc() of big_row_buf when reading an
+    interlaced file, to avoid a possible UMR.
+  Undid recent revision of PNG_NO_STDIO version of png_write_flush().  Users
+    having trouble with fflush() can build with PNG_NO_WRITE_FLUSH defined.
+  Revised libpng*.txt documentation about use of png_write_flush().
+  Removed fflush() from pngtest.c.
+  Added "#define PNG_NO_WRITE_FLUSH" to contrib/pngminim/encoder/pngusr.h
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

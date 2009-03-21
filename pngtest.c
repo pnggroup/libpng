@@ -1,9 +1,9 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.2.32 [September 18, 2008]
+ * Last changed in libpng 1.2.36 [March 21, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -362,12 +362,8 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 static void
 pngtest_flush(png_structp png_ptr)
 {
-#if !defined(_WIN32_WCE)
-   png_FILE_p io_ptr;
-   io_ptr = (png_FILE_p)CVT_PTR((png_ptr->io_ptr));
-   if (io_ptr != NULL)
-      fflush(io_ptr);
-#endif
+   /* Do nothing; fflush() is said to be just a waste of energy. */
+   png_ptr = png_ptr;  /* stifle compiler warning */
 }
 #endif
 
@@ -1685,4 +1681,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_36beta01 your_png_h_is_not_version_1_2_36beta01;
+typedef version_1_2_36beta02 your_png_h_is_not_version_1_2_36beta02;

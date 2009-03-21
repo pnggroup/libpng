@@ -1759,9 +1759,9 @@ png_write_start_row(png_structp png_ptr)
    if (png_ptr->do_filter & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH))
    {
      /* set up previous row buffer */
-      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr,
+     png_ptr->prev_row = (png_bytep)png_malloc(png_ptr,
         (png_uint_32)buf_size);
-      png_memset(png_ptr->prev_row, 0, buf_size);
+     png_memset(png_ptr->prev_row, 0, buf_size);
 
       if (png_ptr->do_filter & PNG_FILTER_UP)
       {
