@@ -2343,6 +2343,12 @@ version 1.2.36beta02 [March 21, 2009]
   Removed fflush() from pngtest.c.
   Added "#define PNG_NO_WRITE_FLUSH" to contrib/pngminim/encoder/pngusr.h
 
+version 1.2.36beta03 [March 28, 2009]
+  Relocated misplaced PNG_1_0_X define in png.h that caused the prototype
+    for png_set_strip_error_numbers() to be omitted from PNG_NO_ASSEMBLER_CODE
+    builds.  This bug was introduced in libpng-1.2.15beta4.
+  Added a section on differences between 1.0.x and 1.2.x to libpng.3/libpng.txt
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

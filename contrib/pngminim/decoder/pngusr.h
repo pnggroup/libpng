@@ -7,6 +7,10 @@
 #ifndef MINRDPNGCONF_H
 #define MINRDPNGCONF_H
 
+#ifdef NJET
+  /* No 16-bit support beyond reading with strip_16 */
+#endif
+
 #define PNG_NO_GLOBAL_ARRAYS
 
 #define PNG_NO_WARNINGS

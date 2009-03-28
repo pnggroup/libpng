@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.36beta02 - March 21, 2009
+ * libpng version 1.2.36beta03 - March 28, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -8,7 +8,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.36beta02 - March 21, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.36beta03 - March 28, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -222,7 +222,7 @@
  *    1.2.35rc01-02           13    10235  12.so.0.35[.0]
  *    1.0.43                  10    10043  10.so.0.43[.0]
  *    1.2.35                  13    10235  12.so.0.35[.0]
- *    1.2.36beta01-02         13    10236  12.so.0.36[.0]
+ *    1.2.36beta01-03         13    10236  12.so.0.36[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -252,7 +252,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.2.36beta02, March 21, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.2.36beta03, March 28, 2009, are
  * Copyright (c) 2004, 2006-2008 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -364,13 +364,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 21, 2009
+ *    March 28, 2009
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.2.36beta02 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.2.36beta03 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -426,9 +426,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.2.36beta02"
+#define PNG_LIBPNG_VER_STRING "1.2.36beta03"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.36beta02 - March 21, 2009\n"
+   " libpng version 1.2.36beta03 - March 28, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  13
@@ -440,7 +440,7 @@
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero: */
 
-#define PNG_LIBPNG_VER_BUILD  02
+#define PNG_LIBPNG_VER_BUILD  03
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -1488,7 +1488,7 @@ struct png_struct_def
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_2_36beta02;
+typedef png_structp version_1_2_36beta03;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -2722,6 +2722,7 @@ extern PNG_EXPORT(void,png_set_mmx_thresholds)
 #if !defined(PNG_1_0_X)
 /* png.c, pnggccrd.c, or pngvcrd.c */
 extern PNG_EXPORT(int,png_mmx_support) PNGARG((void));
+#endif /* PNG_1_0_X */
 #endif /* PNG_ASSEMBLER_CODE_SUPPORTED */
 
 /* Strip the prepended error numbers ("#nnn ") from error and warning
@@ -2730,8 +2731,6 @@ extern PNG_EXPORT(int,png_mmx_support) PNGARG((void));
 extern PNG_EXPORT(void,png_set_strip_error_numbers) PNGARG((png_structp
    png_ptr, png_uint_32 strip_mode));
 #endif
-
-#endif /* PNG_1_0_X */
 
 /* Added at libpng-1.2.6 */
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
