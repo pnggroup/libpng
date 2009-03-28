@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.4.0 [March 21, 2009]
+ * Last changed in libpng 1.4.0 [March 28, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -126,7 +126,6 @@ png_set_filler(png_structp png_ptr, png_uint_32 filler, int filler_loc)
    }
 }
 
-#if !defined(PNG_1_0_X)
 /* Added to libpng-1.2.7 */
 void PNGAPI
 png_set_add_alpha(png_structp png_ptr, png_uint_32 filler, int filler_loc)
@@ -136,7 +135,6 @@ png_set_add_alpha(png_structp png_ptr, png_uint_32 filler, int filler_loc)
    png_set_filler(png_ptr, filler, filler_loc);
    png_ptr->transformations |= PNG_ADD_ALPHA;
 }
-#endif
 
 #endif
 

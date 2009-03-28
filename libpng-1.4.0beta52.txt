@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta51 - March 21, 2009
+ libpng version 1.4.0beta52 - March 28, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.0beta51 - March 21, 2009
+ libpng versions 0.97, January 1998, through 1.4.0beta52 - March 28, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2008 Glenn Randers-Pehrson
 
@@ -141,9 +141,10 @@ so if it doesn't work, you don't have much to undo.  Of course, you
 will also want to insure that you are, in fact, dealing with a PNG
 file.  Libpng provides a simple check to see if a file is a PNG file.
 To use it, pass in the first 1 to 8 bytes of the file to the function
-png_sig_cmp(), and it will return 0 if the bytes match the corresponding
-bytes of the PNG signature, or nonzero otherwise.  Of course, the more bytes
-you pass in, the greater the accuracy of the prediction.
+png_sig_cmp(), and it will return 0 (false) if the bytes match the
+corresponding bytes of the PNG signature, or nonzero (true) otherwise.
+Of course, the more bytes you pass in, the greater the accuracy of the
+prediction.
 
 If you are intending to keep the file pointer open for use in libpng,
 you must ensure you don't read more than 8 bytes from the beginning
@@ -882,7 +883,7 @@ things.
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
-As of libpng version 1.4.0beta51, not all possible expansions are supported.
+As of libpng version 1.4.0beta52, not all possible expansions are supported.
 
 In the following table, the 01 means grayscale with depth<8, 31 means
 indexed with depth<8, other numerals represent the color type, "T" means
@@ -2904,15 +2905,153 @@ application:
 
    png_uint_32 application_vn = PNG_LIBPNG_VER;
 
-VIII. Y2K Compliance in libpng
+VIII.  Changes to Libpng from version 1.0.x to 1.2.x
 
-March 21, 2009
+Support for user memory management was enabled by default.  To
+accomplish this, the functions png_create_read_struct_2(),
+png_create_write_struct_2(), png_set_mem_fn(), png_get_mem_ptr(),
+png_malloc_default(), and png_free_default() were added.
+
+Support for certain MNG features was enabled.
+
+Support for numbered error messages was added.  However, we never got
+around to actually numbering the error messages.  The function
+png_set_strip_error_numbers() was added (Note: the prototype for this
+function was inadvertently removed from png.h in PNG_NO_ASSEMBLER_CODE
+builds of libpng-1.2.15.  It was restored in libpng-1.2.36).
+
+The png_malloc_warn() function was added at libpng-1.2.3.  This issues
+a png_warning and returns NULL instead of aborting when it fails to
+acquire the requested memory allocation.
+
+Support for setting user limits on image width and height was enabled
+by default.  The functions png_set_user_limits(), png_get_user_width_max(),
+and png_get_user_height_max() were added at libpng-1.2.6.
+
+The png_set_add_alpha() function was added at libpng-1.2.7.
+
+The function png_set_expand_gray_1_2_4_to_8() was added at libpng-1.2.9.
+Unlike png_set_gray_1_2_4_to_8(), the new function does not expand the
+tRNS chunk to alpha. The png_set_gray_1_2_4_to_8() function is
+deprecated.
+
+A number of macro definitions in support of runtime selection of
+assembler code features (especially Intel MMX code support) were
+added at libpng-1.2.0:
+
+    PNG_ASM_FLAG_MMX_SUPPORT_COMPILED
+    PNG_ASM_FLAG_MMX_SUPPORT_IN_CPU
+    PNG_ASM_FLAG_MMX_READ_COMBINE_ROW
+    PNG_ASM_FLAG_MMX_READ_INTERLACE
+    PNG_ASM_FLAG_MMX_READ_FILTER_SUB
+    PNG_ASM_FLAG_MMX_READ_FILTER_UP
+    PNG_ASM_FLAG_MMX_READ_FILTER_AVG
+    PNG_ASM_FLAG_MMX_READ_FILTER_PAETH
+    PNG_ASM_FLAGS_INITIALIZED
+    PNG_MMX_READ_FLAGS
+    PNG_MMX_FLAGS
+    PNG_MMX_WRITE_FLAGS
+    PNG_MMX_FLAGS
+
+We added the following functions in support of runtime
+selection of assembler code features:
+
+    png_get_mmx_flagmask()
+    png_set_mmx_thresholds()
+    png_get_asm_flags()
+    png_get_mmx_bitdepth_threshold()
+    png_get_mmx_rowbytes_threshold()
+    png_set_asm_flags()
+
+We replaced all of these functions with simple stubs in libpng-1.2.20,
+when the Intel assembler code was removed due to a licensing issue.
+
+IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
+
+Private libpng prototypes and macro definitions were moved from
+png.h and pngconf.h into a new pngpriv.h header file.
+
+Support for the iTXt chunk has been enabled by default.
+
+Support for global arrays was disabled by default.
+
+Some obsolete/deprecated macros and functions have been removed.
+
+The PNG_1_0_X and PNG_1_2_X macros were eliminated.
+
+Many WIN32_WCE #ifdefs were removed.
+
+PNG_MAX_UINT was replaced with PNG_UINT_31_MAX.  It has been
+deprecated since libpng-1.0.16 and libpng-1.2.6.
+
+The function
+    png_check_sig(sig, num)
+was replaced with
+    !png_sig_cmp(sig, 0, num)
+It has been deprecated since libpng-0.90.
+
+The functions png_read_init(info_ptr), png_write_init(info_ptr),
+png_info_init(info_ptr), png_read_destroy(), and png_write_destroy()
+have been removed.  They have been deprecated since libpng-0.95.
+
+The function
+    png_set_gray_1_2_4_to_8()
+which also expands tRNS to alpha was replaced with
+    png_set_expand_gray_1_2_4_to_8()
+which does not. It has been deprecated since libpng-1.0.18 and 1.2.9.
+
+Support for numbered error messages was removed by default, since we
+never got around to actually numbering the error messages. The function
+png_set_strip_error_numbers() was removed from the library by default.
+
+Functions png_set_benign_errors(), png_benign_error(), and
+png_chunk_benign_error() were added.
+
+Support for setting the maximum amount of memory that the application
+will allocate for reading chunks was added, as a security measure.
+The functions png_set_chunk_cache_max() and png_get_chunk_cache_max()
+were added to the library.
+
+We implemented support for I/O states. Added png_ptr member io_state, and
+functions png_get_io_chunk_name() and png_get_io_state() in pngget.c
+
+The png_permit_empty_plte() was removed. It has been deprecated
+since libpng-1.0.9.  Use png_permit_mng_features() instead.
+
+We removed the obsolete stub functions png_get_mmx_flagmask(),
+png_set_mmx_thresholds(), png_get_asm_flags(),
+png_get_mmx_bitdepth_threshold(), png_get_mmx_rowbytes_threshold(),
+png_set_asm_flags(), and png_mmx_supported()
+
+We removed the png_memcpy_check() and png_memset_check() functions.
+
+We changed the prototype for png_malloc() from
+    png_malloc(png_structp png_ptr, png_uint_32 size)
+to
+    png_malloc(png_structp png_ptr, png_alloc_size_t size)
+
+We changed the prototypes of png_get_compression_buffer_size() and
+png_set_compression_buffer_size() to work with png_size_t instead of
+png_uint_32.
+
+The png_zalloc() function no longer zeroes out the memory that it
+allocates.
+
+The png_zalloc() and png_zfree() functions are no longer exported.
+
+The png_calloc() function was added.
+
+We removed the trailing '.' from the warning and error messages.
+
+X. Y2K Compliance in libpng
+
+March 28, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta51 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta52 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

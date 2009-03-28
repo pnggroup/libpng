@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [March 21, 2009]
+ * Last changed in libpng 1.4.0 [March 28, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1380,6 +1380,11 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
+#if defined(PNG_READ_16_TO_8_SUPPORTED)
+   if (png_ptr->transformations & PNG_16_TO_8)
+      png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)
    if ((png_ptr->transformations & PNG_BACKGROUND) &&
       ((png_ptr->num_trans != 0 ) ||
@@ -1407,11 +1412,6 @@ From Andreas Dilger e-mail to png-implement, 26 March 1998:
       png_do_gamma(&(png_ptr->row_info), png_ptr->row_buf + 1,
          png_ptr->gamma_table, png_ptr->gamma_16_table,
          png_ptr->gamma_shift);
-#endif
-
-#if defined(PNG_READ_16_TO_8_SUPPORTED)
-   if (png_ptr->transformations & PNG_16_TO_8)
-      png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
 #if defined(PNG_READ_DITHER_SUPPORTED)

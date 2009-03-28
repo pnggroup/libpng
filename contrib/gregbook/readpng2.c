@@ -159,7 +159,7 @@ void readpng2_version_info(void)
 
 int readpng2_check_sig(uch *sig, int num)
 {
-    return png_check_sig(sig, num);
+    return (!png_sig_cmp(sig, 0, num));
 }
 
 

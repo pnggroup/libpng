@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta51 - March 21, 2009
+Libpng 1.4.0beta52 - March 28, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta51.tar.gz
-   1.4.0beta51.tar.bz2
+   1.4.0beta52.tar.gz
+   1.4.0beta52.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta51-no-config.tar.gz
-   1.4.0beta51-no-config.tar.bz2
+   1.4.0beta52-no-config.tar.gz
+   1.4.0beta52-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b51.zip
-   lp140b51.tar.bz2
+   lp140b52.zip
+   lp140b52.tar.bz2
 
 Other information:
 
-   1.4.0beta51-README.txt
-   1.4.0beta51-KNOWNBUGS.txt
-   1.4.0beta51-LICENSE.txt
-   1.4.0beta51-Y2K-compliance.txt
+   1.4.0beta52-README.txt
+   1.4.0beta52-KNOWNBUGS.txt
+   1.4.0beta52-LICENSE.txt
+   1.4.0beta52-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -343,7 +343,7 @@ version 1.4.0beta38 [November 22, 2008]
   Added check for zero-area RGB cHRM triange in png_check_cHRM() and
     png_check_cHRM_fixed().
 
-version 1.4.0beta39 [March 21, 2009]
+version 1.4.0beta39 [November 23, 2008]
   Revised png_warning() to write its message on standard output by default
     when warning_fn is NULL.
 
@@ -392,7 +392,7 @@ version 1.4.0beta49 [February 28, 2009]
     (bug introduced in libpng-1.2.34/1.4.0beta29).
   Revised comments in png_set_read_fn() and png_set_write_fn().
 
-version 1.4.0beta50 [March 21, 2009]
+version 1.4.0beta50 [March 18, 2009]
   Use png_calloc() instead of png_malloc() to allocate big_row_buf when
     reading an interlaced file, to avoid a possible UMR.
   Undid recent revision of PNG_NO_STDIO version of png_write_flush().  Users
@@ -405,6 +405,10 @@ version 1.4.0beta50 [March 21, 2009]
 
 version 1.4.0beta51 [March 21, 2009]
   Removed new png_fileno() macro from pngconf.h .
+
+version 1.4.0beta52 [March 28, 2009]
+  Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
+    This avoids building 16-bit gamma tables unnecessarily.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

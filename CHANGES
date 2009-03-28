@@ -2068,7 +2068,7 @@ version 1.4.0beta49 [February 28, 2009]
     (bug introduced in libpng-1.2.34/1.4.0beta29).
   Revised comments in png_set_read_fn() and png_set_write_fn().
 
-version 1.4.0beta50 [March 21, 2009]
+version 1.4.0beta50 [March 18, 2009]
   Use png_calloc() instead of png_malloc() to allocate big_row_buf when
     reading an interlaced file, to avoid a possible UMR.
   Undid revision of PNG_NO_STDIO version of png_write_flush().  Users
@@ -2081,6 +2081,10 @@ version 1.4.0beta50 [March 21, 2009]
 
 version 1.4.0beta51 [March 21, 2009]
   Removed new png_fileno() macro from pngconf.h .
+
+version 1.4.0beta52 [March 28, 2009]
+  Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
+    This avoids building 16-bit gamma tables unnecessarily.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

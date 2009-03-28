@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta51 - March 21, 2009
+ * libpng version 1.4.0beta52 - March 28, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1046,7 +1046,7 @@ typedef unsigned char png_byte;
 #define png_sizeof(x) sizeof(x)
 
 /* The following is needed for medium model support.  It cannot be in the
- * PNG_INTERNAL section.  Needs modification for other compilers besides
+ * pngpriv.h header.  Needs modification for other compilers besides
  * MSC.  Model independent support declares all arrays and pointers to be
  * large using the far keyword.  The zlib version used must also support
  * model independent data.  As of version zlib 1.0.4, the necessary changes
