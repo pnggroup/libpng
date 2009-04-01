@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta52 - March 28, 2009
+Libpng 1.4.0beta53 - April 1, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta52.tar.gz
-   1.4.0beta52.tar.bz2
+   1.4.0beta53.tar.gz
+   1.4.0beta53.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta52-no-config.tar.gz
-   1.4.0beta52-no-config.tar.bz2
+   1.4.0beta53-no-config.tar.gz
+   1.4.0beta53-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b52.zip
-   lp140b52.tar.bz2
+   lp140b53.zip
+   lp140b53.tar.bz2
 
 Other information:
 
-   1.4.0beta52-README.txt
-   1.4.0beta52-KNOWNBUGS.txt
-   1.4.0beta52-LICENSE.txt
-   1.4.0beta52-Y2K-compliance.txt
+   1.4.0beta53-README.txt
+   1.4.0beta53-KNOWNBUGS.txt
+   1.4.0beta53-LICENSE.txt
+   1.4.0beta53-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -406,9 +406,16 @@ version 1.4.0beta50 [March 18, 2009]
 version 1.4.0beta51 [March 21, 2009]
   Removed new png_fileno() macro from pngconf.h .
 
-version 1.4.0beta52 [March 28, 2009]
+version 1.4.0beta52 [March 27, 2009]
   Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
     This avoids building 16-bit gamma tables unnecessarily.
+  Removed fflush() from pngtest.c.
+  Added "#define PNG_NO_WRITE_FLUSH" to contrib/pngminim/encoder/pngusr.h
+  Added a section on differences between 1.0.x and 1.2.x to libpng.3/libpng.txt
+
+version 1.4.0beta53 [April 1, 2009]
+  Removed some remaining MMX macros from pngpriv.h
+  Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -2082,9 +2082,16 @@ version 1.4.0beta50 [March 18, 2009]
 version 1.4.0beta51 [March 21, 2009]
   Removed new png_fileno() macro from pngconf.h .
 
-version 1.4.0beta52 [March 28, 2009]
+version 1.4.0beta52 [March 27, 2009]
   Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
     This avoids building 16-bit gamma tables unnecessarily.
+  Removed fflush() from pngtest.c.
+  Added "#define PNG_NO_WRITE_FLUSH" to contrib/pngminim/encoder/pngusr.h
+  Added a section on differences between 1.0.x and 1.2.x to libpng.3/libpng.txt
+
+version 1.4.0beta53 [April 1, 2009]
+  Removed some remaining MMX macros from pngpriv.h
+  Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
