@@ -1,9 +1,9 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.34 [December 18, 2008]
+ * Last changed in libpng 1.2.36 [April 6, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -785,6 +785,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
    {
       png_warning(png_ptr,
         "Embedded profile length too large in iCCP chunk");
+      png_free(png_ptr, new_name);
       return;
    }
 
