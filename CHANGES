@@ -1,4 +1,4 @@
-
+/*
 CHANGES - changes for libpng
 
 version 0.2
@@ -2093,6 +2093,15 @@ version 1.4.0beta53 [April 1, 2009]
   Removed some remaining MMX macros from pngpriv.h
   Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
 
+version 1.4.0beta54 [April 13, 2009]
+  Added "ifndef PNG_SKIP_SETJMP_CHECK" block in pngconf.h to allow
+    application code writers to bypass the check for multiple inclusion
+    of setjmp.h when they know that it is safe to ignore the situation.
+  Eliminated internal use of setjmp() in pngread.c and pngwrite.c
+  Reordered ancillary chunks in pngtest.png to be the same as what
+    pngtest now produces, and made some cosmetic changes to pngtest output.
+  Eliminated deprecated png_read_init_3() and png_write_init_3() functions.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
@@ -2103,3 +2112,4 @@ to subscribe)
 or to glennrp at users.sourceforge.net
 
 Glenn R-P
+*/

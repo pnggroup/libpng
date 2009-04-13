@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta53 - April 1, 2009
+ * libpng version 1.4.0beta54 - April 13, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -317,21 +317,29 @@
 #ifdef PNG_SETJMP_SUPPORTED
 /* This is an attempt to force a single setjmp behaviour on Linux.  If
  * the X config stuff didn't define _BSD_SOURCE we wouldn't need this.
+ *
+ * You can bypass this test if you know that your application uses exactly
+ * the same setjmp.h that was included when libpng was built.  Only define
+ * PNG_SKIP_SETJMP_CHECK while building your application, prior to the
+ * application's '#include "png.h"'. Don't define PNG_SKIP_SETJMP_CHECK
+ * while building a separate libpng library for general use.
  */
 
-#  ifdef __linux__
-#    ifdef _BSD_SOURCE
-#      define PNG_SAVE_BSD_SOURCE
-#      undef _BSD_SOURCE
-#    endif
-#    ifdef _SETJMP_H
-     /* If you encounter a compiler error here, see the explanation
-      * near the end of INSTALL.
-      */
-         __png.h__ already includes setjmp.h;
-         __dont__ include it again.;
-#    endif
-#  endif /* __linux__ */
+#  ifndef PNG_SKIP_SETJMP_CHECK
+#    ifdef __linux__
+#      ifdef _BSD_SOURCE
+#        define PNG_SAVE_BSD_SOURCE
+#        undef _BSD_SOURCE
+#      endif
+#      ifdef _SETJMP_H
+       /* If you encounter a compiler error here, see the explanation
+        * near the end of INSTALL.
+        */
+           __pngconf.h__ in libpng already includes setjmp.h;
+           __dont__ include it again.;
+#      endif
+#    endif /* __linux__ */
+#  endif /* PNG_SKIP_SETJMP_CHECK */
 
    /* include setjmp.h for error handling */
 #  include <setjmp.h>

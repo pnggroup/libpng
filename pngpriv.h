@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta53 - April 1, 2009
+ * libpng version 1.4.0beta54 - April 13, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -274,14 +274,6 @@ extern "C" {
  * functionality in libpng.  More information about most functions can
  * be found in the files where the functions are located.
  */
-
-extern PNG_EXPORT(void,png_read_init_3) PNGARG((png_structpp ptr_ptr,
-    png_const_charp user_png_ver, png_size_t png_struct_size));
-extern PNG_EXPORT(void,png_write_init_3) PNGARG((png_structpp ptr_ptr,
-    png_const_charp user_png_ver, png_size_t png_struct_size));
-extern PNG_EXPORT(void,png_write_init_2) PNGARG((png_structp png_ptr,
-    png_const_charp user_png_ver, png_size_t png_struct_size, png_size_t
-    png_info_size));
 
 /* Allocate memory for an internal libpng struct */
 PNG_EXTERN png_voidp png_create_struct PNGARG((int type));

@@ -1,3 +1,4 @@
+/*
 TODO - list of things to do for libpng:
 
 Final bug fixes.
@@ -22,3 +23,4 @@ Build gamma tables using fixed point (and do away with floating point entirely).
 Use greater precision when changing to linear gamma for compositing against
   background and doing rgb-to-gray transformation.
 Investigate pre-incremented loop counters and other loop constructions.
+*/

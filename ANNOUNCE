@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta53 - April 1, 2009
+Libpng 1.4.0beta54 - April 13, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta53.tar.gz
-   1.4.0beta53.tar.bz2
+   1.4.0beta54.tar.gz
+   1.4.0beta54.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta53-no-config.tar.gz
-   1.4.0beta53-no-config.tar.bz2
+   1.4.0beta54-no-config.tar.gz
+   1.4.0beta54-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b53.zip
-   lp140b53.tar.bz2
+   lp140b54.zip
+   lp140b54.tar.bz2
 
 Other information:
 
-   1.4.0beta53-README.txt
-   1.4.0beta53-KNOWNBUGS.txt
-   1.4.0beta53-LICENSE.txt
-   1.4.0beta53-Y2K-compliance.txt
+   1.4.0beta54-README.txt
+   1.4.0beta54-KNOWNBUGS.txt
+   1.4.0beta54-LICENSE.txt
+   1.4.0beta54-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -416,6 +416,15 @@ version 1.4.0beta52 [March 27, 2009]
 version 1.4.0beta53 [April 1, 2009]
   Removed some remaining MMX macros from pngpriv.h
   Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
+
+version 1.4.0beta54 [April 13, 2009]
+  Added "ifndef PNG_SKIP_SETJMP_CHECK" block in pngconf.h to allow
+    application code writers to bypass the check for multiple inclusion
+    of setjmp.h when they know that it is safe to ignore the situation.
+  Eliminated internal use of setjmp() in pngread.c and pngwrite.c
+  Reordered ancillary chunks in pngtest.png to be the same as what
+    pngtest now produces, and made some cosmetic changes to pngtest output.
+  Eliminated deprecated png_read_init_3() and png_write_init_3() functions.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

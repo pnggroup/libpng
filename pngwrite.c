@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [April 1, 2009]
+ * Last changed in libpng 1.4.0 [April 13, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -429,6 +429,27 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
 }
 #endif
 
+
+/* Clean up PNG structure and deallocate any memory. */
+#ifdef PNG_USER_MEM_SUPPORTED
+void /* PRIVATE */
+png_cleanup_write_struct(png_structp png_ptr,
+         png_free_ptr free_fn, png_voidp mem_ptr)
+#else
+void /* PRIVATE */
+png_cleanup_write_struct(png_structp png_ptr)
+#endif
+   {
+      png_free(png_ptr, png_ptr->zbuf);
+      png_ptr->zbuf = NULL;
+#ifdef PNG_USER_MEM_SUPPORTED
+      png_destroy_struct_2((png_voidp)png_ptr,
+         (png_free_ptr)free_fn, (png_voidp)mem_ptr);
+#else
+      png_destroy_struct((png_voidp)png_ptr);
+#endif
+   }
+
 /* Initialize png_ptr structure, and allocate any memory needed */
 png_structp PNGAPI
 png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
@@ -446,6 +467,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_malloc_ptr malloc_fn, png_free_ptr free_fn)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
+   int png_cleanup_needed = 0;
 #ifdef PNG_SETJMP_SUPPORTED
     volatile
 #endif
@@ -472,21 +494,6 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
 #endif
 
-#ifdef PNG_SETJMP_SUPPORTED
-#ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
-#else
-   if (setjmp(png_ptr->jmpbuf))
-#endif
-   {
-      png_free(png_ptr, png_ptr->zbuf);
-      png_destroy_struct(png_ptr);
-      return (NULL);
-   }
-#ifdef USE_FAR_KEYWORD
-   png_memcpy(png_ptr->jmpbuf, jmpbuf, png_sizeof(jmp_buf));
-#endif
-#endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
    png_set_mem_fn(png_ptr, mem_ptr, malloc_fn, free_fn);
@@ -531,15 +538,30 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
         png_ptr->flags=0;
 #endif
-        png_error(png_ptr,
+        png_warning(png_ptr,
            "Incompatible libpng version in application and library");
+        png_cleanup_needed = 1;
      }
    }
 
    /* initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
-      (png_uint_32)png_ptr->zbuf_size);
+   if (!png_cleanup_needed)
+     {
+        png_ptr->zbuf = (png_bytep)png_malloc_warn(png_ptr,
+           png_ptr->zbuf_size);
+        if (png_ptr->zbuf == NULL)
+          png_cleanup_needed = 1;
+     }
+   if (png_cleanup_needed)
+     {
+#ifdef PNG_USER_MEM_SUPPORTED
+        png_cleanup_write_struct(png_ptr, free_fn, mem_ptr);
+#else
+        png_cleanup_write_struct(png_ptr);
+#endif
+        return (NULL);
+     }
 
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
 
@@ -565,77 +587,6 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 }
 
 /* Initialize png_ptr structure, and allocate any memory needed */
-
-
-void PNGAPI
-png_write_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
-   png_size_t png_struct_size)
-{
-   png_structp png_ptr=*ptr_ptr;
-#ifdef PNG_SETJMP_SUPPORTED
-   jmp_buf tmp_jmp; /* to save current jump buffer */
-#endif
-
-   int i = 0;
-
-   if (png_ptr == NULL)
-      return;
-
-   do
-   {
-     if (user_png_ver[i] != png_libpng_ver[i])
-     {
-#ifdef PNG_LEGACY_SUPPORTED
-       png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-#else
-       png_ptr->warning_fn=NULL;
-       png_warning(png_ptr,
- "Application uses deprecated png_write_init() and should be recompiled.");
-       break;
-#endif
-     }
-   } while (png_libpng_ver[i++]);
-
-   png_debug(1, "in png_write_init_3");
-
-#ifdef PNG_SETJMP_SUPPORTED
-   /* save jump buffer and error functions */
-   png_memcpy(tmp_jmp, png_ptr->jmpbuf, png_sizeof(jmp_buf));
-#endif
-
-   if (png_sizeof(png_struct) > png_struct_size)
-     {
-       png_destroy_struct(png_ptr);
-       png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG);
-       *ptr_ptr = png_ptr;
-     }
-
-   /* reset all variables to 0 */
-   png_memset(png_ptr, 0, png_sizeof(png_struct));
-
-   /* added at libpng-1.2.6 */
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
-   png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
-#endif
-
-#ifdef PNG_SETJMP_SUPPORTED
-   /* restore jump buffer */
-   png_memcpy(png_ptr->jmpbuf, tmp_jmp, png_sizeof(jmp_buf));
-#endif
-
-   png_set_write_fn(png_ptr, NULL, NULL, NULL);
-
-   /* initialize zbuf - compression buffer */
-   png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = (png_bytep)png_malloc(png_ptr,
-      (png_uint_32)png_ptr->zbuf_size);
-
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
-   png_set_filter_heuristics(png_ptr, PNG_FILTER_HEURISTIC_DEFAULT,
-      1, NULL, NULL);
-#endif
-}
 
 /* Write a few rows of image data.  If the image is interlaced,
  * either you will have to write the 7 sub images, or, if you

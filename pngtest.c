@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [April 1, 2009]
+ * Last changed in libpng 1.4.0 [April 13, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1097,7 +1097,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        ster_chunk_data[1];
 
      if (verbose)
-        fprintf(STDERR, "stereo mode = %lu\n",
+        fprintf(STDERR, "\n stereo mode = %lu\n",
           (unsigned long)(user_chunk_data[0] - 1));
      ster_chunk_data[0]=(unsigned char)(user_chunk_data[0] - 1);
      png_write_chunk(write_ptr, png_sTER, ster_chunk_data, 1);
@@ -1110,7 +1110,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        vpag_chunk_data[9];
 
      if (verbose)
-        fprintf(STDERR, "vpAg = %lu x %lu, units=%lu\n",
+        fprintf(STDERR, " vpAg = %lu x %lu, units = %lu\n",
           (unsigned long)user_chunk_data[1],
           (unsigned long)user_chunk_data[2],
           (unsigned long)user_chunk_data[3]);
@@ -1254,7 +1254,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_uint_32 iwidth, iheight;
       iwidth = png_get_image_width(write_ptr, write_info_ptr);
       iheight = png_get_image_height(write_ptr, write_info_ptr);
-      fprintf(STDERR, "Image width = %lu, height = %lu\n",
+      fprintf(STDERR, "\n Image width = %lu, height = %lu\n",
          (unsigned long)iwidth, (unsigned long)iheight);
    }
 #endif
@@ -1365,7 +1365,7 @@ main(int argc, char *argv[])
    int multiple = 0;
    int ierror = 0;
 
-   fprintf(STDERR, "Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
+   fprintf(STDERR, "\n Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
    fprintf(STDERR, "%s", png_get_copyright(NULL));
    /* Show the version of libpng used in building the library */
@@ -1453,7 +1453,7 @@ main(int argc, char *argv[])
          int k;
 #endif
          int kerror;
-         fprintf(STDERR, "Testing %s:", argv[i]);
+         fprintf(STDERR, "\n Testing %s:", argv[i]);
          kerror = test_one_file(argv[i], outname);
          if (kerror == 0)
          {
@@ -1523,7 +1523,7 @@ main(int argc, char *argv[])
          if (i == 1) status_dots_requested = 1;
          else if (verbose == 0)status_dots_requested = 0;
          if (i == 0 || verbose == 1 || ierror != 0)
-            fprintf(STDERR, "Testing %s:", inname);
+            fprintf(STDERR, "\n Testing %s:", inname);
          kerror = test_one_file(inname, outname);
          if (kerror == 0)
          {
@@ -1554,7 +1554,7 @@ main(int argc, char *argv[])
          else
          {
             if (verbose == 0 && i != 2)
-               fprintf(STDERR, "Testing %s:", inname);
+               fprintf(STDERR, "\n Testing %s:", inname);
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
          }
@@ -1604,11 +1604,11 @@ main(int argc, char *argv[])
 #endif
 
    if (ierror == 0)
-      fprintf(STDERR, "libpng passes test\n");
+      fprintf(STDERR, " libpng passes test\n");
    else
-      fprintf(STDERR, "libpng FAILS test\n");
+      fprintf(STDERR, " libpng FAILS test\n");
    return (int)(ierror != 0);
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta53 your_png_h_is_not_version_1_4_0beta53;
+typedef version_1_4_0beta54 your_png_h_is_not_version_1_4_0beta54;
