@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [April 13, 2009]
+ * Last changed in libpng 1.4.0 [April 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -15,25 +15,6 @@
 #if defined(PNG_READ_SUPPORTED)
 #include "pngpriv.h"
 
-/* Clean up PNG structure and deallocate any memory. */
-#ifdef PNG_USER_MEM_SUPPORTED
-void /* PRIVATE */
-png_cleanup_read_struct(png_structp png_ptr,
-         png_free_ptr free_fn, png_voidp mem_ptr)
-#else
-void /* PRIVATE */
-png_cleanup_read_struct(png_structp png_ptr)
-#endif
-   {
-      png_free(png_ptr, png_ptr->zbuf);
-      png_ptr->zbuf = NULL;
-#ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)png_ptr,
-         (png_free_ptr)free_fn, (png_voidp)mem_ptr);
-#else
-      png_destroy_struct((png_voidp)png_ptr);
-#endif
-   }
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
 png_structp PNGAPI
@@ -54,11 +35,11 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
 
-   int png_cleanup_needed = 0;
 #ifdef PNG_SETJMP_SUPPORTED
    volatile
 #endif
    png_structp png_ptr;
+   int png_cleanup_needed = 0;
 
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
@@ -82,6 +63,18 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
    png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
+#endif
+
+#ifdef PNG_SETJMP_SUPPORTED
+/* Applications that neglect to set up their own setjmp() and then
+   encounter a png_error() will longjmp here.  Since the jmpbuf is
+   then meaningless we abort instead of returning. */
+#ifdef USE_FAR_KEYWORD
+   if (setjmp(jmpbuf))
+#else
+   if (setjmp(png_ptr->jmpbuf))
+#endif
+   PNG_ABORT();
 #endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -145,14 +138,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->zbuf = (png_bytep)png_malloc_warn(png_ptr,
      png_ptr->zbuf_size);
    if (png_ptr->zbuf == NULL)
-     {
-#ifdef PNG_USER_MEM_SUPPORTED
-        png_cleanup_read_struct(png_ptr, free_fn, mem_ptr);
-#else
-        png_cleanup_read_struct(png_ptr);
-#endif
-        return NULL;
-     }
+        png_cleanup_needed = 1;
    }
    png_ptr->zstream.zalloc = png_zalloc;
    png_ptr->zstream.zfree = png_zfree;
@@ -160,27 +146,31 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (!png_cleanup_needed)
    {
-   switch (inflateInit(&png_ptr->zstream))
-   {
-     case Z_OK: /* Do nothing */ break;
-     case Z_MEM_ERROR:
-     case Z_STREAM_ERROR: png_warning(png_ptr, "zlib memory error");
-        png_cleanup_needed = 1;
-     case Z_VERSION_ERROR: png_warning(png_ptr, "zlib version error");
-        png_cleanup_needed = 1;
-     default: png_warning(png_ptr, "Unknown zlib error");
-        png_cleanup_needed = 1;
-   }
+     switch (inflateInit(&png_ptr->zstream))
+     {
+       case Z_OK: /* Do nothing */ break;
+       case Z_MEM_ERROR:
+       case Z_STREAM_ERROR: png_warning(png_ptr, "zlib memory error");
+          png_cleanup_needed = 1; break;
+       case Z_VERSION_ERROR: png_warning(png_ptr, "zlib version error");
+          png_cleanup_needed = 1; break;
+       default: png_warning(png_ptr, "Unknown zlib error");
+          png_cleanup_needed = 1;
+     }
    }
 
    if (png_cleanup_needed)
    {
+      /* Clean up PNG structure and deallocate any memory. */
+      png_free(png_ptr, png_ptr->zbuf);
+      png_ptr->zbuf = NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
-        png_cleanup_read_struct(png_ptr, free_fn, mem_ptr);
+      png_destroy_struct_2((png_voidp)png_ptr,
+         (png_free_ptr)free_fn, (png_voidp)mem_ptr);
 #else
-        png_cleanup_read_struct(png_ptr);
+      png_destroy_struct((png_voidp)png_ptr);
 #endif
-        return (NULL);
+      return (NULL);
    }
 
    png_ptr->zstream.next_out = png_ptr->zbuf;
@@ -188,19 +178,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
    png_set_read_fn(png_ptr, NULL, NULL);
 
-#ifdef PNG_SETJMP_SUPPORTED
-/* Applications that neglect to set up their own setjmp() and then encounter
-   a png_error() will longjmp here.  Since the jmpbuf is then meaningless we
-   abort instead of returning. */
-#ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
-      PNG_ABORT();
-   png_memcpy(png_ptr->jmpbuf, jmpbuf, png_sizeof(jmp_buf));
-#else
-   if (setjmp(png_ptr->jmpbuf))
-      PNG_ABORT();
-#endif
-#endif
+
    return (png_ptr);
 }
 

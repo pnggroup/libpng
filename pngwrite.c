@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [April 13, 2009]
+ * Last changed in libpng 1.4.0 [April 14, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -430,26 +430,6 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
 #endif
 
 
-/* Clean up PNG structure and deallocate any memory. */
-#ifdef PNG_USER_MEM_SUPPORTED
-void /* PRIVATE */
-png_cleanup_write_struct(png_structp png_ptr,
-         png_free_ptr free_fn, png_voidp mem_ptr)
-#else
-void /* PRIVATE */
-png_cleanup_write_struct(png_structp png_ptr)
-#endif
-   {
-      png_free(png_ptr, png_ptr->zbuf);
-      png_ptr->zbuf = NULL;
-#ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)png_ptr,
-         (png_free_ptr)free_fn, (png_voidp)mem_ptr);
-#else
-      png_destroy_struct((png_voidp)png_ptr);
-#endif
-   }
-
 /* Initialize png_ptr structure, and allocate any memory needed */
 png_structp PNGAPI
 png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr,
@@ -471,7 +451,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef PNG_SETJMP_SUPPORTED
     volatile
 #endif
-    png_structp png_ptr;
+   png_structp png_ptr;
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
    jmp_buf jmpbuf;
@@ -494,6 +474,17 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
 #endif
 
+#ifdef PNG_SETJMP_SUPPORTED
+/* Applications that neglect to set up their own setjmp() and then
+   encounter a png_error() will longjmp here.  Since the jmpbuf is
+   then meaningless we abort instead of returning. */
+#ifdef USE_FAR_KEYWORD
+   if (setjmp(jmpbuf))
+#else
+   if (setjmp(png_ptr->jmpbuf))
+#endif
+   PNG_ABORT();
+#endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
    png_set_mem_fn(png_ptr, mem_ptr, malloc_fn, free_fn);
@@ -555,10 +546,14 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
      }
    if (png_cleanup_needed)
      {
+        /* Clean up PNG structure and deallocate any memory. */
+        png_free(png_ptr, png_ptr->zbuf);
+        png_ptr->zbuf = NULL;
 #ifdef PNG_USER_MEM_SUPPORTED
-        png_cleanup_write_struct(png_ptr, free_fn, mem_ptr);
+        png_destroy_struct_2((png_voidp)png_ptr,
+           (png_free_ptr)free_fn, (png_voidp)mem_ptr);
 #else
-        png_cleanup_write_struct(png_ptr);
+        png_destroy_struct((png_voidp)png_ptr);
 #endif
         return (NULL);
      }
@@ -570,23 +565,9 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       1, NULL, NULL);
 #endif
 
-#ifdef PNG_SETJMP_SUPPORTED
-/* Applications that neglect to set up their own setjmp() and then encounter
-   a png_error() will longjmp here.  Since the jmpbuf is then meaningless we
-   abort instead of returning. */
-#ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
-      PNG_ABORT();
-   png_memcpy(png_ptr->jmpbuf, jmpbuf, png_sizeof(jmp_buf));
-#else
-   if (setjmp(png_ptr->jmpbuf))
-      PNG_ABORT();
-#endif
-#endif
    return (png_ptr);
 }
 
-/* Initialize png_ptr structure, and allocate any memory needed */
 
 /* Write a few rows of image data.  If the image is interlaced,
  * either you will have to write the 7 sub images, or, if you

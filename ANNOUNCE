@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta54 - April 13, 2009
+Libpng 1.4.0beta55 - April 14, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta54.tar.gz
-   1.4.0beta54.tar.bz2
+   1.4.0beta55.tar.gz
+   1.4.0beta55.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta54-no-config.tar.gz
-   1.4.0beta54-no-config.tar.bz2
+   1.4.0beta55-no-config.tar.gz
+   1.4.0beta55-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b54.zip
-   lp140b54.tar.bz2
+   lp140b55.zip
+   lp140b55.tar.bz2
 
 Other information:
 
-   1.4.0beta54-README.txt
-   1.4.0beta54-KNOWNBUGS.txt
-   1.4.0beta54-LICENSE.txt
-   1.4.0beta54-Y2K-compliance.txt
+   1.4.0beta55-README.txt
+   1.4.0beta55-KNOWNBUGS.txt
+   1.4.0beta55-LICENSE.txt
+   1.4.0beta55-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -425,6 +425,10 @@ version 1.4.0beta54 [April 13, 2009]
   Reordered ancillary chunks in pngtest.png to be the same as what
     pngtest now produces, and made some cosmetic changes to pngtest output.
   Eliminated deprecated png_read_init_3() and png_write_init_3() functions.
+
+version 1.4.0beta55 [April 14, 2009]
+  Simplified error handling in pngread.c and pngwrite.c by putting
+    the new png_read_cleanup() and png_write_cleanup() functions inline.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
