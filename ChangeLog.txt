@@ -1,8 +1,17 @@
 Change log:
 
+Version 1.6.16 (built with libpng-1.2.35 and zlib-1.2.3.2)
+  Added -newtimestamp and -oldtimestamp options and changed
+    default condition to timestamping the output file with
+    the current time (i.e., -newtimestamp is default)
+  If the -oldtimestamp option is used then the output file
+    has the same timestamp as the input file.
+
 Version 1.6.15 (built with libpng-1.2.35 and zlib-1.2.3.2)
   Fixes some missing typecasts on png_malloc() calls, patch from
     an anonymous reporter to the SourceForge bug tracker.
+  Added -time_stamp option to change time stamping from default
+    condition.
 
 Version 1.6.14 (built with libpng-1.2.35 and zlib-1.2.3.2)
   Avoids CVE-2009-0040.

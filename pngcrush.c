@@ -26,7 +26,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.15"
+#define PNGCRUSH_VERSION "1.6.16"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -546,7 +546,7 @@ static int best_of_three;
 static int methods_specified = 0;
 static int intent = -1;
 static int ster_mode = -1;
-static int new_time_stamp = 0;
+static int new_time_stamp = 1;
 static int plte_len = -1;
 #ifdef PNG_FIXED_POINT_SUPPORTED
 static int specified_gamma = 0;
@@ -1933,6 +1933,8 @@ int main(int argc, char *argv[])
             /* no save; I just use this for testing decode speed */
             nosave++;
             pngcrush_mode = EXTENSION_MODE;
+        } else if (!strncmp(argv[i], "-oldtimestamp", 5)) {
+            new_time_stamp=0;
         } else if (!strncmp(argv[i], "-plte_len", 9)) {
             names++;
             BUMP_I;
@@ -2115,8 +2117,10 @@ int main(int argc, char *argv[])
 #endif
             }
         }
-        else if (!strncmp(argv[i], "-time_stamp", 5))
-            new_time_stamp++;
+        else if (!strncmp(argv[i], "-time_stamp", 5) ||  /* legacy */
+                 !strncmp(argv[i], "-newtimestamp", 5))
+            new_time_stamp=1;
+
 #ifdef PNG_tRNS_SUPPORTED
         else if (!strncmp(argv[i], "-trns_a", 7) ||
                  !strncmp(argv[i], "-tRNS_a", 7)) {
@@ -5736,6 +5740,10 @@ struct options_help pngcrush_options[] = {
     {2, ""},
 #endif
 
+    {0, " -newtimestamp"},
+    {2, ""},
+    {2, "               Reset file modification time [default]."},
+    {2, ""},
 
 #ifdef PNGCRUSH_COUNT_COLORS
     {0, "        -no_cc (no color counting)"},
@@ -5749,11 +5757,16 @@ struct options_help pngcrush_options[] = {
     {2, "               ensuring that the input file is not the output file."},
     {2, ""},
 
+
+    {0, " -oldtimestamp"},
+    {2, ""},
+    {2, "               Don't reset file modification time."},
+    {2, ""},
+
     {0, "            -n (no save; does not do compression or write output PNG)"},
     {2, ""},
     {2, "               Useful in conjunction with -v option to get info."},
     {2, ""},
-
 
     {0, "     -plte_len n (truncate PLTE)"},
     {2, ""},
@@ -5837,11 +5850,6 @@ struct options_help pngcrush_options[] = {
     {2, "               tEXt chunk to insert.  keyword < 80 chars,"},
     {2, "               text < 2048 chars. For now, you can add no more than"},
     {2, "               ten tEXt, iTXt, or zTXt chunks per pngcrush run."},
-    {2, ""},
-
-    {0, "         -time_stamp"},
-    {2, ""},
-    {2, "               Reset file modification time."},
     {2, ""},
 
 #ifdef PNG_tRNS_SUPPORTED
