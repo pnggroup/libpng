@@ -2102,9 +2102,11 @@ version 1.4.0beta54 [April 13, 2009]
     pngtest now produces, and made some cosmetic changes to pngtest output.
   Eliminated deprecated png_read_init_3() and png_write_init_3() functions.
 
-version 1.4.0beta55 [April 14, 2009]
+version 1.4.0beta55 [April 15, 2009]
   Simplified error handling in pngread.c and pngwrite.c by putting
     the new png_read_cleanup() and png_write_cleanup() functions inline.
+
+version 1.4.0beta56 [April 15, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

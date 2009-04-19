@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [April 14, 2009]
+ * Last changed in libpng 1.4.0 [April 15, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1611,4 +1611,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta55 your_png_h_is_not_version_1_4_0beta55;
+typedef version_1_4_0beta56 your_png_h_is_not_version_1_4_0beta56;
