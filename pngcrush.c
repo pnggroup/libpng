@@ -631,10 +631,6 @@ void png_crc_read(png_structp png_ptr, png_bytep buf, png_size_t length);
 int png_crc_error(png_structp png_ptr);
 int png_crc_finish(png_structp png_ptr, png_uint_32 skip);
 
-#if 0
-png_uint_32 png_get_uint_31(png_structp png_ptr, png_bytep buf);
-png_uint_32 png_get_uint_32(png_bytep buf);
-#endif
 void png_save_uint_32(png_bytep buf, png_uint_32 i);
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -1137,20 +1133,20 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
 /* cexcept interface */
 
-static void png_cexcept_error(png_structp png_ptr, png_const_charp msg)
+static void png_cexcept_error(png_structp png_ptr, png_const_charp err_msg)
 {
     if (png_ptr);
 #if (defined(PNGCRUSH_H))
-    if (!strcmp(msg, "Too many IDAT's found")) {
+    if (!strcmp(err_msg, "Too many IDAT's found")) {
 #ifndef PNG_NO_CONSOLE_IO
         fprintf(stderr, "\nIn %s, correcting ", inname);
 #else
-        png_warning(png_ptr, msg);
+        png_warning(png_ptr, err_msg);
 #endif
     } else
 #endif /* defined(PNGCRUSH_H) */
     {
-        Throw msg;
+        Throw err_msg;
     }
 }
 
@@ -1717,7 +1713,6 @@ int main(int argc, char *argv[])
         else if (!strncmp(argv[i], "-brute", 6))
             /* brute force:  try everything */
         {
-            int lev, strat, filt;
             methods_specified = 1;
             brute_force++;
             for (method = 11; method < num_methods; method++)
@@ -1773,7 +1768,6 @@ int main(int argc, char *argv[])
             fix++;
         } else if (!strncmp(argv[i], "-f", 2)) {
             int specified_filter = atoi(argv[++i]);
-            int lev, strat, filt;
             if (specified_filter > 5 || specified_filter < 0)
                 specified_filter = 5;
             names++;
@@ -1809,7 +1803,6 @@ int main(int argc, char *argv[])
                 ("Cannot do -loco because libpng was compiled without MNG features");
 #endif
         } else if (!strncmp(argv[i], "-l", 2)) {
-            int lev, strat, filt;
             int specified_level = atoi(argv[++i]);
             if (specified_level > 9 || specified_level < 0)
                 specified_level = 9;
@@ -2161,7 +2154,6 @@ int main(int argc, char *argv[])
             compression_mem_level = atoi(argv[++i]);
             names++;
         } else if (!strncmp(argv[i], "-z", 2)) {
-            int lev, strat, filt;
             int specified_strategy = atoi(argv[++i]);
             if (specified_strategy > 2 || specified_strategy < 0)
                 specified_strategy = 0;
@@ -2929,18 +2921,18 @@ int main(int argc, char *argv[])
 #if defined(PNGCRUSH_LOCO)
                     if (!(int)
                         (png_memcmp(mng_signature, png_signature, 8))) {
-                        png_byte buffer[40];
-            unsigned long length;
+                        png_byte buff[40];
+                        unsigned long length;
                         /* Skip the MHDR */
                         png_permit_mng_features(read_ptr,
                                                 PNG_FLAG_MNG_FILTER_64);
-            png_default_read_data(read_ptr, buffer, 4);
-            length=buffer[3]+(buffer[2]<<8)+(buffer[1]<<16)+(buffer[0]<<24);
-            png_default_read_data(read_ptr, buffer, 4);
-            printf("Skipping %c%c%c%c chunk.\n",buffer[0],buffer[1],
-              buffer[2],buffer[3]);
-            png_default_read_data(read_ptr, buffer, length);
-            png_default_read_data(read_ptr, buffer, 4);
+            png_default_read_data(read_ptr, buff, 4);
+            length=buff[3]+(buff[2]<<8)+(buff[1]<<16)+(buff[0]<<24);
+            png_default_read_data(read_ptr, buff, 4);
+            printf("Skipping %c%c%c%c chunk.\n",buff[0],buff[1],
+              buff[2],buff[3]);
+            png_default_read_data(read_ptr, buff, length);
+            png_default_read_data(read_ptr, buff, 4);
                         input_format = 1;
                     } else
 #endif
@@ -3160,7 +3152,6 @@ int main(int argc, char *argv[])
 #if defined(PNG_READ_bKGD_SUPPORTED) && defined(PNG_WRITE_bKGD_SUPPORTED)
                 {
                     png_color_16p background;
-
                     if (!have_bkgd
                         && png_get_bKGD(read_ptr, read_info_ptr,
                                         &background)) {
@@ -3181,13 +3172,13 @@ int main(int argc, char *argv[])
                            really check for a non-gray bKGD and refuse to do
                            the reduction if one is present. */
                         png_color_16 backgd;
-                        png_color_16p background = &backgd;
-                        background->red = bkgd_red;
-                        background->green = bkgd_green;
-                        background->blue = bkgd_blue;
-                        background->gray = background->green;
+                        png_color_16p backgrnd = &backgd;
+                        backgrnd->red = bkgd_red;
+                        backgrnd->green = bkgd_green;
+                        backgrnd->blue = bkgd_blue;
+                        backgrnd->gray = backgrnd->green;
                         png_set_bKGD(write_ptr, write_info_ptr,
-                                     background);
+                                     backgrnd);
                     }
                 }
 #endif /* defined(PNG_READ_bKGD_SUPPORTED)&&defined(PNG_WRITE_bKGD_SUPPORTED) */
@@ -3589,7 +3580,6 @@ int main(int argc, char *argv[])
                         png_set_PLTE(write_ptr, write_info_ptr, palette,
                                      num_palette);
                     if (verbose > 1 && first_trial) {
-                        int i;
                         png_colorp p = palette;
                         fprintf(STDERR, "   Palette:\n");
                         fprintf(STDERR,
@@ -3848,7 +3838,6 @@ int main(int argc, char *argv[])
                     if (nosave == 0 && num_unknowns) {
                         png_unknown_chunkp unknowns_keep; /* allocated by us */
                         int num_unknowns_keep;
-                        int i;
 
                         unknowns_keep = (png_unknown_chunk*)png_malloc(write_ptr,
                           (png_uint_32) num_unknowns
@@ -3934,8 +3923,6 @@ int main(int argc, char *argv[])
 
                         P1("Keeping %d unknown chunks\n", num_unknowns);
                         if (num_unknowns) {
-                            int i;
-
                             png_set_unknown_chunks(write_ptr, write_info_ptr,
                               unknowns, num_unknowns);
                             for (i = 0; i < num_unknowns; i++) {
@@ -3949,7 +3936,7 @@ int main(int argc, char *argv[])
 
 #ifdef PNGCRUSH_LOCO
                     if (do_loco) {
-                        png_byte buffer[30];
+                        png_byte buff[30];
                         const png_byte png_MHDR[5] = { 77, 72, 68, 82, '\0' };
                         png_byte mng_signature[8] =
                             { 138, 77, 78, 71, 13, 10, 26, 10 };
@@ -3963,24 +3950,24 @@ int main(int argc, char *argv[])
 
                         /* Write a MHDR chunk */
 
-                        buffer[0] = (png_byte) ((width >> 24) & 0xff);
-                        buffer[1] = (png_byte) ((width >> 16) & 0xff);
-                        buffer[2] = (png_byte) ((width >> 8) & 0xff);
-                        buffer[3] = (png_byte) ((width) & 0xff);
-                        buffer[4] = (png_byte) ((height >> 24) & 0xff);
-                        buffer[5] = (png_byte) ((height >> 16) & 0xff);
-                        buffer[6] = (png_byte) ((height >> 8) & 0xff);
-                        buffer[7] = (png_byte) ((height) & 0xff);
+                        buff[0] = (png_byte) ((width >> 24) & 0xff);
+                        buff[1] = (png_byte) ((width >> 16) & 0xff);
+                        buff[2] = (png_byte) ((width >> 8) & 0xff);
+                        buff[3] = (png_byte) ((width) & 0xff);
+                        buff[4] = (png_byte) ((height >> 24) & 0xff);
+                        buff[5] = (png_byte) ((height >> 16) & 0xff);
+                        buff[6] = (png_byte) ((height >> 8) & 0xff);
+                        buff[7] = (png_byte) ((height) & 0xff);
                         for (i = 8; i < 27; i++)
-                            buffer[i] = 0x00;
-                        buffer[15] = 2; /* layer count */
-                        buffer[19] = 1; /* frame count */
+                            buff[i] = 0x00;
+                        buff[15] = 2; /* layer count */
+                        buff[19] = 1; /* frame count */
                         if (output_color_type == 6)
-                            buffer[27] = 0x09; /* profile: MNG-VLC with trans. */
+                            buff[27] = 0x09; /* profile: MNG-VLC with trans. */
                         else
-                            buffer[27] = 0x01;  /* profile: MNG-VLC */
+                            buff[27] = 0x01;  /* profile: MNG-VLC */
                         png_write_chunk(write_ptr, (png_bytep) png_MHDR,
-                                        buffer, (png_size_t) 28);
+                                        buff, (png_size_t) 28);
                     }
 #endif /* PNGCRUSH_LOCO */
 
@@ -4405,7 +4392,6 @@ int main(int argc, char *argv[])
                                                      end_info_ptr,
                                                      &unknowns);
                     if (num_unknowns && nosave == 0) {
-                        int i;
                         printf("setting %d unknown chunks after IDAT\n",
                                num_unknowns);
                         png_set_unknown_chunks(write_ptr,
@@ -4628,7 +4614,7 @@ int main(int argc, char *argv[])
 
 
 
-png_uint_32 measure_idats(FILE * fpin)
+png_uint_32 measure_idats(FILE * fp_in)
 {
     /* Copyright (C) 1999-2002,2006 Glenn Randers-Pehrson (glennrp@users.sf.net)
        See notice in pngcrush.c for conditions of use and distribution */
@@ -4645,9 +4631,9 @@ png_uint_32 measure_idats(FILE * fpin)
         end_info_ptr = png_create_info_struct(read_ptr);
 
 #if !defined(PNG_NO_STDIO)
-        png_init_io(read_ptr, fpin);
+        png_init_io(read_ptr, fp_in);
 #else
-        png_set_read_fn(read_ptr, (png_voidp) fpin, (png_rw_ptr) NULL);
+        png_set_read_fn(read_ptr, (png_voidp) fp_in, (png_rw_ptr) NULL);
 #endif
 
         png_set_sig_bytes(read_ptr, 0);
@@ -4693,32 +4679,32 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             const png_byte png_MHDR[5] = { 77, 72, 68, 82, '\0' };
 
             int b;
-            png_byte buffer[40];
+            png_byte buff[40];
             unsigned long length;
             /* read the MHDR */
-            png_default_read_data(read_ptr, buffer, 4);
-            length=buffer[3]+(buffer[2]<<8)+(buffer[1]<<16)+(buffer[0]<<24);
-            png_default_read_data(read_ptr, buffer, 4);
-            printf("Reading %c%c%c%c chunk.\n",buffer[0],buffer[1],
-              buffer[2],buffer[3]);
+            png_default_read_data(read_ptr, buff, 4);
+            length=buff[3]+(buff[2]<<8)+(buff[1]<<16)+(buff[0]<<24);
+            png_default_read_data(read_ptr, buff, 4);
+            printf("Reading %c%c%c%c chunk.\n",buff[0],buff[1],
+              buff[2],buff[3]);
             for (b=0; b<40; b++)
-              buffer[b]='\0';
-            png_default_read_data(read_ptr, buffer, length);
+              buff[b]='\0';
+            png_default_read_data(read_ptr, buff, length);
             if (verbose) {
-            printf("  width=%lu\n",(unsigned long)(buffer[3]+(buffer[2]<<8)
-                      +(buffer[1]<<16)+(buffer[0]<<24)));
-            printf("  height=%lu\n",(unsigned long)(buffer[7]+(buffer[6]<<8)
-                      +(buffer[5]<<16)+(buffer[4]<<24)));
-            printf("  ticksps=%lu\n",(unsigned long)(buffer[11]+
-                     (buffer[10]<<8)+(buffer[9]<<16)+(buffer[8]<<24)));
-            printf("  nomlayc=%lu\n",(unsigned long)(buffer[15]+
-                     (buffer[14]<<8)+(buffer[13]<<16)+(buffer[12]<<24)));
-            printf("  nomfram=%lu\n",(unsigned long)(buffer[19]+
-                     (buffer[18]<<8)+(buffer[17]<<16)+(buffer[16]<<24)));
-            printf("  nomplay=%lu\n",(unsigned long)(buffer[23]+
-                     (buffer[22]<<8)+(buffer[21]<<16)+(buffer[20]<<24)));
-            printf("  profile=%lu\n",(unsigned long)(buffer[27]+
-                     (buffer[26]<<8)+(buffer[25]<<16)+(buffer[24]<<24)));
+            printf("  width=%lu\n",(unsigned long)(buff[3]+(buff[2]<<8)
+                      +(buff[1]<<16)+(buff[0]<<24)));
+            printf("  height=%lu\n",(unsigned long)(buff[7]+(buff[6]<<8)
+                      +(buff[5]<<16)+(buff[4]<<24)));
+            printf("  ticksps=%lu\n",(unsigned long)(buff[11]+
+                     (buff[10]<<8)+(buff[9]<<16)+(buff[8]<<24)));
+            printf("  nomlayc=%lu\n",(unsigned long)(buff[15]+
+                     (buff[14]<<8)+(buff[13]<<16)+(buff[12]<<24)));
+            printf("  nomfram=%lu\n",(unsigned long)(buff[19]+
+                     (buff[18]<<8)+(buff[17]<<16)+(buff[16]<<24)));
+            printf("  nomplay=%lu\n",(unsigned long)(buff[23]+
+                     (buff[22]<<8)+(buff[21]<<16)+(buff[20]<<24)));
+            printf("  profile=%lu\n",(unsigned long)(buff[27]+
+                     (buff[26]<<8)+(buff[25]<<16)+(buff[24]<<24)));
             }
 
             if (new_mng) {
@@ -4728,10 +4714,10 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 
                         /* Write a MHDR chunk */
             png_write_chunk(mng_ptr, (png_bytep) png_MHDR,
-                            buffer, (png_size_t) 28);
+                            buff, (png_size_t) 28);
             }
 
-            png_default_read_data(read_ptr, buffer, 4);
+            png_default_read_data(read_ptr, buff, 4);
             input_format = 1;
 
         } else
@@ -4770,7 +4756,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 #endif
         png_byte chunk_name[5];
         png_byte chunk_length[4];
-        png_byte buffer[32];
+        png_byte buff[32];
         png_uint_32 length;
 
         png_default_read_data(png_ptr, chunk_length, 4);
@@ -4881,9 +4867,9 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 #endif
         {
             /* get the color type */
-            png_crc_read(png_ptr, buffer, 13);
+            png_crc_read(png_ptr, buff, 13);
             length -= 13;
-            input_color_type = buffer[9];
+            input_color_type = buff[9];
         }
         else {
           if (png_get_uint_32(chunk_name) == PNG_UINT_dSIG)
@@ -4922,10 +4908,10 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
              * and a gamma chunk.
              */
             if (length == 2615) {
-                png_crc_read(png_ptr, buffer, 22);
+                png_crc_read(png_ptr, buff, 22);
                 length -= 22;
-                buffer[23] = 0;
-                if (!strncmp((png_const_charp) buffer, "Photoshop ICC profile",
+                buff[23] = 0;
+                if (!strncmp((png_const_charp) buff, "Photoshop ICC profile",
                      21))
                 {
                     printf("   Replacing bad Photoshop ICCP chunk with an "
@@ -4984,7 +4970,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 
 #ifdef PNGCRUSH_COUNT_COLORS
 #define USE_HASHCODE
-int count_colors(FILE * fpin)
+int count_colors(FILE * fp_in)
 {
     /* Copyright (C) 2000-2002,2006 Glenn Randers-Pehrson (glennrp@users.sf.net)
        See notice in pngcrush.c for conditions of use and distribution */
@@ -5059,9 +5045,9 @@ int count_colors(FILE * fpin)
             end_info_ptr = NULL;
 
 #if !defined(PNG_NO_STDIO)
-            png_init_io(read_ptr, fpin);
+            png_init_io(read_ptr, fp_in);
 #else
-            png_set_read_fn(read_ptr, (png_voidp) fpin, (png_rw_ptr) NULL);
+            png_set_read_fn(read_ptr, (png_voidp) fp_in, (png_rw_ptr) NULL);
 #endif
 
             {
