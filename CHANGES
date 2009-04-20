@@ -2352,11 +2352,15 @@ version 1.2.36beta03 [March 27, 2009]
 version 1.2.36beta04 [April 5, 2009]
   Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
 
-version 1.2.36beta05 [April 13, 2009]
+version 1.2.36beta05 [April 20, 2009]
   Added "ifndef PNG_SKIP_SETJMP_CHECK" block in pngconf.h to allow
     application code writers to bypass the check for multiple inclusion
     of setjmp.h when they know that it is safe to ignore the situation.
   Made some cosmetic changes to whitespace in pngtest output.
+  Renamed "user_chunk_data" to "my_user_chunk_data" in pngtest.c to suppress
+    "shadowed declaration" warning from gcc-4.3.3.
+  Renamed "gamma" to "png_gamma" in pngset.c to avoid "shadowed declaration"
+    warning about a global "gamma" variable in math.h on some platforms.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
