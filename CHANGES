@@ -2106,7 +2106,11 @@ version 1.4.0beta55 [April 15, 2009]
   Simplified error handling in pngread.c and pngwrite.c by putting
     the new png_read_cleanup() and png_write_cleanup() functions inline.
 
-version 1.4.0beta56 [April 15, 2009]
+version 1.4.0beta56 [April 20, 2009]
+  Renamed "user_chunk_data" to "my_user_chunk_data" in pngtest.c to suppress
+    "shadowed declaration" warning from gcc-4.3.3.
+  Renamed "gamma" to "png_gamma" in pngset.c to avoid "shadowed declaration"
+    warning about a global "gamma" variable in math.h on some platforms.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

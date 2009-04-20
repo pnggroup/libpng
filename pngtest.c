@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [April 15, 2009]
+ * Last changed in libpng 1.4.0 [April 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -563,7 +563,7 @@ static int read_user_chunk_callback(png_struct *png_ptr,
    png_unknown_chunkp chunk)
 {
   png_uint_32
-    *user_chunk_data;
+    *my_user_chunk_data;
 
   /* Return one of the following: */
      /* return (-n);  chunk had an error */
@@ -586,8 +586,8 @@ static int read_user_chunk_callback(png_struct *png_ptr,
          return (-1); /* Error return */
        if (chunk->data[0] != 0 && chunk->data[0] != 1)
           return (-1);  /* Invalid mode */
-       user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
-       user_chunk_data[0]=chunk->data[0]+1;
+       my_user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
+       my_user_chunk_data[0]=chunk->data[0]+1;
        return (1);
      }
   if (chunk->name[0] != 118 || chunk->name[1] != 112 ||    /* v  p */
@@ -599,11 +599,11 @@ static int read_user_chunk_callback(png_struct *png_ptr,
   if (chunk->size != 9)
     return (-1); /* Error return */
 
-  user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
+  my_user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
 
-  user_chunk_data[1]=png_get_uint_31(png_ptr, chunk->data);
-  user_chunk_data[2]=png_get_uint_31(png_ptr, chunk->data + 4);
-  user_chunk_data[3]=(png_uint_32)chunk->data[8];
+  my_user_chunk_data[1]=png_get_uint_31(png_ptr, chunk->data);
+  my_user_chunk_data[2]=png_get_uint_31(png_ptr, chunk->data + 4);
+  my_user_chunk_data[3]=(png_uint_32)chunk->data[8];
 
   return (1);
 
