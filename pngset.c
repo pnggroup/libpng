@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [April 19, 2009]
+ * Last changed in libpng 1.4.0 [April 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -123,7 +123,7 @@ png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
       png_gamma = file_gamma;
    info_ptr->gamma = (float)png_gamma;
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   info_ptr->int_gamma = (int)(gamma*100000.+.5);
+   info_ptr->int_gamma = (int)(png_gamma*100000.+.5);
 #endif
    info_ptr->valid |= PNG_INFO_gAMA;
    if (png_gamma == 0.0)
@@ -156,7 +156,7 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
        png_gamma = int_gamma;
    }
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   info_ptr->gamma = (float)(gamma/100000.);
+   info_ptr->gamma = (float)(png_gamma/100000.);
 #endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
    info_ptr->int_gamma = png_gamma;
