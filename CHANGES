@@ -1,4 +1,4 @@
-
+/*
 CHANGES - changes for libpng
 
 version 0.2
@@ -2349,8 +2349,11 @@ version 1.2.36beta03 [March 27, 2009]
     builds.  This bug was introduced in libpng-1.2.15beta4.
   Added a section on differences between 1.0.x and 1.2.x to libpng.3/libpng.txt
 
-version 1.2.36beta04 [April 6, 2009]
+version 1.2.36beta04 [April 5, 2009]
   Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
+
+version 1.2.36beta05 [April 13, 2009]
+  None.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
@@ -2359,3 +2362,4 @@ to subscribe)
 or to glennrp at users.sourceforge.net
 
 Glenn R-P
+*/

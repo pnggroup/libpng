@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.2.36beta04
+;Version 1.2.36beta05
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
@@ -189,6 +189,7 @@ EXPORTS
 ; Added at version 1.0.12
 ; For compatibility with 1.0.7-1.0.11
 ; png_info_init @174
+; png_read_init_3, png_info_init_3, and png_write_init_3 are deprecated.
   png_read_init_3    @175
   png_write_init_3    @176
   png_info_init_3 @177

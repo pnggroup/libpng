@@ -1,5 +1,5 @@
 
-Libpng 1.2.36beta04 - April 6, 2009
+Libpng 1.2.36beta05 - April 13, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.36beta04.tar.gz
-   libpng-1.2.36beta04.tar.lzma
+   libpng-1.2.36beta05.tar.gz
+   libpng-1.2.36beta05.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.36beta04.tar.bz2
+   libpng-1.2.36beta05.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.36beta04-no-config.tar.gz
-   libpng-1.2.36beta04-no-config.tar.lzma
-   libpng-1.2.36beta04-no-config.tar.bz2
+   libpng-1.2.36beta05-no-config.tar.gz
+   libpng-1.2.36beta05-no-config.tar.lzma
+   libpng-1.2.36beta05-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1236b04.zip
-   lp1236b04.7z
-   lp1236b04.tar.bz2
+   lp1236b05.zip
+   lp1236b05.7z
+   lp1236b05.tar.bz2
 
 Project files
 
-   libpng-1.2.36beta04-project-netware.zip
-   libpng-1.2.36beta04-project-wince.zip
+   libpng-1.2.36beta05-project-netware.zip
+   libpng-1.2.36beta05-project-wince.zip
 
 Other information:
 
-   libpng-1.2.36beta04-README.txt
-   libpng-1.2.36beta04-KNOWNBUGS.txt
-   libpng-1.2.36beta04-LICENSE.txt
-   libpng-1.2.36beta04-Y2K-compliance.txt
-   libpng-1.2.36beta04-[previous version]-diff.txt
+   libpng-1.2.36beta05-README.txt
+   libpng-1.2.36beta05-KNOWNBUGS.txt
+   libpng-1.2.36beta05-LICENSE.txt
+   libpng-1.2.36beta05-Y2K-compliance.txt
+   libpng-1.2.36beta05-[previous version]-diff.txt
 
 Changes since the last public release (1.2.34):
 
@@ -76,14 +76,17 @@ version 1.2.36beta02 [March 21, 2009]
   Removed fflush() from pngtest.c.
   Added "#define PNG_NO_WRITE_FLUSH" to contrib/pngminim/encoder/pngusr.h
 
-version 1.2.36beta03 [April 6, 2009]
+version 1.2.36beta03 [March 27, 2009]
   Relocated misplaced PNG_1_0_X define in png.h that caused the prototype
     for png_set_strip_error_numbers() to be omitted from PNG_NO_ASSEMBLER_CODE
     builds.  This bug was introduced in libpng-1.2.15beta4.
   Added a section on differences between 1.0.x and 1.2.x to libpng.3/libpng.txt
 
-version 1.2.36beta04 [April 6, 2009]
+version 1.2.36beta04 [April 5, 2009]
   Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
+
+version 1.2.36beta05 [April 13, 2009]
+  None.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
