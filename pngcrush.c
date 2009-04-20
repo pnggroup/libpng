@@ -1,5 +1,6 @@
 /* pngcrush.c - recompresses png files
- * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson (glennrp@users.sf.net)
+ * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson
+ *                                   (glennrp at users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
  *
  * The most recent version of pngcrush can be found at SourceForge in
@@ -38,7 +39,8 @@
  * If you have modified this source, you may insert additional notices
  * immediately after this sentence.
  *
- * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson (glennrp@users.sf.net)
+ * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson
+ *                                   (glennrp at users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
  *
  * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
@@ -308,8 +310,6 @@
                          ((png_uint_32) 116    ))
 #endif
 
-#define PNG_FLAG_CRC_CRITICAL_USE         0x0400
-#define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
 #define PNG_FLAG_CRC_ANCILLARY_USE        0x0100
 #define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
@@ -330,7 +330,8 @@
 
 /* we don't need some of the extra libpng transformations
  * so they are ifdef'ed out in pngcrush.h, which is included by
- * libpng's pngconf.h which is included by png.h */
+ * pngcrush's local copy of libpng's pngconf.h which is included
+ * by png.h */
 
 /* defined so I can write to a file on gui/windowing platforms */
 /*  #define STDERR stderr  */
@@ -1191,7 +1192,8 @@ png_voidp png_debug_malloc(png_structp png_ptr, png_uint_32 size)
     /* This calls the library allocator twice, once to get the requested
        buffer and once to get a new free list entry. */
     {
-        memory_infop pinfo = (memory_infop)png_malloc_default(png_ptr, sizeof *pinfo);
+        memory_infop pinfo = (memory_infop)png_malloc_default(png_ptr,
+           sizeof *pinfo);
         pinfo->size = size;
         current_allocation += size;
         if (current_allocation > maximum_allocation)
@@ -1800,7 +1802,8 @@ int main(int argc, char *argv[])
             do_loco = 1;
 #else
             printf
-                ("Cannot do -loco because libpng was compiled without MNG features");
+                ("Cannot do -loco because libpng was compiled"
+                 " without MNG features");
 #endif
         } else if (!strncmp(argv[i], "-l", 2)) {
             int specified_level = atoi(argv[++i]);
@@ -1947,7 +1950,7 @@ int main(int argc, char *argv[])
             do_color_count = 1;
         }
 #ifdef PNG_gAMA_SUPPORTED
-        else if (!strncmp(argv[i], "-rep", 4)) {
+        else if (!strncmp(argv[i], "-replace_gamma", 4)) {
             names++;
             BUMP_I;
             found_gAMA=1;
@@ -2097,7 +2100,8 @@ int main(int argc, char *argv[])
                             "too many text/zTXt inputs; only 10 allowed\n");
                 else
                     fprintf(STDERR,
-                            "keyword exceeds 79 characters or text exceeds 2047 characters\n");
+                            "keyword exceeds 79 characters or text"
+                            " exceeds 2047 characters\n");
                 i += 3;
                 names += 3;
 #ifdef PNG_iTXt_SUPPORTED
@@ -2829,77 +2833,77 @@ int main(int argc, char *argv[])
                         if (keep_unknown_chunk("alla", argv) &&
                             keep_unknown_chunk("allb", argv))
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_IF_SAFE,
-                                                        (png_bytep) NULL,
-                                                        0);
+                                                    PNG_HANDLE_CHUNK_IF_SAFE,
+                                                    (png_bytep) NULL,
+                                                    0);
                         else
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_NEVER,
-                                                        (png_bytep) NULL,
-                                                        0);
+                                                    PNG_HANDLE_CHUNK_NEVER,
+                                                    (png_bytep) NULL,
+                                                    0);
 
 #if !defined(PNG_cHRM_SUPPORTED)
                         if (keep_unknown_chunk("cHRM", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_cHRM);
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_ALWAYS,
-                                                        chunk_name, 1);
+                                                    PNG_HANDLE_CHUNK_ALWAYS,
+                                                    chunk_name, 1);
                         }
 #endif
 #if !defined(PNG_hIST_SUPPORTED)
                         if (keep_unknown_chunk("hIST", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_hIST);
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_ALWAYS,
-                                                        chunk_name, 1);
+                                                    PNG_HANDLE_CHUNK_ALWAYS,
+                                                    chunk_name, 1);
                         }
 #endif
 #if !defined(PNG_iCCP_SUPPORTED)
                         if (keep_unknown_chunk("iCCP", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_iCCP);
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_ALWAYS,
-                                                        chunk_name, 1);
+                                                    PNG_HANDLE_CHUNK_ALWAYS,
+                                                    chunk_name, 1);
                         }
 #endif
 #if !defined(PNG_sCAL_SUPPORTED)
                         if (keep_unknown_chunk("sCAL", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_sCAL);
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_ALWAYS,
-                                                        chunk_name, 1);
+                                                    PNG_HANDLE_CHUNK_ALWAYS,
+                                                    chunk_name, 1);
                         }
 #endif
 #if !defined(PNG_pCAL_SUPPORTED)
                         if (keep_unknown_chunk("pCAL", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_pCAL);
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_ALWAYS,
-                                                        chunk_name, 1);
+                                                    PNG_HANDLE_CHUNK_ALWAYS,
+                                                    chunk_name, 1);
                         }
 #endif
 #if !defined(PNG_sPLT_SUPPORTED)
                         if (keep_unknown_chunk("sPLT", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_sPLT);
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_ALWAYS,
-                                                        chunk_name, 1);
+                                                    PNG_HANDLE_CHUNK_ALWAYS,
+                                                    chunk_name, 1);
                         }
 #endif
 #if !defined(PNG_sTER_SUPPORTED)
                         if (keep_unknown_chunk("sTER", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_sTER);
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_ALWAYS,
-                                                        chunk_name, 1);
+                                                    PNG_HANDLE_CHUNK_ALWAYS,
+                                                    chunk_name, 1);
                         }
 #endif
 #if !defined(PNG_tIME_SUPPORTED)
                         if (keep_unknown_chunk("tIME", argv)) {
                             png_save_uint_32(chunk_name, PNG_UINT_tIME);
                             png_set_keep_unknown_chunks(write_ptr,
-                                                        PNG_HANDLE_CHUNK_ALWAYS,
-                                                        chunk_name, 1);
+                                                    PNG_HANDLE_CHUNK_ALWAYS,
+                                                    chunk_name, 1);
                         }
 #endif
                     }
@@ -3344,7 +3348,7 @@ int main(int argc, char *argv[])
 #endif /* defined(PNG_READ_sRGB_SUPPORTED)&&defined(PNG_WRITE_sRGB_SUPPORTED) */
 
 #if defined(PNG_READ_iCCP_SUPPORTED) && defined(PNG_WRITE_iCCP_SUPPORTED)
-                if (intent < 0) {       /* ignore iCCP if sRGB is being written */
+                if (intent < 0) {  /* ignore iCCP if sRGB is being written */
                     png_charp name;
                     png_charp profile;
                     png_uint_32 proflen;
@@ -3508,7 +3512,8 @@ int main(int argc, char *argv[])
                                              trans, num_trans,
                                              trans_values);
                         }
-                    } else if (have_trns == 1) {  /* will not overwrite existing trns data */
+                    } else if (have_trns == 1) {
+                        /* will not overwrite existing trns data */
                         png_color_16 trans_data;
                         png_byte index_data = (png_byte) trns_index;
                         num_trans = index_data + 1;
@@ -3839,8 +3844,8 @@ int main(int argc, char *argv[])
                         png_unknown_chunkp unknowns_keep; /* allocated by us */
                         int num_unknowns_keep;
 
-                        unknowns_keep = (png_unknown_chunk*)png_malloc(write_ptr,
-                          (png_uint_32) num_unknowns
+                        unknowns_keep = (png_unknown_chunk*)png_malloc(
+                          write_ptr, (png_uint_32) num_unknowns
                           *sizeof(png_unknown_chunk));
 
                         P1("malloc for %d unknown chunks\n", num_unknowns);
@@ -5067,7 +5072,8 @@ int count_colors(FILE * fp_in)
                     unsigned long length;
                     /* skip the MHDR */
                     png_default_read_data(read_ptr, buffer, 4);
-                    length=buffer[3]+(buffer[2]<<8)+(buffer[1]<<16)+(buffer[0]<<24);
+                    length=buffer[3]+(buffer[2]<<8)+(buffer[1]<<16)
+                      +(buffer[0]<<24);
                     png_default_read_data(read_ptr, buffer, 4);
                     printf("Skipping %c%c%c%c chunk.\n",buffer[0],buffer[1],
                       buffer[2],buffer[3]);
@@ -5522,9 +5528,9 @@ void print_version_info(void)
 
 static const char *pngcrush_legal[] = {
     "",
-    /* If you have modified this source, you may insert additional notices
-     * immediately after this sentence: */
-    "Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson (glennrp@users.sf.net)",
+    "If you have modified this source, you may insert additional notices",
+    "immediately after this sentence.",
+    "Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson",
     "Copyright (C) 2005      Greg Roelofs",
     "",
     "DISCLAIMER: The pngcrush computer program is supplied \"AS IS\".",
@@ -5749,7 +5755,7 @@ struct options_help pngcrush_options[] = {
     {2, "               Don't reset file modification time."},
     {2, ""},
 
-    {0, "            -n (no save; does not do compression or write output PNG)"},
+    {0, "            -n (no save; doesn't do compression or write output PNG)"},
     {2, ""},
     {2, "               Useful in conjunction with -v option to get info."},
     {2, ""},
@@ -5771,8 +5777,8 @@ struct options_help pngcrush_options[] = {
     {0, "          -rem chunkname (or \"alla\" or \"allb\")"},
     {2, ""},
     {2, "               Name of an ancillary chunk or optional PLTE to be"},
-    {2, "               removed.  Be careful with this.  Please don't use "},
-    {2, "               this feature to remove transparency, gamma, copyright,"},
+    {2, "               removed.  Be careful with this.  Don't use this"},
+    {2, "               feature to remove transparency, gamma, copyright,"},
     {2, "               or other valuable information.  To remove several"},
     {2, "               different chunks, repeat: -rem tEXt -rem pHYs."},
     {2, "               Known chunks (those in the PNG 1.1 spec or extensions"},
@@ -5788,9 +5794,9 @@ struct options_help pngcrush_options[] = {
     {0, FAKE_PAUSE_STRING},
 
 #ifdef PNG_FIXED_POINT_SUPPORTED
-    {0, "-replace_gamma gamma (float or fixed*100000) even if gAMA is present."},
+    {0, "-replace_gamma gamma (float or fixed*100000) even if it is present."},
 #else
-    {0, "-replace_gamma gamma (float, e.g. 0.45455) even if gAMA is present."},
+    {0, "-replace_gamma gamma (float, e.g. 0.45455) even if it is present."},
 #endif
     {2, ""},
 
@@ -5803,9 +5809,10 @@ struct options_help pngcrush_options[] = {
     {0, "          -rle (use only zlib strategy 3, RLE-only)"},
     {2, ""},
     {2, "               A relatively fast subset of the \"-brute\" methods,"},
-    {2, "               generally more effective than \"-huffman\" on PNG images"},
-    {2, "               (and quite effective on black-and-white images),"},
-    {2, "               but not necessarily worth the bother otherwise."},
+    {2, "               generally more effective than \"-huffman\" on PNG,"},
+    {2, "               images (and quite effective on black-and-white"},
+    {2, "               images) but not necessarily worth the bother"},
+    {2, "               otherwise."},
     {2, ""},
 #endif
 
