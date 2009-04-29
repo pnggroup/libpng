@@ -4900,7 +4900,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 
         if (png_get_uint_32(chunk_name) == PNG_UINT_CgBI)
         {
-          printf(" This is an XCode CGBI file, not a PNG file.\n");
+          printf(" This is an Xcode CGBI file, not a PNG file.\n");
           if (fix)
           {
             printf (" Removing the CgBI chunk.\n");
