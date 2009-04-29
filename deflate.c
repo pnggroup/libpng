@@ -105,6 +105,11 @@ local  void check_match OF((deflate_state *s, IPos start, IPos match,
 #define NIL 0
 /* Tail of hash chains */
 
+
+#ifndef TOO_FAR
+#define TOO_FAR 32767 /* pngcrush mod */
+#endif
+
 #ifndef TOO_FAR
 #  define TOO_FAR 4096
 #endif

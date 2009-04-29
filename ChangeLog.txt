@@ -1,5 +1,10 @@
 Change log:
 
+Version 1.6.17 (built with libpng-1.2.35 and zlib-1.2.3.2)
+  Defined TOO_FAR == 32767 in deflate.c (again).  The definition
+    has continually been inadvertently omitted during zlib updates
+    since pngcrush version 1.6.4.
+
 Version 1.6.16 (built with libpng-1.2.35 and zlib-1.2.3.2)
   Added -newtimestamp and -oldtimestamp options and changed
     default condition to timestamping the output file with
