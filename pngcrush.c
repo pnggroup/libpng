@@ -184,6 +184,14 @@
                          ((png_uint_32)  68    ))
 #endif
 
+/* glennrp added CgBI at pngcrush-1.6.16 */
+#ifndef PNG_UINT_CgBI
+#  define PNG_UINT_CgBI (((png_uint_32)  67<<24) | \
+                         ((png_uint_32) 103<<16) | \
+                         ((png_uint_32)  66<< 8) | \
+                         ((png_uint_32)  73    ))
+#endif
+
 #ifndef PNG_UINT_cHRM
 #  define PNG_UINT_cHRM (((png_uint_32)  99<<24) | \
                          ((png_uint_32)  72<<16) | \
@@ -454,6 +462,7 @@ static png_uint_32 width, height;
 static png_uint_32 measured_idat_length;
 static int found_gAMA = 0;
 static int found_cHRM = 0;
+static int found_CgBI = 0;
 static int found_any_chunk = 0;
 static int image_is_immutable = 0;
 static int pngcrush_must_exit = 0;
@@ -1274,7 +1283,25 @@ void png_crush_pause(void)
 }
 
 
+void png_skip_chunk(png_structp png_ptr)
+{
+  png_byte buff[4];
+  int i;
+  unsigned long length;
 
+  /* read the length field */
+  png_default_read_data(png_ptr, buff, 4);
+  length=buff[3]+(buff[2]<<8)+(buff[1]<<16)+(buff[0]<<24);
+  /* read the chunk name */
+  png_default_read_data(png_ptr, buff, 4);
+  printf("Skipping %c%c%c%c chunk.\n",buff[0],buff[1],
+    buff[2],buff[3]);
+  /* skip the data */
+  for (i=0; i<length; i++)
+     png_default_read_data(png_ptr, buff, 1);
+  /* skip the CRC */
+  png_default_read_data(png_ptr, buff, 4);
+}
 
 #ifndef __riscos
 #  define setfiletype(x)
@@ -2925,27 +2952,33 @@ int main(int argc, char *argv[])
 #if defined(PNGCRUSH_LOCO)
                     if (!(int)
                         (png_memcmp(mng_signature, png_signature, 8))) {
-                        png_byte buff[40];
-                        unsigned long length;
                         /* Skip the MHDR */
                         png_permit_mng_features(read_ptr,
                                                 PNG_FLAG_MNG_FILTER_64);
-            png_default_read_data(read_ptr, buff, 4);
-            length=buff[3]+(buff[2]<<8)+(buff[1]<<16)+(buff[0]<<24);
-            png_default_read_data(read_ptr, buff, 4);
-            printf("Skipping %c%c%c%c chunk.\n",buff[0],buff[1],
-              buff[2],buff[3]);
-            png_default_read_data(read_ptr, buff, length);
-            png_default_read_data(read_ptr, buff, 4);
+                        png_skip_chunk(read_ptr);
                         input_format = 1;
                     } else
 #endif
-                    if (png_sig_cmp(png_signature, 0, 8)) {
-                        if (png_sig_cmp(png_signature, 0, 4))
-                            png_error(read_ptr, "Not a PNG file!");
+                        if (png_sig_cmp(png_signature, 0, 8)) {
+                            if (png_sig_cmp(png_signature, 0, 4))
+                                png_error(read_ptr, "Not a PNG file!");
                         else
                             png_error(read_ptr,
-                                      "PNG file corrupted by ASCII conversion");
+                                "PNG file corrupted by ASCII conversion");
+                    }
+                    if(fix && found_CgBI)
+                    {
+#if 0                   /* doesn't work */
+                        printf("Handling CgBI chunk\n");
+                        png_skip_chunk(read_ptr);
+                        /* iCCP is probably bad */
+                        png_set_keep_unknown_chunks(read_ptr,
+                            PNG_HANDLE_CHUNK_NEVER,
+                            (png_bytep)"iCCP", 1);
+#else
+                        png_error(read_ptr,
+                            "Cannot read CgBI PNG.");
+#endif
                     }
                 }
 
@@ -4848,7 +4881,6 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
         }
 
         else {
-
 #ifdef PNG_UINT_IDAT
         if (png_get_uint_32(chunk_name) == PNG_UINT_IDAT)
 #else
@@ -4865,6 +4897,20 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             printf("Reading %s chunk, length = %lu.\n", chunk_name,
                    (unsigned long)length);
         }
+
+        if (png_get_uint_32(chunk_name) == PNG_UINT_CgBI)
+        {
+          printf(" This is an Apple CGBI file, not a PNG file.\n");
+          if (fix)
+          {
+            printf (" Removing the CgBI chunk.\n");
+          } else {
+            printf (" Try \"pngcrush -fix ...\" to convert it to PNG.\n");
+          }
+          found_CgBI++;
+        }
+
+
 #ifdef PNG_UINT_IHDR
         if (png_get_uint_32(chunk_name) == PNG_UINT_IHDR)
 #else
@@ -4934,7 +4980,6 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
         }
 #endif
 
-
     }
         png_crc_finish(png_ptr, length);
 
@@ -4960,11 +5005,15 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
 
         if (input_format == 0) {
 #ifdef PNG_UINT_IEND
-          if (png_get_uint_32(chunk_name) == PNG_UINT_IEND)
+          if (png_get_uint_32(chunk_name) == PNG_UINT_IEND) {
 #else
-          if (!png_memcmp(chunk_name, png_IEND, 4))
+          if (!png_memcmp(chunk_name, png_IEND, 4)) {
 #endif
-            return sum_idat_length;
+            if (!fix && found_CgBI)
+              return 0;
+            else
+              return sum_idat_length;
+          }
         }
     }
 }
@@ -5070,15 +5119,8 @@ int count_colors(FILE * fp_in)
                 if (!(int) (png_memcmp(mng_signature, png_signature, 8))) {
                     png_byte buffer[40];
                     unsigned long length;
-                    /* skip the MHDR */
-                    png_default_read_data(read_ptr, buffer, 4);
-                    length=buffer[3]+(buffer[2]<<8)+(buffer[1]<<16)
-                      +(buffer[0]<<24);
-                    png_default_read_data(read_ptr, buffer, 4);
-                    printf("Skipping %c%c%c%c chunk.\n",buffer[0],buffer[1],
-                      buffer[2],buffer[3]);
-                    png_default_read_data(read_ptr, buffer, length);
-                    png_default_read_data(read_ptr, buffer, 4);
+                    /* Skip the MHDR chunk. */
+                    png_skip_chunk(read_ptr);
                     png_permit_mng_features(read_ptr,
                                             PNG_FLAG_MNG_FILTER_64);
                     input_format = 1;
@@ -5089,9 +5131,25 @@ int count_colors(FILE * fp_in)
                         png_error(read_ptr, "Not a PNG file.");
                     else
                         png_error(read_ptr,
-                                  "PNG file corrupted by ASCII conversion");
+                           "PNG file corrupted by ASCII conversion");
                 }
             }
+
+            printf("Handling CgBI chunk\n");
+            if (fix && found_CgBI){
+#if 0 /* doesn't work */
+                /* Skip the CgBI chunk. */
+                png_skip_chunk(read_ptr);
+                /* iCCP is probably bad */
+                png_set_keep_unknown_chunks(read_ptr,
+                    PNG_HANDLE_CHUNK_NEVER,
+                    (png_bytep)"iCCP", 1);
+#else
+                        png_error(read_ptr,
+                            "Cannot read CgBI PNG.");
+#endif
+            }
+
             png_read_info(read_ptr, read_info_ptr);
 
 #ifdef PNG_CRC_QUIET_USE
