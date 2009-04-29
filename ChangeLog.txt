@@ -6,6 +6,7 @@ Version 1.6.16 (built with libpng-1.2.35 and zlib-1.2.3.2)
     the current time (i.e., -newtimestamp is default)
   If the -oldtimestamp option is used then the output file
     has the same timestamp as the input file.
+  Added CgBI chunk detection.
 
 Version 1.6.15 (built with libpng-1.2.35 and zlib-1.2.3.2)
   Fixes some missing typecasts on png_malloc() calls, patch from
