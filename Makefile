@@ -15,13 +15,13 @@
 #ZLIB = ../../zlib
 
 CC = gcc
-# CC = gcc-4.3.0
-# LD = gcc-4.3.0
 LD = gcc
+# CC = /usr/local/bin/gcc-4.3.3
+# LD = /usr/local/bin/gcc-4.3.3
 RM = rm -f
 #CFLAGS = -I. -O -Wall
 #CFLAGS = -I. -O3 -fomit-frame-pointer -Wall
-CFLAGS = -I. -O3 -fomit-frame-pointer -Wall
+CFLAGS = -I. -O3 -fomit-frame-pointer -Wall -Wshadow
 #CFLAGS = -I${ZINC} -I. -O3 -fomit-frame-pointer -Wall
 # [note that -Wall is a gcc-specific compilation flag ("all warnings on")]
 LDFLAGS =
