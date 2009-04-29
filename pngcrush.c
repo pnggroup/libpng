@@ -27,7 +27,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.16"
+#define PNGCRUSH_VERSION "1.6.17"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
