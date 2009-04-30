@@ -1954,6 +1954,7 @@ int main(int argc, char *argv[])
             nofilecheck++;
         } else if (!strncmp(argv[i], "-nosave", 2)) {
             /* no save; I just use this for testing decode speed */
+            /* also to avoid saving if a CgBI chunk was found */
             nosave++;
             pngcrush_mode = EXTENSION_MODE;
         } else if (!strncmp(argv[i], "-oldtimestamp", 5)) {
@@ -2968,17 +2969,19 @@ int main(int argc, char *argv[])
                     }
                     if(fix && found_CgBI)
                     {
-#if 0                   /* doesn't work */
-                        printf("Handling CgBI chunk\n");
+                        /* Skip the CgBI chunk */
+
                         png_skip_chunk(read_ptr);
-                        /* iCCP is probably bad */
+
+                        /* iCCP and zTXt are probably unreadable
+                         * because of the nonstandard deflate */
+
                         png_set_keep_unknown_chunks(read_ptr,
                             PNG_HANDLE_CHUNK_NEVER,
                             (png_bytep)"iCCP", 1);
-#else
-                        png_error(read_ptr,
-                            "Cannot read CgBI PNG.");
-#endif
+                        png_set_keep_unknown_chunks(read_ptr,
+                            PNG_HANDLE_CHUNK_NEVER,
+                            (png_bytep)"zTXt", 1);
                     }
                 }
 
@@ -3816,9 +3819,6 @@ int main(int argc, char *argv[])
                                       ".\n", (added_text[0].compression == 1)?
                                       "n un" : " ");
 #endif
-#if 0
-                                printf("   key=%s.\n",(added_text[0].key));
-#endif
                                 png_free(write_ptr, added_text);
                                 added_text = (png_textp) NULL;
                             }
@@ -4010,6 +4010,11 @@ int main(int argc, char *argv[])
 #endif /* PNGCRUSH_LOCO */
 
                     png_crush_pause();
+
+                    if (found_CgBI)
+                        png_error(read_ptr,
+                            "Cannot read Xcode CgBI PNG.");
+
                     P1( "\nWriting info struct\n");
 
 #if 0 /* doesn't work; compression level has to be the same as in IDAT */
@@ -4019,7 +4024,7 @@ int main(int argc, char *argv[])
 #endif
 
                     png_crush_pause();
-                    {
+                      {
                         int compression_window;
                         png_uint_32 zbuf_size;
                         png_uint_32 required_window;
@@ -4095,7 +4100,7 @@ int main(int argc, char *argv[])
 
                         png_set_compression_window_bits(write_ptr,
                                                         compression_window);
-                    }
+                      }
 
                     png_set_compression_level(write_ptr, zlib_level);
                     png_write_info(write_ptr, write_info_ptr);
@@ -4110,9 +4115,7 @@ int main(int argc, char *argv[])
                         png_set_packing(write_ptr);
                     }
 #endif
-
-                }
-                /* no save */
+                } /* no save */
 #define LARGE_PNGCRUSH
 
 #ifdef PNGCRUSH_MULTIPLE_ROWS
@@ -4288,7 +4291,6 @@ int main(int argc, char *argv[])
                 png_free_unknown_chunks(write_ptr, write_info_ptr, -1);
 #  endif
 #endif
-
                 P1( "Reading and writing end_info data\n");
                 png_read_end(read_ptr, end_info_ptr);
 
@@ -4327,8 +4329,8 @@ int main(int argc, char *argv[])
                                     fprintf(STDERR, "\n");
                             }
                         }
-
-                        if (num_text > 0) {
+                        if (nosave) {
+                          if (num_text > 0) {
                             if (keep_chunk("text", argv)) {
                                 int num_to_write = num_text;
                                 for (ntext = 0; ntext < num_text; ntext++) {
@@ -4405,6 +4407,7 @@ int main(int argc, char *argv[])
                                 added_text = (png_textp) NULL;
                             }
                         }
+                      } /* end of nosave block */
                     }
                 }
 #endif /* (PNG_READ_tEXt_SUPPORTED and PNG_WRITE_tEXt_SUPPORTED) or */
@@ -4908,6 +4911,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
             printf (" Try \"pngcrush -fix ...\" to convert it to PNG.\n");
           }
           found_CgBI++;
+          nosave++;
         }
 
 
@@ -5135,19 +5139,23 @@ int count_colors(FILE * fp_in)
                 }
             }
 
-            printf("Handling CgBI chunk\n");
             if (fix && found_CgBI){
-#if 0 /* doesn't work */
                 /* Skip the CgBI chunk. */
                 png_skip_chunk(read_ptr);
-                /* iCCP is probably bad */
+                /* iCCP is probably badly compressed */
                 png_set_keep_unknown_chunks(read_ptr,
                     PNG_HANDLE_CHUNK_NEVER,
                     (png_bytep)"iCCP", 1);
-#else
-                        png_error(read_ptr,
-                            "Cannot read CgBI PNG.");
+#ifdef PNG_iTXt_SUPPORTED
+                /* and iTXt */
+                png_set_keep_unknown_chunks(read_ptr,
+                    PNG_HANDLE_CHUNK_NEVER,
+                    (png_bytep)"iTXt", 1);
 #endif
+                /* zTXt too */
+                png_set_keep_unknown_chunks(read_ptr,
+                    PNG_HANDLE_CHUNK_NEVER,
+                    (png_bytep)"zTXt", 1);
             }
 
             png_read_info(read_ptr, read_info_ptr);
