@@ -48,7 +48,7 @@ extern voidp  malloc OF((uInt size));
 extern void   free   OF((voidpf ptr));
 #endif
 
-#ifdef NO_FSEEKO
+#if defined(NO_FSEEKO) || defined(__MINGW32__)
 #  define FSEEK fseek
 #  define FTELL ftell
 #else
