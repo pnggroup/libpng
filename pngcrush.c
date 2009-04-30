@@ -436,13 +436,17 @@
 #endif
 
 #ifndef CLOCKS_PER_SEC
-#define CLOCKS_PER_SEC 1000
+#  define CLOCKS_PER_SEC 1000
 #endif
 
-#if CLOCKS_PER_SEC <= 100
-#  define TIME_T long
+#ifdef __STDC__
+#  define TIME_T clock_t
 #else
-#  define TIME_T float
+#  if CLOCKS_PER_SEC <= 100
+#    define TIME_T long
+#  else
+#    define TIME_T float
+#  endif
 #endif
 
 struct options_help {

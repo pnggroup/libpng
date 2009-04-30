@@ -4,6 +4,12 @@ Version 1.6.17 (built with libpng-1.2.35 and zlib-1.2.3.2)
   Defined TOO_FAR == 32767 in deflate.c (again).  The definition
     has continually been inadvertently omitted during zlib updates
     since pngcrush version 1.6.4.
+  Revised handling of xcode files so at least we can get printout
+    of IHDR values with "pngcrush -fix -n -v xcode.png"
+  Changes from Thomas M. Edwards:
+  Revised gzio.c so it will not attempt to use fseeko/ftello on MinGW.
+    See http://www.gnu.org/software/hello/manual/gnulib/ftello.html
+  Revised pngcrush.c handling of CLOCKS_PER_SEC to work with the MinGW macro.
 
 Version 1.6.16 (built with libpng-1.2.35 and zlib-1.2.3.2)
   Added -newtimestamp and -oldtimestamp options and changed
