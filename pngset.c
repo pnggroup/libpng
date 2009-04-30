@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.36 [April 15, 2009]
+ * Last changed in libpng 1.2.36 [April 30, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -383,10 +383,6 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
       return;
    }
 
-#ifdef PNG_FREE_ME_SUPPORTED
-   info_ptr->free_me |= PNG_FREE_PCAL;
-#endif
-
    png_memset(info_ptr->pcal_params, 0, (nparams + 1) * png_sizeof(png_charp));
 
    for (i = 0; i < nparams; i++)
@@ -404,6 +400,9 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    }
 
    info_ptr->valid |= PNG_INFO_pCAL;
+#ifdef PNG_FREE_ME_SUPPORTED
+   info_ptr->free_me |= PNG_FREE_PCAL;
+#endif
 }
 #endif
 
@@ -961,7 +960,6 @@ png_set_sPLT(png_structp png_ptr,
 
     png_memcpy(np, info_ptr->splt_palettes,
            info_ptr->splt_palettes_num * png_sizeof(png_sPLT_t));
-
     png_free(png_ptr, info_ptr->splt_palettes);
     info_ptr->splt_palettes=NULL;
 
