@@ -163,6 +163,7 @@ Version 1.6.17 (built with libpng-1.2.36rc01 and zlib-1.2.3.2)
   Revised handling of xcode files so at least we can get printout
     of IHDR values with "pngcrush -fix -n -v xcode.png".
   Moved ChangeLog.txt back into pngcrush.c so it does not get lost.
+  Removed single quotes from the ChangeLog.
 
 Version 1.6.16 (built with libpng-1.2.35 and zlib-1.2.3.2)
   Added -newtimestamp and -oldtimestamp options and changed
@@ -235,7 +236,7 @@ Version 1.6.2 (built with libpng-1.2.8 and zlib-1.2.3)
 Version 1.6.1 (distributed as 1.6.0, built with libpng-1.2.8 and zlib-1.2.3)
 
   Copied non-exported libpng functions from libpng into pngcrush, to make
-  pngcrush play more nicely with shared libpng.  These are #ifdef'ed out
+  pngcrush play more nicely with shared libpng.  These are not compiled
   when a static library is being built with the bundled libpng and
   pngcrush.h is included.
 
@@ -416,7 +417,7 @@ Version 1.4.5 (built with libpng-1.0.7rc2 and cexcept-1.0.0)
   and no color is present that requires 16-bit precision.  For now,
   it only reports the frequencies.
   
-  Added "-fix" option, for fixing bad CRC's and other correctable
+  Added "-fix" option, for fixing bad CRCs and other correctable
   conditions.
 
   Write sBIT.alpha=1 when adding an opaque alpha channel and sBIT
@@ -457,7 +458,7 @@ Version 1.4.2 (built with libpng-1.0.6f and cexcept-0.6.0)
 
 Version 1.4.1 (built with libpng-1.0.6e and cexcept-0.6.0)
 
-  Uses cexcept.h for error handling instead of libpng's built-in
+  Uses cexcept.h for error handling instead of libpngs built-in
   setjmp/longjmp mechanism.  See http://cexcept.sf.net/
 
   Pngcrush.c will now run when compiled with old versions of libpng back
@@ -470,7 +471,7 @@ Version 1.3.6 (built with libpng-1.0.5v)
   RGB to Grayscale conversion is more accurate (15-bit instead of 8-bit)
   and now uses only integer arithmetic.
 
-  #ifdef'ed out PNG_READ_DITHER
+  "#ifdefed" out PNG_READ_DITHER
 
   Changed "Compressed" to "Uncompressed" in help for -itxt.
 
@@ -512,7 +513,7 @@ Version 1.3.2 (built with libpng-1.0.5k)
 
   Fixed "PNG_NO_FLOAING_POINT" typo in pngcrush.h
 
-  #ifdef'ed out parts of the help screen for options that are unsupported.
+  "#ifdefed" out parts of the help screen for options that are unsupported.
 
 Version 1.3.1 (built with libpng-1.0.5k): Eliminated some spurious warnings
   that were being issued by libpng-1.0.5j.  Added  -itxt, -ztxt, and
@@ -532,7 +533,7 @@ Version 1.3.0 (built with libpng-1.0.5j): Added support for handling
   are now supported by libpng (since libpng-1.0.5j).  None of these have
   been adequately tested.
 
-  #ifdef'ed out more unused code (weighted filters and progressive read;
+  "#ifdefed" out more unused code (weighted filters and progressive read;
   this saves about 15k in the size of the executable).
 
   Moved the special definitions from pngconf.h into a new pngcrush.h
@@ -562,7 +563,7 @@ Changes prior to going "open source":
 Version 1.1.8: built with libpng-1.0.5a.  Runs OK with pngvcrd.c.
 
 Version 1.1.7: added ability to add tEXt/zTXt chunks.  Fixed bug with
-closing a file that wasn't opened when using "pngcrush -n".  Fixed
+closing a file that was not opened when using "pngcrush -n".  Fixed
 bug with tEXt/zTXt chunks after IDAT not being copied.
 Added alpha to the displayed palette table.  Rebuilt with libpng-1.0.5.
 
@@ -2714,6 +2715,12 @@ int main(int argc, char *argv[])
 
     if (verbose > 0)
         print_version_info();
+
+    if (found_CgBI)
+    {
+        default_compression_window = -1;
+        force_compression_window = 1;
+    } else
 
     if (default_compression_window == 32)
         default_compression_window = 15;
