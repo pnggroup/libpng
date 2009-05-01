@@ -4045,7 +4045,7 @@ int main(int argc, char *argv[])
                         png_warning(read_ptr,
                             "Cannot read Xcode CgBI PNG. Even if we could,");
                         png_error(read_ptr,
-                            "the original PNG could be recovered.");
+                            "the original PNG could not be recovered.");
 
                     P1( "\nWriting info struct\n");
 
