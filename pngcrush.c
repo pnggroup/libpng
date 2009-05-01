@@ -2716,12 +2716,6 @@ int main(int argc, char *argv[])
     if (verbose > 0)
         print_version_info();
 
-    if (found_CgBI)
-    {
-        default_compression_window = -1;
-        force_compression_window = 1;
-    } else
-
     if (default_compression_window == 32)
         default_compression_window = 15;
     else if (default_compression_window == 16)
