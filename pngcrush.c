@@ -25,6 +25,32 @@
  * Thanks to Stephan Levavej for some helpful suggestions about gcc compiler
  * options and for a suggestion to increase the Z_MEM_LEVEL from default.
  *
+ * Caution: there is another version of pngcrush that has been distributed by
+ * Apple since mid-2008 as a part of the Xcode SDK.   Although it claims
+ * to be pngcrush by Glenn Randers-Pehrson, it has additional options
+ * "-iPhone" * and "-speed".  It writes files that have the PNG 8-byte signature
+ * but are not valid PNG files, due to at least
+ *
+ *   o the presence of the CgBI chunk ahead of the IHDR chunk,
+ *   o nonstandard deflate compression in IDAT, iCCP, and perhaps zTXt chunks,
+ *   o the use of premultiplied alpha in color_type 6 files, and
+ *   o the sample order is ARGB instead of RGBA in color_type 6 files.
+ *
+ * The original PNG file cannot be losslessly recovered from such files
+ * because of the use of premultiplied alpha.
+ *
+ * Most PNG decoders will recognize the fact that an unknown critical
+ * chunk "CgBI" is present and will immediately reject the file.
+ *
+ * It is said that the Xcode version of pngcrush is automatically applied
+ * when PNG files are prepared for downloading to the iPhone unless the
+ * user takes special measures to prevent it.
+ *
+ * I have not seen the source for the Xcode version of pngcrush.  All I
+ * know, for now, is from running "strings -a" on a copy of the executable,
+ * looking at two Xcode-PNG files, and reading Apple's patent application
+ * <http://www.freepatentsonline.com/y2008/0177769.html>.
+ *
  */
 
 #define PNGCRUSH_VERSION "1.6.17"
@@ -4016,8 +4042,10 @@ int main(int argc, char *argv[])
                     png_crush_pause();
 
                     if (found_CgBI)
+                        png_warning(read_ptr,
+                            "Cannot read Xcode CgBI PNG. Even if we could,");
                         png_error(read_ptr,
-                            "Cannot read Xcode CgBI PNG.");
+                            "the original PNG could be recovered.");
 
                     P1( "\nWriting info struct\n");
 
@@ -4912,7 +4940,7 @@ png_uint_32 png_measure_idat(png_structp png_ptr)
           {
             printf (" Removing the CgBI chunk.\n");
           } else {
-            printf (" Try \"pngcrush -fix ...\" to convert it to PNG.\n");
+            printf (" Try \"pngcrush -fix ...\" to attempt to read it.\n");
           }
           found_CgBI++;
           nosave++;
