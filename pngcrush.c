@@ -1,4 +1,5 @@
-/* pngcrush.c - recompresses png files
+/*
+ * pngcrush.c - recompresses png files
  * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson
  *                                   (glennrp at users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
@@ -60,14 +61,18 @@
 */
 
 /*
- * COPYRIGHT NOTICE, DISCLAIMER, AND LICENSE:
+ * NOTICES
  *
  * If you have modified this source, you may insert additional notices
  * immediately after this sentence.
  *
+ * COPYRIGHT:
+ *
  * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson
  *                                   (glennrp at users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
+ *
+ * DISCLAIMERS:
  *
  * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
  * warranties, expressed or implied, including, without limitation, the
@@ -81,6 +86,8 @@
  * or needs.  This computer program is provided with all faults, and the entire
  * risk of satisfactory quality, performance, accuracy, and effort is with
  * the user.
+ *
+ * LICENSE:
  *
  * Permission is hereby irrevocably granted to everyone to use, copy, modify,
  * and distribute this source code, or portions hereof, or executable programs
@@ -578,8 +585,10 @@ Version 1.1.4: added ability to restrict brute_force to one or more filter
 #ifdef PNG_LIBPNG_VER
 #define PNGCRUSH_LIBPNG_VER PNG_LIBPNG_VER
 #else
-/* This must agree with PNG_LIBPNG_VER; you have to define it manually
-   here if you are using libpng-1.0.6h or earlier */
+/* 
+ * This must agree with PNG_LIBPNG_VER; you have to define it manually
+ * here if you are using libpng-1.0.6h or earlier
+ */
 #define PNGCRUSH_LIBPNG_VER 10007
 #endif
 
@@ -787,10 +796,13 @@ Version 1.1.4: added ability to restrict brute_force to one or more filter
 #define PNG_USER_TRANSFORM   0x100000L
 #define PNG_RGB_TO_GRAY      0x600000L  /* two bits, RGB_TO_GRAY_ERR|WARN */
 
-/* we don't need some of the extra libpng transformations
+/*
+ * We don't need some of the extra libpng transformations
  * so they are ifdef'ed out in pngcrush.h, which is included by
  * pngcrush's local copy of libpng's pngconf.h which is included
- * by png.h */
+ * by png.h
+ *
+ */
 
 /* defined so I can write to a file on gui/windowing platforms */
 /*  #define STDERR stderr  */
@@ -1126,7 +1138,8 @@ void print_usage(int retval);
 
 
 #if (!defined(PNGCRUSH_H))
-/* ============================================================
+/*
+ * ============================================================
  * We aren't using the bundled libpng functions, so we must
  * reproduce the libpng routines that aren't exported by libpng
  * ============================================================
@@ -1164,7 +1177,8 @@ png_save_uint_32(png_bytep buf, png_uint_32 i)
    buf[3] = (png_byte)(i & 0xff);
 }
 
-/* Reset the CRC variable to 32 bits of 1's.  Care must be taken
+/*
+ * Reset the CRC variable to 32 bits of 1's.  Care must be taken
  * in case CRC is > 32 bits to leave the top bits 0.
  */
 void /* PRIVATE */
@@ -1172,7 +1186,8 @@ png_reset_crc(png_structp png_ptr)
 {
    png_ptr->crc = crc32(0, Z_NULL, 0);
 }
-/* Calculate the CRC over a section of data.  We can only pass as
+/*
+ * Calculate the CRC over a section of data.  We can only pass as
  * much data to this routine as the largest single buffer size.  We
  * also check that this data will actually be used before going to the
  * trouble of calculating it.
@@ -1238,10 +1253,12 @@ png_crc_error(png_structp png_ptr)
       return (0);
 }
 
-/* Optionally skip data and then check the CRC.  Depending on whether we
-   are reading a ancillary or critical chunk, and how the program has set
-   things up, we may calculate the CRC on the data and print a message.
-   Returns '1' if there was a CRC error, '0' otherwise. */
+/*
+ * Optionally skip data and then check the CRC.  Depending on whether we
+ * are reading a ancillary or critical chunk, and how the program has set
+ * things up, we may calculate the CRC on the data and print a message.
+ * Returns '1' if there was a CRC error, '0' otherwise.
+ */
 int /* PRIVATE */
 png_crc_finish(png_structp png_ptr, png_uint_32 skip)
 {
@@ -1276,7 +1293,8 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
    return (0);
 }
 
-/* Modify the info structure to reflect the transformations.  The
+/*
+ * Modify the info structure to reflect the transformations.  The
  * info should be updated so a PNG file could be written with it,
  * assuming the transformations result in valid PNG data.
  */
@@ -1430,17 +1448,20 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
 }
 
 #if !defined(PNG_NO_STDIO)
-/* This is the function that does the actual reading of data.  If you are
-   not reading from a standard C stream, you should create a replacement
-   read_data function and use it at run time with png_set_read_fn(), rather
-   than changing the library. */
+/*
+ * This is the function that does the actual reading of data.  If you are
+ * not reading from a standard C stream, you should create a replacement
+ * read_data function and use it at run time with png_set_read_fn(), rather
+ * than changing the library.
+ */
 #ifndef USE_FAR_KEYWORD
 void PNGAPI
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;
 
-   /* fread() returns 0 on error, so it is OK to store this in a png_size_t
+   /*
+    * fread() returns 0 on error, so it is OK to store this in a png_size_t
     * instead of an int, which is what fread() actually returns.
     */
 #if defined(_WIN32_WCE)
@@ -1455,10 +1476,11 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       png_error(png_ptr, "Read Error");
 }
 #else
-/* this is the model-independent version. Since the standard I/O library
-   can't handle far buffers in the medium and small models, we have to copy
-   the data.
-*/
+/*
+ * This is the model-independent version. Since the standard I/O library
+ * can't handle far buffers in the medium and small models, we have to copy
+ * the data.
+ */
 
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
@@ -1513,10 +1535,12 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #endif
 #endif
 #if !defined(PNG_NO_STDIO)
-/* This is the function that does the actual writing of data.  If you are
-   not writing to a standard C stream, you should create a replacement
-   write_data function and use it at run time with png_set_write_fn(), rather
-   than changing the library. */
+/*
+ * This is the function that does the actual writing of data.  If you are
+ * not writing to a standard C stream, you should create a replacement
+ * write_data function and use it at run time with png_set_write_fn(), rather
+ * than changing the library.
+ */
 #ifndef USE_FAR_KEYWORD
 void PNGAPI
 png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
@@ -1533,9 +1557,10 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
       png_error(png_ptr, "Write Error");
 }
 #else
-/* this is the model-independent version. Since the standard I/O library
-   can't handle far buffers in the medium and small models, we have to copy
-   the data.
+/*
+ * This is the model-independent version. Since the standard I/O library
+ * can't handle far buffers in the medium and small models, we have to copy
+ * the data.
 */
 
 #define NEAR_BUF_SIZE 1024
@@ -1621,14 +1646,16 @@ static void png_cexcept_error(png_structp png_ptr, png_const_charp err_msg)
 /* START of code to validate memory allocation and deallocation */
 #ifdef PNG_USER_MEM_SUPPORTED
 
-/* Allocate memory.  For reasonable files, size should never exceed
-   64K.  However, zlib may allocate more then 64K if you don't tell
-   it not to.  See zconf.h and png.h for more information.  zlib does
-   need to allocate exactly 64K, so whatever you call here must
-   have the ability to do that.
-
-   This piece of code can be compiled to validate max 64K allocations
-   by setting MAXSEG_64K in zlib zconf.h *or* PNG_MAX_MALLOC_64K. */
+/*
+ * Allocate memory.  For reasonable files, size should never exceed
+ * 64K.  However, zlib may allocate more then 64K if you don't tell
+ * it not to.  See zconf.h and png.h for more information.  zlib does
+ * need to allocate exactly 64K, so whatever you call here must
+ * have the ability to do that.
+ *
+ * This piece of code can be compiled to validate max 64K allocations
+ * by setting MAXSEG_64K in zlib zconf.h *or* PNG_MAX_MALLOC_64K.
+ */
 typedef struct memory_information {
     png_uint_32 size;
     png_voidp pointer;
@@ -1646,15 +1673,19 @@ static int maximum_allocation = 0;
 png_voidp png_debug_malloc(png_structp png_ptr, png_uint_32 size)
 {
 
-    /* png_malloc has already tested for NULL; png_create_struct calls
-       png_debug_malloc directly (with png_ptr == NULL prior to libpng-1.2.0
-       which is OK since we are not using a user mem_ptr) */
+    /*
+     * png_malloc has already tested for NULL; png_create_struct calls
+     * png_debug_malloc directly (with png_ptr == NULL prior to libpng-1.2.0
+     * which is OK since we are not using a user mem_ptr)
+     */
 
     if (size == 0)
         return (png_voidp) (NULL);
 
-    /* This calls the library allocator twice, once to get the requested
-       buffer and once to get a new free list entry. */
+    /*
+     * This calls the library allocator twice, once to get the requested
+     * buffer and once to get a new free list entry.
+     */
     {
         memory_infop pinfo = (memory_infop)png_malloc_default(png_ptr,
            sizeof *pinfo);
@@ -1826,7 +1857,8 @@ static void setfiletype(const char *name)
 
 
 
-/* GRR:  basically boolean; first arg is chunk name-string (e.g., "tIME" or
+/*
+ * GRR:  basically boolean; first arg is chunk name-string (e.g., "tIME" or
  *       "alla"); second is always full argv[] command line
  *     - remove_chunks is argv index of *last* -rem arg on command line
  *       (would be more efficient to build table at time of cmdline processing!)
@@ -2103,8 +2135,10 @@ int main(int argc, char *argv[])
                lv[9] = 2; zs[9] = 2;   /* method  9 == method  16 */
                                        /* method 10 == method 124 */
 
-    /* methods 11 through 16 */
-    /* [strategy 2 (Z_HUFFMAN_ONLY) is independent of zlib compression level] */
+    /* methods 11 through 16
+     *
+     * [strategy 2 (Z_HUFFMAN_ONLY) is independent of zlib compression level]
+     */
     method = 11;
     for (filt = 0; filt <= 5; filt++) {
         fm[method] = filt;
@@ -2113,7 +2147,9 @@ int main(int argc, char *argv[])
         method++;
     }
 
-    /* methods 17 through 124 (9*2*6 = 108) */
+    /*
+     * methods 17 through 124 (9*2*6 = 108)
+     */
     for (lev = 1; lev <= 9; lev++) {
         for (strat = 0; strat <= 1; strat++) {
             for (filt = 0; filt <= 5; filt++) {
@@ -2126,9 +2162,11 @@ int main(int argc, char *argv[])
     }
 
 #ifdef Z_RLE
-    /* methods 125 through 136 */
-    /* [strategy 3 (Z_RLE) is mostly independent of level; 1-3 and 4-9 are
-     * same] */
+    /* methods 125 through 136
+     *
+     * [strategy 3 (Z_RLE) is mostly independent of level; 1-3 and 4-9 are
+     * same]
+     */
     for (filt = 0; filt <= 5; filt++) {
         fm[method] = filt;
         lv[method] = 1;
@@ -2804,9 +2842,12 @@ int main(int argc, char *argv[])
             outname = out_string;
         }
 
-        /* FIXME:  need same input-validation fixes (as above) here, too
+        /*
+         * FIXME:  need same input-validation fixes (as above) here, too
+         *
          * FIXME:  what was the point of setting in_string and out_string in
-         *         DIREX_MODE above if going to do all over again here? */
+         *         DIREX_MODE above if going to do all over again here?
+         */
         if (pngcrush_mode == EXTENSION_MODE || pngcrush_mode == DIREX_MODE) {
             ip = in_string;
             in_string[0] = '\0';
