@@ -2116,7 +2116,7 @@ version 1.4.0beta56 [April 25, 2009]
 version 1.4.0beta57 [May 2, 2009]
   Removed prototype for png_freeptr() that was added in libpng-1.4.0beta24
     but was never defined (again).
-  Rebuilt configure scripts with autoconf-2.61 instead of 2.60
+  Rebuilt configure scripts with autoconf-2.63 instead of 2.62
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
