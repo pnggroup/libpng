@@ -1,6 +1,5 @@
 # DJGPP (DOS gcc) makefile for libpng
-# Copyright (C) 2006 Glenn Randers-Pehrson
-# Copyright (C) 2002 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2006, 2009 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
 
@@ -18,12 +17,9 @@ RANLIB=ranlib
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o pngwtran.o \
-	pngmem.o pngerror.o pngpread.o pnggccrd.o
+	pngmem.o pngerror.o pngpread.o
 
-all: libpng.a pngtest pngdefs.h
-
-pngdefs.h:
-	echo "/* pngdefs.h was built by makefile.dj2 */" > pngdefs.h
+all: libpng.a pngtest
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
@@ -36,25 +32,24 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 clean:
-	rm -f *.o libpng.a pngtest pngout.png pngdefs.h
+	rm -f *.o libpng.a pngtest pngout.png
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngerror.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrio.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwio.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngmem.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngset.o: png.h pngconf.h pngdefs.h pngpriv.h
-pnggccrd.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngget.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngread.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngpread.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrtran.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrutil.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngtrans.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwrite.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwtran.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwutil.o: png.h pngconf.h pngdefs.h pngpriv.h
+png.o: png.h pngconf.h pngpriv.h
+pngerror.o: png.h pngconf.h pngpriv.h
+pngrio.o: png.h pngconf.h pngpriv.h
+pngwio.o: png.h pngconf.h pngpriv.h
+pngmem.o: png.h pngconf.h pngpriv.h
+pngset.o: png.h pngconf.h pngpriv.h
+pngget.o: png.h pngconf.h pngpriv.h
+pngread.o: png.h pngconf.h pngpriv.h
+pngpread.o: png.h pngconf.h pngpriv.h
+pngrtran.o: png.h pngconf.h pngpriv.h
+pngrutil.o: png.h pngconf.h pngpriv.h
+pngtrans.o: png.h pngconf.h pngpriv.h
+pngwrite.o: png.h pngconf.h pngpriv.h
+pngwtran.o: png.h pngconf.h pngpriv.h
+pngwutil.o: png.h pngconf.h pngpriv.h
 
-pngtest.o: png.h pngconf.h pngdefs.h
+pngtest.o: png.h pngconf.h

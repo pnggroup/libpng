@@ -1,5 +1,5 @@
 # makefile for libpng using gcc (generic, static library)
-# Copyright (C) 2006 Glenn Randers-Pehrson
+# Copyright (C) 2008 Glenn Randers-Pehrson
 # Copyright (C) 2000 Cosmin Truta
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # For conditions of distribution and use, see copyright notice in png.h
@@ -31,16 +31,12 @@ A=.a
 EXE=
 
 # Variables
-OBJS = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
+OBJS =  png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
 	pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) pngset$(O) \
-	pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O) \
-	pnggccrd$(O)
+	pngtrans$(O) pngwio$(O) pngwrite$(O) pngwtran$(O) pngwutil$(O)
 
 # Targets
-all: static pngdefs.h
-
-pngdefs.h:
-	echo "/* pngdefs.h was built by makefile.gcc */" > pngdefs.h
+all: static
 
 .c$(O):
 	$(CC) -c $(CFLAGS) -I$(ZLIBINC) $<
@@ -63,23 +59,22 @@ pngtest$(EXE): pngtest$(O) libpng$(A)
 	$(LD) $(LDFLAGS) -L$(ZLIBLIB) -o $@ pngtest$(O) libpng$(A) $(LIBS)
 
 clean:
-	$(RM_F) *$(O) libpng$(A) pngtest$(EXE) pngout.png pngdefs.h
+	$(RM_F) *$(O) libpng$(A) pngtest$(EXE) pngout.png
 
-png$(O):      png.h pngconf.h pngdefs.h pngpriv.h
-pngerror$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pnggccrd$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pngget$(O):   png.h pngconf.h pngdefs.h pngpriv.h
-pngmem$(O):   png.h pngconf.h pngdefs.h pngpriv.h
-pngpread$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pngread$(O):  png.h pngconf.h pngdefs.h pngpriv.h
-pngrio$(O):   png.h pngconf.h pngdefs.h pngpriv.h
-pngrtran$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pngrutil$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pngset$(O):   png.h pngconf.h pngdefs.h pngpriv.h
-pngtest$(O):  png.h pngconf.h pngdefs.h pngpriv.h
-pngtrans$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pngwio$(O):   png.h pngconf.h pngdefs.h pngpriv.h
-pngwrite$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pngwtran$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pngwutil$(O): png.h pngconf.h pngdefs.h pngpriv.h
-pngtest$(O):  png.h pngconf.h pngdefs.h
+png$(O):      png.h pngconf.h pngpriv.h
+pngerror$(O): png.h pngconf.h pngpriv.h
+pngget$(O):   png.h pngconf.h pngpriv.h
+pngmem$(O):   png.h pngconf.h pngpriv.h
+pngpread$(O): png.h pngconf.h pngpriv.h
+pngread$(O):  png.h pngconf.h pngpriv.h
+pngrio$(O):   png.h pngconf.h pngpriv.h
+pngrtran$(O): png.h pngconf.h pngpriv.h
+pngrutil$(O): png.h pngconf.h pngpriv.h
+pngset$(O):   png.h pngconf.h pngpriv.h
+pngtrans$(O): png.h pngconf.h pngpriv.h
+pngwio$(O):   png.h pngconf.h pngpriv.h
+pngwrite$(O): png.h pngconf.h pngpriv.h
+pngwtran$(O): png.h pngconf.h pngpriv.h
+pngwutil$(O): png.h pngconf.h pngpriv.h
+
+pngtest$(O):  png.h pngconf.h pngpriv.h

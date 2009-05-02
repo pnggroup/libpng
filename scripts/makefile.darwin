@@ -18,7 +18,7 @@ ZLIBINC=../zlib
 
 # Library name:
 LIBNAME = libpng14
-PNGMAJ = 12
+PNGMAJ = 14
 PNGMIN = 1.4.0beta57
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
@@ -38,7 +38,7 @@ LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
 
-# CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
+# CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops
 CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz
 
@@ -215,20 +215,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h
-pngerror.o pngerror.pic.o: png.h pngconf.h
-pngrio.o pngrio.pic.o: png.h pngconf.h
-pngwio.o pngwio.pic.o: png.h pngconf.h
-pngmem.o pngmem.pic.o: png.h pngconf.h
-pngset.o pngset.pic.o: png.h pngconf.h
-pngget.o pngget.pic.o: png.h pngconf.h
-pngread.o pngread.pic.o: png.h pngconf.h
-pngrtran.o pngrtran.pic.o: png.h pngconf.h
-pngrutil.o pngrutil.pic.o: png.h pngconf.h
-pngtrans.o pngtrans.pic.o: png.h pngconf.h
-pngwrite.o pngwrite.pic.o: png.h pngconf.h
-pngwtran.o pngwtran.pic.o: png.h pngconf.h
-pngwutil.o pngwutil.pic.o: png.h pngconf.h
-pngpread.o pngpread.pic.o: png.h pngconf.h
+png.o png.pic.o: png.h pngconf.h pngpriv.h
+pngerror.o pngerror.pic.o: png.h pngconf.h pngpriv.h
+pngrio.o pngrio.pic.o: png.h pngconf.h pngpriv.h
+pngwio.o pngwio.pic.o: png.h pngconf.h pngpriv.h
+pngmem.o pngmem.pic.o: png.h pngconf.h pngpriv.h
+pngset.o pngset.pic.o: png.h pngconf.h pngpriv.h
+pngget.o pngget.pic.o: png.h pngconf.h pngpriv.h
+pngread.o pngread.pic.o: png.h pngconf.h pngpriv.h
+pngrtran.o pngrtran.pic.o: png.h pngconf.h pngpriv.h
+pngrutil.o pngrutil.pic.o: png.h pngconf.h pngpriv.h
+pngtrans.o pngtrans.pic.o: png.h pngconf.h pngpriv.h
+pngwrite.o pngwrite.pic.o: png.h pngconf.h pngpriv.h
+pngwtran.o pngwtran.pic.o: png.h pngconf.h pngpriv.h
+pngwutil.o pngwutil.pic.o: png.h pngconf.h pngpriv.h
+pngpread.o pngpread.pic.o: png.h pngconf.h pngpriv.h
 
-pngtest.o: png.h pngconf.h
+pngtest.o: png.h pngconf.h pngpriv.h

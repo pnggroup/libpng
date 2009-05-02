@@ -3,7 +3,7 @@
 #   of the library, and builds two copies of pngtest: one
 #   statically linked and one dynamically linked.
 #
-# Copyright (C) 2002, 2006 Soren Anderson, Charles Wilson,
+# Copyright (C) 2002, 2006-2008 Soren Anderson, Charles Wilson,
 #    and Glenn Randers-Pehrson, based on makefile for linux-elf w/mmx by:
 # Copyright (C) 1998-2000 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
@@ -100,7 +100,7 @@ DL =$(D)$(LIBPATH)
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-	pngwtran.o pngmem.o pngerror.o pngpread.o pnggccrd.o
+	pngwtran.o pngmem.o pngerror.o pngpread.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
@@ -112,11 +112,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 %.pic.o : %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-all: all-static all-shared libpng.pc libpng-config libpng.pc libpng-config \
-	pngconf.h pngdefs.h
-
-pngdefs.h:
-	echo "/* pngdefs.h was built by makefile.cygwin */" > pngdefs.h
+all: all-static all-shared libpng.pc libpng-config libpng.pc libpng-config
 
 # Make this to verify that "make [...] install" will do what you want.
 buildsetup-tell:
@@ -129,8 +125,11 @@ buildsetup-tell:
 libpng.pc: scripts/libpng.pc.in
 	@echo -e Making pkg-config file for this libpng installation..'\n' \
            using PREFIX=\"$(prefix)\"'\n'
-	cat $(S)/scripts/libpng.pc.in | sed -e s\!@PREFIX@!$(prefix)! | \
-	   sed -e s/-lm// > libpng.pc
+	cat scripts/libpng.pc.in | sed -e s!@prefix@!$(prefix)! \
+	-e s!@exec_prefix@!$(exec_prefix)! \
+	-e s!@libdir@!$(LIBPATH)! \
+	-e s!@includedir@!$(INCPATH)! \
+	-e s!-lpng14!-lpng14\ -lz! > libpng.pc
 
 libpng-config: scripts/libpng-config-head.in scripts/libpng-config-body.in
 	@echo -e Making $(LIBNAME) libpng-config file for this libpng \
@@ -147,20 +146,6 @@ static: all-static
 shared: all-shared
 all-static: $(STATLIB) pngtest-stat$(EXE)
 all-shared: $(SHAREDLIB) pngtest$(EXE)
-
-pnggccrd.o: pnggccrd.c png.h pngconf.h pngdefs.h pngpriv.h
-	@echo ""
-	@echo '    You can ignore the "control reaches end of non-void function"'
-	@echo '    warning and "<variable> defined but not used" warnings:'
-	@echo ""
-	$(CC) -c $(CFLAGS) -o $@ $<
-
-pnggccrd.pic.o:	pnggccrd.c png.h pngconf.h pngdefs.h pngpriv.h
-	@echo ""
-	@echo '    You can ignore the "control reaches end of non-void function"'
-	@echo '    warning and "<variable> defined but not used" warnings:'
-	@echo ""
-	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
 
 $(STATLIB): $(OBJS)
 	ar rc $@ $(OBJS)
@@ -179,10 +164,10 @@ pngtest$(EXE): pngtest.pic.o $(SHAREDLIB)
 pngtest-stat$(EXE): pngtest.o $(STATLIB)
 	$(CC) -static $(CFLAGS) $< $(LDFLAGS) -o $@
 
-pngtest.pic.o: pngtest.c pngconf.h pngdefs.h
+pngtest.pic.o: pngtest.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-pngtest.o: pngtest.c pngconf.h pngdefs.h
+pngtest.o: pngtest.c png.h pngconf.h pngpriv.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 test: test-static test-shared
@@ -217,8 +202,7 @@ install-headers:
 	-@if [ ! -d $(DI)/$(LIBNAME) ]; then $(MKDIR_P) $(DI)/$(LIBNAME); fi
 	-@rm -f $(DI)/png.h
 	-@rm -f $(DI)/pngconf.h
-	-@rm -f $(DI)/pngdefs.h
-	install -m 644 $(S)/png.h $(S)/pngconf.h $(S)/pngdefs.h $(DI)/$(LIBNAME)
+	install -m 644 $(S)/png.h $(S)/pngconf.h $(DI)/$(LIBNAME)
 	-@rm -f $(DI)/libpng
 	(cd $(DI); ln -sf $(LIBNAME) libpng; ln -sf $(LIBNAME)/* .)
 
@@ -273,7 +257,7 @@ test-installed:
 clean:
 	/bin/rm -f *.pic.o *.o $(STATLIB) $(IMPLIB) $(SHAREDLIB) \
 	pngtest-stat$(EXE) pngtest$(EXE) pngout.png $(SHAREDDEF) \
-	libpng-config libpng.pc pngtesti$(EXE) pngdefs.h
+	libpng-config libpng.pc pngtesti$(EXE)
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
@@ -283,22 +267,24 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h png.c
-pngerror.o pngerror.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngerror.c
-pngrio.o pngrio.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngrio.c
-pngwio.o pngwio.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngwio.c
-pngmem.o pngmem.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngmem.c
-pngset.o pngset.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngset.c
-pnggccrd.o pnggccrd.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngget.c
-pngget.o pngget.pic.o:		png.h pngconf.h pngdefs.h pngpriv.h pngget.c
-pngread.o pngread.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngread.c
-pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngrtran.c
-pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngrutil.c
-pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngtrans.c
-pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwrite.c
-pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwtran.c
-pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngwutil.c
-pngpread.o pngpread.pic.o:	png.h pngconf.h pngdefs.h pngpriv.h pngpread.c
+png.o png.pic.o:		png.h pngconf.h pngpriv.h png.c
+pngerror.o pngerror.pic.o:	png.h pngconf.h pngpriv.h pngerror.c
+pngrio.o pngrio.pic.o:		png.h pngconf.h pngpriv.h pngrio.c
+pngwio.o pngwio.pic.o:		png.h pngconf.h pngpriv.h pngwio.c
+pngmem.o pngmem.pic.o:		png.h pngconf.h pngpriv.h pngmem.c
+pngset.o pngset.pic.o:		png.h pngconf.h pngpriv.h pngset.c
+pngget.o pngget.pic.o:		png.h pngconf.h pngpriv.h pngget.c
+pngread.o pngread.pic.o:	png.h pngconf.h pngpriv.h pngread.c
+pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngpriv.h pngrtran.c
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngpriv.h pngrutil.c
+pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngpriv.h pngtrans.c
+pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngpriv.h pngwrite.c
+pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngpriv.h pngwtran.c
+pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngpriv.h pngwutil.c
+pngpread.o pngpread.pic.o:	png.h pngconf.h pngpriv.h pngpread.c
 
-pngtest.o:			png.h pngconf.h pngdefs.h pngtest.c
-pngtest-stat.o:			png.h pngconf.h pngdefs.h pngtest.c
+pngtest.o:			png.h pngconf.h pngpriv.h pngtest.c
+pngtest-stat.o:			png.h pngconf.h pngpriv.h pngtest.c
+
+
+

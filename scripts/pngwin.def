@@ -187,11 +187,11 @@ EXPORTS
 ; MMX support
 ; png_mmx_support
 ; png_get_mmx_flagmask
-  png_get_asm_flagmask
-  png_get_asm_flags
+; png_get_asm_flagmask
+; png_get_asm_flags
 ; png_get_mmx_bitdepth_threshold
 ; png_get_mmx_rowbytes_threshold
-  png_set_asm_flags
+; png_set_asm_flags
 ; png_init_mmx_flags
 ; Strip error numbers
   png_set_strip_error_numbers

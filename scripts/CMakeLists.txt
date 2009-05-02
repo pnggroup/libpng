@@ -1,3 +1,4 @@
+
 project(PNG)
 
 # Copyright (C) 2007 Glenn Randers-Pehrson
@@ -29,7 +30,11 @@ endif(NOT WIN32)
 # COMMAND LINE OPTIONS
 option(PNG_SHARED "Build shared lib" YES)
 option(PNG_STATIC "Build static lib" YES)
-option(PNG_TESTS  "Build pngtest" YES)
+if(MINGW)
+  option(PNG_TESTS  "Build pngtest" NO)
+else(MINGW)
+  option(PNG_TESTS  "Build pngtest" YES)
+endif(MINGW)
 option(PNG_NO_CONSOLE_IO "FIXME" YES)
 option(PNG_NO_STDIO      "FIXME" YES)
 option(PNG_DEBUG         "Build with debug output" YES)
@@ -49,9 +54,13 @@ if(NOT WIN32)
       set(png_asm_tmp "OFF")
    endif("uname_output" MATCHES "^.*i[1-9]86.*$")
  endif(uname_executable)
+else(NOT WIN32)
+ # this env var is normally only set on win64
+ SET(TEXT "ProgramFiles(x86)")
+ if("$ENV{${TEXT}}" STREQUAL "")
+  set(png_asm_tmp "ON")
+ endif("$ENV{${TEXT}}" STREQUAL "")
 endif(NOT WIN32)
-
-option(PNG_MMX "Use MMX assembler code (x86 only)" ${png_asm_tmp})
 
 # SET LIBNAME
 # msvc does not append 'lib' - do it here to have consistent name
@@ -68,6 +77,7 @@ set(CMAKE_DEBUG_POSTFIX "d")
 set(libpng_sources
  png.h
  pngconf.h
+ pngpriv.h
  png.c
  pngerror.c
  pngget.c
@@ -88,32 +98,11 @@ set(pngtest_sources
        pngtest.c
 )
 # SOME NEEDED DEFINITIONS
-add_definitions(-DZLIB_DLL)
-
 if(MSVC)
- add_definitions(-DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
- FILE(WRITE pngdefs.h "#define PNG_USE_PNGVCRD\n")
- set(libpng_sources ${libpng_sources}
-         pngvcrd.c
- )
-else(MSVC)
- FILE(WRITE pngdefs.h "#define PNG_USE_PNGGCCRD\n")
- set(libpng_sources ${libpng_sources}
-         pnggccrd.c
- )
+  add_definitions(-DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
 endif(MSVC)
 
-if(NOT MSVC)
- if(NOT PNG_MMX)
-  FILE(APPEND pngdefs.h "#define PNG_NO_MMX_CODE\n")
- endif(NOT PNG_MMX)
-else(NOT MSVC)
- if(PNG_MMX)
- # maybe add this to pngconf.h ?
-  FILE(APPEND pngdefs.h "#define PNG_MMX_MMX_CODE_SUPPORTED\n")
- endif(PNG_MMX)
-endif(NOT MSVC)
-
+add_definitions(-DZLIB_DLL)
 
 if(PNG_CONSOLE_IO_SUPPORTED)
  add_definitions(-DPNG_CONSOLE_IO_SUPPORTED)
@@ -131,9 +120,9 @@ if(PNG_DEBUG)
  add_definitions(-DPNG_DEBUG)
 endif(PNG_DEBUG)
 
-if(NOT M_LIBRARY)
+if(NOT M_LIBRARY AND NOT WIN32)
  add_definitions(-DPNG_NO_FLOATING_POINT_SUPPORTED)
-endif(NOT M_LIBRARY)
+endif(NOT M_LIBRARY AND NOT WIN32)
 
 # NOW BUILD OUR TARGET
 include_directories(${PNG_SOURCE_DIR} ${ZLIB_INCLUDE_DIR})
@@ -178,18 +167,23 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 
 # SET UP LINKS
 set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 0.${PNGLIB_RELEASE}.1.4.0beta57
-     VERSION 0.${PNGLIB_RELEASE}.0
-     SOVERSION 0
+#    VERSION 14.${PNGLIB_RELEASE}.1.4.0beta57
+     VERSION 14.${PNGLIB_RELEASE}.0
+     SOVERSION 14
      CLEAN_DIRECT_OUTPUT 1)
-set_target_properties(${PNG_LIB_NAME_STATIC} PROPERTIES
+if(NOT WIN32)
+  # that's uncool on win32 - it overwrites our static import lib...
+  set_target_properties(${PNG_LIB_NAME_STATIC} PROPERTIES
      OUTPUT_NAME ${PNG_LIB_NAME}
      CLEAN_DIRECT_OUTPUT 1)
-
+endif(NOT WIN32)
 # INSTALL
-install_targets(/lib ${PNG_LIB_NAME} ${PNG_LIB_NAME_STATIC})
-install(FILES png.h pngconf.h pngpriv.h pngdefs.h DESTINATION include)
-install(FILES png.h pngconf.h pngpriv.h pngdefs.h DESTINATION include/${PNGLIB_NAME})
+install_targets(/lib ${PNG_LIB_NAME})
+if(PNG_STATIC)
+  install_targets(/lib ${PNG_LIB_NAME_STATIC})
+endif(PNG_STATIC)
+install(FILES png.h pngconf.h pngpriv.h  DESTINATION include)
+install(FILES png.h pngconf.h pngpriv.h  DESTINATION include/${PNGLIB_NAME})
 install(FILES libpng.3 libpngpf.3             DESTINATION man/man3)
 install(FILES png.5                           DESTINATION man/man5)
 install(FILES ${PNG_BINARY_DIR}/libpng.pc     DESTINATION lib/pkgconfig)
@@ -210,3 +204,4 @@ install(FILES ${PNG_BINARY_DIR}/${PNGLIB_NAME}-config DESTINATION bin)
 # to create msvc import lib for mingw compiled shared lib
 # pexports libpng.dll > libpng.def
 # lib /def:libpng.def /machine:x86
+

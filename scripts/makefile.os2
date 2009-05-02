@@ -28,10 +28,7 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 
 .SUFFIXES:      .c .o
 
-all: $(PNGLIB) $(SHAREDLIB) $(SHAREDLIBIMP) pngdefs.h
-
-pngdefs.h:
-	echo "/* pngdefs.h was built by makefile.os2 */" > pngdefs.h
+all: $(PNGLIB) $(SHAREDLIB) $(SHAREDLIBIMP)
 
 $(PNGLIB): $(OBJS)
 	$(AR) rc $@ $(OBJS)
@@ -53,20 +50,20 @@ clean:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngerror.o pngerror.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrio.o pngrio.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwio.o pngwio.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngmem.o pngmem.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngset.o pngset.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngget.o pngget.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngread.o pngread.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrtran.o pngrtran.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngrutil.o pngrutil.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngtrans.o pngtrans.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwrite.o pngwrite.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwtran.o pngwtran.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngwutil.o pngwutil.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
-pngpread.o pngpread.pic.o: png.h pngconf.h pngdefs.h pngpriv.h
+png.o png.pic.o: png.h pngconf.h pngpriv.h
+pngerror.o pngerror.pic.o: png.h pngconf.h pngpriv.h
+pngrio.o pngrio.pic.o: png.h pngconf.h pngpriv.h
+pngwio.o pngwio.pic.o: png.h pngconf.h pngpriv.h
+pngmem.o pngmem.pic.o: png.h pngconf.h pngpriv.h
+pngset.o pngset.pic.o: png.h pngconf.h pngpriv.h
+pngget.o pngget.pic.o: png.h pngconf.h pngpriv.h
+pngread.o pngread.pic.o: png.h pngconf.h pngpriv.h
+pngrtran.o pngrtran.pic.o: png.h pngconf.h pngpriv.h
+pngrutil.o pngrutil.pic.o: png.h pngconf.h pngpriv.h
+pngtrans.o pngtrans.pic.o: png.h pngconf.h pngpriv.h
+pngwrite.o pngwrite.pic.o: png.h pngconf.h pngpriv.h
+pngwtran.o pngwtran.pic.o: png.h pngconf.h pngpriv.h
+pngwutil.o pngwutil.pic.o: png.h pngconf.h pngpriv.h
+pngpread.o pngpread.pic.o: png.h pngconf.h pngpriv.h
 
-pngtest.o: png.h pngconf.h pngdefs.h
+pngtest.o: png.h pngconf.h
