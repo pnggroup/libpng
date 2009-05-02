@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta56 - April 20, 2009
+Libpng 1.4.0beta57 - April 25, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta56.tar.gz
-   1.4.0beta56.tar.bz2
+   1.4.0beta57.tar.gz
+   1.4.0beta57.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta56-no-config.tar.gz
-   1.4.0beta56-no-config.tar.bz2
+   1.4.0beta57-no-config.tar.gz
+   1.4.0beta57-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b56.zip
-   lp140b56.tar.bz2
+   lp140b57.zip
+   lp140b57.tar.bz2
 
 Other information:
 
-   1.4.0beta56-README.txt
-   1.4.0beta56-KNOWNBUGS.txt
-   1.4.0beta56-LICENSE.txt
-   1.4.0beta56-Y2K-compliance.txt
+   1.4.0beta57-README.txt
+   1.4.0beta57-KNOWNBUGS.txt
+   1.4.0beta57-LICENSE.txt
+   1.4.0beta57-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -430,11 +430,13 @@ version 1.4.0beta55 [April 15, 2009]
   Simplified error handling in pngread.c and pngwrite.c by putting
     the new png_read_cleanup() and png_write_cleanup() functions inline.
 
-version 1.4.0beta56 [April 20, 2009]
+version 1.4.0beta56 [April 25, 2009]
   Renamed "user_chunk_data" to "my_user_chunk_data" in pngtest.c to suppress
     "shadowed declaration" warning from gcc-4.3.3.
   Renamed "gamma" to "png_gamma" in pngset.c to avoid "shadowed declaration"
     warning about a global "gamma" variable in math.h on some platforms.
+
+version 1.4.0beta57 [April 25, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
