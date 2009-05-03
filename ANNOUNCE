@@ -443,6 +443,8 @@ version 1.4.0beta57 [May 2, 2009]
   Removed pngprefs.h and MMX from makefiles
 
 version 1.4.0beta58 [May 3, 2009]
+  Changed pngw32.def to pngwin.def in makefile.mingw (typo was intruduced
+    in beta57).
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
