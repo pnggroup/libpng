@@ -2119,6 +2119,8 @@ version 1.4.0beta57 [May 2, 2009]
   Rebuilt configure scripts with autoconf-2.63 instead of 2.62
   Removed pngprefs.h and MMX from makefiles
 
+version 1.4.0beta58 [May 3, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

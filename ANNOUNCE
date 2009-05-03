@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta57 - May 2, 2009
+Libpng 1.4.0beta58 - May 3, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta57.tar.gz
-   1.4.0beta57.tar.bz2
+   1.4.0beta58.tar.gz
+   1.4.0beta58.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta57-no-config.tar.gz
-   1.4.0beta57-no-config.tar.bz2
+   1.4.0beta58-no-config.tar.gz
+   1.4.0beta58-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b57.zip
-   lp140b57.tar.bz2
+   lp140b58.zip
+   lp140b58.tar.bz2
 
 Other information:
 
-   1.4.0beta57-README.txt
-   1.4.0beta57-KNOWNBUGS.txt
-   1.4.0beta57-LICENSE.txt
-   1.4.0beta57-Y2K-compliance.txt
+   1.4.0beta58-README.txt
+   1.4.0beta58-KNOWNBUGS.txt
+   1.4.0beta58-LICENSE.txt
+   1.4.0beta58-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -441,6 +441,8 @@ version 1.4.0beta57 [May 2, 2009]
     but was never defined (again).
   Rebuilt configure scripts with autoconf-2.63 instead of 2.62
   Removed pngprefs.h and MMX from makefiles
+
+version 1.4.0beta58 [May 3, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
