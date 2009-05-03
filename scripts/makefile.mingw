@@ -148,7 +148,7 @@ $(STATLIB): $(OBJS)
 	$(AR) rc $@ $(OBJS)
 	$(RANLIB) $@
 
-$(SHAREDDEF): scripts/pngw32.def
+$(SHAREDDEF): scripts/pngwin.def
 	cat $< | sed -e '1{G;s/^\(.*\)\(\n\)/EXPORTS/;};2,/^EXPORTS/d' | \
 	sed -e 's/\([^;]*\);/;/' > $@
 
