@@ -1,73 +1,52 @@
 
-Libpng 1.2.36rc01 - April 30, 2009
+Libpng 1.2.36 - May 6, 2009
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.36rc01.tar.gz
-   libpng-1.2.36rc01.tar.lzma
+   libpng-1.2.36.tar.gz
+   libpng-1.2.36.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.36rc01.tar.bz2
+   libpng-1.2.36.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.36rc01-no-config.tar.gz
-   libpng-1.2.36rc01-no-config.tar.lzma
-   libpng-1.2.36rc01-no-config.tar.bz2
+   libpng-1.2.36-no-config.tar.gz
+   libpng-1.2.36-no-config.tar.lzma
+   libpng-1.2.36-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1236r01.zip
-   lp1236r01.7z
-   lp1236r01.tar.bz2
+   lpng1236.zip
+   lpng1236.7z
+   lpng1236.tar.bz2
 
 Project files
 
-   libpng-1.2.36rc01-project-netware.zip
-   libpng-1.2.36rc01-project-wince.zip
+   libpng-1.2.36-project-netware.zip
+   libpng-1.2.36-project-wince.zip
 
 Other information:
 
-   libpng-1.2.36rc01-README.txt
-   libpng-1.2.36rc01-KNOWNBUGS.txt
-   libpng-1.2.36rc01-LICENSE.txt
-   libpng-1.2.36rc01-Y2K-compliance.txt
-   libpng-1.2.36rc01-[previous version]-diff.txt
+   libpng-1.2.36-README.txt
+   libpng-1.2.36-KNOWNBUGS.txt
+   libpng-1.2.36-LICENSE.txt
+   libpng-1.2.36-Y2K-compliance.txt
+   libpng-1.2.36-[previous version]-diff.txt
 
-Changes since the last public release (1.2.34):
+Changes since the last public release (1.2.35):
 
-version 1.2.35beta01 [February 4, 2009]
-  Zero out some arrays of pointers after png_malloc(). (Tavis Ormandy)
+version 1.2.36 [May 6, 2009]
 
-version 1.2.35beta02 [Feburary 4, 2009]
-  Zero out more arrays of pointers after png_malloc().
-
-version 1.2.35beta03 [February 5, 2009]
-  Use png_memset() instead of a loop to intialize pointers.  We realize
-    this will not work on platforms where the NULL pointer is not all zeroes.
-
-version 1.2.35rc01 [February 11, 2009]
-  No changes.
-
-version 1.2.35rc02 [February 12, 2009]
-  Fix typo in new png_memset call in pngset.c (png_color should be png_charp)
-
-version 1.0.43 and 1.2.35 [February 14, 2009]
-  No changes.
-
-version 1.2.36beta01 [February 28, 2009]
   Revised comments in png_set_read_fn() and png_set_write_fn().
   Revised order of #ifdef's and indentation in png_debug definitions of png.h
     bug introduced in libpng-1.2.34.
-
-version 1.2.36beta02 [March 21, 2009]
   Use png_memset() after png_malloc() of big_row_buf when reading an
     interlaced file, to avoid a possible UMR.
   Undid recent revision of PNG_NO_STDIO version of png_write_flush().  Users
@@ -75,17 +54,11 @@ version 1.2.36beta02 [March 21, 2009]
   Revised libpng*.txt documentation about use of png_write_flush().
   Removed fflush() from pngtest.c.
   Added "#define PNG_NO_WRITE_FLUSH" to contrib/pngminim/encoder/pngusr.h
-
-version 1.2.36beta03 [March 27, 2009]
   Relocated misplaced PNG_1_0_X define in png.h that caused the prototype
     for png_set_strip_error_numbers() to be omitted from PNG_NO_ASSEMBLER_CODE
     builds.  This bug was introduced in libpng-1.2.15beta4.
   Added a section on differences between 1.0.x and 1.2.x to libpng.3/libpng.txt
-
-version 1.2.36beta04 [April 5, 2009]
   Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
-
-version 1.2.36beta05 [April 24, 2009]
   Added "ifndef PNG_SKIP_SETJMP_CHECK" block in pngconf.h to allow
     application code writers to bypass the check for multiple inclusion
     of setjmp.h when they know that it is safe to ignore the situation.
@@ -94,11 +67,7 @@ version 1.2.36beta05 [April 24, 2009]
   Renamed "gamma" to "png_gamma" in pngset.c to avoid "shadowed declaration"
     warning about a global "gamma" variable in math.h on some platforms.
 
-version 1.2.36rc01 [April 30, 2009]
-  No changes.
-
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
