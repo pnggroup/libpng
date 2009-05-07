@@ -1,4 +1,4 @@
-                                             
+
 project(PNG)
 
 # Copyright (C) 2007 Glenn Randers-Pehrson
@@ -184,7 +184,6 @@ install_targets(/lib ${PNG_LIB_NAME})
 if(PNG_STATIC)
   install_targets(/lib ${PNG_LIB_NAME_STATIC})
 endif(PNG_STATIC)
-
 install(FILES png.h pngconf.h         DESTINATION include)
 install(FILES png.h pngconf.h         DESTINATION include/${PNGLIB_NAME})
 install(FILES libpng.3 libpngpf.3             DESTINATION man/man3)

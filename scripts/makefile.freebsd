@@ -1,5 +1,5 @@
 # makefile for libpng under FreeBSD
-# Copyright (C) 2002, 2007 Glenn Randers-Pehrson and Andrey A. Chernov
+# Copyright (C) 2002, 2007, 2009 Glenn Randers-Pehrson and Andrey A. Chernov
 # For conditions of distribution and use, see copyright notice in png.h
 
 PREFIX?=        /usr/local

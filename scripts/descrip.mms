@@ -1,6 +1,6 @@
 
 cc_defs = /inc=$(ZLIBSRC)
-c_deb = 
+c_deb =
 
 .ifdef __DECC__
 pref = /prefix=all
@@ -29,7 +29,7 @@ test : pngtest.exe
    run pngtest
 
 clean :
-	delete *.obj;*,*.exe;*
+	delete *.obj;*,*.exe;
 
 
 # Other dependencies.
@@ -44,9 +44,9 @@ pngerror.obj : png.h, pngconf.h
 pngmem.obj : png.h, pngconf.h
 pngrio.obj : png.h, pngconf.h
 pngwio.obj : png.h, pngconf.h
-pngtest.obj : png.h, pngconf.h
 pngtrans.obj : png.h, pngconf.h
 pngwrite.obj : png.h, pngconf.h
 pngwtran.obj : png.h, pngconf.h
 pngwutil.obj : png.h, pngconf.h
 
+pngtest.obj : png.h, pngconf.h

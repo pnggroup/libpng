@@ -176,7 +176,7 @@ pngtest-stat$(EXE): pngtest.o $(STATLIB)
 pngtest.pic.o: pngtest.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-pngtest.o: pngtest.c
+pngtest.o: pngtest.c png.h pngconf.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 test: test-static test-shared

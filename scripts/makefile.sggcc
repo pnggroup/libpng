@@ -212,10 +212,8 @@ test-installed:
 	./pngtesti pngtest.png
 
 clean:
-	$(RM_F) libpng.a pngtest pngtesti pngout.png libpng.pc libpng-config \
-	$(LIBSO) $(LIBSOMAJ)* \
-	$(OLDSOVER) \
-	so_locations
+	$(RM_F) libpng.a pngtest pngtesti pngout.png libpng.pc \
+        so_locations libpng-config $(LIBSO) $(LIBSOMAJ)* $(OLDSOVER)
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
@@ -233,10 +231,10 @@ pngget.o: png.h pngconf.h
 pngread.o: png.h pngconf.h
 pngrtran.o: png.h pngconf.h
 pngrutil.o: png.h pngconf.h
-pngtest.o: png.h pngconf.h
 pngtrans.o: png.h pngconf.h
 pngwrite.o: png.h pngconf.h
 pngwtran.o: png.h pngconf.h
 pngwutil.o: png.h pngconf.h
 pngpread.o: png.h pngconf.h
 
+pngtest.o: png.h pngconf.h

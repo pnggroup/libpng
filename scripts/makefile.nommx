@@ -233,20 +233,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h
-pngerror.o pngerror.pic.o: png.h pngconf.h
-pngrio.o pngrio.pic.o: png.h pngconf.h
-pngwio.o pngwio.pic.o: png.h pngconf.h
-pngmem.o pngmem.pic.o: png.h pngconf.h
-pngset.o pngset.pic.o: png.h pngconf.h
-pngget.o pngget.pic.o: png.h pngconf.h
-pngread.o pngread.pic.o: png.h pngconf.h
-pngrtran.o pngrtran.pic.o: png.h pngconf.h
-pngrutil.o pngrutil.pic.o: png.h pngconf.h
-pngtrans.o pngtrans.pic.o: png.h pngconf.h
-pngwrite.o pngwrite.pic.o: png.h pngconf.h
-pngwtran.o pngwtran.pic.o: png.h pngconf.h
-pngwutil.o pngwutil.pic.o: png.h pngconf.h
-pngpread.o pngpread.pic.o: png.h pngconf.h
+png.o png.pic.o:		png.h pngconf.h png.c
+pngerror.o pngerror.pic.o:	png.h pngconf.h pngerror.c
+pngrio.o pngrio.pic.o:		png.h pngconf.h pngrio.c
+pngwio.o pngwio.pic.o:		png.h pngconf.h pngwio.c
+pngmem.o pngmem.pic.o:		png.h pngconf.h pngmem.c
+pngset.o pngset.pic.o:		png.h pngconf.h pngset.c
+pngget.o pngget.pic.o:		png.h pngconf.h pngget.c
+pngread.o pngread.pic.o:	png.h pngconf.h pngread.c
+pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngrtran.c
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngrutil.c
+pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngtrans.c
+pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngwrite.c
+pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngwtran.c
+pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngwutil.c
+pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
 
-pngtest.o: png.h pngconf.h
+pngtest.o:			png.h pngconf.h pngtest.c

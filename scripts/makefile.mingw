@@ -284,6 +284,3 @@ pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngwutil.c
 pngpread.o pngpread.pic.o:	png.h pngconf.h pngpread.c
 
 pngtest.o pngtest.pic.o:	png.h pngconf.h pngtest.c
-
-
-
