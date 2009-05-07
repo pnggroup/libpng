@@ -1,4 +1,4 @@
-
+/*
 CHANGES - changes for libpng
 
 version 0.2
@@ -2175,7 +2175,7 @@ version 1.2.30beta03 [July 6, 2008]
 version 1.2.30beta04 [July 10, 2008]
   Merged more cosmetic whitespace changes from libpng-1.4.0beta19.
 
-version 1.0.38rc01, 1.2.30rc01 [February 14, 2009]
+version 1.0.38rc01, 1.2.30rc01 [July 18, 2008]
   No changes.
 
 version 1.0.38rc02, 1.2.30rc02 [July 21, 2008]
@@ -2299,7 +2299,7 @@ version 1.0.42, 1.2.34 [December 18, 2008]
 version 1.2.35beta01 [February 4, 2009]
   Zero out some arrays of pointers after png_malloc(). (Tavis Ormandy)
 
-version 1.2.35beta02 [Feburary 4, 2009]
+version 1.2.35beta02 [February 4, 2009]
   Zero out more arrays of pointers after png_malloc().
 
 version 1.2.35beta03 [February 5, 2009]
@@ -2312,7 +2312,49 @@ version 1.2.35rc01 [February 11, 2009]
 version 1.2.35rc02 [February 12, 2009]
   Fix typo in new png_memset call in pngset.c (png_color should be png_charp)
 
+version 1.2.35 [February 14, 2009]
+  No changes.
+
 version 1.0.43 and 1.2.35 [February 14, 2009]
+  No changes.
+
+version 1.2.36beta01 [February 28, 2009]
+  Revised comments in png_set_read_fn() and png_set_write_fn().
+  Revised order of #ifdef's and indentation in png_debug definitions of png.h
+    bug introduced in libpng-1.2.34.
+
+version 1.2.36beta02 [March 21, 2009]
+  Use png_memset() after png_malloc() of big_row_buf when reading an
+    interlaced file, to avoid a possible UMR.
+  Undid recent revision of PNG_NO_STDIO version of png_write_flush().  Users
+    having trouble with fflush() can build with PNG_NO_WRITE_FLUSH defined.
+  Revised libpng*.txt documentation about use of png_write_flush().
+  Removed fflush() from pngtest.c.
+  Added "#define PNG_NO_WRITE_FLUSH" to contrib/pngminim/encoder/pngusr.h
+
+version 1.2.36beta03 [March 27, 2009]
+  Relocated misplaced PNG_1_0_X define in png.h that caused the prototype
+    for png_set_strip_error_numbers() to be omitted from PNG_NO_ASSEMBLER_CODE
+    builds.  This bug was introduced in libpng-1.2.15beta4.
+  Added a section on differences between 1.0.x and 1.2.x to libpng.3/libpng.txt
+
+version 1.2.36beta04 [April 5, 2009]
+  Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
+
+version 1.2.36beta05 [April 24, 2009]
+  Added "ifndef PNG_SKIP_SETJMP_CHECK" block in pngconf.h to allow
+    application code writers to bypass the check for multiple inclusion
+    of setjmp.h when they know that it is safe to ignore the situation.
+  Made some cosmetic changes to whitespace in pngtest output.
+  Renamed "user_chunk_data" to "my_user_chunk_data" in pngtest.c to suppress
+    "shadowed declaration" warning from gcc-4.3.3.
+  Renamed "gamma" to "png_gamma" in pngset.c to avoid "shadowed declaration"
+    warning about a global "gamma" variable in math.h on some platforms.
+
+version 1.2.36rc01 [April 30, 2009]
+  No changes.
+
+version 1.0.44 and 1.2.36 [May 7, 2009]
   No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
@@ -2322,3 +2364,4 @@ to subscribe)
 or to glennrp at users.sourceforge.net
 
 Glenn R-P
+*/
