@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * Last changed in libpng 1.2.36 [May 6, 2009]
+ * Last changed in libpng 1.2.36 [May 7, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)

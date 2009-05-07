@@ -1,73 +1,53 @@
 
-Libpng 1.2.36 - May 6, 2009
+Libpng 1.2.37beta01 - May 7, 2009
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.36.tar.gz
-   libpng-1.2.36.tar.lzma
+   libpng-1.2.37beta01.tar.gz
+   libpng-1.2.37beta01.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.36.tar.bz2
+   libpng-1.2.37beta01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.36-no-config.tar.gz
-   libpng-1.2.36-no-config.tar.lzma
-   libpng-1.2.36-no-config.tar.bz2
+   libpng-1.2.37beta01-no-config.tar.gz
+   libpng-1.2.37beta01-no-config.tar.lzma
+   libpng-1.2.37beta01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1236.zip
-   lpng1236.7z
-   lpng1236.tar.bz2
+   lp1237b01.zip
+   lp1237b01.7z
+   lp1237b01.tar.bz2
 
 Project files
 
-   libpng-1.2.36-project-netware.zip
-   libpng-1.2.36-project-wince.zip
+   libpng-1.2.37beta01-project-netware.zip
+   libpng-1.2.37beta01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.36-README.txt
-   libpng-1.2.36-KNOWNBUGS.txt
-   libpng-1.2.36-LICENSE.txt
-   libpng-1.2.36-Y2K-compliance.txt
-   libpng-1.2.36-[previous version]-diff.txt
+   libpng-1.2.37beta01-README.txt
+   libpng-1.2.37beta01-KNOWNBUGS.txt
+   libpng-1.2.37beta01-LICENSE.txt
+   libpng-1.2.37beta01-Y2K-compliance.txt
+   libpng-1.2.37beta01-[previous version]-diff.txt
 
-Changes since the last public release (1.2.35):
+Changes since the last public release (1.2.36):
 
-version 1.2.36 [May 6, 2009]
+version 1.2.37beta01 [May 7, 2009]
 
-  Revised comments in png_set_read_fn() and png_set_write_fn().
-  Revised order of #ifdef's and indentation in png_debug definitions of png.h
-    bug introduced in libpng-1.2.34.
-  Use png_memset() after png_malloc() of big_row_buf when reading an
-    interlaced file, to avoid a possible UMR.
-  Undid recent revision of PNG_NO_STDIO version of png_write_flush().  Users
-    having trouble with fflush() can build with PNG_NO_WRITE_FLUSH defined.
-  Revised libpng*.txt documentation about use of png_write_flush().
-  Removed fflush() from pngtest.c.
-  Added "#define PNG_NO_WRITE_FLUSH" to contrib/pngminim/encoder/pngusr.h
-  Relocated misplaced PNG_1_0_X define in png.h that caused the prototype
-    for png_set_strip_error_numbers() to be omitted from PNG_NO_ASSEMBLER_CODE
-    builds.  This bug was introduced in libpng-1.2.15beta4.
-  Added a section on differences between 1.0.x and 1.2.x to libpng.3/libpng.txt
-  Fixed potential memory leak of "new_name" in png_write_iCCP() (Ralph Giles)
-  Added "ifndef PNG_SKIP_SETJMP_CHECK" block in pngconf.h to allow
-    application code writers to bypass the check for multiple inclusion
-    of setjmp.h when they know that it is safe to ignore the situation.
-  Renamed "user_chunk_data" to "my_user_chunk_data" in pngtest.c to suppress
-    "shadowed declaration" warning from gcc-4.3.3.
-  Renamed "gamma" to "png_gamma" in pngset.c to avoid "shadowed declaration"
-    warning about a global "gamma" variable in math.h on some platforms.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+
 (subscription required; visit 
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
