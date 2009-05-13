@@ -1,5 +1,5 @@
 
-Libpng 1.2.37beta01 - May 12, 2009
+Libpng 1.2.37beta01 - May 13, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -43,10 +43,13 @@ Other information:
 
 Changes since the last public release (1.2.36):
 
-version 1.2.37beta01 [May 12, 2009]
+version 1.2.37beta01 [May 13, 2009]
   Fixed inconsistency in pngrutil.c, introduced in libpng-1.2.36.  The
     memset() was using "png_ptr->rowbytes" instead of "row_bytes", which
     the corresponding png_malloc() uses (Joe Drew).
+  Clarified usage of sig_bit versus sig_bit_p in example.c (Vincent Torri)
+  Updated some of the makefiles in the scripts directory (merged with
+    those in libpng-1.4.0beta57).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
