@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.4.0 [May 3, 2009]
+ * Last changed in libpng 1.4.0 [May 13, 2009]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2009 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -306,10 +306,10 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
     */
    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_sBIT))
    {
-      png_color_8p sig_bit;
+      png_color_8p sig_bit_p;
 
-      png_get_sBIT(png_ptr, info_ptr, &sig_bit);
-      png_set_shift(png_ptr, sig_bit);
+      png_get_sBIT(png_ptr, info_ptr, &sig_bit_p);
+      png_set_shift(png_ptr, sig_bit_p);
    }
 
    /* flip the RGB pixels to BGR (or RGBA to BGRA) */
@@ -647,6 +647,7 @@ void write_png(char *file_name /* , ... other image information ... */)
       the png structure. */
 
    /* optional significant bit chunk */
+   png_color_8 sig_bit;
    /* if we are dealing with a grayscale image then */
    sig_bit.gray = true_bit_depth;
    /* otherwise, if we are dealing with a color image then */
@@ -655,7 +656,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    sig_bit.blue = true_blue_bit_depth;
    /* if the image has an alpha channel then */
    sig_bit.alpha = true_alpha_bit_depth;
-   png_set_sBIT(png_ptr, info_ptr, sig_bit);
+   png_set_sBIT(png_ptr, info_ptr, &sig_bit);
 
 
    /* Optional gamma chunk is strongly suggested if you have any guess
@@ -680,9 +681,11 @@ void write_png(char *file_name /* , ... other image information ... */)
 #endif
    png_set_text(png_ptr, info_ptr, text_ptr, 3);
 
-   /* other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs, */
+   /* other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs */
+
    /* note that if sRGB is present the gAMA and cHRM chunks must be ignored
-    * on read and should be written in accordance with the sRGB profile */
+    * on read and, if your application chooses to write them, they must
+    * be written in accordance with the sRGB profile */
 
    /* Write the file header information.  REQUIRED */
    png_write_info(png_ptr, info_ptr);
