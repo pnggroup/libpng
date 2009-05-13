@@ -244,7 +244,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* If we don't have another value */
    else
    {
-      screen_gamma = 2.2;  /* A good guess for a PC monitors in a dimly
+      screen_gamma = 2.2;  /* A good guess for a PC monitor in a dimly
                               lit room */
       screen_gamma = 1.7 or 1.0;  /* A good guess for Mac systems */
    }
@@ -681,9 +681,11 @@ void write_png(char *file_name /* , ... other image information ... */)
 #endif
    png_set_text(png_ptr, info_ptr, text_ptr, 3);
 
-   /* other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs, */
+   /* other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs */
+
    /* note that if sRGB is present the gAMA and cHRM chunks must be ignored
-    * on read and must be written in accordance with the sRGB profile */
+    * on read and, if your application chooses to write them, they must
+    * be written in accordance with the sRGB profile */
 
    /* Write the file header information.  REQUIRED */
    png_write_info(png_ptr, info_ptr);
@@ -779,7 +781,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 #endif no_entire /* use only one output method */
 
    /* You can write optional chunks like tEXt, zTXt, and tIME at the end
-    * as well.  Shouldn't be necessary in 1.1.0 and up as all the public
+    * as well.  Shouldn't be necessary in 1.2.0 and up as all the public
     * chunks are supported and you can use png_set_unknown_chunks() to
     * register unknown chunks into the info structure to be written out.
     */
