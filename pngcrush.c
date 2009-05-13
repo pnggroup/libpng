@@ -54,7 +54,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.17"
+#define PNGCRUSH_VERSION "1.6.18"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -156,7 +156,9 @@
 
 Change log:
 
-Version 1.6.17 (built with libpng-1.2.36and zlib-1.2.3.2)
+Version 1.6.18 (built with libpng-1.2.36 and zlib-1.2.3.2)
+
+Version 1.6.17 (built with libpng-1.2.36 and zlib-1.2.3.2)
   Defined TOO_FAR == 32767 in deflate.c (again).  The definition
     has continually been inadvertently omitted during zlib updates
     since pngcrush version 1.6.4.
