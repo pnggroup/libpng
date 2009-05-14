@@ -2119,7 +2119,7 @@ version 1.4.0beta57 [May 2, 2009]
   Rebuilt configure scripts with autoconf-2.63 instead of 2.62
   Removed pngprefs.h and MMX from makefiles
 
-version 1.4.0beta58 [May 13, 2009]
+version 1.4.0beta58 [May 14, 2009]
   Changed pngw32.def to pngwin.def in makefile.mingw (typo was intruduced
     in beta57).
   Clarified usage of sig_bit versus sig_bit_p in example.c (Vincent Torri)
