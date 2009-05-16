@@ -3043,7 +3043,113 @@ The png_calloc() function was added.
 
 We removed the trailing '.' from the warning and error messages.
 
-X. Y2K Compliance in libpng
+
+X. Source code repository
+
+Since about February 2009, version 1.2.34, libpng has been under "git" source
+control.  The git repository was built from old libpng-x.y.z.tar.gz files
+going back to version 0.70.  You can access the git repository (read only)
+at
+
+    git://libpng.git.sourceforge.net/gitroot/libpng
+
+or you can browse it via "gitweb" at
+
+    http://libpng.git.sourceforge.net/git/gitweb.cgi?p=libpng
+
+Patches can be sent to glennrp at users.sourceforge.net or to
+png-mng-implement at lists.sourceforge.net or you can upload them to
+the libpng bug tracker at
+
+    http://libpng.sourceforge.net
+
+XI. Coding style
+
+Our coding style is similar to the "Allman" style, with curly
+braces on separate lines:
+
+    if (condition)
+    {
+       action;
+    }
+
+    else if (another condition)
+    {
+       another action;
+    }
+
+The braces can be omitted from simple one-line actions:
+
+    if (condition)
+       return (0);
+
+We use 3-space indentation, except for continued statements which
+are usually indented the same as the first line of the statement
+plus four more spaces.
+
+Comments appear with the leading "/*" at the same indentation as
+the statement that follows the comment:
+
+    /* Single-line comment */
+    statement;
+
+    /* Multiple-line
+     * comment
+     */
+    statement;
+
+Very short comments can be placed at the end of the statement
+to which they pertain:
+
+    statement;    /* comment */
+
+We don't use C++ style ("//") comments. We have, however,
+used them in the past in some now-abandoned MMX assembler
+code.
+
+Functions and their curly brackets are not indented, and
+exported functions are marked with PNGAPI:
+
+ /* This is a public function that is visible to
+  * application programers. It does thus-and-so.
+  */
+ void PNGAPI
+ png_exported_function(png_ptr, png_info, foo)
+ {
+    body;
+ }
+
+The prototypes for all exported functions appear in png.h.
+
+We mark all non-exported functions with "/* PRIVATE */"":
+
+ void /* PRIVATE */
+ png_non_exported_function(png_ptr, png_info, foo)
+ {
+    body;
+ }
+
+The prototypes for non-exported functions can appear in
+pngpriv.h or in the file where the function is located.
+
+The names of all exported functions and variables begin
+with  "png_", and all publicly visible C preprocessor
+macros begin with "PNG_".
+
+We put a space after each comma and after each semicolon
+in "for" statments, and we put spaces before and after each
+C binary operator and after "for" or "while".  We don't
+put a space between a typecast and the expression being
+cast, nor do we put one between a function name and the
+left parenthesis that follows it:
+
+    for (i = 2; i > 0; --i)
+       x[i] = a(x) + (int)b;
+
+Other rules can be inferred by inspecting the libpng
+source.
+
+XII. Y2K Compliance in libpng
 
 May 15, 2009
 

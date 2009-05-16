@@ -40,11 +40,11 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    png_voidp struct_ptr;
 
    if (type == PNG_STRUCT_INFO)
-     size = png_sizeof(png_info);
+      size = png_sizeof(png_info);
    else if (type == PNG_STRUCT_PNG)
-     size = png_sizeof(png_struct);
+      size = png_sizeof(png_struct);
    else
-     return (png_get_copyright(NULL));
+      return (png_get_copyright(NULL));
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if (malloc_fn != NULL)
@@ -56,7 +56,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    }
    else
 #endif /* PNG_USER_MEM_SUPPORTED */
-      struct_ptr = (png_voidp)farmalloc(size);
+   struct_ptr = (png_voidp)farmalloc(size);
    if (struct_ptr != NULL)
       png_memset(struct_ptr, 0, size);
    return (struct_ptr);
@@ -134,9 +134,9 @@ png_malloc(png_structp png_ptr, png_alloc_size_t size)
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if (png_ptr->malloc_fn != NULL)
-       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
+      ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
    else
-       ret = (png_malloc_default(png_ptr, size));
+      ret = (png_malloc_default(png_ptr, size));
    if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
        png_error(png_ptr, "Out of memory");
    return (ret);
@@ -161,7 +161,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 #endif
 
    if (size != (size_t)size)
-     ret = NULL;
+      ret = NULL;
    else if (size == (png_uint_32)65536L)
    {
       if (png_ptr->offset_table == NULL)
@@ -282,9 +282,9 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 }
 
 /* free a pointer allocated by png_malloc().  In the default
-   configuration, png_ptr is not used, but is passed in case it
-   is needed.  If ptr is NULL, return without taking any action. */
-
+ * configuration, png_ptr is not used, but is passed in case it
+ * is needed.  If ptr is NULL, return without taking any action.
+ */
 void PNGAPI
 png_free(png_structp png_ptr, png_voidp ptr)
 {
@@ -297,7 +297,8 @@ png_free(png_structp png_ptr, png_voidp ptr)
       (*(png_ptr->free_fn))(png_ptr, ptr);
       return;
    }
-   else png_free_default(png_ptr, ptr);
+   else
+      png_free_default(png_ptr, ptr);
 }
 
 void PNGAPI
@@ -305,7 +306,8 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
 
-   if (png_ptr == NULL || ptr == NULL) return;
+   if (png_ptr == NULL || ptr == NULL)
+      return;
 
    if (png_ptr->offset_table != NULL)
    {
@@ -432,10 +434,11 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
 }
 
 /* Allocate memory.  For reasonable files, size should never exceed
-   64K.  However, zlib may allocate more then 64K if you don't tell
-   it not to.  See zconf.h and png.h for more information.  zlib does
-   need to allocate exactly 64K, so whatever you call here must
-   have the ability to do that. */
+ * 64K.  However, zlib may allocate more then 64K if you don't tell
+ * it not to.  See zconf.h and png.h for more information.  zlib does
+ * need to allocate exactly 64K, so whatever you call here must
+ * have the ability to do that.
+ */
 
 png_voidp PNGAPI
 png_calloc(png_structp png_ptr, png_alloc_size_t size)
@@ -458,9 +461,9 @@ png_malloc(png_structp png_ptr, png_alloc_size_t size)
       return (NULL);
 
    if (png_ptr->malloc_fn != NULL)
-       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
+      ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
    else
-       ret = (png_malloc_default(png_ptr, size));
+      ret = (png_malloc_default(png_ptr, size));
    if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
        png_error(png_ptr, "Out of Memory");
    return (ret);
@@ -487,23 +490,23 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
    }
 #endif
 
- /* Check for overflow */
+   /* Check for overflow */
 #if defined(__TURBOC__) && !defined(__FLAT__)
- if (size != (unsigned long)size)
-   ret = NULL;
- else
-   ret = farmalloc(size);
+   if (size != (unsigned long)size)
+      ret = NULL;
+   else
+      ret = farmalloc(size);
 #else
 # if defined(_MSC_VER) && defined(MAXSEG_64K)
- if (size != (unsigned long)size)
-   ret = NULL;
- else
-   ret = halloc(size, 1);
+   if (size != (unsigned long)size)
+      ret = NULL;
+   else
+      ret = halloc(size, 1);
 # else
- if (size != (size_t)size)
-   ret = NULL;
- else
-   ret = malloc((size_t)size);
+   if (size != (size_t)size)
+      ret = NULL;
+   else
+      ret = malloc((size_t)size);
 # endif
 #endif
 
@@ -516,7 +519,8 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 }
 
 /* Free a pointer allocated by png_malloc().  If ptr is NULL, return
-   without taking any action. */
+ * without taking any action.
+ */
 void PNGAPI
 png_free(png_structp png_ptr, png_voidp ptr)
 {
@@ -529,7 +533,8 @@ png_free(png_structp png_ptr, png_voidp ptr)
       (*(png_ptr->free_fn))(png_ptr, ptr);
       return;
    }
-   else png_free_default(png_ptr, ptr);
+   else
+      png_free_default(png_ptr, ptr);
 }
 void PNGAPI
 png_free_default(png_structp png_ptr, png_voidp ptr)
@@ -562,7 +567,8 @@ png_malloc_warn(png_structp png_ptr, png_alloc_size_t size)
 {
    png_voidp ptr;
    png_uint_32 save_flags;
-   if (png_ptr == NULL) return (NULL);
+   if (png_ptr == NULL)
+      return (NULL);
 
    save_flags = png_ptr->flags;
    png_ptr->flags|=PNG_FLAG_MALLOC_NULL_MEM_OK;
@@ -595,7 +601,8 @@ png_set_mem_fn(png_structp png_ptr, png_voidp mem_ptr, png_malloc_ptr
 png_voidp PNGAPI
 png_get_mem_ptr(png_structp png_ptr)
 {
-   if (png_ptr == NULL) return (NULL);
+   if (png_ptr == NULL)
+      return (NULL);
    return ((png_voidp)png_ptr->mem_ptr);
 }
 #endif /* PNG_USER_MEM_SUPPORTED */

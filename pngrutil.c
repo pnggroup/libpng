@@ -39,7 +39,8 @@ png_get_uint_32(png_bytep buf)
 
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
  * data is stored in the PNG file in two's complement format, and it is
- * assumed that the machine format for signed integers is the same. */
+ * assumed that the machine format for signed integers is the same.
+ */
 png_int_32 PNGAPI
 png_get_int_32(png_bytep buf)
 {
@@ -78,21 +79,21 @@ png_read_chunk_header(png_structp png_ptr)
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_HDR;
 #endif
 
-   /* read the length and the chunk name */
+   /* Read the length and the chunk name */
    png_read_data(png_ptr, buf, 8);
    length = png_get_uint_31(png_ptr, buf);
 
-   /* put the chunk name into png_ptr->chunk_name */
+   /* Put the chunk name into png_ptr->chunk_name */
    png_memcpy(png_ptr->chunk_name, buf + 4, 4);
 
    png_debug2(0, "Reading %s chunk, length = %lu",
       png_ptr->chunk_name, length);
 
-   /* reset the crc and run it over the chunk name */
+   /* Reset the crc and run it over the chunk name */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, png_ptr->chunk_name, 4);
 
-   /* check to see if chunk name is valid */
+   /* Check to see if chunk name is valid */
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
 
 #ifdef PNG_IO_STATE_SUPPORTED
@@ -109,15 +110,17 @@ png_read_chunk_header(png_structp png_ptr)
 void /* PRIVATE */
 png_crc_read(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
    png_read_data(png_ptr, buf, length);
    png_calculate_crc(png_ptr, buf, length);
 }
 
 /* Optionally skip data and then check the CRC.  Depending on whether we
-   are reading a ancillary or critical chunk, and how the program has set
-   things up, we may calculate the CRC on the data and print a message.
-   Returns '1' if there was a CRC error, '0' otherwise. */
+ * are reading a ancillary or critical chunk, and how the program has set
+ * things up, we may calculate the CRC on the data and print a message.
+ * Returns '1' if there was a CRC error, '0' otherwise.
+ */
 int /* PRIVATE */
 png_crc_finish(png_structp png_ptr, png_uint_32 skip)
 {
@@ -136,7 +139,7 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
    if (png_crc_error(png_ptr))
    {
       if (((png_ptr->chunk_name[0] & 0x20) &&                /* Ancillary */
-           !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)) ||
+          !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)) ||
           (!(png_ptr->chunk_name[0] & 0x20) &&             /* Critical  */
           (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE)))
       {
@@ -154,7 +157,8 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
 }
 
 /* Compare the CRC stored in the PNG file with that calculated by libpng from
-   the data it has read thus far. */
+ * the data it has read thus far.
+ */
 int /* PRIVATE */
 png_crc_error(png_structp png_ptr)
 {
@@ -315,14 +319,17 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             png_snprintf(umsg, 52,
                 "Buffer error in compressed datastream in %s chunk",
                 png_ptr->chunk_name);
+
          else if (ret == Z_DATA_ERROR)
             png_snprintf(umsg, 52,
                 "Data error in compressed datastream in %s chunk",
                 png_ptr->chunk_name);
+
          else
             png_snprintf(umsg, 52,
                 "Incomplete compressed datastream in %s chunk",
                 png_ptr->chunk_name);
+
          png_warning(png_ptr, umsg);
 #else
          png_warning(png_ptr,
@@ -367,7 +374,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 }
 #endif
 
-/* read and check the IDHR chunk */
+/* Read and check the IDHR chunk */
 void /* PRIVATE */
 png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
@@ -381,7 +388,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_ptr->mode & PNG_HAVE_IHDR)
       png_error(png_ptr, "Out of place IHDR");
 
-   /* check the length */
+   /* Check the length */
    if (length != 13)
       png_error(png_ptr, "Invalid IHDR chunk");
 
@@ -398,7 +405,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    filter_type = buf[11];
    interlace_type = buf[12];
 
-   /* set internal variables */
+   /* Set internal variables */
    png_ptr->width = width;
    png_ptr->height = height;
    png_ptr->bit_depth = (png_byte)bit_depth;
@@ -409,25 +416,28 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
    png_ptr->compression_type = (png_byte)compression_type;
 
-   /* find number of channels */
+   /* Find number of channels */
    switch (png_ptr->color_type)
    {
       case PNG_COLOR_TYPE_GRAY:
       case PNG_COLOR_TYPE_PALETTE:
          png_ptr->channels = 1;
          break;
+
       case PNG_COLOR_TYPE_RGB:
          png_ptr->channels = 3;
          break;
+
       case PNG_COLOR_TYPE_GRAY_ALPHA:
          png_ptr->channels = 2;
          break;
+
       case PNG_COLOR_TYPE_RGB_ALPHA:
          png_ptr->channels = 4;
          break;
    }
 
-   /* set up other useful info */
+   /* Set up other useful info */
    png_ptr->pixel_depth = (png_byte)(png_ptr->bit_depth *
    png_ptr->channels);
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->width);
@@ -438,7 +448,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       color_type, interlace_type, compression_type, filter_type);
 }
 
-/* read and check the palette */
+/* Read and check the palette */
 void /* PRIVATE */
 png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
@@ -452,12 +462,14 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Missing IHDR before PLTE");
+
    else if (png_ptr->mode & PNG_HAVE_IDAT)
    {
       png_warning(png_ptr, "Invalid PLTE after IDAT");
       png_crc_finish(png_ptr, length);
       return;
    }
+
    else if (png_ptr->mode & PNG_HAVE_PLTE)
       png_error(png_ptr, "Duplicate PLTE chunk");
 
@@ -486,6 +498,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          png_crc_finish(png_ptr, length);
          return;
       }
+
       else
       {
          png_error(png_ptr, "Invalid palette chunk");
@@ -518,9 +531,10 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 
    /* If we actually NEED the PLTE chunk (ie for a paletted image), we do
-      whatever the normal CRC configuration tells us.  However, if we
-      have an RGB image, the PLTE can be considered ancillary, so
-      we will act as though it is. */
+    * whatever the normal CRC configuration tells us.  However, if we
+    * have an RGB image, the PLTE can be considered ancillary, so
+    * we will act as though it is.
+    */
 #if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #endif

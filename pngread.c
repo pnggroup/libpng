@@ -74,7 +74,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #else
    if (setjmp(png_ptr->jmpbuf))
 #endif
-   PNG_ABORT();
+      PNG_ABORT();
 #endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -85,50 +85,50 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (user_png_ver)
    {
-     i = 0;
-     do
-     {
-       if (user_png_ver[i] != png_libpng_ver[i])
-          png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-     } while (png_libpng_ver[i++]);
-   }
-   else
-        png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
+      i = 0;
+      do
+      {
+         if (user_png_ver[i] != png_libpng_ver[i])
+            png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
+      } while (png_libpng_ver[i++]);
+    }
+    else
+         png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
    
 
-   if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
-   {
-     /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
-      * we must recompile any applications that use any older library version.
-      * For versions after libpng 1.0, we will be compatible, so we need
-      * only check the first digit.
-      */
-     if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
-         (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
-         (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
-     {
+    if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
+    {
+       /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
+       * we must recompile any applications that use any older library version.
+       * For versions after libpng 1.0, we will be compatible, so we need
+       * only check the first digit.
+       */
+      if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
+          (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
+          (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
+      {
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
-        char msg[80];
-        if (user_png_ver)
-        {
-          png_snprintf(msg, 80,
-             "Application was compiled with png.h from libpng-%.20s",
-             user_png_ver);
-          png_warning(png_ptr, msg);
-        }
-        png_snprintf(msg, 80,
+         char msg[80];
+         if (user_png_ver)
+         {
+           png_snprintf(msg, 80,
+              "Application was compiled with png.h from libpng-%.20s",
+              user_png_ver);
+           png_warning(png_ptr, msg);
+         }
+         png_snprintf(msg, 80,
              "Application  is  running with png.c from libpng-%.20s",
-           png_libpng_ver);
-        png_warning(png_ptr, msg);
+             png_libpng_ver);
+         png_warning(png_ptr, msg);
 #endif
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-        png_ptr->flags = 0;
+         png_ptr->flags = 0;
 #endif
-        png_warning(png_ptr,
-           "Incompatible libpng version in application and library");
+         png_warning(png_ptr,
+            "Incompatible libpng version in application and library");
 
-        png_cleanup_needed = 1;
-     }
+         png_cleanup_needed = 1;
+      }
    }
 
    if (!png_cleanup_needed)
@@ -146,17 +146,17 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (!png_cleanup_needed)
    {
-     switch (inflateInit(&png_ptr->zstream))
-     {
-       case Z_OK: /* Do nothing */ break;
-       case Z_MEM_ERROR:
-       case Z_STREAM_ERROR: png_warning(png_ptr, "zlib memory error");
-          png_cleanup_needed = 1; break;
-       case Z_VERSION_ERROR: png_warning(png_ptr, "zlib version error");
-          png_cleanup_needed = 1; break;
-       default: png_warning(png_ptr, "Unknown zlib error");
-          png_cleanup_needed = 1;
-     }
+      switch (inflateInit(&png_ptr->zstream))
+      {
+         case Z_OK: /* Do nothing */ break;
+         case Z_MEM_ERROR:
+         case Z_STREAM_ERROR: png_warning(png_ptr, "zlib memory error");
+            png_cleanup_needed = 1; break;
+         case Z_VERSION_ERROR: png_warning(png_ptr, "zlib version error");
+            png_cleanup_needed = 1; break;
+         default: png_warning(png_ptr, "Unknown zlib error");
+            png_cleanup_needed = 1;
+      }
    }
 
    if (png_cleanup_needed)
@@ -195,7 +195,8 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 void PNGAPI
 png_read_info(png_structp png_ptr, png_infop info_ptr)
 {
-   if (png_ptr == NULL || info_ptr == NULL) return;
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
    png_debug(1, "in png_read_info");
    /* If we haven't checked all of the PNG signature bytes, do so now. */
    if (png_ptr->sig_bytes < 8)
@@ -407,7 +408,8 @@ void PNGAPI
 png_read_update_info(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_read_update_info");
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       png_read_start_row(png_ptr);
    else
@@ -426,7 +428,8 @@ void PNGAPI
 png_start_read_image(png_structp png_ptr)
 {
    png_debug(1, "in png_start_read_image");
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       png_read_start_row(png_ptr);
 }
@@ -443,7 +446,8 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    PNG_CONST int png_pass_mask[7] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
 #endif
    int ret;
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
    png_debug2(1, "in png_read_row (row %lu, pass %d)",
       (unsigned long) png_ptr->row_number, png_ptr->pass);
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
@@ -633,10 +637,10 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
-/*       old interface (pre-1.0.9):
-         png_do_read_interlace(&(png_ptr->row_info),
-            png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
- */
+         /* old interface (pre-1.0.9):
+          * png_do_read_interlace(&(png_ptr->row_info),
+          *    png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
+          */
          png_do_read_interlace(png_ptr);
 
       if (dsp_row != NULL)
@@ -695,7 +699,8 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
    png_bytepp dp;
 
    png_debug(1, "in png_read_rows");
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
    rp = row;
    dp = display_row;
    if (rp != NULL && dp != NULL)
@@ -744,7 +749,8 @@ png_read_image(png_structp png_ptr, png_bytepp image)
    png_bytepp rp;
 
    png_debug(1, "in png_read_image");
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    pass = png_set_interlace_handling(png_ptr);
@@ -780,7 +786,8 @@ void PNGAPI
 png_read_end(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_read_end");
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
    png_crc_finish(png_ptr, 0); /* Finish off CRC from last IDAT chunk */
 
    do
@@ -1168,7 +1175,8 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
 void PNGAPI
 png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
 {
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
    png_ptr->read_row_fn = read_row_fn;
 }
 
@@ -1182,7 +1190,8 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 {
    int row;
 
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
    /* invert the alpha channel from opacity to transparency
     */
@@ -1200,10 +1209,10 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* -------------- image transformations start here ------------------- */
 
 #if defined(PNG_READ_16_TO_8_SUPPORTED)
-   /* tell libpng to strip 16 bit/color files down to 8 bits per color
+   /* Tell libpng to strip 16 bit/color files down to 8 bits per color.
     */
    if (transforms & PNG_TRANSFORM_STRIP_16)
-       png_set_strip_16(png_ptr);
+      png_set_strip_16(png_ptr);
 #endif
 
 #if defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
@@ -1211,7 +1220,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
     * the background (not recommended).
     */
    if (transforms & PNG_TRANSFORM_STRIP_ALPHA)
-       png_set_strip_alpha(png_ptr);
+      png_set_strip_alpha(png_ptr);
 #endif
 
 #if defined(PNG_READ_PACK_SUPPORTED) && !defined(PNG_READ_EXPAND_SUPPORTED)
@@ -1219,7 +1228,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
     * byte into separate bytes (useful for paletted and grayscale images).
     */
    if (transforms & PNG_TRANSFORM_PACKING)
-       png_set_packing(png_ptr);
+      png_set_packing(png_ptr);
 #endif
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)
@@ -1227,7 +1236,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
     * (not useful if you are using png_set_packing).
     */
    if (transforms & PNG_TRANSFORM_PACKSWAP)
-       png_set_packswap(png_ptr);
+      png_set_packswap(png_ptr);
 #endif
 
 #if defined(PNG_READ_EXPAND_SUPPORTED)
@@ -1237,9 +1246,9 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
     * channels so the data will be available as RGBA quartets.
     */
    if (transforms & PNG_TRANSFORM_EXPAND)
-       if ((png_ptr->bit_depth < 8) ||
-           (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ||
-           (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)))
+      if ((png_ptr->bit_depth < 8) ||
+          (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ||
+          (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)))
          png_set_expand(png_ptr);
 #endif
 
@@ -1250,7 +1259,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* invert monochrome files to have 0 as white and 1 as black
     */
    if (transforms & PNG_TRANSFORM_INVERT_MONO)
-       png_set_invert_mono(png_ptr);
+      png_set_invert_mono(png_ptr);
 #endif
 
 #if defined(PNG_READ_SHIFT_SUPPORTED)
@@ -1272,7 +1281,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* flip the RGB pixels to BGR (or RGBA to BGRA)
     */
    if (transforms & PNG_TRANSFORM_BGR)
-       png_set_bgr(png_ptr);
+      png_set_bgr(png_ptr);
 #endif
 
 #if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
@@ -1286,7 +1295,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* swap bytes of 16 bit files to least significant byte first
     */
    if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
-       png_set_swap(png_ptr);
+      png_set_swap(png_ptr);
 #endif
 
    /* We don't handle adding filler bytes */
@@ -1324,7 +1333,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    png_read_image(png_ptr, info_ptr->row_pointers);
    info_ptr->valid |= PNG_INFO_IDAT;
 
-   /* read rest of file, and get additional chunks in info_ptr - REQUIRED */
+   /* Read rest of file, and get additional chunks in info_ptr - REQUIRED */
    png_read_end(png_ptr, info_ptr);
 
    transforms = transforms; /* quiet compiler warnings */

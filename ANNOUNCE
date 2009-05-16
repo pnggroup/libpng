@@ -448,6 +448,10 @@ version 1.4.0beta58 [May 14, 2009]
   Clarified usage of sig_bit versus sig_bit_p in example.c (Vincent Torri)
 
 version 1.4.0beta59 [May 15, 2009]
+  Reformated sources in libpng style (3-space intentation, comment format)
+  Fixed typo in libpng docs (PNG_FILTER_AVE should be PNG_FILTER_AVG)
+  Added sections about the git repository and our coding style to the
+    documentation
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
