@@ -2376,6 +2376,8 @@ version 1.2.37beta01 [May 14, 2009]
   Updated some of the makefiles in the scripts directory (merged with
     those in libpng-1.4.0beta57).
 
+version 1.2.37beta02 [May 15, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
