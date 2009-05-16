@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta59 - May 15, 2009
+Libpng 1.4.0beta60 - May 16, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta59.tar.gz
-   1.4.0beta59.tar.bz2
+   1.4.0beta60.tar.gz
+   1.4.0beta60.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta59-no-config.tar.gz
-   1.4.0beta59-no-config.tar.bz2
+   1.4.0beta60-no-config.tar.gz
+   1.4.0beta60-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b59.zip
-   lp140b59.tar.bz2
+   lp140b60.zip
+   lp140b60.tar.bz2
 
 Other information:
 
-   1.4.0beta59-README.txt
-   1.4.0beta59-KNOWNBUGS.txt
-   1.4.0beta59-LICENSE.txt
-   1.4.0beta59-Y2K-compliance.txt
+   1.4.0beta60-README.txt
+   1.4.0beta60-KNOWNBUGS.txt
+   1.4.0beta60-LICENSE.txt
+   1.4.0beta60-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -452,6 +452,8 @@ version 1.4.0beta59 [May 15, 2009]
   Fixed typo in libpng docs (PNG_FILTER_AVE should be PNG_FILTER_AVG)
   Added sections about the git repository and our coding style to the
     documentation
+
+version 1.4.0beta60 [May 16, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

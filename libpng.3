@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "May 15, 2009"
+.TH LIBPNG 3 "May 16, 2009"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta59
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta60
 .SH SYNOPSIS
 \fI\fB
 
@@ -809,7 +809,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta59 - May 15, 2009
+ libpng version 1.4.0beta60 - May 16, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -818,7 +818,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.0beta59 - May 15, 2009
+ libpng versions 0.97, January 1998, through 1.4.0beta60 - May 16, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -1692,7 +1692,7 @@ things.
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
-As of libpng version 1.4.0beta59, not all possible expansions are supported.
+As of libpng version 1.4.0beta60, not all possible expansions are supported.
 
 In the following table, the 01 means grayscale with depth<8, 31 means
 indexed with depth<8, other numerals represent the color type, "T" means
@@ -2554,7 +2554,7 @@ types.
        PNG_FILTER_NONE  | PNG_FILTER_VALUE_NONE |
        PNG_FILTER_SUB   | PNG_FILTER_VALUE_SUB  |
        PNG_FILTER_UP    | PNG_FILTER_VALUE_UP   |
-       PNG_FILTER_AVE   | PNG_FILTER_VALUE_AVE  |
+       PNG_FILTER_AVG   | PNG_FILTER_VALUE_AVG  |
        PNG_FILTER_PAETH | PNG_FILTER_VALUE_PAETH|
        PNG_ALL_FILTERS);
 
@@ -3518,7 +3518,7 @@ currently does not allocate the filter buffers until png_write_row()
 is called for the first time.)
 
     filters = PNG_FILTER_NONE | PNG_FILTER_SUB
-              PNG_FILTER_UP | PNG_FILTER_AVE |
+              PNG_FILTER_UP | PNG_FILTER_AVG |
               PNG_FILTER_PAETH | PNG_ALL_FILTERS;
 
     png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE,
@@ -3852,15 +3852,121 @@ The png_calloc() function was added.
 
 We removed the trailing '.' from the warning and error messages.
 
-.SH X. Y2K Compliance in libpng
 
-May 15, 2009
+.SH X. Source code repository
+
+Since about February 2009, version 1.2.34, libpng has been under "git" source
+control.  The git repository was built from old libpng-x.y.z.tar.gz files
+going back to version 0.70.  You can access the git repository (read only)
+at
+
+    git://libpng.git.sourceforge.net/gitroot/libpng
+
+or you can browse it via "gitweb" at
+
+    http://libpng.git.sourceforge.net/git/gitweb.cgi?p=libpng
+
+Patches can be sent to glennrp at users.sourceforge.net or to
+png-mng-implement at lists.sourceforge.net or you can upload them to
+the libpng bug tracker at
+
+    http://libpng.sourceforge.net
+
+.SH XI. Coding style
+
+Our coding style is similar to the "Allman" style, with curly
+braces on separate lines:
+
+    if (condition)
+    {
+       action;
+    }
+
+    else if (another condition)
+    {
+       another action;
+    }
+
+The braces can be omitted from simple one-line actions:
+
+    if (condition)
+       return (0);
+
+We use 3-space indentation, except for continued statements which
+are usually indented the same as the first line of the statement
+plus four more spaces.
+
+Comments appear with the leading "/*" at the same indentation as
+the statement that follows the comment:
+
+    /* Single-line comment */
+    statement;
+
+    /* Multiple-line
+     * comment
+     */
+    statement;
+
+Very short comments can be placed at the end of the statement
+to which they pertain:
+
+    statement;    /* comment */
+
+We don't use C++ style ("//") comments. We have, however,
+used them in the past in some now-abandoned MMX assembler
+code.
+
+Functions and their curly brackets are not indented, and
+exported functions are marked with PNGAPI:
+
+ /* This is a public function that is visible to
+  * application programers. It does thus-and-so.
+  */
+ void PNGAPI
+ png_exported_function(png_ptr, png_info, foo)
+ {
+    body;
+ }
+
+The prototypes for all exported functions appear in png.h.
+
+We mark all non-exported functions with "/* PRIVATE */"":
+
+ void /* PRIVATE */
+ png_non_exported_function(png_ptr, png_info, foo)
+ {
+    body;
+ }
+
+The prototypes for non-exported functions can appear in
+pngpriv.h or in the file where the function is located.
+
+The names of all exported functions and variables begin
+with  "png_", and all publicly visible C preprocessor
+macros begin with "PNG_".
+
+We put a space after each comma and after each semicolon
+in "for" statments, and we put spaces before and after each
+C binary operator and after "for" or "while".  We don't
+put a space between a typecast and the expression being
+cast, nor do we put one between a function name and the
+left parenthesis that follows it:
+
+    for (i = 2; i > 0; --i)
+       x[i] = a(x) + (int)b;
+
+Other rules can be inferred by inspecting the libpng
+source.
+
+.SH XII. Y2K Compliance in libpng
+
+May 16, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta59 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta60 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -4028,7 +4134,7 @@ the first widely used release:
  1.4.0beta9-14       14    10400  14.so.0.0[.0]
  1.2.13              13    10213  12.so.0.13[.0]
  1.4.0beta15-36      14    10400  14.so.0.0[.0]
- 1.4.0beta37-59      14    10400  14.so.14.0[.0]
+ 1.4.0beta37-60      14    10400  14.so.14.0[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -4084,7 +4190,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.4.0beta59 - May 15, 2009:
+Libpng version 1.4.0beta60 - May 16, 2009:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4105,7 +4211,7 @@ included in the libpng distribution, the latter shall prevail.)
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
-libpng versions 1.2.6, August 15, 2004, through 1.4.0beta59, May 15, 2009, are
+libpng versions 1.2.6, August 15, 2004, through 1.4.0beta60, May 16, 2009, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4204,7 +4310,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-May 15, 2009
+May 16, 2009
 
 .\" end of man page
 

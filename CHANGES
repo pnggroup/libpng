@@ -2130,6 +2130,8 @@ version 1.4.0beta59 [May 15, 2009]
   Added sections about the git repository and our coding style to the
     documentation
 
+version 1.4.0beta60 [May 16, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
