@@ -2124,6 +2124,8 @@ version 1.4.0beta58 [May 14, 2009]
     in beta57).
   Clarified usage of sig_bit versus sig_bit_p in example.c (Vincent Torri)
 
+version 1.4.0beta59 [May 15, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
