@@ -2379,6 +2379,8 @@ version 1.2.37beta01 [May 14, 2009]
 version 1.2.37beta02 [May 16, 2009]
   Fixed typo in libpng documentation (FILTER_AVE should be FILTER_AVG)
   Relocated misplaced #endif in pngwrite.c, sCAL chunk handler.
+  In pngpread.c and pngrutil.c, set png_ptr->old_prev_row_size=0 to
+    force the prev_row array to be cleared before row 0 of each pass.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

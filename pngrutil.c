@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.37 [May 15, 2009]
+ * Last changed in libpng 1.2.37 [May 16, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2913,12 +2913,13 @@ png_read_finish_row(png_structp png_ptr)
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
 
+   /* Force prev_row to be cleared. */
+   png_ptr->old_prev_row_size=0;
+
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
-      png_memset_check(png_ptr, png_ptr->prev_row, 0,
-         png_ptr->rowbytes + 1);
       do
       {
          png_ptr->pass++;
@@ -3187,7 +3188,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (row_bytes + 64 > png_ptr->old_big_row_buf_size)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
-      png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
+     png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
      if (png_ptr->interlaced)
        png_memset(png_ptr->big_row_buf, 0, row_bytes + 64);
      png_ptr->row_buf = png_ptr->big_row_buf + 32;
