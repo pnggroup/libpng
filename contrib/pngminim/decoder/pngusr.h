@@ -44,6 +44,7 @@
 #define PNG_NO_READ_sBIT
 #define PNG_NO_READ_sCAL
 #define PNG_NO_READ_sPLT
+#define PNG_NO_READ_sRGB
 #define PNG_NO_READ_TEXT
 #define PNG_NO_READ_tIME
 #define PNG_NO_READ_UNKNOWN_CHUNKS

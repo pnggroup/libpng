@@ -33,7 +33,6 @@
 #define PNG_NO_WRITE_bKGD
 #define PNG_NO_WRITE_cHRM
 #define PNG_NO_WRITE_gAMA
-#define PNG_NO_WRITE_sRGB
 #define PNG_NO_WRITE_hIST
 #define PNG_NO_WRITE_iCCP
 #define PNG_NO_WRITE_oFFs
@@ -42,6 +41,7 @@
 #define PNG_NO_WRITE_sBIT
 #define PNG_NO_WRITE_sCAL
 #define PNG_NO_WRITE_sPLT
+#define PNG_NO_WRITE_sRGB
 #define PNG_NO_WRITE_TEXT
 #define PNG_NO_WRITE_tIME
 #define PNG_NO_WRITE_UNKNOWN_CHUNKS
