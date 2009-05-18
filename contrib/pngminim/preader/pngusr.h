@@ -7,10 +7,6 @@
 #ifndef MINRDPNGCONF_H
 #define MINRDPNGCONF_H
 
-#ifdef NJET
-  /* No 16-bit support beyond reading with strip_16 */
-#endif
-
 #define PNG_NO_GLOBAL_ARRAYS
 
 #define PNG_NO_WARNINGS
@@ -22,8 +18,6 @@
 
 #define PNG_NO_ASSEMBLER_CODE
 #define PNG_NO_OPTIMIZED_CODE
-#define PNG_NO_READ_GAMMA
-#define PNG_NO_READ_BACKGROUND
 #define PNG_NO_READ_DITHER
 #define PNG_NO_READ_INVERT
 #define PNG_NO_READ_SHIFT
@@ -34,9 +28,7 @@
 #define PNG_NO_READ_INVERT_ALPHA
 #define PNG_NO_READ_RGB_TO_GRAY
 #define PNG_NO_READ_USER_TRANSFORM
-#define PNG_NO_READ_bKGD
 #define PNG_NO_READ_cHRM
-#define PNG_NO_READ_gAMA
 #define PNG_NO_READ_hIST
 #define PNG_NO_READ_iCCP
 #define PNG_NO_READ_pCAL
@@ -44,7 +36,6 @@
 #define PNG_NO_READ_sBIT
 #define PNG_NO_READ_sCAL
 #define PNG_NO_READ_sPLT
-#define PNG_NO_READ_sRGB
 #define PNG_NO_READ_TEXT
 #define PNG_NO_READ_tIME
 #define PNG_NO_READ_UNKNOWN_CHUNKS
@@ -67,6 +58,5 @@
 #define PNG_NO_ZALLOC_ZERO
 #define PNG_NO_ERROR_NUMBERS
 #define PNG_NO_EASY_ACCESS
-#define PNG_NO_PROGRESSIVE_READ
 
 #endif /* MINRDPNGCONF_H */
