@@ -1,7 +1,7 @@
 This demonstrates the use of PNG_USER_CONFIG and pngusr.h
 
 To build a minimal read-only progressive decoder with X display, run
-gather.sh to collect needed files from pngminus, libpng, and zlib
+gather.sh to collect needed files from gregbook, libpng, and zlib
 
 Edit makefile.std if required, to find your X library and include files,
 then
