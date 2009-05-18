@@ -2920,6 +2920,8 @@ png_read_finish_row(png_structp png_ptr)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
+      png_memset_check(png_ptr, png_ptr->prev_row, 0,
+         png_ptr->rowbytes + 1);
       do
       {
          png_ptr->pass++;
@@ -3211,15 +3213,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_memset_check(png_ptr, png_ptr->prev_row, 0, row_bytes + 1);
       png_ptr->old_prev_row_size = row_bytes + 1;
    }
-   else
-   {
-      if (png_ptr->reset_prev_row == 1)
-      {
-         png_memset_check(png_ptr, png_ptr->prev_row, 0, row_bytes + 1);
-      }
-   }
 
-   png_ptr->reset_prev_row = 0;  
    png_ptr->rowbytes = row_bytes;
 
    png_debug1(3, "width = %lu,", png_ptr->width);
