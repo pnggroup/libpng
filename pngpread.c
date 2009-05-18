@@ -1,9 +1,9 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.32 [September 18, 2008]
+ * Last changed in libpng 1.2.37 [May 18, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2008 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -1013,6 +1013,7 @@ png_read_push_finish_row(png_structp png_ptr)
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
 
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
@@ -1049,6 +1050,7 @@ png_read_push_finish_row(png_structp png_ptr)
 
       } while (png_ptr->iwidth == 0 || png_ptr->num_rows == 0);
    }
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
 }
 
 #if defined(PNG_READ_tEXt_SUPPORTED)
