@@ -1110,12 +1110,11 @@ png_read_push_finish_row(png_structp png_ptr)
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
 
-   png_ptr->old_prev_row_size = 0;   /* Force prev_row to be cleared */
-
-#if defined(PNG_READ_INTERLACING_SUPPORTED)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
+      png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+
       do
       {
          png_ptr->pass++;
@@ -1148,7 +1147,6 @@ png_read_push_finish_row(png_structp png_ptr)
 
       } while (png_ptr->iwidth == 0 || png_ptr->num_rows == 0);
    }
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
 }
 
 #if defined(PNG_READ_tEXt_SUPPORTED)
