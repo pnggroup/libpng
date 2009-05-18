@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.37 [May 15, 2009]
+ * Last changed in libpng 1.2.37 [May 18, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -2325,6 +2325,7 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    }
 }
 
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 /* Combines the row recently read in with the existing pixels in the
    row.  This routine takes care of alpha and transparency if requested.
    This routine also handles the two methods of progressive display
@@ -2536,6 +2537,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
       }
    }
 }
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
 /* OLD pre-1.0.9 interface:
@@ -2887,6 +2889,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    }
 }
 
+#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 void /* PRIVATE */
 png_read_finish_row(png_structp png_ptr)
 {
@@ -2917,8 +2920,6 @@ png_read_finish_row(png_structp png_ptr)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
-      png_memset_check(png_ptr, png_ptr->prev_row, 0,
-         png_ptr->rowbytes + 1);
       do
       {
          png_ptr->pass++;
@@ -3018,6 +3019,7 @@ png_read_finish_row(png_structp png_ptr)
 
    png_ptr->mode |= PNG_AFTER_IDAT;
 }
+#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
 void /* PRIVATE */
 png_read_start_row(png_structp png_ptr)
@@ -3187,7 +3189,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (row_bytes + 64 > png_ptr->old_big_row_buf_size)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
-      png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
+     png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
      if (png_ptr->interlaced)
        png_memset(png_ptr->big_row_buf, 0, row_bytes + 64);
      png_ptr->row_buf = png_ptr->big_row_buf + 32;
@@ -3195,21 +3197,30 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    }
 
 #ifdef PNG_MAX_MALLOC_64K
-   if ((png_uint_32)png_ptr->rowbytes + 1 > (png_uint_32)65536L)
+   if ((png_uint_32)row_bytes + 1 > (png_uint_32)65536L)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
-   if ((png_uint_32)png_ptr->rowbytes > (png_uint_32)(PNG_SIZE_MAX - 1))
+   if ((png_uint_32)row_bytes > (png_uint_32)(PNG_SIZE_MAX - 1))
       png_error(png_ptr, "Row has too many bytes to allocate in memory.");
 
-   if (png_ptr->rowbytes+1 > png_ptr->old_prev_row_size)
+   if (row_bytes + 1 > png_ptr->old_prev_row_size)
    {
-     png_free(png_ptr, png_ptr->prev_row);
-     png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
-        png_ptr->rowbytes + 1));
-     png_ptr->old_prev_row_size = png_ptr->rowbytes+1;
+      png_free(png_ptr, png_ptr->prev_row);
+      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
+        row_bytes + 1));
+      png_memset_check(png_ptr, png_ptr->prev_row, 0, row_bytes + 1);
+      png_ptr->old_prev_row_size = row_bytes + 1;
+   }
+   else
+   {
+      if (png_ptr->reset_prev_row == 1)
+      {
+         png_memset_check(png_ptr, png_ptr->prev_row, 0, row_bytes + 1);
+      }
    }
 
-   png_memset_check(png_ptr, png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+   png_ptr->reset_prev_row = 0;  
+   png_ptr->rowbytes = row_bytes;
 
    png_debug1(3, "width = %lu,", png_ptr->width);
    png_debug1(3, "height = %lu,", png_ptr->height);
