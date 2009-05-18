@@ -2325,7 +2325,6 @@ png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
    }
 }
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
 /* Combines the row recently read in with the existing pixels in the
    row.  This routine takes care of alpha and transparency if requested.
    This routine also handles the two methods of progressive display
@@ -2537,7 +2536,6 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
       }
    }
 }
-#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
 /* OLD pre-1.0.9 interface:
