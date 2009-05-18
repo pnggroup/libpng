@@ -2129,8 +2129,11 @@ version 1.4.0beta59 [May 15, 2009]
   Fixed typo in libpng docs (PNG_FILTER_AVE should be PNG_FILTER_AVG)
   Added sections about the git repository and our coding style to the
     documentation
+  Relocated misplaced #endif in pngwrite.c, sCAL chunk handler.
 
-version 1.4.0beta60 [May 16, 2009]
+version 1.4.0beta60 [May 18, 2009]
+  Conditionally compile png_combine_row() and png_read_finish_row()
+    which are not used by progressive readers.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

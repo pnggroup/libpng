@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [May 16, 2009]
+ * Last changed in libpng 1.4.0 [May 18, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -180,19 +180,20 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          info_ptr->pcal_X1, info_ptr->pcal_type, info_ptr->pcal_nparams,
          info_ptr->pcal_units, info_ptr->pcal_params);
 #endif
+
 #if defined(PNG_sCAL_SUPPORTED)
    if (info_ptr->valid & PNG_INFO_sCAL)
 #if defined(PNG_WRITE_sCAL_SUPPORTED)
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && !defined(PNG_NO_STDIO)
       png_write_sCAL(png_ptr, (int)info_ptr->scal_unit,
           info_ptr->scal_pixel_width, info_ptr->scal_pixel_height);
-#else
+#else /* !FLOATING_POINT */
 #ifdef PNG_FIXED_POINT_SUPPORTED
       png_write_sCAL_s(png_ptr, (int)info_ptr->scal_unit,
           info_ptr->scal_s_width, info_ptr->scal_s_height);
 #endif /* FIXED_POINT */
 #endif /* FLOATING_POINT */
-#else  /* WRITE_sCAL */
+#else  /* !WRITE_sCAL */
       png_warning(png_ptr,
           "png_write_sCAL not supported; sCAL chunk not written");
 #endif /* WRITE_sCAL */
