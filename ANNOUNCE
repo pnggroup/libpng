@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta60 - May 18, 2009
+Libpng 1.4.0beta61 - May 18, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta60.tar.gz
-   1.4.0beta60.tar.bz2
+   1.4.0beta61.tar.gz
+   1.4.0beta61.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta60-no-config.tar.gz
-   1.4.0beta60-no-config.tar.bz2
+   1.4.0beta61-no-config.tar.gz
+   1.4.0beta61-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b60.zip
-   lp140b60.tar.bz2
+   lp140b61.zip
+   lp140b61.tar.bz2
 
 Other information:
 
-   1.4.0beta60-README.txt
-   1.4.0beta60-KNOWNBUGS.txt
-   1.4.0beta60-LICENSE.txt
-   1.4.0beta60-Y2K-compliance.txt
+   1.4.0beta61-README.txt
+   1.4.0beta61-KNOWNBUGS.txt
+   1.4.0beta61-LICENSE.txt
+   1.4.0beta61-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
