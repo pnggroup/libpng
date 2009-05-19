@@ -1,5 +1,5 @@
 
-Libpng 1.2.37beta02 - May 18, 2009
+Libpng 1.2.37beta02 - May 19, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -51,11 +51,13 @@ version 1.2.37beta01 [May 14, 2009]
   Updated some of the makefiles in the scripts directory (merged with
     those in libpng-1.4.0beta57).
 
-version 1.2.37beta02 [May 18, 2009]
+version 1.2.37beta02 [May 19, 2009]
   Fixed typo in libpng documentation (FILTER_AVE should be FILTER_AVG)
   Relocated misplaced #endif in pngwrite.c, sCAL chunk handler.
   Conditionally compile png_read_finish_row() which is not used by
     progressive readers.
+  Added contrib/pngminim/preader to demonstrate building minimal progressive
+    decoder, based on contrib/gregbook with embedded libpng and zlib.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
