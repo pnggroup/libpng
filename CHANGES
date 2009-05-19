@@ -2384,6 +2384,8 @@ version 1.2.37beta02 [May 19, 2009]
   Added contrib/pngminim/preader to demonstrate building minimal progressive
     decoder, based on contrib/gregbook with embedded libpng and zlib.
 
+version 1.2.37rc01 [May 19, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
