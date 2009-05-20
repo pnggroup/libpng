@@ -2384,7 +2384,12 @@ version 1.2.37beta02 [May 19, 2009]
   Added contrib/pngminim/preader to demonstrate building minimal progressive
     decoder, based on contrib/gregbook with embedded libpng and zlib.
 
-version 1.2.37rc01 [May 19, 2009]
+version 1.2.37beta03 [May 20, 2009]
+  In contrib/pngminim/*, renamed "makefile.std" to "makefile", since there
+    is only one makefile in those directories, and revised the README files
+    accordingly.
+  Reformated sources in libpng style (3-space indentation, comment format)
+  
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

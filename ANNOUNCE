@@ -1,5 +1,5 @@
 
-Libpng 1.2.37rc01 - May 19, 2009
+Libpng 1.2.37beta03 - May 20, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.37rc01.tar.gz
-   libpng-1.2.37rc01.tar.lzma
+   libpng-1.2.37beta03.tar.gz
+   libpng-1.2.37beta03.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.37rc01.tar.bz2
+   libpng-1.2.37beta03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.37rc01-no-config.tar.gz
-   libpng-1.2.37rc01-no-config.tar.lzma
-   libpng-1.2.37rc01-no-config.tar.bz2
+   libpng-1.2.37beta03-no-config.tar.gz
+   libpng-1.2.37beta03-no-config.tar.lzma
+   libpng-1.2.37beta03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1237r01.zip
-   lp1237r01.7z
-   lp1237r01.tar.bz2
+   lp1237b03.zip
+   lp1237b03.7z
+   lp1237b03.tar.bz2
 
 Project files
 
-   libpng-1.2.37rc01-project-netware.zip
-   libpng-1.2.37rc01-project-wince.zip
+   libpng-1.2.37beta03-project-netware.zip
+   libpng-1.2.37beta03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.37rc01-README.txt
-   libpng-1.2.37rc01-KNOWNBUGS.txt
-   libpng-1.2.37rc01-LICENSE.txt
-   libpng-1.2.37rc01-Y2K-compliance.txt
-   libpng-1.2.37rc01-[previous version]-diff.txt
+   libpng-1.2.37beta03-README.txt
+   libpng-1.2.37beta03-KNOWNBUGS.txt
+   libpng-1.2.37beta03-LICENSE.txt
+   libpng-1.2.37beta03-Y2K-compliance.txt
+   libpng-1.2.37beta03-[previous version]-diff.txt
 
 Changes since the last public release (1.2.36):
 
@@ -59,7 +59,11 @@ version 1.2.37beta02 [May 19, 2009]
   Added contrib/pngminim/preader to demonstrate building minimal progressive
     decoder, based on contrib/gregbook with embedded libpng and zlib.
 
-version 1.2.37rc01 [May 19, 2009]
+version 1.2.37beta03 [May 20, 2009]
+  In contrib/pngminim/*, renamed "makefile.std" to "makefile", since there
+    is only one makefile in those directories, and revised the README files
+    accordingly.
+  Reformated sources in libpng style (3-space indentation, comment format)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.2.37 [May 19, 2009]
+ * Last changed in libpng 1.2.37 [May 20, 2009]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2009 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -93,13 +93,13 @@ void read_png(char *file_name)  /* We need to open the file */
       return (ERROR);
 
 #else no_open_file /* prototype 2 */
-void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
+void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
 {
    png_structp png_ptr;
    png_infop info_ptr;
    png_uint_32 width, height;
    int bit_depth, color_type, interlace_type;
-#endif no_open_file /* only use one prototype! */
+#endif no_open_file /* Only use one prototype! */
 
    /* Create and initialize the png_struct with the desired error handler
     * functions.  If you want to use the default stderr and longjump method,
@@ -177,11 +177,11 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
        &interlace_type, int_p_NULL, int_p_NULL);
 
-/* Set up the data transformations you want.  Note that these are all
- * optional.  Only call them if you want/need them.  Many of the
- * transformations only work on specific types of images, and many
- * are mutually exclusive.
- */
+   /* Set up the data transformations you want.  Note that these are all
+    * optional.  Only call them if you want/need them.  Many of the
+    * transformations only work on specific types of images, and many
+    * are mutually exclusive.
+    */
 
    /* Tell libpng to strip 16 bit/color files down to 8 bits/color */
    png_set_strip_16(png_ptr);
@@ -230,9 +230,9 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       png_set_background(png_ptr, &my_background,
                          PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
 
-   /* Some suggestions as to how to get a screen gamma value */
-
-   /* Note that screen gamma is the display_exponent, which includes
+   /* Some suggestions as to how to get a screen gamma value
+    *
+    * Note that screen gamma is the display_exponent, which includes
     * the CRT_exponent and any correction for viewing conditions
     */
    if (/* We have a user-defined screen gamma value */)
@@ -280,7 +280,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       png_colorp palette;
 
       /* This reduces the image to the application supplied palette */
-      if (/* we have our own palette */)
+      if (/* We have our own palette */)
       {
          /* An array of colors to which the image should be dithered */
          png_color std_color_cube[MAX_SCREEN_COLORS];
@@ -377,13 +377,13 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 #else no_sparkle /* Read the image using the "rectangle" effect */
          png_read_rows(png_ptr, png_bytepp_NULL, &row_pointers[y],
             number_of_rows);
-#endif no_sparkle /* use only one of these two methods */
+#endif no_sparkle /* Use only one of these two methods */
       }
 
-      /* if you want to display the image after every pass, do so here */
-#endif no_single /* use only one of these two methods */
+      /* If you want to display the image after every pass, do so here */
+#endif no_single /* Use only one of these two methods */
    }
-#endif no_entire /* use only one of these two methods */
+#endif no_entire /* Use only one of these two methods */
 
    /* Read rest of file, and get additional chunks in info_ptr - REQUIRED */
    png_read_end(png_ptr, info_ptr);
@@ -397,7 +397,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* Close the file */
    fclose(fp);
 
-   /* that's it */
+   /* That's it */
    return (OK);
 }
 
@@ -480,34 +480,35 @@ process_data(png_structp *png_ptr, png_infop *info_ptr,
 
 info_callback(png_structp png_ptr, png_infop info)
 {
-/* Do any setup here, including setting any of the transformations
- * mentioned in the Reading PNG files section.  For now, you _must_
- * call either png_start_read_image() or png_read_update_info()
- * after all the transformations are set (even if you don't set
- * any).  You may start getting rows before png_process_data()
- * returns, so this is your last chance to prepare for that.
- */
+   /* Do any setup here, including setting any of the transformations
+    * mentioned in the Reading PNG files section.  For now, you _must_
+    * call either png_start_read_image() or png_read_update_info()
+    * after all the transformations are set (even if you don't set
+    * any).  You may start getting rows before png_process_data()
+    * returns, so this is your last chance to prepare for that.
+    */
 }
 
 row_callback(png_structp png_ptr, png_bytep new_row,
    png_uint_32 row_num, int pass)
 {
-/*
- * This function is called for every row in the image.  If the
- * image is interlaced, and you turned on the interlace handler,
- * this function will be called for every row in every pass.
- *
- * In this function you will receive a pointer to new row data from
- * libpng called new_row that is to replace a corresponding row (of
- * the same data format) in a buffer allocated by your application.
- *
- * The new row data pointer "new_row" may be NULL, indicating there is
- * no new data to be replaced (in cases of interlace loading).
- *
- * If new_row is not NULL then you need to call
- * png_progressive_combine_row() to replace the corresponding row as
- * shown below:
- */
+   /*
+    * This function is called for every row in the image.  If the
+    * image is interlaced, and you turned on the interlace handler,
+    * this function will be called for every row in every pass.
+    *
+    * In this function you will receive a pointer to new row data from
+    * libpng called new_row that is to replace a corresponding row (of
+    * the same data format) in a buffer allocated by your application.
+    *
+    * The new row data pointer "new_row" may be NULL, indicating there is
+    * no new data to be replaced (in cases of interlace loading).
+    *
+    * If new_row is not NULL then you need to call
+    * png_progressive_combine_row() to replace the corresponding row as
+    * shown below:
+    */
+
    /* Check if row_num is in bounds. */
    if ((row_num >= 0) && (row_num < height))
    {
@@ -522,41 +523,41 @@ row_callback(png_structp png_ptr, png_bytep new_row,
      if ((old_row != NULL) && (new_row != NULL))
      png_progressive_combine_row(png_ptr, old_row, new_row);
    }
-/*
- * The rows and passes are called in order, so you don't really
- * need the row_num and pass, but I'm supplying them because it
- * may make your life easier.
- *
- * For the non-NULL rows of interlaced images, you must call
- * png_progressive_combine_row() passing in the new row and the
- * old row, as demonstrated above.  You can call this function for
- * NULL rows (it will just return) and for non-interlaced images
- * (it just does the png_memcpy for you) if it will make the code
- * easier.  Thus, you can just do this for all cases:
- */
+   /*
+    * The rows and passes are called in order, so you don't really
+    * need the row_num and pass, but I'm supplying them because it
+    * may make your life easier.
+    *
+    * For the non-NULL rows of interlaced images, you must call
+    * png_progressive_combine_row() passing in the new row and the
+    * old row, as demonstrated above.  You can call this function for
+    * NULL rows (it will just return) and for non-interlaced images
+    * (it just does the png_memcpy for you) if it will make the code
+    * easier.  Thus, you can just do this for all cases:
+    */
 
    png_progressive_combine_row(png_ptr, old_row, new_row);
 
-/* where old_row is what was displayed for previous rows.  Note
- * that the first pass (pass == 0 really) will completely cover
- * the old row, so the rows do not have to be initialized.  After
- * the first pass (and only for interlaced images), you will have
- * to pass the current row as new_row, and the function will combine
- * the old row and the new row.
- */
+   /* where old_row is what was displayed for previous rows.  Note
+    * that the first pass (pass == 0 really) will completely cover
+    * the old row, so the rows do not have to be initialized.  After
+    * the first pass (and only for interlaced images), you will have
+    * to pass the current row as new_row, and the function will combine
+    * the old row and the new row.
+    */
 }
 
 end_callback(png_structp png_ptr, png_infop info)
 {
-/* This function is called when the whole image has been read,
- * including any chunks after the image (up to and including
- * the IEND).  You will usually have the same info chunk as you
- * had in the header, although some data may have been added
- * to the comments and time fields.
- *
- * Most people won't do much here, perhaps setting a flag that
- * marks the image as finished.
- */
+   /* This function is called when the whole image has been read,
+    * including any chunks after the image (up to and including
+    * the IEND).  You will usually have the same info chunk as you
+    * had in the header, although some data may have been added
+    * to the comments and time fields.
+    *
+    * Most people won't do much here, perhaps setting a flag that
+    * marks the image as finished.
+    */
 }
 
 /* Write a png file */
@@ -608,6 +609,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    }
 
    /* One of the following I/O initialization functions is REQUIRED */
+
 #ifdef streams /* I/O initialization method 1 */
    /* Set up the output control if you are using standard C streams */
    png_init_io(png_ptr, fp);
@@ -619,7 +621,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_set_write_fn(png_ptr, (void *)user_io_ptr, user_write_fn,
       user_IO_flush_function);
    /* where user_io_ptr is a structure you want available to the callbacks */
-#endif no_streams /* only use one initialization method */
+#endif no_streams /* Only use one initialization method */
 
 #ifdef hilevel
    /* This is the easy way.  Use it if you already have all the
@@ -771,7 +773,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 #ifdef entire /* Write out the entire image data in one call */
    png_write_image(png_ptr, row_pointers);
 
-   /* the other way to write the image - deal with interlacing */
+   /* The other way to write the image - deal with interlacing */
 
 #else no_entire /* Write out the image data by one or more scanlines */
 
