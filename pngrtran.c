@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -27,24 +27,24 @@ png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
       return;
    switch (crit_action)
    {
-      case PNG_CRC_NO_CHANGE:                        /* leave setting as is */
+      case PNG_CRC_NO_CHANGE:                        /* Leave setting as is */
          break;
 
-      case PNG_CRC_WARN_USE:                               /* warn/use data */
+      case PNG_CRC_WARN_USE:                               /* Warn/use data */
          png_ptr->flags &= ~PNG_FLAG_CRC_CRITICAL_MASK;
          png_ptr->flags |= PNG_FLAG_CRC_CRITICAL_USE;
          break;
 
-      case PNG_CRC_QUIET_USE:                             /* quiet/use data */
+      case PNG_CRC_QUIET_USE:                             /* Quiet/use data */
          png_ptr->flags &= ~PNG_FLAG_CRC_CRITICAL_MASK;
          png_ptr->flags |= PNG_FLAG_CRC_CRITICAL_USE |
                            PNG_FLAG_CRC_CRITICAL_IGNORE;
          break;
 
-      case PNG_CRC_WARN_DISCARD:    /* not a valid action for critical data */
+      case PNG_CRC_WARN_DISCARD:    /* Not a valid action for critical data */
          png_warning(png_ptr,
             "Can't discard critical data on CRC error");
-      case PNG_CRC_ERROR_QUIT:                                /* error/quit */
+      case PNG_CRC_ERROR_QUIT:                                /* Error/quit */
 
       case PNG_CRC_DEFAULT:
       default:
@@ -54,26 +54,26 @@ png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
 
    switch (ancil_action)
    {
-      case PNG_CRC_NO_CHANGE:                       /* leave setting as is */
+      case PNG_CRC_NO_CHANGE:                       /* Leave setting as is */
          break;
 
-      case PNG_CRC_WARN_USE:                              /* warn/use data */
+      case PNG_CRC_WARN_USE:                              /* Warn/use data */
          png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
          png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_USE;
          break;
 
-      case PNG_CRC_QUIET_USE:                            /* quiet/use data */
+      case PNG_CRC_QUIET_USE:                            /* Quiet/use data */
          png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
          png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_USE |
                            PNG_FLAG_CRC_ANCILLARY_NOWARN;
          break;
 
-      case PNG_CRC_ERROR_QUIT:                               /* error/quit */
+      case PNG_CRC_ERROR_QUIT:                               /* Error/quit */
          png_ptr->flags &= ~PNG_FLAG_CRC_ANCILLARY_MASK;
          png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_NOWARN;
          break;
 
-      case PNG_CRC_WARN_DISCARD:                      /* warn/discard data */
+      case PNG_CRC_WARN_DISCARD:                      /* Warn/discard data */
 
       case PNG_CRC_DEFAULT:
       default:
@@ -84,7 +84,7 @@ png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) && \
     defined(PNG_FLOATING_POINT_SUPPORTED)
-/* handle alpha and tRNS via a background color */
+/* Handle alpha and tRNS via a background color */
 void PNGAPI
 png_set_background(png_structp png_ptr,
    png_color_16p background_color, int background_gamma_code,
@@ -195,11 +195,11 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
          int i;
 
-         /* initialize an array to sort colors */
+         /* Initialize an array to sort colors */
          png_ptr->dither_sort = (png_bytep)png_malloc(png_ptr,
             (png_uint_32)(num_palette * png_sizeof(png_byte)));
 
-         /* initialize the dither_sort array */
+         /* Initialize the dither_sort array */
          for (i = 0; i < num_palette; i++)
             png_ptr->dither_sort[i] = (png_byte)i;
 
@@ -212,7 +212,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
          for (i = num_palette - 1; i >= maximum_colors; i--)
          {
-            int done; /* to stop early if the list is pre-sorted */
+            int done; /* To stop early if the list is pre-sorted */
             int j;
 
             done = 1;
@@ -885,7 +885,7 @@ png_init_read_transformations(png_structp png_ptr)
     for (i=0; i<png_ptr->num_trans; i++)
     {
       if (png_ptr->trans[i] != 0 && png_ptr->trans[i] != 0xff)
-        k=1; /* partial transparency is present */
+        k=1; /* Partial transparency is present */
     }
     if (k == 0)
       png_ptr->transformations &= ~PNG_GAMMA;
@@ -1066,7 +1066,7 @@ png_init_read_transformations(png_structp png_ptr)
          }
       }
       else
-      /* transformation does not include PNG_BACKGROUND */
+      /* Transformation does not include PNG_BACKGROUND */
 #endif /* PNG_READ_BACKGROUND_SUPPORTED */
       if (color_type == PNG_COLOR_TYPE_PALETTE)
       {
@@ -1528,7 +1528,7 @@ png_do_read_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_USER_TRANSFORM)
     {
       if (png_ptr->read_user_transform_fn != NULL)
-         (*(png_ptr->read_user_transform_fn)) /* user read transform function */
+         (*(png_ptr->read_user_transform_fn)) /* User read transform function */
             (png_ptr,                    /* png_ptr */
                &(png_ptr->row_info),     /* row_info: */
                /*  png_uint_32 width;       width of row */
@@ -2242,7 +2242,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
 #endif
 
 #if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
-/* expand grayscale files to RGB, with or without alpha */
+/* Expand grayscale files to RGB, with or without alpha */
 void /* PRIVATE */
 png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 {
@@ -2322,7 +2322,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-/* reduce RGB files to grayscale, with or without alpha
+/* Reduce RGB files to grayscale, with or without alpha
  * using the equation given in Poynton's ColorFAQ at
  * <http://www.inforamp.net/~poynton/>  (THIS LINK IS DEAD June 2008)
  * New link:
@@ -4009,7 +4009,7 @@ png_build_gamma_table(png_structp png_ptr)
            g = 1.0 / png_ptr->screen_gamma;
 
         else
-           g = png_ptr->gamma;   /* probably doing rgb_to_gray */
+           g = png_ptr->gamma;   /* Probably doing rgb_to_gray */
 
         for (i = 0; i < 256; i++)
         {
@@ -4164,7 +4164,7 @@ png_build_gamma_table(png_structp png_ptr)
            g = 1.0 / png_ptr->screen_gamma;
 
         else
-           g = png_ptr->gamma;   /* probably doing rgb_to_gray */
+           g = png_ptr->gamma;   /* Probably doing rgb_to_gray */
 
 #ifdef PNG_CALLOC_SUPPORTED
         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_calloc(png_ptr,
@@ -4200,7 +4200,7 @@ png_build_gamma_table(png_structp png_ptr)
 #endif
 
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
-/* undoes intrapixel differencing  */
+/* Undoes intrapixel differencing  */
 void /* PRIVATE */
 png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
 {

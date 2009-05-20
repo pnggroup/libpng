@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -510,8 +510,9 @@ png_get_iCCP(png_structp png_ptr, png_infop info_ptr,
       png_debug1(1, "in %s retrieval function", "iCCP");
       *name = info_ptr->iccp_name;
       *profile = info_ptr->iccp_profile;
-      /* compression_type is a dummy so the API won't have to change
-         if we introduce multiple compression types later. */
+      /* Compression_type is a dummy so the API won't have to change
+       * if we introduce multiple compression types later.
+       */
       *proflen = (int)info_ptr->iccp_proflen;
       *compression_type = (int)info_ptr->iccp_compression;
       return (PNG_INFO_iCCP);

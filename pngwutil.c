@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -63,7 +63,7 @@ png_write_sig(png_structp png_ptr)
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
 #ifdef PNG_IO_STATE_SUPPORTED
-   /* inform the I/O callback that the signature is being written */
+   /* Inform the I/O callback that the signature is being written */
    png_ptr->io_state = PNG_IO_WRITING | PNG_IO_SIGNATURE;
 #endif
 
@@ -185,14 +185,14 @@ png_write_chunk_end(png_structp png_ptr)
 
 typedef struct
 {
-   char *input;   /* the uncompressed input data */
-   int input_len;   /* its length */
-   int num_output_ptr; /* number of output pointers used */
-   int max_output_ptr; /* size of output_ptr */
-   png_charpp output_ptr; /* array of pointers to output */
+   char *input;   /* The uncompressed input data */
+   int input_len;   /* Its length */
+   int num_output_ptr; /* Number of output pointers used */
+   int max_output_ptr; /* Size of output_ptr */
+   png_charpp output_ptr; /* Array of pointers to output */
 } compression_state;
 
-/* compress given text into storage in the png_ptr structure */
+/* Compress given text into storage in the png_ptr structure */
 static int /* PRIVATE */
 png_text_compress(png_structp png_ptr,
         png_charp text, png_size_t text_len, int compression,
@@ -249,11 +249,11 @@ png_text_compress(png_structp png_ptr,
    /* This is the same compression loop as in png_write_row() */
    do
    {
-      /* compress the data */
+      /* Compress the data */
       ret = deflate(&png_ptr->zstream, Z_NO_FLUSH);
       if (ret != Z_OK)
       {
-         /* error */
+         /* Error */
          if (png_ptr->zstream.msg != NULL)
             png_error(png_ptr, png_ptr->zstream.msg);
          else
@@ -370,7 +370,7 @@ png_text_compress(png_structp png_ptr,
    return((int)text_len);
 }
 
-/* ship the compressed text out via chunk writes */
+/* Ship the compressed text out via chunk writes */
 static void /* PRIVATE */
 png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
 {
@@ -418,7 +418,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
 #endif
    int ret;
 
-   png_byte buf[13]; /* buffer to store the IHDR info */
+   png_byte buf[13]; /* Buffer to store the IHDR info */
 
    png_debug(1, "in png_write_IHDR");
    /* Check that we have valid input data from the application info */
@@ -517,7 +517,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
 
    png_ptr->pixel_depth = (png_byte)(bit_depth * png_ptr->channels);
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, width);
-   /* set the usr info, so any transformations can modify it */
+   /* Set the usr info, so any transformations can modify it */
    png_ptr->usr_width = png_ptr->width;
    png_ptr->usr_bit_depth = png_ptr->bit_depth;
    png_ptr->usr_channels = png_ptr->channels;
@@ -577,7 +577,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->zstream.next_out = png_ptr->zbuf;
    png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
    /* libpng is not interested in zstream.data_type */
-   /* set it to a predefined value, to avoid its evaluation inside zlib */
+   /* Set it to a predefined value, to avoid its evaluation inside zlib */
    png_ptr->zstream.data_type = Z_BINARY;
 
    png_ptr->mode = PNG_HAVE_IHDR;
@@ -830,7 +830,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
       profile_len = png_text_compress(png_ptr, profile,
         (png_size_t)profile_len, PNG_COMPRESSION_TYPE_BASE, &comp);
 
-   /* make sure we include the NULL after the name and the compression type */
+   /* Make sure we include the NULL after the name and the compression type */
    png_write_chunk_start(png_ptr, (png_bytep)png_iCCP,
           (png_uint_32)(name_len + profile_len + 2));
    new_name[name_len + 1] = 0x00;
@@ -926,7 +926,7 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
 #endif
 
 #if defined(PNG_WRITE_sBIT_SUPPORTED)
-/* write the sBIT chunk */
+/* Write the sBIT chunk */
 void /* PRIVATE */
 png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
 {
@@ -982,7 +982,7 @@ png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
 #endif
 
 #if defined(PNG_WRITE_cHRM_SUPPORTED)
-/* write the cHRM chunk */
+/* Write the cHRM chunk */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void /* PRIVATE */
 png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
@@ -1013,7 +1013,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
       int_red_x, int_red_y, int_green_x, int_green_y, int_blue_x, int_blue_y))
 #endif
    {
-      /* each value is saved in 1/100,000ths */
+      /* Each value is saved in 1/100,000ths */
     
       png_save_uint_32(buf, int_white_x);
       png_save_uint_32(buf + 4, int_white_y);
@@ -1044,7 +1044,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    png_byte buf[32];
 
    png_debug(1, "in png_write_cHRM");
-   /* each value is saved in 1/100,000ths */
+   /* Each value is saved in 1/100,000ths */
 #if !defined(PNG_NO_CHECK_cHRM)
    if (png_check_cHRM_fixed(png_ptr, white_x, white_y, red_x, red_y,
       green_x, green_y, blue_x, blue_y))
@@ -1087,13 +1087,13 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
          png_warning(png_ptr, "Invalid number of transparent colors specified");
          return;
       }
-      /* write the chunk out as it is */
+      /* Write the chunk out as it is */
       png_write_chunk(png_ptr, (png_bytep)png_tRNS, trans,
         (png_size_t)num_trans);
    }
    else if (color_type == PNG_COLOR_TYPE_GRAY)
    {
-      /* one 16 bit value */
+      /* One 16 bit value */
       if (tran->gray >= (1 << png_ptr->bit_depth))
       {
          png_warning(png_ptr,
@@ -1105,7 +1105,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
    }
    else if (color_type == PNG_COLOR_TYPE_RGB)
    {
-      /* three 16 bit values */
+      /* Three 16 bit values */
       png_save_uint_16(buf, tran->red);
       png_save_uint_16(buf + 2, tran->green);
       png_save_uint_16(buf + 4, tran->blue);
@@ -1359,7 +1359,7 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
    else
       text_len = png_strlen(text);
 
-   /* make sure we include the 0 after the key */
+   /* Make sure we include the 0 after the key */
    png_write_chunk_start(png_ptr, (png_bytep)png_tEXt,
       (png_uint_32)(key_len + text_len + 1));
    /*
@@ -1658,8 +1658,8 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
    }
 
    buf[0] = (png_byte)unit;
-   png_memcpy(buf + 1, width, wlen + 1);      /* append the '\0' here */
-   png_memcpy(buf + wlen + 2, height, hlen);  /* do NOT append the '\0' here */
+   png_memcpy(buf + 1, width, wlen + 1);      /* Append the '\0' here */
+   png_memcpy(buf + wlen + 2, height, hlen);  /* Do NOT append the '\0' here */
 
    png_debug1(3, "sCAL total length = %u", (unsigned int)total_len);
    png_write_chunk(png_ptr, (png_bytep)png_sCAL, buf, total_len);
@@ -1769,7 +1769,7 @@ png_write_start_row(png_structp png_ptr)
    /* We only need to keep the previous row if we are using one of these. */
    if (png_ptr->do_filter & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH))
    {
-     /* set up previous row buffer */
+     /* Set up previous row buffer */
 #ifdef PNG_CALLOC_SUPPORTED
      png_ptr->prev_row = (png_bytep)png_calloc(png_ptr,
         (png_alloc_size_t)buf_size);
@@ -1854,7 +1854,7 @@ png_write_finish_row(png_structp png_ptr)
    int ret;
 
    png_debug(1, "in png_write_finish_row");
-   /* next row */
+   /* Next row */
    png_ptr->row_number++;
 
    /* See if we are done */
@@ -2130,7 +2130,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #endif
 
    png_debug(1, "in png_write_find_filter");
-   /* find out how many bytes offset each pixel is */
+   /* Find out how many bytes offset each pixel is */
    bpp = (row_info->pixel_depth + 7) >> 3;
 
    prev_row = png_ptr->prev_row;

@@ -1,6 +1,7 @@
 This demonstrates the use of PNG_USER_CONFIG and pngusr.h
 
-To build a minimal read-only progressive decoder with X display, run
+To build a minimal read-only progressive decoder embedded libpng and
+zlib and with your system's X library, run
 
     gather.sh # to collect needed files from gregbook, libpng, and zlib
 
@@ -9,3 +10,5 @@ then
     
     make
  
+If you prefer to use the shared libraries, go to contrib/gregbook
+and build the rpng2-x application there. 

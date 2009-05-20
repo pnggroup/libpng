@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -45,7 +45,7 @@
 #endif
 
 #if !PNG_DEBUG
-#  define SINGLE_ROWBUF_ALLOC  /* makes buffer overruns easier to nail */
+#  define SINGLE_ROWBUF_ALLOC  /* Makes buffer overruns easier to nail */
 #endif
 
 /* Turn on CPU timing
@@ -75,9 +75,9 @@ int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));
 #include <mem.h>
 #endif
 
-/* defined so I can write to a file on gui/windowing platforms */
+/* Defined so I can write to a file on gui/windowing platforms */
 /*  #define STDERR stderr  */
-#define STDERR stdout   /* for DOS */
+#define STDERR stdout   /* For DOS */
 
 /* In case a system header (e.g., on AIX) defined jmpbuf */
 #ifdef jmpbuf
@@ -89,7 +89,7 @@ int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));
 #  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
 #endif
 
-/* example of using row callbacks to make a simple progress meter */
+/* Example of using row callbacks to make a simple progress meter */
 static int status_pass = 1;
 static int status_dots_requested = 0;
 static int status_dots = 1;
@@ -144,7 +144,7 @@ count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 #endif
 
 #if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-/* example of using user transform callback (we don't transform anything,
+/* Example of using user transform callback (we don't transform anything,
  * but merely count the zero samples)
  */
 
@@ -158,7 +158,7 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
    png_bytep dp = data;
    if (png_ptr == NULL)return;
 
-   /* contents of row_info:
+   /* Contents of row_info:
     *  png_uint_32 width      width of row
     *  png_uint_32 rowbytes   number of bytes in row
     *  png_byte color_type    color type of pixels
@@ -167,7 +167,7 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
     *  png_byte pixel_depth   bits per pixel (depth*channels)
     */
 
-    /* counts the number of zero samples (or zero pixels if color_type is 3 */
+    /* Counts the number of zero samples (or zero pixels if color_type is 3 */
 
     if (row_info->color_type == 0 || row_info->color_type == 3)
     {
@@ -215,7 +215,7 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
           }
        }
     }
-    else /* other color types */
+    else /* Other color types */
     {
        png_uint_32 n, nstop;
        int channel;
@@ -307,7 +307,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       {
          read = MIN(NEAR_BUF_SIZE, remaining);
          err = fread(buf, 1, 1, io_ptr);
-         png_memcpy(data, buf, read); /* copy far buffer to near buffer */
+         png_memcpy(data, buf, read); /* Copy far buffer to near buffer */
          if (err != read)
             break;
          else
@@ -327,7 +327,7 @@ static void
 pngtest_flush(png_structp png_ptr)
 {
    /* Do nothing; fflush() is said to be just a waste of energy. */
-   png_ptr = png_ptr;  /* stifle compiler warning */
+   png_ptr = png_ptr;  /* Stifle compiler warning */
 }
 #endif
 
@@ -380,7 +380,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
       do
       {
          written = MIN(NEAR_BUF_SIZE, remaining);
-         png_memcpy(buf, data, written); /* copy far buffer to near buffer */
+         png_memcpy(buf, data, written); /* Copy far buffer to near buffer */
          err = fwrite(buf, 1, written, io_ptr);
          if (err != written)
             break;
@@ -884,8 +884,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_gAMA(write_ptr, write_info_ptr, gamma);
    }
 #endif
-#endif /* floating point */
-#endif /* fixed point */
+#endif /* Floating point */
+#endif /* Fixed point */
 #if defined(PNG_iCCP_SUPPORTED)
    {
       png_charp name;
@@ -1025,7 +1025,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_tIME(write_ptr, write_info_ptr, mod_time);
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
-         /* we have to use png_memcpy instead of "=" because the string
+         /* We have to use png_memcpy instead of "=" because the string
           * pointed to by png_convert_to_rfc1123() gets free'ed before
           * we use it.
           */
@@ -1070,7 +1070,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_size_t i;
          png_set_unknown_chunks(write_ptr, write_info_ptr, unknowns,
            num_unknowns);
-         /* copy the locations from the read_info_ptr.  The automatically
+         /* Copy the locations from the read_info_ptr.  The automatically
           * generated locations in write_info_ptr are wrong because we
           * haven't written anything yet.
           */
@@ -1213,7 +1213,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
 #if defined(PNG_TIME_RFC1123_SUPPORTED)
-         /* we have to use png_memcpy instead of "=" because the string
+         /* We have to use png_memcpy instead of "=" because the string
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
          png_memcpy(tIME_string,
@@ -1236,7 +1236,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_size_t i;
          png_set_unknown_chunks(write_ptr, write_end_info_ptr, unknowns,
            num_unknowns);
-         /* copy the locations from the read_info_ptr.  The automatically
+         /* Copy the locations from the read_info_ptr.  The automatically
           * generated locations in write_end_info_ptr are wrong because we
           * haven't written the end_info yet.
           */
@@ -1352,7 +1352,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    return (0);
 }
 
-/* input and output filenames */
+/* Input and output filenames */
 #ifdef RISCOS
 static PNG_CONST char *inname = "pngtest/png";
 static PNG_CONST char *outname = "pngout/png";

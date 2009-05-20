@@ -1,7 +1,7 @@
 
 /* pngwio.c - functions for data output
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -85,7 +85,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
       do
       {
          written = MIN(NEAR_BUF_SIZE, remaining);
-         png_memcpy(buf, data, written); /* copy far buffer to near buffer */
+         png_memcpy(buf, data, written); /* Copy far buffer to near buffer */
          err = fwrite(buf, 1, written, io_ptr);
          if (err != written)
             break;

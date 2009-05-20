@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -53,18 +53,18 @@ PNG_tRNS;
 PNG_zTXt;
 
 #ifdef PNG_READ_SUPPORTED
-/* arrays to facilitate easy interlacing - use pass (0 - 6) as index */
+/* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
-/* start of interlace block */
+/* Start of interlace block */
 PNG_CONST int FARDATA png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
 
-/* offset to next interlace block */
+/* Offset to next interlace block */
 PNG_CONST int FARDATA png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
 
-/* start of interlace block in the y direction */
+/* Start of interlace block in the y direction */
 PNG_CONST int FARDATA png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
 
-/* offset to next interlace block in the y direction */
+/* Offset to next interlace block in the y direction */
 PNG_CONST int FARDATA png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
 
 /* Height of interlace block.  This is not currently used - if you need
@@ -155,7 +155,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
    return ((voidpf)ptr);
 }
 
-/* function to free memory for zlib */
+/* Function to free memory for zlib */
 void /* private */
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
@@ -275,7 +275,7 @@ png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
       *ptr_ptr = info_ptr;
    }
 
-   /* set everything to 0 */
+   /* Set everything to 0 */
    png_memset(info_ptr, 0, png_sizeof(png_info));
 }
 
@@ -306,7 +306,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
       return;
 
 #if defined(PNG_TEXT_SUPPORTED)
-   /* free text item num or (if num == -1) all text items */
+   /* Free text item num or (if num == -1) all text items */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_TEXT) & info_ptr->free_me)
 #else
@@ -334,7 +334,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 #endif
 
 #if defined(PNG_tRNS_SUPPORTED)
-   /* free any tRNS entry */
+   /* Free any tRNS entry */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_TRNS) & info_ptr->free_me)
 #else
@@ -351,7 +351,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 #endif
 
 #if defined(PNG_sCAL_SUPPORTED)
-   /* free any sCAL entry */
+   /* Free any sCAL entry */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_SCAL) & info_ptr->free_me)
 #else
@@ -369,7 +369,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 #endif
 
 #if defined(PNG_pCAL_SUPPORTED)
-   /* free any pCAL entry */
+   /* Free any pCAL entry */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_PCAL) & info_ptr->free_me)
 #else
@@ -396,7 +396,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 #endif
 
 #if defined(PNG_iCCP_SUPPORTED)
-   /* free any iCCP entry */
+   /* Free any iCCP entry */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_ICCP) & info_ptr->free_me)
 #else
@@ -412,7 +412,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 #endif
 
 #if defined(PNG_sPLT_SUPPORTED)
-   /* free a given sPLT entry, or (if num == -1) all sPLT entries */
+   /* Free a given sPLT entry, or (if num == -1) all sPLT entries */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_SPLT) & info_ptr->free_me)
 #else
@@ -485,7 +485,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 #endif
 
 #if defined(PNG_hIST_SUPPORTED)
-   /* free any hIST entry */
+   /* Free any hIST entry */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_HIST)  & info_ptr->free_me)
 #else
@@ -501,7 +501,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-   /* free any PLTE entry that was internally allocated */
+   /* Free any PLTE entry that was internally allocated */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_PLTE) & info_ptr->free_me)
 #else
@@ -518,7 +518,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
-   /* free any image bits attached to the info structure */
+   /* Free any image bits attached to the info structure */
 #ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_ROWS) & info_ptr->free_me)
 #else
@@ -643,19 +643,19 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
-   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
 #ifdef PNG_STRING_COPYRIGHT
       return PNG_STRING_COPYRIGHT
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta61 - May 18, 2009" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta61 - May 20, 2009" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta61 - May 18, 2009\
+      return ((png_charp) "libpng version 1.4.0beta61 - May 20, 2009\
       Copyright (c) 1998-2009 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -675,7 +675,7 @@ png_charp PNGAPI
 png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
-   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
    return ((png_charp) PNG_LIBPNG_VER_STRING);
 }
 
@@ -683,7 +683,7 @@ png_charp PNGAPI
 png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
-   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
    return ((png_charp) PNG_LIBPNG_VER_STRING);
 }
 
@@ -691,7 +691,7 @@ png_charp PNGAPI
 png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
-   png_ptr = png_ptr;  /* silence compiler warning about unused png_ptr */
+   png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
 #ifdef __STDC__
    return ((png_charp) PNG_HEADER_VERSION_STRING
 #ifndef PNG_READ_SUPPORTED
@@ -708,7 +708,7 @@ png_get_header_version(png_structp png_ptr)
 int PNGAPI
 png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
 {
-   /* check chunk_name and return "keep" value if it's on the list, else 0 */
+   /* Check chunk_name and return "keep" value if it's on the list, else 0 */
    int i;
    png_bytep p;
    if (png_ptr == NULL || chunk_name == NULL || png_ptr->num_chunk_list<=0)

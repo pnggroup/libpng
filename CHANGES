@@ -2131,11 +2131,17 @@ version 1.4.0beta59 [May 15, 2009]
     documentation
   Relocated misplaced #endif in pngwrite.c, sCAL chunk handler.
 
-version 1.4.0beta60 [May 18, 2009]
+version 1.4.0beta60 [May 19, 2009]
   Conditionally compile png_read_finish_row() which is not used by
     progressive readers.
   Added contrib/pngminim/preader to demonstrate building minimal progressive
     decoder, based on contrib/gregbook with embedded libpng and zlib.
+
+version 1.4.0beta61 [May 20, 2009]
+  In contrib/pngminim/*, renamed "makefile.std" to "makefile", since there
+    is only one makefile in those directories, and revised the README files
+    accordingly.
+  More reformatting of comments, mostly to capitalize sentences.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2009 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -93,13 +93,13 @@ void read_png(char *file_name)  /* We need to open the file */
       return (ERROR);
 
 #else no_open_file /* prototype 2 */
-void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
+void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
 {
    png_structp png_ptr;
    png_infop info_ptr;
    png_uint_32 width, height;
    int bit_depth, color_type, interlace_type;
-#endif no_open_file /* only use one prototype! */
+#endif no_open_file /* Only use one prototype! */
 
    /* Create and initialize the png_struct with the desired error handler
     * functions.  If you want to use the default stderr and longjump method,
@@ -280,7 +280,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
       png_colorp palette;
 
       /* This reduces the image to the application supplied palette */
-      if (/* we have our own palette */)
+      if (/* We have our own palette */)
       {
          /* An array of colors to which the image should be dithered */
          png_color std_color_cube[MAX_SCREEN_COLORS];
@@ -377,13 +377,13 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
 #else no_sparkle /* Read the image using the "rectangle" effect */
          png_read_rows(png_ptr, NULL, &row_pointers[y],
             number_of_rows);
-#endif no_sparkle /* use only one of these two methods */
+#endif no_sparkle /* Use only one of these two methods */
       }
 
-      /* if you want to display the image after every pass, do so here */
-#endif no_single /* use only one of these two methods */
+      /* If you want to display the image after every pass, do so here */
+#endif no_single /* Use only one of these two methods */
    }
-#endif no_entire /* use only one of these two methods */
+#endif no_entire /* Use only one of these two methods */
 
    /* Read rest of file, and get additional chunks in info_ptr - REQUIRED */
    png_read_end(png_ptr, info_ptr);
@@ -397,7 +397,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* file is already open */
    /* Close the file */
    fclose(fp);
 
-   /* that's it */
+   /* That's it */
    return (OK);
 }
 
@@ -621,7 +621,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_set_write_fn(png_ptr, (void *)user_io_ptr, user_write_fn,
       user_IO_flush_function);
    /* where user_io_ptr is a structure you want available to the callbacks */
-#endif no_streams /* only use one initialization method */
+#endif no_streams /* Only use one initialization method */
 
 #ifdef hilevel
    /* This is the easy way.  Use it if you already have all the
@@ -773,7 +773,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 #ifdef entire /* Write out the entire image data in one call */
    png_write_image(png_ptr, row_pointers);
 
-   /* the other way to write the image - deal with interlacing */
+   /* The other way to write the image - deal with interlacing */
 
 #else no_entire /* Write out the image data by one or more scanlines */
 

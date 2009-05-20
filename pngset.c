@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -221,7 +221,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   /* check for width and height valid values */
+   /* Check for width and height valid values */
    if (width == 0 || height == 0)
       png_error(png_ptr, "Image width or height is zero in IHDR");
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
@@ -241,7 +241,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
                  - 8)       /* extra max_pixel_depth pad */
       png_warning(png_ptr, "Width is too large for libpng to process pixels");
 
-   /* check other values */
+   /* Check other values */
    if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&
       bit_depth != 8 && bit_depth != 16)
       png_error(png_ptr, "Invalid bit depth in IHDR");
@@ -307,7 +307,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
       info_ptr->channels++;
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels * info_ptr->bit_depth);
 
-   /* check for potential overflow */
+   /* Check for potential overflow */
    if (width > (PNG_UINT_32_MAX
                  >> 3)      /* 8-byte RGBA pixels */
                  - 64       /* bigrowbuf hack */
@@ -774,7 +774,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       else
 #ifdef PNG_iTXt_SUPPORTED
       {
-         /* set iTXt data */
+         /* Set iTXt data */
          if (text_ptr[i].lang != NULL)
             lang_len = png_strlen(text_ptr[i].lang);
          else
@@ -1044,7 +1044,7 @@ png_set_unknown_chunks(png_structp png_ptr,
                  png_sizeof(from->name));
       to->name[png_sizeof(to->name)-1] = '\0';
       to->size = from->size;
-      /* note our location in the read or write sequence */
+      /* Note our location in the read or write sequence */
       to->location = (png_byte)(png_ptr->mode & 0xff);
 
       if (from->size == 0)
@@ -1196,7 +1196,7 @@ png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
 
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
-/* this function was added to libpng 1.2.6 */
+/* This function was added to libpng 1.2.6 */
 void PNGAPI
 png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
     png_uint_32 user_height_max)
@@ -1210,7 +1210,7 @@ png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
    png_ptr->user_width_max = user_width_max;
    png_ptr->user_height_max = user_height_max;
 }
-/* this function was added to libpng 1.4.0 */
+/* This function was added to libpng 1.4.0 */
 void PNGAPI
 png_set_chunk_cache_max (png_structp png_ptr,
    png_uint_32 user_chunk_cache_max)

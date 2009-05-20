@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -25,7 +25,7 @@ png_set_bgr(png_structp png_ptr)
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
-/* turn on 16 bit byte swapping */
+/* Turn on 16 bit byte swapping */
 void PNGAPI
 png_set_swap(png_structp png_ptr)
 {
@@ -38,7 +38,7 @@ png_set_swap(png_structp png_ptr)
 #endif
 
 #if defined(PNG_READ_PACK_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
-/* turn on pixel packing */
+/* Turn on pixel packing */
 void PNGAPI
 png_set_packing(png_structp png_ptr)
 {
@@ -54,7 +54,7 @@ png_set_packing(png_structp png_ptr)
 #endif
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)||defined(PNG_WRITE_PACKSWAP_SUPPORTED)
-/* turn on packed pixel swapping */
+/* Turn on packed pixel swapping */
 void PNGAPI
 png_set_packswap(png_structp png_ptr)
 {
@@ -179,7 +179,7 @@ png_set_invert_mono(png_structp png_ptr)
    png_ptr->transformations |= PNG_INVERT_MONO;
 }
 
-/* invert monochrome grayscale data */
+/* Invert monochrome grayscale data */
 void /* PRIVATE */
 png_do_invert(png_row_infop row_info, png_bytep row)
 {
@@ -230,7 +230,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
-/* swaps byte order on 16 bit depth images */
+/* Swaps byte order on 16 bit depth images */
 void /* PRIVATE */
 png_do_swap(png_row_infop row_info, png_bytep row)
 {

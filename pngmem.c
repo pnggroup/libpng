@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -20,7 +20,7 @@
 
 /* Borland DOS special memory handler */
 #if defined(__TURBOC__) && !defined(_Windows) && !defined(__FLAT__)
-/* if you change this, be sure to change the one in png.h also */
+/* If you change this, be sure to change the one in png.h also */
 
 /* Allocate memory for a png_struct.  The malloc and memset can be replaced
    by a single call to calloc() if this is thought to improve performance. */
@@ -166,7 +166,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
    {
       if (png_ptr->offset_table == NULL)
       {
-         /* try to see if we need to do any of this fancy stuff */
+         /* Try to see if we need to do any of this fancy stuff */
          ret = farmalloc(size);
          if (ret == NULL || ((png_size_t)ret & 0xffff))
          {
@@ -281,7 +281,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
    return (ret);
 }
 
-/* free a pointer allocated by png_malloc().  In the default
+/* Free a pointer allocated by png_malloc().  In the default
  * configuration, png_ptr is not used, but is passed in case it
  * is needed.  If ptr is NULL, return without taking any action.
  */

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [May 18, 2009]
+ * Last changed in libpng 1.4.0 [May 20, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -618,7 +618,7 @@ png_write_image(png_structp png_ptr, png_bytepp image)
 
    png_debug(1, "in png_write_image");
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)
-   /* intialize interlace handling.  If image is not interlaced,
+   /* Initialize interlace handling.  If image is not interlaced,
     * this will set pass to 1
     */
    num_pass = png_set_interlace_handling(png_ptr);
