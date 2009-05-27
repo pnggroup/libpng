@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.37beta03 - May 20, 2009
+ libpng version 1.2.37rc01 - May 27, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.37beta03 - May 20, 2009
+ libpng versions 0.97, January 1998, through 1.2.37rc01 - May 27, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -2947,13 +2947,13 @@ when the Intel assembler code was removed due to a licensing issue.
 IX.  (Omitted)
 X. Y2K Compliance in libpng
 
-May 20, 2009
+May 27, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.37beta03 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.37rc01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

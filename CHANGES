@@ -2390,6 +2390,8 @@ version 1.2.37beta03 [May 20, 2009]
     accordingly.
   Reformated sources in libpng style (3-space indentation, comment format)
   
+version 1.2.37rc01 [May 27, 2009]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
