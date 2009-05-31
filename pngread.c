@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.37 [May 27, 2009]
+ * Last changed in libpng 1.2.37 [May 31, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -192,7 +192,8 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
    png_size_t png_struct_size, png_size_t png_info_size)
 {
    /* We only come here via pre-1.0.12-compiled applications */
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
 #if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
    if (png_sizeof(png_struct) > png_struct_size ||
       png_sizeof(png_info) > png_info_size)
@@ -246,7 +247,8 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
 
    png_structp png_ptr=*ptr_ptr;
 
-   if (png_ptr == NULL) return;
+   if (png_ptr == NULL)
+      return;
 
    do
    {

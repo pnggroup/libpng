@@ -2393,6 +2393,10 @@ version 1.2.37beta03 [May 20, 2009]
 version 1.2.37rc01 [May 27, 2009]
   No changes.
 
+version 1.2.37 [May 31, 2009]
+  Reformatted several remaining "else statement;" and "if () statment;" into
+    two lines.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
