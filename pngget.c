@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 [May 20, 2009]
+ * Last changed in libpng 1.4.0 [May 31, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -121,7 +121,8 @@ png_get_x_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
       if (info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
           return (0);
 
-      else return (info_ptr->x_pixels_per_unit);
+      else
+          return (info_ptr->x_pixels_per_unit);
    }
 #else
    return (0);
@@ -141,7 +142,8 @@ png_get_y_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
       if (info_ptr->phys_unit_type != PNG_RESOLUTION_METER)
           return (0);
 
-      else return (info_ptr->y_pixels_per_unit);
+      else
+          return (info_ptr->y_pixels_per_unit);
    }
 #else
    return (0);
@@ -162,7 +164,8 @@ png_get_pixels_per_meter(png_structp png_ptr, png_infop info_ptr)
          info_ptr->x_pixels_per_unit != info_ptr->y_pixels_per_unit)
           return (0);
 
-      else return (info_ptr->x_pixels_per_unit);
+      else
+          return (info_ptr->x_pixels_per_unit);
    }
 #else
    return (0);
@@ -206,7 +209,8 @@ png_get_x_offset_microns(png_structp png_ptr, png_infop info_ptr)
       if (info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
           return (0);
 
-      else return (info_ptr->x_offset);
+      else
+          return (info_ptr->x_offset);
    }
 #else
       return (0);
@@ -227,7 +231,8 @@ png_get_y_offset_microns(png_structp png_ptr, png_infop info_ptr)
       if (info_ptr->offset_unit_type != PNG_OFFSET_MICROMETER)
           return (0);
 
-      else return (info_ptr->y_offset);
+      else
+          return (info_ptr->y_offset);
    }
 #else
    return (0);
@@ -248,7 +253,8 @@ png_get_x_offset_pixels(png_structp png_ptr, png_infop info_ptr)
       if (info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
           return (0);
 
-      else return (info_ptr->x_offset);
+      else
+          return (info_ptr->x_offset);
    }
 #else
    return (0);
@@ -269,7 +275,8 @@ png_get_y_offset_pixels(png_structp png_ptr, png_infop info_ptr)
       if (info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
           return (0);
 
-      else return (info_ptr->y_offset);
+      else
+          return (info_ptr->y_offset);
    }
 #else
    return (0);

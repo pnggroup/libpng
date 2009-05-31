@@ -2143,9 +2143,10 @@ version 1.4.0beta61 [May 20, 2009]
     accordingly.
   More reformatting of comments, mostly to capitalize sentences.
 
-version 1.4.0beta62 [May 29, 2009]
+version 1.4.0beta62 [May 31, 2009]
   Added "#define PNG_NO_WRITE_SWAP" to contrib/pngminim/encoder/pngusr.h
     and "define PNG_NO_READ_SWAP" to decoder/pngusr.h and preader/pngusr.h
+  Reformatted several remaining "else statement" into two lines.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

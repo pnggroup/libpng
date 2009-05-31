@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [May 20, 2009]
+ * Last changed in libpng 1.4.0 [May 31, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -59,7 +59,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    if (png_ptr == NULL)
       return (NULL);
 
-   /* added at libpng-1.2.6 */
+   /* Added at libpng-1.2.6 */
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
    png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
@@ -133,7 +133,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (!png_cleanup_needed)
    {
-   /* initialize zbuf - compression buffer */
+   /* Initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    png_ptr->zbuf = (png_bytep)png_malloc_warn(png_ptr,
      png_ptr->zbuf_size);
@@ -403,7 +403,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 }
 #endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
-/* optional call to update the users info_ptr structure */
+/* Optional call to update the users info_ptr structure */
 void PNGAPI
 png_read_update_info(png_structp png_ptr, png_infop info_ptr)
 {
@@ -454,7 +454,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       png_read_start_row(png_ptr);
    if (png_ptr->row_number == 0 && png_ptr->pass == 0)
    {
-   /* check for transforms that have been set but were defined out */
+   /* Check for transforms that have been set but were defined out */
 #if defined(PNG_WRITE_INVERT_SUPPORTED) && !defined(PNG_READ_INVERT_SUPPORTED)
    if (png_ptr->transformations & PNG_INVERT_MONO)
       png_warning(png_ptr, "PNG_READ_INVERT_SUPPORTED is not defined");
@@ -486,7 +486,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    }
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED)
-   /* if interlaced and we do not need a new row, combine row and return */
+   /* If interlaced and we do not need a new row, combine row and return */
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
    {
       switch (png_ptr->pass)
@@ -632,12 +632,12 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       png_do_read_transformations(png_ptr);
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED)
-   /* blow up interlaced rows to full size */
+   /* Blow up interlaced rows to full size */
    if (png_ptr->interlaced &&
       (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
-         /* old interface (pre-1.0.9):
+         /* Old interface (pre-1.0.9):
           * png_do_read_interlace(&(png_ptr->row_info),
           *    png_ptr->row_buf + 1, png_ptr->pass, png_ptr->transformations);
           */
@@ -954,7 +954,7 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 }
 #endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
 
-/* free all memory used by the read */
+/* Free all memory used by the read */
 void PNGAPI
 png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    png_infopp end_info_ptr_ptr)
@@ -1026,7 +1026,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    }
 }
 
-/* free all memory used by the read (old method) */
+/* Free all memory used by the read (old method) */
 void /* PRIVATE */
 png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr)
 {
@@ -1193,7 +1193,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL)
       return;
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
-   /* invert the alpha channel from opacity to transparency
+   /* Invert the alpha channel from opacity to transparency
     */
    if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
        png_set_invert_alpha(png_ptr);
@@ -1256,7 +1256,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
     */
 
 #if defined(PNG_READ_INVERT_SUPPORTED)
-   /* invert monochrome files to have 0 as white and 1 as black
+   /* Invert monochrome files to have 0 as white and 1 as black
     */
    if (transforms & PNG_TRANSFORM_INVERT_MONO)
       png_set_invert_mono(png_ptr);
@@ -1278,21 +1278,21 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #if defined(PNG_READ_BGR_SUPPORTED)
-   /* flip the RGB pixels to BGR (or RGBA to BGRA)
+   /* Flip the RGB pixels to BGR (or RGBA to BGRA)
     */
    if (transforms & PNG_TRANSFORM_BGR)
       png_set_bgr(png_ptr);
 #endif
 
 #if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
-   /* swap the RGBA or GA data to ARGB or AG (or BGRA to ABGR)
+   /* Swap the RGBA or GA data to ARGB or AG (or BGRA to ABGR)
     */
    if (transforms & PNG_TRANSFORM_SWAP_ALPHA)
        png_set_swap_alpha(png_ptr);
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED)
-   /* swap bytes of 16 bit files to least significant byte first
+   /* Swap bytes of 16 bit files to least significant byte first
     */
    if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
       png_set_swap(png_ptr);
@@ -1336,7 +1336,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* Read rest of file, and get additional chunks in info_ptr - REQUIRED */
    png_read_end(png_ptr, info_ptr);
 
-   transforms = transforms; /* quiet compiler warnings */
+   transforms = transforms; /* Quiet compiler warnings */
    params = params;
 
 }
