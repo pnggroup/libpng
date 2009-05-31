@@ -156,7 +156,11 @@
 
 Change log:
 
-Version 1.6.18 (built with libpng-1.2.36 and zlib-1.2.3.2)
+Version 1.6.18 (built with libpng-1.2.37rc01 and zlib-1.2.3.2)
+  Removed extra FCLOSE(fpin) and FCLOSE(fpout) in the first Catch{} block,
+    since they get removed anyway right after that (hanno boeck).
+  Define PNG_NO_READ|WRITE_cHRM and PNG_NO_READ_|WRITEiCCP in pngcrush.h
+    and reordered pngcrush.h
 
 Version 1.6.17 (built with libpng-1.2.36 and zlib-1.2.3.2)
   Defined TOO_FAR == 32767 in deflate.c (again).  The definition
@@ -931,7 +935,9 @@ static PNG_CONST char *extension = "_C" DOT "png";
 static png_uint_32 width, height;
 static png_uint_32 measured_idat_length;
 static int found_gAMA = 0;
+#ifdef PNG_cHRM_SUPPORTED
 static int found_cHRM = 0;
+#endif
 static int found_CgBI = 0;
 static int found_any_chunk = 0;
 static int image_is_immutable = 0;
@@ -5013,12 +5019,10 @@ int main(int argc, char *argv[])
                     png_destroy_info_struct(write_ptr,
                                             &write_end_info_ptr);
                     png_destroy_write_struct(&write_ptr, &write_info_ptr);
-                    FCLOSE(fpout);
                     setfiletype(outname);
                 }
                 png_destroy_read_struct(&read_ptr, &read_info_ptr,
                                         &end_info_ptr);
-                FCLOSE(fpin);
                 if (verbose > 1)
                     fprintf(stderr, "returning after cleanup\n");
                 trial = MAX_METHODS + 1;

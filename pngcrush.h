@@ -10,12 +10,6 @@
 #include <malloc.h>
 */
 
-#define PNG_NO_ASSEMBLER_CODE
-
-#define PNG_NO_ERROR_NUMBERS
-
-#define PNG_NO_CHECK_cHRM
-
 #ifndef PNG_NO_ZALLOC_ZERO
 #  define PNG_NO_ZALLOC_ZERO  /* speeds it up a little */
 #endif
@@ -39,31 +33,24 @@
 #define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #endif
 
-#define PNG_NO_READ_hIST
-#define PNG_NO_WRITE_hIST
-#define PNG_NO_READ_pCAL
-#define PNG_NO_WRITE_pCAL
-#define PNG_NO_READ_sCAL
-#define PNG_NO_WRITE_sCAL
-#define PNG_NO_READ_sPLT
-#define PNG_NO_WRITE_sPLT
-#define PNG_NO_READ_tIME
-#define PNG_NO_WRITE_tIME
-
-#define PNG_NO_INFO_IMAGE
-#define PNG_EASY_ACCESS
+# define PNG_NO_READ_cHRM
+# define PNG_NO_READ_hIST
+# define PNG_NO_READ_iCCP
+# define PNG_NO_READ_pCAL
+# define PNG_NO_READ_sCAL
+# define PNG_NO_READ_sPLT
+# define PNG_NO_READ_tIME
+#define PNG_NO_ASSEMBLER_CODE
+#define PNG_NO_CHECK_cHRM
+#define PNG_NO_READ_BGR
 #define PNG_NO_READ_DITHER
 #define PNG_NO_READ_EMPTY_PLTE
-#define PNG_NO_WRITE_TRANSFORMS
 #define PNG_NO_PROGRESSIVE_READ
-#define PNG_NO_WRITE_WEIGHTED_FILTER
 #define PNG_NO_READ_COMPOSITED_NODIV
-#define PNG_NO_READ_PREMULTIPLY_ALPHA
-#define PNG_NO_READ_SWAP_ALPHA
 #define PNG_NO_READ_INVERT_ALPHA
-#define PNG_NO_READ_BGR
+#define PNG_NO_READ_PREMULTIPLY_ALPHA
 #define PNG_NO_READ_SWAP
-
+#define PNG_NO_READ_SWAP_ALPHA
 #define PNG_READ_USER_TRANSFORM_SUPPORTED
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
 #define PNG_READ_EXPAND_SUPPORTED
@@ -71,8 +58,21 @@
 #define PNG_READ_PACK_SUPPORTED
 #define PNG_READ_SHIFT_SUPPORTED
 
+# define PNG_NO_WRITE_cHRM
+# define PNG_NO_WRITE_hIST
+# define PNG_NO_WRITE_iCCP
+# define PNG_NO_WRITE_pCAL
+# define PNG_NO_WRITE_sCAL
+# define PNG_NO_WRITE_sPLT
+# define PNG_NO_WRITE_tIME
+#define PNG_NO_WRITE_TRANSFORMS
 #define PNG_WRITE_PACK_SUPPORTED
 #define PNG_WRITE_SHIFT_SUPPORTED
+#define PNG_NO_WRITE_WEIGHTED_FILTER
+
+#define PNG_NO_ERROR_NUMBERS
+#define PNG_NO_INFO_IMAGE
+#define PNG_EASY_ACCESS
 
 #if (PNGCRUSH_LIBPNG_VER > 10002)
 /* versions 0.96 through 1.0.2 have a stub png_rgb_to_gray() with the
