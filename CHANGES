@@ -2393,9 +2393,13 @@ version 1.2.37beta03 [May 20, 2009]
 version 1.2.37rc01 [May 27, 2009]
   No changes.
 
-version 1.2.37 [May 31, 2009]
+version 1.2.37 [June 2, 2009]
   Reformatted several remaining "else statement;" and "if () statment;" into
     two lines.
+  Added "#define PNG_NO_WRITE_SWAP" to contrib/pngminim/encoder/pngusr.h
+    and "define PNG_NO_READ_SWAP" to decoder/pngusr.h and preader/pngusr.h
+  Added sections about the git repository and our coding style to the
+    documentation (merged from libpng-1.4.0beta62)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
