@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta62 - May 31, 2009
+ libpng version 1.4.0beta62 - June 2, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.0beta62 - May 31, 2009
+ libpng versions 0.97, January 1998, through 1.4.0beta62 - June 2, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -1839,6 +1839,9 @@ other png_set_*() functions, which might require access to some of
 the IHDR settings.  The remaining png_set_*() functions can be called
 in any order.
 
+If you wish, you can reset the compression_type, interlace_type,
+or filter_method later.
+
     png_set_PLTE(png_ptr, info_ptr, palette,
        num_palette);
     palette        - the palette for the file
@@ -3044,7 +3047,14 @@ The png_calloc() function was added.
 We removed the trailing '.' from the warning and error messages.
 
 
-X. Source code repository
+X. Detecting libpng
+
+The png_get_io_ptr() function has been present since libpng-0.88, has never
+changed, and is unaffected by conditional compilation macros.  It is the
+best choice for use in configure scripts for detecting the presence of any
+libpng version since 0.88.
+
+XI. Source code repository
 
 Since about February 2009, version 1.2.34, libpng has been under "git" source
 control.  The git repository was built from old libpng-x.y.z.tar.gz files
@@ -3063,7 +3073,7 @@ the libpng bug tracker at
 
     http://libpng.sourceforge.net
 
-XI. Coding style
+XII. Coding style
 
 Our coding style is similar to the "Allman" style, with curly
 braces on separate lines:
@@ -3149,9 +3159,9 @@ left parenthesis that follows it:
 Other rules can be inferred by inspecting the libpng
 source.
 
-XII. Y2K Compliance in libpng
+XIII. Y2K Compliance in libpng
 
-May 31, 2009
+June 2, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
