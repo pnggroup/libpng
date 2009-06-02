@@ -1,5 +1,5 @@
 
-Libpng 1.2.37 - May 31, 2009
+Libpng 1.2.37 - June 2, 2009
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -42,7 +42,7 @@ Other information:
 
 Changes since the last public release (1.2.36):
 
-version 1.2.37 [May 31, 2009]
+version 1.2.37 [June 2, 2009]
 
   Fixed inconsistency in pngrutil.c, introduced in libpng-1.2.36.  The
     memset() was using "png_ptr->rowbytes" instead of "row_bytes", which
@@ -59,6 +59,10 @@ version 1.2.37 [May 31, 2009]
     is only one makefile in those directories, and revised the README files
     accordingly.
   Reformated sources in libpng style (3-space indentation, comment format)
+  Added sections about the git repository and our coding style to the
+    documentation (merged from libpng-1.4.0beta62)
+  Added a section about using png_get_io_ptr() in configure scripts to detect
+    the presence of libpng.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit 

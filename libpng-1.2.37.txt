@@ -2946,7 +2946,14 @@ when the Intel assembler code was removed due to a licensing issue.
 
 IX.  (Omitted)
 
-X. Source code repository
+X. Detecting libpng
+
+The png_get_io_ptr() function has been present since libpng-0.88, has never
+changed, and is unaffected by conditional compilation macros.  It is the
+best choice for use in configure scripts for detecting the presence of any
+libpng version since 0.88.
+
+XI. Source code repository
 
 Since about February 2009, version 1.2.34, libpng has been under "git" source
 control.  The git repository was built from old libpng-x.y.z.tar.gz files
@@ -2965,7 +2972,7 @@ the libpng bug tracker at
 
     http://libpng.sourceforge.net
 
-XI. Coding style
+XII. Coding style
 
 Our coding style is similar to the "Allman" style, with curly
 braces on separate lines:
@@ -3051,7 +3058,7 @@ left parenthesis that follows it:
 Other rules can be inferred by inspecting the libpng
 source.
 
-XII. Y2K Compliance in libpng
+XIII. Y2K Compliance in libpng
 
 June 2, 2009
 

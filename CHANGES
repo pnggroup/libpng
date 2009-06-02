@@ -2400,6 +2400,8 @@ version 1.2.37 [June 2, 2009]
     and "define PNG_NO_READ_SWAP" to decoder/pngusr.h and preader/pngusr.h
   Added sections about the git repository and our coding style to the
     documentation (merged from libpng-1.4.0beta62)
+  Added a section about using png_get_io_ptr() in configure scripts to detect
+    the presence of libpng.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
