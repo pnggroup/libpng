@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.2.37 [May 27, 2009]
+ * Last changed in libpng 1.2.37 [June 4, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -254,7 +254,8 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
                 zero_samples++;
           if (row_info->bit_depth == 16)
           {
-             if ((*dp | *(dp+1)) == 0) zero_samples++;
+             if ((*dp | *(dp+1)) == 0)
+                zero_samples++;
              dp+=2;
           }
        }
@@ -275,7 +276,8 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
                    zero_samples++;
              if (row_info->bit_depth == 16)
              {
-                if ((*dp | *(dp+1)) == 0) zero_samples++;
+                if ((*dp | *(dp+1)) == 0)
+                   zero_samples++;
                 dp+=2;
              }
           }
@@ -1684,4 +1686,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_37rc01 your_png_h_is_not_version_1_2_37rc01;
+typedef version_1_2_37 your_png_h_is_not_version_1_2_37;
