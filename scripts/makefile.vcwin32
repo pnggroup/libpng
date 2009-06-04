@@ -1,17 +1,19 @@
 # makefile for libpng
 # Copyright (C) 1998 Tim Wegner
+# Copyright (C) 2006,2009 Glenn Randers-Pehrson
 # For conditions of distribution and use, see copyright notice in png.h
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
 # To use, do "nmake /f scripts\makefile.vcwin32"
 
 # -------- Microsoft Visual C++ 2.0 and later, no assembler code --------
-# If you want to use assembler (MMX) code, use makefile.vcawin32 instead.
+%12-%# If you want to use assembler (MMX) code, use makefile.vcawin32 instead.
 
 # Compiler, linker, librarian, and other tools
 CC = cl
 LD = link
 AR = lib
-CFLAGS  = -nologo -DPNG_NO_MMX_CODE -MD -O2 -W3 -I..\zlib
+%12-%CFLAGS  = -nologo -DPNG_NO_MMX_CODE -MD -O2 -W3 -I..\zlib
+%14+%CFLAGS  = -nologo -MD -O2 -W3 -I..\zlib
 LDFLAGS = -nologo
 ARFLAGS = -nologo
 RM = del
@@ -64,9 +66,6 @@ pngrio$(O): png.h pngconf.h
 pngwio$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
-pngtest$(O): png.h pngconf.h
-	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
-
 pngtrans$(O): png.h pngconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
@@ -82,6 +81,9 @@ pngwutil$(O): png.h pngconf.h
 libpng.lib: $(OBJS)
 	-$(RM) $@
 	$(AR) $(ARFLAGS) -out:$@ $(OBJS) $(ERRFILE)
+
+pngtest$(O): png.h pngconf.h
+	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngtest.exe: pngtest$(O) libpng.lib
 	$(LD) $(LDFLAGS) -out:$@ pngtest$(O) libpng.lib ..\zlib\zlib.lib $(ERRFILE)

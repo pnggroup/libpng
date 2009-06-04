@@ -55,8 +55,6 @@ $  then
 $   dele pngtest.obj;*
 $   CALL MAKE png.OBJ "cc ''CCOPT' png" -
 	png.c png.h pngconf.h
-$   CALL MAKE pngpread.OBJ "cc ''CCOPT' pngpread" -
-					 pngpread.c png.h pngconf.h
 $   CALL MAKE pngset.OBJ "cc ''CCOPT' pngset" -
 	pngset.c png.h pngconf.h
 $   CALL MAKE pngget.OBJ "cc ''CCOPT' pngget" -
@@ -64,7 +62,7 @@ $   CALL MAKE pngget.OBJ "cc ''CCOPT' pngget" -
 $   CALL MAKE pngread.OBJ "cc ''CCOPT' pngread" -
 	pngread.c png.h pngconf.h
 $   CALL MAKE pngpread.OBJ "cc ''CCOPT' pngpread" -
-					 pngpread.c png.h pngconf.h
+	pngpread.c png.h pngconf.h
 $   CALL MAKE pngrtran.OBJ "cc ''CCOPT' pngrtran" -
 	pngrtran.c png.h pngconf.h
 $   CALL MAKE pngrutil.OBJ "cc ''CCOPT' pngrutil" -
