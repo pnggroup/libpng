@@ -2403,6 +2403,8 @@ versions 1.2.37 and 1.0.45 [June 4, 2009]
   Added a section about using png_get_io_ptr() in configure scripts to detect
     the presence of libpng.
 
+versions 1.2.38 [June 5, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
