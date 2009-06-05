@@ -1,166 +1,9 @@
-/*
- * pngcrush.c - recompresses png files
- * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson
- *                                   (glennrp at users.sf.net)
- * Copyright (C) 2005      Greg Roelofs
- *
- * The most recent version of pngcrush can be found at SourceForge in
- * http://pmt.sf.net/pngcrush/
- *
- * This program reads in a PNG image, and writes it out again, with the
- * optimum filter_method and zlib_level.  It uses brute force (trying
- * filter_method none, and libpng adaptive filtering, with compression
- * levels 3 and 9).  It does the most time-consuming method last in case
- * it turns out to be the best.
- *
- * Optionally, it can remove unwanted chunks or add gAMA, sRGB, bKGD,
- * tEXt/zTXt, and tRNS chunks.  It will remove some chunks such as gAMA,
- * cHRM, pHYs, and oFFs when their data fields contain all zero, which is a
- * mistake.
- *
- * Uses libpng and zlib.  This program was based upon libpng's pngtest.c.
- *
- * Thanks to Greg Roelofs for various bug fixes, suggestions, and
- * occasionally creating Linux executables.
- *
- * Thanks to Stephan Levavej for some helpful suggestions about gcc compiler
- * options and for a suggestion to increase the Z_MEM_LEVEL from default.
- *
- * Caution: there is another version of pngcrush that has been distributed by
- * Apple since mid-2008 as a part of the Xcode SDK.   Although it claims
- * to be pngcrush by Glenn Randers-Pehrson, it has additional options
- * "-iPhone" * and "-speed".  It writes files that have the PNG 8-byte signature
- * but are not valid PNG files, due to at least
- *
- *   o the presence of the CgBI chunk ahead of the IHDR chunk,
- *   o nonstandard deflate compression in IDAT, iCCP, and perhaps zTXt chunks,
- *   o the use of premultiplied alpha in color_type 6 files, and
- *   o the sample order is ARGB instead of RGBA in color_type 6 files.
- *
- * The original PNG file cannot be losslessly recovered from such files
- * because of the use of premultiplied alpha.
- *
- * Most PNG decoders will recognize the fact that an unknown critical
- * chunk "CgBI" is present and will immediately reject the file.
- *
- * It is said that the Xcode version of pngcrush is automatically applied
- * when PNG files are prepared for downloading to the iPhone unless the
- * user takes special measures to prevent it.
- *
- * I have not seen the source for the Xcode version of pngcrush.  All I
- * know, for now, is from running "strings -a" on a copy of the executable,
- * looking at two Xcode-PNG files, and reading Apple's patent application
- * <http://www.freepatentsonline.com/y2008/0177769.html>.
- *
- */
-
-#define PNGCRUSH_VERSION "1.6.18"
-
-/*
-#define PNGCRUSH_COUNT_COLORS
-*/
-
-/*
- * NOTICES
- *
- * If you have modified this source, you may insert additional notices
- * immediately after this sentence.
- *
- * COPYRIGHT:
- *
- * Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson
- *                                   (glennrp at users.sf.net)
- * Copyright (C) 2005      Greg Roelofs
- *
- * DISCLAIMERS:
- *
- * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
- * warranties, expressed or implied, including, without limitation, the
- * warranties of merchantability and of fitness for any purpose.  The
- * Author assumes no liability for direct, indirect, incidental, special,
- * exemplary, or consequential damages, which may result from the use of
- * the computer program, even if advised of the possibility of such damage.
- * There is no warranty against interference with your enjoyment of the
- * computer program or against infringement.  There is no warranty that my
- * efforts or the computer program will fulfill any of your particular purposes
- * or needs.  This computer program is provided with all faults, and the entire
- * risk of satisfactory quality, performance, accuracy, and effort is with
- * the user.
- *
- * LICENSE:
- *
- * Permission is hereby irrevocably granted to everyone to use, copy, modify,
- * and distribute this source code, or portions hereof, or executable programs
- * compiled from it, for any purpose, without payment of any fee, subject to
- * the following restrictions:
- *
- * 1. The origin of this source code must not be misrepresented.
- *
- * 2. Altered versions must be plainly marked as such and must not be
- *    misrepresented as being the original source.
- *
- * 3. This Copyright notice, disclaimer, and license may not be removed
- *    or altered from any source or altered source distribution.
- */
-
-/* To do:
- *
- *   Reset CINFO to reflect decoder's required window size (instead of
- *   libz-1.1.3 encoder's required window size, which is 262 bytes larger).
- *   See discussion about zlib in png-list archives for April 2001.
- *
- *   Add a "pcRu" ancillary chunk that keeps track of the best method,
- *   methods already tried, and whether "loco crushing" was effective.
- *
- *   Try both transformed and untransformed colors when "-loco" is used.
- *
- *   Check for unused alpha channel and ok-to-reduce-depth.
- *   Take care that sBIT and bKGD data aren't lost when reducing images
- *   from truecolor to grayscale.
- *
- *   Rearrange palette to put most-used color first and transparent color
- *   second (see ImageMagick 5.1.1 and later).
- *
- *   Finish pplt (partial palette) feature.
- *
- *   Allow in-place file replacement or as a filter, as in
- *    "pngcrush -overwrite file.png"
- *    "pngcreator | pngcrush > output.png"
- *
- *   Use an alternate write function for the trial passes, that
- *   simply counts bytes rather than actually writing to a file, to save wear
- *   and tear on disk drives.
- *
- *   Remove text-handling and color-handling features and put
- *   those in a separate program or programs, to avoid unnecessary
- *   recompressing.
- *
- *   Move the Photoshop-fixing stuff into a separate program.
- *
- *   GRR: More generally (superset of previous 3 items):  split into separate
- *   "edit" and "crush" programs (or functions).  Former is fully libpng-
- *   aware, much like current pngcrush; latter makes little or no use of
- *   libpng (maybe IDAT-compression parts only?), instead handling virtually
- *   all chunks as opaque binary blocks that are copied to output file _once_,
- *   with IDATs alone replaced (either by best in-memory result or by original
- *   _data_ resplit into bigger IDATs, if pngcrush can't match/beat).  "edit"
- *   version should be similar to current code but more efficient:  make
- *   _one_ pass through args list, creating table of PNG_UINTs for removal;
- *   then make initial pass through PNG image, creating (in-order) table of
- *   all chunks (and byte offsets?) and marking each as "keep" or "remove"
- *   according to args table.  Can start with static table of ~20-30 slots,
- *   then double size & copy if run out of room:  still O(n) algorithm.
- */
-
-#if 0 /* changelog */
-
+<html><head><title>Pncrush ChangeLog</title></head>
+<body>
+<pre>
 Change log:
 
-Version 1.6.18 (built with libpng-1.2.37 and zlib-1.2.3.2)
-  Removed extra FCLOSE(fpin) and FCLOSE(fpout) in the first Catch{} block,
-    since they get removed anyway right after that (hanno boeck).
-  Define PNG_NO_READ|WRITE_cHRM and PNG_NO_READ_|WRITEiCCP in pngcrush.h
-    and reordered pngcrush.h
+Version 1.6.18 (built with libpng-1.2.37rc01 and zlib-1.2.3.2)
 
 Version 1.6.17 (built with libpng-1.2.36 and zlib-1.2.3.2)
   Defined TOO_FAR == 32767 in deflate.c (again).  The definition
@@ -935,9 +778,7 @@ static PNG_CONST char *extension = "_C" DOT "png";
 static png_uint_32 width, height;
 static png_uint_32 measured_idat_length;
 static int found_gAMA = 0;
-#ifdef PNG_cHRM_SUPPORTED
 static int found_cHRM = 0;
-#endif
 static int found_CgBI = 0;
 static int found_any_chunk = 0;
 static int image_is_immutable = 0;
@@ -5019,10 +4860,12 @@ int main(int argc, char *argv[])
                     png_destroy_info_struct(write_ptr,
                                             &write_end_info_ptr);
                     png_destroy_write_struct(&write_ptr, &write_info_ptr);
+                    FCLOSE(fpout);
                     setfiletype(outname);
                 }
                 png_destroy_read_struct(&read_ptr, &read_info_ptr,
                                         &end_info_ptr);
+                FCLOSE(fpin);
                 if (verbose > 1)
                     fprintf(stderr, "returning after cleanup\n");
                 trial = MAX_METHODS + 1;
@@ -6539,3 +6382,5 @@ void print_usage(int retval)
 
     exit(retval);
 }
+</pre>
+</body></html>
