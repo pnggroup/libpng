@@ -2150,6 +2150,8 @@ version 1.4.0beta62 [June 2, 2009]
   Added a section about using png_get_io_ptr() in configure scripts to detect
     the presence of libpng.
 
+version 1.4.0beta63 [June 5, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

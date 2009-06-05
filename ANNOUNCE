@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta62 - June 2, 2009
+Libpng 1.4.0beta63 - June 5, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta62.tar.gz
-   1.4.0beta62.tar.bz2
+   1.4.0beta63.tar.gz
+   1.4.0beta63.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta62-no-config.tar.gz
-   1.4.0beta62-no-config.tar.bz2
+   1.4.0beta63-no-config.tar.gz
+   1.4.0beta63-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b62.zip
-   lp140b62.tar.bz2
+   lp140b63.zip
+   lp140b63.tar.bz2
 
 Other information:
 
-   1.4.0beta62-README.txt
-   1.4.0beta62-KNOWNBUGS.txt
-   1.4.0beta62-LICENSE.txt
-   1.4.0beta62-Y2K-compliance.txt
+   1.4.0beta63-README.txt
+   1.4.0beta63-KNOWNBUGS.txt
+   1.4.0beta63-LICENSE.txt
+   1.4.0beta63-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -472,6 +472,8 @@ version 1.4.0beta62 [June 2, 2009]
   Reformatted several remaining "else statement" into two lines.
   Added a section about using png_get_io_ptr() in configure scripts to detect
     the presence of libpng.
+
+version 1.4.0beta63 [June 5, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
