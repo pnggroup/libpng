@@ -54,7 +54,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.18"
+#define PNGCRUSH_VERSION "1.6.19"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -155,6 +155,9 @@
 #if 0 /* changelog */
 
 Change log:
+
+Version 1.6.19 (built with libpng-1.2.37 and zlib-1.2.3.2)
+  Added missing braces that cause an incorrect png_error() to be issued.
 
 Version 1.6.18 (built with libpng-1.2.37 and zlib-1.2.3.2)
   Removed extra FCLOSE(fpin) and FCLOSE(fpout) in the first Catch{} block,
@@ -4517,11 +4520,12 @@ int main(int argc, char *argv[])
                     png_crush_pause();
 
                     if (found_CgBI)
+                    {
                         png_warning(read_ptr,
                             "Cannot read Xcode CgBI PNG. Even if we could,");
                         png_error(read_ptr,
                             "the original PNG could not be recovered.");
-
+                    }
                     P1( "\nWriting info struct\n");
 
 #if 0 /* doesn't work; compression level has to be the same as in IDAT */
