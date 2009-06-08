@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.38beta01 - June 5, 2009
+ libpng version 1.2.38beta01 - June 8, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -9,7 +9,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.38beta01 - June 5, 2009
+ libpng versions 0.97, January 1998, through 1.2.38beta01 - June 8, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -1817,6 +1817,10 @@ other png_set_*() functions, which might require access to some of
 the IHDR settings.  The remaining png_set_*() functions can be called
 in any order.
 
+If you wish, you can reset the compression_type, interlace_type, or
+filter_method later by calling png_set_IHDR() again; if you do this, the
+width, height, bit_depth, and color_type must be the same in each call.
+
     png_set_PLTE(png_ptr, info_ptr, palette,
        num_palette);
     palette        - the palette for the file
@@ -1878,8 +1882,9 @@ in any order.
        trans_values);
     trans          - array of transparent entries for
                      palette (PNG_INFO_tRNS)
-    trans_values   - graylevel or color sample values of
-                     the single transparent color for
+    trans_values   - graylevel or color sample values
+                     (in order red, green, blue) of the
+                     single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
     num_trans      - number of transparent entries
                      (PNG_INFO_tRNS)
@@ -3016,7 +3021,7 @@ We don't use C++ style ("//") comments. We have, however,
 used them in the past in some now-abandoned MMX assembler
 code.
 
-Functions and their curly brackets are not indented, and
+Functions and their curly braces are not indented, and
 exported functions are marked with PNGAPI:
 
  /* This is a public function that is visible to
@@ -3060,7 +3065,7 @@ source.
 
 XIII. Y2K Compliance in libpng
 
-June 5, 2009
+June 8, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
