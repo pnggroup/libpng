@@ -1180,7 +1180,7 @@ version 1.2.4beta3 [June 28, 2002]
   Plugged memory leak of row_buf in pngtest.c when there is a png_error().
   Detect buffer overflow in pngpread.c when IDAT is corrupted with extra data.
   Added "test-installed" target to makefile.32sunu, makefile.64sunu,
-    makefile.beos, makefile.darwin, makefile.dec, makefile.macosx, 
+    makefile.beos, makefile.darwin, makefile.dec, makefile.macosx,
     makefile.solaris, makefile.hpux, makefile.hpgcc, and makefile.so9.
 version 1.2.4rc1 and 1.0.14rc1 [July 2, 2002]
   Added "test-installed" target to makefile.cygwin and makefile.sco.
@@ -1388,7 +1388,7 @@ version 1.2.8beta5 [November 20, 2004]
   Use png_ptr->flags instead of png_ptr->transformations to pass
     PNG_STRIP_ALPHA info to png_do_strip_filler(), to preserve ABI
     compatibility.
-  Revised handling of SPECIALBUILD, PRIVATEBUILD, 
+  Revised handling of SPECIALBUILD, PRIVATEBUILD,
     PNG_LIBPNG_BUILD_SPECIAL_STRING and PNG_LIBPNG_BUILD_PRIVATE_STRING.
 version 1.2.8rc1 [November 24, 2004]
   Moved handling of BUILD macros from pngconf.h to png.h
@@ -1686,14 +1686,14 @@ version 1.2.16beta1 [January 6, 2007]
 
 version 1.2.16beta2 [January 16, 2007]
   Revised scripts/CMakeLists.txt
- 
+
 version 1.2.16 [January 31, 2007]
   No changes.
- 
+
 version 1.2.17beta1 [March 6, 2007]
   Revised scripts/CMakeLists.txt to install both shared and static libraries.
   Deleted a redundant line from pngset.c.
- 
+
 version 1.2.17beta2 [April 26, 2007]
   Relocated misplaced test for png_ptr == NULL in pngpread.c
   Change "==" to "&" for testing PNG_RGB_TO_GRAY_ERR & PNG_RGB_TO_GRAY_WARN
@@ -1714,7 +1714,7 @@ version 1.2.17rc2 [May 8, 2007]
   Added png_ptr->unknown_chunk to hold working unknown chunk data, so it
     can be free'ed in case of error.  Revised unknown chunk handling in
     pngrutil.c and pngpread.c to use this structure.
- 
+
 version 1.2.17rc3 [May 8, 2007]
   Revised symbol-handling in configure script.
 
@@ -2147,10 +2147,13 @@ version 1.4.0beta62 [June 2, 2009]
   Added "#define PNG_NO_WRITE_SWAP" to contrib/pngminim/encoder/pngusr.h
     and "define PNG_NO_READ_SWAP" to decoder/pngusr.h and preader/pngusr.h
   Reformatted several remaining "else statement" into two lines.
-  Added a section about using png_get_io_ptr() in configure scripts to detect
-    the presence of libpng.
+  Added a section to the libpng documentation about using png_get_io_ptr()
+    in configure scripts to detect the presence of libpng.
 
-version 1.4.0beta63 [June 5, 2009]
+version 1.4.0beta63 [June 8, 2009]
+  Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
+    multiple times and to specify the sample order in the tRNS chunk,
+    because the ISO PNG specification has a typo in the tRNS table.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
