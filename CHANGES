@@ -2150,10 +2150,13 @@ version 1.4.0beta62 [June 2, 2009]
   Added a section to the libpng documentation about using png_get_io_ptr()
     in configure scripts to detect the presence of libpng.
 
-version 1.4.0beta63 [June 8, 2009]
+version 1.4.0beta63 [June 12, 2009]
   Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
     multiple times and to specify the sample order in the tRNS chunk,
     because the ISO PNG specification has a typo in the tRNS table.
+  Changed several PNG_UNKNOWN_CHUNK_SUPPORTED to
+    PNG_HANDLE_AS_UNKNOWN_SUPPORTED, to make the png_set_keep mechanism
+    available for ignoring known chunks even when not saving unknown chunks.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 [June 5, 2009]
+ * Last changed in libpng 1.4.0 [June 12, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1118,7 +1118,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_debug(1, "in png_handle_sPLT");
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   
+
    if (png_ptr->user_chunk_cache_max != 0)
    {
       if (png_ptr->user_chunk_cache_max == 1)
@@ -2316,7 +2316,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if (!(png_ptr->chunk_name[0] & 0x20))
    {
-#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
       if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
            PNG_HANDLE_CHUNK_ALWAYS
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
@@ -2328,8 +2328,11 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
-   if ((png_ptr->flags & PNG_FLAG_KEEP_UNKNOWN_CHUNKS) ||
-       (png_ptr->read_user_chunk_fn != NULL))
+   if ((png_ptr->flags & PNG_FLAG_KEEP_UNKNOWN_CHUNKS)
+#if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+       || (png_ptr->read_user_chunk_fn != NULL)
+#endif
+        )
    {
 #ifdef PNG_MAX_MALLOC_64K
        if (length > (png_uint_32)65535L)
@@ -2340,7 +2343,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        }
 #endif
        png_memcpy((png_charp)png_ptr->unknown_chunk.name,
-                  (png_charp)png_ptr->chunk_name, 
+                  (png_charp)png_ptr->chunk_name,
                   png_sizeof(png_ptr->unknown_chunk.name));
        png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name)-1] = '\0';
        png_ptr->unknown_chunk.size = (png_size_t)length;
@@ -2363,8 +2366,10 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           if (ret == 0)
           {
              if (!(png_ptr->chunk_name[0] & 0x20))
+#if defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
                 if (png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
                      PNG_HANDLE_CHUNK_ALWAYS)
+#endif
                    png_chunk_error(png_ptr, "unknown critical chunk");
              png_set_unknown_chunks(png_ptr, info_ptr,
                &png_ptr->unknown_chunk, 1);
