@@ -710,7 +710,8 @@ typedef struct png_time_struct
 typedef png_time FAR * png_timep;
 typedef png_time FAR * FAR * png_timepp;
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED) || \
+ defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
 /* png_unknown_chunk is a structure to hold queued chunks for which there is
  * no specific support.  The idea is that we can use this to queue
  * up private chunks for output even though the library doesn't actually
@@ -945,7 +946,8 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
 #endif
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED) || \
+ defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
    /* Storage for unknown chunks that the library doesn't recognize. */
    png_unknown_chunkp unknown_chunks;
    png_size_t unknown_chunks_num;
