@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 [June 5, 2009]
+ * Last changed in libpng 1.4.0 [June 16, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -894,7 +894,7 @@ png_get_chunk_cache_max (png_structp png_ptr)
        png_ptr->user_chunk_cache_max - 1 : 0);
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
- 
+
 #ifdef PNG_IO_STATE_SUPPORTED
 png_uint_32 PNGAPI
 png_get_io_state (png_structp png_ptr)

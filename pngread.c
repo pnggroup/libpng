@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [June 5, 2009]
+ * Last changed in libpng 1.4.0 [June 16, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -94,7 +94,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
     }
     else
          png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-   
+
 
     if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
     {

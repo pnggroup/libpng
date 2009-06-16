@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [June 5, 2009]
+ * Last changed in libpng 1.4.0 [June 16, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1014,7 +1014,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
 #endif
    {
       /* Each value is saved in 1/100,000ths */
-    
+
       png_save_uint_32(buf, int_white_x);
       png_save_uint_32(buf + 4, int_white_y);
 
