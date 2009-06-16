@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.38beta01 - June 5, 2009
+ * libpng version 1.2.38beta01 - June 12, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -8,7 +8,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.38beta01 - June 5, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.38beta01 - June 12, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -260,7 +260,7 @@
  * If you modify libpng you may insert additional notices immediately following
  * this sentence.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.2.38beta01, June 5, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.2.38beta01, June 12, 2009, are
  * Copyright (c) 2004, 2006-2009 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -372,7 +372,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    June 5, 2009
+ *    June 12, 2009
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -436,7 +436,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.2.38beta01"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.38beta01 - June 5, 2009\n"
+   " libpng version 1.2.38beta01 - June 12, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  13
@@ -456,7 +456,7 @@
 #define PNG_LIBPNG_BUILD_RC       3
 #define PNG_LIBPNG_BUILD_STABLE   4
 #define PNG_LIBPNG_BUILD_RELEASE_STATUS_MASK 7
-  
+
 /* Release-Specific Flags */
 #define PNG_LIBPNG_BUILD_PATCH    8 /* Can be OR'ed with
                                        PNG_LIBPNG_BUILD_STABLE only */
@@ -487,12 +487,12 @@
 /* Ref MSDN: Private as priority over Special
  * VS_FF_PRIVATEBUILD File *was not* built using standard release
  * procedures. If this value is given, the StringFileInfo block must
- * contain a PrivateBuild string. 
+ * contain a PrivateBuild string.
  *
  * VS_FF_SPECIALBUILD File *was* built by the original company using
  * standard release procedures but is a variation of the standard
  * file of the same version number. If this value is given, the
- * StringFileInfo block must contain a SpecialBuild string. 
+ * StringFileInfo block must contain a SpecialBuild string.
  */
 
 #if defined(PNG_USER_PRIVATEBUILD)
@@ -1399,7 +1399,7 @@ struct png_struct_def
    png_user_chunk_ptr read_user_chunk_fn; /* user read chunk handler */
 #endif
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    int num_chunk_list;
    png_bytep chunk_list;
 #endif
@@ -2501,7 +2501,7 @@ extern PNG_EXPORT(void,png_set_sCAL_s) PNGARG((png_structp png_ptr,
 #endif
 #endif /* PNG_sCAL_SUPPORTED || PNG_WRITE_sCAL_SUPPORTED */
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 /* provide a list of chunks and how they are to be handled, if the built-in
    handling or default unknown chunk handling is not desired.  Any chunks not
    listed will be handled in the default manner.  The IHDR and IEND chunks
@@ -2513,16 +2513,16 @@ extern PNG_EXPORT(void,png_set_sCAL_s) PNGARG((png_structp png_ptr,
 */
 extern PNG_EXPORT(void, png_set_keep_unknown_chunks) PNGARG((png_structp
    png_ptr, int keep, png_bytep chunk_list, int num_chunks));
+PNG_EXPORT(int,png_handle_as_unknown) PNGARG((png_structp png_ptr, png_bytep
+   chunk_name));
+#endif
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
 extern PNG_EXPORT(void, png_set_unknown_chunks) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_unknown_chunkp unknowns, int num_unknowns));
 extern PNG_EXPORT(void, png_set_unknown_chunk_location)
    PNGARG((png_structp png_ptr, png_infop info_ptr, int chunk, int location));
 extern PNG_EXPORT(png_uint_32,png_get_unknown_chunks) PNGARG((png_structp
    png_ptr, png_infop info_ptr, png_unknown_chunkpp entries));
-#endif
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-PNG_EXPORT(int,png_handle_as_unknown) PNGARG((png_structp png_ptr, png_bytep
-   chunk_name));
 #endif
 
 /* Png_free_data() will turn off the "valid" flag for anything it frees.

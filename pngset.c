@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.37 [June 4, 2009]
+ * Last changed in libpng 1.2.38 [June 12, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1004,7 +1004,7 @@ png_set_sPLT(png_structp png_ptr,
 }
 #endif /* PNG_sPLT_SUPPORTED */
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
 void PNGAPI
 png_set_unknown_chunks(png_structp png_ptr,
    png_infop info_ptr, png_unknown_chunkp unknowns, int num_unknowns)
@@ -1035,8 +1035,8 @@ png_set_unknown_chunks(png_structp png_ptr,
       png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
       png_unknown_chunkp from = unknowns + i;
 
-      png_memcpy((png_charp)to->name, 
-                 (png_charp)from->name, 
+      png_memcpy((png_charp)to->name,
+                 (png_charp)from->name,
                  png_sizeof(from->name));
       to->name[png_sizeof(to->name)-1] = '\0';
       to->size = from->size;

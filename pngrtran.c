@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.2.37 [June 4, 2009]
+ * Last changed in libpng 1.2.38 [June 12, 2009]
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1177,10 +1177,6 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
          {
             if (png_ptr->transformations & PNG_EXPAND_tRNS)
               info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
-#if 0 /* Removed from libpng-1.2.27 */
-            else
-              info_ptr->color_type |= PNG_COLOR_MASK_COLOR;
-#endif
          }
          if (info_ptr->bit_depth < 8)
             info_ptr->bit_depth = 8;
@@ -1374,12 +1370,12 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 /* From Andreas Dilger e-mail to png-implement, 26 March 1998:
- * 
+ *
  *   In most cases, the "simple transparency" should be done prior to doing
  *   gray-to-RGB, or you will have to test 3x as many bytes to check if a
  *   pixel is transparent.  You would also need to make sure that the
  *   transparency information is upgraded to RGB.
- * 
+ *
  *   To summarize, the current flow is:
  *   - Gray + simple transparency -> compare 1 or 2 gray bytes and composite
  *                                   with background "in place" if transparent,
@@ -4202,7 +4198,7 @@ png_build_gamma_table(png_structp png_ptr)
 
      png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
         (png_uint_32)(num * png_sizeof(png_uint_16p)));
-     png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p)); 
+     png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p));
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
      {
@@ -4264,7 +4260,7 @@ png_build_gamma_table(png_structp png_ptr)
 
         png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p )));
-        png_memset(png_ptr->gamma_16_to_1, 0, num * png_sizeof(png_uint_16p)); 
+        png_memset(png_ptr->gamma_16_to_1, 0, num * png_sizeof(png_uint_16p));
 
         for (i = 0; i < num; i++)
         {
@@ -4290,7 +4286,7 @@ png_build_gamma_table(png_structp png_ptr)
         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p)));
         png_memset(png_ptr->gamma_16_from_1, 0,
-           num * png_sizeof(png_uint_16p)); 
+           num * png_sizeof(png_uint_16p));
 
         for (i = 0; i < num; i++)
         {
