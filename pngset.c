@@ -243,7 +243,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
 
    /* Check other values */
    if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&
-      bit_depth != 8 && bit_depth != 16)
+       bit_depth != 8 && bit_depth != 16)
       png_error(png_ptr, "Invalid bit depth in IHDR");
 
    if (color_type < 0 || color_type == 1 ||
@@ -354,7 +354,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    info_ptr->pcal_purpose = (png_charp)png_malloc_warn(png_ptr, length);
    if (info_ptr->pcal_purpose == NULL)
    {
-       png_warning(png_ptr, "Insufficient memory for pCAL purpose");
+      png_warning(png_ptr, "Insufficient memory for pCAL purpose");
       return;
    }
    png_memcpy(info_ptr->pcal_purpose, purpose, length);
@@ -371,7 +371,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    info_ptr->pcal_units = (png_charp)png_malloc_warn(png_ptr, length);
    if (info_ptr->pcal_units == NULL)
    {
-       png_warning(png_ptr, "Insufficient memory for pCAL units");
+      png_warning(png_ptr, "Insufficient memory for pCAL units");
       return;
    }
    png_memcpy(info_ptr->pcal_units, units, length);
@@ -380,7 +380,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
       (png_size_t)((nparams + 1) * png_sizeof(png_charp)));
    if (info_ptr->pcal_params == NULL)
    {
-       png_warning(png_ptr, "Insufficient memory for pCAL params");
+      png_warning(png_ptr, "Insufficient memory for pCAL params");
       return;
    }
 
@@ -394,8 +394,8 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
       info_ptr->pcal_params[i] = (png_charp)png_malloc_warn(png_ptr, length);
       if (info_ptr->pcal_params[i] == NULL)
       {
-          png_warning(png_ptr, "Insufficient memory for pCAL parameter");
-          return;
+         png_warning(png_ptr, "Insufficient memory for pCAL parameter");
+         return;
       }
       png_memcpy(info_ptr->pcal_params[i], params[i], length);
    }
@@ -1018,7 +1018,7 @@ png_set_unknown_chunks(png_structp png_ptr,
    int i;
 
    if (png_ptr == NULL || info_ptr == NULL || num_unknowns == 0)
-       return;
+      return;
 
    np = (png_unknown_chunkp)png_malloc_warn(png_ptr,
        (png_size_t)((info_ptr->unknown_chunks_num + num_unknowns) *
