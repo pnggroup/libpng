@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.38beta01 - June 12, 2009
+ * libpng version 1.2.38beta01 - June 16, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -521,6 +521,7 @@
 #  define PNG_NO_FREE_ME
 #  define PNG_NO_READ_UNKNOWN_CHUNKS
 #  define PNG_NO_WRITE_UNKNOWN_CHUNKS
+#  define PNG_NO_HANDLE_AS_UNKNOWN
 #  define PNG_NO_READ_USER_CHUNKS
 #  define PNG_NO_READ_iCCP
 #  define PNG_NO_WRITE_iCCP
@@ -940,6 +941,17 @@
 #  define PNG_READ_zTXt_SUPPORTED
 #  define PNG_zTXt_SUPPORTED
 #endif
+#ifndef PNG_NO_READ_OPT_PLTE
+#  define PNG_READ_OPT_PLTE_SUPPORTED /* only affects support of the */
+#endif                      /* optional PLTE chunk in RGB and RGBA images */
+#if defined(PNG_READ_iTXt_SUPPORTED) || defined(PNG_READ_tEXt_SUPPORTED) || \
+    defined(PNG_READ_zTXt_SUPPORTED)
+#  define PNG_READ_TEXT_SUPPORTED
+#  define PNG_TEXT_SUPPORTED
+#endif
+
+#endif /* PNG_READ_ANCILLARY_CHUNKS_SUPPORTED */
+
 #ifndef PNG_NO_READ_UNKNOWN_CHUNKS
 #  define PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 #  ifndef PNG_UNKNOWN_CHUNKS_SUPPORTED
@@ -962,16 +974,6 @@
 #    define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 #  endif
 #endif
-#ifndef PNG_NO_READ_OPT_PLTE
-#  define PNG_READ_OPT_PLTE_SUPPORTED /* only affects support of the */
-#endif                      /* optional PLTE chunk in RGB and RGBA images */
-#if defined(PNG_READ_iTXt_SUPPORTED) || defined(PNG_READ_tEXt_SUPPORTED) || \
-    defined(PNG_READ_zTXt_SUPPORTED)
-#  define PNG_READ_TEXT_SUPPORTED
-#  define PNG_TEXT_SUPPORTED
-#endif
-
-#endif /* PNG_READ_ANCILLARY_CHUNKS_SUPPORTED */
 
 #ifdef PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
 
@@ -1084,6 +1086,16 @@
 #    define PNG_zTXt_SUPPORTED
 #  endif
 #endif
+#if defined(PNG_WRITE_iTXt_SUPPORTED) || defined(PNG_WRITE_tEXt_SUPPORTED) || \
+    defined(PNG_WRITE_zTXt_SUPPORTED)
+#  define PNG_WRITE_TEXT_SUPPORTED
+#  ifndef PNG_TEXT_SUPPORTED
+#    define PNG_TEXT_SUPPORTED
+#  endif
+#endif
+
+#endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
+
 #ifndef PNG_NO_WRITE_UNKNOWN_CHUNKS
 #  define PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
 #  ifndef PNG_UNKNOWN_CHUNKS_SUPPORTED
@@ -1095,15 +1107,6 @@
 #    define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 #  endif
 #endif
-#if defined(PNG_WRITE_iTXt_SUPPORTED) || defined(PNG_WRITE_tEXt_SUPPORTED) || \
-    defined(PNG_WRITE_zTXt_SUPPORTED)
-#  define PNG_WRITE_TEXT_SUPPORTED
-#  ifndef PNG_TEXT_SUPPORTED
-#    define PNG_TEXT_SUPPORTED
-#  endif
-#endif
-
-#endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
 
 /* Turn this off to disable png_read_png() and
  * png_write_png() and leave the row_pointers member
