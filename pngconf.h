@@ -448,35 +448,6 @@
 #  endif
 #endif
 
-/* The following support, added after version 1.0.0, can be turned off here en
- * masse by defining PNG_LEGACY_SUPPORTED in case you need binary compatibility
- * with old applications that require the length of png_struct and png_info
- * to remain unchanged.
- */
-
-#ifdef PNG_LEGACY_SUPPORTED
-#  define PNG_NO_FREE_ME
-#  define PNG_NO_READ_UNKNOWN_CHUNKS
-#  define PNG_NO_WRITE_UNKNOWN_CHUNKS
-#  define PNG_NO_READ_USER_CHUNKS
-#  define PNG_NO_READ_iCCP
-#  define PNG_NO_WRITE_iCCP
-#  define PNG_NO_READ_iTXt
-#  define PNG_NO_WRITE_iTXt
-#  define PNG_NO_READ_sCAL
-#  define PNG_NO_WRITE_sCAL
-#  define PNG_NO_READ_sPLT
-#  define PNG_NO_WRITE_sPLT
-#  define PNG_NO_INFO_IMAGE
-#  define PNG_NO_READ_RGB_TO_GRAY
-#  define PNG_NO_READ_USER_TRANSFORM
-#  define PNG_NO_WRITE_USER_TRANSFORM
-#  define PNG_NO_USER_MEM
-#  define PNG_NO_READ_EMPTY_PLTE
-#  define PNG_NO_MNG_FEATURES
-#  define PNG_NO_FIXED_POINT_SUPPORTED
-#endif
-
 /* Ignore attempt to turn off both floating and fixed point support */
 #if !defined(PNG_FLOATING_POINT_SUPPORTED) || \
     !defined(PNG_NO_FIXED_POINT_SUPPORTED)

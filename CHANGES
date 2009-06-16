@@ -2160,6 +2160,9 @@ version 1.4.0beta63 [June 16, 2009]
   Adopted preference for consistent use of "#ifdef" and "#ifndef" versus
     "#if defined()" and "if !defined()" where possible.
 
+version 1.4.0beta63 [June 16, 2009]
+  Eliminated PNG_LEGACY_SUPPORTED code.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

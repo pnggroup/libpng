@@ -482,6 +482,7 @@ version 1.4.0beta63 [June 16, 2009]
     available for ignoring known chunks even when not saving unknown chunks.
   Adopted preference for consistent use of "#ifdef" and "#ifndef" versus
     "#if defined()" and "if !defined()" where possible.
+  Eliminated PNG_LEGACY_SUPPORTED code.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
