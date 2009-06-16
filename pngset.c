@@ -1009,7 +1009,7 @@ png_set_sPLT(png_structp png_ptr,
 }
 #endif /* PNG_sPLT_SUPPORTED */
 
-#if defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
+#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
 void PNGAPI
 png_set_unknown_chunks(png_structp png_ptr,
    png_infop info_ptr, png_unknown_chunkp unknowns, int num_unknowns)
