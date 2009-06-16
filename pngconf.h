@@ -551,7 +551,7 @@
 #  define PNG_FREE_ME_SUPPORTED
 #endif
 
-#if defined(PNG_READ_SUPPORTED)
+#ifdef PNG_READ_SUPPORTED
 
 #if !defined(PNG_READ_TRANSFORMS_NOT_SUPPORTED) && \
       !defined(PNG_NO_READ_TRANSFORMS)
@@ -639,7 +639,7 @@
 
 #endif /* PNG_READ_SUPPORTED */
 
-#if defined(PNG_WRITE_SUPPORTED)
+#ifdef PNG_WRITE_SUPPORTED
 
 # if !defined(PNG_WRITE_TRANSFORMS_NOT_SUPPORTED) && \
     !defined(PNG_NO_WRITE_TRANSFORMS)
@@ -976,6 +976,7 @@
 #  endif
 #endif
 
+#ifdef PNG_WRITE_SUPPORTED
 #ifdef PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
 
 #ifdef PNG_NO_WRITE_TEXT
@@ -1109,6 +1110,7 @@
 #    define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 #  endif
 #endif
+#endif /* PNG_WRITE_SUPPORTED */
 
 /* Turn this off to disable png_read_png() and
  * png_write_png() and leave the row_pointers member
