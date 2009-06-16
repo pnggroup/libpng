@@ -473,7 +473,7 @@ version 1.4.0beta62 [June 2, 2009]
   Added a section to the libpng documentation about using png_get_io_ptr()
     in configure scripts to detect the presence of libpng.
 
-version 1.4.0beta63 [June 16, 2009]
+version 1.4.0beta63 [June 15, 2009]
   Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
     multiple times and to specify the sample order in the tRNS chunk,
     because the ISO PNG specification has a typo in the tRNS table.
@@ -482,7 +482,11 @@ version 1.4.0beta63 [June 16, 2009]
     available for ignoring known chunks even when not saving unknown chunks.
   Adopted preference for consistent use of "#ifdef" and "#ifndef" versus
     "#if defined()" and "if !defined()" where possible.
+
+version 1.4.0beta64 [June 16, 2009]
   Eliminated PNG_LEGACY_SUPPORTED code.
+  Moved the various unknown chunk macro definitions outside of the
+     PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
