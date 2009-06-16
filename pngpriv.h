@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta63 - June 5, 2009
+ * libpng version 1.4.0beta63 - June 16, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -95,7 +95,7 @@
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
 
-/* flags for the transformations the PNG library does on the image data */
+/* Flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                 0x0001
 #define PNG_INTERLACE           0x0002
 #define PNG_PACK                0x0004
@@ -130,7 +130,7 @@
                        /*  0x20000000L  unused */
                        /*  0x40000000L  unused */
 
-/* flags for png_create_struct */
+/* Flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
 #define PNG_STRUCT_INFO  0x0002
 
@@ -140,7 +140,7 @@
 #define PNG_COST_SHIFT 3
 #define PNG_COST_FACTOR (1<<(PNG_COST_SHIFT))
 
-/* flags for the png_ptr->flags rather than declaring a byte for each one */
+/* Flags for the png_ptr->flags rather than declaring a byte for each one */
 #define PNG_FLAG_ZLIB_CUSTOM_STRATEGY     0x0001
 #define PNG_FLAG_ZLIB_CUSTOM_LEVEL        0x0002
 #define PNG_FLAG_ZLIB_CUSTOM_MEM_LEVEL    0x0004
@@ -182,7 +182,7 @@
 #define PNG_FLAG_CRC_MASK           (PNG_FLAG_CRC_ANCILLARY_MASK | \
                                      PNG_FLAG_CRC_CRITICAL_MASK)
 
-/* save typing and make code easier to understand */
+/* Save typing and make code easier to understand */
 
 #define PNG_COLOR_DIST(c1, c2) (abs((int)((c1).red) - (int)((c2).red)) + \
    abs((int)((c1).green) - (int)((c2).green)) + \
@@ -201,9 +201,9 @@
 #define PNG_OUT_OF_RANGE(value, ideal, delta) \
         ( (value) < (ideal)-(delta) || (value) > (ideal)+(delta) )
 
-/* variables declared in png.c - only it needs to define PNG_NO_EXTERN */
+/* Variables declared in png.c - only it needs to define PNG_NO_EXTERN */
 #if !defined(PNG_NO_EXTERN) || defined(PNG_ALWAYS_EXTERN)
-/* place to hold the signature string for a PNG file. */
+/* Place to hold the signature string for a PNG file. */
 #ifdef PNG_USE_GLOBAL_ARRAYS
    PNG_EXPORT_VAR (const png_byte FARDATA) png_sig[8];
 #else
@@ -359,7 +359,7 @@ PNG_EXTERN void png_calculate_crc PNGARG((png_structp png_ptr, png_bytep ptr,
 PNG_EXTERN void png_flush PNGARG((png_structp png_ptr));
 #endif
 
-/* write various chunks */
+/* Write various chunks */
 
 /* Write the IHDR chunk, and update the png_struct with the necessary
  * information.
@@ -509,12 +509,12 @@ PNG_EXTERN void png_write_start_row PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr));
 #endif
 
-/* combine a row of data, dealing with alpha, etc. if requested */
+/* Combine a row of data, dealing with alpha, etc. if requested */
 PNG_EXTERN void png_combine_row PNGARG((png_structp png_ptr, png_bytep row,
    int mask));
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED)
-/* expand an interlaced row */
+/* Expand an interlaced row */
 /* OLD pre-1.0.9 interface:
 PNG_EXTERN void png_do_read_interlace PNGARG((png_row_infop row_info,
    png_bytep row, int pass, png_uint_32 transformations));
@@ -525,12 +525,12 @@ PNG_EXTERN void png_do_read_interlace PNGARG((png_structp png_ptr));
 /* GRR TO DO (2.0 or whenever):  simplify other internal calling interfaces */
 
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)
-/* grab pixels out of a row for an interlaced pass */
+/* Grab pixels out of a row for an interlaced pass */
 PNG_EXTERN void png_do_write_interlace PNGARG((png_row_infop row_info,
    png_bytep row, int pass));
 #endif
 
-/* unfilter a row */
+/* Unfilter a row */
 PNG_EXTERN void png_read_filter_row PNGARG((png_structp png_ptr,
    png_row_infop row_info, png_bytep row, png_bytep prev_row, int filter));
 
@@ -541,16 +541,16 @@ PNG_EXTERN void png_write_find_filter PNGARG((png_structp png_ptr,
 /* Write out the filtered row. */
 PNG_EXTERN void png_write_filtered_row PNGARG((png_structp png_ptr,
    png_bytep filtered_row));
-/* finish a row while reading, dealing with interlacing passes, etc. */
+/* Finish a row while reading, dealing with interlacing passes, etc. */
 PNG_EXTERN void png_read_finish_row PNGARG((png_structp png_ptr));
 
-/* initialize the row buffers, etc. */
+/* Initialize the row buffers, etc. */
 PNG_EXTERN void png_read_start_row PNGARG((png_structp png_ptr));
-/* optional call to update the users info structure */
+/* Optional call to update the users info structure */
 PNG_EXTERN void png_read_transform_info PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 
-/* these are the functions that do the transformations */
+/* These are the functions that do the transformations */
 #if defined(PNG_READ_FILLER_SUPPORTED)
 PNG_EXTERN void png_do_read_filler PNGARG((png_row_infop row_info,
    png_bytep row, png_uint_32 filler, png_uint_32 flags));
@@ -677,7 +677,7 @@ PNG_EXTERN void png_do_expand PNGARG((png_row_infop row_info,
  * then calls the appropriate callback for the chunk if it is valid.
  */
 
-/* decode the IHDR chunk */
+/* Decode the IHDR chunk */
 PNG_EXTERN void png_handle_IHDR PNGARG((png_structp png_ptr, png_infop info_ptr,
    png_uint_32 length));
 PNG_EXTERN void png_handle_PLTE PNGARG((png_structp png_ptr, png_infop info_ptr,
@@ -776,7 +776,7 @@ PNG_EXTERN void png_handle_unknown PNGARG((png_structp png_ptr,
 PNG_EXTERN void png_check_chunk_name PNGARG((png_structp png_ptr,
    png_bytep chunk_name));
 
-/* handle the transformations for reading and writing */
+/* Handle the transformations for reading and writing */
 PNG_EXTERN void png_do_read_transformations PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_do_write_transformations PNGARG((png_structp png_ptr));
 
