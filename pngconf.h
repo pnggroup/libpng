@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.38beta01 - June 16, 2009
+ * libpng version 1.2.38beta01 - June 17, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -487,7 +487,7 @@
  * iTXt support was added.  iTXt support was turned off by default through
  * libpng-1.2.x, to support old apps that malloc the png_text structure
  * instead of calling png_set_text() and letting libpng malloc it.  It
- * was turned on by default in libpng-1.4.0.
+ * will be turned on by default in libpng-1.4.0.
  */
 
 #if defined(PNG_1_0_X) || defined (PNG_1_2_X)

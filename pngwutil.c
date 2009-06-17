@@ -988,7 +988,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
 #endif
    {
       /* Each value is saved in 1/100,000ths */
-    
+
       png_save_uint_32(buf, int_white_x);
       png_save_uint_32(buf + 4, int_white_y);
 

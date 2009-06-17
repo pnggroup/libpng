@@ -2403,7 +2403,7 @@ versions 1.2.37 and 1.0.45 [June 4, 2009]
   Added a section to the libpng documentation about using png_get_io_ptr()
     in configure scripts to detect the presence of libpng.
 
-versions 1.2.38beta01 [June 16, 2009]
+versions 1.2.38beta01 [June 17, 2009]
   Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
     multiple times and to specify the sample order in the tRNS chunk,
     because the ISO PNG specification has a typo in the tRNS table.
