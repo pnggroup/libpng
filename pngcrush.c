@@ -54,7 +54,7 @@
  *
  */
 
-#define PNGCRUSH_VERSION "1.6.19"
+#define PNGCRUSH_VERSION "1.6.20"
 
 /*
 #define PNGCRUSH_COUNT_COLORS
@@ -155,6 +155,8 @@
 #if 0 /* changelog */
 
 Change log:
+
+Version 1.6.20 (built with libpng-1.2.38beta01 and zlib-1.2.3.2)
 
 Version 1.6.19 (built with libpng-1.2.37 and zlib-1.2.3.2)
   Added missing braces that cause an incorrect png_error() to be issued.

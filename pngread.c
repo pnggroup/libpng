@@ -102,7 +102,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    }
    else
         png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-   
+
 
    if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
    {
