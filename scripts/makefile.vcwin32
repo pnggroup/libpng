@@ -6,14 +6,13 @@
 # To use, do "nmake /f scripts\makefile.vcwin32"
 
 # -------- Microsoft Visual C++ 2.0 and later, no assembler code --------
-%12-%# If you want to use assembler (MMX) code, use makefile.vcawin32 instead.
+# If you want to use assembler (MMX) code, use makefile.vcawin32 instead.
 
 # Compiler, linker, librarian, and other tools
 CC = cl
 LD = link
 AR = lib
-%12-%CFLAGS  = -nologo -DPNG_NO_MMX_CODE -MD -O2 -W3 -I..\zlib
-%14+%CFLAGS  = -nologo -MD -O2 -W3 -I..\zlib
+CFLAGS  = -nologo -DPNG_NO_MMX_CODE -MD -O2 -W3 -I..\zlib
 LDFLAGS = -nologo
 ARFLAGS = -nologo
 RM = del

@@ -8,7 +8,7 @@
 
 # Modeled after libxml-config.
 
-version=1.0.45
+version=1.0.46
 prefix=""
 libdir=""
 libs=""

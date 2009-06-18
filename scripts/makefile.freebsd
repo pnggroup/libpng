@@ -3,8 +3,7 @@
 # For conditions of distribution and use, see copyright notice in png.h
 
 PREFIX?=        /usr/local
-%12-%SHLIB_VER?=     5
-%14+%SHLIB_VER?=     %SONUM%
+SHLIB_VER?=     5
 
 LIB=		png
 SHLIB_MAJOR=	${SHLIB_VER}
@@ -26,9 +25,9 @@ LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 
 CFLAGS+= -I.
-%12-%.if (${MACHINE_ARCH} != "i386")
-%12-%CFLAGS+= -DPNG_NO_MMX_CODE
-%12-%.endif
+.if (${MACHINE_ARCH} != "i386")
+CFLAGS+= -DPNG_NO_MMX_CODE
+.endif
 
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \

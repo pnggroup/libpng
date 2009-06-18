@@ -2382,7 +2382,7 @@ version 1.2.37beta03 [May 20, 2009]
 version 1.2.37rc01 [May 27, 2009]
   No changes.
 
-versions 1.2.37 and 1.0.45 [June 4, 2009]
+versions 1.2.37 and 1.0.45 [June 17, 2009]
   Reformatted several remaining "else statement;" and "if () statment;" into
     two lines.
   Added "#define PNG_NO_WRITE_SWAP" to contrib/pngminim/encoder/pngusr.h
@@ -2391,6 +2391,11 @@ versions 1.2.37 and 1.0.45 [June 4, 2009]
     documentation (merged from libpng-1.4.0beta62)
   Added a section about using png_get_io_ptr() in configure scripts to detect
     the presence of libpng.
+
+version 1.0.46 [June 18, 2009]
+  Fixed a mistake in the editing script that changes the scripts files
+    to version 1.0.x, which created an erroneous libpng.pc and some makefiles.
+    The error was introduced in libpng-1.0.45.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
