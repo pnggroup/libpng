@@ -2416,6 +2416,8 @@ versions 1.2.38beta01 [June 17, 2009]
     pngconf.h, and moved the various unknown chunk macro definitions
     outside of the PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
 
+versions 1.2.38beta02 [June 18, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

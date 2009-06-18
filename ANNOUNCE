@@ -1,5 +1,5 @@
 
-Libpng 1.2.38beta01 - June 17, 2009
+Libpng 1.2.38beta02 - June 18, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.38beta01.tar.gz
-   libpng-1.2.38beta01.tar.lzma
+   libpng-1.2.38beta02.tar.gz
+   libpng-1.2.38beta02.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.38beta01.tar.bz2
+   libpng-1.2.38beta02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.38beta01-no-config.tar.gz
-   libpng-1.2.38beta01-no-config.tar.lzma
-   libpng-1.2.38beta01-no-config.tar.bz2
+   libpng-1.2.38beta02-no-config.tar.gz
+   libpng-1.2.38beta02-no-config.tar.lzma
+   libpng-1.2.38beta02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1238b01.zip
-   lp1238b01.7z
-   lp1238b01.tar.bz2
+   lp1238b02.zip
+   lp1238b02.7z
+   lp1238b02.tar.bz2
 
 Project files
 
-   libpng-1.2.38beta01-project-netware.zip
-   libpng-1.2.38beta01-project-wince.zip
+   libpng-1.2.38beta02-project-netware.zip
+   libpng-1.2.38beta02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.38beta01-README.txt
-   libpng-1.2.38beta01-KNOWNBUGS.txt
-   libpng-1.2.38beta01-LICENSE.txt
-   libpng-1.2.38beta01-Y2K-compliance.txt
-   libpng-1.2.38beta01-[previous version]-diff.txt
+   libpng-1.2.38beta02-README.txt
+   libpng-1.2.38beta02-KNOWNBUGS.txt
+   libpng-1.2.38beta02-LICENSE.txt
+   libpng-1.2.38beta02-Y2K-compliance.txt
+   libpng-1.2.38beta02-[previous version]-diff.txt
 
 Changes since the last public release (1.2.36):
 
@@ -78,7 +78,7 @@ versions 1.2.37 and 1.0.45 [June 4, 2009]
   Added a section in the documentation about using png_get_io_ptr() in
     configure scripts to detect the presence of libpng.
 
-version 1.2.38beta01 [June 17, 2009]
+versions 1.2.38beta01 [June 17, 2009]
   Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
     multiple times and to specify the sample order in the tRNS chunk,
     because the ISO PNG specification has a typo in the tRNS table.
@@ -88,6 +88,8 @@ version 1.2.38beta01 [June 17, 2009]
   Added PNG_NO_HANDLE_AS_UNKNOWN in the PNG_LEGACY_SUPPORTED block of
     pngconf.h, and moved the various unknown chunk macro definitions
     outside of the PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
+
+versions 1.2.38beta02 [June 18, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
