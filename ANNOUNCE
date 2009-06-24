@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta64 - June 16, 2009
+Libpng 1.4.0beta64 - June 24, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -483,7 +483,7 @@ version 1.4.0beta63 [June 15, 2009]
   Adopted preference for consistent use of "#ifdef" and "#ifndef" versus
     "#if defined()" and "if !defined()" where possible.
 
-version 1.4.0beta64 [June 16, 2009]
+version 1.4.0beta64 [June 24, 2009]
   Eliminated PNG_LEGACY_SUPPORTED code.
   Moved the various unknown chunk macro definitions outside of the
      PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
