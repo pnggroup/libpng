@@ -2403,7 +2403,7 @@ versions 1.2.37 and 1.0.45 [June 4, 2009]
   Added a section to the libpng documentation about using png_get_io_ptr()
     in configure scripts to detect the presence of libpng.
 
-versions 1.2.38beta01 [June 17, 2009]
+version 1.2.38beta01 [June 17, 2009]
   Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
     multiple times and to specify the sample order in the tRNS chunk,
     because the ISO PNG specification has a typo in the tRNS table.
@@ -2416,7 +2416,11 @@ versions 1.2.38beta01 [June 17, 2009]
     pngconf.h, and moved the various unknown chunk macro definitions
     outside of the PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
 
-versions 1.2.38beta02 [June 18, 2009]
+version 1.0.46 [June 18, 2009]
+  Removed some editing cruft from scripts/libpng.pc.in and some makefiles.
+
+version 1.2.38rc01 [June 24, 2009]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
