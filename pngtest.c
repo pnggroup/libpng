@@ -7,7 +7,8 @@
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
  * This code is released under the zlib-libpng license.
- * For conditions of distribution and use, see copyright notice in png.h
+ * For conditions of distribution and use, see copyright notice, disclaimer,
+ * and license in png.h
  *
  * This program reads in a PNG image, writes it out again, and then
  * compares the two files.  If the files are identical, this shows that

@@ -3,7 +3,8 @@
  * Copyright (c) 2007, 2009 Glenn Randers-Pehrson
  *
  * This code is released under the zlib-libpng license.
- * For conditions of distribution and use, see copyright notice in png.h
+ * For conditions of distribution and use, see copyright notice, disclaimer,
+ * and license in png.h
  *
  * Derived from pngcrush.h, Copyright 1998-2007, Glenn Randers-Pehrson
  */

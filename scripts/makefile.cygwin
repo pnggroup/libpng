@@ -9,7 +9,8 @@
 # Copyright (C) 1996, 1997 Andreas Dilger
 #
 # This code is released under the zlib-libpng license.
-# For conditions of distribution and use, see copyright notice in png.h
+# For conditions of distribution and use, see copyright notice, disclaimer,
+# and license in png.h
 
 # This makefile intends to support building outside the src directory
 # if desired. When invoking it, specify an argument to SRCDIR on the

@@ -6,7 +6,8 @@
 # Copyright (C) 1996-1997 Andreas Dilger
 #
 # This code is released under the zlib-libpng license.
-# For conditions of distribution and use, see copyright notice in png.h
+# For conditions of distribution and use, see copyright notice, disclaimer,
+# and license in png.h
 
 # Library name:
 PNGMAJ = 14

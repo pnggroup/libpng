@@ -8,6 +8,8 @@ COPYRIGHT NOTICE, DISCLAIMER, and LICENSE:
 If you modify libpng you may insert additional notices immediately following
 this sentence.
 
+This code is released under the zlib-libpng license.
+
 libpng versions 1.2.6, August 15, 2004, through 1.4.0beta65, June 24, 2009, are
 Copyright (c) 2004, 2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5

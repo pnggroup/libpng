@@ -7,7 +7,8 @@
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
  * This code is released under the zlib-libpng license.
- * For conditions of distribution and use, see copyright notice in png.h
+ * For conditions of distribution and use, see copyright notice, disclaimer,
+ * and license in png.h
  *
  * This file provides a location for all input.  Users who need
  * special handling are expected to write a function that has the same

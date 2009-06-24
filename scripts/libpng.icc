@@ -3,7 +3,8 @@
 // Copyright (C) 2000 Cosmin Truta
 //
 // This code is released under the zlib-libpng license.
-// For conditions of distribution and use, see copyright notice in png.h
+// For conditions of distribution and use, see copyright notice, disclaimer,
+// and license in png.h
 //
 // Notes:
 //   All modules are compiled in C mode

@@ -7,7 +7,6 @@
  * Maintained 1998-2009 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
- *
  */
 
 /* This is an example of how to use libpng to read and write PNG files.
