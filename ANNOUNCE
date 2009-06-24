@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta64 - June 24, 2009
+Libpng 1.4.0beta65 - June 24, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta64.tar.gz
-   1.4.0beta64.tar.bz2
+   1.4.0beta65.tar.gz
+   1.4.0beta65.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta64-no-config.tar.gz
-   1.4.0beta64-no-config.tar.bz2
+   1.4.0beta65-no-config.tar.gz
+   1.4.0beta65-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b64.zip
-   lp140b64.tar.bz2
+   lp140b65.zip
+   lp140b65.tar.bz2
 
 Other information:
 
-   1.4.0beta64-README.txt
-   1.4.0beta64-KNOWNBUGS.txt
-   1.4.0beta64-LICENSE.txt
-   1.4.0beta64-Y2K-compliance.txt
+   1.4.0beta65-README.txt
+   1.4.0beta65-KNOWNBUGS.txt
+   1.4.0beta65-LICENSE.txt
+   1.4.0beta65-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -487,6 +487,8 @@ version 1.4.0beta64 [June 24, 2009]
   Eliminated PNG_LEGACY_SUPPORTED code.
   Moved the various unknown chunk macro definitions outside of the
      PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
+
+version 1.4.0beta65 [June 24, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

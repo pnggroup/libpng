@@ -2165,6 +2165,8 @@ version 1.4.0beta64 [June 24, 2009]
   Moved the various unknown chunk macro definitions outside of the
      PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
 
+version 1.4.0beta65 [June 24, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
