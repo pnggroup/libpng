@@ -3,6 +3,8 @@
 
 # Copyright (C) 2000, Pawel Mrochen, based on makefile.msc which is
 # copyright 1995 Guy Eric Schalnat, Group 42, Inc.
+#
+# This code is released under the zlib-libpng license.
 # For conditions of distribution and use, see copyright notice in png.h
 
 # To use, do "wmake /f scripts\makefile.watcom"

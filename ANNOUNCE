@@ -489,6 +489,7 @@ version 1.4.0beta64 [June 24, 2009]
      PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
 
 version 1.4.0beta65 [June 24, 2009]
+  Added a reference to the zlib-libpng license in each file.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

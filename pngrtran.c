@@ -2,10 +2,12 @@
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
  * Last changed in libpng 1.4.0 [June 24, 2009]
- * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the zlib-libpng license.
+ * For conditions of distribution and use, see copyright notice in png.h
  *
  * This file contains functions optionally called by an application
  * in order to tell libpng how to handle data when reading a PNG.

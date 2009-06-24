@@ -1,6 +1,8 @@
 # makefile for libpng
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # Copyright (C) 2007-2008 Glenn Randers-Pehrson
+#
+# This code is released under the zlib-libpng license.
 # For conditions of distribution and use, see copyright notice in png.h
 
 PREFIX?= /usr/local

@@ -2,6 +2,8 @@
 # Copyright (C) 1999-2002, 2006 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42
 # contributed by Jim Rice and updated by Chris Schleicher, Hewlett Packard
+#
+# This code is released under the zlib-libpng license.
 # For conditions of distribution and use, see copyright notice in png.h
 
 # Where the zlib library and include files are located

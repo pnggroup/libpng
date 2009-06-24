@@ -3,6 +3,8 @@
 # Copyright (C) 2000 Cosmin Truta
 # Copyright (C) 2000 Marc O. Gloor (AIX support added, from makefile.gcc)
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+#
+# This code is released under the zlib-libpng license.
 # For conditions of distribution and use, see copyright notice in png.h
 
 # Location of the zlib library and include files

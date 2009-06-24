@@ -3,6 +3,8 @@
 # make includes && make install
 # Copyright (C) 2002 Patrick R.L. Welche
 # Copyright (C) 2007, 2009 Glenn Randers-Pehrson
+#
+# This code is released under the zlib-libpng license.
 # For conditions of distribution and use, see copyright notice in png.h
 
 # You should also run makefile.ne0bsd

@@ -1,7 +1,10 @@
 # makefile for libpng
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 # Copyright (C) 2006, 2009 Glenn Randers-Pehrson
+#
+# This code is released under the zlib-libpng license.
 # For conditions of distribution and use, see copyright notice in png.h
+#
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
 
 # -------- Microsoft C 5.1 and later, does not use assembler code --------

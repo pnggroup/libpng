@@ -4,6 +4,8 @@
 # Copyright (C) 2002, 2006, 2008 Glenn Randers-Pehrson
 # Copyright (C) 1998-2001 Greg Roelofs
 # Copyright (C) 1996-1997 Andreas Dilger
+#
+# This code is released under the zlib-libpng license.
 # For conditions of distribution and use, see copyright notice in png.h
 
 # Library name:

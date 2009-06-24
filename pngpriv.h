@@ -6,6 +6,9 @@
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the zlib-libpng license.
+ *
  */
 
 /* The symbols declared in this file (including the functions declared

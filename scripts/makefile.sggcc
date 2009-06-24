@@ -1,6 +1,8 @@
 # makefile for libpng.a and libpng14.so, SGI IRIX with 'cc'
 # Copyright (C) 2001-2002, 2006 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
+#
+# This code is released under the zlib-libpng license.
 # For conditions of distribution and use, see copyright notice in png.h
 
 # Library name:
