@@ -4,7 +4,7 @@ project(PNG)
 # Copyright (C) 2007 Glenn Randers-Pehrson
 
 # This code is released under the zlib/libpng license.
-# For conditions of distribution and use, see copyright notice, disclaimer,
+# For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
 set(PNGLIB_MAJOR 1)

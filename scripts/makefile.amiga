@@ -3,7 +3,7 @@
 # Copyright (C) 1995-2000 Wolf Faust
 #
 # This code is released under the zlib/libpng license.
-# For conditions of distribution and use, see copyright notice, disclaimer,
+# For conditions of distribution and use, see the disclaimer
 # and license in png.h
 #
 # Note: Use #define PNG_READ_BIG_ENDIAN_SUPPORTED in pngconf.h

@@ -6,7 +6,7 @@ libpng.txt - A description on how to use and modify libpng
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
  This document is released under the zlib/libpng license.
- For conditions of distribution and use, see copyright notice, disclaimer,
+ For conditions of distribution and use, see the disclaimer
  and license in png.h
 
  Based on:

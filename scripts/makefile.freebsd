@@ -2,7 +2,7 @@
 # Copyright (C) 2002, 2007, 2009 Glenn Randers-Pehrson and Andrey A. Chernov
 #
 # This code is released under the zlib/libpng license.
-# For conditions of distribution and use, see copyright notice, disclaimer,
+# For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
 PREFIX?=        /usr/local
