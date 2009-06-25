@@ -4,6 +4,9 @@
  *                                   (glennrp at users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
  *
+ * This software is released under the zlib/libpng license (see LICENSE,
+ * below).
+ *
  * The most recent version of pngcrush can be found at SourceForge in
  * http://pmt.sf.net/pngcrush/
  *
