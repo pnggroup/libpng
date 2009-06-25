@@ -3,7 +3,7 @@ project(PNG)
 
 # Copyright (C) 2007 Glenn Randers-Pehrson
 
-# This code is released under the zlib-libpng license.
+# This code is released under the zlib/libpng license.
 # For conditions of distribution and use, see copyright notice, disclaimer,
 # and license in png.h
 

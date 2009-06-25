@@ -1,12 +1,12 @@
 
 /* pngrio.c - functions for data input
  *
- * Last changed in libpng 1.4.0 [June 24, 2009]
+ * Last changed in libpng 1.4.0 [June 25, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * This code is released under the zlib-libpng license.
+ * This code is released under the zlib/libpng license.
  * For conditions of distribution and use, see copyright notice, disclaimer,
  * and license in png.h
  *

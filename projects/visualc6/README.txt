@@ -3,7 +3,7 @@ Microsoft Developer Studio Project File, Format Version 6.00 for libpng.
 Copyright (C) 2000-2004 Simon-Pierre Cadieux.
 Copyright (C) 2004 Cosmin Truta.
 
-This code is released under the zlib-libpng license.
+This code is released under the zlib/libpng license.
 For conditions of distribution and use, see copyright notice in png.h
 
 

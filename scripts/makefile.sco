@@ -5,7 +5,7 @@
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 #
-# This code is released under the zlib-libpng license.
+# This code is released under the zlib/libpng license.
 # For conditions of distribution and use, see copyright notice, disclaimer,
 # and license in png.h
 
