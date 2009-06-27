@@ -3,7 +3,7 @@ project(PNG)
 
 # Copyright (C) 2007 Glenn Randers-Pehrson
 
-# This code is released under the zlib/libpng license.
+# This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
@@ -170,7 +170,7 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 
 # SET UP LINKS
 set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 14.${PNGLIB_RELEASE}.1.4.0beta65
+#    VERSION 14.${PNGLIB_RELEASE}.1.4.0beta66
      VERSION 14.${PNGLIB_RELEASE}.0
      SOVERSION 14
      CLEAN_DIRECT_OUTPUT 1)

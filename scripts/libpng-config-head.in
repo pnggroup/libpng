@@ -5,13 +5,13 @@
 
 # Copyright (C) 2002 Glenn Randers-Pehrson
 
-# This code is released under the zlib/libpng license.
+# This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
 # Modeled after libxml-config.
 
-version=1.4.0beta65
+version=1.4.0beta66
 prefix=""
 libdir=""
 libs=""

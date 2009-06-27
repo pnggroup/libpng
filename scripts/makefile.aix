@@ -4,7 +4,7 @@
 # Copyright (C) 2000 Marc O. Gloor (AIX support added, from makefile.gcc)
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
-# This code is released under the zlib/libpng license.
+# This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
@@ -23,7 +23,7 @@ LN_SF = ln -f -s
 
 LIBNAME=libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0beta65
+PNGMIN = 1.4.0beta66
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local

@@ -3,7 +3,7 @@ Microsoft Developer Studio Build File, Format Version 6.00 for VisualPng
 
 Copyright 2000, Willem van Schaik.
 
-This code is released under the zlib/libpng license.
+This code is released under the libpng license.
 For conditions of distribution and use, see the
 copyright/license/disclaimer notice in png.h
 

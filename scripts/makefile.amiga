@@ -2,7 +2,7 @@
 # makefile for libpng and SAS C V6.5x compiler
 # Copyright (C) 1995-2000 Wolf Faust
 #
-# This code is released under the zlib/libpng license.
+# This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 #

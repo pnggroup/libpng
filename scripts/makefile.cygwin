@@ -8,7 +8,7 @@
 # Copyright (C) 1998-2000 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 #
-# This code is released under the zlib/libpng license.
+# This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
@@ -68,7 +68,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng14
 PNGMAJ = 14
 CYGDLL = 14
-PNGMIN = 1.4.0beta65
+PNGMIN = 1.4.0beta66
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll

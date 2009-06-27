@@ -4,14 +4,14 @@
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 #
-# This code is released under the zlib/libpng license.
+# This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0beta65
+PNGMIN = 1.4.0beta66
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
