@@ -75,35 +75,25 @@
  *                                   (glennrp at users.sf.net)
  * Copyright (C) 2005      Greg Roelofs
  *
- * DISCLAIMERS:
+ * DISCLAIMER:
  *
- * The pngcrush computer program is supplied "AS IS".  The Author disclaims all
- * warranties, expressed or implied, including, without limitation, the
- * warranties of merchantability and of fitness for any purpose.  The
- * Author assumes no liability for direct, indirect, incidental, special,
- * exemplary, or consequential damages, which may result from the use of
- * the computer program, even if advised of the possibility of such damage.
- * There is no warranty against interference with your enjoyment of the
- * computer program or against infringement.  There is no warranty that my
- * efforts or the computer program will fulfill any of your particular purposes
- * or needs.  This computer program is provided with all faults, and the entire
- * risk of satisfactory quality, performance, accuracy, and effort is with
- * the user.
+ * This software is provided 'as-is', without any express or implied
+ * warranty.  In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * LICENSE:
  *
- * Permission is hereby irrevocably granted to everyone to use, copy, modify,
- * and distribute this source code, or portions hereof, or executable programs
- * compiled from it, for any purpose, without payment of any fee, subject to
- * the following restrictions:
+ *  Permission is granted to anyone to use this software for any purpose,
+ *  including commercial applications, and to alter it and redistribute it
+ *  freely, subject to the following restrictions:
  *
- * 1. The origin of this source code must not be misrepresented.
- *
- * 2. Altered versions must be plainly marked as such and must not be
- *    misrepresented as being the original source.
- *
- * 3. This Copyright notice, disclaimer, and license may not be removed
- *    or altered from any source or altered source distribution.
+ *  1. The origin of this software must not be misrepresented; you must not
+ *     claim that you wrote the original software. If you use this software
+ *     in a product, an acknowledgment in the product documentation would be
+ *     appreciated but is not required.
+ *  2. Altered source versions must be plainly marked as such, and must not be
+ *     misrepresented as being the original software.
+ *  3. This notice may not be removed or altered from any source distribution.
  */
 
 /* To do:
@@ -160,6 +150,8 @@
 Change log:
 
 Version 1.6.20 (built with libpng-1.2.38beta01 and zlib-1.2.3.2)
+  Made the license text identical to the actual zlib/libpng license text
+    found in zlib.h.
 
 Version 1.6.19 (built with libpng-1.2.37 and zlib-1.2.3.2)
   Added missing braces that cause an incorrect png_error() to be issued.
@@ -6066,10 +6058,11 @@ void print_version_info(void)
        * immediately after this sentence: */
       " |    Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson\n"
       " |    Copyright (C) 2005      Greg Roelofs\n"
-      " | This is a free, open-source program.  Permission is irrevocably\n"
+      " | This is a free, open-source program, released under the\n"
+      " | zlib/libpng license.  Permission is irrevocably\n"
       " | granted to everyone to use this version of pngcrush without\n"
       " | payment of any fee.\n"
-      " | Executable name is %s\n"
+      " | The executable name is %s\n"
       " | It was built with libpng version %s, and is\n"
       " | running with %s"
       " |    Copyright (C) 1998-2004,2006-2009 Glenn Randers-Pehrson,\n"
@@ -6113,31 +6106,25 @@ static const char *pngcrush_legal[] = {
     "Copyright (C) 1998-2002,2006-2009 Glenn Randers-Pehrson",
     "Copyright (C) 2005      Greg Roelofs",
     "",
-    "DISCLAIMER: The pngcrush computer program is supplied \"AS IS\".",
-    "The Author disclaims all warranties, expressed or implied, including,",
-    "without limitation, the warranties of merchantability and of fitness",
-    "for  any purpose.  The Author assumes no liability for direct, indirect,",
-    "incidental, special, exemplary, or consequential damages, which may",
-    "result from the use of the computer program, even if advised of the",
-    "possibility of such damage.  There is no warranty against interference",
-    "with your enjoyment of the computer program or against infringement.",
-    "There is no warranty that my efforts or the computer program will",
-    "fulfill any of your particular purposes or needs.  This computer",
-    "program is provided with all faults, and the entire risk of satisfactory",
-    "quality, performance, accuracy, and effort is with the user.",
+    "DISCLAIMER:",
+    "This software is provided \'as-is\', without any express or implied",
+    "warranty.  In no event will the authors be held liable for any damages",
+    "arising from the use of this software.",
     "",
-    "LICENSE: Permission is hereby irrevocably granted to everyone to use,",
-    "copy, modify, and distribute this computer program, or portions hereof,",
-    "purpose, without payment of any fee, subject to the following",
-    "restrictions:",
+    "LICENSE:",
     "",
-    "1. The origin of this binary or source code must not be misrepresented.",
+    "Permission is granted to anyone to use this software for any purpose,",
+    "including commercial applications, and to alter it and redistribute it",
+    "freely, subject to the following restrictions:",
     "",
-    "2. Altered versions must be plainly marked as such and must not be",
-    "misrepresented as being the original binary or source.",
-    "",
-    "3. The Copyright notice, disclaimer, and license may not be removed",
-    "or altered from any source, binary, or altered source distribution.",
+    "1. The origin of this software must not be misrepresented; you must not",
+    "   claim that you wrote the original software. If you use this software",
+    "   in a product, an acknowledgment in the product documentation would",
+    "   be appreciated but is not required.",
+    "2. Altered source versions must be plainly marked as such, and must not",
+    "   be misrepresented as being the original software.",
+    "3. This notice may not be removed or altered from any source"
+    "   distribution.",
     ""
 };
 
