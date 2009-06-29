@@ -1,8 +1,8 @@
 /* pngcrush.h */
 
 /*
- * This software is released under the zlib/libpng license (see LICENSE,
- * in pngcrush.c).
+ * This software is released under a license derived from the libpng
+ * license (see LICENSE, in pngcrush.c).
  */
 
 /* Special defines for pngcrush, mostly just to reduce the size of the
