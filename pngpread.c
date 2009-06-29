@@ -1,11 +1,14 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.37 [June 4, 2009]
- * For conditions of distribution and use, see copyright notice in png.h
+ * Last changed in libpng 1.2.37 [June 29, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  */
 
 #define PNG_INTERNAL
@@ -1387,7 +1390,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 
                tmp = text;
                text = (png_charp)png_malloc(png_ptr, text_size +
-                  (png_uint_32)(png_ptr->zbuf_size
+                  (png_uint_32)(png_ptr->zbuf_size 
                   - png_ptr->zstream.avail_out + 1));
 
                png_memcpy(text, tmp, text_size);
@@ -1609,7 +1612,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
       }
 #endif
       png_memcpy((png_charp)png_ptr->unknown_chunk.name,
-                 (png_charp)png_ptr->chunk_name,
+                 (png_charp)png_ptr->chunk_name, 
                  png_sizeof(png_ptr->unknown_chunk.name));
       png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name) - 1]
         = '\0';
