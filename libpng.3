@@ -1256,6 +1256,8 @@ you want to do are limited to the following set:
     PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity
                                 to transparency
     PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
+    PNG_TRANSFORM_GRAY_TO_RGB   Expand grayscale samples
+                                to RGB (or GA to RGBA)
 
 (This excludes setting a background color, doing gamma transformation,
 dithering, and setting filler.)  If this is the case, simply do this:
@@ -3837,13 +3839,18 @@ The png_calloc() function was added.
 
 We removed the trailing '.' from the warning and error messages.
 
+We added PNG_TRANSFORM_GRAY_TO_RGB to the available high-level
+input transforms.
+
 
 .SH X. Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
 changed, and is unaffected by conditional compilation macros.  It is the
 best choice for use in configure scripts for detecting the presence of any
-libpng version since 0.88.
+libpng version since 0.88.  In an autoconf "configure.in" you could use
+
+    AC_CHECK_LIB(png, png_get_io_ptr, ...
 
 .SH XI. Source code repository
 

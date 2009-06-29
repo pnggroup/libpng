@@ -1412,6 +1412,12 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
       png_set_invert_alpha(png_ptr);
 #endif
 
+#if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
+   /* Invert the alpha channel from opacity to transparency */
+   if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
+      png_set_invert_alpha(png_ptr);
+#endif
+
    /* ----------------------- end of transformations ------------------- */
 
    /* Write the bits */

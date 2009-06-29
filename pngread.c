@@ -1302,6 +1302,13 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
        png_set_invert_alpha(png_ptr);
 #endif
 
+#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
+   /* Expand grayscale image to RGB
+    */
+   if (transforms & PNG_TRANSFORM_GRAY_TO_RGB)
+       png_set_gray_to_rgb(png_structp png_ptr);
+#endif
+
    /* We don't handle adding filler bytes */
 
    /* Optional call to gamma correct and add the background to the palette

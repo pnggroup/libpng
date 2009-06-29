@@ -1046,10 +1046,12 @@ typedef void (PNGAPI *png_unknown_chunk_ptr) PNGARG((png_structp));
 #define PNG_TRANSFORM_SWAP_ALPHA     0x0100    /* read and write */
 #define PNG_TRANSFORM_SWAP_ENDIAN    0x0200    /* read and write */
 #define PNG_TRANSFORM_INVERT_ALPHA   0x0400    /* read and write */
-#define PNG_TRANSFORM_STRIP_FILLER   0x0800    /* WRITE only */
+#define PNG_TRANSFORM_STRIP_FILLER   0x0800    /* write only */
 /* Added to libpng-1.2.34 */
 #define PNG_TRANSFORM_STRIP_FILLER_BEFORE PNG_TRANSFORM_STRIP_FILLER
-#define PNG_TRANSFORM_STRIP_FILLER_AFTER 0x1000 /* WRITE only */
+#define PNG_TRANSFORM_STRIP_FILLER_AFTER 0x1000 /* write only */
+/* Added to libpng-1.4.0 */
+#define PNG_TRANSFORM_GRAY_TO_RGB   0x2000      /* read only */
 
 /* Flags for MNG supported features */
 #define PNG_FLAG_MNG_EMPTY_PLTE     0x01

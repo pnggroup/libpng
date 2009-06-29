@@ -495,8 +495,8 @@ version 1.4.0beta66 [June 27, 2009]
   Refer to the libpng license instead of the libpng license in each file.
 
 version 1.4.0beta67 [June 29, 2009]
-  Relocated INVERT_ALPHA within png_read_png() and png_write_png()
-    to match its position in pngrtran.c.
+  Relocated INVERT_ALPHA within png_read_png() and png_write_png().
+  Added high-level API transform PNG_TRANSFORM_GRAY_TO_RGB.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
