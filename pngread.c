@@ -1195,12 +1195,6 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
    if (png_ptr == NULL)
       return;
-#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
-   /* Invert the alpha channel from opacity to transparency
-    */
-   if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
-       png_set_invert_alpha(png_ptr);
-#endif
 
    /* png_read_info() gives us all of the information from the
     * PNG file before the first IDAT (image data chunk).
@@ -1299,6 +1293,13 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
     */
    if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
       png_set_swap(png_ptr);
+#endif
+
+#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
+   /* Invert the alpha channel from opacity to transparency
+    */
+   if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
+       png_set_invert_alpha(png_ptr);
 #endif
 
    /* We don't handle adding filler bytes */
