@@ -1,7 +1,11 @@
 # makefile for libpng
 # Copyright (C) 1998 Tim Wegner
 # Copyright (C) 2006,2009 Glenn Randers-Pehrson
-# For conditions of distribution and use, see copyright notice in png.h
+
+# This code is released under the libpng license.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h
+
 # Assumes that zlib.lib, zconf.h, and zlib.h have been copied to ..\zlib
 # To use, do "nmake /f scripts\makefile.vcwin32"
 

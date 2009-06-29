@@ -3,7 +3,10 @@
 # Copyright (C) 2000 Cosmin Truta
 # Copyright (C) 2000 Marc O. Gloor (AIX support added, from makefile.gcc)
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
-# For conditions of distribution and use, see copyright notice in png.h
+
+# This code is released under the libpng license.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h
 
 # Location of the zlib library and include files
 ZLIBINC = ../zlib
@@ -20,7 +23,7 @@ LN_SF = ln -f -s
 
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.38rc01
+PNGMIN = 1.2.38rc02
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local

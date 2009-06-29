@@ -3,13 +3,16 @@
 #   of the library, and builds two copies of pngtest: one
 #   statically linked and one dynamically linked.
 #
-# Built from makefile.cygwin
 # Copyright (C) 2002, 2006, 2008 Soren Anderson, Charles Wilson,
 #    and Glenn Randers-Pehrson, based on makefile for linux-elf w/mmx by:
 # Copyright (C) 1998-2000, 2007 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
-# For conditions of distribution and use, see copyright notice in png.h
 
+# This code is released under the libpng license.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h
+
+# Built from makefile.cygwin
 
 # This makefile intends to support building outside the src directory
 # if desired. When invoking it, specify an argument to SRCDIR on the
@@ -74,7 +77,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 MINGDLL = 12
-PNGMIN = 1.2.38rc01
+PNGMIN = 1.2.38rc02
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=libpng$(MINGDLL).dll

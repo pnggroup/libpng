@@ -2422,6 +2422,9 @@ version 1.0.46 [June 18, 2009]
 version 1.2.38rc01 [June 24, 2009]
   No changes.
 
+version 1.2.38rc02 [June 29, 2009]
+  Added a reference to the libpng license in each source file.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

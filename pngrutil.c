@@ -1,11 +1,14 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.38 [June 24, 2009]
- * For conditions of distribution and use, see copyright notice in png.h
+ * Last changed in libpng 1.2.38 [June 29, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  *
  * This file contains routines that are only called from within
  * libpng itself during the course of reading an image.
