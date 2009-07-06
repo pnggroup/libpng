@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [June 29, 2009]
+ * Last changed in libpng 1.4.0 [July 6, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -3952,6 +3952,35 @@ static PNG_CONST int png_gamma_shift[] =
  * tables, we don't make a full table if we are reducing to 8-bit in
  * the future.  Note also how the gamma_16 tables are segmented so that
  * we don't need to allocate > 64K chunks for a full 16-bit table.
+ *
+ * See the PNG extensions document for an integer algorithm for creating
+ * the gamma tables.  Maybe we will implement that here someday.
+ *
+ * We should only reach this point if
+ *
+ *      the file_gamma is known (i.e., the gAMA or sRGB chunk is present,
+ *      or the application has provided a file_gamma)
+ *
+ *   AND
+ *      {
+ *         the screen_gamma is known
+ *
+ *      OR
+ *
+ *         RGB_to_gray transformation is being performed
+ *      }
+ *
+ *   AND
+ *      {
+ *         the screen_gamma is different from the reciprocal of the
+ *         file_gamma by more than the specified threshold
+ *
+ *      OR
+ *
+ *         a background color has been specified and the file_gamma
+ *         and screen_gamma are not 1.0, within the specified threshold.
+ *      }
+ *
  */
 void /* PRIVATE */
 png_build_gamma_table(png_structp png_ptr)
