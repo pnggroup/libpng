@@ -2176,6 +2176,8 @@ version 1.4.0beta67 [July 6, 2009]
   Added high-level API transform PNG_TRANSFORM_GRAY_TO_RGB.
   Added an "xcode" project to the projects directory (Alam Arias).
 
+version 1.4.0beta68 [July 7, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

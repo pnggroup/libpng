@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta67 - July 6, 2009
+Libpng 1.4.0beta68 - July 7, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,27 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta67.tar.gz
-   1.4.0beta67.tar.bz2
+   1.4.0beta68.tar.gz
+   1.4.0beta68.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta67-no-config.tar.gz
-   1.4.0beta67-no-config.tar.bz2
+   1.4.0beta68-no-config.tar.gz
+   1.4.0beta68-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b67.zip
-   lp140b67.tar.bz2
+   lp140b68.zip
+   lp140b68.tar.bz2
 
 Other information:
 
-   1.4.0beta67-README.txt
-   1.4.0beta67-KNOWNBUGS.txt
-   1.4.0beta67-LICENSE.txt
-   1.4.0beta67-Y2K-compliance.txt
+   1.4.0beta68-README.txt
+   1.4.0beta68-KNOWNBUGS.txt
+   1.4.0beta68-LICENSE.txt
+   1.4.0beta68-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -498,6 +498,8 @@ version 1.4.0beta67 [July 6, 2009]
   Relocated INVERT_ALPHA within png_read_png() and png_write_png().
   Added high-level API transform PNG_TRANSFORM_GRAY_TO_RGB.
   Added an "xcode" project to the projects directory (Alam Arias).
+
+version 1.4.0beta68 [July 7, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
