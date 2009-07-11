@@ -1,5 +1,5 @@
 
-Libpng 1.2.38rc02 - June 29, 2009
+Libpng 1.2.38rc03 - July 11, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,74 +9,39 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.38rc02.tar.gz
-   libpng-1.2.38rc02.tar.lzma
+   libpng-1.2.38rc03.tar.gz
+   libpng-1.2.38rc03.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.38rc02.tar.bz2
+   libpng-1.2.38rc03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.38rc02-no-config.tar.gz
-   libpng-1.2.38rc02-no-config.tar.lzma
-   libpng-1.2.38rc02-no-config.tar.bz2
+   libpng-1.2.38rc03-no-config.tar.gz
+   libpng-1.2.38rc03-no-config.tar.lzma
+   libpng-1.2.38rc03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1238r02.zip
-   lp1238r02.7z
-   lp1238r02.tar.bz2
+   lp1238r03.zip
+   lp1238r03.7z
+   lp1238r03.tar.bz2
 
 Project files
 
-   libpng-1.2.38rc02-project-netware.zip
-   libpng-1.2.38rc02-project-wince.zip
+   libpng-1.2.38rc03-project-netware.zip
+   libpng-1.2.38rc03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.38rc02-README.txt
-   libpng-1.2.38rc02-KNOWNBUGS.txt
-   libpng-1.2.38rc02-LICENSE.txt
-   libpng-1.2.38rc02-Y2K-compliance.txt
-   libpng-1.2.38rc02-[previous version]-diff.txt
+   libpng-1.2.38rc03-README.txt
+   libpng-1.2.38rc03-KNOWNBUGS.txt
+   libpng-1.2.38rc03-LICENSE.txt
+   libpng-1.2.38rc03-Y2K-compliance.txt
+   libpng-1.2.38rc03-[previous version]-diff.txt
 
-Changes since the last public release (1.2.36):
-
-version 1.2.37beta01 [May 14, 2009]
-  Fixed inconsistency in pngrutil.c, introduced in libpng-1.2.36.  The
-    memset() was using "png_ptr->rowbytes" instead of "row_bytes", which
-    the corresponding png_malloc() uses (Joe Drew).
-  Clarified usage of sig_bit versus sig_bit_p in example.c (Vincent Torri)
-  Updated some of the makefiles in the scripts directory (merged with
-    those in libpng-1.4.0beta57).
-
-version 1.2.37beta02 [May 19, 2009]
-  Fixed typo in libpng documentation (FILTER_AVE should be FILTER_AVG)
-  Relocated misplaced #endif in pngwrite.c, sCAL chunk handler.
-  Conditionally compile png_read_finish_row() which is not used by
-    progressive readers.
-  Added contrib/pngminim/preader to demonstrate building minimal progressive
-    decoder, based on contrib/gregbook with embedded libpng and zlib.
-
-version 1.2.37beta03 [May 20, 2009]
-  In contrib/pngminim/*, renamed "makefile.std" to "makefile", since there
-    is only one makefile in those directories, and revised the README files
-    accordingly.
-  Reformated sources in libpng style (3-space indentation, comment format)
-
-version 1.2.37rc01 [May 27, 2009]
-  No changes.
-
-versions 1.2.37 and 1.0.45 [June 4, 2009]
-  Reformatted several remaining "else statement;" and "if () statement;" into
-    two lines.
-  Added "#define PNG_NO_WRITE_SWAP" to contrib/pngminim/encoder/pngusr.h
-    and "define PNG_NO_READ_SWAP" to decoder/pngusr.h and preader/pngusr.h
-  Added sections about the git repository and our coding style to the
-    documentation (merged from libpng-1.4.0beta62)
-  Added a section in the documentation about using png_get_io_ptr() in
-    configure scripts to detect the presence of libpng.
+Changes since the last public release (1.2.37):
 
 versions 1.2.38beta01 [June 17, 2009]
   Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
@@ -98,6 +63,10 @@ version 1.2.38rc01 [June 24, 2009]
 version 1.2.38rc02 [June 29, 2009]
   Added a reference to the libpng license in each source file.
 
+version 1.2.38rc03 [July 11, 2009]
+  Revised references to the libpng license in pngconf.h and contrib/visupng
+    source files.
+  Rebuilt configure scripts with autoconf-2.63.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
