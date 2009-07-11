@@ -2425,6 +2425,11 @@ version 1.2.38rc01 [June 24, 2009]
 version 1.2.38rc02 [June 29, 2009]
   Added a reference to the libpng license in each source file.
 
+version 1.2.38rc03 [July 11, 2009]
+  Revised references to the libpng license in pngconf.h and contrib/visupng
+    source files.
+  Updated configure scripts from autoconf-2.62 to autoconf-2.63
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
