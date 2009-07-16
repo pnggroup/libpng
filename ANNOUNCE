@@ -1,5 +1,5 @@
 
-Libpng 1.0.46 - June 18, 2009
+Libpng 1.0.47 - July 16, 2009
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,47 +8,57 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.46.tar.gz
-   libpng-1.0.46.tar.lzma
+   libpng-1.0.47.tar.gz
+   libpng-1.0.47.tar.lzma
      (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.0.46.tar.bz2
+   libpng-1.0.47.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.46-no-config.tar.gz
-   libpng-1.0.46-no-config.tar.lzma
-   libpng-1.0.46-no-config.tar.bz2
+   libpng-1.0.47-no-config.tar.gz
+   libpng-1.0.47-no-config.tar.lzma
+   libpng-1.0.47-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1046.zip
-   lpng1046.7z
-   lpng1046.tar.bz2
+   lpng1047.zip
+   lpng1047.7z
+   lpng1047.tar.bz2
 
 Project files
 
-   libpng-1.0.46-project-netware.zip
-   libpng-1.0.46-project-wince.zip
+   libpng-1.0.47-project-netware.zip
+   libpng-1.0.47-project-wince.zip
 
 Other information:
 
-   libpng-1.0.46-README.txt
-   libpng-1.0.46-KNOWNBUGS.txt
-   libpng-1.0.46-LICENSE.txt
-   libpng-1.0.46-Y2K-compliance.txt
+   libpng-1.0.47-README.txt
+   libpng-1.0.47-KNOWNBUGS.txt
+   libpng-1.0.47-LICENSE.txt
+   libpng-1.0.47-Y2K-compliance.txt
 
-Changes since the last public release (1.0.45):
+Changes since the last public release (1.0.46):
 
-version 1.0.46 [June 18, 2009]
+version 1.0.47 [July 16, 2009]
 
-  Fixed a mistake in the editing script that changes the scripts files
-    to version 1.0.x, which created an erroneous libpng.pc and some makefiles.
-    The error was introduced in libpng-1.0.45.
+  Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
+    multiple times and to specify the sample order in the tRNS chunk,
+    because the ISO PNG specification has a typo in the tRNS table.
+  Changed several PNG_UNKNOWN_CHUNK_SUPPORTED to
+    PNG_HANDLE_AS_UNKNOWN_SUPPORTED, to make the png_set_keep mechanism
+    available for ignoring known chunks even when not saving unknown chunks.
+  Added PNG_NO_HANDLE_AS_UNKNOWN in the PNG_LEGACY_SUPPORTED block of
+    pngconf.h, and moved the various unknown chunk macro definitions
+    outside of the PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
+  Added a reference to the libpng license in each source file.
+  Rebuilt configure scripts with autoconf-2.63.
+
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-(subscription required; visit 
+(subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
 

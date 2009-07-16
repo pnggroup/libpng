@@ -1,5 +1,8 @@
 # makefile for libpng on OS/2 with gcc
-# For conditions of distribution and use, see copyright notice in png.h
+
+# This code is released under the libpng license.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h
 
 # Related files: pngos2.def
 

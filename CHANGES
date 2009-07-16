@@ -1172,7 +1172,7 @@ version 1.2.4beta3 [June 28, 2002]
   Plugged memory leak of row_buf in pngtest.c when there is a png_error().
   Detect buffer overflow in pngpread.c when IDAT is corrupted with extra data.
   Added "test-installed" target to makefile.32sunu, makefile.64sunu,
-    makefile.beos, makefile.darwin, makefile.dec, makefile.macosx, 
+    makefile.beos, makefile.darwin, makefile.dec, makefile.macosx,
     makefile.solaris, makefile.hpux, makefile.hpgcc, and makefile.so9.
 version 1.2.4rc1 and 1.0.14rc1 [July 2, 2002]
   Added "test-installed" target to makefile.cygwin and makefile.sco.
@@ -1376,7 +1376,7 @@ version 1.2.8beta5 [November 20, 2004]
   Use png_ptr->flags instead of png_ptr->transformations to pass
     PNG_STRIP_ALPHA info to png_do_strip_filler(), to preserve ABI
     compatibility.
-  Revised handling of SPECIALBUILD, PRIVATEBUILD, 
+  Revised handling of SPECIALBUILD, PRIVATEBUILD,
     PNG_LIBPNG_BUILD_SPECIAL_STRING and PNG_LIBPNG_BUILD_PRIVATE_STRING.
 version 1.2.8rc1 [November 24, 2004]
   Moved handling of BUILD macros from pngconf.h to png.h
@@ -1674,14 +1674,14 @@ version 1.2.16beta1 [January 6, 2007]
 
 version 1.2.16beta2 [January 16, 2007]
   Revised scripts/CMakeLists.txt
- 
+
 version 1.0.24, 1.2.16 [January 31, 2007]
   No changes.
- 
+
 version 1.2.17beta1 [March 6, 2007]
   Revised scripts/CMakeLists.txt to install both shared and static libraries.
   Deleted a redundant line from pngset.c.
- 
+
 version 1.2.17beta2 [April 26, 2007]
   Relocated misplaced test for png_ptr == NULL in pngpread.c
   Change "==" to "&" for testing PNG_RGB_TO_GRAY_ERR & PNG_RGB_TO_GRAY_WARN
@@ -1702,7 +1702,7 @@ version 1.2.17rc2 [May 8, 2007]
   Added png_ptr->unknown_chunk to hold working unknown chunk data, so it
     can be free'ed in case of error.  Revised unknown chunk handling in
     pngrutil.c and pngpread.c to use this structure.
- 
+
 version 1.2.17rc3 [May 8, 2007]
   Revised symbol-handling in configure script.
 
@@ -2378,24 +2378,49 @@ version 1.2.37beta03 [May 20, 2009]
     is only one makefile in those directories, and revised the README files
     accordingly.
   Reformated sources in libpng style (3-space indentation, comment format)
-  
+
 version 1.2.37rc01 [May 27, 2009]
   No changes.
 
-versions 1.2.37 and 1.0.45 [June 17, 2009]
-  Reformatted several remaining "else statement;" and "if () statment;" into
+versions 1.2.37 and 1.0.45 [June 4, 2009]
+  Reformatted several remaining "else statement;" and "if () statement;" into
     two lines.
   Added "#define PNG_NO_WRITE_SWAP" to contrib/pngminim/encoder/pngusr.h
     and "define PNG_NO_READ_SWAP" to decoder/pngusr.h and preader/pngusr.h
   Added sections about the git repository and our coding style to the
     documentation (merged from libpng-1.4.0beta62)
-  Added a section about using png_get_io_ptr() in configure scripts to detect
-    the presence of libpng.
+  Added a section to the libpng documentation about using png_get_io_ptr()
+    in configure scripts to detect the presence of libpng.
+
+version 1.2.38beta01 [June 17, 2009]
+  Revised libpng*.txt and libpng.3 to mention calling png_set_IHDR()
+    multiple times and to specify the sample order in the tRNS chunk,
+    because the ISO PNG specification has a typo in the tRNS table.
+  Changed several PNG_UNKNOWN_CHUNK_SUPPORTED to
+    PNG_HANDLE_AS_UNKNOWN_SUPPORTED, to make the png_set_keep mechanism
+    available for ignoring known chunks even when not saving unknown chunks.
+  Adopted preference for consistent use of "#ifdef" and "#ifndef" versus
+    "#if defined()" and "if !defined()" where possible.
+  Added PNG_NO_HANDLE_AS_UNKNOWN in the PNG_LEGACY_SUPPORTED block of
+    pngconf.h, and moved the various unknown chunk macro definitions
+    outside of the PNG_READ|WRITE_ANCILLARY_CHUNK_SUPPORTED blocks.
 
 version 1.0.46 [June 18, 2009]
-  Fixed a mistake in the editing script that changes the scripts files
-    to version 1.0.x, which created an erroneous libpng.pc and some makefiles.
-    The error was introduced in libpng-1.0.45.
+  Removed some editing cruft from scripts/libpng.pc.in and some makefiles.
+
+version 1.2.38rc01 [June 24, 2009]
+  No changes.
+
+version 1.2.38rc02 [June 29, 2009]
+  Added a reference to the libpng license in each source file.
+
+version 1.2.38rc03 [July 11, 2009]
+  Revised references to the libpng license in pngconf.h and contrib/visupng
+    source files.
+  Rebuilt configure scripts with autoconf-2.63.
+
+version 1.0.47 and 1.2.38 [July 16, 2009]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
