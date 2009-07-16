@@ -3,9 +3,9 @@
 
 Change log:
 
-Version 1.6.20 (built with libpng-1.2.38beta01 and zlib-1.2.3.2)
-  Made the license text identical to the actual zlib/libpng license text
-    found in zlib.h.
+Version 1.6.20 (built with libpng-1.2.38 and zlib-1.2.3.2)
+  Changed local variable "write" to "wwrite" in inffast.c (zlib) to avoid
+    shadowed declaration warning.
 
 Version 1.6.19 (built with libpng-1.2.37 and zlib-1.2.3.2)
   Added missing braces that cause an incorrect png_error() to be issued.

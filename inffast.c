@@ -1,6 +1,10 @@
 /* inffast.c -- fast decoding
  * Copyright (C) 1995-2006 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
+ *
+ * This file was modified by Glenn Randers-Pehrson, by changing the
+ * variable name "write" to "wwrite" to avoid a "Shadowed Declaration"
+ * warning.
  */
 
 #include "zutil.h"
@@ -79,7 +83,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
 #endif
     unsigned wsize;             /* window size or zero if not using window */
     unsigned whave;             /* valid bytes in the window */
-    unsigned write;             /* window write index */
+    unsigned wwrite;            /* window write index (pngcrush mod) */
     unsigned char FAR *window;  /* allocated sliding window, if wsize != 0 */
     unsigned long hold;         /* local strm->hold */
     unsigned bits;              /* local strm->bits */
@@ -106,7 +110,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
 #endif
     wsize = state->wsize;
     whave = state->whave;
-    write = state->write;
+    wwrite = state->write;
     window = state->window;
     hold = state->hold;
     bits = state->bits;
@@ -213,7 +217,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
 #endif
                     }
                     from = window - OFF;
-                    if (write == 0) {           /* very common case */
+                    if (wwrite == 0) {           /* very common case */
                         from += wsize - op;
                         if (op < len) {         /* some from window */
                             len -= op;
@@ -223,17 +227,17 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
                             from = out - dist;  /* rest from output */
                         }
                     }
-                    else if (write < op) {      /* wrap around window */
-                        from += wsize + write - op;
-                        op -= write;
+                    else if (wwrite < op) {      /* wrap around window */
+                        from += wsize + wwrite - op;
+                        op -= wwrite;
                         if (op < len) {         /* some from end of window */
                             len -= op;
                             do {
                                 PUP(out) = PUP(from);
                             } while (--op);
                             from = window - OFF;
-                            if (write < len) {  /* some from start of window */
-                                op = write;
+                            if (wwrite < len) {  /* some from start of window */
+                                op = wwrite;
                                 len -= op;
                                 do {
                                     PUP(out) = PUP(from);
@@ -243,7 +247,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
                         }
                     }
                     else {                      /* contiguous in window */
-                        from += write - op;
+                        from += wwrite - op;
                         if (op < len) {         /* some from window */
                             len -= op;
                             do {

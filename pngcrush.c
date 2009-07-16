@@ -159,7 +159,9 @@
 
 Change log:
 
-Version 1.6.20 (built with libpng-1.2.38rc02 and zlib-1.2.3.2)
+Version 1.6.20 (built with libpng-1.2.38 and zlib-1.2.3.2)
+  Changed local variable "write" to "wwrite" in inffast.c (zlib) to avoid
+    shadowed declaration warning.
 
 Version 1.6.19 (built with libpng-1.2.37 and zlib-1.2.3.2)
   Added missing braces that cause an incorrect png_error() to be issued.
@@ -3048,7 +3050,7 @@ int main(int argc, char *argv[])
         }
 #else
         if (do_color_count)
-            printf("   color counting (-cc option) is disabled.\n");
+            printf("   color counting (-cc option) is not supported.\n");
 #endif /* PNGCRUSH_COUNT_COLORS */
 
         if (force_output_bit_depth != 0 &&
