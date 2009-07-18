@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta68 - July 7, 2009
+Libpng 1.4.0beta68 - July 18, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -499,7 +499,8 @@ version 1.4.0beta67 [July 6, 2009]
   Added high-level API transform PNG_TRANSFORM_GRAY_TO_RGB.
   Added an "xcode" project to the projects directory (Alam Arias).
 
-version 1.4.0beta68 [July 7, 2009]
+version 1.4.0beta68 [July 18, 2009]
+  Avoid some tests in filter selection in pngwutil.c
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

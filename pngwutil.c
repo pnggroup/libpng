@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [July 7, 2009]
+ * Last changed in libpng 1.4.0 [July 18, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2130,7 +2130,13 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    png_uint_32 row_bytes = row_info->rowbytes;
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    int num_p_filters = (int)png_ptr->num_prev_filters;
-#endif
+#else
+  if (png_ptr->row_number == 0)
+  {
+     /* These will never be selected so we need not test them. */
+     filter_to_do &= ~(PNG_FILTER_UP | PNG_FILTER_PAETH);
+  }
+#endif 
 
    png_debug(1, "in png_write_find_filter");
    /* Find out how many bytes offset each pixel is */
