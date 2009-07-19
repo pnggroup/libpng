@@ -503,6 +503,8 @@ version 1.4.0beta68 [July 19, 2009]
   Avoid some tests in filter selection in pngwutil.c
 
 version 1.4.0beta69 [July 19, 2009]
+  Simplified the new filter-selection test.  This runs faster in the
+    common "PNG_ALL_FILTERS" and PNG_FILTER_NONE cases.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
