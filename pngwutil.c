@@ -2128,9 +2128,13 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    png_uint_32 mins, bpp;
    png_byte filter_to_do = png_ptr->do_filter;
    png_uint_32 row_bytes = row_info->rowbytes;
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    int num_p_filters = (int)png_ptr->num_prev_filters;
-#else
+#endif 
+
+   png_debug(1, "in png_write_find_filter");
+
+#ifndef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
   if ((png_ptr->row_number == 0)  && 
      (filter_to_do & PNG_FILTER_NONE) &&
      (filter_to_do & PNG_FILTER_SUB))
