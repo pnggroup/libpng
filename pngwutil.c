@@ -2135,9 +2135,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    png_debug(1, "in png_write_find_filter");
 
 #ifndef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-  if ((png_ptr->row_number == 0)  && 
-     (filter_to_do & PNG_FILTER_NONE) &&
-     (filter_to_do & PNG_FILTER_SUB))
+  if (png_ptr->row_number == 0 && filter_to_do == PNG_ALL_FILTERS)
   {
       /* These will never be selected so we need not test them. */
       filter_to_do &= ~(PNG_FILTER_UP | PNG_FILTER_PAETH);
