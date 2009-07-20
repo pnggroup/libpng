@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta69 - July 19, 2009
+Libpng 1.4.0beta69 - July 20, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -502,9 +502,11 @@ version 1.4.0beta67 [July 6, 2009]
 version 1.4.0beta68 [July 19, 2009]
   Avoid some tests in filter selection in pngwutil.c
 
-version 1.4.0beta69 [July 19, 2009]
+version 1.4.0beta69 [July 20, 2009]
   Simplified the new filter-selection test.  This runs faster in the
     common "PNG_ALL_FILTERS" and PNG_FILTER_NONE cases.
+  Removed extraneous declaration from the new call to png_read_gray_to_rgb()
+    (bug introduced in libpng-1.4.0beta67).
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

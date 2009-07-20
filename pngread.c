@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [July 19, 2009]
+ * Last changed in libpng 1.4.0 [July 20, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1306,7 +1306,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* Expand grayscale image to RGB
     */
    if (transforms & PNG_TRANSFORM_GRAY_TO_RGB)
-       png_set_gray_to_rgb(png_structp png_ptr);
+       png_set_gray_to_rgb(png_ptr);
 #endif
 
    /* We don't handle adding filler bytes */
