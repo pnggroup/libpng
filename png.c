@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [July 19, 2009]
+ * Last changed in libpng 1.4.0 [July 23, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -134,7 +134,7 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Function to allocate memory for zlib and clear it to 0. */
-voidpf /* private */
+voidpf /* PRIVATE */
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
    png_voidp ptr;
@@ -159,7 +159,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 }
 
 /* Function to free memory for zlib */
-void /* private */
+void /* PRIVATE */
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
    png_free((png_structp)png_ptr, (png_voidp)ptr);
@@ -652,13 +652,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta69 - July 19, 2009" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta69 - July 23, 2009" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta69 - July 19, 2009\
+      return ((png_charp) "libpng version 1.4.0beta69 - July 23, 2009\
       Copyright (c) 1998-2009 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -776,7 +776,11 @@ png_convert_size(size_t size)
  *    A and D, and X || Y is (X << 16) + Y.
 */
 
-void png_64bit_product (long v1, long v2, unsigned long *hi_product,
+void /* PRIVATE */
+png_64bit_product (long v1, long v2, unsigned long *hi_product,
+   unsigned long *lo_product);
+void /* PRIVATE */
+png_64bit_product (long v1, long v2, unsigned long *hi_product,
    unsigned long *lo_product)
 {
    int a, b, c, d;
@@ -800,7 +804,7 @@ void png_64bit_product (long v1, long v2, unsigned long *hi_product,
    *lo_product = (unsigned long)lo;
 }
 
-int /* private */
+int /* PRIVATE */
 png_check_cHRM_fixed(png_structp png_ptr,
    png_fixed_point white_x, png_fixed_point white_y, png_fixed_point red_x,
    png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
