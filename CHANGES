@@ -539,7 +539,8 @@ version 1.0.5d [November 29, 1999]
   Eliminated pngtypes.h; use macros instead to declare PNG_CHNK arrays.
   Renamed "PNG_GLOBAL_ARRAYS" to "PNG_USE_GLOBAL_ARRAYS" and made available
     to applications a macro "PNG_USE_LOCAL_ARRAYS".
-  #ifdef out all the new declarations when PNG_USE_GLOBAL_ARRAYS is defined.
+  Remove all the new declarations with #ifdef/#endif when
+    PNG_USE_GLOBAL_ARRAYS is defined.
   Added PNG_EXPORT_VAR macro to accommodate making DLL's.
 version 1.0.5e [November 30, 1999]
   Added iCCP, iTXt, and sPLT support; added "lang" member to the png_text
@@ -1300,7 +1301,7 @@ version 1.2.6beta4 [July 28, 2004]
   Added PNG_NO_SEQUENTIAL_READ_SUPPORTED macro to conditionally remove
     sequential read support.
   Added some "#if PNG_WRITE_SUPPORTED" blocks.
-  #ifdef'ed out some redundancy in png_malloc_default().
+  Removed some redundancy with #ifdef/#endif in png_malloc_default().
   Use png_malloc instead of png_zalloc to allocate the pallete.
 version 1.0.16rc1 and 1.2.6rc1 [August 4, 2004]
   Fixed buffer overflow vulnerability in png_handle_tRNS()
@@ -1370,7 +1371,8 @@ version 1.2.8beta1 [November 1, 2004]
   Fixed bug, introduced in libpng-1.2.7, that overruns a buffer during
     strip alpha operation in png_do_strip_filler().
   Added PNG_1_2_X definition in pngconf.h
-  #ifdef out png_info_init in png.c and png_read_init in pngread.c (as of 1.3.0)
+  Comment out with #ifdef/#endif png_info_init in png.c and png_read_init
+    in pngread.c (as of 1.3.0)
 version 1.2.8beta2 [November 2, 2004]
   Reduce color_type to a nonalpha type after strip alpha operation in
     png_do_strip_filler().
@@ -1756,9 +1758,9 @@ version 1.2.19beta6 [May 22, 2007]
   Added a special "_MSC_VER" case that defines png_snprintf to _snprintf
 
 version 1.2.19beta7 [May 22, 2007]
-  Squelched png_squelch_warnings() in pnggccrd.c and added an
-    #ifdef PNG_MMX_CODE_SUPPORTED block around the declarations that caused
-    the warnings that png_squelch_warnings was squelching.
+  Squelched png_squelch_warnings() in pnggccrd.c and added
+    an #ifdef PNG_MMX_CODE_SUPPORTED/#endif block around the declarations
+    that caused the warnings that png_squelch_warnings was squelching.
 
 version 1.2.19beta8 [May 22, 2007]
   Removed __MMX__ from test in pngconf.h.
@@ -2156,7 +2158,7 @@ version 1.2.29beta03 [May 2, 2008]
     automake options.
   Changed $(ECHO) to echo in Makefile.am and Makefile.in
   Updated all configure files to autoconf-2.62
-  #ifdef out pnggcrd.c code if using MSC_VER
+  Comment out pnggcrd.c code with #ifdef/#endif if using MSC_VER
 
 version 1.2.29rc01 [May 4, 2008]
   No changes.
@@ -2323,9 +2325,6 @@ version 1.2.35rc01 [February 11, 2009]
 version 1.2.35rc02 [February 12, 2009]
   Fix typo in new png_memset call in pngset.c (png_color should be png_charp)
 
-version 1.2.35 [February 14, 2009]
-  No changes.
-
 version 1.0.43 and 1.2.35 [February 14, 2009]
   No changes.
 
@@ -2432,6 +2431,8 @@ version 1.2.38rc03 [July 11, 2009]
 
 version 1.0.47 and 1.2.38 [July 16, 2009]
   No changes.
+
+versions 1.2.39beta01 [July 23, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
