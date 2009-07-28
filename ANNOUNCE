@@ -515,6 +515,7 @@ version 1.4.0beta70 [July 27, 2009]
     (bug introduced in libpng-0.95, discovered by Evan Rouault)
 
 version 1.4.0beta71 [July 28, 2009]
+  Rebuilt configure scripts with autoconf-2.64.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
