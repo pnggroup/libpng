@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta70 - July 25, 2009
+Libpng 1.4.0beta70 - July 28, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -510,7 +510,8 @@ version 1.4.0beta69 [July 25, 2009]
   Fixed up xcode project (Alam Arias)
   Declared internal png_64bit_product() static.
 
-version 1.4.0beta70 [July 25, 2009]
+version 1.4.0beta70 [July 28, 2009]
+  Avoid a possible NULL dereference in debug build, in png_set_text_2().
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
