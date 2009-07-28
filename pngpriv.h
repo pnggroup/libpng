@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta70 - July 25, 2009
+ * libpng version 1.4.0beta70 - July 28, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -849,6 +849,14 @@ PNG_EXTERN int png_check_cHRM_fixed  PNGARG((png_structp png_ptr,
    png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
    int_green_x, png_fixed_point int_green_y, png_fixed_point int_blue_x,
    png_fixed_point int_blue_y));
+#endif
+
+#if defined(PNG_cHRM_SUPPORTED)
+#if !defined(PNG_NO_CHECK_cHRM)
+/* Added at libpng version 1.2.34 and 1.4.0 */
+PNG_EXTERN void png_64bit_product (long v1, long v2, unsigned long *hi_product,
+   unsigned long *lo_product);
+#endif
 #endif
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
