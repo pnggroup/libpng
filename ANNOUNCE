@@ -51,6 +51,9 @@ version 1.2.39beta02 [July 27, 2009]
     (bug introduced in libpng-0.95, discovered by Evan Rouault)
 
 version 1.2.39beta03 [July 28, 2009]
+  Relocated new png_64_bit_product() prototype into png.h
+  Expanded the information about prototypes in the libpng style section of
+    the documentation.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

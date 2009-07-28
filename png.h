@@ -3698,6 +3698,14 @@ PNG_EXTERN int png_check_cHRM_fixed  PNGARG((png_structp png_ptr,
    png_fixed_point int_blue_y));
 #endif
 
+#if defined(PNG_cHRM_SUPPORTED)
+#if !defined(PNG_NO_CHECK_cHRM)
+/* Added at libpng version 1.2.34 */
+PNG_EXTERN void png_64bit_product (long v1, long v2, unsigned long *hi_product,
+   unsigned long *lo_product);
+#endif
+#endif
+
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
 #endif /* PNG_INTERNAL */

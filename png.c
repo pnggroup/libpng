@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.39 [July 28, 2009]
+ * Last changed in libpng 1.2.37 [June 4, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -828,9 +828,6 @@ png_convert_size(size_t size)
  *    A and D, and X || Y is (X << 16) + Y.
 */
 
-void /* PRIVATE */
-png_64bit_product (long v1, long v2, unsigned long *hi_product,
-   unsigned long *lo_product);
 void /* PRIVATE */
 png_64bit_product (long v1, long v2, unsigned long *hi_product,
    unsigned long *lo_product)
