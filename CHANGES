@@ -2189,9 +2189,11 @@ version 1.4.0beta69 [July 25, 2009]
   Fixed up xcode project (Alam Arias)
   Added a prototype for png_64bit_product() in png.c
 
-version 1.4.0beta70 [July 28, 2009]
+version 1.4.0beta70 [July 27, 2009]
   Avoid a possible NULL dereference in debug build, in png_set_text_2().
     (bug introduced in libpng-0.95, discovered by Evan Rouault)
+
+version 1.4.0beta71 [July 28, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
