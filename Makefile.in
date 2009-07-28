@@ -19,9 +19,9 @@
 #   Source file for Makefile.in (and hence Makefile)
 #
 # Makefile.am need only be changed on a major version number
-# change (e.g. libpng12 --> libpng13).  In that case seach
+# change (e.g. libpng12 --> libpng14).  In that case seach
 # this file for every instance of the old base name (libpng12)
-# and change to the new one (libpng13), then change the
+# and change to the new one (libpng14), then change the
 # -version-number settings below so that the new values have
 # the correct major part (first field).
 
@@ -106,14 +106,14 @@ libpng_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libpng_la_LDFLAGS) $(LDFLAGS) -o $@
 libpng12_la_LIBADD =
-am_libpng12_la_OBJECTS = libpng12_la-png.lo libpng12_la-pngset.lo \
-	libpng12_la-pngget.lo libpng12_la-pngrutil.lo \
-	libpng12_la-pngtrans.lo libpng12_la-pngwutil.lo \
-	libpng12_la-pngread.lo libpng12_la-pngrio.lo \
-	libpng12_la-pngwio.lo libpng12_la-pngwrite.lo \
-	libpng12_la-pngrtran.lo libpng12_la-pngwtran.lo \
-	libpng12_la-pngmem.lo libpng12_la-pngerror.lo \
-	libpng12_la-pngpread.lo
+am_libpng12_la_OBJECTS = libpng12_la-png.lo \
+	libpng12_la-pngset.lo libpng12_la-pngget.lo \
+	libpng12_la-pngrutil.lo libpng12_la-pngtrans.lo \
+	libpng12_la-pngwutil.lo libpng12_la-pngread.lo \
+	libpng12_la-pngrio.lo libpng12_la-pngwio.lo \
+	libpng12_la-pngwrite.lo libpng12_la-pngrtran.lo \
+	libpng12_la-pngwtran.lo libpng12_la-pngmem.lo \
+	libpng12_la-pngerror.lo libpng12_la-pngpread.lo
 libpng12_la_OBJECTS = $(am_libpng12_la_OBJECTS)
 libpng12_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -218,6 +218,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PNGLIB_MAJOR = @PNGLIB_MAJOR@
@@ -319,8 +320,9 @@ libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
 libpng12_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
-libpng12_la_LDFLAGS = -no-undefined -export-dynamic -version-number \
-	0:@PNGLIB_RELEASE@:0 $(am__append_1) $(am__append_2)
+libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
+	-version-number 0:@PNGLIB_RELEASE@:0 $(am__append_1) \
+	$(am__append_2)
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
 	-version-number 3:@PNGLIB_RELEASE@:0

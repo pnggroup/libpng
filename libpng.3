@@ -825,8 +825,10 @@ libpng.txt - A description on how to use and modify libpng
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
- For conditions of distribution and use, see copyright
- notice in png.h.
+
+ This document is released under the libpng license.
+ For conditions of distribution and use, see the disclaimer
+ and license in png.h
 
  Based on:
 
@@ -3755,7 +3757,9 @@ when the Intel assembler code was removed due to a licensing issue.
 The png_get_io_ptr() function has been present since libpng-0.88, has never
 changed, and is unaffected by conditional compilation macros.  It is the
 best choice for use in configure scripts for detecting the presence of any
-libpng version since 0.88.
+libpng version since 0.88.  In an autoconf "configure.in" you could use
+
+    AC_CHECK_LIB(png, png_get_io_ptr, ...
 
 .SH XI. Source code repository
 
@@ -3832,7 +3836,10 @@ exported functions are marked with PNGAPI:
     body;
  }
 
-The prototypes for all exported functions appear in png.h.
+The prototypes for all exported functions appear in png.h,
+above the comment that says
+
+    /* Maintainer: Put new public prototypes here ... */
 
 We mark all non-exported functions with "/* PRIVATE */"":
 
@@ -3842,9 +3849,12 @@ We mark all non-exported functions with "/* PRIVATE */"":
     body;
  }
 
-The prototypes for non-exported functions can appear in
+The prototypes for non-exported functions (except for those in
+pngtest) appear in
 the PNG_INTERNAL section of png.h
-or in the file where the function is located.
+above the comment that says
+
+  /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
 The names of all exported functions and variables begin
 with  "png_", and all publicly visible C preprocessor
