@@ -16,7 +16,7 @@ AUTOMAKE_OPTIONS = foreign
 # test programs - run on make check, make distcheck
 check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
-pngtest_LDADD = libpngQQNNQQ.la
+pngtest_LDADD = libpng14.la
 TESTS = test-pngtest.sh
 TESTS_ENVIRONMENT= srcdir=$(srcdir) 
 
@@ -24,39 +24,39 @@ TESTS_ENVIRONMENT= srcdir=$(srcdir)
 dist_man_MANS= libpng.3 libpngpf.3 png.5
 
 # generate the -config scripts if required
-binconfigs= libpngQQNNQQ-config 
-EXTRA_SCRIPTS= libpng-config libpngQQNNQQ-config
+binconfigs= libpng14-config 
+EXTRA_SCRIPTS= libpng-config libpng14-config
 bin_SCRIPTS= @binconfigs@
 
 # rules to build libpng, only build the old library on request
-lib_LTLIBRARIES=libpngQQNNQQ.la @compatlib@
+lib_LTLIBRARIES=libpng14.la @compatlib@
 EXTRA_LTLIBRARIES= libpng.la
-libpngQQNNQQ_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
+libpng14_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
 	png.h pngconf.h
-libpng_la_SOURCES = $(libpngQQNNQQ_la_SOURCES)
+libpng_la_SOURCES = $(libpng14_la_SOURCES)
 
 libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
-libpngQQNNQQ_la_CPPFLAGS = @LIBPNG_DEFINES@
+libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
-libpngQQNNQQ_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number QQNNQQ:@PNGLIB_RELEASE@:QQNNQQ
+libpng14_la_LDFLAGS = -no-undefined -export-dynamic \
+	-version-number 14:@PNGLIB_RELEASE@:14
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number QQOLDSONUMQQ:@PNGLIB_RELEASE@:QQNNQQ
+	-version-number 14:@PNGLIB_RELEASE@:14
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
-  libpngQQNNQQ_la_LDFLAGS += -Wl,--version-script=libpng.vers
-  libpngQQNNQQ_la_DEPENDENCIES = libpng.vers
+  libpng14_la_LDFLAGS += -Wl,--version-script=libpng.vers
+  libpng14_la_DEPENDENCIES = libpng.vers
 else
   # Only restricted exports when possible
-  libpngQQNNQQ_la_LDFLAGS += -export-symbols libpng.sym
-  libpngQQNNQQ_la_DEPENDENCIES = libpng.sym
+  libpng14_la_LDFLAGS += -export-symbols libpng.sym
+  libpng14_la_DEPENDENCIES = libpng.sym
 endif
-libpng_la_DEPENDENCIES = $(libpngQQNNQQ_la_DEPENDENCIES)
+libpng_la_DEPENDENCIES = $(libpng14_la_DEPENDENCIES)
 
 # Avoid depending upon Character Ranges.
 AN = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -68,7 +68,7 @@ pkginclude_HEADERS= png.h pngconf.h
 # pkg-config stuff, note that libpng.pc is always required in order
 # to get the correct library
 pkgconfigdir = @pkgconfigdir@
-pkgconfig_DATA = libpngQQNNQQ.pc
+pkgconfig_DATA = libpng14.pc
 
 #extra source distribution files.
 EXTRA_DIST= \
@@ -86,9 +86,9 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-QQVERQQ.txt pngvcrd.c 
+	example.c libpng-1.4.0beta71.txt pngvcrd.c 
 
-CLEANFILES= pngout.png libpngQQNNQQ.pc libpngQQNNQQ-config libpng.vers \
+CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers \
 libpng.sym
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
@@ -127,7 +127,7 @@ install-data-hook:
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
-# do evil things to libpng to cause libpngQQNNQQ to be used
+# do evil things to libpng to cause libpng14 to be used
 install-exec-hook:
 	cd $(DESTDIR)$(bindir); rm -f libpng-config
 	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
