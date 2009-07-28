@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.39 [July 25, 2009]
+ * Last changed in libpng 1.2.39 [July 28, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -705,7 +705,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.39beta02 - July 25, 2009\n\
+   return ((png_charp) "\n libpng version 1.2.39beta02 - July 28, 2009\n\
    Copyright (c) 1998-2009 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
