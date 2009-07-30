@@ -1,5 +1,5 @@
 
-Installing libpng version 1.4.0beta71 - July 28, 2009
+Installing libpng version 1.4.0beta72 - July 30, 2009
 
 On Unix/Linux and similar systems, you can simply type
 
@@ -44,7 +44,7 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.4.0beta71" or "lpng109" and "zlib-1.2.1"
+might be called "libpng-1.4.0beta72" or "lpng109" and "zlib-1.2.1"
 or "zlib121") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -95,14 +95,14 @@ include
  CMakeLists.txt    =>  "cmake" script
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       gcc, creates libpng14.so.14.1.4.0beta71)
+                       gcc, creates libpng14.so.14.1.4.0beta72)
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.14.1.4.0beta71)
+                       (gcc, creates libpng14.so.14.1.4.0beta72)
  makefile.gcmmx    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.14.1.4.0beta71,
+                       (gcc, creates libpng14.so.14.1.4.0beta72,
                        uses assembler code tuned for Intel MMX platform)
  makefile.nommx    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.14.1.4.0beta71
+                       (gcc, creates libpng14.so.14.1.4.0beta72
                        does not use Intel MMX assembler code)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
@@ -125,12 +125,12 @@ include
  makefile.openbsd  =>  OpenBSD makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng14.so.14.1.4.0beta71)
+                       creates libpng14.so.14.1.4.0beta72)
  makefile.sunos    =>  Sun makefile
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng14.so.14.1.4.0beta71)
+                       creates libpng14.so.14.1.4.0beta72)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng14.so.14.1.4.0beta71)
+                       creates libpng14.so.14.1.4.0beta72)
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
