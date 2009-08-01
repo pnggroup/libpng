@@ -2445,6 +2445,10 @@ version 1.2.39beta03 [July 29, 2009]
     the documentation.
   Rebuilt configure scripts with autoconf-2.64.
 
+version 1.2.39beta04 [August 1, 2009]
+  Replaced *.tar.lzma with *.txz in distribution.  Get the xz codec
+    from <http://tukaani.org/xz>.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

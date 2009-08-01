@@ -1,5 +1,5 @@
 
-Libpng 1.2.39beta03 - July 29, 2009
+Libpng 1.2.39beta04 - August 1, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.39beta03.tar.gz
-   libpng-1.2.39beta03.tar.lzma
-     (Get the lzma codec from <http://tukaani.org/lzma>).
-   libpng-1.2.39beta03.tar.bz2
+   libpng-1.2.39beta04.txz (LZMA-compressed, recommended)
+   libpng-1.2.39beta04.tar.gz
+   libpng-1.2.39beta04.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.39beta03-no-config.tar.gz
-   libpng-1.2.39beta03-no-config.tar.lzma
-   libpng-1.2.39beta03-no-config.tar.bz2
+   libpng-1.2.39beta04-no-config.txz (LZMA-compressed, recommended)
+   libpng-1.2.39beta04-no-config.tar.gz
+   libpng-1.2.39beta04-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1239b03.zip
-   lp1239b03.7z
-   lp1239b03.tar.bz2
+   lp1239b04.zip
+   lp1239b04.7z
+   lp1239b04.tar.bz2
 
 Project files
 
-   libpng-1.2.39beta03-project-netware.zip
-   libpng-1.2.39beta03-project-wince.zip
+   libpng-1.2.39beta04-project-netware.zip
+   libpng-1.2.39beta04-project-wince.zip
 
 Other information:
 
-   libpng-1.2.39beta03-README.txt
-   libpng-1.2.39beta03-KNOWNBUGS.txt
-   libpng-1.2.39beta03-LICENSE.txt
-   libpng-1.2.39beta03-Y2K-compliance.txt
-   libpng-1.2.39beta03-[previous version]-diff.txt
+   libpng-1.2.39beta04-README.txt
+   libpng-1.2.39beta04-KNOWNBUGS.txt
+   libpng-1.2.39beta04-LICENSE.txt
+   libpng-1.2.39beta04-Y2K-compliance.txt
+   libpng-1.2.39beta04-[previous version]-diff.txt
 
 Changes since the last public release (1.2.38):
 
@@ -50,7 +49,7 @@ version 1.2.39beta02 [July 27, 2009]
   Avoid a possible NULL dereference in debug build, in png_set_text_2().
     (bug introduced in libpng-0.95, discovered by Evan Rouault)
 
-version 1.2.39beta03 [July 29, 2009]
+version 1.2.39beta03 [August 1, 2009]
   Relocated new png_64_bit_product() prototype into png.h
   Expanded the information about prototypes in the libpng style section of
     the documentation.
