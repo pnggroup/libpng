@@ -788,6 +788,14 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
           ((*( (png_bytep)profile + 2))<< 8) |
           ((*( (png_bytep)profile + 3))    );
 
+   if (embedded_profile_len < 0)
+   {
+      png_warning(png_ptr,
+        "Embedded profile length in iCCP chunk is negative");
+      png_free(png_ptr, new_name);
+      return;
+   }
+
    if (profile_len < embedded_profile_len)
    {
       png_warning(png_ptr,
@@ -2119,9 +2127,12 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    png_uint_32 mins, bpp;
    png_byte filter_to_do = png_ptr->do_filter;
    png_uint_32 row_bytes = row_info->rowbytes;
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    int num_p_filters = (int)png_ptr->num_prev_filters;
-#endif
+#endif 
+
+   png_debug(1, "in png_write_find_filter");
+
 
    png_debug(1, "in png_write_find_filter");
    /* Find out how many bytes offset each pixel is */

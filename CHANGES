@@ -2449,6 +2449,10 @@ version 1.2.39beta04 [August 1, 2009]
   Replaced *.tar.lzma with *.txz in distribution.  Get the xz codec
     from <http://tukaani.org/xz>.
 
+version 1.2.39beta05 [August 1, 2009]
+  Reject attempt to write iCCP chunk with negative embedded profile length
+    (JD Chen)
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
