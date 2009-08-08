@@ -528,7 +528,7 @@ version 1.4.0beta73 [August 1, 2009]
     (JD Chen)
 
 version 1.4.0beta74 [August 8, 2009]
-  Changed "trans" to "trans_alpha".
+  Changed png_ptr and info_ptr member "trans" to "trans_alpha".
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
