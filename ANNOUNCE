@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta73 - August 1, 2009
+Libpng 1.4.0beta74 - August 8, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,29 +9,29 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta73.txz (LZMA-compressed, recommended)
-   1.4.0beta73.tar.gz
-   1.4.0beta73.tar.bz2
+   1.4.0beta74.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta74.tar.gz
+   1.4.0beta74.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta73-no-config.txz (LZMA-compressed, recommended)
-   1.4.0beta73-no-config.tar.gz
-   1.4.0beta73-no-config.tar.bz2
+   1.4.0beta74-no-config.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta74-no-config.tar.gz
+   1.4.0beta74-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b73.zip
-   lp140b73.tar.bz2
+   lp140b74.zip
+   lp140b74.tar.bz2
 
 Other information:
 
-   1.4.0beta73-README.txt
-   1.4.0beta73-KNOWNBUGS.txt
-   1.4.0beta73-LICENSE.txt
-   1.4.0beta73-Y2K-compliance.txt
+   1.4.0beta74-README.txt
+   1.4.0beta74-KNOWNBUGS.txt
+   1.4.0beta74-LICENSE.txt
+   1.4.0beta74-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -520,6 +520,15 @@ version 1.4.0beta71 [July 29, 2009]
   Added a prototype for png_64bit_product() in png.c
 
 version 1.4.0beta72 [August 1, 2009]
+  Replaced *.tar.lzma with *.tar.xz in distribution.  Get the xz codec
+    from <http://tukaani.org/xz>.
+
+version 1.4.0beta73 [August 1, 2009]
+  Reject attempt to write iCCP chunk with negative embedded profile length
+    (JD Chen)
+
+version 1.4.0beta74 [August 8, 2009]
+  Changed "trans" to "trans_alpha".
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

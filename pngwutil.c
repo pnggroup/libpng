@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 1, 2009]
+ * Last changed in libpng 1.4.0 [August 8, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1082,7 +1082,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
 /* Write the tRNS chunk */
 void /* PRIVATE */
-png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
+png_write_tRNS(png_structp png_ptr, png_bytep trans_alpha, png_color_16p tran,
    int num_trans, int color_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
@@ -1099,7 +1099,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
          return;
       }
       /* Write the chunk out as it is */
-      png_write_chunk(png_ptr, (png_bytep)png_tRNS, trans,
+      png_write_chunk(png_ptr, (png_bytep)png_tRNS, trans_alpha,
         (png_size_t)num_trans);
    }
    else if (color_type == PNG_COLOR_TYPE_GRAY)
@@ -1130,7 +1130,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
    }
    else
    {
-      png_warning(png_ptr, "Can't write tRNS with an alpha channel");
+      png_warning(png_ptr, "Can't write tRNS in a PNG with an alpha channel");
    }
 }
 #endif

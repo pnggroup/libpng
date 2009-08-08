@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [August 1, 2009]
+ * Last changed in libpng 1.4.0 [August 8, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1078,11 +1078,11 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
 #ifdef PNG_FREE_ME_SUPPORTED
    if (png_ptr->free_me & PNG_FREE_TRNS)
-      png_free(png_ptr, png_ptr->trans);
+      png_free(png_ptr, png_ptr->trans_alpha);
    png_ptr->free_me &= ~PNG_FREE_TRNS;
 #else
    if (png_ptr->flags & PNG_FLAG_FREE_TRNS)
-      png_free(png_ptr, png_ptr->trans);
+      png_free(png_ptr, png_ptr->trans_alpha);
    png_ptr->flags &= ~PNG_FLAG_FREE_TRNS;
 #endif
 #endif
