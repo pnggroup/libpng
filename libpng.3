@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "August 1, 2009"
+.TH LIBPNG 3 "August 8, 2009"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta73
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta74
 .SH SYNOPSIS
 \fI\fB
 
@@ -809,7 +809,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta73 - August 1, 2009
+ libpng version 1.4.0beta74 - August 8, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -820,7 +820,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.0beta73 - August 1, 2009
+ libpng versions 0.97, January 1998, through 1.4.0beta74 - August 8, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -1449,10 +1449,10 @@ into the info_ptr is returned for any complex types.
                      whichever are appropriate for the
                      given color type (png_color_16)
 
-    png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans,
-                     &trans_color);
-    trans          - array of transparent entries for
-                     palette (PNG_INFO_tRNS)
+    png_get_tRNS(png_ptr, info_ptr, &trans_alpha,
+                     &num_trans, &trans_color);
+    trans_alpha    - array of alpha (transparency)
+                     entries for palette (PNG_INFO_tRNS)
     trans_color    - graylevel or color sample values of
                      the single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
@@ -1674,7 +1674,7 @@ things.
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
-As of libpng version 1.4.0beta73, not all possible expansions are supported.
+As of libpng version 1.4.0beta74, not all possible expansions are supported.
 
 In the following table, the 01 means grayscale with depth<8, 31 means
 indexed with depth<8, other numerals represent the color type, "T" means
@@ -2691,10 +2691,11 @@ width, height, bit_depth, and color_type must be the same in each call.
                      appropriate for the given color type
                      (png_color_16)
 
-    png_set_tRNS(png_ptr, info_ptr, trans, num_trans,
-       trans_color);
-    trans          - array of transparent entries for
-                     palette (PNG_INFO_tRNS)
+    png_set_tRNS(png_ptr, info_ptr, trans_alpha,
+       num_trans, trans_color);
+    trans          - array of transparent entries
+    trans_alpha    - array of alpha (transparency)
+                     entries for palette (PNG_INFO_tRNS)
     trans_color    - graylevel or color sample values
                      (in order red, green, blue) of the
                      single transparent color for
@@ -3844,6 +3845,9 @@ We removed the trailing '.' from the warning and error messages.
 We added PNG_TRANSFORM_GRAY_TO_RGB to the available high-level
 input transforms.
 
+The png_struct and info_struct members "trans" and "trans_values" were
+changed to "trans_alpha" and "trans_color", respectively.
+
 The call to png_do_chop() in pngrtran.c, which reduces 16-bit input
 files to 8-bit bit depth, was relocated ahead of the building
 of gamma tables.  This allows us to build 8-bit tables instead
@@ -3977,13 +3981,13 @@ source.
 
 .SH XIII. Y2K Compliance in libpng
 
-August 1, 2009
+August 8, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0beta73 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0beta74 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -4207,7 +4211,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.4.0beta73 - August 1, 2009:
+Libpng version 1.4.0beta74 - August 8, 2009:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4230,7 +4234,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.4.0beta73, August 1, 2009, are
+libpng versions 1.2.6, August 15, 2004, through 1.4.0beta74, August 8, 2009, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4329,7 +4333,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-August 1, 2009
+August 8, 2009
 
 .\" end of man page
 

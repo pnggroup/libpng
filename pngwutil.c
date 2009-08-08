@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 1, 2009]
+ * Last changed in libpng 1.4.0 [August 8, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1130,7 +1130,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
    }
    else
    {
-      png_warning(png_ptr, "Can't write tRNS with an alpha channel");
+      png_warning(png_ptr, "Can't write tRNS in a PNG with an alpha channel");
    }
 }
 #endif

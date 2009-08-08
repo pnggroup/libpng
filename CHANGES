@@ -2197,12 +2197,15 @@ version 1.4.0beta71 [July 29, 2009]
   Rebuilt configure scripts with autoconf-2.64.
 
 version 1.4.0beta72 [August 1, 2009]
-  Replaced *.tar.lzma with *.txz in distribution.  Get the xz codec
+  Replaced *.tar.lzma with *.tar.xz in distribution.  Get the xz codec
     from <http://tukaani.org/xz>.
 
 version 1.4.0beta73 [August 1, 2009]
   Reject attempt to write iCCP chunk with negative embedded profile length
     (JD Chen)
+
+version 1.4.0beta74 [August 8, 2009]
+  Changed "trans" to "trans_alpha".
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
