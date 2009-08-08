@@ -1078,11 +1078,11 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
 #ifdef PNG_FREE_ME_SUPPORTED
    if (png_ptr->free_me & PNG_FREE_TRNS)
-      png_free(png_ptr, png_ptr->trans);
+      png_free(png_ptr, png_ptr->trans_alpha);
    png_ptr->free_me &= ~PNG_FREE_TRNS;
 #else
    if (png_ptr->flags & PNG_FLAG_FREE_TRNS)
-      png_free(png_ptr, png_ptr->trans);
+      png_free(png_ptr, png_ptr->trans_alpha);
    png_ptr->flags &= ~PNG_FLAG_FREE_TRNS;
 #endif
 #endif

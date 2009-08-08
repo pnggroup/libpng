@@ -1082,7 +1082,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
 #if defined(PNG_WRITE_tRNS_SUPPORTED)
 /* Write the tRNS chunk */
 void /* PRIVATE */
-png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
+png_write_tRNS(png_structp png_ptr, png_bytep trans_alpha, png_color_16p tran,
    int num_trans, int color_type)
 {
 #ifdef PNG_USE_LOCAL_ARRAYS
@@ -1099,7 +1099,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
          return;
       }
       /* Write the chunk out as it is */
-      png_write_chunk(png_ptr, (png_bytep)png_tRNS, trans,
+      png_write_chunk(png_ptr, (png_bytep)png_tRNS, trans_alpha,
         (png_size_t)num_trans);
    }
    else if (color_type == PNG_COLOR_TYPE_GRAY)

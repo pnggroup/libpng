@@ -886,16 +886,16 @@ png_set_tIME(png_structp png_ptr, png_infop info_ptr, png_timep mod_time)
 #if defined(PNG_tRNS_SUPPORTED)
 void PNGAPI
 png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
-   png_bytep trans, int num_trans, png_color_16p trans_color)
+   png_bytep trans_alpha, int num_trans, png_color_16p trans_color)
 {
    png_debug1(1, "in %s storage function", "tRNS");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   if (trans != NULL)
+   if (trans_alpha != NULL)
    {
        /*
-        * It may not actually be necessary to set png_ptr->trans here;
+        * It may not actually be necessary to set png_ptr->trans_alpha here;
         * we do it for backward compatibility with the way the png_handle_tRNS
         * function used to do the allocation.
         */
@@ -905,10 +905,10 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 #endif
 
        /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1 */
-       png_ptr->trans = info_ptr->trans = (png_bytep)png_malloc(png_ptr,
+       png_ptr->trans_alpha = info_ptr->trans_alpha = (png_bytep)png_malloc(png_ptr,
            (png_size_t)PNG_MAX_PALETTE_LENGTH);
        if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
-          png_memcpy(info_ptr->trans, trans, (png_size_t)num_trans);
+          png_memcpy(info_ptr->trans_alpha, trans_alpha, (png_size_t)num_trans);
    }
 
    if (trans_color != NULL)

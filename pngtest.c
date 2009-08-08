@@ -1045,11 +1045,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #if defined(PNG_tRNS_SUPPORTED)
    {
-      png_bytep trans;
+      png_bytep trans_alpha;
       int num_trans;
       png_color_16p trans_color;
 
-      if (png_get_tRNS(read_ptr, read_info_ptr, &trans, &num_trans,
+      if (png_get_tRNS(read_ptr, read_info_ptr, &trans_alpha, &num_trans,
          &trans_color))
       {
          int sample_max = (1 << read_info_ptr->bit_depth);
@@ -1060,7 +1060,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
              ((int)trans_color->red > sample_max ||
              (int)trans_color->green > sample_max ||
              (int)trans_color->blue > sample_max))))
-            png_set_tRNS(write_ptr, write_info_ptr, trans, num_trans,
+            png_set_tRNS(write_ptr, write_info_ptr, trans_alpha, num_trans,
                trans_color);
       }
    }

@@ -344,8 +344,8 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    if ((mask & PNG_FREE_TRNS) && (png_ptr->flags & PNG_FLAG_FREE_TRNS))
 #endif
    {
-      png_free(png_ptr, info_ptr->trans);
-      info_ptr->trans = NULL;
+      png_free(png_ptr, info_ptr->trans_alpha);
+      info_ptr->trans_alpha = NULL;
       info_ptr->valid &= ~PNG_INFO_tRNS;
 #ifndef PNG_FREE_ME_SUPPORTED
       png_ptr->flags &= ~PNG_FLAG_FREE_TRNS;

@@ -729,7 +729,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * single color specified that should be treated as fully transparent.
     * Data is valid if (valid & PNG_INFO_tRNS) is non-zero.
     */
-   png_bytep trans;    /* alpha values for paletted image */
+   png_bytep trans_alpha;    /* alpha values for paletted image */
    png_color_16 trans_color; /* transparent color for non-palette image */
 #endif
 
@@ -1194,7 +1194,7 @@ struct png_struct_def
 
 #if defined(PNG_tRNS_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) \
  || defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   png_bytep trans;           /* alpha values for paletted files */
+   png_bytep trans_alpha;           /* alpha values for paletted files */
    png_color_16 trans_color;  /* transparent color for non-paletted files */
 #endif
 
@@ -2298,13 +2298,13 @@ extern PNG_EXPORT(void,png_set_tIME) PNGARG((png_structp png_ptr,
 
 #if defined(PNG_tRNS_SUPPORTED)
 extern PNG_EXPORT(png_uint_32,png_get_tRNS) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_bytep *trans, int *num_trans,
+   png_infop info_ptr, png_bytep *trans_alpha, int *num_trans,
    png_color_16p *trans_color));
 #endif
 
 #if defined(PNG_tRNS_SUPPORTED)
 extern PNG_EXPORT(void,png_set_tRNS) PNGARG((png_structp png_ptr,
-   png_infop info_ptr, png_bytep trans, int num_trans,
+   png_infop info_ptr, png_bytep trans_alpha, int num_trans,
    png_color_16p trans_color));
 #endif
 

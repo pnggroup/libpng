@@ -801,7 +801,7 @@ png_get_tIME(png_structp png_ptr, png_infop info_ptr, png_timep *mod_time)
 #if defined(PNG_tRNS_SUPPORTED)
 png_uint_32 PNGAPI
 png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
-   png_bytep *trans, int *num_trans, png_color_16p *trans_color)
+   png_bytep *trans_alpha, int *num_trans, png_color_16p *trans_color)
 {
    png_uint_32 retval = 0;
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS))
@@ -809,9 +809,9 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
       png_debug1(1, "in %s retrieval function", "tRNS");
       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
-          if (trans != NULL)
+          if (trans_alpha != NULL)
           {
-             *trans = info_ptr->trans;
+             *trans_alpha = info_ptr->trans_alpha;
              retval |= PNG_INFO_tRNS;
           }
 
@@ -826,8 +826,8 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
              retval |= PNG_INFO_tRNS;
           }
 
-          if (trans != NULL)
-             *trans = NULL;
+          if (trans_alpha != NULL)
+             *trans_alpha = NULL;
       }
       if (num_trans != NULL)
       {

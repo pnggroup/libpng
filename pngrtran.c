@@ -859,7 +859,7 @@ png_init_read_transformations(png_structp png_ptr)
               int i, istop;
               istop=(int)png_ptr->num_trans;
               for (i=0; i<istop; i++)
-                 png_ptr->trans[i] = (png_byte)(255 - png_ptr->trans[i]);
+                 png_ptr->trans_alpha[i] = (png_byte)(255 - png_ptr->trans_alpha[i]);
            }
         }
 #endif
@@ -881,7 +881,7 @@ png_init_read_transformations(png_structp png_ptr)
     k=0;
     for (i=0; i<png_ptr->num_trans; i++)
     {
-      if (png_ptr->trans[i] != 0 && png_ptr->trans[i] != 0xff)
+      if (png_ptr->trans_alpha[i] != 0 && png_ptr->trans_alpha[i] != 0xff)
         k=1; /* Partial transparency is present */
     }
     if (k == 0)
@@ -963,26 +963,26 @@ png_init_read_transformations(png_structp png_ptr)
             }
             for (i = 0; i < num_palette; i++)
             {
-               if (i < (int)png_ptr->num_trans && png_ptr->trans[i] != 0xff)
+               if (i < (int)png_ptr->num_trans && png_ptr->trans_alpha[i] != 0xff)
                {
-                  if (png_ptr->trans[i] == 0)
+                  if (png_ptr->trans_alpha[i] == 0)
                   {
                      palette[i] = back;
                   }
-                  else /* if (png_ptr->trans[i] != 0xff) */
+                  else /* if (png_ptr->trans_alpha[i] != 0xff) */
                   {
                      png_byte v, w;
 
                      v = png_ptr->gamma_to_1[palette[i].red];
-                     png_composite(w, v, png_ptr->trans[i], back_1.red);
+                     png_composite(w, v, png_ptr->trans_alpha[i], back_1.red);
                      palette[i].red = png_ptr->gamma_from_1[w];
 
                      v = png_ptr->gamma_to_1[palette[i].green];
-                     png_composite(w, v, png_ptr->trans[i], back_1.green);
+                     png_composite(w, v, png_ptr->trans_alpha[i], back_1.green);
                      palette[i].green = png_ptr->gamma_from_1[w];
 
                      v = png_ptr->gamma_to_1[palette[i].blue];
-                     png_composite(w, v, png_ptr->trans[i], back_1.blue);
+                     png_composite(w, v, png_ptr->trans_alpha[i], back_1.blue);
                      palette[i].blue = png_ptr->gamma_from_1[w];
                   }
                }
@@ -1102,19 +1102,19 @@ png_init_read_transformations(png_structp png_ptr)
 
       for (i = 0; i < istop; i++)
       {
-         if (png_ptr->trans[i] == 0)
+         if (png_ptr->trans_alpha[i] == 0)
          {
             palette[i] = back;
          }
-         else if (png_ptr->trans[i] != 0xff)
+         else if (png_ptr->trans_alpha[i] != 0xff)
          {
             /* The png_composite() macro is defined in png.h */
             png_composite(palette[i].red, palette[i].red,
-               png_ptr->trans[i], back.red);
+               png_ptr->trans_alpha[i], back.red);
             png_composite(palette[i].green, palette[i].green,
-               png_ptr->trans[i], back.green);
+               png_ptr->trans_alpha[i], back.green);
             png_composite(palette[i].blue, palette[i].blue,
-               png_ptr->trans[i], back.blue);
+               png_ptr->trans_alpha[i], back.blue);
          }
       }
 
@@ -1334,7 +1334,7 @@ png_do_read_transformations(png_structp png_ptr)
       if (png_ptr->row_info.color_type == PNG_COLOR_TYPE_PALETTE)
       {
          png_do_expand_palette(&(png_ptr->row_info), png_ptr->row_buf + 1,
-            png_ptr->palette, png_ptr->trans, png_ptr->num_trans);
+            png_ptr->palette, png_ptr->trans_alpha, png_ptr->num_trans);
       }
       else
       {
@@ -3506,7 +3506,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
  */
 void /* PRIVATE */
 png_do_expand_palette(png_row_infop row_info, png_bytep row,
-   png_colorp palette, png_bytep trans, int num_trans)
+   png_colorp palette, png_bytep trans_alpha, int num_trans)
 {
    int shift, value;
    png_bytep sp, dp;
@@ -3597,7 +3597,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
       {
          case 8:
          {
-            if (trans != NULL)
+            if (trans_alpha != NULL)
             {
                sp = row + (png_size_t)row_width - 1;
                dp = row + (png_size_t)(row_width << 2) - 1;
@@ -3607,7 +3607,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
                   if ((int)(*sp) >= num_trans)
                      *dp-- = 0xff;
                   else
-                     *dp-- = trans[*sp];
+                     *dp-- = trans_alpha[*sp];
                   *dp-- = palette[*sp].blue;
                   *dp-- = palette[*sp].green;
                   *dp-- = palette[*sp].red;

@@ -157,10 +157,10 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
       {
          int j;
          for (j=0; j<(int)info_ptr->num_trans; j++)
-            info_ptr->trans[j] = (png_byte)(255 - info_ptr->trans[j]);
+            info_ptr->trans_alpha[j] = (png_byte)(255 - info_ptr->trans_alpha[j]);
       }
 #endif
-      png_write_tRNS(png_ptr, info_ptr->trans, &(info_ptr->trans_color),
+      png_write_tRNS(png_ptr, info_ptr->trans_alpha, &(info_ptr->trans_color),
          info_ptr->num_trans, info_ptr->color_type);
    }
 #endif
