@@ -2460,6 +2460,7 @@ version 1.2.39 and 1.0.48 [August 13, 2009]
   No changes.
 
 version 1.2.40beta01 [August 13, 2009]
+  Removed an extra png_debug() recently added to png_write_find_filter().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

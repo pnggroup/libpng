@@ -43,6 +43,7 @@ Other information:
 Changes since the last public release (1.2.39):
 
 version 1.2.40beta01 [August 13, 2009]
+  Removed an extra png_debug() recently added to png_write_find_filter().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
