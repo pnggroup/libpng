@@ -8,14 +8,14 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.39.txz (LZMA-compressed, recommended)
+   libpng-1.2.39.tar.xz (LZMA-compressed, recommended)
    libpng-1.2.39.tar.gz
    libpng-1.2.39.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.39-no-config.txz (LZMA-compressed, recommended)
+   libpng-1.2.39-no-config.tar.xz (LZMA-compressed, recommended)
    libpng-1.2.39-no-config.tar.gz
    libpng-1.2.39-no-config.tar.bz2
 
@@ -49,7 +49,7 @@ version 1.2.39 [August 13, 2009]
   Rebuilt configure scripts with autoconf-2.64.
   Avoid a possible NULL dereference in debug build, in png_set_text_2().
     (bug introduced in libpng-0.95, discovered by Evan Rouault)
-  Replaced *.tar.lzma with *.txz in distribution.  Get the xz codec
+  Replaced *.tar.lzma with *.tar.xz in distribution.  Get the xz codec
     from <http://tukaani.org/xz>.
   Reject attempt to write iCCP chunk with negative embedded profile length
     (JD Chen)
