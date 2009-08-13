@@ -2,9 +2,9 @@
 #   Source file for Makefile.in (and hence Makefile)
 #
 # Makefile.am need only be changed on a major version number
-# change (e.g. libpng12 --> libpng13).  In that case seach
+# change (e.g. libpng12 --> libpng14).  In that case seach
 # this file for every instance of the old base name (libpng12)
-# and change to the new one (libpng13), then change the
+# and change to the new one (libpng14), then change the
 # -version-number settings below so that the new values have
 # the correct major part (first field).
 
@@ -86,7 +86,7 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.0.47.txt pngvcrd.c 
+	example.c libpng-1.0.48.txt pngvcrd.c 
 
 CLEANFILES= pngout.png libpng10.pc libpng10-config libpng.vers \
 libpng.sym
