@@ -1,73 +1,62 @@
 
-Libpng 1.2.39rc01 - August 6, 2009
+Libpng 1.2.39 - August 13, 2009
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.39rc01.txz (LZMA-compressed, recommended)
-   libpng-1.2.39rc01.tar.gz
-   libpng-1.2.39rc01.tar.bz2
+   libpng-1.2.39.txz (LZMA-compressed, recommended)
+   libpng-1.2.39.tar.gz
+   libpng-1.2.39.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.39rc01-no-config.txz (LZMA-compressed, recommended)
-   libpng-1.2.39rc01-no-config.tar.gz
-   libpng-1.2.39rc01-no-config.tar.bz2
+   libpng-1.2.39-no-config.txz (LZMA-compressed, recommended)
+   libpng-1.2.39-no-config.tar.gz
+   libpng-1.2.39-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1239r01.zip
-   lp1239r01.7z
-   lp1239r01.tar.bz2
+   lpng1239.zip
+   lpng1239.7z
+   lpng1239.tar.bz2
 
 Project files
 
-   libpng-1.2.39rc01-project-netware.zip
-   libpng-1.2.39rc01-project-wince.zip
+   libpng-1.2.39-project-netware.zip
+   libpng-1.2.39-project-wince.zip
 
 Other information:
 
-   libpng-1.2.39rc01-README.txt
-   libpng-1.2.39rc01-KNOWNBUGS.txt
-   libpng-1.2.39rc01-LICENSE.txt
-   libpng-1.2.39rc01-Y2K-compliance.txt
-   libpng-1.2.39rc01-[previous version]-diff.txt
+   libpng-1.2.39-README.txt
+   libpng-1.2.39-KNOWNBUGS.txt
+   libpng-1.2.39-LICENSE.txt
+   libpng-1.2.39-Y2K-compliance.txt
+   libpng-1.2.39-[previous version]-diff.txt
 
 Changes since the last public release (1.2.38):
 
-version 1.2.39beta01 [July 25, 2009]
-  Added a prototype for png_64bit_product() in png.c
+version 1.2.39 [August 13, 2009]
 
-version 1.2.39beta02 [July 27, 2009]
-  Avoid a possible NULL dereference in debug build, in png_set_text_2().
-    (bug introduced in libpng-0.95, discovered by Evan Rouault)
-
-version 1.2.39beta03 [August 6, 2009]
-  Relocated new png_64_bit_product() prototype into png.h
+  Added a prototype for png_64bit_product() in png.h
   Expanded the information about prototypes in the libpng style section of
     the documentation.
   Rebuilt configure scripts with autoconf-2.64.
-
-version 1.2.39beta04 [August 1, 2009]
+  Avoid a possible NULL dereference in debug build, in png_set_text_2().
+    (bug introduced in libpng-0.95, discovered by Evan Rouault)
   Replaced *.tar.lzma with *.txz in distribution.  Get the xz codec
     from <http://tukaani.org/xz>.
-
-version 1.2.39beta05 [August 1, 2009]
   Reject attempt to write iCCP chunk with negative embedded profile length
     (JD Chen)
 
-version 1.2.39c01 [August 6, 2009]
-  No changes.
-
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
