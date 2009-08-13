@@ -2173,8 +2173,6 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
   }
 #endif 
 
-   png_debug(1, "in png_write_find_filter");
-
    /* Find out how many bytes offset each pixel is */
    bpp = (row_info->pixel_depth + 7) >> 3;
 
