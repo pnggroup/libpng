@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [August 13, 2009]
+ * Last changed in libpng 1.4.0 [August 15, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -25,6 +25,7 @@ void PNGAPI
 png_set_bKGD(png_structp png_ptr, png_infop info_ptr, png_color_16p background)
 {
    png_debug1(1, "in %s storage function", "bKGD");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -41,6 +42,7 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
    double green_x, double green_y, double blue_x, double blue_y)
 {
    png_debug1(1, "in %s storage function", "cHRM");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -74,6 +76,7 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    png_fixed_point blue_x, png_fixed_point blue_y)
 {
    png_debug1(1, "in %s storage function", "cHRM fixed");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -112,7 +115,9 @@ void PNGAPI
 png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
 {
    double png_gamma;
+
    png_debug1(1, "in %s storage function", "gAMA");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -140,6 +145,7 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
    png_fixed_point png_gamma;
 
    png_debug1(1, "in %s storage function", "gAMA");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -177,6 +183,7 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
    int i;
 
    png_debug1(1, "in %s storage function", "hIST");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
    if (info_ptr->num_palette == 0 || info_ptr->num_palette
@@ -221,6 +228,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    int filter_type)
 {
    png_debug1(1, "in %s storage function", "IHDR");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -328,6 +336,7 @@ png_set_oFFs(png_structp png_ptr, png_infop info_ptr,
    png_int_32 offset_x, png_int_32 offset_y, int unit_type)
 {
    png_debug1(1, "in %s storage function", "oFFs");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -348,6 +357,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    int i;
 
    png_debug1(1, "in %s storage function", "pCAL");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -417,6 +427,7 @@ png_set_sCAL(png_structp png_ptr, png_infop info_ptr,
              int unit, double width, double height)
 {
    png_debug1(1, "in %s storage function", "sCAL");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -435,6 +446,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    png_size_t length;
 
    png_debug1(1, "in %s storage function", "sCAL");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -480,6 +492,7 @@ png_set_pHYs(png_structp png_ptr, png_infop info_ptr,
    png_uint_32 res_x, png_uint_32 res_y, int unit_type)
 {
    png_debug1(1, "in %s storage function", "pHYs");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -496,6 +509,7 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
 {
 
    png_debug1(1, "in %s storage function", "PLTE");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -551,6 +565,7 @@ png_set_sBIT(png_structp png_ptr, png_infop info_ptr,
    png_color_8p sig_bit)
 {
    png_debug1(1, "in %s storage function", "sBIT");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -564,6 +579,7 @@ void PNGAPI
 png_set_sRGB(png_structp png_ptr, png_infop info_ptr, int intent)
 {
    png_debug1(1, "in %s storage function", "sRGB");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -591,6 +607,7 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
       int_green_y, int_blue_x, int_blue_y;
 #endif
    png_debug1(1, "in %s storage function", "sRGB_gAMA_and_cHRM");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -660,6 +677,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
    png_uint_32 length;
 
    png_debug1(1, "in %s storage function", "iCCP");
+
    if (png_ptr == NULL || info_ptr == NULL || name == NULL || profile == NULL)
       return;
 
@@ -874,6 +892,7 @@ void PNGAPI
 png_set_tIME(png_structp png_ptr, png_infop info_ptr, png_timep mod_time)
 {
    png_debug1(1, "in %s storage function", "tIME");
+
    if (png_ptr == NULL || info_ptr == NULL ||
        (png_ptr->mode & PNG_WROTE_tIME))
       return;
@@ -889,6 +908,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
    png_bytep trans_alpha, int num_trans, png_color_16p trans_color)
 {
    png_debug1(1, "in %s storage function", "tRNS");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -1090,6 +1110,7 @@ png_uint_32 PNGAPI
 png_permit_mng_features (png_structp png_ptr, png_uint_32 mng_features)
 {
    png_debug(1, "in png_permit_mng_features");
+
    if (png_ptr == NULL)
       return (png_uint_32)0;
    png_ptr->mng_features_permitted =
@@ -1151,6 +1172,7 @@ png_set_read_user_chunk_fn(png_structp png_ptr, png_voidp user_chunk_ptr,
    png_user_chunk_ptr read_user_chunk_fn)
 {
    png_debug(1, "in png_set_read_user_chunk_fn");
+
    if (png_ptr == NULL)
       return;
    png_ptr->read_user_chunk_fn = read_user_chunk_fn;
@@ -1235,6 +1257,7 @@ void PNGAPI
 png_set_benign_errors(png_structp png_ptr, int allowed)
 {
    png_debug(1, "in png_set_benign_errors");
+
    if (allowed)
       png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
    else

@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 13, 2009]
+ * Last changed in libpng 1.4.0 [August 15, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -107,17 +107,18 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
 {
    png_byte buf[8];
 
+   png_debug2(0, "Writing %s chunk, length = %lu", chunk_name,
+      (unsigned long)length);
+
+   if (png_ptr == NULL)
+      return;
+
 #ifdef PNG_IO_STATE_SUPPORTED
    /* Inform the I/O callback that the chunk header is being written.
     * PNG_IO_CHUNK_HDR requires a single I/O call.
     */
    png_ptr->io_state = PNG_IO_WRITING | PNG_IO_CHUNK_HDR;
 #endif
-
-   png_debug2(0, "Writing %s chunk, length = %lu", chunk_name,
-      (unsigned long)length);
-   if (png_ptr == NULL)
-      return;
 
    /* Write the length and the chunk name */
    png_save_uint_32(buf, length);
@@ -739,7 +740,7 @@ png_write_gAMA(png_structp png_ptr, double file_gamma)
 
    png_debug(1, "in png_write_gAMA");
 
-   /* file_gamma is saved in 1/100,000ths */
+   /* File_gamma is saved in 1/100,000ths */
    igamma = (png_uint_32)(file_gamma * 100000.0 + 0.5);
    png_save_uint_32(buf, igamma);
    png_write_chunk(png_ptr, (png_bytep)png_gAMA, buf, (png_size_t)4);
@@ -756,7 +757,7 @@ png_write_gAMA_fixed(png_structp png_ptr, png_fixed_point file_gamma)
 
    png_debug(1, "in png_write_gAMA");
 
-   /* file_gamma is saved in 1/100,000ths */
+   /* File_gamma is saved in 1/100,000ths */
    png_save_uint_32(buf, (png_uint_32)file_gamma);
    png_write_chunk(png_ptr, (png_bytep)png_gAMA, buf, (png_size_t)4);
 }

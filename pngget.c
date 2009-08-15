@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 [August 13, 2009]
+ * Last changed in libpng 1.4.0 [August 15, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -187,6 +187,7 @@ png_get_pixel_aspect_ratio(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_pHYs)
    {
       png_debug1(1, "in %s retrieval function", "png_get_aspect_ratio");
+
       if (info_ptr->x_pixels_per_unit == 0)
          return ((float)0.0);
       else
@@ -334,6 +335,7 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs))
    {
       png_debug1(1, "in %s retrieval function", "pHYs");
+
       if (res_x != NULL)
       {
          *res_x = info_ptr->x_pixels_per_unit;
@@ -391,6 +393,7 @@ png_get_bKGD(png_structp png_ptr, png_infop info_ptr,
       && background != NULL)
    {
       png_debug1(1, "in %s retrieval function", "bKGD");
+
       *background = &(info_ptr->background);
       return (PNG_INFO_bKGD);
    }
@@ -408,6 +411,7 @@ png_get_cHRM(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM))
    {
       png_debug1(1, "in %s retrieval function", "cHRM");
+
       if (white_x != NULL)
          *white_x = (double)info_ptr->x_white;
       if (white_y != NULL)
@@ -439,6 +443,7 @@ png_get_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM))
    {
       png_debug1(1, "in %s retrieval function", "cHRM");
+
       if (white_x != NULL)
          *white_x = info_ptr->int_x_white;
       if (white_y != NULL)
@@ -471,6 +476,7 @@ png_get_gAMA(png_structp png_ptr, png_infop info_ptr, double *file_gamma)
       && file_gamma != NULL)
    {
       png_debug1(1, "in %s retrieval function", "gAMA");
+
       *file_gamma = (double)info_ptr->gamma;
       return (PNG_INFO_gAMA);
    }
@@ -486,6 +492,7 @@ png_get_gAMA_fixed(png_structp png_ptr, png_infop info_ptr,
       && int_file_gamma != NULL)
    {
       png_debug1(1, "in %s retrieval function", "gAMA");
+
       *int_file_gamma = info_ptr->int_gamma;
       return (PNG_INFO_gAMA);
    }
@@ -502,6 +509,7 @@ png_get_sRGB(png_structp png_ptr, png_infop info_ptr, int *file_srgb_intent)
       && file_srgb_intent != NULL)
    {
       png_debug1(1, "in %s retrieval function", "sRGB");
+
       *file_srgb_intent = (int)info_ptr->srgb_intent;
       return (PNG_INFO_sRGB);
    }
@@ -519,6 +527,7 @@ png_get_iCCP(png_structp png_ptr, png_infop info_ptr,
       && name != NULL && profile != NULL && proflen != NULL)
    {
       png_debug1(1, "in %s retrieval function", "iCCP");
+
       *name = info_ptr->iccp_name;
       *profile = info_ptr->iccp_profile;
       /* Compression_type is a dummy so the API won't have to change
@@ -554,6 +563,7 @@ png_get_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p *hist)
       && hist != NULL)
    {
       png_debug1(1, "in %s retrieval function", "hIST");
+
       *hist = info_ptr->hist;
       return (PNG_INFO_hIST);
    }
@@ -572,6 +582,7 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
       bit_depth != NULL && color_type != NULL)
    {
       png_debug1(1, "in %s retrieval function", "IHDR");
+
       *width = info_ptr->width;
       *height = info_ptr->height;
       *bit_depth = info_ptr->bit_depth;
@@ -624,6 +635,7 @@ png_get_oFFs(png_structp png_ptr, png_infop info_ptr,
       && offset_x != NULL && offset_y != NULL && unit_type != NULL)
    {
       png_debug1(1, "in %s retrieval function", "oFFs");
+
       *offset_x = info_ptr->x_offset;
       *offset_y = info_ptr->y_offset;
       *unit_type = (int)info_ptr->offset_unit_type;
@@ -644,6 +656,7 @@ png_get_pCAL(png_structp png_ptr, png_infop info_ptr,
        nparams != NULL && units != NULL && params != NULL)
    {
       png_debug1(1, "in %s retrieval function", "pCAL");
+
       *purpose = info_ptr->pcal_purpose;
       *X0 = info_ptr->pcal_X0;
       *X1 = info_ptr->pcal_X1;
@@ -735,6 +748,7 @@ png_get_PLTE(png_structp png_ptr, png_infop info_ptr, png_colorp *palette,
        && palette != NULL)
    {
       png_debug1(1, "in %s retrieval function", "PLTE");
+
       *palette = info_ptr->palette;
       *num_palette = info_ptr->num_palette;
       png_debug1(3, "num_palette = %d", *num_palette);
@@ -751,6 +765,7 @@ png_get_sBIT(png_structp png_ptr, png_infop info_ptr, png_color_8p *sig_bit)
       && sig_bit != NULL)
    {
       png_debug1(1, "in %s retrieval function", "sBIT");
+
       *sig_bit = &(info_ptr->sig_bit);
       return (PNG_INFO_sBIT);
    }
@@ -791,6 +806,7 @@ png_get_tIME(png_structp png_ptr, png_infop info_ptr, png_timep *mod_time)
        && mod_time != NULL)
    {
       png_debug1(1, "in %s retrieval function", "tIME");
+
       *mod_time = &(info_ptr->mod_time);
       return (PNG_INFO_tIME);
    }
@@ -807,6 +823,7 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS))
    {
       png_debug1(1, "in %s retrieval function", "tRNS");
+
       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
           if (trans_alpha != NULL)

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 13, 2009]
+ * Last changed in libpng 1.4.0 [August 15, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -29,6 +29,7 @@ void PNGAPI
 png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_write_info_before_PLTE");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
    if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
@@ -310,6 +311,7 @@ void PNGAPI
 png_write_end(png_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_write_end");
+
    if (png_ptr == NULL)
       return;
    if (!(png_ptr->mode & PNG_HAVE_IDAT))
@@ -423,6 +425,7 @@ void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
 {
    png_debug(1, "in png_convert_from_struct_tm");
+
    ptime->year = (png_uint_16)(1900 + ttime->tm_year);
    ptime->month = (png_byte)(ttime->tm_mon + 1);
    ptime->day = (png_byte)ttime->tm_mday;
@@ -437,6 +440,7 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
    struct tm *tbuf;
 
    png_debug(1, "in png_convert_from_time_t");
+
    tbuf = gmtime(&ttime);
    png_convert_from_struct_tm(ptime, tbuf);
 }
@@ -471,7 +475,9 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif
 #endif
    int i;
+
    png_debug(1, "in png_create_write_struct");
+
 #ifdef PNG_USER_MEM_SUPPORTED
    png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
       (png_malloc_ptr)malloc_fn, (png_voidp)mem_ptr);
@@ -620,6 +626,7 @@ png_write_image(png_structp png_ptr, png_bytepp image)
       return;
 
    png_debug(1, "in png_write_image");
+
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)
    /* Initialize interlace handling.  If image is not interlaced,
     * this will set pass to 1
@@ -645,6 +652,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
 {
    if (png_ptr == NULL)
       return;
+
    png_debug2(1, "in png_write_row (row %ld, pass %d)",
       png_ptr->row_number, png_ptr->pass);
 
@@ -820,6 +828,7 @@ void PNGAPI
 png_set_flush(png_structp png_ptr, int nrows)
 {
    png_debug(1, "in png_set_flush");
+
    if (png_ptr == NULL)
       return;
    png_ptr->flush_dist = (nrows < 0 ? 0 : nrows);
@@ -832,6 +841,7 @@ png_write_flush(png_structp png_ptr)
    int wrote_IDAT;
 
    png_debug(1, "in png_write_flush");
+
    if (png_ptr == NULL)
       return;
    /* We have already written out all of the data */
@@ -892,6 +902,7 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
 #endif
 
    png_debug(1, "in png_destroy_write_struct");
+
    if (png_ptr_ptr != NULL)
    {
       png_ptr = *png_ptr_ptr;
@@ -955,7 +966,7 @@ void /* PRIVATE */
 png_write_destroy(png_structp png_ptr)
 {
 #ifdef PNG_SETJMP_SUPPORTED
-   jmp_buf tmp_jmp; /* save jump buffer */
+   jmp_buf tmp_jmp; /* Save jump buffer */
 #endif
    png_error_ptr error_fn;
    png_error_ptr warning_fn;
@@ -965,10 +976,11 @@ png_write_destroy(png_structp png_ptr)
 #endif
 
    png_debug(1, "in png_write_destroy");
-   /* free any memory zlib uses */
+
+   /* Free any memory zlib uses */
    deflateEnd(&png_ptr->zstream);
 
-   /* free our memory.  png_free checks NULL for us. */
+   /* Free our memory.  png_free checks NULL for us. */
    png_free(png_ptr, png_ptr->zbuf);
    png_free(png_ptr, png_ptr->row_buf);
 #ifndef PNG_NO_WRITE_FILTER
@@ -1022,6 +1034,7 @@ void PNGAPI
 png_set_filter(png_structp png_ptr, int method, int filters)
 {
    png_debug(1, "in png_set_filter");
+
    if (png_ptr == NULL)
       return;
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
@@ -1145,6 +1158,7 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
    int i;
 
    png_debug(1, "in png_set_filter_heuristics");
+
    if (png_ptr == NULL)
       return;
    if (heuristic_method >= PNG_FILTER_HEURISTIC_LAST)
@@ -1259,6 +1273,7 @@ void PNGAPI
 png_set_compression_level(png_structp png_ptr, int level)
 {
    png_debug(1, "in png_set_compression_level");
+
    if (png_ptr == NULL)
       return;
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_LEVEL;
@@ -1269,6 +1284,7 @@ void PNGAPI
 png_set_compression_mem_level(png_structp png_ptr, int mem_level)
 {
    png_debug(1, "in png_set_compression_mem_level");
+
    if (png_ptr == NULL)
       return;
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_MEM_LEVEL;
@@ -1279,6 +1295,7 @@ void PNGAPI
 png_set_compression_strategy(png_structp png_ptr, int strategy)
 {
    png_debug(1, "in png_set_compression_strategy");
+
    if (png_ptr == NULL)
       return;
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
@@ -1310,6 +1327,7 @@ void PNGAPI
 png_set_compression_method(png_structp png_ptr, int method)
 {
    png_debug(1, "in png_set_compression_method");
+
    if (png_ptr == NULL)
       return;
    if (method != 8)
@@ -1332,6 +1350,7 @@ png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
    write_user_transform_fn)
 {
    png_debug(1, "in png_set_write_user_transform_fn");
+
    if (png_ptr == NULL)
       return;
    png_ptr->transformations |= PNG_USER_TRANSFORM;

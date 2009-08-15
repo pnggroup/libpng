@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * Last changed in libpng 1.4.0 [August 13, 2009]
+ * Last changed in libpng 1.4.0 [August 15, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -90,6 +90,7 @@ void /* PRIVATE */
 png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 {
    png_debug(1, "in png_do_pack");
+
    if (row_info->bit_depth == 8 &&
       row_info->channels == 1)
    {
@@ -213,6 +214,7 @@ void /* PRIVATE */
 png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
 {
    png_debug(1, "in png_do_shift");
+
    if (
       row_info->color_type != PNG_COLOR_TYPE_PALETTE)
    {
@@ -333,6 +335,7 @@ void /* PRIVATE */
 png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_write_swap_alpha");
+
    {
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       {
@@ -418,6 +421,7 @@ void /* PRIVATE */
 png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_write_invert_alpha");
+
    {
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       {
@@ -505,6 +509,7 @@ void /* PRIVATE */
 png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_write_intrapixel");
+
    if (
        (row_info->color_type & PNG_COLOR_MASK_COLOR))
    {

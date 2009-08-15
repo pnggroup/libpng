@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [August 13, 2009]
+ * Last changed in libpng 1.4.0 [August 15, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -97,7 +97,9 @@ png_set_sig_bytes(png_structp png_ptr, int num_bytes)
 {
    if (png_ptr == NULL)
       return;
+
    png_debug(1, "in png_set_sig_bytes");
+
    if (num_bytes > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
 
@@ -212,6 +214,7 @@ png_create_info_struct(png_structp png_ptr)
    png_infop info_ptr;
 
    png_debug(1, "in png_create_info_struct");
+
    if (png_ptr == NULL)
       return (NULL);
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -239,6 +242,7 @@ png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
       return;
 
    png_debug(1, "in png_destroy_info_struct");
+
    if (info_ptr_ptr != NULL)
       info_ptr = *info_ptr_ptr;
 
@@ -288,6 +292,7 @@ png_data_freer(png_structp png_ptr, png_infop info_ptr,
    int freer, png_uint_32 mask)
 {
    png_debug(1, "in png_data_freer");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
    if (freer == PNG_DESTROY_WILL_FREE_DATA)
@@ -305,6 +310,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    int num)
 {
    png_debug(1, "in png_free_data");
+
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
@@ -596,6 +602,7 @@ void PNGAPI
 png_init_io(png_structp png_ptr, png_FILE_p fp)
 {
    png_debug(1, "in png_init_io");
+
    if (png_ptr == NULL)
       return;
    png_ptr->io_ptr = (png_voidp)fp;
@@ -652,13 +659,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta75 - August 13, 2009" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta75 - August 15, 2009" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta75 - August 13, 2009\
+      return ((png_charp) "libpng version 1.4.0beta75 - August 15, 2009\
       Copyright (c) 1998-2009 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -811,6 +818,7 @@ png_check_cHRM_fixed(png_structp png_ptr,
    unsigned long xy_hi,xy_lo,yx_hi,yx_lo;
 
    png_debug(1, "in function png_check_cHRM_fixed");
+
    if (png_ptr == NULL)
       return 0;
 
