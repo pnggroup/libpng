@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [August 15, 2009]
+ * Last changed in libpng 1.4.0 [August 16, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -95,10 +95,10 @@ PNG_CONST int FARDATA png_pass_dsp_mask[]
 void PNGAPI
 png_set_sig_bytes(png_structp png_ptr, int num_bytes)
 {
+   png_debug(1, "in png_set_sig_bytes");
+
    if (png_ptr == NULL)
       return;
-
-   png_debug(1, "in png_set_sig_bytes");
 
    if (num_bytes > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
@@ -217,6 +217,7 @@ png_create_info_struct(png_structp png_ptr)
 
    if (png_ptr == NULL)
       return (NULL);
+
 #ifdef PNG_USER_MEM_SUPPORTED
    info_ptr = (png_infop)png_create_struct_2(PNG_STRUCT_INFO,
       png_ptr->malloc_fn, png_ptr->mem_ptr);
@@ -238,10 +239,11 @@ void PNGAPI
 png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
 {
    png_infop info_ptr = NULL;
-   if (png_ptr == NULL)
-      return;
 
    png_debug(1, "in png_destroy_info_struct");
+
+   if (png_ptr == NULL)
+      return;
 
    if (info_ptr_ptr != NULL)
       info_ptr = *info_ptr_ptr;
@@ -270,10 +272,10 @@ png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
 {
    png_infop info_ptr = *ptr_ptr;
 
+   png_debug(1, "in png_info_init_3");
+
    if (info_ptr == NULL)
       return;
-
-   png_debug(1, "in png_info_init_3");
 
    if (png_sizeof(png_info) > png_info_struct_size)
    {
@@ -295,6 +297,7 @@ png_data_freer(png_structp png_ptr, png_infop info_ptr,
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
+
    if (freer == PNG_DESTROY_WILL_FREE_DATA)
       info_ptr->free_me |= mask;
    else if (freer == PNG_USER_WILL_FREE_DATA)
@@ -605,6 +608,7 @@ png_init_io(png_structp png_ptr, png_FILE_p fp)
 
    if (png_ptr == NULL)
       return;
+
    png_ptr->io_ptr = (png_voidp)fp;
 }
 #endif
@@ -659,13 +663,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta75 - August 15, 2009" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta75 - August 16, 2009" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta75 - August 15, 2009\
+      return ((png_charp) "libpng version 1.4.0beta75 - August 16, 2009\
       Copyright (c) 1998-2009 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");

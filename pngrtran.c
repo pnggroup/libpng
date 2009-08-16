@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [August 15, 2009]
+ * Last changed in libpng 1.4.0 [August 16, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -581,6 +581,7 @@ png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 
    if (png_ptr == NULL)
       return;
+
    if ((fabs(scrn_gamma * file_gamma - 1.0) > PNG_GAMMA_THRESHOLD) ||
        (png_ptr->color_type & PNG_COLOR_MASK_ALPHA) ||
        (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE))
@@ -602,6 +603,7 @@ png_set_expand(png_structp png_ptr)
 
    if (png_ptr == NULL)
       return;
+
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
@@ -631,6 +633,7 @@ png_set_palette_to_rgb(png_structp png_ptr)
 
    if (png_ptr == NULL)
       return;
+
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
@@ -643,6 +646,7 @@ png_set_expand_gray_1_2_4_to_8(png_structp png_ptr)
 
    if (png_ptr == NULL)
       return;
+
    png_ptr->transformations |= PNG_EXPAND;
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
@@ -697,6 +701,7 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
 
    if (png_ptr == NULL)
       return;
+
    switch(error_action)
    {
       case 1: png_ptr->transformations |= PNG_RGB_TO_GRAY;
@@ -753,6 +758,7 @@ png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
 
    if (png_ptr == NULL)
       return;
+
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    png_ptr->transformations |= PNG_USER_TRANSFORM;
    png_ptr->read_user_transform_fn = read_user_transform_fn;
