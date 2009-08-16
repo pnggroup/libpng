@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [August 15, 2009]
+ * Last changed in libpng 1.4.0 [August 16, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -199,10 +199,10 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 void PNGAPI
 png_read_info(png_structp png_ptr, png_infop info_ptr)
 {
+   png_debug(1, "in png_read_info");
+ 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
- 
-   png_debug(1, "in png_read_info");
  
    /* If we haven't checked all of the PNG signature bytes, do so now. */
    if (png_ptr->sig_bytes < 8)
@@ -454,10 +454,11 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    PNG_CONST int png_pass_mask[7] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
 #endif
    int ret;
+
+   png_debug2(1, "in png_read_row (row %lu, pass %d)",
+ 
    if (png_ptr == NULL)
       return;
- 
-   png_debug2(1, "in png_read_row (row %lu, pass %d)",
  
       (unsigned long) png_ptr->row_number, png_ptr->pass);
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
