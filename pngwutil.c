@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.39 [August 13, 2009]
+ * Last changed in libpng 1.2.40 [August 19, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -102,6 +102,7 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
 
    png_debug2(0, "Writing %s chunk, length = %lu", chunk_name,
       (unsigned long)length);
+
    if (png_ptr == NULL)
       return;
 
