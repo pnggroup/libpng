@@ -532,6 +532,7 @@ version 1.4.0beta74 [August 8, 2009]
 
 version 1.4.0beta75 [August 21, 2009]
   Removed an extra png_debug() recently added to png_write_find_filter().
+  Fixed incorrect #ifdef in pngset.c regarding unknown chunk support.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
