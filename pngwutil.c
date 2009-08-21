@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 15, 2009]
+ * Last changed in libpng 1.4.0 [August 21, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -740,7 +740,7 @@ png_write_gAMA(png_structp png_ptr, double file_gamma)
 
    png_debug(1, "in png_write_gAMA");
 
-   /* File_gamma is saved in 1/100,000ths */
+   /* file_gamma is saved in 1/100,000ths */
    igamma = (png_uint_32)(file_gamma * 100000.0 + 0.5);
    png_save_uint_32(buf, igamma);
    png_write_chunk(png_ptr, (png_bytep)png_gAMA, buf, (png_size_t)4);
@@ -757,7 +757,7 @@ png_write_gAMA_fixed(png_structp png_ptr, png_fixed_point file_gamma)
 
    png_debug(1, "in png_write_gAMA");
 
-   /* File_gamma is saved in 1/100,000ths */
+   /* file_gamma is saved in 1/100,000ths */
    png_save_uint_32(buf, (png_uint_32)file_gamma);
    png_write_chunk(png_ptr, (png_bytep)png_gAMA, buf, (png_size_t)4);
 }

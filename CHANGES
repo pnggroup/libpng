@@ -2207,7 +2207,7 @@ version 1.4.0beta73 [August 1, 2009]
 version 1.4.0beta74 [August 8, 2009]
   Changed png_ptr and info_ptr member "trans" to "trans_alpha".
 
-version 1.4.0beta75 [August 13, 2009]
+version 1.4.0beta75 [August 21, 2009]
   Removed an extra png_debug() recently added to png_write_find_filter().
 
 version 1.4.0betaN [future]
