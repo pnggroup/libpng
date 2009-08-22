@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta76 - August 21, 2009
+Libpng 1.4.0beta76 - August 22, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -534,7 +534,8 @@ version 1.4.0beta75 [August 21, 2009]
   Removed an extra png_debug() recently added to png_write_find_filter().
   Fixed incorrect #ifdef in pngset.c regarding unknown chunk support.
 
-version 1.4.0beta76 [August 21, 2009]
+version 1.4.0beta76 [August 22, 2009]
+  Moved an incorrectly located test in png_read_row() in pngread.c
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
