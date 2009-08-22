@@ -2463,6 +2463,8 @@ version 1.2.40beta01 [August 20, 2009]
   Removed an extra png_debug() recently added to png_write_find_filter().
   Fixed incorrect #ifdef in pngset.c regarding unknown chunk support.
 
+version 1.2.40beta02 [August 22, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
