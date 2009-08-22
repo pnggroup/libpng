@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 21, 2009]
+ * Last changed in libpng 1.4.0 [August 22, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * and license in png.h
  */
 
-/* get internal access to png.h */
+/* Get internal access to png.h */
 #include "png.h"
 #ifdef PNG_WRITE_SUPPORTED
 #include "pngpriv.h"
@@ -34,7 +34,8 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
       return;
    if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
    {
-   png_write_sig(png_ptr); /* write PNG signature */
+   /* Write PNG signature */
+   png_write_sig(png_ptr);
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
    if ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&(png_ptr->mng_features_permitted))
    {
@@ -42,7 +43,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
       png_ptr->mng_features_permitted=0;
    }
 #endif
-   /* write IHDR information. */
+   /* Write IHDR information. */
    png_write_IHDR(png_ptr, info_ptr->width, info_ptr->height,
       info_ptr->bit_depth, info_ptr->color_type, info_ptr->compression_type,
       info_ptr->filter_type,
@@ -152,7 +153,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->valid & PNG_INFO_tRNS)
    {
 #if defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
-      /* invert the alpha channel (in tRNS) */
+      /* Invert the alpha channel (in tRNS) */
       if ((png_ptr->transformations & PNG_INVERT_ALPHA) &&
          info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
@@ -229,11 +230,11 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
    {
       png_debug2(2, "Writing header text chunk %d, type %d", i,
          info_ptr->text[i].compression);
-      /* an internationalized chunk? */
+      /* An internationalized chunk? */
       if (info_ptr->text[i].compression > 0)
       {
 #if defined(PNG_WRITE_iTXt_SUPPORTED)
-          /* write international chunk */
+          /* Write international chunk */
           png_write_iTXt(png_ptr,
                          info_ptr->text[i].compression,
                          info_ptr->text[i].key,
@@ -250,7 +251,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
       else if (info_ptr->text[i].compression == PNG_TEXT_COMPRESSION_zTXt)
       {
 #if defined(PNG_WRITE_zTXt_SUPPORTED)
-         /* write compressed chunk */
+         /* Write compressed chunk */
          png_write_zTXt(png_ptr, info_ptr->text[i].key,
             info_ptr->text[i].text, 0,
             info_ptr->text[i].compression);
@@ -263,7 +264,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
       else if (info_ptr->text[i].compression == PNG_TEXT_COMPRESSION_NONE)
       {
 #if defined(PNG_WRITE_tEXt_SUPPORTED)
-         /* write uncompressed chunk */
+         /* Write uncompressed chunk */
          png_write_tEXt(png_ptr, info_ptr->text[i].key,
                          info_ptr->text[i].text,
                          0);
@@ -317,29 +318,29 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
    if (!(png_ptr->mode & PNG_HAVE_IDAT))
       png_error(png_ptr, "No IDATs written into file");
 
-   /* see if user wants us to write information chunks */
+   /* See if user wants us to write information chunks */
    if (info_ptr != NULL)
    {
 #if defined(PNG_WRITE_TEXT_SUPPORTED)
       int i; /* local index variable */
 #endif
 #if defined(PNG_WRITE_tIME_SUPPORTED)
-      /* check to see if user has supplied a time chunk */
+      /* Check to see if user has supplied a time chunk */
       if ((info_ptr->valid & PNG_INFO_tIME) &&
          !(png_ptr->mode & PNG_WROTE_tIME))
          png_write_tIME(png_ptr, &(info_ptr->mod_time));
 #endif
 #if defined(PNG_WRITE_TEXT_SUPPORTED)
-      /* loop through comment chunks */
+      /* Loop through comment chunks */
       for (i = 0; i < info_ptr->num_text; i++)
       {
          png_debug2(2, "Writing trailer text chunk %d, type %d", i,
             info_ptr->text[i].compression);
-         /* an internationalized chunk? */
+         /* An internationalized chunk? */
          if (info_ptr->text[i].compression > 0)
          {
 #if defined(PNG_WRITE_iTXt_SUPPORTED)
-            /* write international chunk */
+            /* Write international chunk */
             png_write_iTXt(png_ptr,
                         info_ptr->text[i].compression,
                         info_ptr->text[i].key,
@@ -355,7 +356,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
          else if (info_ptr->text[i].compression >= PNG_TEXT_COMPRESSION_zTXt)
          {
 #if defined(PNG_WRITE_zTXt_SUPPORTED)
-            /* write compressed chunk */
+            /* Write compressed chunk */
             png_write_zTXt(png_ptr, info_ptr->text[i].key,
                info_ptr->text[i].text, 0,
                info_ptr->text[i].compression);
@@ -368,7 +369,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
          else if (info_ptr->text[i].compression == PNG_TEXT_COMPRESSION_NONE)
          {
 #if defined(PNG_WRITE_tEXt_SUPPORTED)
-            /* write uncompressed chunk */
+            /* Write uncompressed chunk */
             png_write_tEXt(png_ptr, info_ptr->text[i].key,
                info_ptr->text[i].text, 0);
 #else
@@ -406,7 +407,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 
    png_ptr->mode |= PNG_AFTER_IDAT;
 
-   /* write end of PNG file */
+   /* Write end of PNG file */
    png_write_IEND(png_ptr);
    /* This flush, added in libpng-1.0.8, removed from libpng-1.0.9beta03,
     * and restored again in libpng-1.2.30, may cause some applications that
@@ -487,7 +488,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    if (png_ptr == NULL)
       return (NULL);
 
-   /* added at libpng-1.2.6 */
+   /* Added at libpng-1.2.6 */
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
    png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
@@ -554,7 +555,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
      }
    }
 
-   /* initialize zbuf - compression buffer */
+   /* Initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
    if (!png_cleanup_needed)
    {
@@ -605,7 +606,7 @@ png_write_rows(png_structp png_ptr, png_bytepp row,
    if (png_ptr == NULL)
       return;
 
-   /* loop through the rows */
+   /* Loop through the rows */
    for (i = 0, rp = row; i < num_rows; i++, rp++)
    {
       png_write_row(png_ptr, *rp);
@@ -635,10 +636,10 @@ png_write_image(png_structp png_ptr, png_bytepp image)
 #else
    num_pass = 1;
 #endif
-   /* loop through passes */
+   /* Loop through passes */
    for (pass = 0; pass < num_pass; pass++)
    {
-      /* loop through image */
+      /* Loop through image */
       for (i = 0, rp = image; i < png_ptr->height; i++, rp++)
       {
          png_write_row(png_ptr, *rp);
@@ -646,7 +647,7 @@ png_write_image(png_structp png_ptr, png_bytepp image)
    }
 }
 
-/* called by user to write a row of image data */
+/* Called by user to write a row of image data */
 void PNGAPI
 png_write_row(png_structp png_ptr, png_bytep row)
 {
@@ -656,15 +657,15 @@ png_write_row(png_structp png_ptr, png_bytep row)
    png_debug2(1, "in png_write_row (row %ld, pass %d)",
       png_ptr->row_number, png_ptr->pass);
 
-   /* initialize transformations and other stuff if first time */
+   /* Initialize transformations and other stuff if first time */
    if (png_ptr->row_number == 0 && png_ptr->pass == 0)
    {
-      /* make sure we wrote the header info */
+      /* Make sure we wrote the header info */
       if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
          png_error(png_ptr,
             "png_write_info was never called before png_write_row");
 
-      /* check for transforms that have been set but were defined out */
+      /* Check for transforms that have been set but were defined out */
 #if !defined(PNG_WRITE_INVERT_SUPPORTED) && defined(PNG_READ_INVERT_SUPPORTED)
       if (png_ptr->transformations & PNG_INVERT_MONO)
          png_warning(png_ptr, "PNG_WRITE_INVERT_SUPPORTED is not defined");
@@ -698,7 +699,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
    }
 
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED)
-   /* if interlaced and not interested in row, return */
+   /* If interlaced and not interested in row, return */
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
    {
       switch (png_ptr->pass)
@@ -756,7 +757,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
    }
 #endif
 
-   /* set up row info for transformations */
+   /* Set up row info for transformations */
    png_ptr->row_info.color_type = png_ptr->color_type;
    png_ptr->row_info.width = png_ptr->usr_width;
    png_ptr->row_info.channels = png_ptr->usr_channels;
@@ -834,7 +835,7 @@ png_set_flush(png_structp png_ptr, int nrows)
    png_ptr->flush_dist = (nrows < 0 ? 0 : nrows);
 }
 
-/* flush the current output buffers now */
+/* Flush the current output buffers now */
 void PNGAPI
 png_write_flush(png_structp png_ptr)
 {
@@ -852,11 +853,11 @@ png_write_flush(png_structp png_ptr)
    {
       int ret;
 
-      /* compress the data */
+      /* Compress the data */
       ret = deflate(&png_ptr->zstream, Z_SYNC_FLUSH);
       wrote_IDAT = 0;
 
-      /* check for compression errors */
+      /* Check for compression errors */
       if (ret != Z_OK)
       {
          if (png_ptr->zstream.msg != NULL)
@@ -867,7 +868,7 @@ png_write_flush(png_structp png_ptr)
 
       if (!(png_ptr->zstream.avail_out))
       {
-         /* write the IDAT and reset the zlib output buffer */
+         /* Write the IDAT and reset the zlib output buffer */
          png_write_IDAT(png_ptr, png_ptr->zbuf,
                         png_ptr->zbuf_size);
          png_ptr->zstream.next_out = png_ptr->zbuf;
@@ -879,7 +880,7 @@ png_write_flush(png_structp png_ptr)
    /* If there is any data left to be output, write it into a new IDAT */
    if (png_ptr->zbuf_size != png_ptr->zstream.avail_out)
    {
-      /* write the IDAT and reset the zlib output buffer */
+      /* Write the IDAT and reset the zlib output buffer */
       png_write_IDAT(png_ptr, png_ptr->zbuf,
                      png_ptr->zbuf_size - png_ptr->zstream.avail_out);
       png_ptr->zstream.next_out = png_ptr->zbuf;
@@ -1312,7 +1313,7 @@ png_set_compression_window_bits(png_structp png_ptr, int window_bits)
    else if (window_bits < 8)
       png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
 #ifndef WBITS_8_OK
-   /* avoid libpng bug with 256-byte windows */
+   /* Avoid libpng bug with 256-byte windows */
    if (window_bits == 8)
      {
        png_warning(png_ptr, "Compression window is being reset to 512");
@@ -1446,7 +1447,7 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
    /* It is REQUIRED to call this to finish writing the rest of the file */
    png_write_end(png_ptr, info_ptr);
 
-   transforms = transforms; /* quiet compiler warnings */
+   transforms = transforms; /* Quiet compiler warnings */
    params = params;
 }
 #endif
