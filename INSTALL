@@ -32,8 +32,7 @@ is not already on your system.  zlib can usually be found
 wherever you got libpng.  zlib can be placed in another directory,
 at the same level as libpng.
 
-If you want to use "cmake" (see www.cmake.org), copy CMakeLists.txt
-from the "scripts" directory to this directory and type
+If you want to use "cmake" (see www.cmake.org), type
 
    cmake . -DCMAKE_INSTALL_PREFIX=/path
    make
