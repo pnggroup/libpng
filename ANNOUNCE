@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta76 - August 22, 2009
+Libpng 1.4.0beta77 - August 26, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,29 +9,29 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta76.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta76.tar.gz
-   1.4.0beta76.tar.bz2
+   1.4.0beta77.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta77.tar.gz
+   1.4.0beta77.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   1.4.0beta76-no-config.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta76-no-config.tar.gz
-   1.4.0beta76-no-config.tar.bz2
+   1.4.0beta77-no-config.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta77-no-config.tar.gz
+   1.4.0beta77-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b76.zip
-   lp140b76.tar.bz2
+   lp140b77.zip
+   lp140b77.tar.bz2
 
 Other information:
 
-   1.4.0beta76-README.txt
-   1.4.0beta76-KNOWNBUGS.txt
-   1.4.0beta76-LICENSE.txt
-   1.4.0beta76-Y2K-compliance.txt
+   1.4.0beta77-README.txt
+   1.4.0beta77-KNOWNBUGS.txt
+   1.4.0beta77-LICENSE.txt
+   1.4.0beta77-Y2K-compliance.txt
 
 Changes since the last public release (1.2.10):
 
@@ -536,6 +536,8 @@ version 1.4.0beta75 [August 21, 2009]
 
 version 1.4.0beta76 [August 22, 2009]
   Moved an incorrectly located test in png_read_row() in pngread.c
+
+version 1.4.0beta77 [August 26, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -2214,6 +2214,8 @@ version 1.4.0beta75 [August 21, 2009]
 version 1.4.0beta76 [August 22, 2009]
   Moved an incorrectly located test in png_read_row() in pngread.c
 
+version 1.4.0beta77 [August 26, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
