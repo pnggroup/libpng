@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta77 - August 26, 2009
+Libpng 1.4.0beta77 - August 27, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -529,7 +529,11 @@ version 1.4.0beta75 [August 21, 2009]
 version 1.4.0beta76 [August 22, 2009]
   Moved an incorrectly located test in png_read_row() in pngread.c
 
-version 1.4.0beta77 [August 26, 2009]
+version 1.4.0beta77 [August 27, 2009]
+  Removed lpXYZ.tar.bz2 (with CRLF), KNOWNBUG, libpng-x.y.z-KNOWNBUG.txt,
+    and the "noconfig" files from the distribution.
+  Moved CMakeLists.txt from scripts into the main libpng directory.
+  Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
