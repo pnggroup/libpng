@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta77 - August 27, 2009
+Libpng 1.4.0beta78 - August 28, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta77.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta77.tar.gz
-   1.4.0beta77.tar.bz2
+   1.4.0beta78.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta78.tar.gz
+   1.4.0beta78.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b77.zip
-   lp140b77.7z
+   lp140b78.zip
+   lp140b78.7z
 
 Other information:
 
-   1.4.0beta77-README.txt
-   1.4.0beta77-KNOWNBUGS.txt
-   1.4.0beta77-LICENSE.txt
+   1.4.0beta78-README.txt
+   1.4.0beta78-KNOWNBUGS.txt
+   1.4.0beta78-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -534,6 +534,8 @@ version 1.4.0beta77 [August 27, 2009]
     and the "noconfig" files from the distribution.
   Moved CMakeLists.txt from scripts into the main libpng directory.
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
+
+version 1.4.0beta78 [August 28, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
