@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta78 - August 28, 2009
+ * libpng version 1.4.0beta78 - August 29, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -698,6 +698,13 @@
 #define PNG_STRING_NEWLINE "\n"
 #endif
 
+/* Added at libpng-1.4.0 */
+#if !defined(PNG_NO_USE_SYSTEM_MEMSET) || defined(PNG_USE_MEMSET_LOOP)
+#  ifndef PNG_USE_SYSTEM_MEMSET
+#    define PNG_USE_SYSTEM_MEMSET
+#  endif
+#endif
+
 /* These are currently experimental features, define them if you want */
 
 /* very little testing */
@@ -1323,6 +1330,16 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  endif
 #endif
 
+/* Added at libpng-1.4.0 */
+#ifndef PNG_USE_SYSTEM_MEMSET
+# define png_memset(array,value,num) \
+  { \
+  int ipng_memset; \
+  for (ipng_memset=0; ipng_memset<(num); ++ipng_memset) \
+    ((png_bytep)array)[ipng_memset] = (value); \
+  }
+#endif
+
 #if defined(USE_FAR_KEYWORD)
 /* use this to make far-to-near assignments */
 #  define CHECK   1
@@ -1334,7 +1351,9 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define png_strlen  _fstrlen
 #  define png_memcmp  _fmemcmp    /* SJT: added */
 #  define png_memcpy  _fmemcpy
-#  define png_memset  _fmemset
+#  ifndef png_memset
+#    define png_memset  _fmemset
+#  endif
 #  define png_sprintf sprintf
 #else
 #  if defined(_WINDOWS_)  /* favor Windows over C runtime fns */
@@ -1345,7 +1364,9 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    define png_strlen  lstrlenA
 #    define png_memcmp  memcmp
 #    define png_memcpy  CopyMemory
+#  ifndef png_memset
 #    define png_memset  memset
+#  endif
 #    define png_sprintf wsprintfA
 #  else
 #    define CVT_PTR(ptr)         (ptr)
@@ -1355,7 +1376,9 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    define png_strlen  strlen
 #    define png_memcmp  memcmp      /* SJT: added */
 #    define png_memcpy  memcpy
+#  ifndef png_memset
 #    define png_memset  memset
+#  endif
 #    define png_sprintf sprintf
 #  ifndef PNG_NO_SNPRINTF
 #    ifdef _MSC_VER

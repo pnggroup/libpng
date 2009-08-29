@@ -2220,7 +2220,9 @@ version 1.4.0beta77 [August 27, 2009]
   Moved CMakeLists.txt from scripts into the main libpng directory.
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
-version 1.4.0beta78 [August 28, 2009]
+version 1.4.0beta78 [August 29, 2009]
+  Added abililty to configure libpng to use a loop instead of memset(),
+    using PNG_USE_MEMSET_LOOP.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
