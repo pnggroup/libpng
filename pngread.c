@@ -1317,16 +1317,15 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    png_free_data(png_ptr, info_ptr, PNG_FREE_ROWS, 0);
    if (info_ptr->row_pointers == NULL)
    {
-#ifdef PNG_CALLOC_SUPPORTED
-      info_ptr->row_pointers = (png_bytepp)png_calloc(png_ptr,
-         info_ptr->height * png_sizeof(png_bytep));
-#else
+    png_uint_32 iptr;
+
       info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
          info_ptr->height * png_sizeof(png_bytep));
-      png_memset(info_ptr->row_pointers, 0, info_ptr->height
-         * png_sizeof(png_bytep));
-#endif
+      for (iptr=0; iptr<info_ptr->height; iptr++)
+         info_ptr->row_pointers[iptr] = NULL;
+
       info_ptr->free_me |= PNG_FREE_ROWS;
+
       for (row = 0; row < (int)info_ptr->height; row++)
          info_ptr->row_pointers[row] = (png_bytep)png_malloc(png_ptr,
             png_get_rowbytes(png_ptr, info_ptr));

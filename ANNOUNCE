@@ -537,6 +537,8 @@ version 1.4.0beta77 [August 27, 2009]
 version 1.4.0beta78 [August 31, 2009]
   Converted all PNG_NO_* tests to PNG_*_SUPPORTED everywhere except pngconf.h
   Eliminated PNG_NO_FREE_ME and PNG_FREE_ME_SUPPORTED macros.
+  Use a loop instead of png_memset() to initialize row_pointers in
+    png_read_png().
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

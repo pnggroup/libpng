@@ -2219,6 +2219,8 @@ version 1.4.0beta77 [August 27, 2009]
     and the "noconfig" files from the distribution.
   Moved CMakeLists.txt from scripts into the main libpng directory.
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
+  Use a loop instead of png_memset() to initialize row_pointers in
+    png_read_png().
 
 version 1.4.0beta78 [August 31, 2009]
   Converted all PNG_NO_* tests to PNG_*_SUPPORTED everywhere except pngconf.h
