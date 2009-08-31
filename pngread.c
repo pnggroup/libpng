@@ -1078,37 +1078,19 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->gamma_from_1);
    png_free(png_ptr, png_ptr->gamma_to_1);
 #endif
-#ifdef PNG_FREE_ME_SUPPORTED
    if (png_ptr->free_me & PNG_FREE_PLTE)
       png_zfree(png_ptr, png_ptr->palette);
    png_ptr->free_me &= ~PNG_FREE_PLTE;
-#else
-   if (png_ptr->flags & PNG_FLAG_FREE_PLTE)
-      png_zfree(png_ptr, png_ptr->palette);
-   png_ptr->flags &= ~PNG_FLAG_FREE_PLTE;
-#endif
 #if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-#ifdef PNG_FREE_ME_SUPPORTED
    if (png_ptr->free_me & PNG_FREE_TRNS)
       png_free(png_ptr, png_ptr->trans_alpha);
    png_ptr->free_me &= ~PNG_FREE_TRNS;
-#else
-   if (png_ptr->flags & PNG_FLAG_FREE_TRNS)
-      png_free(png_ptr, png_ptr->trans_alpha);
-   png_ptr->flags &= ~PNG_FLAG_FREE_TRNS;
-#endif
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)
-#ifdef PNG_FREE_ME_SUPPORTED
    if (png_ptr->free_me & PNG_FREE_HIST)
       png_free(png_ptr, png_ptr->hist);
    png_ptr->free_me &= ~PNG_FREE_HIST;
-#else
-   if (png_ptr->flags & PNG_FLAG_FREE_HIST)
-      png_free(png_ptr, png_ptr->hist);
-   png_ptr->flags &= ~PNG_FLAG_FREE_HIST;
-#endif
 #endif
 #if defined(PNG_READ_GAMMA_SUPPORTED)
    if (png_ptr->gamma_16_table != NULL)
@@ -1332,9 +1314,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
    /* -------------- image transformations end here ------------------- */
 
-#ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_ROWS, 0);
-#endif
    if (info_ptr->row_pointers == NULL)
    {
 #ifdef PNG_CALLOC_SUPPORTED
@@ -1346,9 +1326,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
       png_memset(info_ptr->row_pointers, 0, info_ptr->height
          * png_sizeof(png_bytep));
 #endif
-#ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_ROWS;
-#endif
       for (row = 0; row < (int)info_ptr->height; row++)
          info_ptr->row_pointers[row] = (png_bytep)png_malloc(png_ptr,
             png_get_rowbytes(png_ptr, info_ptr));

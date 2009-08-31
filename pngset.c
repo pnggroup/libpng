@@ -195,9 +195,7 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
       return;
    }
 
-#ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_HIST, 0);
-#endif
    /* Changed from info->num_palette to PNG_MAX_PALETTE_LENGTH in
     * version 1.2.1
     */
@@ -214,11 +212,7 @@ png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
    info_ptr->hist = png_ptr->hist;
    info_ptr->valid |= PNG_INFO_hIST;
 
-#ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_HIST;
-#else
-   png_ptr->flags |= PNG_FLAG_FREE_HIST;
-#endif
 }
 #endif
 
@@ -415,9 +409,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    }
 
    info_ptr->valid |= PNG_INFO_pCAL;
-#ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_PCAL;
-#endif
 }
 #endif
 
@@ -479,9 +471,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    }
    png_memcpy(info_ptr->scal_s_height, sheight, length);
    info_ptr->valid |= PNG_INFO_sCAL;
-#ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_SCAL;
-#endif
 }
 #endif
 #endif
@@ -530,9 +520,7 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
     * we do it for backward compatibility with the way the png_handle_tRNS
     * function used to do the allocation.
     */
-#ifdef PNG_FREE_ME_SUPPORTED
    png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
-#endif
 
    /* Changed in libpng-1.2.1 to allocate PNG_MAX_PALETTE_LENGTH instead
     * of num_palette entries, in case of an invalid PNG file that has
@@ -551,11 +539,7 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
 
-#ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_PLTE;
-#else
-   png_ptr->flags |= PNG_FLAG_FREE_PLTE;
-#endif
 
    info_ptr->valid |= PNG_INFO_PLTE;
 }
@@ -708,9 +692,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
    /* Compression is always zero but is here so the API and info structure
     * does not have to change if we introduce multiple compression types */
    info_ptr->iccp_compression = (png_byte)compression_type;
-#ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_ICCP;
-#endif
    info_ptr->valid |= PNG_INFO_iCCP;
 }
 #endif
@@ -771,9 +753,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
             (png_size_t)(info_ptr->max_text * png_sizeof(png_text)));
          if (info_ptr->text == NULL)
             return(1);
-#ifdef PNG_FREE_ME_SUPPORTED
          info_ptr->free_me |= PNG_FREE_TEXT;
-#endif
       }
       png_debug1(3, "allocated %d entries for info_ptr->text",
          info_ptr->max_text);
@@ -921,9 +901,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
         * function used to do the allocation.
         */
 
-#ifdef PNG_FREE_ME_SUPPORTED
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
-#endif
 
        /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1 */
        png_ptr->trans_alpha = info_ptr->trans_alpha = (png_bytep)png_malloc(png_ptr,
@@ -953,11 +931,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
    if (num_trans != 0)
    {
       info_ptr->valid |= PNG_INFO_tRNS;
-#ifdef PNG_FREE_ME_SUPPORTED
       info_ptr->free_me |= PNG_FREE_TRNS;
-#else
-      png_ptr->flags |= PNG_FLAG_FREE_TRNS;
-#endif
    }
 }
 #endif
@@ -1028,9 +1002,7 @@ png_set_sPLT(png_structp png_ptr,
    info_ptr->splt_palettes = np;
    info_ptr->splt_palettes_num += nentries;
    info_ptr->valid |= PNG_INFO_sPLT;
-#ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_SPLT;
-#endif
 }
 #endif /* PNG_sPLT_SUPPORTED */
 
@@ -1091,9 +1063,7 @@ png_set_unknown_chunks(png_structp png_ptr,
 
    info_ptr->unknown_chunks = np;
    info_ptr->unknown_chunks_num += num_unknowns;
-#ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_UNKN;
-#endif
 }
 void PNGAPI
 png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
@@ -1161,9 +1131,7 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
       *p=(png_byte)keep;
    png_ptr->num_chunk_list = old_num_chunks + num_chunks;
    png_ptr->chunk_list = new_list;
-#ifdef PNG_FREE_ME_SUPPORTED
    png_ptr->free_me |= PNG_FREE_LIST;
-#endif
 }
 #endif
 

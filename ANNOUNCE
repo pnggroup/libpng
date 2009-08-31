@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta78 - August 29, 2009
+Libpng 1.4.0beta78 - August 31, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -534,7 +534,9 @@ version 1.4.0beta77 [August 27, 2009]
   Moved CMakeLists.txt from scripts into the main libpng directory.
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
-version 1.4.0beta78 [August 29, 2009]
+version 1.4.0beta78 [August 31, 2009]
+  Converted all PNG_NO_* tests to PNG_*_SUPPORTED everywhere except pngconf.h
+  Eliminated PNG_NO_FREE_ME and PNG_FREE_ME_SUPPORTED macros.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

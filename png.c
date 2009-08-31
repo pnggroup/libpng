@@ -288,7 +288,6 @@ png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
    png_memset(info_ptr, 0, png_sizeof(png_info));
 }
 
-#ifdef PNG_FREE_ME_SUPPORTED
 void PNGAPI
 png_data_freer(png_structp png_ptr, png_infop info_ptr,
    int freer, png_uint_32 mask)
@@ -306,7 +305,6 @@ png_data_freer(png_structp png_ptr, png_infop info_ptr,
       png_warning(png_ptr,
          "Unknown freer parameter in png_data_freer");
 }
-#endif
 
 void PNGAPI
 png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
@@ -319,11 +317,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
 #if defined(PNG_TEXT_SUPPORTED)
    /* Free text item num or (if num == -1) all text items */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_TEXT) & info_ptr->free_me)
-#else
-   if (mask & PNG_FREE_TEXT)
-#endif
    {
       if (num != -1)
       {
@@ -347,28 +341,17 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
 #if defined(PNG_tRNS_SUPPORTED)
    /* Free any tRNS entry */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_TRNS) & info_ptr->free_me)
-#else
-   if ((mask & PNG_FREE_TRNS) && (png_ptr->flags & PNG_FLAG_FREE_TRNS))
-#endif
    {
       png_free(png_ptr, info_ptr->trans_alpha);
       info_ptr->trans_alpha = NULL;
       info_ptr->valid &= ~PNG_INFO_tRNS;
-#ifndef PNG_FREE_ME_SUPPORTED
-      png_ptr->flags &= ~PNG_FLAG_FREE_TRNS;
-#endif
    }
 #endif
 
 #if defined(PNG_sCAL_SUPPORTED)
    /* Free any sCAL entry */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_SCAL) & info_ptr->free_me)
-#else
-   if (mask & PNG_FREE_SCAL)
-#endif
    {
 #if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
       png_free(png_ptr, info_ptr->scal_s_width);
@@ -382,11 +365,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
 #if defined(PNG_pCAL_SUPPORTED)
    /* Free any pCAL entry */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_PCAL) & info_ptr->free_me)
-#else
-   if (mask & PNG_FREE_PCAL)
-#endif
    {
       png_free(png_ptr, info_ptr->pcal_purpose);
       png_free(png_ptr, info_ptr->pcal_units);
@@ -409,11 +388,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
 #if defined(PNG_iCCP_SUPPORTED)
    /* Free any iCCP entry */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_ICCP) & info_ptr->free_me)
-#else
-   if (mask & PNG_FREE_ICCP)
-#endif
    {
       png_free(png_ptr, info_ptr->iccp_name);
       png_free(png_ptr, info_ptr->iccp_profile);
@@ -425,11 +400,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
 #if defined(PNG_sPLT_SUPPORTED)
    /* Free a given sPLT entry, or (if num == -1) all sPLT entries */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_SPLT) & info_ptr->free_me)
-#else
-   if (mask & PNG_FREE_SPLT)
-#endif
    {
       if (num != -1)
       {
@@ -465,11 +436,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
       png_ptr->unknown_chunk.data = NULL;
    }
 
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_UNKN) & info_ptr->free_me)
-#else
-   if (mask & PNG_FREE_UNKN)
-#endif
    {
       if (num != -1)
       {
@@ -498,44 +465,26 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
 #if defined(PNG_hIST_SUPPORTED)
    /* Free any hIST entry */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_HIST)  & info_ptr->free_me)
-#else
-   if ((mask & PNG_FREE_HIST) && (png_ptr->flags & PNG_FLAG_FREE_HIST))
-#endif
    {
       png_free(png_ptr, info_ptr->hist);
       info_ptr->hist = NULL;
       info_ptr->valid &= ~PNG_INFO_hIST;
-#ifndef PNG_FREE_ME_SUPPORTED
-      png_ptr->flags &= ~PNG_FLAG_FREE_HIST;
-#endif
    }
 #endif
 
    /* Free any PLTE entry that was internally allocated */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_PLTE) & info_ptr->free_me)
-#else
-   if ((mask & PNG_FREE_PLTE) && (png_ptr->flags & PNG_FLAG_FREE_PLTE))
-#endif
    {
       png_zfree(png_ptr, info_ptr->palette);
       info_ptr->palette = NULL;
       info_ptr->valid &= ~PNG_INFO_PLTE;
-#ifndef PNG_FREE_ME_SUPPORTED
-      png_ptr->flags &= ~PNG_FLAG_FREE_PLTE;
-#endif
       info_ptr->num_palette = 0;
    }
 
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
    /* Free any image bits attached to the info structure */
-#ifdef PNG_FREE_ME_SUPPORTED
    if ((mask & PNG_FREE_ROWS) & info_ptr->free_me)
-#else
-   if (mask & PNG_FREE_ROWS)
-#endif
    {
       if (info_ptr->row_pointers)
       {
@@ -550,12 +499,10 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-#ifdef PNG_FREE_ME_SUPPORTED
    if (num == -1)
       info_ptr->free_me &= ~mask;
    else
       info_ptr->free_me &= ~(mask & ~PNG_FREE_MUL);
-#endif
 }
 
 /* This is an internal routine to free any memory that the info struct is
