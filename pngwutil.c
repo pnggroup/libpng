@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 28, 2009]
+ * Last changed in libpng 1.4.0 [August 31, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -220,7 +220,7 @@ png_text_compress(png_structp png_ptr,
 
    if (compression >= PNG_TEXT_COMPRESSION_LAST)
    {
-#if !defined(PNG_NO_STDIO)
+#if defined(PNG_STDIO_SUPPORTED)
       char msg[50];
       png_snprintf(msg, 50, "Unknown compression type %d", compression);
       png_warning(png_ptr, msg);
@@ -633,7 +633,7 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
 
    png_write_chunk_start(png_ptr, (png_bytep)png_PLTE,
      (png_uint_32)(num_pal * 3));
-#ifndef PNG_NO_POINTER_INDEXING
+#ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (i = 0, pal_ptr = palette; i < num_pal; i++, pal_ptr++)
    {
       buf[0] = pal_ptr->red;
@@ -879,7 +879,7 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
    png_size_t entry_size = (spalette->depth == 8 ? 6 : 10);
    png_size_t palette_size = entry_size * spalette->nentries;
    png_sPLT_entryp ep;
-#ifdef PNG_NO_POINTER_INDEXING
+#ifndef PNG_POINTER_INDEXING_SUPPORTED
    int i;
 #endif
 
@@ -896,7 +896,7 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
    png_write_chunk_data(png_ptr, (png_bytep)&spalette->depth, (png_size_t)1);
 
    /* Loop through each palette entry, writing appropriately */
-#ifndef PNG_NO_POINTER_INDEXING
+#ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (ep = spalette->entries; ep<spalette->entries + spalette->nentries; ep++)
    {
       if (spalette->depth == 8)
@@ -1030,7 +1030,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    int_blue_x  = (png_uint_32)(blue_x  * 100000.0 + 0.5);
    int_blue_y  = (png_uint_32)(blue_y  * 100000.0 + 0.5);
 
-#if !defined(PNG_NO_CHECK_cHRM)
+#if defined(PNG_CHECK_cHRM_SUPPORTED)
    if (png_check_cHRM_fixed(png_ptr, int_white_x, int_white_y,
       int_red_x, int_red_y, int_green_x, int_green_y, int_blue_x, int_blue_y))
 #endif
@@ -1068,7 +1068,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    png_debug(1, "in png_write_cHRM");
 
    /* Each value is saved in 1/100,000ths */
-#if !defined(PNG_NO_CHECK_cHRM)
+#if defined(PNG_CHECK_cHRM_SUPPORTED)
    if (png_check_cHRM_fixed(png_ptr, white_x, white_y, red_x, red_y,
       green_x, green_y, blue_x, blue_y))
 #endif
@@ -1279,7 +1279,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
       if ((png_byte)*kp < 0x20 ||
          ((png_byte)*kp > 0x7E && (png_byte)*kp < 0xA1))
       {
-#if !defined(PNG_NO_STDIO)
+#if defined(PNG_STDIO_SUPPORTED)
          char msg[40];
 
          png_snprintf(msg, 40,
@@ -1643,7 +1643,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
 
 #if defined(PNG_WRITE_sCAL_SUPPORTED)
 /* Write the sCAL chunk */
-#if defined(PNG_FLOATING_POINT_SUPPORTED) && !defined(PNG_NO_STDIO)
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
 void /* PRIVATE */
 png_write_sCAL(png_structp png_ptr, int unit, double width, double height)
 {
@@ -1790,7 +1790,7 @@ png_write_start_row(png_structp png_ptr)
      (png_alloc_size_t)buf_size);
    png_ptr->row_buf[0] = PNG_FILTER_VALUE_NONE;
 
-#ifndef PNG_NO_WRITE_FILTER
+#ifdef PNG_WRITE_FILTER_SUPPORTED
    /* Set up filtering buffer, if using this filter */
    if (png_ptr->do_filter & PNG_FILTER_SUB)
    {
@@ -1833,7 +1833,7 @@ png_write_start_row(png_structp png_ptr)
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
    }
-#endif /* PNG_NO_WRITE_FILTER */
+#endif /* PNG_WRITE_FILTER_SUPPORTED */
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* If interlaced, we need to set up width and height of pass */
@@ -2155,7 +2155,7 @@ void /* PRIVATE */
 png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 {
    png_bytep best_row;
-#ifndef PNG_NO_WRITE_FILTER
+#ifdef PNG_WRITE_FILTER_SUPPORTED
    png_bytep prev_row, row_buf;
    png_uint_32 mins, bpp;
    png_byte filter_to_do = png_ptr->do_filter;
@@ -2180,7 +2180,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    prev_row = png_ptr->prev_row;
 #endif
    best_row = png_ptr->row_buf;
-#ifndef PNG_NO_WRITE_FILTER
+#ifdef PNG_WRITE_FILTER_SUPPORTED
    row_buf = best_row;
    mins = PNG_MAXSUM;
 
@@ -2756,12 +2756,12 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          best_row = png_ptr->paeth_row;
       }
    }
-#endif /* PNG_NO_WRITE_FILTER */
+#endif /* PNG_WRITE_FILTER_SUPPORTED */
    /* Do the actual writing of the filtered row data from the chosen filter. */
 
    png_write_filtered_row(png_ptr, best_row);
 
-#ifndef PNG_NO_WRITE_FILTER
+#ifdef PNG_WRITE_FILTER_SUPPORTED
 #if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
    /* Save the type of filter we picked this time for future calculations */
    if (png_ptr->num_prev_filters > 0)
@@ -2774,7 +2774,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_ptr->prev_filters[j] = best_row[0];
    }
 #endif
-#endif /* PNG_NO_WRITE_FILTER */
+#endif /* PNG_WRITE_FILTER_SUPPORTED */
 }
 
 

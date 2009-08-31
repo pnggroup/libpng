@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.0beta78 - August 28, 2009
+ * libpng version 1.4.0beta78 - August 31, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.0beta78 - August 28, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.0beta78 - August 31, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -161,7 +161,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta78, August 28, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta78, August 31, 2009, are
  * Copyright (c) 2004, 2006-2007 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -337,7 +337,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.4.0beta78"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.0beta78 - August 28, 2009\n"
+   " libpng version 1.4.0beta78 - August 31, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   14
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -1459,7 +1459,7 @@ extern PNG_EXPORT(void,png_write_info_before_PLTE) PNGARG((png_structp png_ptr,
 extern PNG_EXPORT(void,png_write_info) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the information before the actual image data. */
 extern PNG_EXPORT(void,png_read_info) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
@@ -1625,20 +1625,20 @@ extern PNG_EXPORT(void,png_start_read_image) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(void,png_read_update_info) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read one or more rows of image data. */
 extern PNG_EXPORT(void,png_read_rows) PNGARG((png_structp png_ptr,
    png_bytepp row, png_bytepp display_row, png_uint_32 num_rows));
 #endif
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read a row of data. */
 extern PNG_EXPORT(void,png_read_row) PNGARG((png_structp png_ptr,
    png_bytep row,
    png_bytep display_row));
 #endif
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the whole image into memory at once. */
 extern PNG_EXPORT(void,png_read_image) PNGARG((png_structp png_ptr,
    png_bytepp image));
@@ -1660,7 +1660,7 @@ extern PNG_EXPORT(void,png_write_image) PNGARG((png_structp png_ptr,
 extern PNG_EXPORT(void,png_write_end) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the end of the PNG file. */
 extern PNG_EXPORT(void,png_read_end) PNGARG((png_structp png_ptr,
    png_infop info_ptr));
@@ -1818,7 +1818,7 @@ extern PNG_EXPORT(void,png_set_compression_method) PNGARG((png_structp png_ptr,
  * more information.
  */
 
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_STDIO_SUPPORTED
 /* Initialize the input/output for the PNG file to the default functions. */
 extern PNG_EXPORT(void,png_init_io) PNGARG((png_structp png_ptr, png_FILE_p fp));
 #endif

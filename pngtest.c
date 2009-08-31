@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [August 28, 2009]
+ * Last changed in libpng 1.4.0 [August 31, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -38,7 +38,7 @@
 #  include <stdlib.h>
 #  define FCLOSE(file) fclose(file)
 
-#if defined(PNG_NO_STDIO)
+#ifndef PNG_STDIO_SUPPORTED
      typedef FILE                * png_FILE_p;
 #endif
 
@@ -55,7 +55,7 @@
 #define PNGTEST_TIMING
 */
 
-#ifdef PNG_NO_FLOATING_POINT_SUPPORTED
+#ifndef PNG_FLOATING_POINT_SUPPORTED
 #undef PNGTEST_TIMING
 #endif
 
@@ -253,7 +253,7 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 
 static int wrote_question = 0;
 
-#if defined(PNG_NO_STDIO)
+#ifndef PNG_STDIO_SUPPORTED
 /* START of code to validate stdio-free compilation */
 /* These copies of the default read/write functions come from pngrio.c and
  * pngwio.c.  They allow "don't include stdio" testing of the library.
@@ -430,7 +430,7 @@ pngtest_error(png_structp png_ptr, png_const_charp message)
     * actually OK in this case.
     */
 }
-#endif /* PNG_NO_STDIO */
+#endif /* !PNG_STDIO_SUPPORTED */
 /* END of code to validate stdio-free compilation */
 
 /* START of code to validate memory allocation and deallocation */
@@ -684,7 +684,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    read_ptr =
       png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #endif
-#if defined(PNG_NO_STDIO)
+#ifndef PNG_STDIO_SUPPORTED
    png_set_error_fn(read_ptr, (png_voidp)inname, pngtest_error,
        pngtest_warning);
 #endif
@@ -707,7 +707,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    write_ptr =
       png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #endif
-#if defined(PNG_NO_STDIO)
+#ifndef PNG_STDIO_SUPPORTED
    png_set_error_fn(write_ptr, (png_voidp)inname, pngtest_error,
        pngtest_warning);
 #endif
@@ -769,7 +769,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
    png_debug(0, "Initializing input and output streams");
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_STDIO_SUPPORTED
    png_init_io(read_ptr, fpin);
 #  ifdef PNG_WRITE_SUPPORTED
    png_init_io(write_ptr, fpout);
@@ -868,8 +868,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 #endif
 #else /* Use floating point versions */
-#if defined(PNG_FLOATING_POINT_SUPPORTED)
-#if defined(PNG_cHRM_SUPPORTED)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+#ifdef PNG_cHRM_SUPPORTED
    {
       double white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
          blue_y;
@@ -983,7 +983,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_sBIT(write_ptr, write_info_ptr, sig_bit);
    }
 #endif
-#if defined(PNG_sCAL_SUPPORTED)
+#if def PNG_sCAL_SUPPORTED
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    {
       int unit;

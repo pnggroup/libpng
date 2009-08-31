@@ -1,7 +1,7 @@
 
 /* pngwio.c - functions for data output
  *
- * Last changed in libpng 1.4.0 [August 28, 2009]
+ * Last changed in libpng 1.4.0 [August 31, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -38,7 +38,7 @@ png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
       png_error(png_ptr, "Call to NULL write function");
 }
 
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_STDIO_SUPPORTED
 /* This is the function that does the actual writing of data.  If you are
  * not writing to a standard C stream, you should create a replacement
  * write_data function and use it at run time with png_set_write_fn(), rather
@@ -114,7 +114,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
  * to disk).  After png_flush is called, there should be no data pending
  * writing in any buffers.
  */
-#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
 void /* PRIVATE */
 png_flush(png_structp png_ptr)
 {
@@ -122,7 +122,7 @@ png_flush(png_structp png_ptr)
       (*(png_ptr->output_flush_fn))(png_ptr);
 }
 
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_STDIO_SUPPORTED
 void PNGAPI
 png_default_flush(png_structp png_ptr)
 {
@@ -173,7 +173,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 
    png_ptr->io_ptr = io_ptr;
 
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_STDIO_SUPPORTED
    if (write_data_fn != NULL)
       png_ptr->write_data_fn = write_data_fn;
 
@@ -183,8 +183,8 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    png_ptr->write_data_fn = write_data_fn;
 #endif
 
-#if defined(PNG_WRITE_FLUSH_SUPPORTED)
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
+#ifdef PNG_STDIO_SUPPORTED
    if (output_flush_fn != NULL)
       png_ptr->output_flush_fn = output_flush_fn;
 
@@ -206,8 +206,8 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    }
 }
 
-#if defined(USE_FAR_KEYWORD)
-#if defined(_MSC_VER)
+#ifdef USE_FAR_KEYWORD
+#ifdef _MSC_VER
 void *png_far_to_near(png_structp png_ptr, png_voidp ptr, int check)
 {
    void *near_ptr;

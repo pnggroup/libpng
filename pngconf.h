@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta78 - August 29, 2009
+ * libpng version 1.4.0beta78 - August 31, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -129,6 +129,19 @@
 #  endif
 #endif
 
+/* Added at libpng version 1.4.0 */
+#if !defined(PNG_NO_WARNINGS) && !defined(PNG_WARNINGS_SUPPORTED)
+#  define PNG_WARNINGS_SUPPORTED
+#endif
+
+#if !defined(PNG_NO_ERROR_TEXT) && !defined(PNG_ERROR_TEXT_SUPPORTED)
+#  define PNG_ERROR_TEXT_SUPPORTED
+#endif
+
+#if !defined(PNG_NO_CHECK_cHRM) && !defined(PNG_CHECK_cHRM_SUPPORTED)
+#  define PNG_CHECK_cHRM_SUPPORTED
+#endif
+
 /* Enabled by default in 1.2.0.  You can disable this if you don't need to
    support PNGs that are embedded in MNG datastreams */
 #if !defined(PNG_NO_MNG_FEATURES)
@@ -137,6 +150,7 @@
 #  endif
 #endif
 
+/* Added at libpng version 1.4.0 */
 #ifndef PNG_NO_FLOATING_POINT_SUPPORTED
 #  ifndef PNG_FLOATING_POINT_SUPPORTED
 #    define PNG_FLOATING_POINT_SUPPORTED
@@ -246,6 +260,10 @@
  * #define PNG_NO_STDIO
  */
 
+#if !defined(PNG_NO_STDIO) && !defined(PNG_STDIO_SUPPORTED)
+#  define PNG_STDIO_SUPPORTED
+#endif
+
 #if defined(_WIN32_WCE)
 #  include <windows.h>
    /* Console I/O functions are not supported on WindowsCE */
@@ -256,10 +274,8 @@
 #endif
 
 #ifdef PNG_BUILD_DLL
-#  ifndef PNG_CONSOLE_IO_SUPPORTED
-#    ifndef PNG_NO_CONSOLE_IO
-#      define PNG_NO_CONSOLE_IO
-#    endif
+#  if !defined(PNG_CONSOLE_IO_SUPPORTED) && !defined(PNG_NO_CONSOLE_IO)
+#    define PNG_NO_CONSOLE_IO
 #  endif
 #endif
 
@@ -275,6 +291,10 @@
 #  else
 #    include <stdio.h>
 #  endif
+
+#if !(defined PNG_NO_CONSOLE_IO) && !defined(PNG_CONSOLE_IO_SUPPORTED)
+#  define PNG_CONSOLE_IO_SUPPORTED
+#endif
 
 /* This macro protects us against machines that don't have function
  * prototypes (ie K&R style headers).  If your compiler does not handle
@@ -310,12 +330,14 @@
 #  endif
 #endif
 
-/* enough people need this for various reasons to include it here */
+/* Enough people need this for various reasons to include it here */
 #if !defined(MACOS) && !defined(RISCOS) && !defined(_WIN32_WCE)
 #  include <sys/types.h>
 #endif
 
-#if !defined(PNG_SETJMP_NOT_SUPPORTED) && !defined(PNG_NO_SETJMP_SUPPORTED)
+/* PNG_SETJMP_NOT_SUPPORTED and PNG_NO_SETJMP_SUPPORTED are deprecated. */
+#if !defined(PNG_NO_SETJMP) && \
+    !defined(PNG_SETJMP_NOT_SUPPORTED) && !defined(PNG_NO_SETJMP_SUPPORTED)
 #  define PNG_SETJMP_SUPPORTED
 #endif
 
@@ -346,7 +368,7 @@
 #    endif /* __linux__ */
 #  endif /* PNG_SKIP_SETJMP_CHECK */
 
-   /* include setjmp.h for error handling */
+   /* Include setjmp.h for error handling */
 #  include <setjmp.h>
 
 #  ifdef __linux__
@@ -428,30 +450,15 @@
 /* Any features you will not be using can be undef'ed here */
 
 /* GR-P, 0.96a: Set "*TRANSFORMS_SUPPORTED as default but allow user
- * to turn it off with "*TRANSFORMS_NOT_SUPPORTED" or *PNG_NO_*_TRANSFORMS
- * on the compile line, then pick and choose which ones to define without
- * having to edit this file. It is safe to use the *TRANSFORMS_NOT_SUPPORTED
+ * to turn it off with PNG_NO_READ|WRITE_TRANSFORMS on the compile line,
+ * then pick and choose which ones to define without having to edit this
+ * file. It is safe to use the PNG_NO_READ|WRITE_TRANSFORMS
  * if you only want to have a png-compliant reader/writer but don't need
  * any of the extra transformations.  This saves about 80 kbytes in a
  * typical installation of the library. (PNG_NO_* form added in version
- * 1.0.1c, for consistency)
+ * 1.0.1c, for consistency; PNG_*_TRANSFORMS_NOT_SUPPORTED deprecated in
+ * 1.4.0)
  */
-
-/* The size of the png_text structure changed in libpng-1.0.6 when
- * iTXt support was added.  iTXt support was turned off by default through
- * libpng-1.2.x, to support old apps that malloc the png_text structure
- * instead of calling png_set_text() and letting libpng malloc it.  It
- * was turned on by default in libpng-1.4.0.
- */
-
-#if !defined(PNG_NO_iTXt_SUPPORTED)
-#  if !defined(PNG_READ_iTXt_SUPPORTED) && !defined(PNG_NO_READ_iTXt)
-#    define PNG_READ_iTXt
-#  endif
-#  if !defined(PNG_WRITE_iTXt_SUPPORTED) && !defined(PNG_NO_WRITE_iTXt)
-#    define PNG_WRITE_iTXt
-#  endif
-#endif
 
 /* Ignore attempt to turn off both floating and fixed point support */
 #if !defined(PNG_FLOATING_POINT_SUPPORTED) || \
@@ -465,6 +472,7 @@
 
 #ifdef PNG_READ_SUPPORTED
 
+/* PNG_READ_TRANSFORMS_NOT_SUPPORTED is deprecated. */
 #if !defined(PNG_READ_TRANSFORMS_NOT_SUPPORTED) && \
       !defined(PNG_NO_READ_TRANSFORMS)
 #  define PNG_READ_TRANSFORMS_SUPPORTED
@@ -532,13 +540,21 @@
 #  endif
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
+/* PNG_PROGRESSIVE_READ_NOT_SUPPORTED is deprecated. */
 #if !defined(PNG_NO_PROGRESSIVE_READ) && \
  !defined(PNG_PROGRESSIVE_READ_NOT_SUPPORTED)  /* if you don't do progressive */
 #  define PNG_PROGRESSIVE_READ_SUPPORTED     /* reading.  This is not talking */
 #endif                               /* about interlacing capability!  You'll */
-              /* still have interlacing unless you change the following line: */
+            /* still have interlacing unless you change the following define: */
 
 #define PNG_READ_INTERLACING_SUPPORTED /* required for PNG-compliant decoders */
+
+/* PNG_NO_SEQUENTIAL_READ_SUPPORTED is deprecated. */
+#if !defined(PNG_NO_SEQUENTIAL_READ) && \
+    !defined(PNG_SEQUENTIAL_READ_SUPPORTED) && \
+    !defined(PNG_NO_SEQUENTIAL_READ_SUPPORTED)
+#  define PNG_SEQUENTIAL_READ_SUPPORTED
+#endif
 
 #ifndef PNG_NO_READ_COMPOSITE_NODIV
 #  ifndef PNG_NO_READ_COMPOSITED_NODIV  /* libpng-1.0.x misspelling */
@@ -557,6 +573,7 @@
 
 #ifdef PNG_WRITE_SUPPORTED
 
+/* PNG_WRITE_TRANSFORMS_NOT_SUPPORTED is deprecated. */
 # if !defined(PNG_WRITE_TRANSFORMS_NOT_SUPPORTED) && \
     !defined(PNG_NO_WRITE_TRANSFORMS)
 #  define PNG_WRITE_TRANSFORMS_SUPPORTED
@@ -630,7 +647,7 @@
 #  endif
 #endif
 
-#ifndef PNG_NO_STDIO
+#if defined(PNG_STDIO_SUPPORTED) && !defined(PNG_TIME_RFC1123_SUPPORTED)
 #  define PNG_TIME_RFC1123_SUPPORTED
 #endif
 
@@ -700,7 +717,7 @@
 
 /* These are currently experimental features, define them if you want */
 
-/* very little testing */
+/* Very little testing */
 /*
 #ifdef PNG_READ_SUPPORTED
 #  ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
@@ -721,10 +738,12 @@
 #  define PNG_USE_READ_MACROS
 #endif
 
-/* Buggy compilers (e.g., gcc 2.7.2.2) need this */
-/*
-#define PNG_NO_POINTER_INDEXING
-*/
+/* Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING */
+
+#if !defined(PNG_NO_POINTER_INDEXING) && \
+    !defined(PNG_POINTER_INDEXING_SUPPORTED)
+#  define PNG_POINTER_INDEXING_SUPPORTED
+#endif
 
 
 /* Any chunks you are not interested in, you can undef here.  The
@@ -733,12 +752,21 @@
  * a bit smaller.
  */
 
+/* The size of the png_text structure changed in libpng-1.0.6 when
+ * iTXt support was added.  iTXt support was turned off by default through
+ * libpng-1.2.x, to support old apps that malloc the png_text structure
+ * instead of calling png_set_text() and letting libpng malloc it.  It
+ * was turned on by default in libpng-1.4.0.
+ */
+
+/* PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED is deprecated. */
 #if defined(PNG_READ_SUPPORTED) && \
     !defined(PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED) && \
     !defined(PNG_NO_READ_ANCILLARY_CHUNKS)
 #  define PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
 #endif
 
+/* PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED is deprecated. */
 #if defined(PNG_WRITE_SUPPORTED) && \
     !defined(PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED) && \
     !defined(PNG_NO_WRITE_ANCILLARY_CHUNKS)
@@ -752,6 +780,7 @@
 #  define PNG_NO_READ_tEXt
 #  define PNG_NO_READ_zTXt
 #endif
+
 #ifndef PNG_NO_READ_bKGD
 #  define PNG_READ_bKGD_SUPPORTED
 #  define PNG_bKGD_SUPPORTED
@@ -979,6 +1008,10 @@
 #endif
 
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
+
+#if !defined(PNG_NO_WRITE_FILTER) && !defined(PNG_WRITE_FILTER_SUPPORTED)
+#  define PNG_WRITE_FILTER_SUPPORTED
+#endif
 
 #ifndef PNG_NO_WRITE_UNKNOWN_CHUNKS
 #  define PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
@@ -1311,7 +1344,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
 #else
 #  define png_jmpbuf(png_ptr) \
-   (LIBPNG_WAS_COMPILED_WITH__PNG_SETJMP_NOT_SUPPORTED)
+   (LIBPNG_WAS_COMPILED_WITH__PNG_NO_SETJMP)
 #endif
 
 /* memory model/platform independent fns */

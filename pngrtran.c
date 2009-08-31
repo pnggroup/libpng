@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [August 28, 2009]
+ * Last changed in libpng 1.4.0 [August 31, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -517,7 +517,6 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
          png_sizeof(png_byte)));
-
       png_memset(distance, 0xff, num_entries * png_sizeof(png_byte));
 
       for (i = 0; i < num_palette; i++)
@@ -1329,7 +1328,7 @@ png_do_read_transformations(png_structp png_ptr)
 
    if (png_ptr->row_buf == NULL)
    {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#if defined(PNG_STDIO_SUPPORTED) && !defined(_WIN32_WCE)
       char msg[50];
 
       png_snprintf2(msg, 50,

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [August 28, 2009]
+ * Last changed in libpng 1.4.0 [August 31, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -111,7 +111,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
           (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
           (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
       {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#if defined(PNG_STDIO_SUPPORTED) && !defined(_WIN32_WCE)
          char msg[80];
          if (user_png_ver)
          {
@@ -187,7 +187,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 }
 
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the information before the actual image data.  This has been
  * changed in v0.90 to allow reading a file that already has the magic
  * bytes read from the stream.  You can tell libpng how many bytes have
@@ -407,7 +407,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
          png_handle_unknown(png_ptr, info_ptr, length);
    }
 }
-#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
 /* Optional call to update the users info_ptr structure */
 void PNGAPI
@@ -425,7 +425,7 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
    png_read_transform_info(png_ptr, info_ptr);
 }
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Initialize palette, background, etc, after transformations
  * are set, but before any reading takes place.  This allows
  * the user to obtain a gamma-corrected palette, for example.
@@ -441,9 +441,9 @@ png_start_read_image(png_structp png_ptr)
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       png_read_start_row(png_ptr);
 }
-#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 void PNGAPI
 png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 {
@@ -674,9 +674,9 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    if (png_ptr->read_row_fn != NULL)
       (*(png_ptr->read_row_fn))(png_ptr, png_ptr->row_number, png_ptr->pass);
 }
-#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read one or more rows of image data.  If the image is interlaced,
  * and png_set_interlace_handling() has been called, the rows need to
  * contain the contents of the rows from the previous pass.  If the
@@ -738,9 +738,9 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
          dp++;
       }
 }
-#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the entire image.  If the image has an alpha channel or a tRNS
  * chunk, and you have called png_handle_alpha()[*], you will need to
  * initialize the image to the current image that PNG will be overlaying.
@@ -788,9 +788,9 @@ png_read_image(png_structp png_ptr, png_bytepp image)
       }
    }
 }
-#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the end of the PNG file.  Will not read past the end of the
  * file, will verify the end is accurate, and will read any comments
  * or time information at the end of the file, if info is not NULL.
@@ -966,7 +966,7 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
          png_handle_unknown(png_ptr, info_ptr, length);
    } while (!(png_ptr->mode & PNG_HAVE_IEND));
 }
-#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
 /* Free all memory used by the read */
 void PNGAPI
@@ -1197,7 +1197,7 @@ png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
 }
 
 
-#ifndef PNG_NO_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
 void PNGAPI
 png_read_png(png_structp png_ptr, png_infop info_ptr,
@@ -1365,5 +1365,5 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
 }
 #endif /* PNG_INFO_IMAGE_SUPPORTED */
-#endif /* PNG_NO_SEQUENTIAL_READ_SUPPORTED */
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 #endif /* PNG_READ_SUPPORTED */

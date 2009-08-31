@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta78 - August 28, 2009
+ * libpng version 1.4.0beta78 - August 31, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -314,8 +314,8 @@ PNG_EXTERN void PNGAPI png_push_fill_buffer PNGARG((png_structp png_ptr,
 PNG_EXTERN void PNGAPI png_default_write_data PNGARG((png_structp png_ptr,
    png_bytep data, png_size_t length));
 
-#if defined(PNG_WRITE_FLUSH_SUPPORTED)
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
+#ifdef PNG_STDIO_SUPPORTED
 PNG_EXTERN void PNGAPI png_default_flush PNGARG((png_structp png_ptr));
 #endif
 #endif
@@ -492,7 +492,7 @@ PNG_EXTERN void png_write_tIME PNGARG((png_structp png_ptr,
 #endif
 
 #if defined(PNG_WRITE_sCAL_SUPPORTED)
-#if defined(PNG_FLOATING_POINT_SUPPORTED) && !defined(PNG_NO_STDIO)
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
 PNG_EXTERN void png_write_sCAL PNGARG((png_structp png_ptr,
    int unit, double width, double height));
 #else
@@ -851,8 +851,8 @@ PNG_EXTERN int png_check_cHRM_fixed  PNGARG((png_structp png_ptr,
    png_fixed_point int_blue_y));
 #endif
 
-#if defined(PNG_cHRM_SUPPORTED)
-#if !defined(PNG_NO_CHECK_cHRM)
+#ifdef PNG_cHRM_SUPPORTED
+#ifdef PNG_CHECK_cHRM_SUPPORTED
 /* Added at libpng version 1.2.34 and 1.4.0 */
 PNG_EXTERN void png_64bit_product (long v1, long v2, unsigned long *hi_product,
    unsigned long *lo_product);

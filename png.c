@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [August 28, 2009]
+ * Last changed in libpng 1.4.0 [August 31, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -594,7 +594,7 @@ png_get_io_ptr(png_structp png_ptr)
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_STDIO_SUPPORTED
 /* Initialize the default input/output functions for the PNG file.  If you
  * use your own read or write routines, you can call either png_set_read_fn()
  * or png_set_write_fn() instead of png_init_io().  If you have defined
@@ -663,13 +663,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta78 - August 28, 2009" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta78 - August 31, 2009" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta78 - August 28, 2009\
+      return ((png_charp) "libpng version 1.4.0beta78 - August 31, 2009\
       Copyright (c) 1998-2009 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -770,7 +770,7 @@ png_convert_size(size_t size)
 
 /* Added at libpng version 1.2.34 and 1.4.0 (moved from pngset.c) */
 #if defined(PNG_cHRM_SUPPORTED)
-#if !defined(PNG_NO_CHECK_cHRM)
+#if defined(PNG_CHECK_cHRM_SUPPORTED)
 
 /*
  *    Multiply two 32-bit numbers, V1 and V2, using 32-bit
@@ -881,6 +881,6 @@ png_check_cHRM_fixed(png_structp png_ptr,
 
    return ret;
 }
-#endif /* NO_PNG_CHECK_cHRM */
+#endif /* PNG_CHECK_cHRM_SUPPORTED */
 #endif /* PNG_cHRM_SUPPORTED */
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
