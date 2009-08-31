@@ -815,9 +815,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #endif
 
 /* New members added in libpng-1.0.6 */
-#ifdef PNG_FREE_ME_SUPPORTED
    png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
-#endif
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED) || \
  defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
@@ -1260,9 +1258,7 @@ struct png_struct_def
 
 /* New members added in libpng-1.0.6 */
 
-#ifdef PNG_FREE_ME_SUPPORTED
    png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
-#endif
 
 #if defined(PNG_USER_CHUNKS_SUPPORTED)
    png_voidp user_chunk_ptr;
@@ -1940,12 +1936,10 @@ extern PNG_EXPORT(void,png_free) PNGARG((png_structp png_ptr, png_voidp ptr));
 /* Free data that was allocated internally */
 extern PNG_EXPORT(void,png_free_data) PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 free_me, int num));
-#ifdef PNG_FREE_ME_SUPPORTED
 /* Reassign responsibility for freeing existing data, whether allocated
  * by libpng or by the application */
 extern PNG_EXPORT(void,png_data_freer) PNGARG((png_structp png_ptr,
    png_infop info_ptr, int freer, png_uint_32 mask));
-#endif
 /* Assignments for png_data_freer */
 #define PNG_DESTROY_WILL_FREE_DATA 1
 #define PNG_SET_WILL_FREE_DATA 1

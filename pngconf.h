@@ -466,10 +466,6 @@
 #  define PNG_FIXED_POINT_SUPPORTED
 #endif
 
-#ifndef PNG_NO_FREE_ME
-#  define PNG_FREE_ME_SUPPORTED
-#endif
-
 #ifdef PNG_READ_SUPPORTED
 
 /* PNG_READ_TRANSFORMS_NOT_SUPPORTED is deprecated. */

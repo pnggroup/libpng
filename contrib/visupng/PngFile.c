@@ -35,7 +35,7 @@ png_cexcept_error(png_structp png_ptr, png_const_charp msg)
 {
    if(png_ptr)
      ;
-#ifndef PNG_NO_CONSOLE_IO
+#ifdef PNG_CONSOLE_IO_SUPPORTED
    fprintf(stderr, "libpng error: %s\n", msg);
 #endif
    {
@@ -155,7 +155,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
         
         // initialize the png structure
         
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_STDIO_SUPPORTED
         png_init_io(png_ptr, pfFile);
 #else
         png_set_read_fn(png_ptr, (png_voidp)pfFile, png_read_data);
@@ -324,7 +324,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
     {
         // initialize the png structure
         
-#if !defined(PNG_NO_STDIO)
+#ifdef PNG_STDIO_SUPPORTED
         png_init_io(png_ptr, pfFile);
 #else
         png_set_write_fn(png_ptr, (png_voidp)pfFile, png_write_data, png_flush);
@@ -395,7 +395,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
     return TRUE;
 }
 
-#ifdef PNG_NO_STDIO
+#ifndef PNG_STDIO_SUPPORTED
 
 static void
 png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
