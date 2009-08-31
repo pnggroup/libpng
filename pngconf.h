@@ -1195,6 +1195,8 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define PNG_IMPEXP
 #endif
 
+#define PNG_USE_LOCAL_ARRAYS /* Not used in libpng, defined for legacy apps */
+
 /* If you define PNGAPI, e.g., with compiler option "-DPNGAPI=__stdcall",
  * you may get warnings regarding the linkage of png_zalloc and png_zfree.
  * Don't ignore those warnings; you must also reset the default calling

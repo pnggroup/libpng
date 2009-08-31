@@ -3770,7 +3770,7 @@ png.h and pngconf.h into a new pngpriv.h header file.
 
 Support for the iTXt chunk has been enabled by default.
 
-Support for global arrays was disabled by default.
+Support for global arrays was removed.
 
 Some obsolete/deprecated macros and functions have been removed.
 
@@ -3856,7 +3856,10 @@ allocates.
 
 The png_zalloc() and png_zfree() functions are no longer exported.
 
-The png_calloc() function was added.
+The png_calloc() function was added and is used in place of
+of "png_malloc(); png_memset();" except in the case in png_read_png()
+where the array consists of pointers; in this case a "for" loop is used
+after the png_malloc() to set the pointers to NULL.
 
 We removed the trailing '.' from the warning and error messages.
 
