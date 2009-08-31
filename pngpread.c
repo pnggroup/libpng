@@ -149,7 +149,6 @@ png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
 void /* PRIVATE */
 png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
       PNG_CONST PNG_IHDR;
       PNG_CONST PNG_IDAT;
       PNG_CONST PNG_IEND;
@@ -205,7 +204,6 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_zTXt_SUPPORTED)
       PNG_CONST PNG_zTXt;
 #endif
-#endif /* PNG_USE_LOCAL_ARRAYS */
    /* First we make sure we have enough data for the 4 byte chunk name
     * and the 4 byte chunk length before proceeding with decoding the
     * chunk data.  To fully decode each of these chunks, we also make
@@ -728,9 +726,7 @@ png_push_restore_buffer(png_structp png_ptr, png_bytep buffer,
 void /* PRIVATE */
 png_push_read_IDAT(png_structp png_ptr)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
    PNG_CONST PNG_IDAT;
-#endif
    if (!(png_ptr->mode & PNG_HAVE_CHUNK_HEADER))
    {
       png_byte chunk_length[4];
@@ -1088,7 +1084,6 @@ png_push_process_row(png_structp png_ptr)
 void /* PRIVATE */
 png_read_push_finish_row(png_structp png_ptr)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
@@ -1107,7 +1102,6 @@ png_read_push_finish_row(png_structp png_ptr)
     * it, uncomment it here and in png.h
    PNG_CONST int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
    */
-#endif
 
    png_ptr->row_number++;
    if (png_ptr->row_number < png_ptr->num_rows)
@@ -1689,10 +1683,9 @@ void PNGAPI
 png_progressive_combine_row (png_structp png_ptr,
    png_bytep old_row, png_bytep new_row)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
    PNG_CONST int FARDATA png_pass_dsp_mask[7] =
       {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
-#endif
+
    if (png_ptr == NULL)
       return;
 

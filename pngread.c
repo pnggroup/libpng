@@ -231,7 +231,6 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 
    for (;;)
    {
-#ifdef PNG_USE_LOCAL_ARRAYS
       PNG_CONST PNG_IHDR;
       PNG_CONST PNG_IDAT;
       PNG_CONST PNG_IEND;
@@ -287,7 +286,6 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_zTXt_SUPPORTED)
       PNG_CONST PNG_zTXt;
 #endif
-#endif /* PNG_USE_LOCAL_ARRAYS */
       png_uint_32 length = png_read_chunk_header(png_ptr);
       PNG_CONST png_bytep chunk_name = png_ptr->chunk_name;
 
@@ -447,12 +445,10 @@ png_start_read_image(png_structp png_ptr)
 void PNGAPI
 png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
    PNG_CONST PNG_IDAT;
    PNG_CONST int png_pass_dsp_mask[7] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55,
       0xff};
    PNG_CONST int png_pass_mask[7] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
-#endif
    int ret;
  
    if (png_ptr == NULL)
@@ -806,7 +802,6 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 
    do
    {
-#ifdef PNG_USE_LOCAL_ARRAYS
       PNG_CONST PNG_IHDR;
       PNG_CONST PNG_IDAT;
       PNG_CONST PNG_IEND;
@@ -862,7 +857,6 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 #if defined(PNG_READ_zTXt_SUPPORTED)
       PNG_CONST PNG_zTXt;
 #endif
-#endif /* PNG_USE_LOCAL_ARRAYS */
       png_uint_32 length = png_read_chunk_header(png_ptr);
       PNG_CONST png_bytep chunk_name = png_ptr->chunk_name;
 

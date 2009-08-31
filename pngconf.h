@@ -200,7 +200,7 @@
  *   we don't need to worry about PNG_STATIC or ALL_STATIC when it comes
  *   to __declspec() stuff.  However, we DO need to worry about
  *   PNG_BUILD_DLL and PNG_STATIC because those change some defaults
- *   such as CONSOLE_IO and whether GLOBAL_ARRAYS are allowed.
+ *   such as CONSOLE_IO.
  */
 #if defined(__CYGWIN__)
 #  if defined(ALL_STATIC)
@@ -1187,41 +1187,6 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #if !defined(PNG_DLL) && (defined(PNG_BUILD_DLL) || defined(PNG_USE_DLL))
 #  define PNG_DLL
 #endif
-/* If CYGWIN, then disallow GLOBAL ARRAYS unless building a static lib.
- * When building a static lib, default to no GLOBAL ARRAYS, but allow
- * command-line override
- */
-#if defined(__CYGWIN__)
-#  if !defined(PNG_STATIC)
-#    if defined(PNG_USE_GLOBAL_ARRAYS)
-#      undef PNG_USE_GLOBAL_ARRAYS
-#    endif
-#    if !defined(PNG_USE_LOCAL_ARRAYS)
-#      define PNG_USE_LOCAL_ARRAYS
-#    endif
-#  else
-#    if defined(PNG_USE_LOCAL_ARRAYS) || defined(PNG_NO_GLOBAL_ARRAYS)
-#      if defined(PNG_USE_GLOBAL_ARRAYS)
-#        undef PNG_USE_GLOBAL_ARRAYS
-#      endif
-#    endif
-#  endif
-#  if !defined(PNG_USE_LOCAL_ARRAYS) && !defined(PNG_USE_GLOBAL_ARRAYS)
-#    define PNG_USE_LOCAL_ARRAYS
-#  endif
-#endif
-
-/* Do not use global arrays (helps with building DLL's)
- * They are no longer used in libpng itself, since version 1.0.5c,
- * but might be required for some pre-1.0.5c applications.
- */
-#if !defined(PNG_USE_LOCAL_ARRAYS) && !defined(PNG_USE_GLOBAL_ARRAYS)
-#  if defined(PNG_NO_GLOBAL_ARRAYS) || (defined(__GNUC__) && defined(PNG_DLL))
-#    define PNG_USE_LOCAL_ARRAYS
-#  else
-#    define PNG_USE_GLOBAL_ARRAYS
-#  endif
-#endif
 
 #if defined(__CYGWIN__)
 #  undef PNGAPI
@@ -1315,21 +1280,10 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  ifndef PNG_EXPORT
 #    define PNG_EXPORT(type,symbol) PNG_FUNCTION_EXPORT symbol END
 #  endif
-#  ifdef PNG_USE_GLOBAL_ARRAYS
-#    ifndef PNG_EXPORT_VAR
-#      define PNG_EXPORT_VAR(type) PNG_DATA_EXPORT
-#    endif
-#  endif
 #endif
 
 #ifndef PNG_EXPORT
 #  define PNG_EXPORT(type,symbol) PNG_IMPEXP type PNGAPI symbol
-#endif
-
-#ifdef PNG_USE_GLOBAL_ARRAYS
-#  ifndef PNG_EXPORT_VAR
-#    define PNG_EXPORT_VAR(type) extern PNG_IMPEXP type
-#  endif
 #endif
 
 /* Users may want to use these so they are not private.  Any library

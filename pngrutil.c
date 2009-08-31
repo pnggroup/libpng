@@ -2310,9 +2310,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if (png_ptr->mode & PNG_HAVE_IDAT)
    {
-#ifdef PNG_USE_LOCAL_ARRAYS
       PNG_CONST PNG_IDAT;
-#endif
       if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))  /* Not an IDAT */
          png_ptr->mode |= PNG_AFTER_IDAT;
    }
@@ -2638,11 +2636,9 @@ png_do_read_interlace(png_structp png_ptr)
    png_bytep row = png_ptr->row_buf + 1;
    int pass = png_ptr->pass;
    png_uint_32 transformations = png_ptr->transformations;
-#ifdef PNG_USE_LOCAL_ARRAYS
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    /* Offset to next interlace block */
    PNG_CONST int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
-#endif
 
    png_debug(1, "in png_do_read_interlace");
    if (row != NULL && row_info != NULL)
@@ -2980,7 +2976,6 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
 void /* PRIVATE */
 png_read_finish_row(png_structp png_ptr)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
@@ -2996,7 +2991,6 @@ png_read_finish_row(png_structp png_ptr)
    /* Offset to next interlace block in the y direction */
    PNG_CONST int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
-#endif
 
    png_debug(1, "in png_read_finish_row");
    png_ptr->row_number++;
@@ -3042,9 +3036,7 @@ png_read_finish_row(png_structp png_ptr)
 
    if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
    {
-#ifdef PNG_USE_LOCAL_ARRAYS
       PNG_CONST PNG_IDAT;
-#endif
       char extra;
       int ret;
 
@@ -3113,7 +3105,6 @@ png_read_finish_row(png_structp png_ptr)
 void /* PRIVATE */
 png_read_start_row(png_structp png_ptr)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
@@ -3128,7 +3119,6 @@ png_read_start_row(png_structp png_ptr)
 
    /* Offset to next interlace block in the y direction */
    PNG_CONST int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
-#endif
 #endif
 
    int max_pixel_depth;

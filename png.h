@@ -433,29 +433,7 @@ extern "C" {
 /* Version information for C files, stored in png.c.  This had better match
  * the version above.
  */
-#ifdef PNG_USE_GLOBAL_ARRAYS
-PNG_EXPORT_VAR (const char) png_libpng_ver[18];
-  /* Need room for 99.99.99beta99z */
-#else
 #define png_libpng_ver png_get_header_ver(NULL)
-#endif
-
-#ifdef PNG_USE_GLOBAL_ARRAYS
-/* This was removed in version 1.0.5c */
-/* Structures to facilitate easy interlacing.  See png.c for more details */
-PNG_EXPORT_VAR (const int FARDATA) png_pass_start[7];
-PNG_EXPORT_VAR (const int FARDATA) png_pass_inc[7];
-PNG_EXPORT_VAR (const int FARDATA) png_pass_ystart[7];
-PNG_EXPORT_VAR (const int FARDATA) png_pass_yinc[7];
-PNG_EXPORT_VAR (const int FARDATA) png_pass_mask[7];
-PNG_EXPORT_VAR (const int FARDATA) png_pass_dsp_mask[7];
-#ifdef PNG_USE_PNGGCCRD
-PNG_EXPORT_VAR (const int FARDATA) png_pass_width[7];
-#endif
-/* This isn't currently used.  If you need it, see png.c for more details.
-PNG_EXPORT_VAR (const int FARDATA) png_pass_height[7];
-*/
-#endif
 
 #endif /* PNG_NO_EXTERN */
 

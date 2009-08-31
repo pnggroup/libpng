@@ -540,6 +540,9 @@ version 1.4.0beta78 [August 31, 2009]
   Use png_malloc plus a loop instead of png_calloc() to initialize
     row_pointers in png_read_png().
 
+version 1.4.0beta79 [August 31, 2009]
+  Eliminated PNG_GLOBAL_ARRAYS and PNG_LOCAL_ARRAYS; always use local arrays.
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
