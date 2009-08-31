@@ -3774,6 +3774,24 @@ Support for global arrays was disabled by default.
 
 Some obsolete/deprecated macros and functions have been removed.
 
+These macros are deprecated:
+
+    PNG_READ_TRANSFORMS_NOT_SUPPORTED
+    PNG_PROGRESSIVE_READ_NOT_SUPPORTED
+    PNG_NO_SEQUENTIAL_READ_SUPPORTED
+    PNG_WRITE_TRANSFORMS_NOT_SUPPORTED
+    PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED
+    PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED
+
+They have been replaced, respectively, by:
+
+    PNG_NO_READ_TRANSFORMS
+    PNG_NO_PROGRESSIVE_READ
+    PNG_NO_SEQUENTIAL_READ
+    PNG_NO_WRITE_TRANSFORMS
+    PNG_NO_READ_ANCILLARY_CHUNKS
+    PNG_NO_WRITE_ANCILLARY_CHUNKS
+
 The PNG_1_0_X and PNG_1_2_X macros were eliminated.
 
 The PNG_LEGACY_SUPPORTED macro was eliminated.
