@@ -48,9 +48,6 @@
 #include "pngusr.h"
 #endif
 
-/* Added at libpng-1.4.0beta49 for testing */
-#define PNG_CALLOC_SUPPORTED
-
 /*
  * If you create a private DLL you need to define in "pngusr.h" the followings:
  * #define PNG_USER_PRIVATEBUILD <Describes by whom and why this version of
@@ -83,9 +80,9 @@
 #endif
 #endif /* __STDC__ */
 
-#ifndef PNG_VERSION_INFO_ONLY
-
 /* End of material added to libpng-1.2.8 */
+
+#ifndef PNG_VERSION_INFO_ONLY
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your
@@ -154,6 +151,9 @@
 #    define PNG_FLOATING_POINT_SUPPORTED
 #  endif
 #endif
+
+/* Added at libpng-1.4.0beta49 for testing (no longer used in libpng) */
+#define PNG_CALLOC_SUPPORTED
 
 /* If you are running on a machine where you cannot allocate more
  * than 64K of memory at once, uncomment this.  While libpng will not
