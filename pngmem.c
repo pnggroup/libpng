@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.4.0 [August 31, 2009]
+ * Last changed in libpng 1.4.0 [September 1, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -114,7 +114,6 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * result, we would be truncating potentially larger memory requests
  * (which should cause a fatal error) and introducing major problems.
  */
-#ifdef PNG_CALLOC_SUPPORTED
 png_voidp PNGAPI
 png_calloc(png_structp png_ptr, png_alloc_size_t size)
 {
@@ -125,7 +124,6 @@ png_calloc(png_structp png_ptr, png_alloc_size_t size)
       png_memset(ret,0,(png_size_t)size);
    return (ret);
 }
-#endif
 
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_alloc_size_t size)

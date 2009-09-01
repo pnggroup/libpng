@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [August 31, 2009]
+ * Last changed in libpng 1.4.0 [September 1, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -351,14 +351,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             png_ptr->palette_to_index[i] = (png_byte)i;
          }
 
-#ifdef PNG_CALLOC_SUPPORTED
          hash = (png_dsortpp)png_calloc(png_ptr, (png_uint_32)(769 *
             png_sizeof(png_dsortp)));
-#else
-         hash = (png_dsortpp)png_malloc(png_ptr, (png_uint_32)(769 *
-            png_sizeof(png_dsortp)));
-         png_memset(hash, 0, 769 * png_sizeof(png_dsortp));
-#endif
 
          num_new_palette = num_palette;
 
@@ -505,15 +499,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
       int num_blue = (1 << PNG_DITHER_BLUE_BITS);
       png_size_t num_entries = ((png_size_t)1 << total_bits);
 
-#ifdef PNG_CALLOC_SUPPORTED
       png_ptr->palette_lookup = (png_bytep )png_calloc(png_ptr,
          (png_uint_32)(num_entries * png_sizeof(png_byte)));
-#else
-      png_ptr->palette_lookup = (png_bytep )png_malloc(png_ptr,
-         (png_uint_32)(num_entries * png_sizeof(png_byte)));
-      png_memset(png_ptr->palette_lookup, 0, num_entries *
-         png_sizeof(png_byte));
-#endif
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
          png_sizeof(png_byte)));
@@ -4130,14 +4117,8 @@ png_build_gamma_table(png_structp png_ptr)
      else
         g = 1.0;
 
-#ifdef PNG_CALLOC_SUPPORTED
      png_ptr->gamma_16_table = (png_uint_16pp)png_calloc(png_ptr,
         (png_uint_32)(num * png_sizeof(png_uint_16p)));
-#else
-     png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
-        (png_uint_32)(num * png_sizeof(png_uint_16p)));
-     png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p));
-#endif
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
      {
@@ -4197,14 +4178,8 @@ png_build_gamma_table(png_structp png_ptr)
 
         g = 1.0 / (png_ptr->gamma);
 
-#ifdef PNG_CALLOC_SUPPORTED
         png_ptr->gamma_16_to_1 = (png_uint_16pp)png_calloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p )));
-#else
-        png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
-           (png_uint_32)(num * png_sizeof(png_uint_16p )));
-        png_memset(png_ptr->gamma_16_to_1, 0, num * png_sizeof(png_uint_16p));
-#endif
 
         for (i = 0; i < num; i++)
         {
@@ -4227,15 +4202,8 @@ png_build_gamma_table(png_structp png_ptr)
         else
            g = png_ptr->gamma;   /* Probably doing rgb_to_gray */
 
-#ifdef PNG_CALLOC_SUPPORTED
         png_ptr->gamma_16_from_1 = (png_uint_16pp)png_calloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p)));
-#else
-        png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
-           (png_uint_32)(num * png_sizeof(png_uint_16p)));
-        png_memset(png_ptr->gamma_16_from_1, 0,
-           num * png_sizeof(png_uint_16p));
-#endif
 
         for (i = 0; i < num; i++)
         {

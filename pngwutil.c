@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [August 31, 2009]
+ * Last changed in libpng 1.4.0 [September 1, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1753,14 +1753,8 @@ png_write_start_row(png_structp png_ptr)
    if (png_ptr->do_filter & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH))
    {
      /* Set up previous row buffer */
-#ifdef PNG_CALLOC_SUPPORTED
      png_ptr->prev_row = (png_bytep)png_calloc(png_ptr,
         (png_alloc_size_t)buf_size);
-#else
-     png_ptr->prev_row = (png_bytep)png_malloc(png_ptr,
-        (png_uint_32)buf_size);
-     png_memset(png_ptr->prev_row, 0, buf_size);
-#endif
 
       if (png_ptr->do_filter & PNG_FILTER_UP)
       {
