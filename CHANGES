@@ -2230,6 +2230,8 @@ version 1.4.0beta79 [September 1, 2009]
   Eliminated PNG_GLOBAL_ARRAYS and PNG_LOCAL_ARRAYS; always use local arrays.
   Eliminated PNG_CALLOC_SUPPORTED macro and always provide png_calloc().
 
+version 1.4.0beta80 [September 1, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 
