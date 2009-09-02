@@ -2463,7 +2463,7 @@ version 1.2.40beta01 [August 20, 2009]
   Removed an extra png_debug() recently added to png_write_find_filter().
   Fixed incorrect #ifdef in pngset.c regarding unknown chunk support.
 
-version 1.2.40beta02 [August 27, 2009]
+version 1.2.40rc01 [September 2, 2009]
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
