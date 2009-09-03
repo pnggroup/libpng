@@ -1,5 +1,5 @@
 
-Installing libpng version 1.4.0beta80 - September 1, 2009
+Installing libpng version 1.4.0beta80 - September 3, 2009
 
 On Unix/Linux and similar systems, you can simply type
 
@@ -117,7 +117,6 @@ include
  makefile.hp64     =>  HPUX (10.20 and 11.00) makefile, 64-bit
  makefile.ibmc     =>  IBM C/C++ version 3.x for Win32 and OS/2 (static)
  makefile.intel    =>  Intel C/C++ version 4.0 and later
- libpng.icc        =>  Project file for IBM VisualAge/C++ version 4.0 or later
  makefile.netbsd   =>  NetBSD/cc makefile, uses PNGGCCRD, makes libpng.so.
  makefile.ne14bsd  =>  NetBSD/cc makefile, uses PNGGCCRD,
                        makes libpng14.so

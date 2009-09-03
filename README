@@ -1,4 +1,4 @@
-README for libpng version 1.4.0beta80 - September 1, 2009 (shared library 14.0)
+README for libpng version 1.4.0beta80 - September 3, 2009 (shared library 14.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -204,7 +204,6 @@ Files in this distribution:
        makefile.hp64    =>  HPUX (10.20 and 11.00) makefile, 64 bit
        makefile.ibmc    =>  IBM C/C++ version 3.x for Win32 and OS/2 (static)
        makefile.intel   =>  Intel C/C++ version 4.0 and later
-       libpng.icc       =>  Project file, IBM VisualAge/C++ 4.0 or later
        makefile.netbsd  =>  NetBSD/cc makefile, PNGGCCRD, makes libpng.so.
        makefile.ne14bsd  =>  NetBSD/cc makefile, PNGGCCRD, makes libpng14.so
        makefile.openbsd =>  OpenBSD makefile
