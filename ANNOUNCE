@@ -1,5 +1,5 @@
 
-Libpng 1.0.48 - August 13, 2009
+Libpng 1.0.50 - September 10, 2009
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,50 +8,43 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.48.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.48.tar.gz
-   libpng-1.0.48.tar.bz2
+   libpng-1.0.50.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.50.tar.gz
+   libpng-1.0.50.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.48-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.48-no-config.tar.gz
-   libpng-1.0.48-no-config.tar.bz2
+   libpng-1.0.50-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.50-no-config.tar.gz
+   libpng-1.0.50-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1048.zip
-   lpng1048.7z
-   lpng1048.tar.bz2
+   lpng1050.zip
+   lpng1050.7z
+   lpng1050.tar.bz2
 
 Project files
 
-   libpng-1.0.48-project-netware.zip
-   libpng-1.0.48-project-wince.zip
+   libpng-1.0.50-project-netware.zip
+   libpng-1.0.50-project-wince.zip
 
 Other information:
 
-   libpng-1.0.48-README.txt
-   libpng-1.0.48-KNOWNBUGS.txt
-   libpng-1.0.48-LICENSE.txt
-   libpng-1.0.48-Y2K-compliance.txt
+   libpng-1.0.50-README.txt
+   libpng-1.0.50-KNOWNBUGS.txt
+   libpng-1.0.50-LICENSE.txt
+   libpng-1.0.50-Y2K-compliance.txt
 
-Changes since the last public release (1.0.47):
+Changes since the last public release (1.0.49):
 
-version 1.0.48 [August 13, 2009]
+version 1.0.50 [September 10, 2009]
 
-  Added a prototype for png_64bit_product() in png.h
-  Expanded the information about prototypes in the libpng style section of
-    the documentation.
-  Rebuilt configure scripts with autoconf-2.64.
-  Avoid a possible NULL dereference in debug build, in png_set_text_2().
-    (bug introduced in libpng-0.95, discovered by Evan Rouault)
-  Replaced *.tar.lzma with *.tar.xz in distribution.  Get the xz codec
-    from <http://tukaani.org/xz>.
-  Reject attempt to write iCCP chunk with negative embedded profile length
-    (JD Chen)
+version 1.0.50 [September 10, 2009]
+  Removed some editing cruft from pngset.c and pngwutil.c.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
