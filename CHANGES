@@ -2230,8 +2230,9 @@ version 1.4.0beta79 [September 1, 2009]
   Eliminated PNG_GLOBAL_ARRAYS and PNG_LOCAL_ARRAYS; always use local arrays.
   Eliminated PNG_CALLOC_SUPPORTED macro and always provide png_calloc().
 
-version 1.4.0beta80 [September 3, 2009]
+version 1.4.0beta80 [September 16, 2009]
   Removed scripts/libpng.icc
+  Changed (png_byte)filler  to (png_uint_16)filler in png_set_filler().
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

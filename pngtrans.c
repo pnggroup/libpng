@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.4.0 [September 1, 2009]
+ * Last changed in libpng 1.4.0 [September 16, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -117,7 +117,7 @@ png_set_filler(png_structp png_ptr, png_uint_32 filler, int filler_loc)
    if (png_ptr == NULL)
       return;
    png_ptr->transformations |= PNG_FILLER;
-   png_ptr->filler = (png_byte)filler;
+   png_ptr->filler = (png_uint_16)filler;
    if (filler_loc == PNG_FILLER_AFTER)
       png_ptr->flags |= PNG_FLAG_FILLER_AFTER;
    else
