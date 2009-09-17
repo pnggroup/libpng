@@ -550,6 +550,7 @@ version 1.4.0beta80 [September 17, 2009]
     (Dennis Gustafsson)
   Fixed typo introduced in beta78 in pngtest.c ("#if def " should be "#ifdef ") 
 
+version 1.4.0beta81 [September 17, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
