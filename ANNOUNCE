@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta80 - September 16, 2009
+Libpng 1.4.0beta80 - September 17, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -544,9 +544,10 @@ version 1.4.0beta79 [September 1, 2009]
   Eliminated PNG_GLOBAL_ARRAYS and PNG_LOCAL_ARRAYS; always use local arrays.
   Eliminated PNG_CALLOC_SUPPORTED macro and always provide png_calloc().
 
-version 1.4.0beta80 [September 16, 2009]
+version 1.4.0beta80 [September 17, 2009]
   Removed scripts/libpng.icc
-  Changed (png_byte)filler  to (png_uint_16)filler in png_set_filler().
+  Changed typecast of filler from png_byte to png_uint_16 in png_set_filler().
+    (Dennis Gustafsson)
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
