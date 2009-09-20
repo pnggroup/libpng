@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [September 17, 2009]
+ * Last changed in libpng 1.4.0 [September 20, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -231,60 +231,60 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 
    for (;;)
    {
-      PNG_CONST PNG_IHDR;
-      PNG_CONST PNG_IDAT;
-      PNG_CONST PNG_IEND;
-      PNG_CONST PNG_PLTE;
+      PNG_IHDR;
+      PNG_IDAT;
+      PNG_IEND;
+      PNG_PLTE;
 #if defined(PNG_READ_bKGD_SUPPORTED)
-      PNG_CONST PNG_bKGD;
+      PNG_bKGD;
 #endif
 #if defined(PNG_READ_cHRM_SUPPORTED)
-      PNG_CONST PNG_cHRM;
+      PNG_cHRM;
 #endif
 #if defined(PNG_READ_gAMA_SUPPORTED)
-      PNG_CONST PNG_gAMA;
+      PNG_gAMA;
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)
-      PNG_CONST PNG_hIST;
+      PNG_hIST;
 #endif
 #if defined(PNG_READ_iCCP_SUPPORTED)
-      PNG_CONST PNG_iCCP;
+      PNG_iCCP;
 #endif
 #if defined(PNG_READ_iTXt_SUPPORTED)
-      PNG_CONST PNG_iTXt;
+      PNG_iTXt;
 #endif
 #if defined(PNG_READ_oFFs_SUPPORTED)
-      PNG_CONST PNG_oFFs;
+      PNG_oFFs;
 #endif
 #if defined(PNG_READ_pCAL_SUPPORTED)
-      PNG_CONST PNG_pCAL;
+      PNG_pCAL;
 #endif
 #if defined(PNG_READ_pHYs_SUPPORTED)
-      PNG_CONST PNG_pHYs;
+      PNG_pHYs;
 #endif
 #if defined(PNG_READ_sBIT_SUPPORTED)
-      PNG_CONST PNG_sBIT;
+      PNG_sBIT;
 #endif
 #if defined(PNG_READ_sCAL_SUPPORTED)
-      PNG_CONST PNG_sCAL;
+      PNG_sCAL;
 #endif
 #if defined(PNG_READ_sPLT_SUPPORTED)
-      PNG_CONST PNG_sPLT;
+      PNG_sPLT;
 #endif
 #if defined(PNG_READ_sRGB_SUPPORTED)
-      PNG_CONST PNG_sRGB;
+      PNG_sRGB;
 #endif
 #if defined(PNG_READ_tEXt_SUPPORTED)
-      PNG_CONST PNG_tEXt;
+      PNG_tEXt;
 #endif
 #if defined(PNG_READ_tIME_SUPPORTED)
-      PNG_CONST PNG_tIME;
+      PNG_tIME;
 #endif
 #if defined(PNG_READ_tRNS_SUPPORTED)
-      PNG_CONST PNG_tRNS;
+      PNG_tRNS;
 #endif
 #if defined(PNG_READ_zTXt_SUPPORTED)
-      PNG_CONST PNG_zTXt;
+      PNG_zTXt;
 #endif
       png_uint_32 length = png_read_chunk_header(png_ptr);
       PNG_CONST png_bytep chunk_name = png_ptr->chunk_name;
@@ -445,7 +445,7 @@ png_start_read_image(png_structp png_ptr)
 void PNGAPI
 png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 {
-   PNG_CONST PNG_IDAT;
+   PNG_IDAT;
    PNG_CONST int png_pass_dsp_mask[7] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55,
       0xff};
    PNG_CONST int png_pass_mask[7] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
@@ -802,60 +802,60 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 
    do
    {
-      PNG_CONST PNG_IHDR;
-      PNG_CONST PNG_IDAT;
-      PNG_CONST PNG_IEND;
-      PNG_CONST PNG_PLTE;
+      PNG_IHDR;
+      PNG_IDAT;
+      PNG_IEND;
+      PNG_PLTE;
 #if defined(PNG_READ_bKGD_SUPPORTED)
-      PNG_CONST PNG_bKGD;
+      PNG_bKGD;
 #endif
 #if defined(PNG_READ_cHRM_SUPPORTED)
-      PNG_CONST PNG_cHRM;
+      PNG_cHRM;
 #endif
 #if defined(PNG_READ_gAMA_SUPPORTED)
-      PNG_CONST PNG_gAMA;
+      PNG_gAMA;
 #endif
 #if defined(PNG_READ_hIST_SUPPORTED)
-      PNG_CONST PNG_hIST;
+      PNG_hIST;
 #endif
 #if defined(PNG_READ_iCCP_SUPPORTED)
-      PNG_CONST PNG_iCCP;
+      PNG_iCCP;
 #endif
 #if defined(PNG_READ_iTXt_SUPPORTED)
-      PNG_CONST PNG_iTXt;
+      PNG_iTXt;
 #endif
 #if defined(PNG_READ_oFFs_SUPPORTED)
-      PNG_CONST PNG_oFFs;
+      PNG_oFFs;
 #endif
 #if defined(PNG_READ_pCAL_SUPPORTED)
-      PNG_CONST PNG_pCAL;
+      PNG_pCAL;
 #endif
 #if defined(PNG_READ_pHYs_SUPPORTED)
-      PNG_CONST PNG_pHYs;
+      PNG_pHYs;
 #endif
 #if defined(PNG_READ_sBIT_SUPPORTED)
-      PNG_CONST PNG_sBIT;
+      PNG_sBIT;
 #endif
 #if defined(PNG_READ_sCAL_SUPPORTED)
-      PNG_CONST PNG_sCAL;
+      PNG_sCAL;
 #endif
 #if defined(PNG_READ_sPLT_SUPPORTED)
-      PNG_CONST PNG_sPLT;
+      PNG_sPLT;
 #endif
 #if defined(PNG_READ_sRGB_SUPPORTED)
-      PNG_CONST PNG_sRGB;
+      PNG_sRGB;
 #endif
 #if defined(PNG_READ_tEXt_SUPPORTED)
-      PNG_CONST PNG_tEXt;
+      PNG_tEXt;
 #endif
 #if defined(PNG_READ_tIME_SUPPORTED)
-      PNG_CONST PNG_tIME;
+      PNG_tIME;
 #endif
 #if defined(PNG_READ_tRNS_SUPPORTED)
-      PNG_CONST PNG_tRNS;
+      PNG_tRNS;
 #endif
 #if defined(PNG_READ_zTXt_SUPPORTED)
-      PNG_CONST PNG_zTXt;
+      PNG_zTXt;
 #endif
       png_uint_32 length = png_read_chunk_header(png_ptr);
       PNG_CONST png_bytep chunk_name = png_ptr->chunk_name;
