@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [September 17, 2009]
+ * Last changed in libpng 1.4.0 [September 20, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1002,14 +1002,14 @@ png_init_read_transformations(png_structp png_ptr)
                   palette[i].blue = png_ptr->gamma_table[palette[i].blue];
                }
             }
-	    /* Prevent the transformations being done again, and make sure
-	     * that the now spurious alpha channel is stripped - the code
-	     * has just reduced background composition and gamma correction
-	     * to a simple alpha channel strip.
-	     */
-	    png_ptr->transformations &= ~PNG_BACKGROUND;
-	    png_ptr->transformations &= ~PNG_GAMMA;
-	    png_ptr->transformations |= PNG_STRIP_ALPHA;
+            /* Prevent the transformations being done again, and make sure
+             * that the now spurious alpha channel is stripped - the code
+             * has just reduced background composition and gamma correction
+             * to a simple alpha channel strip.
+             */
+            png_ptr->transformations &= ~PNG_BACKGROUND;
+            png_ptr->transformations &= ~PNG_GAMMA;
+            png_ptr->transformations |= PNG_STRIP_ALPHA;
          }
          /* if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN) */
          else
@@ -1087,8 +1087,8 @@ png_init_read_transformations(png_structp png_ptr)
             palette[i].blue = png_ptr->gamma_table[palette[i].blue];
          }
 
-	 /* Done the gamma correction. */
-	 png_ptr->transformations &= ~PNG_GAMMA;
+         /* Done the gamma correction. */
+         png_ptr->transformations &= ~PNG_GAMMA;
       }
    }
 #if defined(PNG_READ_BACKGROUND_SUPPORTED)

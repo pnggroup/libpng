@@ -2238,6 +2238,7 @@ version 1.4.0beta80 [September 17, 2009]
 
 version 1.4.0beta81 [September 20, 2009]
   Eliminated unused PNG_FLAG_FREE_* defines from pngpriv.h
+  Expanded TAB characters in pngrtran.c
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
