@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta81 - September 17, 2009
+ * libpng version 1.4.0beta81 - September 20, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -73,7 +73,7 @@
 #endif
 
 #if defined(WIN32) || defined(_Windows) || defined(_WINDOWS) || \
-	defined(_WIN32) || defined(__WIN32__)
+    defined(_WIN32) || defined(__WIN32__)
 #  include <windows.h>  /* defines _WINDOWS_ macro */
 /* I have no idea why is this necessary... */
 #  if defined(_MSC_VER)
@@ -157,9 +157,9 @@
 #define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
-#define PNG_FLAG_FREE_PLTE                0x1000
-#define PNG_FLAG_FREE_TRNS                0x2000
-#define PNG_FLAG_FREE_HIST                0x4000
+                                /*        0x1000  unused */
+                                /*        0x2000  unused */
+                                /*        0x4000  unused */
 #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000L
 #define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x10000L
 #define PNG_FLAG_LIBRARY_MISMATCH         0x20000L
