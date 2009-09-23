@@ -2241,7 +2241,7 @@ version 1.4.0beta81 [September 23, 2009]
   Expanded TAB characters in pngrtran.c
   Removed PNG_CONST from all "PNG_CONST PNG_CHNK" declarations to avoid
     compiler complaints about doubly declaring things "const".
-  Changed some "#if defined(" to "ifdef"
+  Changed all "#if [!]defined(X)" to "if[n]def X" where possible.
   Eliminated unused png_ptr->row_buf_size
 
 version 1.4.0betaN [future]
