@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta81 - September 23, 2009
+Libpng 1.4.0beta82 - September 23, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta81.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta81.tar.gz
-   1.4.0beta81.tar.bz2
+   1.4.0beta82.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta82.tar.gz
+   1.4.0beta82.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b81.zip
-   lp140b81.7z
+   lp140b82.zip
+   lp140b82.7z
 
 Other information:
 
-   1.4.0beta81-README.txt
-   1.4.0beta81-LICENSE.txt
+   1.4.0beta82-README.txt
+   1.4.0beta82-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -557,6 +557,8 @@ version 1.4.0beta81 [September 23, 2009]
     compiler complaints about doubly declaring things "const".
   Changed all "#if [!]defined(X)" to "if[n]def X" where possible.
   Eliminated unused png_ptr->row_buf_size
+
+version 1.4.0beta82 [September 23, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
