@@ -2242,6 +2242,7 @@ version 1.4.0beta81 [September 23, 2009]
   Removed PNG_CONST from all "PNG_CONST PNG_CHNK" declarations to avoid
     compiler complaints about doubly declaring things "const".
   Changed some "#if defined(" to "ifdef"
+  Eliminated unused png_ptr->row_buf_size
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

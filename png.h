@@ -1275,11 +1275,6 @@ struct png_struct_def
    png_byte filter_type;
 #endif
 
-/* New member added in libpng-1.0.10, ifdef'ed out in 1.2.0 */
-#if (defined(PNG_DEBUG) && defined(PNG_USE_PNGGCCRD))
-   png_uint_32 row_buf_size;
-#endif
-
 /* New members added in libpng-1.2.0 */
 
 /* New members added in libpng-1.0.2 but first enabled by default in 1.2.0 */
