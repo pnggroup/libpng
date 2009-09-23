@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta81 - September 20, 2009
+Libpng 1.4.0beta81 - September 23, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -550,11 +550,12 @@ version 1.4.0beta80 [September 17, 2009]
     (Dennis Gustafsson)
   Fixed typo introduced in beta78 in pngtest.c ("#if def " should be "#ifdef ") 
 
-version 1.4.0beta81 [September 20, 2009]
+version 1.4.0beta81 [September 23, 2009]
   Eliminated unused PNG_FLAG_FREE_* defines from pngpriv.h
   Expanded TAB characters in pngrtran.c
   Removed PNG_CONST from all "PNG_CONST PNG_CHNK" declarations to avoid
     compiler complaints about doubly declaring things "const".
+  Changed some "#if defined(" to "ifdef"
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta81 - September 17, 2009
+ * libpng version 1.4.0beta81 - September 23, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -139,7 +139,7 @@
 
 /* Enabled by default in 1.2.0.  You can disable this if you don't need to
    support PNGs that are embedded in MNG datastreams */
-#if !defined(PNG_NO_MNG_FEATURES)
+#ifndef PNG_NO_MNG_FEATURES
 #  ifndef PNG_MNG_FEATURES_SUPPORTED
 #    define PNG_MNG_FEATURES_SUPPORTED
 #  endif
@@ -200,44 +200,44 @@
  *   PNG_BUILD_DLL and PNG_STATIC because those change some defaults
  *   such as CONSOLE_IO.
  */
-#if defined(__CYGWIN__)
-#  if defined(ALL_STATIC)
-#    if defined(PNG_BUILD_DLL)
+#ifdef __CYGWIN__
+#  ifdef ALL_STATIC
+#    ifdef PNG_BUILD_DLL
 #      undef PNG_BUILD_DLL
 #    endif
-#    if defined(PNG_USE_DLL)
+#    ifdef PNG_USE_DLL
 #      undef PNG_USE_DLL
 #    endif
-#    if defined(PNG_DLL)
+#    ifdef PNG_DLL
 #      undef PNG_DLL
 #    endif
-#    if !defined(PNG_STATIC)
+#    ifndef PNG_STATIC
 #      define PNG_STATIC
 #    endif
 #  else
-#    if defined (PNG_BUILD_DLL)
-#      if defined(PNG_STATIC)
+#    ifdef PNG_BUILD_DLL
+#      ifdef PNG_STATIC
 #        undef PNG_STATIC
 #      endif
-#      if defined(PNG_USE_DLL)
+#      ifdef PNG_USE_DLL
 #        undef PNG_USE_DLL
 #      endif
-#      if !defined(PNG_DLL)
+#      ifndef PNG_DLL
 #        define PNG_DLL
 #      endif
 #    else
-#      if defined(PNG_STATIC)
-#        if defined(PNG_USE_DLL)
+#      ifdef PNG_STATIC
+#        ifdef PNG_USE_DLL
 #          undef PNG_USE_DLL
 #        endif
-#        if defined(PNG_DLL)
+#        ifdef PNG_DLL
 #          undef PNG_DLL
 #        endif
 #      else
-#        if !defined(PNG_USE_DLL)
+#        ifndef PNG_USE_DLL
 #          define PNG_USE_DLL
 #        endif
-#        if !defined(PNG_DLL)
+#        ifndef PNG_DLL
 #          define PNG_DLL
 #        endif
 #      endif
@@ -262,7 +262,7 @@
 #  define PNG_STDIO_SUPPORTED
 #endif
 
-#if defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
 #  include <windows.h>
    /* Console I/O functions are not supported on WindowsCE */
 #  define PNG_NO_CONSOLE_IO
@@ -1029,8 +1029,8 @@
 #endif
 
 /* need the time information for reading tIME chunks */
-#if defined(PNG_tIME_SUPPORTED)
-#  if !defined(_WIN32_WCE)
+#ifdef PNG_tIME_SUPPORTED
+#  ifndef _WIN32_WCE
      /* "time.h" functions are not supported on WindowsCE */
 #    include <time.h>
 #  endif
@@ -1103,8 +1103,8 @@ typedef unsigned char png_byte;
  */
 
 /* MSC Medium model */
-#if defined(FAR)
-#  if defined(M_I86MM)
+#ifdef FAR
+#  ifdef M_I86MM
 #    define USE_FAR_KEYWORD
 #    define FARDATA FAR
 #    include <dos.h>
@@ -1137,7 +1137,7 @@ typedef char            FAR * png_charp;
 typedef png_fixed_point FAR * png_fixed_point_p;
 
 #ifndef PNG_NO_STDIO
-#if defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
 typedef HANDLE                png_FILE_p;
 #else
 typedef FILE                * png_FILE_p;
@@ -1186,7 +1186,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define PNG_DLL
 #endif
 
-#if defined(__CYGWIN__)
+#ifdef __CYGWIN__
 #  undef PNGAPI
 #  define PNGAPI __cdecl
 #  undef PNG_IMPEXP
@@ -1229,7 +1229,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #     define PNG_IMPEXP
 #  endif
 
-#  if !defined(PNG_IMPEXP)
+#  ifndef PNG_IMPEXP
 
 #     define PNG_EXPORT_TYPE1(type,symbol)  PNG_IMPEXP type PNGAPI symbol
 #     define PNG_EXPORT_TYPE2(type,symbol)  type PNG_IMPEXP PNGAPI symbol
@@ -1240,7 +1240,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #           define PNG_EXPORT PNG_EXPORT_TYPE1
 #        else
 #           define PNG_EXPORT PNG_EXPORT_TYPE2
-#           if defined(PNG_BUILD_DLL)
+#           ifdef PNG_BUILD_DLL
 #              define PNG_IMPEXP __export
 #           else
 #              define PNG_IMPEXP /*__import */ /* doesn't exist AFAIK in
@@ -1250,8 +1250,8 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #        endif
 #     endif
 
-#     if !defined(PNG_IMPEXP)
-#        if defined(PNG_BUILD_DLL)
+#     ifndef PNG_IMPEXP
+#        ifdef PNG_BUILD_DLL
 #           define PNG_IMPEXP __declspec(dllexport)
 #        else
 #           define PNG_IMPEXP __declspec(dllimport)
@@ -1306,7 +1306,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  endif
 #endif
 
-#if defined(USE_FAR_KEYWORD)
+#ifdef USE_FAR_KEYWORD
 /* use this to make far-to-near assignments */
 #  define CHECK   1
 #  define NOCHECK 0
@@ -1320,7 +1320,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define png_memset  _fmemset
 #  define png_sprintf sprintf
 #else
-#  if defined(_WINDOWS_)  /* favor Windows over C runtime fns */
+#  ifdef _WINDOWS_  /* favor Windows over C runtime fns */
 #    define CVT_PTR(ptr)         (ptr)
 #    define CVT_PTR_NOCHECK(ptr) (ptr)
 #    define png_strcpy  lstrcpyA
