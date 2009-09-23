@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * Last changed in libpng 1.4.0 [September 17, 2009]
+ * Last changed in libpng 1.4.0 [September 23, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -19,7 +19,7 @@
  */
 
 #include "png.h"
-#if defined(PNG_READ_SUPPORTED)
+#ifdef PNG_READ_SUPPORTED
 #include "pngpriv.h"
 
 /* Read the data from whatever input you are using.  The default routine
@@ -155,7 +155,7 @@ png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
          "same structure.  Resetting write_data_fn to NULL");
    }
 
-#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
    png_ptr->output_flush_fn = NULL;
 #endif
 }

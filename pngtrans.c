@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.4.0 [September 17, 2009]
+ * Last changed in libpng 1.4.0 [September 23, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -644,7 +644,7 @@ png_set_user_transform_info(png_structp png_ptr, png_voidp
 
    if (png_ptr == NULL)
       return;
-#if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
+#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
    png_ptr->user_transform_ptr = user_transform_ptr;
    png_ptr->user_transform_depth = (png_byte)user_transform_depth;
    png_ptr->user_transform_channels = (png_byte)user_transform_channels;
@@ -666,7 +666,7 @@ png_get_user_transform_ptr(png_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
-#if defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
+#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
    return ((png_voidp)png_ptr->user_transform_ptr);
 #else
    return (NULL);

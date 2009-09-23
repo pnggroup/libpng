@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [September 20, 2009]
+ * Last changed in libpng 1.4.0 [September 23, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -15,7 +15,7 @@
  */
 
 #include "png.h"
-#if defined(PNG_READ_SUPPORTED)
+#ifdef PNG_READ_SUPPORTED
 #include "pngpriv.h"
 
 
@@ -235,55 +235,55 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       PNG_IDAT;
       PNG_IEND;
       PNG_PLTE;
-#if defined(PNG_READ_bKGD_SUPPORTED)
+#ifdef PNG_READ_bKGD_SUPPORTED
       PNG_bKGD;
 #endif
-#if defined(PNG_READ_cHRM_SUPPORTED)
+#ifdef PNG_READ_cHRM_SUPPORTED
       PNG_cHRM;
 #endif
-#if defined(PNG_READ_gAMA_SUPPORTED)
+#ifdef PNG_READ_gAMA_SUPPORTED
       PNG_gAMA;
 #endif
-#if defined(PNG_READ_hIST_SUPPORTED)
+#ifdef PNG_READ_hIST_SUPPORTED
       PNG_hIST;
 #endif
-#if defined(PNG_READ_iCCP_SUPPORTED)
+#ifdef PNG_READ_iCCP_SUPPORTED
       PNG_iCCP;
 #endif
-#if defined(PNG_READ_iTXt_SUPPORTED)
+#ifdef PNG_READ_iTXt_SUPPORTED
       PNG_iTXt;
 #endif
-#if defined(PNG_READ_oFFs_SUPPORTED)
+#ifdef PNG_READ_oFFs_SUPPORTED
       PNG_oFFs;
 #endif
-#if defined(PNG_READ_pCAL_SUPPORTED)
+#ifdef PNG_READ_pCAL_SUPPORTED
       PNG_pCAL;
 #endif
-#if defined(PNG_READ_pHYs_SUPPORTED)
+#ifdef PNG_READ_pHYs_SUPPORTED
       PNG_pHYs;
 #endif
-#if defined(PNG_READ_sBIT_SUPPORTED)
+#ifdef PNG_READ_sBIT_SUPPORTED
       PNG_sBIT;
 #endif
-#if defined(PNG_READ_sCAL_SUPPORTED)
+#ifdef PNG_READ_sCAL_SUPPORTED
       PNG_sCAL;
 #endif
-#if defined(PNG_READ_sPLT_SUPPORTED)
+#ifdef PNG_READ_sPLT_SUPPORTED
       PNG_sPLT;
 #endif
-#if defined(PNG_READ_sRGB_SUPPORTED)
+#ifdef PNG_READ_sRGB_SUPPORTED
       PNG_sRGB;
 #endif
-#if defined(PNG_READ_tEXt_SUPPORTED)
+#ifdef PNG_READ_tEXt_SUPPORTED
       PNG_tEXt;
 #endif
-#if defined(PNG_READ_tIME_SUPPORTED)
+#ifdef PNG_READ_tIME_SUPPORTED
       PNG_tIME;
 #endif
-#if defined(PNG_READ_tRNS_SUPPORTED)
+#ifdef PNG_READ_tRNS_SUPPORTED
       PNG_tRNS;
 #endif
-#if defined(PNG_READ_zTXt_SUPPORTED)
+#ifdef PNG_READ_zTXt_SUPPORTED
       PNG_zTXt;
 #endif
       png_uint_32 length = png_read_chunk_header(png_ptr);
@@ -333,71 +333,71 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
          png_ptr->mode |= PNG_HAVE_IDAT;
          break;
       }
-#if defined(PNG_READ_bKGD_SUPPORTED)
+#ifdef PNG_READ_bKGD_SUPPORTED
       else if (!png_memcmp(chunk_name, png_bKGD, 4))
          png_handle_bKGD(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_cHRM_SUPPORTED)
+#ifdef PNG_READ_cHRM_SUPPORTED
       else if (!png_memcmp(chunk_name, png_cHRM, 4))
          png_handle_cHRM(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_gAMA_SUPPORTED)
+#ifdef PNG_READ_gAMA_SUPPORTED
       else if (!png_memcmp(chunk_name, png_gAMA, 4))
          png_handle_gAMA(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_hIST_SUPPORTED)
+#ifdef PNG_READ_hIST_SUPPORTED
       else if (!png_memcmp(chunk_name, png_hIST, 4))
          png_handle_hIST(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_oFFs_SUPPORTED)
+#ifdef PNG_READ_oFFs_SUPPORTED
       else if (!png_memcmp(chunk_name, png_oFFs, 4))
          png_handle_oFFs(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_pCAL_SUPPORTED)
+#ifdef PNG_READ_pCAL_SUPPORTED
       else if (!png_memcmp(chunk_name, png_pCAL, 4))
          png_handle_pCAL(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_sCAL_SUPPORTED)
+#ifdef PNG_READ_sCAL_SUPPORTED
       else if (!png_memcmp(chunk_name, png_sCAL, 4))
          png_handle_sCAL(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_pHYs_SUPPORTED)
+#ifdef PNG_READ_pHYs_SUPPORTED
       else if (!png_memcmp(chunk_name, png_pHYs, 4))
          png_handle_pHYs(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_sBIT_SUPPORTED)
+#ifdef PNG_READ_sBIT_SUPPORTED
       else if (!png_memcmp(chunk_name, png_sBIT, 4))
          png_handle_sBIT(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_sRGB_SUPPORTED)
+#ifdef PNG_READ_sRGB_SUPPORTED
       else if (!png_memcmp(chunk_name, png_sRGB, 4))
          png_handle_sRGB(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_iCCP_SUPPORTED)
+#ifdef PNG_READ_iCCP_SUPPORTED
       else if (!png_memcmp(chunk_name, png_iCCP, 4))
          png_handle_iCCP(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_sPLT_SUPPORTED)
+#ifdef PNG_READ_sPLT_SUPPORTED
       else if (!png_memcmp(chunk_name, png_sPLT, 4))
          png_handle_sPLT(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_tEXt_SUPPORTED)
+#ifdef PNG_READ_tEXt_SUPPORTED
       else if (!png_memcmp(chunk_name, png_tEXt, 4))
          png_handle_tEXt(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_tIME_SUPPORTED)
+#ifdef PNG_READ_tIME_SUPPORTED
       else if (!png_memcmp(chunk_name, png_tIME, 4))
          png_handle_tIME(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_tRNS_SUPPORTED)
+#ifdef PNG_READ_tRNS_SUPPORTED
       else if (!png_memcmp(chunk_name, png_tRNS, 4))
          png_handle_tRNS(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_zTXt_SUPPORTED)
+#ifdef PNG_READ_zTXt_SUPPORTED
       else if (!png_memcmp(chunk_name, png_zTXt, 4))
          png_handle_zTXt(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_iTXt_SUPPORTED)
+#ifdef PNG_READ_iTXt_SUPPORTED
       else if (!png_memcmp(chunk_name, png_iTXt, 4))
          png_handle_iTXt(png_ptr, info_ptr, length);
 #endif
@@ -492,7 +492,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 #endif
    }
 
-#if defined(PNG_READ_INTERLACING_SUPPORTED)
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    /* If interlaced and we do not need a new row, combine row and return */
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
    {
@@ -625,7 +625,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 
    png_memcpy(png_ptr->prev_row, png_ptr->row_buf, png_ptr->rowbytes + 1);
 
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
+#ifdef PNG_MNG_FEATURES_SUPPORTED
    if ((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
       (png_ptr->filter_type == PNG_INTRAPIXEL_DIFFERENCING))
    {
@@ -638,7 +638,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    if (png_ptr->transformations || (png_ptr->flags&PNG_FLAG_STRIP_ALPHA))
       png_do_read_transformations(png_ptr);
 
-#if defined(PNG_READ_INTERLACING_SUPPORTED)
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Blow up interlaced rows to full size */
    if (png_ptr->interlaced &&
       (png_ptr->transformations & PNG_INTERLACE))
@@ -806,55 +806,55 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       PNG_IDAT;
       PNG_IEND;
       PNG_PLTE;
-#if defined(PNG_READ_bKGD_SUPPORTED)
+#ifdef PNG_READ_bKGD_SUPPORTED
       PNG_bKGD;
 #endif
-#if defined(PNG_READ_cHRM_SUPPORTED)
+#ifdef PNG_READ_cHRM_SUPPORTED
       PNG_cHRM;
 #endif
-#if defined(PNG_READ_gAMA_SUPPORTED)
+#ifdef PNG_READ_gAMA_SUPPORTED
       PNG_gAMA;
 #endif
-#if defined(PNG_READ_hIST_SUPPORTED)
+#ifdef PNG_READ_hIST_SUPPORTED
       PNG_hIST;
 #endif
-#if defined(PNG_READ_iCCP_SUPPORTED)
+#ifdef PNG_READ_iCCP_SUPPORTED
       PNG_iCCP;
 #endif
-#if defined(PNG_READ_iTXt_SUPPORTED)
+#ifdef PNG_READ_iTXt_SUPPORTED
       PNG_iTXt;
 #endif
-#if defined(PNG_READ_oFFs_SUPPORTED)
+#ifdef PNG_READ_oFFs_SUPPORTED
       PNG_oFFs;
 #endif
-#if defined(PNG_READ_pCAL_SUPPORTED)
+#ifdef PNG_READ_pCAL_SUPPORTED
       PNG_pCAL;
 #endif
-#if defined(PNG_READ_pHYs_SUPPORTED)
+#ifdef PNG_READ_pHYs_SUPPORTED
       PNG_pHYs;
 #endif
-#if defined(PNG_READ_sBIT_SUPPORTED)
+#ifdef PNG_READ_sBIT_SUPPORTED
       PNG_sBIT;
 #endif
-#if defined(PNG_READ_sCAL_SUPPORTED)
+#ifdef PNG_READ_sCAL_SUPPORTED
       PNG_sCAL;
 #endif
-#if defined(PNG_READ_sPLT_SUPPORTED)
+#ifdef PNG_READ_sPLT_SUPPORTED
       PNG_sPLT;
 #endif
-#if defined(PNG_READ_sRGB_SUPPORTED)
+#ifdef PNG_READ_sRGB_SUPPORTED
       PNG_sRGB;
 #endif
-#if defined(PNG_READ_tEXt_SUPPORTED)
+#ifdef PNG_READ_tEXt_SUPPORTED
       PNG_tEXt;
 #endif
-#if defined(PNG_READ_tIME_SUPPORTED)
+#ifdef PNG_READ_tIME_SUPPORTED
       PNG_tIME;
 #endif
-#if defined(PNG_READ_tRNS_SUPPORTED)
+#ifdef PNG_READ_tRNS_SUPPORTED
       PNG_tRNS;
 #endif
-#if defined(PNG_READ_zTXt_SUPPORTED)
+#ifdef PNG_READ_zTXt_SUPPORTED
       PNG_zTXt;
 #endif
       png_uint_32 length = png_read_chunk_header(png_ptr);
@@ -888,71 +888,71 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
       }
       else if (!png_memcmp(chunk_name, png_PLTE, 4))
          png_handle_PLTE(png_ptr, info_ptr, length);
-#if defined(PNG_READ_bKGD_SUPPORTED)
+#ifdef PNG_READ_bKGD_SUPPORTED
       else if (!png_memcmp(chunk_name, png_bKGD, 4))
          png_handle_bKGD(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_cHRM_SUPPORTED)
+#ifdef PNG_READ_cHRM_SUPPORTED
       else if (!png_memcmp(chunk_name, png_cHRM, 4))
          png_handle_cHRM(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_gAMA_SUPPORTED)
+#ifdef PNG_READ_gAMA_SUPPORTED
       else if (!png_memcmp(chunk_name, png_gAMA, 4))
          png_handle_gAMA(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_hIST_SUPPORTED)
+#ifdef PNG_READ_hIST_SUPPORTED
       else if (!png_memcmp(chunk_name, png_hIST, 4))
          png_handle_hIST(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_oFFs_SUPPORTED)
+#ifdef PNG_READ_oFFs_SUPPORTED
       else if (!png_memcmp(chunk_name, png_oFFs, 4))
          png_handle_oFFs(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_pCAL_SUPPORTED)
+#ifdef PNG_READ_pCAL_SUPPORTED
       else if (!png_memcmp(chunk_name, png_pCAL, 4))
          png_handle_pCAL(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_sCAL_SUPPORTED)
+#ifdef PNG_READ_sCAL_SUPPORTED
       else if (!png_memcmp(chunk_name, png_sCAL, 4))
          png_handle_sCAL(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_pHYs_SUPPORTED)
+#ifdef PNG_READ_pHYs_SUPPORTED
       else if (!png_memcmp(chunk_name, png_pHYs, 4))
          png_handle_pHYs(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_sBIT_SUPPORTED)
+#ifdef PNG_READ_sBIT_SUPPORTED
       else if (!png_memcmp(chunk_name, png_sBIT, 4))
          png_handle_sBIT(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_sRGB_SUPPORTED)
+#ifdef PNG_READ_sRGB_SUPPORTED
       else if (!png_memcmp(chunk_name, png_sRGB, 4))
          png_handle_sRGB(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_iCCP_SUPPORTED)
+#ifdef PNG_READ_iCCP_SUPPORTED
       else if (!png_memcmp(chunk_name, png_iCCP, 4))
          png_handle_iCCP(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_sPLT_SUPPORTED)
+#ifdef PNG_READ_sPLT_SUPPORTED
       else if (!png_memcmp(chunk_name, png_sPLT, 4))
          png_handle_sPLT(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_tEXt_SUPPORTED)
+#ifdef PNG_READ_tEXt_SUPPORTED
       else if (!png_memcmp(chunk_name, png_tEXt, 4))
          png_handle_tEXt(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_tIME_SUPPORTED)
+#ifdef PNG_READ_tIME_SUPPORTED
       else if (!png_memcmp(chunk_name, png_tIME, 4))
          png_handle_tIME(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_tRNS_SUPPORTED)
+#ifdef PNG_READ_tRNS_SUPPORTED
       else if (!png_memcmp(chunk_name, png_tRNS, 4))
          png_handle_tRNS(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_zTXt_SUPPORTED)
+#ifdef PNG_READ_zTXt_SUPPORTED
       else if (!png_memcmp(chunk_name, png_zTXt, 4))
          png_handle_zTXt(png_ptr, info_ptr, length);
 #endif
-#if defined(PNG_READ_iTXt_SUPPORTED)
+#ifdef PNG_READ_iTXt_SUPPORTED
       else if (!png_memcmp(chunk_name, png_iTXt, 4))
          png_handle_iTXt(png_ptr, info_ptr, length);
 #endif
@@ -996,7 +996,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 
    if (info_ptr != NULL)
    {
-#if defined(PNG_TEXT_SUPPORTED)
+#ifdef PNG_TEXT_SUPPORTED
       png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, -1);
 #endif
 
@@ -1011,7 +1011,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 
    if (end_info_ptr != NULL)
    {
-#if defined(PNG_READ_TEXT_SUPPORTED)
+#ifdef PNG_READ_TEXT_SUPPORTED
       png_free_data(png_ptr, end_info_ptr, PNG_FREE_TEXT, -1);
 #endif
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -1061,14 +1061,14 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    png_free(png_ptr, png_ptr->big_row_buf);
    png_free(png_ptr, png_ptr->prev_row);
    png_free(png_ptr, png_ptr->chunkdata);
-#if defined(PNG_READ_DITHER_SUPPORTED)
+#ifdef PNG_READ_DITHER_SUPPORTED
    png_free(png_ptr, png_ptr->palette_lookup);
    png_free(png_ptr, png_ptr->dither_index);
 #endif
-#if defined(PNG_READ_GAMMA_SUPPORTED)
+#ifdef PNG_READ_GAMMA_SUPPORTED
    png_free(png_ptr, png_ptr->gamma_table);
 #endif
-#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+#ifdef PNG_READ_BACKGROUND_SUPPORTED
    png_free(png_ptr, png_ptr->gamma_from_1);
    png_free(png_ptr, png_ptr->gamma_to_1);
 #endif
@@ -1081,12 +1081,12 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
       png_free(png_ptr, png_ptr->trans_alpha);
    png_ptr->free_me &= ~PNG_FREE_TRNS;
 #endif
-#if defined(PNG_READ_hIST_SUPPORTED)
+#ifdef PNG_READ_hIST_SUPPORTED
    if (png_ptr->free_me & PNG_FREE_HIST)
       png_free(png_ptr, png_ptr->hist);
    png_ptr->free_me &= ~PNG_FREE_HIST;
 #endif
-#if defined(PNG_READ_GAMMA_SUPPORTED)
+#ifdef PNG_READ_GAMMA_SUPPORTED
    if (png_ptr->gamma_16_table != NULL)
    {
       int i;
@@ -1097,7 +1097,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
       }
    png_free(png_ptr, png_ptr->gamma_16_table);
    }
-#if defined(PNG_READ_BACKGROUND_SUPPORTED)
+#ifdef PNG_READ_BACKGROUND_SUPPORTED
    if (png_ptr->gamma_16_from_1 != NULL)
    {
       int i;
@@ -1120,7 +1120,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
    }
 #endif
 #endif
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
+#ifdef PNG_TIME_RFC1123_SUPPORTED
    png_free(png_ptr, png_ptr->time_buffer);
 #endif
 
@@ -1174,7 +1174,7 @@ png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
 
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-#if defined(PNG_INFO_IMAGE_SUPPORTED)
+#ifdef PNG_INFO_IMAGE_SUPPORTED
 void PNGAPI
 png_read_png(png_structp png_ptr, png_infop info_ptr,
                            int transforms,
@@ -1194,14 +1194,14 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
    /* -------------- image transformations start here ------------------- */
 
-#if defined(PNG_READ_16_TO_8_SUPPORTED)
+#ifdef PNG_READ_16_TO_8_SUPPORTED
    /* Tell libpng to strip 16 bit/color files down to 8 bits per color.
     */
    if (transforms & PNG_TRANSFORM_STRIP_16)
       png_set_strip_16(png_ptr);
 #endif
 
-#if defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
+#ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
    /* Strip alpha bytes from the input data without combining with
     * the background (not recommended).
     */
@@ -1217,7 +1217,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
       png_set_packing(png_ptr);
 #endif
 
-#if defined(PNG_READ_PACKSWAP_SUPPORTED)
+#ifdef PNG_READ_PACKSWAP_SUPPORTED
    /* Change the order of packed pixels to least significant bit first
     * (not useful if you are using png_set_packing).
     */
@@ -1225,7 +1225,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
       png_set_packswap(png_ptr);
 #endif
 
-#if defined(PNG_READ_EXPAND_SUPPORTED)
+#ifdef PNG_READ_EXPAND_SUPPORTED
    /* Expand paletted colors into true RGB triplets
     * Expand grayscale images to full 8 bits from 1, 2, or 4 bits/pixel
     * Expand paletted or RGB images with transparency to full alpha
@@ -1241,14 +1241,14 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* We don't handle background color or gamma transformation or dithering.
     */
 
-#if defined(PNG_READ_INVERT_SUPPORTED)
+#ifdef PNG_READ_INVERT_SUPPORTED
    /* Invert monochrome files to have 0 as white and 1 as black
     */
    if (transforms & PNG_TRANSFORM_INVERT_MONO)
       png_set_invert_mono(png_ptr);
 #endif
 
-#if defined(PNG_READ_SHIFT_SUPPORTED)
+#ifdef PNG_READ_SHIFT_SUPPORTED
    /* If you want to shift the pixel values from the range [0,255] or
     * [0,65535] to the original [0,7] or [0,31], or whatever range the
     * colors were originally in:
@@ -1263,35 +1263,35 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    }
 #endif
 
-#if defined(PNG_READ_BGR_SUPPORTED)
+#ifdef PNG_READ_BGR_SUPPORTED
    /* Flip the RGB pixels to BGR (or RGBA to BGRA)
     */
    if (transforms & PNG_TRANSFORM_BGR)
       png_set_bgr(png_ptr);
 #endif
 
-#if defined(PNG_READ_SWAP_ALPHA_SUPPORTED)
+#ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
    /* Swap the RGBA or GA data to ARGB or AG (or BGRA to ABGR)
     */
    if (transforms & PNG_TRANSFORM_SWAP_ALPHA)
        png_set_swap_alpha(png_ptr);
 #endif
 
-#if defined(PNG_READ_SWAP_SUPPORTED)
+#ifdef PNG_READ_SWAP_SUPPORTED
    /* Swap bytes of 16 bit files to least significant byte first
     */
    if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
       png_set_swap(png_ptr);
 #endif
 
-#if defined(PNG_READ_INVERT_ALPHA_SUPPORTED)
+#ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
    /* Invert the alpha channel from opacity to transparency
     */
    if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
        png_set_invert_alpha(png_ptr);
 #endif
 
-#if defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
+#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
    /* Expand grayscale image to RGB
     */
    if (transforms & PNG_TRANSFORM_GRAY_TO_RGB)

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.0 [September 17, 2009]
+ * Last changed in libpng 1.4.0 [September 23, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -64,7 +64,7 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #include <time.h>
 #endif
 
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
+#ifdef PNG_TIME_RFC1123_SUPPORTED
 #define PNG_tIME_STRING_LENGTH 29
 static int tIME_chunk_present = 0;
 static char tIME_string[PNG_tIME_STRING_LENGTH] = "tIME chunk is not present";
@@ -130,7 +130,7 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 }
 
 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
 /* Example of using user transform callback (we don't transform anything,
  * but merely examine the row filters.  We set this to 256 rather than
  * 5 in case illegal filter values are present.)
@@ -146,7 +146,7 @@ count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 }
 #endif
 
-#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
 /* Example of using user transform callback (we don't transform anything,
  * but merely count the zero samples)
  */
@@ -327,7 +327,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 }
 #endif /* USE_FAR_KEYWORD */
 
-#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
 static void
 pngtest_flush(png_structp png_ptr)
 {
@@ -563,7 +563,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 
 
 /* Demonstration of user chunk support of the sTER and vpAg chunks */
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
 
 /* (sTER is a public chunk not yet known by libpng.  vpAg is a private
 chunk used in ImageMagick to store "virtual page" size).  */
@@ -689,7 +689,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        pngtest_warning);
 #endif
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
    user_chunk_data[0] = 0;
    user_chunk_data[1] = 0;
    user_chunk_data[2] = 0;
@@ -778,7 +778,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_set_read_fn(read_ptr, (png_voidp)fpin, pngtest_read_data);
 #  ifdef PNG_WRITE_SUPPORTED
    png_set_write_fn(write_ptr, (png_voidp)fpout,  pngtest_write_data,
-#    if defined(PNG_WRITE_FLUSH_SUPPORTED)
+#    ifdef PNG_WRITE_FLUSH_SUPPORTED
       pngtest_flush);
 #    else
       NULL);
@@ -800,7 +800,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_set_read_status_fn(read_ptr, NULL);
    }
 
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
    {
       int i;
       for (i = 0; i<256; i++)
@@ -808,19 +808,19 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_set_read_user_transform_fn(read_ptr, count_filters);
    }
 #endif
-#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
    zero_samples = 0;
    png_set_write_user_transform_fn(write_ptr, count_zero_samples);
 #endif
 
-#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 #  ifndef PNG_HANDLE_CHUNK_ALWAYS
 #    define PNG_HANDLE_CHUNK_ALWAYS       3
 #  endif
    png_set_keep_unknown_chunks(read_ptr, PNG_HANDLE_CHUNK_ALWAYS,
       NULL, 0);
 #endif
-#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
 #  ifndef PNG_HANDLE_CHUNK_IF_SAFE
 #    define PNG_HANDLE_CHUNK_IF_SAFE      2
 #  endif
@@ -839,15 +839,15 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
           &color_type, &interlace_type, &compression_type, &filter_type))
       {
          png_set_IHDR(write_ptr, write_info_ptr, width, height, bit_depth,
-#if defined(PNG_WRITE_INTERLACING_SUPPORTED)
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
             color_type, interlace_type, compression_type, filter_type);
 #else
             color_type, PNG_INTERLACE_NONE, compression_type, filter_type);
 #endif
       }
    }
-#if defined(PNG_FIXED_POINT_SUPPORTED)
-#if defined(PNG_cHRM_SUPPORTED)
+#ifdef PNG_FIXED_POINT_SUPPORTED
+#ifdef PNG_cHRM_SUPPORTED
    {
       png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
          blue_y;
@@ -859,7 +859,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_gAMA_SUPPORTED)
+#ifdef PNG_gAMA_SUPPORTED
    {
       png_fixed_point gamma;
 
@@ -881,7 +881,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_gAMA_SUPPORTED)
+#ifdef PNG_gAMA_SUPPORTED
    {
       double gamma;
 
@@ -891,7 +891,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif /* Floating point */
 #endif /* Fixed point */
-#if defined(PNG_iCCP_SUPPORTED)
+#ifdef PNG_iCCP_SUPPORTED
    {
       png_charp name;
       png_charp profile;
@@ -906,7 +906,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_sRGB_SUPPORTED)
+#ifdef PNG_sRGB_SUPPORTED
    {
       int intent;
 
@@ -921,7 +921,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
          png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
    }
-#if defined(PNG_bKGD_SUPPORTED)
+#ifdef PNG_bKGD_SUPPORTED
    {
       png_color_16p background;
 
@@ -931,7 +931,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_hIST_SUPPORTED)
+#ifdef PNG_hIST_SUPPORTED
    {
       png_uint_16p hist;
 
@@ -939,7 +939,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_hIST(write_ptr, write_info_ptr, hist);
    }
 #endif
-#if defined(PNG_oFFs_SUPPORTED)
+#ifdef PNG_oFFs_SUPPORTED
    {
       png_int_32 offset_x, offset_y;
       int unit_type;
@@ -951,7 +951,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_pCAL_SUPPORTED)
+#ifdef PNG_pCAL_SUPPORTED
    {
       png_charp purpose, units;
       png_charpp params;
@@ -966,7 +966,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_pHYs_SUPPORTED)
+#ifdef PNG_pHYs_SUPPORTED
    {
       png_uint_32 res_x, res_y;
       int unit_type;
@@ -975,7 +975,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_pHYs(write_ptr, write_info_ptr, res_x, res_y, unit_type);
    }
 #endif
-#if defined(PNG_sBIT_SUPPORTED)
+#ifdef PNG_sBIT_SUPPORTED
    {
       png_color_8p sig_bit;
 
@@ -1010,7 +1010,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif
 #endif
-#if defined(PNG_TEXT_SUPPORTED)
+#ifdef PNG_TEXT_SUPPORTED
    {
       png_textp text_ptr;
       int num_text;
@@ -1022,14 +1022,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_tIME_SUPPORTED)
+#ifdef PNG_tIME_SUPPORTED
    {
       png_timep mod_time;
 
       if (png_get_tIME(read_ptr, read_info_ptr, &mod_time))
       {
          png_set_tIME(write_ptr, write_info_ptr, mod_time);
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
+#ifdef PNG_TIME_RFC1123_SUPPORTED
          /* We have to use png_memcpy instead of "=" because the string
           * pointed to by png_convert_to_rfc1123() gets free'ed before
           * we use it.
@@ -1043,7 +1043,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_tRNS_SUPPORTED)
+#ifdef PNG_tRNS_SUPPORTED
    {
       png_bytep trans_alpha;
       int num_trans;
@@ -1065,7 +1065,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
    {
       png_unknown_chunkp unknowns;
       int num_unknowns = (int)png_get_unknown_chunks(read_ptr, read_info_ptr,
@@ -1094,7 +1094,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
  */
    png_write_info(write_ptr, write_info_ptr);
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
    if (user_chunk_data[0] != 0)
    {
       png_byte png_sTER[5] = {115,  84,  69,  82, '\0'};
@@ -1188,17 +1188,17 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 
-#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
    png_free_data(read_ptr, read_info_ptr, PNG_FREE_UNKN, -1);
 #endif
-#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
    png_free_data(write_ptr, write_info_ptr, PNG_FREE_UNKN, -1);
 #endif
 
    png_debug(0, "Reading and writing end_info data");
 
    png_read_end(read_ptr, end_info_ptr);
-#if defined(PNG_TEXT_SUPPORTED)
+#ifdef PNG_TEXT_SUPPORTED
    {
       png_textp text_ptr;
       int num_text;
@@ -1210,14 +1210,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_tIME_SUPPORTED)
+#ifdef PNG_tIME_SUPPORTED
    {
       png_timep mod_time;
 
       if (png_get_tIME(read_ptr, end_info_ptr, &mod_time))
       {
          png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
+#ifdef PNG_TIME_RFC1123_SUPPORTED
          /* We have to use png_memcpy instead of "=" because the string
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
@@ -1230,7 +1230,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#if defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
    {
       png_unknown_chunkp unknowns;
       int num_unknowns;
@@ -1457,7 +1457,7 @@ main(int argc, char *argv[])
 #endif
       for (i=2; i<argc; ++i)
       {
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
          int k;
 #endif
          int kerror;
@@ -1465,19 +1465,19 @@ main(int argc, char *argv[])
          kerror = test_one_file(argv[i], outname);
          if (kerror == 0)
          {
-#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
             fprintf(STDERR, "\n PASS (%lu zero samples)\n",
                (unsigned long)zero_samples);
 #else
             fprintf(STDERR, " PASS\n");
 #endif
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
             for (k = 0; k<256; k++)
                if (filters_used[k])
                   fprintf(STDERR, " Filter %d was used %lu times\n",
                      k, (unsigned long)filters_used[k]);
 #endif
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
+#ifdef PNG_TIME_RFC1123_SUPPORTED
          if (tIME_chunk_present != 0)
             fprintf(STDERR, " tIME = %s\n", tIME_string);
          tIME_chunk_present = 0;
@@ -1537,23 +1537,23 @@ main(int argc, char *argv[])
          {
             if (verbose == 1 || i == 2)
             {
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
                 int k;
 #endif
-#if defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
                 fprintf(STDERR, "\n PASS (%lu zero samples)\n",
                    (unsigned long)zero_samples);
 #else
                 fprintf(STDERR, " PASS\n");
 #endif
-#if defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
                 for (k = 0; k<256; k++)
                    if (filters_used[k])
                       fprintf(STDERR, " Filter %d was used %lu times\n",
                          k,
                          (unsigned long)filters_used[k]);
 #endif
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
+#ifdef PNG_TIME_RFC1123_SUPPORTED
              if (tIME_chunk_present != 0)
                 fprintf(STDERR, " tIME = %s\n", tIME_string);
 #endif /* PNG_TIME_RFC1123_SUPPORTED */

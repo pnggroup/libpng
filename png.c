@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [September 17, 2009]
+ * Last changed in libpng 1.4.0 [September 23, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -251,7 +251,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-#if defined(PNG_TEXT_SUPPORTED)
+#ifdef PNG_TEXT_SUPPORTED
    /* Free text item num or (if num == -1) all text items */
    if ((mask & PNG_FREE_TEXT) & info_ptr->free_me)
    {
@@ -275,7 +275,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-#if defined(PNG_tRNS_SUPPORTED)
+#ifdef PNG_tRNS_SUPPORTED
    /* Free any tRNS entry */
    if ((mask & PNG_FREE_TRNS) & info_ptr->free_me)
    {
@@ -285,7 +285,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-#if defined(PNG_sCAL_SUPPORTED)
+#ifdef PNG_sCAL_SUPPORTED
    /* Free any sCAL entry */
    if ((mask & PNG_FREE_SCAL) & info_ptr->free_me)
    {
@@ -299,7 +299,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-#if defined(PNG_pCAL_SUPPORTED)
+#ifdef PNG_pCAL_SUPPORTED
    /* Free any pCAL entry */
    if ((mask & PNG_FREE_PCAL) & info_ptr->free_me)
    {
@@ -322,7 +322,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-#if defined(PNG_iCCP_SUPPORTED)
+#ifdef PNG_iCCP_SUPPORTED
    /* Free any iCCP entry */
    if ((mask & PNG_FREE_ICCP) & info_ptr->free_me)
    {
@@ -334,7 +334,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-#if defined(PNG_sPLT_SUPPORTED)
+#ifdef PNG_sPLT_SUPPORTED
    /* Free a given sPLT entry, or (if num == -1) all sPLT entries */
    if ((mask & PNG_FREE_SPLT) & info_ptr->free_me)
    {
@@ -365,7 +365,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
+#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
    if (png_ptr->unknown_chunk.data)
    {
       png_free(png_ptr, png_ptr->unknown_chunk.data);
@@ -399,7 +399,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-#if defined(PNG_hIST_SUPPORTED)
+#ifdef PNG_hIST_SUPPORTED
    /* Free any hIST entry */
    if ((mask & PNG_FREE_HIST)  & info_ptr->free_me)
    {
@@ -418,7 +418,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
       info_ptr->num_palette = 0;
    }
 
-#if defined(PNG_INFO_IMAGE_SUPPORTED)
+#ifdef PNG_INFO_IMAGE_SUPPORTED
    /* Free any image bits attached to the info structure */
    if ((mask & PNG_FREE_ROWS) & info_ptr->free_me)
    {
@@ -452,7 +452,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
 
-#if defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    if (png_ptr->num_chunk_list)
    {
       png_free(png_ptr, png_ptr->chunk_list);
@@ -496,7 +496,7 @@ png_init_io(png_structp png_ptr, png_FILE_p fp)
 }
 #endif
 
-#if defined(PNG_TIME_RFC1123_SUPPORTED)
+#ifdef PNG_TIME_RFC1123_SUPPORTED
 /* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
  */
@@ -546,13 +546,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta81 - September 17, 2009" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta81 - September 23, 2009" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta81 - September 17, 2009\
+      return ((png_charp) "libpng version 1.4.0beta81 - September 23, 2009\
       Copyright (c) 1998-2009 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -652,8 +652,8 @@ png_convert_size(size_t size)
 #endif /* PNG_SIZE_T */
 
 /* Added at libpng version 1.2.34 and 1.4.0 (moved from pngset.c) */
-#if defined(PNG_cHRM_SUPPORTED)
-#if defined(PNG_CHECK_cHRM_SUPPORTED)
+#ifdef PNG_cHRM_SUPPORTED
+#ifdef PNG_CHECK_cHRM_SUPPORTED
 
 /*
  *    Multiply two 32-bit numbers, V1 and V2, using 32-bit
