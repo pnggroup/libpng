@@ -1298,7 +1298,7 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
 
    info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, info_ptr->width);
 
-#if !defined(PNG_READ_EXPAND_SUPPORTED)
+#ifndef PNG_READ_EXPAND_SUPPORTED
    if (png_ptr)
       return;
 #endif

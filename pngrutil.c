@@ -485,7 +485,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
-#if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
+#ifndef PNG_READ_OPT_PLTE_SUPPORTED
    if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
    {
       png_crc_finish(png_ptr, length);
@@ -538,13 +538,13 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
     * have an RGB image, the PLTE can be considered ancillary, so
     * we will act as though it is.
     */
-#if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
+#ifndef PNG_READ_OPT_PLTE_SUPPORTED
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #endif
    {
       png_crc_finish(png_ptr, 0);
    }
-#if !defined(PNG_READ_OPT_PLTE_SUPPORTED)
+#ifndef PNG_READ_OPT_PLTE_SUPPORTED
    else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
    {
       /* If we don't want to use the data from an ancillary chunk,
@@ -2388,7 +2388,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_crc_finish(png_ptr, skip);
 
-#if !defined(PNG_READ_USER_CHUNKS_SUPPORTED)
+#ifndef PNG_READ_USER_CHUNKS_SUPPORTED
    info_ptr = info_ptr; /* Quiet compiler warnings about unused info_ptr */
 #endif
 }
@@ -2843,7 +2843,7 @@ png_do_read_interlace(png_structp png_ptr)
       row_info->width = final_width;
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, final_width);
    }
-#if !defined(PNG_READ_PACKSWAP_SUPPORTED)
+#ifndef PNG_READ_PACKSWAP_SUPPORTED
    transformations = transformations; /* Silence compiler warning */
 #endif
 }
