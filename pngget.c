@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 [September 23, 2009]
+ * Last changed in libpng 1.4.0 [September 24, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -579,52 +579,44 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
    int *filter_type)
 
 {
+   int test_interlace_type = 0;
+   int test_compression_type = 0;
+   int test_filter_type = 0;
+
    png_debug1(1, "in %s retrieval function", "IHDR");
 
-   if (png_ptr != NULL && info_ptr != NULL && width != NULL && height != NULL &&
-      bit_depth != NULL && color_type != NULL)
+   if (png_ptr == NULL || info_ptr == NULL || width == NULL ||
+       height == NULL || bit_depth == NULL || color_type == NULL)
+      return (0);
+
+   *width = info_ptr->width;
+   *height = info_ptr->height;
+   *bit_depth = info_ptr->bit_depth;
+   *color_type = info_ptr->color_type;
+
+   if (compression_type != NULL)
    {
-      *width = info_ptr->width;
-      *height = info_ptr->height;
-      *bit_depth = info_ptr->bit_depth;
-      if (info_ptr->bit_depth < 1 || info_ptr->bit_depth > 16)
-         png_error(png_ptr, "Invalid bit depth");
-
-      *color_type = info_ptr->color_type;
-
-      if (info_ptr->color_type > 6)
-         png_error(png_ptr, "Invalid color type");
-
-      if (compression_type != NULL)
-         *compression_type = info_ptr->compression_type;
-
-      if (filter_type != NULL)
-         *filter_type = info_ptr->filter_type;
-
-      if (interlace_type != NULL)
-         *interlace_type = info_ptr->interlace_type;
-
-      /* Check for potential overflow of rowbytes */
-      if (*width == 0 || *width > PNG_UINT_31_MAX)
-        png_error(png_ptr, "Invalid image width");
-
-      if (*height == 0 || *height > PNG_UINT_31_MAX)
-        png_error(png_ptr, "Invalid image height");
-
-      if (info_ptr->width > (PNG_UINT_32_MAX
-                 >> 3)      /* 8-byte RGBA pixels */
-                 - 64       /* bigrowbuf hack */
-                 - 1        /* filter byte */
-                 - 7*8      /* rounding of width to multiple of 8 pixels */
-                 - 8)       /* extra max_pixel_depth pad */
-      {
-         png_warning(png_ptr,
-            "Width too large for libpng to process image data");
-      }
-
-      return (1);
+      *compression_type = info_ptr->compression_type;
+      test_compression_type=*compression_type;
    }
-   return (0);
+
+   if (filter_type != NULL)
+   {
+      *filter_type = info_ptr->filter_type;
+      test_filter_type=*filter_type;
+   }
+
+   if (interlace_type != NULL)
+   {
+      *interlace_type = info_ptr->interlace_type;
+      test_interlace_type=*interlace_type;
+   }
+
+   png_check_IHDR (png_ptr, *width, *height, *bit_depth, *color_type,
+      info_ptr->interlace_type, info_ptr->compression_type,
+      info_ptr->filter_type);
+
+   return (1);
 }
 
 #ifdef PNG_oFFs_SUPPORTED

@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta82 - September 23, 2009
+ * libpng version 1.4.0beta82 - September 24, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -810,12 +810,18 @@ PNG_EXTERN void png_do_write_intrapixel PNGARG((png_row_infop row_info,
 
 /* Added at libpng version 1.4.0 */
 #ifdef PNG_cHRM_SUPPORTED
-PNG_EXTERN int png_check_cHRM_fixed  PNGARG((png_structp png_ptr,
+PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_structp png_ptr,
    png_fixed_point int_white_x, png_fixed_point int_white_y,
    png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
    int_green_x, png_fixed_point int_green_y, png_fixed_point int_blue_x,
    png_fixed_point int_blue_y));
 #endif
+
+/* Added at libpng version 1.4.0 */
+PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
+   png_uint_32 width, png_uint_32 height, int bit_depth,
+   int color_type, int interlace_type, int compression_type,
+   int filter_type));
 
 #ifdef PNG_cHRM_SUPPORTED
 #ifdef PNG_CHECK_cHRM_SUPPORTED

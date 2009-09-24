@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta82 - September 23, 2009
+Libpng 1.4.0beta82 - September 24, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -558,7 +558,9 @@ version 1.4.0beta81 [September 23, 2009]
   Changed all "#if [!]defined(X)" to "if[n]def X" where possible.
   Eliminated unused png_ptr->row_buf_size
 
-version 1.4.0beta82 [September 23, 2009]
+version 1.4.0beta82 [September 24, 2009]
+  Move redundant IHDR checking into new png_check_IHDR() in png.c
+    and report all errors found in the IHDR data.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
