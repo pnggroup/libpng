@@ -12,8 +12,6 @@
 #ifndef MINWRPNGCONF_H
 #define MINWRPNGCONF_H
 
-%12-%#define PNG_NO_GLOBAL_ARRAYS
-%12-%
 #define PNG_NO_READ_SUPPORTED
 
 #define PNG_NO_WARNINGS
