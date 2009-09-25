@@ -3067,6 +3067,8 @@ of 16-bit tables, when only 8-bit tables are needed. This avoids
 wasting some computing resources when the application has called
 the png_set_strip_16() function and encounters a 16-bit PNG file.
 
+Checking for and reporting of errors in the IHDR chunk is more thorough.
+
 X. Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
