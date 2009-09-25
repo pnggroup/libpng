@@ -887,17 +887,22 @@ png_check_IHDR(png_structp png_ptr,
 
    if (filter_type != PNG_FILTER_TYPE_BASE)
    {
-     if (!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+      if (!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
          (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
-         ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
+         ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) == 0) &&
          (color_type == PNG_COLOR_TYPE_RGB ||
          color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
-        png_warning(png_ptr, "Unknown filter method in IHDR");
-      error = 1;
-   }
+      {
+         png_warning(png_ptr, "Unknown filter method in IHDR");
+         error = 1;
+      }
 
-     if (png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)
-        png_warning(png_ptr, "Invalid filter method in IHDR");
+      if (png_ptr->mode & PNG_HAVE_PNG_SIGNATURE)
+      {
+         png_warning(png_ptr, "Invalid filter method in IHDR");
+         error = 1;
+      }
+   }
 
 #else
    if (filter_type != PNG_FILTER_TYPE_BASE)

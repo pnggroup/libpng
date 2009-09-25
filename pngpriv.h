@@ -817,19 +817,19 @@ PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_structp png_ptr,
    png_fixed_point int_blue_y));
 #endif
 
+#ifdef PNG_cHRM_SUPPORTED
+#ifdef PNG_CHECK_cHRM_SUPPORTED
+/* Added at libpng version 1.2.34 and 1.4.0 */
+PNG_EXTERN void png_64bit_product PNGARG((long v1, long v2,
+   unsigned long *hi_product, unsigned long *lo_product));
+#endif
+#endif
+
 /* Added at libpng version 1.4.0 */
 PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
    png_uint_32 width, png_uint_32 height, int bit_depth,
    int color_type, int interlace_type, int compression_type,
    int filter_type));
-
-#ifdef PNG_cHRM_SUPPORTED
-#ifdef PNG_CHECK_cHRM_SUPPORTED
-/* Added at libpng version 1.2.34 and 1.4.0 */
-PNG_EXTERN void png_64bit_product (long v1, long v2, unsigned long *hi_product,
-   unsigned long *lo_product);
-#endif
-#endif
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
