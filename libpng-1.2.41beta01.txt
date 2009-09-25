@@ -630,8 +630,8 @@ into the info_ptr is returned for any complex types.
 
     png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans,
                      &trans_values);
-    trans          - array of transparent entries for
-                     palette (PNG_INFO_tRNS)
+    trans          - array of transparent
+                     entries for palette (PNG_INFO_tRNS)
     trans_values   - graylevel or color sample values of
                      the single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
@@ -1860,8 +1860,8 @@ width, height, bit_depth, and color_type must be the same in each call.
 
     png_set_tRNS(png_ptr, info_ptr, trans, num_trans,
        trans_values);
-    trans          - array of transparent entries for
-                     palette (PNG_INFO_tRNS)
+    trans          - array of transparent
+                     entries for palette (PNG_INFO_tRNS)
     trans_values   - graylevel or color sample values
                      (in order red, green, blue) of the
                      single transparent color for
@@ -2930,7 +2930,6 @@ We replaced all of these functions with simple stubs in libpng-1.2.20,
 when the Intel assembler code was removed due to a licensing issue.
 
 IX.  (Omitted)
-
 X. Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
@@ -3047,10 +3046,12 @@ cast, nor do we put one between a function name and the
 left parenthesis that follows it:
 
     for (i = 2; i > 0; --i)
-       x[i] = a(x) + (int)b;
+       y[i] = a(x) + (int)b;
 
 We prefer #ifdef and #ifndef to #if defined() and if !defined()
 when there is only one macro being tested.
+
+We do not use the TAB character for indentation in the C sources.
 
 Other rules can be inferred by inspecting the libpng
 source.
