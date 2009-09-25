@@ -2466,8 +2466,16 @@ version 1.2.40beta01 [August 20, 2009]
 version 1.2.40rc01 [September 2, 2009]
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
-version 1.2.40 and 1.0.49 [September 10, 2009]
+version 1.2.40 and 1.0.49 [September 25, 2009]
   No changes.
+
+version 1.0.50 [September 10, 2009]
+  Removed some editing cruft from pngset.c and pngwutil.c.
+
+version 1.2.41beta01 [September 25, 2009]
+  Moved redundant IHDR checking into new png_check_IHDR() in png.c
+    and report all errors found in the IHDR data.
+  Eliminated useless call to png_check_cHRM() from pngset.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
