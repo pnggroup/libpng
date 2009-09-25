@@ -1,4 +1,4 @@
-.TH LIBPNGPF 3 "September 23, 2009"
+.TH LIBPNGPF 3 "September 25, 2009"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta82
 (private functions)
@@ -29,6 +29,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta82
 
 \fI\fB
 
+\fBint png_check_cHRM_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_fixed_point \fP\fIint_white_x\fP\fB, png_fixed_point \fP\fIint_white_y\fP\fB, png_fixed_point \fP\fIint_red_x\fP\fB, png_fixed_point \fP\fIint_red_y\fP\fB, png_fixed_point \fP\fIint_green_x\fP\fB, png_fixed_point \fP\fIint_green_y\fP\fB, png_fixed_point \fP\fIint_blue_x\fP\fB, png_fixed_point \fIint_blue_y\fP\fB);\fP
+
 \fI\fB
 
 \fBvoid png_check_chunk_name (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIchunk_name\fP\fB);\fP
@@ -38,6 +40,12 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta82
 \fI\fB
 
 \fBpng_size_t png_check_keyword (png_structp \fP\fIpng_ptr\fP\fB, png_charp \fP\fIkey\fP\fB, png_charpp \fInew_key\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fBvoid png_check_IHDR (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fP\fIwidth\fP\fB, png_uint_32 \fP\fIheight\fP\fB, int \fP\fIbit_depth\fP\fB, int \fP\fIcolor_type\fP\fB, int \fP\fIinterlace_type\fP\fB, int \fP\fIcompression_type\fP\fB, int \fIfilter_type\fP\fB);\fP
 
 \fI\fB
 
