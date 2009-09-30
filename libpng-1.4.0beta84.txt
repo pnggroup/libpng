@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta84 - September 25, 2009
+ libpng version 1.4.0beta84 - September 30, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.0beta84 - September 25, 2009
+ libpng versions 0.97, January 1998, through 1.4.0beta84 - September 30, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -1884,7 +1884,6 @@ width, height, bit_depth, and color_type must be the same in each call.
 
     png_set_tRNS(png_ptr, info_ptr, trans_alpha,
        num_trans, trans_color);
-    trans          - array of transparent entries
     trans_alpha    - array of alpha (transparency)
                      entries for palette (PNG_INFO_tRNS)
     trans_color    - graylevel or color sample values
@@ -3121,6 +3120,15 @@ We use 3-space indentation, except for continued statements which
 are usually indented the same as the first line of the statement
 plus four more spaces.
 
+For macro definitions we use 2-space indentation, always leaving the "#"
+in the first column.
+
+    #ifndef PNG_NO_FEATURE
+    #  ifndef PNG_FEATURE_SUPPORTED
+    #    define PNG_FEATURE_SUPPORTED
+    #  endif
+    #endif
+
 Comments appear with the leading "/*" at the same indentation as
 the statement that follows the comment:
 
@@ -3197,7 +3205,7 @@ source.
 
 XIII. Y2K Compliance in libpng
 
-September 25, 2009
+September 30, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

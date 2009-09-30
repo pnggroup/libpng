@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta84 - September 25, 2009
+ * libpng version 1.4.0beta84 - September 30, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -23,16 +23,16 @@
 #define PNGCONF_H
 
 #ifndef PNG_NO_LIMITS_H
-#include <limits.h>
+#  include <limits.h>
 #endif
 
 /* Added at libpng-1.2.9 */
 
 /* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure" script. */
 #ifdef PNG_CONFIGURE_LIBPNG
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#  ifdef HAVE_CONFIG_H
+#    include "config.h"
+#  endif
 #endif
 
 /*
@@ -45,7 +45,7 @@
 #  ifndef PNG_USER_PRIVATEBUILD
 #    define PNG_USER_PRIVATEBUILD
 #  endif
-#include "pngusr.h"
+#  include "pngusr.h"
 #endif
 
 /*
@@ -68,16 +68,16 @@
  */
 
 #ifdef __STDC__
-#ifdef SPECIALBUILD
-#  pragma message("PNG_LIBPNG_SPECIALBUILD (and deprecated SPECIALBUILD)\
- are now LIBPNG reserved macros. Use PNG_USER_PRIVATEBUILD instead.")
-#endif
+#  ifdef SPECIALBUILD
+#    pragma message("PNG_LIBPNG_SPECIALBUILD (and deprecated SPECIALBUILD)\
+     are now LIBPNG reserved macros. Use PNG_USER_PRIVATEBUILD instead.")
+#  endif
 
-#ifdef PRIVATEBUILD
-# pragma message("PRIVATEBUILD is deprecated.\
- Use PNG_USER_PRIVATEBUILD instead.")
-# define PNG_USER_PRIVATEBUILD PRIVATEBUILD
-#endif
+#  ifdef PRIVATEBUILD
+#    pragma message("PRIVATEBUILD is deprecated.\
+     Use PNG_USER_PRIVATEBUILD instead.")
+#    define PNG_USER_PRIVATEBUILD PRIVATEBUILD
+#  endif
 #endif /* __STDC__ */
 
 /* End of material added to libpng-1.2.8 */
@@ -152,7 +152,9 @@
 #  endif
 #endif
 
-/* Added at libpng-1.4.0beta49 for testing (no longer used in libpng) */
+/* Added at libpng-1.4.0beta49 for testing (this test is no longer used
+   in libpng and png_calloc() is always present)
+ */
 #define PNG_CALLOC_SUPPORTED
 
 /* If you are running on a machine where you cannot allocate more
@@ -568,7 +570,7 @@
 #ifdef PNG_WRITE_SUPPORTED
 
 /* PNG_WRITE_TRANSFORMS_NOT_SUPPORTED is deprecated. */
-# if !defined(PNG_WRITE_TRANSFORMS_NOT_SUPPORTED) && \
+#if !defined(PNG_WRITE_TRANSFORMS_NOT_SUPPORTED) && \
     !defined(PNG_NO_WRITE_TRANSFORMS)
 #  define PNG_WRITE_TRANSFORMS_SUPPORTED
 #endif
@@ -608,9 +610,10 @@
 
 #if !defined(PNG_NO_WRITE_INTERLACING_SUPPORTED) && \
     !defined(PNG_WRITE_INTERLACING_SUPPORTED)
-#define PNG_WRITE_INTERLACING_SUPPORTED  /* not required for PNG-compliant
-                                            encoders, but can cause trouble
-                                            if left undefined */
+    /* This is not required for PNG-compliant encoders, but can cause
+     * trouble if left undefined
+    */
+#  define PNG_WRITE_INTERLACING_SUPPORTED
 #endif
 
 #if !defined(PNG_NO_WRITE_WEIGHTED_FILTER) && \
@@ -665,15 +668,16 @@
 #  define PNG_EASY_ACCESS_SUPPORTED
 #endif
 
+/* Added at libpng-1.2.0 */
 #if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
 #  define PNG_USER_MEM_SUPPORTED
 #endif
 
 /* Added at libpng-1.2.6 */
 #ifndef PNG_SET_USER_LIMITS_SUPPORTED
-#if !defined(PNG_NO_SET_USER_LIMITS) && !defined(PNG_SET_USER_LIMITS_SUPPORTED)
-#  define PNG_SET_USER_LIMITS_SUPPORTED
-#endif
+#  ifndef PNG_NO_SET_USER_LIMITS
+#    define PNG_SET_USER_LIMITS_SUPPORTED
+#  endif
 #endif
 
 /* Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGs no matter
@@ -1028,7 +1032,7 @@
 #  define PNG_INFO_IMAGE_SUPPORTED
 #endif
 
-/* need the time information for reading tIME chunks */
+/* Need the time information for reading tIME chunks */
 #ifdef PNG_tIME_SUPPORTED
 #  ifndef _WIN32_WCE
      /* "time.h" functions are not supported on WindowsCE */
@@ -1072,7 +1076,8 @@ typedef unsigned char png_byte;
  */
 
 /* Separate compiler dependencies (problem here is that zlib.h always
-   defines FAR. (SJT) */
+ * defines FAR. (SJT)
+ */
 #ifdef __BORLANDC__
 #  if defined(__LARGE__) || defined(__HUGE__) || defined(__COMPACT__)
 #    define LDATA 1
@@ -1137,11 +1142,11 @@ typedef char            FAR * png_charp;
 typedef png_fixed_point FAR * png_fixed_point_p;
 
 #ifndef PNG_NO_STDIO
-#ifdef _WIN32_WCE
+#  ifdef _WIN32_WCE
 typedef HANDLE                png_FILE_p;
-#else
+#  else
 typedef FILE                * png_FILE_p;
-#endif
+#  endif
 #endif
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -1164,8 +1169,7 @@ typedef double          FAR * FAR * png_doublepp;
 /* Pointers to pointers to pointers; i.e., pointer to array */
 typedef char            FAR * FAR * FAR * png_charppp;
 
-/*
- * Define PNG_BUILD_DLL if the module being built is a Windows
+/* Define PNG_BUILD_DLL if the module being built is a Windows
  * LIBPNG DLL.
  *
  * Define PNG_USE_DLL if you want to *link* to the Windows LIBPNG DLL.
@@ -1231,41 +1235,40 @@ typedef char            FAR * FAR * FAR * png_charppp;
 
 #  ifndef PNG_IMPEXP
 
-#     define PNG_EXPORT_TYPE1(type,symbol)  PNG_IMPEXP type PNGAPI symbol
-#     define PNG_EXPORT_TYPE2(type,symbol)  type PNG_IMPEXP PNGAPI symbol
+#    define PNG_EXPORT_TYPE1(type,symbol)  PNG_IMPEXP type PNGAPI symbol
+#    define PNG_EXPORT_TYPE2(type,symbol)  type PNG_IMPEXP PNGAPI symbol
 
-      /* Borland/Microsoft */
-#     if defined(_MSC_VER) || defined(__BORLANDC__)
-#        if (_MSC_VER >= 800) || (__BORLANDC__ >= 0x500)
-#           define PNG_EXPORT PNG_EXPORT_TYPE1
-#        else
-#           define PNG_EXPORT PNG_EXPORT_TYPE2
-#           ifdef PNG_BUILD_DLL
-#              define PNG_IMPEXP __export
-#           else
-#              define PNG_IMPEXP /*__import */ /* doesn't exist AFAIK in
-                                                 VC++ */
-#           endif                             /* Exists in Borland C++ for
-                                                 C++ classes (== huge) */
-#        endif
-#     endif
+     /* Borland/Microsoft */
+#    if defined(_MSC_VER) || defined(__BORLANDC__)
+#      if (_MSC_VER >= 800) || (__BORLANDC__ >= 0x500)
+#         define PNG_EXPORT PNG_EXPORT_TYPE1
+#      else
+#         define PNG_EXPORT PNG_EXPORT_TYPE2
+#         ifdef PNG_BUILD_DLL
+#            define PNG_IMPEXP __export
+#         else
+#            define PNG_IMPEXP /*__import */ /* doesn't exist AFAIK in VC++ */
+#         endif                              /* Exists in Borland C++ for
+                                                C++ classes (== huge) */
+#      endif
+#    endif
 
-#     ifndef PNG_IMPEXP
-#        ifdef PNG_BUILD_DLL
-#           define PNG_IMPEXP __declspec(dllexport)
-#        else
-#           define PNG_IMPEXP __declspec(dllimport)
-#        endif
-#     endif
+#    ifndef PNG_IMPEXP
+#      ifdef PNG_BUILD_DLL
+#        define PNG_IMPEXP __declspec(dllexport)
+#      else
+#        define PNG_IMPEXP __declspec(dllimport)
+#      endif
+#    endif
 #  endif  /* PNG_IMPEXP */
 #else /* !(DLL || non-cygwin WINDOWS) */
 #   if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
-#      ifndef PNGAPI
-#         define PNGAPI _System
-#      endif
+#     ifndef PNGAPI
+#       define PNGAPI _System
+#     endif
 #   else
-#      if 0 /* ... other platforms, with other meanings */
-#      endif
+#     if 0 /* ... other platforms, with other meanings */
+#     endif
 #   endif
 #endif
 
@@ -1340,27 +1343,28 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    define png_memcpy  memcpy
 #    define png_memset  memset
 #    define png_sprintf sprintf
-#  ifndef PNG_NO_SNPRINTF
-#    ifdef _MSC_VER
-#      define png_snprintf _snprintf   /* Added to v 1.2.19 */
-#      define png_snprintf2 _snprintf
-#      define png_snprintf6 _snprintf
+#    ifndef PNG_NO_SNPRINTF
+#      ifdef _MSC_VER
+#        define png_snprintf _snprintf   /* Added to v 1.2.19 */
+#        define png_snprintf2 _snprintf
+#        define png_snprintf6 _snprintf
+#      else
+#        define png_snprintf snprintf   /* Added to v 1.2.19 */
+#        define png_snprintf2 snprintf
+#        define png_snprintf6 snprintf
+#      endif
 #    else
-#      define png_snprintf snprintf   /* Added to v 1.2.19 */
-#      define png_snprintf2 snprintf
-#      define png_snprintf6 snprintf
+       /* You don't have or don't want to use snprintf().  Caution: Using
+        * sprintf instead of snprintf exposes your application to accidental
+        * or malevolent buffer overflows.  If you don't have snprintf()
+        * as a general rule you should provide one (you can get one from
+        * Portable OpenSSH).
+        */
+#      define png_snprintf(s1,n,fmt,x1) sprintf(s1,fmt,x1)
+#      define png_snprintf2(s1,n,fmt,x1,x2) sprintf(s1,fmt,x1,x2)
+#      define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
+          sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
 #    endif
-#  else
-     /* You don't have or don't want to use snprintf().  Caution: Using
-      * sprintf instead of snprintf exposes your application to accidental
-      * or malevolent buffer overflows.  If you don't have snprintf()
-      * as a general rule you should provide one (you can get one from
-      * Portable OpenSSH). */
-#    define png_snprintf(s1,n,fmt,x1) sprintf(s1,fmt,x1)
-#    define png_snprintf2(s1,n,fmt,x1,x2) sprintf(s1,fmt,x1,x2)
-#    define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
-        sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
-#  endif
 #  endif
 #endif
 
