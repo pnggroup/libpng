@@ -1051,11 +1051,16 @@ png_check_IHDR(png_structp png_ptr,
          ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) == 0) &&
          (color_type == PNG_COLOR_TYPE_RGB ||
          color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
-        png_warning(png_ptr, "Unknown filter method in IHDR");
-      error = 1;
+      {
+         png_warning(png_ptr, "Unknown filter method in IHDR");
+         error = 1;
+      }
 
-     if (png_ptr->mode & PNG_HAVE_PNG_SIGNATURE)
-        png_warning(png_ptr, "Invalid filter method in IHDR");
+      if (png_ptr->mode & PNG_HAVE_PNG_SIGNATURE)
+      {
+         png_warning(png_ptr, "Invalid filter method in IHDR");
+         error = 1;
+      }
    }
 
 #else
