@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.41beta01 - September 25, 2009
+ * libpng version 1.2.41beta02 - September 30, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -787,6 +787,7 @@
 #endif
 /* end of obsolete code to be removed from libpng-1.4.0 */
 
+/* Added at libpng-1.2.0 */
 #if !defined(PNG_1_0_X)
 #if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
 #  define PNG_USER_MEM_SUPPORTED
@@ -794,12 +795,12 @@
 #endif /* PNG_1_0_X */
 
 /* Added at libpng-1.2.6 */
-#if !defined(PNG_1_0_X)
-#ifndef PNG_SET_USER_LIMITS_SUPPORTED
-#if !defined(PNG_NO_SET_USER_LIMITS) && !defined(PNG_SET_USER_LIMITS_SUPPORTED)
-#  define PNG_SET_USER_LIMITS_SUPPORTED
-#endif
-#endif
+#ifndef PNG_1_0_X
+#  ifndef PNG_SET_USER_LIMITS_SUPPORTED
+#    ifndef PNG_NO_SET_USER_LIMITS
+#      define PNG_SET_USER_LIMITS_SUPPORTED
+#    endif
+#  endif
 #endif /* PNG_1_0_X */
 
 /* Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGS no matter

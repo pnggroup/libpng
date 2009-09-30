@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.2.41 [September 25, 2009]
+ * Last changed in libpng 1.2.41 [September 30, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -576,6 +576,19 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL || width == NULL ||
        height == NULL || bit_depth == NULL || color_type == NULL)
       return (0);
+
+#ifdef PNG_DEBUG
+   /* Test to make sure the user isn't trying to stuff height into
+    * a 16-bit int (assuming height immediately follows width).
+    */
+   *width = 0;
+   *height = PNG_UINT_31_MAX;
+   if (*width != 0)
+   {
+     png_warning(png_ptr,
+       "Application's height variable cannot hold a 32-bit value");
+   }
+#endif
 
    *width = info_ptr->width;
    *height = info_ptr->height;
