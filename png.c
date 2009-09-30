@@ -19,7 +19,8 @@
 typedef version_1_4_0beta84 Your_png_h_is_not_version_1_4_0beta84;
 
 /* Version information for C files.  This had better match the version
- * string defined in png.h.  */
+ * string defined in png.h.
+ */
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
