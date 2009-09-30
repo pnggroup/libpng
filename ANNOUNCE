@@ -568,6 +568,7 @@ version 1.4.0beta83 [September 25, 2009]
 
 version 1.4.0beta84 [September 30, 2009]
   Fixed some inconsistent indentation in pngconf.h
+  Revised png_check_IHDR() to add a test for width variable less than 32-bit.
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.

@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [September 25, 2009]
+ * Last changed in libpng 1.4.0 [September 30, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -546,13 +546,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version x 1.4.0beta84 - September 25, 2009" PNG_STRING_NEWLINE \
+     "libpng version x 1.4.0beta84 - September 30, 2009" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta84 - September 25, 2009\
+      return ((png_charp) "libpng version 1.4.0beta84 - September 30, 2009\
       Copyright (c) 1998-2009 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -790,40 +790,41 @@ png_check_IHDR(png_structp png_ptr,
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    if (width > png_ptr->user_width_max || width > PNG_USER_WIDTH_MAX)
-   {
-      png_warning(png_ptr, "Image width exceeds user limit in IHDR");
-      error = 1;
-   }
-
-   if (height > png_ptr->user_height_max || height > PNG_USER_HEIGHT_MAX)
-   {
-      png_warning(png_ptr, "Image height exceeds user limit in IHDR");
-      error = 1;
-   }
-
 #else
-   if (width > PNG_USER_WIDTH_MAX
+   if (width > PNG_USER_WIDTH_MAX)
+#endif
    {
       png_warning(png_ptr, "Image width exceeds user limit in IHDR");
+      if ((width >> 16) == height)
+      {
+         /* This is likely to be caused by passing consecutive addresses
+          * of 16-bit width and height variables to png_get_IHDR(), which
+          * overflowed when we tried to fill them with 31-bit data.
+          */ 
+         png_warning(png_ptr, "High bytes of width == low bytes of height");
+      }
       error = 1;
    }
 
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (height > png_ptr->user_height_max || height > PNG_USER_HEIGHT_MAX)
+#else
    if (height > PNG_USER_HEIGHT_MAX)
+#endif
    {
       png_warning(png_ptr, "Image height exceeds user limit in IHDR");
       error = 1;
    }
-#endif
 
-   if (height > PNG_UINT_31_MAX)
+   if (width > PNG_UINT_31_MAX)
    {
-      png_warning(png_ptr, "Invalid image height in IHDR");
+      png_warning(png_ptr, "Invalid image width in IHDR");
       error = 1;
    }
 
    if ( height > PNG_UINT_31_MAX)
    {
-      png_warning(png_ptr, "Invalid image width in IHDR");
+      png_warning(png_ptr, "Invalid image height in IHDR");
       error = 1;
    }
 
