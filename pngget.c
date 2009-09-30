@@ -577,19 +577,6 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
        height == NULL || bit_depth == NULL || color_type == NULL)
       return (0);
 
-#ifdef PNG_DEBUG
-   /* Test to make sure the user isn't trying to stuff height into
-    * a 16-bit int (assuming height immediately follows width).
-    */
-   *width = 0;
-   *height = PNG_UINT_31_MAX;
-   if (*width != 0)
-   {
-     png_warning(png_ptr,
-       "Application's height variable cannot hold a 32-bit value");
-   }
-#endif
-
    *width = info_ptr->width;
    *height = info_ptr->height;
    *bit_depth = info_ptr->bit_depth;
