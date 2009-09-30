@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta01 - September 25, 2009
+Libpng 1.2.41beta02 - September 30, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,40 +9,40 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41beta01.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta01.tar.gz
-   libpng-1.2.41beta01.tar.bz2
+   libpng-1.2.41beta02.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta02.tar.gz
+   libpng-1.2.41beta02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41beta01-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta01-no-config.tar.gz
-   libpng-1.2.41beta01-no-config.tar.bz2
+   libpng-1.2.41beta02-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta02-no-config.tar.gz
+   libpng-1.2.41beta02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241b01.zip
-   lp1241b01.7z
-   lp1241b01.tar.bz2
+   lp1241b02.zip
+   lp1241b02.7z
+   lp1241b02.tar.bz2
 
 Project files
 
-   libpng-1.2.41beta01-project-netware.zip
-   libpng-1.2.41beta01-project-wince.zip
+   libpng-1.2.41beta02-project-netware.zip
+   libpng-1.2.41beta02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41beta01-README.txt
-   libpng-1.2.41beta01-KNOWNBUGS.txt
-   libpng-1.2.41beta01-LICENSE.txt
-   libpng-1.2.41beta01-Y2K-compliance.txt
-   libpng-1.2.41beta01-[previous version]-diff.txt
+   libpng-1.2.41beta02-README.txt
+   libpng-1.2.41beta02-KNOWNBUGS.txt
+   libpng-1.2.41beta02-LICENSE.txt
+   libpng-1.2.41beta02-Y2K-compliance.txt
+   libpng-1.2.41beta02-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
-version 1.2.41beta01 [September 25, 2009]
+version 1.2.41beta01 [September 30, 2009]
   Moved redundant IHDR checking into new png_check_IHDR() in png.c
     and report all errors found in the IHDR data.
   Eliminated useless call to png_check_cHRM() from pngset.c
