@@ -16,7 +16,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_41beta02 Your_png_h_is_not_version_1_2_41beta02;
+typedef version_1_2_41beta03 Your_png_h_is_not_version_1_2_41beta03;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.  */
@@ -705,7 +705,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.41beta02 - September 30, 2009\n\
+   return ((png_charp) "\n libpng version 1.2.41beta03 - September 30, 2009\n\
    Copyright (c) 1998-2009 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -1046,7 +1046,7 @@ png_check_IHDR(png_structp png_ptr,
 
    if (filter_type != PNG_FILTER_TYPE_BASE)
    {
-     if (!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+      if (!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
          (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
          ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) == 0) &&
          (color_type == PNG_COLOR_TYPE_RGB ||
