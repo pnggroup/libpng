@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta03 - September 30, 2009
+Libpng 1.2.41beta03 - October 1, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -51,7 +51,9 @@ version 1.2.41beta01 [September 25, 2009]
 version 1.2.41beta02 [September 30, 2009]
   Revised png_check_IHDR().
 
-version 1.2.41beta03 [September 30, 2009]
+version 1.2.41beta03 [October 1, 2009]
+  Revised png_check_IHDR() again, to check info_ptr members instead of
+    the contents of the returned parameters.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

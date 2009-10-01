@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.41beta03 - September 30, 2009
+ libpng version 1.2.41beta03 - October 1, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.41beta03 - September 30, 2009
+ libpng versions 0.97, January 1998, through 1.2.41beta03 - October 1, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -545,9 +545,32 @@ in until png_read_end() has read the chunk data following the image.
                      for PNG 1.0)
     interlace_type - (PNG_INTERLACE_NONE or
                      PNG_INTERLACE_ADAM7)
-    Any or all of interlace_type, compression_type, of
+
+    Any or all of interlace_type, compression_type, or
     filter_method can be NULL if you are
     not interested in their values.
+
+    Note that png_get_IHDR() returns 32-bit data into
+    the application's width and height variables.
+    This is an unsafe situation if these are 16-bit
+    variables.  In such situations, the
+    png_get_image_width() and png_get_image_height()
+    functions described below are safer.
+
+    width            = png_get_image_width(png_ptr,
+                         info_ptr);
+    height           = png_get_image_height(png_ptr,
+                         info_ptr);
+    bit_depth        = png_get_bit_depth(png_ptr,
+                         info_ptr);
+    color_type       = png_get_color_type(png_ptr,
+                         info_ptr);
+    filter_method    = png_get_filter_type(png_ptr,
+                         info_ptr);
+    compression_type = png_get_compression_type(png_ptr,
+                         info_ptr);
+    interlace_type   = png_get_interlace_type(png_ptr,
+                         info_ptr);
 
     channels = png_get_channels(png_ptr, info_ptr);
     channels       - number of channels of info for the
@@ -567,23 +590,6 @@ in until png_read_end() has read the chunk data following the image.
                      libpng, the remaining 4 bytes would
                      be in signature[4] through signature[7]
                      (see png_set_sig_bytes())).
-
-
-    width            = png_get_image_width(png_ptr,
-                         info_ptr);
-    height           = png_get_image_height(png_ptr,
-                         info_ptr);
-    bit_depth        = png_get_bit_depth(png_ptr,
-                         info_ptr);
-    color_type       = png_get_color_type(png_ptr,
-                         info_ptr);
-    filter_method    = png_get_filter_type(png_ptr,
-                         info_ptr);
-    compression_type = png_get_compression_type(png_ptr,
-                         info_ptr);
-    interlace_type   = png_get_interlace_type(png_ptr,
-                         info_ptr);
-
 
 These are also important, but their validity depends on whether the chunk
 has been read.  The png_get_valid(png_ptr, info_ptr, PNG_INFO_<chunk>) and
@@ -2982,6 +2988,15 @@ We use 3-space indentation, except for continued statements which
 are usually indented the same as the first line of the statement
 plus four more spaces.
 
+For macro definitions we use 2-space indentation, always leaving the "#"
+in the first column.
+
+    #ifndef PNG_NO_FEATURE
+    #  ifndef PNG_FEATURE_SUPPORTED
+    #    define PNG_FEATURE_SUPPORTED
+    #  endif
+    #endif
+
 Comments appear with the leading "/*" at the same indentation as
 the statement that follows the comment:
 
@@ -3058,7 +3073,7 @@ source.
 
 XIII. Y2K Compliance in libpng
 
-September 30, 2009
+October 1, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

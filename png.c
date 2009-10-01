@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.41 [September 30, 2009]
+ * Last changed in libpng 1.2.41 [October 1, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -705,7 +705,7 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.41beta03 - September 30, 2009\n\
+   return ((png_charp) "\n libpng version 1.2.41beta03 - October 1, 2009\n\
    Copyright (c) 1998-2009 Glenn Randers-Pehrson\n\
    Copyright (c) 1996-1997 Andreas Dilger\n\
    Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
@@ -953,14 +953,6 @@ png_check_IHDR(png_structp png_ptr,
 #endif
    {
       png_warning(png_ptr, "Image width exceeds user limit in IHDR");
-      if ((width >> 16) == height)
-      {
-         /* This is likely to be caused by passing consecutive addresses
-          * of 16-bit width and height variables to png_get_IHDR(), which
-          * overflowed when we tried to fill them with 31-bit data.
-          */ 
-         png_warning(png_ptr, "High bytes of width == low bytes of height");
-      }
       error = 1;
    }
 
