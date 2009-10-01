@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [September 30, 2009]
+ * Last changed in libpng 1.4.0 [October 1, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -227,16 +227,18 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   png_check_IHDR (png_ptr, width, height, bit_depth, color_type,
-       interlace_type, compression_type, filter_type);
-
    info_ptr->width = width;
    info_ptr->height = height;
    info_ptr->bit_depth = (png_byte)bit_depth;
-   info_ptr->color_type =(png_byte) color_type;
+   info_ptr->color_type = (png_byte)color_type;
    info_ptr->compression_type = (png_byte)compression_type;
    info_ptr->filter_type = (png_byte)filter_type;
    info_ptr->interlace_type = (png_byte)interlace_type;
+
+   png_check_IHDR (png_ptr, info_ptr->width, info_ptr->height,
+       info_ptr->bit_depth, info_ptr->color_type, info_ptr->interlace_type,
+       info_ptr->compression_type, info_ptr->filter_type);
+
    if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       info_ptr->channels = 1;
    else if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)

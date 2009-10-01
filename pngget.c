@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 [September 30, 2009]
+ * Last changed in libpng 1.4.0 [October 1, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -579,10 +579,6 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
    int *filter_type)
 
 {
-   int test_interlace_type = 0;
-   int test_compression_type = 0;
-   int test_filter_type = 0;
-
    png_debug1(1, "in %s retrieval function", "IHDR");
 
    if (png_ptr == NULL || info_ptr == NULL || width == NULL ||
@@ -595,26 +591,22 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
    *color_type = info_ptr->color_type;
 
    if (compression_type != NULL)
-   {
       *compression_type = info_ptr->compression_type;
-      test_compression_type=*compression_type;
-   }
 
    if (filter_type != NULL)
-   {
       *filter_type = info_ptr->filter_type;
-      test_filter_type=*filter_type;
-   }
 
    if (interlace_type != NULL)
-   {
       *interlace_type = info_ptr->interlace_type;
-      test_interlace_type=*interlace_type;
-   }
 
-   png_check_IHDR (png_ptr, *width, *height, *bit_depth, *color_type,
-      info_ptr->interlace_type, info_ptr->compression_type,
-      info_ptr->filter_type);
+   /* This is redundant if we can be sure that the info_ptr values were all
+    * assigned in png_set_IHDR().  We do the check anyhow in case an
+    * application has ignored our advice not to mess with the members
+    * of info_ptr directly.
+    */
+   png_check_IHDR (png_ptr, info_ptr->width, info_ptr->height,
+       info_ptr->bit_depth, info_ptr->color_type, info_ptr->interlace_type,
+       info_ptr->compression_type, info_ptr->filter_type);
 
    return (1);
 }
