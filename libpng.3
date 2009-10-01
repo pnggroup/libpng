@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "September 30, 2009"
+.TH LIBPNG 3 "October 1, 2009"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta85
 .SH SYNOPSIS
@@ -809,7 +809,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta85 - September 30, 2009
+ libpng version 1.4.0beta85 - October 1, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -820,7 +820,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.0beta85 - September 30, 2009
+ libpng versions 0.97, January 1998, through 1.4.0beta85 - October 1, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -1366,9 +1366,32 @@ in until png_read_end() has read the chunk data following the image.
                      for PNG 1.0)
     interlace_type - (PNG_INTERLACE_NONE or
                      PNG_INTERLACE_ADAM7)
-    Any or all of interlace_type, compression_type, of
+
+    Any or all of interlace_type, compression_type, or
     filter_method can be NULL if you are
     not interested in their values.
+
+    Note that png_get_IHDR() returns 32-bit data into
+    the application's width and height variables.
+    This is an unsafe situation if these are 16-bit
+    variables.  In such situations, the
+    png_get_image_width() and png_get_image_height()
+    functions described below are safer.
+
+    width            = png_get_image_width(png_ptr,
+                         info_ptr);
+    height           = png_get_image_height(png_ptr,
+                         info_ptr);
+    bit_depth        = png_get_bit_depth(png_ptr,
+                         info_ptr);
+    color_type       = png_get_color_type(png_ptr,
+                         info_ptr);
+    filter_method    = png_get_filter_type(png_ptr,
+                         info_ptr);
+    compression_type = png_get_compression_type(png_ptr,
+                         info_ptr);
+    interlace_type   = png_get_interlace_type(png_ptr,
+                         info_ptr);
 
     channels = png_get_channels(png_ptr, info_ptr);
     channels       - number of channels of info for the
@@ -1388,23 +1411,6 @@ in until png_read_end() has read the chunk data following the image.
                      libpng, the remaining 4 bytes would
                      be in signature[4] through signature[7]
                      (see png_set_sig_bytes())).
-
-
-    width            = png_get_image_width(png_ptr,
-                         info_ptr);
-    height           = png_get_image_height(png_ptr,
-                         info_ptr);
-    bit_depth        = png_get_bit_depth(png_ptr,
-                         info_ptr);
-    color_type       = png_get_color_type(png_ptr,
-                         info_ptr);
-    filter_method    = png_get_filter_type(png_ptr,
-                         info_ptr);
-    compression_type = png_get_compression_type(png_ptr,
-                         info_ptr);
-    interlace_type   = png_get_interlace_type(png_ptr,
-                         info_ptr);
-
 
 These are also important, but their validity depends on whether the chunk
 has been read.  The png_get_valid(png_ptr, info_ptr, PNG_INFO_<chunk>) and
@@ -4014,7 +4020,7 @@ source.
 
 .SH XIII. Y2K Compliance in libpng
 
-September 30, 2009
+October 1, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -4244,7 +4250,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.4.0beta85 - September 30, 2009:
+Libpng version 1.4.0beta85 - October 1, 2009:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4267,7 +4273,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.4.0beta85, September 30, 2009, are
+libpng versions 1.2.6, August 15, 2004, through 1.4.0beta85, October 1, 2009, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4366,7 +4372,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-September 30, 2009
+October 1, 2009
 
 .\" end of man page
 
