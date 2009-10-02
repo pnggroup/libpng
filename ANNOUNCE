@@ -56,6 +56,7 @@ version 1.2.41beta03 [October 1, 2009]
     the contents of the returned parameters.
 
 version 1.2.41beta04 [October 2, 2009]
+  Added "xcode" project similar one already in libpng-1.4.0beta (Alam Arias).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
