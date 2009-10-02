@@ -2260,6 +2260,8 @@ version 1.4.0beta85 [October 1, 2009]
   Revised png_check_IHDR() again, to check info_ptr members instead of
     the contents of the returned parameters.
 
+version 1.4.0beta86 [October 2, 2009]
+
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
 

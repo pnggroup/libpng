@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta85 - October 1, 2009
+Libpng 1.4.0beta86 - October 2, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta85.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta85.tar.gz
-   1.4.0beta85.tar.bz2
+   1.4.0beta86.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta86.tar.gz
+   1.4.0beta86.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b85.zip
-   lp140b85.7z
+   lp140b86.zip
+   lp140b86.7z
 
 Other information:
 
-   1.4.0beta85-README.txt
-   1.4.0beta85-LICENSE.txt
+   1.4.0beta86-README.txt
+   1.4.0beta86-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -573,6 +573,8 @@ version 1.4.0beta84 [September 30, 2009]
 version 1.4.0beta85 [October 1, 2009]
   Revised png_check_IHDR() again, to check info_ptr members instead of
     the contents of the returned parameters.
+
+version 1.4.0beta86 [October 2, 2009]
 
 version 1.4.0betaN [future]
   Build shared libraries with -lz and sometimes -lm.
