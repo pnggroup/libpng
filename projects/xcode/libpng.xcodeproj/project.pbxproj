@@ -26,6 +26,7 @@
 		14461C8209C3C37F005840C0 /* pngwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = 14461C6E09C3C37F005840C0 /* pngwrite.c */; };
 		14461C8309C3C37F005840C0 /* pngwtran.c in Sources */ = {isa = PBXBuildFile; fileRef = 14461C6F09C3C37F005840C0 /* pngwtran.c */; };
 		14461C8409C3C37F005840C0 /* pngwutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 14461C7009C3C37F005840C0 /* pngwutil.c */; };
+		67FA470510693F6B0078FB9E /* pngpriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 67FA470410693F6B0078FB9E /* pngpriv.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,7 @@
 		14461C6E09C3C37F005840C0 /* pngwrite.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pngwrite.c; path = ../../pngwrite.c; sourceTree = SOURCE_ROOT; };
 		14461C6F09C3C37F005840C0 /* pngwtran.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pngwtran.c; path = ../../pngwtran.c; sourceTree = SOURCE_ROOT; };
 		14461C7009C3C37F005840C0 /* pngwutil.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pngwutil.c; path = ../../pngwutil.c; sourceTree = SOURCE_ROOT; };
+		67FA470410693F6B0078FB9E /* pngpriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pngpriv.h; path = ../../pngpriv.h; sourceTree = SOURCE_ROOT; };
 		8D07F2C70486CC7A007CD1D0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D07F2C80486CC7A007CD1D0 /* libpng.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = libpng.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -92,6 +94,7 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				67FA470410693F6B0078FB9E /* pngpriv.h */,
 				14461C5D09C3C37F005840C0 /* png.c */,
 				14461C5E09C3C37F005840C0 /* png.h */,
 				14461C5F09C3C37F005840C0 /* pngconf.h */,
@@ -124,6 +127,7 @@
 			files = (
 				14461C7209C3C37F005840C0 /* png.h in Headers */,
 				14461C7309C3C37F005840C0 /* pngconf.h in Headers */,
+				67FA470510693F6B0078FB9E /* pngpriv.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,37 +227,28 @@
 				DYLIB_COMPATIBILITY_VERSION = 14;
 				DYLIB_CURRENT_VERSION = 14;
 				FRAMEWORK_VERSION = 1.4.0beta86;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_LDFLAGS = "-lz";
 				PRODUCT_NAME = libpng;
 				WRAPPER_EXTENSION = framework;
-				ZERO_LINK = YES;
 			};
 			name = Debug;
 		};
 		4FADC24408B4156D00ABE55E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				DYLIB_COMPATIBILITY_VERSION = 14;
 				DYLIB_CURRENT_VERSION = 14;
 				FRAMEWORK_VERSION = 1.4.0beta86;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_LDFLAGS = "-lz";
@@ -266,24 +261,34 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
 					i386,
+					ppc,
+					ppc64,
+					x86_64,
 				);
+				DEPLOYMENT_POSTPROCESSING = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_VERSION_i386 = 4.0;
 				GCC_VERSION_ppc = 3.3;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.2;
 				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.2;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				"SDKROOT[arch=i386]" = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
-				"SDKROOT[arch=ppc]" = "$(DEVELOPER_SDK_DIR)/MacOSX10.2.8.sdk";
+				"SDKROOT[arch=ppc]" = "$(DEVELOPER_SDK_DIR)/MacOSX10.3.9.sdk";
 				SDKROOT_i386 = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
-				SDKROOT_ppc = "$(DEVELOPER_SDK_DIR)/MacOSX10.2.8.sdk";
+				SDKROOT_ppc = "$(DEVELOPER_SDK_DIR)/MacOSX10.3.9.sdk";
+				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
@@ -291,24 +296,33 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
 					i386,
+					ppc,
+					ppc64,
+					x86_64,
 				);
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_VERSION_i386 = 4.0;
 				GCC_VERSION_ppc = 3.3;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.2;
 				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.2;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				"SDKROOT[arch=i386]" = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
-				"SDKROOT[arch=ppc]" = "$(DEVELOPER_SDK_DIR)/MacOSX10.2.8.sdk";
+				"SDKROOT[arch=ppc]" = "$(DEVELOPER_SDK_DIR)/MacOSX10.3.9.sdk";
 				SDKROOT_i386 = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
-				SDKROOT_ppc = "$(DEVELOPER_SDK_DIR)/MacOSX10.2.8.sdk";
+				SDKROOT_ppc = "$(DEVELOPER_SDK_DIR)/MacOSX10.3.9.sdk";
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
