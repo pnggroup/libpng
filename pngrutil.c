@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 [October 2, 2009]
+ * Last changed in libpng 1.4.0 [October 7, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -212,7 +212,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                               png_size_t chunklength,
                               png_size_t prefix_size, png_size_t *newlength)
 {
-   static PNG_CONST char msg[] = "Error decoding compressed text";
+   static PNG_CONST char msg[] = "Error decoding compressed chunk";
    png_charp text;
    png_size_t text_size;
 
@@ -1111,7 +1111,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_bytep entry_start;
    png_sPLT_t new_palette;
-#ifndef PNG_POINTER_INDEXING_SUPPORTED
+#ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_sPLT_entryp pp;
 #endif
    int data_length, entry_size, i;
@@ -1214,7 +1214,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (i = 0; i < new_palette.nentries; i++)
    {
-      png_sPLT_entryp pp = new_palette.entries + i;
+      pp = new_palette.entries + i;
 
       if (new_palette.depth == 8)
       {
