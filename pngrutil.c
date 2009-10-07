@@ -1120,14 +1120,14 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 }
 #endif /* PNG_READ_iCCP_SUPPORTED */
 
-#if defined(PNG_READ_sPLT_SUPPORTED)
+#ifdef PNG_READ_sPLT_SUPPORTED
 void /* PRIVATE */
 png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 /* Note: this does not properly handle chunks that are > 64K under DOS */
 {
    png_bytep entry_start;
    png_sPLT_t new_palette;
-#ifdef PNG_NO_POINTER_INDEXING
+#ifndef PNG_NO_POINTER_INDEXING
    png_sPLT_entryp pp;
 #endif
    int data_length, entry_size, i;
@@ -1213,7 +1213,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifndef PNG_NO_POINTER_INDEXING
    for (i = 0; i < new_palette.nentries; i++)
    {
-      png_sPLT_entryp pp = new_palette.entries + i;
+      pp = new_palette.entries + i;
 
       if (new_palette.depth == 8)
       {

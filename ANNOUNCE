@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta04 - October 5, 2009
+Libpng 1.2.41beta04 - October 7, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,9 +55,10 @@ version 1.2.41beta03 [October 1, 2009]
   Revised png_check_IHDR() again, to check info_ptr members instead of
     the contents of the returned parameters.
 
-version 1.2.41beta04 [October 5, 2009]
+version 1.2.41beta04 [October 7, 2009]
   Added "xcode" project similar one already in libpng-1.4.0beta (Alam Arias).
   Ported some cosmetic changes from libpng-1.4.0beta86.
+  Eliminated a shadowed declaration of "pp" in png_handle_sPLT().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
