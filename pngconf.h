@@ -494,14 +494,16 @@
  */
 
 #if defined(PNG_1_0_X) || defined (PNG_1_2_X)
-#  ifndef PNG_NO_iTXt_SUPPORTED
-#    define PNG_NO_iTXt_SUPPORTED
-#  endif
-#  ifndef PNG_NO_READ_iTXt
-#    define PNG_NO_READ_iTXt
-#  endif
-#  ifndef PNG_NO_WRITE_iTXt
-#    define PNG_NO_WRITE_iTXt
+#  ifndef PNG_iTXt_SUPPORTED
+#    ifndef PNG_NO_iTXt_SUPPORTED
+#      define PNG_NO_iTXt_SUPPORTED
+#    endif
+#    ifndef PNG_NO_READ_iTXt
+#      define PNG_NO_READ_iTXt
+#    endif
+#    ifndef PNG_NO_WRITE_iTXt
+#      define PNG_NO_WRITE_iTXt
+#    endif
 #  endif
 #endif
 

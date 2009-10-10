@@ -61,6 +61,7 @@ version 1.2.41beta04 [October 7, 2009]
   Eliminated a shadowed declaration of "pp" in png_handle_sPLT().
 
 version 1.2.41beta05 [October 10, 2009]
+  Revised pngconf.h to make it easier to enable iTXt support.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
