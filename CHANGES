@@ -2492,6 +2492,8 @@ version 1.2.41beta04 [October 7, 2009]
 
 version 1.2.41beta05 [October 10, 2009]
   Revised pngconf.h to make it easier to enable iTXt support.
+  Ported some cosmetic changes from libpng-1.4.0beta87, changing
+    many "#if defined(x)" to "#ifdef x".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

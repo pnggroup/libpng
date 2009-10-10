@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.40 [October 10, 2009]
+ * Last changed in libpng 1.2.41 [October 10, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -459,7 +459,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
     * 5. The color_type is RGB or RGBA
     */
    if (
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
+#ifdef PNG_MNG_FEATURES_SUPPORTED
       !((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
       ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) == 0) &&
       (color_type == PNG_COLOR_TYPE_RGB ||
@@ -487,7 +487,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->bit_depth = (png_byte)bit_depth;
    png_ptr->color_type = (png_byte)color_type;
    png_ptr->interlaced = (png_byte)interlace_type;
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
+#ifdef PNG_MNG_FEATURES_SUPPORTED
    png_ptr->filter_type = (png_byte)filter_type;
 #endif
    png_ptr->compression_type = (png_byte)compression_type;
@@ -579,7 +579,7 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
    png_debug(1, "in png_write_PLTE");
 
    if ((
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
+#ifdef PNG_MNG_FEATURES_SUPPORTED
         !(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE) &&
 #endif
         num_pal == 0) || num_pal > 256)
@@ -700,7 +700,7 @@ png_write_IEND(png_structp png_ptr)
    png_ptr->mode |= PNG_HAVE_IEND;
 }
 
-#if defined(PNG_WRITE_gAMA_SUPPORTED)
+#ifdef PNG_WRITE_gAMA_SUPPORTED
 /* Write a gAMA chunk */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void /* PRIVATE */
@@ -738,7 +738,7 @@ png_write_gAMA_fixed(png_structp png_ptr, png_fixed_point file_gamma)
 #endif
 #endif
 
-#if defined(PNG_WRITE_sRGB_SUPPORTED)
+#ifdef PNG_WRITE_sRGB_SUPPORTED
 /* Write a sRGB chunk */
 void /* PRIVATE */
 png_write_sRGB(png_structp png_ptr, int srgb_intent)
@@ -758,7 +758,7 @@ png_write_sRGB(png_structp png_ptr, int srgb_intent)
 }
 #endif
 
-#if defined(PNG_WRITE_iCCP_SUPPORTED)
+#ifdef PNG_WRITE_iCCP_SUPPORTED
 /* Write an iCCP chunk */
 void /* PRIVATE */
 png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
@@ -839,7 +839,7 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
 }
 #endif
 
-#if defined(PNG_WRITE_sPLT_SUPPORTED)
+#ifdef PNG_WRITE_sPLT_SUPPORTED
 /* Write a sPLT chunk */
 void /* PRIVATE */
 png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
@@ -920,7 +920,7 @@ png_write_sPLT(png_structp png_ptr, png_sPLT_tp spalette)
 }
 #endif
 
-#if defined(PNG_WRITE_sBIT_SUPPORTED)
+#ifdef PNG_WRITE_sBIT_SUPPORTED
 /* Write the sBIT chunk */
 void /* PRIVATE */
 png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
@@ -977,7 +977,7 @@ png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
 }
 #endif
 
-#if defined(PNG_WRITE_cHRM_SUPPORTED)
+#ifdef PNG_WRITE_cHRM_SUPPORTED
 /* Write the cHRM chunk */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void /* PRIVATE */
@@ -1004,7 +1004,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
    int_blue_x  = (png_uint_32)(blue_x  * 100000.0 + 0.5);
    int_blue_y  = (png_uint_32)(blue_y  * 100000.0 + 0.5);
 
-#if !defined(PNG_NO_CHECK_cHRM)
+#ifndef PNG_NO_CHECK_cHRM
    if (png_check_cHRM_fixed(png_ptr, int_white_x, int_white_y,
       int_red_x, int_red_y, int_green_x, int_green_y, int_blue_x, int_blue_y))
 #endif
@@ -1042,7 +1042,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
    png_debug(1, "in png_write_cHRM");
 
    /* Each value is saved in 1/100,000ths */
-#if !defined(PNG_NO_CHECK_cHRM)
+#ifndef PNG_NO_CHECK_cHRM
    if (png_check_cHRM_fixed(png_ptr, white_x, white_y, red_x, red_y,
       green_x, green_y, blue_x, blue_y))
 #endif
@@ -1065,7 +1065,7 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
 #endif
 #endif
 
-#if defined(PNG_WRITE_tRNS_SUPPORTED)
+#ifdef PNG_WRITE_tRNS_SUPPORTED
 /* Write the tRNS chunk */
 void /* PRIVATE */
 png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
@@ -1122,7 +1122,7 @@ png_write_tRNS(png_structp png_ptr, png_bytep trans, png_color_16p tran,
 }
 #endif
 
-#if defined(PNG_WRITE_bKGD_SUPPORTED)
+#ifdef PNG_WRITE_bKGD_SUPPORTED
 /* Write the background chunk */
 void /* PRIVATE */
 png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
@@ -1137,7 +1137,7 @@ png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
    if (color_type == PNG_COLOR_TYPE_PALETTE)
    {
       if (
-#if defined(PNG_MNG_FEATURES_SUPPORTED)
+#ifdef PNG_MNG_FEATURES_SUPPORTED
           (png_ptr->num_palette ||
           (!(png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE))) &&
 #endif
@@ -1176,7 +1176,7 @@ png_write_bKGD(png_structp png_ptr, png_color_16p back, int color_type)
 }
 #endif
 
-#if defined(PNG_WRITE_hIST_SUPPORTED)
+#ifdef PNG_WRITE_hIST_SUPPORTED
 /* Write the histogram */
 void /* PRIVATE */
 png_write_hIST(png_structp png_ptr, png_uint_16p hist, int num_hist)
@@ -1340,7 +1340,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 }
 #endif
 
-#if defined(PNG_WRITE_tEXt_SUPPORTED)
+#ifdef PNG_WRITE_tEXt_SUPPORTED
 /* Write a tEXt chunk */
 void /* PRIVATE */
 png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
@@ -1381,7 +1381,7 @@ png_write_tEXt(png_structp png_ptr, png_charp key, png_charp text,
 }
 #endif
 
-#if defined(PNG_WRITE_zTXt_SUPPORTED)
+#ifdef PNG_WRITE_zTXt_SUPPORTED
 /* Write a compressed text chunk */
 void /* PRIVATE */
 png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
@@ -1441,7 +1441,7 @@ png_write_zTXt(png_structp png_ptr, png_charp key, png_charp text,
 }
 #endif
 
-#if defined(PNG_WRITE_iTXt_SUPPORTED)
+#ifdef PNG_WRITE_iTXt_SUPPORTED
 /* Write an iTXt chunk */
 void /* PRIVATE */
 png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
@@ -1530,7 +1530,7 @@ png_write_iTXt(png_structp png_ptr, int compression, png_charp key,
 }
 #endif
 
-#if defined(PNG_WRITE_oFFs_SUPPORTED)
+#ifdef PNG_WRITE_oFFs_SUPPORTED
 /* Write the oFFs chunk */
 void /* PRIVATE */
 png_write_oFFs(png_structp png_ptr, png_int_32 x_offset, png_int_32 y_offset,
@@ -1553,7 +1553,7 @@ png_write_oFFs(png_structp png_ptr, png_int_32 x_offset, png_int_32 y_offset,
    png_write_chunk(png_ptr, (png_bytep)png_oFFs, buf, (png_size_t)9);
 }
 #endif
-#if defined(PNG_WRITE_pCAL_SUPPORTED)
+#ifdef PNG_WRITE_pCAL_SUPPORTED
 /* Write the pCAL chunk (described in the PNG extensions document) */
 void /* PRIVATE */
 png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
@@ -1616,7 +1616,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
 }
 #endif
 
-#if defined(PNG_WRITE_sCAL_SUPPORTED)
+#ifdef PNG_WRITE_sCAL_SUPPORTED
 /* Write the sCAL chunk */
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && !defined(PNG_NO_STDIO)
 void /* PRIVATE */
@@ -1631,7 +1631,7 @@ png_write_sCAL(png_structp png_ptr, int unit, double width, double height)
    png_debug(1, "in png_write_sCAL");
 
    buf[0] = (char)unit;
-#if defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
 /* sprintf() function is not supported on WindowsCE */
    {
       wchar_t wc_buf[32];
@@ -1690,7 +1690,7 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
 #endif
 #endif
 
-#if defined(PNG_WRITE_pHYs_SUPPORTED)
+#ifdef PNG_WRITE_pHYs_SUPPORTED
 /* Write the pHYs chunk */
 void /* PRIVATE */
 png_write_pHYs(png_structp png_ptr, png_uint_32 x_pixels_per_unit,
@@ -1715,7 +1715,7 @@ png_write_pHYs(png_structp png_ptr, png_uint_32 x_pixels_per_unit,
 }
 #endif
 
-#if defined(PNG_WRITE_tIME_SUPPORTED)
+#ifdef PNG_WRITE_tIME_SUPPORTED
 /* Write the tIME chunk.  Use either png_convert_from_struct_tm()
  * or png_convert_from_time_t(), or fill in the structure yourself.
  */
@@ -1753,7 +1753,6 @@ void /* PRIVATE */
 png_write_start_row(png_structp png_ptr)
 {
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
-#ifdef PNG_USE_LOCAL_ARRAYS
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
@@ -1767,7 +1766,6 @@ png_write_start_row(png_structp png_ptr)
 
    /* Offset to next interlace block in the y direction */
    int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
-#endif
 #endif
 
    png_size_t buf_size;
@@ -1820,7 +1818,7 @@ png_write_start_row(png_structp png_ptr)
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
    }
-#endif /* PNG_NO_WRITE_FILTER */
+#endif /* PNG_WRITE_FILTER_SUPPORTED */
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* If interlaced, we need to set up width and height of pass */
@@ -1854,7 +1852,6 @@ void /* PRIVATE */
 png_write_finish_row(png_structp png_ptr)
 {
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
-#ifdef PNG_USE_LOCAL_ARRAYS
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
@@ -1868,7 +1865,6 @@ png_write_finish_row(png_structp png_ptr)
 
    /* Offset to next interlace block in the y direction */
    int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
-#endif
 #endif
 
    int ret;
@@ -1962,7 +1958,7 @@ png_write_finish_row(png_structp png_ptr)
    png_ptr->zstream.data_type = Z_BINARY;
 }
 
-#if defined(PNG_WRITE_INTERLACING_SUPPORTED)
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
 /* Pick out the correct pixels for the interlace pass.
  * The basic idea here is to go through the row with a source
  * pointer and a destination pointer (sp and dp), and copy the
@@ -1973,7 +1969,6 @@ png_write_finish_row(png_structp png_ptr)
 void /* PRIVATE */
 png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 {
-#ifdef PNG_USE_LOCAL_ARRAYS
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
@@ -1981,12 +1976,11 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 
    /* Offset to next interlace block */
    int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
-#endif
 
    png_debug(1, "in png_do_write_interlace");
 
    /* We don't have to do anything on the last pass (6) */
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
    if (row != NULL && row_info != NULL && pass < 6)
 #else
    if (pass < 6)
@@ -2206,7 +2200,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          sum += (v < 128) ? v : 256 - v;
       }
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          png_uint_32 sumhi, sumlo;
@@ -2270,7 +2264,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_uint_32 i;
       int v;
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       /* We temporarily increase the "minimum sum" by the factor we
        * would reduce the sum of this filter, so that we can do the
        * early exit comparison without scaling the sum each time.
@@ -2323,7 +2317,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
             break;
       }
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          int j;
@@ -2384,7 +2378,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       int v;
 
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          int j;
@@ -2426,7 +2420,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
             break;
       }
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          int j;
@@ -2489,7 +2483,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_uint_32 i;
       int v;
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          int j;
@@ -2538,7 +2532,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
             break;
       }
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          int j;
@@ -2622,7 +2616,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_uint_32 i;
       int v;
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          int j;
@@ -2703,7 +2697,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
             break;
       }
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
          int j;
@@ -2739,13 +2733,13 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
          best_row = png_ptr->paeth_row;
       }
    }
-#endif /* PNG_NO_WRITE_FILTER */
+#endif /* PNG_WRITE_FILTER_SUPPORTED */
    /* Do the actual writing of the filtered row data from the chosen filter. */
 
    png_write_filtered_row(png_ptr, best_row);
 
 #ifndef PNG_NO_WRITE_FILTER
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    /* Save the type of filter we picked this time for future calculations */
    if (png_ptr->num_prev_filters > 0)
    {
@@ -2757,7 +2751,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       png_ptr->prev_filters[j] = best_row[0];
    }
 #endif
-#endif /* PNG_NO_WRITE_FILTER */
+#endif /* PNG_WRITE_FILTER_SUPPORTED */
 }
 
 
@@ -2812,7 +2806,7 @@ png_write_filtered_row(png_structp png_ptr, png_bytep filtered_row)
    /* Finish row - updates counters and flushes zlib if last row */
    png_write_finish_row(png_ptr);
 
-#if defined(PNG_WRITE_FLUSH_SUPPORTED)
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
    png_ptr->flush_rows++;
 
    if (png_ptr->flush_dist > 0 &&
