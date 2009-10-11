@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta05 - October 10, 2009
+Libpng 1.2.41beta05 - October 11, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -60,8 +60,9 @@ version 1.2.41beta04 [October 7, 2009]
   Ported some cosmetic changes from libpng-1.4.0beta86.
   Eliminated a shadowed declaration of "pp" in png_handle_sPLT().
 
-version 1.2.41beta05 [October 10, 2009]
-  Revised pngconf.h to make it easier to enable iTXt support.
+version 1.2.41beta05 [October 11, 2009]
+  Revised pngconf.h to make it easier to enable iTXt support.  Previously
+    defining PNG_iTXt_SUPPORTED would not work as expected.
   Ported some cosmetic changes from libpng-1.4.0beta87, changing
     many "#if defined(x)" to "#ifdef x".
 
