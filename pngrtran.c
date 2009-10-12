@@ -745,7 +745,7 @@ void /* PRIVATE */
 png_init_read_transformations(png_structp png_ptr)
 {
    png_debug(1, "in png_init_read_transformations");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
    if (png_ptr != NULL)
 #endif
   {
@@ -1550,7 +1550,7 @@ void /* PRIVATE */
 png_do_unpack(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_unpack");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
    if (row != NULL && row_info != NULL && row_info->bit_depth < 8)
 #else
    if (row_info->bit_depth < 8)
@@ -1643,7 +1643,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
 {
    png_debug(1, "in png_do_unshift");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
        row != NULL && row_info != NULL && sig_bits != NULL &&
 #endif
        row_info->color_type != PNG_COLOR_TYPE_PALETTE)
@@ -1751,7 +1751,7 @@ void /* PRIVATE */
 png_do_chop(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_chop");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
    if (row != NULL && row_info != NULL && row_info->bit_depth == 16)
 #else
    if (row_info->bit_depth == 16)
@@ -1808,7 +1808,7 @@ void /* PRIVATE */
 png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_read_swap_alpha");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
    if (row != NULL && row_info != NULL)
 #endif
    {
@@ -1900,7 +1900,7 @@ void /* PRIVATE */
 png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_read_invert_alpha");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
    if (row != NULL && row_info != NULL)
 #endif
    {
@@ -2007,7 +2007,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
 
    png_debug(1, "in png_do_read_filler");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
        row != NULL  && row_info != NULL &&
 #endif
        row_info->color_type == PNG_COLOR_TYPE_GRAY)
@@ -2179,7 +2179,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 
    png_debug(1, "in png_do_gray_to_rgb");
    if (row_info->bit_depth >= 8 &&
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
        row != NULL && row_info != NULL &&
 #endif
       !(row_info->color_type & PNG_COLOR_MASK_COLOR))
@@ -2285,7 +2285,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
 
    png_debug(1, "in png_do_rgb_to_gray");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
        row != NULL && row_info != NULL &&
 #endif
       (row_info->color_type & PNG_COLOR_MASK_COLOR))
@@ -2766,7 +2766,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
 
    png_debug(1, "in png_do_background");
    if (background != NULL &&
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
        row != NULL && row_info != NULL &&
 #endif
       (!(row_info->color_type & PNG_COLOR_MASK_ALPHA) ||
@@ -3455,7 +3455,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
 
    png_debug(1, "in png_do_gamma");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
        row != NULL && row_info != NULL &&
 #endif
        ((row_info->bit_depth <= 8 && gamma_table != NULL) ||
@@ -3643,7 +3643,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
 
    png_debug(1, "in png_do_expand_palette");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
        row != NULL && row_info != NULL &&
 #endif
        row_info->color_type == PNG_COLOR_TYPE_PALETTE)
@@ -3788,7 +3788,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
    png_uint_32 row_width=row_info->width;
 
    png_debug(1, "in png_do_expand");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
    if (row != NULL && row_info != NULL)
 #endif
    {
@@ -3999,7 +3999,7 @@ png_do_dither(png_row_infop row_info, png_bytep row,
    png_uint_32 row_width=row_info->width;
 
    png_debug(1, "in png_do_dither");
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
    if (row != NULL && row_info != NULL)
 #endif
    {
@@ -4321,7 +4321,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_read_intrapixel");
    if (
-#if defined(PNG_USELESS_TESTS_SUPPORTED)
+#ifdef PNG_USELESS_TESTS_SUPPORTED
        row != NULL && row_info != NULL &&
 #endif
        (row_info->color_type & PNG_COLOR_MASK_COLOR))
