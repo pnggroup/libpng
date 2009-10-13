@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.0 [October 10, 2009]
+ * Last changed in libpng 1.4.0 [October 13, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -151,7 +151,6 @@ static PNG_CONST char png_digit[16] = {
 };
 
 #define PNG_MAX_ERROR_TEXT 64
-
 #if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_ERROR_TEXT_SUPPORTED)
 static void /* PRIVATE */
 png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
@@ -303,7 +302,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 static void /* PRIVATE */
 png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 {
-#ifndef PNG_CONSOLE_IO_SUPPORTED
+#ifdef PNG_CONSOLE_IO_SUPPORTED
 #  ifdef PNG_ERROR_NUMBERS_SUPPORTED
    if (*warning_message == PNG_LITERAL_SHARP)
    {
