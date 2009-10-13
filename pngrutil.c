@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 [October 10, 2009]
+ * Last changed in libpng 1.4.0 [October 13, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -3271,9 +3271,9 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
      if (png_ptr->interlaced)
-       png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr, row_bytes + 64);
+        png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr, row_bytes + 64);
      else
-      png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
+     png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
      png_ptr->row_buf = png_ptr->big_row_buf + 32;
      png_ptr->old_big_row_buf_size = row_bytes + 64;
    }
@@ -3285,12 +3285,12 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if ((png_uint_32)png_ptr->rowbytes > (png_uint_32)(PNG_SIZE_MAX - 1))
       png_error(png_ptr, "Row has too many bytes to allocate in memory");
 
-   if (png_ptr->rowbytes+1 > png_ptr->old_prev_row_size)
+   if (png_ptr->rowbytes + 1 > png_ptr->old_prev_row_size)
    {
-     png_free(png_ptr, png_ptr->prev_row);
-     png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
+      png_free(png_ptr, png_ptr->prev_row);
+      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
         png_ptr->rowbytes + 1));
-     png_ptr->old_prev_row_size = png_ptr->rowbytes+1;
+      png_ptr->old_prev_row_size = png_ptr->rowbytes + 1;
    }
 
    png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
