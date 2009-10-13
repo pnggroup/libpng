@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.41 [October 12, 2009]
+ * Last changed in libpng 1.2.41 [October 13, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1623,10 +1623,10 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
    if (png_ptr->chunkdata == NULL)
-   {
-      png_warning(png_ptr, "No memory for pCAL purpose.");
-      return;
-   }
+     {
+       png_warning(png_ptr, "No memory for pCAL purpose.");
+       return;
+     }
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
 
@@ -1687,12 +1687,12 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    params = (png_charpp)png_malloc_warn(png_ptr,
       (png_uint_32)(nparams * png_sizeof(png_charp))) ;
    if (params == NULL)
-   {
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      png_warning(png_ptr, "No memory for pCAL params.");
-      return;
-   }
+     {
+       png_free(png_ptr, png_ptr->chunkdata);
+       png_ptr->chunkdata = NULL;
+       png_warning(png_ptr, "No memory for pCAL params.");
+       return;
+     }
 
    /* Get pointers to the start of each parameter string. */
    for (i = 0; i < (int)nparams; i++)
@@ -3184,12 +3184,12 @@ png_read_start_row(png_structp png_ptr)
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) && \
 defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (png_ptr->transformations & PNG_USER_TRANSFORM)
-   {
-      int user_pixel_depth = png_ptr->user_transform_depth*
-        png_ptr->user_transform_channels;
-      if (user_pixel_depth > max_pixel_depth)
-        max_pixel_depth=user_pixel_depth;
-   }
+     {
+       int user_pixel_depth = png_ptr->user_transform_depth*
+         png_ptr->user_transform_channels;
+       if (user_pixel_depth > max_pixel_depth)
+         max_pixel_depth=user_pixel_depth;
+     }
 #endif
 
    /* Align the width on the next larger 8 pixels.  Mainly used
