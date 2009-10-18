@@ -115,8 +115,22 @@
 #  define PNG_WRITE_SUPPORTED
 #endif
 
+/* Added in libpng-1.2.41 */
+#if !defined(PNG_NO_WARNINGS) && !defined(PNG_WARNINGS_SUPPORTED)
+#  define PNG_WARNINGS_SUPPORTED
+#endif
+
+#if !defined(PNG_NO_ERROR_TEXT) && !defined(PNG_ERROR_TEXT_SUPPORTED)
+#  define PNG_ERROR_TEXT_SUPPORTED
+#endif
+
+#if !defined(PNG_NO_CHECK_cHRM) && !defined(PNG_CHECK_cHRM_SUPPORTED)
+#  define PNG_CHECK_cHRM_SUPPORTED
+#endif
+
 /* Enabled by default in 1.2.0.  You can disable this if you don't need to
-   support PNGs that are embedded in MNG datastreams */
+ * support PNGs that are embedded in MNG datastreams
+ */
 #if !defined(PNG_1_0_X) && !defined(PNG_NO_MNG_FEATURES)
 #  ifndef PNG_MNG_FEATURES_SUPPORTED
 #    define PNG_MNG_FEATURES_SUPPORTED
@@ -232,6 +246,10 @@
  * #define PNG_NO_STDIO
  */
 
+#if !defined(PNG_NO_STDIO) && !defined(PNG_STDIO_SUPPORTED)
+#  define PNG_STDIO_SUPPORTED
+#endif
+
 #if defined(_WIN32_WCE)
 #  include <windows.h>
    /* Console I/O functions are not supported on WindowsCE */
@@ -266,6 +284,10 @@
 #      include <stdio.h>
 #    endif
 #  endif
+
+#if !(defined PNG_NO_CONSOLE_IO) && !defined(PNG_CONSOLE_IO_SUPPORTED)
+#  define PNG_CONSOLE_IO_SUPPORTED
+#endif
 
 /* This macro protects us against machines that don't have function
  * prototypes (ie K&R style headers).  If your compiler does not handle
@@ -620,11 +642,20 @@
 #  endif
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
+/* PNG_PROGRESSIVE_READ_NOT_SUPPORTED is deprecated. */
 #if !defined(PNG_NO_PROGRESSIVE_READ) && \
- !defined(PNG_PROGRESSIVE_READ_SUPPORTED) /* if you don't do progressive   */
-#  define PNG_PROGRESSIVE_READ_SUPPORTED  /* reading.  This is not talking */
-#endif                            /* about interlacing capability!  You'll */
-           /* still have interlacing unless you change the following line: */
+ !defined(PNG_PROGRESSIVE_READ_NOT_SUPPORTED)  /* if you don't do progressive */
+#  define PNG_PROGRESSIVE_READ_SUPPORTED     /* reading.  This is not talking */
+#endif                               /* about interlacing capability!  You'll */
+            /* still have interlacing unless you change the following define: */
+#define PNG_READ_INTERLACING_SUPPORTED /* required for PNG-compliant decoders */
+
+/* PNG_NO_SEQUENTIAL_READ_SUPPORTED is deprecated. */
+#if !defined(PNG_NO_SEQUENTIAL_READ) && \
+    !defined(PNG_SEQUENTIAL_READ_SUPPORTED) && \
+    !defined(PNG_NO_SEQUENTIAL_READ_SUPPORTED)
+#  define PNG_SEQUENTIAL_READ_SUPPORTED
+#endif
 
 #define PNG_READ_INTERLACING_SUPPORTED /* required in PNG-compliant decoders */
 
@@ -710,6 +741,7 @@
 
 #endif /* PNG_WRITE_SUPPORTED */
 
+#define PNG_NO_ERROR_NUMBERS
 #ifndef PNG_1_0_X
 #  ifndef PNG_NO_ERROR_NUMBERS
 #    define PNG_ERROR_NUMBERS_SUPPORTED
@@ -843,6 +875,11 @@
 /*
 #define PNG_NO_POINTER_INDEXING
 */
+
+#if !defined(PNG_NO_POINTER_INDEXING) && \
+    !defined(PNG_POINTER_INDEXING_SUPPORTED)
+#  define PNG_POINTER_INDEXING_SUPPORTED
+#endif
 
 /* These functions are turned off by default, as they will be phased out. */
 /*
@@ -1103,6 +1140,10 @@
 #endif
 
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
+
+#if !defined(PNG_NO_WRITE_FILTER) && !defined(PNG_WRITE_FILTER_SUPPORTED)
+#  define PNG_WRITE_FILTER_SUPPORTED
+#endif
 
 #ifndef PNG_NO_WRITE_UNKNOWN_CHUNKS
 #  define PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
