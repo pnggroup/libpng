@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta06 - October 18, 2009
+Libpng 1.2.41beta07 - October 18, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41beta06.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta06.tar.gz
-   libpng-1.2.41beta06.tar.bz2
+   libpng-1.2.41beta07.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta07.tar.gz
+   libpng-1.2.41beta07.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41beta06-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta06-no-config.tar.gz
-   libpng-1.2.41beta06-no-config.tar.bz2
+   libpng-1.2.41beta07-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta07-no-config.tar.gz
+   libpng-1.2.41beta07-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241b06.zip
-   lp1241b06.7z
-   lp1241b06.tar.bz2
+   lp1241b07.zip
+   lp1241b07.7z
+   lp1241b07.tar.bz2
 
 Project files
 
-   libpng-1.2.41beta06-project-netware.zip
-   libpng-1.2.41beta06-project-wince.zip
+   libpng-1.2.41beta07-project-netware.zip
+   libpng-1.2.41beta07-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41beta06-README.txt
-   libpng-1.2.41beta06-KNOWNBUGS.txt
-   libpng-1.2.41beta06-LICENSE.txt
-   libpng-1.2.41beta06-Y2K-compliance.txt
-   libpng-1.2.41beta06-[previous version]-diff.txt
+   libpng-1.2.41beta07-README.txt
+   libpng-1.2.41beta07-KNOWNBUGS.txt
+   libpng-1.2.41beta07-LICENSE.txt
+   libpng-1.2.41beta07-Y2K-compliance.txt
+   libpng-1.2.41beta07-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
@@ -72,6 +72,8 @@ version 1.2.41beta06 [October 18, 2009]
     deleted in libpng-1.2.41beta05.
   Converted all PNG_NO_* tests to PNG_*_SUPPORTED everywhere except pngconf.h
     as in libpng-1.4.0beta78 and later.
+
+version 1.2.41beta07 [October 18, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
