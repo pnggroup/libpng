@@ -331,7 +331,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       }
       if (ret != Z_STREAM_END)
       {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#if defined(PNG_STDIO_SUPPORTED) && !defined(_WIN32_WCE)
          char umsg[52];
 
          if (ret == Z_BUF_ERROR)
@@ -378,7 +378,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    }
    else /* if (comp_type != PNG_COMPRESSION_TYPE_BASE) */
    {
-#if !defined(PNG_NO_STDIO) && !defined(_WIN32_WCE)
+#if defined(PNG_STDIO_SUPPORTED) && !defined(_WIN32_WCE)
       char umsg[50];
 
       png_snprintf(umsg, 50, "Unknown zTXt compression type %d", comp_type);
@@ -473,7 +473,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_color palette[PNG_MAX_PALETTE_LENGTH];
    int num, i;
-#ifndef PNG_NO_POINTER_INDEXING
+#ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_colorp pal_ptr;
 #endif
 
@@ -526,7 +526,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    num = (int)length / 3;
 
-#ifndef PNG_NO_POINTER_INDEXING
+#ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
    {
       png_byte buf[3];
@@ -692,7 +692,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-#ifndef PNG_NO_CONSOLE_IO
+#ifdef PNG_CONSOLE_IO_SUPPORTED
          fprintf(stderr, "gamma = (%d/100000)", (int)igamma);
 #endif
          return;
@@ -872,7 +872,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
          {
             png_warning(png_ptr,
               "Ignoring incorrect cHRM value when sRGB is also present");
-#ifndef PNG_NO_CONSOLE_IO
+#ifdef PNG_CONSOLE_IO_SUPPORTED
 #ifdef PNG_FLOATING_POINT_SUPPORTED
             fprintf(stderr, "wx=%f, wy=%f, rx=%f, ry=%f\n",
                white_x, white_y, red_x, red_y);
@@ -964,7 +964,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
            "Ignoring incorrect gAMA value when sRGB is also present");
-#ifndef PNG_NO_CONSOLE_IO
+#ifdef PNG_CONSOLE_IO_SUPPORTED
 #  ifdef PNG_FIXED_POINT_SUPPORTED
          fprintf(stderr, "incorrect gamma=(%d/100000)\n",
             (int)png_ptr->int_gamma);
@@ -1127,7 +1127,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_bytep entry_start;
    png_sPLT_t new_palette;
-#ifndef PNG_NO_POINTER_INDEXING
+#ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_sPLT_entryp pp;
 #endif
    int data_length, entry_size, i;
@@ -1210,7 +1210,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        return;
    }
 
-#ifndef PNG_NO_POINTER_INDEXING
+#ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (i = 0; i < new_palette.nentries; i++)
    {
       pp = new_palette.entries + i;
@@ -2909,7 +2909,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
    }
 }
 
-#ifndef PNG_NO_SEQUENTIAL_READ
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 void /* PRIVATE */
 png_read_finish_row(png_structp png_ptr)
 {
@@ -3039,7 +3039,7 @@ png_read_finish_row(png_structp png_ptr)
 
    png_ptr->mode |= PNG_AFTER_IDAT;
 }
-#endif /* PNG_NO_SEQUENTIAL_READ */
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
 void /* PRIVATE */
 png_read_start_row(png_structp png_ptr)

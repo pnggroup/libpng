@@ -80,7 +80,7 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-#ifndef PNG_NO_CHECK_cHRM
+#ifdef PNG_CHECK_cHRM_SUPPORTED
    if (png_check_cHRM_fixed(png_ptr,
       white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y))
 #endif

@@ -38,7 +38,7 @@ png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
       png_error(png_ptr, "Call to NULL write function");
 }
 
-#ifndef PNG_NO_STDIO
+#ifdef PNG_STDIO_SUPPORTED
 /* This is the function that does the actual writing of data.  If you are
  * not writing to a standard C stream, you should create a replacement
  * write_data function and use it at run time with png_set_write_fn(), rather
@@ -137,7 +137,7 @@ png_flush(png_structp png_ptr)
       (*(png_ptr->output_flush_fn))(png_ptr);
 }
 
-#ifndef PNG_NO_STDIO
+#ifdef PNG_STDIO_SUPPORTED
 void PNGAPI
 png_default_flush(png_structp png_ptr)
 {
@@ -192,7 +192,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 
    png_ptr->io_ptr = io_ptr;
 
-#ifndef PNG_NO_STDIO
+#ifdef PNG_STDIO_SUPPORTED
    if (write_data_fn != NULL)
       png_ptr->write_data_fn = write_data_fn;
 
@@ -203,7 +203,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 #endif
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-#ifndef PNG_NO_STDIO
+#ifdef PNG_STDIO_SUPPORTED
    if (output_flush_fn != NULL)
       png_ptr->output_flush_fn = output_flush_fn;
 

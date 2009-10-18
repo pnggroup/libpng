@@ -641,7 +641,7 @@ png_get_io_ptr(png_structp png_ptr)
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-#ifndef PNG_NO_STDIO
+#ifdef PNG_STDIO_SUPPORTED
 /* Initialize the default input/output functions for the PNG file.  If you
  * use your own read or write routines, you can call either png_set_read_fn()
  * or png_set_write_fn() instead of png_init_io().  If you have defined
@@ -823,7 +823,7 @@ png_convert_size(size_t size)
 
 /* Added at libpng version 1.2.34 and 1.4.0 (moved from pngset.c) */
 #ifdef PNG_cHRM_SUPPORTED
-#ifndef PNG_NO_CHECK_cHRM
+#ifdef PNG_CHECK_cHRM_SUPPORTED
 
 /*
  *    Multiply two 32-bit numbers, V1 and V2, using 32-bit
@@ -934,7 +934,7 @@ png_check_cHRM_fixed(png_structp png_ptr,
 
    return ret;
 }
-#endif /* PNG_NO_CHECK_cHRM */
+#endif /* PNG_CHECK_cHRM_SUPPORTED */
 #endif /* PNG_cHRM_SUPPORTED */
 
 void /* PRIVATE */

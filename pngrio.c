@@ -39,7 +39,7 @@ png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
       png_error(png_ptr, "Call to NULL read function");
 }
 
-#ifndef PNG_NO_STDIO
+#ifdef PNG_STDIO_SUPPORTED
 /* This is the function that does the actual reading of data.  If you are
  * not reading from a standard C stream, you should create a replacement
  * read_data function and use it at run time with png_set_read_fn(), rather
@@ -152,7 +152,7 @@ png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
       return;
    png_ptr->io_ptr = io_ptr;
 
-#ifndef PNG_NO_STDIO
+#ifdef PNG_STDIO_SUPPORTED
    if (read_data_fn != NULL)
       png_ptr->read_data_fn = read_data_fn;
    else

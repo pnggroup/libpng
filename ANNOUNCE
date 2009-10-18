@@ -70,6 +70,8 @@ version 1.2.41beta05 [October 17, 2009]
 version 1.2.41beta06 [October 18, 2009]
   Restored PNG_USE_LOCAL_ARRAYS code in pngread.c that was inadvertently
     deleted in libpng-1.2.41beta05.
+  Converted all PNG_NO_* tests to PNG_*_SUPPORTED everywhere except pngconf.h
+    as in libpng-1.4.0beta78 and later.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

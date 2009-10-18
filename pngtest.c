@@ -54,7 +54,7 @@
 #  define FCLOSE(file) fclose(file)
 #endif
 
-#ifdef PNG_NO_STDIO
+#ifndef PNG_STDIO_SUPPORTED
 #  ifdef _WIN32_WCE
      typedef HANDLE                png_FILE_p;
 #  else
@@ -297,7 +297,7 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 
 static int wrote_question = 0;
 
-#ifdef PNG_NO_STDIO
+#ifndef PNG_STDIO_SUPPORTED
 /* START of code to validate stdio-free compilation */
 /* These copies of the default read/write functions come from pngrio.c and
  * pngwio.c.  They allow "don't include stdio" testing of the library.
@@ -742,7 +742,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_create_read_struct(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
       png_error_ptr_NULL, png_error_ptr_NULL);
 #endif
-#ifdef PNG_NO_STDIO
+#ifndef PNG_STDIO_SUPPORTED
    png_set_error_fn(read_ptr, (png_voidp)inname, pngtest_error,
        pngtest_warning);
 #endif
@@ -767,7 +767,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_create_write_struct(PNG_LIBPNG_VER_STRING, png_voidp_NULL,
       png_error_ptr_NULL, png_error_ptr_NULL);
 #endif
-#ifdef PNG_NO_STDIO
+#ifndef PNG_STDIO_SUPPORTED
    png_set_error_fn(write_ptr, (png_voidp)inname, pngtest_error,
        pngtest_warning);
 #endif
@@ -829,7 +829,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
    png_debug(0, "Initializing input and output streams");
-#ifndef PNG_NO_STDIO
+#ifdef PNG_STDIO_SUPPORTED
    png_init_io(read_ptr, fpin);
 #  ifdef PNG_WRITE_SUPPORTED
    png_init_io(write_ptr, fpout);
