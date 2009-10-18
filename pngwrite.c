@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.4.0 [October 1, 2009]
+ * Last changed in libpng 1.4.0 [October 17, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -40,7 +40,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
    if ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE)&&(png_ptr->mng_features_permitted))
    {
       png_warning(png_ptr, "MNG features are not allowed in a PNG datastream");
-      png_ptr->mng_features_permitted=0;
+      png_ptr->mng_features_permitted = 0;
    }
 #endif
    /* Write IHDR information. */
@@ -111,7 +111,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
            up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
            up++)
       {
-         int keep=png_handle_as_unknown(png_ptr, up->name);
+         int keep = png_handle_as_unknown(png_ptr, up->name);
          if (keep != PNG_HANDLE_CHUNK_NEVER &&
             up->location && !(up->location & PNG_HAVE_PLTE) &&
             !(up->location & PNG_HAVE_IDAT) &&
@@ -158,7 +158,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
          int j;
-         for (j=0; j<(int)info_ptr->num_trans; j++)
+         for (j = 0; j<(int)info_ptr->num_trans; j++)
             info_ptr->trans_alpha[j] = (png_byte)(255 - info_ptr->trans_alpha[j]);
       }
 #endif
@@ -289,7 +289,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
            up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
            up++)
       {
-         int keep=png_handle_as_unknown(png_ptr, up->name);
+         int keep = png_handle_as_unknown(png_ptr, up->name);
          if (keep != PNG_HANDLE_CHUNK_NEVER &&
             up->location && (up->location & PNG_HAVE_PLTE) &&
             !(up->location & PNG_HAVE_IDAT) &&
@@ -392,7 +392,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
            up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
            up++)
       {
-         int keep=png_handle_as_unknown(png_ptr, up->name);
+         int keep = png_handle_as_unknown(png_ptr, up->name);
          if (keep != PNG_HANDLE_CHUNK_NEVER &&
             up->location && (up->location & PNG_AFTER_IDAT) &&
             ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
@@ -490,8 +490,8 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
    /* Added at libpng-1.2.6 */
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   png_ptr->user_width_max=PNG_USER_WIDTH_MAX;
-   png_ptr->user_height_max=PNG_USER_HEIGHT_MAX;
+   png_ptr->user_width_max = PNG_USER_WIDTH_MAX;
+   png_ptr->user_height_max = PNG_USER_HEIGHT_MAX;
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -513,7 +513,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (user_png_ver)
    {
-      i=0;
+      i = 0;
       do
       {
          if (user_png_ver[i] != png_libpng_ver[i])
@@ -547,7 +547,7 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
         png_warning(png_ptr, msg);
 #endif
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-        png_ptr->flags=0;
+        png_ptr->flags = 0;
 #endif
         png_warning(png_ptr,
            "Incompatible libpng version in application and library");
@@ -1053,16 +1053,16 @@ png_set_filter(png_structp png_ptr, int method, int filters)
          case 7: png_warning(png_ptr, "Unknown row filter for method 0");
 #endif /* PNG_WRITE_FILTER_SUPPORTED */
          case PNG_FILTER_VALUE_NONE:
-              png_ptr->do_filter=PNG_FILTER_NONE; break;
+              png_ptr->do_filter = PNG_FILTER_NONE; break;
 #ifdef PNG_WRITE_FILTER_SUPPORTED
          case PNG_FILTER_VALUE_SUB:
-              png_ptr->do_filter=PNG_FILTER_SUB; break;
+              png_ptr->do_filter = PNG_FILTER_SUB; break;
          case PNG_FILTER_VALUE_UP:
-              png_ptr->do_filter=PNG_FILTER_UP; break;
+              png_ptr->do_filter = PNG_FILTER_UP; break;
          case PNG_FILTER_VALUE_AVG:
-              png_ptr->do_filter=PNG_FILTER_AVG; break;
+              png_ptr->do_filter = PNG_FILTER_AVG; break;
          case PNG_FILTER_VALUE_PAETH:
-              png_ptr->do_filter=PNG_FILTER_PAETH; break;
+              png_ptr->do_filter = PNG_FILTER_PAETH; break;
          default: png_ptr->do_filter = (png_byte)filters; break;
 #else
          default: png_warning(png_ptr, "Unknown row filter for method 0");
@@ -1317,7 +1317,7 @@ png_set_compression_window_bits(png_structp png_ptr, int window_bits)
    if (window_bits == 8)
      {
        png_warning(png_ptr, "Compression window is being reset to 512");
-       window_bits=9;
+       window_bits = 9;
      }
 #endif
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_WINDOW_BITS;
