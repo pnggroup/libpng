@@ -2466,7 +2466,7 @@ version 1.2.40beta01 [August 20, 2009]
 version 1.2.40rc01 [September 2, 2009]
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
-version 1.2.40 and 1.0.49 [October 11, 2009]
+version 1.2.40 and 1.0.49 [October 18, 2009]
   No changes.
 
 version 1.0.50 [September 10, 2009]
@@ -2490,11 +2490,14 @@ version 1.2.41beta04 [October 7, 2009]
   Ported some cosmetic changes from libpng-1.4.0beta86.
   Eliminated a shadowed declaration of "pp" in png_handle_sPLT().
 
-version 1.2.41beta05 [October 11, 2009]
-  Revised pngconf.h to make it easier to enable iTXt support.  Previously
-    defining PNG_iTXt_SUPPORTED would not work as expected.
+version 1.2.41beta05 [October 17, 2009]
+  Revised pngconf.h to make it easier to enable iTXt support.  From libpng
+    version 1.2.9 through 1.2.40, defining PNG_iTXt_SUPPORTED did not work
+    as expected.
   Ported some cosmetic changes from libpng-1.4.0beta87, changing
     many "#if defined(x)" to "#ifdef x".
+
+version 1.2.41beta06 [October 18, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

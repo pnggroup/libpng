@@ -27,7 +27,7 @@ png_default_error PNGARG((png_structp png_ptr,
 static void /* PRIVATE */
 png_default_warning PNGARG((png_structp png_ptr,
   png_const_charp warning_message));
-#endif /* PNG_NO_WARNINGS */
+#endif /* PNG_WARNINGS_SUPPORTED */
 
 /* This function is called whenever there is a fatal error.  This function
  * should not be changed.  If there is a need to handle errors differently,
@@ -93,7 +93,7 @@ png_err(png_structp png_ptr)
       use the default handler, which will not return. */
    png_default_error(png_ptr, '\0');
 }
-#endif /* PNG_NO_ERROR_TEXT */
+#endif /* PNG_ERROR_TEXT_SUPPORTED */
 
 #ifndef PNG_NO_WARNINGS
 /* This function is called whenever there is a non-fatal error.  This function
@@ -125,7 +125,7 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
    else
       png_default_warning(png_ptr, warning_message + offset);
 }
-#endif /* PNG_NO_WARNINGS */
+#endif /* PNG_WARNINGS_SUPPORTED */
 
 
 /* These utilities are used internally to build an error message that relates
@@ -141,7 +141,6 @@ static PNG_CONST char png_digit[16] = {
 };
 
 #define PNG_MAX_ERROR_TEXT 64
-
 #if !defined(PNG_NO_WARNINGS) || !defined(PNG_NO_ERROR_TEXT)
 static void /* PRIVATE */
 png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
@@ -190,7 +189,7 @@ png_chunk_error(png_structp png_ptr, png_const_charp error_message)
    }
 }
 #endif /* PNG_READ_SUPPORTED */
-#endif /* !defined(PNG_NO_WARNINGS) || !defined(PNG_NO_ERROR_TEXT) */
+#endif /* PNG_WARNINGS_SUPPORTED || PNG_ERROR_TEXT_SUPPORTED */
 
 #ifndef PNG_NO_WARNINGS
 void PNGAPI
@@ -205,7 +204,7 @@ png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
      png_warning(png_ptr, msg);
    }
 }
-#endif /* PNG_NO_WARNINGS */
+#endif /* PNG_WARNINGS_SUPPORTED */
 
 
 /* This is the default error handling function.  Note that replacements for
@@ -318,7 +317,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 #endif
    png_ptr = png_ptr; /* Make compiler happy */
 }
-#endif /* PNG_NO_WARNINGS */
+#endif /* PNG_WARNINGS_SUPPORTED */
 
 /* This function is called when the application wants to use another method
  * of handling errors and warnings.  Note that the error function MUST NOT

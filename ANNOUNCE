@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta05 - October 11, 2009
+Libpng 1.2.41beta06 - October 18, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41beta05.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta05.tar.gz
-   libpng-1.2.41beta05.tar.bz2
+   libpng-1.2.41beta06.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta06.tar.gz
+   libpng-1.2.41beta06.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41beta05-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta05-no-config.tar.gz
-   libpng-1.2.41beta05-no-config.tar.bz2
+   libpng-1.2.41beta06-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta06-no-config.tar.gz
+   libpng-1.2.41beta06-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241b05.zip
-   lp1241b05.7z
-   lp1241b05.tar.bz2
+   lp1241b06.zip
+   lp1241b06.7z
+   lp1241b06.tar.bz2
 
 Project files
 
-   libpng-1.2.41beta05-project-netware.zip
-   libpng-1.2.41beta05-project-wince.zip
+   libpng-1.2.41beta06-project-netware.zip
+   libpng-1.2.41beta06-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41beta05-README.txt
-   libpng-1.2.41beta05-KNOWNBUGS.txt
-   libpng-1.2.41beta05-LICENSE.txt
-   libpng-1.2.41beta05-Y2K-compliance.txt
-   libpng-1.2.41beta05-[previous version]-diff.txt
+   libpng-1.2.41beta06-README.txt
+   libpng-1.2.41beta06-KNOWNBUGS.txt
+   libpng-1.2.41beta06-LICENSE.txt
+   libpng-1.2.41beta06-Y2K-compliance.txt
+   libpng-1.2.41beta06-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
@@ -60,11 +60,14 @@ version 1.2.41beta04 [October 7, 2009]
   Ported some cosmetic changes from libpng-1.4.0beta86.
   Eliminated a shadowed declaration of "pp" in png_handle_sPLT().
 
-version 1.2.41beta05 [October 11, 2009]
-  Revised pngconf.h to make it easier to enable iTXt support.  Previously
-    defining PNG_iTXt_SUPPORTED would not work as expected.
+version 1.2.41beta05 [October 17, 2009]
+  Revised pngconf.h to make it easier to enable iTXt support.  From libpng
+    version 1.2.9 through 1.2.40, defining PNG_iTXt_SUPPORTED did not work
+    as expected.
   Ported some cosmetic changes from libpng-1.4.0beta87, changing
     many "#if defined(x)" to "#ifdef x".
+
+version 1.2.41beta06 [October 18, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
