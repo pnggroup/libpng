@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [October 10, 2009]
+ * Last changed in libpng 1.4.0 [October 20, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -4006,8 +4006,8 @@ static PNG_CONST int png_gamma_shift[] =
  *         a background color has been specified and the file_gamma
  *         and screen_gamma are not 1.0, within the specified threshold.
  *      }
- *
  */
+
 void /* PRIVATE */
 png_build_gamma_table(png_structp png_ptr)
 {

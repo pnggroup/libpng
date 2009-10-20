@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [October 10, 2009]
+ * Last changed in libpng 1.4.0 [October 20, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -79,7 +79,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    if (setjmp(png_ptr->jmpbuf))
 #endif
       PNG_ABORT();
-#endif
+#endif /* PNG_SETJMP_SUPPORTED */
 
 #ifdef PNG_USER_MEM_SUPPORTED
    png_set_mem_fn(png_ptr, mem_ptr, malloc_fn, free_fn);
