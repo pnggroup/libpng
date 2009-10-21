@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.41beta07 - October 18, 2009
+ * libpng version 1.2.41beta07 - October 21, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -188,44 +188,44 @@
  *   PNG_BUILD_DLL and PNG_STATIC because those change some defaults
  *   such as CONSOLE_IO and whether GLOBAL_ARRAYS are allowed.
  */
-#if defined(__CYGWIN__)
-#  if defined(ALL_STATIC)
-#    if defined(PNG_BUILD_DLL)
+#ifdef __CYGWIN__
+#  ifdef ALL_STATIC
+#    ifdef PNG_BUILD_DLL
 #      undef PNG_BUILD_DLL
 #    endif
-#    if defined(PNG_USE_DLL)
+#    ifdef PNG_USE_DLL
 #      undef PNG_USE_DLL
 #    endif
-#    if defined(PNG_DLL)
+#    ifdef PNG_DLL
 #      undef PNG_DLL
 #    endif
-#    if !defined(PNG_STATIC)
+#    ifndef PNG_STATIC
 #      define PNG_STATIC
 #    endif
 #  else
-#    if defined (PNG_BUILD_DLL)
-#      if defined(PNG_STATIC)
+#    ifdef PNG_BUILD_DLL
+#      ifdef PNG_STATIC
 #        undef PNG_STATIC
 #      endif
-#      if defined(PNG_USE_DLL)
+#      ifdef PNG_USE_DLL
 #        undef PNG_USE_DLL
 #      endif
-#      if !defined(PNG_DLL)
+#      ifndef PNG_DLL
 #        define PNG_DLL
 #      endif
 #    else
-#      if defined(PNG_STATIC)
-#        if defined(PNG_USE_DLL)
+#      ifdef PNG_STATIC
+#        ifdef PNG_USE_DLL
 #          undef PNG_USE_DLL
 #        endif
-#        if defined(PNG_DLL)
+#        ifdef PNG_DLL
 #          undef PNG_DLL
 #        endif
 #      else
-#        if !defined(PNG_USE_DLL)
+#        ifndef PNG_USE_DLL
 #          define PNG_USE_DLL
 #        endif
-#        if !defined(PNG_DLL)
+#        ifndef PNG_DLL
 #          define PNG_DLL
 #        endif
 #      endif
@@ -250,7 +250,7 @@
 #  define PNG_STDIO_SUPPORTED
 #endif
 
-#if defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
 #  include <windows.h>
    /* Console I/O functions are not supported on WindowsCE */
 #  define PNG_NO_CONSOLE_IO
@@ -279,7 +279,7 @@
 #      endif
 #    endif
 #  else
-#    if !defined(_WIN32_WCE)
+#    ifndef _WIN32_WCE
 /* "stdio.h" functions are not supported on WindowsCE */
 #      include <stdio.h>
 #    endif
@@ -400,8 +400,8 @@
  * them inside an appropriate ifdef/endif pair for portability.
  */
 
-#if defined(PNG_FLOATING_POINT_SUPPORTED)
-#  if defined(MACOS)
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+#  ifdef MACOS
      /* We need to check that <math.h> hasn't already been included earlier
       * as it seems it doesn't agree with <fp.h>, yet we should really use
       * <fp.h> if possible.
@@ -529,7 +529,7 @@
 #  endif
 #endif
 
-#if !defined(PNG_NO_iTXt_SUPPORTED)
+#ifndef PNG_NO_iTXt_SUPPORTED
 #  if !defined(PNG_READ_iTXt_SUPPORTED) && !defined(PNG_NO_READ_iTXt)
 #    define PNG_READ_iTXt
 #  endif
@@ -802,7 +802,7 @@
 #    endif
 #  endif
 
-#  if defined(__APPLE__)
+#  ifdef __APPLE__
 #    if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE)
 #      define PNG_NO_MMX_CODE
 #    endif
@@ -822,7 +822,7 @@
 /* end of obsolete code to be removed from libpng-1.4.0 */
 
 /* Added at libpng-1.2.0 */
-#if !defined(PNG_1_0_X)
+#ifndef PNG_1_0_X
 #if !defined(PNG_NO_USER_MEM) && !defined(PNG_USER_MEM_SUPPORTED)
 #  define PNG_USER_MEM_SUPPORTED
 #endif
@@ -1168,8 +1168,8 @@
 #endif
 
 /* need the time information for reading tIME chunks */
-#if defined(PNG_tIME_SUPPORTED)
-#  if !defined(_WIN32_WCE)
+#ifdef PNG_tIME_SUPPORTED
+#  ifndef _WIN32_WCE
      /* "time.h" functions are not supported on WindowsCE */
 #    include <time.h>
 #  endif
@@ -1241,8 +1241,8 @@ typedef unsigned char png_byte;
  */
 
 /* MSC Medium model */
-#if defined(FAR)
-#  if defined(M_I86MM)
+#ifdef FAR
+#  ifdef M_I86MM
 #    define USE_FAR_KEYWORD
 #    define FARDATA FAR
 #    include <dos.h>
@@ -1275,7 +1275,7 @@ typedef char            FAR * png_charp;
 typedef png_fixed_point FAR * png_fixed_point_p;
 
 #ifndef PNG_NO_STDIO
-#if defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
 typedef HANDLE                png_FILE_p;
 #else
 typedef FILE                * png_FILE_p;
@@ -1339,17 +1339,17 @@ typedef z_stream FAR *  png_zstreamp;
  * When building a static lib, default to no GLOBAL ARRAYS, but allow
  * command-line override
  */
-#if defined(__CYGWIN__)
-#  if !defined(PNG_STATIC)
-#    if defined(PNG_USE_GLOBAL_ARRAYS)
+#ifdef __CYGWIN__
+#  ifndef PNG_STATIC
+#    ifdef PNG_USE_GLOBAL_ARRAYS
 #      undef PNG_USE_GLOBAL_ARRAYS
 #    endif
-#    if !defined(PNG_USE_LOCAL_ARRAYS)
+#    ifndef PNG_USE_LOCAL_ARRAYS
 #      define PNG_USE_LOCAL_ARRAYS
 #    endif
 #  else
 #    if defined(PNG_USE_LOCAL_ARRAYS) || defined(PNG_NO_GLOBAL_ARRAYS)
-#      if defined(PNG_USE_GLOBAL_ARRAYS)
+#      ifdef PNG_USE_GLOBAL_ARRAYS
 #        undef PNG_USE_GLOBAL_ARRAYS
 #      endif
 #    endif
@@ -1372,7 +1372,7 @@ typedef z_stream FAR *  png_zstreamp;
 #  endif
 #endif
 
-#if defined(__CYGWIN__)
+#ifdef __CYGWIN__
 #  undef PNGAPI
 #  define PNGAPI __cdecl
 #  undef PNG_IMPEXP
@@ -1413,7 +1413,7 @@ typedef z_stream FAR *  png_zstreamp;
 #     define PNG_IMPEXP
 #  endif
 
-#  if !defined(PNG_IMPEXP)
+#  ifndef PNG_IMPEXP
 
 #     define PNG_EXPORT_TYPE1(type,symbol)  PNG_IMPEXP type PNGAPI symbol
 #     define PNG_EXPORT_TYPE2(type,symbol)  type PNG_IMPEXP PNGAPI symbol
@@ -1424,7 +1424,7 @@ typedef z_stream FAR *  png_zstreamp;
 #           define PNG_EXPORT PNG_EXPORT_TYPE1
 #        else
 #           define PNG_EXPORT PNG_EXPORT_TYPE2
-#           if defined(PNG_BUILD_DLL)
+#           ifdef PNG_BUILD_DLL
 #              define PNG_IMPEXP __export
 #           else
 #              define PNG_IMPEXP /*__import */ /* doesn't exist AFAIK in
@@ -1434,8 +1434,8 @@ typedef z_stream FAR *  png_zstreamp;
 #        endif
 #     endif
 
-#     if !defined(PNG_IMPEXP)
-#        if defined(PNG_BUILD_DLL)
+#     ifndef PNG_IMPEXP
+#        ifdef PNG_BUILD_DLL
 #           define PNG_IMPEXP __declspec(dllexport)
 #        else
 #           define PNG_IMPEXP __declspec(dllimport)
@@ -1496,7 +1496,7 @@ typedef z_stream FAR *  png_zstreamp;
    (LIBPNG_WAS_COMPILED_WITH__PNG_SETJMP_NOT_SUPPORTED)
 #endif
 
-#if defined(USE_FAR_KEYWORD)  /* memory model independent fns */
+#ifdef USE_FAR_KEYWORD  /* memory model independent fns */
 /* use this to make far-to-near assignments */
 #  define CHECK   1
 #  define NOCHECK 0
