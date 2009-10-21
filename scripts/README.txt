@@ -1,8 +1,8 @@
 
-Makefiles for  libpng version 1.4.0beta102 - November 15, 2009
+Makefiles for  libpng version 1.4.0rc02 - November 18, 2009
 
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.14.1.4.0beta102)
+                       (gcc, creates libpng14.so.14.1.4.0rc02)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -20,7 +20,7 @@ Makefiles for  libpng version 1.4.0beta102 - November 15, 2009
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       gcc, creates libpng14.so.14.1.4.0beta102)
+                       gcc, creates libpng14.so.14.1.4.0rc02)
  makefile.freebsd  =>  FreeBSD makefile
  makefile.gcc      =>  Generic gcc makefile
  makefile.hpgcc    =>  HPUX makefile using gcc
@@ -36,12 +36,12 @@ Makefiles for  libpng version 1.4.0beta102 - November 15, 2009
  makefile.os2      =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng14.so.14.1.4.0beta102)
+                       creates libpng14.so.14.1.4.0rc02)
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng14.so.14.1.4.0beta102)
+                       creates libpng14.so.14.1.4.0rc02)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng14.so.14.1.4.0beta102)
+                       creates libpng14.so.14.1.4.0rc02)
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.sunos    =>  Sun makefile
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
@@ -59,7 +59,7 @@ Other supporting scripts:
  libpng-config-head.in => used by several makefiles to create libpng-config
  libpng.pc.in      =>  Used by several makefiles to create libpng.pc
  pngos2.def        =>  OS/2 module definition file used by makefile.os2
- pngwin.def        =>  Module definition file for makefile.cygwin and mingw
+ pngwin.def        =>  Module definitions for makefile.cygwin and mingw
  png32ce.def       =>  Module definition file used by makefile.cegcc
  pngwin.rc         =>  Used by the visualc6 and visualc71 projects.
  SCOPTIONS.ppc     =>  Used with smakefile.ppc

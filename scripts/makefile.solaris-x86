@@ -1,22 +1,12 @@
-# makefile for libpng, HPUX (10.20 and 11.00) using the ANSI/C product.
-# Copyright (C) 1999-2002, 2006, 2009 Glenn Randers-Pehrson
-# Copyright (C) 1995 Guy Eric Schalnat, Group 42
-# contributed by Jim Rice and updated by Chris Schleicher, Hewlett Packard
-#
+# makefile for libpng on Solaris 2.x with gcc
+# Copyright (C) 2004, 2006-2008 Glenn Randers-Pehrson
+# Contributed by William L. Sebok, based on makefile.linux
+# Copyright (C) 1998 Greg Roelofs
+# Copyright (C) 1996, 1997 Andreas Dilger
+
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
-
-# Where the zlib library and include files are located
-ZLIBLIB=/opt/zlib/lib
-ZLIBINC=/opt/zlib/include
-
-# Note that if you plan to build a libpng shared library, zlib must also
-# be a shared library, which zlib's configure does not do.  After running
-# zlib's configure, edit the appropriate lines of makefile to read:
-#   CFLAGS=-DPNG_CONFIGURE_LIBPNG -O1 -DHAVE_UNISTD -DUSE_MAP -fPIC \
-#   LDSHARED=ld -b
-#   SHAREDLIB=libz.sl
 
 # Library name:
 LIBNAME = libpng14
@@ -25,32 +15,41 @@ PNGMIN = 1.4.0rc02
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
-LIBSO=$(LIBNAME).sl
-LIBSOMAJ=$(LIBNAME).sl.$(PNGMAJ)
-LIBSOVER=$(LIBNAME).sl.$(PNGVER)
-OLDSO=libpng.sl
-OLDSOMAJ=libpng.sl.14
-OLDSOVER=libpng.sl.14.$(PNGMIN)
+LIBSO=$(LIBNAME).so
+LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
+LIBSOVER=$(LIBNAME).so.$(PNGVER)
+OLDSO=libpng.so
+OLDSOMAJ=libpng.so.14
+OLDSOVER=libpng.so.14.$(PNGMIN)
 
 # Utilities:
 AR_RC=ar rc
-CC=cc
+CC=gcc
 MKDIR_P=mkdir -p
-LN_SF=ln -sf
-RANLIB=ranlib
+LN_SF=ln -f -s
+RANLIB=echo
 RM_F=/bin/rm -f
 
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -O -Ae -Wl,+vnocompatwarnings +DD64 \
--D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +Z -DHAVE_UNISTD_H -DUSE_MMAP
-# Caution: be sure you have built zlib with the same CFLAGS.
-CCFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -O -Ae -Wl,+vnocompatwarnings +DD64 \
--D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +Z -DHAVE_UNISTD_H -DUSE_MMAP
-
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
-
-# where make install puts libpng.a, libpng14.sl, and png.h
-prefix=/opt/libpng
+# Where make install puts libpng.a, libpng14.so*, and png.h
+prefix=/usr/local
 exec_prefix=$(prefix)
+
+# Where the zlib library and include files are located
+# Changing these to ../zlib poses a security risk.  If you want
+# to have zlib in an adjacent directory, specify the full path instead of "..".
+#ZLIBLIB=../zlib
+#ZLIBINC=../zlib
+
+ZLIBLIB=/usr/local/lib
+ZLIBINC=/usr/local/include
+
+WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
+	-Wmissing-declarations -Wtraditional -Wcast-align \
+	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
+CFLAGS=-I$(ZLIBINC) -W -Wall -O \
+	# $(WARNMORE) -g -DPNG_DEBUG=5
+LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng14 -lz -lm
+
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
 MANPATH=$(prefix)/man
@@ -77,10 +76,10 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
-.SUFFIXES:	.c .o .pic.o
+.SUFFIXES:      .c .o .pic.o
 
 .c.pic.o:
-	$(CC) -c $(CFLAGS) +z -o $@ $*.c
+	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
 
 all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
@@ -99,8 +98,9 @@ libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo ccopts=\"-Ae +DA1.1 +DS2.0\"; \
+	echo cppflags=\""; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
+	echo R_opts=\"-R$(LIBPATH)\"; \
 	echo libs=\"-lpng14 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
@@ -112,15 +112,27 @@ $(LIBSOMAJ): $(LIBSOVER)
 	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
 
 $(LIBSOVER): $(OBJSDLL)
-	$(LD) -b +s \
-	+h $(LIBSOMAJ) -o $(LIBSOVER) $(OBJSDLL)
+	@case "`type ld`" in *ucb*) \
+	echo; \
+	echo '## WARNING:'; \
+	echo '## The commands "CC" and "LD" must NOT refer to /usr/ucb/cc'; \
+	echo '## and /usr/ucb/ld.  If they do, you need to adjust your PATH'; \
+	echo '## environment variable to put /usr/ccs/bin ahead of /usr/ucb.'; \
+	echo '## The environment variable LD_LIBRARY_PATH should not be set'; \
+	echo '## at all.  If it is, things are likely to break because of'; \
+	echo '## the libucb dependency that is created.'; \
+	echo; \
+	;; \
+	esac
+	$(LD) -G -h $(LIBSOMAJ) \
+	 -o $(LIBSOVER) $(OBJSDLL)
 
-$(OLDSOVER): $(OBJSDLL)
-	$(LD) -b +s \
-	+h $(OLDSOMAJ) -o $(OLDSOVER) $(OBJSDLL)
+$(OLDSOVER): $(OBJS)
+	$(LD) -G -h $(OLDSOMAJ) \
+	 -o $(OLDSOVER) $(OBJSDLL)
 
-pngtest: pngtest.o libpng.a
-	$(CC) -o pngtest $(CCFLAGS) pngtest.o $(LDFLAGS)
+pngtest: pngtest.o $(LIBSO)
+	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
 
 test: pngtest
 	./pngtest
@@ -156,8 +168,8 @@ install-shared: install-headers $(LIBSOVER) libpng.pc \
 	(cd $(DL); \
 	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
 	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
-	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
+	$(LN_SF) $(LIBSOVER) $(LIBSO); \
+	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -193,19 +205,19 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) -I$(DI) -I$(ZLIBINC) $(CCFLAGS) \
+	$(CC) -I$(DI) -I$(ZLIBINC) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
-	   -L$(DL) -L$(ZLIBLIB) \
-	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
+	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags` \
+	   -L$(DL) -L$(ZLIBLIB) -R$(ZLIBLIB) -R$(DL)
 	./pngtestd pngtest.png
 
 test-installed:
 	echo
 	echo Testing installed dynamic shared library.
-	$(CC) $(CCFLAGS) \
+	$(CC) -I$(ZLIBINC) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
-	   -L$(ZLIBLIB) \
-	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags`
+	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags` \
+	   -L$(ZLIBLIB) -R$(ZLIBLIB)
 	./pngtesti pngtest.png
 
 clean:
@@ -220,20 +232,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o: png.h pngconf.h pngpriv.h
-pngerror.o: png.h pngconf.h pngpriv.h
-pngrio.o: png.h pngconf.h pngpriv.h
-pngwio.o: png.h pngconf.h pngpriv.h
-pngmem.o: png.h pngconf.h pngpriv.h
-pngset.o: png.h pngconf.h pngpriv.h
-pngget.o: png.h pngconf.h pngpriv.h
-pngread.o: png.h pngconf.h pngpriv.h
-pngrtran.o: png.h pngconf.h pngpriv.h
-pngrutil.o: png.h pngconf.h pngpriv.h
-pngtrans.o: png.h pngconf.h pngpriv.h
-pngwrite.o: png.h pngconf.h pngpriv.h
-pngwtran.o: png.h pngconf.h pngpriv.h
-pngwutil.o: png.h pngconf.h pngpriv.h
-pngpread.o: png.h pngconf.h pngpriv.h
+png.o png.pic.o: png.h pngconf.h pngpriv.h
+pngerror.o pngerror.pic.o: png.h pngconf.h pngpriv.h
+pngrio.o pngrio.pic.o: png.h pngconf.h pngpriv.h
+pngwio.o pngwio.pic.o: png.h pngconf.h pngpriv.h
+pngmem.o pngmem.pic.o: png.h pngconf.h pngpriv.h
+pngset.o pngset.pic.o: png.h pngconf.h pngpriv.h
+pngget.o pngget.pic.o: png.h pngconf.h pngpriv.h
+pngread.o pngread.pic.o: png.h pngconf.h pngpriv.h
+pngrtran.o pngrtran.pic.o: png.h pngconf.h pngpriv.h
+pngrutil.o pngrutil.pic.o: png.h pngconf.h pngpriv.h
+pngtrans.o pngtrans.pic.o: png.h pngconf.h pngpriv.h
+pngwrite.o pngwrite.pic.o: png.h pngconf.h pngpriv.h
+pngwtran.o pngwtran.pic.o: png.h pngconf.h pngpriv.h
+pngwutil.o pngwutil.pic.o: png.h pngconf.h pngpriv.h
+pngpread.o pngpread.pic.o: png.h pngconf.h pngpriv.h
 
 pngtest.o: png.h pngconf.h
