@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta102 - November 15, 2009
+Libpng 1.4.0beta102 - November 18, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -685,7 +685,7 @@ version 1.4.0beta101 [November 14, 2009]
     accidentally deleted from the zip and 7z distributions when the xcode
     project was added.
 
-version 1.4.0beta102 [November 15, 2009]
+version 1.4.0beta102 [November 18, 2009]
   Added libpng-config.in and libpng-pc.in to the zip and 7z distributions.
   Fixed a typo in projects/visualc6/pngtest.dsp, introduced in beta100.
   Moved descriptions of makefiles and other scripts out of INSTALL into

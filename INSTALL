@@ -1,5 +1,5 @@
 
-Installing libpng version 1.4.0beta102 - November 15, 2009
+Installing libpng version 1.4.0beta102 - November 18, 2009
 
 On Unix/Linux and similar systems, you can simply type
 
@@ -60,8 +60,10 @@ Your directory structure should look like this:
           CMakeLists.txt    =>  "cmake" script
           configuration files:
              configure.ac, configure, Makefile.am, Makefile.in,
-             autogen.sh, config.guess, ltmain.sh, missing, libpng-pc.in,
-             libpng-config.in, aclocal.m4, config.h.in, config.sub,
+%12-%             autogen.sh, config.guess, ltmain.sh, missing,
+%12-%             aclocal.m4, config.h.in, config.sub,
+%14+%             autogen.sh, config.guess, ltmain.sh, missing, libpng-pc.in,
+%14+%             libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
              gregbook
