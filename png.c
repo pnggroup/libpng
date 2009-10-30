@@ -717,10 +717,23 @@ png_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
-   return ((png_charp) "\n libpng version 1.2.41beta08 - October 30, 2009\n\
-   Copyright (c) 1998-2009 Glenn Randers-Pehrson\n\
-   Copyright (c) 1996-1997 Andreas Dilger\n\
-   Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.\n");
+#ifdef PNG_STRING_COPYRIGHT
+      return PNG_STRING_COPYRIGHT
+#else
+#ifdef __STDC__
+   return ((png_charp) PNG_STRING_NEWLINE \
+     "libpng version x 1.2.41beta08 - October 30, 2009" PNG_STRING_NEWLINE \
+     "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
+     "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
+     "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
+     PNG_STRING_NEWLINE);
+#else
+      return ((png_charp) "libpng version 1.2.41beta08 - October 30, 2009\
+      Copyright (c) 1998-2009 Glenn Randers-Pehrson\
+      Copyright (c) 1996-1997 Andreas Dilger\
+      Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
+#endif
+#endif
 }
 
 /* The following return the library version as a short string in the
@@ -752,11 +765,15 @@ png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
+#ifdef __STDC__
    return ((png_charp) PNG_HEADER_VERSION_STRING
 #ifndef PNG_READ_SUPPORTED
    "     (NO READ SUPPORT)"
 #endif
-   "\n");
+   PNG_STRING_NEWLINE);
+#else
+   return ((png_charp) PNG_HEADER_VERSION_STRING);
+#endif
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)

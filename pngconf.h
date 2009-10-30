@@ -115,6 +115,17 @@
 #  define PNG_WRITE_SUPPORTED
 #endif
 
+/* Enabled in 1.2.41. */
+#ifdef PNG_ALLOW_BENIGN_ERRORS
+#  define png_benign_error png_warning
+#  define png_chunk_benign_error png_chunk_warning
+#else
+#  ifndef PNG_BENIGN_ERRORS_SUPPORTED
+#    define png_benign_error png_error
+#    define png_chunk_benign_error png_chunk_error
+#  endif
+#endif
+
 /* Added in libpng-1.2.41 */
 #if !defined(PNG_NO_WARNINGS) && !defined(PNG_WARNINGS_SUPPORTED)
 #  define PNG_WARNINGS_SUPPORTED
@@ -613,24 +624,33 @@
 #  ifndef PNG_NO_READ_BACKGROUND
 #    define PNG_READ_BACKGROUND_SUPPORTED
 #  endif
+#ifndef PNG_1_0_X
 #  ifndef PNG_NO_READ_16_TO_8
 #    define PNG_READ_16_TO_8_SUPPORTED
 #  endif
+#endif
 #  ifndef PNG_NO_READ_FILLER
 #    define PNG_READ_FILLER_SUPPORTED
 #  endif
 #  ifndef PNG_NO_READ_GAMMA
 #    define PNG_READ_GAMMA_SUPPORTED
 #  endif
+#ifndef PNG_1_0_X
 #  ifndef PNG_NO_READ_GRAY_TO_RGB
 #    define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #  endif
+#endif
 #  ifndef PNG_NO_READ_SWAP_ALPHA
 #    define PNG_READ_SWAP_ALPHA_SUPPORTED
 #  endif
 #  ifndef PNG_NO_READ_INVERT_ALPHA
 #    define PNG_READ_INVERT_ALPHA_SUPPORTED
 #  endif
+#ifndef PNG_1_0_X
+#  ifndef PNG_NO_READ_PREMULTIPLY_ALPHA
+#      define PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+#  endif
+#endif
 #  ifndef PNG_NO_READ_STRIP_ALPHA
 #    define PNG_READ_STRIP_ALPHA_SUPPORTED
 #  endif
@@ -707,9 +727,11 @@
 #  ifndef PNG_NO_WRITE_SWAP_ALPHA
 #    define PNG_WRITE_SWAP_ALPHA_SUPPORTED
 #  endif
+#ifndef PNG_1_0_X
 #  ifndef PNG_NO_WRITE_INVERT_ALPHA
 #    define PNG_WRITE_INVERT_ALPHA_SUPPORTED
 #  endif
+#endif
 #  ifndef PNG_NO_WRITE_USER_TRANSFORM
 #    define PNG_WRITE_USER_TRANSFORM_SUPPORTED
 #  endif
@@ -847,7 +869,31 @@
 #  define PNG_USER_HEIGHT_MAX 1000000L
 #endif
 
-/* Added at libpng-1.2.34 and 1.4.0 */
+#ifndef PNG_1_0_X
+/* Added at libpng-1.2.41 */
+#ifndef PNG_USER_CHUNK_CACHE_MAX
+#  define PNG_USER_CHUNK_CACHE_MAX 0x7ffffffLL
+#endif
+#endif
+
+/* Added at libpng-1.2.41 */
+#ifndef PNG_1_0_X
+#if !defined(PNG_NO_IO_STATE) && !defined(PNG_IO_STATE_SUPPORTED)
+#  define PNG_IO_STATE_SUPPORTED
+#endif
+#endif
+
+#ifndef PNG_LITERAL_SHARP
+#  define PNG_LITERAL_SHARP 0x23
+#endif
+#ifndef PNG_LITERAL_LEFT_SQUARE_BRACKET
+#  define PNG_LITERAL_LEFT_SQUARE_BRACKET 0x5b
+#endif
+#ifndef PNG_LITERAL_RIGHT_SQUARE_BRACKET
+#  define PNG_LITERAL_RIGHT_SQUARE_BRACKET 0x5d
+#endif
+
+/* Added at libpng-1.2.34 */
 #ifndef PNG_STRING_NEWLINE
 #define PNG_STRING_NEWLINE "\n"
 #endif

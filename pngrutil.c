@@ -112,6 +112,13 @@ png_read_chunk_header(png_structp png_ptr)
    png_byte buf[8];
    png_uint_32 length;
 
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that the chunk header is being read.
+    * PNG_IO_CHUNK_HDR requires a single I/O call.
+    */
+   png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_HDR;
+#endif
+
    /* Read the length and the chunk name */
    png_read_data(png_ptr, buf, 8);
    length = png_get_uint_31(png_ptr, buf);
@@ -128,6 +135,13 @@ png_read_chunk_header(png_structp png_ptr)
 
    /* Check to see if chunk name is valid */
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that chunk data will (possibly) be read.
+    * PNG_IO_CHUNK_DATA does NOT require a specific number of I/O calls.
+    */
+   png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;
+#endif
 
    return length;
 }
@@ -202,6 +216,12 @@ png_crc_error(png_structp png_ptr)
       if (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE)
          need_crc = 0;
    }
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that the chunk CRC is being read */
+   /* PNG_IO_CHUNK_CRC requires the I/O to be done at once */
+   png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_CRC;
+#endif
 
    png_read_data(png_ptr, crc_bytes, 4);
 
@@ -1136,6 +1156,23 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_sPLT");
 
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+
+   if (png_ptr->user_chunk_cache_max != 0)
+   {
+      if (png_ptr->user_chunk_cache_max == 1)
+      {
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+      if (--png_ptr->user_chunk_cache_max == 1)
+      {
+         png_warning(png_ptr, "No space in chunk cache for sPLT");
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+   }
+#endif
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Missing IHDR before sPLT");
@@ -1923,6 +1960,22 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_tEXt");
 
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (png_ptr->user_chunk_cache_max != 0)
+   {
+      if (png_ptr->user_chunk_cache_max == 1)
+      {
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+      if (--png_ptr->user_chunk_cache_max == 1)
+      {
+         png_warning(png_ptr, "No space in chunk cache for tEXt");
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+   }
+#endif
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Missing IHDR before tEXt");
@@ -2009,6 +2062,22 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_zTXt");
 
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (png_ptr->user_chunk_cache_max != 0)
+   {
+      if (png_ptr->user_chunk_cache_max == 1)
+      {
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+      if (--png_ptr->user_chunk_cache_max == 1)
+      {
+         png_warning(png_ptr, "No space in chunk cache for zTXt");
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+   }
+#endif
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Missing IHDR before zTXt");
@@ -2114,6 +2183,22 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_iTXt");
 
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (png_ptr->user_chunk_cache_max != 0)
+   {
+      if (png_ptr->user_chunk_cache_max == 1)
+      {
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+      if (--png_ptr->user_chunk_cache_max == 1)
+      {
+         png_warning(png_ptr, "No space in chunk cache for iTXt");
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+   }
+#endif
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Missing IHDR before iTXt");
@@ -2242,6 +2327,22 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_unknown");
 
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (png_ptr->user_chunk_cache_max != 0)
+   {
+      if (png_ptr->user_chunk_cache_max == 1)
+      {
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+      if (--png_ptr->user_chunk_cache_max == 1)
+      {
+         png_warning(png_ptr, "No space in chunk cache for unknown chunk");
+         png_crc_finish(png_ptr, length);
+         return;
+      }
+   }
+#endif
 
    if (png_ptr->mode & PNG_HAVE_IDAT)
    {
@@ -3209,9 +3310,10 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (row_bytes + 64 > png_ptr->old_big_row_buf_size)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
-     png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
      if (png_ptr->interlaced)
-       png_memset(png_ptr->big_row_buf, 0, row_bytes + 64);
+        png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr, row_bytes + 64);
+     else
+        png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
      png_ptr->row_buf = png_ptr->big_row_buf + 32;
      png_ptr->old_big_row_buf_size = row_bytes + 64;
    }

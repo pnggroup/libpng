@@ -58,10 +58,15 @@ png_save_uint_16(png_bytep buf, unsigned int i)
  * we should call png_set_sig_bytes() to tell libpng how many of the
  * bytes have already been written.
  */
-void /* PRIVATE */
+void PNGAPI
 png_write_sig(png_structp png_ptr)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that the signature is being written */
+   png_ptr->io_state = PNG_IO_WRITING | PNG_IO_SIGNATURE;
+#endif
 
    /* Write the rest of the 8 byte signature */
    png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
@@ -106,6 +111,13 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
    if (png_ptr == NULL)
       return;
 
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that the chunk header is being written.
+    * PNG_IO_CHUNK_HDR requires a single I/O call.
+    */
+   png_ptr->io_state = PNG_IO_WRITING | PNG_IO_CHUNK_HDR;
+#endif
+
    /* Write the length and the chunk name */
    png_save_uint_32(buf, length);
    png_memcpy(buf + 4, chunk_name, 4);
@@ -115,6 +127,13 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
    /* Reset the crc and run it over the chunk name */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, chunk_name, (png_size_t)4);
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that chunk data will (possibly) be written.
+    * PNG_IO_CHUNK_DATA does NOT require a specific number of I/O calls.
+    */
+   png_ptr->io_state = PNG_IO_WRITING | PNG_IO_CHUNK_DATA;
+#endif
 }
 
 /* Write the data of a PNG chunk started with png_write_chunk_start().
@@ -145,6 +164,13 @@ png_write_chunk_end(png_structp png_ptr)
    png_byte buf[4];
 
    if (png_ptr == NULL) return;
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   /* Inform the I/O callback that the chunk CRC is being written.
+    * PNG_IO_CHUNK_CRC requires a single I/O function call.
+    */
+   png_ptr->io_state = PNG_IO_WRITING | PNG_IO_CHUNK_CRC;
+#endif
 
    /* Write the crc in a single operation */
    png_save_uint_32(buf, png_ptr->crc);
@@ -1792,29 +1818,28 @@ png_write_start_row(png_structp png_ptr)
    /* We only need to keep the previous row if we are using one of these. */
    if (png_ptr->do_filter & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH))
    {
-     /* Set up previous row buffer */
-     png_ptr->prev_row = (png_bytep)png_malloc(png_ptr,
-        (png_uint_32)buf_size);
-     png_memset(png_ptr->prev_row, 0, buf_size);
+      /* Set up previous row buffer */
+      png_ptr->prev_row = (png_bytep)png_calloc(png_ptr,
+         (png_uint_32)buf_size);
 
       if (png_ptr->do_filter & PNG_FILTER_UP)
       {
          png_ptr->up_row = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)(png_ptr->rowbytes + 1));
+            (png_uint_32)(png_ptr->rowbytes + 1));
          png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
       }
 
       if (png_ptr->do_filter & PNG_FILTER_AVG)
       {
          png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)(png_ptr->rowbytes + 1));
+            (png_uint_32)(png_ptr->rowbytes + 1));
          png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
       }
 
       if (png_ptr->do_filter & PNG_FILTER_PAETH)
       {
          png_ptr->paeth_row = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)(png_ptr->rowbytes + 1));
+            (png_uint_32)(png_ptr->rowbytes + 1));
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
    }
@@ -2150,6 +2175,14 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #endif 
 
    png_debug(1, "in png_write_find_filter");
+
+#ifndef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+  if (png_ptr->row_number == 0 && filter_to_do == PNG_ALL_FILTERS)
+  {
+      /* These will never be selected so we need not test them. */
+      filter_to_do &= ~(PNG_FILTER_UP | PNG_FILTER_PAETH);
+  }
+#endif 
 
    /* Find out how many bytes offset each pixel is */
    bpp = (row_info->pixel_depth + 7) >> 3;

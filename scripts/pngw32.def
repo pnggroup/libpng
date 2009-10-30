@@ -237,3 +237,15 @@ EXPORTS
   png_save_int_32 @205
   png_get_uint_31 @206
   png_set_expand_gray_1_2_4_to_8  @207
+; Added at version 1.2.41
+  png_write_sig @207
+  png_benign_error @208
+  png_benign_chunk_error @209
+  png_set_benign_error @210
+  png_get_io_chunk_name @211
+  png_get_io_state @212
+  png_set_premultiply_alpha @213
+  png_get_chunk_cache_max @214
+  png_set_chunk_cache_max @215
+  png_check_cHRM_fixed @216
+  png_calloc @217

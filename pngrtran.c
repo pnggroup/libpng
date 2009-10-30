@@ -140,6 +140,22 @@ png_set_strip_alpha(png_structp png_ptr)
 }
 #endif
 
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+void PNGAPI
+png_set_premultiply_alpha(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_premultiply_alpha");
+
+   if(png_ptr == NULL)
+      return;
+   png_ptr->transformations |=
+     (PNG_PREMULTIPLY_ALPHA | PNG_EXPAND_tRNS);
+   png_ptr->transformations |=
+     PNG_EXPAND;  /* This shouldn't be necessary */
+   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+}
+#endif
+
 #ifdef PNG_READ_DITHER_SUPPORTED
 /* Dither file to 8 bit.  Supply a palette, the current number
  * of elements in the palette, the maximum number of elements
@@ -335,9 +351,8 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
             png_ptr->palette_to_index[i] = (png_byte)i;
          }
 
-         hash = (png_dsortpp)png_malloc(png_ptr, (png_uint_32)(769 *
+         hash = (png_dsortpp)png_calloc(png_ptr, (png_uint_32)(769 *
             png_sizeof(png_dsortp)));
-         png_memset(hash, 0, 769 * png_sizeof(png_dsortp));
 
          num_new_palette = num_palette;
 
@@ -483,10 +498,9 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
       int num_green = (1 << PNG_DITHER_GREEN_BITS);
       int num_blue = (1 << PNG_DITHER_BLUE_BITS);
       png_size_t num_entries = ((png_size_t)1 << total_bits);
-      png_ptr->palette_lookup = (png_bytep )png_malloc(png_ptr,
+
+      png_ptr->palette_lookup = (png_bytep )png_calloc(png_ptr,
          (png_uint_32)(num_entries * png_sizeof(png_byte)));
-      png_memset(png_ptr->palette_lookup, 0, num_entries *
-         png_sizeof(png_byte));
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
          png_sizeof(png_byte)));
@@ -1437,6 +1451,11 @@ png_do_read_transformations(png_structp png_ptr)
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
+#ifdef PNG_READ_16_TO_8_SUPPORTED
+   if (png_ptr->transformations & PNG_16_TO_8)
+      png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
+
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
    if ((png_ptr->transformations & PNG_BACKGROUND) &&
       ((png_ptr->num_trans != 0 ) ||
@@ -1464,11 +1483,6 @@ png_do_read_transformations(png_structp png_ptr)
       png_do_gamma(&(png_ptr->row_info), png_ptr->row_buf + 1,
           png_ptr->gamma_table, png_ptr->gamma_16_table,
           png_ptr->gamma_shift);
-#endif
-
-#ifdef PNG_READ_16_TO_8_SUPPORTED
-   if (png_ptr->transformations & PNG_16_TO_8)
-      png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
 #ifdef PNG_READ_DITHER_SUPPORTED
@@ -1518,6 +1532,12 @@ png_do_read_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_FILLER)
       png_do_read_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
          (png_uint_32)png_ptr->filler, png_ptr->flags);
+#endif
+
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+   if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
+      png_do_read_premultiply_alpha(&(png_ptr->row_info),
+         png_ptr->row_buf + 1);
 #endif
 
 #ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
@@ -2016,6 +2036,85 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 */
                sp-=2;
                dp=sp;
+            }
+         }
+      }
+   }
+}
+#endif
+
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+void /* PRIVATE */
+png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
+{
+   png_debug(1, "in png_do_read_premultiply_alpha");
+
+   {
+      png_uint_32 row_width = row_info->width;
+      if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+      {
+         /* This premultiplies the pixels with the alpha channel in RGBA */
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp = row + row_info->rowbytes;
+            png_bytep dp = sp;
+                      png_uint_16 a = 0;
+            png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+                              a = *(--sp); --dp;
+
+               *(--dp) = (*(--sp) * a) / 255;
+               *(--dp) = (*(--sp) * a) / 255;
+               *(--dp) = (*(--sp) * a) / 255;
+            }
+         }
+         /* This premultiplies the pixels with the alpha channel in RRGGBBAA */
+         else
+         {
+            png_uint_16p sp = (png_uint_16p)(row + row_info->rowbytes);
+            png_uint_16p dp = sp;
+                      png_uint_32 a = 0;
+            png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+                              a = *(--sp); --dp;
+               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
+               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
+               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
+            }
+         }
+      }
+      else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+      {
+         /* This premultiplies the pixels with the alpha channel in GA */
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp = row + row_info->rowbytes;
+            png_bytep dp = sp;
+            png_uint_16 a = 0;
+                      png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+               a = *(--sp); --dp;
+               *(--dp) = (*(--sp) * a) / 255;
+            }
+         }
+         /* This premultiplies the pixels with the alpha channel in GGAA */
+         else
+         {
+            png_uint_16p sp  = (png_uint_16p) (row + row_info->rowbytes);
+            png_uint_16p dp  = sp;
+                      png_uint_32 a = 0;
+                      png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+                              a = *(--sp); --dp;
+               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
             }
          }
       }
@@ -4129,6 +4228,33 @@ static PNG_CONST int png_gamma_shift[] =
  * tables, we don't make a full table if we are reducing to 8-bit in
  * the future.  Note also how the gamma_16 tables are segmented so that
  * we don't need to allocate > 64K chunks for a full 16-bit table.
+ *
+ * See the PNG extensions document for an integer algorithm for creating
+ * the gamma tables.  Maybe we will implement that here someday.
+ *
+ * We should only reach this point if
+ *
+ *      the file_gamma is known (i.e., the gAMA or sRGB chunk is present,
+ *      or the application has provided a file_gamma)
+ *
+ *   AND
+ *      {
+ *         the screen_gamma is known
+ *      OR
+ *
+ *         RGB_to_gray transformation is being performed
+ *      }
+ *
+ *   AND
+ *      {
+ *         the screen_gamma is different from the reciprocal of the
+ *         file_gamma by more than the specified threshold
+ *
+ *      OR
+ *
+ *         a background color has been specified and the file_gamma
+ *         and screen_gamma are not 1.0, within the specified threshold.
+ *      }
  */
 
 void /* PRIVATE */
@@ -4240,9 +4366,8 @@ png_build_gamma_table(png_structp png_ptr)
      else
         g = 1.0;
 
-     png_ptr->gamma_16_table = (png_uint_16pp)png_malloc(png_ptr,
+     png_ptr->gamma_16_table = (png_uint_16pp)png_calloc(png_ptr,
         (png_uint_32)(num * png_sizeof(png_uint_16p)));
-     png_memset(png_ptr->gamma_16_table, 0, num * png_sizeof(png_uint_16p));
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
      {
@@ -4302,9 +4427,8 @@ png_build_gamma_table(png_structp png_ptr)
 
         g = 1.0 / (png_ptr->gamma);
 
-        png_ptr->gamma_16_to_1 = (png_uint_16pp)png_malloc(png_ptr,
+        png_ptr->gamma_16_to_1 = (png_uint_16pp)png_calloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p )));
-        png_memset(png_ptr->gamma_16_to_1, 0, num * png_sizeof(png_uint_16p));
 
         for (i = 0; i < num; i++)
         {
@@ -4327,10 +4451,8 @@ png_build_gamma_table(png_structp png_ptr)
         else
            g = png_ptr->gamma;   /* Probably doing rgb_to_gray */
 
-        png_ptr->gamma_16_from_1 = (png_uint_16pp)png_malloc(png_ptr,
+        png_ptr->gamma_16_from_1 = (png_uint_16pp)png_calloc(png_ptr,
            (png_uint_32)(num * png_sizeof(png_uint_16p)));
-        png_memset(png_ptr->gamma_16_from_1, 0,
-           num * png_sizeof(png_uint_16p));
 
         for (i = 0; i < num; i++)
         {

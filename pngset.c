@@ -474,10 +474,8 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
     * of num_palette entries, in case of an invalid PNG file that has
     * too-large sample values.
     */
-   png_ptr->palette = (png_colorp)png_malloc(png_ptr,
+   png_ptr->palette = (png_colorp)png_calloc(png_ptr,
       PNG_MAX_PALETTE_LENGTH * png_sizeof(png_color));
-   png_memset(png_ptr->palette, 0, PNG_MAX_PALETTE_LENGTH *
-      png_sizeof(png_color));
    png_memcpy(png_ptr->palette, palette, num_palette * png_sizeof(png_color));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
@@ -1208,7 +1206,33 @@ png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
    png_ptr->user_width_max = user_width_max;
    png_ptr->user_height_max = user_height_max;
 }
+/* This function was added to libpng 1.2.41 */
+void PNGAPI
+png_set_chunk_cache_max (png_structp png_ptr,
+   png_uint_32 user_chunk_cache_max)
+{
+    if (png_ptr == NULL)
+      return;
+    png_ptr->user_chunk_cache_max = user_chunk_cache_max;
+    if (user_chunk_cache_max == 0x7fffffffL)  /* Unlimited */
+       png_ptr->user_chunk_cache_max = 0;
+    else
+       png_ptr->user_chunk_cache_max = user_chunk_cache_max + 1;
+}
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 
+
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
+void PNGAPI
+png_set_benign_errors(png_structp png_ptr, int allowed)
+{
+   png_debug(1, "in png_set_benign_errors");
+
+   if (allowed)
+      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
+   else
+      png_ptr->flags &= ~PNG_FLAG_BENIGN_ERRORS_WARN;
+}
+#endif /* PNG_BENIGN_ERRORS_SUPPORTED */
 #endif /* ?PNG_1_0_X */
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

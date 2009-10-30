@@ -1199,6 +1199,8 @@ typedef void (PNGAPI *png_unknown_chunk_ptr) PNGARG((png_structp));
 /* Added to libpng-1.2.34 */
 #define PNG_TRANSFORM_STRIP_FILLER_BEFORE 0x0800  /* write only */
 #define PNG_TRANSFORM_STRIP_FILLER_AFTER  0x1000  /* write only */
+/* Added to libpng-1.2.41 */
+#define PNG_TRANSFORM_GRAY_TO_RGB   0x2000      /* read only */
 
 /* Flags for MNG supported features */
 #define PNG_FLAG_MNG_EMPTY_PLTE     0x01
@@ -1498,6 +1500,10 @@ struct png_struct_def
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    png_uint_32 user_width_max;
    png_uint_32 user_height_max;
+   /* Added in libpng-1.2.41: Total number of sPLT, text, and unknown
+    * chunks that can be stored (0x7fffffff means unlimited).
+    */
+   png_uint_32 user_chunk_cache_max;
 #endif
 
 /* New member added in libpng-1.0.25 and 1.2.17 */
@@ -1512,6 +1518,10 @@ struct png_struct_def
 /* New member added in libpng-1.2.30 */
   png_charp chunkdata;  /* buffer for reading chunk data */
 
+/* New member added in libpng-1.4.0 */
+#ifdef PNG_IO_STATE_SUPPORTED
+  png_uint_32 io_state;
+#endif
 };
 
 
@@ -1697,6 +1707,11 @@ extern PNG_EXPORT(void,png_set_swap_alpha) PNGARG((png_structp png_ptr));
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED) || \
     defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
 extern PNG_EXPORT(void,png_set_invert_alpha) PNGARG((png_structp png_ptr));
+#endif
+
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+extern PNG_EXPORT(void,png_set_premultiply_alpha)
+  PNGARG((png_structp png_ptr));
 #endif
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
@@ -2103,6 +2118,9 @@ extern PNG_EXPORT(void,png_progressive_combine_row) PNGARG((png_structp png_ptr,
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
 extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
+   png_uint_32 size));
+/* Added at libpng version 1.2.41 */
+extern PNG_EXPORT(png_voidp,png_calloc) PNGARG((png_structp png_ptr,
    png_uint_32 size));
 
 #ifdef PNG_1_0_X
@@ -2778,6 +2796,24 @@ extern PNG_EXPORT(png_uint_32,png_get_user_height_max) PNGARG((png_structp
    png_ptr));
 #endif
 
+/* Added in libpng-1.4.0 */
+#ifdef PNG_IO_STATE_SUPPORTED
+extern PNG_EXPORT(png_uint_32,png_get_io_state) PNGARG((png_structp png_ptr));
+
+extern PNG_EXPORT(png_bytep,png_get_io_chunk_name)
+   PNGARG((png_structp png_ptr));
+
+/* The flags returned by png_get_io_state() are the following: */
+#define PNG_IO_NONE        0x0000  /* no I/O at this moment */
+#define PNG_IO_READING     0x0001  /* currently reading */
+#define PNG_IO_WRITING     0x0002  /* currently writing */
+#define PNG_IO_SIGNATURE   0x0010  /* currently at the file signature */
+#define PNG_IO_CHUNK_HDR   0x0020  /* currently at the chunk header */
+#define PNG_IO_CHUNK_DATA  0x0040  /* currently at the chunk data */
+#define PNG_IO_CHUNK_CRC   0x0080  /* currently at the chunk crc */
+#define PNG_IO_MASK_OP     0x000f  /* current operation: reading/writing */
+#define PNG_IO_MASK_LOC    0x00f0  /* current location: sig/hdr/data/crc */
+#endif /* ?PNG_IO_STATE_SUPPORTED */
 
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and in
  * project defs
@@ -2921,7 +2957,8 @@ extern PNG_EXPORT(void,png_save_uint_16)
                        /*    0x800000L     Unused */
 #define PNG_ADD_ALPHA       0x1000000L  /* Added to libpng-1.2.7 */
 #define PNG_EXPAND_tRNS     0x2000000L  /* Added to libpng-1.2.9 */
-                       /*   0x4000000L  unused */
+#define PNG_PREMULTIPLY_ALPHA 0x4000000L  /* Added to libpng-1.2.41 */
+                                          /* by volker */
                        /*   0x8000000L  unused */
                        /*  0x10000000L  unused */
                        /*  0x20000000L  unused */
@@ -3412,6 +3449,11 @@ PNG_EXTERN void png_do_write_invert_alpha PNGARG((png_row_infop row_info,
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
 PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
    png_bytep row, png_uint_32 flags));
+#endif
+
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+PNG_EXTERN void png_do_read_premultiply_alpha
+   PNGARG((png_row_infop row_info, png_bytep row));
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)

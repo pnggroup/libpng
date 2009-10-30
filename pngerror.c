@@ -45,7 +45,7 @@ png_error(png_structp png_ptr, png_const_charp error_message)
      if (png_ptr->flags&
        (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
      {
-       if (*error_message == '#')
+       if (*error_message == PNG_LITERAL_SHARP)
        {
            /* Strip "#nnnn " from beginning of error message. */
            int offset;
@@ -112,7 +112,7 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
      (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
 #endif
      {
-       if (*warning_message == '#')
+       if (*warning_message == PNG_LITERAL_SHARP)
        {
            for (offset = 1; offset < 15; offset++)
               if (warning_message[offset] == ' ')
@@ -127,6 +127,16 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
 }
 #endif /* PNG_WARNINGS_SUPPORTED */
 
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
+void PNGAPI
+png_benign_error(png_structp png_ptr, png_const_charp error_message)
+{
+  if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
+    png_warning(png_ptr, error_message);
+  else
+    png_error(png_ptr, error_message);
+}
+#endif
 
 /* These utilities are used internally to build an error message that relates
  * to the current chunk.  The chunk name comes from png_ptr->chunk_name,
@@ -153,10 +163,10 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
       int c = png_ptr->chunk_name[iin++];
       if (isnonalpha(c))
       {
-         buffer[iout++] = '[';
+         buffer[iout++] = PNG_LITERAL_LEFT_SQUARE_BRACKET;
          buffer[iout++] = png_digit[(c & 0xf0) >> 4];
          buffer[iout++] = png_digit[c & 0x0f];
-         buffer[iout++] = ']';
+         buffer[iout++] = PNG_LITERAL_RIGHT_SQUARE_BRACKET;
       }
       else
       {
@@ -206,6 +216,18 @@ png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
 }
 #endif /* PNG_WARNINGS_SUPPORTED */
 
+#ifdef PNG_READ_SUPPORTED
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
+void PNGAPI
+png_chunk_benign_error(png_structp png_ptr, png_const_charp error_message)
+{
+  if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
+    png_chunk_warning(png_ptr, error_message);
+  else
+    png_chunk_error(png_ptr, error_message);
+}
+#endif
+#endif /* PNG_READ_SUPPORTED */
 
 /* This is the default error handling function.  Note that replacements for
  * this function MUST NOT RETURN, or the program will likely crash.  This
@@ -217,7 +239,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*error_message == '#')
+   if (*error_message == PNG_LITERAL_SHARP)
    {
      /* Strip "#nnnn " from beginning of error message. */
      int offset;
@@ -282,7 +304,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
 #  ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*warning_message == '#')
+   if (*warning_message == PNG_LITERAL_SHARP)
    {
      int offset;
      char warning_number[16];

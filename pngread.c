@@ -349,6 +349,10 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
       png_size_t num_checked = png_ptr->sig_bytes,
                  num_to_check = 8 - num_checked;
 
+#ifdef PNG_IO_STATE_SUPPORTED
+      png_ptr->io_state = PNG_IO_READING | PNG_IO_SIGNATURE;
+#endif
+
       png_read_data(png_ptr, &(info_ptr->signature[num_checked]), num_to_check);
       png_ptr->sig_bytes = 8;
 
@@ -1446,6 +1450,22 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
     */
    if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
       png_set_swap(png_ptr);
+#endif
+
+/* Added at libpng-1.2.41 */
+#ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
+   /* Invert the alpha channel from opacity to transparency
+    */
+   if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
+       png_set_invert_alpha(png_ptr);
+#endif
+
+/* Added at libpng-1.2.41 */
+#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
+   /* Expand grayscale image to RGB
+    */
+   if (transforms & PNG_TRANSFORM_GRAY_TO_RGB)
+       png_set_gray_to_rgb(png_ptr);
 #endif
 
    /* We don't handle adding filler bytes */

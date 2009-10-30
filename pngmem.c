@@ -114,6 +114,16 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * result, we would be truncating potentially larger memory requests
  * (which should cause a fatal error) and introducing major problems.
  */
+png_voidp PNGAPI
+png_calloc(png_structp png_ptr, png_uint_32 size)
+{
+   png_voidp ret;
+
+   ret = (png_malloc(png_ptr, size));
+   if (ret != NULL)
+      png_memset(ret,0,(png_size_t)size);
+   return (ret);
+}
 
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)
@@ -431,6 +441,16 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * have the ability to do that.
  */
 
+png_voidp PNGAPI
+png_calloc(png_structp png_ptr, png_uint_32 size)
+{
+   png_voidp ret;
+
+   ret = (png_malloc(png_ptr, size));
+   if (ret != NULL)
+      png_memset(ret,0,(png_size_t)size);
+   return (ret);
+}
 
 png_voidp PNGAPI
 png_malloc(png_structp png_ptr, png_uint_32 size)

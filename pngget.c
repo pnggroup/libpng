@@ -939,7 +939,27 @@ png_get_user_height_max (png_structp png_ptr)
 {
     return (png_ptr? png_ptr->user_height_max : 0);
 }
+/* This function was added to libpng 1.2.41 */
+png_uint_32 PNGAPI
+png_get_chunk_cache_max (png_structp png_ptr)
+{
+    return (png_ptr? png_ptr->user_chunk_cache_max? 0x7fffffffL :
+       png_ptr->user_chunk_cache_max - 1 : 0);
+}
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 
+#ifdef PNG_IO_STATE_SUPPORTED
+png_uint_32 PNGAPI
+png_get_io_state (png_structp png_ptr)
+{
+    return png_ptr->io_state;
+}
+
+png_bytep PNGAPI
+png_get_io_chunk_name (png_structp png_ptr)
+{
+   return png_ptr->chunk_name;
+}
+#endif /* ?PNG_IO_STATE_SUPPORTED */
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
