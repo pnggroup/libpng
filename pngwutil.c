@@ -1752,28 +1752,28 @@ png_write_start_row(png_structp png_ptr)
    /* We only need to keep the previous row if we are using one of these. */
    if (png_ptr->do_filter & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH))
    {
-     /* Set up previous row buffer */
-     png_ptr->prev_row = (png_bytep)png_calloc(png_ptr,
-        (png_alloc_size_t)buf_size);
+      /* Set up previous row buffer */
+      png_ptr->prev_row = (png_bytep)png_calloc(png_ptr,
+         (png_alloc_size_t)buf_size);
 
       if (png_ptr->do_filter & PNG_FILTER_UP)
       {
          png_ptr->up_row = (png_bytep)png_malloc(png_ptr,
-           (png_size_t)(png_ptr->rowbytes + 1));
+            (png_size_t)(png_ptr->rowbytes + 1));
          png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
       }
 
       if (png_ptr->do_filter & PNG_FILTER_AVG)
       {
          png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
-           (png_alloc_size_t)(png_ptr->rowbytes + 1));
+            (png_alloc_size_t)(png_ptr->rowbytes + 1));
          png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
       }
 
       if (png_ptr->do_filter & PNG_FILTER_PAETH)
       {
          png_ptr->paeth_row = (png_bytep)png_malloc(png_ptr,
-           (png_size_t)(png_ptr->rowbytes + 1));
+            (png_size_t)(png_ptr->rowbytes + 1));
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
    }
