@@ -2514,6 +2514,8 @@ version 1.2.41beta08 [October 30, 2009]
   Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
     This avoids building 16-bit gamma tables unnecessarily.
 
+version 1.2.41beta09 [October 30, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
