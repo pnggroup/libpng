@@ -2798,6 +2798,11 @@ extern PNG_EXPORT(png_uint_32,png_get_user_width_max) PNGARG((png_structp
    png_ptr));
 extern PNG_EXPORT(png_uint_32,png_get_user_height_max) PNGARG((png_structp
    png_ptr));
+/* Added in libpng-1.2.41 */
+extern PNG_EXPORT(void,png_set_chunk_cache_max) PNGARG((png_structp
+   png_ptr, png_uint_32 user_chunk_cache_max));
+extern PNG_EXPORT(png_uint_32,png_get_chunk_cache_max)
+   PNGARG((png_structp png_ptr));
 #endif
 
 /* Added in libpng-1.2.41 */
