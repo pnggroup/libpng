@@ -2270,7 +2270,11 @@ version 1.4.0rc01 [October 19, 2009]
 version 1.4.0beta87 [October 30, 2009]
   Moved version 1.4.0 back into beta.
 
-version 1.4.0beta87 [October 30, 2009]
+version 1.4.0beta88 [October 30, 2009]
+  Revised libpng*.txt section about differences between 1.2.x and 1.4.0
+    because most of the new features have now been ported back to 1.2.41
+
+version 1.4.0beta89 [October 30, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
