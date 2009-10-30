@@ -589,6 +589,7 @@ version 1.4.0beta88 [October 30, 2009]
     because most of the new features have now been ported back to 1.2.41
 
 version 1.4.0beta89 [October 30, 2009]
+  More bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
