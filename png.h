@@ -1500,10 +1500,6 @@ struct png_struct_def
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    png_uint_32 user_width_max;
    png_uint_32 user_height_max;
-   /* Added in libpng-1.2.41: Total number of sPLT, text, and unknown
-    * chunks that can be stored (0x7fffffff means unlimited).
-    */
-   png_uint_32 user_chunk_cache_max;
 #endif
 
 /* New member added in libpng-1.0.25 and 1.2.17 */
@@ -1517,6 +1513,14 @@ struct png_struct_def
 
 /* New member added in libpng-1.2.30 */
   png_charp chunkdata;  /* buffer for reading chunk data */
+
+/* New member added in libpng-1.2.41 */
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   /* Total number of sPLT, text, and unknown
+    * chunks that can be stored (0x7fffffff means unlimited).
+    */
+   png_uint_32 user_chunk_cache_max;
+#endif
 
 /* New member added in libpng-1.2.41 */
 #ifdef PNG_IO_STATE_SUPPORTED
