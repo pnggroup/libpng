@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [October 20, 2009]
+ * Last changed in libpng 1.4.0 [October 30, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1128,7 +1128,7 @@ png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
    png_ptr->user_width_max = user_width_max;
    png_ptr->user_height_max = user_height_max;
 }
-/* This function was added to libpng 1.4.0 */
+/* This function was added to libpng 1.2.41 */
 void PNGAPI
 png_set_chunk_cache_max (png_structp png_ptr,
    png_uint_32 user_chunk_cache_max)

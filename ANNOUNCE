@@ -1,5 +1,5 @@
 
-Libpng 1.4.0rc01 - October 20, 2009
+Libpng 1.4.0beta87 - October 30, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0rc01.tar.xz (LZMA-compressed, recommended)
-   1.4.0rc01.tar.gz
-   1.4.0rc01.tar.bz2
+   1.4.0beta87.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta87.tar.gz
+   1.4.0beta87.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140r01.zip
-   lp140r01.7z
+   lp140b87.zip
+   lp140b87.7z
 
 Other information:
 
-   1.4.0rc01-README.txt
-   1.4.0rc01-LICENSE.txt
+   1.4.0beta87-README.txt
+   1.4.0beta87-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -578,8 +578,11 @@ version 1.4.0beta86 [October 9, 2009]
   Updated the "xcode" project (Alam Arias).
   Eliminated a shadowed declaration of "pp" in png_handle_sPLT().
 
-version 1.4.0beta00 [October 20, 2009]
+version 1.4.0rc01 [October 19, 2009]
   Trivial cosmetic changes.
+
+version 1.4.0beta87 [October 30, 2009]
+  Moved version 1.4.0 back into beta.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

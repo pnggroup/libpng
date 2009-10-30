@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.0 [October 20, 2009]
+ * Last changed in libpng 1.4.0 [October 30, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -892,7 +892,7 @@ png_get_user_height_max (png_structp png_ptr)
 {
     return (png_ptr? png_ptr->user_height_max : 0);
 }
-/* This function was added to libpng 1.4.0 */
+/* This function was added to libpng 1.2.41 */
 png_uint_32 PNGAPI
 png_get_chunk_cache_max (png_structp png_ptr)
 {
