@@ -2508,13 +2508,11 @@ version 1.2.41beta07 [October 21, 2009]
     many "#if defined(x)" to "#ifdef x" in png.h and pngconf.h.
 
 version 1.2.41beta08 [October 30, 2009]
-  Ported functions from libpng-1.4.0rc01: png_calloc(), png_get_io_state(),
-    png_get_io_chunk_name(), png_set_premultiply_alpha, and
-    png_do_read_premultiply_alpha().
+  Ported from libpng-1.4.0rc01: png_calloc(), png_get_io_chunk_name(),
+    png_get_io_state(), png_set_user_cache_max(), png_get_user_cache_max(),
+    png_set_premultiply_alpha, and png_do_read_premultiply_alpha().
   Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
     This avoids building 16-bit gamma tables unnecessarily.
-
-version 1.2.41beta09 [October 30, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

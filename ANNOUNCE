@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta09 - October 30, 2009
+Libpng 1.2.41beta08 - October 30, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41beta09.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta09.tar.gz
-   libpng-1.2.41beta09.tar.bz2
+   libpng-1.2.41beta08.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta08.tar.gz
+   libpng-1.2.41beta08.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41beta09-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta09-no-config.tar.gz
-   libpng-1.2.41beta09-no-config.tar.bz2
+   libpng-1.2.41beta08-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta08-no-config.tar.gz
+   libpng-1.2.41beta08-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241b09.zip
-   lp1241b09.7z
-   lp1241b09.tar.bz2
+   lp1241b08.zip
+   lp1241b08.7z
+   lp1241b08.tar.bz2
 
 Project files
 
-   libpng-1.2.41beta09-project-netware.zip
-   libpng-1.2.41beta09-project-wince.zip
+   libpng-1.2.41beta08-project-netware.zip
+   libpng-1.2.41beta08-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41beta09-README.txt
-   libpng-1.2.41beta09-KNOWNBUGS.txt
-   libpng-1.2.41beta09-LICENSE.txt
-   libpng-1.2.41beta09-Y2K-compliance.txt
-   libpng-1.2.41beta09-[previous version]-diff.txt
+   libpng-1.2.41beta08-README.txt
+   libpng-1.2.41beta08-KNOWNBUGS.txt
+   libpng-1.2.41beta08-LICENSE.txt
+   libpng-1.2.41beta08-Y2K-compliance.txt
+   libpng-1.2.41beta08-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
@@ -78,13 +78,11 @@ version 1.2.41beta07 [October 21, 2009]
     many "#if defined(x)" to "#ifdef x" in png.h and pngconf.h.
 
 version 1.2.41beta08 [October 30, 2009]
-  Ported functions from libpng-1.4.0rc01: png_calloc(), png_get_io_state(),
-    png_get_io_chunk_name(), png_set_premultiply_alpha, and
-    png_do_read_premultiply_alpha().
+  Ported from libpng-1.4.0rc01: png_calloc(), png_get_io_chunk_name(),
+    png_get_io_state(), png_set_user_cache_max(), png_get_user_cache_max(),
+    png_set_premultiply_alpha, and png_do_read_premultiply_alpha().
   Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
     This avoids building 16-bit gamma tables unnecessarily.
-
-version 1.2.41beta09 [October 30, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
