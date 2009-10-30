@@ -2959,17 +2959,6 @@ selection of assembler code features:
 We replaced all of these functions with simple stubs in libpng-1.2.20,
 when the Intel assembler code was removed due to a licensing issue.
 
-IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
-
-Private libpng prototypes and macro definitions were moved from
-png.h and pngconf.h into a new pngpriv.h header file.
-
-Support for the iTXt chunk has been enabled by default.
-
-Support for global arrays was removed.
-
-Some obsolete/deprecated macros and functions have been removed.
-
 These macros are deprecated:
 
     PNG_READ_TRANSFORMS_NOT_SUPPORTED
@@ -2988,12 +2977,6 @@ They have been replaced, respectively, by:
     PNG_NO_READ_ANCILLARY_CHUNKS
     PNG_NO_WRITE_ANCILLARY_CHUNKS
 
-The PNG_1_0_X and PNG_1_2_X macros were eliminated.
-
-The PNG_LEGACY_SUPPORTED macro was eliminated.
-
-Many WIN32_WCE #ifdefs were removed.
-
 PNG_MAX_UINT was replaced with PNG_UINT_31_MAX.  It has been
 deprecated since libpng-1.0.16 and libpng-1.2.6.
 
@@ -3003,19 +2986,11 @@ was replaced with
     !png_sig_cmp(sig, 0, num)
 It has been deprecated since libpng-0.90.
 
-The functions png_read_init(info_ptr), png_write_init(info_ptr),
-png_info_init(info_ptr), png_read_destroy(), and png_write_destroy()
-have been removed.  They have been deprecated since libpng-0.95.
-
 The function
     png_set_gray_1_2_4_to_8()
 which also expands tRNS to alpha was replaced with
     png_set_expand_gray_1_2_4_to_8()
 which does not. It has been deprecated since libpng-1.0.18 and 1.2.9.
-
-Support for numbered error messages was removed by default, since we
-never got around to actually numbering the error messages. The function
-png_set_strip_error_numbers() was removed from the library by default.
 
 Functions png_set_benign_errors(), png_benign_error(), and
 png_chunk_benign_error() were added.
@@ -3027,6 +3002,51 @@ were added to the library.
 
 We implemented support for I/O states. Added png_ptr member io_state, and
 functions png_get_io_chunk_name() and png_get_io_state() in pngget.c
+
+The png_calloc() function was added and is used in place of
+of "png_malloc(); png_memset();" except in the case in png_read_png()
+where the array consists of pointers; in this case a "for" loop is used
+after the png_malloc() to set the pointers to NULL.
+
+We added PNG_TRANSFORM_GRAY_TO_RGB to the available high-level
+input transforms.
+
+We added the png_set_premultiply_alpha and
+png_do_read_premultiply_alpha() functions.
+
+The call to png_do_chop() in pngrtran.c, which reduces 16-bit input
+files to 8-bit bit depth, was relocated ahead of the building
+of gamma tables.  This allows us to build 8-bit tables instead
+of 16-bit tables, when only 8-bit tables are needed. This avoids 
+wasting some computing resources when the application has called
+the png_set_strip_16() function and encounters a 16-bit PNG file.
+
+Checking for and reporting of errors in the IHDR chunk is more thorough.
+
+IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
+
+Private libpng prototypes and macro definitions were moved from
+png.h and pngconf.h into a new pngpriv.h header file.
+
+Support for the iTXt chunk has been enabled by default.
+
+Support for global arrays was removed.
+
+Some obsolete/deprecated macros and functions have been removed.
+
+The PNG_1_0_X and PNG_1_2_X macros were eliminated.
+
+The PNG_LEGACY_SUPPORTED macro was eliminated.
+
+Many WIN32_WCE #ifdefs were removed.
+
+The functions png_read_init(info_ptr), png_write_init(info_ptr),
+png_info_init(info_ptr), png_read_destroy(), and png_write_destroy()
+have been removed.  They have been deprecated since libpng-0.95.
+
+Support for numbered error messages was removed by default, since we
+never got around to actually numbering the error messages. The function
+png_set_strip_error_numbers() was removed from the library by default.
 
 The png_permit_empty_plte() was removed. It has been deprecated
 since libpng-1.0.9.  Use png_permit_mng_features() instead.
@@ -3052,27 +3072,10 @@ allocates.
 
 The png_zalloc() and png_zfree() functions are no longer exported.
 
-The png_calloc() function was added and is used in place of
-of "png_malloc(); png_memset();" except in the case in png_read_png()
-where the array consists of pointers; in this case a "for" loop is used
-after the png_malloc() to set the pointers to NULL.
-
 We removed the trailing '.' from the warning and error messages.
-
-We added PNG_TRANSFORM_GRAY_TO_RGB to the available high-level
-input transforms.
 
 The png_struct and info_struct members "trans" and "trans_values" were
 changed to "trans_alpha" and "trans_color", respectively.
-
-The call to png_do_chop() in pngrtran.c, which reduces 16-bit input
-files to 8-bit bit depth, was relocated ahead of the building
-of gamma tables.  This allows us to build 8-bit tables instead
-of 16-bit tables, when only 8-bit tables are needed. This avoids 
-wasting some computing resources when the application has called
-the png_set_strip_16() function and encounters a 16-bit PNG file.
-
-Checking for and reporting of errors in the IHDR chunk is more thorough.
 
 X. Detecting libpng
 
@@ -3181,7 +3184,8 @@ We mark all non-exported functions with "/* PRIVATE */"":
  }
 
 The prototypes for non-exported functions (except for those in
-pngtest) appear in pngpriv.h
+pngtest) appear in
+pngpriv.h
 above the comment that says
 
   /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
