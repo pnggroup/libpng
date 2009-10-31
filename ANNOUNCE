@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta89 - October 30, 2009
+Libpng 1.4.0beta89 - October 31, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -588,8 +588,9 @@ version 1.4.0beta88 [October 30, 2009]
   Revised libpng*.txt section about differences between 1.2.x and 1.4.0
     because most of the new features have now been ported back to 1.2.41
 
-version 1.4.0beta89 [October 30, 2009]
+version 1.4.0beta89 [October 31, 2009]
   More bugfixes and improvements to CMakeLists.txt (Philip Lowman)
+  Removed a harmless extra png_set_invert_alpha() from pngwrite.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
