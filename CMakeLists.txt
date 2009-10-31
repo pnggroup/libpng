@@ -1,5 +1,12 @@
-project(PNG C)
 cmake_minimum_required(VERSION 2.4.3)
+if(UNIX AND NOT DEFINED CMAKE_BUILD_TYPE)
+   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of
+   build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug
+   Release RelWithDebInfo MinSizeRel.")
+endif()
+
+project(PNG C)
+enable_testing()
 
 # Copyright (C) 2007 Glenn Randers-Pehrson
 
@@ -172,7 +179,7 @@ if(PNG_TESTS AND PNG_SHARED)
 # does not work with msvc due to png_lib_ver issue
  add_executable(pngtest ${pngtest_sources})
  target_link_libraries(pngtest ${PNG_LIB_NAME})
-#  add_test(pngtest ${PNG_SOURCE_DIR}/pngtest.png)
+ add_test(pngtest pngtest ${PNG_SOURCE_DIR}/pngtest.png)
 endif()
 
 
@@ -225,8 +232,12 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
 endif()
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL )
-install(FILES png.h pngconf.h         DESTINATION include)
-install(FILES png.h pngconf.h         DESTINATION include/${PNGLIB_NAME})
+    install(FILES png.h pngconf.h         DESTINATION include)
+    install(FILES png.h pngconf.h         DESTINATION include/${PNGLIB_NAME})
+endif()
+if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL )
+    install(PROGRAMS ${PNG_BINARY_DIR}/libpng-config      DESTINATION bin)
+    install(PROGRAMS ${PNG_BINARY_DIR}/${PNGLIB_NAME}-config DESTINATION bin)
 endif()
 if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
     install(FILES libpng.3 libpngpf.3             DESTINATION man/man3)
