@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta09 - October 30, 2009
+Libpng 1.2.41beta09 - October 31, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -84,7 +84,8 @@ version 1.2.41beta08 [October 30, 2009]
   Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
     This avoids building 16-bit gamma tables unnecessarily.
 
-version 1.2.41beta09 [October 30, 2009]
+version 1.2.41beta09 [October 31, 2009]
+  Removed a harmless extra png_set_invert_alpha() from pngwrite.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

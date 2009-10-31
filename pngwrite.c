@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.2.41 [October 30, 2009]
+ * Last changed in libpng 1.2.41 [October 31, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1563,12 +1563,6 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
    /* Swap bits of 1, 2, 4 bit packed pixel formats */
    if (transforms & PNG_TRANSFORM_PACKSWAP)
       png_set_packswap(png_ptr);
-#endif
-
-#ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
-   /* Invert the alpha channel from opacity to transparency */
-   if (transforms & PNG_TRANSFORM_INVERT_ALPHA)
-      png_set_invert_alpha(png_ptr);
 #endif
 
 #ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED

@@ -2466,7 +2466,7 @@ version 1.2.40beta01 [August 20, 2009]
 version 1.2.40rc01 [September 2, 2009]
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
-version 1.2.40 and 1.0.49 [October 30, 2009]
+version 1.2.40 and 1.0.49 [October 31, 2009]
   No changes.
 
 version 1.0.50 [September 10, 2009]
@@ -2514,7 +2514,8 @@ version 1.2.41beta08 [October 30, 2009]
   Relocated png_do_chop() ahead of building gamma tables in pngrtran.c
     This avoids building 16-bit gamma tables unnecessarily.
 
-version 1.2.41beta09 [October 30, 2009]
+version 1.2.41beta09 [October 31, 2009]
+  Removed a harmless extra png_set_invert_alpha() from pngwrite.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
