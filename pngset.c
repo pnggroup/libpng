@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.41 [October 30, 2009]
+ * Last changed in libpng 1.2.41 [November 1, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -716,6 +716,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          lang_len = 0;
          lang_key_len = 0;
       }
+
       else
 #ifdef PNG_iTXt_SUPPORTED
       {
@@ -729,6 +730,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          else
             lang_key_len = 0;
       }
+
 #else
       {
          png_warning(png_ptr, "iTXt chunk not supported.");
@@ -746,6 +748,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 #endif
             textp->compression = PNG_TEXT_COMPRESSION_NONE;
       }
+
       else
       {
          text_length = png_strlen(text_ptr[i].text);
@@ -797,6 +800,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       }
       else
 #endif
+
       {
          textp->text_length = text_length;
 #ifdef PNG_iTXt_SUPPORTED
@@ -837,8 +841,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 
    if (trans != NULL)
    {
-       /*
-        * It may not actually be necessary to set png_ptr->trans here;
+       /* It may not actually be necessary to set png_ptr->trans here;
         * we do it for backward compatibility with the way the png_handle_tRNS
         * function used to do the allocation.
         */

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.41 [October 30, 2009]
+ * Last changed in libpng 1.2.41 [November 1, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -322,9 +322,23 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                png_charp tmp;
 
                tmp = text;
-               text = (png_charp)png_malloc_warn(png_ptr,
-                  (png_uint_32)(text_size +
-                  png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1));
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+               if ((png_ptr->user_chunk_cache_max != 0) &&
+                  (--png_ptr->user_chunk_cache_max == 0))
+               {
+                  png_warning(png_ptr, "No space in chunk cache");
+                  text = NULL;
+               }
+
+               else
+               {
+#endif
+                  text = (png_charp)png_malloc_warn(png_ptr,
+                     (png_uint_32)(text_size +
+                      png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1));
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+               }
+#endif
                if (text == NULL)
                {
                   png_free(png_ptr, tmp);
