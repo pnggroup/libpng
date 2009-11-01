@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta09 - November 1, 2009
+Libpng 1.2.41beta10 - November 1, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41beta09.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta09.tar.gz
-   libpng-1.2.41beta09.tar.bz2
+   libpng-1.2.41beta10.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta10.tar.gz
+   libpng-1.2.41beta10.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41beta09-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta09-no-config.tar.gz
-   libpng-1.2.41beta09-no-config.tar.bz2
+   libpng-1.2.41beta10-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta10-no-config.tar.gz
+   libpng-1.2.41beta10-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241b09.zip
-   lp1241b09.7z
-   lp1241b09.tar.bz2
+   lp1241b10.zip
+   lp1241b10.7z
+   lp1241b10.tar.bz2
 
 Project files
 
-   libpng-1.2.41beta09-project-netware.zip
-   libpng-1.2.41beta09-project-wince.zip
+   libpng-1.2.41beta10-project-netware.zip
+   libpng-1.2.41beta10-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41beta09-README.txt
-   libpng-1.2.41beta09-KNOWNBUGS.txt
-   libpng-1.2.41beta09-LICENSE.txt
-   libpng-1.2.41beta09-Y2K-compliance.txt
-   libpng-1.2.41beta09-[previous version]-diff.txt
+   libpng-1.2.41beta10-README.txt
+   libpng-1.2.41beta10-KNOWNBUGS.txt
+   libpng-1.2.41beta10-LICENSE.txt
+   libpng-1.2.41beta10-Y2K-compliance.txt
+   libpng-1.2.41beta10-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
@@ -90,6 +90,8 @@ version 1.2.41beta09 [November 1, 2009]
   Moved CMakeLists.txt from scripts into the main libpng directory.
   Apply png_user_chunk_cache_max within png_decompress_chunk().
   Merged libpng-1.2.41.txt with libpng-1.4.0.txt where appropriate.
+
+version 1.2.41beta10 [November 1, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
