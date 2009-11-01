@@ -200,7 +200,7 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 14.${PNGLIB_RELEASE}.1.4.0beta89
+#    VERSION 14.${PNGLIB_RELEASE}.1.4.0beta90
      VERSION 14.${PNGLIB_RELEASE}.0
      SOVERSION 14
      CLEAN_DIRECT_OUTPUT 1)
