@@ -421,7 +421,7 @@ where 0x7fffffffL means unlimited.  You can retrieve this limit with
    chunk_cache_max = png_get_chunk_cache_max(png_ptr);
 
 This limit also applies to the number of buffers that can be allocated
-by png_decompress_chunk().
+by png_decompress_chunk() while decompressing iTXt, zTXt, and iCCP chunks.
 
 The high-level read interface
 
