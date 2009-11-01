@@ -1026,7 +1026,6 @@
 
 /* Need the time information for reading tIME chunks */
 #ifdef PNG_tIME_SUPPORTED
-     /* "time.h" functions are not supported on WindowsCE */
 #    include <time.h>
 #endif
 

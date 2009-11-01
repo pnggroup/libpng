@@ -421,7 +421,6 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 }
 
 #ifdef PNG_WRITE_tIME_SUPPORTED
-/* "time.h" functions are not supported on WindowsCE */
 void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
 {
