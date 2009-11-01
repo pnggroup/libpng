@@ -662,18 +662,20 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
    if (png_ptr == NULL || info_ptr == NULL || num_text == 0)
       return(0);
 
-#ifdef PNG_iTXt_NOT_PREVIOUSLY_SUPPORTED
    /* If an earlier version of the library was used to build the
     * application, it might be using a png_textp structure that
-    * does not contain the lang or lang_key elements. If you build
+    * does not contain the lang or lang_key elements. Even if you build
     * this library with PNG_iTXt_SUPPORTED explicitly defined,
-    * then we assume that your older library was also built with
-    * PNG_iTXt_SUPPORTED defined and the complete png_textp structure
-    * has existed all along and it's safe to access them.  See pngconf.h.
+    * and your older library was also built with PNG_iTXt_SUPPORTED
+    * defined, the complete png_textp structure probably has not existed
+    * all along and it's not safe to access them, due to a bug in
+    * pngconf.h from version 1.2.9 to 1.2.40.
+    *
+    * To do: accept mismatched libraries when both are version 1.2.41
+    * or later.
     */
    if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
       caller_no_itxt = 1;
-#endif
 
    /* Make sure we have enough space in the "text" array in info_struct
     * to hold all of the incoming text_ptr objects.

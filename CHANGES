@@ -2530,6 +2530,10 @@ version 1.2.41beta10 [November 1, 2009]
     been building previous versions with PNG_iTXt_SUPPORTED as well.
 
 version 1.2.41beta11 [November 1, 2009]
+  Revised iTXt support. To ensure binary compatibility with
+    previous versions, the "lang" and "lang_key" members will be assumed
+    to be omitted from previous versions whenever there is a library
+    mismatch.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
