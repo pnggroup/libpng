@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "October 30, 2009"
+.TH LIBPNG 3 "November 1, 2009"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.2.41beta09
 .SH SYNOPSIS
@@ -821,7 +821,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.41beta09 - October 30, 2009
+ libpng version 1.2.41beta09 - November 1, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -832,7 +832,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.41beta09 - October 30, 2009
+ libpng versions 0.97, January 1998, through 1.2.41beta09 - November 1, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -1231,6 +1231,19 @@ If you need to retrieve the limits that are being applied, use
    width_max = png_get_user_width_max(png_ptr);
    height_max = png_get_user_height_max(png_ptr);
 
+The PNG specification sets no limit on the number of ancillary chunks
+allowed in a PNG datastream.  You can impose a limit on the total number
+of sPLT, tEXt, iTXt, zTXt, and unknown chunks that will be stored, with
+
+   png_set_chunk_cache_max(png_ptr, user_chunk_cache_max);
+
+where 0x7fffffffL means unlimited.  You can retrieve this limit with
+
+   chunk_cache_max = png_get_chunk_cache_max(png_ptr);
+
+This limit also applies to the number of buffers that can be allocated
+by png_decompress_chunk() while decompressing iTXt, zTXt, and iCCP chunks.
+
 .SS The high-level read interface
 
 At this point there are two ways to proceed; through the high-level
@@ -1258,6 +1271,8 @@ you want to do are limited to the following set:
     PNG_TRANSFORM_INVERT_ALPHA  Change alpha from opacity
                                 to transparency
     PNG_TRANSFORM_SWAP_ENDIAN   Byte-swap 16-bit samples
+    PNG_TRANSFORM_GRAY_TO_RGB   Expand grayscale samples
+                                to RGB (or GA to RGBA)
 
 (This excludes setting a background color, doing gamma transformation,
 dithering, and setting filler.)  If this is the case, simply do this:
@@ -1501,6 +1516,10 @@ into the info_ptr is returned for any complex types.
                          string for unknown).
     text_ptr[i].lang_key  - keyword in UTF-8
                          (empty string for unknown).
+    Note that the itxt_length, lang, and lang_key
+    members of the text_ptr structure only exist
+    when the library is built with iTXt chunk support.
+
     num_text       - number of comments (same as
                      num_comments; you can put NULL here
                      to avoid the duplication)
@@ -1679,6 +1698,43 @@ things.
 
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
+
+As of libpng version 1.2.41beta09, not all possible expansions are supported.
+
+In the following table, the 01 means grayscale with depth<8, 31 means
+indexed with depth<8, other numerals represent the color type, "T" means
+the tRNS chunk is present, A means an alpha channel is present, and O
+means tRNS or alpha is present but all pixels in the image are opaque.
+
+  FROM  01  31   0  0T  0O   2  2T  2O   3  3T  3O  4A  4O  6A  6O 
+   TO
+   01    -                   
+   31        -
+    0    1       -           
+   0T                -
+   0O                    -
+    2           GX           -
+   2T                            -
+   2O                                -
+    3        1                           -
+   3T                                        -
+   3O                                            -
+   4A                T                               -
+   4O                                                    -
+   6A               GX         TX           TX               -
+   6O                   GX                      TX               -
+
+Within the matrix,
+     "-" means the transformation is not supported.
+     "X" means the transformation is obtained by png_set_expand().
+     "1" means the transformation is obtained by
+         png_set_expand_gray_1_2_4_to_8
+     "G" means the transformation is obtained by
+         png_set_gray_to_rgb().
+     "P" means the transformation is obtained by
+         png_set_expand_palette_to_rgb().
+     "T" means the transformation is obtained by
+         png_set_tRNS_to_alpha().
 
 PNG can have files with 16 bits per channel.  If you only can handle
 8 bits per channel, this will strip the pixels down to 8 bit.
@@ -2737,6 +2793,10 @@ width, height, bit_depth, and color_type must be the same in each call.
                          empty for unknown).
     text_ptr[i].translated_keyword  - keyword in UTF-8 (NULL
                          or empty for unknown).
+    Note that the itxt_length, lang, and lang_key
+    members of the text_ptr structure only exist
+    when the library is built with iTXt chunk support.
+
     num_text       - number of comments
 
     png_set_sPLT(png_ptr, info_ptr, &palette_ptr,
@@ -3967,7 +4027,7 @@ source.
 
 .SH XIII. Y2K Compliance in libpng
 
-October 30, 2009
+November 1, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -4313,7 +4373,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.2.41beta09 - October 30, 2009:
+Libpng version 1.2.41beta09 - November 1, 2009:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4336,7 +4396,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.2.41beta09, October 30, 2009, are
+libpng versions 1.2.6, August 15, 2004, through 1.2.41beta09, November 1, 2009, are
 Copyright (c) 2004,2006-2008 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4435,7 +4495,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-October 30, 2009
+November 1, 2009
 
 .\" end of man page
 
