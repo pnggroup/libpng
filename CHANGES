@@ -2529,6 +2529,8 @@ version 1.2.41beta10 [November 1, 2009]
     longer necessary to gain iTXt support), as a signal that the user has
     been building previous versions with PNG_iTXt_SUPPORTED as well.
 
+version 1.2.41beta11 [November 1, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
