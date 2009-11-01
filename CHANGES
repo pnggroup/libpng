@@ -2281,6 +2281,7 @@ version 1.4.0beta89 [November 1, 2009]
   Merged libpng-1.2.41.txt with libpng-1.4.0.txt where appropriate.
 
 version 1.4.0beta90 [November 1, 2009]
+  Removed all remaining WIN32_WCE #ifdefs
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

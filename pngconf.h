@@ -264,14 +264,6 @@
 #  define PNG_STDIO_SUPPORTED
 #endif
 
-#ifdef _WIN32_WCE
-#  include <windows.h>
-   /* Console I/O functions are not supported on WindowsCE */
-#  define PNG_NO_CONSOLE_IO
-#  ifdef PNG_DEBUG
-#    undef PNG_DEBUG
-#  endif
-#endif
 
 #ifdef PNG_BUILD_DLL
 #  if !defined(PNG_CONSOLE_IO_SUPPORTED) && !defined(PNG_NO_CONSOLE_IO)
@@ -331,7 +323,7 @@
 #endif
 
 /* Enough people need this for various reasons to include it here */
-#if !defined(MACOS) && !defined(RISCOS) && !defined(_WIN32_WCE)
+#if !defined(MACOS) && !defined(RISCOS)
 #  include <sys/types.h>
 #endif
 
@@ -1034,10 +1026,8 @@
 
 /* Need the time information for reading tIME chunks */
 #ifdef PNG_tIME_SUPPORTED
-#  ifndef _WIN32_WCE
      /* "time.h" functions are not supported on WindowsCE */
 #    include <time.h>
-#  endif
 #endif
 
 /* Some typedefs to get us started.  These should be safe on most of the
@@ -1142,11 +1132,7 @@ typedef char            FAR * png_charp;
 typedef png_fixed_point FAR * png_fixed_point_p;
 
 #ifndef PNG_NO_STDIO
-#  ifdef _WIN32_WCE
-typedef HANDLE                png_FILE_p;
-#  else
 typedef FILE                * png_FILE_p;
-#  endif
 #endif
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED

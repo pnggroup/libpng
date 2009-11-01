@@ -113,7 +113,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
           (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
           (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
       {
-#if defined(PNG_STDIO_SUPPORTED) && !defined(_WIN32_WCE)
+#ifdef PNG_STDIO_SUPPORTED
          char msg[80];
          if (user_png_ver)
          {
