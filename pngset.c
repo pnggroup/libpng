@@ -653,6 +653,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
                int num_text)
 {
    int i;
+   int caller_no_itxt = 0;
 
    png_debug1(1, "in %s storage function", ((png_ptr == NULL ||
       png_ptr->chunk_name[0] == '\0') ?
@@ -660,6 +661,19 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
    if (png_ptr == NULL || info_ptr == NULL || num_text == 0)
       return(0);
+
+#ifdef PNG_iTXt_NOT_PREVIOUSLY_SUPPORTED
+   /* If an earlier version of the library was used to build the
+    * application, it might be using a png_textp structure that
+    * does not contain the lang or lang_key elements. If you build
+    * this library with PNG_iTXt_SUPPORTED explicitly defined,
+    * then we assume that your older library was also built with
+    * PNG_iTXt_SUPPORTED defined and the complete png_textp structure
+    * has existed all along and it's safe to access them.  See pngconf.h.
+    */
+   if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
+      caller_no_itxt = 1;
+#endif
 
    /* Make sure we have enough space in the "text" array in info_struct
     * to hold all of the incoming text_ptr objects.
@@ -721,17 +735,28 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 #ifdef PNG_iTXt_SUPPORTED
       {
          /* Set iTXt data */
-         if (text_ptr[i].lang != NULL)
-            lang_len = png_strlen(text_ptr[i].lang);
-         else
-            lang_len = 0;
-         if (text_ptr[i].lang_key != NULL)
-            lang_key_len = png_strlen(text_ptr[i].lang_key);
-         else
-            lang_key_len = 0;
-      }
 
-#else
+         if (caller_no_itxt == 0)
+         {
+            if (text_ptr[i].lang != NULL)
+               lang_len = png_strlen(text_ptr[i].lang);
+            else
+               lang_len = 0;
+            if (text_ptr[i].lang_key != NULL)
+               lang_key_len = png_strlen(text_ptr[i].lang_key);
+            else
+               lang_key_len = 0;
+         }
+
+         else /* Caller does not support iTXt */
+         {
+            lang_len = 0;
+            lang_key_len = 0;
+            png_warning(png_ptr,
+               "iTXt lang and lang_key not available from application");
+         }
+      }
+#else /* PNG_iTXt_SUPPORTED */
       {
          png_warning(png_ptr, "iTXt chunk not supported.");
          continue;

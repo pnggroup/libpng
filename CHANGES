@@ -2522,6 +2522,12 @@ version 1.2.41beta09 [November 1, 2009]
   Merged libpng-1.2.41.txt with libpng-1.4.0.txt where appropriate.
 
 version 1.2.41beta10 [November 1, 2009]
+  Enabled iTXt support by default. To ensure binary compatibility with
+    previous versions, the "lang" and "lang_key" members will be assumed
+    to be omitted from previous versions unless the current libpng
+    version was built with PNG_iTXt_SUPPORTED (which is otherwise no
+    longer necessary to gain iTXt support), as a signal that the user has
+    been building previous versions with PNG_iTXt_SUPPORTED as well.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
