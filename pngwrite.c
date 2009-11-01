@@ -421,6 +421,8 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 }
 
 #ifdef PNG_WRITE_tIME_SUPPORTED
+#ifndef _WIN32_WCE
+/* "tm" structure is not supported on WindowsCE */
 void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
 {
@@ -445,7 +447,7 @@ png_convert_from_time_t(png_timep ptime, time_t ttime)
    png_convert_from_struct_tm(ptime, tbuf);
 }
 #endif
-
+#endif
 
 /* Initialize png_ptr structure, and allocate any memory needed */
 png_structp PNGAPI

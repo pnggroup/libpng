@@ -1443,12 +1443,15 @@ extern PNG_EXPORT(png_charp,png_convert_to_rfc1123)
 
 #ifdef PNG_WRITE_tIME_SUPPORTED
 /* Convert from a struct tm to png_time */
+#  ifndef _WIN32_WCE
+/* "tm" structure is not supported on WindowsCE */
 extern PNG_EXPORT(void,png_convert_from_struct_tm) PNGARG((png_timep ptime,
    struct tm FAR * ttime));
 
 /* Convert from time_t to png_time.  Uses gmtime() */
 extern PNG_EXPORT(void,png_convert_from_time_t) PNGARG((png_timep ptime,
    time_t ttime));
+#  endif /* _WIN32_WCE */
 #endif /* PNG_WRITE_tIME_SUPPORTED */
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
