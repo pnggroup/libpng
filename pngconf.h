@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta89 - October 30, 2009
+ * libpng version 1.4.0beta89 - November 1, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -692,7 +692,7 @@
 
 /* Added at libpng-1.4.0 */
 #ifndef PNG_USER_CHUNK_CACHE_MAX
-#  define PNG_USER_CHUNK_CACHE_MAX 0x7ffffffLL
+#  define PNG_USER_CHUNK_CACHE_MAX 0x7fffffffL
 #endif
 
 /* Added at libpng-1.4.0 */
