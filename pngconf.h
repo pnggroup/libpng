@@ -526,20 +526,6 @@
  * was turned on by default in libpng-1.2.41.
  */
 
-#if 0
-#ifndef PNG_NO_iTXt
-#  ifndef PNG_iTXt_SUPPORTED
-#    define PNG_iTXt_SUPPORTED
-#  endif
-#  if !defined(PNG_READ_iTXt_SUPPORTED) && !defined(PNG_NO_READ_iTXt)
-#    define PNG_READ_iTXt_SUPPORTED
-#  endif
-#  if !defined(PNG_WRITE_iTXt_SUPPORTED) && !defined(PNG_NO_WRITE_iTXt)
-#    define PNG_WRITE_iTXt_SUPPORTED
-#  endif
-#endif
-#endif
-
 /* The following support, added after version 1.0.0, can be turned off here en
  * masse by defining PNG_LEGACY_SUPPORTED in case you need binary compatibility
  * with old applications that require the length of png_struct and png_info
