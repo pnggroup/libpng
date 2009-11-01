@@ -523,42 +523,21 @@
  * iTXt support was added.  iTXt support was turned off by default through
  * libpng-1.2.x, to support old apps that malloc the png_text structure
  * instead of calling png_set_text() and letting libpng malloc it.  It
- * will be turned on by default in libpng-1.4.0.
+ * was turned on by default in libpng-1.2.41.
  */
 
-/* If you have previously been defining PNG_iTXt_SUPPORTED, please
- * continue to do so in libpng-1.2.41 and later, until you switch to
- * libpng-1.4.0, even though it is not necessary now to gain iTXt support.
- * Your PNG_iTXt_SUPPORTED definition will be interpreted in png_set_text()
- * as a signal that you have defined it in your builds of previous libpng
- * versions that did not support iTXt by default.
- */
-#if !defined(PNG_iTXt_SUPPORTED) && !defined(PNG_READ_iTXt_SUPPORTED) && \
-    !defined(PNG_WRITE_iTXt_SUPPORTED)
-#  define PNG_iTXt_NOT_PREVIOUSLY_SUPPORTED
-#endif
-
-#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
+#if 0
+#ifndef PNG_NO_iTXt
 #  ifndef PNG_iTXt_SUPPORTED
-#    ifndef PNG_NO_iTXt_SUPPORTED
-#      define PNG_NO_iTXt_SUPPORTED
-#    endif
-#    ifndef PNG_NO_READ_iTXt
-#      define PNG_NO_READ_iTXt
-#    endif
-#    ifndef PNG_NO_WRITE_iTXt
-#      define PNG_NO_WRITE_iTXt
-#    endif
+#    define PNG_iTXt_SUPPORTED
 #  endif
-#endif
-
-#ifndef PNG_NO_iTXt_SUPPORTED
 #  if !defined(PNG_READ_iTXt_SUPPORTED) && !defined(PNG_NO_READ_iTXt)
-#    define PNG_READ_iTXt
+#    define PNG_READ_iTXt_SUPPORTED
 #  endif
 #  if !defined(PNG_WRITE_iTXt_SUPPORTED) && !defined(PNG_NO_WRITE_iTXt)
-#    define PNG_WRITE_iTXt
+#    define PNG_WRITE_iTXt_SUPPORTED
 #  endif
+#endif
 #endif
 
 /* The following support, added after version 1.0.0, can be turned off here en
