@@ -2519,6 +2519,7 @@ version 1.2.41beta09 [November 1, 2009]
   More bugfixes and improvements to CMakeLists.txt (Philip Lowman)
   Moved CMakeLists.txt from scripts into the main libpng directory.
   Apply png_user_chunk_cache_max within png_decompress_chunk().
+  Merged libpng-1.2.41.txt with libpng-1.4.0.txt where appropriate.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
