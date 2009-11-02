@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0beta90 - November 1, 2009
+ libpng version 1.4.0beta90 - November 2, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.0beta90 - November 1, 2009
+ libpng versions 0.97, January 1998, through 1.4.0beta90 - November 2, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -2916,6 +2916,9 @@ accomplish this, the functions png_create_read_struct_2(),
 png_create_write_struct_2(), png_set_mem_fn(), png_get_mem_ptr(),
 png_malloc_default(), and png_free_default() were added.
 
+Support for the iTXt chunk has been enabled by default as of
+version 1.2.41.
+
 Support for certain MNG features was enabled.
 
 Support for numbered error messages was added.  However, we never got
@@ -3038,8 +3041,6 @@ IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
 
 Private libpng prototypes and macro definitions were moved from
 png.h and pngconf.h into a new pngpriv.h header file.
-
-Support for the iTXt chunk has been enabled by default.
 
 Support for global arrays was removed.
 
@@ -3225,7 +3226,7 @@ source.
 
 XIII. Y2K Compliance in libpng
 
-November 1, 2009
+November 2, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

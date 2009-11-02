@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta90 - November 1, 2009
+ * libpng version 1.4.0beta90 - November 2, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -998,6 +998,8 @@
 #endif
 
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
+
+#define PNG_CONVERT_tIME_SUPPORTED (PNG_tIME_SUPPORTED && !WIN32_WCE)
 
 #if !defined(PNG_NO_WRITE_FILTER) && !defined(PNG_WRITE_FILTER_SUPPORTED)
 #  define PNG_WRITE_FILTER_SUPPORTED

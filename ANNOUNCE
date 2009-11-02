@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta90 - November 1, 2009
+Libpng 1.4.0beta90 - November 2, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -594,7 +594,7 @@ version 1.4.0beta89 [November 1, 2009]
   Apply png_user_chunk_cache_max within png_decompress_chunk().
   Merged libpng-1.2.41.txt with libpng-1.4.0.txt where appropriate.
 
-version 1.4.0beta90 [November 1, 2009]
+version 1.4.0beta90 [November 2, 2009]
   Removed all remaining WIN32_WCE #ifdefs except those involving the
     time.h "tm" structure
 
