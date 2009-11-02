@@ -2540,6 +2540,8 @@ version 1.2.41beta12 [November 2, 2009]
   Free png_ptr->user_png_ver when destroying png_ptr.
 
 version 1.2.41beta13 [November 2, 2009]
+  Updated scripts/pngw32.def
+  Patched ltmain.sh for wince support.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
