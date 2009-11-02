@@ -2542,6 +2542,7 @@ version 1.2.41beta12 [November 2, 2009]
 version 1.2.41beta13 [November 2, 2009]
   Updated scripts/pngw32.def
   Patched ltmain.sh for wince support.
+  Added PNG_CONVERT_tIME_SUPPORTED macro.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

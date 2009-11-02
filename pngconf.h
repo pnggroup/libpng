@@ -1162,6 +1162,15 @@
 #  endif
 #endif
 
+#ifndef PNG_NO_CONVERT_tIME
+# ifndef _WIN32_WCE
+/* The "tm" structure is not supported on WindowsCE */
+#  ifndef PNG_CONVERT_tIME_SUPPORTED
+#    define PNG_CONVERT_tIME_SUPPORTED
+#   endif
+# endif
+#endif
+
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
 
 #if !defined(PNG_NO_WRITE_FILTER) && !defined(PNG_WRITE_FILTER_SUPPORTED)
