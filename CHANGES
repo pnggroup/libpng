@@ -2466,7 +2466,7 @@ version 1.2.40beta01 [August 20, 2009]
 version 1.2.40rc01 [September 2, 2009]
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
-version 1.2.40 and 1.0.49 [November 1, 2009]
+version 1.2.40 and 1.0.49 [November 2, 2009]
   No changes.
 
 version 1.0.50 [September 10, 2009]
@@ -2529,11 +2529,12 @@ version 1.2.41beta10 [November 1, 2009]
     longer necessary to gain iTXt support), as a signal that the user has
     been building previous versions with PNG_iTXt_SUPPORTED as well.
 
-version 1.2.41beta11 [November 1, 2009]
+version 1.2.41beta11 [November 2, 2009]
+  Store user's user_png_ver in new png_ptr->user_png_ver element.
   Revised iTXt support. To ensure binary compatibility with
     previous versions, the "lang" and "lang_key" members will be assumed
-    to be omitted from previous versions whenever there is a library
-    mismatch.
+    to be omitted from versions prior to 1.2.41beta11 whenever there is a
+    library mismatch.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
