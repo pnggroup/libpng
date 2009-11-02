@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta90 - November 2, 2009
+Libpng 1.4.0beta91 - November 2, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta90.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta90.tar.gz
-   1.4.0beta90.tar.bz2
+   1.4.0beta91.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta91.tar.gz
+   1.4.0beta91.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b90.zip
-   lp140b90.7z
+   lp140b91.zip
+   lp140b91.7z
 
 Other information:
 
-   1.4.0beta90-README.txt
-   1.4.0beta90-LICENSE.txt
+   1.4.0beta91-README.txt
+   1.4.0beta91-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -597,6 +597,8 @@ version 1.4.0beta89 [November 1, 2009]
 version 1.4.0beta90 [November 2, 2009]
   Removed all remaining WIN32_WCE #ifdefs except those involving the
     time.h "tm" structure
+
+version 1.4.0beta91 [November 2, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

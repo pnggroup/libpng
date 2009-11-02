@@ -2284,6 +2284,8 @@ version 1.4.0beta90 [November 2, 2009]
   Removed all remaining WIN32_WCE #ifdefs except those involving the
     time.h "tm" structure
 
+version 1.4.0beta91 [November 2, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
