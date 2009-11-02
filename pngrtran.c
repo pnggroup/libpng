@@ -1315,7 +1315,7 @@ png_do_read_transformations(png_structp png_ptr)
 
    if (png_ptr->row_buf == NULL)
    {
-#ifdef PNG_STDIO_SUPPORTED)
+#ifdef PNG_STDIO_SUPPORTED
       char msg[50];
 
       png_snprintf2(msg, 50,
