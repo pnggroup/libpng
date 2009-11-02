@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta12 - November 2, 2009
+Libpng 1.2.41beta13 - November 2, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41beta12.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta12.tar.gz
-   libpng-1.2.41beta12.tar.bz2
+   libpng-1.2.41beta13.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta13.tar.gz
+   libpng-1.2.41beta13.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41beta12-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta12-no-config.tar.gz
-   libpng-1.2.41beta12-no-config.tar.bz2
+   libpng-1.2.41beta13-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta13-no-config.tar.gz
+   libpng-1.2.41beta13-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241b12.zip
-   lp1241b12.7z
-   lp1241b12.tar.bz2
+   lp1241b13.zip
+   lp1241b13.7z
+   lp1241b13.tar.bz2
 
 Project files
 
-   libpng-1.2.41beta12-project-netware.zip
-   libpng-1.2.41beta12-project-wince.zip
+   libpng-1.2.41beta13-project-netware.zip
+   libpng-1.2.41beta13-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41beta12-README.txt
-   libpng-1.2.41beta12-KNOWNBUGS.txt
-   libpng-1.2.41beta12-LICENSE.txt
-   libpng-1.2.41beta12-Y2K-compliance.txt
-   libpng-1.2.41beta12-[previous version]-diff.txt
+   libpng-1.2.41beta13-README.txt
+   libpng-1.2.41beta13-KNOWNBUGS.txt
+   libpng-1.2.41beta13-LICENSE.txt
+   libpng-1.2.41beta13-Y2K-compliance.txt
+   libpng-1.2.41beta13-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
@@ -108,6 +108,8 @@ version 1.2.41beta11 [November 2, 2009]
 
 version 1.2.41beta12 [November 2, 2009]
   Free png_ptr->user_png_ver when destroying png_ptr.
+
+version 1.2.41beta13 [November 2, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
