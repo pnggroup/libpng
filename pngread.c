@@ -1326,6 +1326,11 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr
 #endif /* PNG_TEXT_SUPPORTED */
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
+/* New member added in libpng-1.2.41, will be removed from 1.4.0 */
+#ifdef PNG_iTXt_SUPPORTED
+   png_free(png_ptr, png_ptr->user_png_ver);
+#endif
+
    /* Save the important info out of the png_struct, in case it is
     * being used again.
     */

@@ -1179,6 +1179,11 @@ png_write_destroy(png_structp png_ptr)
    free_fn = png_ptr->free_fn;
 #endif
 
+/* New member added in libpng-1.2.41, will be removed from 1.4.0 */
+#ifdef PNG_iTXt_SUPPORTED
+   png_free(png_ptr, png_ptr->user_png_ver);
+#endif
+
    png_memset(png_ptr, 0, png_sizeof(png_struct));
 
    png_ptr->error_fn = error_fn;
