@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.41 [November 1, 2009]
+ * Last changed in libpng 1.2.41 [November 2, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -118,6 +118,10 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
        * For versions after libpng 1.0, we will be compatible, so we need
        * only check the first digit.
        */
+#ifdef PNG_iTXt_SUPPORTED
+      png_size_t length;
+#endif
+
       if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
           (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
           (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
@@ -142,6 +146,27 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
          png_error(png_ptr,
             "Incompatible libpng version in application and library");
       }
+
+#ifdef PNG_iTXt_SUPPORTED
+      /* Any library mismatch is trouble for png_set_read() in
+       * libpng-1.2.41 and later 1.2.x, so we store the caller's
+       * library version string.
+       */
+
+      length = (png_size_t)png_strlen(user_png_ver) + 1;
+      png_debug1(3, "allocating user_png_ver for png_ptr (%lu bytes)",
+        (unsigned long)length);
+      png_ptr->user_png_ver = (png_charp)png_malloc_warn(png_ptr,
+          (png_uint_32)length);
+
+      if (png_ptr->user_png_ver == NULL)
+         png_warning(png_ptr, "Could not store png_ptr->user_png_ver");
+
+      else
+         png_memcpy(png_ptr->user_png_ver, user_png_ver, length);
+
+#endif /* PNG_iTXt_SUPPORTED */
+      
    }
 
    /* Initialize zbuf - compression buffer */
