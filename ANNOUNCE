@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta13 - November 2, 2009
+Libpng 1.2.41beta13 - November 3, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -109,8 +109,10 @@ version 1.2.41beta11 [November 2, 2009]
 version 1.2.41beta12 [November 2, 2009]
   Free png_ptr->user_png_ver when destroying png_ptr.
 
-version 1.2.41beta13 [November 2, 2009]
-  Updated scripts/pngw32.def
+version 1.2.41beta13 [November 3, 2009]
+  Updated scripts/pngw32.def and projects/wince/png32ce.def
+  Copied projects/wince/png32ce.def to the scripts directory.
+  Added scripts/makefile.wce
   Patched ltmain.sh for wince support.
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
