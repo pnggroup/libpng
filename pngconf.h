@@ -1162,7 +1162,7 @@
 #  endif
 #endif
 
-#ifdef PNG_tIME_SUPPORTED
+#ifdef PNG_WRITE_tIME_SUPPORTED
 #  ifndef PNG_NO_CONVERT_tIME
 #    ifndef _WIN32_WCE
 /*   The "tm" structure is not supported on WindowsCE */
