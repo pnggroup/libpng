@@ -2291,6 +2291,8 @@ version 1.4.0beta91 [November 3, 2009]
   Patched ltmain.sh for wince support.
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
+version 1.4.0beta92 [November 3, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
