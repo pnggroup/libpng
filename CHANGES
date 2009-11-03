@@ -2547,6 +2547,7 @@ version 1.2.41beta13 [November 3, 2009]
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
 version 1.2.41beta14 [November 3, 2009]
+  Added empty pngpriv.h file as an aid to migration to 1.4.x
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
