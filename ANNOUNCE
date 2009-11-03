@@ -606,6 +606,8 @@ version 1.4.0beta91 [November 3, 2009]
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
 version 1.4.0beta92 [November 3, 2009]
+  Make inclusion of time.h in pngconf.h depend on PNG_CONVERT_tIME_SUPPORTED
+  Make #define PNG_CONVERT_tIME_SUPPORTED depend on PNG_tIME_SUPPORTED
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
