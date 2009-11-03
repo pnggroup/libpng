@@ -222,6 +222,7 @@ EXPORTS
   png_save_int_32
   png_get_uint_31
   png_set_expand_gray_1_2_4_to_8
+
 ; Added at version 1.2.41
   png_write_sig
   png_benign_error

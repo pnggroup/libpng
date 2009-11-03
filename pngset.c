@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.41 [November 2, 2009]
+ * Last changed in libpng 1.2.41 [November 3, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -766,14 +766,14 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
          if (caller_no_itxt == 0)
          {
-            if (text_ptr[i].lang != NULL)
-               lang_len = png_strlen(text_ptr[i].lang);
-            else
-               lang_len = 0;
-            if (text_ptr[i].lang_key != NULL)
-               lang_key_len = png_strlen(text_ptr[i].lang_key);
-            else
-               lang_key_len = 0;
+         if (text_ptr[i].lang != NULL)
+            lang_len = png_strlen(text_ptr[i].lang);
+         else
+            lang_len = 0;
+         if (text_ptr[i].lang_key != NULL)
+            lang_key_len = png_strlen(text_ptr[i].lang_key);
+         else
+            lang_key_len = 0;
          }
 
          else /* Caller does not support iTXt */
