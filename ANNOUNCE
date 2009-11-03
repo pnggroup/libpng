@@ -118,6 +118,8 @@ version 1.2.41beta13 [November 3, 2009]
 
 version 1.2.41beta14 [November 3, 2009]
   Added empty pngpriv.h file as an aid to migration to 1.4.x
+  Make inclusion of time.h in pngconf.h depend on PNG_CONVERT_tIME_SUPPORTED
+  Make #define PNG_CONVERT_tIME_SUPPORTED depend on PNG_tIME_SUPPORTED
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

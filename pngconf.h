@@ -1162,13 +1162,15 @@
 #  endif
 #endif
 
-#ifndef PNG_NO_CONVERT_tIME
-# ifndef _WIN32_WCE
-/* The "tm" structure is not supported on WindowsCE */
-#  ifndef PNG_CONVERT_tIME_SUPPORTED
-#    define PNG_CONVERT_tIME_SUPPORTED
+#ifdef PNG_tIME_SUPPORTED
+#  ifndef PNG_NO_CONVERT_tIME
+#    ifndef _WIN32_WCE
+/*   The "tm" structure is not supported on WindowsCE */
+#      ifndef PNG_CONVERT_tIME_SUPPORTED
+#        define PNG_CONVERT_tIME_SUPPORTED
+#      endif
 #   endif
-# endif
+#  endif
 #endif
 
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
@@ -1199,12 +1201,10 @@
 #  define PNG_INFO_IMAGE_SUPPORTED
 #endif
 
-/* need the time information for reading tIME chunks */
-#ifdef PNG_tIME_SUPPORTED
-#  ifndef _WIN32_WCE
+/* Need the time information for converting tIME chunks */
+#ifdef PNG_CONVERT_tIME_SUPPORTED
      /* "time.h" functions are not supported on WindowsCE */
 #    include <time.h>
-#  endif
 #endif
 
 /* Some typedefs to get us started.  These should be safe on most of the
