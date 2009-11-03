@@ -599,6 +599,9 @@ version 1.4.0beta90 [November 2, 2009]
     time.h "tm" structure
 
 version 1.4.0beta91 [November 3, 2009]
+  Updated scripts/pngw32.def and projects/wince/png32ce.def
+  Copied projects/wince/png32ce.def to the scripts directory.
+  Added scripts/makefile.wce
   Patched ltmain.sh for wince support.
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
