@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta92 - November 3, 2009
+Libpng 1.4.0beta92 - November 5, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -605,7 +605,7 @@ version 1.4.0beta91 [November 3, 2009]
   Patched ltmain.sh for wince support.
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
-version 1.4.0beta92 [November 3, 2009]
+version 1.4.0beta92 [November 5, 2009]
   Make inclusion of time.h in pngconf.h depend on PNG_CONVERT_tIME_SUPPORTED
   Make #define PNG_CONVERT_tIME_SUPPORTED depend on PNG_WRITE_tIME_SUPPORTED
 

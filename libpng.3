@@ -3814,6 +3814,16 @@ The function
 which also expands tRNS to alpha was replaced with
     png_set_expand_gray_1_2_4_to_8()
 which does not. It has been deprecated since libpng-1.0.18 and 1.2.9.
+.SH IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
+
+Private libpng prototypes and macro definitions were moved from
+png.h and pngconf.h into a new pngpriv.h header file.
+
+Support for global arrays was removed.
+
+Some obsolete/deprecated macros and functions have been removed.
+
+The PNG_1_0_X and PNG_1_2_X macros were eliminated.
 
 Functions png_set_benign_errors(), png_benign_error(), and
 png_chunk_benign_error() were added.
@@ -3845,17 +3855,6 @@ wasting some computing resources when the application has called
 the png_set_strip_16() function and encounters a 16-bit PNG file.
 
 Checking for and reporting of errors in the IHDR chunk is more thorough.
-
-.SH IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
-
-Private libpng prototypes and macro definitions were moved from
-png.h and pngconf.h into a new pngpriv.h header file.
-
-Support for global arrays was removed.
-
-Some obsolete/deprecated macros and functions have been removed.
-
-The PNG_1_0_X and PNG_1_2_X macros were eliminated.
 
 The PNG_LEGACY_SUPPORTED macro was eliminated.
 
