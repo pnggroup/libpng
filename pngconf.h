@@ -1286,6 +1286,41 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define PNG_EXPORT(type,symbol) PNG_IMPEXP type PNGAPI symbol
 #endif
 
+/* Support for compiler specific function attributes.  These are used
+ * so that where compiler support is available incorrect use of API
+ * functions in png.h will generate compiler warnings.
+ */
+#ifdef __GNUC__
+#  define PNG_DEPRECATED __attribute__((__deprecated__))
+#  define PNG_USE_RESULT __attribute__((__warn_unused_result__))
+#  define PNG_NORETURN   __attribute__((__noreturn__))
+#  define PNG_ALLOCATED  __attribute__((__malloc__))
+
+#  ifndef PNG_CONFIGURE_LIBPNG
+   /* This specifically protects structure members that should only be
+    * accessed from within the library, therefore should be empty during
+    * a library build.
+    */
+#    define PNG_DEPSTRUCT  __attribute__((__deprecated__))
+#  endif
+#endif
+
+#ifndef PNG_DEPRECATED
+#  define PNG_DEPRECATED  /* use of this function is deprecated */
+#endif
+#ifndef PNG_USE_RESULT
+#  define PNG_USE_RESULT  /* the result of this function must be checked */
+#endif
+#ifndef PNG_NORETURN
+#  define PNG_NORETURN    /* this function does not return */
+#endif
+#ifndef PNG_ALLOCATED
+#  define PNG_ALLOCATED   /* the result of the function is new memory */
+#endif
+#ifndef PNG_DEPSTRUCT
+#  define PNG_DEPSTRUCT   /* access to this struct member is deprecated */
+#endif
+
 /* Users may want to use these so they are not private.  Any library
  * functions that are passed far data must be model-independent.
  */

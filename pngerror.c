@@ -22,7 +22,7 @@
 
 static void /* PRIVATE */
 png_default_error PNGARG((png_structp png_ptr,
-  png_const_charp error_message));
+  png_const_charp error_message)) PNG_NORETURN;
 #ifdef PNG_WARNINGS_SUPPORTED
 static void /* PRIVATE */
 png_default_warning PNGARG((png_structp png_ptr,
@@ -285,9 +285,9 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    longjmp(png_ptr->jmpbuf, 1);
 #  endif
    }
-#else
-   PNG_ABORT();
 #endif
+   /* Here if not setjmp support or if png_ptr is null. */
+   PNG_ABORT();
 #ifndef PNG_CONSOLE_IO_SUPPORTED
    error_message = error_message; /* Make compiler happy */
 #endif

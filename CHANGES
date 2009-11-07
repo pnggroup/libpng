@@ -2295,9 +2295,31 @@ version 1.4.0beta92 [November 4, 2009]
   Make inclusion of time.h in pngconf.h depend on PNG_CONVERT_tIME_SUPPORTED
   Make #define PNG_CONVERT_tIME_SUPPORTED depend on PNG_WRITE_tIME_SUPPORTED
   Revised libpng*.txt to describe differences from 1.2.40 to 1.4.0 (instead
-    of from 1.2.41)
+    of differences from 1.2.41 to 1.4.0)
 
 version 1.4.0beta93 [November 7, 2009]
+  Added PNG_DEPSTRUCT, PNG_DEPRECATED, PNG_USE_RESULT, PNG_NORETURN, and
+    PNG_ALLOCATED macros to detect deprecated direct access to the
+    png_struct or info_struct members and other deprecated usage in
+    applications (John Bowler).
+  Added -DPNG_CONFIGURE_LIBPNG to the makefile CFLAGS, to prevent warnings
+    about direct access to png structs by libpng functions while building
+    libpng.
+  Updated scripts/makefile* to add "-DPNG_CONFIGURE_LIBPNG" to CFLAGS.
+    They need to be tested, especially those using compilers other than gcc.
+  Updated projects/visualc6 and visualc71 with "/d PNG_CONFIGURE_LIBPNG".
+    They should work but still need to be updated to remove
+    references to pnggccrd.c or pngvcrd.c and ASM building.
+  Added README.txt to the beos, cbuilder5, netware, and xcode projects warning
+    that they need to be updated, to remove references to pnggccrd.c and
+    pngvcrd.c and to depend on pngpriv.h
+  Removed three direct references to read_info_ptr members in pngtest.c
+    that were detected by the new PNG_DEPSTRUCT macro.
+  Moved the png_debug macro definitions and the png_read_destroy(),
+    png_write_destroy() and png_far_to_near() prototypes from png.h
+    to pngpriv.h (John Bowler)
+  Moved the synopsis lines for png_read_destroy(), png_write_destroy()
+    png_debug(), png_debug1(), and png_debug2() from libpng.3 to libpngpf.3.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

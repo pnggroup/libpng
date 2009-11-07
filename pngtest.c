@@ -1052,11 +1052,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_tRNS(read_ptr, read_info_ptr, &trans_alpha, &num_trans,
          &trans_color))
       {
-         int sample_max = (1 << read_info_ptr->bit_depth);
+         int sample_max = (1 << bit_depth);
          /* libpng doesn't reject a tRNS chunk with out-of-range samples */
-         if (!((read_info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
+         if (!((color_type == PNG_COLOR_TYPE_GRAY &&
              (int)trans_color->gray > sample_max) ||
-             (read_info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
+             (color_type == PNG_COLOR_TYPE_RGB &&
              ((int)trans_color->red > sample_max ||
              (int)trans_color->green > sample_max ||
              (int)trans_color->blue > sample_max))))
