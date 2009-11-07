@@ -635,6 +635,7 @@ version 1.4.0beta93 [November 7, 2009]
     png_debug(), png_debug1(), and png_debug2() from libpng.3 to libpngpf.3.
 
 version 1.4.0beta94 [November 7, 2009]
+  Removed the obsolete, unused pnggccrd.c and pngvcrd.c files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

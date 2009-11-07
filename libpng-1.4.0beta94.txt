@@ -3014,6 +3014,8 @@ Support for global arrays was removed.
 
 Some obsolete/deprecated macros and functions have been removed.
 
+The obsolete, unused pnggccrd.c and pngvcrd.files were removed.
+
 The PNG_1_0_X and PNG_1_2_X macros were eliminated.
 
 Functions png_set_benign_errors(), png_benign_error(), and
