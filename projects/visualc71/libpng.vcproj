@@ -139,7 +139,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalOptions="/d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;Use MMX instructions&quot;&quot;&quot;&quot;"
+				AdditionalOptions="/d PNG_CONFIGURE_LIBPNG /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;Use MMX instructions&quot;&quot;&quot;&quot;"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
@@ -188,7 +188,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalOptions="/d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;Use MMX instructions&quot;&quot;&quot;&quot;"
+				AdditionalOptions="/d PNG_CONFIGURE_LIBPNG /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;Use MMX instructions&quot;&quot;&quot;&quot;"
 				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
@@ -236,7 +236,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalOptions="/d PNG_LIBPNG_DLLFNAME_POSTFIX=&quot;&quot;&quot;&quot;VB&quot;&quot;&quot;&quot; /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;__stdcall calling convention used for exported functions&quot;&quot;&quot;&quot;"
+				AdditionalOptions="/d PNG_CONFIGURE_LIBPNG /d PNG_LIBPNG_DLLFNAME_POSTFIX=&quot;&quot;&quot;&quot;VB&quot;&quot;&quot;&quot; /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;__stdcall calling convention used for exported functions&quot;&quot;&quot;&quot;"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>

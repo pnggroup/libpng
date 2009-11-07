@@ -56,8 +56,8 @@ MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -87,8 +87,8 @@ MTL=midl.exe
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "_DEBUG" /d PNG_DEBUG=1
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG" /d PNG_DEBUG=1
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -118,8 +118,8 @@ MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG" /d PNG_LIBPNG_SPECIALBUILD=""""Use MMX instructions""""
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG" /d PNG_LIBPNG_SPECIALBUILD=""""Use MMX instructions""""
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -149,8 +149,8 @@ MTL=midl.exe
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "_DEBUG" /d PNG_DEBUG=1 /d PNG_LIBPNG_SPECIALBUILD=""""Use MMX instructions""""
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG" /d PNG_DEBUG=1 /d PNG_LIBPNG_SPECIALBUILD=""""Use MMX instructions""""
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -180,8 +180,8 @@ MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG" /dPNG_LIBPNG_DLLFNAME_POSTFIX=""""VB"""" /dPNG_LIBPNG_SPECIALBUILD=""""__stdcall calling convention used for exported functions""""
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG" /dPNG_LIBPNG_DLLFNAME_POSTFIX=""""VB"""" /dPNG_LIBPNG_SPECIALBUILD=""""__stdcall calling convention used for exported functions""""
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -213,8 +213,8 @@ CPP=cl.exe
 # ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -240,8 +240,8 @@ CPP=cl.exe
 # ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
+# ADD RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -267,8 +267,8 @@ CPP=cl.exe
 # ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /D "PNG_USE_PNGVCRD" /D "PNG_LIBPNG_SPECIALBUILD" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -294,8 +294,8 @@ CPP=cl.exe
 # ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /D "PNG_USE_PNGVCRD" /D "PNG_LIBPNG_SPECIALBUILD" /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
+# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
+# ADD RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -364,8 +364,6 @@ SOURCE=..\..\pngset.c
 SOURCE=..\..\pngtrans.c
 # End Source File
 # Begin Source File
-
-SOURCE=..\..\pngvcrd.c
 
 !IF  "$(CFG)" == "libpng - Win32 DLL Release"
 
