@@ -41,8 +41,8 @@ LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
 
-# CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops
-CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops
+# CFLAGS=--DPNG_CONFIGURE_LIBPNG I$(ZLIBINC) -W -Wall -O3 -funroll-loops
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -W -Wall -O -funroll-loops
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz
 
 INCPATH=$(prefix)/include

@@ -23,7 +23,7 @@ LD = ilink
 AR = ilib
 RM = del
 
-CFLAGS = -I$(ZLIBINC) -Mc -O2 -W3
+CFLAGS = -DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -Mc -O2 -W3
 LDFLAGS =
 
 # File extensions

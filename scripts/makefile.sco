@@ -41,7 +41,7 @@ exec_prefix=$(prefix)
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-CFLAGS= -dy -belf -I$(ZLIBINC) -O3
+CFLAGS= -DPNG_CONFIGURE_LIBPNG -dy -belf -I$(ZLIBINC) -O3
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz -lm
 
 INCPATH=$(prefix)/include/libpng

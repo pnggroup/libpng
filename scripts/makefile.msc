@@ -10,7 +10,7 @@
 
 # -------- Microsoft C 5.1 and later, does not use assembler code --------
 MODEL=L
-CFLAGS=-Oait -Gs -nologo -W3 -A$(MODEL) -I..\zlib
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -Oait -Gs -nologo -W3 -A$(MODEL) -I..\zlib
 #-Ox generates bad code with MSC 5.1
 CC=cl
 LD=link

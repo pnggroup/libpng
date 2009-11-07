@@ -36,7 +36,7 @@ CALLING=r	# registers
 
 
 CC=wcc386
-CFLAGS=-$(CPU)$(CALLING) -fp$(CPU) -fpi87 -oneatx -mf -bt=$(OS) -i=$(ZLIBINC) -zq
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -$(CPU)$(CALLING) -fp$(CPU) -fpi87 -oneatx -mf -bt=$(OS) -i=$(ZLIBINC) -zq
 LD=wcl386
 LDFLAGS=-zq
 

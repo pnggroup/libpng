@@ -20,7 +20,7 @@ SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
 
 HDRS=	png.h pngconf.h
 
-CFLAGS+= -W -Wall
+CFLAGS+= -DPNG_CONFIGURE_LIBPNG -W -Wall
 CPPFLAGS+= -I${.CURDIR}
 
 NOPROFILE= Yes
