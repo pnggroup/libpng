@@ -97,6 +97,18 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta93
 
 \fI\fB
 
+\fBint png_debug(int \fP\fIlevel\fP\fB, png_const_charp \fImessage\fP\fB);\fP
+
+\fI\fB
+
+\fBint png_debug1(int \fP\fIlevel\fP\fB, png_const_charp \fP\fImessage\fP\fB, \fIp1\fP\fB);\fP
+
+\fI\fB
+
+\fBint png_debug2(int \fP\fIlevel\fP\fB, png_const_charp \fP\fImessage\fP\fB, \fP\fIp1\fP\fB, \fIp2\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_decompress_chunk (png_structp \fP\fIpng_ptr\fP\fB, int \fP\fIcomp_type\fP\fB, png_size_t \fP\fIchunklength\fP\fB, png_size_t \fP\fIprefix_length\fP\fB, png_size_t \fI*data_length\fP\fB);\fP
 
 \fI\fB
@@ -559,6 +571,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta93
 
 \fI\fB
 
+\fBvoid png_read_destroy (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_infop \fIend_info_ptr\fP\fB);\fP
+
 \fI\fB
 
 \fBvoid png_read_filter_row (png_structp \fP\fIpng_ptr\fP\fB, png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_bytep \fP\fIprev_row\fP\fB, int \fIfilter\fP\fB);\fP
@@ -618,6 +632,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0beta93
 \fBvoid png_write_data (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fP\fIdata\fP\fB, png_size_t \fIlength\fP\fB);\fP
 
 \fI\fB
+
+\fBvoid png_write_destroy (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 

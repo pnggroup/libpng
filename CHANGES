@@ -2304,9 +2304,8 @@ version 1.4.0beta93 [November 7, 2009]
     applications (John Bowler).
   Added -DPNG_CONFIGURE_LIBPNG to the makefile CFLAGS, to prevent warnings
     about direct access to png structs by libpng functions while building
-    libpng.
-  Updated scripts/makefile* to add "-DPNG_CONFIGURE_LIBPNG" to CFLAGS.
-    They need to be tested, especially those using compilers other than gcc.
+    libpng.  The scripts/makefiles need to be tested, especially those using
+    compilers other than gcc.
   Updated projects/visualc6 and visualc71 with "/d PNG_CONFIGURE_LIBPNG".
     They should work but still need to be updated to remove
     references to pnggccrd.c or pngvcrd.c and ASM building.
