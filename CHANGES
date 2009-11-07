@@ -2302,10 +2302,10 @@ version 1.4.0beta93 [November 7, 2009]
     PNG_ALLOCATED macros to detect deprecated direct access to the
     png_struct or info_struct members and other deprecated usage in
     applications (John Bowler).
-  Added -DPNG_CONFIGURE_LIBPNG to the makefile CFLAGS, to prevent warnings
-    about direct access to png structs by libpng functions while building
-    libpng.  The scripts/makefiles need to be tested, especially those using
-    compilers other than gcc.
+  Updated scripts/makefile* to add "-DPNG_CONFIGURE_LIBPNG" to CFLAGS,
+    to prevent warnings about direct access to png structs by libpng
+    functions while building libpng.  They need to be tested, especially
+    those using compilers other than gcc.
   Updated projects/visualc6 and visualc71 with "/d PNG_CONFIGURE_LIBPNG".
     They should work but still need to be updated to remove
     references to pnggccrd.c or pngvcrd.c and ASM building.
@@ -2319,6 +2319,8 @@ version 1.4.0beta93 [November 7, 2009]
     to pngpriv.h (John Bowler)
   Moved the synopsis lines for png_read_destroy(), png_write_destroy()
     png_debug(), png_debug1(), and png_debug2() from libpng.3 to libpngpf.3.
+
+version 1.4.0beta94 [November 7, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

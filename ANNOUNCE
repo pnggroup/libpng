@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta93 - November 7, 2009
+Libpng 1.4.0beta94 - November 7, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta93.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta93.tar.gz
-   1.4.0beta93.tar.bz2
+   1.4.0beta94.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta94.tar.gz
+   1.4.0beta94.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b93.zip
-   lp140b93.7z
+   lp140b94.zip
+   lp140b94.7z
 
 Other information:
 
-   1.4.0beta93-README.txt
-   1.4.0beta93-LICENSE.txt
+   1.4.0beta94-README.txt
+   1.4.0beta94-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -616,11 +616,10 @@ version 1.4.0beta93 [November 7, 2009]
     PNG_ALLOCATED macros to detect deprecated direct access to the
     png_struct or info_struct members and other deprecated usage in
     applications (John Bowler).
-  Added -DPNG_CONFIGURE_LIBPNG to the makefile CFLAGS, to prevent warnings
-    about direct access to png structs by libpng functions while building
-    libpng.
-  Updated scripts/makefile* to add "-DPNG_CONFIGURE_LIBPNG" to CFLAGS.
-    They need to be tested, especially those using compilers other than gcc.
+  Updated scripts/makefile* to add "-DPNG_CONFIGURE_LIBPNG" to CFLAGS,
+    to prevent warnings about direct access to png structs by libpng
+    functions while building libpng.  They need to be tested, especially
+    those using compilers other than gcc.
   Updated projects/visualc6 and visualc71 with "/d PNG_CONFIGURE_LIBPNG".
     They should work but still need to be updated to remove
     references to pnggccrd.c or pngvcrd.c and ASM building.
@@ -635,6 +634,7 @@ version 1.4.0beta93 [November 7, 2009]
   Moved the synopsis lines for png_read_destroy(), png_write_destroy()
     png_debug(), png_debug1(), and png_debug2() from libpng.3 to libpngpf.3.
 
+version 1.4.0beta94 [November 7, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
