@@ -2322,6 +2322,7 @@ version 1.4.0beta93 [November 7, 2009]
 
 version 1.4.0beta94 [November 7, 2009]
   Removed the obsolete, unused pnggccrd.c and pngvcrd.c files.
+  Updated CMakeLists.txt to add "-DPNG_CONFIGURE_LIBPNG" to the definitions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

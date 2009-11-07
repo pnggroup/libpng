@@ -117,6 +117,9 @@ set(pngtest_sources
        pngtest.c
 )
 # SOME NEEDED DEFINITIONS
+
+add_definitions(-DPNG_CONFIGURE_LIBPNG)
+
 if(MSVC)
   add_definitions(-DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
 endif(MSVC)
