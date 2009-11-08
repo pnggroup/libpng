@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.41beta14 - November 3, 2009
+ libpng version 1.2.41beta14 - November 8, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.41beta14 - November 3, 2009
+ libpng versions 0.97, January 1998, through 1.2.41beta14 - November 8, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -3028,13 +3028,13 @@ They have been replaced, respectively, by:
 PNG_MAX_UINT was replaced with PNG_UINT_31_MAX.  It has been
 deprecated since libpng-1.0.16 and libpng-1.2.6.
 
-The function
+The deprecated function
     png_check_sig(sig, num)
 was replaced with
     !png_sig_cmp(sig, 0, num)
 It has been deprecated since libpng-0.90.
 
-The function
+The deprecated function
     png_set_gray_1_2_4_to_8()
 which also expands tRNS to alpha was replaced with
     png_set_expand_gray_1_2_4_to_8()
@@ -3209,7 +3209,7 @@ source.
 
 XIII. Y2K Compliance in libpng
 
-November 3, 2009
+November 8, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

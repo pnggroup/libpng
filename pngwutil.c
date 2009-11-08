@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.41 [November 3, 2009]
+ * Last changed in libpng 1.2.41 [November 8, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -63,11 +63,6 @@ png_write_sig(png_structp png_ptr)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
-#ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that the signature is being written */
-   png_ptr->io_state = PNG_IO_WRITING | PNG_IO_SIGNATURE;
-#endif
-
    /* Write the rest of the 8 byte signature */
    png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
       (png_size_t)(8 - png_ptr->sig_bytes));
@@ -111,12 +106,6 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
    if (png_ptr == NULL)
       return;
 
-#ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that the chunk header is being written.
-    * PNG_IO_CHUNK_HDR requires a single I/O call.
-    */
-   png_ptr->io_state = PNG_IO_WRITING | PNG_IO_CHUNK_HDR;
-#endif
 
    /* Write the length and the chunk name */
    png_save_uint_32(buf, length);
@@ -127,13 +116,6 @@ png_write_chunk_start(png_structp png_ptr, png_bytep chunk_name,
    /* Reset the crc and run it over the chunk name */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, chunk_name, (png_size_t)4);
-
-#ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that chunk data will (possibly) be written.
-    * PNG_IO_CHUNK_DATA does NOT require a specific number of I/O calls.
-    */
-   png_ptr->io_state = PNG_IO_WRITING | PNG_IO_CHUNK_DATA;
-#endif
 }
 
 /* Write the data of a PNG chunk started with png_write_chunk_start().
@@ -164,13 +146,6 @@ png_write_chunk_end(png_structp png_ptr)
    png_byte buf[4];
 
    if (png_ptr == NULL) return;
-
-#ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that the chunk CRC is being written.
-    * PNG_IO_CHUNK_CRC requires a single I/O function call.
-    */
-   png_ptr->io_state = PNG_IO_WRITING | PNG_IO_CHUNK_CRC;
-#endif
 
    /* Write the crc in a single operation */
    png_save_uint_32(buf, png_ptr->crc);

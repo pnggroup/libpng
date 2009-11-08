@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.41 [November 3, 2009]
+ * Last changed in libpng 1.2.41 [November 8, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -653,9 +653,6 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
                int num_text)
 {
    int i;
-#ifdef PNG_iTXt_SUPPORTED
-   int caller_no_itxt = 0;
-#endif
 
    png_debug1(1, "in %s storage function", ((png_ptr == NULL ||
       png_ptr->chunk_name[0] == '\0') ?
@@ -663,45 +660,6 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
    if (png_ptr == NULL || info_ptr == NULL || num_text == 0)
       return(0);
-
-#ifdef PNG_iTXt_SUPPORTED
-   /* If an earlier version of the library was used to build the
-    * application, it might be using a png_textp structure that
-    * does not contain the lang or lang_key elements. Even if you build
-    * this library with PNG_iTXt_SUPPORTED explicitly defined,
-    * and your older library was also built with PNG_iTXt_SUPPORTED
-    * defined, the complete png_textp structure probably has not existed
-    * all along and it's not safe to access them, due to a bug in
-    * pngconf.h from version 1.2.9 to 1.2.40.
-    */
-   if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
-   {
-      int j;
-      png_byte c[12];
-
-      j = 0;
-      for (j = 0; j < 12; j++)
-         c[j] = 0;
-
-      for (j = 0; c[j] && j < 12; j++)
-         c[j] = png_ptr->user_png_ver[j];
-
-      if ((c[5] == '\0')   /* 1.2.N */         ||
-          (c[5] == 'b')    /* 1.2.NbetaNN */   ||
-          (c[5] == 'r')    /* 1.2.NrcNN   */   ||
-          (c[4] == '1')    /* 1.2.1x */        ||
-          (c[4] == '2')    /* 1.2.2x */        ||
-          (c[4] == '3')    /* 1.2.3x */        ||
-          ((c[4] == '4')   /* 1.2.4x */        &&
-          (((c[5] == '0')) /* 1.2.40 */        ||
-          ((c[5] == '1')   /* 1.2.41x */       &&
-          (((c[6] == 'b')  /* 1.2.41betax */   &&
-          ((c[10] == '0'))) /* 1.2.41beta0x */ ||
-          ((c[10] == '1')   /* 1.2.41beta1x */ &&
-          (c[11] == '0'))))))) /* 1.2.41beta10 */
-         caller_no_itxt = 1;
-   }
-#endif /* PNG_iTXt_SUPPORTED */
 
    /* Make sure we have enough space in the "text" array in info_struct
     * to hold all of the incoming text_ptr objects.
@@ -764,8 +722,6 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       {
          /* Set iTXt data */
 
-         if (caller_no_itxt == 0)
-         {
          if (text_ptr[i].lang != NULL)
             lang_len = png_strlen(text_ptr[i].lang);
          else
@@ -774,15 +730,6 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
             lang_key_len = png_strlen(text_ptr[i].lang_key);
          else
             lang_key_len = 0;
-         }
-
-         else /* Caller does not support iTXt */
-         {
-            lang_len = 0;
-            lang_key_len = 0;
-            png_warning(png_ptr,
-               "iTXt lang and lang_key not available from application");
-         }
       }
 #else /* PNG_iTXt_SUPPORTED */
       {
@@ -1261,19 +1208,6 @@ png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
       return;
    png_ptr->user_width_max = user_width_max;
    png_ptr->user_height_max = user_height_max;
-}
-/* This function was added to libpng 1.2.41 */
-void PNGAPI
-png_set_chunk_cache_max (png_structp png_ptr,
-   png_uint_32 user_chunk_cache_max)
-{
-    if (png_ptr == NULL)
-      return;
-    png_ptr->user_chunk_cache_max = user_chunk_cache_max;
-    if (user_chunk_cache_max == 0x7fffffffL)  /* Unlimited */
-       png_ptr->user_chunk_cache_max = 0;
-    else
-       png_ptr->user_chunk_cache_max = user_chunk_cache_max + 1;
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 
