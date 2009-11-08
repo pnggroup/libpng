@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta94 - November 7, 2009
+Libpng 1.4.0beta94 - November 8, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -634,9 +634,10 @@ version 1.4.0beta93 [November 7, 2009]
   Moved the synopsis lines for png_read_destroy(), png_write_destroy()
     png_debug(), png_debug1(), and png_debug2() from libpng.3 to libpngpf.3.
 
-version 1.4.0beta94 [November 7, 2009]
+version 1.4.0beta94 [November 8, 2009]
   Removed the obsolete, unused pnggccrd.c and pngvcrd.c files.
   Updated CMakeLists.txt to add "-DPNG_CONFIGURE_LIBPNG" to the definitions.
+  Removed dependency of pngtest.o on pngpriv.h in the makefiles.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

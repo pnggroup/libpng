@@ -74,4 +74,4 @@ pngwrite$(O): png.h pngconf.h pngpriv.h
 pngwtran$(O): png.h pngconf.h pngpriv.h
 pngwutil$(O): png.h pngconf.h pngpriv.h
 
-pngtest$(O):  png.h pngconf.h pngpriv.h
+pngtest$(O):  png.h pngconf.h

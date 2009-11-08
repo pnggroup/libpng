@@ -82,7 +82,7 @@ pngrio$(O): png.h pngconf.h pngpriv.h
 pngwio$(O): png.h pngconf.h pngpriv.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
-pngtest$(O): png.h pngconf.h pngpriv.h
+pngtest$(O): png.h pngconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 pngtrans$(O): png.h pngconf.h pngpriv.h

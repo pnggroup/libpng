@@ -244,4 +244,4 @@ pngwtran.o: png.h pngconf.h pngpriv.h
 pngwutil.o: png.h pngconf.h pngpriv.h
 pngpread.o: png.h pngconf.h pngpriv.h
 
-pngtest.o: png.h pngconf.h pngpriv.h
+pngtest.o: png.h pngconf.h
