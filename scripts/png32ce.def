@@ -243,4 +243,3 @@ EXPORTS
   png_get_chunk_cache_max @215
   png_set_chunk_cache_max @216
   png_check_cHRM_fixed @217
-  png_calloc @218

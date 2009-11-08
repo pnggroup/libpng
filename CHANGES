@@ -2553,7 +2553,8 @@ version 1.2.41beta14 [November 8, 2009]
     1.2.41beta12.
   Reverted IOSTATE feature, user_cache_max, and premultiply_alpha features
     from 1.2.41beta08.
-  Retained png_calloc() from 1.2.41beta08 but as a non-exported function.
+  Retained png_calloc() from 1.2.41beta08 but as a non-exported function,
+    and removed reference to png_calloc from scripts/*.def
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

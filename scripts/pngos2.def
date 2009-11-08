@@ -234,7 +234,6 @@ EXPORTS
   png_get_chunk_cache_max
   png_set_chunk_cache_max
   png_check_cHRM_fixed
-  png_calloc
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
   png_pass_start
