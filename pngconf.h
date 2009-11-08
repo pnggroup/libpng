@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.41beta14 - November 3, 2009
+ * libpng version 1.2.41beta14 - November 8, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -523,8 +523,29 @@
  * iTXt support was added.  iTXt support was turned off by default through
  * libpng-1.2.x, to support old apps that malloc the png_text structure
  * instead of calling png_set_text() and letting libpng malloc it.  It
- * was turned on by default in libpng-1.2.41.
+ * will be turned on by default in libpng-1.4.0.
  */
+
+#if defined(PNG_1_0_X) || defined (PNG_1_2_X)
+#  ifndef PNG_NO_iTXt_SUPPORTED
+#    define PNG_NO_iTXt_SUPPORTED
+#  endif
+#  ifndef PNG_NO_READ_iTXt
+#    define PNG_NO_READ_iTXt
+#  endif
+#  ifndef PNG_NO_WRITE_iTXt
+#    define PNG_NO_WRITE_iTXt
+#  endif
+#endif
+
+#if !defined(PNG_NO_iTXt_SUPPORTED)
+#  if !defined(PNG_READ_iTXt_SUPPORTED) && !defined(PNG_NO_READ_iTXt)
+#    define PNG_READ_iTXt
+#  endif
+#  if !defined(PNG_WRITE_iTXt_SUPPORTED) && !defined(PNG_NO_WRITE_iTXt)
+#    define PNG_WRITE_iTXt
+#  endif
+#endif
 
 /* The following support, added after version 1.0.0, can be turned off here en
  * masse by defining PNG_LEGACY_SUPPORTED in case you need binary compatibility
@@ -623,11 +644,6 @@
 #  ifndef PNG_NO_READ_INVERT_ALPHA
 #    define PNG_READ_INVERT_ALPHA_SUPPORTED
 #  endif
-#ifndef PNG_1_0_X
-#  ifndef PNG_NO_READ_PREMULTIPLY_ALPHA
-#      define PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-#  endif
-#endif
 #  ifndef PNG_NO_READ_STRIP_ALPHA
 #    define PNG_READ_STRIP_ALPHA_SUPPORTED
 #  endif
@@ -850,13 +866,6 @@
 /* Added at libpng-1.2.41 */
 #ifndef PNG_USER_CHUNK_CACHE_MAX
 #  define PNG_USER_CHUNK_CACHE_MAX 0x7fffffffL
-#endif
-#endif
-
-/* Added at libpng-1.2.41 */
-#ifndef PNG_1_0_X
-#if !defined(PNG_NO_IO_STATE) && !defined(PNG_IO_STATE_SUPPORTED)
-#  define PNG_IO_STATE_SUPPORTED
 #endif
 #endif
 

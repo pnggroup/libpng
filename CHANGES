@@ -2466,7 +2466,7 @@ version 1.2.40beta01 [August 20, 2009]
 version 1.2.40rc01 [September 2, 2009]
   Various bugfixes and improvements to CMakeLists.txt (Philip Lowman)
 
-version 1.2.40 and 1.0.49 [November 4, 2009]
+version 1.2.40 and 1.0.49 [September 2, 2009]
   No changes.
 
 version 1.0.50 [September 10, 2009]
@@ -2546,9 +2546,25 @@ version 1.2.41beta13 [November 3, 2009]
   Patched ltmain.sh for wince support.
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
-version 1.2.41beta14 [November 4, 2009]
+version 1.2.41beta14 [November 8, 2009]
   Make inclusion of time.h in pngconf.h depend on PNG_CONVERT_tIME_SUPPORTED
   Make #define PNG_CONVERT_tIME_SUPPORTED depend on PNG_WRITE_tIME_SUPPORTED
+  Reverted iTXt compatibility stuff from 1.2.41beta05, 1.2.41beta11, and
+    1.2.41beta12.
+  Reverted IOSTATE feature, user_cache_max, and premultiply_alpha features
+    from 1.2.41beta08.
+  Retained png_calloc() from 1.2.41beta08 but as a non-exported function.
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+(subscription required; visit
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe)
+or to glennrp at users.sourceforge.net
+
+Glenn R-P
+*/
+versions 1.2.41beta01 through 1.2.41beta13 were abandoned [November 5, 2009].
+  The 1.0.x/1.2.x series will only receive security updates from now on.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

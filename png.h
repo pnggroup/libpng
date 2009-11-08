@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.41beta14 - November 3, 2009
+ * libpng version 1.2.41beta14 - November 8, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -10,7 +10,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.41beta14 - November 3, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.41beta14 - November 8, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -277,7 +277,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.2.41beta14, November 3, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.2.41beta14, November 8, 2009, are
  * Copyright (c) 2004, 2006-2009 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -389,7 +389,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    November 3, 2009
+ *    November 8, 2009
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -453,7 +453,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.2.41beta14"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.41beta14 - November 3, 2009\n"
+   " libpng version 1.2.41beta14 - November 8, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  13
@@ -1514,23 +1514,7 @@ struct png_struct_def
 /* New member added in libpng-1.2.30 */
   png_charp chunkdata;  /* buffer for reading chunk data */
 
-/* New member added in libpng-1.2.41 */
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   /* Total number of sPLT, text, and unknown
-    * chunks that can be stored (0x7fffffff means unlimited).
-    */
-   png_uint_32 user_chunk_cache_max;
-#endif
 
-/* New member added in libpng-1.2.41 */
-#ifdef PNG_IO_STATE_SUPPORTED
-  png_uint_32 io_state;
-#endif
-
-/* New member added in libpng-1.2.41, will be removed from 1.4.0 */
-#ifdef PNG_iTXt_SUPPORTED
-  png_charp user_png_ver; /* libpng version used to build calling app */
-#endif
 };
 
 
@@ -1713,11 +1697,6 @@ extern PNG_EXPORT(void,png_set_swap_alpha) PNGARG((png_structp png_ptr));
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED) || \
     defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
 extern PNG_EXPORT(void,png_set_invert_alpha) PNGARG((png_structp png_ptr));
-#endif
-
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-extern PNG_EXPORT(void,png_set_premultiply_alpha)
-  PNGARG((png_structp png_ptr));
 #endif
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
@@ -2124,9 +2103,6 @@ extern PNG_EXPORT(void,png_progressive_combine_row) PNGARG((png_structp png_ptr,
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
 extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
-   png_uint_32 size));
-/* Added at libpng version 1.2.41 */
-extern PNG_EXPORT(png_voidp,png_calloc) PNGARG((png_structp png_ptr,
    png_uint_32 size));
 
 #ifdef PNG_1_0_X
@@ -2800,32 +2776,7 @@ extern PNG_EXPORT(png_uint_32,png_get_user_width_max) PNGARG((png_structp
    png_ptr));
 extern PNG_EXPORT(png_uint_32,png_get_user_height_max) PNGARG((png_structp
    png_ptr));
-/* Added in libpng-1.2.41 */
-extern PNG_EXPORT(void,png_set_chunk_cache_max) PNGARG((png_structp
-   png_ptr, png_uint_32 user_chunk_cache_max));
-extern PNG_EXPORT(png_uint_32,png_get_chunk_cache_max)
-   PNGARG((png_structp png_ptr));
 #endif
-
-/* Added in libpng-1.2.41 */
-#ifdef PNG_IO_STATE_SUPPORTED
-extern PNG_EXPORT(png_uint_32,png_get_io_state) PNGARG((png_structp png_ptr));
-
-extern PNG_EXPORT(png_bytep,png_get_io_chunk_name)
-   PNGARG((png_structp png_ptr));
-
-/* The flags returned by png_get_io_state() are the following: */
-#define PNG_IO_NONE        0x0000  /* no I/O at this moment */
-#define PNG_IO_READING     0x0001  /* currently reading */
-#define PNG_IO_WRITING     0x0002  /* currently writing */
-#define PNG_IO_SIGNATURE   0x0010  /* currently at the file signature */
-#define PNG_IO_CHUNK_HDR   0x0020  /* currently at the chunk header */
-#define PNG_IO_CHUNK_DATA  0x0040  /* currently at the chunk data */
-#define PNG_IO_CHUNK_CRC   0x0080  /* currently at the chunk crc */
-#define PNG_IO_MASK_OP     0x000f  /* current operation: reading/writing */
-#define PNG_IO_MASK_LOC    0x00f0  /* current location: sig/hdr/data/crc */
-#endif /* ?PNG_IO_STATE_SUPPORTED */
-
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and in
  * project defs
  */
@@ -3462,11 +3413,6 @@ PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
    png_bytep row, png_uint_32 flags));
 #endif
 
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-PNG_EXTERN void png_do_read_premultiply_alpha
-   PNGARG((png_row_infop row_info, png_bytep row));
-#endif
-
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 PNG_EXTERN void png_do_swap PNGARG((png_row_infop row_info, png_bytep row));
 #endif
@@ -3772,6 +3718,10 @@ PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
    png_uint_32 width, png_uint_32 height, int bit_depth,
    int color_type, int interlace_type, int compression_type,
    int filter_type));
+
+/* Added at libpng version 1.2.41 */
+PNG_EXTERN png_voidp png_calloc PNGARG((png_structp png_ptr,
+   png_uint_32 size));
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 

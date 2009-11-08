@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta14 - November 4, 2009
+Libpng 1.2.41beta14 - November 8, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -116,9 +116,14 @@ version 1.2.41beta13 [November 3, 2009]
   Patched ltmain.sh for wince support.
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
-version 1.2.41beta14 [November 4, 2009]
+version 1.2.41beta14 [November 8, 2009]
   Make inclusion of time.h in pngconf.h depend on PNG_CONVERT_tIME_SUPPORTED
   Make #define PNG_CONVERT_tIME_SUPPORTED depend on PNG_WRITE_tIME_SUPPORTED
+  Reverted iTXt compatibility stuff from 1.2.41beta05, 1.2.41beta11, and
+    1.2.41beta12.
+  Reverted IOSTATE feature, user_cache_max, and premultiply_alpha features
+    from 1.2.41beta08.
+  Retained png_calloc() from 1.2.41beta08 but as a non-exported function
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
