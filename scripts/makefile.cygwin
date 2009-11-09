@@ -7,7 +7,7 @@
 #    and Glenn Randers-Pehrson, based on makefile for linux-elf w/mmx by:
 # Copyright (C) 1998-2000 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
-
+#
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
@@ -36,7 +36,7 @@ DESTDIR=
 
 CC=gcc
 ifdef MINGW
-MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
+MINGW_CCFLAGS=-DPNG_CONFIGURE_LIBPNG -mno-cygwin -I/usr/include/mingw
 MINGW_LDFLAGS=-mno-cygwin -L/usr/lib/mingw
 endif
 

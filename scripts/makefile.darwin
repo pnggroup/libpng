@@ -4,7 +4,7 @@
 # derived from makefile.linux:
 #  Copyright (C) 1998, 1999 Greg Roelofs
 #  Copyright (C) 1996, 1997 Andreas Dilger
-
+#
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
@@ -41,8 +41,8 @@ LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
 
-# CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
-CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops
+# CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -W -Wall -O -funroll-loops
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 
 INCPATH=$(prefix)/include

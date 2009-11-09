@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta15 - November 8, 2009
+Libpng 1.2.41beta15 - November 9, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -126,7 +126,7 @@ version 1.2.41beta14 [November 8, 2009]
   Retained png_calloc() from 1.2.41beta08 but as a non-exported function,
     and removed reference to png_calloc from scripts/*.def
 
-version 1.2.41beta15 [November 8, 2009]
+version 1.2.41beta15 [November 9, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

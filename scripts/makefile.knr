@@ -1,11 +1,11 @@
 # makefile for libpng
 # Copyright (C) 2002, 2006, 2009 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
-
+#
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
-
+#
 # This makefile requires the file ansi2knr.c, which you can get
 # from the Ghostscript ftp site at ftp://ftp.cs.wisc.edu/ghost/
 # If you have libjpeg, you probably already have ansi2knr.c in the jpeg
@@ -27,7 +27,7 @@ LIBPATH=$(prefix)/lib
 DESTDIR=
 
 CC=cc
-CFLAGS=-I../zlib -O
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -I../zlib -O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 # flags for ansi2knr
 ANSI2KNRFLAGS=

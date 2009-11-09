@@ -3,7 +3,7 @@
 # Copyright (C) 2000 Cosmin Truta
 # Copyright (C) 2000 Marc O. Gloor (AIX support added, from makefile.gcc)
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
-
+#
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
@@ -48,7 +48,7 @@ LDDEBUG =
 CRELEASE = -O2
 LDRELEASE = -s
 WARNMORE=-W -Wall
-CFLAGS = -I$(ZLIBINC) $(WARNMORE) $(CRELEASE)
+CFLAGS = -DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) $(WARNMORE) $(CRELEASE)
 LDFLAGS = -L. -L$(ZLIBLIB) -lpng12 -lz -lm $(LDRELEASE)
 
 # File extensions

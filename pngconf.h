@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.41beta15 - November 8, 2009
+ * libpng version 1.2.41beta15 - November 9, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1520,6 +1520,42 @@ typedef z_stream FAR *  png_zstreamp;
 #  ifndef PNG_EXPORT_VAR
 #    define PNG_EXPORT_VAR(type) extern PNG_IMPEXP type
 #  endif
+#endif
+
+/* Support for compiler specific function attributes.  These are used
+ * so that where compiler support is available incorrect use of API
+ * functions in png.h will generate compiler warnings.  Added at libpng
+ * version 1.2.41.
+ */
+#ifdef __GNUC__
+#  define PNG_DEPRECATED __attribute__((__deprecated__))
+#  define PNG_USE_RESULT __attribute__((__warn_unused_result__))
+#  define PNG_NORETURN   __attribute__((__noreturn__))
+#  define PNG_ALLOCATED  __attribute__((__malloc__))
+
+#  ifndef PNG_CONFIGURE_LIBPNG
+   /* This specifically protects structure members that should only be
+    * accessed from within the library, therefore should be empty during
+    * a library build.
+    */
+#    define PNG_DEPSTRUCT  __attribute__((__deprecated__))
+#  endif
+#endif
+
+#ifndef PNG_DEPRECATED
+#  define PNG_DEPRECATED  /* use of this function is deprecated */
+#endif
+#ifndef PNG_USE_RESULT
+#  define PNG_USE_RESULT  /* the result of this function must be checked */
+#endif
+#ifndef PNG_NORETURN
+#  define PNG_NORETURN    /* this function does not return */
+#endif
+#ifndef PNG_ALLOCATED
+#  define PNG_ALLOCATED   /* the result of the function is new memory */
+#endif
+#ifndef PNG_DEPSTRUCT
+#  define PNG_DEPSTRUCT   /* access to this struct member is deprecated */
 #endif
 
 /* User may want to use these so they are not in PNG_INTERNAL. Any library

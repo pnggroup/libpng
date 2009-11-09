@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.41beta15 - November 8, 2009
+ * libpng version 1.2.41beta15 - November 9, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -10,7 +10,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.41beta15 - November 8, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.41beta15 - November 9, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -277,7 +277,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.2.41beta15, November 8, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.2.41beta15, November 9, 2009, are
  * Copyright (c) 2004, 2006-2009 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -389,7 +389,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    November 8, 2009
+ *    November 9, 2009
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -453,7 +453,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.2.41beta15"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.41beta15 - November 8, 2009\n"
+   " libpng version 1.2.41beta15 - November 9, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  13
@@ -791,25 +791,25 @@ typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
 typedef struct png_info_struct
 {
    /* The following are necessary for every PNG file */
-   png_uint_32 width;       /* width of image in pixels (from IHDR) */
-   png_uint_32 height;      /* height of image in pixels (from IHDR) */
-   png_uint_32 valid;       /* valid chunk data (see PNG_INFO_ below) */
-   png_uint_32 rowbytes;    /* bytes needed to hold an untransformed row */
-   png_colorp palette;      /* array of color values (valid & PNG_INFO_PLTE) */
-   png_uint_16 num_palette; /* number of color entries in "palette" (PLTE) */
-   png_uint_16 num_trans;   /* number of transparent palette color (tRNS) */
-   png_byte bit_depth;      /* 1, 2, 4, 8, or 16 bits/channel (from IHDR) */
-   png_byte color_type;     /* see PNG_COLOR_TYPE_ below (from IHDR) */
+   png_uint_32 width PNG_DEPSTRUCT;       /* width of image in pixels (from IHDR) */
+   png_uint_32 height PNG_DEPSTRUCT;      /* height of image in pixels (from IHDR) */
+   png_uint_32 valid PNG_DEPSTRUCT;       /* valid chunk data (see PNG_INFO_ below) */
+   png_uint_32 rowbytes PNG_DEPSTRUCT;    /* bytes needed to hold an untransformed row */
+   png_colorp palette PNG_DEPSTRUCT;      /* array of color values (valid & PNG_INFO_PLTE) */
+   png_uint_16 num_palette PNG_DEPSTRUCT; /* number of color entries in "palette" (PLTE) */
+   png_uint_16 num_trans PNG_DEPSTRUCT;   /* number of transparent palette color (tRNS) */
+   png_byte bit_depth PNG_DEPSTRUCT;      /* 1, 2, 4, 8, or 16 bits/channel (from IHDR) */
+   png_byte color_type PNG_DEPSTRUCT;     /* see PNG_COLOR_TYPE_ below (from IHDR) */
    /* The following three should have been named *_method not *_type */
-   png_byte compression_type; /* must be PNG_COMPRESSION_TYPE_BASE (IHDR) */
-   png_byte filter_type;    /* must be PNG_FILTER_TYPE_BASE (from IHDR) */
-   png_byte interlace_type; /* One of PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
+   png_byte compression_type PNG_DEPSTRUCT; /* must be PNG_COMPRESSION_TYPE_BASE (IHDR) */
+   png_byte filter_type PNG_DEPSTRUCT;    /* must be PNG_FILTER_TYPE_BASE (from IHDR) */
+   png_byte interlace_type PNG_DEPSTRUCT; /* One of PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
 
    /* The following is informational only on read, and not used on writes. */
-   png_byte channels;       /* number of data channels per pixel (1, 2, 3, 4) */
-   png_byte pixel_depth;    /* number of bits per pixel */
-   png_byte spare_byte;     /* to align the data, and for future use */
-   png_byte signature[8];   /* magic bytes read by libpng from start of file */
+   png_byte channels PNG_DEPSTRUCT;       /* number of data channels per pixel (1, 2, 3, 4) */
+   png_byte pixel_depth PNG_DEPSTRUCT;    /* number of bits per pixel */
+   png_byte spare_byte PNG_DEPSTRUCT;     /* to align the data, and for future use */
+   png_byte signature[8] PNG_DEPSTRUCT;   /* magic bytes read by libpng from start of file */
 
    /* The rest of the data is optional.  If you are reading, check the
     * valid field to see if the information in these are valid.  If you
@@ -822,13 +822,13 @@ typedef struct png_info_struct
     * on which the image was created, normally in the range [1.0, 2.5].
     * Data is valid if (valid & PNG_INFO_gAMA) is non-zero.
     */
-   float gamma; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
+   float gamma PNG_DEPSTRUCT; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
 #endif
 
 #ifdef PNG_sRGB_SUPPORTED
     /* GR-P, 0.96a */
     /* Data valid if (valid & PNG_INFO_sRGB) non-zero. */
-   png_byte srgb_intent; /* sRGB rendering intent [0, 1, 2, or 3] */
+   png_byte srgb_intent PNG_DEPSTRUCT; /* sRGB rendering intent [0, 1, 2, or 3] */
 #endif
 
 #ifdef PNG_TEXT_SUPPORTED
@@ -840,16 +840,16 @@ typedef struct png_info_struct
     * unique, and the text string may be empty.  Any number of text chunks may
     * be in an image.
     */
-   int num_text; /* number of comments read/to write */
-   int max_text; /* current size of text array */
-   png_textp text; /* array of comments read/to write */
+   int num_text PNG_DEPSTRUCT; /* number of comments read/to write */
+   int max_text PNG_DEPSTRUCT; /* current size of text array */
+   png_textp text PNG_DEPSTRUCT; /* array of comments read/to write */
 #endif /* PNG_TEXT_SUPPORTED */
 
 #ifdef PNG_tIME_SUPPORTED
    /* The tIME chunk holds the last time the displayed image data was
     * modified.  See the png_time struct for the contents of this struct.
     */
-   png_time mod_time;
+   png_time mod_time PNG_DEPSTRUCT;
 #endif
 
 #ifdef PNG_sBIT_SUPPORTED
@@ -859,7 +859,7 @@ typedef struct png_info_struct
     * the low-order bits is not specified.  Data is valid if
     * (valid & PNG_INFO_sBIT) is non-zero.
     */
-   png_color_8 sig_bit; /* significant bits in color channels */
+   png_color_8 sig_bit PNG_DEPSTRUCT; /* significant bits in color channels */
 #endif
 
 #if defined(PNG_tRNS_SUPPORTED) || defined(PNG_READ_EXPAND_SUPPORTED) || \
@@ -873,8 +873,8 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * single color specified that should be treated as fully transparent.
     * Data is valid if (valid & PNG_INFO_tRNS) is non-zero.
     */
-   png_bytep trans; /* transparent values for paletted image */
-   png_color_16 trans_values; /* transparent color for non-palette image */
+   png_bytep trans PNG_DEPSTRUCT; /* transparent values for paletted image */
+   png_color_16 trans_values PNG_DEPSTRUCT; /* transparent color for non-palette image */
 #endif
 
 #if defined(PNG_bKGD_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
@@ -884,7 +884,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * in "background" are normally in the same color space/depth as the
     * pixel data.  Data is valid if (valid & PNG_INFO_bKGD) is non-zero.
     */
-   png_color_16 background;
+   png_color_16 background PNG_DEPSTRUCT;
 #endif
 
 #ifdef PNG_oFFs_SUPPORTED
@@ -893,9 +893,9 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * application-specific co-ordinate space.  See the PNG_OFFSET_ defines
     * below for the unit types.  Valid if (valid & PNG_INFO_oFFs) non-zero.
     */
-   png_int_32 x_offset; /* x offset on page */
-   png_int_32 y_offset; /* y offset on page */
-   png_byte offset_unit_type; /* offset units type */
+   png_int_32 x_offset PNG_DEPSTRUCT; /* x offset on page */
+   png_int_32 y_offset PNG_DEPSTRUCT; /* y offset on page */
+   png_byte offset_unit_type PNG_DEPSTRUCT; /* offset units type */
 #endif
 
 #ifdef PNG_pHYs_SUPPORTED
@@ -903,9 +903,9 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * display or printing in "phys_unit_type" units (see PNG_RESOLUTION_
     * defines below).  Data is valid if (valid & PNG_INFO_pHYs) is non-zero.
     */
-   png_uint_32 x_pixels_per_unit; /* horizontal pixel density */
-   png_uint_32 y_pixels_per_unit; /* vertical pixel density */
-   png_byte phys_unit_type; /* resolution type (see PNG_RESOLUTION_ below) */
+   png_uint_32 x_pixels_per_unit PNG_DEPSTRUCT; /* horizontal pixel density */
+   png_uint_32 y_pixels_per_unit PNG_DEPSTRUCT; /* vertical pixel density */
+   png_byte phys_unit_type PNG_DEPSTRUCT; /* resolution type (see PNG_RESOLUTION_ below) */
 #endif
 
 #ifdef PNG_hIST_SUPPORTED
@@ -915,7 +915,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * values in the range [0,65535]. Data valid if (valid & PNG_INFO_hIST)
     * is non-zero.
     */
-   png_uint_16p hist;
+   png_uint_16p hist PNG_DEPSTRUCT;
 #endif
 
 #ifdef PNG_cHRM_SUPPORTED
@@ -926,14 +926,14 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * [0.0, 0.8].  Data valid if (valid & PNG_INFO_cHRM) non-zero.
     */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   float x_white;
-   float y_white;
-   float x_red;
-   float y_red;
-   float x_green;
-   float y_green;
-   float x_blue;
-   float y_blue;
+   float x_white PNG_DEPSTRUCT;
+   float y_white PNG_DEPSTRUCT;
+   float x_red PNG_DEPSTRUCT;
+   float y_red PNG_DEPSTRUCT;
+   float x_green PNG_DEPSTRUCT;
+   float y_green PNG_DEPSTRUCT;
+   float x_blue PNG_DEPSTRUCT;
+   float y_blue PNG_DEPSTRUCT;
 #endif
 #endif
 
@@ -949,40 +949,40 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * implemented, and for a description of the ASCII parameter strings.
     * Data values are valid if (valid & PNG_INFO_pCAL) non-zero.
     */
-   png_charp pcal_purpose;  /* pCAL chunk description string */
-   png_int_32 pcal_X0;      /* minimum value */
-   png_int_32 pcal_X1;      /* maximum value */
-   png_charp pcal_units;    /* Latin-1 string giving physical units */
-   png_charpp pcal_params;  /* ASCII strings containing parameter values */
-   png_byte pcal_type;      /* equation type (see PNG_EQUATION_ below) */
-   png_byte pcal_nparams;   /* number of parameters given in pcal_params */
+   png_charp pcal_purpose PNG_DEPSTRUCT;  /* pCAL chunk description string */
+   png_int_32 pcal_X0 PNG_DEPSTRUCT;      /* minimum value */
+   png_int_32 pcal_X1 PNG_DEPSTRUCT;      /* maximum value */
+   png_charp pcal_units PNG_DEPSTRUCT;    /* Latin-1 string giving physical units */
+   png_charpp pcal_params PNG_DEPSTRUCT;  /* ASCII strings containing parameter values */
+   png_byte pcal_type PNG_DEPSTRUCT;      /* equation type (see PNG_EQUATION_ below) */
+   png_byte pcal_nparams PNG_DEPSTRUCT;   /* number of parameters given in pcal_params */
 #endif
 
 /* New members added in libpng-1.0.6 */
 #ifdef PNG_FREE_ME_SUPPORTED
-   png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
+   png_uint_32 free_me PNG_DEPSTRUCT;     /* flags items libpng is responsible for freeing */
 #endif
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED) || \
  defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
    /* Storage for unknown chunks that the library doesn't recognize. */
-   png_unknown_chunkp unknown_chunks;
-   png_size_t unknown_chunks_num;
+   png_unknown_chunkp unknown_chunks PNG_DEPSTRUCT;
+   png_size_t unknown_chunks_num PNG_DEPSTRUCT;
 #endif
 
 #ifdef PNG_iCCP_SUPPORTED
    /* iCCP chunk data. */
-   png_charp iccp_name;     /* profile name */
-   png_charp iccp_profile;  /* International Color Consortium profile data */
+   png_charp iccp_name PNG_DEPSTRUCT;     /* profile name */
+   png_charp iccp_profile PNG_DEPSTRUCT;  /* International Color Consortium profile data */
                             /* Note to maintainer: should be png_bytep */
-   png_uint_32 iccp_proflen;  /* ICC profile data length */
-   png_byte iccp_compression; /* Always zero */
+   png_uint_32 iccp_proflen PNG_DEPSTRUCT;  /* ICC profile data length */
+   png_byte iccp_compression PNG_DEPSTRUCT; /* Always zero */
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED
    /* Data on sPLT chunks (there may be more than one). */
-   png_sPLT_tp splt_palettes;
-   png_uint_32 splt_palettes_num;
+   png_sPLT_tp splt_palettes PNG_DEPSTRUCT;
+   png_uint_32 splt_palettes_num PNG_DEPSTRUCT;
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
@@ -993,36 +993,36 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * in the image.  This external representation is converted to double
     * here.  Data values are valid if (valid & PNG_INFO_sCAL) is non-zero.
     */
-   png_byte scal_unit;         /* unit of physical scale */
+   png_byte scal_unit PNG_DEPSTRUCT;         /* unit of physical scale */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   double scal_pixel_width;    /* width of one pixel */
-   double scal_pixel_height;   /* height of one pixel */
+   double scal_pixel_width PNG_DEPSTRUCT;    /* width of one pixel */
+   double scal_pixel_height PNG_DEPSTRUCT;   /* height of one pixel */
 #endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
-   png_charp scal_s_width;     /* string containing height */
-   png_charp scal_s_height;    /* string containing width */
+   png_charp scal_s_width PNG_DEPSTRUCT;     /* string containing height */
+   png_charp scal_s_height PNG_DEPSTRUCT;    /* string containing width */
 #endif
 #endif
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED
    /* Memory has been allocated if (valid & PNG_ALLOCATED_INFO_ROWS) non-zero */
    /* Data valid if (valid & PNG_INFO_IDAT) non-zero */
-   png_bytepp row_pointers;        /* the image bits */
+   png_bytepp row_pointers PNG_DEPSTRUCT;        /* the image bits */
 #endif
 
 #if defined(PNG_FIXED_POINT_SUPPORTED) && defined(PNG_gAMA_SUPPORTED)
-   png_fixed_point int_gamma; /* gamma of image, if (valid & PNG_INFO_gAMA) */
+   png_fixed_point int_gamma PNG_DEPSTRUCT; /* gamma of image, if (valid & PNG_INFO_gAMA) */
 #endif
 
 #if defined(PNG_cHRM_SUPPORTED) && defined(PNG_FIXED_POINT_SUPPORTED)
-   png_fixed_point int_x_white;
-   png_fixed_point int_y_white;
-   png_fixed_point int_x_red;
-   png_fixed_point int_y_red;
-   png_fixed_point int_x_green;
-   png_fixed_point int_y_green;
-   png_fixed_point int_x_blue;
-   png_fixed_point int_y_blue;
+   png_fixed_point int_x_white PNG_DEPSTRUCT;
+   png_fixed_point int_y_white PNG_DEPSTRUCT;
+   png_fixed_point int_x_red PNG_DEPSTRUCT;
+   png_fixed_point int_y_red PNG_DEPSTRUCT;
+   png_fixed_point int_x_green PNG_DEPSTRUCT;
+   png_fixed_point int_y_green PNG_DEPSTRUCT;
+   png_fixed_point int_x_blue PNG_DEPSTRUCT;
+   png_fixed_point int_y_blue PNG_DEPSTRUCT;
 #endif
 
 } png_info;
@@ -1222,219 +1222,219 @@ struct png_struct_def
 #ifdef PNG_SETJMP_SUPPORTED
    jmp_buf jmpbuf;            /* used in png_error */
 #endif
-   png_error_ptr error_fn;    /* function for printing errors and aborting */
-   png_error_ptr warning_fn;  /* function for printing warnings */
-   png_voidp error_ptr;       /* user supplied struct for error functions */
-   png_rw_ptr write_data_fn;  /* function for writing output data */
-   png_rw_ptr read_data_fn;   /* function for reading input data */
-   png_voidp io_ptr;          /* ptr to application struct for I/O functions */
+   png_error_ptr error_fn PNG_DEPSTRUCT;    /* function for printing errors and aborting */
+   png_error_ptr warning_fn PNG_DEPSTRUCT;  /* function for printing warnings */
+   png_voidp error_ptr PNG_DEPSTRUCT;       /* user supplied struct for error functions */
+   png_rw_ptr write_data_fn PNG_DEPSTRUCT;  /* function for writing output data */
+   png_rw_ptr read_data_fn PNG_DEPSTRUCT;   /* function for reading input data */
+   png_voidp io_ptr PNG_DEPSTRUCT;          /* ptr to application struct for I/O functions */
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
-   png_user_transform_ptr read_user_transform_fn; /* user read transform */
+   png_user_transform_ptr read_user_transform_fn PNG_DEPSTRUCT; /* user read transform */
 #endif
 
 #ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
-   png_user_transform_ptr write_user_transform_fn; /* user write transform */
+   png_user_transform_ptr write_user_transform_fn PNG_DEPSTRUCT; /* user write transform */
 #endif
 
 /* These were added in libpng-1.0.2 */
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-   png_voidp user_transform_ptr; /* user supplied struct for user transform */
-   png_byte user_transform_depth;    /* bit depth of user transformed pixels */
-   png_byte user_transform_channels; /* channels in user transformed pixels */
+   png_voidp user_transform_ptr PNG_DEPSTRUCT; /* user supplied struct for user transform */
+   png_byte user_transform_depth PNG_DEPSTRUCT;    /* bit depth of user transformed pixels */
+   png_byte user_transform_channels PNG_DEPSTRUCT; /* channels in user transformed pixels */
 #endif
 #endif
 
-   png_uint_32 mode;          /* tells us where we are in the PNG file */
-   png_uint_32 flags;         /* flags indicating various things to libpng */
-   png_uint_32 transformations; /* which transformations to perform */
+   png_uint_32 mode PNG_DEPSTRUCT;          /* tells us where we are in the PNG file */
+   png_uint_32 flags PNG_DEPSTRUCT;         /* flags indicating various things to libpng */
+   png_uint_32 transformations PNG_DEPSTRUCT; /* which transformations to perform */
 
-   z_stream zstream;          /* pointer to decompression structure (below) */
-   png_bytep zbuf;            /* buffer for zlib */
-   png_size_t zbuf_size;      /* size of zbuf */
-   int zlib_level;            /* holds zlib compression level */
-   int zlib_method;           /* holds zlib compression method */
-   int zlib_window_bits;      /* holds zlib compression window bits */
-   int zlib_mem_level;        /* holds zlib compression memory level */
-   int zlib_strategy;         /* holds zlib compression strategy */
+   z_stream zstream PNG_DEPSTRUCT;          /* pointer to decompression structure (below) */
+   png_bytep zbuf PNG_DEPSTRUCT;            /* buffer for zlib */
+   png_size_t zbuf_size PNG_DEPSTRUCT;      /* size of zbuf */
+   int zlib_level PNG_DEPSTRUCT;            /* holds zlib compression level */
+   int zlib_method PNG_DEPSTRUCT;           /* holds zlib compression method */
+   int zlib_window_bits PNG_DEPSTRUCT;      /* holds zlib compression window bits */
+   int zlib_mem_level PNG_DEPSTRUCT;        /* holds zlib compression memory level */
+   int zlib_strategy PNG_DEPSTRUCT;         /* holds zlib compression strategy */
 
-   png_uint_32 width;         /* width of image in pixels */
-   png_uint_32 height;        /* height of image in pixels */
-   png_uint_32 num_rows;      /* number of rows in current pass */
-   png_uint_32 usr_width;     /* width of row at start of write */
-   png_uint_32 rowbytes;      /* size of row in bytes */
-   png_uint_32 irowbytes;     /* size of current interlaced row in bytes */
-   png_uint_32 iwidth;        /* width of current interlaced row in pixels */
-   png_uint_32 row_number;    /* current row in interlace pass */
-   png_bytep prev_row;        /* buffer to save previous (unfiltered) row */
-   png_bytep row_buf;         /* buffer to save current (unfiltered) row */
+   png_uint_32 width PNG_DEPSTRUCT;         /* width of image in pixels */
+   png_uint_32 height PNG_DEPSTRUCT;        /* height of image in pixels */
+   png_uint_32 num_rows PNG_DEPSTRUCT;      /* number of rows in current pass */
+   png_uint_32 usr_width PNG_DEPSTRUCT;     /* width of row at start of write */
+   png_uint_32 rowbytes PNG_DEPSTRUCT;      /* size of row in bytes */
+   png_uint_32 irowbytes PNG_DEPSTRUCT;     /* size of current interlaced row in bytes */
+   png_uint_32 iwidth PNG_DEPSTRUCT;        /* width of current interlaced row in pixels */
+   png_uint_32 row_number PNG_DEPSTRUCT;    /* current row in interlace pass */
+   png_bytep prev_row PNG_DEPSTRUCT;        /* buffer to save previous (unfiltered) row */
+   png_bytep row_buf PNG_DEPSTRUCT;         /* buffer to save current (unfiltered) row */
 #ifndef PNG_NO_WRITE_FILTER
-   png_bytep sub_row;         /* buffer to save "sub" row when filtering */
-   png_bytep up_row;          /* buffer to save "up" row when filtering */
-   png_bytep avg_row;         /* buffer to save "avg" row when filtering */
-   png_bytep paeth_row;       /* buffer to save "Paeth" row when filtering */
+   png_bytep sub_row PNG_DEPSTRUCT;         /* buffer to save "sub" row when filtering */
+   png_bytep up_row PNG_DEPSTRUCT;          /* buffer to save "up" row when filtering */
+   png_bytep avg_row PNG_DEPSTRUCT;         /* buffer to save "avg" row when filtering */
+   png_bytep paeth_row PNG_DEPSTRUCT;       /* buffer to save "Paeth" row when filtering */
 #endif
-   png_row_info row_info;     /* used for transformation routines */
+   png_row_info row_info PNG_DEPSTRUCT;     /* used for transformation routines */
 
-   png_uint_32 idat_size;     /* current IDAT size for read */
-   png_uint_32 crc;           /* current chunk CRC value */
-   png_colorp palette;        /* palette from the input file */
-   png_uint_16 num_palette;   /* number of color entries in palette */
-   png_uint_16 num_trans;     /* number of transparency values */
-   png_byte chunk_name[5];    /* null-terminated name of current chunk */
-   png_byte compression;      /* file compression type (always 0) */
-   png_byte filter;           /* file filter type (always 0) */
-   png_byte interlaced;       /* PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
-   png_byte pass;             /* current interlace pass (0 - 6) */
-   png_byte do_filter;        /* row filter flags (see PNG_FILTER_ below ) */
-   png_byte color_type;       /* color type of file */
-   png_byte bit_depth;        /* bit depth of file */
-   png_byte usr_bit_depth;    /* bit depth of users row */
-   png_byte pixel_depth;      /* number of bits per pixel */
-   png_byte channels;         /* number of channels in file */
-   png_byte usr_channels;     /* channels at start of write */
-   png_byte sig_bytes;        /* magic bytes read/written from start of file */
+   png_uint_32 idat_size PNG_DEPSTRUCT;     /* current IDAT size for read */
+   png_uint_32 crc PNG_DEPSTRUCT;           /* current chunk CRC value */
+   png_colorp palette PNG_DEPSTRUCT;        /* palette from the input file */
+   png_uint_16 num_palette PNG_DEPSTRUCT;   /* number of color entries in palette */
+   png_uint_16 num_trans PNG_DEPSTRUCT;     /* number of transparency values */
+   png_byte chunk_name[5] PNG_DEPSTRUCT;    /* null-terminated name of current chunk */
+   png_byte compression PNG_DEPSTRUCT;      /* file compression type (always 0) */
+   png_byte filter PNG_DEPSTRUCT;           /* file filter type (always 0) */
+   png_byte interlaced PNG_DEPSTRUCT;       /* PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
+   png_byte pass PNG_DEPSTRUCT;             /* current interlace pass (0 - 6) */
+   png_byte do_filter PNG_DEPSTRUCT;        /* row filter flags (see PNG_FILTER_ below ) */
+   png_byte color_type PNG_DEPSTRUCT;       /* color type of file */
+   png_byte bit_depth PNG_DEPSTRUCT;        /* bit depth of file */
+   png_byte usr_bit_depth PNG_DEPSTRUCT;    /* bit depth of users row */
+   png_byte pixel_depth PNG_DEPSTRUCT;      /* number of bits per pixel */
+   png_byte channels PNG_DEPSTRUCT;         /* number of channels in file */
+   png_byte usr_channels PNG_DEPSTRUCT;     /* channels at start of write */
+   png_byte sig_bytes PNG_DEPSTRUCT;        /* magic bytes read/written from start of file */
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
 #ifdef PNG_LEGACY_SUPPORTED
-   png_byte filler;           /* filler byte for pixel expansion */
+   png_byte filler PNG_DEPSTRUCT;           /* filler byte for pixel expansion */
 #else
-   png_uint_16 filler;           /* filler bytes for pixel expansion */
+   png_uint_16 filler PNG_DEPSTRUCT;           /* filler bytes for pixel expansion */
 #endif
 #endif
 
 #ifdef PNG_bKGD_SUPPORTED
-   png_byte background_gamma_type;
+   png_byte background_gamma_type PNG_DEPSTRUCT;
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
-   float background_gamma;
+   float background_gamma PNG_DEPSTRUCT;
 #  endif
-   png_color_16 background;   /* background color in screen gamma space */
+   png_color_16 background PNG_DEPSTRUCT;   /* background color in screen gamma space */
 #ifdef PNG_READ_GAMMA_SUPPORTED
-   png_color_16 background_1; /* background normalized to gamma 1.0 */
+   png_color_16 background_1 PNG_DEPSTRUCT; /* background normalized to gamma 1.0 */
 #endif
 #endif /* PNG_bKGD_SUPPORTED */
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-   png_flush_ptr output_flush_fn; /* Function for flushing output */
-   png_uint_32 flush_dist;    /* how many rows apart to flush, 0 - no flush */
-   png_uint_32 flush_rows;    /* number of rows written since last flush */
+   png_flush_ptr output_flush_fn PNG_DEPSTRUCT; /* Function for flushing output */
+   png_uint_32 flush_dist PNG_DEPSTRUCT;    /* how many rows apart to flush, 0 - no flush */
+   png_uint_32 flush_rows PNG_DEPSTRUCT;    /* number of rows written since last flush */
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   int gamma_shift;      /* number of "insignificant" bits 16-bit gamma */
+   int gamma_shift PNG_DEPSTRUCT;      /* number of "insignificant" bits 16-bit gamma */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-   float gamma;          /* file gamma value */
-   float screen_gamma;   /* screen gamma value (display_exponent) */
+   float gamma PNG_DEPSTRUCT;          /* file gamma value */
+   float screen_gamma PNG_DEPSTRUCT;   /* screen gamma value (display_exponent) */
 #endif
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   png_bytep gamma_table;     /* gamma table for 8-bit depth files */
-   png_bytep gamma_from_1;    /* converts from 1.0 to screen */
-   png_bytep gamma_to_1;      /* converts from file to 1.0 */
-   png_uint_16pp gamma_16_table; /* gamma table for 16-bit depth files */
-   png_uint_16pp gamma_16_from_1; /* converts from 1.0 to screen */
-   png_uint_16pp gamma_16_to_1; /* converts from file to 1.0 */
+   png_bytep gamma_table PNG_DEPSTRUCT;     /* gamma table for 8-bit depth files */
+   png_bytep gamma_from_1 PNG_DEPSTRUCT;    /* converts from 1.0 to screen */
+   png_bytep gamma_to_1 PNG_DEPSTRUCT;      /* converts from file to 1.0 */
+   png_uint_16pp gamma_16_table PNG_DEPSTRUCT; /* gamma table for 16-bit depth files */
+   png_uint_16pp gamma_16_from_1 PNG_DEPSTRUCT; /* converts from 1.0 to screen */
+   png_uint_16pp gamma_16_to_1 PNG_DEPSTRUCT; /* converts from file to 1.0 */
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_sBIT_SUPPORTED)
-   png_color_8 sig_bit;       /* significant bits in each available channel */
+   png_color_8 sig_bit PNG_DEPSTRUCT;       /* significant bits in each available channel */
 #endif
 
 #if defined(PNG_READ_SHIFT_SUPPORTED) || defined(PNG_WRITE_SHIFT_SUPPORTED)
-   png_color_8 shift;         /* shift for significant bit tranformation */
+   png_color_8 shift PNG_DEPSTRUCT;         /* shift for significant bit tranformation */
 #endif
 
 #if defined(PNG_tRNS_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) \
  || defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   png_bytep trans;           /* transparency values for paletted files */
-   png_color_16 trans_values; /* transparency values for non-paletted files */
+   png_bytep trans PNG_DEPSTRUCT;           /* transparency values for paletted files */
+   png_color_16 trans_values PNG_DEPSTRUCT; /* transparency values for non-paletted files */
 #endif
 
-   png_read_status_ptr read_row_fn;   /* called after each row is decoded */
-   png_write_status_ptr write_row_fn; /* called after each row is encoded */
+   png_read_status_ptr read_row_fn PNG_DEPSTRUCT;   /* called after each row is decoded */
+   png_write_status_ptr write_row_fn PNG_DEPSTRUCT; /* called after each row is encoded */
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-   png_progressive_info_ptr info_fn; /* called after header data fully read */
-   png_progressive_row_ptr row_fn;   /* called after each prog. row is decoded */
-   png_progressive_end_ptr end_fn;   /* called after image is complete */
-   png_bytep save_buffer_ptr;        /* current location in save_buffer */
-   png_bytep save_buffer;            /* buffer for previously read data */
-   png_bytep current_buffer_ptr;     /* current location in current_buffer */
-   png_bytep current_buffer;         /* buffer for recently used data */
-   png_uint_32 push_length;          /* size of current input chunk */
-   png_uint_32 skip_length;          /* bytes to skip in input data */
-   png_size_t save_buffer_size;      /* amount of data now in save_buffer */
-   png_size_t save_buffer_max;       /* total size of save_buffer */
-   png_size_t buffer_size;           /* total amount of available input data */
-   png_size_t current_buffer_size;   /* amount of data now in current_buffer */
-   int process_mode;                 /* what push library is currently doing */
-   int cur_palette;                  /* current push library palette index */
+   png_progressive_info_ptr info_fn PNG_DEPSTRUCT; /* called after header data fully read */
+   png_progressive_row_ptr row_fn PNG_DEPSTRUCT;   /* called after each prog. row is decoded */
+   png_progressive_end_ptr end_fn PNG_DEPSTRUCT;   /* called after image is complete */
+   png_bytep save_buffer_ptr PNG_DEPSTRUCT;        /* current location in save_buffer */
+   png_bytep save_buffer PNG_DEPSTRUCT;            /* buffer for previously read data */
+   png_bytep current_buffer_ptr PNG_DEPSTRUCT;     /* current location in current_buffer */
+   png_bytep current_buffer PNG_DEPSTRUCT;         /* buffer for recently used data */
+   png_uint_32 push_length PNG_DEPSTRUCT;          /* size of current input chunk */
+   png_uint_32 skip_length PNG_DEPSTRUCT;          /* bytes to skip in input data */
+   png_size_t save_buffer_size PNG_DEPSTRUCT;      /* amount of data now in save_buffer */
+   png_size_t save_buffer_max PNG_DEPSTRUCT;       /* total size of save_buffer */
+   png_size_t buffer_size PNG_DEPSTRUCT;           /* total amount of available input data */
+   png_size_t current_buffer_size PNG_DEPSTRUCT;   /* amount of data now in current_buffer */
+   int process_mode PNG_DEPSTRUCT;                 /* what push library is currently doing */
+   int cur_palette PNG_DEPSTRUCT;                  /* current push library palette index */
 
 #  ifdef PNG_TEXT_SUPPORTED
-     png_size_t current_text_size;   /* current size of text input data */
-     png_size_t current_text_left;   /* how much text left to read in input */
-     png_charp current_text;         /* current text chunk buffer */
-     png_charp current_text_ptr;     /* current location in current_text */
+     png_size_t current_text_size PNG_DEPSTRUCT;   /* current size of text input data */
+     png_size_t current_text_left PNG_DEPSTRUCT;   /* how much text left to read in input */
+     png_charp current_text PNG_DEPSTRUCT;         /* current text chunk buffer */
+     png_charp current_text_ptr PNG_DEPSTRUCT;     /* current location in current_text */
 #  endif /* PNG_TEXT_SUPPORTED */
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
 #if defined(__TURBOC__) && !defined(_Windows) && !defined(__FLAT__)
 /* for the Borland special 64K segment handler */
-   png_bytepp offset_table_ptr;
-   png_bytep offset_table;
-   png_uint_16 offset_table_number;
-   png_uint_16 offset_table_count;
-   png_uint_16 offset_table_count_free;
+   png_bytepp offset_table_ptr PNG_DEPSTRUCT;
+   png_bytep offset_table PNG_DEPSTRUCT;
+   png_uint_16 offset_table_number PNG_DEPSTRUCT;
+   png_uint_16 offset_table_count PNG_DEPSTRUCT;
+   png_uint_16 offset_table_count_free PNG_DEPSTRUCT;
 #endif
 
 #ifdef PNG_READ_DITHER_SUPPORTED
-   png_bytep palette_lookup;         /* lookup table for dithering */
-   png_bytep dither_index;           /* index translation for palette files */
+   png_bytep palette_lookup PNG_DEPSTRUCT;         /* lookup table for dithering */
+   png_bytep dither_index PNG_DEPSTRUCT;           /* index translation for palette files */
 #endif
 
 #if defined(PNG_READ_DITHER_SUPPORTED) || defined(PNG_hIST_SUPPORTED)
-   png_uint_16p hist;                /* histogram */
+   png_uint_16p hist PNG_DEPSTRUCT;                /* histogram */
 #endif
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-   png_byte heuristic_method;        /* heuristic for row filter selection */
-   png_byte num_prev_filters;        /* number of weights for previous rows */
-   png_bytep prev_filters;           /* filter type(s) of previous row(s) */
-   png_uint_16p filter_weights;      /* weight(s) for previous line(s) */
-   png_uint_16p inv_filter_weights;  /* 1/weight(s) for previous line(s) */
-   png_uint_16p filter_costs;        /* relative filter calculation cost */
-   png_uint_16p inv_filter_costs;    /* 1/relative filter calculation cost */
+   png_byte heuristic_method PNG_DEPSTRUCT;        /* heuristic for row filter selection */
+   png_byte num_prev_filters PNG_DEPSTRUCT;        /* number of weights for previous rows */
+   png_bytep prev_filters PNG_DEPSTRUCT;           /* filter type(s) of previous row(s) */
+   png_uint_16p filter_weights PNG_DEPSTRUCT;      /* weight(s) for previous line(s) */
+   png_uint_16p inv_filter_weights PNG_DEPSTRUCT;  /* 1/weight(s) for previous line(s) */
+   png_uint_16p filter_costs PNG_DEPSTRUCT;        /* relative filter calculation cost */
+   png_uint_16p inv_filter_costs PNG_DEPSTRUCT;    /* 1/relative filter calculation cost */
 #endif
 
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-   png_charp time_buffer;            /* String to hold RFC 1123 time text */
+   png_charp time_buffer PNG_DEPSTRUCT;            /* String to hold RFC 1123 time text */
 #endif
 
 /* New members added in libpng-1.0.6 */
 
 #ifdef PNG_FREE_ME_SUPPORTED
-   png_uint_32 free_me;   /* flags items libpng is responsible for freeing */
+   png_uint_32 free_me PNG_DEPSTRUCT;   /* flags items libpng is responsible for freeing */
 #endif
 
 #ifdef PNG_USER_CHUNKS_SUPPORTED
-   png_voidp user_chunk_ptr;
-   png_user_chunk_ptr read_user_chunk_fn; /* user read chunk handler */
+   png_voidp user_chunk_ptr PNG_DEPSTRUCT;
+   png_user_chunk_ptr read_user_chunk_fn PNG_DEPSTRUCT; /* user read chunk handler */
 #endif
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-   int num_chunk_list;
-   png_bytep chunk_list;
+   int num_chunk_list PNG_DEPSTRUCT;
+   png_bytep chunk_list PNG_DEPSTRUCT;
 #endif
 
 /* New members added in libpng-1.0.3 */
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-   png_byte rgb_to_gray_status;
+   png_byte rgb_to_gray_status PNG_DEPSTRUCT;
    /* These were changed from png_byte in libpng-1.0.6 */
-   png_uint_16 rgb_to_gray_red_coeff;
-   png_uint_16 rgb_to_gray_green_coeff;
-   png_uint_16 rgb_to_gray_blue_coeff;
+   png_uint_16 rgb_to_gray_red_coeff PNG_DEPSTRUCT;
+   png_uint_16 rgb_to_gray_green_coeff PNG_DEPSTRUCT;
+   png_uint_16 rgb_to_gray_blue_coeff PNG_DEPSTRUCT;
 #endif
 
 /* New member added in libpng-1.0.4 (renamed in 1.0.9) */
@@ -1443,76 +1443,77 @@ struct png_struct_def
     defined(PNG_WRITE_EMPTY_PLTE_SUPPORTED)
 /* Changed from png_byte to png_uint_32 at version 1.2.0 */
 #ifdef PNG_1_0_X
-   png_byte mng_features_permitted;
+   png_byte mng_features_permitted PNG_DEPSTRUCT;
 #else
-   png_uint_32 mng_features_permitted;
+   png_uint_32 mng_features_permitted PNG_DEPSTRUCT;
 #endif /* PNG_1_0_X */
 #endif
 
 /* New member added in libpng-1.0.7 */
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   png_fixed_point int_gamma;
+   png_fixed_point int_gamma PNG_DEPSTRUCT;
 #endif
 
 /* New member added in libpng-1.0.9, ifdef'ed out in 1.0.12, enabled in 1.2.0 */
 #ifdef PNG_MNG_FEATURES_SUPPORTED
-   png_byte filter_type;
+   png_byte filter_type PNG_DEPSTRUCT;
 #endif
 
 #ifdef PNG_1_0_X
 /* New member added in libpng-1.0.10, ifdef'ed out in 1.2.0 */
-   png_uint_32 row_buf_size;
+   png_uint_32 row_buf_size PNG_DEPSTRUCT;
 #endif
 
 /* New members added in libpng-1.2.0 */
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 #  ifndef PNG_1_0_X
 #    ifdef PNG_MMX_CODE_SUPPORTED
-   png_byte     mmx_bitdepth_threshold;
-   png_uint_32  mmx_rowbytes_threshold;
+   png_byte     mmx_bitdepth_threshold PNG_DEPSTRUCT;
+   png_uint_32  mmx_rowbytes_threshold PNG_DEPSTRUCT;
 #    endif
-   png_uint_32  asm_flags;
+   png_uint_32  asm_flags PNG_DEPSTRUCT;
 #  endif
 #endif
 
 /* New members added in libpng-1.0.2 but first enabled by default in 1.2.0 */
 #ifdef PNG_USER_MEM_SUPPORTED
-   png_voidp mem_ptr;            /* user supplied struct for mem functions */
-   png_malloc_ptr malloc_fn;     /* function for allocating memory */
-   png_free_ptr free_fn;         /* function for freeing memory */
+   png_voidp mem_ptr PNG_DEPSTRUCT;            /* user supplied struct for mem functions */
+   png_malloc_ptr malloc_fn PNG_DEPSTRUCT;     /* function for allocating memory */
+   png_free_ptr free_fn PNG_DEPSTRUCT;         /* function for freeing memory */
 #endif
 
 /* New member added in libpng-1.0.13 and 1.2.0 */
-   png_bytep big_row_buf;        /* buffer to save current (unfiltered) row */
+   png_bytep big_row_buf PNG_DEPSTRUCT;        /* buffer to save current (unfiltered) row */
 
 #ifdef PNG_READ_DITHER_SUPPORTED
 /* The following three members were added at version 1.0.14 and 1.2.4 */
-   png_bytep dither_sort;        /* working sort array */
-   png_bytep index_to_palette;   /* where the original index currently is */
+   png_bytep dither_sort PNG_DEPSTRUCT;        /* working sort array */
+   png_bytep index_to_palette PNG_DEPSTRUCT;   /* where the original index currently is */
                                  /* in the palette */
-   png_bytep palette_to_index;   /* which original index points to this */
+   png_bytep palette_to_index PNG_DEPSTRUCT;   /* which original index points to this */
                                  /* palette color */
 #endif
 
 /* New members added in libpng-1.0.16 and 1.2.6 */
-   png_byte compression_type;
+   png_byte compression_type PNG_DEPSTRUCT;
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   png_uint_32 user_width_max;
-   png_uint_32 user_height_max;
+   png_uint_32 user_width_max PNG_DEPSTRUCT;
+   png_uint_32 user_height_max PNG_DEPSTRUCT;
 #endif
 
 /* New member added in libpng-1.0.25 and 1.2.17 */
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
    /* Storage for unknown chunk that the library doesn't recognize. */
-   png_unknown_chunk unknown_chunk;
+   png_unknown_chunk unknown_chunk PNG_DEPSTRUCT;
 #endif
 
 /* New members added in libpng-1.2.26 */
-  png_uint_32 old_big_row_buf_size, old_prev_row_size;
+  png_uint_32 old_big_row_buf_size PNG_DEPSTRUCT;
+  png_uint_32 old_prev_row_size PNG_DEPSTRUCT;
 
 /* New member added in libpng-1.2.30 */
-  png_charp chunkdata;  /* buffer for reading chunk data */
+  png_charp chunkdata PNG_DEPSTRUCT;  /* buffer for reading chunk data */
 
 
 };

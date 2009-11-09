@@ -1,7 +1,7 @@
 # Commodore Amiga Makefile
 # makefile for libpng and SAS C V6.5x compiler
 # Copyright (C) 1995-2000 Wolf Faust
-
+#
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
@@ -15,7 +15,7 @@ CC=sc
 #compiler flags
 # WARNING: a bug in V6.51 causes bad code with OPTGO
 #          So use V6.55 or set NOOPTGO!!!!!!!!!
-CFLAGS= NOSTKCHK PARMS=REG OPTIMIZE OPTGO OPTPEEP OPTINLOCAL OPTINL\
+CFLAGS= -DPNG_CONFIGURE_LIBPNG NOSTKCHK PARMS=REG OPTIMIZE OPTGO OPTPEEP OPTINLOCAL OPTINL\
 	OPTLOOP OPTRDEP=4 OPTDEP=4 OPTCOMP=4 INCLUDEDIR=$(ZLIB) \
 	DEFINE=PNG_INTERNAL
 #linker flags

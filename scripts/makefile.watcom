@@ -3,7 +3,7 @@
 
 # Copyright (C) 2000, Pawel Mrochen, based on makefile.msc which is
 # copyright 1995 Guy Eric Schalnat, Group 42, Inc.
-
+#
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
@@ -36,7 +36,7 @@ CALLING=r	# registers
 
 
 CC=wcc386
-CFLAGS=-$(CPU)$(CALLING) -fp$(CPU) -fpi87 -oneatx -mf -bt=$(OS) -i=$(ZLIBINC) -zq
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -$(CPU)$(CALLING) -fp$(CPU) -fpi87 -oneatx -mf -bt=$(OS) -i=$(ZLIBINC) -zq
 LD=wcl386
 LDFLAGS=-zq
 

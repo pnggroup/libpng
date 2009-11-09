@@ -4,13 +4,13 @@
 # Copyright (C) 2006 Glenn Randers-Pehrson
 # Copyright (C) 2000, Pawel Mrochen, based on makefile.msc which is
 # copyright 1995 Guy Eric Schalnat, Group 42, Inc.
-
+#
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
-
+#
 # To use, do "nmake /f scripts\makefile.intel"
-
+#
 # ------------------- Intel C/C++ Compiler 4.0 and later -------------------
 
 # Where the zlib library and include files are located
@@ -32,7 +32,7 @@ CALLING=r	# __fastcall
 # --------------------------------------------------------------------------
 
 CC=icl -c
-CFLAGS=-O2 -G$(CPU)$(CALLING) -Qip -Qunroll4 -I$(ZLIBINC) -nologo
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -O2 -G$(CPU)$(CALLING) -Qip -Qunroll4 -I$(ZLIBINC) -nologo
 LD=link
 LDFLAGS=/SUBSYSTEM:CONSOLE /NOLOGO
 

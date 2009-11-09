@@ -2,7 +2,7 @@
 # Copyright (C) 1999-2002, 2006, 2009 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42
 # contributed by Jim Rice and updated by Chris Schleicher, Hewlett Packard
-
+#
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
@@ -14,7 +14,7 @@ ZLIBINC=/opt/zlib/include
 # Note that if you plan to build a libpng shared library, zlib must also
 # be a shared library, which zlib's configure does not do.  After running
 # zlib's configure, edit the appropriate lines of makefile to read:
-#   CFLAGS=-O1 -DHAVE_UNISTD -DUSE_MAP -fPIC \
+#   CFLAGS=-DPNG_CONFIGURE_LIBPNG -O1 -DHAVE_UNISTD -DUSE_MAP -fPIC \
 #   LDSHARED=ld -b
 #   SHAREDLIB=libz.sl
 
@@ -40,10 +40,10 @@ LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
 
-CFLAGS=-I$(ZLIBINC) -O -Ae -Wl,+vnocompatwarnings +DD64 \
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -O -Ae -Wl,+vnocompatwarnings +DD64 \
 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +Z -DHAVE_UNISTD_H -DUSE_MMAP
 # Caution: be sure you have built zlib with the same CFLAGS.
-CCFLAGS=-I$(ZLIBINC) -O -Ae -Wl,+vnocompatwarnings +DD64 \
+CCFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -O -Ae -Wl,+vnocompatwarnings +DD64 \
 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 +Z -DHAVE_UNISTD_H -DUSE_MMAP
 
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
