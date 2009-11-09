@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta94 - November 7, 2009
+ * libpng version 1.4.0beta94 - November 9, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1291,17 +1291,27 @@ typedef char            FAR * FAR * FAR * png_charppp;
  * functions in png.h will generate compiler warnings.
  */
 #ifdef __GNUC__
-#  define PNG_DEPRECATED __attribute__((__deprecated__))
-#  define PNG_USE_RESULT __attribute__((__warn_unused_result__))
-#  define PNG_NORETURN   __attribute__((__noreturn__))
-#  define PNG_ALLOCATED  __attribute__((__malloc__))
+#  ifndef PNG_DEPRECATED
+#    define PNG_DEPRECATED __attribute__((__deprecated__))
+#  endif
+#  ifndef PNG_USE_RESULT
+#    define PNG_USE_RESULT __attribute__((__warn_unused_result__))
+#  endif
+#  ifndef PNG_NORETURN
+#    define PNG_NORETURN   __attribute__((__noreturn__))
+#  endif
+#  ifndef PNG_ALLOCATED
+#    define PNG_ALLOCATED  __attribute__((__malloc__))
+#  endif
 
 #  ifndef PNG_CONFIGURE_LIBPNG
-   /* This specifically protects structure members that should only be
-    * accessed from within the library, therefore should be empty during
-    * a library build.
-    */
-#    define PNG_DEPSTRUCT  __attribute__((__deprecated__))
+    /* This specifically protects structure members that should only be
+     * accessed from within the library, therefore should be empty during
+     * a library build.
+     */
+#    ifndef PNG_DEPSTRUCT
+#      define PNG_DEPSTRUCT  __attribute__((__deprecated__))
+#    endif
 #  endif
 #endif
 
