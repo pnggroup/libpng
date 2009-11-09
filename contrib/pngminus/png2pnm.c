@@ -211,8 +211,8 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL a
   if (ret != 8)
     return FALSE;
 
-  ret = png_check_sig (buf, 8);
-  if (!ret)
+  ret = png_sig_cmp (buf, 0, 8);
+  if (ret)
     return FALSE;
 
   /* create png and info structures */
