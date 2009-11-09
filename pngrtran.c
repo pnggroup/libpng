@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [November 7, 2009]
+ * Last changed in libpng 1.4.0 [November 9, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -607,8 +607,9 @@ png_set_expand(png_structp png_ptr)
  *  More to the point, these functions make it obvious what libpng will be
  *  doing, whereas "expand" can (and does) mean any number of things.
  *
- *  GRP 20060307: In libpng-1.4.0, png_set_gray_1_2_4_to_8() was modified
- *  to expand only the sample depth but not to expand the tRNS to alpha.
+ *  GRP 20060307: In libpng-1.2.9, png_set_gray_1_2_4_to_8() was modified
+ *  to expand only the sample depth but not to expand the tRNS to alpha
+ *  and its name was changed to png_set_expand_gray_1_2_4_to_8().
  */
 
 /* Expand paletted images to RGB. */

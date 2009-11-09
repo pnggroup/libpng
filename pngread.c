@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [November 7, 2009]
+ * Last changed in libpng 1.4.0 [November 9, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -67,7 +67,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    png_ptr->user_width_max = PNG_USER_WIDTH_MAX;
    png_ptr->user_height_max = PNG_USER_HEIGHT_MAX;
-   /* Added at libpng-1.2.41 */
+   /* Added at libpng-1.4.0 */
    png_ptr->user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
 #endif
 

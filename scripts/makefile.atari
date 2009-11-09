@@ -6,7 +6,7 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 #
-# modified for LC56/ATARI assumes libz.lib is in same dir and uses default
+# Modified for LC56/ATARI assumes libz.lib is in same dir and uses default
 # rules for library management
 #
 CFLAGS=-DPNG_CONFIGURE_LIBPNG -I..\zlib -O

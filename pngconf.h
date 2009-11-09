@@ -1316,19 +1316,19 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #endif
 
 #ifndef PNG_DEPRECATED
-#  define PNG_DEPRECATED  /* use of this function is deprecated */
+#  define PNG_DEPRECATED  /* Use of this function is deprecated */
 #endif
 #ifndef PNG_USE_RESULT
-#  define PNG_USE_RESULT  /* the result of this function must be checked */
+#  define PNG_USE_RESULT  /* The result of this function must be checked */
 #endif
 #ifndef PNG_NORETURN
-#  define PNG_NORETURN    /* this function does not return */
+#  define PNG_NORETURN    /* This function does not return */
 #endif
 #ifndef PNG_ALLOCATED
-#  define PNG_ALLOCATED   /* the result of the function is new memory */
+#  define PNG_ALLOCATED   /* The result of the function is new memory */
 #endif
 #ifndef PNG_DEPSTRUCT
-#  define PNG_DEPSTRUCT   /* access to this struct member is deprecated */
+#  define PNG_DEPSTRUCT   /* Access to this struct member is deprecated */
 #endif
 
 /* Users may want to use these so they are not private.  Any library
@@ -1352,7 +1352,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #endif
 
 #ifdef USE_FAR_KEYWORD
-/* use this to make far-to-near assignments */
+/* Use this to make far-to-near assignments */
 #  define CHECK   1
 #  define NOCHECK 0
 #  define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
@@ -1365,7 +1365,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define png_memset  _fmemset
 #  define png_sprintf sprintf
 #else
-#  ifdef _WINDOWS_  /* favor Windows over C runtime fns */
+#  ifdef _WINDOWS_  /* Favor Windows over C runtime fns */
 #    define CVT_PTR(ptr)         (ptr)
 #    define CVT_PTR_NOCHECK(ptr) (ptr)
 #    define png_strcpy  lstrcpyA
