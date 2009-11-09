@@ -1553,19 +1553,19 @@ typedef z_stream FAR *  png_zstreamp;
 #endif
 
 #ifndef PNG_DEPRECATED
-#  define PNG_DEPRECATED  /* use of this function is deprecated */
+#  define PNG_DEPRECATED  /* Use of this function is deprecated */
 #endif
 #ifndef PNG_USE_RESULT
-#  define PNG_USE_RESULT  /* the result of this function must be checked */
+#  define PNG_USE_RESULT  /* The result of this function must be checked */
 #endif
 #ifndef PNG_NORETURN
-#  define PNG_NORETURN    /* this function does not return */
+#  define PNG_NORETURN    /* This function does not return */
 #endif
 #ifndef PNG_ALLOCATED
-#  define PNG_ALLOCATED   /* the result of the function is new memory */
+#  define PNG_ALLOCATED   /* The result of the function is new memory */
 #endif
 #ifndef PNG_DEPSTRUCT
-#  define PNG_DEPSTRUCT   /* access to this struct member is deprecated */
+#  define PNG_DEPSTRUCT   /* Access to this struct member is deprecated */
 #endif
 
 /* User may want to use these so they are not in PNG_INTERNAL. Any library
@@ -1584,7 +1584,7 @@ typedef z_stream FAR *  png_zstreamp;
 #endif
 
 #ifdef USE_FAR_KEYWORD  /* memory model independent fns */
-/* use this to make far-to-near assignments */
+/* Use this to make far-to-near assignments */
 #  define CHECK   1
 #  define NOCHECK 0
 #  define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
@@ -1594,7 +1594,7 @@ typedef z_stream FAR *  png_zstreamp;
 #  define png_memcmp  _fmemcmp    /* SJT: added */
 #  define png_memcpy  _fmemcpy
 #  define png_memset  _fmemset
-#else /* use the usual functions */
+#else /* Use the usual functions */
 #  define CVT_PTR(ptr)         (ptr)
 #  define CVT_PTR_NOCHECK(ptr) (ptr)
 #  ifndef PNG_NO_SNPRINTF
@@ -1612,7 +1612,8 @@ typedef z_stream FAR *  png_zstreamp;
       * sprintf instead of snprintf exposes your application to accidental
       * or malevolent buffer overflows.  If you don't have snprintf()
       * as a general rule you should provide one (you can get one from
-      * Portable OpenSSH). */
+      * Portable OpenSSH).
+      */
 #    define png_snprintf(s1,n,fmt,x1) sprintf(s1,fmt,x1)
 #    define png_snprintf2(s1,n,fmt,x1,x2) sprintf(s1,fmt,x1,x2)
 #    define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
