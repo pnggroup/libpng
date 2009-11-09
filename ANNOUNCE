@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta16 - November 9, 2009
+Libpng 1.2.41beta17 - November 9, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41beta16.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta16.tar.gz
-   libpng-1.2.41beta16.tar.bz2
+   libpng-1.2.41beta17.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta17.tar.gz
+   libpng-1.2.41beta17.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41beta16-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta16-no-config.tar.gz
-   libpng-1.2.41beta16-no-config.tar.bz2
+   libpng-1.2.41beta17-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta17-no-config.tar.gz
+   libpng-1.2.41beta17-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241b16.zip
-   lp1241b16.7z
-   lp1241b16.tar.bz2
+   lp1241b17.zip
+   lp1241b17.7z
+   lp1241b17.tar.bz2
 
 Project files
 
-   libpng-1.2.41beta16-project-netware.zip
-   libpng-1.2.41beta16-project-wince.zip
+   libpng-1.2.41beta17-project-netware.zip
+   libpng-1.2.41beta17-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41beta16-README.txt
-   libpng-1.2.41beta16-KNOWNBUGS.txt
-   libpng-1.2.41beta16-LICENSE.txt
-   libpng-1.2.41beta16-Y2K-compliance.txt
-   libpng-1.2.41beta16-[previous version]-diff.txt
+   libpng-1.2.41beta17-README.txt
+   libpng-1.2.41beta17-KNOWNBUGS.txt
+   libpng-1.2.41beta17-LICENSE.txt
+   libpng-1.2.41beta17-Y2K-compliance.txt
+   libpng-1.2.41beta17-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
@@ -142,6 +142,8 @@ version 1.2.41beta16 [November 9, 2009]
   Removed three direct references to read_info_ptr members in pngtest.c
     that were detected by the new PNG_DEPSTRUCT macro.
   Only #define PNG_DEPSTRUCT, etc. in pngconf.h if not already defined.
+
+version 1.2.41beta17 [November 9, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

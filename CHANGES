@@ -2574,6 +2574,8 @@ version 1.2.41beta16 [November 9, 2009]
     that were detected by the new PNG_DEPSTRUCT macro.
   Only #define PNG_DEPSTRUCT, etc. in pngconf.h if not already defined.
 
+version 1.2.41beta17 [November 9, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
