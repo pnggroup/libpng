@@ -2577,6 +2577,7 @@ version 1.2.41beta16 [November 9, 2009]
 version 1.2.41beta17 [November 9, 2009]
   Updated CMakeLists.txt to add "-DPNG_CONFIGURE_LIBPNG" to the definitions.
   Marked deprecated function prototypes with PNG_DEPRECATED.
+  Marked memory allocation function prototypes with PNG_ALLOCATED.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

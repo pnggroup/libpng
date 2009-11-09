@@ -1557,12 +1557,12 @@ extern PNG_EXPORT(int,png_check_sig) PNGARG((png_bytep sig, int num)) PNG_DEPREC
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
 extern PNG_EXPORT(png_structp,png_create_read_struct)
    PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
-   png_error_ptr error_fn, png_error_ptr warn_fn));
+   png_error_ptr error_fn, png_error_ptr warn_fn)) PNG_ALLOCATED;
 
 /* Allocate and initialize png_ptr struct for writing, and any other memory */
 extern PNG_EXPORT(png_structp,png_create_write_struct)
    PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
-   png_error_ptr error_fn, png_error_ptr warn_fn));
+   png_error_ptr error_fn, png_error_ptr warn_fn)) PNG_ALLOCATED;
 
 #ifdef PNG_WRITE_SUPPORTED
 extern PNG_EXPORT(png_uint_32,png_get_compression_buffer_size)
@@ -1582,11 +1582,11 @@ extern PNG_EXPORT(int,png_reset_zstream) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(png_structp,png_create_read_struct_2)
    PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
-   png_malloc_ptr malloc_fn, png_free_ptr free_fn));
+   png_malloc_ptr malloc_fn, png_free_ptr free_fn)) PNG_ALLOCATED;
 extern PNG_EXPORT(png_structp,png_create_write_struct_2)
    PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
-   png_malloc_ptr malloc_fn, png_free_ptr free_fn));
+   png_malloc_ptr malloc_fn, png_free_ptr free_fn)) PNG_ALLOCATED;
 #endif
 
 /* Write a PNG chunk - size, type, (optional) data, CRC. */
@@ -1606,7 +1606,7 @@ extern PNG_EXPORT(void,png_write_chunk_end) PNGARG((png_structp png_ptr));
 
 /* Allocate and initialize the info structure */
 extern PNG_EXPORT(png_infop,png_create_info_struct)
-   PNGARG((png_structp png_ptr));
+   PNGARG((png_structp png_ptr)) PNG_ALLOCATED;
 
 #if defined(PNG_1_0_X) || defined (PNG_1_2_X)
 /* Initialize the info structure (old interface - DEPRECATED) */
@@ -2106,14 +2106,14 @@ extern PNG_EXPORT(void,png_progressive_combine_row) PNGARG((png_structp png_ptr,
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
 extern PNG_EXPORT(png_voidp,png_malloc) PNGARG((png_structp png_ptr,
-   png_uint_32 size));
+   png_uint_32 size)) PNG_ALLOCATED;
 
 #ifdef PNG_1_0_X
 #  define png_malloc_warn png_malloc
 #else
 /* Added at libpng version 1.2.4 */
 extern PNG_EXPORT(png_voidp,png_malloc_warn) PNGARG((png_structp png_ptr,
-   png_uint_32 size));
+   png_uint_32 size)) PNG_ALLOCATED;
 #endif
 
 /* Frees a pointer allocated by png_malloc() */
@@ -2159,7 +2159,7 @@ extern PNG_EXPORT(void,png_data_freer) PNGARG((png_structp png_ptr,
 
 #ifdef PNG_USER_MEM_SUPPORTED
 extern PNG_EXPORT(png_voidp,png_malloc_default) PNGARG((png_structp png_ptr,
-   png_uint_32 size));
+   png_uint_32 size)) PNG_ALLOCATED;
 extern PNG_EXPORT(void,png_free_default) PNGARG((png_structp png_ptr,
    png_voidp ptr));
 #endif
