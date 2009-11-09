@@ -144,6 +144,7 @@ version 1.2.41beta16 [November 9, 2009]
   Only #define PNG_DEPSTRUCT, etc. in pngconf.h if not already defined.
 
 version 1.2.41beta17 [November 9, 2009]
+  Updated CMakeLists.txt to add "-DPNG_CONFIGURE_LIBPNG" to the definitions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
