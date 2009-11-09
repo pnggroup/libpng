@@ -1528,9 +1528,6 @@ typedef z_stream FAR *  png_zstreamp;
  * version 1.2.41.
  */
 #ifdef __GNUC__
-#  ifndef PNG_DEPRECATED
-#    define PNG_DEPRECATED __attribute__((__deprecated__))
-#  endif
 #  ifndef PNG_USE_RESULT
 #    define PNG_USE_RESULT __attribute__((__warn_unused_result__))
 #  endif
@@ -1546,6 +1543,9 @@ typedef z_stream FAR *  png_zstreamp;
      * accessed from within the library, therefore should be empty during
      * a library build.
      */
+#    ifndef PNG_DEPRECATED
+#      define PNG_DEPRECATED __attribute__((__deprecated__))
+#    endif
 #    ifndef PNG_DEPSTRUCT
 #      define PNG_DEPSTRUCT  __attribute__((__deprecated__))
 #    endif

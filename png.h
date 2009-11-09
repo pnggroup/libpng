@@ -1552,7 +1552,7 @@ extern PNG_EXPORT(int,png_sig_cmp) PNGARG((png_bytep sig, png_size_t start,
 /* Simple signature checking function.  This is the same as calling
  * png_check_sig(sig, n) := !png_sig_cmp(sig, 0, n).
  */
-extern PNG_EXPORT(int,png_check_sig) PNGARG((png_bytep sig, int num));
+extern PNG_EXPORT(int,png_check_sig) PNGARG((png_bytep sig, int num)) PNG_DEPRECATED;
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
 extern PNG_EXPORT(png_structp,png_create_read_struct)
@@ -1610,7 +1610,8 @@ extern PNG_EXPORT(png_infop,png_create_info_struct)
 
 #if defined(PNG_1_0_X) || defined (PNG_1_2_X)
 /* Initialize the info structure (old interface - DEPRECATED) */
-extern PNG_EXPORT(void,png_info_init) PNGARG((png_infop info_ptr));
+extern PNG_EXPORT(void,png_info_init) PNGARG((png_infop info_ptr))
+    PNG_DEPRECATED;
 #undef png_info_init
 #define png_info_init(info_ptr) png_info_init_3(&info_ptr,\
     png_sizeof(png_info));
@@ -1657,7 +1658,8 @@ extern PNG_EXPORT(void,png_set_palette_to_rgb) PNGARG((png_structp png_ptr));
 extern PNG_EXPORT(void,png_set_tRNS_to_alpha) PNGARG((png_structp png_ptr));
 #if defined(PNG_1_0_X) || defined (PNG_1_2_X)
 /* Deprecated */
-extern PNG_EXPORT(void,png_set_gray_1_2_4_to_8) PNGARG((png_structp png_ptr));
+extern PNG_EXPORT(void,png_set_gray_1_2_4_to_8) PNGARG((png_structp
+    png_ptr)) PNG_DEPRECATED;
 #endif
 #endif
 
@@ -1785,7 +1787,7 @@ extern PNG_EXPORT(void,png_set_gamma) PNGARG((png_structp png_ptr,
 /* Permit or disallow empty PLTE (0: not permitted, 1: permitted) */
 /* Deprecated and will be removed.  Use png_permit_mng_features() instead. */
 extern PNG_EXPORT(void,png_permit_empty_plte) PNGARG((png_structp png_ptr,
-   int empty_plte_permitted));
+   int empty_plte_permitted)) PNG_DEPRECATED;
 #endif
 #endif
 
@@ -1854,14 +1856,14 @@ extern PNG_EXPORT(void,png_destroy_read_struct) PNGARG((png_structpp
 
 /* Free all memory used by the read (old method - NOT DLL EXPORTED) */
 extern void png_read_destroy PNGARG((png_structp png_ptr, png_infop info_ptr,
-   png_infop end_info_ptr));
+   png_infop end_info_ptr)) PNG_DEPRECATED;
 
 /* Free any memory associated with the png_struct and the png_info_structs */
 extern PNG_EXPORT(void,png_destroy_write_struct)
    PNGARG((png_structpp png_ptr_ptr, png_infopp info_ptr_ptr));
 
 /* Free any memory used in png_ptr struct (old method - NOT DLL EXPORTED) */
-extern void png_write_destroy PNGARG((png_structp png_ptr));
+extern void png_write_destroy PNGARG((png_structp png_ptr)) PNG_DEPRECATED;
 
 /* Set the libpng method of handling chunk CRC errors */
 extern PNG_EXPORT(void,png_set_crc_action) PNGARG((png_structp png_ptr,
@@ -2176,14 +2178,14 @@ extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
 #ifndef PNG_NO_ERROR_TEXT
 /* Fatal error in PNG image of libpng - can't continue */
 extern PNG_EXPORT(void,png_error) PNGARG((png_structp png_ptr,
-   png_const_charp error_message));
+   png_const_charp error_message)) PNG_NORETURN;
 
 /* The same, but the chunk name is prepended to the error string. */
 extern PNG_EXPORT(void,png_chunk_error) PNGARG((png_structp png_ptr,
-   png_const_charp error_message));
+   png_const_charp error_message)) PNG_NORETURN;
 #else
 /* Fatal error in PNG image of libpng - can't continue */
-extern PNG_EXPORT(void,png_err) PNGARG((png_structp png_ptr));
+extern PNG_EXPORT(void,png_err) PNGARG((png_structp png_ptr)) PNG_NORETURN;
 #endif
 
 #ifndef PNG_NO_WARNINGS
@@ -3062,7 +3064,8 @@ PNG_EXPORT_VAR (png_byte FARDATA) png_zTXt[5];
 /* Initialize png_ptr struct for reading, and allocate any other memory.
  * (old interface - DEPRECATED - use png_create_read_struct instead).
  */
-extern PNG_EXPORT(void,png_read_init) PNGARG((png_structp png_ptr));
+extern PNG_EXPORT(void,png_read_init) PNGARG((png_structp png_ptr))
+    PNG_DEPRECATED;
 #undef png_read_init
 #define png_read_init(png_ptr) png_read_init_3(&png_ptr, \
     PNG_LIBPNG_VER_STRING,  png_sizeof(png_struct));
@@ -3080,7 +3083,8 @@ extern PNG_EXPORT(void,png_read_init_2) PNGARG((png_structp png_ptr,
 /* Initialize png_ptr struct for writing, and allocate any other memory.
  * (old interface - DEPRECATED - use png_create_write_struct instead).
  */
-extern PNG_EXPORT(void,png_write_init) PNGARG((png_structp png_ptr));
+extern PNG_EXPORT(void,png_write_init) PNGARG((png_structp png_ptr))
+    PNG_DEPRECATED;
 #undef png_write_init
 #define png_write_init(png_ptr) png_write_init_3(&png_ptr, \
     PNG_LIBPNG_VER_STRING, png_sizeof(png_struct));
