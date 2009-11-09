@@ -117,6 +117,7 @@ version 1.2.41beta13 [November 3, 2009]
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
 version 1.2.41beta14 [November 8, 2009]
+  versions 1.2.41beta05 through 1.2.41beta13 were abandoned.
   Make inclusion of time.h in pngconf.h depend on PNG_CONVERT_tIME_SUPPORTED
   Make #define PNG_CONVERT_tIME_SUPPORTED depend on PNG_WRITE_tIME_SUPPORTED
   Reverted iTXt compatibility stuff from 1.2.41beta05, 1.2.41beta11, and
@@ -127,6 +128,18 @@ version 1.2.41beta14 [November 8, 2009]
     and removed reference to png_calloc from scripts/*.def
 
 version 1.2.41beta15 [November 9, 2009]
+  Added PNG_DEPSTRUCT, PNG_DEPRECATED, PNG_USE_RESULT, PNG_NORETURN, and
+    PNG_ALLOCATED macros to detect deprecated direct access to the
+    png_struct or info_struct members and other deprecated usage in
+    applications (John Bowler).
+  Updated scripts/makefile* to add "-DPNG_CONFIGURE_LIBPNG" to CFLAGS,
+    to prevent warnings about direct access to png structs by libpng
+    functions while building libpng.  They need to be tested, especially
+    those using compilers other than gcc.
+  Updated projects/visualc6 and visualc71 with "/d PNG_CONFIGURE_LIBPNG".
+  Removed three direct references to read_info_ptr members in pngtest.c
+    that were detected by the new PNG_DEPSTRUCT macro.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

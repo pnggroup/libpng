@@ -2547,6 +2547,8 @@ version 1.2.41beta13 [November 3, 2009]
   Added PNG_CONVERT_tIME_SUPPORTED macro.
 
 version 1.2.41beta14 [November 8, 2009]
+  versions 1.2.41beta05 through 1.2.41beta13 were abandoned.
+  The 1.0.x/1.2.x series will only receive security updates from now on.
   Make inclusion of time.h in pngconf.h depend on PNG_CONVERT_tIME_SUPPORTED
   Make #define PNG_CONVERT_tIME_SUPPORTED depend on PNG_WRITE_tIME_SUPPORTED
   Reverted iTXt compatibility stuff from 1.2.41beta05, 1.2.41beta11, and
@@ -2577,8 +2579,6 @@ or to glennrp at users.sourceforge.net
 
 Glenn R-P
 */
-versions 1.2.41beta01 through 1.2.41beta13 were abandoned [November 5, 2009].
-  The 1.0.x/1.2.x series will only receive security updates from now on.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
