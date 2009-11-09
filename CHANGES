@@ -2332,6 +2332,7 @@ version 1.4.0beta95 [November 9, 2009]
   Changed png_check_sig() to !png_sig_cmp() in contrib programs.
   Corrected the png_get_IHDR() call in contrib/gregbook/readpng2.c
   Changed pngminim/*/gather.sh to stop trying to remove pnggccrd.c and pngvcrd.c
+  Added dependency on pngpriv.h in contrib/pngminim/*/makefile
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -41,7 +41,7 @@ OBJS  = rpng2-x$(O) readpng2$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
 
 # implicit make rules -------------------------------------------------------
 
-.c$(O): png.h pngconf.h readpng2.h pngusr.h zlib.h
+.c$(O): png.h pngconf.h pngpriv.h readpng2.h pngusr.h zlib.h
 	$(CC) -c $(CFLAGS) $<
 
 # dependencies
