@@ -141,6 +141,7 @@ version 1.2.41beta15 [November 8, 2009]
 version 1.2.41beta16 [November 9, 2009]
   Removed three direct references to read_info_ptr members in pngtest.c
     that were detected by the new PNG_DEPSTRUCT macro.
+  Only #define PNG_DEPSTRUCT, etc. in pngconf.h if not already defined.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
