@@ -124,7 +124,7 @@ if(MSVC)
 endif(MSVC)
 
 if(PNG_SHARED OR  NOT MSVC)
-	#if building msvc static this has NOT do be defined
+	#if building msvc static this has NOT to be defined
 	add_definitions(-DZLIB_DLL)
 endif()
 
