@@ -2568,10 +2568,19 @@ version 1.2.41beta15 [November 8, 2009]
     functions while building libpng.  They need to be tested, especially
     those using compilers other than gcc.
   Updated projects/visualc6 and visualc71 with "/d PNG_CONFIGURE_LIBPNG".
-
-version 1.2.41beta16 [November 9, 2009]
   Removed three direct references to read_info_ptr members in pngtest.c
     that were detected by the new PNG_DEPSTRUCT macro.
+
+version 1.2.41beta16 [November 9, 2009]
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+(subscription required; visit
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe)
+or to glennrp at users.sourceforge.net
+
+Glenn R-P
+*/
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
