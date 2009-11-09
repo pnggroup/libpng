@@ -2578,6 +2578,8 @@ version 1.2.41beta17 [November 9, 2009]
   Updated CMakeLists.txt to add "-DPNG_CONFIGURE_LIBPNG" to the definitions.
   Marked deprecated function prototypes with PNG_DEPRECATED.
   Marked memory allocation function prototypes with PNG_ALLOCATED.
+  Changed png_check_sig() to !png_sig_cmp() in contrib programs.
+  Corrected the png_get_IHDR() call in contrib/gregbook/readpng2.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

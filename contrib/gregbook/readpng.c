@@ -93,7 +93,7 @@ int readpng_init(FILE *infile, ulg *pWidth, ulg *pHeight)
      * have used slightly more general png_sig_cmp() function instead */
 
     fread(sig, 1, 8, infile);
-    if (!png_check_sig(sig, 8))
+    if (png_sig_cmp(sig, 0, 8))
         return 1;   /* bad signature */
 
 
