@@ -2326,7 +2326,7 @@ version 1.4.0beta94 [November 9, 2009]
   Removed dependency of pngtest.o on pngpriv.h in the makefiles.
   Only #define PNG_DEPSTRUCT, etc. in pngconf.h if not already defined.
 
-version 1.4.0beta95 [November 9, 2009]
+version 1.4.0beta95 [November 10, 2009]
   Changed png_check_sig() to !png_sig_cmp() in contrib programs.
   Added -DPNG_CONFIGURE_LIBPNG to contrib/pngminm/*/makefile
   Changed png_check_sig() to !png_sig_cmp() in contrib programs.
