@@ -108,6 +108,7 @@ include
                        ansi2knr (Requires ansi2knr.c from
                        ftp://ftp.cs.wisc.edu/ghost)
  makefile.aix      =>  AIX/gcc makefile
+ makefile.cegcc    =>  minge32ce for Windows CE makefile
  makefile.cygwin   =>  Cygwin/gcc makefile
  makefile.darwin   =>  Darwin makefile, can use on MacosX
  makefile.dec      =>  DEC Alpha UNIX makefile
