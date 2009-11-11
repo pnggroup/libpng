@@ -2582,9 +2582,11 @@ version 1.2.41beta17 [November 10, 2009]
   Corrected the png_get_IHDR() call in contrib/gregbook/readpng2.c
   Added "-DPNG_CONFIGURE_LIBPNG" to the contrib/pngminum makefiles.
 
-version 1.2.41rc01 [November 11, 2009]
+version 1.2.41beta18 [November 11, 2009]
   Renamed scripts/makefile.wce to scripts/makefile.cegcc
   Marked nonexported functions with PNG_PRIVATE macro.
+
+version 1.2.41beta19 [November 11, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
