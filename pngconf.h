@@ -1549,6 +1549,15 @@ typedef z_stream FAR *  png_zstreamp;
 #    ifndef PNG_DEPSTRUCT
 #      define PNG_DEPSTRUCT  __attribute__((__deprecated__))
 #    endif
+#    ifndef PNG_PRIVATE
+#if 0 /* Doesn't work so we use deprecated instead*/
+#      define PNG_PRIVATE \
+        __attribute__((warning("This function is not exported by libpng.")))
+#else
+#      define PNG_PRIVATE \
+        __attribute__((__deprecated__))
+#endif
+#    endif
 #  endif
 #endif
 
@@ -1566,6 +1575,9 @@ typedef z_stream FAR *  png_zstreamp;
 #endif
 #ifndef PNG_DEPSTRUCT
 #  define PNG_DEPSTRUCT   /* Access to this struct member is deprecated */
+#endif
+#ifndef PNG_PRIVATE
+#  define PNG_PRIVATE     /* This is a private libpng function */
 #endif
 
 /* User may want to use these so they are not in PNG_INTERNAL. Any library
