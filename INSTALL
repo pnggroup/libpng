@@ -54,17 +54,21 @@ Your directory structure should look like this:
           README
           *.h
           *.c
+          CMakeLists.txt    =>  "cmake" script
           contrib
              gregbook
+             pngminim
              pngminus
              pngsuite
              visupng
           projects
-             beos
-             c5builder (Borland)
+             cbuilder5 (Borland)
              visualc6 (msvc)
+             visualc71
+             xcode
           scripts
              makefile.*
+             *.def (module definition files)
           pngtest.png
           etc.
       zlib
@@ -79,10 +83,8 @@ distribution of libpng.  It is available in both tar.gz (UNIX style line
 endings) and zip (DOS style line endings) formats.
 
 If you are building libpng with MSVC, you can enter the
-libpng projects\visualc6 directory and follow the instructions in
-projects\visualc6\README.txt.
-
-You can build libpng for beos as instructed in projects\beos.
+libpng projects\visualc6 or visualc71 directory and follow the instructions
+in README.txt.
 
 Else enter the zlib directory and follow the instructions in zlib/README,
 then come back here and run "configure" or choose the appropriate
@@ -91,7 +93,6 @@ makefile.sys in the scripts directory.
 The files that are presently available in the scripts directory
 include
 
- CMakeLists.txt    =>  "cmake" script
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
                        gcc, creates libpng14.so.14.1.4.0beta97)
@@ -139,7 +140,6 @@ include
  smakefile.ppc     =>  AMIGA smakefile for SAS C V6.58/7.00 PPC compiler
                        (Requires SCOPTIONS, copied from scripts/SCOPTIONS.ppc)
  makefile.atari    =>  Atari makefile
- makefile.beos     =>  BEOS makefile for X86
  makefile.bor      =>  Borland makefile (uses bcc)
  makefile.bc32     =>  32-bit Borland C++ (all modules compiled in C mode)
  makefile.tc3      =>  Turbo C 3.0 makefile
@@ -151,6 +151,8 @@ include
                        not use assembler code)
  makefile.os2      =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
  pngos2.def        =>  OS/2 module definition file used by makefile.os2
+ pngwin.def        =>  module definition file for makefile.cygwin and mingw
+ png32ce.def       =>  module definition file used by makefile.cegcc
  makefile.watcom   =>  Watcom 10a+ Makefile, 32-bit flat memory model
  makevms.com       =>  VMS build script
  descrip.mms       =>  VMS makefile for MMS or MMK
