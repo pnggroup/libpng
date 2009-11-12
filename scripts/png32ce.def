@@ -44,7 +44,6 @@ EXPORTS
   png_get_image_height  @36
   png_get_image_width  @37
   png_get_interlace_type  @38
-  png_get_io_ptr    @39
   png_get_libpng_ver  @40
   png_get_oFFs    @41
   png_get_pCAL    @42
@@ -208,7 +207,7 @@ EXPORTS
 ; png_set_asm_flags  @191
 ; png_init_mmx_flags  @192
 ; Strip error numbers
-; png_set_strip_error_numbers @193
+  png_set_strip_error_numbers @193
 ; Added at version 1.2.2
   png_handle_as_unknown @179
   png_zalloc @180
@@ -234,12 +233,4 @@ EXPORTS
   png_set_expand_gray_1_2_4_to_8  @207
 ; Added at version 1.2.41
   png_write_sig @208
-  png_benign_error @209
-  png_benign_chunk_error @210
-  png_set_benign_error @211
-  png_get_io_chunk_name @212
-  png_get_io_state @213
-  png_set_premultiply_alpha @214
-  png_get_chunk_cache_max @215
-  png_set_chunk_cache_max @216
   png_check_cHRM_fixed @217

@@ -11,7 +11,6 @@ DATA		PRELOAD MOVEABLE MULTIPLE
 
 EXPORTS
 
-
   png_build_grayscale_palette
   png_check_sig
   png_chunk_error
@@ -225,14 +224,6 @@ EXPORTS
 
 ; Added at version 1.2.41
   png_write_sig
-  png_benign_error
-  png_benign_chunk_error
-  png_set_benign_error
-  png_get_io_chunk_name
-  png_get_io_state
-  png_set_premultiply_alpha
-  png_get_chunk_cache_max
-  png_set_chunk_cache_max
   png_check_cHRM_fixed
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS

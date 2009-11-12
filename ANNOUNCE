@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta19 - November 11, 2009
+Libpng 1.2.41beta19 - November 12, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -155,7 +155,8 @@ version 1.2.41beta18 [November 11, 2009]
   Renamed scripts/makefile.wce to scripts/makefile.cegcc
   Marked nonexported functions with PNG_PRIVATE macro.
 
-version 1.2.41beta19 [November 11, 2009]
+version 1.2.41beta19 [November 12, 2009]
+  Revised scripts/*.def to reflect functions actually exported by libpng.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

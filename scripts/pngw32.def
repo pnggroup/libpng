@@ -239,12 +239,4 @@ EXPORTS
   png_set_expand_gray_1_2_4_to_8  @207
 ; Added at version 1.2.41
   png_write_sig @208
-  png_benign_error @209
-  png_benign_chunk_error @210
-  png_set_benign_error @211
-  png_get_io_chunk_name @212
-  png_get_io_state @213
-  png_set_premultiply_alpha @214
-  png_get_chunk_cache_max @215
-  png_set_chunk_cache_max @216
   png_check_cHRM_fixed @217
