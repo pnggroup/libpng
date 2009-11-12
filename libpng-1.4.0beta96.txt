@@ -3069,7 +3069,8 @@ png_set_mmx_thresholds(), png_get_asm_flags(),
 png_get_mmx_bitdepth_threshold(), png_get_mmx_rowbytes_threshold(),
 png_set_asm_flags(), and png_mmx_supported()
 
-We removed the png_memcpy_check() and png_memset_check() functions.
+We removed the png_check_sig(), png_memcpy_check(), and
+png_memset_check() functions.
 
 We changed the prototype for png_malloc() from
     png_malloc(png_structp png_ptr, png_uint_32 size)

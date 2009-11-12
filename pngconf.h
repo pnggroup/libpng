@@ -1289,6 +1289,8 @@ typedef char            FAR * FAR * FAR * png_charppp;
 /* Support for compiler specific function attributes.  These are used
  * so that where compiler support is available incorrect use of API
  * functions in png.h will generate compiler warnings.
+ *
+ * Added at libpng-1.2.41.
  */
 #ifdef __GNUC__
 #  ifndef PNG_DEPRECATED
