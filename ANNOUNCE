@@ -656,6 +656,7 @@ version 1.4.0beta96 [November 12, 2009]
   Removed recently removed function names from scripts/*.def
   Revised pngtest.png to put chunks in the same order written by pngtest
     (evidently the same change made in libpng-1.0beta54 was lost).
+  Added PNG_PRIVATE macro definition in pngconf.h for possible future use.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

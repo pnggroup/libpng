@@ -1312,6 +1312,9 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    ifndef PNG_DEPSTRUCT
 #      define PNG_DEPSTRUCT  __attribute__((__deprecated__))
 #    endif
+#    ifndef PNG_PRIVATE
+#      define PNG_PRIVATE __attribute__((__deprecated__))
+#    endif
 #  endif
 #endif
 
@@ -1329,6 +1332,9 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #endif
 #ifndef PNG_DEPSTRUCT
 #  define PNG_DEPSTRUCT   /* Access to this struct member is deprecated */
+#endif
+#ifndef PNG_PRIVATE
+#  define PNG_PRIVATE     /* This is a private libpng function */
 #endif
 
 /* Users may want to use these so they are not private.  Any library
