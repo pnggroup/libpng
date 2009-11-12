@@ -48,7 +48,9 @@ build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = pngtest$(EXEEXT)
 @HAVE_LD_VERSION_SCRIPT_TRUE@am__append_1 = -Wl,--version-script=libpng.vers
-@HAVE_LD_VERSION_SCRIPT_FALSE@am__append_2 = -export-symbols libpng.sym
+@HAVE_LD_VERSION_SCRIPT_TRUE@am__append_2 = -Wl,--version-script=libpng.vers
+@HAVE_LD_VERSION_SCRIPT_FALSE@am__append_3 = -export-symbols libpng.sym
+@HAVE_LD_VERSION_SCRIPT_FALSE@am__append_4 = -export-symbols libpng.sym
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_man_MANS) \
 	$(pkginclude_HEADERS) $(srcdir)/Makefile.am \
@@ -106,14 +108,14 @@ libpng_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libpng_la_LDFLAGS) $(LDFLAGS) -o $@
 libpng14_la_LIBADD =
-am_libpng14_la_OBJECTS = libpng14_la-png.lo \
-	libpng14_la-pngset.lo libpng14_la-pngget.lo \
-	libpng14_la-pngrutil.lo libpng14_la-pngtrans.lo \
-	libpng14_la-pngwutil.lo libpng14_la-pngread.lo \
-	libpng14_la-pngrio.lo libpng14_la-pngwio.lo \
-	libpng14_la-pngwrite.lo libpng14_la-pngrtran.lo \
-	libpng14_la-pngwtran.lo libpng14_la-pngmem.lo \
-	libpng14_la-pngerror.lo libpng14_la-pngpread.lo
+am_libpng14_la_OBJECTS = libpng14_la-png.lo libpng14_la-pngset.lo \
+	libpng14_la-pngget.lo libpng14_la-pngrutil.lo \
+	libpng14_la-pngtrans.lo libpng14_la-pngwutil.lo \
+	libpng14_la-pngread.lo libpng14_la-pngrio.lo \
+	libpng14_la-pngwio.lo libpng14_la-pngwrite.lo \
+	libpng14_la-pngrtran.lo libpng14_la-pngwtran.lo \
+	libpng14_la-pngmem.lo libpng14_la-pngerror.lo \
+	libpng14_la-pngpread.lo
 libpng14_la_OBJECTS = $(am_libpng14_la_OBJECTS)
 libpng14_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -319,13 +321,12 @@ libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
 libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
-libpng14_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_RELEASE@:14 $(am__append_1) \
-	$(am__append_2)
+libpng14_la_LDFLAGS = -no-undefined -export-dynamic -version-number \
+	14:@PNGLIB_RELEASE@:14 $(am__append_2) $(am__append_4)
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_RELEASE@:14
-
+	-version-number 14:@PNGLIB_RELEASE@:14 $(am__append_1) \
+	$(am__append_3)
 @HAVE_LD_VERSION_SCRIPT_FALSE@libpng14_la_DEPENDENCIES = libpng.sym
 @HAVE_LD_VERSION_SCRIPT_TRUE@libpng14_la_DEPENDENCIES = libpng.vers
 libpng_la_DEPENDENCIES = $(libpng14_la_DEPENDENCIES)

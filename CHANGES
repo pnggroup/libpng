@@ -2336,6 +2336,8 @@ version 1.4.0beta95 [November 10, 2009]
 
 version 1.4.0beta96 [November 12, 2009]
   Renamed scripts/makefile.wce to scripts/makefile.cegcc
+  Revised Makefile.am to use libpng.sys while building libpng.so
+    so that only PNG_EXPORT functions are exported.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

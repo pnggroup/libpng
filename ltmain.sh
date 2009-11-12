@@ -2560,7 +2560,7 @@ func_win32_libid ()
     ;;
   *ar\ archive*) # could be an import, or static
     if eval $OBJDUMP -f $1 | $SED -e '10q' 2>/dev/null |
-      $EGREP 'file format (pe-i386(.*architecture: i386)?|pe-arm-wince)' >/dev/null ; then
+       $EGREP 'file format pe-i386(.*architecture: i386)?' >/dev/null ; then
       win32_nmres=`eval $NM -f posix -A $1 |
 	$SED -n -e '
 	    1,100{

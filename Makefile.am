@@ -49,10 +49,12 @@ libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
+  libpng_la_LDFLAGS += -Wl,--version-script=libpng.vers
   libpng14_la_LDFLAGS += -Wl,--version-script=libpng.vers
   libpng14_la_DEPENDENCIES = libpng.vers
 else
   # Only restricted exports when possible
+  libpng_la_LDFLAGS += -export-symbols libpng.sym
   libpng14_la_LDFLAGS += -export-symbols libpng.sym
   libpng14_la_DEPENDENCIES = libpng.sym
 endif
