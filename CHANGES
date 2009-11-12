@@ -2334,7 +2334,7 @@ version 1.4.0beta95 [November 10, 2009]
   Changed pngminim/*/gather.sh to stop trying to remove pnggccrd.c and pngvcrd.c
   Added dependency on pngpriv.h in contrib/pngminim/*/makefile
 
-version 1.4.0rc02 [November 10, 2009]
+version 1.4.0beta96 [November 12, 2009]
   Renamed scripts/makefile.wce to scripts/makefile.cegcc
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
