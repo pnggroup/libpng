@@ -660,6 +660,7 @@ version 1.4.0beta96 [November 12, 2009]
 
 version 1.4.0beta97 [November 12, 2009]
   Restored pngtest.png to the libpng-1.4.0beta7 version.
+  Removed projects/beos since no one seems to be supporting it.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
