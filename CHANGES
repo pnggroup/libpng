@@ -2338,8 +2338,10 @@ version 1.4.0beta96 [November 12, 2009]
   Renamed scripts/makefile.wce to scripts/makefile.cegcc
   Revised Makefile.am to use libpng.sys while building libpng.so
     so that only PNG_EXPORT functions are exported.
-  Removed the deprecated png_check_sig() function.
+  Removed the deprecated png_check_sig() function/macro.
   Removed recently removed function names from scripts/*.def
+  Revised pngtest.png to put chunks in the same order written by pngtest
+    (evidently the same change made in libpng-1.0beta54 was lost).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
