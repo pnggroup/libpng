@@ -2,9 +2,9 @@
 #   Source file for Makefile.in (and hence Makefile)
 #
 # Makefile.am need only be changed on a major version number
-# change (e.g. libpng12 --> libpng13).  In that case seach
+# change (e.g. libpng12 --> libpng14).  In that case seach
 # this file for every instance of the old base name (libpng12)
-# and change to the new one (libpng13), then change the
+# and change to the new one (libpng14), then change the
 # -version-number settings below so that the new values have
 # the correct major part (first field).
 
@@ -34,7 +34,7 @@ EXTRA_LTLIBRARIES= libpng.la
 libpng14_la_SOURCES = png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
-	png.h pngconf.h
+	png.h pngconf.h pngpriv.h
 libpng_la_SOURCES = $(libpng14_la_SOURCES)
 
 libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
@@ -42,10 +42,10 @@ libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
 libpng14_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_RELEASE@:14
+	-version-number 14:@PNGLIB_RELEASE@:0
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_RELEASE@:14
+	-version-number 14:@PNGLIB_RELEASE@:0
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
@@ -77,18 +77,15 @@ EXTRA_DIST= \
 	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/projects/cbuilder5/* \
-	${srcdir}/projects/beos/* \
 	${srcdir}/projects/visualc6/* \
 	${srcdir}/projects/visualc71/* \
-	${srcdir}/projects/wince.txt \
-	${srcdir}/projects/netware.txt \
 	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \
 	${srcdir}/contrib/pngminus/* \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.4.0beta97.txt pngvcrd.c 
+	example.c libpng-1.4.0beta97.txt
 
 CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers \
 libpng.sym
