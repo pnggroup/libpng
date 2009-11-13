@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta97 - November 13, 2009
+Libpng 1.4.0beta98 - November 13, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta97.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta97.tar.gz
-   1.4.0beta97.tar.bz2
+   1.4.0beta98.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta98.tar.gz
+   1.4.0beta98.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b97.zip
-   lp140b97.7z
+   lp140b98.zip
+   lp140b98.7z
 
 Other information:
 
-   1.4.0beta97-README.txt
-   1.4.0beta97-LICENSE.txt
+   1.4.0beta98-README.txt
+   1.4.0beta98-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -662,6 +662,8 @@ version 1.4.0beta97 [November 13, 2009]
   Restored pngtest.png to the libpng-1.4.0beta7 version.
   Removed projects/beos and netware.txt; no one seems to be supporting them.
   Revised Makefile.in
+
+version 1.4.0beta98 [November 13, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
