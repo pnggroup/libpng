@@ -168,7 +168,7 @@ EXPORTS
   png_convert_to_rfc1123
   png_set_invalid
 ; Added at version 1.0.12
-%12_%  png_info_init_3
+  png_info_init_3
   png_destroy_struct
 ; Added at version 1.2.0
 ; For use with PNG_USER_MEM_SUPPORTED
