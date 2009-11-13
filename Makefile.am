@@ -73,7 +73,6 @@ EXTRA_DIST= \
 	${srcdir}/projects/visualc6/* \
 	${srcdir}/projects/visualc71/* \
 	${srcdir}/projects/xcode/* \
-	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \
 	${srcdir}/contrib/pngminim/* \
 	${srcdir}/contrib/pngminus/* \

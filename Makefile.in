@@ -53,10 +53,9 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_man_MANS) \
 	$(pkginclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure $(top_srcdir)/scripts/libpng-config.in \
-	$(top_srcdir)/scripts/libpng.pc-configure.in INSTALL TODO \
-	config.guess config.sub depcomp install-sh ltmain.sh missing \
-	mkinstalldirs
+	$(srcdir)/libpng-config.in $(srcdir)/libpng-pc.in \
+	$(top_srcdir)/configure INSTALL TODO config.guess config.sub \
+	depcomp install-sh ltmain.sh missing mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -323,7 +322,6 @@ EXTRA_DIST = \
 	${srcdir}/projects/visualc6/* \
 	${srcdir}/projects/visualc71/* \
 	${srcdir}/projects/xcode/* \
-	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \
 	${srcdir}/contrib/pngminim/* \
 	${srcdir}/contrib/pngminus/* \
@@ -394,9 +392,9 @@ $(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-libpng.pc: $(top_builddir)/config.status $(top_srcdir)/scripts/libpng.pc-configure.in
+libpng.pc: $(top_builddir)/config.status $(srcdir)/libpng-pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-libpng-config: $(top_builddir)/config.status $(top_srcdir)/scripts/libpng-config.in
+libpng-config: $(top_builddir)/config.status $(srcdir)/libpng-config.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)

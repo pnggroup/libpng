@@ -2350,6 +2350,11 @@ version 1.4.0beta97 [November 13, 2009]
   Revised Makefile.in
 
 version 1.4.0beta98 [November 13, 2009]
+  Moved libpng-config.in and libpng.pc-configure.in out of the scripts
+    directory, to libpng-config.in and libpng-pc.in, respectively, and
+    modified Makefile.am and configure.ac accordingly.  Now "configure"
+    needs nothing from the "scripts" directory.
+  Avoid redefining PNG_CONST in pngconf.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
