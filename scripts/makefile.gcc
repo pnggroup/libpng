@@ -64,20 +64,20 @@ pngtest$(EXE): pngtest$(O) libpng$(A)
 clean:
 	$(RM_F) *$(O) libpng$(A) pngtest$(EXE) pngout.png
 
-png$(O):      png.h pngconf.h
-pngerror$(O): png.h pngconf.h
-pngget$(O):   png.h pngconf.h
-pngmem$(O):   png.h pngconf.h
-pngpread$(O): png.h pngconf.h
-pngread$(O):  png.h pngconf.h
-pngrio$(O):   png.h pngconf.h
-pngrtran$(O): png.h pngconf.h
-pngrutil$(O): png.h pngconf.h
-pngset$(O):   png.h pngconf.h
-pngtrans$(O): png.h pngconf.h
-pngwio$(O):   png.h pngconf.h
-pngwrite$(O): png.h pngconf.h
-pngwtran$(O): png.h pngconf.h
-pngwutil$(O): png.h pngconf.h
+png$(O):      png.h pngconf.h pngpriv.h
+pngerror$(O): png.h pngconf.h pngpriv.h
+pngget$(O):   png.h pngconf.h pngpriv.h
+pngmem$(O):   png.h pngconf.h pngpriv.h
+pngpread$(O): png.h pngconf.h pngpriv.h
+pngread$(O):  png.h pngconf.h pngpriv.h
+pngrio$(O):   png.h pngconf.h pngpriv.h
+pngrtran$(O): png.h pngconf.h pngpriv.h
+pngrutil$(O): png.h pngconf.h pngpriv.h
+pngset$(O):   png.h pngconf.h pngpriv.h
+pngtrans$(O): png.h pngconf.h pngpriv.h
+pngwio$(O):   png.h pngconf.h pngpriv.h
+pngwrite$(O): png.h pngconf.h pngpriv.h
+pngwtran$(O): png.h pngconf.h pngpriv.h
+pngwutil$(O): png.h pngconf.h pngpriv.h
 
 pngtest$(O):  png.h pngconf.h

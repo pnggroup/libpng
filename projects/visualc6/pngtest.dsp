@@ -58,7 +58,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386
-# ADD LINK32 Win32_DLL_Release\libpng13.lib ..\..\..\zlib\projects\visualc6\Win32_DLL_Release\zlib1.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 Win32_DLL_Release\libpng14.lib ..\..\..\zlib\projects\visualc6\Win32_DLL_Release\zlib1.lib /nologo /subsystem:console /machine:I386
 # Begin Special Build Tool
 OutDir=.\Win32_DLL_Release
 SOURCE="$(InputPath)"
@@ -90,7 +90,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 Win32_DLL_Debug\libpng13d.lib ..\..\..\zlib\projects\visualc6\Win32_DLL_Debug\zlib1d.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 Win32_DLL_Debug\libpng14d.lib ..\..\..\zlib\projects\visualc6\Win32_DLL_Debug\zlib1d.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 OutDir=.\Win32_DLL_Debug
 SOURCE="$(InputPath)"
@@ -122,7 +122,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386
-# ADD LINK32 Win32_DLL_ASM_Release\libpng13.lib ..\..\..\zlib\projects\visualc6\Win32_DLL_ASM_Release\zlib1.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 Win32_DLL_ASM_Release\libpng14.lib ..\..\..\zlib\projects\visualc6\Win32_DLL_ASM_Release\zlib1.lib /nologo /subsystem:console /machine:I386
 # Begin Special Build Tool
 OutDir=.\Win32_DLL_ASM_Release
 SOURCE="$(InputPath)"
@@ -154,7 +154,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 Win32_DLL_ASM_Debug\libpng13d.lib ..\..\..\zlib\projects\visualc6\Win32_DLL_ASM_Debug\zlib1d.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 Win32_DLL_ASM_Debug\libpng14d.lib ..\..\..\zlib\projects\visualc6\Win32_DLL_ASM_Debug\zlib1d.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 OutDir=.\Win32_DLL_ASM_Debug
 SOURCE="$(InputPath)"

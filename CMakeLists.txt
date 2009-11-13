@@ -15,8 +15,8 @@ enable_testing()
 # and license in png.h
 
 set(PNGLIB_MAJOR 1)
-set(PNGLIB_MINOR 2)
-set(PNGLIB_RELEASE 41)
+set(PNGLIB_MINOR 4)
+set(PNGLIB_RELEASE 0)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -96,6 +96,7 @@ set(CMAKE_DEBUG_POSTFIX "d")
 set(libpng_sources
  png.h
  pngconf.h
+ pngpriv.h
  png.c
  pngerror.c
  pngget.c
@@ -127,9 +128,6 @@ if(PNG_SHARED OR  NOT MSVC)
 	#if building msvc static this has NOT to be defined
 	add_definitions(-DZLIB_DLL)
 endif()
-
-add_definitions(-DLIBPNG_NO_MMX)
-add_definitions(-DPNG_NO_MMX_CODE)
 
 if(PNG_CONSOLE_IO_SUPPORTED)
  add_definitions(-DPNG_CONSOLE_IO_SUPPORTED)
@@ -205,9 +203,9 @@ configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 0.${PNGLIB_RELEASE}.1.2.41beta19
-     VERSION 0.${PNGLIB_RELEASE}.0
-     SOVERSION 0
+#    VERSION 14.${PNGLIB_RELEASE}.1.4.0beta97
+     VERSION 14.${PNGLIB_RELEASE}.0
+     SOVERSION 14
      CLEAN_DIRECT_OUTPUT 1)
 endif()
 if(PNG_STATIC)
@@ -235,8 +233,8 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
 endif()
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL )
-    install(FILES png.h pngconf.h         DESTINATION include)
-    install(FILES png.h pngconf.h         DESTINATION include/${PNGLIB_NAME})
+    install(FILES png.h pngconf.h pngpriv.h         DESTINATION include)
+    install(FILES png.h pngconf.h pngpriv.h         DESTINATION include/${PNGLIB_NAME})
 endif()
 if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL )
     install(PROGRAMS ${PNG_BINARY_DIR}/libpng-config      DESTINATION bin)

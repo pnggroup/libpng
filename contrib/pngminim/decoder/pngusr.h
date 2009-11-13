@@ -16,8 +16,6 @@
   /* No 16-bit support beyond reading with strip_16 */
 #endif
 
-#define PNG_NO_GLOBAL_ARRAYS
-
 #define PNG_NO_WARNINGS
 #define png_warning(s1,s2) ""
 #define png_chunk_warning(s1,s2) ""
@@ -25,8 +23,6 @@
 #define png_error(s1,s2) png_err(s1)
 #define png_chunk_error(s1,s2) png_err(s1)
 
-#define PNG_NO_ASSEMBLER_CODE
-#define PNG_NO_OPTIMIZED_CODE
 #define PNG_NO_READ_GAMMA
 #define PNG_NO_READ_BACKGROUND
 #define PNG_NO_READ_DITHER
@@ -59,7 +55,6 @@
 #define PNG_NO_READ_OPT_PLTE
 #define PNG_NO_READ_STRIP_ALPHA
 #define PNG_NO_READ_oFFs
-#define PNG_NO_WARN_UNINITIALIZED_ROW
 
 #define PNG_NO_WRITE_SUPPORTED
 
