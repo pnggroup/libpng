@@ -2589,6 +2589,8 @@ version 1.2.41beta18 [November 11, 2009]
 version 1.2.41beta19 [November 12, 2009]
   Revised scripts/*.def to reflect functions actually exported by libpng.
 
+version 1.2.41beta20 [November 13, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

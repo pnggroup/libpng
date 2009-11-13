@@ -1,5 +1,5 @@
 
-Libpng 1.2.41beta19 - November 12, 2009
+Libpng 1.2.41beta20 - November 13, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41beta19.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta19.tar.gz
-   libpng-1.2.41beta19.tar.bz2
+   libpng-1.2.41beta20.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta20.tar.gz
+   libpng-1.2.41beta20.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41beta19-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41beta19-no-config.tar.gz
-   libpng-1.2.41beta19-no-config.tar.bz2
+   libpng-1.2.41beta20-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41beta20-no-config.tar.gz
+   libpng-1.2.41beta20-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241b19.zip
-   lp1241b19.7z
-   lp1241b19.tar.bz2
+   lp1241b20.zip
+   lp1241b20.7z
+   lp1241b20.tar.bz2
 
 Project files
 
-   libpng-1.2.41beta19-project-netware.zip
-   libpng-1.2.41beta19-project-wince.zip
+   libpng-1.2.41beta20-project-netware.zip
+   libpng-1.2.41beta20-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41beta19-README.txt
-   libpng-1.2.41beta19-KNOWNBUGS.txt
-   libpng-1.2.41beta19-LICENSE.txt
-   libpng-1.2.41beta19-Y2K-compliance.txt
-   libpng-1.2.41beta19-[previous version]-diff.txt
+   libpng-1.2.41beta20-README.txt
+   libpng-1.2.41beta20-KNOWNBUGS.txt
+   libpng-1.2.41beta20-LICENSE.txt
+   libpng-1.2.41beta20-Y2K-compliance.txt
+   libpng-1.2.41beta20-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
@@ -157,6 +157,8 @@ version 1.2.41beta18 [November 11, 2009]
 
 version 1.2.41beta19 [November 12, 2009]
   Revised scripts/*.def to reflect functions actually exported by libpng.
+
+version 1.2.41beta20 [November 13, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
