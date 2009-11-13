@@ -116,20 +116,6 @@ AC_ARG_WITH(binconfigs,
 	[binconfigs='${binconfigs}'])
 AC_SUBST([binconfigs])
 
-# Allow the old version number library, libpng.so, to be removed from
-# the build
-AC_ARG_WITH(libpng-compat,
-	AC_HELP_STRING([--with-libpng-compat],
-		[Generate the obsolete libpng.so library @<:@default=yes@:>@]),
-	[if test "${withval}" = no; then
-		compatlib=
-		AC_MSG_NOTICE([libpng.so will not be built])
-	else
-		compatlib=libpng.la
-	fi],
-	[compatlib=libpng.la])
-AC_SUBST([compatlib])
-
 # Config files, substituting as above
 AC_CONFIG_FILES([Makefile libpng.pc:scripts/libpng.pc-configure.in])
 AC_CONFIG_FILES([libpng-config:scripts/libpng-config.in],
