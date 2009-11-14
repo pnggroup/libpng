@@ -2361,6 +2361,7 @@ version 1.4.0beta99 [November 14, 2009]
   Avoid redefining PNG_CONST in pngconf.h
 
 version 1.4.0beta100 [November 14, 2009]
+  Removed ASM builds from projects/visualc6 and projects/visualc71
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

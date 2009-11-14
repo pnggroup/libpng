@@ -17,7 +17,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -62,97 +62,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				WarningLevel="3"
-				DebugInformationFormat="4"
-				CompileAs="1"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\zlib1d.dll"
-				ModuleDefinitionFile="..\..\..\zlib\win32\zlib.def"
-				GenerateDebugInformation="TRUE"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="DLL ASM Release|Win32"
-			OutputDirectory=".\Win32_DLL_ASM_Release\ZLib"
-			IntermediateDirectory=".\Win32_DLL_ASM_Release\ZLib"
-			ConfigurationType="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;ASMV;ASMINF"
-				StringPooling="TRUE"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				WarningLevel="3"
-				CompileAs="1"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\zlib1.dll"
-				LinkIncremental="1"
-				ModuleDefinitionFile="..\..\..\zlib\win32\zlib.def"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="DLL ASM Debug|Win32"
-			OutputDirectory=".\Win32_DLL_ASM_Debug\ZLib"
-			IntermediateDirectory=".\Win32_DLL_ASM_Debug\ZLib"
-			ConfigurationType="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;ASMV;ASMINF"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
@@ -197,7 +107,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -236,85 +146,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				WarningLevel="3"
-				DebugInformationFormat="4"
-				CompileAs="1"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\zlibd.lib"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="LIB ASM Release|Win32"
-			OutputDirectory=".\Win32_LIB_ASM_Release\ZLib"
-			IntermediateDirectory=".\Win32_LIB_ASM_Release\ZLib"
-			ConfigurationType="4">
-			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;ASMV;ASMINF"
-				StringPooling="TRUE"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				WarningLevel="3"
-				CompileAs="1"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\zlib.lib"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="LIB ASM Debug|Win32"
-			OutputDirectory=".\Win32_LIB_ASM_Debug\ZLib"
-			IntermediateDirectory=".\Win32_LIB_ASM_Debug\ZLib"
-			ConfigurationType="4">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;ASMV;ASMINF"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
@@ -398,18 +230,6 @@
 					<Tool
 						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\zlib\zutil.c">
@@ -466,18 +286,6 @@
 					<Tool
 						Name="VCResourceCompilerTool"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCResourceCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCResourceCompilerTool"/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -498,24 +306,6 @@
 						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="DLL ASM Release|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling..."
-						CommandLine="ml /nologo /c /Cx /coff /Fo&quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;
-"
-						Outputs="$(IntDir)\$(InputName).obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL ASM Debug|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling..."
-						CommandLine="ml /nologo /c /Cx /coff /Zi /Fo&quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;
-"
-						Outputs="$(IntDir)\$(InputName).obj"/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="LIB Release|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
@@ -526,24 +316,6 @@
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling..."
-						CommandLine="ml /nologo /c /Cx /coff /Fo&quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;
-"
-						Outputs="$(IntDir)\$(InputName).obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling..."
-						CommandLine="ml /nologo /c /Cx /coff /Zi /Fo&quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;
-"
-						Outputs="$(IntDir)\$(InputName).obj"/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -561,18 +333,6 @@
 						Name="VCCLCompilerTool"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="DLL ASM Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\.."/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL ASM Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\.."/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="LIB Release|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
@@ -583,18 +343,6 @@
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\.."/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\.."/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -612,24 +360,6 @@
 						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="DLL ASM Release|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling..."
-						CommandLine="ml /nologo /c /Cx /coff /Fo&quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;
-"
-						Outputs="$(IntDir)\$(InputName).obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DLL ASM Debug|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling..."
-						CommandLine="ml /nologo /c /Cx /coff /Zi /Fo&quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;
-"
-						Outputs="$(IntDir)\$(InputName).obj"/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="LIB Release|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
@@ -640,24 +370,6 @@
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Release|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling..."
-						CommandLine="ml /nologo /c /Cx /coff /Fo&quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;
-"
-						Outputs="$(IntDir)\$(InputName).obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB ASM Debug|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling..."
-						CommandLine="ml /nologo /c /Cx /coff /Zi /Fo&quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;
-"
-						Outputs="$(IntDir)\$(InputName).obj"/>
 				</FileConfiguration>
 			</File>
 		</Filter>
