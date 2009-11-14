@@ -16,7 +16,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0beta100 Your_png_h_is_not_version_1_4_0beta100;
+typedef version_1_4_0beta101 Your_png_h_is_not_version_1_4_0beta101;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
@@ -547,13 +547,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.0beta100 - November 14, 2009" PNG_STRING_NEWLINE \
+     "libpng version 1.4.0beta101 - November 14, 2009" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0beta100 - November 14, 2009\
+      return ((png_charp) "libpng version 1.4.0beta101 - November 14, 2009\
       Copyright (c) 1998-2009 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");

@@ -23,7 +23,7 @@ LN_SF = ln -f -s
 
 LIBNAME=libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0beta100
+PNGMIN = 1.4.0beta101
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local

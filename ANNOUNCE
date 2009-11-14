@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta100 - November 14, 2009
+Libpng 1.4.0beta101 - November 14, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta100.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta100.tar.gz
-   1.4.0beta100.tar.bz2
+   1.4.0beta101.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta101.tar.gz
+   1.4.0beta101.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b100.zip
-   lp140b100.7z
+   lp140b101.zip
+   lp140b101.7z
 
 Other information:
 
-   1.4.0beta100-README.txt
-   1.4.0beta100-LICENSE.txt
+   1.4.0beta101-README.txt
+   1.4.0beta101-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -548,7 +548,7 @@ version 1.4.0beta80 [September 17, 2009]
   Removed scripts/libpng.icc
   Changed typecast of filler from png_byte to png_uint_16 in png_set_filler().
     (Dennis Gustafsson)
-  Fixed typo introduced in beta78 in pngtest.c ("#if def " should be "#ifdef ") 
+  Fixed typo introduced in beta78 in pngtest.c ("#if def " should be "#ifdef ")
 
 version 1.4.0beta81 [September 23, 2009]
   Eliminated unused PNG_FLAG_FREE_* defines from pngpriv.h
@@ -679,6 +679,8 @@ version 1.4.0beta100 [November 14, 2009]
   Revised CMakeLists.txt to account for new location of libpng-config.in
     and libpng-pc.in
   Updated INSTALL to reflect removal and relocation of files.
+
+version 1.4.0beta101 [November 14, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
