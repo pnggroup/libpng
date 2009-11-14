@@ -2360,6 +2360,8 @@ version 1.4.0beta99 [November 14, 2009]
     needs nothing from the "scripts" directory.
   Avoid redefining PNG_CONST in pngconf.h
 
+version 1.4.0beta100 [November 14, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
