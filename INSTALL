@@ -1,5 +1,5 @@
 
-Installing libpng version 1.4.0beta101 - November 14, 2009
+Installing libpng version 1.4.0beta100 - November 14, 2009
 
 On Unix/Linux and similar systems, you can simply type
 
@@ -43,7 +43,7 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.4.0beta101" or "lpng140" and "zlib-1.2.3"
+might be called "libpng-1.4.0beta100" or "lpng140" and "zlib-1.2.3"
 or "zlib123") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -100,9 +100,9 @@ include
 
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       gcc, creates libpng14.so.14.1.4.0beta101)
+                       gcc, creates libpng14.so.14.1.4.0beta100)
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.14.1.4.0beta101)
+                       (gcc, creates libpng14.so.14.1.4.0beta100)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -124,12 +124,12 @@ include
  makefile.openbsd  =>  OpenBSD makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng14.so.14.1.4.0beta101)
+                       creates libpng14.so.14.1.4.0beta100)
  makefile.sunos    =>  Sun makefile
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng14.so.14.1.4.0beta101)
+                       creates libpng14.so.14.1.4.0beta100)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng14.so.14.1.4.0beta101)
+                       creates libpng14.so.14.1.4.0beta100)
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
@@ -195,24 +195,3 @@ instead, as demonstrated in contrib/visupng of the libpng distribution.
 Further information can be found in the README and libpng.txt
 files, in the individual makefiles, in png.h, and the manual pages
 libpng.3 and png.5.
-
-
-Using the ./configure script -- 16 December 2002.
-=================================================
-
-
-The ./configure script should work compatibly with what scripts/makefile.*
-did, however there are some options you need to add to configure explicitly,
-which previously was done semi-automatically (if you didn't edit
-scripts/makefile.* yourself, that is)
-
-CFLAGS="-Wall -O -funroll-loops \
--malign-loops=2 -malign-functions=2" ./configure --prefix=/usr/include \
---with-pkgconfigdir=/usr/lib/pkgconfig --includedir=/usr/include
-
-You can alternatively specify --includedir=/usr/include, /usr/local/include,
-/usr/include/png12, or whatever.
-
-If you find that the configure script is out-of-date or is not supporting
-your platform properly, try running autogen.sh to regenerate "configure",
-"Makefile.in", and the other configuration files. Then try configure again.
