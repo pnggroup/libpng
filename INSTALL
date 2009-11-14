@@ -43,8 +43,8 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.4.0beta100" or "lpng109" and "zlib-1.2.1"
-or "zlib121") so that you have directories called "zlib" and "libpng".
+might be called "libpng-1.4.0beta100" or "lpng140" and "zlib-1.2.3"
+or "zlib123") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
 
@@ -55,6 +55,11 @@ Your directory structure should look like this:
           *.h
           *.c
           CMakeLists.txt    =>  "cmake" script
+          configuration files:
+             configure.ac, configure, Makefile.am, Makefile.in,
+             autogen.sh, config.guess, ltmain.sh, missing, libpng-pc.in,
+             libpng-config.in, aclocal.m4, config.h.in, config.sub,
+             depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
              gregbook
              pngminim
@@ -98,12 +103,6 @@ include
                        gcc, creates libpng14.so.14.1.4.0beta100)
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng14.so.14.1.4.0beta100)
- makefile.gcmmx    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.14.1.4.0beta100,
-                       uses assembler code tuned for Intel MMX platform)
- makefile.nommx    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.14.1.4.0beta100
-                       does not use Intel MMX assembler code)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -145,10 +144,7 @@ include
  makefile.tc3      =>  Turbo C 3.0 makefile
  makefile.dj2      =>  DJGPP 2 makefile
  makefile.msc      =>  Microsoft C makefile
- makefile.vcawin32 =>  makefile for Microsoft Visual C++ 5.0 and later (uses
-                       assembler code tuned for Intel MMX platform)
- makefile.vcwin32  =>  makefile for Microsoft Visual C++ 4.0 and later (does
-                       not use assembler code)
+ makefile.vcwin32  =>  makefile for Microsoft Visual C++ 4.0 and later
  makefile.os2      =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
  pngos2.def        =>  OS/2 module definition file used by makefile.os2
  pngwin.def        =>  module definition file for makefile.cygwin and mingw
@@ -210,7 +206,6 @@ did, however there are some options you need to add to configure explicitly,
 which previously was done semi-automatically (if you didn't edit
 scripts/makefile.* yourself, that is)
 
-
 CFLAGS="-Wall -O -funroll-loops \
 -malign-loops=2 -malign-functions=2" ./configure --prefix=/usr/include \
 --with-pkgconfigdir=/usr/lib/pkgconfig --includedir=/usr/include
@@ -218,4 +213,6 @@ CFLAGS="-Wall -O -funroll-loops \
 You can alternatively specify --includedir=/usr/include, /usr/local/include,
 /usr/include/png12, or whatever.
 
-
+If you find that the configure script is out-of-date or is not supporting
+your platform properly, try running autogen.sh to regenerate "configure",
+"Makefile.in", and the other configuration files. Then try configure again.
