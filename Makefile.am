@@ -73,13 +73,14 @@ EXTRA_DIST= \
 	${srcdir}/projects/visualc6/* \
 	${srcdir}/projects/visualc71/* \
 	${srcdir}/projects/xcode/* \
+	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \
 	${srcdir}/contrib/pngminim/* \
 	${srcdir}/contrib/pngminus/* \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.4.0beta98.txt
+	example.c libpng-1.4.0beta99.txt
 
 CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers \
 libpng.sym

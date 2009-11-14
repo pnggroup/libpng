@@ -22,7 +22,8 @@ I_opts="-I${includedir}"
 L_opts="-L${libdir}"
 R_opts=""
 cppflags=""
-ccopts=""
+%12-%ccopts="@LIBPNG_NO_MMX@"
+%14+%ccopts=""
 ldopts=""
 
 usage()

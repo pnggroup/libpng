@@ -2350,6 +2350,10 @@ version 1.4.0beta97 [November 13, 2009]
   Revised Makefile.in
 
 version 1.4.0beta98 [November 13, 2009]
+  Added the "xcode" project to zip distributions,
+  Fixed a typo in scripts/pngwin.def introduced in beta97.
+
+version 1.4.0beta99 [November 14, 2009]
   Moved libpng-config.in and libpng.pc-configure.in out of the scripts
     directory, to libpng-config.in and libpng-pc.in, respectively, and
     modified Makefile.am and configure.ac accordingly.  Now "configure"
