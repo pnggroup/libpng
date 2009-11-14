@@ -1,5 +1,5 @@
 
-Installing libpng version 1.4.0beta100 - November 14, 2009
+Installing libpng version 1.4.0beta101 - November 14, 2009
 
 On Unix/Linux and similar systems, you can simply type
 
@@ -43,7 +43,7 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.4.0beta100" or "lpng140" and "zlib-1.2.3"
+might be called "libpng-1.4.0beta101" or "libpng14" and "zlib-1.2.3"
 or "zlib123") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -91,7 +91,7 @@ If you are building libpng with MSVC, you can enter the
 libpng projects\visualc6 or visualc71 directory and follow the instructions
 in README.txt.
 
-Else enter the zlib directory and follow the instructions in zlib/README,
+Otherwise enter the zlib directory and follow the instructions in zlib/README,
 then come back here and run "configure" or choose the appropriate
 makefile.sys in the scripts directory.
 
@@ -100,9 +100,9 @@ include
 
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       gcc, creates libpng14.so.14.1.4.0beta100)
+                       gcc, creates libpng14.so.14.1.4.0beta101)
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng14.so.14.1.4.0beta100)
+                       (gcc, creates libpng14.so.14.1.4.0beta101)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -118,18 +118,17 @@ include
  makefile.hp64     =>  HPUX (10.20 and 11.00) makefile, 64-bit
  makefile.ibmc     =>  IBM C/C++ version 3.x for Win32 and OS/2 (static)
  makefile.intel    =>  Intel C/C++ version 4.0 and later
- makefile.netbsd   =>  NetBSD/cc makefile, uses PNGGCCRD, makes libpng.so.
- makefile.ne14bsd  =>  NetBSD/cc makefile, uses PNGGCCRD,
-                       makes libpng14.so
+ makefile.netbsd   =>  NetBSD/cc makefile, makes libpng.so.
+ makefile.ne14bsd  =>  NetBSD/cc makefile, makes libpng14.so
  makefile.openbsd  =>  OpenBSD makefile
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng14.so.14.1.4.0beta100)
+                       creates libpng14.so.14.1.4.0beta101)
  makefile.sunos    =>  Sun makefile
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng14.so.14.1.4.0beta100)
+                       creates libpng14.so.14.1.4.0beta101)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng14.so.14.1.4.0beta100)
+                       creates libpng14.so.14.1.4.0beta101)
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
