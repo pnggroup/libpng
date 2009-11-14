@@ -191,13 +191,13 @@ set(exec_prefix ${CMAKE_INSTALL_PREFIX})
 set(libdir      ${CMAKE_INSTALL_PREFIX}/lib)
 set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
 
-configure_file(${PNG_SOURCE_DIR}/scripts/libpng.pc.in
+configure_file(${PNG_SOURCE_DIR}/libpng-pc.in
   ${PNG_BINARY_DIR}/libpng.pc)
-configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
+configure_file(${PNG_SOURCE_DIR}/libpng-config.in
   ${PNG_BINARY_DIR}/libpng-config)
-configure_file(${PNG_SOURCE_DIR}/scripts/libpng.pc.in
+configure_file(${PNG_SOURCE_DIR}/libpng-pc.in
   ${PNG_BINARY_DIR}/${PNGLIB_NAME}.pc)
-configure_file(${PNG_SOURCE_DIR}/scripts/libpng-config.in
+configure_file(${PNG_SOURCE_DIR}/libpng-config.in
   ${PNG_BINARY_DIR}/${PNGLIB_NAME}-config)
 
 # SET UP LINKS
