@@ -2368,6 +2368,9 @@ version 1.4.0beta100 [November 14, 2009]
   Updated INSTALL to reflect removal and relocation of files.
 
 version 1.4.0beta101 [November 14, 2009]
+  Restored the binary files (*.jpg, *.png, some project files) that were
+    accidentally deleted from the zip and 7z distributions when the xcode
+    project was added.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
