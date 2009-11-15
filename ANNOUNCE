@@ -686,6 +686,7 @@ version 1.4.0beta101 [November 14, 2009]
     project was added.
 
 version 1.4.0beta102 [November 15, 2009]
+  Added libpng-config.in and libpng-pc.in to the zip and 7z distributions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
