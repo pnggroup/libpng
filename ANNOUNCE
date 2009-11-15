@@ -1,5 +1,5 @@
 
-Libpng 1.2.41rc01 - November 14, 2009
+Libpng 1.2.41rc01 - November 15, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -158,8 +158,11 @@ version 1.2.41beta18 [November 11, 2009]
 version 1.2.41beta18 [November 11, 2009]
   Revised scripts/*.def to reflect functions actually exported by libpng.
 
-version 1.2.41rc01 and 1.0.51rc01 [November 14, 2009]
+version 1.2.41rc01 and 1.0.51rc01 [November 15, 2009]
   Revised scripts/*.def to reflect functions actually exported by libpng.
+  Updated the copyright year in scripts/pngw32.rc from 2004 to 2009.
+  Moved descriptions of makefiles and other scripts out of INSTALL into
+    scripts/README.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
