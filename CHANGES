@@ -2586,7 +2586,7 @@ version 1.2.41beta18 [November 11, 2009]
   Renamed scripts/makefile.wce to scripts/makefile.cegcc
   Marked nonexported functions with PNG_PRIVATE macro.
 
-version 1.2.41rc01 and 1.0.51rc01 [November 15, 2009]
+version 1.2.41rc01 and 1.0.51rc01 [November 18, 2009]
   Revised scripts/*.def to reflect functions actually exported by libpng.
   Updated the copyright year in scripts/pngw32.rc from 2004 to 2009.
   Moved descriptions of makefiles and other scripts out of INSTALL into
