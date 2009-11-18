@@ -159,7 +159,7 @@ void readpng2_version_info(void)
 
 int readpng2_check_sig(uch *sig, int num)
 {
-    return png_check_sig(sig, num);
+    return !png_sig_cmp(sig, 0, num);
 }
 
 
@@ -379,6 +379,7 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 {
     mainprog_info  *mainprog_ptr;
     int  color_type, bit_depth;
+    png_uint_32 width, height;
     double  gamma;
 
 
@@ -414,8 +415,10 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 
     /* this is just like in the non-progressive case */
 
-    png_get_IHDR(png_ptr, info_ptr, &mainprog_ptr->width,
-      &mainprog_ptr->height, &bit_depth, &color_type, NULL, NULL, NULL);
+    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
+       NULL, NULL, NULL);
+    mainprog_ptr->width = (ulg)width;
+    mainprog_ptr->height = (ulg)height;
 
 
     /* since we know we've read all of the PNG file's "header" (i.e., up

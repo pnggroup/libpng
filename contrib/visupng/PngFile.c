@@ -126,7 +126,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
     // first check the eight byte PNG signature
 
     fread(pbSig, 1, 8, pfFile);
-    if (!png_check_sig(pbSig, 8))
+    if (png_sig_cmp(pbSig, 0, 8))
     {
         *ppbImageData = pbImageData = NULL;
         return FALSE;

@@ -43,7 +43,7 @@ LDEBUG=$(LDEBUG) -N
 # -d  merge duplicate strings
 # -k- turn off standard stack frame
 # -w  display all warnings
-CFLAGS=-I$(ZLIB_DIR) -O2 -d -k- -w $(TARGET_CPU) $(CDEBUG)
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIB_DIR) -O2 -d -k- -w $(TARGET_CPU) $(CDEBUG)
 
 # -M  generate map file
 LDFLAGS=-L$(ZLIB_DIR) -M $(LDEBUG)
