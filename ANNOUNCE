@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta102 - November 18, 2009
+Libpng 1.4.0rc02 - November 18, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta102.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta102.tar.gz
-   1.4.0beta102.tar.bz2
+   1.4.0rc02.tar.xz (LZMA-compressed, recommended)
+   1.4.0rc02.tar.gz
+   1.4.0rc02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b102.zip
-   lp140b102.7z
+   lp140r02.zip
+   lp140r02.7z
 
 Other information:
 
-   1.4.0beta102-README.txt
-   1.4.0beta102-LICENSE.txt
+   1.4.0rc02-README.txt
+   1.4.0rc02-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -691,6 +691,8 @@ version 1.4.0beta102 [November 18, 2009]
   Moved descriptions of makefiles and other scripts out of INSTALL into
     scripts/README.txt
   Updated the copyright year in scripts/pngwin.rc from 2006 to 2009.
+
+version 1.4.0rc02 [November 18, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -2379,6 +2379,8 @@ version 1.4.0beta102 [November 18, 2009]
     scripts/README.txt
   Updated the copyright year in scripts/pngwin.rc from 2006 to 2009.
 
+version 1.4.0rc02 [November 18, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
