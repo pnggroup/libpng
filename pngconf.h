@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0rc02 - November 18, 2009
+ * libpng version 1.4.0beta103 - November 20, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -129,12 +129,19 @@
 #  define PNG_WARNINGS_SUPPORTED
 #endif
 
+/* Added at libpng version 1.4.0 */
 #if !defined(PNG_NO_ERROR_TEXT) && !defined(PNG_ERROR_TEXT_SUPPORTED)
 #  define PNG_ERROR_TEXT_SUPPORTED
 #endif
 
+/* Added at libpng version 1.4.0 */
 #if !defined(PNG_NO_CHECK_cHRM) && !defined(PNG_CHECK_cHRM_SUPPORTED)
 #  define PNG_CHECK_cHRM_SUPPORTED
+#endif
+
+/* Added at libpng version 1.4.0 */
+#if !defined(PNG_NO_ALIGNED_MEMORY) && !defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#  define PNG_ALIGNED_MEMORY_SUPPORTED
 #endif
 
 /* Enabled by default in 1.2.0.  You can disable this if you don't need to
