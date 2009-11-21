@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.0 [November 20, 2009]
+ * Last changed in libpng 1.4.0 [November 21, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -229,6 +229,21 @@ png_chunk_benign_error(png_structp png_ptr, png_const_charp error_message)
 #endif
 #endif /* PNG_READ_SUPPORTED */
 
+#ifdef PNG_SETJMP_SUPPORTED
+/* This API only exists if ANSI-C style error handling is used, otherwise
+ * it is necessary for png_default_error to be overridden.
+ */
+jmp_buf* PNGAPI
+png_set_longjmp_fn(png_structp png_ptr, png_longjmp_ptr longjmp_fn, size_t jmp_buf_size)
+{
+   if (png_ptr == NULL || jmp_buf_size != png_sizeof(jmp_buf))
+      return NULL;
+
+   png_ptr->longjmp_fn = longjmp_fn;
+   return &png_ptr->jmpbuf;
+}
+#endif
+
 /* This is the default error handling function.  Note that replacements for
  * this function MUST NOT RETURN, or the program will likely crash.  This
  * function is used by default, or if the program supplies NULL for the
@@ -273,16 +288,16 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
-   if (png_ptr)
+   if (png_ptr && png_ptr->longjmp_fn)
    {
 #  ifdef USE_FAR_KEYWORD
    {
       jmp_buf jmpbuf;
       png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
-      longjmp(jmpbuf, 1);
+      png_ptr->longjmp_fn(jmpbuf, 1);
    }
 #  else
-   longjmp(png_ptr->jmpbuf, 1);
+   png_ptr->longjmp_fn(png_ptr->jmpbuf, 1);
 #  endif
    }
 #endif

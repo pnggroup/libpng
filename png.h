@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.0beta103 - November 20, 2009
+ * libpng version 1.4.0beta103 - November 21, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.0beta103 - November 20, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.0beta103 - November 21, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -163,7 +163,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta103, November 20, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta103, November 21, 2009, are
  * Copyright (c) 2004, 2006-2007 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -339,7 +339,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.4.0beta103"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.0beta103 - November 20, 2009\n"
+   " libpng version 1.4.0beta103 - November 21, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   14
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -1010,6 +1010,13 @@ typedef int (PNGAPI *png_user_chunk_ptr) PNGARG((png_structp, png_unknown_chunkp
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
 typedef void (PNGAPI *png_unknown_chunk_ptr) PNGARG((png_structp));
 #endif
+#ifdef PNG_SETJMP_SUPPORTED
+/* This must match the function definition in <setjmp.h>, and the
+ * application must include this before png.h to obtain the definition
+ * of jmp_buf.
+ */
+typedef void (PNGAPI *png_longjmp_ptr) PNGARG((jmp_buf, int));
+#endif
 
 /* Transform masks for the high-level interface */
 #define PNG_TRANSFORM_IDENTITY       0x0000    /* read and write */
@@ -1049,7 +1056,8 @@ typedef void (*png_free_ptr) PNGARG((png_structp, png_voidp));
 struct png_struct_def
 {
 #ifdef PNG_SETJMP_SUPPORTED
-   jmp_buf jmpbuf;            /* used in png_error */
+   jmp_buf jmpbuf PNG_DEPSTRUCT;            /* used in png_error */
+   png_longjmp_ptr longjmp_fn PNG_DEPSTRUCT;/* setjmp non-local goto function. */
 #endif
    png_error_ptr error_fn PNG_DEPSTRUCT;    /* function for printing errors and aborting */
    png_error_ptr warning_fn PNG_DEPSTRUCT;  /* function for printing warnings */
@@ -1378,6 +1386,26 @@ extern PNG_EXPORT(png_size_t,png_get_compression_buffer_size)
 #ifdef PNG_WRITE_SUPPORTED
 extern PNG_EXPORT(void,png_set_compression_buffer_size)
    PNGARG((png_structp png_ptr, png_size_t size));
+#endif
+
+/* Moved from pngconf.h in 1.4.0 and modified to ensure setjmp/longjmp
+ * match up.
+ */
+#ifdef PNG_SETJMP_SUPPORTED
+/* This function returns the jmp_buf built in to *png_ptr.  It must be
+ * supplied with an appropriate 'longjmp' function to use on that jmp_buf
+ * unless the default error function is overridden in which case NULL is
+ * acceptable.  The size of the jmp_buf is checked against the actual size
+ * allocated by the library - the call will return NULL on a mismatch
+ * indicating an ABI mismatch.
+ */
+extern PNG_EXPORT(jmp_buf*, png_set_longjmp_fn)
+   PNGARG((png_structp png_ptr, png_longjmp_ptr longjmp_fn, size_t jmp_buf_size));
+#  define png_jmpbuf(png_ptr) \
+   (*png_set_longjmp_fn((png_ptr), longjmp, sizeof (jmp_buf)))
+#else
+#  define png_jmpbuf(png_ptr) \
+   (LIBPNG_WAS_COMPILED_WITH__PNG_NO_SETJMP)
 #endif
 
 /* Reset the compression stream */

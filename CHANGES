@@ -2386,6 +2386,10 @@ version 1.4.0beta103 [November 21, 2009]
     to png_flush() after png_write_IEND().  See 1.4.0beta32, 1.4.0beta50
     changes above and 1.2.30, 1.2.30rc01 and rc03 in 1.2.41 CHANGES.  Someone
     needs this feature but I don't remember who.
+  Make the 'png_jmpbuf' macro expand to a call that records the correct
+    longjmp function as well as returning a pointer to the setjmp
+    jmp_buf buffer, and marked direct access to jmpbuf 'deprecated'.
+    (John Bowler)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

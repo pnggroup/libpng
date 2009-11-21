@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta103 - November 20, 2009
+ * libpng version 1.4.0beta103 - November 21, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1351,13 +1351,6 @@ typedef char            FAR * FAR * FAR * png_charppp;
 /* Users may want to use these so they are not private.  Any library
  * functions that are passed far data must be model-independent.
  */
-
-#ifdef PNG_SETJMP_SUPPORTED
-#  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
-#else
-#  define png_jmpbuf(png_ptr) \
-   (LIBPNG_WAS_COMPILED_WITH__PNG_NO_SETJMP)
-#endif
 
 /* memory model/platform independent fns */
 #ifndef PNG_ABORT

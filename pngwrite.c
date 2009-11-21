@@ -503,7 +503,10 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
 #ifdef USE_FAR_KEYWORD
    if (setjmp(jmpbuf))
 #else
-   if (setjmp(png_ptr->jmpbuf))
+   if (setjmp(png_jmpbuf(png_ptr))) /* sets longjmp to match setjmp */
+#endif
+#ifdef USE_FAR_KEYWORD
+   png_memcpy(png_jmpbuf(png_ptr), jmpbuf, png_sizeof(jmp_buf));
 #endif
       PNG_ABORT();
 #endif
