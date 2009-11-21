@@ -214,6 +214,7 @@ EXPORTS
   png_set_chunk_cache_max
   png_check_cHRM_fixed
   png_calloc
+  png_longjmp_ptr
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
   png_libpng_ver
