@@ -209,5 +209,4 @@ EXPORTS
   png_set_chunk_cache_max
   png_check_cHRM_fixed
   png_calloc
-  png_longjmp_ptr
   png_set_longjmp_fn
