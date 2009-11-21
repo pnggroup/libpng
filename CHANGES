@@ -2381,6 +2381,7 @@ version 1.4.0beta102 [November 18, 2009]
 
 version 1.4.0beta103 [November 21, 2009]
   Removed obsolete comments about ASM from projects/visualc71/README_zlib.txt
+  Align row_buf on 16-byte boundary in memory.
   Restored the PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED guard around the call
     to png_flush() after png_write_IEND().  See 1.4.0beta32, 1.4.0beta50
     changes above and 1.2.30, 1.2.30rc01 and rc03 in 1.2.41 CHANGES.  Someone
