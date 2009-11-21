@@ -2391,6 +2391,8 @@ version 1.4.0beta103 [November 21, 2009]
     jmp_buf buffer, and marked direct access to jmpbuf 'deprecated'.
     (John Bowler)
 
+version 1.4.0beta104 [November 21, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
