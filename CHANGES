@@ -2592,6 +2592,9 @@ version 1.2.41rc01 and 1.0.51rc01 [November 18, 2009]
   Moved descriptions of makefiles and other scripts out of INSTALL into
     scripts/README.txt
 
+version 1.2.41rc02 [November 22, 2009]
+  Rebuilt the configure scripts with autoconf-2.65
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
