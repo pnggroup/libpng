@@ -2395,6 +2395,8 @@ version 1.4.0beta104 [November 22, 2009]
   Removed png_longjmp_ptr from scripts/*.def and libpng.3
   Rebuilt configure scripts with autoconf-2.65
 
+version 1.4.0beta105 [November 22, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta104 - November 22, 2009
+Libpng 1.4.0beta105 - November 22, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta104.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta104.tar.gz
-   1.4.0beta104.tar.bz2
+   1.4.0beta105.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta105.tar.gz
+   1.4.0beta105.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b104.zip
-   lp140b104.7z
+   lp140b105.zip
+   lp140b105.7z
 
 Other information:
 
-   1.4.0beta104-README.txt
-   1.4.0beta104-LICENSE.txt
+   1.4.0beta105-README.txt
+   1.4.0beta105-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -707,6 +707,8 @@ version 1.4.0beta103 [November 21, 2009]
 version 1.4.0beta104 [November 22, 2009]
   Removed png_longjmp_ptr from scripts/*.def and libpng.3
   Rebuilt configure scripts with autoconf-2.65
+
+version 1.4.0beta105 [November 22, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
