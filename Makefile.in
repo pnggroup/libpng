@@ -106,14 +106,14 @@ libpng_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libpng_la_LDFLAGS) $(LDFLAGS) -o $@
 libpng12_la_LIBADD =
-am_libpng12_la_OBJECTS = libpng12_la-png.lo \
-	libpng12_la-pngset.lo libpng12_la-pngget.lo \
-	libpng12_la-pngrutil.lo libpng12_la-pngtrans.lo \
-	libpng12_la-pngwutil.lo libpng12_la-pngread.lo \
-	libpng12_la-pngrio.lo libpng12_la-pngwio.lo \
-	libpng12_la-pngwrite.lo libpng12_la-pngrtran.lo \
-	libpng12_la-pngwtran.lo libpng12_la-pngmem.lo \
-	libpng12_la-pngerror.lo libpng12_la-pngpread.lo
+am_libpng12_la_OBJECTS = libpng12_la-png.lo libpng12_la-pngset.lo \
+	libpng12_la-pngget.lo libpng12_la-pngrutil.lo \
+	libpng12_la-pngtrans.lo libpng12_la-pngwutil.lo \
+	libpng12_la-pngread.lo libpng12_la-pngrio.lo \
+	libpng12_la-pngwio.lo libpng12_la-pngwrite.lo \
+	libpng12_la-pngrtran.lo libpng12_la-pngwtran.lo \
+	libpng12_la-pngmem.lo libpng12_la-pngerror.lo \
+	libpng12_la-pngpread.lo
 libpng12_la_OBJECTS = $(am_libpng12_la_OBJECTS)
 libpng12_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -320,9 +320,8 @@ libpng_la_CPPFLAGS = @LIBPNG_DEFINES@
 libpng12_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
-libpng12_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 0:@PNGLIB_RELEASE@:0 $(am__append_1) \
-	$(am__append_2)
+libpng12_la_LDFLAGS = -no-undefined -export-dynamic -version-number \
+	0:@PNGLIB_RELEASE@:0 $(am__append_1) $(am__append_2)
 # -rpath is needed as automake doesn't know the directory
 libpng_la_LDFLAGS = -rpath '$(libdir)' -no-undefined -export-dynamic \
 	-version-number 3:@PNGLIB_RELEASE@:0
