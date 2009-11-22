@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta104 - November 21, 2009
+Libpng 1.4.0beta104 - November 22, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -704,8 +704,9 @@ version 1.4.0beta103 [November 21, 2009]
     jmp_buf buffer, and marked direct access to jmpbuf 'deprecated'.
     (John Bowler)
 
-version 1.4.0beta104 [November 21, 2009]
+version 1.4.0beta104 [November 22, 2009]
   Removed png_longjmp_ptr from scripts/*.def and libpng.3
+  Rebuilt configure scripts with autoconf-2.65
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
