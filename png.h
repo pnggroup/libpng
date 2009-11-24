@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.0beta105 - November 22, 2009
+ * libpng version 1.4.0beta105 - November 24, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.0beta105 - November 22, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.0beta105 - November 24, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -163,7 +163,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta105, November 22, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.0beta105, November 24, 2009, are
  * Copyright (c) 2004, 2006-2007 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -339,7 +339,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.4.0beta105"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.0beta105 - November 22, 2009\n"
+   " libpng version 1.4.0beta105 - November 24, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   14
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -2474,6 +2474,15 @@ extern PNG_EXPORT(png_bytep,png_get_io_chunk_name)
                         (png_uint_32)(alpha)) + (png_uint_32)32768L);        \
        (composite) = (png_uint_16)((temp + (temp >> 16)) >> 16); }
 
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+#define PNG_DIVIDE_BY_255(v)  \
+     ((png_byte)(((png_uint_16)v + \
+     (((png_uint_16)v + 128) >> 8) + 128) >> 8))
+#define PNG_DIVIDE_BY_65535(v)  \
+     ((png_byte)(((png_uint_32)v + \
+     (((png_uint_32)v + 32768L) >> 16) + 32768L) >> 16))
+#endif
+
 #else  /* Standard method using integer division */
 
 #  define png_composite(composite, fg, alpha, bg)                            \
@@ -2486,7 +2495,16 @@ extern PNG_EXPORT(png_bytep,png_get_io_chunk_name)
        (png_uint_32)(bg)*(png_uint_32)(65535L - (png_uint_32)(alpha)) +      \
        (png_uint_32)32767) / (png_uint_32)65535L)
 
+#define PNG_DIVIDE_BY_255(v) (((png_uint_16)v)/255)
+#define PNG_DIVIDE_BY_65535(v) ((png_uint_32)v)/65535)
 #endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
+
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+#define PNG_8_BIT_PREMULTIPLY(color,alpha) \
+      PNG_DIVIDE_BY_255((color)*(alpha))
+#define PNG_16_BIT_PREMULTIPLY(color,alpha)\
+      PNG_DIVIDE_BY_65535((color)*(alpha))
+#endif
 
 #ifdef PNG_USE_READ_MACROS
 /* Inline macros to do direct reads of bytes from the input buffer.

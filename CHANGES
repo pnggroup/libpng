@@ -2395,7 +2395,11 @@ version 1.4.0beta104 [November 22, 2009]
   Removed png_longjmp_ptr from scripts/*.def and libpng.3
   Rebuilt configure scripts with autoconf-2.65
 
-version 1.4.0beta105 [November 22, 2009]
+version 1.4.0beta105 [November 24, 2009]
+  Use fast integer PNG_DIVIDE_BY_255() or PNG_DIVIDE_BY_65535() to accomplish
+    alpha premultiplication when PNG_READ_COMPOSITE_NODIV_SUPPORTED is defined.
+  Changed "/255" to "/255.0" in background calculations to make it clear
+    that the 255 is used as a double.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

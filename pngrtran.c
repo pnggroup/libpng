@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [November 22, 2009]
+ * Last changed in libpng 1.4.0 [November 24, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -957,19 +957,19 @@ png_init_read_transformations(png_structp png_ptr)
                else
                {
                   back.red = (png_byte)(pow(
-                     (double)png_ptr->background.red/255, gs) * 255.0 + .5);
+                     (double)png_ptr->background.red/255.0, gs) * 255.0 + .5);
                   back.green = (png_byte)(pow(
-                     (double)png_ptr->background.green/255, gs) * 255.0 + .5);
+                     (double)png_ptr->background.green/255.0, gs) * 255.0 + .5);
                   back.blue = (png_byte)(pow(
-                     (double)png_ptr->background.blue/255, gs) * 255.0 + .5);
+                     (double)png_ptr->background.blue/255.0, gs) * 255.0 + .5);
                }
 
                back_1.red = (png_byte)(pow(
-                  (double)png_ptr->background.red/255, g) * 255.0 + .5);
+                  (double)png_ptr->background.red/255.0, g) * 255.0 + .5);
                back_1.green = (png_byte)(pow(
-                  (double)png_ptr->background.green/255, g) * 255.0 + .5);
+                  (double)png_ptr->background.green/255.0, g) * 255.0 + .5);
                back_1.blue = (png_byte)(pow(
-                  (double)png_ptr->background.blue/255, g) * 255.0 + .5);
+                  (double)png_ptr->background.blue/255.0, g) * 255.0 + .5);
             }
             for (i = 0; i < num_palette; i++)
             {
@@ -2015,16 +2015,15 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
          {
             png_bytep sp = row + row_info->rowbytes;
             png_bytep dp = sp;
-                      png_uint_16 a = 0;
+            png_uint_16 a = 0;
             png_uint_32 i;
 
             for (i = 0; i < row_width; i++)
             {
-                              a = *(--sp); --dp;
-
-               *(--dp) = (*(--sp) * a) / 255;
-               *(--dp) = (*(--sp) * a) / 255;
-               *(--dp) = (*(--sp) * a) / 255;
+               a = *(--sp); --dp;
+               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
+               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
+               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
             }
          }
          /* This premultiplies the pixels with the alpha channel in RRGGBBAA */
@@ -2032,15 +2031,15 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
          {
             png_uint_16p sp = (png_uint_16p)(row + row_info->rowbytes);
             png_uint_16p dp = sp;
-                      png_uint_32 a = 0;
+            png_uint_32 a = 0;
             png_uint_32 i;
 
             for (i = 0; i < row_width; i++)
             {
-                              a = *(--sp); --dp;
-               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
-               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
-               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
+               a = *(--sp); --dp;
+               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
+               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
+               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
             }
          }
       }
@@ -2052,12 +2051,12 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
             png_bytep sp = row + row_info->rowbytes;
             png_bytep dp = sp;
             png_uint_16 a = 0;
-                      png_uint_32 i;
+            png_uint_32 i;
 
             for (i = 0; i < row_width; i++)
             {
                a = *(--sp); --dp;
-               *(--dp) = (*(--sp) * a) / 255;
+               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
             }
          }
          /* This premultiplies the pixels with the alpha channel in GGAA */
@@ -2070,8 +2069,8 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
 
             for (i = 0; i < row_width; i++)
             {
-                              a = *(--sp); --dp;
-               *(--dp) = (png_uint_16) ((*(--sp) * a) / 65535);
+               a = *(--sp); --dp;
+               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
             }
          }
       }
