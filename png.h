@@ -2476,11 +2476,11 @@ extern PNG_EXPORT(png_bytep,png_get_io_chunk_name)
 
 #ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
 #define PNG_DIVIDE_BY_255(v)  \
-     ((png_byte)(((png_uint_16)v + \
-     (((png_uint_16)v + 128) >> 8) + 128) >> 8))
+     ((png_byte)(((png_uint_16)(v) + \
+     (((png_uint_16)(v) + 128) >> 8) + 128) >> 8))
 #define PNG_DIVIDE_BY_65535(v)  \
-     ((png_byte)(((png_uint_32)v + \
-     (((png_uint_32)v + 32768L) >> 16) + 32768L) >> 16))
+     ((png_byte)(((png_uint_32)(v) + \
+     (((png_uint_32)(v) + 32768L) >> 16) + 32768L) >> 16))
 #endif
 
 #else  /* Standard method using integer division */
@@ -2495,8 +2495,8 @@ extern PNG_EXPORT(png_bytep,png_get_io_chunk_name)
        (png_uint_32)(bg)*(png_uint_32)(65535L - (png_uint_32)(alpha)) +      \
        (png_uint_32)32767) / (png_uint_32)65535L)
 
-#define PNG_DIVIDE_BY_255(v) (((png_uint_16)v)/255)
-#define PNG_DIVIDE_BY_65535(v) ((png_uint_32)v)/65535)
+#define PNG_DIVIDE_BY_255(v) (((png_uint_16)(v))/255)
+#define PNG_DIVIDE_BY_65535(v) ((png_uint_32)(v))/65535L)
 #endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
 
 #ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
