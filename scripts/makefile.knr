@@ -27,7 +27,7 @@ LIBPATH=$(prefix)/lib
 DESTDIR=
 
 CC=cc
-CFLAGS=-I../zlib -O
+CFLAGS=-DPNG_CONFIGURE_LIBPNG -I../zlib -O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 # flags for ansi2knr
 ANSI2KNRFLAGS=

@@ -62,15 +62,15 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 
 ### if you don't need thread safety, but want the asm accel
-#CFLAGS= $(strip $(MINGW_CCFLAGS) -DPNG_THREAD_UNSAFE_OK \
+#CFLAGS= -DPNG_CONFIGURE_LIBPNG $(strip $(MINGW_CCFLAGS) -DPNG_THREAD_UNSAFE_OK \
 #	$(addprefix -I,$(ZLIBINC)) -W -Wall -O $(ALIGN) -funroll-loops \
 #	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### if you need thread safety and want (minimal) asm accel
-#CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
+#CFLAGS= -DPNG_CONFIGURE_LIBPNG $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 #	-W -Wall -O $(ALIGN) -funroll-loops \
 #	-fomit-frame-pointer)  # $(WARNMORE) -g -DPNG_DEBUG=5
 ### Normal (non-asm) compilation
-CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
+CFLAGS= -DPNG_CONFIGURE_LIBPNG $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
         -W -Wall -O3 $(ALIGN) -funroll-loops -DPNG_NO_MMX_CODE \
 	-fomit-frame-pointer) # $(WARNMORE) -g -DPNG_DEBUG=5
 

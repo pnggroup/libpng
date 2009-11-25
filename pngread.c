@@ -15,7 +15,6 @@
  */
 
 #define PNG_INTERNAL
-#define PNG_NO_PEDANTIC_WARNINGS
 #include "png.h"
 #ifdef PNG_READ_SUPPORTED
 
