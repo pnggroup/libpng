@@ -1522,6 +1522,13 @@ typedef z_stream FAR *  png_zstreamp;
 #  endif
 #endif
 
+#ifdef PNG_PEDANTIC_WARNINGS
+#  ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
+#    define PNG_PEDANTIC_WARNINGS_SUPPORTED
+#  endif
+#endif
+
+#ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
 /* Support for compiler specific function attributes.  These are used
  * so that where compiler support is available incorrect use of API
  * functions in png.h will generate compiler warnings.  Added at libpng
@@ -1560,6 +1567,7 @@ typedef z_stream FAR *  png_zstreamp;
 #    endif
 #  endif
 #endif
+#endif /* PNG_PEDANTIC_WARNINGS */
 
 #ifndef PNG_DEPRECATED
 #  define PNG_DEPRECATED  /* Use of this function is deprecated */

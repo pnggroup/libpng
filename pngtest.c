@@ -31,6 +31,7 @@
  * of files at once by typing "pngtest -m file1.png file2.png ..."
  */
 
+#define PNG_PEDANTIC_WARNINGS
 #include "png.h"
 
 #ifdef _WIN32_WCE

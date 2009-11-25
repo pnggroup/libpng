@@ -57,7 +57,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -W -Wall -D_REENTRANT -O2 \
+CFLAGS=-W -Wall -D_REENTRANT -O2 \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LDFLAGS=-L. -lpng12

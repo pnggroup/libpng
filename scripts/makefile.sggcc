@@ -47,7 +47,7 @@ ZLIBINC=../zlib
 ABI=
 
 WARNMORE= # -g -DPNG_DEBUG=5
-CFLAGS=-DPNG_CONFIGURE_LIBPNG $(ABI) -I$(ZLIBINC) -O $(WARNMORE) -fPIC -mabi=n32 -DPNG_NO_MMX_CODE
+CFLAGS=$(ABI) -I$(ZLIBINC) -O $(WARNMORE) -fPIC -mabi=n32 -DPNG_NO_MMX_CODE
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=cc $(ABI) -shared -soname $(LIBSOMAJ) \
   -set_version sgi$(PNGMAJ).0

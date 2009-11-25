@@ -36,7 +36,7 @@ DESTDIR=
 
 CC=gcc
 ifdef MINGW
-MINGW_CCFLAGS=-DPNG_CONFIGURE_LIBPNG -mno-cygwin -I/usr/include/mingw
+MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
 MINGW_LDFLAGS=-mno-cygwin -L/usr/lib/mingw
 endif
 
