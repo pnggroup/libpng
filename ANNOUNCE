@@ -1,5 +1,5 @@
 
-Libpng 1.2.41rc03 - November 25, 2009
+Libpng 1.2.41rc04 - November 25, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.41rc03.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41rc03.tar.gz
-   libpng-1.2.41rc03.tar.bz2
+   libpng-1.2.41rc04.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41rc04.tar.gz
+   libpng-1.2.41rc04.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.41rc03-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.41rc03-no-config.tar.gz
-   libpng-1.2.41rc03-no-config.tar.bz2
+   libpng-1.2.41rc04-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.41rc04-no-config.tar.gz
+   libpng-1.2.41rc04-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1241r03.zip
-   lp1241r03.7z
-   lp1241r03.tar.bz2
+   lp1241r04.zip
+   lp1241r04.7z
+   lp1241r04.tar.bz2
 
 Project files
 
-   libpng-1.2.41rc03-project-netware.zip
-   libpng-1.2.41rc03-project-wince.zip
+   libpng-1.2.41rc04-project-netware.zip
+   libpng-1.2.41rc04-project-wince.zip
 
 Other information:
 
-   libpng-1.2.41rc03-README.txt
-   libpng-1.2.41rc03-KNOWNBUGS.txt
-   libpng-1.2.41rc03-LICENSE.txt
-   libpng-1.2.41rc03-Y2K-compliance.txt
-   libpng-1.2.41rc03-[previous version]-diff.txt
+   libpng-1.2.41rc04-README.txt
+   libpng-1.2.41rc04-KNOWNBUGS.txt
+   libpng-1.2.41rc04-LICENSE.txt
+   libpng-1.2.41rc04-Y2K-compliance.txt
+   libpng-1.2.41rc04-[previous version]-diff.txt
 
 Changes since the last public release (1.2.40):
 
@@ -166,6 +166,14 @@ version 1.2.41rc01 and 1.0.51rc01 [November 18, 2009]
 
 version 1.2.41rc02 [November 22, 2009]
   Rebuilt the configure scripts with autoconf-2.65
+
+version 1.2.41rc03 [November 25, 2009]
+  Disabled the new pedantic warnings about deprecated function use and
+    deprecated structure access unless the user defines PNG_PEDANTIC_WARNINGS.
+  Added "#define PNG_NO_PEDANTIC_WARNINGS" in the libpng source files.
+  Removed "-DPNG_CONFIGURE_LIBPNG" from the makefiles and projects.
+
+version 1.2.41rc04 [November 25, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

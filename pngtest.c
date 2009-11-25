@@ -31,6 +31,7 @@
  * of files at once by typing "pngtest -m file1.png file2.png ..."
  */
 
+#define PNG_PEDANTIC_WARNINGS
 #include "png.h"
 
 #ifdef _WIN32_WCE
@@ -1689,4 +1690,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_41rc03 your_png_h_is_not_version_1_2_41rc03;
+typedef version_1_2_41rc04 your_png_h_is_not_version_1_2_41rc04;

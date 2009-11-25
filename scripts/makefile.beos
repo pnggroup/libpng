@@ -11,7 +11,7 @@
 # Library name:
 LIBNAME=libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.41rc03
+PNGMIN = 1.2.41rc04
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -44,7 +44,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # On BeOS, -O1 is actually better than -O3.  This is a known bug but it's
 # still here in R4.5
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -W -Wall -O1 -funroll-loops \
+CFLAGS=-I$(ZLIBINC) -W -Wall -O1 -funroll-loops \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 # LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz
 LDFLAGS=-L. -Wl,-soname=$(LIBSOMAJ) -L$(ZLIBLIB) -lz

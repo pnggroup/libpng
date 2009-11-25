@@ -10,7 +10,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.41rc03
+PNGMIN = 1.2.41rc04
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -51,7 +51,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE \
+CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng12 -lz -lm

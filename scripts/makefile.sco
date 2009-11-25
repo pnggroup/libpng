@@ -12,7 +12,7 @@
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 0
-PNGMIN = 1.2.41rc03
+PNGMIN = 1.2.41rc04
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -41,7 +41,7 @@ exec_prefix=$(prefix)
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-CFLAGS= -DPNG_CONFIGURE_LIBPNG -dy -belf -I$(ZLIBINC) -O3 -DPNG_NO_MMX_CODE
+CFLAGS= -dy -belf -I$(ZLIBINC) -O3 -DPNG_NO_MMX_CODE
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -lm
 
 INCPATH=$(prefix)/include/libpng

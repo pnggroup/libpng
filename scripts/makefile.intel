@@ -32,7 +32,7 @@ CALLING=r	# __fastcall
 # --------------------------------------------------------------------------
 
 CC=icl -c
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -O2 -G$(CPU)$(CALLING) -Qip -Qunroll4 -I$(ZLIBINC) -nologo
+CFLAGS=-O2 -G$(CPU)$(CALLING) -Qip -Qunroll4 -I$(ZLIBINC) -nologo
 LD=link
 LDFLAGS=/SUBSYSTEM:CONSOLE /NOLOGO
 

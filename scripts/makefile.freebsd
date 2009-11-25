@@ -27,7 +27,7 @@ SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 
-CFLAGS+= -DPNG_CONFIGURE_LIBPNG -I.
+CFLAGS+= -I.
 .if (${MACHINE_ARCH} != "i386")
 CFLAGS+= -DPNG_CONFIGURE_LIBPNG -DPNG_NO_MMX_CODE
 .endif

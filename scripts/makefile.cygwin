@@ -36,7 +36,7 @@ DESTDIR=
 
 CC=gcc
 ifdef MINGW
-MINGW_CCFLAGS=-DPNG_CONFIGURE_LIBPNG -mno-cygwin -I/usr/include/mingw
+MINGW_CCFLAGS=-mno-cygwin -I/usr/include/mingw
 MINGW_LDFLAGS=-mno-cygwin -L/usr/lib/mingw
 endif
 
@@ -77,7 +77,7 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng12
 PNGMAJ = 0
 CYGDLL = 12
-PNGMIN = 1.2.41rc03
+PNGMIN = 1.2.41rc04
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
