@@ -715,6 +715,7 @@ version 1.4.0beta105 [November 25, 2009]
     that the 255 is used as a double.
 
 version 1.4.0beta106 [November 26, 2009]
+  Moved the PNG_DIVIDE_* and PNG_*_PREMULTIPLY macros from png.h to pngpriv.h.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
