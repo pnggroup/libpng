@@ -2404,6 +2404,8 @@ version 1.4.0beta105 [November 25, 2009]
 version 1.4.0beta106 [November 27, 2009]
   Removed premultiplied alpha feature.
 
+version 1.4.0beta107 [November 27, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta106 - November 27, 2009
+Libpng 1.4.0beta107 - November 27, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta106.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta106.tar.gz
-   1.4.0beta106.tar.bz2
+   1.4.0beta107.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta107.tar.gz
+   1.4.0beta107.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b106.zip
-   lp140b106.7z
+   lp140b107.zip
+   lp140b107.7z
 
 Other information:
 
-   1.4.0beta106-README.txt
-   1.4.0beta106-LICENSE.txt
+   1.4.0beta107-README.txt
+   1.4.0beta107-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -716,6 +716,8 @@ version 1.4.0beta105 [November 25, 2009]
 
 version 1.4.0beta106 [November 27, 2009]
   Removed premultiplied alpha feature.
+
+version 1.4.0beta107 [November 27, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
