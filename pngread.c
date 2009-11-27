@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.0 [November 26, 2009]
+ * Last changed in libpng 1.4.0 [November 27, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -425,23 +425,6 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
    else
       png_warning(png_ptr,
       "Ignoring extra png_read_update_info() call; row buffer not reallocated");
-
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-   if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
-   {
-     /* TO DO:
-      * Check for linear colorspace and if not, issue a warning.
-      * If gAMA is present with gamma == 1.0, it's linear.
-      * If iCCP is present, assume user knows what they are doing
-      *   and it's linear.
-      * If gAMA is present with gamma != 1.0, it's not linear.
-      * If no gAMA or iCCP, assume not linear.
-      * If not linear do:
-      *   png_warning(png_ptr,
-      *      "Premultiply should only be used with gamma == 1.0");
-      */
-   }
-#endif
 
    png_read_transform_info(png_ptr, info_ptr);
 }

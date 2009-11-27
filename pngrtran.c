@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [November 26, 2009]
+ * Last changed in libpng 1.4.0 [November 27, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -137,22 +137,6 @@ png_set_strip_alpha(png_structp png_ptr)
    if (png_ptr == NULL)
       return;
    png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
-}
-#endif
-
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-void PNGAPI
-png_set_premultiply_alpha(png_structp png_ptr)
-{
-   png_debug(1, "in png_set_premultiply_alpha");
-
-   if(png_ptr == NULL)
-      return;
-   png_ptr->transformations |=
-     (PNG_PREMULTIPLY_ALPHA | PNG_EXPAND_tRNS);
-   png_ptr->transformations |=
-     PNG_EXPAND;  /* This shouldn't be necessary */
-   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
 #endif
 
@@ -1508,12 +1492,6 @@ png_do_read_transformations(png_structp png_ptr)
          (png_uint_32)png_ptr->filler, png_ptr->flags);
 #endif
 
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-   if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
-      png_do_read_premultiply_alpha(&(png_ptr->row_info),
-         png_ptr->row_buf + 1);
-#endif
-
 #ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
    if (png_ptr->transformations & PNG_INVERT_ALPHA)
       png_do_read_invert_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
@@ -1993,84 +1971,6 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 */
                sp-=2;
                dp=sp;
-            }
-         }
-      }
-   }
-}
-#endif
-
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-void /* PRIVATE */
-png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
-{
-   png_debug(1, "in png_do_read_premultiply_alpha");
-
-   {
-      png_uint_32 row_width = row_info->width;
-      if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-      {
-         /* This premultiplies the pixels with the alpha channel in RGBA */
-         if (row_info->bit_depth == 8)
-         {
-            png_bytep sp = row + row_info->rowbytes;
-            png_bytep dp = sp;
-            png_uint_16 a = 0;
-            png_uint_32 i;
-
-            for (i = 0; i < row_width; i++)
-            {
-               a = *(--sp); --dp;
-               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
-               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
-               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
-            }
-         }
-         /* This premultiplies the pixels with the alpha channel in RRGGBBAA */
-         else
-         {
-            png_uint_16p sp = (png_uint_16p)(row + row_info->rowbytes);
-            png_uint_16p dp = sp;
-            png_uint_32 a = 0;
-            png_uint_32 i;
-
-            for (i = 0; i < row_width; i++)
-            {
-               a = *(--sp); --dp;
-               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
-               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
-               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
-            }
-         }
-      }
-      else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-      {
-         /* This premultiplies the pixels with the alpha channel in GA */
-         if (row_info->bit_depth == 8)
-         {
-            png_bytep sp = row + row_info->rowbytes;
-            png_bytep dp = sp;
-            png_uint_16 a = 0;
-            png_uint_32 i;
-
-            for (i = 0; i < row_width; i++)
-            {
-               a = *(--sp); --dp;
-               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
-            }
-         }
-         /* This premultiplies the pixels with the alpha channel in GGAA */
-         else
-         {
-            png_uint_16p sp  = (png_uint_16p) (row + row_info->rowbytes);
-            png_uint_16p dp  = sp;
-                      png_uint_32 a = 0;
-                      png_uint_32 i;
-
-            for (i = 0; i < row_width; i++)
-            {
-               a = *(--sp); --dp;
-               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
             }
          }
       }

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.0beta106 - November 26, 2009
+ * libpng version 1.4.0beta106 - November 27, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -522,9 +522,6 @@
 #  endif
 #  ifndef PNG_NO_READ_INVERT_ALPHA
 #    define PNG_READ_INVERT_ALPHA_SUPPORTED
-#  endif
-#  ifndef PNG_NO_READ_PREMULTIPLY_ALPHA
-#      define PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
 #  endif
 #  ifndef PNG_NO_READ_STRIP_ALPHA
 #    define PNG_READ_STRIP_ALPHA_SUPPORTED

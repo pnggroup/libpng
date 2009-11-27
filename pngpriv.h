@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta106 - November 26, 2009
+ * libpng version 1.4.0beta106 - November 27, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -127,8 +127,7 @@
                        /*     0x800000L     Unused */
 #define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
 #define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
-#define PNG_PREMULTIPLY_ALPHA 0x4000000L  /* Added to libpng-1.4.0 */
-                                          /* by volker */
+                       /*   0x4000000L  unused */
                        /*   0x8000000L  unused */
                        /*  0x10000000L  unused */
                        /*  0x20000000L  unused */
@@ -552,11 +551,6 @@ PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
    png_bytep row, png_uint_32 flags));
 #endif
 
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-PNG_EXTERN void png_do_read_premultiply_alpha
-   PNGARG((png_row_infop row_info, png_bytep row));
-#endif
-
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 PNG_EXTERN void png_do_swap PNGARG((png_row_infop row_info, png_bytep row));
 #endif
@@ -830,25 +824,6 @@ PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
    png_uint_32 width, png_uint_32 height, int bit_depth,
    int color_type, int interlace_type, int compression_type,
    int filter_type));
-
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-#  ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
-#    define PNG_DIVIDE_BY_255(v)  \
-       ((png_byte)(((png_uint_16)(v) + \
-       (((png_uint_16)(v) + 128) >> 8) + 128) >> 8))
-#    define PNG_DIVIDE_BY_65535(v)  \
-       ((png_byte)(((png_uint_32)(v) + \
-       (((png_uint_32)(v) + 32768L) >> 16) + 32768L) >> 16))
-#  else
-#    define PNG_DIVIDE_BY_255(v) (((png_uint_16)(v))/255)
-#    define PNG_DIVIDE_BY_65535(v) (((png_uint_32)(v))/65535L)
-#  endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
-
-#  define PNG_8_BIT_PREMULTIPLY(color,alpha) \
-      PNG_DIVIDE_BY_255((color)*(alpha))
-#  define PNG_16_BIT_PREMULTIPLY(color,alpha)\
-      PNG_DIVIDE_BY_65535((color)*(alpha))
-#endif /* PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED */
 
 /* Free all memory used by the read (old method - NOT DLL EXPORTED) */
 extern void png_read_destroy PNGARG((png_structp png_ptr, png_infop info_ptr,
