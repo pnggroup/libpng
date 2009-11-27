@@ -1,5 +1,5 @@
 
-Libpng 1.2.41rc04 - November 25, 2009
+Libpng 1.2.41rc04 - November 27, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -168,12 +168,14 @@ version 1.2.41rc02 [November 22, 2009]
   Rebuilt the configure scripts with autoconf-2.65
 
 version 1.2.41rc03 [November 25, 2009]
-  Disabled the new pedantic warnings about deprecated function use and
-    deprecated structure access unless the user defines PNG_PEDANTIC_WARNINGS.
+  Disabled the new pedantic warnings about deprecated function use
+    and deprecated structure access unless the user defines
+    PNG_PEDANTIC_WARNINGS.
   Added "#define PNG_NO_PEDANTIC_WARNINGS" in the libpng source files.
   Removed "-DPNG_CONFIGURE_LIBPNG" from the makefiles and projects.
 
-version 1.2.41rc04 [November 25, 2009]
+version 1.2.41rc04 [November 27, 2009]
+  Updated the list of files and made some cosmetic changes in README.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
