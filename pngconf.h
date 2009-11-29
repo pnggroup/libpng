@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.1alpha02 - November 28, 2009
+ * libpng version 1.4.1alpha02 - November 29, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -524,7 +524,7 @@
 #    define PNG_READ_INVERT_ALPHA_SUPPORTED
 #  endif
 #  ifndef PNG_NO_READ_PREMULTIPLY_ALPHA
-#      define PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+#    define PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
 #  endif
 #  ifndef PNG_NO_READ_STRIP_ALPHA
 #    define PNG_READ_STRIP_ALPHA_SUPPORTED
@@ -860,6 +860,13 @@
 #  define PNG_READ_TEXT_SUPPORTED
 #  define PNG_TEXT_SUPPORTED
 #endif
+
+#  /* Premultiply will not work without gamma support. */
+#  ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+#    ifndef PNG_READ_GAMMA_SUPPORTED
+#      undef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+#    endif
+#  endif
 
 #endif /* PNG_READ_ANCILLARY_CHUNKS_SUPPORTED */
 

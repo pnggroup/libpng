@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [November 28, 2009]
+ * Last changed in libpng 1.4.0 [November 29, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -151,7 +151,7 @@ png_set_premultiply_alpha(png_structp png_ptr, double gamma)
    png_ptr->transformations |=
      (PNG_PREMULTIPLY_ALPHA | PNG_EXPAND_tRNS);
    png_ptr->transformations |=
-     PNG_EXPAND;  /* This shouldn't be necessary */
+     PNG_EXPAND;
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
    /* Check for overflow */
    if (gamma == 0 || gamma > 21474.83)
@@ -902,8 +902,11 @@ png_init_read_transformations(png_structp png_ptr)
       png_ptr->transformations &= ~PNG_GAMMA;
    }
 
-   if ((png_ptr->transformations & (PNG_GAMMA | PNG_RGB_TO_GRAY)) &&
-        png_ptr->gamma != 0.0)
+   if ((png_ptr->transformations & (PNG_GAMMA |
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+        PNG_PREMULTIPLY_ALPHA |         
+#endif
+        PNG_RGB_TO_GRAY )) && png_ptr->gamma != 0.0)
    {
       png_build_gamma_table(png_ptr);
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
@@ -1298,6 +1301,11 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
      }
 #endif
 
+#  ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+   if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
+      info_ptr->bit_depth = 16;
+#endif
+
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels *
       info_ptr->bit_depth);
 
@@ -1430,8 +1438,17 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
+#  ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+   /* Do this after the PREMULTIPLY operation */
+   if (!(png_ptr->transformations & PNG_PREMULTIPLY_ALPHA))
+   {
+     if (png_ptr->transformations & PNG_16_TO_8)
+        png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+   }
+#  else
    if (png_ptr->transformations & PNG_16_TO_8)
       png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#  endif
 #endif
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
@@ -1513,9 +1530,30 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 #ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+
+  /* TO DO: build 16-bit gamma tables */
+
+  /* TO DO: expand pixels to 16 bits either here or (better) inside
+   * png_do_read_premultiply_alpha
+   */
+
    if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
       png_do_read_premultiply_alpha(&(png_ptr->row_info),
          png_ptr->row_buf + 1);
+
+#  ifdef PNG_READ_16_TO_8_SUPPORTED
+   if (!(png_ptr->transformations & PNG_PREMULTIPLY_ALPHA))
+   {
+     if (png_ptr->transformations & PNG_16_TO_8)
+        png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+   }
+#  endif
+
+   /* TO DO: apply png_ptr->gamma_premultiply to the premultiplied
+    * samples, using either the 8-bit or 16-bit gamma table as
+    * appropriate.
+    */
+
 #endif
 
 #ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
@@ -2008,30 +2046,17 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
 {
+
+  /* TO DO: expand to 16 bits, then apply gamma
+   * before premultiply
+   */
+
    png_debug(1, "in png_do_read_premultiply_alpha");
 
    {
       png_uint_32 row_width = row_info->width;
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
       {
-         /* This premultiplies the pixels with the alpha channel in RGBA */
-         if (row_info->bit_depth == 8)
-         {
-            png_bytep sp = row + row_info->rowbytes;
-            png_bytep dp = sp;
-            png_uint_16 a = 0;
-            png_uint_32 i;
-
-            for (i = 0; i < row_width; i++)
-            {
-               a = *(--sp); --dp;
-               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
-               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
-               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
-            }
-         }
-         /* This premultiplies the pixels with the alpha channel in RRGGBBAA */
-         else
          {
             png_uint_16p sp = (png_uint_16p)(row + row_info->rowbytes);
             png_uint_16p dp = sp;
@@ -2049,22 +2074,6 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
       }
       else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       {
-         /* This premultiplies the pixels with the alpha channel in GA */
-         if (row_info->bit_depth == 8)
-         {
-            png_bytep sp = row + row_info->rowbytes;
-            png_bytep dp = sp;
-            png_uint_16 a = 0;
-            png_uint_32 i;
-
-            for (i = 0; i < row_width; i++)
-            {
-               a = *(--sp); --dp;
-               sp--; *(--dp) = PNG_8_BIT_PREMULTIPLY((*sp), a);
-            }
-         }
-         /* This premultiplies the pixels with the alpha channel in GGAA */
-         else
          {
             png_uint_16p sp  = (png_uint_16p) (row + row_info->rowbytes);
             png_uint_16p dp  = sp;
@@ -3880,6 +3889,24 @@ png_do_expand(png_row_infop row_info, png_bytep row,
          row_info->pixel_depth = (png_byte)(row_info->bit_depth << 2);
          row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
       }
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+      if (row_info->bit_depth == 8)
+      {
+         if (row_info->bit_depth == 8)
+         {
+            png_bytep sp = row + (png_size_t)row_width;
+            png_bytep dp =  sp + (png_size_t)row_width;
+            for (i = 1; i < row_width; i++)
+            {
+               *(--dp) = *(--sp);
+               *(--dp) = *(sp);
+            }
+         }
+         row_info->pixel_depth *= 2;
+         row_info->rowbytes *= 2;
+      }
+#endif
+
    }
 }
 #endif
