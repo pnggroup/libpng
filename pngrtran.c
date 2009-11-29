@@ -1533,13 +1533,15 @@ png_do_read_transformations(png_structp png_ptr)
 
   /* TO DO: build 16-bit gamma tables */
 
-  /* TO DO: expand pixels to 16 bits either here or (better) inside
-   * png_do_read_premultiply_alpha
-   */
-
    if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
       png_do_read_premultiply_alpha(&(png_ptr->row_info),
          png_ptr->row_buf + 1);
+
+   /* TO DO: apply png_ptr->gamma_premultiply to the premultiplied
+    * samples, using the 16-bit gamma table.  We may need to set
+    * png_ptr->screen_gamma to our output gamma, even though it is
+    * not necessarily destined to a screen.
+    */
 
 #  ifdef PNG_READ_16_TO_8_SUPPORTED
    if (!(png_ptr->transformations & PNG_PREMULTIPLY_ALPHA))
@@ -1549,11 +1551,6 @@ png_do_read_transformations(png_structp png_ptr)
    }
 #  endif
 
-   /* TO DO: apply png_ptr->gamma_premultiply to the premultiplied
-    * samples, using either the 8-bit or 16-bit gamma table as
-    * appropriate.
-    */
-
 #endif
 
 #ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
@@ -1562,11 +1559,13 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 #ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
+   /* Convert from RGBA to ARGB */
    if (png_ptr->transformations & PNG_SWAP_ALPHA)
       png_do_read_swap_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
 #ifdef PNG_READ_SWAP_SUPPORTED
+   /* Swaps byte order on 16 bit depth images */
    if (png_ptr->transformations & PNG_SWAP_BYTES)
       png_do_swap(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
@@ -2047,9 +2046,7 @@ void /* PRIVATE */
 png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
 {
 
-  /* TO DO: expand to 16 bits, then apply gamma
-   * before premultiply
-   */
+  /* TO DO: apply gamma before premultiply  */
 
    png_debug(1, "in png_do_read_premultiply_alpha");
 
