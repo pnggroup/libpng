@@ -2602,7 +2602,7 @@ version 1.2.41rc03 [November 25, 2009]
   Added "#define PNG_NO_PEDANTIC_WARNINGS" in the libpng source files.
   Removed "-DPNG_CONFIGURE_LIBPNG" from the makefiles and projects.
 
-version 1.2.41rc04 [November 27, 2009]
+version 1.2.41 [December 3, 2009]
   Updated the list of files and made some cosmetic changes in README.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
