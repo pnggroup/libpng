@@ -18,13 +18,13 @@ check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng10.la
 TESTS = test-pngtest.sh
-TESTS_ENVIRONMENT= srcdir=$(srcdir) 
+TESTS_ENVIRONMENT= srcdir=$(srcdir)
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5
 
 # generate the -config scripts if required
-binconfigs= libpng10-config 
+binconfigs= libpng10-config
 EXTRA_SCRIPTS= libpng-config libpng10-config
 bin_SCRIPTS= @binconfigs@
 
@@ -86,7 +86,7 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.0.51rc01.txt pngvcrd.c 
+	example.c libpng-1.0.51.txt pngvcrd.c
 
 CLEANFILES= pngout.png libpng10.pc libpng10-config libpng.vers \
 libpng.sym
