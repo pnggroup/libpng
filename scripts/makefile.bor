@@ -51,7 +51,7 @@ LDEBUG=$(LDEBUG) -N
 # -w  set all warnings on
 # -O2 optimize for speed
 # -Z  global optimization
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -O2 -Z -X- -w -I$(ZLIB_DIR) -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
+CFLAGS=-O2 -Z -X- -w -I$(ZLIB_DIR) -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
 
 # -M  generate map file
 LDFLAGS=-M -L$(ZLIB_DIR) $(MODEL_ARG) $(LDEBUG)

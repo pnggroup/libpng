@@ -39,7 +39,7 @@ LN_SF=ln -f -s
 RANLIB=ranlib
 RM_F=/bin/rm -f
 
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -O # $(WARNMORE) -DPNG_DEBUG=5
+CFLAGS=-I$(ZLIBINC) -O # $(WARNMORE) -DPNG_DEBUG=5
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
 
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \

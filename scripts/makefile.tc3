@@ -6,8 +6,8 @@
 # ----- Turbo C 3.00 (can be modified to work with earlier versions) -----
 
 MODEL=l
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -O2 -Z -m$(MODEL) -I..\zlib
-#CFLAGS=-DPNG_CONFIGURE_LIBPNG -D_NO_PROTO -O2 -Z -m$(MODEL) -I..\zlib  # Turbo C older than 3.00
+CFLAGS=-O2 -Z -m$(MODEL) -I..\zlib
+#CFLAGS=-D_NO_PROTO -O2 -Z -m$(MODEL) -I..\zlib  # Turbo C older than 3.00
 CC=tcc
 LD=tcc
 LIB=tlib

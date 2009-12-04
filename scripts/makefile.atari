@@ -9,7 +9,7 @@
 # Modified for LC56/ATARI assumes libz.lib is in same dir and uses default
 # rules for library management
 #
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -I..\zlib -O
+CFLAGS=-I..\zlib -O
 LBR = png.lib
 LDFLAGS=-lpng -lz -lm
 
