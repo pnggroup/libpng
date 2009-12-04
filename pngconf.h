@@ -756,7 +756,6 @@
 
 #endif /* PNG_WRITE_SUPPORTED */
 
-#define PNG_NO_ERROR_NUMBERS
 #ifndef PNG_1_0_X
 #  ifndef PNG_NO_ERROR_NUMBERS
 #    define PNG_ERROR_NUMBERS_SUPPORTED

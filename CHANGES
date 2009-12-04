@@ -2606,6 +2606,8 @@ version 1.2.41 [December 3, 2009]
   Updated the list of files and made some cosmetic changes in README.
 
 version 1.2.42 [December 4, 2009]
+  Removed "#define PNG_NO_ERROR_NUMBERS" that was inadvertently added
+    to pngconf.h in version 1.2.41.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
