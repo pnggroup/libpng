@@ -1298,33 +1298,51 @@ typedef char            FAR * FAR * FAR * png_charppp;
  *
  * Added at libpng-1.2.41.
  */
-#ifdef __GNUC__
-#  ifndef PNG_DEPRECATED
-#    define PNG_DEPRECATED __attribute__((__deprecated__))
-#  endif
-#  ifndef PNG_USE_RESULT
-#    define PNG_USE_RESULT __attribute__((__warn_unused_result__))
-#  endif
-#  ifndef PNG_NORETURN
-#    define PNG_NORETURN   __attribute__((__noreturn__))
-#  endif
-#  ifndef PNG_ALLOCATED
-#    define PNG_ALLOCATED  __attribute__((__malloc__))
-#  endif
 
-#  ifndef PNG_CONFIGURE_LIBPNG
+#ifndef PNG_NO_PEDANTIC_WARNINGS
+#  ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
+#    define PNG_PEDANTIC_WARNINGS_SUPPORTED
+#  endif
+#endif
+
+#ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
+/* Support for compiler specific function attributes.  These are used
+ * so that where compiler support is available incorrect use of API
+ * functions in png.h will generate compiler warnings.  Added at libpng
+ * version 1.2.41.
+ */
+#  ifdef __GNUC__
+#    ifndef PNG_USE_RESULT
+#      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
+#    endif
+#    ifndef PNG_NORETURN
+#      define PNG_NORETURN   __attribute__((__noreturn__))
+#    endif
+#    ifndef PNG_ALLOCATED
+#      define PNG_ALLOCATED  __attribute__((__malloc__))
+#    endif
+
     /* This specifically protects structure members that should only be
      * accessed from within the library, therefore should be empty during
      * a library build.
      */
+#    ifndef PNG_DEPRECATED
+#      define PNG_DEPRECATED __attribute__((__deprecated__))
+#    endif
 #    ifndef PNG_DEPSTRUCT
 #      define PNG_DEPSTRUCT  __attribute__((__deprecated__))
 #    endif
 #    ifndef PNG_PRIVATE
-#      define PNG_PRIVATE __attribute__((__deprecated__))
-#    endif
-#  endif
-#endif
+#      if 0 /* Doesn't work so we use deprecated instead*/
+#        define PNG_PRIVATE \
+          __attribute__((warning("This function is not exported by libpng.")))
+#      else
+#        define PNG_PRIVATE \
+          __attribute__((__deprecated__))
+#      endif
+#    endif /* PNG_PRIVATE */
+#  endif /* __GNUC__ */
+#endif /* PNG_PEDANTIC_WARNINGS */
 
 #ifndef PNG_DEPRECATED
 #  define PNG_DEPRECATED  /* Use of this function is deprecated */
