@@ -8,22 +8,22 @@
 CFG=libpng - Win32 DLL Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "libpng.mak".
-!MESSAGE 
+!MESSAGE
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "libpng.mak" CFG="libpng - Win32 DLL Release"
-!MESSAGE 
+!MESSAGE
 !MESSAGE Possible choices for configuration are:
-!MESSAGE 
+!MESSAGE
 !MESSAGE "libpng - Win32 DLL Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "libpng - Win32 DLL Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "libpng - Win32 DLL VB" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "libpng - Win32 LIB Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "libpng - Win32 LIB Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE 
+!MESSAGE
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -52,8 +52,8 @@ MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -83,8 +83,8 @@ MTL=midl.exe
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG" /d PNG_DEBUG=1
+# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG" /d PNG_DEBUG=1
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -114,8 +114,8 @@ MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG" /dPNG_LIBPNG_DLLFNAME_POSTFIX=""""VB"""" /dPNG_LIBPNG_SPECIALBUILD=""""__stdcall calling convention used for exported functions""""
+# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG" /dPNG_LIBPNG_DLLFNAME_POSTFIX=""""VB"""" /dPNG_LIBPNG_SPECIALBUILD=""""__stdcall calling convention used for exported functions""""
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -147,8 +147,8 @@ CPP=cl.exe
 # ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "PNG_CONFIGURE_LIBPNG" /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -174,8 +174,8 @@ CPP=cl.exe
 # ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
-# ADD RSC /l 0x409 /d "PNG_CONFIGURE_LIBPNG" /d "_DEBUG"
+# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG"
+# ADD RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo

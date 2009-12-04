@@ -4,7 +4,7 @@ It needs to depend on pngpriv.h
 
 It needs to *not* depend on pnggccrd.c or pngvcrd.c
 
-It needs to DEFINE PNG_CONFIGURE_LIBPNG while building
+It needs to DEFINE PNG_NO_PEDANTIC_WARNING while building
 the library, but not while building an application.
 
 If an updated version is not received, this project will
