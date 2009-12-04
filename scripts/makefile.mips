@@ -22,8 +22,8 @@ LIBPATH=$(prefix)/lib
 DESTDIR=
 
 CC=cc
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -I../zlib -O -systype sysv -DSYSV -w -Dmips
-#CFLAGS=-DPNG_CONFIGURE_LIBPNG -O
+CFLAGS=-I../zlib -O -systype sysv -DSYSV -w -Dmips
+#CFLAGS=-O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
 #RANLIB=ranlib

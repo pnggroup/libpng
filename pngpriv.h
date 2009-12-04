@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.1alpha02 - November 28, 2009
+ * libpng version 1.4.1alpha02 - December 4, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -554,7 +554,8 @@ PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
 
 #ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
 PNG_EXTERN void png_do_read_premultiply_alpha
-   PNGARG((png_row_infop row_info, png_bytep row));
+   PNGARG((png_row_infop row_info, png_bytep row,
+   png_uint_16pp gamma_16_to_1));
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
@@ -952,19 +953,13 @@ extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
 
 #ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
 #  ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
-#    define PNG_DIVIDE_BY_255(v)  \
-       ((png_byte)(((png_uint_16)(v) + \
-       (((png_uint_16)(v) + 128) >> 8) + 128) >> 8))
 #    define PNG_DIVIDE_BY_65535(v)  \
        ((png_byte)(((png_uint_32)(v) + \
        (((png_uint_32)(v) + 32768L) >> 16) + 32768L) >> 16))
 #  else
-#    define PNG_DIVIDE_BY_255(v) (((png_uint_16)(v))/255)
 #    define PNG_DIVIDE_BY_65535(v) (((png_uint_32)(v))/65535L)
 #  endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
 
-#  define PNG_8_BIT_PREMULTIPLY(color,alpha) \
-      PNG_DIVIDE_BY_255((color)*(alpha))
 #  define PNG_16_BIT_PREMULTIPLY(color,alpha)\
       PNG_DIVIDE_BY_65535((color)*(alpha))
 #endif /* PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED */

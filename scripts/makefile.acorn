@@ -2,7 +2,7 @@
 
 
 # Toolflags:
-CCflags = -DPNG_CONFIGURE_LIBPNG -c -depend !Depend -IC:,Zlib: -g -throwback  -DRISCOS  -fnah
+CCflags = -c -depend !Depend -IC:,Zlib: -g -throwback  -DRISCOS  -fnah
 C++flags = -c -depend !Depend -IC: -throwback
 Linkflags = -aif -c++ -o $@
 ObjAsmflags = -throwback -NoCache -depend !Depend

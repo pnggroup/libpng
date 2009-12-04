@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [November 29, 2009]
+ * Last changed in libpng 1.4.0 [December 4, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -16,6 +16,7 @@
  * in pngtrans.c.
  */
 
+#define PNG_NO_PEDANTIC_WARNINGS
 #include "png.h"
 #ifdef PNG_READ_SUPPORTED
 #include "pngpriv.h"
@@ -142,21 +143,15 @@ png_set_strip_alpha(png_structp png_ptr)
 
 #ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
 void PNGAPI
-png_set_premultiply_alpha(png_structp png_ptr, double gamma)
+png_set_premultiply_alpha(png_structp png_ptr)
 {
    png_debug(1, "in png_set_premultiply_alpha");
 
    if(png_ptr == NULL)
       return;
    png_ptr->transformations |=
-     (PNG_PREMULTIPLY_ALPHA | PNG_EXPAND_tRNS);
-   png_ptr->transformations |=
-     PNG_EXPAND;
+     (PNG_PREMULTIPLY_ALPHA | PNG_EXPAND_tRNS | PNG_EXPAND);
    png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-   /* Check for overflow */
-   if (gamma == 0 || gamma > 21474.83)
-      png_error(png_ptr, "Invalid gamma for premultiply");
-   png_ptr->gamma_premultiply = (float)gamma;
 }
 #endif
 
@@ -758,7 +753,7 @@ png_set_read_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
 #endif
 
 /* Initialize everything needed for the read.  This includes modifying
- * the palette.
+ * the palette and building any needed gamma tables.
  */
 void /* PRIVATE */
 png_init_read_transformations(png_structp png_ptr)
@@ -1531,25 +1526,23 @@ png_do_read_transformations(png_structp png_ptr)
 
 #ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
 
-  /* TO DO: build 16-bit gamma tables */
-
    if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
-      png_do_read_premultiply_alpha(&(png_ptr->row_info),
-         png_ptr->row_buf + 1);
+   {
+      png_do_gamma(&(png_ptr->row_info), png_ptr->row_buf + 1,
+          png_ptr->gamma_table, png_ptr->gamma_16_table,
+          png_ptr->gamma_shift);
 
-   /* TO DO: apply png_ptr->gamma_premultiply to the premultiplied
-    * samples, using the 16-bit gamma table.  We may need to set
-    * png_ptr->screen_gamma to our output gamma, even though it is
-    * not necessarily destined to a screen.
-    */
+      png_do_read_premultiply_alpha(&(png_ptr->row_info),
+         png_ptr->row_buf + 1, png_ptr->gamma_16_to_1);
 
 #  ifdef PNG_READ_16_TO_8_SUPPORTED
-   if (!(png_ptr->transformations & PNG_PREMULTIPLY_ALPHA))
-   {
-     if (png_ptr->transformations & PNG_16_TO_8)
-        png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
-   }
+      if (!(png_ptr->transformations & PNG_PREMULTIPLY_ALPHA))
+      {
+        if (png_ptr->transformations & PNG_16_TO_8)
+           png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+      }
 #  endif
+   }
 
 #endif
 
@@ -2043,7 +2036,8 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 
 #ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
 void /* PRIVATE */
-png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
+png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row,
+   png_uint_16pp gamma_16_to_1)
 {
 
   /* TO DO: apply gamma before premultiply  */
@@ -2063,9 +2057,12 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                a = *(--sp); --dp;
-               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
-               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
-               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
+               sp--; *(--dp) = gamma_16_to_1[(int)(*sp)];
+               *(dp) = PNG_16_BIT_PREMULTIPLY((*dp), a);
+               sp--; *(--dp) = gamma_16_to_1[(int)(*sp)];
+               *(dp) = PNG_16_BIT_PREMULTIPLY((*dp), a);
+               sp--; *(--dp) = gamma_16_to_1[*sp];
+               *(dp) = PNG_16_BIT_PREMULTIPLY((*dp), a);
             }
          }
       }
@@ -2080,7 +2077,8 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                a = *(--sp); --dp;
-               sp--; *(--dp) = PNG_16_BIT_PREMULTIPLY((*sp), a);
+               sp--; *(--dp) = gamma_16_to_1[*sp];
+               *(dp) = PNG_16_BIT_PREMULTIPLY((*dp), a);
             }
          }
       }
@@ -4022,17 +4020,23 @@ static PNG_CONST int png_gamma_shift[] =
  *      OR
  *
  *         RGB_to_gray transformation is being performed
+ *
  *      }
  *
  *   AND
  *      {
- *         the screen_gamma is different from the reciprocal of the
- *         file_gamma by more than the specified threshold
+ *         the screen_gamma is different from the reciprocal of
+ *         the file_gamma by more than the specified threshold
  *
  *      OR
  *
  *         a background color has been specified and the file_gamma
  *         and screen_gamma are not 1.0, within the specified threshold.
+ *
+ *      OR
+ *
+ *         premultiplication by alpha is being performed and the file_gamma
+ *         and postmultiply_gamma are not 1.0, within the specified threshold.
  *      }
  */
 
@@ -4096,7 +4100,12 @@ png_build_gamma_table(png_structp png_ptr)
      }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_RGB_TO_GRAY_SUPPORTED */
   }
+
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+  if (png_ptr->transformations &  PNG_PREMULTIPLY_ALPHA)
+#else
   else
+#endif
   {
      double g;
      int i, j, shift, num;
@@ -4201,6 +4210,7 @@ png_build_gamma_table(png_structp png_ptr)
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+/* PREMULTIPLY */
      if (png_ptr->transformations & (PNG_BACKGROUND | PNG_RGB_TO_GRAY))
      {
 

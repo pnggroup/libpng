@@ -2408,13 +2408,23 @@ version 1.4.0beta106 [November 27, 2009]
 version 1.4.0beta107 [November 27, 2009]
   Updated README
 
+version 1.4.0beta107 [December 4, 2009]
+  Updated README
+  Added "#define PNG_NO_PEDANTIC_WARNINGS" in the libpng source files.
+  Removed "-DPNG_CONFIGURE_LIBPNG" from the makefiles and projects.
+  Revised scripts/makefile.netbsd, makefile.openbsd, and makefile.sco
+    to put png.h and pngconf.h in $prefix/include, like the other scripts,
+    instead of in $prefix/include/libpng.  Also revised makefile.sco
+    to put them in $prefix/include/libpng14 instead of in
+    $prefix/include/libpng/libpng14.
+
 version 1.4.1alpha01 [November 27, 2009]
   Based on 1.4.0beta107
 
-version 1.4.1alpha02 [November 29, 2009]
+version 1.4.1alpha02 [December 4, 2009]
   Restored premultiplied alpha feature from version 1.4.0beta105.
   Added "double gamma" to parameters for png_set_premultiply_alpha().
-  Added "float gamma_premultiply" member to the png_struct.
+  Added "float postmultiply_gamma" member to the png_struct.
   Moved PNG_DIVIDE_BY_255, PNG_8_BIT_PREMULTIPLY(), etc., from
     png.h to pngpriv.h
   Updated documentation about png_set_premultiply_alpha().

@@ -1,5 +1,5 @@
 
-Libpng 1.4.1alpha02 - November 29, 2009
+Libpng 1.4.1alpha02 - December 4, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -29,10 +29,10 @@ Changes since the last public release (1.4.0beta107):
 version 1.4.1alpha01 [November 27, 2009]
   Based on 1.4.0beta107
 
-version 1.4.1alpha02 [November 29, 2009]
+version 1.4.1alpha02 [December 4, 2009]
   Restored premultiplied alpha feature from version 1.4.0beta105.
   Added "double gamma" to parameters for png_set_premultiply_alpha().
-  Added "float gamma_premultiply" member to the png_struct.
+  Added "float postmultiply_gamma" member to the png_struct.
   Moved PNG_DIVIDE_BY_255, PNG_8_BIT_PREMULTIPLY(), etc., from
     png.h to pngpriv.h
   Updated documentation about png_set_premultiply_alpha().

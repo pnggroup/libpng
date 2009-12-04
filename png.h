@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.1alpha02 - November 29, 2009
+ * libpng version 1.4.1alpha02 - December 4, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.1alpha02 - November 29, 2009: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.1alpha02 - December 4, 2009: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -131,7 +131,7 @@
  *    1.4.0beta15-36          14    10400  14.so.0.0[.0]
  *    1.4.0beta37-87          14    10400  14.so.14.0[.0]
  *    1.4.0rc01               14    10400  14.so.14.0[.0]
- *    1.4.0beta88-107         14    10400  14.so.14.0[.0]
+ *    1.4.0beta88-108         14    10400  14.so.14.0[.0]
  *    1.4.1alpha01-02         14    10401  14.so.14.0[.0]
  *
  *    Henceforth the source version will match the shared-library major
@@ -164,7 +164,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.1alpha02, November 29, 2009, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.1alpha02, December 4, 2009, are
  * Copyright (c) 2004, 2006-2007 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -340,7 +340,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.4.1alpha02"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.1alpha02 - November 29, 2009\n"
+   " libpng version 1.4.1alpha02 - December 4, 2009\n"
 
 #define PNG_LIBPNG_VER_SONUM   14
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -1332,14 +1332,9 @@ struct png_struct_def
 /* New member added in libpng-1.2.30 */
   png_charp chunkdata PNG_DEPSTRUCT;  /* buffer for reading chunk data */
 
-/* New member added in libpng-1.2.41 */
+/* New member added in libpng-1.4.0 */
 #ifdef PNG_IO_STATE_SUPPORTED
    png_uint_32 io_state PNG_DEPSTRUCT;
-#endif
-
-/* New member added in libpng-1.4.1 */
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-   float gamma_premultiply PNG_DEPSTRUCT;
 #endif
 };
 
@@ -1527,11 +1522,6 @@ extern PNG_EXPORT(void,png_set_swap_alpha) PNGARG((png_structp png_ptr));
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED) || \
     defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
 extern PNG_EXPORT(void,png_set_invert_alpha) PNGARG((png_structp png_ptr));
-#endif
-
-#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-extern PNG_EXPORT(void,png_set_premultiply_alpha)
-  PNGARG((png_structp png_ptr, double gamma));
 #endif
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)

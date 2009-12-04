@@ -15,7 +15,7 @@
 CC = cl
 LD = link
 AR = lib
-CFLAGS  = -DPNG_CONFIGURE_LIBPNG -nologo -MD -O2 -W3 -I..\zlib
+CFLAGS  = -nologo -MD -O2 -W3 -I..\zlib
 LDFLAGS = -nologo
 ARFLAGS = -nologo
 RM = del
