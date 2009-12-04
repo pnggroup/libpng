@@ -47,7 +47,9 @@ version 1.2.42beta01 [December 4, 2009]
     to pngconf.h in version 1.2.41.
   Revised scripts/makefile.netbsd, makefile.openbsd, and makefile.sco
     to put png.h and pngconf.h in $prefix/include, like the other scripts,
-    instead of in $prefix/include/libpng.
+    instead of in $prefix/include/libpng.  Also revised makefile.sco
+    to put them in $prefix/include/libpng12 instead of in
+    $prefix/include/libpng/libpng12.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
