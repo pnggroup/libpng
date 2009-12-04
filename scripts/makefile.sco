@@ -12,7 +12,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0rc02
+PNGMIN = 1.4.0beta107
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -41,10 +41,10 @@ exec_prefix=$(prefix)
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-CFLAGS= -DPNG_CONFIGURE_LIBPNG -dy -belf -I$(ZLIBINC) -O3
+CFLAGS= -dy -belf -I$(ZLIBINC) -O3
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz -lm
 
-INCPATH=$(prefix)/include/libpng
+INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
 MANPATH=$(prefix)/man
 BINPATH=$(exec_prefix)/bin

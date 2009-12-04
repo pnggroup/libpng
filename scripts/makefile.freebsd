@@ -27,7 +27,7 @@ SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 
-CFLAGS+= -DPNG_CONFIGURE_LIBPNG -I.
+CFLAGS+= -I.
 
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
