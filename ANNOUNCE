@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta108 - December 4, 2009
+Libpng 1.4.0beta108 - December 11, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -728,7 +728,8 @@ version 1.4.0beta107 [December 4, 2009]
     to put them in $prefix/include/libpng14 instead of in
     $prefix/include/libpng/libpng14.
 
-version 1.4.0beta108 [December 4, 2009]
+version 1.4.0beta108 [December 11, 2009]
+  Removed leftover "-DPNG_CONFIGURE_LIBPNG" from contrib/pngminim/*/makefile
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
