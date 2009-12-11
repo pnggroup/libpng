@@ -2616,6 +2616,7 @@ version 1.2.42beta01 [December 4, 2009]
   Removed leftover "-DPNG_CONFIGURE_LIBPNG" from scripts/makefile.darwin
 
 version 1.2.42beta02 [December 11, 2009]
+  Removed leftover "-DPNG_CONFIGURE_LIBPNG" from contrib/pngminim/*/makefile
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -48,11 +48,12 @@ version 1.2.42beta01 [December 4, 2009]
   Revised scripts/makefile.netbsd, makefile.openbsd, and makefile.sco
     to put png.h and pngconf.h in $prefix/include, like the other scripts,
     instead of in $prefix/include/libpng.  Also revised makefile.sco
-    to put them in $prefix/include/libpng12 instead of in
-    $prefix/include/libpng/libpng12.
+    to put them in $prefix/include/libpng%NN% instead of in
+    $prefix/include/libpng/libpng%NN%.
   Removed leftover "-DPNG_CONFIGURE_LIBPNG" from scripts/makefile.darwin
 
 version 1.2.42beta02 [December 11, 2009]
+  Removed leftover "-DPNG_CONFIGURE_LIBPNG" from contrib/pngminim/*/makefile
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
