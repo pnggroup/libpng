@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta108 - December 4, 2009
+ * libpng version 1.4.0beta108 - December 11, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -942,10 +942,6 @@ extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
 #endif
 #ifndef png_debug2
 #define png_debug2(l, m, p1, p2)
-#endif
-
-#if 0
-extern PNG_EXPORT(png_bytep,png_sig_bytes) PNGARG((void));
 #endif
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
