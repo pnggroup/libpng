@@ -2605,7 +2605,7 @@ version 1.2.41rc03 [November 25, 2009]
 version 1.2.41 [December 3, 2009]
   Updated the list of files and made some cosmetic changes in README.
 
-version 1.2.42 [December 4, 2009]
+version 1.2.42beta01 [December 4, 2009]
   Removed "#define PNG_NO_ERROR_NUMBERS" that was inadvertently added
     to pngconf.h in version 1.2.41.
   Revised scripts/makefile.netbsd, makefile.openbsd, and makefile.sco
@@ -2614,6 +2614,8 @@ version 1.2.42 [December 4, 2009]
     to put them in $prefix/include/libpng12 instead of in
     $prefix/include/libpng/libpng12.
   Removed leftover "-DPNG_CONFIGURE_LIBPNG" from scripts/makefile.darwin
+
+version 1.2.42beta02 [December 11, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
