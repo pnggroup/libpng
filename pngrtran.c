@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [December 4, 2009]
+ * Last changed in libpng 1.4.0 [December 11, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1473,6 +1473,20 @@ png_do_read_transformations(png_structp png_ptr)
       png_do_gamma(&(png_ptr->row_info), png_ptr->row_buf + 1,
           png_ptr->gamma_table, png_ptr->gamma_16_table,
           png_ptr->gamma_shift);
+#endif
+
+#ifdef PNG_READ_16_TO_8_SUPPORTED
+#  ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+   /* Do this after the PREMULTIPLY operation */
+   if (!(png_ptr->transformations & PNG_PREMULTIPLY_ALPHA))
+   {
+     if (png_ptr->transformations & PNG_16_TO_8)
+        png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+   }
+#  else
+   if (png_ptr->transformations & PNG_16_TO_8)
+      png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#  endif
 #endif
 
 #ifdef PNG_READ_DITHER_SUPPORTED
