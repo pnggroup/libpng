@@ -2417,6 +2417,9 @@ version 1.4.0beta107 [December 4, 2009]
 
 version 1.4.0beta108 [December 11, 2009]
   Removed leftover "-DPNG_CONFIGURE_LIBPNG" from contrib/pngminim/*/makefile
+  Relocated png_do_chop() to its original position in pngrtran.c; the
+    change in version 1.2.41beta08 caused transparency to be handled wrong
+    in some 16-bit datastreams (Yusaku Sugai).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
