@@ -1,5 +1,5 @@
 
-Libpng 1.4.1alpha02 - December 11, 2009
+Libpng 1.5.0alpha01 - December 12, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.1alpha02.tar.xz (LZMA-compressed, recommended)
-   1.4.1alpha02.tar.gz
-   1.4.1alpha02.tar.bz2
+   1.5.0alpha01.tar.xz (LZMA-compressed, recommended)
+   1.5.0alpha01.tar.gz
+   1.5.0alpha01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp141a02.zip
-   lp141a02.7z
+   lp150a01.zip
+   lp150a01.7z
 
 Other information:
 
-   1.4.1alpha02-README.txt
-   1.4.1alpha02-LICENSE.txt
+   1.5.0alpha01-README.txt
+   1.5.0alpha01-LICENSE.txt
 
 Changes since the last public release (1.4.0beta107):
 
@@ -54,6 +54,9 @@ version 1.4.1alpha02 [December 11, 2009]
   Relocated png_do_chop() to its original position in pngrtran.c; the
     change in version 1.2.41beta08 caused transparency to be handled wrong
     in some 16-bit datastreams (Yusaku Sugai).
+
+version 1.5.0alpha01 [December 12, 2009]
+  Bump version to 1.5.0alpha01
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
