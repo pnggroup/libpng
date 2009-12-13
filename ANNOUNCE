@@ -1,5 +1,5 @@
 
-Libpng 1.2.42beta02 - December 11, 2009
+Libpng 1.2.42rc01 - December 13, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.42beta02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.42beta02.tar.gz
-   libpng-1.2.42beta02.tar.bz2
+   libpng-1.2.42rc01.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.42rc01.tar.gz
+   libpng-1.2.42rc01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.42beta02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.42beta02-no-config.tar.gz
-   libpng-1.2.42beta02-no-config.tar.bz2
+   libpng-1.2.42rc01-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.42rc01-no-config.tar.gz
+   libpng-1.2.42rc01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1242b02.zip
-   lp1242b02.7z
-   lp1242b02.tar.bz2
+   lp1242r01.zip
+   lp1242r01.7z
+   lp1242r01.tar.bz2
 
 Project files
 
-   libpng-1.2.42beta02-project-netware.zip
-   libpng-1.2.42beta02-project-wince.zip
+   libpng-1.2.42rc01-project-netware.zip
+   libpng-1.2.42rc01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.42beta02-README.txt
-   libpng-1.2.42beta02-KNOWNBUGS.txt
-   libpng-1.2.42beta02-LICENSE.txt
-   libpng-1.2.42beta02-Y2K-compliance.txt
-   libpng-1.2.42beta02-[previous version]-diff.txt
+   libpng-1.2.42rc01-README.txt
+   libpng-1.2.42rc01-KNOWNBUGS.txt
+   libpng-1.2.42rc01-LICENSE.txt
+   libpng-1.2.42rc01-Y2K-compliance.txt
+   libpng-1.2.42rc01-[previous version]-diff.txt
 
 Changes since the last public release (1.2.41):
 
@@ -57,6 +57,8 @@ version 1.2.42beta02 [December 11, 2009]
   Relocated png_do_chop() to its original position in pngrtran.c. The
     change in version 1.2.41beta08 caused transparency to be handled wrong
     in some 16-bit datastreams (Yusaku Sugai).
+
+version 1.2.42rc01 [December 13, 2009]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

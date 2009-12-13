@@ -1,5 +1,5 @@
 
-Known bugs in libpng version 1.2.42beta02
+Known bugs in libpng version 1.2.42rc01
 
 1. December 4, 2009: The PNG_NO_ERROR_NUMBERS macro was inadvertently
    defined in libpng-1.2.41/pngconf.h, which may cause a problem with
