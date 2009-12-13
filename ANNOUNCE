@@ -1,5 +1,5 @@
 
-Libpng 1.4.0beta108 - December 11, 2009
+Libpng 1.4.0beta109 - December 13, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0beta108.tar.xz (LZMA-compressed, recommended)
-   1.4.0beta108.tar.gz
-   1.4.0beta108.tar.bz2
+   1.4.0beta109.tar.xz (LZMA-compressed, recommended)
+   1.4.0beta109.tar.gz
+   1.4.0beta109.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140b108.zip
-   lp140b108.7z
+   lp140b109.zip
+   lp140b109.7z
 
 Other information:
 
-   1.4.0beta108-README.txt
-   1.4.0beta108-LICENSE.txt
+   1.4.0beta109-README.txt
+   1.4.0beta109-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -733,6 +733,12 @@ version 1.4.0beta108 [December 11, 2009]
   Relocated png_do_chop() to its original position in pngrtran.c; the
     change in version 1.2.41beta08 caused transparency to be handled wrong
     in some 16-bit datastreams (Yusaku Sugai).
+
+version 1.4.0beta109 [December 13, 2009]
+  Added "bit_depth" parameter to the private png_build_gamma_table() function.
+  Pass bit_depth=8 to png_build_gamma_table() when bit_depth is 16 but the
+    PNG_16_TO_8 transform has been set, to avoid unnecessary build of 16-bit
+    tables.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

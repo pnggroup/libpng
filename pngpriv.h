@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.0beta108 - December 11, 2009
+ * libpng version 1.4.0beta109 - December 13, 2009
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -475,7 +475,8 @@ PNG_EXTERN void png_write_finish_row PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_write_start_row PNGARG((png_structp png_ptr));
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
-PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr));
+PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
+   png_byte bit_depth));
 #endif
 
 /* Combine a row of data, dealing with alpha, etc. if requested */
