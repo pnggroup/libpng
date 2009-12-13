@@ -2427,6 +2427,8 @@ version 1.4.0beta109 [December 13, 2009]
     PNG_16_TO_8 transform has been set, to avoid unnecessary build of 16-bit
     tables.
 
+version 1.4.0beta110 [December 13, 2009]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
