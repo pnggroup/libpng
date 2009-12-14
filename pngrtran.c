@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [December 12, 2009]
+ * Last changed in libpng 1.4.0 [December 14, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -903,7 +903,17 @@ png_init_read_transformations(png_structp png_ptr)
 #endif
         PNG_RGB_TO_GRAY )) && png_ptr->gamma != 0.0)
    {
-      png_build_gamma_table(png_ptr);
+#ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
+     if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
+        png_build_gamma_table(png_ptr, 16);
+     else
+     {
+#endif
+      if (png_ptr->transformations & PNG_16_TO_8)
+         png_build_gamma_table(png_ptr, 8);
+      else
+         png_build_gamma_table(png_ptr, png_ptr->bit_depth);
+     }
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
       if (png_ptr->transformations & PNG_BACKGROUND)
       {
@@ -1296,11 +1306,6 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
      }
 #endif
 
-#  ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-   if (png_ptr->transformations & PNG_PREMULTIPLY_ALPHA)
-      info_ptr->bit_depth = 16;
-#endif
-
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels *
       info_ptr->bit_depth);
 
@@ -1432,19 +1437,6 @@ png_do_read_transformations(png_structp png_ptr)
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
-#ifdef PNG_READ_16_TO_8_SUPPORTED
-#  ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
-   /* Do this after the PREMULTIPLY operation */
-   if (!(png_ptr->transformations & PNG_PREMULTIPLY_ALPHA))
-   {
-     if (png_ptr->transformations & PNG_16_TO_8)
-        png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
-   }
-#  else
-   if (png_ptr->transformations & PNG_16_TO_8)
-      png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
-#  endif
-#endif
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
    if ((png_ptr->transformations & PNG_BACKGROUND) &&
@@ -1462,19 +1454,6 @@ png_do_read_transformations(png_structp png_ptr)
 );
 #endif
 
-#ifdef PNG_READ_GAMMA_SUPPORTED
-   if ((png_ptr->transformations & PNG_GAMMA) &&
-#ifdef PNG_READ_BACKGROUND_SUPPORTED
-       !((png_ptr->transformations & PNG_BACKGROUND) &&
-       ((png_ptr->num_trans != 0) ||
-       (png_ptr->color_type & PNG_COLOR_MASK_ALPHA))) &&
-#endif
-       (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE))
-      png_do_gamma(&(png_ptr->row_info), png_ptr->row_buf + 1,
-          png_ptr->gamma_table, png_ptr->gamma_16_table,
-          png_ptr->gamma_shift);
-#endif
-
 #ifdef PNG_READ_16_TO_8_SUPPORTED
 #  ifdef PNG_READ_PREMULTIPLY_ALPHA_SUPPORTED
    /* Do this after the PREMULTIPLY operation */
@@ -1487,6 +1466,20 @@ png_do_read_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_16_TO_8)
       png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #  endif
+
+#endif
+
+#ifdef PNG_READ_GAMMA_SUPPORTED
+   if ((png_ptr->transformations & PNG_GAMMA) &&
+#ifdef PNG_READ_BACKGROUND_SUPPORTED
+       !((png_ptr->transformations & PNG_BACKGROUND) &&
+       ((png_ptr->num_trans != 0) ||
+       (png_ptr->color_type & PNG_COLOR_MASK_ALPHA))) &&
+#endif
+       (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE))
+      png_do_gamma(&(png_ptr->row_info), png_ptr->row_buf + 1,
+          png_ptr->gamma_table, png_ptr->gamma_16_table,
+          png_ptr->gamma_shift);
 #endif
 
 #ifdef PNG_READ_DITHER_SUPPORTED
@@ -2071,11 +2064,11 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row,
             for (i = 0; i < row_width; i++)
             {
                a = *(--sp); --dp;
-               sp--; *(--dp) = gamma_16_to_1[(int)(*sp)];
+               sp--; *(--dp) = *gamma_16_to_1[(*sp)];
                *(dp) = PNG_16_BIT_PREMULTIPLY((*dp), a);
-               sp--; *(--dp) = gamma_16_to_1[(int)(*sp)];
+               sp--; *(--dp) = *gamma_16_to_1[(*sp)];
                *(dp) = PNG_16_BIT_PREMULTIPLY((*dp), a);
-               sp--; *(--dp) = gamma_16_to_1[*sp];
+               sp--; *(--dp) = *gamma_16_to_1[(*sp)];
                *(dp) = PNG_16_BIT_PREMULTIPLY((*dp), a);
             }
          }
@@ -2091,7 +2084,7 @@ png_do_read_premultiply_alpha(png_row_infop row_info, png_bytep row,
             for (i = 0; i < row_width; i++)
             {
                a = *(--sp); --dp;
-               sp--; *(--dp) = gamma_16_to_1[*sp];
+               sp--; *(--dp) = *gamma_16_to_1[*sp];
                *(dp) = PNG_16_BIT_PREMULTIPLY((*dp), a);
             }
          }
@@ -4055,12 +4048,13 @@ static PNG_CONST int png_gamma_shift[] =
  */
 
 void /* PRIVATE */
-png_build_gamma_table(png_structp png_ptr)
+png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
 {
   png_debug(1, "in png_build_gamma_table");
 
-  if (png_ptr->bit_depth <= 8)
+  if (bit_depth <= 8)
   {
+     /* Build 8-bit gamma tables */
      int i;
      double g;
 
@@ -4121,6 +4115,7 @@ png_build_gamma_table(png_structp png_ptr)
   else
 #endif
   {
+     /* Build 16-bit gamma tables */
      double g;
      int i, j, shift, num;
      int sig_bit;
