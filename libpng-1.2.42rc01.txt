@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.42rc01 - December 13, 2009
+ libpng version 1.2.42rc01 - December 17, 2009
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.42rc01 - December 13, 2009
+ libpng versions 0.97, January 1998, through 1.2.42rc01 - December 17, 2009
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -3170,11 +3170,13 @@ when there is only one macro being tested.
 
 We do not use the TAB character for indentation in the C sources.
 
+Lines do not exceed 80 characters.
+
 Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-December 13, 2009
+December 17, 2009
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

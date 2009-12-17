@@ -1,5 +1,5 @@
 
-Libpng 1.2.42rc01 - December 13, 2009
+Libpng 1.2.42rc01 - December 17, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -58,7 +58,8 @@ version 1.2.42beta02 [December 11, 2009]
     change in version 1.2.41beta08 caused transparency to be handled wrong
     in some 16-bit datastreams (Yusaku Sugai).
 
-version 1.2.42rc01 [December 13, 2009]
+version 1.2.42rc01 [December 17, 2009]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
