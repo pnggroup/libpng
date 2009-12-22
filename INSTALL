@@ -62,7 +62,7 @@ Your directory structure should look like this:
              configure.ac, configure, Makefile.am, Makefile.in,
 %12-%             autogen.sh, config.guess, ltmain.sh, missing,
 %12-%             aclocal.m4, config.h.in, config.sub,
-%14+%             autogen.sh, config.guess, ltmain.sh, missing, libpng-pc.in,
+%14+%             autogen.sh, config.guess, ltmain.sh, missing, libpng.pc.in,
 %14+%             libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
