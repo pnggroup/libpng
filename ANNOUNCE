@@ -744,6 +744,8 @@ version 1.4.0rc02 [December 22, 2009]
   Declared png_cleanup_needed "volatile" in pngread.c and pngwrite.c
 
 version 1.4.0rc03 [December 22, 2009]
+  Renamed libpng-pc.in back to libpng.pc.in and revised CMakeLists.txt
+    (revising the change in 1.4.0beta99)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
