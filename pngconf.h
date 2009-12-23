@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.0.51 - December 3, 2009
+ * libpng version 1.0.52rc01 - December 23, 2009
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -758,7 +758,6 @@
 
 #endif /* PNG_WRITE_SUPPORTED */
 
-#define PNG_NO_ERROR_NUMBERS
 #ifndef PNG_1_0_X
 #  ifndef PNG_NO_ERROR_NUMBERS
 #    define PNG_ERROR_NUMBERS_SUPPORTED

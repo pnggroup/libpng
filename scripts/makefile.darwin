@@ -22,7 +22,7 @@ ZLIBINC=../zlib
 # Library name:
 LIBNAME = libpng10
 PNGMAJ = 10
-PNGMIN = 1.0.51
+PNGMIN = 1.0.52rc01
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -42,7 +42,7 @@ RANLIB=ranlib
 RM_F=/bin/rm -f
 
 # CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
-CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -W -Wall -O -funroll-loops
+CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng10 -lz
 
 INCPATH=$(prefix)/include

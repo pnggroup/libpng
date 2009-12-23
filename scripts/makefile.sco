@@ -12,7 +12,7 @@
 # Library name:
 LIBNAME = libpng10
 PNGMAJ = 0
-PNGMIN = 1.0.51
+PNGMIN = 1.0.52rc01
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -44,7 +44,7 @@ ZLIBINC=../zlib
 CFLAGS= -dy -belf -I$(ZLIBINC) -O3 -DPNG_NO_MMX_CODE
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng10 -lz -lm
 
-INCPATH=$(prefix)/include/libpng
+INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
 MANPATH=$(prefix)/man
 BINPATH=$(exec_prefix)/bin
