@@ -2427,12 +2427,19 @@ version 1.4.0beta109 [December 13, 2009]
     PNG_16_TO_8 transform has been set, to avoid unnecessary build of 16-bit
     tables.
 
-version 1.4.0rc02 [December 22, 2009]
+version 1.4.0rc02 [December 20, 2009]
   Declared png_cleanup_needed "volatile" in pngread.c and pngwrite.c
 
 version 1.4.0rc03 [December 22, 2009]
   Renamed libpng-pc.in back to libpng.pc.in and revised CMakeLists.txt
     (revising the change in 1.4.0beta99)
+
+version 1.4.0rc04 [December 25, 2009]
+  Swapped PNG_UNKNOWN_CHUNKS_SUPPORTED and PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+    in pngset.c to be consistent with other changes in version 1.2.38.
+
+version 1.4.0 [December 25, 2009]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
