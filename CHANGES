@@ -2437,12 +2437,14 @@ version 1.4.1alpha02 [December 11, 2009]
     change in version 1.2.41beta08 caused transparency to be handled wrong
     in some 16-bit datastreams (Yusaku Sugai).
 
-version 1.5.0alpha01 [December 22, 2009]
+version 1.5.0alpha01 [December 25, 2009]
   Bump version to 1.5.0alpha01
   Add "depth" parameter to private png_build_gamma_table()
   Declared png_cleanup_needed "volatile" in pngread.c and pngwrite.c
   Renamed libpng-pc.in back to libpng.pc.in and revised CMakeLists.txt
     (revising the change in 1.4.0beta99)
+  Swapped PNG_UNKNOWN_CHUNKS_SUPPORTED and PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+    in pngset.c to be consistent with other changes in version 1.2.38.
 
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
