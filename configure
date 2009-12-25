@@ -11493,7 +11493,7 @@ fi
 
 
 # Config files, substituting as above
-ac_config_files="$ac_config_files Makefile libpng.pc:libpng-pc.in"
+ac_config_files="$ac_config_files Makefile libpng.pc:libpng.pc.in"
 
 ac_config_files="$ac_config_files libpng-config:libpng-config.in"
 
@@ -12476,7 +12476,7 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "libpng.pc") CONFIG_FILES="$CONFIG_FILES libpng.pc:libpng-pc.in" ;;
+    "libpng.pc") CONFIG_FILES="$CONFIG_FILES libpng.pc:libpng.pc.in" ;;
     "libpng-config") CONFIG_FILES="$CONFIG_FILES libpng-config:libpng-config.in" ;;
 
   *) as_fn_error "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

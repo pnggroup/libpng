@@ -117,7 +117,7 @@ AC_ARG_WITH(binconfigs,
 AC_SUBST([binconfigs])
 
 # Config files, substituting as above
-AC_CONFIG_FILES([Makefile libpng.pc:libpng-pc.in])
+AC_CONFIG_FILES([Makefile libpng.pc:libpng.pc.in])
 AC_CONFIG_FILES([libpng-config:libpng-config.in],
 		[chmod +x libpng-config])
 
