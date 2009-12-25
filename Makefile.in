@@ -53,7 +53,7 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_man_MANS) \
 	$(pkginclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(srcdir)/libpng-config.in $(srcdir)/libpng-pc.in \
+	$(srcdir)/libpng-config.in $(srcdir)/libpng.pc.in \
 	$(top_srcdir)/configure INSTALL TODO config.guess config.sub \
 	depcomp install-sh ltmain.sh missing mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -329,7 +329,7 @@ EXTRA_DIST = \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.4.0rc04.txt
+	example.c libpng-1.4.0rc05.txt
 
 CLEANFILES = pngout.png libpng14.pc libpng14-config libpng.vers \
 libpng.sym
@@ -393,7 +393,7 @@ $(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-libpng.pc: $(top_builddir)/config.status $(srcdir)/libpng-pc.in
+libpng.pc: $(top_builddir)/config.status $(srcdir)/libpng.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 libpng-config: $(top_builddir)/config.status $(srcdir)/libpng-config.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
