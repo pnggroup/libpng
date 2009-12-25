@@ -2624,9 +2624,13 @@ version 1.2.42beta02 [December 11, 2009]
 version 1.2.42rc01 [December 17, 2009]
   No changes.
 
-version 1.2.42rc02 [December 23, 2009]
+version 1.2.42rc02 [December 22, 2009]
   Renamed libpng-pc.in back to libpng.pc.in and revised CMakeLists.txt
     (revising changes made in 1.2.41beta17 and 1.2.41rc01)
+
+version 1.2.42rc03 [December 25, 2009]
+  Swapped PNG_UNKNOWN_CHUNKS_SUPPORTED and PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+    in pngset.c to be consistent with other changes in version 1.2.38.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
