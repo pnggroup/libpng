@@ -2440,7 +2440,7 @@ version 1.4.0rc04 [December 25, 2009]
 
 version 1.4.0rc05 [December 25, 2009]
   Changed "libpng-pc.in" to "libpng.pc.in" in configure.ac, configure, and
-    Makefile.ing to be consistent with changes in libpng-1.4.0rc03
+    Makefile.in to be consistent with changes in libpng-1.4.0rc03
 
 version 1.4.0 [December 25, 2009]
   No changes.
