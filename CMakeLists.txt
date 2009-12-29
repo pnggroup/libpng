@@ -8,7 +8,7 @@ endif()
 project(PNG C)
 enable_testing()
 
-# Copyright (C) 2007 Glenn Randers-Pehrson
+# Copyright (C) 2007-2010 Glenn Randers-Pehrson
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -203,7 +203,7 @@ configure_file(${PNG_SOURCE_DIR}/libpng-config.in
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#    VERSION 14.${PNGLIB_RELEASE}.1.4.0rc05
+#    VERSION 14.${PNGLIB_RELEASE}.1.4.0rc06
      VERSION 14.${PNGLIB_RELEASE}.0
      SOVERSION 14
      CLEAN_DIRECT_OUTPUT 1)

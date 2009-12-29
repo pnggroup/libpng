@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.0 [December 25, 2009]
+ * Last changed in libpng 1.4.0 [December 29, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -886,10 +886,7 @@ png_init_read_transformations(png_structp png_ptr)
    if ((png_ptr->transformations & (PNG_GAMMA | PNG_RGB_TO_GRAY)) &&
         png_ptr->gamma != 0.0)
    {
-      if (png_ptr->transformations & PNG_16_TO_8)
-         png_build_gamma_table(png_ptr, 8);
-      else
-         png_build_gamma_table(png_ptr, png_ptr->bit_depth);
+      png_build_gamma_table(png_ptr, png_ptr->bit_depth);
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
       if (png_ptr->transformations & PNG_BACKGROUND)

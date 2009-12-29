@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.0 [December 25, 2009]
+ * Last changed in libpng 1.4.0 [December 29, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -389,7 +389,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    if (info_ptr->scal_s_width == NULL)
    {
       png_warning(png_ptr,
-       "Memory allocation failed while processing sCAL");
+         "Memory allocation failed while processing sCAL");
       return;
    }
    png_memcpy(info_ptr->scal_s_width, swidth, length);
@@ -403,7 +403,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
       png_free (png_ptr, info_ptr->scal_s_width);
       info_ptr->scal_s_width = NULL;
       png_warning(png_ptr,
-       "Memory allocation failed while processing sCAL");
+         "Memory allocation failed while processing sCAL");
       return;
    }
    png_memcpy(info_ptr->scal_s_height, sheight, length);
@@ -452,8 +452,7 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
       }
    }
 
-   /*
-    * It may not actually be necessary to set png_ptr->palette here;
+   /* It may not actually be necessary to set png_ptr->palette here;
     * we do it for backward compatibility with the way the png_handle_tRNS
     * function used to do the allocation.
     */
@@ -593,7 +592,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
    new_iccp_name = (png_charp)png_malloc_warn(png_ptr, length);
    if (new_iccp_name == NULL)
    {
-      png_warning(png_ptr, "Insufficient memory to process iCCP chunk");
+        png_warning(png_ptr, "Insufficient memory to process iCCP chunk");
       return;
    }
    png_memcpy(new_iccp_name, name, length);
@@ -602,7 +601,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
    {
       png_free (png_ptr, new_iccp_name);
       png_warning(png_ptr,
-      "Insufficient memory to process iCCP profile");
+          "Insufficient memory to process iCCP profile");
       return;
    }
    png_memcpy(new_iccp_profile, profile, (png_size_t)proflen);
@@ -613,7 +612,8 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
    info_ptr->iccp_name = new_iccp_name;
    info_ptr->iccp_profile = new_iccp_profile;
    /* Compression is always zero but is here so the API and info structure
-    * does not have to change if we introduce multiple compression types */
+    * does not have to change if we introduce multiple compression types
+    */
    info_ptr->iccp_compression = (png_byte)compression_type;
    info_ptr->free_me |= PNG_FREE_ICCP;
    info_ptr->valid |= PNG_INFO_iCCP;
@@ -886,11 +886,11 @@ png_set_sPLT(png_structp png_ptr,
    if (np == NULL)
    {
       png_warning(png_ptr, "No memory for sPLT palettes");
-     return;
+      return;
    }
 
    png_memcpy(np, info_ptr->splt_palettes,
-          info_ptr->splt_palettes_num * png_sizeof(png_sPLT_t));
+       info_ptr->splt_palettes_num * png_sizeof(png_sPLT_t));
    png_free(png_ptr, info_ptr->splt_palettes);
    info_ptr->splt_palettes=NULL;
 
@@ -901,7 +901,7 @@ png_set_sPLT(png_structp png_ptr,
       png_uint_32 length;
 
       length = png_strlen(from->name) + 1;
-        to->name = (png_charp)png_malloc_warn(png_ptr, (png_size_t)length);
+      to->name = (png_charp)png_malloc_warn(png_ptr, (png_size_t)length);
       if (to->name == NULL)
       {
          png_warning(png_ptr,
@@ -910,7 +910,7 @@ png_set_sPLT(png_structp png_ptr,
       }
       png_memcpy(to->name, from->name, length);
       to->entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,
-            (png_size_t)(from->nentries * png_sizeof(png_sPLT_entry)));
+          (png_size_t)(from->nentries * png_sizeof(png_sPLT_entry)));
       if (to->entries == NULL)
       {
          png_warning(png_ptr,
@@ -949,22 +949,22 @@ png_set_unknown_chunks(png_structp png_ptr,
    if (np == NULL)
    {
       png_warning(png_ptr,
-         "Out of memory while processing unknown chunk");
+          "Out of memory while processing unknown chunk");
       return;
    }
 
    png_memcpy(np, info_ptr->unknown_chunks,
-          info_ptr->unknown_chunks_num * png_sizeof(png_unknown_chunk));
+       info_ptr->unknown_chunks_num * png_sizeof(png_unknown_chunk));
    png_free(png_ptr, info_ptr->unknown_chunks);
+   info_ptr->unknown_chunks = NULL;
 
    for (i = 0; i < num_unknowns; i++)
    {
       png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
       png_unknown_chunkp from = unknowns + i;
 
-      png_memcpy((png_charp)to->name,
-                 (png_charp)from->name,
-                 png_sizeof(from->name));
+      png_memcpy((png_charp)to->name, (png_charp)from->name,
+          png_sizeof(from->name));
       to->name[png_sizeof(to->name)-1] = '\0';
       to->size = from->size;
       /* Note our location in the read or write sequence */
@@ -996,7 +996,7 @@ png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
    int chunk, int location)
 {
    if (png_ptr != NULL && info_ptr != NULL && chunk >= 0 && chunk <
-         (int)info_ptr->unknown_chunks_num)
+       (int)info_ptr->unknown_chunks_num)
       info_ptr->unknown_chunks[chunk].location = (png_byte)location;
 }
 #endif
@@ -1043,16 +1043,16 @@ png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
    old_num_chunks = png_ptr->num_chunk_list;
    new_list=(png_bytep)png_malloc(png_ptr,
       (png_size_t)
-      (5*(num_chunks + old_num_chunks)));
+       (5*(num_chunks + old_num_chunks)));
    if (png_ptr->chunk_list != NULL)
    {
       png_memcpy(new_list, png_ptr->chunk_list,
-         (png_size_t)(5*old_num_chunks));
+          (png_size_t)(5*old_num_chunks));
       png_free(png_ptr, png_ptr->chunk_list);
       png_ptr->chunk_list=NULL;
    }
    png_memcpy(new_list + 5*old_num_chunks, chunk_list,
-      (png_size_t)(5*num_chunks));
+       (png_size_t)(5*num_chunks));
    for (p = new_list + 5*old_num_chunks + 4, i = 0; i<num_chunks; i++, p += 5)
       *p=(png_byte)keep;
    png_ptr->num_chunk_list = old_num_chunks + num_chunks;

@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.0 [December 25, 2009]
+ * Last changed in libpng 1.4.0 [December 29, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -17,7 +17,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_0rc05 Your_png_h_is_not_version_1_4_0rc05;
+typedef version_1_4_0rc06 Your_png_h_is_not_version_1_4_0rc06;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
@@ -315,7 +315,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
             for (i = 0; i < (int)info_ptr->pcal_nparams; i++)
             {
                png_free(png_ptr, info_ptr->pcal_params[i]);
-               info_ptr->pcal_params[i]=NULL;
+               info_ptr->pcal_params[i] = NULL;
             }
             png_free(png_ptr, info_ptr->pcal_params);
             info_ptr->pcal_params = NULL;
@@ -430,8 +430,10 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
          for (row = 0; row < (int)info_ptr->height; row++)
          {
             png_free(png_ptr, info_ptr->row_pointers[row]);
+            info_ptr->row_pointers[row] = NULL;
          }
          png_free(png_ptr, info_ptr->row_pointers);
+         info_ptr->row_pointers = NULL;
       }
       info_ptr->valid &= ~PNG_INFO_IDAT;
    }
@@ -458,6 +460,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
    if (png_ptr->num_chunk_list)
    {
       png_free(png_ptr, png_ptr->chunk_list);
+      png_ptr->chunk_list = NULL;
       png_ptr->num_chunk_list = 0;
    }
 #endif
@@ -548,14 +551,14 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.0rc05 - December 25, 2009" PNG_STRING_NEWLINE \
-     "Copyright (c) 1998-2009 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
+     "libpng version 1.4.0rc06 - December 29, 2009" PNG_STRING_NEWLINE \
+     "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.0rc05 - December 25, 2009\
-      Copyright (c) 1998-2009 Glenn Randers-Pehrson\
+      return ((png_charp) "libpng version 1.4.0rc06 - December 29, 2009\
+      Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
 #endif

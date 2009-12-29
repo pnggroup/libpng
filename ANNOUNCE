@@ -1,5 +1,5 @@
 
-Libpng 1.4.0rc05 - December 25, 2009
+Libpng 1.4.0rc06 - December 29, 2009
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.0rc05.tar.xz (LZMA-compressed, recommended)
-   1.4.0rc05.tar.gz
-   1.4.0rc05.tar.bz2
+   1.4.0rc06.tar.xz (LZMA-compressed, recommended)
+   1.4.0rc06.tar.gz
+   1.4.0rc06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp140r05.zip
-   lp140r05.7z
+   lp140r06.zip
+   lp140r06.7z
 
 Other information:
 
-   1.4.0rc05-README.txt
-   1.4.0rc05-LICENSE.txt
+   1.4.0rc06-README.txt
+   1.4.0rc06-LICENSE.txt
 
 Changes since the last public release (1.2.10):
 
@@ -755,7 +755,11 @@ version 1.4.0rc05 [December 25, 2009]
   Changed "libpng-pc.in" to "libpng.pc.in" in configure.ac, configure, and
     Makefile.in to be consistent with changes in libpng-1.4.0rc03
 
-version 1.4.0 [December 25, 2009]
+version 1.4.0rc06 [December 29, 2009]
+  Reverted the gamma_table changes from libpng-1.4.0beta109.
+  Fixed some indentation errors.
+
+version 1.4.0 [December 29, 2009]
   No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
