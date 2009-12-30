@@ -2446,7 +2446,10 @@ version 1.4.0rc06 [December 29, 2009]
   Reverted the gamma_table changes from libpng-1.4.0beta109.
   Fixed some indentation errors.
 
-version 1.4.0 [December 29, 2009]
+version 1.4.0rc07 [December 30, 2009]
+  Revised libpng*.txt and libpng.3 about 1.2.x->1.4.x differences.
+
+version 1.4.0 [December 30, 2009]
   No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
