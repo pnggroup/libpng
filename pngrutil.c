@@ -1,8 +1,8 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.0 [December 29, 2009]
- * Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.0 [January 1, 2010]
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -3285,9 +3285,12 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (row_bytes + 48 > png_ptr->old_big_row_buf_size)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
-     png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
      if (png_ptr->interlaced)
-       png_memset(png_ptr->big_row_buf, 0, row_bytes + 48);
+        png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr,
+            row_bytes + 48);
+     else
+        png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr,
+            row_bytes + 48);
      png_ptr->old_big_row_buf_size = row_bytes + 48;
 
 #ifdef PNG_ALIGNED_MEMORY_SUPPORTED
