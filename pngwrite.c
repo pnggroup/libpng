@@ -1,8 +1,8 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.2.41 [December 3, 2009]
- * Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ * Last changed in libpng 1.2.42 [January 1, 2010]
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -415,12 +415,12 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
     * do not set png_ptr->output_flush_fn to crash.  If your application
     * experiences a problem, please try building libpng with
     * PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED defined, and report the event to
-    * png-mng-implement at lists.sf.net .  This kludge will be removed
-    * from libpng-1.4.0.
+    * png-mng-implement at lists.sf.net .
     */
-#if defined(PNG_WRITE_FLUSH_SUPPORTED) && \
-    defined(PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED)
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
+#  ifdef PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED
    png_flush(png_ptr);
+#  endif
 #endif
 }
 

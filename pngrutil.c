@@ -3206,9 +3206,14 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
      if (png_ptr->interlaced)
-        png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr, row_bytes + 64);
+        png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr,
+            row_bytes + 64);
      else
-        png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 64);
+        png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr,
+            row_bytes + 64);
+     png_ptr->old_big_row_buf_size = row_bytes + 64;
+
+     /* Use 32 bytes of padding before and after row_buf. */
      png_ptr->row_buf = png_ptr->big_row_buf + 32;
      png_ptr->old_big_row_buf_size = row_bytes + 64;
    }

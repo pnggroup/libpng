@@ -280,7 +280,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    {
       jmp_buf jmpbuf;
       png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
-      longjmp(jmpbuf, 1);
+     longjmp(jmpbuf,1);
    }
 #  else
    longjmp(png_ptr->jmpbuf, 1);

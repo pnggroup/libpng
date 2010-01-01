@@ -558,6 +558,7 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
    else
       png_warning(png_ptr,
       "Ignoring extra png_read_update_info() call; row buffer not reallocated");
+
    png_read_transform_info(png_ptr, info_ptr);
 }
 
