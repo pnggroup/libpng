@@ -1,5 +1,5 @@
 
-Libpng 1.0.52rc01 - December 23, 2009
+Libpng 1.0.52rc02 - January 1, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.52rc01.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.52rc01.tar.gz
-   libpng-1.0.52rc01.tar.bz2
+   libpng-1.0.52rc02.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.52rc02.tar.gz
+   libpng-1.0.52rc02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.52rc01-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.52rc01-no-config.tar.gz
-   libpng-1.0.52rc01-no-config.tar.bz2
+   libpng-1.0.52rc02-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.52rc02-no-config.tar.gz
+   libpng-1.0.52rc02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1052r01.zip
-   lp1052r01.7z
-   lp1052r01.tar.bz2
+   lp1052r02.zip
+   lp1052r02.7z
+   lp1052r02.tar.bz2
 
 Project files
 
-   libpng-1.0.52rc01-project-netware.zip
-   libpng-1.0.52rc01-project-wince.zip
+   libpng-1.0.52rc02-project-netware.zip
+   libpng-1.0.52rc02-project-wince.zip
 
 Other information:
 
-   libpng-1.0.52rc01-README.txt
-   libpng-1.0.52rc01-KNOWNBUGS.txt
-   libpng-1.0.52rc01-LICENSE.txt
-   libpng-1.0.52rc01-Y2K-compliance.txt
-   libpng-1.0.52rc01-[previous version]-diff.txt
+   libpng-1.0.52rc02-README.txt
+   libpng-1.0.52rc02-KNOWNBUGS.txt
+   libpng-1.0.52rc02-LICENSE.txt
+   libpng-1.0.52rc02-Y2K-compliance.txt
+   libpng-1.0.52rc02-[previous version]-diff.txt
 
 Changes since the last public release (1.0.51):
 
@@ -65,7 +65,16 @@ version 1.2.42rc02 [December 22, 2009]
   Renamed libpng-pc.in back to libpng.pc.in and revised CMakeLists.txt
     (revising changes made in 1.2.41beta17 and 1.2.41rc01)
 
-version 1.0.52 and 1.2.42 [December 23, 2009]
+version 1.2.42rc03 [December 25, 2009]
+  Marked png_memcpy_check() and png_memset_check() PNG_DEPRECATED.
+  Swapped PNG_UNKNOWN_CHUNKS_SUPPORTED and PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+    in pngset.c to be consistent with other changes in version 1.2.38.
+
+version 1.2.42rc04 [January 1, 2010]
+  Marked png_memcpy_check() and png_memset_check() PNG_DEPRECATED.
+  Updated copyright year.
+
+version 1.0.52 and 1.2.42 [January 1, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.2.41 [December 23, 2009]
+ * Last changed in libpng 1.2.41 [December 3, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -280,7 +280,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    {
       jmp_buf jmpbuf;
       png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
-      longjmp(jmpbuf, 1);
+     longjmp(jmpbuf,1);
    }
 #  else
    longjmp(png_ptr->jmpbuf, 1);

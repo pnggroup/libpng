@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.41 [December 23, 2009]
+ * Last changed in libpng 1.2.41 [December 3, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -558,6 +558,7 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
    else
       png_warning(png_ptr,
       "Ignoring extra png_read_update_info() call; row buffer not reallocated");
+
    png_read_transform_info(png_ptr, info_ptr);
 }
 
