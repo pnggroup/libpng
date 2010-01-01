@@ -1,4 +1,4 @@
-README for libpng version 1.5.0alpha01 - December 12, 2009 (shared library 14.0)
+README for libpng version 1.5.0alpha01 - January 1, 2010 (shared library 14.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -245,7 +245,7 @@ Files in this distribution:
 
 Good luck, and happy coding.
 
--Glenn Randers-Pehrson (current maintainer)
+-Glenn Randers-Pehrson (current maintainer, since 1998)
  Internet: glennrp at users.sourceforge.net
 
 -Andreas Eric Dilger (former maintainer, 1996-1997)
