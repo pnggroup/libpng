@@ -1,8 +1,8 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.0 [December 29, 2009]
- * Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.0 [January 1, 2010]
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -231,11 +231,12 @@ png_chunk_benign_error(png_structp png_ptr, png_const_charp error_message)
 #endif /* PNG_READ_SUPPORTED */
 
 #ifdef PNG_SETJMP_SUPPORTED
-/* This API only exists if ANSI-C style error handling is used, otherwise
- * it is necessary for png_default_error to be overridden.
+/* This API only exists if ANSI-C style error handling is used,
+ * otherwise it is necessary for png_default_error to be overridden.
  */
 jmp_buf* PNGAPI
-png_set_longjmp_fn(png_structp png_ptr, png_longjmp_ptr longjmp_fn, size_t jmp_buf_size)
+png_set_longjmp_fn(png_structp png_ptr, png_longjmp_ptr longjmp_fn,
+    size_t jmp_buf_size)
 {
    if (png_ptr == NULL || jmp_buf_size != png_sizeof(jmp_buf))
       return NULL;
@@ -295,7 +296,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    {
       jmp_buf jmpbuf;
       png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
-      png_ptr->longjmp_fn(jmpbuf, 1);
+     png_ptr->longjmp_fn(jmpbuf, 1);
    }
 #  else
    png_ptr->longjmp_fn(png_ptr->jmpbuf, 1);

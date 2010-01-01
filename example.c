@@ -2,9 +2,9 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.4.0 [December 29, 2009]
+ * Last changed in libpng 1.4.0 [January 1, 2010]
  * This file has been placed in the public domain by the authors.
- * Maintained 1998-2009 Glenn Randers-Pehrson
+ * Maintained 1998-2010 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */

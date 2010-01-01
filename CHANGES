@@ -762,6 +762,7 @@ version 1.4.0rc06 [December 29, 2009]
 version 1.4.0rc07 [January 1, 2010]
   Revised libpng*.txt and libpng.3 about 1.2.x->1.4.x differences.
   Use png_calloc() instead of png_malloc(); png_memset() in pngrutil.c
+  Update copyright year to 2010.
 
 version 1.4.0 [January 1, 2010]
   No changes.
