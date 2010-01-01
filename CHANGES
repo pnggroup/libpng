@@ -2632,6 +2632,10 @@ version 1.2.42rc03 [December 25, 2009]
   Swapped PNG_UNKNOWN_CHUNKS_SUPPORTED and PNG_HANDLE_AS_UNKNOWN_SUPPORTED
     in pngset.c to be consistent with other changes in version 1.2.38.
 
+version 1.2.42rc04 [January 1, 2010]
+  Marked png_memcpy_check() and png_memset_check() PNG_DEPRECATED.
+  Updated copyright year.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
