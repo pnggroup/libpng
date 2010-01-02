@@ -2437,7 +2437,7 @@ version 1.4.1alpha02 [December 11, 2009]
     change in version 1.2.41beta08 caused transparency to be handled wrong
     in some 16-bit datastreams (Yusaku Sugai).
 
-version 1.5.0alpha01 [January 1, 2010]
+version 1.5.0alpha01 [January 2, 2010]
   Bump version to 1.5.0alpha01
   Add "depth" parameter to private png_build_gamma_table()
   Declared png_cleanup_needed "volatile" in pngread.c and pngwrite.c
@@ -2448,6 +2448,8 @@ version 1.5.0alpha01 [January 1, 2010]
   Changed "libpng-pc.in" to "libpng.pc.in" in configure.ac, configure, and
     Makefile.in to be consistent with changes in libpng-1.4.0rc03
   Updated copyright year to 2010.
+  Avoid deprecated references to png_ptr-io_ptr and png_ptr->error_ptr
+    in pngtest.c
 
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
