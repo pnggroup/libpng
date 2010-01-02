@@ -59,7 +59,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386
-# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_Release\libpng14.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Release"
+# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_Release\libpng15.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Release"
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL Debug"
 
@@ -90,7 +90,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 zlib1d.lib /nologo /dll /debug /machine:I386 /out:"Win32_DLL_Debug\libpng14d.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Debug"
+# ADD LINK32 zlib1d.lib /nologo /dll /debug /machine:I386 /out:"Win32_DLL_Debug\libpng15d.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Debug"
 
 !ELSEIF  "$(CFG)" == "libpng - Win32 DLL VB"
 
@@ -121,10 +121,10 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386
-# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_VB\libpng14vb.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Release"
+# ADD LINK32 zlib1.lib /nologo /dll /machine:I386 /out:"Win32_DLL_VB\libpng15vb.dll" /libpath:"..\..\..\zlib\projects\visualc6\Win32_DLL_Release"
 # Begin Special Build Tool
 OutDir=.\Win32_DLL_VB
-TargetName=libpng14vb
+TargetName=libpng15vb
 SOURCE="$(InputPath)"
 PostBuild_Cmds=echo    Deleting $(targetname) import library and export file (Not required for VB projects)	del $(outdir)\$(targetname).lib	del $(outdir)\$(targetname).exp
 # End Special Build Tool

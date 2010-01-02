@@ -6,7 +6,7 @@
 # and license in png.h
 
 PREFIX?=        /usr/local
-SHLIB_VER?=     14
+SHLIB_VER?=     15
 
 LIB=		png
 SHLIB_MAJOR=	${SHLIB_VER}

@@ -10,8 +10,8 @@
 # and license in png.h
 
 # Library name:
-LIBNAME = libpng14
-PNGMAJ = 14
+LIBNAME = libpng15
+PNGMAJ = 15
 PNGMIN = 1.5.0alpha01
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
@@ -20,8 +20,8 @@ LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).so.$(PNGVER)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.14
-OLDSOVER=libpng.so.14.$(PNGMIN)
+OLDSOMAJ=libpng.so.15
+OLDSOVER=libpng.so.15.$(PNGMIN)
 
 # Utilities:
 CC=cc
@@ -42,7 +42,7 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CFLAGS= -dy -belf -I$(ZLIBINC) -O3
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz -lm
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng15 -lz -lm
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -86,7 +86,7 @@ libpng.pc:
 	-e s!@exec_prefix@!$(exec_prefix)! \
 	-e s!@libdir@!$(LIBPATH)! \
 	-e s!@includedir@!$(INCPATH)! \
-	-e s!-lpng14!-lpng14\ -lz\ -lm! > libpng.pc
+	-e s!-lpng15!-lpng15\ -lz\ -lm! > libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
@@ -94,7 +94,7 @@ libpng-config:
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo ccopts=\"-belf\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng14 -lz -lm\"; \
+	echo libs=\"-lpng15 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 

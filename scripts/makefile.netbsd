@@ -8,7 +8,7 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-# You should also run makefile.ne14bsd
+# You should also run makefile.ne15bsd
 
 LOCALBASE?=/usr/local
 LIBDIR=	${LOCALBASE}/lib

@@ -16,7 +16,7 @@ AUTOMAKE_OPTIONS = foreign
 # test programs - run on make check, make distcheck
 check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
-pngtest_LDADD = libpng14.la
+pngtest_LDADD = libpng15.la
 TESTS = test-pngtest.sh
 TESTS_ENVIRONMENT= srcdir=$(srcdir) 
 
@@ -24,33 +24,33 @@ TESTS_ENVIRONMENT= srcdir=$(srcdir)
 dist_man_MANS= libpng.3 libpngpf.3 png.5
 
 # generate the -config scripts if required
-binconfigs= libpng14-config 
-EXTRA_SCRIPTS= libpng-config libpng14-config
+binconfigs= libpng15-config 
+EXTRA_SCRIPTS= libpng-config libpng15-config
 bin_SCRIPTS= @binconfigs@
 
 # rules to build libpng, only build the old library on request
-lib_LTLIBRARIES=libpng14.la
+lib_LTLIBRARIES=libpng15.la
 EXTRA_LTLIBRARIES= libpng.la
-libpng14_la_SOURCES = png.c pngset.c pngget.c pngrutil.c \
+libpng15_la_SOURCES = png.c pngset.c pngget.c pngrutil.c \
 	pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
 	png.h pngconf.h pngpriv.h
 
-libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
+libpng15_la_CPPFLAGS = @LIBPNG_DEFINES@
 
 # MAJOR UPGRADE: the version-number settings below must be changed.
-libpng14_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_RELEASE@:0
+libpng15_la_LDFLAGS = -no-undefined -export-dynamic \
+	-version-number 15:@PNGLIB_RELEASE@:0
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
-  libpng14_la_LDFLAGS += -Wl,--version-script=libpng.vers
-  libpng14_la_DEPENDENCIES = libpng.vers
+  libpng15_la_LDFLAGS += -Wl,--version-script=libpng.vers
+  libpng15_la_DEPENDENCIES = libpng.vers
 else
   # Only restricted exports when possible
-  libpng14_la_LDFLAGS += -export-symbols libpng.sym
-  libpng14_la_DEPENDENCIES = libpng.sym
+  libpng15_la_LDFLAGS += -export-symbols libpng.sym
+  libpng15_la_DEPENDENCIES = libpng.sym
 endif
 
 # Avoid depending upon Character Ranges.
@@ -63,7 +63,7 @@ pkginclude_HEADERS= png.h pngconf.h
 # pkg-config stuff, note that libpng.pc is always required in order
 # to get the correct library
 pkgconfigdir = @pkgconfigdir@
-pkgconfig_DATA = libpng14.pc
+pkgconfig_DATA = libpng15.pc
 
 #extra source distribution files.
 EXTRA_DIST= \
@@ -82,7 +82,7 @@ EXTRA_DIST= \
 	$(TESTS) \
 	example.c libpng-1.5.0alpha01.txt
 
-CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers \
+CLEANFILES= pngout.png libpng15.pc libpng15-config libpng.vers \
 libpng.sym
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
@@ -121,7 +121,7 @@ install-data-hook:
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
-# do evil things to libpng to cause libpng14 to be used
+# do evil things to libpng to cause libpng15 to be used
 install-exec-hook:
 	cd $(DESTDIR)$(bindir); rm -f libpng-config
 	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
