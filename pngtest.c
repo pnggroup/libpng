@@ -312,12 +312,17 @@ static int wrote_question = 0;
 static void
 pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   png_size_t check;
+   png_size_t check = 0;
+   png_voidp io_ptr;
 
    /* fread() returns 0 on error, so it is OK to store this in a png_size_t
     * instead of an int, which is what fread() actually returns.
     */
-   READFILE((png_FILE_p)png_ptr->io_ptr, data, length, check);
+   io_ptr = png_get_io_ptr(png_ptr);
+   if (io_ptr != NULL)
+   {
+      READFILE((png_FILE_p)io_ptr, data, length, check);
+   }
 
    if (check != length)
    {
@@ -457,9 +462,12 @@ static void
 pngtest_warning(png_structp png_ptr, png_const_charp message)
 {
    PNG_CONST char *name = "UNKNOWN (ERROR!)";
-   if (png_ptr != NULL && png_ptr->error_ptr != NULL)
-      name = png_ptr->error_ptr;
-   fprintf(STDERR, "%s: libpng warning: %s\n", name, message);
+   char *test;
+   test = png_get_error_ptr(png_ptr);
+   if (test == NULL)
+     fprintf(STDERR, "%s: libpng warning: %s\n", name, message);
+   else
+     fprintf(STDERR, "%s: libpng warning: %s\n", test, message);
 }
 
 /* This is the default error handling function.  Note that replacements for
@@ -1690,4 +1698,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_42rc04 your_png_h_is_not_version_1_2_42rc04;
+typedef version_1_2_42rc05 your_png_h_is_not_version_1_2_42rc05;

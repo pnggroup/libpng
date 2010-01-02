@@ -2636,6 +2636,10 @@ version 1.2.42rc04 [January 1, 2010]
   Marked png_memcpy_check() and png_memset_check() PNG_DEPRECATED.
   Updated copyright year.
 
+version 1.2.42rc05 [January 2, 2010]
+  Avoid deprecated references to png_ptr-io_ptr and png_ptr->error_ptr
+    in pngtest.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
