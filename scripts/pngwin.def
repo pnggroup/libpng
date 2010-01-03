@@ -1,16 +1,11 @@
-;----------------------------------------
-; PNG.LIB module definition file for OS/2
-;----------------------------------------
+;------------------------------------------
+; LIBPNG module definition file for Windows
+;------------------------------------------
 
-; Version 1.4.0
-
-LIBRARY		PNG
-DESCRIPTION	"PNG image compression library for OS/2"
-CODE		PRELOAD MOVEABLE DISCARDABLE
-DATA		PRELOAD MOVEABLE MULTIPLE
+LIBRARY
 
 EXPORTS
-
+;Version 1.4.0
   png_build_grayscale_palette
   png_chunk_error
   png_chunk_warning
@@ -168,40 +163,40 @@ EXPORTS
   png_write_png
   png_write_row
   png_write_rows
-  png_write_sig
   png_access_version_number
   png_init_io
   png_convert_to_rfc1123
   png_set_invalid
-
-; Added at version 1.2.0:
-  png_permit_empty_plte
+; Added at version 1.0.12
+  png_info_init_3
+  png_destroy_struct
+; Added at version 1.2.0
+; For use with PNG_USER_MEM_SUPPORTED
+  png_destroy_struct_2
+  png_create_read_struct_2
+  png_create_write_struct_2
+  png_malloc_default
+  png_free_default
+; MNG features
   png_permit_mng_features
-
-; Added at version 1.2.2:
+; Added at version 1.2.2
   png_handle_as_unknown
-
-; Added at version 1.2.2 and deleted from 1.2.3:
+; Added at version 1.2.2 and deleted from 1.2.3
 ; png_zalloc
 ; png_zfree
-
 ; Added at version 1.2.4
   png_malloc_warn
-
-; Added at version 1.2.6
-  png_set_user_limits
   png_get_user_height_max
   png_get_user_width_max
+  png_set_user_limits
 ; Added at version 1.2.7
   png_set_add_alpha
-
 ; Added at version 1.2.9
   png_save_uint_32
   png_save_uint_16
   png_save_int_32
   png_get_uint_31
   png_set_expand_gray_1_2_4_to_8
-
 ; Added at version 1.2.41
   png_write_sig
 ; png_benign_error
@@ -215,37 +210,3 @@ EXPORTS
   png_check_cHRM_fixed
   png_calloc
   png_set_longjmp_fn
-
-; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
-  png_libpng_ver
-  png_pass_start
-  png_pass_inc
-  png_pass_ystart
-  png_pass_yinc
-  png_pass_mask
-  png_pass_dsp_mask
-; png_pass_width
-; png_pass_height
-
-; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
-  png_IHDR
-  png_IDAT
-  png_IEND
-  png_PLTE
-  png_bKGD
-  png_cHRM
-  png_gAMA
-  png_hIST
-  png_iCCP
-  png_iTXt
-  png_oFFs
-  png_pCAL
-  png_pHYs
-  png_sBIT
-  png_sCAL
-  png_sPLT
-  png_sRGB
-  png_tEXt
-  png_tIME
-  png_tRNS
-  png_zTXt

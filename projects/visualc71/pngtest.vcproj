@@ -18,7 +18,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_DLL;PNG_NO_STDIO;PNG_NO_GLOBAL_ARRAYS"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_DLL;PNG_NO_STDIO;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -65,103 +65,7 @@ $(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;PNG_DLL;PNG_NO_STDIO;PNG_NO_GLOBAL_ARRAYS"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				WarningLevel="3"
-				DebugInformationFormat="4"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"
-				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
-$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
-				Outputs="$(IntDir)\pngout.png"/>
-			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/pngtest.exe"
-				GenerateDebugInformation="TRUE"
-				SubSystem="1"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="DLL ASM Release|Win32"
-			OutputDirectory=".\Win32_DLL_ASM_Release\Test"
-			IntermediateDirectory=".\Win32_DLL_ASM_Release\Test"
-			ConfigurationType="1">
-			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_DLL;PNG_NO_STDIO;PNG_NO_GLOBAL_ARRAYS"
-				StringPooling="TRUE"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				WarningLevel="3"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"
-				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
-$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
-				Outputs="$(IntDir)\pngout.png"/>
-			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/pngtest.exe"
-				LinkIncremental="1"
-				SubSystem="1"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="DLL ASM Debug|Win32"
-			OutputDirectory=".\Win32_DLL_ASM_Debug\Test"
-			IntermediateDirectory=".\Win32_DLL_ASM_Debug\Test"
-			ConfigurationType="1">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;PNG_DLL;PNG_NO_STDIO;PNG_NO_GLOBAL_ARRAYS"
+				PreprocessorDefinitions="WIN32;_DEBUG;PNG_DLL;PNG_NO_STDIO;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
@@ -209,7 +113,7 @@ $(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_DLL;PNG_NO_STDIO;PNG_NO_GLOBAL_ARRAYS;PNGAPI=__stdcall"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_DLL;PNG_NO_STDIO;PNGAPI=__stdcall;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -226,7 +130,7 @@ $(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/pngtest.exe"
 				LinkIncremental="1"
-				IgnoreDefaultLibraryNames="$(IntDir)\libpng13vb.lib"
+				IgnoreDefaultLibraryNames="$(IntDir)\libpng14b.lib"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -259,7 +163,7 @@ $(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;PNG_NO_GLOBAL_ARRAYS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -307,103 +211,7 @@ $(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;PNG_NO_GLOBAL_ARRAYS"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				WarningLevel="3"
-				DebugInformationFormat="4"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"
-				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
-$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
-				Outputs="$(IntDir)\pngout.png"/>
-			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/pngtest.exe"
-				GenerateDebugInformation="TRUE"
-				SubSystem="1"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="LIB ASM Release|Win32"
-			OutputDirectory=".\Win32_LIB_ASM_Release\Test"
-			IntermediateDirectory=".\Win32_LIB_ASM_Release\Test"
-			ConfigurationType="1">
-			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_NO_GLOBAL_ARRAYS"
-				StringPooling="TRUE"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				WarningLevel="3"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"
-				Description="Testing..."
-				CommandLine="set path=$(OutDir)\..;$(OutDir)\..\ZLib
-$(TargetPath) ..\..\pngtest.png $(IntDir)\pngout.png"
-				Outputs="$(IntDir)\pngout.png"/>
-			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/pngtest.exe"
-				LinkIncremental="1"
-				SubSystem="1"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="LIB ASM Debug|Win32"
-			OutputDirectory=".\Win32_LIB_ASM_Debug\Test"
-			IntermediateDirectory=".\Win32_LIB_ASM_Debug\Test"
-			ConfigurationType="1">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;PNG_NO_GLOBAL_ARRAYS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"

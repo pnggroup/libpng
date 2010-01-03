@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.42 - January 3, 2010
+ libpng version 1.4.0 - January 3, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.42 - January 3, 2010
+ libpng versions 0.97, January 1998, through 1.4.0 - January 3, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -649,11 +649,11 @@ pointer into the info_ptr is returned for any complex types.
                      whichever are appropriate for the
                      given color type (png_color_16)
 
-    png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans,
-                     &trans_values);
-    trans          - array of transparent
+    png_get_tRNS(png_ptr, info_ptr, &trans_alpha,
+                     &num_trans, &trans_color);
+    trans_alpha    - array of alpha (transparency)
                      entries for palette (PNG_INFO_tRNS)
-    trans_values   - graylevel or color sample values of
+    trans_color    - graylevel or color sample values of
                      the single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
     num_trans      - number of transparent entries
@@ -878,7 +878,7 @@ things.
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
-As of libpng version 1.2.42, not all possible expansions are supported.
+As of libpng version 1.4.0, not all possible expansions are supported.
 
 In the following table, the 01 means grayscale with depth<8, 31 means
 indexed with depth<8, other numerals represent the color type, "T" means
@@ -937,15 +937,6 @@ fully opaque and 255 (in 8-bit or paletted images) or 65535 (in 16-bit
 images) is fully transparent, with
 
     png_set_invert_alpha(png_ptr);
-
-The PNG format only supports pixels with postmultiplied alpha.
-If you want to replace the pixels, after reading them, with pixels
-that have premultiplied color samples, you can do this with
-
-    png_set_premultiply_alpha(png_ptr);
-
-If you do this, any input with a tRNS chunk will be expanded to
-have an alpha channel.
 
 PNG files pack pixels of bit depths 1, 2, and 4 into bytes as small as
 they can, resulting in, for example, 8 pixels per byte for 1 bit
@@ -1146,40 +1137,6 @@ recommended that PNG viewers support gamma correction.
       png_set_gamma(png_ptr, screen_gamma, gamma);
    else
       png_set_gamma(png_ptr, screen_gamma, 0.45455);
-
-If you need to reduce an RGB file to a paletted file, or if a paletted
-file has more entries then will fit on your screen, png_set_dither()
-will do that.  Note that this is a simple match dither that merely
-finds the closest color available.  This should work fairly well with
-optimized palettes, and fairly badly with linear color cubes.  If you
-pass a palette that is larger then maximum_colors, the file will
-reduce the number of colors in the palette so it will fit into
-maximum_colors.  If there is a histogram, it will use it to make
-more intelligent choices when reducing the palette.  If there is no
-histogram, it may not do as good a job.
-
-   if (color_type & PNG_COLOR_MASK_COLOR)
-   {
-      if (png_get_valid(png_ptr, info_ptr,
-         PNG_INFO_PLTE))
-      {
-         png_uint_16p histogram = NULL;
-
-         png_get_hIST(png_ptr, info_ptr,
-            &histogram);
-         png_set_dither(png_ptr, palette, num_palette,
-            max_screen_colors, histogram, 1);
-      }
-      else
-      {
-         png_color std_color_cube[MAX_SCREEN_COLORS] =
-            { ... colors ... };
-
-         png_set_dither(png_ptr, std_color_cube,
-            MAX_SCREEN_COLORS, MAX_SCREEN_COLORS,
-            NULL,0);
-      }
-   }
 
 PNG files describe monochrome as black being zero and white being one.
 The following code will reverse this (make black be one and white be
@@ -1928,11 +1885,11 @@ width, height, bit_depth, and color_type must be the same in each call.
                      appropriate for the given color type
                      (png_color_16)
 
-    png_set_tRNS(png_ptr, info_ptr, trans, num_trans,
-       trans_values);
-    trans          - array of transparent
+    png_set_tRNS(png_ptr, info_ptr, trans_alpha,
+       num_trans, trans_color);
+    trans_alpha    - array of alpha (transparency)
                      entries for palette (PNG_INFO_tRNS)
-    trans_values   - graylevel or color sample values
+    trans_color    - graylevel or color sample values
                      (in order red, green, blue) of the
                      single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
@@ -2673,10 +2630,10 @@ Configuring for compiler xxx:
 
 All includes for libpng are in pngconf.h.  If you need to add, change
 or delete an include, this is the place to do it.
-The includes that are not needed outside libpng are protected by the
-PNG_INTERNAL definition, which is only defined for those routines inside
-libpng itself.  The files in libpng proper only include png.h, which
-includes pngconf.h.
+The includes that are not needed outside libpng are placed in pngpriv.h,
+which is only used by the routines inside libpng itself.
+The files in libpng proper only include pngpriv.h and png.h, which
+in turn includes pngconf.h.
 
 Configuring zlib:
 
@@ -3038,8 +2995,94 @@ which also expands tRNS to alpha was replaced with
     png_set_expand_gray_1_2_4_to_8()
 which does not. It has been deprecated since libpng-1.0.18 and 1.2.9.
 
-IX.  (Omitted)
+IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
 
+Private libpng prototypes and macro definitions were moved from
+png.h and pngconf.h into a new pngpriv.h header file.
+
+Functions png_set_benign_errors(), png_benign_error(), and
+png_chunk_benign_error() were added.
+
+Support for setting the maximum amount of memory that the application
+will allocate for reading chunks was added, as a security measure.
+The functions png_set_chunk_cache_max() and png_get_chunk_cache_max()
+were added to the library.
+
+We implemented support for I/O states by adding png_ptr member io_state
+and functions png_get_io_chunk_name() and png_get_io_state() in pngget.c
+
+We added PNG_TRANSFORM_GRAY_TO_RGB to the available high-level
+input transforms.
+
+Checking for and reporting of errors in the IHDR chunk is more thorough.
+
+Support for global arrays was removed, to improve thread safety.
+
+Some obsolete/deprecated macros and functions have been removed.
+
+Typecasted NULL definitions such as
+   #define png_voidp_NULL            (png_voidp)NULL
+were eliminated.  If you used these in your application, just use
+NULL instead.
+
+The png_struct and info_struct members "trans" and "trans_values" were
+changed to "trans_alpha" and "trans_color", respectively.
+
+The obsolete, unused pnggccrd.c and pngvcrd.c files and related makefiles
+were removed.
+
+The PNG_1_0_X and PNG_1_2_X macros were eliminated.
+
+The PNG_LEGACY_SUPPORTED macro was eliminated.
+
+Many WIN32_WCE #ifdefs were removed.
+
+The functions png_read_init(info_ptr), png_write_init(info_ptr),
+png_info_init(info_ptr), png_read_destroy(), and png_write_destroy()
+have been removed.  They have been deprecated since libpng-0.95.
+
+The png_permit_empty_plte() was removed. It has been deprecated
+since libpng-1.0.9.  Use png_permit_mng_features() instead.
+
+We removed the obsolete stub functions png_get_mmx_flagmask(),
+png_set_mmx_thresholds(), png_get_asm_flags(),
+png_get_mmx_bitdepth_threshold(), png_get_mmx_rowbytes_threshold(),
+png_set_asm_flags(), and png_mmx_supported()
+
+We removed the obsolete png_check_sig(), png_memcpy_check(), and
+png_memset_check() functions.  Instead use !png_sig_cmp(), png_memcpy(),
+and png_memset(), respectively.
+
+The function png_set_gray_1_2_4_to_8() was removed. It has been
+deprecated since libpng-1.0.18 and 1.2.9, when it was replaced with
+png_set_expand_gray_1_2_4_to_8() because the former function also
+expanded palette images.
+
+We changed the prototype for png_malloc() from
+    png_malloc(png_structp png_ptr, png_uint_32 size)
+to
+    png_malloc(png_structp png_ptr, png_alloc_size_t size)
+
+The png_calloc() function was added and is used in place of
+of "png_malloc(); png_memset();" except in the case in png_read_png()
+where the array consists of pointers; in this case a "for" loop is used
+after the png_malloc() to set the pointers to NULL, to give robust.
+behavior in case the application runs out of memory part-way through
+the process.
+
+We changed the prototypes of png_get_compression_buffer_size() and
+png_set_compression_buffer_size() to work with png_size_t instead of
+png_uint_32.
+
+Support for numbered error messages was removed by default, since we
+never got around to actually numbering the error messages. The function
+png_set_strip_error_numbers() was removed from the library by default.
+
+The png_zalloc() and png_zfree() functions are no longer exported.
+The png_zalloc() function no longer zeroes out the memory that it
+allocates.
+
+We removed the trailing '.' from the warning and error messages.
 
 X. Detecting libpng
 
@@ -3149,7 +3192,7 @@ We mark all non-exported functions with "/* PRIVATE */"":
 
 The prototypes for non-exported functions (except for those in
 pngtest) appear in
-the PNG_INTERNAL section of png.h
+pngpriv.h
 above the comment that says
 
   /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
@@ -3185,7 +3228,7 @@ Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.42 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.0 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

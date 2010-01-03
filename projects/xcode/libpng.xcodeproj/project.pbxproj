@@ -26,6 +26,7 @@
 		14461C8209C3C37F005840C0 /* pngwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = 14461C6E09C3C37F005840C0 /* pngwrite.c */; };
 		14461C8309C3C37F005840C0 /* pngwtran.c in Sources */ = {isa = PBXBuildFile; fileRef = 14461C6F09C3C37F005840C0 /* pngwtran.c */; };
 		14461C8409C3C37F005840C0 /* pngwutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 14461C7009C3C37F005840C0 /* pngwutil.c */; };
+		67FA470510693F6B0078FB9E /* pngpriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 67FA470410693F6B0078FB9E /* pngpriv.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,7 @@
 		14461C6E09C3C37F005840C0 /* pngwrite.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pngwrite.c; path = ../../pngwrite.c; sourceTree = SOURCE_ROOT; };
 		14461C6F09C3C37F005840C0 /* pngwtran.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pngwtran.c; path = ../../pngwtran.c; sourceTree = SOURCE_ROOT; };
 		14461C7009C3C37F005840C0 /* pngwutil.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pngwutil.c; path = ../../pngwutil.c; sourceTree = SOURCE_ROOT; };
+		67FA470410693F6B0078FB9E /* pngpriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pngpriv.h; path = ../../pngpriv.h; sourceTree = SOURCE_ROOT; };
 		8D07F2C70486CC7A007CD1D0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D07F2C80486CC7A007CD1D0 /* libpng.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = libpng.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -92,6 +94,7 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				67FA470410693F6B0078FB9E /* pngpriv.h */,
 				14461C5D09C3C37F005840C0 /* png.c */,
 				14461C5E09C3C37F005840C0 /* png.h */,
 				14461C5F09C3C37F005840C0 /* pngconf.h */,
@@ -124,6 +127,7 @@
 			files = (
 				14461C7209C3C37F005840C0 /* png.h in Headers */,
 				14461C7309C3C37F005840C0 /* pngconf.h in Headers */,
+				67FA470510693F6B0078FB9E /* pngpriv.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,9 +224,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
-				DYLIB_COMPATIBILITY_VERSION = 3;
-				DYLIB_CURRENT_VERSION = 3;
-				FRAMEWORK_VERSION = 1.2.42;
+				DYLIB_COMPATIBILITY_VERSION = 14;
+				DYLIB_CURRENT_VERSION = 14;
+				FRAMEWORK_VERSION = 1.4.0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = Info.plist;
@@ -238,9 +242,9 @@
 		4FADC24408B4156D00ABE55E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 3;
-				DYLIB_CURRENT_VERSION = 3;
-				FRAMEWORK_VERSION = 1.2.42;
+				DYLIB_COMPATIBILITY_VERSION = 14;
+				DYLIB_CURRENT_VERSION = 14;
+				FRAMEWORK_VERSION = 1.4.0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = Info.plist;

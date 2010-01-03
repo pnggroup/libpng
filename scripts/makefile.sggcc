@@ -1,4 +1,4 @@
-# makefile for libpng.a and libpng12.so, SGI IRIX with 'cc'
+# makefile for libpng.a and libpng14.so, SGI IRIX with 'cc'
 # Copyright (C) 2001-2002, 2006 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
@@ -7,9 +7,9 @@
 # and license in png.h
 
 # Library name:
-LIBNAME=libpng12
-PNGMAJ = 0
-PNGMIN = 1.2.42
+LIBNAME=libpng14
+PNGMAJ = 14
+PNGMIN = 1.4.0
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -17,8 +17,8 @@ LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).so.$(PNGVER)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.3
-OLDSOVER=libpng.so.3.$(PNGMIN)
+OLDSOMAJ=libpng.so.14
+OLDSOVER=libpng.so.14.$(PNGMIN)
 
 # Utilities:
 AR_RC=ar rc
@@ -28,7 +28,7 @@ LN_SF=ln -sf
 RANLIB=echo
 RM_F=/bin/rm -f
 
-# Where make install puts libpng.a, libpng12.so, and libpng12/png.h
+# Where make install puts libpng.a, libpng14.so, and libpng14/png.h
 # Prefix must be a full pathname.
 
 prefix=/usr/local
@@ -47,7 +47,7 @@ ZLIBINC=../zlib
 ABI=
 
 WARNMORE= # -g -DPNG_DEBUG=5
-CFLAGS=$(ABI) -I$(ZLIBINC) -O $(WARNMORE) -fPIC -mabi=n32 -DPNG_NO_MMX_CODE
+CFLAGS=$(ABI) -I$(ZLIBINC) -O $(WARNMORE) -fPIC -mabi=n32
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=cc $(ABI) -shared -soname $(LIBSOMAJ) \
   -set_version sgi$(PNGMAJ).0
@@ -93,18 +93,18 @@ libpng.pc:
 	-e s!@exec_prefix@!$(exec_prefix)! \
 	-e s!@libdir@!$(LIBPATH)! \
 	-e s!@includedir@!$(INCPATH)! \
-	-e s!-lpng12!-lpng12\ -lz\ -lm! > libpng.pc
+	-e s!-lpng14!-lpng14\ -lz\ -lm! > libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo ccopts=\"$(ABI)\"; \
-	echo cppflags=\"-DPNG_NO_MMX_CODE\"; \
+	echo cppflags=\"\"; \
 	echo ldopts=\"$(ABI)\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo libdir=\"$(LIBPATH)\"; \
-	echo libs=\"-lpng12 -lz -lm\"; \
+	echo libs=\"-lpng14 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -224,20 +224,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o: png.h pngconf.h
-pngerror.o: png.h pngconf.h
-pngrio.o: png.h pngconf.h
-pngwio.o: png.h pngconf.h
-pngmem.o: png.h pngconf.h
-pngset.o: png.h pngconf.h
-pngget.o: png.h pngconf.h
-pngread.o: png.h pngconf.h
-pngrtran.o: png.h pngconf.h
-pngrutil.o: png.h pngconf.h
-pngtrans.o: png.h pngconf.h
-pngwrite.o: png.h pngconf.h
-pngwtran.o: png.h pngconf.h
-pngwutil.o: png.h pngconf.h
-pngpread.o: png.h pngconf.h
+png.o: png.h pngconf.h pngpriv.h
+pngerror.o: png.h pngconf.h pngpriv.h
+pngrio.o: png.h pngconf.h pngpriv.h
+pngwio.o: png.h pngconf.h pngpriv.h
+pngmem.o: png.h pngconf.h pngpriv.h
+pngset.o: png.h pngconf.h pngpriv.h
+pngget.o: png.h pngconf.h pngpriv.h
+pngread.o: png.h pngconf.h pngpriv.h
+pngrtran.o: png.h pngconf.h pngpriv.h
+pngrutil.o: png.h pngconf.h pngpriv.h
+pngtrans.o: png.h pngconf.h pngpriv.h
+pngwrite.o: png.h pngconf.h pngpriv.h
+pngwtran.o: png.h pngconf.h pngpriv.h
+pngwutil.o: png.h pngconf.h pngpriv.h
+pngpread.o: png.h pngconf.h pngpriv.h
 
 pngtest.o: png.h pngconf.h

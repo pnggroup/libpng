@@ -21,9 +21,9 @@ RANLIB = ranlib
 RM_F = rm -f
 LN_SF = ln -f -s
 
-LIBNAME=libpng12
-PNGMAJ = 0
-PNGMIN = 1.2.42
+LIBNAME=libpng14
+PNGMAJ = 14
+PNGMIN = 1.4.0
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
@@ -49,7 +49,7 @@ CRELEASE = -O2
 LDRELEASE = -s
 WARNMORE=-W -Wall
 CFLAGS = -I$(ZLIBINC) $(WARNMORE) $(CRELEASE)
-LDFLAGS = -L. -L$(ZLIBLIB) -lpng12 -lz -lm $(LDRELEASE)
+LDFLAGS = -L. -L$(ZLIBLIB) -lpng14 -lz -lm $(LDRELEASE)
 
 # File extensions
 O=.o
@@ -97,20 +97,20 @@ install: $(LIBNAME)$(A)
 clean:
 	$(RM_F) *.o $(LIBNAME)$(A) pngtest pngout.png
 
-png$(O):      png.h pngconf.h
-pngerror$(O): png.h pngconf.h
-pngget$(O):   png.h pngconf.h
-pngmem$(O):   png.h pngconf.h
-pngpread$(O): png.h pngconf.h
-pngread$(O):  png.h pngconf.h
-pngrio$(O):   png.h pngconf.h
-pngrtran$(O): png.h pngconf.h
-pngrutil$(O): png.h pngconf.h
-pngset$(O):   png.h pngconf.h
-pngtrans$(O): png.h pngconf.h
-pngwio$(O):   png.h pngconf.h
-pngwrite$(O): png.h pngconf.h
-pngwtran$(O): png.h pngconf.h
-pngwutil$(O): png.h pngconf.h
+png$(O):      png.h pngconf.h pngpriv.h
+pngerror$(O): png.h pngconf.h pngpriv.h
+pngget$(O):   png.h pngconf.h pngpriv.h
+pngmem$(O):   png.h pngconf.h pngpriv.h
+pngpread$(O): png.h pngconf.h pngpriv.h
+pngread$(O):  png.h pngconf.h pngpriv.h
+pngrio$(O):   png.h pngconf.h pngpriv.h
+pngrtran$(O): png.h pngconf.h pngpriv.h
+pngrutil$(O): png.h pngconf.h pngpriv.h
+pngset$(O):   png.h pngconf.h pngpriv.h
+pngtrans$(O): png.h pngconf.h pngpriv.h
+pngwio$(O):   png.h pngconf.h pngpriv.h
+pngwrite$(O): png.h pngconf.h pngpriv.h
+pngwtran$(O): png.h pngconf.h pngpriv.h
+pngwutil$(O): png.h pngconf.h pngpriv.h
 
 pngtest$(O):  png.h pngconf.h

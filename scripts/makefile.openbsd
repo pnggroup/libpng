@@ -11,7 +11,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.2.42
+SHLIB_MINOR=	1.4.0
 
 LIB=	png
 SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
@@ -21,7 +21,7 @@ SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
 HDRS=	png.h pngconf.h
 
 CFLAGS+= -W -Wall
-CPPFLAGS+= -I${.CURDIR} -DPNG_NO_MMX_CODE
+CPPFLAGS+= -I${.CURDIR}
 
 NOPROFILE= Yes
 

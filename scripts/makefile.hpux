@@ -19,9 +19,9 @@ ZLIBINC=/opt/zlib/include
 #   SHAREDLIB=libz.sl
 
 # Library name:
-LIBNAME = libpng12
-PNGMAJ = 0
-PNGMIN = 1.2.42
+LIBNAME = libpng14
+PNGMAJ = 14
+PNGMIN = 1.4.0
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
@@ -29,8 +29,8 @@ LIBSO=$(LIBNAME).sl
 LIBSOMAJ=$(LIBNAME).sl.$(PNGMAJ)
 LIBSOVER=$(LIBNAME).sl.$(PNGVER)
 OLDSO=libpng.sl
-OLDSOMAJ=libpng.sl.3
-OLDSOVER=libpng.sl.3.$(PNGMIN)
+OLDSOMAJ=libpng.sl.14
+OLDSOVER=libpng.sl.14.$(PNGMIN)
 
 # Utilities:
 AR_RC=ar rc
@@ -40,7 +40,7 @@ LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
 
-# where make install puts libpng.a, libpng12.sl, and png.h
+# where make install puts libpng.a, libpng14.sl, and png.h
 prefix=/opt/libpng
 exec_prefix=$(prefix)
 INCPATH=$(prefix)/include
@@ -48,7 +48,7 @@ LIBPATH=$(exec_prefix)/lib
 MANPATH=$(prefix)/man
 BINPATH=$(exec_prefix)/bin
 
-CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0 -DPNG_NO_MMX_CODE
+CFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
 # Caution: be sure you have built zlib with the same CFLAGS.
 CCFLAGS=-I$(ZLIBINC) -O -Ae +DA1.1 +DS2.0
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -lm
@@ -90,7 +90,7 @@ libpng.pc:
 	-e s!@exec_prefix@!$(exec_prefix)! \
 	-e s!@libdir@!$(LIBPATH)! \
 	-e s!@includedir@!$(INCPATH)! \
-	-e s!-lpng12!-lpng12\ -lz\ -lm! > libpng.pc
+	-e s!-lpng14!-lpng14\ -lz\ -lm! > libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
@@ -98,7 +98,7 @@ libpng-config:
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo ccopts=\"-Ae +DA1.1 +DS2.0\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng12 -lz -lm\"; \
+	echo libs=\"-lpng14 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -217,20 +217,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o: png.h pngconf.h
-pngerror.o: png.h pngconf.h
-pngrio.o: png.h pngconf.h
-pngwio.o: png.h pngconf.h
-pngmem.o: png.h pngconf.h
-pngset.o: png.h pngconf.h
-pngget.o: png.h pngconf.h
-pngread.o: png.h pngconf.h
-pngrtran.o: png.h pngconf.h
-pngrutil.o: png.h pngconf.h
-pngtrans.o: png.h pngconf.h
-pngwrite.o: png.h pngconf.h
-pngwtran.o: png.h pngconf.h
-pngwutil.o: png.h pngconf.h
-pngpread.o: png.h pngconf.h
+png.o: png.h pngconf.h pngpriv.h
+pngerror.o: png.h pngconf.h pngpriv.h
+pngrio.o: png.h pngconf.h pngpriv.h
+pngwio.o: png.h pngconf.h pngpriv.h
+pngmem.o: png.h pngconf.h pngpriv.h
+pngset.o: png.h pngconf.h pngpriv.h
+pngget.o: png.h pngconf.h pngpriv.h
+pngread.o: png.h pngconf.h pngpriv.h
+pngrtran.o: png.h pngconf.h pngpriv.h
+pngrutil.o: png.h pngconf.h pngpriv.h
+pngtrans.o: png.h pngconf.h pngpriv.h
+pngwrite.o: png.h pngconf.h pngpriv.h
+pngwtran.o: png.h pngconf.h pngpriv.h
+pngwutil.o: png.h pngconf.h pngpriv.h
+pngpread.o: png.h pngconf.h pngpriv.h
 
 pngtest.o: png.h pngconf.h
