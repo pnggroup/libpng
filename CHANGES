@@ -2640,6 +2640,8 @@ version 1.2.42rc05 [January 2, 2010]
   Avoid deprecated references to png_ptr-io_ptr and png_ptr->error_ptr
     in pngtest.c
 
+version 1.2.42 and 1.0.52 [January 3, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
