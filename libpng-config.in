@@ -11,12 +11,11 @@
 
 # Modeled after libxml-config.
 
-sysroot=""
 version="@PNGLIB_VERSION@"
-prefix="${sysroot}@prefix@"
-exec_prefix="${sysroot}@exec_prefix@"
-libdir="${sysroot}@libdir@"
-includedir="${sysroot}@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+libdir="@libdir@"
+includedir="@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
 libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
 all_libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ @LIBS@"
 I_opts="-I${includedir}"

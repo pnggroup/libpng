@@ -1,8 +1,7 @@
-sysroot=${PKG_CONFIG_SYSROOT_DIR}
-prefix=${sysroot}@prefix@
-exec_prefix=${sysroot}@exec_prefix@
-libdir=${sysroot}@libdir@
-includedir=${sysroot}@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 
 Name: libpng
 Description: Loads and saves PNG files
