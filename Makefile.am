@@ -30,7 +30,7 @@ bin_SCRIPTS= @binconfigs@
 
 # rules to build libpng, only build the old library on request
 lib_LTLIBRARIES=libpng15.la
-EXTRA_LTLIBRARIES= libpng.la
+# EXTRA_LTLIBRARIES= libpng.la
 libpng15_la_SOURCES = png.c pngset.c pngget.c pngrutil.c \
 	pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
@@ -67,7 +67,7 @@ pkgconfig_DATA = libpng15.pc
 
 #extra source distribution files.
 EXTRA_DIST= \
-	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/projects/cbuilder5/* \
 	${srcdir}/projects/visualc6/* \
