@@ -2641,8 +2641,11 @@ version 1.2.42rc05 [January 2, 2010]
     in pngtest.c
 
 version 1.2.42 and 1.0.52 [January 3, 2010]
+  No changes.
 
-version 1.2.43beta01 [January 3, 2010]
+version 1.2.43beta01 [January 4, 2010]
+  Updated CMakeLists.txt for consistent indentation and to avoid an
+    unclosed if-statement warning (Philip Lowman).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
