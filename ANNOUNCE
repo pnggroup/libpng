@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta01 - January 3, 2010
+Libpng 1.4.1beta01 - January 4, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,9 @@ Other information:
 
 Changes since the last public release (1.4.0):
 
-version 1.4.1beta01 [January 3, 2010]
+version 1.4.1beta01 [January 4, 2010]
+  Updated CMakeLists.txt for consistent indentation and to avoid an
+    unclosed if-statement warning (Philip Lowman).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
