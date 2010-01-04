@@ -2456,6 +2456,8 @@ version 1.5.0alpha01 [January 4, 2010]
   Removed the just-added sysroot feature.  It is the job of pkg-config,
     not foo.pc, to mangle the directory locations when $PKG_CONFIG_SYSROOT_DIR
     has been defined.
+  Updated CMakeLists.txt for consistent indentation and to avoid an
+    unclosed if-statement warning (Philip Lowman).
   Revised Makefile.am and makefile.in to remove references to Y2KINFO,
     KNOWNBUG, and libpng.la (Robert Schwebel)
 
