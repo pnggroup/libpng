@@ -91,9 +91,6 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" \
 	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libpng_la_LIBADD =
-libpng_la_SOURCES = libpng.c
-libpng_la_OBJECTS = libpng.lo
 libpng14_la_LIBADD =
 am_libpng14_la_OBJECTS = libpng14_la-png.lo libpng14_la-pngset.lo \
 	libpng14_la-pngget.lo libpng14_la-pngrutil.lo \
@@ -124,8 +121,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = libpng.c $(libpng14_la_SOURCES) $(pngtest_SOURCES)
-DIST_SOURCES = libpng.c $(libpng14_la_SOURCES) $(pngtest_SOURCES)
+SOURCES = $(libpng14_la_SOURCES) $(pngtest_SOURCES)
+DIST_SOURCES = $(libpng14_la_SOURCES) $(pngtest_SOURCES)
 man3dir = $(mandir)/man3
 man5dir = $(mandir)/man5
 NROFF = nroff
@@ -294,7 +291,7 @@ bin_SCRIPTS = @binconfigs@
 
 # rules to build libpng, only build the old library on request
 lib_LTLIBRARIES = libpng14.la
-EXTRA_LTLIBRARIES = libpng.la
+# EXTRA_LTLIBRARIES= libpng.la
 libpng14_la_SOURCES = png.c pngset.c pngget.c pngrutil.c \
 	pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
@@ -316,7 +313,7 @@ pkgconfig_DATA = libpng14.pc
 
 #extra source distribution files.
 EXTRA_DIST = \
-	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/projects/cbuilder5/* \
 	${srcdir}/projects/visualc6/* \
@@ -428,8 +425,6 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libpng.la: $(libpng_la_OBJECTS) $(libpng_la_DEPENDENCIES) 
-	$(LINK)  $(libpng_la_OBJECTS) $(libpng_la_LIBADD) $(LIBS)
 libpng14.la: $(libpng14_la_OBJECTS) $(libpng14_la_DEPENDENCIES) 
 	$(libpng14_la_LINK) -rpath $(libdir) $(libpng14_la_OBJECTS) $(libpng14_la_LIBADD) $(LIBS)
 
@@ -485,7 +480,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng14_la-png.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng14_la-pngerror.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng14_la-pngget.Plo@am__quote@

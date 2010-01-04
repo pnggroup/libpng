@@ -29,6 +29,8 @@ Changes since the last public release (1.4.0):
 version 1.4.1beta01 [January 4, 2010]
   Updated CMakeLists.txt for consistent indentation and to avoid an
     unclosed if-statement warning (Philip Lowman).
+  Revised Makefile.am and Makefile.in to remove references to Y2KINFO,
+    KNOWNBUG, and libpng.la (Robert Schwebel).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
