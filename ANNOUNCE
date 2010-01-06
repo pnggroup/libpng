@@ -33,6 +33,8 @@ version 1.4.1beta01 [January 6, 2010]
     KNOWNBUG, and libpng.la (Robert Schwebel).
   Revised Makefile.am and Makefile.in to make libpng.so.14, libpng.sl.14,
     and libpng.14.dylib links in the installed library directory.
+  Revised scripts/makefile.linux to make the same files as configure,
+    except for libpng.la and libpng14.la.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
