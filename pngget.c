@@ -872,13 +872,11 @@ png_get_user_chunk_ptr(png_structp png_ptr)
 }
 #endif
 
-#ifdef PNG_WRITE_SUPPORTED
 png_size_t PNGAPI
 png_get_compression_buffer_size(png_structp png_ptr)
 {
    return (png_ptr ? png_ptr->zbuf_size : 0L);
 }
-#endif
 
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED

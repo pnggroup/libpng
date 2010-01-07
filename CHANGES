@@ -2465,6 +2465,8 @@ version 1.4.1beta01 [January 7, 2010]
     KNOWNBUG, and libpng.la (Robert Schwebel).
   Revised the makefiles to install the same files and symbolic
     links as configure, except for libpng.la and libpng14.la.
+  Make png_set|get_compression_buffer_size() available even when
+    PNG_WRITE_SUPPORTED is not enabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
