@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta01 - January 6, 2010
+Libpng 1.4.1beta01 - January 7, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,12 +26,12 @@ Other information:
 
 Changes since the last public release (1.4.0):
 
-version 1.4.1beta01 [January 6, 2010]
+version 1.4.1beta01 [January 7, 2010]
   Updated CMakeLists.txt for consistent indentation and to avoid an
     unclosed if-statement warning (Philip Lowman).
   Revised Makefile.am and Makefile.in to remove references to Y2KINFO,
     KNOWNBUG, and libpng.la (Robert Schwebel).
-  Revised scripts/makefile.linux to install the same files and symbolic
+  Revised the makefiles to install the same files and symbolic
     links as configure, except for libpng.la and libpng14.la.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
