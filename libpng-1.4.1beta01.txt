@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.1beta01 - January 3, 2010
+ libpng version 1.4.1beta01 - January 7, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.1beta01 - January 3, 2010
+ libpng versions 0.97, January 1998, through 1.4.1beta01 - January 7, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -259,6 +259,15 @@ the beginning in order to see if this was a PNG file, you need to let
 libpng know that there are some bytes missing from the start of the file.
 
     png_set_sig_bytes(png_ptr, number);
+
+You can change the zlib compression buffer size to be used while
+reading compressed data with
+
+    png_set_compression_buffer_size(png_ptr, buffer_size);
+
+where the default size is 8192 bytes.  Note that the buffer size
+is changed immediately and the buffer is reallocated immediately,
+instead of setting a flag to be acted upon later.
 
 Setting up callback code
 
@@ -3222,7 +3231,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-January 3, 2010
+January 7, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
