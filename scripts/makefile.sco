@@ -130,8 +130,8 @@ install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	-@$(RM_F) $(DL)/$(LIBSOMAJ)
 	-@$(RM_F) $(DL)/$(OLDSO)
 	cp $(LIBSOMAJ) $(DL)
-	(cd $(DL);
-	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
+	(cd $(DL); \
+	$(LN_SF) $(LIBSOMAJ) $(LIBSO); \
 	$(LN_SF) $(LIBSO) $(OLDSO))
 
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
