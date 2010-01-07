@@ -15,7 +15,6 @@ PNGMAJ = 14
 LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.14
 
 # Utilities:
 AR_RC=ar rc
@@ -150,11 +149,9 @@ install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	-@$(RM_F) $(DL)/$(LIBSO)
 	-@$(RM_F) $(DL)/$(LIBSOMAJ)
 	-@$(RM_F) $(DL)/$(OLDSO)
-	-@$(RM_F) $(DL)/$(OLDSOMAJ)
 	cp $(LIBSOMAJ) $(DL)
 	(cd $(DL);
 	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
-	$(LN_SF) $(LIBSOMAJ) $(OLDSOMAJ)
 	$(LN_SF) $(LIBSO) $(OLDSO))
 
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
