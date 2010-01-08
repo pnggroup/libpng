@@ -1,12 +1,6 @@
 # Makefile.am:
 #   Source file for Makefile.in (and hence Makefile)
 #
-# Makefile.am need only be changed on a major version number
-# change (e.g. libpng12 --> libpng13).  In that case seach
-# this file for every instance of the old base name (libpng12)
-# and change to the new one (libpng13), then change the
-# -version-number settings below so that the new values have
-# the correct major part (first field).
 
 PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 
@@ -16,7 +10,7 @@ AUTOMAKE_OPTIONS = foreign
 # test programs - run on make check, make distcheck
 check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
-pngtest_LDADD = libpng14.la
+pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh
 TESTS_ENVIRONMENT= srcdir=$(srcdir) 
 
@@ -24,33 +18,32 @@ TESTS_ENVIRONMENT= srcdir=$(srcdir)
 dist_man_MANS= libpng.3 libpngpf.3 png.5
 
 # generate the -config scripts if required
-binconfigs= libpng14-config 
-EXTRA_SCRIPTS= libpng-config libpng14-config
+binconfigs= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config 
+EXTRA_SCRIPTS= libpng-config libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config
 bin_SCRIPTS= @binconfigs@
 
 # rules to build libpng, only build the old library on request
-lib_LTLIBRARIES=libpng14.la
+lib_LTLIBRARIES=libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # EXTRA_LTLIBRARIES= libpng.la
-libpng14_la_SOURCES = png.c pngset.c pngget.c pngrutil.c \
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngset.c pngget.c pngrutil.c \
 	pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
 	png.h pngconf.h pngpriv.h
 
-libpng14_la_CPPFLAGS = @LIBPNG_DEFINES@
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS = @LIBPNG_DEFINES@
 
-# MAJOR UPGRADE: the version-number settings below must be changed.
-libpng14_la_LDFLAGS = -no-undefined -export-dynamic \
-	-version-number 14:@PNGLIB_RELEASE@:0
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined -export-dynamic \
+	-version-number @PNGLIB_MAJOR@@PNGLIB_MINOR@:@PNGLIB_RELEASE@:0
 
 if HAVE_LD_VERSION_SCRIPT
   # Versioned symbols and restricted exports
-  libpng14_la_LDFLAGS += -Wl,--version-script=libpng.vers
-  libpng14_la_DEPENDENCIES = libpng.vers
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -Wl,--version-script=libpng.vers
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.vers
 else
   # Only restricted exports when possible
-  libpng14_la_LDFLAGS += -export-symbols libpng.sym
-  libpng14_la_DEPENDENCIES = libpng.sym
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -export-symbols libpng.sym
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.sym
 endif
 
 # Avoid depending upon Character Ranges.
@@ -63,7 +56,7 @@ pkginclude_HEADERS= png.h pngconf.h
 # pkg-config stuff, note that libpng.pc is always required in order
 # to get the correct library
 pkgconfigdir = @pkgconfigdir@
-pkgconfig_DATA = libpng14.pc
+pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 
 #extra source distribution files.
 EXTRA_DIST= \
@@ -82,7 +75,7 @@ EXTRA_DIST= \
 	$(TESTS) \
 	example.c libpng-1.4.1beta01.txt
 
-CLEANFILES= pngout.png libpng14.pc libpng14-config libpng.vers \
+CLEANFILES= pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers \
 libpng.sym
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
@@ -121,13 +114,13 @@ install-data-hook:
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
-# do evil things to libpng to cause libpng14 to be used
+# do evil things to libpng to cause libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ to be used
 install-exec-hook:
 	cd $(DESTDIR)$(bindir); rm -f libpng-config
 	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
 	@set -x;\
 	cd $(DESTDIR)$(libdir);\
-	for ext in a la so sl dylib; do\
+	for ext in a la so so.@PNGLIB_MAJOR@@PNGLIB_MINOR@.@PNGLIB_RELEASE@ sl dylib; do\
 		rm -f libpng.$$ext;\
                 if test -f $(PNGLIB_BASENAME).$$ext; then\
                        $(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
