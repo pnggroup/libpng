@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta01 - January 8, 2010
+Libpng 1.4.1beta02 - January 9, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,24 +9,24 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.1beta01.tar.xz (LZMA-compressed, recommended)
-   1.4.1beta01.tar.gz
-   1.4.1beta01.tar.bz2
+   1.4.1beta02.tar.xz (LZMA-compressed, recommended)
+   1.4.1beta02.tar.gz
+   1.4.1beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp141b01.zip
-   lp141b01.7z
+   lp141b02.zip
+   lp141b02.7z
 
 Other information:
 
-   1.4.1beta01-README.txt
-   1.4.1beta01-LICENSE.txt
+   1.4.1beta02-README.txt
+   1.4.1beta02-LICENSE.txt
 
 Changes since the last public release (1.4.0):
 
-version 1.4.1beta01 [January 8, 2010]
+version 1.4.1beta01 [January 10, 2010]
   Updated CMakeLists.txt for consistent indentation and to avoid an
     unclosed if-statement warning (Philip Lowman).
   Revised Makefile.am and Makefile.in to remove references to Y2KINFO,
@@ -35,6 +35,10 @@ version 1.4.1beta01 [January 8, 2010]
     links as configure, except for libpng.la and libpng14.la.
   Make png_set|get_compression_buffer_size() available even when
     PNG_WRITE_SUPPORTED is not enabled.
+  Revised Makefile.am and Makefile.in to simplify their maintenance.
+
+version 1.4.1beta02 [January 9, 2010]
+  Revised the makefiles to install a link to libpng14.so.14.1
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

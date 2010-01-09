@@ -2467,6 +2467,10 @@ version 1.4.1beta01 [January 8, 2010]
     links as configure, except for libpng.la and libpng14.la.
   Make png_set|get_compression_buffer_size() available even when
     PNG_WRITE_SUPPORTED is not enabled.
+  Revised Makefile.am and Makefile.in to simplify their maintenance.
+
+version 1.4.1beta02 [January 9, 2010]
+  Revised the makefiles to install a link to libpng14.so.14.1
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
