@@ -2468,9 +2468,13 @@ version 1.4.1beta01 [January 8, 2010]
   Make png_set|get_compression_buffer_size() available even when
     PNG_WRITE_SUPPORTED is not enabled.
   Revised Makefile.am and Makefile.in to simplify their maintenance.
+  Revised scripts/makefile.linux to install a link to libpng14.so.14.1
 
 version 1.4.1beta02 [January 9, 2010]
-  Revised the makefiles to install a link to libpng14.so.14.1
+  Revised the rest of the makefiles to install a link to libpng14.so.14.1
+
+version 1.4.1beta03 [January 10, 2010]
+  Removed png_set_premultiply_alpha() from scripts/*.def
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
