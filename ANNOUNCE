@@ -1,5 +1,5 @@
 
-Libpng 1.2.43beta01 - January 4, 2010
+Libpng 1.2.43beta01 - January 14, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,9 +42,13 @@ Other information:
 
 Changes since the last public release (1.2.42):
 
-version 1.2.43beta01 [January 4, 2010]
+version 1.2.43beta01 [January 14, 2010]
   Updated CMakeLists.txt for consistent indentation and to avoid an
     unclosed if-statement warning (Philip Lowman).
+  Removed "#ifdef PNG_1_0_X / #endif" surrounding
+    PNG_READ_16_TO_8_SUPPORTED and PNG_READ_GRAY_TO_RGB_SUPPORTED
+    in pngconf.h.  These were added in libpng-1.2.41beta08 and libpng-1.0.51,
+    which introduced a binary incompatibility with libpng-1.0.50.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
