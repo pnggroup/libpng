@@ -1,66 +1,54 @@
 
-Libpng 1.0.52 - January 3, 2010
+Libpng 1.0.53beta01 - January 14, 2010
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.52.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.52.tar.gz
-   libpng-1.0.52.tar.bz2
+   libpng-1.0.53beta01.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.53beta01.tar.gz
+   libpng-1.0.53beta01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.52-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.52-no-config.tar.gz
-   libpng-1.0.52-no-config.tar.bz2
+   libpng-1.0.53beta01-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.53beta01-no-config.tar.gz
+   libpng-1.0.53beta01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1052.zip
-   lpng1052.7z
-   lpng1052.tar.bz2
+   lp1053b01.zip
+   lp1053b01.7z
+   lp1053b01.tar.bz2
 
 Project files
 
-   libpng-1.0.52-project-netware.zip
-   libpng-1.0.52-project-wince.zip
+   libpng-1.0.53beta01-project-netware.zip
+   libpng-1.0.53beta01-project-wince.zip
 
 Other information:
 
-   libpng-1.0.52-README.txt
-   libpng-1.0.52-KNOWNBUGS.txt
-   libpng-1.0.52-LICENSE.txt
-   libpng-1.0.52-Y2K-compliance.txt
+   libpng-1.0.53beta01-README.txt
+   libpng-1.0.53beta01-KNOWNBUGS.txt
+   libpng-1.0.53beta01-LICENSE.txt
+   libpng-1.0.53beta01-Y2K-compliance.txt
+   libpng-1.0.53beta01-[previous version]-diff.txt
 
-Changes since the last public release (1.0.51):
+Changes since the last public release (1.0.52):
 
-version 1.0.52 [January 3, 2010]
-
-  Removed "#define PNG_NO_ERROR_NUMBERS" that was inadvertently added
-    to pngconf.h in version 1.2.41.
-  Revised scripts/makefile.netbsd, makefile.openbsd, and makefile.sco
-    to put png.h and pngconf.h in $prefix/include, like the other scripts,
-    instead of in $prefix/include/libpng.  Also revised makefile.sco
-    to put them in $prefix/include/libpng12 instead of in
-    $prefix/include/libpng/libpng12.
-  Removed leftover "-DPNG_CONFIGURE_LIBPNG" from scripts/makefile.darwin
-    and contrib/pngminim/*/makefile
-  Relocated png_do_chop() to its original position in pngrtran.c; the
-    change in version 1.2.41beta08 caused transparency to be handled wrong
-    in some 16-bit datastreams (Yusaku Sugai).
-  Renamed libpng-pc.in back to libpng.pc.in and revised CMakeLists.txt
-    (revising changes made in 1.2.41)
-  Swapped PNG_UNKNOWN_CHUNKS_SUPPORTED and PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-    in pngset.c to be consistent with other changes in version 1.2.38.
-  Avoid deprecated references to png_ptr-io_ptr and png_ptr->error_ptr
-    in pngtest.c
-
+version 1.2.43beta01 [January 14, 2010]
+  Updated CMakeLists.txt for consistent indentation and to avoid an
+    unclosed if-statement warning (Philip Lowman).
+  Removed "#ifdef PNG_1_0_X / #endif" surrounding
+    PNG_READ_16_TO_8_SUPPORTED and PNG_READ_GRAY_TO_RGB_SUPPORTED
+    in pngconf.h.  These were added in libpng-1.2.41beta08 and libpng-1.0.51,
+    which introduced a binary incompatibility with libpng-1.0.50.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 

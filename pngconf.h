@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.0.52 - January 3, 2010
+ * libpng version 1.0.53beta01 - January 14, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -624,22 +624,18 @@
 #  ifndef PNG_NO_READ_BACKGROUND
 #    define PNG_READ_BACKGROUND_SUPPORTED
 #  endif
-#ifndef PNG_1_0_X
 #  ifndef PNG_NO_READ_16_TO_8
 #    define PNG_READ_16_TO_8_SUPPORTED
 #  endif
-#endif
 #  ifndef PNG_NO_READ_FILLER
 #    define PNG_READ_FILLER_SUPPORTED
 #  endif
 #  ifndef PNG_NO_READ_GAMMA
 #    define PNG_READ_GAMMA_SUPPORTED
 #  endif
-#ifndef PNG_1_0_X
 #  ifndef PNG_NO_READ_GRAY_TO_RGB
 #    define PNG_READ_GRAY_TO_RGB_SUPPORTED
 #  endif
-#endif
 #  ifndef PNG_NO_READ_SWAP_ALPHA
 #    define PNG_READ_SWAP_ALPHA_SUPPORTED
 #  endif
