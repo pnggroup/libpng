@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta03 - January 10, 2010
+Libpng 1.4.1rc01 - January 16, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.1beta03.tar.xz (LZMA-compressed, recommended)
-   1.4.1beta03.tar.gz
-   1.4.1beta03.tar.bz2
+   1.4.1rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.1rc01.tar.gz
+   1.4.1rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp141b03.zip
-   lp141b03.7z
+   lp141r01.zip
+   lp141r01.7z
 
 Other information:
 
-   1.4.1beta03-README.txt
-   1.4.1beta03-LICENSE.txt
+   1.4.1rc01-README.txt
+   1.4.1rc01-LICENSE.txt
 
 Changes since the last public release (1.4.0):
 
@@ -43,6 +43,9 @@ version 1.4.1beta02 [January 9, 2010]
 
 version 1.4.1beta03 [January 10, 2010]
   Removed png_set_premultiply_alpha() from scripts/*.def
+
+version 1.4.1rc01 [January 16, 2010]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
