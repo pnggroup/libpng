@@ -50,7 +50,7 @@ version 1.4.1rc01 [January 16, 2010]
 version 1.4.1beta04 [January 23, 2010]
   Revised png_decompress_chunk() to improve speed and memory usage when
     decoding large chunks.
-  Added png_set|get_chunk_malloc_max() function and PNG_CHUNK_MALLOC_MAX macro.
+  Added png_set|get_chunk_malloc_max() functions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
