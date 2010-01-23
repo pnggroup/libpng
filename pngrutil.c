@@ -220,6 +220,8 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    if (comp_type == PNG_COMPRESSION_TYPE_BASE)
    {
       int ret = Z_OK;
+      png_size_t buffer_size;
+
       png_ptr->zstream.next_in = (png_bytep)(png_ptr->chunkdata + prefix_size);
       png_ptr->zstream.avail_in = (uInt)(chunklength - prefix_size);
       png_ptr->zstream.next_out = png_ptr->zbuf;
@@ -227,6 +229,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
       text_size = 0;
       text = NULL;
+      buffer_size = 0;
 
       while (png_ptr->zstream.avail_in)
       {
@@ -246,9 +249,10 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                text = (png_charp)png_malloc_warn(png_ptr, text_size);
                if (text ==  NULL)
                  {
-                    png_free(png_ptr, png_ptr->chunkdata);
-                    png_ptr->chunkdata = NULL;
-                    png_error(png_ptr, "Not enough memory to decompress chunk");
+                    png_error(png_ptr,
+                       "Not enough memory to decompress chunk");
+                    text_size = 0;
+                    break;
                  }
                png_memcpy(text, png_ptr->chunkdata, prefix_size);
             }
@@ -261,14 +265,16 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             if (text_size > png_sizeof(msg))
                text_size = png_sizeof(msg);
             png_memcpy(text + prefix_size, msg, text_size);
+            buffer_size = text_size;
             break;
          }
          if (!png_ptr->zstream.avail_out || ret == Z_STREAM_END)
          {
-            if (text == NULL)
+            if (text == NULL)  /* Initialize the decompression buffer */
             {
                text_size = prefix_size +
                    png_ptr->zbuf_size - png_ptr->zstream.avail_out;
+
                text = (png_charp)png_malloc_warn(png_ptr, text_size + 1);
                if (text ==  NULL)
                {
@@ -281,13 +287,14 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                     text_size - prefix_size);
                png_memcpy(text, png_ptr->chunkdata, prefix_size);
                *(text + text_size) = 0x00;
+               buffer_size = text_size;
             }
-            else
+            else               /* Enlarge the decompression buffer */
             {
                png_charp tmp;
 
                tmp = text;
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
                if ((png_ptr->user_chunk_cache_max != 0) &&
                   (--png_ptr->user_chunk_cache_max == 0))
                {
@@ -301,7 +308,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                   text = (png_charp)png_malloc_warn(png_ptr,
                      (png_size_t)(text_size +
                       png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1));
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
                }
 #endif
                if (text == NULL)

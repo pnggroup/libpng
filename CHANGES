@@ -2476,8 +2476,7 @@ version 1.4.1beta02 [January 9, 2010]
 version 1.4.1beta03 [January 10, 2010]
   Removed png_set_premultiply_alpha() from scripts/*.def
 
-version 1.4.1rc01 [January 16, 2010]
-  No changes.
+version 1.4.1beta04 [January 23, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
