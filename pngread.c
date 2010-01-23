@@ -70,6 +70,7 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->user_height_max = PNG_USER_HEIGHT_MAX;
    /* Added at libpng-1.4.0 */
    png_ptr->user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
+   png_ptr->user_chunk_malloc_max = png_get_chunk_malloc_max(png_ptr);
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
