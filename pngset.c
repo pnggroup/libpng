@@ -1130,6 +1130,7 @@ png_set_user_limits (png_structp png_ptr, png_uint_32 user_width_max,
    png_ptr->user_width_max = user_width_max;
    png_ptr->user_height_max = user_height_max;
 }
+
 /* This function was added to libpng 1.4.0 */
 void PNGAPI
 png_set_chunk_cache_max (png_structp png_ptr,
@@ -1142,6 +1143,16 @@ png_set_chunk_cache_max (png_structp png_ptr,
        png_ptr->user_chunk_cache_max = 0;
     else
        png_ptr->user_chunk_cache_max = user_chunk_cache_max + 1;
+}
+
+/* This function was added to libpng 1.4.1 */
+void PNGAPI
+png_set_chunk_malloc_max (png_structp png_ptr,
+   png_uint_32 user_chunk_malloc_max)
+{
+    if (png_ptr == NULL)
+      return;
+    png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 

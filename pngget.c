@@ -895,8 +895,14 @@ png_get_user_height_max (png_structp png_ptr)
 png_uint_32 PNGAPI
 png_get_chunk_cache_max (png_structp png_ptr)
 {
-    return (png_ptr? png_ptr->user_chunk_cache_max? 0x7fffffffL :
-       png_ptr->user_chunk_cache_max - 1 : 0);
+    return (png_ptr? (png_ptr->user_chunk_cache_max? 0x7fffffffL :
+       png_ptr->user_chunk_cache_max - 1) : 0);
+}
+/* This function was added to libpng 1.4.1 */
+png_uint_32 PNGAPI
+png_get_chunk_malloc_max (png_structp png_ptr)
+{
+    return (png_ptr? png_ptr->user_chunk_cache_max : 0);
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 

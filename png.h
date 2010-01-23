@@ -1336,9 +1336,17 @@ struct png_struct_def
 /* New member added in libpng-1.2.30 */
   png_charp chunkdata PNG_DEPSTRUCT;  /* buffer for reading chunk data */
 
-/* New member added in libpng-1.4.0 */
 #ifdef PNG_IO_STATE_SUPPORTED
+/* New member added in libpng-1.4.0 */
    png_uint_32 io_state PNG_DEPSTRUCT;
+#endif
+
+/* Added in libpng-1.4.1 */
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   /* Total memory that a zTXt, sPLT, iTXt, iCCP, or unknown chunk
+    * can occupy when decompressed.
+    */
+   png_uint_32 user_chunk_malloc_max PNG_DEPSTRUCT;
 #endif
 };
 
@@ -2395,6 +2403,11 @@ extern PNG_EXPORT(png_uint_32,png_get_user_height_max) PNGARG((png_structp
 extern PNG_EXPORT(void,png_set_chunk_cache_max) PNGARG((png_structp
    png_ptr, png_uint_32 user_chunk_cache_max));
 extern PNG_EXPORT(png_uint_32,png_get_chunk_cache_max)
+   PNGARG((png_structp png_ptr));
+/* Added in libpng-1.4.1 */
+extern PNG_EXPORT(void,png_set_chunk_malloc_max) PNGARG((png_structp
+   png_ptr, png_uint_32 user_chunk_cache_max));
+extern PNG_EXPORT(png_uint_32,png_get_chunk_malloc_max)
    PNGARG((png_structp png_ptr));
 #endif
 

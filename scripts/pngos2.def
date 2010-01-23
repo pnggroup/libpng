@@ -214,6 +214,9 @@ EXPORTS
   png_check_cHRM_fixed
   png_calloc
   png_set_longjmp_fn
+; Added at version 1.4.1
+  png_get_chunk_malloc_max
+  png_set_chunk_malloc_max
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
   png_libpng_ver

@@ -278,63 +278,90 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                text = (png_charp)png_malloc_warn(png_ptr, text_size + 1);
                if (text ==  NULL)
                {
-                  png_free(png_ptr, png_ptr->chunkdata);
-                  png_ptr->chunkdata = NULL;
                   png_error(png_ptr,
                     "Not enough memory to decompress chunk");
+                  text_size = 0;
+                  break;
                }
+               png_memcpy(text, png_ptr->chunkdata, prefix_size);
                png_memcpy(text + prefix_size, png_ptr->zbuf,
                     text_size - prefix_size);
-               png_memcpy(text, png_ptr->chunkdata, prefix_size);
                *(text + text_size) = 0x00;
                buffer_size = text_size;
             }
             else               /* Enlarge the decompression buffer */
             {
-               png_charp tmp;
+               png_charp tmp = text;
+               png_size_t new_text_size;
 
-               tmp = text;
-#ifdef PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
-               if ((png_ptr->user_chunk_cache_max != 0) &&
-                  (--png_ptr->user_chunk_cache_max == 0))
+               new_text_size = text_size + png_ptr->zbuf_size -
+                   png_ptr->zstream.avail_out;
+
+               if (new_text_size > buffer_size)
                {
-                  png_warning(png_ptr, "No space in chunk cache");
+                  if (png_ptr->zstream.avail_out)
+                     buffer_size = new_text_size;
+                  else
+                     buffer_size += buffer_size;
+               }
+
+#ifdef PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
+               if (png_ptr->user_chunk_malloc_max <= buffer_size)
+               {
+                  png_free(png_ptr, tmp);
+                  png_warning(png_ptr, "No space for decompressed chunk");
                   text = NULL;
                }
 
                else
-               {
-#endif
                   text = (png_charp)png_malloc_warn(png_ptr,
-                     (png_size_t)(text_size +
-                      png_ptr->zbuf_size - png_ptr->zstream.avail_out + 1));
-#ifdef PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
-               }
+                     buffer_size + 1);
+#else
+               text = (png_charp)png_malloc_warn(png_ptr,
+                  buffer_size + 1);
 #endif
+
                if (text == NULL)
                {
-                  png_free(png_ptr, tmp);
-                  png_free(png_ptr, png_ptr->chunkdata);
-                  png_ptr->chunkdata = NULL;
-                  png_error(png_ptr,
+                  png_warning(png_ptr,
                     "Not enough memory to decompress chunk");
+                  break;
                }
+
                png_memcpy(text, tmp, text_size);
                png_free(png_ptr, tmp);
-               png_memcpy(text + text_size, png_ptr->zbuf,
-                  (png_ptr->zbuf_size - png_ptr->zstream.avail_out));
-               text_size += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
-               *(text + text_size) = 0x00;
-            }
-            if (ret == Z_STREAM_END)
-               break;
-            else
-            {
-               png_ptr->zstream.next_out = png_ptr->zbuf;
-               png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
             }
          }
+         if (ret == Z_STREAM_END)
+            break;
+
+         else
+         {
+            png_ptr->zstream.next_out = png_ptr->zbuf;
+            png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+         }
       }
+
+      if (text != NULL && buffer_size > text_size)
+      {
+         /* Reduce text allocation to actual size */
+         png_charp tmp;
+
+         tmp = text;
+         text = (png_charp)png_malloc_warn(png_ptr,
+             text_size);
+
+         if (text == NULL)
+            text = tmp;
+
+         else
+         {
+            png_memcpy(text, tmp, text_size + 1);
+            png_free(png_ptr, tmp);
+         }
+
+      }
+
       if (ret != Z_STREAM_END)
       {
 #ifdef PNG_STDIO_SUPPORTED
@@ -365,11 +392,11 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          {
             text = (png_charp)png_malloc_warn(png_ptr, text_size+1);
             if (text == NULL)
-              {
-                png_free(png_ptr, png_ptr->chunkdata);
-                png_ptr->chunkdata = NULL;
-                png_error(png_ptr, "Not enough memory for text");
-              }
+            {
+               png_free(png_ptr, png_ptr->chunkdata);
+               png_ptr->chunkdata = NULL;
+               png_error(png_ptr, "Not enough memory for text");
+            }
             png_memcpy(text, png_ptr->chunkdata, prefix_size);
          }
          *(text + text_size) = 0x00;

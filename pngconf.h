@@ -675,6 +675,10 @@
 #ifndef PNG_SET_USER_LIMITS_SUPPORTED
 #  ifndef PNG_NO_SET_USER_LIMITS
 #    define PNG_SET_USER_LIMITS_SUPPORTED
+     /* Feature added at libpng-1.4.0, this flag added at 1.4.1 */
+#    define PNG_CHUNK_CACHE_LIMIT_SUPPORTED
+     /* Feature added at libpng-1.4.1, this flag added at 1.4.1 */
+#    define PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
 #  endif
 #endif
 

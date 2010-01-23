@@ -432,6 +432,18 @@ where 0x7fffffffL means unlimited.  You can retrieve this limit with
 This limit also applies to the number of buffers that can be allocated
 by png_decompress_chunk() while decompressing iTXt, zTXt, and iCCP chunks.
 
+You can also set a limit on the amount of memory that a compressed chunk
+other than IDAT can occupy, with
+
+   png_set_chunk_malloc_max(png_ptr, user_chunk_malloc_max);
+
+and you can retrieve the limit with
+
+   chunk_malloc_max = png_get_chunk_malloc_max(png_ptr);
+
+Any chunks that would cause either of these limits to be exceeded will
+be ignored.
+
 The high-level read interface
 
 At this point there are two ways to proceed; through the high-level
