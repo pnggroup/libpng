@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta04 - January 23, 2010
+Libpng 1.4.1beta05 - January 26, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.1beta04.tar.xz (LZMA-compressed, recommended)
-   1.4.1beta04.tar.gz
-   1.4.1beta04.tar.bz2
+   1.4.1beta05.tar.xz (LZMA-compressed, recommended)
+   1.4.1beta05.tar.gz
+   1.4.1beta05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp141b04.zip
-   lp141b04.7z
+   lp141b05.zip
+   lp141b05.7z
 
 Other information:
 
-   1.4.1beta04-README.txt
-   1.4.1beta04-LICENSE.txt
+   1.4.1beta05-README.txt
+   1.4.1beta05-LICENSE.txt
 
 Changes since the last public release (1.4.0):
 
