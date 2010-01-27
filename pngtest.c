@@ -1483,11 +1483,11 @@ main(int argc, char *argv[])
             for (k = 0; k<256; k++)
             {
                int int_k=(int)k;
-               unsigned long ul_used=(unsigned long)filters_used[int_k];
-               if (ul_used)
+               int int_used=(int)filters_used[int_k];
+               if (int_used)
                {
-                  fprintf(STDERR, " Filter %d was used %lu times\n",
-                     int_k, ul_used);
+                  fprintf(STDERR, " Filter %d", int_k);
+                  fprintf(STDERR, " was used %d times\n", int_used);
                }
             }
 #endif
@@ -1564,11 +1564,11 @@ main(int argc, char *argv[])
                 for (k = 0; k<256; k++)
                 {
                    int int_k=(int)k;
-                   unsigned long ul_used=(unsigned long)filters_used[int_k];
-                   if (ul_used)
+                   int int_used=(int)filters_used[int_k];
+                   if (int_used)
                    {
-                      fprintf(STDERR, " Filter %d was used %lu times\n",
-                         int_k, ul_used);
+                      fprintf(STDERR, " Filter %d", int_k);
+                      fprintf(STDERR, " was used %d times\n", int_used);
                    }
                 }
 #endif
@@ -1638,4 +1638,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_1beta06 your_png_h_is_not_version_1_4_1beta06;
+typedef version_1_4_1beta05 your_png_h_is_not_version_1_4_1beta05;
