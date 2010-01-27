@@ -1471,7 +1471,7 @@ main(int argc, char *argv[])
          if (kerror == 0)
          {
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
-         int k;
+            int k;
 #endif
 #ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
             fprintf(STDERR, "\n PASS (%lu zero samples)\n",
@@ -1481,9 +1481,15 @@ main(int argc, char *argv[])
 #endif
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
             for (k = 0; k<256; k++)
-               if (filters_used[k])
+            {
+               int int_k=(int)k;
+               unsigned long ul_used=(unsigned long)filters_used[int_k];
+               if (ul_used)
+               {
                   fprintf(STDERR, " Filter %d was used %lu times\n",
-                     k, (unsigned long)filters_used[k]);
+                     int_k, ul_used);
+               }
+            }
 #endif
 #ifdef PNG_TIME_RFC1123_SUPPORTED
          if (tIME_chunk_present != 0)
@@ -1556,10 +1562,15 @@ main(int argc, char *argv[])
 #endif
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
                 for (k = 0; k<256; k++)
-                   if (filters_used[k])
+                {
+                   int int_k=(int)k;
+                   unsigned long ul_used=(unsigned long)filters_used[int_k];
+                   if (ul_used)
+                   {
                       fprintf(STDERR, " Filter %d was used %lu times\n",
-                         k,
-                         (unsigned long)filters_used[k]);
+                         int_k, ul_used);
+                   }
+                }
 #endif
 #ifdef PNG_TIME_RFC1123_SUPPORTED
              if (tIME_chunk_present != 0)
@@ -1627,4 +1638,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_1beta05 your_png_h_is_not_version_1_4_1beta05;
+typedef version_1_4_1beta06 your_png_h_is_not_version_1_4_1beta06;
