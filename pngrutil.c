@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [January 26, 2010]
+ * Last changed in libpng 1.4.1 [January 28, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -201,6 +201,68 @@ png_crc_error(png_structp png_ptr)
 
 #if defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_READ_iTXt_SUPPORTED) || \
     defined(PNG_READ_iCCP_SUPPORTED)
+png_size_t
+png_measure_decompressed_chunk(png_structp png_ptr, int comp_type,
+    png_size_t chunklength, png_size_t prefix_size)
+{
+   png_charp text;
+   png_charp test = "X";
+   png_size_t text_size = 0;
+
+   if (comp_type == PNG_COMPRESSION_TYPE_BASE)
+   {
+      int ret = Z_OK;
+
+      png_ptr->zstream.next_in = (png_bytep)(png_ptr->chunkdata + prefix_size);
+      png_ptr->zstream.avail_in = (uInt)(chunklength - prefix_size);
+      png_ptr->zstream.next_out = png_ptr->zbuf;
+      png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+
+      text = NULL;
+
+      while (png_ptr->zstream.avail_in)
+      {
+         ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
+         if (ret != Z_OK && ret != Z_STREAM_END)
+         {
+            inflateReset(&png_ptr->zstream);
+            png_ptr->zstream.avail_in = 0;
+            break;
+         }
+         if (!png_ptr->zstream.avail_out || ret == Z_STREAM_END)
+         {
+            if (text == NULL)  /* Initialize the decompression buffer */
+            {
+               text_size = prefix_size +
+                   png_ptr->zbuf_size - png_ptr->zstream.avail_out;
+
+               text=test;
+            }
+            else               /* Enlarge the decompression buffer */
+            {
+              text_size += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
+#ifdef PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
+              if (text_size >= png_ptr->user_chunk_malloc_max - 1)
+                 return 0;
+#endif
+            }
+         }
+         if (ret == Z_STREAM_END)
+            break;
+
+         else
+         {
+            png_ptr->zstream.next_out = png_ptr->zbuf;
+            png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+         }
+      }
+
+      inflateReset(&png_ptr->zstream);
+      png_ptr->zstream.avail_in = 0;
+   }
+   return text_size;
+}
+
 /*
  * Decompress trailing data in a chunk.  The assumption is that chunkdata
  * points at an allocated area holding the contents of a chunk with a
@@ -216,6 +278,15 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    static PNG_CONST char msg[] = "Error decoding compressed chunk";
    png_charp text;
    png_size_t text_size;
+   png_size_t expanded_size;
+
+   expanded_size= png_measure_decompressed_chunk(png_ptr, comp_type,
+      chunklength, prefix_size);
+   if (expanded_size == 0)
+   {
+      *newlength=0;
+      return;
+   }
 
    if (comp_type == PNG_COMPRESSION_TYPE_BASE)
    {
@@ -274,8 +345,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          {
             if (text == NULL)  /* Initialize the decompression buffer */
             {
-               text_size = prefix_size +
-                   png_ptr->zbuf_size - png_ptr->zstream.avail_out;
+               text_size = expanded_size;
 
                text = (png_charp)png_malloc_warn(png_ptr, text_size + 1);
                if (text ==  NULL)
@@ -291,64 +361,6 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                *(text + text_size) = 0x00;
                buffer_size = text_size;
             }
-            else               /* Enlarge the decompression buffer */
-            {
-               png_charp tmp = text;
-               png_size_t new_text_size;
-
-               new_text_size = text_size + png_ptr->zbuf_size -
-                   png_ptr->zstream.avail_out;
-
-               if (new_text_size > buffer_size)
-               {
-                  if (png_ptr->zstream.avail_out)
-                     buffer_size = new_text_size;
-                  else
-                     buffer_size += buffer_size;
-
-#ifdef PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
-                  if (buffer_size >= png_ptr->user_chunk_malloc_max - 1)
-                  {
-                     if (new_text_size >=
-                         png_ptr->user_chunk_malloc_max - 1)
-                     {
-                        png_free(png_ptr, tmp);
-                        png_warning(png_ptr,
-                            "No space for decompressed chunk");
-                        text = NULL;
-                     }
-                     else
-                     {
-                        buffer_size = png_ptr->user_chunk_malloc_max - 1;
-                        text = (png_charp)png_malloc_warn(png_ptr,
-                            buffer_size + 1);
-                     }
-                  }
-
-                  else
-                     text = (png_charp)png_malloc_warn(png_ptr,
-                         buffer_size + 1);
-#else
-                 text = (png_charp)png_malloc_warn(png_ptr,
-                    buffer_size + 1);
-#endif
-
-                 if (text == NULL)
-                 {
-                    png_warning(png_ptr,
-                      "Not enough memory to decompress chunk");
-                    break;
-                 }
-
-                 png_memcpy(text, tmp, text_size);
-                 png_free(png_ptr, tmp);
-               }
-            /* FIX ME: zTXt chunk written by pngtest is 6 bytes too large */
-            png_memcpy(text + text_size, png_ptr->zbuf,
-               (png_ptr->zbuf_size - png_ptr->zstream.avail_out));
-            text_size += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
-            *(text + text_size) = 0x00;
-            }
          }
          if (ret == Z_STREAM_END)
             break;
@@ -358,26 +370,6 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             png_ptr->zstream.next_out = png_ptr->zbuf;
             png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
          }
-      }
-
-      if (text != NULL && buffer_size > text_size)
-      {
-         /* Reduce text allocation to actual size */
-         png_charp tmp;
-
-         tmp = text;
-         text = (png_charp)png_malloc_warn(png_ptr,
-             text_size);
-
-         if (text == NULL)
-            text = tmp;
-
-         else
-         {
-            png_memcpy(text, tmp, text_size + 1);
-            png_free(png_ptr, tmp);
-         }
-
       }
 
       if (ret != Z_STREAM_END)
