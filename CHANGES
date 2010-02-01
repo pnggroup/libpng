@@ -2643,13 +2643,17 @@ version 1.2.42rc05 [January 2, 2010]
 version 1.2.42 and 1.0.52 [January 3, 2010]
   No changes.
 
-version 1.2.43beta01 [January 14, 2010]
+version 1.2.43beta01 [January 27, 2010]
   Updated CMakeLists.txt for consistent indentation and to avoid an
     unclosed if-statement warning (Philip Lowman).
   Removed "#ifdef PNG_1_0_X / #endif" surrounding
     PNG_READ_16_TO_8_SUPPORTED and PNG_READ_GRAY_TO_RGB_SUPPORTED
     in pngconf.h.  These were added in libpng-1.2.41beta08 and libpng-1.0.51,
     which introduced a binary incompatibility with libpng-1.0.50.
+  Backported new png_decompress_chunk() algorithm from libpng-1.4.1
+
+version 1.2.43beta02 [February 1, 2010]
+  Backported two-pass png_decompress_chunk() algorithm from libpng-1.4.1
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
