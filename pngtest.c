@@ -1536,14 +1536,14 @@ main(int argc, char *argv[])
 #endif
       for (i=2; i<argc; ++i)
       {
-#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
-         int k;
-#endif
          int kerror;
          fprintf(STDERR, "\n Testing %s:", argv[i]);
          kerror = test_one_file(argv[i], outname);
          if (kerror == 0)
          {
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
+            int k;
+#endif
 #ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
             fprintf(STDERR, "\n PASS (%lu zero samples)\n",
                (unsigned long)zero_samples);
@@ -1629,8 +1629,7 @@ main(int argc, char *argv[])
                 for (k = 0; k<256; k++)
                    if (filters_used[k])
                       fprintf(STDERR, " Filter %d was used %lu times\n",
-                         k,
-                         (unsigned long)filters_used[k]);
+                         k, (unsigned long)filters_used[k]);
 #endif
 #ifdef PNG_TIME_RFC1123_SUPPORTED
              if (tIME_chunk_present != 0)
@@ -1698,4 +1697,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_43beta01 your_png_h_is_not_version_1_2_43beta01;
+typedef version_1_2_43beta02 your_png_h_is_not_version_1_2_43beta02;
