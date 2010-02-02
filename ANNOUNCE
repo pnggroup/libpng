@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta06 - January 28, 2010
+Libpng 1.4.1beta06 - February 2, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,7 +55,7 @@ version 1.4.1beta04 [January 23, 2010]
 version 1.4.1beta05 [January 26, 2010]
   Relocated "int k" declaration in pngtest.c to minimize its scope.
 
-version 1.4.1beta06 [January 28, 2010]
+version 1.4.1beta06 [February 2, 2010]
   Revised png_decompress_chunk() to use a two-pass method suggested by
     John Bowler.
 
