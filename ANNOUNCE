@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta06 - February 2, 2010
+Libpng 1.4.1beta07 - February 5, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.1beta06.tar.xz (LZMA-compressed, recommended)
-   1.4.1beta06.tar.gz
-   1.4.1beta06.tar.bz2
+   1.4.1beta07.tar.xz (LZMA-compressed, recommended)
+   1.4.1beta07.tar.gz
+   1.4.1beta07.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp141b06.zip
-   lp141b06.7z
+   lp141b07.zip
+   lp141b07.7z
 
 Other information:
 
-   1.4.1beta06-README.txt
-   1.4.1beta06-LICENSE.txt
+   1.4.1beta07-README.txt
+   1.4.1beta07-LICENSE.txt
 
 Changes since the last public release (1.4.0):
 
@@ -55,9 +55,12 @@ version 1.4.1beta04 [January 23, 2010]
 version 1.4.1beta05 [January 26, 2010]
   Relocated "int k" declaration in pngtest.c to minimize its scope.
 
-version 1.4.1beta06 [February 2, 2010]
+version 1.4.1beta06 [January 28, 2010]
   Revised png_decompress_chunk() to use a two-pass method suggested by
     John Bowler.
+
+version 1.4.1beta07 [February 5, 2010]
+  Added defineable PNG_USER_CHUNK_CACHE_MAX and PNG_USER_CHUNK_MALLOC_MAX
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

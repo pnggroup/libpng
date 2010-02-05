@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.1beta06 - January 28, 2010
+ * libpng version 1.4.1beta07 - February 5, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -676,11 +676,13 @@
 #  ifndef PNG_NO_SET_USER_LIMITS
 #    define PNG_SET_USER_LIMITS_SUPPORTED
      /* Feature added at libpng-1.4.0, this flag added at 1.4.1 */
-#    define PNG_CHUNK_CACHE_LIMIT_SUPPORTED
+#    define PNG_SET_CHUNK_CACHE_LIMIT_SUPPORTED
      /* Feature added at libpng-1.4.1, this flag added at 1.4.1 */
-#    define PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
+#    define PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
 #  endif
 #endif
+
+/* Added at libpng-1.2.43 */
 
 /* Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGs no matter
  * how large, set these limits to 0x7fffffffL
@@ -692,9 +694,14 @@
 #  define PNG_USER_HEIGHT_MAX 1000000L
 #endif
 
-/* Added at libpng-1.4.0 */
+/* Added at libpng-1.2.43 */
 #ifndef PNG_USER_CHUNK_CACHE_MAX
 #  define PNG_USER_CHUNK_CACHE_MAX 0x7fffffffL
+#endif
+
+/* Added at libpng-1.2.43 */
+#ifndef PNG_USER_CHUNK_MALLOC_MAX
+#  define PNG_USER_CHUNK_MALLOC_MAX 0x7fffffffL
 #endif
 
 /* Added at libpng-1.4.0 */
@@ -865,20 +872,22 @@
 #endif /* PNG_READ_ANCILLARY_CHUNKS_SUPPORTED */
 
 #ifndef PNG_NO_READ_UNKNOWN_CHUNKS
-#  define PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+#  ifndef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+#    define PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+#  endif
 #  ifndef PNG_UNKNOWN_CHUNKS_SUPPORTED
 #    define PNG_UNKNOWN_CHUNKS_SUPPORTED
 #  endif
-#endif
-#if !defined(PNG_NO_READ_USER_CHUNKS) && \
-     defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
-#  define PNG_READ_USER_CHUNKS_SUPPORTED
-#  define PNG_USER_CHUNKS_SUPPORTED
-#  ifdef PNG_NO_READ_UNKNOWN_CHUNKS
-#    undef PNG_NO_READ_UNKNOWN_CHUNKS
+#  ifndef PNG_READ_USER_CHUNKS_SUPPORTED
+#    define PNG_READ_USER_CHUNKS_SUPPORTED
 #  endif
-#  ifdef PNG_NO_HANDLE_AS_UNKNOWN
-#    undef PNG_NO_HANDLE_AS_UNKNOWN
+#endif
+#ifndef PNG_NO_READ_USER_CHUNKS
+#  ifndef PNG_READ_USER_CHUNKS_SUPPORTED
+#    define PNG_READ_USER_CHUNKS_SUPPORTED
+#  endif
+#  ifndef PNG_USER_CHUNKS_SUPPORTED
+#    define PNG_USER_CHUNKS_SUPPORTED
 #  endif
 #endif
 #ifndef PNG_NO_HANDLE_AS_UNKNOWN
@@ -1020,8 +1029,10 @@
 
 #endif /* PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED */
 
-#if !defined(PNG_NO_WRITE_FILTER) && !defined(PNG_WRITE_FILTER_SUPPORTED)
-#  define PNG_WRITE_FILTER_SUPPORTED
+#ifndef PNG_NO_WRITE_FILTER
+#  ifndef PNG_WRITE_FILTER_SUPPORTED
+#    define PNG_WRITE_FILTER_SUPPORTED
+#  endif
 #endif
 
 #ifndef PNG_NO_WRITE_UNKNOWN_CHUNKS
