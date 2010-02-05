@@ -859,8 +859,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
          blue_y;
-      if (png_get_cHRM_fixed(read_ptr, read_info_ptr, &white_x, &white_y, &red_x,
-         &red_y, &green_x, &green_y, &blue_x, &blue_y))
+      if (png_get_cHRM_fixed(read_ptr, read_info_ptr, &white_x, &white_y,
+         &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y))
       {
          png_set_cHRM_fixed(write_ptr, write_info_ptr, white_x, white_y, red_x,
             red_y, green_x, green_y, blue_x, blue_y);
@@ -1012,7 +1012,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_sCAL_s(read_ptr, read_info_ptr, &unit, &scal_width,
           &scal_height))
       {
-         png_set_sCAL_s(write_ptr, write_info_ptr, unit, scal_width, scal_height);
+         png_set_sCAL_s(write_ptr, write_info_ptr, unit, scal_width,
+             scal_height);
       }
    }
 #endif
@@ -1626,4 +1627,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_1beta06 your_png_h_is_not_version_1_4_1beta06;
+typedef version_1_4_1beta07 your_png_h_is_not_version_1_4_1beta07;

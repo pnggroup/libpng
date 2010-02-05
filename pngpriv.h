@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.1beta06 - January 28, 2010
+ * libpng version 1.4.1beta07 - February 5, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -353,8 +353,8 @@ PNG_EXTERN void png_write_IEND PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_write_gAMA PNGARG((png_structp png_ptr, double file_gamma));
 #endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
-PNG_EXTERN void png_write_gAMA_fixed PNGARG((png_structp png_ptr, png_fixed_point
-    file_gamma));
+PNG_EXTERN void png_write_gAMA_fixed PNGARG((png_structp png_ptr,
+    png_fixed_point file_gamma));
 #endif
 #endif
 
@@ -558,7 +558,8 @@ PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
 PNG_EXTERN void png_do_swap PNGARG((png_row_infop row_info, png_bytep row));
 #endif
 
-#if defined(PNG_READ_PACKSWAP_SUPPORTED) || defined(PNG_WRITE_PACKSWAP_SUPPORTED)
+#if defined(PNG_READ_PACKSWAP_SUPPORTED) || \
+    defined(PNG_WRITE_PACKSWAP_SUPPORTED)
 PNG_EXTERN void png_do_packswap PNGARG((png_row_infop row_info, png_bytep row));
 #endif
 

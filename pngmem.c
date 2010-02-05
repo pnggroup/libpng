@@ -201,7 +201,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
             {
 #ifndef PNG_USER_MEM_SUPPORTED
                if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
-                  png_error(png_ptr, "Out Of Memory"); /* Note "O" and "M" */
+                  png_error(png_ptr, "Out Of Memory"); /* Note "O", "M" */
                else
                   png_warning(png_ptr, "Out Of Memory");
 #endif
@@ -229,7 +229,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
             {
 #ifndef PNG_USER_MEM_SUPPORTED
                if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
-                  png_error(png_ptr, "Out Of memory"); /* Note "O" and "M" */
+                  png_error(png_ptr, "Out Of memory"); /* Note "O", "m" */
                else
                   png_warning(png_ptr, "Out Of memory");
 #endif

@@ -2492,6 +2492,7 @@ version 1.4.1beta06 [January 28, 2010]
     John Bowler.
 
 version 1.4.1beta07 [February 5, 2010]
+  Folded some long lines in png.h
   Added defineable PNG_USER_CHUNK_CACHE_MAX and PNG_USER_CHUNK_MALLOC_MAX
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

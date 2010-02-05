@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.1 [January 28, 2010]
+ * Last changed in libpng 1.4.1 [February 5, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -31,7 +31,9 @@ png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
       warn_fn, NULL, NULL, NULL));
 }
 
-/* Alternate create PNG structure for reading, and allocate any memory needed. */
+/* Alternate create PNG structure for reading, and allocate any memory
+ * needed.
+ */
 png_structp PNGAPI
 png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
@@ -478,7 +480,8 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    if (png_ptr->transformations & PNG_FILLER)
       png_warning(png_ptr, "PNG_READ_FILLER_SUPPORTED is not defined");
 #endif
-#if defined(PNG_WRITE_PACKSWAP_SUPPORTED) && !defined(PNG_READ_PACKSWAP_SUPPORTED)
+#if defined(PNG_WRITE_PACKSWAP_SUPPORTED) && \
+    !defined(PNG_READ_PACKSWAP_SUPPORTED)
    if (png_ptr->transformations & PNG_PACKSWAP)
       png_warning(png_ptr, "PNG_READ_PACKSWAP_SUPPORTED is not defined");
 #endif
@@ -1045,7 +1048,8 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 
 /* Free all memory used by the read (old method) */
 void /* PRIVATE */
-png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr)
+png_read_destroy(png_structp png_ptr, png_infop info_ptr,
+    png_infop end_info_ptr)
 {
 #ifdef PNG_SETJMP_SUPPORTED
    jmp_buf tmp_jmp;

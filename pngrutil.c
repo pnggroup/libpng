@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [January 28, 2010]
+ * Last changed in libpng 1.4.1 [February 5, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -241,10 +241,12 @@ png_measure_decompressed_chunk(png_structp png_ptr, int comp_type,
             else               /* Enlarge the decompression buffer */
             {
               text_size += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
-#ifdef PNG_CHUNK_MALLOC_LIMIT_SUPPORTED
+#ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
               if (text_size >= png_ptr->user_chunk_malloc_max - 1)
-                 return 0;
+#else
+              if (text_size >= PNG_USER_CHUNK_MALLOC_MAX)
 #endif
+                 return 0;
             }
          }
          if (ret == Z_STREAM_END)
@@ -1229,7 +1231,8 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_ptr->chunkdata[slength] = 0x00;
 
-   for (entry_start = (png_bytep)png_ptr->chunkdata; *entry_start; entry_start++)
+   for (entry_start = (png_bytep)png_ptr->chunkdata; *entry_start;
+       entry_start++)
       /* Empty loop to find end of name */ ;
    ++entry_start;
 
@@ -2405,7 +2408,8 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        png_memcpy((png_charp)png_ptr->unknown_chunk.name,
                   (png_charp)png_ptr->chunk_name,
                   png_sizeof(png_ptr->unknown_chunk.name));
-       png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name)-1] = '\0';
+       png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name)-1]
+           = '\0';
        png_ptr->unknown_chunk.size = (png_size_t)length;
        if (length == 0)
          png_ptr->unknown_chunk.data = NULL;
@@ -2877,7 +2881,8 @@ png_do_read_interlace(png_structp png_ptr)
          default:
          {
             png_size_t pixel_bytes = (row_info->pixel_depth >> 3);
-            png_bytep sp = row + (png_size_t)(row_info->width - 1) * pixel_bytes;
+            png_bytep sp = row + (png_size_t)(row_info->width - 1)
+                * pixel_bytes;
             png_bytep dp = row + (png_size_t)(final_width - 1) * pixel_bytes;
 
             int jstop = png_pass_inc[pass];
