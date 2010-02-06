@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.1 [February 5, 2010]
+ * Last changed in libpng 1.4.1 [February 6, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -584,7 +584,9 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       png_error(png_ptr, "Invalid attempt to read row data");
 
    png_ptr->zstream.next_out = png_ptr->row_buf;
-   png_ptr->zstream.avail_out = (uInt)png_ptr->irowbytes;
+   png_ptr->zstream.avail_out =
+       (uInt)(PNG_ROWBYTES(png_ptr->pixel_depth,
+       png_ptr->iwidth) + 1);
    do
    {
       if (!(png_ptr->zstream.avail_in))

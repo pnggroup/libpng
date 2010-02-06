@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [February 5, 2010]
+ * Last changed in libpng 1.4.1 [February 6, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -242,9 +242,11 @@ png_measure_decompressed_chunk(png_structp png_ptr, int comp_type,
             {
               text_size += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
 #ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
-              if (text_size >= png_ptr->user_chunk_malloc_max - 1)
+              if (png_ptr->user_chunk_malloc_max &&
+                  (text_size >= png_ptr->user_chunk_malloc_max - 1))
 #else
-              if (text_size >= PNG_USER_CHUNK_MALLOC_MAX)
+              if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
+                  text_size >= PNG_USER_CHUNK_MALLOC_MAX))
 #endif
                  return 0;
             }
@@ -1181,7 +1183,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_sPLT");
 
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_USER_LIMITS_SUPPORTED
 
    if (png_ptr->user_chunk_cache_max != 0)
    {
@@ -1986,7 +1988,7 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_tEXt");
 
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_USER_LIMITS_SUPPORTED
    if (png_ptr->user_chunk_cache_max != 0)
    {
       if (png_ptr->user_chunk_cache_max == 1)
@@ -2088,7 +2090,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_zTXt");
 
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_USER_LIMITS_SUPPORTED
    if (png_ptr->user_chunk_cache_max != 0)
    {
       if (png_ptr->user_chunk_cache_max == 1)
@@ -2209,7 +2211,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_iTXt");
 
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_USER_LIMITS_SUPPORTED
    if (png_ptr->user_chunk_cache_max != 0)
    {
       if (png_ptr->user_chunk_cache_max == 1)
@@ -2353,7 +2355,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_unknown");
 
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_USER_LIMITS_SUPPORTED
    if (png_ptr->user_chunk_cache_max != 0)
    {
       if (png_ptr->user_chunk_cache_max == 1)
@@ -3077,9 +3079,6 @@ png_read_finish_row(png_structp png_ptr)
             png_pass_start[png_ptr->pass]) /
             png_pass_inc[png_ptr->pass];
 
-         png_ptr->irowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,
-            png_ptr->iwidth) + 1;
-
          if (!(png_ptr->transformations & PNG_INTERLACE))
          {
             png_ptr->num_rows = (png_ptr->height +
@@ -3204,16 +3203,12 @@ png_read_start_row(png_structp png_ptr)
          png_pass_inc[png_ptr->pass] - 1 -
          png_pass_start[png_ptr->pass]) /
          png_pass_inc[png_ptr->pass];
-
-         png_ptr->irowbytes =
-            PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1;
    }
    else
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
    {
       png_ptr->num_rows = png_ptr->height;
       png_ptr->iwidth = png_ptr->width;
-      png_ptr->irowbytes = png_ptr->rowbytes + 1;
    }
    max_pixel_depth = png_ptr->pixel_depth;
 
@@ -3378,7 +3373,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_debug1(3, "iwidth = %lu,", png_ptr->iwidth);
    png_debug1(3, "num_rows = %lu,", png_ptr->num_rows);
    png_debug1(3, "rowbytes = %lu,", png_ptr->rowbytes);
-   png_debug1(3, "irowbytes = %lu", png_ptr->irowbytes);
+   png_debug1(3, "irowbytes = %lu",
+       PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1);
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }
