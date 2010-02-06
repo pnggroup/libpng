@@ -2491,9 +2491,13 @@ version 1.4.1beta06 [January 28, 2010]
   Revised png_decompress_chunk() to use a two-pass method suggested by
     John Bowler.
 
-version 1.4.1beta07 [February 5, 2010]
-  Folded some long lines in png.h
-  Added defineable PNG_USER_CHUNK_CACHE_MAX and PNG_USER_CHUNK_MALLOC_MAX
+version 1.4.1beta07 [February 6, 2010]
+  Folded some long lines in the source files.
+  Added defineable PNG_USER_CHUNK_CACHE_MAX, PNG_USER_CHUNK_MALLOC_MAX,
+    and a PNG_USER_LIMITS_SUPPORTED flag.
+  Eliminated use of png_ptr->irowbytes and reused the slot in png_ptr as
+    png_ptr->png_user_chunk_malloc_max.
+  Revised png_push_save_buffer() to do fewer but larger png_malloc() calls.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

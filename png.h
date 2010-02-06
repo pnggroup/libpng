@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.1beta07 - February 5, 2010
+ * libpng version 1.4.1beta07 - February 6, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.1beta07 - February 5, 2010: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.1beta07 - February 6, 2010: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -136,7 +136,7 @@
  *    1.4.0                   14    10400  14.so.14.0[.0]
  *    1.4.1beta01-03          14    10401  14.so.14.1[.0]
  *    1.4.1rc01               14    10401  14.so.14.1[.0]
- *    1.4.1beta04             14    10401  14.so.14.1[.0]
+ *    1.4.1beta04-07          14    10401  14.so.14.1[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -168,7 +168,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.1beta07, February 5, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.1beta07, February 6, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -280,7 +280,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    February 5, 2010
+ *    February 6, 2010
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -344,7 +344,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.4.1beta07"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.1beta07 - February 5, 2010\n"
+   " libpng version 1.4.1beta07 - February 6, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   14
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -1095,7 +1095,8 @@ struct png_struct_def
 #endif
    png_error_ptr error_fn PNG_DEPSTRUCT;    /* function for printing
                                                errors and aborting */
-   png_error_ptr warning_fn PNG_DEPSTRUCT;  /* function for printing warnings */
+   png_error_ptr warning_fn PNG_DEPSTRUCT;  /* function for printing
+                                               warnings */
    png_voidp error_ptr PNG_DEPSTRUCT;       /* user supplied struct for
                                                error functions */
    png_rw_ptr write_data_fn PNG_DEPSTRUCT;  /* function for writing
@@ -1107,12 +1108,12 @@ struct png_struct_def
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
    png_user_transform_ptr read_user_transform_fn PNG_DEPSTRUCT; /* user read
-                                                                   transform */
+                                                                 transform */
 #endif
 
 #ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
    png_user_transform_ptr write_user_transform_fn PNG_DEPSTRUCT; /* user write
-                                                                    transform */
+                                                                  transform */
 #endif
 
 /* These were added in libpng-1.0.2 */
@@ -1153,8 +1154,18 @@ struct png_struct_def
    png_uint_32 num_rows PNG_DEPSTRUCT;      /* number of rows in current pass */
    png_uint_32 usr_width PNG_DEPSTRUCT;     /* width of row at start of write */
    png_size_t rowbytes PNG_DEPSTRUCT;       /* size of row in bytes */
-   png_size_t irowbytes PNG_DEPSTRUCT;      /* size of current interlaced row
-                                               in bytes */
+#if 0 /* Replaced with the following in libpng-1.4.1 */
+   png_size_t irowbytes PNG_DEPSTRUCT;
+#endif
+/* Added in libpng-1.4.1 */
+#ifdef PNG_USER_LIMITS_SUPPORTED
+   /* Total memory that a zTXt, sPLT, iTXt, iCCP, or unknown chunk
+    * can occupy when decompressed.  0 means unlimited.
+    * We will change the typedef from png_size_t to png_alloc_size_t
+    * in libpng-1.5.0
+    */
+   png_size_t user_chunk_malloc_max PNG_DEPSTRUCT;
+#endif
    png_uint_32 iwidth PNG_DEPSTRUCT;        /* width of current interlaced
                                                row in pixels */
    png_uint_32 row_number PNG_DEPSTRUCT;    /* current row in interlace pass */
@@ -1427,7 +1438,7 @@ struct png_struct_def
 /* New members added in libpng-1.0.16 and 1.2.6 */
    png_byte compression_type PNG_DEPSTRUCT;
 
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_USER_LIMITS_SUPPORTED
    png_uint_32 user_width_max PNG_DEPSTRUCT;
    png_uint_32 user_height_max PNG_DEPSTRUCT;
    /* Added in libpng-1.4.0: Total number of sPLT, text, and unknown
@@ -1452,14 +1463,6 @@ struct png_struct_def
 #ifdef PNG_IO_STATE_SUPPORTED
 /* New member added in libpng-1.4.0 */
    png_uint_32 io_state PNG_DEPSTRUCT;
-#endif
-
-/* Added in libpng-1.4.1 */
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   /* Total memory that a zTXt, sPLT, iTXt, iCCP, or unknown chunk
-    * can occupy when decompressed.  0 means unlimited.
-    */
-   png_uint_32 user_chunk_malloc_max PNG_DEPSTRUCT;
 #endif
 };
 
@@ -2525,8 +2528,8 @@ extern PNG_EXPORT(png_uint_32,png_get_chunk_cache_max)
    PNGARG((png_structp png_ptr));
 /* Added in libpng-1.4.1 */
 extern PNG_EXPORT(void,png_set_chunk_malloc_max) PNGARG((png_structp
-   png_ptr, png_uint_32 user_chunk_cache_max));
-extern PNG_EXPORT(png_uint_32,png_get_chunk_malloc_max)
+   png_ptr, png_alloc_size_t user_chunk_cache_max));
+extern PNG_EXPORT(png_alloc_size_t,png_get_chunk_malloc_max)
    PNGARG((png_structp png_ptr));
 #endif
 

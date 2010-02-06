@@ -329,7 +329,9 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_ptr->mode |= PNG_HAVE_IDAT;
       png_ptr->process_mode = PNG_READ_IDAT_MODE;
       png_push_have_info(png_ptr, info_ptr);
-      png_ptr->zstream.avail_out = (uInt)png_ptr->irowbytes;
+      png_ptr->zstream.avail_out =
+          (uInt) PNG_ROWBYTES(png_ptr->pixel_depth,
+          png_ptr->iwidth) + 1;
       png_ptr->zstream.next_out = png_ptr->row_buf;
       return;
    }
@@ -684,19 +686,25 @@ png_push_save_buffer(png_structp png_ptr)
          }
       }
    }
-   if (png_ptr->save_buffer_size + png_ptr->current_buffer_size >
-      png_ptr->save_buffer_max)
+   if (png_ptr->save_buffer_size >
+       (png_ptr->save_buffer_max - png_ptr->current_buffer_size))
    {
       png_size_t new_max;
       png_bytep old_buffer;
 
-      if (png_ptr->save_buffer_size > PNG_SIZE_MAX -
-         (png_ptr->current_buffer_size + 256))
-      {
-        png_error(png_ptr, "Potential overflow of save_buffer");
-      }
+      if (png_ptr->save_buffer_size == PNG_SIZE_MAX)
+        png_error(png_ptr, "Overflow of save_buffer");
 
-      new_max = png_ptr->save_buffer_size + png_ptr->current_buffer_size + 256;
+      if (png_ptr->save_buffer_size > PNG_SIZE_MAX -
+          (png_ptr->current_buffer_size +
+          (png_ptr->save_buffer_size >> 3) + 256))
+         new_max = PNG_SIZE_MAX;
+
+      else
+         new_max = png_ptr->save_buffer_size + png_ptr->current_buffer_size +
+             (png_ptr->save_buffer_size >> 3) + 256;
+
+      
       old_buffer = png_ptr->save_buffer;
       png_ptr->save_buffer = (png_bytep)png_malloc(png_ptr,
          (png_size_t)new_max);
@@ -869,7 +877,9 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
            break;
          }
          png_push_process_row(png_ptr);
-         png_ptr->zstream.avail_out = (uInt)png_ptr->irowbytes;
+         png_ptr->zstream.avail_out =
+             (uInt) PNG_ROWBYTES(png_ptr->pixel_depth,
+             png_ptr->iwidth) + 1;
          png_ptr->zstream.next_out = png_ptr->row_buf;
       }
 
@@ -1133,9 +1143,6 @@ png_read_push_finish_row(png_structp png_ptr)
             png_pass_inc[png_ptr->pass] - 1 -
             png_pass_start[png_ptr->pass]) /
             png_pass_inc[png_ptr->pass];
-
-         png_ptr->irowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,
-            png_ptr->iwidth) + 1;
 
          if (png_ptr->transformations & PNG_INTERLACE)
             break;
