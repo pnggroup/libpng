@@ -685,7 +685,7 @@ png_write_row(png_structp png_ptr, png_bytep row)
     defined(PNG_READ_PACKSWAP_SUPPORTED)
       if (png_ptr->transformations & PNG_PACKSWAP)
          png_warning(png_ptr,
-%4+-%             "PNG_WRITE_PACKSWAP_SUPPORTED is not defined");
+             "PNG_WRITE_PACKSWAP_SUPPORTED is not defined");
 #endif
 #if !defined(PNG_WRITE_PACK_SUPPORTED) && defined(PNG_READ_PACK_SUPPORTED)
       if (png_ptr->transformations & PNG_PACK)
