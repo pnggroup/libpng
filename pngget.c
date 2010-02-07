@@ -1,8 +1,8 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.2.41 [December 3, 2009]
- * Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ * Last changed in libpng 1.2.43 [February 7, 2010]
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -872,13 +872,11 @@ png_get_user_chunk_ptr(png_structp png_ptr)
 }
 #endif
 
-#ifdef PNG_WRITE_SUPPORTED
 png_uint_32 PNGAPI
 png_get_compression_buffer_size(png_structp png_ptr)
 {
    return (png_uint_32)(png_ptr? png_ptr->zbuf_size : 0L);
 }
-#endif
 
 #ifdef PNG_ASSEMBLER_CODE_SUPPORTED
 #ifndef PNG_1_0_X
@@ -929,7 +927,8 @@ png_get_mmx_rowbytes_threshold (png_structp png_ptr)
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
-/* These functions were added to libpng 1.2.6 */
+/* These functions were added to libpng 1.2.6 but not enabled
+* by default. They will be enabled in libpng-1.4.0 */
 png_uint_32 PNGAPI
 png_get_user_width_max (png_structp png_ptr)
 {

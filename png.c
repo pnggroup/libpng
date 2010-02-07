@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.42 [January 3, 2010]
+ * Last changed in libpng 1.2.43 [February 7, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -17,7 +17,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_43beta02 Your_png_h_is_not_version_1_2_43beta02;
+typedef version_1_2_43beta03 Your_png_h_is_not_version_1_2_43beta03;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
@@ -78,7 +78,8 @@ PNG_CONST int FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
 */
 
 /* Mask to determine which pixels are valid in a pass */
-PNG_CONST int FARDATA png_pass_mask[] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
+PNG_CONST int FARDATA png_pass_mask[] =
+    {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
 
 /* Mask to determine which pixels to overwrite while displaying */
 PNG_CONST int FARDATA png_pass_dsp_mask[]
@@ -687,8 +688,8 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
           ptime->day % 32, short_months[(ptime->month - 1) % 12],
         ptime->year, ptime->hour % 24, ptime->minute % 60,
           ptime->second % 61);
-      WideCharToMultiByte(CP_ACP, 0, time_buf, -1, png_ptr->time_buffer, 29,
-          NULL, NULL);
+      WideCharToMultiByte(CP_ACP, 0, time_buf, -1, png_ptr->time_buffer,
+          29, NULL, NULL);
    }
 #else
 #ifdef USE_FAR_KEYWORD
@@ -723,13 +724,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.2.43beta02 - February 1, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.2.43beta03 - February 7, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.2.43beta02 - February 1, 2010\
+      return ((png_charp) "libpng version 1.2.43beta03 - February 7, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");

@@ -2650,10 +2650,17 @@ version 1.2.43beta01 [January 27, 2010]
     PNG_READ_16_TO_8_SUPPORTED and PNG_READ_GRAY_TO_RGB_SUPPORTED
     in pngconf.h.  These were added in libpng-1.2.41beta08 and libpng-1.0.51,
     which introduced a binary incompatibility with libpng-1.0.50.
-  Backported new png_decompress_chunk() algorithm from libpng-1.4.1
+  Backported new png_decompress_chunk() algorithm from libpng-1.4.1.
 
 version 1.2.43beta02 [February 1, 2010]
-  Backported two-pass png_decompress_chunk() algorithm from libpng-1.4.1
+  Backported two-pass png_decompress_chunk() algorithm from libpng-1.4.1.
+
+version 1.2.43beta03 [February 6, 2010]
+  Backported fast png_push_save_buffer() algorithm from libpng-1.4.1.
+  Backported some cosmetic changes from libpng-1.4.1.
+
+version 1.0.53rc01 and 1.2.43rc01 [February 7, 2010]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.2.41 [December 3, 2009]
+ * Last changed in libpng 1.2.43 [February 7, 2010]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -31,7 +31,9 @@ png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
       warn_fn, png_voidp_NULL, png_malloc_ptr_NULL, png_free_ptr_NULL));
 }
 
-/* Alternate create PNG structure for reading, and allocate any memory needed. */
+/* Alternate create PNG structure for reading, and allocate any memory
+ * needed.
+ */
 png_structp PNGAPI
 png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
@@ -64,9 +66,17 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
       return (NULL);
 
    /* Added at libpng-1.2.6 */
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#ifdef PNG_USER_LIMITS_SUPPORTED
    png_ptr->user_width_max = PNG_USER_WIDTH_MAX;
    png_ptr->user_height_max = PNG_USER_HEIGHT_MAX;
+#  ifdef PNG_USER_CHUNK_CACHE_MAX
+   /* Added at libpng-1.2.43 and 1.4.0 */
+   png_ptr->user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
+#  endif
+#  ifdef PNG_SET_USER_CHUNK_MALLOC_MAX
+   /* Added at libpng-1.2.43 and 1.4.1 */
+   png_ptr->user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
+#  endif
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -231,7 +241,8 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
       png_ptr->flags = 0;
 #endif
       png_error(png_ptr,
-      "The png struct allocated by the application for reading is too small.");
+      "The png struct allocated by the application for reading is"
+      " too small.");
    }
    if (png_sizeof(png_info) > png_info_size)
    {
@@ -240,7 +251,8 @@ png_read_init_2(png_structp png_ptr, png_const_charp user_png_ver,
       png_ptr->flags = 0;
 #endif
       png_error(png_ptr,
-        "The info struct allocated by application for reading is too small.");
+        "The info struct allocated by application for reading is"
+        " too small.");
    }
    png_read_init_3(&png_ptr, user_png_ver, png_struct_size);
 }
@@ -270,7 +282,8 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
 #else
         png_ptr->warning_fn = NULL;
         png_warning(png_ptr,
-         "Application uses deprecated png_read_init() and should be recompiled.");
+         "Application uses deprecated png_read_init() and should be"
+         " recompiled.");
         break;
 #endif
       }
@@ -317,7 +330,8 @@ png_read_init_3(png_structpp ptr_ptr, png_const_charp user_png_ver,
    {
       case Z_OK: /* Do nothing */ break;
       case Z_STREAM_ERROR: png_error(png_ptr, "zlib memory error"); break;
-      case Z_VERSION_ERROR: png_error(png_ptr, "zlib version error"); break;
+      case Z_VERSION_ERROR: png_error(png_ptr, "zlib version error");
+          break;
       default: png_error(png_ptr, "Unknown zlib error");
    }
 
@@ -609,7 +623,8 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
    if (png_ptr->transformations & PNG_FILLER)
       png_warning(png_ptr, "PNG_READ_FILLER_SUPPORTED is not defined.");
 #endif
-#if defined(PNG_WRITE_PACKSWAP_SUPPORTED) && !defined(PNG_READ_PACKSWAP_SUPPORTED)
+#if defined(PNG_WRITE_PACKSWAP_SUPPORTED) && \
+    !defined(PNG_READ_PACKSWAP_SUPPORTED)
    if (png_ptr->transformations & PNG_PACKSWAP)
       png_warning(png_ptr, "PNG_READ_PACKSWAP_SUPPORTED is not defined.");
 #endif
@@ -712,7 +727,9 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       png_error(png_ptr, "Invalid attempt to read row data");
 
    png_ptr->zstream.next_out = png_ptr->row_buf;
-   png_ptr->zstream.avail_out = (uInt)png_ptr->irowbytes;
+   png_ptr->zstream.avail_out =
+       (uInt)(PNG_ROWBYTES(png_ptr->pixel_depth,
+       png_ptr->iwidth) + 1);
    do
    {
       if (!(png_ptr->zstream.avail_in))
@@ -1179,7 +1196,8 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 
 /* Free all memory used by the read (old method) */
 void /* PRIVATE */
-png_read_destroy(png_structp png_ptr, png_infop info_ptr, png_infop end_info_ptr)
+png_read_destroy(png_structp png_ptr, png_infop info_ptr,
+    png_infop end_info_ptr)
 {
 #ifdef PNG_SETJMP_SUPPORTED
    jmp_buf tmp_jmp;

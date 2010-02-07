@@ -1,8 +1,8 @@
 
 /* pngrio.c - functions for data input
  *
- * Last changed in libpng 1.2.41 [December 3, 2009]
- * Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ * Last changed in libpng 1.2.43 [February 7, 2010]
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -92,7 +92,8 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    if ((png_bytep)n_data == data)
    {
 #ifdef _WIN32_WCE
-      if ( !ReadFile((HANDLE)(png_ptr->io_ptr), data, length, &check, NULL) )
+      if ( !ReadFile((HANDLE)(png_ptr->io_ptr), data, length, &check,
+          NULL) )
          check = 0;
 #else
       check = fread(n_data, 1, length, io_ptr);
