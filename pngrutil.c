@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [February 6, 2010]
+ * Last changed in libpng 1.4.1 [February 7, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -246,7 +246,7 @@ png_measure_decompressed_chunk(png_structp png_ptr, int comp_type,
                   (text_size >= png_ptr->user_chunk_malloc_max - 1))
 #else
               if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
-                  text_size >= PNG_USER_CHUNK_MALLOC_MAX))
+                  text_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
 #endif
                  return 0;
             }
