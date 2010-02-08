@@ -2503,7 +2503,7 @@ version 1.4.1beta08 [February 6, 2010]
   Minor cleanup and updating of dates and copyright year.
 
 version 1.4.1beta09 [February 8, 2010]
-  Fixed incorrect test in new png_push_save_buffer() code.
+  Reverted to original png_push_save_buffer() code.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

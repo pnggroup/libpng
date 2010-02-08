@@ -686,27 +686,19 @@ png_push_save_buffer(png_structp png_ptr)
          }
       }
    }
-   if (png_ptr->save_buffer_size >
-       (png_ptr->save_buffer_max - png_ptr->current_buffer_size))
+   if (png_ptr->save_buffer_size + png_ptr->current_buffer_size >
+      png_ptr->save_buffer_max)
    {
       png_size_t new_max;
       png_bytep old_buffer;
 
-      if (png_ptr->save_buffer_max == PNG_SIZE_MAX ||
-          (png_ptr->save_buffer_size > PNG_SIZE_MAX -
-          png_ptr->current_buffer_size))
-         png_error(png_ptr, "Overflow of save_buffer");
-
       if (png_ptr->save_buffer_size > PNG_SIZE_MAX -
-          (png_ptr->current_buffer_size +
-          (png_ptr->save_buffer_size >> 3) + 256))
-         new_max = PNG_SIZE_MAX;
+         (png_ptr->current_buffer_size + 256))
+      {
+        png_error(png_ptr, "Potential overflow of save_buffer");
+      }
 
-      else
-         new_max = png_ptr->save_buffer_size + png_ptr->current_buffer_size +
-             (png_ptr->save_buffer_size >> 3) + 256;
-
-      
+      new_max = png_ptr->save_buffer_size + png_ptr->current_buffer_size + 256;
       old_buffer = png_ptr->save_buffer;
       png_ptr->save_buffer = (png_bytep)png_malloc(png_ptr,
          (png_size_t)new_max);
