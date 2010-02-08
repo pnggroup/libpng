@@ -2662,6 +2662,9 @@ version 1.2.43beta03 [February 6, 2010]
 version 1.2.43beta04 [February 7, 2010]
   Fixed incorrect test in new png_push_save_buffer() code.
 
+version 1.2.43beta05 [February 7, 2010]
+  Reverted recent changes to png_push_save-buffer().
+
 version 1.0.53rc01 and 1.2.43rc01 [February 8, 2010]
   No changes.
 
