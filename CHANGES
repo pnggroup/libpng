@@ -2507,7 +2507,7 @@ version 1.5.0beta01 [February 7, 2010]
     into pnginfo.h
 
 version 1.5.0beta02 [February 8, 2010]
-  Fixed incorrect test in new png_push_save_buffer() code.
+  Reverted to original png_push_save_buffer() code.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

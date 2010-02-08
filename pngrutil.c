@@ -325,7 +325,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                text = (png_charp)png_malloc_warn(png_ptr, text_size);
                if (text ==  NULL)
                {
-                  png_error(png_ptr,
+                  png_warning(png_ptr,
                      "Not enough memory to decompress chunk");
                   text_size = 0;
                   break;
@@ -355,7 +355,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                text = (png_charp)png_malloc_warn(png_ptr, text_size + 1);
                if (text ==  NULL)
                {
-                  png_error(png_ptr,
+                  png_warning(png_ptr,
                     "Not enough memory to decompress chunk");
                   text_size = 0;
                   break;
@@ -410,11 +410,13 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             {
                png_free(png_ptr, png_ptr->chunkdata);
                png_ptr->chunkdata = NULL;
-               png_error(png_ptr, "Not enough memory for text");
+               png_warning(png_ptr, "Not enough memory for text");
             }
-            png_memcpy(text, png_ptr->chunkdata, prefix_size);
+            else
+               png_memcpy(text, png_ptr->chunkdata, prefix_size);
          }
-         *(text + text_size) = 0x00;
+         if (text != NULL)
+            *(text + text_size) = 0x00;
       }
 
       inflateReset(&png_ptr->zstream);
