@@ -2514,6 +2514,8 @@ version 1.5.0beta03 [February 8, 2010]
     calling png_error().
   Updated configure script to use SO number 15.
 
+version 1.5.0beta04 [February 8, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
