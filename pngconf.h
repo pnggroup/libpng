@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.1beta08 - February 7, 2010
+ * libpng version 1.4.1beta09 - February 8, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -674,12 +674,16 @@
 #endif
 
 /* Added at libpng-1.2.6 */
-#ifndef PNG_SET_USER_LIMITS_SUPPORTED
-#  ifndef PNG_NO_SET_USER_LIMITS
+#ifndef PNG_NO_SET_USER_LIMITS
+#  ifndef PNG_SET_USER_LIMITS_SUPPORTED
 #    define PNG_SET_USER_LIMITS_SUPPORTED
-     /* Feature added at libpng-1.4.0, this flag added at 1.4.1 */
+#  endif
+  /* Feature added at libpng-1.4.0, this flag added at 1.4.1 */
+#  ifndef PNG_SET_CHUNK_CACHE_LIMIT_SUPPORTED
 #    define PNG_SET_CHUNK_CACHE_LIMIT_SUPPORTED
-     /* Feature added at libpng-1.4.1, this flag added at 1.4.1 */
+#  endif
+  /* Feature added at libpng-1.4.1, this flag added at 1.4.1 */
+#  ifndef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
 #    define PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
 #  endif
 #endif
@@ -690,8 +694,6 @@
 #    define PNG_USER_LIMITS_SUPPORTED
 #  endif
 #endif
-
-/* Added at libpng-1.2.43 */
 
 /* Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGs no matter
  * how large, set these two limits to 0x7fffffffL
