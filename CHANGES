@@ -2659,7 +2659,10 @@ version 1.2.43beta03 [February 6, 2010]
   Backported fast png_push_save_buffer() algorithm from libpng-1.4.1.
   Backported some cosmetic changes from libpng-1.4.1.
 
-version 1.0.53rc01 and 1.2.43rc01 [February 7, 2010]
+version 1.2.43beta04 [February 7, 2010]
+  Fixed incorrect test in new png_push_save_buffer() code.
+
+version 1.0.53rc01 and 1.2.43rc01 [February 8, 2010]
   No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
