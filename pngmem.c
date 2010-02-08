@@ -115,7 +115,7 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * result, we would be truncating potentially larger memory requests
  * (which should cause a fatal error) and introducing major problems.
  */
-png_voidp PNGAPI
+png_voidp /* PRIVATE */
 png_calloc(png_structp png_ptr, png_uint_32 size)
 {
    png_voidp ret;
