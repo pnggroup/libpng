@@ -9,7 +9,7 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-# where "make install" puts libpng.a, libpng14.dylib, png.h and pngconf.h
+# where "make install" puts libpng.a, libpng15.dylib, png.h and pngconf.h
 prefix=/usr/local
 exec_prefix=$(prefix)
 
@@ -20,8 +20,8 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 # Library name:
-LIBNAME = libpng14
-PNGMAJ = 14
+LIBNAME = libpng15
+PNGMAJ = 15
 
 # Shared library names:
 LIBSO=$(LIBNAME).dylib
@@ -39,7 +39,7 @@ RM_F=/bin/rm -f
 
 # CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops
 CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng14 -lz
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng15 -lz
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -83,14 +83,14 @@ libpng.pc:
 	-e s!@exec_prefix@!$(exec_prefix)! \
 	-e s!@libdir@!$(LIBPATH)! \
 	-e s!@includedir@!$(INCPATH)! \
-	-e s!-lpng14!-lpng14\ -lz! > libpng.pc
+	-e s!-lpng15!-lpng15\ -lz! > libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng14 -lz\"; \
+	echo libs=\"-lpng15 -lz\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -100,7 +100,7 @@ $(LIBSO): $(LIBSOMAJ)
 $(LIBSOMAJ): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(LIBSOMAJ) \
-	 -current_version 14 -compatibility_version 14 \
+	 -current_version 15 -compatibility_version 15 \
 	 -o $(LIBSOMAJ) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 

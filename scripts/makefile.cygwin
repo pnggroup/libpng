@@ -65,9 +65,9 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
         -W -Wall -O3 $(ALIGN) -funroll-loops \
 	-fomit-frame-pointer) # $(WARNMORE) -g -DPNG_DEBUG=5
 
-LIBNAME = libpng14
-PNGMAJ = 14
-CYGDLL = 14
+LIBNAME = libpng15
+PNGMAJ = 15
+CYGDLL = 15
 
 SHAREDLIB=cygpng$(CYGDLL).dll
 STATLIB=libpng.a
@@ -130,7 +130,7 @@ libpng.pc: scripts/libpng.pc.in
 	-e s!@exec_prefix@!$(exec_prefix)! \
 	-e s!@libdir@!$(LIBPATH)! \
 	-e s!@includedir@!$(INCPATH)! \
-	-e s!-lpng14!-lpng14\ -lz! > libpng.pc
+	-e s!-lpng15!-lpng15\ -lz! > libpng.pc
 
 libpng-config: scripts/libpng-config-head.in scripts/libpng-config-body.in
 	@echo -e Making $(LIBNAME) libpng-config file for this libpng \
@@ -243,16 +243,16 @@ test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
 	$(CC) -I$(DI) $(CFLAGS) \
-	   `$(BINPATH)/libpng14-config --cflags` pngtest.c \
+	   `$(BINPATH)/libpng15-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) \
-	   -o pngtestd `$(BINPATH)/libpng14-config --ldflags`
+	   -o pngtestd `$(BINPATH)/libpng15-config --ldflags`
 	./pngtestd pngtest.png
 
 test-installed:
 	$(CC) $(CFLAGS) \
-	   `$(BINPATH)/libpng14-config --cflags` pngtest.c \
+	   `$(BINPATH)/libpng15-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) \
-	   -o pngtesti$(EXE) `$(BINPATH)/libpng14-config --ldflags`
+	   -o pngtesti$(EXE) `$(BINPATH)/libpng15-config --ldflags`
 	./pngtesti$(EXE) pngtest.png
 
 clean:

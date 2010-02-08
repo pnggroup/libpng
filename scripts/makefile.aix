@@ -21,8 +21,8 @@ RANLIB = ranlib
 RM_F = rm -f
 LN_SF = ln -f -s
 
-LIBNAME=libpng14
-PNGMAJ = 14
+LIBNAME=libpng15
+PNGMAJ = 15
 
 prefix=/usr/local
 INCPATH=$(prefix)/include
@@ -47,7 +47,7 @@ CRELEASE = -O2
 LDRELEASE = -s
 WARNMORE=-W -Wall
 CFLAGS = -I$(ZLIBINC) $(WARNMORE) $(CRELEASE)
-LDFLAGS = -L. -L$(ZLIBLIB) -lpng14 -lz -lm $(LDRELEASE)
+LDFLAGS = -L. -L$(ZLIBLIB) -lpng15 -lz -lm $(LDRELEASE)
 
 # File extensions
 O=.o
