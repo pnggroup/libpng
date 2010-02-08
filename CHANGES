@@ -2499,7 +2499,11 @@ version 1.4.1beta07 [February 6, 2010]
     png_ptr->png_user_chunk_malloc_max.
   Revised png_push_save_buffer() to do fewer but larger png_malloc() calls.
 
-version 1.4.1beta08 [February 7, 2010]
+version 1.4.1beta08 [February 6, 2010]
+  Minor cleanup and updating of dates and copyright year.
+
+version 1.4.1beta09 [February 8, 2010]
+  Fixed incorrect test in new png_push_save_buffer() code.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

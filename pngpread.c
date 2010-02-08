@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.4.1 [February 7, 2010]
+ * Last changed in libpng 1.4.1 [February 8, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -692,8 +692,10 @@ png_push_save_buffer(png_structp png_ptr)
       png_size_t new_max;
       png_bytep old_buffer;
 
-      if (png_ptr->save_buffer_size == PNG_SIZE_MAX)
-        png_error(png_ptr, "Overflow of save_buffer");
+      if (png_ptr->save_buffer_max == PNG_SIZE_MAX ||
+          (png_ptr->save_buffer_size > PNG_SIZE_MAX -
+          png_ptr->current_buffer_size))
+         png_error(png_ptr, "Overflow of save_buffer");
 
       if (png_ptr->save_buffer_size > PNG_SIZE_MAX -
           (png_ptr->current_buffer_size +
@@ -805,7 +807,7 @@ png_push_read_IDAT(png_structp png_ptr)
 
       png_calculate_crc(png_ptr, png_ptr->current_buffer_ptr, save_size);
       if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
-        png_process_IDAT_data(png_ptr, png_ptr->current_buffer_ptr, save_size);
+         png_process_IDAT_data(png_ptr, png_ptr->current_buffer_ptr, save_size);
 
       png_ptr->idat_size -= save_size;
       png_ptr->buffer_size -= save_size;
