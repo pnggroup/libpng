@@ -68,8 +68,6 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng14
 PNGMAJ = 14
 CYGDLL = 14
-PNGMIN = 1.4.0rc08
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=cygpng$(CYGDLL).dll
 STATLIB=libpng.a
@@ -270,21 +268,21 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o:		png.h pngconf.h pngpriv.h png.c
-pngerror.o pngerror.pic.o:	png.h pngconf.h pngpriv.h pngerror.c
-pngrio.o pngrio.pic.o:		png.h pngconf.h pngpriv.h pngrio.c
-pngwio.o pngwio.pic.o:		png.h pngconf.h pngpriv.h pngwio.c
-pngmem.o pngmem.pic.o:		png.h pngconf.h pngpriv.h pngmem.c
-pngset.o pngset.pic.o:		png.h pngconf.h pngpriv.h pngset.c
-pngget.o pngget.pic.o:		png.h pngconf.h pngpriv.h pngget.c
-pngread.o pngread.pic.o:	png.h pngconf.h pngpriv.h pngread.c
-pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngpriv.h pngrtran.c
-pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngpriv.h pngrutil.c
-pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngpriv.h pngtrans.c
-pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngpriv.h pngwrite.c
-pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngpriv.h pngwtran.c
-pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngpriv.h pngwutil.c
-pngpread.o pngpread.pic.o:	png.h pngconf.h pngpriv.h pngpread.c
+png.o png.pic.o:		png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h png.c
+pngerror.o pngerror.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngerror.c
+pngrio.o pngrio.pic.o:		png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngrio.c
+pngwio.o pngwio.pic.o:		png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngwio.c
+pngmem.o pngmem.pic.o:		png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngmem.c
+pngset.o pngset.pic.o:		png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngset.c
+pngget.o pngget.pic.o:		png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngget.c
+pngread.o pngread.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngread.c
+pngrtran.o pngrtran.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngrtran.c
+pngrutil.o pngrutil.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngrutil.c
+pngtrans.o pngtrans.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngtrans.c
+pngwrite.o pngwrite.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngwrite.c
+pngwtran.o pngwtran.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngwtran.c
+pngwutil.o pngwutil.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngwutil.c
+pngpread.o pngpread.pic.o:	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngpread.c
 
 pngtest.o:			png.h pngconf.h pngtest.c
 pngtest-stat.o:			png.h pngconf.h pngtest.c

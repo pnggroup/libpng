@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.4.0rc08
+;Version 1.5.0beta01
   png_build_grayscale_palette
   png_chunk_error
   png_chunk_warning
@@ -204,9 +204,11 @@ EXPORTS
 ; png_set_benign_error
   png_get_io_chunk_name
   png_get_io_state
-  png_set_premultiply_alpha
   png_get_chunk_cache_max
   png_set_chunk_cache_max
   png_check_cHRM_fixed
   png_calloc
   png_set_longjmp_fn
+; Added at version 1.4.1
+  png_get_chunk_malloc_max
+  png_set_chunk_malloc_max

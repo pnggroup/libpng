@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.0rc08 - January 2, 2010
+ libpng version 1.5.0beta01 - February 8, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.0rc08 - January 2, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta01 - February 8, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -260,6 +260,15 @@ libpng know that there are some bytes missing from the start of the file.
 
     png_set_sig_bytes(png_ptr, number);
 
+You can change the zlib compression buffer size to be used while
+reading compressed data with
+
+    png_set_compression_buffer_size(png_ptr, buffer_size);
+
+where the default size is 8192 bytes.  Note that the buffer size
+is changed immediately and the buffer is reallocated immediately,
+instead of setting a flag to be acted upon later.
+
 Setting up callback code
 
 You can set up a callback function to handle any unknown chunks in the
@@ -422,6 +431,18 @@ where 0x7fffffffL means unlimited.  You can retrieve this limit with
 
 This limit also applies to the number of buffers that can be allocated
 by png_decompress_chunk() while decompressing iTXt, zTXt, and iCCP chunks.
+
+You can also set a limit on the amount of memory that a compressed chunk
+other than IDAT can occupy, with
+
+   png_set_chunk_malloc_max(png_ptr, user_chunk_malloc_max);
+
+and you can retrieve the limit with
+
+   chunk_malloc_max = png_get_chunk_malloc_max(png_ptr);
+
+Any chunks that would cause either of these limits to be exceeded will
+be ignored.
 
 The high-level read interface
 
@@ -878,7 +899,7 @@ things.
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
-As of libpng version 1.4.0rc08, not all possible expansions are supported.
+As of libpng version 1.5.0beta01, not all possible expansions are supported.
 
 In the following table, the 01 means grayscale with depth<8, 31 means
 indexed with depth<8, other numerals represent the color type, "T" means
@@ -2479,7 +2500,7 @@ via
 Your replacement memory functions must have prototypes as follows:
 
     png_voidp malloc_fn(png_structp png_ptr,
-       png_size_t size);
+       png_alloc_size_t size);
     void free_fn(png_structp png_ptr, png_voidp ptr);
 
 Your malloc_fn() must return NULL in case of failure.  The png_malloc()
@@ -2994,6 +3015,7 @@ The function
 which also expands tRNS to alpha was replaced with
     png_set_expand_gray_1_2_4_to_8()
 which does not. It has been deprecated since libpng-1.0.18 and 1.2.9.
+
 IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
 
 Private libpng prototypes and macro definitions were moved from
@@ -3028,7 +3050,7 @@ The png_struct and info_struct members "trans" and "trans_values" were
 changed to "trans_alpha" and "trans_color", respectively.
 
 The obsolete, unused pnggccrd.c and pngvcrd.c files and related makefiles
-%were removed.
+were removed.
 
 The PNG_1_0_X and PNG_1_2_X macros were eliminated.
 
@@ -3052,10 +3074,17 @@ We removed the obsolete png_check_sig(), png_memcpy_check(), and
 png_memset_check() functions.  Instead use !png_sig_cmp(), png_memcpy(),
 and png_memset(), respectively.
 
+The function png_set_gray_1_2_4_to_8() was removed. It has been
+deprecated since libpng-1.0.18 and 1.2.9, when it was replaced with
+png_set_expand_gray_1_2_4_to_8() because the former function also
+expanded palette images.
+
 We changed the prototype for png_malloc() from
     png_malloc(png_structp png_ptr, png_uint_32 size)
 to
     png_malloc(png_structp png_ptr, png_alloc_size_t size)
+
+This also applies to the prototype for the user replacement malloc_fn().
 
 The png_calloc() function was added and is used in place of
 of "png_malloc(); png_memset();" except in the case in png_read_png()
@@ -3216,13 +3245,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-January 2, 2010
+February 8, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.0rc08 are Y2K compliant.  It is my belief that earlier
+upward through 1.5.0beta01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that

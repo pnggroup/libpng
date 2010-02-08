@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.4.0 [January 2, 2010]
+ * Last changed in libpng 1.4.0 [February 8, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -17,6 +17,7 @@
  * identify the replacement functions.
  */
 
+#define PNG_INTERNAL
 #define PNG_NO_PEDANTIC_WARNINGS
 #include "png.h"
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
@@ -201,7 +202,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
             {
 #ifndef PNG_USER_MEM_SUPPORTED
                if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
-                  png_error(png_ptr, "Out Of Memory"); /* Note "O" and "M" */
+                  png_error(png_ptr, "Out Of Memory"); /* Note "O", "M" */
                else
                   png_warning(png_ptr, "Out Of Memory");
 #endif
@@ -229,7 +230,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
             {
 #ifndef PNG_USER_MEM_SUPPORTED
                if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
-                  png_error(png_ptr, "Out Of memory"); /* Note "O" and "M" */
+                  png_error(png_ptr, "Out Of memory"); /* Note "O", "m" */
                else
                   png_warning(png_ptr, "Out Of memory");
 #endif

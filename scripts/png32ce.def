@@ -15,7 +15,7 @@ LIBRARY lpngce
  png_get_int_32
 
 EXPORTS
-;Version 1.4.0rc08
+;Version 1.5.0beta01
   png_build_grayscale_palette  @1
 ;  png_check_sig        @2
   png_chunk_error      @3
@@ -249,9 +249,11 @@ EXPORTS
   png_set_benign_error @211
   png_get_io_chunk_name @212
   png_get_io_state @213
-  png_set_premultiply_alpha @214
   png_get_chunk_cache_max @215
   png_set_chunk_cache_max @216
   png_check_cHRM_fixed @217
   png_calloc @218
   png_set_longjmp_fn @219
+; Added at version 1.4.1
+  png_get_chunk_malloc_max @220
+  png_set_chunk_malloc_max @221

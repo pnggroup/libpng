@@ -2455,8 +2455,55 @@ version 1.4.0rc08 [January 2, 2010]
   Avoid deprecated references to png_ptr-io_ptr and png_ptr->error_ptr
     in pngtest.c
 
-version 1.4.0 [January 2, 2010]
+version 1.4.0 [January 3, 2010]
   No changes.
+
+version 1.4.1beta01 [January 8, 2010]
+  Updated CMakeLists.txt for consistent indentation and to avoid an
+    unclosed if-statement warning (Philip Lowman).
+  Revised Makefile.am and Makefile.in to remove references to Y2KINFO,
+    KNOWNBUG, and libpng.la (Robert Schwebel).
+  Revised the makefiles to install the same files and symbolic
+    links as configure, except for libpng.la and libpng14.la.
+  Make png_set|get_compression_buffer_size() available even when
+    PNG_WRITE_SUPPORTED is not enabled.
+  Revised Makefile.am and Makefile.in to simplify their maintenance.
+  Revised scripts/makefile.linux to install a link to libpng14.so.14.1
+
+version 1.4.1beta02 [January 9, 2010]
+  Revised the rest of the makefiles to install a link to libpng14.so.14.1
+
+version 1.4.1beta03 [January 10, 2010]
+  Removed png_set_premultiply_alpha() from scripts/*.def
+
+version 1.4.1rc01 [January 16, 2010]
+  No changes.
+
+version 1.4.1beta04 [January 23, 2010]
+  Revised png_decompress_chunk() to improve speed and memory usage when
+    decoding large chunks.
+  Added png_set|get_chunk_malloc_max() functions.
+
+version 1.4.1beta05 [January 26, 2010]
+  Relocated "int k" declaration in pngtest.c to minimize its scope.
+
+version 1.4.1beta06 [January 28, 2010]
+  Revised png_decompress_chunk() to use a two-pass method suggested by
+    John Bowler.
+
+version 1.4.1beta07 [February 6, 2010]
+  Folded some long lines in the source files.
+  Added defineable PNG_USER_CHUNK_CACHE_MAX, PNG_USER_CHUNK_MALLOC_MAX,
+    and a PNG_USER_LIMITS_SUPPORTED flag.
+  Eliminated use of png_ptr->irowbytes and reused the slot in png_ptr as
+    png_ptr->png_user_chunk_malloc_max.
+  Revised png_push_save_buffer() to do fewer but larger png_malloc() calls.
+
+version 1.4.1beta08 [February 6, 2010]
+  Minor cleanup and updating of dates and copyright year.
+
+version 1.5.0beta01 [February 8, 2010]
+  Moved declaration of png_struct into private pngstruct.h and png_info into pnginfo.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

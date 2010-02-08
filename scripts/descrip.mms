@@ -33,20 +33,20 @@ clean :
 
 
 # Other dependencies.
-png.obj : png.h, pngconf.h, pngpriv.h
-pngpread.obj : png.h, pngconf.h, pngpriv.h
-pngset.obj : png.h, pngconf.h, pngpriv.h
-pngget.obj : png.h, pngconf.h, pngpriv.h
-pngread.obj : png.h, pngconf.h, pngpriv.h
-pngrtran.obj : png.h, pngconf.h, pngpriv.h
-pngrutil.obj : png.h, pngconf.h, pngpriv.h
-pngerror.obj : png.h, pngconf.h, pngpriv.h
-pngmem.obj : png.h, pngconf.h, pngpriv.h
-pngrio.obj : png.h, pngconf.h, pngpriv.h
-pngwio.obj : png.h, pngconf.h, pngpriv.h
-pngtrans.obj : png.h, pngconf.h, pngpriv.h
-pngwrite.obj : png.h, pngconf.h, pngpriv.h
-pngwtran.obj : png.h, pngconf.h, pngpriv.h
-pngwutil.obj : png.h, pngconf.h, pngpriv.h
+png.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngpread.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngset.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngget.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngread.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngrtran.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngrutil.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngerror.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngmem.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngrio.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngwio.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngtrans.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngwrite.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngwtran.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+pngwutil.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
 
 pngtest.obj : png.h, pngconf.h
