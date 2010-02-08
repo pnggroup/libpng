@@ -595,7 +595,6 @@ typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
 #ifdef PNG_INTERNAL
 #include "pnginfo.h"
 #else
-typedef struct { ; } png_info_struct;
 typedef struct png_info_struct png_info;
 #endif
 
@@ -788,8 +787,6 @@ typedef void (*png_free_ptr) PNGARG((png_structp, png_voidp));
 
 #ifdef PNG_INTERNAL
 #include "pngstruct.h"
-#else
-typedef struct { ; } png_struct_def;
 #endif
 
 /* This triggers a compiler error in png.c, if png.c and png.h
