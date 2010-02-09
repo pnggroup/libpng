@@ -2517,6 +2517,8 @@ version 1.5.0beta03 [February 8, 2010]
 version 1.5.0beta04 [February 9, 2010]
   Removed malformed "incomplete struct declaration" of png_info from png.h
 
+version 1.5.0beta05 [February 9, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
