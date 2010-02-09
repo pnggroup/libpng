@@ -592,7 +592,7 @@ typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
 #endif
 
 
-#ifdef PNG_INTERNAL
+#ifdef PNG_EXPOSE_INTERNAL_STRUCTURES
 #include "pnginfo.h"
 #endif
 
@@ -784,7 +784,7 @@ typedef void (PNGAPI *png_longjmp_ptr) PNGARG((jmp_buf, int));
 typedef png_voidp (*png_malloc_ptr) PNGARG((png_structp, png_alloc_size_t));
 typedef void (*png_free_ptr) PNGARG((png_structp, png_voidp));
 
-#ifdef PNG_INTERNAL
+#ifdef PNG_EXPOSE_INTERNAL_STRUCTURES
 #include "pngstruct.h"
 #endif
 

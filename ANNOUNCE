@@ -43,9 +43,10 @@ version 1.5.0beta04 [February 9, 2010]
 
 version 1.5.0beta05 [February 9, 2010]
   Removed PNG_DEPSTRUCT markup in pngstruct.h and pnginfo.h, and undid the
-    linewrapping that it required.
+    linewrapping that it entailed.
   Revised comments in pngstruct.h and pnginfo.h and added pointers to
     the libpng license.
+  Changed PNG_INTERNAL to PNG_EXPOSE_INTERNAL_STRUCTURES
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
