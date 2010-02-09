@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.0beta04 - February 8, 2010
+ * libpng version 1.5.0beta04 - February 9, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.5.0beta04 - February 8, 2010: Glenn
+ *  libpng versions 0.97, January 1998, through 1.5.0beta04 - February 9, 2010: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -169,7 +169,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta04, February 8, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta04, February 9, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -281,7 +281,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    February 8, 2010
+ *    February 9, 2010
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -345,7 +345,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.0beta04"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.5.0beta04 - February 8, 2010\n"
+   " libpng version 1.5.0beta04 - February 9, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -594,26 +594,9 @@ typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
 
 #ifdef PNG_INTERNAL
 #include "pnginfo.h"
-#else
-
-/* provide an incomplete structure-type-reference for png_info */
-
-# if 1 /* this works on FreeBSD but is not in the C language. */
-       /* gcc (GCC) 4.2.1 20070719  [FreeBSD] */
-       /* also on Sunos running gcc (GCC) 4.3.4 */
-typedef struct { ; } png_info;
-# endif
-
-# if 0 /* does not work on FreeBSD or SunOS. */
-typedef struct png_info;
-# endif
-
-# if 0 /* does not work on FreeBSD  or SunOS */
-struct png_info;
-# endif
-
 #endif
 
+typedef struct png_info_def png_info;
 typedef png_info FAR * png_infop;
 typedef png_info FAR * FAR * png_infopp;
 

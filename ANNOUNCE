@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta04 - February 8, 2010
+Libpng 1.5.0beta04 - February 9, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -38,7 +38,8 @@ version 1.5.0beta03 [February 8, 2010]
     calling png_error().
   Updated configure script to use SO number 15.
 
-version 1.5.0beta04 [February 8, 2010]
+version 1.5.0beta04 [February 9, 2010]
+  Removed malformed "incomplete struct declaration" of png_info from png.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

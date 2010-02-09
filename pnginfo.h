@@ -37,7 +37,7 @@
  * itxt_ptr structure argument, and the png_set_rows and png_set_unknowns
  * functions do not make their own copies.
  */
-typedef struct png_info_struct
+struct png_info_def
 {
    /* the following are necessary for every PNG file */
    png_uint_32 width PNG_DEPSTRUCT;  /* width of image in pixels (from IHDR) */
@@ -298,4 +298,4 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_fixed_point int_y_blue PNG_DEPSTRUCT;
 #endif
 
-} png_info;
+};
