@@ -47,6 +47,7 @@ version 1.5.0beta05 [February 9, 2010]
   Revised comments in pngstruct.h and pnginfo.h and added pointers to
     the libpng license.
   Changed PNG_INTERNAL to PNG_EXPOSE_INTERNAL_STRUCTURES
+  Removed the cbuilder5 project, which has not been updated to 1.4.0.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
