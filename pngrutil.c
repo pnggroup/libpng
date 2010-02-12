@@ -224,11 +224,8 @@ png_measure_decompressed_chunk(png_structp png_ptr, int comp_type,
       {
          ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
          if (ret != Z_OK && ret != Z_STREAM_END)
-         {
-            inflateReset(&png_ptr->zstream);
-            png_ptr->zstream.avail_in = 0;
             break;
-         }
+
          if (!png_ptr->zstream.avail_out || ret == Z_STREAM_END)
          {
             if (text == NULL)  /* Initialize the decompression buffer */
@@ -249,9 +246,10 @@ png_measure_decompressed_chunk(png_structp png_ptr, int comp_type,
                    text_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
 #endif
                {
-                  inflateReset(&png_ptr->zstream);
-                  png_ptr->zstream.avail_in = 0;
-                  return 0;
+                  png_warning(png_ptr,
+                      "Exceeded malloc limit while expanding chunk");
+                  text_size = 0;
+                  break;
                }
             }
          }
