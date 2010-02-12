@@ -240,15 +240,19 @@ png_measure_decompressed_chunk(png_structp png_ptr, int comp_type,
             }
             else               /* Enlarge the decompression buffer */
             {
-              text_size += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
+               text_size += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
 #ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
-              if (png_ptr->user_chunk_malloc_max &&
-                  (text_size >= png_ptr->user_chunk_malloc_max - 1))
+               if (png_ptr->user_chunk_malloc_max &&
+                   (text_size >= png_ptr->user_chunk_malloc_max - 1))
 #else
-              if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
-                  text_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
+               if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
+                   text_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
 #endif
-                 return 0;
+               {
+                  inflateReset(&png_ptr->zstream);
+                  png_ptr->zstream.avail_in = 0;
+                  return 0;
+               }
             }
          }
          if (ret == Z_STREAM_END)
