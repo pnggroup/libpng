@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.5.0 [February 9, 2010]
+ * Last changed in libpng 1.4.1 [February 12, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -14,7 +14,6 @@
  * libpng itself during the course of reading an image.
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
 #define PNG_NO_PEDANTIC_WARNINGS
 #include "png.h"
 #ifdef PNG_READ_SUPPORTED
@@ -285,7 +284,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    png_size_t text_size;
    png_size_t expanded_size;
 
-   expanded_size= png_measure_decompressed_chunk(png_ptr, comp_type,
+   expanded_size = png_measure_decompressed_chunk(png_ptr, comp_type,
       chunklength, prefix_size);
    if (expanded_size == 0)
    {
@@ -296,7 +295,6 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    if (comp_type == PNG_COMPRESSION_TYPE_BASE)
    {
       int ret = Z_OK;
-      png_size_t buffer_size;
 
       png_ptr->zstream.next_in = (png_bytep)(png_ptr->chunkdata + prefix_size);
       png_ptr->zstream.avail_in = (uInt)(chunklength - prefix_size);
@@ -305,7 +303,6 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
       text_size = 0;
       text = NULL;
-      buffer_size = 0;
 
       while (png_ptr->zstream.avail_in)
       {
@@ -325,7 +322,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                text = (png_charp)png_malloc_warn(png_ptr, text_size);
                if (text ==  NULL)
                {
-                  png_warning(png_ptr,
+                  png_error(png_ptr,
                      "Not enough memory to decompress chunk");
                   text_size = 0;
                   break;
@@ -343,7 +340,6 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                text_size = png_sizeof(msg);
 
             png_memcpy(text + prefix_size, msg, text_size);
-            buffer_size = text_size;
             break;
          }
          if (!png_ptr->zstream.avail_out || ret == Z_STREAM_END)
@@ -355,7 +351,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                text = (png_charp)png_malloc_warn(png_ptr, text_size + 1);
                if (text ==  NULL)
                {
-                  png_warning(png_ptr,
+                  png_error(png_ptr,
                     "Not enough memory to decompress chunk");
                   text_size = 0;
                   break;
@@ -364,16 +360,15 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                     text_size - prefix_size);
                png_memcpy(text, png_ptr->chunkdata, prefix_size);
                *(text + text_size) = 0x00;
-               buffer_size = text_size;
             }
-         }
-         if (ret == Z_STREAM_END)
-            break;
+            if (ret == Z_STREAM_END)
+               break;
 
-         else
-         {
-            png_ptr->zstream.next_out = png_ptr->zbuf;
-            png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+            else
+            {
+               png_ptr->zstream.next_out = png_ptr->zbuf;
+               png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+            }
          }
       }
 
@@ -410,13 +405,11 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             {
                png_free(png_ptr, png_ptr->chunkdata);
                png_ptr->chunkdata = NULL;
-               png_warning(png_ptr, "Not enough memory for text");
+               png_error(png_ptr, "Not enough memory for text");
             }
-            else
-               png_memcpy(text, png_ptr->chunkdata, prefix_size);
+            png_memcpy(text, png_ptr->chunkdata, prefix_size);
          }
-         if (text != NULL)
-            *(text + text_size) = 0x00;
+         *(text + text_size) = 0x00;
       }
 
       inflateReset(&png_ptr->zstream);
