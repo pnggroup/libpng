@@ -80,6 +80,7 @@ version 1.4.1beta11 [February 12, 2010]
   Removed the cbuilder5 project, which has not been updated to 1.4.0.
   Removed unused "buffer_size" variable from png_decompress_chunk().
   Relocated misplaced closing curley bracket in png_decompress_chunk().
+  Reverted to original png_decompress_chunk() plus counting pass.
 
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
