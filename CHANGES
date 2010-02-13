@@ -2505,9 +2505,17 @@ version 1.4.1beta08 [February 6, 2010]
 version 1.4.1beta09 [February 7, 2010]
   Reverted to original png_push_save_buffer() code.
 
-version 1.4.1beta10 [February 8, 2010]
+version 1.4.1beta10 [February 9, 2010]
   Return allocated "old_buffer" in png_push_save_buffer() before calling
     png_error(), to avoid a potential memory leak.
+
+version 1.4.1beta11 [February 13, 2010]
+  Relocated misplaced closing curley bracket in png_decompress_chunk().
+  Removed unused "buffer_size" variable from png_decompress_chunk().
+  Removed the cbuilder5 project, which has not been updated to 1.4.0.
+  Reverted to original png_decompress_chunk() plus counting pass.
+
+version 1.4.1rc02 [February 13, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
