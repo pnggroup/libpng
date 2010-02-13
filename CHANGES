@@ -2513,7 +2513,7 @@ version 1.4.1beta11 [February 13, 2010]
   Relocated misplaced closing curley bracket in png_decompress_chunk().
   Removed unused "buffer_size" variable from png_decompress_chunk().
   Removed the cbuilder5 project, which has not been updated to 1.4.0.
-  Reverted to original png_decompress_chunk() plus counting pass.
+  Complete rewrite of two-pass png_decompress_chunk() by John Bowler.
 
 version 1.4.1rc02 [February 13, 2010]
 
