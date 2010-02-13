@@ -313,7 +313,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    else if (comp_type == PNG_COMPRESSION_TYPE_BASE)
    {
       png_size_t expanded_size = png_inflate(png_ptr,
-		png_ptr->chunkdata + prefix_size,
+		(png_bytep)(png_ptr->chunkdata + prefix_size),
                 chunklength - prefix_size,
 		0/*output*/, 0/*output size*/);
 
@@ -345,9 +345,9 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          {
 	    png_memcpy(text, png_ptr->chunkdata, prefix_size);
 	    new_size = png_inflate(png_ptr,
-                png_ptr->chunkdata + prefix_size,
+                (png_bytep)(png_ptr->chunkdata + prefix_size),
 		chunklength - prefix_size,
-                text + prefix_size, expanded_size);
+                (png_bytep)(text + prefix_size), expanded_size);
 	    text[prefix_size + expanded_size] = 0; /* just in case */
 
 	    if (new_size == expanded_size)
