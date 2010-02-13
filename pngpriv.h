@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.1beta11 - February 13, 2010
+ * libpng version 1.5.0beta05 - February 13, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -306,6 +306,8 @@ PNG_EXTERN void png_crc_read PNGARG((png_structp png_ptr, png_bytep buf,
 /* Decompress data in a chunk that uses compression */
 #if defined(PNG_zTXt_SUPPORTED) || defined(PNG_iTXt_SUPPORTED) || \
     defined(PNG_iCCP_SUPPORTED) || defined(PNG_sPLT_SUPPORTED)
+PNG_EXTERN png_size_t png_measure_decompressed_chunk PNGARG((png_structp
+    png_ptr, int comp_type, png_size_t chunklength, png_size_t prefix_length));
 PNG_EXTERN void png_decompress_chunk PNGARG((png_structp png_ptr,
    int comp_type, png_size_t chunklength, png_size_t prefix_length,
    png_size_t *data_length));
