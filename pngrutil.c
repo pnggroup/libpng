@@ -14,6 +14,7 @@
  * libpng itself during the course of reading an image.
  */
 
+#define PNG_EXPOSE_INTERNAL_STRUCTURES
 #define PNG_NO_PEDANTIC_WARNINGS
 #include "png.h"
 #ifdef PNG_READ_SUPPORTED
