@@ -2518,6 +2518,8 @@ version 1.4.1beta11 [February 12, 2010]
 version 1.4.1beta12 [February 14, 2010]
   Fixed typecast of png_get_user_malloc_max() in pngget.c (Daisuke Nishikawa)
 
+version 1.4.1beta13 [February 14, 2010]
+
 version 1.4.1rc02 [February 14, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

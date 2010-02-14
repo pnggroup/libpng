@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta12 - February 14, 2010
+Libpng 1.4.1beta13 - February 14, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.1beta12.tar.xz (LZMA-compressed, recommended)
-   1.4.1beta12.tar.gz
-   1.4.1beta12.tar.bz2
+   1.4.1beta13.tar.xz (LZMA-compressed, recommended)
+   1.4.1beta13.tar.gz
+   1.4.1beta13.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp141b12.zip
-   lp141b12.7z
+   lp141b13.zip
+   lp141b13.7z
 
 Other information:
 
-   1.4.1beta12-README.txt
-   1.4.1beta12-LICENSE.txt
+   1.4.1beta13-README.txt
+   1.4.1beta13-LICENSE.txt
 
 Changes since the last public release (1.4.0):
 
@@ -85,6 +85,7 @@ version 1.4.1beta11 [February 12, 2010]
 version 1.4.1beta12 [February 14, 2010]
   Fixed typecast of png_get_user_malloc_max() in pngget.c (Daisuke Nishikawa)
 
+version 1.4.1beta13 [February 14, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
