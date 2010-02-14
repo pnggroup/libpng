@@ -50,7 +50,7 @@ version 1.5.0beta05 [February 12, 2010]
   Removed the cbuilder5 project, which has not been updated to 1.4.0.
 
 version 1.4.1beta12 and 1.5.0beta06 [February 14, 2010]
-  Fixed type declaration of png_get_user_malloc_max() in pngget.c (Daisuke
+  Fixed type declaration of png_get_chunk_malloc_max() in pngget.c (Daisuke
     Nishikawa)
 
 version 1.5.0beta07 [February 14, 2010]
