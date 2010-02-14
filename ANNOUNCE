@@ -1,5 +1,5 @@
 
-Libpng 1.4.1beta11 - February 13, 2010
+Libpng 1.4.1beta12 - February 14, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.1beta11.tar.xz (LZMA-compressed, recommended)
-   1.4.1beta11.tar.gz
-   1.4.1beta11.tar.bz2
+   1.4.1beta12.tar.xz (LZMA-compressed, recommended)
+   1.4.1beta12.tar.gz
+   1.4.1beta12.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp141b11.zip
-   lp141b11.7z
+   lp141b12.zip
+   lp141b12.7z
 
 Other information:
 
-   1.4.1beta11-README.txt
-   1.4.1beta11-LICENSE.txt
+   1.4.1beta12-README.txt
+   1.4.1beta12-LICENSE.txt
 
 Changes since the last public release (1.4.0):
 
@@ -76,11 +76,14 @@ version 1.4.1beta10 [February 9, 2010]
   Return allocated "old_buffer" in png_push_save_buffer() before calling
     png_error(), to avoid a potential memory leak.
 
-version 1.4.1beta11 [February 13, 2010]
+version 1.4.1beta11 [February 12, 2010]
   Removed the cbuilder5 project, which has not been updated to 1.4.0.
   Removed unused "buffer_size" variable from png_decompress_chunk().
   Relocated misplaced closing curley bracket in png_decompress_chunk().
   Complete rewrite of two-pass png_decompress_chunk() by John Bowler.
+
+version 1.4.1beta12 [February 14, 2010]
+  Fixed incorrect typecast of png_get_user_malloc_max() in pngget.c
 
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
