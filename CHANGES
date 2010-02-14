@@ -2518,13 +2518,17 @@ version 1.4.1beta10 and 1.5.0beta03 [February 8, 2010]
 version 1.5.0beta04 [February 9, 2010]
   Removed malformed "incomplete struct declaration" of png_info from png.h
 
-version 1.5.0beta05 [February 13, 2010]
+version 1.5.0beta05 [February 12, 2010]
   Removed PNG_DEPSTRUCT markup in pngstruct.h and pnginfo.h, and undid the
     linewrapping that it entailed.
   Revised comments in pngstruct.h and pnginfo.h and added pointers to
     the libpng license.
   Changed PNG_INTERNAL to PNG_EXPOSE_INTERNAL_STRUCTURES
   Removed the cbuilder5 project, which has not been updated to 1.4.0.
+
+version 1.4.1beta12 and 1.5.0beta06 [February 14, 2010]
+  Fixed type declaration of png_get_user_malloc_max() in pngget.c (Daisuke
+    Nishikawa)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

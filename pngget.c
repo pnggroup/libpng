@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.1 [February 13, 2010]
+ * Last changed in libpng 1.4.1 [February 14, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -900,11 +900,11 @@ png_get_chunk_cache_max (png_structp png_ptr)
     return (png_ptr? png_ptr->user_chunk_cache_max : 0);
 }
 /* This function was added to libpng 1.4.1 */
-png_uint_32 PNGAPI
+png_alloc_size_t PNGAPI
 png_get_chunk_malloc_max (png_structp png_ptr)
 {
     return (png_ptr?
-       (png_uint_32)png_ptr->user_chunk_malloc_max : 0);
+       png_ptr->user_chunk_malloc_max : 0);
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 

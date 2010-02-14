@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta05 - February 13, 2010
+Libpng 1.5.0beta06 - February 14, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta05.tar.gz
-   1.5.0beta05.tar.bz2
+   1.5.0beta06.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta06.tar.gz
+   1.5.0beta06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b05.zip
-   lp150b05.7z
+   lp150b06.zip
+   lp150b06.7z
 
 Other information:
 
-   1.5.0beta05-README.txt
-   1.5.0beta05-LICENSE.txt
+   1.5.0beta06-README.txt
+   1.5.0beta06-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -41,13 +41,17 @@ version 1.5.0beta03 [February 8, 2010]
 version 1.5.0beta04 [February 9, 2010]
   Removed malformed "incomplete struct declaration" of png_info from png.h
 
-version 1.5.0beta05 [February 13, 2010]
+version 1.5.0beta05 [February 12, 2010]
   Removed PNG_DEPSTRUCT markup in pngstruct.h and pnginfo.h, and undid the
     linewrapping that it entailed.
   Revised comments in pngstruct.h and pnginfo.h and added pointers to
     the libpng license.
   Changed PNG_INTERNAL to PNG_EXPOSE_INTERNAL_STRUCTURES
   Removed the cbuilder5 project, which has not been updated to 1.4.0.
+
+version 1.4.1beta12 and 1.5.0beta06 [February 14, 2010]
+  Fixed type declaration of png_get_user_malloc_max() in pngget.c (Daisuke
+    Nishikawa)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
