@@ -1,8 +1,8 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * Last changed in libpng 1.2.41 [December 3, 2009]
- * Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ * Last changed in libpng 1.2.43 [February 18, 2010]
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -30,7 +30,8 @@ png_do_write_transformations(png_structp png_ptr)
 #ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
    if (png_ptr->transformations & PNG_USER_TRANSFORM)
       if (png_ptr->write_user_transform_fn != NULL)
-        (*(png_ptr->write_user_transform_fn)) /* User write transform function */
+        (*(png_ptr->write_user_transform_fn)) /* User write transform
+                                                 function */
           (png_ptr,                    /* png_ptr */
            &(png_ptr->row_info),       /* row_info:     */
              /*  png_uint_32 width;          width of row */

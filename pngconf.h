@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.0.53beta02 - January 27, 2010
+ * libpng version 1.0.53rc01 - February 18, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -849,6 +849,13 @@
 #  endif
 #endif /* PNG_1_0_X */
 
+/* Added at libpng-1.0.53 and 1.2.43 */
+#ifndef PNG_USER_LIMITS_SUPPORTED
+#  ifndef PNG_NO_USER_LIMITS
+#    define PNG_USER_LIMITS_SUPPORTED
+#  endif
+#endif
+
 /* Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGS no matter
  * how large, set these limits to 0x7fffffffL
  */
@@ -859,11 +866,16 @@
 #  define PNG_USER_HEIGHT_MAX 1000000L
 #endif
 
-#ifndef PNG_1_0_X
-/* Added at libpng-1.2.41 */
+/* Added at libpng-1.2.43.  To accept all valid PNGs no matter
+ * how large, set these two limits to 0.
+ */
 #ifndef PNG_USER_CHUNK_CACHE_MAX
-#  define PNG_USER_CHUNK_CACHE_MAX 0x7fffffffL
+#  define PNG_USER_CHUNK_CACHE_MAX 0
 #endif
+
+/* Added at libpng-1.2.43 */
+#ifndef PNG_USER_CHUNK_MALLOC_MAX
+#  define PNG_USER_CHUNK_MALLOC_MAX 0
 #endif
 
 #ifndef PNG_LITERAL_SHARP

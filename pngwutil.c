@@ -1,8 +1,8 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.41 [December 3, 2009]
- * Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ * Last changed in libpng 1.2.43 [February 18, 2010]
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -59,7 +59,7 @@ png_save_uint_16(png_bytep buf, unsigned int i)
  * we should call png_set_sig_bytes() to tell libpng how many of the
  * bytes have already been written.
  */
-void PNGAPI
+void /* PRIVATE */
 png_write_sig(png_structp png_ptr)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -413,7 +413,8 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
             case 4:
             case 8:
             case 16: png_ptr->channels = 1; break;
-            default: png_error(png_ptr, "Invalid bit depth for grayscale image");
+            default: png_error(png_ptr,
+                         "Invalid bit depth for grayscale image");
          }
          break;
       case PNG_COLOR_TYPE_RGB:
@@ -618,7 +619,9 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
       png_write_chunk_data(png_ptr, buf, (png_size_t)3);
    }
 #else
-   /* This is a little slower but some buggy compilers need to do this instead */
+   /* This is a little slower but some buggy compilers need to do this
+    * instead
+    */
    pal_ptr=palette;
    for (i = 0; i < num_pal; i++)
    {
@@ -1640,7 +1643,8 @@ png_write_sCAL(png_structp png_ptr, int unit, double width, double height)
       size_t wc_len;
       swprintf(wc_buf, TEXT("%12.12e"), width);
       wc_len = wcslen(wc_buf);
-      WideCharToMultiByte(CP_ACP, 0, wc_buf, -1, buf + 1, wc_len, NULL, NULL);
+      WideCharToMultiByte(CP_ACP, 0, wc_buf, -1, buf + 1, wc_len, NULL,
+          NULL);
       total_len = wc_len + 2;
       swprintf(wc_buf, TEXT("%12.12e"), height);
       wc_len = wcslen(wc_buf);
