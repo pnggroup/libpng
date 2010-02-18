@@ -2516,12 +2516,11 @@ version 1.4.1beta11 [February 12, 2010]
   Complete rewrite of two-pass png_decompress_chunk() by John Bowler.
 
 version 1.4.1beta12 [February 14, 2010]
-  Fixed type declaration of png_get_chunk_malloc_max() in pngget.c
-    (Daisuke Nishikawa)
+  Fixed type declaration of png_get_user_malloc_max() in pngget.c (Daisuke
+    Nishikawa)
 
-version 1.4.1beta13 [February 14, 2010]
-
-version 1.4.1rc02 [February 14, 2010]
+version 1.4.1rc02 [February 18, 2010]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
