@@ -390,10 +390,6 @@
 #include "zlib.h"
 #endif
 
-#ifdef AIX
-#define jmpbuf __jmpbuf
-#endif
-
 /* Include all user configurable info, including optional assembler routines */
 #include "pngconf.h"
 

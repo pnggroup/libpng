@@ -59,7 +59,13 @@ AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )
 AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
 
-LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
+case $host_os in
+  aix*)
+    LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG -D_ALLSOURCE;;
+  *)
+    LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG;;
+esac
+endif
 LIBPNG_DEFINES=$LIBPNG_DEFINES
 AC_SUBST(LIBPNG_DEFINES)
 
