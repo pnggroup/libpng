@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.1rc02 - February 18, 2010
+ * libpng version 1.4.1rc03 - February 19, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -21,6 +21,16 @@
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
+
+/* Added at libpng-1.4.1 */
+#if ((defined(_AIX)) && \
+     (!defined (_XOPEN_SOURCE)) &&  \
+     (!defined (_POSIX_SOURCE)) && \
+     (!defined (_ANSI_C_SOURCE)))
+#  ifndef _ALL_SOURCE
+#    define _ALL_SOURCE
+#  endif
+#endif
 
 #ifndef PNG_NO_LIMITS_H
 #  include <limits.h>
