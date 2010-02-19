@@ -868,7 +868,8 @@ extern PNG_EXPORT(jmp_buf*, png_set_longjmp_fn)
  * will use it; otherwise it will call PNG_ABORT().  This function was
  * added in libpng-1.5.0.
  */
-extern PNG_EXPORT(void, png_longjmp) PNGARG((png_structp png_ptr, int val));
+extern PNG_EXPORT(void, png_longjmp) PNGARG((png_structp png_ptr, int val))
+    PNG_NORETURN ;
 
 /* Reset the compression stream */
 extern PNG_EXPORT(int,png_reset_zstream) PNGARG((png_structp png_ptr));
