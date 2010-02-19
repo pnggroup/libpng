@@ -82,11 +82,6 @@ int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));
 /*  #define STDERR stderr  */
 #define STDERR stdout   /* For DOS */
 
-/* In case a system header (e.g., on AIX) defined jmpbuf */
-#ifdef jmpbuf
-#  undef jmpbuf
-#endif
-
 /* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
@@ -661,7 +656,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    int bit_depth, color_type;
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
-   jmp_buf jmpbuf;
+   jmp_buf png_jmpbuf;
 #endif
 #endif
 
@@ -731,7 +726,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_SETJMP_SUPPORTED
    png_debug(0, "Setting jmpbuf for read struct");
 #ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
+   if (setjmp(png_jmpbuf))
 #else
    if (setjmp(png_jmpbuf(read_ptr)))
 #endif
@@ -749,13 +744,13 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(read_ptr), jmpbuf, png_sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(read_ptr), png_jmpbuf, png_sizeof(jmp_buf));
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
    png_debug(0, "Setting jmpbuf for write struct");
 #ifdef USE_FAR_KEYWORD
-   if (setjmp(jmpbuf))
+   if (setjmp(png_jmpbuf))
 #else
    if (setjmp(png_jmpbuf(write_ptr)))
 #endif
@@ -771,7 +766,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(write_ptr), jmpbuf, png_sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(write_ptr), png_jmpbuf, png_sizeof(jmp_buf));
 #endif
 #endif
 #endif
@@ -1625,4 +1620,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_5_0beta08 your_png_h_is_not_version_1_5_0beta08;
+typedef version_1_5_0beta09 your_png_h_is_not_version_1_5_0beta09;

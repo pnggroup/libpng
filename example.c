@@ -31,7 +31,7 @@
   */
 
 #ifndef png_jmpbuf
-#  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#  define png_jmpbuf(png_ptr) ((png_ptr)->png_jmpbuf)
 #endif
 
 /* Check to see if a file is a PNG file using png_sig_cmp().  png_sig_cmp()
