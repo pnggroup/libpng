@@ -59,6 +59,8 @@ version 1.5.0beta07 [February 19, 2010]
   Noted in scripts/makefile.mingw that it expects to be run under MSYS.
   Removed obsolete unused MMX-querying support from contrib/gregbook
   Added exported png_longjmp() function.
+  Added "#ifdef _AIX; #define _ALL_SOURCE 1; #endif" at the top of pngpriv.h,
+    otherwise AIX reserves "jmpbuf" and renames it to "__jmpbuf".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

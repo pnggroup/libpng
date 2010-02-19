@@ -22,6 +22,11 @@
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
+/* Added at libpng-1.2.43 */
+#ifdef _AIX
+#define _ALL_SOURCE 1
+#endif
+
 #ifndef PNG_NO_LIMITS_H
 #  include <limits.h>
 #endif
