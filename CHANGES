@@ -2542,6 +2542,10 @@ version 1.5.0beta08 [February 19, 2010]
   Added -D_ALLSOURCE in configure.ac, makefile.aix, and CMakeLists.txt
     when building on AIX.
 
+version 1.5.0beta09 [February 19, 2010]
+  Removed -D_ALLSOURCE from configure.ac, makefile.aix, and CMakeLists.txt.
+  Changed the name of png_ptr->jmpbuf in pngstruct.h
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

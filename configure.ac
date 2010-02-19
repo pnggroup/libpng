@@ -18,12 +18,12 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.5.0beta08], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.5.0beta09], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.5.0beta08
+PNGLIB_VERSION=1.5.0beta09
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=5
 PNGLIB_RELEASE=0
@@ -59,13 +59,7 @@ AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )
 AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
 
-case $host_os in
-  aix*)
-    LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG -D_ALLSOURCE;;
-  *)
-    LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG;;
-esac
-endif
+LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 LIBPNG_DEFINES=$LIBPNG_DEFINES
 AC_SUBST(LIBPNG_DEFINES)
 
