@@ -125,6 +125,10 @@ set(pngtest_sources
 
 add_definitions(-DPNG_CONFIGURE_LIBPNG)
 
+if (_AIX)
+  add_definitions(-D_ALLSOURCE)
+endif(_AIX)
+
 if(MSVC)
   add_definitions(-DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
 endif(MSVC)
@@ -209,7 +213,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 15.${PNGLIB_RELEASE}.1.5.0beta07
+#   VERSION 15.${PNGLIB_RELEASE}.1.5.0beta08
     VERSION 15.${PNGLIB_RELEASE}.0
     SOVERSION 15
     CLEAN_DIRECT_OUTPUT 1)
