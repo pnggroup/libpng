@@ -480,5 +480,5 @@ static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg)
         exit(99);
     }
 
-    longjmp(mainprog_ptr->jmpbuf, 1);
+    png_longjmp(mainprog_ptr, 1);
 }

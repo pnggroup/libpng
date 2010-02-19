@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.0 [February 14, 2010]
+ * Last changed in libpng 1.5.0 [February 19, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -289,7 +289,15 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
       fprintf(stderr, PNG_STRING_NEWLINE);
    }
 #endif
+   png_longjmp(png_ptr, 1);
+#ifndef PNG_CONSOLE_IO_SUPPORTED
+   error_message = error_message; /* Make compiler happy */
+#endif
+}
 
+void PNGAPI
+png_longjmp(png_structp png_ptr, int val)
+{
 #ifdef PNG_SETJMP_SUPPORTED
    if (png_ptr && png_ptr->longjmp_fn)
    {
@@ -297,18 +305,15 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    {
       jmp_buf jmpbuf;
       png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
-     png_ptr->longjmp_fn(jmpbuf, 1);
+     png_ptr->longjmp_fn(jmpbuf, val);
    }
 #  else
-   png_ptr->longjmp_fn(png_ptr->jmpbuf, 1);
+   png_ptr->longjmp_fn(png_ptr->jmpbuf, val);
 #  endif
    }
 #endif
    /* Here if not setjmp support or if png_ptr is null. */
    PNG_ABORT();
-#ifndef PNG_CONSOLE_IO_SUPPORTED
-   error_message = error_message; /* Make compiler happy */
-#endif
 }
 
 #ifdef PNG_WARNINGS_SUPPORTED
