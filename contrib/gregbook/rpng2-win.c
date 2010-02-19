@@ -32,6 +32,7 @@
     - 2.01:  fixed 64-bit typo in readpng2.c
     - 2.02:  fixed improper display of usage screen on PNG error(s); fixed
               unexpected-EOF and file-read-error cases
+    - 2.03:  removed runtime MMX-enabling/disabling and obsolete -mmx* options
 
   ---------------------------------------------------------------------------
 
@@ -395,18 +396,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
             }
         } else if (!strncmp(*argv, "-timing", 2)) {
             timing = TRUE;
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-        } else if (!strncmp(*argv, "-nommxfilters", 7)) {
-            rpng2_info.nommxfilters = TRUE;
-        } else if (!strncmp(*argv, "-nommxcombine", 7)) {
-            rpng2_info.nommxcombine = TRUE;
-        } else if (!strncmp(*argv, "-nommxinterlace", 7)) {
-            rpng2_info.nommxinterlace = TRUE;
-        } else if (!strcmp(*argv, "-nommx")) {
-            rpng2_info.nommxfilters = TRUE;
-            rpng2_info.nommxcombine = TRUE;
-            rpng2_info.nommxinterlace = TRUE;
-#endif
         } else {
             if (**argv != '-') {
                 filename = *argv;
@@ -430,9 +419,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
         readpng2_version_info();
         fprintf(stderr, "\n"
           "Usage:  %s [-gamma exp] [-bgcolor bg | -bgpat pat] [-timing]\n"
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          "        %*s [[-nommxfilters] [-nommxcombine] [-nommxinterlace] | -nommx]\n"
-#endif
           "        %*s file.png\n\n"
           "    exp \ttransfer-function exponent (``gamma'') of the display\n"
           "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
@@ -445,10 +431,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
           "\t\t  transparent images; overrides -bgcolor option\n"
           "    -timing\tenables delay for every block read, to simulate modem\n"
           "\t\t  download of image (~36 Kbps)\n"
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          "    -nommx*\tdisable optimized MMX routines for decoding row filters,\n"
-          "\t\t  combining rows, and expanding interlacing, respectively\n"
-#endif
           "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
           "Press Q or Esc to quit this usage screen. ",
           PROGNAME,

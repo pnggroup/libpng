@@ -2530,7 +2530,10 @@ version 1.4.1beta12 and 1.5.0beta06 [February 14, 2010]
   Fixed type declaration of png_get_chunk_malloc_max() in pngget.c (Daisuke
     Nishikawa)
 
-version 1.5.0beta07 [February 14, 2010]
+version 1.5.0beta07 [February 19, 2010]
+  Changed #ifdef PNG_NO_STDIO_SUPPORTED to #ifdef PNG_NO_CONSOLE_IO_SUPPORTED
+    wherever png_snprintf() is used to construct error and warning messages.
+  Removed obsolete unused MMX-querying support from contrib/gregbook
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

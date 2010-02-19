@@ -40,6 +40,7 @@
     - 2.02:  fixed improper display of usage screen on PNG error(s); fixed
               unexpected-EOF and file-read-error cases; fixed Trace() cut-and-
               paste bugs
+    - 2.03:  deleted runtime MMX-enabling/disabling and obsolete -mmx* options
 
   ---------------------------------------------------------------------------
 
@@ -94,7 +95,7 @@
 
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
-#define VERSION   "2.02 of 16 March 2008"
+#define VERSION   "2.03 of 25 February 2010"
 #define RESNAME   "rpng2"	/* our X resource application name */
 #define RESCLASS  "Rpng"	/* our X resource class name */
 
@@ -435,18 +436,6 @@ int main(int argc, char **argv)
                     loop_interval = 100000;
             }
 #endif
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-        } else if (!strncmp(*argv, "-nommxfilters", 7)) {
-            rpng2_info.nommxfilters = TRUE;
-        } else if (!strncmp(*argv, "-nommxcombine", 7)) {
-            rpng2_info.nommxcombine = TRUE;
-        } else if (!strncmp(*argv, "-nommxinterlace", 7)) {
-            rpng2_info.nommxinterlace = TRUE;
-        } else if (!strcmp(*argv, "-nommx")) {
-            rpng2_info.nommxfilters = TRUE;
-            rpng2_info.nommxcombine = TRUE;
-            rpng2_info.nommxinterlace = TRUE;
-#endif
         } else {
             if (**argv != '-') {
                 filename = *argv;
@@ -468,9 +457,6 @@ int main(int argc, char **argv)
         readpng2_version_info();
         fprintf(stderr, "\n"
           "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg | -bgpat pat]\n"
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          "        %*s [[-nommxfilters] [-nommxcombine] [-nommxinterlace] | -nommx]\n"
-#endif
 #ifdef FEATURE_LOOP
           "        %*s [-usleep dur | -timing] [-pause] [-loop [sec]] file.png\n\n"
 #else
@@ -490,10 +476,6 @@ int main(int argc, char **argv)
           "    -loop\tloops through background images after initial display\n"
           "\t\t  is complete (depends on -bgpat)\n"
           "    sec \tseconds to display each background image (default = 2)\n"
-#endif
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          "    -nommx*\tdisable optimized MMX routines for decoding row filters,\n"
-          "\t\t  combining rows, and expanding interlacing, respectively\n"
 #endif
           "    dur \tduration in microseconds to wait after displaying each\n"
           "\t\t  row (for demo purposes)\n"
