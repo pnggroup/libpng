@@ -257,3 +257,5 @@ EXPORTS
 ; Added at version 1.4.1
   png_get_chunk_malloc_max @220
   png_set_chunk_malloc_max @221
+; Added at version 1.5.0
+  png_longjmp @222

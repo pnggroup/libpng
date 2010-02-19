@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.5.0 [February 14, 2010]
+ * Last changed in libpng 1.5.0 [February 19, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -222,7 +222,7 @@ png_text_compress(png_structp png_ptr,
 
    if (compression >= PNG_TEXT_COMPRESSION_LAST)
    {
-#ifdef PNG_STDIO_SUPPORTED
+#ifdef PNG_CONSOLE_IO_SUPPORTED
       char msg[50];
       png_snprintf(msg, 50, "Unknown compression type %d", compression);
       png_warning(png_ptr, msg);
@@ -1254,7 +1254,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
       if ((png_byte)*kp < 0x20 ||
          ((png_byte)*kp > 0x7E && (png_byte)*kp < 0xA1))
       {
-#ifdef PNG_STDIO_SUPPORTED
+#ifdef PNG_CONSOLE_IO_SUPPORTED
          char msg[40];
 
          png_snprintf(msg, 40,

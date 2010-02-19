@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [February 14, 2010]
+ * Last changed in libpng 1.4.1 [February 19, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -260,7 +260,7 @@ png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
 	    msg = png_ptr->zstream.msg;
 	 else
 	 {
-#ifdef PNG_STDIO_SUPPORTED
+#ifdef PNG_CONSOLE_IO_SUPPORTED
 	    switch (ret)
 	    {
 	 case Z_BUF_ERROR:
