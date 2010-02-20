@@ -2522,11 +2522,12 @@ version 1.4.1beta12 [February 14, 2010]
 version 1.4.1rc02 [January 18, 2010]
   No changes.
 
-version 1.4.1rc03 [February 19, 2010]
+version 1.4.1rc03 [February 20, 2010]
   Noted in scripts/makefile.mingw that it expects to be run under MSYS.
   Removed obsolete unused MMX-querying support from contrib/gregbook
   Removed the AIX redefinition of jmpbuf in png.h
-  Define _ALLSOURCE in pngconf.h when building with nonANSI AIX compiler.
+  Define _ALL_SOURCE in configure.ac, makefile.aix, and CMakeLists.txt
+    when using AIX compiler.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
