@@ -1,5 +1,5 @@
 
-Libpng 1.2.43rc02 - February 20, 2010
+Libpng 1.2.43rc03 - February 20, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.43rc02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.43rc02.tar.gz
-   libpng-1.2.43rc02.tar.bz2
+   libpng-1.2.43rc03.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.43rc03.tar.gz
+   libpng-1.2.43rc03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.43rc02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.43rc02-no-config.tar.gz
-   libpng-1.2.43rc02-no-config.tar.bz2
+   libpng-1.2.43rc03-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.43rc03-no-config.tar.gz
+   libpng-1.2.43rc03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1243r02.zip
-   lp1243r02.7z
-   lp1243r02.tar.bz2
+   lp1243r03.zip
+   lp1243r03.7z
+   lp1243r03.tar.bz2
 
 Project files
 
-   libpng-1.2.43rc02-project-netware.zip
-   libpng-1.2.43rc02-project-wince.zip
+   libpng-1.2.43rc03-project-netware.zip
+   libpng-1.2.43rc03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.43rc02-README.txt
-   libpng-1.2.43rc02-KNOWNBUGS.txt
-   libpng-1.2.43rc02-LICENSE.txt
-   libpng-1.2.43rc02-Y2K-compliance.txt
-   libpng-1.2.43rc02-[previous version]-diff.txt
+   libpng-1.2.43rc03-README.txt
+   libpng-1.2.43rc03-KNOWNBUGS.txt
+   libpng-1.2.43rc03-LICENSE.txt
+   libpng-1.2.43rc03-Y2K-compliance.txt
+   libpng-1.2.43rc03-[previous version]-diff.txt
 
 Changes since the last public release (1.2.42):
 
@@ -71,7 +71,8 @@ version 1.0.53rc01 and 1.2.43rc01 [February 20, 2010]
   No changes.
 
 version 1.0.53rc02 and 1.2.43rc02 [February 20, 2010]
-  Define _ALL_SOURCE in pngconf.h when building with AIX compiler.
+  Define _ALL_SOURCE in configure.ac, makefile.aix, and CMakeLists.txt
+    when using AIX compiler.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
