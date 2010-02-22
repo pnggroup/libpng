@@ -388,5 +388,5 @@ static void writepng_error_handler(png_structp png_ptr, png_const_charp msg)
         exit(99);
     }
 
-    png_longjmp(mainprog_ptr, 1);
+    png_longjmp(png_ptr, 1);
 }

@@ -71,6 +71,7 @@ version 1.5.0beta09 [February 19, 2010]
 
 version 1.5.0beta10 [February 22, 2010]
   Removed unused gzio.c from contrib/pngminim gather and makefile scripts
+  Revised png_longjmp() calls in contrib/gregbook to use png_ptr
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
