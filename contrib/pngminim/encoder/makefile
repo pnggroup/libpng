@@ -14,7 +14,7 @@ O=.o
 L=.a
 E=
 
-ZOBJS  = adler32$(O) compress$(O) crc32$(O) deflate$(O) gzio$(O) \
+ZOBJS  = adler32$(O) compress$(O) crc32$(O) deflate$(O) \
 	 dummy_inflate$(O) \
 	 trees$(O) uncompr$(O) zutil$(O)
 
