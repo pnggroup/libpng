@@ -1,5 +1,5 @@
 
-Libpng 1.4.1rc04 - February 20, 2010
+Libpng 1.4.1rc04 - February 22, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -89,12 +89,15 @@ version 1.4.1beta12 [February 14, 2010]
 version 1.4.1rc02 [February 18, 2010]
   No changes.
 
-version 1.4.1rc03 [February 20, 2010]
+version 1.4.1rc03 [February 19, 2010]
   Noted in scripts/makefile.mingw that it expects to be run under MSYS.
   Removed obsolete unused MMX-querying support from contrib/gregbook
   Removed the AIX redefinition of jmpbuf in png.h
   Define _ALL_SOURCE in configure.ac, makefile.aix, and CMakeLists.txt
     when using AIX compiler.
+
+version 1.4.1rc04 [February 22, 2010]
+  Removed unused gzio.c from contrib/pngminim gather and makefile scripts
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
