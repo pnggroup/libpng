@@ -31,7 +31,7 @@ O=.o
 L=.a
 E=
 
-ZOBJS  = adler32$(O) crc32$(O) gzio$(O) \
+ZOBJS  = adler32$(O) crc32$(O) \
 	 infback$(O) inffast$(O) inflate$(O) inftrees$(O) \
 	 trees$(O) uncompr$(O) zutil$(O)
 

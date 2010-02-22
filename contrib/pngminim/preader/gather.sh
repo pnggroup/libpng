@@ -7,4 +7,4 @@ rm example.c pngtest.c pngw*.c
 # change the following 2 lines if zlib is somewhere else
 cp ../../../../zlib/*.h .
 cp ../../../../zlib/*.c .
-rm minigzip.c example.c compress.c deflate.c 
+rm minigzip.c example.c compress.c deflate.c gz*

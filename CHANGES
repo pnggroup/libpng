@@ -2672,9 +2672,12 @@ version 1.2.43beta05 [February 8, 2010]
 version 1.0.53rc01 and 1.2.43rc01 [February 18, 2010]
   No changes.
 
-version 1.0.53rc02 and 1.2.43rc02 [February 20, 2010]
+version 1.0.53rc02 and 1.2.43rc02 [February 19, 2010]
   Define _ALL_SOURCE in configure.ac, makefile.aix, and CMakeLists.txt
     when using AIX compiler.
+
+version 1.0.53rc03 and 1.2.43rc03 [February 22, 2010]
+  Removed unused gzio.c from contrib/pngminim gather and makefile scripts
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
