@@ -2529,8 +2529,10 @@ version 1.4.1rc03 [February 19, 2010]
   Define _ALL_SOURCE in configure.ac, makefile.aix, and CMakeLists.txt
     when using AIX compiler.
 
-version 1.4.1rc04 [February 22, 2010]
+version 1.4.1rc04 [February 19, 2010]
   Removed unused gzio.c from contrib/pngminim gather and makefile scripts
+
+version 1.4.1 [February 25, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
