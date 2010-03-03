@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta10 - February 22, 2010
+Libpng 1.5.0beta11 - March 3, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta10.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta10.tar.gz
-   1.5.0beta10.tar.bz2
+   1.5.0beta11.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta11.tar.gz
+   1.5.0beta11.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b10.zip
-   lp150b10.7z
+   lp150b11.zip
+   lp150b11.7z
 
 Other information:
 
-   1.5.0beta10-README.txt
-   1.5.0beta10-LICENSE.txt
+   1.5.0beta11-README.txt
+   1.5.0beta11-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -69,9 +69,13 @@ version 1.5.0beta09 [February 19, 2010]
   Removed -D_ALLSOURCE from configure.ac, makefile.aix, and CMakeLists.txt.
   Changed the name of png_ptr->jmpbuf in pngstruct.h
 
-version 1.5.0beta10 [February 22, 2010]
+version 1.5.0beta10 [February 25, 2010]
   Removed unused gzio.c from contrib/pngminim gather and makefile scripts
-  Revised png_longjmp() calls in contrib/gregbook to use png_ptr
+  Removed replacement error handlers from contrib/gregbook.  Because of
+    the new png_longjmp() function they are no longer needed.
+
+version 1.5.0beta11 [March 3, 2010]
+  Removed checking for already-included setjmp.h from pngconf.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
