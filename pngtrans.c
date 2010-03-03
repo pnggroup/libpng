@@ -136,7 +136,7 @@ png_set_filler(png_structp png_ptr, png_uint_32 filler, int filler_loc)
    }
 
    /* Also I added this in libpng-1.0.2a (what happens when we expand
-    * a less-than-8-bit grayscale to GA? */
+    * a less-than-8-bit grayscale to GA?) */
 
    if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY && png_ptr->bit_depth >= 8)
    {
@@ -223,10 +223,10 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       png_uint_32 i;
       png_uint_32 istop = row_info->rowbytes;
 
-      for (i = 0; i < istop; i+=2)
+      for (i = 0; i < istop; i += 2)
       {
          *rp = (png_byte)(~(*rp));
-         rp+=2;
+         rp += 2;
       }
    }
    else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
@@ -236,11 +236,11 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       png_uint_32 i;
       png_uint_32 istop = row_info->rowbytes;
 
-      for (i = 0; i < istop; i+=4)
+      for (i = 0; i < istop; i += 4)
       {
          *rp = (png_byte)(~(*rp));
-         *(rp+1) = (png_byte)(~(*(rp+1)));
-         rp+=4;
+         *(rp + 1) = (png_byte)(~(*(rp + 1)));
+         rp += 4;
       }
    }
 }
@@ -413,9 +413,9 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
    png_debug(1, "in png_do_strip_filler");
 
    {
-      png_bytep sp=row;
-      png_bytep dp=row;
-      png_uint_32 row_width=row_info->width;
+      png_bytep sp = row;
+      png_bytep dp = row;
+      png_uint_32 row_width = row_info->width;
       png_uint_32 i;
 
       if ((row_info->color_type == PNG_COLOR_TYPE_RGB ||
@@ -428,7 +428,7 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
             /* This converts from RGBX or RGBA to RGB */
             if (flags & PNG_FLAG_FILLER_AFTER)
             {
-               dp+=3; sp+=4;
+               dp += 3; sp += 4;
                for (i = 1; i < row_width; i++)
                {
                   *dp++ = *sp++;
@@ -485,7 +485,7 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
                   dp += 6;
                   */
 
-                  sp+=2;
+                  sp += 2;
                   *dp++ = *sp++;
                   *dp++ = *sp++;
                   *dp++ = *sp++;
@@ -506,18 +506,18 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
       {
          if (row_info->bit_depth == 8)
          {
-            /* This converts from GX or GA to G */
             if (flags & PNG_FLAG_FILLER_AFTER)
             {
+               /* This converts from GX or GA to G */
                for (i = 0; i < row_width; i++)
                {
                   *dp++ = *sp++;
                   sp++;
                }
             }
-            /* This converts from XG or AG to G */
             else
             {
+               /* This converts from XG or AG to G */
                for (i = 0; i < row_width; i++)
                {
                   sp++;
