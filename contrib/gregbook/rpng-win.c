@@ -24,6 +24,8 @@
     - 1.10:  enabled "message window"/console (thanks to David Geldreich)
     - 2.00:  dual-licensed (added GNU GPL)
     - 2.01:  fixed improper display of usage screen on PNG error(s)
+    - 2.02:  removed special error-handling which is no longer needed
+             because of the new libpng png_longjmp() feature in libpng-1.5.0.
 
   ---------------------------------------------------------------------------
 

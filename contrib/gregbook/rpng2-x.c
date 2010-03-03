@@ -41,6 +41,8 @@
               unexpected-EOF and file-read-error cases; fixed Trace() cut-and-
               paste bugs
     - 2.03:  deleted runtime MMX-enabling/disabling and obsolete -mmx* options
+             removed special error-handling which is no longer needed
+             because of the new libpng png_longjmp() feature in libpng-1.5.0.
 
   ---------------------------------------------------------------------------
 

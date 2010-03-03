@@ -66,7 +66,6 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr);
 static void readpng2_row_callback(png_structp png_ptr, png_bytep new_row,
                                  png_uint_32 row_num, int pass);
 static void readpng2_end_callback(png_structp png_ptr, png_infop info_ptr);
-static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg);
 
 
 
@@ -102,7 +101,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
     /* could also replace libpng warning-handler (final NULL), but no need: */
 
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, mainprog_ptr,
-      readpng2_error_handler, NULL);
+      NULL, NULL);
     if (!png_ptr)
         return 4;   /* out of memory */
 
@@ -450,35 +449,4 @@ void readpng2_cleanup(mainprog_info *mainprog_ptr)
 
     mainprog_ptr->png_ptr = NULL;
     mainprog_ptr->info_ptr = NULL;
-}
-
-
-
-
-
-static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg)
-{
-    mainprog_info  *mainprog_ptr;
-
-    /* This function, aside from the extra step of retrieving the "error
-     * pointer" (below) and the fact that it exists within the application
-     * rather than within libpng, is essentially identical to libpng's
-     * default error handler.  The second point is critical:  since both
-     * setjmp() and longjmp() are called from the same code, they are
-     * guaranteed to have compatible notions of how big a jmp_buf is,
-     * regardless of whether _BSD_SOURCE or anything else has (or has not)
-     * been defined. */
-
-    fprintf(stderr, "readpng2 libpng error: %s\n", msg);
-    fflush(stderr);
-
-    mainprog_ptr = png_get_error_ptr(png_ptr);
-    if (mainprog_ptr == NULL) {         /* we are completely hosed now */
-        fprintf(stderr,
-          "readpng2 severe error:  jmpbuf not recoverable; terminating.\n");
-        fflush(stderr);
-        exit(99);
-    }
-
-    png_longjmp(png_ptr, 1);
 }
