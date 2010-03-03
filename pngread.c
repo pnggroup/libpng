@@ -136,8 +136,8 @@ png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
             png_warning(png_ptr, msg);
          }
          png_snprintf(msg, 80,
-              "Application  is  running with png.c from libpng-%.20s",
-              png_libpng_ver);
+             "Application  is  running with png.c from libpng-%.20s",
+             png_libpng_ver);
          png_warning(png_ptr, msg);
 #endif
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
