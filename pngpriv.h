@@ -280,9 +280,9 @@ PNG_EXTERN void PNGAPI png_default_write_data PNGARG((png_structp png_ptr,
    png_bytep data, png_size_t length));
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-#ifdef PNG_STDIO_SUPPORTED
+#  ifdef PNG_STDIO_SUPPORTED
 PNG_EXTERN void PNGAPI png_default_flush PNGARG((png_structp png_ptr));
-#endif
+#  endif
 #endif
 
 /* Reset the CRC variable */
@@ -349,13 +349,13 @@ PNG_EXTERN void png_write_IDAT PNGARG((png_structp png_ptr, png_bytep data,
 PNG_EXTERN void png_write_IEND PNGARG((png_structp png_ptr));
 
 #ifdef PNG_WRITE_gAMA_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_EXTERN void png_write_gAMA PNGARG((png_structp png_ptr, double file_gamma));
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
+#  endif
+#  ifdef PNG_FIXED_POINT_SUPPORTED
 PNG_EXTERN void png_write_gAMA_fixed PNGARG((png_structp png_ptr,
     png_fixed_point file_gamma));
-#endif
+#  endif
 #endif
 
 #ifdef PNG_WRITE_sBIT_SUPPORTED
@@ -364,12 +364,12 @@ PNG_EXTERN void png_write_sBIT PNGARG((png_structp png_ptr, png_color_8p sbit,
 #endif
 
 #ifdef PNG_WRITE_cHRM_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_EXTERN void png_write_cHRM PNGARG((png_structp png_ptr,
    double white_x, double white_y,
    double red_x, double red_y, double green_x, double green_y,
    double blue_x, double blue_y));
-#endif
+#  endif
 PNG_EXTERN void png_write_cHRM_fixed PNGARG((png_structp png_ptr,
    png_fixed_point int_white_x, png_fixed_point int_white_y,
    png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
@@ -459,15 +459,15 @@ PNG_EXTERN void png_write_tIME PNGARG((png_structp png_ptr,
 #endif
 
 #ifdef PNG_WRITE_sCAL_SUPPORTED
-#if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
+#  if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
 PNG_EXTERN void png_write_sCAL PNGARG((png_structp png_ptr,
    int unit, double width, double height));
-#else
-#ifdef PNG_FIXED_POINT_SUPPORTED
+#  else
+#    ifdef PNG_FIXED_POINT_SUPPORTED
 PNG_EXTERN void png_write_sCAL_s PNGARG((png_structp png_ptr,
    int unit, png_charp width, png_charp height));
-#endif
-#endif
+#    endif
+#  endif
 #endif
 
 /* Called when finished processing a row of data */
@@ -615,17 +615,17 @@ PNG_EXTERN void png_do_shift PNGARG((png_row_infop row_info, png_bytep row,
 #endif
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
-#ifdef PNG_READ_GAMMA_SUPPORTED
+#  ifdef PNG_READ_GAMMA_SUPPORTED
 PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
    png_color_16p trans_color, png_color_16p background,
    png_color_16p background_1,
    png_bytep gamma_table, png_bytep gamma_from_1, png_bytep gamma_to_1,
    png_uint_16pp gamma_16, png_uint_16pp gamma_16_from_1,
    png_uint_16pp gamma_16_to_1, int gamma_shift));
-#else
+#  else
 PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
    png_color_16p trans_color, png_color_16p background));
-#endif
+#  endif
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
@@ -778,24 +778,24 @@ PNG_EXTERN void png_push_read_end PNGARG((png_structp png_ptr,
 PNG_EXTERN void png_process_some_data PNGARG((png_structp png_ptr,
    png_infop info_ptr));
 PNG_EXTERN void png_read_push_finish_row PNGARG((png_structp png_ptr));
-#ifdef PNG_READ_tEXt_SUPPORTED
+#  ifdef PNG_READ_tEXt_SUPPORTED
 PNG_EXTERN void png_push_handle_tEXt PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 length));
 PNG_EXTERN void png_push_read_tEXt PNGARG((png_structp png_ptr,
    png_infop info_ptr));
-#endif
-#ifdef PNG_READ_zTXt_SUPPORTED
+#  endif
+#  ifdef PNG_READ_zTXt_SUPPORTED
 PNG_EXTERN void png_push_handle_zTXt PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 length));
 PNG_EXTERN void png_push_read_zTXt PNGARG((png_structp png_ptr,
    png_infop info_ptr));
-#endif
-#ifdef PNG_READ_iTXt_SUPPORTED
+#  endif
+#  ifdef PNG_READ_iTXt_SUPPORTED
 PNG_EXTERN void png_push_handle_iTXt PNGARG((png_structp png_ptr,
    png_infop info_ptr, png_uint_32 length));
 PNG_EXTERN void png_push_read_iTXt PNGARG((png_structp png_ptr,
    png_infop info_ptr));
-#endif
+#  endif
 
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
@@ -816,11 +816,11 @@ PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_structp png_ptr,
 #endif
 
 #ifdef PNG_cHRM_SUPPORTED
-#ifdef PNG_CHECK_cHRM_SUPPORTED
+#  ifdef PNG_CHECK_cHRM_SUPPORTED
 /* Added at libpng version 1.2.34 and 1.4.0 */
 PNG_EXTERN void png_64bit_product PNGARG((long v1, long v2,
    unsigned long *hi_product, unsigned long *lo_product));
-#endif
+#  endif
 #endif
 
 /* Added at libpng version 1.4.0 */
@@ -847,60 +847,61 @@ extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
  * libpng yet, but more support will be added as needed.
  */
 #ifdef PNG_DEBUG
-#if (PNG_DEBUG > 0)
-#if !defined(PNG_DEBUG_FILE) && defined(_MSC_VER)
-#include <crtdbg.h>
-#if (PNG_DEBUG > 1)
-#ifndef _DEBUG
-#  define _DEBUG
-#endif
-#ifndef png_debug
-#define png_debug(l,m)  _RPT0(_CRT_WARN,m PNG_STRING_NEWLINE)
-#endif
-#ifndef png_debug1
-#define png_debug1(l,m,p1)  _RPT1(_CRT_WARN,m PNG_STRING_NEWLINE,p1)
-#endif
-#ifndef png_debug2
-#define png_debug2(l,m,p1,p2) _RPT2(_CRT_WARN,m PNG_STRING_NEWLINE,p1,p2)
-#endif
-#endif
-#else /* PNG_DEBUG_FILE || !_MSC_VER */
-#ifndef PNG_DEBUG_FILE
-#define PNG_DEBUG_FILE stderr
-#endif /* PNG_DEBUG_FILE */
+#  if (PNG_DEBUG > 0)
+#    if !defined(PNG_DEBUG_FILE) && defined(_MSC_VER)
+#      include <crtdbg.h>
+#      if (PNG_DEBUG > 1)
+#        ifndef _DEBUG
+#          define _DEBUG
+#        endif
+#        ifndef png_debug
+#          define png_debug(l,m)  _RPT0(_CRT_WARN,m PNG_STRING_NEWLINE)
+#        endif
+#        ifndef png_debug1
+#          define png_debug1(l,m,p1)  _RPT1(_CRT_WARN,m PNG_STRING_NEWLINE,p1)
+#        endif
+#        ifndef png_debug2
+#          define png_debug2(l,m,p1,p2) \
+             _RPT2(_CRT_WARN,m PNG_STRING_NEWLINE,p1,p2)
+#        endif
+#      endif
+#    else /* PNG_DEBUG_FILE || !_MSC_VER */
+#      ifndef PNG_DEBUG_FILE
+#        define PNG_DEBUG_FILE stderr
+#      endif /* PNG_DEBUG_FILE */
 
-#if (PNG_DEBUG > 1)
+#      if (PNG_DEBUG > 1)
 /* Note: ["%s"m PNG_STRING_NEWLINE] probably does not work on
  * non-ISO compilers
  */
-#  ifdef __STDC__
-#    ifndef png_debug
-#      define png_debug(l,m) \
+#        ifdef __STDC__
+#          ifndef png_debug
+#            define png_debug(l,m) \
        { \
        int num_tabs=l; \
        fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":"")))); \
        }
-#    endif
-#    ifndef png_debug1
-#      define png_debug1(l,m,p1) \
+#          endif
+#          ifndef png_debug1
+#            define png_debug1(l,m,p1) \
        { \
        int num_tabs=l; \
        fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))),p1); \
        }
-#    endif
-#    ifndef png_debug2
-#      define png_debug2(l,m,p1,p2) \
+#          endif
+#          ifndef png_debug2
+#            define png_debug2(l,m,p1,p2) \
        { \
        int num_tabs=l; \
        fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))),p1,p2); \
        }
-#    endif
-#  else /* __STDC __ */
-#    ifndef png_debug
-#      define png_debug(l,m) \
+#          endif
+#        else /* __STDC __ */
+#          ifndef png_debug
+#            define png_debug(l,m) \
        { \
        int num_tabs=l; \
        char format[256]; \
@@ -909,9 +910,9 @@ extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
          m,PNG_STRING_NEWLINE); \
        fprintf(PNG_DEBUG_FILE,format); \
        }
-#    endif
-#    ifndef png_debug1
-#      define png_debug1(l,m,p1) \
+#          endif
+#          ifndef png_debug1
+#            define png_debug1(l,m,p1) \
        { \
        int num_tabs=l; \
        char format[256]; \
@@ -920,9 +921,9 @@ extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
          m,PNG_STRING_NEWLINE); \
        fprintf(PNG_DEBUG_FILE,format,p1); \
        }
-#    endif
-#    ifndef png_debug2
-#      define png_debug2(l,m,p1,p2) \
+#          endif
+#          ifndef png_debug2
+#            define png_debug2(l,m,p1,p2) \
        { \
        int num_tabs=l; \
        char format[256]; \
@@ -931,21 +932,21 @@ extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
          m,PNG_STRING_NEWLINE); \
        fprintf(PNG_DEBUG_FILE,format,p1,p2); \
        }
-#    endif
-#  endif /* __STDC __ */
-#endif /* (PNG_DEBUG > 1) */
+#          endif
+#        endif /* __STDC __ */
+#      endif /* (PNG_DEBUG > 1) */
 
-#endif /* _MSC_VER */
-#endif /* (PNG_DEBUG > 0) */
+#    endif /* _MSC_VER */
+#  endif /* (PNG_DEBUG > 0) */
 #endif /* PNG_DEBUG */
 #ifndef png_debug
-#define png_debug(l, m)
+#  define png_debug(l, m)
 #endif
 #ifndef png_debug1
-#define png_debug1(l, m, p1)
+#  define png_debug1(l, m, p1)
 #endif
 #ifndef png_debug2
-#define png_debug2(l, m, p1, p2)
+#  define png_debug2(l, m, p1, p2)
 #endif
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
