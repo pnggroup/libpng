@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.5.0beta11 - March 3, 2010
+ libpng version 1.5.0beta11 - March 6, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.0beta11 - March 3, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta11 - March 6, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -3174,12 +3174,12 @@ the statement that follows the comment:
     /* Single-line comment */
     statement;
 
-    /* Multiple-line
-     * comment
+    /* This is a multiple-line
+     * comment.
      */
     statement;
 
-Very short comments can be placed at the end of the statement
+Very short comments can be placed after the end of the statement
 to which they pertain:
 
     statement;    /* comment */
@@ -3226,9 +3226,9 @@ macros begin with "PNG_".
 
 We put a space after each comma and after each semicolon
 in "for" statments, and we put spaces before and after each
-C binary operator and after "for" or "while".  We don't
-put a space between a typecast and the expression being
-cast, nor do we put one between a function name and the
+C binary operator and after "for" or "while", and before
+"?".  We don't put a space between a typecast and the expression
+being cast, nor do we put one between a function name and the
 left parenthesis that follows it:
 
     for (i = 2; i > 0; --i)
@@ -3245,7 +3245,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-March 3, 2010
+March 6, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

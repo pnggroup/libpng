@@ -2544,15 +2544,16 @@ version 1.5.0beta08 [February 19, 2010]
 
 version 1.5.0beta09 [February 19, 2010]
   Removed -D_ALLSOURCE from configure.ac, makefile.aix, and CMakeLists.txt.
-  Changed the name of png_ptr->jmpbuf in pngstruct.h
+  Changed the name of png_ptr->jmpbuf to png_ptr->png_jmpbuf in pngstruct.h
 
 version 1.5.0beta10 [February 25, 2010]
   Removed unused gzio.c from contrib/pngminim gather and makefile scripts
   Removed replacement error handlers from contrib/gregbook.  Because of
     the new png_longjmp() function they are no longer needed.
 
-version 1.5.0beta11 [March 3, 2010]
+version 1.5.0beta11 [March 6, 2010]
   Removed checking for already-included setjmp.h from pngconf.h
+  Fixed inconsistent indentations and made numerous cosmetic changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
