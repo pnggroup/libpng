@@ -71,13 +71,13 @@
 
 #ifdef __STDC__
 #  ifdef SPECIALBUILD
-#    pragma message("PNG_LIBPNG_SPECIALBUILD (and deprecated SPECIALBUILD)\
-     are now LIBPNG reserved macros. Use PNG_USER_PRIVATEBUILD instead.")
+#    pragma message("PNG_LIBPNG_SPECIALBUILD (and deprecated SPECIALBUILD) \
+       are now LIBPNG reserved macros. Use PNG_USER_PRIVATEBUILD instead.")
 #  endif
 
 #  ifdef PRIVATEBUILD
 #    pragma message("PRIVATEBUILD is deprecated.\
-     Use PNG_USER_PRIVATEBUILD instead.")
+       Use PNG_USER_PRIVATEBUILD instead.")
 #    define PNG_USER_PRIVATEBUILD PRIVATEBUILD
 #  endif
 #endif /* __STDC__ */
@@ -162,7 +162,7 @@
 #endif
 
 /* Added at libpng-1.4.0beta49 for testing (this test is no longer used
-   in libpng and png_calloc() is always present)
+ * in libpng and png_calloc() is always present)
  */
 #define PNG_CALLOC_SUPPORTED
 
@@ -374,7 +374,6 @@
  * being called to fill in the gamma tables.  Don't set this value
  * less then 8, and even that may not work (I haven't tested it).
  */
-
 #ifndef PNG_MAX_GAMMA_8
 #  define PNG_MAX_GAMMA_8 11
 #endif
@@ -390,7 +389,6 @@
  * and warning message functions, so some compilers won't complain.
  * If you do not want to use const, define PNG_NO_CONST here.
  */
-
 #ifndef PNG_CONST
 #  ifndef PNG_NO_CONST
 #    define PNG_CONST const
@@ -499,14 +497,16 @@
 #    endif
 #  endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
-/* PNG_PROGRESSIVE_READ_NOT_SUPPORTED is deprecated. */
-#  if !defined(PNG_NO_PROGRESSIVE_READ) && \
- !defined(PNG_PROGRESSIVE_READ_NOT_SUPPORTED)  /* if you don't do progressive */
-#    define PNG_PROGRESSIVE_READ_SUPPORTED     /* reading.  This is not talking */
-#  endif                               /* about interlacing capability!  You'll */
-            /* still have interlacing unless you change the following define: */
+#  ifndef PNG_NO_PROGRESSIVE_READ
+#    define PNG_PROGRESSIVE_READ_SUPPORTED
+#  endif
+/* You can define PNG_NO_PROGRESSIVE_READ if you don't do progressive reading.
+ * This is not talking about interlacing capability!  You'll still have
+ * interlacing unless you change the following define which is required
+ * for PNG-compliant decoders:
+ */
 
-#  define PNG_READ_INTERLACING_SUPPORTED /* required for PNG-compliant decoders */
+#  define PNG_READ_INTERLACING_SUPPORTED
 
 /* PNG_NO_SEQUENTIAL_READ_SUPPORTED is deprecated. */
 #  if !defined(PNG_NO_SEQUENTIAL_READ) && \
@@ -517,7 +517,8 @@
 
 #  ifndef PNG_NO_READ_COMPOSITE_NODIV
 #    ifndef PNG_NO_READ_COMPOSITED_NODIV  /* libpng-1.0.x misspelling */
-#      define PNG_READ_COMPOSITE_NODIV_SUPPORTED   /* well tested on Intel, SGI */
+       /* well tested on Intel, SGI */
+#      define PNG_READ_COMPOSITE_NODIV_SUPPORTED
 #    endif
 #  endif
 
@@ -534,7 +535,7 @@
 
 /* PNG_WRITE_TRANSFORMS_NOT_SUPPORTED is deprecated. */
 #  if !defined(PNG_WRITE_TRANSFORMS_NOT_SUPPORTED) && \
-    !defined(PNG_NO_WRITE_TRANSFORMS)
+      !defined(PNG_NO_WRITE_TRANSFORMS)
 #    define PNG_WRITE_TRANSFORMS_SUPPORTED
 #  endif
 
@@ -572,7 +573,7 @@
 #  endif /* PNG_WRITE_TRANSFORMS_SUPPORTED */
 
 #  if !defined(PNG_NO_WRITE_INTERLACING_SUPPORTED) && \
-    !defined(PNG_WRITE_INTERLACING_SUPPORTED)
+      !defined(PNG_WRITE_INTERLACING_SUPPORTED)
     /* This is not required for PNG-compliant encoders, but can cause
      * trouble if left undefined
     */
@@ -580,8 +581,8 @@
 #  endif
 
 #  if !defined(PNG_NO_WRITE_WEIGHTED_FILTER) && \
-    !defined(PNG_WRITE_WEIGHTED_FILTER) && \
-     defined(PNG_FLOATING_POINT_SUPPORTED)
+      !defined(PNG_WRITE_WEIGHTED_FILTER) && \
+      defined(PNG_FLOATING_POINT_SUPPORTED)
 #    define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 #  endif
 
@@ -590,7 +591,7 @@
 #  endif
 
 #  if !defined(PNG_NO_SAVE_INT_32) || defined(PNG_WRITE_oFFS_SUPPORTED) || \
-    defined(PNG_WRITE_pCAL_SUPPORTED)
+      defined(PNG_WRITE_pCAL_SUPPORTED)
 #    ifndef PNG_SAVE_INT_32_SUPPORTED
 #      define PNG_SAVE_INT_32_SUPPORTED
 #    endif
@@ -700,20 +701,20 @@
 
 /* These are currently experimental features, define them if you want */
 
-/* Very little testing */
+/* Very little testing, not enabled by default. */
 /*
 #ifdef PNG_READ_SUPPORTED
-#    ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-#        define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-#    endif
+#  ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#    define PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#  endif
 #endif
 */
 
 /* This is only for PowerPC big-endian and 680x0 systems */
-/* some testing */
+/* some testing, not enabled by default. */
 /*
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
-#    define PNG_READ_BIG_ENDIAN_SUPPORTED
+#  define PNG_READ_BIG_ENDIAN_SUPPORTED
 #endif
 */
 
@@ -840,7 +841,7 @@
 #    define PNG_READ_OPT_PLTE_SUPPORTED /* only affects support of the */
 #  endif                      /* optional PLTE chunk in RGB and RGBA images */
 #  if defined(PNG_READ_iTXt_SUPPORTED) || defined(PNG_READ_tEXt_SUPPORTED) || \
-    defined(PNG_READ_zTXt_SUPPORTED)
+      defined(PNG_READ_zTXt_SUPPORTED)
 #    define PNG_READ_TEXT_SUPPORTED
 #    define PNG_TEXT_SUPPORTED
 #  endif
@@ -984,8 +985,9 @@
 #        define PNG_zTXt_SUPPORTED
 #      endif
 #    endif
-#    if defined(PNG_WRITE_iTXt_SUPPORTED) || defined(PNG_WRITE_tEXt_SUPPORTED) || \
-    defined(PNG_WRITE_zTXt_SUPPORTED)
+#    if defined(PNG_WRITE_iTXt_SUPPORTED) || \
+        defined(PNG_WRITE_tEXt_SUPPORTED) || \
+        defined(PNG_WRITE_zTXt_SUPPORTED)
 #      define PNG_WRITE_TEXT_SUPPORTED
 #      ifndef PNG_TEXT_SUPPORTED
 #        define PNG_TEXT_SUPPORTED
@@ -1034,7 +1036,7 @@
 
 /* Need the time information for converting tIME chunks */
 #ifdef PNG_CONVERT_tIME_SUPPORTED
-     /* "time.h" functions are not supported on WindowsCE */
+   /* "time.h" functions are not supported on WindowsCE */
 #  include <time.h>
 #endif
 
@@ -1125,7 +1127,8 @@ typedef unsigned char png_byte;
 #endif
 
 /* Typedef for floating-point numbers that are converted
-   to fixed-point with a multiple of 100,000, e.g., int_gamma */
+ * to fixed-point with a multiple of 100,000, e.g., int_gamma
+ */
 typedef png_int_32 png_fixed_point;
 
 /* Add typedefs for pointers */
@@ -1212,7 +1215,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 
 #if defined(PNG_DLL) || defined(_DLL) || defined(__DLL__ ) || \
     (( defined(_Windows) || defined(_WINDOWS) || \
-       defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ))
+    defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ))
 
 #  ifndef PNGAPI
 #    if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
@@ -1223,7 +1226,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  endif
 
 #  if !defined(PNG_IMPEXP) && (!defined(PNG_DLL) || \
-       0 /* WINCOMPILER_WITH_NO_SUPPORT_FOR_DECLIMPEXP */)
+      0 /* WINCOMPILER_WITH_NO_SUPPORT_FOR_DECLIMPEXP */)
 #    define PNG_IMPEXP
 #  endif
 
@@ -1242,8 +1245,8 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #          define PNG_IMPEXP __export
 #        else
 #          define PNG_IMPEXP /*__import */ /* doesn't exist AFAIK in VC++ */
-#        endif                              /* Exists in Borland C++ for
-                                                C++ classes (== huge) */
+#        endif                             /* Exists in Borland C++ for
+                                              C++ classes (== huge) */
 #      endif
 #    endif
 
