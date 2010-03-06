@@ -24,7 +24,7 @@
 
 static void /* PRIVATE */
 png_default_error PNGARG((png_structp png_ptr,
-  png_const_charp error_message)) PNG_NORETURN;
+    png_const_charp error_message)) PNG_NORETURN;
 #ifdef PNG_WARNINGS_SUPPORTED
 static void /* PRIVATE */
 png_default_warning PNGARG((png_structp png_ptr,
@@ -45,7 +45,7 @@ png_error(png_structp png_ptr, png_const_charp error_message)
    if (png_ptr != NULL)
    {
      if (png_ptr->flags&
-       (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
+         (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
      {
        if (*error_message == PNG_LITERAL_SHARP)
        {
@@ -111,16 +111,16 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
    {
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
    if (png_ptr->flags&
-     (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
+       (PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))
 #endif
-     {
-       if (*warning_message == PNG_LITERAL_SHARP)
-       {
-           for (offset = 1; offset < 15; offset++)
-              if (warning_message[offset] == ' ')
+      {
+         if (*warning_message == PNG_LITERAL_SHARP)
+         {
+            for (offset = 1; offset < 15; offset++)
+               if (warning_message[offset] == ' ')
                   break;
-       }
-     }
+         }
+      }
    }
    if (png_ptr != NULL && png_ptr->warning_fn != NULL)
       (*(png_ptr->warning_fn))(png_ptr, warning_message + offset);
@@ -134,9 +134,9 @@ void PNGAPI
 png_benign_error(png_structp png_ptr, png_const_charp error_message)
 {
   if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
-    png_warning(png_ptr, error_message);
+     png_warning(png_ptr, error_message);
   else
-    png_error(png_ptr, error_message);
+     png_error(png_ptr, error_message);
 }
 #endif
 
@@ -156,7 +156,7 @@ static PNG_CONST char png_digit[16] = {
 #if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_ERROR_TEXT_SUPPORTED)
 static void /* PRIVATE */
 png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
-   error_message)
+    error_message)
 {
    int iout = 0, iin = 0;
 
@@ -193,11 +193,11 @@ png_chunk_error(png_structp png_ptr, png_const_charp error_message)
 {
    char msg[18+PNG_MAX_ERROR_TEXT];
    if (png_ptr == NULL)
-     png_error(png_ptr, error_message);
+      png_error(png_ptr, error_message);
    else
    {
-     png_format_buffer(png_ptr, msg, error_message);
-     png_error(png_ptr, msg);
+      png_format_buffer(png_ptr, msg, error_message);
+      png_error(png_ptr, msg);
    }
 }
 #endif /* PNG_READ_SUPPORTED */
@@ -209,11 +209,11 @@ png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
 {
    char msg[18+PNG_MAX_ERROR_TEXT];
    if (png_ptr == NULL)
-     png_warning(png_ptr, warning_message);
+      png_warning(png_ptr, warning_message);
    else
    {
-     png_format_buffer(png_ptr, msg, warning_message);
-     png_warning(png_ptr, msg);
+      png_format_buffer(png_ptr, msg, warning_message);
+      png_warning(png_ptr, msg);
    }
 }
 #endif /* PNG_WARNINGS_SUPPORTED */
@@ -223,10 +223,10 @@ png_chunk_warning(png_structp png_ptr, png_const_charp warning_message)
 void PNGAPI
 png_chunk_benign_error(png_structp png_ptr, png_const_charp error_message)
 {
-  if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
-    png_chunk_warning(png_ptr, error_message);
-  else
-    png_chunk_error(png_ptr, error_message);
+   if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
+      png_chunk_warning(png_ptr, error_message);
+   else
+      png_chunk_error(png_ptr, error_message);
 }
 #endif
 #endif /* PNG_READ_SUPPORTED */
@@ -259,28 +259,28 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
    if (*error_message == PNG_LITERAL_SHARP)
    {
-     /* Strip "#nnnn " from beginning of error message. */
-     int offset;
-     char error_number[16];
-     for (offset = 0; offset<15; offset++)
-     {
+      /* Strip "#nnnn " from beginning of error message. */
+      int offset;
+      char error_number[16];
+      for (offset = 0; offset<15; offset++)
+      {
          error_number[offset] = error_message[offset + 1];
          if (error_message[offset] == ' ')
-             break;
-     }
-     if ((offset > 1) && (offset < 15))
-     {
-       error_number[offset - 1] = '\0';
-       fprintf(stderr, "libpng error no. %s: %s",
-          error_number, error_message + offset + 1);
-       fprintf(stderr, PNG_STRING_NEWLINE);
-     }
-     else
-     {
-       fprintf(stderr, "libpng error: %s, offset=%d",
-          error_message, offset);
-       fprintf(stderr, PNG_STRING_NEWLINE);
-     }
+            break;
+      }
+      if ((offset > 1) && (offset < 15))
+      {
+         error_number[offset - 1] = '\0';
+         fprintf(stderr, "libpng error no. %s: %s",
+             error_number, error_message + offset + 1);
+         fprintf(stderr, PNG_STRING_NEWLINE);
+      }
+      else
+      {
+         fprintf(stderr, "libpng error: %s, offset=%d",
+             error_message, offset);
+         fprintf(stderr, PNG_STRING_NEWLINE);
+      }
    }
    else
 #endif
@@ -329,33 +329,33 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 #  ifdef PNG_ERROR_NUMBERS_SUPPORTED
    if (*warning_message == PNG_LITERAL_SHARP)
    {
-     int offset;
-     char warning_number[16];
-     for (offset = 0; offset < 15; offset++)
-     {
-        warning_number[offset] = warning_message[offset + 1];
-        if (warning_message[offset] == ' ')
+      int offset;
+      char warning_number[16];
+      for (offset = 0; offset < 15; offset++)
+      {
+         warning_number[offset] = warning_message[offset + 1];
+         if (warning_message[offset] == ' ')
             break;
-     }
-     if ((offset > 1) && (offset < 15))
-     {
-       warning_number[offset + 1] = '\0';
-       fprintf(stderr, "libpng warning no. %s: %s",
-          warning_number, warning_message + offset);
-       fprintf(stderr, PNG_STRING_NEWLINE);
-     }
-     else
-     {
-       fprintf(stderr, "libpng warning: %s",
-          warning_message);
-       fprintf(stderr, PNG_STRING_NEWLINE);
-     }
+      }
+      if ((offset > 1) && (offset < 15))
+      {
+         warning_number[offset + 1] = '\0';
+         fprintf(stderr, "libpng warning no. %s: %s",
+             warning_number, warning_message + offset);
+         fprintf(stderr, PNG_STRING_NEWLINE);
+      }
+      else
+      {
+         fprintf(stderr, "libpng warning: %s",
+             warning_message);
+         fprintf(stderr, PNG_STRING_NEWLINE);
+      }
    }
    else
 #  endif
    {
-     fprintf(stderr, "libpng warning: %s", warning_message);
-     fprintf(stderr, PNG_STRING_NEWLINE);
+      fprintf(stderr, "libpng warning: %s", warning_message);
+      fprintf(stderr, PNG_STRING_NEWLINE);
    }
 #else
    warning_message = warning_message; /* Make compiler happy */
@@ -371,7 +371,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
  */
 void PNGAPI
 png_set_error_fn(png_structp png_ptr, png_voidp error_ptr,
-   png_error_ptr error_fn, png_error_ptr warning_fn)
+    png_error_ptr error_fn, png_error_ptr warning_fn)
 {
    if (png_ptr == NULL)
       return;
@@ -400,8 +400,9 @@ png_set_strip_error_numbers(png_structp png_ptr, png_uint_32 strip_mode)
 {
    if (png_ptr != NULL)
    {
-     png_ptr->flags &=
-       ((~(PNG_FLAG_STRIP_ERROR_NUMBERS|PNG_FLAG_STRIP_ERROR_TEXT))&strip_mode);
+      png_ptr->flags &=
+         ((~(PNG_FLAG_STRIP_ERROR_NUMBERS |
+         PNG_FLAG_STRIP_ERROR_TEXT))&strip_mode);
    }
 }
 #endif
