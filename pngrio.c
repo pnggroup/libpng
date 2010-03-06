@@ -47,7 +47,7 @@ png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
  * read_data function and use it at run time with png_set_read_fn(), rather
  * than changing the library.
  */
-#ifndef USE_FAR_KEYWORD
+#  ifndef USE_FAR_KEYWORD
 void PNGAPI
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -63,7 +63,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    if (check != length)
       png_error(png_ptr, "Read Error");
 }
-#else
+#  else
 /* This is the model-independent version. Since the standard I/O library
    can't handle far buffers in the medium and small models, we have to copy
    the data.
@@ -111,7 +111,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    if ((png_uint_32)check != (png_uint_32)length)
       png_error(png_ptr, "read Error");
 }
-#endif
+#  endif
 #endif
 
 /* This function allows the application to supply a new input function

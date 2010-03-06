@@ -483,7 +483,7 @@ png_get_io_ptr(png_structp png_ptr)
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-#ifdef PNG_STDIO_SUPPORTED
+#  ifdef PNG_STDIO_SUPPORTED
 /* Initialize the default input/output functions for the PNG file.  If you
  * use your own read or write routines, you can call either png_set_read_fn()
  * or png_set_write_fn() instead of png_init_io().  If you have defined
@@ -500,9 +500,9 @@ png_init_io(png_structp png_ptr, png_FILE_p fp)
 
    png_ptr->io_ptr = (png_voidp)fp;
 }
-#endif
+#  endif
 
-#ifdef PNG_TIME_RFC1123_SUPPORTED
+#  ifdef PNG_TIME_RFC1123_SUPPORTED
 /* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
  */
@@ -521,7 +521,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
          png_sizeof(char)));
    }
 
-#ifdef USE_FAR_KEYWORD
+#    ifdef USE_FAR_KEYWORD
    {
       char near_time_buf[29];
       png_snprintf6(near_time_buf, 29, "%d %s %d %02d:%02d:%02d +0000",
@@ -531,15 +531,15 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
       png_memcpy(png_ptr->time_buffer, near_time_buf,
           29*png_sizeof(char));
    }
-#else
+#    else
    png_snprintf6(png_ptr->time_buffer, 29, "%d %s %d %02d:%02d:%02d +0000",
        ptime->day % 32, short_months[(ptime->month - 1) % 12],
        ptime->year, ptime->hour % 24, ptime->minute % 60,
        ptime->second % 61);
-#endif
+#    endif
    return ((png_charp)png_ptr->time_buffer);
 }
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#  endif /* PNG_TIME_RFC1123_SUPPORTED */
 
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
 
@@ -550,19 +550,19 @@ png_get_copyright(png_structp png_ptr)
 #ifdef PNG_STRING_COPYRIGHT
       return PNG_STRING_COPYRIGHT
 #else
-#ifdef __STDC__
+#  ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
      "libpng version 1.5.0beta11 - March 3, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
-#else
+#  else
       return ((png_charp) "libpng version 1.5.0beta11 - March 3, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
-#endif
+#  endif
 #endif
 }
 
@@ -597,9 +597,9 @@ png_get_header_version(png_structp png_ptr)
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
 #ifdef __STDC__
    return ((png_charp) PNG_HEADER_VERSION_STRING
-#ifndef PNG_READ_SUPPORTED
+#  ifndef PNG_READ_SUPPORTED
    "     (NO READ SUPPORT)"
-#endif
+#  endif
    PNG_STRING_NEWLINE);
 #else
    return ((png_charp) PNG_HEADER_VERSION_STRING);
@@ -607,7 +607,7 @@ png_get_header_version(png_structp png_ptr)
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#  ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 int PNGAPI
 png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
 {
@@ -622,7 +622,7 @@ png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
         return ((int)*(p + 4));
    return 0;
 }
-#endif
+#  endif
 
 /* This function, added to libpng-1.0.6g, is untested. */
 int PNGAPI
@@ -645,7 +645,7 @@ png_access_version_number(void)
 
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-#ifdef PNG_SIZE_T
+#  ifdef PNG_SIZE_T
 /* Added at libpng version 1.2.6 */
    PNG_EXTERN png_size_t PNGAPI png_convert_size PNGARG((size_t size));
 png_size_t PNGAPI
@@ -655,11 +655,11 @@ png_convert_size(size_t size)
       PNG_ABORT();  /* We haven't got access to png_ptr, so no png_error() */
    return ((png_size_t)size);
 }
-#endif /* PNG_SIZE_T */
+#  endif /* PNG_SIZE_T */
 
 /* Added at libpng version 1.2.34 and 1.4.0 (moved from pngset.c) */
-#ifdef PNG_cHRM_SUPPORTED
-#ifdef PNG_CHECK_cHRM_SUPPORTED
+#  ifdef PNG_cHRM_SUPPORTED
+#    ifdef PNG_CHECK_cHRM_SUPPORTED
 
 /*
  *    Multiply two 32-bit numbers, V1 and V2, using 32-bit
@@ -770,8 +770,8 @@ png_check_cHRM_fixed(png_structp png_ptr,
 
    return ret;
 }
-#endif /* PNG_CHECK_cHRM_SUPPORTED */
-#endif /* PNG_cHRM_SUPPORTED */
+#    endif /* PNG_CHECK_cHRM_SUPPORTED */
+#  endif /* PNG_cHRM_SUPPORTED */
 
 void /* PRIVATE */
 png_check_IHDR(png_structp png_ptr,
@@ -794,21 +794,21 @@ png_check_IHDR(png_structp png_ptr,
       error = 1;
    }
 
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
    if (width > png_ptr->user_width_max || width > PNG_USER_WIDTH_MAX)
-#else
+#  else
    if (width > PNG_USER_WIDTH_MAX)
-#endif
+#  endif
    {
       png_warning(png_ptr, "Image width exceeds user limit in IHDR");
       error = 1;
    }
 
-#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
    if (height > png_ptr->user_height_max || height > PNG_USER_HEIGHT_MAX)
-#else
+#  else
    if (height > PNG_USER_HEIGHT_MAX)
-#endif
+#  endif
    {
       png_warning(png_ptr, "Image height exceeds user limit in IHDR");
       error = 1;
@@ -870,7 +870,7 @@ png_check_IHDR(png_structp png_ptr,
       error = 1;
    }
 
-#ifdef PNG_MNG_FEATURES_SUPPORTED
+#  ifdef PNG_MNG_FEATURES_SUPPORTED
    /* Accept filter_method 64 (intrapixel differencing) only if
     * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
     * 2. Libpng did not read a PNG signature (this filter_method is only
@@ -903,13 +903,13 @@ png_check_IHDR(png_structp png_ptr,
       }
    }
 
-#else
+#  else
    if (filter_type != PNG_FILTER_TYPE_BASE)
    {
       png_warning(png_ptr, "Unknown filter method in IHDR");
       error = 1;
    }
-#endif
+#  endif
 
    if (error == 1)
       png_error(png_ptr, "Invalid IHDR data");

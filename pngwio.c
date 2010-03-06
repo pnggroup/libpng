@@ -124,7 +124,7 @@ png_flush(png_structp png_ptr)
       (*(png_ptr->output_flush_fn))(png_ptr);
 }
 
-#ifdef PNG_STDIO_SUPPORTED
+#  ifdef PNG_STDIO_SUPPORTED
 void PNGAPI
 png_default_flush(png_structp png_ptr)
 {
@@ -134,7 +134,7 @@ png_default_flush(png_structp png_ptr)
    io_ptr = (png_FILE_p)CVT_PTR((png_ptr->io_ptr));
    fflush(io_ptr);
 }
-#endif
+#  endif
 #endif
 
 /* This function allows the application to supply new output functions for
@@ -168,7 +168,7 @@ png_default_flush(png_structp png_ptr)
  */
 void PNGAPI
 png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
-   png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn)
+    png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn)
 {
    if (png_ptr == NULL)
       return;
@@ -186,15 +186,15 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 #endif
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-#ifdef PNG_STDIO_SUPPORTED
+#  ifdef PNG_STDIO_SUPPORTED
    if (output_flush_fn != NULL)
       png_ptr->output_flush_fn = output_flush_fn;
 
    else
       png_ptr->output_flush_fn = png_default_flush;
-#else
+#  else
    png_ptr->output_flush_fn = output_flush_fn;
-#endif
+#  endif
 #endif /* PNG_WRITE_FLUSH_SUPPORTED */
 
    /* It is an error to read while writing a png file */
@@ -209,7 +209,7 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
 }
 
 #ifdef USE_FAR_KEYWORD
-#ifdef _MSC_VER
+#  ifdef _MSC_VER
 void *png_far_to_near(png_structp png_ptr, png_voidp ptr, int check)
 {
    void *near_ptr;
@@ -237,6 +237,6 @@ void *png_far_to_near(png_structp png_ptr, png_voidp ptr, int check)
 
    return(near_ptr);
 }
-#   endif
-#   endif
+#  endif
+#endif
 #endif /* PNG_WRITE_SUPPORTED */
