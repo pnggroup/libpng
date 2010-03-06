@@ -1228,7 +1228,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    new_palette.depth = *entry_start++;
-   entry_size = (new_palette.depth == 8? 6 : 10);
+   entry_size = (new_palette.depth == 8 ? 6 : 10);
    data_length = (slength - (entry_start - (png_bytep)png_ptr->chunkdata));
 
    /* Integrity-check the data length */
@@ -2994,9 +2994,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
             pb = abs(pc);
             pc = abs(p + pc);
 #else
-            pa = p < 0? -p : p;
-            pb = pc < 0? -pc : pc;
-            pc = (p + pc) < 0? -(p + pc) : p + pc;
+            pa = p < 0 ? -p : p;
+            pb = pc < 0 ? -pc : pc;
+            pc = (p + pc) < 0 ? -(p + pc) : p + pc;
 #endif
 
             /*
@@ -3008,7 +3008,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
                   p = c;
              */
 
-            p = (pa <= pb && pa <= pc)? a : (pb <= pc) ? b : c;
+            p = (pa <= pb && pa <= pc) ? a : (pb <= pc) ? b : c;
 
             *rp = (png_byte)(((int)(*rp) + p) & 0xff);
             rp++;
@@ -3125,7 +3125,7 @@ png_read_finish_row(png_structp png_ptr)
             break;
          }
          if (ret != Z_OK)
-            png_error(png_ptr, png_ptr->zstream.msg? png_ptr->zstream.msg :
+            png_error(png_ptr, png_ptr->zstream.msg ? png_ptr->zstream.msg :
                 "Decompression Error");
 
          if (!(png_ptr->zstream.avail_out))

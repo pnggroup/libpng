@@ -861,7 +861,7 @@ png_get_unknown_chunks(png_structp png_ptr, png_infop info_ptr,
 png_byte PNGAPI
 png_get_rgb_to_gray_status (png_structp png_ptr)
 {
-   return (png_byte)(png_ptr? png_ptr->rgb_to_gray_status : 0);
+   return (png_byte)(png_ptr ? png_ptr->rgb_to_gray_status : 0);
 }
 #endif
 
@@ -869,7 +869,7 @@ png_get_rgb_to_gray_status (png_structp png_ptr)
 png_voidp PNGAPI
 png_get_user_chunk_ptr(png_structp png_ptr)
 {
-   return (png_ptr? png_ptr->user_chunk_ptr : NULL);
+   return (png_ptr ? png_ptr->user_chunk_ptr : NULL);
 }
 #endif
 
@@ -886,24 +886,24 @@ png_get_compression_buffer_size(png_structp png_ptr)
 png_uint_32 PNGAPI
 png_get_user_width_max (png_structp png_ptr)
 {
-   return (png_ptr? png_ptr->user_width_max : 0);
+   return (png_ptr ? png_ptr->user_width_max : 0);
 }
 png_uint_32 PNGAPI
 png_get_user_height_max (png_structp png_ptr)
 {
-   return (png_ptr? png_ptr->user_height_max : 0);
+   return (png_ptr ? png_ptr->user_height_max : 0);
 }
 /* This function was added to libpng 1.4.0 */
 png_uint_32 PNGAPI
 png_get_chunk_cache_max (png_structp png_ptr)
 {
-   return (png_ptr? png_ptr->user_chunk_cache_max : 0);
+   return (png_ptr ? png_ptr->user_chunk_cache_max : 0);
 }
 /* This function was added to libpng 1.4.1 */
 png_alloc_size_t PNGAPI
 png_get_chunk_malloc_max (png_structp png_ptr)
 {
-   return (png_ptr? png_ptr->user_chunk_malloc_max : 0);
+   return (png_ptr ? png_ptr->user_chunk_malloc_max : 0);
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 
