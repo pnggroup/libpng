@@ -2555,6 +2555,8 @@ version 1.5.0beta11 [March 6, 2010]
   Removed checking for already-included setjmp.h from pngconf.h
   Fixed inconsistent indentations and made numerous cosmetic changes.
 
+version 1.5.0beta12 [March 8, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
