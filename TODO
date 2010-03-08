@@ -2,12 +2,11 @@
 TODO - list of things to do for libpng:
 
 Final bug fixes.
-Improve API by hiding the png_struct and png_info structs.
 Finish work on the no-floating-point version (including gamma compensation)
 Better C++ wrapper/full C++ implementation?
 Fix problem with C++ and EXTERN "C".
 cHRM transformation.
-Improve setjmp/longjmp usage or remove it in favor of returning error codes.
+Remove setjmp/longjmp usage in favor of returning error codes.
 Add "grayscale->palette" transformation and "palette->grayscale" detection.
 Improved dithering.
 Multi-lingual error and warning message support.
