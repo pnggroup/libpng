@@ -2567,6 +2567,9 @@ version 1.5.0beta13 [March 9, 2010]
     PNG_USER_CHUNK_MALLOC_MAX nor PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
     is defined.
   Removed unused png_measure_compressed_chunk() from pngpriv.h and libpngpf.3
+  Moved the 'config.h' support from pngconf.h to pngpriv.h
+  Removed PNGAPI from the png_longjmp_ptr typedef.
+  Eliminated dependence of pngtest.c on the private pngdebug.h file.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
