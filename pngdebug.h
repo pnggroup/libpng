@@ -1,6 +1,15 @@
-/* pngdebug.h
+
+/* pngdebug.h - Debugging macros for libpng, also used in pngtest.c
  *
- * Debugging macros, also used in pngtest.c
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
+ * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
+ * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * Last changed in libpng version 1.5.0 - March 8, 2010
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  */
 
 /* Define PNG_DEBUG at compile time for debugging information.  Higher
