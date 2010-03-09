@@ -2562,6 +2562,7 @@ version 1.5.0beta12 [March 9, 2010]
   Created new pngdebug.h and moved debug definitions there.
 
 version 1.5.0beta13 [March 9, 2010]
+  Protect pngstruct.h, pnginfo.h, and pngdebug.h from being included twice.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
