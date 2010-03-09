@@ -31,6 +31,18 @@
 
 #include <stdlib.h>
 
+/* Added at libpng-1.2.9 */
+/* Moved to pngpriv.h at libpng-1.5.0 */
+
+/* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure"
+ * script.
+ */
+#ifdef PNG_CONFIGURE_LIBPNG
+#  ifdef HAVE_CONFIG_H
+#    include "config.h"
+#  endif
+#endif
+
 /* The functions exported by PNG_EXTERN are internal functions, which
  * aren't usually used outside the library (as far as I know), so it is
  * debatable if they should be exported at all.  In the future, when it

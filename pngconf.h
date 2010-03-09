@@ -26,17 +26,6 @@
 #  include <limits.h>
 #endif
 
-/* Added at libpng-1.2.9 */
-
-/* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure"
- * script.
- */
-#ifdef PNG_CONFIGURE_LIBPNG
-#  ifdef HAVE_CONFIG_H
-#    include "config.h"
-#  endif
-#endif
-
 /*
  * Added at libpng-1.2.8
  *
