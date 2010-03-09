@@ -325,8 +325,10 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       if (png_ptr->user_chunk_malloc_max &&
           (prefix_size + expanded_size >= png_ptr->user_chunk_malloc_max - 1))
 #else
+#  ifdef PNG_USER_CHUNK_MALLOC_MAX
       if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
           prefix_size + expanded_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
+#  endif
 #endif
          png_warning(png_ptr, "Exceeded size limit while expanding chunk");
 
@@ -335,7 +337,12 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
        * and we have nothing to do - the code will exit through the
        * error case below.
        */
+#if defined(PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED) || \
+    defined(PNG_USER_CHUNK_MALLOC_MAX)
       else if (expanded_size > 0)
+#else
+      if (expanded_size > 0)
+#endif
       {
          /* Success (maybe) - really uncompress the chunk. */
          png_size_t new_size = 0;
