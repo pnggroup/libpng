@@ -14,12 +14,9 @@
  * read a PNG file or stream.
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#ifdef PNG_READ_SUPPORTED
 #include "pngpriv.h"
 
+#ifdef PNG_READ_SUPPORTED
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
 png_structp PNGAPI

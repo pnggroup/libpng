@@ -32,7 +32,6 @@
  */
 
 #include "png.h"
-#include "pngpriv.h"
 
 #  include <stdio.h>
 #  include <stdlib.h>
@@ -42,10 +41,12 @@
      typedef FILE                * png_FILE_p;
 #endif
 
-/* Makes pngtest verbose so we can find problems (needs to be before png.h) */
+/* Makes pngtest verbose so we can find problems. */
 #ifndef PNG_DEBUG
 #  define PNG_DEBUG 0
 #endif
+
+#include "pngdebug.h"
 
 #if !PNG_DEBUG
 #  define SINGLE_ROWBUF_ALLOC  /* Makes buffer overruns easier to nail */

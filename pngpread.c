@@ -11,11 +11,9 @@
  * and license in png.h
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 #include "pngpriv.h"
+
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 
 /* Push model modes */
 #define PNG_READ_SIG_MODE   0

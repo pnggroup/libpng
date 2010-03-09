@@ -14,11 +14,9 @@
  * libpng itself during the course of reading an image.
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#ifdef PNG_READ_SUPPORTED
 #include "pngpriv.h"
+
+#ifdef PNG_READ_SUPPORTED
 
 #    define png_strtod(p,a,b) strtod(a,b)
 png_uint_32 PNGAPI

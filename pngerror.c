@@ -16,11 +16,9 @@
  * at each function.
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 #include "pngpriv.h"
+
+#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
 static void /* PRIVATE */
 png_default_error PNGARG((png_structp png_ptr,

@@ -81,20 +81,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngerror.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngrio.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngwio.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngmem.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngset.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngget.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngread.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngrtran.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngrutil.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngtrans.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngwrite.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngwtran.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngwutil.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngpread.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
+png.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngerror.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngrio.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwio.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngmem.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngset.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngget.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngread.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngrtran.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngrutil.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngtrans.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwrite.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwtran.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwutil.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngpread.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 
 pngtest.o: png.h pngconf.h

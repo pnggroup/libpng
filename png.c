@@ -11,10 +11,7 @@
  * and license in png.h
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
 #define PNG_NO_EXTERN
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */

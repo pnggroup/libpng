@@ -12,11 +12,9 @@
  *
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 #include "pngpriv.h"
+
+#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
 png_uint_32 PNGAPI
 png_get_valid(png_structp png_ptr, png_infop info_ptr, png_uint_32 flag)

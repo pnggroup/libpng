@@ -16,11 +16,9 @@
  * info struct and allows us to change the structure in the future.
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 #include "pngpriv.h"
+
+#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
 #ifdef PNG_bKGD_SUPPORTED
 void PNGAPI

@@ -218,20 +218,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngerror.o pngerror.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngrio.o pngrio.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngwio.o pngwio.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngmem.o pngmem.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngset.o pngset.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngget.o pngget.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngread.o pngread.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngrtran.o pngrtran.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngrutil.o pngrutil.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngtrans.o pngtrans.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngwrite.o pngwrite.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngwtran.o pngwtran.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngwutil.o pngwutil.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
-pngpread.o pngpread.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h
+png.o png.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngerror.o pngerror.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngrio.o pngrio.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwio.o pngwio.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngmem.o pngmem.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngset.o pngset.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngget.o pngget.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngread.o pngread.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngrtran.o pngrtran.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngrutil.o pngrutil.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngtrans.o pngtrans.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwrite.o pngwrite.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwtran.o pngwtran.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwutil.o pngwutil.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngpread.o pngpread.pic.o: png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 
 pngtest.o: png.h pngconf.h

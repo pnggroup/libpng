@@ -18,11 +18,9 @@
  * libpng use it at run time with png_set_read_fn(...).
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#ifdef PNG_READ_SUPPORTED
 #include "pngpriv.h"
+
+#ifdef PNG_READ_SUPPORTED
 
 /* Read the data from whatever input you are using.  The default routine
  * reads from a file pointer.  Note that this routine sometimes gets called

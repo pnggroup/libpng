@@ -33,20 +33,20 @@ clean :
 
 
 # Other dependencies.
-png.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngpread.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngset.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngget.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngread.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngrtran.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngrutil.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngerror.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngmem.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngrio.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngwio.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngtrans.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngwrite.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngwtran.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
-pngwutil.obj : png.h, pngconf.h, pngpriv.h pngstruct.h pnginfo.h
+png.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngpread.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngset.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngget.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngread.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngrtran.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngrutil.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngerror.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngmem.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngrio.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngwio.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngtrans.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngwrite.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngwtran.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
+pngwutil.obj : png.h, pngconf.h, pngpriv.h, pngstruct.h, pnginfo.h, pngdebug.h
 
 pngtest.obj : png.h, pngconf.h

@@ -588,15 +588,6 @@ typedef png_unknown_chunk FAR * png_unknown_chunkp;
 typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
 #endif
 
-/* CAUTION: Applications should not define this. If they do, ABI
- * compatibility of the application with libpng from one libpng
- * release to the next is not assured. It should only be defined
- * while building libpng.
- */
-#ifdef PNG_EXPOSE_INTERNAL_STRUCTURES
-#  include "pnginfo.h"
-#endif
-
 typedef struct png_info_def png_info;
 typedef png_info FAR * png_infop;
 typedef png_info FAR * FAR * png_infopp;
@@ -784,15 +775,6 @@ typedef void (PNGAPI *png_longjmp_ptr) PNGARG((jmp_buf, int));
 
 typedef png_voidp (*png_malloc_ptr) PNGARG((png_structp, png_alloc_size_t));
 typedef void (*png_free_ptr) PNGARG((png_structp, png_voidp));
-
-/* CAUTION: Applications should not define this. If they do, ABI
- * compatibility of the application with libpng from one libpng
- * release to the next is not assured. It should only be defined
- * while building libpng.
- */
-#ifdef PNG_EXPOSE_INTERNAL_STRUCTURES
-#  include "pngstruct.h"
-#endif
 
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.

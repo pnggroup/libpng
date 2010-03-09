@@ -11,12 +11,9 @@
  * and license in png.h
  */
 
-/* Get internal access to png.h */
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#ifdef PNG_WRITE_SUPPORTED
 #include "pngpriv.h"
+
+#ifdef PNG_WRITE_SUPPORTED
 
 /* Writes all the PNG information.  This is the suggested way to use the
  * library.  If you have a new chunk to add, make a function to write it,

@@ -11,11 +11,9 @@
  * and license in png.h
  */
 
-#define PNG_EXPOSE_INTERNAL_STRUCTURES
-#define PNG_NO_PEDANTIC_WARNINGS
-#include "png.h"
-#ifdef PNG_WRITE_SUPPORTED
 #include "pngpriv.h"
+
+#ifdef PNG_WRITE_SUPPORTED
 
 /* Transform the data according to the user's wishes.  The order of
  * transformations is significant.
