@@ -18,6 +18,8 @@
  * It should NOT be accessed directly by an application.
  */
 
+#ifndef PNGSTRUCT_H
+#define PNGSTRUCT_H
 struct png_struct_def
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -306,3 +308,4 @@ struct png_struct_def
    png_uint_32 io_state;
 #endif
 };
+#endif /* PNGSTRUCT_H */

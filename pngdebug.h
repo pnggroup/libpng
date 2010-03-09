@@ -17,6 +17,8 @@
  * only been added since version 0.95 so it is not implemented throughout
  * libpng yet, but more support will be added as needed.
  */
+#ifndef PNGDEBUG_H
+#define PNGDEBUG_H
 #ifdef PNG_DEBUG
 #  if (PNG_DEBUG > 0)
 #    if !defined(PNG_DEBUG_FILE) && defined(_MSC_VER)
@@ -119,3 +121,4 @@
 #ifndef png_debug2
 #  define png_debug2(l, m, p1, p2)
 #endif
+#endif /* PNGDEBUG_H */

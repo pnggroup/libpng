@@ -50,6 +50,9 @@
  * itxt_ptr structure argument, and the png_set_rows and png_set_unknowns
  * functions do not make their own copies.
  */
+#ifndef PNGINFO_H
+#define PNGINFO_H
+
 struct png_info_def
 {
    /* the following are necessary for every PNG file */
@@ -288,3 +291,4 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #endif
 
 };
+#endif /* PNGINFO_H */
