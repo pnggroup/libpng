@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.5.0beta12 - March 8, 2010
+ libpng version 1.5.0beta12 - March 9, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.0beta12 - March 8, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta12 - March 9, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -867,6 +867,7 @@ For example, 4 bit/pixel paletted or grayscale data will be returned
 2 pixels/byte with the leftmost pixel in the high-order bits of the
 byte, unless png_set_packing() is called.  8-bit RGB data will be stored
 in RGB RGB RGB format unless png_set_filler() or png_set_add_alpha()
+%10%in RGB RGB RGB format unless png_set_filler()
 is called to insert filler bytes, either before or after each RGB triplet.
 16-bit RGB data will be returned RRGGBB RRGGBB, with the most significant
 byte of the color value first, unless png_set_strip_16() is called to
@@ -875,6 +876,7 @@ png_set_add alpha() is called to insert filler bytes, either before or
 after each RRGGBB triplet.  Similarly, 8-bit or 16-bit grayscale data can
 be modified with
 png_set_filler(), png_set_add_alpha(), or png_set_strip_16().
+%10%png_set_filler() or png_set_strip_16().
 
 The following code transforms grayscale images of less than 8 to 8 bits,
 changes paletted images to RGB, and adds a full alpha channel if there is
@@ -887,6 +889,7 @@ viewing application that wishes to treat all images in the same way.
 
     if (color_type == PNG_COLOR_TYPE_GRAY &&
         bit_depth < 8) png_set_expand_gray_1_2_4_to_8(png_ptr);
+%10%        bit_depth < 8) png_set_gray_1_2_4_to_8(png_ptr);
 
     if (png_get_valid(png_ptr, info_ptr,
         PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
@@ -2919,6 +2922,7 @@ application:
 
    png_uint_32 application_vn = PNG_LIBPNG_VER;
 
+%10%.SH VIII.  (Omitted).
 VIII.  Changes to Libpng from version 1.0.x to 1.2.x
 
 Support for user memory management was enabled by default.  To
@@ -3245,7 +3249,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-March 8, 2010
+March 9, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
