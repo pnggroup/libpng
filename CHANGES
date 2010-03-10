@@ -2574,6 +2574,8 @@ version 1.5.0beta13 [March 10, 2010]
     expressions (i.e. a trailing ';' must always be added) and correct
     the format statements in various png_debug messages.
 
+version 1.5.0beta14 [March 10, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
