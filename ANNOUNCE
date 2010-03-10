@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta13 - March 9, 2010
+Libpng 1.5.0beta13 - March 10, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -84,7 +84,7 @@ version 1.5.0beta12 [March 9, 2010]
     and "#define PNG_NO_PEDANTIC_WARNINGS" (John Bowler).
   Created new pngdebug.h and moved debug definitions there.
 
-version 1.5.0beta13 [March 9, 2010]
+version 1.5.0beta13 [March 10, 2010]
   Protect pngstruct.h, pnginfo.h, and pngdebug.h from being included twice.
   Revise the "#ifdef" blocks in png_inflate() so it will compile when neither
     PNG_USER_CHUNK_MALLOC_MAX nor PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
@@ -93,6 +93,9 @@ version 1.5.0beta13 [March 9, 2010]
   Moved the 'config.h' support from pngconf.h to pngpriv.h
   Removed PNGAPI from the png_longjmp_ptr typedef.
   Eliminated dependence of pngtest.c on the private pngdebug.h file.
+  Make all png_debug macros into *unterminated* statements or
+    expressions (i.e. a trailing ';' must always be added) and correct
+    the format statements in various png_debug messages.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
