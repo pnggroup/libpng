@@ -103,6 +103,8 @@ version 1.5.0beta14 [March 11, 2010]
   Corrected CE and OS/2 DEF files (scripts/png*def) for symbols removed and
     added ordinal numbers to the Windows DEF file and corrected the duplicated
     ordinal numbers on CE symbols that are commented out.
+  Added back in export symbols that can be present in the Windows build but
+    are disabled by default.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
