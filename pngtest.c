@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.5.0 [March 10, 2010]
+ * Last changed in libpng 1.5.0 [March 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -306,7 +306,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
    /* Check if data really is near. If so, use usual code. */
    n_data = (png_byte *)CVT_PTR_NOCHECK(data);
-   io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
+   io_ptr = (png_FILE_p)CVT_PTR(png_get_io_ptr(png_ptr));
    if ((png_bytep)n_data == data)
    {
       check = fread(n_data, 1, length, io_ptr);
@@ -356,7 +356,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;
 
-   check = fwrite(data, 1, length, (png_FILE_p)png_ptr->io_ptr);
+   check = fwrite(data, 1, length, (png_FILE_p)png_get_io_ptr(png_ptr));
    if (check != length)
    {
       png_error(png_ptr, "Write Error");
@@ -380,7 +380,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
    /* Check if data really is near. If so, use usual code. */
    near_data = (png_byte *)CVT_PTR_NOCHECK(data);
-   io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
+   io_ptr = (png_FILE_p)CVT_PTR(png_get_io_ptr(png_ptr));
    if ((png_bytep)near_data == data)
    {
       check = fwrite(near_data, 1, length, io_ptr);
