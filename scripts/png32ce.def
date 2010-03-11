@@ -1,18 +1,11 @@
-;------------------------------------------
-; LIBPNG module definition file for Windows
-;------------------------------------------
+;---------------------------------------------
+; LIBPNG module definition file for Windows CE
+;---------------------------------------------
 
-LIBRARY lpngce
-
- png_memcpy_check
- png_memset_check
- png_set_dither
- png_read_init_3
- png_write_init_3
- png_set_strip_error_numbers
- png_get_uint_32
- png_get_uint_16
- png_get_int_32
+; Warning: changing the name of the library from
+; the default may require changes to other files,
+; for example the '.la' file used by GNU libtool
+LIBRARY
 
 EXPORTS
 ;Version 1.5.0beta14
@@ -86,14 +79,13 @@ EXPORTS
   png_malloc    @68
 ;  png_memcpy_check    @69
 ;  png_memset_check    @70
-  png_permit_empty_plte  @71
+;  png_permit_empty_plte  @71
   png_process_data    @72
   png_progressive_combine_row  @73
   png_read_end    @74
   png_read_image    @75
   png_read_info    @76
-; png_read_init is deprecated
-  png_read_init    @77
+;  png_read_init    @77
   png_read_png    @78
   png_read_row    @79
   png_read_rows    @80
@@ -123,7 +115,7 @@ EXPORTS
   png_set_gAMA    @104
   png_set_gAMA_fixed  @105
   png_set_gamma    @106
-  png_set_gray_1_2_4_to_8  @107 ; deprecated
+;  png_set_gray_1_2_4_to_8  @107
   png_set_gray_to_rgb  @108
   png_set_hIST    @109
   png_set_iCCP    @110
@@ -178,14 +170,12 @@ EXPORTS
   png_write_image    @159
   png_write_info    @160
   png_write_info_before_PLTE  @161
-; png_write_init is deprecated
-  png_write_init    @162
+;  png_write_init    @162
   png_write_png    @163
   png_write_row    @164
   png_write_rows    @165
-; png_read_init_2 and png_write_init_2 are deprecated.
-  png_read_init_2    @166
-  png_write_init_2    @167
+;  png_read_init_2    @166
+;  png_write_init_2    @167
   png_access_version_number  @168
 ;  png_sig_bytes    @169
 ;  png_libpng_ver    @170
@@ -194,7 +184,7 @@ EXPORTS
   png_set_invalid  @173
 ; Added at version 1.0.12
 ; For compatiblity with 1.0.7-1.0.11
-  png_info_init @174
+;  png_info_init @174
 ;  png_read_init_3    @175
 ;  png_write_init_3    @176
   png_info_init_3 @177
@@ -244,9 +234,10 @@ EXPORTS
   png_set_expand_gray_1_2_4_to_8  @207
 ; Added at version 1.2.41
   png_write_sig @208
-  png_benign_error @209
-  png_benign_chunk_error @210
-  png_set_benign_error @211
+; Uncomment these if you define PNG_BENIGN_ERRORS_SUPPORTED
+;  png_benign_error @209
+;  png_benign_chunk_error @210
+;  png_set_benign_errors @211
   png_get_io_chunk_name @212
   png_get_io_state @213
   png_get_chunk_cache_max @215

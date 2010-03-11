@@ -175,7 +175,7 @@ EXPORTS
   png_set_invalid
 
 ; Added at version 1.2.0:
-  png_permit_empty_plte
+;  png_permit_empty_plte
   png_permit_mng_features
 
 ; Added at version 1.2.2:
@@ -204,9 +204,10 @@ EXPORTS
 
 ; Added at version 1.2.41
   png_write_sig
-; png_benign_error
-; png_benign_chunk_error
-; png_set_benign_error
+; Uncomment these if you define PNG_BENIGN_ERRORS_SUPPORTED
+;  png_benign_error @209
+;  png_benign_chunk_error @210
+;  png_set_benign_errors @211
   png_get_io_chunk_name
   png_get_io_state
   png_get_chunk_cache_max
@@ -219,37 +220,3 @@ EXPORTS
   png_set_chunk_malloc_max
 ; Added at version 1.5.0
   png_longjmp
-
-; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
-  png_libpng_ver
-  png_pass_start
-  png_pass_inc
-  png_pass_ystart
-  png_pass_yinc
-  png_pass_mask
-  png_pass_dsp_mask
-; png_pass_width
-; png_pass_height
-
-; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
-  png_IHDR
-  png_IDAT
-  png_IEND
-  png_PLTE
-  png_bKGD
-  png_cHRM
-  png_gAMA
-  png_hIST
-  png_iCCP
-  png_iTXt
-  png_oFFs
-  png_pCAL
-  png_pHYs
-  png_sBIT
-  png_sCAL
-  png_sPLT
-  png_sRGB
-  png_tEXt
-  png_tIME
-  png_tRNS
-  png_zTXt
