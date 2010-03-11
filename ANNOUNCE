@@ -99,6 +99,7 @@ version 1.5.0beta13 [March 10, 2010]
 
 version 1.5.0beta14 [March 11, 2010]
   Removed direct access to png_ptr->io_ptr from the Windows code in pngtest.c
+  Revised Makefile.am to account for recent additions and replacements.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
