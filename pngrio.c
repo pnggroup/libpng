@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * Last changed in libpng 1.5.0 [March 10, 2010]
+ * Last changed in libpng 1.5.0 [March 12, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -46,7 +46,7 @@ png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
  * than changing the library.
  */
 #  ifndef USE_FAR_KEYWORD
-void PNGAPI
+void PNGCBAPI
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;
@@ -70,7 +70,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
 
-static void PNGAPI
+static void PNGCBAPI
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;

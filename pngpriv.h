@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta14 - March 10, 2010
+ * libpng version 1.5.0beta14 - March 12, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -25,6 +25,7 @@
 #define PNGPRIV_H
 
 #define PNG_NO_PEDANTIC_WARNINGS
+#define PNGLIB_BUILD
 #include "png.h"
 #include "pnginfo.h"
 #include "pngstruct.h"
@@ -280,23 +281,25 @@ PNG_EXTERN voidpf png_zalloc PNGARG((voidpf png_ptr, uInt items, uInt size));
 /* Function to free memory for zlib.  PNGAPI is disallowed. */
 PNG_EXTERN void png_zfree PNGARG((voidpf png_ptr, voidpf ptr));
 
-/* Next four functions are used internally as callbacks.  PNGAPI is required
- * but not PNG_EXPORT.  PNGAPI added at libpng version 1.2.3. */
+/* Next four functions are used internally as callbacks.  PNGCBAPI is required
+ * but not PNG_EXPORT.  PNGAPI added at libpng version 1.2.3, changed to PNGCBAPI
+ * at 1.5.0
+ */
 
-PNG_EXTERN void PNGAPI png_default_read_data PNGARG((png_structp png_ptr,
+PNG_EXTERN void PNGCBAPI png_default_read_data PNGARG((png_structp png_ptr,
     png_bytep data, png_size_t length));
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-PNG_EXTERN void PNGAPI png_push_fill_buffer PNGARG((png_structp png_ptr,
+PNG_EXTERN void PNGCBAPI png_push_fill_buffer PNGARG((png_structp png_ptr,
     png_bytep buffer, png_size_t length));
 #endif
 
-PNG_EXTERN void PNGAPI png_default_write_data PNGARG((png_structp png_ptr,
+PNG_EXTERN void PNGCBAPI png_default_write_data PNGARG((png_structp png_ptr,
     png_bytep data, png_size_t length));
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
 #  ifdef PNG_STDIO_SUPPORTED
-PNG_EXTERN void PNGAPI png_default_flush PNGARG((png_structp png_ptr));
+PNG_EXTERN void PNGCBAPI png_default_flush PNGARG((png_structp png_ptr));
 #  endif
 #endif
 

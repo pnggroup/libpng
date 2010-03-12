@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta14 - March 10, 2010
+ * libpng version 1.5.0beta14 - March 12, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1177,10 +1177,10 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #endif
 
 #ifdef __CYGWIN__
-#  undef PNGAPI
-#  define PNGAPI __cdecl
-#  undef PNG_IMPEXP
-#  define PNG_IMPEXP
+   /*NOTE: Force __cdecl throughout CYGWIN */
+#  undef PNGCAPI
+#  define PNGCAPI __cdecl
+   /*Allow declspec through for the moment */
 #endif
 
 #define PNG_USE_LOCAL_ARRAYS /* Not used in libpng, defined for legacy apps */
@@ -1193,6 +1193,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
  */
 
 #if defined(__MINGW32__) && !defined(PNG_MODULEDEF)
+   /* NOTE: causes weird effects below. */
 #  ifndef PNG_NO_MODULEDEF
 #    define PNG_NO_MODULEDEF
 #  endif
@@ -1206,11 +1207,11 @@ typedef char            FAR * FAR * FAR * png_charppp;
     (( defined(_Windows) || defined(_WINDOWS) || \
     defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ))
 
-#  ifndef PNGAPI
+#  ifndef PNGCAPI
 #    if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
-#      define PNGAPI __cdecl
+#      define PNGCAPI __cdecl
 #    else
-#      define PNGAPI _cdecl
+#      define PNGCAPI _cdecl
 #    endif
 #  endif
 
@@ -1221,15 +1222,12 @@ typedef char            FAR * FAR * FAR * png_charppp;
 
 #  ifndef PNG_IMPEXP
 
-#    define PNG_EXPORT_TYPE1(type,symbol)  PNG_IMPEXP type PNGAPI symbol
-#    define PNG_EXPORT_TYPE2(type,symbol)  type PNG_IMPEXP PNGAPI symbol
-
      /* Borland/Microsoft */
 #    if defined(_MSC_VER) || defined(__BORLANDC__)
 #      if (_MSC_VER >= 800) || (__BORLANDC__ >= 0x500)
-#        define PNG_EXPORT PNG_EXPORT_TYPE1
+         /* Default order: PNG_IMPEXP before type */
 #      else
-#        define PNG_EXPORT PNG_EXPORT_TYPE2
+#        define PNG_EXPORT_OLD /* Use type PNG_IMPEXP order */
 #        ifdef PNG_BUILD_DLL
 #          define PNG_IMPEXP __export
 #        else
@@ -1240,7 +1238,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    endif
 
 #    ifndef PNG_IMPEXP
-#      ifdef PNG_BUILD_DLL
+#      ifdef PNGLIB_BUILD
 #        define PNG_IMPEXP __declspec(dllexport)
 #      else
 #        define PNG_IMPEXP __declspec(dllimport)
@@ -1251,6 +1249,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
 #    ifndef PNGAPI
 #      define PNGAPI _System
+#      define PNGCAPI
 #    endif
 #  else
 #    if 0 /* ... other platforms, with other meanings */
@@ -1258,21 +1257,37 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  endif
 #endif
 
-#ifndef PNGAPI
-#  define PNGAPI
-#endif
-#ifndef PNG_IMPEXP
-#  define PNG_IMPEXP
-#endif
-
-#ifdef PNG_BUILDSYMS
-#  ifndef PNG_EXPORT
-#    define PNG_EXPORT(type,symbol) PNG_FUNCTION_EXPORT symbol END
+#ifndef PNG_EXPORT
+#  ifdef PNG_BUILDSYMS
+#    define PNG_EXPORT(type, name, args, attributes, ordinal)\
+	PNG_FUNCTION_EXPORT name END
+#  else
+#    ifdef PNG_EXPORT_OLD
+#      define PNG_EXPORT(type, name, args, attributes, ordinal)\
+	type PNG_IMPEXP (PNGAPI name) PNGARG(args) attributes
+#    else
+#      define PNG_EXPORT(type, name, args, attributes, ordinal)\
+	PNG_IMPEXP type (PNGAPI name) PNGARG(args) attributes
+#    endif
 #  endif
 #endif
 
-#ifndef PNG_EXPORT
-#  define PNG_EXPORT(type,symbol) PNG_IMPEXP type PNGAPI symbol
+#ifndef PNG_CALLBACK
+# define PNG_CALLBACK(type, name, args, attributes)\
+	type (PNGCBAPI name) PNGARG(args) attributes
+#endif
+
+#ifndef PNGCAPI
+# define PNGCAPI
+#endif
+#ifndef PNGCBAPI
+# define PNGCBAPI PNGCAPI
+#endif
+#ifndef PNGAPI
+#  define PNGAPI PNGCAPI
+#endif
+#ifndef PNG_IMPEXP
+#  define PNG_IMPEXP
 #endif
 
 /* Support for compiler specific function attributes.  These are used

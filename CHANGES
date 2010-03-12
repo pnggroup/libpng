@@ -2574,7 +2574,7 @@ version 1.5.0beta13 [March 10, 2010]
     expressions (i.e. a trailing ';' must always be added) and correct
     the format statements in various png_debug messages.
 
-version 1.5.0beta14 [March 11, 2010]
+version 1.5.0beta14 [March 12, 2010]
   Removed direct access to png_ptr->io_ptr from the Windows code in pngtest.c
   Revised Makefile.am to account for recent additions and replacements.
   Corrected CE and OS/2 DEF files (scripts/png*def) for symbols removed and
@@ -2582,6 +2582,12 @@ version 1.5.0beta14 [March 11, 2010]
     ordinal numbers on CE symbols that are commented out.
   Added back in export symbols that can be present in the Windows build but
     are disabled by default.
+  PNG_EXPORT changed to include an 'ordinal' field for DEF file generation.
+    PNG_CALLBACK added to make callback definitions uniform.  PNGAPI split
+    into PNGCAPI (base C form), PNGAPI (exports) and PNGCBAPI (callbacks),
+    and appropriate changes made to all files.  Cygwin builds re-hinged to
+    allow procedure call standard changes and to remove the need for the DEF
+    file (fixes build on Cygwin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

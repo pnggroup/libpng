@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.5.0 [March 11, 2010]
+ * Last changed in libpng 1.5.0 [March 12, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -101,9 +101,9 @@ static int status_pass = 1;
 static int status_dots_requested = 0;
 static int status_dots = 1;
 
-void
+void PNGCBAPI
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
-void
+void PNGCBAPI
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
    if (png_ptr == NULL || row_number > PNG_UINT_31_MAX)
@@ -123,9 +123,9 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
    fprintf(stdout, "r");
 }
 
-void
+void PNGCBAPI
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
-void
+void PNGCBAPI
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
    if (png_ptr == NULL || row_number > PNG_UINT_31_MAX || pass > 7)
@@ -140,9 +140,9 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
  * 5 in case illegal filter values are present.)
  */
 static png_uint_32 filters_used[256];
-void
+void PNGCBAPI
 count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data);
-void
+void PNGCBAPI
 count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    if (png_ptr != NULL && row_info != NULL)
@@ -157,9 +157,9 @@ count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 
 static png_uint_32 zero_samples;
 
-void
+void PNGCBAPI
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data);
-void
+void PNGCBAPI
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    png_bytep dp = data;
@@ -588,7 +588,7 @@ static png_uint_32 user_chunk_data[4];
      * 3: vpAg units
      */
 
-static int read_user_chunk_callback(png_struct *png_ptr,
+static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
    png_unknown_chunkp chunk)
 {
    png_uint_32
