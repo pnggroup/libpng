@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta14 - March 12, 2010
+ * libpng version 1.5.0beta14 - March 13, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1258,23 +1258,22 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #endif
 
 #ifndef PNG_EXPORT
-#  ifdef PNG_BUILDSYMS
+#  ifdef PNG_EXPORT_OLD
 #    define PNG_EXPORT(type, name, args, attributes, ordinal)\
-	PNG_FUNCTION_EXPORT name END
+       type PNG_IMPEXP (PNGAPI name) PNGARG(args) attributes
 #  else
-#    ifdef PNG_EXPORT_OLD
-#      define PNG_EXPORT(type, name, args, attributes, ordinal)\
-	type PNG_IMPEXP (PNGAPI name) PNGARG(args) attributes
-#    else
-#      define PNG_EXPORT(type, name, args, attributes, ordinal)\
-	PNG_IMPEXP type (PNGAPI name) PNGARG(args) attributes
-#    endif
+#    define PNG_EXPORT(type, name, args, attributes, ordinal)\
+       PNG_IMPEXP type (PNGAPI name) PNGARG(args) attributes
 #  endif
+#endif
+
+#ifndef PNG_REMOVED
+#  define PNG_REMOVED(name, ordinal)
 #endif
 
 #ifndef PNG_CALLBACK
 # define PNG_CALLBACK(type, name, args, attributes)\
-	type (PNGCBAPI name) PNGARG(args) attributes
+  type (PNGCBAPI name) PNGARG(args) attributes
 #endif
 
 #ifndef PNGCAPI
@@ -1324,21 +1323,23 @@ typedef char            FAR * FAR * FAR * png_charppp;
      * accessed from within the library, therefore should be empty during
      * a library build.
      */
-#    ifndef PNG_DEPRECATED
-#      define PNG_DEPRECATED __attribute__((__deprecated__))
-#    endif
-#    ifndef PNG_DEPSTRUCT
-#      define PNG_DEPSTRUCT  __attribute__((__deprecated__))
-#    endif
-#    ifndef PNG_PRIVATE
-#      if 0 /* Doesn't work so we use deprecated instead*/
-#        define PNG_PRIVATE \
-          __attribute__((warning("This function is not exported by libpng.")))
-#      else
-#        define PNG_PRIVATE \
-          __attribute__((__deprecated__))
+#    ifndef PNGLIB_BUILD
+#      ifndef PNG_DEPRECATED
+#        define PNG_DEPRECATED __attribute__((__deprecated__))
 #      endif
-#    endif /* PNG_PRIVATE */
+#      ifndef PNG_DEPSTRUCT
+#        define PNG_DEPSTRUCT  __attribute__((__deprecated__))
+#      endif
+#      ifndef PNG_PRIVATE
+#        if 0 /* Doesn't work so we use deprecated instead*/
+#          define PNG_PRIVATE \
+            __attribute__((warning("This function is not exported by libpng.")))
+#        else
+#          define PNG_PRIVATE \
+            __attribute__((__deprecated__))
+#        endif
+#      endif /* PNG_PRIVATE */
+#    endif /* PNGLIB_BUILD */
 #  endif /* __GNUC__ */
 #endif /* PNG_PEDANTIC_WARNINGS */
 

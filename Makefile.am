@@ -29,7 +29,7 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngset.c pngget.c pngrutil
 	pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
-	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+	%HEADERS%
 
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS = @LIBPNG_DEFINES@
 
@@ -45,9 +45,6 @@ else
   libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -export-symbols libpng.sym
   libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.sym
 endif
-
-# Avoid depending upon Character Ranges.
-AN = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
 #distribute headers in /usr/include/libpng/*
 pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
@@ -72,13 +69,13 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	CMakeLists.txt example.c libpng-1.5.0beta14.txt
+	CMakeLists.txt example.c libpng.def libpng-@PNGLIB_VERSION@.txt
 
-CLEANFILES= pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers \
-libpng.sym
+CLEANFILES= dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
+	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
-config.sub configure depcomp install-sh ltmain.sh missing
+config.sub configure depcomp install-sh ltmain.sh missing libpng.def
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -86,21 +83,21 @@ $(PNGLIB_BASENAME).pc: libpng.pc
 $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
-libpng.sym: png.h pngconf.h
-	rm -f $@ $@.new
-	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
-		$(SED) -n -e \
-		's|^.*PNG_FUNCTION_EXPORT[ 	]*\([$(AN)]*\).*$$|$(SYMBOL_PREFIX)\1|p' \
-		-e 's|^.*PNG_DATA_EXPORT[ 	]*\([$(AN)]*\).*$$|$(SYMBOL_PREFIX)\1|p' \
-			>$@.new
-	mv $@.new $@
+libpng.sym: scripts/sym.dfn png.h pngconf.h
+libpng.vers: scripts/vers.dfn png.h pngconf.h
+libpng.def: scripts/def.dfn png.h pngconf.h
 
-libpng.vers: libpng.sym
-	rm -f $@ $@.new
-	echo PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0 '{global:' > $@.new
-	$(SED) s/$$/\;/ libpng.sym >> $@.new
-	echo 'local: *; };' >> $@.new
-	mv $@.new $@
+SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
+		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
+		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'
+
+libpng.sym libpng.vers libpng.def:
+	$(RM) -f $@ dfn.c dfn?.out
+	echo '#include "$<"' >dfn.c
+	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
+	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p' dfn1.out >dfn2.out
+	$(SED) -e 's| *@@@ *||' -e 's| *$$||' dfn2.out >dfn3.out
+	mv dfn3.out $@
 
 test: check
 
