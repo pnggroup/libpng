@@ -387,9 +387,9 @@
  */
 
 #ifndef PNG_NO_PEDANTIC_WARNINGS
-#ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
-#  define PNG_PEDANTIC_WARNINGS_SUPPORTED
-#endif
+#  ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
+#    define PNG_PEDANTIC_WARNINGS_SUPPORTED
+#  endif
 #endif
 
 #ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
@@ -633,11 +633,6 @@
 #    ifndef PNG_NO_READ_INVERT
 #      define PNG_READ_INVERT_SUPPORTED
 #    endif
-#    if 0 /* removed from libpng-1.4.0 */
-#      ifndef PNG_NO_READ_DITHER
-#        define PNG_READ_DITHER_SUPPORTED
-#      endif
-#    endif /* 0 */
 #    ifndef PNG_NO_READ_BACKGROUND
 #      define PNG_READ_BACKGROUND_SUPPORTED
 #    endif
@@ -683,8 +678,8 @@
 
 /* PNG_NO_SEQUENTIAL_READ_SUPPORTED is deprecated. */
 #  if !defined(PNG_NO_SEQUENTIAL_READ) && \
-    !defined(PNG_SEQUENTIAL_READ_SUPPORTED) && \
-    !defined(PNG_NO_SEQUENTIAL_READ_SUPPORTED)
+      !defined(PNG_SEQUENTIAL_READ_SUPPORTED) && \
+      !defined(PNG_NO_SEQUENTIAL_READ_SUPPORTED)
 #    define PNG_SEQUENTIAL_READ_SUPPORTED
 #  endif
 
@@ -696,7 +691,7 @@
 #  endif
 
 #  if !defined(PNG_NO_GET_INT_32) || defined(PNG_READ_oFFS_SUPPORTED) || \
-    defined(PNG_READ_pCAL_SUPPORTED)
+      defined(PNG_READ_pCAL_SUPPORTED)
 #    ifndef PNG_GET_INT_32_SUPPORTED
 #      define PNG_GET_INT_32_SUPPORTED
 #    endif
@@ -869,7 +864,7 @@
 #  define PNG_LITERAL_RIGHT_SQUARE_BRACKET 0x5d
 #endif
 #ifndef PNG_STRING_NEWLINE
-#define PNG_STRING_NEWLINE "\n"
+#  define PNG_STRING_NEWLINE "\n"
 #endif
 
 /* These are currently experimental features, define them if you want */
@@ -1209,7 +1204,7 @@
 
 /* Need the time information for converting tIME chunks */
 #ifdef PNG_CONVERT_tIME_SUPPORTED
-   /* "time.h" functions are not supported on WindowsCE */
+  /* "time.h" functions are not supported on WindowsCE */
 #  include <time.h>
 #endif
 
@@ -1266,11 +1261,11 @@ typedef unsigned char png_byte;
 #      endif
 #      define USE_FAR_KEYWORD
 #    endif   /* LDATA != 1 */
-     /* Possibly useful for moving data out of default segment.
-      * Uncomment it if you want. Could also define FARDATA as
-      * const if your compiler supports it. (SJT)
+         /* Possibly useful for moving data out of default segment.
+          * Uncomment it if you want. Could also define FARDATA as
+          * const if your compiler supports it. (SJT)
 #        define FARDATA FAR
-      */
+          */
 #  endif  /* __WIN32__, __FLAT__, __CYGWIN__ */
 #endif   /* __BORLANDC__ */
 
@@ -1345,7 +1340,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
  * functions that are passed far data must be model-independent.
  */
 
-/* memory model/platform independent fns */
+/* Memory model/platform independent fns */
 #ifndef PNG_ABORT
 #  ifdef _WINDOWS_
 #    define PNG_ABORT() ExitProcess(0)

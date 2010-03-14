@@ -153,7 +153,7 @@ $(STATLIB): $(OBJS)
 	$(AR) rc $@ $(OBJS)
 	$(RANLIB) $@
 
-%14_%$(SHAREDDEF): libpng.def
+$(SHAREDDEF): libpng.def
 	cat $< | sed -e '1{G;s/^\(.*\)\(\n\)/EXPORTS/;};2,/^EXPORTS/d' | \
 	sed -e 's/\([^;]*\);/;/' > $@
 

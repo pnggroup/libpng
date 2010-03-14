@@ -15,7 +15,6 @@ Makefiles for  libpng version 1.5.0beta14 - March 14, 2010
  makefile.beos     =>  beos makefile
  makefile.bor      =>  Borland makefile (uses bcc)
  makefile.cegcc    =>  minge32ce for Windows CE makefile
- makefile.cygwin   =>  Cygwin/gcc makefile
  makefile.darwin   =>  Darwin makefile, can use on MacosX
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
@@ -58,7 +57,6 @@ Other supporting scripts:
  libpng-config-body.in => used by several makefiles to create libpng-config
  libpng-config-head.in => used by several makefiles to create libpng-config
  libpng.pc.in      =>  Used by several makefiles to create libpng.pc
- pngwin.def        =>  Module definitions for makefile.cygwin and mingw
  pngwin.rc         =>  Used by the visualc6 and visualc71 projects.
  SCOPTIONS.ppc     =>  Used with smakefile.ppc
 
