@@ -136,7 +136,8 @@
 #endif
 
 /* Enabled by default in 1.2.0.  You can disable this if you don't need to
-   support PNGs that are embedded in MNG datastreams */
+ * support PNGs that are embedded in MNG datastreams
+ */
 #ifndef PNG_NO_MNG_FEATURES
 #  ifndef PNG_MNG_FEATURES_SUPPORTED
 #    define PNG_MNG_FEATURES_SUPPORTED
@@ -393,11 +394,11 @@
 #endif
 
 #ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
-/* Support for compiler specific function attributes.  These are used
- * so that where compiler support is available incorrect use of API
- * functions in png.h will generate compiler warnings.  Added at libpng
- * version 1.2.41.
- */
+  /* Support for compiler specific function attributes.  These are used
+   * so that where compiler support is available incorrect use of API
+   * functions in png.h will generate compiler warnings.  Added at libpng
+   * version 1.2.41.
+   */
 #  ifdef __GNUC__
 #    ifndef PNG_USE_RESULT
 #      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
@@ -676,7 +677,7 @@
 
 #  define PNG_READ_INTERLACING_SUPPORTED
 
-/* PNG_NO_SEQUENTIAL_READ_SUPPORTED is deprecated. */
+  /* PNG_NO_SEQUENTIAL_READ_SUPPORTED is deprecated. */
 #  if !defined(PNG_NO_SEQUENTIAL_READ) && \
       !defined(PNG_SEQUENTIAL_READ_SUPPORTED) && \
       !defined(PNG_NO_SEQUENTIAL_READ_SUPPORTED)
@@ -685,7 +686,7 @@
 
 #  ifndef PNG_NO_READ_COMPOSITE_NODIV
 #    ifndef PNG_NO_READ_COMPOSITED_NODIV  /* libpng-1.0.x misspelling */
-       /* well tested on Intel, SGI */
+      /* well tested on Intel, SGI */
 #      define PNG_READ_COMPOSITE_NODIV_SUPPORTED
 #    endif
 #  endif
@@ -744,7 +745,7 @@
       !defined(PNG_WRITE_INTERLACING_SUPPORTED)
     /* This is not required for PNG-compliant encoders, but can cause
      * trouble if left undefined
-    */
+     */
 #    define PNG_WRITE_INTERLACING_SUPPORTED
 #  endif
 
@@ -891,7 +892,6 @@
 #endif
 
 /* Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING */
-
 #if !defined(PNG_NO_POINTER_INDEXING) && \
     !defined(PNG_POINTER_INDEXING_SUPPORTED)
 #  define PNG_POINTER_INDEXING_SUPPORTED
@@ -1006,8 +1006,11 @@
 #    define PNG_zTXt_SUPPORTED
 #  endif
 #  ifndef PNG_NO_READ_OPT_PLTE
-#    define PNG_READ_OPT_PLTE_SUPPORTED /* only affects support of the */
-#  endif                      /* optional PLTE chunk in RGB and RGBA images */
+    /* This only affects support of the optional PLTE chunk in RGB and RGBA
+     * images.
+     */
+#    define PNG_READ_OPT_PLTE_SUPPORTED
+#  endif
 #  if defined(PNG_READ_iTXt_SUPPORTED) || defined(PNG_READ_tEXt_SUPPORTED) || \
       defined(PNG_READ_zTXt_SUPPORTED)
 #    define PNG_READ_TEXT_SUPPORTED
@@ -1164,8 +1167,8 @@
 
 #    ifdef PNG_WRITE_tIME_SUPPORTED
 #      ifndef PNG_NO_CONVERT_tIME
+        /* The "tm" structure is not supported on WindowsCE */
 #        ifndef _WIN32_WCE
-/*   The "tm" structure is not supported on WindowsCE */
 #          ifndef PNG_CONVERT_tIME_SUPPORTED
 #            define PNG_CONVERT_tIME_SUPPORTED
 #          endif
@@ -1194,9 +1197,8 @@
 #  endif
 #endif /* PNG_WRITE_SUPPORTED */
 
-/* Turn this off to disable png_read_png() and
- * png_write_png() and leave the row_pointers member
- * out of the info structure.
+/* Turn this off to disable png_read_png() and png_write_png() and
+ * leave the row_pointers member out of the info structure.
  */
 #ifndef PNG_NO_INFO_IMAGE
 #  define PNG_INFO_IMAGE_SUPPORTED
@@ -1228,9 +1230,9 @@ typedef short png_int_16;
 typedef unsigned char png_byte;
 
 #ifdef PNG_NO_SIZE_T
-   typedef unsigned int png_size_t;
+typedef unsigned int png_size_t;
 #else
-   typedef size_t png_size_t;
+typedef size_t png_size_t;
 #endif
 #define png_sizeof(x) sizeof(x)
 
@@ -1252,7 +1254,7 @@ typedef unsigned char png_byte;
 #  else
 #    define LDATA 0
 #  endif
-   /* GRR:  why is Cygwin in here?  Cygwin is not Borland C... */
+  /* GRR:  why is Cygwin in here?  Cygwin is not Borland C... */
 #  if !defined(__WIN32__) && !defined(__FLAT__) && !defined(__CYGWIN__)
 #    define PNG_MAX_MALLOC_64K
 #    if (LDATA != 1)
@@ -1311,7 +1313,7 @@ typedef char            FAR * png_charp;
 typedef png_fixed_point FAR * png_fixed_point_p;
 
 #ifndef PNG_NO_STDIO
-typedef FILE                * png_FILE_p;
+typedef FILE            * png_FILE_p;
 #endif
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -1394,12 +1396,12 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #        define png_snprintf6 snprintf
 #      endif
 #    else
-       /* You don't have or don't want to use snprintf().  Caution: Using
-        * sprintf instead of snprintf exposes your application to accidental
-        * or malevolent buffer overflows.  If you don't have snprintf()
-        * as a general rule you should provide one (you can get one from
-        * Portable OpenSSH).
-        */
+      /* You don't have or don't want to use snprintf().  Caution: Using
+       * sprintf instead of snprintf exposes your application to accidental
+       * or malevolent buffer overflows.  If you don't have snprintf()
+       * as a general rule you should provide one (you can get one from
+       * Portable OpenSSH).
+       */
 #      define png_snprintf(s1,n,fmt,x1) sprintf(s1,fmt,x1)
 #      define png_snprintf2(s1,n,fmt,x1,x2) sprintf(s1,fmt,x1,x2)
 #      define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
