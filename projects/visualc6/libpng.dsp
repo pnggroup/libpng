@@ -44,9 +44,9 @@ CFG=libpng - Win32 DLL Release
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 CPP=cl.exe
-# ADD BASE CPP /nologo /MD /W3 /O2 /D "WIN32" /D "NDEBUG" /FD /c
+# ADD BASE CPP /nologo /MD /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "ZLIB_DLL" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -75,9 +75,9 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 CPP=cl.exe
-# ADD BASE CPP /nologo /MDd /W3 /Gm /ZI /Od /D "WIN32" /D "_DEBUG" /FD /GZ /c
+# ADD BASE CPP /nologo /MDd /W3 /Gm /ZI /Od /D "_DEBUG" /FD /GZ /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /D "ZLIB_DLL" /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -106,9 +106,9 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 CPP=cl.exe
-# ADD BASE CPP /nologo /MD /W3 /O2 /D "WIN32" /D "NDEBUG" /FD /c
+# ADD BASE CPP /nologo /MD /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /D "PNG_BUILD_DLL" /D "ZLIB_DLL" /D PNGAPI=__stdcall /D "PNG_NO_MODULEDEF" /D "PNG_LIBPNG_SPECIALBUILD" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "ZLIB_DLL" /D PNGAPI=__stdcall /D "PNG_NO_MODULEDEF" /D "PNG_LIBPNG_SPECIALBUILD" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -142,9 +142,9 @@ PostBuild_Cmds=echo    Deleting $(targetname) import library and export file (No
 # PROP Intermediate_Dir "Win32_LIB_Release"
 # PROP Target_Dir ""
 CPP=cl.exe
-# ADD BASE CPP /nologo /MD /W3 /O2 /D "WIN32" /D "NDEBUG" /FD /c
+# ADD BASE CPP /nologo /MD /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
@@ -169,9 +169,9 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Win32_LIB_Debug"
 # PROP Target_Dir ""
 CPP=cl.exe
-# ADD BASE CPP /nologo /MDd /W3 /Gm /ZI /Od /D "WIN32" /D "_DEBUG" /FD /GZ /c
+# ADD BASE CPP /nologo /MDd /W3 /Gm /ZI /Od /D "_DEBUG" /FD /GZ /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "WIN32" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG"
@@ -241,7 +241,7 @@ SOURCE=..\..\pngtrans.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\scripts\pngwin.def
+SOURCE=..\..\libpng.def
 
 !IF  "$(CFG)" == "libpng - Win32 DLL Release"
 

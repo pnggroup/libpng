@@ -119,6 +119,10 @@ version 1.5.0beta14 [March 14, 2010]
     to join tokens in the output and rewrite *.dfn to use this.
   Eliminated scripts/*.def in favor of libpng.def; updated projects/visualc71
     and removed scripts/makefile.cygwin.
+  Made PNG_BUILD_DLL safe: it can be set whenever a DLL is being built.
+  Removed the include of sys/types.h - apparently unnecessary now on the
+    platforms on which it happened (all but Mac OS and RISC OS).
+  Moved the Mac OS test into pngpriv.h (the only place it is used.)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

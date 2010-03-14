@@ -58,18 +58,18 @@
 		</Configuration>
 		<Configuration
 			Name="DLL Debug|Win32"
-			OutputDirectory=".\Win32_DLL_Debug"
-			IntermediateDirectory=".\Win32_DLL_Debug"
+			OutputDirectory="Win32_DLL_Debug"
+			IntermediateDirectory="Win32_DLL_Debug"
 			ConfigurationType="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="PNG_DEBUG=1;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				CompileAs="0"/>
@@ -89,7 +89,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1"
+				PreprocessorDefinitions="PNG_DEBUG=1"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
 			<Tool
@@ -136,7 +136,6 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalOptions="/d PNG_NO_PEDANTIC_WARNINGS /d PNG_LIBPNG_DLLFNAME_POSTFIX=&quot;&quot;&quot;&quot;VB&quot;&quot;&quot;&quot; /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;__stdcall calling convention used for exported functions&quot;&quot;&quot;&quot;"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
@@ -153,26 +152,26 @@
 		</Configuration>
 		<Configuration
 			Name="LIB Release|Win32"
-			OutputDirectory=".\Win32_LIB_Release"
-			IntermediateDirectory=".\Win32_LIB_Release"
+			OutputDirectory="Win32_LIB_Release"
+			IntermediateDirectory="Win32_LIB_Release"
 			ConfigurationType="4">
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/libpng.lib"/>
+				OutputFile="$(OutDir)\libpng.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -194,18 +193,18 @@
 		</Configuration>
 		<Configuration
 			Name="LIB Debug|Win32"
-			OutputDirectory=".\Win32_LIB_Debug"
-			IntermediateDirectory=".\Win32_LIB_Debug"
+			OutputDirectory="Win32_LIB_Debug"
+			IntermediateDirectory="Win32_LIB_Debug"
 			ConfigurationType="4">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				CompileAs="0"/>
@@ -213,7 +212,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/libpngd.lib"/>
+				OutputFile="$(OutDir)\libpngd.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -334,27 +333,6 @@
 				RelativePath="..\..\pngtrans.c">
 			</File>
 			<File
-				RelativePath="..\..\scripts\pngwin.def">
-				<FileConfiguration
-					Name="DLL VB|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="..\..\pngwio.c">
 			</File>
 			<File
@@ -400,7 +378,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\PRJ0041.mak">
+			RelativePath="PRJ0041.mak">
 			<FileConfiguration
 				Name="DLL Release|Win32">
 				<Tool

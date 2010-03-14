@@ -43,9 +43,9 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Win32_DLL_Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /O2 /D "WIN32" /D "NDEBUG" /FD /c
+# ADD BASE CPP /nologo /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MD /W3 /O2 /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /D "PNG_DLL" /D "PNG_NO_STDIO" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "..\..\..\zlib" /D "NDEBUG" /D "PNG_NO_STDIO" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -75,9 +75,9 @@ PostBuild_Cmds=set path=$(outdir);..\..\..\zlib\projects\visualc6\Win32_DLL_Rele
 # PROP Intermediate_Dir "Win32_DLL_Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /ZI /Od /D "WIN32" /D "_DEBUG" /FD /GZ /c
+# ADD BASE CPP /nologo /W3 /Gm /ZI /Od /D "_DEBUG" /FD /GZ /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\..\..\zlib" /D "WIN32" /D "_DEBUG" /D "PNG_DLL" /D "PNG_NO_STDIO" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\..\..\zlib" /D "_DEBUG" /D "PNG_NO_STDIO" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -107,9 +107,9 @@ PostBuild_Cmds=set path=$(outdir);..\..\..\zlib\projects\visualc6\Win32_DLL_Debu
 # PROP Intermediate_Dir "Win32_LIB_Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /O2 /D "WIN32" /D "NDEBUG" /FD /c
+# ADD BASE CPP /nologo /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MD /W3 /O2 /I "..\..\..\zlib" /D "WIN32" /D "NDEBUG" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "..\..\..\zlib" /D "NDEBUG" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -139,9 +139,9 @@ PostBuild_Cmds=$(outdir)\pngtest.exe ..\..\pngtest.png
 # PROP Intermediate_Dir "Win32_LIB_Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /ZI /Od /D "WIN32" /D "_DEBUG" /FD /GZ /c
+# ADD BASE CPP /nologo /W3 /Gm /ZI /Od /D "_DEBUG" /FD /GZ /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\..\..\zlib" /D "WIN32" /D "_DEBUG" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\..\..\zlib" /D "_DEBUG" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"

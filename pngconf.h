@@ -246,7 +246,7 @@
  * the magic flag PNG_USE_DLL to turn on the special processing before
  * it includes png.h.
  * 
- * Two additional macros are used to make this happen:
+ * Four additional macros are used to make this happen:
  *
  * PNG_IMPEXP The magic (if any) to cause a symbol to be exported from
  *            the build or imported if PNG_USE_DLL is set - compiler
@@ -254,6 +254,13 @@
  *
  * PNG_EXPORT_TYPE(type) A macro that pre or appends PNG_IMPEXP to
  *                       'type', compiler specific.
+ *
+ * PNG_DLL_EXPORT Set to the magic to use during a libpng build to
+ *                make a symbol exported from the DLL.
+ *
+ * PNG_DLL_IMPORT Set to the magic to force the libpng symbols to come
+ *                from a DLL - used to define PNG_IMPEXP when
+ *                PNG_USE_DLL is set.
  */
 
 /* System specific discovery.
@@ -272,17 +279,14 @@
 #    define PNGCAPI __cdecl
 #  endif
 
-  /* Use dllexport and give the option of forcing DLL linking. */
-#  ifdef DLL_EXPORT /* set by libtool */
-#    ifndef PNG_IMPEXP
-#      define PNG_IMPEXP __declspec(dllexport)
-#    endif
+  /* Provide the appropriate defaults for exporting a symbol from
+   * the DLL and forcing import.  Always set these - the choice to
+   * use them is made below.
+   */
+#  ifndef PNG_DLL_EXPORT
+#    define PNG_DLL_EXPORT __declspec(dllexport)
 #  endif
-
 #  ifndef PNG_DLL_IMPORT
-    /* Always set this because we don't know what will happen when
-     * the application is compiled.
-     */
 #    define PNG_DLL_IMPORT __declspec(dllimport)
 #  endif
 
@@ -312,30 +316,22 @@
 #    endif /* compiler/api */
     /* NOTE: PNGCBAPI always defaults to PNGCAPI. */
 
-#    if defined(DLL_EXPORT) || defined(_WINDLL) || defined(_DLL) ||\
-        defined(__DLL__)
-      /* Building a DLL; check the compiler. */
-#      if (defined(_MSC_VER) && _MSC_VER < 800) ||\
-          (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
-        /* older Borland and MSC
-         * compilers used '__export' and required this to be after
-         * the type.
-         */
-#        ifndef PNG_EXPORT_TYPE
-#          define PNG_EXPORT_TYPE(type) type PNG_IMPEXP
-#        endif
-#        ifndef PNG_IMPEXP
-#          define PNG_IMPEXP __export
-#        endif
-#      else /* newer compiler */
-#        ifndef PNG_IMPEXP
-#          define PNG_IMPEXP __declspec(dllexport)
-#        endif
-#        ifndef PNG_DLL_IMPORT
-#          define PNG_DLL_IMPORT __declspec(dllimport)
-#        endif
-#      endif /* compiler */
-#    endif /* building DLL */
+#    if (defined(_MSC_VER) && _MSC_VER < 800) ||\
+        (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
+      /* older Borland and MSC
+       * compilers used '__export' and required this to be after
+       * the type.
+       */
+#      ifndef PNG_EXPORT_TYPE
+#        define PNG_EXPORT_TYPE(type) type PNG_IMPEXP
+#      endif
+#      define PNG_DLL_EXPORT __export
+#    else /* newer compiler */
+#      define PNG_DLL_EXPORT __declspec(dllexport)
+#      ifndef PNG_DLL_IMPORT
+#        define PNG_DLL_IMPORT __declspec(dllimport)
+#      endif
+#    endif /* compiler */
 
 #  else /* !Cygwin && !Windows/x86 */
 #    if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
@@ -359,9 +355,31 @@
 #  define PNGAPI PNGCAPI
 #endif
 
+/* The default for PNG_IMPEXP depends on whether the library is
+ * being built or used.
+ */
 #ifndef PNG_IMPEXP
-#  define PNG_IMPEXP
+#  ifdef PNGLIB_BUILD
+    /* Building the library */
+#    if (defined(DLL_EXPORT)/*from libtool*/ ||\
+	defined(_WINDLL) || defined(_DLL) || defined(__DLL__) ||\
+	defined(PNG_BUILD_DLL)) && defined(PNG_DLL_EXPORT)
+      /* Building a DLL. */
+#      define PNG_IMPEXP PNG_DLL_EXPORT
+#    endif /* DLL */
+#  else
+    /* Using the library */
+#    if defined(PNG_USE_DLL) && defined(PNG_DLL_IMPORT)
+      /* This forces use of a DLL, disallowing static linking */
+#      define PNG_IMPEXP PNG_DLL_IMPORT
+#    endif
+#  endif
+
+#  ifndef PNG_IMPEXP
+#    define PNG_IMPEXP
+#  endif
 #endif
+
 #ifndef PNG_EXPORT_TYPE
 #  define PNG_EXPORT_TYPE(type) PNG_IMPEXP type
 #endif
@@ -470,13 +488,6 @@
 #  define PNG_STDIO_SUPPORTED
 #endif
 
-
-#ifdef PNG_BUILD_DLL
-#  if !defined(PNG_CONSOLE_IO_SUPPORTED) && !defined(PNG_NO_CONSOLE_IO)
-#    define PNG_NO_CONSOLE_IO
-#  endif
-#endif
-
 #ifdef PNG_NO_STDIO
 #  ifndef PNG_NO_CONSOLE_IO
 #    define PNG_NO_CONSOLE_IO
@@ -492,22 +503,6 @@
 
 #if !(defined PNG_NO_CONSOLE_IO) && !defined(PNG_CONSOLE_IO_SUPPORTED)
 #  define PNG_CONSOLE_IO_SUPPORTED
-#endif
-
-/* Try to determine if we are compiling on a Mac.  Note that testing for
- * just __MWERKS__ is not good enough, because the Codewarrior is now used
- * on non-Mac platforms.
- */
-#ifndef MACOS
-#  if (defined(__MWERKS__) && defined(macintosh)) || defined(applec) || \
-      defined(THINK_C) || defined(__SC__) || defined(TARGET_OS_MAC)
-#    define MACOS
-#  endif
-#endif
-
-/* Enough people need this for various reasons to include it here */
-#if !defined(MACOS) && !defined(RISCOS)
-#include <sys/types.h>
 #endif
 
 /* PNG_SETJMP_NOT_SUPPORTED and PNG_NO_SETJMP_SUPPORTED are deprecated. */

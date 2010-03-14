@@ -57,7 +57,8 @@
  */
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-#  ifdef MACOS
+#  if (defined(__MWERKS__) && defined(macintosh)) || defined(applec) || \
+    defined(THINK_C) || defined(__SC__) || defined(TARGET_OS_MAC)
      /* We need to check that <math.h> hasn't already been included earlier
       * as it seems it doesn't agree with <fp.h>, yet we should really use
       * <fp.h> if possible.

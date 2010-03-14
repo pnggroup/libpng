@@ -101,7 +101,7 @@ set(CMAKE_DEBUG_POSTFIX "d")
 set(libpng_sources
   png.h
   pngconf.h
- pngpriv.h
+  pngpriv.h
   png.c
   pngerror.c
   pngget.c
@@ -123,10 +123,8 @@ set(pngtest_sources
 )
 # SOME NEEDED DEFINITIONS
 
-add_definitions(-DPNG_CONFIGURE_LIBPNG)
-
 if(MSVC)
-  add_definitions(-DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
+  add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
 endif(MSVC)
 
 if(PNG_SHARED OR  NOT MSVC)
@@ -148,7 +146,7 @@ if(PNG_NO_STDIO)
 endif()
 
 if(PNG_DEBUG)
-  add_definitions(-DPNG_DEBUG)
+  add_definitions(-DPNG_DEBUG=1)
 endif()
 
 if(NOT M_LIBRARY AND NOT WIN32)
