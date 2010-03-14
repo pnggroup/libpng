@@ -10,8 +10,8 @@
 	<Configurations>
 		<Configuration
 			Name="DLL Release|Win32"
-			OutputDirectory=".\Win32_DLL_Release\ZLib"
-			IntermediateDirectory=".\Win32_DLL_Release\ZLib"
+			OutputDirectory="Win32_DLL_Release\ZLib"
+			IntermediateDirectory="Win32_DLL_Release\ZLib"
 			ConfigurationType="2">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -55,8 +55,8 @@
 		</Configuration>
 		<Configuration
 			Name="DLL Debug|Win32"
-			OutputDirectory=".\Win32_DLL_Debug\ZLib"
-			IntermediateDirectory=".\Win32_DLL_Debug\ZLib"
+			OutputDirectory="Win32_DLL_Debug\ZLib"
+			IntermediateDirectory="Win32_DLL_Debug\ZLib"
 			ConfigurationType="2">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -100,8 +100,8 @@
 		</Configuration>
 		<Configuration
 			Name="LIB Release|Win32"
-			OutputDirectory=".\Win32_LIB_Release\ZLib"
-			IntermediateDirectory=".\Win32_LIB_Release\ZLib"
+			OutputDirectory="Win32_LIB_Release\ZLib"
+			IntermediateDirectory="Win32_LIB_Release\ZLib"
 			ConfigurationType="4">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -139,8 +139,8 @@
 		</Configuration>
 		<Configuration
 			Name="LIB Debug|Win32"
-			OutputDirectory=".\Win32_LIB_Debug\ZLib"
-			IntermediateDirectory=".\Win32_LIB_Debug\ZLib"
+			OutputDirectory="Win32_LIB_Debug\ZLib"
+			IntermediateDirectory="Win32_LIB_Debug\ZLib"
 			ConfigurationType="4">
 			<Tool
 				Name="VCCLCompilerTool"

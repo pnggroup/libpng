@@ -11,28 +11,27 @@
 	<Configurations>
 		<Configuration
 			Name="DLL Release|Win32"
-			OutputDirectory=".\Win32_DLL_Release"
-			IntermediateDirectory=".\Win32_DLL_Release"
+			OutputDirectory="Win32_DLL_Release"
+			IntermediateDirectory="Win32_DLL_Release"
 			ConfigurationType="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="NDEBUG;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng15.dll"
-				LinkIncremental="1"
-				ModuleDefinitionFile="..\..\scripts\pngwin.def"/>
+				OutputFile="$(OutDir)\libpng15.dll"
+				LinkIncremental="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -78,8 +77,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng15d.dll"
-				ModuleDefinitionFile="..\..\scripts\pngwin.def"
+				OutputFile="$(OutDir)\libpng15d.dll"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -107,26 +105,26 @@
 		</Configuration>
 		<Configuration
 			Name="DLL VB|Win32"
-			OutputDirectory=".\Win32_DLL_VB"
-			IntermediateDirectory=".\Win32_DLL_VB"
+			OutputDirectory="Win32_DLL_VB"
+			IntermediateDirectory="Win32_DLL_VB"
 			ConfigurationType="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;PNGAPI=__stdcall;PNG_NO_MODULEDEF;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="NDEBUG;PNG_NO_STDIO;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough="pngpriv.h"
 				WarningLevel="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng15vb.dll"
+				OutputFile="$(OutDir)\libpng15vb.dll"
 				LinkIncremental="1"/>
 			<Tool
 				Name="VCMIDLTool"/>

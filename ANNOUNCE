@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta14 - March 13, 2010
+Libpng 1.5.0beta14 - March 14, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -97,7 +97,7 @@ version 1.5.0beta13 [March 10, 2010]
     expressions (i.e. a trailing ';' must always be added) and correct
     the format statements in various png_debug messages.
 
-version 1.5.0beta14 [March 13, 2010]
+version 1.5.0beta14 [March 14, 2010]
   Removed direct access to png_ptr->io_ptr from the Windows code in pngtest.c
   Revised Makefile.am to account for recent additions and replacements.
   Corrected CE and OS/2 DEF files (scripts/png*def) for symbols removed and
@@ -117,6 +117,8 @@ version 1.5.0beta14 [March 13, 2010]
   Updated the symbol file generation to stop it adding spurious spaces
     to EOL (coming from preprocessor macro expansion).  Added a facility
     to join tokens in the output and rewrite *.dfn to use this.
+  Eliminated scripts/*.def in favor of libpng.def; updated projects/visualc71
+    and removed scripts/makefile.cygwin.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

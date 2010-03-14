@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.5.0 [March 12, 2010]
+ * Last changed in libpng 1.5.0 [March 14, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -268,7 +268,7 @@ static int wrote_question = 0;
  */
 
 #ifndef USE_FAR_KEYWORD
-static void
+static void PNGCBAPI
 pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check = 0;
@@ -297,7 +297,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
 
-static void
+static void PNGCBAPI
 pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;
@@ -337,7 +337,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #endif /* USE_FAR_KEYWORD */
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-static void
+static void PNGCBAPI
 pngtest_flush(png_structp png_ptr)
 {
    /* Do nothing; fflush() is said to be just a waste of energy. */
@@ -351,7 +351,7 @@ pngtest_flush(png_structp png_ptr)
  * than changing the library.
  */
 #ifndef USE_FAR_KEYWORD
-static void
+static void PNGCBAPI
 pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;
@@ -371,7 +371,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 #define NEAR_BUF_SIZE 1024
 #define MIN(a,b) (a <= b ? a : b)
 
-static void
+static void PNGCBAPI
 pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
    png_size_t check;
@@ -417,7 +417,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
  * here if you don't want to.  In the default configuration, png_ptr is
  * not used, but it is passed in case it may be useful.
  */
-static void
+static void PNGCBAPI
 pngtest_warning(png_structp png_ptr, png_const_charp message)
 {
    PNG_CONST char *name = "UNKNOWN (ERROR!)";
@@ -434,7 +434,7 @@ pngtest_warning(png_structp png_ptr, png_const_charp message)
  * function is used by default, or if the program supplies NULL for the
  * error function pointer in png_set_error_fn().
  */
-static void
+static void PNGCBAPI
 pngtest_error(png_structp png_ptr, png_const_charp message)
 {
    pngtest_warning(png_ptr, message);
@@ -471,12 +471,12 @@ static int maximum_allocation = 0;
 static int total_allocation = 0;
 static int num_allocations = 0;
 
-png_voidp png_debug_malloc
-   PNGARG((png_structp png_ptr, png_alloc_size_t size));
-void png_debug_free PNGARG((png_structp png_ptr, png_voidp ptr));
+png_voidp PNGCBAPI png_debug_malloc PNGARG((png_structp png_ptr,
+    png_alloc_size_t size));
+void PNGCBAPI png_debug_free PNGARG((png_structp png_ptr, png_voidp ptr));
 
 png_voidp
-png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
+PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
 {
 
    /* png_malloc has already tested for NULL; png_create_struct calls
@@ -523,7 +523,7 @@ png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
 }
 
 /* Free a pointer.  It is removed from the list at the same time. */
-void
+void PNGCBAPI
 png_debug_free(png_structp png_ptr, png_voidp ptr)
 {
    if (png_ptr == NULL)
@@ -690,8 +690,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
    read_ptr =
       png_create_read_struct_2(PNG_LIBPNG_VER_STRING, NULL,
-      NULL, NULL, NULL,
-      (png_malloc_ptr)png_debug_malloc, (png_free_ptr)png_debug_free);
+      NULL, NULL, NULL, png_debug_malloc, png_debug_free);
 #else
    read_ptr =
       png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);

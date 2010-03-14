@@ -4,7 +4,7 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-# Related files: pngos2.def
+# Related files: libpng.def
 
 CC=gcc -Zomf -s
 
@@ -36,10 +36,10 @@ all: $(PNGLIB) $(SHAREDLIB) $(SHAREDLIBIMP)
 $(PNGLIB): $(OBJS)
 	$(AR) rc $@ $(OBJS)
 
-$(SHAREDLIB): $(OBJS) pngos2.def
+$(SHAREDLIB): $(OBJS) libpng.def
 	$(CC) $(LDFLAGS) -Zdll -o $@ $^
 
-$(SHAREDLIBIMP): pngos2.def
+$(SHAREDLIBIMP): libpng.def
 	$(IMPLIB) -o $@ $^
 
 pngtest.exe: pngtest.o png.dll pngdll.lib

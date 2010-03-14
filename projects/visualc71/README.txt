@@ -5,6 +5,16 @@ Copyright (C) 2004 Simon-Pierre Cadieux.
 This code is released under the libpng license.
 For conditions of distribution and use, see copyright notice in png.h
 
+Changes in libpng 15:
+* The standard calling convention (used in all builds) is __stdcall for
+  libpng exported functions and __cdecl for function callbacks.
+  Consequently the VB configuration is no longer required but is provided
+  in libpng15vb.dll for backward compatibility.
+* The DEF file is no longer required, the DLLs link by name.  A standard
+  DEF file, libpng.def, is included in the distribution for applications
+  that require link by number (ordinal), builds that require link by
+  number should use the ordinals from this file (or from png.h).
+
 Assumptions:
 * The libpng source files are in ..\..
 * The zlib source files are in ..\..\..\zlib

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta14 - March 13, 2010
+ * libpng version 1.5.0beta14 - March 14, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -167,82 +167,289 @@
 #  define PNG_MAX_MALLOC_64K
 #endif
 
-/* Special munging to support doing things the 'cygwin' way:
- * 'Normal' png-on-win32 defines/defaults:
- *   PNG_BUILD_DLL -- building dll
- *   PNG_USE_DLL   -- building an application, linking to dll
- *   (no define)   -- building static library, or building an
- *                    application and linking to the static lib
- * 'Cygwin' defines/defaults:
- *   PNG_BUILD_DLL -- (ignored) building the dll
- *   (no define)   -- (ignored) building an application, linking to the dll
- *   PNG_STATIC    -- (ignored) building the static lib, or building an
- *                    application that links to the static lib.
- *   ALL_STATIC    -- (ignored) building various static libs, or building an
- *                    application that links to the static libs.
- * Thus,
- * a cygwin user should define either PNG_BUILD_DLL or PNG_STATIC, and
- * this bit of #ifdefs will define the 'correct' config variables based on
- * that. If a cygwin user *wants* to define 'PNG_USE_DLL' that's okay, but
- * unnecessary.
- *
- * Also, the precedence order is:
- *   ALL_STATIC (since we can't #undef something outside our namespace)
- *   PNG_BUILD_DLL
- *   PNG_STATIC
- *   (nothing) == PNG_USE_DLL
- *
- * CYGWIN (2002-01-20): The preceding is now obsolete. With the advent
- *   of auto-import in binutils, we no longer need to worry about
- *   __declspec(dllexport) / __declspec(dllimport) and friends.  Therefore,
- *   we don't need to worry about PNG_STATIC or ALL_STATIC when it comes
- *   to __declspec() stuff.  However, we DO need to worry about
- *   PNG_BUILD_DLL and PNG_STATIC because those change some defaults
- *   such as CONSOLE_IO.
+/* This macro protects us against machines that don't have function
+ * prototypes (ie K&R style headers).  If your compiler does not handle
+ * function prototypes, define this macro and use the included ansi2knr.
+ * I've always been able to use _NO_PROTO as the indicator, but you may
+ * need to drag the empty declaration out in front of here, or change the
+ * ifdef to suit your own needs.
  */
-#ifdef __CYGWIN__
-#  ifdef ALL_STATIC
-#    ifdef PNG_BUILD_DLL
-#      undef PNG_BUILD_DLL
-#    endif
-#    ifdef PNG_USE_DLL
-#      undef PNG_USE_DLL
-#    endif
-#    ifdef PNG_DLL
-#      undef PNG_DLL
-#    endif
-#    ifndef PNG_STATIC
-#      define PNG_STATIC
-#    endif
+#ifndef PNGARG
+
+#  ifdef OF /* zlib prototype munger */
+#    define PNGARG(arglist) OF(arglist)
 #  else
-#    ifdef PNG_BUILD_DLL
-#      ifdef PNG_STATIC
-#        undef PNG_STATIC
-#      endif
-#      ifdef PNG_USE_DLL
-#        undef PNG_USE_DLL
-#      endif
-#      ifndef PNG_DLL
-#        define PNG_DLL
-#      endif
+
+#    ifdef _NO_PROTO
+#      define PNGARG(arglist) ()
 #    else
-#      ifdef PNG_STATIC
-#        ifdef PNG_USE_DLL
-#          undef PNG_USE_DLL
-#        endif
-#        ifdef PNG_DLL
-#          undef PNG_DLL
-#        endif
-#      else
-#        ifndef PNG_USE_DLL
-#          define PNG_USE_DLL
-#        endif
-#        ifndef PNG_DLL
-#          define PNG_DLL
-#        endif
-#      endif
+#      define PNGARG(arglist) arglist
+#    endif /* _NO_PROTO */
+
+#  endif /* OF */
+
+#endif /* PNGARG */
+
+/* Function calling conventions.
+ * =============================
+ * Normally it is not necessary to specify to the compiler how to call
+ * a function - it just does it - however on x86 systems derived from
+ * Microsoft and Borland C compilers ('IBM PC', 'DOS', 'Windows' systems
+ * and some others) there are multiple ways to call a function and the
+ * default can be changed on the compiler command line.  For this reason
+ * libpng allows the calling convention of every exported function and
+ * every function called via a user supplied function pointer to be
+ * specified.  This is done by defining the following macros:
+ *
+ * PNGAPI    Calling convention for exported functions.
+ * PNGCBAPI  Calling convention for user provided (callback) functions.
+ * PNGCAPI   Calling convention used by the ANSI-C library (required
+ *           for longjmp callbacks and sometimes used internally to
+ *           specify the calling convention for zlib).
+ *
+ *
+ * Two common cases are supported:
+ *
+ * PNGAPI_RULE=0  Use the operating system convention for PNGAPI and
+ *                the 'C' calling convention (from PNGCAPI) for
+ *                callbacks (PNGCBAPI).
+ * PNGAPI_RULE=1  Use PNGCAPI - the 'C' calling convention - throughout.
+ *                This is correct on Cygwin implementations, assumed to
+ *                be correct on MingW compilations and likely to work
+ *                in C/C++ only environments everywhere else.
+ *
+ * These cases only differ if the operating system does not use the C
+ * calling convention, at present this just means the above cases
+ * (x86 DOS/Windows sytems) and, even then, this does not apply to
+ * Cygwin running on those systems.
+ */
+#ifndef PNGAPI_RULE
+#  define PNGAPI_RULE 0
+#endif
+
+/* Symbol export
+ * =============
+ * When building a shared library it is almost always necessary to tell
+ * the compiler which symbols to export.  The png.h macro 'PNG_EXPORT'
+ * is used to mark the symbols.  On some systems these symbols can be
+ * extracted at link time and need no special processing by the compiler,
+ * on other systems the symbols are flagged by the compiler and just
+ * the declaration requires a special tag applied (unfortunately) in a
+ * compiler dependent way.  Some systems can do either.
+ *
+ * A small number of older systems also require a symbol from a DLL to
+ * be flagged to the program that calls it.  This is a problem because
+ * we do not know in the header file included by application code that
+ * the symbol will come from a shared library, as opposed to a statically
+ * linked one.  For this reason the application must tell us by setting
+ * the magic flag PNG_USE_DLL to turn on the special processing before
+ * it includes png.h.
+ * 
+ * Two additional macros are used to make this happen:
+ *
+ * PNG_IMPEXP The magic (if any) to cause a symbol to be exported from
+ *            the build or imported if PNG_USE_DLL is set - compiler
+ *            and system specific.
+ *
+ * PNG_EXPORT_TYPE(type) A macro that pre or appends PNG_IMPEXP to
+ *                       'type', compiler specific.
+ */
+
+/* System specific discovery.
+ * ==========================
+ * This code is used at build time to find PNG_IMPEXP, the API settings
+ * and PNG_EXPORT_TYPE(), it may also set a macro to indicate the DLL
+ * import processing is possible.
+ *
+ * NOTE: this is poorly tested and may miss many cases, the default
+ * (everything empty) is harmless unless the result is a DLL that is
+ * intended to be distributed!
+ */
+#if defined(__CYGWIN__)
+  /* Cygwin: force PNGCAPI to cdecl. */
+#  ifndef PNGCAPI
+#    define PNGCAPI __cdecl
+#  endif
+
+  /* Use dllexport and give the option of forcing DLL linking. */
+#  ifdef DLL_EXPORT /* set by libtool */
+#    ifndef PNG_IMPEXP
+#      define PNG_IMPEXP __declspec(dllexport)
 #    endif
 #  endif
+
+#  ifndef PNG_DLL_IMPORT
+    /* Always set this because we don't know what will happen when
+     * the application is compiled.
+     */
+#    define PNG_DLL_IMPORT __declspec(dllimport)
+#  endif
+
+#else /* !Cygwin */
+#  if ( defined(_Windows) || defined(_WINDOWS) || defined(WIN32) ||\
+        defined(_WIN32) || defined(__WIN32__) ) &&\
+      ( defined(_X86_) || defined(_X64_) || defined(_M_IX86) ||\
+        defined(_M_X64) || defined(_M_IA64) )
+    /* Windows system (DOS doesn't support DLLs) running on x86/x64 and
+     * not being built under Cygwin or by a MingW compiler.
+     */
+#    if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
+#      ifndef PNGCAPI
+#        define PNGCAPI __cdecl
+#      endif
+#      if PNGAPI_RULE == 0 && !defined(PNGAPI)
+#        define PNGAPI __stdcall
+#      endif
+#    else
+      /* An older compiler, or one not detected (erroneously) above. */
+#      ifndef PNGCAPI
+#        define PNGCAPI _cdecl
+#      endif
+#      if PNGAPI_RULE == 0 && !defined(PNGAPI)
+#        define PNGAPI _stdcall
+#      endif
+#    endif /* compiler/api */
+    /* NOTE: PNGCBAPI always defaults to PNGCAPI. */
+
+#    if defined(DLL_EXPORT) || defined(_WINDLL) || defined(_DLL) ||\
+        defined(__DLL__)
+      /* Building a DLL; check the compiler. */
+#      if (defined(_MSC_VER) && _MSC_VER < 800) ||\
+          (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
+        /* older Borland and MSC
+         * compilers used '__export' and required this to be after
+         * the type.
+         */
+#        ifndef PNG_EXPORT_TYPE
+#          define PNG_EXPORT_TYPE(type) type PNG_IMPEXP
+#        endif
+#        ifndef PNG_IMPEXP
+#          define PNG_IMPEXP __export
+#        endif
+#      else /* newer compiler */
+#        ifndef PNG_IMPEXP
+#          define PNG_IMPEXP __declspec(dllexport)
+#        endif
+#        ifndef PNG_DLL_IMPORT
+#          define PNG_DLL_IMPORT __declspec(dllimport)
+#        endif
+#      endif /* compiler */
+#    endif /* building DLL */
+
+#  else /* !Cygwin && !Windows/x86 */
+#    if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
+#      ifndef PNGAPI
+#        define PNGAPI _System
+#      endif
+#    else /* !Cygwin && !Windows/x86 && !OS/2 */
+      /* Use the defaults */
+#    endif /* other system, !OS/2 */
+#  endif /* !Windows/x86 */
+#endif /* !Cygwin */
+
+/* Now do all the defaulting . */
+#ifndef PNGCAPI
+#  define PNGCAPI
+#endif
+#ifndef PNGCBAPI
+#  define PNGCBAPI PNGCAPI
+#endif
+#ifndef PNGAPI
+#  define PNGAPI PNGCAPI
+#endif
+
+#ifndef PNG_IMPEXP
+#  define PNG_IMPEXP
+#endif
+#ifndef PNG_EXPORT_TYPE
+#  define PNG_EXPORT_TYPE(type) PNG_IMPEXP type
+#endif
+#ifndef PNG_EXPORT
+#  define PNG_EXPORT(type, name, args, attributes, ordinal)\
+     PNG_EXPORT_TYPE(type) (PNGAPI name) PNGARG(args) attributes
+#endif
+
+/* Use PNG_REMOVED to comment out a removed interface. */
+#ifndef PNG_REMOVED
+#  define PNG_REMOVED(name, ordinal)
+#endif
+
+#ifndef PNG_CALLBACK
+#  define PNG_CALLBACK(type, name, args, attributes)\
+   type (PNGCBAPI name) PNGARG(args) attributes
+#endif
+
+/* Support for compiler specific function attributes.  These are used
+ * so that where compiler support is available incorrect use of API
+ * functions in png.h will generate compiler warnings.
+ *
+ * Added at libpng-1.2.41.
+ */
+
+#ifndef PNG_NO_PEDANTIC_WARNINGS
+#ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
+#  define PNG_PEDANTIC_WARNINGS_SUPPORTED
+#endif
+#endif
+
+#ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
+/* Support for compiler specific function attributes.  These are used
+ * so that where compiler support is available incorrect use of API
+ * functions in png.h will generate compiler warnings.  Added at libpng
+ * version 1.2.41.
+ */
+#  ifdef __GNUC__
+#    ifndef PNG_USE_RESULT
+#      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
+#    endif
+#    ifndef PNG_NORETURN
+#      define PNG_NORETURN   __attribute__((__noreturn__))
+#    endif
+#    ifndef PNG_ALLOCATED
+#      define PNG_ALLOCATED  __attribute__((__malloc__))
+#    endif
+
+    /* This specifically protects structure members that should only be
+     * accessed from within the library, therefore should be empty during
+     * a library build.
+     */
+#    ifndef PNGLIB_BUILD
+#      ifndef PNG_DEPRECATED
+#        define PNG_DEPRECATED __attribute__((__deprecated__))
+#      endif
+#      ifndef PNG_DEPSTRUCT
+#        define PNG_DEPSTRUCT  __attribute__((__deprecated__))
+#      endif
+#      ifndef PNG_PRIVATE
+#        if 0 /* Doesn't work so we use deprecated instead*/
+#          define PNG_PRIVATE \
+            __attribute__((warning("This function is not exported by libpng.")))
+#        else
+#          define PNG_PRIVATE \
+            __attribute__((__deprecated__))
+#        endif
+#      endif /* PNG_PRIVATE */
+#    endif /* PNGLIB_BUILD */
+#  endif /* __GNUC__ */
+#endif /* PNG_PEDANTIC_WARNINGS */
+
+#ifndef PNG_DEPRECATED
+#  define PNG_DEPRECATED  /* Use of this function is deprecated */
+#endif
+#ifndef PNG_USE_RESULT
+#  define PNG_USE_RESULT  /* The result of this function must be checked */
+#endif
+#ifndef PNG_NORETURN
+#  define PNG_NORETURN    /* This function does not return */
+#endif
+#ifndef PNG_ALLOCATED
+#  define PNG_ALLOCATED   /* The result of the function is new memory */
+#endif
+#ifndef PNG_DEPSTRUCT
+#  define PNG_DEPSTRUCT   /* Access to this struct member is deprecated */
+#endif
+#ifndef PNG_PRIVATE
+#  define PNG_PRIVATE     /* This is a private libpng function */
 #endif
 
 /* This protects us against compilers that run on a windowing system
@@ -285,29 +492,6 @@
 #if !(defined PNG_NO_CONSOLE_IO) && !defined(PNG_CONSOLE_IO_SUPPORTED)
 #  define PNG_CONSOLE_IO_SUPPORTED
 #endif
-
-/* This macro protects us against machines that don't have function
- * prototypes (ie K&R style headers).  If your compiler does not handle
- * function prototypes, define this macro and use the included ansi2knr.
- * I've always been able to use _NO_PROTO as the indicator, but you may
- * need to drag the empty declaration out in front of here, or change the
- * ifdef to suit your own needs.
- */
-#ifndef PNGARG
-
-#  ifdef OF /* zlib prototype munger */
-#    define PNGARG(arglist) OF(arglist)
-#  else
-
-#    ifdef _NO_PROTO
-#      define PNGARG(arglist) ()
-#    else
-#      define PNGARG(arglist) arglist
-#    endif /* _NO_PROTO */
-
-#  endif /* OF */
-
-#endif /* PNGARG */
 
 /* Try to determine if we are compiling on a Mac.  Note that testing for
  * just __MWERKS__ is not good enough, because the Codewarrior is now used
@@ -1155,212 +1339,7 @@ typedef double          FAR * FAR * png_doublepp;
 /* Pointers to pointers to pointers; i.e., pointer to array */
 typedef char            FAR * FAR * FAR * png_charppp;
 
-/* Define PNG_BUILD_DLL if the module being built is a Windows
- * LIBPNG DLL.
- *
- * Define PNG_USE_DLL if you want to *link* to the Windows LIBPNG DLL.
- * It is equivalent to Microsoft predefined macro _DLL that is
- * automatically defined when you compile using the share
- * version of the CRT (C Run-Time library)
- *
- * The cygwin mods make this behavior a little different:
- * Define PNG_BUILD_DLL if you are building a dll for use with cygwin
- * Define PNG_STATIC if you are building a static library for use with cygwin,
- *   -or- if you are building an application that you want to link to the
- *   static library.
- * PNG_USE_DLL is defined by default (no user action needed) unless one of
- *   the other flags is defined.
- */
-
-#if !defined(PNG_DLL) && (defined(PNG_BUILD_DLL) || defined(PNG_USE_DLL))
-#  define PNG_DLL
-#endif
-
-#ifdef __CYGWIN__
-   /*NOTE: Force __cdecl throughout CYGWIN */
-#  undef PNGCAPI
-#  define PNGCAPI __cdecl
-   /*Allow declspec through for the moment */
-#endif
-
 #define PNG_USE_LOCAL_ARRAYS /* Not used in libpng, defined for legacy apps */
-
-/* If you define PNGAPI, e.g., with compiler option "-DPNGAPI=__stdcall",
- * you may get warnings regarding the linkage of png_zalloc and png_zfree.
- * Don't ignore those warnings; you must also reset the default calling
- * convention in your compiler to match your PNGAPI, and you must build
- * zlib and your applications the same way you build libpng.
- */
-
-#if defined(__MINGW32__) && !defined(PNG_MODULEDEF)
-   /* NOTE: causes weird effects below. */
-#  ifndef PNG_NO_MODULEDEF
-#    define PNG_NO_MODULEDEF
-#  endif
-#endif
-
-#if !defined(PNG_IMPEXP) && defined(PNG_BUILD_DLL) && !defined(PNG_NO_MODULEDEF)
-#  define PNG_IMPEXP
-#endif
-
-#if defined(PNG_DLL) || defined(_DLL) || defined(__DLL__ ) || \
-    (( defined(_Windows) || defined(_WINDOWS) || \
-    defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ))
-
-#  ifndef PNGCAPI
-#    if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
-#      define PNGCAPI __cdecl
-#    else
-#      define PNGCAPI _cdecl
-#    endif
-#  endif
-
-#  if !defined(PNG_IMPEXP) && (!defined(PNG_DLL) || \
-      0 /* WINCOMPILER_WITH_NO_SUPPORT_FOR_DECLIMPEXP */)
-#    define PNG_IMPEXP
-#  endif
-
-#  ifndef PNG_IMPEXP
-
-     /* Borland/Microsoft */
-#    if defined(_MSC_VER) || defined(__BORLANDC__)
-#      if (_MSC_VER >= 800) || (__BORLANDC__ >= 0x500)
-         /* Default order: PNG_IMPEXP before type */
-#      else
-#        define PNG_EXPORT_OLD /* Use type PNG_IMPEXP order */
-#        ifdef PNG_BUILD_DLL
-#          define PNG_IMPEXP __export
-#        else
-#          define PNG_IMPEXP /*__import */ /* doesn't exist AFAIK in VC++ */
-#        endif                             /* Exists in Borland C++ for
-                                              C++ classes (== huge) */
-#      endif
-#    endif
-
-#    ifndef PNG_IMPEXP
-#      ifdef PNGLIB_BUILD
-#        define PNG_IMPEXP __declspec(dllexport)
-#      else
-#        define PNG_IMPEXP __declspec(dllimport)
-#      endif
-#    endif
-#  endif  /* PNG_IMPEXP */
-#else /* !(DLL || non-cygwin WINDOWS) */
-#  if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
-#    ifndef PNGAPI
-#      define PNGAPI _System
-#      define PNGCAPI
-#    endif
-#  else
-#    if 0 /* ... other platforms, with other meanings */
-#    endif
-#  endif
-#endif
-
-#ifndef PNG_EXPORT
-#  ifdef PNG_EXPORT_OLD
-#    define PNG_EXPORT(type, name, args, attributes, ordinal)\
-       type PNG_IMPEXP (PNGAPI name) PNGARG(args) attributes
-#  else
-#    define PNG_EXPORT(type, name, args, attributes, ordinal)\
-       PNG_IMPEXP type (PNGAPI name) PNGARG(args) attributes
-#  endif
-#endif
-
-#ifndef PNG_REMOVED
-#  define PNG_REMOVED(name, ordinal)
-#endif
-
-#ifndef PNG_CALLBACK
-# define PNG_CALLBACK(type, name, args, attributes)\
-  type (PNGCBAPI name) PNGARG(args) attributes
-#endif
-
-#ifndef PNGCAPI
-# define PNGCAPI
-#endif
-#ifndef PNGCBAPI
-# define PNGCBAPI PNGCAPI
-#endif
-#ifndef PNGAPI
-#  define PNGAPI PNGCAPI
-#endif
-#ifndef PNG_IMPEXP
-#  define PNG_IMPEXP
-#endif
-
-/* Support for compiler specific function attributes.  These are used
- * so that where compiler support is available incorrect use of API
- * functions in png.h will generate compiler warnings.
- *
- * Added at libpng-1.2.41.
- */
-
-#ifndef PNG_NO_PEDANTIC_WARNINGS
-#ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
-#  define PNG_PEDANTIC_WARNINGS_SUPPORTED
-#endif
-#endif
-
-#ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
-/* Support for compiler specific function attributes.  These are used
- * so that where compiler support is available incorrect use of API
- * functions in png.h will generate compiler warnings.  Added at libpng
- * version 1.2.41.
- */
-#  ifdef __GNUC__
-#    ifndef PNG_USE_RESULT
-#      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
-#    endif
-#    ifndef PNG_NORETURN
-#      define PNG_NORETURN   __attribute__((__noreturn__))
-#    endif
-#    ifndef PNG_ALLOCATED
-#      define PNG_ALLOCATED  __attribute__((__malloc__))
-#    endif
-
-    /* This specifically protects structure members that should only be
-     * accessed from within the library, therefore should be empty during
-     * a library build.
-     */
-#    ifndef PNGLIB_BUILD
-#      ifndef PNG_DEPRECATED
-#        define PNG_DEPRECATED __attribute__((__deprecated__))
-#      endif
-#      ifndef PNG_DEPSTRUCT
-#        define PNG_DEPSTRUCT  __attribute__((__deprecated__))
-#      endif
-#      ifndef PNG_PRIVATE
-#        if 0 /* Doesn't work so we use deprecated instead*/
-#          define PNG_PRIVATE \
-            __attribute__((warning("This function is not exported by libpng.")))
-#        else
-#          define PNG_PRIVATE \
-            __attribute__((__deprecated__))
-#        endif
-#      endif /* PNG_PRIVATE */
-#    endif /* PNGLIB_BUILD */
-#  endif /* __GNUC__ */
-#endif /* PNG_PEDANTIC_WARNINGS */
-
-#ifndef PNG_DEPRECATED
-#  define PNG_DEPRECATED  /* Use of this function is deprecated */
-#endif
-#ifndef PNG_USE_RESULT
-#  define PNG_USE_RESULT  /* The result of this function must be checked */
-#endif
-#ifndef PNG_NORETURN
-#  define PNG_NORETURN    /* This function does not return */
-#endif
-#ifndef PNG_ALLOCATED
-#  define PNG_ALLOCATED   /* The result of the function is new memory */
-#endif
-#ifndef PNG_DEPSTRUCT
-#  define PNG_DEPSTRUCT   /* Access to this struct member is deprecated */
-#endif
-#ifndef PNG_PRIVATE
-#  define PNG_PRIVATE     /* This is a private libpng function */
-#endif
 
 /* Users may want to use these so they are not private.  Any library
  * functions that are passed far data must be model-independent.

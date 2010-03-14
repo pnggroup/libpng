@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [March 10, 2010]
+ * Last changed in libpng 1.4.1 [March 14, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -32,10 +32,11 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
 png_uint_32 PNGAPI
 png_get_uint_32(png_bytep buf)
 {
-   png_uint_32 i = ((png_uint_32)(*buf) << 24) +
+   png_uint_32 i =
+       ((png_uint_32)(*(buf    )) << 24) +
        ((png_uint_32)(*(buf + 1)) << 16) +
-       ((png_uint_32)(*(buf + 2)) << 8) +
-       (png_uint_32)(*(buf + 3));
+       ((png_uint_32)(*(buf + 2)) <<  8) +
+       ((png_uint_32)(*(buf + 3))      ) ;
 
    return (i);
 }
@@ -254,7 +255,10 @@ png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
        * buffer if available.
        */
       {
-         char *msg, umsg[52];
+         char *msg;
+#ifdef PNG_CONSOLE_IO_SUPPORTED
+	 char umsg[52];
+#endif
          if (png_ptr->zstream.msg != 0)
             msg = png_ptr->zstream.msg;
          else
@@ -376,9 +380,9 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
    else /* if (comp_type != PNG_COMPRESSION_TYPE_BASE) */
    {
+#ifdef PNG_STDIO_SUPPORTED
       char umsg[50];
 
-#ifdef PNG_STDIO_SUPPORTED
       png_snprintf(umsg, sizeof umsg,
           "Unknown zTXt compression type %d", comp_type);
       png_warning(png_ptr, umsg);

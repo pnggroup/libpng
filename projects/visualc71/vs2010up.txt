@@ -1,0 +1,16 @@
+VisualStdio 2010 introduces a new 'TargetName' field, see:
+
+http://social.msdn.microsoft.com/Forums/en/vcprerelease/thread/3c03e730-6a0e-4ee4-a0d6-6a5c3ce4343c
+
+If you upgrade the libpng.sln to 2010 you will have to update the target name
+from the default for libpng and zlib as follows:
+
+zlib Library Debug: add 'd' to the end of the default target name
+zlib DLL Debug: add '1d' to the end of the default target name
+zlib DLL Release: add '1' to the end of the default target name
+libpng Library Debug: add 'd' to the end of the default target name
+libpng DLL Debug: add '15d' to the end of the default target name
+libpng DLL Release: add '15' to the end of the default target name
+libpng DLL VB: add '15vb' to the end of the default target name
+
+If you don't do this you will get warnings and some builds will fail.

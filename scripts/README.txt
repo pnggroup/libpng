@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.5.0beta14 - March 10, 2010
+Makefiles for  libpng version 1.5.0beta14 - March 14, 2010
 
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng15.so.15.1.5.0beta14)
@@ -33,7 +33,7 @@ Makefiles for  libpng version 1.5.0beta14 - March 10, 2010
  makefile.msc      =>  Microsoft C makefile
  makefile.netbsd   =>  NetBSD/cc makefile, makes libpng.so.
  makefile.openbsd  =>  OpenBSD makefile
- makefile.os2      =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
+ makefile.os2      =>  OS/2 Makefile (gcc and emx, requires libpng.def)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.sggcc    =>  Silicon Graphics (gcc,
                        creates libpng15.so.15.1.5.0beta14)
@@ -58,9 +58,7 @@ Other supporting scripts:
  libpng-config-body.in => used by several makefiles to create libpng-config
  libpng-config-head.in => used by several makefiles to create libpng-config
  libpng.pc.in      =>  Used by several makefiles to create libpng.pc
- pngos2.def        =>  OS/2 module definition file used by makefile.os2
  pngwin.def        =>  Module definitions for makefile.cygwin and mingw
- png32ce.def       =>  Module definition file used by makefile.cegcc
  pngwin.rc         =>  Used by the visualc6 and visualc71 projects.
  SCOPTIONS.ppc     =>  Used with smakefile.ppc
 
