@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta14 - March 14, 2010
+Libpng 1.5.0beta15 - March 14, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta14.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta14.tar.gz
-   1.5.0beta14.tar.bz2
+   1.5.0beta15.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta15.tar.gz
+   1.5.0beta15.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b14.zip
-   lp150b14.7z
+   lp150b15.zip
+   lp150b15.7z
 
 Other information:
 
-   1.5.0beta14-README.txt
-   1.5.0beta14-LICENSE.txt
+   1.5.0beta15-README.txt
+   1.5.0beta15-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -123,6 +123,8 @@ version 1.5.0beta14 [March 14, 2010]
   Removed the include of sys/types.h - apparently unnecessary now on the
     platforms on which it happened (all but Mac OS and RISC OS).
   Moved the Mac OS test into pngpriv.h (the only place it is used.)
+
+version 1.5.0beta14 [March 14, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

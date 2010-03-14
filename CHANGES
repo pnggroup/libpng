@@ -2601,6 +2601,8 @@ version 1.5.0beta14 [March 14, 2010]
     platforms on which it happened (all but Mac OS and RISC OS).
   Moved the Mac OS test into pngpriv.h (the only place it is used.)
 
+version 1.5.0beta14 [March 14, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
