@@ -241,7 +241,7 @@ SOURCE=..\..\pngtrans.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\libpng.def
+SOURCE=..\..\scripts\pngwin.def
 
 !IF  "$(CFG)" == "libpng - Win32 DLL Release"
 

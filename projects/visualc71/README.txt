@@ -11,7 +11,7 @@ Changes in libpng 15:
   Consequently the VB configuration is no longer required but is provided
   in libpng15vb.dll for backward compatibility.
 * The DEF file is no longer required, the DLLs link by name.  A standard
-  DEF file, libpng.def, is included in the distribution for applications
+  DEF file, pngwin.def, is included in the distribution for applications
   that require link by number (ordinal), builds that require link by
   number should use the ordinals from this file (or from png.h).
 

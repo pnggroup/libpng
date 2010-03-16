@@ -69,13 +69,14 @@ EXTRA_DIST= \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	CMakeLists.txt example.c libpng.def libpng-@PNGLIB_VERSION@.txt
+	CMakeLists.txt example.c libpng-@PNGLIB_VERSION@.txt
 
 CLEANFILES= dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
-	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym
+	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
+	libpng.def checksym.lst symbols.new symbols.chk
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
-config.sub configure depcomp install-sh ltmain.sh missing libpng.def
+config.sub configure depcomp install-sh ltmain.sh missing
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -86,18 +87,27 @@ $(PNGLIB_BASENAME)-config: libpng-config
 libpng.sym: scripts/sym.dfn png.h pngconf.h
 libpng.vers: scripts/vers.dfn png.h pngconf.h
 libpng.def: scripts/def.dfn png.h pngconf.h
+checksym.lst: scripts/checksym.dfn png.h pngconf.h
 
 SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'
 
-libpng.sym libpng.vers libpng.def:
-	$(RM) -f $@ dfn.c dfn?.out
+libpng.sym libpng.vers libpng.def checksym.lst:
+	$(RM) $@ dfn.c dfn?.out
 	echo '#include "$<"' >dfn.c
 	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
 	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p' dfn1.out >dfn2.out
 	$(SED) -e 's| *@@@ *||' -e 's| *$$||' dfn2.out >dfn3.out
+	$(RM) dfn.c dfn[12].out
 	mv dfn3.out $@
+
+symbols.chk: scripts/checksym.awk scripts/symbols.def checksym.lst
+	$(RM) $@ symbols.new
+	$(AWK) -f $^ >&2
+	mv symbols.new $@
+
+dist: symbols.chk
 
 test: check
 

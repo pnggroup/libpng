@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta15 - March 14, 2010
+Libpng 1.5.0beta15 - March 16, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -124,7 +124,11 @@ version 1.5.0beta14 [March 14, 2010]
     platforms on which it happened (all but Mac OS and RISC OS).
   Moved the Mac OS test into pngpriv.h (the only place it is used.)
 
-version 1.5.0beta14 [March 14, 2010]
+version 1.5.0beta14 [March 16, 2010]
+  Added symbols.chk target to Makefile.am to validate the symbols in png.h
+    against the new DEF file scripts/symbols.def.
+  Changed the default DEF file back to pngwin.def.
+  Removed makefile.mingw.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

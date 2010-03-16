@@ -11,7 +11,7 @@
 
 #define PNG_EXPORT(type, name, args, attributes, ordinal)\
 	PNG_DEFN_MAGIC- name @ordinal-PNG_DEFN_END
-#define PNG_REMOVED(name, ordinal)\
+#define PNG_REMOVED(type, name, args, attributes, ordinal)\
 	PNG_DEFN_MAGIC-; name @ordinal-PNG_DEFN_END
 
 PNG_DEFN_MAGIC-;---------------------------------------------------------------PNG_DEFN_END
