@@ -1,14 +1,8 @@
 ;--------------------------------------------------------------
-; LIBPNG module definition file for Windows, WindowsCE and OS/2
-; On OS/2 uncomment lines preceded by ;0S2
+; LIBPNG symbol list as a WIn32 DEF file
+; Contains all the symbols that can be exported from libpng
 ;--------------------------------------------------------------
-
-; If you give the library an explicit name one or other files
-; may need modifying to support the new name on one or more
-; systems.
 LIBRARY
-;OS2 DESCRIPTION "PNG image compression library"
-;OS2 CODE PRELOAD MOVEABLE DISCARDABLE
 
 EXPORTS
 ;Version 1.5.0beta15
@@ -60,6 +54,7 @@ EXPORTS
  png_set_invert_mono @46
  png_set_background @47
  png_set_strip_16 @48
+ png_set_dither @49
  png_set_gamma @50
  png_set_flush @51
  png_write_flush @52
@@ -114,8 +109,12 @@ EXPORTS
  png_free_default @101
  png_error @102
  png_chunk_error @103
+ png_err @104
  png_warning @105
  png_chunk_warning @106
+ png_benign_error @107
+ png_chunk_benign_error @108
+ png_set_benign_errors @109
  png_get_valid @110
  png_get_rowbytes @111
  png_get_rows @112
@@ -175,7 +174,9 @@ EXPORTS
  png_get_tRNS @166
  png_set_tRNS @167
  png_get_sCAL @168
+ png_get_sCAL_s @169
  png_set_sCAL @170
+ png_set_sCAL_s @171
  png_set_keep_unknown_chunks @172
  png_handle_as_unknown @173
  png_set_unknown_chunks @174
@@ -189,6 +190,7 @@ EXPORTS
  png_get_header_version @182
  png_get_libpng_ver @183
  png_permit_mng_features @184
+ png_set_strip_error_numbers @185
  png_set_user_limits @186
  png_get_user_width_max @187
  png_get_user_height_max @188
@@ -196,8 +198,17 @@ EXPORTS
  png_get_chunk_cache_max @190
  png_set_chunk_malloc_max @191
  png_get_chunk_malloc_max @192
+ png_get_pixels_per_inch @193
+ png_get_x_pixels_per_inch @194
+ png_get_y_pixels_per_inch @195
+ png_get_x_offset_inches @196
+ png_get_y_offset_inches @197
+ png_get_pHYs_dpi @198
  png_get_io_state @199
  png_get_io_chunk_name @200
+ png_get_uint_32 @201
+ png_get_uint_16 @202
+ png_get_int_32 @203
  png_get_uint_31 @204
  png_save_uint_32 @205
  png_save_int_32 @206
