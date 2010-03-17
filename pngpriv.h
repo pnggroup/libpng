@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta15 - March 14, 2010
+ * libpng version 1.5.0beta15 - March 17, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -75,11 +75,6 @@
       */
 #    include <m68881.h>
 #  endif
-#endif
-
-/* Codewarrior on NT has linking problems without this. */
-#if (defined(__MWERKS__) && defined(WIN32)) || defined(__STDC__)
-#  define PNG_ALWAYS_EXTERN
 #endif
 
 /* This provides the non-ANSI (far) memory allocation routines. */

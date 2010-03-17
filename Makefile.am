@@ -94,17 +94,18 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'
 
 libpng.sym libpng.vers libpng.def checksym.lst:
-	$(RM) $@ dfn.c dfn?.out
+	rm -f $@ dfn.c dfn?.out
 	echo '#include "$<"' >dfn.c
 	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
 	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p' dfn1.out >dfn2.out
 	$(SED) -e 's| *@@@ *||' -e 's| *$$||' dfn2.out >dfn3.out
-	$(RM) dfn.c dfn[12].out
+	rm -f dfn.c dfn[12].out
 	mv dfn3.out $@
 
 symbols.chk: scripts/checksym.awk scripts/symbols.def checksym.lst
-	$(RM) $@ symbols.new
-	$(AWK) -f $^ >&2
+	rm -f $@ symbols.new
+	$(AWK) -f ${srcdir}/scripts/checksym.awk ${srcdir}/scripts/symbols.def\
+	    checksym.lst >&2
 	mv symbols.new $@
 
 dist: symbols.chk
