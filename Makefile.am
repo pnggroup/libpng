@@ -73,10 +73,12 @@ EXTRA_DIST= \
 
 CLEANFILES= dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
-	libpng.def checksym.lst symbols.new symbols.chk
+	libpng.def symbols.new symbols.chk scripts/*.out
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
 config.sub configure depcomp install-sh ltmain.sh missing
+
+SUFFIXES = .dfn .out
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -84,17 +86,25 @@ $(PNGLIB_BASENAME).pc: libpng.pc
 $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
-libpng.sym: scripts/sym.dfn png.h pngconf.h
-libpng.vers: scripts/vers.dfn png.h pngconf.h
-libpng.def: scripts/def.dfn png.h pngconf.h
-checksym.lst: scripts/checksym.dfn png.h pngconf.h
+scripts/sym.out scripts/vers.out scritps/def.out scripts/checksym.out: png.h pngconf.h
+
+libpng.sym: scripts/sym.out
+	rm -f $@
+	cp $? $@
+libpng.vers: scripts/vers.out
+	rm -f $@
+	cp $? $@
+libpng.def: scripts/def.out
+	rm -f $@
+	cp $? $@
 
 SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'
 
-libpng.sym libpng.vers libpng.def checksym.lst:
+.dfn.out:
 	rm -f $@ dfn.c dfn?.out
+	test -d scripts || mkdir scripts
 	echo '#include "$<"' >dfn.c
 	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
 	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p' dfn1.out >dfn2.out
@@ -102,10 +112,10 @@ libpng.sym libpng.vers libpng.def checksym.lst:
 	rm -f dfn.c dfn[12].out
 	mv dfn3.out $@
 
-symbols.chk: scripts/checksym.awk scripts/symbols.def checksym.lst
+symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/checksym.out
 	rm -f $@ symbols.new
 	$(AWK) -f ${srcdir}/scripts/checksym.awk ${srcdir}/scripts/symbols.def\
-	    checksym.lst >&2
+	    scripts/checksym.out >&2
 	mv symbols.new $@
 
 dist: symbols.chk
@@ -138,3 +148,5 @@ uninstall-hook:
 	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
 	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
 	rm -f $(DESTDIR)$(bindir)/libpng-config
+	rm -f $(DESTDIR)$(libdir)/libpng.a
+	rm -f $(DESTDIR)$(libdir)/libpng.la
