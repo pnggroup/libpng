@@ -2601,7 +2601,7 @@ version 1.5.0beta14 [March 14, 2010]
     platforms on which it happened (all but Mac OS and RISC OS).
   Moved the Mac OS test into pngpriv.h (the only place it is used.)
 
-version 1.5.0beta14 [March 17, 2010]
+version 1.5.0beta15 [March 17, 2010]
   Added symbols.chk target to Makefile.am to validate the symbols in png.h
     against the new DEF file scripts/symbols.def.
   Changed the default DEF file back to pngwin.def.
