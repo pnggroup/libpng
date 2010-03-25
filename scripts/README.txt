@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.5.0beta16 - March 17, 2010
+Makefiles for  libpng version 1.5.0beta16 - March 25, 2010
 
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng15.so.15.1.5.0beta16)
@@ -27,7 +27,6 @@ Makefiles for  libpng version 1.5.0beta16 - March 17, 2010
  makefile.hp64     =>  HPUX (10.20 and 11.00) makefile, 64-bit
  makefile.ibmc     =>  IBM C/C++ version 3.x for Win32 and OS/2 (static)
  makefile.intel    =>  Intel C/C++ version 4.0 and later
- makefile.mingw    =>  Mingw makefile
  makefile.mips     =>  MIPS makefile
  makefile.msc      =>  Microsoft C makefile
  makefile.netbsd   =>  NetBSD/cc makefile, makes libpng.so.
