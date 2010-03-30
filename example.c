@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.5.0 [March 17, 2010]
+ * Last changed in libpng 1.5.0 [March 30, 2010]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2010 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -676,17 +676,21 @@ void write_png(char *file_name /* , ... other image information ... */)
    text_ptr[0].key = "Title";
    text_ptr[0].text = "Mona Lisa";
    text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
+   text_ptr[0].itxt_length = 0;
+   text_ptr[0].lang = NULL;
+   text_ptr[0].lang_key = NULL;
    text_ptr[1].key = "Author";
    text_ptr[1].text = "Leonardo DaVinci";
    text_ptr[1].compression = PNG_TEXT_COMPRESSION_NONE;
+   text_ptr[1].itxt_length = 0;
+   text_ptr[1].lang = NULL;
+   text_ptr[1].lang_key = NULL;
    text_ptr[2].key = "Description";
    text_ptr[2].text = "<long text>";
    text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
-#ifdef PNG_iTXt_SUPPORTED
-   text_ptr[0].lang = NULL;
-   text_ptr[1].lang = NULL;
+   text_ptr[2].itxt_length = 0;
    text_ptr[2].lang = NULL;
-#endif
+   text_ptr[2].lang_key = NULL;
    png_set_text(png_ptr, info_ptr, text_ptr, 3);
 
    /* Other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs */

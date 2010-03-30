@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [March 17, 2010]
+ * Last changed in libpng 1.4.1 [March 30, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2051,11 +2051,9 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    text_ptr->compression = PNG_TEXT_COMPRESSION_NONE;
    text_ptr->key = key;
-#ifdef PNG_iTXt_SUPPORTED
    text_ptr->lang = NULL;
    text_ptr->lang_key = NULL;
    text_ptr->itxt_length = 0;
-#endif
    text_ptr->text = text;
    text_ptr->text_length = png_strlen(text);
 
@@ -2172,11 +2170,9 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    text_ptr->compression = comp_type;
    text_ptr->key = png_ptr->chunkdata;
-#ifdef PNG_iTXt_SUPPORTED
    text_ptr->lang = NULL;
    text_ptr->lang_key = NULL;
    text_ptr->itxt_length = 0;
-#endif
    text_ptr->text = png_ptr->chunkdata + prefix_len;
    text_ptr->text_length = data_len;
 

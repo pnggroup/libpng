@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.0 [March 17, 2010]
+ * Last changed in libpng 1.5.0 [March 30, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -697,8 +697,8 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          lang_key_len = 0;
       }
 
-      else
 #ifdef PNG_iTXt_SUPPORTED
+      else
       {
          /* Set iTXt data */
 
@@ -747,7 +747,6 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
       png_memcpy(textp->key, text_ptr[i].key,(png_size_t)(key_len));
       *(textp->key + key_len) = '\0';
-#ifdef PNG_iTXt_SUPPORTED
       if (text_ptr[i].compression > 0)
       {
          textp->lang = textp->key + key_len + 1;
@@ -759,12 +758,9 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          textp->text = textp->lang_key + lang_key_len + 1;
       }
       else
-#endif
       {
-#ifdef PNG_iTXt_SUPPORTED
          textp->lang=NULL;
          textp->lang_key=NULL;
-#endif
          textp->text = textp->key + key_len + 1;
       }
       if (text_length)
@@ -780,12 +776,9 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
       }
       else
 #endif
-
       {
          textp->text_length = text_length;
-#ifdef PNG_iTXt_SUPPORTED
          textp->itxt_length = 0;
-#endif
       }
       info_ptr->num_text++;
       png_debug1(3, "transferred text chunk %d", info_ptr->num_text);
