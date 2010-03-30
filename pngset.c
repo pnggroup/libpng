@@ -697,8 +697,8 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          lang_key_len = 0;
       }
 
-#ifdef PNG_iTXt_SUPPORTED
       else
+#ifdef PNG_iTXt_SUPPORTED
       {
          /* Set iTXt data */
 
