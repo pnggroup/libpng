@@ -2538,6 +2538,8 @@ version 1.4.2beta01 [April 1, 2010]
   Conditionally compile an "else" statement in png_decompress_chunk().
   Restored the macro definition of png_check_sig().
 
+version 1.4.2beta02 [April 1, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
