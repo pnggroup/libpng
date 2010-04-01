@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [February 25, 2010]
+ * Last changed in libpng 1.4.2 [April 1, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -334,7 +334,11 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
        * and we have nothing to do - the code will exit through the
        * error case below.
        */
-      else if (expanded_size > 0)
+#if defined(PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED) || \
+    defined(PNG_USER_CHUNK_MALLOC_MAX)
+      else
+#endif
+      if (expanded_size > 0)
       {
          /* Success (maybe) - really uncompress the chunk. */
 	 png_size_t new_size = 0;
