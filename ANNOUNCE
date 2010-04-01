@@ -132,7 +132,7 @@ version 1.5.0beta15 [March 17, 2010]
   Eliminated PNG_NO_EXTERN and PNG_ALL_EXTERN
 
 version 1.5.0beta16 [April 1, 2010]
-  Make png_text_struct independent of PNG_iTXt_SUPPORTED, so that
+  Made png_text_struct independent of PNG_iTXt_SUPPORTED, so that
     fields are initialized in all configurations.  The READ/WRITE
     macros (PNG_(READ|WRITE)_iTXt_SUPPORTED) still function as
     before to disable code to actually read or write iTXt chunks
@@ -140,6 +140,7 @@ version 1.5.0beta16 [April 1, 2010]
     read or write support (but it is probably better to check for
     the one actually required - read or write.)
   Combined multiple png_warning() calls for a single error.
+  Restored the macro definition of png_check_sig().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

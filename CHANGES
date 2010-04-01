@@ -2617,6 +2617,7 @@ version 1.5.0beta16 [April 1, 2010]
     read or write support (but it is probably better to check for
     the one actually required - read or write.)
   Combined multiple png_warning() calls for a single error.
+  Restored the macro definition of png_check_sig().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
