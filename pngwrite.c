@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.5.0 [March 17, 2010]
+ * Last changed in libpng 1.5.0 [April 1, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -541,21 +541,20 @@ png_create_write_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
         char msg[80];
         if (user_png_ver)
         {
-           png_snprintf(msg, 80,
-               "Application was compiled with png.h from libpng-%.20s",
-               user_png_ver);
-           png_warning(png_ptr, msg);
-        }
-        png_snprintf(msg, 80,
-            "Application  is  running with png.c from libpng-%.20s",
-            png_libpng_ver);
-        png_warning(png_ptr, msg);
+            png_snprintf2(msg, 80,
+                "Application built with libpng-%.20s"
+                " but running with %.20s",
+                user_png_ver,
+                png_libpng_ver);
+            png_warning(png_ptr, msg);
+         }
+#else
+         png_warning(png_ptr,
+             "Incompatible libpng version in application and library");
 #endif
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
         png_ptr->flags = 0;
 #endif
-        png_warning(png_ptr,
-            "Incompatible libpng version in application and library");
         png_cleanup_needed = 1;
      }
    }

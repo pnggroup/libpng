@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * Last changed in libpng 1.5.0 [March 17, 2010]
+ * Last changed in libpng 1.5.0 [April 1, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -150,9 +150,8 @@ png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
    {
       png_ptr->write_data_fn = NULL;
       png_warning(png_ptr,
-         "It's an error to set both read_data_fn and write_data_fn in the ");
-      png_warning(png_ptr,
-         "same structure.  Resetting write_data_fn to NULL");
+          "Can't set both read_data_fn and write_data_fn in the"
+          " same structure");
    }
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED

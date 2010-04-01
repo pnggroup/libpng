@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [March 30, 2010]
+ * Last changed in libpng 1.4.1 [April 1, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1133,15 +1133,14 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
-      png_warning(png_ptr, "Ignoring truncated iCCP profile");
 #ifdef PNG_STDIO_SUPPORTED
  {
-    char umsg[50];
+    char umsg[80];
 
-    png_snprintf(umsg, 50, "declared profile size = %lu",
-        (unsigned long)profile_size);
-    png_warning(png_ptr, umsg);
-    png_snprintf(umsg, 50, "actual profile length = %lu",
+    png_snprintf2(umsg, 80,
+        "Ignoring iCCP chunk with declared size = %lu "
+         "and actual length = %lu",
+        (unsigned long)profile_size,
         (unsigned long)profile_length);
     png_warning(png_ptr, umsg);
  }

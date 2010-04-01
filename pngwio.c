@@ -1,7 +1,7 @@
 
 /* pngwio.c - functions for data output
  *
- * Last changed in libpng 1.5.0 [March 17, 2010]
+ * Last changed in libpng 1.5.0 [April 1, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -200,9 +200,8 @@ png_set_write_fn(png_structp png_ptr, png_voidp io_ptr,
    {
       png_ptr->read_data_fn = NULL;
       png_warning(png_ptr,
-         "Attempted to set both read_data_fn and write_data_fn in");
-      png_warning(png_ptr,
-         "the same structure.  Resetting read_data_fn to NULL");
+          "Can't set both read_data_fn and write_data_fn in the"
+          " same structure");
    }
 }
 
