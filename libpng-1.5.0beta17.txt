@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.5.0beta17 - April 1, 2010
+ libpng version 1.5.0beta17 - April 2, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.0beta17 - April 1, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta17 - April 2, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -241,8 +241,12 @@ free any memory.
     }
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
-you can compile libpng with PNG_SETJMP_NOT_SUPPORTED, in which case
+you can compile libpng with PNG_NO_SETJMP, in which case
 errors will result in a call to PNG_ABORT() which defaults to abort().
+
+You can #define PNG_ABORT() to a function that does something
+more useful than abort(), as long as your function does not
+return.
 
 Now you need to set up the input code.  The default for libpng is to
 use the C function fread().  If you use this, you will need to pass a
@@ -1691,8 +1695,12 @@ section below for more information on the libpng error handling.
     return;
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
-you can compile libpng with PNG_SETJMP_NOT_SUPPORTED, in which case
+you can compile libpng with PNG_NO_SETJMP, in which case
 errors will result in a call to PNG_ABORT() which defaults to abort().
+
+You can #define PNG_ABORT() to a function that does something
+more useful than abort(), as long as your function does not
+return.
 
 Now you need to set up the output code.  The default for libpng is to
 use the C function fwrite().  If you use this, you will need to pass a
@@ -2554,8 +2562,9 @@ Error handling in libpng is done through png_error() and png_warning().
 Errors handled through png_error() are fatal, meaning that png_error()
 should never return to its caller.  Currently, this is handled via
 setjmp() and longjmp() (unless you have compiled libpng with
-PNG_SETJMP_NOT_SUPPORTED, in which case it is handled via PNG_ABORT()),
+PNG_NO_SETJMP, in which case it is handled via PNG_ABORT()),
 but you could change this to do things like exit() if you should wish.
+as long as your function does not return.
 
 On non-fatal errors, png_warning() is called
 to print a warning message, and then control returns to the calling code.
@@ -3249,7 +3258,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-April 1, 2010
+April 2, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
