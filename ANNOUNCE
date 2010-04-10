@@ -1,5 +1,5 @@
 
-Libpng 1.4.2beta02 - April 1, 2010
+Libpng 1.4.2rc01 - April 10, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.2beta02.tar.xz (LZMA-compressed, recommended)
-   1.4.2beta02.tar.gz
-   1.4.2beta02.tar.bz2
+   1.4.2rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.2rc01.tar.gz
+   1.4.2rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp142b02.zip
-   lp142b02.7z
+   lp142r01.zip
+   lp142r01.7z
 
 Other information:
 
-   1.4.2beta02-README.txt
-   1.4.2beta02-LICENSE.txt
+   1.4.2rc01-README.txt
+   1.4.2rc01-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -30,7 +30,7 @@ version 1.4.2beta01 [April 1, 2010]
   Restored the macro definition of png_check_sig().
   Conditionally compile an "else" statement in png_decompress_chunk().
 
-version 1.4.2beta02 [April 1, 2010]
+version 1.4.2rc01 [April 10, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
