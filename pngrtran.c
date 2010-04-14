@@ -535,7 +535,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
       png_free(png_ptr, distance);
    }
 }
-#endif
+#endif /* PNG_READ_DITHER_SUPPORTED */
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
 /* Transform the image from the file_gamma to the screen_gamma.  We

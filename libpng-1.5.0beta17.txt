@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.5.0beta17 - April 2, 2010
+ libpng version 1.5.0beta17 - April 14, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.0beta17 - April 2, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta17 - April 14, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -2563,7 +2563,7 @@ Errors handled through png_error() are fatal, meaning that png_error()
 should never return to its caller.  Currently, this is handled via
 setjmp() and longjmp() (unless you have compiled libpng with
 PNG_NO_SETJMP, in which case it is handled via PNG_ABORT()),
-but you could change this to do things like exit() if you should wish.
+but you could change this to do things like exit() if you should wish,
 as long as your function does not return.
 
 On non-fatal errors, png_warning() is called
@@ -3118,6 +3118,11 @@ The png_zalloc() and png_zfree() functions are no longer exported.
 The png_zalloc() function no longer zeroes out the memory that it
 allocates.
 
+Support for dithering was removed by default, because it has never
+been well tested and doesn't work very well.  The code has not
+been removed, however, and can be enabled by building libpng with
+PNG_READ_DITHER_SUPPORTED defined.
+
 We removed the trailing '.' from the warning and error messages.
 
 X. Detecting libpng
@@ -3258,7 +3263,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-April 2, 2010
+April 14, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
