@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.1 [April 10, 2010]
+ * Last changed in libpng 1.4.1 [April 14, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -536,7 +536,7 @@ png_set_dither(png_structp png_ptr, png_colorp palette,
       png_free(png_ptr, distance);
    }
 }
-#endif
+#endif /* PNG_READ_DITHER_SUPPORTED */
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
 /* Transform the image from the file_gamma to the screen_gamma.  We

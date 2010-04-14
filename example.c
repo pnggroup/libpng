@@ -271,6 +271,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
          png_set_gamma(png_ptr, screen_gamma, 0.45455);
    }
 
+#ifdef PNG_READ_DITHER_SUPPORTED
    /* Dither RGB files down to 8 bit palette or reduce palettes
     * to the number of colors available on your screen.
     */
@@ -299,6 +300,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
                         max_screen_colors, histogram, 0);
       }
    }
+#endif /* PNG_READ_DITHER_SUPPORTED */
 
    /* Invert monochrome files to have 0 as white and 1 as black */
    png_set_invert_mono(png_ptr);
