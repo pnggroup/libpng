@@ -2551,6 +2551,9 @@ version 1.4.2rc02 [April 16, 2010]
     the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros to
     PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
 
+version 1.4.2rc03 [April 16, 2010]
+  Added some "(long)" typecasts to printf calls in png_handle_cHRM().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
