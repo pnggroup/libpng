@@ -1,6 +1,6 @@
-.TH LIBPNGPF 3 "April 10, 2010"
+.TH LIBPNGPF 3 "April 16, 2010"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.2rc01
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.2rc02
 (private functions)
 .SH SYNOPSIS
 \fB#include <png.h>\fP
@@ -147,7 +147,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.2rc01
 
 \fI\fB
 
-\fBvoid png_do_dither (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_bytep \fP\fIpalette_lookup\fP\fB, png_bytep \fIdither_lookup\fP\fB);\fP
+\fBvoid png_do_quantize (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_bytep \fP\fIpalette_lookup\fP\fB, png_bytep \fIquantize_lookup\fP\fB);\fP
 
 \fI\fB
 

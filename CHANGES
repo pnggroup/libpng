@@ -2054,7 +2054,7 @@ version 1.4.0beta46 [December 10, 2008]
     PNG_TRANSFORM_STRIP_FILLER (Jim Barry).
 
 version 1.4.0beta47 [December 15, 2008]
-  Support for dithering was removed by default, because it has never
+  Support for dithering was disabled by default, because it has never
     been well tested and doesn't work very well.  The code has not
     been removed, however, and can be enabled by building libpng with
     PNG_READ_DITHER_SUPPORTED defined.
@@ -2541,7 +2541,15 @@ version 1.4.2beta01 [April 1, 2010]
   Conditionally compile an "else" statement in png_decompress_chunk().
   Restored the macro definition of png_check_sig().
 
-version 1.4.2rc01 [April 14, 2010]
+version 1.4.2rc01 [April 10, 2010]
+  No changes.
+
+version 1.4.2rc02 [April 16, 2010]
+  Documented the fact that png_set_dither() was disabled since libpng-1.4.0.
+  Reenabled png_set_dither() but renamed it to png_set_quantize() to reflect
+    more accurately what it actually does.  At the same time, renamed
+    the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros to
+    PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
