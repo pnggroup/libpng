@@ -515,7 +515,9 @@
 #  endif
 #  ifndef PNG_NO_READ_QUANTIZE
      /* Prior to libpng-1.4.0 this was PNG_READ_DITHER_SUPPORTED */
-#    define PNG_READ_QUANTIZE_SUPPORTED
+#    ifndef PNG_NO_READ_DITHER  /* This migration aid will be removed */
+#      define PNG_READ_QUANTIZE_SUPPORTED
+#    endif
 #  endif
 #  ifndef PNG_NO_READ_BACKGROUND
 #    define PNG_READ_BACKGROUND_SUPPORTED
