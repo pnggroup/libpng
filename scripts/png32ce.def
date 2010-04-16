@@ -6,7 +6,7 @@ LIBRARY lpngce
 
  png_memcpy_check
  png_memset_check
- png_set_dither
+ png_set_quantize
  png_read_init_3
  png_write_init_3
  png_set_strip_error_numbers
@@ -15,7 +15,7 @@ LIBRARY lpngce
  png_get_int_32
 
 EXPORTS
-;Version 1.4.2rc01
+;Version 1.4.2rc02
   png_build_grayscale_palette  @1
 ;  png_check_sig        @2
   png_chunk_error      @3
@@ -113,7 +113,7 @@ EXPORTS
   png_set_compression_strategy  @94
   png_set_compression_window_bits  @95
   png_set_crc_action  @96
-;  png_set_dither    @97
+  png_set_quantize    @97
   png_set_error_fn    @98
   png_set_expand    @99
   png_set_filler    @100
