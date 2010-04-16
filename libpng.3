@@ -1,6 +1,6 @@
 .TH LIBPNG 3 "April 16, 2010"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.2rc02
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.2rc03
 .SH SYNOPSIS
 \fI\fB
 
@@ -785,7 +785,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.2rc02 - April 16, 2010
+ libpng version 1.4.2rc03 - April 16, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -796,7 +796,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.2rc02 - April 16, 2010
+ libpng versions 0.97, January 1998, through 1.4.2rc03 - April 16, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -1026,8 +1026,12 @@ free any memory.
     }
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
-you can compile libpng with PNG_SETJMP_NOT_SUPPORTED, in which case
+you can compile libpng with PNG_NO_SETJMP, in which case
 errors will result in a call to PNG_ABORT() which defaults to abort().
+
+You can #define PNG_ABORT() to a function that does something
+more useful than abort(), as long as your function does not
+return.
 
 Now you need to set up the input code.  The default for libpng is to
 use the C function fread().  If you use this, you will need to pass a
@@ -1684,7 +1688,7 @@ things.
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
-As of libpng version 1.4.2rc02, not all possible expansions are supported.
+As of libpng version 1.4.2rc03, not all possible expansions are supported.
 
 In the following table, the 01 means grayscale with depth<8, 31 means
 indexed with depth<8, other numerals represent the color type, "T" means
@@ -2507,8 +2511,12 @@ section below for more information on the libpng error handling.
     return;
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
-you can compile libpng with PNG_SETJMP_NOT_SUPPORTED, in which case
+you can compile libpng with PNG_NO_SETJMP, in which case
 errors will result in a call to PNG_ABORT() which defaults to abort().
+
+You can #define PNG_ABORT() to a function that does something
+more useful than abort(), as long as your function does not
+return.
 
 Now you need to set up the output code.  The default for libpng is to
 use the C function fwrite().  If you use this, you will need to pass a
@@ -3370,8 +3378,9 @@ Error handling in libpng is done through png_error() and png_warning().
 Errors handled through png_error() are fatal, meaning that png_error()
 should never return to its caller.  Currently, this is handled via
 setjmp() and longjmp() (unless you have compiled libpng with
-PNG_SETJMP_NOT_SUPPORTED, in which case it is handled via PNG_ABORT()),
-but you could change this to do things like exit() if you should wish.
+PNG_NO_SETJMP, in which case it is handled via PNG_ABORT()),
+but you could change this to do things like exit() if you should wish,
+as long as your function does not return.
 
 On non-fatal errors, png_warning() is called
 to print a warning message, and then control returns to the calling code.
@@ -4002,12 +4011,12 @@ the statement that follows the comment:
     /* Single-line comment */
     statement;
 
-    /* Multiple-line
-     * comment
+    /* This is a multiple-line
+     * comment.
      */
     statement;
 
-Very short comments can be placed at the end of the statement
+Very short comments can be placed after the end of the statement
 to which they pertain:
 
     statement;    /* comment */
@@ -4054,9 +4063,9 @@ macros begin with "PNG_".
 
 We put a space after each comma and after each semicolon
 in "for" statments, and we put spaces before and after each
-C binary operator and after "for" or "while".  We don't
-put a space between a typecast and the expression being
-cast, nor do we put one between a function name and the
+C binary operator and after "for" or "while", and before
+"?".  We don't put a space between a typecast and the expression
+being cast, nor do we put one between a function name and the
 left parenthesis that follows it:
 
     for (i = 2; i > 0; --i)
@@ -4079,7 +4088,7 @@ Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.2rc02 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.2rc03 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -4313,7 +4322,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.4.2rc02 - April 16, 2010:
+Libpng version 1.4.2rc03 - April 16, 2010:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4336,7 +4345,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.4.2rc02, April 16, 2010, are
+libpng versions 1.2.6, August 15, 2004, through 1.4.2rc03, April 16, 2010, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
