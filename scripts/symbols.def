@@ -54,7 +54,7 @@ EXPORTS
  png_set_invert_mono @46
  png_set_background @47
  png_set_strip_16 @48
- png_set_dither @49
+; png_set_dither @49
  png_set_gamma @50
  png_set_flush @51
  png_write_flush @52
@@ -213,3 +213,4 @@ EXPORTS
  png_save_uint_32 @205
  png_save_int_32 @206
  png_save_uint_16 @207
+ png_set_quantize @208

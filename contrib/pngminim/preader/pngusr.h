@@ -19,7 +19,7 @@
 #define png_error(s1,s2) png_err(s1)
 #define png_chunk_error(s1,s2) png_err(s1)
 
-#define PNG_NO_READ_DITHER
+#define PNG_NO_READ_QUANTIZE
 #define PNG_NO_READ_INVERT
 #define PNG_NO_READ_SHIFT
 #define PNG_NO_READ_PACK

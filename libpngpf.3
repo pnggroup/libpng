@@ -1,4 +1,4 @@
-.TH LIBPNGPF 3 "April 1, 2010"
+.TH LIBPNGPF 3 "April 17, 2010"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta17
 (private functions)
@@ -143,14 +143,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta17
 
 \fI\fB
 
-\fI\fB
-
-\fBvoid png_do_dither (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_bytep \fP\fIpalette_lookup\fP\fB, png_bytep \fIdither_lookup\fP\fB);\fP
-
-\fI\fB
-
-\fI\fB
-
 \fBvoid png_do_expand (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_color_16p \fItrans_value\fP\fB);\fP
 
 \fI\fB
@@ -188,6 +180,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta17
 \fI\fB
 
 \fBvoid png_do_packswap (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fIrow\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fBvoid png_do_quantize (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_bytep \fP\fIpalette_lookup\fP\fB, png_bytep \fIquantize_lookup\fP\fB);\fP
+
+\fI\fB
 
 \fI\fB
 

@@ -5,7 +5,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng version 1.5.0 - April 1, 2010
+ * Last changed in libpng version 1.5.0 - April 17, 2010
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -187,12 +187,12 @@ struct png_struct_def
    png_uint_16 offset_table_count_free;
 #endif
 
-#ifdef PNG_READ_DITHER_SUPPORTED
-   png_bytep palette_lookup; /* lookup table for dithering */
-   png_bytep dither_index;   /* index translation for palette files */
+#ifdef PNG_READ_QUANTIZE_SUPPORTED
+   png_bytep palette_lookup; /* lookup table for quantizing */
+   png_bytep quantize_index; /* index translation for palette files */
 #endif
 
-#if defined(PNG_READ_DITHER_SUPPORTED) || defined(PNG_hIST_SUPPORTED)
+#if defined(PNG_READ_QUANTIZE_SUPPORTED) || defined(PNG_hIST_SUPPORTED)
    png_uint_16p hist;                /* histogram */
 #endif
 
@@ -263,9 +263,9 @@ struct png_struct_def
 /* New member added in libpng-1.0.13 and 1.2.0 */
    png_bytep big_row_buf;         /* buffer to save current (unfiltered) row */
 
-#ifdef PNG_READ_DITHER_SUPPORTED
+#ifdef PNG_READ_QUANTIZE_SUPPORTED
 /* The following three members were added at version 1.0.14 and 1.2.4 */
-   png_bytep dither_sort;            /* working sort array */
+   png_bytep quantize_sort;          /* working sort array */
    png_bytep index_to_palette;       /* where the original index currently is
                                         in the palette */
    png_bytep palette_to_index;       /* which original index points to this

@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.5.0beta17 - April 1, 2010
+Makefiles for  libpng version 1.5.0beta17 - April 17, 2010
 
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng15.so.15.1.5.0beta17)

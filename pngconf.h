@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta17 - April 1, 2010
+ * libpng version 1.5.0beta17 - April 17, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -523,18 +523,18 @@
 
 /* Other defines for things like memory and the like can go here.  */
 
-/* This controls how fine the dithering gets.  As this allocates
+/* This controls how fine the quantizing gets.  As this allocates
  * a largish chunk of memory (32K), those who are not as concerned
- * with dithering quality can decrease some or all of these.
+ * with quantizing quality can decrease some or all of these.
  */
-#ifndef PNG_DITHER_RED_BITS
-#  define PNG_DITHER_RED_BITS 5
+#ifndef PNG_QUANTIZE_RED_BITS
+#  define PNG_QUANTIZE_RED_BITS 5
 #endif
-#ifndef PNG_DITHER_GREEN_BITS
-#  define PNG_DITHER_GREEN_BITS 5
+#ifndef PNG_QUANTIZE_GREEN_BITS
+#  define PNG_QUANTIZE_GREEN_BITS 5
 #endif
-#ifndef PNG_DITHER_BLUE_BITS
-#  define PNG_DITHER_BLUE_BITS 5
+#ifndef PNG_QUANTIZE_BLUE_BITS
+#  define PNG_QUANTIZE_BLUE_BITS 5
 #endif
 
 /* This controls how fine the gamma correction becomes when you
@@ -629,6 +629,9 @@
 #    ifndef PNG_NO_READ_INVERT
 #      define PNG_READ_INVERT_SUPPORTED
 #    endif
+#  ifndef PNG_NO_READ_QUANTIZE
+#    define PNG_READ_QUANTIZE_SUPPORTED
+#  endif
 #    ifndef PNG_NO_READ_BACKGROUND
 #      define PNG_READ_BACKGROUND_SUPPORTED
 #    endif

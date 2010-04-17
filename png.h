@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.0beta17 - April 1, 2010
+ * libpng version 1.5.0beta17 - April 17, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.0beta17 - April 1, 2010: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.0beta17 - April 17, 2010: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -170,7 +170,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta17, April 1, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta17, April 17, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -282,7 +282,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    April 1, 2010
+ *    April 17, 2010
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -346,7 +346,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.0beta17"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.0beta17 - April 1, 2010\n"
+     " libpng version 1.5.0beta17 - April 17, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1033,13 +1033,13 @@ extern PNG_EXPORT(void,png_set_background,(png_structp png_ptr,
 extern PNG_EXPORT(void,png_set_strip_16,(png_structp png_ptr),,48);
 #endif
 
-#ifdef PNG_READ_DITHER_SUPPORTED
-/* Turn on dithering, and reduce the palette to the number of colors
+#ifdef PNG_READ_QUANTIZE_SUPPORTED
+/* Turn on quantizing, and reduce the palette to the number of colors
  * available.
  */
-extern PNG_EXPORT(void,png_set_dither,(png_structp png_ptr,
+extern PNG_EXPORT(void,png_set_quantize,(png_structp png_ptr,
     png_colorp palette, int num_palette, int maximum_colors,
-    png_uint_16p histogram, int full_dither),,49);
+    png_uint_16p histogram, int full_quantize),,49);
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED

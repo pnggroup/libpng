@@ -2054,7 +2054,7 @@ version 1.4.0beta46 [December 10, 2008]
     PNG_TRANSFORM_STRIP_FILLER (Jim Barry).
 
 version 1.4.0beta47 [December 15, 2008]
-  Support for dithering was removed by default, because it has never
+  Support for dithering was disabled by default, because it has never
     been well tested and doesn't work very well.  The code has not
     been removed, however, and can be enabled by building libpng with
     PNG_READ_DITHER_SUPPORTED defined.
@@ -2611,7 +2611,7 @@ version 1.5.0beta15 [March 17, 2010]
   Removed makefile.mingw.
   Eliminated PNG_NO_EXTERN and PNG_ALL_EXTERN
 
-version 1.5.0beta16 [April 14, 2010]
+version 1.5.0beta16 [April 1, 2010]
   Make png_text_struct independent of PNG_iTXt_SUPPORTED, so that
     fields are initialized in all configurations.  The READ/WRITE
     macros (PNG_(READ|WRITE)_iTXt_SUPPORTED) still function as
@@ -2621,6 +2621,15 @@ version 1.5.0beta16 [April 14, 2010]
     the one actually required - read or write.)
   Combined multiple png_warning() calls for a single error.
   Restored the macro definition of png_check_sig().
+
+version 1.5.0beta17 [April 17, 2010]
+  Added some "(long)" typecasts to printf calls in png_handle_cHRM().
+  Documented the fact that png_set_dither() was disabled since libpng-1.4.0.
+  Reenabled png_set_dither() but renamed it to png_set_quantize() to reflect
+    more accurately what it actually does.  At the same time, renamed
+    the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros to
+    PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
+  Added some "(long)" typecasts to printf calls in png_handle_cHRM().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

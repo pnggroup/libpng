@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.5.0beta17 - April 14, 2010
+ libpng version 1.5.0beta17 - April 17, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.0beta17 - April 14, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta17 - April 17, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -479,7 +479,7 @@ you want to do are limited to the following set:
                                 to RGB (or GA to RGBA)
 
 (This excludes setting a background color, doing gamma transformation,
-dithering, and setting filler.)  If this is the case, simply do this:
+quantizing, and setting filler.)  If this is the case, simply do this:
 
     png_read_png(png_ptr, info_ptr, png_transforms, NULL)
 
@@ -1165,6 +1165,40 @@ recommended that PNG viewers support gamma correction.
       png_set_gamma(png_ptr, screen_gamma, gamma);
    else
       png_set_gamma(png_ptr, screen_gamma, 0.45455);
+
+If you need to reduce an RGB file to a paletted file, or if a paletted
+file has more entries then will fit on your screen, png_set_quantize()
+will do that.  Note that this is a simple match dither that merely
+finds the closest color available.  This should work fairly well with
+optimized palettes, and fairly badly with linear color cubes.  If you
+pass a palette that is larger then maximum_colors, the file will
+reduce the number of colors in the palette so it will fit into
+maximum_colors.  If there is a histogram, it will use it to make
+more intelligent choices when reducing the palette.  If there is no
+histogram, it may not do as good a job.
+
+   if (color_type & PNG_COLOR_MASK_COLOR)
+   {
+      if (png_get_valid(png_ptr, info_ptr,
+         PNG_INFO_PLTE))
+      {
+         png_uint_16p histogram = NULL;
+
+         png_get_hIST(png_ptr, info_ptr,
+            &histogram);
+         png_set_quantize(png_ptr, palette, num_palette,
+            max_screen_colors, histogram, 1);
+      }
+      else
+      {
+         png_color std_color_cube[MAX_SCREEN_COLORS] =
+            { ... colors ... };
+
+         png_set_quantize(png_ptr, std_color_cube,
+            MAX_SCREEN_COLORS, MAX_SCREEN_COLORS,
+            NULL,0);
+      }
+   }
 
 PNG files describe monochrome as black being zero and white being one.
 The following code will reverse this (make black be one and white be
@@ -3118,10 +3152,14 @@ The png_zalloc() and png_zfree() functions are no longer exported.
 The png_zalloc() function no longer zeroes out the memory that it
 allocates.
 
-Support for dithering was removed by default, because it has never
-been well tested and doesn't work very well.  The code has not
-been removed, however, and can be enabled by building libpng with
-PNG_READ_DITHER_SUPPORTED defined.
+Support for dithering was disabled by default in libpng-1.4.0, because
+been well tested and doesn't actually "dither".  The code was not
+removed, however, and could be enabled by building libpng with
+PNG_READ_DITHER_SUPPORTED defined.  In libpng-1.4.2, this support
+was reenabled, but the function was renamed png_set_quantize() to
+reflect more accurately what it actually does.  At the same time,
+the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros were also renamed to
+PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
 
 We removed the trailing '.' from the warning and error messages.
 
@@ -3263,7 +3301,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-April 14, 2010
+April 17, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
