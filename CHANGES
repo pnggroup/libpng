@@ -2622,7 +2622,7 @@ version 1.5.0beta16 [April 1, 2010]
   Combined multiple png_warning() calls for a single error.
   Restored the macro definition of png_check_sig().
 
-version 1.5.0beta17 [April 16, 2010]
+version 1.5.0beta17 [April 17, 2010]
   Added some "(long)" typecasts to printf calls in png_handle_cHRM().
   Documented the fact that png_set_dither() was disabled since libpng-1.4.0.
   Reenabled png_set_dither() but renamed it to png_set_quantize() to reflect
