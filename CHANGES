@@ -2643,6 +2643,8 @@ version 1.5.0beta17 [April 17, 2010]
   Removed the xcode project because it has not been updated to work
     with libpng-1.5.0.
 
+version 1.5.0beta18 [April 17, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

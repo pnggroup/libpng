@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta17 - April 17, 2010
+Libpng 1.5.0beta18 - April 17, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta17.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta17.tar.gz
-   1.5.0beta17.tar.bz2
+   1.5.0beta18.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta18.tar.gz
+   1.5.0beta18.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b17.zip
-   lp150b17.7z
+   lp150b18.zip
+   lp150b18.7z
 
 Other information:
 
-   1.5.0beta17-README.txt
-   1.5.0beta17-LICENSE.txt
+   1.5.0beta18-README.txt
+   1.5.0beta18-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -161,6 +161,8 @@ version 1.5.0beta17 [April 17, 2010]
     in the new installed header file pnglibconf.h
   Removed the xcode project because it has not been updated to work
     with libpng-1.5.0.
+
+version 1.5.0beta18 [April 17, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
