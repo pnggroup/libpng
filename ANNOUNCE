@@ -149,6 +149,8 @@ version 1.5.0beta17 [April 17, 2010]
     the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros to
     PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
   Added some "(long)" typecasts to printf calls in png_handle_cHRM().
+
+version 1.5.0freeze01 [April 17, 2010]
   Freeze build-time only configuration in the build.
     In all prior versions of libpng most configuration options
     controlled by compiler #defines had to be repeated by the
@@ -158,7 +160,9 @@ version 1.5.0beta17 [April 17, 2010]
     dependent (and those that are system dependent) are evaluated
     each time - pngconf.h holds these.  Options that can be changed
     per-file in the application are in png.h.  Frozen options are
-    in the new installed header file pnglconf.h
+    in the new installed header file pnglibconf.h
+  Removed the xcode project because it has not been updated to work
+    with libpng-1.5.0.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
