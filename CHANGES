@@ -2642,6 +2642,7 @@ version 1.5.0beta17 [April 17, 2010]
     in the new installed header file pnglibconf.h
   Removed the xcode project because it has not been updated to work
     with libpng-1.5.0.
+  Removed the ability to include optional pngusr.h
 
 version 1.5.0beta18 [April 17, 2010]
 

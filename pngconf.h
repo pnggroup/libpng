@@ -49,7 +49,7 @@
 #  endif
 #endif
 
-/* COMPILER SPECIIFC OPTIONS.
+/* COMPILER SPECIFIC OPTIONS.
  *
  * These options are provided so that a variety of difficult compilers
  * can be used.  Some are fixed at build time (e.g. PNG_API_RULE
