@@ -25,6 +25,9 @@
 #define PNGPRIV_H
 
 #define PNGLIB_BUILD
+#ifdef PNG_USER_CONFIG
+#  include "pngusr.h"
+#endif
 #include "png.h"
 #include "pnginfo.h"
 #include "pngstruct.h"
@@ -75,6 +78,18 @@
 /* Added at libpng version 1.4.0 */
 #if !defined(PNG_NO_WARNINGS) && !defined(PNG_WARNINGS_SUPPORTED)
 #  define PNG_WARNINGS_SUPPORTED
+#endif
+
+/* If warnings or errors are turned off the code is disabled
+ * or redirected here.
+ */
+#ifndef PNG_WARNINGS_SUPPORTED
+#  define png_warning(s1,s2) ((void)0)
+#  define png_chunk_warning(s1,s2) ((void)0)
+#endif
+#ifndef PNG_ERROR_TEXT_SUPPORTED
+#  define png_error(s1,s2) png_err(s1)
+#  define png_chunk_error(s1,s2) png_err(s1)
 #endif
 
 /* Added at libpng version 1.4.0 */
