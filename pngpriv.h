@@ -30,17 +30,102 @@
 #include "pngstruct.h"
 
 #include <stdlib.h>
+#ifdef BSD
+#  include <strings.h>
+#else
+#  include <string.h>
+#endif
 
 /* Added at libpng-1.2.9 */
 /* Moved to pngpriv.h at libpng-1.5.0 */
 
 /* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure"
- * script.
+ * script.  We may need it here to get the correct configuration on things
+ * like limits.
  */
 #ifdef PNG_CONFIGURE_LIBPNG
 #  ifdef HAVE_CONFIG_H
 #    include "config.h"
 #  endif
+#endif
+
+/* Moved to pngpriv.h at libpng-1.5.0 */
+/* If you are running on a machine where you cannot allocate more
+ * than 64K of memory at once, uncomment this.  While libpng will not
+ * normally need that much memory in a chunk (unless you load up a very
+ * large file), zlib needs to know how big of a chunk it can use, and
+ * libpng thus makes sure to check any memory allocation to verify it
+ * will fit into memory.
+ *
+ * zlib provides 'MAXSEG_64K' which, if defined, indicates the
+ * same limit and pngconf.h (already included) sets the limit
+ * if certain operating systems are detected.
+ */
+#if defined(MAXSEG_64K) && !defined(PNG_MAX_MALLOC_64K)
+#  define PNG_MAX_MALLOC_64K
+#endif
+
+/* Moved to pngpriv.h at libpng-1.5.0 */
+/* Feature support: in 1.4 this was in pngconf.h, but these
+ * features have no affect on the libpng API.  Add library
+ * only features to the end of this list.  Add features that
+ * affect the API to scipts/config.dfn using png_on or png_off
+ * as determined by the default and update scripts/config.std
+ */
+/* Added at libpng version 1.4.0 */
+#if !defined(PNG_NO_WARNINGS) && !defined(PNG_WARNINGS_SUPPORTED)
+#  define PNG_WARNINGS_SUPPORTED
+#endif
+
+/* Added at libpng version 1.4.0 */
+#if !defined(PNG_NO_CHECK_cHRM) && !defined(PNG_CHECK_cHRM_SUPPORTED)
+#  define PNG_CHECK_cHRM_SUPPORTED
+#endif
+
+/* Added at libpng version 1.4.0 */
+#if !defined(PNG_NO_ALIGNED_MEMORY) && !defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#  define PNG_ALIGNED_MEMORY_SUPPORTED
+#endif
+
+/* Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
+ * See png[wr]util.c
+ */
+#if !defined(PNG_NO_POINTER_INDEXING) && \
+    !defined(PNG_POINTER_INDEXING_SUPPORTED)
+#  define PNG_POINTER_INDEXING_SUPPORTED
+#endif
+
+/* Other defines for things like memory and the like can go here.  */
+
+/* This controls how fine the dithering gets.  As this allocates
+ * a largish chunk of memory (32K), those who are not as concerned
+ * with dithering quality can decrease some or all of these.
+ */
+#ifndef PNG_DITHER_RED_BITS
+#  define PNG_DITHER_RED_BITS 5
+#endif
+#ifndef PNG_DITHER_GREEN_BITS
+#  define PNG_DITHER_GREEN_BITS 5
+#endif
+#ifndef PNG_DITHER_BLUE_BITS
+#  define PNG_DITHER_BLUE_BITS 5
+#endif
+
+/* This controls how fine the gamma correction becomes when you
+ * are only interested in 8 bits anyway.  Increasing this value
+ * results in more memory being used, and more pow() functions
+ * being called to fill in the gamma tables.  Don't set this value
+ * less then 8, and even that may not work (I haven't tested it).
+ */
+#ifndef PNG_MAX_GAMMA_8
+#  define PNG_MAX_GAMMA_8 11
+#endif
+
+/* This controls how much a difference in gamma we can tolerate before
+ * we actually start doing gamma conversion.
+ */
+#ifndef PNG_GAMMA_THRESHOLD
+#  define PNG_GAMMA_THRESHOLD 0.05
 #endif
 
 /* The functions exported by PNG_EXTERN are internal functions, which
@@ -90,6 +175,31 @@
 #  ifdef _MSC_VER
 #    include <malloc.h>
 #  endif
+#endif
+
+/* This is the size of the compression buffer, and thus the size of
+ * an IDAT chunk.  Make this whatever size you feel is best for your
+ * machine.  One of these will be allocated per png_struct.  When this
+ * is full, it writes the data to the disk, and does some other
+ * calculations.  Making this an extremely small size will slow
+ * the library down, but you may want to experiment to determine
+ * where it becomes significant, if you are concerned with memory
+ * usage.  Note that zlib allocates at least 32Kb also.  For readers,
+ * this describes the size of the buffer available to read the data in.
+ * Unless this gets smaller than the size of a row (compressed),
+ * it should not make much difference how big this is.
+ */
+
+#ifndef PNG_ZBUF_SIZE
+#  define PNG_ZBUF_SIZE 8192
+#endif
+
+/* Just a little check that someone hasn't tried to define something
+ * contradictory.
+ */
+#if (PNG_ZBUF_SIZE > 65536L) && defined(PNG_MAX_MALLOC_64K)
+#  undef PNG_ZBUF_SIZE
+#  define PNG_ZBUF_SIZE 65536L
 #endif
 
 /* Various modes of operation.  Note that after an init, mode is set to

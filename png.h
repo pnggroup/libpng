@@ -386,13 +386,28 @@
  */
 #define PNG_LIBPNG_VER 10500 /* 1.5.0 */
 
-#ifndef PNG_VERSION_INFO_ONLY
-/* Include the compression library's header */
-#  include "zlib.h"
+/* Library configuration: these options cannot be changed after
+ * the library has been built.
+ */
+#ifndef PNGLCONF_H
+#   include "pnglconf.h"
 #endif
 
-/* Include all user configurable info, including optional assembler routines */
-#include "pngconf.h"
+#ifndef PNG_VERSION_INFO_ONLY
+/* Standard header files (not needed for the version info) */
+#  ifdef PNG_STDIO_SUPPORTED
+#    include <stdio.h>
+#  endif
+#  ifdef PNG_SETJMP_SUPPORTED
+#    include <setjmp.h>
+#  endif
+
+/* Include the compression library's header */
+#  include "zlib.h"
+
+/* Machine specific configuration. */
+#  include "pngconf.h"
+#endif
 
 /*
  * Added at libpng-1.2.8
@@ -408,7 +423,7 @@
  * StringFileInfo block must contain a SpecialBuild string.
  */
 
-#ifdef PNG_USER_PRIVATEBUILD
+#ifdef PNG_USER_PRIVATEBUILD /* From pnglconf.h */
 #  define PNG_LIBPNG_BUILD_TYPE \
        (PNG_LIBPNG_BUILD_BASE_TYPE | PNG_LIBPNG_BUILD_PRIVATE)
 #else
@@ -427,17 +442,56 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/* This file is arranged in several sections.  The first section contains
- * structure and type definitions.  The second section contains the external
- * library functions, while the third has the internal library functions,
- * which applications aren't expected to use directly.
- */
-
 /* Version information for C files, stored in png.c.  This had better match
  * the version above.
  */
 #define png_libpng_ver png_get_header_ver(NULL)
 
+/* This file is arranged in several sections:
+ *
+ * 1. Any configuration options that can be specified by for the application
+ *    code when it is built.  (Build time configuration is in pnglconf.h)
+ * 2. Type definitions (base types are defined in pngconf.h), structure
+ *    definitions.
+ * 3. Exported library functions.
+ *
+ * The library source code has additional files (principally pngpriv.h) that
+ * allow configuration of the library.
+ */
+/* Section 1: run time configuration
+ * See pnglconf.h for build time configuration
+ *
+ * Run time configuration allows the application to choose between
+ * implementations of certain arithmetic APIs.  The default is set
+ * at build time and recorded in pnglconf.h, but it is safe to
+ * override these (and only these) settings.  Note that this won't
+ * change what the library does, only application code, and the
+ * settings can (and probably should) be made on a per-file basis
+ * by setting the #defines before including png.h
+ *
+ * Use macros to read integers from PNG data or use the exported
+ * functions?
+ *   PNG_USE_READ_MACROS: use the macros (see below)  Note that
+ *     the macros evaluate their argument multiple times.
+ *   PNG_NO_USE_READ_MACROS: call the relevant library function.
+ *
+ * Use the alternative algorithm for compositing alpha samples that
+ * does not use division?
+ *   PNG_READ_COMPOSITE_NODIV_SUPPORTED: use the 'no division'
+ *      algorithm.
+ *   PNG_NO_READ_COMPOSITE_NODIV: use the 'division' algorithm.
+ *
+ * How to handle benign errors if PNG_ALLOW_BENIGN_ERRORS is
+ * false?
+ *   PNG_ALLOW_BENIGN_ERRORS: map calls to the benign error
+ *      APIs to png_warning.
+ * Otherwise the calls are mapped to png_error.
+ */
+
+/* Section 2: type definitions, including structures and compile time
+ * constants.
+ * See pngconf.h for base types that vary by machine/system
+ */
 /* Three color definitions.  The order of the red, green, and blue, (and the
  * exact size) is not important, although the size of the fields need to
  * be png_byte or png_uint_16 (as defined below).
@@ -784,7 +838,8 @@ typedef png_structp version_1_5_0beta17;
 
 typedef png_struct FAR * FAR * png_structpp;
 
-/* Here are the function definitions most commonly used.  This is not
+/* Section 3: exported functions
+ * Here are the function definitions most commonly used.  This is not
  * the place to find out how to use libpng.  See libpng.txt for the
  * full explanation, see example.c for the summary.  This just provides
  * a simple one line description of the use of each function.
@@ -1398,7 +1453,7 @@ extern PNG_EXPORT(void,png_free_default,(png_structp png_ptr,
     png_voidp ptr),,101);
 #endif
 
-#ifndef PNG_NO_ERROR_TEXT
+#ifdef PNG_ERROR_TEXT_SUPPORTED
 /* Fatal error in PNG image of libpng - can't continue */
 extern PNG_EXPORT(void,png_error,(png_structp png_ptr,
     png_const_charp error_message),PNG_NORETURN,102);
@@ -1423,15 +1478,25 @@ extern PNG_EXPORT(void,png_chunk_warning,(png_structp png_ptr,
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 /* Benign error in libpng.  Can continue, but may have a problem.
  * User can choose whether to handle as a fatal error or as a warning. */
+#  undef png_benign_error
 extern PNG_EXPORT(void,png_benign_error,(png_structp png_ptr,
     png_const_charp warning_message),,107);
 
 /* Same, chunk name is prepended to message. */
+#  undef png_chunk_benign_error
 extern PNG_EXPORT(void,png_chunk_benign_error,(png_structp png_ptr,
     png_const_charp warning_message),,108);
 
 extern PNG_EXPORT(void,png_set_benign_errors,(png_structp png_ptr,
     int allowed),,109);
+#else
+#  ifdef PNG_ALLOW_BENIGN_ERRORS
+#    define png_benign_error png_warning
+#    define png_chunk_benign_error png_chunk_warning
+#  else
+#    define png_benign_error png_error
+#    define png_chunk_benign_error png_chunk_error
+#  endif
 #endif
 
 /* The png_set_<chunk> functions are for storing values in the png_info_struct.
@@ -1851,7 +1916,7 @@ extern PNG_EXPORT(png_alloc_size_t,png_get_chunk_malloc_max,
     (png_structp png_ptr),,192);
 #endif
 
-#if defined(PNG_INCH_CONVERSIONS) && defined(PNG_FLOATING_POINT_SUPPORTED)
+#if defined(PNG_INCH_CONVERSIONS_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
 PNG_EXPORT(png_uint_32,png_get_pixels_per_inch,(png_structp png_ptr,
     png_infop info_ptr),,193);
 
@@ -1872,7 +1937,7 @@ PNG_EXPORT(png_uint_32,png_get_pHYs_dpi,(png_structp png_ptr,
     png_infop info_ptr, png_uint_32 *res_x, png_uint_32 *res_y,
     int *unit_type),,198);
 #  endif /* PNG_pHYs_SUPPORTED */
-#endif  /* PNG_INCH_CONVERSIONS && PNG_FLOATING_POINT_SUPPORTED */
+#endif  /* PNG_INCH_CONVERSIONS_SUPPORTED && PNG_FLOATING_POINT_SUPPORTED */
 
 /* Added in libpng-1.4.0 */
 #ifdef PNG_IO_STATE_SUPPORTED
@@ -1943,7 +2008,6 @@ extern PNG_EXPORT(png_bytep,png_get_io_chunk_name,(png_structp png_ptr),,200);
  * The png_get_int_32() routine assumes we are using two's complement
  * format for negative values, which is almost certainly true.
  */
-/* We could make special-case BIG_ENDIAN macros that do direct reads here */
 #  define png_get_uint_32(buf) \
      (((png_uint_32)(*(buf)) << 24) + \
       ((png_uint_32)(*((buf) + 1)) << 16) + \
@@ -1959,20 +2023,21 @@ extern PNG_EXPORT(png_bytep,png_get_io_chunk_name,(png_structp png_ptr),,200);
       ((png_int_32)(*((buf) + 2)) << 8) + \
       ((png_int_32)(*((buf) + 3))))
 #  endif
-#else
+#endif
 extern PNG_EXPORT(png_uint_32,png_get_uint_32,(png_bytep buf),,201);
 extern PNG_EXPORT(png_uint_16,png_get_uint_16,(png_bytep buf),,202);
 #  ifdef PNG_GET_INT_32_SUPPORTED
 extern PNG_EXPORT(png_int_32,png_get_int_32,(png_bytep buf),,203);
 #  endif
-#endif
 extern PNG_EXPORT(png_uint_32,png_get_uint_31,(png_structp png_ptr,
     png_bytep buf),,204);
 /* No png_get_int_16 -- may be added if there's a real need for it. */
 
 /* Place a 32-bit number into a buffer in PNG byte order (big-endian). */
 extern PNG_EXPORT(void,png_save_uint_32,(png_bytep buf, png_uint_32 i),,205);
+#ifdef PNG_SAVE_INT_32_SUPPORTED
 extern PNG_EXPORT(void,png_save_int_32,(png_bytep buf, png_int_32 i),,206);
+#endif
 
 /* Place a 16-bit number into a buffer in PNG byte order.
  * The parameter is declared unsigned int, not png_uint_16,
@@ -1987,19 +2052,6 @@ extern PNG_EXPORT(void,png_save_uint_16,(png_bytep buf, unsigned int i),,207);
 #ifdef PNG_EXPORT_LAST_ORDINAL
   PNG_EXPORT_LAST_ORDINAL(207);
 #endif
-
-/* ************************************************************************* */
-
-/* Various modes of operation.  Note that after an init, mode is set to
- * zero automatically when the structure is created.
- */
-#define PNG_HAVE_IHDR               0x01
-#define PNG_HAVE_PLTE               0x02
-#define PNG_HAVE_IDAT               0x04
-#define PNG_AFTER_IDAT              0x08 /* Have complete zlib datastream */
-#define PNG_HAVE_IEND               0x10
-#define PNG_HAVE_gAMA               0x20
-#define PNG_HAVE_cHRM               0x40
 
 #ifdef __cplusplus
 }

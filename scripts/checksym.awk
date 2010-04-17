@@ -33,7 +33,7 @@ master == "" {
 }
 FILENAME==master && NF==2 && $2~/^@/ && $1!~/^;/ {
     o=0+substr($2,2)
-    if (o >0) {
+    if (o > 0) {
 	if (official[o] == "") {
 	    official[o] = $1
 	    if (o > mastero) mastero = o
@@ -51,13 +51,14 @@ FILENAME==master {
 # Read new definitions, these are free form but the lines must
 # just be symbol definitions.  Lines will be commented out for
 # 'removed' symbols, introduced in png.h using PNG_REMOVED rather
-# than PNG_EXPORT.  Use checksym.dfn to generate the input file.
+# than PNG_EXPORT.  Use symbols.dfn or pngwin.dfn to generate the
+# input file.
 #
-#  symbol ordinal     # two fields, exported symbol
-#  ; symbol ordinal   # three fields, removed symbol
-#  ; ordinal          # two fields, the last ordinal
-NF==2 && $1 == ";" && $2 ~ /^[1-9][0-9]*$/ { # last ordinal
-    o = 0+$2
+#  symbol @ordinal     # two fields, exported symbol
+#  ; symbol @ordinal   # three fields, removed symbol
+#  ; @ordinal          # two fields, the last ordinal
+NF==2 && $1 == ";" && $2 ~ /^@[1-9][0-9]*$/ { # last ordinal
+    o=0+substr($2,2)
     if (lasto == 0 || lasto == o)
 	lasto=o
     else {
@@ -66,8 +67,8 @@ NF==2 && $1 == ";" && $2 ~ /^[1-9][0-9]*$/ { # last ordinal
     }
     next
 }
-NF==3 && $1 == ";" && $3 ~ /^[1-9][0-9]*$/ { # removed symbol
-    o = 0+$3
+NF==3 && $1 == ";" && $3 ~ /^@[1-9][0-9]*$/ { # removed symbol
+    o=0+substr($3,2)
     if (removed[o] == "" || removed[o] == $2) {
 	removed[o] = $2
 	if (o > symbolo) symbolo = o
@@ -78,8 +79,8 @@ NF==3 && $1 == ";" && $3 ~ /^[1-9][0-9]*$/ { # removed symbol
     }
     next
 }
-NF==2 && $2 ~ /^[1-9][0-9]*$/ { # exported symbol
-    o = 0+$2
+NF==2 && $2 ~ /^@[1-9][0-9]*$/ { # exported symbol
+    o=0+substr($2,2)
     if (symbol[o] == "" || symbol[o] == $1) {
     	symbol[o] = $1
 	if (o > symbolo) symbolo = o
@@ -105,36 +106,38 @@ END{
 		mastero ", exceeds last ordinal from png.h", lasto
 	err = 1
     }
-    missing = 0
+    unexported=0
     for (o=1; o<=lasto; ++o) {
-	stop=0
 	if (symbol[o] == "" && removed[o] == "") {
-	    if (missing == 0) missing = o
-	    if (o < lasto) continue
-	    stop=1
+	    if (unexported == 0) unexported = o
+	    if (official[o] == "") {
+	    	# missing in export list too, so ok
+		if (o < lasto) continue
+	    }
 	}
-	if (missing != 0) {
-	    if (o-1 > missing)
-		print "png.h: missing symbol definitions:", missing "-" o-1
+	if (unexported != 0) {
+	    # Symbols in the .def but not in the new file are errors
+	    if (o-1 > unexported)
+		print "png.h: warning: unexported symbol definitions:",
+		    unexported "-" o-1
 	    else
-		print "png.h: missing symbol definition:", missing
-	    missing = 0
-	    err = 1
+		print "png.h: warning: unexported symbol definition:",
+		    unexported
+	    unexported = 0
 	}
-	if (stop == 1) break; # lasto is missing
 	if (symbol[o] != "" && removed[o] != "") {
 	    print "png.h: symbol", o,
 	      "both exported as '" symbol[o] "' and removed as '" removed[o] "'"
 	    err = 1
 	} else if (symbol[o] != official[o]) {
-	    # either master symbol not there or it changed
+	    # either the symbol is missing somewhere or it changed
 	    err = 1
 	    if (symbol[o] == "")
-		print "png.h: removed symbol", o,
-		    "'" symbol[o] "' exported as '" official[o] "' in", master
+		print "png.h: symbol", o,
+		    "is exported as '" official[o] "' in", master
 	    else if (official[o] == "")
-		print "png.h: exported symbol", o, "'" symbol[o] "' not present in",
-		    master
+		print "png.h: exported symbol", o,
+		    "'" symbol[o] "' not present in", master
 	    else
 		print "png.h: exported symbol", o,
 		    "'" symbol[o] "' exists as '" official[o] "' in", master

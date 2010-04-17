@@ -1,0 +1,38 @@
+
+/* pngwin.dfn - define format of pngwin.def
+ *
+ * Last changed in libpng 1.5.0 [March 12, 2010]
+ * Copyright (c) 1998-2010 Glenn Randers-Pehrson
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ */
+
+#define PNG_EXPORT(type, name, args, attributes, ordinal)\
+	PNG_DEFN_MAGIC- name @ordinal-PNG_DEFN_END
+#define PNG_REMOVED(type, name, args, attributes, ordinal)\
+	PNG_DEFN_MAGIC-; name @ordinal-PNG_DEFN_END
+#define PNG_EXPORT_LAST_ORDINAL(ordinal)\
+	PNG_DEFN_MAGIC-; @ordinal-PNG_DEFN_END
+
+PNG_DEFN_MAGIC-;---------------------------------------------------------------PNG_DEFN_END
+PNG_DEFN_MAGIC-; LIBPNG module definition file for Windows, WindowsCE and OS/2-PNG_DEFN_END
+PNG_DEFN_MAGIC-; On OS/2 uncomment lines preceded by ;0S2-PNG_DEFN_END
+PNG_DEFN_MAGIC-;---------------------------------------------------------------PNG_DEFN_END
+PNG_DEFN_MAGIC--PNG_DEFN_END
+PNG_DEFN_MAGIC-; If you give the library an explicit name one or other files-PNG_DEFN_END
+PNG_DEFN_MAGIC-; may need modifying to support the new name on one or more-PNG_DEFN_END
+PNG_DEFN_MAGIC-; systems.-PNG_DEFN_END
+PNG_DEFN_MAGIC-LIBRARY-PNG_DEFN_END
+PNG_DEFN_MAGIC-;OS2 DESCRIPTION	"PNG image compression library"-PNG_DEFN_END
+PNG_DEFN_MAGIC-;OS2 CODE		PRELOAD MOVEABLE DISCARDABLE-PNG_DEFN_END
+PNG_DEFN_MAGIC--PNG_DEFN_END
+PNG_DEFN_MAGIC-EXPORTS-PNG_DEFN_END
+PNG_DEFN_MAGIC-;Version PNGLIB_VERSION-PNG_DEFN_END
+
+/* Read the defaults, but use scripts/pnglconf.h; the 'standard'
+ * header file.
+ */
+#include "pnglconf.h"
+#include "../png.h"

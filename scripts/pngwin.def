@@ -198,6 +198,9 @@ EXPORTS
  png_get_chunk_malloc_max @192
  png_get_io_state @199
  png_get_io_chunk_name @200
+ png_get_uint_32 @201
+ png_get_uint_16 @202
+ png_get_int_32 @203
  png_get_uint_31 @204
  png_save_uint_32 @205
  png_save_int_32 @206

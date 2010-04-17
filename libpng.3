@@ -1957,7 +1957,7 @@ recommended that PNG viewers support gamma correction.
 
 If you need to reduce an RGB file to a paletted file, or if a paletted
 file has more entries then will fit on your screen, png_set_quantize()
-will do that.  Note that this is a simple match dither that merely
+will do that.  Note that this is a simple match quantization that merely
 finds the closest color available.  This should work fairly well with
 optimized palettes, and fairly badly with linear color cubes.  If you
 pass a palette that is larger then maximum_colors, the file will
