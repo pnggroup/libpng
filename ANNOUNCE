@@ -158,7 +158,7 @@ version 1.5.0beta17 [April 17, 2010]
     dependent (and those that are system dependent) are evaluated
     each time - pngconf.h holds these.  Options that can be changed
     per-file in the application are in png.h.  Frozen options are
-    in the new installed header file pnglibconf.h
+    in the new installed header file pnglibconf.h (John Bowler)
   Removed the xcode project because it has not been updated to work
     with libpng-1.5.0.
 
@@ -169,6 +169,7 @@ version 1.5.0beta18 [April 17, 2010]
     errors are disabled via PNG_NO_WARN or PNG_NO_ERROR_TEXT, to avoid
     storing unneeded error/warning text.
   Updated contrib/pngminim project to work with the new pnglibconf.h
+  Added some PNG_NO_* defines to contrib/pngminim/*/pngusr.h to save space.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
