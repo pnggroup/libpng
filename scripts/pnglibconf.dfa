@@ -223,6 +223,7 @@ setting USER_CHUNK_MALLOC_MAX default 0
 
 # READ options
 option READ enables READ_INTERLACING
+option READ_QUANTIZE requires READ
 
 option READ_TRANSFORMS requires READ
 = NO_READ_TRANSFORMS PNG_READ_TRANSFORMS_NOT_SUPPORTED
@@ -264,9 +265,6 @@ option INCH_CONVERSIONS requires FLOATING_POINT off
 
 # IN DEVELOPMENT
 # These are currently experimental features, define them if you want
-
-# Never enabled?
-option READ_DITHER requires READ off
 
 # Very little testing, not enabled by default.
 option READ_16_TO_8_ACCURATE_SCALE requires READ off
