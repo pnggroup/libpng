@@ -4,6 +4,7 @@
 #CC=cc
 CC=gcc
 LD=$(CC)
+AWK=awk
 
 RM=rm -f
 
@@ -31,6 +32,24 @@ OBJS  = pngm2pnm$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
 # dependencies
 
 all: pngm2pnm$(E)
+
+# see scripts/pnglibconf.mak for more options
+pnglibconf.h: pnglibconf.mak pnglibconf.dfn
+	make -f pnglibconf.mak pnglibconf.h
+
+# used on demand to regenerate the standard header, CPPFLAGS should
+# be empty - no non-standard defines
+pnglibconf.dfn: pnglibconf.dfa options.awk
+	rm -f $@ dfn?.out
+	test -z "$(CPPFLAGS)" 
+	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
+	$(AWK) -f options.awk pre=1 out=dfn1.out\
+	    logunsupported=1 - pnglibconf.dfa 1>&2
+	$(AWK) -f options.awk pre=0 out=dfn2.out\
+	    logunsupported=1 dfn1.out 1>&2
+	rm dfn1.out
+	mv dfn2.out $@
+
 
 pngm2pnm$(E): $(OBJS)
 	$(LD) -o pngm2pnm$(E) $(OBJS)
