@@ -4,9 +4,6 @@
 #CC=cc
 CC=gcc
 LD=$(CC)
-AWK=awk
-SED=sed
-CPP=cpp
 
 RM=rm -f
 
@@ -28,50 +25,33 @@ OBJS  = pngm2pnm$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
 
 # implicit make rules -------------------------------------------------------
 
-.c$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h  pngusr.h zlib.h
+# note: dependencies do not work on implicit rule lines
+.c$(O):
 	$(CC) -c $(CFLAGS) $<
 
 # dependencies
 
 all: pngm2pnm$(E)
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: pnglibconf.mak pnglibconf.dfn
-	make -f pnglibconf.mak pnglibconf.h
-
-# used on demand to regenerate the standard header, CPPFLAGS should
-# be empty - no non-standard defines
-
-.dfn.out:
-	rm -f $@ dfn.c dfn?.out
-	echo '#include "$<"' >dfn.c
-	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
-	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
-	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p'\
-	    dfn1.out >dfn2.out
-	$(SED) -e 's| *@@@ *||g' -e 's| *$$||' dfn2.out >dfn3.out
-	rm -f dfn.c dfn[12].out
-	mv dfn3.out $@
-
-pnglibconf.dfn: pnglibconf.dfa options.awk
-	rm -f $@ dfn?.out
-	test -z "$(CPPFLAGS)" 
-	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
-	$(AWK) -f options.awk pre=1 out=dfn1.out\
-	    logunsupported=1 - pnglibconf.dfa 1>&2
-	$(AWK) -f options.awk pre=0 out=dfn2.out\
-	    logunsupported=1 dfn1.out 1>&2
-	rm dfn1.out
-	mv dfn2.out $@
-
-
 pngm2pnm$(E): $(OBJS)
 	$(LD) -o pngm2pnm$(E) $(OBJS)
 	strip pngm2pnm$(E)
 
+pnglibconf.h: scripts/pnglibconf.mak scripts/pnglibconf.dfa \
+	scripts/options.awk pngusr.h
+
+	rm -f pnglibconf.h
+
+	$(MAKE) $(MAKEFLAGS) -f scripts/pnglibconf.mak\
+	 CPPFLAGS=-DPNG_USER_CONFIG $@
+
 clean:
+	$(MAKE) $(MAKEFLAGS) -f scripts/pnglibconf.mak clean
 	$(RM) pngm2pnm$(O)
 	$(RM) pngm2pnm$(E)
 	$(RM) $(OBJS)
+
+$(OBJS): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h\
+	 pnginfo.h pngdebug.h zlib.h
 
 # End of makefile for pngm2pnm

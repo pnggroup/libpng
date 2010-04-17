@@ -12,14 +12,13 @@
 #ifndef MINWRPNGCONF_H
 #define MINWRPNGCONF_H
 
+#define PNG_USER_PRIVATEBUILD "PNG minimal build"
+#define PNG_USER_DLLFNAME_POSTFIX "MN"
+
 #define PNG_NO_READ_SUPPORTED
 
 #define PNG_NO_WARNINGS
-#define png_warning(s1,s2) ""
-#define png_chunk_warning(s1,s2) ""
 #define PNG_NO_ERROR_TEXT
-#define png_error(s1,s2) png_err(s1)
-#define png_chunk_error(s1,s2) png_err(s1)
 
 #define PNG_NO_WRITE_BACKGROUND
 #define PNG_NO_WRITE_GAMMA

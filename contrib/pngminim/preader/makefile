@@ -41,7 +41,7 @@ OBJS  = rpng2-x$(O) readpng2$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
 
 # implicit make rules -------------------------------------------------------
 
-.c$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h  readpng2.h pngusr.h zlib.h
+.c$(O):
 	$(CC) -c $(CFLAGS) $<
 
 # dependencies
@@ -52,9 +52,16 @@ rpng2-x$(E): $(OBJS)
 	$(LD) -o rpng2-x$(E) $(OBJS) $(LIBS)
 	strip rpng2-x$(E)
 
+pnglibconf.h: scripts/pnglibconf.mak scripts/pnglibconf.dfa scripts/options.awk pngusr.h
+	rm -f pnglibconf.h
+	$(MAKE) $(MAKEFLAGS) -f scripts/pnglibconf.mak CPPFLAGS=-DPNG_USER_CONFIG $@
+
 clean:
+	$(MAKE) $(MAKEFLAGS) -f scripts/pnglibconf.mak clean
 	$(RM) rpng2-x$(O)
 	$(RM) rpng2-x$(E)
 	$(RM) $(OBJS)
+
+$(OBJS): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h  readpng2.h pngusr.h zlib.h
 
 # End of makefile for rpng2-x
