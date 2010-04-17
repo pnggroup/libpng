@@ -184,8 +184,9 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
       buffer[iout + PNG_MAX_ERROR_TEXT - 1] = '\0';
    }
 }
+#endif /* PNG_WARNINGS_SUPPORTED || PNG_ERROR_TEXT_SUPPORTED */
 
-#ifdef PNG_READ_SUPPORTED
+#if defined(PNG_READ_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
 void PNGAPI
 png_chunk_error(png_structp png_ptr, png_const_charp error_message)
 {
@@ -198,8 +199,7 @@ png_chunk_error(png_structp png_ptr, png_const_charp error_message)
       png_error(png_ptr, msg);
    }
 }
-#endif /* PNG_READ_SUPPORTED */
-#endif /* PNG_WARNINGS_SUPPORTED || PNG_ERROR_TEXT_SUPPORTED */
+#endif /* PNG_READ_SUPPORTED && PNG_ERROR_TEXT_SUPPORTED */
 
 #ifdef PNG_WARNINGS_SUPPORTED
 void PNGAPI
