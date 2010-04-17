@@ -36,6 +36,58 @@ file pnglconf.h scripts/pnglconf.dfa PNGLCONF_H
 
 #----------------------------------------------------------------------
 
+# The following setting, option and chunk values can all be changed
+# while building libpng:
+# 
+# setting: change 'setting' lines to fine tune library performance,
+#   changes to the settings don't affect the libpng API functionally
+#
+# option: change 'option' lines to remove or add capabilities from
+#   or to the library; options change the library API
+#
+# chunk: change 'chunk' lines to remove capabilities to process
+#   optional ('ancillary') chunks.  This does not prevent PNG
+#   decoding but does change the libpng API because some chunks
+#   will be ignored.
+#
+# There are three ways of disabling features, in order of correctness:
+#
+# 1) Create 'pngusr.h', enter the required private build information
+# detailed below and #define PNG_NO_<option> for each option you
+# don't want in that file in that file.  You can also turn on options
+# using PNG_<option>_SUPPORTED.  When you have finished rerun
+# configure and rebuild pnglconf.h file with -DPNG_USER_CONFIG:
+# 
+#  make clean
+#  CPPFLAGS='-DPNG_USER_CONFIG' ./configure
+#  make pnglconf.h
+#
+# pngusr.h is only used during the creation of pnglconf.h, but it
+# is safer to ensure that -DPNG_USER_CONFIG is specified throughout
+# the build by changing the CPPFLAGS passed to the initial ./configure
+#
+# This process will result in a very annoying build fail if you
+# forget to define both 'PNG_USER_PRIVATEBUILD' and
+# 'PNG_USER_DLLFNAME_POSTFIX' in pngusr.h - this is deliberate.
+#
+# 2) Add definitions of the settings you want to change to
+# CPPFLAGS; for example:
+# 
+# #define PNG_DEFAULT_READ_MACROS 0
+#
+# (This would change the default to *not* use read macros.)  Be
+# very careful to change only settings that don't alter the API
+# because this approach bypasses the private build checking.  You
+# can also change settings from pngpriv.h (read pngpriv.h) safely
+# without API changes.  Do that in the same way.
+#
+# 3) Edit this file and add 'off' to the end of every option you
+# don't want enabled, make other changes as required.  Only do
+# this if you are proposing a permanent change to the PNG API
+# or ABI.  Do *not* release the result, under any circumstances.
+
+#----------------------------------------------------------------------
+
 # PNG_USER_CONFIG has to be defined on the compiler command line
 # to cause pngusr.h to be read while constructing pnglconf.h
 #
@@ -68,7 +120,7 @@ file pnglconf.h scripts/pnglconf.dfa PNGLCONF_H
 
 # Note that PNG_USR_CONFIG only has an effect when building
 # pnglconf.h
-setting USR_CONFIG requires USER_PRIVATEBUILD USER_DLLFNAME_POSTFIX
+setting USER_CONFIG requires USER_PRIVATEBUILD USER_DLLFNAME_POSTFIX
 setting USER_PRIVATEBUILD
 setting USER_DLLFNAME_POSTFIX
 setting USER_VERSIONINFO_COMMENTS
@@ -78,6 +130,8 @@ setting USER_VERSIONINFO_LEGALTRADEMARKS
 # Record the 'API rule' used to select calling conventions on
 # those systems that support such things (see all the comments in
 # pngconf.h)
+# Changing this setting has a fundamental affect on the PNG ABI,
+# do not release shared libraries with this changed.
 setting API_RULE default 0
 
 # Default to using the read macros
@@ -92,7 +146,7 @@ option FIXED_POINT enables ok_math
 # Added at libpng version 1.4.0 
 option ERROR_TEXT
 
-# The following is always on (defined empty)
+# The following is always on (defined empty) 
 setting CALLOC_SUPPORTED default
 
 # This protects us against compilers that run on a windowing system
@@ -161,16 +215,11 @@ setting USER_CHUNK_CACHE_MAX default 0
 # Added at libpng-1.2.43
 setting USER_CHUNK_MALLOC_MAX default 0
 
-# The following defines give you the ability to remove code from the
-# library that you will not be using.  It is simply a matter of
-# defining the features on the compiler command line (in CPPFLAGS,
-# or CFLAGS) or, perhaps easier, hand-editing pnglconf.h after it
-# has been generated from this file.
-#
-# If you build a shared library with non-default options then the
-# result should normally be made a 'private' build so that applications
-# linked against the default DLL do not fail at run time because of
-# unresolved symbols.
+# All of the following options relate to code capabilities for
+# processing image data before creating a PNG or after reading one.
+# You can remove these capabilities safely and still be PNG
+# conformant, however the library that results is still non-standard.
+# See the comments above about how to change options and settings.
 
 # READ options
 option READ enables READ_INTERLACING
