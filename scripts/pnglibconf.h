@@ -1,5 +1,5 @@
 /* 1.5.0beta17 STANDARD API DEFINITION */
-/* pnglconf.h - library build configuration */
+/* pnglibconf.h - library build configuration */
 
 /* libpng version 1.5.0beta17 - April 2, 2010 */
 
@@ -9,9 +9,9 @@
 /* For conditions of distribution and use, see the disclaimer */
 /* and license in png.h */
 
-/* pnglconf.h */
+/* pnglibconf.h */
 /* Machine generated file: DO NOT EDIT */
-/* Derived from: scripts/pnglconf.dfa */
+/* Derived from: scripts/pnglibconf.dfa */
 #ifndef PNGLCONF_H
 #define PNGLCONF_H
 /* settings */

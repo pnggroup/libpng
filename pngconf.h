@@ -112,7 +112,7 @@
  * (x86 DOS/Windows sytems) and, even then, this does not apply to
  * Cygwin running on those systems.
  *
- * Note that the value must be defined in pnglconf.h so that what
+ * Note that the value must be defined in pnglibconf.h so that what
  * the application uses to call the library matches the conventions
  * set when building the library.
  */

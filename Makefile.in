@@ -83,7 +83,8 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" \
-	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(pkgincludedir)"
+	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(pkgincludedir)" \
+	"$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LIBADD =
 am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =  \
@@ -102,8 +103,10 @@ am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =  \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngmem.lo \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.lo \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngpread.lo
+nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =  \
-	$(am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS)
+	$(am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS) \
+	$(nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS)
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LINK = $(LIBTOOL) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) \
@@ -127,6 +130,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
+	$(nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(pngtest_SOURCES)
 DIST_SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(pngtest_SOURCES)
@@ -135,11 +139,24 @@ man5dir = $(mandir)/man5
 NROFF = nroff
 MANS = $(dist_man_MANS)
 DATA = $(pkgconfig_DATA)
-HEADERS = $(pkginclude_HEADERS)
+HEADERS = $(nodist_pkginclude_HEADERS) $(pkginclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
+# If stdout is a non-dumb tty, use colors.  If test -t is not supported,
+# then this fails; a conservative approach.  Of course do not redirect
+# stdout here, just stderr.
 am__tty_colors = \
-red=; grn=; lgn=; blu=; std=
+red=; grn=; lgn=; blu=; std=; \
+test "X$(AM_COLOR_TESTS)" != Xno \
+&& test "X$$TERM" != Xdumb \
+&& { test "X$(AM_COLOR_TESTS)" = Xalways || test -t 1 2>/dev/null; } \
+&& { \
+  red='[0;31m'; \
+  grn='[0;32m'; \
+  lgn='[1;32m'; \
+  blu='[1;34m'; \
+  std='[m'; \
+}
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -285,7 +302,7 @@ top_srcdir = @top_srcdir@
 PNGLIB_BASENAME = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 
 # libpng does not follow GNU file name conventions
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign color-tests
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh
@@ -305,6 +322,7 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngset.c pngget.c pngrutil
 	pngwtran.c pngmem.c pngerror.c pngpread.c \
 	png.h pngconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 
+nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS = @LIBPNG_DEFINES@
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined \
 	-export-dynamic -version-number \
@@ -313,6 +331,7 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined \
 @HAVE_LD_VERSION_SCRIPT_FALSE@libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.sym
 @HAVE_LD_VERSION_SCRIPT_TRUE@libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.vers
 pkginclude_HEADERS = png.h pngconf.h
+nodist_pkginclude_HEADERS = pnglibconf.h
 pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 
 #extra source distribution files.
@@ -331,14 +350,16 @@ EXTRA_DIST = \
 	$(TESTS) \
 	CMakeLists.txt example.c libpng-@PNGLIB_VERSION@.txt
 
+SCRIPT_CLEANFILES = scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
 CLEANFILES = dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
-	libpng.def symbols.new symbols.chk scripts/*.out
+	pngwin.def check.new pnglibconf.* symbols.new \
+	$(SCRIPT_CLEANFILES)
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
 config.sub configure depcomp install-sh ltmain.sh missing
 
-SUFFIXES = .dfn .out
+SUFFIXES = .chk .dfn .out
 SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'
@@ -347,7 +368,7 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .dfn .out .c .lo .o .obj
+.SUFFIXES: .chk .dfn .out .c .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -736,6 +757,26 @@ uninstall-pkgconfigDATA:
 	test -n "$$files" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(pkgconfigdir)' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(pkgconfigdir)" && rm -f $$files
+install-nodist_pkgincludeHEADERS: $(nodist_pkginclude_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(pkgincludedir)" || $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)"
+	@list='$(nodist_pkginclude_HEADERS)'; test -n "$(pkgincludedir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(pkgincludedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(pkgincludedir)" || exit $$?; \
+	done
+
+uninstall-nodist_pkgincludeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(nodist_pkginclude_HEADERS)'; test -n "$(pkgincludedir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(pkgincludedir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(pkgincludedir)" && rm -f $$files
 install-pkgincludeHEADERS: $(pkginclude_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(pkgincludedir)" || $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)"
@@ -946,6 +987,9 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) \
+	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
+	  dist-hook
 	-test -n "$(am__skip_mode_fix)" \
 	|| find "$(distdir)" -type d ! -perm -777 -exec chmod a+rwx {} \; -o \
 	  ! -type d ! -perm -444 -links 1 -exec chmod a+r {} \; -o \
@@ -1067,7 +1111,7 @@ check: check-am
 all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(MANS) $(DATA) $(HEADERS) \
 		config.h
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(pkgincludedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(pkgincludedir)" "$(DESTDIR)$(pkgincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1121,8 +1165,8 @@ info: info-am
 
 info-am:
 
-install-data-am: install-man install-pkgconfigDATA \
-	install-pkgincludeHEADERS
+install-data-am: install-man install-nodist_pkgincludeHEADERS \
+	install-pkgconfigDATA install-pkgincludeHEADERS
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 install-dvi: install-dvi-am
@@ -1173,8 +1217,8 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-binSCRIPTS uninstall-libLTLIBRARIES \
-	uninstall-man uninstall-pkgconfigDATA \
-	uninstall-pkgincludeHEADERS
+	uninstall-man uninstall-nodist_pkgincludeHEADERS \
+	uninstall-pkgconfigDATA uninstall-pkgincludeHEADERS
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
 uninstall-man: uninstall-man3 uninstall-man5
@@ -1185,23 +1229,24 @@ uninstall-man: uninstall-man3 uninstall-man5
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-TESTS check-am \
 	clean clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
 	clean-libtool ctags dist dist-all dist-bzip2 dist-gzip \
-	dist-lzma dist-shar dist-tarZ dist-xz dist-zip distcheck \
-	distclean distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-binSCRIPTS install-data \
+	dist-hook dist-lzma dist-shar dist-tarZ dist-xz dist-zip \
+	distcheck distclean distclean-compile distclean-generic \
+	distclean-hdr distclean-libtool distclean-tags distcleancheck \
+	distdir distuninstallcheck dvi dvi-am html html-am info \
+	info-am install install-am install-binSCRIPTS install-data \
 	install-data-am install-data-hook install-dvi install-dvi-am \
 	install-exec install-exec-am install-exec-hook install-html \
 	install-html-am install-info install-info-am \
 	install-libLTLIBRARIES install-man install-man3 install-man5 \
-	install-pdf install-pdf-am install-pkgconfigDATA \
-	install-pkgincludeHEADERS install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binSCRIPTS uninstall-hook uninstall-libLTLIBRARIES \
-	uninstall-man uninstall-man3 uninstall-man5 \
+	install-nodist_pkgincludeHEADERS install-pdf install-pdf-am \
+	install-pkgconfigDATA install-pkgincludeHEADERS install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-binSCRIPTS uninstall-hook \
+	uninstall-libLTLIBRARIES uninstall-man uninstall-man3 \
+	uninstall-man5 uninstall-nodist_pkgincludeHEADERS \
 	uninstall-pkgconfigDATA uninstall-pkgincludeHEADERS
 
 
@@ -1214,7 +1259,8 @@ $(PNGLIB_BASENAME).pc: libpng.pc
 $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
-scripts/sym.out scripts/vers.out scritps/def.out scripts/checksym.out: png.h pngconf.h
+scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
+scripts/symbols.out scripts/pngwin.out: png.h pngconf.h scripts/pnglibconf.h
 
 libpng.sym: scripts/sym.out
 	rm -f $@
@@ -1222,36 +1268,81 @@ libpng.sym: scripts/sym.out
 libpng.vers: scripts/vers.out
 	rm -f $@
 	cp $? $@
-libpng.def: scripts/def.out
+pngwin.def: scripts/pngwin.out
 	rm -f $@
 	cp $? $@
+pnglibconf.h: pnglibconf.out
+	rm -f $@
+	cp $? $@
+scripts/pnglibconf.h:
+	@echo "This is a machine generated file, but if you want to make" >&2
+	@echo "a new one simply make 'scripts/pnglibconf.out' and copy that" >&2
+	@exit 1
 
 .dfn.out:
 	rm -f $@ dfn.c dfn?.out
 	test -d scripts || mkdir scripts
 	echo '#include "$<"' >dfn.c
-	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
-	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p' dfn1.out >dfn2.out
-	$(SED) -e 's| *@@@ *||' -e 's| *$$||' dfn2.out >dfn3.out
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
+	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
+	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p'\
+	    dfn1.out >dfn2.out
+	$(SED) -e 's| *@@@ *||g' -e 's| *$$||' dfn2.out >dfn3.out
 	rm -f dfn.c dfn[12].out
 	mv dfn3.out $@
 
-symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/checksym.out
+# The .dfn file for pnglibconf.h is machine generated
+pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
+	rm -f $@ dfn?.out
+	$(AWK) -f ${srcdir}/scripts/options.awk pre=1 out=dfn1.out\
+	    ${srcdir}/scripts/pnglibconf.dfa 1>&2
+	$(AWK) -f ${srcdir}/scripts/options.awk pre=0 out=dfn2.out\
+	    dfn1.out 1>&2
+	rm dfn1.out
+	mv dfn2.out $@
+
+# Symbol checks (.def and .out files should match)
+scripts/pngwin.chk: scripts/checksym.awk scripts/pngwin.def scripts/pngwin.out
+scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.out
+.out.chk:
 	rm -f $@ symbols.new
-	$(AWK) -f ${srcdir}/scripts/checksym.awk ${srcdir}/scripts/symbols.def\
-	    scripts/checksym.out >&2
+	$(AWK) -f ${srcdir}/scripts/checksym.awk ${srcdir}/scripts/${*F}.def\
+	    $< >&2
 	mv symbols.new $@
 
-dist: symbols.chk
+# used on demand to regenerate the standard header, CPPFLAGS should
+# be empty - no non-standard defines
+scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
+	rm -f $@ dfn?.out
+	test -z "$(CPPFLAGS)" 
+	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
+	$(AWK) -f ${srcdir}/scripts/options.awk pre=1 out=dfn1.out\
+	    logunsupported=1 - ${srcdir}/scripts/pnglibconf.dfa 1>&2
+	$(AWK) -f ${srcdir}/scripts/options.awk pre=0 out=dfn2.out\
+	    logunsupported=1 dfn1.out 1>&2
+	rm dfn1.out
+	mv dfn2.out $@
 
-test: check
+$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h \
+	pnglibconf.h pngpriv.h pngdebug.h pnginfo.h pngstruct.h
+
+test: check-am
+
+# Extra checks
+check: scripts/symbols.chk scripts/pngwin.chk
+
+# Don't distribute the generated script files
+dist-hook:
+	cd '$(top_distdir)'; rm -f $(SCRIPT_CLEANFILES)
 
 # install the .../include headers as links to the new ones
 install-data-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h \
 		pngconf.h
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pnglibconf.h \
+		pnglibconf.h
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
@@ -1269,7 +1360,7 @@ install-exec-hook:
 	done
 
 uninstall-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
 	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
 	rm -f $(DESTDIR)$(bindir)/libpng-config
 	rm -f $(DESTDIR)$(libdir)/libpng.a

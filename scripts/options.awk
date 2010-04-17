@@ -251,7 +251,7 @@ $1 == "setting" && (NF == 2 || NF >= 3 && ($3 == "requires" || $3 == "default"))
 
 # The order of the dependency lines (option, chunk, setting) is irrelevant
 # - the 'enables', 'requires' and 'if' settings will be used to determine
-# the correct order in the output and the final values in pnglconf.h are
+# the correct order in the output and the final values in pnglibconf.h are
 # not order dependent.  'requires' and 'if' entries take precedence over
 # 'enables' from other options; if an option requires another option it
 # won't be set regardless of any options that enable it unless the other
@@ -306,7 +306,7 @@ $1 ~ /^@/{
 }
 
 # For checking purposes names that start with "ok_" or "fail_" are
-# not output to pnglconf.h and must be either enabled or disabled
+# not output to pnglibconf.h and must be either enabled or disabled
 # respectively for the build to succeed.  This allows interdependencies
 # between options of the form "at least one of" or "at most one of"
 # to be checked.  For example:
@@ -526,7 +526,7 @@ END{
 	    print "#     endif" >out
 	    print "#   endif /*!command line*/" >out
 	    # If PNG_on is still set the option should be defined in
-	    # pnglconf.h
+	    # pnglibconf.h
 	    print "#   ifdef PNG_on" >out
 	    if (i ~ /^fail_/)
 	        print error, i, "if" iffs[i], "requires" requires[i] end >out

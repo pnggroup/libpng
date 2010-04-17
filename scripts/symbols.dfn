@@ -11,8 +11,8 @@
 
 /* NOTE: making 'symbols.chk' checks both that the exported
  * symbols in the library don't change and (implicitly) that
- * scripts/pnglconf.h is as expected.  If scripts/pnglconf.h
- * is remade using scripts/pnglconf.dfa then this checks the
+ * scripts/pnglibconf.h is as expected.  If scripts/pnglibconf.h
+ * is remade using scripts/pnglibconf.dfa then this checks the
  * .dfa file too.
  */
 
@@ -23,18 +23,18 @@
 #define PNG_EXPORT_LAST_ORDINAL(ordinal)\
 	PNG_DEFN_MAGIC-; @ordinal-PNG_DEFN_END
 
-/* Read the defaults, but use scripts/pnglconf.h; the 'standard'
+/* Read the defaults, but use scripts/pnglibconf.h; the 'standard'
  * header file.
  */
-#include "pnglconf.h"
+#include "pnglibconf.h"
 #include "../png.h"
 
 /* Some things are turned off by default.  Turn these things
  * on here (by hand) to get the APIs they expose and validate
  * that no harm is done.  This list is the set of options
- * defaulted to 'off' in scripts/pnglconf.dfa
+ * defaulted to 'off' in scripts/pnglibconf.dfa
  *
- * Maintenance: if scripts/pnglconf.dfa options are changed
+ * Maintenance: if scripts/pnglibconf.dfa options are changed
  * from, or to, 'off' this needs updating!
  */
 #define PNG_BENIGN_ERRORS_SUPPORTED

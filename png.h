@@ -390,7 +390,7 @@
  * the library has been built.
  */
 #ifndef PNGLCONF_H
-#   include "pnglconf.h"
+#   include "pnglibconf.h"
 #endif
 
 #ifndef PNG_VERSION_INFO_ONLY
@@ -423,7 +423,7 @@
  * StringFileInfo block must contain a SpecialBuild string.
  */
 
-#ifdef PNG_USER_PRIVATEBUILD /* From pnglconf.h */
+#ifdef PNG_USER_PRIVATEBUILD /* From pnglibconf.h */
 #  define PNG_LIBPNG_BUILD_TYPE \
        (PNG_LIBPNG_BUILD_BASE_TYPE | PNG_LIBPNG_BUILD_PRIVATE)
 #else
@@ -450,7 +450,7 @@ extern "C" {
 /* This file is arranged in several sections:
  *
  * 1. Any configuration options that can be specified by for the application
- *    code when it is built.  (Build time configuration is in pnglconf.h)
+ *    code when it is built.  (Build time configuration is in pnglibconf.h)
  * 2. Type definitions (base types are defined in pngconf.h), structure
  *    definitions.
  * 3. Exported library functions.
@@ -459,11 +459,11 @@ extern "C" {
  * allow configuration of the library.
  */
 /* Section 1: run time configuration
- * See pnglconf.h for build time configuration
+ * See pnglibconf.h for build time configuration
  *
  * Run time configuration allows the application to choose between
  * implementations of certain arithmetic APIs.  The default is set
- * at build time and recorded in pnglconf.h, but it is safe to
+ * at build time and recorded in pnglibconf.h, but it is safe to
  * override these (and only these) settings.  Note that this won't
  * change what the library does, only application code, and the
  * settings can (and probably should) be made on a per-file basis

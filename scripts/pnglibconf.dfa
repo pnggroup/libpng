@@ -1,10 +1,10 @@
-# scripts/pnglconf.dfa - library build configuration control
+# scripts/pnglibconf.dfa - library build configuration control
 #
-@/*- pnglconf.dfn intermediate file
-@ *  generated from scripts/pnglconf.dfa
+@/*- pnglibconf.dfn intermediate file
+@ *  generated from scripts/pnglibconf.dfa
 @ */
 #
-com pnglconf.h - library build configuration
+com pnglibconf.h - library build configuration
 com
 com libpng version PNGLIB_VERSION - April 2, 2010
 com
@@ -14,13 +14,13 @@ com This code is released under the libpng license.
 com For conditions of distribution and use, see the disclaimer
 com and license in png.h
 com
-file pnglconf.h scripts/pnglconf.dfa PNGLCONF_H
+file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 
 # This file is preprocessed by scripts/options.awk and the
-# C compiler to generate 'pnglconf.h' - a list of all the
+# C compiler to generate 'pnglibconf.h' - a list of all the
 # configuration options.  The file lists the various options
 # that can *only* be specified during the libpng build;
-# pnglconf.h freezes the definitons selected for the specific
+# pnglibconf.h freezes the definitons selected for the specific
 # build.
 #
 # The syntax is detailed in scripts/options.awk, this is a summary
@@ -56,13 +56,13 @@ file pnglconf.h scripts/pnglconf.dfa PNGLCONF_H
 # detailed below and #define PNG_NO_<option> for each option you
 # don't want in that file in that file.  You can also turn on options
 # using PNG_<option>_SUPPORTED.  When you have finished rerun
-# configure and rebuild pnglconf.h file with -DPNG_USER_CONFIG:
+# configure and rebuild pnglibconf.h file with -DPNG_USER_CONFIG:
 # 
 #  make clean
 #  CPPFLAGS='-DPNG_USER_CONFIG' ./configure
-#  make pnglconf.h
+#  make pnglibconf.h
 #
-# pngusr.h is only used during the creation of pnglconf.h, but it
+# pngusr.h is only used during the creation of pnglibconf.h, but it
 # is safer to ensure that -DPNG_USER_CONFIG is specified throughout
 # the build by changing the CPPFLAGS passed to the initial ./configure
 #
@@ -89,9 +89,9 @@ file pnglconf.h scripts/pnglconf.dfa PNGLCONF_H
 #----------------------------------------------------------------------
 
 # PNG_USER_CONFIG has to be defined on the compiler command line
-# to cause pngusr.h to be read while constructing pnglconf.h
+# to cause pngusr.h to be read while constructing pnglibconf.h
 #
-# If this is set during the build 'pnglconf.h' will define
+# If this is set during the build 'pnglibconf.h' will define
 # PNG_USER_PRIVATEBUILD to the value that *must* be set by pngusr.h
 # and contain other definitions as below.
 #
@@ -119,7 +119,7 @@ file pnglconf.h scripts/pnglconf.dfa PNGLCONF_H
 @#endif
 
 # Note that PNG_USR_CONFIG only has an effect when building
-# pnglconf.h
+# pnglibconf.h
 setting USER_CONFIG requires USER_PRIVATEBUILD USER_DLLFNAME_POSTFIX
 setting USER_PRIVATEBUILD
 setting USER_DLLFNAME_POSTFIX
