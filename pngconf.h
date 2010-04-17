@@ -363,6 +363,9 @@
 /* The following uses const char * instead of char * for error
  * and warning message functions, so some compilers won't complain.
  * If you do not want to use const, define PNG_NO_CONST here.
+ *
+ * This should not change how the APIs are called, so it can be done
+ * on a per-file basis in the application.
  */
 #ifndef PNG_CONST
 #  ifndef PNG_NO_CONST

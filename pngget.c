@@ -290,7 +290,8 @@ png_get_y_offset_pixels(png_structp png_ptr, png_infop info_ptr)
    return (0);
 }
 
-#if defined(PNG_INCH_CONVERSIONS) && defined(PNG_FLOATING_POINT_SUPPORTED)
+#if defined(PNG_INCH_CONVERSIONS_SUPPORTED) && \
+    defined(PNG_FLOATING_POINT_SUPPORTED)
 png_uint_32 PNGAPI
 png_get_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
@@ -361,7 +362,7 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
    return (retval);
 }
 #endif /* PNG_pHYs_SUPPORTED */
-#endif  /* PNG_INCH_CONVERSIONS && PNG_FLOATING_POINT_SUPPORTED */
+#endif  /* PNG_INCH_CONVERSIONS_SUPPORTED && PNG_FLOATING_POINT_SUPPORTED */
 
 /* png_get_channels really belongs in here, too, but it's been around longer */
 

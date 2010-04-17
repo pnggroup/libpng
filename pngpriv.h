@@ -97,18 +97,18 @@
 
 /* Other defines for things like memory and the like can go here.  */
 
-/* This controls how fine the dithering gets.  As this allocates
+/* This controls how fine the quantizing gets.  As this allocates
  * a largish chunk of memory (32K), those who are not as concerned
- * with dithering quality can decrease some or all of these.
+ * with quantizing quality can decrease some or all of these.
  */
-#ifndef PNG_DITHER_RED_BITS
-#  define PNG_DITHER_RED_BITS 5
+#ifndef PNG_QUANTIZE_RED_BITS
+#  define PNG_QUANTIZE_RED_BITS 5
 #endif
-#ifndef PNG_DITHER_GREEN_BITS
-#  define PNG_DITHER_GREEN_BITS 5
+#ifndef PNG_QUANTIZE_GREEN_BITS
+#  define PNG_QUANTIZE_GREEN_BITS 5
 #endif
-#ifndef PNG_DITHER_BLUE_BITS
-#  define PNG_DITHER_BLUE_BITS 5
+#ifndef PNG_QUANTIZE_BLUE_BITS
+#  define PNG_QUANTIZE_BLUE_BITS 5
 #endif
 
 /* This controls how fine the gamma correction becomes when you

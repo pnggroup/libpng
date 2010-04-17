@@ -32,9 +32,13 @@
  */
 
 #include "png.h"
-
+/* Copied from pngpriv.h but only used in error messages below. */
+#ifndef PNG_ZBUF_SIZE
+#  define PNG_ZBUF_SIZE 8192
+#endif
 #  include <stdio.h>
 #  include <stdlib.h>
+#  include <string.h>
 #  define FCLOSE(file) fclose(file)
 
 #ifndef PNG_STDIO_SUPPORTED
