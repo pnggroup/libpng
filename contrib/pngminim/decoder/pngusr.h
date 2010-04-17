@@ -12,10 +12,6 @@
 #ifndef MINRDPNGCONF_H
 #define MINRDPNGCONF_H
 
-#ifdef NJET
-  /* No 16-bit support beyond reading with strip_16 */
-#endif
-
 #define PNG_NO_WARNINGS
 #define png_warning(s1,s2) ""
 #define png_chunk_warning(s1,s2) ""

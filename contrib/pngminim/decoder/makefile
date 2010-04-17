@@ -5,6 +5,8 @@
 CC=gcc
 LD=$(CC)
 AWK=awk
+SED=sed
+CPP=cpp
 
 RM=rm -f
 
@@ -39,6 +41,18 @@ pnglibconf.h: pnglibconf.mak pnglibconf.dfn
 
 # used on demand to regenerate the standard header, CPPFLAGS should
 # be empty - no non-standard defines
+
+.dfn.out:
+	rm -f $@ dfn.c dfn?.out
+	echo '#include "$<"' >dfn.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
+	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
+	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p'\
+	    dfn1.out >dfn2.out
+	$(SED) -e 's| *@@@ *||g' -e 's| *$$||' dfn2.out >dfn3.out
+	rm -f dfn.c dfn[12].out
+	mv dfn3.out $@
+
 pnglibconf.dfn: pnglibconf.dfa options.awk
 	rm -f $@ dfn?.out
 	test -z "$(CPPFLAGS)" 
