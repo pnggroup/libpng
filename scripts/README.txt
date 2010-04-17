@@ -1,6 +1,7 @@
 
 Makefiles for  libpng version 1.5.0beta17 - April 17, 2010
 
+pnglibconf.h       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng15.so.15.1.5.0beta17)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
@@ -52,11 +53,25 @@ Makefiles for  libpng version 1.5.0beta17 - April 17, 2010
                        (Requires SCOPTIONS, copied from scripts/SCOPTIONS.ppc)
 
 Other supporting scripts:
+ README.txt        =>  This file
  descrip.mms       =>  VMS makefile for MMS or MMK
  libpng-config-body.in => used by several makefiles to create libpng-config
  libpng-config-head.in => used by several makefiles to create libpng-config
  libpng.pc.in      =>  Used by several makefiles to create libpng.pc
  pngwin.rc         =>  Used by the visualc6 and visualc71 projects.
+ pngwin.def        =>  Used by makefile.os2
+ pngwin.dfn        =>  Used to maintain pngwin.def
  SCOPTIONS.ppc     =>  Used with smakefile.ppc
+
+checksym.awk       =>  Used for maintaining pnglibconf.h
+def.dfn            =>  Used for maintaining pnglibconf.h
+options.awk        =>  Used for maintaining pnglibconf.h
+pnglibconf.dfa     =>  Used for maintaining pnglibconf.h
+pnglibconf.mak     =>  Used for maintaining pnglibconf.h
+sym.dfn            =>  Used for symbol versioning
+symbols.def        =>  Used for symbol versioning
+symbols.dfn        =>  Used for symbol versioning
+vers.dfn           =>  Used for symbol versioning
+
 
 Further information can be found in comments in the individual makefiles.
