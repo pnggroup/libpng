@@ -46,14 +46,14 @@ CFG=libpng - Win32 DLL Release
 CPP=cl.exe
 # ADD BASE CPP /nologo /MD /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "ZLIB_DLL" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "..\..\scripts" /I "..\..\..\zlib" /D "NDEBUG" /D "ZLIB_DLL" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -77,14 +77,14 @@ LINK32=link.exe
 CPP=cl.exe
 # ADD BASE CPP /nologo /MDd /W3 /Gm /ZI /Od /D "_DEBUG" /FD /GZ /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /D "ZLIB_DLL" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\..\scripts" /I "..\..\..\zlib" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /D "ZLIB_DLL" /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG" /d PNG_DEBUG=1
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "_DEBUG" /d PNG_DEBUG=1
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -108,14 +108,14 @@ LINK32=link.exe
 CPP=cl.exe
 # ADD BASE CPP /nologo /MD /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /D "ZLIB_DLL" /D PNGAPI=__stdcall /D "PNG_NO_MODULEDEF" /D "PNG_LIBPNG_SPECIALBUILD" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "." /I "..\..\..\zlib" /D "NDEBUG" /D "ZLIB_DLL" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG" /dPNG_LIBPNG_DLLFNAME_POSTFIX=""""VB"""" /dPNG_LIBPNG_SPECIALBUILD=""""__stdcall calling convention used for exported functions""""
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /i "." /i "..\.." /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -144,11 +144,11 @@ PostBuild_Cmds=echo    Deleting $(targetname) import library and export file (No
 CPP=cl.exe
 # ADD BASE CPP /nologo /MD /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MD /W3 /O2 /I "..\.." /I "..\..\..\zlib" /D "NDEBUG" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "..\..\scripts" /I "..\..\..\zlib" /D "NDEBUG" /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
-# ADD RSC /l 0x409 /i "..\.." /d "PNG_NO_PEDANTIC_WARNINGS" /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\.." /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -171,11 +171,11 @@ LIB32=link.exe -lib
 CPP=cl.exe
 # ADD BASE CPP /nologo /MDd /W3 /Gm /ZI /Od /D "_DEBUG" /FD /GZ /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\.." /I "..\..\..\zlib" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\..\scripts" /I "..\..\..\zlib" /D "_DEBUG" /D "DEBUG" /D PNG_DEBUG=1 /FD /GZ /c
 # SUBTRACT CPP /YX /Yc /Yu
 RSC=rc.exe
-# ADD BASE RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG"
-# ADD RSC /l 0x409 /d "PNG_NO_PEDANTIC_WARNINGS" /d "_DEBUG"
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo

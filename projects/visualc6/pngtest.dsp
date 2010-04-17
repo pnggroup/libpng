@@ -45,7 +45,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /O2 /D "NDEBUG" /FD /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MD /W3 /O2 /I "..\..\..\zlib" /D "NDEBUG" /D "PNG_NO_STDIO" /FD /c
+# ADD CPP /nologo /MD /W3 /O2 /I "..\..\..\zlib" /D "NDEBUG" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -77,7 +77,7 @@ PostBuild_Cmds=set path=$(outdir);..\..\..\zlib\projects\visualc6\Win32_DLL_Rele
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /ZI /Od /D "_DEBUG" /FD /GZ /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\..\..\zlib" /D "_DEBUG" /D "PNG_NO_STDIO" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\..\..\zlib" /D "_DEBUG" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
