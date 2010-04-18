@@ -2644,7 +2644,7 @@ version 1.5.0beta17 [April 17, 2010]
     with libpng-1.5.0.
   Removed the ability to include optional pngusr.h
 
-version 1.5.0beta18 [April 17, 2010]
+version 1.5.0beta18 [April 18, 2010]
   Restored the ability to include optional pngusr.h
   Moved replacements for png_error() and png_warning() from the
     contrib/pngminim project to pngerror.c, for use when warnings or

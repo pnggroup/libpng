@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta18 - April 17, 2010
+Libpng 1.5.0beta18 - April 18, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -162,7 +162,7 @@ version 1.5.0beta17 [April 17, 2010]
   Removed the xcode project because it has not been updated to work
     with libpng-1.5.0.
 
-version 1.5.0beta18 [April 17, 2010]
+version 1.5.0beta18 [April 18, 2010]
   Restored the ability to include optional pngusr.h
   Moved replacements for png_error() and png_warning() from the
     contrib/pngminim project to pngerror.c, for use when warnings or

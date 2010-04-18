@@ -1,6 +1,6 @@
 /* minwrpngconf.h: headers to make a minimal png-write-only library
  *
- * Copyright (c) 2007, 2009 Glenn Randers-Pehrson
+ * Copyright (c) 2007, 2010 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
