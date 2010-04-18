@@ -60,6 +60,7 @@ EXPORTS
  png_set_invert_mono @46
  png_set_background @47
  png_set_strip_16 @48
+ png_set_quantize @49
  png_set_gamma @50
  png_set_flush @51
  png_write_flush @52
