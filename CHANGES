@@ -2644,7 +2644,7 @@ version 1.5.0beta17 [April 17, 2010]
     with libpng-1.5.0.
   Removed the ability to include optional pngusr.h
 
-version 1.5.0beta18 [April 18, 2010]
+version 1.5.0beta18 [April 17, 2010]
   Restored the ability to include optional pngusr.h
   Moved replacements for png_error() and png_warning() from the
     contrib/pngminim project to pngerror.c, for use when warnings or
@@ -2652,6 +2652,8 @@ version 1.5.0beta18 [April 18, 2010]
     storing unneeded error/warning text.
   Updated contrib/pngminim project to work with the new pnglibconf.h
   Added some PNG_NO_* defines to contrib/pngminim/*/pngusr.h to save space.
+
+version 1.5.0beta19 [April 18, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
