@@ -90,9 +90,9 @@
  * Microsoft and Borland C compilers ('IBM PC', 'DOS', 'Windows' systems
  * and some others) there are multiple ways to call a function and the
  * default can be changed on the compiler command line.  For this reason
- * libpng allows the calling convention of every exported function and
- * every function called via a user supplied function pointer to be
- * specified.  This is done by defining the following macros:
+ * libpng specifies the calling convention of every exported function and
+ * every function called via a user supplied function pointer.  This is
+ * done in this file by defining the following macros:
  *
  * PNGAPI    Calling convention for exported functions.
  * PNGCBAPI  Calling convention for user provided (callback) functions.
@@ -100,16 +100,19 @@
  *           for longjmp callbacks and sometimes used internally to
  *           specify the calling convention for zlib).
  *
+ * These macros should never be overridden.  If it is necessary to
+ * change calling convention in a private build this can be done
+ * by setting PNG_API_RULE (which defaults to 0) to one of the values
+ * below to select the correct 'API' variants.
  *
- * Two common cases are supported:
- *
- * PNG_API_RULE=0  Use the operating system convention for PNGAPI and
+ * PNG_API_RULE=0 Use PNGCAPI - the 'C' calling convention - throughout.
+ *                This is correct in every known environment.
+ * PNG_API_RULE=1 Use the operating system convention for PNGAPI and
  *                the 'C' calling convention (from PNGCAPI) for
- *                callbacks (PNGCBAPI).
- * PNG_API_RULE=1  Use PNGCAPI - the 'C' calling convention - throughout.
- *                This is correct on Cygwin implementations, assumed to
- *                be correct on MingW compilations and likely to work
- *                in C/C++ only environments everywhere else.
+ *                callbacks (PNGCBAPI).  This is no longer required
+ *                in any known environment - if it has to be used
+ *                please post an explanation of the problem to the
+ *                libpng mailing list.
  *
  * These cases only differ if the operating system does not use the C
  * calling convention, at present this just means the above cases
@@ -160,82 +163,66 @@
  * ==========================
  * This code is used at build time to find PNG_IMPEXP, the API settings
  * and PNG_EXPORT_TYPE(), it may also set a macro to indicate the DLL
- * import processing is possible.
- *
- * NOTE: this is poorly tested and may miss many cases, the default
- * (everything empty) is harmless unless the result is a DLL that is
- * intended to be distributed!
+ * import processing is possible.  On Windows/x86 systems it also sets
+ * compiler-specific macros to the values required to change the calling
+ * conventions of the various functions.
  */
-#if defined(__CYGWIN__)
-  /* Cygwin: force PNGCAPI to cdecl. */
-#  ifndef PNGCAPI
-#    define PNGCAPI __cdecl
-#  endif
-
-  /* Provide the appropriate defaults for exporting a symbol from
-   * the DLL and forcing import.  Always set these - the choice to
-   * use them is made below.
+#if ( defined(_Windows) || defined(_WINDOWS) || defined(WIN32) ||\
+      defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) ) &&\
+    ( defined(_X86_) || defined(_X64_) || defined(_M_IX86) ||\
+      defined(_M_X64) || defined(_M_IA64) )
+  /* Windows system (DOS doesn't support DLLs) running on x86/x64.
+   * Includes builds under Cygwin or MinGW.
    */
-#  ifndef PNG_DLL_EXPORT
-#    define PNG_DLL_EXPORT __declspec(dllexport)
-#  endif
-#  ifndef PNG_DLL_IMPORT
-#    define PNG_DLL_IMPORT __declspec(dllimport)
-#  endif
-
-#else /* !Cygwin */
-#  if ( defined(_Windows) || defined(_WINDOWS) || defined(WIN32) ||\
-        defined(_WIN32) || defined(__WIN32__) ) &&\
-      ( defined(_X86_) || defined(_X64_) || defined(_M_IX86) ||\
-        defined(_M_X64) || defined(_M_IA64) )
-    /* Windows system (DOS doesn't support DLLs) running on x86/x64 and
-     * not being built under Cygwin or by a MingW compiler.
+#  if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
+#    define PNGCAPI __cdecl
+#    if PNG_API_RULE == 1
+#      define PNGAPI __stdcall
+#    endif
+#  else
+    /* An older compiler, or one not detected (erroneously) above,
+     * if necessary override on the command line to get the correct
+     * variants for the compiler.
      */
-#    if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
-#      ifndef PNGCAPI
-#        define PNGCAPI __cdecl
-#      endif
-#      if PNG_API_RULE == 0 && !defined(PNGAPI)
-#        define PNGAPI __stdcall
-#      endif
-#    else
-      /* An older compiler, or one not detected (erroneously) above. */
-#      ifndef PNGCAPI
-#        define PNGCAPI _cdecl
-#      endif
-#      if PNG_API_RULE == 0 && !defined(PNGAPI)
-#        define PNGAPI _stdcall
-#      endif
-#    endif /* compiler/api */
-    /* NOTE: PNGCBAPI always defaults to PNGCAPI. */
+#    ifndef PNGCAPI
+#      define PNGCAPI _cdecl
+#    endif
+#    if PNG_API_RULE == 1 && !defined(PNGAPI)
+#      define PNGAPI _stdcall
+#    endif
+#  endif /* compiler/api */
+  /* NOTE: PNGCBAPI always defaults to PNGCAPI. */
 
-#    if (defined(_MSC_VER) && _MSC_VER < 800) ||\
-        (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
-      /* older Borland and MSC
-       * compilers used '__export' and required this to be after
-       * the type.
-       */
-#      ifndef PNG_EXPORT_TYPE
-#        define PNG_EXPORT_TYPE(type) type PNG_IMPEXP
-#      endif
-#      define PNG_DLL_EXPORT __export
-#    else /* newer compiler */
-#      define PNG_DLL_EXPORT __declspec(dllexport)
-#      ifndef PNG_DLL_IMPORT
-#        define PNG_DLL_IMPORT __declspec(dllimport)
-#      endif
-#    endif /* compiler */
+#  if defined(PNGAPI) && !defined(PNG_USER_PRIVATEBUILD)
+   ERROR: PNG_USER_PRIVATEBUILD must be defined if PNGAPI is changed
+#  endif
 
-#  else /* !Cygwin && !Windows/x86 */
-#    if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
-#      ifndef PNGAPI
-#        define PNGAPI _System
-#      endif
-#    else /* !Cygwin && !Windows/x86 && !OS/2 */
-      /* Use the defaults */
-#    endif /* other system, !OS/2 */
-#  endif /* !Windows/x86 */
-#endif /* !Cygwin */
+#  if (defined(_MSC_VER) && _MSC_VER < 800) ||\
+      (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
+    /* older Borland and MSC
+     * compilers used '__export' and required this to be after
+     * the type.
+     */
+#    ifndef PNG_EXPORT_TYPE
+#      define PNG_EXPORT_TYPE(type) type PNG_IMPEXP
+#    endif
+#    define PNG_DLL_EXPORT __export
+#  else /* newer compiler */
+#    define PNG_DLL_EXPORT __declspec(dllexport)
+#    ifndef PNG_DLL_IMPORT
+#      define PNG_DLL_IMPORT __declspec(dllimport)
+#    endif
+#  endif /* compiler */
+
+#else /* !Windows/x86 */
+#  if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
+#    define PNGAPI _System
+#  else /* !Windows/x86 && !OS/2 */
+    /* Use the defaults, or define PNG*API on the command line (but
+     * this will have to be done for every compile!)
+     */
+#  endif /* other system, !OS/2 */
+#endif /* !Windows/x86 */
 
 /* Now do all the defaulting . */
 #ifndef PNGCAPI

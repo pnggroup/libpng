@@ -1,6 +1,7 @@
+/* 1.5.0beta19 STANDARD API DEFINITION */
 /* pnglibconf.h - library build configuration */
 
-/* libpng version 1.5.0beta17 - April 2, 2010 */
+/* libpng version 1.5.0beta19 - April 2, 2010 */
 
 /* Copyright (c) 1998-2010 Glenn Randers-Pehrson */
 
@@ -8,17 +9,12 @@
 /* For conditions of distribution and use, see the disclaimer */
 /* and license in png.h */
 
-/* This file generates a libpng library with no STDIO support,
- * it is provided to allow generation of a DLL suitable for use
- * with Visual Basic and for no other purpose.
- */
+/* pnglibconf.h */
 /* Machine generated file: DO NOT EDIT */
-/* Derived from: scripts/pnglibconf.dfa with PNG_NO_STDIO */
+/* Derived from: scripts/pnglibconf.dfa */
 #ifndef PNGLCONF_H
 #define PNGLCONF_H
 /* settings */
-#define PNG_USER_PRIVATEBUILD "libpng DLL for use with Visual Basic"
-#define PNG_USER_DLLFNAME_POSTFIX "VB"
 #define PNG_CALLOC_SUPPORTED
 #define PNG_USER_WIDTH_MAX 1000000L
 #define PNG_API_RULE 0
@@ -36,17 +32,23 @@
 #define PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
 #define PNG_USER_LIMITS_SUPPORTED
 #define PNG_FIXED_POINT_SUPPORTED
+/*#undef PNG_ERROR_NUMBERS_SUPPORTED*/
 #define PNG_ERROR_TEXT_SUPPORTED
 #define PNG_READ_SUPPORTED
+/*#undef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED*/
+/*#undef PNG_BENIGN_ERRORS_SUPPORTED*/
 #define PNG_SETJMP_SUPPORTED
 #define PNG_WRITE_FLUSH_SUPPORTED
 #define PNG_MNG_FEATURES_SUPPORTED
 #define PNG_FLOATING_POINT_SUPPORTED
+/*#undef PNG_INCH_CONVERSIONS_SUPPORTED*/
+#define PNG_STDIO_SUPPORTED
 #define PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 #define PNG_USER_MEM_SUPPORTED
 #define PNG_IO_STATE_SUPPORTED
 #define PNG_SET_USER_LIMITS_SUPPORTED
 #define PNG_READ_ANCILLARY_CHUNKS_SUPPORTED
+#define PNG_WRITE_INT_FUNCTIONS_SUPPORTED
 #define PNG_WRITE_ANCILLARY_CHUNKS_SUPPORTED
 #define PNG_WRITE_FILTER_SUPPORTED
 #define PNG_SET_CHUNK_CACHE_LIMIT_SUPPORTED
@@ -83,6 +85,7 @@
 #define PNG_READ_SHIFT_SUPPORTED
 #define PNG_CONVERT_tIME_SUPPORTED
 #define PNG_READ_USER_TRANSFORM_SUPPORTED
+#define PNG_READ_INT_FUNCTIONS_SUPPORTED
 #define PNG_READ_USER_CHUNKS_SUPPORTED
 #define PNG_READ_hIST_SUPPORTED
 #define PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
@@ -90,6 +93,7 @@
 #define PNG_READ_COMPOSITE_NODIV_SUPPORTED
 #define PNG_SEQUENTIAL_READ_SUPPORTED
 #define PNG_READ_BACKGROUND_SUPPORTED
+#define PNG_READ_QUANTIZE_SUPPORTED
 #define PNG_READ_iCCP_SUPPORTED
 #define PNG_READ_STRIP_ALPHA_SUPPORTED
 #define PNG_READ_PACKSWAP_SUPPORTED
@@ -103,9 +107,11 @@
 #define PNG_READ_tIME_SUPPORTED
 #define PNG_READ_pHYs_SUPPORTED
 #define PNG_WRITE_SWAP_ALPHA_SUPPORTED
+#define PNG_TIME_RFC1123_SUPPORTED
 #define PNG_READ_TEXT_SUPPORTED
 #define PNG_WRITE_BGR_SUPPORTED
 #define PNG_USER_CHUNKS_SUPPORTED
+#define PNG_CONSOLE_IO_SUPPORTED
 #define PNG_GET_INT_32_SUPPORTED
 #define PNG_WRITE_PACK_SUPPORTED
 #define PNG_READ_FILLER_SUPPORTED

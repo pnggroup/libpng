@@ -6,10 +6,6 @@ This code is released under the libpng license.
 For conditions of distribution and use, see copyright notice in png.h
 
 Changes in libpng 15:
-* The standard calling convention (used in all builds) is __stdcall for
-  libpng exported functions and __cdecl for function callbacks.
-  Consequently the VB configuration is no longer required but is provided
-  in libpng15vb.dll for backward compatibility.
 * The DEF file is no longer required, the DLLs link by name.  A standard
   DEF file, pngwin.def, is included in the distribution for applications
   that require link by number (ordinal), builds that require link by
@@ -18,9 +14,14 @@ Changes in libpng 15:
 Assumptions:
 * The libpng source files are in ..\..
 * The zlib source files are in ..\..\..\zlib
-* The zlib project file is in . /* Warning: This is until the zlib project
-  files get intergrated into the next zlib release. The final zlib project
-  directory will then be ..\..\..\zlib\projects\visualc71. */
+  The source files must be from zlib version 1.2.3 - this project file
+  will not work with any other version.
+* The zlib project file is in .
+
+You may delete the zlib project from the solution and use the official
+zlib build instead - take care to link against either zlib.lib or zdll.lib
+as appropriate.  You must do this if you want to use a version of zlib other
+than zlib-1.2.3!
 
 To use:
 
@@ -46,7 +47,7 @@ This project builds the libpng binaries as follows:
 
 * Win32_DLL_Release\libpng15.dll      DLL build
 * Win32_DLL_Debug\libpng15d.dll       DLL build (debug version)
-* Win32_DLL_VB\libpng15vb.dll         DLL build for Visual Basic, using stdcall
+* Win32_DLL_VB\libpng15vb.dll         DLL build for Visual Basic (no stdio)
 * Win32_LIB_Release\libpng.lib        static build
 * Win32_LIB_Debug\libpngd.lib         static build (debug version)
 

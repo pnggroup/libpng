@@ -2660,6 +2660,11 @@ version 1.5.0beta19 [April 24, 2010]
     is to use the macros - this allows applications to choose at app build
     time whether or not to use macros (previously impossible because the
     functions weren't in the default build.)
+  Changed Windows calling convention back to __cdecl for API functions.
+    For Windows/x86 platforms only:
+      __stdcall is no longer needed for Visual Basic, so libpng-1.5.0 uses
+      __cdecl throughout (both API functions and callbacks) on Windows/x86
+      platforms.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
