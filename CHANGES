@@ -2667,6 +2667,8 @@ version 1.5.0beta19 [April 24, 2010]
       platforms.
   Replaced visualc6 and visualc71 projects with new vstudio project 
 
+version 1.5.0beta20 [April 24, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
