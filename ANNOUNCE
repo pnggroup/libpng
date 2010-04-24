@@ -186,6 +186,7 @@ version 1.5.0beta19 [April 24, 2010]
   Replaced visualc6 and visualc71 projects with new vstudio project 
 
 version 1.5.0beta20 [April 24, 2010]
+  Changed the overly-restrictive permissions of some files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
