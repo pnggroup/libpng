@@ -338,14 +338,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 EXTRA_DIST = \
 	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/projects/visualc6/* \
-	${srcdir}/projects/visualc71/* \
-	${srcdir}/scripts/* \
-	${srcdir}/contrib/gregbook/* \
-	${srcdir}/contrib/pngminim/* \
-	${srcdir}/contrib/pngminus/* \
-	${srcdir}/contrib/pngsuite/* \
-	${srcdir}/contrib/visupng/* \
+	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
 	$(TESTS) \
 	CMakeLists.txt example.c libpng-@PNGLIB_VERSION@.txt
 
