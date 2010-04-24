@@ -2653,7 +2653,13 @@ version 1.5.0beta18 [April 17, 2010]
   Updated contrib/pngminim project to work with the new pnglibconf.h
   Added some PNG_NO_* defines to contrib/pngminim/*/pngusr.h to save space.
 
-version 1.5.0beta19 [April 18, 2010]
+version 1.5.0beta19 [April 24, 2010]
+  Added PNG_{READ,WRITE}_INT_FUNCTIONS_SUPPORTED.  This allows the functions
+    to read and write ints to be disabled independently of PNG_USE_READ_MACROS,
+    which allows libpng to be built with the functions even though the default
+    is to use the macros - this allows applications to choose at app build
+    time whether or not to use macros (previously impossible because the
+    functions weren't in the default build.)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta19 - April 18, 2010
+ * libpng version 1.5.0beta19 - April 24, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -41,8 +41,12 @@
 /* This controls optimization of the reading of 16 and 32 bit values
  * from PNG files.  It can be set on a per-app-file basis - it
  * just changes whether a macro is used to the function is called.
- * The library builder sets the default.
+ * The library builder sets the default, if read functions are not
+ * built into the library the macro implementation is forced on.
  */
+#ifndef PNG_READ_INT_FUNCTIONS_SUPPORTED
+#  define PNG_USE_READ_MACROS
+#endif
 #if !defined(PNG_NO_USE_READ_MACROS) && !defined(PNG_USE_READ_MACROS)
 #  if PNG_DEFAULT_READ_MACROS
 #    define PNG_USE_READ_MACROS

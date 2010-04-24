@@ -137,6 +137,18 @@ setting API_RULE default 0
 # Default to using the read macros
 setting DEFAULT_READ_MACROS default 1
 
+# The alternative is to call functions to read PNG values, if
+# the functions are turned *off* the read macros must always
+# be enabled, so turning this off will actually force the
+# USE_READ_MACROS option on (see pngconf.h)
+option READ_INT_FUNCTIONS requires READ
+
+# The same for write, but these can only be switched off if
+# no writing is required at all - hence the use of an 'enables'
+# not a 'requires' below:
+option WRITE_INT_FUNCTIONS off
+option WRITE enables WRITE_INT_FUNCTIONS
+
 # Generic options - affect both read and write.
 option BENIGN_ERRORS off
 option MNG_FEATURES
@@ -361,7 +373,7 @@ option WRITE_UNKNOWN_CHUNKS requires WRITE
 
 option HANDLE_AS_UNKNOWN
 
-option GET_INT_32 requires READ
+option GET_INT_32 requires READ READ_INT_FUNCTIONS
 # png_get_int_32 is required by the ancillary chunks oFFs and pCAL
 option READ_oFFs enables GET_INT_32
 option READ_pCAL enables GET_INT_32
