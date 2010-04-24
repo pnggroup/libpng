@@ -2666,9 +2666,10 @@ version 1.5.0beta19 [April 24, 2010]
       __cdecl throughout (both API functions and callbacks) on Windows/x86
       platforms.
   Replaced visualc6 and visualc71 projects with new vstudio project 
+  Relaxed the overly-restrictive permissions of some files.
 
 version 1.5.0beta20 [April 24, 2010]
-  Relaxed the overly-restrictive permissions of some files.
+  Relaxed more overly-restrictive permissions of some files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
