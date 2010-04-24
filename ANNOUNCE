@@ -1,5 +1,5 @@
 
-Libpng 1.4.2rc03 - April 16, 2010
+Libpng 1.4.2rc03 - April 24, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -33,15 +33,16 @@ version 1.4.2beta01 [April 1, 2010]
 version 1.4.2rc01 [April 10, 2010]
   No changes.
 
-version 1.4.2rc02 [April 16, 2010]
+version 1.4.2rc02 [April 24, 2010]
   Documented the fact that png_set_dither() was disabled since libpng-1.4.0.
   Reenabled png_set_dither() but renamed it to png_set_quantize() to reflect
     more accurately what it actually does.  At the same time, renamed
     the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros to
     PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
 
-version 1.4.2rc03 [April 16, 2010]
+version 1.4.2rc03 [April 24, 2010]
   Added some "(long)" typecasts to printf calls in png_handle_cHRM().
+  Relaxed the overly-restrictive permissions of some files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
