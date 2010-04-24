@@ -2665,6 +2665,7 @@ version 1.5.0beta19 [April 24, 2010]
       __stdcall is no longer needed for Visual Basic, so libpng-1.5.0 uses
       __cdecl throughout (both API functions and callbacks) on Windows/x86
       platforms.
+  Replaced visualc6 and visualc71 projects with new vstudio project 
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
