@@ -1,7 +1,7 @@
 
 VisualStudio instructions
 
-libpng version 1.5.0beta19 - April 20, 2010
+libpng version 1.5.0beta21 - April 25, 2010
 
 Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -9,7 +9,7 @@ This code is released under the libpng license.
 For conditions of distribution and use, see the disclaimer
 and license in png.h
 
-This diretory  contains support for building libpng under MicroSoft
+This directory  contains support for building libpng under MicroSoft
 VisualStudio 2010.  It may also work under later versions of VisualStudio.
 You should be familiar with VisualStudio before using this directory.
 

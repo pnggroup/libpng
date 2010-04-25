@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version PNGLIB_VERSION - April 2, 2010
+com libpng version PNGLIB_VERSION - last changed on April 25, 2010
 com
 com Copyright (c) 1998-2010 Glenn Randers-Pehrson
 com

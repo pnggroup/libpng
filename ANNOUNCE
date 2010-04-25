@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta20 - April 24, 2010
+Libpng 1.5.0beta21 - April 25, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta20.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta20.tar.gz
-   1.5.0beta20.tar.bz2
+   1.5.0beta21.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta21.tar.gz
+   1.5.0beta21.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b20.zip
-   lp150b20.7z
+   lp150b21.zip
+   lp150b21.7z
 
 Other information:
 
-   1.5.0beta20-README.txt
-   1.5.0beta20-LICENSE.txt
+   1.5.0beta21-README.txt
+   1.5.0beta21-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -188,6 +188,9 @@ version 1.5.0beta19 [April 24, 2010]
 
 version 1.5.0beta20 [April 24, 2010]
   Relaxed more overly-restrictive permissions of some files.
+
+version 1.5.0beta21 [April 25, 2010]
+  Trivial editing; changed CRLF to NEWLINE in the new vstudio project files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

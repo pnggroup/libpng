@@ -2671,6 +2671,9 @@ version 1.5.0beta19 [April 24, 2010]
 version 1.5.0beta20 [April 24, 2010]
   Relaxed more overly-restrictive permissions of some files.
 
+version 1.5.0beta21 [April 25, 2010]
+  Trivial editing; changed CRLF to NEWLINE in the new vstudio project files.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
