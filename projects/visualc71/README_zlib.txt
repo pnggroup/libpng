@@ -10,6 +10,8 @@ Copyright (C) 2004 Cosmin Truta.
 This code is released under the libpng license.
 For conditions of distribution and use, see copyright notice in zlib.h.
 
+NOTE: This project will be removed from libpng-1.5.0.  It has
+been replaced with the "vstudio" project.
 
 To use:
 
