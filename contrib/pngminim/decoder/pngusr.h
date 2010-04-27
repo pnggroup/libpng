@@ -23,6 +23,7 @@
 #define png_error(s1,s2) png_err(s1)
 #define png_chunk_error(s1,s2) png_err(s1)
 
+#define PNG_NO_READ_BGR
 #define PNG_NO_READ_GAMMA
 #define PNG_NO_READ_BACKGROUND
 #define PNG_NO_READ_QUANTIZE
@@ -59,6 +60,7 @@
 #define PNG_NO_WRITE_SUPPORTED
 
 #define PNG_NO_INFO_IMAGE
+#define PNG_NO_IO_STATE
 #define PNG_NO_USER_MEM
 #define PNG_NO_FIXED_POINT_SUPPORTED
 #define PNG_NO_MNG_FEATURES
@@ -71,5 +73,7 @@
 #define PNG_NO_PROGRESSIVE_READ
 #define PNG_NO_USER_LIMITS
 #define PNG_NO_SET_USER_LIMITS
+#define PNG_NO_TIME_RFC1123
 
 #endif /* MINRDPNGCONF_H */
+
