@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.4.2 [April 24, 2010]
+ * Last changed in libpng 1.4.2 [April 27, 2010]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2010 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -687,8 +687,11 @@ void write_png(char *file_name /* , ... other image information ... */)
    text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
 #ifdef PNG_iTXt_SUPPORTED
    text_ptr[0].lang = NULL;
+   text_ptr[0].lang_key = NULL;
    text_ptr[1].lang = NULL;
+   text_ptr[1].lang_key = NULL;
    text_ptr[2].lang = NULL;
+   text_ptr[2].lang_key = NULL;
 #endif
    png_set_text(png_ptr, info_ptr, text_ptr, 3);
 

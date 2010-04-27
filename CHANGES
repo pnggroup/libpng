@@ -2559,7 +2559,7 @@ version 1.4.2rc04 [April 27, 2010]
   Added the "vstudio" project to replace "visualc6" and "visualc71" which
     will be removed from libpng-1.5.0.
   Demonstrate in example.c that lang_key should be initialized.
-  Set PNG_NO_READ_BGR, PNG_NO_IO_STATE, and PNG_NO_TIME_RFC1143 in
+  Set PNG_NO_READ_BGR, PNG_NO_IO_STATE, and PNG_NO_TIME_RFC1123 in
     contrib/pngminim/decoder/pngusr.h to make a smaller decoder application.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
