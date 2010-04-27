@@ -2671,10 +2671,12 @@ version 1.5.0beta19 [April 24, 2010]
 version 1.5.0beta20 [April 24, 2010]
   Relaxed more overly-restrictive permissions of some files.
 
-version 1.5.0beta21 [April 25, 2010]
+version 1.5.0beta21 [April 27, 2010]
   Removed some unwanted binary bytes and changed CRLF to NEWLINE in the new
     vstudio project files, and some trivial editing of some files in the
     scripts directory.
+  Set PNG_NO_READ_BGR, PNG_NO_IO_STATE, and PNG_NO_TIME_RFC1123 in
+    contrib/pngminim/decoder/pngusr.h to make a smaller decoder application.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
