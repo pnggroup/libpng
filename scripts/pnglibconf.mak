@@ -12,11 +12,15 @@ CPP = $(CC) -E
 COPY = cp
 DELETE = rm -f
 ECHO = echo
+DFA_XTRA = # Appended to scripts/options.awk
 
 # CPPFLAGS should contain the options to control the result,
 # but DEFS and CFLAGS are also supported here, override
 # as appropriate
 DFNFLAGS = $(DEFS) $(CPPFLAGS) $(CFLAGS)
+
+# srcdir is a defacto standard for the location of the source
+srcdir = .
 
 # The standard pnglibconf.h exists as scripts/pnglibconf.h,
 # copy this if the following doesn't work.
@@ -30,11 +34,11 @@ pnglibconf.h: pnglibconf.dfn
 	$(COPY) dfn3.out $@
 	$(DELETE) dfn.c dfn1.out dfn2.out dfn3.out
 
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
+pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk
 	$(DELETE) $@ dfn1.out dfn2.out
-	$(AWK) -f scripts/options.awk pre=1 out=dfn1.out\
-	    scripts/pnglibconf.dfa 1>&2
-	$(AWK) -f scripts/options.awk pre=0 out=dfn2.out dfn1.out 1>&2
+	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn1.out\
+	    $(srcdir)/scripts/pnglibconf.dfa $(DFA_XTRA) 1>&2
+	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	$(COPY) dfn2.out $@
 	$(DELETE) dfn1.out dfn2.out
 

@@ -2681,6 +2681,7 @@ version 1.5.0beta21 [April 27, 2010]
 version 1.5.0beta22 [April 28, 2010]
   Fixed dependencies of GET_INT_32 - it does not require READ_INT_FUNCTIONS
     because it has a macro equivalent.
+  Improved the options.awk script; added an "everything off" option.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

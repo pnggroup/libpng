@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version PNGLIB_VERSION - last changed on April 27, 2010
+com libpng version PNGLIB_VERSION - last changed on April 28, 2010
 com
 com Copyright (c) 1998-2010 Glenn Randers-Pehrson
 com
@@ -28,11 +28,15 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 #
 # setting <name> [requires ...] [default]
 #    #define PNG_<name> <value>  /* value comes from current setting */
-# option <name> [requires ...] [if ...] [enables ...] [on|off]
+# option <name> [requires ...] [if ...] [enables ...] [disabled]
 #    #define PNG_<name>_SUPPORTED if the requirements are met and
 #    enable the other options listed
-# chunk <name> [requires ...] [on|off]
+# chunk <name> [requires ...] [disabled]
 #    Enable chunk processing for the given ancillary chunk
+#
+# Note that the 'on' and 'off' keywords, while valid on both option
+# and chunk, should not be used in this file because they force the
+# relevant options on or off.
 
 #----------------------------------------------------------------------
 
@@ -50,7 +54,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 #   decoding but does change the libpng API because some chunks
 #   will be ignored.
 #
-# There are three ways of disabling features, in order of correctness:
+# There are three ways of disabling features, in no particular order:
 #
 # 1) Create 'pngusr.h', enter the required private build information
 # detailed below and #define PNG_NO_<option> for each option you
@@ -81,11 +85,18 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # can also change settings from pngpriv.h (read pngpriv.h) safely
 # without API changes.  Do that in the same way.
 #
-# 3) Edit this file and add 'off' to the end of every option you
-# don't want enabled, make other changes as required.  Only do
-# this if you are proposing a permanent change to the PNG API
-# or ABI.  Do *not* release the result, under any circumstances.
-
+# 3) Write a new '.dfa' file (say 'pngusr.dfa') and in this file
+# provide override values for setting entries and turn option or
+# chunk values explicitly 'on' or 'off':
+#
+#    setting FOO default VALUE
+#    option BAR [on|off]
+#
+# Then add this file to the options.awk command line (the *first*
+# one) after this file.
+#
+# Don't edit this file unless you are contributing a patch to
+# libpng and need new or modified options/settings.
 #----------------------------------------------------------------------
 
 # PNG_USER_CONFIG has to be defined on the compiler command line
@@ -146,11 +157,11 @@ option READ_INT_FUNCTIONS requires READ
 # The same for write, but these can only be switched off if
 # no writing is required at all - hence the use of an 'enables'
 # not a 'requires' below:
-option WRITE_INT_FUNCTIONS off
+option WRITE_INT_FUNCTIONS disabled
 option WRITE enables WRITE_INT_FUNCTIONS
 
 # Generic options - affect both read and write.
-option BENIGN_ERRORS off
+option BENIGN_ERRORS disabled
 option MNG_FEATURES
 option FLOATING_POINT enables ok_math
 option FIXED_POINT enables ok_math
@@ -181,7 +192,7 @@ option SETJMP
 = NO_SETJMP SETJMP_NOT_SUPPORTED
 
 # For the moment this is disabled (no code support):
-option ERROR_NUMBERS off
+option ERROR_NUMBERS disabled
 
 # If this is disabled it is not possible for apps to get the
 # values from the 'info' structure, this effectively removes
@@ -197,7 +208,7 @@ option IO_STATE
 # This is only for PowerPC big-endian and 680x0 systems
 # some testing, not enabled by default.
 # NO LONGER USED
-#option READ_BIG_ENDIAN off
+#option READ_BIG_ENDIAN disabled
 
 # Allow users to control limits on what the READ code will
 # read:
@@ -250,7 +261,7 @@ option READ_INVERT requires READ_TRANSFORMS
 option READ_BACKGROUND requires READ_TRANSFORMS
 option READ_16_TO_8 requires READ_TRANSFORMS
 option READ_FILLER requires READ_TRANSFORMS
-option READ_GAMMA requires READ_TRANSFORMS
+option READ_GAMMA requires READ_TRANSFORMS enables READ_gAMA
 option READ_GRAY_TO_RGB requires READ_TRANSFORMS
 option READ_SWAP_ALPHA requires READ_TRANSFORMS
 option READ_INVERT_ALPHA requires READ_TRANSFORMS
@@ -272,14 +283,14 @@ option READ_COMPOSITE_NODIV requires READ
 = NO_READ_COMPOSITE_NODIV PNG_NO_READ_COMPOSITED_NODIV
 
 # Inch conversions: not switched on by default
-option INCH_CONVERSIONS requires FLOATING_POINT off
+option INCH_CONVERSIONS requires FLOATING_POINT disabled
 = INCH_CONVERSIONS PNG_INCH_CONVERSIONS
 
 # IN DEVELOPMENT
 # These are currently experimental features, define them if you want
 
 # Very little testing, not enabled by default.
-option READ_16_TO_8_ACCURATE_SCALE requires READ off
+option READ_16_TO_8_ACCURATE_SCALE requires READ disabled
 
 # WRITE options
 option WRITE
@@ -373,7 +384,7 @@ option WRITE_UNKNOWN_CHUNKS requires WRITE
 
 option HANDLE_AS_UNKNOWN
 
-option GET_INT_32 requires READ READ_INT_FUNCTIONS
+option GET_INT_32 requires READ
 # png_get_int_32 is required by the ancillary chunks oFFs and pCAL
 option READ_oFFs enables GET_INT_32
 option READ_pCAL enables GET_INT_32

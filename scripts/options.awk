@@ -1,7 +1,7 @@
 #!/bin/awk -f
 # scripts/options.awk - library build configuration control
 #
-# last changed in libpng version 1.5.0 - April 27, 2010
+# last changed in libpng version 1.5.0 - April 28, 2010
 #
 # Copyright (c) 1998-2010 Glenn Randers-Pehrson
 #
@@ -12,16 +12,25 @@
 # The output of this script is written to the file given by
 # the variable 'out'.  The script is run twice, once with
 # an intermediate output file, 'options.tmp' then again on
-# that file to produce the final output.  Each time the
-# output files and whether or not to pre-prrocess must be
-# specified:
+# that file to produce the final output:
 #
-#  awk -f scripts/options.awk pre=1 out=options.tmp scripts/options.dat 1>&2
-#  awk -f scripts/options.awk pre=0 out=options.dfn options.tmp 1>&2
+#  awk -f scripts/options.awk out=options.tmp scripts/options.dfa 1>&2
+#  awk -f scripts/options.awk out=options.dfn options.tmp 1>&2
+#
+# Some options may be specified on the command line:
+#
+#   deb=1            Causes debugging to be output
+#   logunsupported=1 Causes all options to be recorded in the output
+#   everything=off   Causes all options to be disabled by default
+#   everything=on    Causes all options to be enabled by default
+#
+# These options may also be specified in the original input file (and
+# are copied to the preprocessed file).
 
 BEGIN{
     out="/dev/null"                      # intermediate, preprocessed, file
-    pre=-1                               # preprocess
+    pre=-1                               # preprocess (first line)
+    err=0                                # in-line exit sets this
     start="PNG_DEFN_MAGIC-"              # Arbitrary start
     end="-PNG_DEFN_END"                  # Arbitrary end
     cx= "/@@@*"                          # Open C comment for output file
@@ -32,11 +41,14 @@ BEGIN{
     und=comment "#undef PNG_@@@"         # Unsupported option
     une="@@@_SUPPORTED" cend             # end unsupported option
     error=start "ERROR:"                 # error message
+
+    # Variables
     deb=0                                # debug - set on command line
+    everything=""                        # do not override defaults
     logunsupported=0                     # write unsupported options too
     
     # Precreate arrays
-    option[""] = ""      # list of all options: default on/off/""
+    option[""] = ""      # list of all options: default enabled/disabled
     done[""] = 1         # marks option as having been output
     requires[""] = ""    # requires by option
     iffs[""] = ""        # if by option
@@ -48,6 +60,27 @@ BEGIN{
 
     # For decorating the output file
     protect = ""
+}
+
+# The output file must be specified before any input:
+out == "/dev/null" {
+    print "out=output.file must be given on the command line"
+    err = 1
+    exit 1
+}
+
+# The very first line indicates whether we are reading pre-processed
+# input or not, this must come *first* because 'PREPROCESSED' needs
+# to be the very first line in the temporary file.
+pre == -1{
+    if ($0 == "PREPROCESSED") {
+	pre = 0
+	next
+    } else {
+    	pre = 1
+	print "PREPROCESSED" >out
+	# And fall through to continue processing
+    }
 }
 
 # Preprocessing - this just copies the input file with lines
@@ -116,23 +149,66 @@ $1 == "file" && NF >= 2{
     next
 }
 
-# option NAME ( (requires|enables|if) NAME* | on | off )*
-#   Declares an option 'NAME' and describes its default setting (on|off)
+# variable=value
+#   Sets the given variable to the given value (the syntax is fairly
+#   free form, except for deb (you are expected to understand how to
+#   set the debug variable...)
+$0 ~ /^[ 	]*everything[ 	=]*off[ 	]*$/{
+    everything = "off"
+    next
+}
+$0 ~ /^[ 	]*everything[ 	=]*on[ 	]*$/{
+    everything = "on"
+    next
+}
+$0 ~ /^[ 	]*logunsupported[ 	=]*0[ 	]*$/{
+    logunsupported = 0
+    next
+}
+$0 ~ /^[ 	]*logunsupported[ 	=]*1[ 	]*$/{
+    logunsupported = 1
+    next
+}
+$1 == "deb" && $2 == "=" && NF == 3{
+    deb = $3
+    next
+}
+
+# option NAME ( (requires|enables|if) NAME* | on | off | disabled )*
+#   Declares an option 'NAME' and describes its default setting (disabled)
 #   and its relationship to other options.  The option is disabled
 #   unless *all* the options listed after 'requires' are set and at
 #   least one of the options listed after 'if' is set.  If the
 #   option is set then it turns on all the options listed after 'enables'.
+#
+#   Note that "enables" takes priority over the required/if/disabled/off
+#   setting of the target option.
+#
+#   The definition file may list an option as 'disabled': off by default,
+#   otherwise the option is enabled: on by default.  A later (and it must
+#   be later) entry may turn an option on or off explicitly.
 
 $1 == "option" && NF >= 2{
-    onoff = option[$2]  # records default on or default off
+    onoff = option[$2]  # records current (and the default is "", enabled)
     key = ""
     for (i=3; i<=NF; ++i) {
-    	if ($(i) == "on" || $(i) == "off") {
+    	if ($(i) == "on" || $(i) == "off" || $(i) == "disabled") {
 	    key = ""
 	    if (onoff != $(i)) {
-	    	if (onoff == "")
+		# on or off can zap disabled or enabled:
+	    	if (onoff == "" ||
+		    (onoff == "disabled" || onoff == "enabled") &&
+		    	($(i) == "on" || $(i) == "off")) {
+		    # It's easy to mis-spell the option when turning it
+		    # on or off, so warn about it here:
+		    if (onoff == "" && ($(i) == "on" || $(i) == "off")) {
+		    	print $2 ": ERROR: turning unrecognized option", $(i)
+			# For the moment error out - it is safer
+			err = 1 # prevent END{} running
+			exit 1
+		    }
 		    onoff = $(i)
-		else {
+		} else {
 		    # Print a message, otherwise the error
 		    # below is incomprehensible
 		    print $2 ": currently", onoff ": attempt to turn", $(i)
@@ -152,17 +228,15 @@ $1 == "option" && NF >= 2{
     }
 
     if (i > NF) {
-	# Set the option - this may explicitly set it to "", that's good
-	# becaue we need to ensure it exists and we can't rely on some
-	# actually quite sensible awk implementation not optimising the
-	# read above away (gawk doesn't)
+	# Set the option, defaulting to 'enabled'
+	if (onoff == "") onoff = "enabled"
 	option[$2] = onoff
 	next
     }
     # Else fall through to the error handler
 }
 
-# chunk NAME [requires OPT] [off]
+# chunk NAME [requires OPT] [on|off|disabled]
 #   Expands to the 'option' settings appropriate to the reading and
 #   writing of an ancilliary PNG chunk 'NAME':
 #
@@ -184,7 +258,7 @@ pre && $1 == "chunk" && NF >= 2{
 	# read the keywords/additional OPTS
     	req = 0
 	for (i=3; i<=NF; ++i) {
-	    if ($(i) == "on" || $(i) == "off") {
+	    if ($(i) == "on" || $(i) == "off" || $(i) == "disabled") {
 	    	if (onoff != $(i)) {
 		    if (onoff == "")
 			onoff = $(i)
@@ -243,6 +317,7 @@ $1 == "setting" && (NF == 2 || NF >= 3 && ($3 == "requires" || $3 == "default"))
 	    break # Format error, handled below
 
     setting[$2] = reqs
+    # NOTE: this overwrites a previous value silently
     if (isdef && deflt == "")
     	deflt = " " # as a flag to force output
     defaults[$2] = deflt
@@ -302,6 +377,7 @@ $1 ~ /^@/{
 # any other format errors.
 {
     print "options.awk: bad line (" NR "):", $0
+    err = 1 # prevent END{} running
     exit 1
 }
 
@@ -324,15 +400,15 @@ $1 ~ /^@/{
 # of the names to be enabled.
 
 END{
-    if (out == "/dev/null") {
-	print "out=output.file must be given on the command line"
-	exit 1
-    }
+    # END{} gets run on an exit (a traditional awk feature)
+    if (err) exit 1
+
     if (pre) {
-    	if (pre != 1) {
-	    print "pre=0 or pre=1 must be given on command line"
-	    exit 1
-	}
+    	# Record the variables
+	print "deb =", deb
+	if (everything != "")
+	    print "everything =", everything
+	print "logunsupported =", logunsupported
 	exit 0
     }
 
@@ -377,6 +453,9 @@ END{
 	    print def i, "PNG_" i end >out
 	    if (defaults[i] != "") {
 	    	print "#else /*default*/" >out
+		# And add the default definition for the benefit
+		# of later settings an options test:
+		print "# define PNG_" i defaults[i] >out
 		print def i defaults[i] end >out
 	    }
 	    print "#endif" >out
@@ -408,8 +487,16 @@ END{
     print "/* OPTIONS */" >out
     print comment, "options", cend >out
     for (opt in enabledby) tree[opt] = 1  # may not be explicit options
-    for (opt in option) tree[opt] = ""    # so unlisted options marked
-    for (opt in tree) {
+    for (opt in option) if (opt != "") {
+    	o = option[opt]
+	# option should always be one of the following values
+	if (o != "on" && o != "off" && o != "disabled" && o != "enabled") {
+	    print "internal option error (" o ")"
+	    exit 1
+	}
+    	tree[opt] = ""    # so unlisted options marked
+    }
+    for (opt in tree) if (opt != "") {
     	if (tree[opt] == 1) {
 	    tree[opt] = ""
 	    if (option[opt] != "") {
@@ -418,7 +505,7 @@ END{
 	    }
 	    # Macros only listed in 'enables' remain off unless
 	    # one of the enabling macros is on.
-	    option[opt] = "off"
+	    option[opt] = "disabled"
 	}
 
     	split("", list) # clear 'list'
@@ -431,6 +518,51 @@ END{
 
     # print the tree for extreme debugging
     if (deb > 2) for (i in tree) if (i != "") print i, "depends-on" tree[i]
+
+    # Ok, now check all options marked explicitly 'on' or 'off':
+    #
+    # If an option[opt] is 'on' then turn on all requires[opt]
+    # If an option[opt] is 'off' then turn off all enabledby[opt]
+    #
+    # Error out if we have to turn 'on' an 'off' option or vice versa.
+    npending = 0
+    for (opt in option) if (opt != "") {
+    	if (option[opt] == "on" || option[opt] == "off")
+	    pending[++npending] = opt
+    }
+
+    err = 0 # set on error
+    while (npending > 0) {
+    	opt = pending[npending--]
+	if (option[opt] == "on") {
+	    nreqs = split(requires[opt], r)
+	    for (j=1; j<=nreqs; ++j) {
+	    	if (option[r[j]] == "off") {
+		    print "option", opt, "turned on, but requirement", r[j], "is turned off"
+		    err = 1
+		} else if (option[r[j]] != "on") {
+		    option[r[j]] = "on"
+		    pending[++npending] = r[j]
+		}
+	    }
+	} else {
+	    if (option[opt] != "off") {
+	    	print "internal error (2)"
+		exit 1
+	    }
+	    nreqs = split(enabledby[opt], r)
+	    for (j=1; j<=nreqs; ++j) {
+	    	if (option[r[j]] == "on") {
+		    print "option", opt, "turned off, but enabled by", r[j], "which is turned on"
+		    err = 1
+		} else if (option[r[j]] != "off") {
+		    option[r[j]] = "off"
+		    pending[++npending] = r[j]
+		}
+	    }
+	}
+    }
+    if (err) exit 1
 
     # option[i] is now the complete list of all the tokens we may
     # need to output, go through it as above, depth first.
@@ -460,7 +592,10 @@ END{
 	    #   an 'enabledby' is _SUPPORTED
 	    # OR:
 	    #   NO_name is not defined AND
-	    #   the option is not marked "off"
+	    #   the option is not disabled; an option is disabled if:
+	    #     option == off
+	    #     option == disabled && everything != on
+	    #     option == "" && everything == off
 	    if (deb) print "option", i
 	    print "" >out
 	    print "/* option:", i, option[i] >out
@@ -475,6 +610,11 @@ END{
 	    for (j=1; j<=nreqs; ++j) {
 	    	print "#ifndef PNG_" r[j] "_SUPPORTED" >out
 		print "#   undef PNG_on /*!" r[j] "*/" >out
+		# this error appears in the final output if something
+		# was switched 'on' but the processing above to force
+		# the requires did not work
+		if (option[i] == "on")
+		    print error, i, "requires", r[j] end >out
 		print "#endif" >out
 	    }
 
@@ -491,6 +631,11 @@ END{
 		}
 		print "#ifdef PNG_no_if /*missing if*/" >out
 		print "#   undef PNG_on" >out
+		# There is no checking above for this, because we
+		# don't know which 'if' to choose, so whine about
+		# it here:
+		if (option[i] == "on")
+		    print error, i, "needs one of:", iffs[i] end >out
 		print "#endif" >out
 	    }
 
@@ -503,12 +648,18 @@ END{
 	    for (j=1; j<=nreqs; ++j) {
 	    	print "#ifdef PNG_" r[j] "_SUPPORTED" >out
 		print "#   undef PNG_not_enabled /*" r[j] "*/" >out
+		# Oops, probably not intended (should be factored
+		# out by the checks above).
+		if (option[i] == "off")
+		    print error, i, "enabled by:", r[j] end >out
 		print "#endif" >out
 	    }
 
 	    print "#   ifndef PNG_" i "_SUPPORTED /*!command line*/" >out
 	    print "#     ifdef PNG_not_enabled /*!enabled*/" >out
-	    if (option[i] == "off") {
+	    if (option[i] == "off" ||
+	        option[i] == "disabled" && everything != "on" ||
+		option[i] == "enabled" && everything == "off") {
 		print "#       undef PNG_on /*default off*/" >out
 	    } else {
 		print "#       ifdef PNG_NO_" i >out
@@ -529,7 +680,7 @@ END{
 	    # pnglibconf.h
 	    print "#   ifdef PNG_on" >out
 	    if (i ~ /^fail_/)
-	        print error, i, "if" iffs[i], "requires" requires[i] end >out
+	        print error, i, "is on: enabled by:" iffs[i] enabledby[i] ", requires" requires[i] end >out
 	    else if (i !~ /^ok_/)
 		print def i sup >out
 	    print "#   endif /* definition */" >out
@@ -539,7 +690,7 @@ END{
 		if (logunsupported)
 		    print und i une >out
 		if (i ~ /^ok_/)
-		    print error, i, "if" iffs[i], "requires" requires[i] end >out
+		    print error, i, "not enabled: requires:" requires[i] ", enabled by:" iffs[i] enabledby[i] end >out
 		print "#endif" >out
 	    }
 

@@ -52,9 +52,9 @@ all: libpng.a pngtest
 # copy this if the following doesn't work.
 pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
 	$(RM_F) $@ dfn?.out
-	$(AWK) -f scripts/options.awk pre=1 out=dfn1.out\
-	    scripts/pnglibconf.dfa 1>&2
-	$(AWK) -f scripts/options.awk pre=0 out=dfn2.out dfn1.out 1>&2
+	$(AWK) -f scripts/options.awk out=dfn1.out\
+	    scripts/pnglibconf.dfa $(DFA_XTRA) 1>&2
+	$(AWK) -f scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	cp dfn2.out $@
 	$(RM_F) dfn?.out
 
