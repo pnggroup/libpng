@@ -2685,6 +2685,10 @@ version 1.5.0beta22 [April 28, 2010]
   Revised contrib/pngminim to use the "everything off" option in pngusr.dfa.
 
 version 1.5.0beta23 [April 28, 2010]
+  Corrected PNG_REMOVED macro to take five arguments.
+    The macro was documented with two arguments (name,ordinal), however
+    the symbol checking .dfn files assumed five arguments.  The five
+    argument form seems more useful so it is changed to that.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

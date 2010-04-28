@@ -271,7 +271,7 @@
 
 /* Use PNG_REMOVED to comment out a removed interface. */
 #ifndef PNG_REMOVED
-#  define PNG_REMOVED(name, ordinal)
+#  define PNG_REMOVED(type, name, args, attributes, ordinal)
 #endif
 
 #ifndef PNG_CALLBACK
