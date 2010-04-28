@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta22 - April 28, 2010
+Libpng 1.5.0beta23 - April 28, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta22.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta22.tar.gz
-   1.5.0beta22.tar.bz2
+   1.5.0beta23.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta23.tar.gz
+   1.5.0beta23.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b22.zip
-   lp150b22.7z
+   lp150b23.zip
+   lp150b23.7z
 
 Other information:
 
-   1.5.0beta22-README.txt
-   1.5.0beta22-LICENSE.txt
+   1.5.0beta23-README.txt
+   1.5.0beta23-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -201,6 +201,8 @@ version 1.5.0beta22 [April 28, 2010]
     because it has a macro equivalent.
   Improved the options.awk script; added an "everything off" option.
   Revised contrib/pngminim to use the "everything off" option in pngusr.dfa.
+
+version 1.5.0beta23 [April 28, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

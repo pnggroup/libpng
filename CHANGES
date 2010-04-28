@@ -2684,6 +2684,8 @@ version 1.5.0beta22 [April 28, 2010]
   Improved the options.awk script; added an "everything off" option.
   Revised contrib/pngminim to use the "everything off" option in pngusr.dfa.
 
+version 1.5.0beta23 [April 28, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
