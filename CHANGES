@@ -2689,6 +2689,8 @@ version 1.5.0beta23 [April 28, 2010]
     The macro was documented with two arguments (name,ordinal), however
     the symbol checking .dfn files assumed five arguments.  The five
     argument form seems more useful so it is changed to that.
+  Corrected PNG_UNKNOWN_CHUNKS_SUPPORTED to PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+    in gregbook/readpng2.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
