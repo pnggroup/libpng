@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.5.0 [April 27, 2010]
+ * Last changed in libpng 1.5.0 [April 28, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -15,6 +15,7 @@
 
 #ifdef PNG_WRITE_SUPPORTED
 
+#ifdef PNG_WRITE_INT_FUNCTIONS_SUPPORTED
 /* Place a 32-bit number into a buffer in PNG byte order.  We work
  * with unsigned numbers for convenience, although one supported
  * ancillary chunk uses signed (two's complement) numbers.
@@ -53,6 +54,7 @@ png_save_uint_16(png_bytep buf, unsigned int i)
    buf[0] = (png_byte)((i >> 8) & 0xff);
    buf[1] = (png_byte)(i & 0xff);
 }
+#endif
 
 /* Simple function to write the signature.  If we have already written
  * the magic bytes of the signature, or more likely, the PNG stream is

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [April 27, 2010]
+ * Last changed in libpng 1.4.1 [April 28, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -27,7 +27,11 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
       png_error(png_ptr, "PNG unsigned integer out of range");
    return (i);
 }
-#ifndef PNG_USE_READ_MACROS
+#ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
+/* NOTE: the read macros will obscure these definitions, so that if
+ * PNG_USE_READ_MACROS is set the library will not use them internally,
+ * but the APIs will still be available externally.
+ */
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
 png_uint_32 (PNGAPI
 png_get_uint_32)(png_bytep buf)
@@ -44,7 +48,9 @@ png_get_uint_32)(png_bytep buf)
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
  * data is stored in the PNG file in two's complement format, and it is
  * assumed that the machine format for signed integers is the same.
+ * Only used internally in this file.
  */
+#if defined(PNG_GET_INT_32_SUPPORTED)
 png_int_32 (PNGAPI
 png_get_int_32)(png_bytep buf)
 {
@@ -55,6 +61,7 @@ png_get_int_32)(png_bytep buf)
 
    return (i);
 }
+#endif
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 (PNGAPI
@@ -65,7 +72,7 @@ png_get_uint_16)(png_bytep buf)
 
    return (i);
 }
-#endif /* PNG_USE_READ_MACROS */
+#endif /* PNG_READ_INT_FUNCTIONS_SUPPORTED */
 
 /* Read the chunk header (length + type name).
  * Put the type name into png_ptr->chunk_name, and return the length.

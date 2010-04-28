@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta21 - April 27, 2010
+Libpng 1.5.0beta22 - April 28, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta21.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta21.tar.gz
-   1.5.0beta21.tar.bz2
+   1.5.0beta22.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta22.tar.gz
+   1.5.0beta22.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b21.zip
-   lp150b21.7z
+   lp150b22.zip
+   lp150b22.7z
 
 Other information:
 
-   1.5.0beta21-README.txt
-   1.5.0beta21-LICENSE.txt
+   1.5.0beta22-README.txt
+   1.5.0beta22-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -195,6 +195,10 @@ version 1.5.0beta21 [April 27, 2010]
     scripts directory.
   Set PNG_NO_READ_BGR, PNG_NO_IO_STATE, and PNG_NO_TIME_RFC1123 in
     contrib/pngminim/decoder/pngusr.h to make a smaller decoder application.
+
+version 1.5.0beta22 [April 28, 2010]
+  Fixed dependencies of GET_INT_32 - it does not require READ_INT_FUNCTIONS
+    because it has a macro equivalent.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

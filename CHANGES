@@ -2678,6 +2678,10 @@ version 1.5.0beta21 [April 27, 2010]
   Set PNG_NO_READ_BGR, PNG_NO_IO_STATE, and PNG_NO_TIME_RFC1123 in
     contrib/pngminim/decoder/pngusr.h to make a smaller decoder application.
 
+version 1.5.0beta22 [April 28, 2010]
+  Fixed dependencies of GET_INT_32 - it does not require READ_INT_FUNCTIONS
+    because it has a macro equivalent.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
