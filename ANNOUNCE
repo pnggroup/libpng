@@ -200,6 +200,7 @@ version 1.5.0beta22 [April 28, 2010]
   Fixed dependencies of GET_INT_32 - it does not require READ_INT_FUNCTIONS
     because it has a macro equivalent.
   Improved the options.awk script; added an "everything off" option.
+  Revised contrib/pngminim to use the "everything off" option in pngusr.dfa.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
