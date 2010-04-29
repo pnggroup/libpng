@@ -6,4 +6,4 @@ rm example.c pngtest.c pngr*.c pngpread.c
 cp ../../../../zlib/*.h .
 cp ../../../../zlib/*.c .
 rm inf*.[ch]
-rm minigzip.c example.c gz*
+rm uncompr.c minigzip.c example.c gz*

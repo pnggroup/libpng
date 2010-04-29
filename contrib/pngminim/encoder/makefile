@@ -15,8 +15,7 @@ L=.a
 E=
 
 ZOBJS  = adler32$(O) compress$(O) crc32$(O) deflate$(O) \
-	 dummy_inflate$(O) \
-	 trees$(O) uncompr$(O) zutil$(O)
+	 trees$(O) zutil$(O)
 
 OBJS  = pnm2pngm$(O) png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
 	pngset$(O) pngtrans$(O) pngwio$(O) pngwrite$(O) \
