@@ -217,6 +217,7 @@ version 1.5.0beta23 [April 29, 2010]
     other change.  The intention is that users of libpng will find it
     easier to understand if an API they need is missing.
   Include png_reset_zstream() in png.c only when PNG_READ_SUPPORTED is defined.
+  Removed dummy_inflate.c from contrib/pngminim/encoder
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

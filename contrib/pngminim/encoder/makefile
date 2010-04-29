@@ -42,7 +42,6 @@ ZHDRS  = $(ZH) $(ZCONF)
 # code because deflate defines an unused API function deflateBound
 # which itself calls compressBound from compress.
 ZOBJS  = adler32$(O) compress$(O) crc32$(O) deflate$(O) \
-	 dummy_inflate$(O) \
 	 trees$(O) zutil$(O)
 
 # libpng
