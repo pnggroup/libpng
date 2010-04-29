@@ -1,5 +1,5 @@
 
-Libpng 1.4.2rc06 - May 4, 2010
+Libpng 1.4.2rc05 - April 29, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.2rc06.tar.xz (LZMA-compressed, recommended)
-   1.4.2rc06.tar.gz
-   1.4.2rc06.tar.bz2
+   1.4.2rc05.tar.xz (LZMA-compressed, recommended)
+   1.4.2rc05.tar.gz
+   1.4.2rc05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp142r06.zip
-   lp142r06.7z
+   lp142r05.zip
+   lp142r05.7z
 
 Other information:
 
-   1.4.2rc06-README.txt
-   1.4.2rc06-LICENSE.txt
+   1.4.2rc05-README.txt
+   1.4.2rc05-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -59,11 +59,6 @@ version 1.4.2rc05 [April 29, 2010]
   Corrected protection of png_get_user_transform_ptr. The API declaration in
     png.h is removed if both READ and WRITE USER_TRANSFORM are turned off
     but was left defined in pngtrans.c
-
-version 1.4.2rc06 [May 4, 2010]
-  Moved declarations of umsg[] inside the proper #ifdef blocks in pngrutil.c
-  Added a typecast in pngrutil.c to stifle compiler warning in the calculation
-    of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
