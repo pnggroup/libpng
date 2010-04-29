@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version PNGLIB_VERSION - last changed on April 28, 2010
+com libpng version PNGLIB_VERSION - last changed on April 29, 2010
 com
 com Copyright (c) 1998-2010 Glenn Randers-Pehrson
 com
@@ -98,6 +98,11 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # Don't edit this file unless you are contributing a patch to
 # libpng and need new or modified options/settings.
 #----------------------------------------------------------------------
+
+# The following causes commented out #undef lines to be written to
+# pnglibconf.h, this can be stopped by logunsupported=0 in a later
+# file or on the command line (after pnglibconf.dfa)
+logunsupported = 1
 
 # PNG_USER_CONFIG has to be defined on the compiler command line
 # to cause pngusr.h to be read while constructing pnglibconf.h

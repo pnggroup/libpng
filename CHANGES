@@ -2694,6 +2694,10 @@ version 1.5.0beta23 [April 29, 2010]
   Corrected protection of png_get_user_transform_ptr. The API declaration in
     png.h is removed if both READ and WRITE USER_TRANSFORM are turned off
     but was left defined in pngtrans.c
+  Added logunsupported=1 to cause pnglibconf.h to document disabled options.
+    This makes the installed pnglibconf.h more readable but causes no
+    other change.  The intention is that users of libpng will find it
+    easier to understand if an API they need is missing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
