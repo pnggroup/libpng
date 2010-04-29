@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.5.0 [April 28, 2010]
+ * Last changed in libpng 1.5.0 [April 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -654,7 +654,6 @@ png_set_user_transform_info(png_structp png_ptr, png_voidp
         "This version of libpng does not support user transform info");
 #endif
 }
-#endif
 
 /* This function returns a pointer to the user_transform_ptr associated with
  * the user transform functions.  The application should free any memory
@@ -672,4 +671,6 @@ png_get_user_transform_ptr(png_structp png_ptr)
    return (NULL);
 #endif
 }
+#endif /* PNG_READ_USER_TRANSFORM_SUPPORTED ||
+	  PNG_WRITE_USER_TRANSFORM_SUPPORTED */
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

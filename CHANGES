@@ -2684,13 +2684,16 @@ version 1.5.0beta22 [April 28, 2010]
   Improved the options.awk script; added an "everything off" option.
   Revised contrib/pngminim to use the "everything off" option in pngusr.dfa.
 
-version 1.5.0beta23 [April 28, 2010]
+version 1.5.0beta23 [April 29, 2010]
   Corrected PNG_REMOVED macro to take five arguments.
     The macro was documented with two arguments (name,ordinal), however
     the symbol checking .dfn files assumed five arguments.  The five
     argument form seems more useful so it is changed to that.
   Corrected PNG_UNKNOWN_CHUNKS_SUPPORTED to PNG_HANDLE_AS_UNKNOWN_SUPPORTED
     in gregbook/readpng2.c
+  Corrected protection of png_get_user_transform_ptr. The API declaration in
+    png.h is removed if both READ and WRITE USER_TRANSFORM are turned off
+    but was left defined in pngtrans.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
