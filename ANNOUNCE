@@ -1,5 +1,5 @@
 
-Libpng 1.4.2rc05 - April 29, 2010
+Libpng 1.4.2rc06 - April 29, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.2rc05.tar.xz (LZMA-compressed, recommended)
-   1.4.2rc05.tar.gz
-   1.4.2rc05.tar.bz2
+   1.4.2rc06.tar.xz (LZMA-compressed, recommended)
+   1.4.2rc06.tar.gz
+   1.4.2rc06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp142r05.zip
-   lp142r05.7z
+   lp142r06.zip
+   lp142r06.7z
 
 Other information:
 
-   1.4.2rc05-README.txt
-   1.4.2rc05-LICENSE.txt
+   1.4.2rc06-README.txt
+   1.4.2rc06-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
