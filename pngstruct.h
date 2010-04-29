@@ -5,7 +5,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng version 1.5.0 - April 28, 2010
+ * Last changed in libpng version 1.5.0 - April 29, 2010
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
