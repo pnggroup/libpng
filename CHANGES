@@ -2555,12 +2555,16 @@ version 1.4.2rc03 [April 24, 2010]
   Added some "(long)" typecasts to printf calls in png_handle_cHRM().
   Relaxed the overly-restrictive permissions of some files.
 
-version 1.4.2rc04 [April 27, 2010]
+version 1.4.2rc04 [April 28, 2010]
   Added the "vstudio" project to replace "visualc6" and "visualc71" which
     will be removed from libpng-1.5.0.
   Demonstrate in example.c that lang_key should be initialized.
   Set PNG_NO_READ_BGR, PNG_NO_IO_STATE, and PNG_NO_TIME_RFC1123 in
     contrib/pngminim/decoder/pngusr.h to make a smaller decoder application.
+
+version 1.4.2rc05 [April 29, 2010]
+  Include png_reset_zstream() in png.c only when PNG_READ_SUPPORTED is defined.
+  Removed dummy_inflate.c from contrib/pngminim/encoder
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
