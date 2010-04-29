@@ -54,6 +54,8 @@ version 1.4.2rc04 [April 28, 2010]
 version 1.4.2rc05 [April 29, 2010]
   Include png_reset_zstream() in png.c only when PNG_READ_SUPPORTED is defined.
   Removed dummy_inflate.c and uncompr.c from contrib/pngminim/encoder
+  Corrected PNG_UNKNOWN_CHUNKS_SUPPORTED to PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+    in gregbook/readpng2.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

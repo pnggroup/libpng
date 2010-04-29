@@ -129,7 +129,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
     }
 
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
     /* prepare the reader to ignore all recognized chunks whose data won't be
      * used, i.e., all chunks recognized by libpng except for IHDR, PLTE, IDAT,
      * IEND, tRNS, bKGD, gAMA, and sRGB (small performance improvement) */
@@ -158,7 +158,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
         png_set_keep_unknown_chunks(png_ptr, 1 /* PNG_HANDLE_CHUNK_NEVER */,
           chunks_to_ignore, sizeof(chunks_to_ignore)/5);
     }
-#endif /* PNG_UNKNOWN_CHUNKS_SUPPORTED */
+#endif /* PNG_HANDLE_AS_UNKNOWN_SUPPORTED */
 
 
     /* instead of doing png_init_io() here, now we set up our callback
