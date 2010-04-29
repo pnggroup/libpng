@@ -2700,6 +2700,7 @@ version 1.5.0beta23 [April 29, 2010]
     easier to understand if an API they need is missing.
   Include png_reset_zstream() in png.c only when PNG_READ_SUPPORTED is defined.
   Removed dummy_inflate.c from contrib/pngminim/encoder
+  Removed contrib/pngminim/*/gather.sh; gathering is now done in the makefile.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
