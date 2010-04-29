@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta23 - April 29, 2010
+Libpng 1.5.0beta24 - April 29, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta23.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta23.tar.gz
-   1.5.0beta23.tar.bz2
+   1.5.0beta24.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta24.tar.gz
+   1.5.0beta24.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b23.zip
-   lp150b23.7z
+   lp150b24.zip
+   lp150b24.7z
 
 Other information:
 
-   1.5.0beta23-README.txt
-   1.5.0beta23-LICENSE.txt
+   1.5.0beta24-README.txt
+   1.5.0beta24-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
