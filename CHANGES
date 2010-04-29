@@ -2567,6 +2567,9 @@ version 1.4.2rc05 [April 29, 2010]
   Removed dummy_inflate.c and uncompr.c from contrib/pngminim/encoder
   Corrected PNG_UNKNOWN_CHUNKS_SUPPORTED to PNG_HANDLE_AS_UNKNOWN_SUPPORTED
     in gregbook/readpng2.c
+  Corrected protection of png_get_user_transform_ptr. The API declaration in
+    png.h is removed if both READ and WRITE USER_TRANSFORM are turned off
+    but was left defined in pngtrans.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

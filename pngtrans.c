@@ -655,7 +655,6 @@ png_set_user_transform_info(png_structp png_ptr, png_voidp
         "This version of libpng does not support user transform info");
 #endif
 }
-#endif
 
 /* This function returns a pointer to the user_transform_ptr associated with
  * the user transform functions.  The application should free any memory
@@ -673,4 +672,6 @@ png_get_user_transform_ptr(png_structp png_ptr)
    return (NULL);
 #endif
 }
+#endif /* PNG_READ_USER_TRANSFORM_SUPPORTED ||
+	  PNG_WRITE_USER_TRANSFORM_SUPPORTED */
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
