@@ -65,7 +65,7 @@ PNGSRCS=png$(C) pngerror$(C) pngget$(C) pngmem$(C) \
 	pngpread$(C) pngread$(C) pngrio$(C) pngrtran$(C) pngrutil$(C) \
 	pngset$(C) pngtrans$(C)
 
-# Standard headres
+# Standard headers
 PNGH   =png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h
 
 # Machine generated headers
