@@ -3326,7 +3326,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       * of padding before and after row_buf.
       */
      png_ptr->row_buf = png_ptr->big_row_buf + 32
-         - (((png_alloc_size_t)&(png_ptr->big_row_buf[0]) + 15) % 16);
+         - (((png_alloc_size_t)&(png_ptr->big_row_buf[0])
+         + (png_alloc_size_t)15) % 16);
      png_ptr->old_big_row_buf_size = row_bytes + 48;
 #else
      /* Use 32 bytes of padding before and 16 bytes after row_buf. */
