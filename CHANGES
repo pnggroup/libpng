@@ -2571,6 +2571,9 @@ version 1.4.2rc05 [April 29, 2010]
     png.h is removed if both READ and WRITE USER_TRANSFORM are turned off
     but was left defined in pngtrans.c
 
+version 1.4.2rc06 [May 3, 2010]
+  Moved declarations of umsg[] inside the proper #ifdef blocks in pngrutil.c
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
