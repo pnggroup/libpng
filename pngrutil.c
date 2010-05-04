@@ -3312,6 +3312,11 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    if (row_bytes + 48 > png_ptr->old_big_row_buf_size)
    {
+#ifdef PNG_ALIGNED_MEMORY_SUPPORTED
+      png_size_t big_row_buf_address;
+      int row_buf_offset;
+#endif
+
      png_free(png_ptr, png_ptr->big_row_buf);
      if (png_ptr->interlaced)
         png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr,
@@ -3325,10 +3330,12 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
      /* Use 16-byte aligned memory for row_buf with at least 16 bytes
       * of padding before and after row_buf.
       */
-     png_ptr->row_buf = png_ptr->big_row_buf + 32
-         - (((png_alloc_size_t)&(png_ptr->big_row_buf[0])
-         + (png_alloc_size_t)15) % 16);
-     png_ptr->old_big_row_buf_size = row_bytes + 48;
+      {
+         big_row_buf_address = (png_size_t)png_ptr->big_row_buf;
+         row_buf_offset = 32 - ((big_row_buf_address + 15) & 0x0F);
+         png_ptr->row_buf = png_ptr->big_row_buf + row_buf_offset;
+      }
+      png_ptr->old_big_row_buf_size = row_bytes + 48;
 #else
      /* Use 32 bytes of padding before and 16 bytes after row_buf. */
      png_ptr->row_buf = png_ptr->big_row_buf + 32;

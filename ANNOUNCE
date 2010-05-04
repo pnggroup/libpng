@@ -1,5 +1,5 @@
 
-Libpng 1.4.2rc06 - May 3, 2010
+Libpng 1.4.2rc06 - May 4, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -60,7 +60,7 @@ version 1.4.2rc05 [April 29, 2010]
     png.h is removed if both READ and WRITE USER_TRANSFORM are turned off
     but was left defined in pngtrans.c
 
-version 1.4.2rc06 [May 3, 2010]
+version 1.4.2rc06 [May 4, 2010]
   Moved declarations of umsg[] inside the proper #ifdef blocks in pngrutil.c
   Added a typecast in pngrutil.c to stifle compiler warning in the calculation
     of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
