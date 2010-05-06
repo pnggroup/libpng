@@ -1,57 +1,43 @@
 
-Libpng 1.4.2rc06 - May 4, 2010
+Libpng 1.4.2 - May 6, 2010
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.2rc06.tar.xz (LZMA-compressed, recommended)
-   1.4.2rc06.tar.gz
-   1.4.2rc06.tar.bz2
+   libpng-1.4.2.tar.xz (LZMA-compressed, recommended)
+   libpng-1.4.2.tar.gz
+   libpng-1.4.2.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp142r06.zip
-   lp142r06.7z
+   lpng142.zip
+   lpng142.7z
 
 Other information:
 
-   1.4.2rc06-README.txt
-   1.4.2rc06-LICENSE.txt
+   libpng-1.4.2-README.txt
+   libpng-1.4.2-LICENSE.txt
 
 Changes since the last public release (1.4.1):
-
-version 1.4.2beta01 [April 1, 2010]
   Restored the macro definition of png_check_sig().
   Conditionally compile an "else" statement in png_decompress_chunk().
-
-version 1.4.2rc01 [April 10, 2010]
-  No changes.
-
-version 1.4.2rc02 [April 16, 2010]
   Documented the fact that png_set_dither() was disabled since libpng-1.4.0.
   Reenabled png_set_dither() but renamed it to png_set_quantize() to reflect
     more accurately what it actually does.  At the same time, renamed
     the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros to
     PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
-
-version 1.4.2rc03 [April 24, 2010]
   Added some "(long)" typecasts to printf calls in png_handle_cHRM().
   Relaxed the overly-restrictive permissions of some files.
-
-version 1.4.2rc04 [April 28, 2010]
   Added the "vstudio" project to replace "visualc6" and "visualc71" which
     will be removed from libpng-1.5.0.
   Demonstrate in example.c that lang_key should be initialized.
   Set PNG_NO_READ_BGR, PNG_NO_IO_STATE, and PNG_NO_TIME_RFC1123 in
     contrib/pngminim/decoder/pngusr.h to make a smaller decoder application.
-
-version 1.4.2rc05 [April 29, 2010]
   Include png_reset_zstream() in png.c only when PNG_READ_SUPPORTED is defined.
   Removed dummy_inflate.c and uncompr.c from contrib/pngminim/encoder
   Corrected PNG_UNKNOWN_CHUNKS_SUPPORTED to PNG_HANDLE_AS_UNKNOWN_SUPPORTED
@@ -59,8 +45,6 @@ version 1.4.2rc05 [April 29, 2010]
   Corrected protection of png_get_user_transform_ptr. The API declaration in
     png.h is removed if both READ and WRITE USER_TRANSFORM are turned off
     but was left defined in pngtrans.c
-
-version 1.4.2rc06 [May 4, 2010]
   Moved declarations of umsg[] inside the proper #ifdef blocks in pngrutil.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
