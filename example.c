@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.5.0 [April 29, 2010]
+ * Last changed in libpng 1.5.0 [May 6, 2010]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2010 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -658,14 +658,18 @@ void write_png(char *file_name /* , ... other image information ... */)
 
    /* Optional significant bit (sBIT) chunk */
    png_color_8 sig_bit;
+
    /* If we are dealing with a grayscale image then */
    sig_bit.gray = true_bit_depth;
+
    /* Otherwise, if we are dealing with a color image then */
    sig_bit.red = true_red_bit_depth;
    sig_bit.green = true_green_bit_depth;
    sig_bit.blue = true_blue_bit_depth;
+
    /* If the image has an alpha channel then */
    sig_bit.alpha = true_alpha_bit_depth;
+
    png_set_sBIT(png_ptr, info_ptr, &sig_bit);
 
 
@@ -757,6 +761,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    /* Turn on interlace handling if you are not using png_write_image() */
    if (interlacing)
       number_passes = png_set_interlace_handling(png_ptr);
+
    else
       number_passes = 1;
 

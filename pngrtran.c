@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.0 [April 29, 2010]
+ * Last changed in libpng 1.5.0 [May 6, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -100,6 +100,7 @@ png_set_background(png_structp png_ptr,
  
    if (png_ptr == NULL)
       return;
+
    if (background_gamma_code == PNG_BACKGROUND_GAMMA_UNKNOWN)
    {
       png_warning(png_ptr, "Application must supply a known background gamma");
@@ -124,6 +125,7 @@ png_set_strip_16(png_structp png_ptr)
 
    if (png_ptr == NULL)
       return;
+
    png_ptr->transformations |= PNG_16_TO_8;
 }
 #endif
@@ -136,6 +138,7 @@ png_set_strip_alpha(png_structp png_ptr)
 
    if (png_ptr == NULL)
       return;
+
    png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
 }
 #endif
@@ -168,6 +171,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
 
    if (png_ptr == NULL)
       return;
+
    png_ptr->transformations |= PNG_QUANTIZE;
 
    if (!full_quantize)
@@ -224,6 +228,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
                   done = 0;
                }
             }
+
             if (done)
                break;
          }
@@ -243,6 +248,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
                   do
                      j--;
                   while ((int)png_ptr->quantize_sort[j] >= maximum_colors);
+
                   palette[i] = palette[j];
                }
             }
@@ -367,8 +373,10 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
 
                      t = (png_dsortp)png_malloc_warn(png_ptr,
                          (png_uint_32)(png_sizeof(png_dsort)));
+
                      if (t == NULL)
                          break;
+
                      t->next = hash[d];
                      t->left = (png_byte)i;
                      t->right = (png_byte)j;
@@ -419,6 +427,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
                                   png_ptr->index_to_palette[j])
                                  png_ptr->quantize_index[k] =
                                      png_ptr->index_to_palette[next_j];
+
                               if ((int)png_ptr->quantize_index[k] ==
                                   num_new_palette)
                                  png_ptr->quantize_index[k] =
@@ -428,11 +437,13 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
 
                         png_ptr->index_to_palette[png_ptr->palette_to_index
                             [num_new_palette]] = png_ptr->index_to_palette[j];
+
                         png_ptr->palette_to_index[png_ptr->index_to_palette[j]]
                             = png_ptr->palette_to_index[num_new_palette];
 
                         png_ptr->index_to_palette[j] =
                             (png_byte)num_new_palette;
+
                         png_ptr->palette_to_index[num_new_palette] =
                             (png_byte)j;
                      }
@@ -490,6 +501,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
           png_sizeof(png_byte)));
+
       png_memset(distance, 0xff, num_entries * png_sizeof(png_byte));
 
       for (i = 0; i < num_palette; i++)
@@ -661,8 +673,10 @@ png_set_rgb_to_gray(png_structp png_ptr, int error_action, double red,
 {
    int red_fixed = (int)((float)red*100000.0 + 0.5);
    int green_fixed = (int)((float)green*100000.0 + 0.5);
+
    if (png_ptr == NULL)
       return;
+
    png_set_rgb_to_gray_fixed(png_ptr, error_action, red_fixed, green_fixed);
 }
 #endif
@@ -696,6 +710,7 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
    {
       png_warning(png_ptr,
         "Cannot do RGB_TO_GRAY without EXPAND_SUPPORTED");
+
       png_ptr->transformations &= ~PNG_RGB_TO_GRAY;
    }
 #endif
@@ -706,17 +721,20 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
          red_int   =  6968; /* .212671 * 32768 + .5 */
          green_int = 23434; /* .715160 * 32768 + .5 */
       }
+
       else if (red + green < 100000L)
       {
          red_int = (png_uint_16)(((png_uint_32)red*32768L)/100000L);
          green_int = (png_uint_16)(((png_uint_32)green*32768L)/100000L);
       }
+
       else
       {
          png_warning(png_ptr, "ignoring out of range rgb_to_gray coefficients");
          red_int   =  6968;
          green_int = 23434;
       }
+
       png_ptr->rgb_to_gray_red_coeff   = red_int;
       png_ptr->rgb_to_gray_green_coeff = green_int;
       png_ptr->rgb_to_gray_blue_coeff  =
@@ -776,6 +794,7 @@ png_init_read_transformations(png_structp png_ptr)
    {
       png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
    }
+
    else if ((png_ptr->transformations & PNG_BACKGROUND) &&
        !(png_ptr->transformations & PNG_BACKGROUND_EXPAND) &&
        (png_ptr->transformations & PNG_GRAY_TO_RGB) &&
@@ -947,6 +966,7 @@ png_init_read_transformations(png_structp png_ptr)
                   back.green = (png_byte)png_ptr->background.green;
                   back.blue  = (png_byte)png_ptr->background.blue;
                }
+
                else
                {
                   back.red = (png_byte)(pow(
@@ -961,8 +981,10 @@ png_init_read_transformations(png_structp png_ptr)
 
                back_1.red = (png_byte)(pow(
                    (double)png_ptr->background.red/255.0, g) * 255.0 + .5);
+
                back_1.green = (png_byte)(pow(
                    (double)png_ptr->background.green/255.0, g) * 255.0 + .5);
+
                back_1.blue = (png_byte)(pow(
                    (double)png_ptr->background.blue/255.0, g) * 255.0 + .5);
             }
@@ -1007,6 +1029,7 @@ png_init_read_transformations(png_structp png_ptr)
             png_ptr->transformations &= ~PNG_GAMMA;
             png_ptr->transformations |= PNG_STRIP_ALPHA;
          }
+
          /* if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN) */
          else
          /* color_type != PNG_COLOR_TYPE_PALETTE */
@@ -1036,6 +1059,7 @@ png_init_read_transformations(png_structp png_ptr)
 
             png_ptr->background_1.gray = (png_uint_16)(pow(
                 (double)png_ptr->background.gray / m, g) * m + .5);
+
             png_ptr->background.gray = (png_uint_16)(pow(
                 (double)png_ptr->background.gray / m, gs) * m + .5);
 
@@ -1046,22 +1070,29 @@ png_init_read_transformations(png_structp png_ptr)
                /* RGB or RGBA with color background */
                png_ptr->background_1.red = (png_uint_16)(pow(
                    (double)png_ptr->background.red / m, g) * m + .5);
+
                png_ptr->background_1.green = (png_uint_16)(pow(
                    (double)png_ptr->background.green / m, g) * m + .5);
+
                png_ptr->background_1.blue = (png_uint_16)(pow(
                    (double)png_ptr->background.blue / m, g) * m + .5);
+
                png_ptr->background.red = (png_uint_16)(pow(
                    (double)png_ptr->background.red / m, gs) * m + .5);
+
                png_ptr->background.green = (png_uint_16)(pow(
                    (double)png_ptr->background.green / m, gs) * m + .5);
+
                png_ptr->background.blue = (png_uint_16)(pow(
                    (double)png_ptr->background.blue / m, gs) * m + .5);
             }
+
             else
             {
                /* GRAY, GRAY ALPHA, RGB, or RGBA with gray background */
                png_ptr->background_1.red = png_ptr->background_1.green
                    = png_ptr->background_1.blue = png_ptr->background_1.gray;
+
                png_ptr->background.red = png_ptr->background.green
                    = png_ptr->background.blue = png_ptr->background.gray;
             }
@@ -1111,13 +1142,16 @@ png_init_read_transformations(png_structp png_ptr)
          {
             palette[i] = back;
          }
+
          else if (png_ptr->trans_alpha[i] != 0xff)
          {
             /* The png_composite() macro is defined in png.h */
             png_composite(palette[i].red, palette[i].red,
                 png_ptr->trans_alpha[i], back.red);
+
             png_composite(palette[i].green, palette[i].green,
                 png_ptr->trans_alpha[i], back.green);
+
             png_composite(palette[i].blue, palette[i].blue,
                 png_ptr->trans_alpha[i], back.blue);
          }
@@ -1141,10 +1175,13 @@ png_init_read_transformations(png_structp png_ptr)
 
       if (sr < 0 || sr > 8)
          sr = 0;
+
       if (sg < 0 || sg > 8)
          sg = 0;
+
       if (sb < 0 || sb > 8)
          sb = 0;
+
       for (i = 0; i < istop; i++)
       {
          png_ptr->palette[i].red >>= sr;
@@ -1178,8 +1215,10 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
          if (png_ptr->num_trans &&
              (png_ptr->transformations & PNG_EXPAND_tRNS))
             info_ptr->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+
          else
             info_ptr->color_type = PNG_COLOR_TYPE_RGB;
+
          info_ptr->bit_depth = 8;
          info_ptr->num_trans = 0;
       }
@@ -1192,6 +1231,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
          }
          if (info_ptr->bit_depth < 8)
             info_ptr->bit_depth = 8;
+
          info_ptr->num_trans = 0;
       }
    }
@@ -1252,8 +1292,10 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 
    if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       info_ptr->channels = 1;
+
    else if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
       info_ptr->channels = 3;
+
    else
       info_ptr->channels = 1;
 
@@ -1284,6 +1326,7 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    {
       if (info_ptr->bit_depth < png_ptr->user_transform_depth)
          info_ptr->bit_depth = png_ptr->user_transform_depth;
+
       if (info_ptr->channels < png_ptr->user_transform_channels)
          info_ptr->channels = png_ptr->user_transform_channels;
    }
@@ -1350,6 +1393,7 @@ png_do_read_transformations(png_structp png_ptr)
             png_do_expand(&(png_ptr->row_info), png_ptr->row_buf + 1,
                 &(png_ptr->trans_color));
          else
+
             png_do_expand(&(png_ptr->row_info), png_ptr->row_buf + 1,
                 NULL);
       }
@@ -1366,14 +1410,16 @@ png_do_read_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_RGB_TO_GRAY)
    {
       int rgb_error =
-         png_do_rgb_to_gray(png_ptr, &(png_ptr->row_info),
-             png_ptr->row_buf + 1);
+          png_do_rgb_to_gray(png_ptr, &(png_ptr->row_info),
+              png_ptr->row_buf + 1);
+
       if (rgb_error)
       {
          png_ptr->rgb_to_gray_status=1;
          if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
              PNG_RGB_TO_GRAY_WARN)
             png_warning(png_ptr, "png_do_rgb_to_gray found nongray pixel");
+
          if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
              PNG_RGB_TO_GRAY_ERR)
             png_error(png_ptr, "png_do_rgb_to_gray found nongray pixel");
@@ -1460,6 +1506,7 @@ png_do_read_transformations(png_structp png_ptr)
    {
       png_do_quantize((png_row_infop)&(png_ptr->row_info), png_ptr->row_buf + 1,
           png_ptr->palette_lookup, png_ptr->quantize_index);
+
       if (png_ptr->row_info.rowbytes == (png_uint_32)0)
          png_error(png_ptr, "png_do_quantize returned rowbytes=0");
    }
@@ -1536,11 +1583,13 @@ png_do_read_transformations(png_structp png_ptr)
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
       if (png_ptr->user_transform_depth)
          png_ptr->row_info.bit_depth = png_ptr->user_transform_depth;
+
       if (png_ptr->user_transform_channels)
          png_ptr->row_info.channels = png_ptr->user_transform_channels;
 #endif
       png_ptr->row_info.pixel_depth = (png_byte)(png_ptr->row_info.bit_depth *
           png_ptr->row_info.channels);
+
       png_ptr->row_info.rowbytes = PNG_ROWBYTES(png_ptr->row_info.pixel_depth,
           png_ptr->row_info.width);
    }
@@ -1575,11 +1624,13 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                *dp = (png_byte)((*sp >> shift) & 0x01);
+
                if (shift == 7)
                {
                   shift = 0;
                   sp--;
                }
+
                else
                   shift++;
 
@@ -1597,11 +1648,13 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                *dp = (png_byte)((*sp >> shift) & 0x03);
+
                if (shift == 6)
                {
                   shift = 0;
                   sp--;
                }
+
                else
                   shift += 2;
 
@@ -1618,11 +1671,13 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                *dp = (png_byte)((*sp >> shift) & 0x0f);
+
                if (shift == 4)
                {
                   shift = 0;
                   sp--;
                }
+
                else
                   shift = 4;
 
@@ -1664,10 +1719,12 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
          shift[channels++] = row_info->bit_depth - sig_bits->green;
          shift[channels++] = row_info->bit_depth - sig_bits->blue;
       }
+
       else
       {
          shift[channels++] = row_info->bit_depth - sig_bits->gray;
       }
+
       if (row_info->color_type & PNG_COLOR_MASK_ALPHA)
       {
          shift[channels++] = row_info->bit_depth - sig_bits->alpha;
@@ -1677,6 +1734,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
       {
          if (shift[c] <= 0)
             shift[c] = 0;
+
          else
             value = 1;
       }
@@ -2023,6 +2081,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->pixel_depth = 16;
             row_info->rowbytes = row_width * 2;
          }
+
          else
          {
             /* This changes the data from G to XG */
@@ -2038,6 +2097,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->rowbytes = row_width * 2;
          }
       }
+
       else if (row_info->bit_depth == 16)
       {
          if (flags & PNG_FLAG_FILLER_AFTER)
@@ -2058,6 +2118,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->pixel_depth = 32;
             row_info->rowbytes = row_width * 4;
          }
+
          else
          {
             /* This changes the data from GG to XXGG */
@@ -2097,6 +2158,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->pixel_depth = 32;
             row_info->rowbytes = row_width * 4;
          }
+
          else
          {
             /* This changes the data from RGB to XRGB */
@@ -2114,6 +2176,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->rowbytes = row_width * 4;
          }
       }
+
       else if (row_info->bit_depth == 16)
       {
          if (flags & PNG_FLAG_FILLER_AFTER)
@@ -2138,6 +2201,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->pixel_depth = 64;
             row_info->rowbytes = row_width * 8;
          }
+
          else
          {
             /* This changes the data from RRGGBB to XXRRGGBB */
@@ -2154,6 +2218,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
                *(--dp) = hi_filler;
                *(--dp) = lo_filler;
             }
+
             row_info->channels = 4;
             row_info->pixel_depth = 64;
             row_info->rowbytes = row_width * 8;
@@ -2190,6 +2255,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
                *(dp--) = *(sp--);
             }
          }
+
          else
          {
             /* This changes GG to RRGGBB */
@@ -2206,6 +2272,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
             }
          }
       }
+
       else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       {
          if (row_info->bit_depth == 8)
@@ -2221,6 +2288,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
                *(dp--) = *(sp--);
             }
          }
+
          else
          {
             /* This changes GGAA to RRGGBBAA */
@@ -2303,12 +2371,14 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                   png_byte red   = png_ptr->gamma_to_1[*(sp++)];
                   png_byte green = png_ptr->gamma_to_1[*(sp++)];
                   png_byte blue  = png_ptr->gamma_to_1[*(sp++)];
+
                   if (red != green || red != blue)
                   {
                      rgb_error |= 1;
                      *(dp++) = png_ptr->gamma_from_1[
                          (rc*red + gc*green + bc*blue)>>15];
                   }
+
                   else
                      *(dp++) = *(sp - 1);
                }
@@ -2323,11 +2393,13 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                   png_byte red   = *(sp++);
                   png_byte green = *(sp++);
                   png_byte blue  = *(sp++);
+
                   if (red != green || red != blue)
                   {
                      rgb_error |= 1;
                      *(dp++) = (png_byte)((rc*red + gc*green + bc*blue)>>15);
                   }
+
                   else
                      *(dp++) = *(sp - 1);
                }
@@ -2352,6 +2424,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
 
                   if (red == green && red == blue)
                      w = red;
+
                   else
                   {
                      png_uint_16 red_1   = png_ptr->gamma_16_to_1[(red&0xff)
@@ -2387,6 +2460,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
 
                   if (red != green || red != blue)
                      rgb_error |= 1;
+
                   gray16  = (png_uint_16)((rc*red + gc*green + bc*blue)>>15);
                   *(dp++) = (png_byte)((gray16>>8) & 0xff);
                   *(dp++) = (png_byte)(gray16 & 0xff);
@@ -2408,10 +2482,13 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                   png_byte red   = png_ptr->gamma_to_1[*(sp++)];
                   png_byte green = png_ptr->gamma_to_1[*(sp++)];
                   png_byte blue  = png_ptr->gamma_to_1[*(sp++)];
+
                   if (red != green || red != blue)
                      rgb_error |= 1;
+
                   *(dp++) =  png_ptr->gamma_from_1
                       [(rc*red + gc*green + bc*blue)>>15];
+
                   *(dp++) = *(sp++);  /* alpha */
                }
             }
@@ -2427,6 +2504,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                   png_byte blue  = *(sp++);
                   if (red != green || red != blue)
                      rgb_error |= 1;
+
                   *(dp++) =  (png_byte)((rc*red + gc*green + bc*blue)>>15);
                   *(dp++) = *(sp++);  /* alpha */
                }
@@ -2450,19 +2528,25 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
 
                   if (red == green && red == blue)
                      w = red;
+
                   else
                   {
                      png_uint_16 red_1   = png_ptr->gamma_16_to_1[(red&0xff) >>
                          png_ptr->gamma_shift][red>>8];
+
                      png_uint_16 green_1 =
                          png_ptr->gamma_16_to_1[(green&0xff) >>
                          png_ptr->gamma_shift][green>>8];
+
                      png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff) >>
                          png_ptr->gamma_shift][blue>>8];
+
                      png_uint_16 gray16  = (png_uint_16)((rc * red_1
                          + gc * green_1 + bc * blue_1)>>15);
+
                      w = png_ptr->gamma_16_from_1[(gray16&0xff) >>
                          png_ptr->gamma_shift][gray16 >> 8];
+
                      rgb_error |= 1;
                   }
 
@@ -2483,8 +2567,10 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                   red   = (png_uint_16)((*(sp)<<8) | *(sp + 1)); sp += 2;
                   green = (png_uint_16)((*(sp)<<8) | *(sp + 1)); sp += 2;
                   blue  = (png_uint_16)((*(sp)<<8) | *(sp + 1)); sp += 2;
+
                   if (red != green || red != blue)
                      rgb_error |= 1;
+
                   gray16  = (png_uint_16)((rc*red + gc*green + bc*blue)>>15);
                   *(dp++) = (png_byte)((gray16>>8) & 0xff);
                   *(dp++) = (png_byte)(gray16 & 0xff);
@@ -2604,11 +2690,13 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *sp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
                         *sp |= (png_byte)(background->gray << shift);
                      }
+
                      if (!shift)
                      {
                         shift = 7;
                         sp++;
                      }
+
                      else
                         shift--;
                   }
@@ -2630,6 +2718,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                            *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
                            *sp |= (png_byte)(background->gray << shift);
                         }
+
                         else
                         {
                            png_byte p = (png_byte)((*sp >> shift) & 0x03);
@@ -2638,15 +2727,18 @@ png_do_background(png_row_infop row_info, png_bytep row,
                            *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
                            *sp |= (png_byte)(g << shift);
                         }
+
                         if (!shift)
                         {
                            shift = 6;
                            sp++;
                         }
+
                         else
                            shift -= 2;
                      }
                   }
+
                   else
 #endif
                   {
@@ -2660,11 +2752,13 @@ png_do_background(png_row_infop row_info, png_bytep row,
                            *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
                            *sp |= (png_byte)(background->gray << shift);
                         }
+
                         if (!shift)
                         {
                            shift = 6;
                            sp++;
                         }
+
                         else
                            shift -= 2;
                      }
@@ -2687,6 +2781,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                            *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
                            *sp |= (png_byte)(background->gray << shift);
                         }
+
                         else
                         {
                            png_byte p = (png_byte)((*sp >> shift) & 0x0f);
@@ -2695,15 +2790,18 @@ png_do_background(png_row_infop row_info, png_bytep row,
                            *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
                            *sp |= (png_byte)(g << shift);
                         }
+
                         if (!shift)
                         {
                            shift = 4;
                            sp++;
                         }
+
                         else
                            shift -= 4;
                      }
                   }
+
                   else
 #endif
                   {
@@ -2717,11 +2815,13 @@ png_do_background(png_row_infop row_info, png_bytep row,
                            *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
                            *sp |= (png_byte)(background->gray << shift);
                         }
+
                         if (!shift)
                         {
                            shift = 4;
                            sp++;
                         }
+
                         else
                            shift -= 4;
                      }
@@ -2768,12 +2868,14 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         png_uint_16 v;
 
                         v = (png_uint_16)(((*sp) << 8) + *(sp + 1));
+
                         if (v == trans_color->gray)
                         {
                            /* Background is already in screen gamma */
                            *sp = (png_byte)((background->gray >> 8) & 0xff);
                            *(sp + 1) = (png_byte)(background->gray & 0xff);
                         }
+
                         else
                         {
                            v = gamma_16[*(sp + 1) >> gamma_shift][*sp];
@@ -2791,6 +2893,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         png_uint_16 v;
 
                         v = (png_uint_16)(((*sp) << 8) + *(sp + 1));
+
                         if (v == trans_color->gray)
                         {
                            *sp = (png_byte)((background->gray >> 8) & 0xff);
@@ -2822,6 +2925,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *(sp + 1) = (png_byte)background->green;
                         *(sp + 2) = (png_byte)background->blue;
                      }
+
                      else
                      {
                         *sp = gamma_table[*sp];
@@ -2856,10 +2960,13 @@ png_do_background(png_row_infop row_info, png_bytep row,
                   for (i = 0; i < row_width; i++, sp += 6)
                   {
                      png_uint_16 r = (png_uint_16)(((*sp) << 8) + *(sp + 1));
+
                      png_uint_16 g = (png_uint_16)(((*(sp + 2)) << 8)
                          + *(sp + 3));
+
                      png_uint_16 b = (png_uint_16)(((*(sp + 4)) << 8)
                          + *(sp + 5));
+
                      if (r == trans_color->red && g == trans_color->green &&
                          b == trans_color->blue)
                      {
@@ -2871,20 +2978,24 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *(sp + 4) = (png_byte)((background->blue >> 8) & 0xff);
                         *(sp + 5) = (png_byte)(background->blue & 0xff);
                      }
+
                      else
                      {
                         png_uint_16 v = gamma_16[*(sp + 1) >> gamma_shift][*sp];
                         *sp = (png_byte)((v >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(v & 0xff);
+
                         v = gamma_16[*(sp + 3) >> gamma_shift][*(sp + 2)];
                         *(sp + 2) = (png_byte)((v >> 8) & 0xff);
                         *(sp + 3) = (png_byte)(v & 0xff);
+
                         v = gamma_16[*(sp + 5) >> gamma_shift][*(sp + 4)];
                         *(sp + 4) = (png_byte)((v >> 8) & 0xff);
                         *(sp + 5) = (png_byte)(v & 0xff);
                      }
                   }
                }
+
                else
 #endif
                {
@@ -2892,8 +3003,10 @@ png_do_background(png_row_infop row_info, png_bytep row,
                   for (i = 0; i < row_width; i++, sp += 6)
                   {
                      png_uint_16 r = (png_uint_16)(((*sp) << 8) + *(sp + 1));
+
                      png_uint_16 g = (png_uint_16)(((*(sp + 2)) << 8)
                          + *(sp + 3));
+
                      png_uint_16 b = (png_uint_16)(((*(sp + 4)) << 8)
                          + *(sp + 5));
 
@@ -2935,6 +3048,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         /* Background is already in screen gamma */
                         *dp = (png_byte)background->gray;
                      }
+
                      else
                      {
                         png_byte v, w;
@@ -2991,6 +3105,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *dp = (png_byte)((v >> 8) & 0xff);
                         *(dp + 1) = (png_byte)(v & 0xff);
                      }
+
 #ifdef PNG_READ_GAMMA_SUPPORTED
                      else if (a == 0)
 #else
@@ -3001,6 +3116,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *dp = (png_byte)((background->gray >> 8) & 0xff);
                         *(dp + 1) = (png_byte)(background->gray & 0xff);
                      }
+
 #ifdef PNG_READ_GAMMA_SUPPORTED
                      else
                      {
@@ -3024,6 +3140,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                   {
                      png_uint_16 a = (png_uint_16)(((*(sp + 2)) << 8)
                          + *(sp + 3));
+
                      if (a == (png_uint_16)0xffff)
                         png_memcpy(dp, sp, 2);
 
@@ -3036,6 +3153,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *dp = (png_byte)((background->gray >> 8) & 0xff);
                         *(dp + 1) = (png_byte)(background->gray & 0xff);
                      }
+
 #ifdef PNG_READ_GAMMA_SUPPORTED
                      else
                      {
@@ -3073,6 +3191,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *(dp + 1) = gamma_table[*(sp + 1)];
                         *(dp + 2) = gamma_table[*(sp + 2)];
                      }
+
                      else if (a == 0)
                      {
                         /* Background is already in screen gamma */
@@ -3080,6 +3199,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *(dp + 1) = (png_byte)background->green;
                         *(dp + 2) = (png_byte)background->blue;
                      }
+
                      else
                      {
                         png_byte v, w;
@@ -3087,9 +3207,11 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         v = gamma_to_1[*sp];
                         png_composite(w, v, a, background_1->red);
                         *dp = gamma_from_1[w];
+
                         v = gamma_to_1[*(sp + 1)];
                         png_composite(w, v, a, background_1->green);
                         *(dp + 1) = gamma_from_1[w];
+
                         v = gamma_to_1[*(sp + 2)];
                         png_composite(w, v, a, background_1->blue);
                         *(dp + 2) = gamma_from_1[w];
@@ -3111,17 +3233,21 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *(dp + 1) = *(sp + 1);
                         *(dp + 2) = *(sp + 2);
                      }
+
                      else if (a == 0)
                      {
                         *dp = (png_byte)background->red;
                         *(dp + 1) = (png_byte)background->green;
                         *(dp + 2) = (png_byte)background->blue;
                      }
+
                      else
                      {
                         png_composite(*dp, *sp, a, background->red);
+
                         png_composite(*(dp + 1), *(sp + 1), a,
                             background->green);
+
                         png_composite(*(dp + 2), *(sp + 2), a,
                             background->blue);
                      }
@@ -3140,6 +3266,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                   {
                      png_uint_16 a = (png_uint_16)(((png_uint_16)(*(sp + 6))
                          << 8) + (png_uint_16)(*(sp + 7)));
+
                      if (a == (png_uint_16)0xffff)
                      {
                         png_uint_16 v;
@@ -3147,13 +3274,16 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         v = gamma_16[*(sp + 1) >> gamma_shift][*sp];
                         *dp = (png_byte)((v >> 8) & 0xff);
                         *(dp + 1) = (png_byte)(v & 0xff);
+
                         v = gamma_16[*(sp + 3) >> gamma_shift][*(sp + 2)];
                         *(dp + 2) = (png_byte)((v >> 8) & 0xff);
                         *(dp + 3) = (png_byte)(v & 0xff);
+
                         v = gamma_16[*(sp + 5) >> gamma_shift][*(sp + 4)];
                         *(dp + 4) = (png_byte)((v >> 8) & 0xff);
                         *(dp + 5) = (png_byte)(v & 0xff);
                      }
+
                      else if (a == 0)
                      {
                         /* Background is already in screen gamma */
@@ -3164,30 +3294,35 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *(dp + 4) = (png_byte)((background->blue >> 8) & 0xff);
                         *(dp + 5) = (png_byte)(background->blue & 0xff);
                      }
+
                      else
                      {
                         png_uint_16 v, w, x;
 
                         v = gamma_16_to_1[*(sp + 1) >> gamma_shift][*sp];
                         png_composite_16(w, v, a, background_1->red);
+
                         x = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
                         *dp = (png_byte)((x >> 8) & 0xff);
                         *(dp + 1) = (png_byte)(x & 0xff);
 
                         v = gamma_16_to_1[*(sp + 3) >> gamma_shift][*(sp + 2)];
                         png_composite_16(w, v, a, background_1->green);
+
                         x = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
                         *(dp + 2) = (png_byte)((x >> 8) & 0xff);
                         *(dp + 3) = (png_byte)(x & 0xff);
 
                         v = gamma_16_to_1[*(sp + 5) >> gamma_shift][*(sp + 4)];
                         png_composite_16(w, v, a, background_1->blue);
+
                         x = gamma_16_from_1[(w & 0xff) >> gamma_shift][w >> 8];
                         *(dp + 4) = (png_byte)((x >> 8) & 0xff);
                         *(dp + 5) = (png_byte)(x & 0xff);
                      }
                   }
                }
+
                else
 #endif
                {
@@ -3197,10 +3332,12 @@ png_do_background(png_row_infop row_info, png_bytep row,
                   {
                      png_uint_16 a = (png_uint_16)(((png_uint_16)(*(sp + 6))
                          << 8) + (png_uint_16)(*(sp + 7)));
+
                      if (a == (png_uint_16)0xffff)
                      {
                         png_memcpy(dp, sp, 6);
                      }
+
                      else if (a == 0)
                      {
                         *dp = (png_byte)((background->red >> 8) & 0xff);
@@ -3210,6 +3347,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         *(dp + 4) = (png_byte)((background->blue >> 8) & 0xff);
                         *(dp + 5) = (png_byte)(background->blue & 0xff);
                      }
+
                      else
                      {
                         png_uint_16 v;
@@ -3223,9 +3361,11 @@ png_do_background(png_row_infop row_info, png_bytep row,
                         png_composite_16(v, r, a, background->red);
                         *dp = (png_byte)((v >> 8) & 0xff);
                         *(dp + 1) = (png_byte)(v & 0xff);
+
                         png_composite_16(v, g, a, background->green);
                         *(dp + 2) = (png_byte)((v >> 8) & 0xff);
                         *(dp + 3) = (png_byte)(v & 0xff);
+
                         png_composite_16(v, b, a, background->blue);
                         *(dp + 4) = (png_byte)((v >> 8) & 0xff);
                         *(dp + 5) = (png_byte)(v & 0xff);
@@ -3267,8 +3407,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
 
    png_debug(1, "in png_do_gamma");
 
-   if (
-       ((row_info->bit_depth <= 8 && gamma_table != NULL) ||
+   if (((row_info->bit_depth <= 8 && gamma_table != NULL) ||
        (row_info->bit_depth == 16 && gamma_16_table != NULL)))
    {
       switch (row_info->color_type)
@@ -3288,6 +3427,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
                   sp++;
                }
             }
+
             else /* if (row_info->bit_depth == 16) */
             {
                sp = row;
@@ -3333,6 +3473,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
                   sp++;
                }
             }
+
             else /* if (row_info->bit_depth == 16) */
             {
                sp = row;
@@ -3368,6 +3509,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
                   sp += 2;
                }
             }
+
             else /* if (row_info->bit_depth == 16) */
             {
                sp = row;
@@ -3460,8 +3602,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
 
    png_debug(1, "in png_do_expand_palette");
 
-   if (
-       row_info->color_type == PNG_COLOR_TYPE_PALETTE)
+   if (row_info->color_type == PNG_COLOR_TYPE_PALETTE)
    {
       if (row_info->bit_depth < 8)
       {
@@ -3485,6 +3626,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
                      shift = 0;
                      sp--;
                   }
+
                   else
                      shift++;
 
@@ -3507,6 +3649,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
                      shift = 0;
                      sp--;
                   }
+
                   else
                      shift += 2;
 
@@ -3529,6 +3672,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
                      shift = 0;
                      sp--;
                   }
+
                   else
                      shift += 4;
 
@@ -3541,6 +3685,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
          row_info->pixel_depth = 8;
          row_info->rowbytes = row_width;
       }
+
       switch (row_info->bit_depth)
       {
          case 8:
@@ -3569,6 +3714,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
                row_info->color_type = 6;
                row_info->channels = 4;
             }
+
             else
             {
                sp = row + (png_size_t)row_width - 1;
@@ -3636,6 +3782,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                         shift = 0;
                         sp--;
                      }
+
                      else
                         shift++;
 
@@ -3660,6 +3807,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                         shift = 0;
                         sp--;
                      }
+
                      else
                         shift += 2;
 
@@ -3683,6 +3831,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                         shift = 0;
                         sp--;
                      }
+
                      else
                         shift = 4;
 
@@ -3704,12 +3853,15 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                gray = gray & 0xff;
                sp = row + (png_size_t)row_width - 1;
                dp = row + (png_size_t)(row_width << 1) - 1;
+
                for (i = 0; i < row_width; i++)
                {
                   if (*sp == gray)
                      *dp-- = 0;
+
                   else
                      *dp-- = 0xff;
+
                   *dp-- = *sp--;
                }
             }
@@ -3727,11 +3879,13 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                      *dp-- = 0;
                      *dp-- = 0;
                   }
+
                   else
                   {
                      *dp-- = 0xff;
                      *dp-- = 0xff;
                   }
+
                   *dp-- = *sp--;
                   *dp-- = *sp--;
                }
@@ -3757,8 +3911,10 @@ png_do_expand(png_row_infop row_info, png_bytep row,
             {
                if (*(sp - 2) == red && *(sp - 1) == green && *(sp) == blue)
                   *dp-- = 0;
+
                else
                   *dp-- = 0xff;
+
                *dp-- = *sp--;
                *dp-- = *sp--;
                *dp-- = *sp--;
@@ -3786,11 +3942,13 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                   *dp-- = 0;
                   *dp-- = 0;
                }
+
                else
                {
                   *dp-- = 0xff;
                   *dp-- = 0xff;
                }
+
                *dp-- = *sp--;
                *dp-- = *sp--;
                *dp-- = *sp--;
@@ -3850,11 +4008,13 @@ png_do_quantize(png_row_infop row_info, png_bytep row,
 
             *dp++ = palette_lookup[p];
          }
+
          row_info->color_type = PNG_COLOR_TYPE_PALETTE;
          row_info->channels = 1;
          row_info->pixel_depth = row_info->bit_depth;
          row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
       }
+
       else if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA &&
          palette_lookup != NULL && row_info->bit_depth == 8)
       {
@@ -3879,15 +4039,18 @@ png_do_quantize(png_row_infop row_info, png_bytep row,
 
             *dp++ = palette_lookup[p];
          }
+
          row_info->color_type = PNG_COLOR_TYPE_PALETTE;
          row_info->channels = 1;
          row_info->pixel_depth = row_info->bit_depth;
          row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
       }
+
       else if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
          quantize_lookup && row_info->bit_depth == 8)
       {
          sp = row;
+
          for (i = 0; i < row_width; i++, sp++)
          {
             *sp = quantize_lookup[*sp];
@@ -4041,6 +4204,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
 
      if (png_ptr->screen_gamma > .000001)
         g = 1.0 / (png_ptr->gamma * png_ptr->screen_gamma);
+
      else
         g = 1.0;
 
@@ -4073,6 +4237,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
               last++;
            }
         }
+
         while (last < ((png_uint_32)num << 8))
         {
            png_ptr->gamma_16_table[(int)(last & (0xff >> shift))]
@@ -4115,6 +4280,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
 
            ig = (((png_uint_32)i *
                (png_uint_32)png_gamma_shift[shift]) >> 4);
+
            for (j = 0; j < 256; j++)
            {
               png_ptr->gamma_16_to_1[i][j] =
@@ -4167,6 +4333,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
    {
       int bytes_per_pixel;
       png_uint_32 row_width = row_info->width;
+
       if (row_info->bit_depth == 8)
       {
          png_bytep rp;

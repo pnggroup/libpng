@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.1 [April 29, 2010]
+ * Last changed in libpng 1.4.1 [May 6, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -343,11 +343,13 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
          *res_x = info_ptr->x_pixels_per_unit;
          retval |= PNG_INFO_pHYs;
       }
+
       if (res_y != NULL)
       {
          *res_y = info_ptr->y_pixels_per_unit;
          retval |= PNG_INFO_pHYs;
       }
+
       if (unit_type != NULL)
       {
          *unit_type = (int)info_ptr->phys_unit_type;
@@ -373,6 +375,7 @@ png_get_channels(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
       return(info_ptr->channels);
+
    else
       return (0);
 }
@@ -382,6 +385,7 @@ png_get_signature(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
       return(info_ptr->signature);
+
    else
       return (NULL);
 }
@@ -498,6 +502,7 @@ png_get_gAMA_fixed(png_structp png_ptr, png_infop info_ptr,
       *int_file_gamma = info_ptr->int_gamma;
       return (PNG_INFO_gAMA);
    }
+
    return (0);
 }
 #endif
@@ -515,6 +520,7 @@ png_get_sRGB(png_structp png_ptr, png_infop info_ptr, int *file_srgb_intent)
       *file_srgb_intent = (int)info_ptr->srgb_intent;
       return (PNG_INFO_sRGB);
    }
+
    return (0);
 }
 #endif
@@ -539,6 +545,7 @@ png_get_iCCP(png_structp png_ptr, png_infop info_ptr,
       *compression_type = (int)info_ptr->iccp_compression;
       return (PNG_INFO_iCCP);
    }
+
    return (0);
 }
 #endif
@@ -553,6 +560,7 @@ png_get_sPLT(png_structp png_ptr, png_infop info_ptr,
       *spalettes = info_ptr->splt_palettes;
       return ((png_uint_32)info_ptr->splt_palettes_num);
    }
+
    return (0);
 }
 #endif
@@ -569,6 +577,7 @@ png_get_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p *hist)
       *hist = info_ptr->hist;
       return (PNG_INFO_hIST);
    }
+
    return (0);
 }
 #endif
@@ -627,6 +636,7 @@ png_get_oFFs(png_structp png_ptr, png_infop info_ptr,
       *unit_type = (int)info_ptr->offset_unit_type;
       return (PNG_INFO_oFFs);
    }
+
    return (0);
 }
 #endif
@@ -652,6 +662,7 @@ png_get_pCAL(png_structp png_ptr, png_infop info_ptr,
       *params = info_ptr->pcal_params;
       return (PNG_INFO_pCAL);
    }
+
    return (0);
 }
 #endif
@@ -670,6 +681,7 @@ png_get_sCAL(png_structp png_ptr, png_infop info_ptr,
       *height = info_ptr->scal_pixel_height;
       return (PNG_INFO_sCAL);
    }
+
    return(0);
 }
 #else
@@ -686,6 +698,7 @@ png_get_sCAL_s(png_structp png_ptr, png_infop info_ptr,
       *height = info_ptr->scal_s_height;
       return (PNG_INFO_sCAL);
    }
+
    return(0);
 }
 #endif
@@ -722,6 +735,7 @@ png_get_pHYs(png_structp png_ptr, png_infop info_ptr,
          retval |= PNG_INFO_pHYs;
       }
    }
+
    return (retval);
 }
 #endif
@@ -740,6 +754,7 @@ png_get_PLTE(png_structp png_ptr, png_infop info_ptr, png_colorp *palette,
       png_debug1(3, "num_palette = %d", *num_palette);
       return (PNG_INFO_PLTE);
    }
+
    return (0);
 }
 
@@ -755,6 +770,7 @@ png_get_sBIT(png_structp png_ptr, png_infop info_ptr, png_color_8p *sig_bit)
       *sig_bit = &(info_ptr->sig_bit);
       return (PNG_INFO_sBIT);
    }
+
    return (0);
 }
 #endif
@@ -778,8 +794,10 @@ png_get_text(png_structp png_ptr, png_infop info_ptr, png_textp *text_ptr,
 
       return ((png_uint_32)info_ptr->num_text);
    }
+
    if (num_text != NULL)
       *num_text = 0;
+
    return(0);
 }
 #endif
@@ -796,6 +814,7 @@ png_get_tIME(png_structp png_ptr, png_infop info_ptr, png_timep *mod_time)
       *mod_time = &(info_ptr->mod_time);
       return (PNG_INFO_tIME);
    }
+
    return (0);
 }
 #endif
@@ -821,6 +840,7 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
          if (trans_color != NULL)
             *trans_color = &(info_ptr->trans_color);
       }
+
       else /* if (info_ptr->color_type != PNG_COLOR_TYPE_PALETTE) */
       {
          if (trans_color != NULL)
@@ -832,12 +852,14 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
          if (trans_alpha != NULL)
             *trans_alpha = NULL;
       }
+
       if (num_trans != NULL)
       {
          *num_trans = info_ptr->num_trans;
          retval |= PNG_INFO_tRNS;
       }
    }
+
    return (retval);
 }
 #endif
@@ -852,6 +874,7 @@ png_get_unknown_chunks(png_structp png_ptr, png_infop info_ptr,
       *unknowns = info_ptr->unknown_chunks;
       return ((png_uint_32)info_ptr->unknown_chunks_num);
    }
+
    return (0);
 }
 #endif

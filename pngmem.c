@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.5.0 [April 29, 2010]
+ * Last changed in libpng 1.5.0 [May 6, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -44,8 +44,10 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
 
    if (type == PNG_STRUCT_INFO)
       size = png_sizeof(png_info);
+
    else if (type == PNG_STRUCT_PNG)
       size = png_sizeof(png_struct);
+
    else
       return (png_get_copyright(NULL));
 
@@ -57,11 +59,13 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
       png_ptr->mem_ptr=mem_ptr;
       struct_ptr = (*(malloc_fn))(png_ptr, (png_uint_32)size);
    }
+
    else
 #  endif /* PNG_USER_MEM_SUPPORTED */
    struct_ptr = (png_voidp)farmalloc(size);
    if (struct_ptr != NULL)
       png_memset(struct_ptr, 0, size);
+
    return (struct_ptr);
 }
 
@@ -90,6 +94,7 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
          (*(free_fn))(png_ptr, struct_ptr);
          return;
       }
+
 #  endif /* PNG_USER_MEM_SUPPORTED */
       farfree (struct_ptr);
    }
@@ -120,8 +125,10 @@ png_calloc(png_structp png_ptr, png_alloc_size_t size)
    png_voidp ret;
 
    ret = (png_malloc(png_ptr, size));
+
    if (ret != NULL)
       png_memset(ret,0,(png_size_t)size);
+
    return (ret);
 }
 
@@ -136,10 +143,13 @@ png_malloc(png_structp png_ptr, png_alloc_size_t size)
 #  ifdef PNG_USER_MEM_SUPPORTED
    if (png_ptr->malloc_fn != NULL)
       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
+
    else
       ret = (png_malloc_default(png_ptr, size));
+
    if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
        png_error(png_ptr, "Out of memory");
+
    return (ret);
 }
 
@@ -158,11 +168,13 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
       png_warning(png_ptr, "Cannot Allocate > 64K");
       ret = NULL;
    }
+
    else
 #  endif
 
    if (size != (size_t)size)
       ret = NULL;
+
    else if (size == (png_uint_32)65536L)
    {
       if (png_ptr->offset_table == NULL)
@@ -185,10 +197,13 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 
             if (png_ptr->zlib_window_bits > 14)
                num_blocks = (int)(1 << (png_ptr->zlib_window_bits - 14));
+
             else
                num_blocks = 1;
+
             if (png_ptr->zlib_mem_level >= 7)
                num_blocks += (int)(1 << (png_ptr->zlib_mem_level - 7));
+
             else
                num_blocks++;
 
@@ -201,6 +216,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 #  ifndef PNG_USER_MEM_SUPPORTED
                if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
                   png_error(png_ptr, "Out Of Memory"); /* Note "O", "M" */
+
                else
                   png_warning(png_ptr, "Out Of Memory");
 #  endif
@@ -213,6 +229,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
                if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
                   png_error(png_ptr,
                     "Farmalloc didn't return normalized pointer");
+
                else
                   png_warning(png_ptr,
                     "Farmalloc didn't return normalized pointer");
@@ -229,6 +246,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 #  ifndef PNG_USER_MEM_SUPPORTED
                if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
                   png_error(png_ptr, "Out Of memory"); /* Note "O", "m" */
+
                else
                   png_warning(png_ptr, "Out Of memory");
 #  endif
@@ -241,6 +259,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
                hptr = (png_byte huge *)((long)(hptr) & 0xfffffff0L);
                hptr = hptr + 16L;  /* "hptr += 16L" fails on Turbo C++ 3.0 */
             }
+
             for (i = 0; i < num_blocks; i++)
             {
                png_ptr->offset_table_ptr[i] = (png_bytep)hptr;
@@ -258,6 +277,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 #  ifndef PNG_USER_MEM_SUPPORTED
          if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
             png_error(png_ptr, "Out of Memory"); /* Note "o" and "M" */
+
          else
             png_warning(png_ptr, "Out of Memory");
 #  endif
@@ -266,6 +286,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 
       ret = png_ptr->offset_table_ptr[png_ptr->offset_table_count++];
    }
+
    else
       ret = farmalloc(size);
 
@@ -274,6 +295,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
    {
       if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
          png_error(png_ptr, "Out of memory"); /* Note "o" and "m" */
+
       else
          png_warning(png_ptr, "Out of memory"); /* Note "o" and "m" */
    }
@@ -298,6 +320,7 @@ png_free(png_structp png_ptr, png_voidp ptr)
       (*(png_ptr->free_fn))(png_ptr, ptr);
       return;
    }
+
    else
       png_free_default(png_ptr, ptr);
 }
@@ -333,9 +356,7 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
    }
 
    if (ptr != NULL)
-   {
       farfree(ptr);
-   }
 }
 
 #else /* Not the Borland DOS special memory handler */
@@ -362,8 +383,10 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
 
    if (type == PNG_STRUCT_INFO)
       size = png_sizeof(png_info);
+
    else if (type == PNG_STRUCT_PNG)
       size = png_sizeof(png_struct);
+
    else
       return (NULL);
 
@@ -374,8 +397,10 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
       png_structp png_ptr = &dummy_struct;
       png_ptr->mem_ptr=mem_ptr;
       struct_ptr = (*(malloc_fn))(png_ptr, size);
+
       if (struct_ptr != NULL)
          png_memset(struct_ptr, 0, size);
+
       return (struct_ptr);
    }
 #  endif /* PNG_USER_MEM_SUPPORTED */
@@ -389,6 +414,7 @@ png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
    struct_ptr = (png_voidp)malloc(size);
 #    endif
 #  endif
+
    if (struct_ptr != NULL)
       png_memset(struct_ptr, 0, size);
 
@@ -424,11 +450,14 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
 #  endif /* PNG_USER_MEM_SUPPORTED */
 #  if defined(__TURBOC__) && !defined(__FLAT__)
       farfree(struct_ptr);
+
 #  else
 #    if defined(_MSC_VER) && defined(MAXSEG_64K)
       hfree(struct_ptr);
+
 #    else
       free(struct_ptr);
+
 #    endif
 #  endif
    }
@@ -447,8 +476,10 @@ png_calloc(png_structp png_ptr, png_alloc_size_t size)
    png_voidp ret;
 
    ret = (png_malloc(png_ptr, size));
+
    if (ret != NULL)
       png_memset(ret,0,(png_size_t)size);
+
    return (ret);
 }
 
@@ -463,10 +494,13 @@ png_malloc(png_structp png_ptr, png_alloc_size_t size)
 
    if (png_ptr->malloc_fn != NULL)
       ret = ((png_voidp)(*(png_ptr->malloc_fn))(png_ptr, (png_size_t)size));
+
    else
       ret = (png_malloc_default(png_ptr, size));
+
    if (ret == NULL && (png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
        png_error(png_ptr, "Out of Memory");
+
    return (ret);
 }
 
@@ -485,6 +519,7 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 #    ifndef PNG_USER_MEM_SUPPORTED
       if ((png_ptr->flags&PNG_FLAG_MALLOC_NULL_MEM_OK) == 0)
          png_error(png_ptr, "Cannot Allocate > 64K");
+
       else
 #    endif
          return NULL;
@@ -493,19 +528,25 @@ png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
 
    /* Check for overflow */
 #  if defined(__TURBOC__) && !defined(__FLAT__)
+
    if (size != (unsigned long)size)
       ret = NULL;
+
    else
       ret = farmalloc(size);
+
 #  else
 #    if defined(_MSC_VER) && defined(MAXSEG_64K)
    if (size != (unsigned long)size)
       ret = NULL;
+
    else
       ret = halloc(size, 1);
+
 #    else
    if (size != (size_t)size)
       ret = NULL;
+
    else
       ret = malloc((size_t)size);
 #    endif
@@ -534,6 +575,7 @@ png_free(png_structp png_ptr, png_voidp ptr)
       (*(png_ptr->free_fn))(png_ptr, ptr);
       return;
    }
+
    else
       png_free_default(png_ptr, ptr);
 }
@@ -547,11 +589,14 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 
 #  if defined(__TURBOC__) && !defined(__FLAT__)
    farfree(ptr);
+
 #  else
 #    if defined(_MSC_VER) && defined(MAXSEG_64K)
    hfree(ptr);
+
 #    else
    free(ptr);
+
 #    endif
 #  endif
 }
@@ -604,6 +649,7 @@ png_get_mem_ptr(png_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
+
    return ((png_voidp)png_ptr->mem_ptr);
 }
 #endif /* PNG_USER_MEM_SUPPORTED */

@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.0 [April 29, 2010]
+ * Last changed in libpng 1.5.0 [May 6, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -53,8 +53,10 @@ int PNGAPI
 png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+
    if (num_to_check > 8)
       num_to_check = 8;
+
    else if (num_to_check < 1)
       return (-1);
 
@@ -81,6 +83,7 @@ png_zalloc(voidpf png_ptr, uInt items, uInt size)
 
    if (png_ptr == NULL)
       return (NULL);
+
    if (items > PNG_UINT_32_MAX/size)
    {
      png_warning (p, "Potential overflow in png_zalloc()");
@@ -127,6 +130,7 @@ png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length)
           (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
          need_crc = 0;
    }
+
    else                                                    /* critical */
    {
       if (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE)
@@ -234,8 +238,10 @@ png_data_freer(png_structp png_ptr, png_infop info_ptr,
 
    if (freer == PNG_DESTROY_WILL_FREE_DATA)
       info_ptr->free_me |= mask;
+
    else if (freer == PNG_USER_WILL_FREE_DATA)
       info_ptr->free_me &= ~mask;
+
    else
       png_warning(png_ptr,
          "Unknown freer parameter in png_data_freer");
@@ -262,6 +268,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
             info_ptr->text[num].key = NULL;
          }
       }
+
       else
       {
          int i;
@@ -347,6 +354,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
             info_ptr->splt_palettes[num].entries = NULL;
          }
       }
+
       else
       {
          if (info_ptr->splt_palettes_num)
@@ -381,6 +389,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
              info_ptr->unknown_chunks[num].data = NULL;
           }
       }
+
       else
       {
          int i;
@@ -438,6 +447,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
    if (num == -1)
       info_ptr->free_me &= ~mask;
+
    else
       info_ptr->free_me &= ~(mask & ~PNG_FREE_MUL);
 }
@@ -475,6 +485,7 @@ png_get_io_ptr(png_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
+
    return (png_ptr->io_ptr);
 }
 
@@ -511,6 +522,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 
    if (png_ptr == NULL)
       return (NULL);
+
    if (png_ptr->time_buffer == NULL)
    {
       png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, (png_uint_32)(29*
@@ -548,13 +560,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #  ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.5.0beta24 - April 29, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.5.0beta24 - May 6, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #  else
-      return ((png_charp) "libpng version 1.5.0beta24 - April 29, 2010\
+      return ((png_charp) "libpng version 1.5.0beta24 - May 6, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -611,6 +623,7 @@ png_handle_as_unknown(png_structp png_ptr, png_bytep chunk_name)
    png_bytep p;
    if (png_ptr == NULL || chunk_name == NULL || png_ptr->num_chunk_list<=0)
       return 0;
+
    p = png_ptr->chunk_list + png_ptr->num_chunk_list*5 - 5;
    for (i = png_ptr->num_chunk_list; i; i--, p -= 5)
       if (!png_memcmp(chunk_name, p, 4))
@@ -627,6 +640,7 @@ png_reset_zstream(png_structp png_ptr)
 {
    if (png_ptr == NULL)
       return Z_STREAM_ERROR;
+
    return (inflateReset(&png_ptr->zstream));
 }
 #endif /* PNG_READ_SUPPORTED */
@@ -650,6 +664,7 @@ png_convert_size(size_t size)
 {
    if (size > (png_size_t)-1)
       PNG_ABORT();  /* We haven't got access to png_ptr, so no png_error() */
+
    return ((png_size_t)size);
 }
 #  endif /* PNG_SIZE_T */
@@ -739,16 +754,19 @@ png_check_cHRM_fixed(png_structp png_ptr,
       png_warning(png_ptr, "Invalid cHRM white point");
       ret = 0;
    }
+
    if (red_x > 100000L - red_y)
    {
       png_warning(png_ptr, "Invalid cHRM red point");
       ret = 0;
    }
+
    if (green_x > 100000L - green_y)
    {
       png_warning(png_ptr, "Invalid cHRM green point");
       ret = 0;
    }
+
    if (blue_x > 100000L - blue_y)
    {
       png_warning(png_ptr, "Invalid cHRM blue point");
@@ -793,6 +811,7 @@ png_check_IHDR(png_structp png_ptr,
 
 #  ifdef PNG_SET_USER_LIMITS_SUPPORTED
    if (width > png_ptr->user_width_max || width > PNG_USER_WIDTH_MAX)
+
 #  else
    if (width > PNG_USER_WIDTH_MAX)
 #  endif

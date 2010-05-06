@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta24 - April 29, 2010
+Libpng 1.5.0beta24 - May 6, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -219,6 +219,11 @@ version 1.5.0beta23 [April 29, 2010]
   Include png_reset_zstream() in png.c only when PNG_READ_SUPPORTED is defined.
   Removed dummy_inflate.c from contrib/pngminim/encoder
   Removed contrib/pngminim/*/gather.sh; gathering is now done in the makefile.
+
+version 1.5.0beta24 [May 6, 2010]
+  Use bitwise "&" instead of arithmetic mod in pngrutil.c calculation of the
+    offset of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
+  Added more blank lines for readability.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
