@@ -2702,7 +2702,7 @@ version 1.5.0beta23 [April 29, 2010]
   Removed dummy_inflate.c from contrib/pngminim/encoder
   Removed contrib/pngminim/*/gather.sh; gathering is now done in the makefile.
 
-version 1.5.0beta24 [May 6, 2010]
+version 1.5.0beta24 [May 7, 2010]
   Use bitwise "&" instead of arithmetic mod in pngrutil.c calculation of the
     offset of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
   Added more blank lines for readability.
