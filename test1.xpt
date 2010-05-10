@@ -1,0 +1,11 @@
+Title: PngSuite
+Author: Willem A.J. van Schaik
+(gwillem@ntuvax.ntu.ac.sg)
+Copyright: Copyright Willem van Schaik, Singapore 1995
+Description: A compilation of a set of images created to test the
+various color-types of the PNG format. Included are
+black&white, color, paletted, with alpha channel, with
+transparency formats. All bit-depths allowed according
+to the spec are present.
+Software: Created on a NeXTstation color using "pnmtopng".
+Disclaimer: Freeware.

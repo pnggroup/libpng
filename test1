@@ -1,0 +1,3 @@
+#!/bin/sh
+echo 'Testing uncompressed text chunk - tEXT (plain format)'
+./pngmeta -quiet ct1n0g04.png | diff -c test1.xpt -

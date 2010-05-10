@@ -1,0 +1,3 @@
+#!/bin/sh
+echo 'Testing compressed text chunk   - zTXT (SOIF format)'
+./pngmeta -soif -quiet ctzn0g04.png | diff -c test2.xpt -

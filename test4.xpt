@@ -1,0 +1,20 @@
+<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+         xmlns:s='http://www.tasi.ac.uk/rdf/vocab#'
+         xmlns:dc='http://purl.org/dc/elements/1.0/'>
+  <s:Image about="ct1n0g04.png">
+    <dc:type>image/png</dc:type>
+    <s:Title>PngSuite</s:Title>
+    <s:Author>Willem A.J. van Schaik
+(gwillem@ntuvax.ntu.ac.sg)</s:Author>
+    <s:Copyright>Copyright Willem van Schaik, Singapore 1995</s:Copyright>
+    <s:Description>A compilation of a set of images created to test the
+various color-types of the PNG format. Included are
+black&amp;white, color, paletted, with alpha channel, with
+transparency formats. All bit-depths allowed according
+to the spec are present.</s:Description>
+    <s:Software>Created on a NeXTstation color using "pnmtopng".</s:Software>
+    <s:Disclaimer>Freeware.</s:Disclaimer>
+  </s:Image>
+</rdf:RDF>
+
+<!--Created by pngmeta V1.10 -->

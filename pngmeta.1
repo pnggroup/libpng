@@ -1,0 +1,139 @@
+.TH PNGMETA 1 "10 March 1998"
+.\"
+.\" Manual page for pngmeta - see end of page for copyright
+.\"
+.\" $Source: /home/cur/djb1/develop/pngmeta/pngmeta/RCS/pngmeta.1,v $
+.\"
+.\" $Id: pngmeta.1,v 1.4 2000/01/31 14:05:45 djb1 Exp $
+.\"
+.SH NAME
+pngmeta \- extract metadata from Portable Network Graphics (PNG) image files
+.SH SYNOPSIS
+.B pngmeta
+.RB [ \--soif ]
+.RB [ \--html ]
+.RB [ \--xrdf ]
+.RB [ \--all ]
+.RB [ \--quiet ]
+.RB [ \--uri\ URI ]
+.RI [ filename ]
+.SH DESCRIPTION
+The
+.I pngmeta
+filter outputs the metadata from Portable Network Graphics (PNG)
+format image files in one of these formats:
+.LP
+1. Simple key: value
+.LP
+2. SOIF format (as used by the Harvest system, version 1.4).
+.IP
+As such it can be used as a Summarizer for the Harvest Essence system.
+It could also be used by other indexers to extract data for
+indexing PNG images.
+.LP
+3. HTML page
+With each element as an element in a descriptive (DL) list
+.LP
+4. XML/RDF
+With each element as an RDF property on the source URI.
+.LP
+In the absence of options, the program operates as a filter,
+accepting input from stdin and sending output to stdout.
+If a single file name is given,
+it is assumed to correspond to a PNG file,
+and is processed.
+.SH FORMAT OPTIONS
+.TP
+.B \--soif
+Format output using (Harvest) SOIF format.  This is the default if
+the program is called PngImage.sum.
+.TP
+.B \--html
+Format output in HTML, with each field/value as an element in a descriptive
+.RB ( DL )
+list.
+.TP
+.B \--xrdf
+Format output in RDF/XML, with each field/value as an element in a descriptive
+.RB ( DL )
+list.
+.SH OTHER OPTIONS
+.TP
+.B \--all
+Output all the information about the image size, depth etc. even if
+not usually printed.
+.TP
+.B \--quiet
+Suppress the output of the banner for plain text output.
+.B \--uri URI
+Set the URI that is used for the SOIF and XML/RDF outputs.  By
+default this will be the filename, or "stdin" if this is the program
+is used as a filter.
+.TP
+.B \--help
+Show a usage message
+.TP
+.B \--version
+Show the program and library versions
+.SH FILES
+.TP 2.2i
+.I pngmeta
+executable
+.SH "SEE ALSO"
+.IR gif2png (1),
+.IR libpng (3),
+.IR pbm (1),
+.IR pgm (1),
+.IR pngcheck (1),
+.IR pngtopnm (1),
+.IR pnm (5),
+.IR pnmgamma (1),
+.IR pnmtopng (1),
+.IR ptot (1),
+.IR tiff2png (1),
+.IR zlib (3)
+.LP
+For information about Harvest and its SOIF format:
+.IP
+http://harvest.cs.colorado.edu/
+.LP
+For
+.IR PNG
+.IP
+http://www.cdrom.com/pub/png/
+.LP
+For
+.IR "libpng library:"
+.IP
+ftp://swrinde.nde.swri.edu/pub/png/src/
+.br
+http://www.cdrom.com/pub/png/src/
+.LP
+For
+.IR zlib
+.IP
+http://www.cdrom.com/pub/infozip/zlib/
+.LP
+For
+.IR "zlib library:"
+.IP
+http://www.cdrom.com/pub/infozip/zlib/
+.SH AUTHORS
+Version 1.10.
+Dave Beckett (D.J.Beckett@ukc.ac.uk).
+.LP
+The
+.IR zlib (3)
+library required by
+.I pngmeta
+is copyright (C) 1995-1996 Jean-loup Gailly and Mark Adler.
+Some code was modified from the code for the
+.IR libpng (3)
+library function
+.B png_read_end()
+which is copyright (c) Guy Eric Schalnat, Andreas Dilger, Glenn
+Randers-Pehrson and others -- see the source for details.
+.LP
+Original UNIX manual page by R. P. C. Rodgers,
+U.S. National Library of Medicine (rodgers@nlm.nih.gov).
+.\" end of man page

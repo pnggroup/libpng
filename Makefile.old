@@ -1,0 +1,68 @@
+#
+# basic makefile for pngmeta
+#
+
+PACKAGE=pngmeta
+VERSION=1.10
+
+ZLIB=../zlib
+LIBPNG=../libpng
+
+# Compile with GNU cc
+CC=gcc
+EXTRA_CC_FLAGS=-W -Wall
+
+# If you are not using gcc, set these options (must be an ANSI C compiler)
+#CC=cc
+#EXTRA_CC_FLAGS=
+
+
+CFLAGS= -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\" $(EXTRA_CC_FLAGS) -I$(LIBPNG) -I$(ZLIB) -g
+LDFLAGS=-L$(LIBPNG) -L$(ZLIB) -lpng -lz -lm
+
+# Need ranlib?
+#RANLIB=ranlib
+RANLIB=echo
+
+INSTALL=install
+
+# hierarchy where make install puts pngmeta
+prefix=/usr/local
+
+
+# Nothing needs configuring below here
+
+TEMPDIR=/tmp
+
+OBJS = pngmeta.o
+
+all: build
+
+build: pngmeta
+
+pngmeta: $(OBJS)
+	$(CC) -o pngmeta $(CCFLAGS) pngmeta.o $(LDFLAGS)
+
+TESTS=test1 test2 test3 test4
+
+check: pngmeta $(TESTS)
+	for test in $(TESTS); do \
+	  $$test; \
+	done
+
+test-results: pngmeta
+	./pngmeta -quiet ct1n0g04.png > test1.xpt
+	./pngmeta -soif -quiet ctzn0g04.png > test2.xpt
+	./pngmeta -html -quiet 8859.png > test3.xpt
+	./pngmeta -xrdf ct1n0g04.png > test4.xpt
+
+install: pngmeta
+	-@mkdir $(prefix)/bin
+	$(INSTALL) -c pngmeta $(prefix)/bin
+	$(INSTALL) -c pngmeta.1 $(prefix)/man/man1/pngmeta.1
+
+pngmeta.man: pngmeta.1
+	nroff -man $? > pngmeta.man
+
+clean:
+	rm -f *.o pngmeta.man pngmeta *~

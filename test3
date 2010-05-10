@@ -1,0 +1,3 @@
+#!/bin/sh
+echo 'Testing HTML output'
+./pngmeta -html -quiet 8859.png | diff -c test3.xpt -

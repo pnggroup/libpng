@@ -1,0 +1,3 @@
+#!/bin/sh
+echo 'Testing RDF/XML output'
+./pngmeta -xrdf ct1n0g04.png | diff -c test4.xpt -

@@ -1,0 +1,40 @@
+Changes
+-------
+
+Version
+1.10	Updated to use latest zlib (1.1.3), libpng (1.0.5o).  Added
+	GNU style --options including --help page and --version
+
+1.9	Added -uri URI option to set URI for SOIF and RDF/XML output
+	For RDF/XML output don't escape values starting with <RDF
+
+1.8	Added RDF in XML output written by
+        Dan Brickley <daniel.brickley@bristol.ac.uk>
+
+1.7	Bug in printing out version.
+	Updated to use GNU configure stuff.
+
+1.6	libpng 1.0.0, zlib 1.1.1
+	Does SOIF by default when program is PngImage.sum
+	Version information output in usage and HTML.
+	Use libpng time formatting routine.
+
+1.4-1.5	libpng 0.87, 0.88, 0.88b, 0.89c and finally 0.90
+
+1.3	Tidied up HTML output.  Tested with libpng 0.86
+
+1.2	Added HTML output in <DL><DT>field</DT><DD><P>value</P></DD>...</DL>
+	form.
+
+1.1	Now outputs image meta data: format, colors (bitdepth),
+	width, height and image type in the style of the GIF
+	summariser for Harvest V1.4  Only outputs this for SOIF format.
+
+	Prints modification time chunk (tIME) contents if present in
+	RFC 1123 format, as suggested by PNG spec.
+
+1.0	For libpng 0.85 }
+			} Same functionality
+0.9	For libpng 0.81 }
+
+

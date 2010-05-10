@@ -1,0 +1,18 @@
+@FILE { ctzn0g04.png
+image-format{3}:	PNG
+image-colors{1}:	4
+image-width{2}:	32
+image-height{2}:	32
+image-type{25}:	Grayscale, non-interlaced
+Title{8}:	PngSuite
+Author{49}:	Willem A.J. van Schaik
+(gwillem@ntuvax.ntu.ac.sg)
+Copyright{43}:	Copyright Willem van Schaik, Singapore 1995
+Description{239}:	A compilation of a set of images created to test the
+various color-types of the PNG format. Included are
+black&white, color, paletted, with alpha channel, with
+transparency formats. All bit-depths allowed according
+to the spec are present.
+Software{48}:	Created on a NeXTstation color using "pnmtopng".
+Disclaimer{9}:	Freeware.
+}
