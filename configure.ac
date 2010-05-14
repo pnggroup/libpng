@@ -61,7 +61,7 @@ AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
 
 case $host_os in
   aix*)
-   LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG -D_ALL_SOURCE;;
+   LIBPNG_DEFINES="-DPNG_CONFIGURE_LIBPNG -D_ALL_SOURCE";;
   *)
    LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG;;
 esac
