@@ -18,15 +18,15 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.4.2], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.4.3beta01], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.4.2
+PNGLIB_VERSION=1.4.3beta01
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=4
-PNGLIB_RELEASE=2
+PNGLIB_RELEASE=3
 
 dnl End of version number stuff
 
