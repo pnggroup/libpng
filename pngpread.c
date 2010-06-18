@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.5.0 [May 7, 2010]
+ * Last changed in libpng 1.5.0 [June 18, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1693,7 +1693,7 @@ png_push_have_end(png_structp png_ptr, png_infop info_ptr)
 void /* PRIVATE */
 png_push_have_row(png_structp png_ptr, png_bytep row)
 {
-   if (png_ptr->row_fn != NULL)
+   if (png_ptr->row_fn != NULL && png_ptr->row_number < png_ptr->height)
       (*(png_ptr->row_fn))(png_ptr, row, png_ptr->row_number,
          (int)png_ptr->pass);
 }

@@ -5,7 +5,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng version 1.5.0 - May 7, 2010
+ * Last changed in libpng version 1.5.0 - June 18, 2010
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -34,7 +34,7 @@
  */
 #ifndef PNGDEBUG_H
 #define PNGDEBUG_H
-/* These settings control the formatting of messages in pngerror.c */
+/* These settings control the formatting of messages in png.c and pngerror.c */
 /* Moved to pngdebug.h at 1.5.0 */
 #  ifndef PNG_LITERAL_SHARP
 #    define PNG_LITERAL_SHARP 0x23
