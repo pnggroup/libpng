@@ -2580,6 +2580,7 @@ version 1.4.3beta01 [June 18, 2010]
   Added missing quotation marks in the aix block of configure.ac
   The new "vstudio" project was missing from the zip and 7z distributions.
   In pngpread.c: png_push_have_row() add check for new_row > height
+  Removed the now-redundant check for out-of-bounds new_row from example.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
