@@ -2679,6 +2679,10 @@ version 1.0.53rc02 and 1.2.43rc02 [February 19, 2010]
 version 1.0.53 and 1.2.43 [February 25, 2010]
   Removed unused gzio.c from contrib/pngminim gather and makefile scripts
 
+version 1.2.44beta01 [June 18, 2010]
+  In pngpread.c: png_push_have_row() add check for new_row > height
+  Removed the now-redundant check for out-of-bounds new_row from example.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
