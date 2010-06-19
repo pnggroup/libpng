@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.4.1 [February 25, 2010]
+ * Last changed in libpng 1.4.3 [June 19, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -890,6 +890,12 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 void /* PRIVATE */
 png_push_process_row(png_structp png_ptr)
 {
+   if (png_ptr->row_number >= png_ptr->num_rows)
+   {
+      png_benign_error(png_ptr, "Extra row in image");
+      return;
+   }
+
    png_ptr->row_info.color_type = png_ptr->color_type;
    png_ptr->row_info.width = png_ptr->iwidth;
    png_ptr->row_info.channels = png_ptr->channels;
@@ -1682,7 +1688,7 @@ png_push_have_end(png_structp png_ptr, png_infop info_ptr)
 void /* PRIVATE */
 png_push_have_row(png_structp png_ptr, png_bytep row)
 {
-   if (png_ptr->row_fn != NULL && png_ptr->row_number < png_ptr->height)
+   if (png_ptr->row_fn != NULL)
       (*(png_ptr->row_fn))(png_ptr, row, png_ptr->row_number,
          (int)png_ptr->pass);
 }
