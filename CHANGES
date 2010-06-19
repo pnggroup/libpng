@@ -2711,8 +2711,10 @@ version 1.5.0beta25 [June 18, 2010]
   In pngpread.c: png_push_have_row() add check for new_row > height
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
-version 1.5.0beta26 [June 19, 2010]
+version 1.5.0beta26 [June 18, 2010]
   In pngpread.c: png_push_process_row() add check for too many rows.
+
+version 1.5.0beta27 [June 19, 2010]
   Removed the check added in beta25 as it is now redundant.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

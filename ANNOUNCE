@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta26 - June 19, 2010
+Libpng 1.5.0beta27 - June 19, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta26.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta26.tar.gz
-   1.5.0beta26.tar.bz2
+   1.5.0beta27.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta27.tar.gz
+   1.5.0beta27.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b26.zip
-   lp150b26.7z
+   lp150b27.zip
+   lp150b27.7z
 
 Other information:
 
-   1.5.0beta26-README.txt
-   1.5.0beta26-LICENSE.txt
+   1.5.0beta27-README.txt
+   1.5.0beta27-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -229,8 +229,10 @@ version 1.5.0beta25 [June 19, 2010]
   In pngpread.c: png_push_have_row() add check for new_row > height
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
-version 1.5.0beta26 [June 19, 2010]
+version 1.5.0beta26 [June 18, 2010]
   In pngpread.c: png_push_process_row() add check for too many rows.
+
+version 1.5.0beta27 [June 19, 2010]
   Removed the check added in beta25 as it is now redundant.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:

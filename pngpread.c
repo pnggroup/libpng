@@ -1693,7 +1693,7 @@ png_push_have_end(png_structp png_ptr, png_infop info_ptr)
 void /* PRIVATE */
 png_push_have_row(png_structp png_ptr, png_bytep row)
 {
-   if (png_ptr->row_fn != NULL && png_ptr->row_number < png_ptr->height)
+   if (png_ptr->row_fn != NULL)
       (*(png_ptr->row_fn))(png_ptr, row, png_ptr->row_number,
          (int)png_ptr->pass);
 }
