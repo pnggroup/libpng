@@ -2584,13 +2584,17 @@ version 1.4.3beta01 [June 18, 2010]
 version 1.4.3beta02 [June 18, 2010]
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
-version 1.4.3beta03 [June 19, 2010]
+version 1.4.3beta03 [June 18, 2010]
   In pngpread.c: png_push_finish_row() add check for too many rows.
 
 version 1.4.3beta04 [June 19, 2010]
   In pngpread.c: png_push_process_row() add check for too many rows.
   Removed the checks added in beta01 and beta03, as they are now redundant.
 
+version 1.4.3beta05 [June 20, 2010]
+  Rewrote png_process_IDAT_data to consistently treat extra data as warnings
+    and handle end conditions more cleanly.
+  Removed the new (beta04) check in png_push_process_row().
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
