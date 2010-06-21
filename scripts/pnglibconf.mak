@@ -5,8 +5,13 @@
 # how to automate the build of pnglibconf.h from scripts/pnglibconf.dfa
 # given 'awk' and 'sed'
 
-# Override as appropriate:
-AWK = awk
+# Override as appropriate, these definitions can be overridden on
+# the make command line (AWK='nawk' for example).
+AWK = gawk
+AWK = mawk
+AWK = nawk
+AWK = one-true-awk
+AWK = awk  # Crashes on SunOS 5.10 - use 'nawk'
 SED = sed
 CPP = $(CC) -E
 COPY = cp
@@ -36,6 +41,8 @@ pnglibconf.h: pnglibconf.dfn
 
 pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk
 	$(DELETE) $@ dfn1.out dfn2.out
+	$(ECHO) "Calling $(AWK) from scripts/pnglibconf.mak" >&2
+	$(ECHO) "If 'awk' crashes try a better awk (e.g. AWK='nawk')" >&2
 	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn1.out\
 	    $(srcdir)/scripts/pnglibconf.dfa $(DFA_XTRA) 1>&2
 	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn2.out dfn1.out 1>&2

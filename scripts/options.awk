@@ -1,7 +1,7 @@
 #!/bin/awk -f
 # scripts/options.awk - library build configuration control
 #
-# last changed in libpng version 1.5.0 - June 20, 2010
+# last changed in libpng version 1.5.0 - June 21, 2010
 #
 # Copyright (c) 1998-2010 Glenn Randers-Pehrson
 #
@@ -23,6 +23,8 @@
 #   logunsupported=1 Causes all options to be recorded in the output
 #   everything=off   Causes all options to be disabled by default
 #   everything=on    Causes all options to be enabled by default
+#
+# If awk fails on your platform, try nawk instead.
 #
 # These options may also be specified in the original input file (and
 # are copied to the preprocessed file).
@@ -85,6 +87,7 @@ pre == -1{
 
 # Preprocessing - this just copies the input file with lines
 # that need preprocessing (just chunk at present) expanded
+# The bare "pre" instead of "pre != 0" crashes under Sunos awk
 pre && $1 != "chunk"{
     print >out
     next
@@ -124,7 +127,8 @@ $1 ~ /^#/ || $0 ~ /^[ 	]*$/{
 #   the preceding 'com' removed
 $1 == "com"{
     if (NF > 1) {
-	sub(/^[ 	]*com[ 	]*/, "")
+	# sub(/^[ 	]*com[ 	]*/, "")
+	$1 = ""
 	print comment, $0, cend >out
     } else
     	print start end >out
@@ -196,9 +200,7 @@ $1 == "option" && NF >= 2{
 	    key = ""
 	    if (onoff != $(i)) {
 		# on or off can zap disabled or enabled:
-	    	if (onoff == "" ||
-		    (onoff == "disabled" || onoff == "enabled") &&
-		    	($(i) == "on" || $(i) == "off")) {
+	    	if (onoff == "" || (onoff == "disabled" || onoff == "enabled") && ($(i) == "on" || $(i) == "off")) {
 		    # It's easy to mis-spell the option when turning it
 		    # on or off, so warn about it here:
 		    if (onoff == "" && ($(i) == "on" || $(i) == "off")) {
@@ -247,7 +249,7 @@ $1 == "option" && NF >= 2{
 #    option WRITE_NAME enables NAME
 #    [option WRITE_NAME off]
 
-pre && $1 == "chunk" && NF >= 2{
+pre != 0 && $1 == "chunk" && NF >= 2{
     # 'chunk' is handled on the first pass by writing appropriate
     # 'option' lines into the intermediate file.
     onoff = ""
@@ -278,12 +280,8 @@ pre && $1 == "chunk" && NF >= 2{
 	    	
     if (i > NF) {
     	# Output new 'option' lines to the intermediate file (out)
-	print "option READ_" $2,
-		"requires READ_ANCILLARY_CHUNKS" reqread,
-		"enables", $2, onoff >out
-    	print "option WRITE_" $2,
-		"requires WRITE_ANCILLARY_CHUNKS" reqwrite,
-		"enables", $2, onoff >out
+	print "option READ_" $2, "requires READ_ANCILLARY_CHUNKS" reqread, "enables", $2, onoff >out
+    	print "option WRITE_" $2, "requires WRITE_ANCILLARY_CHUNKS" reqwrite, "enables", $2, onoff >out
 	next
     }
     # Else hit the error handler below - bad line format!
@@ -367,7 +365,8 @@ $1 == "=" && NF == 3{
 # @ removed.
 
 $1 ~ /^@/{
-    sub(/^[ 	]*@/, "")
+    # sub(/^[ 	]*@/, "")
+    $1 = substr($1, 2)
     print >out
     next
 }
@@ -406,8 +405,9 @@ END{
     if (pre) {
     	# Record the variables
 	print "deb =", deb
-	if (everything != "")
+	if (everything != "") {
 	    print "everything =", everything
+        }
 	print "logunsupported =", logunsupported
 	exit 0
     }
@@ -426,8 +426,9 @@ END{
 	for (i in setting) if (!doneset[i]) {
 	    nreqs = split(setting[i], r)
 	    if (nreqs > 0) {
-		for (j=1; j<=nreqs; ++j) if (!doneset[r[j]])
+		for (j=1; j<=nreqs; ++j) if (!doneset[r[j]]) {
 		    break
+		}
 	    	if (j<=nreqs) {
 		    finished = 0
 		    continue # try a different setting
@@ -441,15 +442,17 @@ END{
 	    print "/* setting: ", i >out
 	    print " *   requires:" setting[i] >out
 	    print " *   default: ", defaults[i], "*/" >out
-	    if (defaults[i] == "") # no default, only check if defined
+	    if (defaults[i] == "") { # no default, only check if defined
 		print "#ifdef PNG_" i >out
+	    }
 	    for (j=1; j<=nreqs; ++j) {
 	    	print "# ifndef PNG_" r[j] >out
 		print error, i, "requires", r[j] end >out
 		print "# endif" >out
 	    }
-	    if (defaults[i] != "") # default handling
+	    if (defaults[i] != "") { # default handling
 		print "#ifdef PNG_" i >out
+	    }
 	    print def i, "PNG_" i end >out
 	    if (defaults[i] != "") {
 	    	print "#else /*default*/" >out
@@ -466,8 +469,9 @@ END{
 
 	if (!finished && !movement) {
 	    print "setting: loop or missing setting in 'requires', cannot process:"
-	    for (i in setting) if (!doneset[i])
+	    for (i in setting) if (!doneset[i]) {
 	    	print "  setting", i, "requires" setting[i]
+	    }
 	    exit 1
 	}
     }
@@ -527,8 +531,9 @@ END{
     # Error out if we have to turn 'on' an 'off' option or vice versa.
     npending = 0
     for (opt in option) if (opt != "") {
-    	if (option[opt] == "on" || option[opt] == "off")
+    	if (option[opt] == "on" || option[opt] == "off") {
 	    pending[++npending] = opt
+	}
     }
 
     err = 0 # set on error
@@ -573,8 +578,9 @@ END{
 	for (i in option) if (!done[i]) {
 	    nreqs = split(tree[i], r)
 	    if (nreqs > 0) {
-		for (j=1; j<=nreqs; ++j) if (!done[r[j]])
+		for (j=1; j<=nreqs; ++j) if (!done[r[j]]) {
 		    break
+		}
 	    	if (j<=nreqs) {
 		    finished = 0
 		    continue  # next option
@@ -613,8 +619,9 @@ END{
 		# this error appears in the final output if something
 		# was switched 'on' but the processing above to force
 		# the requires did not work
-		if (option[i] == "on")
+		if (option[i] == "on") {
 		    print error, i, "requires", r[j] end >out
+		}
 		print "#endif" >out
 	    }
 
@@ -634,8 +641,9 @@ END{
 		# There is no checking above for this, because we
 		# don't know which 'if' to choose, so whine about
 		# it here:
-		if (option[i] == "on")
+		if (option[i] == "on") {
 		    print error, i, "needs one of:", iffs[i] end >out
+		}
 		print "#endif" >out
 	    }
 
@@ -650,16 +658,15 @@ END{
 		print "#   undef PNG_not_enabled /*" r[j] "*/" >out
 		# Oops, probably not intended (should be factored
 		# out by the checks above).
-		if (option[i] == "off")
+		if (option[i] == "off") {
 		    print error, i, "enabled by:", r[j] end >out
+		}
 		print "#endif" >out
 	    }
 
 	    print "#   ifndef PNG_" i "_SUPPORTED /*!command line*/" >out
 	    print "#     ifdef PNG_not_enabled /*!enabled*/" >out
-	    if (option[i] == "off" ||
-	        option[i] == "disabled" && everything != "on" ||
-		option[i] == "enabled" && everything == "off") {
+	    if (option[i] == "off" || option[i] == "disabled" && everything != "on" || option[i] == "enabled" && everything == "off") {
 		print "#       undef PNG_on /*default off*/" >out
 	    } else {
 		print "#       ifdef PNG_NO_" i >out
@@ -679,18 +686,21 @@ END{
 	    # If PNG_on is still set the option should be defined in
 	    # pnglibconf.h
 	    print "#   ifdef PNG_on" >out
-	    if (i ~ /^fail_/)
+	    if (i ~ /^fail_/) {
 	        print error, i, "is on: enabled by:" iffs[i] enabledby[i] ", requires" requires[i] end >out
-	    else if (i !~ /^ok_/)
+	    } else if (i !~ /^ok_/) {
 		print def i sup >out
+	    }
 	    print "#   endif /* definition */" >out
 	    print "#endif /*requires, if*/" >out
 	    if (logunsupported || i ~ /^ok_/) {
 		print "#ifndef  PNG_on" >out
-		if (logunsupported)
+		if (logunsupported) {
 		    print und i une >out
-		if (i ~ /^ok_/)
+		}
+		if (i ~ /^ok_/) {
 		    print error, i, "not enabled: requires:" requires[i] ", enabled by:" iffs[i] enabledby[i] end >out
+		}
 		print "#endif" >out
 	    }
 
@@ -703,8 +713,9 @@ END{
 	    for (i in option) if (!done[i]) {
 	    	print "  option", i, "depends on" tree[i], "needs:"
 		nreqs = split(tree[i], r)
-		if (nreqs > 0) for (j=1; j<=nreqs; ++j) if (!done[r[j]])
+		if (nreqs > 0) for (j=1; j<=nreqs; ++j) if (!done[r[j]]) {
 		    print "    " r[j]
+		}
 	    }
 	    exit 1
 	}
@@ -712,6 +723,7 @@ END{
     print comment, "end of options", cend >out
 
     # Regular end - everything looks ok
-    if (protect != "")
+    if (protect != "") {
     	print start "#endif", cx, protect, "*/" end >out
+    }
 }

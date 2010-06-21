@@ -6,6 +6,9 @@ CC=gcc
 LD=$(CC)
 STRIP=strip
 
+# If awk fails try
+# make AWK=nawk
+
 RM=rm -f
 COPY=cp
 

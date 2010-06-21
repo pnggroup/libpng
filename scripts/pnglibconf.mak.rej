@@ -1,0 +1,17 @@
+***************
+*** 36,41 ****
+  
+  pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk
+        $(DELETE) $@ dfn1.out dfn2.out
+        $(AWK) -f $(srcdir)/scripts/options.awk out=dfn1.out\
+            $(srcdir)/scripts/pnglibconf.dfa $(DFA_XTRA) 1>&2
+        $(AWK) -f $(srcdir)/scripts/options.awk out=dfn2.out dfn1.out 1>&2
+--- 41,48 ----
+  
+  pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk
+        $(DELETE) $@ dfn1.out dfn2.out
++        $(ECHO) "Calling $(AWK) from scripts/pnglibconf.mak" >&2
++        $(ECHO) "If 'awk' crashes try a better awk (e.g. AWK='nawk')" >&2
+        $(AWK) -f $(srcdir)/scripts/options.awk out=dfn1.out\
+            $(srcdir)/scripts/pnglibconf.dfa $(DFA_XTRA) 1>&2
+        $(AWK) -f $(srcdir)/scripts/options.awk out=dfn2.out dfn1.out 1>&2

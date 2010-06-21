@@ -2722,6 +2722,11 @@ version 1.5.0beta28 [June 20, 2010]
     and handle end conditions more cleanly.
   Removed the new (beta26) check in png_push_process_row().
 
+version 1.5.0beta29 [June 21, 2010]
+  Revised scripts/options.awk to work on Sunos (but still doesn't work)
+  Added comment to options.awk and contrib/pngminim/*/makefile to try nawk.
+  
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
