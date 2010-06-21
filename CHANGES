@@ -2596,6 +2596,9 @@ version 1.4.3beta05 [June 20, 2010]
     and handle end conditions more cleanly.
   Removed the new (beta04) check in png_push_process_row().
 
+version 1.4.3rc01 [June 21, 2010]
+  Revised some comments in png_process_IDAT_data().
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).

@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.4.3 [June 20, 2010]
+ * Last changed in libpng 1.4.3 [June 21, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -834,7 +834,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 
    /* This routine must process all the data it has been given
     * before returning, calling the row callback as required to
-    * handle the uncomrpessed results.
+    * handle the uncompressed results.
     */
    png_ptr->zstream.next_in = buffer;
    png_ptr->zstream.avail_in = (uInt)buffer_length;
@@ -849,7 +849,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 
       /* We have data for zlib, but we must check that zlib
        * has somewhere to put the results.  It doesn't matter
-       * if we don't expect any results - it may be the input
+       * if we don't expect any results -- it may be the input
        * data is just the LZ end code.
        */
       if (!(png_ptr->zstream.avail_out > 0))
@@ -880,9 +880,9 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 	  */
          if (png_ptr->row_number >= png_ptr->num_rows ||
 	     png_ptr->pass > 6)
-	    png_warning(png_ptr, "Truncated compressed data");
+	    png_warning(png_ptr, "Truncated compressed data in IDAT");
 	 else
-	    png_error(png_ptr, "Decompression error");
+	    png_error(png_ptr, "Decompression error in IDAT");
 
 	 /* Skip the check on unprocessed input */
          return;
@@ -899,9 +899,9 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 	     png_ptr->pass > 6)
          {
 	    /* Extra data. */
-	    png_warning(png_ptr, "Extra compressed data");
+	    png_warning(png_ptr, "Extra compressed data in IDAT");
             png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
-	    /* Do not more proecessing, skip the unprocessed
+	    /* Do no more processing; skip the unprocessed
 	     * input check below.
 	     */
             return;
