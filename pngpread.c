@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.4.3 [June 21, 2010]
+ * Last changed in libpng 1.4.3 [June 23, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -829,7 +829,7 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
    png_size_t buffer_length)
 {
    /* The caller checks for a non-zero buffer length. */
-   if (!(buffer_length > 0) || buffer == 0)
+   if (!(buffer_length > 0) || buffer == NULL)
       png_error(png_ptr, "No IDAT data (internal error)");
 
    /* This routine must process all the data it has been given
