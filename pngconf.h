@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta30 - June 22, 2010
+ * libpng version 1.5.0beta31 - June 24, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -141,7 +141,7 @@
  * linked one.  For this reason the application must tell us by setting
  * the magic flag PNG_USE_DLL to turn on the special processing before
  * it includes png.h.
- * 
+ *
  * Four additional macros are used to make this happen:
  *
  * PNG_IMPEXP The magic (if any) to cause a symbol to be exported from

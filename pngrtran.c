@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.0 [June 22, 2010]
+ * Last changed in libpng 1.5.0 [June 24, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -25,7 +25,7 @@ void PNGAPI
 png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
 {
    png_debug(1, "in png_set_crc_action");
- 
+
    if (png_ptr == NULL)
       return;
 
@@ -97,7 +97,7 @@ png_set_background(png_structp png_ptr,
     int need_expand, double background_gamma)
 {
    png_debug(1, "in png_set_background");
- 
+
    if (png_ptr == NULL)
       return;
 

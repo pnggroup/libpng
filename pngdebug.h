@@ -5,7 +5,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng version 1.5.0 - June 22, 2010
+ * Last changed in libpng version 1.5.0 - June 24, 2010
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -26,7 +26,7 @@
  *
  *   level: level of detail of message, starting at 0.  A level 'n'
  *          message is preceded by 'n' tab characters (not implemented
- *          on Microsoft compilers unless PNG_DEBUG_FILE is also 
+ *          on Microsoft compilers unless PNG_DEBUG_FILE is also
  *          defined, to allow debug DLL compilation with no standard IO).
  *   message: a printf(3) style text string.  A trailing '\n' is added
  *            to the message.

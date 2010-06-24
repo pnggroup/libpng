@@ -2729,6 +2729,10 @@ version 1.5.0beta29 [June 21, 2010]
 version 1.5.0beta30 [June 22, 2010]
   Stop memory leak when reading a malformed sCAL chunk.
 
+version 1.5.0beta31 [June 24, 2010]
+  Revised pngpread.c patch of beta28 to avoid an endless loop.
+  Removed some trailing blanks.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
