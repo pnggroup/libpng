@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.44 [June 23, 2010]
+ * Last changed in libpng 1.2.44 [June 24, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -914,11 +914,11 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
 	 /* Do we have a complete row? */
 	 if (png_ptr->zstream.avail_out == 0)
 	    png_push_process_row(png_ptr);
-
-	 /* And check for the end of the stream. */
-	 if (ret == Z_STREAM_END)
-            png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
       }
+
+      /* And check for the end of the stream. */
+      if (ret == Z_STREAM_END)
+	 png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
    }
 
    /* All the data should have been processed, if anything
