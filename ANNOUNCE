@@ -1,5 +1,5 @@
 
-Libpng 1.4.3rc02 - June 23, 2010
+Libpng 1.4.3rc03 - June 24, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.3rc02.tar.xz (LZMA-compressed, recommended)
-   1.4.3rc02.tar.gz
-   1.4.3rc02.tar.bz2
+   1.4.3rc03.tar.xz (LZMA-compressed, recommended)
+   1.4.3rc03.tar.gz
+   1.4.3rc03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp143r02.zip
-   lp143r02.7z
+   lp143r03.zip
+   lp143r03.7z
 
 Other information:
 
-   1.4.3rc02-README.txt
-   1.4.3rc02-LICENSE.txt
+   1.4.3rc03-README.txt
+   1.4.3rc03-LICENSE.txt
 
 Changes since the last public release (1.4.2):
 
@@ -49,9 +49,15 @@ version 1.4.3beta05 [June 20, 2010]
 version 1.4.3rc01 [June 21, 2010]
   Revised some comments in png_process_IDAT_data().
 
-version 1.4.2rc02 [June 23, 2010]
+version 1.4.3rc03 [June 24, 2010]
+  Revised pngpread.c patch of beta05 to avoid an endless loop.
+
   Changed char *msg to PNG_CONST char *msg in pngrutil.c
   Stop memory leak when reading a malformed sCAL chunk.
+  Removed some trailing blanks.
+
+version 1.4.3rc03 [June 24, 2010]
+  Revised pngpread.c patch of beta05 to avoid an endless loop.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

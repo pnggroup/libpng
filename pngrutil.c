@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.3 [June 23, 2010]
+ * Last changed in libpng 1.4.3 [June 24, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -326,8 +326,10 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       if (png_ptr->user_chunk_malloc_max &&
           (prefix_size + expanded_size >= png_ptr->user_chunk_malloc_max - 1))
 #else
+#  ifdef PNG_USER_CHUNK_MALLOC_MAX
       if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
           prefix_size + expanded_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
+#  endif
 #endif
          png_warning(png_ptr, "Exceeded size limit while expanding chunk");
 
@@ -363,7 +365,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
                *newlength = prefix_size + expanded_size;
                return; /* The success return! */
             }
-      
+
             png_warning(png_ptr, "png_inflate logic error");
             png_free(png_ptr, text);
          }

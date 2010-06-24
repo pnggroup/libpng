@@ -2599,9 +2599,13 @@ version 1.4.3beta05 [June 20, 2010]
 version 1.4.3rc01 [June 21, 2010]
   Revised some comments in png_process_IDAT_data().
 
-version 1.4.3rc02 [June 23, 2010]
+version 1.4.3rc02 [June 22, 2010]
   Changed char *msg to PNG_CONST char *msg in pngrutil.c
   Stop memory leak when reading a malformed sCAL chunk.
+  Removed some trailing blanks.
+
+version 1.4.3rc03 [June 24, 2010]
+  Revised pngpread.c patch of beta05 to avoid an endless loop.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
