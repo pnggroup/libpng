@@ -47,7 +47,6 @@ version 1.2.44 [June 26, 2010]
     and handle end conditions more cleanly.
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
-
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 
 (subscription required; visit
