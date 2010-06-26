@@ -1,34 +1,36 @@
 
-Libpng 1.4.3beta01 - May 17, 2010
+Libpng 1.4.3 - June 26, 2010
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.3beta01.tar.xz (LZMA-compressed, recommended)
-   1.4.3beta01.tar.gz
-   1.4.3beta01.tar.bz2
+   libpng-1.4.3.tar.xz (LZMA-compressed, recommended)
+   libpng-1.4.3.tar.gz
+   libpng-1.4.3.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp143b01.zip
-   lp143b01.7z
+   lpng143.zip
+   lpng143.7z
 
 Other information:
 
-   1.4.3beta01-README.txt
-   1.4.3beta01-LICENSE.txt
+   libpng-1.4.3-README.txt
+   libpng-1.4.3-LICENSE.txt
 
 Changes since the last public release (1.4.2):
-
-version 1.4.3beta01 [May 17, 2010]
   Added missing quotation marks in the aix block of configure.ac
   The new "vstudio" project was missing from the zip and 7z distributions.
+  Rewrote png_process_IDAT_data to consistently treat extra data as warnings
+    and handle end conditions more cleanly.
+  Removed the now-redundant check for out-of-bounds new_row from example.c
+  Changed char *msg to PNG_CONST char *msg in pngrutil.c
+  Stop memory leak when reading a malformed sCAL chunk.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
