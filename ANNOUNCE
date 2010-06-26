@@ -1,104 +1,54 @@
 
-Libpng 1.2.44rc03 - June 24, 2010
+Libpng 1.2.44 - June 26, 2010
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.44rc03.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.44rc03.tar.gz
-   libpng-1.2.44rc03.tar.bz2
+   libpng-1.2.44.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.44.tar.gz
+   libpng-1.2.44.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.44rc03-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.44rc03-no-config.tar.gz
-   libpng-1.2.44rc03-no-config.tar.bz2
+   libpng-1.2.44-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.44-no-config.tar.gz
+   libpng-1.2.44-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1244r03.zip
-   lp1244r03.7z
-   lp1244r03.tar.bz2
+   lpng1244.zip
+   lpng1244.7z
+   lpng1244.tar.bz2
 
 Project files
 
-   libpng-1.2.44rc03-project-netware.zip
-   libpng-1.2.44rc03-project-wince.zip
+   libpng-1.2.44-project-netware.zip
+   libpng-1.2.44-project-wince.zip
 
 Other information:
 
-   libpng-1.2.44rc03-README.txt
-   libpng-1.2.44rc03-KNOWNBUGS.txt
-   libpng-1.2.44rc03-LICENSE.txt
-   libpng-1.2.44rc03-Y2K-compliance.txt
-   libpng-1.2.44rc03-[previous version]-diff.txt
+   libpng-1.2.44-README.txt
+   libpng-1.2.44-KNOWNBUGS.txt
+   libpng-1.2.44-LICENSE.txt
+   libpng-1.2.44-Y2K-compliance.txt
+   libpng-1.2.44-[previous version]-diff.txt
 
-Changes since the last public release (1.2.42):
+Changes since the last public release (1.2.43):
 
-version 1.2.43beta01 [January 27, 2010]
-  Updated CMakeLists.txt for consistent indentation and to avoid an
-    unclosed if-statement warning (Philip Lowman).
-  Removed "#ifdef PNG_1_0_X / #endif" surrounding
-    PNG_READ_16_TO_8_SUPPORTED and PNG_READ_GRAY_TO_RGB_SUPPORTED
-    in pngconf.h.  These were added in libpng-1.2.41beta08 and libpng-1.0.51,
-    which introduced a binary incompatibility with libpng-1.0.50.
-  Backported new png_decompress_chunk() algorithm from libpng-1.4.1
+version 1.2.44 [June 26, 2010]
 
-version 1.2.43beta02 [February 1, 2010]
-  Backported two-pass png_decompress_chunk() algorithm from libpng-1.4.1
-
-version 1.2.43beta03 [February 6, 2010]
-  Backported fast png_push_save_buffer() algorithm from libpng-1.4.1
-
-version 1.2.43beta04 [February 8, 2010]
-  Reverted recent changes to png_push_save-buffer().
-  Removed PNGAPI declaration of png_calloc() and png_write_sig() in
-    1ibpng-1.2.X, introduced by mistake in libpng-1.2.41.
-  Return allocated "old_buffer" in png_push_save_buffer() before png_error(),
-    to avoid a potential memory leak.
-
-version 1.2.43beta05 [February 8, 2010]
-  Ported rewritten png_decompress_chunk() by John Bowler from libpng-1.4.1.
-
-version 1.0.53rc01 and 1.2.43rc01 [February 18, 2010]
-  No changes.
-
-version 1.0.53rc02 and 1.2.43rc02 [February 19, 2010]
-  Define _ALL_SOURCE in configure.ac, makefile.aix, and CMakeLists.txt
-    when using AIX compiler.
-
-version 1.0.53 and 1.2.43 [February 25, 2010]
-  Removed unused gzio.c from contrib/pngminim gather and makefile scripts
-
-version 1.2.44beta01 [June 18, 2010]
-  In pngpread.c: png_push_have_row() add check for new_row > height
-  Removed the now-redundant check for out-of-bounds new_row from example.c
-
-version 1.2.44beta02 [June 19, 2010]
-  In pngpread.c: png_push_process_row() add check for too many rows.
-  Removed the now-redundant check for new_row > height in png_push_have_row().
-
-version 1.2.44beta03 [June 20, 2010]
   Rewrote png_process_IDAT_data to consistently treat extra data as warnings
     and handle end conditions more cleanly.
-  Removed the new (beta02) check in png_push_process_row().
+  Removed the now-redundant check for out-of-bounds new_row from example.c
 
-version 1.2.44rc01 [June 21, 2010]
-  Revised some comments in png_process_IDAT_data().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
-version 1.2.44rc02 [June 22, 2010]
-  Stop memory leak when reading a malformed sCAL chunk.
-
-version 1.4.3rc03 [June 24, 2010]
-  Revised pngpread.c patch of beta05 to avoid an endless loop.
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
