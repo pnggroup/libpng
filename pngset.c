@@ -560,7 +560,8 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_FIXED_POINT_SUPPORTED
    int_file_gamma = 45455L;
    png_set_gAMA_fixed(png_ptr, info_ptr, int_file_gamma);
-#else
+#endif
+#ifdef PNG_FLOATING_POINT_SUPPORTED
    /* Floating point must be set! */
    file_gamma = (float).45455;
    png_set_gAMA(png_ptr, info_ptr, file_gamma);
