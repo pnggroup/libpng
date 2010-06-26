@@ -2740,6 +2740,7 @@ version 1.5.0beta33 [June 26, 2010]
   Made FIXED and FLOATING options consistent in the APIs they enable and
     disable.  Corrected scripts/options.awk to handle both command line
     options and options specified in the .dfa files.
+  Changed char *msg to PNG_CONST char *msg in pngrutil.c
   Make png_set_sRGB_gAMA_and_cHRM set values using either the fixed or
     floating point APIs, but not both.
 
