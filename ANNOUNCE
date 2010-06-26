@@ -252,7 +252,7 @@ version 1.5.0beta31 [June 26, 2010]
   Removed some trailing blanks.
 
 version 1.5.0beta32 [June 26, 2010]
-  Removed leftover scripts/options.patch and scripts/options.rej
+  Removed leftover scripts/options.patch and scripts/options.rej.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
