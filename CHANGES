@@ -2736,10 +2736,12 @@ version 1.5.0beta31 [June 26, 2010]
 version 1.5.0beta32 [June 26, 2010]
   Removed leftover scripts/options.patch and scripts/options.rej
 
-version 1.5.0beta32 [June 26, 2010]
+version 1.5.0beta33 [June 26, 2010]
   Made FIXED and FLOATING options consistent in the APIs they enable and
     disable.  Corrected scripts/options.awk to handle both command line
     options and options specified in the .dfa files.
+  Make png_set_sRGB_gAMA_and_cHRM set values using either the fixed or
+    floating point APIs, but not both.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
