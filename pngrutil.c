@@ -746,8 +746,8 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->gamma = file_gamma;
 #  endif
    png_set_gAMA(png_ptr, info_ptr, file_gamma);
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
+#else
+   /* Fixed point must be set! */
    png_set_gAMA_fixed(png_ptr, info_ptr, igamma);
 #endif
 }
@@ -3187,7 +3187,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
          break;
       }
       default:
-         png_warning(png_ptr, "Ignoring bad adaptive filter type");
+         png_error(png_ptr, "Ignoring bad adaptive filter type");
          *row = 0;
          break;
    }

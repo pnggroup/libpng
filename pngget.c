@@ -684,7 +684,7 @@ png_get_sCAL(png_structp png_ptr, png_infop info_ptr,
 
    return(0);
 }
-#else
+#endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
 png_uint_32 PNGAPI
 png_get_sCAL_s(png_structp png_ptr, png_infop info_ptr,
@@ -701,7 +701,6 @@ png_get_sCAL_s(png_structp png_ptr, png_infop info_ptr,
 
    return(0);
 }
-#endif
 #endif
 #endif
 

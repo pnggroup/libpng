@@ -85,6 +85,36 @@ pre == -1{
     }
 }
 
+# variable=value
+#   Sets the given variable to the given value (the syntax is fairly
+#   free form, except for deb (you are expected to understand how to
+#   set the debug variable...)
+#
+#   This happens before the check on 'pre' below skips most of the
+#   rest of the actions, so the variable settings happen during
+#   preprocessing but are recorded in the END action too.  This
+#   allows them to be set on the command line too.
+$0 ~ /^[ 	]*everything[ 	=]*off[ 	]*$/{
+    everything = "off"
+    next
+}
+$0 ~ /^[ 	]*everything[ 	=]*on[ 	]*$/{
+    everything = "on"
+    next
+}
+$0 ~ /^[ 	]*logunsupported[ 	=]*0[ 	]*$/{
+    logunsupported = 0
+    next
+}
+$0 ~ /^[ 	]*logunsupported[ 	=]*1[ 	]*$/{
+    logunsupported = 1
+    next
+}
+$1 == "deb" && $2 == "=" && NF == 3{
+    deb = $3
+    next
+}
+
 # Preprocessing - this just copies the input file with lines
 # that need preprocessing (just chunk at present) expanded
 # The bare "pre" instead of "pre != 0" crashes under Sunos awk
@@ -150,31 +180,6 @@ $1 == "file" && NF >= 2{
     	print start "#ifndef", protect end >out
     	print start "#define", protect end >out
     }
-    next
-}
-
-# variable=value
-#   Sets the given variable to the given value (the syntax is fairly
-#   free form, except for deb (you are expected to understand how to
-#   set the debug variable...)
-$0 ~ /^[ 	]*everything[ 	=]*off[ 	]*$/{
-    everything = "off"
-    next
-}
-$0 ~ /^[ 	]*everything[ 	=]*on[ 	]*$/{
-    everything = "on"
-    next
-}
-$0 ~ /^[ 	]*logunsupported[ 	=]*0[ 	]*$/{
-    logunsupported = 0
-    next
-}
-$0 ~ /^[ 	]*logunsupported[ 	=]*1[ 	]*$/{
-    logunsupported = 1
-    next
-}
-$1 == "deb" && $2 == "=" && NF == 3{
-    deb = $3
     next
 }
 
@@ -403,12 +408,12 @@ END{
     if (err) exit 1
 
     if (pre) {
-    	# Record the variables
-	print "deb =", deb
+    	# Record the final value of the variables
+	print "deb =", deb >out
 	if (everything != "") {
-	    print "everything =", everything
+	    print "everything =", everything >out
         }
-	print "logunsupported =", logunsupported
+	print "logunsupported =", logunsupported >out
 	exit 0
     }
 

@@ -11,7 +11,7 @@ LIBRARY
 ;OS2 CODE PRELOAD MOVEABLE DISCARDABLE
 
 EXPORTS
-;Version 1.5.0beta32
+;Version 1.5.0beta33
  png_access_version_number @1
  png_set_sig_bytes @2
  png_sig_cmp @3
@@ -117,6 +117,9 @@ EXPORTS
  png_chunk_error @103
  png_warning @105
  png_chunk_warning @106
+ png_benign_error @107
+ png_chunk_benign_error @108
+ png_set_benign_errors @109
  png_get_valid @110
  png_get_rowbytes @111
  png_get_rows @112
@@ -176,7 +179,9 @@ EXPORTS
  png_get_tRNS @166
  png_set_tRNS @167
  png_get_sCAL @168
+ png_get_sCAL_s @169
  png_set_sCAL @170
+ png_set_sCAL_s @171
  png_set_keep_unknown_chunks @172
  png_handle_as_unknown @173
  png_set_unknown_chunks @174
@@ -197,6 +202,12 @@ EXPORTS
  png_get_chunk_cache_max @190
  png_set_chunk_malloc_max @191
  png_get_chunk_malloc_max @192
+ png_get_pixels_per_inch @193
+ png_get_x_pixels_per_inch @194
+ png_get_y_pixels_per_inch @195
+ png_get_x_offset_inches @196
+ png_get_y_offset_inches @197
+ png_get_pHYs_dpi @198
  png_get_io_state @199
  png_get_io_chunk_name @200
  png_get_uint_32 @201

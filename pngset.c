@@ -141,6 +141,7 @@ png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
       png_warning(png_ptr, "Setting gamma = 0");
 }
 #endif
+#ifdef PNG_FIXED_POINT_SUPPORTED
 void PNGAPI
 png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
     int_gamma)
@@ -172,14 +173,13 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
 #ifdef PNG_FLOATING_POINT_SUPPORTED
    info_ptr->gamma = (float)(png_gamma/100000.);
 #endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
    info_ptr->int_gamma = png_gamma;
-#endif
    info_ptr->valid |= PNG_INFO_gAMA;
 
    if (png_gamma == 0)
       png_warning(png_ptr, "Setting gamma = 0");
 }
+#endif
 #endif
 
 #ifdef PNG_hIST_SUPPORTED
@@ -368,7 +368,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
 }
 #endif
 
-#if defined(PNG_READ_sCAL_SUPPORTED) || defined(PNG_WRITE_sCAL_SUPPORTED)
+#ifdef PNG_sCAL_SUPPORTED
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void PNGAPI
 png_set_sCAL(png_structp png_ptr, png_infop info_ptr,
@@ -385,7 +385,7 @@ png_set_sCAL(png_structp png_ptr, png_infop info_ptr,
 
    info_ptr->valid |= PNG_INFO_sCAL;
 }
-#else
+#endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
 void PNGAPI
 png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
@@ -438,7 +438,6 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    info_ptr->valid |= PNG_INFO_sCAL;
    info_ptr->free_me |= PNG_FREE_SCAL;
 }
-#endif
 #endif
 #endif
 
@@ -558,13 +557,13 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    png_set_sRGB(png_ptr, info_ptr, intent);
 
 #ifdef PNG_gAMA_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   file_gamma = (float).45455;
-   png_set_gAMA(png_ptr, info_ptr, file_gamma);
-#endif
 #ifdef PNG_FIXED_POINT_SUPPORTED
    int_file_gamma = 45455L;
    png_set_gAMA_fixed(png_ptr, info_ptr, int_file_gamma);
+#else
+   /* Floating point must be set! */
+   file_gamma = (float).45455;
+   png_set_gAMA(png_ptr, info_ptr, file_gamma);
 #endif
 #endif
 

@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.0beta32 - June 26, 2010
+ * libpng version 1.5.0beta33 - June 26, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.0beta32 - June 26, 2010: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.0beta33 - June 26, 2010: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -140,7 +140,7 @@
  *    1.4.1                   14    10401  14.so.14.1[.0]
  *    1.4.2                   14    10402  14.so.14.2[.0]
  *    1.4.3                   14    10403  14.so.14.3[.0]
- *    1.5.0beta01-32          15    10500  15.so.15.0[.0]
+ *    1.5.0beta01-33          15    10500  15.so.15.0[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -172,7 +172,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta32, June 26, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta33, June 26, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -290,7 +290,7 @@
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.5.0beta32 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.5.0beta33 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -346,9 +346,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.5.0beta32"
+#define PNG_LIBPNG_VER_STRING "1.5.0beta33"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.0beta32 - June 26, 2010\n"
+     " libpng version 1.5.0beta33 - June 26, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -361,7 +361,7 @@
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  32
+#define PNG_LIBPNG_VER_BUILD  33
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -836,7 +836,7 @@ typedef PNG_CALLBACK(void, *png_free_ptr, (png_structp, png_voidp),);
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_5_0beta32;
+typedef png_structp version_1_5_0beta33;
 
 typedef png_struct FAR * FAR * png_structpp;
 
@@ -998,16 +998,17 @@ extern PNG_EXPORT(void,png_set_bgr,(png_structp png_ptr),,30);
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
 /* Expand the grayscale to 24-bit RGB if necessary. */
 extern PNG_EXPORT(void,png_set_gray_to_rgb,(png_structp png_ptr),,31);
-#endif
 
-#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 /* Reduce RGB to grayscale. */
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_rgb_to_gray,(png_structp png_ptr,
     int error_action, double red, double green ),,32);
 #  endif
+#  ifdef PNG_FIXED_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_rgb_to_gray_fixed,(png_structp png_ptr,
     int error_action, png_fixed_point red, png_fixed_point green),,33);
+#  endif
+
 extern PNG_EXPORT(png_byte,png_get_rgb_to_gray_status,(png_structp png_ptr),,
     34);
 #endif
@@ -1081,6 +1082,7 @@ extern PNG_EXPORT(void,png_set_background,(png_structp png_ptr,
     png_color_16p background_color, int background_gamma_code,
     int need_expand, double background_gamma),,47);
 #  endif
+/* TODO: png_set_background_fixed */
 #  define PNG_BACKGROUND_GAMMA_UNKNOWN 0
 #  define PNG_BACKGROUND_GAMMA_SCREEN  1
 #  define PNG_BACKGROUND_GAMMA_FILE    2
@@ -1107,6 +1109,7 @@ extern PNG_EXPORT(void,png_set_quantize,(png_structp png_ptr,
 extern PNG_EXPORT(void,png_set_gamma,(png_structp png_ptr,
     double screen_gamma, double default_file_gamma),,50);
 #  endif
+/* TODO: png_set_gamma_fixed */
 #endif
 
 
@@ -1267,6 +1270,7 @@ extern PNG_EXPORT(void,png_set_filter_heuristics,(png_structp png_ptr,
     int heuristic_method, int num_weights, png_doublep filter_weights,
     png_doublep filter_costs),,68);
 #  endif
+/* TODO: png_set_filter_heuristics_fixed */
 #endif /*  PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
 
 /* Heuristic used for row filter selection.  These defines should NOT be
@@ -1582,6 +1586,7 @@ extern PNG_EXPORT(png_uint_32, png_get_y_pixels_per_meter,
 extern PNG_EXPORT(float, png_get_pixel_aspect_ratio,
     (png_structp png_ptr, png_infop info_ptr),,125);
 #  endif
+/* TODO: png_get_pixel_aspect_ratio_fixed */
 
 /* Returns image x, y offset in pixels or microns, from oFFs chunk data. */
 extern PNG_EXPORT(png_int_32, png_get_x_offset_pixels,
@@ -1648,8 +1653,10 @@ extern PNG_EXPORT(void,png_set_cHRM_fixed,(png_structp png_ptr,
 extern PNG_EXPORT(png_uint_32,png_get_gAMA,(png_structp png_ptr,
     png_infop info_ptr, double *file_gamma),,137);
 #  endif
+#  ifdef PNG_FIXED_POINT_SUPPORTED
 extern PNG_EXPORT(png_uint_32,png_get_gAMA_fixed,(png_structp png_ptr,
     png_infop info_ptr, png_fixed_point *int_file_gamma),,138);
+#  endif
 #endif
 
 #ifdef PNG_gAMA_SUPPORTED
@@ -1657,8 +1664,10 @@ extern PNG_EXPORT(png_uint_32,png_get_gAMA_fixed,(png_structp png_ptr,
 extern PNG_EXPORT(void,png_set_gAMA,(png_structp png_ptr,
     png_infop info_ptr, double file_gamma),,139);
 #  endif
+#  ifdef PNG_FIXED_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_gAMA_fixed,(png_structp png_ptr,
     png_infop info_ptr, png_fixed_point int_file_gamma),,140);
+#  endif
 #endif
 
 #ifdef PNG_hIST_SUPPORTED
@@ -1813,12 +1822,11 @@ extern PNG_EXPORT(void,png_set_tRNS,(png_structp png_ptr,
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(png_uint_32,png_get_sCAL,(png_structp png_ptr,
     png_infop info_ptr, int *unit, double *width, double *height),,168);
-#  else
-#    ifdef PNG_FIXED_POINT_SUPPORTED
+#  endif
+#  ifdef PNG_FIXED_POINT_SUPPORTED
 extern PNG_EXPORT(png_uint_32,png_get_sCAL_s,(png_structp png_ptr,
     png_infop info_ptr, int *unit, png_charpp swidth,
     png_charpp sheight),,169);
-#    endif
 #  endif
 #endif /* PNG_sCAL_SUPPORTED */
 
@@ -1826,12 +1834,11 @@ extern PNG_EXPORT(png_uint_32,png_get_sCAL_s,(png_structp png_ptr,
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_sCAL,(png_structp png_ptr,
     png_infop info_ptr, int unit, double width, double height),,170);
-#  else
-#    ifdef PNG_FIXED_POINT_SUPPORTED
+#  endif
+#  ifdef PNG_FIXED_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_sCAL_s,(png_structp png_ptr,
     png_infop info_ptr, int unit, png_charp swidth,
     png_charp sheight),,171);
-#    endif
 #  endif
 #endif /* PNG_sCAL_SUPPORTED || PNG_WRITE_sCAL_SUPPORTED */
 

@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta32 - June 26, 2010
+Libpng 1.5.0beta33 - June 26, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta32.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta32.tar.gz
-   1.5.0beta32.tar.bz2
+   1.5.0beta33.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta33.tar.gz
+   1.5.0beta33.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b32.zip
-   lp150b32.7z
+   lp150b33.zip
+   lp150b33.7z
 
 Other information:
 
-   1.5.0beta32-README.txt
-   1.5.0beta32-LICENSE.txt
+   1.5.0beta33-README.txt
+   1.5.0beta33-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -252,7 +252,12 @@ version 1.5.0beta31 [June 26, 2010]
   Removed some trailing blanks.
 
 version 1.5.0beta32 [June 26, 2010]
-  Removed leftover scripts/options.patch and scripts/options.rej.
+  Removed leftover scripts/options.patch and scripts/options.rej
+
+version 1.5.0beta32 [June 26, 2010]
+  Made FIXED and FLOATING options consistent in the APIs they enable and
+    disable.  Corrected scripts/options.awk to handle both command line
+    options and options specified in the .dfa files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

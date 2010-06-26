@@ -662,26 +662,12 @@ png_set_gray_to_rgb(png_structp png_ptr)
 #endif
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-/* Convert a RGB image to a grayscale of the same width.  This allows us,
- * for example, to convert a 24 bpp RGB image into an 8 bpp grayscale image.
- */
-
-void PNGAPI
-png_set_rgb_to_gray(png_structp png_ptr, int error_action, double red,
-    double green)
-{
-   int red_fixed = (int)((float)red*100000.0 + 0.5);
-   int green_fixed = (int)((float)green*100000.0 + 0.5);
-
-   if (png_ptr == NULL)
-      return;
-
-   png_set_rgb_to_gray_fixed(png_ptr, error_action, red_fixed, green_fixed);
-}
+void
+#ifdef PNG_FIXED_POINT_SUPPORTED
+    PNGAPI
+#else
+    /* PRIVATE */
 #endif
-
-void PNGAPI
 png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
     png_fixed_point red, png_fixed_point green)
 {
@@ -741,6 +727,26 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
           (png_uint_16)(32768 - red_int - green_int);
    }
 }
+
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+/* Convert a RGB image to a grayscale of the same width.  This allows us,
+ * for example, to convert a 24 bpp RGB image into an 8 bpp grayscale image.
+ */
+
+void PNGAPI
+png_set_rgb_to_gray(png_structp png_ptr, int error_action, double red,
+    double green)
+{
+   int red_fixed = (int)((float)red*100000.0 + 0.5);
+   int green_fixed = (int)((float)green*100000.0 + 0.5);
+
+   if (png_ptr == NULL)
+      return;
+
+   png_set_rgb_to_gray_fixed(png_ptr, error_action, red_fixed, green_fixed);
+}
+#endif /* FLOATING POINT */
+
 #endif
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \

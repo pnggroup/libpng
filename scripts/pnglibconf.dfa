@@ -166,7 +166,7 @@ option WRITE_INT_FUNCTIONS disabled
 option WRITE enables WRITE_INT_FUNCTIONS
 
 # Generic options - affect both read and write.
-option BENIGN_ERRORS disabled
+option BENIGN_ERRORS
 option MNG_FEATURES
 option FLOATING_POINT enables ok_math
 option FIXED_POINT enables ok_math
@@ -288,7 +288,7 @@ option READ_COMPOSITE_NODIV requires READ
 = NO_READ_COMPOSITE_NODIV PNG_NO_READ_COMPOSITED_NODIV
 
 # Inch conversions: not switched on by default
-option INCH_CONVERSIONS requires FLOATING_POINT disabled
+option INCH_CONVERSIONS requires FLOATING_POINT
 = INCH_CONVERSIONS PNG_INCH_CONVERSIONS
 
 # IN DEVELOPMENT
