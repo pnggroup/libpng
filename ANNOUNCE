@@ -31,7 +31,7 @@ Changes since the last public release (1.4.2):
   Removed the now-redundant check for out-of-bounds new_row from example.c
   Changed char *msg to PNG_CONST char *msg in pngrutil.c
   Stop memory leak when reading a malformed sCAL chunk.
-
+ 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
