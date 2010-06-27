@@ -1,5 +1,5 @@
 
-Libpng 1.4.4beta01 - June 26, 2010
+Libpng 1.4.4beta01 - June 27, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -62,7 +62,9 @@ version 1.4.3rc03 [June 23, 2010]
 version 1.4.3 [June 26, 2010]
   Updated some of the "last changed" dates.
 
-version 1.4.4beta01 [June 26, 2010]
+version 1.4.4beta01 [June 27, 2010]
+  Removed extraneous new_push_process_row.c file.
+  Revised the "SEE ALSO" style of libpng.3, libpngpf.3, and png.5
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
