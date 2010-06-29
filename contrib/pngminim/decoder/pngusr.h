@@ -12,10 +12,6 @@
 #ifndef MINRDPNGCONF_H
 #define MINRDPNGCONF_H
 
-#ifdef NJET
-  /* No 16-bit support beyond reading with strip_16 */
-#endif
-
 /* If pngusr.h is included during the build the following must
  * be defined either here or in the .dfa file (pngusr.dfa in
  * this case).  To include pngusr.h set -DPNG_USER_CONFIG in
