@@ -2557,6 +2557,7 @@ version 1.5.0beta10 [February 25, 2010]
 version 1.5.0beta11 [March 6, 2010]
   Removed checking for already-included setjmp.h from pngconf.h
   Fixed inconsistent indentations and made numerous cosmetic changes.
+  Revised the "SEE ALSO" style of libpng.3, libpngpf.3, and png.5
 
 version 1.5.0beta12 [March 9, 2010]
   Moved "#include png.h" inside pngpriv.h and removed "#include png.h" from
@@ -2736,13 +2737,26 @@ version 1.5.0beta31 [June 26, 2010]
 version 1.5.0beta32 [June 26, 2010]
   Removed leftover scripts/options.patch and scripts/options.rej
 
-version 1.5.0beta33 [June 26, 2010]
+version 1.5.0beta33 [June 29, 2010]
   Made FIXED and FLOATING options consistent in the APIs they enable and
     disable.  Corrected scripts/options.awk to handle both command line
     options and options specified in the .dfa files.
   Changed char *msg to PNG_CONST char *msg in pngrutil.c
   Make png_set_sRGB_gAMA_and_cHRM set values using either the fixed or
     floating point APIs, but not both.
+  Reversed patch to remove error handler when the jmp_buf is stored in the
+    main program structure, not the png_struct.
+    The error handler is needed because the default handler in libpng will
+    always use the jmp_buf in the library control structure; this is never
+    set.  The gregbook code is a useful example because, even though it
+    uses setjmp/longjmp, it shows how error handling can be implemented
+    using control mechanisms not directly supported by libpng.  The
+    technique will work correctly with mechanisms such as Microsoft
+    Structure Exceptions or C++ exceptions (compiler willing - note that gcc
+    does not by default support interworking of C and C++ error handling.)
+  Reverted changes to call png_longjmp in contrib/gregbook where it is not
+    appropriate.  If mainprog->jmpbuf is used by setjmp, then png_longjmp
+    cannot be used.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

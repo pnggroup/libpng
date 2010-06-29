@@ -32,9 +32,7 @@
     - 2.01:  fixed 64-bit typo in readpng2.c
     - 2.02:  fixed improper display of usage screen on PNG error(s); fixed
               unexpected-EOF and file-read-error cases
-    - 2.03:  removed runtime MMX-enabling/disabling and obsolete -mmx* options;
-             removed special error-handling which is no longer needed
-             because of the new libpng png_longjmp() feature in libpng-1.5.0.
+    - 2.03:  removed runtime MMX-enabling/disabling and obsolete -mmx* options
 
   ---------------------------------------------------------------------------
 

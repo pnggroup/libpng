@@ -29,8 +29,6 @@
     - 1.04:  fixed DOS/OS2/Win32 detection, including partial Cygwin fix
               (see http://home.att.net/~perlspinr/diffs/GregBook_cygwin.diff)
     - 2.00:  dual-licensed (added GNU GPL)
-    - 2.01:  removed special error-handling which is no longer needed
-             because of the new libpng png_longjmp() feature in libpng-1.5.0.
 
         [REPORTED BUG (win32 only):  "contrib/gregbook/wpng.c - cmd line
          dose not work!  In order to do something useful I needed to redirect

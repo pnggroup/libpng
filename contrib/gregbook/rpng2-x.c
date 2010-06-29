@@ -41,8 +41,6 @@
               unexpected-EOF and file-read-error cases; fixed Trace() cut-and-
               paste bugs
     - 2.03:  deleted runtime MMX-enabling/disabling and obsolete -mmx* options
-             removed special error-handling which is no longer needed
-             because of the new libpng png_longjmp() feature in libpng-1.5.0.
 
   ---------------------------------------------------------------------------
 
@@ -786,8 +784,9 @@ static void rpng2_x_init(void)
     if (rpng2_x_create_window()) {
 
         /* GRR TEMPORARY HACK:  this is fundamentally no different from cases
-         * above; libpng should longjmp() back to us when png_ptr goes away.
-         * If we/it segfault instead, seems like a libpng bug... */
+         * above; libpng should call our error handler to longjmp() back to us
+	 * when png_ptr goes away.  If we/it segfault instead, seems like a
+	 * libpng bug... */
 
         /* we're here via libpng callback, so if window fails, clean and bail */
         readpng2_cleanup(&rpng2_info);
