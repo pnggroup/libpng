@@ -1,5 +1,5 @@
 
-Libpng 1.4.4beta01 - June 27, 2010
+Libpng 1.4.4beta01 - July 1, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -24,47 +24,13 @@ Other information:
    1.4.4beta01-README.txt
    1.4.4beta01-LICENSE.txt
 
-Changes since the last public release (1.4.2):
+Changes since the last public release (1.4.3):
 
-version 1.4.3beta01 [June 18, 2010]
-  Added missing quotation marks in the aix block of configure.ac
-  The new "vstudio" project was missing from the zip and 7z distributions.
-  In pngpread.c: png_push_have_row() add check for new_row > height
-
-version 1.4.3beta02 [June 18, 2010]
-  Removed the now-redundant check for out-of-bounds new_row from example.c
-
-version 1.4.3beta03 [June 18, 2010]
-  In pngpread.c: png_push_finish_row() add check for too many rows.
-
-version 1.4.3beta04 [June 19, 2010]
-  In pngpread.c: png_push_process_row() add check for too many rows.
-  Removed the checks added in beta01 and beta03, as they are now redundant.
-
-version 1.4.3beta05 [June 20, 2010]
-  Rewrote png_process_IDAT_data to consistently treat extra data as warnings
-    and handle end conditions more cleanly.
-  Removed the new (beta04) check in png_push_process_row().
-
-version 1.4.3rc01 [June 21, 2010]
-  Revised some comments in png_process_IDAT_data().
-
-version 1.4.3rc03 [June 22, 2010]
-  Revised pngpread.c patch of beta05 to avoid an endless loop.
-
-  Changed char *msg to PNG_CONST char *msg in pngrutil.c
-  Stop memory leak when reading a malformed sCAL chunk.
-  Removed some trailing blanks.
-
-version 1.4.3rc03 [June 23, 2010]
-  Revised pngpread.c patch of beta05 to avoid an endless loop.
-
-version 1.4.3 [June 26, 2010]
-  Updated some of the "last changed" dates.
-
-version 1.4.4beta01 [June 27, 2010]
+version 1.4.4beta01 [July 1, 2010]
   Removed extraneous new_push_process_row.c file.
   Revised the "SEE ALSO" style of libpng.3, libpngpf.3, and png.5
+  Removed some newly-added TAB characters from pngpread.c.
+  Fixed some indentation in pngpread.c and pngrutil.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

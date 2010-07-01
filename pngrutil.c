@@ -1128,20 +1128,20 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if (profile_size > profile_length)
    {
+#ifdef PNG_STDIO_SUPPORTED
+         char umsg[50];
+#endif
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
       png_warning(png_ptr, "Ignoring truncated iCCP profile");
 #ifdef PNG_STDIO_SUPPORTED
- {
-    char umsg[50];
 
-    png_snprintf(umsg, 50, "declared profile size = %lu",
-        (unsigned long)profile_size);
-    png_warning(png_ptr, umsg);
-    png_snprintf(umsg, 50, "actual profile length = %lu",
-        (unsigned long)profile_length);
-    png_warning(png_ptr, umsg);
- }
+      png_snprintf(umsg, 50, "declared profile size = %lu",
+          (unsigned long)profile_size);
+      png_warning(png_ptr, umsg);
+      png_snprintf(umsg, 50, "actual profile length = %lu",
+          (unsigned long)profile_length);
+      png_warning(png_ptr, umsg);
 #endif
       return;
    }
