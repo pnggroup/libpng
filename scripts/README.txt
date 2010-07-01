@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.4.4beta01 - June 26, 2010
+Makefiles for  libpng version 1.4.4beta01 - July 1, 2010
 
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng14.so.14.1.4.4beta01)
@@ -20,7 +20,7 @@ Makefiles for  libpng version 1.4.4beta01 - June 26, 2010
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       gcc, creates libpng14.so.14.1.4.4beta01)
+                       (gcc, creates libpng14.so.14.1.4.4beta01)
  makefile.freebsd  =>  FreeBSD makefile
  makefile.gcc      =>  Generic gcc makefile
  makefile.hpgcc    =>  HPUX makefile using gcc

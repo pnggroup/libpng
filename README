@@ -1,4 +1,4 @@
-README for libpng version 1.4.4beta01 - June 26, 2010 (shared library 14.0)
+README for libpng version 1.4.4beta01 - July 1, 2010 (shared library 14.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -185,7 +185,7 @@ Files in this distribution:
        makefile.std     =>  Generic UNIX makefile (cc, creates static
                             libpng.a)
        makefile.elf     =>  Linux/ELF makefile symbol versioning,
-                            gcc, creates libpng14.so.14.1.4.4beta01)
+                            (gcc, creates libpng14.so.14.1.4.4beta01)
        makefile.linux   =>  Linux/ELF makefile
                             (gcc, creates libpng14.so.14.1.4.4beta01)
        makefile.gcc     =>  Generic makefile (gcc, creates static libpng.a)
