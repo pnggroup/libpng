@@ -2737,7 +2737,7 @@ version 1.5.0beta31 [June 26, 2010]
 version 1.5.0beta32 [June 26, 2010]
   Removed leftover scripts/options.patch and scripts/options.rej
 
-version 1.5.0beta33 [July 6, 2010]
+version 1.5.0beta33 [July 6, 3010]
   Made FIXED and FLOATING options consistent in the APIs they enable and
     disable.  Corrected scripts/options.awk to handle both command line
     options and options specified in the .dfa files.
@@ -2759,6 +2759,8 @@ version 1.5.0beta33 [July 6, 2010]
     cannot be used.
   Changed "extern PNG_EXPORT" to "PNG_EXPORT" in png.h (Jan Nijtmans)
   Changed "extern" to "PNG_EXTERN" in pngpriv.h (except for the 'extern "C" {')
+
+version 1.5.0beta34 [July 6, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
