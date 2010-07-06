@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta33 - June 29, 2010
+ * libpng version 1.5.0beta33 - July 6, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -810,7 +810,7 @@ PNG_EXTERN void png_handle_hIST PNGARG((png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_READ_iCCP_SUPPORTED
-extern void png_handle_iCCP PNGARG((png_structp png_ptr, png_infop info_ptr,
+PNG_EXTERN void png_handle_iCCP PNGARG((png_structp png_ptr, png_infop info_ptr,
     png_uint_32 length));
 #endif /* PNG_READ_iCCP_SUPPORTED */
 
@@ -845,7 +845,7 @@ PNG_EXTERN void png_handle_sCAL PNGARG((png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_READ_sPLT_SUPPORTED
-extern void png_handle_sPLT PNGARG((png_structp png_ptr, png_infop info_ptr,
+PNG_EXTERN void png_handle_sPLT PNGARG((png_structp png_ptr, png_infop info_ptr,
     png_uint_32 length));
 #endif /* PNG_READ_sPLT_SUPPORTED */
 
@@ -966,14 +966,14 @@ PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
     int filter_type));
 
 /* Free all memory used by the read (old method - NOT DLL EXPORTED) */
-extern void png_read_destroy PNGARG((png_structp png_ptr, png_infop info_ptr,
+PNG_EXTERN void png_read_destroy PNGARG((png_structp png_ptr, png_infop info_ptr,
     png_infop end_info_ptr));
 
 /* Free any memory used in png_ptr struct (old method - NOT DLL EXPORTED) */
-extern void png_write_destroy PNGARG((png_structp png_ptr));
+PNG_EXTERN void png_write_destroy PNGARG((png_structp png_ptr));
 
 #ifdef USE_FAR_KEYWORD  /* memory model conversion function */
-extern void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
+PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
     int check));
 #endif /* USE_FAR_KEYWORD */
 
