@@ -2760,7 +2760,8 @@ version 1.5.0beta33 [July 6, 3010]
   Changed "extern PNG_EXPORT" to "PNG_EXPORT" in png.h (Jan Nijtmans)
   Changed "extern" to "PNG_EXTERN" in pngpriv.h (except for the 'extern "C" {')
 
-version 1.5.0beta34 [July 6, 2010]
+version 1.5.0beta34 [July 12, 2010]
+  Put #ifndef PNG_EXTERN, #endif around the define PNG_EXTERN in pngpriv.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
