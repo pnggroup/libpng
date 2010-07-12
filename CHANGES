@@ -2617,7 +2617,7 @@ version 1.4.4beta01 [July 12, 2010]
   Fixed some indentation in pngpread.c and pngrutil.c
   Changed "extern PNG_EXPORT" to "PNG_EXPORT" in png.h (Jan Nijtmans)
   Changed "extern" to "PNG_EXTERN" in pngpriv.h (except for the 'extern "C" {')
-  Put #ifndef PNG_EXTERN, #endif around the define PNG_EXTERN in pngpriv.h
+  Put "#ifndef PNG_EXTERN, #endif" around "#define PNG_EXTERN" in pngpriv.h
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
