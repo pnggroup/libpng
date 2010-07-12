@@ -1,5 +1,5 @@
 
-Libpng 1.4.4beta01 - July 1, 2010
+Libpng 1.4.4beta01 - July 12, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,11 +26,14 @@ Other information:
 
 Changes since the last public release (1.4.3):
 
-version 1.4.4beta01 [July 1, 2010]
+version 1.4.4beta01 [July 12, 2010]
   Removed extraneous new_push_process_row.c file.
   Revised the "SEE ALSO" style of libpng.3, libpngpf.3, and png.5
   Removed some newly-added TAB characters from pngpread.c.
   Fixed some indentation in pngpread.c and pngrutil.c
+  Changed "extern PNG_EXPORT" to "PNG_EXPORT" in png.h (Jan Nijtmans)
+  Changed "extern" to "PNG_EXTERN" in pngpriv.h (except for the 'extern "C" {')
+  Put #ifndef PNG_EXTERN, #endif around the define PNG_EXTERN in pngpriv.h
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
