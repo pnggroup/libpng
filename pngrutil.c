@@ -269,7 +269,7 @@ png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
       {
          PNG_CONST char *msg;
 #ifdef PNG_CONSOLE_IO_SUPPORTED
-	 char umsg[52];
+         char umsg[52];
 #endif
          if (png_ptr->zstream.msg != 0)
             msg = png_ptr->zstream.msg;

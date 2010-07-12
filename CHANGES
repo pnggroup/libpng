@@ -2764,6 +2764,7 @@ version 1.5.0beta34 [July 12, 2010]
   Put #ifndef PNG_EXTERN, #endif around the define PNG_EXTERN in pngpriv.h
 
 version 1.5.0beta35 [July 12, 2010]
+  Removed some newly-added TAB characters.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
