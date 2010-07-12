@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta34 - July 6, 2010
+ * libpng version 1.5.0beta34 - July 11, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -143,14 +143,16 @@
 #  define PNG_GAMMA_THRESHOLD 0.05
 #endif
 
+#ifndef PNG_EXTERN
 /* The functions exported by PNG_EXTERN are internal functions, which
  * aren't usually used outside the library (as far as I know), so it is
  * debatable if they should be exported at all.  In the future, when it
  * is possible to have run-time registry of chunk-handling functions,
  * some of these will be made available again.
-#define PNG_EXTERN extern
+#  define PNG_EXTERN extern
  */
-#define PNG_EXTERN
+#  define PNG_EXTERN
+#endif
 
 /* Other defines specific to compilers can go here.  Try to keep
  * them inside an appropriate ifdef/endif pair for portability.
