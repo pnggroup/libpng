@@ -1,5 +1,5 @@
 
-Libpng 1.4.4beta02 - July 12, 2010
+Libpng 1.4.4beta02 - July 17, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -35,7 +35,8 @@ version 1.4.4beta01 [July 12, 2010]
   Changed "extern" to "PNG_EXTERN" in pngpriv.h (except for the 'extern "C" {')
   Put "#ifndef PNG_EXTERN, #endif" around "#define PNG_EXTERN" in pngpriv.h
 
-version 1.4.4beta02 [July 12, 2010]
+version 1.4.4beta02 [July 17, 2010]
+  Added -DNO_PNG_SNPRINTF to CFLAGS in scripts/makefile.dj2
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
