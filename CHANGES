@@ -2763,8 +2763,9 @@ version 1.5.0beta33 [July 6, 3010]
 version 1.5.0beta34 [July 12, 2010]
   Put #ifndef PNG_EXTERN, #endif around the define PNG_EXTERN in pngpriv.h
 
-version 1.5.0beta35 [July 12, 2010]
+version 1.5.0beta35 [July 17, 2010]
   Removed some newly-added TAB characters.
+  Added -DNO_PNG_SNPRINTF to CFLAGS in scripts/makefile.dj2
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

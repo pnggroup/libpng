@@ -13,7 +13,7 @@ INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 
 CC=gcc
-CFLAGS=-I../zlib -O
+CFLAGS=-I../zlib -O -DPNG_NO_SNPRINTF
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
 RANLIB=ranlib
