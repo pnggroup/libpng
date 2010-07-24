@@ -1053,11 +1053,7 @@ typedef void (PNGAPI *png_unknown_chunk_ptr) PNGARG((png_structp));
  * application must include this before png.h to obtain the definition
  * of jmp_buf.
  */
-#  ifdef __WATCOMC__
-typedef void (*png_longjmp_ptr) PNGARG((jmp_buf, int));
-#  else
 typedef void (PNGAPI *png_longjmp_ptr) PNGARG((jmp_buf, int));
-#  endif
 #endif
 
 /* Transform masks for the high-level interface */

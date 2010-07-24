@@ -439,7 +439,7 @@
 
 /* The following uses const char * instead of char * for error
  * and warning message functions, so some compilers won't complain.
- * If you do not want to use const, define PNG_NO_CONST here.
+ * If you do not want to use const, define PNG_NO_CONST.
  */
 
 #ifndef PNG_CONST
@@ -454,8 +454,10 @@
  * library that you will not be using.  I wish I could figure out how to
  * automate this, but I can't do that without making it seriously hard
  * on the users.  So if you are not using an ability, change the #define
- * to and #undef, and that part of the library will not be compiled.  If
- * your linker can't find a function, you may want to make sure the
+ * to an #undef, or pass in PNG_NO_feature and that part of the library
+ * will not be compiled.
+
+ * If your linker can't find a function, you may want to make sure the
  * ability is defined here.  Some of these depend upon some others being
  * defined.  I haven't figured out all the interactions here, so you may
  * have to experiment awhile to get everything to compile.  If you are
@@ -1236,6 +1238,13 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define PNG_DLL
 #endif
 
+/* If you define PNGAPI, e.g., with compiler option "-DPNGAPI=__stdcall",
+ * you may get warnings regarding the linkage of png_zalloc and png_zfree.
+ * Don't ignore those warnings; you must also reset the default calling
+ * convention in your compiler to match your PNGAPI, and you must build
+ * zlib and your applications the same way you build libpng.
+ */
+
 #ifdef __CYGWIN__
 #  undef PNGAPI
 #  define PNGAPI __cdecl
@@ -1243,14 +1252,11 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  define PNG_IMPEXP
 #endif
 
-#define PNG_USE_LOCAL_ARRAYS /* Not used in libpng, defined for legacy apps */
-
-/* If you define PNGAPI, e.g., with compiler option "-DPNGAPI=__stdcall",
- * you may get warnings regarding the linkage of png_zalloc and png_zfree.
- * Don't ignore those warnings; you must also reset the default calling
- * convention in your compiler to match your PNGAPI, and you must build
- * zlib and your applications the same way you build libpng.
- */
+#ifdef __WATCOMC__
+#  ifndef PNGAPI
+#    define PNGAPI
+#  endif
+#endif
 
 #if defined(__MINGW32__) && !defined(PNG_MODULEDEF)
 #  ifndef PNG_NO_MODULEDEF
@@ -1267,7 +1273,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
        defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ))
 
 #  ifndef PNGAPI
-#     if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800)) || defined( __WATCOMC__ )
+#     if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
 #        define PNGAPI __cdecl
 #     else
 #        define PNGAPI _cdecl
@@ -1334,6 +1340,8 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #ifndef PNG_EXPORT
 #  define PNG_EXPORT(type,symbol) PNG_IMPEXP type PNGAPI symbol
 #endif
+
+#define PNG_USE_LOCAL_ARRAYS /* Not used in libpng, defined for legacy apps */
 
 /* Support for compiler specific function attributes.  These are used
  * so that where compiler support is available incorrect use of API
