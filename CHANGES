@@ -2625,6 +2625,8 @@ version 1.4.4beta02 [July 24, 2010]
     #ifdef blocks in pngconf.h
   Added a special case typedef of png_longjmp_ptr for WATCOM.
 
+version 1.4.4beta03 [July 24, 2010]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).

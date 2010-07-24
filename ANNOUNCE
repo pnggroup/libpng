@@ -1,5 +1,5 @@
 
-Libpng 1.4.4beta02 - July 24, 2010
+Libpng 1.4.4beta03 - July 24, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.4beta02.tar.xz (LZMA-compressed, recommended)
-   1.4.4beta02.tar.gz
-   1.4.4beta02.tar.bz2
+   1.4.4beta03.tar.xz (LZMA-compressed, recommended)
+   1.4.4beta03.tar.gz
+   1.4.4beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp144b02.zip
-   lp144b02.7z
+   lp144b03.zip
+   lp144b03.7z
 
 Other information:
 
-   1.4.4beta02-README.txt
-   1.4.4beta02-LICENSE.txt
+   1.4.4beta03-README.txt
+   1.4.4beta03-LICENSE.txt
 
 Changes since the last public release (1.4.3):
 
@@ -40,6 +40,8 @@ version 1.4.4beta02 [July 24, 2010]
   Moved the definition of png_snprintf() outside of the enclosing
     #ifdef blocks in pngconf.h
   Added a special case typedef of png_longjmp_ptr for WATCOM.
+
+version 1.4.4beta03 [July 24, 2010]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
