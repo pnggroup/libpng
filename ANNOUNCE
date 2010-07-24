@@ -39,6 +39,7 @@ version 1.4.4beta02 [July 24, 2010]
   Added -DNO_PNG_SNPRINTF to CFLAGS in scripts/makefile.dj2
   Moved the definition of png_snprintf() outside of the enclosing
     #ifdef blocks in pngconf.h
+  Added a special case typedef of png_longjmp_ptr for WATCOM.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
