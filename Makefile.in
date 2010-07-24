@@ -322,7 +322,6 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 EXTRA_DIST = \
 	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/projects/cbuilder5/* \
 	${srcdir}/projects/visualc6/* \
 	${srcdir}/projects/visualc71/* \
 	${srcdir}/projects/xcode/* \
