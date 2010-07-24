@@ -2630,6 +2630,8 @@ version 1.4.4beta03 [July 24, 2010]
   Eliminated the new special case typedef of png_longjmp_ptr for WATCOM
     and made a special case "#define PNGAPI" in pngconf.h instead.
 
+version 1.4.4beta04 [July 24, 2010]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
