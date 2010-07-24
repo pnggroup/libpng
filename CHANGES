@@ -2769,6 +2769,8 @@ version 1.5.0beta35 [July 24, 2010]
   Moved the definition of png_snprintf() outside of the enclosing
     #ifdef blocks in pngconf.h
 
+version 1.5.0beta36 [July 24, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
