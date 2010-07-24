@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.4beta02 - July 12, 2010
+ * libpng version 1.4.4beta02 - July 24, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1267,7 +1267,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
        defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ))
 
 #  ifndef PNGAPI
-#     if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
+#     if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800)) || defined( __WATCOMC__ )
 #        define PNGAPI __cdecl
 #     else
 #        define PNGAPI _cdecl
@@ -1453,29 +1453,30 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    define png_memcpy  memcpy
 #    define png_memset  memset
 #    define png_sprintf sprintf
-#    ifndef PNG_NO_SNPRINTF
-#      ifdef _MSC_VER
-#        define png_snprintf _snprintf   /* Added to v 1.2.19 */
-#        define png_snprintf2 _snprintf
-#        define png_snprintf6 _snprintf
-#      else
-#        define png_snprintf snprintf   /* Added to v 1.2.19 */
-#        define png_snprintf2 snprintf
-#        define png_snprintf6 snprintf
-#      endif
-#    else
-       /* You don't have or don't want to use snprintf().  Caution: Using
-        * sprintf instead of snprintf exposes your application to accidental
-        * or malevolent buffer overflows.  If you don't have snprintf()
-        * as a general rule you should provide one (you can get one from
-        * Portable OpenSSH).
-        */
-#      define png_snprintf(s1,n,fmt,x1) sprintf(s1,fmt,x1)
-#      define png_snprintf2(s1,n,fmt,x1,x2) sprintf(s1,fmt,x1,x2)
-#      define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
-          sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
-#    endif
 #  endif
+#endif
+
+#ifndef PNG_NO_SNPRINTF
+#  ifdef _MSC_VER
+#    define png_snprintf _snprintf   /* Added to v 1.2.19 */
+#    define png_snprintf2 _snprintf
+#    define png_snprintf6 _snprintf
+#  else
+#    define png_snprintf snprintf   /* Added to v 1.2.19 */
+#    define png_snprintf2 snprintf
+#    define png_snprintf6 snprintf
+#  endif
+#else
+   /* You don't have or don't want to use snprintf().  Caution: Using
+    * sprintf instead of snprintf exposes your application to accidental
+    * or malevolent buffer overflows.  If you don't have snprintf()
+    * as a general rule you should provide one (you can get one from
+    * Portable OpenSSH).
+    */
+#  define png_snprintf(s1,n,fmt,x1) png_sprintf(s1,fmt,x1)
+#  define png_snprintf2(s1,n,fmt,x1,x2) png_sprintf(s1,fmt,x1,x2)
+#  define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
+      png_sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
 #endif
 
 /* png_alloc_size_t is guaranteed to be no smaller than png_size_t,
