@@ -281,7 +281,7 @@ sucker_message(png_structp pp, char *buffer, size_t bufsize, const char *msg)
       if (ps->current != NULL)
       {
          pos = safecat(buffer, bufsize, pos, ps->current->name);
-	 pos = safecat(buffer, bufsize, pos, sep);
+         pos = safecat(buffer, bufsize, pos, sep);
       }
    }
    else if (pp == ps->pwrite)
@@ -390,8 +390,8 @@ sucker_read_buffer_next(png_sucker *ps)
       if (pbNew != NULL)
       {
          ps->next = pbNew;
-	 ps->readpos = 0;
-	 return 1;
+         ps->readpos = 0;
+         return 1;
       }
 
       png_error(ps->pread, "buffer lost");
@@ -413,10 +413,10 @@ sucker_read(png_structp pp, png_bytep pb, png_size_t st)
       if (cbAvail > 0)
       {
          if (cbAvail > st) cbAvail = st;
-	 memcpy(pb, ps->next->buffer + ps->readpos, cbAvail);
-	 st -= cbAvail;
-	 pb += cbAvail;
-	 ps->readpos += cbAvail;
+         memcpy(pb, ps->next->buffer + ps->readpos, cbAvail);
+         st -= cbAvail;
+         pb += cbAvail;
+         ps->readpos += cbAvail;
       }
       else if (!sucker_read_buffer_next(ps))
          png_error(pp, "read beyond end of file");
@@ -492,9 +492,9 @@ sucker_read_set(png_sucker *ps, png_uint_32 id)
       if (pf->id == id)
       {
          ps->current = pf;
-	 ps->next = NULL;
-	 sucker_read_buffer_next(ps);
-	 return;
+         ps->next = NULL;
+         sucker_read_buffer_next(ps);
+         return;
       }
 
       pf = pf->next;
@@ -761,174 +761,174 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
       static png_byte sign[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
       case modifier_start:
          sucker_read(pp, pm->buffer, 8); /* size of signature. */
-	 pm->buffer_count = 8;
-	 pm->buffer_position = 0;
+         pm->buffer_count = 8;
+         pm->buffer_position = 0;
 
-	 if (memcmp(pm->buffer, sign, 8) != 0)
-	    png_error(pp, "invalid PNG file signature");
-	 pm->state = modifier_signature;
-	 break;
+         if (memcmp(pm->buffer, sign, 8) != 0)
+            png_error(pp, "invalid PNG file signature");
+         pm->state = modifier_signature;
+         break;
 
       case modifier_signature:
-	 sucker_read(pp, pm->buffer, 13+12); /* size of IHDR */
-	 pm->buffer_count = 13+12;
-	 pm->buffer_position = 0;
+         sucker_read(pp, pm->buffer, 13+12); /* size of IHDR */
+         pm->buffer_count = 13+12;
+         pm->buffer_position = 0;
 
-	 if (png_get_uint_32(pm->buffer) != 13 ||
-	     png_get_uint_32(pm->buffer+4) != CHUNK_IHDR)
-	    png_error(pp, "invalid IHDR");
+         if (png_get_uint_32(pm->buffer) != 13 ||
+             png_get_uint_32(pm->buffer+4) != CHUNK_IHDR)
+            png_error(pp, "invalid IHDR");
 
-	 /* Check the list of modifiers for modifications to the IHDR. */
+         /* Check the list of modifiers for modifications to the IHDR. */
          mod = pm->modifications;
-	 while (mod != NULL)
-	 {
-	    if (mod->chunk == CHUNK_IHDR && mod->modify_fn &&
-	        (*mod->modify_fn)(pp, pm, mod, 0))
-	       {
-	       mod->modified = 1;
-	       modifier_setbuffer(pm);
-	       }
+         while (mod != NULL)
+         {
+            if (mod->chunk == CHUNK_IHDR && mod->modify_fn &&
+                (*mod->modify_fn)(pp, pm, mod, 0))
+               {
+               mod->modified = 1;
+               modifier_setbuffer(pm);
+               }
 
-	    /* Ignore removal or add if IHDR! */
-	    mod = mod->next;
-	 }
+            /* Ignore removal or add if IHDR! */
+            mod = mod->next;
+         }
 
-	 /* Cache information from the IHDR (the modified one.) */
-	 pm->bit_depth = pm->buffer[8+8];
-	 pm->colour_type = pm->buffer[8+8+1];
+         /* Cache information from the IHDR (the modified one.) */
+         pm->bit_depth = pm->buffer[8+8];
+         pm->colour_type = pm->buffer[8+8+1];
 
-	 pm->state = modifier_IHDR;
-	 pm->flush = 0;
-	 break;
+         pm->state = modifier_IHDR;
+         pm->flush = 0;
+         break;
 
       default:
          /* Read a new chunk and process it until we see PLTE, IDAT or
-	  * IEND.  'flush' indicates that there is still some data to
-	  * output from the preceding chunk.
-	  */
-	 if ((cb = pm->flush) > 0)
-	 {
-	    if (cb > st) cb = st;
-	    pm->flush -= cb;
-	    sucker_read(pp, pb, cb);
-	    pb += cb;
-	    st -= cb;
-	    if (st <= 0) return;
-	 }
+          * IEND.  'flush' indicates that there is still some data to
+          * output from the preceding chunk.
+          */
+         if ((cb = pm->flush) > 0)
+         {
+            if (cb > st) cb = st;
+            pm->flush -= cb;
+            sucker_read(pp, pb, cb);
+            pb += cb;
+            st -= cb;
+            if (st <= 0) return;
+         }
 
-	 /* No more bytes to flush, read a header, or handle a pending
-	  * chunk.
-	  */
-	 if (pm->pending_chunk != 0)
-	 {
-	    png_save_uint_32(pm->buffer, pm->pending_len);
-	    png_save_uint_32(pm->buffer+4, pm->pending_chunk);
-	    pm->pending_len = 0;
-	    pm->pending_chunk = 0;
-	 }
+         /* No more bytes to flush, read a header, or handle a pending
+          * chunk.
+          */
+         if (pm->pending_chunk != 0)
+         {
+            png_save_uint_32(pm->buffer, pm->pending_len);
+            png_save_uint_32(pm->buffer+4, pm->pending_chunk);
+            pm->pending_len = 0;
+            pm->pending_chunk = 0;
+         }
          else
-	    sucker_read(pp, pm->buffer, 8);
+            sucker_read(pp, pm->buffer, 8);
 
-	 pm->buffer_count = 8;
-	 pm->buffer_position = 0;
+         pm->buffer_count = 8;
+         pm->buffer_position = 0;
 
-	 /* Check for something to modify or a terminator chunk. */
-	 len = png_get_uint_32(pm->buffer);
-	 chunk = png_get_uint_32(pm->buffer+4);
+         /* Check for something to modify or a terminator chunk. */
+         len = png_get_uint_32(pm->buffer);
+         chunk = png_get_uint_32(pm->buffer+4);
 
-	 /* Terminators first, they may have to be delayed for added
-	  * chunks
-	  */
-	 if (chunk == CHUNK_PLTE || chunk == CHUNK_IDAT || chunk == CHUNK_IEND)
-	 {
-	    mod = pm->modifications;
+         /* Terminators first, they may have to be delayed for added
+          * chunks
+          */
+         if (chunk == CHUNK_PLTE || chunk == CHUNK_IDAT || chunk == CHUNK_IEND)
+         {
+            mod = pm->modifications;
 
-	    while (mod != NULL)
-	    {
-	       if ((mod->add == chunk ||
-	           mod->add == CHUNK_PLTE && chunk == CHUNK_IDAT) &&
-		   mod->modify_fn != NULL && !mod->modified && !mod->added)
-	       {
-		  /* Regardless of what the modify function does do not run this
-		   * again.
-		   */
-		  mod->added = 1;
+            while (mod != NULL)
+            {
+               if ((mod->add == chunk ||
+                   mod->add == CHUNK_PLTE && chunk == CHUNK_IDAT) &&
+                   mod->modify_fn != NULL && !mod->modified && !mod->added)
+               {
+                  /* Regardless of what the modify function does do not run this
+                   * again.
+                   */
+                  mod->added = 1;
 
-		  if ((*mod->modify_fn)(pp, pm, mod, 1/*add*/))
-		  {
-		     /* Reset the CRC on a new chunk */
-		     if (pm->buffer_count > 0)
-			modifier_setbuffer(pm);
-		     else
-		        {
-			pm->buffer_position = 0;
-			mod->removed = 1;
-			}
+                  if ((*mod->modify_fn)(pp, pm, mod, 1/*add*/))
+                  {
+                     /* Reset the CRC on a new chunk */
+                     if (pm->buffer_count > 0)
+                        modifier_setbuffer(pm);
+                     else
+                        {
+                        pm->buffer_position = 0;
+                        mod->removed = 1;
+                        }
 
-		     /* The buffer has been filled with something (we assume) so
-		      * output this.  Pend the current chunk.
-		      */
-		     pm->pending_len = len;
-		     pm->pending_chunk = chunk;
-		     break; /* out of while */
-		  }
-	       }
+                     /* The buffer has been filled with something (we assume) so
+                      * output this.  Pend the current chunk.
+                      */
+                     pm->pending_len = len;
+                     pm->pending_chunk = chunk;
+                     break; /* out of while */
+                  }
+               }
 
-	       mod = mod->next;
-	    }
+               mod = mod->next;
+            }
 
-	    /* Don't do any further processing if the buffer was modified -
-	     * otherwise the code will end up modifying a chunk that was just
-	     * added.
-	     */
-	    if (mod != NULL)
-	       break; /* out of switch */
-	 }
+            /* Don't do any further processing if the buffer was modified -
+             * otherwise the code will end up modifying a chunk that was just
+             * added.
+             */
+            if (mod != NULL)
+               break; /* out of switch */
+         }
 
-	 /* If we get to here then this chunk may need to be modified.  To do
-	  * this is must be less than 1024 bytes in total size, otherwise
-	  * it just gets flushed.
-	  */
-	 if (len+12 <= sizeof pm->buffer)
-	 {
-	    sucker_read(pp, pm->buffer+pm->buffer_count,
-	       len+12-pm->buffer_count);
-	    pm->buffer_count = len+12;
+         /* If we get to here then this chunk may need to be modified.  To do
+          * this is must be less than 1024 bytes in total size, otherwise
+          * it just gets flushed.
+          */
+         if (len+12 <= sizeof pm->buffer)
+         {
+            sucker_read(pp, pm->buffer+pm->buffer_count,
+               len+12-pm->buffer_count);
+            pm->buffer_count = len+12;
 
-	    /* Check for a modification, else leave it be. */
-	    mod = pm->modifications;
-	    while (mod != NULL)
-	    {
-	       if (mod->chunk == chunk)
-	       {
-	          if (mod->modify_fn == NULL)
-		  {
-		     /* Remove this chunk */
-		     pm->buffer_count = pm->buffer_position = 0;
-		     mod->removed = 1;
-		     break; /* Terminate the while loop */
-		  }
-		  else if ((*mod->modify_fn)(pp, pm, mod, 0))
-		  {
-		     mod->modified = 1;
-		     /* The chunk may have been removed: */
-		     if (pm->buffer_count == 0)
-		     {
-		        pm->buffer_position = 0;
-			break;
-		     }
-		     modifier_setbuffer(pm);
-		  }
-	       }
+            /* Check for a modification, else leave it be. */
+            mod = pm->modifications;
+            while (mod != NULL)
+            {
+               if (mod->chunk == chunk)
+               {
+                  if (mod->modify_fn == NULL)
+                  {
+                     /* Remove this chunk */
+                     pm->buffer_count = pm->buffer_position = 0;
+                     mod->removed = 1;
+                     break; /* Terminate the while loop */
+                  }
+                  else if ((*mod->modify_fn)(pp, pm, mod, 0))
+                  {
+                     mod->modified = 1;
+                     /* The chunk may have been removed: */
+                     if (pm->buffer_count == 0)
+                     {
+                        pm->buffer_position = 0;
+                        break;
+                     }
+                     modifier_setbuffer(pm);
+                  }
+               }
 
-	       mod = mod->next;
-	    }
-	 }
-	 else
-	    pm->flush = len+12 - pm->buffer_count; /* data + crc */
+               mod = mod->next;
+            }
+         }
+         else
+            pm->flush = len+12 - pm->buffer_count; /* data + crc */
 
-	 /* Take the data from the buffer (if there is any). */
-	 break;
+         /* Take the data from the buffer (if there is any). */
+         break;
       }
 
       /* Here to read from the modifier buffer (not directly from
@@ -954,22 +954,22 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
    {
       if (setjmp(pm->this.jmpbuf) == 0)
       {
-	 png_set_read_fn(pp, pm, modifier_read);
+         png_set_read_fn(pp, pm, modifier_read);
 
-	 pm->state = modifier_start;
-	 pm->bit_depth = 0;
-	 pm->colour_type = 255;
+         pm->state = modifier_start;
+         pm->bit_depth = 0;
+         pm->colour_type = 255;
 
-	 pm->pending_len = 0;
-	 pm->pending_chunk = 0;
-	 pm->flush = 0;
-	 pm->buffer_count = 0;
-	 pm->buffer_position = 0;
+         pm->pending_len = 0;
+         pm->pending_chunk = 0;
+         pm->flush = 0;
+         pm->buffer_count = 0;
+         pm->buffer_position = 0;
       }
       else
       {
-	 sucker_read_reset(&pm->this);
-	 pp = NULL;
+         sucker_read_reset(&pm->this);
+         pp = NULL;
       }
    }
 
@@ -1073,11 +1073,11 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
       /* 65535 pixels, but rotate the values. */
       while (i<128)
       {
-	 /* Three bytes per pixel, r, g, b, make b by r^g */
-	 buffer[3*i+0] = (v >> 8) & 0xff;
-	 buffer[3*i+1] = v & 0xff;
-	 buffer[3*i+2] = ((v >> 8) ^ v) & 0xff;
-	 ++v;
+         /* Three bytes per pixel, r, g, b, make b by r^g */
+         buffer[3*i+0] = (v >> 8) & 0xff;
+         buffer[3*i+1] = v & 0xff;
+         buffer[3*i+2] = ((v >> 8) ^ v) & 0xff;
+         ++v;
          ++i;
       }
       return;
@@ -1085,11 +1085,11 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
       /* 65535 pixels, r, g, b, a; just replicate */
       while (i<128)
       {
-	 buffer[4*i+0] = (v >> 8) & 0xff;
-	 buffer[4*i+1] = v & 0xff;
-	 buffer[4*i+2] = (v >> 8) & 0xff;
-	 buffer[4*i+3] = v & 0xff;
-	 ++v;
+         buffer[4*i+0] = (v >> 8) & 0xff;
+         buffer[4*i+1] = v & 0xff;
+         buffer[4*i+2] = (v >> 8) & 0xff;
+         buffer[4*i+3] = v & 0xff;
+         ++v;
          ++i;
       }
       return;
@@ -1099,15 +1099,15 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
        */
       while (i<128)
       {
-	 png_uint_32 t = v++;
-	 buffer[6*i+0] = (t >> 8) & 0xff;
-	 buffer[6*i+1] = t & 0xff;
-	 t *= 257;
-	 buffer[6*i+2] = (t >> 8) & 0xff;
-	 buffer[6*i+3] = t & 0xff;
-	 t *= 17;
-	 buffer[6*i+4] = (t >> 8) & 0xff;
-	 buffer[6*i+5] = t & 0xff;
+         png_uint_32 t = v++;
+         buffer[6*i+0] = (t >> 8) & 0xff;
+         buffer[6*i+1] = t & 0xff;
+         t *= 257;
+         buffer[6*i+2] = (t >> 8) & 0xff;
+         buffer[6*i+3] = t & 0xff;
+         t *= 17;
+         buffer[6*i+4] = (t >> 8) & 0xff;
+         buffer[6*i+5] = t & 0xff;
          ++i;
       }
       return;
@@ -1115,16 +1115,16 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
       /* As above in the 32 bit case. */
       while (i<128)
       {
-	 png_uint_32 t = v++;
-	 buffer[8*i+0] = (t >> 8) & 0xff;
-	 buffer[8*i+1] = t & 0xff;
-	 buffer[8*i+4] = (t >> 8) & 0xff;
-	 buffer[8*i+5] = t & 0xff;
-	 t *= 257;
-	 buffer[8*i+2] = (t >> 8) & 0xff;
-	 buffer[8*i+3] = t & 0xff;
-	 buffer[8*i+6] = (t >> 8) & 0xff;
-	 buffer[8*i+7] = t & 0xff;
+         png_uint_32 t = v++;
+         buffer[8*i+0] = (t >> 8) & 0xff;
+         buffer[8*i+1] = t & 0xff;
+         buffer[8*i+4] = (t >> 8) & 0xff;
+         buffer[8*i+5] = t & 0xff;
+         t *= 257;
+         buffer[8*i+2] = (t >> 8) & 0xff;
+         buffer[8*i+3] = t & 0xff;
+         buffer[8*i+6] = (t >> 8) & 0xff;
+         buffer[8*i+7] = t & 0xff;
          ++i;
       }
       return;
@@ -1144,16 +1144,16 @@ make_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
       png_infop pi;
 
       {
-	 size_t pos;
-	 char name[64];  /* Same size as the buffer in a file. */
+         size_t pos;
+         char name[64];  /* Same size as the buffer in a file. */
 
-	 /* Build a name */
-	 pos = safecat(name, sizeof name, 0, bit_depths[bdlo]);
-	 pos = safecat(name, sizeof name, pos, "bit ");
-	 pos = safecat(name, sizeof name, pos, colour_types[colour_type]);
+         /* Build a name */
+         pos = safecat(name, sizeof name, 0, bit_depths[bdlo]);
+         pos = safecat(name, sizeof name, pos, "bit ");
+         pos = safecat(name, sizeof name, pos, colour_types[colour_type]);
 
-	 /* Get a png_struct for writing the image. */
-	 pp = set_sucker_for_write(ps, &pi, name);
+         /* Get a png_struct for writing the image. */
+         pp = set_sucker_for_write(ps, &pi, name);
       }
       if (pp == NULL) return;
 
@@ -1161,19 +1161,19 @@ make_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
       if (setjmp(ps->jmpbuf) != 0)
       {
          sucker_write_reset(ps);
-	 continue;
+         continue;
       }
 
       h = standard_height(pp, colour_type, bit_depth),
       png_set_IHDR(pp, pi, standard_width(pp, colour_type, bit_depth), h,
          bit_depth, colour_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE,
-	 PNG_FILTER_TYPE_BASE);
+         PNG_FILTER_TYPE_BASE);
 
       if (colour_type == 3) /* palette */
       {
-	 int i;
+         int i;
          png_color pal[256];
-	 for (i=0; i<256; ++i) pal[i].red = pal[i].green = pal[i].blue = i;
+         for (i=0; i<256; ++i) pal[i].red = pal[i].green = pal[i].blue = i;
          png_set_PLTE(pp, pi, pal, 256);
       }
 
@@ -1186,7 +1186,7 @@ make_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
       else for (y=0; y<h; ++y)
       {
          png_byte buffer[STD_ROWMAX];
-	 standard_row(pp, buffer, colour_type, bit_depth, y);
+         standard_row(pp, buffer, colour_type, bit_depth, y);
          png_write_row(pp, buffer);
       }
 
@@ -1231,7 +1231,7 @@ test_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
       if (setjmp(ps->jmpbuf) != 0)
       {
          sucker_read_reset(ps);
-	 continue;
+         continue;
       }
 
       h = standard_height(pp, colour_type, bit_depth);
@@ -1259,19 +1259,19 @@ test_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
 
       if (colour_type == 3) /* palette */
       {
-	 png_colorp pal;
-	 int num;
-	 if (png_get_PLTE(pp, pi, &pal, &num) & PNG_INFO_PLTE)
-	 {
-	    int i;
-	    if (num != 256)
-	       png_error(pp, "validate: color type 3 PLTE chunk size changed");
-	    for (i=0; i<num; ++i)
-	       if (pal[i].red != i || pal[i].green != i || pal[i].blue != i)
-	          png_error(pp, "validate: color type 3 PLTE chunk changed");
-	 }
-	 else
-	    png_error(pp, "validate: missing PLTE with color type 3");
+         png_colorp pal;
+         int num;
+         if (png_get_PLTE(pp, pi, &pal, &num) & PNG_INFO_PLTE)
+         {
+            int i;
+            if (num != 256)
+               png_error(pp, "validate: color type 3 PLTE chunk size changed");
+            for (i=0; i<num; ++i)
+               if (pal[i].red != i || pal[i].green != i || pal[i].blue != i)
+                  png_error(pp, "validate: color type 3 PLTE chunk changed");
+         }
+         else
+            png_error(pp, "validate: missing PLTE with color type 3");
       }
 
       cb = standard_rowsize(pp, colour_type, bit_depth);
@@ -1283,24 +1283,24 @@ test_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
       else for (y=0; y<h; ++y)
       {
          png_byte std[STD_ROWMAX];
-	 png_byte read[STD_ROWMAX];
-	 png_byte display[STD_ROWMAX];
+         png_byte read[STD_ROWMAX];
+         png_byte display[STD_ROWMAX];
 
-	 standard_row(pp, std, colour_type, bit_depth, y);
+         standard_row(pp, std, colour_type, bit_depth, y);
          png_read_row(pp, read, display);
 
          if (memcmp(std, read, cb) != 0)
-	 {
-	    char msg[64];
-	    sprintf(msg, "validate: PNG image row %d (of %d) changed", y,
-	       h);
-	    png_error(pp, msg);
-	 }
+         {
+            char msg[64];
+            sprintf(msg, "validate: PNG image row %d (of %d) changed", y,
+               h);
+            png_error(pp, msg);
+         }
          if (memcmp(std, display, cb) != 0)
-	 {
-	    char msg[64];
-	    sprintf(msg, "validate: transformed row %d (of %d) changed", y, h);
-	    png_error(pp, msg);
+         {
+            char msg[64];
+            sprintf(msg, "validate: transformed row %d (of %d) changed", y, h);
+            png_error(pp, msg);
          }
       }
 
@@ -1422,13 +1422,13 @@ sbit_modify(png_structp pp, png_modifier *pm, png_modification *me, int add)
       case 4: cb = 2; break;
       case 6: cb = 4; break;
       default:
-	 png_error(pp, "unexpected colour type in sBIT modification");
+         png_error(pp, "unexpected colour type in sBIT modification");
       }
 
       png_save_uint_32(pm->buffer, cb);
       png_save_uint_32(pm->buffer+4, CHUNK_sBIT);
       while (cb > 0)
-	 (pm->buffer+8)[--cb] = sbit;
+         (pm->buffer+8)[--cb] = sbit;
 
       return 1;
    }
@@ -1562,166 +1562,166 @@ gamma_test(png_modifier *pm, const png_byte colour_type,
        */
       const int processing = (fabs(screen_gamma*file_gamma-1) >=
          PNG_GAMMA_THRESHOLD && !threshold_test && !speed && colour_type != 3)
-	 || bit_depth != out_bd;
+         || bit_depth != out_bd;
       const int samples_per_pixel = (out_ct & 2) ? 3 : 1;
       const double gamma = 1/(file_gamma*screen_gamma); /* Overall correction */
 
       for (y=0; y<h; ++y) /* just one pass - no interlacing */
       {
-	 unsigned s, x;
-	 png_byte std[STD_ROWMAX];
-	 png_byte display[STD_ROWMAX];
+         unsigned s, x;
+         png_byte std[STD_ROWMAX];
+         png_byte display[STD_ROWMAX];
 
-	 standard_row(pp, std, colour_type, bit_depth, y);
-	 png_read_row(pp, NULL, display);
+         standard_row(pp, std, colour_type, bit_depth, y);
+         png_read_row(pp, NULL, display);
 
-	 if (processing) for (x=0; x<w; ++x) for (s=0; s<samples_per_pixel; ++s)
-	 {
-	    /* Input sample values: */
-	    const unsigned id = sample(std, colour_type, bit_depth, x, s);
-	    const unsigned od = sample(display, out_ct, out_bd, x, s);
-	    const unsigned isbit = id >> (bit_depth-sbit);
-	    double i, sample, encoded_sample, output, encoded_error, error;
-	    double es_lo, es_hi;
+         if (processing) for (x=0; x<w; ++x) for (s=0; s<samples_per_pixel; ++s)
+         {
+            /* Input sample values: */
+            const unsigned id = sample(std, colour_type, bit_depth, x, s);
+            const unsigned od = sample(display, out_ct, out_bd, x, s);
+            const unsigned isbit = id >> (bit_depth-sbit);
+            double i, sample, encoded_sample, output, encoded_error, error;
+            double es_lo, es_hi;
 
-	    /* First check on the 'perfect' result obtained from the digitized
-	     * input value, id, and compare this against the actual digitized
-	     * result, 'od'.  'i' is the input result in the range 0..1:
-	     *
-	     * NOTE: sbit should be taken into account here but isn't, as
-	     * described above.
-	     */
-	    i = isbit; i /= (1U<<sbit)-1;
+            /* First check on the 'perfect' result obtained from the digitized
+             * input value, id, and compare this against the actual digitized
+             * result, 'od'.  'i' is the input result in the range 0..1:
+             *
+             * NOTE: sbit should be taken into account here but isn't, as
+             * described above.
+             */
+            i = isbit; i /= (1U<<sbit)-1;
 
-	    /* Then get the gamma corrected version of 'i' and compare to 'od',
-	     * any error less than .5 is insignificant - just quantization of
-	     * the output value to the nearest digital value (neverthelss the
-	     * error is still recorded - it's interesting ;-)
-	     */
-	    encoded_sample = pow(i, gamma) * outmax;
-	    encoded_error = fabs(od-encoded_sample);
+            /* Then get the gamma corrected version of 'i' and compare to 'od',
+             * any error less than .5 is insignificant - just quantization of
+             * the output value to the nearest digital value (neverthelss the
+             * error is still recorded - it's interesting ;-)
+             */
+            encoded_sample = pow(i, gamma) * outmax;
+            encoded_error = fabs(od-encoded_sample);
 
-	    if (encoded_error > maxerrout)
-	       maxerrout = encoded_error;
+            if (encoded_error > maxerrout)
+               maxerrout = encoded_error;
 
-	    if (encoded_error < .5+maxout)
-	       continue;
+            if (encoded_error < .5+maxout)
+               continue;
 
-	    /* There may be an error, calculate the actual sample values -
-	     * unencoded light intensity values.  Note that in practice these
-	     * are not unencoded because they include a 'viewing correction' to
-	     * decrease or (normally) increase the perceptual contrast of the
-	     * image.  There's nothing we can do about this - we don't know what
-	     * it is - so assume the unencoded value is perceptually linear.
-	     */
-	    sample = pow(i, 1/file_gamma); /* In range 0..1 */
-	    output = od;
-	    output /= outmax;
-	    output = pow(output, screen_gamma);
+            /* There may be an error, calculate the actual sample values -
+             * unencoded light intensity values.  Note that in practice these
+             * are not unencoded because they include a 'viewing correction' to
+             * decrease or (normally) increase the perceptual contrast of the
+             * image.  There's nothing we can do about this - we don't know what
+             * it is - so assume the unencoded value is perceptually linear.
+             */
+            sample = pow(i, 1/file_gamma); /* In range 0..1 */
+            output = od;
+            output /= outmax;
+            output = pow(output, screen_gamma);
 
-	    /* Now we have the numbers for real errors, both absolute values as
-	     * as a percentage of the correct value (output):
-	     */
-	    error = fabs(sample-output);
-	    if (error > maxerrabs)
-	       maxerrabs = error;
-	    /* The following is an attempt to ignore the tendency of
-	     * quantization to dominate the percentage errors for low output
-	     * sample values:
-	     */
-	    if (sample*maxpc > .5+maxabs)
-	    {
-	       double pcerr = error/sample;
-	       if (pcerr > maxerrpc) maxerrpc = pcerr;
-	    }
+            /* Now we have the numbers for real errors, both absolute values as
+             * as a percentage of the correct value (output):
+             */
+            error = fabs(sample-output);
+            if (error > maxerrabs)
+               maxerrabs = error;
+            /* The following is an attempt to ignore the tendency of
+             * quantization to dominate the percentage errors for low output
+             * sample values:
+             */
+            if (sample*maxpc > .5+maxabs)
+            {
+               double pcerr = error/sample;
+               if (pcerr > maxerrpc) maxerrpc = pcerr;
+            }
 
-	    /* Now calculate the digitization limits for 'encoded_sample' using
-	     * the 'max' values.  Note that maxout is in the encoded space but
-	     * maxpc and maxabs are in linear light space.
-	     *
-	     * First find the maximum error in linear light space, range 0..1:
-	     */
-	    {
-	       double tmp = sample * maxpc;
-	       if (tmp < maxabs) tmp = maxabs;
+            /* Now calculate the digitization limits for 'encoded_sample' using
+             * the 'max' values.  Note that maxout is in the encoded space but
+             * maxpc and maxabs are in linear light space.
+             *
+             * First find the maximum error in linear light space, range 0..1:
+             */
+            {
+               double tmp = sample * maxpc;
+               if (tmp < maxabs) tmp = maxabs;
 
-	       /* Low bound - the minimum of the three: */
-	       es_lo = encoded_sample - maxout;
-	       if (es_lo > 0 && sample-tmp > 0)
-	       {
-		  double l = outmax * pow(sample-tmp, 1/screen_gamma);
-		  if (l < es_lo) es_lo = l;
-	       }
-	       else
-	          es_lo = 0;
+               /* Low bound - the minimum of the three: */
+               es_lo = encoded_sample - maxout;
+               if (es_lo > 0 && sample-tmp > 0)
+               {
+                  double l = outmax * pow(sample-tmp, 1/screen_gamma);
+                  if (l < es_lo) es_lo = l;
+               }
+               else
+                  es_lo = 0;
 
-	       es_hi = encoded_sample + maxout;
-	       if (es_hi < outmax && sample+tmp < 1)
-	       {
-		  double h = outmax * pow(sample+tmp, 1/screen_gamma);
-		  if (h > es_hi) es_hi = h;
-	       }
-	       else
-	          es_hi = outmax;
-	    }
+               es_hi = encoded_sample + maxout;
+               if (es_hi < outmax && sample+tmp < 1)
+               {
+                  double h = outmax * pow(sample+tmp, 1/screen_gamma);
+                  if (h > es_hi) es_hi = h;
+               }
+               else
+                  es_hi = outmax;
+            }
 
-	    /* The primary test is that the final encoded value returned by the
-	     * library should be between the two limits (inclusive) that were
-	     * calculated above.  At this point quantization of the output must
-	     * be taken into account.
-	     */
-	    if (od+.5 < es_lo || od-.5 > es_hi)
-	    {
-	       /* Thee has been an error in processing. */
-	       double is_lo, is_hi;
+            /* The primary test is that the final encoded value returned by the
+             * library should be between the two limits (inclusive) that were
+             * calculated above.  At this point quantization of the output must
+             * be taken into account.
+             */
+            if (od+.5 < es_lo || od-.5 > es_hi)
+            {
+               /* Thee has been an error in processing. */
+               double is_lo, is_hi;
 
-	       if (use_input_precision)
-	       {
-		  /* Ok, something is wrong - this actually happens in current
-		   * libpng sbit processing.  Assume that the input value (id,
-		   * adjusted for sbit) can be anywhere between value-.5 and
-		   * value+.5 - quite a large range if sbit is low.
-		   */
-		  double tmp = (isbit - .5)/((1U<<sbit)-1);
-		  if (tmp > 0)
-		  {
-		     is_lo = outmax * pow(tmp, gamma) - maxout;
-		     if (is_lo < 0) is_lo = 0;
-		  }
-		  else
-		     is_lo = 0;
+               if (use_input_precision)
+               {
+                  /* Ok, something is wrong - this actually happens in current
+                   * libpng sbit processing.  Assume that the input value (id,
+                   * adjusted for sbit) can be anywhere between value-.5 and
+                   * value+.5 - quite a large range if sbit is low.
+                   */
+                  double tmp = (isbit - .5)/((1U<<sbit)-1);
+                  if (tmp > 0)
+                  {
+                     is_lo = outmax * pow(tmp, gamma) - maxout;
+                     if (is_lo < 0) is_lo = 0;
+                  }
+                  else
+                     is_lo = 0;
 
-		  tmp = (isbit + .5)/((1U<<sbit)-1);
-		  if (tmp < 1)
-		  {
-		     is_hi = outmax * pow(tmp, gamma) + maxout;
-		     if (is_hi > outmax) is_hi = outmax;
-		  }
-		  else
-		     is_hi = outmax;
+                  tmp = (isbit + .5)/((1U<<sbit)-1);
+                  if (tmp < 1)
+                  {
+                     is_hi = outmax * pow(tmp, gamma) + maxout;
+                     if (is_hi > outmax) is_hi = outmax;
+                  }
+                  else
+                     is_hi = outmax;
 
-		  if (!(od+.5 < is_lo || od-.5 > is_hi))
-		     continue;
-	       }
+                  if (!(od+.5 < is_lo || od-.5 > is_hi))
+                     continue;
+               }
 
-	       {
-		  char msg[256];
-	          sprintf(msg,
-		     "error: %.3f; %u{%u;%u} -> %u not %.2f (%.1f-%.1f)",
-		     od-encoded_sample, id, sbit, isbit, od, encoded_sample,
-		     use_input_precision ? is_lo : es_lo,
-		     use_input_precision ? is_hi : es_hi);
-	          png_warning(pp, msg);
-	       }
-	    }
-	 }
-	 else if (!speed && memcmp(std, display, cb) != 0)
-	 {
-	    char msg[64];
-	    /* No transform is expected on the threshold tests. */
-	    sprintf(msg, "gamma: below threshold row %d (of %d) changed", y, h);
-	    png_error(pp, msg);
-	 }
+               {
+                  char msg[256];
+                  sprintf(msg,
+                     "error: %.3f; %u{%u;%u} -> %u not %.2f (%.1f-%.1f)",
+                     od-encoded_sample, id, sbit, isbit, od, encoded_sample,
+                     use_input_precision ? is_lo : es_lo,
+                     use_input_precision ? is_hi : es_hi);
+                  png_warning(pp, msg);
+               }
+            }
+         }
+         else if (!speed && memcmp(std, display, cb) != 0)
+         {
+            char msg[64];
+            /* No transform is expected on the threshold tests. */
+            sprintf(msg, "gamma: below threshold row %d (of %d) changed", y, h);
+            png_error(pp, msg);
+         }
       }
    }
 
@@ -1778,8 +1778,8 @@ perform_gamma_threshold_tests(png_modifier *pm)
       double gamma = 1.0;
       while (gamma >= .4)
       {
-	 gamma_threshold_test(pm, colour_type, bit_depth, gamma, 1/gamma);
-	 gamma *= .95;
+         gamma_threshold_test(pm, colour_type, bit_depth, gamma, 1/gamma);
+         gamma *= .95;
       }
 
       /* And a special test for sRGB */
@@ -1827,9 +1827,9 @@ static void perform_gamma_transform_tests(png_modifier *pm, int speed)
 
       for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j) if (i != j)
       {
-	 gamma_transform_test(pm, colour_type, bit_depth, 1/pm->gammas[i],
-	    pm->gammas[j], bit_depth, speed, pm->use_input_precision,
-	    0/*do not strip16*/);
+         gamma_transform_test(pm, colour_type, bit_depth, 1/pm->gammas[i],
+            pm->gammas[j], bit_depth, speed, pm->use_input_precision,
+            0/*do not strip16*/);
          if (fail(pm)) return;
       }
    }
@@ -1848,20 +1848,20 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
       for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j)
          if (i != j)
       {
-	 if (sbit < 8)
-	 {
-	    gamma_transform_test(pm, 0, 8, 1/pm->gammas[i], pm->gammas[j], sbit,
-	       speed, pm->use_input_precision_sbit, 0/*strip16*/);
-	    if (fail(pm)) return;
-	    gamma_transform_test(pm, 2, 8, 1/pm->gammas[i], pm->gammas[j], sbit,
-	       speed, pm->use_input_precision_sbit, 0/*strip16*/);
-	    if (fail(pm)) return;
-	 }
-	 gamma_transform_test(pm, 0, 16, 1/pm->gammas[i], pm->gammas[j], sbit,
-	    speed, pm->use_input_precision_sbit, 0/*strip16*/);
+         if (sbit < 8)
+         {
+            gamma_transform_test(pm, 0, 8, 1/pm->gammas[i], pm->gammas[j], sbit,
+               speed, pm->use_input_precision_sbit, 0/*strip16*/);
+            if (fail(pm)) return;
+            gamma_transform_test(pm, 2, 8, 1/pm->gammas[i], pm->gammas[j], sbit,
+               speed, pm->use_input_precision_sbit, 0/*strip16*/);
+            if (fail(pm)) return;
+         }
+         gamma_transform_test(pm, 0, 16, 1/pm->gammas[i], pm->gammas[j], sbit,
+            speed, pm->use_input_precision_sbit, 0/*strip16*/);
          if (fail(pm)) return;
-	 gamma_transform_test(pm, 2, 16, 1/pm->gammas[i], pm->gammas[j], sbit,
-	    speed, pm->use_input_precision_sbit, 0/*strip16*/);
+         gamma_transform_test(pm, 2, 16, 1/pm->gammas[i], pm->gammas[j], sbit,
+            speed, pm->use_input_precision_sbit, 0/*strip16*/);
          if (fail(pm)) return;
       }
    }
@@ -1931,13 +1931,13 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
       printf("Gamma correction with sBIT:\n");
       if (pm->sbitlow < 8)
       {
-	 printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
-	 printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
-	 printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
+         printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
+         printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
+         printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
       }
       printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
       if (pm->sbitlow < 8)
-	 printf("  8 bit color: %.5f\n", pm->error_color_8);
+         printf("  8 bit color: %.5f\n", pm->error_color_8);
       printf(" 16 bit color: %.5f\n", pm->error_color_16);
    }
 
@@ -2003,7 +2003,7 @@ int main(int argc, const char **argv)
       else if (strcmp(*argv, "-q") == 0)
          pm.this.verbose = pm.log = summary = 0;
       else if (strcmp(*argv, "-g") == 0)
-	 pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
+         pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
       else if (strcmp(*argv, "-w") == 0)
          pm.this.treat_warnings_as_errors = 0;
       else if (strcmp(*argv, "-speed") == 0)
@@ -2014,27 +2014,27 @@ int main(int argc, const char **argv)
       {
          --argc;
          if (strcmp(4+*argv, "abs8") == 0)
-	    pm.maxabs8 = atof(*++argv);
-	 else if (strcmp(4+*argv, "abs16") == 0)
-	    pm.maxabs16 = atof(*++argv);
-	 else if (strcmp(4+*argv, "out8") == 0)
-	    pm.maxout8 = atof(*++argv);
-	 else if (strcmp(4+*argv, "out16") == 0)
-	    pm.maxout16 = atof(*++argv);
-	 else if (strcmp(4+*argv, "pc8") == 0)
-	    pm.maxpc8 = atof(*++argv);
-	 else if (strcmp(4+*argv, "pc16") == 0)
-	    pm.maxpc16 = atof(*++argv);
-	 else
-	 {
-	    fprintf(stderr, "pngvalid: %s: unknown 'max' option\n", *argv);
-	    exit(1);
-	 }
+            pm.maxabs8 = atof(*++argv);
+         else if (strcmp(4+*argv, "abs16") == 0)
+            pm.maxabs16 = atof(*++argv);
+         else if (strcmp(4+*argv, "out8") == 0)
+            pm.maxout8 = atof(*++argv);
+         else if (strcmp(4+*argv, "out16") == 0)
+            pm.maxout16 = atof(*++argv);
+         else if (strcmp(4+*argv, "pc8") == 0)
+            pm.maxpc8 = atof(*++argv);
+         else if (strcmp(4+*argv, "pc16") == 0)
+            pm.maxpc16 = atof(*++argv);
+         else
+         {
+            fprintf(stderr, "pngvalid: %s: unknown 'max' option\n", *argv);
+            exit(1);
+         }
       }
       else
       {
          fprintf(stderr, "pngvalid: %s: unknown argument\n", *argv);
-	 exit(1);
+         exit(1);
       }
 
    /* Make useful base images */
@@ -2052,9 +2052,9 @@ int main(int argc, const char **argv)
 #else
          "fixed",
 #endif
-	 (pm.this.nerrors || pm.this.treat_warnings_as_errors &&
-	    pm.this.nwarnings) ? "(errors)" : (pm.this.nwarnings ?
-	       "(warnings)" : "(no errors or warnings)")
+         (pm.this.nerrors || pm.this.treat_warnings_as_errors &&
+            pm.this.nwarnings) ? "(errors)" : (pm.this.nwarnings ?
+               "(warnings)" : "(no errors or warnings)")
       );
 
    /* Error exit if there are any errors, and maybe if there are any

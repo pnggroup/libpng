@@ -917,7 +917,7 @@ png_init_read_transformations(png_structp png_ptr)
               istop=(int)png_ptr->num_trans;
               for (i=0; i<istop; i++)
                  png_ptr->trans_alpha[i] = (png_byte)(255 -
-		    png_ptr->trans_alpha[i]);
+                    png_ptr->trans_alpha[i]);
            }
         }
 #endif
@@ -985,21 +985,21 @@ png_init_read_transformations(png_structp png_ptr)
                   case PNG_BACKGROUND_GAMMA_FILE:
                      g = png_reciprocal(png_ptr->gamma);
                      gs = png_reciprocal2(png_ptr->gamma,
-		        png_ptr->screen_gamma);
+                        png_ptr->screen_gamma);
                      break;
 
                   case PNG_BACKGROUND_GAMMA_UNIQUE:
                      g = png_reciprocal(png_ptr->background_gamma);
                      gs = png_reciprocal2(png_ptr->background_gamma,
-		        png_ptr->screen_gamma);
+                        png_ptr->screen_gamma);
                      break;
                   default:
                      g = PNG_FP_1;    /* back_1 */
                      gs = PNG_FP_1;   /* back */
-		     break;
+                     break;
                }
 
-	       if ( png_gamma_significant(gs) )
+               if ( png_gamma_significant(gs) )
                {
                   back.red   = (png_byte)png_ptr->background.red;
                   back.green = (png_byte)png_ptr->background.green;
@@ -1067,8 +1067,8 @@ png_init_read_transformations(png_structp png_ptr)
          else
          /* color_type != PNG_COLOR_TYPE_PALETTE */
          {
-	    png_fixed_point g = PNG_FP_1;
-	    png_fixed_point gs = PNG_FP_1;
+            png_fixed_point g = PNG_FP_1;
+            png_fixed_point gs = PNG_FP_1;
 
             switch (png_ptr->background_gamma_type)
             {
@@ -1085,12 +1085,12 @@ png_init_read_transformations(png_structp png_ptr)
                case PNG_BACKGROUND_GAMMA_UNIQUE:
                   g = png_reciprocal(png_ptr->background_gamma);
                   gs = png_reciprocal2(png_ptr->background_gamma,
-		      png_ptr->screen_gamma);
+                      png_ptr->screen_gamma);
                   break;
             }
 
             png_ptr->background_1.gray = png_gamma_correct(png_ptr,
-	        png_ptr->background.gray, g);
+                png_ptr->background.gray, g);
 
             png_ptr->background.gray = png_gamma_correct(png_ptr,
                 png_ptr->background.gray, gs);

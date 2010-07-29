@@ -888,7 +888,6 @@ png_check_IHDR(png_structp png_ptr,
    if (error == 1)
       png_error(png_ptr, "Invalid IHDR data");
 }
-#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
 
 #if defined(PNG_sCAL_SUPPORTED) || defined(PNG_pCAL_SUPPORTED)
 /* ASCII to fp functions */
@@ -918,16 +917,16 @@ png_check_fp_number(png_charp string, png_size_t size, int *statep,
       int type;
       /* First find the type of the next character */
       {
-	 char ch = string[i];
-	 if (ch >= 48 && ch <= 57)
-	    type = PNG_FP_DIGIT;
-	 else switch (ch)
-	 {
-	 case 43: case 45:  type = PNG_FP_SIGN;  break;
-	 case 46:           type = PNG_FP_DOT;   break;
-	 case 69: case 101: type = PNG_FP_E;     break;
-	 default:           goto PNG_FP_End;
-	 }
+         char ch = string[i];
+         if (ch >= 48 && ch <= 57)
+            type = PNG_FP_DIGIT;
+         else switch (ch)
+         {
+         case 43: case 45:  type = PNG_FP_SIGN;  break;
+         case 46:           type = PNG_FP_DOT;   break;
+         case 69: case 101: type = PNG_FP_E;     break;
+         default:           goto PNG_FP_End;
+         }
       }
 
       /* Now deal with this type according to the current
@@ -937,57 +936,57 @@ png_check_fp_number(png_charp string, png_size_t size, int *statep,
       switch ((state & PNG_FP_STATE) + type)
       {
       case PNG_FP_INTEGER + PNG_FP_SIGN:
-	 if (state & PNG_FP_SAW_ANY)
-	    goto PNG_FP_End; /* not a part of the number */
-	 png_fp_add(state, PNG_FP_SAW_SIGN);
-	 break;
+         if (state & PNG_FP_SAW_ANY)
+            goto PNG_FP_End; /* not a part of the number */
+         png_fp_add(state, PNG_FP_SAW_SIGN);
+         break;
       case PNG_FP_INTEGER + PNG_FP_DOT:
-	 /* Ok as trailer, ok as lead of fraction. */
-	 if (state & PNG_FP_SAW_DOT) /* two dots */
-	    goto PNG_FP_End;
-	 else if (state & PNG_FP_SAW_DIGIT) /* trailing dot? */
-	    png_fp_add(state, PNG_FP_SAW_DOT);
-	 else
-	    png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
-	 break;
+         /* Ok as trailer, ok as lead of fraction. */
+         if (state & PNG_FP_SAW_DOT) /* two dots */
+            goto PNG_FP_End;
+         else if (state & PNG_FP_SAW_DIGIT) /* trailing dot? */
+            png_fp_add(state, PNG_FP_SAW_DOT);
+         else
+            png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
+         break;
       case PNG_FP_INTEGER + PNG_FP_DIGIT:
-	 if (state & PNG_FP_SAW_DOT) /* delayed fraction */
-	    png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
-	 png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
-	 break;
+         if (state & PNG_FP_SAW_DOT) /* delayed fraction */
+            png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
+         png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
+         break;
       case PNG_FP_INTEGER + PNG_FP_E:
-	 if ((state & PNG_FP_SAW_DIGIT) == 0)
-	    goto PNG_FP_End;
-	 png_fp_set(state, PNG_FP_EXPONENT);
-	 break;
+         if ((state & PNG_FP_SAW_DIGIT) == 0)
+            goto PNG_FP_End;
+         png_fp_set(state, PNG_FP_EXPONENT);
+         break;
    /* case PNG_FP_FRACTION + PNG_FP_SIGN:
-	 goto PNG_FP_End; ** no sign in exponent */
+         goto PNG_FP_End; ** no sign in exponent */
    /* case PNG_FP_FRACTION + PNG_FP_DOT:
-	 goto PNG_FP_End; ** Because SAW_DOT is always set */
+         goto PNG_FP_End; ** Because SAW_DOT is always set */
       case PNG_FP_FRACTION + PNG_FP_DIGIT:
-	 png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
-	 break;
+         png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
+         break;
       case PNG_FP_FRACTION + PNG_FP_E:
-	 /* This is correct because the trailing '.' on an
-	  * integer is handled above - so we can only get here
-	  * with the sequence ".E" (with no preceding digits).
-	  */
-	 if ((state & PNG_FP_SAW_DIGIT) == 0)
-	    goto PNG_FP_End;
-	 png_fp_set(state, PNG_FP_EXPONENT);
-	 break;
+         /* This is correct because the trailing '.' on an
+          * integer is handled above - so we can only get here
+          * with the sequence ".E" (with no preceding digits).
+          */
+         if ((state & PNG_FP_SAW_DIGIT) == 0)
+            goto PNG_FP_End;
+         png_fp_set(state, PNG_FP_EXPONENT);
+         break;
       case PNG_FP_EXPONENT + PNG_FP_SIGN:
-	 if (state & PNG_FP_SAW_ANY)
-	    goto PNG_FP_End; /* not a part of the number */
-	 png_fp_add(state, PNG_FP_SAW_SIGN);
-	 break;
+         if (state & PNG_FP_SAW_ANY)
+            goto PNG_FP_End; /* not a part of the number */
+         png_fp_add(state, PNG_FP_SAW_SIGN);
+         break;
    /* case PNG_FP_EXPONENT + PNG_FP_DOT:
-	 goto PNG_FP_End; */
+         goto PNG_FP_End; */
       case PNG_FP_EXPONENT + PNG_FP_DIGIT:
-	 png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
-	 break;
+         png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
+         break;
    /* case PNG_FP_EXPONEXT + PNG_FP_E:
-	 goto PNG_FP_End; */
+         goto PNG_FP_End; */
       default: goto PNG_FP_End; /* I.e. break 2 */
       }
 
@@ -1040,8 +1039,8 @@ png_pow10(int power)
       do
       {
          if (power & 1) d *= mult;
-	 mult *= mult;
-	 power >>= 1;
+         mult *= mult;
+         power >>= 1;
       }
       while (power > 0);
 
@@ -1077,258 +1076,258 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
       if (fp < 0)
       {
          fp = -fp;
-	 *ascii++ = 45; /* '-'  PLUS 1 TOTAL 1*/
-	 --size;
+         *ascii++ = 45; /* '-'  PLUS 1 TOTAL 1*/
+         --size;
       }
 
       if (fp >= DBL_MIN && fp <= DBL_MAX)
       {
-	 int exp;       /* A base 10 exponent */
-	 double base;   /* 10^exp */
+         int exp;       /* A base 10 exponent */
+         double base;   /* 10^exp */
 
-	 /* First extract a base 10 exponent of the number,
-	  * the calculation below rounds down when converting
-	  * from base 2 to base 10 (multiply by log10(2) -
-	  * 0.3010, but 77/256 is 0.3008, so exp needs to
-	  * be increased.  Note that the arithmetic shift
-	  * performs a floor() unlike C arithmetic - using a
-	  * C multiply would break the following for negative
-	  * exponents.
-	  */
-	 (void)frexp(fp, &exp); /* exponent to base 2 */
-	 exp = (exp * 77) >> 8; /* <= exponent to base 10 */
-	 /* Avoid underflow here. */
-	 base = png_pow10(exp); /* May underflow */
-	 while (base < DBL_MIN || base < fp)
-	 {
-	    /* And this may overflow. */
-	    double test = png_pow10(exp+1);
-	    if (test <= DBL_MAX)
-	       ++exp, base = test;
-	    else
-	       break;
-	 }
+         /* First extract a base 10 exponent of the number,
+          * the calculation below rounds down when converting
+          * from base 2 to base 10 (multiply by log10(2) -
+          * 0.3010, but 77/256 is 0.3008, so exp needs to
+          * be increased.  Note that the arithmetic shift
+          * performs a floor() unlike C arithmetic - using a
+          * C multiply would break the following for negative
+          * exponents.
+          */
+         (void)frexp(fp, &exp); /* exponent to base 2 */
+         exp = (exp * 77) >> 8; /* <= exponent to base 10 */
+         /* Avoid underflow here. */
+         base = png_pow10(exp); /* May underflow */
+         while (base < DBL_MIN || base < fp)
+         {
+            /* And this may overflow. */
+            double test = png_pow10(exp+1);
+            if (test <= DBL_MAX)
+               ++exp, base = test;
+            else
+               break;
+         }
 
-	 /* Normalize fp and correct exp, after this fp is in the
-	  * range [.1,1) and exp is both the exponent and the digit
-	  * *before* which the decimal point should be inserted
-	  * (starting with 0 for the first digit).  Note that this
-	  * works even if 10^exp is out of range because of the
-	  * test on DBL_MAX above.
-	  */
-	 fp /= base;
-	 while (fp >= 1) fp /= 10, ++exp;
+         /* Normalize fp and correct exp, after this fp is in the
+          * range [.1,1) and exp is both the exponent and the digit
+          * *before* which the decimal point should be inserted
+          * (starting with 0 for the first digit).  Note that this
+          * works even if 10^exp is out of range because of the
+          * test on DBL_MAX above.
+          */
+         fp /= base;
+         while (fp >= 1) fp /= 10, ++exp;
 
-	 /* Because of the code above fp may, at this point, be
-	  * less than .1, this is ok because the code below can
-	  * handle the leading zeros this generates, so no attempt
-	  * is made to correct that here.
-	  */
+         /* Because of the code above fp may, at this point, be
+          * less than .1, this is ok because the code below can
+          * handle the leading zeros this generates, so no attempt
+          * is made to correct that here.
+          */
 
-	 {
-	    int czero, clead, cdigits;
-	    char exponent[10];
+         {
+            int czero, clead, cdigits;
+            char exponent[10];
 
-	    /* Allow up to two leading zeros - this will not lengthen
-	     * the number compared to using E-n.
-	     */
-	    if (exp < 0 && exp > -3) /* PLUS 3 TOTAL 4 */
-	    {
-	       czero = -exp; /* PLUS 2 digits: TOTAL 3 */
-	       exp = 0;      /* Dot added below before first output. */
-	    }
-	    else
-	       czero = 0;    /* No zeros to add */
+            /* Allow up to two leading zeros - this will not lengthen
+             * the number compared to using E-n.
+             */
+            if (exp < 0 && exp > -3) /* PLUS 3 TOTAL 4 */
+            {
+               czero = -exp; /* PLUS 2 digits: TOTAL 3 */
+               exp = 0;      /* Dot added below before first output. */
+            }
+            else
+               czero = 0;    /* No zeros to add */
 
-	    /* Generate the digit list, stripping trailing zeros and
-	     * inserting a '.' before a digit if the exponent is 0.
-	     */
-	    clead = czero; /* Count of leading zeros */
-	    cdigits = 0;   /* Count of digits in list. */
-	    do
-	    {
-	       double d;
+            /* Generate the digit list, stripping trailing zeros and
+             * inserting a '.' before a digit if the exponent is 0.
+             */
+            clead = czero; /* Count of leading zeros */
+            cdigits = 0;   /* Count of digits in list. */
+            do
+            {
+               double d;
 
-	       fp *= 10;
-	       /* Use modf here, not floor and subtract, so that
-		* the separation is done in one step.  At the end
-		* of the loop don't break the number into parts so
-		* that the final digit is rounded.
-		*/
-	       if (cdigits+czero-clead+1 < (int)precision)
-		  fp = modf(fp, &d);
-	       else
-	       {
-		  /* End of loop - round the whole number. */
-		  d = floor(fp + .5);
+               fp *= 10;
+               /* Use modf here, not floor and subtract, so that
+        	* the separation is done in one step.  At the end
+        	* of the loop don't break the number into parts so
+        	* that the final digit is rounded.
+        	*/
+               if (cdigits+czero-clead+1 < (int)precision)
+        	  fp = modf(fp, &d);
+               else
+               {
+        	  /* End of loop - round the whole number. */
+        	  d = floor(fp + .5);
 
-		  if (d > 9)
-		  {
-		     /* Rounding up to 10, handle that here. */
-		     if (czero > 0)
-		     {
-		        --czero, d = 1;
-			if (cdigits == 0) --clead;
+        	  if (d > 9)
+        	  {
+        	     /* Rounding up to 10, handle that here. */
+        	     if (czero > 0)
+        	     {
+        	        --czero, d = 1;
+        		if (cdigits == 0) --clead;
                      }
-		     else
-		     {
-			while (cdigits > 0 && d > 9)
-			{
-			   int ch = *--ascii;
-			   if (exp != (-1))
-			      ++exp;
-			   else if (ch == 46)
-			   {
-			      ch = *--ascii, ++size;
-			      /* Advance exp to '1', so that the
-			       * decimal point happens after the
-			       * previous digit.
-			       */
-			      exp = 1;
-			   }
+        	     else
+        	     {
+        		while (cdigits > 0 && d > 9)
+        		{
+        		   int ch = *--ascii;
+        		   if (exp != (-1))
+        		      ++exp;
+        		   else if (ch == 46)
+        		   {
+        		      ch = *--ascii, ++size;
+        		      /* Advance exp to '1', so that the
+        		       * decimal point happens after the
+        		       * previous digit.
+        		       */
+        		      exp = 1;
+        		   }
 
-			   --cdigits;
-			   d = ch - 47;  /* I.e. 1+(ch-48) */
-			}
+        		   --cdigits;
+        		   d = ch - 47;  /* I.e. 1+(ch-48) */
+        		}
 
-			/* Did we reach the beginning? If so adjust the
-			 * exponent but take into account the leading
-			 * decimal point.
-			 */
-			if (d > 9)  /* cdigits == 0 */
-			{
-			   if (exp == (-1))
-			   {
-			      /* Leading decimal point (plus zeros?), if
-			       * we lose the decimal point here it must
-			       * be reentered below.
-			       */
-			      int ch = *--ascii;
-			      if (ch == 46)
-			         ++size, exp = 1;
-			      /* Else lost a leading zero, so 'exp' is
-			       * still ok at (-1)
-			       */
-			   }
-			   else
-			      ++exp;
+        		/* Did we reach the beginning? If so adjust the
+        		 * exponent but take into account the leading
+        		 * decimal point.
+        		 */
+        		if (d > 9)  /* cdigits == 0 */
+        		{
+        		   if (exp == (-1))
+        		   {
+        		      /* Leading decimal point (plus zeros?), if
+        		       * we lose the decimal point here it must
+        		       * be reentered below.
+        		       */
+        		      int ch = *--ascii;
+        		      if (ch == 46)
+        		         ++size, exp = 1;
+        		      /* Else lost a leading zero, so 'exp' is
+        		       * still ok at (-1)
+        		       */
+        		   }
+        		   else
+        		      ++exp;
 
-			   /* In all cases we output a '1' */
-			   d = 1;
-			}
-		     }
-		  }
-		  fp = 0; /* Guarantees termination below. */
-	       }
+        		   /* In all cases we output a '1' */
+        		   d = 1;
+        		}
+        	     }
+        	  }
+        	  fp = 0; /* Guarantees termination below. */
+               }
 
-	       if (d == 0)
-	       {
-		  ++czero;
-		  if (cdigits == 0) ++clead;
-	       }
-	       else
-	       {
-		  /* Included embedded zeros in the digit count. */
-		  cdigits += czero - clead;
-		  clead = 0;
+               if (d == 0)
+               {
+        	  ++czero;
+        	  if (cdigits == 0) ++clead;
+               }
+               else
+               {
+        	  /* Included embedded zeros in the digit count. */
+        	  cdigits += czero - clead;
+        	  clead = 0;
 
-		  while (czero > 0)
-		  {
-		     /* exp == (-1) means we just output the decimal
-		      * place - after the DP don't adjust 'exp' any
-		      * more!
-		      */
-		     if (exp != (-1)) 
-		     {
-		        if (exp == 0) *ascii++ = 46, --size;
-		        /* PLUS 1: TOTAL 4 */
-			--exp;
-		     }
-		     *ascii++ = 48, --czero;
-		  }
+        	  while (czero > 0)
+        	  {
+        	     /* exp == (-1) means we just output the decimal
+        	      * place - after the DP don't adjust 'exp' any
+        	      * more!
+        	      */
+        	     if (exp != (-1)) 
+        	     {
+        	        if (exp == 0) *ascii++ = 46, --size;
+        	        /* PLUS 1: TOTAL 4 */
+        		--exp;
+        	     }
+        	     *ascii++ = 48, --czero;
+        	  }
 
-		  if (exp != (-1))
-		  {
-		     if (exp == 0) *ascii++ = 46, --size; /* counted above */
-		     --exp;
-		  }
-		  *ascii++ = 48 + (int)d, ++cdigits;
-	       }
-	    }
-	    while (cdigits+czero-clead < (int)precision && fp > DBL_MIN);
+        	  if (exp != (-1))
+        	  {
+        	     if (exp == 0) *ascii++ = 46, --size; /* counted above */
+        	     --exp;
+        	  }
+        	  *ascii++ = 48 + (int)d, ++cdigits;
+               }
+            }
+            while (cdigits+czero-clead < (int)precision && fp > DBL_MIN);
 
-	    /* The total output count (max) is now 4+precision */
+            /* The total output count (max) is now 4+precision */
 
-	    /* Check for an exponent, if we don't need one we are
-	     * done and just need to terminate the string.  At
-	     * this point exp==(-1) is effectively if flag - it got
-	     * to '-1' because of the decrement after outputing
-	     * the decimal point above (the exponent required is
-	     * *not* -1!)
-	     */
-	    if (exp >= (-1) && exp <= 2)
-	    {
-	       /* The following only happens if we didn't output the
-		* leading zeros above for negative exponent, so this
-		* doest add to the digit requirement.  Note that the
-		* two zeros here can only be output if the two leading
-		* zeros were *not* output, so this doesn't increase
-		* the output count.
-		*/
-	       while (--exp >= 0) *ascii++ = 48;
-	       *ascii = 0;
-	       /* Total buffer requirement (including the '\0') is
-		* 5+precision - see check at the start.
-		*/
-	       return;
-	    }
+            /* Check for an exponent, if we don't need one we are
+             * done and just need to terminate the string.  At
+             * this point exp==(-1) is effectively if flag - it got
+             * to '-1' because of the decrement after outputing
+             * the decimal point above (the exponent required is
+             * *not* -1!)
+             */
+            if (exp >= (-1) && exp <= 2)
+            {
+               /* The following only happens if we didn't output the
+        	* leading zeros above for negative exponent, so this
+        	* doest add to the digit requirement.  Note that the
+        	* two zeros here can only be output if the two leading
+        	* zeros were *not* output, so this doesn't increase
+        	* the output count.
+        	*/
+               while (--exp >= 0) *ascii++ = 48;
+               *ascii = 0;
+               /* Total buffer requirement (including the '\0') is
+        	* 5+precision - see check at the start.
+        	*/
+               return;
+            }
 
-	    /* Here if an exponent is required, adjust size for
-	     * the digits we output but did not count.  The total
-	     * digit output here so far is at most 1+precision - no
-	     * decimal point and no leading or trailing zeros have
-	     * been output.
-	     */
-	    size -= cdigits;
+            /* Here if an exponent is required, adjust size for
+             * the digits we output but did not count.  The total
+             * digit output here so far is at most 1+precision - no
+             * decimal point and no leading or trailing zeros have
+             * been output.
+             */
+            size -= cdigits;
 
-	    *ascii++ = 69, --size;    /* 'E': PLUS 1 TOTAL 2+precision*/
-	    if (exp < 0)
-	    {
-	       *ascii++ = 45, --size; /* '-': PLUS 1 TOTAL 3+precision */
-	       exp = -exp;
-	    }
+            *ascii++ = 69, --size;    /* 'E': PLUS 1 TOTAL 2+precision*/
+            if (exp < 0)
+            {
+               *ascii++ = 45, --size; /* '-': PLUS 1 TOTAL 3+precision */
+               exp = -exp;
+            }
 
-	    cdigits = 0;
-	    while (exp > 0)
-	    {
-	       exponent[cdigits++] = 48 + exp % 10;
-	       exp /= 10;
-	    }
+            cdigits = 0;
+            while (exp > 0)
+            {
+               exponent[cdigits++] = 48 + exp % 10;
+               exp /= 10;
+            }
 
-	    /* Need another size check here for the exponent digits, so
-	     * this need not be considered above.
-	     */
-	    if ((int)size > cdigits)
-	    {
-	       while (cdigits > 0) *ascii++ = exponent[--cdigits];
-	       *ascii = 0;
-	       return;
-	    }
-	 }
+            /* Need another size check here for the exponent digits, so
+             * this need not be considered above.
+             */
+            if ((int)size > cdigits)
+            {
+               while (cdigits > 0) *ascii++ = exponent[--cdigits];
+               *ascii = 0;
+               return;
+            }
+         }
       }
       else if (!(fp >= DBL_MIN))
       {
          *ascii++ = 48; /* '0' */
-	 *ascii = 0;
-	 return;
+         *ascii = 0;
+         return;
       }
       else
       {
          *ascii++ = 105; /* 'i' */
-	 *ascii++ = 110; /* 'n' */
-	 *ascii++ = 102; /* 'f' */
-	 *ascii = 0;
-	 return;
+         *ascii++ = 110; /* 'n' */
+         *ascii++ = 102; /* 'f' */
+         *ascii = 0;
+         return;
       }
    }
 
@@ -1369,82 +1368,82 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
    {
       if (a == 0 || times == 0)
       {
-	 *res = 0;
+         *res = 0;
          return 1;
       }
       else
       {
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-	 double r = a;
-	 r *= times;
-	 r /= div;
-	 r = floor(r+.5);
-	 /* A png_fixed_point is a 32 bit integer. */
-	 if (r <= 2147483647. && r >= -2147483648.)
-	 {
-	    *res = (png_fixed_point)r;
-	    return 1;
-	 }
+         double r = a;
+         r *= times;
+         r /= div;
+         r = floor(r+.5);
+         /* A png_fixed_point is a 32 bit integer. */
+         if (r <= 2147483647. && r >= -2147483648.)
+         {
+            *res = (png_fixed_point)r;
+            return 1;
+         }
 #else
-	 int negative = 0;
-	 png_uint_32 A, T, D;
-	 if (a < 0) negative = 1, A = -a; else A = a;
-	 if (times < 0) negative = !negative, T = -times; else T = times;
-	 if (div < 0) negative = !negative, D = -div; else D = div;
+         int negative = 0;
+         png_uint_32 A, T, D;
+         if (a < 0) negative = 1, A = -a; else A = a;
+         if (times < 0) negative = !negative, T = -times; else T = times;
+         if (div < 0) negative = !negative, D = -div; else D = div;
 
-	 /* Following can't overflow because the arguments only
-	  * have 31 bits each, however the result may be 32 bits.
-	  */
-	 png_uint_32 s16 = (A >> 16) * (T & 0xffff) +
-			   (A & 0xffff) * (T >> 16);
-	 /* Can't overflow because the a*times bit is only 30
-	  * bits at most.
-	  */
-	 png_uint_32 s32 = (A >> 16) * (T >> 16) + (s16 >> 16);
-	 png_uint_32 s00 = (A & 0xffff) * (T & 0xffff);
+         /* Following can't overflow because the arguments only
+          * have 31 bits each, however the result may be 32 bits.
+          */
+         png_uint_32 s16 = (A >> 16) * (T & 0xffff) +
+        		   (A & 0xffff) * (T >> 16);
+         /* Can't overflow because the a*times bit is only 30
+          * bits at most.
+          */
+         png_uint_32 s32 = (A >> 16) * (T >> 16) + (s16 >> 16);
+         png_uint_32 s00 = (A & 0xffff) * (T & 0xffff);
 
-	 s16 = (s16 & 0xffff) << 16;
-	 s00 += s16;
-	 if (s00 < s16) ++s32; /* carry */
+         s16 = (s16 & 0xffff) << 16;
+         s00 += s16;
+         if (s00 < s16) ++s32; /* carry */
 
-	 if (s32 < D) /* else overflow */
-	 {
-	    /* s32.s00 is now the 64 bit product, do a standard
-	     * division, we know that s32 < D, so the maximum
-	     * required shift is 31.
-	     */
-	    int bitshift = 32;
-	    png_fixed_point result = 0; /* NOTE: signed */
+         if (s32 < D) /* else overflow */
+         {
+            /* s32.s00 is now the 64 bit product, do a standard
+             * division, we know that s32 < D, so the maximum
+             * required shift is 31.
+             */
+            int bitshift = 32;
+            png_fixed_point result = 0; /* NOTE: signed */
 
-	    while (--bitshift >= 0)
-	    {
-	       png_uint_32 d32, d00;
-	       if (bitshift > 0)
-	          d32 = D >> (32-bitshift), d00 = D << bitshift;
-	       else
-	          d32 = 0, d00 = D;
+            while (--bitshift >= 0)
+            {
+               png_uint_32 d32, d00;
+               if (bitshift > 0)
+                  d32 = D >> (32-bitshift), d00 = D << bitshift;
+               else
+                  d32 = 0, d00 = D;
 
-	       if (s32 > d32)
-	       {
-		  if (s00 < d00) --s32; /* carry */
-	          s32 -= d32, s00 -= d00, result += 1<<bitshift;
-	       }
-	       else if (s32 == d32 && s00 >= d00)
-	          s32 = 0, s00 -= d00, result += 1<<bitshift;
-	    }
+               if (s32 > d32)
+               {
+        	  if (s00 < d00) --s32; /* carry */
+                  s32 -= d32, s00 -= d00, result += 1<<bitshift;
+               }
+               else if (s32 == d32 && s00 >= d00)
+                  s32 = 0, s00 -= d00, result += 1<<bitshift;
+            }
 
-	    /* Handle the rounding. */
-	    if (s00 >= (D >> 1)) ++result;
+            /* Handle the rounding. */
+            if (s00 >= (D >> 1)) ++result;
 
-	    if (negative) result = -result;
+            if (negative) result = -result;
 
-	    /* Check for overflow. */
-	    if (negative && result <= 0 || !negative && result >= 0)
-	    {
-	       *res = result;
-	       return 1;
-	    }
-	 }
+            /* Check for overflow. */
+            if (negative && result <= 0 || !negative && result >= 0)
+            {
+               *res = result;
+               return 1;
+            }
+         }
 #endif
       }
    }
@@ -1837,12 +1836,12 @@ png_gamma_8bit_correct(unsigned value, png_fixed_point gamma)
    if (value > 0 && value < 255)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-	 return (png_byte)floor(255*pow(value/255.,gamma*.00001)+.5);
+         return (png_byte)floor(255*pow(value/255.,gamma*.00001)+.5);
 #     else
-	 png_uint_32 log = png_log8bit(value);
-	 png_fixed_point res;
-	 if (png_muldiv(&res, gamma, log, PNG_FP_1))
-	    return png_exp8bit(res);
+         png_uint_32 log = png_log8bit(value);
+         png_fixed_point res;
+         if (png_muldiv(&res, gamma, log, PNG_FP_1))
+            return png_exp8bit(res);
 #     endif
 
       /* Overflow. */
@@ -1858,12 +1857,12 @@ png_gamma_16bit_correct(unsigned value, png_fixed_point gamma)
    if (value > 0 && value < 65535)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-	 return (png_uint_16)floor(65535*pow(value/65535.,gamma*.00001)+.5);
+         return (png_uint_16)floor(65535*pow(value/65535.,gamma*.00001)+.5);
 #     else
-	 png_uint_32 log = png_log16bit(value);
-	 png_fixed_point res;
-	 if (png_muldiv(&res, gamma, log, PNG_FP_1))
-	    return png_exp16bit(res);
+         png_uint_32 log = png_log16bit(value);
+         png_fixed_point res;
+         if (png_muldiv(&res, gamma, log, PNG_FP_1))
+            return png_exp16bit(res);
 #     endif
 
       /* Overflow. */
@@ -1928,40 +1927,40 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
        */
       if (png_gamma_significant(gamma))
       {
-	 /* The old code would overflow at the end and this would cause the
-	  * 'pow' function to return a result >1, resulting in an
-	  * arithmetic error.  This code follows the spec exactly; ig is
-	  * the recovered input sample, it always has 8-16 bits.
-	  *
-	  * We want input * 65535/max, rounded, the arithmetic fits in 32
-	  * bits (unsigned) so long as max <= 32767.
-	  */
-	 unsigned j;
-	 for (j = 0; j < 256; j++)
-	 {
-	    png_uint_16 ig = (j << (8-shift)) + i;
+         /* The old code would overflow at the end and this would cause the
+          * 'pow' function to return a result >1, resulting in an
+          * arithmetic error.  This code follows the spec exactly; ig is
+          * the recovered input sample, it always has 8-16 bits.
+          *
+          * We want input * 65535/max, rounded, the arithmetic fits in 32
+          * bits (unsigned) so long as max <= 32767.
+          */
+         unsigned j;
+         for (j = 0; j < 256; j++)
+         {
+            png_uint_16 ig = (j << (8-shift)) + i;
 #           ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-	       /* Inline the 'max' scaling operation: */
-	       sub_table[j] = (png_uint_16)floor(65535*pow(ig/(double)max,
-	          gamma*.00001)+.5);
+               /* Inline the 'max' scaling operation: */
+               sub_table[j] = (png_uint_16)floor(65535*pow(ig/(double)max,
+                  gamma*.00001)+.5);
 #           else
-	       if (shift)
-		  ig = (ig * 65535U + max_by_2)/max;
-	       sub_table[j] = png_gamma_16bit_correct(ig, gamma);
+               if (shift)
+        	  ig = (ig * 65535U + max_by_2)/max;
+               sub_table[j] = png_gamma_16bit_correct(ig, gamma);
 #           endif
-	 }
+         }
       }
       else
       {
          /* We must still build a table, but do it the fast way. */
-	 unsigned j;
-	 for (j = 0; j < 256; j++)
-	 {
-	    png_uint_32 ig = (j << (8-shift)) + i;
-	    if (shift)
-	       ig = (ig * 65535U + max_by_2)/max;
-	    sub_table[j] = ig;
-	 }
+         unsigned j;
+         for (j = 0; j < 256; j++)
+         {
+            png_uint_32 ig = (j << (8-shift)) + i;
+            if (shift)
+               ig = (ig * 65535U + max_by_2)/max;
+            sub_table[j] = ig;
+         }
       }
    }
 }
@@ -2017,8 +2016,8 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
 
       while (last <= bound)
       {
-	 table[last & (0xffU >> shift)][last >> (8U - shift)] = out;
-	 last++;
+         table[last & (0xffU >> shift)][last >> (8U - shift)] = out;
+         last++;
       }
    }
 
@@ -2061,18 +2060,18 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
   {
      png_build_8bit_table(png_ptr, &png_ptr->gamma_table,
         png_ptr->screen_gamma > 0 ?  png_reciprocal2(png_ptr->gamma,
-	   png_ptr->screen_gamma) : PNG_FP_1);
+           png_ptr->screen_gamma) : PNG_FP_1);
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
      if (png_ptr->transformations & ((PNG_BACKGROUND) | PNG_RGB_TO_GRAY))
      {
         png_build_8bit_table(png_ptr, &png_ptr->gamma_to_1,
-	   png_reciprocal(png_ptr->gamma));
+           png_reciprocal(png_ptr->gamma));
 
         png_build_8bit_table(png_ptr, &png_ptr->gamma_from_1,
            png_ptr->screen_gamma > 0 ?  png_reciprocal(png_ptr->screen_gamma) :
-	      png_ptr->gamma/* Probably doing rgb_to_gray */);
+              png_ptr->gamma/* Probably doing rgb_to_gray */);
      }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_RGB_TO_GRAY_SUPPORTED */
   }
@@ -2118,10 +2117,10 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
 
      if (png_ptr->transformations & PNG_16_TO_8)
      {
-	/* PNG_MAX_GAMMA_8 is the number of bits to keep - effectively
-	 * the significant bits in the *input* when the output will
-	 * eventually be 8 bits.  By default it is 11.
-	 */
+        /* PNG_MAX_GAMMA_8 is the number of bits to keep - effectively
+         * the significant bits in the *input* when the output will
+         * eventually be 8 bits.  By default it is 11.
+         */
         if (shift < (16U - PNG_MAX_GAMMA_8))
            shift = (16U - PNG_MAX_GAMMA_8);
      }
@@ -2132,25 +2131,25 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
      png_ptr->gamma_shift = shift;
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
-	png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
-	   png_ptr->screen_gamma > 0 ? png_product2(png_ptr->gamma,
-	      png_ptr->screen_gamma) : PNG_FP_1);
+        png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
+           png_ptr->screen_gamma > 0 ? png_product2(png_ptr->gamma,
+              png_ptr->screen_gamma) : PNG_FP_1);
      else
-	png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,
-	   png_ptr->screen_gamma > 0 ? png_reciprocal2(png_ptr->gamma,
-	      png_ptr->screen_gamma) : PNG_FP_1);
+        png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,
+           png_ptr->screen_gamma > 0 ? png_reciprocal2(png_ptr->gamma,
+              png_ptr->screen_gamma) : PNG_FP_1);
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
      if (png_ptr->transformations & (PNG_BACKGROUND | PNG_RGB_TO_GRAY))
      {
-	png_build_16bit_table(png_ptr, &png_ptr->gamma_16_to_1, shift,
-	   png_reciprocal(png_ptr->gamma));
+        png_build_16bit_table(png_ptr, &png_ptr->gamma_16_to_1, shift,
+           png_reciprocal(png_ptr->gamma));
 
-	/* Notice that the '16 from 1' table should be full precision, however
-	 * the lookup on this table still uses gamma_shift, os it can't be.
-	 * TODO: fix this.
-	 */
+        /* Notice that the '16 from 1' table should be full precision, however
+         * the lookup on this table still uses gamma_shift, os it can't be.
+         * TODO: fix this.
+         */
         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_from_1, shift,
            png_ptr->screen_gamma > 0 ? png_reciprocal(png_ptr->screen_gamma) :
            png_ptr->gamma/* Probably doing rgb_to_gray */);
@@ -2159,3 +2158,4 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
   }
 }
 #endif /* READ_GAMMA */
+#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */

@@ -992,10 +992,10 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       if (PNG_OUT_OF_RANGE(info_ptr->gamma, 45500L, 500))
       {
-	 png_warning(png_ptr,
-	     "Ignoring incorrect gAMA value when sRGB is also present");
+         png_warning(png_ptr,
+             "Ignoring incorrect gAMA value when sRGB is also present");
 #ifdef PNG_CONSOLE_IO_SUPPORTED
-	 fprintf(stderr, "incorrect gamma=(%d/100000)\n", info_ptr->gamma);
+         fprintf(stderr, "incorrect gamma=(%d/100000)\n", info_ptr->gamma);
 #endif
       }
    }
@@ -1889,12 +1889,12 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_size_t heighti = index;
       if (png_ptr->chunkdata[index] == 45 /* negative height */ ||
           !png_check_fp_number(png_ptr->chunkdata, slength, &state, &index) ||
-	  index != slength)
-	 png_warning(png_ptr, "Invalid sCAL chunk ignored: bad height format");
+          index != slength)
+         png_warning(png_ptr, "Invalid sCAL chunk ignored: bad height format");
       else
-	 /* This is the (only) success case. */
-	 png_set_sCAL_s(png_ptr, info_ptr, png_ptr->chunkdata[0],
-	    png_ptr->chunkdata+1, png_ptr->chunkdata+heighti);
+         /* This is the (only) success case. */
+         png_set_sCAL_s(png_ptr, info_ptr, png_ptr->chunkdata[0],
+            png_ptr->chunkdata+1, png_ptr->chunkdata+heighti);
    }
 
    /* Clean up - just free the temporarily allocated buffer. */
@@ -3476,10 +3476,10 @@ png_get_num_rows(png_structp png_ptr)
    if (png_ptr != NULL)
    {
       if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-	 return png_ptr->num_rows;
+         return png_ptr->num_rows;
       else
-	 png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
-	    "before png_get_num_rows");
+         png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
+            "before png_get_num_rows");
    }
 
    /* Here on error */

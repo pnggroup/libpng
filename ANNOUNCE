@@ -299,7 +299,6 @@ version 1.5.0beta36 [July 29, 2010]
     pass.
   A new test program, pngvalid.c, validates the gamma code.
   Errors in the 16 bit gamma correction (overflows) have been corrected.
-  Gamma handling arithmetic is in a new file, pngarith.c
   cHRM chunk testing is done consistently (previously the floating point
     API bypassed it, because the test really didn't work on FP, now the test
     is performed on the actual values to be stored in the PNG file so it

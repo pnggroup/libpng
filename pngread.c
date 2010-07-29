@@ -866,14 +866,14 @@ png_read_image(png_structp png_ptr, png_bytepp image)
    {
       if (!(png_ptr->transformations & PNG_INTERLACE))
       {
-	 /* Caller called png_start_read_image or png_read_update_info without
-	  * first turning on the PNG_INTERLACE transform.  We can fix this here,
-	  * but the caller should do it!
-	  */
-	 png_warning(png_ptr, "Interlace handling should be turned on when "
-	    "using png_read_image");
-	 /* Make sure this is set correctly */
-	 png_ptr->num_rows = png_ptr->height;
+         /* Caller called png_start_read_image or png_read_update_info without
+          * first turning on the PNG_INTERLACE transform.  We can fix this here,
+          * but the caller should do it!
+          */
+         png_warning(png_ptr, "Interlace handling should be turned on when "
+            "using png_read_image");
+         /* Make sure this is set correctly */
+         png_ptr->num_rows = png_ptr->height;
       }
 
       /* Obtain the pass number, which also turns on the PNG_INTERLACE flag in
