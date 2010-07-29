@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.5.0 [July 24, 2010]
+ * Last changed in libpng 1.5.0 [July 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -32,7 +32,9 @@ png_save_uint_32(png_bytep buf, png_uint_32 i)
 #ifdef PNG_SAVE_INT_32_SUPPORTED
 /* The png_save_int_32 function assumes integers are stored in two's
  * complement format.  If this isn't the case, then this routine needs to
- * be modified to write data in two's complement format.
+ * be modified to write data in two's complement format.  Note that,
+ * the following works correctly even if png_int_32 has more than 32 bits
+ * (compare the more complex code required on read for sign extention.)
  */
 void PNGAPI
 png_save_int_32(png_bytep buf, png_int_32 i)
@@ -770,23 +772,6 @@ png_write_IEND(png_structp png_ptr)
 
 #ifdef PNG_WRITE_gAMA_SUPPORTED
 /* Write a gAMA chunk */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-void /* PRIVATE */
-png_write_gAMA(png_structp png_ptr, double file_gamma)
-{
-   PNG_gAMA;
-   png_uint_32 igamma;
-   png_byte buf[4];
-
-   png_debug(1, "in png_write_gAMA");
-
-   /* file_gamma is saved in 1/100,000ths */
-   igamma = (png_uint_32)(file_gamma * 100000.0 + 0.5);
-   png_save_uint_32(buf, igamma);
-   png_write_chunk(png_ptr, (png_bytep)png_gAMA, buf, (png_size_t)4);
-}
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
 void /* PRIVATE */
 png_write_gAMA_fixed(png_structp png_ptr, png_fixed_point file_gamma)
 {
@@ -799,7 +784,6 @@ png_write_gAMA_fixed(png_structp png_ptr, png_fixed_point file_gamma)
    png_save_uint_32(buf, (png_uint_32)file_gamma);
    png_write_chunk(png_ptr, (png_bytep)png_gAMA, buf, (png_size_t)4);
 }
-#endif
 #endif
 
 #ifdef PNG_WRITE_sRGB_SUPPORTED
@@ -1044,53 +1028,6 @@ png_write_sBIT(png_structp png_ptr, png_color_8p sbit, int color_type)
 
 #ifdef PNG_WRITE_cHRM_SUPPORTED
 /* Write the cHRM chunk */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-void /* PRIVATE */
-png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
-    double red_x, double red_y, double green_x, double green_y,
-    double blue_x, double blue_y)
-{
-   PNG_cHRM;
-   png_byte buf[32];
-
-   png_fixed_point int_white_x, int_white_y, int_red_x, int_red_y,
-      int_green_x, int_green_y, int_blue_x, int_blue_y;
-
-   png_debug(1, "in png_write_cHRM");
-
-   int_white_x = (png_uint_32)(white_x * 100000.0 + 0.5);
-   int_white_y = (png_uint_32)(white_y * 100000.0 + 0.5);
-   int_red_x   = (png_uint_32)(red_x   * 100000.0 + 0.5);
-   int_red_y   = (png_uint_32)(red_y   * 100000.0 + 0.5);
-   int_green_x = (png_uint_32)(green_x * 100000.0 + 0.5);
-   int_green_y = (png_uint_32)(green_y * 100000.0 + 0.5);
-   int_blue_x  = (png_uint_32)(blue_x  * 100000.0 + 0.5);
-   int_blue_y  = (png_uint_32)(blue_y  * 100000.0 + 0.5);
-
-#ifdef PNG_CHECK_cHRM_SUPPORTED
-   if (png_check_cHRM_fixed(png_ptr, int_white_x, int_white_y,
-      int_red_x, int_red_y, int_green_x, int_green_y, int_blue_x, int_blue_y))
-#endif
-   {
-      /* Each value is saved in 1/100,000ths */
-
-      png_save_uint_32(buf, int_white_x);
-      png_save_uint_32(buf + 4, int_white_y);
-
-      png_save_uint_32(buf + 8, int_red_x);
-      png_save_uint_32(buf + 12, int_red_y);
-
-      png_save_uint_32(buf + 16, int_green_x);
-      png_save_uint_32(buf + 20, int_green_y);
-
-      png_save_uint_32(buf + 24, int_blue_x);
-      png_save_uint_32(buf + 28, int_blue_y);
-
-      png_write_chunk(png_ptr, (png_bytep)png_cHRM, buf, (png_size_t)32);
-   }
-}
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
 void /* PRIVATE */
 png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
     png_fixed_point white_y, png_fixed_point red_x, png_fixed_point red_y,
@@ -1123,7 +1060,6 @@ png_write_cHRM_fixed(png_structp png_ptr, png_fixed_point white_x,
       png_write_chunk(png_ptr, (png_bytep)png_cHRM, buf, (png_size_t)32);
    }
 }
-#endif
 #endif
 
 #ifdef PNG_WRITE_tRNS_SUPPORTED
@@ -1691,27 +1627,6 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
 
 #ifdef PNG_WRITE_sCAL_SUPPORTED
 /* Write the sCAL chunk */
-#if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
-void /* PRIVATE */
-png_write_sCAL(png_structp png_ptr, int unit, double width, double height)
-{
-   PNG_sCAL;
-   char buf[64];
-   png_size_t total_len;
-
-   png_debug(1, "in png_write_sCAL");
-
-   buf[0] = (char)unit;
-   png_snprintf(buf + 1, 63, "%12.12e", width);
-   total_len = 1 + png_strlen(buf + 1) + 1;
-   png_snprintf(buf + total_len, 64 - total_len, "%12.12e", height);
-   total_len += png_strlen(buf + total_len);
-
-   png_debug1(3, "sCAL total length = %u", (unsigned int)total_len);
-   png_write_chunk(png_ptr, (png_bytep)png_sCAL, (png_bytep)buf, total_len);
-}
-#else
-#ifdef PNG_FIXED_POINT_SUPPORTED
 void /* PRIVATE */
 png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
     png_charp height)
@@ -1739,8 +1654,6 @@ png_write_sCAL_s(png_structp png_ptr, int unit, png_charp width,
    png_debug1(3, "sCAL total length = %u", (unsigned int)total_len);
    png_write_chunk(png_ptr, (png_bytep)png_sCAL, buf, total_len);
 }
-#endif
-#endif
 #endif
 
 #ifdef PNG_WRITE_pHYs_SUPPORTED

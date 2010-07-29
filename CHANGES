@@ -2769,7 +2769,27 @@ version 1.5.0beta35 [July 24, 2010]
   Moved the definition of png_snprintf() outside of the enclosing
     #ifdef blocks in pngconf.h
 
-version 1.5.0beta36 [July 24, 2010]
+version 1.5.0beta36 [July 29, 2010]
+  Patches by John Bowler:
+  Fixed point APIs are now supported throughout (no missing APIs).
+  Internal fixed point arithmetic support exists for all internal floating
+    point operations.
+  sCAL validates the floating point strings it is passed.
+  Safe, albeit rudimentary, Watcom support is provided by PNG_API_RULE==2
+  Two new APIs exist to get the number of passes without turning on the
+    PNG_INTERLACE transform and to get the number of rows in the current
+    pass.
+  A new test program, pngvalid.c, validates the gamma code.
+  Errors in the 16 bit gamma correction (overflows) have been corrected.
+  Gamma handling arithmetic is in a new file, pngarith.c
+  cHRM chunk testing is done consistently (previously the floating point
+    API bypassed it, because the test really didn't work on FP, now the test
+    is performed on the actual values to be stored in the PNG file so it
+    works in the FP case too.)
+  Most floating point APIs now simply call the fixed point APIs after
+    converting the values to the fixed point form used in the PNG file.
+  The standard headers no longer include zlib.h, which is currently only
+    required for pngstruct.h and can therefore be internal.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

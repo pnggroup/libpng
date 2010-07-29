@@ -5,7 +5,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng version 1.5.0 - July 24, 2010
+ * Last changed in libpng version 1.5.0 - July 29, 2010
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -20,6 +20,12 @@
 
 #ifndef PNGSTRUCT_H
 #define PNGSTRUCT_H
+/* zlib.h defines the structure z_stream, an instance of which is included
+ * in this structure and is required for decompressing the LZ compressed
+ * data in PNG files.
+ */
+#include "zlib.h"
+
 struct png_struct_def
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -104,9 +110,7 @@ struct png_struct_def
 
 #ifdef PNG_bKGD_SUPPORTED
    png_byte background_gamma_type;
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
-   float background_gamma;
-#  endif
+   png_fixed_point background_gamma;
    png_color_16 background;   /* background color in screen gamma space */
 #ifdef PNG_READ_GAMMA_SUPPORTED
    png_color_16 background_1; /* background normalized to gamma 1.0 */
@@ -121,10 +125,8 @@ struct png_struct_def
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    int gamma_shift;      /* number of "insignificant" bits in 16-bit gamma */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   float gamma;          /* file gamma value */
-   float screen_gamma;   /* screen gamma value (display_exponent) */
-#endif
+   png_fixed_point gamma;        /* file gamma value */
+   png_fixed_point screen_gamma; /* screen gamma value (display_exponent) */
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
@@ -154,7 +156,7 @@ struct png_struct_def
    png_write_status_ptr write_row_fn; /* called after each row is encoded */
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
    png_progressive_info_ptr info_fn; /* called after header data fully read */
-   png_progressive_row_ptr row_fn;   /* called after each prog. row is decoded */
+   png_progressive_row_ptr row_fn;   /* called after a prog. row is decoded */
    png_progressive_end_ptr end_fn;   /* called after image is complete */
    png_bytep save_buffer_ptr;        /* current location in save_buffer */
    png_bytep save_buffer;            /* buffer for previously read data */
@@ -239,11 +241,6 @@ struct png_struct_def
     defined(PNG_WRITE_EMPTY_PLTE_SUPPORTED)
 /* Changed from png_byte to png_uint_32 at version 1.2.0 */
    png_uint_32 mng_features_permitted;
-#endif
-
-/* New member added in libpng-1.0.7 */
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   png_fixed_point int_gamma;
 #endif
 
 /* New member added in libpng-1.0.9, ifdef'ed out in 1.0.12, enabled in 1.2.0 */

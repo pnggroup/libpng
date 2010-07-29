@@ -485,9 +485,6 @@ int main(int argc, char **argv)
           "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
           "is displayed) to quit.\n"
           "\n", PROGNAME,
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          (int)strlen(PROGNAME), " ",
-#endif
           (int)strlen(PROGNAME), " ", default_display_exponent, num_bgpat-1);
         exit(1);
     }

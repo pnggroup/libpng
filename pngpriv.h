@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta36 - July 24, 2010
+ * libpng version 1.5.0beta36 - July 29, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -32,12 +32,10 @@
 #include "pnginfo.h"
 #include "pngstruct.h"
 
+/* This is required for the definition of abort(), used as a last ditch
+ * error handler when all else fails.
+ */
 #include <stdlib.h>
-#ifdef BSD
-#  include <strings.h>
-#else
-#  include <string.h>
-#endif
 
 /* Added at libpng-1.2.9 */
 /* Moved to pngpriv.h at libpng-1.5.0 */
@@ -53,6 +51,9 @@
 #endif
 
 /* Moved to pngpriv.h at libpng-1.5.0 */
+/* NOTE: some of these may be used in external applications as these definitions
+ * were exposed in pngconf.h prior to 1.5.
+ */
 /* If you are running on a machine where you cannot allocate more
  * than 64K of memory at once, uncomment this.  While libpng will not
  * normally need that much memory in a chunk (unless you load up a very
@@ -68,16 +69,12 @@
 #  define PNG_MAX_MALLOC_64K
 #endif
 
-/* Moved to pngpriv.h at libpng-1.5.0 */
-/* Feature support: in 1.4 this was in pngconf.h, but these
- * features have no affect on the libpng API.  Add library
- * only features to the end of this list.  Add features that
- * affect the API to scipts/config.dfn using png_on or png_off
- * as determined by the default and update scripts/config.std
+/* Just a little check that someone hasn't tried to define something
+ * contradictory.
  */
-/* Added at libpng version 1.4.0 */
-#if !defined(PNG_NO_WARNINGS) && !defined(PNG_WARNINGS_SUPPORTED)
-#  define PNG_WARNINGS_SUPPORTED
+#if (PNG_ZBUF_SIZE > 65536L) && defined(PNG_MAX_MALLOC_64K)
+#  undef PNG_ZBUF_SIZE
+#  define PNG_ZBUF_SIZE 65536L
 #endif
 
 /* If warnings or errors are turned off the code is disabled
@@ -90,57 +87,7 @@
 #ifndef PNG_ERROR_TEXT_SUPPORTED
 #  define png_error(s1,s2) png_err(s1)
 #  define png_chunk_error(s1,s2) png_err(s1)
-#endif
-
-/* Added at libpng version 1.4.0 */
-#if !defined(PNG_NO_CHECK_cHRM) && !defined(PNG_CHECK_cHRM_SUPPORTED)
-#  define PNG_CHECK_cHRM_SUPPORTED
-#endif
-
-/* Added at libpng version 1.4.0 */
-#if !defined(PNG_NO_ALIGNED_MEMORY) && !defined(PNG_ALIGNED_MEMORY_SUPPORTED)
-#  define PNG_ALIGNED_MEMORY_SUPPORTED
-#endif
-
-/* Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
- * See png[wr]util.c
- */
-#if !defined(PNG_NO_POINTER_INDEXING) && \
-    !defined(PNG_POINTER_INDEXING_SUPPORTED)
-#  define PNG_POINTER_INDEXING_SUPPORTED
-#endif
-
-/* Other defines for things like memory and the like can go here.  */
-
-/* This controls how fine the quantizing gets.  As this allocates
- * a largish chunk of memory (32K), those who are not as concerned
- * with quantizing quality can decrease some or all of these.
- */
-#ifndef PNG_QUANTIZE_RED_BITS
-#  define PNG_QUANTIZE_RED_BITS 5
-#endif
-#ifndef PNG_QUANTIZE_GREEN_BITS
-#  define PNG_QUANTIZE_GREEN_BITS 5
-#endif
-#ifndef PNG_QUANTIZE_BLUE_BITS
-#  define PNG_QUANTIZE_BLUE_BITS 5
-#endif
-
-/* This controls how fine the gamma correction becomes when you
- * are only interested in 8 bits anyway.  Increasing this value
- * results in more memory being used, and more pow() functions
- * being called to fill in the gamma tables.  Don't set this value
- * less then 8, and even that may not work (I haven't tested it).
- */
-#ifndef PNG_MAX_GAMMA_8
-#  define PNG_MAX_GAMMA_8 11
-#endif
-
-/* This controls how much a difference in gamma we can tolerate before
- * we actually start doing gamma conversion.
- */
-#ifndef PNG_GAMMA_THRESHOLD
-#  define PNG_GAMMA_THRESHOLD 0.05
+#  define png_fixed_error(s1,s2,s3) png_err(s1)
 #endif
 
 #ifndef PNG_EXTERN
@@ -154,11 +101,30 @@
 #  define PNG_EXTERN
 #endif
 
+/* Some fixed point APIs are still required even if not exported because
+ * they get used by the corresponding floating point APIs.  This magic
+ * deals with this:
+ */
+#ifdef PNG_FIXED_POINT_SUPPORTED
+#  define PNGFAPI PNGAPI
+#else
+#  define PNGFAPI /* PRIVATE */
+#endif
+
 /* Other defines specific to compilers can go here.  Try to keep
  * them inside an appropriate ifdef/endif pair for portability.
  */
+#if defined(PNG_FLOATING_POINT_SUPPORTED) ||\
+    defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
+   /* pngarith.c requires the following ANSI-C constants if the convertion of
+    * floating point to ASCII is implemented therein:
+    * 
+    *  DBL_DIG  Maximum number of decimal digits (can be set to any constant)
+    *  DBL_MIN  Smalles normalized fp number (can be set to an arbitrary value)
+    *  DBL_MAX  Maximum floating point number (can be set to an arbitrary value)
+    */
+#  include <float.h>
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED
 #  if (defined(__MWERKS__) && defined(macintosh)) || defined(applec) || \
     defined(THINK_C) || defined(__SC__) || defined(TARGET_OS_MAC)
      /* We need to check that <math.h> hasn't already been included earlier
@@ -194,31 +160,85 @@
 #  endif
 #endif
 
-/* This is the size of the compression buffer, and thus the size of
- * an IDAT chunk.  Make this whatever size you feel is best for your
- * machine.  One of these will be allocated per png_struct.  When this
- * is full, it writes the data to the disk, and does some other
- * calculations.  Making this an extremely small size will slow
- * the library down, but you may want to experiment to determine
- * where it becomes significant, if you are concerned with memory
- * usage.  Note that zlib allocates at least 32Kb also.  For readers,
- * this describes the size of the buffer available to read the data in.
- * Unless this gets smaller than the size of a row (compressed),
- * it should not make much difference how big this is.
+/* Moved here around 1.5.0beta36 from pngconf.h */
+/* Users may want to use these so they are not private.  Any library
+ * functions that are passed far data must be model-independent.
  */
 
-#ifndef PNG_ZBUF_SIZE
-#  define PNG_ZBUF_SIZE 8192
+/* Memory model/platform independent fns */
+#ifndef PNG_ABORT
+#  ifdef _WINDOWS_
+#    define PNG_ABORT() ExitProcess(0)
+#  else
+#    define PNG_ABORT() abort()
+#  endif
 #endif
 
-/* Just a little check that someone hasn't tried to define something
- * contradictory.
+#ifdef USE_FAR_KEYWORD
+/* Use this to make far-to-near assignments */
+#  define CHECK   1
+#  define NOCHECK 0
+#  define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
+#  define CVT_PTR_NOCHECK(ptr) (png_far_to_near(png_ptr,ptr,NOCHECK))
+#  define png_strcpy  _fstrcpy
+#  define png_strncpy _fstrncpy   /* Added to v 1.2.6 */
+#  define png_strlen  _fstrlen
+#  define png_memcmp  _fmemcmp    /* SJT: added */
+#  define png_memcpy  _fmemcpy
+#  define png_memset  _fmemset
+#  define png_sprintf sprintf
+#else
+#  ifdef _WINDOWS_  /* Favor Windows over C runtime fns */
+#    define CVT_PTR(ptr)         (ptr)
+#    define CVT_PTR_NOCHECK(ptr) (ptr)
+#    define png_strcpy  lstrcpyA
+#    define png_strncpy lstrcpynA
+#    define png_strlen  lstrlenA
+#    define png_memcmp  memcmp
+#    define png_memcpy  CopyMemory
+#    define png_memset  memset
+#    define png_sprintf wsprintfA
+#  else
+#    define CVT_PTR(ptr)         (ptr)
+#    define CVT_PTR_NOCHECK(ptr) (ptr)
+#    define png_strcpy  strcpy
+#    define png_strncpy strncpy     /* Added to v 1.2.6 */
+#    define png_strlen  strlen
+#    define png_memcmp  memcmp      /* SJT: added */
+#    define png_memcpy  memcpy
+#    define png_memset  memset
+#    define png_sprintf sprintf
+#  endif
+#endif
+/* End of memory model/platform independent support */
+
+#ifndef PNG_NO_SNPRINTF
+#  ifdef _MSC_VER
+#    define png_snprintf _snprintf   /* Added to v 1.2.19 */
+#    define png_snprintf2 _snprintf
+#    define png_snprintf6 _snprintf
+#  else
+#    define png_snprintf snprintf   /* Added to v 1.2.19 */
+#    define png_snprintf2 snprintf
+#    define png_snprintf6 snprintf
+#  endif
+#else
+  /* You don't have or don't want to use snprintf().  Caution: Using
+   * sprintf instead of snprintf exposes your application to accidental
+   * or malevolent buffer overflows.  If you don't have snprintf()
+   * as a general rule you should provide one (you can get one from
+   * Portable OpenSSH).
+   */
+#  define png_snprintf(s1,n,fmt,x1) png_sprintf(s1,fmt,x1)
+#  define png_snprintf2(s1,n,fmt,x1,x2) png_sprintf(s1,fmt,x1,x2)
+#  define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
+      png_sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
+#endif
+/* End of 1.5.0beta36 move from pngconf.h */
+
+/* CONSTANTS and UTILITY MACROS
+ * These are used internally by libpng and not exposed in the API
  */
-#if (PNG_ZBUF_SIZE > 65536L) && defined(PNG_MAX_MALLOC_64K)
-#  undef PNG_ZBUF_SIZE
-#  define PNG_ZBUF_SIZE 65536L
-#endif
-
 /* Various modes of operation.  Note that after an init, mode is set to
  * zero automatically when the structure is created.
  */
@@ -276,9 +296,7 @@
 #define PNG_STRUCT_INFO  0x0002
 
 /* Scaling factor for filter heuristic weighting calculations */
-#define PNG_WEIGHT_SHIFT 8
 #define PNG_WEIGHT_FACTOR (1<<(PNG_WEIGHT_SHIFT))
-#define PNG_COST_SHIFT 3
 #define PNG_COST_FACTOR (1<<(PNG_COST_SHIFT))
 
 /* Flags for the png_ptr->flags rather than declaring a byte for each one */
@@ -343,6 +361,44 @@
 #define PNG_OUT_OF_RANGE(value, ideal, delta) \
    ( (value) < (ideal)-(delta) || (value) > (ideal)+(delta) )
 
+/* Convertions between fixed and floating point, only defined if
+ * required (to make sure the code doesn't accidentally use float
+ * when it is supposedly disabled.)
+ */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+/* The floating point convertion can't overflow, though it can and
+ * does lose accuracy relative to the original fixed point value.
+ * In practice this doesn't matter because png_fixed_point only
+ * stores numbers with very low precision.  The png_ptr and s
+ * arguments are unused by default but are there in case error
+ * checking becomes a requirement.
+ */
+#define png_float(png_ptr, fixed, s) (.00001 * (fixed))
+
+/* The fixed point convertion performs range checking and evaluates
+ * its argument multiple times, so must be used with care.  The
+ * range checking uses the PNG specification values for a signed
+ * 32 bit fixed point value except that the values are deliberately
+ * rounded-to-zero to an integral value - 21474.  's' is a string
+ * that describes the value being converted.
+ *
+ * NOTE: this macro will raise a png_error if the range check fails,
+ * therefore it is normally only appropriate to use this on values
+ * that come from API calls or other sources where an out of range
+ * error indicates a programming error, not a data error!
+ *
+ * NOTE: by default this is off - the macro is not used - because the
+ * function call saves a lot of code.
+ */
+#ifdef PNG_FIXED_POINT_MACRO_SUPPORTED
+#define png_fixed(png_ptr, fp, s) ((fp) <= 21474 && (fp) >= -21474 ?\
+    ((png_fixed_point)(100000 * (fp))) : (png_fixed_error(png_ptr, s, fp),0))
+#else
+PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
+   png_const_charp text));
+#endif
+#endif
+
 /* Constant strings for known chunk types.  If you need to add a chunk,
  * define the name here, and add an invocation of the macro wherever it's
  * needed.
@@ -404,8 +460,8 @@ PNG_EXTERN voidpf png_zalloc PNGARG((voidpf png_ptr, uInt items, uInt size));
 PNG_EXTERN void png_zfree PNGARG((voidpf png_ptr, voidpf ptr));
 
 /* Next four functions are used internally as callbacks.  PNGCBAPI is required
- * but not PNG_EXPORT.  PNGAPI added at libpng version 1.2.3, changed to PNGCBAPI
- * at 1.5.0
+ * but not PNG_EXPORT.  PNGAPI added at libpng version 1.2.3, changed to
+ * PNGCBAPI at 1.5.0
  */
 
 PNG_EXTERN void PNGCBAPI png_default_read_data PNGARG((png_structp png_ptr,
@@ -597,15 +653,8 @@ PNG_EXTERN void png_write_tIME PNGARG((png_structp png_ptr,
 #endif
 
 #ifdef PNG_WRITE_sCAL_SUPPORTED
-#  if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
-PNG_EXTERN void png_write_sCAL PNGARG((png_structp png_ptr,
-    int unit, double width, double height));
-#  else
-#    ifdef PNG_FIXED_POINT_SUPPORTED
 PNG_EXTERN void png_write_sCAL_s PNGARG((png_structp png_ptr,
     int unit, png_charp width, png_charp height));
-#    endif
-#  endif
 #endif
 
 /* Called when finished processing a row of data */
@@ -945,7 +994,7 @@ PNG_EXTERN void png_do_write_intrapixel PNGARG((png_row_infop row_info,
 #endif
 
 /* Added at libpng version 1.4.0 */
-#ifdef PNG_cHRM_SUPPORTED
+#ifdef PNG_CHECK_cHRM_SUPPORTED
 PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_structp png_ptr,
     png_fixed_point int_white_x, png_fixed_point int_white_y,
     png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
@@ -953,12 +1002,11 @@ PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_structp png_ptr,
     png_fixed_point int_blue_y));
 #endif
 
-#ifdef PNG_cHRM_SUPPORTED
-#  ifdef PNG_CHECK_cHRM_SUPPORTED
+#ifdef PNG_CHECK_cHRM_SUPPORTED
 /* Added at libpng version 1.2.34 and 1.4.0 */
+/* Currently only used by png_check_cHRM_fixed */
 PNG_EXTERN void png_64bit_product PNGARG((long v1, long v2,
     unsigned long *hi_product, unsigned long *lo_product));
-#  endif
 #endif
 
 /* Added at libpng version 1.4.0 */
@@ -968,20 +1016,164 @@ PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
     int filter_type));
 
 /* Free all memory used by the read (old method - NOT DLL EXPORTED) */
-PNG_EXTERN void png_read_destroy PNGARG((png_structp png_ptr, png_infop info_ptr,
-    png_infop end_info_ptr));
+PNG_EXTERN void png_read_destroy PNGARG((png_structp png_ptr,
+    png_infop info_ptr, png_infop end_info_ptr));
 
 /* Free any memory used in png_ptr struct (old method - NOT DLL EXPORTED) */
 PNG_EXTERN void png_write_destroy PNGARG((png_structp png_ptr));
 
 #ifdef USE_FAR_KEYWORD  /* memory model conversion function */
-PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
+PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr, png_voidp ptr,
     int check));
 #endif /* USE_FAR_KEYWORD */
 
-#include "pngdebug.h"
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
+PNG_EXTERN void png_fixed_error PNGARG((png_structp png_ptr,
+    png_const_charp name, double value));
+#endif
+
+/* ASCII to FP interfaces, currently only implemented if sCAL
+ * support is required.
+ */
+#if defined(PNG_READ_sCAL_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
+/* MAX_DIGITS is actually the maximum number of characters in an sCAL
+ * width or height, derived from the precision (number of significant
+ * digits - a build time settable option) and assumpitions about the
+ * maximum ridiculous exponent.
+ */
+#define PNG_sCAL_MAX_DIGITS (PNG_sCAL_PRECISION+1/*.*/+1/*E*/+10/*exponent*/)
+PNG_EXTERN void png_ascii_from_fp(png_structp png_ptr, png_charp ascii,
+    png_size_t size, double fp, unsigned precision);
+#endif /* READ_sCAL && FLOATING_POINT */
+
+#if defined(PNG_sCAL_SUPPORTED) || defined(PNG_pCAL_SUPPORTED)
+/* An internal API to validate the format of a floating point number.
+ * The result is the index of the next character.  If the number is
+ * not valid it will be the index of a character in the supposed number.
+ *
+ * The format of a number is defined in the PNG extensions specification
+ * and this API is strictly conformant to that spec, not anyone elses!
+ *
+ * The format as a regular expression is:
+ *
+ * [+-]?[0-9]+.?([Ee][+-]?[0-9]+)?
+ *
+ * or:
+ *
+ * [+-]?.[0-9]+(.[0-9]+)?([Ee][+-]?[0-9]+)?
+ *
+ * The complexity is that either integer or fraction must be present and the
+ * fraction is permitted to have no digits only if the integer is present.
+ *
+ * NOTE: The dangling E problem.
+ *   There is a PNG valid floating point number in the following:
+ *
+ *       PNG floating point numb1.ers are not greedy.
+ *
+ *   Working this out requires *TWO* character lookahead (because of the
+ *   sign), the parser does not do this - it will fail at the 'r' - this
+ *   doesn't matter for PNG sCAL chunk values, but it requires more care
+ *   if the value were ever to be embedded in something more complex.  Use
+ *   ANSI-C strtod if you need the lookahead.
+ */
+/* State table for the parser. */
+#define PNG_FP_INTEGER    0  /* before or in integer */
+#define PNG_FP_FRACTION   1  /* before or in fraction */
+#define PNG_FP_EXPONENT   2  /* before or in exponent */
+#define PNG_FP_STATE      3  /* mask for the above */
+#define PNG_FP_SAW_SIGN   4  /* Saw +/- in current state */
+#define PNG_FP_SAW_DIGIT  8  /* Saw a digit in current state */
+#define PNG_FP_SAW_DOT   16  /* Saw a dot in current state */
+#define PNG_FP_SAW_E     32  /* Saw an E (or e) in current state */
+#define PNG_FP_SAW_ANY   60  /* Saw any of the above 4 */
+#define PNG_FP_WAS_VALID 64  /* Preceding substring is a valid fp number */
+#define PNG_FP_INVALID  128  /* Available for callers as a distinct value */
+
+/* Result codes for the parser (boolean - true meants ok, false means
+ * not ok yet.)
+ */
+#define PNG_FP_MAYBE      0  /* The number may be valid in the future */
+#define PNG_FP_OK         1  /* The number is valid */
+
+/* The actual parser.  This can be called repeatedly, it updates
+ * the index into the string and the state variable (which must
+ * be initialzed to 0).  It returns a result code, as above.  There
+ * is no point calling the parser any more if it fails to advance to
+ * the end of the string - it is stuck on an invalid character (or
+ * terminated by '\0').
+ *
+ * Note that the pointer will consume an E or even an E+ then leave
+ * a 'maybe' state even though a preceding integer.fraction is valid.
+ * The PNG_FP_WAS_VALID flag indicates that a preceding substring was
+ * a valid number.  It's possible to recover from this by calling
+ * the parser again (from the start, with state 0) but with a string
+ * that omits the last character (i.e. set the size to the index of
+ * the problem character.)  This has not been tested within libpng.
+ */
+PNG_EXTERN int png_check_fp_number(png_charp string, png_size_t size,
+    int *statep, png_size_tp whereami);
+
+/* This is the same but it checks a complete string and returns true
+ * only if it just contains a floating point number.
+ */
+PNG_EXTERN int png_check_fp_string(png_charp string, png_size_t size);
+#endif /* pCAL || sCAL */
+
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)
+/* Added at libpng version 1.5.0 */
+/* This is a utility to provide a*times/div (rounded) and indicate
+ * if there is an overflow.  The result is a boolean - false (0)
+ * for overflow, true (1) if no overflow, in which case *res
+ * holds the result.
+ */
+PNG_EXTERN int png_muldiv PNGARG((png_fixed_point_p res, png_fixed_point a,
+    png_int_32 times, png_int_32 div));
+#endif
+
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)
+/* Same deal, but issue a warning on overflow and return 0. */
+PNG_EXTERN png_fixed_point png_muldiv_warn PNGARG((png_structp png_ptr,
+    png_fixed_point a, png_int_32 times, png_int_32 div));
+#endif
+
+#ifdef PNG_READ_GAMMA_SUPPORTED
+/* Calculate a reciprocal - used for gamma values.  This returns
+ * 0 if the argument is 0 in order to maintain an undefined value,
+ * there are no warnings.
+ */
+PNG_EXTERN png_fixed_point png_reciprocal PNGARG((png_fixed_point a));
+
+/* The same but gives a reciprocal of the product of two fixed point
+ * values.  Accuracy is suitable for gamma calculations but this is
+ * not exact - use png_muldiv for that.
+ */
+PNG_EXTERN png_fixed_point png_reciprocal2 PNGARG((png_fixed_point a,
+    png_fixed_point b));
+#endif
+
+#ifdef PNG_READ_GAMMA_SUPPORTED
+/* Internal fixed point gamma correction.  These APIs are called as
+ * required to convert single values - they don't need to be fast,
+ * they are not used when processing image pixel values.
+ *
+ * While the input is an 'unsigned' value it must actually be the
+ * correct bit value - 0..255 or 0..65535 as required.
+ */
+PNG_EXTERN png_uint_16 png_gamma_correct PNGARG((png_structp png_ptr,
+    unsigned value, png_fixed_point gamma));
+PNG_EXTERN int png_gamma_significant PNGARG((png_fixed_point gamma));
+PNG_EXTERN png_uint_16 png_gamma_16bit_correct PNGARG((unsigned value,
+    png_fixed_point gamma));
+PNG_EXTERN png_byte png_gamma_8bit_correct PNGARG((unsigned value,
+    png_fixed_point gamma));
+PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
+    png_byte bit_depth));
+#endif
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
+
+
+#include "pngdebug.h"
 
 #ifdef __cplusplus
 }

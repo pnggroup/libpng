@@ -5,7 +5,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng version 1.5.0 - July 24, 2010
+ * Last changed in libpng version 1.5.0 - July 29, 2010
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -82,12 +82,12 @@ struct png_info_def
     * and initialize the appropriate fields below.
     */
 
-#if defined(PNG_gAMA_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
+#if defined(PNG_gAMA_SUPPORTED)
    /* The gAMA chunk describes the gamma characteristics of the system
     * on which the image was created, normally in the range [1.0, 2.5].
     * Data is valid if (valid & PNG_INFO_gAMA) is non-zero.
     */
-   float gamma; /* gamma value of image, if (valid & PNG_INFO_gAMA) */
+   png_fixed_point gamma;
 #endif
 
 #ifdef PNG_sRGB_SUPPORTED
@@ -191,16 +191,14 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * colors in the image as the creator.  Values are in the range
     * [0.0, 0.8].  Data valid if (valid & PNG_INFO_cHRM) non-zero.
     */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   float x_white;
-   float y_white;
-   float x_red;
-   float y_red;
-   float x_green;
-   float y_green;
-   float x_blue;
-   float y_blue;
-#endif
+   png_fixed_point x_white;
+   png_fixed_point y_white;
+   png_fixed_point x_red;
+   png_fixed_point y_red;
+   png_fixed_point x_green;
+   png_fixed_point y_green;
+   png_fixed_point x_blue;
+   png_fixed_point y_blue;
 #endif
 
 #ifdef PNG_pCAL_SUPPORTED
@@ -237,8 +235,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #ifdef PNG_iCCP_SUPPORTED
    /* iCCP chunk data. */
    png_charp iccp_name;     /* profile name */
-   png_charp iccp_profile;  /* International Color Consortium profile data */
-                            /* Note to maintainer: should be png_bytep */
+   png_bytep iccp_profile;  /* International Color Consortium profile data */
    png_uint_32 iccp_proflen;  /* ICC profile data length */
    png_byte iccp_compression; /* Always zero */
 #endif
@@ -254,18 +251,12 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
     * subject matter of the graphic.  The chunk contains a unit specification
     * a byte value, and two ASCII strings representing floating-point
     * values.  The values are width and height corresponsing to one pixel
-    * in the image.  This external representation is converted to double
-    * here.  Data values are valid if (valid & PNG_INFO_sCAL) is non-zero.
+    * in the image.  Data values are valid if (valid & PNG_INFO_sCAL) is
+    * non-zero.
     */
    png_byte scal_unit;         /* unit of physical scale */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   double scal_pixel_width;    /* width of one pixel */
-   double scal_pixel_height;   /* height of one pixel */
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
    png_charp scal_s_width;     /* string containing height */
    png_charp scal_s_height;    /* string containing width */
-#endif
 #endif
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED
@@ -273,21 +264,6 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
       non-zero */
    /* Data valid if (valid & PNG_INFO_IDAT) non-zero */
    png_bytepp row_pointers;        /* the image bits */
-#endif
-
-#if defined(PNG_FIXED_POINT_SUPPORTED) && defined(PNG_gAMA_SUPPORTED)
-   png_fixed_point int_gamma; /* gamma of image, if (valid & PNG_INFO_gAMA) */
-#endif
-
-#if defined(PNG_cHRM_SUPPORTED) && defined(PNG_FIXED_POINT_SUPPORTED)
-   png_fixed_point int_x_white;
-   png_fixed_point int_y_white;
-   png_fixed_point int_x_red;
-   png_fixed_point int_y_red;
-   png_fixed_point int_x_green;
-   png_fixed_point int_y_green;
-   png_fixed_point int_x_blue;
-   png_fixed_point int_y_blue;
 #endif
 
 };

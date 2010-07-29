@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.1 [July 24, 2010]
+ * Last changed in libpng 1.4.1 [July 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -254,7 +254,7 @@ png_get_x_offset_pixels(png_structp png_ptr, png_infop info_ptr)
 #ifdef PNG_oFFs_SUPPORTED
    if (info_ptr->valid & PNG_INFO_oFFs)
    {
-      png_debug1(1, "in %s retrieval function", "png_get_x_offset_microns");
+      png_debug1(1, "in %s retrieval function", "png_get_x_offset_pixels");
 
       if (info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
          return (0);
@@ -276,7 +276,7 @@ png_get_y_offset_pixels(png_structp png_ptr, png_infop info_ptr)
 #ifdef PNG_oFFs_SUPPORTED
    if (info_ptr->valid & PNG_INFO_oFFs)
    {
-      png_debug1(1, "in %s retrieval function", "png_get_y_offset_microns");
+      png_debug1(1, "in %s retrieval function", "png_get_y_offset_pixels");
 
       if (info_ptr->offset_unit_type != PNG_OFFSET_PIXEL)
          return (0);
@@ -290,42 +290,106 @@ png_get_y_offset_pixels(png_structp png_ptr, png_infop info_ptr)
    return (0);
 }
 
-#if defined(PNG_INCH_CONVERSIONS_SUPPORTED) && \
-    defined(PNG_FLOATING_POINT_SUPPORTED)
+#ifdef PNG_INCH_CONVERSIONS_SUPPORTED
+static png_uint_32
+ppi_from_ppm(png_uint_32 ppm)
+{
+#if 0
+   /* The convertion is *(2.54/100), in binary (32 digits):
+    * .00000110100000001001110101001001
+    */
+   png_uint_32 t1001, t1101;
+   ppm >>= 1;                  /* .1 */
+   t1001 = ppm + (ppm >> 3);   /* .1001 */
+   t1101 = t1001 + (ppm >> 1); /* .1101 */
+   ppm >>= 20;                 /* .000000000000000000001 */
+   t1101 += t1101 >> 15;       /* .1101000000000001101 */
+   t1001 >>= 11;               /* .000000000001001 */
+   t1001 += t1001 >> 12;       /* .000000000001001000000001001 */
+   ppm += t1001;               /* .000000000001001000001001001 */
+   ppm += t1101;               /* .110100000001001110101001001 */
+   return (ppm + 16) >> 5;/* .00000110100000001001110101001001 */
+#else
+   /* The argument is a PNG unsigned integer, so it is not permitted
+    * to be bigger than 2^31.
+    */
+   png_fixed_point result;
+   if (ppm <= PNG_UINT_31_MAX && png_muldiv(&result, ppm, 127, 5000))
+      return result;
+
+   /* Overflow. */
+   return 0;
+#endif
+}
+
 png_uint_32 PNGAPI
 png_get_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
-   return ((png_uint_32)((float)png_get_pixels_per_meter(png_ptr, info_ptr)
-       *.0254 +.5));
+   return ppi_from_ppm(png_get_pixels_per_meter(png_ptr, info_ptr));
 }
 
 png_uint_32 PNGAPI
 png_get_x_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
-   return ((png_uint_32)((float)png_get_x_pixels_per_meter(png_ptr, info_ptr)
-       *.0254 +.5));
+   return ppi_from_ppm(png_get_x_pixels_per_meter(png_ptr, info_ptr));
 }
 
 png_uint_32 PNGAPI
 png_get_y_pixels_per_inch(png_structp png_ptr, png_infop info_ptr)
 {
-   return ((png_uint_32)((float)png_get_y_pixels_per_meter(png_ptr, info_ptr)
-       *.0254 +.5));
+   return ppi_from_ppm(png_get_y_pixels_per_meter(png_ptr, info_ptr));
 }
 
+#ifdef PNG_FIXED_POINT_SUPPORTED
+static png_fixed_point
+png_fixed_inches_from_microns(png_structp png_ptr, png_int_32 microns)
+{
+   /* Convert from metres * 1,000,000 to inches * 100,000, meters to
+    * inches is simply *(100/2.54), so we want *(10/2.54) == 1000/254.
+    * Notice that this can overflow - a warning is output and 0 is
+    * returned.
+    */
+   return png_muldiv_warn(png_ptr, microns, 500, 127);
+}
+
+png_fixed_point PNGAPI
+png_get_x_offset_inches_fixed(png_structp png_ptr, png_infop info_ptr)
+{
+   return png_fixed_inches_from_microns(png_ptr,
+      png_get_x_offset_microns(png_ptr, info_ptr));
+}
+#endif
+
+#ifdef PNG_FIXED_POINT_SUPPORTED
+png_fixed_point PNGAPI
+png_get_y_offset_inches_fixed(png_structp png_ptr, png_infop info_ptr)
+{
+   return png_fixed_inches_from_microns(png_ptr,
+      png_get_y_offset_microns(png_ptr, info_ptr));
+}
+#endif
+
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 float PNGAPI
 png_get_x_offset_inches(png_structp png_ptr, png_infop info_ptr)
 {
-   return ((float)png_get_x_offset_microns(png_ptr, info_ptr)
-       *.00003937);
+   /* To avoid the overflow do the conversion directly in floating
+    * point.
+    */
+   return png_get_x_offset_microns(png_ptr, info_ptr) * .00003937f;
 }
+#endif
 
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 float PNGAPI
 png_get_y_offset_inches(png_structp png_ptr, png_infop info_ptr)
 {
-   return ((float)png_get_y_offset_microns(png_ptr, info_ptr)
-       *.00003937);
+   /* To avoid the overflow do the conversion directly in floating
+    * point.
+    */
+   return png_get_y_offset_microns(png_ptr, info_ptr) * .00003937f;
 }
+#endif
 
 #ifdef PNG_pHYs_SUPPORTED
 png_uint_32 PNGAPI
@@ -364,7 +428,7 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
    return (retval);
 }
 #endif /* PNG_pHYs_SUPPORTED */
-#endif  /* PNG_INCH_CONVERSIONS_SUPPORTED && PNG_FLOATING_POINT_SUPPORTED */
+#endif  /* PNG_INCH_CONVERSIONS_SUPPORTED */
 
 /* png_get_channels really belongs in here, too, but it's been around longer */
 
@@ -419,26 +483,27 @@ png_get_cHRM(png_structp png_ptr, png_infop info_ptr,
       png_debug1(1, "in %s retrieval function", "cHRM");
 
       if (white_x != NULL)
-         *white_x = (double)info_ptr->x_white;
+         *white_x = png_float(png_ptr, info_ptr->x_white, "cHRM white X");
       if (white_y != NULL)
-         *white_y = (double)info_ptr->y_white;
+         *white_y = png_float(png_ptr, info_ptr->y_white, "cHRM white Y");
       if (red_x != NULL)
-         *red_x = (double)info_ptr->x_red;
+         *red_x = png_float(png_ptr, info_ptr->x_red, "cHRM red X");
       if (red_y != NULL)
-         *red_y = (double)info_ptr->y_red;
+         *red_y = png_float(png_ptr, info_ptr->y_red, "cHRM red Y");
       if (green_x != NULL)
-         *green_x = (double)info_ptr->x_green;
+         *green_x = png_float(png_ptr, info_ptr->x_green, "cHRM green X");
       if (green_y != NULL)
-         *green_y = (double)info_ptr->y_green;
+         *green_y = png_float(png_ptr, info_ptr->y_green, "cHRM green Y");
       if (blue_x != NULL)
-         *blue_x = (double)info_ptr->x_blue;
+         *blue_x = png_float(png_ptr, info_ptr->x_blue, "cHRM blue X");
       if (blue_y != NULL)
-         *blue_y = (double)info_ptr->y_blue;
+         *blue_y = png_float(png_ptr, info_ptr->y_blue, "cHRM blue Y");
       return (PNG_INFO_cHRM);
    }
    return (0);
 }
 #endif
+
 #ifdef PNG_FIXED_POINT_SUPPORTED
 png_uint_32 PNGAPI
 png_get_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
@@ -451,21 +516,21 @@ png_get_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM))
    {
       if (white_x != NULL)
-         *white_x = info_ptr->int_x_white;
+         *white_x = info_ptr->x_white;
       if (white_y != NULL)
-         *white_y = info_ptr->int_y_white;
+         *white_y = info_ptr->y_white;
       if (red_x != NULL)
-         *red_x = info_ptr->int_x_red;
+         *red_x = info_ptr->x_red;
       if (red_y != NULL)
-         *red_y = info_ptr->int_y_red;
+         *red_y = info_ptr->y_red;
       if (green_x != NULL)
-         *green_x = info_ptr->int_x_green;
+         *green_x = info_ptr->x_green;
       if (green_y != NULL)
-         *green_y = info_ptr->int_y_green;
+         *green_y = info_ptr->y_green;
       if (blue_x != NULL)
-         *blue_x = info_ptr->int_x_blue;
+         *blue_x = info_ptr->x_blue;
       if (blue_y != NULL)
-         *blue_y = info_ptr->int_y_blue;
+         *blue_y = info_ptr->y_blue;
       return (PNG_INFO_cHRM);
    }
    return (0);
@@ -474,36 +539,30 @@ png_get_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_gAMA_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-png_uint_32 PNGAPI
-png_get_gAMA(png_structp png_ptr, png_infop info_ptr, double *file_gamma)
+png_uint_32 PNGFAPI
+png_get_gAMA_fixed(png_structp png_ptr, png_infop info_ptr,
+    png_fixed_point *file_gamma)
 {
    png_debug1(1, "in %s retrieval function", "gAMA");
 
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_gAMA)
        && file_gamma != NULL)
    {
-      *file_gamma = (double)info_ptr->gamma;
+      *file_gamma = info_ptr->gamma;
       return (PNG_INFO_gAMA);
    }
+
    return (0);
 }
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 png_uint_32 PNGAPI
-png_get_gAMA_fixed(png_structp png_ptr, png_infop info_ptr,
-    png_fixed_point *int_file_gamma)
+png_get_gAMA(png_structp png_ptr, png_infop info_ptr, double *file_gamma)
 {
-   png_debug1(1, "in %s retrieval function", "gAMA");
-
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_gAMA)
-       && int_file_gamma != NULL)
-   {
-      *int_file_gamma = info_ptr->int_gamma;
-      return (PNG_INFO_gAMA);
-   }
-
-   return (0);
+   png_fixed_point igamma;
+   png_uint_32 ok = png_get_gAMA_fixed(png_ptr, info_ptr, &igamma);
+   if (ok)
+      *file_gamma = png_float(png_ptr, igamma, "png_get_gAMA");
+   return ok;
 }
 #endif
 #endif
@@ -529,7 +588,7 @@ png_get_sRGB(png_structp png_ptr, png_infop info_ptr, int *file_srgb_intent)
 png_uint_32 PNGAPI
 png_get_iCCP(png_structp png_ptr, png_infop info_ptr,
     png_charpp name, int *compression_type,
-    png_charpp profile, png_uint_32 *proflen)
+    png_bytepp profile, png_uint_32 *proflen)
 {
    png_debug1(1, "in %s retrieval function", "iCCP");
 
@@ -668,6 +727,25 @@ png_get_pCAL(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
+#ifdef PNG_FIXED_POINT_SUPPORTED
+png_uint_32 PNGAPI
+png_get_sCAL_fixed(png_structp png_ptr, png_infop info_ptr,
+    int *unit, png_fixed_point *width, png_fixed_point *height)
+{
+   if (png_ptr != NULL && info_ptr != NULL &&
+       (info_ptr->valid & PNG_INFO_sCAL))
+   {
+      *unit = info_ptr->scal_unit;
+      /*TODO: make this work */
+      *width = png_fixed(png_ptr, atof(info_ptr->scal_s_width), "sCAL width");
+      *height = png_fixed(png_ptr, atof(info_ptr->scal_s_height),
+         "sCAL height");
+      return (PNG_INFO_sCAL);
+   }
+
+   return(0);
+}
+#endif
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 png_uint_32 PNGAPI
 png_get_sCAL(png_structp png_ptr, png_infop info_ptr,
@@ -677,15 +755,14 @@ png_get_sCAL(png_structp png_ptr, png_infop info_ptr,
        (info_ptr->valid & PNG_INFO_sCAL))
    {
       *unit = info_ptr->scal_unit;
-      *width = info_ptr->scal_pixel_width;
-      *height = info_ptr->scal_pixel_height;
+      *width = atof(info_ptr->scal_s_width);
+      *height = atof(info_ptr->scal_s_height);
       return (PNG_INFO_sCAL);
    }
 
    return(0);
 }
 #endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
 png_uint_32 PNGAPI
 png_get_sCAL_s(png_structp png_ptr, png_infop info_ptr,
              int *unit, png_charpp width, png_charpp height)
@@ -701,7 +778,6 @@ png_get_sCAL_s(png_structp png_ptr, png_infop info_ptr,
 
    return(0);
 }
-#endif
 #endif
 
 #ifdef PNG_pHYs_SUPPORTED

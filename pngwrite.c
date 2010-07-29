@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.5.0 [July 24, 2010]
+ * Last changed in libpng 1.5.0 [July 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -60,15 +60,7 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
     */
 #ifdef PNG_WRITE_gAMA_SUPPORTED
    if (info_ptr->valid & PNG_INFO_gAMA)
-   {
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
-      png_write_gAMA(png_ptr, info_ptr->gamma);
-#else
-#ifdef PNG_FIXED_POINT_SUPPORTED
-      png_write_gAMA_fixed(png_ptr, info_ptr->int_gamma);
-#  endif
-#endif
-   }
+      png_write_gAMA_fixed(png_ptr, info_ptr->gamma);
 #endif
 #ifdef PNG_WRITE_sRGB_SUPPORTED
    if (info_ptr->valid & PNG_INFO_sRGB)
@@ -78,32 +70,19 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 #ifdef PNG_WRITE_iCCP_SUPPORTED
    if (info_ptr->valid & PNG_INFO_iCCP)
       png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_COMPRESSION_TYPE_BASE,
-                     info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
+          (png_charp)info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
 #endif
 #ifdef PNG_WRITE_sBIT_SUPPORTED
    if (info_ptr->valid & PNG_INFO_sBIT)
       png_write_sBIT(png_ptr, &(info_ptr->sig_bit), info_ptr->color_type);
 #endif
-
 #ifdef PNG_WRITE_cHRM_SUPPORTED
    if (info_ptr->valid & PNG_INFO_cHRM)
-   {
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-      png_write_cHRM(png_ptr,
+      png_write_cHRM_fixed(png_ptr,
           info_ptr->x_white, info_ptr->y_white,
           info_ptr->x_red, info_ptr->y_red,
           info_ptr->x_green, info_ptr->y_green,
           info_ptr->x_blue, info_ptr->y_blue);
-#else
-#  ifdef PNG_FIXED_POINT_SUPPORTED
-      png_write_cHRM_fixed(png_ptr,
-          info_ptr->int_x_white, info_ptr->int_y_white,
-          info_ptr->int_x_red, info_ptr->int_y_red,
-          info_ptr->int_x_green, info_ptr->int_y_green,
-          info_ptr->int_x_blue, info_ptr->int_y_blue);
-#  endif
-#endif
-   }
 #endif
 
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
@@ -168,7 +147,8 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
       {
          int j;
          for (j = 0; j<(int)info_ptr->num_trans; j++)
-            info_ptr->trans_alpha[j] = (png_byte)(255 - info_ptr->trans_alpha[j]);
+            info_ptr->trans_alpha[j] =
+	       (png_byte)(255 - info_ptr->trans_alpha[j]);
       }
 #endif
       png_write_tRNS(png_ptr, info_ptr->trans_alpha, &(info_ptr->trans_color),
@@ -198,25 +178,10 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
           info_ptr->pcal_units, info_ptr->pcal_params);
 #endif
 
-#ifdef PNG_sCAL_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_sCAL)
 #ifdef PNG_WRITE_sCAL_SUPPORTED
-
-#if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
-      png_write_sCAL(png_ptr, (int)info_ptr->scal_unit,
-          info_ptr->scal_pixel_width, info_ptr->scal_pixel_height);
-#else /* !FLOATING_POINT */
-
-#ifdef PNG_FIXED_POINT_SUPPORTED
+   if (info_ptr->valid & PNG_INFO_sCAL)
       png_write_sCAL_s(png_ptr, (int)info_ptr->scal_unit,
           info_ptr->scal_s_width, info_ptr->scal_s_height);
-#endif /* FIXED_POINT */
-
-#endif /* FLOATING_POINT */
-#else  /* !WRITE_sCAL */
-      png_warning(png_ptr,
-          "png_write_sCAL not supported; sCAL chunk not written");
-#endif /* WRITE_sCAL */
 #endif /* sCAL */
 
 #ifdef PNG_WRITE_pHYs_SUPPORTED

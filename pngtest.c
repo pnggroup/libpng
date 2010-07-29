@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.5.0 [July 24, 2010]
+ * Last changed in libpng 1.5.0 [July 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -31,6 +31,7 @@
  * of files at once by typing "pngtest -m file1.png file2.png ..."
  */
 
+#include "zlib.h"
 #include "png.h"
 /* Copied from pngpriv.h but only used in error messages below. */
 #ifndef PNG_ZBUF_SIZE
@@ -63,6 +64,17 @@ typedef FILE                * png_FILE_p;
 #if !PNG_DEBUG
 #  define SINGLE_ROWBUF_ALLOC  /* Makes buffer overruns easier to nail */
 #endif
+
+/* The code uses memcmp and memcpy on large objects (typically row pointers) so
+ * it is necessary to do soemthing special on certain architectures, note that
+ * the actual support for this was effectively removed in 1.4, so only the
+ * memory remains in this program:
+ */
+#define CVT_PTR(ptr)         (ptr)
+#define CVT_PTR_NOCHECK(ptr) (ptr)
+#define png_memcmp  memcmp
+#define png_memcpy  memcpy
+#define png_memset  memset
 
 /* Turn on CPU timing
 #define PNGTEST_TIMING
@@ -957,7 +969,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_iCCP_SUPPORTED
    {
       png_charp name;
-      png_charp profile;
+      png_bytep profile;
       png_uint_32 proflen;
       int compression_type;
 

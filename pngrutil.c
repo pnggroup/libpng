@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [July 24, 2010]
+ * Last changed in libpng 1.4.1 [July 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -27,6 +27,29 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
       png_error(png_ptr, "PNG unsigned integer out of range");
    return (i);
 }
+
+#if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_READ_cHRM_SUPPORTED)
+/* The following is a variation on the above for use with the fixed
+ * point values used for gAMA and cHRM.  Instead of png_error it
+ * issues a warning and returns (-1) - an invalid value because both
+ * gAMA and cHRM use *unsigned* integers for fixed point values.
+ */
+#define PNG_FIXED_ERROR (-1)
+
+png_fixed_point /* PRIVATE */
+png_get_fixed_point(png_structp png_ptr, png_bytep buf)
+{
+   png_uint_32 u = png_get_uint_32(buf);
+   if (u <= PNG_UINT_31_MAX)
+      return (png_fixed_point)u; /* known to be in range */
+
+   /* The caller can turn off the warning by passing NULL. */
+   if (png_ptr != NULL)
+      png_warning(png_ptr, "PNG fixed point integer out of range");
+   return PNG_FIXED_ERROR;
+}
+#endif
+
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
 /* NOTE: the read macros will obscure these definitions, so that if
  * PNG_USE_READ_MACROS is set the library will not use them internally,
@@ -46,22 +69,20 @@ png_get_uint_32)(png_bytep buf)
 }
 
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
- * data is stored in the PNG file in two's complement format, and it is
- * assumed that the machine format for signed integers is the same.
- * Only used internally in this file.
+ * data is stored in the PNG file in two's complement format and there
+ * is no guarantee that a 'png_int_32' is exactly 32 bits, therefore
+ * the following code does a two's complement to native convertion.
  */
-#if defined(PNG_GET_INT_32_SUPPORTED)
 png_int_32 (PNGAPI
 png_get_int_32)(png_bytep buf)
 {
-   png_int_32 i = ((png_int_32)(*buf) << 24) +
-       ((png_int_32)(*(buf + 1)) << 16) +
-       ((png_int_32)(*(buf + 2)) << 8) +
-       (png_int_32)(*(buf + 3));
+   png_uint_32 u = png_get_uint_32(buf);
+   if ((u & 0x80000000) == 0) /* negative */
+      return u;
 
-   return (i);
+   u = (u ^ 0xffffffff) + 1;  /* 2's complement: -x = ~x+1 */
+   return -u;
 }
-#endif
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 (PNGAPI
@@ -677,9 +698,6 @@ void /* PRIVATE */
 png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_fixed_point igamma;
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   float file_gamma;
-#endif
    png_byte buf[4];
 
    png_debug(1, "in png_handle_gAMA");
@@ -718,12 +736,12 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
-   igamma = (png_fixed_point)png_get_uint_32(buf);
-   /* Check for zero gamma */
-   if (igamma == 0)
+   igamma = png_get_fixed_point(NULL, buf);
+   /* Check for zero gamma or an error. */
+   if (igamma <= 0)
    {
       png_warning(png_ptr,
-          "Ignoring gAMA chunk with gamma=0");
+          "Ignoring gAMA chunk with out of range gamma");
       return;
    }
 
@@ -740,16 +758,12 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   file_gamma = (float)igamma / (float)100000.0;
 #  ifdef PNG_READ_GAMMA_SUPPORTED
-   png_ptr->gamma = file_gamma;
+   /* Gamma correction on read is supported. */
+   png_ptr->gamma = igamma;
 #  endif
-   png_set_gAMA(png_ptr, info_ptr, file_gamma);
-#else
-   /* Fixed point must be set! */
+   /* And set the 'info' structure members. */
    png_set_gAMA_fixed(png_ptr, info_ptr, igamma);
-#endif
 }
 #endif
 
@@ -831,13 +845,8 @@ void /* PRIVATE */
 png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_byte buf[32];
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   float white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
-#endif
-   png_fixed_point int_x_white, int_y_white, int_x_red, int_y_red, int_x_green,
-       int_y_green, int_x_blue, int_y_blue;
-
-   png_uint_32 uint_x, uint_y;
+   png_fixed_point x_white, y_white, x_red, y_red, x_green, y_green, x_blue,
+      y_blue;
 
    png_debug(1, "in png_handle_cHRM");
 
@@ -877,80 +886,54 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
-   uint_x = png_get_uint_32(buf);
-   uint_y = png_get_uint_32(buf + 4);
-   int_x_white = (png_fixed_point)uint_x;
-   int_y_white = (png_fixed_point)uint_y;
-
-   uint_x = png_get_uint_32(buf + 8);
-   uint_y = png_get_uint_32(buf + 12);
-   int_x_red = (png_fixed_point)uint_x;
-   int_y_red = (png_fixed_point)uint_y;
-
-   uint_x = png_get_uint_32(buf + 16);
-   uint_y = png_get_uint_32(buf + 20);
-   int_x_green = (png_fixed_point)uint_x;
-   int_y_green = (png_fixed_point)uint_y;
-
-   uint_x = png_get_uint_32(buf + 24);
-   uint_y = png_get_uint_32(buf + 28);
-   int_x_blue = (png_fixed_point)uint_x;
-   int_y_blue = (png_fixed_point)uint_y;
-
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   white_x = (float)int_x_white / (float)100000.0;
-   white_y = (float)int_y_white / (float)100000.0;
-   red_x   = (float)int_x_red   / (float)100000.0;
-   red_y   = (float)int_y_red   / (float)100000.0;
-   green_x = (float)int_x_green / (float)100000.0;
-   green_y = (float)int_y_green / (float)100000.0;
-   blue_x  = (float)int_x_blue  / (float)100000.0;
-   blue_y  = (float)int_y_blue  / (float)100000.0;
-#endif
+   x_white = png_get_fixed_point(NULL, buf);
+   y_white = png_get_fixed_point(NULL, buf + 4);
+   x_red   = png_get_fixed_point(NULL, buf + 8);
+   y_red   = png_get_fixed_point(NULL, buf + 12);
+   x_green = png_get_fixed_point(NULL, buf + 16);
+   y_green = png_get_fixed_point(NULL, buf + 20);
+   x_blue  = png_get_fixed_point(NULL, buf + 24);
+   y_blue  = png_get_fixed_point(NULL, buf + 28);
+   if (x_white == PNG_FIXED_ERROR ||
+       y_white == PNG_FIXED_ERROR ||
+       x_red   == PNG_FIXED_ERROR ||
+       y_red   == PNG_FIXED_ERROR ||
+       x_green == PNG_FIXED_ERROR ||
+       y_green == PNG_FIXED_ERROR ||
+       x_blue  == PNG_FIXED_ERROR ||
+       y_blue  == PNG_FIXED_ERROR)
+   {
+      png_warning(png_ptr, "Ignoring cHRM chunk with negative chromaticities");
+      return;
+   }
 
 #ifdef PNG_READ_sRGB_SUPPORTED
    if ((info_ptr != NULL) && (info_ptr->valid & PNG_INFO_sRGB))
    {
-      if (PNG_OUT_OF_RANGE(int_x_white, 31270,  1000) ||
-          PNG_OUT_OF_RANGE(int_y_white, 32900,  1000) ||
-          PNG_OUT_OF_RANGE(int_x_red,   64000L, 1000) ||
-          PNG_OUT_OF_RANGE(int_y_red,   33000,  1000) ||
-          PNG_OUT_OF_RANGE(int_x_green, 30000,  1000) ||
-          PNG_OUT_OF_RANGE(int_y_green, 60000L, 1000) ||
-          PNG_OUT_OF_RANGE(int_x_blue,  15000,  1000) ||
-          PNG_OUT_OF_RANGE(int_y_blue,   6000,  1000))
+      if (PNG_OUT_OF_RANGE(x_white, 31270,  1000) ||
+          PNG_OUT_OF_RANGE(y_white, 32900,  1000) ||
+          PNG_OUT_OF_RANGE(x_red,   64000L, 1000) ||
+          PNG_OUT_OF_RANGE(y_red,   33000,  1000) ||
+          PNG_OUT_OF_RANGE(x_green, 30000,  1000) ||
+          PNG_OUT_OF_RANGE(y_green, 60000L, 1000) ||
+          PNG_OUT_OF_RANGE(x_blue,  15000,  1000) ||
+          PNG_OUT_OF_RANGE(y_blue,   6000,  1000))
       {
          png_warning(png_ptr,
              "Ignoring incorrect cHRM value when sRGB is also present");
 #ifdef PNG_CONSOLE_IO_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-         fprintf(stderr, "wx=%f, wy=%f, rx=%f, ry=%f\n",
-             white_x, white_y, red_x, red_y);
-         fprintf(stderr, "gx=%f, gy=%f, bx=%f, by=%f\n",
-             green_x, green_y, blue_x, blue_y);
-#else
-         fprintf(stderr, "wx=%ld, wy=%ld, rx=%ld, ry=%ld\n",
-             (long)int_x_white, (long)int_y_white,
-             (long)int_x_red, (long)int_y_red);
-         fprintf(stderr, "gx=%ld, gy=%ld, bx=%ld, by=%ld\n",
-             (long)int_x_green, (long)int_y_green,
-             (long)int_x_blue, (long)int_y_blue);
-#endif
+         fprintf(stderr, "wx=%d, wy=%d, rx=%d, ry=%d\n",
+             x_white, y_white, x_red, y_red);
+         fprintf(stderr, "gx=%d, gy=%d, bx=%d, by=%d\n",
+             x_green, y_green, x_blue, y_blue);
 #endif /* PNG_CONSOLE_IO_SUPPORTED */
       }
       return;
    }
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   png_set_cHRM(png_ptr, info_ptr,
-       white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
-   png_set_cHRM_fixed(png_ptr, info_ptr,
-       int_x_white, int_y_white, int_x_red, int_y_red, int_x_green,
-       int_y_green, int_x_blue, int_y_blue);
-#endif
+   png_set_cHRM_fixed(png_ptr, info_ptr, x_white, y_white, x_red, y_red,
+      x_green, y_green, x_blue, y_blue);
 }
 #endif
 
@@ -1007,48 +990,31 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_gAMA))
    {
-   png_fixed_point igamma;
-#ifdef PNG_FIXED_POINT_SUPPORTED
-      igamma=info_ptr->int_gamma;
-#else
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
-      igamma=(png_fixed_point)(info_ptr->gamma * 100000.);
-#  endif
-#endif
-      if (PNG_OUT_OF_RANGE(igamma, 45500L, 500))
+      if (PNG_OUT_OF_RANGE(info_ptr->gamma, 45500L, 500))
       {
-         png_warning(png_ptr,
-             "Ignoring incorrect gAMA value when sRGB is also present");
+	 png_warning(png_ptr,
+	     "Ignoring incorrect gAMA value when sRGB is also present");
 #ifdef PNG_CONSOLE_IO_SUPPORTED
-#  ifdef PNG_FIXED_POINT_SUPPORTED
-         fprintf(stderr, "incorrect gamma=(%d/100000)\n",
-             (int)png_ptr->int_gamma);
-#  else
-#    ifdef PNG_FLOATING_POINT_SUPPORTED
-         fprintf(stderr, "incorrect gamma=%f\n", png_ptr->gamma);
-#    endif
-#  endif
+	 fprintf(stderr, "incorrect gamma=(%d/100000)\n", info_ptr->gamma);
 #endif
       }
    }
 #endif /* PNG_READ_gAMA_SUPPORTED */
 
 #ifdef PNG_READ_cHRM_SUPPORTED
-#ifdef PNG_FIXED_POINT_SUPPORTED
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM))
-      if (PNG_OUT_OF_RANGE(info_ptr->int_x_white, 31270,  1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->int_y_white, 32900,  1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->int_x_red,   64000L, 1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->int_y_red,   33000,  1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->int_x_green, 30000,  1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->int_y_green, 60000L, 1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->int_x_blue,  15000,  1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->int_y_blue,   6000,  1000))
+      if (PNG_OUT_OF_RANGE(info_ptr->x_white, 31270,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->y_white, 32900,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->x_red,   64000L, 1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->y_red,   33000,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->x_green, 30000,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->y_green, 60000L, 1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->x_blue,  15000,  1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->y_blue,   6000,  1000))
       {
          png_warning(png_ptr,
              "Ignoring incorrect cHRM value when sRGB is also present");
       }
-#endif /* PNG_FIXED_POINT_SUPPORTED */
 #endif /* PNG_READ_cHRM_SUPPORTED */
 
    png_set_sRGB_gAMA_and_cHRM(png_ptr, info_ptr, intent);
@@ -1144,7 +1110,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    profile_length = data_length - prefix_length;
 
-   if ( prefix_length > data_length || profile_length < 4)
+   if (prefix_length > data_length || profile_length < 4)
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
@@ -1167,22 +1133,24 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
 #ifdef PNG_STDIO_SUPPORTED
- {
-    char umsg[80];
+      {
+         char umsg[80];
 
-    png_snprintf2(umsg, 80,
-        "Ignoring iCCP chunk with declared size = %lu "
-         "and actual length = %lu",
-        (unsigned long)profile_size,
-        (unsigned long)profile_length);
-    png_warning(png_ptr, umsg);
- }
+         png_snprintf2(umsg, 80,
+             "Ignoring iCCP chunk with declared size = %u "
+              "and actual length = %u", profile_size, profile_length);
+         png_warning(png_ptr, umsg);
+      }
+#else
+      png_warning(png_ptr,
+         "Ignoring iCCP chunk with uncompressed size mismatch");
 #endif
       return;
    }
 
    png_set_iCCP(png_ptr, info_ptr, png_ptr->chunkdata,
-       compression_type, png_ptr->chunkdata + prefix_length, profile_length);
+       compression_type, (png_bytep)png_ptr->chunkdata + prefix_length,
+       profile_length);
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = NULL;
 }
@@ -1854,16 +1822,8 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_charp ep;
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   double width, height;
-   png_charp vp;
-#else
-#ifdef PNG_FIXED_POINT_SUPPORTED
-   png_charp swidth, sheight;
-#endif
-#endif
-   png_size_t slength;
+   png_size_t slength, index;
+   int state;
 
    png_debug(1, "in png_handle_sCAL");
 
@@ -1897,6 +1857,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
+   png_ptr->chunkdata[slength] = 0x00; /* Null terminate the last string */
 
    if (png_crc_finish(png_ptr, 0))
    {
@@ -1905,115 +1866,40 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   png_ptr->chunkdata[slength] = 0x00; /* Null terminate the last string */
-
-   ep = png_ptr->chunkdata + 1;        /* Skip unit byte */
-
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   width = png_strtod(png_ptr, ep, &vp);
-   if (*vp)
+   /* Validate the unit. */
+   if (png_ptr->chunkdata[0] != 1 && png_ptr->chunkdata[0] != 2)
    {
-      png_warning(png_ptr, "malformed width string in sCAL chunk");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
-   }
-#else
-#ifdef PNG_FIXED_POINT_SUPPORTED
-   swidth = (png_charp)png_malloc_warn(png_ptr, png_strlen(ep) + 1);
-
-   if (swidth == NULL)
-   {
-      png_warning(png_ptr, "Out of memory while processing sCAL chunk width");
+      png_warning(png_ptr, "Invalid sCAL ignored: invalid unit");
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
       return;
    }
 
-   png_memcpy(swidth, ep, png_strlen(ep));
-#endif
-#endif
-
-   for (ep = png_ptr->chunkdata; *ep; ep++)
-      /* Empty loop */ ;
-
-   ep++;
-
-   if (png_ptr->chunkdata + slength < ep)
+   /* Validate the ASCII numbers, need two ASCII numbers separated by
+    * a '\0' and they need to fit exactly in the chunk data.
+    */
+   index = 0;
+   state = 0;
+   if (png_ptr->chunkdata[1] == 45 /* negative width */ ||
+       !png_check_fp_number(png_ptr->chunkdata, slength, &state, &index) ||
+       index >= slength || png_ptr->chunkdata[index++] != 0)
+      png_warning(png_ptr, "Invalid sCAL chunk ignored: bad width format");
+   else
    {
-      png_warning(png_ptr, "Truncated sCAL chunk");
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
-      png_free(png_ptr, swidth);
-#endif
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
+      png_size_t heighti = index;
+      if (png_ptr->chunkdata[index] == 45 /* negative height */ ||
+          !png_check_fp_number(png_ptr->chunkdata, slength, &state, &index) ||
+	  index != slength)
+	 png_warning(png_ptr, "Invalid sCAL chunk ignored: bad height format");
+      else
+	 /* This is the (only) success case. */
+	 png_set_sCAL_s(png_ptr, info_ptr, png_ptr->chunkdata[0],
+	    png_ptr->chunkdata+1, png_ptr->chunkdata+heighti);
    }
 
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   height = png_strtod(png_ptr, ep, &vp);
-
-   if (*vp)
-   {
-      png_warning(png_ptr, "malformed height string in sCAL chunk");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
-      png_free(png_ptr, swidth);
-#endif
-      return;
-   }
-
-#else
-#ifdef PNG_FIXED_POINT_SUPPORTED
-   sheight = (png_charp)png_malloc_warn(png_ptr, png_strlen(ep) + 1);
-
-   if (sheight == NULL)
-   {
-      png_warning(png_ptr, "Out of memory while processing sCAL chunk height");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
-      png_free(png_ptr, swidth);
-#endif
-      return;
-   }
-
-   png_memcpy(sheight, ep, png_strlen(ep));
-#endif
-#endif
-
-   if (png_ptr->chunkdata + slength < ep
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-       || width <= 0. || height <= 0.
-#endif
-       )
-   {
-      png_warning(png_ptr, "Invalid sCAL data");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
-      png_free(png_ptr, swidth);
-      png_free(png_ptr, sheight);
-#endif
-      return;
-   }
-
-
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   png_set_sCAL(png_ptr, info_ptr, png_ptr->chunkdata[0], width, height);
-#else
-#ifdef PNG_FIXED_POINT_SUPPORTED
-   png_set_sCAL_s(png_ptr, info_ptr, png_ptr->chunkdata[0], swidth, sheight);
-#endif
-#endif
-
+   /* Clean up - just free the temporarily allocated buffer. */
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = NULL;
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
-   png_free(png_ptr, swidth);
-   png_free(png_ptr, sheight);
-#endif
 }
 #endif
 
@@ -3567,4 +3453,37 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }
+
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+int PNGAPI
+png_get_num_passes(png_structp png_ptr)
+{
+   if (png_ptr != NULL)
+   {
+      if (png_ptr->interlaced)
+         return 7;
+      else
+         return 1;
+   }
+
+   /* Here on error */
+   return 0;
+}
+
+png_uint_32 PNGAPI
+png_get_num_rows(png_structp png_ptr)
+{
+   if (png_ptr != NULL)
+   {
+      if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+	 return png_ptr->num_rows;
+      else
+	 png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
+	    "before png_get_num_rows");
+   }
+
+   /* Here on error */
+   return 0;
+}
+#endif /* SEQUENTIAL READ */
 #endif /* PNG_READ_SUPPORTED */

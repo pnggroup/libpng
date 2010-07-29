@@ -55,8 +55,10 @@
 
 
 #include <stdlib.h>     /* for exit() prototype */
+#include <setjmp.h>
 
-#include "png.h"        /* libpng header; includes zlib.h and setjmp.h */
+#include <zlib.h>
+#include "png.h"        /* libpng header from the local directory */
 #include "readpng2.h"   /* typedefs, common macros, public prototypes */
 
 
@@ -216,7 +218,11 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
     mainprog_info  *mainprog_ptr;
     int  color_type, bit_depth;
     png_uint_32 width, height;
+#ifdef PNG_FLOATING_POINT_SUPPORTED
     double  gamma;
+#else
+    png_fixed_point gamma;
+#endif
 
 
     /* setjmp() doesn't make sense here, because we'd either have to exit(),
@@ -327,11 +333,19 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
      * "gamma" value for the entire display system, i.e., the product of
      * LUT_exponent and CRT_exponent. */
 
+#ifdef PNG_FLOATING_POINT_SUPPORTED
     if (png_get_gAMA(png_ptr, info_ptr, &gamma))
         png_set_gamma(png_ptr, mainprog_ptr->display_exponent, gamma);
     else
         png_set_gamma(png_ptr, mainprog_ptr->display_exponent, 0.45455);
-
+#else
+    if (png_get_gAMA_fixed(png_ptr, info_ptr, &gamma))
+        png_set_gamma_fixed(png_ptr,
+	    (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), gamma);
+    else
+        png_set_gamma_fixed(png_ptr,
+	    (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), 45455);
+#endif
 
     /* we'll let libpng expand interlaced images, too */
 

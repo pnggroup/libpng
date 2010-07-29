@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version PNGLIB_VERSION - last changed on July 24, 2010
+com libpng version PNGLIB_VERSION - last changed on July 29, 2010
 com
 com Copyright (c) 1998-2010 Glenn Randers-Pehrson
 com
@@ -134,6 +134,17 @@ logunsupported = 1
 @#  include "pngusr.h"
 @#endif
 
+# This is a special fixup for the Watcom C compiler on Windows, which has
+# multiple procedure call standards.  Unless PNG_API_RULE is set explicitly
+# (i.e. if it is not defined at this point) it will be forced to '2' here when
+# using Watcom.  This indicates to the other header files that Watcom behaviour
+# is required where appropriate.
+@#ifdef __WATCOMC__
+@#  ifndef PNG_API_RULE
+@#     define PNG_API_RULE 2 /* Use Watcom calling conventions */
+@#  endif
+@#endif
+
 # Note that PNG_USR_CONFIG only has an effect when building
 # pnglibconf.h
 setting USER_CONFIG requires USER_PRIVATEBUILD USER_DLLFNAME_POSTFIX
@@ -166,8 +177,14 @@ option WRITE_INT_FUNCTIONS disabled
 option WRITE enables WRITE_INT_FUNCTIONS
 
 # Generic options - affect both read and write.
+option WARNINGS
 option BENIGN_ERRORS
 option MNG_FEATURES
+
+# Arithmetic options, the first is the big switch that chooses between internal
+# floating and fixed point arithmetic implementations - it does not affect any
+# APIs.  The second two (the _POINT settings) switch off individual APIs.
+option FLOATING_ARITHMETIC
 option FLOATING_POINT enables ok_math
 option FIXED_POINT enables ok_math
 
@@ -287,8 +304,8 @@ option SEQUENTIAL_READ requires READ
 option READ_COMPOSITE_NODIV requires READ
 = NO_READ_COMPOSITE_NODIV PNG_NO_READ_COMPOSITED_NODIV
 
-# Inch conversions: not switched on by default
-option INCH_CONVERSIONS requires FLOATING_POINT
+# Inch conversions
+option INCH_CONVERSIONS
 = INCH_CONVERSIONS PNG_INCH_CONVERSIONS
 
 # IN DEVELOPMENT
@@ -319,6 +336,8 @@ option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS
 # trouble if left undefined
 option WRITE_INTERLACING requires WRITE
 
+# The following depends, internally, on WEIGHT_SHIFT and COST_SHIFT
+# where are set below.
 option WRITE_WEIGHTED_FILTER requires WRITE FLOATING_POINT
 
 option WRITE_FLUSH requires WRITE
@@ -348,6 +367,81 @@ option WRITE_ANCILLARY_CHUNKS requires WRITE
 # These options disable *all* the text chunks if turned off
 option READ_TEXT requires READ_ANCILLARY_CHUNKS enables TEXT
 option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
+
+# Moved to pnglibconf.h at libpng-1.5.0
+# Feature support: in 1.4 this was in pngconf.h, but the following
+# features have no affect on the libpng API.  Add library
+# only features to the end of this list.  Add features that
+# affect the API above.  (Note: the list of chunks follows
+# the library-only settings.)
+#
+# BUILD TIME ONLY OPTIONS
+#   These options do not affect the API but rather alter how the
+#   API is implemented, they get recorded in pnglibconf.h, but
+#   can't be changed by the application.
+
+# Check the correctness of cHRM chunks
+option CHECK_cHRM requires cHRM
+#
+# Artificially align memory - the code typically aligns to 8 byte
+# boundaries if this is switched on, it's a small waste of space
+# but can help (in theory) on some architectures.  Only affects
+# internal structures.  Added at libpng 1.4.0
+option ALIGN_MEMORY
+
+# Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
+# See png[wr]util.c, normally this should always be *on*
+option POINTER_INDEXING
+
+# Other defines for things like memory and the like can go here.
+
+# BUILD TIME SETTINGS
+# Like build time options these do not affect the API, but they
+# may be useful to applications because they record details of
+# how the API will behave particularly with regard to overall
+# accuracy.
+
+# This controls how fine the quantizing gets.  As this allocates
+# a largish chunk of memory (32K), those who are not as concerned
+# with quantizing quality can decrease some or all of these.
+setting QUANTIZE_RED_BITS default 5
+setting QUANTIZE_GREEN_BITS default 5
+setting QUANTIZE_BLUE_BITS default 5
+
+# This controls how fine the gamma correction becomes when you
+# are only interested in 8 bits anyway.  Increasing this value
+# results in more memory being used, and more pow() functions
+# being called to fill in the gamma tables.  Don't set this value
+# less then 8, and even that may not work (I haven't tested it).
+setting MAX_GAMMA_8 default 11
+
+# This controls how much a difference in gamma we can tolerate before
+# we actually start doing gamma conversion, it's a fixed point value,
+# so the default below is 0.05, meaning libpng ignores corrections in
+# the range 0.95 to 1.05
+setting GAMMA_THRESHOLD_FIXED default 5000
+
+# Scaling factor for filter heuristic weighting calculations
+setting WEIGHT_SHIFT default 8
+setting COST_SHIFT default 3
+
+# Precision to use when converting a floating point value to a PNG
+# extension format string in an sCAL chunk (only relevant if the
+# floating point API is enabled)
+setting sCAL_PRECISION default 5
+
+# This is the size of the compression buffer, and thus the size of
+# an IDAT chunk.  Make this whatever size you feel is best for your
+# machine.  One of these will be allocated per png_struct.  When this
+# is full, it writes the data to the disk, and does some other
+# calculations.  Making this an extremely small size may slow
+# the library down, but you may want to experiment to determine
+# where it becomes significant, if you are concerned with memory
+# usage.  Note that zlib allocates at least 32Kb also.  For readers,
+# this describes the size of the buffer available to read the data in.
+# Unless this gets smaller than the size of a row (compressed),
+# it should not make much difference how big this is.
+setting ZBUF_SIZE default 8192
 
 # Ancillary chunks
 chunk bKGD
@@ -389,13 +483,8 @@ option WRITE_UNKNOWN_CHUNKS requires WRITE
 
 option HANDLE_AS_UNKNOWN
 
-option GET_INT_32 requires READ
-# png_get_int_32 is required by the ancillary chunks oFFs and pCAL
-option READ_oFFs enables GET_INT_32
-option READ_pCAL enables GET_INT_32
-
 option SAVE_INT_32 requires WRITE
-# Likewise for png_save_int_32
+# png_save_int_32 is required by the ancillary chunks oFFs and pCAL
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32
 

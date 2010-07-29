@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.0 [July 24, 2010]
+ * Last changed in libpng 1.5.0 [July 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -35,42 +35,7 @@ png_set_bKGD(png_structp png_ptr, png_infop info_ptr, png_color_16p background)
 #endif
 
 #ifdef PNG_cHRM_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-void PNGAPI
-png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
-    double white_x, double white_y, double red_x, double red_y,
-    double green_x, double green_y, double blue_x, double blue_y)
-{
-   png_debug1(1, "in %s storage function", "cHRM");
-
-   if (png_ptr == NULL || info_ptr == NULL)
-      return;
-
-   /* TODO: call png_check_cHRM_fixed */
-   info_ptr->x_white = (float)white_x;
-   info_ptr->y_white = (float)white_y;
-   info_ptr->x_red   = (float)red_x;
-   info_ptr->y_red   = (float)red_y;
-   info_ptr->x_green = (float)green_x;
-   info_ptr->y_green = (float)green_y;
-   info_ptr->x_blue  = (float)blue_x;
-   info_ptr->y_blue  = (float)blue_y;
-#ifdef PNG_FIXED_POINT_SUPPORTED
-   info_ptr->int_x_white = (png_fixed_point)(white_x*100000. + 0.5);
-   info_ptr->int_y_white = (png_fixed_point)(white_y*100000. + 0.5);
-   info_ptr->int_x_red   = (png_fixed_point)(  red_x*100000. + 0.5);
-   info_ptr->int_y_red   = (png_fixed_point)(  red_y*100000. + 0.5);
-   info_ptr->int_x_green = (png_fixed_point)(green_x*100000. + 0.5);
-   info_ptr->int_y_green = (png_fixed_point)(green_y*100000. + 0.5);
-   info_ptr->int_x_blue  = (png_fixed_point)( blue_x*100000. + 0.5);
-   info_ptr->int_y_blue  = (png_fixed_point)( blue_y*100000. + 0.5);
-#endif
-   info_ptr->valid |= PNG_INFO_cHRM;
-}
-#endif /* PNG_FLOATING_POINT_SUPPORTED */
-
-#ifdef PNG_FIXED_POINT_SUPPORTED
-void PNGAPI
+void PNGFAPI
 png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
     png_fixed_point white_x, png_fixed_point white_y, png_fixed_point red_x,
     png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
@@ -86,99 +51,71 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
        white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y))
 #endif
    {
-      info_ptr->int_x_white = white_x;
-      info_ptr->int_y_white = white_y;
-      info_ptr->int_x_red   = red_x;
-      info_ptr->int_y_red   = red_y;
-      info_ptr->int_x_green = green_x;
-      info_ptr->int_y_green = green_y;
-      info_ptr->int_x_blue  = blue_x;
-      info_ptr->int_y_blue  = blue_y;
-#ifdef  PNG_FLOATING_POINT_SUPPORTED
-      info_ptr->x_white = (float)(white_x/100000.);
-      info_ptr->y_white = (float)(white_y/100000.);
-      info_ptr->x_red   = (float)(  red_x/100000.);
-      info_ptr->y_red   = (float)(  red_y/100000.);
-      info_ptr->x_green = (float)(green_x/100000.);
-      info_ptr->y_green = (float)(green_y/100000.);
-      info_ptr->x_blue  = (float)( blue_x/100000.);
-      info_ptr->y_blue  = (float)( blue_y/100000.);
-#endif
+      info_ptr->x_white = white_x;
+      info_ptr->y_white = white_y;
+      info_ptr->x_red   = red_x;
+      info_ptr->y_red   = red_y;
+      info_ptr->x_green = green_x;
+      info_ptr->y_green = green_y;
+      info_ptr->x_blue  = blue_x;
+      info_ptr->y_blue  = blue_y;
       info_ptr->valid |= PNG_INFO_cHRM;
    }
 }
-#endif /* PNG_FIXED_POINT_SUPPORTED */
+
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+void PNGAPI
+png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
+    double white_x, double white_y, double red_x, double red_y,
+    double green_x, double green_y, double blue_x, double blue_y)
+{
+   png_set_cHRM_fixed(png_ptr, info_ptr,
+      png_fixed(png_ptr, white_x, "cHRM White X"),
+      png_fixed(png_ptr, white_y, "cHRM White Y"),
+      png_fixed(png_ptr, red_x, "cHRM Red X"),
+      png_fixed(png_ptr, red_y, "cHRM Red Y"),
+      png_fixed(png_ptr, green_x, "cHRM Green X"),
+      png_fixed(png_ptr, green_y, "cHRM Green Y"),
+      png_fixed(png_ptr, blue_x, "cHRM Blue X"),
+      png_fixed(png_ptr, blue_y, "cHRM Blue Y"));
+}
+#endif /* PNG_FLOATING_POINT_SUPPORTED */
+
 #endif /* PNG_cHRM_SUPPORTED */
 
 #ifdef PNG_gAMA_SUPPORTED
+void PNGFAPI
+png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
+    gamma)
+{
+   png_debug1(1, "in %s storage function", "gAMA");
+
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
+   /* Previously these values were limited, however they must be
+    * wrong, therfore storing them (and setting PNG_INFO_gAMA)
+    * must be wrong too.
+    */
+   if (gamma > (png_fixed_point)PNG_UINT_31_MAX)
+      png_warning(png_ptr, "Gamma too large, ignored");
+
+   else if (gamma <= 0)
+      png_warning(png_ptr, "Negative gamma ignored");
+
+   else
+   {
+      info_ptr->gamma = gamma;
+      info_ptr->valid |= PNG_INFO_gAMA;
+   }
+}
+
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void PNGAPI
 png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
 {
-   double png_gamma;
-
-   png_debug1(1, "in %s storage function", "gAMA");
-
-   if (png_ptr == NULL || info_ptr == NULL)
-      return;
-
-   /* Check for overflow */
-   if (file_gamma > 21474.83)
-   {
-      png_warning(png_ptr, "Limiting gamma to 21474.83");
-      png_gamma = 21474.83;
-   }
-
-   else
-      png_gamma = file_gamma;
-
-   info_ptr->gamma = (float)png_gamma;
-#ifdef PNG_FIXED_POINT_SUPPORTED
-   info_ptr->int_gamma = (int)(png_gamma*100000.+.5);
-#endif
-   info_ptr->valid |= PNG_INFO_gAMA;
-
-   if (png_gamma == 0.0)
-      png_warning(png_ptr, "Setting gamma = 0");
-}
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
-void PNGAPI
-png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
-    int_gamma)
-{
-   png_fixed_point png_gamma;
-
-   png_debug1(1, "in %s storage function", "gAMA");
-
-   if (png_ptr == NULL || info_ptr == NULL)
-      return;
-
-   if (int_gamma > (png_fixed_point)PNG_UINT_31_MAX)
-   {
-      png_warning(png_ptr, "Limiting gamma to 21474.83");
-      png_gamma = PNG_UINT_31_MAX;
-   }
-
-   else
-   {
-      if (int_gamma < 0)
-      {
-         png_warning(png_ptr, "Setting negative gamma to zero");
-         png_gamma = 0;
-      }
-
-      else
-         png_gamma = int_gamma;
-   }
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   info_ptr->gamma = (float)(png_gamma/100000.);
-#endif
-   info_ptr->int_gamma = png_gamma;
-   info_ptr->valid |= PNG_INFO_gAMA;
-
-   if (png_gamma == 0)
-      png_warning(png_ptr, "Setting gamma = 0");
+   png_set_gAMA_fixed(png_ptr, info_ptr, png_fixed(png_ptr, file_gamma,
+      "png_set_gAMA"));
 }
 #endif
 #endif
@@ -309,6 +246,17 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
    png_debug1(3, "allocating purpose for info (%lu bytes)",
        (unsigned long)length);
 
+   /* TODO: validate format of calibration name and unit name */
+
+   /* Check that the type matches the specification. */
+   if (type < 0 || type > 3)
+      png_error(png_ptr, "Invalid pCAL equation type");
+
+   /* Validate params[nparams] */
+   for (i=0; i<nparams; ++i)
+      if (!png_check_fp_string(params[i], png_strlen(params[i])))
+         png_error(png_ptr, "Invalid format for pCAL parameter");
+
    info_ptr->pcal_purpose = (png_charp)png_malloc_warn(png_ptr, length);
    if (info_ptr->pcal_purpose == NULL)
    {
@@ -370,74 +318,93 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-void PNGAPI
-png_set_sCAL(png_structp png_ptr, png_infop info_ptr,
-    int unit, double width, double height)
-{
-   png_debug1(1, "in %s storage function", "sCAL");
-
-   if (png_ptr == NULL || info_ptr == NULL)
-      return;
-
-   info_ptr->scal_unit = (png_byte)unit;
-   info_ptr->scal_pixel_width = width;
-   info_ptr->scal_pixel_height = height;
-
-   info_ptr->valid |= PNG_INFO_sCAL;
-}
-#endif
-#ifdef PNG_FIXED_POINT_SUPPORTED
-void PNGAPI
+void PNGFAPI
 png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
     int unit, png_charp swidth, png_charp sheight)
 {
-   png_size_t length;
+   png_size_t lengthw, lengthh;
 
    png_debug1(1, "in %s storage function", "sCAL");
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   /* Double check the unit (should never get here with an invalid
+    * unit unless this is an API call.)
+    */
+   if (unit != 1 && unit != 2)
+      png_error(png_ptr, "Invalid sCAL unit");
+
+   if (swidth == NULL || (lengthw = png_strlen(swidth)) <= 0 ||
+       swidth[0] == 45 /*'-'*/ || !png_check_fp_string(swidth, lengthw))
+      png_error(png_ptr, "Invalid sCAL width");
+
+   if (sheight == NULL || (lengthh = png_strlen(sheight)) <= 0 ||
+       sheight[0] == 45 /*'-'*/ || !png_check_fp_string(sheight, lengthh))
+      png_error(png_ptr, "Invalid sCAL height");
+
    info_ptr->scal_unit = (png_byte)unit;
 
-   length = png_strlen(swidth) + 1;
+   ++lengthw;
 
-   png_debug1(3, "allocating unit for info (%u bytes)",
-       (unsigned int)length);
+   png_debug1(3, "allocating unit for info (%u bytes)", lengthw);
 
-   info_ptr->scal_s_width = (png_charp)png_malloc_warn(png_ptr, length);
+   info_ptr->scal_s_width = (png_charp)png_malloc_warn(png_ptr, lengthw);
 
    if (info_ptr->scal_s_width == NULL)
    {
-      png_warning(png_ptr,
-         "Memory allocation failed while processing sCAL");
+      png_warning(png_ptr, "Memory allocation failed while processing sCAL");
       return;
    }
 
-   png_memcpy(info_ptr->scal_s_width, swidth, length);
+   png_memcpy(info_ptr->scal_s_width, swidth, lengthw);
 
-   length = png_strlen(sheight) + 1;
+   ++lengthh;
 
-   png_debug1(3, "allocating unit for info (%u bytes)",
-      (unsigned int)length);
+   png_debug1(3, "allocating unit for info (%u bytes)", lengthh);
 
-   info_ptr->scal_s_height = (png_charp)png_malloc_warn(png_ptr, length);
+   info_ptr->scal_s_height = (png_charp)png_malloc_warn(png_ptr, lengthh);
 
    if (info_ptr->scal_s_height == NULL)
    {
       png_free (png_ptr, info_ptr->scal_s_width);
       info_ptr->scal_s_width = NULL;
 
-      png_warning(png_ptr,
-         "Memory allocation failed while processing sCAL");
-
+      png_warning(png_ptr, "Memory allocation failed while processing sCAL");
       return;
    }
 
-   png_memcpy(info_ptr->scal_s_height, sheight, length);
+   png_memcpy(info_ptr->scal_s_height, sheight, lengthh);
+
    info_ptr->valid |= PNG_INFO_sCAL;
    info_ptr->free_me |= PNG_FREE_SCAL;
+}
+
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+void PNGAPI
+png_set_sCAL(png_structp png_ptr, png_infop info_ptr, int unit, double width,
+   double height)
+{
+   png_debug1(1, "in %s storage function", "sCAL");
+
+   /* Check the arguments. */
+   if (width <= 0)
+      png_warning(png_ptr, "Invalid sCAL width ignored");
+   else if (height <= 0)
+      png_warning(png_ptr, "Invalid sCAL height ignored");
+   else
+   {
+      /* Convert 'width' and 'height' to ASCII. */
+      char swidth[PNG_sCAL_MAX_DIGITS+1];
+      char sheight[PNG_sCAL_MAX_DIGITS+1];
+
+      png_ascii_from_fp(png_ptr, swidth, sizeof swidth, width,
+         PNG_sCAL_PRECISION);
+      png_ascii_from_fp(png_ptr, sheight, sizeof sheight, height,
+         PNG_sCAL_PRECISION);
+
+      png_set_sCAL_s(png_ptr, info_ptr, unit, swidth, sheight);
+   }
 }
 #endif
 #endif
@@ -543,16 +510,10 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    png_set_sRGB(png_ptr, info_ptr, intent);
 
 #ifdef PNG_gAMA_SUPPORTED
-#ifdef PNG_FIXED_POINT_SUPPORTED
    png_set_gAMA_fixed(png_ptr, info_ptr, 45455L);
-#else
-   /* Floating point must be set! */
-   png_set_gAMA(png_ptr, info_ptr, .45455);
-#endif
 #endif
 
 #ifdef PNG_cHRM_SUPPORTED
-#ifdef PNG_FIXED_POINT_SUPPORTED
    png_set_cHRM_fixed(png_ptr, info_ptr,
       /* color      x       y */
       /* white */ 31270L, 32900L,
@@ -560,16 +521,6 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
       /* green */ 30000L, 60000L,
       /* blue  */ 15000L,  6000L
    );
-#else
-   /* Floating point must be supported! */
-   png_set_cHRM(png_ptr, info_ptr,
-      /* color      x      y */
-      /* while */ .3127, .3290,
-      /* red   */ .64,   .33,
-      /* green */ .30,   .60,
-      /* blue  */ .15,   .06
-   );
-#endif
 #endif /* cHRM */
 }
 #endif /* sRGB */
@@ -579,10 +530,10 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
 void PNGAPI
 png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
     png_charp name, int compression_type,
-    png_charp profile, png_uint_32 proflen)
+    png_bytep profile, png_uint_32 proflen)
 {
    png_charp new_iccp_name;
-   png_charp new_iccp_profile;
+   png_bytep new_iccp_profile;
    png_uint_32 length;
 
    png_debug1(1, "in %s storage function", "iCCP");
@@ -598,7 +549,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
       return;
    }
    png_memcpy(new_iccp_name, name, length);
-   new_iccp_profile = (png_charp)png_malloc_warn(png_ptr, proflen);
+   new_iccp_profile = (png_bytep)png_malloc_warn(png_ptr, proflen);
 
    if (new_iccp_profile == NULL)
    {
@@ -844,8 +795,8 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
        png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 
        /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1 */
-       png_ptr->trans_alpha = info_ptr->trans_alpha = (png_bytep)png_malloc(png_ptr,
-           (png_size_t)PNG_MAX_PALETTE_LENGTH);
+       png_ptr->trans_alpha = info_ptr->trans_alpha =
+          (png_bytep)png_malloc(png_ptr, (png_size_t)PNG_MAX_PALETTE_LENGTH);
 
        if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
           png_memcpy(info_ptr->trans_alpha, trans_alpha, (png_size_t)num_trans);
@@ -864,7 +815,8 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
          png_warning(png_ptr,
             "tRNS chunk has out-of-range samples for bit_depth");
 
-      png_memcpy(&(info_ptr->trans_color), trans_color, png_sizeof(png_color_16));
+      png_memcpy(&(info_ptr->trans_color), trans_color,
+         png_sizeof(png_color_16));
 
       if (num_trans == 0)
          num_trans = 1;

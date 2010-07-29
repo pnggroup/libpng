@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.0 [July 24, 2010]
+ * Last changed in libpng 1.5.0 [July 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -236,6 +236,30 @@ png_chunk_benign_error(png_structp png_ptr, png_const_charp error_message)
 }
 #endif
 #endif /* PNG_READ_SUPPORTED */
+
+#ifdef PNG_ERROR_TEXT_SUPPORTED
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+void
+png_fixed_error(png_structp png_ptr, png_const_charp name, double value)
+{
+#  define fixed_message "fixed point overflow in "
+#  define fixed_message_ln ((sizeof fixed_message)-1)
+   int  iin;
+   char msg[fixed_message_ln+PNG_MAX_ERROR_TEXT];
+   png_memcpy(msg, fixed_message, fixed_message_ln);
+   iin = 0;
+   if (name != NULL) while (iin < (PNG_MAX_ERROR_TEXT-1) && name[iin] != 0)
+   {
+      msg[fixed_message_ln + iin] = name[iin];
+      ++iin;
+   }
+   msg[fixed_message_ln + iin] = 0;
+   /* To discover 'value' put a breakpoint here: */
+   png_error(png_ptr, msg);
+   value = value; png_ptr = png_ptr; /* Quiet the compiler */
+}
+#endif
+#endif
 
 #ifdef PNG_SETJMP_SUPPORTED
 /* This API only exists if ANSI-C style error handling is used,

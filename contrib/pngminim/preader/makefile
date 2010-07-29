@@ -64,7 +64,7 @@ ZOBJS  = adler32$(O) crc32$(O) \
 	 zutil$(O)
 
 # libpng
-PNGSRCS=png$(C) pngerror$(C) pngget$(C) pngmem$(C) \
+PNGSRCS=png$(C) pngarith$(C) pngerror$(C) pngget$(C) pngmem$(C) \
 	pngpread$(C) pngread$(C) pngrio$(C) pngrtran$(C) pngrutil$(C) \
 	pngset$(C) pngtrans$(C)
 
@@ -80,7 +80,7 @@ PNGINC= png.h pngconf.h pngusr.h $(PNGCONF)
 # Headers the PNG library uses
 PNGHDRS=$(PNGH) $(PNGCONF) pngusr.h
 
-PNGOBJS=png$(O) pngerror$(O) pngget$(O) pngmem$(O) \
+PNGOBJS=png$(O) pngarith$(O) pngerror$(O) pngget$(O) pngmem$(O) \
 	pngpread$(O) pngread$(O) pngrio$(O) pngrtran$(O) pngrutil$(O) \
 	pngset$(O) pngtrans$(O)
 

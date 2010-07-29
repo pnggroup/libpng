@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta36 - July 24, 2010
+ * libpng version 1.5.0beta36 - July 29, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -22,20 +22,29 @@
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
-/* Need the time information for converting tIME chunks, it
- * defines struct tm:
- */
-#ifdef PNG_CONVERT_tIME_SUPPORTED
-  /* "time.h" functions are not supported on WindowsCE */
-#  include <time.h>
-#endif
-
 /* PNG_NO_LIMITS_H may be used to turn off the use of the standard C
  * definition file for  machine specific limits, this may impact the
  * correctness of the definitons below (see uses of INT_MAX).
  */
 #ifndef PNG_NO_LIMITS_H
 #  include <limits.h>
+#endif
+
+/* For the memory copy APIs (i.e. the standard definitions of these),
+ * because this file defines png_memcpy and so on the base APIs must
+ * be defined here.
+ */
+#ifdef BSD
+#  include <strings.h>
+#else
+#  include <string.h>
+#endif
+
+/* For png_FILE_p - this provides the standard definition of a
+ * FILE
+ */
+#ifdef PNG_STDIO_SUPPORTED
+#  include <stdio.h>
 #endif
 
 /* This controls optimization of the reading of 16 and 32 bit values
@@ -171,9 +180,20 @@
       defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) ) &&\
     ( defined(_X86_) || defined(_X64_) || defined(_M_IX86) ||\
       defined(_M_X64) || defined(_M_IA64) )
-  /* Windows system (DOS doesn't support DLLs) running on x86/x64.
-   * Includes builds under Cygwin or MinGW.
+  /* Windows system (DOS doesn't support DLLs) running on x86/x64.  Includes
+   * builds under Cygwin or MinGW.  Also includes Watcom builds but these need
+   * special treatment because they are not compatible with GCC or Visual C
+   * because of different calling conventions.
    */
+#  if PNG_API_RULE == 2
+    /* If this line results in an error, either because __watcall is not
+     * understood or because of a redefine just below you cannot use *this*
+     * build of the library with the compiler you are using.  *This* build was
+     * build using Watcom and applications must also be built using Watcom!
+     */
+#    define PNGCAPI __watcall
+#  endif
+
 #  if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
 #    define PNGCAPI __cdecl
 #    if PNG_API_RULE == 1
@@ -266,7 +286,7 @@
 #endif
 #ifndef PNG_EXPORT
 #  define PNG_EXPORT(type, name, args, attributes, ordinal)\
-     PNG_EXPORT_TYPE(type) (PNGAPI name) PNGARG(args) attributes
+     extern PNG_EXPORT_TYPE(type) (PNGAPI name) PNGARG(args) attributes
 #endif
 
 /* Use PNG_REMOVED to comment out a removed interface. */
@@ -350,6 +370,22 @@
 #endif
 #ifndef PNG_PRIVATE
 #  define PNG_PRIVATE     /* This is a private libpng function */
+#endif
+#ifndef PNG_FP_EXPORT     /* A floating point API. */
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
+#    define PNG_FP_EXPORT(type, name, args, attributes, ordinal)\
+	PNG_EXPORT(type, name, args, attributes, ordinal)
+#  else                   /* No floating point APIs */
+#    define PNG_FP_EXPORT(type, name, args, attributes, ordinal)
+#  endif
+#endif
+#ifndef PNG_FIXED_EXPORT  /* A fixed point API. */
+#  ifdef PNG_FIXED_POINT_SUPPORTED
+#    define PNG_FIXED_EXPORT(type, name, args, attributes, ordinal)\
+	PNG_EXPORT(type, name, args, attributes, ordinal)
+#  else                   /* No fixed point APIs */
+#    define PNG_FIXED_EXPORT(type, name, args, attributes, ordinal)
+#  endif
 #endif
 
 /* The following uses const char * instead of char * for error
@@ -454,20 +490,22 @@ typedef size_t png_size_t;
 #endif
 
 /* Typedef for floating-point numbers that are converted
- * to fixed-point with a multiple of 100,000, e.g., int_gamma
+ * to fixed-point with a multiple of 100,000, e.g., gamma
  */
 typedef png_int_32 png_fixed_point;
 
 /* Add typedefs for pointers */
-typedef void            FAR * png_voidp;
-typedef png_byte        FAR * png_bytep;
-typedef png_uint_32     FAR * png_uint_32p;
-typedef png_int_32      FAR * png_int_32p;
-typedef png_uint_16     FAR * png_uint_16p;
-typedef png_int_16      FAR * png_int_16p;
-typedef PNG_CONST char  FAR * png_const_charp;
-typedef char            FAR * png_charp;
-typedef png_fixed_point FAR * png_fixed_point_p;
+typedef void               FAR * png_voidp;
+typedef png_byte           FAR * png_bytep;
+typedef PNG_CONST png_byte FAR * png_const_bytep;
+typedef png_uint_32        FAR * png_uint_32p;
+typedef png_int_32         FAR * png_int_32p;
+typedef png_uint_16        FAR * png_uint_16p;
+typedef png_int_16         FAR * png_int_16p;
+typedef PNG_CONST char     FAR * png_const_charp;
+typedef char               FAR * png_charp;
+typedef png_fixed_point    FAR * png_fixed_point_p;
+typedef png_size_t         FAR * png_size_tp;
 
 #ifdef PNG_STDIO_SUPPORTED
 typedef FILE            * png_FILE_p;
@@ -492,81 +530,6 @@ typedef double          FAR * FAR * png_doublepp;
 
 /* Pointers to pointers to pointers; i.e., pointer to array */
 typedef char            FAR * FAR * FAR * png_charppp;
-
-#define PNG_USE_LOCAL_ARRAYS /* Not used in libpng, defined for legacy apps */
-
-/* Users may want to use these so they are not private.  Any library
- * functions that are passed far data must be model-independent.
- */
-
-/* Memory model/platform independent fns */
-#ifndef PNG_ABORT
-#  ifdef _WINDOWS_
-#    define PNG_ABORT() ExitProcess(0)
-#  else
-#    define PNG_ABORT() abort()
-#  endif
-#endif
-
-#ifdef USE_FAR_KEYWORD
-/* Use this to make far-to-near assignments */
-#  define CHECK   1
-#  define NOCHECK 0
-#  define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
-#  define CVT_PTR_NOCHECK(ptr) (png_far_to_near(png_ptr,ptr,NOCHECK))
-#  define png_strcpy  _fstrcpy
-#  define png_strncpy _fstrncpy   /* Added to v 1.2.6 */
-#  define png_strlen  _fstrlen
-#  define png_memcmp  _fmemcmp    /* SJT: added */
-#  define png_memcpy  _fmemcpy
-#  define png_memset  _fmemset
-#  define png_sprintf sprintf
-#else
-#  ifdef _WINDOWS_  /* Favor Windows over C runtime fns */
-#    define CVT_PTR(ptr)         (ptr)
-#    define CVT_PTR_NOCHECK(ptr) (ptr)
-#    define png_strcpy  lstrcpyA
-#    define png_strncpy lstrcpynA
-#    define png_strlen  lstrlenA
-#    define png_memcmp  memcmp
-#    define png_memcpy  CopyMemory
-#    define png_memset  memset
-#    define png_sprintf wsprintfA
-#  else
-#    define CVT_PTR(ptr)         (ptr)
-#    define CVT_PTR_NOCHECK(ptr) (ptr)
-#    define png_strcpy  strcpy
-#    define png_strncpy strncpy     /* Added to v 1.2.6 */
-#    define png_strlen  strlen
-#    define png_memcmp  memcmp      /* SJT: added */
-#    define png_memcpy  memcpy
-#    define png_memset  memset
-#    define png_sprintf sprintf
-#  endif
-#endif
-
-#ifndef PNG_NO_SNPRINTF
-#  ifdef _MSC_VER
-#    define png_snprintf _snprintf   /* Added to v 1.2.19 */
-#    define png_snprintf2 _snprintf
-#    define png_snprintf6 _snprintf
-#  else
-#    define png_snprintf snprintf   /* Added to v 1.2.19 */
-#    define png_snprintf2 snprintf
-#    define png_snprintf6 snprintf
-#  endif
-#else
-  /* You don't have or don't want to use snprintf().  Caution: Using
-   * sprintf instead of snprintf exposes your application to accidental
-   * or malevolent buffer overflows.  If you don't have snprintf()
-   * as a general rule you should provide one (you can get one from
-   * Portable OpenSSH).
-   */
-#  define png_snprintf(s1,n,fmt,x1) png_sprintf(s1,fmt,x1)
-#  define png_snprintf2(s1,n,fmt,x1,x2) png_sprintf(s1,fmt,x1,x2)
-#  define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
-      png_sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
-#endif
 
 /* png_alloc_size_t is guaranteed to be no smaller than png_size_t,
  * and no smaller than png_uint_32.  Casts from png_size_t or png_uint_32
@@ -598,6 +561,5 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    endif
 #  endif
 #endif
-/* End of memory model/platform independent support */
 
 #endif /* PNGCONF_H */

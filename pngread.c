@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.5.0 [July 24, 2010]
+ * Last changed in libpng 1.5.0 [July 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -500,6 +500,10 @@ png_start_read_image(png_structp png_ptr)
 
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       png_read_start_row(png_ptr);
+   else
+      png_warning(png_ptr,
+          "Ignoring extra png_start_read_image() call;"
+          " row buffer not reallocated");
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
@@ -852,7 +856,31 @@ png_read_image(png_structp png_ptr, png_bytepp image)
       return;
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
-   pass = png_set_interlace_handling(png_ptr);
+   if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
+   {
+      pass = png_set_interlace_handling(png_ptr);
+      /* And make sure transforms are initialized. */
+      png_start_read_image(png_ptr);
+   }
+   else
+   {
+      if (!(png_ptr->transformations & PNG_INTERLACE))
+      {
+	 /* Caller called png_start_read_image or png_read_update_info without
+	  * first turning on the PNG_INTERLACE transform.  We can fix this here,
+	  * but the caller should do it!
+	  */
+	 png_warning(png_ptr, "Interlace handling should be turned on when "
+	    "using png_read_image");
+	 /* Make sure this is set correctly */
+	 png_ptr->num_rows = png_ptr->height;
+      }
+
+      /* Obtain the pass number, which also turns on the PNG_INTERLACE flag in
+       * the above error case.
+       */
+      pass = png_set_interlace_handling(png_ptr);
+   }
 #else
    if (png_ptr->interlaced)
       png_error(png_ptr,
@@ -861,9 +889,7 @@ png_read_image(png_structp png_ptr, png_bytepp image)
    pass = 1;
 #endif
 
-
    image_height=png_ptr->height;
-   png_ptr->num_rows = image_height; /* Make sure this is set correctly */
 
    for (j = 0; j < pass; j++)
    {
