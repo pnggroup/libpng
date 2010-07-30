@@ -1342,7 +1342,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
    }
 
    /* Here on buffer too small. */
-   png_error(png_ptr, "ASCII convertion buffer too small");
+   png_error(png_ptr, "ASCII conversion buffer too small");
 }
 
 #  endif /* FLOATING_POINT */
@@ -1401,9 +1401,21 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 #else
          int negative = 0;
          png_uint_32 A, T, D;
-         if (a < 0) negative = 1, A = -a; else A = a;
-         if (times < 0) negative = !negative, T = -times; else T = times;
-         if (div < 0) negative = !negative, D = -div; else D = div;
+
+         if (a < 0)
+            negative = 1, A = -a;
+         else
+            A = a;
+
+         if (times < 0)
+            negative = !negative, T = -times;
+         else
+            T = times;
+
+         if (div < 0)
+            negative = !negative, D = -div;
+         else
+            D = div;
 
          /* Following can't overflow because the arguments only
           * have 31 bits each, however the result may be 32 bits.
@@ -1432,6 +1444,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
             while (--bitshift >= 0)
             {
                png_uint_32 d32, d00;
+
                if (bitshift > 0)
                   d32 = D >> (32-bitshift), d00 = D << bitshift;
                else
@@ -1442,8 +1455,9 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
         	  if (s00 < d00) --s32; /* carry */
                   s32 -= d32, s00 -= d00, result += 1<<bitshift;
                }
-               else if (s32 == d32 && s00 >= d00)
-                  s32 = 0, s00 -= d00, result += 1<<bitshift;
+               else
+                  if (s32 == d32 && s00 >= d00)
+                     s32 = 0, s00 -= d00, result += 1<<bitshift;
             }
 
             /* Handle the rounding. */
@@ -1638,7 +1652,7 @@ png_8bit_l2[128] =
    24347096U, 0U
 #if 0
    /* The following are the values for 16 bit tables - these work fine for the 8
-    * bit convertions but produce very slightly larger errors in the 16 bit log
+    * bit conversions but produce very slightly larger errors in the 16 bit log
     * (about 1.2 as opposed to 0.7 absolute error in the final value).  To use
     * these all the shifts below must be adjusted appropriately.
     */
@@ -1667,10 +1681,18 @@ png_log8bit(unsigned x)
     * input), return 7.99998 for the overflow (log 0) case - so the result is
     * always at most 19 bits.
     */
-   if ((x &= 0xff) == 0) return 0xffffffff; 
-   if ((x & 0xf0) == 0) log  = 4, x <<= 4;
-   if ((x & 0xc0) == 0) log += 2, x <<= 2;
-   if ((x & 0x80) == 0) log += 1, x <<= 1;
+   if ((x &= 0xff) == 0)
+      return 0xffffffff; 
+
+   if ((x & 0xf0) == 0)
+      log  = 4, x <<= 4;
+
+   if ((x & 0xc0) == 0)
+      log += 2, x <<= 2;
+
+   if ((x & 0x80) == 0)
+      log += 1, x <<= 1;
+
    return (log << 16) + ((png_8bit_l2[x-128]+32768)>>16);
 }
 
@@ -1710,11 +1732,20 @@ png_log16bit(png_uint_32 x)
    unsigned log = 0;
 
    /* As above, but now the input has 16 bits. */
-   if ((x &= 0xffff) == 0) return 0xffffffff;
-   if ((x & 0xff00) == 0) log  = 8, x <<= 8;
-   if ((x & 0xf000) == 0) log += 4, x <<= 4;
-   if ((x & 0xc000) == 0) log += 2, x <<= 2;
-   if ((x & 0x8000) == 0) log += 1, x <<= 1;
+   if ((x &= 0xffff) == 0)
+      return 0xffffffff;
+
+   if ((x & 0xff00) == 0)
+      log  = 8, x <<= 8;
+
+   if ((x & 0xf000) == 0)
+      log += 4, x <<= 4;
+
+   if ((x & 0xc000) == 0)
+      log += 2, x <<= 2;
+
+   if ((x & 0x8000) == 0)
+      log += 1, x <<= 1;
 
    /* Calculate the base logarithm from the top 8 bits as a 28 bit fractional
     * value.
@@ -1800,12 +1831,23 @@ png_exp(png_uint_32 x)
        * converge on 45426 and this is used to allow linear interpolation of the
        * low bits.
        */
-      if (x & 0x800) e -= (((e >> 16) * 44938U) +  16U) >> 5;
-      if (x & 0x400) e -= (((e >> 16) * 45181U) +  32U) >> 6;
-      if (x & 0x200) e -= (((e >> 16) * 45303U) +  64U) >> 7;
-      if (x & 0x100) e -= (((e >> 16) * 45365U) + 128U) >> 8;
-      if (x & 0x080) e -= (((e >> 16) * 45395U) + 256U) >> 9;
-      if (x & 0x040) e -= (((e >> 16) * 45410U) + 512U) >> 10;
+      if (x & 0x800)
+         e -= (((e >> 16) * 44938U) +  16U) >> 5;
+
+      if (x & 0x400)
+         e -= (((e >> 16) * 45181U) +  32U) >> 6;
+
+      if (x & 0x200)
+         e -= (((e >> 16) * 45303U) +  64U) >> 7;
+
+      if (x & 0x100)
+         e -= (((e >> 16) * 45365U) + 128U) >> 8;
+
+      if (x & 0x080)
+         e -= (((e >> 16) * 45395U) + 256U) >> 9;
+
+      if (x & 0x040)
+         e -= (((e >> 16) * 45410U) + 512U) >> 10;
 
       /* And handle the low 6 bits in a single block. */
       e -= (((e >> 16) * 355U * (x & 0x3fU)) + 256U) >> 9;

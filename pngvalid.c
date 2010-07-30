@@ -1876,7 +1876,7 @@ static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
     * used by the library - otherwise we will get spurious errors from the
     * internal sbit style approximation.
     *
-    * The threshold test is here because otherwise the 16 to 8 convertion will
+    * The threshold test is here because otherwise the 16 to 8 conversion will
     * proceed *without* gamma correction, and the tests above will fail (but not
     * by much) - this could be fixed, it only appears with the -g option.
     */

@@ -116,11 +116,11 @@
  */
 #if defined(PNG_FLOATING_POINT_SUPPORTED) ||\
     defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
-   /* pngarith.c requires the following ANSI-C constants if the convertion of
+   /* png.c requires the following ANSI-C constants if the conversion of
     * floating point to ASCII is implemented therein:
     * 
     *  DBL_DIG  Maximum number of decimal digits (can be set to any constant)
-    *  DBL_MIN  Smalles normalized fp number (can be set to an arbitrary value)
+    *  DBL_MIN  Smallest normalized fp number (can be set to an arbitrary value)
     *  DBL_MAX  Maximum floating point number (can be set to an arbitrary value)
     */
 #  include <float.h>
@@ -366,7 +366,7 @@
  * when it is supposedly disabled.)
  */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-/* The floating point convertion can't overflow, though it can and
+/* The floating point conversion can't overflow, though it can and
  * does lose accuracy relative to the original fixed point value.
  * In practice this doesn't matter because png_fixed_point only
  * stores numbers with very low precision.  The png_ptr and s
@@ -375,7 +375,7 @@
  */
 #define png_float(png_ptr, fixed, s) (.00001 * (fixed))
 
-/* The fixed point convertion performs range checking and evaluates
+/* The fixed point conversion performs range checking and evaluates
  * its argument multiple times, so must be used with care.  The
  * range checking uses the PNG specification values for a signed
  * 32 bit fixed point value except that the values are deliberately

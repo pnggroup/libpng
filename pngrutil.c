@@ -71,7 +71,7 @@ png_get_uint_32)(png_bytep buf)
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
  * data is stored in the PNG file in two's complement format and there
  * is no guarantee that a 'png_int_32' is exactly 32 bits, therefore
- * the following code does a two's complement to native convertion.
+ * the following code does a two's complement to native conversion.
  */
 png_int_32 (PNGAPI
 png_get_int_32)(png_bytep buf)

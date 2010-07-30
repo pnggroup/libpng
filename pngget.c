@@ -295,7 +295,7 @@ static png_uint_32
 ppi_from_ppm(png_uint_32 ppm)
 {
 #if 0
-   /* The convertion is *(2.54/100), in binary (32 digits):
+   /* The conversion is *(2.54/100), in binary (32 digits):
     * .00000110100000001001110101001001
     */
    png_uint_32 t1001, t1101;
