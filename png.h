@@ -1295,9 +1295,11 @@ PNG_EXPORT(void,png_set_filter,(png_structp png_ptr, int method, int filters),,
 PNG_FP_EXPORT(void,png_set_filter_heuristics,(png_structp png_ptr,
     int heuristic_method, int num_weights, png_doublep filter_weights,
     png_doublep filter_costs),,68);
+#if 0 /* TO DO */
 PNG_FIXED_EXPORT(void,png_set_filter_heuristics_fixed,(png_structp png_ptr,
     int heuristic_method, int num_weights, png_fixed_point_p filter_weights,
     png_fixed_point_p filter_costs),,209);
+#endif
 #endif /*  PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
 
 /* Heuristic used for row filter selection.  These defines should NOT be
@@ -1605,8 +1607,10 @@ PNG_EXPORT(png_uint_32,png_get_y_pixels_per_meter,(png_structp png_ptr,
 /* Returns pixel aspect ratio, computed from pHYs chunk data.  */
 PNG_FP_EXPORT(float,png_get_pixel_aspect_ratio,(png_structp png_ptr,
     png_infop info_ptr),,125);
+#if 0 /* TO DO */
 PNG_FIXED_EXPORT(png_fixed_point,png_get_pixel_aspect_ratio_fixed,
     (png_structp png_ptr, png_infop info_ptr),,210);
+#endif
 
 /* Returns image x, y offset in pixels or microns, from oFFs chunk data. */
 PNG_EXPORT(png_int_32,png_get_x_offset_pixels,(png_structp png_ptr,
@@ -1824,9 +1828,11 @@ PNG_EXPORT(png_uint_32,png_get_sCAL_s,(png_structp png_ptr,
 
 PNG_FP_EXPORT(void,png_set_sCAL,(png_structp png_ptr, png_infop info_ptr,
     int unit, double width, double height),,170);
+#if 0 /* TO DO */
 PNG_FIXED_EXPORT(void,png_set_sCAL_fixed,(png_structp png_ptr,
    png_infop info_ptr, int unit, png_fixed_point width,
    png_fixed_point height), ,213);
+#endif
 PNG_EXPORT(void,png_set_sCAL_s,(png_structp png_ptr, png_infop info_ptr,
     int unit, png_charp swidth, png_charp sheight),,171);
 #endif /* PNG_sCAL_SUPPORTED */

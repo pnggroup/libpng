@@ -218,11 +218,11 @@ EXPORTS
  png_save_int_32 @206
  png_save_uint_16 @207
  png_set_gamma_fixed @208
- png_set_filter_heuristics_fixed @209
- png_get_pixel_aspect_ratio_fixed @210
+; png_set_filter_heuristics_fixed @209
+; png_get_pixel_aspect_ratio_fixed @210
  png_get_x_offset_inches_fixed @211
  png_get_y_offset_inches_fixed @212
- png_set_sCAL_fixed @213
+; png_set_sCAL_fixed @213
  png_get_sCAL_fixed @214
  png_get_num_passes @215
  png_get_num_rows @216
