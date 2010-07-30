@@ -1159,7 +1159,11 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
                else
                {
         	  /* End of loop - round the whole number. */
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
         	  d = floor(fp + .5);
+#else
+        	  d = (double)((int)(fp + .5));
+#endif
 
         	  if (d > 9)
         	  {
@@ -1343,7 +1347,11 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
 png_fixed_point
 png_fixed(png_structp png_ptr, double fp, png_const_charp text)
 {
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    double r = floor(100000 * fp + .5);
+#else
+   double r = (double)((int)(100000 * fp + .5));
+#endif
    if (r <= 2147483647. && r >= -2147483648.)
       return (png_fixed_point)r;
 
