@@ -3492,10 +3492,10 @@ png_get_num_cols(png_structp png_ptr)
    if (png_ptr != NULL)
    {
       if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-	 return png_ptr->iwidth;
+         return png_ptr->iwidth;
       else
-	 png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
-	    "before png_get_num_cols");
+         png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
+            "before png_get_num_cols");
    }
 
    /* Here on error */

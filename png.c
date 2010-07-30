@@ -1184,112 +1184,112 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
 
                fp *= 10;
                /* Use modf here, not floor and subtract, so that
-        	* the separation is done in one step.  At the end
-        	* of the loop don't break the number into parts so
-        	* that the final digit is rounded.
-        	*/
+                * the separation is done in one step.  At the end
+                * of the loop don't break the number into parts so
+                * that the final digit is rounded.
+                */
                if (cdigits+czero-clead+1 < (int)precision)
-        	  fp = modf(fp, &d);
+                  fp = modf(fp, &d);
 
                else
                {
-        	  d = floor(fp + .5);
+                  d = floor(fp + .5);
 
-        	  if (d > 9)
-        	  {
-        	     /* Rounding up to 10, handle that here. */
-        	     if (czero > 0)
-        	     {
-        	        --czero, d = 1;
-        		if (cdigits == 0) --clead;
+                  if (d > 9)
+                  {
+                     /* Rounding up to 10, handle that here. */
+                     if (czero > 0)
+                     {
+                        --czero, d = 1;
+                        if (cdigits == 0) --clead;
                      }
-        	     else
-        	     {
-        		while (cdigits > 0 && d > 9)
-        		{
-        		   int ch = *--ascii;
+                     else
+                     {
+                        while (cdigits > 0 && d > 9)
+                        {
+                           int ch = *--ascii;
 
-        		   if (exp != (-1))
-        		      ++exp;
+                           if (exp != (-1))
+                              ++exp;
 
-        		   else if (ch == 46)
-        		   {
-        		      ch = *--ascii, ++size;
-        		      /* Advance exp to '1', so that the
-        		       * decimal point happens after the
-        		       * previous digit.
-        		       */
-        		      exp = 1;
-        		   }
+                           else if (ch == 46)
+                           {
+                              ch = *--ascii, ++size;
+                              /* Advance exp to '1', so that the
+                               * decimal point happens after the
+                               * previous digit.
+                               */
+                              exp = 1;
+                           }
 
-        		   --cdigits;
-        		   d = ch - 47;  /* I.e. 1+(ch-48) */
-        		}
+                           --cdigits;
+                           d = ch - 47;  /* I.e. 1+(ch-48) */
+                        }
 
-        		/* Did we reach the beginning? If so adjust the
-        		 * exponent but take into account the leading
-        		 * decimal point.
-        		 */
-        		if (d > 9)  /* cdigits == 0 */
-        		{
-        		   if (exp == (-1))
-        		   {
-        		      /* Leading decimal point (plus zeros?), if
-        		       * we lose the decimal point here it must
-        		       * be reentered below.
-        		       */
-        		      int ch = *--ascii;
+                        /* Did we reach the beginning? If so adjust the
+                         * exponent but take into account the leading
+                         * decimal point.
+                         */
+                        if (d > 9)  /* cdigits == 0 */
+                        {
+                           if (exp == (-1))
+                           {
+                              /* Leading decimal point (plus zeros?), if
+                               * we lose the decimal point here it must
+                               * be reentered below.
+                               */
+                              int ch = *--ascii;
 
-        		      if (ch == 46)
-        		         ++size, exp = 1;
+                              if (ch == 46)
+                                 ++size, exp = 1;
 
-        		      /* Else lost a leading zero, so 'exp' is
-        		       * still ok at (-1)
-        		       */
-        		   }
-        		   else
-        		      ++exp;
+                              /* Else lost a leading zero, so 'exp' is
+                               * still ok at (-1)
+                               */
+                           }
+                           else
+                              ++exp;
 
-        		   /* In all cases we output a '1' */
-        		   d = 1;
-        		}
-        	     }
-        	  }
-        	  fp = 0; /* Guarantees termination below. */
+                           /* In all cases we output a '1' */
+                           d = 1;
+                        }
+                     }
+                  }
+                  fp = 0; /* Guarantees termination below. */
                }
 
                if (d == 0)
                {
-        	  ++czero;
-        	  if (cdigits == 0) ++clead;
+                  ++czero;
+                  if (cdigits == 0) ++clead;
                }
                else
                {
-        	  /* Included embedded zeros in the digit count. */
-        	  cdigits += czero - clead;
-        	  clead = 0;
+                  /* Included embedded zeros in the digit count. */
+                  cdigits += czero - clead;
+                  clead = 0;
 
-        	  while (czero > 0)
-        	  {
-        	     /* exp == (-1) means we just output the decimal
-        	      * place - after the DP don't adjust 'exp' any
-        	      * more!
-        	      */
-        	     if (exp != (-1)) 
-        	     {
-        	        if (exp == 0) *ascii++ = 46, --size;
-        	        /* PLUS 1: TOTAL 4 */
-        		--exp;
-        	     }
-        	     *ascii++ = 48, --czero;
-        	  }
+                  while (czero > 0)
+                  {
+                     /* exp == (-1) means we just output the decimal
+                      * place - after the DP don't adjust 'exp' any
+                      * more!
+                      */
+                     if (exp != (-1)) 
+                     {
+                        if (exp == 0) *ascii++ = 46, --size;
+                        /* PLUS 1: TOTAL 4 */
+                        --exp;
+                     }
+                     *ascii++ = 48, --czero;
+                  }
 
-        	  if (exp != (-1))
-        	  {
-        	     if (exp == 0) *ascii++ = 46, --size; /* counted above */
-        	     --exp;
-        	  }
-        	  *ascii++ = 48 + (int)d, ++cdigits;
+                  if (exp != (-1))
+                  {
+                     if (exp == 0) *ascii++ = 46, --size; /* counted above */
+                     --exp;
+                  }
+                  *ascii++ = 48 + (int)d, ++cdigits;
                }
             }
             while (cdigits+czero-clead < (int)precision && fp > DBL_MIN);
@@ -1306,19 +1306,19 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
             if (exp >= (-1) && exp <= 2)
             {
                /* The following only happens if we didn't output the
-        	* leading zeros above for negative exponent, so this
-        	* doest add to the digit requirement.  Note that the
-        	* two zeros here can only be output if the two leading
-        	* zeros were *not* output, so this doesn't increase
-        	* the output count.
-        	*/
+                * leading zeros above for negative exponent, so this
+                * doest add to the digit requirement.  Note that the
+                * two zeros here can only be output if the two leading
+                * zeros were *not* output, so this doesn't increase
+                * the output count.
+                */
                while (--exp >= 0) *ascii++ = 48;
 
                *ascii = 0;
 
                /* Total buffer requirement (including the '\0') is
-        	* 5+precision - see check at the start.
-        	*/
+                * 5+precision - see check at the start.
+                */
                return;
             }
 
@@ -1452,7 +1452,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
           * have 31 bits each, however the result may be 32 bits.
           */
          png_uint_32 s16 = (A >> 16) * (T & 0xffff) +
-        		   (A & 0xffff) * (T >> 16);
+                           (A & 0xffff) * (T >> 16);
          /* Can't overflow because the a*times bit is only 30
           * bits at most.
           */
@@ -1486,7 +1486,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 
                if (s32 > d32)
                {
-        	  if (s00 < d00) --s32; /* carry */
+                  if (s00 < d00) --s32; /* carry */
                   s32 -= d32, s00 -= d00, result += 1<<bitshift;
                }
 
@@ -2052,7 +2052,7 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
 
 #           else
                if (shift)
-        	  ig = (ig * 65535U + max_by_2)/max;
+                  ig = (ig * 65535U + max_by_2)/max;
 
                sub_table[j] = png_gamma_16bit_correct(ig, gamma);
 #           endif
