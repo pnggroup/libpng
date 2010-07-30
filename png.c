@@ -861,10 +861,10 @@ png_check_IHDR(png_structp png_ptr,
    if (filter_type != PNG_FILTER_TYPE_BASE)
    {
       if (!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
-         (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
-         ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) == 0) &&
-         (color_type == PNG_COLOR_TYPE_RGB ||
-         color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
+          (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
+          ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) == 0) &&
+          (color_type == PNG_COLOR_TYPE_RGB ||
+          color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
       {
          png_warning(png_ptr, "Unknown filter method in IHDR");
          error = 1;
@@ -918,8 +918,10 @@ png_check_fp_number(png_charp string, png_size_t size, int *statep,
       /* First find the type of the next character */
       {
          char ch = string[i];
+
          if (ch >= 48 && ch <= 57)
             type = PNG_FP_DIGIT;
+
          else switch (ch)
          {
          case 43: case 45:  type = PNG_FP_SIGN;  break;
@@ -938,34 +940,48 @@ png_check_fp_number(png_charp string, png_size_t size, int *statep,
       case PNG_FP_INTEGER + PNG_FP_SIGN:
          if (state & PNG_FP_SAW_ANY)
             goto PNG_FP_End; /* not a part of the number */
+
          png_fp_add(state, PNG_FP_SAW_SIGN);
          break;
+
       case PNG_FP_INTEGER + PNG_FP_DOT:
          /* Ok as trailer, ok as lead of fraction. */
          if (state & PNG_FP_SAW_DOT) /* two dots */
             goto PNG_FP_End;
+
          else if (state & PNG_FP_SAW_DIGIT) /* trailing dot? */
             png_fp_add(state, PNG_FP_SAW_DOT);
+
          else
             png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
+
          break;
+
       case PNG_FP_INTEGER + PNG_FP_DIGIT:
          if (state & PNG_FP_SAW_DOT) /* delayed fraction */
             png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
+
          png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
+
          break;
       case PNG_FP_INTEGER + PNG_FP_E:
          if ((state & PNG_FP_SAW_DIGIT) == 0)
             goto PNG_FP_End;
+
          png_fp_set(state, PNG_FP_EXPONENT);
+
          break;
+
    /* case PNG_FP_FRACTION + PNG_FP_SIGN:
          goto PNG_FP_End; ** no sign in exponent */
+
    /* case PNG_FP_FRACTION + PNG_FP_DOT:
          goto PNG_FP_End; ** Because SAW_DOT is always set */
+
       case PNG_FP_FRACTION + PNG_FP_DIGIT:
          png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
          break;
+
       case PNG_FP_FRACTION + PNG_FP_E:
          /* This is correct because the trailing '.' on an
           * integer is handled above - so we can only get here
@@ -973,20 +989,30 @@ png_check_fp_number(png_charp string, png_size_t size, int *statep,
           */
          if ((state & PNG_FP_SAW_DIGIT) == 0)
             goto PNG_FP_End;
+
          png_fp_set(state, PNG_FP_EXPONENT);
+
          break;
+
       case PNG_FP_EXPONENT + PNG_FP_SIGN:
          if (state & PNG_FP_SAW_ANY)
             goto PNG_FP_End; /* not a part of the number */
+
          png_fp_add(state, PNG_FP_SAW_SIGN);
+
          break;
+
    /* case PNG_FP_EXPONENT + PNG_FP_DOT:
          goto PNG_FP_End; */
+
       case PNG_FP_EXPONENT + PNG_FP_DIGIT:
          png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
+
          break;
+
    /* case PNG_FP_EXPONEXT + PNG_FP_E:
          goto PNG_FP_End; */
+
       default: goto PNG_FP_End; /* I.e. break 2 */
       }
 
@@ -1027,11 +1053,13 @@ png_pow10(int power)
 {
    int recip = 0;
    double d = 1;
+
    /* Handle negative exponent with a reciprocal at the end because
     * 10 is exact whereas .1 is inexact in base 2
     */
    if (power < 0)
       recip = 1, power = -power;
+
    if (power > 0)
    {
       /* Decompose power bitwise. */
@@ -1095,15 +1123,20 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
           * exponents.
           */
          (void)frexp(fp, &exp); /* exponent to base 2 */
+
          exp = (exp * 77) >> 8; /* <= exponent to base 10 */
+
          /* Avoid underflow here. */
          base = png_pow10(exp); /* May underflow */
+
          while (base < DBL_MIN || base < fp)
          {
             /* And this may overflow. */
             double test = png_pow10(exp+1);
+
             if (test <= DBL_MAX)
                ++exp, base = test;
+
             else
                break;
          }
@@ -1144,6 +1177,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
              */
             clead = czero; /* Count of leading zeros */
             cdigits = 0;   /* Count of digits in list. */
+
             do
             {
                double d;
@@ -1156,6 +1190,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
         	*/
                if (cdigits+czero-clead+1 < (int)precision)
         	  fp = modf(fp, &d);
+
                else
                {
         	  d = floor(fp + .5);
@@ -1173,8 +1208,10 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
         		while (cdigits > 0 && d > 9)
         		{
         		   int ch = *--ascii;
+
         		   if (exp != (-1))
         		      ++exp;
+
         		   else if (ch == 46)
         		   {
         		      ch = *--ascii, ++size;
@@ -1202,8 +1239,10 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
         		       * be reentered below.
         		       */
         		      int ch = *--ascii;
+
         		      if (ch == 46)
         		         ++size, exp = 1;
+
         		      /* Else lost a leading zero, so 'exp' is
         		       * still ok at (-1)
         		       */
@@ -1274,7 +1313,9 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
         	* the output count.
         	*/
                while (--exp >= 0) *ascii++ = 48;
+
                *ascii = 0;
+
                /* Total buffer requirement (including the '\0') is
         	* 5+precision - see check at the start.
         	*/
@@ -1297,6 +1338,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
             }
 
             cdigits = 0;
+
             while (exp > 0)
             {
                exponent[cdigits++] = 48 + exp % 10;
@@ -1309,7 +1351,9 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
             if ((int)size > cdigits)
             {
                while (cdigits > 0) *ascii++ = exponent[--cdigits];
+
                *ascii = 0;
+
                return;
             }
          }
@@ -1343,6 +1387,7 @@ png_fixed_point
 png_fixed(png_structp png_ptr, double fp, png_const_charp text)
 {
    double r = floor(100000 * fp + .5);
+
    if (r <= 2147483647. && r >= -2147483648.)
       return (png_fixed_point)r;
 
@@ -1360,7 +1405,7 @@ png_fixed(png_structp png_ptr, double fp, png_const_charp text)
  */
 int
 png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
-   png_int_32 div)
+    png_int_32 div)
 {
    /* Return a * times / div, rounded. */
    if (div != 0)
@@ -1377,6 +1422,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
          r *= times;
          r /= div;
          r = floor(r+.5);
+
          /* A png_fixed_point is a 32 bit integer. */
          if (r <= 2147483647. && r >= -2147483648.)
          {
@@ -1415,7 +1461,9 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 
          s16 = (s16 & 0xffff) << 16;
          s00 += s16;
-         if (s00 < s16) ++s32; /* carry */
+
+         if (s00 < s16)
+            ++s32; /* carry */
 
          if (s32 < D) /* else overflow */
          {
@@ -1432,6 +1480,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 
                if (bitshift > 0)
                   d32 = D >> (32-bitshift), d00 = D << bitshift;
+
                else
                   d32 = 0, d00 = D;
 
@@ -1440,15 +1489,18 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
         	  if (s00 < d00) --s32; /* carry */
                   s32 -= d32, s00 -= d00, result += 1<<bitshift;
                }
+
                else
                   if (s32 == d32 && s00 >= d00)
                      s32 = 0, s00 -= d00, result += 1<<bitshift;
             }
 
             /* Handle the rounding. */
-            if (s00 >= (D >> 1)) ++result;
+            if (s00 >= (D >> 1))
+               ++result;
 
-            if (negative) result = -result;
+            if (negative)
+               result = -result;
 
             /* Check for overflow. */
             if (negative && result <= 0 || !negative && result >= 0)
@@ -1471,9 +1523,10 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
  */
 png_fixed_point
 png_muldiv_warn(png_structp png_ptr, png_fixed_point a, png_int_32 times,
-   png_int_32 div)
+    png_int_32 div)
 {
    png_fixed_point result;
+
    if (png_muldiv(&result, a, times, div))
       return result;
 
@@ -1489,10 +1542,12 @@ png_reciprocal(png_fixed_point a)
 {
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    double r = floor(1E10/a+.5);
+
    if (r <= 2147483647. && r >= -2147483648.)
       return (png_fixed_point)r;
 #else
    png_fixed_point res;
+
    if (png_muldiv(&res, 100000, 100000, a))
       return res;
 #endif
@@ -1509,10 +1564,12 @@ png_product2(png_fixed_point a, png_fixed_point b)
    double r = a * 1E-5;
    r *= b;
    r = floor(r+.5);
+
    if (r <= 2147483647. && r >= -2147483648.)
       return (png_fixed_point)r;
 #else
    png_fixed_point res;
+
    if (png_muldiv(&res, a, b, 100000))
       return res;
 #endif
@@ -1529,6 +1586,7 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
    double r = 1E15/a;
    r /= b;
    r = floor(r+.5);
+
    if (r <= 2147483647. && r >= -2147483648.)
       return (png_fixed_point)r;
 #else
@@ -1538,6 +1596,7 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
     * 1/100000
     */
    png_fixed_point res = png_product2(a, b);
+
    if (res != 0)
       return png_reciprocal(res);
 #endif
@@ -1566,7 +1625,7 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
 
 void /* PRIVATE */
 png_64bit_product (long v1, long v2, unsigned long *hi_product,
-   unsigned long *lo_product)
+    unsigned long *lo_product)
 {
    int a, b, c, d;
    long lo, hi, x, y;
@@ -1751,8 +1810,10 @@ png_log16bit(png_uint_32 x)
     * the overall scaling by 6-12.  Round at every step.
     */
    x -= 1U << 24;
+
    if (x <= 65536U) /* <= '257' */
       log += ((23591U * (65536U-x)) + (1U << (16+6-12-1))) >> (16+6-12);
+
    else
       log -= ((23499U * (x-65536U)) + (1U << (16+6-12-1))) >> (16+6-12);
 
@@ -1812,7 +1873,7 @@ png_exp(png_uint_32 x)
 
       /* Incorporate the low 12 bits - these decrease the returned value by
        * multiplying by a number less than 1 if the bit is set.  The multiplier
-       * is determined by the above table and the shift, notice that the values
+       * is determined by the above table and the shift. Notice that the values
        * converge on 45426 and this is used to allow linear interpolation of the
        * low bits.
        */
@@ -1881,6 +1942,7 @@ png_gamma_8bit_correct(unsigned value, png_fixed_point gamma)
 #     else
          png_uint_32 log = png_log8bit(value);
          png_fixed_point res;
+
          if (png_muldiv(&res, gamma, log, PNG_FP_1))
             return png_exp8bit(res);
 #     endif
@@ -1899,9 +1961,11 @@ png_gamma_16bit_correct(unsigned value, png_fixed_point gamma)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
          return (png_uint_16)floor(65535*pow(value/65535.,gamma*.00001)+.5);
+
 #     else
          png_uint_32 log = png_log16bit(value);
          png_fixed_point res;
+
          if (png_muldiv(&res, gamma, log, PNG_FP_1))
             return png_exp16bit(res);
 #     endif
@@ -1923,6 +1987,7 @@ png_gamma_correct(png_structp png_ptr, unsigned value, png_fixed_point gamma)
 {
    if (png_ptr->bit_depth == 8)
       return png_gamma_8bit_correct(value, gamma);
+
    else
       return png_gamma_16bit_correct(value, gamma);
 }
@@ -1933,8 +1998,8 @@ png_gamma_correct(png_structp png_ptr, unsigned value, png_fixed_point gamma)
 int /* PRIVATE */
 png_gamma_significant(png_fixed_point gamma)
 {
-   return gamma < PNG_FP_1-PNG_GAMMA_THRESHOLD_FIXED ||
-      gamma > PNG_FP_1+PNG_GAMMA_THRESHOLD_FIXED;
+   return gamma < PNG_FP_1 - PNG_GAMMA_THRESHOLD_FIXED ||
+       gamma > PNG_FP_1 + PNG_GAMMA_THRESHOLD_FIXED;
 }
 
 /* Internal function to build a single 16 bit table - the table consists of
@@ -1956,12 +2021,12 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
    unsigned i;
 
    png_uint_16pp table = *ptable =
-      (png_uint_16pp)png_calloc(png_ptr, num * png_sizeof(png_uint_16p));
+       (png_uint_16pp)png_calloc(png_ptr, num * png_sizeof(png_uint_16p));
 
    for (i = 0; i < num; i++)
    {
       png_uint_16p sub_table = table[i] =
-         (png_uint_16p)png_malloc(png_ptr, 256 * png_sizeof(png_uint_16));
+          (png_uint_16p)png_malloc(png_ptr, 256 * png_sizeof(png_uint_16));
 
       /* The 'threshold' test is repeated here because it can arise for one of
        * the 16 bit tables even if the others don't hit it.
@@ -1983,10 +2048,12 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
 #           ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
                /* Inline the 'max' scaling operation: */
                sub_table[j] = (png_uint_16)floor(65535*pow(ig/(double)max,
-                  gamma*.00001)+.5);
+                   gamma*.00001)+.5);
+
 #           else
                if (shift)
         	  ig = (ig * 65535U + max_by_2)/max;
+
                sub_table[j] = png_gamma_16bit_correct(ig, gamma);
 #           endif
          }
@@ -1995,11 +2062,14 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
       {
          /* We must still build a table, but do it the fast way. */
          unsigned j;
+
          for (j = 0; j < 256; j++)
          {
             png_uint_32 ig = (j << (8-shift)) + i;
+
             if (shift)
                ig = (ig * 65535U + max_by_2)/max;
+
             sub_table[j] = ig;
          }
       }
@@ -2019,7 +2089,7 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
    png_uint_32 last;
 
    png_uint_16pp table = *ptable =
-      (png_uint_16pp)png_calloc(png_ptr, num * png_sizeof(png_uint_16p));
+       (png_uint_16pp)png_calloc(png_ptr, num * png_sizeof(png_uint_16p));
 
    /* 'num' is the number of tables and also the number of low bits of low
     * bits of the input 16 bit value used to select a table.  Each table is
@@ -2027,7 +2097,7 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
     */
    for (i = 0; i < num; i++)
       table[i] = (png_uint_16p)png_malloc(png_ptr,
-         256 * png_sizeof(png_uint_16));
+          256 * png_sizeof(png_uint_16));
 
    /* 'gamma' is set to the reciprocal of the value calculated above, so
     * pow(out,g) is an *input* value.  'last' is the last input value set.
@@ -2050,8 +2120,10 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
    {
       /* Find the corresponding maximum input value */
       png_uint_16 out = i * 257U; /* 16 bit output value */
+
       /* Find the boundary value in 16 bits: */
       png_uint_16 bound = png_gamma_16bit_correct(out+128U, gamma);
+
       /* Adjust (round) to (16-shift) bits: */
       bound = (bound * max + 32768)/65535;
 
@@ -2083,6 +2155,7 @@ png_build_8bit_table(png_structp png_ptr, png_bytepp ptable,
 
    if (png_gamma_significant(gamma)) for (i=0; i<256; i++)
       table[i] = png_gamma_8bit_correct(i, gamma);
+
    else for (i=0; i<245; ++i)
       table[i] = i;
 }
@@ -2100,19 +2173,19 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
   if (bit_depth <= 8)
   {
      png_build_8bit_table(png_ptr, &png_ptr->gamma_table,
-        png_ptr->screen_gamma > 0 ?  png_reciprocal2(png_ptr->gamma,
-           png_ptr->screen_gamma) : PNG_FP_1);
+         png_ptr->screen_gamma > 0 ?  png_reciprocal2(png_ptr->gamma,
+         png_ptr->screen_gamma) : PNG_FP_1);
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
      if (png_ptr->transformations & ((PNG_BACKGROUND) | PNG_RGB_TO_GRAY))
      {
         png_build_8bit_table(png_ptr, &png_ptr->gamma_to_1,
-           png_reciprocal(png_ptr->gamma));
+            png_reciprocal(png_ptr->gamma));
 
         png_build_8bit_table(png_ptr, &png_ptr->gamma_from_1,
-           png_ptr->screen_gamma > 0 ?  png_reciprocal(png_ptr->screen_gamma) :
-              png_ptr->gamma/* Probably doing rgb_to_gray */);
+            png_ptr->screen_gamma > 0 ?  png_reciprocal(png_ptr->screen_gamma) :
+            png_ptr->gamma/* Probably doing rgb_to_gray */);
      }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_RGB_TO_GRAY_SUPPORTED */
   }
@@ -2153,6 +2226,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
       */
      if (sig_bit > 0)
         shift = 16U - sig_bit; /* shift == insignificant bits */
+
      else
         shift = 0; /* keep all 16 bits */
 
@@ -2172,28 +2246,29 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
      png_ptr->gamma_shift = shift;
 
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
-        png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
-           png_ptr->screen_gamma > 0 ? png_product2(png_ptr->gamma,
-              png_ptr->screen_gamma) : PNG_FP_1);
+         png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
+         png_ptr->screen_gamma > 0 ? png_product2(png_ptr->gamma,
+         png_ptr->screen_gamma) : PNG_FP_1);
+
      else
-        png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,
-           png_ptr->screen_gamma > 0 ? png_reciprocal2(png_ptr->gamma,
-              png_ptr->screen_gamma) : PNG_FP_1);
+         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,
+         png_ptr->screen_gamma > 0 ? png_reciprocal2(png_ptr->gamma,
+         png_ptr->screen_gamma) : PNG_FP_1);
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
      if (png_ptr->transformations & (PNG_BACKGROUND | PNG_RGB_TO_GRAY))
      {
         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_to_1, shift,
-           png_reciprocal(png_ptr->gamma));
+            png_reciprocal(png_ptr->gamma));
 
         /* Notice that the '16 from 1' table should be full precision, however
-         * the lookup on this table still uses gamma_shift, os it can't be.
+         * the lookup on this table still uses gamma_shift, so it can't be.
          * TODO: fix this.
          */
         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_from_1, shift,
-           png_ptr->screen_gamma > 0 ? png_reciprocal(png_ptr->screen_gamma) :
-           png_ptr->gamma/* Probably doing rgb_to_gray */);
+            png_ptr->screen_gamma > 0 ? png_reciprocal(png_ptr->screen_gamma) :
+            png_ptr->gamma/* Probably doing rgb_to_gray */);
      }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_RGB_TO_GRAY_SUPPORTED */
   }
