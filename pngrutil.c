@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [July 29, 2010]
+ * Last changed in libpng 1.4.1 [July 30, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -3480,6 +3480,22 @@ png_get_num_rows(png_structp png_ptr)
       else
          png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
             "before png_get_num_rows");
+   }
+
+   /* Here on error */
+   return 0;
+}
+
+png_uint_32 PNGAPI
+png_get_num_cols(png_structp png_ptr)
+{
+   if (png_ptr != NULL)
+   {
+      if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+	 return png_ptr->iwidth;
+      else
+	 png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
+	    "before png_get_num_cols");
    }
 
    /* Here on error */

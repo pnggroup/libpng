@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta36 - July 29, 2010
+ * libpng version 1.5.0beta36 - July 30, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1042,8 +1042,8 @@ PNG_EXTERN void png_fixed_error PNGARG((png_structp png_ptr,
  * maximum ridiculous exponent.
  */
 #define PNG_sCAL_MAX_DIGITS (PNG_sCAL_PRECISION+1/*.*/+1/*E*/+10/*exponent*/)
-PNG_EXTERN void png_ascii_from_fp(png_structp png_ptr, png_charp ascii,
-    png_size_t size, double fp, unsigned precision);
+PNG_EXTERN void png_ascii_from_fp PNGARG((png_structp png_ptr, png_charp ascii,
+    png_size_t size, double fp, unsigned precision));
 #endif /* READ_sCAL && FLOATING_POINT */
 
 #if defined(PNG_sCAL_SUPPORTED) || defined(PNG_pCAL_SUPPORTED)
@@ -1110,13 +1110,13 @@ PNG_EXTERN void png_ascii_from_fp(png_structp png_ptr, png_charp ascii,
  * that omits the last character (i.e. set the size to the index of
  * the problem character.)  This has not been tested within libpng.
  */
-PNG_EXTERN int png_check_fp_number(png_charp string, png_size_t size,
-    int *statep, png_size_tp whereami);
+PNG_EXTERN int png_check_fp_number PNGARG((png_charp string, png_size_t size,
+    int *statep, png_size_tp whereami));
 
 /* This is the same but it checks a complete string and returns true
  * only if it just contains a floating point number.
  */
-PNG_EXTERN int png_check_fp_string(png_charp string, png_size_t size);
+PNG_EXTERN int png_check_fp_string PNGARG((png_charp string, png_size_t size));
 #endif /* pCAL || sCAL */
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)

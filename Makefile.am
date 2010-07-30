@@ -105,6 +105,11 @@ scripts/pnglibconf.h:
 	@echo "a new one simply make 'scripts/pnglibconf.out' and copy that" >&2
 	@exit 1
 
+# The following is necessary to ensure that the local pnglibconf.h is used, not
+# an installed one (this can happen immediately after on a clean system if
+# 'make test' is the first thing the user does.)
+pngvalid.o pngtest.o: pnglibconf.h
+
 SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'

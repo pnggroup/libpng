@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "July 29, 2010"
+.TH LIBPNG 3 "July 30, 2010"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 .SH SYNOPSIS
@@ -200,6 +200,18 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 
 \fI\fB
 
+\fBint png_get_num_cols (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBint png_get_num_passes (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBint png_get_num_rows (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBpng_uint_32 png_get_oFFs (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*offset_x\fP\fB, png_uint_32 \fP\fI*offset_y\fP\fB, int \fI*unit_type\fP\fB);\fP
 
 \fI\fB
@@ -213,6 +225,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 \fI\fB
 
 \fBfloat png_get_pixel_aspect_ratio (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_fixed_point png_get_pixel_aspect_ratio_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -239,6 +255,18 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 \fI\fB
 
 \fBpng_uint_32 png_get_sBIT (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_color_8p \fI*sig_bit\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_get_sCAL (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int* \fP\fIunit\fP\fB, double* \fP\fIwidth\fP\fB, double* \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_get_sCAL_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int* \fP\fIunit\fP\fB, png_fixed_pointp \fP\fIwidth\fP\fB, png_fixed_pointp \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_get_sCAL_s (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int* \fP\fIunit\fP\fB, png_charpp \fP\fIwidth\fP\fB, \fIpng_charppheight\fP\fB);\fP
 
 \fI\fB
 
@@ -306,6 +334,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 
 \fI\fB
 
+\fBfloat png_get_x_offset_inches (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_fixed_point png_get_x_offset_inches_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBpng_int_32 png_get_x_offset_microns (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
@@ -315,6 +351,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 \fI\fB
 
 \fBpng_uint_32 png_get_x_pixels_per_meter (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBfloat png_get_y_offset_inches (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_fixed_point png_get_y_offset_inches_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -347,14 +391,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 \fI\fB
 
 \fBpng_voidp png_malloc_default(png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
-
-\fI\fB
-
-\fBvoidp png_memcpy (png_voidp \fP\fIs1\fP\fB, png_voidp \fP\fIs2\fP\fB, png_size_t \fIsize\fP\fB);\fP
-
-\fI\fB
-
-\fBvoidp png_memset (png_voidp \fP\fIs1\fP\fB, int \fP\fIvalue\fP\fB, png_size_t \fIsize\fP\fB);\fP
 
 \fI\fB
 
@@ -411,6 +447,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 \fI\fB
 
 \fBvoid png_set_background (png_structp \fP\fIpng_ptr\fP\fB, png_color_16p \fP\fIbackground_color\fP\fB, int \fP\fIbackground_gamma_code\fP\fB, int \fP\fIneed_expand\fP\fB, double \fIbackground_gamma\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_background_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_color_16p \fP\fIbackground_color\fP\fB, int \fP\fIbackground_gamma_code\fP\fB, int \fP\fIneed_expand\fP\fB, png_uint_32 \fIbackground_gamma\fP\fB);\fP
 
 \fI\fB
 
@@ -482,11 +522,19 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 
 \fI\fB
 
+\fBvoid png_set_filter_heuristics_fixed (png_structp \fP\fIpng_ptr\fP\fB, int \fP\fIheuristic_method\fP\fB, int \fP\fInum_weights\fP\fB, png_fixed_point_p \fP\fIfilter_weights\fP\fB, png_fixed_point_p \fIfilter_costs\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_set_flush (png_structp \fP\fIpng_ptr\fP\fB, int \fInrows\fP\fB);\fP
 
 \fI\fB
 
 \fBvoid png_set_gamma (png_structp \fP\fIpng_ptr\fP\fB, double \fP\fIscreen_gamma\fP\fB, double \fIdefault_file_gamma\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_gamma_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fP\fIscreen_gamma\fP\fB, png_uint_32 \fIdefault_file_gamma\fP\fB);\fP
 
 \fI\fB
 
@@ -602,7 +650,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 
 \fI\fB
 
-\fBvoid png_set_rgb_to_gray_fixed (png_structp \fP\fIpng_ptr\fP\fB, int error_action png_fixed_point \fP\fIred\fP\fB, png_fixed_point \fIgreen\fP\fB);\fP
+\fBvoid png_set_rgb_to_gray_fixed (png_structp \fP\fIpng_ptr\fP\fB, int error_action png_uint_32 \fP\fIred\fP\fB, png_uint_32 \fIgreen\fP\fB);\fP
 
 \fI\fB
 
@@ -614,7 +662,21 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 
 \fI\fB
 
-\fBvoid png_set_sCAL (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fIunit\fP\fB, double \fP\fIwidth\fP\fB, double \fIheight\fP\fB);\fP
+\fBvoid png_set_sCAL (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIunit\fP\fB, double \fP\fIwidth\fP\fB, double \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_sCAL_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIunit\fP\fB, png_fixed_point \fP\fIwidth\fP\fB, png_fixed_point \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_sCAL_s (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIunit\fP\fB, png_charp \fP\fIwidth\fP\fB, png_charp \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
 
 \fI\fB
 
@@ -789,7 +851,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.5.0beta36 - July 29, 2010
+ libpng version 1.5.0beta36 - July 30, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
@@ -800,7 +862,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.0beta36 - July 29, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta36 - July 30, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -888,33 +950,67 @@ same instance of a structure.
 .SH II. Structures
 
 There are two main structures that are important to libpng, png_struct
-and png_info.  The first, png_struct, is an internal structure that
-will not, for the most part, be used by a user except as the first
-variable passed to every libpng function call.
+and png_info.  Both are internal structures that are no longer exposed
+in the libpng interface (as of libpng 1.5.0).
 
 The png_info structure is designed to provide information about the
 PNG file.  At one time, the fields of png_info were intended to be
 directly accessible to the user.  However, this tended to cause problems
 with applications using dynamically loaded libraries, and as a result
 a set of interface functions for png_info (the png_get_*() and png_set_*()
-functions) was developed.  The fields of png_info are still available for
-older applications, but it is suggested that applications use the new
-interfaces if at all possible.
+functions) was developed.
 
-Applications that do make direct access to the members of png_struct (except
-for png_ptr->jmpbuf) must be recompiled whenever the library is updated,
-and applications that make direct access to the members of png_info must
-be recompiled if they were compiled or loaded with libpng version 1.0.6,
-in which the members were in a different order.  In version 1.0.7, the
-members of the png_info structure reverted to the old order, as they were
-in versions 0.97c through 1.0.5.  Starting with version 2.0.0, both
-structures are going to be hidden, and the contents of the structures will
-only be accessible through the png_get/png_set functions.
+The png_struct structure is the object used by the library to decode a
+single image.  As of 1.5.0 this structure is also not exposed.
+
+Almost all libpng APIs require a pointer to a png_struct as the first argument.
+Many (in particular the png_set and png_get APIs) also require a pointer
+to png_info as the second argument.  Some application visible macros
+defined in png.h designed for basic data access (reading and writing
+integers in the PNG format) break this rule, but it's almost always safe
+to assume that a (png_struct*) has to be passed to call an API function.
 
 The png.h header file is an invaluable reference for programming with libpng.
 And while I'm on the topic, make sure you include the libpng header file:
 
 #include <png.h>
+
+.SS Types
+
+The png.h header file defines a number of integral types used by the
+APIs.  Most of these are fairly obvious; for example types corresponding
+to integers of particular sizes and types for passing color values.
+
+One exception is how non-integral numbers are handled.  For application
+convenience most APIs that take such numbers have C (double) arguments,
+however internally PNG, and libpng, use 32 bit signed integers and encode
+the value by multiplying by 100,000.  As of libpng 1.5.0 a convenience
+macro PNG_FP_1 is defined in png.h along with a type (png_fixed_point)
+which is simply (png_int_32).
+
+All APIs that take (double) arguments also have an matching API that
+takes the corresponding fixed point integer arguments.  The fixed point
+API has the same name as the floating point one with _fixed appended.
+The actual range of values permitted in the APIs is frequently less than
+the full range of (png_fixed_point) (-21474 to +21474).  When APIs require
+a non-negative argument the type is recorded as png_uint_32 above.  Consult
+the header file and the text below for more information.
+
+.SS Configuration
+
+The main header file function declarations are frequently protected by C
+preprocessing directives of the form:
+
+    #ifdef PNG_feature_SUPPORTED
+    declare-function
+    #endif
+
+The library can be built without support for these APIs, although a
+standard build will have all implemented APIs.  Application programs
+should check the feature macros before using an API for maximum
+portability.  From libpng 1.5.0 the feature macros set during the build
+of libpng are recorded in the header file "pnglibconf.h" and this file
+is always included by png.h.
 
 .SH III. Reading
 
@@ -1941,7 +2037,8 @@ a slightly smaller exponent is better.
            guess for Mac systems */
    }
 
-The png_set_gamma() function handles gamma transformations of the data.
+The functions png_set_gamma() and its fixed point equivalent
+png_set_gamma_fixed() handle gamma transformations of the data.
 Pass both the file gamma and the current screen_gamma.  If the file does
 not have a gamma value, you can pass one anyway if you have an idea what
 it is (usually 0.45455 is a good guess for GIF images on PCs).  Note
@@ -2145,6 +2242,26 @@ while the sixth pass will be 1/2 as wide and 1/2 as high as the original
 wide as the original, and 1/2 as high, containing all of the odd
 numbered scanlines.  Phew!
 
+If you want to retrieve the separate images you must pass the correct
+number of rows to each successive call of png_read_rows().
+Calculating the number isn't quite as straightforward as the previous
+paragraph might suggest; think about what happens with an image with a odd
+number of rows, which passes get the extra row?  To help you libpng 1.5.0
+implements a function to return the number of rows and columns in the current
+pass:
+
+    int number_of_rows = png_get_num_rows(png_ptr);
+    int number_of_cols = png_get_num_cols(png_ptr);
+
+Simply call that before each call to png_read_rows().  You must call
+png_start_read_image() (or png_read_update_info) before the first call to
+ensure that the number libpng holds internally has been updated.
+
+For very small interlaced images the number of rows or columns in a pass
+can be zero.
+You don't need to call png_read_rows() in this case, libpng will simply
+skip to the next pass.
+
 If you want libpng to expand the images, call this before calling
 png_start_read_image() or png_read_update_info():
 
@@ -2156,6 +2273,14 @@ This will return the number of passes needed.  Currently, this
 is seven, but may change if another interlace type is added.
 This function can be called even if the file is not interlaced,
 where it will return one pass.
+
+If you need to get the number of passes later (for example after the call
+to png_start_read_image()) just call:
+
+    number_of_passes = png_get_num_passes(png_ptr);
+
+This function just returns the number - it doesn't make any changes to the
+libpng state.
 
 If you are not going to display the image after each pass, but are
 going to wait until the entire image is read in, use the sparkle
@@ -3318,9 +3443,11 @@ these functions, call the appropriate png_set_*_fn() function.
 
 Memory allocation is done through the functions png_malloc(), png_calloc(),
 and png_free().  These currently just call the standard C functions.
-png_calloc() calls png_malloc() and then png_memset() to clear the newly
-allocated memory to zero.  If your pointers can't access more then 64K
-at a time, you will want to set MAXSEG_64K in zlib.h.  Since it is
+png_calloc() calls png_malloc() and then clears the newly
+allocated memory to zero.  There is limited support for certain systems
+with segmented memory architectures and the types of pointers declared by
+png.h match this; you will have to use appropriate pointers in your
+application.  Since it is
 unlikely that the method of handling memory allocation on a platform
 will change between applications, these functions must be modified in
 the library at compile time.  If you prefer to use a different method
@@ -3907,8 +4034,8 @@ png_get_mmx_bitdepth_threshold(), png_get_mmx_rowbytes_threshold(),
 png_set_asm_flags(), and png_mmx_supported()
 
 We removed the obsolete png_check_sig(), png_memcpy_check(), and
-png_memset_check() functions.  Instead use !png_sig_cmp(), png_memcpy(),
-and png_memset(), respectively.
+png_memset_check() functions.  Instead use !png_sig_cmp(), memcpy(),
+and memset(), respectively.
 
 The function png_set_gray_1_2_4_to_8() was removed. It has been
 deprecated since libpng-1.0.18 and 1.2.9, when it was replaced with
@@ -3923,7 +4050,7 @@ to
 This also applies to the prototype for the user replacement malloc_fn().
 
 The png_calloc() function was added and is used in place of
-of "png_malloc(); png_memset();" except in the case in png_read_png()
+of "png_malloc(); memset();" except in the case in png_read_png()
 where the array consists of pointers; in this case a "for" loop is used
 after the png_malloc() to set the pointers to NULL, to give robust.
 behavior in case the application runs out of memory part-way through
@@ -4090,7 +4217,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIII. Y2K Compliance in libpng
 
-July 29, 2010
+July 30, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -4332,7 +4459,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.5.0beta36 - July 29, 2010:
+Libpng version 1.5.0beta36 - July 30, 2010:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4355,7 +4482,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.5.0beta36, July 29, 2010, are
+libpng versions 1.2.6, August 15, 2004, through 1.5.0beta36, July 30, 2010, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4454,7 +4581,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-July 29, 2010
+July 30, 2010
 
 .\" end of man page
 

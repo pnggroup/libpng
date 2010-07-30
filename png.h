@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.0beta36 - July 29, 2010
+ * libpng version 1.5.0beta36 - July 30, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.0beta36 - July 29, 2010: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.0beta36 - July 30, 2010: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -172,7 +172,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta36, July 29, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta36, July 30, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -284,7 +284,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 29, 2010
+ *    July 30, 2010
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -348,7 +348,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.0beta36"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.0beta36 - July 29, 2010\n"
+     " libpng version 1.5.0beta36 - July 30, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1092,6 +1092,7 @@ PNG_EXPORT(int,png_set_interlace_handling,(png_structp png_ptr),,45);
  */
 PNG_EXPORT(int,png_get_num_passes,(png_structp png_ptr),,215);
 PNG_EXPORT(png_uint_32,png_get_num_rows,(png_structp png_ptr),,216);
+PNG_EXPORT(png_uint_32,png_get_num_cols,(png_structp png_ptr),,218);
 #endif
 
 #if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
@@ -2055,7 +2056,7 @@ PNG_EXPORT(void,png_save_uint_16,(png_bytep buf, unsigned int i),,207);
  * use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(217);
+  PNG_EXPORT_LAST_ORDINAL(218);
 #endif
 
 #ifdef __cplusplus

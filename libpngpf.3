@@ -1,4 +1,4 @@
-.TH LIBPNGPF 3 "July 29, 2010"
+.TH LIBPNGPF 3 "July 30, 2010"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 (private functions)
@@ -7,9 +7,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 
 \fI\fB
 
-\fBvoid png_64bit_product (long \fP\fIv1\fP\fB, long \fP\fIv2\fP\fB, unsigned long \fI*hi_product,
+\fBvoid png_64bit_product (long \fP\fIv1\fP\fB, long \fP\fIv2\fP\fB, unsigned long \fP\fI*hi_product\fP\fB, unsigned long \fI*lo_product\fP\fB);\fP
 
-\fBunsigned long \fI*lo_product\fP\fB);\fP
+\fI\fB
+
+\fI\fB
+
+\fBvoid png_ascii_from_fp (png_structp \fP\fIpng_ptr\fP\fB, png_charp \fP\fIascii\fP\fB, png_size_t \fP\fIsize\fP\fB, double \fP\fIfp\fP\fB, unsigned \fIprecision\fP\fB);\fP
+
+\fI\fB
 
 \fI\fB
 
@@ -38,6 +44,30 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 \fI\fB
 
 \fBvoid png_check_chunk_name (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIchunk_name\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fBint png_check_fp_number (png_charp \fP\fIstring\fP\fB, png_size_t \fP\fIsize\fP\fB, int* \fP\fIstatep\fP\fB, png_size_tp \fIwhereami\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fBint png_check_fp_string (png_charp \fP\fIstring\fP\fB, png_size_t \fIsize\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
 
 \fI\fB
 
@@ -281,13 +311,63 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 
 \fI\fB
 
-\fBvoid *png_far_to_near (png_structp png_ptr,png_voidp \fP\fIptr\fP\fB, int \fIcheck\fP\fB);\fP
+\fBvoid *png_far_to_near (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIptr\fP\fB, int \fIcheck\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fBvoid png_fixed_error (png_structp \fP\fIpng_ptr\fP\fB, \fIpng_const_charp
+
+\fBname, double \fIvalue\fP\fB);\fP
 
 \fI\fB
 
 \fI\fB
 
 \fBvoid png_flush (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fBint png_gamma_significant (png_fixed_point \fIgamma\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fBpng_uint_16 png_gamma_16bit_correct (png_structp \fP\fIpng_ptr\fP\fB, unsigned \fP\fIvalue\fP\fB, png_fixed_point \fIgamma\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fBpng_byte png_gamma_8bit_correct (png_structp \fP\fIpng_ptr\fP\fB, unsigned \fP\fIvalue\fP\fB, png_fixed_point \fIgamma\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
 
 \fI\fB
 
@@ -432,6 +512,30 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 \fI\fB
 
 \fBvoid png_init_read_transformations (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fBint png_muldiv (png_fixed_point_p \fP\fIres\fP\fB, png_fixed_point \fP\fIa\fP\fB, png_int_32 \fP\fItimes\fP\fB, png_int_32 \fIdiv\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fBpng_fixed_point png_muldiv_warn (png_structp \fP\fIpng_ptr\fP\fB, png_fixed_point \fP\fIa\fP\fB, png_int_32 \fP\fItimes\fP\fB, png_int_32 \fIdiv\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
 
 \fI\fB
 
@@ -596,6 +700,30 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.0beta36
 \fI\fB
 
 \fBvoid png_read_transform_info (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fBpng_fixed_point png_reciprocal (png_fixed_point \fIa\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
+
+\fBpng_fixed_point png_reciprocal2 (png_fixed_point \fP\fIa\fP\fB, png_fixed_point \fIb\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fI\fB
 
 \fI\fB
 
@@ -812,7 +940,7 @@ The functions listed above are used privately by libpng
 and are not recommended for use by applications.  They are
 not "exported" to applications using shared libraries.  They
 are listed alphabetically here as an aid to libpng maintainers.
-See png.h for more information on these functions.
+See pngpriv.h for more information on these functions.
 
 .SH SEE ALSO
 .BR "png"(5), " libpng"(3), " zlib"(3), " deflate"(5), " " and " zlib"(5)

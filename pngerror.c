@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.0 [July 29, 2010]
+ * Last changed in libpng 1.5.0 [July 30, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -256,7 +256,7 @@ png_fixed_error(png_structp png_ptr, png_const_charp name, double value)
    msg[fixed_message_ln + iin] = 0;
    /* To discover 'value' put a breakpoint here: */
    png_error(png_ptr, msg);
-   value = value; png_ptr = png_ptr; /* Quiet the compiler */
+   value = value; /* Quiet the compiler */
 }
 #endif
 #endif
