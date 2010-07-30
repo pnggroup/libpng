@@ -2023,8 +2023,8 @@ PNG_EXPORT(png_bytep,png_get_io_chunk_name,(png_structp png_ptr),,200);
       ((png_uint_32)(*((buf) + 1))))
 #  define png_get_int_32(buf) \
      ((png_int_32)((*(buf) & 0x80) \
-      ? -((png_get_uint_32(buf) ^ 0xffffffff)+1) \
-      : png_get_uint_32(buf)))
+      ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffff)+1)) \
+      : (png_int_32)png_get_uint_32(buf)))
 #endif
 
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED

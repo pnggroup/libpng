@@ -2793,7 +2793,8 @@ version 1.5.0beta36 [July 29, 2010]
     negative numbers.
 
 version 1.5.0beta37 [July 30, 2010]
-  Added a typecast in png_get_int_32() to avoid compiler warning.
+  Added a typecast in png_get_int_32() in png.h and pngrutil.h to avoid
+    a compiler warning.
   Replaced oFFs 0,0 with oFFs -10,20 in pngtest.png
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
