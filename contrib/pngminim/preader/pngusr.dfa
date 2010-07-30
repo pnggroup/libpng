@@ -15,6 +15,7 @@ option PROGRESSIVE_READ on
 # You may choose fixed or floating point APIs:
 # option FLOATING_POINT on
 option FIXED_POINT on
+
 # You must chose the internal fixed point implementation or to
 # use the system floating point.  The latter is considerably
 # smaller (by about 1kbyte on an x86 system):
