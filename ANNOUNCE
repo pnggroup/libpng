@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta37 - July 30, 2010
+Libpng 1.5.0beta38 - July 30, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta37.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta37.tar.gz
-   1.5.0beta37.tar.bz2
+   1.5.0beta38.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta38.tar.gz
+   1.5.0beta38.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b37.zip
-   lp150b37.7z
+   lp150b38.zip
+   lp150b38.7z
 
 Other information:
 
-   1.5.0beta37-README.txt
-   1.5.0beta37-LICENSE.txt
+   1.5.0beta38-README.txt
+   1.5.0beta38-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -314,6 +314,8 @@ version 1.5.0beta37 [July 30, 2010]
   Added a typecast in png_get_int_32() in png.h and pngrutil.h to avoid
     a compiler warning.
   Replaced oFFs 0,0 with oFFs -10,20 in pngtest.png
+
+version 1.5.0beta38 [July 30, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

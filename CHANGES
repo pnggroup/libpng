@@ -2797,6 +2797,8 @@ version 1.5.0beta37 [July 30, 2010]
     a compiler warning.
   Replaced oFFs 0,0 with oFFs -10,20 in pngtest.png
 
+version 1.5.0beta38 [July 30, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
