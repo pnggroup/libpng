@@ -1155,10 +1155,16 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
         	* that the final digit is rounded.
         	*/
                if (cdigits+czero-clead+1 < (int)precision)
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
         	  fp = modf(fp, &d);
+#else
+               {
+        	  d = (double)((int)(fp));
+                  fp -= d;
+               }
+#endif
                else
                {
-        	  /* End of loop - round the whole number. */
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
         	  d = floor(fp + .5);
 #else
