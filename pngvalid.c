@@ -43,7 +43,7 @@ static size_t safecatn(char *buffer, size_t bufsize, size_t pos, int n)
 }
 
 static size_t safecatd(char *buffer, size_t bufsize, size_t pos, double d,
-   int precision)
+    int precision)
 {
    char number[64];
    sprintf(number, "%.*f", precision, d);
@@ -112,7 +112,7 @@ next_format(png_bytep colour_type, png_bytep bit_depth)
 
 static inline unsigned
 sample(png_byte *row, png_byte colour_type, png_byte bit_depth, png_uint_32 x,
-   unsigned sample)
+    unsigned sample)
 {
    png_uint_32 index, result;
    
@@ -139,28 +139,28 @@ sample(png_byte *row, png_byte colour_type, png_byte bit_depth, png_uint_32 x,
 }
 
 /*************************** BASIC PNG FILE WRITING ***************************/
-/* A png_sucker takes data from the sequential writer or provides data
+/* A png_store takes data from the sequential writer or provides data
  * to the sequential reader.  It can also store the result of a PNG
  * write for later retrieval.
  */
-#define SUCKER_BUFFER_SIZE 500 /* arbitrary */
-typedef struct png_sucker_buffer
+#define STORE_BUFFER_SIZE 500 /* arbitrary */
+typedef struct png_store_buffer
 {
-   struct png_sucker_buffer* prev;    /* NOTE: stored in reverse order */
-   png_byte                  buffer[SUCKER_BUFFER_SIZE];
-} png_sucker_buffer;
+   struct png_store_buffer*  prev;    /* NOTE: stored in reverse order */
+   png_byte                  buffer[STORE_BUFFER_SIZE];
+} png_store_buffer;
 
-typedef struct png_sucker_file
+typedef struct png_store_file
 {
-   struct png_sucker_file* next;      /* as many as you like... */
+   struct png_store_file*  next;      /* as many as you like... */
    char                    name[64];  /* textual name */
    png_uint_32             id;        /* as a convenience to users */
    png_size_t              datacount; /* In this (the last) buffer */
-   png_sucker_buffer       data;      /* Last buffer in file */
-} png_sucker_file;
+   png_store_buffer        data;      /* Last buffer in file */
+} png_store_file;
 
-#define SUCKER_ERROR 0x345
-typedef struct png_sucker
+#define STORE_ERROR 0x345
+typedef struct png_store
 {
    jmp_buf            jmpbuf;
    int                verbose;
@@ -172,21 +172,21 @@ typedef struct png_sucker
    /* Read fields */
    png_structp        pread;    /* Used to read a saved file */
    png_infop          piread;
-   png_sucker_file*   current;  /* Set when reading */
-   png_sucker_buffer* next;     /* Set when reading */
+   png_store_file*    current;  /* Set when reading */
+   png_store_buffer*  next;     /* Set when reading */
    png_size_t         readpos;  /* Position in *next */
    /* Write fields */
-   png_sucker_file*   saved;
+   png_store_file*    saved;
    png_structp        pwrite;   /* Used when writing a new file */
    png_infop          piwrite;
    png_size_t         writepos; /* Position in .new */
    char               wname[64];/* Name of file being written */
-   png_sucker_buffer  new;      /* The end of the new PNG file being written. */
-} png_sucker;
+   png_store_buffer   new;      /* The end of the new PNG file being written. */
+} png_store;
 
 /* Initialization and cleanup */
 static void
-sucker_init(png_sucker* ps)
+store_init(png_store* ps)
 {
    memset(ps, 0, sizeof *ps);
    ps->verbose = 0;
@@ -204,28 +204,28 @@ sucker_init(png_sucker* ps)
 }
 
 static void
-sucker_freebuffer(png_sucker_buffer* psb)
+store_freebuffer(png_store_buffer* psb)
 {
    if (psb->prev)
    {
-      sucker_freebuffer(psb->prev);
+      store_freebuffer(psb->prev);
       free(psb->prev);
       psb->prev = NULL;
    }
 }
 
 static void
-sucker_freenew(png_sucker *ps)
+store_freenew(png_store *ps)
 {
-   sucker_freebuffer(&ps->new);
+   store_freebuffer(&ps->new);
    ps->writepos = 0;
 }
 
 static void
-sucker_storenew(png_sucker *ps)
+store_storenew(png_store *ps)
 {
-   png_sucker_buffer *pb;
-   if (ps->writepos != SUCKER_BUFFER_SIZE)
+   png_store_buffer *pb;
+   if (ps->writepos != STORE_BUFFER_SIZE)
       png_error(ps->pwrite, "invalid store call");
    pb = malloc(sizeof *pb);
    if (pb == NULL)
@@ -236,23 +236,23 @@ sucker_storenew(png_sucker *ps)
 }
 
 static void
-sucker_freefile(png_sucker_file *pf)
+store_freefile(png_store_file *pf)
 {
    if (pf->next)
-      sucker_freefile(pf->next);
+      store_freefile(pf->next);
    pf->next = NULL;
-   sucker_freebuffer(&pf->data);
+   store_freebuffer(&pf->data);
    pf->datacount = 0;
    free(pf);
 }
 
 /* Main interface to file storeage, after writing a new PNG file (see the API
- * below) call sucker_storefile to store the result with the given name and id.
+ * below) call store_storefile to store the result with the given name and id.
  */
 static void
-sucker_storefile(png_sucker *ps, png_uint_32 id)
+store_storefile(png_store *ps, png_uint_32 id)
 {
-   png_sucker_file *pf = malloc(sizeof *pf);
+   png_store_file *pf = malloc(sizeof *pf);
    if (pf == NULL)
       png_error(ps->pwrite, "storefile: OOM");
    safecat(pf->name, sizeof pf->name, 0, ps->wname);
@@ -269,10 +269,10 @@ sucker_storefile(png_sucker *ps, png_uint_32 id)
 
 /* Generate an error message (in the given buffer) */
 static size_t
-sucker_message(png_structp pp, char *buffer, size_t bufsize, const char *msg)
+store_message(png_structp pp, char *buffer, size_t bufsize, const char *msg)
 {
    size_t pos = 0;
-   png_sucker *ps = png_get_error_ptr(pp);
+   png_store *ps = png_get_error_ptr(pp);
 
    if (pp == ps->pread)
    {
@@ -304,12 +304,12 @@ sucker_message(png_structp pp, char *buffer, size_t bufsize, const char *msg)
 
 /* Functions to use as PNG callbacks. */
 static void
-sucker_error(png_structp pp, png_const_charp message) /* PNG_NORETURN */
+store_error(png_structp pp, png_const_charp message) /* PNG_NORETURN */
 {
-   png_sucker *ps = png_get_error_ptr(pp);
+   png_store *ps = png_get_error_ptr(pp);
    char buffer[256];
 
-   sucker_message(pp, buffer, sizeof buffer, message);
+   store_message(pp, buffer, sizeof buffer, message);
 
    if (ps->nerrors++ == 0)
       safecat(ps->error, sizeof ps->error, 0, buffer);
@@ -321,16 +321,16 @@ sucker_error(png_structp pp, png_const_charp message) /* PNG_NORETURN */
     * libpng is *not* expected to ever call longjmp, so this is a sanity
     * check.  The code below ensures that libpng gets a copy of our jmp_buf.
     */
-   longjmp(ps->jmpbuf, SUCKER_ERROR);
+   longjmp(ps->jmpbuf, STORE_ERROR);
 }
 
 static void
-sucker_warning(png_structp pp, png_const_charp message)
+store_warning(png_structp pp, png_const_charp message)
 {
-   png_sucker *ps = png_get_error_ptr(pp);
+   png_store *ps = png_get_error_ptr(pp);
    char buffer[256];
 
-   sucker_message(pp, buffer, sizeof buffer, message);
+   store_message(pp, buffer, sizeof buffer, message);
 
    if (ps->nwarnings++ == 0 && ps->nerrors == 0)
       safecat(ps->error, sizeof ps->error, 0, buffer);
@@ -340,21 +340,21 @@ sucker_warning(png_structp pp, png_const_charp message)
 }
 
 static void
-sucker_write(png_structp pp, png_bytep pb, png_size_t st)
+store_write(png_structp pp, png_bytep pb, png_size_t st)
 {
-   png_sucker *ps = png_get_io_ptr(pp);
+   png_store *ps = png_get_io_ptr(pp);
    if (ps->pwrite != pp)
-      png_error(pp, "sucker state damaged");
+      png_error(pp, "store state damaged");
    while (st > 0)
    {
       size_t cb;
 
-      if (ps->writepos >= SUCKER_BUFFER_SIZE)
-         sucker_storenew(ps);
+      if (ps->writepos >= STORE_BUFFER_SIZE)
+         store_storenew(ps);
 
       cb = st;
-      if (cb > SUCKER_BUFFER_SIZE - ps->writepos)
-         cb = SUCKER_BUFFER_SIZE - ps->writepos;
+      if (cb > STORE_BUFFER_SIZE - ps->writepos)
+         cb = STORE_BUFFER_SIZE - ps->writepos;
       memcpy(ps->new.buffer + ps->writepos, pb, cb);
       pb += cb;
       st -= cb;
@@ -363,26 +363,26 @@ sucker_write(png_structp pp, png_bytep pb, png_size_t st)
 }
 
 static void
-sucker_flush(png_structp pp)
+store_flush(png_structp pp)
 {
    /*DOES NOTHING*/
 }
 
 static size_t
-sucker_read_buffer_size(png_sucker *ps)
+store_read_buffer_size(png_store *ps)
 {
    /* Return the bytes available for read in the current buffer. */
    if (ps->next != &ps->current->data)
-      return SUCKER_BUFFER_SIZE;
+      return STORE_BUFFER_SIZE;
 
    return ps->current->datacount;
 }
 
 static int
-sucker_read_buffer_next(png_sucker *ps)
+store_read_buffer_next(png_store *ps)
 {
-   png_sucker_buffer *pbOld = ps->next;
-   png_sucker_buffer *pbNew = &ps->current->data;
+   png_store_buffer *pbOld = ps->next;
+   png_store_buffer *pbNew = &ps->current->data;
    if (pbOld != pbNew)
    {
       while (pbNew != NULL && pbNew->prev != pbOld)
@@ -401,14 +401,14 @@ sucker_read_buffer_next(png_sucker *ps)
 }
 
 static void
-sucker_read(png_structp pp, png_bytep pb, png_size_t st)
+store_read(png_structp pp, png_bytep pb, png_size_t st)
 {
-   png_sucker *ps = png_get_io_ptr(pp);
+   png_store *ps = png_get_io_ptr(pp);
    if (ps->pread != pp || ps->current == NULL || ps->next == NULL)
-      png_error(pp, "sucker state damaged");
+      png_error(pp, "store state damaged");
    while (st > 0)
    {
-      size_t cbAvail = sucker_read_buffer_size(ps) - ps->readpos;
+      size_t cbAvail = store_read_buffer_size(ps) - ps->readpos;
 
       if (cbAvail > 0)
       {
@@ -418,7 +418,7 @@ sucker_read(png_structp pp, png_bytep pb, png_size_t st)
          pb += cbAvail;
          ps->readpos += cbAvail;
       }
-      else if (!sucker_read_buffer_next(ps))
+      else if (!store_read_buffer_next(ps))
          png_error(pp, "read beyond end of file");
    }
 }
@@ -426,7 +426,7 @@ sucker_read(png_structp pp, png_bytep pb, png_size_t st)
 /* Setup functions. */
 /* Cleanup when aborting a write or after storing the new file. */
 static void
-sucker_write_reset(png_sucker *ps)
+store_write_reset(png_store *ps)
 {
    if (ps->pwrite != NULL)
    {
@@ -435,29 +435,29 @@ sucker_write_reset(png_sucker *ps)
       ps->piwrite = NULL;
    }
    
-   sucker_freenew(ps);
+   store_freenew(ps);
 }
 
 /* The following is the main write function, it returns a png_struct and,
  * optionally, a png)info suitable for writiing a new PNG file.  Use
- * sucker_storefile above to record this file after it has been written.  The
- * returned libpng structures as destroyed by sucker_write_reset above.
+ * store_storefile above to record this file after it has been written.  The
+ * returned libpng structures as destroyed by store_write_reset above.
  */
 static png_structp
-set_sucker_for_write(png_sucker *ps, png_infopp ppi, const char name[64])
+set_store_for_write(png_store *ps, png_infopp ppi, const char name[64])
 {
    if (setjmp(ps->jmpbuf) != 0)
       return NULL;
 
    if (ps->pwrite != NULL)
-      png_error(ps->pwrite, "sucker already in use");
+      png_error(ps->pwrite, "store already in use");
 
-   sucker_write_reset(ps);
+   store_write_reset(ps);
    safecat(ps->wname, sizeof ps->wname, 0, name);
 
-   ps->pwrite = png_create_write_struct(PNG_LIBPNG_VER_STRING, ps, sucker_error,
-      sucker_warning);
-   png_set_write_fn(ps->pwrite, ps, sucker_write, sucker_flush);
+   ps->pwrite = png_create_write_struct(PNG_LIBPNG_VER_STRING, ps, store_error,
+      store_warning);
+   png_set_write_fn(ps->pwrite, ps, store_write, store_flush);
 
    if (ppi != NULL)
       *ppi = ps->piwrite = png_create_info_struct(ps->pwrite);
@@ -468,7 +468,7 @@ set_sucker_for_write(png_sucker *ps, png_infopp ppi, const char name[64])
 /* Cleanup when finished reading (either due to error or in the success case. )
  */
 static void
-sucker_read_reset(png_sucker *ps)
+store_read_reset(png_store *ps)
 {
    if (ps->pread != NULL)
    {
@@ -483,9 +483,9 @@ sucker_read_reset(png_sucker *ps)
 }
 
 static void
-sucker_read_set(png_sucker *ps, png_uint_32 id)
+store_read_set(png_store *ps, png_uint_32 id)
 {
-   png_sucker_file *pf = ps->saved;
+   png_store_file *pf = ps->saved;
 
    while (pf != NULL)
    {
@@ -493,7 +493,7 @@ sucker_read_set(png_sucker *ps, png_uint_32 id)
       {
          ps->current = pf;
          ps->next = NULL;
-         sucker_read_buffer_next(ps);
+         store_read_buffer_next(ps);
          return;
       }
 
@@ -506,10 +506,10 @@ sucker_read_set(png_sucker *ps, png_uint_32 id)
 /* The main interface for reading a saved file - pass the id number of the file
  * to retrieve.  Ids must be unique or the earlier file will be hidden.  The API
  * returns a png_struct and, optionally, a png_info.  Both of these will be
- * destroyed by sucker_read_reset above.
+ * destroyed by store_read_reset above.
  */
 static png_structp
-set_sucker_for_read(png_sucker *ps, png_infopp ppi, png_uint_32 id,
+set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
    const char *name)
 {
    safecat(ps->test, sizeof ps->test, 0, name);
@@ -518,14 +518,14 @@ set_sucker_for_read(png_sucker *ps, png_infopp ppi, png_uint_32 id,
       return NULL;
 
    if (ps->pread != NULL)
-      png_error(ps->pread, "sucker already in use");
+      png_error(ps->pread, "store already in use");
 
-   sucker_read_reset(ps);
+   store_read_reset(ps);
 
-   ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps, sucker_error,
-      sucker_warning);
-   sucker_read_set(ps, id);
-   png_set_read_fn(ps->pread, ps, sucker_read);
+   ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps, store_error,
+      store_warning);
+   store_read_set(ps, id);
+   png_set_read_fn(ps->pread, ps, store_read);
 
    if (ppi != NULL)
       *ppi = ps->piread = png_create_info_struct(ps->pread);
@@ -535,16 +535,16 @@ set_sucker_for_read(png_sucker *ps, png_infopp ppi, png_uint_32 id,
 
 /*********************** PNG FILE MODIFICATION ON READ ************************/
 /* Files may be modified on read.  The following structure contains a complete
- * png_sucker together with extra members to handle modification and a special
+ * png_store together with extra members to handle modification and a special
  * read callback for libpng.  To use this the 'modifications' field must be set
  * to a list of png_modification structures that actually perform the
  * modification, otherwise a png_modifier is functionally equivalent to a
- * png_sucker.  There is a special read function, set_modifier_for_read, which
- * replaces set_sucker_for_read.
+ * png_store.  There is a special read function, set_modifier_for_read, which
+ * replaces set_store_for_read.
  */
 typedef struct png_modifier
 {
-   png_sucker               this;            /* I am a png_sucker */
+   png_store               this;             /* I am a png_store */
    struct png_modification *modifications;   /* Changes to make */
    enum modifier_state
    {
@@ -640,7 +640,7 @@ static void
 modifier_init(png_modifier *pm)
 {
    memset(pm, 0, sizeof *pm);
-   sucker_init(&pm->this);
+   store_init(&pm->this);
    pm->modifications = NULL;
    pm->state = modifier_start;
    pm->sbitlow = 1;
@@ -707,7 +707,7 @@ modification_init(png_modification *pmm)
 static void
 modifier_reset(png_modifier *pm)
 {
-   sucker_read_reset(&pm->this);
+   store_read_reset(&pm->this);
    pm->modifications = NULL;
    pm->state = modifier_start;
    pm->bit_depth = pm->colour_type = 0;
@@ -760,7 +760,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
       {
       static png_byte sign[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
       case modifier_start:
-         sucker_read(pp, pm->buffer, 8); /* size of signature. */
+         store_read(pp, pm->buffer, 8); /* size of signature. */
          pm->buffer_count = 8;
          pm->buffer_position = 0;
 
@@ -770,7 +770,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
          break;
 
       case modifier_signature:
-         sucker_read(pp, pm->buffer, 13+12); /* size of IHDR */
+         store_read(pp, pm->buffer, 13+12); /* size of IHDR */
          pm->buffer_count = 13+12;
          pm->buffer_position = 0;
 
@@ -810,7 +810,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
          {
             if (cb > st) cb = st;
             pm->flush -= cb;
-            sucker_read(pp, pb, cb);
+            store_read(pp, pb, cb);
             pb += cb;
             st -= cb;
             if (st <= 0) return;
@@ -827,7 +827,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
             pm->pending_chunk = 0;
          }
          else
-            sucker_read(pp, pm->buffer, 8);
+            store_read(pp, pm->buffer, 8);
 
          pm->buffer_count = 8;
          pm->buffer_position = 0;
@@ -891,8 +891,8 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
           */
          if (len+12 <= sizeof pm->buffer)
          {
-            sucker_read(pp, pm->buffer+pm->buffer_count,
-               len+12-pm->buffer_count);
+            store_read(pp, pm->buffer+pm->buffer_count,
+                len+12-pm->buffer_count);
             pm->buffer_count = len+12;
 
             /* Check for a modification, else leave it be. */
@@ -932,7 +932,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
       }
 
       /* Here to read from the modifier buffer (not directly from
-       * the sucker, as in the flush case above.)
+       * the store, as in the flush case above.)
        */
       cb = pm->buffer_count - pm->buffer_position;
       if (cb > st) cb = st;
@@ -946,9 +946,9 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
 /* Set up a modifier. */
 static png_structp
 set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
-   const char *name)
+    const char *name)
 {
-   png_structp pp = set_sucker_for_read(&pm->this, ppi, id, name);
+   png_structp pp = set_store_for_read(&pm->this, ppi, id, name);
 
    if (pp != NULL)
    {
@@ -968,7 +968,7 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
       }
       else
       {
-         sucker_read_reset(&pm->this);
+         store_read_reset(&pm->this);
          pp = NULL;
       }
    }
@@ -1042,7 +1042,7 @@ standard_height(png_structp pp, png_byte colour_type, png_byte bit_depth)
 
 static void
 standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
-   png_byte bit_depth, png_uint_32 y)
+    png_byte bit_depth, png_uint_32 y)
 {
    png_uint_32 v = y << 7;
    png_uint_32 i = 0;
@@ -1134,7 +1134,7 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
 }
 
 static void
-make_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
+make_standard(png_store* ps, png_byte colour_type, int bdlo, int bdhi)
 {
    for (; bdlo <= bdhi; ++bdlo)
    {
@@ -1153,14 +1153,14 @@ make_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
          pos = safecat(name, sizeof name, pos, colour_types[colour_type]);
 
          /* Get a png_struct for writing the image. */
-         pp = set_sucker_for_write(ps, &pi, name);
+         pp = set_store_for_write(ps, &pi, name);
       }
       if (pp == NULL) return;
 
       /* Do the honourable write stuff, protected by a local setjmp */
       if (setjmp(ps->jmpbuf) != 0)
       {
-         sucker_write_reset(ps);
+         store_write_reset(ps);
          continue;
       }
 
@@ -1193,14 +1193,14 @@ make_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
       png_write_end(pp, pi);
 
       /* And store this under the appropriate id, then clean up. */
-      sucker_storefile(ps, FILEID(colour_type, bit_depth));
+      store_storefile(ps, FILEID(colour_type, bit_depth));
 
-      sucker_write_reset(ps);
+      store_write_reset(ps);
    }
 }
 
 static void
-make_standard_images(png_sucker *ps)
+make_standard_images(png_store *ps)
 {
    /* Arguments are colour_type, low bit depth, high bit depth */
    make_standard(ps, 0, 0, 4);
@@ -1212,7 +1212,7 @@ make_standard_images(png_sucker *ps)
 
 /* Tests - individual test cases */
 static void
-test_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
+test_standard(png_store* ps, png_byte colour_type, int bdlo, int bdhi)
 {
    for (; bdlo <= bdhi; ++bdlo)
    {
@@ -1223,14 +1223,14 @@ test_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
       png_infop pi;
 
       /* Get a png_struct for writing the image. */
-      pp = set_sucker_for_read(ps, &pi, FILEID(colour_type, bit_depth),
+      pp = set_store_for_read(ps, &pi, FILEID(colour_type, bit_depth),
          "standard");
       if (pp == NULL) return;
 
       /* Do the honourable write stuff, protected by a local setjmp */
       if (setjmp(ps->jmpbuf) != 0)
       {
-         sucker_read_reset(ps);
+         store_read_reset(ps);
          continue;
       }
 
@@ -1306,7 +1306,7 @@ test_standard(png_sucker* ps, png_byte colour_type, int bdlo, int bdhi)
 
       png_read_end(pp, pi);
 
-      sucker_read_reset(ps);
+      store_read_reset(ps);
    }
 }
 
@@ -1328,7 +1328,7 @@ perform_standard_test(png_modifier *pm)
 /********************************* GAMMA TESTS ********************************/
 /* Gamma test images. */
 static void
-make_gamma_images(png_sucker *ps)
+make_gamma_images(png_store *ps)
 {
    /* Do nothing - the standard greyscale images are used. */
 }
@@ -1460,9 +1460,9 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
  */
 static void
 gamma_test(png_modifier *pm, const png_byte colour_type,
-   const png_byte bit_depth, const double file_gamma, const double screen_gamma,
-   const png_byte sbit, const int threshold_test, const char *name,
-   const int speed, const int use_input_precision, const int strip16)
+    const png_byte bit_depth, const double file_gamma, const double screen_gamma,
+    const png_byte sbit, const int threshold_test, const char *name,
+    const int speed, const int use_input_precision, const int strip16)
 {
    png_structp pp;
    png_infop pi;
@@ -1754,7 +1754,7 @@ gamma_test(png_modifier *pm, const png_byte colour_type,
 }
 
 static void gamma_threshold_test(png_modifier *pm, png_byte colour_type,
-   png_byte bit_depth, double file_gamma, double screen_gamma)
+    png_byte bit_depth, double file_gamma, double screen_gamma)
 {
    size_t pos = 0;
    char name[64];
@@ -1789,9 +1789,9 @@ perform_gamma_threshold_tests(png_modifier *pm)
 }
 
 static void gamma_transform_test(png_modifier *pm, const png_byte colour_type,
-   const png_byte bit_depth, const double file_gamma, const double screen_gamma,
-   const png_byte sbit, const int speed, const int use_input_precision,
-   const int strip16)
+    const png_byte bit_depth, const double file_gamma, const double screen_gamma,
+    const png_byte sbit, const int speed, const int use_input_precision,
+    const int strip16)
 {
    size_t pos = 0;
    char name[64];
