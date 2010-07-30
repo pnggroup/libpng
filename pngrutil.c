@@ -77,11 +77,11 @@ png_int_32 (PNGAPI
 png_get_int_32)(png_bytep buf)
 {
    png_uint_32 u = png_get_uint_32(buf);
-   if ((u & 0x80000000) == 0) /* negative */
+   if ((u & 0x80000000) == 0) /* non-negative */
       return u;
 
    u = (u ^ 0xffffffff) + 1;  /* 2's complement: -x = ~x+1 */
-   return -u;
+   return -(png_int_32)u;
 }
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */

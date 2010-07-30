@@ -307,8 +307,11 @@ version 1.5.0beta36 [July 29, 2010]
     converting the values to the fixed point form used in the PNG file.
   The standard headers no longer include zlib.h, which is currently only
     required for pngstruct.h and can therefore be internal.
+  Revised png_get_int_32 to undo the PNG two's complement representation of
+    negative numbers.
 
 version 1.5.0beta37 [July 30, 2010]
+  Added a typecast in png_get_int_32() to avoid compiler warning.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
