@@ -90,7 +90,6 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LIBADD =
 am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =  \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-png.lo \
-	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.lo \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.lo \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngget.lo \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngmem.lo \
@@ -322,7 +321,7 @@ bin_SCRIPTS = @binconfigs@
 # rules to build libpng, only build the old library on request
 lib_LTLIBRARIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # EXTRA_LTLIBRARIES= libpng.la
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngarith.c pngerror.c\
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	pngget.c pngmem.c pngpread.c pngread.c pngrio.c pngrtran.c pngrutil.c\
 	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
 	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h
@@ -511,7 +510,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-png.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngmem.Plo@am__quote@
@@ -556,13 +554,6 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-png.lo: png.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='png.c' object='libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-png.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-png.lo `test -f 'png.c' || echo '$(srcdir)/'`png.c
-
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.lo: pngarith.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.lo -MD -MP -MF $(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.Tpo -c -o libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.lo `test -f 'pngarith.c' || echo '$(srcdir)/'`pngarith.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.Tpo $(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pngarith.c' object='libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngarith.lo `test -f 'pngarith.c' || echo '$(srcdir)/'`pngarith.c
 
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.lo: pngerror.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.lo -MD -MP -MF $(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.Tpo -c -o libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.lo `test -f 'pngerror.c' || echo '$(srcdir)/'`pngerror.c
