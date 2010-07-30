@@ -1,4 +1,4 @@
-/* libpng-1.5.0beta36 STANDARD API DEFINITION */
+/* libpng-1.5.0beta37 STANDARD API DEFINITION */
 /* pnglibconf.h - library build configuration */
 
 /* last changed in libpng version 1.5.0 - July 30, 2010 */

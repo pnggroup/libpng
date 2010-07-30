@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta36 - July 30, 2010
+Libpng 1.5.0beta37 - July 30, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta36.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta36.tar.gz
-   1.5.0beta36.tar.bz2
+   1.5.0beta37.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta37.tar.gz
+   1.5.0beta37.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b36.zip
-   lp150b36.7z
+   lp150b37.zip
+   lp150b37.7z
 
 Other information:
 
-   1.5.0beta36-README.txt
-   1.5.0beta36-LICENSE.txt
+   1.5.0beta37-README.txt
+   1.5.0beta37-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -307,6 +307,8 @@ version 1.5.0beta36 [July 29, 2010]
     converting the values to the fixed point form used in the PNG file.
   The standard headers no longer include zlib.h, which is currently only
     required for pngstruct.h and can therefore be internal.
+
+version 1.5.0beta37 [July 30, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

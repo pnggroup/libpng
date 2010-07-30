@@ -2790,6 +2790,8 @@ version 1.5.0beta36 [July 29, 2010]
   The standard headers no longer include zlib.h, which is currently only
     required for pngstruct.h and can therefore be internal.
 
+version 1.5.0beta37 [July 30, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
