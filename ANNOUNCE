@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta38 - July 31, 2010
+Libpng 1.5.0beta39 - July 31, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta38.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta38.tar.gz
-   1.5.0beta38.tar.bz2
+   1.5.0beta39.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta39.tar.gz
+   1.5.0beta39.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b38.zip
-   lp150b38.7z
+   lp150b39.zip
+   lp150b39.7z
 
 Other information:
 
-   1.5.0beta38-README.txt
-   1.5.0beta38-LICENSE.txt
+   1.5.0beta39-README.txt
+   1.5.0beta39-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -323,6 +323,8 @@ version 1.5.0beta38 [July 31, 2010]
     build does not include such a thing.
   Revised png_get_int_16() to be similar to png_get_int_32().
   Restored projects/visualc71.
+
+version 1.5.0beta39 [July 31, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
