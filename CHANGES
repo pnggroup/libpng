@@ -2804,6 +2804,7 @@ version 1.5.0beta38 [July 31, 2010]
     VStudio release library project because the latest zlib Official Windows
     build does not include such a thing.
   Revised png_get_int_16() to be similar to png_get_int_32().
+  Restored projects/visualc71.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
