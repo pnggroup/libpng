@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [July 30, 2010]
+ * Last changed in libpng 1.4.1 [July 31, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -3074,8 +3074,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
       }
       default:
          png_error(png_ptr, "Ignoring bad adaptive filter type");
-         *row = 0;
-         break;
+	 /*NOT REACHED */
+	 break;
    }
 }
 

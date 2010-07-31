@@ -2797,7 +2797,12 @@ version 1.5.0beta37 [July 30, 2010]
     a compiler warning.
   Replaced oFFs 0,0 with oFFs -10,20 in pngtest.png
 
-version 1.5.0beta38 [July 30, 2010]
+version 1.5.0beta38 [July 31, 2010]
+  Implemented remaining "_fixed" functions.
+  Corrected a number of recently introduced warnings mostly resulting from
+    safe but uncast assignments to shorter integers.  Also added a zlib
+    VStudio release library project because the latest zlib Official Windows
+    build does not include such a thing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

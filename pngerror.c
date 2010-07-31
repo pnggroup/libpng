@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.0 [July 30, 2010]
+ * Last changed in libpng 1.5.0 [July 31, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -240,7 +240,7 @@ png_chunk_benign_error(png_structp png_ptr, png_const_charp error_message)
 #ifdef PNG_ERROR_TEXT_SUPPORTED
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void
-png_fixed_error(png_structp png_ptr, png_const_charp name, double value)
+png_fixed_error(png_structp png_ptr, png_const_charp name)
 {
 #  define fixed_message "fixed point overflow in "
 #  define fixed_message_ln ((sizeof fixed_message)-1)
@@ -254,9 +254,7 @@ png_fixed_error(png_structp png_ptr, png_const_charp name, double value)
       ++iin;
    }
    msg[fixed_message_ln + iin] = 0;
-   /* To discover 'value' put a breakpoint here: */
    png_error(png_ptr, msg);
-   value = value; /* Quiet the compiler */
 }
 #endif
 #endif

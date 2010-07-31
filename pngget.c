@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.4.1 [July 30, 2010]
+ * Last changed in libpng 1.4.1 [July 31, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -182,7 +182,7 @@ float PNGAPI
 png_get_pixel_aspect_ratio(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
-#ifdef PNG_pHYs_SUPPORTED
+#ifdef PNG_READ_pHYs_SUPPORTED
 
    if (info_ptr->valid & PNG_INFO_pHYs)
    {
@@ -199,6 +199,27 @@ png_get_pixel_aspect_ratio(png_structp png_ptr, png_infop info_ptr)
       return (0.0);
 #endif
    return ((float)0.0);
+}
+#endif
+
+#ifdef PNG_FIXED_POINT_SUPPORTED
+png_fixed_point PNGAPI
+png_get_pixel_aspect_ratio_fixed(png_structp png_ptr, png_infop info_ptr)
+{
+#ifdef PNG_READ_pHYs_SUPPORTED
+   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs)
+       && info_ptr->x_pixels_per_unit > 0 && info_ptr->y_pixels_per_unit > 0)
+   {
+      png_fixed_point res;
+
+      png_debug1(1, "in %s retrieval function", "png_get_aspect_ratio_fixed");
+
+      if (png_muldiv(&res, info_ptr->y_pixels_per_unit, PNG_FP_1,
+          info_ptr->x_pixels_per_unit))
+	 return res;
+   }
+#endif
+   return 0;
 }
 #endif
 
@@ -728,6 +749,7 @@ png_get_pCAL(png_structp png_ptr, png_infop info_ptr,
 
 #ifdef PNG_sCAL_SUPPORTED
 #ifdef PNG_FIXED_POINT_SUPPORTED
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
 png_uint_32 PNGAPI
 png_get_sCAL_fixed(png_structp png_ptr, png_infop info_ptr,
     int *unit, png_fixed_point *width, png_fixed_point *height)
@@ -736,7 +758,7 @@ png_get_sCAL_fixed(png_structp png_ptr, png_infop info_ptr,
        (info_ptr->valid & PNG_INFO_sCAL))
    {
       *unit = info_ptr->scal_unit;
-      /*TODO: make this work */
+      /*TODO: make this work without FP support */
       *width = png_fixed(png_ptr, atof(info_ptr->scal_s_width), "sCAL width");
       *height = png_fixed(png_ptr, atof(info_ptr->scal_s_height),
          "sCAL height");
@@ -745,7 +767,8 @@ png_get_sCAL_fixed(png_structp png_ptr, png_infop info_ptr,
 
    return(0);
 }
-#endif
+#endif /*FLOATING_ARITHMETIC*/
+#endif /*FIXED_POINT*/
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 png_uint_32 PNGAPI
 png_get_sCAL(png_structp png_ptr, png_infop info_ptr,

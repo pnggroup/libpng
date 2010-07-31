@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta38 - July 30, 2010
+Libpng 1.5.0beta38 - July 31, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -226,7 +226,7 @@ version 1.5.0beta24 [May 7, 2010]
     offset of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
   Added more blank lines for readability.
 
-version 1.5.0beta25 [July 30, 2010]
+version 1.5.0beta25 [July 31, 2010]
   In pngpread.c: png_push_have_row() add check for new_row > height
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
@@ -315,7 +315,12 @@ version 1.5.0beta37 [July 30, 2010]
     a compiler warning.
   Replaced oFFs 0,0 with oFFs -10,20 in pngtest.png
 
-version 1.5.0beta38 [July 30, 2010]
+version 1.5.0beta38 [July 31, 2010]
+  Implemented remaining "_fixed" functions.
+  Corrected a number of recently introduced warnings mostly resulting from
+    safe but uncast assignments to shorter integers.  Also added a zlib
+    VStudio release library project because the latest zlib Official Windows
+    build does not include such a thing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version PNGLIB_VERSION - last changed on July 30, 2010
+com libpng version PNGLIB_VERSION - last changed on July 31, 2010
 com
 com Copyright (c) 1998-2010 Glenn Randers-Pehrson
 com
@@ -338,7 +338,7 @@ option WRITE_INTERLACING requires WRITE
 
 # The following depends, internally, on WEIGHT_SHIFT and COST_SHIFT
 # where are set below.
-option WRITE_WEIGHTED_FILTER requires WRITE FLOATING_POINT
+option WRITE_WEIGHTED_FILTER requires WRITE
 
 option WRITE_FLUSH requires WRITE
 

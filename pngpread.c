@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.5.0 [July 30, 2010]
+ * Last changed in libpng 1.5.0 [July 31, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1212,8 +1212,9 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
-         png_error(png_ptr, "Out of place tEXt");
          info_ptr = info_ptr; /* To quiet some compiler warnings */
+         png_error(png_ptr, "Out of place tEXt");
+	 /*NOT REACHED*/
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1308,8 +1309,9 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
    {
-      png_error(png_ptr, "Out of place zTXt");
       info_ptr = info_ptr; /* To quiet some compiler warnings */
+      png_error(png_ptr, "Out of place zTXt");
+      /*NOT REACHED*/
    }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1511,8 +1513,9 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
    {
-      png_error(png_ptr, "Out of place iTXt");
       info_ptr = info_ptr; /* To quiet some compiler warnings */
+      png_error(png_ptr, "Out of place iTXt");
+      /*NOT REACHED*/
    }
 
 #ifdef PNG_MAX_MALLOC_64K

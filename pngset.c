@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.0 [July 30, 2010]
+ * Last changed in libpng 1.5.0 [July 31, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -318,11 +318,11 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
-void PNGFAPI
+void PNGAPI
 png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
     int unit, png_charp swidth, png_charp sheight)
 {
-   png_size_t lengthw, lengthh;
+   png_size_t lengthw = 0, lengthh = 0;
 
    png_debug1(1, "in %s storage function", "sCAL");
 
@@ -402,6 +402,32 @@ png_set_sCAL(png_structp png_ptr, png_infop info_ptr, int unit, double width,
          PNG_sCAL_PRECISION);
       png_ascii_from_fp(png_ptr, sheight, sizeof sheight, height,
          PNG_sCAL_PRECISION);
+
+      png_set_sCAL_s(png_ptr, info_ptr, unit, swidth, sheight);
+   }
+}
+#endif
+
+#ifdef PNG_FIXED_POINT_SUPPORTED
+void PNGAPI
+png_set_sCAL_fixed(png_structp png_ptr, png_infop info_ptr, int unit,
+   png_fixed_point width, png_fixed_point height)
+{
+   png_debug1(1, "in %s storage function", "sCAL");
+
+   /* Check the arguments. */
+   if (width <= 0)
+      png_warning(png_ptr, "Invalid sCAL width ignored");
+   else if (height <= 0)
+      png_warning(png_ptr, "Invalid sCAL height ignored");
+   else
+   {
+      /* Convert 'width' and 'height' to ASCII. */
+      char swidth[PNG_sCAL_MAX_DIGITS+1];
+      char sheight[PNG_sCAL_MAX_DIGITS+1];
+
+      png_ascii_from_fixed(png_ptr, swidth, sizeof swidth, width);
+      png_ascii_from_fixed(png_ptr, sheight, sizeof sheight, height);
 
       png_set_sCAL_s(png_ptr, info_ptr, unit, swidth, sheight);
    }

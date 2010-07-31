@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.0 [July 30, 2010]
+ * Last changed in libpng 1.5.0 [July 31, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -560,13 +560,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #  ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.5.0beta38 - July 30, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.5.0beta38 - July 31, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #  else
-      return ((png_charp) "libpng version 1.5.0beta38 - July 30, 2010\
+      return ((png_charp) "libpng version 1.5.0beta38 - July 31, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -1289,7 +1289,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
                      if (exp == 0) *ascii++ = 46, --size; /* counted above */
                      --exp;
                   }
-                  *ascii++ = 48 + (int)d, ++cdigits;
+                  *ascii++ = (char)(48 + (int)d), ++cdigits;
                }
             }
             while (cdigits+czero-clead < (int)precision && fp > DBL_MIN);
@@ -1379,6 +1379,79 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
 }
 
 #  endif /* FLOATING_POINT */
+
+#  ifdef PNG_FIXED_POINT_SUPPORTED
+/* Function to format a fixed point value in ASCII.
+ */
+void /* PRIVATE */
+png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
+    png_fixed_point fp)
+{
+   /* Require space for 10 decimal digits, a decimal point, a minus sign and a
+    * trailing \0, 13 characters:
+    */
+   if (size > 12)
+   {
+      png_uint_32 num;
+
+      /* Avoid overflow here on the minimum integer. */
+      if (fp < 0)
+         *ascii++ = 45, --size, num = -fp;
+      else
+         num = fp;
+
+      if (num <= 0x80000000U) /* else overflowed */
+      {
+	 unsigned ndigits = 0, first = 16/*flag value*/;
+         char digits[10];
+
+	 while (num)
+	 {
+	    /* Split the low digit off num: */
+	    unsigned tmp = num/10;
+	    num -= tmp*10;
+	    digits[ndigits++] = (char)(48 + num);
+	    /* Record the first non-zero digit, note that this is a number
+	     * starting at 1, it's not actually the array index.
+	     */
+	    if (first == 16 && num > 0)
+	       first = ndigits;
+	    num = tmp;
+	 }
+
+	 if (ndigits > 0)
+	 {
+	    while (ndigits > 5) *ascii++ = digits[--ndigits];
+	    /* The remaining digits are fractional digits, ndigits is '5' or
+	     * smaller at this point.  It is certainly not zero.  Check for a
+	     * non-zero fractional digit:
+	     */
+	    if (first <= 5)
+	    {
+	       unsigned i;
+	       *ascii++ = 46; /* decimal point */
+	       /* ndigits may be <5 for small numbers, output leading zeros then
+		* ndigits digits to first:
+		*/
+	       i = 5;
+	       while (ndigits < i) *ascii++ = 48, --i;
+	       while (ndigits >= first) *ascii++ = digits[--ndigits];
+	       /* Don't output the trailing zeros! */
+	    }
+	 }
+	 else
+	    *ascii++ = 48;
+
+	 /* And null terminate the string: */
+	 *ascii = 0;
+	 return;
+      }
+   }
+
+   /* Here on buffer too small. */
+   png_error(png_ptr, "ASCII conversion buffer too small");
+}
+#   endif /* FIXED_POINT */
 #endif /* READ_SCAL */
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) &&\
@@ -1391,12 +1464,13 @@ png_fixed(png_structp png_ptr, double fp, png_const_charp text)
    if (r <= 2147483647. && r >= -2147483648.)
       return (png_fixed_point)r;
 
-   png_fixed_error(png_ptr, text, fp);
-   return 0;
+   png_fixed_error(png_ptr, text);
+   return 0; /*NOT REACHED*/
 }
 #endif
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED) ||\
+    defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG__READ_pHYs_SUPPORTED)
 /* muldiv functions */
 /* This API takes signed arguments and rounds the result to the nearest
  * integer (or, for a fixed point number - the standard argument - to
@@ -1945,13 +2019,13 @@ png_gamma_8bit_correct(unsigned value, png_fixed_point gamma)
 
          if (png_muldiv(&res, gamma, log, PNG_FP_1))
             return png_exp8bit(res);
-#     endif
 
-      /* Overflow. */
-      value = 0;
+	 /* Overflow. */
+	 value = 0;
+#     endif
    }
 
-   return value;
+   return (png_byte)value;
 }
 
 png_uint_16
@@ -1968,13 +2042,13 @@ png_gamma_16bit_correct(unsigned value, png_fixed_point gamma)
 
          if (png_muldiv(&res, gamma, log, PNG_FP_1))
             return png_exp16bit(res);
-#     endif
 
-      /* Overflow. */
-      value = 0;
+	 /* Overflow. */
+	 value = 0;
+#     endif
    }
 
-   return value;
+   return (png_uint_16)value;
 }
 
 /* This does the right thing based on the bit_depth field of the
@@ -2044,7 +2118,7 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
          unsigned j;
          for (j = 0; j < 256; j++)
          {
-            png_uint_16 ig = (j << (8-shift)) + i;
+            png_uint_32 ig = (j << (8-shift)) + i;
 #           ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
                /* Inline the 'max' scaling operation: */
                sub_table[j] = (png_uint_16)floor(65535*pow(ig/(double)max,
@@ -2070,7 +2144,7 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
             if (shift)
                ig = (ig * 65535U + max_by_2)/max;
 
-            sub_table[j] = ig;
+            sub_table[j] = (png_uint_16)ig;
          }
       }
    }
@@ -2119,13 +2193,13 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
    for (i = 0; i < 255; ++i) /* 8 bit output value */
    {
       /* Find the corresponding maximum input value */
-      png_uint_16 out = i * 257U; /* 16 bit output value */
+      png_uint_16 out = (png_uint_16)(i * 257U); /* 16 bit output value */
 
       /* Find the boundary value in 16 bits: */
       png_uint_16 bound = png_gamma_16bit_correct(out+128U, gamma);
 
       /* Adjust (round) to (16-shift) bits: */
-      bound = (bound * max + 32768)/65535;
+      bound = (png_uint_16)(((png_uint_32)bound * max + 32768U)/65535U);
 
       while (last <= bound)
       {
@@ -2156,8 +2230,8 @@ png_build_8bit_table(png_structp png_ptr, png_bytepp ptable,
    if (png_gamma_significant(gamma)) for (i=0; i<256; i++)
       table[i] = png_gamma_8bit_correct(i, gamma);
 
-   else for (i=0; i<245; ++i)
-      table[i] = i;
+   else for (i=0; i<256; ++i)
+      table[i] = (png_byte)i;
 }
 
 /* We build the 8- or 16-bit gamma tables here.  Note that for 16-bit
