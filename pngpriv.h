@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta38 - July 30, 2010
+ * libpng version 1.5.0beta38 - July 31, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -87,7 +87,7 @@
 #ifndef PNG_ERROR_TEXT_SUPPORTED
 #  define png_error(s1,s2) png_err(s1)
 #  define png_chunk_error(s1,s2) png_err(s1)
-#  define png_fixed_error(s1,s2,s3) png_err(s1)
+#  define png_fixed_error(s1,s2) png_err(s1)
 #endif
 
 #ifndef PNG_EXTERN
@@ -392,7 +392,7 @@
  */
 #ifdef PNG_FIXED_POINT_MACRO_SUPPORTED
 #define png_fixed(png_ptr, fp, s) ((fp) <= 21474 && (fp) >= -21474 ?\
-    ((png_fixed_point)(100000 * (fp))) : (png_fixed_error(png_ptr, s, fp),0))
+    ((png_fixed_point)(100000 * (fp))) : (png_fixed_error(png_ptr, s),0))
 #else
 PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
    png_const_charp text));
@@ -1029,22 +1029,30 @@ PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr, png_voidp ptr,
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
 PNG_EXTERN void png_fixed_error PNGARG((png_structp png_ptr,
-    png_const_charp name, double value));
+    png_const_charp name)) PNG_NORETURN;
 #endif
 
 /* ASCII to FP interfaces, currently only implemented if sCAL
  * support is required.
  */
-#if defined(PNG_READ_sCAL_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
+#if defined(PNG_READ_sCAL_SUPPORTED)
 /* MAX_DIGITS is actually the maximum number of characters in an sCAL
  * width or height, derived from the precision (number of significant
  * digits - a build time settable option) and assumpitions about the
  * maximum ridiculous exponent.
  */
 #define PNG_sCAL_MAX_DIGITS (PNG_sCAL_PRECISION+1/*.*/+1/*E*/+10/*exponent*/)
+
+#ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_EXTERN void png_ascii_from_fp PNGARG((png_structp png_ptr, png_charp ascii,
     png_size_t size, double fp, unsigned precision));
-#endif /* READ_sCAL && FLOATING_POINT */
+#endif /* FLOATING_POINT */
+
+#ifdef PNG_FIXED_POINT_SUPPORTED
+PNG_EXTERN void png_ascii_from_fixed PNGARG((png_structp png_ptr,
+    png_charp ascii, png_size_t size, png_fixed_point fp));
+#endif /* FIXED_POINT */
+#endif /* READ_sCAL */
 
 #if defined(PNG_sCAL_SUPPORTED) || defined(PNG_pCAL_SUPPORTED)
 /* An internal API to validate the format of a floating point number.
@@ -1119,7 +1127,8 @@ PNG_EXTERN int png_check_fp_number PNGARG((png_charp string, png_size_t size,
 PNG_EXTERN int png_check_fp_string PNGARG((png_charp string, png_size_t size));
 #endif /* pCAL || sCAL */
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED) ||\
+    defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG_READ_pHYs_SUPPORTED)
 /* Added at libpng version 1.5.0 */
 /* This is a utility to provide a*times/div (rounded) and indicate
  * if there is an overflow.  The result is a boolean - false (0)

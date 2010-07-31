@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.0beta38 - July 30, 2010
+ * libpng version 1.5.0beta38 - July 31, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.0beta38 - July 30, 2010: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.0beta38 - July 31, 2010: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -172,7 +172,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta38, July 30, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta38, July 31, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -284,7 +284,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 30, 2010
+ *    July 31, 2010
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -348,7 +348,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.0beta38"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.0beta38 - July 30, 2010\n"
+     " libpng version 1.5.0beta38 - July 31, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1295,11 +1295,9 @@ PNG_EXPORT(void,png_set_filter,(png_structp png_ptr, int method, int filters),,
 PNG_FP_EXPORT(void,png_set_filter_heuristics,(png_structp png_ptr,
     int heuristic_method, int num_weights, png_doublep filter_weights,
     png_doublep filter_costs),,68);
-#if 0 /* TO DO */
 PNG_FIXED_EXPORT(void,png_set_filter_heuristics_fixed,(png_structp png_ptr,
     int heuristic_method, int num_weights, png_fixed_point_p filter_weights,
     png_fixed_point_p filter_costs),,209);
-#endif
 #endif /*  PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
 
 /* Heuristic used for row filter selection.  These defines should NOT be
@@ -1607,10 +1605,8 @@ PNG_EXPORT(png_uint_32,png_get_y_pixels_per_meter,(png_structp png_ptr,
 /* Returns pixel aspect ratio, computed from pHYs chunk data.  */
 PNG_FP_EXPORT(float,png_get_pixel_aspect_ratio,(png_structp png_ptr,
     png_infop info_ptr),,125);
-#if 0 /* TO DO */
 PNG_FIXED_EXPORT(png_fixed_point,png_get_pixel_aspect_ratio_fixed,
     (png_structp png_ptr, png_infop info_ptr),,210);
-#endif
 
 /* Returns image x, y offset in pixels or microns, from oFFs chunk data. */
 PNG_EXPORT(png_int_32,png_get_x_offset_pixels,(png_structp png_ptr,
@@ -1820,19 +1816,24 @@ PNG_EXPORT(void,png_set_tRNS,(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_sCAL_SUPPORTED
 PNG_FP_EXPORT(png_uint_32,png_get_sCAL,(png_structp png_ptr, png_infop info_ptr,
     int *unit, double *width, double *height),,168);
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+/* NOTE: this API is currently implemented using floating point arithmetic,
+ * consequently it can only be used on systems with floating point support.
+ * In any case the range of values supported by png_fixed_point is small and it
+ * is highly recommended that png_get_sCAL_s be used instead.
+ */
 PNG_FIXED_EXPORT(png_uint_32,png_get_sCAL_fixed,(png_structp png_ptr,
     png_infop info_ptr, int *unit, png_fixed_point *width,
     png_fixed_point *height),,214);
+#endif
 PNG_EXPORT(png_uint_32,png_get_sCAL_s,(png_structp png_ptr,
     png_infop info_ptr, int *unit, png_charpp swidth, png_charpp sheight),,169);
 
 PNG_FP_EXPORT(void,png_set_sCAL,(png_structp png_ptr, png_infop info_ptr,
     int unit, double width, double height),,170);
-#if 0 /* TO DO */
 PNG_FIXED_EXPORT(void,png_set_sCAL_fixed,(png_structp png_ptr,
    png_infop info_ptr, int unit, png_fixed_point width,
    png_fixed_point height), ,213);
-#endif
 PNG_EXPORT(void,png_set_sCAL_s,(png_structp png_ptr, png_infop info_ptr,
     int unit, png_charp swidth, png_charp sheight),,171);
 #endif /* PNG_sCAL_SUPPORTED */

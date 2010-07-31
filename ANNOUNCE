@@ -321,6 +321,7 @@ version 1.5.0beta38 [July 31, 2010]
     safe but uncast assignments to shorter integers.  Also added a zlib
     VStudio release library project because the latest zlib Official Windows
     build does not include such a thing.
+  Revised png_get_int_16() to be similar to png_get_int_32().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
