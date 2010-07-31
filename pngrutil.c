@@ -30,38 +30,41 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
 }
 #ifndef PNG_USE_READ_MACROS
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
-png_uint_32 PNGAPI
-png_get_uint_32(png_bytep buf)
+png_uint_32 (PNGAPI
+png_get_uint_32)(png_bytep buf)
 {
-   png_uint_32 i = ((png_uint_32)(*buf) << 24) +
-      ((png_uint_32)(*(buf + 1)) << 16) +
-      ((png_uint_32)(*(buf + 2)) << 8) +
-      (png_uint_32)(*(buf + 3));
+   png_uint_32 i =
+       ((png_uint_32)(*(buf    )) << 24) +
+       ((png_uint_32)(*(buf + 1)) << 16) +
+       ((png_uint_32)(*(buf + 2)) <<  8) +
+       ((png_uint_32)(*(buf + 3))      ) ;
 
    return (i);
 }
 
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
- * data is stored in the PNG file in two's complement format, and it is
- * assumed that the machine format for signed integers is the same.
+ * data is stored in the PNG file in two's complement format and there
+ * is no guarantee that a 'png_int_32' is exactly 32 bits, therefore
+ * the following code does a two's complement to native conversion.
  */
-png_int_32 PNGAPI
-png_get_int_32(png_bytep buf)
+png_int_32 (PNGAPI
+png_get_int_32)(png_bytep buf)
 {
-   png_int_32 i = ((png_int_32)(*buf) << 24) +
-      ((png_int_32)(*(buf + 1)) << 16) +
-      ((png_int_32)(*(buf + 2)) << 8) +
-      (png_int_32)(*(buf + 3));
+   png_uint_32 u = png_get_uint_32(buf);
+   if ((u & 0x80000000) == 0) /* non-negative */
+      return u;
 
-   return (i);
+   u = (u ^ 0xffffffff) + 1;  /* 2's complement: -x = ~x+1 */
+   return -(png_int_32)u;
 }
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
-png_uint_16 PNGAPI
-png_get_uint_16(png_bytep buf)
+png_uint_16 (PNGAPI
+png_get_uint_16)(png_bytep buf)
 {
-   png_uint_16 i = (png_uint_16)(((png_uint_16)(*buf) << 8) +
-      (png_uint_16)(*(buf + 1)));
+   png_uint_16 i =
+       ((png_uint_32)(*buf) << 8) +
+       ((png_uint_32)(*(buf + 1)));
 
    return (i);
 }
