@@ -216,7 +216,7 @@ png_get_pixel_aspect_ratio_fixed(png_structp png_ptr, png_infop info_ptr)
 
       if (png_muldiv(&res, info_ptr->y_pixels_per_unit, PNG_FP_1,
           info_ptr->x_pixels_per_unit))
-	 return res;
+         return res;
    }
 #endif
    return 0;

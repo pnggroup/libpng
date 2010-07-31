@@ -1214,7 +1214,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
       {
          info_ptr = info_ptr; /* To quiet some compiler warnings */
          png_error(png_ptr, "Out of place tEXt");
-	 /*NOT REACHED*/
+         /*NOT REACHED*/
       }
 
 #ifdef PNG_MAX_MALLOC_64K

@@ -3075,8 +3075,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
       }
       default:
          png_error(png_ptr, "Ignoring bad adaptive filter type");
-	 /*NOT REACHED */
-	 break;
+         /*NOT REACHED */
+         break;
    }
 }
 

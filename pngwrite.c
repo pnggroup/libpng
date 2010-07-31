@@ -1228,20 +1228,20 @@ png_init_filter_heuristics(png_structp png_ptr, int heuristic_method,
             png_ptr->prev_filters[i] = 255;
          }
 
-	 png_ptr->filter_weights = (png_uint_16p)png_malloc(png_ptr,
-	     (png_uint_32)(png_sizeof(png_uint_16) * num_weights));
+         png_ptr->filter_weights = (png_uint_16p)png_malloc(png_ptr,
+             (png_uint_32)(png_sizeof(png_uint_16) * num_weights));
 
-	 png_ptr->inv_filter_weights = (png_uint_16p)png_malloc(png_ptr,
-	     (png_uint_32)(png_sizeof(png_uint_16) * num_weights));
+         png_ptr->inv_filter_weights = (png_uint_16p)png_malloc(png_ptr,
+             (png_uint_32)(png_sizeof(png_uint_16) * num_weights));
 
-	 for (i = 0; i < num_weights; i++)
-	 {
-	    png_ptr->inv_filter_weights[i] =
-	    png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
-	 }
+         for (i = 0; i < num_weights; i++)
+         {
+            png_ptr->inv_filter_weights[i] =
+            png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
+         }
 
-	 /* Safe to set this now */
-	 png_ptr->num_prev_filters = (png_byte)num_weights;
+         /* Safe to set this now */
+         png_ptr->num_prev_filters = (png_byte)num_weights;
       }
 
       /* If, in the future, there are other filter methods, this would
@@ -1249,17 +1249,17 @@ png_init_filter_heuristics(png_structp png_ptr, int heuristic_method,
        */
       if (png_ptr->filter_costs == NULL)
       {
-	 png_ptr->filter_costs = (png_uint_16p)png_malloc(png_ptr,
-	     (png_uint_32)(png_sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
+         png_ptr->filter_costs = (png_uint_16p)png_malloc(png_ptr,
+             (png_uint_32)(png_sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
 
-	 png_ptr->inv_filter_costs = (png_uint_16p)png_malloc(png_ptr,
-	     (png_uint_32)(png_sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
+         png_ptr->inv_filter_costs = (png_uint_16p)png_malloc(png_ptr,
+             (png_uint_32)(png_sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
       }
 
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
       {
-	 png_ptr->inv_filter_costs[i] =
-	 png_ptr->filter_costs[i] = PNG_COST_FACTOR;
+         png_ptr->inv_filter_costs[i] =
+         png_ptr->filter_costs[i] = PNG_COST_FACTOR;
       }
 
       /* All the arrays are inited, safe to set this: */
@@ -1300,20 +1300,20 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
       int i;
       for (i = 0; i < num_weights; i++)
       {
-	 if (filter_weights[i] <= 0.0)
-	 {
-	    png_ptr->inv_filter_weights[i] =
-	    png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
-	 }
+         if (filter_weights[i] <= 0.0)
+         {
+            png_ptr->inv_filter_weights[i] =
+            png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
+         }
 
-	 else
-	 {
-	    png_ptr->inv_filter_weights[i] =
-		(png_uint_16)(PNG_WEIGHT_FACTOR*filter_weights[i]+.5);
+         else
+         {
+            png_ptr->inv_filter_weights[i] =
+                (png_uint_16)(PNG_WEIGHT_FACTOR*filter_weights[i]+.5);
 
-	    png_ptr->filter_weights[i] =
-		(png_uint_16)(PNG_WEIGHT_FACTOR/filter_weights[i]+.5);
-	 }
+            png_ptr->filter_weights[i] =
+                (png_uint_16)(PNG_WEIGHT_FACTOR/filter_weights[i]+.5);
+         }
       }
 
       /* Here is where we set the relative costs of the different filters.  We
@@ -1325,11 +1325,11 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
        */
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++) if (filter_costs[i] >= 1.0)
       {
-	 png_ptr->inv_filter_costs[i] =
-	     (png_uint_16)(PNG_COST_FACTOR / filter_costs[i] + .5);
+         png_ptr->inv_filter_costs[i] =
+             (png_uint_16)(PNG_COST_FACTOR / filter_costs[i] + .5);
 
-	 png_ptr->filter_costs[i] =
-	     (png_uint_16)(PNG_COST_FACTOR * filter_costs[i] + .5);
+         png_ptr->filter_costs[i] =
+             (png_uint_16)(PNG_COST_FACTOR * filter_costs[i] + .5);
       }
    }
 }
@@ -1355,20 +1355,20 @@ png_set_filter_heuristics_fixed(png_structp png_ptr, int heuristic_method,
       int i;
       for (i = 0; i < num_weights; i++)
       {
-	 if (filter_weights[i] <= 0)
-	 {
-	    png_ptr->inv_filter_weights[i] =
-	    png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
-	 }
+         if (filter_weights[i] <= 0)
+         {
+            png_ptr->inv_filter_weights[i] =
+            png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
+         }
 
-	 else
-	 {
-	    png_ptr->inv_filter_weights[i] = (png_uint_16)
-	       ((PNG_WEIGHT_FACTOR*filter_weights[i]+PNG_FP_HALF)/PNG_FP_1);
+         else
+         {
+            png_ptr->inv_filter_weights[i] = (png_uint_16)
+               ((PNG_WEIGHT_FACTOR*filter_weights[i]+PNG_FP_HALF)/PNG_FP_1);
 
-	    png_ptr->filter_weights[i] = (png_uint_16)((PNG_WEIGHT_FACTOR*
-	       PNG_FP_1+(filter_weights[i]/2))/filter_weights[i]);
-	 }
+            png_ptr->filter_weights[i] = (png_uint_16)((PNG_WEIGHT_FACTOR*
+               PNG_FP_1+(filter_weights[i]/2))/filter_weights[i]);
+         }
       }
 
       /* Here is where we set the relative costs of the different filters.  We
@@ -1381,11 +1381,11 @@ png_set_filter_heuristics_fixed(png_structp png_ptr, int heuristic_method,
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
          if (filter_costs[i] >= PNG_FP_1)
       {
-	 png_ptr->inv_filter_costs[i] = (png_uint_16)((PNG_COST_FACTOR*
-	    PNG_FP_1+(filter_costs[i]/2)) / filter_costs[i]);
+         png_ptr->inv_filter_costs[i] = (png_uint_16)((PNG_COST_FACTOR*
+            PNG_FP_1+(filter_costs[i]/2)) / filter_costs[i]);
 
-	 png_ptr->filter_costs[i] = (png_uint_16)
-	    ((PNG_COST_FACTOR * filter_costs[i] +PNG_FP_HALF)/PNG_FP_1);
+         png_ptr->filter_costs[i] = (png_uint_16)
+            ((PNG_COST_FACTOR * filter_costs[i] +PNG_FP_HALF)/PNG_FP_1);
       }
    }
 }
