@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- * zlib.props - location of zlib source and build
+ * zlib.props - location of zlib source
  *
- * libpng version 1.5.0beta39 - July 31, 2010
+ * libpng version 1.5.0beta39 - August 2, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  *
@@ -11,32 +11,19 @@
  * and license in png.h
 
  * You must edit this file to record the location of the zlib
- * official and debug builds unless they are in the default
- * directories:
-
- *   official: zlib1
- *   debug:    zlib debug
+ * source code.
  -->
 
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0"
+   xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
-    <!-- Place the name of the directory containing the official
-         build of zlib and the corresponding header files in this
-         property.  The directory is expected to contain at least:
-
-            zdll.lib  # The DLL import library
-            zlib.lib  # The static library
-            zlib.h    # The header file
-            zconf.h   # Another header file included by zlib.h
-     -->
-    <ZLib1Dir>..\..\..\..\zlib124-dll\zlib-1.2.4</ZLib1Dir>
-
-    <!-- Place the name of the directory containing the source of
-         zlib used for debugging in this property.
-         The directory need only contain the '.c' and '.h' files
-         from the source.  For your own sanity make sure that the
-         '.h' files in the source match those from the 'official'
-         build above.
+    <!-- Place the name of the directory containing the source of zlib used for
+	 debugging in this property.
+         The directory need only contain the '.c' and '.h' files from the
+	 source.
+	 If you use a relative directory name (as below) then it must be
+	 relative to the project directories; these are one level deepers than
+	 the directories containing this file.
      -->
     <ZLibSrcDir>..\..\..\..\zlib-1.2.4</ZLibSrcDir>
   </PropertyGroup>

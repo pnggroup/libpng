@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta39 - July 31, 2010
+ * libpng version 1.5.0beta39 - August 2, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -439,13 +439,15 @@ extern "C" {
  */
 
 /* Allocate memory for an internal libpng struct */
-PNG_EXTERN png_voidp png_create_struct PNGARG((int type));
+PNG_EXTERN PNG_FUNCTION(png_voidp,png_create_struct,PNGARG((int type)),
+   PNG_ALLOCATED);
 
 /* Free memory from internal libpng struct */
 PNG_EXTERN void png_destroy_struct PNGARG((png_voidp struct_ptr));
 
-PNG_EXTERN png_voidp png_create_struct_2 PNGARG((int type, png_malloc_ptr
-    malloc_fn, png_voidp mem_ptr));
+PNG_EXTERN PNG_FUNCTION(png_voidp,png_create_struct_2,
+   PNGARG((int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)),
+   PNG_ALLOCATED);
 PNG_EXTERN void png_destroy_struct_2 PNGARG((png_voidp struct_ptr,
     png_free_ptr free_fn, png_voidp mem_ptr));
 
@@ -454,7 +456,8 @@ PNG_EXTERN void png_info_destroy PNGARG((png_structp png_ptr,
     png_infop info_ptr));
 
 /* Function to allocate memory for zlib.  PNGAPI is disallowed. */
-PNG_EXTERN voidpf png_zalloc PNGARG((voidpf png_ptr, uInt items, uInt size));
+PNG_EXTERN PNG_FUNCTION(voidpf,png_zalloc,PNGARG((voidpf png_ptr, uInt items,
+   uInt size)),PNG_ALLOCATED);
 
 /* Function to free memory for zlib.  PNGAPI is disallowed. */
 PNG_EXTERN void png_zfree PNGARG((voidpf png_ptr, voidpf ptr));
@@ -1028,8 +1031,8 @@ PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr, png_voidp ptr,
 #endif /* USE_FAR_KEYWORD */
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
-PNG_EXTERN void png_fixed_error PNGARG((png_structp png_ptr,
-    png_const_charp name)) PNG_NORETURN;
+PNG_EXTERN PNG_FUNCTION(void, png_fixed_error, (png_structp png_ptr,
+   png_const_charp name),PNG_NORETURN);
 #endif
 
 /* ASCII to FP interfaces, currently only implemented if sCAL

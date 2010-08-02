@@ -1,7 +1,7 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.5.0 [July 31, 2010]
+ * Last changed in libpng 1.5.0 [August 2, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -27,16 +27,17 @@
 
 /* Allocate memory for a png_struct.  The malloc and memset can be replaced
    by a single call to calloc() if this is thought to improve performance. */
-png_voidp /* PRIVATE */
-png_create_struct(int type)
+PNG_FUNCTION(png_voidp /* PRIVATE */,
+png_create_struct,(int type),PNG_ALLOCATED)
 {
 #  ifdef PNG_USER_MEM_SUPPORTED
    return (png_create_struct_2(type, NULL, NULL));
 }
 
 /* Alternate version of png_create_struct, for use with user-defined malloc. */
-png_voidp /* PRIVATE */
-png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
+PNG_FUNCTION(png_voidp /* PRIVATE */,
+png_create_struct_2,(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr),
+   PNG_ALLOCATED)
 {
 #  endif /* PNG_USER_MEM_SUPPORTED */
    png_size_t size;
@@ -119,8 +120,8 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * result, we would be truncating potentially larger memory requests
  * (which should cause a fatal error) and introducing major problems.
  */
-png_voidp PNGAPI
-png_calloc(png_structp png_ptr, png_alloc_size_t size)
+PNG_FUNCTION(png_voidp,PNGAPI
+png_calloc,(png_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 
@@ -132,8 +133,8 @@ png_calloc(png_structp png_ptr, png_alloc_size_t size)
    return (ret);
 }
 
-png_voidp PNGAPI
-png_malloc(png_structp png_ptr, png_alloc_size_t size)
+PNG_FUNCTION(png_voidp,PNGAPI
+png_malloc,(png_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 
@@ -153,8 +154,8 @@ png_malloc(png_structp png_ptr, png_alloc_size_t size)
    return (ret);
 }
 
-png_voidp PNGAPI
-png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
+PNG_FUNCTION(png_voidp,PNGAPI
+png_malloc_default,(png_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 #  endif /* PNG_USER_MEM_SUPPORTED */
@@ -364,8 +365,8 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 /* Allocate memory for a png_struct or a png_info.  The malloc and
    memset can be replaced by a single call to calloc() if this is thought
    to improve performance noticably. */
-png_voidp /* PRIVATE */
-png_create_struct(int type)
+PNG_FUNCTION(png_voidp /* PRIVATE */,
+png_create_struct,(int type),PNG_ALLOCATED)
 {
 #  ifdef PNG_USER_MEM_SUPPORTED
    return (png_create_struct_2(type, NULL, NULL));
@@ -374,8 +375,9 @@ png_create_struct(int type)
 /* Allocate memory for a png_struct or a png_info.  The malloc and
    memset can be replaced by a single call to calloc() if this is thought
    to improve performance noticably. */
-png_voidp /* PRIVATE */
-png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
+PNG_FUNCTION(png_voidp /* PRIVATE */,
+png_create_struct_2,(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr),
+   PNG_ALLOCATED)
 {
 #  endif /* PNG_USER_MEM_SUPPORTED */
    png_size_t size;
@@ -470,8 +472,8 @@ png_destroy_struct_2(png_voidp struct_ptr, png_free_ptr free_fn,
  * have the ability to do that.
  */
 
-png_voidp PNGAPI
-png_calloc(png_structp png_ptr, png_alloc_size_t size)
+PNG_FUNCTION(png_voidp,PNGAPI
+png_calloc,(png_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 
@@ -483,8 +485,8 @@ png_calloc(png_structp png_ptr, png_alloc_size_t size)
    return (ret);
 }
 
-png_voidp PNGAPI
-png_malloc(png_structp png_ptr, png_alloc_size_t size)
+PNG_FUNCTION(png_voidp,PNGAPI
+png_malloc,(png_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 
@@ -504,8 +506,8 @@ png_malloc(png_structp png_ptr, png_alloc_size_t size)
    return (ret);
 }
 
-png_voidp PNGAPI
-png_malloc_default(png_structp png_ptr, png_alloc_size_t size)
+PNG_FUNCTION(png_voidp,PNGAPI
+png_malloc_default,(png_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 #  endif /* PNG_USER_MEM_SUPPORTED */
@@ -579,6 +581,7 @@ png_free(png_structp png_ptr, png_voidp ptr)
    else
       png_free_default(png_ptr, ptr);
 }
+
 void PNGAPI
 png_free_default(png_structp png_ptr, png_voidp ptr)
 {
@@ -600,7 +603,6 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 #    endif
 #  endif
 }
-
 #endif /* Not Borland DOS special memory handler */
 
 /* This function was added at libpng version 1.2.3.  The png_malloc_warn()
@@ -608,8 +610,8 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
  * instead of issuing a png_error, if it fails to allocate the requested
  * memory.
  */
-png_voidp PNGAPI
-png_malloc_warn(png_structp png_ptr, png_alloc_size_t size)
+PNG_FUNCTION(png_voidp,PNGAPI
+png_malloc_warn,(png_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ptr;
    png_uint_32 save_flags;

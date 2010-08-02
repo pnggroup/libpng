@@ -26,8 +26,16 @@
 #include <setjmp.h> /* For jmp_buf, setjmp, longjmp */
 #include <math.h>   /* For floor */
 
+/* Unused formal parameter errors are removed using the following macro which is
+ * expected to have no bad effects on performance.
+ */
+#ifndef UNUSED
+#define UNUSED(param) param = param;
+#endif
+
 /******************************* ERROR UTILITIES ******************************/
-static size_t safecat(char *buffer, size_t bufsize, size_t pos, const char *cat)
+static size_t safecat(char *buffer, size_t bufsize, size_t pos,
+   PNG_CONST char *cat)
 {
    while (pos < bufsize && cat != NULL && *cat != 0) buffer[pos++] = *cat++;
    if (pos >= bufsize) pos = bufsize-1;
@@ -50,16 +58,16 @@ static size_t safecatd(char *buffer, size_t bufsize, size_t pos, double d,
    return safecat(buffer, bufsize, pos, number);
 }
 
-static const char invalid[] = "invalid";
-static const char sep[] = ": ";
+static PNG_CONST char invalid[] = "invalid";
+static PNG_CONST char sep[] = ": ";
 
 /* NOTE: this is indexed by ln2(bit_depth)! */
-static const char *bit_depths[8] =
+static PNG_CONST char *bit_depths[8] =
 {
    "1", "2", "4", "8", "16", invalid, invalid, invalid
 };
 
-static const char *colour_types[8] =
+static PNG_CONST char *colour_types[8] =
 {
    "greyscale", invalid, "truecolour", "indexed-colour",
    "greyscale with alpha", invalid, "truecolour with alpha", invalid
@@ -110,7 +118,7 @@ next_format(png_bytep colour_type, png_bytep bit_depth)
    return 0;
 }
 
-static inline unsigned
+static unsigned
 sample(png_byte *row, png_byte colour_type, png_byte bit_depth, png_uint_32 x,
     unsigned sample)
 {
@@ -235,6 +243,8 @@ store_storenew(png_store *ps)
    ps->writepos = 0;
 }
 
+/* Currently unused: */
+#if 0
 static void
 store_freefile(png_store_file *pf)
 {
@@ -245,6 +255,7 @@ store_freefile(png_store_file *pf)
    pf->datacount = 0;
    free(pf);
 }
+#endif
 
 /* Main interface to file storeage, after writing a new PNG file (see the API
  * below) call store_storefile to store the result with the given name and id.
@@ -269,7 +280,7 @@ store_storefile(png_store *ps, png_uint_32 id)
 
 /* Generate an error message (in the given buffer) */
 static size_t
-store_message(png_structp pp, char *buffer, size_t bufsize, const char *msg)
+store_message(png_structp pp, char *buffer, size_t bufsize, PNG_CONST char *msg)
 {
    size_t pos = 0;
    png_store *ps = png_get_error_ptr(pp);
@@ -365,6 +376,7 @@ store_write(png_structp pp, png_bytep pb, png_size_t st)
 static void
 store_flush(png_structp pp)
 {
+   pp = pp;
    /*DOES NOTHING*/
 }
 
@@ -444,7 +456,8 @@ store_write_reset(png_store *ps)
  * returned libpng structures as destroyed by store_write_reset above.
  */
 static png_structp
-set_store_for_write(png_store *ps, png_infopp ppi, const char name[64])
+set_store_for_write(png_store *ps, png_infopp ppi,
+   PNG_CONST char * volatile name)
 {
    if (setjmp(ps->jmpbuf) != 0)
       return NULL;
@@ -510,7 +523,7 @@ store_read_set(png_store *ps, png_uint_32 id)
  */
 static png_structp
 set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
-   const char *name)
+   PNG_CONST char *name)
 {
    safecat(ps->test, sizeof ps->test, 0, name);
 
@@ -568,7 +581,7 @@ typedef struct png_modifier
    unsigned                 ngammas;
 
    /* Lowest sbit to test (libpng fails for sbit < 8) */
-   unsigned                 sbitlow;
+   png_byte                 sbitlow;
 
    /* Error control - these are the limits on errors accepted by the gamma tests
     * below.
@@ -590,10 +603,10 @@ typedef struct png_modifier
 
    /* Flags: */
    /* When to use the use_input_precision option: */
-   int                      use_input_precision :1;
-   int                      use_input_precision_sbit :1;
-   int                      use_input_precision_16to8 :1;
-   int                      log :1;   /* Log max error */
+   unsigned                 use_input_precision :1;
+   unsigned                 use_input_precision_sbit :1;
+   unsigned                 use_input_precision_16to8 :1;
+   unsigned                 log :1;   /* Log max error */
 
    /* Buffer information, the buffer size limits the size of the chunks that can
     * be modified - they must fit (including header and CRC) into the buffer!
@@ -633,7 +646,7 @@ static double outerr(png_modifier *pm, png_byte bit_depth)
 static int fail(png_modifier *pm)
 {
    return !pm->log && !pm->this.verbose && (pm->this.nerrors > 0 ||
-      pm->this.treat_warnings_as_errors && pm->this.nwarnings > 0);
+      (pm->this.treat_warnings_as_errors && pm->this.nwarnings > 0));
 }
 
 static void
@@ -643,7 +656,7 @@ modifier_init(png_modifier *pm)
    store_init(&pm->this);
    pm->modifications = NULL;
    pm->state = modifier_start;
-   pm->sbitlow = 1;
+   pm->sbitlow = 1U;
    pm->maxout8 = pm->maxpc8 = pm->maxabs8 = 0;
    pm->maxout16 = pm->maxpc16 = pm->maxabs16 = 0;
    pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = 0;
@@ -846,7 +859,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
             while (mod != NULL)
             {
                if ((mod->add == chunk ||
-                   mod->add == CHUNK_PLTE && chunk == CHUNK_IDAT) &&
+                   (mod->add == CHUNK_PLTE && chunk == CHUNK_IDAT)) &&
                    mod->modify_fn != NULL && !mod->modified && !mod->added)
                {
                   /* Regardless of what the modify function does do not run this
@@ -946,15 +959,15 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
 /* Set up a modifier. */
 static png_structp
 set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
-    const char *name)
+    PNG_CONST char *name)
 {
-   png_structp pp = set_store_for_read(&pm->this, ppi, id, name);
+   volatile png_structp ppSafe = set_store_for_read(&pm->this, ppi, id, name);
 
-   if (pp != NULL)
+   if (ppSafe != NULL)
    {
       if (setjmp(pm->this.jmpbuf) == 0)
       {
-         png_set_read_fn(pp, pm, modifier_read);
+         png_set_read_fn(ppSafe, pm, modifier_read);
 
          pm->state = modifier_start;
          pm->bit_depth = 0;
@@ -969,11 +982,11 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
       else
       {
          store_read_reset(&pm->this);
-         pp = NULL;
+         ppSafe = NULL;
       }
    }
 
-   return pp;
+   return ppSafe;
 }
 
 /***************************** STANDARD PNG FILES *****************************/
@@ -986,11 +999,11 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
  * and with an ID derived from the colour type and bit depth as follows:
  */
 #define FILEID(col, depth) ((png_uint_32)((col) + ((depth)<<3)))
-#define COL_FROM_ID(id) ((id)& 0x7)
-#define DEPTH_FROM_ID(id) (((id) >> 3) & 0x1f)
+#define COL_FROM_ID(id) ((id)& 0x7U)
+#define DEPTH_FROM_ID(id) (((id) >> 3) & 0x1fU)
 
-#define STD_WIDTH  128
-#define STD_ROWMAX (STD_WIDTH*8)
+#define STD_WIDTH  128U
+#define STD_ROWMAX (STD_WIDTH*8U)
 
 static unsigned
 bit_size(png_structp pp, png_byte colour_type, png_byte bit_depth)
@@ -1012,11 +1025,10 @@ standard_rowsize(png_structp pp, png_byte colour_type, png_byte bit_depth)
    return (STD_WIDTH * bit_size(pp, colour_type, bit_depth)) / 8;
 }
 
-static png_uint_32
-standard_width(png_structp pp, png_byte colour_type, png_byte bit_depth)
-{
-   return STD_WIDTH;
-}
+/* standard_wdith(pp, colour_type, bit_depth) current returns the same number
+ * every time, so just use a macro:
+ */
+#define standard_width(pp, colour_type, bit_depth) STD_WIDTH
 
 static png_uint_32
 standard_height(png_structp pp, png_byte colour_type, png_byte bit_depth)
@@ -1026,6 +1038,7 @@ standard_height(png_structp pp, png_byte colour_type, png_byte bit_depth)
    case 1:
    case 2:
    case 4:
+   default:
       return 1;   /* Total of 128 pixels */
    case 8:
       return 2;   /* Total of 256 pixels/bytes */
@@ -1134,11 +1147,14 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
 }
 
 static void
-make_standard(png_store* ps, png_byte colour_type, int bdlo, int bdhi)
+make_standard(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
+   int PNG_CONST bdloIn, int PNG_CONST bdhi)
 {
+   volatile int bdlo = bdloIn;
+
    for (; bdlo <= bdhi; ++bdlo)
    {
-      png_byte bit_depth = 1U << bdlo;
+      png_byte bit_depth;
       png_uint_32 h, y;
       png_structp pp;
       png_infop pi;
@@ -1164,6 +1180,7 @@ make_standard(png_store* ps, png_byte colour_type, int bdlo, int bdhi)
          continue;
       }
 
+      bit_depth = 1U << bdlo;
       h = standard_height(pp, colour_type, bit_depth),
       png_set_IHDR(pp, pi, standard_width(pp, colour_type, bit_depth), h,
          bit_depth, colour_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE,
@@ -1171,9 +1188,11 @@ make_standard(png_store* ps, png_byte colour_type, int bdlo, int bdhi)
 
       if (colour_type == 3) /* palette */
       {
-         int i;
+         unsigned i = 0;
          png_color pal[256];
-         for (i=0; i<256; ++i) pal[i].red = pal[i].green = pal[i].blue = i;
+         do
+            pal[i].red = pal[i].green = pal[i].blue = (png_byte)i;
+         while(++i < 256U);
          png_set_PLTE(pp, pi, pal, 256);
       }
 
@@ -1212,8 +1231,11 @@ make_standard_images(png_store *ps)
 
 /* Tests - individual test cases */
 static void
-test_standard(png_store* ps, png_byte colour_type, int bdlo, int bdhi)
+test_standard(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
+   int PNG_CONST bdloIn, int PNG_CONST bdhi)
 {
+   volatile int bdlo = bdloIn;
+
    for (; bdlo <= bdhi; ++bdlo)
    {
       png_byte bit_depth = 1U << bdlo;
@@ -1327,12 +1349,6 @@ perform_standard_test(png_modifier *pm)
 
 /********************************* GAMMA TESTS ********************************/
 /* Gamma test images. */
-static void
-make_gamma_images(png_store *ps)
-{
-   /* Do nothing - the standard greyscale images are used. */
-}
-
 typedef struct gamma_modification
 {
    png_modification this;
@@ -1343,6 +1359,8 @@ gamma_modification;
 static int
 gamma_modify(png_structp pp, png_modifier *pm, png_modification *me, int add)
 {
+   UNUSED(pp);
+   UNUSED(add);
    /* This simply dumps the given gamma value into the buffer. */
    png_save_uint_32(pm->buffer, 4);
    png_save_uint_32(pm->buffer+4, CHUNK_gAMA);
@@ -1357,7 +1375,7 @@ gamma_modification_init(gamma_modification *me, png_modifier *pm, double gamma)
    me->this.chunk = CHUNK_gAMA;
    me->this.modify_fn = gamma_modify;
    me->this.add = CHUNK_PLTE;
-   me->gamma = floor(gamma * 100000 + .5);
+   me->gamma = (png_fixed_point)floor(gamma * 100000 + .5);
    me->this.next = pm->modifications;
    pm->modifications = &me->this;
 }
@@ -1372,6 +1390,8 @@ srgb_modification;
 static int
 srgb_modify(png_structp pp, png_modifier *pm, png_modification *me, int add)
 {
+   UNUSED(pp);
+   UNUSED(add);
    /* As above, ignore add and just make a new chunk */
    png_save_uint_32(pm->buffer, 1);
    png_save_uint_32(pm->buffer+4, CHUNK_sRGB);
@@ -1459,10 +1479,11 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
  * maxpc:  maximum percentage error (as a percentage)
  */
 static void
-gamma_test(png_modifier *pm, const png_byte colour_type,
-    const png_byte bit_depth, const double file_gamma, const double screen_gamma,
-    const png_byte sbit, const int threshold_test, const char *name,
-    const int speed, const int use_input_precision, const int strip16)
+gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
+    PNG_CONST png_byte bit_depth, PNG_CONST double file_gamma,
+    PNG_CONST double screen_gamma, PNG_CONST png_byte sbit,
+    PNG_CONST int threshold_test, PNG_CONST char *name, PNG_CONST int speed,
+    PNG_CONST int use_input_precision, PNG_CONST int strip16)
 {
    png_structp pp;
    png_infop pi;
@@ -1513,15 +1534,15 @@ gamma_test(png_modifier *pm, const png_byte colour_type,
    png_read_update_info(pp, pi);
 
    {
-      const png_byte out_ct = png_get_color_type(pp, pi);
-      const png_byte out_bd = png_get_bit_depth(pp, pi);
-      const unsigned outmax = (1U<<out_bd)-1;
-      const png_uint_32 w = png_get_image_width(pp, pi);
-      const png_uint_32 h = png_get_image_height(pp, pi);
-      const size_t cb = png_get_rowbytes(pp, pi); /* For the memcmp below. */
-      const double maxabs = abserr(pm, out_bd);
-      const double maxout = outerr(pm, out_bd);
-      const double maxpc = pcerr(pm, out_bd);
+      PNG_CONST png_byte out_ct = png_get_color_type(pp, pi);
+      PNG_CONST png_byte out_bd = png_get_bit_depth(pp, pi);
+      PNG_CONST unsigned outmax = (1U<<out_bd)-1;
+      PNG_CONST png_uint_32 w = png_get_image_width(pp, pi);
+      PNG_CONST png_uint_32 h = png_get_image_height(pp, pi);
+      PNG_CONST size_t cb = png_get_rowbytes(pp, pi); /* For memcmp below. */
+      PNG_CONST double maxabs = abserr(pm, out_bd);
+      PNG_CONST double maxout = outerr(pm, out_bd);
+      PNG_CONST double maxpc = pcerr(pm, out_bd);
       png_uint_32 y;
 
       /* There are three sources of error, firstly the quantization in the file
@@ -1560,11 +1581,11 @@ gamma_test(png_modifier *pm, const png_byte colour_type,
        * basic tests below do not do this, however if 'use_input_precision' is
        * set a subsequent test is performed below.
        */
-      const int processing = (fabs(screen_gamma*file_gamma-1) >=
+      PNG_CONST int processing = (fabs(screen_gamma*file_gamma-1) >=
          PNG_GAMMA_THRESHOLD && !threshold_test && !speed && colour_type != 3)
          || bit_depth != out_bd;
-      const int samples_per_pixel = (out_ct & 2) ? 3 : 1;
-      const double gamma = 1/(file_gamma*screen_gamma); /* Overall correction */
+      PNG_CONST unsigned samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
+      PNG_CONST double gamma = 1/(file_gamma*screen_gamma); /* Overall */
 
       for (y=0; y<h; ++y) /* just one pass - no interlacing */
       {
@@ -1578,9 +1599,9 @@ gamma_test(png_modifier *pm, const png_byte colour_type,
          if (processing) for (x=0; x<w; ++x) for (s=0; s<samples_per_pixel; ++s)
          {
             /* Input sample values: */
-            const unsigned id = sample(std, colour_type, bit_depth, x, s);
-            const unsigned od = sample(display, out_ct, out_bd, x, s);
-            const unsigned isbit = id >> (bit_depth-sbit);
+            PNG_CONST unsigned id = sample(std, colour_type, bit_depth, x, s);
+            PNG_CONST unsigned od = sample(display, out_ct, out_bd, x, s);
+            PNG_CONST unsigned isbit = id >> (bit_depth-sbit);
             double i, sample, encoded_sample, output, encoded_error, error;
             double es_lo, es_hi;
 
@@ -1788,10 +1809,11 @@ perform_gamma_threshold_tests(png_modifier *pm)
    }
 }
 
-static void gamma_transform_test(png_modifier *pm, const png_byte colour_type,
-    const png_byte bit_depth, const double file_gamma, const double screen_gamma,
-    const png_byte sbit, const int speed, const int use_input_precision,
-    const int strip16)
+static void gamma_transform_test(png_modifier *pm,
+   PNG_CONST png_byte colour_type, PNG_CONST png_byte bit_depth,
+   PNG_CONST double file_gamma, PNG_CONST double screen_gamma,
+   PNG_CONST png_byte sbit, PNG_CONST int speed,
+   PNG_CONST int use_input_precision, PNG_CONST int strip16)
 {
    size_t pos = 0;
    char name[64];
@@ -1823,7 +1845,7 @@ static void perform_gamma_transform_tests(png_modifier *pm, int speed)
     */
    while (next_format(&colour_type, &bit_depth)) if (colour_type != 3)
    {
-      int i, j;
+      unsigned i, j;
 
       for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j) if (i != j)
       {
@@ -1844,7 +1866,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
     */
    for (sbit=pm->sbitlow; sbit<16; ++sbit)
    {
-      int i, j;
+      unsigned i, j;
       for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j)
          if (i != j)
       {
@@ -1880,7 +1902,7 @@ static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
     * proceed *without* gamma correction, and the tests above will fail (but not
     * by much) - this could be fixed, it only appears with the -g option.
     */
-   int i, j;
+   unsigned i, j;
    for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j)
       if (i != j && fabs(pm->gammas[j]/pm->gammas[i]-1) >= PNG_GAMMA_THRESHOLD)
    {
@@ -1929,14 +1951,14 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
    if (summary)
    {
       printf("Gamma correction with sBIT:\n");
-      if (pm->sbitlow < 8)
+      if (pm->sbitlow < 8U)
       {
          printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
          printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
          printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
       }
       printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
-      if (pm->sbitlow < 8)
+      if (pm->sbitlow < 8U)
          printf("  8 bit color: %.5f\n", pm->error_color_8);
       printf(" 16 bit color: %.5f\n", pm->error_color_16);
    }
@@ -1954,10 +1976,11 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
 }
 
 /* main program */
-int main(int argc, const char **argv)
+int main(int argc, PNG_CONST char **argv)
 {
-   int summary = 1; /* Print the error sumamry at the end */
-   int speed = 0;   /* Speed test only (for gamma stuff) */
+   int summary = 1;    /* Print the error sumamry at the end */
+   int speed = 0;      /* Speed test only (for gamma stuff) */
+   PNG_CONST char *touch = NULL; /* Create the given output file on success. */
 
    /* This is an array of standard gamma values (believe it or not I've seen
     * every one of these mentioned somewhere.)
@@ -1974,9 +1997,9 @@ int main(int argc, const char **argv)
 
    /* Store the test gammas */
    pm.gammas = gammas;
-   pm.ngammas = 3; /* for speed */
-   pm.sbitlow = 8; /* because libpng doesn't do sbit below 8! */
-   pm.use_input_precision_16to8 = 1; /* Because of the way libpng does it */
+   pm.ngammas = 3U; /* for speed */
+   pm.sbitlow = 8U; /* because libpng doesn't do sbit below 8! */
+   pm.use_input_precision_16to8 = 1U; /* Because of the way libpng does it */
 
    /* Some default values (set the behavior for 'make check' here) */
    pm.maxout8 = .1;     /* Arithmetic error in *encoded* value */
@@ -2006,11 +2029,13 @@ int main(int argc, const char **argv)
          pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
       else if (strcmp(*argv, "-w") == 0)
          pm.this.treat_warnings_as_errors = 0;
-      else if (strcmp(*argv, "-speed") == 0)
+      else if (strcmp(*argv, "--speed") == 0)
          speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
-      else if (argc >= 1 && strcmp(*argv, "-sbitlow") == 0)
-         --argc, pm.sbitlow = atol(*++argv);
-      else if (argc >= 1 && strncmp(*argv, "-max", 4) == 0)
+      else if (argc >= 1 && strcmp(*argv, "--sbitlow") == 0)
+         --argc, pm.sbitlow = (png_byte)atoi(*++argv);
+      else if (argc >= 1 && strcmp(*argv, "--touch") == 0)
+         --argc, touch = *++argv;
+      else if (argc >= 1 && strncmp(*argv, "--max", 4) == 0)
       {
          --argc;
          if (strcmp(4+*argv, "abs8") == 0)
@@ -2039,7 +2064,6 @@ int main(int argc, const char **argv)
 
    /* Make useful base images */
    make_standard_images(&pm.this);
-   make_gamma_images(&pm.this);
 
    /* Perform the standard and gamma tests. */
    if (!speed)
@@ -2052,21 +2076,40 @@ int main(int argc, const char **argv)
 #else
          "fixed",
 #endif
-         (pm.this.nerrors || pm.this.treat_warnings_as_errors &&
-            pm.this.nwarnings) ? "(errors)" : (pm.this.nwarnings ?
+         (pm.this.nerrors || (pm.this.treat_warnings_as_errors &&
+            pm.this.nwarnings)) ? "(errors)" : (pm.this.nwarnings ?
                "(warnings)" : "(no errors or warnings)")
       );
 
    /* Error exit if there are any errors, and maybe if there are any
     * warnings.
     */
-   if (pm.this.nerrors || pm.this.treat_warnings_as_errors && pm.this.nwarnings)
+   if (pm.this.nerrors || (pm.this.treat_warnings_as_errors &&
+       pm.this.nwarnings))
    {
       if (!pm.this.verbose)
          fprintf(stderr, "pngvalid: %s\n", pm.this.error);
       fprintf(stderr, "pngvalid: %d errors, %d warnings\n", pm.this.nerrors,
          pm.this.nwarnings);
       exit(1);
+   }
+
+   /* Success case. */
+   if (touch != NULL)
+   {
+      FILE *fsuccess = fopen(touch, "wt");
+      if (fsuccess != NULL)
+      {
+         int error = 0;
+         fprintf(fsuccess, "PNG validation succeeded\n");
+         fflush(fsuccess);
+         error = ferror(fsuccess);
+         if (fclose(fsuccess) || error)
+         {
+            fprintf(stderr, "%s: write failed\n", touch);
+            exit(1);
+         }
+      }
    }
 
    return 0;

@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.0 [July 31, 2010]
+ * Last changed in libpng 1.5.0 [August 2, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -20,13 +20,13 @@
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
-static void /* PRIVATE */
-png_default_error PNGARG((png_structp png_ptr,
-    png_const_charp error_message)) PNG_NORETURN;
+static PNG_FUNCTION(void, png_default_error,PNGARG((png_structp png_ptr,
+    png_const_charp error_message)),PNG_NORETURN);
+
 #ifdef PNG_WARNINGS_SUPPORTED
 static void /* PRIVATE */
 png_default_warning PNGARG((png_structp png_ptr,
-  png_const_charp warning_message));
+   png_const_charp warning_message));
 #endif /* PNG_WARNINGS_SUPPORTED */
 
 /* This function is called whenever there is a fatal error.  This function
@@ -35,8 +35,8 @@ png_default_warning PNGARG((png_structp png_ptr,
  * to replace the error function at run-time.
  */
 #ifdef PNG_ERROR_TEXT_SUPPORTED
-void PNGAPI
-png_error(png_structp png_ptr, png_const_charp error_message)
+PNG_FUNCTION(void,PNGAPI
+png_error,(png_structp png_ptr, png_const_charp error_message),PNG_NORETURN)
 {
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
    char msg[16];
@@ -86,8 +86,8 @@ png_error(png_structp png_ptr, png_const_charp error_message)
    png_default_error(png_ptr, error_message);
 }
 #else
-void PNGAPI
-png_err(png_structp png_ptr)
+PNG_FUNCTION(void,PNGAPI
+png_err,(png_structp png_ptr),PNG_NORETURN)
 {
    if (png_ptr != NULL && png_ptr->error_fn != NULL)
       (*(png_ptr->error_fn))(png_ptr, '\0');
@@ -192,8 +192,9 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
 #endif /* PNG_WARNINGS_SUPPORTED || PNG_ERROR_TEXT_SUPPORTED */
 
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
-void PNGAPI
-png_chunk_error(png_structp png_ptr, png_const_charp error_message)
+PNG_FUNCTION(void,PNGAPI
+png_chunk_error,(png_structp png_ptr, png_const_charp error_message),
+   PNG_NORETURN)
 {
    char msg[18+PNG_MAX_ERROR_TEXT];
    if (png_ptr == NULL)
@@ -239,8 +240,8 @@ png_chunk_benign_error(png_structp png_ptr, png_const_charp error_message)
 
 #ifdef PNG_ERROR_TEXT_SUPPORTED
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-void
-png_fixed_error(png_structp png_ptr, png_const_charp name)
+PNG_FUNCTION(void,
+png_fixed_error,(png_structp png_ptr, png_const_charp name),PNG_NORETURN)
 {
 #  define fixed_message "fixed point overflow in "
 #  define fixed_message_ln ((sizeof fixed_message)-1)
@@ -280,8 +281,9 @@ png_set_longjmp_fn(png_structp png_ptr, png_longjmp_ptr longjmp_fn,
  * function is used by default, or if the program supplies NULL for the
  * error function pointer in png_set_error_fn().
  */
-static void /* PRIVATE */
-png_default_error(png_structp png_ptr, png_const_charp error_message)
+static PNG_FUNCTION(void /* PRIVATE */,
+png_default_error,(png_structp png_ptr, png_const_charp error_message),
+   PNG_NORETURN)
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
@@ -319,14 +321,14 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
       fprintf(stderr, PNG_STRING_NEWLINE);
    }
 #endif
-   png_longjmp(png_ptr, 1);
 #ifndef PNG_CONSOLE_IO_SUPPORTED
    error_message = error_message; /* Make compiler happy */
 #endif
+   png_longjmp(png_ptr, 1);
 }
 
-void PNGAPI
-png_longjmp(png_structp png_ptr, int val)
+PNG_FUNCTION(void,PNGAPI
+png_longjmp,(png_structp png_ptr, int val),PNG_NORETURN)
 {
 #ifdef PNG_SETJMP_SUPPORTED
    if (png_ptr && png_ptr->longjmp_fn)

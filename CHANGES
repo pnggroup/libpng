@@ -2806,7 +2806,19 @@ version 1.5.0beta38 [July 31, 2010]
   Revised png_get_int_16() to be similar to png_get_int_32().
   Restored projects/visualc71.
 
-version 1.5.0beta39 [July 31, 2010]
+version 1.5.0beta39 [August 2, 2010]
+  VisualC/GCC warning fixes, VisualC build fixes
+  The changes include support for function attributes in VC in addition to
+    those already present in GCC - necessary because without these some
+    warnings are unavoidable.  Fixes include signed/unsigned fixes in
+    pngvalid and checks with gcc -Wall -Wextra -Wunused.
+  VC requires function attributes on function definitions as well as
+    declarations, PNG_FUNCTION has been added to enable this and the
+    relevant function definitions changed.
+
+projects/vstudio now builds and runs all tests (pngvalid added),
+however the DLL builds are probably not useful as there seems to be no
+way to avoid dependency on the VC runtime in the DLL case.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

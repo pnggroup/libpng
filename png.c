@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.0 [July 31, 2010]
+ * Last changed in libpng 1.5.0 [August 2, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -73,8 +73,8 @@ png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Function to allocate memory for zlib and clear it to 0. */
-voidpf /* PRIVATE */
-png_zalloc(voidpf png_ptr, uInt items, uInt size)
+PNG_FUNCTION(voidpf /* PRIVATE */,
+png_zalloc,(voidpf png_ptr, uInt items, uInt size),PNG_ALLOCATED)
 {
    png_voidp ptr;
    png_structp p=(png_structp)png_ptr;
@@ -147,8 +147,8 @@ png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length)
  * and png_info_init() so that applications that want to use a shared
  * libpng don't have to be recompiled if png_info changes size.
  */
-png_infop PNGAPI
-png_create_info_struct(png_structp png_ptr)
+PNG_FUNCTION(png_infop,PNGAPI
+png_create_info_struct,(png_structp png_ptr),PNG_ALLOCATED)
 {
    png_infop info_ptr;
 
@@ -560,13 +560,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #  ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.5.0beta39 - July 31, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.5.0beta39 - August 2, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #  else
-      return ((png_charp) "libpng version 1.5.0beta39 - July 31, 2010\
+      return ((png_charp) "libpng version 1.5.0beta39 - August 2, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -1430,9 +1430,9 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
             {
                unsigned i;
                *ascii++ = 46; /* decimal point */
-               /* ndigits may be <5 for small numbers, output leading zeros then
-        	* ndigits digits to first:
-        	*/
+               /* ndigits may be <5 for small numbers, output leading zeros
+                * then ndigits digits to first:
+                */
                i = 5;
                while (ndigits < i) *ascii++ = 48, --i;
                while (ndigits >= first) *ascii++ = digits[--ndigits];
@@ -1454,7 +1454,7 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
 #   endif /* FIXED_POINT */
 #endif /* READ_SCAL */
 
-#if defined(PNG_FLOATING_POINT_SUPPORTED) &&\
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && \
    !defined(PNG_FIXED_POINT_MACRO_SUPPORTED)
 png_fixed_point
 png_fixed(png_structp png_ptr, double fp, png_const_charp text)
@@ -1465,11 +1465,11 @@ png_fixed(png_structp png_ptr, double fp, png_const_charp text)
       return (png_fixed_point)r;
 
    png_fixed_error(png_ptr, text);
-   return 0; /*NOT REACHED*/
+   /*NOT REACHED*/
 }
 #endif
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) ||\
+#if defined(PNG_READ_GAMMA_SUPPORTED) || \
     defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG__READ_pHYs_SUPPORTED)
 /* muldiv functions */
 /* This API takes signed arguments and rounds the result to the nearest

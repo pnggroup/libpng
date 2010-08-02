@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.5.0 [July 31, 2010]
+ * Last changed in libpng 1.5.0 [August 2, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -19,9 +19,9 @@
 #ifdef PNG_READ_SUPPORTED
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
-png_structp PNGAPI
-png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
-    png_error_ptr error_fn, png_error_ptr warn_fn)
+PNG_FUNCTION(png_structp,PNGAPI
+png_create_read_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
+    png_error_ptr error_fn, png_error_ptr warn_fn),PNG_ALLOCATED)
 {
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -32,10 +32,10 @@ png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr,
 /* Alternate create PNG structure for reading, and allocate any memory
  * needed.
  */
-png_structp PNGAPI
-png_create_read_struct_2(png_const_charp user_png_ver, png_voidp error_ptr,
+PNG_FUNCTION(png_structp,PNGAPI
+png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
-    png_malloc_ptr malloc_fn, png_free_ptr free_fn)
+    png_malloc_ptr malloc_fn, png_free_ptr free_fn),PNG_ALLOCATED)
 {
 #endif /* PNG_USER_MEM_SUPPORTED */
 

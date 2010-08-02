@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.0beta39 - July 31, 2010
+ * libpng version 1.5.0beta39 - August 2, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.0beta39 - July 31, 2010: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.0beta39 - August 2, 2010: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -172,7 +172,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta39, July 31, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta39, August 2, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -284,7 +284,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 31, 2010
+ *    August 2, 2010
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -348,7 +348,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.0beta39"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.0beta39 - July 31, 2010\n"
+     " libpng version 1.5.0beta39 - August 2, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -801,7 +801,9 @@ typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp),);
 #ifdef PNG_SETJMP_SUPPORTED
 /* This must match the function definition in <setjmp.h>, and the
  * application must include this before png.h to obtain the definition
- * of jmp_buf.  The function is required to be PNG_NORETURN.
+ * of jmp_buf.  The function is required to be PNG_NORETURN.  (Note that
+ * PNG_PTR_NORETURN is used here because current versions of the Microsoft
+ * C compiler do not support the PNG_NORETURN attribute on a pointer.)
  *
  * If you get a type warning from the compiler when linking against this line
  * then your compiler has 'longjmp' that does not match the requirements of the
@@ -814,7 +816,8 @@ typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp),);
  * your compiler.  This may be very difficult - try using a different compiler
  * to build the library!
  */
-typedef void (PNGCAPI *png_longjmp_ptr) PNGARG((jmp_buf, int)) PNG_NORETURN;
+typedef PNG_FUNCTION(void,(PNGCAPI *png_longjmp_ptr),PNGARG((jmp_buf, int)),
+   PNG_PTR_NORETURN);
 #endif
 
 /* Transform masks for the high-level interface */
@@ -1833,7 +1836,7 @@ PNG_FP_EXPORT(void,png_set_sCAL,(png_structp png_ptr, png_infop info_ptr,
     int unit, double width, double height),,170);
 PNG_FIXED_EXPORT(void,png_set_sCAL_fixed,(png_structp png_ptr,
    png_infop info_ptr, int unit, png_fixed_point width,
-   png_fixed_point height), ,213);
+   png_fixed_point height),,213);
 PNG_EXPORT(void,png_set_sCAL_s,(png_structp png_ptr, png_infop info_ptr,
     int unit, png_charp swidth, png_charp sheight),,171);
 #endif /* PNG_sCAL_SUPPORTED */

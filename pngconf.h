@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta39 - July 31, 2010
+ * libpng version 1.5.0beta39 - August 2, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -281,12 +281,36 @@
 #  endif
 #endif
 
+/* THe following complexity is concerned with getting the 'attributes' of the
+ * declared function in the correct place.  This potentially requires a separate
+ * PNG_EXPORT function for every compiler.
+ */
+#ifndef PNG_FUNCTION
+#  ifdef __GNUC__
+#     define PNG_FUNCTION(type, name, args, attributes)\
+	 attributes type name args
+#  else /* !GNUC */
+#     ifdef _MSC_VER
+#        define PNG_FUNCTION(type, name, args, attributes)\
+	    attributes type name args
+#     else /* !MSC */
+#        define PNG_FUNCTION(type, name, args, attributes)\
+	    type name args
+#     endif
+#  endif
+#endif
+
 #ifndef PNG_EXPORT_TYPE
 #  define PNG_EXPORT_TYPE(type) PNG_IMPEXP type
 #endif
+
 #ifndef PNG_EXPORT
+   /* The ordinal value is only relevant when preprocessing png.h for symbol
+    * table entries.
+    */
 #  define PNG_EXPORT(type, name, args, attributes, ordinal)\
-     extern PNG_EXPORT_TYPE(type) (PNGAPI name) PNGARG(args) attributes
+      extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),\
+         attributes)
 #endif
 
 /* Use PNG_REMOVED to comment out a removed interface. */
@@ -325,6 +349,9 @@
 #    ifndef PNG_NORETURN
 #      define PNG_NORETURN   __attribute__((__noreturn__))
 #    endif
+#    ifndef PNG_PTR_NORETURN
+#      define PNG_PTR_NORETURN   __attribute__((__noreturn__))
+#    endif
 #    ifndef PNG_ALLOCATED
 #      define PNG_ALLOCATED  __attribute__((__malloc__))
 #    endif
@@ -348,6 +375,36 @@
 #          define PNG_PRIVATE \
             __attribute__((__deprecated__))
 #        endif
+#      endif /* PNG_PRIVATE */
+#    endif /* PNGLIB_BUILD */
+#  endif /* __GNUC__ */
+#  ifdef _MSC_VER /* may need to check value */
+#    ifndef PNG_USE_RESULT
+#      define PNG_USE_RESULT /*not supported*/
+#    endif
+#    ifndef PNG_NORETURN
+#      define PNG_NORETURN   __declspec(noreturn)
+#    endif
+#    ifndef PNG_PTR_NORETURN
+#      define PNG_PTR_NORETURN /*not supported*/
+#    endif
+#    ifndef PNG_ALLOCATED
+#      define PNG_ALLOCATED __declspec(restrict)
+#    endif
+
+    /* This specifically protects structure members that should only be
+     * accessed from within the library, therefore should be empty during
+     * a library build.
+     */
+#    ifndef PNGLIB_BUILD
+#      ifndef PNG_DEPRECATED
+#        define PNG_DEPRECATED __declspec(deprecated)
+#      endif
+#      ifndef PNG_DEPSTRUCT
+#        define PNG_DEPSTRUCT  __declspec(deprecated)
+#      endif
+#      ifndef PNG_PRIVATE
+#        define PNG_PRIVATE __declspec(deprecated)
 #      endif /* PNG_PRIVATE */
 #    endif /* PNGLIB_BUILD */
 #  endif /* __GNUC__ */
