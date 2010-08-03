@@ -50,7 +50,6 @@ version 1.4.4beta04 [July 31, 2010]
   Updated the read macros and functions from 1.5.0beta38.
 
 version 1.4.4beta05 [August 3, 2010]
-  Updated projects/visualc71 so it can find scripts/pnglibconf.h
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
