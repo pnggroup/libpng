@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.4beta05 - August 3, 2010
+ * libpng version 1.4.4beta05 - August 4, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -269,10 +269,18 @@
  * #define PNG_NO_STDIO
  */
 
+#ifdef _WIN32_WCE
+#  define PNG_NO_CONSOLE_IO
+#  define PNG_NO_STDIO
+#  define PNG_NO_TIME_RFC1123
+#  ifdef PNG_DEBUG
+#    undef PNG_DEBUG
+#  endif
+#endif
+
 #if !defined(PNG_NO_STDIO) && !defined(PNG_STDIO_SUPPORTED)
 #  define PNG_STDIO_SUPPORTED
 #endif
-
 
 #ifdef PNG_BUILD_DLL
 #  if !defined(PNG_CONSOLE_IO_SUPPORTED) && !defined(PNG_NO_CONSOLE_IO)
@@ -1420,10 +1428,14 @@ typedef char            FAR * FAR * FAR * png_charppp;
 
 /* memory model/platform independent fns */
 #ifndef PNG_ABORT
-#  ifdef _WINDOWS_
-#     define PNG_ABORT() ExitProcess(0)
+#  ifdef _WIN32_WCE
+#    define PNG_ABORT() exit(-1)
 #  else
-#     define PNG_ABORT() abort()
+#    ifdef _WINDOWS_
+#       define PNG_ABORT() ExitProcess(0)
+#    else
+#       define PNG_ABORT() abort()
+#    endif
 #  endif
 #endif
 
@@ -1497,22 +1509,14 @@ typedef char            FAR * FAR * FAR * png_charppp;
  * to encounter practical situations that require such conversions.
  */
 #if defined(__TURBOC__) && !defined(__FLAT__)
-#  define  png_mem_alloc farmalloc
-#  define  png_mem_free  farfree
    typedef unsigned long png_alloc_size_t;
 #else
 #  if defined(_MSC_VER) && defined(MAXSEG_64K)
-#    define  png_mem_alloc(s) halloc(s, 1)
-#    define  png_mem_free     hfree
      typedef unsigned long    png_alloc_size_t;
 #  else
 #    if defined(_WINDOWS_) && (!defined(INT_MAX) || INT_MAX <= 0x7ffffffeL)
-#      define  png_mem_alloc(s) HeapAlloc(GetProcessHeap(), 0, s)
-#      define  png_mem_free(p)  HeapFree(GetProcessHeap(), 0, p)
        typedef DWORD            png_alloc_size_t;
 #    else
-#      define  png_mem_alloc malloc
-#      define  png_mem_free  free
        typedef png_size_t    png_alloc_size_t;
 #    endif
 #  endif
