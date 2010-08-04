@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.0beta40 - August 2, 2010
+ * libpng version 1.5.0beta40 - August 4, 2010
  *
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -484,7 +484,7 @@ typedef unsigned int png_size_t;
 #else
 typedef size_t png_size_t;
 #endif
-#define png_sizeof(x) sizeof(x)
+#define png_sizeof(x) (sizeof (x))
 
 /* The following is needed for medium model support.  It cannot be in the
  * pngpriv.h header.  Needs modification for other compilers besides
@@ -598,22 +598,19 @@ typedef char            FAR * FAR * FAR * png_charppp;
  * to encounter practical situations that require such conversions.
  */
 #if defined(__TURBOC__) && !defined(__FLAT__)
-#  define png_mem_alloc farmalloc
-#  define png_mem_free  farfree
    typedef unsigned long png_alloc_size_t;
 #else
 #  if defined(_MSC_VER) && defined(MAXSEG_64K)
-#    define png_mem_alloc(s) halloc(s, 1)
-#    define png_mem_free     hfree
      typedef unsigned long    png_alloc_size_t;
 #  else
-#    if defined(_WINDOWS_) && (!defined(INT_MAX) || INT_MAX <= 0x7ffffffeL)
-#      define png_mem_alloc(s) HeapAlloc(GetProcessHeap(), 0, s)
-#      define png_mem_free(p)  HeapFree(GetProcessHeap(), 0, p)
-       typedef DWORD            png_alloc_size_t;
+     /* This is an attempt to detect an old Windows system where (int) is
+      * actually 16 bits, in that case png_malloc must have an argument with a
+      * bigger size to accomodate the requirements of the library.
+      */
+#    if (defined(_Windows) || defined(_WINDOWS) || defined(_WINDOWS_)) && \
+        (!defined(INT_MAX) || INT_MAX <= 0x7ffffffeL)
+       typedef DWORD         png_alloc_size_t;
 #    else
-#      define png_mem_alloc malloc
-#      define png_mem_free  free
        typedef png_size_t    png_alloc_size_t;
 #    endif
 #  endif

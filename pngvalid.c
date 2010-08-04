@@ -2114,5 +2114,3 @@ int main(int argc, PNG_CONST char **argv)
 
    return 0;
 }
-
-/* vim: set sw=3 ts=8 tw=80: */
