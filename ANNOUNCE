@@ -52,6 +52,7 @@ version 1.4.4beta04 [July 31, 2010]
 version 1.4.4beta05 [August 4, 2010]
   Updated projects/visualc71 so it can find scripts/pnglibconf.h
   Removed unused png_mem_* defines from pngconf.h.
+  Correct use of _WINDOWS_ in pngconf.h
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

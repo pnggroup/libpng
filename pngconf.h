@@ -1124,7 +1124,7 @@ typedef unsigned char png_byte;
 #else
    typedef size_t png_size_t;
 #endif
-#define png_sizeof(x) sizeof(x)
+#define png_sizeof(x) (sizeof (x))
 
 /* The following is needed for medium model support.  It cannot be in the
  * pngpriv.h header.  Needs modification for other compilers besides
@@ -1428,14 +1428,10 @@ typedef char            FAR * FAR * FAR * png_charppp;
 
 /* memory model/platform independent fns */
 #ifndef PNG_ABORT
-#  ifdef _WIN32_WCE
-#    define PNG_ABORT() exit(-1)
+#  ifdef _WINDOWS_
+#     define PNG_ABORT() ExitProcess(0)
 #  else
-#    ifdef _WINDOWS_
-#       define PNG_ABORT() ExitProcess(0)
-#    else
-#       define PNG_ABORT() abort()
-#    endif
+#     define PNG_ABORT() abort()
 #  endif
 #endif
 
@@ -1514,8 +1510,13 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #  if defined(_MSC_VER) && defined(MAXSEG_64K)
      typedef unsigned long    png_alloc_size_t;
 #  else
-#    if defined(_WINDOWS_) && (!defined(INT_MAX) || INT_MAX <= 0x7ffffffeL)
-       typedef DWORD            png_alloc_size_t;
+     /* This is an attempt to detect an old Windows system where (int) is
+      * actually 16 bits, in that case png_malloc must have an argument with a
+      * bigger size to accomodate the requirements of the library.
+      */
+#    if (defined(_Windows) || defined(_WINDOWS) || defined(_WINDOWS_)) && \
+        (!defined(INT_MAX) || INT_MAX <= 0x7ffffffeL)
+       typedef DWORD         png_alloc_size_t;
 #    else
        typedef png_size_t    png_alloc_size_t;
 #    endif
