@@ -2819,6 +2819,7 @@ version 1.5.0beta39 [August 2, 2010]
 version 1.5.0beta40 [August 4, 2010]
   Correct use of _WINDOWS_ in pngconf.h
   Removed png_mem_ #defines; they are no longer used.
+  Added the sRGB chunk to pngtest.png
 
 projects/vstudio now builds and runs all tests (pngvalid added),
 however the DLL builds are probably not useful as there seems to be no
