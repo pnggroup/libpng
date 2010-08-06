@@ -2638,6 +2638,8 @@ version 1.4.4beta05 [August 6, 2010]
   Removed unused png_mem_* defines from pngconf.h.
   Correct use of _WINDOWS_ in pngconf.h
 
+version 1.4.4beta06 [August 6, 2010]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).

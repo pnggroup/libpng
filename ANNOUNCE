@@ -1,5 +1,5 @@
 
-Libpng 1.4.4beta05 - August 6, 2010
+Libpng 1.4.4beta06 - August 6, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.4beta05.tar.xz (LZMA-compressed, recommended)
-   1.4.4beta05.tar.gz
-   1.4.4beta05.tar.bz2
+   1.4.4beta06.tar.xz (LZMA-compressed, recommended)
+   1.4.4beta06.tar.gz
+   1.4.4beta06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp144b05.zip
-   lp144b05.7z
+   lp144b06.zip
+   lp144b06.7z
 
 Other information:
 
-   1.4.4beta05-README.txt
-   1.4.4beta05-LICENSE.txt
+   1.4.4beta06-README.txt
+   1.4.4beta06-LICENSE.txt
 
 Changes since the last public release (1.4.3):
 
@@ -53,6 +53,8 @@ version 1.4.4beta05 [August 6, 2010]
   Updated projects/visualc71 so it can find scripts/pnglibconf.h
   Removed unused png_mem_* defines from pngconf.h.
   Correct use of _WINDOWS_ in pngconf.h
+
+version 1.4.4beta06 [August 6, 2010]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
