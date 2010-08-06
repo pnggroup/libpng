@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta40 - August 6, 2010
+Libpng 1.5.0beta41 - August 6, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta40.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta40.tar.gz
-   1.5.0beta40.tar.bz2
+   1.5.0beta41.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta41.tar.gz
+   1.5.0beta41.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b40.zip
-   lp150b40.7z
+   lp150b41.zip
+   lp150b41.7z
 
 Other information:
 
-   1.5.0beta40-README.txt
-   1.5.0beta40-LICENSE.txt
+   1.5.0beta41-README.txt
+   1.5.0beta41-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -338,6 +338,8 @@ version 1.5.0beta40 [August 6, 2010]
   Correct use of _WINDOWS_ in pngconf.h
   Removed png_mem_ #defines; they are no longer used.
   Added the sRGB chunk to pngtest.png
+
+version 1.5.0beta41 [August 6, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
