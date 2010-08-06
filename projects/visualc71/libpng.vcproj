@@ -17,7 +17,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
+				AdditionalIncludeDirectories="..\..;..\..\scripts;..\..\..\zlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -45,7 +45,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
+				AdditionalIncludeDirectories="..\..;..\..\scripts;..\..\..\zlib;$(IntDir)"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -65,7 +65,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
+				AdditionalIncludeDirectories="..\..;..\..\scripts;..\..\..\zlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_BUILD_DLL;ZLIB_DLL;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -93,7 +93,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,PNG_DEBUG=1"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
+				AdditionalIncludeDirectories="..\..;..\..\scripts;..\..\..\zlib;$(IntDir)"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -113,8 +113,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;PNGAPI=__stdcall;PNG_NO_MODULEDEF;PNG_LIBPNG_SPECIALBUILD;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..;..\..\scripts;..\..\..\zlib"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_BUILD_DLL;ZLIB_DLL;PNGAPI=__stdcall;PNG_NO_MODULEDEF;PNG_LIBPNG_SPECIALBUILD;PNG_USER_PRIVATEBUILD;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -141,7 +141,7 @@
 				AdditionalOptions="/d PNG_NO_PEDANTIC_WARNINGS /d PNG_LIBPNG_DLLFNAME_POSTFIX=&quot;&quot;&quot;&quot;VB&quot;&quot;&quot;&quot; /d PNG_LIBPNG_SPECIALBUILD=&quot;&quot;&quot;&quot;__stdcall calling convention used for exported functions&quot;&quot;&quot;&quot;"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib;$(IntDir)"/>
+				AdditionalIncludeDirectories="..\..;..\..\scripts;..\..\..\zlib;$(IntDir)"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -161,10 +161,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
+				AdditionalIncludeDirectories="..\..;..\..\scripts;..\..\..\zlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="TRUE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="png.h"
@@ -202,10 +202,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..;..\..\..\zlib"
+				AdditionalIncludeDirectories="..\..;..\..\scripts;..\..\..\zlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="png.h"
 				WarningLevel="3"
