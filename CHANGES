@@ -2823,10 +2823,6 @@ version 1.5.0beta40 [August 6, 2010]
 
 version 1.5.0beta41 [August 6, 2010]
 
-projects/vstudio now builds and runs all tests (pngvalid added),
-however the DLL builds are probably not useful as there seems to be no
-way to avoid dependency on the VC runtime in the DLL case.
-
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
