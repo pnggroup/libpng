@@ -2640,6 +2640,7 @@ version 1.4.4beta05 [August 6, 2010]
 
 version 1.4.4beta06 [August 11, 2010]
   Don't try to use version-script with cygwin/mingw.
+  Revised contrib/gregbook to work under cygwin/mingw.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

@@ -138,7 +138,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
          * version recognizes more chunks, add them to this list.  If a
          * future version of readpng2.c recognizes more chunks, delete them
          * from this list. */
-        static const png_byte chunks_to_ignore[] = {
+        static /* const */ png_byte chunks_to_ignore[] = {
              99,  72,  82,  77, '\0',  /* cHRM */
             104,  73,  83,  84, '\0',  /* hIST */
             105,  67,  67,  80, '\0',  /* iCCP */

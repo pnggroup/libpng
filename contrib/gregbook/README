@@ -165,7 +165,7 @@ RUNNING THE PROGRAMS:  (VERY) BRIEF INTRO
      rpng is a simple PNG viewer that can display transparent PNGs with a
      specified background color; for example,
 
-	rpng -bgcolor #ff0000 toucan.png
+	rpng -bgcolor \#ff0000 toucan.png
 
      would display the image with a red background.  rpng2 is a progressive
      viewer that simulates a web browser in some respects; it can display

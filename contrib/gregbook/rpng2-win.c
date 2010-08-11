@@ -96,7 +96,33 @@
 #include <time.h>
 #include <math.h>      /* only for PvdM background code */
 #include <windows.h>
+#ifdef __CYGWIN__
+/* getch replacement. Turns out, we don't really need this,
+ * but leave it here if we ever enable any of the uses of
+ * _getch in the main code
+ */
+#include <unistd.h>
+#include <termio.h>
+#include <sys/ioctl.h>
+int repl_getch( void )
+{
+  char ch;
+  int fd = fileno(stdin);
+  struct termio old_tty, new_tty;
+
+  ioctl(fd, TCGETA, &old_tty);
+  new_tty = old_tty;
+  new_tty.c_lflag &= ~(ICANON | ECHO | ISIG);
+  ioctl(fd, TCSETA, &new_tty);
+  fread(&ch, 1, sizeof(ch), stdin);
+  ioctl(fd, TCSETA, &old_tty);
+
+  return ch;
+}
+#define _getch repl_getch
+#else
 #include <conio.h>     /* only for _getch() */
+#endif
 
 /* all for PvdM background code: */
 #ifndef PI
@@ -270,7 +296,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     filename = (char *)NULL;
     memset(&rpng2_info, 0, sizeof(mainprog_info));
 
-
+#ifndef __CYGWIN__
     /* Next reenable console output, which normally goes to the bit bucket
      * for windowed apps.  Closing the console window will terminate the
      * app.  Thanks to David.Geldreich@realviz.com for supplying the magical
@@ -279,7 +305,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     AllocConsole();
     freopen("CONOUT$", "a", stderr);
     freopen("CONOUT$", "a", stdout);
-
+#endif
 
     /* Set the default value for our display-system exponent, i.e., the
      * product of the CRT exponent and the exponent corresponding to
@@ -413,7 +439,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
     /* print usage screen if any errors up to this point */
 
     if (error) {
+#ifndef __CYGWIN__
         int ch;
+#endif
 
         fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
         readpng2_version_info();
@@ -432,16 +460,23 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
           "    -timing\tenables delay for every block read, to simulate modem\n"
           "\t\t  download of image (~36 Kbps)\n"
           "\nPress Q, Esc or mouse button 1 after image is displayed to quit.\n"
+#ifndef __CYGWIN__
           "Press Q or Esc to quit this usage screen. ",
+#else
+          ,
+#endif
           PROGNAME,
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
+#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__)) && \
+    !(defined(__CYGWIN__) || defined(__MINGW32__))
           (int)strlen(PROGNAME), " ",
 #endif
           (int)strlen(PROGNAME), " ", default_display_exponent, num_bgpat);
         fflush(stderr);
+#ifndef __CYGWIN__
         do
             ch = _getch();
         while (ch != 'q' && ch != 'Q' && ch != 0x1B);
+#endif
         exit(1);
     }
 
@@ -478,18 +513,24 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
 
 
     if (error) {
+#ifndef __CYGWIN__
         int ch;
+#endif
 
         fprintf(stderr, PROGNAME ":  aborting.\n");
+#ifndef __CYGWIN__
         do
             ch = _getch();
         while (ch != 'q' && ch != 'Q' && ch != 0x1B);
+#endif
         exit(2);
     } else {
         fprintf(stderr, "\n%s %s:  %s\n", PROGNAME, VERSION, appname);
+#ifndef __CYGWIN__
         fprintf(stderr,
           "\n   [console window:  closing this window will terminate %s]\n\n",
           PROGNAME);
+#endif
         fflush(stderr);
     }
 
@@ -1132,7 +1173,12 @@ static void rpng2_win_finish_display()
 
     rpng2_info.state = kDone;
     printf(
-      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n");
+#ifndef __CYGWIN__
+      "Done.  Press Q, Esc or mouse button 1 (within image window) to quit.\n"
+#else
+      "Done.  Press mouse button 1 (within image window) to quit.\n"
+#endif
+    );
     fflush(stdout);
 }
 
