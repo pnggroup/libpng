@@ -39,11 +39,10 @@ AC_PROG_LD
 AC_PROG_CPP
 AC_CHECK_TOOL(SED, sed, :)
 AC_CHECK_TOOL(AWK, awk, :)
-AC_LIBTOOL_WIN32_DLL
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -65,6 +64,15 @@ LIBPNG_DEFINES=$LIBPNG_DEFINES
 AC_SUBST(LIBPNG_DEFINES)
 
 AC_MSG_CHECKING([if libraries can be versioned])
+# Special case for PE/COFF platforms: ld reports
+# support for version-script, but doesn't actually
+# DO anything with it.
+case $host in
+*cygwin* | *mingw32* )
+    have_ld_version_script=no
+    AC_MSG_RESULT(no)
+;;
+* )
 GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
 if test "$GLD"; then
     have_ld_version_script=yes
@@ -74,6 +82,9 @@ else
     AC_MSG_RESULT(no)
     AC_MSG_WARN(*** You have not enabled versioned symbols.)
 fi
+;;
+esac
+
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 
 if test "$have_ld_version_script" = "yes"; then
