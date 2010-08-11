@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta41 - August 6, 2010
+ * libpng version 1.5.0beta41 - August 11, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -357,7 +357,7 @@
 #define PNG_OUT_OF_RANGE(value, ideal, delta) \
    ( (value) < (ideal)-(delta) || (value) > (ideal)+(delta) )
 
-/* Convertions between fixed and floating point, only defined if
+/* Conversions between fixed and floating point, only defined if
  * required (to make sure the code doesn't accidentally use float
  * when it is supposedly disabled.)
  */
