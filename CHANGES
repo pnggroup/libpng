@@ -2638,7 +2638,7 @@ version 1.4.4beta05 [August 6, 2010]
   Removed unused png_mem_* defines from pngconf.h.
   Correct use of _WINDOWS_ in pngconf.h
 
-version 1.4.4beta06 [August 11, 2010]
+version 1.4.4beta06 [August 13, 2010]
   Don't try to use version-script with cygwin/mingw.
   Revised contrib/gregbook to work under cygwin/mingw.
 

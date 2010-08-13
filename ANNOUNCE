@@ -1,5 +1,5 @@
 
-Libpng 1.4.4beta06 - August 11, 2010
+Libpng 1.4.4beta07 - August 13, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.4beta06.tar.xz (LZMA-compressed, recommended)
-   1.4.4beta06.tar.gz
-   1.4.4beta06.tar.bz2
+   1.4.4beta07.tar.xz (LZMA-compressed, recommended)
+   1.4.4beta07.tar.gz
+   1.4.4beta07.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp144b06.zip
-   lp144b06.7z
+   lp144b07.zip
+   lp144b07.7z
 
 Other information:
 
-   1.4.4beta06-README.txt
-   1.4.4beta06-LICENSE.txt
+   1.4.4beta07-README.txt
+   1.4.4beta07-LICENSE.txt
 
 Changes since the last public release (1.4.3):
 
@@ -54,7 +54,7 @@ version 1.4.4beta05 [August 6, 2010]
   Removed unused png_mem_* defines from pngconf.h.
   Correct use of _WINDOWS_ in pngconf.h
 
-version 1.4.4beta06 [August 11, 2010]
+version 1.4.4beta06 [August 13, 2010]
   Don't try to use version-script with cygwin/mingw.
   Revised contrib/gregbook to work under cygwin/mingw.
 
