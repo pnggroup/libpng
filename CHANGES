@@ -2638,9 +2638,12 @@ version 1.4.4beta05 [August 6, 2010]
   Removed unused png_mem_* defines from pngconf.h.
   Correct use of _WINDOWS_ in pngconf.h
 
-version 1.4.4beta06 [August 13, 2010]
+version 1.4.4beta06 [August 11, 2010]
   Don't try to use version-script with cygwin/mingw.
   Revised contrib/gregbook to work under cygwin/mingw.
+
+version 1.4.4beta07 [August 13, 2010]
+  Add .dll.a to the list of extensions to be symlinked by Makefile.am (Yaakov)
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
