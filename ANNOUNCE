@@ -1,5 +1,5 @@
 
-Libpng 1.4.4beta07 - August 13, 2010
+Libpng 1.4.4beta07 - August 17, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -58,7 +58,8 @@ version 1.4.4beta06 [August 11, 2010]
   Don't try to use version-script with cygwin/mingw.
   Revised contrib/gregbook to work under cygwin/mingw.
 
-version 1.4.4beta07 [August 13, 2010]
+version 1.4.4beta07 [August 17, 2010]
+  Updated prebuilt aclocal.m4 and ltmain.sh
   Add .dll.a to the list of extensions to be symlinked by Makefile.am (Yaakov)
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
