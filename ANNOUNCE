@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta42 - August 11, 2010
+Libpng 1.5.0beta43 - August 11, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta42.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta42.tar.gz
-   1.5.0beta42.tar.bz2
+   1.5.0beta43.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta43.tar.gz
+   1.5.0beta43.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b42.zip
-   lp150b42.7z
+   lp150b43.zip
+   lp150b43.7z
 
 Other information:
 
-   1.5.0beta42-README.txt
-   1.5.0beta42-LICENSE.txt
+   1.5.0beta43-README.txt
+   1.5.0beta43-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -344,10 +344,12 @@ version 1.5.0beta41 [August 11, 2010]
   Don't try to use version-script with cygwin/mingw.
   Revised contrib/gregbook to work under cygwin/mingw.
 
-version 1.5.0beta42 [August 11, 2010]
+version 1.5.0beta42 [August 18, 2010]
   Add .dll.a to the list of extensions to be symlinked by Makefile.am (Yaakov)
   Made all API functions that have const arguments and constant string
     literal pointers declare them (John Bowler).
+
+version 1.5.0beta43 [August 11, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
