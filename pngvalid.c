@@ -587,7 +587,7 @@ typedef struct png_modifier
     * below.
     */
    double                   maxout8;  /* Maximum output value error */
-   double                   maxabs8;  /* Abosulte sample error 0..1 */
+   double                   maxabs8;  /* Absolute sample error 0..1 */
    double                   maxpc8;   /* Percentage sample error 0..100% */
    double                   maxout16; /* Maximum output value error */
    double                   maxabs16; /* Absolute sample error 0..1 */
@@ -814,6 +814,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
          pm->flush = 0;
          break;
 
+      case modifier_IHDR:
       default:
          /* Read a new chunk and process it until we see PLTE, IDAT or
           * IEND.  'flush' indicates that there is still some data to
@@ -1371,11 +1372,14 @@ gamma_modify(png_structp pp, png_modifier *pm, png_modification *me, int add)
 static void
 gamma_modification_init(gamma_modification *me, png_modifier *pm, double gamma)
 {
+   double g;
+
    modification_init(&me->this);
    me->this.chunk = CHUNK_gAMA;
    me->this.modify_fn = gamma_modify;
    me->this.add = CHUNK_PLTE;
-   me->gamma = (png_fixed_point)floor(gamma * 100000 + .5);
+   g = floor(gamma * 100000 + .5);
+   me->gamma = (png_fixed_point)g;
    me->this.next = pm->modifications;
    pm->modifications = &me->this;
 }
