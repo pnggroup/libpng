@@ -773,7 +773,7 @@ typedef png_row_info FAR * FAR * png_row_infopp;
  * own.  The png_error_ptr type should match that of user-supplied warning
  * and error functions, while the png_rw_ptr type should match that of the
  * user read/write data functions.  Note that the 'write' function must not
- * modify the buffer it is passed, the 'read' function, on the other hand, is
+ * modify the buffer it is passed. The 'read' function, on the other hand, is
  * expected to return the read data in the buffer.
  */
 typedef struct png_struct_def png_struct;
@@ -1191,7 +1191,7 @@ PNG_EXPORT(void,png_read_image,(png_structp png_ptr, png_bytepp image),,57);
 /* Write a row of image data */
 PNG_EXPORT(void,png_write_row,(png_structp png_ptr, png_const_bytep row),,58);
 
-/* Write a few rows of image data: (*row) is not written, however the type is
+/* Write a few rows of image data: (*row) is not written; however, the type is
  * declared as writeable to maintain compatibility with previous versions of
  * libpng and to allow the 'display_row' array from read_rows to be passed
  * unchanged to write_rows.
@@ -1449,7 +1449,7 @@ PNG_EXPORT(void,png_process_data,(png_structp png_ptr, png_infop info_ptr,
     png_bytep buffer, png_size_t buffer_size),,92);
 
 /* Function that combines rows.  'new_row' is a flag that should come from the
- * callback and be non-NULL if anything needs to be done, the library stores its
+ * callback and be non-NULL if anything needs to be done; the library stores its
  * own version of the new data internally and ignores the passed in value.
  */
 PNG_EXPORT(void,png_progressive_combine_row,(png_structp png_ptr,
