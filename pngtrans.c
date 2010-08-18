@@ -79,7 +79,7 @@ png_set_packswap(png_structp png_ptr)
 
 #if defined(PNG_READ_SHIFT_SUPPORTED) || defined(PNG_WRITE_SHIFT_SUPPORTED)
 void PNGAPI
-png_set_shift(png_structp png_ptr, png_color_8p true_bits)
+png_set_shift(png_structp png_ptr, png_const_color_8p true_bits)
 {
    png_debug(1, "in png_set_shift");
 
@@ -395,18 +395,19 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
 
    if (row_info->bit_depth < 8)
    {
-      png_bytep rp, end, table;
+      png_bytep rp;
+      png_const_bytep end, table;
 
       end = row + row_info->rowbytes;
 
       if (row_info->bit_depth == 1)
-         table = (png_bytep)onebppswaptable;
+         table = onebppswaptable;
 
       else if (row_info->bit_depth == 2)
-         table = (png_bytep)twobppswaptable;
+         table = twobppswaptable;
 
       else if (row_info->bit_depth == 4)
-         table = (png_bytep)fourbppswaptable;
+         table = fourbppswaptable;
 
       else
          return;

@@ -50,7 +50,7 @@ png_set_sig_bytes(png_structp png_ptr, int num_bytes)
  * PNG signature (this is the same behaviour as strcmp, memcmp, etc).
  */
 int PNGAPI
-png_sig_cmp(png_bytep sig, png_size_t start, png_size_t num_to_check)
+png_sig_cmp(png_const_bytep sig, png_size_t start, png_size_t num_to_check)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
@@ -120,7 +120,7 @@ png_reset_crc(png_structp png_ptr)
  * trouble of calculating it.
  */
 void /* PRIVATE */
-png_calculate_crc(png_structp png_ptr, png_bytep ptr, png_size_t length)
+png_calculate_crc(png_structp png_ptr, png_const_bytep ptr, png_size_t length)
 {
    int need_crc = 1;
 
@@ -513,8 +513,8 @@ png_init_io(png_structp png_ptr, png_FILE_p fp)
 /* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
  */
-png_charp PNGAPI
-png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
+png_const_charp PNGAPI
+png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
 {
    static PNG_CONST char short_months[12][4] =
         {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -545,13 +545,13 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
        ptime->year, ptime->hour % 24, ptime->minute % 60,
        ptime->second % 61);
 #    endif
-   return ((png_charp)png_ptr->time_buffer);
+   return png_ptr->time_buffer;
 }
 #  endif /* PNG_TIME_RFC1123_SUPPORTED */
 
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
 
-png_charp PNGAPI
+png_const_charp PNGAPI
 png_get_copyright(png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
@@ -559,17 +559,17 @@ png_get_copyright(png_structp png_ptr)
       return PNG_STRING_COPYRIGHT
 #else
 #  ifdef __STDC__
-   return ((png_charp) PNG_STRING_NEWLINE \
+   return PNG_STRING_NEWLINE \
      "libpng version 1.5.0beta42 - August 11, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
-     PNG_STRING_NEWLINE);
+     PNG_STRING_NEWLINE;
 #  else
-      return ((png_charp) "libpng version 1.5.0beta42 - August 11, 2010\
+      return "libpng version 1.5.0beta42 - August 11, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
-      Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
+      Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
 #  endif
 #endif
 }
@@ -582,34 +582,34 @@ png_get_copyright(png_structp png_ptr)
  * png_get_header_ver().  Due to the version_nn_nn_nn typedef guard,
  * it is guaranteed that png.c uses the correct version of png.h.
  */
-png_charp PNGAPI
+png_const_charp PNGAPI
 png_get_libpng_ver(png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    return png_get_header_ver(png_ptr);
 }
 
-png_charp PNGAPI
+png_const_charp PNGAPI
 png_get_header_ver(png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
-   return ((png_charp) PNG_LIBPNG_VER_STRING);
+   return PNG_LIBPNG_VER_STRING;
 }
 
-png_charp PNGAPI
+png_const_charp PNGAPI
 png_get_header_version(png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
 #ifdef __STDC__
-   return ((png_charp) PNG_HEADER_VERSION_STRING
+   return PNG_HEADER_VERSION_STRING
 #  ifndef PNG_READ_SUPPORTED
    "     (NO READ SUPPORT)"
 #  endif
-   PNG_STRING_NEWLINE);
+   PNG_STRING_NEWLINE;
 #else
-   return ((png_charp) PNG_HEADER_VERSION_STRING);
+   return PNG_HEADER_VERSION_STRING;
 #endif
 }
 
@@ -906,7 +906,7 @@ png_check_IHDR(png_structp png_ptr,
 #define PNG_FP_E     12  /* [Ee] */
 
 int /* PRIVATE */
-png_check_fp_number(png_charp string, png_size_t size, int *statep,
+png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
    png_size_tp whereami)
 {
    int state = *statep;
@@ -1033,7 +1033,7 @@ PNG_FP_End:
 
 /* The same but for a complete string. */
 int
-png_check_fp_string(png_charp string, png_size_t size)
+png_check_fp_string(png_const_charp string, png_size_t size)
 {
    int        state=0;
    png_size_t index=0;
@@ -1058,7 +1058,10 @@ png_pow10(int power)
     * 10 is exact whereas .1 is inexact in base 2
     */
    if (power < 0)
+   {
+      if (power < DBL_MIN_10_EXP) return 0;
       recip = 1, power = -power;
+   }
 
    if (power > 0)
    {
@@ -1084,7 +1087,7 @@ png_pow10(int power)
  */
 void /* PRIVATE */
 png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
-    double fp, unsigned precision)
+    double fp, unsigned int precision)
 {
    /* We use standard functions from math.h, but not printf because
     * that would require stdio.  The caller must supply a buffer of
@@ -1402,13 +1405,13 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
 
       if (num <= 0x80000000U) /* else overflowed */
       {
-         unsigned ndigits = 0, first = 16/*flag value*/;
+         unsigned int ndigits = 0, first = 16/*flag value*/;
          char digits[10];
 
          while (num)
          {
             /* Split the low digit off num: */
-            unsigned tmp = num/10;
+            unsigned int tmp = num/10;
             num -= tmp*10;
             digits[ndigits++] = (char)(48 + num);
             /* Record the first non-zero digit, note that this is a number
@@ -1428,7 +1431,7 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
              */
             if (first <= 5)
             {
-               unsigned i;
+               unsigned int i;
                *ascii++ = 46; /* decimal point */
                /* ndigits may be <5 for small numbers, output leading zeros
                 * then ndigits digits to first:
@@ -1790,9 +1793,9 @@ png_8bit_l2[128] =
 };
 
 static png_uint_32
-png_log8bit(unsigned x)
+png_log8bit(unsigned int x)
 {
-   unsigned log = 0;
+   unsigned int log = 0;
    /* Each time 'x' is multiplied by 2, 1 must be subtracted off the final log,
     * because the log is actually negate that means adding 1.  The final
     * returned value thus has the range 0 (for 255 input) to 7.994 (for 1
@@ -1847,7 +1850,7 @@ png_log8bit(unsigned x)
 static png_uint_32
 png_log16bit(png_uint_32 x)
 {
-   unsigned log = 0;
+   unsigned int log = 0;
 
    /* As above, but now the input has 16 bits. */
    if ((x &= 0xffff) == 0)
@@ -2007,12 +2010,13 @@ png_exp16bit(png_uint_32 log)
 #endif /* FLOATING_ARITHMETIC */
 
 png_byte
-png_gamma_8bit_correct(unsigned value, png_fixed_point gamma)
+png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma)
 {
    if (value > 0 && value < 255)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-         return (png_byte)floor(255*pow(value/255.,gamma*.00001)+.5);
+         double r = floor(255*pow(value/255.,gamma*.00001)+.5);
+         return (png_byte)r;
 #     else
          png_uint_32 log = png_log8bit(value);
          png_fixed_point res;
@@ -2029,13 +2033,13 @@ png_gamma_8bit_correct(unsigned value, png_fixed_point gamma)
 }
 
 png_uint_16
-png_gamma_16bit_correct(unsigned value, png_fixed_point gamma)
+png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma)
 {
    if (value > 0 && value < 65535)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-         return (png_uint_16)floor(65535*pow(value/65535.,gamma*.00001)+.5);
-
+         double r = floor(65535*pow(value/65535.,gamma*.00001)+.5);
+         return (png_uint_16)r;
 #     else
          png_uint_32 log = png_log16bit(value);
          png_fixed_point res;
@@ -2057,7 +2061,8 @@ png_gamma_16bit_correct(unsigned value, png_fixed_point gamma)
  * 8 bit (as are the arguments.)
  */
 png_uint_16 /* PRIVATE */
-png_gamma_correct(png_structp png_ptr, unsigned value, png_fixed_point gamma)
+png_gamma_correct(png_structp png_ptr, unsigned int value,
+    png_fixed_point gamma)
 {
    if (png_ptr->bit_depth == 8)
       return png_gamma_8bit_correct(value, gamma);
@@ -2086,13 +2091,13 @@ png_gamma_significant(png_fixed_point gamma)
  */
 static void
 png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
-   PNG_CONST unsigned shift, PNG_CONST png_fixed_point gamma)
+   PNG_CONST unsigned int shift, PNG_CONST png_fixed_point gamma)
 {
    /* Various values derived from 'shift': */
-   PNG_CONST unsigned num = 1U << (8U - shift);
-   PNG_CONST unsigned max = (1U << (16U - shift))-1U;
-   PNG_CONST unsigned max_by_2 = 1U << (15U-shift);
-   unsigned i;
+   PNG_CONST unsigned int num = 1U << (8U - shift);
+   PNG_CONST unsigned int max = (1U << (16U - shift))-1U;
+   PNG_CONST unsigned int max_by_2 = 1U << (15U-shift);
+   unsigned int i;
 
    png_uint_16pp table = *ptable =
        (png_uint_16pp)png_calloc(png_ptr, num * png_sizeof(png_uint_16p));
@@ -2115,15 +2120,14 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
           * We want input * 65535/max, rounded, the arithmetic fits in 32
           * bits (unsigned) so long as max <= 32767.
           */
-         unsigned j;
+         unsigned int j;
          for (j = 0; j < 256; j++)
          {
             png_uint_32 ig = (j << (8-shift)) + i;
 #           ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
                /* Inline the 'max' scaling operation: */
-               sub_table[j] = (png_uint_16)floor(65535*pow(ig/(double)max,
-                   gamma*.00001)+.5);
-
+               double d = floor(65535*pow(ig/(double)max, gamma*.00001)+.5);
+               sub_table[j] = (png_uint_16)d;
 #           else
                if (shift)
                   ig = (ig * 65535U + max_by_2)/max;
@@ -2135,7 +2139,7 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
       else
       {
          /* We must still build a table, but do it the fast way. */
-         unsigned j;
+         unsigned int j;
 
          for (j = 0; j < 256; j++)
          {
@@ -2155,11 +2159,11 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
  */
 static void
 png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
-   PNG_CONST unsigned shift, PNG_CONST png_fixed_point gamma)
+   PNG_CONST unsigned int shift, PNG_CONST png_fixed_point gamma)
 {
-   PNG_CONST unsigned num = 1U << (8U - shift);
-   PNG_CONST unsigned max = (1U << (16U - shift))-1U;
-   unsigned i;
+   PNG_CONST unsigned int num = 1U << (8U - shift);
+   PNG_CONST unsigned int max = (1U << (16U - shift))-1U;
+   unsigned int i;
    png_uint_32 last;
 
    png_uint_16pp table = *ptable =
@@ -2224,7 +2228,7 @@ static void
 png_build_8bit_table(png_structp png_ptr, png_bytepp ptable,
    PNG_CONST png_fixed_point gamma)
 {
-   unsigned i;
+   unsigned int i;
    png_bytep table = *ptable = (png_bytep)png_malloc(png_ptr, 256);
 
    if (png_gamma_significant(gamma)) for (i=0; i<256; i++)

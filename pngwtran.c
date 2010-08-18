@@ -236,7 +236,8 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
  * data to 0 to 15.
  */
 void /* PRIVATE */
-png_do_shift(png_row_infop row_info, png_bytep row, png_color_8p bit_depth)
+png_do_shift(png_row_infop row_info, png_bytep row,
+    png_const_color_8p bit_depth)
 {
    png_debug(1, "in png_do_shift");
 

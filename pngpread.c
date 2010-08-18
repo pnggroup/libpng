@@ -1741,8 +1741,8 @@ png_push_have_row(png_structp png_ptr, png_bytep row)
 }
 
 void PNGAPI
-png_progressive_combine_row (png_structp png_ptr,
-    png_bytep old_row, png_bytep new_row)
+png_progressive_combine_row (png_structp png_ptr, png_bytep old_row,
+    png_const_bytep new_row)
 {
    PNG_CONST int FARDATA png_pass_dsp_mask[7] =
       {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};

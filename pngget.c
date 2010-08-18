@@ -465,7 +465,7 @@ png_get_channels(png_structp png_ptr, png_infop info_ptr)
       return (0);
 }
 
-png_bytep PNGAPI
+png_const_bytep PNGAPI
 png_get_signature(png_structp png_ptr, png_infop info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
@@ -1035,7 +1035,7 @@ png_get_io_state (png_structp png_ptr)
    return png_ptr->io_state;
 }
 
-png_bytep PNGAPI
+png_const_bytep PNGAPI
 png_get_io_chunk_name (png_structp png_ptr)
 {
    return png_ptr->chunk_name;

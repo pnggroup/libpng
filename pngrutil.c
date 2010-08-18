@@ -20,7 +20,7 @@
 
 #    define png_strtod(p,a,b) strtod(a,b)
 png_uint_32 PNGAPI
-png_get_uint_31(png_structp png_ptr, png_bytep buf)
+png_get_uint_31(png_structp png_ptr, png_const_bytep buf)
 {
    png_uint_32 i = png_get_uint_32(buf);
    if (i > PNG_UINT_31_MAX)
@@ -36,8 +36,8 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
  */
 #define PNG_FIXED_ERROR (-1)
 
-png_fixed_point /* PRIVATE */
-png_get_fixed_point(png_structp png_ptr, png_bytep buf)
+static png_fixed_point /* PRIVATE */
+png_get_fixed_point(png_structp png_ptr, png_const_bytep buf)
 {
    png_uint_32 u = png_get_uint_32(buf);
    if (u <= PNG_UINT_31_MAX)
@@ -57,7 +57,7 @@ png_get_fixed_point(png_structp png_ptr, png_bytep buf)
  */
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
 png_uint_32 (PNGAPI
-png_get_uint_32)(png_bytep buf)
+png_get_uint_32)(png_const_bytep buf)
 {
    png_uint_32 i =
        ((png_uint_32)(*(buf    )) << 24) +
@@ -74,7 +74,7 @@ png_get_uint_32)(png_bytep buf)
  * the following code does a two's complement to native conversion.
  */
 png_int_32 (PNGAPI
-png_get_int_32)(png_bytep buf)
+png_get_int_32)(png_const_bytep buf)
 {
    png_uint_32 u = png_get_uint_32(buf);
    if ((u & 0x80000000) == 0) /* non-negative */
@@ -86,7 +86,7 @@ png_get_int_32)(png_bytep buf)
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 (PNGAPI
-png_get_uint_16)(png_bytep buf)
+png_get_uint_16)(png_const_bytep buf)
 {
    png_uint_16 i =
        ((png_uint_32)(*buf) << 8) +
@@ -236,12 +236,12 @@ png_crc_error(png_structp png_ptr)
 #if defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_READ_iTXt_SUPPORTED) || \
     defined(PNG_READ_iCCP_SUPPORTED)
 static png_size_t
-png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
+png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
     png_bytep output, png_size_t output_size)
 {
    png_size_t count = 0;
 
-   png_ptr->zstream.next_in = (png_bytep)data; /* const_cast: VALID */
+   png_ptr->zstream.next_in = data;
    png_ptr->zstream.avail_in = size;
 
    while (1)
@@ -2478,7 +2478,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
 
 void /* PRIVATE */
-png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
+png_check_chunk_name(png_structp png_ptr, png_const_bytep chunk_name)
 {
    png_debug(1, "in png_check_chunk_name");
    if (isnonalpha(chunk_name[0]) || isnonalpha(chunk_name[1]) ||
@@ -2956,7 +2956,7 @@ png_do_read_interlace(png_structp png_ptr)
 
 void /* PRIVATE */
 png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
-    png_bytep prev_row, int filter)
+    png_const_bytep prev_row, int filter)
 {
    png_debug(1, "in png_read_filter_row");
    png_debug2(2, "row = %u, filter = %d", png_ptr->row_number, filter);
@@ -2985,7 +2985,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
          png_uint_32 i;
          png_uint_32 istop = row_info->rowbytes;
          png_bytep rp = row;
-         png_bytep pp = prev_row;
+         png_const_bytep pp = prev_row;
 
          for (i = 0; i < istop; i++)
          {
@@ -2998,7 +2998,7 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
       {
          png_uint_32 i;
          png_bytep rp = row;
-         png_bytep pp = prev_row;
+         png_const_bytep pp = prev_row;
          png_bytep lp = row;
          png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
          png_uint_32 istop = row_info->rowbytes - bpp;
@@ -3022,9 +3022,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
       {
          png_uint_32 i;
          png_bytep rp = row;
-         png_bytep pp = prev_row;
+         png_const_bytep pp = prev_row;
          png_bytep lp = row;
-         png_bytep cp = prev_row;
+         png_const_bytep cp = prev_row;
          png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
          png_uint_32 istop=row_info->rowbytes - bpp;
 

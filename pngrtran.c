@@ -92,7 +92,7 @@ png_set_crc_action(png_structp png_ptr, int crit_action, int ancil_action)
 /* Handle alpha and tRNS via a background color */
 void PNGFAPI
 png_set_background_fixed(png_structp png_ptr,
-    png_color_16p background_color, int background_gamma_code,
+    png_const_color_16p background_color, int background_gamma_code,
     int need_expand, png_fixed_point background_gamma)
 {
    png_debug(1, "in png_set_background_fixed");
@@ -117,7 +117,7 @@ png_set_background_fixed(png_structp png_ptr,
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 void PNGAPI
 png_set_background(png_structp png_ptr,
-    png_color_16p background_color, int background_gamma_code,
+    png_const_color_16p background_color, int background_gamma_code,
     int need_expand, double background_gamma)
 {
    png_set_background_fixed(png_ptr, background_color, background_gamma_code,
@@ -174,7 +174,7 @@ typedef png_dsort FAR * FAR * png_dsortpp;
 
 void PNGAPI
 png_set_quantize(png_structp png_ptr, png_colorp palette,
-    int num_palette, int maximum_colors, png_uint_16p histogram,
+    int num_palette, int maximum_colors, png_const_uint_16p histogram,
     int full_quantize)
 {
    png_debug(1, "in png_set_quantize");
@@ -1531,7 +1531,7 @@ png_do_read_transformations(png_structp png_ptr)
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
    if (png_ptr->transformations & PNG_QUANTIZE)
    {
-      png_do_quantize((png_row_infop)&(png_ptr->row_info), png_ptr->row_buf + 1,
+      png_do_quantize(&(png_ptr->row_info), png_ptr->row_buf + 1,
           png_ptr->palette_lookup, png_ptr->quantize_index);
 
       if (png_ptr->row_info.rowbytes == (png_uint_32)0)
@@ -1727,7 +1727,8 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
  * the values back to 0 through 31.
  */
 void /* PRIVATE */
-png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
+png_do_unshift(png_row_infop row_info, png_bytep row,
+    png_const_color_8p sig_bits)
 {
    png_debug(1, "in png_do_unshift");
 
@@ -2679,12 +2680,12 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
  */
 void /* PRIVATE */
 png_do_background(png_row_infop row_info, png_bytep row,
-    png_color_16p trans_color, png_color_16p background
+    png_const_color_16p trans_color, png_const_color_16p background
 #ifdef PNG_READ_GAMMA_SUPPORTED
-    , png_color_16p background_1,
-    png_bytep gamma_table, png_bytep gamma_from_1, png_bytep gamma_to_1,
-    png_uint_16pp gamma_16, png_uint_16pp gamma_16_from_1,
-    png_uint_16pp gamma_16_to_1, int gamma_shift
+    , png_const_color_16p background_1, png_const_bytep gamma_table,
+    png_const_bytep gamma_from_1, png_const_bytep gamma_to_1,
+    png_const_uint_16pp gamma_16, png_const_uint_16pp gamma_16_from_1,
+    png_const_uint_16pp gamma_16_to_1, int gamma_shift
 #endif
     )
 {
@@ -3425,7 +3426,7 @@ png_do_background(png_row_infop row_info, png_bytep row,
  */
 void /* PRIVATE */
 png_do_gamma(png_row_infop row_info, png_bytep row,
-    png_bytep gamma_table, png_uint_16pp gamma_16_table,
+    png_const_bytep gamma_table, png_const_uint_16pp gamma_16_table,
     int gamma_shift)
 {
    png_bytep sp;
@@ -3620,7 +3621,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
  */
 void /* PRIVATE */
 png_do_expand_palette(png_row_infop row_info, png_bytep row,
-   png_colorp palette, png_bytep trans_alpha, int num_trans)
+   png_const_colorp palette, png_const_bytep trans_alpha, int num_trans)
 {
    int shift, value;
    png_bytep sp, dp;
@@ -3772,7 +3773,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
  */
 void /* PRIVATE */
 png_do_expand(png_row_infop row_info, png_bytep row,
-    png_color_16p trans_value)
+    png_const_color_16p trans_value)
 {
    int shift, value;
    png_bytep sp, dp;
@@ -3996,7 +3997,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
 void /* PRIVATE */
 png_do_quantize(png_row_infop row_info, png_bytep row,
-    png_bytep palette_lookup, png_bytep quantize_lookup)
+    png_const_bytep palette_lookup, png_const_bytep quantize_lookup)
 {
    png_bytep sp, dp;
    png_uint_32 i;

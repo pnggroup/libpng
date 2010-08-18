@@ -118,9 +118,9 @@ next_format(png_bytep colour_type, png_bytep bit_depth)
    return 0;
 }
 
-static unsigned
+static unsigned int
 sample(png_byte *row, png_byte colour_type, png_byte bit_depth, png_uint_32 x,
-    unsigned sample)
+    unsigned int sample)
 {
    png_uint_32 index, result;
    
@@ -578,7 +578,7 @@ typedef struct png_modifier
 
    /* Test values */
    double                  *gammas;
-   unsigned                 ngammas;
+   unsigned int             ngammas;
 
    /* Lowest sbit to test (libpng fails for sbit < 8) */
    png_byte                 sbitlow;
@@ -603,10 +603,10 @@ typedef struct png_modifier
 
    /* Flags: */
    /* When to use the use_input_precision option: */
-   unsigned                 use_input_precision :1;
-   unsigned                 use_input_precision_sbit :1;
-   unsigned                 use_input_precision_16to8 :1;
-   unsigned                 log :1;   /* Log max error */
+   unsigned int             use_input_precision :1;
+   unsigned int             use_input_precision_sbit :1;
+   unsigned int             use_input_precision_16to8 :1;
+   unsigned int             log :1;   /* Log max error */
 
    /* Buffer information, the buffer size limits the size of the chunks that can
     * be modified - they must fit (including header and CRC) into the buffer!
@@ -1006,7 +1006,7 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
 #define STD_WIDTH  128U
 #define STD_ROWMAX (STD_WIDTH*8U)
 
-static unsigned
+static unsigned int
 bit_size(png_structp pp, png_byte colour_type, png_byte bit_depth)
 {
    switch (colour_type)
@@ -1189,7 +1189,7 @@ make_standard(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
 
       if (colour_type == 3) /* palette */
       {
-         unsigned i = 0;
+         unsigned int i = 0;
          png_color pal[256];
          do
             pal[i].red = pal[i].green = pal[i].blue = (png_byte)i;
@@ -1540,7 +1540,7 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
    {
       PNG_CONST png_byte out_ct = png_get_color_type(pp, pi);
       PNG_CONST png_byte out_bd = png_get_bit_depth(pp, pi);
-      PNG_CONST unsigned outmax = (1U<<out_bd)-1;
+      PNG_CONST unsigned int outmax = (1U<<out_bd)-1;
       PNG_CONST png_uint_32 w = png_get_image_width(pp, pi);
       PNG_CONST png_uint_32 h = png_get_image_height(pp, pi);
       PNG_CONST size_t cb = png_get_rowbytes(pp, pi); /* For memcmp below. */
@@ -1588,12 +1588,12 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
       PNG_CONST int processing = (fabs(screen_gamma*file_gamma-1) >=
          PNG_GAMMA_THRESHOLD && !threshold_test && !speed && colour_type != 3)
          || bit_depth != out_bd;
-      PNG_CONST unsigned samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
+      PNG_CONST unsigned int samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
       PNG_CONST double gamma = 1/(file_gamma*screen_gamma); /* Overall */
 
       for (y=0; y<h; ++y) /* just one pass - no interlacing */
       {
-         unsigned s, x;
+         unsigned int s, x;
          png_byte std[STD_ROWMAX];
          png_byte display[STD_ROWMAX];
 
@@ -1603,9 +1603,10 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
          if (processing) for (x=0; x<w; ++x) for (s=0; s<samples_per_pixel; ++s)
          {
             /* Input sample values: */
-            PNG_CONST unsigned id = sample(std, colour_type, bit_depth, x, s);
-            PNG_CONST unsigned od = sample(display, out_ct, out_bd, x, s);
-            PNG_CONST unsigned isbit = id >> (bit_depth-sbit);
+            PNG_CONST unsigned int id =
+                sample(std, colour_type, bit_depth, x, s);
+            PNG_CONST unsigned int od = sample(display, out_ct, out_bd, x, s);
+            PNG_CONST unsigned int isbit = id >> (bit_depth-sbit);
             double i, sample, encoded_sample, output, encoded_error, error;
             double es_lo, es_hi;
 
@@ -1849,7 +1850,7 @@ static void perform_gamma_transform_tests(png_modifier *pm, int speed)
     */
    while (next_format(&colour_type, &bit_depth)) if (colour_type != 3)
    {
-      unsigned i, j;
+      unsigned int i, j;
 
       for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j) if (i != j)
       {
@@ -1870,7 +1871,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
     */
    for (sbit=pm->sbitlow; sbit<16; ++sbit)
    {
-      unsigned i, j;
+      unsigned int i, j;
       for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j)
          if (i != j)
       {
@@ -1906,7 +1907,7 @@ static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
     * proceed *without* gamma correction, and the tests above will fail (but not
     * by much) - this could be fixed, it only appears with the -g option.
     */
-   unsigned i, j;
+   unsigned int i, j;
    for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j)
       if (i != j && fabs(pm->gammas[j]/pm->gammas[i]-1) >= PNG_GAMMA_THRESHOLD)
    {

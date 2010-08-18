@@ -412,7 +412,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 #ifdef PNG_CONVERT_tIME_SUPPORTED
 /* "tm" structure is not supported on WindowsCE */
 void PNGAPI
-png_convert_from_struct_tm(png_timep ptime, struct tm FAR * ttime)
+png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm FAR * ttime)
 {
    png_debug(1, "in png_convert_from_struct_tm");
 
@@ -643,7 +643,7 @@ png_write_image(png_structp png_ptr, png_bytepp image)
 
 /* Called by user to write a row of image data */
 void PNGAPI
-png_write_row(png_structp png_ptr, png_bytep row)
+png_write_row(png_structp png_ptr, png_const_bytep row)
 {
    if (png_ptr == NULL)
       return;
@@ -1284,7 +1284,8 @@ png_init_filter_heuristics(png_structp png_ptr, int heuristic_method,
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void PNGAPI
 png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
-   int num_weights, png_doublep filter_weights, png_doublep filter_costs)
+   int num_weights, png_const_doublep filter_weights,
+   png_const_doublep filter_costs)
 {
    png_debug(1, "in png_set_filter_heuristics");
 
@@ -1338,8 +1339,8 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 #ifdef PNG_FIXED_POINT_SUPPORTED
 void PNGAPI
 png_set_filter_heuristics_fixed(png_structp png_ptr, int heuristic_method,
-   int num_weights, png_fixed_point_p filter_weights,
-   png_fixed_point_p filter_costs)
+   int num_weights, png_const_fixed_point_p filter_weights,
+   png_const_fixed_point_p filter_costs)
 {
    png_debug(1, "in png_set_filter_heuristics_fixed");
 

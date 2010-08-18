@@ -22,7 +22,8 @@
 
 #ifdef PNG_bKGD_SUPPORTED
 void PNGAPI
-png_set_bKGD(png_structp png_ptr, png_infop info_ptr, png_color_16p background)
+png_set_bKGD(png_structp png_ptr, png_infop info_ptr,
+    png_const_color_16p background)
 {
    png_debug1(1, "in %s storage function", "bKGD");
 
@@ -122,7 +123,7 @@ png_set_gAMA(png_structp png_ptr, png_infop info_ptr, double file_gamma)
 
 #ifdef PNG_hIST_SUPPORTED
 void PNGAPI
-png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_16p hist)
+png_set_hIST(png_structp png_ptr, png_infop info_ptr, png_const_uint_16p hist)
 {
    int i;
 
@@ -231,8 +232,8 @@ png_set_oFFs(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_pCAL_SUPPORTED
 void PNGAPI
 png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
-    png_charp purpose, png_int_32 X0, png_int_32 X1, int type, int nparams,
-    png_charp units, png_charpp params)
+    png_const_charp purpose, png_int_32 X0, png_int_32 X1, int type,
+    int nparams, png_const_charp units, png_charpp params)
 {
    png_size_t length;
    int i;
@@ -320,7 +321,7 @@ png_set_pCAL(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_sCAL_SUPPORTED
 void PNGAPI
 png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
-    int unit, png_charp swidth, png_charp sheight)
+    int unit, png_const_charp swidth, png_const_charp sheight)
 {
    png_size_t lengthw = 0, lengthh = 0;
 
@@ -454,7 +455,7 @@ png_set_pHYs(png_structp png_ptr, png_infop info_ptr,
 
 void PNGAPI
 png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
-    png_colorp palette, int num_palette)
+    png_const_colorp palette, int num_palette)
 {
 
    png_debug1(1, "in %s storage function", "PLTE");
@@ -499,7 +500,7 @@ png_set_PLTE(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_sBIT_SUPPORTED
 void PNGAPI
 png_set_sBIT(png_structp png_ptr, png_infop info_ptr,
-    png_color_8p sig_bit)
+    png_const_color_8p sig_bit)
 {
    png_debug1(1, "in %s storage function", "sBIT");
 
@@ -555,8 +556,8 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_iCCP_SUPPORTED
 void PNGAPI
 png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
-    png_charp name, int compression_type,
-    png_bytep profile, png_uint_32 proflen)
+    png_const_charp name, int compression_type,
+    png_const_bytep profile, png_uint_32 proflen)
 {
    png_charp new_iccp_name;
    png_bytep new_iccp_profile;
@@ -603,7 +604,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
 
 #ifdef PNG_TEXT_SUPPORTED
 void PNGAPI
-png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
+png_set_text(png_structp png_ptr, png_infop info_ptr, png_const_textp text_ptr,
     int num_text)
 {
    int ret;
@@ -614,8 +615,8 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 }
 
 int /* PRIVATE */
-png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
-    int num_text)
+png_set_text_2(png_structp png_ptr, png_infop info_ptr,
+    png_const_textp text_ptr, int num_text)
 {
    int i;
 
@@ -788,7 +789,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
 
 #ifdef PNG_tIME_SUPPORTED
 void PNGAPI
-png_set_tIME(png_structp png_ptr, png_infop info_ptr, png_timep mod_time)
+png_set_tIME(png_structp png_ptr, png_infop info_ptr, png_const_timep mod_time)
 {
    png_debug1(1, "in %s storage function", "tIME");
 
@@ -804,7 +805,7 @@ png_set_tIME(png_structp png_ptr, png_infop info_ptr, png_timep mod_time)
 #ifdef PNG_tRNS_SUPPORTED
 void PNGAPI
 png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
-    png_bytep trans_alpha, int num_trans, png_color_16p trans_color)
+    png_const_bytep trans_alpha, int num_trans, png_const_color_16p trans_color)
 {
    png_debug1(1, "in %s storage function", "tRNS");
 
@@ -861,7 +862,7 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_sPLT_SUPPORTED
 void PNGAPI
 png_set_sPLT(png_structp png_ptr,
-    png_infop info_ptr, png_sPLT_tp entries, int nentries)
+    png_infop info_ptr, png_const_sPLT_tp entries, int nentries)
 /*
  *  entries        - array of png_sPLT_t structures
  *                   to be added to the list of palettes
@@ -895,7 +896,7 @@ png_set_sPLT(png_structp png_ptr,
    for (i = 0; i < nentries; i++)
    {
       png_sPLT_tp to = np + info_ptr->splt_palettes_num + i;
-      png_sPLT_tp from = entries + i;
+      png_const_sPLT_tp from = entries + i;
       png_uint_32 length;
 
       length = png_strlen(from->name) + 1;
@@ -938,7 +939,7 @@ png_set_sPLT(png_structp png_ptr,
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
 void PNGAPI
 png_set_unknown_chunks(png_structp png_ptr,
-   png_infop info_ptr, png_unknown_chunkp unknowns, int num_unknowns)
+   png_infop info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
 {
    png_unknown_chunkp np;
    int i;
@@ -966,10 +967,9 @@ png_set_unknown_chunks(png_structp png_ptr,
    for (i = 0; i < num_unknowns; i++)
    {
       png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
-      png_unknown_chunkp from = unknowns + i;
+      png_const_unknown_chunkp from = unknowns + i;
 
-      png_memcpy((png_charp)to->name, (png_charp)from->name,
-          png_sizeof(from->name));
+      png_memcpy(to->name, from->name, png_sizeof(from->name));
       to->name[png_sizeof(to->name)-1] = '\0';
       to->size = from->size;
       /* Note our location in the read or write sequence */
@@ -1028,7 +1028,7 @@ png_permit_mng_features (png_structp png_ptr, png_uint_32 mng_features)
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 void PNGAPI
-png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_bytep
+png_set_keep_unknown_chunks(png_structp png_ptr, int keep, png_const_bytep
     chunk_list, int num_chunks)
 {
    png_bytep new_list, p;
