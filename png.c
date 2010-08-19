@@ -396,7 +396,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
          if (info_ptr->unknown_chunks_num)
          {
-            for (i = 0; i < (int)info_ptr->unknown_chunks_num; i++)
+            for (i = 0; i < info_ptr->unknown_chunks_num; i++)
                png_free_data(png_ptr, info_ptr, PNG_FREE_UNKN, i);
 
             png_free(png_ptr, info_ptr->unknown_chunks);
@@ -1344,7 +1344,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
 
             while (exp > 0)
             {
-               exponent[cdigits++] = 48 + exp % 10;
+               exponent[cdigits++] = (char)(48 + exp % 10);
                exp /= 10;
             }
 
@@ -1580,7 +1580,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
                result = -result;
 
             /* Check for overflow. */
-            if (negative && result <= 0 || !negative && result >= 0)
+            if ((negative && result <= 0) || (!negative && result >= 0))
             {
                *res = result;
                return 1;
@@ -1792,7 +1792,7 @@ png_8bit_l2[128] =
 #endif
 };
 
-static png_uint_32
+static png_int_32
 png_log8bit(unsigned int x)
 {
    unsigned int log = 0;
@@ -1814,7 +1814,8 @@ png_log8bit(unsigned int x)
    if ((x & 0x80) == 0)
       log += 1, x <<= 1;
 
-   return (log << 16) + ((png_8bit_l2[x-128]+32768)>>16);
+   /* result is at most 19 bits, so this cast is safe: */
+   return (png_int_32)((log << 16) + ((png_8bit_l2[x-128]+32768)>>16));
 }
 
 /* The above gives exact (to 16 binary places) log2 values for 8 bit images,
@@ -1847,7 +1848,7 @@ png_log8bit(unsigned int x)
  * Zero  (257):      0
  * End   (258):  23499
  */
-static png_uint_32
+static png_int_32
 png_log16bit(png_uint_32 x)
 {
    unsigned int log = 0;
@@ -1894,7 +1895,8 @@ png_log16bit(png_uint_32 x)
    else
       log -= ((23499U * (x-65536U)) + (1U << (16+6-12-1))) >> (16+6-12);
 
-   return (log + 2048) >> 12;
+   /* Safe, because the result can't have more than 20 bits: */
+   return (png_int_32)((log + 2048) >> 12);
 }
 
 /* The 'exp()' case must invert the above, taking a 20 bit fixed point
@@ -1941,9 +1943,9 @@ for (i=11;i>=0;--i){ print i, " ", (1 - e(-(2^i)/65536*l(2))) * 2^(32-i), "\n"}
 #endif
 
 static png_uint_32
-png_exp(png_uint_32 x)
+png_exp(png_fixed_point x)
 {
-   if (x <= 0xfffff) /* Else zero */
+   if (x > 0 && x <= 0xfffff) /* Else overflow or zero (underflow) */
    {
       /* Obtain a 4 bit approximation */
       png_uint_32 e = png_32bit_exp[(x >> 12) & 0xf];
@@ -1980,11 +1982,16 @@ png_exp(png_uint_32 x)
       return e;
    }
 
+   /* Check for overflow */
+   if (x <= 0)
+      return png_32bit_exp[0];
+
+   /* Else underflow */
    return 0;
 }
 
 static png_byte
-png_exp8bit(png_uint_32 log)
+png_exp8bit(png_fixed_point log)
 {
    /* Get a 32 bit value: */
    png_uint_32 x = png_exp(log);
@@ -1994,18 +2001,18 @@ png_exp8bit(png_uint_32 log)
     * step.
     */
    x -= x >> 8;
-   return (x + 0x7fffffU) >> 24;
+   return (png_byte)((x + 0x7fffffU) >> 24);
 }
 
 static png_uint_16
-png_exp16bit(png_uint_32 log)
+png_exp16bit(png_fixed_point log)
 {
    /* Get a 32 bit value: */
    png_uint_32 x = png_exp(log);
 
    /* Convert the 32 bit value to 0..65535 by multiplying by 65536-1: */
    x -= x >> 16;
-   return (x + 32767U) >> 16;
+   return (png_uint_16)((x + 32767U) >> 16);
 }
 #endif /* FLOATING_ARITHMETIC */
 
@@ -2018,7 +2025,7 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma)
          double r = floor(255*pow(value/255.,gamma*.00001)+.5);
          return (png_byte)r;
 #     else
-         png_uint_32 log = png_log8bit(value);
+         png_int_32 log = png_log8bit(value);
          png_fixed_point res;
 
          if (png_muldiv(&res, gamma, log, PNG_FP_1))
@@ -2041,7 +2048,7 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma)
          double r = floor(65535*pow(value/65535.,gamma*.00001)+.5);
          return (png_uint_16)r;
 #     else
-         png_uint_32 log = png_log16bit(value);
+         png_int_32 log = png_log16bit(value);
          png_fixed_point res;
 
          if (png_muldiv(&res, gamma, log, PNG_FP_1))
@@ -2200,12 +2207,12 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
       png_uint_16 out = (png_uint_16)(i * 257U); /* 16 bit output value */
 
       /* Find the boundary value in 16 bits: */
-      png_uint_16 bound = png_gamma_16bit_correct(out+128U, gamma);
+      png_uint_32 bound = png_gamma_16bit_correct(out+128U, gamma);
 
       /* Adjust (round) to (16-shift) bits: */
-      bound = (png_uint_16)(((png_uint_32)bound * max + 32768U)/65535U);
+      bound = (bound * max + 32768U)/65535U + 1U;
 
-      while (last <= bound)
+      while (last < bound)
       {
          table[last & (0xffU >> shift)][last >> (8U - shift)] = out;
          last++;
@@ -2244,7 +2251,7 @@ png_build_8bit_table(png_structp png_ptr, png_bytepp ptable,
  * we don't need to allocate > 64K chunks for a full 16-bit table.
  */
 void /* PRIVATE */
-png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
+png_build_gamma_table(png_structp png_ptr, int bit_depth)
 {
   png_debug(1, "in png_build_gamma_table");
 
@@ -2302,8 +2309,8 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
       *   <all high 8 bit values><n << gamma_shift>..<(n+1 << gamma_shift)-1>
       *
       */
-     if (sig_bit > 0)
-        shift = 16U - sig_bit; /* shift == insignificant bits */
+     if (sig_bit > 0 && sig_bit < 16U)
+        shift = (png_byte)(16U - sig_bit); /* shift == insignificant bits */
 
      else
         shift = 0; /* keep all 16 bits */

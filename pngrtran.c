@@ -1273,7 +1273,8 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
    if (png_ptr->transformations & PNG_BACKGROUND)
    {
-      info_ptr->color_type &= ~PNG_COLOR_MASK_ALPHA;
+      info_ptr->color_type = (png_byte)(info_ptr->color_type &
+          ~PNG_COLOR_MASK_ALPHA);
       info_ptr->num_trans = 0;
       info_ptr->background = png_ptr->background;
    }
@@ -2609,8 +2610,9 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
             }
          }
       }
-   row_info->channels -= (png_byte)2;
-      row_info->color_type &= ~PNG_COLOR_MASK_COLOR;
+      row_info->channels -= 2;
+      row_info->color_type = (png_byte)(row_info->color_type &
+          ~PNG_COLOR_MASK_COLOR);
       row_info->pixel_depth = (png_byte)(row_info->channels *
           row_info->bit_depth);
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, row_width);
@@ -3408,7 +3410,8 @@ png_do_background(png_row_infop row_info, png_bytep row,
 
       if (row_info->color_type & PNG_COLOR_MASK_ALPHA)
       {
-         row_info->color_type &= ~PNG_COLOR_MASK_ALPHA;
+         row_info->color_type = (png_byte)(row_info->color_type &
+             ~PNG_COLOR_MASK_ALPHA);
          row_info->channels--;
          row_info->pixel_depth = (png_byte)(row_info->channels *
              row_info->bit_depth);
@@ -3715,9 +3718,8 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
          row_info->rowbytes = row_width;
       }
 
-      switch (row_info->bit_depth)
+      else if (row_info->bit_depth == 8)
       {
-         case 8:
          {
             if (trans_alpha != NULL)
             {
@@ -3763,7 +3765,6 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
                row_info->color_type = 2;
                row_info->channels = 3;
             }
-            break;
          }
       }
    }
@@ -3897,8 +3898,8 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 
             else if (row_info->bit_depth == 16)
             {
-               png_byte gray_high = (gray >> 8) & 0xff;
-               png_byte gray_low = gray & 0xff;
+               png_byte gray_high = (png_byte)((gray >> 8) & 0xff);
+               png_byte gray_low = (png_byte)(gray & 0xff);
                sp = row + row_info->rowbytes - 1;
                dp = row + (row_info->rowbytes << 1) - 1;
                for (i = 0; i < row_width; i++)
@@ -3931,9 +3932,9 @@ png_do_expand(png_row_infop row_info, png_bytep row,
       {
          if (row_info->bit_depth == 8)
          {
-            png_byte red = trans_value->red & 0xff;
-            png_byte green = trans_value->green & 0xff;
-            png_byte blue = trans_value->blue & 0xff;
+            png_byte red = (png_byte)(trans_value->red & 0xff);
+            png_byte green = (png_byte)(trans_value->green & 0xff);
+            png_byte blue = (png_byte)(trans_value->blue & 0xff);
             sp = row + (png_size_t)row_info->rowbytes - 1;
             dp = row + (png_size_t)(row_width << 2) - 1;
             for (i = 0; i < row_width; i++)
@@ -3951,12 +3952,12 @@ png_do_expand(png_row_infop row_info, png_bytep row,
          }
          else if (row_info->bit_depth == 16)
          {
-            png_byte red_high = (trans_value->red >> 8) & 0xff;
-            png_byte green_high = (trans_value->green >> 8) & 0xff;
-            png_byte blue_high = (trans_value->blue >> 8) & 0xff;
-            png_byte red_low = trans_value->red & 0xff;
-            png_byte green_low = trans_value->green & 0xff;
-            png_byte blue_low = trans_value->blue & 0xff;
+            png_byte red_high = (png_byte)((trans_value->red >> 8) & 0xff);
+            png_byte green_high = (png_byte)((trans_value->green >> 8) & 0xff);
+            png_byte blue_high = (png_byte)((trans_value->blue >> 8) & 0xff);
+            png_byte red_low = (png_byte)(trans_value->red & 0xff);
+            png_byte green_low = (png_byte)(trans_value->green & 0xff);
+            png_byte blue_low = (png_byte)(trans_value->blue & 0xff);
             sp = row + row_info->rowbytes - 1;
             dp = row + (png_size_t)(row_width << 3) - 1;
             for (i = 0; i < row_width; i++)

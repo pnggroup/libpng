@@ -229,7 +229,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
  defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
    /* Storage for unknown chunks that the library doesn't recognize. */
    png_unknown_chunkp unknown_chunks;
-   png_size_t unknown_chunks_num;
+   int unknown_chunks_num;
 #endif
 
 #ifdef PNG_iCCP_SUPPORTED

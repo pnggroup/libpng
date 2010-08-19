@@ -1878,7 +1878,7 @@ PNG_EXPORT(void, png_set_unknown_chunks,(png_structp png_ptr,
     174);
 PNG_EXPORT(void, png_set_unknown_chunk_location, (png_structp png_ptr,
     png_infop info_ptr, int chunk, int location),,175);
-PNG_EXPORT(png_uint_32,png_get_unknown_chunks,(png_structp png_ptr,
+PNG_EXPORT(int,png_get_unknown_chunks,(png_structp png_ptr,
     png_infop info_ptr, png_unknown_chunkpp entries),,176);
 #endif
 

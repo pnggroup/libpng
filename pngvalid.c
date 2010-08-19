@@ -82,40 +82,35 @@ next_format(png_bytep colour_type, png_bytep bit_depth)
       *colour_type = 0, *bit_depth = 1;
       return 1;
    }
-   else switch (*colour_type)
+
+   *bit_depth = (png_byte)(*bit_depth << 1);
+
+   /* Palette images are restricted to 8 bit depth */
+   if (*bit_depth <= 8 || (*colour_type != 3 && *bit_depth <= 16))
+      return 1;
+
+   /* Move to the next color type, or return 0 at the end. */
+   switch (*colour_type)
    {
    case 0:
-      *bit_depth <<= 1;
-      if (*bit_depth <= 16) return 1;
       *colour_type = 2;
       *bit_depth = 8;
       return 1;
    case 2:
-      *bit_depth <<= 1;
-      if (*bit_depth <= 16) return 1;
       *colour_type = 3;
       *bit_depth = 1;
       return 1;
    case 3:
-      *bit_depth <<= 1;
-      if (*bit_depth <= 8) return 1;
       *colour_type = 4;
       *bit_depth = 8;
       return 1;
    case 4:
-      *bit_depth <<= 1;
-      if (*bit_depth <= 16) return 1;
       *colour_type = 6;
       *bit_depth = 8;
       return 1;
-   case 6:
-      *bit_depth <<= 1;
-      if (*bit_depth <= 16) return 1;
-      break;
+   default:
+      return 0;
    }
-
-   /* Here at the end. */
-   return 0;
 }
 
 static unsigned int
@@ -171,10 +166,10 @@ typedef struct png_store_file
 typedef struct png_store
 {
    jmp_buf            jmpbuf;
-   int                verbose;
+   unsigned int       verbose :1;
+   unsigned int       treat_warnings_as_errors :1;
    int                nerrors;
    int                nwarnings;
-   int                treat_warnings_as_errors;
    char               test[64]; /* Name of test */
    char               error[128];
    /* Read fields */
@@ -690,9 +685,9 @@ typedef struct png_modification
     * to add the chunk before the relevant chunk.
     */
    png_uint_32              add;
-   int                      modified :1;     /* Chunk was modified */
-   int                      added    :1;     /* Chunk was added */
-   int                      removed  :1;     /* Chunk was removed */
+   unsigned int             modified :1;     /* Chunk was modified */
+   unsigned int             added    :1;     /* Chunk was added */
+   unsigned int             removed  :1;     /* Chunk was removed */
 } png_modification;
 
 static void modification_reset(png_modification *pmm)
@@ -1142,10 +1137,18 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
          ++i;
       }
       return;
+
+   default:
+      break;
    }
 
    png_error(pp, "internal error");
 }
+
+/* This is just to do the right cast - could be changed to a function to check
+ * 'bd' but there isn't much point.
+ */
+#define DEPTH(bd) ((png_byte)(1U << (bd)))
 
 static void
 make_standard(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
@@ -1181,7 +1184,7 @@ make_standard(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          continue;
       }
 
-      bit_depth = 1U << bdlo;
+      bit_depth = DEPTH(bdlo);
       h = standard_height(pp, colour_type, bit_depth),
       png_set_IHDR(pp, pi, standard_width(pp, colour_type, bit_depth), h,
          bit_depth, colour_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE,
@@ -1239,7 +1242,7 @@ test_standard(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
 
    for (; bdlo <= bdhi; ++bdlo)
    {
-      png_byte bit_depth = 1U << bdlo;
+      png_byte bit_depth = DEPTH(bdlo);
       png_uint_32 h, y;
       size_t cb;
       png_structp pp;
@@ -1761,6 +1764,8 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
    /* Log the summary values too. */
    if (colour_type == 0 || colour_type == 4) switch (bit_depth)
    {
+   case 1:
+      break;
    case 2:
       if (maxerrout > pm->error_gray_2) pm->error_gray_2 = maxerrout; break;
    case 4:
@@ -1769,6 +1774,8 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
       if (maxerrout > pm->error_gray_8) pm->error_gray_8 = maxerrout; break;
    case 16:
       if (maxerrout > pm->error_gray_16) pm->error_gray_16 = maxerrout; break;
+   default:
+      png_error(pp, "bad bit depth (internal: 1)");
    }
    else if (colour_type == 2 || colour_type == 6) switch (bit_depth)
    {
@@ -1776,6 +1783,8 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
       if (maxerrout > pm->error_color_8) pm->error_color_8 = maxerrout; break;
    case 16:
       if (maxerrout > pm->error_color_16) pm->error_color_16 = maxerrout; break;
+   default:
+      png_error(pp, "bad bit depth (internal: 2)");
    }
 }
 
@@ -2029,7 +2038,7 @@ int main(int argc, PNG_CONST char **argv)
       else if (strcmp(*argv, "-l") == 0)
          pm.log = 1;
       else if (strcmp(*argv, "-q") == 0)
-         pm.this.verbose = pm.log = summary = 0;
+         summary = pm.this.verbose = pm.log = 0;
       else if (strcmp(*argv, "-g") == 0)
          pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
       else if (strcmp(*argv, "-w") == 0)
@@ -2073,7 +2082,7 @@ int main(int argc, PNG_CONST char **argv)
    /* Perform the standard and gamma tests. */
    if (!speed)
       perform_standard_test(&pm);
-   perform_gamma_test(&pm, speed, summary && !speed);
+   perform_gamma_test(&pm, speed != 0, summary && !speed);
    if (summary && !speed)
       printf("Results using %s point arithmetic %s\n",
 #if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) || PNG_LIBPNG_VER < 10500

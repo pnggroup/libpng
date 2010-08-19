@@ -262,14 +262,15 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
        */
       if ((ret == Z_OK || ret == Z_STREAM_END) && avail > 0)
       {
+         png_size_t space = avail; /* > 0, see above */
          if (output != 0 && output_size > count)
          {
-            int copy = output_size - count;
-            if (avail < copy)
-               copy = avail;
+            png_size_t copy = output_size - count;
+            if (space < copy)
+               copy = space;
             png_memcpy(output + count, png_ptr->zbuf, copy);
          }
-         count += avail;
+         count += space;
       }
 
       if (ret == Z_OK)
@@ -497,6 +498,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* Find number of channels */
    switch (png_ptr->color_type)
    {
+      default: /* invalid, png_set_IHDR calls png_error */
       case PNG_COLOR_TYPE_GRAY:
       case PNG_COLOR_TYPE_PALETTE:
          png_ptr->channels = 1;

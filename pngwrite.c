@@ -712,6 +712,7 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
                return;
             }
             break;
+
          case 1:
             if ((png_ptr->row_number & 0x07) || png_ptr->width < 5)
             {
@@ -719,6 +720,7 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
                return;
             }
             break;
+
          case 2:
             if ((png_ptr->row_number & 0x07) != 4)
             {
@@ -726,6 +728,7 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
                return;
             }
             break;
+
          case 3:
             if ((png_ptr->row_number & 0x03) || png_ptr->width < 3)
             {
@@ -733,6 +736,7 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
                return;
             }
             break;
+
          case 4:
             if ((png_ptr->row_number & 0x03) != 2)
             {
@@ -740,6 +744,7 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
                return;
             }
             break;
+
          case 5:
             if ((png_ptr->row_number & 0x01) || png_ptr->width < 2)
             {
@@ -747,12 +752,16 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
                return;
             }
             break;
+
          case 6:
             if (!(png_ptr->row_number & 0x01))
             {
                png_write_finish_row(png_ptr);
                return;
             }
+            break;
+
+         default: /* error: ignore it */
             break;
       }
    }
@@ -782,10 +791,10 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* Handle interlacing */
    if (png_ptr->interlaced && png_ptr->pass < 6 &&
-      (png_ptr->transformations & PNG_INTERLACE))
+       (png_ptr->transformations & PNG_INTERLACE))
    {
       png_do_write_interlace(&(png_ptr->row_info),
-         png_ptr->row_buf + 1, png_ptr->pass);
+          png_ptr->row_buf + 1, png_ptr->pass);
       /* This should always get caught above, but still ... */
       if (!(png_ptr->row_info.width))
       {
@@ -810,7 +819,7 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
     * 5. The color_type is RGB or RGBA
     */
    if ((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
-      (png_ptr->filter_type == PNG_INTRAPIXEL_DIFFERENCING))
+       (png_ptr->filter_type == PNG_INTRAPIXEL_DIFFERENCING))
    {
       /* Intrapixel differencing */
       png_do_write_intrapixel(&(png_ptr->row_info), png_ptr->row_buf + 1);
@@ -931,20 +940,20 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
    {
       if (png_ptr != NULL)
       {
-        png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
+         png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-        if (png_ptr->num_chunk_list)
-        {
-           png_free(png_ptr, png_ptr->chunk_list);
-           png_ptr->num_chunk_list = 0;
-        }
+         if (png_ptr->num_chunk_list)
+         {
+            png_free(png_ptr, png_ptr->chunk_list);
+            png_ptr->num_chunk_list = 0;
+         }
 #endif
       }
 
 #ifdef PNG_USER_MEM_SUPPORTED
       png_destroy_struct_2((png_voidp)info_ptr, (png_free_ptr)free_fn,
-         (png_voidp)mem_ptr);
+          (png_voidp)mem_ptr);
 #else
       png_destroy_struct((png_voidp)info_ptr);
 #endif
@@ -1104,7 +1113,8 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             if (png_ptr->prev_row == NULL)
             {
                png_warning(png_ptr, "Can't add Up filter after starting");
-               png_ptr->do_filter &= ~PNG_FILTER_UP;
+               png_ptr->do_filter = (png_byte)(png_ptr->do_filter &
+                   ~PNG_FILTER_UP);
             }
 
             else
@@ -1120,7 +1130,8 @@ png_set_filter(png_structp png_ptr, int method, int filters)
             if (png_ptr->prev_row == NULL)
             {
                png_warning(png_ptr, "Can't add Average filter after starting");
-               png_ptr->do_filter &= ~PNG_FILTER_AVG;
+               png_ptr->do_filter = (png_byte)(png_ptr->do_filter &
+                   ~PNG_FILTER_AVG);
             }
 
             else
@@ -1284,8 +1295,8 @@ png_init_filter_heuristics(png_structp png_ptr, int heuristic_method,
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void PNGAPI
 png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
-   int num_weights, png_const_doublep filter_weights,
-   png_const_doublep filter_costs)
+    int num_weights, png_const_doublep filter_weights,
+    png_const_doublep filter_costs)
 {
    png_debug(1, "in png_set_filter_heuristics");
 
@@ -1339,8 +1350,8 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
 #ifdef PNG_FIXED_POINT_SUPPORTED
 void PNGAPI
 png_set_filter_heuristics_fixed(png_structp png_ptr, int heuristic_method,
-   int num_weights, png_const_fixed_point_p filter_weights,
-   png_const_fixed_point_p filter_costs)
+    int num_weights, png_const_fixed_point_p filter_weights,
+    png_const_fixed_point_p filter_costs)
 {
    png_debug(1, "in png_set_filter_heuristics_fixed");
 
@@ -1382,11 +1393,21 @@ png_set_filter_heuristics_fixed(png_structp png_ptr, int heuristic_method,
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
          if (filter_costs[i] >= PNG_FP_1)
       {
-         png_ptr->inv_filter_costs[i] = (png_uint_16)((PNG_COST_FACTOR*
-            PNG_FP_1+(filter_costs[i]/2)) / filter_costs[i]);
+         png_uint_32 tmp;
 
-         png_ptr->filter_costs[i] = (png_uint_16)
-            ((PNG_COST_FACTOR * filter_costs[i] +PNG_FP_HALF)/PNG_FP_1);
+         /* Use a 32 bit unsigned temporary here because otherwise the
+          * intermediate value will be a 32 bit *signed* integer (ANSI rules)
+          * and this will get the wrong answer on division.
+          */
+         tmp = PNG_COST_FACTOR*PNG_FP_1 + (filter_costs[i]/2);
+         tmp /= filter_costs[i];
+
+         png_ptr->inv_filter_costs[i] = (png_uint_16)tmp;
+
+         tmp = PNG_COST_FACTOR * filter_costs[i] + PNG_FP_HALF;
+         tmp /= PNG_FP_1;
+
+         png_ptr->filter_costs[i] = (png_uint_16)tmp;
       }
    }
 }
@@ -1444,10 +1465,10 @@ png_set_compression_window_bits(png_structp png_ptr, int window_bits)
 #ifndef WBITS_8_OK
    /* Avoid libpng bug with 256-byte windows */
    if (window_bits == 8)
-     {
-       png_warning(png_ptr, "Compression window is being reset to 512");
-       window_bits = 9;
-     }
+      {
+        png_warning(png_ptr, "Compression window is being reset to 512");
+        window_bits = 9;
+      }
 
 #endif
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_WINDOW_BITS;
@@ -1497,7 +1518,7 @@ png_set_write_user_transform_fn(png_structp png_ptr, png_user_transform_ptr
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 void PNGAPI
 png_write_png(png_structp png_ptr, png_infop info_ptr,
-              int transforms, voidp params)
+    int transforms, voidp params)
 {
    if (png_ptr == NULL || info_ptr == NULL)
       return;

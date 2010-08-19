@@ -1145,19 +1145,19 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
    {
       png_unknown_chunkp unknowns;
-      int num_unknowns = (int)png_get_unknown_chunks(read_ptr, read_info_ptr,
+      int num_unknowns = png_get_unknown_chunks(read_ptr, read_info_ptr,
          &unknowns);
 
       if (num_unknowns)
       {
-         png_size_t i;
+         int i;
          png_set_unknown_chunks(write_ptr, write_info_ptr, unknowns,
            num_unknowns);
          /* Copy the locations from the read_info_ptr.  The automatically
           * generated locations in write_info_ptr are wrong because we
           * haven't written anything yet.
           */
-         for (i = 0; i < (png_size_t)num_unknowns; i++)
+         for (i = 0; i < num_unknowns; i++)
            png_set_unknown_chunk_location(write_ptr, write_info_ptr, i,
              unknowns[i].location);
       }
@@ -1318,21 +1318,19 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
    {
       png_unknown_chunkp unknowns;
-      int num_unknowns;
-
-      num_unknowns = (int)png_get_unknown_chunks(read_ptr, end_info_ptr,
+      int num_unknowns = png_get_unknown_chunks(read_ptr, end_info_ptr,
          &unknowns);
 
       if (num_unknowns)
       {
-         png_size_t i;
+         int i;
          png_set_unknown_chunks(write_ptr, write_end_info_ptr, unknowns,
            num_unknowns);
          /* Copy the locations from the read_info_ptr.  The automatically
           * generated locations in write_end_info_ptr are wrong because we
           * haven't written the end_info yet.
           */
-         for (i = 0; i < (png_size_t)num_unknowns; i++)
+         for (i = 0; i < num_unknowns; i++)
            png_set_unknown_chunk_location(write_ptr, write_end_info_ptr, i,
              unknowns[i].location);
       }

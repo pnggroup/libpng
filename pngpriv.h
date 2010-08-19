@@ -1188,7 +1188,7 @@ PNG_EXTERN png_uint_16 png_gamma_16bit_correct PNGARG((unsigned int value,
 PNG_EXTERN png_byte png_gamma_8bit_correct PNGARG((unsigned int value,
     png_fixed_point gamma));
 PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
-    png_byte bit_depth));
+    int bit_depth));
 #endif
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */

@@ -354,7 +354,10 @@ version 1.5.0beta43 [August 11, 2010]
     Also added scripts/chkfmt to validate the format of all the files that can
     reasonably be validated (it is suggested to run "make distclean" before
     checking, because some machine generated files have long lines.)
-    Reformatted the CHANGES file to be more consistent throughout.
+  Reformatted the CHANGES file to be more consistent throughout.
+  Made changes to address various issues identified by GCC, mostly
+    signed/unsigned and shortening problems on assignment but also a few
+    difficult to optimize (for GCC) loops.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

@@ -1120,6 +1120,7 @@ png_push_process_row(png_structp png_ptr)
 
             break;
          }
+
          case 6:
          {
             png_push_have_row(png_ptr, png_ptr->row_buf + 1);

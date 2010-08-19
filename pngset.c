@@ -948,8 +948,8 @@ png_set_unknown_chunks(png_structp png_ptr,
       return;
 
    np = (png_unknown_chunkp)png_malloc_warn(png_ptr,
-       (png_size_t)((info_ptr->unknown_chunks_num + num_unknowns) *
-       png_sizeof(png_unknown_chunk)));
+       (png_size_t)(info_ptr->unknown_chunks_num + num_unknowns) *
+       png_sizeof(png_unknown_chunk));
 
    if (np == NULL)
    {
@@ -959,7 +959,8 @@ png_set_unknown_chunks(png_structp png_ptr,
    }
 
    png_memcpy(np, info_ptr->unknown_chunks,
-       info_ptr->unknown_chunks_num * png_sizeof(png_unknown_chunk));
+       (png_size_t)info_ptr->unknown_chunks_num *
+       png_sizeof(png_unknown_chunk));
 
    png_free(png_ptr, info_ptr->unknown_chunks);
    info_ptr->unknown_chunks = NULL;
@@ -999,12 +1000,13 @@ png_set_unknown_chunks(png_structp png_ptr,
    info_ptr->unknown_chunks_num += num_unknowns;
    info_ptr->free_me |= PNG_FREE_UNKN;
 }
+
 void PNGAPI
 png_set_unknown_chunk_location(png_structp png_ptr, png_infop info_ptr,
     int chunk, int location)
 {
    if (png_ptr != NULL && info_ptr != NULL && chunk >= 0 && chunk <
-       (int)info_ptr->unknown_chunks_num)
+       info_ptr->unknown_chunks_num)
       info_ptr->unknown_chunks[chunk].location = (png_byte)location;
 }
 #endif

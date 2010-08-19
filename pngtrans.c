@@ -581,7 +581,8 @@ png_do_strip_filler(png_row_infop row_info, png_bytep row, png_uint_32 flags)
       }
 
       if (flags & PNG_FLAG_STRIP_ALPHA)
-        row_info->color_type &= ~PNG_COLOR_MASK_ALPHA;
+        row_info->color_type = (png_byte)(row_info->color_type &
+            ~PNG_COLOR_MASK_ALPHA);
    }
 }
 #endif

@@ -740,11 +740,13 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
                half_z_window_size >>= 1;
             }
             z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
-            if (data[0] != (png_byte)z_cmf)
+            if (data[0] != z_cmf)
             {
+               int tmp;
                data[0] = (png_byte)z_cmf;
-               data[1] &= 0xe0;
-               data[1] += (png_byte)(0x1f - ((z_cmf << 8) + data[1]) % 0x1f);
+               tmp = data[1] & 0xe0;
+               tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
+               data[1] = (png_byte)tmp;
             }
          }
       }
@@ -1868,14 +1870,14 @@ png_write_finish_row(png_structp png_ptr)
                break;
 
             png_ptr->usr_width = (png_ptr->width +
-               png_pass_inc[png_ptr->pass] - 1 -
-               png_pass_start[png_ptr->pass]) /
-               png_pass_inc[png_ptr->pass];
+                png_pass_inc[png_ptr->pass] - 1 -
+                png_pass_start[png_ptr->pass]) /
+                png_pass_inc[png_ptr->pass];
 
             png_ptr->num_rows = (png_ptr->height +
-               png_pass_yinc[png_ptr->pass] - 1 -
-               png_pass_ystart[png_ptr->pass]) /
-               png_pass_yinc[png_ptr->pass];
+                png_pass_yinc[png_ptr->pass] - 1 -
+                png_pass_ystart[png_ptr->pass]) /
+                png_pass_yinc[png_ptr->pass];
 
             if (png_ptr->transformations & PNG_INTERLACE)
                break;
@@ -1920,6 +1922,7 @@ png_write_finish_row(png_structp png_ptr)
       {
          if (png_ptr->zstream.msg != NULL)
             png_error(png_ptr, png_ptr->zstream.msg);
+
          else
             png_error(png_ptr, "zlib error");
       }
@@ -1999,6 +2002,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 
             break;
          }
+
          case 2:
          {
             png_bytep sp;
@@ -2035,6 +2039,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 
             break;
          }
+
          case 4:
          {
             png_bytep sp;
@@ -2068,6 +2073,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                *dp = (png_byte)d;
             break;
          }
+
          default:
          {
             png_bytep sp;
@@ -2135,8 +2141,8 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 #ifndef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
   if (png_ptr->row_number == 0 && filter_to_do == PNG_ALL_FILTERS)
   {
-      /* These will never be selected so we need not test them. */
-      filter_to_do &= ~(PNG_FILTER_UP | PNG_FILTER_PAETH);
+     /* These will never be selected so we need not test them. */
+     filter_to_do &= ~(PNG_FILTER_UP | PNG_FILTER_PAETH);
   }
 #endif
 
@@ -2275,10 +2281,10 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
             if (png_ptr->prev_filters[j] == PNG_FILTER_VALUE_SUB)
             {
                lmlo = (lmlo * png_ptr->inv_filter_weights[j]) >>
-                  PNG_WEIGHT_SHIFT;
+                   PNG_WEIGHT_SHIFT;
 
                lmhi = (lmhi * png_ptr->inv_filter_weights[j]) >>
-                  PNG_WEIGHT_SHIFT;
+                   PNG_WEIGHT_SHIFT;
             }
          }
 
@@ -2303,6 +2309,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 
          sum += (v < 128) ? v : 256 - v;
       }
+
       for (lp = row_buf + 1; i < row_bytes;
          i++, rp++, lp++, dp++)
       {
