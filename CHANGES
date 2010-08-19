@@ -2994,6 +2994,8 @@ Version 1.5.0beta43 [August 11, 2010]
   Made changes to address various issues identified by GCC, mostly
     signed/unsigned and shortening problems on assignment but also a few
     difficult to optimize (for GCC) loops.
+  Fixed non-GCC fixed point builds.  In png.c a declaration was misplaced
+    in an earlier update.  Fixed to declare the auto variables at the head.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

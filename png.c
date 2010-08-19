@@ -1509,6 +1509,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 #else
          int negative = 0;
          png_uint_32 A, T, D;
+         png_uint_32 s16, s32, s00;
 
          if (a < 0)
             negative = 1, A = -a;
@@ -1528,13 +1529,13 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
          /* Following can't overflow because the arguments only
           * have 31 bits each, however the result may be 32 bits.
           */
-         png_uint_32 s16 = (A >> 16) * (T & 0xffff) +
+         s16 = (A >> 16) * (T & 0xffff) +
                            (A & 0xffff) * (T >> 16);
          /* Can't overflow because the a*times bit is only 30
           * bits at most.
           */
-         png_uint_32 s32 = (A >> 16) * (T >> 16) + (s16 >> 16);
-         png_uint_32 s00 = (A & 0xffff) * (T & 0xffff);
+         s32 = (A >> 16) * (T >> 16) + (s16 >> 16);
+         s00 = (A & 0xffff) * (T & 0xffff);
 
          s16 = (s16 & 0xffff) << 16;
          s00 += s16;
