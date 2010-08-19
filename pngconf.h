@@ -288,14 +288,14 @@
 #ifndef PNG_FUNCTION
 #  ifdef __GNUC__
 #     define PNG_FUNCTION(type, name, args, attributes)\
-	 attributes type name args
+         attributes type name args
 #  else /* !GNUC */
 #     ifdef _MSC_VER
 #        define PNG_FUNCTION(type, name, args, attributes)\
-	    attributes type name args
+         attributes type name args
 #     else /* !MSC */
 #        define PNG_FUNCTION(type, name, args, attributes)\
-	    type name args
+            type name args
 #     endif
 #  endif
 #endif
@@ -430,18 +430,18 @@
 #endif
 #ifndef PNG_FP_EXPORT     /* A floating point API. */
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
-#    define PNG_FP_EXPORT(type, name, args, attributes, ordinal)\
-	PNG_EXPORT(type, name, args, attributes, ordinal)
+#     define PNG_FP_EXPORT(type, name, args, attributes, ordinal)\
+         PNG_EXPORT(type, name, args, attributes, ordinal)
 #  else                   /* No floating point APIs */
-#    define PNG_FP_EXPORT(type, name, args, attributes, ordinal)
+#     define PNG_FP_EXPORT(type, name, args, attributes, ordinal)
 #  endif
 #endif
 #ifndef PNG_FIXED_EXPORT  /* A fixed point API. */
 #  ifdef PNG_FIXED_POINT_SUPPORTED
-#    define PNG_FIXED_EXPORT(type, name, args, attributes, ordinal)\
-	PNG_EXPORT(type, name, args, attributes, ordinal)
+#     define PNG_FIXED_EXPORT(type, name, args, attributes, ordinal)\
+         PNG_EXPORT(type, name, args, attributes, ordinal)
 #  else                   /* No fixed point APIs */
-#    define PNG_FIXED_EXPORT(type, name, args, attributes, ordinal)
+#     define PNG_FIXED_EXPORT(type, name, args, attributes, ordinal)
 #  endif
 #endif
 

@@ -341,10 +341,10 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
 #else
     if (png_get_gAMA_fixed(png_ptr, info_ptr, &gamma))
         png_set_gamma_fixed(png_ptr,
-	    (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), gamma);
+            (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), gamma);
     else
         png_set_gamma_fixed(png_ptr,
-	    (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), 45455);
+            (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), 45455);
 #endif
 
     /* we'll let libpng expand interlaced images, too */

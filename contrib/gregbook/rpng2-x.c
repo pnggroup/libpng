@@ -782,8 +782,8 @@ static void rpng2_x_init(void)
 
         /* GRR TEMPORARY HACK:  this is fundamentally no different from cases
          * above; libpng should call our error handler to longjmp() back to us
-	 * when png_ptr goes away.  If we/it segfault instead, seems like a
-	 * libpng bug... */
+         * when png_ptr goes away.  If we/it segfault instead, seems like a
+         * libpng bug... */
 
         /* we're here via libpng callback, so if window fails, clean and bail */
         readpng2_cleanup(&rpng2_info);

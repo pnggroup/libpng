@@ -1023,7 +1023,8 @@ png_init_read_transformations(png_structp png_ptr)
             }
             for (i = 0; i < num_palette; i++)
             {
-               if (i < (int)png_ptr->num_trans && png_ptr->trans_alpha[i] != 0xff)
+               if (i < (int)png_ptr->num_trans &&
+                   png_ptr->trans_alpha[i] != 0xff)
                {
                   if (png_ptr->trans_alpha[i] == 0)
                   {
