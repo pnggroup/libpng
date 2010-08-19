@@ -208,14 +208,19 @@ png_get_pixel_aspect_ratio_fixed(png_structp png_ptr, png_infop info_ptr)
 {
 #ifdef PNG_READ_pHYs_SUPPORTED
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs)
-       && info_ptr->x_pixels_per_unit > 0 && info_ptr->y_pixels_per_unit > 0)
+       && info_ptr->x_pixels_per_unit > 0 && info_ptr->y_pixels_per_unit > 0
+       && info_ptr->x_pixels_per_unit <= PNG_UINT_31_MAX
+       && info_ptr->y_pixels_per_unit <= PNG_UINT_31_MAX)
    {
       png_fixed_point res;
 
       png_debug1(1, "in %s retrieval function", "png_get_aspect_ratio_fixed");
 
-      if (png_muldiv(&res, info_ptr->y_pixels_per_unit, PNG_FP_1,
-          info_ptr->x_pixels_per_unit))
+      /* The following casts work because a PNG 4 byte integer only has a valid
+       * range of 0..2^31-1; otherwise the cast might overflow.
+       */
+      if (png_muldiv(&res, (png_int_32)info_ptr->y_pixels_per_unit, PNG_FP_1,
+          (png_int_32)info_ptr->x_pixels_per_unit))
          return res;
    }
 #endif
@@ -335,7 +340,8 @@ ppi_from_ppm(png_uint_32 ppm)
     * to be bigger than 2^31.
     */
    png_fixed_point result;
-   if (ppm <= PNG_UINT_31_MAX && png_muldiv(&result, ppm, 127, 5000))
+   if (ppm <= PNG_UINT_31_MAX && png_muldiv(&result, (png_int_32)ppm, 127,
+       5000))
       return result;
 
    /* Overflow. */
@@ -377,7 +383,7 @@ png_fixed_point PNGAPI
 png_get_x_offset_inches_fixed(png_structp png_ptr, png_infop info_ptr)
 {
    return png_fixed_inches_from_microns(png_ptr,
-      png_get_x_offset_microns(png_ptr, info_ptr));
+       png_get_x_offset_microns(png_ptr, info_ptr));
 }
 #endif
 
@@ -386,7 +392,7 @@ png_fixed_point PNGAPI
 png_get_y_offset_inches_fixed(png_structp png_ptr, png_infop info_ptr)
 {
    return png_fixed_inches_from_microns(png_ptr,
-      png_get_y_offset_microns(png_ptr, info_ptr));
+       png_get_y_offset_microns(png_ptr, info_ptr));
 }
 #endif
 
@@ -397,7 +403,7 @@ png_get_x_offset_inches(png_structp png_ptr, png_infop info_ptr)
    /* To avoid the overflow do the conversion directly in floating
     * point.
     */
-   return png_get_x_offset_microns(png_ptr, info_ptr) * .00003937f;
+   return (float)(png_get_x_offset_microns(png_ptr, info_ptr) * .00003937);
 }
 #endif
 
@@ -408,7 +414,7 @@ png_get_y_offset_inches(png_structp png_ptr, png_infop info_ptr)
    /* To avoid the overflow do the conversion directly in floating
     * point.
     */
-   return png_get_y_offset_microns(png_ptr, info_ptr) * .00003937f;
+   return (float)(png_get_y_offset_microns(png_ptr, info_ptr) * .00003937);
 }
 #endif
 
@@ -439,6 +445,7 @@ png_get_pHYs_dpi(png_structp png_ptr, png_infop info_ptr,
       {
          *unit_type = (int)info_ptr->phys_unit_type;
          retval |= PNG_INFO_pHYs;
+
          if (*unit_type == 1)
          {
             if (res_x != NULL) *res_x = (png_uint_32)(*res_x * .0254 + .50);
@@ -788,7 +795,7 @@ png_get_sCAL(png_structp png_ptr, png_infop info_ptr,
 #endif
 png_uint_32 PNGAPI
 png_get_sCAL_s(png_structp png_ptr, png_infop info_ptr,
-             int *unit, png_charpp width, png_charpp height)
+    int *unit, png_charpp width, png_charpp height)
 {
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_sCAL))
@@ -963,14 +970,14 @@ png_get_tRNS(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
-png_uint_32 PNGAPI
+int PNGAPI
 png_get_unknown_chunks(png_structp png_ptr, png_infop info_ptr,
     png_unknown_chunkpp unknowns)
 {
    if (png_ptr != NULL && info_ptr != NULL && unknowns != NULL)
    {
       *unknowns = info_ptr->unknown_chunks;
-      return ((png_uint_32)info_ptr->unknown_chunks_num);
+      return info_ptr->unknown_chunks_num;
    }
 
    return (0);
@@ -1008,17 +1015,20 @@ png_get_user_width_max (png_structp png_ptr)
 {
    return (png_ptr ? png_ptr->user_width_max : 0);
 }
+
 png_uint_32 PNGAPI
 png_get_user_height_max (png_structp png_ptr)
 {
    return (png_ptr ? png_ptr->user_height_max : 0);
 }
+
 /* This function was added to libpng 1.4.0 */
 png_uint_32 PNGAPI
 png_get_chunk_cache_max (png_structp png_ptr)
 {
    return (png_ptr ? png_ptr->user_chunk_cache_max : 0);
 }
+
 /* This function was added to libpng 1.4.1 */
 png_alloc_size_t PNGAPI
 png_get_chunk_malloc_max (png_structp png_ptr)
