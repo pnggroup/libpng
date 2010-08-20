@@ -598,7 +598,7 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
    png_structp result = NULL;
 
    /* NOTE: reference to 'name' must be outside the Try block or GCC can
-    * optimized it away.
+    * optimize it away.
     */
    safecat(ps->test, sizeof ps->test, 0, name);
 
@@ -1484,9 +1484,9 @@ make_error(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
                if (ps->expect_warning && ps->saw_warning)
                   Throw ps;
 
-               /* If we get here there is a problem, we have success, however the
-                * Throw within the png_error will take control back to the Catch
-                * below, and the loop will continue.
+               /* If we get here there is a problem, we have success, however
+                * the Throw within the png_error will take control back to the
+                * Catch below, and the loop will continue.
                 */
                ps->expect_error = 0;
                ps->expect_warning = 0;
