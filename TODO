@@ -24,5 +24,7 @@ Add interpolated method of handling interlacing.
 Provide for conditional compilation of 16-bit support (except for the
   initial stripping down to 8-bits when reading a 16-bit PNG datastream).
 Switch to the simpler zlib (zlib/libpng) license if legally possible.
+Extend pngvalid.c to test the progressive reader, and to validate more
+  of the libpng transformations.
 
 */
