@@ -772,7 +772,7 @@ Version 1.0.6f [April 14, 2000]
   Revised png_set_iCCP() and png_set_rows() to avoid prematurely freeing data.
   Add checks in png_set_text() for NULL members of the input text structure.
   Revised libpng.txt/libpng.3.
-  Removed superfluous prototype for png_set_itxt from png.h
+  Removed superfluous prototype for png_set_iTXt from png.h
   Removed "else" from pngread.c, after png_error(), and changed "0" to "length".
   Changed several png_errors about malformed ancillary chunks to png_warnings.
 
@@ -1510,6 +1510,7 @@ Version 1.2.7beta2 [August 28, 2004]
   Undid new code added in 1.2.6rc2 to update the color_type in
     png_set_filler().
   Added png_set_add_alpha() that updates color type.
+
 Version 1.0.17rc1 and 1.2.7rc1 [September 4, 2004]
   Revised png_set_strip_filler() to not remove alpha if color_type has alpha.
 
