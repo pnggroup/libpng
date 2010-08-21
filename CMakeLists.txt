@@ -256,8 +256,8 @@ if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL )
 endif()
 if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
   # Install man pages
-  install(FILES libpng.3 libpngpf.3             DESTINATION man/man3)
-  install(FILES png.5                           DESTINATION man/man5)
+  install(FILES libpng.3 libpngpf.3             DESTINATION share/man/man3)
+  install(FILES png.5                           DESTINATION share/man/man5)
   # Install pkg-config files
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
 	  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
