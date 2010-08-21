@@ -196,9 +196,12 @@ endif()
 
 # CREATE PKGCONFIG FILES
 # we use the same files like ./configure, so we have to set its vars
+if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+  set(CMAKE_INSTALL_LIBDIR ${CMAKE_INSTALL_PREFIX}/lib)
+endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 set(prefix      ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix ${CMAKE_INSTALL_PREFIX})
-set(libdir      ${CMAKE_INSTALL_PREFIX}/lib)
+set(libdir      ${CMAKE_INSTALL_LIBDIR})
 set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
@@ -232,13 +235,13 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
   if(PNG_SHARED)
     install(TARGETS ${PNG_LIB_NAME}
             RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib)
+	    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
   endif()
   if(PNG_STATIC)
     install(TARGETS ${PNG_LIB_NAME_STATIC}
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib)
+	    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
   endif()
 endif()
 
@@ -257,11 +260,11 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
   install(FILES png.5                           DESTINATION man/man5)
   # Install pkg-config files
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
-          DESTINATION lib/pkgconfig)
+	  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
           DESTINATION bin)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
-          DESTINATION lib/pkgconfig)
+	  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
           DESTINATION bin)
 endif()
