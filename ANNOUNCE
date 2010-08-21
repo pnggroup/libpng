@@ -65,6 +65,7 @@ version 1.4.4beta07 [August 21, 2010]
     installing libpng in /usr/lib64 (Funda Wang).
   Revised CMakeLists.txt to put the man pages in share/man/man* not man/man*
   Revised CMakeLists.txt to make symlinks instead of copies when installing.
+  Changed PNG_LIB_NAME from pngNN to libpngNN in CMakeLists.txt (Philip Lowman)
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
