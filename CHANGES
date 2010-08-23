@@ -2986,7 +2986,7 @@ Version 1.5.0beta42 [August 18, 2010]
   Made all API functions that have const arguments and constant string
     literal pointers declare them (John Bowler).
 
-Version 1.5.0beta43 [August 11, 2010]
+Version 1.5.0beta43 [August 20, 2010]
   Removed spurious tabs, shorten long lines (no source change)
     Also added scripts/chkfmt to validate the format of all the files that can
     reasonably be validated (it is suggested to run "make distclean" before
@@ -2998,6 +2998,13 @@ Version 1.5.0beta43 [August 11, 2010]
   Fixed non-GCC fixed point builds.  In png.c a declaration was misplaced
     in an earlier update.  Fixed to declare the auto variables at the head.
   Use cexcept.h in pngvalid.c.
+
+Version 1.5.0beta44 [August 11, 2010]
+  Updated CMakeLists.txt to use CMAKE_INSTALL_LIBDIR variable; useful for
+    installing libpng in /usr/lib64 (Funda Wang).
+  Revised CMakeLists.txt to put the man pages in share/man/man* not man/man*
+  Revised CMakeLists.txt to make symlinks instead of copies when installing.
+  Changed PNG_LIB_NAME from pngNN to libpngNN in CMakeLists.txt (Philip Lowman)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

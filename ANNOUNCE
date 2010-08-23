@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta43 - August 11, 2010
+Libpng 1.5.0beta44 - August 11, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta43.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta43.tar.gz
-   1.5.0beta43.tar.bz2
+   1.5.0beta44.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta44.tar.gz
+   1.5.0beta44.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b43.zip
-   lp150b43.7z
+   lp150b44.zip
+   lp150b44.7z
 
 Other information:
 
-   1.5.0beta43-README.txt
-   1.5.0beta43-LICENSE.txt
+   1.5.0beta44-README.txt
+   1.5.0beta44-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -349,7 +349,7 @@ version 1.5.0beta42 [August 18, 2010]
   Made all API functions that have const arguments and constant string
     literal pointers declare them (John Bowler).
 
-version 1.5.0beta43 [August 11, 2010]
+Version 1.5.0beta43 [August 20, 2010]
   Removed spurious tabs, shorten long lines (no source change)
     Also added scripts/chkfmt to validate the format of all the files that can
     reasonably be validated (it is suggested to run "make distclean" before
@@ -361,6 +361,13 @@ version 1.5.0beta43 [August 11, 2010]
   Fixed non-GCC fixed point builds.  In png.c a declaration was misplaced
     in an earlier update.  Fixed to declare the auto variables at the head.
   Use cexcept.h in pngvalid.c.
+
+Version 1.5.0beta44 [August 11, 2010]
+  Updated CMakeLists.txt to use CMAKE_INSTALL_LIBDIR variable; useful for
+    installing libpng in /usr/lib64 (Funda Wang).
+  Revised CMakeLists.txt to put the man pages in share/man/man* not man/man*
+  Revised CMakeLists.txt to make symlinks instead of copies when installing.
+  Changed PNG_LIB_NAME from pngNN to libpngNN in CMakeLists.txt (Philip Lowman)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
