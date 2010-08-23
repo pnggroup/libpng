@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.4beta07 - August 22, 2010
+ * libpng version 1.4.4beta07 - August 23, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -52,7 +52,9 @@
 
 /*
  * If you create a private DLL you need to define in "pngusr.h" the following:
- * #define PNG_USER_PRIVATEBUILD (a flag)
+ * #define PNG_USER_PRIVATEBUILD <Describes by whom and why this version of
+ *        the DLL was built>
+ *  e.g. #define PNG_USER_PRIVATEBUILD "Build by MyCompany for xyz reasons."
  * #define PNG_USER_DLLFNAME_POSTFIX <two-letter postfix that serve to
  *        distinguish your DLL from those of the official release. These
  *        correspond to the trailing letters that come after the version
