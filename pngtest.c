@@ -302,7 +302,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
    /* Check if data really is near. If so, use usual code. */
    n_data = (png_byte *)CVT_PTR_NOCHECK(data);
-   io_ptr = (png_FILE_p)CVT_PTR(png_ptr->io_ptr);
+   io_ptr = (png_FILE_p)CVT_PTR(png_get_io_ptr(png_ptr));
    if ((png_bytep)n_data == data)
    {
       check = fread(n_data, 1, length, io_ptr);

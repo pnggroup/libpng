@@ -51,7 +51,7 @@
 #endif
 
 /*
- * If you create a private DLL you need to define in "pngusr.h" the following:
+ * If you create a private DLL you should define in "pngusr.h" the following:
  * #define PNG_USER_PRIVATEBUILD <Describes by whom and why this version of
  *        the DLL was built>
  *  e.g. #define PNG_USER_PRIVATEBUILD "Build by MyCompany for xyz reasons."
@@ -59,7 +59,7 @@
  *        distinguish your DLL from those of the official release. These
  *        correspond to the trailing letters that come after the version
  *        number and must match your private DLL name>
- *  e.g. // private DLL "libpng13gx.dll"
+ *  e.g. // private DLL "libpng14gx.dll"
  *       #define PNG_USER_DLLFNAME_POSTFIX "gx"
  *
  * The following macros are also at your disposal if you want to complete the
