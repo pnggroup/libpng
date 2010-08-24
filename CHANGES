@@ -2999,7 +2999,7 @@ Version 1.5.0beta43 [August 20, 2010]
     in an earlier update.  Fixed to declare the auto variables at the head.
   Use cexcept.h in pngvalid.c.
 
-Version 1.5.0beta44 [August 11, 2010]
+Version 1.5.0beta44 [August 24, 2010]
   Updated CMakeLists.txt to use CMAKE_INSTALL_LIBDIR variable; useful for
     installing libpng in /usr/lib64 (Funda Wang).
   Revised CMakeLists.txt to put the man pages in share/man/man* not man/man*
@@ -3013,6 +3013,8 @@ Version 1.5.0beta44 [August 11, 2010]
   Implemented progressive reader in pngvalid.c for standard tests
   Implemented progressive read in pngvalid.c gamma tests
   Turn on progressive reader in pngvalid.c by default and tidy code.
+
+Version 1.5.0beta45 [August 24, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
