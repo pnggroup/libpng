@@ -190,8 +190,8 @@ next_format(png_bytep colour_type, png_bytep bit_depth)
 }
 
 static unsigned int
-sample(png_byte *row, png_byte colour_type, png_byte bit_depth, png_uint_32 x,
-    unsigned int sample)
+sample(png_const_bytep row, png_byte colour_type, png_byte bit_depth,
+    png_uint_32 x, unsigned int sample)
 {
    png_uint_32 index, result;
    
@@ -363,6 +363,7 @@ store_init(png_store* ps)
    ps->saw_warning = 0;
    ps->speed = 0;
    ps->progressive = 0;
+   ps->validated = 0;
    ps->nerrors = ps->nwarnings = 0;
    ps->pread = NULL;
    ps->piread = NULL;
@@ -605,6 +606,31 @@ store_read_buffer_size(png_store *ps)
    return ps->current->datacount;
 }
 
+/* Return total bytes available for read. */
+static size_t
+store_read_buffer_avail(png_store *ps)
+{
+   if (ps->current != NULL && ps->next != NULL)
+   {
+      png_store_buffer *next = &ps->current->data;
+      size_t cbAvail = ps->current->datacount;
+
+      while (next != ps->next && next != NULL)
+      {
+         next = next->prev;
+         cbAvail += STORE_BUFFER_SIZE;
+      }
+
+      if (next != ps->next)
+         png_error(ps->pread, "buffer read error");
+
+      if (cbAvail > ps->readpos)
+         return cbAvail - ps->readpos;
+   }
+
+   return 0;
+}
+
 static int
 store_read_buffer_next(png_store *ps)
 {
@@ -628,13 +654,14 @@ store_read_buffer_next(png_store *ps)
    return 0; /* EOF or error */
 }
 
+/* Need separate implementation and callback to allow use of the same code
+ * during progressive read, where the io_ptr is set internally by libpng.
+ */
 static void
-store_read(png_structp pp, png_bytep pb, png_size_t st)
+store_read_imp(png_store *ps, png_bytep pb, png_size_t st)
 {
-   png_store *ps = png_get_io_ptr(pp);
-
-   if (ps->pread != pp || ps->current == NULL || ps->next == NULL)
-      png_error(pp, "store state damaged");
+   if (ps->current == NULL || ps->next == NULL)
+      png_error(ps->pread, "store state damaged");
 
    while (st > 0)
    {
@@ -650,20 +677,29 @@ store_read(png_structp pp, png_bytep pb, png_size_t st)
       }
 
       else if (!store_read_buffer_next(ps))
-         png_error(pp, "read beyond end of file");
+         png_error(ps->pread, "read beyond end of file");
    }
 }
 
 static void
-store_progressive_read(png_structp pp, png_infop pi)
+store_read(png_structp pp, png_bytep pb, png_size_t st)
 {
    png_store *ps = png_get_io_ptr(pp);
 
+   if (ps == NULL || ps->pread != pp)
+      png_error(pp, "bad store read call");
+
+   store_read_imp(ps, pb, st);
+}
+
+static void
+store_progressive_read(png_store *ps, png_structp pp, png_infop pi)
+{
    /* Notice that a call to store_read will cause this function to fail because
     * readpos will be set.
     */
    if (ps->pread != pp || ps->current == NULL || ps->next == NULL)
-      png_error(pp, "store state damaged");
+      png_error(pp, "store state damaged (progressive)");
 
    do
    {
@@ -881,7 +917,7 @@ set_store_for_write(png_store *ps, png_infopp ppi,
    Try
    {
       if (ps->pwrite != NULL)
-         png_error(ps->pwrite, "store already in use");
+         png_error(ps->pwrite, "write store already in use");
 
       store_write_reset(ps);
       safecat(ps->wname, sizeof ps->wname, 0, name);
@@ -937,6 +973,7 @@ store_read_reset(png_store *ps)
    ps->current = NULL;
    ps->next = NULL;
    ps->readpos = 0;
+   ps->validated = 0;
 }
 
 static void
@@ -980,7 +1017,7 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
    safecat(ps->test, sizeof ps->test, 0, name);
 
    if (ps->pread != NULL)
-      png_error(ps->pread, "store already in use");
+      png_error(ps->pread, "read store already in use");
 
    store_read_reset(ps);
 
@@ -1183,7 +1220,7 @@ typedef struct png_modification
    png_uint_32              chunk;
 
    /* If the following is NULL all matching chunks will be removed: */
-   int                    (*modify_fn)(png_structp pp, struct png_modifier *pm,
+   int                    (*modify_fn)(struct png_modifier *pm,
                                struct png_modification *me, int add);
 
    /* If the following is set to PLTE, IDAT or IEND and the chunk has not been
@@ -1259,11 +1296,13 @@ modifier_setbuffer(png_modifier *pm)
    pm->buffer_position = 0;
 }
 
+/* Separate the callback into the actual implementation (which is passed the
+ * png_modifier explicitly) and the callback, which gets the modifier from the
+ * png_struct.
+ */
 static void
-modifier_read(png_structp pp, png_bytep pb, png_size_t st)
+modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
 {
-   png_modifier *pm = png_get_io_ptr(pp);
-
    while (st > 0)
    {
       size_t cb;
@@ -1274,30 +1313,30 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
       {
          static png_byte sign[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
          case modifier_start:
-            store_read(pp, pm->buffer, 8); /* size of signature. */
+            store_read_imp(&pm->this, pm->buffer, 8); /* size of signature. */
             pm->buffer_count = 8;
             pm->buffer_position = 0;
    
             if (memcmp(pm->buffer, sign, 8) != 0)
-               png_error(pp, "invalid PNG file signature");
+               png_error(pm->this.pread, "invalid PNG file signature");
             pm->state = modifier_signature;
             break;
    
          case modifier_signature:
-            store_read(pp, pm->buffer, 13+12); /* size of IHDR */
+            store_read_imp(&pm->this, pm->buffer, 13+12); /* size of IHDR */
             pm->buffer_count = 13+12;
             pm->buffer_position = 0;
    
             if (png_get_uint_32(pm->buffer) != 13 ||
                 png_get_uint_32(pm->buffer+4) != CHUNK_IHDR)
-               png_error(pp, "invalid IHDR");
+               png_error(pm->this.pread, "invalid IHDR");
    
             /* Check the list of modifiers for modifications to the IHDR. */
             mod = pm->modifications;
             while (mod != NULL)
             {
                if (mod->chunk == CHUNK_IHDR && mod->modify_fn &&
-                   (*mod->modify_fn)(pp, pm, mod, 0))
+                   (*mod->modify_fn)(pm, mod, 0))
                   {
                   mod->modified = 1;
                   modifier_setbuffer(pm);
@@ -1325,7 +1364,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
             {
                if (cb > st) cb = st;
                pm->flush -= cb;
-               store_read(pp, pb, cb);
+               store_read_imp(&pm->this, pb, cb);
                pb += cb;
                st -= cb;
                if (st <= 0) return;
@@ -1342,7 +1381,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
                pm->pending_chunk = 0;
             }
             else
-               store_read(pp, pm->buffer, 8);
+               store_read_imp(&pm->this, pm->buffer, 8);
    
             pm->buffer_count = 8;
             pm->buffer_position = 0;
@@ -1370,7 +1409,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
                       */
                      mod->added = 1;
    
-                     if ((*mod->modify_fn)(pp, pm, mod, 1/*add*/))
+                     if ((*mod->modify_fn)(pm, mod, 1/*add*/))
                      {
                         /* Reset the CRC on a new chunk */
                         if (pm->buffer_count > 0)
@@ -1408,7 +1447,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
              */
             if (len+12 <= sizeof pm->buffer)
             {
-               store_read(pp, pm->buffer+pm->buffer_count,
+               store_read_imp(&pm->this, pm->buffer+pm->buffer_count,
                    len+12-pm->buffer_count);
                pm->buffer_count = len+12;
    
@@ -1426,7 +1465,7 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
                         break; /* Terminate the while loop */
                      }
 
-                     else if ((*mod->modify_fn)(pp, pm, mod, 0))
+                     else if ((*mod->modify_fn)(pm, mod, 0))
                      {
                         mod->modified = 1;
                         /* The chunk may have been removed: */
@@ -1463,6 +1502,75 @@ modifier_read(png_structp pp, png_bytep pb, png_size_t st)
       pb += cb;
       pm->buffer_position += cb;
    }
+}
+
+/* The callback: */
+static void
+modifier_read(png_structp pp, png_bytep pb, png_size_t st)
+{
+   png_modifier *pm = png_get_io_ptr(pp);
+
+   if (pm == NULL || pm->this.pread != pp)
+      png_error(pp, "bad modifier_read call");
+
+   modifier_read_imp(pm, pb, st);
+}
+
+/* Like store_progressive_read but the data is getting changed as we go so we
+ * need a local buffer.
+ */
+static void
+modifier_progressive_read(png_modifier *pm, png_structp pp, png_infop pi)
+{
+   if (pm->this.pread != pp || pm->this.current == NULL ||
+       pm->this.next == NULL)
+      png_error(pp, "store state damaged (progressive)");
+
+   /* This is another Horowitz and Hill random noise generator.  In this case
+    * the aim is to stress the progressive reader with truely horrible variable
+    * buffer sizes in the range 1..500, so a sequence of 9 bit random numbers is
+    * generated.  We could probably just count from 1 to 32767 and get as good
+    * a result.
+    */
+   for (;;)
+   {
+      static png_uint_32 noise = 1;
+      png_size_t cb, cbAvail;
+      png_byte buffer[512];
+
+      /* Generate 15 more bits of stuff: */
+      noise = (noise << 9) | ((noise ^ (noise >> (9-5))) & 0x1ff);
+      cb = noise & 0x1ff;
+
+      /* Check that this number of bytes are available (in the current buffer.)
+       * (This doesn't quite work - the modifier might delete a chunk; unlikely
+       * but possible, it doesn't happen at present because the modifier only
+       * adds chunks to standard images.)
+       */
+      cbAvail = store_read_buffer_avail(&pm->this);
+      if (pm->buffer_count > pm->buffer_position)
+         cbAvail += pm->buffer_count - pm->buffer_position;
+
+      if (cb > cbAvail)
+      {
+         /* Check for EOF: */
+         if (cbAvail == 0)
+            break;
+
+         cb = cbAvail;
+      }
+
+      modifier_read_imp(pm, buffer, cb);
+      png_process_data(pp, pi, buffer, cb);
+   }
+
+   /* Check the invariants at the end (if this fails it's a problem in this
+    * file!)
+    */
+   if (pm->buffer_count > pm->buffer_position ||
+       pm->this.next != &pm->this.current->data ||
+       pm->this.readpos < pm->this.current->datacount)
+      png_error(pp, "progressive read implementation error");
 }
 
 /* Set up a modifier. */
@@ -2027,30 +2135,111 @@ perform_error_test(png_modifier *pm)
       return;
 }
 
-static void
-standard_info_validate(png_structp pp, png_infop pi, png_byte colour_type,
-    png_byte bit_depth, int interlace_type)
+/* Because we want to use the same code in both the progressive reader and the
+ * sequential reader it is necessary to deal with the fact that the progressive
+ * reader callbacks only have one parameter (png_get_progressive_ptr()), so this
+ * must contain all the test parameters and all the local variables directly
+ * accessible to the sequential reader implementation.
+ *
+ * The techinque adopted is to reinvent part of what Dijkstra termed a
+ * 'display'; an array of pointers to the stack frames of enclosing functions so
+ * that a nested function definition can access the local (C auto) variables of
+ * the functions that contain its definition.  In fact C provides the first
+ * pointer (the local variables - the stack frame pointer) and the last (the
+ * global variables - the BCPL global vector typically implemented as global
+ * addresses), this code requires one more pointer to make the display - the
+ * local variables (and function call parameters) of the function that actually
+ * invokes either the progressive or sequential reader.
+ *
+ * Perhaps confusingly this technique is confounded with classes - the
+ * 'standard_display' defined here is sub-classed as the 'gamma_display' below.
+ * A gamma_display is a standard_display, taking advantage of the ANSI-C
+ * requirement that the pointer to the first member of a structure must be the
+ * same as the pointer to the structure.  This allows us to reuse standard_
+ * functions in the gamma test code; something that could not be done with
+ * nested funtions!
+ */
+typedef struct standard_display
 {
-   if (png_get_bit_depth(pp, pi) != bit_depth)
+   png_store*  ps;             /* Test parameters (passed to the function) */
+   png_byte    colour_type;
+   png_byte    bit_depth;
+   int         interlace_type;
+   png_uint_32 id;             /* Calculated file ID */
+   png_uint_32 w;              /* Width of image */
+   png_uint_32 h;              /* Height of image */
+   int         npasses;        /* Number of interlaced passes */
+   size_t      cbRow;          /* Bytes in a row of the output image. */
+} standard_display;
+
+static void
+standard_display_init(standard_display *dp, png_store* ps, png_byte colour_type,
+   png_byte bit_depth, int interlace_type)
+{
+   dp->ps = ps;
+   dp->colour_type = colour_type;
+   dp->bit_depth = bit_depth;
+   dp->interlace_type = interlace_type;
+   dp->id = FILEID(colour_type, bit_depth, interlace_type);
+   dp->w = 0;
+   dp->h = 0;
+   dp->npasses = 0;
+   dp->cbRow = 0;
+}
+
+/* By passing a 'standard_display' the progressive callbacks can be used
+ * directly by the sequential code, the functions suffixed _imp are the
+ * implementations, the functions without the suffix are the callbacks.
+ *
+ * The code for the info callback is split into two because this callback calls
+ * png_read_update_info or png_start_read_image and what gets called depends on
+ * whether the info needs updating (we want to test both calls in pngvalid.)
+ */
+static void
+standard_info_part1(standard_display *dp, png_structp pp, png_infop pi)
+{
+   if (png_get_bit_depth(pp, pi) != dp->bit_depth)
       png_error(pp, "validate: bit depth changed");
 
-   if (png_get_color_type(pp, pi) != colour_type)
+   if (png_get_color_type(pp, pi) != dp->colour_type)
       png_error(pp, "validate: color type changed");
 
    if (png_get_filter_type(pp, pi) != PNG_FILTER_TYPE_BASE)
       png_error(pp, "validate: filter type changed");
 
-   if (png_get_interlace_type(pp, pi) != interlace_type)
+   if (png_get_interlace_type(pp, pi) != dp->interlace_type)
       png_error(pp, "validate: interlacing changed");
 
    if (png_get_compression_type(pp, pi) != PNG_COMPRESSION_TYPE_BASE)
       png_error(pp, "validate: compression type changed");
 
-   if (colour_type == 3) /* palette */
+   dp->w = png_get_image_width(pp, pi);
+
+   if (dp->w != standard_width(pp, dp->colour_type, dp->bit_depth))
+      png_error(pp, "validate: image width changed");
+
+   dp->h = png_get_image_height(pp, pi);
+
+   if (dp->h != standard_height(pp, dp->colour_type, dp->bit_depth))
+      png_error(pp, "validate: image height changed");
+
+   /* Important: this is validating the value *before* any transforms have been
+    * put in place.  It doesn't matter for the standard tests, where there are
+    * no transforms, it does for other tests where rowbytes may change after
+    * png_read_update_info.
+    */
+   if (png_get_rowbytes(pp, pi) != 
+       standard_rowsize(pp, dp->colour_type, dp->bit_depth))
+      png_error(pp, "validate: row size changed");
+
+   if (dp->colour_type == 3) /* palette */
    {
       png_colorp pal;
       int num;
 
+      /* This could be passed in but isn't - the values set above when the
+       * standard images were made are just repeated here.
+       */
       if (png_get_PLTE(pp, pi, &pal, &num) & PNG_INFO_PLTE)
       {
          int i;
@@ -2071,60 +2260,39 @@ standard_info_validate(png_structp pp, png_infop pi, png_byte colour_type,
     * creating the image (interlaced or not).  This has the side effect of
     * turning ono interlace handling.
     */
-   if (png_set_interlace_handling(pp) !=
-       npasses_from_interlace_type(pp, interlace_type))
+   dp->npasses = png_set_interlace_handling(pp);
+
+   if (dp->npasses != npasses_from_interlace_type(pp, dp->interlace_type))
       png_error(pp, "validate: file changed interlace type");
-}
 
-static void
-standard_info_validate_from_id(png_structp pp, png_infop pi, png_uint_32 id)
-{
-   standard_info_validate(pp, pi, COL_FROM_ID(id), DEPTH_FROM_ID(id),
-      INTERLACE_FROM_ID(id));
-}
-
-static void
-standard_size_validate(png_store *ps, png_structp pp, png_infop pi,
-    png_byte colour_type, png_byte bit_depth, int nImages)
-{
-   /* Validation of image width and height is done here, although it could be
-    * done above, to avoid reading width/height multiple times.
+   /* Caller calls png_read_update_info or png_start_read_image now, then calls
+    * part2.
     */
-   PNG_CONST png_uint_32 w = standard_width(pp, colour_type, bit_depth);
-   PNG_CONST png_uint_32 h = standard_height(pp, colour_type, bit_depth);
-   PNG_CONST size_t cbRow = standard_rowsize(pp, colour_type, bit_depth);
+}
 
-   if (png_get_image_width(pp, pi) != w)
-      png_error(pp, "validate: image width changed");
-
-   if (png_get_image_height(pp, pi) != h)
-      png_error(pp, "validate: image height changed");
-
-   if (png_get_rowbytes(pp, pi) != cbRow)
-      png_error(pp, "validate: row size changed");
+/* This must be called *after* the png_read_update_info call to get the correct
+ * 'rowbytes' value, otherwise png_get_rowbytes will refer to the untransformed
+ * image.
+ */
+static void
+standard_info_part2(standard_display *dp, png_structp pp, png_infop pi,
+    int nImages)
+{
+   /* Record cbRow now that it can be found. */
+   dp->cbRow = png_get_rowbytes(pp, pi);
 
    /* Then ensure there is enough space for the output image(s). */
-   store_ensure_image(ps, pp, nImages*cbRow*h);
+   store_ensure_image(dp->ps, pp, nImages * dp->cbRow * dp->h);
 }
 
 static void
-standard_size_validate_from_id(png_store *ps, png_structp pp, png_infop pi,
-    png_uint_32 id, int nImages)
+standard_info_imp(standard_display *dp, png_structp pp, png_infop pi,
+    int nImages)
 {
-   standard_size_validate(ps, pp, pi, COL_FROM_ID(id), DEPTH_FROM_ID(id),
-      nImages);
-}
-
-static void
-standard_info(png_structp pp, png_infop pi)
-{
-   png_store *ps = png_get_progressive_ptr(pp);
-   png_uint_32 id = ps->current->id;
-
    /* Note that the validation routine has the side effect of turning on
     * interlace handling in the subsequent code.
     */
-   standard_info_validate_from_id(pp, pi, id);
+   standard_info_part1(dp, pp, pi);
 
    /* And the info callback has to call this (or png_read_update_info - see
     * below in the png_modifier code for that variant.
@@ -2134,7 +2302,18 @@ standard_info(png_structp pp, png_infop pi)
    /* Validate the height, width and rowbytes plus ensure that sufficient buffer
     * exists for decoding the image.
     */
-   standard_size_validate_from_id(ps, pp, pi, id, 1/*only one copy*/);
+   standard_info_part2(dp, pp, pi, nImages);
+}
+
+static void
+standard_info(png_structp pp, png_infop pi)
+{
+   standard_display *dp = png_get_progressive_ptr(pp);
+
+   /* Call with nImages==1 because the progressive reader can only produce one
+    * image.
+    */
+   standard_info_imp(dp, pp, pi, 1/*only one image*/);
 }
 
 static void
@@ -2149,35 +2328,33 @@ progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
     */
    if (new_row != NULL)
    {
-      PNG_CONST png_store *ps = png_get_progressive_ptr(pp);
-      PNG_CONST png_uint_32 id = ps->current->id;
+      PNG_CONST standard_display *dp = png_get_progressive_ptr(pp);
 
       /* Combine the new row into the old: */
-      png_progressive_combine_row(pp, ps->image +
-         y*standard_rowsize(pp, COL_FROM_ID(id), DEPTH_FROM_ID(id)), new_row);
+      png_progressive_combine_row(pp, dp->ps->image + y * dp->cbRow, new_row);
    }
 }
 
 static void
-standard_row_validate(png_structp pp, png_byte colour_type, png_byte bit_depth,
-    png_const_bytep row, png_const_bytep display, png_uint_32 y, size_t cbRow)
+standard_row_validate(standard_display *dp, png_structp pp, png_const_bytep row,
+   png_const_bytep display, png_uint_32 y)
 {
    png_byte std[STD_ROWMAX];
-   standard_row(pp, std, colour_type, bit_depth, y);
+   standard_row(pp, std, dp->colour_type, dp->bit_depth, y);
 
    /* At the end both the 'read' and 'display' arrays should end up identical.
     * In earlier passes 'read' will be narrow, containing only the columns that
     * were read, and display will be full width but populated with garbage where
     * pixels have not been filled in.
     */
-   if (row != NULL && memcmp(std, row, cbRow) != 0)
+   if (row != NULL && memcmp(std, row, dp->cbRow) != 0)
    {
       char msg[64];
       sprintf(msg, "PNG image row %d changed", y);
       png_error(pp, msg);
    }
 
-   if (display != NULL && memcmp(std, display, cbRow) != 0)
+   if (display != NULL && memcmp(std, display, dp->cbRow) != 0)
    {
       char msg[64];
       sprintf(msg, "display row %d changed", y);
@@ -2186,56 +2363,52 @@ standard_row_validate(png_structp pp, png_byte colour_type, png_byte bit_depth,
 }
 
 static void
-standard_image_validate(png_store *ps, png_structp pp, png_const_bytep pImage,
-    png_const_bytep pDisplay, png_byte colour_type, png_byte bit_depth)
+standard_image_validate(standard_display *dp, png_structp pp,
+   png_const_bytep pImage, png_const_bytep pDisplay)
 {
-   size_t cbRow = standard_rowsize(pp, colour_type, bit_depth);
-   png_uint_32 h = standard_height(pp, colour_type, bit_depth);
    png_uint_32 y;
 
-   for (y=0; y<h; ++y)
+   for (y=0; y<dp->h; ++y)
    {
-      standard_row_validate(pp, colour_type, bit_depth, pImage, pDisplay, y,
-         cbRow);
+      standard_row_validate(dp, pp, pImage, pDisplay, y);
 
       if (pImage != NULL)
-         pImage += cbRow;
+         pImage += dp->cbRow;
 
       if (pDisplay != NULL)
-         pDisplay += cbRow;
+         pDisplay += dp->cbRow;
    }
 
    /* This avoids false positives if the validation code is never called! */
-   ps->validated = 1;
-}
-
-static void
-standard_image_validate_from_id(png_store *ps, png_structp pp,
-    png_const_bytep pImage, png_const_bytep pDisplay, png_uint_32 id)
-{
-   standard_image_validate(ps, pp, pImage, pDisplay, COL_FROM_ID(id),
-      DEPTH_FROM_ID(id));
+   dp->ps->validated = 1;
 }
 
 static void
 standard_end(png_structp pp, png_infop pi)
 {
-   png_store *ps = png_get_progressive_ptr(pp);
+   standard_display *dp = png_get_progressive_ptr(pp);
 
    UNUSED(pi);
 
    /* Validate the image - progressive reading only produces one variant for
     * interlaced images.
     */
-   standard_image_validate_from_id(ps, pp, ps->image, NULL, ps->current->id);
+   standard_image_validate(dp, pp, dp->ps->image, NULL);
 }
 
 /* A single test run checking the standard image to ensure it is not damaged. */
 static void
-standard_test(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
-   png_byte PNG_CONST bit_depth, int interlace_type)
+standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
+   png_byte PNG_CONST bit_depthIn, int interlace_typeIn)
 {
-   context(ps, fault);
+   standard_display d;
+   context(psIn, fault);
+
+   /* Set up the display (stack frame) variables from the arguments to the
+    * function and initialize the locals that are filled in later.
+    */
+   standard_display_init(&d, psIn, colour_typeIn, bit_depthIn,
+      interlace_typeIn);
 
    /* Everything is protected by a Try/Catch.  The functions called also
     * typically have local Try/Catch blocks.
@@ -2248,81 +2421,75 @@ standard_test(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
       /* Get a png_struct for writing the image, this will throw an error if it
        * fails, so we don't need to check the result.
        */
-      pp = set_store_for_read(ps, &pi,
-         FILEID(colour_type, bit_depth, interlace_type), "standard");
-
-      /* Clear the validated flag, check it below - this detects coding errors
-       * both below and in libpng that silently cause nothing to be done.
-       */
-      ps->validated = 0;
+      pp = set_store_for_read(d.ps, &pi, d.id, "standard");
 
       /* Introduce the correct read function. */
-      if (ps->progressive)
+      if (d.ps->progressive)
       {
-         png_set_progressive_read_fn(ps->pread, ps, standard_info,
-            progressive_row, standard_end);
+         png_set_progressive_read_fn(pp, &d, standard_info, progressive_row,
+            standard_end);
 
          /* Now feed data into the reader until we reach the end: */
-         store_progressive_read(pp, pi);
+         store_progressive_read(d.ps, pp, pi);
       }
       else
       {
-         size_t cbImage, cbRow;
-         png_uint_32 h;
-         int pass, npasses;
-
-         png_set_read_fn(ps->pread, ps, store_read);
+         /* Note that this takes the store, not the display. */
+         png_set_read_fn(pp, d.ps, store_read);
 
          /* Check the header values: */
          png_read_info(pp, pi);
-         standard_info_validate(pp, pi, colour_type, bit_depth, interlace_type);
-
-         png_start_read_image(pp);
 
          /* The code tests both versions of the images that the sequential
           * reader can produce.
           */
-         standard_size_validate(ps, pp, pi, colour_type, bit_depth, 2);
+         standard_info_imp(&d, pp, pi, 2/*images*/);
 
-         /* Need the total bytes in the image below, we can't get to this point
+         /* Need the total bytes in the image below; we can't get to this point
           * unless the PNG file values have been checked against the expected
           * values.
           */
-         cbRow = standard_rowsize(pp, colour_type, bit_depth);
-         h = standard_height(pp, colour_type, bit_depth);
-         cbImage = cbRow * h;
-         npasses = npasses_from_interlace_type(pp, interlace_type);
-
-         for (pass=1; pass <= npasses; ++pass)
          {
-            png_uint_32 y;
-            png_byte *row;
+            PNG_CONST size_t    cbImage = d.cbRow * d.h;
+            PNG_CONST png_bytep pImage = d.ps->image;
 
-            for (y=0, row=ps->image; y<h; ++y, row += cbRow)
-               png_read_row(pp, row, row+cbImage);
+            {
+               PNG_CONST int         npasses = d.npasses;
+               PNG_CONST png_uint_32 h = d.h;
+               PNG_CONST size_t      cbRow = d.cbRow;
+               int pass;
+
+               for (pass=1; pass <= npasses; ++pass)
+               {
+                  png_uint_32 y;
+                  png_byte *row;
+
+                  for (y=0, row=pImage; y<h; ++y, row += cbRow)
+                     png_read_row(pp, row, row+cbImage);
+               }
+            }
+
+            /* After the last pass loop over the rows again to check that the
+             * image is correct.
+             */
+            standard_image_validate(&d, pp, pImage, pImage+cbImage);
          }
-
-         /* After the last pass loop over the rows again to check that the image
-          * is correct.
-          */
-         standard_image_validate(ps, pp, ps->image, ps->image+cbImage,
-            colour_type, bit_depth);
 
          png_read_end(pp, pi);
       }
 
       /* Check for validation. */
-      if (!ps->validated)
+      if (!d.ps->validated)
          png_error(pp, "image read failed silently");
 
       /* Successful completion, in either case clean up the store. */
-      store_read_reset(ps);
+      store_read_reset(d.ps);
    }
 
    Catch(fault)
    {
-      store_read_reset(ps);
-      if (ps != fault) Throw fault;
+      store_read_reset(d.ps);
+      if (d.ps != fault) Throw fault;
    }
 }
 
@@ -2379,9 +2546,8 @@ typedef struct gamma_modification
 } gamma_modification;
 
 static int
-gamma_modify(png_structp pp, png_modifier *pm, png_modification *me, int add)
+gamma_modify(png_modifier *pm, png_modification *me, int add)
 {
-   UNUSED(pp);
    UNUSED(add);
    /* This simply dumps the given gamma value into the buffer. */
    png_save_uint_32(pm->buffer, 4);
@@ -2412,9 +2578,8 @@ typedef struct srgb_modification
 } srgb_modification;
 
 static int
-srgb_modify(png_structp pp, png_modifier *pm, png_modification *me, int add)
+srgb_modify(png_modifier *pm, png_modification *me, int add)
 {
-   UNUSED(pp);
    UNUSED(add);
    /* As above, ignore add and just make a new chunk */
    png_save_uint_32(pm->buffer, 1);
@@ -2454,7 +2619,7 @@ typedef struct sbit_modification
 } sbit_modification;
 
 static int
-sbit_modify(png_structp pp, png_modifier *pm, png_modification *me, int add)
+sbit_modify(png_modifier *pm, png_modification *me, int add)
 {
    png_byte sbit = ((sbit_modification*)me)->sbit;
    if (pm->bit_depth > sbit)
@@ -2480,7 +2645,8 @@ sbit_modify(png_structp pp, png_modifier *pm, png_modification *me, int add)
             break;
 
          default:
-            png_error(pp, "unexpected colour type in sBIT modification");
+            png_error(pm->this.pread,
+               "unexpected colour type in sBIT modification");
       }
 
       png_save_uint_32(pm->buffer, cb);
@@ -2513,6 +2679,345 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
    pm->modifications = &me->this;
 }
 
+/* Reader callbacks and implementations, where they differ from the standard
+ * ones.
+ */
+typedef struct gamma_display
+{
+   standard_display this;
+
+   /* Parameters */
+   png_modifier*    pm;
+   double           file_gamma;
+   double           screen_gamma;
+   png_byte         sbit;
+   int              threshold_test;
+   PNG_CONST char*  name;
+   int              speed;
+   int              use_input_precision;
+   int              strip16;
+
+   /* Local variables */
+   double       maxerrout;
+   double       maxerrpc;
+   double       maxerrabs;
+} gamma_display;
+
+static void
+gamma_display_init(gamma_display *dp, png_modifier *pm, png_byte colour_type,
+    png_byte bit_depth, int interlace_type, double file_gamma,
+    double screen_gamma, png_byte sbit, int threshold_test, int speed,
+    int use_input_precision, int strip16)
+{
+   /* Standard fields */
+   standard_display_init(&dp->this, &pm->this, colour_type, bit_depth,
+      interlace_type);
+   
+   /* Parameter fields */
+   dp->pm = pm;
+   dp->file_gamma = file_gamma;
+   dp->screen_gamma = screen_gamma;
+   dp->sbit = sbit;
+   dp->threshold_test = threshold_test;
+   dp->speed = speed;
+   dp->use_input_precision = use_input_precision;
+   dp->strip16 = strip16;
+
+   /* Local variable fields */
+   dp->maxerrout = dp->maxerrpc = dp->maxerrabs = 0;
+}
+
+static void
+gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
+{
+   /* Reused the standard stuff as appropriate. */
+   standard_info_part1(&dp->this, pp, pi);
+
+   /* If requested strip 16 to 8 bits - this is handled automagically below
+    * because the output bit depth is read from the library.  Note that there
+    * are interactions with sBIT but, internally, libpng makes sbit at most
+    * PNG_MAX_GAMMA_8 when doing the following.
+    */
+   if (dp->strip16)
+      png_set_strip_16(pp);
+
+   png_read_update_info(pp, pi);
+
+   /* Now we may get a different cbRow: */
+   standard_info_part2(&dp->this, pp, pi, 1/*images*/);
+}
+
+static void
+gamma_info(png_structp pp, png_infop pi)
+{
+   gamma_info_imp(png_get_progressive_ptr(pp), pp, pi);
+}
+
+static void
+gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
+    png_const_bytep pRow)
+{
+   /* Get some constants derived from the input and output file formats: */
+   PNG_CONST png_byte sbit = dp->sbit;
+   PNG_CONST double file_gamma = dp->file_gamma;
+   PNG_CONST double screen_gamma = dp->screen_gamma;
+   PNG_CONST int use_input_precision = dp->use_input_precision;
+   PNG_CONST int speed = dp->speed;
+   PNG_CONST png_byte in_ct = dp->this.colour_type;
+   PNG_CONST png_byte in_bd = dp->this.bit_depth;
+   PNG_CONST png_uint_32 w = dp->this.w;
+   PNG_CONST png_uint_32 h = dp->this.h;
+   PNG_CONST size_t cbRow = dp->this.cbRow;
+   PNG_CONST png_byte out_ct = png_get_color_type(pp, pi);
+   PNG_CONST png_byte out_bd = png_get_bit_depth(pp, pi);
+   PNG_CONST unsigned int outmax = (1U<<out_bd)-1;
+   PNG_CONST double maxabs = abserr(dp->pm, out_bd);
+   PNG_CONST double maxout = outerr(dp->pm, out_bd);
+   PNG_CONST double maxpc = pcerr(dp->pm, out_bd);
+
+   /* There are three sources of error, firstly the quantization in the
+    * file encoding, determined by sbit and/or the file depth, secondly
+    * the output (screen) gamma and thirdly the output file encoding.
+    * Since this API receives the screen and file gamma in double
+    * precision it is possible to calculate an exact answer given an input
+    * pixel value.  Therefore we assume that the *input* value is exact -
+    * sample/maxsample - calculate the corresponding gamma corrected
+    * output to the limits of double precision arithmetic and compare with
+    * what libpng returns.
+    *
+    * Since the library must quantise the output to 8 or 16 bits there is
+    * a fundamental limit on the accuracy of the output of +/-.5 - this
+    * quantisation limit is included in addition to the other limits
+    * specified by the paramaters to the API.  (Effectively, add .5
+    * everywhere.)
+    *
+    * The behavior of the 'sbit' paramter is defined by section 12.5
+    * (sample depth scaling) of the PNG spec.  That section forces the
+    * decoder to assume that the PNG values have been scaled if sBIT is
+    * presence:
+    *
+    *     png-sample = floor( input-sample * (max-out/max-in) + .5 );
+    *
+    * This means that only a subset of the possible PNG values should
+    * appear in the input, however the spec allows the encoder to use a
+    * variety of approximations to the above and doesn't require any
+    * restriction of the values produced.
+    *
+    * Nevertheless the spec requires that the upper 'sBIT' bits of the
+    * value stored in a PNG file be the original sample bits.
+    * Consequently the code below simply scales the top sbit bits by
+    * (1<<sbit)-1 to obtain an original sample value.
+    *
+    * Because there is limited precision in the input it is arguable that
+    * an acceptable result is any valid result from input-.5 to input+.5.
+    * The basic tests below do not do this, however if
+    * 'use_input_precision' is set a subsequent test is performed below.
+    */
+   PNG_CONST int processing = (fabs(screen_gamma*file_gamma-1) >=
+      PNG_GAMMA_THRESHOLD && !dp->threshold_test && !speed && in_ct != 3) ||
+      in_bd != out_bd;
+
+   PNG_CONST unsigned int samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
+
+   PNG_CONST double gamma = 1/(file_gamma*screen_gamma); /* Overall */
+
+   double maxerrout = 0, maxerrabs = 0, maxerrpc = 0;
+   png_uint_32 y;
+
+   for (y=0; y<h; ++y, pRow += cbRow)
+   {
+      unsigned int s, x;
+      png_byte std[STD_ROWMAX];
+
+      standard_row(pp, std, in_ct, in_bd, y);
+
+      if (processing)
+      {
+         for (x=0; x<w; ++x) for (s=0; s<samples_per_pixel; ++s)
+         {
+            /* Input sample values: */
+            PNG_CONST unsigned int
+               id = sample(std, in_ct, in_bd, x, s);
+
+            PNG_CONST unsigned int
+               od = sample(pRow, out_ct, out_bd, x, s);
+
+            PNG_CONST unsigned int
+               isbit = id >> (in_bd-sbit);
+
+            double i, sample, encoded_sample, output, encoded_error, error;
+            double es_lo, es_hi;
+
+            /* First check on the 'perfect' result obtained from the
+             * digitized input value, id, and compare this against the
+             * actual digitized result, 'od'.  'i' is the input result
+             * in the range 0..1:
+             *
+             * NOTE: sBIT should be taken into account here but isn't,
+             * as described above.
+             */
+            i = isbit; i /= (1U<<sbit)-1;
+
+            /* Then get the gamma corrected version of 'i' and compare
+             * to 'od', any error less than .5 is insignificant - just
+             * quantization of the output value to the nearest digital
+             * value (nevertheless the error is still recorded - it's
+             * interesting ;-)
+             */
+            encoded_sample = pow(i, gamma) * outmax;
+            encoded_error = fabs(od-encoded_sample);
+
+            if (encoded_error > maxerrout)
+               maxerrout = encoded_error;
+
+            if (encoded_error < .5+maxout)
+               continue;
+
+            /* There may be an error, calculate the actual sample
+             * values - unencoded light intensity values.  Note that
+             * in practice these are not unencoded because they
+             * include a 'viewing correction' to decrease or
+             * (normally) increase the perceptual contrast of the
+             * image.  There's nothing we can do about this - we don't
+             * know what it is - so assume the unencoded value is
+             * perceptually linear.
+             */
+            sample = pow(i, 1/file_gamma); /* In range 0..1 */
+            output = od;
+            output /= outmax;
+            output = pow(output, screen_gamma);
+
+            /* Now we have the numbers for real errors, both absolute
+             * values as as a percentage of the correct value (output):
+             */
+            error = fabs(sample-output);
+
+            if (error > maxerrabs)
+               maxerrabs = error;
+
+            /* The following is an attempt to ignore the tendency of
+             * quantization to dominate the percentage errors for low
+             * output sample values:
+             */
+            if (sample*maxpc > .5+maxabs)
+            {
+               double pcerr = error/sample;
+               if (pcerr > maxerrpc) maxerrpc = pcerr;
+            }
+
+            /* Now calculate the digitization limits for
+             * 'encoded_sample' using the 'max' values.  Note that
+             * maxout is in the encoded space but maxpc and maxabs are
+             * in linear light space.
+             *
+             * First find the maximum error in linear light space,
+             * range 0..1:
+             */
+            {
+               double tmp = sample * maxpc;
+               if (tmp < maxabs) tmp = maxabs;
+
+               /* Low bound - the minimum of the three: */
+               es_lo = encoded_sample - maxout;
+               if (es_lo > 0 && sample-tmp > 0)
+               {
+                  double l = outmax * pow(sample-tmp, 1/screen_gamma);
+                  if (l < es_lo) es_lo = l;
+               }
+               else
+                  es_lo = 0;
+
+               es_hi = encoded_sample + maxout;
+               if (es_hi < outmax && sample+tmp < 1)
+               {
+                  double h = outmax * pow(sample+tmp, 1/screen_gamma);
+                  if (h > es_hi) es_hi = h;
+               }
+               else
+                  es_hi = outmax;
+            }
+
+            /* The primary test is that the final encoded value
+             * returned by the library should be between the two limits
+             * (inclusive) that were calculated above.  At this point
+             * quantization of the output must be taken into account.
+             */
+            if (od+.5 < es_lo || od-.5 > es_hi)
+            {
+               /* There has been an error in processing. */
+               double is_lo, is_hi;
+
+               if (use_input_precision)
+               {
+                  /* Ok, something is wrong - this actually happens in
+                   * current libpng sbit processing.  Assume that the
+                   * input value (id, adjusted for sbit) can be
+                   * anywhere between value-.5 and value+.5 - quite a
+                   * large range if sbit is low.
+                   */
+                  double tmp = (isbit - .5)/((1U<<sbit)-1);
+
+                  if (tmp > 0)
+                  {
+                     is_lo = outmax * pow(tmp, gamma) - maxout;
+                     if (is_lo < 0) is_lo = 0;
+                  }
+
+                  else
+                     is_lo = 0;
+
+                  tmp = (isbit + .5)/((1U<<sbit)-1);
+
+                  if (tmp < 1)
+                  {
+                     is_hi = outmax * pow(tmp, gamma) + maxout;
+                     if (is_hi > outmax) is_hi = outmax;
+                  }
+
+                  else
+                     is_hi = outmax;
+
+                  if (!(od+.5 < is_lo || od-.5 > is_hi))
+                     continue;
+               }
+
+               {
+                  char msg[256];
+                  sprintf(msg,
+                   "error: %.3f; %u{%u;%u} -> %u not %.2f (%.1f-%.1f)",
+                     od-encoded_sample, id, sbit, isbit, od,
+                     encoded_sample,
+                     use_input_precision ? is_lo : es_lo,
+                     use_input_precision ? is_hi : es_hi);
+                  png_warning(pp, msg);
+               }
+            }
+         }
+      }
+
+      else if (!speed && memcmp(std, pRow, cbRow) != 0)
+      {
+         char msg[64];
+         /* No transform is expected on the threshold tests. */
+         sprintf(msg, "gamma: below threshold row %d changed", y);
+         png_error(pp, msg);
+      }
+   } /* row (y) loop */
+
+   dp->maxerrout = maxerrout;
+   dp->maxerrabs = maxerrabs;
+   dp->maxerrpc = maxerrpc;
+   dp->this.ps->validated = 1;
+}
+
+static void
+gamma_end(png_structp pp, png_infop pi)
+{
+   gamma_display *dp = png_get_progressive_ptr(pp);
+
+   gamma_image_validate(dp, pp, pi, dp->this.ps->image);
+}
+
 /* A single test run checking a gamma transformation.
  *
  * maxabs: maximum absolute error as a fraction
@@ -2520,22 +3025,24 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
  * maxpc:  maximum percentage error (as a percentage)
  */
 static void
-gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
-    PNG_CONST png_byte bit_depth, PNG_CONST int interlace_type,
-    PNG_CONST double file_gamma, PNG_CONST double screen_gamma,
-    PNG_CONST png_byte sbit, PNG_CONST int threshold_test, PNG_CONST char *name,
-    PNG_CONST int speed, PNG_CONST int use_input_precision,
-    PNG_CONST int strip16)
+gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
+    PNG_CONST png_byte bit_depthIn, PNG_CONST int interlace_typeIn,
+    PNG_CONST double file_gammaIn, PNG_CONST double screen_gammaIn,
+    PNG_CONST png_byte sbitIn, PNG_CONST int threshold_testIn,
+    PNG_CONST char *name, PNG_CONST int speedIn,
+    PNG_CONST int use_input_precisionIn, PNG_CONST int strip16In)
 {
-   context(&pm->this, fault);
+   gamma_display d;
+   context(&pmIn->this, fault);
+
+   gamma_display_init(&d, pmIn, colour_typeIn, bit_depthIn, interlace_typeIn,
+      file_gammaIn, screen_gammaIn, sbitIn, threshold_testIn, speedIn,
+      use_input_precisionIn, strip16In);
 
    Try
    {
       png_structp pp;
       png_infop pi;
-      int npasses;
-      double maxerrout = 0, maxerrpc = 0, maxerrabs = 0;
-
       gamma_modification gamma_mod;
       srgb_modification srgb_mod;
       sbit_modification sbit_mod;
@@ -2543,330 +3050,99 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
       /* Make an appropriate modifier to set the PNG file gamma to the
        * given gamma value and the sBIT chunk to the given precision.
        */
-      pm->modifications = NULL;
-      gamma_modification_init(&gamma_mod, pm, file_gamma);
-      srgb_modification_init(&srgb_mod, pm, 127/*delete*/);
-      sbit_modification_init(&sbit_mod, pm, sbit);
+      d.pm->modifications = NULL;
+      gamma_modification_init(&gamma_mod, d.pm, d.file_gamma);
+      srgb_modification_init(&srgb_mod, d.pm, 127/*delete*/);
+      sbit_modification_init(&sbit_mod, d.pm, d.sbit);
 
-      modification_reset(pm->modifications);
+      modification_reset(d.pm->modifications);
 
       /* Get a png_struct for writing the image. */
-      pp = set_modifier_for_read(pm, &pi, FILEID(colour_type, bit_depth,
-         interlace_type), name);
-
-      /* Se the correct read function. */
-      png_set_read_fn(pp, pm, modifier_read);
+      pp = set_modifier_for_read(d.pm, &pi, d.this.id, name);
 
       /* Set up gamma processing. */
-      png_set_gamma(pp, screen_gamma, file_gamma);
+      png_set_gamma(pp, d.screen_gamma, d.file_gamma);
 
-      /* Check the header values: */
-      png_read_info(pp, pi);
-
-      /* If requested strip 16 to 8 bits - this is handled automagically below
-       * because the output bit depth is read from the library.  Note that there
-       * are interactions with sBIT but, internally, libpng makes sbit at most
-       * PNG_MAX_GAMMA_8 when doing the following.
-       */
-      if (strip16)
-         png_set_strip_16(pp);
-
-      npasses = png_set_interlace_handling(pp);
-
-      png_read_update_info(pp, pi);
-
+      /* Introduce the correct read function. */
+      if (d.pm->this.progressive)
       {
-         PNG_CONST png_byte out_ct = png_get_color_type(pp, pi);
-         PNG_CONST png_byte out_bd = png_get_bit_depth(pp, pi);
-         PNG_CONST unsigned int outmax = (1U<<out_bd)-1;
-         PNG_CONST png_uint_32 w = png_get_image_width(pp, pi);
-         PNG_CONST png_uint_32 h = png_get_image_height(pp, pi);
-         PNG_CONST size_t cb = png_get_rowbytes(pp, pi); /* For memcmp below. */
-         PNG_CONST double maxabs = abserr(pm, out_bd);
-         PNG_CONST double maxout = outerr(pm, out_bd);
-         PNG_CONST double maxpc = pcerr(pm, out_bd);
-         int pass;
+         /* Share the row function with the standard implementation. */
+         png_set_progressive_read_fn(pp, &d, gamma_info, progressive_row,
+            gamma_end);
 
-         /* There are three sources of error, firstly the quantization in the
-          * file encoding, determined by sbit and/or the file depth, secondly
-          * the output (screen) gamma and thirdly the output file encoding.
-          * Since this API receives the screen and file gamma in double
-          * precision it is possible to calculate an exact answer given an input
-          * pixel value.  Therefore we assume that the *input* value is exact -
-          * sample/maxsample - calculate the corresponding gamma corrected
-          * output to the limits of double precision arithmetic and compare with
-          * what libpng returns.
-          *
-          * Since the library must quantise the output to 8 or 16 bits there is
-          * a fundamental limit on the accuracy of the output of +/-.5 - this
-          * quantisation limit is included in addition to the other limits
-          * specified by the paramaters to the API.  (Effectively, add .5
-          * everywhere.)
-          *
-          * The behavior of the 'sbit' paramter is defined by section 12.5
-          * (sample depth scaling) of the PNG spec.  That section forces the
-          * decoder to assume that the PNG values have been scaled if sBIT is
-          * presence:
-          *
-          *     png-sample = floor( input-sample * (max-out/max-in) + .5 );
-          *
-          * This means that only a subset of the possible PNG values should
-          * appear in the input, however the spec allows the encoder to use a
-          * variety of approximations to the above and doesn't require any
-          * restriction of the values produced.
-          *
-          * Nevertheless the spec requires that the upper 'sBIT' bits of the
-          * value stored in a PNG file be the original sample bits.
-          * Consequently the code below simply scales the top sbit bits by
-          * (1<<sbit)-1 to obtain an original sample value.
-          *
-          * Because there is limited precision in the input it is arguable that
-          * an acceptable result is any valid result from input-.5 to input+.5.
-          * The basic tests below do not do this, however if
-          * 'use_input_precision' is set a subsequent test is performed below.
-          */
-         PNG_CONST int processing = (fabs(screen_gamma*file_gamma-1) >=
-            PNG_GAMMA_THRESHOLD && !threshold_test && !speed && colour_type !=
-            3) || bit_depth != out_bd;
+         /* Now feed data into the reader until we reach the end: */
+         modifier_progressive_read(d.pm, pp, pi);
+      }
+      else
+      {
+         /* modifier_read expects a png_modifier* */
+         png_set_read_fn(pp, d.pm, modifier_read);
 
-         PNG_CONST unsigned int samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
+         /* Check the header values: */
+         png_read_info(pp, pi);
 
-         PNG_CONST double gamma = 1/(file_gamma*screen_gamma); /* Overall */
+         /* Process the 'info' requirements. only one image is generated */
+         gamma_info_imp(&d, pp, pi);
 
-         for (pass=1; pass <= npasses; ++pass)
+         /* And finally read and validate the image. */
          {
-            png_uint_32 y;
+            PNG_CONST png_bytep pImage = d.this.ps->image;
 
-            /* Make sure the image buffer is big enough. */
-            store_ensure_image(&pm->this, pp, h*cb);
-
-            for (y=0; y<h; ++y)
             {
-               unsigned int s, x;
-               png_byte std[STD_ROWMAX];
+               PNG_CONST int         npasses = d.this.npasses;
+               PNG_CONST png_uint_32 h = d.this.h;
+               PNG_CONST size_t      cbRow = d.this.cbRow;
+               int pass;
 
-               png_read_row(pp, NULL, pm->this.image+(y*cb));
-
-               if (pass < npasses)
-                  continue;
-
-               /* Else this is the last pass and the output should match the
-                * original input.
-                */
-               standard_row(pp, std, colour_type, bit_depth, y);
-
-               if (processing)
+               for (pass=1; pass <= npasses; ++pass)
                {
-                  for (x=0; x<w; ++x) for (s=0; s<samples_per_pixel; ++s)
-                  {
-                     /* Input sample values: */
-                     PNG_CONST unsigned int
-                        id = sample(std, colour_type, bit_depth, x, s);
+                  png_uint_32 y;
+                  png_byte *row;
 
-                     PNG_CONST unsigned int
-                        od = sample(pm->this.image+(y*cb), out_ct, out_bd, x,
-                           s);
-
-                     PNG_CONST unsigned int
-                        isbit = id >> (bit_depth-sbit);
-
-                     double i, sample, encoded_sample, output, encoded_error,
-                        error;
-                     double es_lo, es_hi;
-
-                     /* First check on the 'perfect' result obtained from the
-                      * digitized input value, id, and compare this against the
-                      * actual digitized result, 'od'.  'i' is the input result
-                      * in the range 0..1:
-                      *
-                      * NOTE: sBIT should be taken into account here but isn't,
-                      * as described above.
-                      */
-                     i = isbit; i /= (1U<<sbit)-1;
-
-                     /* Then get the gamma corrected version of 'i' and compare
-                      * to 'od', any error less than .5 is insignificant - just
-                      * quantization of the output value to the nearest digital
-                      * value (nevertheless the error is still recorded - it's
-                      * interesting ;-)
-                      */
-                     encoded_sample = pow(i, gamma) * outmax;
-                     encoded_error = fabs(od-encoded_sample);
-
-                     if (encoded_error > maxerrout)
-                        maxerrout = encoded_error;
-
-                     if (encoded_error < .5+maxout)
-                        continue;
-
-                     /* There may be an error, calculate the actual sample
-                      * values - unencoded light intensity values.  Note that
-                      * in practice these are not unencoded because they
-                      * include a 'viewing correction' to decrease or
-                      * (normally) increase the perceptual contrast of the
-                      * image.  There's nothing we can do about this - we don't
-                      * know what it is - so assume the unencoded value is
-                      * perceptually linear.
-                      */
-                     sample = pow(i, 1/file_gamma); /* In range 0..1 */
-                     output = od;
-                     output /= outmax;
-                     output = pow(output, screen_gamma);
-
-                     /* Now we have the numbers for real errors, both absolute
-                      * values as as a percentage of the correct value (output):
-                      */
-                     error = fabs(sample-output);
-
-                     if (error > maxerrabs)
-                        maxerrabs = error;
-
-                     /* The following is an attempt to ignore the tendency of
-                      * quantization to dominate the percentage errors for low
-                      * output sample values:
-                      */
-                     if (sample*maxpc > .5+maxabs)
-                     {
-                        double pcerr = error/sample;
-                        if (pcerr > maxerrpc) maxerrpc = pcerr;
-                     }
-
-                     /* Now calculate the digitization limits for
-                      * 'encoded_sample' using the 'max' values.  Note that
-                      * maxout is in the encoded space but maxpc and maxabs are
-                      * in linear light space.
-                      *
-                      * First find the maximum error in linear light space,
-                      * range 0..1:
-                      */
-                     {
-                        double tmp = sample * maxpc;
-                        if (tmp < maxabs) tmp = maxabs;
-
-                        /* Low bound - the minimum of the three: */
-                        es_lo = encoded_sample - maxout;
-                        if (es_lo > 0 && sample-tmp > 0)
-                        {
-                           double l = outmax * pow(sample-tmp, 1/screen_gamma);
-                           if (l < es_lo) es_lo = l;
-                        }
-                        else
-                           es_lo = 0;
-
-                        es_hi = encoded_sample + maxout;
-                        if (es_hi < outmax && sample+tmp < 1)
-                        {
-                           double h = outmax * pow(sample+tmp, 1/screen_gamma);
-                           if (h > es_hi) es_hi = h;
-                        }
-                        else
-                           es_hi = outmax;
-                     }
-
-                     /* The primary test is that the final encoded value
-                      * returned by the library should be between the two limits
-                      * (inclusive) that were calculated above.  At this point
-                      * quantization of the output must be taken into account.
-                      */
-                     if (od+.5 < es_lo || od-.5 > es_hi)
-                     {
-                        /* There has been an error in processing. */
-                        double is_lo, is_hi;
-
-                        if (use_input_precision)
-                        {
-                           /* Ok, something is wrong - this actually happens in
-                            * current libpng sbit processing.  Assume that the
-                            * input value (id, adjusted for sbit) can be
-                            * anywhere between value-.5 and value+.5 - quite a
-                            * large range if sbit is low.
-                            */
-                           double tmp = (isbit - .5)/((1U<<sbit)-1);
-
-                           if (tmp > 0)
-                           {
-                              is_lo = outmax * pow(tmp, gamma) - maxout;
-                              if (is_lo < 0) is_lo = 0;
-                           }
-
-                           else
-                              is_lo = 0;
-
-                           tmp = (isbit + .5)/((1U<<sbit)-1);
-
-                           if (tmp < 1)
-                           {
-                              is_hi = outmax * pow(tmp, gamma) + maxout;
-                              if (is_hi > outmax) is_hi = outmax;
-                           }
-
-                           else
-                              is_hi = outmax;
-
-                           if (!(od+.5 < is_lo || od-.5 > is_hi))
-                              continue;
-                        }
-
-                        {
-                           char msg[256];
-                           sprintf(msg,
-                            "error: %.3f; %u{%u;%u} -> %u not %.2f (%.1f-%.1f)",
-                              od-encoded_sample, id, sbit, isbit, od,
-                              encoded_sample,
-                              use_input_precision ? is_lo : es_lo,
-                              use_input_precision ? is_hi : es_hi);
-                           png_warning(pp, msg);
-                        }
-                     }
-                  }
+                  for (y=0, row=pImage; y<h; ++y, row += cbRow)
+                     png_read_row(pp, NULL, row);
                }
+            }
 
-               else if (!speed && memcmp(std, pm->this.image+(y*cb), cb) != 0)
-               {
-                  char msg[64];
-                  /* No transform is expected on the threshold tests. */
-                  sprintf(msg, "gamma: below threshold row %d (of %d) changed",
-                      y, h);
-                  png_error(pp, msg);
-               }
-            } /* row (y) loop */
-         } /* pass loop */
+            gamma_image_validate(&d, pp, pi, pImage);
+         }
+
+         png_read_end(pp, pi);
       }
 
-      png_read_end(pp, pi);
-      modifier_reset(pm);
+      modifier_reset(d.pm);
 
-      if (pm->log && !threshold_test && !speed)
+      if (d.pm->log && !d.threshold_test && !d.speed)
          fprintf(stderr, "%d bit %s %s: max error %f (%.2g, %2g%%)\n",
-            bit_depth, colour_types[colour_type], name, maxerrout, maxerrabs,
-            100*maxerrpc);
+            d.this.bit_depth, colour_types[d.this.colour_type], d.name,
+            d.maxerrout, d.maxerrabs, 100*d.maxerrpc);
 
       /* Log the summary values too. */
-      if (colour_type == 0 || colour_type == 4)
+      if (d.this.colour_type == 0 || d.this.colour_type == 4)
       {
-         switch (bit_depth)
+         switch (d.this.bit_depth)
          {
          case 1:
             break;
 
          case 2:
-            if (maxerrout > pm->error_gray_2)
-               pm->error_gray_2 = maxerrout;
+            if (d.maxerrout > d.pm->error_gray_2)
+               d.pm->error_gray_2 = d.maxerrout;
             break;
 
          case 4:
-            if (maxerrout > pm->error_gray_4)
-               pm->error_gray_4 = maxerrout;
+            if (d.maxerrout > d.pm->error_gray_4)
+               d.pm->error_gray_4 = d.maxerrout;
             break;
 
          case 8:
-            if (maxerrout > pm->error_gray_8)
-               pm->error_gray_8 = maxerrout;
+            if (d.maxerrout > d.pm->error_gray_8)
+               d.pm->error_gray_8 = d.maxerrout;
             break;
 
          case 16:
-            if (maxerrout > pm->error_gray_16)
-               pm->error_gray_16 = maxerrout;
+            if (d.maxerrout > d.pm->error_gray_16)
+               d.pm->error_gray_16 = d.maxerrout;
             break;
 
          default:
@@ -2874,19 +3150,19 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
          }
       }
 
-      else if (colour_type == 2 || colour_type == 6)
+      else if (d.this.colour_type == 2 || d.this.colour_type == 6)
       {
-         switch (bit_depth)
+         switch (d.this.bit_depth)
          {
          case 8:
-            if (maxerrout > pm->error_color_8)
-               pm->error_color_8 = maxerrout;
+            if (d.maxerrout > d.pm->error_color_8)
+               d.pm->error_color_8 = d.maxerrout;
 
             break;
 
          case 16:
-            if (maxerrout > pm->error_color_16)
-               pm->error_color_16 = maxerrout;
+            if (d.maxerrout > d.pm->error_color_16)
+               d.pm->error_color_16 = d.maxerrout;
 
             break;
 
@@ -2898,9 +3174,9 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
 
    Catch(fault)
    {
-      modifier_reset(pm);
+      modifier_reset(d.pm);
 
-      if (fault != &pm->this)
+      if (fault != &d.pm->this)
          Throw fault;
    }
 }
