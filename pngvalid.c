@@ -118,9 +118,9 @@ log2depth(png_byte bit_depth)
 /* A numeric ID based on PNG file characteristics: */
 #define FILEID(col, depth, interlace) \
    ((png_uint_32)((col) + ((depth)<<3)) + ((interlace)<<8))
-#define COL_FROM_ID(id) ((id)& 0x7U)
-#define DEPTH_FROM_ID(id) (((id) >> 3) & 0x1fU)
-#define INTERLACE_FROM_ID(id) (((id) >> 8) & 0xff)
+#define COL_FROM_ID(id) ((png_byte)((id)& 0x7U))
+#define DEPTH_FROM_ID(id) ((png_byte)(((id) >> 3) & 0x1fU))
+#define INTERLACE_FROM_ID(id) ((int)(((id) >> 8) & 0xff))
 
 /* Utility to construct a standard name for a standard image. */
 static size_t
@@ -241,7 +241,7 @@ typedef struct png_store_file
 {
    struct png_store_file*  next;      /* as many as you like... */
    char                    name[FILE_NAME_SIZE];
-   png_uint_32             id;        /* as a convenience to users */
+   png_uint_32             id;        /* must be correct (see FILEID) */
    png_size_t              datacount; /* In this (the last) buffer */
    png_store_buffer        data;      /* Last buffer in file */
 } png_store_file;
@@ -282,6 +282,8 @@ typedef struct png_store
    unsigned int       expect_warning :1;
    unsigned int       saw_warning :1;
    unsigned int       speed :1;
+   unsigned int       progressive :1; /* use progressive read */
+   unsigned int       validated :1;   /* used as a temporary flag */
    int                nerrors;
    int                nwarnings;
    char               test[64]; /* Name of test */
@@ -360,6 +362,7 @@ store_init(png_store* ps)
    ps->expect_warning = 0;
    ps->saw_warning = 0;
    ps->speed = 0;
+   ps->progressive = 0;
    ps->nerrors = ps->nwarnings = 0;
    ps->pread = NULL;
    ps->piread = NULL;
@@ -651,6 +654,27 @@ store_read(png_structp pp, png_bytep pb, png_size_t st)
    }
 }
 
+static void
+store_progressive_read(png_structp pp, png_infop pi)
+{
+   png_store *ps = png_get_io_ptr(pp);
+
+   /* Notice that a call to store_read will cause this function to fail because
+    * readpos will be set.
+    */
+   if (ps->pread != pp || ps->current == NULL || ps->next == NULL)
+      png_error(pp, "store state damaged");
+
+   do
+   {
+      if (ps->readpos != 0)
+         png_error(pp, "store_read called during progressive read");
+
+      png_process_data(pp, pi, ps->next->buffer, store_read_buffer_size(ps));
+   }
+   while (store_read_buffer_next(ps));
+}
+
 /***************************** MEMORY MANAGEMENT*** ***************************/
 /* A store_memory is simply the header for an allocated block of memory.  The
  * pointer returned to libpng is just after the end of the header block, the
@@ -672,7 +696,7 @@ typedef struct store_memory
  * all the memory.
  */
 static void
-store_pool_error(png_structp pp, png_store *ps, PNG_CONST char *msg)
+store_pool_error(png_store *ps, png_structp pp, PNG_CONST char *msg)
 {
    if (pp != NULL)
       png_error(pp, msg);
@@ -690,10 +714,10 @@ store_memory_free(png_structp pp, store_pool *pool, store_memory *memory)
     * pointer (for sure), but the contents may have been trashed.
     */
    if (memory->pool != pool)
-      store_pool_error(pp, pool->store, "memory corrupted (pool)");
+      store_pool_error(pool->store, pp, "memory corrupted (pool)");
 
    else if (memcmp(memory->mark, pool->mark, sizeof memory->mark) != 0)
-      store_pool_error(pp, pool->store, "memory corrupted (start)");
+      store_pool_error(pool->store, pp, "memory corrupted (start)");
 
    /* It should be safe to read the size field now. */
    else
@@ -701,11 +725,11 @@ store_memory_free(png_structp pp, store_pool *pool, store_memory *memory)
       png_alloc_size_t cb = memory->size;
 
       if (cb > pool->max)
-         store_pool_error(pp, pool->store, "memory corrupted (size)");
+         store_pool_error(pool->store, pp, "memory corrupted (size)");
 
       else if (memcmp((png_bytep)(memory+1)+cb, pool->mark, sizeof pool->mark)
          != 0)
-         store_pool_error(pp, pool->store, "memory corrupted (end)");
+         store_pool_error(pool->store, pp, "memory corrupted (end)");
 
       /* Finally give the library a chance to find problems too: */
       else
@@ -783,7 +807,7 @@ store_malloc(png_structp pp, png_alloc_size_t cb)
       ++new;
    }
    else
-      store_pool_error(pp, pool->store, "out of memory");
+      store_pool_error(pool->store, pp, "out of memory");
 
    return new;
 }
@@ -802,7 +826,7 @@ store_free(png_structp pp, png_voidp memory)
    {
       if (*test == NULL)
       {
-         store_pool_error(pp, pool->store, "bad pointer to free");
+         store_pool_error(pool->store, pp, "bad pointer to free");
          return;
       }
    }
@@ -2003,6 +2027,209 @@ perform_error_test(png_modifier *pm)
       return;
 }
 
+static void
+standard_info_validate(png_structp pp, png_infop pi, png_byte colour_type,
+    png_byte bit_depth, int interlace_type)
+{
+   if (png_get_bit_depth(pp, pi) != bit_depth)
+      png_error(pp, "validate: bit depth changed");
+
+   if (png_get_color_type(pp, pi) != colour_type)
+      png_error(pp, "validate: color type changed");
+
+   if (png_get_filter_type(pp, pi) != PNG_FILTER_TYPE_BASE)
+      png_error(pp, "validate: filter type changed");
+
+   if (png_get_interlace_type(pp, pi) != interlace_type)
+      png_error(pp, "validate: interlacing changed");
+
+   if (png_get_compression_type(pp, pi) != PNG_COMPRESSION_TYPE_BASE)
+      png_error(pp, "validate: compression type changed");
+
+   if (colour_type == 3) /* palette */
+   {
+      png_colorp pal;
+      int num;
+
+      if (png_get_PLTE(pp, pi, &pal, &num) & PNG_INFO_PLTE)
+      {
+         int i;
+
+         if (num != 256)
+            png_error(pp, "validate: color type 3 PLTE chunk size changed");
+
+         for (i=0; i<num; ++i)
+            if (pal[i].red != i || pal[i].green != i || pal[i].blue != i)
+               png_error(pp, "validate: color type 3 PLTE chunk changed");
+      }
+
+      else
+         png_error(pp, "validate: missing PLTE with color type 3");
+   }
+
+   /* Read the number of passes - expected to match the value used when
+    * creating the image (interlaced or not).  This has the side effect of
+    * turning ono interlace handling.
+    */
+   if (png_set_interlace_handling(pp) !=
+       npasses_from_interlace_type(pp, interlace_type))
+      png_error(pp, "validate: file changed interlace type");
+}
+
+static void
+standard_info_validate_from_id(png_structp pp, png_infop pi, png_uint_32 id)
+{
+   standard_info_validate(pp, pi, COL_FROM_ID(id), DEPTH_FROM_ID(id),
+      INTERLACE_FROM_ID(id));
+}
+
+static void
+standard_size_validate(png_store *ps, png_structp pp, png_infop pi,
+    png_byte colour_type, png_byte bit_depth, int nImages)
+{
+   /* Validation of image width and height is done here, although it could be
+    * done above, to avoid reading width/height multiple times.
+    */
+   PNG_CONST png_uint_32 w = standard_width(pp, colour_type, bit_depth);
+   PNG_CONST png_uint_32 h = standard_height(pp, colour_type, bit_depth);
+   PNG_CONST size_t cbRow = standard_rowsize(pp, colour_type, bit_depth);
+
+   if (png_get_image_width(pp, pi) != w)
+      png_error(pp, "validate: image width changed");
+
+   if (png_get_image_height(pp, pi) != h)
+      png_error(pp, "validate: image height changed");
+
+   if (png_get_rowbytes(pp, pi) != cbRow)
+      png_error(pp, "validate: row size changed");
+
+   /* Then ensure there is enough space for the output image(s). */
+   store_ensure_image(ps, pp, nImages*cbRow*h);
+}
+
+static void
+standard_size_validate_from_id(png_store *ps, png_structp pp, png_infop pi,
+    png_uint_32 id, int nImages)
+{
+   standard_size_validate(ps, pp, pi, COL_FROM_ID(id), DEPTH_FROM_ID(id),
+      nImages);
+}
+
+static void
+standard_info(png_structp pp, png_infop pi)
+{
+   png_store *ps = png_get_progressive_ptr(pp);
+   png_uint_32 id = ps->current->id;
+
+   /* Note that the validation routine has the side effect of turning on
+    * interlace handling in the subsequent code.
+    */
+   standard_info_validate_from_id(pp, pi, id);
+
+   /* And the info callback has to call this (or png_read_update_info - see
+    * below in the png_modifier code for that variant.
+    */
+   png_start_read_image(pp);
+
+   /* Validate the height, width and rowbytes plus ensure that sufficient buffer
+    * exists for decoding the image.
+    */
+   standard_size_validate_from_id(ps, pp, pi, id, 1/*only one copy*/);
+}
+
+static void
+progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
+{
+   UNUSED(pass);
+
+   /* When handling interlacing some rows will be absent in each pass, the
+    * callback still gets called, but with a NULL pointer.  We need our own
+    * 'cbRow', but we can't call png_get_rowbytes because we got no info
+    * structure.
+    */
+   if (new_row != NULL)
+   {
+      PNG_CONST png_store *ps = png_get_progressive_ptr(pp);
+      PNG_CONST png_uint_32 id = ps->current->id;
+
+      /* Combine the new row into the old: */
+      png_progressive_combine_row(pp, ps->image +
+         y*standard_rowsize(pp, COL_FROM_ID(id), DEPTH_FROM_ID(id)), new_row);
+   }
+}
+
+static void
+standard_row_validate(png_structp pp, png_byte colour_type, png_byte bit_depth,
+    png_const_bytep row, png_const_bytep display, png_uint_32 y, size_t cbRow)
+{
+   png_byte std[STD_ROWMAX];
+   standard_row(pp, std, colour_type, bit_depth, y);
+
+   /* At the end both the 'read' and 'display' arrays should end up identical.
+    * In earlier passes 'read' will be narrow, containing only the columns that
+    * were read, and display will be full width but populated with garbage where
+    * pixels have not been filled in.
+    */
+   if (row != NULL && memcmp(std, row, cbRow) != 0)
+   {
+      char msg[64];
+      sprintf(msg, "PNG image row %d changed", y);
+      png_error(pp, msg);
+   }
+
+   if (display != NULL && memcmp(std, display, cbRow) != 0)
+   {
+      char msg[64];
+      sprintf(msg, "display row %d changed", y);
+      png_error(pp, msg);
+   }
+}
+
+static void
+standard_image_validate(png_store *ps, png_structp pp, png_const_bytep pImage,
+    png_const_bytep pDisplay, png_byte colour_type, png_byte bit_depth)
+{
+   size_t cbRow = standard_rowsize(pp, colour_type, bit_depth);
+   png_uint_32 h = standard_height(pp, colour_type, bit_depth);
+   png_uint_32 y;
+
+   for (y=0; y<h; ++y)
+   {
+      standard_row_validate(pp, colour_type, bit_depth, pImage, pDisplay, y,
+         cbRow);
+
+      if (pImage != NULL)
+         pImage += cbRow;
+
+      if (pDisplay != NULL)
+         pDisplay += cbRow;
+   }
+
+   /* This avoids false positives if the validation code is never called! */
+   ps->validated = 1;
+}
+
+static void
+standard_image_validate_from_id(png_store *ps, png_structp pp,
+    png_const_bytep pImage, png_const_bytep pDisplay, png_uint_32 id)
+{
+   standard_image_validate(ps, pp, pImage, pDisplay, COL_FROM_ID(id),
+      DEPTH_FROM_ID(id));
+}
+
+static void
+standard_end(png_structp pp, png_infop pi)
+{
+   png_store *ps = png_get_progressive_ptr(pp);
+
+   UNUSED(pi);
+
+   /* Validate the image - progressive reading only produces one variant for
+    * interlaced images.
+    */
+   standard_image_validate_from_id(ps, pp, ps->image, NULL, ps->current->id);
+}
+
 /* A single test run checking the standard image to ensure it is not damaged. */
 static void
 standard_test(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
@@ -2017,9 +2244,6 @@ standard_test(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
    {
       png_structp pp;
       png_infop pi;
-      png_uint_32 h;
-      size_t cbRow;
-      int npasses;
 
       /* Get a png_struct for writing the image, this will throw an error if it
        * fails, so we don't need to check the result.
@@ -2027,124 +2251,71 @@ standard_test(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
       pp = set_store_for_read(ps, &pi,
          FILEID(colour_type, bit_depth, interlace_type), "standard");
 
-      /* Introduce the correct read function. */
-      png_set_read_fn(ps->pread, ps, store_read);
-
-      /* Check the header values: */
-      png_read_info(pp, pi);
-
-      if (png_get_image_width(pp, pi) !=
-          standard_width(pp, colour_type, bit_depth))
-         png_error(pp, "validate: image width changed");
-
-      h = standard_height(pp, colour_type, bit_depth);
-
-      if (png_get_image_height(pp, pi) != h)
-         png_error(pp, "validate: image height changed");
-
-      if (png_get_bit_depth(pp, pi) != bit_depth)
-         png_error(pp, "validate: bit depth changed");
-
-      if (png_get_color_type(pp, pi) != colour_type)
-         png_error(pp, "validate: color type changed");
-
-      if (png_get_filter_type(pp, pi) != PNG_FILTER_TYPE_BASE)
-         png_error(pp, "validate: filter type changed");
-
-      if (png_get_interlace_type(pp, pi) != interlace_type)
-         png_error(pp, "validate: interlacing changed");
-
-      if (png_get_compression_type(pp, pi) != PNG_COMPRESSION_TYPE_BASE)
-         png_error(pp, "validate: compression type changed");
-
-      if (colour_type == 3) /* palette */
-      {
-         png_colorp pal;
-         int num;
-
-         if (png_get_PLTE(pp, pi, &pal, &num) & PNG_INFO_PLTE)
-         {
-            int i;
-
-            if (num != 256)
-               png_error(pp,
-                  "validate: color type 3 PLTE chunk size changed");
-
-            for (i=0; i<num; ++i)
-               if (pal[i].red != i || pal[i].green != i || pal[i].blue != i)
-                  png_error(pp, "validate: color type 3 PLTE chunk changed");
-         }
-
-         else
-            png_error(pp, "validate: missing PLTE with color type 3");
-      }
-
-      /* Read the number of passes - expected to match the value used when
-       * creating the image (interlaced or not).
+      /* Clear the validated flag, check it below - this detects coding errors
+       * both below and in libpng that silently cause nothing to be done.
        */
-      npasses = png_set_interlace_handling(pp);
-      if (npasses != npasses_from_interlace_type(pp, interlace_type))
-         png_error(pp, "validate: file changed interlace type");
+      ps->validated = 0;
 
-      png_start_read_image(pp);
+      /* Introduce the correct read function. */
+      if (ps->progressive)
+      {
+         png_set_progressive_read_fn(ps->pread, ps, standard_info,
+            progressive_row, standard_end);
 
-      cbRow = standard_rowsize(pp, colour_type, bit_depth);
-
-      if (png_get_rowbytes(pp, pi) != cbRow)
-         png_error(pp, "validate: row size changed");
-
+         /* Now feed data into the reader until we reach the end: */
+         store_progressive_read(pp, pi);
+      }
       else
       {
-         size_t cbImage = h * cbRow;
-         int pass;
+         size_t cbImage, cbRow;
+         png_uint_32 h;
+         int pass, npasses;
 
-         /* Make sure the image buffer is big enough. */
-         store_ensure_image(ps, pp, 2*cbImage);
+         png_set_read_fn(ps->pread, ps, store_read);
+
+         /* Check the header values: */
+         png_read_info(pp, pi);
+         standard_info_validate(pp, pi, colour_type, bit_depth, interlace_type);
+
+         png_start_read_image(pp);
+
+         /* The code tests both versions of the images that the sequential
+          * reader can produce.
+          */
+         standard_size_validate(ps, pp, pi, colour_type, bit_depth, 2);
+
+         /* Need the total bytes in the image below, we can't get to this point
+          * unless the PNG file values have been checked against the expected
+          * values.
+          */
+         cbRow = standard_rowsize(pp, colour_type, bit_depth);
+         h = standard_height(pp, colour_type, bit_depth);
+         cbImage = cbRow * h;
+         npasses = npasses_from_interlace_type(pp, interlace_type);
 
          for (pass=1; pass <= npasses; ++pass)
          {
             png_uint_32 y;
-            for (y=0; y<h; ++y)
-            {
-               png_byte *row = ps->image + (y*cbRow);
-               png_byte *display = row + cbImage;
+            png_byte *row;
 
-               png_read_row(pp, row, display);
+            for (y=0, row=ps->image; y<h; ++y, row += cbRow)
+               png_read_row(pp, row, row+cbImage);
+         }
 
-               /* Check the final row on the last pass */
-               if (pass == npasses)
-               {
-                  png_byte std[STD_ROWMAX];
-                  standard_row(pp, std, colour_type, bit_depth, y);
+         /* After the last pass loop over the rows again to check that the image
+          * is correct.
+          */
+         standard_image_validate(ps, pp, ps->image, ps->image+cbImage,
+            colour_type, bit_depth);
 
-                  /* At the end both the 'read' and 'display' arrays should end
-                   * up identical.  In earlier passes 'read' will be narrow,
-                   * containing only the columns that were read, and display
-                   * will be full width but populated with garbage where pixels
-                   * have not bee filled in.
-                   */
-                  if (memcmp(std, row, cbRow) != 0)
-                  {
-                     char msg[64];
-                     sprintf(msg, "validate: PNG image row %d (of %d) changed",
-                        y, h);
-                     png_error(pp, msg);
-                  }
-
-                  if (memcmp(std, display, cbRow) != 0)
-                  {
-                     char msg[64];
-                     sprintf(msg,
-                        "validate: display row %d (of %d) changed", y, h);
-                     png_error(pp, msg);
-                  }
-               }
-            } /* row (y) loop */
-         } /* pass loop */
+         png_read_end(pp, pi);
       }
 
-      png_read_end(pp, pi);
+      /* Check for validation. */
+      if (!ps->validated)
+         png_error(pp, "image read failed silently");
 
+      /* Successful completion, in either case clean up the store. */
       store_read_reset(ps);
    }
 
@@ -3078,6 +3249,9 @@ int main(int argc, PNG_CONST char **argv)
 
       else if (strcmp(*argv, "--speed") == 0)
          pm.this.speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
+
+      else if (strcmp(*argv, "--progressive-read") == 0)
+         pm.this.progressive = 1;
 
       else if (strcmp(*argv, "--interlace") == 0)
          pm.interlace_type = PNG_INTERLACE_ADAM7;
