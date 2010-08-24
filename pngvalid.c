@@ -2336,6 +2336,39 @@ progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
 }
 
 static void
+sequential_row(standard_display *dp, png_structp pp, png_infop pi,
+    PNG_CONST png_bytep pImage, PNG_CONST png_bytep pDisplay)
+{
+   PNG_CONST int         npasses = dp->npasses;
+   PNG_CONST png_uint_32 h = dp->h;
+   PNG_CONST size_t      cbRow = dp->cbRow;
+   int pass;
+
+   for (pass=1; pass <= npasses; ++pass)
+   {
+      png_uint_32 y;
+      png_bytep pRow1 = pImage;
+      png_bytep pRow2 = pDisplay;
+
+      for (y=0; y<h; ++y)
+      {
+         png_read_row(pp, pRow1, pRow2);
+
+         if (pRow1 != NULL)
+            pRow1 += cbRow;
+
+         if (pRow2 != NULL)
+            pRow2 += cbRow;
+      }
+   }
+
+   /* And finish the read operation (only really necessary if the caller wants
+    * to find additional data in png_info from chunks after the last IDAT.)
+    */
+   png_read_end(pp, pi);
+}
+
+static void
 standard_row_validate(standard_display *dp, png_structp pp, png_const_bytep row,
    png_const_bytep display, png_uint_32 y)
 {
@@ -2421,7 +2454,8 @@ standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
       /* Get a png_struct for writing the image, this will throw an error if it
        * fails, so we don't need to check the result.
        */
-      pp = set_store_for_read(d.ps, &pi, d.id, "standard");
+      pp = set_store_for_read(d.ps, &pi, d.id,
+         d.ps->progressive ? "progressive reader" : "sequential reader");
 
       /* Introduce the correct read function. */
       if (d.ps->progressive)
@@ -2450,32 +2484,16 @@ standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
           * values.
           */
          {
-            PNG_CONST size_t    cbImage = d.cbRow * d.h;
             PNG_CONST png_bytep pImage = d.ps->image;
+            PNG_CONST png_bytep pDisplay = pImage + d.cbRow * d.h;
 
-            {
-               PNG_CONST int         npasses = d.npasses;
-               PNG_CONST png_uint_32 h = d.h;
-               PNG_CONST size_t      cbRow = d.cbRow;
-               int pass;
-
-               for (pass=1; pass <= npasses; ++pass)
-               {
-                  png_uint_32 y;
-                  png_byte *row;
-
-                  for (y=0, row=pImage; y<h; ++y, row += cbRow)
-                     png_read_row(pp, row, row+cbImage);
-               }
-            }
+            sequential_row(&d, pp, pi, pImage, pDisplay);
 
             /* After the last pass loop over the rows again to check that the
              * image is correct.
              */
-            standard_image_validate(&d, pp, pImage, pImage+cbImage);
+            standard_image_validate(&d, pp, pImage, pDisplay);
          }
-
-         png_read_end(pp, pi);
       }
 
       /* Check for validation. */
@@ -2504,6 +2522,14 @@ test_standard(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
       for (interlace_type = PNG_INTERLACE_NONE;
            interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
       {
+         /* Test both sequential and standard readers here. */
+         pm->this.progressive = !pm->this.progressive;
+         standard_test(&pm->this, colour_type, DEPTH(bdlo), interlace_type);
+
+         if (fail(pm))
+            return 0;
+
+         pm->this.progressive = !pm->this.progressive;
          standard_test(&pm->this, colour_type, DEPTH(bdlo), interlace_type);
 
          if (fail(pm))
@@ -2730,7 +2756,7 @@ gamma_display_init(gamma_display *dp, png_modifier *pm, png_byte colour_type,
 static void
 gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
 {
-   /* Reused the standard stuff as appropriate. */
+   /* Reuse the standard stuff as appropriate. */
    standard_info_part1(&dp->this, pp, pi);
 
    /* If requested strip 16 to 8 bits - this is handled automagically below
@@ -3084,30 +3110,9 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
          /* Process the 'info' requirements. only one image is generated */
          gamma_info_imp(&d, pp, pi);
 
-         /* And finally read and validate the image. */
-         {
-            PNG_CONST png_bytep pImage = d.this.ps->image;
+         sequential_row(&d.this, pp, pi, NULL, d.this.ps->image);
 
-            {
-               PNG_CONST int         npasses = d.this.npasses;
-               PNG_CONST png_uint_32 h = d.this.h;
-               PNG_CONST size_t      cbRow = d.this.cbRow;
-               int pass;
-
-               for (pass=1; pass <= npasses; ++pass)
-               {
-                  png_uint_32 y;
-                  png_byte *row;
-
-                  for (y=0, row=pImage; y<h; ++y, row += cbRow)
-                     png_read_row(pp, NULL, row);
-               }
-            }
-
-            gamma_image_validate(&d, pp, pi, pImage);
-         }
-
-         png_read_end(pp, pi);
+         gamma_image_validate(&d, pp, pi, d.this.ps->image);
       }
 
       modifier_reset(d.pm);

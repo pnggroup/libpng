@@ -375,6 +375,7 @@ Version 1.5.0beta44 [August 11, 2010]
   Simplified the pngvalid error-handling code now that cexcept.h is in place.
   Implemented progressive reader in pngvalid.c for standard tests
   Implemented progressive read in pngvalid.c gamma tests
+  Turn on progressive reader in pngvalid.c by default and tidy code.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
