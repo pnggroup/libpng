@@ -77,7 +77,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # 2) Add definitions of the settings you want to change to
 # CPPFLAGS; for example:
 # 
-# #define PNG_DEFAULT_READ_MACROS 0
+#   -DPNG_DEFAULT_READ_MACROS=0
 #
 # (This would change the default to *not* use read macros.)  Be
 # very careful to change only settings that don't alter the API
@@ -93,14 +93,17 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 #    option BAR [on|off]
 #
 # Then add this file to the options.awk command line (the *first*
-# one) after this file.
+# one) after this file.  The make macro DFA_XTRA is provided to make
+# this easier (set it like CPPFLAGS prior to running ./configure).
+# Look at the builds below contrib/pngminim for some extreme examples
+# of how this can be used.
 #
 # Don't edit this file unless you are contributing a patch to
 # libpng and need new or modified options/settings.
 #----------------------------------------------------------------------
 
 # The following causes commented out #undef lines to be written to
-# pnglibconf.h, this can be stopped by logunsupported=0 in a later
+# pnglibconf.h; this can be stopped by logunsupported=0 in a later
 # file or on the command line (after pnglibconf.dfa)
 logunsupported = 1
 
