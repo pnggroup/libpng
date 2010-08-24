@@ -3078,7 +3078,15 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
       pp = set_modifier_for_read(d.pm, &pi, d.this.id, name);
 
       /* Set up gamma processing. */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
       png_set_gamma(pp, d.screen_gamma, d.file_gamma);
+#else
+      {
+         png_fixed_point s = floor(d.screen_gamma*100000+.5);
+         png_fixed_point f = floor(d.file_gamma*100000+.5);
+         png_set_gamma_fixed(pp, s, f);
+      }
+#endif
 
       /* Introduce the correct read function. */
       if (d.pm->this.progressive)
