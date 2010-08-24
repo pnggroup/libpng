@@ -35,13 +35,15 @@
 
 /***************************** EXCEPTION HANDLING *****************************/
 #include "contrib/visupng/cexcept.h"
+struct png_store;
 define_exception_type(struct png_store*);
 
-/* The following is a macro to reduce typing everywhere where the well known
+/* The following are macros to reduce typing everywhere where the well known
  * name 'the_exception_context' must be defined.
  */
-#define context(ps,fault) struct exception_context *the_exception_context = \
-   &(ps)->exception_context; png_store *fault
+#define anon_context(ps) struct exception_context *the_exception_context = \
+   &(ps)->exception_context
+#define context(ps,fault) anon_context(ps); png_store *fault
 
 /******************************* ERROR UTILITIES ******************************/
 static size_t safecat(char *buffer, size_t bufsize, size_t pos,
@@ -186,6 +188,27 @@ typedef struct png_store_file
    png_store_buffer        data;      /* Last buffer in file */
 } png_store_file;
 
+/* The following is a pool of memory allocated by a single libpng read or write
+ * operation.
+ */
+typedef struct store_pool
+{
+   struct png_store    *store;   /* Back pointer */
+   struct store_memory *list;    /* List of allocated memory */
+   png_byte             mark[4]; /* Before and after data */
+
+   /* Statistics for this run. */
+   png_alloc_size_t     max;     /* Maximum single allocation */
+   png_alloc_size_t     current; /* Current allocation */
+   png_alloc_size_t     limit;   /* Highest current allocation */
+   png_alloc_size_t     total;   /* Total allocation */
+
+   /* Overall statistics (retained across successive runs). */
+   png_alloc_size_t     max_max;
+   png_alloc_size_t     max_limit;
+   png_alloc_size_t     max_total;
+} store_pool;
+
 typedef struct png_store
 {
    /* For cexcept.h exception handling - simply store one of these;
@@ -200,6 +223,7 @@ typedef struct png_store
    unsigned int       expect_error :1;
    unsigned int       expect_warning :1;
    unsigned int       saw_warning :1;
+   unsigned int       speed :1;
    int                nerrors;
    int                nwarnings;
    char               test[64]; /* Name of test */
@@ -211,6 +235,7 @@ typedef struct png_store
    png_store_file*    current;  /* Set when reading */
    png_store_buffer*  next;     /* Set when reading */
    png_size_t         readpos;  /* Position in *next */
+   store_pool         read_memory_pool;
 
    /* Write fields */
    png_store_file*    saved;
@@ -219,18 +244,62 @@ typedef struct png_store
    png_size_t         writepos; /* Position in .new */
    char               wname[64];/* Name of file being written */
    png_store_buffer   new;      /* The end of the new PNG file being written. */
+   store_pool         write_memory_pool;
 } png_store;
 
 /* Initialization and cleanup */
 static void
+store_pool_mark(png_byte *mark)
+{
+   /* Generate a new mark.  This uses a boring repeatable algorihtm and it is
+    * implemented here so that it gives the same set of numbers on every
+    * architecture.  It's a linear congruential generator (Knuth or Sedgewick
+    * "Algorithms") but it comes from the 'feedback taps' table in Horowitz and
+    * Hill, "The Art of Electronics".
+    */
+   static png_uint_32 u0 = 0x12345678, u1 = 1;
+
+   /* There are thirty three bits, the next bit in the sequence is bit-33 XOR
+    * bit-20.  The top 1 bit is in u1, the bottom 32 are in u0.
+    */
+   int i;
+   for (i=0; i<4; ++i)
+   {
+      /* First generate 8 new bits then shift them in at the end. */
+      png_uint_32 u = ((u0 >> (20-8)) ^ ((u1 << 7) | (u0 >> (32-7)))) & 0xff;
+      u1 <<= 8;
+      u1 |= u0 >> 24;
+      u0 <<= 8;
+      u0 |= u;
+      *mark++ = (png_byte)u;
+   }
+}
+
+static void
+store_pool_init(png_store *ps, store_pool *pool)
+{
+   memset(pool, 0, sizeof *pool);
+
+   pool->store = ps;
+   pool->list = NULL;
+   pool->max = pool->current = pool->limit = pool->total = 0;
+   pool->max_max = pool->max_limit = pool->max_total = 0;
+   store_pool_mark(pool->mark);
+}
+
+static void
 store_init(png_store* ps)
 {
    memset(ps, 0, sizeof *ps);
+   init_exception_context(&ps->exception_context);
+   store_pool_init(ps, &ps->read_memory_pool);
+   store_pool_init(ps, &ps->write_memory_pool);
    ps->verbose = 0;
    ps->treat_warnings_as_errors = 0;
    ps->expect_error = 0;
    ps->expect_warning = 0;
    ps->saw_warning = 0;
+   ps->speed = 0;
    ps->nerrors = ps->nwarnings = 0;
    ps->pread = NULL;
    ps->piread = NULL;
@@ -279,20 +348,19 @@ store_storenew(png_store *ps)
    ps->writepos = 0;
 }
 
-/* Currently unused: */
-#if 0
 static void
-store_freefile(png_store_file *pf)
+store_freefile(png_store_file **ppf)
 {
-   if (pf->next)
-      store_freefile(pf->next);
+   if (*ppf != NULL)
+   {
+      store_freefile(&(*ppf)->next);
 
-   pf->next = NULL;
-   store_freebuffer(&pf->data);
-   pf->datacount = 0;
-   free(pf);
+      store_freebuffer(&(*ppf)->data);
+      (*ppf)->datacount = 0;
+      free(*ppf);
+      *ppf = NULL;
+   }
 }
-#endif
 
 /* Main interface to file storeage, after writing a new PNG file (see the API
  * below) call store_storefile to store the result with the given name and id.
@@ -348,8 +416,11 @@ store_message(png_structp pp, char *buffer, size_t bufsize, PNG_CONST char *msg)
       pos = safecat(buffer, bufsize, pos, "pngvalid: ");
    }
 
-   pos = safecat(buffer, bufsize, pos, ps->test);
-   pos = safecat(buffer, bufsize, pos, sep);
+   if (ps->test[0] != 0)
+   {
+      pos = safecat(buffer, bufsize, pos, ps->test);
+      pos = safecat(buffer, bufsize, pos, sep);
+   }
    pos = safecat(buffer, bufsize, pos, msg);
    return pos;
 }
@@ -494,6 +565,168 @@ store_read(png_structp pp, png_bytep pb, png_size_t st)
    }
 }
 
+/***************************** MEMORY MANAGEMENT*** ***************************/
+/* A store_memory is simply the header for an allocated block of memory.  The
+ * pointer returned to libpng is just after the end of the header block, the
+ * allocated memory is followed by a second copy of the 'mark'.
+ */
+typedef struct store_memory
+{
+   store_pool          *pool;    /* Originating pool */
+   struct store_memory *next;    /* Singly linked list */
+   png_alloc_size_t     size;    /* Size of memory allocated */
+   png_byte             mark[4]; /* ID marker */
+} store_memory;
+
+/* Handle a fatal error in memory allocation.  This calls png_error if the
+ * libpng struct is non-NULL, else it outputs a message and returns.  This means
+ * that a memory problem while libpng is running will abort (png_error) the
+ * handling of particular file while one in cleanup (after the destroy of the
+ * struct has returned) will simply keep going and free (or attempt to free)
+ * all the memory.
+ */
+static void
+store_pool_error(png_structp pp, png_store *ps, PNG_CONST char *msg)
+{
+   if (pp != NULL)
+      png_error(pp, msg);
+
+   /* Else we have to do it ourselves and return. */
+   fprintf(stderr, "%s: memory: %s\n", ps->test, msg);
+   ++ps->nerrors;
+}
+
+static void
+store_memory_free(png_structp pp, store_pool *pool, store_memory *memory)
+{
+   /* Note that pp may be NULL (see store_pool_delete below), the caller has
+    * found 'memory' in pool->list *and* unlinked this entry, so this is a valid
+    * pointer (for sure), but the contents may have been trashed.
+    */
+   if (memory->pool != pool)
+      store_pool_error(pp, pool->store, "memory corrupted (pool)");
+
+   else if (memcmp(memory->mark, pool->mark, sizeof memory->mark) != 0)
+      store_pool_error(pp, pool->store, "memory corrupted (start)");
+
+   /* It should be safe to read the size field now. */
+   else
+   {
+      png_alloc_size_t cb = memory->size;
+
+      if (cb > pool->max)
+         store_pool_error(pp, pool->store, "memory corrupted (size)");
+
+      else if (memcmp((png_bytep)(memory+1)+cb, pool->mark, sizeof pool->mark)
+         != 0)
+         store_pool_error(pp, pool->store, "memory corrupted (end)");
+
+      /* Finally give the library a chance to find problems too: */
+      else
+         {
+         pool->current -= cb;
+         free(memory);
+         }
+   }
+}
+
+static void
+store_pool_delete(png_store *ps, store_pool *pool)
+{
+   if (pool->list != NULL)
+   {
+      fprintf(stderr, "%s: %s %s: memory lost (list follows):\n", ps->test,
+         pool == &ps->read_memory_pool ? "read" : "write",
+         pool == &ps->read_memory_pool ? (ps->current != NULL ?
+            ps->current->name : "unknown file") : ps->wname);
+      ++ps->nerrors;
+
+      do
+      {
+         store_memory *next = pool->list;
+         pool->list = next->next;
+         next->next = NULL;
+
+         fprintf(stderr, "\t%ud bytes @ %p\n", next->size, next+1);
+         /* The NULL means this will always return, even if the memory is
+          * corrupted.
+          */
+         store_memory_free(NULL, pool, next);
+      }
+      while (pool->list != NULL);
+   }
+
+   /* And reset the other fields too for the next time. */
+   if (pool->max > pool->max_max) pool->max_max = pool->max;
+   pool->max = 0;
+   if (pool->current != 0) /* unexpected internal error */
+      fprintf(stderr, "%s: %s %s: memory counter mismatch (internal error)\n",
+         ps->test, pool == &ps->read_memory_pool ? "read" : "write",
+         pool == &ps->read_memory_pool ? (ps->current != NULL ?
+            ps->current->name : "unknown file") : ps->wname);
+   pool->current = 0;
+   if (pool->limit > pool->max_limit) pool->max_limit = pool->limit;
+   pool->limit = 0;
+   if (pool->total > pool->max_total) pool->max_total = pool->total;
+   pool->total = 0;
+
+   /* Get a new mark too. */
+   store_pool_mark(pool->mark);
+}
+
+/* The memory callbacks: */
+static png_voidp
+store_malloc(png_structp pp, png_alloc_size_t cb)
+{
+   store_pool *pool = png_get_mem_ptr(pp);
+   store_memory *new = malloc(cb + (sizeof *new) + (sizeof pool->mark));
+
+   if (new != NULL)
+   {
+      if (cb > pool->max) pool->max = cb;
+      pool->current += cb;
+      if (pool->current > pool->limit) pool->limit = pool->current;
+      pool->total += cb;
+
+      new->size = cb;
+      memcpy(new->mark, pool->mark, sizeof new->mark);
+      memcpy((png_byte*)(new+1) + cb, pool->mark, sizeof pool->mark);
+      new->pool = pool;
+      new->next = pool->list;
+      pool->list = new;
+      ++new;
+   }
+   else
+      store_pool_error(pp, pool->store, "out of memory");
+
+   return new;
+}
+
+static void
+store_free(png_structp pp, png_voidp memory)
+{
+   store_pool *pool = png_get_mem_ptr(pp);
+   store_memory *this = memory, **test;
+
+   /* First check that this 'memory' really is valid memory - it must be in the
+    * pool list.  If it is use the shared memory_free function to free it.
+    */
+   --this;
+   for (test = &pool->list; *test != this; test = &(*test)->next)
+   {
+      if (*test == NULL)
+      {
+         store_pool_error(pp, pool->store, "bad pointer to free");
+         return;
+      }
+   }
+
+   /* Unlink this entry, *test == this. */
+   *test = this->next;
+   this->next = NULL;
+   store_memory_free(pp, pool, this);
+}
+
 /* Setup functions. */
 /* Cleanup when aborting a write or after storing the new file. */
 static void
@@ -501,10 +734,24 @@ store_write_reset(png_store *ps)
 {
    if (ps->pwrite != NULL)
    {
-      png_destroy_write_struct(&ps->pwrite, &ps->piwrite);
+      anon_context(ps);
+
+      Try
+         png_destroy_write_struct(&ps->pwrite, &ps->piwrite);
+
+      Catch_anonymous
+      {
+         /* memory corruption: continue. */
+      }
+
       ps->pwrite = NULL;
       ps->piwrite = NULL;
    }
+
+   /* And make sure that all the memory has been freed - this will output
+    * spurious errors in the case of memory corruption above, but this is safe.
+    */
+   store_pool_delete(ps, &ps->write_memory_pool);
    
    store_freenew(ps);
 }
@@ -529,8 +776,14 @@ set_store_for_write(png_store *ps, png_infopp ppi,
       store_write_reset(ps);
       safecat(ps->wname, sizeof ps->wname, 0, name);
 
-      ps->pwrite = png_create_write_struct(PNG_LIBPNG_VER_STRING, ps,
-         store_error, store_warning);
+      /* Don't do the slow memory checks if doing a speed test. */
+      if (ps->speed)
+         ps->pwrite = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+            ps, store_error, store_warning);
+      else
+         ps->pwrite = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
+            ps, store_error, store_warning, &ps->write_memory_pool,
+            store_malloc, store_free);
       png_set_write_fn(ps->pwrite, ps, store_write, store_flush);
 
       if (ppi != NULL)
@@ -554,10 +807,22 @@ store_read_reset(png_store *ps)
 {
    if (ps->pread != NULL)
    {
-      png_destroy_read_struct(&ps->pread, &ps->piread, NULL);
+      anon_context(ps);
+      
+      Try
+         png_destroy_read_struct(&ps->pread, &ps->piread, NULL);
+
+      Catch_anonymous
+      {
+         /*error already output: continue*/
+      }
+
       ps->pread = NULL;
       ps->piread = NULL;
    }
+
+   /* Always do this to be safe. */
+   store_pool_delete(ps, &ps->read_memory_pool);
 
    ps->current = NULL;
    ps->next = NULL;
@@ -609,8 +874,13 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
 
       store_read_reset(ps);
 
-      ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps, store_error,
-          store_warning);
+      if (ps->speed)
+         ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps,
+             store_error, store_warning);
+      else
+         ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
+             store_error, store_warning, &ps->read_memory_pool, store_malloc,
+             store_free);
       store_read_set(ps, id);
       png_set_read_fn(ps->pread, ps, store_read);
 
@@ -626,6 +896,17 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
    }
 
    return result;
+}
+
+/* The overall cleanup of a store simply calls the above then removes all the
+ * saved files.  This does not delete the store itself.
+ */
+static void
+store_delete(png_store *ps)
+{
+   store_write_reset(ps);
+   store_read_reset(ps);
+   store_freefile(&ps->saved);
 }
 
 /*********************** PNG FILE MODIFICATION ON READ ************************/
@@ -1085,7 +1366,7 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
       {
          store_read_reset(&pm->this);
          if (fault != &pm->this) Throw fault;
-         ppSafe = NULL;
+         return NULL;
       }
    }
 
@@ -2483,7 +2764,6 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
 int main(int argc, PNG_CONST char **argv)
 {
    volatile int summary = 1;    /* Print the error sumamry at the end */
-   volatile int speed = 0;      /* Speed test only (for gamma stuff) */
 
    /* Create the given output file on success: */
    PNG_CONST char *volatile touch = NULL;
@@ -2545,7 +2825,7 @@ int main(int argc, PNG_CONST char **argv)
          pm.this.treat_warnings_as_errors = 0;
 
       else if (strcmp(*argv, "--speed") == 0)
-         speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
+         pm.this.speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
 
       else if (argc >= 1 && strcmp(*argv, "--sbitlow") == 0)
          --argc, pm.sbitlow = (png_byte)atoi(*++argv);
@@ -2595,22 +2875,30 @@ int main(int argc, PNG_CONST char **argv)
       make_standard_images(&pm.this);
 
       /* Perform the standard and gamma tests. */
-      if (!speed)
+      if (!pm.this.speed)
       {
          perform_standard_test(&pm);
          perform_error_test(&pm);
       }
 
-      perform_gamma_test(&pm, speed != 0, summary && !speed);
+      perform_gamma_test(&pm, pm.this.speed != 0, summary && !pm.this.speed);
    }
 
    Catch(fault)
    {
-      fprintf(stderr, "pngvalid: test aborted\n");
+      fprintf(stderr,
+         "pngvalid: test aborted (probably failed in cleanup)\n");
+      if (!pm.this.verbose)
+      {
+         if (pm.this.error[0] != 0)
+            fprintf(stderr, "pngvalid: first error: %s\n", pm.this.error);
+         fprintf(stderr, "pngvalid: run with -v to see what happened\n");
+      }
       exit(1);
    }
 
-   if (summary && !speed)
+   if (summary && !pm.this.speed)
+   {
       printf("Results using %s point arithmetic %s\n",
 #if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) || PNG_LIBPNG_VER < 10500
          "floating",
@@ -2621,6 +2909,19 @@ int main(int argc, PNG_CONST char **argv)
             pm.this.nwarnings)) ? "(errors)" : (pm.this.nwarnings ?
                "(warnings)" : "(no errors or warnings)")
       );
+      printf("Allocated memory statistics (in bytes):\n"
+         "\tread  %u maximum single, %u peak, %u total\n"
+         "\twrite %u maximum single, %u peak, %u total\n",
+         pm.this.read_memory_pool.max_max, pm.this.read_memory_pool.max_limit,
+         pm.this.read_memory_pool.max_total, pm.this.write_memory_pool.max_max,
+         pm.this.write_memory_pool.max_limit,
+         pm.this.write_memory_pool.max_total);
+   }
+
+   /* Do this here to provoke memory corruption errors in memory not directly
+    * allocated by libpng - not a complete test, but better than nothing.
+    */
+   store_delete(&pm.this);
 
    /* Error exit if there are any errors, and maybe if there are any
     * warnings.

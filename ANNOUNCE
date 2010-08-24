@@ -368,6 +368,7 @@ Version 1.5.0beta44 [August 11, 2010]
   Revised CMakeLists.txt to put the man pages in share/man/man* not man/man*
   Revised CMakeLists.txt to make symlinks instead of copies when installing.
   Changed PNG_LIB_NAME from pngNN to libpngNN in CMakeLists.txt (Philip Lowman)
+  Implemented memory checks within pngvalid
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
