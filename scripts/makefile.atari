@@ -40,8 +40,8 @@ $(LBR): $(OBJS)
 
 $(OBJS): pngpriv.h png.h pngconf.h pnglibconf.h pnginfo.h pngstruct.h pngdebug.h
 
-pnglibconf.h: scripts/pnglibconf.h
-	cp scripts/pnglibconf.h pnglibconf.h
+pnglibconf.h: scripts/pnglibconf.h.prebuilt
+	cp scripts/pnglibconf.h.prebuilt pnglibconf.h
 
 pngtest.ttp: pngtest.o $(LBR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o$@ pngtest.o

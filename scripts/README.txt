@@ -1,7 +1,7 @@
 
 Makefiles for  libpng version 1.5.0beta45 - August 24, 2010
 
-pnglibconf.h       =>  Stores configuration settings
+pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng15.so.15.1.5.0beta45)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)

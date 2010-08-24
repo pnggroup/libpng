@@ -48,7 +48,7 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 
 all: libpng.a pngtest
 
-# The standard pnglibconf.h exists as scripts/pnglibconf.h,
+# The standard pnglibconf.h exists as scripts/pnglibconf.h.prebuilt,
 # copy this if the following doesn't work.
 pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
 	$(RM_F) $@ dfn?.out

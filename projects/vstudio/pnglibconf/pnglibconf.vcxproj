@@ -40,7 +40,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <CustomBuildStep>
-      <Command>copy ..\..\..\scripts\pnglibconf.h ..\..\..\pnglibconf.h</Command>
+      <Command>copy ..\..\..\scripts\pnglibconf.h_prebuilt ..\..\..\pnglibconf.h</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Generating pnglibconf.h</Message>
@@ -49,7 +49,7 @@
       <Outputs>..\..\..\pnglibconf.h</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>..\..\..\scripts\pnglibconf.h</Inputs>
+      <Inputs>..\..\..\scripts\pnglibconf.h_prebuilt</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -100,7 +100,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <CustomBuildStep>
-      <Command>copy ..\..\..\scripts\pnglibconf.h ..\..\..\pnglibconf.h</Command>
+      <Command>copy ..\..\..\scripts\pnglibconf.h_prebuilt ..\..\..\pnglibconf.h</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Generating pnglibconf.h</Message>
@@ -109,7 +109,7 @@
       <Outputs>..\..\..\pnglibconf.h</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>..\..\..\scripts\pnglibconf.h</Inputs>
+      <Inputs>..\..\..\scripts\pnglibconf.h_prebuilt</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>

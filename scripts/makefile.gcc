@@ -42,8 +42,8 @@ OBJS =  png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
 all: static
 
 # see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h
-	cp scripts/pnglibconf.h $@
+pnglibconf.h: scripts/pnglibconf.h.prebuilt
+	cp scripts/pnglibconf.h.prebuilt $@
 
 .c$(O):
 	$(CC) -c $(CFLAGS) -I$(ZLIBINC) $<

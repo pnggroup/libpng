@@ -3021,6 +3021,7 @@ Version 1.5.0beta45 [August 24, 2010]
     simply copies the file; in the future it may actually generate the
     file from scripts/pnglibconf.dfa as the other build systems do.
   Changed pngvalid to work when floating point APIs are disabled
+  Renamed the prebuilt scripts/pnglibconf.h to scripts/pnglibconf.h.prebuilt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

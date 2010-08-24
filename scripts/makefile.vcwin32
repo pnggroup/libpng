@@ -36,8 +36,8 @@ OBJS  = $(OBJS1) $(OBJS2) $(OBJS3)
 all: libpng.lib
 
 # see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h
-	cp scripts/pnglibconf.h $@
+pnglibconf.h: scripts/pnglibconf.h.prebuilt
+	cp scripts/pnglibconf.h.prebuilt $@
 
 png$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)

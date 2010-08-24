@@ -77,6 +77,7 @@ Your directory structure should look like this:
           scripts
              makefile.*
              *.def (module definition files)
+             etc.
           pngtest.png
           etc.
       zlib

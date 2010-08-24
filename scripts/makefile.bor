@@ -109,8 +109,8 @@ LIBNAME=libpng$(MODEL).lib
 all: libpng pngtest
 
 # try !inlude scripts\pnglibconf.mak for more options
-pnglibconf.h: scripts\pnglibconf.h
-	copy scripts\pnglibconf.h $@
+pnglibconf.h: scripts\pnglibconf.h.prebuilt
+	copy scripts\pnglibconf.h.prebuilt $@
 
 libpng: $(LIBNAME)
 

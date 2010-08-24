@@ -31,8 +31,8 @@ PNG_DEFN_MAGIC--PNG_DEFN_END
 PNG_DEFN_MAGIC-EXPORTS-PNG_DEFN_END
 PNG_DEFN_MAGIC-;Version PNGLIB_VERSION-PNG_DEFN_END
 
-/* Read the defaults, but use scripts/pnglibconf.h; the 'standard'
+/* Read the defaults, but use scripts/pnglibconf.h.prebuilt; the 'standard'
  * header file.
  */
-#include "pnglibconf.h"
+#include "pnglibconf.h.prebuilt"
 #include "../png.h"

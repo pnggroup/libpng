@@ -27,7 +27,7 @@ DFNFLAGS = $(DEFS) $(CPPFLAGS) $(CFLAGS)
 # srcdir is a defacto standard for the location of the source
 srcdir = .
 
-# The standard pnglibconf.h exists as scripts/pnglibconf.h,
+# The standard pnglibconf.h exists as scripts/pnglibconf.h.prebuilt,
 # copy this if the following doesn't work.
 pnglibconf.h: pnglibconf.dfn
 	$(DELETE) $@ dfn.c dfn1.out dfn2.out dfn3.out

@@ -26,8 +26,8 @@ OBJSL3 = +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O) +pngwio$(O)
 all: libpng$(MODEL).lib pngtest$(E)
 
 # see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h
-	cp scripts/pnglibconf.h $@
+pnglibconf.h: scripts/pnglibconf.h.prebuilt
+	cp scripts/pnglibconf.h.prebuilt $@
 
 pngtest: pngtest$(E)
 

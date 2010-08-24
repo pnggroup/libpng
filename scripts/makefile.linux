@@ -88,8 +88,8 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a $(LIBSO) pngtest pngtest-static libpng.pc libpng-config
 
 # see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h
-	cp scripts/pnglibconf.h $@
+pnglibconf.h: scripts/pnglibconf.h.prebuilt
+	cp scripts/pnglibconf.h.prebuilt $@
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
