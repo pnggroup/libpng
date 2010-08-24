@@ -882,7 +882,6 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
              store_error, store_warning, &ps->read_memory_pool, store_malloc,
              store_free);
       store_read_set(ps, id);
-      png_set_read_fn(ps->pread, ps, store_read);
 
       if (ppi != NULL)
          *ppi = ps->piread = png_create_info_struct(ps->pread);
@@ -1349,8 +1348,6 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
 
       Try
       {
-         png_set_read_fn(ppSafe, pm, modifier_read);
-
          pm->state = modifier_start;
          pm->bit_depth = 0;
          pm->colour_type = 255;
@@ -1843,152 +1840,162 @@ perform_error_test(png_modifier *pm)
    make_error(&pm->this, 6, 3, 4);
 }
 
-
+/* A single test run checking the standard image to ensure it is not damaged. */
 static void
-test_standard(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
+standard_test(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
+   png_byte PNG_CONST bit_depth)
+{
+   context(ps, fault);
+   png_structp pp;
+   png_infop pi;
+
+   /* Get a png_struct for writing the image. */
+   pp = set_store_for_read(ps, &pi, FILEID(colour_type, bit_depth),
+      "standard");
+
+   if (pp == NULL)
+      return;
+
+   /* Do the honourable write stuff, protected by a local catch */
+   Try
+   {
+      png_uint_32 h = standard_height(pp, colour_type, bit_depth), y;
+      size_t cb;
+
+      /* Introduce the correct read function. */
+      png_set_read_fn(ps->pread, ps, store_read);
+
+      /* Check the header values: */
+      png_read_info(pp, pi);
+
+      if (png_get_image_width(pp, pi) !=
+          standard_width(pp, colour_type, bit_depth))
+         png_error(pp, "validate: image width changed");
+
+      if (png_get_image_height(pp, pi) != h)
+         png_error(pp, "validate: image height changed");
+
+      if (png_get_bit_depth(pp, pi) != bit_depth)
+         png_error(pp, "validate: bit depth changed");
+
+      if (png_get_color_type(pp, pi) != colour_type)
+         png_error(pp, "validate: color type changed");
+
+      if (png_get_filter_type(pp, pi) != PNG_FILTER_TYPE_BASE)
+         png_error(pp, "validate: filter type changed");
+
+      if (png_get_interlace_type(pp, pi) != PNG_INTERLACE_NONE)
+         png_error(pp, "validate: interlacing changed");
+
+      if (png_get_compression_type(pp, pi) != PNG_COMPRESSION_TYPE_BASE)
+         png_error(pp, "validate: compression type changed");
+
+      if (png_set_interlace_handling(pp) != 1)
+         png_error(pp, "validate: interlacing unexpected");
+
+      if (colour_type == 3) /* palette */
+      {
+         png_colorp pal;
+         int num;
+
+         if (png_get_PLTE(pp, pi, &pal, &num) & PNG_INFO_PLTE)
+         {
+            int i;
+
+            if (num != 256)
+               png_error(pp,
+                  "validate: color type 3 PLTE chunk size changed");
+
+            for (i=0; i<num; ++i)
+               if (pal[i].red != i || pal[i].green != i || pal[i].blue != i)
+                  png_error(pp, "validate: color type 3 PLTE chunk changed");
+         }
+
+         else
+            png_error(pp, "validate: missing PLTE with color type 3");
+      }
+
+      cb = standard_rowsize(pp, colour_type, bit_depth);
+      png_start_read_image(pp);
+
+      if (png_get_rowbytes(pp, pi) != cb)
+         png_error(pp, "validate: row size changed");
+
+      else for (y=0; y<h; ++y)
+      {
+         png_byte std[STD_ROWMAX];
+         png_byte read[STD_ROWMAX];
+         png_byte display[STD_ROWMAX];
+
+         standard_row(pp, std, colour_type, bit_depth, y);
+         png_read_row(pp, read, display);
+
+         if (memcmp(std, read, cb) != 0)
+         {
+            char msg[64];
+            sprintf(msg, "validate: PNG image row %d (of %d) changed", y,
+               h);
+            png_error(pp, msg);
+         }
+
+         if (memcmp(std, display, cb) != 0)
+         {
+            char msg[64];
+            sprintf(msg, "validate: transformed row %d (of %d) changed", y,
+               h);
+            png_error(pp, msg);
+         }
+      }
+
+      png_read_end(pp, pi);
+
+      store_read_reset(ps);
+   }
+
+   Catch(fault)
+   {
+      store_read_reset(ps);
+      if (ps != fault) Throw fault;
+   }
+}
+
+static int
+test_standard(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
    int PNG_CONST bdloIn, int PNG_CONST bdhi)
 {
    volatile int bdlo = bdloIn;
 
    for (; bdlo <= bdhi; ++bdlo)
    {
-      context(ps, fault);
-      PNG_CONST png_byte bit_depth = DEPTH(bdlo);
-      png_structp pp;
-      png_infop pi;
+      standard_test(&pm->this, colour_type, DEPTH(bdlo));
 
-      /* Get a png_struct for writing the image. */
-      pp = set_store_for_read(ps, &pi, FILEID(colour_type, bit_depth),
-         "standard");
-
-      if (pp == NULL)
-         return;
-
-      /* Do the honourable write stuff, protected by a local catch */
-      Try
-      {
-         png_uint_32 h = standard_height(pp, colour_type, bit_depth), y;
-         size_t cb;
-
-         /* Check the header values: */
-         png_read_info(pp, pi);
-
-         if (png_get_image_width(pp, pi) !=
-             standard_width(pp, colour_type, bit_depth))
-            png_error(pp, "validate: image width changed");
-
-         if (png_get_image_height(pp, pi) != h)
-            png_error(pp, "validate: image height changed");
-
-         if (png_get_bit_depth(pp, pi) != bit_depth)
-            png_error(pp, "validate: bit depth changed");
-
-         if (png_get_color_type(pp, pi) != colour_type)
-            png_error(pp, "validate: color type changed");
-
-         if (png_get_filter_type(pp, pi) != PNG_FILTER_TYPE_BASE)
-            png_error(pp, "validate: filter type changed");
-
-         if (png_get_interlace_type(pp, pi) != PNG_INTERLACE_NONE)
-            png_error(pp, "validate: interlacing changed");
-
-         if (png_get_compression_type(pp, pi) != PNG_COMPRESSION_TYPE_BASE)
-            png_error(pp, "validate: compression type changed");
-
-         if (png_set_interlace_handling(pp) != 1)
-            png_error(pp, "validate: interlacing unexpected");
-
-         if (colour_type == 3) /* palette */
-         {
-            png_colorp pal;
-            int num;
-
-            if (png_get_PLTE(pp, pi, &pal, &num) & PNG_INFO_PLTE)
-            {
-               int i;
-
-               if (num != 256)
-                  png_error(pp,
-                     "validate: color type 3 PLTE chunk size changed");
-
-               for (i=0; i<num; ++i)
-                  if (pal[i].red != i || pal[i].green != i || pal[i].blue != i)
-                     png_error(pp, "validate: color type 3 PLTE chunk changed");
-            }
-
-            else
-               png_error(pp, "validate: missing PLTE with color type 3");
-         }
-
-         cb = standard_rowsize(pp, colour_type, bit_depth);
-         png_start_read_image(pp);
-
-         if (png_get_rowbytes(pp, pi) != cb)
-            png_error(pp, "validate: row size changed");
-
-         else for (y=0; y<h; ++y)
-         {
-            png_byte std[STD_ROWMAX];
-            png_byte read[STD_ROWMAX];
-            png_byte display[STD_ROWMAX];
-
-            standard_row(pp, std, colour_type, bit_depth, y);
-            png_read_row(pp, read, display);
-
-            if (memcmp(std, read, cb) != 0)
-            {
-               char msg[64];
-               sprintf(msg, "validate: PNG image row %d (of %d) changed", y,
-                  h);
-               png_error(pp, msg);
-            }
-
-            if (memcmp(std, display, cb) != 0)
-            {
-               char msg[64];
-               sprintf(msg, "validate: transformed row %d (of %d) changed", y,
-                  h);
-               png_error(pp, msg);
-            }
-         }
-
-         png_read_end(pp, pi);
-
-         store_read_reset(ps);
-      }
-
-      Catch(fault)
-      {
-         store_read_reset(ps);
-         if (ps != fault) Throw fault;
-      }
+      if (fail(pm))
+         return 0;
    }
+
+   return 1; /*keep going*/
 }
 
 static void
 perform_standard_test(png_modifier *pm)
 {
-   test_standard(&pm->this, 0, 0, 4);
-
-   if (fail(pm))
+   /* Test each colour type over the valid range of bit depths (expressed as
+    * log2(bit_depth) in turn, stop as soon as any error is detected.
+    */
+   if (!test_standard(pm, 0, 0, 4))
       return;
 
-   test_standard(&pm->this, 2, 3, 4);
-
-   if (fail(pm))
+   if (!test_standard(pm, 2, 3, 4))
       return;
 
-   test_standard(&pm->this, 3, 0, 3);
-
-   if (fail(pm))
+   if (!test_standard(pm, 3, 0, 3))
       return;
 
-   test_standard(&pm->this, 4, 3, 4);
-
-   if (fail(pm))
+   if (!test_standard(pm, 4, 3, 4))
       return;
 
-   test_standard(&pm->this, 6, 3, 4);
+   if (!test_standard(pm, 6, 3, 4))
+      return;
 }
 
 
@@ -2135,7 +2142,9 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
    pm->modifications = &me->this;
 }
 
-/* maxabs: maximum absolute error as a fraction
+/* A single test run checking a gamma transformation.
+ *
+ * maxabs: maximum absolute error as a fraction
  * maxout: maximum output error in the output units
  * maxpc:  maximum percentage error (as a percentage)
  */
@@ -2173,6 +2182,9 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
        */
       pp = set_modifier_for_read(pm, &pi, FILEID(colour_type, bit_depth), name);
       if (pp == NULL) Throw &pm->this;
+
+      /* Se the correct read function. */
+      png_set_read_fn(pp, pm, modifier_read);
 
       /* Set up gamma processing. */
       png_set_gamma(pp, screen_gamma, file_gamma);
