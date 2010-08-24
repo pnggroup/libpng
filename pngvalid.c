@@ -952,42 +952,45 @@ static png_structp
 set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
    PNG_CONST char *name)
 {
-   context(ps, fault);
-   png_structp result = NULL;
-
-   /* NOTE: reference to 'name' must be outside the Try block or GCC can
-    * optimize it away.
-    */
+   /* Set the name for png_error */
    safecat(ps->test, sizeof ps->test, 0, name);
 
-   Try
+   if (ps->pread != NULL)
+      png_error(ps->pread, "store already in use");
+
+   store_read_reset(ps);
+
+   /* Both the create APIs can return NULL if used in their default mode
+    * (because there is no other way of handling an error because the jmp_buf by
+    * default is stored in png_struct and that has not been allocated!)
+    * However, given that store_error works correctly in these circumstances we
+    * don't ever expect NULL in this program.
+    */
+   if (ps->speed)
+      ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps,
+          store_error, store_warning);
+   else
+      ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
+          store_error, store_warning, &ps->read_memory_pool, store_malloc,
+          store_free);
+
+   if (ps->pread == NULL)
    {
-      if (ps->pread != NULL)
-         png_error(ps->pread, "store already in use");
+      struct exception_context *the_exception_context = &ps->exception_context;
 
-      store_read_reset(ps);
+      ++(ps->nerrors);
+      fprintf(stderr, "%s: png_create_read_struct returned NULL (unexpected)\n",
+         ps->test);
 
-      if (ps->speed)
-         ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps,
-             store_error, store_warning);
-      else
-         ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
-             store_error, store_warning, &ps->read_memory_pool, store_malloc,
-             store_free);
-      store_read_set(ps, id);
-
-      if (ppi != NULL)
-         *ppi = ps->piread = png_create_info_struct(ps->pread);
-
-      result = ps->pread;
+      Throw ps;
    }
+      
+   store_read_set(ps, id);
 
-   Catch(fault)
-   {
-      if (ps != fault) Throw fault;
-   }
+   if (ppi != NULL)
+      *ppi = ps->piread = png_create_info_struct(ps->pread);
 
-   return result;
+   return ps->pread;
 }
 
 /* The overall cleanup of a store simply calls the above then removes all the
@@ -1443,34 +1446,21 @@ static png_structp
 set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
     PNG_CONST char *name)
 {
-   volatile png_structp ppSafe = set_store_for_read(&pm->this, ppi, id, name);
+   /* Do this first so that the modifier fields are cleared even if an error
+    * happens allocating the png_struct.  No allocation is done here so no
+    * cleanup is required.
+    */
+   pm->state = modifier_start;
+   pm->bit_depth = 0;
+   pm->colour_type = 255;
 
-   if (ppSafe != NULL)
-   {
-      context(&pm->this, fault);
+   pm->pending_len = 0;
+   pm->pending_chunk = 0;
+   pm->flush = 0;
+   pm->buffer_count = 0;
+   pm->buffer_position = 0;
 
-      Try
-      {
-         pm->state = modifier_start;
-         pm->bit_depth = 0;
-         pm->colour_type = 255;
-
-         pm->pending_len = 0;
-         pm->pending_chunk = 0;
-         pm->flush = 0;
-         pm->buffer_count = 0;
-         pm->buffer_position = 0;
-      }
-
-      Catch(fault)
-      {
-         store_read_reset(&pm->this);
-         if (fault != &pm->this) Throw fault;
-         return NULL;
-      }
-   }
-
-   return ppSafe;
+   return set_store_for_read(&pm->this, ppi, id, name);
 }
 
 /***************************** STANDARD PNG FILES *****************************/
@@ -2031,16 +2021,11 @@ standard_test(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
       size_t cbRow;
       int npasses;
 
-      /* Get a png_struct for writing the image. */
+      /* Get a png_struct for writing the image, this will throw an error if it
+       * fails, so we don't need to check the result.
+       */
       pp = set_store_for_read(ps, &pi,
          FILEID(colour_type, bit_depth, interlace_type), "standard");
-
-      /* 'return' from within a Try block is not permitted, so use a bare Throw
-       * to get to the Catch block: set_store_for_read has already handled the
-       * error.
-       */
-      if (pp == NULL)
-         Throw ps;
 
       /* Introduce the correct read function. */
       png_set_read_fn(ps->pread, ps, store_read);
@@ -2394,14 +2379,9 @@ gamma_test(png_modifier *pm, PNG_CONST png_byte colour_type,
 
       modification_reset(pm->modifications);
 
-      /* Get a png_struct for writing the image, if this fails just given up by
-       * doing a Throw to get to the Catch below.
-       */
+      /* Get a png_struct for writing the image. */
       pp = set_modifier_for_read(pm, &pi, FILEID(colour_type, bit_depth,
          interlace_type), name);
-
-      if (pp == NULL)
-         Throw &pm->this;
 
       /* Se the correct read function. */
       png_set_read_fn(pp, pm, modifier_read);
