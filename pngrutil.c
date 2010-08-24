@@ -1878,9 +1878,6 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_warning(png_ptr, "malformed height string in sCAL chunk");
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
-      png_free(png_ptr, swidth);
-#endif
       return;
    }
 #else
@@ -1891,9 +1888,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_warning(png_ptr, "Out of memory while processing sCAL chunk height");
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
       png_free(png_ptr, swidth);
-#endif
       return;
    }
    png_memcpy(sheight, ep, png_strlen(ep));

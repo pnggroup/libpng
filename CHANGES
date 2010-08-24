@@ -2642,7 +2642,7 @@ version 1.4.4beta06 [August 11, 2010]
   Don't try to use version-script with cygwin/mingw.
   Revised contrib/gregbook to work under cygwin/mingw.
 
-version 1.4.4beta07 [August 23, 2010]
+version 1.4.4beta07 [August 24, 2010]
   Updated prebuilt aclocal.m4 and ltmain.sh
   Add .dll.a to the list of extensions to be symlinked by Makefile.am (Yaakov)
   Updated CMakeLists.txt to use CMAKE_INSTALL_LIBDIR variable; useful for
@@ -2652,6 +2652,7 @@ version 1.4.4beta07 [August 23, 2010]
   Changed PNG_LIB_NAME from pngNN to libpngNN in CMakeLists.txt (Philip Lowman)
   Moved "#include pngusr.h" ahead of PNG_USER_PRIVATEBUILD test in pngconf.h
   Eliminated a deprecated reference to png_ptr->io_ptr in pngtest.c
+  Eliminated new unnecessary #if tests regarding the sCAL chunk from pngrutil.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
