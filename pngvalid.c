@@ -475,12 +475,10 @@ store_storefile(png_store *ps, png_uint_32 id)
 
 /* Generate an error message (in the given buffer) */
 static size_t
-store_message(png_structp pp, char *buffer, size_t bufsize, PNG_CONST char *msg)
+store_message(png_store *ps, png_structp pp, char *buffer, size_t bufsize,
+   size_t pos, PNG_CONST char *msg)
 {
-   size_t pos = 0;
-   png_store *ps = png_get_error_ptr(pp);
-
-   if (pp == ps->pread)
+   if (pp != NULL && pp == ps->pread)
    {
       /* Reading a file */
       pos = safecat(buffer, bufsize, pos, "read: ");
@@ -492,7 +490,7 @@ store_message(png_structp pp, char *buffer, size_t bufsize, PNG_CONST char *msg)
       }
    }
 
-   else if (pp == ps->pwrite)
+   else if (pp != NULL && pp == ps->pwrite)
    {
       /* Writing a file */
       pos = safecat(buffer, bufsize, pos, "write: ");
@@ -502,7 +500,7 @@ store_message(png_structp pp, char *buffer, size_t bufsize, PNG_CONST char *msg)
 
    else
    {
-      /* Neither reading nor writing */
+      /* Neither reading nor writing (or a memory error in struct delete) */
       pos = safecat(buffer, bufsize, pos, "pngvalid: ");
    }
 
@@ -515,6 +513,34 @@ store_message(png_structp pp, char *buffer, size_t bufsize, PNG_CONST char *msg)
    return pos;
 }
 
+/* Log an error or warning - the relevant count is always incremented. */
+static void
+store_log(png_store* ps, png_structp pp, png_const_charp message, int is_error)
+{
+   /* The warning is copied to the error buffer if there are no errors and it is
+    * the first warning.  The error is copied to the error buffer if it is the
+    * first error (overwriting any prior warnings).
+    */
+   if (is_error ? (ps->nerrors)++ == 0 :
+       (ps->nwarnings)++ == 0 && ps->nerrors == 0)
+      store_message(ps, pp, ps->error, sizeof ps->error, 0, message);
+
+   if (ps->verbose)
+   {
+      char buffer[256];
+      size_t pos;
+
+      if (is_error)
+         pos = safecat(buffer, sizeof buffer, 0, "error: ");
+      else
+         pos = safecat(buffer, sizeof buffer, 0, "warning: ");
+         
+      store_message(ps, pp, buffer, sizeof buffer, pos, message);
+      fputs(buffer, stderr);
+      fputc('\n', stderr);
+   }
+}
+
 /* Functions to use as PNG callbacks. */
 static void
 store_error(png_structp pp, png_const_charp message) /* PNG_NORETURN */
@@ -522,17 +548,7 @@ store_error(png_structp pp, png_const_charp message) /* PNG_NORETURN */
    png_store *ps = png_get_error_ptr(pp);
 
    if (!ps->expect_error)
-   {
-      char buffer[256];
-
-      store_message(pp, buffer, sizeof buffer, message);
-
-      if (ps->nerrors++ == 0)
-         safecat(ps->error, sizeof ps->error, 0, buffer);
-
-      if (ps->verbose)
-         fprintf(stderr, "error: %s\n", buffer);
-   }
+      store_log(ps, pp, message, 1/*error*/);
 
    /* And finally throw an exception. */
    {
@@ -547,17 +563,7 @@ store_warning(png_structp pp, png_const_charp message)
    png_store *ps = png_get_error_ptr(pp);
 
    if (!ps->expect_warning)
-   {
-      char buffer[256];
-
-      store_message(pp, buffer, sizeof buffer, message);
-
-      if (ps->nwarnings++ == 0 && ps->nerrors == 0)
-         safecat(ps->error, sizeof ps->error, 0, buffer);
-
-      if (ps->verbose)
-         fprintf(stderr, "warning: %s\n", buffer);
-   }
+      store_log(ps, pp, message, 0/*warning*/);
    else
       ps->saw_warning = 1;
 }
@@ -737,9 +743,11 @@ store_pool_error(png_store *ps, png_structp pp, PNG_CONST char *msg)
    if (pp != NULL)
       png_error(pp, msg);
 
-   /* Else we have to do it ourselves and return. */
-   fprintf(stderr, "%s: memory: %s\n", ps->test, msg);
-   ++ps->nerrors;
+   /* Else we have to do it ourselves.  png_error eventually calls store_log,
+    * above.  store_log accepts a NULL png_structp - it just changes what gets
+    * output by store_message.
+    */
+   store_log(ps, pp, msg, 1/*error*/);
 }
 
 static void
@@ -911,8 +919,7 @@ static png_structp
 set_store_for_write(png_store *ps, png_infopp ppi,
    PNG_CONST char * volatile name)
 {
-   context(ps,fault);
-   png_structp result = NULL;
+   anon_context(ps);
 
    Try
    {
@@ -934,16 +941,12 @@ set_store_for_write(png_store *ps, png_infopp ppi,
 
       if (ppi != NULL)
          *ppi = ps->piwrite = png_create_info_struct(ps->pwrite);
-
-      result = ps->pwrite;
    }
 
-   Catch(fault)
-   {
-      if (fault != ps) Throw fault;
-   }
+   Catch_anonymous
+      return NULL;
 
-   return result;
+   return ps->pwrite;
 }
 
 /* Cleanup when finished reading (either due to error or in the success case. )
@@ -1039,9 +1042,8 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
    {
       struct exception_context *the_exception_context = &ps->exception_context;
 
-      ++(ps->nerrors);
-      fprintf(stderr, "%s: png_create_read_struct returned NULL (unexpected)\n",
-         ps->test);
+      store_log(ps, NULL, "png_create_read_struct returned NULL (unexpected)",
+         1/*error*/);
 
       Throw ps;
    }
@@ -1882,8 +1884,11 @@ make_standard_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
 
    Catch(fault)
    {
-      store_write_reset(ps);
-      if (ps != fault) Throw fault;
+      /* Use the png_store retuned by the exception, this may help the compiler
+       * because 'ps' is not used in this branch of the setjmp.  Note that fault
+       * and ps will always be the same value.
+       */
+      store_write_reset(fault);
    }
 }
 
@@ -1966,8 +1971,8 @@ static PNG_CONST struct
     };
 
 static void
-make_error(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
-    png_byte bit_depth, int interlace_type, int test, png_const_charp name)
+make_error(png_store* ps, png_byte PNG_CONST colour_type, png_byte bit_depth,
+    int interlace_type, int test, png_const_charp name)
 {
    context(ps, fault);
 
@@ -2015,23 +2020,17 @@ make_error(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          if (ps->expect_warning && ps->saw_warning)
             Throw ps;
 
-         /* If we get here there is a problem, we have success, however
-          * the Throw within the png_error will take control back to the
-          * Catch below, and the loop will continue.
+         /* If we get here there is a problem, we have success - no error or
+          * no warning - when we shouldn't have success.  Log an error.
           */
-         ps->expect_error = 0;
-         ps->expect_warning = 0;
-         png_error(pp, error_test[test].msg);
+         store_log(ps, pp, error_test[test].msg, 1/*error*/);
       }
 
       Catch (fault)
-      {
-         ps->expect_error = 0;
-         ps->expect_warning = 0;
-         if (ps != fault) Throw fault;
-      }
+         ps = fault; /* expected exit, make sure ps is not clobbered */
 
-      ps->expect_error = 0; /* safety */
+      /* And clear these flags */
+      ps->expect_error = 0;
       ps->expect_warning = 0;
 
       /* Now write the whole image, just to make sure that the detected, or
@@ -2072,14 +2071,7 @@ make_error(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
 
    Catch(fault)
    {
-      /* This is not expected because we catch the errors (maybe)
-       * above.
-       */
-      ps->expect_error = 0;
-      store_write_reset(ps);
-
-      if (ps != fault)
-         Throw fault;
+      store_write_reset(fault);
    }
 }
 
@@ -2500,15 +2492,14 @@ standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
       if (!d.ps->validated)
          png_error(pp, "image read failed silently");
 
-      /* Successful completion, in either case clean up the store. */
-      store_read_reset(d.ps);
+      /* Successful completion. */
    }
 
    Catch(fault)
-   {
-      store_read_reset(d.ps);
-      if (d.ps != fault) Throw fault;
-   }
+      d.ps = fault; /* make sure this hasn't been clobbered. */
+
+   /* In either case clean up the store. */
+   store_read_reset(d.ps);
 }
 
 static int
@@ -3006,15 +2997,15 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
                   if (!(od+.5 < is_lo || od-.5 > is_hi))
                      continue;
                }
+               else
+                  is_lo = es_lo, is_hi = es_hi;
 
                {
                   char msg[256];
                   sprintf(msg,
                    "error: %.3f; %u{%u;%u} -> %u not %.2f (%.1f-%.1f)",
                      od-encoded_sample, id, sbit, isbit, od,
-                     encoded_sample,
-                     use_input_precision ? is_lo : es_lo,
-                     use_input_precision ? is_hi : es_hi);
+                     encoded_sample, is_lo, is_hi);
                   png_warning(pp, msg);
                }
             }
@@ -3178,12 +3169,7 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
    }
 
    Catch(fault)
-   {
-      modifier_reset(d.pm);
-
-      if (fault != &d.pm->this)
-         Throw fault;
-   }
+      modifier_reset((png_modifier*)fault);
 }
 
 static void gamma_threshold_test(png_modifier *pm, png_byte colour_type,
@@ -3596,8 +3582,7 @@ int main(int argc, PNG_CONST char **argv)
 
    Catch(fault)
    {
-      fprintf(stderr,
-         "pngvalid: test aborted (probably failed in cleanup)\n");
+      fprintf(stderr, "pngvalid: test aborted (probably failed in cleanup)\n");
       if (!pm.this.verbose)
       {
          if (pm.this.error[0] != 0)
