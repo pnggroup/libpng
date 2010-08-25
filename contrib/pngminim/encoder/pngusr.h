@@ -12,17 +12,12 @@
 #ifndef MINWRPNGCONF_H
 #define MINWRPNGCONF_H
 
-/* If pngusr.h is included during the build the following must
- * be defined either here or in the .dfa file (pngusr.dfa in
- * this case).  To include pngusr.h set -DPNG_USER_CONFIG in
- * CPPFLAGS
- */
-#define PNG_USER_PRIVATEBUILD "libpng minimal conformant PNG encoder"
-#define PNG_USER_DLLFNAME_POSTFIX "me"
+/* To include pngusr.h set -DPNG_USER_CONFIG in CPPFLAGS */
 
 /* List options to turn off features of the build that do not
  * affect the API (so are not recorded in pnglibconf.h)
  */
+
 #define PNG_NO_WARNINGS
 
 #endif /* MINWRPNGCONF_H */
