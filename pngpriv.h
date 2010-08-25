@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta45 - August 24, 2010
+ * libpng version 1.5.0beta45 - August 25, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -32,6 +32,13 @@
 #define PNGLIB_BUILD
 #ifdef PNG_USER_CONFIG
 #  include "pngusr.h"
+   /* These should have been defined in pngusr.h */
+#  ifndef PNG_USER_PRIVATEBUILD
+#    define PNG_USER_PRIVATEBUILD "Custom libpng build"
+#  endif
+#  ifndef PNG_USER_DLLFNAME_POSTFIX
+#    define PNG_USER_DLLFNAME_POSTFIX "Cb"
+#  endif
 #endif
 #include "png.h"
 #include "pnginfo.h"

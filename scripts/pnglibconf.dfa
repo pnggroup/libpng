@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version PNGLIB_VERSION - last changed on August 24, 2010
+com libpng version PNGLIB_VERSION - last changed on August 25, 2010
 com
 com Copyright (c) 1998-2010 Glenn Randers-Pehrson
 com
@@ -14,6 +14,7 @@ com This code is released under the libpng license.
 com For conditions of distribution and use, see the disclaimer
 com and license in png.h
 com
+
 file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 
 # This file is preprocessed by scripts/options.awk and the
@@ -70,10 +71,6 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # is safer to ensure that -DPNG_USER_CONFIG is specified throughout
 # the build by changing the CPPFLAGS passed to the initial ./configure
 #
-# This process will result in a very annoying build fail if you
-# forget to define both 'PNG_USER_PRIVATEBUILD' and
-# 'PNG_USER_DLLFNAME_POSTFIX' in pngusr.h - this is deliberate.
-#
 # 2) Add definitions of the settings you want to change to
 # CPPFLAGS; for example:
 # 
@@ -105,14 +102,11 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # The following causes commented out #undef lines to be written to
 # pnglibconf.h; this can be stopped by logunsupported=0 in a later
 # file or on the command line (after pnglibconf.dfa)
+
 logunsupported = 1
 
 # PNG_USER_CONFIG has to be defined on the compiler command line
 # to cause pngusr.h to be read while constructing pnglibconf.h
-#
-# If this is set during the build 'pnglibconf.h' will define
-# PNG_USER_PRIVATEBUILD to the value that *must* be set by pngusr.h
-# and contain other definitions as below.
 #
 # If you create a private DLL you need to define the following
 # macros in the file 'pngusr.h' and set -DPNG_USER_CONFIG for
@@ -150,7 +144,7 @@ logunsupported = 1
 
 # Note that PNG_USR_CONFIG only has an effect when building
 # pnglibconf.h
-setting USER_CONFIG requires USER_PRIVATEBUILD USER_DLLFNAME_POSTFIX
+setting USER_CONFIG
 setting USER_PRIVATEBUILD
 setting USER_DLLFNAME_POSTFIX
 setting USER_VERSIONINFO_COMMENTS
