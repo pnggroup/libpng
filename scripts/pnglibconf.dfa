@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version PNGLIB_VERSION - last changed on August 26, 2010
+com libpng version 1.5.0beta46 - last changed on August 26, 2010
 com
 com Copyright (c) 1998-2010 Glenn Randers-Pehrson
 com
@@ -313,6 +313,8 @@ option READ_16_TO_8_ACCURATE_SCALE requires READ disabled
 
 # WRITE options
 option WRITE
+
+option WRITE_16BIT requires WRITE
 
 option WRITE_TRANSFORMS requires WRITE
 = NO_WRITE_TRANSFORMS PNG_WRITE_TRANSFORMS_NOT_SUPPORTED

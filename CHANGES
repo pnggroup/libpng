@@ -3026,7 +3026,8 @@ Version 1.5.0beta45 [August 26, 2010]
     in pngpriv.h in case the user neglected to define them in their pngusr.h
 
 Version 1.5.0beta46 [August 26, 2010]
-[devel]  Added new private header files to libpng_sources in CMakeLists.txt
+  Added new private header files to libpng_sources in CMakeLists.txt
+  Added PNG_WRITE_16BIT_SUPPORTED option.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -393,6 +393,7 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
             }
          }
 
+#ifdef PNG_WRITE_16BIT_SUPPORTED
          else
          {
             /* This converts from AARRGGBB to RRGGBBAA */
@@ -415,6 +416,7 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = save[1];
             }
          }
+#endif /* PNG_WRITE_16BIT_SUPPORTED */
       }
 
       else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
@@ -434,6 +436,7 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
             }
          }
 
+#ifdef PNG_WRITE_16BIT_SUPPORTED
          else
          {
             /* This converts from AAGG to GGAA */
@@ -452,6 +455,7 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = save[1];
             }
          }
+#endif /* PNG_WRITE_16BIT_SUPPORTED */
       }
    }
 }
@@ -485,6 +489,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
             }
          }
 
+#ifdef PNG_WRITE_16BIT_SUPPORTED
          else
          {
             /* This inverts the alpha channel in RRGGBBAA */
@@ -507,6 +512,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = (png_byte)(255 - *(sp++));
             }
          }
+#endif /* PNG_WRITE_16BIT_SUPPORTED */
       }
 
       else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
@@ -525,6 +531,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
             }
          }
 
+#ifdef PNG_WRITE_16BIT_SUPPORTED
          else
          {
             /* This inverts the alpha channel in GGAA */
@@ -543,6 +550,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = (png_byte)(255 - *(sp++));
             }
          }
+#endif /* PNG_WRITE_16BIT_SUPPORTED */
       }
    }
 }
@@ -580,6 +588,7 @@ png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
          }
       }
 
+#ifdef PNG_WRITE_16BIT_SUPPORTED
       else if (row_info->bit_depth == 16)
       {
          png_bytep rp;
@@ -607,6 +616,7 @@ png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
             *(rp + 5) = (png_byte)(blue & 0xff);
          }
       }
+#endif /* PNG_WRITE_16BIT_SUPPORTED */
    }
 }
 #endif /* PNG_MNG_FEATURES_SUPPORTED */

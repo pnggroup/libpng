@@ -449,7 +449,9 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
             case 2:
             case 4:
             case 8:
+#ifdef PNG_WRITE_16BIT_SUPPORTED
             case 16:
+#endif
                png_ptr->channels = 1; break;
             default:
                png_error(png_ptr,
@@ -458,7 +460,11 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
          break;
 
       case PNG_COLOR_TYPE_RGB:
+#ifdef PNG_WRITE_16BIT_SUPPORTED
          if (bit_depth != 8 && bit_depth != 16)
+#else
+         if (bit_depth != 8)
+#endif
             png_error(png_ptr, "Invalid bit depth for RGB image");
 
          png_ptr->channels = 3;
@@ -486,7 +492,11 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
          break;
 
       case PNG_COLOR_TYPE_RGB_ALPHA:
+#ifdef PNG_WRITE_16BIT_SUPPORTED
          if (bit_depth != 8 && bit_depth != 16)
+#else
+         if (bit_depth != 8)
+#endif
             png_error(png_ptr, "Invalid bit depth for RGBA image");
 
          png_ptr->channels = 4;
@@ -1106,7 +1116,11 @@ png_write_tRNS(png_structp png_ptr, png_const_bytep trans_alpha,
       png_save_uint_16(buf, tran->red);
       png_save_uint_16(buf + 2, tran->green);
       png_save_uint_16(buf + 4, tran->blue);
+#ifdef PNG_WRITE_16BIT_SUPPORTED
       if (png_ptr->bit_depth == 8 && (buf[0] | buf[2] | buf[4]))
+#else
+      if (buf[0] | buf[2] | buf[4])
+#endif
       {
          png_warning(png_ptr,
            "Ignoring attempt to write 16-bit tRNS chunk when bit_depth is 8");
@@ -1154,7 +1168,11 @@ png_write_bKGD(png_structp png_ptr, png_const_color_16p back, int color_type)
       png_save_uint_16(buf, back->red);
       png_save_uint_16(buf + 2, back->green);
       png_save_uint_16(buf + 4, back->blue);
+#ifdef PNG_WRITE_16BIT_SUPPORTED
       if (png_ptr->bit_depth == 8 && (buf[0] | buf[2] | buf[4]))
+#else
+      if (buf[0] | buf[2] | buf[4])
+#endif
       {
          png_warning(png_ptr,
              "Ignoring attempt to write 16-bit bKGD chunk when bit_depth is 8");
