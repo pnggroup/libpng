@@ -101,7 +101,10 @@ set(CMAKE_DEBUG_POSTFIX "d")
 set(libpng_sources
   png.h
   pngconf.h
- pngpriv.h
+  pngpriv.h
+  pngdebug.h
+  pnginfo.h
+  pngstruct.h
   png.c
   pngerror.c
   pngget.c
