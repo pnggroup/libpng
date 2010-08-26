@@ -2654,6 +2654,8 @@ version 1.4.4beta07 [August 26, 2010]
   Eliminated a deprecated reference to png_ptr->io_ptr in pngtest.c
   Eliminated new unnecessary #if tests regarding the sCAL chunk from pngrutil.c
 
+version 1.4.4beta08 [August 26, 2010]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
