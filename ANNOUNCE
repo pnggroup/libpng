@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta45 - August 25, 2010
+Libpng 1.5.0beta45 - August 26, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -226,7 +226,7 @@ version 1.5.0beta24 [May 7, 2010]
     offset of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
   Added more blank lines for readability.
 
-version 1.5.0beta25 [August 25, 2010]
+version 1.5.0beta25 [August 26, 2010]
   In pngpread.c: png_push_have_row() add check for new_row > height
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
@@ -377,7 +377,7 @@ Version 1.5.0beta44 [August 24, 2010]
   Implemented progressive read in pngvalid.c gamma tests
   Turn on progressive reader in pngvalid.c by default and tidy code.
 
-Version 1.5.0beta45 [August 25, 2010]
+Version 1.5.0beta45 [August 26, 2010]
   Added an explicit make step to projects/vstudio for pnglibconf.h
     Also corrected zlib.vcxproj into which Visual Studio had introduced
     what it calls an "authoring error".  The change to make pnglibconf.h
@@ -386,7 +386,7 @@ Version 1.5.0beta45 [August 25, 2010]
   Changed pngvalid to work when floating point APIs are disabled
   Renamed the prebuilt scripts/pnglibconf.h to scripts/pnglibconf.h.prebuilt
   Supply default values for PNG_USER_PRIVATEBUILD and PNG_USER_DLLFNAME_POSTFIX
-    in pngpriv.h in case the user forgot to define them in their pngusr.h
+    in pngpriv.h in case the user neglected to define them in their pngusr.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
