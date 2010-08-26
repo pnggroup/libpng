@@ -3025,6 +3025,8 @@ Version 1.5.0beta45 [August 26, 2010]
   Supply default values for PNG_USER_PRIVATEBUILD and PNG_USER_DLLFNAME_POSTFIX
     in pngpriv.h in case the user neglected to define them in their pngusr.h
 
+Version 1.5.0beta46 [August 26, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

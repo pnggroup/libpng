@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta45 - August 26, 2010
+Libpng 1.5.0beta46 - August 26, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta45.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta45.tar.gz
-   1.5.0beta45.tar.bz2
+   1.5.0beta46.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta46.tar.gz
+   1.5.0beta46.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b45.zip
-   lp150b45.7z
+   lp150b46.zip
+   lp150b46.7z
 
 Other information:
 
-   1.5.0beta45-README.txt
-   1.5.0beta45-LICENSE.txt
+   1.5.0beta46-README.txt
+   1.5.0beta46-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -387,6 +387,8 @@ Version 1.5.0beta45 [August 26, 2010]
   Renamed the prebuilt scripts/pnglibconf.h to scripts/pnglibconf.h.prebuilt
   Supply default values for PNG_USER_PRIVATEBUILD and PNG_USER_DLLFNAME_POSTFIX
     in pngpriv.h in case the user neglected to define them in their pngusr.h
+
+Version 1.5.0beta46 [August 26, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
