@@ -22,9 +22,9 @@ Use greater precision when changing to linear gamma for compositing against
 Investigate pre-incremented loop counters and other loop constructions.
 Add interpolated method of handling interlacing.
 Provide for conditional compilation of 16-bit support (except for the
-  initial stripping down to 8-bits when reading a 16-bit PNG datastream).
+  initial stripping down to 8-bits and proper decoding of "cheap transparency"
+  when reading a 16-bit PNG datastream).
 Switch to the simpler zlib (zlib/libpng) license if legally possible.
-Extend pngvalid.c to test the progressive reader, and to validate more
-  of the libpng transformations.
+Extend pngvalid.c to validate more of the libpng transformations.
 
 */
