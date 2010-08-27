@@ -145,7 +145,23 @@ standard_name_from_id(char *buffer, size_t bufsize, size_t pos, png_uint_32 id)
       log2depth(DEPTH_FROM_ID(id)), INTERLACE_FROM_ID(id));
 }
 
-/* Convenience API to list valid formats: */
+/* Convenience API and defines to list valid formats.  Note that 16 bit read and
+ * write support is required to do 16 bit read tests (we must be able to make a
+ * 16 bit image to test!)
+ */
+#ifdef PNG_WRITE_16BIT_SUPPORTED
+#  define WRITE_BDHI 4
+#  ifdef PNG_READ_16BIT_SUPPORTED
+#     define READ_BDHI 4
+#     define DO_16BIT
+#  endif
+#else
+#  define WRITE_BDHI 3
+#endif
+#ifndef DO_16BIT
+#  define READ_BDHI 3
+#endif
+
 static int
 next_format(png_bytep colour_type, png_bytep bit_depth)
 {
@@ -158,7 +174,11 @@ next_format(png_bytep colour_type, png_bytep bit_depth)
    *bit_depth = (png_byte)(*bit_depth << 1);
 
    /* Palette images are restricted to 8 bit depth */
-   if (*bit_depth <= 8 || (*colour_type != 3 && *bit_depth <= 16))
+   if (*bit_depth <= 8
+#     ifdef DO_16BIT
+         || (*colour_type != 3 && *bit_depth <= 16)
+#     endif
+      )
       return 1;
 
    /* Move to the next color type, or return 0 at the end. */
@@ -1207,7 +1227,7 @@ modifier_init(png_modifier *pm)
    /* Rely on the memset for all the other fields - there are no pointers */
 }
 
-/* One modification strucutre must be provided for each chunk to be modified (in
+/* One modification structure must be provided for each chunk to be modified (in
  * fact more than one can be provided if multiple separate changes are desired
  * for a single chunk.)  Modifications include adding a new chunk when a
  * suitable chunk does not exist.
@@ -1920,11 +1940,11 @@ make_standard_images(png_store *ps)
 
    /* Arguments are colour_type, low bit depth, high bit depth
     */
-   make_standard(ps, 0, 0, 4);
-   make_standard(ps, 2, 3, 4);
-   make_standard(ps, 3, 0, 3);
-   make_standard(ps, 4, 3, 4);
-   make_standard(ps, 6, 3, 4);
+   make_standard(ps, 0, 0, WRITE_BDHI);
+   make_standard(ps, 2, 3, WRITE_BDHI);
+   make_standard(ps, 3, 0, 3/*palette: max 8 bits*/);
+   make_standard(ps, 4, 3, WRITE_BDHI);
+   make_standard(ps, 6, 3, WRITE_BDHI);
 }
 
 /* Tests - individual test cases */
@@ -2111,19 +2131,19 @@ perform_error_test(png_modifier *pm)
    /* Need to do this here because we just write in this test. */
    safecat(pm->this.test, sizeof pm->this.test, 0, "error test");
 
-   if (!make_errors(pm, 0, 0, 4))
+   if (!make_errors(pm, 0, 0, WRITE_BDHI))
       return;
 
-   if (!make_errors(pm, 2, 3, 4))
+   if (!make_errors(pm, 2, 3, WRITE_BDHI))
       return;
 
    if (!make_errors(pm, 3, 0, 3))
       return;
 
-   if (!make_errors(pm, 4, 3, 4))
+   if (!make_errors(pm, 4, 3, WRITE_BDHI))
       return;
 
-   if (!make_errors(pm, 6, 3, 4))
+   if (!make_errors(pm, 6, 3, WRITE_BDHI))
       return;
 }
 
@@ -2537,19 +2557,19 @@ perform_standard_test(png_modifier *pm)
    /* Test each colour type over the valid range of bit depths (expressed as
     * log2(bit_depth) in turn, stop as soon as any error is detected.
     */
-   if (!test_standard(pm, 0, 0, 4))
+   if (!test_standard(pm, 0, 0, READ_BDHI))
       return;
 
-   if (!test_standard(pm, 2, 3, 4))
+   if (!test_standard(pm, 2, 3, READ_BDHI))
       return;
 
    if (!test_standard(pm, 3, 0, 3))
       return;
 
-   if (!test_standard(pm, 4, 3, 4))
+   if (!test_standard(pm, 4, 3, READ_BDHI))
       return;
 
-   if (!test_standard(pm, 6, 3, 4))
+   if (!test_standard(pm, 6, 3, READ_BDHI))
       return;
 }
 
@@ -3284,7 +3304,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
    /* The only interesting cases are colour and grayscale, alpha is ignored here
     * for overall speed.  Only bit depths 8 and 16 are tested.
     */
-   for (sbit=pm->sbitlow; sbit<16; ++sbit)
+   for (sbit=pm->sbitlow; sbit<(1<<READ_BDHI); ++sbit)
    {
       unsigned int i, j;
 
@@ -3311,6 +3331,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
                      return;
                }
 
+#ifdef DO_16BIT
                gamma_transform_test(pm, 0, 16, pm->interlace_type,
                    1/pm->gammas[i], pm->gammas[j], sbit, speed,
                    pm->use_input_precision_sbit, 0/*strip16*/);
@@ -3324,12 +3345,17 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
 
                if (fail(pm))
                   return;
+#endif
             }
          }
       }
    }
 }
 
+/* Note that this requires a 16 bit source image but produces 8 bit output, so
+ * we only need the 16bit write support.
+ */
+#ifdef PNG_WRITE_16BIT_SUPPORTED
 static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
 {
 #  ifndef PNG_MAX_GAMMA_8
@@ -3382,6 +3408,7 @@ static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
       }
    }
 }
+#endif
 
 static void
 perform_gamma_test(png_modifier *pm, int speed, int summary)
@@ -3404,9 +3431,11 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
       printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
       printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
       printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
-      printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
       printf("  8 bit color: %.5f\n", pm->error_color_8);
+#ifdef DO_16BIT
+      printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
       printf(" 16 bit color: %.5f\n", pm->error_color_16);
+#endif
    }
 
    /* The sbit tests produce much larger errors: */
@@ -3423,16 +3452,16 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
          printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
          printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
          printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
+         printf("  8 bit color: %.5f\n", pm->error_color_8);
       }
 
+#ifdef DO_16BIT
       printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
-
-      if (pm->sbitlow < 8U)
-         printf("  8 bit color: %.5f\n", pm->error_color_8);
-
       printf(" 16 bit color: %.5f\n", pm->error_color_16);
+#endif
    }
 
+#ifdef PNG_WRITE_16BIT_SUPPORTED
    /* The 16 to 8 bit strip operations: */
    pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = pm->error_gray_16 =
    pm->error_color_8 = pm->error_color_16 = 0;
@@ -3443,6 +3472,7 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
       printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
       printf(" 16 bit color: %.5f\n", pm->error_color_16);
    }
+#endif
 }
 
 /* main program */
