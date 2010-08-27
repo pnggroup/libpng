@@ -7,6 +7,7 @@
 # and license in png.h
 
 # First all the build options off:
+
 everything = off
 
 # All that is required is some read code. This example switches
@@ -31,7 +32,8 @@ option FLOATING_ARITHMETIC off
 # program here, pngm2pnm, requires the following.  Take a look
 # at pnglibconf.h to find out the full set of what has to be
 # enabled to make the following work.
+
 option SETJMP on
 option STDIO on
 option READ_EXPAND on
-option READ_16BIT on
+option READ_16_TO_8 on

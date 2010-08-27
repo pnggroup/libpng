@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.0 [August 26, 2010]
+ * Last changed in libpng 1.5.0 [August 27, 2010]
  * Copyright (c) 2010 Glenn Randers-Pehrson
  * Written by John C. Bowler
  *
@@ -2776,7 +2776,11 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
     * PNG_MAX_GAMMA_8 when doing the following.
     */
    if (dp->strip16)
-      png_set_strip_16(pp);
+#     ifdef PNG_READ_16_TO_8
+         png_set_strip_16(pp);
+#     else
+         png_error(pp, "strip16 (16 to 8 bit conversion) not supported");
+#     endif
 
    png_read_update_info(pp, pi);
 
@@ -3355,7 +3359,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
 /* Note that this requires a 16 bit source image but produces 8 bit output, so
  * we only need the 16bit write support.
  */
-#ifdef PNG_WRITE_16BIT_SUPPORTED
+#ifdef PNG_16_TO_8_SUPPORTED
 static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
 {
 #  ifndef PNG_MAX_GAMMA_8
@@ -3408,7 +3412,7 @@ static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
       }
    }
 }
-#endif
+#endif /* 16 to 8 bit conversion */
 
 static void
 perform_gamma_test(png_modifier *pm, int speed, int summary)
@@ -3461,7 +3465,7 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
 #endif
    }
 
-#ifdef PNG_WRITE_16BIT_SUPPORTED
+#ifdef PNG_16_TO_8_SUPPORTED
    /* The 16 to 8 bit strip operations: */
    pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = pm->error_gray_16 =
    pm->error_color_8 = pm->error_color_16 = 0;

@@ -7,18 +7,22 @@
 # and license in png.h
 
 # First all the build options off:
+
 everything = off
 
 # Just switch on the progressive read code
+
 option PROGRESSIVE_READ on
 
 # You may choose fixed or floating point APIs:
 # option FLOATING_POINT on
+
 option FIXED_POINT on
 
 # You must chose the internal fixed point implementation or to
 # use the system floating point.  The latter is considerably
 # smaller (by about 1kbyte on an x86 system):
+
 option FLOATING_ARITHMETIC on
 # option FLOATING_ARITHMETIC off
 
@@ -26,6 +30,7 @@ option FLOATING_ARITHMETIC on
 # program here, rpng2-x, requires the following.  Take a look
 # at pnglibconf.h to find out the full set of what has to be
 # enabled to make the following work.
+
 option SETJMP on
 option STDIO on
 option READ_bKGD on
