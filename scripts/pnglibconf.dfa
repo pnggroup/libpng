@@ -293,7 +293,8 @@ option READ enables READ_INTERLACING
 
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit
-# processing after that has happened.
+# processing after that has happened.  You need to be sure to enable READ_16_TO_8
+# when you disable READ_16BIT for this to work properly.
 
 option READ_16BIT requires READ enables 16BIT
 
