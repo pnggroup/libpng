@@ -241,6 +241,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       }
    }
 
+#ifndef PNG_16BIT_SUPPORTED
    else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
       row_info->bit_depth == 16)
    {
@@ -255,9 +256,11 @@ png_do_invert(png_row_infop row_info, png_bytep row)
          rp += 4;
       }
    }
+#endif
 }
 #endif
 
+#ifdef PNG_16BIT_SUPPORTED
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* Swaps byte order on 16 bit depth images */
 void /* PRIVATE */
@@ -279,6 +282,7 @@ png_do_swap(png_row_infop row_info, png_bytep row)
       }
    }
 }
+#endif
 #endif
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)||defined(PNG_WRITE_PACKSWAP_SUPPORTED)
@@ -626,6 +630,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
          }
       }
 
+#ifdef PNG_16BIT_SUPPORTED
       else if (row_info->bit_depth == 16)
       {
          if (row_info->color_type == PNG_COLOR_TYPE_RGB)
@@ -660,6 +665,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
             }
          }
       }
+#endif
    }
 }
 #endif /* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */

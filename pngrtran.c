@@ -1288,8 +1288,14 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
+#ifdef PNG_READ_16BIT_SUPPORTED
    if ((png_ptr->transformations & PNG_16_TO_8) && (info_ptr->bit_depth == 16))
       info_ptr->bit_depth = 8;
+#else
+   /* Force chopping 16-bit input down to 8 */
+   png_ptr->transformations |=PNG_16_TO_8;
+   info_ptr->bit_depth = 8;
+#endif
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
@@ -1590,9 +1596,11 @@ png_do_read_transformations(png_structp png_ptr)
       png_do_read_swap_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
+#ifdef PNG_READ_16BIT_SUPPORTED
 #ifdef PNG_READ_SWAP_SUPPORTED
    if (png_ptr->transformations & PNG_SWAP_BYTES)
       png_do_swap(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#endif
 #endif
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
@@ -1817,6 +1825,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
             break;
          }
 
+#ifdef PNG_READ_16BIT_SUPPORTED
          case 16:
          {
             png_bytep bp = row;
@@ -1832,6 +1841,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
             }
             break;
          }
+#endif
       }
    }
 }
@@ -1919,6 +1929,8 @@ png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
                *(--dp) = save;
             }
          }
+
+#ifdef PNG_READ_16BIT_SUPPORTED
          /* This converts from RRGGBBAA to AARRGGBB */
          else
          {
@@ -1941,7 +1953,9 @@ png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
                *(--dp) = save[1];
             }
          }
+#endif
       }
+
       else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       {
          /* This converts from GA to AG */
@@ -1959,6 +1973,8 @@ png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
                *(--dp) = save;
             }
          }
+
+#ifdef PNG_READ_16BIT_SUPPORTED
          /* This converts from GGAA to AAGG */
          else
          {
@@ -1977,6 +1993,7 @@ png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
                *(--dp) = save[1];
             }
          }
+#endif
       }
    }
 }
@@ -2013,6 +2030,8 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             dp=sp;
          }
       }
+
+#ifdef PNG_READ_16BIT_SUPPORTED
       /* This inverts the alpha channel in RRGGBBAA */
       else
       {
@@ -2038,6 +2057,7 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             dp=sp;
          }
       }
+#endif
    }
    else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
    {
@@ -2054,6 +2074,8 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             *(--dp) = *(--sp);
          }
       }
+
+#ifdef PNG_READ_16BIT_SUPPORTED
       else
       {
          /* This inverts the alpha channel in GGAA */
@@ -2073,6 +2095,7 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
             dp=sp;
          }
       }
+#endif
    }
 }
 #endif
@@ -2128,6 +2151,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
          }
       }
 
+#ifdef PNG_READ_16BIT_SUPPORTED
       else if (row_info->bit_depth == 16)
       {
          if (flags & PNG_FLAG_FILLER_AFTER)
@@ -2166,6 +2190,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->rowbytes = row_width * 4;
          }
       }
+#endif
    } /* COLOR_TYPE == GRAY */
    else if (row_info->color_type == PNG_COLOR_TYPE_RGB)
    {
@@ -2207,6 +2232,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
          }
       }
 
+#ifdef PNG_READ_16BIT_SUPPORTED
       else if (row_info->bit_depth == 16)
       {
          if (flags & PNG_FLAG_FILLER_AFTER)
@@ -2254,6 +2280,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             row_info->rowbytes = row_width * 8;
          }
       }
+#endif
    } /* COLOR_TYPE == RGB */
 }
 #endif
@@ -4007,9 +4034,9 @@ png_do_quantize(png_row_infop row_info, png_bytep row,
 
    png_debug(1, "in png_do_quantize");
 
+   if (row_info->bit_depth == 8)
    {
-      if (row_info->color_type == PNG_COLOR_TYPE_RGB &&
-         palette_lookup && row_info->bit_depth == 8)
+      if (row_info->color_type == PNG_COLOR_TYPE_RGB && palette_lookup)
       {
          int r, g, b, p;
          sp = row;
@@ -4046,7 +4073,7 @@ png_do_quantize(png_row_infop row_info, png_bytep row,
       }
 
       else if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA &&
-         palette_lookup != NULL && row_info->bit_depth == 8)
+         palette_lookup != NULL)
       {
          int r, g, b, p;
          sp = row;
@@ -4077,7 +4104,7 @@ png_do_quantize(png_row_infop row_info, png_bytep row,
       }
 
       else if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
-         quantize_lookup && row_info->bit_depth == 8)
+         quantize_lookup)
       {
          sp = row;
 
