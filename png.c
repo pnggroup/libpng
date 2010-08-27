@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.0 [August 26, 2010]
+ * Last changed in libpng 1.5.0 [August 27, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -560,13 +560,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.0beta46 - August 26, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.5.0beta46 - August 27, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.0beta46 - August 26, 2010\
+      return "libpng version 1.5.0beta46 - August 27, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1637,7 +1637,7 @@ png_reciprocal(png_fixed_point a)
 static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
 {
-   /* The required result is 1/a * 1/b, the following preserves accuracy. */
+   /* The required result is 1/a * 1/b; the following preserves accuracy. */
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    double r = a * 1E-5;
    r *= b;
@@ -1659,7 +1659,7 @@ png_product2(png_fixed_point a, png_fixed_point b)
 png_fixed_point
 png_reciprocal2(png_fixed_point a, png_fixed_point b)
 {
-   /* The required result is 1/a * 1/b, the following preserves accuracy. */
+   /* The required result is 1/a * 1/b; the following preserves accuracy. */
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    double r = 1E15/a;
    r /= b;

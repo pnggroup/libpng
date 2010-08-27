@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.5.0 [August 26, 2010]
+ * Last changed in libpng 1.5.0 [August 27, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -241,7 +241,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       }
    }
 
-#ifndef PNG_16BIT_SUPPORTED
+#ifdef PNG_16BIT_SUPPORTED
    else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
       row_info->bit_depth == 16)
    {
