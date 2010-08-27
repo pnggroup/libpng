@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.0 [August 26, 2010]
+ * Last changed in libpng 1.5.0 [August 27, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1293,8 +1293,11 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       info_ptr->bit_depth = 8;
 #else
    /* Force chopping 16-bit input down to 8 */
-   png_ptr->transformations |=PNG_16_TO_8;
-   info_ptr->bit_depth = 8;
+   if (info_ptr->bit_depth == 16)
+   {
+      png_ptr->transformations |=PNG_16_TO_8;
+      info_ptr->bit_depth = 8;
+   }
 #endif
 #endif
 
@@ -2109,7 +2112,9 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
    png_uint_32 i;
    png_uint_32 row_width = row_info->width;
 
+#ifdef PNG_READ_16BIT_SUPPORTED
    png_byte hi_filler = (png_byte)((filler>>8) & 0xff);
+#endif
    png_byte lo_filler = (png_byte)(filler & 0xff);
 
    png_debug(1, "in png_do_read_filler");
