@@ -2093,7 +2093,7 @@ png_gamma_significant(png_fixed_point gamma)
  * 'num' 256 entry subtables, where 'num' is determined by 'shift' - the amount
  * to shift the input values right (or 16-number_of_signifiant_bits).
  *
- * The caller is respoonsible for ensuring that the table gets cleaned up on
+ * The caller is responsible for ensuring that the table gets cleaned up on
  * png_error (i.e. if one of the mallocs below fails) - i.e. the *table argument
  * should be somewhere that will be cleaned.
  */
