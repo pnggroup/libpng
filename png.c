@@ -2331,15 +2331,19 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
 
      png_ptr->gamma_shift = shift;
 
+#ifdef PNG_16BIT_SUPPORTED
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
+#endif
          png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
          png_ptr->screen_gamma > 0 ? png_product2(png_ptr->gamma,
          png_ptr->screen_gamma) : PNG_FP_1);
 
+#ifdef PNG_16BIT_SUPPORTED
      else
          png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,
          png_ptr->screen_gamma > 0 ? png_reciprocal2(png_ptr->gamma,
          png_ptr->screen_gamma) : PNG_FP_1);
+#endif
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
