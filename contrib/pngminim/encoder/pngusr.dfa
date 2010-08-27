@@ -9,6 +9,8 @@
 # First all the build options off:
 everything = off
 
+option NO_16BIT on
+
 # Switch on the write code - this makes a minimalist encoder
 option WRITE on
 

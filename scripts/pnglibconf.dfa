@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version 1.5.0beta46 - last changed on August 26, 2010
+com libpng version 1.5.0beta46 - last changed on August 27, 2010
 com
 com Copyright (c) 1998-2010 Glenn Randers-Pehrson
 com
@@ -136,6 +136,7 @@ logunsupported = 1
 # (i.e. if it is not defined at this point) it will be forced to '2' here when
 # using Watcom.  This indicates to the other header files that Watcom behaviour
 # is required where appropriate.
+
 @#ifdef __WATCOMC__
 @#  ifndef PNG_API_RULE
 @#     define PNG_API_RULE 2 /* Use Watcom calling conventions */
@@ -144,6 +145,7 @@ logunsupported = 1
 
 # Note that PNG_USR_CONFIG only has an effect when building
 # pnglibconf.h
+
 setting USER_CONFIG
 setting USER_PRIVATEBUILD
 setting USER_DLLFNAME_POSTFIX
@@ -156,24 +158,29 @@ setting USER_VERSIONINFO_LEGALTRADEMARKS
 # pngconf.h)
 # Changing this setting has a fundamental affect on the PNG ABI,
 # do not release shared libraries with this changed.
+
 setting API_RULE default 0
 
 # Default to using the read macros
+
 setting DEFAULT_READ_MACROS default 1
 
 # The alternative is to call functions to read PNG values, if
 # the functions are turned *off* the read macros must always
 # be enabled, so turning this off will actually force the
 # USE_READ_MACROS option on (see pngconf.h)
+
 option READ_INT_FUNCTIONS requires READ
 
 # The same for write, but these can only be switched off if
 # no writing is required at all - hence the use of an 'enables'
 # not a 'requires' below:
+
 option WRITE_INT_FUNCTIONS disabled
 option WRITE enables WRITE_INT_FUNCTIONS
 
 # Generic options - affect both read and write.
+
 option WARNINGS
 option BENIGN_ERRORS
 option MNG_FEATURES
@@ -181,14 +188,17 @@ option MNG_FEATURES
 # Arithmetic options, the first is the big switch that chooses between internal
 # floating and fixed point arithmetic implementations - it does not affect any
 # APIs.  The second two (the _POINT settings) switch off individual APIs.
+
 option FLOATING_ARITHMETIC
 option FLOATING_POINT enables ok_math
 option FIXED_POINT enables ok_math
 
 # Added at libpng version 1.4.0 
+
 option ERROR_TEXT
 
 # The following is always on (defined empty) 
+
 setting CALLOC_SUPPORTED default
 
 # This protects us against compilers that run on a windowing system
@@ -199,34 +209,42 @@ setting CALLOC_SUPPORTED default
 # will also prevent these, plus will prevent the entire set of stdio
 # macros and functions (FILE *, printf, etc.) from being compiled and used,
 # unless (PNG_DEBUG > 0) has been #defined.
+
 option STDIO
 option CONSOLE_IO requires STDIO
 
 # Note: prior to 1.5.0 this option could not be disabled if STDIO
 # was enabled.
+
 option TIME_RFC1123 requires STDIO
 
 # PNG_SETJMP_NOT_SUPPORTED is an old equivalent for NO_SETJMP
+
 option SETJMP
 = NO_SETJMP SETJMP_NOT_SUPPORTED
 
 # For the moment this is disabled (no code support):
+
 option ERROR_NUMBERS disabled
 
 # If this is disabled it is not possible for apps to get the
 # values from the 'info' structure, this effectively removes
 # quite a lot of the READ API.
+
 option EASY_ACCESS
 
 # Added at libpng-1.2.0
+
 option USER_MEM
 
 # Added at libpng-1.4.0
+
 option IO_STATE
 
 # This is only for PowerPC big-endian and 680x0 systems
 # some testing, not enabled by default.
 # NO LONGER USED
+
 #option READ_BIG_ENDIAN disabled
 
 # Allow users to control limits on what the READ code will
@@ -234,27 +252,33 @@ option IO_STATE
 
 # Added at libpng-1.2.43; adds limit fields to png_struct,
 # allows some usages of these fields
+
 option USER_LIMITS
 
 # Added at libpng-1.2.6; adds setting APIs, allows additional
 # usage of this field (UTSL)
+
 option SET_USER_LIMITS requires USER_LIMITS
 
 # Feature added at libpng-1.4.0, this flag added at 1.4.1
 option SET_USER_LIMITS enables SET_CHUNK_CACHE_LIMIT
 # Feature added at libpng-1.4.1, this flag added at 1.4.1
+
 option SET_USER_LIMITS enables SET_CHUNK_MALLOC_LIMIT
 
 # Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGs no matter
 # how large, set these two limits to 0x7fffffffL
+
 setting USER_WIDTH_MAX default 1000000L
 setting USER_HEIGHT_MAX default 1000000L
 
 # Added at libpng-1.2.43.  To accept all valid PNGs no matter
 # how large, set these two limits to 0.
+
 setting USER_CHUNK_CACHE_MAX default 0
 
 # Added at libpng-1.2.43
+
 setting USER_CHUNK_MALLOC_MAX default 0
 
 # All of the following options relate to code capabilities for
@@ -265,10 +289,9 @@ setting USER_CHUNK_MALLOC_MAX default 0
 
 # READ options
 
-option READ_16BIT requires READ enables 16BIT
-option NO_READ_16BIT requires READ_16_TO_8
-
 option READ enables READ_INTERLACING
+
+option READ_16BIT requires READ enables 16BIT
 
 option READ_QUANTIZE requires READ
 
@@ -279,7 +302,7 @@ option READ_EXPAND requires READ_TRANSFORMS
 option READ_SHIFT requires READ_TRANSFORMS
 option READ_PACK requires READ_TRANSFORMS
 option READ_BGR requires READ_TRANSFORMS
-option READ_SWAP requires READ_TRANSFORMS
+option READ_SWAP requires READ_TRANSFORMS READ_16BIT
 option READ_PACKSWAP requires READ_TRANSFORMS
 option READ_INVERT requires READ_TRANSFORMS
 option READ_BACKGROUND requires READ_TRANSFORMS
@@ -307,6 +330,7 @@ option READ_COMPOSITE_NODIV requires READ
 = NO_READ_COMPOSITE_NODIV PNG_NO_READ_COMPOSITED_NODIV
 
 # Inch conversions
+
 option INCH_CONVERSIONS
 = INCH_CONVERSIONS PNG_INCH_CONVERSIONS
 
@@ -314,9 +338,11 @@ option INCH_CONVERSIONS
 # These are currently experimental features, define them if you want
 
 # Very little testing, not enabled by default.
+
 option READ_16_TO_8_ACCURATE_SCALE requires READ disabled
 
 # WRITE options
+
 option WRITE
 
 option WRITE_16BIT requires WRITE enables 16BIT
@@ -324,11 +350,10 @@ option WRITE_16BIT requires WRITE enables 16BIT
 option WRITE_TRANSFORMS requires WRITE
 = NO_WRITE_TRANSFORMS PNG_WRITE_TRANSFORMS_NOT_SUPPORTED
 
-#  ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
 option WRITE_SHIFT requires WRITE_TRANSFORMS
 option WRITE_PACK requires WRITE_TRANSFORMS
 option WRITE_BGR requires WRITE_TRANSFORMS
-option WRITE_SWAP requires WRITE_TRANSFORMS
+option WRITE_SWAP requires WRITE_TRANSFORMS WRITE_16BIT
 option WRITE_PACKSWAP requires WRITE_TRANSFORMS
 option WRITE_INVERT requires WRITE_TRANSFORMS
 option WRITE_FILLER requires WRITE_TRANSFORMS
@@ -338,10 +363,12 @@ option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS
 
 # This is not required for PNG-compliant encoders, but can cause
 # trouble if left undefined
+
 option WRITE_INTERLACING requires WRITE
 
 # The following depends, internally, on WEIGHT_SHIFT and COST_SHIFT
 # where are set below.
+
 option WRITE_WEIGHTED_FILTER requires WRITE
 
 option WRITE_FLUSH requires WRITE
@@ -369,6 +396,7 @@ option WRITE_ANCILLARY_CHUNKS requires WRITE
 = NO_WRITE_ANCILLARY_CHUNKS WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED
 
 # These options disable *all* the text chunks if turned off
+
 option READ_TEXT requires READ_ANCILLARY_CHUNKS enables TEXT
 option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
 
@@ -385,16 +413,20 @@ option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
 #   can't be changed by the application.
 
 # Check the correctness of cHRM chunks
+
 option CHECK_cHRM requires cHRM
+
 #
 # Artificially align memory - the code typically aligns to 8 byte
 # boundaries if this is switched on, it's a small waste of space
 # but can help (in theory) on some architectures.  Only affects
 # internal structures.  Added at libpng 1.4.0
+
 option ALIGN_MEMORY
 
 # Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
 # See png[wr]util.c, normally this should always be *on*
+
 option POINTER_INDEXING
 
 # Other defines for things like memory and the like can go here.
@@ -408,6 +440,7 @@ option POINTER_INDEXING
 # This controls how fine the quantizing gets.  As this allocates
 # a largish chunk of memory (32K), those who are not as concerned
 # with quantizing quality can decrease some or all of these.
+
 setting QUANTIZE_RED_BITS default 5
 setting QUANTIZE_GREEN_BITS default 5
 setting QUANTIZE_BLUE_BITS default 5
@@ -417,21 +450,25 @@ setting QUANTIZE_BLUE_BITS default 5
 # results in more memory being used, and more pow() functions
 # being called to fill in the gamma tables.  Don't set this value
 # less then 8, and even that may not work (I haven't tested it).
+
 setting MAX_GAMMA_8 default 11
 
 # This controls how much a difference in gamma we can tolerate before
 # we actually start doing gamma conversion, it's a fixed point value,
 # so the default below is 0.05, meaning libpng ignores corrections in
 # the range 0.95 to 1.05
+
 setting GAMMA_THRESHOLD_FIXED default 5000
 
 # Scaling factor for filter heuristic weighting calculations
+
 setting WEIGHT_SHIFT default 8
 setting COST_SHIFT default 3
 
 # Precision to use when converting a floating point value to a PNG
 # extension format string in an sCAL chunk (only relevant if the
 # floating point API is enabled)
+
 setting sCAL_PRECISION default 5
 
 # This is the size of the compression buffer, and thus the size of
@@ -445,6 +482,7 @@ setting sCAL_PRECISION default 5
 # this describes the size of the buffer available to read the data in.
 # Unless this gets smaller than the size of a row (compressed),
 # it should not make much difference how big this is.
+
 setting ZBUF_SIZE default 8192
 
 # Ancillary chunks
@@ -469,6 +507,7 @@ chunk zTXt requires TEXT
 # This only affects support of the optional PLTE chunk in RGB and RGBA
 # images.  Notice that READ_ANCILLARY_CHUNKS therefore disables part
 # of the regular chunk reading too.
+
 option READ_OPT_PLTE requires READ_ANCILLARY_CHUNKS
 
 option READ_UNKNOWN_CHUNKS requires READ
@@ -477,6 +516,7 @@ option READ_USER_CHUNKS requires READ enables USER_CHUNKS
 
 option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
 # The "tm" structure is not supported on WindowsCE
+
 @#ifdef _WIN32_WCE
 @#   define PNG_NO_CONVERT_tIME
 @#endif
@@ -488,10 +528,13 @@ option WRITE_UNKNOWN_CHUNKS requires WRITE
 option HANDLE_AS_UNKNOWN
 
 option SAVE_INT_32 requires WRITE
+
 # png_save_int_32 is required by the ancillary chunks oFFs and pCAL
+
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32
 
 # Turn this off to disable png_read_png() and png_write_png() and
 # leave the row_pointers member out of the info structure.
+
 option INFO_IMAGE

@@ -12,16 +12,19 @@ everything = off
 # All that is required is some read code. This example switches
 # on the sequential read code (see ../preader for a progressive
 # read example).
+
 option SEQUENTIAL_READ on
 
 # You must choose fixed or floating point arithmetic:
 # option FLOATING_POINT on
+
 option FIXED_POINT on
 
 # You must chose the internal fixed point implementation or to
 # use the system floating point.  The latter is considerably
 # smaller (by about 1kbyte on an x86 system):
 # option FLOATING_ARITHMETIC on
+
 option FLOATING_ARITHMETIC off
 
 # Your program will probably need other options.  The example
@@ -31,3 +34,4 @@ option FLOATING_ARITHMETIC off
 option SETJMP on
 option STDIO on
 option READ_EXPAND on
+option READ_16BIT on
