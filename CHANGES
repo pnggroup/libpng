@@ -3025,9 +3025,10 @@ Version 1.5.0beta45 [August 26, 2010]
   Supply default values for PNG_USER_PRIVATEBUILD and PNG_USER_DLLFNAME_POSTFIX
     in pngpriv.h in case the user neglected to define them in their pngusr.h
 
-Version 1.5.0beta46 [August 26, 2010]
+Version 1.5.0beta46 [August 27, 2010]
   Added new private header files to libpng_sources in CMakeLists.txt
   Added PNG_READ_16BIT, PNG_WRITE_16BIT, and PNG_16BIT options.
+  Added reference to scripts/pnglibconf.h.prebuilt in the visualc71 project.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
