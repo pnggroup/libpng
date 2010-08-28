@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta46 - August 26, 2010
+ * libpng version 1.5.0beta46 - August 28, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -749,9 +749,11 @@ PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
     png_bytep row, png_uint_32 flags));
 #endif
 
+#ifdef PNG_16BIT_SUPPORTED
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 PNG_EXTERN void png_do_swap PNGARG((png_row_infop row_info,
     png_bytep row));
+#endif
 #endif
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED) || \

@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.0 [August 27, 2010]
+ * Last changed in libpng 1.5.0 [August 28, 2010]
  * Copyright (c) 2010 Glenn Randers-Pehrson
  * Written by John C. Bowler
  *
