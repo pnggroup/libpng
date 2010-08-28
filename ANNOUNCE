@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta46 - August 28, 2010
+Libpng 1.5.0beta47 - August 28, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta46.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta46.tar.gz
-   1.5.0beta46.tar.bz2
+   1.5.0beta47.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta47.tar.gz
+   1.5.0beta47.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b46.zip
-   lp150b46.7z
+   lp150b47.zip
+   lp150b47.7z
 
 Other information:
 
-   1.5.0beta46-README.txt
-   1.5.0beta46-LICENSE.txt
+   1.5.0beta47-README.txt
+   1.5.0beta47-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -392,6 +392,8 @@ Version 1.5.0beta46 [August 28, 2010]
   Added new private header files to libpng_sources in CMakeLists.txt
   Added PNG_READ_16BIT, PNG_WRITE_16BIT, and PNG_16BIT options.
   Added reference to scripts/pnglibconf.h.prebuilt in the visualc71 project.
+
+Version 1.5.0beta47 [August 28, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
