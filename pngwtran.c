@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * Last changed in libpng 1.5.0 [August 28, 2010]
+ * Last changed in libpng 1.5.0 [September 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -34,7 +34,7 @@ png_do_write_transformations(png_structp png_ptr)
             (png_ptr,                    /* png_ptr */
             &(png_ptr->row_info),           /* row_info: */
                /*  png_uint_32 width;       width of row */
-               /*  png_uint_32 rowbytes;    number of bytes in row */
+               /*  png_size_t rowbytes;     number of bytes in row */
                /*  png_byte color_type;     color type of pixels */
                /*  png_byte bit_depth;      bit depth of samples */
                /*  png_byte channels;       number of channels (1-4) */
@@ -279,9 +279,9 @@ png_do_shift(png_row_infop row_info, png_bytep row,
       if (row_info->bit_depth < 8)
       {
          png_bytep bp = row;
-         png_uint_32 i;
+         png_size_t i;
          png_byte mask;
-         png_uint_32 row_bytes = row_info->rowbytes;
+         png_size_t row_bytes = row_info->rowbytes;
 
          if (bit_depth->gray == 1 && row_info->bit_depth == 2)
             mask = 0x55;

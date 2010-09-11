@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [August 28, 2010]
+ * Last changed in libpng 1.4.1 [September 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -241,12 +241,45 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
 {
    png_size_t count = 0;
 
+   /* zlib can't necessarily handle more than 65535 bytes at once (i.e. it can't
+    * even necessarily handle 65536 bytes) because the type uInt is "16 bits or
+    * more".  Consequently it is necessary to chunk the input to zlib.  This
+    * code uses ZLIB_IO_MAX, from pngpriv.h, as the maximum (the maximum value
+    * that can be stored in a uInt.)  It is possible to set ZLIB_IO_MAX to a
+    * lower value in pngpriv.h and this may sometimes have a performance
+    * advantage, because it forces access of the input data to be separated from
+    * at least some of the use by some period of time.
+    */
    png_ptr->zstream.next_in = data;
-   png_ptr->zstream.avail_in = size;
+   /* avail_in is set below from 'size' */
+   png_ptr->zstream.avail_in = 0;
 
    while (1)
    {
       int ret, avail;
+
+      /* The setting of 'avail_in' used to be outside the loop, by setting it
+       * inside it is possible to chunk the input to zlib and simply rely on
+       * zlib to advance the 'next_in' pointer.  This allows arbitrary amounts o
+       * data to be passed through zlib at the unavoidable cost of requiring a
+       * window save (memcpy of up to 32768 output bytes) every ZLIB_IO_MAX
+       * input bytes.
+       */
+      if (png_ptr->zstream.avail_in == 0 && size > 0)
+      {
+         if (size <= ZLIB_IO_MAX)
+         {
+            /* The value is less than ZLIB_IO_MAX so the cast is safe: */
+            png_ptr->zstream.avail_in = (uInt)size;
+            size = 0;
+         }
+   
+         else
+         {
+            png_ptr->zstream.avail_in = ZLIB_IO_MAX;
+            size -= ZLIB_IO_MAX;
+         }
+      }
 
       /* Reset the output buffer each time round - we empty it
        * after every inflate call.
@@ -1033,7 +1066,8 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_bytep pC;
    png_charp profile;
    png_uint_32 skip = 0;
-   png_uint_32 profile_size, profile_length;
+   png_uint_32 profile_size;
+   png_alloc_size_t profile_length;
    png_size_t slength, prefix_length, data_length;
 
    png_debug(1, "in png_handle_iCCP");
@@ -1128,9 +1162,13 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
                   ((*(pC + 2)) <<  8) |
                   ((*(pC + 3))      );
 
+   /* NOTE: the following guarantees that 'profile_length' fits into 32 bits,
+    * because profile_size is a 32 bit value.
+    */
    if (profile_size < profile_length)
       profile_length = profile_size;
 
+   /* And the following guarantees that profile_size == profile_length. */
    if (profile_size > profile_length)
    {
       png_free(png_ptr, png_ptr->chunkdata);
@@ -1153,7 +1191,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_set_iCCP(png_ptr, info_ptr, png_ptr->chunkdata,
        compression_type, (png_bytep)png_ptr->chunkdata + prefix_length,
-       profile_length);
+       profile_size);
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = NULL;
 }
@@ -1169,7 +1207,8 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_sPLT_entryp pp;
 #endif
-   int data_length, entry_size, i;
+   png_uint_32 data_length;
+   int entry_size, i;
    png_uint_32 skip = 0;
    png_size_t slength;
 
@@ -1214,6 +1253,11 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
+
+   /* WARNING: this may break if size_t is less than 32 bits; it is assumed
+    * that the PNG_MAX_MALLOC_64K test is enabled in this case, but this is a
+    * potential breakage point if the types in pngconf.h aren't exactly right.
+    */
    slength = (png_size_t)length;
    png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
 
@@ -1243,7 +1287,12 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    new_palette.depth = *entry_start++;
    entry_size = (new_palette.depth == 8 ? 6 : 10);
-   data_length = (slength - (entry_start - (png_bytep)png_ptr->chunkdata));
+   /* This must fit in a png_uint_32 because it is derived from the original
+    * chunk data length (and use 'length', not 'slength' here for clarity -
+    * they are guaranteed to be the same, see the tests above.)
+    */
+   data_length = length - (png_uint_32)(entry_start -
+      (png_bytep)png_ptr->chunkdata);
 
    /* Integrity-check the data length */
    if (data_length % entry_size)
@@ -1254,13 +1303,12 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   new_palette.nentries = (png_int_32) ( data_length / entry_size);
-   if ((png_uint_32) new_palette.nentries >
-       (png_uint_32) (PNG_SIZE_MAX / png_sizeof(png_sPLT_entry)))
+   if ((data_length / entry_size) > (PNG_SIZE_MAX / png_sizeof(png_sPLT_entry)))
    {
        png_warning(png_ptr, "sPLT chunk too long");
        return;
    }
+   new_palette.nentries = (png_int_32) ( data_length / entry_size);
 
    new_palette.entries = (png_sPLT_entryp)png_malloc_warn(
        png_ptr, new_palette.nentries * png_sizeof(png_sPLT_entry));
@@ -2969,9 +3017,9 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
 
       case PNG_FILTER_VALUE_SUB:
       {
-         png_uint_32 i;
-         png_uint_32 istop = row_info->rowbytes;
-         png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
+         png_size_t i;
+         png_size_t istop = row_info->rowbytes;
+         unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
          png_bytep rp = row + bpp;
          png_bytep lp = row;
 
@@ -2984,8 +3032,8 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
       }
       case PNG_FILTER_VALUE_UP:
       {
-         png_uint_32 i;
-         png_uint_32 istop = row_info->rowbytes;
+         png_size_t i;
+         png_size_t istop = row_info->rowbytes;
          png_bytep rp = row;
          png_const_bytep pp = prev_row;
 
@@ -2998,12 +3046,12 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
       }
       case PNG_FILTER_VALUE_AVG:
       {
-         png_uint_32 i;
+         png_size_t i;
          png_bytep rp = row;
          png_const_bytep pp = prev_row;
          png_bytep lp = row;
-         png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
-         png_uint_32 istop = row_info->rowbytes - bpp;
+         unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
+         png_size_t istop = row_info->rowbytes - bpp;
 
          for (i = 0; i < bpp; i++)
          {
@@ -3022,13 +3070,13 @@ png_read_filter_row(png_structp png_ptr, png_row_infop row_info, png_bytep row,
       }
       case PNG_FILTER_VALUE_PAETH:
       {
-         png_uint_32 i;
+         png_size_t i;
          png_bytep rp = row;
          png_const_bytep pp = prev_row;
          png_bytep lp = row;
          png_const_bytep cp = prev_row;
-         png_uint_32 bpp = (row_info->pixel_depth + 7) >> 3;
-         png_uint_32 istop=row_info->rowbytes - bpp;
+         unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
+         png_size_t istop=row_info->rowbytes - bpp;
 
          for (i = 0; i < bpp; i++)
          {
@@ -3112,8 +3160,7 @@ png_read_finish_row(png_structp png_ptr)
    {
       png_ptr->row_number = 0;
 
-      png_memset(png_ptr->prev_row, 0,
-          png_ptr->rowbytes + 1);
+      png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
       do
       {
@@ -3427,19 +3474,18 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    }
 
 #ifdef PNG_MAX_MALLOC_64K
-   if ((png_uint_32)png_ptr->rowbytes + 1 > (png_uint_32)65536L)
+   if (png_ptr->rowbytes > 65535)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 
 #endif
-   if ((png_uint_32)png_ptr->rowbytes > (png_uint_32)(PNG_SIZE_MAX - 1))
+   if (png_ptr->rowbytes > (PNG_SIZE_MAX - 1))
       png_error(png_ptr, "Row has too many bytes to allocate in memory");
 
    if (png_ptr->rowbytes + 1 > png_ptr->old_prev_row_size)
    {
       png_free(png_ptr, png_ptr->prev_row);
 
-      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, (png_uint_32)(
-          png_ptr->rowbytes + 1));
+      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, png_ptr->rowbytes + 1);
 
       png_ptr->old_prev_row_size = png_ptr->rowbytes + 1;
    }

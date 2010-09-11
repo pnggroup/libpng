@@ -1,7 +1,7 @@
 
 /* pngwio.c - functions for data output
  *
- * Last changed in libpng 1.5.0 [August 28, 2010]
+ * Last changed in libpng 1.5.0 [September 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -50,7 +50,7 @@ png_write_data(png_structp png_ptr, png_const_bytep data, png_size_t length)
 void PNGCBAPI
 png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   png_uint_32 check;
+   png_size_t check;
 
    if (png_ptr == NULL)
       return;

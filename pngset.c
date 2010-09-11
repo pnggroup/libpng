@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.0 [August 28, 2010]
+ * Last changed in libpng 1.5.0 [September 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1116,17 +1116,28 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
 #endif
 
 void PNGAPI
-png_set_compression_buffer_size(png_structp png_ptr,
-    png_size_t size)
+png_set_compression_buffer_size(png_structp png_ptr, png_size_t size)
 {
     if (png_ptr == NULL)
        return;
 
     png_free(png_ptr, png_ptr->zbuf);
-    png_ptr->zbuf_size = size;
+    if (size > ZLIB_IO_MAX)
+    {
+        png_warning(png_ptr, "Attempt to set buffer size beyond max ignored");
+        png_ptr->zbuf_size = ZLIB_IO_MAX;
+        size = ZLIB_IO_MAX; /* must fit */
+    }
+    else
+        png_ptr->zbuf_size = (uInt)size;
+
     png_ptr->zbuf = (png_bytep)png_malloc(png_ptr, size);
+    /* The following ensures a relatively safe failure if this gets called while
+     * the buffer is actually in use.
+     */
     png_ptr->zstream.next_out = png_ptr->zbuf;
-    png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+    png_ptr->zstream.avail_out = 0;
+    png_ptr->zstream.avail_in = 0;
 }
 
 void PNGAPI
@@ -1170,8 +1181,7 @@ png_set_chunk_malloc_max (png_structp png_ptr,
    png_alloc_size_t user_chunk_malloc_max)
 {
     if (png_ptr)
-       png_ptr->user_chunk_malloc_max =
-          (png_size_t)user_chunk_malloc_max;
+       png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 

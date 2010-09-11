@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.5.0 [August 28, 2010]
+ * Last changed in libpng 1.5.0 [September 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -217,8 +217,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
    if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
    {
       png_bytep rp = row;
-      png_uint_32 i;
-      png_uint_32 istop = row_info->rowbytes;
+      png_size_t i;
+      png_size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i++)
       {
@@ -231,8 +231,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       row_info->bit_depth == 8)
    {
       png_bytep rp = row;
-      png_uint_32 i;
-      png_uint_32 istop = row_info->rowbytes;
+      png_size_t i;
+      png_size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i += 2)
       {
@@ -246,8 +246,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       row_info->bit_depth == 16)
    {
       png_bytep rp = row;
-      png_uint_32 i;
-      png_uint_32 istop = row_info->rowbytes;
+      png_size_t i;
+      png_size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i += 4)
       {

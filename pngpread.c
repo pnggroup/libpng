@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.5.0 [August 28, 2010]
+ * Last changed in libpng 1.5.0 [September 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -582,34 +582,47 @@ png_push_crc_finish(png_structp png_ptr)
 {
    if (png_ptr->skip_length && png_ptr->save_buffer_size)
    {
-      png_size_t save_size;
+      png_size_t save_size = png_ptr->current_buffer_size;
+      png_uint_32 skip_length = png_ptr->skip_length;
 
-      if (png_ptr->skip_length < (png_uint_32)png_ptr->save_buffer_size)
-         save_size = (png_size_t)png_ptr->skip_length;
+      /* We want the smaller of 'skip_length' and 'current_buffer_size', but
+       * they are of different types and we don't know which variable has the
+       * fewest bits.  Carefully select the smaller and cast it to the type of
+       * the larger - this cannot overflow.  Do not cast in the following test
+       * - it will break on either 16 or 64 bit platforms.
+       */
+      if (skip_length < save_size)
+         save_size = (png_size_t)skip_length;
 
       else
-         save_size = png_ptr->save_buffer_size;
+         skip_length = (png_uint_32)save_size;
 
       png_calculate_crc(png_ptr, png_ptr->save_buffer_ptr, save_size);
 
-      png_ptr->skip_length -= save_size;
+      png_ptr->skip_length -= skip_length;
       png_ptr->buffer_size -= save_size;
       png_ptr->save_buffer_size -= save_size;
       png_ptr->save_buffer_ptr += save_size;
    }
    if (png_ptr->skip_length && png_ptr->current_buffer_size)
    {
-      png_size_t save_size;
+      png_size_t save_size = png_ptr->current_buffer_size;
+      png_uint_32 skip_length = png_ptr->skip_length;
 
-      if (png_ptr->skip_length < (png_uint_32)png_ptr->current_buffer_size)
-         save_size = (png_size_t)png_ptr->skip_length;
+      /* We want the smaller of 'skip_length' and 'current_buffer_size', but
+       * they are of different types and we don't know which variable has the
+       * fewest bits.  Carefully select the smaller and cast it to the type of
+       * the larger - this cannot overflow.
+       */
+      if (skip_length < save_size)
+         save_size = (png_size_t)skip_length;
 
       else
-         save_size = png_ptr->current_buffer_size;
+         skip_length = (png_uint_32)save_size;
 
       png_calculate_crc(png_ptr, png_ptr->current_buffer_ptr, save_size);
 
-      png_ptr->skip_length -= save_size;
+      png_ptr->skip_length -= skip_length;
       png_ptr->buffer_size -= save_size;
       png_ptr->current_buffer_size -= save_size;
       png_ptr->current_buffer_ptr += save_size;
@@ -771,49 +784,52 @@ png_push_read_IDAT(png_structp png_ptr)
    }
    if (png_ptr->idat_size && png_ptr->save_buffer_size)
    {
-      png_size_t save_size;
+      png_size_t save_size = png_ptr->save_buffer_size;
+      png_uint_32 idat_size = png_ptr->idat_size;
 
-      if (png_ptr->idat_size < (png_uint_32)png_ptr->save_buffer_size)
-      {
-         save_size = (png_size_t)png_ptr->idat_size;
-
-         /* Check for overflow */
-         if ((png_uint_32)save_size != png_ptr->idat_size)
-            png_error(png_ptr, "save_size overflowed in pngpread");
-      }
+      /* We want the smaller of 'idat_size' and 'current_buffer_size', but they
+       * are of different types and we don't know which variable has the fewest
+       * bits.  Carefully select the smaller and cast it to the type of the
+       * larger - this cannot overflow.  Do not cast in the following test - it
+       * will break on either 16 or 64 bit platforms.
+       */
+      if (idat_size < save_size)
+         save_size = (png_size_t)idat_size;
 
       else
-         save_size = png_ptr->save_buffer_size;
+         idat_size = (png_uint_32)save_size;
 
       png_calculate_crc(png_ptr, png_ptr->save_buffer_ptr, save_size);
 
       png_process_IDAT_data(png_ptr, png_ptr->save_buffer_ptr, save_size);
 
-      png_ptr->idat_size -= save_size;
+      png_ptr->idat_size -= idat_size;
       png_ptr->buffer_size -= save_size;
       png_ptr->save_buffer_size -= save_size;
       png_ptr->save_buffer_ptr += save_size;
    }
+
    if (png_ptr->idat_size && png_ptr->current_buffer_size)
    {
-      png_size_t save_size;
+      png_size_t save_size = png_ptr->current_buffer_size;
+      png_uint_32 idat_size = png_ptr->idat_size;
 
-      if (png_ptr->idat_size < (png_uint_32)png_ptr->current_buffer_size)
-      {
-         save_size = (png_size_t)png_ptr->idat_size;
+      /* We want the smaller of 'idat_size' and 'current_buffer_size', but they
+       * are of different types and we don't know which variable has the fewest
+       * bits.  Carefully select the smaller and cast it to the type of the
+       * larger - this cannot overflow.
+       */
+      if (idat_size < save_size)
+         save_size = (png_size_t)idat_size;
 
-         /* Check for overflow */
-         if ((png_uint_32)save_size != png_ptr->idat_size)
-            png_error(png_ptr, "save_size overflowed in pngpread");
-      }
       else
-         save_size = png_ptr->current_buffer_size;
+         idat_size = (png_uint_32)save_size;
 
       png_calculate_crc(png_ptr, png_ptr->current_buffer_ptr, save_size);
 
       png_process_IDAT_data(png_ptr, png_ptr->current_buffer_ptr, save_size);
 
-      png_ptr->idat_size -= save_size;
+      png_ptr->idat_size -= idat_size;
       png_ptr->buffer_size -= save_size;
       png_ptr->current_buffer_size -= save_size;
       png_ptr->current_buffer_ptr += save_size;

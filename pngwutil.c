@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.5.0 [August 28, 2010]
+ * Last changed in libpng 1.5.0 [September 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -197,7 +197,7 @@ png_write_chunk_end(png_structp png_ptr)
 typedef struct
 {
    png_const_bytep input;   /* The uncompressed input data */
-   int input_len;   /* Its length */
+   png_size_t input_len;   /* Its length */
    int num_output_ptr; /* Number of output pointers used */
    int max_output_ptr; /* Size of output_ptr */
    png_bytep *output_ptr; /* Array of pointers to output */
@@ -396,7 +396,7 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
    /* Handle the no-compression case */
    if (comp->input)
    {
-      png_write_chunk_data(png_ptr, comp->input, (png_size_t)comp->input_len);
+      png_write_chunk_data(png_ptr, comp->input, comp->input_len);
 
       return;
    }
@@ -1766,8 +1766,7 @@ png_write_start_row(png_structp png_ptr)
    /* Set up filtering buffer, if using this filter */
    if (png_ptr->do_filter & PNG_FILTER_SUB)
    {
-      png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
-          (png_alloc_size_t)(png_ptr->rowbytes + 1));
+      png_ptr->sub_row = (png_bytep)png_malloc(png_ptr, png_ptr->rowbytes + 1);
 
       png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
    }
@@ -1782,7 +1781,7 @@ png_write_start_row(png_structp png_ptr)
       if (png_ptr->do_filter & PNG_FILTER_UP)
       {
          png_ptr->up_row = (png_bytep)png_malloc(png_ptr,
-             (png_size_t)(png_ptr->rowbytes + 1));
+            png_ptr->rowbytes + 1);
 
          png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
       }
@@ -1790,7 +1789,7 @@ png_write_start_row(png_structp png_ptr)
       if (png_ptr->do_filter & PNG_FILTER_AVG)
       {
          png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
-             (png_alloc_size_t)(png_ptr->rowbytes + 1));
+             png_ptr->rowbytes + 1);
 
          png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
       }
@@ -1798,7 +1797,7 @@ png_write_start_row(png_structp png_ptr)
       if (png_ptr->do_filter & PNG_FILTER_PAETH)
       {
          png_ptr->paeth_row = (png_bytep)png_malloc(png_ptr,
-             (png_size_t)(png_ptr->rowbytes + 1));
+             png_ptr->rowbytes + 1);
 
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
@@ -2149,7 +2148,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    png_bytep prev_row, row_buf;
    png_uint_32 mins, bpp;
    png_byte filter_to_do = png_ptr->do_filter;
-   png_uint_32 row_bytes = row_info->rowbytes;
+   png_size_t row_bytes = row_info->rowbytes;
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    int num_p_filters = (int)png_ptr->num_prev_filters;
 #endif
@@ -2203,7 +2202,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    {
       png_bytep rp;
       png_uint_32 sum = 0;
-      png_uint_32 i;
+      png_size_t i;
       int v;
 
       for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
@@ -2258,7 +2257,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    /* It's the only filter so no testing is needed */
    {
       png_bytep rp, lp, dp;
-      png_uint_32 i;
+      png_size_t i;
 
       for (i = 0, rp = row_buf + 1, dp = png_ptr->sub_row + 1; i < bpp;
            i++, rp++, dp++)
@@ -2279,7 +2278,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    {
       png_bytep rp, dp, lp;
       png_uint_32 sum = 0, lmins = mins;
-      png_uint_32 i;
+      png_size_t i;
       int v;
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
@@ -2384,7 +2383,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_UP)
    {
       png_bytep rp, dp, pp;
-      png_uint_32 i;
+      png_size_t i;
 
       for (i = 0, rp = row_buf + 1, dp = png_ptr->up_row + 1,
           pp = prev_row + 1; i < row_bytes;
@@ -2399,7 +2398,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    {
       png_bytep rp, dp, pp;
       png_uint_32 sum = 0, lmins = mins;
-      png_uint_32 i;
+      png_size_t i;
       int v;
 
 
@@ -2513,7 +2512,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    {
       png_bytep rp, dp, pp, lp;
       png_uint_32 sum = 0, lmins = mins;
-      png_uint_32 i;
+      png_size_t i;
       int v;
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
@@ -2614,7 +2613,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_PAETH)
    {
       png_bytep rp, dp, pp, cp, lp;
-      png_uint_32 i;
+      png_size_t i;
 
       for (i = 0, rp = row_buf + 1, dp = png_ptr->paeth_row + 1,
           pp = prev_row + 1; i < bpp; i++)
@@ -2654,7 +2653,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    {
       png_bytep rp, dp, pp, cp, lp;
       png_uint_32 sum = 0, lmins = mins;
-      png_uint_32 i;
+      png_size_t i;
       int v;
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
@@ -2807,17 +2806,44 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
 void /* PRIVATE */
 png_write_filtered_row(png_structp png_ptr, png_bytep filtered_row)
 {
+   png_size_t avail;
+
    png_debug(1, "in png_write_filtered_row");
 
    png_debug1(2, "filter = %d", filtered_row[0]);
    /* Set up the zlib input buffer */
 
    png_ptr->zstream.next_in = filtered_row;
-   png_ptr->zstream.avail_in = (uInt)png_ptr->row_info.rowbytes + 1;
+   png_ptr->zstream.avail_in = 0;
+   avail = png_ptr->row_info.rowbytes + 1;
    /* Repeat until we have compressed all the data */
    do
    {
       int ret; /* Return of zlib */
+
+      /* Record the number of bytes available - zlib supports at least 65535
+       * bytes at one step, depending on the size of the zlib type 'uInt', the
+       * maximum size zlib can write at once is ZLIB_IO_MAX (from pngpriv.h).
+       * Use this because on 16 bit systems 'rowbytes' can be up to 65536 (i.e.
+       * one more than 16 bits) and, in this case 'rowbytes+1' can overflow a
+       * uInt.  ZLIB_IO_MAX can be safely reduced to cause zlib to be called
+       * with smaller chunks of data.
+       */
+      if (png_ptr->zstream.avail_in == 0)
+      {
+         if (avail > ZLIB_IO_MAX)
+         {
+            png_ptr->zstream.avail_in  = ZLIB_IO_MAX;
+            avail -= ZLIB_IO_MAX;
+         }
+
+         else
+         {
+            /* So this will fit in the available uInt space: */
+            png_ptr->zstream.avail_in = (uInt)avail;
+            avail = 0;
+         }
+      }
 
       /* Compress the data */
       ret = deflate(&png_ptr->zstream, Z_NO_FLUSH);
@@ -2841,7 +2867,7 @@ png_write_filtered_row(png_structp png_ptr, png_bytep filtered_row)
          png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
       }
    /* Repeat until all data has been compressed */
-   } while (png_ptr->zstream.avail_in);
+   } while (avail > 0 || png_ptr->zstream.avail_in > 0);
 
    /* Swap the current and previous rows */
    if (png_ptr->prev_row != NULL)

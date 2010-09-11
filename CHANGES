@@ -3030,7 +3030,9 @@ Version 1.5.0beta46 [August 28, 2010]
   Added PNG_READ_16BIT, PNG_WRITE_16BIT, and PNG_16BIT options.
   Added reference to scripts/pnglibconf.h.prebuilt in the visualc71 project.
 
-Version 1.5.0beta47 [August 28, 2010]
+Version 1.5.0beta47 [September 11, 2010]
+  Fixed a number of problems with 64-bit compilation reported by Visual
+    Studio 2010 (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

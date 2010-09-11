@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.0 [August 28, 2010]
+ * Last changed in libpng 1.5.0 [September 11, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1545,7 +1545,7 @@ png_do_read_transformations(png_structp png_ptr)
       png_do_quantize(&(png_ptr->row_info), png_ptr->row_buf + 1,
           png_ptr->palette_lookup, png_ptr->quantize_index);
 
-      if (png_ptr->row_info.rowbytes == (png_uint_32)0)
+      if (png_ptr->row_info.rowbytes == 0)
          png_error(png_ptr, "png_do_quantize returned rowbytes=0");
    }
 #endif /* PNG_READ_QUANTIZE_SUPPORTED */
@@ -1614,7 +1614,7 @@ png_do_read_transformations(png_structp png_ptr)
              (png_ptr,                    /* png_ptr */
              &(png_ptr->row_info),     /* row_info: */
                 /*  png_uint_32 width;       width of row */
-                /*  png_uint_32 rowbytes;    number of bytes in row */
+                /*  png_size_t rowbytes;     number of bytes in row */
                 /*  png_byte color_type;     color type of pixels */
                 /*  png_byte bit_depth;      bit depth of samples */
                 /*  png_byte channels;       number of channels (1-4) */
@@ -1788,8 +1788,8 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
          case 2:
          {
             png_bytep bp;
-            png_uint_32 i;
-            png_uint_32 istop = row_info->rowbytes;
+            png_size_t i;
+            png_size_t istop = row_info->rowbytes;
 
             for (bp = row, i = 0; i < istop; i++)
             {
@@ -1802,8 +1802,8 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
          case 4:
          {
             png_bytep bp = row;
-            png_uint_32 i;
-            png_uint_32 istop = row_info->rowbytes;
+            png_size_t i;
+            png_size_t istop = row_info->rowbytes;
             png_byte mask = (png_byte)((((int)0xf0 >> shift[0]) & (int)0xf0) |
                 (png_byte)((int)0xf >> shift[0]));
 

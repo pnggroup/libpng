@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0beta47 - August 28, 2010
+ * libpng version 1.5.0beta47 - September 11, 2010
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -348,6 +348,18 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 
 #define PNG_FLAG_CRC_MASK           (PNG_FLAG_CRC_ANCILLARY_MASK | \
                                      PNG_FLAG_CRC_CRITICAL_MASK)
+
+/* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib
+ * can handle at once.  This type need be no larger than 16 bits (so maximum of
+ * 65535), this define allows us to discover how big it is, but limited by the
+ * maximuum for png_size_t.  The value can be overriden in a library build
+ * (pngusr.h, or set it in CPPFLAGS) and it works to set it to a considerably
+ * lower value (e.g. 255 works).  A lower value may help memory usage (slightly)
+ * and may even improve performance on some systems (and degrade it on others.)
+ */
+#ifndef ZLIB_IO_MAX
+#  define ZLIB_IO_MAX ((uInt)-1)
+#endif
 
 /* Save typing and make code easier to understand */
 

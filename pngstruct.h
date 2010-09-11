@@ -5,7 +5,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng version 1.5.0 - August 28, 2010
+ * Last changed in libpng version 1.5.0 - September 11, 2010
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -63,7 +63,7 @@ struct png_struct_def
 
    z_stream zstream;          /* pointer to decompression structure (below) */
    png_bytep zbuf;            /* buffer for zlib */
-   png_size_t zbuf_size;      /* size of zbuf */
+   uInt zbuf_size;            /* size of zbuf (typically 65536) */
    int zlib_level;            /* holds zlib compression level */
    int zlib_method;           /* holds zlib compression method */
    int zlib_window_bits;      /* holds zlib compression window bits */
@@ -284,7 +284,7 @@ struct png_struct_def
    /* Total memory that a zTXt, sPLT, iTXt, iCCP, or unknown chunk
     * can occupy when decompressed.  0 means unlimited.
     */
-   png_uint_32 user_chunk_malloc_max;
+   png_alloc_size_t user_chunk_malloc_max;
 #endif
 
 /* New member added in libpng-1.0.25 and 1.2.17 */
@@ -294,8 +294,8 @@ struct png_struct_def
 #endif
 
 /* New members added in libpng-1.2.26 */
-  png_uint_32 old_big_row_buf_size;
-  png_uint_32 old_prev_row_size;
+  png_size_t old_big_row_buf_size;
+  png_size_t old_prev_row_size;
 
 /* New member added in libpng-1.2.30 */
   png_charp chunkdata;  /* buffer for reading chunk data */

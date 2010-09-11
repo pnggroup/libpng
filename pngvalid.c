@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.0 [August 28, 2010]
+ * Last changed in libpng 1.5.0 [September 11, 2010]
  * Copyright (c) 2010 Glenn Randers-Pehrson
  * Written by John C. Bowler
  *
@@ -3558,6 +3558,9 @@ int main(int argc, PNG_CONST char **argv)
 
       else if (strcmp(*argv, "--speed") == 0)
          pm.this.speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
+
+      else if (strcmp(*argv, "--nogamma") == 0)
+         pm.ngammas = 0;
 
       else if (strcmp(*argv, "--progressive-read") == 0)
          pm.this.progressive = 1;
