@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta47 - September 11, 2010
+Libpng 1.5.0beta48 - September 11, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta47.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta47.tar.gz
-   1.5.0beta47.tar.bz2
+   1.5.0beta48.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta48.tar.gz
+   1.5.0beta48.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b47.zip
-   lp150b47.7z
+   lp150b48.zip
+   lp150b48.7z
 
 Other information:
 
-   1.5.0beta47-README.txt
-   1.5.0beta47-LICENSE.txt
+   1.5.0beta48-README.txt
+   1.5.0beta48-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -396,6 +396,8 @@ Version 1.5.0beta46 [August 28, 2010]
 Version 1.5.0beta47 [September 11, 2010]
   Fixed a number of problems with 64-bit compilation reported by Visual
     Studio 2010 (John Bowler).
+
+Version 1.5.0beta48 [September 11, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
