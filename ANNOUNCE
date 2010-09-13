@@ -1,5 +1,5 @@
 
-Libpng 1.4.4rc02 - September 13, 2010
+Libpng 1.4.4rc03 - September 13, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.4rc02.tar.xz (LZMA-compressed, recommended)
-   1.4.4rc02.tar.gz
-   1.4.4rc02.tar.bz2
+   1.4.4rc03.tar.xz (LZMA-compressed, recommended)
+   1.4.4rc03.tar.gz
+   1.4.4rc03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp144r02.zip
-   lp144r02.7z
+   lp144r03.zip
+   lp144r03.7z
 
 Other information:
 
-   1.4.4rc02-README.txt
-   1.4.4rc02-LICENSE.txt
+   1.4.4rc03-README.txt
+   1.4.4rc03-LICENSE.txt
 
 Changes since the last public release (1.4.3):
 
@@ -79,6 +79,9 @@ version 1.4.4rc01 [September 10, 2010]
 
 version 1.4.4rc02 [September 13, 2010]
   Revised CMakeLists.txt (Philip Lowman).
+
+version 1.4.4rc03 [September 13, 2010]
+  Removed an extraneous close-double-quote from CMakeLists.txt
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

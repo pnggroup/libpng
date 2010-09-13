@@ -2664,6 +2664,9 @@ version 1.4.4rc01 [September 10, 2010]
 version 1.4.4rc02 [September 13, 2010]
   Revised CMakeLists.txt (Philip Lowman).
 
+version 1.4.4rc03 [September 13, 2010]
+  Removed an extraneous close-double-quote from CMakeLists.txt
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
