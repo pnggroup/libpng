@@ -82,6 +82,7 @@ version 1.4.4rc02 [September 13, 2010]
 
 version 1.4.4rc03 [September 13, 2010]
   Removed an extraneous close-double-quote from CMakeLists.txt
+  Eliminated another deprecated reference to png_ptr->io_ptr in pngtest.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
