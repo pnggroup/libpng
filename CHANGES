@@ -2661,7 +2661,8 @@ version 1.4.4beta08 [September 2, 2010]
 version 1.4.4rc01 [September 10, 2010]
   No changes.
 
-version 1.4.4rc02 [September 10, 2010]
+version 1.4.4rc02 [September 13, 2010]
+  Revised CMakeLists.txt (Philip Lowman).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
