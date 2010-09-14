@@ -3034,7 +3034,10 @@ Version 1.5.0beta47 [September 11, 2010]
   Fixed a number of problems with 64-bit compilation reported by Visual
     Studio 2010 (John Bowler).
 
-Version 1.5.0beta48 [September 11, 2010]
+Version 1.5.0beta48 [September 14, 2010]
+  Updated CMakeLists.txt (Philip Lowman).
+  Revised autogen.sh to recognize and use $AUTOCONF, $AUTOMAKE, $AUTOHEADER,
+    $AUTOPOINT, $ACLOCAL and $LIBTOOLIZE
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
