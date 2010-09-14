@@ -197,7 +197,7 @@ if(PNG_TESTS AND PNG_SHARED)
   # does not work with msvc due to png_lib_ver issue
   add_executable(pngtest ${pngtest_sources})
   target_link_libraries(pngtest ${PNG_LIB_NAME})
-  add_test(pngtest pngtest ${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png)
+  add_test(pngtest ./pngtest ${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png)
 endif()
 
 #

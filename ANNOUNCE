@@ -1,5 +1,5 @@
 
-Libpng 1.4.4rc03 - September 13, 2010
+Libpng 1.4.4rc03 - September 14, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -80,7 +80,7 @@ version 1.4.4rc01 [September 10, 2010]
 version 1.4.4rc02 [September 13, 2010]
   Revised CMakeLists.txt (Philip Lowman).
 
-version 1.4.4rc03 [September 13, 2010]
+version 1.4.4rc03 [September 14, 2010]
   Removed an extraneous close-double-quote from CMakeLists.txt
   Eliminated another deprecated reference to png_ptr->io_ptr in pngtest.c
 
