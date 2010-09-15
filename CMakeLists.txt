@@ -232,17 +232,13 @@ set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
 set(LIBS        "-lz -lm")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc @ONLY)
-  _png_generate_symlink_code(PNG_PC_INSTALL_CODE ${PNGLIB_NAME}.pc libpng.pc)
-  install(CODE ${PNG_PC_INSTALL_CODE})
+_png_generate_symlink_code(PNG_PC_INSTALL_CODE ${PNGLIB_NAME}.pc libpng.pc)
+install(CODE ${PNG_PC_INSTALL_CODE})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config @ONLY)
-  _png_generate_symlink_code(PNG_CONFIG_INSTALL_CODE ${PNGLIB_NAME}-config libpng-config)
+_png_generate_symlink_code(PNG_CONFIG_INSTALL_CODE ${PNGLIB_NAME}-config libpng-config)
 install(CODE ${PNG_CONFIG_INSTALL_CODE})
-  MESSAGE(STATUS \"Symlinking ${PNGLIB_NAME}-config to libpng-config\")
-  execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
-    \"${PNGLIB_NAME}-config\"
-    \"libpng-config\")
 
 # SET UP LINKS
 if(PNG_SHARED)
@@ -278,8 +274,8 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
     install(TARGETS ${PNG_LIB_NAME}
         ${PNG_EXPORT_RULE}
         RUNTIME DESTINATION bin
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
     # Create a symlink for libpng.dll.a => libpng14.dll.a on Cygwin
     if(CYGWIN)
@@ -304,13 +300,13 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
         ${PNG_EXPORT_RULE}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-        if(NOT WIN32 OR CYGWIN)
+    if(NOT WIN32 OR CYGWIN)
       _png_generate_symlink_code(PNG_STATIC_INSTALL_CODE
             ${PNGLIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
             libpng${CMAKE_STATIC_LIBRARY_SUFFIX})
       install(CODE ${PNG_STATIC_INSTALL_CODE})
       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng${CMAKE_STATIC_LIBRARY_SUFFIX} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-        endif()
+    endif()
   endif()
 endif()
 
