@@ -2668,7 +2668,7 @@ version 1.4.4rc03 [September 14, 2010]
   Removed an extraneous close-double-quote from CMakeLists.txt
   Eliminated another deprecated reference to png_ptr->io_ptr in pngtest.c
 
-version 1.4.4rc04 [September 15, 2010]
+version 1.4.4rc04 [September 16, 2010]
   Fixed indentation and removed debugging message from CMakeLists.txt
   Revised autogen.sh to recognize and use $AUTOCONF, $AUTOMAKE, $AUTOHEADER,
     $AUTOPOINT, $ACLOCAL and $LIBTOOLIZE
