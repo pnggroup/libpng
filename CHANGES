@@ -2673,6 +2673,10 @@ version 1.4.4rc04 [September 16, 2010]
   Revised autogen.sh to recognize and use $AUTOCONF, $AUTOMAKE, $AUTOHEADER,
     $AUTOPOINT, $ACLOCAL and $LIBTOOLIZE
 
+version 1.4.4rc05 [September 20, 2010]
+  Rebuilt configure scripts with automake-1.11.1 instead of automake-1.11.
+  Removed unused mkinstalldirs file.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
