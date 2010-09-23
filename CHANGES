@@ -2677,6 +2677,9 @@ version 1.4.4rc05 [September 20, 2010]
   Rebuilt configure scripts with automake-1.11.1 instead of automake-1.11.
   Removed unused mkinstalldirs file.
 
+version 1.4.4 [September 23, 2010]
+  No changes.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
