@@ -2680,6 +2680,9 @@ version 1.4.4rc05 [September 20, 2010]
 version 1.4.4 [September 23, 2010]
   No changes.
 
+version 1.4.5beta01 [September 24, 2010]
+  Fixed configure.ac bug introduced in version 1.4.4rc05.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).

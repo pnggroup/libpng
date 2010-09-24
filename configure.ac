@@ -16,17 +16,17 @@ dnl should not be necessary to regenerate configure if the time
 dnl stamps are correct
 AC_PREREQ(2.59)
 
+AC_INIT([libpng], [1.4.4], [png-mng-implement@lists.sourceforge.net])
+AM_INIT_AUTOMAKE
+dnl stop configure from automagically running automake
+AM_MAINTAINER_MODE
+
 dnl Version number stuff here:
 
 PNGLIB_VERSION=1.4.4
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=4
-PNGLIB_RELEASE=4
-
-AC_INIT([libpng], [1.4.4], [png-mng-implement@lists.sourceforge.net])
-AM_INIT_AUTOMAKE
-dnl stop configure from automagically running automake
-AM_MAINTAINER_MODE
+PNGLIB_RELEASE=5
 
 dnl End of version number stuff
 
