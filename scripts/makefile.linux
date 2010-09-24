@@ -10,7 +10,7 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 14
-RELEASE = 4
+RELEASE = 5
 
 # Shared library names:
 LIBSO=$(LIBNAME).so
