@@ -1,5 +1,5 @@
 
-Libpng 1.4.5beta01 - September 24, 2010
+Libpng 1.4.5beta01 - September 25, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.4.4):
 
-version 1.4.5beta01 [September 24, 2010]
+version 1.4.5beta01 [September 25, 2010]
   Fixed possible configure.ac bug introduced in version 1.4.4rc05.
   Rebuilt configure scripts with autoconf-2.68 instead of autoconf-2.65
 
