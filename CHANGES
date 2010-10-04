@@ -3038,6 +3038,10 @@ Version 1.5.0beta48 [October 4, 2010]
   Updated CMakeLists.txt (Philip Lowman).
   Revised autogen.sh to recognize and use $AUTOCONF, $AUTOMAKE, $AUTOHEADER,
     $AUTOPOINT, $ACLOCAL and $LIBTOOLIZE
+  Fixed problem with symbols creation in Makefile.am which was assuming
+    that CCP writes to standard output by default (Martin Banky).
+
+Version 1.5.0beta49 [October 5, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

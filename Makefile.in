@@ -1290,7 +1290,7 @@ pngvalid.o pngtest.o: pnglibconf.h
 	test -d scripts || mkdir scripts
 	echo '#include "$<"' >dfn.c
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
-	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c >dfn1.out
+	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c dfn1.out
 	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p'\
 	    dfn1.out >dfn2.out
 	$(SED) -e 's| *@@@ *||g' -e 's| *$$||' dfn2.out >dfn3.out
