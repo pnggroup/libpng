@@ -3038,7 +3038,6 @@ Version 1.5.0beta48 [October 4, 2010]
   Updated CMakeLists.txt (Philip Lowman).
   Revised autogen.sh to recognize and use $AUTOCONF, $AUTOMAKE, $AUTOHEADER,
     $AUTOPOINT, $ACLOCAL and $LIBTOOLIZE
-  Rebuilt configure scripts with autoconf-2.68 instead of autoconf-2.65
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
