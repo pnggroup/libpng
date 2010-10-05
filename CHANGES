@@ -2689,6 +2689,8 @@ version 1.4.5beta02 [October 5, 2010]
   Fixed problem with symbols creation in Makefile.am which was assuming
     that CCP writes to standard output by default (Martin Banky).
 
+version 1.4.5beta03 [October 5, 2010]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
