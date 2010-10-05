@@ -12,13 +12,13 @@ check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh
-TESTS_ENVIRONMENT= srcdir=$(srcdir) 
+TESTS_ENVIRONMENT= srcdir=$(srcdir)
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5
 
 # generate the -config scripts if required
-binconfigs= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config 
+binconfigs= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config
 EXTRA_SCRIPTS= libpng-config libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config
 bin_SCRIPTS= @binconfigs@
 
@@ -88,7 +88,8 @@ $(PNGLIB_BASENAME)-config: libpng-config
 
 libpng.sym: png.h pngconf.h
 	rm -f $@ $@.new
-	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h | \
+	$(CPP) @LIBPNG_DEFINES@ $(CPPFLAGS) -DPNG_BUILDSYMS $(srcdir)/png.h $(srcdir)/$@
+	cat $(srcdir)/$@ | \
 		$(SED) -n -e \
 		's|^.*PNG_FUNCTION_EXPORT[ 	]*\([$(AN)]*\).*$$|$(SYMBOL_PREFIX)\1|p' \
 		-e 's|^.*PNG_DATA_EXPORT[ 	]*\([$(AN)]*\).*$$|$(SYMBOL_PREFIX)\1|p' \
