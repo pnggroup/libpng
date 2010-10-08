@@ -3046,6 +3046,7 @@ Version 1.5.0beta49 [October 8, 2010]
   Undid Makefile.am revision of 1.5.0beta48.
 
 Version 1.5.0beta50 [October 8, 2010]
+  Restored mkinstalldirs which was removed from version 1.5.0beta48.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
