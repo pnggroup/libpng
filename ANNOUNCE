@@ -1,5 +1,5 @@
 
-Libpng 1.4.5beta03 - October 5, 2010
+Libpng 1.4.5beta03 - October 8, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -32,11 +32,13 @@ version 1.4.5beta01 [September 25, 2010]
 
 version 1.4.5beta02 [October 5, 2010]
   Reverted configure scripts to autoconf-2.65
-  Fixed problem with symbols creation in Makefile.am which was assuming
-    that CCP writes to standard output by default (Martin Banky).
+  Fixed problem with symbols creation in Makefile.am which was assuming that
+    all versions of cpp write to standard output by default (Martin Banky). The
+    bug was introduced in libpng-1.2.9beta5.
 
-version 1.4.5beta03 [October 5, 2010]
+version 1.4.5beta03 [October 8, 2010]
   Wrapped long lines in CMakeLists.txt and introduced ${libpng_public_hdrs}
+  Undid Makefile revision of 1.4.5beta02.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
