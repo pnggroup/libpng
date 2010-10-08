@@ -1635,7 +1635,7 @@ Version 1.2.9beta5 [March 4, 2006]
   Removed trailing blanks from source files.
   Put version and date of latest change in each source file, and changed
     copyright year accordingly.
-  More cleanup of configure.ac, Makefile.ac, and associated scripts.
+  More cleanup of configure.ac, Makefile.am, and associated scripts.
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 Version 1.2.9beta6 [March 6, 2006]
@@ -3038,10 +3038,12 @@ Version 1.5.0beta48 [October 4, 2010]
   Updated CMakeLists.txt (Philip Lowman).
   Revised autogen.sh to recognize and use $AUTOCONF, $AUTOMAKE, $AUTOHEADER,
     $AUTOPOINT, $ACLOCAL and $LIBTOOLIZE
-  Fixed problem with symbols creation in Makefile.am which was assuming
-    that CCP writes to standard output by default (Martin Banky).
+  Fixed problem with symbols creation in Makefile.am which was assuming that
+    all versions of ccp write to standard output by default (Martin Banky). The
+    bug was introduced in libpng-1.2.9beta5.
 
-Version 1.5.0beta49 [October 5, 2010]
+Version 1.5.0beta49 [October 8, 2010]
+  Undid Makefile.am revision of 1.5.0beta48.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
