@@ -50,14 +50,14 @@ DIST_COMMON = README $(am__configure_deps) $(dist_man_MANS) \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(srcdir)/libpng-config.in $(srcdir)/libpng.pc.in \
 	$(top_srcdir)/configure INSTALL TODO config.guess config.sub \
-	depcomp install-sh ltmain.sh missing mkinstalldirs
+	depcomp install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = libpng.pc libpng-config
 CONFIG_CLEAN_VPATH_FILES =
