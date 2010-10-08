@@ -821,8 +821,8 @@ store_pool_delete(png_store *ps, store_pool *pool)
          pool->list = next->next;
          next->next = NULL;
 
-         fprintf(stderr, "\t%ud bytes @ %p\n",
-             (unsigned int)next->size, next+1);
+         fprintf(stderr, "\t%lu bytes @ %p\n",
+             (unsigned long)next->size, next+1);
          /* The NULL means this will always return, even if the memory is
           * corrupted.
           */
@@ -3651,14 +3651,14 @@ int main(int argc, PNG_CONST char **argv)
                "(warnings)" : "(no errors or warnings)")
       );
       printf("Allocated memory statistics (in bytes):\n"
-         "\tread  %u maximum single, %u peak, %u total\n"
-         "\twrite %u maximum single, %u peak, %u total\n",
-         (unsigned int)pm.this.read_memory_pool.max_max,
-         (unsigned int)pm.this.read_memory_pool.max_limit,
-         (unsigned int)pm.this.read_memory_pool.max_total,
-         (unsigned int)pm.this.write_memory_pool.max_max,
-         (unsigned int)pm.this.write_memory_pool.max_limit,
-         (unsigned int)pm.this.write_memory_pool.max_total);
+         "\tread  %lu maximum single, %lu peak, %lu total\n"
+         "\twrite %lu maximum single, %lu peak, %lu total\n",
+         (unsigned long)pm.this.read_memory_pool.max_max,
+         (unsigned long)pm.this.read_memory_pool.max_limit,
+         (unsigned long)pm.this.read_memory_pool.max_total,
+         (unsigned long)pm.this.write_memory_pool.max_max,
+         (unsigned long)pm.this.write_memory_pool.max_limit,
+         (unsigned long)pm.this.write_memory_pool.max_total);
    }
 
    /* Do this here to provoke memory corruption errors in memory not directly
