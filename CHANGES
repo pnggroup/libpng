@@ -3046,9 +3046,10 @@ Version 1.5.0beta48 [October 4, 2010]
 Version 1.5.0beta49 [October 8, 2010]
   Undid Makefile.am revision of 1.5.0beta48.
 
-Version 1.5.0beta50 [October 8, 2010]
+Version 1.5.0beta50 [October 12, 2010]
   Revised Makefile.in to account for mkinstalldirs being removed.
   Added some "(unsigned long)" typecasts in printf statements in pngvalid.c.
+  Suppressed a compiler warning in png_handle_sPLT().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

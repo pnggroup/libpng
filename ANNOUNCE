@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta50 - October 8, 2010
+Libpng 1.5.0beta50 - October 12, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -226,7 +226,7 @@ version 1.5.0beta24 [May 7, 2010]
     offset of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
   Added more blank lines for readability.
 
-version 1.5.0beta25 [October 8, 2010]
+version 1.5.0beta25 [October 12, 2010]
   In pngpread.c: png_push_have_row() add check for new_row > height
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
@@ -408,9 +408,10 @@ Version 1.5.0beta48 [October 4, 2010]
 Version 1.5.0beta49 [October 8, 2010]
   Undid Makefile.am revision of 1.5.0beta48.
 
-Version 1.5.0beta50 [October 8, 2010]
+Version 1.5.0beta50 [October 12, 2010]
   Revised Makefile.in to account for mkinstalldirs being removed.
   Added some "(unsigned long)" typecasts in printf statements in pngvalid.c.
+  Suppressed a compiler warning in png_handle_sPLT().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

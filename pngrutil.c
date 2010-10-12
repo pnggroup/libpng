@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [October 8, 2010]
+ * Last changed in libpng 1.4.1 [October 12, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1211,6 +1211,8 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    int entry_size, i;
    png_uint_32 skip = 0;
    png_size_t slength;
+   png_uint_32 dl;
+   png_size_t max_dl;
 
    png_debug(1, "in png_handle_sPLT");
 
@@ -1303,13 +1305,16 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   if ((data_length / entry_size) > (PNG_SIZE_MAX / png_sizeof(png_sPLT_entry)))
+   dl = (png_int_32) ( data_length / entry_size);
+   max_dl = PNG_SIZE_MAX / png_sizeof(png_sPLT_entry);
+
+   if (dl > max_dl)
    {
        png_warning(png_ptr, "sPLT chunk too long");
        return;
    }
-   new_palette.nentries = (png_int_32) ( data_length / entry_size);
 
+   new_palette.nentries = (png_int_32) ( data_length / entry_size);
    new_palette.entries = (png_sPLT_entryp)png_malloc_warn(
        png_ptr, new_palette.nentries * png_sizeof(png_sPLT_entry));
 
