@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.5.0 [October 8, 2010]
+ * Last changed in libpng 1.5.0 [October 12, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -521,7 +521,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       return;
 
    png_debug2(1, "in png_read_row (row %lu, pass %d)",
-       (unsigned long) png_ptr->row_number, png_ptr->pass);
+       (unsigned long)png_ptr->row_number, png_ptr->pass);
 
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))
       png_read_start_row(png_ptr);

@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.0 [October 8, 2010]
+ * Last changed in libpng 1.5.0 [October 12, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -650,7 +650,7 @@ png_uint_32 PNGAPI
 png_access_version_number(void)
 {
    /* Version of *.c files used when building libpng */
-   return((png_uint_32) PNG_LIBPNG_VER);
+   return((png_uint_32)PNG_LIBPNG_VER);
 }
 
 
@@ -695,14 +695,14 @@ png_check_cHRM_fixed(png_structp png_ptr,
         "Ignoring attempt to set negative chromaticity value");
       ret = 0;
    }
-   if (white_x > (png_fixed_point) PNG_UINT_31_MAX ||
-       white_y > (png_fixed_point) PNG_UINT_31_MAX ||
-         red_x > (png_fixed_point) PNG_UINT_31_MAX ||
-         red_y > (png_fixed_point) PNG_UINT_31_MAX ||
-       green_x > (png_fixed_point) PNG_UINT_31_MAX ||
-       green_y > (png_fixed_point) PNG_UINT_31_MAX ||
-        blue_x > (png_fixed_point) PNG_UINT_31_MAX ||
-        blue_y > (png_fixed_point) PNG_UINT_31_MAX )
+   if (white_x > (png_fixed_point)PNG_UINT_31_MAX ||
+       white_y > (png_fixed_point)PNG_UINT_31_MAX ||
+         red_x > (png_fixed_point)PNG_UINT_31_MAX ||
+         red_y > (png_fixed_point)PNG_UINT_31_MAX ||
+       green_x > (png_fixed_point)PNG_UINT_31_MAX ||
+       green_y > (png_fixed_point)PNG_UINT_31_MAX ||
+        blue_x > (png_fixed_point)PNG_UINT_31_MAX ||
+        blue_y > (png_fixed_point)PNG_UINT_31_MAX )
    {
       png_warning(png_ptr,
         "Ignoring attempt to set chromaticity value exceeding 21474.83");

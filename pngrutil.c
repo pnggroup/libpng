@@ -1305,7 +1305,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   dl = (png_int_32) ( data_length / entry_size);
+   dl = (png_int_32)( data_length / entry_size);
    max_dl = PNG_SIZE_MAX / png_sizeof(png_sPLT_entry);
 
    if (dl > max_dl)
@@ -1314,7 +1314,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        return;
    }
 
-   new_palette.nentries = (png_int_32) ( data_length / entry_size);
+   new_palette.nentries = (png_int_32)( data_length / entry_size);
    new_palette.entries = (png_sPLT_entryp)png_malloc_warn(
        png_ptr, new_palette.nentries * png_sizeof(png_sPLT_entry));
 
@@ -1617,8 +1617,8 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    num = length / 2 ;
-   if (num != (unsigned int) png_ptr->num_palette || num >
-       (unsigned int) PNG_MAX_PALETTE_LENGTH)
+   if (num != (unsigned int)png_ptr->num_palette || num >
+       (unsigned int)PNG_MAX_PALETTE_LENGTH)
    {
       png_warning(png_ptr, "Incorrect hIST chunk length");
       png_crc_finish(png_ptr, length);

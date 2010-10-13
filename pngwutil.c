@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.5.0 [October 8, 2010]
+ * Last changed in libpng 1.5.0 [October 12, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1616,7 +1616,7 @@ png_write_pCAL(png_structp png_ptr, png_charp purpose, png_int_32 X0,
    {
       params_len[i] = png_strlen(params[i]) + (i == nparams - 1 ? 0 : 1);
       png_debug2(3, "pCAL parameter %d length = %lu", i,
-          (unsigned long) params_len[i]);
+          (unsigned long)params_len[i]);
       total_len += (png_size_t)params_len[i];
    }
 
