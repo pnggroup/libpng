@@ -677,13 +677,14 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
       if (text_ptr[i].key == NULL)
           continue;
 
-      key_len = png_strlen(text_ptr[i].key);
-
-      if (text_ptr[i].compression >= PNG_TEXT_COMPRESSION_LAST)
+      if (text_ptr[i].compression < PNG_TEXT_COMPRESSION_NONE ||
+          text_ptr[i].compression >= PNG_TEXT_COMPRESSION_LAST)
       {
          png_warning(png_ptr, "text compression mode is out of range");
          continue;
       }
+
+      key_len = png_strlen(text_ptr[i].key);
 
       if (text_ptr[i].compression <= 0)
       {
