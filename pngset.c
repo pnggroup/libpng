@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.0 [October 8, 2010]
+ * Last changed in libpng 1.5.0 [October 13, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -678,6 +678,12 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
           continue;
 
       key_len = png_strlen(text_ptr[i].key);
+
+      if (text_ptr[i].compression >= PNG_TEXT_COMPRESSION_LAST)
+      {
+         png_warning(png_ptr, "text compression mode is out of range");
+         continue;
+      }
 
       if (text_ptr[i].compression <= 0)
       {
