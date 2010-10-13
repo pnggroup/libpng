@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.5.0 [October 8, 2010]
+ * Last changed in libpng 1.5.0 [October 13, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1410,7 +1410,7 @@ png_push_read_zTXt(png_structp png_ptr, png_infop info_ptr)
 
       text++;
 
-      png_ptr->zstream.next_in = (png_bytep )text;
+      png_ptr->zstream.next_in = (png_bytep)text;
       png_ptr->zstream.avail_in = (uInt)(png_ptr->current_text_size -
           (text - key));
       png_ptr->zstream.next_out = png_ptr->zbuf;

@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.0 [October 12, 2010]
+ * Last changed in libpng 1.5.0 [October 13, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -560,13 +560,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.0beta50 - October 8, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.5.0beta50 - October 13, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.0beta50 - October 8, 2010\
+      return "libpng version 1.5.0beta50 - October 13, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -794,13 +794,13 @@ png_check_IHDR(png_structp png_ptr,
       error = 1;
    }
 
-   if ( height > PNG_UINT_31_MAX)
+   if (height > PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Invalid image height in IHDR");
       error = 1;
    }
 
-   if ( width > (PNG_UINT_32_MAX
+   if (width > (PNG_UINT_32_MAX
                  >> 3)      /* 8-byte RGBA pixels */
                  - 64       /* bigrowbuf hack */
                  - 1        /* filter byte */

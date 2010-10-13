@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.0 [October 8, 2010]
+ * Last changed in libpng 1.5.0 [October 13, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -506,7 +506,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
       int num_blue = (1 << PNG_QUANTIZE_BLUE_BITS);
       png_size_t num_entries = ((png_size_t)1 << total_bits);
 
-      png_ptr->palette_lookup = (png_bytep )png_calloc(png_ptr,
+      png_ptr->palette_lookup = (png_bytep)png_calloc(png_ptr,
           (png_uint_32)(num_entries * png_sizeof(png_byte)));
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
@@ -999,7 +999,7 @@ png_init_read_transformations(png_structp png_ptr)
                      break;
                }
 
-               if ( png_gamma_significant(gs) )
+               if (png_gamma_significant(gs))
                {
                   back.red   = (png_byte)png_ptr->background.red;
                   back.green = (png_byte)png_ptr->background.green;
@@ -1507,7 +1507,7 @@ png_do_read_transformations(png_structp png_ptr)
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
    if ((png_ptr->transformations & PNG_BACKGROUND) &&
-       ((png_ptr->num_trans != 0 ) ||
+       ((png_ptr->num_trans != 0) ||
        (png_ptr->color_type & PNG_COLOR_MASK_ALPHA)))
       png_do_background(&(png_ptr->row_info), png_ptr->row_buf + 1,
           &(png_ptr->trans_color), &(png_ptr->background)
@@ -4176,7 +4176,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
             png_uint_32 s2   = (*(rp + 4) << 8) | *(rp + 5);
             png_uint_32 red  = (png_uint_32)((s0 + s1 + 65536L) & 0xffffL);
             png_uint_32 blue = (png_uint_32)((s2 + s1 + 65536L) & 0xffffL);
-            *(rp  ) = (png_byte)((red >> 8) & 0xff);
+            *(rp    ) = (png_byte)((red >> 8) & 0xff);
             *(rp + 1) = (png_byte)(red & 0xff);
             *(rp + 4) = (png_byte)((blue >> 8) & 0xff);
             *(rp + 5) = (png_byte)(blue & 0xff);

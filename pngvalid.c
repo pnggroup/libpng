@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.0 [October 8, 2010]
+ * Last changed in libpng 1.5.0 [October 13, 2010]
  * Copyright (c) 2010 Glenn Randers-Pehrson
  * Written by John C. Bowler
  *
@@ -970,7 +970,7 @@ set_store_for_write(png_store *ps, png_infopp ppi,
    return ps->pwrite;
 }
 
-/* Cleanup when finished reading (either due to error or in the success case. )
+/* Cleanup when finished reading (either due to error or in the success case).
  */
 static void
 store_read_reset(png_store *ps)
@@ -2838,7 +2838,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
     * decoder to assume that the PNG values have been scaled if sBIT is
     * presence:
     *
-    *     png-sample = floor( input-sample * (max-out/max-in) + .5 );
+    *     png-sample = floor( input-sample * (max-out/max-in) + .5);
     *
     * This means that only a subset of the possible PNG values should
     * appear in the input, however the spec allows the encoder to use a

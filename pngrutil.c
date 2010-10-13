@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.1 [October 12, 2010]
+ * Last changed in libpng 1.4.1 [October 13, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1124,7 +1124,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* There should be at least one zero (the compression type byte)
     * following the separator, and we should be on it
     */
-   if ( profile >= png_ptr->chunkdata + slength - 1)
+   if (profile >= png_ptr->chunkdata + slength - 1)
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
@@ -1305,7 +1305,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   dl = (png_int_32)( data_length / entry_size);
+   dl = (png_int_32)(data_length / entry_size);
    max_dl = PNG_SIZE_MAX / png_sizeof(png_sPLT_entry);
 
    if (dl > max_dl)
@@ -1314,7 +1314,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
        return;
    }
 
-   new_palette.nentries = (png_int_32)( data_length / entry_size);
+   new_palette.nentries = (png_int_32)(data_length / entry_size);
    new_palette.entries = (png_sPLT_entryp)png_malloc_warn(
        png_ptr, new_palette.nentries * png_sizeof(png_sPLT_entry));
 
