@@ -29,7 +29,7 @@ PNG_DEFN_MAGIC-;OS2 DESCRIPTION	"PNG image compression library"-PNG_DEFN_END
 PNG_DEFN_MAGIC-;OS2 CODE		PRELOAD MOVEABLE DISCARDABLE-PNG_DEFN_END
 PNG_DEFN_MAGIC--PNG_DEFN_END
 PNG_DEFN_MAGIC-EXPORTS-PNG_DEFN_END
-PNG_DEFN_MAGIC-;Version 1.5.0beta50-PNG_DEFN_END
+PNG_DEFN_MAGIC-;Version 1.5.0beta51-PNG_DEFN_END
 
 /* Read the defaults, but use scripts/pnglibconf.h.prebuilt; the 'standard'
  * header file.
