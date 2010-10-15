@@ -3052,7 +3052,7 @@ Version 1.5.0beta50 [October 14, 2010]
   Suppressed a compiler warning in png_handle_sPLT().
   Check for out-of-range text compression mode in png_set_text().
 
-Version 1.5.0beta51 [October 14, 2010]
+Version 1.5.0beta51 [(PENDING RELEASE)]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
