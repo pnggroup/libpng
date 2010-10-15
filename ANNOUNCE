@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta51 - (PENDING RELEASE)
+Libpng 1.5.0beta52 - (PENDING RELEASE)
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta51.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta51.tar.gz
-   1.5.0beta51.tar.bz2
+   1.5.0beta52.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta52.tar.gz
+   1.5.0beta52.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b51.zip
-   lp150b51.7z
+   lp150b52.zip
+   lp150b52.7z
 
 Other information:
 
-   1.5.0beta51-README.txt
-   1.5.0beta51-LICENSE.txt
+   1.5.0beta52-README.txt
+   1.5.0beta52-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -414,7 +414,12 @@ Version 1.5.0beta50 [October 14, 2010]
   Suppressed a compiler warning in png_handle_sPLT().
   Check for out-of-range text compression mode in png_set_text().
 
-Version 1.5.0beta51 [(PENDING RELEASE)]
+Version 1.5.0beta51 [October 15, 2010]
+  Changed embedded dates to "(PENDING RELEASE) in beta releases (and future
+    rc releases) to minimize the difference between releases.
+
+Version 1.5.0beta52 [(PENDING RELEASE)]
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
