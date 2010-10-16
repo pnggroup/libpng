@@ -3059,6 +3059,8 @@ Version 1.5.0beta51 [October 15, 2010]
 Version 1.5.0beta52 [October 16, 2010]
   Restored some of the embedded dates (in png.h, png.c, documentation, etc.)
 
+Version 1.5.0beta53 [October 16, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
