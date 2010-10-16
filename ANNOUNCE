@@ -424,6 +424,8 @@ Version 1.5.0beta52 [October 16, 2010]
 Version 1.5.0beta53 [October 16, 2010]
   Updated INSTALL to mention using "make maintainer-clean" and to remove
     obsolete statement about a custom ltmain.sh
+  Disabled "color-tests" by default in Makefile.am so it will work with
+    automake versions earlier than 1.11.1
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
