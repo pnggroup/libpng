@@ -3056,7 +3056,8 @@ Version 1.5.0beta51 [October 15, 2010]
   Changed embedded dates to "(PENDING RELEASE) in beta releases (and future
     rc releases) to minimize the difference between releases.
 
-Version 1.5.0beta52 [October 15, 2010]
+Version 1.5.0beta52 [October 16, 2010]
+  Restored some of the embedded dates (in png.h, png.c, documentation, etc.)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
