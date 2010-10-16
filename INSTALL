@@ -1,5 +1,5 @@
 
-Installing libpng version 1.5.0beta53 - October 16, 2010
+Installing libpng
 
 On Unix/Linux and similar systems, you can simply type
 
@@ -13,10 +13,15 @@ If configure does not work on your system and you have a reasonably
 up-to-date set of tools, running ./autogen.sh before running ./configure
 may fix the problem.  You can also run the individual commands in
 autogen.sh with the --force option, if supported by your version of
-the tools.  If you run 'libtoolize --force', though, this will replace
-the distributed, patched, version of ltmain.sh with an unpatched version
-and your shared library builds may fail to produce libraries with the
-correct version numbers.
+the tools.  To be really sure that you aren't using any of the included
+pre-built scripts, you can do this:
+
+    ../configure --enable-maintainer-mode
+    make maintainer-clean
+    ../configure [--prefix=/path] [other options]
+    make
+    make install
+    make check
 
 Instead, you can use one of the custom-built makefiles in the
 "scripts" directory
@@ -46,8 +51,8 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.5.0beta53" or "libpng15" and "zlib-1.2.3"
-or "zlib123") so that you have directories called "zlib" and "libpng".
+might be called "libpng-x.y.z" or "libpngNN" and "zlib-1.2.5"
+or "zlib125") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
 
@@ -60,8 +65,6 @@ Your directory structure should look like this:
           CMakeLists.txt    =>  "cmake" script
           configuration files:
              configure.ac, configure, Makefile.am, Makefile.in,
-             autogen.sh, config.guess, ltmain.sh, missing,
-             aclocal.m4, config.h.in, config.sub,
              autogen.sh, config.guess, ltmain.sh, missing, libpng.pc.in,
              libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
@@ -72,10 +75,8 @@ Your directory structure should look like this:
              pngsuite
              visupng
           projects
-             cbuilder5 (Borland)
-             visualc6 (msvc)
              visualc71
-             xcode
+             vstudio
           scripts
              makefile.*
              *.def (module definition files)
