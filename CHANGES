@@ -3059,11 +3059,13 @@ Version 1.5.0beta51 [October 15, 2010]
 Version 1.5.0beta52 [October 16, 2010]
   Restored some of the embedded dates (in png.h, png.c, documentation, etc.)
 
-Version 1.5.0beta53 [October 16, 2010]
+Version 1.5.0beta53 [October 17, 2010]
   Updated INSTALL to mention using "make maintainer-clean" and to remove
     obsolete statement about a custom ltmain.sh
   Disabled "color-tests" by default in Makefile.am so it will work with
     automake versions earlier than 1.11.1
+  Use document name "libpng.txt" instead of "libpng-version.txt" as it was
+    prior to libpng-1.2.16beta2, to simplify version differences.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
