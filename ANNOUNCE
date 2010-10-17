@@ -428,6 +428,7 @@ Version 1.5.0beta53 [October 17, 2010]
     automake versions earlier than 1.11.1
   Use document name "libpng.txt" instead of "libpng-version.txt" as it was
     prior to libpng-1.2.16beta2, to simplify version differences.
+  Removed obsolete remarks about setjmp handling from INSTALL.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

@@ -112,7 +112,7 @@ scripts directory into this directory, for example
 Read the makefile to see if you need to change any source or
 target directories to match your preferences.
 
-Then read pngconf.h to see if you want to make any configuration
+Then read pnglibconf.dfa to see if you want to make any configuration
 changes.
 
 Then just run "make" which will create the libpng library in
@@ -129,19 +129,6 @@ put the library in its final resting place (if you want to
 do that, run "make install" in the zlib directory first if necessary).
 Some also allow you to run "make test-installed" after you have
 run "make install".
-
-If you encounter a compiler error message complaining about the
-lines
-
-      __png.h__ already includes setjmp.h;
-      __dont__ include it again.;
-
-this means you have compiled another module that includes setjmp.h,
-which is hazardous because the two modules might not include exactly
-the same setjmp.h.  If you are sure that you know what you are doing
-and that they are exactly the same, then you can comment out or
-delete the two lines.  Better yet, use the cexcept interface
-instead, as demonstrated in contrib/visupng of the libpng distribution.
 
 Further information can be found in the README and libpng.txt
 files, in the individual makefiles, in png.h, and the manual pages
