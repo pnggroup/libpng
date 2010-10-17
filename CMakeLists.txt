@@ -367,7 +367,7 @@ if(PNG_EXPORT_RULE AND NOT SKIP_INSTALL_EXPORT AND NOT SKIP_INSTALL_ALL )
   install(EXPORT libpng DESTINATION lib/libpng FILE lib${PNG_LIB_NAME}.cmake)
 endif()
 
-# what's with libpng.txt and all the extra files?
+# what's with libpng-manual.txt and all the extra files?
 
 
 # UNINSTALL
