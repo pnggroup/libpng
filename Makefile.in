@@ -344,7 +344,7 @@ EXTRA_DIST = \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
 	$(TESTS) \
-	CMakeLists.txt example.c libpng-@PNGLIB_VERSION@.txt
+	CMakeLists.txt example.c libpng.txt
 
 SCRIPT_CLEANFILES = scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
 CLEANFILES = dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
