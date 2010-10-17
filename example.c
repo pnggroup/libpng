@@ -10,7 +10,7 @@
  */
 
 /* This is an example of how to use libpng to read and write PNG files.
- * The file libpng.txt is much more verbose then this.  If you have not
+ * The file libpng-manual.txt is much more verbose then this.  If you have not
  * read it, do so first.  This was designed to be a starting point of an
  * implementation.  This is not officially part of libpng, is hereby placed
  * in the public domain, and therefore does not require a copyright notice.

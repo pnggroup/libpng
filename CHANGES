@@ -3064,8 +3064,8 @@ Version 1.5.0beta53 [October 17, 2010]
     obsolete statement about a custom ltmain.sh
   Disabled "color-tests" by default in Makefile.am so it will work with
     automake versions earlier than 1.11.1
-  Use document name "libpng.txt" instead of "libpng-version.txt" as it was
-    prior to libpng-1.2.16beta2, to simplify version differences.
+  Use document name "libpng-manual.txt" instead of "libpng-<version>.txt"
+    to simplify version differences.
   Removed obsolete remarks about setjmp handling from INSTALL.
   Revised and renamed the typedef in png.h and png.c that was designed
     to catch library and header mismatch.

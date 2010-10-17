@@ -1,4 +1,4 @@
-README for libpng version 1.5.0beta53 - October 16, 2010 (shared library 15.0)
+README for libpng version 1.5.0beta53 - October 17, 2010 (shared library 15.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -58,7 +58,7 @@ on the PNG-implement mailing list and not on material submitted
 privately to Guy, Andreas, or Glenn.  They will forward any good
 suggestions to the list.
 
-For a detailed description on using libpng, read libpng.txt.  For
+For a detailed description on using libpng, read libpng-manual.txt.  For
 examples of libpng in a program, see example.c and pngtest.c.  For usage
 information and restrictions (what little they are) on libpng, see
 png.h.  For a description on using zlib (the compression library used by
@@ -141,8 +141,8 @@ Files in this distribution:
       TODO          =>  Things not implemented in the current library
       Y2KINFO       =>  Statement of Y2K compliance
       example.c     =>  Example code for using libpng functions
-      libpng.3      =>  manual page for libpng (includes libpng.txt)
-      libpng.txt    =>  Description of libpng and its functions
+      libpng.3      =>  manual page for libpng (includes libpng-manual.txt)
+      libpng-manual.txt  =>  Description of libpng and its functions
       libpngpf.3    =>  manual page for libpng's private functions
       png.5         =>  manual page for the PNG format
       png.c         =>  Basic interface functions common to library

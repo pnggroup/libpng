@@ -159,9 +159,9 @@
  *   DLLNUM will change each time there are forward or backward changes
  *   in binary compatibility (e.g., when a new feature is added).
  *
- * See libpng.txt or libpng.3 for more information.  The PNG specification
- * is available as a W3C Recommendation and as an ISO Specification,
- * <http://www.w3.org/TR/2003/REC-PNG-20031110/
+ * See libpng-manual.txt or libpng.3 for more information.  The PNG
+ * specification is available as a W3C Recommendation and as an ISO
+ * Specification, <http://www.w3.org/TR/2003/REC-PNG-20031110/
  */
 
 /*
@@ -339,7 +339,7 @@
 #ifndef PNG_H
 #define PNG_H
 
-/* This is not the place to learn how to use libpng.  The file libpng.txt
+/* This is not the place to learn how to use libpng. The file libpng-manual.txt
  * describes how to use libpng, and the file example.c summarizes it
  * with some code on which to build.  This file is useful for looking
  * at the actual function definitions and structure components.
@@ -878,7 +878,7 @@ typedef png_struct FAR * FAR * png_structpp;
 
 /* Section 3: exported functions
  * Here are the function definitions most commonly used.  This is not
- * the place to find out how to use libpng.  See libpng.txt for the
+ * the place to find out how to use libpng.  See libpng-manual.txt for the
  * full explanation, see example.c for the summary.  This just provides
  * a simple one line description of the use of each function.
  */
@@ -1355,7 +1355,7 @@ PNG_EXPORT(void,png_set_compression_method,(png_structp png_ptr, int method),,
  * and call standard C I/O routines such as fread(), fwrite(), and
  * fprintf().  These functions can be made to use other I/O routines
  * at run time for those applications that need to handle I/O in a
- * different manner by calling png_set_???_fn().  See libpng.txt for
+ * different manner by calling png_set_???_fn().  See libpng-manual.txt for
  * more information.
  */
 

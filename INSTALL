@@ -130,6 +130,6 @@ do that, run "make install" in the zlib directory first if necessary).
 Some also allow you to run "make test-installed" after you have
 run "make install".
 
-Further information can be found in the README and libpng.txt
+Further information can be found in the README and libpng-manual.txt
 files, in the individual makefiles, in png.h, and the manual pages
 libpng.3 and png.5.
