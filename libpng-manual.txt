@@ -1,4 +1,4 @@
-libpng.txt - A description on how to use and modify libpng
+libpng-manual.txt - A description on how to use and modify libpng
 
  libpng version 1.5.0beta53 - October 17, 2010
  Updated and distributed by Glenn Randers-Pehrson
