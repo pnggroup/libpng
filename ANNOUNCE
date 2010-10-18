@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta53 - October 18, 2010
+Libpng 1.5.0beta54 - October 18, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta53.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta53.tar.gz
-   1.5.0beta53.tar.bz2
+   1.5.0beta54.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta54.tar.gz
+   1.5.0beta54.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b53.zip
-   lp150b53.7z
+   lp150b54.zip
+   lp150b54.7z
 
 Other information:
 
-   1.5.0beta53-README.txt
-   1.5.0beta53-LICENSE.txt
+   1.5.0beta54-README.txt
+   1.5.0beta54-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -431,6 +431,8 @@ Version 1.5.0beta53 [October 18, 2010]
   Removed obsolete remarks about setjmp handling from INSTALL.
   Revised and renamed the typedef in png.h and png.c that was designed
     to catch library and header mismatch.
+
+Version 1.5.0beta54 [October 18, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
