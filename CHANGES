@@ -3059,7 +3059,7 @@ Version 1.5.0beta51 [October 15, 2010]
 Version 1.5.0beta52 [October 16, 2010]
   Restored some of the embedded dates (in png.h, png.c, documentation, etc.)
 
-Version 1.5.0beta53 [October 17, 2010]
+Version 1.5.0beta53 [October 18, 2010]
   Updated INSTALL to mention using "make maintainer-clean" and to remove
     obsolete statement about a custom ltmain.sh
   Disabled "color-tests" by default in Makefile.am so it will work with
