@@ -18,13 +18,16 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-#    define png_strtod(p,a,b) strtod(a,b)
+#define png_strtod(p,a,b) strtod(a,b)
+
 png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_const_bytep buf)
 {
    png_uint_32 i = png_get_uint_32(buf);
+
    if (i > PNG_UINT_31_MAX)
       png_error(png_ptr, "PNG unsigned integer out of range");
+
    return (i);
 }
 
@@ -40,12 +43,14 @@ static png_fixed_point /* PRIVATE */
 png_get_fixed_point(png_structp png_ptr, png_const_bytep buf)
 {
    png_uint_32 u = png_get_uint_32(buf);
+
    if (u <= PNG_UINT_31_MAX)
       return (png_fixed_point)u; /* known to be in range */
 
    /* The caller can turn off the warning by passing NULL. */
    if (png_ptr != NULL)
       png_warning(png_ptr, "PNG fixed point integer out of range");
+
    return PNG_FIXED_ERROR;
 }
 #endif
@@ -145,6 +150,7 @@ png_crc_read(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
    if (png_ptr == NULL)
       return;
+
    png_read_data(png_ptr, buf, length);
    png_calculate_crc(png_ptr, buf, length);
 }
@@ -296,11 +302,14 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
       if ((ret == Z_OK || ret == Z_STREAM_END) && avail > 0)
       {
          png_size_t space = avail; /* > 0, see above */
+
          if (output != 0 && output_size > count)
          {
             png_size_t copy = output_size - count;
+
             if (space < copy)
                copy = space;
+
             png_memcpy(output + count, png_ptr->zbuf, copy);
          }
          count += space;
@@ -329,6 +338,7 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
 #endif
          if (png_ptr->zstream.msg != 0)
             msg = png_ptr->zstream.msg;
+
          else
          {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
@@ -443,6 +453,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             png_warning(png_ptr, "png_inflate logic error");
             png_free(png_ptr, text);
          }
+
          else
             png_warning(png_ptr, "Not enough memory to decompress chunk");
       }
@@ -469,10 +480,12 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
     */
    {
       png_charp text = png_malloc_warn(png_ptr, prefix_size + 1);
+
       if (text != NULL)
       {
          if (prefix_size > 0)
             png_memcpy(text, png_ptr->chunkdata, prefix_size);
+
          png_free(png_ptr, png_ptr->chunkdata);
          png_ptr->chunkdata = text;
 
@@ -595,6 +608,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_crc_finish(png_ptr, length);
       return;
    }
+
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
    {
@@ -654,6 +668,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       png_crc_finish(png_ptr, 0);
    }
+
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
    {
@@ -675,6 +690,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
             return;
          }
       }
+
       /* Otherwise, we (optionally) emit a warning and use the chunk. */
       else if (!(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN))
       {
@@ -740,12 +756,14 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
       png_error(png_ptr, "Missing IHDR before gAMA");
+
    else if (png_ptr->mode & PNG_HAVE_IDAT)
    {
       png_warning(png_ptr, "Invalid gAMA after IDAT");
       png_crc_finish(png_ptr, length);
       return;
    }
+
    else if (png_ptr->mode & PNG_HAVE_PLTE)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place gAMA chunk");
@@ -769,30 +787,36 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    png_crc_read(png_ptr, buf, 4);
+
    if (png_crc_finish(png_ptr, 0))
       return;
 
    igamma = png_get_fixed_point(NULL, buf);
+
    /* Check for zero gamma or an error. */
    if (igamma <= 0)
    {
       png_warning(png_ptr,
           "Ignoring gAMA chunk with out of range gamma");
+
       return;
    }
 
-#ifdef PNG_READ_sRGB_SUPPORTED
+#  ifdef PNG_READ_sRGB_SUPPORTED
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sRGB))
+   {
       if (PNG_OUT_OF_RANGE(igamma, 45500L, 500))
       {
          png_warning(png_ptr,
              "Ignoring incorrect gAMA value when sRGB is also present");
-#ifdef PNG_CONSOLE_IO_SUPPORTED
+
+#    ifdef PNG_CONSOLE_IO_SUPPORTED
          fprintf(stderr, "gamma = (%d/100000)", (int)igamma);
-#endif
+#    endif
          return;
       }
-#endif /* PNG_READ_sRGB_SUPPORTED */
+   }
+#  endif /* PNG_READ_sRGB_SUPPORTED */
 
 #  ifdef PNG_READ_GAMMA_SUPPORTED
    /* Gamma correction on read is supported. */
@@ -901,9 +925,9 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_warning(png_ptr, "Missing PLTE before cHRM");
 
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM)
-#ifdef PNG_READ_sRGB_SUPPORTED
+#  ifdef PNG_READ_sRGB_SUPPORTED
        && !(info_ptr->valid & PNG_INFO_sRGB)
-#endif
+#  endif
       )
    {
       png_warning(png_ptr, "Duplicate cHRM chunk");
@@ -919,6 +943,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 
    png_crc_read(png_ptr, buf, 32);
+
    if (png_crc_finish(png_ptr, 0))
       return;
 
@@ -930,6 +955,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    y_green = png_get_fixed_point(NULL, buf + 20);
    x_blue  = png_get_fixed_point(NULL, buf + 24);
    y_blue  = png_get_fixed_point(NULL, buf + 28);
+
    if (x_white == PNG_FIXED_ERROR ||
        y_white == PNG_FIXED_ERROR ||
        x_red   == PNG_FIXED_ERROR ||
@@ -957,9 +983,11 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       {
          png_warning(png_ptr,
              "Ignoring incorrect cHRM value when sRGB is also present");
+
 #ifdef PNG_CONSOLE_IO_SUPPORTED
          fprintf(stderr, "wx=%d, wy=%d, rx=%d, ry=%d\n",
              x_white, y_white, x_red, y_red);
+
          fprintf(stderr, "gx=%d, gy=%d, bx=%d, by=%d\n",
              x_green, y_green, x_blue, y_blue);
 #endif /* PNG_CONSOLE_IO_SUPPORTED */

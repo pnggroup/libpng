@@ -103,10 +103,13 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
          read = MIN(NEAR_BUF_SIZE, remaining);
          err = fread(buf, 1, read, io_ptr);
          png_memcpy(data, buf, read); /* copy far buffer to near buffer */
+
          if (err != read)
             break;
+
          else
             check += err;
+
          data += read;
          remaining -= read;
       }
@@ -123,9 +126,12 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
  * for libpng if standard C streams aren't being used.
  *
  * This function takes as its arguments:
+ *
  * png_ptr      - pointer to a png input data structure
+ *
  * io_ptr       - pointer to user supplied structure containing info about
  *                the input functions.  May be NULL.
+ *
  * read_data_fn - pointer to a new input function that takes as its
  *                arguments a pointer to a png_struct, a pointer to
  *                a location where input data can be stored, and a 32-bit
