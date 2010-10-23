@@ -29,17 +29,17 @@ png_do_write_transformations(png_structp png_ptr)
 #ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
    if (png_ptr->transformations & PNG_USER_TRANSFORM)
       if (png_ptr->write_user_transform_fn != NULL)
-        (*(png_ptr->write_user_transform_fn)) /* User write transform
+         (*(png_ptr->write_user_transform_fn)) /* User write transform
                                                  function */
-            (png_ptr,                    /* png_ptr */
-            &(png_ptr->row_info),           /* row_info: */
-               /*  png_uint_32 width;       width of row */
-               /*  png_size_t rowbytes;     number of bytes in row */
-               /*  png_byte color_type;     color type of pixels */
-               /*  png_byte bit_depth;      bit depth of samples */
-               /*  png_byte channels;       number of channels (1-4) */
-               /*  png_byte pixel_depth;    bits per pixel (depth*channels) */
-            png_ptr->row_buf + 1);      /* start of pixel data for row */
+             (png_ptr,                    /* png_ptr */
+             &(png_ptr->row_info),           /* row_info: */
+                /*  png_uint_32 width;       width of row */
+                /*  png_size_t rowbytes;     number of bytes in row */
+                /*  png_byte color_type;     color type of pixels */
+                /*  png_byte bit_depth;      bit depth of samples */
+                /*  png_byte channels;       number of channels (1-4) */
+                /*  png_byte pixel_depth;    bits per pixel (depth*channels) */
+             png_ptr->row_buf + 1);      /* start of pixel data for row */
 #endif
 
 #ifdef PNG_WRITE_FILLER_SUPPORTED
@@ -142,6 +142,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 
             break;
          }
+
          case 2:
          {
             png_bytep sp, dp;
@@ -180,6 +181,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 
             break;
          }
+
          case 4:
          {
             png_bytep sp, dp;
@@ -219,6 +221,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             break;
          }
       }
+
       row_info->bit_depth = (png_byte)bit_depth;
       row_info->pixel_depth = (png_byte)(bit_depth * row_info->channels);
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
@@ -310,6 +313,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
             }
          }
       }
+
       else if (row_info->bit_depth == 8)
       {
          png_bytep bp = row;
@@ -336,6 +340,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
             }
          }
       }
+
       else
       {
          png_bytep bp;
