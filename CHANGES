@@ -3070,7 +3070,8 @@ Version 1.5.0beta53 [October 18, 2010]
   Revised and renamed the typedef in png.h and png.c that was designed
     to catch library and header mismatch.
 
-Version 1.5.0beta54 [October 18, 2010]
+Version 1.5.0beta54 [October 23, 2010]
+  Require 48 bytes, not 64 bytes, for big_row_buf in overflow checks.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

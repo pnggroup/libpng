@@ -16,10 +16,6 @@
 /* Generate a compiler error if there is an old png.h in the search path. */
 typedef png_libpng_version_1_5_0beta54 Your_png_h_is_not_version_1_5_0beta54;
 
-/* Version information for C files.  This had better match the version
- * string defined in png.h.
- */
-
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
  * stream we can set num_bytes = 8 so that libpng will not attempt to read
@@ -72,7 +68,7 @@ png_sig_cmp(png_const_bytep sig, png_size_t start, png_size_t num_to_check)
 #endif /* PNG_READ_SUPPORTED */
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-/* Function to allocate memory for zlib and clear it to 0. */
+/* Function to allocate memory for zlib */
 PNG_FUNCTION(voidpf /* PRIVATE */,
 png_zalloc,(voidpf png_ptr, uInt items, uInt size),PNG_ALLOCATED)
 {
@@ -560,13 +556,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.0beta54 - October 18, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.5.0beta54 - October 23, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.0beta54 - October 18, 2010\
+      return "libpng version 1.5.0beta54 - October 23, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -802,7 +798,7 @@ png_check_IHDR(png_structp png_ptr,
 
    if (width > (PNG_UINT_32_MAX
                  >> 3)      /* 8-byte RGBA pixels */
-                 - 64       /* bigrowbuf hack */
+                 - 48       /* bigrowbuf hack */
                  - 1        /* filter byte */
                  - 7*8      /* rounding of width to multiple of 8 pixels */
                  - 8)       /* extra max_pixel_depth pad */

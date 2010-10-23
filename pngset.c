@@ -203,7 +203,7 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
    /* Check for potential overflow */
    if (width > (PNG_UINT_32_MAX
                  >> 3)      /* 8-byte RRGGBBAA pixels */
-                 - 64       /* bigrowbuf hack */
+                 - 48       /* bigrowbuf hack */
                  - 1        /* filter byte */
                  - 7*8      /* rounding of width to multiple of 8 pixels */
                  - 8)       /* extra max_pixel_depth pad */
