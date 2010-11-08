@@ -19,10 +19,6 @@
 /* Generate a compiler error if there is an old png.h in the search path. */
 typedef version_1_4_5beta04 Your_png_h_is_not_version_1_4_5beta04;
 
-/* Version information for C files.  This had better match the version
- * string defined in png.h.
- */
-
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
  * stream we can set num_bytes = 8 so that libpng will not attempt to read
@@ -551,13 +547,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.5beta04 - October 8, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.4.5beta04 - November 8, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.5beta04 - October 8, 2010\
+      return ((png_charp) "libpng version 1.4.5beta04 - November 8, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
