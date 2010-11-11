@@ -3074,6 +3074,8 @@ Version 1.5.0beta54 [November 10, 2010]
   Require 48 bytes, not 64 bytes, for big_row_buf in overflow checks.
   Used a consistent structure for the pngget.c functions.
 
+Version 1.5.0beta55 [November 11, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

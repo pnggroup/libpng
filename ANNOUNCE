@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta54 - November 10, 2010
+Libpng 1.5.0beta55 - November 11, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta54.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta54.tar.gz
-   1.5.0beta54.tar.bz2
+   1.5.0beta55.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta55.tar.gz
+   1.5.0beta55.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b54.zip
-   lp150b54.7z
+   lp150b55.zip
+   lp150b55.7z
 
 Other information:
 
-   1.5.0beta54-README.txt
-   1.5.0beta54-LICENSE.txt
+   1.5.0beta55-README.txt
+   1.5.0beta55-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -226,7 +226,7 @@ version 1.5.0beta24 [May 7, 2010]
     offset of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
   Added more blank lines for readability.
 
-version 1.5.0beta25 [November 10, 2010]
+version 1.5.0beta25 [November 11, 2010]
   In pngpread.c: png_push_have_row() add check for new_row > height
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
@@ -435,6 +435,8 @@ Version 1.5.0beta53 [October 18, 2010]
 Version 1.5.0beta54 [November 10, 2010]
   Require 48 bytes, not 64 bytes, for big_row_buf in overflow checks.
   Used a consistent structure for the pngget.c functions.
+
+Version 1.5.0beta55 [November 11, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
