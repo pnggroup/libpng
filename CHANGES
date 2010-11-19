@@ -2697,6 +2697,9 @@ version 1.4.5beta03 [October 8, 2010]
 version 1.4.5beta04 [November 8, 2010]
   Check for out-of-range text compression mode in png_set_text().
 
+version 1.4.5rc01 [November 19, 2010]
+  No changes.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).

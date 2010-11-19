@@ -1,5 +1,5 @@
 
-Libpng 1.4.5beta04 - November 8, 2010
+Libpng 1.4.5rc01 - November 19, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.5beta04.tar.xz (LZMA-compressed, recommended)
-   1.4.5beta04.tar.gz
-   1.4.5beta04.tar.bz2
+   1.4.5rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.5rc01.tar.gz
+   1.4.5rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp145b04.zip
-   lp145b04.7z
+   lp145r01.zip
+   lp145r01.7z
 
 Other information:
 
-   1.4.5beta04-README.txt
-   1.4.5beta04-LICENSE.txt
+   1.4.5rc01-README.txt
+   1.4.5rc01-LICENSE.txt
 
 Changes since the last public release (1.4.4):
 
@@ -42,6 +42,9 @@ version 1.4.5beta03 [October 8, 2010]
 
 version 1.4.5beta04 [November 8, 2010]
   Check for out-of-range text compression mode in png_set_text().
+
+version 1.4.5rc01 [November 19, 2010]
+  No changes.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
