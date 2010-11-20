@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.5 [November 20, 2010]
+ * Last changed in libpng 1.4.5 [%RDATE%]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -30,16 +30,15 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
 }
 #ifndef PNG_USE_READ_MACROS
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
-png_uint_32 (PNGAPI
-png_get_uint_32)(png_bytep buf)
+png_int_32 PNGAPI
+png_get_int_32(png_bytep buf)
 {
-   png_uint_32 i =
-       ((png_uint_32)(*(buf    )) << 24) +
-       ((png_uint_32)(*(buf + 1)) << 16) +
-       ((png_uint_32)(*(buf + 2)) <<  8) +
-       ((png_uint_32)(*(buf + 3))      ) ;
+   png_uint_32 uval = png_get_uint_32(buf);
+   if ((uval & 0x80000000L) == 0) /* non-negative */
+      return uval;
 
-   return (i);
+   uval = (uval ^ 0xffffffffL) + 1;  /* 2's complement: -x = ~x+1 */
+   return -(png_int_32)uval;
 }
 
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
@@ -48,25 +47,25 @@ png_get_uint_32)(png_bytep buf)
  * the following code does a two's complement to native conversion.
  */
 png_int_32 PNGAPI
-png_get_int_32 (png_bytep buf)
+png_get_int_32(png_bytep buf)
 {
-   png_uint_32 u = png_get_uint_32(buf);
-   if ((u & 0x80000000) == 0) /* non-negative */
-      return u;
+   png_uint_32 uval = png_get_uint_32(buf);
+   if ((uval & 0x80000000L) == 0) /* non-negative */
+      return uval;
 
-   u = (u ^ 0xffffffff) + 1;  /* 2's complement: -x = ~x+1 */
-   return -(png_int_32)u;
+   uval = (uval ^ 0xffffffffL) + 1;  /* 2's complement: -x = ~x+1 */
+   return -(png_int_32)uval;
 }
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 PNGAPI
 png_get_uint_16 (png_bytep buf)
 {
-   png_uint_16 i =
-       ((png_uint_32)(*buf) << 8) +
-       ((png_uint_32)(*(buf + 1)));
+   unsigned int val =
+       ((unsigned int)(*buf) << 8) +
+       ((unsigned int)(*(buf + 1)));
 
-   return (i);
+   return (png_uint_16)val;
 }
 #endif /* PNG_USE_READ_MACROS */
 
