@@ -1,5 +1,5 @@
 
-Libpng 1.4.5rc02 - November 20, 2010
+Libpng 1.4.5beta05 - November 20, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.5rc02.tar.xz (LZMA-compressed, recommended)
-   1.4.5rc02.tar.gz
-   1.4.5rc02.tar.bz2
+   1.4.5beta05.tar.xz (LZMA-compressed, recommended)
+   1.4.5beta05.tar.gz
+   1.4.5beta05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp145r02.zip
-   lp145r02.7z
+   lp145b05.zip
+   lp145b05.7z
 
 Other information:
 
-   1.4.5rc02-README.txt
-   1.4.5rc02-LICENSE.txt
+   1.4.5beta05-README.txt
+   1.4.5beta05-LICENSE.txt
 
 Changes since the last public release (1.4.4):
 
@@ -46,7 +46,7 @@ version 1.4.5beta04 [November 8, 2010]
 version 1.4.5rc01 [November 19, 2010]
   No changes.
 
-version 1.4.5rc02 [November 20, 2010]
+version 1.4.5beta05 [November 20, 2010]
   Removed some extraneous parentheses that appeared in pngrutil.c of
     libpng-1.4.3bet01
   Revised png_get_uint_32, png_get_int_32, png_get_uint_16 (Cosmin)
