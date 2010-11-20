@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.4 [August 26, 2010]
+ * Last changed in libpng 1.4.5 [November 20, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -47,8 +47,8 @@ png_get_uint_32)(png_bytep buf)
  * is no guarantee that a 'png_int_32' is exactly 32 bits, therefore
  * the following code does a two's complement to native conversion.
  */
-png_int_32 (PNGAPI
-png_get_int_32)(png_bytep buf)
+png_int_32 PNGAPI
+png_get_int_32 (png_bytep buf)
 {
    png_uint_32 u = png_get_uint_32(buf);
    if ((u & 0x80000000) == 0) /* non-negative */
@@ -59,8 +59,8 @@ png_get_int_32)(png_bytep buf)
 }
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
-png_uint_16 (PNGAPI
-png_get_uint_16)(png_bytep buf)
+png_uint_16 PNGAPI
+png_get_uint_16 (png_bytep buf)
 {
    png_uint_16 i =
        ((png_uint_32)(*buf) << 8) +
