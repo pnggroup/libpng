@@ -2657,6 +2657,7 @@ PNG_EXPORT(png_bytep,png_get_io_chunk_name)
       ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
       : (png_int_32)png_get_uint_32(buf)))
 #else
+PNG_EXPORT(png_uint_32,png_get_uint_32) PNGARG((png_bytep buf));
 PNG_EXPORT(png_uint_16,png_get_uint_16) PNGARG((png_bytep buf));
 #ifdef PNG_GET_INT_32_SUPPORTED
 PNG_EXPORT(png_int_32,png_get_int_32) PNGARG((png_bytep buf));
