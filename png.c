@@ -17,7 +17,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_5beta05 Your_png_h_is_not_version_1_4_5beta05;
+typedef version_1_4_5rc02 Your_png_h_is_not_version_1_4_5rc02;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -547,13 +547,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.5beta05 - November 20, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.4.5rc02 - November 20, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.5beta05 - November 20, 2010\
+      return ((png_charp) "libpng version 1.4.5rc02 - November 20, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");

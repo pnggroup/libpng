@@ -24,10 +24,12 @@ png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_bytep buf)
 {
    png_uint_32 i = png_get_uint_32(buf);
-   if (i > PNG_UINT_31_MAX)
+
+   if (val > PNG_UINT_31_MAX)
      png_error(png_ptr, "PNG unsigned integer out of range");
    return (i);
 }
+
 #ifndef PNG_USE_READ_MACROS
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
 png_uint_32 PNGAPI
@@ -95,6 +97,7 @@ png_read_sig(png_structp png_ptr, png_infop info_ptr)
       if (num_checked < 4 &&
           png_sig_cmp(info_ptr->signature, num_checked, num_to_check - 4))
          png_error(png_ptr, "Not a PNG file");
+
       else
          png_error(png_ptr, "PNG file corrupted by ASCII conversion");
    }
@@ -150,6 +153,7 @@ png_crc_read(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
    if (png_ptr == NULL)
       return;
+
    png_read_data(png_ptr, buf, length);
    png_calculate_crc(png_ptr, buf, length);
 }
@@ -169,6 +173,7 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
    {
       png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
    }
+
    if (i)
    {
       png_crc_read(png_ptr, png_ptr->zbuf, i);
@@ -183,11 +188,13 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
       {
          png_chunk_warning(png_ptr, "CRC error");
       }
+
       else
       {
          png_chunk_benign_error(png_ptr, "CRC error");
          return (0);
       }
+
       return (1);
    }
 
@@ -210,6 +217,7 @@ png_crc_error(png_structp png_ptr)
           (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
          need_crc = 0;
    }
+
    else                                                    /* critical */
    {
       if (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE)
@@ -228,6 +236,7 @@ png_crc_error(png_structp png_ptr)
       crc = png_get_uint_32(crc_bytes);
       return ((int)(crc != png_ptr->crc));
    }
+
    else
       return (0);
 }
@@ -267,6 +276,7 @@ png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
             if (avail < copy) copy = avail;
             png_memcpy(output + count, png_ptr->zbuf, copy);
          }
+
          count += avail;
       }
 
@@ -300,9 +310,11 @@ png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
                case Z_BUF_ERROR:
                   msg = "Buffer error in compressed datastream in %s chunk";
                   break;
+
                case Z_DATA_ERROR:
                   msg = "Data error in compressed datastream in %s chunk";
                   break;
+
                default:
                   msg = "Incomplete compressed datastream in %s chunk";
                   break;
@@ -402,6 +414,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
             png_warning(png_ptr, "png_inflate logic error");
             png_free(png_ptr, text);
          }
+
          else
           png_warning(png_ptr, "Not enough memory to decompress chunk");
       }
