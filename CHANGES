@@ -2702,7 +2702,7 @@ version 1.4.5rc01 [November 19, 2010]
 
 version 1.4.5beta05 [November 20, 2010]
   Removed some extraneous parentheses that appeared in pngrutil.c of
-    libpng-1.4.3bet01
+    libpng-1.4.3beta01
   Revised png_get_uint_32, png_get_int_32, png_get_uint_16 (Cosmin)
   Moved reading of file signature into png_read_sig (Cosmin)
   Fixed atomicity of chunk header serialization (Cosmin)
