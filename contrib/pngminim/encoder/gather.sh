@@ -1,3 +1,5 @@
+#!/bin/sh
+
 cp ../../pngminus/pnm2png.c pnm2pngm.c
 cp ../../../*.h .
 cp ../../../*.c .

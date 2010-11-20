@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.1 [February 25, 2010]
+ * Last changed in libpng 1.4.5 [November 20, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -220,7 +220,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 
    /* Read and check the PNG file signature. */
    png_read_sig(png_ptr, info_ptr);
-  
+
    for (;;)
    {
       PNG_IHDR;
