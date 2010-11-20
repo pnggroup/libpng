@@ -2649,11 +2649,12 @@ PNG_EXPORT(png_bytep,png_get_io_chunk_name)
       ((png_uint_32)(*((buf) + 2)) << 8) + \
       ((png_uint_32)(*((buf) + 3))))
 #  define png_get_uint_16(buf) \
-     (((png_uint_32)(*(buf)) << 8) + \
-      ((png_uint_32)(*((buf) + 1))))
+     ((png_uint_16) \
+      (((unsigned int)(*(buf)) << 8) + \
+       ((unsigned int)(*((buf) + 1)))))
 #  define png_get_int_32(buf) \
      ((png_int_32)((*(buf) & 0x80) \
-      ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffff)+1)) \
+      ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
       : (png_int_32)png_get_uint_32(buf)))
 #else
 PNG_EXPORT(png_uint_16,png_get_uint_16) PNGARG((png_bytep buf));

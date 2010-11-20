@@ -69,6 +69,39 @@ png_get_uint_16 (png_bytep buf)
 }
 #endif /* PNG_USE_READ_MACROS */
 
+/* Read and check the PNG file signature */
+void /* PRIVATE */
+png_read_sig(png_structp png_ptr, png_infop info_ptr)
+{
+   png_size_t num_checked, num_to_check;
+
+   /* Exit if the user application does not expect a signature. */
+   if (png_ptr->sig_bytes >= 8)
+      return;
+
+   num_checked = png_ptr->sig_bytes;
+   num_to_check = 8 - num_checked;
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   png_ptr->io_state = PNG_IO_READING | PNG_IO_SIGNATURE;
+#endif
+
+   /* The signature must be serialized in a single I/O call. */
+   png_read_data(png_ptr, &(info_ptr->signature[num_checked]), num_to_check);
+   png_ptr->sig_bytes = 8;
+
+   if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
+   {
+      if (num_checked < 4 &&
+          png_sig_cmp(info_ptr->signature, num_checked, num_to_check - 4))
+         png_error(png_ptr, "Not a PNG file");
+      else
+         png_error(png_ptr, "PNG file corrupted by ASCII conversion");
+   }
+   if (num_checked < 3)
+      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
+}
+
 /* Read the chunk header (length + type name).
  * Put the type name into png_ptr->chunk_name, and return the length.
  */
@@ -79,32 +112,31 @@ png_read_chunk_header(png_structp png_ptr)
    png_uint_32 length;
 
 #ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that the chunk header is being read.
-    * PNG_IO_CHUNK_HDR requires a single I/O call.
-    */
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_HDR;
 #endif
 
-   /* Read the length and the chunk name */
+   /* Read the length and the chunk name.
+    * This must be performed in a single I/O call.
+    */
    png_read_data(png_ptr, buf, 8);
    length = png_get_uint_31(png_ptr, buf);
 
-   /* Put the chunk name into png_ptr->chunk_name */
+   /* Put the chunk name into png_ptr->chunk_name. */
    png_memcpy(png_ptr->chunk_name, buf + 4, 4);
 
    png_debug2(0, "Reading %s chunk, length = %lu",
       png_ptr->chunk_name, length);
 
-   /* Reset the crc and run it over the chunk name */
+   /* Reset the crc and run it over the chunk name. */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, png_ptr->chunk_name, 4);
 
-   /* Check to see if chunk name is valid */
+   /* Check to see if chunk name is valid. */
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
 
 #ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that chunk data will (possibly) be read.
-    * PNG_IO_CHUNK_DATA does NOT require a specific number of I/O calls.
+   /* It is unspecified how many I/O calls will be performed
+    * during the serialization of the chunk data.
     */
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;
 #endif
@@ -185,11 +217,10 @@ png_crc_error(png_structp png_ptr)
    }
 
 #ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that the chunk CRC is being read */
-   /* PNG_IO_CHUNK_CRC requires the I/O to be done at once */
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_CRC;
 #endif
 
+   /* The chunk CRC must be serialized in a single I/O call. */
    png_read_data(png_ptr, crc_bytes, 4);
 
    if (need_crc)
@@ -3108,17 +3139,10 @@ png_read_finish_row(png_structp png_ptr)
          {
             while (!png_ptr->idat_size)
             {
-               png_byte chunk_length[4];
-
                png_crc_finish(png_ptr, 0);
-
-               png_read_data(png_ptr, chunk_length, 4);
-               png_ptr->idat_size = png_get_uint_31(png_ptr, chunk_length);
-               png_reset_crc(png_ptr);
-               png_crc_read(png_ptr, png_ptr->chunk_name, 4);
+               png_ptr->idat_size = png_read_chunk_header(png_ptr);
                if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
                   png_error(png_ptr, "Not enough image data");
-
             }
             png_ptr->zstream.avail_in = (uInt)png_ptr->zbuf_size;
             png_ptr->zstream.next_in = png_ptr->zbuf;
