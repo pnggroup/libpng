@@ -1,5 +1,5 @@
 
-Libpng 1.4.5rc02 - November 20, 2010
+Libpng 1.4.5rc02 - November 21, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -46,7 +46,7 @@ version 1.4.5beta04 [November 8, 2010]
 version 1.4.5rc01 [November 19, 2010]
   No changes.
 
-version 1.4.5beta05 [November 20, 2010]
+version 1.4.5beta05 [November 21, 2010]
   Removed some extraneous parentheses that appeared in pngrutil.c of
     libpng-1.4.3beta01
   Revised png_get_uint_32, png_get_int_32, png_get_uint_16 (Cosmin)
@@ -54,6 +54,11 @@ version 1.4.5beta05 [November 20, 2010]
   Fixed atomicity of chunk header serialization (Cosmin)
   Added test for io_state in pngtest.c (Cosmin)
   Added "#!/bin/sh" at the top of contrib/pngminim/*/gather.sh scripts.
+
+version 1.4.5beta06 [November 21, 2010]
+  Restored the parentheses in pngrutil.c; they are needed when the
+    png_get_*int_*() functions are compiled (i.e., when PNG_USE_READ_MACROS
+    is not defined).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
