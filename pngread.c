@@ -618,6 +618,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             }
             break;
 
+         default:
          case 6:
             if (!(png_ptr->row_number & 1))
             {

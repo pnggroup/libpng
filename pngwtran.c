@@ -220,6 +220,9 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 
             break;
          }
+
+         default:
+            break;
       }
 
       row_info->bit_depth = (png_byte)bit_depth;

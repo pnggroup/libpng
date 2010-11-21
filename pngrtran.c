@@ -719,6 +719,11 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
 
       case 3:
          png_ptr->transformations |= PNG_RGB_TO_GRAY_ERR;
+         break;
+
+      default:
+         png_error(png_ptr, "invalid error action to rgb_to_gray");
+         break;
    }
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #ifdef PNG_READ_EXPAND_SUPPORTED
@@ -885,6 +890,8 @@ png_init_read_transformations(png_structp png_ptr)
                       = png_ptr->trans_color.blue = png_ptr->trans_color.gray;
                }
                break;
+
+            default:
 
             case 8:
 
@@ -1088,6 +1095,9 @@ png_init_read_transformations(png_structp png_ptr)
                   gs = png_reciprocal2(png_ptr->background_gamma,
                       png_ptr->screen_gamma);
                   break;
+
+               default:
+                  png_error(png_ptr, "invalid background gamma type");
             }
 
             png_ptr->background_1.gray = png_gamma_correct(png_ptr,
@@ -1725,6 +1735,9 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
             }
             break;
          }
+
+         default:
+            break;
       }
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
@@ -1785,6 +1798,9 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 
       switch (row_info->bit_depth)
       {
+         default:
+            break; 
+
          case 2:
          {
             png_bytep bp;
@@ -2966,6 +2982,9 @@ png_do_background(png_row_infop row_info, png_bytep row,
                   }
                   break;
                }
+
+               default:
+                  break;
             }
             break;
          }
@@ -3438,6 +3457,9 @@ png_do_background(png_row_infop row_info, png_bytep row,
             }
             break;
          }
+
+         default:
+            break;
       }
 
       if (row_info->color_type & PNG_COLOR_MASK_ALPHA)
@@ -3646,6 +3668,9 @@ png_do_gamma(png_row_infop row_info, png_bytep row,
             }
             break;
          }
+
+         default:
+            break;
       }
    }
 }
@@ -3744,6 +3769,9 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
                }
                break;
             }
+
+            default:
+               break;
          }
          row_info->bit_depth = 8;
          row_info->pixel_depth = 8;
@@ -3901,6 +3929,9 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                   }
                   break;
                }
+
+               default:
+                  break;
             }
 
             row_info->bit_depth = 8;
