@@ -23,11 +23,11 @@
 png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_bytep buf)
 {
-   png_uint_32 i = png_get_uint_32(buf);
+   png_uint_32 val = png_get_uint_32(buf);
 
    if (val > PNG_UINT_31_MAX)
      png_error(png_ptr, "PNG unsigned integer out of range");
-   return (i);
+   return (val);
 }
 
 #ifndef PNG_USE_READ_MACROS
