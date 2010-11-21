@@ -2711,6 +2711,8 @@ version 1.4.5beta06 [November 21, 2010]
   Restored the parentheses in pngrutil.c; they are needed when the
     png_get_*int_*() functions are compiled (i.e., when PNG_USE_READ_MACROS
     is not defined).
+  Make the "png_get_uint_16" macro return a png_uint_32 in libpng-1.4 for API
+    compatibility.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

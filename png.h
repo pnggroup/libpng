@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.5rc02 - November 20, 2010
+ * libpng version 1.4.5rc02 - November 21, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.5rc02 - November 20, 2010: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.5rc02 - November 21, 2010: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -182,7 +182,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.4.5rc02, November 20, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.4.5rc02, November 21, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -294,7 +294,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    November 20, 2010
+ *    November 21, 2010
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -358,7 +358,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.4.5rc02"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.5rc02 - November 20, 2010\n"
+   " libpng version 1.4.5rc02 - November 21, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   14
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -2649,10 +2649,17 @@ PNG_EXPORT(png_bytep,png_get_io_chunk_name)
       ((png_uint_32)(*((buf) + 1)) << 16) + \
       ((png_uint_32)(*((buf) + 2)) << 8) + \
       ((png_uint_32)(*((buf) + 3))))
-#  define png_get_uint_16(buf) \
-     ((png_uint_16) \
-      (((unsigned int)(*(buf)) << 8) + \
-       ((unsigned int)(*((buf) + 1)))))
+#  ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED  /* Undefined in 1.4.x by default. */
+#    define png_get_uint_16(buf) \
+       ((png_uint_16) \
+        (((unsigned int)(*(buf)) << 8) + \
+         ((unsigned int)(*((buf) + 1)))))
+#  else
+#    define png_get_uint_16(buf) \
+       ((png_uint_32) \
+        (((unsigned int)(*(buf)) << 8) + \
+         ((unsigned int)(*((buf) + 1)))))
+#  endif
 #  define png_get_int_32(buf) \
      ((png_int_32)((*(buf) & 0x80) \
       ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
