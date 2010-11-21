@@ -2713,6 +2713,14 @@ version 1.4.5beta06 [November 21, 2010]
     is not defined).
   Make the "png_get_uint_16" macro return a png_uint_32 in libpng-1.4 for API
     compatibility.
+  Changes to remove gcc warnings (John Bowler)
+    Certain optional gcc warning flags resulted in warnings in libpng code.
+    With these changes only -Wconversion and -Wcast-qual cannot be turned on.
+    Changes are trivial rearrangements of code.  -Wconversion is not possible
+    for pngrutil.c (because of the widespread use of += et al on variables
+    smaller than (int) or (unsigned int)) and -Wcast-qual is not possible
+    with pngwio.c and pngwutil.c because the 'write' callback and zlib
+    compression both fail to declare their input buffers with 'const'.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.5 [November 20, 2010]
+ * Last changed in libpng 1.4.5 [November 21, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -502,6 +502,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
                return;
             }
             break;
+
          case 1:
             if ((png_ptr->row_number & 0x07) || png_ptr->width < 5)
             {
@@ -512,6 +513,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
                return;
             }
             break;
+
          case 2:
             if ((png_ptr->row_number & 0x07) != 4)
             {
@@ -522,6 +524,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
                return;
             }
             break;
+
          case 3:
             if ((png_ptr->row_number & 3) || png_ptr->width < 3)
             {
@@ -532,6 +535,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
                return;
             }
             break;
+
          case 4:
             if ((png_ptr->row_number & 3) != 2)
             {
@@ -542,6 +546,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
                return;
             }
             break;
+
          case 5:
             if ((png_ptr->row_number & 1) || png_ptr->width < 2)
             {
@@ -552,6 +557,8 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
                return;
             }
             break;
+
+         default:
          case 6:
             if (!(png_ptr->row_number & 1))
             {
