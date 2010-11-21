@@ -3089,6 +3089,7 @@ Version 1.5.0beta55 [November 21, 2010]
     with pngwio.c and pngwutil.c because the 'write' callback and zlib
     compression both fail to declare their input buffers with 'const'.
 
+Version 1.5.0beta56 [November 21, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
