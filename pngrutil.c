@@ -31,6 +31,11 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
 }
 
 #ifndef PNG_USE_READ_MACROS
+/* The parentheses around "PNGAPI function_name" in the following three
+ * functions are necessary because they allow the macros to co-exist with
+ * these (unused but exported) functions.
+ */
+
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
 png_uint_32 (PNGAPI
 png_get_uint_32)(png_bytep buf)
