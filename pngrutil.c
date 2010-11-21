@@ -58,8 +58,11 @@ png_get_fixed_point(png_structp png_ptr, png_const_bytep buf)
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
 /* NOTE: the read macros will obscure these definitions, so that if
  * PNG_USE_READ_MACROS is set the library will not use them internally,
- * but the APIs will still be available externally.  The parentheses
- * around "PNGAPI function_name" are necessary because ...
+ * but the APIs will still be available externally.
+ *
+ * The parentheses around "PNGAPI function_name" in the following three
+ * functions are necessary because they allow the macros to co-exist with
+ * these (unused but exported) functions.
  */
 
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
