@@ -23,12 +23,12 @@
 png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_const_bytep buf)
 {
-   png_uint_32 i = png_get_uint_32(buf);
+   png_uint_32 uval = png_get_uint_32(buf);
 
-   if (i > PNG_UINT_31_MAX)
+   if (uval > PNG_UINT_31_MAX)
       png_error(png_ptr, "PNG unsigned integer out of range");
 
-   return (i);
+   return (uval);
 }
 
 #if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_READ_cHRM_SUPPORTED)
@@ -42,10 +42,10 @@ png_get_uint_31(png_structp png_ptr, png_const_bytep buf)
 static png_fixed_point /* PRIVATE */
 png_get_fixed_point(png_structp png_ptr, png_const_bytep buf)
 {
-   png_uint_32 u = png_get_uint_32(buf);
+   png_uint_32 uval = png_get_uint_32(buf);
 
-   if (u <= PNG_UINT_31_MAX)
-      return (png_fixed_point)u; /* known to be in range */
+   if (uval <= PNG_UINT_31_MAX)
+      return (png_fixed_point)uval; /* known to be in range */
 
    /* The caller can turn off the warning by passing NULL. */
    if (png_ptr != NULL)
@@ -58,19 +58,21 @@ png_get_fixed_point(png_structp png_ptr, png_const_bytep buf)
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
 /* NOTE: the read macros will obscure these definitions, so that if
  * PNG_USE_READ_MACROS is set the library will not use them internally,
- * but the APIs will still be available externally.
+ * but the APIs will still be available externally.  The parentheses
+ * around "PNGAPI function_name" are necessary because ...
  */
+
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
 png_uint_32 (PNGAPI
 png_get_uint_32)(png_const_bytep buf)
 {
-   png_uint_32 i =
+   png_uint_32 uval =
        ((png_uint_32)(*(buf    )) << 24) +
        ((png_uint_32)(*(buf + 1)) << 16) +
        ((png_uint_32)(*(buf + 2)) <<  8) +
        ((png_uint_32)(*(buf + 3))      ) ;
 
-   return (i);
+   return uval;
 }
 
 /* Grab a signed 32-bit integer from a buffer in big-endian format.  The
@@ -81,25 +83,59 @@ png_get_uint_32)(png_const_bytep buf)
 png_int_32 (PNGAPI
 png_get_int_32)(png_const_bytep buf)
 {
-   png_uint_32 u = png_get_uint_32(buf);
-   if ((u & 0x80000000) == 0) /* non-negative */
-      return u;
+   png_uint_32 uval = png_get_uint_32(buf);
+   if ((uval & 0x80000000L) == 0) /* non-negative */
+      return uval;
 
-   u = (u ^ 0xffffffff) + 1;  /* 2's complement: -x = ~x+1 */
-   return -(png_int_32)u;
+   uval = (uval ^ 0xffffffffL) + 1;  /* 2's complement: -x = ~x+1 */
+   return -(png_int_32)uval;
 }
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 (PNGAPI
 png_get_uint_16)(png_const_bytep buf)
 {
-   png_uint_16 i =
-       ((png_uint_32)(*buf) << 8) +
-       ((png_uint_32)(*(buf + 1)));
+   unsigned int val =
+       ((unsigned int)(*buf) << 8) +
+       ((unsigned int)(*(buf + 1)));
 
-   return (i);
+   return (png_uint_16)val;
 }
+
 #endif /* PNG_READ_INT_FUNCTIONS_SUPPORTED */
+
+/* Read and check the PNG file signature */
+void /* PRIVATE */
+png_read_sig(png_structp png_ptr, png_infop info_ptr)
+{
+   png_size_t num_checked, num_to_check;
+
+   /* Exit if the user application does not expect a signature. */
+   if (png_ptr->sig_bytes >= 8)
+      return;
+
+   num_checked = png_ptr->sig_bytes;
+   num_to_check = 8 - num_checked;
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   png_ptr->io_state = PNG_IO_READING | PNG_IO_SIGNATURE;
+#endif
+
+   /* The signature must be serialized in a single I/O call. */
+   png_read_data(png_ptr, &(info_ptr->signature[num_checked]), num_to_check);
+   png_ptr->sig_bytes = 8;
+
+   if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
+   {
+      if (num_checked < 4 &&
+          png_sig_cmp(info_ptr->signature, num_checked, num_to_check - 4))
+         png_error(png_ptr, "Not a PNG file");
+      else
+         png_error(png_ptr, "PNG file corrupted by ASCII conversion");
+   }
+   if (num_checked < 3)
+      png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
+}
 
 /* Read the chunk header (length + type name).
  * Put the type name into png_ptr->chunk_name, and return the length.
@@ -111,33 +147,29 @@ png_read_chunk_header(png_structp png_ptr)
    png_uint_32 length;
 
 #ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that the chunk header is being read.
-    * PNG_IO_CHUNK_HDR requires a single I/O call.
-    */
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_HDR;
 #endif
 
-   /* Read the length and the chunk name */
+   /* Read the length and the chunk name.
+    * This must be performed in a single I/O call.
+    */
    png_read_data(png_ptr, buf, 8);
    length = png_get_uint_31(png_ptr, buf);
 
-   /* Put the chunk name into png_ptr->chunk_name */
+   /* Put the chunk name into png_ptr->chunk_name. */
    png_memcpy(png_ptr->chunk_name, buf + 4, 4);
 
    png_debug2(0, "Reading %s chunk, length = %u",
        png_ptr->chunk_name, length);
 
-   /* Reset the crc and run it over the chunk name */
+   /* Reset the crc and run it over the chunk name. */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, png_ptr->chunk_name, 4);
 
-   /* Check to see if chunk name is valid */
+   /* Check to see if chunk name is valid. */
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
 
 #ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that chunk data will (possibly) be read.
-    * PNG_IO_CHUNK_DATA does NOT require a specific number of I/O calls.
-    */
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;
 #endif
 
@@ -222,11 +254,10 @@ png_crc_error(png_structp png_ptr)
    }
 
 #ifdef PNG_IO_STATE_SUPPORTED
-   /* Inform the I/O callback that the chunk CRC is being read */
-   /* PNG_IO_CHUNK_CRC requires the I/O to be done at once */
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_CRC;
 #endif
 
+   /* The chunk CRC must be serialized in a single I/O call. */
    png_read_data(png_ptr, crc_bytes, 4);
 
    if (need_crc)
@@ -279,7 +310,7 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
             png_ptr->zstream.avail_in = (uInt)size;
             size = 0;
          }
-   
+
          else
          {
             png_ptr->zstream.avail_in = ZLIB_IO_MAX;
@@ -3284,18 +3315,10 @@ png_read_finish_row(png_structp png_ptr)
          {
             while (!png_ptr->idat_size)
             {
-               png_byte chunk_length[4];
-
                png_crc_finish(png_ptr, 0);
-
-               png_read_data(png_ptr, chunk_length, 4);
-               png_ptr->idat_size = png_get_uint_31(png_ptr, chunk_length);
-               png_reset_crc(png_ptr);
-               png_crc_read(png_ptr, png_ptr->chunk_name, 4);
-
+               png_ptr->idat_size = png_read_chunk_header(png_ptr);
                if (png_memcmp(png_ptr->chunk_name, png_IDAT, 4))
                   png_error(png_ptr, "Not enough image data");
-
             }
 
             png_ptr->zstream.avail_in = (uInt)png_ptr->zbuf_size;
@@ -3307,6 +3330,7 @@ png_read_finish_row(png_structp png_ptr)
             png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zstream.avail_in);
             png_ptr->idat_size -= png_ptr->zstream.avail_in;
          }
+
          ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
 
          if (ret == Z_STREAM_END)
@@ -3319,6 +3343,7 @@ png_read_finish_row(png_structp png_ptr)
             png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
             break;
          }
+
          if (ret != Z_OK)
             png_error(png_ptr, png_ptr->zstream.msg ? png_ptr->zstream.msg :
                 "Decompression Error");

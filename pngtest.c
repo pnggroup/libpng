@@ -299,6 +299,48 @@ static int wrote_question = 0;
  * than changing the library.
  */
 
+#ifdef PNG_IO_STATE_SUPPORTED
+void
+pngtest_check_io_state(png_structp png_ptr, png_size_t data_length,
+   png_uint_32 io_op);
+void
+pngtest_check_io_state(png_structp png_ptr, png_size_t data_length,
+   png_uint_32 io_op)
+{
+   png_uint_32 io_state = png_get_io_state(png_ptr);
+   int err = 0;
+
+   /* Check if the current operation (reading / writing) is as expected. */
+   if ((io_state & PNG_IO_MASK_OP) != io_op)
+      png_error(png_ptr, "Incorrect operation in I/O state");
+
+   /* Check if the buffer size specific to the current location
+    * (file signature / header / data / crc) is as expected.
+    */
+   switch (io_state & PNG_IO_MASK_LOC)
+   {
+   case PNG_IO_SIGNATURE:
+      if (data_length > 8)
+         err = 1;
+      break;
+   case PNG_IO_CHUNK_HDR:
+      if (data_length != 8)
+         err = 1;
+      break;
+   case PNG_IO_CHUNK_DATA:
+      break;  /* no restrictions here */
+   case PNG_IO_CHUNK_CRC:
+      if (data_length != 4)
+         err = 1;
+      break;
+   default:
+      err = 1;  /* uninitialized */
+   }
+   if (err)
+      png_error(png_ptr, "Bad I/O state or buffer size");
+}
+#endif
+
 #ifndef USE_FAR_KEYWORD
 static void PNGCBAPI
 pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
@@ -317,8 +359,12 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
    if (check != length)
    {
-      png_error(png_ptr, "Read Error!");
+      png_error(png_ptr, "Read Error");
    }
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   pngtest_check_io_state(png_ptr, length, PNG_IO_READING);
+#endif
 }
 #else
 /* This is the model-independent version. Since the standard I/O library
@@ -366,7 +412,11 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    }
 
    if (check != length)
-      png_error(png_ptr, "read Error");
+      png_error(png_ptr, "Read Error");
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   pngtest_check_io_state(png_ptr, length, PNG_IO_READING);
+#endif
 }
 #endif /* USE_FAR_KEYWORD */
 
@@ -396,6 +446,10 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    {
       png_error(png_ptr, "Write Error");
    }
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   pngtest_check_io_state(png_ptr, length, PNG_IO_WRITING);
+#endif
 }
 #else
 /* This is the model-independent version. Since the standard I/O library
@@ -448,6 +502,10 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    {
       png_error(png_ptr, "Write Error");
    }
+
+#ifdef PNG_IO_STATE_SUPPORTED
+   pngtest_check_io_state(png_ptr, length, PNG_IO_WRITING);
+#endif
 }
 #endif /* USE_FAR_KEYWORD */
 

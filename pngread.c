@@ -232,32 +232,8 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   /* If we haven't checked all of the PNG signature bytes, do so now. */
-   if (png_ptr->sig_bytes < 8)
-   {
-      png_size_t num_checked = png_ptr->sig_bytes,
-                 num_to_check = 8 - num_checked;
-
-#ifdef PNG_IO_STATE_SUPPORTED
-      png_ptr->io_state = PNG_IO_READING | PNG_IO_SIGNATURE;
-#endif
-
-      png_read_data(png_ptr, &(info_ptr->signature[num_checked]), num_to_check);
-      png_ptr->sig_bytes = 8;
-
-      if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
-      {
-         if (num_checked < 4 &&
-             png_sig_cmp(info_ptr->signature, num_checked, num_to_check - 4))
-            png_error(png_ptr, "Not a PNG file");
-
-         else
-            png_error(png_ptr, "PNG file corrupted by ASCII conversion");
-      }
-
-      if (num_checked < 3)
-         png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
-   }
+   /* Read and check the PNG file signature. */
+   png_read_sig(png_ptr, info_ptr);
 
    for (;;)
    {

@@ -511,6 +511,9 @@ PNG_EXTERN void png_reset_crc PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_write_data PNGARG((png_structp png_ptr,
     png_const_bytep data, png_size_t length));
 
+/* Read and check the PNG file signature */
+PNG_EXTERN void png_read_sig PNGARG((png_structp png_ptr, png_infop info_ptr));
+
 /* Read the chunk header (length + type name) */
 PNG_EXTERN png_uint_32 png_read_chunk_header PNGARG((png_structp png_ptr));
 

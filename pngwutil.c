@@ -653,7 +653,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
 
    png_ptr->zstream.next_out = png_ptr->zbuf;
    png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-   /* libpng is not interested in zstream.data_type, so set it 
+   /* libpng is not interested in zstream.data_type, so set it
     * to a predefined value, to avoid its evaluation inside zlib
     */
    png_ptr->zstream.data_type = Z_BINARY;

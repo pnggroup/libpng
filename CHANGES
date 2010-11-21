@@ -3074,7 +3074,12 @@ Version 1.5.0beta54 [November 10, 2010]
   Require 48 bytes, not 64 bytes, for big_row_buf in overflow checks.
   Used a consistent structure for the pngget.c functions.
 
-Version 1.5.0beta55 [November 11, 2010]
+Version 1.5.0beta55 [November 21, 2010]
+  Revised png_get_uint_32, png_get_int_32, png_get_uint_16 (Cosmin)
+  Moved reading of file signature into png_read_sig (Cosmin)
+  Fixed atomicity of chunk header serialization (Cosmin)
+  Added test for io_state in pngtest.c (Cosmin)
+  Added "#!/bin/sh" at the top of contrib/pngminim/*/gather.sh scripts.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

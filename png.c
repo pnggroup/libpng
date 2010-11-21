@@ -556,13 +556,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.0beta55 - November 11, 2010" PNG_STRING_NEWLINE \
+     "libpng version 1.5.0beta55 - November 21, 2010" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.0beta55 - November 11, 2010\
+      return "libpng version 1.5.0beta55 - November 21, 2010\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1274,7 +1274,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
                       * place - after the DP don't adjust 'exp' any
                       * more!
                       */
-                     if (exp != (-1)) 
+                     if (exp != (-1))
                      {
                         if (exp == 0) *ascii++ = 46, --size;
                         /* PLUS 1: TOTAL 4 */
@@ -1800,7 +1800,7 @@ png_log8bit(unsigned int x)
     * always at most 19 bits.
     */
    if ((x &= 0xff) == 0)
-      return 0xffffffff; 
+      return 0xffffffff;
 
    if ((x & 0xf0) == 0)
       log  = 4, x <<= 4;

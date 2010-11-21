@@ -214,7 +214,7 @@ sample(png_const_bytep row, png_byte colour_type, png_byte bit_depth,
     png_uint_32 x, unsigned int sample)
 {
    png_uint_32 index, result;
-   
+
    /* Find a sample index for the desired sample: */
    x *= bit_depth;
    index = x;
@@ -554,7 +554,7 @@ store_log(png_store* ps, png_structp pp, png_const_charp message, int is_error)
          pos = safecat(buffer, sizeof buffer, 0, "error: ");
       else
          pos = safecat(buffer, sizeof buffer, 0, "warning: ");
-         
+
       store_message(ps, pp, buffer, sizeof buffer, pos, message);
       fputs(buffer, stderr);
       fputc('\n', stderr);
@@ -927,7 +927,7 @@ store_write_reset(png_store *ps)
     * spurious errors in the case of memory corruption above, but this is safe.
     */
    store_pool_delete(ps, &ps->write_memory_pool);
-   
+
    store_freenew(ps);
 }
 
@@ -978,7 +978,7 @@ store_read_reset(png_store *ps)
    if (ps->pread != NULL)
    {
       anon_context(ps);
-      
+
       Try
          png_destroy_read_struct(&ps->pread, &ps->piread, NULL);
 
@@ -1068,7 +1068,7 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
 
       Throw ps;
    }
-      
+
    store_read_set(ps, id);
 
    if (ppi != NULL)
@@ -1339,21 +1339,21 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
             store_read_imp(&pm->this, pm->buffer, 8); /* size of signature. */
             pm->buffer_count = 8;
             pm->buffer_position = 0;
-   
+
             if (memcmp(pm->buffer, sign, 8) != 0)
                png_error(pm->this.pread, "invalid PNG file signature");
             pm->state = modifier_signature;
             break;
-   
+
          case modifier_signature:
             store_read_imp(&pm->this, pm->buffer, 13+12); /* size of IHDR */
             pm->buffer_count = 13+12;
             pm->buffer_position = 0;
-   
+
             if (png_get_uint_32(pm->buffer) != 13 ||
                 png_get_uint_32(pm->buffer+4) != CHUNK_IHDR)
                png_error(pm->this.pread, "invalid IHDR");
-   
+
             /* Check the list of modifiers for modifications to the IHDR. */
             mod = pm->modifications;
             while (mod != NULL)
@@ -1364,19 +1364,19 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                   mod->modified = 1;
                   modifier_setbuffer(pm);
                   }
-   
+
                /* Ignore removal or add if IHDR! */
                mod = mod->next;
             }
-   
+
             /* Cache information from the IHDR (the modified one.) */
             pm->bit_depth = pm->buffer[8+8];
             pm->colour_type = pm->buffer[8+8+1];
-   
+
             pm->state = modifier_IHDR;
             pm->flush = 0;
             break;
-   
+
          case modifier_IHDR:
          default:
             /* Read a new chunk and process it until we see PLTE, IDAT or
@@ -1392,7 +1392,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                st -= cb;
                if (st <= 0) return;
             }
-   
+
             /* No more bytes to flush, read a header, or handle a pending
              * chunk.
              */
@@ -1405,14 +1405,14 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
             }
             else
                store_read_imp(&pm->this, pm->buffer, 8);
-   
+
             pm->buffer_count = 8;
             pm->buffer_position = 0;
-   
+
             /* Check for something to modify or a terminator chunk. */
             len = png_get_uint_32(pm->buffer);
             chunk = png_get_uint_32(pm->buffer+4);
-   
+
             /* Terminators first, they may have to be delayed for added
              * chunks
              */
@@ -1420,7 +1420,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                 chunk == CHUNK_IEND)
             {
                mod = pm->modifications;
-   
+
                while (mod != NULL)
                {
                   if ((mod->add == chunk ||
@@ -1431,7 +1431,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                       * this again.
                       */
                      mod->added = 1;
-   
+
                      if ((*mod->modify_fn)(pm, mod, 1/*add*/))
                      {
                         /* Reset the CRC on a new chunk */
@@ -1443,7 +1443,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                            pm->buffer_position = 0;
                            mod->removed = 1;
                            }
-   
+
                         /* The buffer has been filled with something (we assume)
                          * so output this.  Pend the current chunk.
                          */
@@ -1452,10 +1452,10 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                         break; /* out of while */
                      }
                   }
-   
+
                   mod = mod->next;
                }
-   
+
                /* Don't do any further processing if the buffer was modified -
                 * otherwise the code will end up modifying a chunk that was just
                 * added.
@@ -1463,7 +1463,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                if (mod != NULL)
                   break; /* out of switch */
             }
-   
+
             /* If we get to here then this chunk may need to be modified.  To do
              * this is must be less than 1024 bytes in total size, otherwise
              * it just gets flushed.
@@ -1473,7 +1473,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                store_read_imp(&pm->this, pm->buffer+pm->buffer_count,
                    len+12-pm->buffer_count);
                pm->buffer_count = len+12;
-   
+
                /* Check for a modification, else leave it be. */
                mod = pm->modifications;
                while (mod != NULL)
@@ -1500,14 +1500,14 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                         modifier_setbuffer(pm);
                      }
                   }
-   
+
                   mod = mod->next;
                }
             }
 
             else
                pm->flush = len+12 - pm->buffer_count; /* data + crc */
-   
+
             /* Take the data from the buffer (if there is any). */
             break;
       }
@@ -2073,7 +2073,7 @@ make_error(png_store* ps, png_byte PNG_CONST colour_type, png_byte bit_depth,
          for (pass=1; pass<=npasses; ++pass)
          {
             png_uint_32 y;
-         
+
             for (y=0; y<h; ++y)
             {
                png_byte buffer[STD_ROWMAX];
@@ -2241,7 +2241,7 @@ standard_info_part1(standard_display *dp, png_structp pp, png_infop pi)
     * no transforms, it does for other tests where rowbytes may change after
     * png_read_update_info.
     */
-   if (png_get_rowbytes(pp, pi) != 
+   if (png_get_rowbytes(pp, pi) !=
        standard_rowsize(pp, dp->colour_type, dp->bit_depth))
       png_error(pp, "validate: row size changed");
 
@@ -2750,7 +2750,7 @@ gamma_display_init(gamma_display *dp, png_modifier *pm, png_byte colour_type,
    /* Standard fields */
    standard_display_init(&dp->this, &pm->this, colour_type, bit_depth,
       interlace_type);
-   
+
    /* Parameter fields */
    dp->pm = pm;
    dp->file_gamma = file_gamma;
