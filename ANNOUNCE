@@ -1,5 +1,5 @@
 
-Libpng 1.4.5beta06 - November 21, 2010
+Libpng 1.4.5beta07 - November 24, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.5beta06.tar.xz (LZMA-compressed, recommended)
-   1.4.5beta06.tar.gz
-   1.4.5beta06.tar.bz2
+   1.4.5beta07.tar.xz (LZMA-compressed, recommended)
+   1.4.5beta07.tar.gz
+   1.4.5beta07.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp145b06.zip
-   lp145b06.7z
+   lp145b07.zip
+   lp145b07.7z
 
 Other information:
 
-   1.4.5beta06-README.txt
-   1.4.5beta06-LICENSE.txt
+   1.4.5beta07-README.txt
+   1.4.5beta07-LICENSE.txt
 
 Changes since the last public release (1.4.4):
 
@@ -46,7 +46,7 @@ version 1.4.5beta04 [November 8, 2010]
 version 1.4.5rc01 [November 19, 2010]
   No changes.
 
-version 1.4.5beta05 [November 21, 2010]
+version 1.4.5beta05 [November 24, 2010]
   Removed some extraneous parentheses that appeared in pngrutil.c of
     libpng-1.4.3beta01
   Revised png_get_uint_32, png_get_int_32, png_get_uint_16 (Cosmin)
@@ -69,6 +69,8 @@ version 1.4.5beta06 [November 21, 2010]
     smaller than (int) or (unsigned int)) and -Wcast-qual is not possible
     with pngwio.c and pngwutil.c because the 'write' callback and zlib
     compression both fail to declare their input buffers with 'const'.
+
+version 1.4.5beta07 [November 24, 2010]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
