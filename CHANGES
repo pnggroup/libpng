@@ -2723,6 +2723,8 @@ version 1.4.5beta06 [November 21, 2010]
     compression both fail to declare their input buffers with 'const'.
 
 version 1.4.5beta07 [November 24, 2010]
+  Reverted png_get_uint_16 macro to beta05 and added comment about the
+    potential API incompatibility.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

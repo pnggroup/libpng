@@ -2649,17 +2649,21 @@ PNG_EXPORT(png_bytep,png_get_io_chunk_name)
       ((png_uint_32)(*((buf) + 1)) << 16) + \
       ((png_uint_32)(*((buf) + 2)) << 8) + \
       ((png_uint_32)(*((buf) + 3))))
-#  ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED  /* Undefined in 1.4.x by default. */
-#    define png_get_uint_16(buf) \
-       ((png_uint_16) \
-        (((unsigned int)(*(buf)) << 8) + \
-         ((unsigned int)(*((buf) + 1)))))
-#  else
-#    define png_get_uint_16(buf) \
-       ((png_uint_32) \
-        (((unsigned int)(*(buf)) << 8) + \
-         ((unsigned int)(*((buf) + 1)))))
-#  endif
+
+  /* The following definition introduces an API incompatibility (but not
+   * an ABI incompatibility) with libpng-1.4.0 through 1.4.4.  Prior to
+   * libpng-1.4.5 the macro, which is used by default, returned (incorrectly)
+   * a (png_uint_32), while the function, if used instead, correctly returned
+   * a (png_uint_16).
+   *
+   * Libpng versions 1.0.x and 1.2.x only used a function so are not affected
+   * by this potential API incompatibility between macros.
+   */
+#  define png_get_uint_16(buf) \
+     ((png_uint_16) \
+       (((unsigned int)(*(buf)) << 8) + \
+        ((unsigned int)(*((buf) + 1)))))
+
 #  define png_get_int_32(buf) \
      ((png_int_32)((*(buf) & 0x80) \
       ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
