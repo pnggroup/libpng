@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.5beta07 - November 24, 2010
+ libpng version 1.4.5beta07 - November 25, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.5beta07 - November 24, 2010
+ libpng versions 0.97, January 1998, through 1.4.5beta07 - November 25, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -3122,6 +3122,12 @@ deprecated since libpng-1.0.18 and 1.2.9, when it was replaced with
 png_set_expand_gray_1_2_4_to_8() because the former function also
 expanded palette images.
 
+Macros for png_get_uint_16, png_get_uint_32, and png_get_int_32
+were added and are used by default instead of the corresponding
+functions. Unfortunately,
+from libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the  
+function) incorrectly returned a value of type png_uint_32.
+
 We changed the prototype for png_malloc() from
     png_malloc(png_structp png_ptr, png_uint_32 size)
 to
@@ -3297,7 +3303,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-November 24, 2010
+November 25, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
