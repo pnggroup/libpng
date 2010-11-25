@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.0beta56 - November 21, 2010
+ libpng version 1.5.0beta56 - November 25, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.0beta56 - November 21, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta56 - November 25, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -3191,6 +3191,12 @@ deprecated since libpng-1.0.18 and 1.2.9, when it was replaced with
 png_set_expand_gray_1_2_4_to_8() because the former function also
 expanded palette images.
 
+Macros for png_get_uint_16, png_get_uint_32, and png_get_int_32
+were added and are used by default instead of the corresponding
+functions. Unfortunately,
+from libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the  
+function) incorrectly returned a value of type png_uint_32.
+
 We changed the prototype for png_malloc() from
     png_malloc(png_structp png_ptr, png_uint_32 size)
 to
@@ -3228,7 +3234,12 @@ PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
 
 We removed the trailing '.' from the warning and error messages.
 
-X. Detecting libpng
+X.  Changes to Libpng from version 1.4.x to 1.5.x
+
+From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the  
+function) incorrectly returned a value of type png_uint_32.
+
+XI. Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
 changed, and is unaffected by conditional compilation macros.  It is the
@@ -3237,7 +3248,7 @@ libpng version since 0.88.  In an autoconf "configure.in" you could use
 
     AC_CHECK_LIB(png, png_get_io_ptr, ...
 
-XI. Source code repository
+XII. Source code repository
 
 Since about February 2009, version 1.2.34, libpng has been under "git" source
 control.  The git repository was built from old libpng-x.y.z.tar.gz files
@@ -3256,7 +3267,7 @@ the libpng bug tracker at
 
     http://libpng.sourceforge.net
 
-XII. Coding style
+XIII. Coding style
 
 Our coding style is similar to the "Allman" style, with curly
 braces on separate lines:
@@ -3364,9 +3375,9 @@ Lines do not exceed 80 characters.
 
 Other rules can be inferred by inspecting the libpng source.
 
-XIII. Y2K Compliance in libpng
+XIV. Y2K Compliance in libpng
 
-November 21, 2010
+November 25, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
