@@ -2726,6 +2726,9 @@ version 1.4.5beta07 [November 25, 2010]
   Reverted png_get_uint_16 macro to beta05 and added comment about the
     potential API incompatibility.
 
+version 1.4.5rc02 [December 2, 2010]
+  No changes.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
