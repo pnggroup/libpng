@@ -333,7 +333,7 @@ typedef struct png_store
 static void
 store_pool_mark(png_byte *mark)
 {
-   /* Generate a new mark.  This uses a boring repeatable algorihtm and it is
+   /* Generate a new mark.  This uses a boring repeatable algorithm and it is
     * implemented here so that it gives the same set of numbers on every
     * architecture.  It's a linear congruential generator (Knuth or Sedgewick
     * "Algorithms") but it comes from the 'feedback taps' table in Horowitz and
@@ -568,7 +568,7 @@ store_error(png_structp pp, png_const_charp message) /* PNG_NORETURN */
    png_store *ps = png_get_error_ptr(pp);
 
    if (!ps->expect_error)
-      store_log(ps, pp, message, 1/*error*/);
+      store_log(ps, pp, message, 1 /* error */);
 
    /* And finally throw an exception. */
    {
@@ -583,7 +583,7 @@ store_warning(png_structp pp, png_const_charp message)
    png_store *ps = png_get_error_ptr(pp);
 
    if (!ps->expect_warning)
-      store_log(ps, pp, message, 0/*warning*/);
+      store_log(ps, pp, message, 0 /* warning */);
    else
       ps->saw_warning = 1;
 }
@@ -767,7 +767,7 @@ store_pool_error(png_store *ps, png_structp pp, PNG_CONST char *msg)
     * above.  store_log accepts a NULL png_structp - it just changes what gets
     * output by store_message.
     */
-   store_log(ps, pp, msg, 1/*error*/);
+   store_log(ps, pp, msg, 1 /* error */);
 }
 
 static void
@@ -840,9 +840,15 @@ store_pool_delete(png_store *ps, store_pool *pool)
          pool == &ps->read_memory_pool ? (ps->current != NULL ?
             ps->current->name : "unknown file") : ps->wname);
    pool->current = 0;
-   if (pool->limit > pool->max_limit) pool->max_limit = pool->limit;
+
+   if (pool->limit > pool->max_limit)
+      pool->max_limit = pool->limit;
+
    pool->limit = 0;
-   if (pool->total > pool->max_total) pool->max_total = pool->total;
+
+   if (pool->total > pool->max_total)
+      pool->max_total = pool->total;
+
    pool->total = 0;
 
    /* Get a new mark too. */
@@ -858,9 +864,14 @@ store_malloc(png_structp pp, png_alloc_size_t cb)
 
    if (new != NULL)
    {
-      if (cb > pool->max) pool->max = cb;
+      if (cb > pool->max)
+         pool->max = cb;
+
       pool->current += cb;
-      if (pool->current > pool->limit) pool->limit = pool->current;
+
+      if (pool->current > pool->limit)
+         pool->limit = pool->current;
+
       pool->total += cb;
 
       new->size = cb;
@@ -871,6 +882,7 @@ store_malloc(png_structp pp, png_alloc_size_t cb)
       pool->list = new;
       ++new;
    }
+
    else
       store_pool_error(pool->store, pp, "out of memory");
 
@@ -884,7 +896,7 @@ store_free(png_structp pp, png_voidp memory)
    store_memory *this = memory, **test;
 
    /* First check that this 'memory' really is valid memory - it must be in the
-    * pool list.  If it is use the shared memory_free function to free it.
+    * pool list.  If it is, use the shared memory_free function to free it.
     */
    --this;
    for (test = &pool->list; *test != this; test = &(*test)->next)
@@ -932,7 +944,7 @@ store_write_reset(png_store *ps)
 }
 
 /* The following is the main write function, it returns a png_struct and,
- * optionally, a png)info suitable for writiing a new PNG file.  Use
+ * optionally, a png_info suitable for writiing a new PNG file.  Use
  * store_storefile above to record this file after it has been written.  The
  * returned libpng structures as destroyed by store_write_reset above.
  */
@@ -954,10 +966,12 @@ set_store_for_write(png_store *ps, png_infopp ppi,
       if (ps->speed)
          ps->pwrite = png_create_write_struct(PNG_LIBPNG_VER_STRING,
             ps, store_error, store_warning);
+
       else
          ps->pwrite = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
             ps, store_error, store_warning, &ps->write_memory_pool,
             store_malloc, store_free);
+
       png_set_write_fn(ps->pwrite, ps, store_write, store_flush);
 
       if (ppi != NULL)
@@ -1054,6 +1068,7 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
    if (ps->speed)
       ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps,
           store_error, store_warning);
+
    else
       ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
           store_error, store_warning, &ps->read_memory_pool, store_malloc,
@@ -1086,6 +1101,7 @@ store_delete(png_store *ps)
    store_write_reset(ps);
    store_read_reset(ps);
    store_freefile(&ps->saved);
+
    if (ps->image != NULL)
    {
       free(ps->image-1);
@@ -1182,7 +1198,7 @@ static double pcerr(png_modifier *pm, png_byte bit_depth)
 static double outerr(png_modifier *pm, png_byte bit_depth)
 {
    /* There is a serious error in the 2 and 4 bit grayscale transform because
-    * the gamma table value (8 bits) is simply shifted, not rouned, so the
+    * the gamma table value (8 bits) is simply shifted, not rounded, so the
     * error in 4 bit greyscale gamma is up to the value below.  This is a hack
     * to allow pngvalid to succeed:
     */
@@ -1465,7 +1481,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
             }
 
             /* If we get to here then this chunk may need to be modified.  To do
-             * this is must be less than 1024 bytes in total size, otherwise
+             * this it must be less than 1024 bytes in total size, otherwise
              * it just gets flushed.
              */
             if (len+12 <= sizeof pm->buffer)
@@ -1629,7 +1645,7 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
  * as above (FILEID).
  */
 
-/* The number of passes is related to the interlace type, there's no libpng API
+/* The number of passes is related to the interlace type. There's no libpng API
  * to determine this so we need an inquiry function:
  */
 static int
@@ -1740,8 +1756,8 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
          return;
 
       case 16:
-         /* Generate all 65536 pixel values in order, this includes the 8 bit GA
-          * case as we as the 16 bit G case.
+         /* Generate all 65536 pixel values in order, which includes the 8 bit
+          * GA case as well as the 16 bit G case.
           */
          while (i<128)
             buffer[2*i] = (v>>8) & 0xff, buffer[2*i+1] = v & 0xff, ++v, ++i;
@@ -1872,7 +1888,7 @@ make_standard_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
       else
       {
          /* Somewhat confusingly this must be called *after* png_write_info
-          * because, if it is called before, the information in *pp has not been
+          * because if it is called before, the information in *pp has not been
           * updated to reflect the interlaced image.
           */
          int npasses = png_set_interlace_handling(pp);
@@ -1905,7 +1921,7 @@ make_standard_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
 
    Catch(fault)
    {
-      /* Use the png_store retuned by the exception, this may help the compiler
+      /* Use the png_store returned by the exception. This may help the compiler
        * because 'ps' is not used in this branch of the setjmp.  Note that fault
        * and ps will always be the same value.
        */
@@ -2154,7 +2170,7 @@ perform_error_test(png_modifier *pm)
  * must contain all the test parameters and all the local variables directly
  * accessible to the sequential reader implementation.
  *
- * The techinque adopted is to reinvent part of what Dijkstra termed a
+ * The technique adopted is to reinvent part of what Dijkstra termed a
  * 'display'; an array of pointers to the stack frames of enclosing functions so
  * that a nested function definition can access the local (C auto) variables of
  * the functions that contain its definition.  In fact C provides the first
@@ -2201,7 +2217,7 @@ standard_display_init(standard_display *dp, png_store* ps, png_byte colour_type,
 }
 
 /* By passing a 'standard_display' the progressive callbacks can be used
- * directly by the sequential code, the functions suffixed _imp are the
+ * directly by the sequential code, the functions suffixed "_imp" are the
  * implementations, the functions without the suffix are the callbacks.
  *
  * The code for the info callback is split into two because this callback calls
@@ -2238,7 +2254,7 @@ standard_info_part1(standard_display *dp, png_structp pp, png_infop pi)
 
    /* Important: this is validating the value *before* any transforms have been
     * put in place.  It doesn't matter for the standard tests, where there are
-    * no transforms, it does for other tests where rowbytes may change after
+    * no transforms, but it does for other tests where rowbytes may change after
     * png_read_update_info.
     */
    if (png_get_rowbytes(pp, pi) !=
@@ -2271,7 +2287,7 @@ standard_info_part1(standard_display *dp, png_structp pp, png_infop pi)
 
    /* Read the number of passes - expected to match the value used when
     * creating the image (interlaced or not).  This has the side effect of
-    * turning ono interlace handling.
+    * turning on interlace handling.
     */
    dp->npasses = png_set_interlace_handling(pp);
 
@@ -2326,7 +2342,7 @@ standard_info(png_structp pp, png_infop pi)
    /* Call with nImages==1 because the progressive reader can only produce one
     * image.
     */
-   standard_info_imp(dp, pp, pi, 1/*only one image*/);
+   standard_info_imp(dp, pp, pi, 1 /*only one image*/);
 }
 
 static void
@@ -2464,7 +2480,7 @@ standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
       png_structp pp;
       png_infop pi;
 
-      /* Get a png_struct for writing the image, this will throw an error if it
+      /* Get a png_struct for writing the image. This will throw an error if it
        * fails, so we don't need to check the result.
        */
       pp = set_store_for_read(d.ps, &pi, d.id,
@@ -2549,7 +2565,7 @@ test_standard(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
       }
    }
 
-   return 1; /*keep going*/
+   return 1; /* keep going */
 }
 
 static void
@@ -2786,7 +2802,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
    png_read_update_info(pp, pi);
 
    /* Now we may get a different cbRow: */
-   standard_info_part2(&dp->this, pp, pi, 1/*images*/);
+   standard_info_part2(&dp->this, pp, pi, 1 /*images*/);
 }
 
 static void
@@ -2820,6 +2836,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
    /* There are three sources of error, firstly the quantization in the
     * file encoding, determined by sbit and/or the file depth, secondly
     * the output (screen) gamma and thirdly the output file encoding.
+    *
     * Since this API receives the screen and file gamma in double
     * precision it is possible to calculate an exact answer given an input
     * pixel value.  Therefore we assume that the *input* value is exact -
@@ -2827,21 +2844,21 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
     * output to the limits of double precision arithmetic and compare with
     * what libpng returns.
     *
-    * Since the library must quantise the output to 8 or 16 bits there is
+    * Since the library must quantize the output to 8 or 16 bits there is
     * a fundamental limit on the accuracy of the output of +/-.5 - this
-    * quantisation limit is included in addition to the other limits
+    * quantization limit is included in addition to the other limits
     * specified by the paramaters to the API.  (Effectively, add .5
     * everywhere.)
     *
     * The behavior of the 'sbit' paramter is defined by section 12.5
     * (sample depth scaling) of the PNG spec.  That section forces the
     * decoder to assume that the PNG values have been scaled if sBIT is
-    * presence:
+    * present:
     *
     *     png-sample = floor( input-sample * (max-out/max-in) + .5);
     *
     * This means that only a subset of the possible PNG values should
-    * appear in the input, however the spec allows the encoder to use a
+    * appear in the input. However, the spec allows the encoder to use a
     * variety of approximations to the above and doesn't require any
     * restriction of the values produced.
     *
@@ -2915,7 +2932,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
             if (encoded_error < .5+maxout)
                continue;
 
-            /* There may be an error, calculate the actual sample
+            /* There may be an error, so calculate the actual sample
              * values - unencoded light intensity values.  Note that
              * in practice these are not unencoded because they
              * include a 'viewing correction' to decrease or
@@ -2961,20 +2978,24 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
 
                /* Low bound - the minimum of the three: */
                es_lo = encoded_sample - maxout;
+
                if (es_lo > 0 && sample-tmp > 0)
                {
                   double l = outmax * pow(sample-tmp, 1/screen_gamma);
                   if (l < es_lo) es_lo = l;
                }
+
                else
                   es_lo = 0;
 
                es_hi = encoded_sample + maxout;
+
                if (es_hi < outmax && sample+tmp < 1)
                {
                   double h = outmax * pow(sample+tmp, 1/screen_gamma);
                   if (h > es_hi) es_hi = h;
                }
+
                else
                   es_hi = outmax;
             }
@@ -3027,10 +3048,12 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
 
                {
                   char msg[256];
+
                   sprintf(msg,
                    "error: %.3f; %u{%u;%u} -> %u not %.2f (%.1f-%.1f)",
                      od-encoded_sample, id, sbit, isbit, od,
                      encoded_sample, is_lo, is_hi);
+
                   png_warning(pp, msg);
                }
             }
@@ -3040,8 +3063,10 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
       else if (!speed && memcmp(std, pRow, cbRow) != 0)
       {
          char msg[64];
+
          /* No transform is expected on the threshold tests. */
          sprintf(msg, "gamma: below threshold row %d changed", y);
+
          png_error(pp, msg);
       }
    } /* row (y) loop */
@@ -3131,7 +3156,7 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
          /* Check the header values: */
          png_read_info(pp, pi);
 
-         /* Process the 'info' requirements. only one image is generated */
+         /* Process the 'info' requirements. Only one image is generated */
          gamma_info_imp(&d, pp, pi);
 
          sequential_row(&d.this, pp, pi, NULL, d.this.ps->image);
@@ -3157,21 +3182,25 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
          case 2:
             if (d.maxerrout > d.pm->error_gray_2)
                d.pm->error_gray_2 = d.maxerrout;
+
             break;
 
          case 4:
             if (d.maxerrout > d.pm->error_gray_4)
                d.pm->error_gray_4 = d.maxerrout;
+
             break;
 
          case 8:
             if (d.maxerrout > d.pm->error_gray_8)
                d.pm->error_gray_8 = d.maxerrout;
+
             break;
 
          case 16:
             if (d.maxerrout > d.pm->error_gray_16)
                d.pm->error_gray_16 = d.maxerrout;
+
             break;
 
          default:
@@ -3184,12 +3213,14 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
          switch (d.this.bit_depth)
          {
          case 8:
+
             if (d.maxerrout > d.pm->error_color_8)
                d.pm->error_color_8 = d.maxerrout;
 
             break;
 
          case 16:
+
             if (d.maxerrout > d.pm->error_color_16)
                d.pm->error_color_16 = d.maxerrout;
 
@@ -3270,6 +3301,7 @@ static void gamma_transform_test(png_modifier *pm,
 
    if (strip16)
       pos = safecat(name, sizeof name, pos, "16to8 ");
+
    pos = safecatd(name, sizeof name, pos, file_gamma, 3);
    pos = safecat(name, sizeof name, pos, "->");
    pos = safecatd(name, sizeof name, pos, screen_gamma, 3);
@@ -3366,7 +3398,7 @@ static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
 #  ifndef PNG_MAX_GAMMA_8
 #     define PNG_MAX_GAMMA_8 11
 #  endif
-   /* Include the alpha cases here, not that sbit matches the internal value
+   /* Include the alpha cases here. Note that sbit matches the internal value
     * used by the library - otherwise we will get spurious errors from the
     * internal sbit style approximation.
     *
@@ -3471,6 +3503,7 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
    pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = pm->error_gray_16 =
    pm->error_color_8 = pm->error_color_16 = 0;
    perform_gamma_strip16_tests(pm, speed);
+
    if (summary)
    {
       printf("Gamma correction with 16 to 8 bit reduction:\n");
@@ -3505,6 +3538,7 @@ int main(int argc, PNG_CONST char **argv)
     * note that, for testing purposes, it is deliberately mis-aligned.
     */
    pm.this.image = malloc(2*STD_IMAGEMAX+1);
+
    if (pm.this.image != NULL)
    {
       /* Ignore OOM at this point - the 'ensure' routine above will allocate the
@@ -3529,9 +3563,10 @@ int main(int argc, PNG_CONST char **argv)
    pm.maxpc8 = .499;    /* I.e. .499% fractional error */
    pm.maxout16 = .499;  /* Error in *encoded* value */
    pm.maxabs16 = .00005;/* 1/20000 */
-   /* NOTE: this is a reasonable perceptual limit, we assume that humans can
+
+   /* NOTE: this is a reasonable perceptual limit. We assume that humans can
     * perceive light level differences of 1% over a 100:1 range, so we need to
-    * maintain 1 in 10000 accuracy (in linear light space), this is what the
+    * maintain 1 in 10000 accuracy (in linear light space), which is what the
     * following guarantees.  It also allows significantly higher errors at
     * higher 16 bit values, which is important for performance.  The actual
     * maximum 16 bit error is about +/-1.9 in the fixed point implementation but
@@ -3633,6 +3668,7 @@ int main(int argc, PNG_CONST char **argv)
       {
          if (pm.this.error[0] != 0)
             fprintf(stderr, "pngvalid: first error: %s\n", pm.this.error);
+
          fprintf(stderr, "pngvalid: run with -v to see what happened\n");
       }
       exit(1);
