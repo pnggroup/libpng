@@ -1230,7 +1230,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
       {
-         info_ptr = info_ptr; /* To quiet some compiler warnings */
+         PNG_UNUSED(info_ptr) /* To quiet some compiler warnings */
          png_error(png_ptr, "Out of place tEXt");
          /*NOT REACHED*/
       }
@@ -1327,7 +1327,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
    {
-      info_ptr = info_ptr; /* To quiet some compiler warnings */
+      PNG_UNUSED(info_ptr) /* To quiet some compiler warnings */
       png_error(png_ptr, "Out of place zTXt");
       /*NOT REACHED*/
    }
@@ -1531,7 +1531,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 {
    if (!(png_ptr->mode & PNG_HAVE_IHDR) || (png_ptr->mode & PNG_HAVE_IEND))
    {
-      info_ptr = info_ptr; /* To quiet some compiler warnings */
+      PNG_UNUSED(info_ptr) /* To quiet some compiler warnings */
       png_error(png_ptr, "Out of place iTXt");
       /*NOT REACHED*/
    }
@@ -1669,7 +1669,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
          png_chunk_error(png_ptr, "unknown critical chunk");
 
-      info_ptr = info_ptr; /* To quiet some compiler warnings */
+      PNG_UNUSED(info_ptr) /* To quiet some compiler warnings */
    }
 
 #ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED

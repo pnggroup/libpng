@@ -618,8 +618,7 @@ store_write(png_structp pp, png_bytep pb, png_size_t st)
 static void
 store_flush(png_structp pp)
 {
-   pp = pp;
-   /*DOES NOTHING*/
+   UNUSED(pp) /*DOES NOTHING*/
 }
 
 static size_t
