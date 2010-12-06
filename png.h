@@ -897,23 +897,51 @@ typedef png_struct FAR * FAR * png_structpp;
  *                   relevant when preprocessing png.h with
  *                   the *.dfn files for building symbol table
  *                   entries.
+ *
+ * For testing purposes, we also have
+ *   PNG_EXPORTX(ordinal, type, name, (args));
+ *
+ *       ordinal:    ordinal that is used while building
+ *                   *.def files. The ordinal value is only
+ *                   relevant when preprocessing png.h with
+ *                   the *.dfn files for building symbol table
+ *                   entries.
+ *       type:       return type of the function
+ *       name:       function name
+ *       args:       function arguments, with types
+ *
+ * and
+ *   PNG_EXPORTA(ordinal, type, name, (args), attributes);
+ *
+ *       ordinal:    ordinal that is used while building
+ *                   *.def files. The ordinal value is only
+ *                   relevant when preprocessing png.h with
+ *                   the *.dfn files for building symbol table
+ *                   entries.
+ *       type:       return type of the function
+ *       name:       function name
+ *       args:       function arguments, with types
+ *       attributes: function attributes
+ *
+ * PNG_EXPORTX and PNG_EXPORTA are currently only used for the
+ * first 10 headers, below.
  */
 
 /* Returns the version number of the library */
-PNG_EXPORT(png_uint_32,png_access_version_number,(void),,1);
+PNG_EXPORTX(1,png_uint_32,png_access_version_number,(void));
 
 /* Tell lib we have already handled the first <num_bytes> magic bytes.
  * Handling more than 8 bytes from the beginning of the file is an error.
  */
-PNG_EXPORT(void,png_set_sig_bytes,(png_structp png_ptr, int num_bytes),,2);
+PNG_EXPORTX(2, void,png_set_sig_bytes,(png_structp png_ptr, int num_bytes));
 
 /* Check sig[start] through sig[start + num_to_check - 1] to see if it's a
  * PNG file.  Returns zero if the supplied bytes match the 8-byte PNG
  * signature, and non-zero otherwise.  Having num_to_check == 0 or
  * start > 7 will always fail (ie return non-zero).
  */
-PNG_EXPORT(int,png_sig_cmp,(png_const_bytep sig, png_size_t start,
-    png_size_t num_to_check),,3);
+PNG_EXPORTX(3,int,png_sig_cmp,(png_const_bytep sig, png_size_t start,
+    png_size_t num_to_check));
 
 /* Simple signature checking function.  This is the same as calling
  * png_check_sig(sig, n) := !png_sig_cmp(sig, 0, n).
@@ -921,19 +949,19 @@ PNG_EXPORT(int,png_sig_cmp,(png_const_bytep sig, png_size_t start,
 #define png_check_sig(sig,n) !png_sig_cmp((sig), 0, (n))
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
-PNG_EXPORT(png_structp,png_create_read_struct,(png_const_charp user_png_ver,
+PNG_EXPORTA(4, png_structp,png_create_read_struct,(png_const_charp user_png_ver,
     png_voidp error_ptr, png_error_ptr error_fn, png_error_ptr warn_fn),
-    PNG_ALLOCATED,4);
+    PNG_ALLOCATED);
 
 /* Allocate and initialize png_ptr struct for writing, and any other memory */
-PNG_EXPORT(png_structp,png_create_write_struct,(png_const_charp user_png_ver,
+PNG_EXPORTA(5,png_structp,png_create_write_struct,(png_const_charp user_png_ver,
     png_voidp error_ptr, png_error_ptr error_fn, png_error_ptr warn_fn),
-    PNG_ALLOCATED,5);
+    PNG_ALLOCATED);
 
-PNG_EXPORT(png_size_t,png_get_compression_buffer_size,(png_structp png_ptr),,6);
+PNG_EXPORTX(6,png_size_t,png_get_compression_buffer_size,(png_structp png_ptr));
 
-PNG_EXPORT(void,png_set_compression_buffer_size,(png_structp png_ptr,
-    png_size_t size),,7);
+PNG_EXPORTX(7,void,png_set_compression_buffer_size,(png_structp png_ptr,
+    png_size_t size));
 
 /* Moved from pngconf.h in 1.4.0 and modified to ensure setjmp/longjmp
  * match up.
@@ -946,8 +974,8 @@ PNG_EXPORT(void,png_set_compression_buffer_size,(png_structp png_ptr,
  * allocated by the library - the call will return NULL on a mismatch
  * indicating an ABI mismatch.
  */
-PNG_EXPORT(jmp_buf*,png_set_longjmp_fn,(png_structp png_ptr,
-    png_longjmp_ptr longjmp_fn, size_t jmp_buf_size),,8);
+PNG_EXPORTX(8,jmp_buf*,png_set_longjmp_fn,(png_structp png_ptr,
+    png_longjmp_ptr longjmp_fn, size_t jmp_buf_size));
 #  define png_jmpbuf(png_ptr) \
       (*png_set_longjmp_fn((png_ptr), longjmp, sizeof (jmp_buf)))
 #else
@@ -959,11 +987,11 @@ PNG_EXPORT(jmp_buf*,png_set_longjmp_fn,(png_structp png_ptr,
  * will use it; otherwise it will call PNG_ABORT().  This function was
  * added in libpng-1.5.0.
  */
-PNG_EXPORT(void,png_longjmp,(png_structp png_ptr, int val),PNG_NORETURN,9);
+PNG_EXPORTA(9,void,png_longjmp,(png_structp png_ptr, int val),PNG_NORETURN);
 
 #ifdef PNG_READ_SUPPORTED
 /* Reset the compression stream */
-PNG_EXPORT(int,png_reset_zstream,(png_structp png_ptr),,10);
+PNG_EXPORTX(10,int,png_reset_zstream,(png_structp png_ptr));
 #endif
 
 /* New functions added in libpng-1.0.2 (not enabled by default until 1.2.0) */

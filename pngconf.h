@@ -313,6 +313,10 @@
 #  define PNG_EXPORT(type, name, args, attributes, ordinal)\
       extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),\
          attributes)
+#  define PNG_EXPORTX(ordinal, type, name, args)\
+      PNG_EXPORT(type, name, args,, ordinal )
+#  define PNG_EXPORTA(ordinal, type, name, args, attributes)\
+      PNG_EXPORT(type, name, args, attributes, ordinal)
 #endif
 
 /* Use PNG_REMOVED to comment out a removed interface. */

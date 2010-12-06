@@ -3092,6 +3092,8 @@ Version 1.5.0beta55 [November 21, 2010]
 Version 1.5.0beta56 [December 6, 2010]
   Added the private PNG_UNUSED() macro definition in pngpriv.h.
   Added some commentary about PNG_EXPORT in png.h and pngconf.h
+  Added PNG_EXPORTX() and PNG_EXPORTA() macros for testing, with the
+    objective of improving the cosmetic appearance of png.h.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
