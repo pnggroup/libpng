@@ -69,7 +69,8 @@
  * below) but still have compiler specific implementations, others
  * may be changed on a per-file basis when compiling against libpng.
  */
-/* This macro protects us against machines that don't have function
+
+/* The PNGARG macro protects us against machines that don't have function
  * prototypes (ie K&R style headers).  If your compiler does not handle
  * function prototypes, define this macro and use the included ansi2knr.
  * I've always been able to use _NO_PROTO as the indicator, but you may
@@ -306,7 +307,8 @@
 
 #ifndef PNG_EXPORT
    /* The ordinal value is only relevant when preprocessing png.h for symbol
-    * table entries.
+    * table entries, so we discard it here.  See the .dfn files in the
+    * scripts directory.
     */
 #  define PNG_EXPORT(type, name, args, attributes, ordinal)\
       extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),\

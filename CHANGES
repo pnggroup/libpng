@@ -3089,8 +3089,9 @@ Version 1.5.0beta55 [November 21, 2010]
     with pngwio.c and pngwutil.c because the 'write' callback and zlib
     compression both fail to declare their input buffers with 'const'.
 
-Version 1.5.0beta56 [December 5, 2010]
+Version 1.5.0beta56 [December 6, 2010]
   Added the private PNG_UNUSED() macro definition in pngpriv.h.
+  Added some commentary about PNG_EXPORT in png.h and pngconf.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
