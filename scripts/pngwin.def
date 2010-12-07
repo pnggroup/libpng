@@ -3,6 +3,12 @@
 ; On OS/2 uncomment lines preceded by ;0S2
 ;--------------------------------------------------------------
 
+; make scripts/pngwin.chk will validate this file against the
+; build of libpng, the following line tells the check code to
+; ignore symbols (ordinal values) that are missing in both
+; files.
+;missing ignore
+
 ; If you give the library an explicit name one or other files
 ; may need modifying to support the new name on one or more
 ; systems.

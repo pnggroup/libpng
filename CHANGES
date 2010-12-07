@@ -3100,6 +3100,9 @@ Version 1.5.0beta56 [December 7, 2010]
 Version 1.5.0beta57 [December 7, 2010]
   Documented the pngvalid gamma error summary with additional comments and
     print statements.
+  Improved missing symbol handling in checksym.awk; symbols missing in both
+    the old and new files can now be optionally ignored, treated as errors
+    or warnings.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

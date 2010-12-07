@@ -20,6 +20,7 @@ BEGIN{
    lasto = 0        # last ordinal value from png.h
    mastero = 0      # highest ordinal in master file
    symbolo = 0      # highest ordinal in png.h
+   missing = "error"# log an error on missing symbols
 }
 
 # Read existing definitions from the master file (the first
@@ -43,6 +44,13 @@ FILENAME==master && NF==2 && $2~/^@/ && $1!~/^;/ {
    } else
       print master ": bad export line format:", $0
    err = 1
+}
+FILENAME==master && $1==";missing" && NF==2{
+   # This allows the master file to control how missing symbols
+   # are handled; symbols that aren't in either the master or
+   # the new file.  Valid values are 'ignore', 'warning' and
+   # 'error'
+   missing = $2
 }
 FILENAME==master {
    next
@@ -112,11 +120,19 @@ END{
          }
       }
       if (unexported != 0) {
-         # Symbols in the .def but not in the new file are errors
-         if (o-1 > unexported)
-            print "png.h: warning: unexported symbol definitions:", unexported "-" o-1
-         else
-            print "png.h: warning: unexported symbol definition:", unexported
+         # Symbols in the .def but not in the new file are errors, but
+         # the 'unexported' symbols aren't in either.  By default this
+         # is an error too (see the setting of 'missing' at the start),
+         # but this can be reset on the command line or by stuff in the
+         # file - see the comments above.
+         if (missing != "ignore") {
+            if (o-1 > unexported)
+               print "png.h:", missing ": missing symbols:", unexported "-" o-1
+            else
+               print "png.h:", missing ": missing symbol:", unexported
+            if (missing != "warning")
+               err = 1
+         }
          unexported = 0
       }
       if (symbol[o] != "" && removed[o] != "") {
