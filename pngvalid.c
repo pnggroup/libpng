@@ -997,7 +997,7 @@ store_read_reset(png_store *ps)
 
       Catch_anonymous
       {
-         /*error already output: continue*/
+         /* error already output: continue */
       }
 
       ps->pread = NULL;
@@ -1059,10 +1059,10 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
    store_read_reset(ps);
 
    /* Both the create APIs can return NULL if used in their default mode
-    * (because there is no other way of handling an error because the jmp_buf by
-    * default is stored in png_struct and that has not been allocated!)
-    * However, given that store_error works correctly in these circumstances we
-    * don't ever expect NULL in this program.
+    * (because there is no other way of handling an error because the jmp_buf
+    * by default is stored in png_struct and that has not been allocated!)
+    * However, given that store_error works correctly in these circumstances
+    * we don't ever expect NULL in this program.
     */
    if (ps->speed)
       ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps,
@@ -1078,7 +1078,7 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
       struct exception_context *the_exception_context = &ps->exception_context;
 
       store_log(ps, NULL, "png_create_read_struct returned NULL (unexpected)",
-         1/*error*/);
+         1 /*error*/);
 
       Throw ps;
    }
@@ -1447,7 +1447,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                       */
                      mod->added = 1;
 
-                     if ((*mod->modify_fn)(pm, mod, 1/*add*/))
+                     if ((*mod->modify_fn)(pm, mod, 1 /*add*/))
                      {
                         /* Reset the CRC on a new chunk */
                         if (pm->buffer_count > 0)
@@ -1472,15 +1472,15 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                }
 
                /* Don't do any further processing if the buffer was modified -
-                * otherwise the code will end up modifying a chunk that was just
-                * added.
+                * otherwise the code will end up modifying a chunk that was
+                * just added.
                 */
                if (mod != NULL)
                   break; /* out of switch */
             }
 
-            /* If we get to here then this chunk may need to be modified.  To do
-             * this it must be less than 1024 bytes in total size, otherwise
+            /* If we get to here then this chunk may need to be modified.  To
+             * do this it must be less than 1024 bytes in total size, otherwise
              * it just gets flushed.
              */
             if (len+12 <= sizeof pm->buffer)
@@ -1566,9 +1566,9 @@ modifier_progressive_read(png_modifier *pm, png_structp pp, png_infop pi)
 
    /* This is another Horowitz and Hill random noise generator.  In this case
     * the aim is to stress the progressive reader with truely horrible variable
-    * buffer sizes in the range 1..500, so a sequence of 9 bit random numbers is
-    * generated.  We could probably just count from 1 to 32767 and get as good
-    * a result.
+    * buffer sizes in the range 1..500, so a sequence of 9 bit random numbers
+    * is generated.  We could probably just count from 1 to 32767 and get as
+    * good a result.
     */
    for (;;)
    {
@@ -1958,7 +1958,7 @@ make_standard_images(png_store *ps)
     */
    make_standard(ps, 0, 0, WRITE_BDHI);
    make_standard(ps, 2, 3, WRITE_BDHI);
-   make_standard(ps, 3, 0, 3/*palette: max 8 bits*/);
+   make_standard(ps, 3, 0, 3 /*palette: max 8 bits*/);
    make_standard(ps, 4, 3, WRITE_BDHI);
    make_standard(ps, 6, 3, WRITE_BDHI);
 }
@@ -2059,7 +2059,7 @@ make_error(png_store* ps, png_byte PNG_CONST colour_type, png_byte bit_depth,
          /* If we get here there is a problem, we have success - no error or
           * no warning - when we shouldn't have success.  Log an error.
           */
-         store_log(ps, pp, error_test[test].msg, 1/*error*/);
+         store_log(ps, pp, error_test[test].msg, 1 /*error*/);
       }
 
       Catch (fault)
@@ -2505,7 +2505,7 @@ standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
          /* The code tests both versions of the images that the sequential
           * reader can produce.
           */
-         standard_info_imp(&d, pp, pi, 2/*images*/);
+         standard_info_imp(&d, pp, pi, 2 /*images*/);
 
          /* Need the total bytes in the image below; we can't get to this point
           * unless the PNG file values have been checked against the expected
@@ -3118,7 +3118,7 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
        */
       d.pm->modifications = NULL;
       gamma_modification_init(&gamma_mod, d.pm, d.file_gamma);
-      srgb_modification_init(&srgb_mod, d.pm, 127/*delete*/);
+      srgb_modification_init(&srgb_mod, d.pm, 127 /*delete*/);
       sbit_modification_init(&sbit_mod, d.pm, d.sbit);
 
       modification_reset(d.pm->modifications);
@@ -3247,8 +3247,8 @@ static void gamma_threshold_test(png_modifier *pm, png_byte colour_type,
    pos = safecatd(name, sizeof name, pos, screen_gamma, 3);
 
    (void)gamma_test(pm, colour_type, bit_depth, interlace_type, file_gamma,
-      screen_gamma, bit_depth, 1, name, 0/*speed*/, 0/*no input precision*/,
-      0/*no strip16*/);
+      screen_gamma, bit_depth, 1, name, 0 /*speed*/, 0 /*no input precision*/,
+      0 /*no strip16*/);
 }
 
 static void
@@ -3325,7 +3325,7 @@ static void perform_gamma_transform_tests(png_modifier *pm, int speed)
       {
          gamma_transform_test(pm, colour_type, bit_depth, pm->interlace_type,
             1/pm->gammas[i], pm->gammas[j], bit_depth, speed,
-            pm->use_input_precision, 0/*do not strip16*/);
+            pm->use_input_precision, 0 /*do not strip16*/);
 
          if (fail(pm))
             return;
@@ -3354,14 +3354,14 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
                {
                   gamma_transform_test(pm, 0, 8, pm->interlace_type,
                       1/pm->gammas[i], pm->gammas[j], sbit, speed,
-                      pm->use_input_precision_sbit, 0/*strip16*/);
+                      pm->use_input_precision_sbit, 0 /*strip16*/);
 
                   if (fail(pm))
                      return;
 
                   gamma_transform_test(pm, 2, 8, pm->interlace_type,
                       1/pm->gammas[i], pm->gammas[j], sbit, speed,
-                      pm->use_input_precision_sbit, 0/*strip16*/);
+                      pm->use_input_precision_sbit, 0 /*strip16*/);
 
                   if (fail(pm))
                      return;
@@ -3370,14 +3370,14 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
 #ifdef DO_16BIT
                gamma_transform_test(pm, 0, 16, pm->interlace_type,
                    1/pm->gammas[i], pm->gammas[j], sbit, speed,
-                   pm->use_input_precision_sbit, 0/*strip16*/);
+                   pm->use_input_precision_sbit, 0 /*strip16*/);
 
                if (fail(pm))
                   return;
 
                gamma_transform_test(pm, 2, 16, pm->interlace_type,
                    1/pm->gammas[i], pm->gammas[j], sbit, speed,
-                   pm->use_input_precision_sbit, 0/*strip16*/);
+                   pm->use_input_precision_sbit, 0 /*strip16*/);
 
                if (fail(pm))
                   return;
@@ -3415,28 +3415,28 @@ static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
          {
             gamma_transform_test(pm, 0, 16, pm->interlace_type, 1/pm->gammas[i],
                 pm->gammas[j], PNG_MAX_GAMMA_8, speed,
-                pm->use_input_precision_16to8, 1/*strip16*/);
+                pm->use_input_precision_16to8, 1 /*strip16*/);
 
             if (fail(pm))
                return;
 
             gamma_transform_test(pm, 2, 16, pm->interlace_type, 1/pm->gammas[i],
                 pm->gammas[j], PNG_MAX_GAMMA_8, speed,
-                pm->use_input_precision_16to8, 1/*strip16*/);
+                pm->use_input_precision_16to8, 1 /*strip16*/);
 
             if (fail(pm))
                return;
 
             gamma_transform_test(pm, 4, 16, pm->interlace_type, 1/pm->gammas[i],
                 pm->gammas[j], PNG_MAX_GAMMA_8, speed,
-                pm->use_input_precision_16to8, 1/*strip16*/);
+                pm->use_input_precision_16to8, 1 /*strip16*/);
 
             if (fail(pm))
                return;
 
             gamma_transform_test(pm, 6, 16, pm->interlace_type, 1/pm->gammas[i],
                 pm->gammas[j], PNG_MAX_GAMMA_8, speed,
-                pm->use_input_precision_16to8, 1/*strip16*/);
+                pm->use_input_precision_16to8, 1 /*strip16*/);
 
             if (fail(pm))
                return;
@@ -3527,7 +3527,7 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
 /* main program */
 int main(int argc, PNG_CONST char **argv)
 {
-   volatile int summary = 1;    /* Print the error sumamry at the end */
+   volatile int summary = 1;    /* Print the error summary at the end */
 
    /* Create the given output file on success: */
    PNG_CONST char *volatile touch = NULL;
@@ -3552,8 +3552,8 @@ int main(int argc, PNG_CONST char **argv)
 
    if (pm.this.image != NULL)
    {
-      /* Ignore OOM at this point - the 'ensure' routine above will allocate the
-       * array appropriately.
+      /* Ignore OOM at this point - the 'ensure' routine above will allocate
+       * the array appropriately.
        */
       ++(pm.this.image);
       pm.this.cb_image = 2*STD_IMAGEMAX;
@@ -3589,7 +3589,7 @@ int main(int argc, PNG_CONST char **argv)
     * maximum 16 bit error is about +/-1.9 in the fixed point implementation but
     * this is only allowed for values >38149 by the following:
     */
-   pm.maxpc16 = .005;   /* I.e. 1/200% - 1/20000 */
+   pm.maxpc16 = .005;   /* I.e., 1/200% - 1/20000 */
 
    /* Now parse the command line options. */
    while (--argc >= 1)
