@@ -305,19 +305,18 @@
 #  define PNG_EXPORT_TYPE(type) PNG_IMPEXP type
 #endif
 
-#ifndef PNG_EXPORT
    /* The ordinal value is only relevant when preprocessing png.h for symbol
     * table entries, so we discard it here.  See the .dfn files in the
     * scripts directory.
     */
-#  define PNG_EXPORT(ordinal, type, name, args)\
-      extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),)
-#endif
 #ifndef PNG_EXPORTA
 #  define PNG_EXPORTA(ordinal, type, name, args, attributes)\
       extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),\
          attributes)
 #endif
+
+#define PNG_EXPORT(ordinal, type, name, args)\
+   PNG_EXPORTA(ordinal, type, name, args, )
 
 /* Use PNG_REMOVED to comment out a removed interface. */
 #ifndef PNG_REMOVED

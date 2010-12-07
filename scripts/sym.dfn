@@ -11,7 +11,5 @@
 
 #define PNG_EXPORTA(ordinal, type, name, args, attributes)\
 	PNG_DEFN_MAGIC-SYMBOL_PREFIX @@@ name-PNG_DEFN_END
-#define PNG_EXPORT(ordinal, type, name, args)\
-	PNG_DEFN_MAGIC-SYMBOL_PREFIX @@@ name-PNG_DEFN_END
 
 #include "../png.h"
