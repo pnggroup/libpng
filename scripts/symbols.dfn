@@ -16,9 +16,11 @@
  * .dfa file too.
  */
 
-#define PNG_EXPORT(type, name, args, attributes, ordinal)\
+#define PNG_EXPORTA(ordinal, type, name, args, attributes)\
 	PNG_DEFN_MAGIC-name @ordinal-PNG_DEFN_END
-#define PNG_REMOVED(type, name, args, attributes, ordinal)\
+#define PNG_EXPORT(ordinal, type, name, args)\
+	PNG_DEFN_MAGIC-name @ordinal-PNG_DEFN_END
+#define PNG_REMOVED(ordinal, type, name, args, attributes)\
 	PNG_DEFN_MAGIC-; name @ordinal-PNG_DEFN_END
 #define PNG_EXPORT_LAST_ORDINAL(ordinal)\
 	PNG_DEFN_MAGIC-; @ordinal-PNG_DEFN_END

@@ -16,7 +16,9 @@
  * substitution within the name, regular C ## joins the pp-tokens,
  * not their final values.
  */
-#define PNG_EXPORT(type, name, args, attributes, ordinal)\
+#define PNG_EXPORTA(ordinal, type, name, args, attributes)\
+	PNG_DEFN_MAGIC- SYMBOL_PREFIX @@@ name;-PNG_DEFN_END
+#define PNG_EXPORT(ordinal, type, name, args)\
 	PNG_DEFN_MAGIC- SYMBOL_PREFIX @@@ name;-PNG_DEFN_END
 
 #define TRAILER PNG_DEFN_MAGIC-local: *; };-PNG_DEFN_END

@@ -310,18 +310,18 @@
     * table entries, so we discard it here.  See the .dfn files in the
     * scripts directory.
     */
-#  define PNG_EXPORT(type, name, args, attributes, ordinal)\
+#  define PNG_EXPORT(ordinal, type, name, args)\
+      extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),)
+#endif
+#ifndef PNG_EXPORTA
+#  define PNG_EXPORTA(ordinal, type, name, args, attributes)\
       extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),\
          attributes)
-#  define PNG_EXPORTX(ordinal, type, name, args)\
-      PNG_EXPORT(type, name, args,, ordinal )
-#  define PNG_EXPORTA(ordinal, type, name, args, attributes)\
-      PNG_EXPORT(type, name, args, attributes, ordinal)
 #endif
 
 /* Use PNG_REMOVED to comment out a removed interface. */
 #ifndef PNG_REMOVED
-#  define PNG_REMOVED(type, name, args, attributes, ordinal)
+#  define PNG_REMOVED(ordinal, type, name, args, attributes)
 #endif
 
 #ifndef PNG_CALLBACK
@@ -436,18 +436,18 @@
 #endif
 #ifndef PNG_FP_EXPORT     /* A floating point API. */
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
-#     define PNG_FP_EXPORT(type, name, args, attributes, ordinal)\
-         PNG_EXPORT(type, name, args, attributes, ordinal)
+#     define PNG_FP_EXPORT(ordinal, type, name, args)\
+         PNG_EXPORT(ordinal, type, name, args)
 #  else                   /* No floating point APIs */
-#     define PNG_FP_EXPORT(type, name, args, attributes, ordinal)
+#     define PNG_FP_EXPORT(ordinal, type, name, args)
 #  endif
 #endif
 #ifndef PNG_FIXED_EXPORT  /* A fixed point API. */
 #  ifdef PNG_FIXED_POINT_SUPPORTED
-#     define PNG_FIXED_EXPORT(type, name, args, attributes, ordinal)\
-         PNG_EXPORT(type, name, args, attributes, ordinal)
+#     define PNG_FIXED_EXPORT(ordinal, type, name, args)\
+         PNG_EXPORT(ordinal, type, name, args)
 #  else                   /* No fixed point APIs */
-#     define PNG_FIXED_EXPORT(type, name, args, attributes, ordinal)
+#     define PNG_FIXED_EXPORT(ordinal, type, name, args)
 #  endif
 #endif
 
