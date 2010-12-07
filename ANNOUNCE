@@ -1,5 +1,5 @@
 
-Libpng 1.5.0beta56 - December 7, 2010
+Libpng 1.5.0beta57 - December 7, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0beta56.tar.xz (LZMA-compressed, recommended)
-   1.5.0beta56.tar.gz
-   1.5.0beta56.tar.bz2
+   1.5.0beta57.tar.xz (LZMA-compressed, recommended)
+   1.5.0beta57.tar.gz
+   1.5.0beta57.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150b56.zip
-   lp150b56.7z
+   lp150b57.zip
+   lp150b57.7z
 
 Other information:
 
-   1.5.0beta56-README.txt
-   1.5.0beta56-LICENSE.txt
+   1.5.0beta57-README.txt
+   1.5.0beta57-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -458,6 +458,8 @@ Version 1.5.0beta56 [December 7, 2010]
     objective of simplifying and improving the cosmetic appearance of png.h.
   Fixed some incorrect "=" macro names in pnglibconf.dfa
   Included documentation of changes in 1.5.0 from 1.4.x in libpng-manual.txt
+
+Version 1.5.0beta57 [December 7, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
