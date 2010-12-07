@@ -3573,7 +3573,7 @@ int main(int argc, PNG_CONST char **argv)
     * transformations.  The practial limits for human perception are described
     * below (the setting for maxpc16), however for 8 bit encodings it isn't
     * possible to meet the accepted capabilities of human vision - i.e. 8 bit
-    * images can never be good enough (regardless of encoding.)
+    * images can never be good enough, regardless of encoding.
     */
    pm.maxout8 = .1;     /* Arithmetic error in *encoded* value */
    pm.maxabs8 = .00005; /* 1/20000 */

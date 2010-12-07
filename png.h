@@ -767,11 +767,11 @@ typedef png_info FAR * FAR * png_infopp;
  */
 typedef struct png_row_info_struct
 {
-   png_uint_32 width; /* width of row */
-   png_size_t rowbytes; /* number of bytes in row */
-   png_byte color_type; /* color type of row */
-   png_byte bit_depth; /* bit depth of row */
-   png_byte channels; /* number of channels (1, 2, 3, or 4) */
+   png_uint_32 width;    /* width of row */
+   png_size_t rowbytes;  /* number of bytes in row */
+   png_byte color_type;  /* color type of row */
+   png_byte bit_depth;   /* bit depth of row */
+   png_byte channels;    /* number of channels (1, 2, 3, or 4) */
    png_byte pixel_depth; /* bits per pixel (depth * channels) */
 } png_row_info;
 
@@ -800,15 +800,16 @@ typedef PNG_CALLBACK(void, *png_write_status_ptr, (png_structp, png_uint_32,
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef PNG_CALLBACK(void, *png_progressive_info_ptr, 
     (png_structp, png_infop), );
-typedef PNG_CALLBACK(void, *png_progressive_end_ptr, (png_structp, png_infop), );
-typedef PNG_CALLBACK(void, *png_progressive_row_ptr, (png_structp, png_bytep, 
-    png_uint_32, int), );
+typedef PNG_CALLBACK(void, *png_progressive_end_ptr,
+    (png_structp, png_infop), );
+typedef PNG_CALLBACK(void, *png_progressive_row_ptr,
+    (png_structp, png_bytep, png_uint_32, int), );
 #endif
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-typedef PNG_CALLBACK(void, *png_user_transform_ptr, (png_structp, png_row_infop, 
-    png_bytep), );
+typedef PNG_CALLBACK(void, *png_user_transform_ptr,
+    (png_structp, png_row_infop, png_bytep), );
 #endif
 
 #ifdef PNG_USER_CHUNKS_SUPPORTED
@@ -818,6 +819,7 @@ typedef PNG_CALLBACK(int, *png_user_chunk_ptr, (png_structp,
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
 typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp), );
 #endif
+
 #ifdef PNG_SETJMP_SUPPORTED
 /* This must match the function definition in <setjmp.h>, and the
  * application must include this before png.h to obtain the definition
@@ -1125,21 +1127,22 @@ PNG_EXPORT(44, void, png_set_shift, (png_structp png_ptr, png_const_color_8p
 #if defined(PNG_READ_INTERLACING_SUPPORTED) || \
     defined(PNG_WRITE_INTERLACING_SUPPORTED)
 /* Have the code handle the interlacing.  Returns the number of passes.
- * MUST be called before png_read_update_info or png_start_read_image, otherwise
- * it will not have the desired effect.  Note that it is still necessary to call
- * png_read_row or png_read_rows png_get_image_height times for each pass.
- */
+ * MUST be called before png_read_update_info or png_start_read_image,
+ * otherwise it will not have the desired effect.  Note that it is still
+ * necessary to call png_read_row or png_read_rows png_get_image_height
+ * times for each pass.
+*/
 PNG_EXPORT(45, int, png_set_interlace_handling, (png_structp png_ptr));
 #endif
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-/* Alternatively call this to get the number of rows in the current pass.  Call
- * this after png_read_update_info or png_start_read_image; if you call it
- * before it will just return the image height (which is also what it returns
- * for a non-interlaced image!).
+/* Alternatively call this to get the number of rows in the current pass.
+ * Call this after png_read_update_info or png_start_read_image; if you
+ * call it before it will just return the image height (which is also what
+ * it returns for a non-interlaced image!).
  *
- * NOTE: you need to call these to find out how many times to call png_read_row
- * if you handle your own de-interlacing.
+ * NOTE: you need to call these to find out how many times to call
+ * png_read_row if you handle your own de-interlacing.
  */
 PNG_EXPORT(215, int, png_get_num_passes, (png_structp png_ptr));
 PNG_EXPORT(216, png_uint_32, png_get_num_rows, (png_structp png_ptr));
@@ -1196,7 +1199,6 @@ PNG_FIXED_EXPORT(208, void, png_set_gamma_fixed, (png_structp png_ptr,
     png_fixed_point screen_gamma, png_fixed_point default_file_gamma));
 #endif
 
-
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
 /* Set how many lines between output flushes - 0 for no flushing */
 PNG_EXPORT(51, void, png_set_flush, (png_structp png_ptr, int nrows));
@@ -1232,9 +1234,9 @@ PNG_EXPORT(57, void, png_read_image, (png_structp png_ptr, png_bytepp image));
 PNG_EXPORT(58, void, png_write_row,
     (png_structp png_ptr, png_const_bytep row));
 
-/* Write a few rows of image data: (*row) is not written; however, the type is
- * declared as writeable to maintain compatibility with previous versions of
- * libpng and to allow the 'display_row' array from read_rows to be passed
+/* Write a few rows of image data: (*row) is not written; however, the type
+ * is declared as writeable to maintain compatibility with previous versions
+ * of libpng and to allow the 'display_row' array from read_rows to be passed
  * unchanged to write_rows.
  */
 PNG_EXPORT(59, void, png_write_rows, (png_structp png_ptr, png_bytepp row, 
@@ -1269,7 +1271,7 @@ PNG_EXPORT(65, void, png_destroy_write_struct, (png_structpp png_ptr_ptr,
 PNG_EXPORT(66, void, png_set_crc_action,
     (png_structp png_ptr, int crit_action, int ancil_action));
 
-/* Values for png_set_crc_action() to say how to handle CRC errors in
+/* Values for png_set_crc_action() say how to handle CRC errors in
  * ancillary and critical chunks, and whether to use the data contained
  * therein.  Note that it is impossible to "discard" data in a critical
  * chunk.  For versions prior to 0.90, the action was always error/quit, 
@@ -1495,9 +1497,10 @@ PNG_EXPORT(92, void, png_process_data,
     (png_structp png_ptr, png_infop info_ptr, 
     png_bytep buffer, png_size_t buffer_size));
 
-/* Function that combines rows.  'new_row' is a flag that should come from the
- * callback and be non-NULL if anything needs to be done; the library stores its
- * own version of the new data internally and ignores the passed in value.
+/* Function that combines rows.  'new_row' is a flag that should come from
+ * the callback and be non-NULL if anything needs to be done; the library
+ * stores its own version of the new data internally and ignores the passed
+ * in value.
  */
 PNG_EXPORT(93, void, png_progressive_combine_row, (png_structp png_ptr, 
     png_bytep old_row, png_const_bytep new_row));
@@ -2167,8 +2170,8 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * defs
  */
 
-/* The last ordinal number (this is the *last* one; the next one to
- * use is one more than this.)
+/* The last ordinal number (this is the *last* one already used; the next
+ * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
   PNG_EXPORT_LAST_ORDINAL(218);

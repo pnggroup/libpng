@@ -63,9 +63,10 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #endif
 
 /* Moved to pngpriv.h at libpng-1.5.0 */
-/* NOTE: some of these may be used in external applications as these definitions
- * were exposed in pngconf.h prior to 1.5.
+/* NOTE: some of these may have been used in external applications as
+ * these definitions were exposed in pngconf.h prior to 1.5.
  */
+
 /* If you are running on a machine where you cannot allocate more
  * than 64K of memory at once, uncomment this.  While libpng will not
  * normally need that much memory in a chunk (unless you load up a very
@@ -116,7 +117,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
  * aren't usually used outside the library (as far as I know), so it is
  * debatable if they should be exported at all.  In the future, when it
  * is possible to have run-time registry of chunk-handling functions,
- * some of these will be made available again.
+ * some of these might be made available again.
 #  define PNG_EXTERN extern
  */
 #  define PNG_EXTERN
@@ -256,6 +257,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 /* CONSTANTS and UTILITY MACROS
  * These are used internally by libpng and not exposed in the API
  */
+
 /* Various modes of operation.  Note that after an init, mode is set to
  * zero automatically when the structure is created.
  */
@@ -408,8 +410,9 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
  * its argument multiple times, so must be used with care.  The
  * range checking uses the PNG specification values for a signed
  * 32 bit fixed point value except that the values are deliberately
- * rounded-to-zero to an integral value - 21474.  's' is a string
- * that describes the value being converted.
+ * rounded-to-zero to an integral value - 21474 (21474.83 is roughly
+ * (2^31-1) * 100000). 's' is a string that describes the value being
+ * converted.
  *
  * NOTE: this macro will raise a png_error if the range check fails,
  * therefore it is normally only appropriate to use this on values
