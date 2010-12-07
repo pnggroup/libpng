@@ -3094,6 +3094,7 @@ Version 1.5.0beta56 [December 7, 2010]
   Added some commentary about PNG_EXPORT in png.h and pngconf.h
   Revised PNG_EXPORT() macro and added PNG_EXPORTA() macro, with the
     objective of simplifying and improving the cosmetic appearance of png.h.
+  Fixed some incorrect "=" macro names in pnglibconf.dfa
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
