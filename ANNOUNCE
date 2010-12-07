@@ -460,6 +460,8 @@ Version 1.5.0beta56 [December 7, 2010]
   Included documentation of changes in 1.5.0 from 1.4.x in libpng-manual.txt
 
 Version 1.5.0beta57 [December 7, 2010]
+  Documented the pngvalid gamma error summary with additional comments and
+    print statements.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

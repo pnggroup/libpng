@@ -3463,7 +3463,19 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
 
    if (summary)
    {
-      printf("Gamma correction error summary (output value error):\n");
+      printf("Gamma correction error summary\n\n");
+      printf("The printed value is the maximum error in the pixel values\n");
+      printf("calculated by the libpng gamma correction code.  The error\n");
+      printf("is calculated as the difference between the output pixel\n");
+      printf("value (always an integer) and the ideal value from the\n");
+      printf("libpng specification (typically not an integer).\n\n");
+
+      printf("Expect this value to be less than .5 for 8 bit formats,\n");
+      printf("less than 1 for formats with fewer than 8 bits and a small\n");
+      printf("number (typically less than 5) for the 16 bit formats.\n");
+      printf("For performance reasons the value for 16 bit formats\n");
+      printf("increases when the image file includes an sBIT chunk.\n\n");
+
       printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
       printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
       printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
@@ -3556,7 +3568,13 @@ int main(int argc, PNG_CONST char **argv)
    pm.sbitlow = 8U; /* because libpng doesn't do sBIT below 8! */
    pm.use_input_precision_16to8 = 1U; /* Because of the way libpng does it */
 
-   /* Some default values (set the behavior for 'make check' here) */
+   /* Some default values (set the behavior for 'make check' here).
+    * These values simply control the maximum error permitted in the gamma
+    * transformations.  The practial limits for human perception are described
+    * below (the setting for maxpc16), however for 8 bit encodings it isn't
+    * possible to meet the accepted capabilities of human vision - i.e. 8 bit
+    * images can never be good enough (regardless of encoding.)
+    */
    pm.maxout8 = .1;     /* Arithmetic error in *encoded* value */
    pm.maxabs8 = .00005; /* 1/20000 */
    pm.maxpc8 = .499;    /* I.e. .499% fractional error */
