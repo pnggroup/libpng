@@ -41,7 +41,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = pngtest$(EXEEXT) pngvalid$(EXEEXT)
-TESTS = test-pngtest.sh pngvalid$(EXEEXT)
+TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh 
 @HAVE_LD_VERSION_SCRIPT_TRUE@am__append_1 = -Wl,--version-script=libpng.vers
 @HAVE_LD_VERSION_SCRIPT_FALSE@am__append_2 = -export-symbols libpng.sym
 subdir = .

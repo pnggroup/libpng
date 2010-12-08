@@ -17,7 +17,7 @@ pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngvalid_SOURCES = pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS = test-pngtest.sh pngvalid
+TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh
 TESTS_ENVIRONMENT= srcdir=$(srcdir) 
 
 # man pages
