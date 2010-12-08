@@ -467,6 +467,9 @@ Version 1.5.0beta57 [December 8, 2010]
     or warnings.
   Removed references to pngvcrd.c and pnggccrd.c from the vstudio project.
   Updated "libpng14" to "libpng15" in the visualc71 project.
+  Enabled the strip16 tests in pngvalid.`
+  Don't display test results (except PASS/FAIL) when running "make test".
+    Instead put them in pngtest-log.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
