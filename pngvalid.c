@@ -1169,10 +1169,20 @@ typedef struct png_modifier
    /* Whether or not to interlace. */
    int                      interlace_type :9; /* int, but must store '1' */
 
+   /* Run the standard tests? */
+   unsigned int             test_standard :1;
+
    /* When to use the use_input_precision option: */
    unsigned int             use_input_precision :1;
    unsigned int             use_input_precision_sbit :1;
    unsigned int             use_input_precision_16to8 :1;
+
+   /* Which gamma tests to run: */
+   unsigned int             test_threshold :1;
+   unsigned int             test_transform :1; /* main tests */
+   unsigned int             test_sbit :1;
+   unsigned int             test_strip16 :1;
+
    unsigned int             log :1;   /* Log max error */
 
    /* Buffer information, the buffer size limits the size of the chunks that can
@@ -1235,9 +1245,14 @@ modifier_init(png_modifier *pm)
    pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = 0;
    pm->error_gray_16 = pm->error_color_8 = pm->error_color_16 = 0;
    pm->interlace_type = PNG_INTERLACE_NONE;
+   pm->test_standard = 1;
    pm->use_input_precision = 0;
    pm->use_input_precision_sbit = 0;
    pm->use_input_precision_16to8 = 0;
+   pm->test_threshold = 1;
+   pm->test_transform = 1;
+   pm->test_sbit = 1;
+   pm->test_strip16 = 1;
    pm->log = 0;
 
    /* Rely on the memset for all the other fields - there are no pointers */
@@ -2792,7 +2807,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
     * PNG_MAX_GAMMA_8 when doing the following.
     */
    if (dp->strip16)
-#     ifdef PNG_READ_16_TO_8
+#     ifdef PNG_READ_16_TO_8_SUPPORTED
          png_set_strip_16(pp);
 #     else
          png_error(pp, "strip16 (16 to 8 bit conversion) not supported");
@@ -3391,7 +3406,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm, int speed)
 /* Note that this requires a 16 bit source image but produces 8 bit output, so
  * we only need the 16bit write support.
  */
-#ifdef PNG_16_TO_8_SUPPORTED
+#ifdef PNG_READ_16_TO_8_SUPPORTED
 static void perform_gamma_strip16_tests(png_modifier *pm, int speed)
 {
 #  ifndef PNG_MAX_GAMMA_8
@@ -3450,7 +3465,7 @@ static void
 perform_gamma_test(png_modifier *pm, int speed, int summary)
 {
    /* First some arbitrary no-transform tests: */
-   if (!speed)
+   if (!speed && pm->test_threshold)
    {
       perform_gamma_threshold_tests(pm);
 
@@ -3459,67 +3474,76 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
    }
 
    /* Now some real transforms. */
-   perform_gamma_transform_tests(pm, speed);
-
-   if (summary)
+   if (pm->test_transform)
    {
-      printf("Gamma correction error summary\n\n");
-      printf("The printed value is the maximum error in the pixel values\n");
-      printf("calculated by the libpng gamma correction code.  The error\n");
-      printf("is calculated as the difference between the output pixel\n");
-      printf("value (always an integer) and the ideal value from the\n");
-      printf("libpng specification (typically not an integer).\n\n");
+      perform_gamma_transform_tests(pm, speed);
 
-      printf("Expect this value to be less than .5 for 8 bit formats,\n");
-      printf("less than 1 for formats with fewer than 8 bits and a small\n");
-      printf("number (typically less than 5) for the 16 bit formats.\n");
-      printf("For performance reasons the value for 16 bit formats\n");
-      printf("increases when the image file includes an sBIT chunk.\n\n");
-
-      printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
-      printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
-      printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
-      printf("  8 bit color: %.5f\n", pm->error_color_8);
-#ifdef DO_16BIT
-      printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
-      printf(" 16 bit color: %.5f\n", pm->error_color_16);
-#endif
-   }
-
-   /* The sbit tests produce much larger errors: */
-   pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = pm->error_gray_16 =
-   pm->error_color_8 = pm->error_color_16 = 0;
-   perform_gamma_sbit_tests(pm, speed);
-
-   if (summary)
-   {
-      printf("Gamma correction with sBIT:\n");
-
-      if (pm->sbitlow < 8U)
+      if (summary)
       {
+         printf("Gamma correction error summary\n\n");
+         printf("The printed value is the maximum error in the pixel values\n");
+         printf("calculated by the libpng gamma correction code.  The error\n");
+         printf("is calculated as the difference between the output pixel\n");
+         printf("value (always an integer) and the ideal value from the\n");
+         printf("libpng specification (typically not an integer).\n\n");
+
+         printf("Expect this value to be less than .5 for 8 bit formats,\n");
+         printf("less than 1 for formats with fewer than 8 bits and a small\n");
+         printf("number (typically less than 5) for the 16 bit formats.\n");
+         printf("For performance reasons the value for 16 bit formats\n");
+         printf("increases when the image file includes an sBIT chunk.\n\n");
+
          printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
          printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
          printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
          printf("  8 bit color: %.5f\n", pm->error_color_8);
-      }
-
 #ifdef DO_16BIT
-      printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
-      printf(" 16 bit color: %.5f\n", pm->error_color_16);
+         printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
+         printf(" 16 bit color: %.5f\n", pm->error_color_16);
 #endif
+      }
    }
 
-#ifdef PNG_16_TO_8_SUPPORTED
-   /* The 16 to 8 bit strip operations: */
-   pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = pm->error_gray_16 =
-   pm->error_color_8 = pm->error_color_16 = 0;
-   perform_gamma_strip16_tests(pm, speed);
-
-   if (summary)
+   /* The sbit tests produce much larger errors: */
+   if (pm->test_sbit)
    {
-      printf("Gamma correction with 16 to 8 bit reduction:\n");
-      printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
-      printf(" 16 bit color: %.5f\n", pm->error_color_16);
+      pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 =
+      pm->error_gray_16 = pm->error_color_8 = pm->error_color_16 = 0;
+      perform_gamma_sbit_tests(pm, speed);
+
+      if (summary)
+      {
+         printf("Gamma correction with sBIT:\n");
+
+         if (pm->sbitlow < 8U)
+         {
+            printf("  2 bit gray:  %.5f\n", pm->error_gray_2);
+            printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
+            printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
+            printf("  8 bit color: %.5f\n", pm->error_color_8);
+         }
+
+   #ifdef DO_16BIT
+         printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
+         printf(" 16 bit color: %.5f\n", pm->error_color_16);
+   #endif
+      }
+   }
+
+#ifdef PNG_READ_16_TO_8_SUPPORTED
+   if (pm->test_strip16)
+   {
+      /* The 16 to 8 bit strip operations: */
+      pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 =
+      pm->error_gray_16 = pm->error_color_8 = pm->error_color_16 = 0;
+      perform_gamma_strip16_tests(pm, speed);
+
+      if (summary)
+      {
+         printf("Gamma correction with 16 to 8 bit reduction:\n");
+         printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
+         printf(" 16 bit color: %.5f\n", pm->error_color_16);
+      }
    }
 #endif
 }
@@ -3577,7 +3601,7 @@ int main(int argc, PNG_CONST char **argv)
     */
    pm.maxout8 = .1;     /* Arithmetic error in *encoded* value */
    pm.maxabs8 = .00005; /* 1/20000 */
-   pm.maxpc8 = .499;    /* I.e. .499% fractional error */
+   pm.maxpc8 = .499;    /* I.e., .499% fractional error */
    pm.maxout16 = .499;  /* Error in *encoded* value */
    pm.maxabs16 = .00005;/* 1/20000 */
 
@@ -3610,10 +3634,26 @@ int main(int argc, PNG_CONST char **argv)
          pm.this.treat_warnings_as_errors = 0;
 
       else if (strcmp(*argv, "--speed") == 0)
-         pm.this.speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]);
+         pm.this.speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]),
+            pm.test_standard = 0;
+
+      else if (strcmp(*argv, "--nostandard") == 0)
+         pm.test_standard = 0;
 
       else if (strcmp(*argv, "--nogamma") == 0)
          pm.ngammas = 0;
+
+      else if (strcmp(*argv, "--nogamma-threshold") == 0)
+         pm.test_threshold = 0;
+
+      else if (strcmp(*argv, "--nogamma-transform") == 0)
+         pm.test_transform = 0;
+
+      else if (strcmp(*argv, "--nogamma-sbit") == 0)
+         pm.test_sbit = 0;
+
+      else if (strcmp(*argv, "--nogamma-16-to-8") == 0)
+         pm.test_strip16 = 0;
 
       else if (strcmp(*argv, "--progressive-read") == 0)
          pm.this.progressive = 1;
@@ -3669,13 +3709,15 @@ int main(int argc, PNG_CONST char **argv)
       make_standard_images(&pm.this);
 
       /* Perform the standard and gamma tests. */
-      if (!pm.this.speed)
+      if (pm.test_standard)
       {
          perform_standard_test(&pm);
          perform_error_test(&pm);
       }
 
-      perform_gamma_test(&pm, pm.this.speed != 0, summary && !pm.this.speed);
+      if (pm.ngammas > 0)
+         perform_gamma_test(&pm, pm.this.speed != 0,
+            summary && !pm.this.speed);
    }
 
    Catch(fault)
