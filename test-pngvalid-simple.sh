@@ -1,3 +1,3 @@
 #!/bin/sh
 
-./pngvalid -q --nogamma
+./pngvalid -q --speed
