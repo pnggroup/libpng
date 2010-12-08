@@ -3103,6 +3103,7 @@ Version 1.5.0beta57 [December 8, 2010]
   Improved missing symbol handling in checksym.awk; symbols missing in both
     the old and new files can now be optionally ignored, treated as errors
     or warnings.
+  Removed references to pngvcrd.c and pnggccrd.c from the vstudio project.
   Updated "libpng14" to "libpng15" in the visualc71 project.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
