@@ -36,6 +36,7 @@
 #define PNG_NO_WRITE_USER_TRANSFORM
 #define PNG_NO_WRITE_bKGD
 #define PNG_NO_WRITE_cHRM
+#define PNG_NO_WRITE_gAMA
 #define PNG_NO_WRITE_hIST
 #define PNG_NO_WRITE_iCCP
 #define PNG_NO_WRITE_oFFs
