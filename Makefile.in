@@ -41,7 +41,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = pngtest$(EXEEXT) pngvalid$(EXEEXT)
-TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh 
 @HAVE_LD_VERSION_SCRIPT_TRUE@am__append_1 = -Wl,--version-script=libpng.vers
 @HAVE_LD_VERSION_SCRIPT_FALSE@am__append_2 = -export-symbols libpng.sym
 subdir = .
@@ -146,21 +145,8 @@ DATA = $(pkgconfig_DATA)
 HEADERS = $(nodist_pkginclude_HEADERS) $(pkginclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-# If stdout is a non-dumb tty, use colors.  If test -t is not supported,
-# then this fails; a conservative approach.  Of course do not redirect
-# stdout here, just stderr.
 am__tty_colors = \
-red=; grn=; lgn=; blu=; std=; \
-test "X$(AM_COLOR_TESTS)" != Xno \
-&& test "X$$TERM" != Xdumb \
-&& { test "X$(AM_COLOR_TESTS)" = Xalways || test -t 1 2>/dev/null; } \
-&& { \
-  red='[0;31m'; \
-  grn='[0;32m'; \
-  lgn='[1;32m'; \
-  blu='[1;34m'; \
-  std='[m'; \
-}
+red=; grn=; lgn=; blu=; std=
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -217,6 +203,7 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
+MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
@@ -248,6 +235,7 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
@@ -283,7 +271,6 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
-lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -306,11 +293,16 @@ top_srcdir = @top_srcdir@
 PNGLIB_BASENAME = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 
 # libpng does not follow GNU file name conventions
-AUTOMAKE_OPTIONS = foreign color-tests
+
+# "color-tests" requires automake 1.11.1 or later.  Enable it if you like,
+# to get red "FAIL" and green "PASS" notations during tests.
+# AUTOMAKE_OPTIONS = foreign color-tests
+AUTOMAKE_OPTIONS = foreign
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngvalid_SOURCES = pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh
 TESTS_ENVIRONMENT = srcdir=$(srcdir) 
 
 # man pages

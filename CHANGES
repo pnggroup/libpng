@@ -3109,6 +3109,7 @@ Version 1.5.0beta57 [December 9, 2010]
   Don't display test results (except PASS/FAIL) when running "make test".
     Instead put them in pngtest-log.txt
   Added "--with-zprefix=<string>" to configure.ac
+  Updated the prebuilt configuration files to autoconf version 2.68
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
