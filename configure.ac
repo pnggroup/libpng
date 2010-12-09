@@ -57,7 +57,15 @@ AC_STRUCT_TM
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )
-AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
+AC_ARG_WITH(zprefix,
+   AC_HELP_STRING([--with-zprefix],
+                  [prefix that may have been used in installed zlib]),
+                  [zprefix=${withval}],
+                  [zprefix='z_'])
+AC_CHECK_LIB(z, zlibVersion, ,
+    AC_CHECK_LIB(z, ${zprefix}zlibVersion, ,
+                 AC_ERROR([zlib not installed])))
+
 
 LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 LIBPNG_DEFINES=$LIBPNG_DEFINES

@@ -3097,7 +3097,7 @@ Version 1.5.0beta56 [December 7, 2010]
   Fixed some incorrect "=" macro names in pnglibconf.dfa
   Included documentation of changes in 1.5.0 from 1.4.x in libpng-manual.txt
 
-Version 1.5.0beta57 [December 8, 2010]
+Version 1.5.0beta57 [December 9, 2010]
   Documented the pngvalid gamma error summary with additional comments and
     print statements.
   Improved missing symbol handling in checksym.awk; symbols missing in both
@@ -3108,6 +3108,7 @@ Version 1.5.0beta57 [December 8, 2010]
   Enabled the strip16 tests in pngvalid.`
   Don't display test results (except PASS/FAIL) when running "make test".
     Instead put them in pngtest-log.txt
+  Added "--with-zprefix=<string>" to configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
