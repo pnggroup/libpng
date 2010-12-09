@@ -15,7 +15,7 @@ do
    test "$gamma" = sbit      || opts="$opts --nogamma-sbit"
    test "$gamma" = 16-to-8   || opts="$opts --nogamma-16-to-8"
 
-   if ./pngvalid --nostandard $opts >> pngtest-log.txt
+   if ./pngvalid --nostandard $opts >> pngtest-log.txt 2>&1
    then
       echo "  PASS:" pngvalid "(gamma-$gamma)"
    else

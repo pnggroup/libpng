@@ -10,7 +10,7 @@ echo "Running test-pngvalid-simple.sh"
 for opts in "" --progressive-read --interlace \
    "--progressive-read --interlace"
 do
-   if ./pngvalid  --nogamma $opts >> pngtest-log.txt
+   if ./pngvalid  --nogamma $opts >> pngtest-log.txt 2>&1
    then
       echo "  PASS:" pngvalid --nogamma $opts
    else
