@@ -66,7 +66,7 @@ png_get_int_32)(png_bytep buf)
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 (PNGAPI
-png_get_uint_16) (png_bytep buf)
+png_get_uint_16)(png_bytep buf)
 {
    /* ANSI-C requires an int value to accomodate at least 16 bits so this
     * works and allows the compiler not to worry about possible narrowing
