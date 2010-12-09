@@ -2729,10 +2729,10 @@ version 1.4.5beta07 [November 25, 2010]
 version 1.4.5rc02 [December 2, 2010]
   No changes.
 
-version 1.4.5rc03 [December 3, 2010]
+version 1.4.5rc03 [December 9, 2010]
   Added missing vstudio/*/*.vcxproj files to the zip and 7z distributions.
 
-version 1.4.5rc04 [December 8, 2010]
+version 1.4.5rc03-cos [December 8, 2010]
   Removed PNG_NO_WRITE_GAMMA from pngminim/encoder/pngusr.h
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net

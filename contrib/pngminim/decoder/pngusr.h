@@ -38,6 +38,7 @@
 #define PNG_NO_READ_gAMA
 #define PNG_NO_READ_hIST
 #define PNG_NO_READ_iCCP
+#define PNG_NO_READ_oFFs
 #define PNG_NO_READ_pCAL
 #define PNG_NO_READ_pHYs
 #define PNG_NO_READ_sBIT
@@ -51,7 +52,6 @@
 #define PNG_NO_READ_EMPTY_PLTE
 #define PNG_NO_READ_OPT_PLTE
 #define PNG_NO_READ_STRIP_ALPHA
-#define PNG_NO_READ_oFFs
 
 #define PNG_NO_WRITE_SUPPORTED
 
