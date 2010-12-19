@@ -7,8 +7,14 @@ err=0
 echo >> pngtest-log.txt
 echo "============ pngvalid-simple.sh ==============" >> pngtest-log.txt
 echo "Running test-pngvalid-simple.sh"
+# The options to test are:
+#
+# --progressive-read, --interlace on the 'transform' images
+# --progressive-read on the 'size' images
+#
 for opts in "" --progressive-read --interlace \
-   "--progressive-read --interlace"
+   "--progressive-read --interlace" "--nostandard --size" \
+   "--nostandard --size --progressive-read"
 do
    if ./pngvalid  --nogamma $opts >> pngtest-log.txt 2>&1
    then

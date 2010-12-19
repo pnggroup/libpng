@@ -3111,7 +3111,8 @@ Version 1.5.0beta57 [December 9, 2010]
   Added "--with-zprefix=<string>" to configure.ac
   Updated the prebuilt configuration files to autoconf version 2.68
 
-Version 1.5.0beta58 [December 9, 2010]
+Version 1.5.0beta58 [December 19, 2010]
+  Fixed interlace image handling and add test cases (John Bowler)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

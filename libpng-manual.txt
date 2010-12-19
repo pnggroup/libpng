@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.0beta58 - December 9, 2010
+ libpng version 1.5.0beta58 - December 10, 2010
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.0beta58 - December 9, 2010
+ libpng versions 0.97, January 1998, through 1.5.0beta58 - December 10, 2010
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -1475,13 +1475,15 @@ a single row_pointer instead of an array of row_pointers:
 
 If the file is interlaced (interlace_type != 0 in the IHDR chunk), things
 get somewhat harder.  The only current (PNG Specification version 1.2)
-interlacing type for PNG is (interlace_type == PNG_INTERLACE_ADAM7)
-is a somewhat complicated 2D interlace scheme, known as Adam7, that
+interlacing type for PNG is (interlace_type == PNG_INTERLACE_ADAM7);
+a somewhat complicated 2D interlace scheme, known as Adam7, that
 breaks down an image into seven smaller images of varying size, based
-on an 8x8 grid.
+on an 8x8 grid.  This number is defined (from libpng 1.5) as
+PNG_INTERLACE_ADAM7_PASSES in png.h
 
 libpng can fill out those images or it can give them to you "as is".
-If you want them filled out, there are two ways to do that.  The one
+It is almost always better to have libpng handle the interlacing for you.
+If you want the images filled out, there are two ways to do that.  The one
 mentioned in the PNG specification is to expand each pixel to cover
 those pixels that have not been read yet (the "rectangle" method).
 This results in a blocky image for the first pass, which gradually
@@ -1491,65 +1493,20 @@ rest of the image remaining whatever colors they were initialized to
 before the start of the read.  The first method usually looks better,
 but tends to be slower, as there are more pixels to put in the rows.
 
-If you don't want libpng to handle the interlacing details, just call
-png_read_rows() seven times to read in all seven images.  Each of the
-images is a valid image by itself, or they can all be combined on an
-8x8 grid to form a single image (although if you intend to combine them
-you would be far better off using the libpng interlace handling).
-
-The first pass will return an image 1/8 as wide as the entire image
-(every 8th column starting in column 0) and 1/8 as high as the original
-(every 8th row starting in row 0), the second will be 1/8 as wide
-(starting in column 4) and 1/8 as high (also starting in row 0).  The
-third pass will be 1/4 as wide (every 4th pixel starting in column 0) and
-1/8 as high (every 8th row starting in row 4), and the fourth pass will
-be 1/4 as wide and 1/4 as high (every 4th column starting in column 2,
-and every 4th row starting in row 0).  The fifth pass will return an
-image 1/2 as wide, and 1/4 as high (starting at column 0 and row 2),
-while the sixth pass will be 1/2 as wide and 1/2 as high as the original
-(starting in column 1 and row 0).  The seventh and final pass will be as
-wide as the original, and 1/2 as high, containing all of the odd
-numbered scanlines.  Phew!
-
-If you want to retrieve the separate images you must pass the correct
-number of rows to each successive call of png_read_rows().
-Calculating the number isn't quite as straightforward as the previous
-paragraph might suggest; think about what happens with an image with a odd
-number of rows, which passes get the extra row?  To help you libpng 1.5.0
-implements a function to return the number of rows and columns in the current
-pass:
-
-    int number_of_rows = png_get_num_rows(png_ptr);
-    int number_of_cols = png_get_num_cols(png_ptr);
-
-Simply call that before each call to png_read_rows().  You must call
-png_start_read_image() (or png_read_update_info) before the first call to
-ensure that the number libpng holds internally has been updated.
-
-For very small interlaced images the number of rows or columns in a pass
-can be zero.
-You don't need to call png_read_rows() in this case, libpng will simply
-skip to the next pass.
-
-If you want libpng to expand the images, call this before calling
-png_start_read_image() or png_read_update_info():
+If, as is likely, you want libpng to expand the images, call this before
+calling png_start_read_image() or png_read_update_info():
 
     if (interlace_type == PNG_INTERLACE_ADAM7)
         number_of_passes
            = png_set_interlace_handling(png_ptr);
 
-This will return the number of passes needed.  Currently, this
-is seven, but may change if another interlace type is added.
-This function can be called even if the file is not interlaced,
-where it will return one pass.
-
-If you need to get the number of passes later (for example after the call
-to png_start_read_image()) just call:
-
-    number_of_passes = png_get_num_passes(png_ptr);
-
-This function just returns the number - it doesn't make any changes to the
-libpng state.
+This will return the number of passes needed.  Currently, this is seven,
+but may change if another interlace type is added.  This function can be
+called even if the file is not interlaced, where it will return one pass.
+You then need to read the whole image 'number_of_passes' times.  Each time
+will distribute the pixels from the current pass to the correct place in
+the output image, so you need to supply the same rows to png_read_rows in
+each pass.
 
 If you are not going to display the image after each pass, but are
 going to wait until the entire image is read in, use the sparkle
@@ -1574,6 +1531,94 @@ the second parameter NULL.
 
     png_read_rows(png_ptr, NULL, row_pointers,
        number_of_rows);
+
+If you don't want libpng to handle the interlacing details, just call
+png_read_rows() PNG_INTERLACE_ADAM7_PASSES times to read in all the images.
+Each of the images is a valid image by itself, however you will almost
+certainly need to distribute the pixels from each sub-image to the
+correct place.  This is where everything gets very tricky.
+
+If you want to retrieve the separate images you must pass the correct
+number of rows to each successive call of png_read_rows().  The calculation
+gets pretty complicated for small images, where some sub-images may
+not even exist because either their width or height ends up zero.
+libpng provides two macros to help you in 1.5 and later versions:
+
+   png_uint_32 width = PNG_PASS_COLS(image_width, pass_number);
+   png_uint_32 height = PNG_PASS_ROWS(image_height, pass_number);
+
+Respectively these tell you the width and height of the sub-image
+corresponding to the numbered pass.  'pass' is in in the range 0 to 6 -
+this can be confusing because the specification refers to the same passes
+as 1 to 7!  Be careful, you must check both the width and height before
+calling png_read_rows() and not call it for that pass if either is zero.
+
+You can, of course, read each sub-image row by row.  If you want to
+produce optimal code to make a pixel-by-pixel transformation of an
+interlaced image this is the best approach; read each row of each pass,
+transform it, and write it out to a new interlaced image.
+
+If you want to de-interlace the image yourself libpng provides further
+macros to help that tell you where to place the pixels in the output image.
+Because the interlacing scheme is rectangular - sub-image pixels are always
+arranged on a rectangular grid - all you need to know for each pass is the
+starting column and row in the output image of the first pixel plus the
+spacing between each pixel.  As of libpng 1.5 there are four macros to
+retrieve this information:
+
+   png_uint_32 x = PNG_PASS_START_COL(pass);
+   png_uint_32 y = PNG_PASS_START_ROW(pass);
+   png_uint_32 xStep = 1U << PNG_PASS_COL_SHIFT(pass);
+   png_uint_32 yStep = 1U << PNG_PASS_ROW_SHIFT(pass);
+
+These allow you to write the obvious loop:
+
+   png_uint_32 input_y = 0;
+   png_uint_32 output_y = PNG_PASS_START_ROW(pass);
+
+   while (output_y < output_image_height)
+   {
+      png_uint_32 input_x = 0;
+      png_uint_32 output_x = PNG_PASS_START_COL(pass);
+
+      while (output_x < output_image_width)
+      {
+         image[output_y][output_x] = subimage[pass][input_y][input_x++];
+         output_x += xStep;
+      }
+
+      ++input_y;
+      ouput_y += yStep;
+   }
+
+Notice that the steps between successive output rows and columns are
+returned as shifts.  This is possible because the pixels in the subimages
+are always a power of 2 apart - 1, 2, 4 or 8 pixels - in the original
+image.  In practice you may need to directly calculate the output coordinate
+given an input coordinate.  libpng provides two further macros for this
+purpose:
+
+   png_uint_32 output_x = PNG_COL_FROM_PASS_COL(input_x, pass);
+   png_uint_32 output_y = PNG_ROW_FROM_PASS_ROW(input_y, pass);
+
+Finally a pair of macros are provided to tell you if a particular image
+row or column appears in a given pass:
+
+   int col_in_pass = PNG_COL_IN_INTERLACE_PASS(output_x, pass);
+   int row_in_pass = PNG_ROW_IN_INTERLACE_PASS(output_y, pass);
+
+Bear in mind that you will probably also need to check the width and height
+of the pass in addition to the above to be sure the pass even exists!
+
+With any luck you are convinced by now that you don't want to do your own
+interlace handling.  In reality normally the only good reason for doing this
+is if you are processing PNG files on a pixel-by-pixel basis and don't want
+to load the whole file into memory when it is interlaced.
+
+libpng includes a test program, pngvalid, that illustrates reading and
+writing of interlaced images.  If you can't get interlacing to work in your
+code and don't want to leave it to libpng (the recommended approach) see
+how pngvalid.c does it.
 
 Finishing a sequential read
 
@@ -1780,6 +1825,9 @@ png_infop info_ptr;
        any).  You may start getting rows before
        png_process_data() returns, so this is your
        last chance to prepare for that.
+
+       This is where you turn on interlace handling,
+       assuming you don't want to do it yourself.
      */
  }
 
@@ -1800,14 +1848,22 @@ png_infop info_ptr;
        supplying them because it may make your life
        easier.
 
-       For the non-NULL rows of interlaced images,
+       If you did not turn on interlace handling then
+       the callback is called for each row of each
+       sub-image when the image is interlaced.  In this
+       case 'row_num' is the row in the sub-image, not
+       the row in the output image as it is in all other
+       cases.
+
+       For the non-NULL rows of interlaced images when
+       you have switched on libpng interlace handling,
        you must call png_progressive_combine_row()
        passing in the row and the old row.  You can
        call this function for NULL rows (it will just
        return) and for non-interlaced images (it just
        does the memcpy for you) if it will make the
        code easier.  Thus, you can just do this for
-       all cases:
+       all cases if you switch on interlace handling;
      */
 
         png_progressive_combine_row(png_ptr, old_row,
@@ -1983,11 +2039,10 @@ filter types.
        PNG_FILTER_PAETH | PNG_FILTER_VALUE_PAETH|
        PNG_ALL_FILTERS);
 
-If an application
-wants to start and stop using particular filters during compression,
-it should start out with all of the filters (to ensure that the previous
-row of pixels will be stored in case it's needed later), and then add
-and remove them after the start of compression.
+If an application wants to start and stop using particular filters during
+compression, it should start out with all of the filters (to ensure that
+the previous row of pixels will be stored in case it's needed later),
+and then add and remove them after the start of compression.
 
 If you are writing a PNG datastream that is to be embedded in a MNG
 datastream, the second parameter can be either 0 or 64.
@@ -2586,25 +2641,39 @@ for details of which pixels to write when.
 
 If you don't want libpng to handle the interlacing details, just
 use png_set_interlace_handling() and call png_write_rows() the
-correct number of times to write all seven sub-images.
+correct number of times to write all the sub-images
+(png_set_interlace_handling() returns the number of sub-images.)
 
 If you want libpng to build the sub-images, call this before you start
 writing any rows:
 
-    number_of_passes =
-       png_set_interlace_handling(png_ptr);
+    number_of_passes = png_set_interlace_handling(png_ptr);
 
 This will return the number of passes needed.  Currently, this is seven,
 but may change if another interlace type is added.
 
 Then write the complete image number_of_passes times.
 
-    png_write_rows(png_ptr, row_pointers,
-       number_of_rows);
+    png_write_rows(png_ptr, row_pointers, number_of_rows);
 
-As some of these rows are not used, and thus return immediately, you may
-want to read about interlacing in the PNG specification, and only update
-the rows that are actually used.
+Think carefully before you write an interlaced image.  Typically code that
+reads such images reads all the image data into memory, uncompressed, before
+doing any processing.  Only code that can display an image on the fly can
+take advantage of the interlacing and even then the image has to be exactly
+the correct size for the output device, because scaling an image requires
+adjacent pixels and these are not available until all the passes have been
+read.
+
+If you do write an interlaced image you will hardly ever need to handle
+the interlacing yourself.  Call png_set_interlace_handling() and use the
+approach described above.
+
+The only time it is conceivable that you will really need to write an
+interlaced image pass-by-pass is when you have read one pass by pass and
+made some pixel-by-pixel transformation to it, as described in the read
+code above.  In this case use the PNG_PASS_ROWS and PNG_PASS_COLS macros
+to determine the size of each sub-image in turn and simply write the rows
+you obtained from the read code.
 
 Finishing a sequential write
 
@@ -3382,9 +3451,10 @@ Any program that compiled against libpng 1.4 and did not use deprecated
 features or access internal library structures should compile and work
 against libpng 1.5.
 
-libpng 1.5.0 adds png_get_num_ functions to help in the reading of
-interlaced images.  The functions return the number of interlace passes
-and the number of rows and columns in each pass.
+libpng 1.5.0 adds PNG_ PASS macros to help in the reading and writing of
+interlaced images.  The macros return the number of rows and columns in
+each pass and information that can be used to de-interlace and (if
+absolutely necessary) interlace an image.
 
 libpng 1.5.0 adds an API png_longjmp(png_ptr, value).  This API calls
 the application provided png_longjmp_ptr on the internal, but application
@@ -3740,7 +3810,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-December 9, 2010
+December 10, 2010
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

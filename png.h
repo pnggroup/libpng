@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.0beta58 - December 9, 2010
+ * libpng version 1.5.0beta58 - December 10, 2010
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.0beta58 - December 9, 2010: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.0beta58 - December 10, 2010: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -173,7 +173,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta58, December 9, 2010, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.0beta58, December 10, 2010, are
  * Copyright (c) 2004, 2006-2010 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -285,7 +285,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    December 9, 2010
+ *    December 10, 2010
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -349,7 +349,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.0beta58"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.0beta58 - December 9, 2010\n"
+     " libpng version 1.5.0beta58 - December 10, 2010\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1135,20 +1135,6 @@ PNG_EXPORT(44, void, png_set_shift, (png_structp png_ptr, png_const_color_8p
 PNG_EXPORT(45, int, png_set_interlace_handling, (png_structp png_ptr));
 #endif
 
-#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-/* Alternatively call this to get the number of rows in the current pass.
- * Call this after png_read_update_info or png_start_read_image; if you
- * call it before it will just return the image height (which is also what
- * it returns for a non-interlaced image!).
- *
- * NOTE: you need to call these to find out how many times to call
- * png_read_row if you handle your own de-interlacing.
- */
-PNG_EXPORT(215, int, png_get_num_passes, (png_structp png_ptr));
-PNG_EXPORT(216, png_uint_32, png_get_num_rows, (png_structp png_ptr));
-PNG_EXPORT(218, png_uint_32, png_get_num_cols, (png_structp png_ptr));
-#endif
-
 #if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
 /* Invert monochrome files */
 PNG_EXPORT(46, void, png_set_invert_mono, (png_structp png_ptr));
@@ -1159,7 +1145,7 @@ PNG_EXPORT(46, void, png_set_invert_mono, (png_structp png_ptr));
 PNG_FP_EXPORT(47, void, png_set_background, (png_structp png_ptr, 
     png_const_color_16p background_color, int background_gamma_code, 
     int need_expand, double background_gamma));
-PNG_FIXED_EXPORT(217, void, png_set_background_fixed, (png_structp png_ptr, 
+PNG_FIXED_EXPORT(215, void, png_set_background_fixed, (png_structp png_ptr,
     png_const_color_16p background_color, int background_gamma_code, 
     int need_expand, png_fixed_point background_gamma));
 #endif
@@ -2072,6 +2058,59 @@ PNG_EXPORT(200, png_const_bytep, png_get_io_chunk_name, (png_structp png_ptr));
 #  define PNG_IO_MASK_LOC    0x00f0   /* current location: sig/hdr/data/crc */
 #endif /* ?PNG_IO_STATE_SUPPORTED */
 
+/* Interlace support.  The following macros are always defined so that if
+ * libpng interlace handling is turned off the macros may be used to handle
+ * interlaced images within the application.
+ */
+#define PNG_INTERLACE_ADAM7_PASSES 7
+
+/* Two macros to return the first row and first column of the original,
+ * full, image which appears in a given pass.  'pass' is in the range 0
+ * to 6 and the result is in the range 0 to 7.
+ */
+#define PNG_PASS_START_ROW(pass) (((1U&~(pass))<<(3-((pass)>>1)))&7)
+#define PNG_PASS_START_COL(pass) (((1U& (pass))<<(3-(((pass)+1)>>1)))&7)
+
+/* Two macros to help evaluate the number of rows or columns in each
+ * pass.  This is expressed as a shift - effectively log2 of the number or
+ * rows or columns in each 8x8 tile of the original image.
+ */
+#define PNG_PASS_ROW_SHIFT(pass) ((pass)>2?(8-(pass))>>1:3)
+#define PNG_PASS_COL_SHIFT(pass) ((pass)>1?(7-(pass))>>1:3)
+
+/* Hence two macros to determine the number of rows or columns in a given
+ * pass of an image given its height or width.  In fact these macros may
+ * return non-zero even though the sub-image is empty, because the other
+ * dimension may be empty for a small image.
+ */
+#define PNG_PASS_ROWS(height, pass) (((height)+(((1<<PNG_PASS_ROW_SHIFT(pass))\
+   -1)-PNG_PASS_START_ROW(pass)))>>PNG_PASS_ROW_SHIFT(pass))
+#define PNG_PASS_COLS(width, pass) (((width)+(((1<<PNG_PASS_COL_SHIFT(pass))\
+   -1)-PNG_PASS_START_COL(pass)))>>PNG_PASS_COL_SHIFT(pass))
+
+/* For the progressive reader it is necessary to find the row in the output
+ * image given a row in an interlaced image, so two more macros:
+ */
+#define PNG_ROW_FROM_PASS_ROW(yIn, pass) \
+   (((yIn)<<PNG_PASS_ROW_SHIFT(pass))+PNG_PASS_START_ROW(pass))
+#define PNG_COL_FROM_PASS_COL(xIn, pass) \
+   (((xIn)<<PNG_PASS_COL_SHIFT(pass))+PNG_PASS_START_COL(pass))
+
+/* Two macros which return a boolean (0 or 1) saying whether the given row
+ * or column is in a particular pass.  These use a common utility macro that
+ * returns a mask for a given pass - the offset 'off' selects the row or
+ * column version.  The mask has the appropriate bit set for each column in
+ * the tile.
+ */
+#define PNG_PASS_MASK(pass,off) ( \
+   ((0x110145AFU>>(((7-(off))-(pass))<<2)) & 0xFU) | \
+   ((0x01145AF0U>>(((7-(off))-(pass))<<2)) & 0xF0U))
+
+#define PNG_ROW_IN_INTERLACE_PASS(y, pass) \
+   ((PNG_PASS_MASK(pass,0) >> ((y)&7)) & 1)
+#define PNG_COL_IN_INTERLACE_PASS(x, pass) \
+   ((PNG_PASS_MASK(pass,1) >> ((x)&7)) & 1)
+
 #ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
 /* With these routines we avoid an integer divide, which will be slower on
  * most machines.  However, it does take more operations than the corresponding
@@ -2174,7 +2213,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(218);
+  PNG_EXPORT_LAST_ORDINAL(215);
 #endif
 
 #ifdef __cplusplus

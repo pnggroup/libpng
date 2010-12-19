@@ -3293,15 +3293,12 @@ png_read_finish_row(png_structp png_ptr)
                 png_pass_yinc[png_ptr->pass] - 1 -
                 png_pass_ystart[png_ptr->pass]) /
                 png_pass_yinc[png_ptr->pass];
-
-            if (!(png_ptr->num_rows))
-               continue;
          }
 
          else  /* if (png_ptr->transformations & PNG_INTERLACE) */
-            break;
+            break; /* libpng deinterlacing sees every row */
 
-      } while (png_ptr->iwidth == 0);
+      } while (png_ptr->num_rows == 0 || png_ptr->iwidth == 0);
 
       if (png_ptr->pass < 7)
          return;
@@ -3614,55 +3611,4 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }
-
-#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-int PNGAPI
-png_get_num_passes(png_structp png_ptr)
-{
-   if (png_ptr != NULL)
-   {
-      if (png_ptr->interlaced)
-         return 7;
-
-      else
-         return 1;
-   }
-
-   /* Here on error */
-   return 0;
-}
-
-png_uint_32 PNGAPI
-png_get_num_rows(png_structp png_ptr)
-{
-   if (png_ptr != NULL)
-   {
-      if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-         return png_ptr->num_rows;
-
-      else
-         png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
-            "before png_get_num_rows");
-   }
-
-   /* Here on error */
-   return 0;
-}
-
-png_uint_32 PNGAPI
-png_get_num_cols(png_structp png_ptr)
-{
-   if (png_ptr != NULL)
-   {
-      if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-         return png_ptr->iwidth;
-      else
-         png_error(png_ptr, "Call png_start_read_image or png_read_update_info "
-            "before png_get_num_cols");
-   }
-
-   /* Here on error */
-   return 0;
-}
-#endif /* SEQUENTIAL READ */
 #endif /* PNG_READ_SUPPORTED */

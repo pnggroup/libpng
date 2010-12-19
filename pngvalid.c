@@ -3,7 +3,7 @@
  *
  * Last changed in libpng 1.5.0 [(PENDING RELEASE)]
  * Copyright (c) 2010 Glenn Randers-Pehrson
- * Written by John C. Bowler
+ * Written by John Cunningham Bowler
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -45,7 +45,13 @@ define_exception_type(struct png_store*);
    &(ps)->exception_context
 #define context(ps,fault) anon_context(ps); png_store *fault
 
-/******************************* ERROR UTILITIES ******************************/
+/******************************* UTILITIES ************************************/
+/* Error handling is particularly problematic in production code - error
+ * handlers often themselves have bugs which lead to programs that detect
+ * minor errors crashing.  The following functions deal with one very
+ * common class of errors in error handlers - attempting to format error or
+ * warning messages into buffers that are too small.
+ */
 static size_t safecat(char *buffer, size_t bufsize, size_t pos,
    PNG_CONST char *cat)
 {
@@ -115,25 +121,45 @@ log2depth(png_byte bit_depth)
    }
 }
 
-/* A numeric ID based on PNG file characteristics: */
-#define FILEID(col, depth, interlace) \
-   ((png_uint_32)((col) + ((depth)<<3)) + ((interlace)<<8))
+/* A numeric ID based on PNG file characteristics.  The 'do_interlace' field
+ * simply records whether pngvalid did the interlace itself or whether it
+ * was done by libpng.  Width and height must be less than 256.
+ */
+#define FILEID(col, depth, interlace, width, height, do_interlace) \
+   ((png_uint_32)((col) + ((depth)<<3) + ((interlace)<<8) + \
+    (((do_interlace)!=0)<<15) + ((width)<<16) + ((height)<<24)))
+
 #define COL_FROM_ID(id) ((png_byte)((id)& 0x7U))
 #define DEPTH_FROM_ID(id) ((png_byte)(((id) >> 3) & 0x1fU))
-#define INTERLACE_FROM_ID(id) ((int)(((id) >> 8) & 0xff))
+#define INTERLACE_FROM_ID(id) ((int)(((id) >> 8) & 0x3))
+#define DO_INTERLACE_FROM_ID(id) ((int)(((id)>>15) & 1))
+#define WIDTH_FROM_ID(id) (((id)>>16) & 0xff)
+#define HEIGHT_FROM_ID(id) (((id)>>24) & 0xff)
 
 /* Utility to construct a standard name for a standard image. */
 static size_t
 standard_name(char *buffer, size_t bufsize, size_t pos, png_byte colour_type,
-    int log_bit_depth, int interlace_type)
+    int log_bit_depth, int interlace_type, png_uint_32 w, png_uint_32 h,
+    int do_interlace)
 {
    pos = safecat(buffer, bufsize, pos, colour_types[colour_type]);
    pos = safecat(buffer, bufsize, pos, " ");
    pos = safecat(buffer, bufsize, pos, bit_depths[log_bit_depth]);
-   pos = safecat(buffer, bufsize, pos, " bit");
+   pos = safecat(buffer, bufsize, pos, " bit ");
 
    if (interlace_type != PNG_INTERLACE_NONE)
-      pos = safecat(buffer, bufsize, pos, " interlaced");
+      pos = safecat(buffer, bufsize, pos, "interlaced");
+   if (do_interlace)
+      pos = safecat(buffer, bufsize, pos, "(pngvalid)");
+   else
+      pos = safecat(buffer, bufsize, pos, "(libpng)");
+   if (w > 0 || h > 0)
+   {
+      pos = safecat(buffer, bufsize, pos, " ");
+      pos = safecatn(buffer, bufsize, pos, w);
+      pos = safecat(buffer, bufsize, pos, "x");
+      pos = safecatn(buffer, bufsize, pos, h);
+   }
 
    return pos;
 }
@@ -142,7 +168,8 @@ static size_t
 standard_name_from_id(char *buffer, size_t bufsize, size_t pos, png_uint_32 id)
 {
    return standard_name(buffer, bufsize, pos, COL_FROM_ID(id),
-      log2depth(DEPTH_FROM_ID(id)), INTERLACE_FROM_ID(id));
+      log2depth(DEPTH_FROM_ID(id)), INTERLACE_FROM_ID(id),
+      WIDTH_FROM_ID(id), HEIGHT_FROM_ID(id), DO_INTERLACE_FROM_ID(id));
 }
 
 /* Convenience API and defines to list valid formats.  Note that 16 bit read and
@@ -241,6 +268,72 @@ sample(png_const_bytep row, png_byte colour_type, png_byte bit_depth,
    /* Less than 8 bits per sample. */
    index &= 7;
    return (result >> (8-index-bit_depth)) & ((1U<<bit_depth)-1);
+}
+
+/* Copy a single pixel, of a given size, from one buffer to another -
+ * while this is basically bit addressed there is an implicit assumption
+ * that pixels 8 or more bits in size are byte aligned and that pixels
+ * do not otherwise cross byte boundaries.  (This is, so far as I know,
+ * universally true in bitmap computer graphics.  [JCB 20101212])
+ *
+ * NOTE: The to and from buffers may be the same.
+ */
+static void
+pixel_copy(png_bytep toBuffer, png_uint_32 toIndex,
+   png_const_bytep fromBuffer, png_uint_32 fromIndex, unsigned int pixelSize)
+{
+   /* Assume we can multiply by 'size' without overflow because we are
+    * just working in a single buffer.
+    */
+   toIndex *= pixelSize;
+   fromIndex *= pixelSize;
+   if (pixelSize < 8) /* Sub-byte */
+   {
+      /* Mask to select the location of the copied pixel: */
+      unsigned int destMask = ((1U<<pixelSize)-1) << (8-pixelSize-(toIndex&7));
+      /* The following read the entire pixels and clears the extra: */
+      unsigned int destByte = toBuffer[toIndex >> 3] & ~destMask;
+      unsigned int sourceByte = fromBuffer[fromIndex >> 3];
+
+      /* Don't rely on << or >> supporting '0' here, just in case: */
+      fromIndex &= 7;
+      if (fromIndex > 0) sourceByte <<= fromIndex;
+      if ((toIndex & 7) > 0) sourceByte >>= toIndex & 7;
+
+      toBuffer[toIndex >> 3] = (png_byte)(destByte | (sourceByte & destMask));
+   }
+   else /* One or more bytes */
+      memmove(toBuffer+(toIndex>>3), fromBuffer+(fromIndex>>3), pixelSize>>3);
+}
+
+/* Compare pixels - they are assumed to start at the first byte in the
+ * given buffers.
+ */
+static int
+pixel_cmp(png_const_bytep pa, png_const_bytep pb, png_uint_32 bit_width)
+{
+   if (memcmp(pa, pb, bit_width>>3) == 0)
+   {
+      png_uint_32 p;
+
+      if ((bit_width & 7) == 0) return 0;
+
+      /* Ok, any differences? */
+      p = pa[bit_width >> 3];
+      p ^= pb[bit_width >> 3];
+
+      if (p == 0) return 0;
+
+      /* There are, but they may not be significant, remove the bits
+       * after the end (the low order bits in PNG.)
+       */
+      bit_width &= 7;
+      p >>= 8-bit_width;
+
+      if (p == 0) return 0;
+   }
+
+   return 1; /* Different */
 }
 
 /*************************** BASIC PNG FILE WRITING ***************************/
@@ -420,6 +513,12 @@ store_ensure_image(png_store *ps, png_structp pp, size_t cb)
       ++(ps->image);
       ps->cb_image = cb;
    }
+
+   /* And, for error checking, the whole buffer is set to '1' - this
+    * matches what happens with the 'size' test images on write and also
+    * matches the unused bits in the test rows.
+    */
+   memset(ps->image, 0xff, cb);
 }
 
 static void
@@ -1172,6 +1271,9 @@ typedef struct png_modifier
    /* Run the standard tests? */
    unsigned int             test_standard :1;
 
+   /* Run the odd-sized image and interlace read/write tests? */
+   unsigned int             test_size :1;
+
    /* When to use the use_input_precision option: */
    unsigned int             use_input_precision :1;
    unsigned int             use_input_precision_sbit :1;
@@ -1246,6 +1348,7 @@ modifier_init(png_modifier *pm)
    pm->error_gray_16 = pm->error_color_8 = pm->error_color_16 = 0;
    pm->interlace_type = PNG_INTERLACE_NONE;
    pm->test_standard = 1;
+   pm->test_size = 0;
    pm->use_input_precision = 0;
    pm->use_input_precision_sbit = 0;
    pm->use_input_precision_16to8 = 0;
@@ -1650,17 +1753,34 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
 
 /***************************** STANDARD PNG FILES *****************************/
 /* Standard files - write and save standard files. */
-/* The standard files are constructed with rows which fit into a 1024 byte row
+/* There are two basic forms of standard images.  Those which attempt to have
+ * all the possible pixel values (not possible for 16bpp images, but a range of
+ * values are produced) and those which have a range of image sizes.  The former
+ * are used for testing transforms, in particular gamma correction and bit
+ * reduction and increase.  The latter are reserved for testing the behavior of
+ * libpng with respect to 'odd' image sizes - particularly small images where
+ * rows become 1 byte and interlace passes disappear.
+ *
+ * The first, most useful, set are the 'transform' images, the second set of
+ * small images are the 'size' images.
+ *
+ * The transform files are constructed with rows which fit into a 1024 byte row
  * buffer.  This makes allocation easier below.  Further regardless of the file
- * format every file has 128 pixels (giving 1024 bytes for 64bpp formats).
+ * format every row has 128 pixels (giving 1024 bytes for 64bpp formats).
  *
  * Files are stored with no gAMA or sBIT chunks, with a PLTE only when needed
  * and with an ID derived from the colour type, bit depth and interlace type
- * as above (FILEID).
+ * as above (FILEID).  The width (128) and height (variable) are not stored in
+ * the FILEID - instead the fields are set to 0, indicating a transform file.
+ *
+ * The size files ar constructed with rows a maximum of 128 bytes wide, allowing
+ * a maximum width of 16 pixels (for the 64bpp case.)  They also have a maximum
+ * height of 16 rows.  The width and height are stored in the FILEID and, being
+ * non-zero, indicate a size file.
  */
 
-/* The number of passes is related to the interlace type. There's no libpng API
- * to determine this so we need an inquiry function:
+/* The number of passes is related to the interlace type. There wass no libpng
+ * API to determine this prior to 1.5, so we need an inquiry function:
  */
 static int
 npasses_from_interlace_type(png_structp pp, int interlace_type)
@@ -1674,12 +1794,9 @@ npasses_from_interlace_type(png_structp pp, int interlace_type)
       return 1;
 
    case PNG_INTERLACE_ADAM7:
-      return 7;
+      return PNG_INTERLACE_ADAM7_PASSES;
    }
 }
-
-#define STD_WIDTH  128U
-#define STD_ROWMAX (STD_WIDTH*8U)
 
 static unsigned int
 bit_size(png_structp pp, png_byte colour_type, png_byte bit_depth)
@@ -1700,19 +1817,30 @@ bit_size(png_structp pp, png_byte colour_type, png_byte bit_depth)
    }
 }
 
+#define TRANSFORM_WIDTH  128U
+#define TRANSFORM_ROWMAX (TRANSFORM_WIDTH*8U)
+#define SIZE_ROWMAX (16*8U) /* 16 pixels, max 8 bytes each - 128 bytes */
+#define STANDARD_ROWMAX TRANSFORM_ROWMAX /* The larger of the two */
+
+/* So the maximum image sizes are as follows.  A 'transform' image may require
+ * more than 65535 bytes.  The size images are a maximum of 2046 bytes.
+ */
+#define TRANSFORM_IMAGEMAX (TRANSFORM_ROWMAX * (png_uint_32)2048)
+#define SIZE_IMAGEMAX (SIZE_ROWMAX * 16U)
+
 static size_t
-standard_rowsize(png_structp pp, png_byte colour_type, png_byte bit_depth)
+transform_rowsize(png_structp pp, png_byte colour_type, png_byte bit_depth)
 {
-   return (STD_WIDTH * bit_size(pp, colour_type, bit_depth)) / 8;
+   return (TRANSFORM_WIDTH * bit_size(pp, colour_type, bit_depth)) / 8;
 }
 
-/* standard_wdith(pp, colour_type, bit_depth) current returns the same number
+/* transform_width(pp, colour_type, bit_depth) current returns the same number
  * every time, so just use a macro:
  */
-#define standard_width(pp, colour_type, bit_depth) STD_WIDTH
+#define transform_width(pp, colour_type, bit_depth) TRANSFORM_WIDTH
 
 static png_uint_32
-standard_height(png_structp pp, png_byte colour_type, png_byte bit_depth)
+transform_height(png_structp pp, png_byte colour_type, png_byte bit_depth)
 {
    switch (bit_size(pp, colour_type, bit_depth))
    {
@@ -1740,12 +1868,45 @@ standard_height(png_structp pp, png_byte colour_type, png_byte bit_depth)
    }
 }
 
-/* So the maximum standard image size is: */
-#define STD_IMAGEMAX (STD_ROWMAX * 2048)
+/* The following can only be defined here, now we have the definitions
+ * of the transform image sizes.
+ */
+static png_uint_32
+standard_width(png_structp pp, png_uint_32 id)
+{
+   png_uint_32 width = WIDTH_FROM_ID(id);
+   UNUSED(pp);
+
+   if (width == 0)
+      width = transform_width(pp, COL_FROM_ID(id), DEPTH_FROM_ID(id));
+
+   return width;
+}
+
+static png_uint_32
+standard_height(png_structp pp, png_uint_32 id)
+{
+   png_uint_32 height = HEIGHT_FROM_ID(id);
+
+   if (height == 0)
+      height = transform_height(pp, COL_FROM_ID(id), DEPTH_FROM_ID(id));
+
+   return height;
+}
+
+static png_uint_32
+standard_rowsize(png_structp pp, png_uint_32 id)
+{
+   png_uint_32 width = standard_width(pp, id);
+
+   /* This won't overflow: */
+   width *= bit_size(pp, COL_FROM_ID(id), DEPTH_FROM_ID(id));
+   return (width + 7) / 8;
+}
 
 static void
-standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
-    png_byte bit_depth, png_uint_32 y)
+transform_row(png_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
+   png_byte colour_type, png_byte bit_depth, png_uint_32 y)
 {
    png_uint_32 v = y << 7;
    png_uint_32 i = 0;
@@ -1856,8 +2017,14 @@ standard_row(png_structp pp, png_byte buffer[STD_ROWMAX], png_byte colour_type,
  */
 #define DEPTH(bd) ((png_byte)(1U << (bd)))
 
+/* Make a standardized image given a an image colour type, bit depth and
+ * interlace type.  The standard images have a very restricted range of
+ * rows and heights and are used for testing transforms rather than image
+ * layout details.  See make_size_images below for a way to make images
+ * that test odd sizes along with the libpng interlace handling.
+ */
 static void
-make_standard_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
+make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
     png_byte PNG_CONST bit_depth, int interlace_type, png_const_charp name)
 {
    context(ps, fault);
@@ -1875,9 +2042,9 @@ make_standard_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
       if (pp == NULL)
          Throw ps;
 
-      h = standard_height(pp, colour_type, bit_depth);
+      h = transform_height(pp, colour_type, bit_depth);
 
-      png_set_IHDR(pp, pi, standard_width(pp, colour_type, bit_depth), h,
+      png_set_IHDR(pp, pi, transform_width(pp, colour_type, bit_depth), h,
          bit_depth, colour_type, interlace_type,
          PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
@@ -1896,7 +2063,7 @@ make_standard_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
       png_write_info(pp, pi);
 
       if (png_get_rowbytes(pp, pi) !=
-          standard_rowsize(pp, colour_type, bit_depth))
+          transform_rowsize(pp, colour_type, bit_depth))
          png_error(pp, "row size incorrect");
 
       else
@@ -1911,15 +2078,15 @@ make_standard_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          if (npasses != npasses_from_interlace_type(pp, interlace_type))
             png_error(pp, "write: png_set_interlace_handling failed");
 
-         for (pass=1; pass<=npasses; ++pass)
+         for (pass=0; pass<npasses; ++pass)
          {
             png_uint_32 y;
 
             for (y=0; y<h; ++y)
             {
-               png_byte buffer[STD_ROWMAX];
+               png_byte buffer[TRANSFORM_ROWMAX];
 
-               standard_row(pp, buffer, colour_type, bit_depth, y);
+               transform_row(pp, buffer, colour_type, bit_depth, y);
                png_write_row(pp, buffer);
             }
          }
@@ -1928,7 +2095,8 @@ make_standard_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
       png_write_end(pp, pi);
 
       /* And store this under the appropriate id, then clean up. */
-      store_storefile(ps, FILEID(colour_type, bit_depth, interlace_type));
+      store_storefile(ps, FILEID(colour_type, bit_depth, interlace_type,
+         0, 0, 0));
 
       store_write_reset(ps);
    }
@@ -1956,15 +2124,16 @@ make_standard(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type, int bdlo,
       {
          char name[FILE_NAME_SIZE];
 
-         standard_name(name, sizeof name, 0, colour_type, bdlo, interlace_type);
-         make_standard_image(ps, colour_type, DEPTH(bdlo), interlace_type,
+         standard_name(name, sizeof name, 0, colour_type, bdlo, interlace_type,
+            0, 0, 0);
+         make_transform_image(ps, colour_type, DEPTH(bdlo), interlace_type,
             name);
       }
    }
 }
 
 static void
-make_standard_images(png_store *ps)
+make_transform_images(png_store *ps)
 {
    /* This is in case of errors. */
    safecat(ps->test, sizeof ps->test, 0, "make standard images");
@@ -1976,6 +2145,270 @@ make_standard_images(png_store *ps)
    make_standard(ps, 3, 0, 3 /*palette: max 8 bits*/);
    make_standard(ps, 4, 3, WRITE_BDHI);
    make_standard(ps, 6, 3, WRITE_BDHI);
+}
+
+/* The following two routines use the PNG interlace support macros from
+ * png.h to interlace or deinterlace rows.
+ */
+static void
+interlace_row(png_bytep buffer, png_const_bytep imageRow,
+   unsigned int pixel_size, png_uint_32 w, int pass)
+{
+   png_uint_32 xin, xout, xstep;
+
+   /* Note that this can, trivially, be optimized to a memcpy on pass 7, the
+    * code is presented this way to make it easier to understand.  In practice
+    * consult the code in the libpng source to see other ways of doing this.
+    */
+   xin = PNG_PASS_START_COL(pass);
+   xstep = 1U<<PNG_PASS_COL_SHIFT(pass);
+
+   for (xout=0; xin<w; xin+=xstep)
+   {
+      pixel_copy(buffer, xout, imageRow, xin, pixel_size);
+      ++xout;
+   }
+}
+
+static void
+deinterlace_row(png_bytep buffer, png_const_bytep row,
+   unsigned int pixel_size, png_uint_32 w, int pass)
+{
+   /* The inverse of the above, 'row' is part of row 'y' of the output image,
+    * in 'buffer'.  The image is 'w' wide and this is pass 'pass', distribute
+    * the pixels of row into buffer and return the number written (to allow
+    * this to be checked).
+    */
+   png_uint_32 xin, xout, xstep;
+
+   xout = PNG_PASS_START_COL(pass);
+   xstep = 1U<<PNG_PASS_COL_SHIFT(pass);
+
+   for (xin=0; xout<w; xout+=xstep)
+   {
+      pixel_copy(buffer, xout, row, xin, pixel_size);
+      ++xin;
+   }
+}
+
+/* Build a single row for the 'size' test images, this fills in only the
+ * first bit_width bits of the sample row.
+ */
+static void
+size_row(png_byte buffer[SIZE_ROWMAX], png_uint_32 bit_width, png_uint_32 y)
+{
+   /* height is in the range 1 to 16, so: */
+   y = ((y & 1) << 7) + ((y & 2) << 6) + ((y & 4) << 5) + ((y & 8) << 4);
+   /* the following ensures bits are set in small images: */
+   y ^= 0xA5;
+
+   while (bit_width >= 8)
+      *buffer++ = (png_byte)y++, bit_width -= 8;
+
+   /* There may be up to 7 remaining bits, these go in the most significant
+    * bits of the byte.
+    */
+   if (bit_width > 0)
+   {
+      png_uint_32 mask = (1U<<(8-bit_width))-1;
+      *buffer = (png_byte)((*buffer & mask) | (y & ~mask));
+   }
+}
+
+static void
+make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
+    png_byte PNG_CONST bit_depth, int PNG_CONST interlace_type,
+    png_uint_32 PNG_CONST w, png_uint_32 PNG_CONST h,
+    int PNG_CONST do_interlace)
+{
+   char name[FILE_NAME_SIZE];
+   context(ps, fault);
+
+   /* Make a name and get an appropriate id: */
+   PNG_CONST png_uint_32 id = FILEID(colour_type, bit_depth, interlace_type,
+      w, h, do_interlace);
+
+   standard_name_from_id(name, sizeof name, 0, id);
+
+   Try
+   {
+      png_infop pi;
+      unsigned int pixel_size;
+      png_structp pp = set_store_for_write(ps, &pi, name);
+
+      /* In the event of a problem return control to the Catch statement below
+       * to do the clean up - it is not possible to 'return' directly from a Try
+       * block.
+       */
+      if (pp == NULL)
+         Throw ps;
+
+      png_set_IHDR(pp, pi, w, h, bit_depth, colour_type, interlace_type,
+         PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+      /* Same palette as make_transform_image - I don' think there is any
+       * benefit from using a different one (JB 20101211)
+       */
+      if (colour_type == 3) /* palette */
+      {
+         unsigned int i = 0;
+         png_color pal[256];
+
+         do
+            pal[i].red = pal[i].green = pal[i].blue = (png_byte)i;
+         while(++i < 256U);
+
+         png_set_PLTE(pp, pi, pal, 256);
+      }
+
+      png_write_info(pp, pi);
+
+      /* Calculate the bit size, divide by 8 to get the byte size - this won't
+       * overflow because we know the w values are all small enough even for
+       * a system where 'unsigned int' is only 16 bits.
+       */
+      pixel_size = bit_size(pp, colour_type, bit_depth);
+      if (png_get_rowbytes(pp, pi) != ((w * pixel_size) + 7) / 8)
+         png_error(pp, "row size incorrect");
+
+      else
+      {
+         int npasses = npasses_from_interlace_type(pp, interlace_type);
+         png_uint_32 y;
+         int pass;
+         png_byte image[16][SIZE_ROWMAX];
+
+         /* To help consistent error detection make the parts of this buffer
+          * that aren't set below all '1':
+          */
+         memset(image, 0xff, sizeof image);
+
+         if (!do_interlace && npasses != png_set_interlace_handling(pp))
+            png_error(pp, "write: png_set_interlace_handling failed");
+
+         /* Prepare the whole image first to avoid making it 7 times: */
+         for (y=0; y<h; ++y)
+            size_row(image[y], w * pixel_size, y);
+
+         for (pass=0; pass<npasses; ++pass)
+         {
+            /* The following two are for checking the macros: */
+            PNG_CONST png_uint_32 wPass = PNG_PASS_COLS(w, pass);
+
+            /* If do_interlace is set we don't call png_write_row for every
+             * row because some of them are empty.  In fact, for a 1x1 image,
+             * most of them are empty!
+             */
+            for (y=0; y<h; ++y)
+            {
+               png_const_bytep row = image[y];
+               png_byte tempRow[SIZE_ROWMAX];
+
+               /* If do_interlace *and* the image is interlaced we
+                * need a reduced interlace row, this may be reduced
+                * to empty.
+                */
+               if (do_interlace && interlace_type == PNG_INTERLACE_ADAM7)
+               {
+                  /* The row must not be written if it doesn't exist, notice
+                   * that there are two conditions here, either the row isn't
+                   * ever in the pass or the row would be but isn't wide
+                   * enough to contribute any pixels.  In fact the wPass test
+                   * can be used to skip the whole y loop in this case.
+                   */
+                  if (PNG_ROW_IN_INTERLACE_PASS(y, pass) && wPass > 0)
+                  {
+                     /* Set to all 1's for error detection (libpng tends to
+                      * set unset things to 0).
+                      */
+                     memset(tempRow, 0xff, sizeof tempRow);
+                     interlace_row(tempRow, row, pixel_size, w, pass);
+                     row = tempRow;
+                  }
+                  else
+                     continue;
+               }
+
+               /* Only get to here if the row has some pixels in it. */
+               png_write_row(pp, row);
+            }
+         }
+      }
+
+      png_write_end(pp, pi);
+
+      /* And store this under the appropriate id, then clean up. */
+      store_storefile(ps, id);
+
+      store_write_reset(ps);
+   }
+
+   Catch(fault)
+   {
+      /* Use the png_store returned by the exception. This may help the compiler
+       * because 'ps' is not used in this branch of the setjmp.  Note that fault
+       * and ps will always be the same value.
+       */
+      store_write_reset(fault);
+   }
+}
+
+static void
+make_size(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type, int bdlo,
+    int PNG_CONST bdhi)
+{
+   for (; bdlo <= bdhi; ++bdlo)
+   {
+      png_uint_32 width;
+
+      for (width = 1; width <= 16; ++width)
+      {
+         png_uint_32 height;
+
+         for (height = 1; height <= 16; ++height)
+         {
+            /* The four combinations of DIY interlace and interlace or not -
+             * no interlace + DIY should be identical to no interlace with
+             * libpng doing it.
+             */
+            make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_NONE,
+               width, height, 0);
+            make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_NONE,
+               width, height, 1);
+            make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
+               width, height, 0);
+            make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
+               width, height, 1);
+         }
+      }
+   }
+}
+
+static void
+make_size_images(png_store *ps)
+{
+   /* This is in case of errors. */
+   safecat(ps->test, sizeof ps->test, 0, "make size images");
+
+   /* Arguments are colour_type, low bit depth, high bit depth
+    */
+   make_size(ps, 0, 0, WRITE_BDHI);
+   make_size(ps, 2, 3, WRITE_BDHI);
+   make_size(ps, 3, 0, 3 /*palette: max 8 bits*/);
+   make_size(ps, 4, 3, WRITE_BDHI);
+   make_size(ps, 6, 3, WRITE_BDHI);
+}
+
+/* Return a row based on image id and 'y' for checking: */
+static void
+standard_row(png_structp pp, png_byte std[STANDARD_ROWMAX], png_uint_32 id,
+   png_uint_32 y)
+{
+   if (WIDTH_FROM_ID(id) == 0)
+      transform_row(pp, std, COL_FROM_ID(id), DEPTH_FROM_ID(id), y);
+   else
+      size_row(std, WIDTH_FROM_ID(id) * bit_size(pp, COL_FROM_ID(id),
+         DEPTH_FROM_ID(id)), y);
 }
 
 /* Tests - individual test cases */
@@ -2037,8 +2470,8 @@ make_error(png_store* ps, png_byte PNG_CONST colour_type, png_byte bit_depth,
       if (pp == NULL)
          Throw ps;
 
-      png_set_IHDR(pp, pi, standard_width(pp, colour_type, bit_depth),
-         standard_height(pp, colour_type, bit_depth), bit_depth, colour_type,
+      png_set_IHDR(pp, pi, transform_width(pp, colour_type, bit_depth),
+         transform_height(pp, colour_type, bit_depth), bit_depth, colour_type,
          interlace_type, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
       if (colour_type == 3) /* palette */
@@ -2088,27 +2521,27 @@ make_error(png_store* ps, png_byte PNG_CONST colour_type, png_byte bit_depth,
        * undetected, errro has not created problems inside libpng.
        */
       if (png_get_rowbytes(pp, pi) !=
-          standard_rowsize(pp, colour_type, bit_depth))
+          transform_rowsize(pp, colour_type, bit_depth))
          png_error(pp, "row size incorrect");
 
       else
       {
-         png_uint_32 h = standard_height(pp, colour_type, bit_depth);
+         png_uint_32 h = transform_height(pp, colour_type, bit_depth);
          int npasses = png_set_interlace_handling(pp);
          int pass;
 
          if (npasses != npasses_from_interlace_type(pp, interlace_type))
             png_error(pp, "write: png_set_interlace_handling failed");
 
-         for (pass=1; pass<=npasses; ++pass)
+         for (pass=0; pass<npasses; ++pass)
          {
             png_uint_32 y;
 
             for (y=0; y<h; ++y)
             {
-               png_byte buffer[STD_ROWMAX];
+               png_byte buffer[TRANSFORM_ROWMAX];
 
-               standard_row(pp, buffer, colour_type, bit_depth, y);
+               transform_row(pp, buffer, colour_type, bit_depth, y);
                png_write_row(pp, buffer);
             }
          }
@@ -2140,7 +2573,8 @@ make_errors(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
          unsigned int test;
          char name[FILE_NAME_SIZE];
 
-         standard_name(name, sizeof name, 0, colour_type, bdlo, interlace_type);
+         standard_name(name, sizeof name, 0, colour_type, bdlo, interlace_type,
+            0, 0, 0);
 
          for (test=0; test<(sizeof error_test)/(sizeof error_test[0]); ++test)
          {
@@ -2212,22 +2646,29 @@ typedef struct standard_display
    png_uint_32 w;              /* Width of image */
    png_uint_32 h;              /* Height of image */
    int         npasses;        /* Number of interlaced passes */
-   size_t      cbRow;          /* Bytes in a row of the output image. */
+   png_uint_32 pixel_size;     /* Width of one pixel in bits */
+   png_uint_32 bit_width;      /* Width of output row in bits */
+   size_t      cbRow;          /* Bytes in a row of the output image */
+   int         do_interlace;   /* Do interlacing internally */
 } standard_display;
 
 static void
-standard_display_init(standard_display *dp, png_store* ps, png_byte colour_type,
-   png_byte bit_depth, int interlace_type)
+standard_display_init(standard_display *dp, png_store* ps, png_uint_32 id,
+   int do_interlace)
 {
    dp->ps = ps;
-   dp->colour_type = colour_type;
-   dp->bit_depth = bit_depth;
-   dp->interlace_type = interlace_type;
-   dp->id = FILEID(colour_type, bit_depth, interlace_type);
+   dp->colour_type = COL_FROM_ID(id);
+   dp->bit_depth = DEPTH_FROM_ID(id);
+   dp->interlace_type = INTERLACE_FROM_ID(id);
+   dp->id = id;
+   /* All the rest are filled in after the read_info: */
    dp->w = 0;
    dp->h = 0;
    dp->npasses = 0;
+   dp->pixel_size = 0;
+   dp->bit_width = 0;
    dp->cbRow = 0;
+   dp->do_interlace = do_interlace;
 }
 
 /* By passing a 'standard_display' the progressive callbacks can be used
@@ -2258,12 +2699,12 @@ standard_info_part1(standard_display *dp, png_structp pp, png_infop pi)
 
    dp->w = png_get_image_width(pp, pi);
 
-   if (dp->w != standard_width(pp, dp->colour_type, dp->bit_depth))
+   if (dp->w != standard_width(pp, dp->id))
       png_error(pp, "validate: image width changed");
 
    dp->h = png_get_image_height(pp, pi);
 
-   if (dp->h != standard_height(pp, dp->colour_type, dp->bit_depth))
+   if (dp->h != standard_height(pp, dp->id))
       png_error(pp, "validate: image height changed");
 
    /* Important: this is validating the value *before* any transforms have been
@@ -2271,8 +2712,7 @@ standard_info_part1(standard_display *dp, png_structp pp, png_infop pi)
     * no transforms, but it does for other tests where rowbytes may change after
     * png_read_update_info.
     */
-   if (png_get_rowbytes(pp, pi) !=
-       standard_rowsize(pp, dp->colour_type, dp->bit_depth))
+   if (png_get_rowbytes(pp, pi) != standard_rowsize(pp, dp->id))
       png_error(pp, "validate: row size changed");
 
    if (dp->colour_type == 3) /* palette */
@@ -2301,11 +2741,10 @@ standard_info_part1(standard_display *dp, png_structp pp, png_infop pi)
 
    /* Read the number of passes - expected to match the value used when
     * creating the image (interlaced or not).  This has the side effect of
-    * turning on interlace handling.
+    * turning on interlace handling (if do_interlace is not set.)
     */
-   dp->npasses = png_set_interlace_handling(pp);
-
-   if (dp->npasses != npasses_from_interlace_type(pp, dp->interlace_type))
+   dp->npasses = npasses_from_interlace_type(pp, dp->interlace_type);
+   if (!dp->do_interlace && dp->npasses != png_set_interlace_handling(pp))
       png_error(pp, "validate: file changed interlace type");
 
    /* Caller calls png_read_update_info or png_start_read_image now, then calls
@@ -2322,7 +2761,14 @@ standard_info_part2(standard_display *dp, png_structp pp, png_infop pi,
     int nImages)
 {
    /* Record cbRow now that it can be found. */
+   dp->pixel_size = bit_size(pp, png_get_color_type(pp, pi),
+      png_get_bit_depth(pp, pi));
+   dp->bit_width = png_get_image_width(pp, pi) * dp->pixel_size;
    dp->cbRow = png_get_rowbytes(pp, pi);
+
+   /* Validate the rowbytes here again. */
+   if (dp->cbRow != (dp->bit_width+7)/8)
+      png_error(pp, "bad png_get_rowbytes calculation");
 
    /* Then ensure there is enough space for the output image(s). */
    store_ensure_image(dp->ps, pp, nImages * dp->cbRow * dp->h);
@@ -2362,20 +2808,43 @@ standard_info(png_structp pp, png_infop pi)
 static void
 progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
 {
-   UNUSED(pass);
+   PNG_CONST standard_display *dp = png_get_progressive_ptr(pp);
 
    /* When handling interlacing some rows will be absent in each pass, the
-    * callback still gets called, but with a NULL pointer.  We need our own
-    * 'cbRow', but we can't call png_get_rowbytes because we got no info
-    * structure.
+    * callback still gets called, but with a NULL pointer.  This is checked
+    * in the 'else' clause below.  We need our own 'cbRow', but we can't call
+    * png_get_rowbytes because we got no info structure.
     */
    if (new_row != NULL)
    {
-      PNG_CONST standard_display *dp = png_get_progressive_ptr(pp);
+      png_bytep row;
+
+      /* In the case where the reader doesn't do the interlace it gives
+       * us the y in the sub-image:
+       */
+      if (dp->do_interlace && dp->interlace_type == PNG_INTERLACE_ADAM7)
+         y = PNG_ROW_FROM_PASS_ROW(y, pass);
+
+      /* Validate this just in case. */
+      if (y >= dp->h)
+         png_error(pp, "invalid y to progressive row callback");
+
+      row = dp->ps->image + y * dp->cbRow;
 
       /* Combine the new row into the old: */
-      png_progressive_combine_row(pp, dp->ps->image + y * dp->cbRow, new_row);
-   }
+      if (dp->do_interlace)
+      {
+         if (dp->interlace_type == PNG_INTERLACE_ADAM7)
+            deinterlace_row(row, new_row, dp->pixel_size, dp->w, pass);
+         else
+            memcpy(row, new_row, dp->cbRow);
+      }
+      else
+         png_progressive_combine_row(pp, row, new_row);
+   } else if (dp->interlace_type == PNG_INTERLACE_ADAM7 &&
+      PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
+      PNG_PASS_COLS(dp->w, pass) > 0)
+      png_error(pp, "missing row in progressive de-interlacing");
 }
 
 static void
@@ -2383,19 +2852,52 @@ sequential_row(standard_display *dp, png_structp pp, png_infop pi,
     PNG_CONST png_bytep pImage, PNG_CONST png_bytep pDisplay)
 {
    PNG_CONST int         npasses = dp->npasses;
-   PNG_CONST png_uint_32 h = dp->h;
+   PNG_CONST int         do_interlace = dp->do_interlace &&
+      dp->interlace_type == PNG_INTERLACE_ADAM7;
+   PNG_CONST png_uint_32 height = standard_height(pp, dp->id);
+   PNG_CONST png_uint_32 width = standard_width(pp, dp->id);
    PNG_CONST size_t      cbRow = dp->cbRow;
    int pass;
 
-   for (pass=1; pass <= npasses; ++pass)
+   for (pass=0; pass<npasses; ++pass)
    {
       png_uint_32 y;
+      png_uint_32 wPass = PNG_PASS_COLS(width, pass);
       png_bytep pRow1 = pImage;
       png_bytep pRow2 = pDisplay;
 
-      for (y=0; y<h; ++y)
+      for (y=0; y<height; ++y)
       {
-         png_read_row(pp, pRow1, pRow2);
+         if (do_interlace)
+         {
+            /* wPass may be zero or this row may not be in this pass.
+             * png_read_row must not be called in either case.
+             */
+            if (wPass > 0 && PNG_ROW_IN_INTERLACE_PASS(y, pass))
+            {
+               /* Read the row into a pair of temporary buffers, then do the
+                * merge here into the output rows.
+                */
+               png_byte row[STANDARD_ROWMAX], display[STANDARD_ROWMAX];
+
+               /* The following aids (to some extent) error detection - we can
+                * see where png_read_row wrote.  Use opposite values in row and
+                * display to make this easier.
+                */
+               memset(row, 0xff, sizeof row);
+               memset(display, 0, sizeof display);
+
+               png_read_row(pp, row, display);
+
+               if (pRow1 != NULL)
+                  deinterlace_row(pRow1, row, dp->pixel_size, dp->w, pass);
+
+               if (pRow2 != NULL)
+                  deinterlace_row(pRow2, display, dp->pixel_size, dp->w, pass);
+            }
+         }
+         else
+            png_read_row(pp, pRow1, pRow2);
 
          if (pRow1 != NULL)
             pRow1 += cbRow;
@@ -2415,22 +2917,34 @@ static void
 standard_row_validate(standard_display *dp, png_structp pp, png_const_bytep row,
    png_const_bytep display, png_uint_32 y)
 {
-   png_byte std[STD_ROWMAX];
-   standard_row(pp, std, dp->colour_type, dp->bit_depth, y);
+   png_byte std[STANDARD_ROWMAX];
 
-   /* At the end both the 'read' and 'display' arrays should end up identical.
-    * In earlier passes 'read' will be narrow, containing only the columns that
-    * were read, and display will be full width but populated with garbage where
-    * pixels have not been filled in.
+   memset(std, 0xff, sizeof std);
+   standard_row(pp, std, dp->id, y);
+
+   /* At the end both the 'row' and 'display' arrays should end up identical.
+    * In earlier passes 'row' will be partially filled in, with only the pixels
+    * that have been read so far, but 'display' will have those pixels
+    * replicated to fill the unread pixels while reading an interlaced image.
+    * The side effect inside the libpng sequential reader is that the 'row'
+    * array retains the correct values for unwritten pixels within the row
+    * bytes, while the 'display' array gets bits off the end of the image (in
+    * the last byte) trashed.  Unfortunately in the progressive reader the
+    * row bytes are always trashed, so we always do a pixel_cmp here even though
+    * a memcmp of all cbRow bytes will succeed for the sequential reader.
     */
-   if (row != NULL && memcmp(std, row, dp->cbRow) != 0)
+   if (row != NULL && pixel_cmp(std, row, dp->bit_width) != 0)
    {
       char msg[64];
       sprintf(msg, "PNG image row %d changed", y);
       png_error(pp, msg);
    }
 
-   if (display != NULL && memcmp(std, display, dp->cbRow) != 0)
+   /* In this case use pixel_cmp because we need to compare a partial
+    * byte at the end of the row if the row is not an exact multiple
+    * of 8 bits wide.
+    */
+   if (display != NULL && pixel_cmp(std, display, dp->bit_width) != 0)
    {
       char msg[64];
       sprintf(msg, "display row %d changed", y);
@@ -2474,8 +2988,8 @@ standard_end(png_structp pp, png_infop pi)
 
 /* A single test run checking the standard image to ensure it is not damaged. */
 static void
-standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
-   png_byte PNG_CONST bit_depthIn, int interlace_typeIn)
+standard_test(png_store* PNG_CONST psIn, png_uint_32 PNG_CONST id,
+   int do_interlace)
 {
    standard_display d;
    context(psIn, fault);
@@ -2483,8 +2997,7 @@ standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
    /* Set up the display (stack frame) variables from the arguments to the
     * function and initialize the locals that are filled in later.
     */
-   standard_display_init(&d, psIn, colour_typeIn, bit_depthIn,
-      interlace_typeIn);
+   standard_display_init(&d, psIn, id, do_interlace);
 
    /* Everything is protected by a Try/Catch.  The functions called also
     * typically have local Try/Catch blocks.
@@ -2494,11 +3007,14 @@ standard_test(png_store* PNG_CONST psIn, png_byte PNG_CONST colour_typeIn,
       png_structp pp;
       png_infop pi;
 
-      /* Get a png_struct for writing the image. This will throw an error if it
+      /* Get a png_struct for reading the image. This will throw an error if it
        * fails, so we don't need to check the result.
        */
       pp = set_store_for_read(d.ps, &pi, d.id,
-         d.ps->progressive ? "progressive reader" : "sequential reader");
+         d.do_interlace ?  (d.ps->progressive ?
+            "pngvalid progressive deinterlacer" :
+            "pngvalid sequential deinterlacer") : (d.ps->progressive ?
+               "progressive reader" : "sequential reader"));
 
       /* Introduce the correct read function. */
       if (d.ps->progressive)
@@ -2564,15 +3080,8 @@ test_standard(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
       for (interlace_type = PNG_INTERLACE_NONE;
            interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
       {
-         /* Test both sequential and standard readers here. */
-         pm->this.progressive = !pm->this.progressive;
-         standard_test(&pm->this, colour_type, DEPTH(bdlo), interlace_type);
-
-         if (fail(pm))
-            return 0;
-
-         pm->this.progressive = !pm->this.progressive;
-         standard_test(&pm->this, colour_type, DEPTH(bdlo), interlace_type);
+         standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo),
+            interlace_type, 0, 0, 0), 0/*do_interlace*/);
 
          if (fail(pm))
             return 0;
@@ -2601,6 +3110,104 @@ perform_standard_test(png_modifier *pm)
       return;
 
    if (!test_standard(pm, 6, 3, READ_BDHI))
+      return;
+}
+
+
+/********************************** SIZE TESTS ********************************/
+static int
+test_size(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
+    int bdlo, int PNG_CONST bdhi)
+{
+   /* Run the tests on each combination.
+    *
+    * NOTE: on my 32 bit x86 each of the following blocks takes
+    * a total of 3.5 seconds if done across every combo of bit depth
+    * width and height.  This is a waste of time in practice, hence the
+    * hinc and winc stuff:
+    */
+   static PNG_CONST png_byte hinc[] = {1, 3, 11, 1, 5};
+   static PNG_CONST png_byte winc[] = {1, 9, 5, 7, 1};
+   for (; bdlo <= bdhi; ++bdlo)
+   {
+      png_uint_32 h, w;
+
+      for (h=1; h<=16; h+=hinc[bdlo]) for (w=1; w<=16; w+=winc[bdlo])
+      {
+         /* First test all the 'size' images against the sequential
+          * reader using libpng to deinterlace (where required.)  This
+          * validates the write side of libpng.  There are four possibilities
+          * to validate.
+          */
+         standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo),
+            PNG_INTERLACE_NONE, w, h, 0), 0/*do_interlace*/);
+
+         if (fail(pm))
+            return 0;
+
+         standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo),
+            PNG_INTERLACE_NONE, w, h, 1), 0/*do_interlace*/);
+
+         if (fail(pm))
+            return 0;
+
+         standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo),
+            PNG_INTERLACE_ADAM7, w, h, 0), 0/*do_interlace*/);
+
+         if (fail(pm))
+            return 0;
+
+         standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo),
+            PNG_INTERLACE_ADAM7, w, h, 1), 0/*do_interlace*/);
+
+         if (fail(pm))
+            return 0;
+
+         /* Now validate the interlaced read side - do_interlace true,
+          * in the progressive case this does actually make a difference
+          * to the code used in the non-interlaced case too.
+          */
+         standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo),
+            PNG_INTERLACE_NONE, w, h, 0), 1/*do_interlace*/);
+
+         if (fail(pm))
+            return 0;
+
+         standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo),
+            PNG_INTERLACE_ADAM7, w, h, 0), 1/*do_interlace*/);
+
+         if (fail(pm))
+            return 0;
+      }
+   }
+
+   return 1; /* keep going */
+}
+
+static void
+perform_size_test(png_modifier *pm)
+{
+   /* Test each colour type over the valid range of bit depths (expressed as
+    * log2(bit_depth) in turn, stop as soon as any error is detected.
+    */
+   if (!test_size(pm, 0, 0, READ_BDHI))
+      return;
+
+   if (!test_size(pm, 2, 3, READ_BDHI))
+      return;
+
+   /* For the moment don't do the palette test - it's a waste of time when
+    * compared to the greyscale test.
+    */
+#if 0
+   if (!test_size(pm, 3, 0, 3))
+      return;
+#endif
+
+   if (!test_size(pm, 4, 3, READ_BDHI))
+      return;
+
+   if (!test_size(pm, 6, 3, READ_BDHI))
       return;
 }
 
@@ -2772,14 +3379,12 @@ typedef struct gamma_display
 } gamma_display;
 
 static void
-gamma_display_init(gamma_display *dp, png_modifier *pm, png_byte colour_type,
-    png_byte bit_depth, int interlace_type, double file_gamma,
-    double screen_gamma, png_byte sbit, int threshold_test, int speed,
-    int use_input_precision, int strip16)
+gamma_display_init(gamma_display *dp, png_modifier *pm, png_uint_32 id,
+    double file_gamma, double screen_gamma, png_byte sbit, int threshold_test,
+    int speed, int use_input_precision, int strip16)
 {
    /* Standard fields */
-   standard_display_init(&dp->this, &pm->this, colour_type, bit_depth,
-      interlace_type);
+   standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/);
 
    /* Parameter fields */
    dp->pm = pm;
@@ -2900,9 +3505,9 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
    for (y=0; y<h; ++y, pRow += cbRow)
    {
       unsigned int s, x;
-      png_byte std[STD_ROWMAX];
+      png_byte std[STANDARD_ROWMAX];
 
-      standard_row(pp, std, in_ct, in_bd, y);
+      transform_row(pp, std, in_ct, in_bd, y);
 
       if (processing)
       {
@@ -3116,9 +3721,9 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
    gamma_display d;
    context(&pmIn->this, fault);
 
-   gamma_display_init(&d, pmIn, colour_typeIn, bit_depthIn, interlace_typeIn,
-      file_gammaIn, screen_gammaIn, sbitIn, threshold_testIn, speedIn,
-      use_input_precisionIn, strip16In);
+   gamma_display_init(&d, pmIn, FILEID(colour_typeIn, bit_depthIn,
+      interlace_typeIn, 0, 0, 0), file_gammaIn, screen_gammaIn, sbitIn,
+      threshold_testIn, speedIn, use_input_precisionIn, strip16In);
 
    Try
    {
@@ -3548,10 +4153,356 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
 #endif
 }
 
+/* INTERLACE MACRO VALIDATION */
+/* This is copied verbatim from the specification, it is simply the pass
+ * number in which each pixel in each 8x8 tile appears.  The array must
+ * be indexed adam7[y][x] and notice that the pass numbers are based at
+ * 1, not 0 - the base libpng uses.
+ */
+static PNG_CONST
+png_byte adam7[8][8] =
+{
+   { 1,6,4,6,2,6,4,6 },
+   { 7,7,7,7,7,7,7,7 },
+   { 5,6,5,6,5,6,5,6 },
+   { 7,7,7,7,7,7,7,7 },
+   { 3,6,4,6,3,6,4,6 },
+   { 7,7,7,7,7,7,7,7 },
+   { 5,6,5,6,5,6,5,6 },
+   { 7,7,7,7,7,7,7,7 }
+};
+
+/* This routine validates all the interlace support macros in png.h for
+ * a variety of valid PNG widths and heights.  It uses a number of similarly
+ * named internal routines that feed off the above array.
+ */
+static png_uint_32
+png_pass_start_row(int pass)
+{
+   int x, y;
+   ++pass;
+   for (y=0; y<8; ++y) for (x=0; x<8; ++x) if (adam7[y][x] == pass)
+      return y;
+   return 0xf;
+}
+
+static png_uint_32
+png_pass_start_col(int pass)
+{
+   int x, y;
+   ++pass;
+   for (x=0; x<8; ++x) for (y=0; y<8; ++y) if (adam7[y][x] == pass)
+      return x;
+   return 0xf;
+}
+
+static int
+png_pass_row_shift(int pass)
+{
+   int x, y, base=(-1), inc=8;
+   ++pass;
+   for (y=0; y<8; ++y) for (x=0; x<8; ++x) if (adam7[y][x] == pass)
+   {
+      if (base == (-1))
+         base = y;
+      else if (base == y)
+         {}
+      else if (inc == y-base)
+         base=y;
+      else if (inc == 8)
+         inc = y-base, base=y;
+      else if (inc != y-base)
+         return 0xff; /* error - more than one 'inc' value! */
+   }
+
+   if (base == (-1)) return 0xfe; /* error - no row in pass! */
+
+   /* The shift is always 1, 2 or 3 - no pass has all the rows! */
+   switch (inc)
+   {
+case 2: return 1;
+case 4: return 2;
+case 8: return 3;
+default: break;
+   }
+
+   /* error - unrecognized 'inc' */
+   return (inc << 8) + 0xfd;
+}
+
+static int
+png_pass_col_shift(int pass)
+{
+   int x, y, base=(-1), inc=8;
+   ++pass;
+   for (x=0; x<8; ++x) for (y=0; y<8; ++y) if (adam7[y][x] == pass)
+   {
+      if (base == (-1))
+         base = x;
+      else if (base == x)
+         {}
+      else if (inc == x-base)
+         base=x;
+      else if (inc == 8)
+         inc = x-base, base=x;
+      else if (inc != x-base)
+         return 0xff; /* error - more than one 'inc' value! */
+   }
+
+   if (base == (-1)) return 0xfe; /* error - no row in pass! */
+
+   /* The shift is always 1, 2 or 3 - no pass has all the rows! */
+   switch (inc)
+   {
+case 1: return 0; /* pass 7 has all the columns */
+case 2: return 1;
+case 4: return 2;
+case 8: return 3;
+default: break;
+   }
+
+   /* error - unrecognized 'inc' */
+   return (inc << 8) + 0xfd;
+}
+
+static png_uint_32
+png_row_from_pass_row(png_uint_32 yIn, int pass)
+{
+   /* By examination of the array: */
+   switch (pass)
+   {
+case 0: return yIn * 8;
+case 1: return yIn * 8;
+case 2: return yIn * 8 + 4;
+case 3: return yIn * 4;
+case 4: return yIn * 4 + 2;
+case 5: return yIn * 2;
+case 6: return yIn * 2 + 1;
+default: break;
+   }
+
+   return 0xff; /* bad pass number */
+}
+
+static png_uint_32
+png_col_from_pass_col(png_uint_32 xIn, int pass)
+{
+   /* By examination of the array: */
+   switch (pass)
+   {
+case 0: return xIn * 8;
+case 1: return xIn * 8 + 4;
+case 2: return xIn * 4;
+case 3: return xIn * 4 + 2;
+case 4: return xIn * 2;
+case 5: return xIn * 2 + 1;
+case 6: return xIn;
+default: break;
+   }
+
+   return 0xff; /* bad pass number */
+}
+
+static int
+png_row_in_interlace_pass(png_uint_32 y, int pass)
+{
+   /* Is row 'y' in pass 'pass'? */
+   int x;
+   y &= 7;
+   ++pass;
+   for (x=0; x<8; ++x) if (adam7[y][x] == pass)
+      return 1;
+
+   return 0;
+}
+
+static int
+png_col_in_interlace_pass(png_uint_32 x, int pass)
+{
+   /* Is column 'x' in pass 'pass'? */
+   int y;
+   x &= 7;
+   ++pass;
+   for (y=0; y<8; ++y) if (adam7[y][x] == pass)
+      return 1;
+
+   return 0;
+}
+
+static png_uint_32
+png_pass_rows(png_uint_32 height, int pass)
+{
+   png_uint_32 tiles = height>>3;
+   png_uint_32 rows = 0;
+   unsigned int x, y;
+
+   height &= 7;
+   ++pass;
+   for (y=0; y<8; ++y) for (x=0; x<8; ++x) if (adam7[y][x] == pass)
+   {
+      rows += tiles;
+      if (y < height) ++rows;
+      break; /* i.e. break the 'x', column, loop. */
+   }
+
+   return rows;
+}
+
+static png_uint_32
+png_pass_cols(png_uint_32 width, int pass)
+{
+   png_uint_32 tiles = width>>3;
+   png_uint_32 cols = 0;
+   unsigned int x, y;
+
+   width &= 7;
+   ++pass;
+   for (x=0; x<8; ++x) for (y=0; y<8; ++y) if (adam7[y][x] == pass)
+   {
+      cols += tiles;
+      if (x < width) ++cols;
+      break; /* i.e. break the 'y', row, loop. */
+   }
+
+   return cols;
+}
+
+static void
+perform_interlace_macro_validation(void)
+{
+   /* The macros to validate, first those that depend only on pass:
+    *
+    * PNG_PASS_START_ROW(pass)
+    * PNG_PASS_START_COL(pass)
+    * PNG_PASS_ROW_SHIFT(pass)
+    * PNG_PASS_COL_SHIFT(pass)
+    */
+   int pass;
+
+   for (pass=0; pass<7; ++pass)
+   {
+      png_uint_32 m, f, v;
+
+      m = PNG_PASS_START_ROW(pass);
+      f = png_pass_start_row(pass);
+      if (m != f)
+      {
+         fprintf(stderr, "PNG_PASS_START_ROW(%d) = %u != %x\n", pass, m, f);
+         exit(1);
+      }
+
+      m = PNG_PASS_START_COL(pass);
+      f = png_pass_start_col(pass);
+      if (m != f)
+      {
+         fprintf(stderr, "PNG_PASS_START_COL(%d) = %u != %x\n", pass, m, f);
+         exit(1);
+      }
+
+      m = PNG_PASS_ROW_SHIFT(pass);
+      f = png_pass_row_shift(pass);
+      if (m != f)
+      {
+         fprintf(stderr, "PNG_PASS_ROW_SHIFT(%d) = %u != %x\n", pass, m, f);
+         exit(1);
+      }
+
+      m = PNG_PASS_COL_SHIFT(pass);
+      f = png_pass_col_shift(pass);
+      if (m != f)
+      {
+         fprintf(stderr, "PNG_PASS_COL_SHIFT(%d) = %u != %x\n", pass, m, f);
+         exit(1);
+      }
+
+      /* Macros that depend on the image or sub-image height too:
+       *
+       * PNG_PASS_ROWS(height, pass)
+       * PNG_PASS_COLS(width, pass)
+       * PNG_ROW_FROM_PASS_ROW(yIn, pass)
+       * PNG_COL_FROM_PASS_COL(xIn, pass)
+       * PNG_ROW_IN_INTERLACE_PASS(y, pass)
+       * PNG_COL_IN_INTERLACE_PASS(x, pass)
+       */
+      for (v=0;;)
+      {
+         /* First the base 0 stuff: */
+         m = PNG_ROW_FROM_PASS_ROW(v, pass);
+         f = png_row_from_pass_row(v, pass);
+         if (m != f)
+         {
+            fprintf(stderr, "PNG_ROW_FROM_PASS_ROW(%u, %d) = %u != %x\n",
+               v, pass, m, f);
+            exit(1);
+         }
+
+         m = PNG_COL_FROM_PASS_COL(v, pass);
+         f = png_col_from_pass_col(v, pass);
+         if (m != f)
+         {
+            fprintf(stderr, "PNG_COL_FROM_PASS_COL(%u, %d) = %u != %x\n",
+               v, pass, m, f);
+            exit(1);
+         }
+
+         m = PNG_ROW_IN_INTERLACE_PASS(v, pass);
+         f = png_row_in_interlace_pass(v, pass);
+         if (m != f)
+         {
+            fprintf(stderr, "PNG_ROW_IN_INTERLACE_PASS(%u, %d) = %u != %x\n",
+               v, pass, m, f);
+            exit(1);
+         }
+
+         m = PNG_COL_IN_INTERLACE_PASS(v, pass);
+         f = png_col_in_interlace_pass(v, pass);
+         if (m != f)
+         {
+            fprintf(stderr, "PNG_COL_IN_INTERLACE_PASS(%u, %d) = %u != %x\n",
+               v, pass, m, f);
+            exit(1);
+         }
+
+         /* Then the base 1 stuff: */
+         ++v;
+         m = PNG_PASS_ROWS(v, pass);
+         f = png_pass_rows(v, pass);
+         if (m != f)
+         {
+            fprintf(stderr, "PNG_PASS_ROWS(%u, %d) = %u != %x\n",
+               v, pass, m, f);
+            exit(1);
+         }
+
+         m = PNG_PASS_COLS(v, pass);
+         f = png_pass_cols(v, pass);
+         if (m != f)
+         {
+            fprintf(stderr, "PNG_PASS_COLS(%u, %d) = %u != %x\n",
+               v, pass, m, f);
+            exit(1);
+         }
+
+         /* Move to the next v - the stepping algorithm starts skipping
+          * values above 1024.
+          */
+         if (v > 1024)
+         {
+            if (v == PNG_UINT_31_MAX)
+               break;
+
+            v = (v << 1) ^ v;
+            if (v >= PNG_UINT_31_MAX)
+               v = PNG_UINT_31_MAX-1;
+         }
+      }
+   }
+}
+
 /* main program */
 int main(int argc, PNG_CONST char **argv)
 {
-   volatile int summary = 1;    /* Print the error summary at the end */
+   volatile int summary = 1;  /* Print the error summary at the end */
 
    /* Create the given output file on success: */
    PNG_CONST char *volatile touch = NULL;
@@ -3572,7 +4523,7 @@ int main(int argc, PNG_CONST char **argv)
    /* Preallocate the image buffer, because we know how big it needs to be,
     * note that, for testing purposes, it is deliberately mis-aligned.
     */
-   pm.this.image = malloc(2*STD_IMAGEMAX+1);
+   pm.this.image = malloc(2*TRANSFORM_IMAGEMAX+1);
 
    if (pm.this.image != NULL)
    {
@@ -3580,7 +4531,7 @@ int main(int argc, PNG_CONST char **argv)
        * the array appropriately.
        */
       ++(pm.this.image);
-      pm.this.cb_image = 2*STD_IMAGEMAX;
+      pm.this.cb_image = 2*TRANSFORM_IMAGEMAX;
    }
 
    /* Default to error on warning: */
@@ -3636,6 +4587,9 @@ int main(int argc, PNG_CONST char **argv)
       else if (strcmp(*argv, "--speed") == 0)
          pm.this.speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]),
             pm.test_standard = 0;
+
+      else if (strcmp(*argv, "--size") == 0)
+         pm.test_size = 1;
 
       else if (strcmp(*argv, "--nostandard") == 0)
          pm.test_standard = 0;
@@ -3706,13 +4660,21 @@ int main(int argc, PNG_CONST char **argv)
    Try
    {
       /* Make useful base images */
-      make_standard_images(&pm.this);
+      make_transform_images(&pm.this);
 
       /* Perform the standard and gamma tests. */
       if (pm.test_standard)
       {
+         perform_interlace_macro_validation();
          perform_standard_test(&pm);
          perform_error_test(&pm);
+      }
+
+      /* Various oddly sized images: */
+      if (pm.test_size)
+      {
+         make_size_images(&pm.this);
+         perform_size_test(&pm);
       }
 
       if (pm.ngammas > 0)

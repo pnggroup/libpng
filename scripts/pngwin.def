@@ -230,7 +230,4 @@ EXPORTS
  png_get_y_offset_inches_fixed @212
  png_set_sCAL_fixed @213
  png_get_sCAL_fixed @214
- png_get_num_passes @215
- png_get_num_rows @216
- png_set_background_fixed @217
- png_get_num_cols @218
+ png_set_background_fixed @215
