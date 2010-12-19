@@ -441,11 +441,10 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    }
 #endif
 
-   if (num == -1)
-      info_ptr->free_me &= ~mask;
+   if (num != -1)
+      mask &= ~PNG_FREE_MUL;
 
-   else
-      info_ptr->free_me &= ~(mask & ~PNG_FREE_MUL);
+   info_ptr->free_me &= ~mask;
 }
 
 /* This is an internal routine to free any memory that the info struct is

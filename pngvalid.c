@@ -2221,20 +2221,21 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
     png_uint_32 PNG_CONST w, png_uint_32 PNG_CONST h,
     int PNG_CONST do_interlace)
 {
-   char name[FILE_NAME_SIZE];
    context(ps, fault);
-
-   /* Make a name and get an appropriate id: */
-   PNG_CONST png_uint_32 id = FILEID(colour_type, bit_depth, interlace_type,
-      w, h, do_interlace);
-
-   standard_name_from_id(name, sizeof name, 0, id);
 
    Try
    {
       png_infop pi;
+      png_structp pp;
       unsigned int pixel_size;
-      png_structp pp = set_store_for_write(ps, &pi, name);
+
+      /* Make a name and get an appropriate id for the store: */
+      char name[FILE_NAME_SIZE];
+      PNG_CONST png_uint_32 id = FILEID(colour_type, bit_depth, interlace_type,
+         w, h, do_interlace);
+
+      standard_name_from_id(name, sizeof name, 0, id);
+      pp = set_store_for_write(ps, &pi, name);
 
       /* In the event of a problem return control to the Catch statement below
        * to do the clean up - it is not possible to 'return' directly from a Try
@@ -2455,8 +2456,8 @@ static PNG_CONST struct
     };
 
 static void
-make_error(png_store* ps, png_byte PNG_CONST colour_type, png_byte bit_depth,
-    int interlace_type, int test, png_const_charp name)
+make_error(png_store* volatile ps, png_byte PNG_CONST colour_type,
+    png_byte bit_depth, int interlace_type, int test, png_const_charp name)
 {
    context(ps, fault);
 
