@@ -3116,6 +3116,8 @@ Version 1.5.0beta58 [December 19, 2010]
   Fixed the clean rule in Makefile.am to remove pngtest-log.txt
   Made minor changes to work around warnings in gcc 3.4
 
+Version 1.5.0beta59 [December 19, 2010]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
