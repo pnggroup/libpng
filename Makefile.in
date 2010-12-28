@@ -341,7 +341,7 @@ EXTRA_DIST = \
 SCRIPT_CLEANFILES = scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
 CLEANFILES = dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
-	pngwin.def check.new pnglibconf.* symbols.new pngtest-log.txt \
+	check.new pnglibconf.* symbols.new pngtest-log.txt \
 	$(SCRIPT_CLEANFILES)
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
@@ -1253,15 +1253,12 @@ $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
 scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
-scripts/symbols.out scripts/pngwin.out: png.h pngconf.h scripts/pnglibconf.h.prebuilt
+scripts/symbols.out: png.h pngconf.h scripts/pnglibconf.h.prebuilt
 
 libpng.sym: scripts/sym.out
 	rm -f $@
 	cp $? $@
 libpng.vers: scripts/vers.out
-	rm -f $@
-	cp $? $@
-pngwin.def: scripts/pngwin.out
 	rm -f $@
 	cp $? $@
 pnglibconf.h: pnglibconf.out
@@ -1299,7 +1296,6 @@ pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
 	mv dfn2.out $@
 
 # Symbol checks (.def and .out files should match)
-scripts/pngwin.chk: scripts/checksym.awk scripts/pngwin.def scripts/pngwin.out
 scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.out
 .out.chk:
 	rm -f $@ symbols.new
@@ -1325,7 +1321,7 @@ $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h \
 test: check-am
 
 # Extra checks
-check: scripts/symbols.chk scripts/pngwin.chk
+check: scripts/symbols.chk
 
 # Don't distribute the generated script files
 dist-hook:
