@@ -3119,6 +3119,9 @@ Version 1.5.0beta58 [December 19, 2010]
 Version 1.5.0rc01 [December 27, 2010]
   No changes.
 
+Version 1.5.0rc02 [December 28, 2010]
+  Eliminated references to the scripts/*.def files in project/visualc71.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

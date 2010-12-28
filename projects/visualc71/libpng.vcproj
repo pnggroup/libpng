@@ -31,8 +31,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/libpng15.dll"
-				LinkIncremental="1"
-				ModuleDefinitionFile="..\..\scripts\pngwin.def"/>
+				LinkIncremental="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -80,7 +79,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/libpng15d.dll"
-				ModuleDefinitionFile="..\..\scripts\pngwin.def"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -339,27 +337,6 @@
 			</File>
 			<File
 				RelativePath="..\..\pngtrans.c">
-			</File>
-			<File
-				RelativePath="..\..\scripts\pngwin.def">
-				<FileConfiguration
-					Name="DLL VB|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="LIB Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\pngwio.c">
