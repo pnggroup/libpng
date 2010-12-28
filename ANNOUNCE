@@ -1,5 +1,5 @@
 
-Libpng 1.5.0rc02 - December 28, 2010
+Libpng 1.5.0rc03 - December 28, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0rc02.tar.xz (LZMA-compressed, recommended)
-   1.5.0rc02.tar.gz
-   1.5.0rc02.tar.bz2
+   1.5.0rc03.tar.xz (LZMA-compressed, recommended)
+   1.5.0rc03.tar.gz
+   1.5.0rc03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150r02.7z  (LZMA-compressed, recommended)
-   lp150r02.zip
+   lp150r03.7z  (LZMA-compressed, recommended)
+   lp150r03.zip
 
 Other information:
 
-   1.5.0rc02-README.txt
-   1.5.0rc02-LICENSE.txt
+   1.5.0rc03-README.txt
+   1.5.0rc03-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -481,8 +481,10 @@ Version 1.5.0beta58 [December 19, 2010]
 Version 1.5.0rc01 [December 28, 2010]
   No changes.
 
-Version 1.5.0rc02 [December 28, 2010]
+Version 1.5.0rc02 [December 27, 2010]
   Eliminated references to the scripts/*.def files in project/visualc71.
+
+Version 1.5.0rc03 [December 28, 2010]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

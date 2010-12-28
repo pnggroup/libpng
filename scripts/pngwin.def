@@ -17,7 +17,7 @@ LIBRARY
 ;OS2 CODE PRELOAD MOVEABLE DISCARDABLE
 
 EXPORTS
-;Version 1.5.0rc02
+;Version 1.5.0rc03
  png_access_version_number @1
  png_set_sig_bytes @2
  png_sig_cmp @3
