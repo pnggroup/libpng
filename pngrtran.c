@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.5 [December 27, 2010]
+ * Last changed in libpng 1.4.5 [December 29, 2010]
  * Copyright (c) 1998-2010 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1008,7 +1008,7 @@ png_init_read_transformations(png_structp png_ptr)
              */
             png_ptr->transformations &= ~PNG_BACKGROUND;
             png_ptr->transformations &= ~PNG_GAMMA;
-            png_ptr->transformations |= PNG_STRIP_ALPHA;
+            png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
          }
          /* if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN) */
          else
@@ -1131,7 +1131,7 @@ png_init_read_transformations(png_structp png_ptr)
 
       /* Handled alpha, still need to strip the channel. */
       png_ptr->transformations &= ~PNG_BACKGROUND;
-      png_ptr->transformations |= PNG_STRIP_ALPHA;
+      png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
    }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED */
 

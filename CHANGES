@@ -2735,7 +2735,10 @@ version 1.4.5rc03 [December 3, 2010]
 version 1.4.5 [December 9, 2010]
   Removed PNG_NO_WRITE_GAMMA from pngminim/encoder/pngusr.h
 
-version 1.4.5beta01 [December 27, 2010]
+version 1.4.6beta01 [December 29, 2010]
+  Fixed bug in background transformation handling in pngrtran.c (it was
+    looking for the flag in png_ptr->transformations instead of in
+    png_ptr->flags).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
