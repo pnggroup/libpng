@@ -3125,7 +3125,10 @@ Version 1.5.0rc02 [December 27, 2010]
 Version 1.5.0rc03 [December 28, 2010]
   Eliminated scripts/*.def and revised Makefile.am accordingly
 
-Version 1.5.0rc04 [December 28, 2010]
+Version 1.5.0rc04 [December 29, 2010]
+  Fixed bug in background transformation handling in pngrtran.c (it was
+    looking for the flag in png_ptr->transformations instead of in
+    png_ptr->flags).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

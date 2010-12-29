@@ -1068,7 +1068,7 @@ png_init_read_transformations(png_structp png_ptr)
              */
             png_ptr->transformations &= ~PNG_BACKGROUND;
             png_ptr->transformations &= ~PNG_GAMMA;
-            png_ptr->transformations |= PNG_STRIP_ALPHA;
+            png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
          }
 
          /* if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN) */
@@ -1202,7 +1202,7 @@ png_init_read_transformations(png_structp png_ptr)
 
       /* Handled alpha, still need to strip the channel. */
       png_ptr->transformations &= ~PNG_BACKGROUND;
-      png_ptr->transformations |= PNG_STRIP_ALPHA;
+      png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
    }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED */
 
