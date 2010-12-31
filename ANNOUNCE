@@ -1,5 +1,5 @@
 
-Libpng 1.4.6beta01 - December 29, 2010
+Libpng 1.4.6beta02 - December 31, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,29 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.6beta01.tar.xz (LZMA-compressed, recommended)
-   1.4.6beta01.tar.gz
-   1.4.6beta01.tar.bz2
+   1.4.6beta02.tar.xz (LZMA-compressed, recommended)
+   1.4.6beta02.tar.gz
+   1.4.6beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp146b01.7z (LZMA-compressed, recommended)
-   lp146b01.zip
+   lp146b02.7z (LZMA-compressed, recommended)
+   lp146b02.zip
 
 Other information:
 
-   1.4.6beta01-README.txt
-   1.4.6beta01-LICENSE.txt
+   1.4.6beta02-README.txt
+   1.4.6beta02-LICENSE.txt
 
 Changes since the last public release (1.4.5):
 
 Version 1.4.6beta01 [December 29, 2010]
   Fixed bug in background transformation handling in pngrtran.c (it was
     looking for the flag in png_ptr->transformations instead of in
-    png_ptr->flags).
+    png_ptr->flags) (David Raymond).
+
+version 1.4.6beta02 [December 31, 2010]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
