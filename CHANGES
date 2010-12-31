@@ -3128,7 +3128,10 @@ Version 1.5.0rc03 [December 28, 2010]
 Version 1.5.0rc04 [December 29, 2010]
   Fixed bug in background transformation handling in pngrtran.c (it was
     looking for the flag in png_ptr->transformations instead of in
-    png_ptr->flags).
+    png_ptr->flags) (David Raymond).
+
+version 1.5.0rc05 [December 31, 2010]
+  Fixed typo in a comment in CMakeLists.txt (libpng14 => libpng15) (Cosmin)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

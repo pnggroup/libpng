@@ -1,5 +1,5 @@
 
-Libpng 1.5.0rc04 - December 29, 2010
+Libpng 1.5.0rc05 - December 31, 2010
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0rc04.tar.xz (LZMA-compressed, recommended)
-   1.5.0rc04.tar.gz
-   1.5.0rc04.tar.bz2
+   1.5.0rc05.tar.xz (LZMA-compressed, recommended)
+   1.5.0rc05.tar.gz
+   1.5.0rc05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150r04.7z  (LZMA-compressed, recommended)
-   lp150r04.zip
+   lp150r05.7z  (LZMA-compressed, recommended)
+   lp150r05.zip
 
 Other information:
 
-   1.5.0rc04-README.txt
-   1.5.0rc04-LICENSE.txt
+   1.5.0rc05-README.txt
+   1.5.0rc05-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -226,7 +226,7 @@ version 1.5.0beta24 [May 7, 2010]
     offset of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
   Added more blank lines for readability.
 
-version 1.5.0beta25 [December 29, 2010]
+version 1.5.0beta25 [December 31, 2010]
   In pngpread.c: png_push_have_row() add check for new_row > height
   Removed the now-redundant check for out-of-bounds new_row from example.c
 
@@ -478,7 +478,7 @@ Version 1.5.0beta58 [December 19, 2010]
   Fixed the clean rule in Makefile.am to remove pngtest-log.txt
   Made minor changes to work around warnings in gcc 3.4
 
-Version 1.5.0rc01 [December 29, 2010]
+Version 1.5.0rc01 [December 31, 2010]
   No changes.
 
 Version 1.5.0rc02 [December 27, 2010]
@@ -490,7 +490,10 @@ Version 1.5.0rc03 [December 28, 2010]
 Version 1.5.0rc04 [December 29, 2010]
   Fixed bug in background transformation handling in pngrtran.c (it was
     looking for the flag in png_ptr->transformations instead of in
-    png_ptr->flags).
+    png_ptr->flags) (David Raymond).
+
+version 1.5.0rc05 [December 31, 2010]
+  Fixed typo in a comment in CMakeLists.txt (libpng14 => libpng15) (Cosmin)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

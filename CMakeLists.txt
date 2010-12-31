@@ -261,7 +261,7 @@ install(CODE ${PNG_CONFIG_INSTALL_CODE})
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 15.${PNGLIB_RELEASE}.1.5.0rc04
+#   VERSION 15.${PNGLIB_RELEASE}.1.5.0rc05
     VERSION 15.${PNGLIB_RELEASE}.0
     SOVERSION 15
     CLEAN_DIRECT_OUTPUT 1)
@@ -295,7 +295,7 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-    # Create a symlink for libpng.dll.a => libpng14.dll.a on Cygwin
+    # Create a symlink for libpng.dll.a => libpng15.dll.a on Cygwin
     if(CYGWIN)
       _png_generate_symlink_code(PNG_SHARED_IMPLIB_INSTALL_CODE
         ${PNGLIB_NAME}${CMAKE_IMPORT_LIBRARY_SUFFIX}
