@@ -18,12 +18,12 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.5.0rc05], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.5.0rc06], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.5.0rc05
+PNGLIB_VERSION=1.5.0rc06
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=5
 PNGLIB_RELEASE=0
@@ -57,13 +57,13 @@ AC_STRUCT_TM
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )
-AC_ARG_WITH(zprefix,
-   AC_HELP_STRING([--with-zprefix],
+AC_ARG_WITH(zlib-prefix,
+   AC_HELP_STRING([--with-zlib-prefix],
                   [prefix that may have been used in installed zlib]),
-                  [zprefix=${withval}],
-                  [zprefix='z_'])
+                  [ZPREFIX=${withval}],
+                  [ZPREFIX='z_'])
 AC_CHECK_LIB(z, zlibVersion, ,
-    AC_CHECK_LIB(z, ${zprefix}zlibVersion, ,
+    AC_CHECK_LIB(z, ${ZPREFIX}zlibVersion, ,
                  AC_ERROR([zlib not installed])))
 
 
