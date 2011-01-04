@@ -1,5 +1,5 @@
 
-Libpng 1.5.0rc06 - January 4, 2011
+Libpng 1.5.0rc07 - January 4, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.0rc06.tar.xz (LZMA-compressed, recommended)
-   1.5.0rc06.tar.gz
-   1.5.0rc06.tar.bz2
+   1.5.0rc07.tar.xz (LZMA-compressed, recommended)
+   1.5.0rc07.tar.gz
+   1.5.0rc07.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp150r06.7z  (LZMA-compressed, recommended)
-   lp150r06.zip
+   lp150r07.7z  (LZMA-compressed, recommended)
+   lp150r07.zip
 
 Other information:
 
-   1.5.0rc06-README.txt
-   1.5.0rc06-LICENSE.txt
+   1.5.0rc07-README.txt
+   1.5.0rc07-LICENSE.txt
 
 Changes since the last public release (1.4.1):
 
@@ -497,6 +497,9 @@ version 1.5.0rc05 [December 31, 2010]
 
 version 1.5.0rc06 [January 4, 2011]
   Changed the new configure option "zprefix=string" to "zlib-prefix=string"
+
+version 1.5.0rc07 [January 4, 2011]
+  Updated copyright year.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

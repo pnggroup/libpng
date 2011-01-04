@@ -3136,6 +3136,9 @@ version 1.5.0rc05 [December 31, 2010]
 version 1.5.0rc06 [January 4, 2011]
   Changed the new configure option "zprefix=string" to "zlib-prefix=string"
 
+version 1.5.0rc07 [January 4, 2011]
+  Updated copyright year.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
