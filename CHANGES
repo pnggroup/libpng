@@ -3130,17 +3130,19 @@ Version 1.5.0rc04 [December 29, 2010]
     looking for the flag in png_ptr->transformations instead of in
     png_ptr->flags) (David Raymond).
 
-version 1.5.0rc05 [December 31, 2010]
+Version 1.5.0rc05 [December 31, 2010]
   Fixed typo in a comment in CMakeLists.txt (libpng14 => libpng15) (Cosmin)
 
-version 1.5.0rc06 [January 4, 2011]
+Version 1.5.0rc06 [January 4, 2011]
   Changed the new configure option "zprefix=string" to "zlib-prefix=string"
 
-version 1.5.0rc07 [January 4, 2011]
+Version 1.5.0rc07 [January 4, 2011]
   Updated copyright year.
 
-version 1.5.0 [January 6, 2011]
+Version 1.5.0 [January 6, 2011]
   No changes.
+
+Version 1.5.1beta01 [January 6, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

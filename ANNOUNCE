@@ -1,308 +1,34 @@
 
-Libpng 1.5.0 - January 6, 2011
+Libpng 1.5.1beta01 - January 6, 2011
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.0.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.0.tar.gz
-   libpng-1.5.0.tar.bz2
+   1.5.1beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.1beta01.tar.gz
+   1.5.1beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng150.7z  (LZMA-compressed, recommended)
-   lpng150.zip
+   lp151b01.7z  (LZMA-compressed, recommended)
+   lp151b01.zip
 
 Other information:
 
-   libpng-1.5.0-README.txt
-   libpng-1.5.0-LICENSE.txt
+   1.5.1beta01-README.txt
+   1.5.1beta01-LICENSE.txt
 
-Changes since the last public release (1.4.1):
+Changes since the last public release (1.5.0):
 
-version 1.5.0 [January 6, 2011]
+Version 1.5.1beta01 [January 6, 2011]
 
-  Moved declaration of png_struct into private pngstruct.h and png_info
-    into pnginfo.h
-  Updated configure script to use SO number 15.
-  Removed PNG_DEPSTRUCT markup in pngstruct.h and pnginfo.h, and undid the
-    linewrapping that it entailed.
-  Revised comments in pngstruct.h and pnginfo.h and added pointers to
-    the libpng license.
-  Removed the cbuilder5 project, which has not been updated to 1.4.0.
-  Changed #ifdef PNG_NO_STDIO_SUPPORTED to #ifdef PNG_NO_CONSOLE_IO_SUPPORTED
-    wherever png_snprintf() is used to construct error and warning messages.
-  Removed obsolete unused MMX-querying support from contrib/gregbook
-  Noted in scripts/makefile.mingw that it expects to be run under MSYS.
-  Added exported png_longjmp() function.
-  Removed the AIX redefinition of jmpbuf in png.h
-  Changed the name of png_ptr->jmpbuf to png_ptr->png_jmpbuf in pngstruct.h
-  Removed unused gzio.c from contrib/pngminim gather and makefile scripts
-  Removed checking for already-included setjmp.h from pngconf.h
-  Fixed inconsistent indentations and made numerous cosmetic changes.
-  Revised the "SEE ALSO" style of libpng.3, libpngpf.3, and png.5
-  Moved "#include png.h" inside pngpriv.h and removed "#include png.h" from
-    the source files, along with "#define PNG_EXPOSE_INTERNAL_STRUCTURES"
-    and "#define PNG_NO_PEDANTIC_WARNINGS" (John Bowler).
-  Created new pngdebug.h and moved debug definitions there.
-  Protect pngstruct.h, pnginfo.h, and pngdebug.h from being included twice.
-  Moved the 'config.h' support from pngconf.h to pngpriv.h
-  Removed PNGAPI from the png_longjmp_ptr typedef.
-  Eliminated dependence of pngtest.c on the private pngdebug.h file.
-  Make all png_debug macros into *unterminated* statements or
-    expressions (i.e. a trailing ';' must always be added) and correct
-    the format statements in various png_debug messages.
-  Removed direct access to png_ptr->io_ptr from the Windows code in pngtest.c
-  Corrected CE and OS/2 DEF files (scripts/png*def) for symbols removed and
-    added ordinal numbers to the Windows DEF file and corrected the duplicated
-    ordinal numbers on CE symbols that are commented out.
-  PNG_EXPORT changed to include an 'ordinal' field for DEF file generation.
-    PNG_CALLBACK added to make callback definitions uniform.  PNGAPI split
-    into PNGCAPI (base C form), PNGAPI (exports) and PNGCBAPI (callbacks),
-    and appropriate changes made to all files.  Cygwin builds re-hinged to
-    allow procedure call standard changes and to remove the need for the DEF
-    file (fixes build on Cygwin).
-  Enabled 'attribute' warnings that are relevant to library APIs and callbacks.
-  Changed rules for generation of the various symbol files and added a new
-    rule for a DEF file (which is also added to the distribution).
-  Updated the symbol file generation to stop it adding spurious spaces
-    to EOL (coming from preprocessor macro expansion).  Added a facility
-    to join tokens in the output and rewrite *.dfn to use this.
-  Eliminated scripts/*.def in favor of libpng.def; updated projects/visualc71
-    and removed scripts/makefile.cygwin and makefile.mingw.
-  Made PNG_BUILD_DLL safe: it can be set whenever a DLL is being built.
-  Removed the include of sys/types.h - apparently unnecessary now on the
-    platforms on which it happened (all but Mac OS and RISC OS).
-  Moved the Mac OS test into pngpriv.h (the only place it is used.)
-  Added symbols.chk target to Makefile.am to validate the symbols in png.h
-    against the new DEF file scripts/symbols.def.
-  Eliminated PNG_NO_EXTERN and PNG_ALL_EXTERN
-  Make png_text_struct independent of PNG_iTXt_SUPPORTED, so that
-    fields are initialized in all configurations.  The READ/WRITE
-    macros (PNG_(READ|WRITE)_iTXt_SUPPORTED) still function as
-    before to disable code to actually read or write iTXt chunks
-    and iTXt_SUPPORTED can be used to detect presence of either
-    read or write support (but it is probably better to check for
-    the one actually required - read or write.)
-  Combined multiple png_warning() calls for a single error.
-  Restored the macro definition of png_check_sig().
-  Added some "(long)" typecasts to printf calls in png_handle_cHRM().
-  Documented the fact that png_set_dither() was disabled since libpng-1.4.0.
-  Reenabled png_set_dither() but renamed it to png_set_quantize() to reflect
-    more accurately what it actually does.  At the same time, renamed
-    the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros to
-    PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
-  Freeze build-time only configuration in the build.
-    In all prior versions of libpng most configuration options
-    controlled by compiler #defines had to be repeated by the
-    application code that used libpng.  This patch changes this
-    so that compilation options that can only be changed at build
-    time are frozen in the build.  Options that are compiler
-    dependent (and those that are system dependent) are evaluated
-    each time - pngconf.h holds these.  Options that can be changed
-    per-file in the application are in png.h.  Frozen options are
-    in the new installed header file pnglibconf.h (John Bowler)
-  Removed the xcode project because it has not been updated to work
-    with libpng-1.5.0.
-  Moved replacements for png_error() and png_warning() from the
-    contrib/pngminim project to pngerror.c, for use when warnings or
-    errors are disabled via PNG_NO_WARN or PNG_NO_ERROR_TEXT, to avoid
-    storing unneeded error/warning text.
-  Updated contrib/pngminim project to work with the new pnglibconf.h
-  Added some PNG_NO_* defines to contrib/pngminim/*/pngusr.h to save space.
-  Added PNG_{READ,WRITE}_INT_FUNCTIONS_SUPPORTED.  This allows the functions
-    to read and write ints to be disabled independently of PNG_USE_READ_MACROS,
-    which allows libpng to be built with the functions even though the default
-    is to use the macros - this allows applications to choose at app build
-    time whether or not to use macros (previously impossible because the
-    functions weren't in the default build.)
-  Changed Windows calling convention back to __cdecl for API functions.
-    For Windows/x86 platforms only:
-      __stdcall is no longer needed for Visual Basic, so libpng-1.5.0 uses
-      __cdecl throughout (both API functions and callbacks) on Windows/x86
-      platforms.
-  Replaced the visualc6 project with new vstudio project.
-  Relaxed the overly-restrictive permissions of some files.
-  Set PNG_NO_READ_BGR, PNG_NO_IO_STATE, and PNG_NO_TIME_RFC1123 in
-    contrib/pngminim/decoder/pngusr.h to make a smaller decoder application.
-  Fixed dependencies of GET_INT_32 - it does not require READ_INT_FUNCTIONS
-    because it has a macro equivalent.
-  Improved the options.awk script; added an "everything off" option.
-  Revised contrib/pngminim to use the "everything off" option in pngusr.dfa.
-  Corrected PNG_REMOVED macro to take five arguments.
-  Corrected PNG_UNKNOWN_CHUNKS_SUPPORTED to PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-    in gregbook/readpng2.c
-  Corrected protection of png_get_user_transform_ptr. The API declaration in
-    png.h is removed if both READ and WRITE USER_TRANSFORM are turned off
-    but was left defined in pngtrans.c
-  Added logunsupported=1 to cause pnglibconf.h to document disabled options.
-    This makes the installed pnglibconf.h more readable but causes no
-    other change.  The intention is that users of libpng will find it
-    easier to understand if an API they need is missing.
-  Include png_reset_zstream() in png.c only when PNG_READ_SUPPORTED is defined.
-  Removed dummy_inflate.c from contrib/pngminim/encoder
-  Removed contrib/pngminim/*/gather.sh; gathering is now done in the makefile.
-  Use bitwise "&" instead of arithmetic mod in pngrutil.c calculation of the
-    offset of the png_ptr->rowbuf pointer into png_ptr->big_row_buf.
-  Added more blank lines for readability.
-  In pngpread.c: png_push_process_row() add check for too many rows.
-  Rewrote png_process_IDAT_data to consistently treat extra data as warnings
-    and handle end conditions more cleanly.
-  Removed the now-redundant check for out-of-bounds new_row from example.c
-  Revised scripts/options.awk to work on Sunos (but still doesn't work)
-  Added comment to options.awk and contrib/pngminim/*/makefile to try nawk.
-  Stop memory leak when reading a malformed sCAL chunk.
-  Made FIXED and FLOATING options consistent in the APIs they enable and
-    disable.  Corrected scripts/options.awk to handle both command line
-    options and options specified in the .dfa files.
-  Changed char *msg to PNG_CONST char *msg in pngrutil.c
-  Make png_set_sRGB_gAMA_and_cHRM set values using either the fixed or
-    floating point APIs, but not both.
-  Changed "extern PNG_EXPORT" to "PNG_EXPORT" in png.h (Jan Nijtmans)
-  Changed "extern" to "PNG_EXTERN" in pngpriv.h (except for the 'extern "C" {')
-  Put #ifndef PNG_EXTERN, #endif around the define PNG_EXTERN in pngpriv.h
-  Added -DNO_PNG_SNPRINTF to CFLAGS in scripts/makefile.dj2
-  Moved the definition of png_snprintf() outside of the enclosing
-    #ifdef blocks in pngconf.h
-  Patches by John Bowler:
-  Fixed point APIs are now supported throughout (no missing APIs).
-  Internal fixed point arithmetic support exists for all internal floating
-    point operations.
-  sCAL validates the floating point strings it is passed.
-  Safe, albeit rudimentary, Watcom support is provided by PNG_API_RULE==2
-  Two new APIs exist to get the number of passes without turning on the
-    PNG_INTERLACE transform and to get the number of rows in the current
-    pass.
-  A new test program, pngvalid.c, validates the gamma code.
-  Errors in the 16 bit gamma correction (overflows) have been corrected.
-  cHRM chunk testing is done consistently (previously the floating point
-    API bypassed it, because the test really didn't work on FP, now the test
-    is performed on the actual values to be stored in the PNG file so it
-    works in the FP case too.)
-  Most floating point APIs now simply call the fixed point APIs after
-    converting the values to the fixed point form used in the PNG file.
-  The standard headers no longer include zlib.h, which is currently only
-    required for pngstruct.h and can therefore be internal.
-  Revised png_get_int_32 to undo the PNG two's complement representation of
-    negative numbers.
-  Added a typecast in png_get_int_32() in png.h and pngrutil.h to avoid
-    a compiler warning.
-  Replaced oFFs 0,0 with oFFs -10,20 in pngtest.png
-  VisualC/GCC warning fixes, VisualC build fixes
-  The changes include support for function attributes in VC in addition to
-    those already present in GCC - necessary because without these some
-    warnings are unavoidable.  Fixes include signed/unsigned fixes in
-    pngvalid and checks with gcc -Wall -Wextra -Wunused.
-  VC requires function attributes on function definitions as well as
-    declarations, PNG_FUNCTION has been added to enable this and the
-    relevant function definitions changed.
-  Added the sRGB and cHRM chunks to pngtest.png
-  Don't try to use version-script with cygwin/mingw.
-  Revised contrib/gregbook to work under cygwin/mingw.
-  Made all API functions that have const arguments and constant string
-    literal pointers declare them (John Bowler).
-  Removed spurious tabs, shorten long lines (no source change)
-    Also added scripts/chkfmt to validate the format of all the files that can
-    reasonably be validated (it is suggested to run "make distclean" before
-    checking, because some machine generated files have long lines.)
-    Reformatted the CHANGES file to be more consistent throughout.
-  Made changes to address various issues identified by GCC, mostly
-    signed/unsigned and shortening problems on assignment but also a few
-    difficult to optimize (for GCC) loops.
-  Use cexcept.h in pngvalid.c.
-  Updated CMakeLists.txt to use CMAKE_INSTALL_LIBDIR variable; useful for
-    installing libpng in /usr/lib64 (Funda Wang).
-  Revised CMakeLists.txt to put the man pages in share/man/man* not man/man*
-  Revised CMakeLists.txt to make symlinks instead of copies when installing.
-  Changed PNG_LIB_NAME from pngNN to libpngNN in CMakeLists.txt (Philip Lowman)
-  Implemented memory checks within pngvalid
-  Reformatted/rearranged pngvalid.c to assist use of progressive reader.
-  Check interlaced images in pngvalid
-  Clarified pngusr.h comments in pnglibconf.dfa
-  Simplified the pngvalid error-handling code now that cexcept.h is in place.
-  Implemented progressive reader in pngvalid.c for standard tests
-  Implemented progressive read in pngvalid.c gamma tests
-  Turn on progressive reader in pngvalid.c by default and tidy code.
-  Added an explicit make step to projects/vstudio for pnglibconf.h
-    Also corrected zlib.vcxproj into which Visual Studio had introduced
-    what it calls an "authoring error".  The change to make pnglibconf.h
-    simply copies the file; in the future it may actually generate the
-    file from scripts/pnglibconf.dfa as the other build systems do.
-  Changed pngvalid to work when floating point APIs are disabled
-  Renamed the prebuilt scripts/pnglibconf.h to scripts/pnglibconf.h.prebuilt
-  Supply default values for PNG_USER_PRIVATEBUILD and PNG_USER_DLLFNAME_POSTFIX
-    in pngpriv.h in case the user neglected to define them in their pngusr.h
-  Added new private header files to libpng_sources in CMakeLists.txt
-  Added PNG_READ_16BIT, PNG_WRITE_16BIT, and PNG_16BIT options.
-  Added reference to scripts/pnglibconf.h.prebuilt in the visualc71 project.
-  Fixed a number of problems with 64-bit compilation reported by Visual
-    Studio 2010 (John Bowler).
-  Revised autogen.sh to recognize and use $AUTOCONF, $AUTOMAKE, $AUTOHEADER,
-    $AUTOPOINT, $ACLOCAL and $LIBTOOLIZE
-  Removed unused mkinstalldirs and revised Makefile.in accorgingly.
-  Added some "(unsigned long)" typecasts in printf statements in pngvalid.c.
-  Suppressed a compiler warning in png_handle_sPLT().
-  Check for out-of-range text compression mode in png_set_text().
-  Changed many embedded dates to "(PENDING RELEASE) in beta releases (and
-    future rc releases) to minimize the difference between releases.
-  Updated INSTALL to mention using "make maintainer-clean" and to remove
-    obsolete statement about a custom ltmain.sh
-  Disabled "color-tests" by default in Makefile.am so it will work with
-    automake versions earlier than 1.11.1
-  Use document name "libpng-manual.txt" instead of "libpng-<version>.txt"
-    to simplify version differences.
-  Removed obsolete remarks about setjmp handling from INSTALL.
-  Revised and renamed the typedef in png.h and png.c that was designed
-    to catch library and header mismatch.
-  Require 48 bytes, not 64 bytes, for big_row_buf in overflow checks.
-  Used a consistent structure for the pngget.c functions.
-  Revised png_get_uint_32, png_get_int_32, png_get_uint_16 (Cosmin)
-  Moved reading of file signature into png_read_sig (Cosmin)
-  Fixed atomicity of chunk header serialization (Cosmin)
-  Added test for io_state in pngtest.c (Cosmin)
-  Added "#!/bin/sh" at the top of contrib/pngminim/*/gather.sh scripts.
-  Changes to remove gcc warnings (John Bowler)
-    Certain optional gcc warning flags resulted in warnings in libpng code.
-    With these changes only -Wconversion and -Wcast-qual cannot be turned on.
-    Changes are trivial rearrangements of code.  -Wconversion is not possible
-    for pngrutil.c (because of the widespread use of += et al on variables
-    smaller than (int) or (unsigned int)) and -Wcast-qual is not possible
-    with pngwio.c and pngwutil.c because the 'write' callback and zlib
-    compression both fail to declare their input buffers with 'const'.
-  Added the private PNG_UNUSED() macro definition in pngpriv.h.
-  Added some commentary about PNG_EXPORT in png.h and pngconf.h
-  Revised PNG_EXPORT() macro and added PNG_EXPORTA() macro, with the
-    objective of simplifying and improving the cosmetic appearance of png.h.
-  Fixed some incorrect "=" macro names in pnglibconf.dfa
-  Included documentation of changes in 1.5.0 from 1.4.x in libpng-manual.txt
-  Documented the pngvalid gamma error summary with additional comments and
-    print statements.
-  Improved missing symbol handling in checksym.awk; symbols missing in both
-    the old and new files can now be optionally ignored, treated as errors
-    or warnings.
-  Removed references to pngvcrd.c and pnggccrd.c from the vstudio project.
-  Updated "libpng14" to "libpng15" in the visualc71 project.
-  Enabled the strip16 tests in pngvalid.
-  Don't display test results (except PASS/FAIL) when running "make test".
-    Instead put them in pngtest-log.txt
-  Updated the prebuilt configuration files to autoconf version 2.68
-  Fixed interlace image handling and add test cases (John Bowler)
-  Fixed the clean rule in Makefile.am to remove pngtest-log.txt
-  Made minor changes to work around warnings in gcc 3.4
-  Eliminated references to the scripts/*.def files in project/visualc71.
-  Eliminated scripts/*.def and revised Makefile.am accordingly
-  Fixed bug in background transformation handling in pngrtran.c (it was
-    looking for the flag in png_ptr->transformations instead of in
-    png_ptr->flags) (David Raymond).
-  Fixed typo in a comment in CMakeLists.txt (libpng14 => libpng15) (Cosmin)
-  Added "--with-zlib-prefix=<string>" to configure.ac
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
