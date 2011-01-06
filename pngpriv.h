@@ -1,11 +1,12 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.5.0rc07 - (PENDING RELEASE)
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * Last changed in libpng 1.5.0 [January 6, 2011]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
