@@ -3507,7 +3507,7 @@ corresponding function by defining PNG_USE_READ_MACROS or
 PNG_NO_USE_READ_MACROS before including png.h.  Notice that this is
 only supported from 1.5.0 -defining PNG_NO_USE_READ_MACROS prior to 1.5.0
  will lead to a link failure.
-%15%
+
 B. Changes to the build and configuration of libpng
 
 Details of internal changes to the library code can be found in the CHANGES
