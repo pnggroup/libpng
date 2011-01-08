@@ -558,7 +558,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta01
 
 \fI\fB
 
-\fBvoid png_set_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_charp \fP\fIprofile\fP\fB, png_uint_32 \fIproflen\fP\fB);\fP
+\fBvoid png_set_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_const_bytepp \fP\fIprofile\fP\fB, png_uint_32 \fIproflen\fP\fB);\fP
 
 \fI\fB
 
@@ -4312,7 +4312,7 @@ in earlier versions of libpng, has been completely removed from
 libpng 1.5.
 
 In png_get_iCCP, the type of "profile" was changed from png_charpp
-to png_bytepp.
+to png_bytepp, and in png_set_iCCP, to const_png_bytepp.
 
 There are changes of form in png.h, including new and changed macros to
 declare

@@ -3461,7 +3461,7 @@ in earlier versions of libpng, has been completely removed from
 libpng 1.5.
 
 In png_get_iCCP, the type of "profile" was changed from png_charpp
-to png_bytepp.
+to png_bytepp, and in png_set_iCCP, to const_png_bytepp.
 
 There are changes of form in png.h, including new and changed macros to
 declare
