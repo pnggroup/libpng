@@ -1,5 +1,5 @@
 
-Libpng 1.5.1beta01 - January 7, 2011
+Libpng 1.5.1beta01 - January 8, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,8 +26,11 @@ Other information:
 
 Changes since the last public release (1.5.0):
 
-Version 1.5.1beta01 [January 7, 2011]
+Version 1.5.1beta01 [January 8, 2011]
   Added description of png_set_crc_action() to the manual.
+  Added a note in the manual that the type of the iCCP profile was changed
+    from png_charpp to png_bytepp in png_get_iCCP().  This change happened
+    in version 1.5.0beta36 but is not noted in the CHANGES.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

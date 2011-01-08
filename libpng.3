@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "January 7, 2011"
+.TH LIBPNG 3 "January 8, 2011"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta01
 .SH SYNOPSIS
@@ -160,7 +160,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta01
 
 \fI\fB
 
-\fBpng_uint_32 png_get_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charpp \fP\fIname\fP\fB, int \fP\fI*compression_type\fP\fB, png_charpp \fP\fIprofile\fP\fB, png_uint_32 \fI*proflen\fP\fB);\fP
+\fBpng_uint_32 png_get_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charpp \fP\fIname\fP\fB, int \fP\fI*compression_type\fP\fB, png_bytepp \fP\fIprofile\fP\fB, png_uint_32 \fI*proflen\fP\fB);\fP
 
 \fI\fB
 
@@ -851,7 +851,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.1beta01 - January 7, 2011
+ libpng version 1.5.1beta01 - January 8, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
@@ -862,7 +862,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.1beta01 - January 7, 2011
+ libpng versions 0.97, January 1998, through 1.5.1beta01 - January 8, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -4311,6 +4311,9 @@ the main libpng control structures, png_struct and png_info, deprecated
 in earlier versions of libpng, has been completely removed from
 libpng 1.5.
 
+In png_get_iCCP, the type of "profile" was changed from png_charpp
+to png_bytepp.
+
 There are changes of form in png.h, including new and changed macros to
 declare
 parts of the API.  Some API functions with arguments that are pointers to
@@ -4686,7 +4689,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIV. Y2K Compliance in libpng
 
-January 7, 2011
+January 8, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -4932,7 +4935,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.5.1beta01 - January 7, 2011:
+Libpng version 1.5.1beta01 - January 8, 2011:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4955,7 +4958,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.5.1beta01, January 7, 2011, are
+libpng versions 1.2.6, August 15, 2004, through 1.5.1beta01, January 8, 2011, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -5054,7 +5057,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-January 7, 2011
+January 8, 2011
 
 .\" end of man page
 

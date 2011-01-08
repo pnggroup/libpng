@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.1beta01 - January 7, 2011
+ libpng version 1.5.1beta01 - January 8, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.1beta01 - January 7, 2011
+ libpng versions 0.97, January 1998, through 1.5.1beta01 - January 8, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -3460,6 +3460,9 @@ the main libpng control structures, png_struct and png_info, deprecated
 in earlier versions of libpng, has been completely removed from
 libpng 1.5.
 
+In png_get_iCCP, the type of "profile" was changed from png_charpp
+to png_bytepp.
+
 There are changes of form in png.h, including new and changed macros to
 declare
 parts of the API.  Some API functions with arguments that are pointers to
@@ -3835,7 +3838,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-January 7, 2011
+January 8, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
