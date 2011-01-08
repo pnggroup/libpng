@@ -2427,7 +2427,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
 
    png_debug(1, "in png_do_rgb_to_gray");
 
-   if (
+   if (!(row_info->color_type & PNG_COLOR_MASK_PALETTE) &&
        (row_info->color_type & PNG_COLOR_MASK_COLOR))
    {
       png_uint_32 rc = png_ptr->rgb_to_gray_red_coeff;
