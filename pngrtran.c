@@ -3778,7 +3778,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
          row_info->rowbytes = row_width;
       }
 
-      else if (row_info->bit_depth == 8)
+      if (row_info->bit_depth == 8)
       {
          {
             if (trans_alpha != NULL)
