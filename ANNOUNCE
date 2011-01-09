@@ -1,5 +1,5 @@
 
-Libpng 1.5.1beta01 - January 8, 2011
+Libpng 1.5.1beta02 - January 9, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,24 +9,24 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.1beta01.tar.xz (LZMA-compressed, recommended)
-   1.5.1beta01.tar.gz
-   1.5.1beta01.tar.bz2
+   1.5.1beta02.tar.xz (LZMA-compressed, recommended)
+   1.5.1beta02.tar.gz
+   1.5.1beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp151b01.7z  (LZMA-compressed, recommended)
-   lp151b01.zip
+   lp151b02.7z  (LZMA-compressed, recommended)
+   lp151b02.zip
 
 Other information:
 
-   1.5.1beta01-README.txt
-   1.5.1beta01-LICENSE.txt
+   1.5.1beta02-README.txt
+   1.5.1beta02-LICENSE.txt
 
 Changes since the last public release (1.5.0):
 
-Version 1.5.1beta01 [January 8, 2011]
+version 1.5.1beta01 [January 8, 2011]
   Added description of png_set_crc_action() to the manual.
   Added a note in the manual that the type of the iCCP profile was changed
     from png_charpp to png_bytepp in png_get_iCCP().  This change happened
@@ -34,6 +34,8 @@ Version 1.5.1beta01 [January 8, 2011]
     it was changed from png_charpp to png_const_bytepp in png_set_iCCP().
   Ensure that png_rgb_to_gray ignores palette mapped images,
   Fixed the failure to handle palette mapped images correctly.
+
+Version 1.5.1beta02 [January 9, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
