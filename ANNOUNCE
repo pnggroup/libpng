@@ -37,6 +37,7 @@ version 1.5.1beta01 [January 8, 2011]
 
 Version 1.5.1beta02 [January 14, 2011]
   Fixed a bug in handling of interlaced images (bero at arklinux.org).
+  Updated CMakeLists.txt (Clifford Yapp)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
