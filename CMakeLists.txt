@@ -231,22 +231,25 @@ endmacro()
 # CREATE PKGCONFIG FILES
 # we use the same files like ./configure, so we have to set its vars
 if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
-  set(CMAKE_INSTALL_LIBDIR ${CMAKE_INSTALL_PREFIX}/lib)
+  set(CMAKE_INSTALL_LIBDIR lib)
 endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 set(prefix      ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix ${CMAKE_INSTALL_PREFIX})
-set(libdir      ${CMAKE_INSTALL_LIBDIR})
+set(libdir      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
 set(LIBS        "-lz -lm")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc @ONLY)
-_png_generate_symlink_code(PNG_PC_INSTALL_CODE ${PNGLIB_NAME}.pc libpng.pc)
+_png_generate_symlink_code(PNG_PC_INSTALL_CODE
+  ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
+  ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc)
 install(CODE ${PNG_PC_INSTALL_CODE})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config @ONLY)
-_png_generate_symlink_code(PNG_CONFIG_INSTALL_CODE ${PNGLIB_NAME}-config
-  libpng-config)
+_png_generate_symlink_code(PNG_CONFIG_INSTALL_CODE
+  ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
+  ${CMAKE_CURRENT_BINARY_DIR}/libpng-config)
 install(CODE ${PNG_CONFIG_INSTALL_CODE})
 
 # SET UP LINKS
@@ -298,13 +301,23 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
     endif()
 
     if(NOT WIN32)
-      _png_generate_symlink_code(PNG_SHARED_INSTALL_CODE
-            ${PNGLIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
-            libpng${CMAKE_SHARED_LIBRARY_SUFFIX})
-      install(CODE ${PNG_SHARED_INSTALL_CODE})
-      install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/libpng${CMAKE_SHARED_LIBRARY_SUFFIX}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      IF(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+        _png_generate_symlink_code(PNG_SHARED_INSTALL_CODE
+ ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${PNGLIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
+ ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libpng${CMAKE_SHARED_LIBRARY_SUFFIX})
+                install(CODE ${PNG_SHARED_INSTALL_CODE})
+                install(FILES
+ ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libpng${CMAKE_SHARED_LIBRARY_SUFFIX}
+                DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      ELSE(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+        _png_generate_symlink_code(PNG_SHARED_INSTALL_CODE
+           ${PNGLIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
+           libpng${CMAKE_SHARED_LIBRARY_SUFFIX})
+        install(CODE ${PNG_SHARED_INSTALL_CODE})
+        install(FILES
+           ${CMAKE_CURRENT_BINARY_DIR}/libpng${CMAKE_SHARED_LIBRARY_SUFFIX}
+                DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      ENDIF(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
     endif()
   endif()
 
@@ -314,13 +327,23 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
     if(NOT WIN32 OR CYGWIN)
-      _png_generate_symlink_code(PNG_STATIC_INSTALL_CODE
-            ${PNGLIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
-            libpng${CMAKE_STATIC_LIBRARY_SUFFIX})
-      install(CODE ${PNG_STATIC_INSTALL_CODE})
-      install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/libpng${CMAKE_STATIC_LIBRARY_SUFFIX}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      IF(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+         _png_generate_symlink_code(PNG_STATIC_INSTALL_CODE
+${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${PNGLIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/libpng${CMAKE_STATIC_LIBRARY_SUFFIX})
+        install(CODE ${PNG_STATIC_INSTALL_CODE})
+        install(FILES
+          ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/libpng${CMAKE_STATIC_LIBRARY_SUFFIX}
+             DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      ELSE(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+        _png_generate_symlink_code(PNG_STATIC_INSTALL_CODE
+           ${PNGLIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
+           libpng${CMAKE_STATIC_LIBRARY_SUFFIX})
+        install(CODE ${PNG_STATIC_INSTALL_CODE})
+        install(FILES
+          ${CMAKE_CURRENT_BINARY_DIR}/libpng${CMAKE_STATIC_LIBRARY_SUFFIX}
+                     DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      ENDIF(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
     endif()
   endif()
 endif()
@@ -358,7 +381,7 @@ if(PNG_EXPORT_RULE AND NOT SKIP_INSTALL_EXPORT AND NOT SKIP_INSTALL_ALL )
   install(EXPORT libpng DESTINATION lib/libpng FILE lib${PNG_LIB_NAME}.cmake)
 endif()
 
-# what's with libpng.txt and all the extra files?
+# what's with libpng-manual.txt and all the extra files?
 
 
 # UNINSTALL

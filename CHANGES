@@ -2740,8 +2740,9 @@ version 1.4.6beta01 [December 29, 2010]
     looking for the flag in png_ptr->transformations instead of in
     png_ptr->flags) (David Raymond).
 
-version 1.4.6beta02 [December 31, 2010]
+version 1.4.6beta02 [January 14, 2011]
   Fixed misspelled macros in contrib/pngminim (Cosmin)
+  Updated CMakeLists.txt (Clifford Yapp)
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
