@@ -841,7 +841,7 @@ png_read_image(png_structp png_ptr, png_bytepp image)
    }
    else
    {
-      if (!(png_ptr->transformations & PNG_INTERLACE))
+      if (png_ptr->interlaced && !(png_ptr->transformations & PNG_INTERLACE))
       {
          /* Caller called png_start_read_image or png_read_update_info without
           * first turning on the PNG_INTERLACE transform.  We can fix this here,
