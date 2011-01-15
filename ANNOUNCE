@@ -1,5 +1,5 @@
 
-Libpng 1.4.6beta02 - January 14, 2011
+Libpng 1.4.6beta02 - January 15, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -34,6 +34,8 @@ Version 1.4.6beta01 [December 29, 2010]
 version 1.4.6beta02 [January 14, 2011]
   Fixed misspelled macros in contrib/pngminim (Cosmin)
   Updated CMakeLists.txt (Clifford Yapp)
+
+version 1.4.6rc01 [January 15, 2011]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
