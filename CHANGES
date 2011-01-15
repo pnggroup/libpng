@@ -2744,8 +2744,12 @@ version 1.4.6beta02 [January 14, 2011]
   Fixed misspelled macros in contrib/pngminim (Cosmin).
   Updated CMakeLists.txt (Clifford Yapp).
 
-version 1.4.6beta03 [January 15, 2011]
+version 1.4.6beta03 [January 14, 2011]
   Fixed some typecasts in png_debug statements (Cosmin).
+
+version 1.4.6beta04 [January 15, 2011]
+  Updated documentation of png_set|get_tRNS() and png_set|get_iCCP()
+    (Thomas Klausner).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

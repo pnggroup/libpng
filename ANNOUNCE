@@ -1,5 +1,5 @@
 
-Libpng 1.4.6beta03 - January 15, 2011
+Libpng 1.4.6beta04 - January 15, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.6beta03.tar.xz (LZMA-compressed, recommended)
-   1.4.6beta03.tar.gz
-   1.4.6beta03.tar.bz2
+   1.4.6beta04.tar.xz (LZMA-compressed, recommended)
+   1.4.6beta04.tar.gz
+   1.4.6beta04.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp146b03.7z (LZMA-compressed, recommended)
-   lp146b03.zip
+   lp146b04.7z (LZMA-compressed, recommended)
+   lp146b04.zip
 
 Other information:
 
-   1.4.6beta03-README.txt
-   1.4.6beta03-LICENSE.txt
+   1.4.6beta04-README.txt
+   1.4.6beta04-LICENSE.txt
 
 Changes since the last public release (1.4.5):
 
@@ -35,8 +35,12 @@ version 1.4.6beta02 [January 14, 2011]
   Fixed misspelled macros in contrib/pngminim (Cosmin)
   Updated CMakeLists.txt (Clifford Yapp)
 
-version 1.4.6beta03 [January 15, 2011]
+version 1.4.6beta03 [January 14, 2011]
   Fixed some typecasts in png_debug statements (Cosmin).
+
+version 1.4.6beta04 [January 15, 2011]
+  Updated documentation of png_set|get_tRNS() and png_set|get_iCCP()
+    (Thomas Klausner).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
