@@ -39,8 +39,7 @@ version 1.4.6beta03 [January 14, 2011]
   Fixed some typecasts in png_debug statements (Cosmin).
 
 version 1.4.6beta04 [January 15, 2011]
-  Updated documentation of png_set|get_tRNS() and png_set|get_iCCP()
-    (Thomas Klausner).
+  Updated documentation of png_set|get_tRNS() (Thomas Klausner).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
