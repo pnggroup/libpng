@@ -2741,10 +2741,11 @@ version 1.4.6beta01 [December 29, 2010]
     png_ptr->flags) (David Raymond).
 
 version 1.4.6beta02 [January 14, 2011]
-  Fixed misspelled macros in contrib/pngminim (Cosmin)
-  Updated CMakeLists.txt (Clifford Yapp)
+  Fixed misspelled macros in contrib/pngminim (Cosmin).
+  Updated CMakeLists.txt (Clifford Yapp).
 
-version 1.4.6rc01 [January 15, 2011]
+version 1.4.6beta03 [January 15, 2011]
+  Fixed some typecasts in png_debug statements (Cosmin).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
