@@ -1,5 +1,5 @@
 
-Libpng 1.5.1beta02 - January 14, 2011
+Libpng 1.5.1beta03 - January 15, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.1beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.1beta02.tar.gz
-   1.5.1beta02.tar.bz2
+   1.5.1beta03.tar.xz (LZMA-compressed, recommended)
+   1.5.1beta03.tar.gz
+   1.5.1beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp151b02.7z  (LZMA-compressed, recommended)
-   lp151b02.zip
+   lp151b03.7z  (LZMA-compressed, recommended)
+   lp151b03.zip
 
 Other information:
 
-   1.5.1beta02-README.txt
-   1.5.1beta02-LICENSE.txt
+   1.5.1beta03-README.txt
+   1.5.1beta03-LICENSE.txt
 
 Changes since the last public release (1.5.0):
 
@@ -38,6 +38,9 @@ version 1.5.1beta01 [January 8, 2011]
 Version 1.5.1beta02 [January 14, 2011]
   Fixed a bug in handling of interlaced images (bero at arklinux.org).
   Updated CMakeLists.txt (Clifford Yapp)
+
+Version 1.5.1beta03 [January 15, 2011]
+  Fixed typecasting of some png_debug() statements (Cosmin)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

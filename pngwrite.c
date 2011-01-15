@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.5.1 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -783,7 +783,8 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
    png_debug1(3, "row_info->channels = %d", png_ptr->row_info.channels);
    png_debug1(3, "row_info->bit_depth = %d", png_ptr->row_info.bit_depth);
    png_debug1(3, "row_info->pixel_depth = %d", png_ptr->row_info.pixel_depth);
-   png_debug1(3, "row_info->rowbytes = %u", png_ptr->row_info.rowbytes);
+   png_debug1(3, "row_info->rowbytes = %lu",
+       (unsigned long)png_ptr->row_info.rowbytes);
 
    /* Copy user's row into buffer, leaving room for filter byte. */
    png_memcpy(png_ptr->row_buf + 1, row, png_ptr->row_info.rowbytes);

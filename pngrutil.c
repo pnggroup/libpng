@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.5.1 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -608,7 +608,7 @@ png_handle_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->width);
    png_debug1(3, "bit_depth = %d", png_ptr->bit_depth);
    png_debug1(3, "channels = %d", png_ptr->channels);
-   png_debug1(3, "rowbytes = %u", png_ptr->rowbytes);
+   png_debug1(3, "rowbytes = %lu", (unsigned long)png_ptr->rowbytes);
    png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,
        color_type, interlace_type, compression_type, filter_type);
 }
@@ -3607,9 +3607,9 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_debug1(3, "height = %u,", png_ptr->height);
    png_debug1(3, "iwidth = %u,", png_ptr->iwidth);
    png_debug1(3, "num_rows = %u,", png_ptr->num_rows);
-   png_debug1(3, "rowbytes = %u,", png_ptr->rowbytes);
-   png_debug1(3, "irowbytes = %u",
-       PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1);
+   png_debug1(3, "rowbytes = %lu,", (unsigned long)png_ptr->rowbytes);
+   png_debug1(3, "irowbytes = %lu",
+       (unsigned long)PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1);
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }

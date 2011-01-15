@@ -3155,6 +3155,9 @@ Version 1.5.1beta02 [January 14, 2011]
   Fixed a bug in handling of interlaced images (bero at arklinux.org).
   Updated CMakeLists.txt (Clifford Yapp)
 
+Version 1.5.1beta03 [January 15, 2011]
+  Fixed typecasting of some png_debug() statements (Cosmin)
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

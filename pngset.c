@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.5.1 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -352,7 +352,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
 
    ++lengthw;
 
-   png_debug1(3, "allocating unit for info (%u bytes)", lengthw);
+   png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthw);
 
    info_ptr->scal_s_width = (png_charp)png_malloc_warn(png_ptr, lengthw);
 
@@ -366,7 +366,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
 
    ++lengthh;
 
-   png_debug1(3, "allocating unit for info (%u bytes)", lengthh);
+   png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthh);
 
    info_ptr->scal_s_height = (png_charp)png_malloc_warn(png_ptr, lengthh);
 
@@ -751,10 +751,10 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
       if (textp->key == NULL)
          return(1);
 
-      png_debug2(2, "Allocated %lu bytes at %x in png_set_text",
+      png_debug2(2, "Allocated %lu bytes at %p in png_set_text",
           (unsigned long)(png_uint_32)
           (key_len + lang_len + lang_key_len + text_length + 4),
-          (int)textp->key);
+          textp->key);
 
       png_memcpy(textp->key, text_ptr[i].key,(png_size_t)(key_len));
       *(textp->key + key_len) = '\0';
