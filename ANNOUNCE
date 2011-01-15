@@ -43,7 +43,7 @@ Version 1.5.1beta03 [January 14, 2011]
   Fixed typecasting of some png_debug() statements (Cosmin)
 
 Version 1.5.1beta04 [January 15, 2011]
-  Updated documentation of png_set|get_tRNS().
+  Updated documentation of png_set|get_tRNS() (Thomas Klausner).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
