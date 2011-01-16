@@ -60,6 +60,8 @@ Version 1.5.1beta05 [January 16, 2011]
     changed exp() back to png_exp().
 
 Version 1.5.1beta06 [January 16, 2011]
+  Prevent png_push_crc_skip() from hanging while reading an unknown chunk
+    or an over-large compressed zTXT chunk with the progressive reader.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

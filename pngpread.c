@@ -582,7 +582,7 @@ png_push_crc_finish(png_structp png_ptr)
 {
    if (png_ptr->skip_length && png_ptr->save_buffer_size)
    {
-      png_size_t save_size = png_ptr->current_buffer_size;
+      png_size_t save_size = png_ptr->save_buffer_size;
       png_uint_32 skip_length = png_ptr->skip_length;
 
       /* We want the smaller of 'skip_length' and 'current_buffer_size', but
