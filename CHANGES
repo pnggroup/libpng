@@ -3166,9 +3166,14 @@ Version 1.5.1beta04 [January 16, 2011]
   Corrected pngvalid gamma test "sample" function to access all of the color
     samples of each pixel, instead of sampling the red channel three times.
   Prefixed variable names index, div, exp, gamma with "png_" to avoid "shadow"
-    warnings.
+    warnings, and (mistakenly) changed png_exp() to exp().
   Revised png_fixed() in png.c to avoid compiler warning about reaching the
     end without returning anything.
+
+Version 1.5.1beta05 [January 16, 2011]
+  Changed variable names png_index, png_div, png_exp, and png_gamma to
+    char_index, divisor, exp_b10, and gamma_val, respectively, and
+    changed exp() back to png_exp().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
