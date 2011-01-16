@@ -3165,6 +3165,10 @@ Version 1.5.1beta04 [January 16, 2011]
     macros such as png_memset() are no longer accessible by applications.
   Corrected pngvalid gamma test "sample" function to access all of the color
     samples of each pixel, instead of sampling the red channel three times.
+  Prefixed variable names index, div, exp, gamma with "png_" to avoid "shadow"
+    warnings.
+  Revised png_fixed() in png.c to avoid compiler warning about reaching the
+    end without returning anything.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
