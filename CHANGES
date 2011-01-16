@@ -3163,6 +3163,8 @@ Version 1.5.1beta04 [January 16, 2011]
   Mentioned in the documentation that applications must #include "zlib.h"
     if they need access to anything in zlib.h, and that a number of
     macros such as png_memset() are no longer accessible by applications.
+  Corrected pngvalid gamma test "sample" function to access all of the color
+    samples of each pixel, instead of sampling the red channel three times.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
