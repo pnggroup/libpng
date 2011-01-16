@@ -25,7 +25,7 @@ endif()
 project(libpng C)
 enable_testing()
 
-# Copyright (C) 2007-2010 Glenn Randers-Pehrson
+# Copyright (C) 2007-2011 Glenn Randers-Pehrson
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
