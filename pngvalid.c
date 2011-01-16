@@ -249,10 +249,13 @@ sample(png_const_bytep row, png_byte colour_type, png_byte bit_depth,
    if ((colour_type & 1) == 0) /* !palette */
    {
       if (colour_type & 2)
-         index *= 3, index += sample; /* Colour channels; select one */
+         index *= 3;
 
       if (colour_type & 4)
          index += x; /* Alpha channel */
+
+      if (colour_type & (2+4))
+         index += sample * bit_depth; /* Multiple channels: select one */
    }
 
    /* Return the sample from the row as an integer. */
