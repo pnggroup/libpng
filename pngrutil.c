@@ -1962,7 +1962,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
-   png_size_t slength, index;
+   png_size_t slength, i;
    int state;
 
    png_debug(1, "in png_handle_sCAL");
@@ -2019,21 +2019,21 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* Validate the ASCII numbers, need two ASCII numbers separated by
     * a '\0' and they need to fit exactly in the chunk data.
     */
-   index = 0;
+   i = 0;
    state = 0;
 
    if (png_ptr->chunkdata[1] == 45 /* negative width */ ||
-       !png_check_fp_number(png_ptr->chunkdata, slength, &state, &index) ||
-       index >= slength || png_ptr->chunkdata[index++] != 0)
+       !png_check_fp_number(png_ptr->chunkdata, slength, &state, &i) ||
+       i >= slength || png_ptr->chunkdata[i++] != 0)
       png_warning(png_ptr, "Invalid sCAL chunk ignored: bad width format");
 
    else
    {
-      png_size_t heighti = index;
+      png_size_t heighti = i;
 
-      if (png_ptr->chunkdata[index] == 45 /* negative height */ ||
-          !png_check_fp_number(png_ptr->chunkdata, slength, &state, &index) ||
-          index != slength)
+      if (png_ptr->chunkdata[i] == 45 /* negative height */ ||
+          !png_check_fp_number(png_ptr->chunkdata, slength, &state, &i) ||
+          i != slength)
          png_warning(png_ptr, "Invalid sCAL chunk ignored: bad height format");
 
       else

@@ -585,7 +585,7 @@ png_push_crc_finish(png_structp png_ptr)
       png_size_t save_size = png_ptr->save_buffer_size;
       png_uint_32 skip_length = png_ptr->skip_length;
 
-      /* We want the smaller of 'skip_length' and 'current_buffer_size', but
+      /* We want the smaller of 'skip_length' and 'save_buffer_size', but
        * they are of different types and we don't know which variable has the
        * fewest bits.  Carefully select the smaller and cast it to the type of
        * the larger - this cannot overflow.  Do not cast in the following test
@@ -609,10 +609,8 @@ png_push_crc_finish(png_structp png_ptr)
       png_size_t save_size = png_ptr->current_buffer_size;
       png_uint_32 skip_length = png_ptr->skip_length;
 
-      /* We want the smaller of 'skip_length' and 'current_buffer_size', but
-       * they are of different types and we don't know which variable has the
-       * fewest bits.  Carefully select the smaller and cast it to the type of
-       * the larger - this cannot overflow.
+      /* We want the smaller of 'skip_length' and 'current_buffer_size', here,
+       * the same problem exists as above and the same solution.
        */
       if (skip_length < save_size)
          save_size = (png_size_t)skip_length;

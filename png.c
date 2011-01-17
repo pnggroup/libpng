@@ -1792,7 +1792,7 @@ png_8bit_l2[128] =
 static png_int_32
 png_log8bit(unsigned int x)
 {
-   unsigned int log = 0;
+   unsigned int lg2 = 0;
    /* Each time 'x' is multiplied by 2, 1 must be subtracted off the final log,
     * because the log is actually negate that means adding 1.  The final
     * returned value thus has the range 0 (for 255 input) to 7.994 (for 1
@@ -1803,16 +1803,16 @@ png_log8bit(unsigned int x)
       return 0xffffffff;
 
    if ((x & 0xf0) == 0)
-      log  = 4, x <<= 4;
+      lg2  = 4, x <<= 4;
 
    if ((x & 0xc0) == 0)
-      log += 2, x <<= 2;
+      lg2 += 2, x <<= 2;
 
    if ((x & 0x80) == 0)
-      log += 1, x <<= 1;
+      lg2 += 1, x <<= 1;
 
    /* result is at most 19 bits, so this cast is safe: */
-   return (png_int_32)((log << 16) + ((png_8bit_l2[x-128]+32768)>>16));
+   return (png_int_32)((lg2 << 16) + ((png_8bit_l2[x-128]+32768)>>16));
 }
 
 /* The above gives exact (to 16 binary places) log2 values for 8 bit images,
@@ -1848,29 +1848,29 @@ png_log8bit(unsigned int x)
 static png_int_32
 png_log16bit(png_uint_32 x)
 {
-   unsigned int log = 0;
+   unsigned int lg2 = 0;
 
    /* As above, but now the input has 16 bits. */
    if ((x &= 0xffff) == 0)
       return 0xffffffff;
 
    if ((x & 0xff00) == 0)
-      log  = 8, x <<= 8;
+      lg2  = 8, x <<= 8;
 
    if ((x & 0xf000) == 0)
-      log += 4, x <<= 4;
+      lg2 += 4, x <<= 4;
 
    if ((x & 0xc000) == 0)
-      log += 2, x <<= 2;
+      lg2 += 2, x <<= 2;
 
    if ((x & 0x8000) == 0)
-      log += 1, x <<= 1;
+      lg2 += 1, x <<= 1;
 
    /* Calculate the base logarithm from the top 8 bits as a 28 bit fractional
     * value.
     */
-   log <<= 28;
-   log += (png_8bit_l2[(x>>8)-128]+8) >> 4;
+   lg2 <<= 28;
+   lg2 += (png_8bit_l2[(x>>8)-128]+8) >> 4;
 
    /* Now we need to interpolate the factor, this requires a division by the top
     * 8 bits.  Do this with maximum precision.
@@ -1881,19 +1881,19 @@ png_log16bit(png_uint_32 x)
     * the value at 1<<16 (ignoring this) will be 0 or 1; this gives us exactly
     * 16 bits to interpolate to get the low bits of the result.  Round the
     * answer.  Note that the end point values are scaled by 64 to retain overall
-    * precision and that 'log' is current scaled by an extra 12 bits, so adjust
+    * precision and that 'lg2' is current scaled by an extra 12 bits, so adjust
     * the overall scaling by 6-12.  Round at every step.
     */
    x -= 1U << 24;
 
    if (x <= 65536U) /* <= '257' */
-      log += ((23591U * (65536U-x)) + (1U << (16+6-12-1))) >> (16+6-12);
+      lg2 += ((23591U * (65536U-x)) + (1U << (16+6-12-1))) >> (16+6-12);
 
    else
-      log -= ((23499U * (x-65536U)) + (1U << (16+6-12-1))) >> (16+6-12);
+      lg2 -= ((23499U * (x-65536U)) + (1U << (16+6-12-1))) >> (16+6-12);
 
    /* Safe, because the result can't have more than 20 bits: */
-   return (png_int_32)((log + 2048) >> 12);
+   return (png_int_32)((lg2 + 2048) >> 12);
 }
 
 /* The 'exp()' case must invert the above, taking a 20 bit fixed point
@@ -1988,10 +1988,10 @@ png_exp(png_fixed_point x)
 }
 
 static png_byte
-png_exp8bit(png_fixed_point log)
+png_exp8bit(png_fixed_point lg2)
 {
    /* Get a 32 bit value: */
-   png_uint_32 x = png_exp(log);
+   png_uint_32 x = png_exp(lg2);
 
    /* Convert the 32 bit value to 0..255 by multiplying by 256-1, note that the
     * second, rounding, step can't overflow because of the first, subtraction,
@@ -2002,10 +2002,10 @@ png_exp8bit(png_fixed_point log)
 }
 
 static png_uint_16
-png_exp16bit(png_fixed_point log)
+png_exp16bit(png_fixed_point lg2)
 {
    /* Get a 32 bit value: */
-   png_uint_32 x = png_exp(log);
+   png_uint_32 x = png_exp(lg2);
 
    /* Convert the 32 bit value to 0..65535 by multiplying by 65536-1: */
    x -= x >> 16;
@@ -2022,10 +2022,10 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
          double r = floor(255*pow(value/255.,gamma_val*.00001)+.5);
          return (png_byte)r;
 #     else
-         png_int_32 log = png_log8bit(value);
+         png_int_32 lg2 = png_log8bit(value);
          png_fixed_point res;
 
-         if (png_muldiv(&res, gamma_val, log, PNG_FP_1))
+         if (png_muldiv(&res, gamma_val, lg2, PNG_FP_1))
             return png_exp8bit(res);
 
          /* Overflow. */
@@ -2045,10 +2045,10 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
          double r = floor(65535*pow(value/65535.,gamma_val*.00001)+.5);
          return (png_uint_16)r;
 #     else
-         png_int_32 log = png_log16bit(value);
+         png_int_32 lg2 = png_log16bit(value);
          png_fixed_point res;
 
-         if (png_muldiv(&res, gamma_val, log, PNG_FP_1))
+         if (png_muldiv(&res, gamma_val, lg2, PNG_FP_1))
             return png_exp16bit(res);
 
          /* Overflow. */

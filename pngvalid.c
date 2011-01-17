@@ -238,28 +238,28 @@ next_format(png_bytep colour_type, png_bytep bit_depth)
 
 static unsigned int
 sample(png_const_bytep row, png_byte colour_type, png_byte bit_depth,
-    png_uint_32 x, unsigned int sample)
+    png_uint_32 x, unsigned int sample_index)
 {
-   png_uint_32 index, result;
+   png_uint_32 bit_index, result;
 
    /* Find a sample index for the desired sample: */
    x *= bit_depth;
-   index = x;
+   bit_index = x;
 
    if ((colour_type & 1) == 0) /* !palette */
    {
       if (colour_type & 2)
-         index *= 3;
+         bit_index *= 3;
 
       if (colour_type & 4)
-         index += x; /* Alpha channel */
+         bit_index += x; /* Alpha channel */
 
       if (colour_type & (2+4))
-         index += sample * bit_depth; /* Multiple channels: select one */
+         bit_index += sample_index * bit_depth; /* Multiple channels: select one */
    }
 
    /* Return the sample from the row as an integer. */
-   row += index >> 3;
+   row += bit_index >> 3;
    result = *row;
 
    if (bit_depth == 8)
@@ -269,8 +269,8 @@ sample(png_const_bytep row, png_byte colour_type, png_byte bit_depth,
       return (result << 8) + *++row;
 
    /* Less than 8 bits per sample. */
-   index &= 7;
-   return (result >> (8-index-bit_depth)) & ((1U<<bit_depth)-1);
+   bit_index &= 7;
+   return (result >> (8-bit_index-bit_depth)) & ((1U<<bit_depth)-1);
 }
 
 /* Copy a single pixel, of a given size, from one buffer to another -
@@ -2493,6 +2493,8 @@ make_error(png_store* volatile ps, png_byte PNG_CONST colour_type,
       /* Time for a few errors, these are in various optional chunks, the
        * standard tests test the standard chunks pretty well.
        */
+#     define exception__prev exception_prev_1
+#     define exception__env exception_env_1
       Try
       {
          /* Expect this to throw: */
@@ -2516,6 +2518,8 @@ make_error(png_store* volatile ps, png_byte PNG_CONST colour_type,
 
       Catch (fault)
          ps = fault; /* expected exit, make sure ps is not clobbered */
+#undef exception__prev
+#undef exception__env
 
       /* And clear these flags */
       ps->expect_error = 0;
@@ -3236,7 +3240,7 @@ gamma_modify(png_modifier *pm, png_modification *me, int add)
 }
 
 static void
-gamma_modification_init(gamma_modification *me, png_modifier *pm, double gamma)
+gamma_modification_init(gamma_modification *me, png_modifier *pm, double gammad)
 {
    double g;
 
@@ -3244,7 +3248,7 @@ gamma_modification_init(gamma_modification *me, png_modifier *pm, double gamma)
    me->this.chunk = CHUNK_gAMA;
    me->this.modify_fn = gamma_modify;
    me->this.add = CHUNK_PLTE;
-   g = floor(gamma * 100000 + .5);
+   g = floor(gammad * 100000 + .5);
    me->gamma = (png_fixed_point)g;
    me->this.next = pm->modifications;
    pm->modifications = &me->this;
@@ -3501,7 +3505,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
 
    PNG_CONST unsigned int samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
 
-   PNG_CONST double gamma = 1/(file_gamma*screen_gamma); /* Overall */
+   PNG_CONST double gamma_correction = 1/(file_gamma*screen_gamma);/* Overall */
 
    double maxerrout = 0, maxerrabs = 0, maxerrpc = 0;
    png_uint_32 y;
@@ -3527,7 +3531,8 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
             PNG_CONST unsigned int
                isbit = id >> (in_bd-sbit);
 
-            double i, sample, encoded_sample, output, encoded_error, error;
+            double i, input_sample, encoded_sample, output;
+            double encoded_error, error;
             double es_lo, es_hi;
 
             /* First check on the 'perfect' result obtained from the
@@ -3546,7 +3551,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
              * value (nevertheless the error is still recorded - it's
              * interesting ;-)
              */
-            encoded_sample = pow(i, gamma) * outmax;
+            encoded_sample = pow(i, gamma_correction) * outmax;
             encoded_error = fabs(od-encoded_sample);
 
             if (encoded_error > maxerrout)
@@ -3564,7 +3569,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
              * know what it is - so assume the unencoded value is
              * perceptually linear.
              */
-            sample = pow(i, 1/file_gamma); /* In range 0..1 */
+            input_sample = pow(i, 1/file_gamma); /* In range 0..1 */
             output = od;
             output /= outmax;
             output = pow(output, screen_gamma);
@@ -3572,7 +3577,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
             /* Now we have the numbers for real errors, both absolute
              * values as as a percentage of the correct value (output):
              */
-            error = fabs(sample-output);
+            error = fabs(input_sample-output);
 
             if (error > maxerrabs)
                maxerrabs = error;
@@ -3581,10 +3586,10 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
              * quantization to dominate the percentage errors for low
              * output sample values:
              */
-            if (sample*maxpc > .5+maxabs)
+            if (input_sample*maxpc > .5+maxabs)
             {
-               double pcerr = error/sample;
-               if (pcerr > maxerrpc) maxerrpc = pcerr;
+               double percentage_error = error/input_sample;
+               if (percentage_error > maxerrpc) maxerrpc = percentage_error;
             }
 
             /* Now calculate the digitization limits for
@@ -3596,16 +3601,17 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
              * range 0..1:
              */
             {
-               double tmp = sample * maxpc;
+               double tmp = input_sample * maxpc;
                if (tmp < maxabs) tmp = maxabs;
 
                /* Low bound - the minimum of the three: */
                es_lo = encoded_sample - maxout;
 
-               if (es_lo > 0 && sample-tmp > 0)
+               if (es_lo > 0 && input_sample-tmp > 0)
                {
-                  double l = outmax * pow(sample-tmp, 1/screen_gamma);
-                  if (l < es_lo) es_lo = l;
+                  double low_value = outmax * pow(input_sample-tmp,
+                     1/screen_gamma);
+                  if (low_value < es_lo) es_lo = low_value;
                }
 
                else
@@ -3613,10 +3619,11 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
 
                es_hi = encoded_sample + maxout;
 
-               if (es_hi < outmax && sample+tmp < 1)
+               if (es_hi < outmax && input_sample+tmp < 1)
                {
-                  double h = outmax * pow(sample+tmp, 1/screen_gamma);
-                  if (h > es_hi) es_hi = h;
+                  double high_value = outmax * pow(input_sample+tmp,
+                     1/screen_gamma);
+                  if (high_value > es_hi) es_hi = high_value;
                }
 
                else
@@ -3645,7 +3652,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
 
                   if (tmp > 0)
                   {
-                     is_lo = outmax * pow(tmp, gamma) - maxout;
+                     is_lo = outmax * pow(tmp, gamma_correction) - maxout;
                      if (is_lo < 0) is_lo = 0;
                   }
 
@@ -3656,7 +3663,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
 
                   if (tmp < 1)
                   {
-                     is_hi = outmax * pow(tmp, gamma) + maxout;
+                     is_hi = outmax * pow(tmp, gamma_correction) + maxout;
                      if (is_hi > outmax) is_hi = outmax;
                   }
 
@@ -3883,15 +3890,15 @@ perform_gamma_threshold_tests(png_modifier *pm)
 
    while (next_format(&colour_type, &bit_depth))
    {
-      double gamma = 1.0;
-      while (gamma >= .4)
+      double test_gamma = 1.0;
+      while (test_gamma >= .4)
       {
          /* There's little point testing the interlacing vs non-interlacing,
           * but this can be set from the command line.
           */
          gamma_threshold_test(pm, colour_type, bit_depth, pm->interlace_type,
-            gamma, 1/gamma);
-         gamma *= .95;
+            test_gamma, 1/test_gamma);
+         test_gamma *= .95;
       }
 
       /* And a special test for sRGB */

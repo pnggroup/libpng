@@ -87,7 +87,7 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_gAMA_SUPPORTED
 void PNGFAPI
 png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
-    gamma)
+    file_gamma)
 {
    png_debug1(1, "in %s storage function", "gAMA");
 
@@ -98,15 +98,15 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
     * wrong, therefore storing them (and setting PNG_INFO_gAMA)
     * must be wrong too.
     */
-   if (gamma > (png_fixed_point)PNG_UINT_31_MAX)
+   if (file_gamma > (png_fixed_point)PNG_UINT_31_MAX)
       png_warning(png_ptr, "Gamma too large, ignored");
 
-   else if (gamma <= 0)
+   else if (file_gamma <= 0)
       png_warning(png_ptr, "Negative or zero gamma ignored");
 
    else
    {
-      info_ptr->gamma = gamma;
+      info_ptr->gamma = file_gamma;
       info_ptr->valid |= PNG_INFO_gAMA;
    }
 }
