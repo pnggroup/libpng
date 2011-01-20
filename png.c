@@ -555,13 +555,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.1beta06 - January 16, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.1beta06 - January 20, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.1beta06 - January 16, 2011\
+      return "libpng version 1.5.1beta06 - January 20, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1460,11 +1460,10 @@ png_fixed(png_structp png_ptr, double fp, png_const_charp text)
 {
    double r = floor(100000 * fp + .5);
 
-   if (r <= 2147483647. && r >= -2147483648.)
-      return (png_fixed_point)r;
+   if (r > 2147483647. || r < -2147483648.)
+      png_fixed_error(png_ptr, text);
 
-   png_fixed_error(png_ptr, text);
-   /*NOT REACHED*/
+   return (png_fixed_point)r;
 }
 #endif
 

@@ -1,5 +1,5 @@
 
-Libpng 1.5.1beta06 - January 16, 2011
+Libpng 1.5.1beta06 - January 20, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -51,17 +51,18 @@ Version 1.5.1beta04 [January 16, 2011]
     samples of each pixel, instead of sampling the red channel three times.
   Prefixed variable names index, div, exp, gamma with "png_" to avoid "shadow"
     warnings.
-  Revised png_fixed() in png.c to avoid compiler warning about reaching the
-    end without returning anything.
 
 Version 1.5.1beta05 [January 16, 2011]
   Changed variable names png_index, png_div, png_exp, and png_gamma to
     char_index, divisor, exp_b10, and gamma_val, respectively, and
     changed exp() back to png_exp().
 
-Version 1.5.1beta06 [January 16, 2011]
+Version 1.5.1beta06 [January 20, 2011]
   Prevent png_push_crc_skip() from hanging while reading an unknown chunk
     or an over-large compressed zTXt chunk with the progressive reader.
+  Eliminated more GCC "shadow" warnings.
+  Revised png_fixed() in png.c to avoid compiler warning about reaching the
+    end without returning anything.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
