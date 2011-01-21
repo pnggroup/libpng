@@ -1,5 +1,5 @@
 
-Libpng 1.5.1beta06 - January 20, 2011
+Libpng 1.5.1rc01 - January 21, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.1beta06.tar.xz (LZMA-compressed, recommended)
-   1.5.1beta06.tar.gz
-   1.5.1beta06.tar.bz2
+   1.5.1rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.1rc01.tar.gz
+   1.5.1rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp151b06.7z  (LZMA-compressed, recommended)
-   lp151b06.zip
+   lp151r01.7z  (LZMA-compressed, recommended)
+   lp151r01.zip
 
 Other information:
 
-   1.5.1beta06-README.txt
-   1.5.1beta06-LICENSE.txt
+   1.5.1rc01-README.txt
+   1.5.1rc01-LICENSE.txt
 
 Changes since the last public release (1.5.0):
 
@@ -63,6 +63,8 @@ Version 1.5.1beta06 [January 20, 2011]
   Eliminated more GCC "shadow" warnings.
   Revised png_fixed() in png.c to avoid compiler warning about reaching the
     end without returning anything.
+
+Version 1.5.1rc01 [January 21, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

@@ -3180,6 +3180,8 @@ Version 1.5.1beta06 [January 20, 2011]
   Revised png_fixed() in png.c to avoid compiler warning about reaching the
     end without returning anything.
 
+Version 1.5.1rc01 [January 21, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
