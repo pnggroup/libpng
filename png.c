@@ -1,8 +1,8 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.2 [May 6, 2010]
- * Copyright (c) 1998-2010 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.6 [January 21, 2011]
+ * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -470,7 +470,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
  * pointer before png_write_destroy() or png_read_destroy() are called.
  */
 png_voidp PNGAPI
-png_get_io_ptr(png_structp png_ptr)
+png_get_io_ptr(const_png_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
@@ -539,7 +539,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
 
 png_charp PNGAPI
-png_get_copyright(png_structp png_ptr)
+png_get_copyright(const_png_structp png_ptr)
 {
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
 #ifdef PNG_STRING_COPYRIGHT
@@ -547,13 +547,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.6beta04 - January 15, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.4.6beta04 - January 21, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.6beta04 - January 15, 2011\
+      return ((png_charp) "libpng version 1.4.6beta04 - January 21, 2011\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -570,7 +570,7 @@ png_get_copyright(png_structp png_ptr)
  * it is guaranteed that png.c uses the correct version of png.h.
  */
 png_charp PNGAPI
-png_get_libpng_ver(png_structp png_ptr)
+png_get_libpng_ver(const_png_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
@@ -578,7 +578,7 @@ png_get_libpng_ver(png_structp png_ptr)
 }
 
 png_charp PNGAPI
-png_get_header_ver(png_structp png_ptr)
+png_get_header_ver(const_png_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
@@ -586,7 +586,7 @@ png_get_header_ver(png_structp png_ptr)
 }
 
 png_charp PNGAPI
-png_get_header_version(png_structp png_ptr)
+png_get_header_version(const_png_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
    png_ptr = png_ptr;  /* Silence compiler warning about unused png_ptr */
