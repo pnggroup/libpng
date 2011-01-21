@@ -3181,6 +3181,7 @@ Version 1.5.1beta06 [January 20, 2011]
     end without returning anything.
 
 Version 1.5.1rc01 [January 21, 2011]
+  In the manual, describe the png_get_IHDR() arguments in the correct order.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

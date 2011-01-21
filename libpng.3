@@ -1599,15 +1599,17 @@ in until png_read_end() has read the chunk data following the image.
                      PNG_COLOR_MASK_COLOR
                      PNG_COLOR_MASK_ALPHA
 
+    interlace_type - (PNG_INTERLACE_NONE or
+                     PNG_INTERLACE_ADAM7)
+
+    compression_type - (must be PNG_COMPRESSION_TYPE_BASE
+                     for PNG 1.0)
+
     filter_method  - (must be PNG_FILTER_TYPE_BASE
                      for PNG 1.0, and can also be
                      PNG_INTRAPIXEL_DIFFERENCING if
                      the PNG datastream is embedded in
                      a MNG-1.0 datastream)
-    compression_type - (must be PNG_COMPRESSION_TYPE_BASE
-                     for PNG 1.0)
-    interlace_type - (PNG_INTERLACE_NONE or
-                     PNG_INTERLACE_ADAM7)
 
     Any or all of interlace_type, compression_type, or
     filter_method can be NULL if you are
@@ -1628,11 +1630,11 @@ in until png_read_end() has read the chunk data following the image.
                          info_ptr);
     color_type       = png_get_color_type(png_ptr,
                          info_ptr);
-    filter_method    = png_get_filter_type(png_ptr,
+    interlace_type   = png_get_interlace_type(png_ptr,
                          info_ptr);
     compression_type = png_get_compression_type(png_ptr,
                          info_ptr);
-    interlace_type   = png_get_interlace_type(png_ptr,
+    filter_method    = png_get_filter_type(png_ptr,
                          info_ptr);
 
     channels = png_get_channels(png_ptr, info_ptr);
