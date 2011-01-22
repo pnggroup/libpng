@@ -3188,7 +3188,10 @@ Version 1.5.1beta07 [January 22, 2011]
 
 Version 1.5.1beta08 [January 22, 2011]
   Added png_get_io_chunk_type() and deprecated png_get_io_chunk_name()
-  Added synopses for the IO_STATE functions to the manual.
+  Added synopses for the IO_STATE functions and other missing synopses
+    to the manual. Removed the synopses from libpngpf.3 because they
+    were out of date and no longer useful.  Better information can be
+    obtained by reading the prototypes and comments in pngpriv.h
 
 Version 1.5.1rc01 [January 22, 2011]
 
