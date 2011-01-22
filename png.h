@@ -2065,7 +2065,7 @@ PNG_EXPORT(199, png_uint_32, png_get_io_state, (png_structp png_ptr));
 
 PNG_EXPORTA(200, png_const_bytep, png_get_io_chunk_name,
     (png_structp png_ptr), PNG_DEPRECATED);
-PNG_EXPORT(200, png_uint_32, png_get_io_chunk_type,
+PNG_EXPORT(215, png_uint_32, png_get_io_chunk_type,
     (const_png_structp png_ptr));
 
 /* The flags returned by png_get_io_state() are the following: */
@@ -2235,7 +2235,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(215);
+  PNG_EXPORT_LAST_ORDINAL(216);
 #endif
 
 #ifdef __cplusplus
