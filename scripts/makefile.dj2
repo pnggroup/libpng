@@ -1,5 +1,5 @@
 # DJGPP (DOS gcc) makefile for libpng
-# Copyright (C) 2002, 2006, 2009-2010 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2006, 2009-2010-2011 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
 # This code is released under the libpng license.
