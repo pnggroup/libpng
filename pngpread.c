@@ -1786,7 +1786,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
 }
 
 png_voidp PNGAPI
-png_get_progressive_ptr(png_structp png_ptr)
+png_get_progressive_ptr(const_png_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);

@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.5.1 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -697,7 +697,7 @@ png_set_user_transform_info(png_structp png_ptr, png_voidp
  * are called.
  */
 png_voidp PNGAPI
-png_get_user_transform_ptr(png_structp png_ptr)
+png_get_user_transform_ptr(const_png_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
