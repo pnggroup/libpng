@@ -221,3 +221,4 @@ EXPORTS
  png_set_sCAL_fixed @213
  png_get_sCAL_fixed @214
  png_set_background_fixed @215
+ png_get_io_chunk_type @216
