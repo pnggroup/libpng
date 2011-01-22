@@ -16,6 +16,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
+\fBvoid png_build_grayscale_palette (int \fP\fIbit_depth\fP\fB, png_colorp \fIpalette\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_voidp png_calloc (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_chunk_benign_error (png_structp \fP\fIpng_ptr\fP\fB, png_const_charp \fIerror\fP\fB);\fP
 
 \fI\fB
@@ -48,7 +56,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBpng_structp png_create_read_struct_2(png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+\fBpng_structp png_create_read_struct_2 (png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
 
 \fI\fB
 
@@ -56,7 +64,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBpng_structp png_create_write_struct_2(png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+\fBpng_structp png_create_write_struct_2 (png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_data_freer (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIfreer\fP\fB, png_uint_32 \fImask)\fP\fB);\fP
 
 \fI\fB
 
@@ -72,6 +84,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
+\fBvoid png_err (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_error (png_structp \fP\fIpng_ptr\fP\fB, png_const_charp \fIerror\fP\fB);\fP
 
 \fI\fB
@@ -84,7 +100,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBvoid png_free_default(png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fIptr\fP\fB);\fP
+\fBvoid png_free_default (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fIptr\fP\fB);\fP
 
 \fI\fB
 
@@ -113,6 +129,12 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 \fI\fB
 
 \fBpng_uint_32 png_get_chunk_cache_max (const_png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fBpng_alloc_size_t png_get_chunk_malloc_max (const_png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -184,6 +206,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
+\fBpng_const_bytep png_get_io_chunk_name (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBpng_uint_32 png_get_io_chunk_type (const_png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
@@ -196,31 +222,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBpng_const_bytep png_get_io_chunk_name (png_structp \fIpng_ptr\fP\fB);\fP
-
-\fI\fB
-
 \fBpng_byte png_get_libpng_ver (const_png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_alloc_size_t png_get_chunk_malloc_max (const_png_structp \fIpng_ptr\fP\fB);\fP
-
-\fI\fB
-
-\fBpng_voidp png_get_mem_ptr(const_png_structp \fIpng_ptr\fP\fB);\fP
-
-\fI\fB
-
-\fBint png_get_num_cols (const_png_structp \fIpng_ptr\fP\fB);\fP
-
-\fI\fB
-
-\fBint png_get_num_passes (const_png_structp \fIpng_ptr\fP\fB);\fP
-
-\fI\fB
-
-\fBint png_get_num_rows (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_voidp png_get_mem_ptr (const_png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -240,7 +246,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
+\fBpng_uint_32 png_get_pHYs_dpi (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*res_x\fP\fB, png_uint_32 \fP\fI*res_y\fP\fB, int \fI*unit_type\fP\fB);\fP
+
+\fI\fB
+
 \fBpng_fixed_point png_get_pixel_aspect_ratio_fixed (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_pixels_per_inch (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -330,7 +344,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBpng_uint_32 png_get_user_height_max(const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_user_height_max (const_png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -362,6 +376,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
+\fBpng_uint_32 png_get_x_pixels_per_inch (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBpng_uint_32 png_get_x_pixels_per_meter (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
@@ -382,11 +400,19 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
+\fBpng_uint_32 png_get_y_pixels_per_inch (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBpng_uint_32 png_get_y_pixels_per_meter (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
 \fBint png_handle_as_unknown (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIchunk_name\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_info_init_3 (png_infopp \fP\fIinfo_ptr\fP\fB, png_size_t \fIpng_info_struct_size\fP\fB);\fP
 
 \fI\fB
 
@@ -402,7 +428,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBpng_voidp png_malloc_default(png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+\fBpng_voidp png_malloc_default (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_voidp png_malloc_warn (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_permit_mng_features (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fImng_features_permitted\fP\fB);\fP
 
 \fI\fB
 
@@ -442,7 +476,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBpng_save_int_32 (png_bytep \fP\fIbuf\fP\fB, png_int_32 \fIi\fP\fB);\fP
+\fBint png_reset_zstream (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_save_int_32 (png_bytep \fP\fIbuf\fP\fB, png_int_32 \fIi\fP\fB);\fP
 
 \fI\fB
 
@@ -463,6 +501,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 \fI\fB
 
 \fBvoid png_set_background_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_color_16p \fP\fIbackground_color\fP\fB, int \fP\fIbackground_gamma_code\fP\fB, int \fP\fIneed_expand\fP\fB, png_uint_32 \fIbackground_gamma\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_benign_errors (png_structp \fP\fIpng_ptr\fP\fB, int \fIallowed\fP\fB);\fP
 
 \fI\fB
 
@@ -518,7 +560,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBvoid png_set_expand_gray_1_2_4_to_8(png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_expand_gray_1_2_4_to_8 (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -558,7 +600,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBvoid png_set_gray_1_2_4_to_8(png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_gray_1_2_4_to_8 (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -606,7 +648,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBvoid png_set_mem_fn(png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+\fBvoid png_set_compression_buffer_size (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_mem_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
 
 \fI\fB
 
@@ -622,7 +668,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBvoid png_set_palette_to_rgb(png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_palette_to_rgb (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -651,6 +697,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 \fI\fB
 
 \fBvoid png_set_read_status_fn (png_structp \fP\fIpng_ptr\fP\fB, png_read_status_ptr \fIread_row_fn\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_read_user_chunk_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIuser_chunk_ptr\fP\fB, png_user_chunk_ptr \fIread_user_chunk_fn\fP\fB);\fP
 
 \fI\fB
 
@@ -686,12 +736,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fI\fB
-
-\fI\fB
-
-\fI\fB
-
 \fBvoid png_set_shift (png_structp \fP\fIpng_ptr\fP\fB, png_color_8p \fItrue_bits\fP\fB);\fP
 
 \fI\fB
@@ -720,6 +764,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
+\fBvoid png_set_strip_error_numbers (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIstrip_mode\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_set_swap (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
@@ -740,7 +788,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBvoid png_set_tRNS_to_alpha(png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_tRNS_to_alpha (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -748,11 +796,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 
 \fI\fB
 
-\fBvoid png_set_unknown_chunk_location(png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIchunk\fP\fB, int \fIlocation\fP\fB);\fP
-
-\fI\fB
-
-\fBvoid png_set_read_user_chunk_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIuser_chunk_ptr\fP\fB, png_user_chunk_ptr \fIread_user_chunk_fn\fP\fB);\fP
+\fBvoid png_set_unknown_chunk_location (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIchunk\fP\fB, int \fIlocation\fP\fB);\fP
 
 \fI\fB
 
@@ -773,10 +817,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 \fI\fB
 
 \fBvoid png_set_write_user_transform_fn (png_structp \fP\fIpng_ptr\fP\fB, png_user_transform_ptr \fIwrite_user_transform_fn\fP\fB);\fP
-
-\fI\fB
-
-\fBvoid png_set_compression_buffer_size(png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
 
 \fI\fB
 
