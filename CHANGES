@@ -3181,10 +3181,15 @@ Version 1.5.1beta06 [January 20, 2011]
   Revised png_fixed() in png.c to avoid compiler warning about reaching the
     end without returning anything.
 
-Version 1.5.1rc01 [January 22, 2011]
+Version 1.5.1beta07 [January 22, 2011]
   In the manual, describe the png_get_IHDR() arguments in the correct order.
   Added const_png_structp and const_png_infop types, and used them in
     prototypes for most png_get_*() functions.
+
+Version 1.5.1beta08 [January 22, 2011]
+  Added png_get_io_chunk_type() and deprecated png_get_io_chunk_name()
+
+Version 1.5.1rc01 [January 22, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

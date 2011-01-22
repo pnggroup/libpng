@@ -1013,6 +1013,15 @@ png_get_io_state (png_structp png_ptr)
    return png_ptr->io_state;
 }
 
+png_uint_32 PNGAPI
+png_get_io_chunk_type (const_png_structp png_ptr)
+{
+   return ((png_ptr->chunk_name[0] << 24) +
+           (png_ptr->chunk_name[1] << 16) +
+           (png_ptr->chunk_name[2] <<  8) +
+           (png_ptr->chunk_name[3]));
+}
+
 png_const_bytep PNGAPI
 png_get_io_chunk_name (png_structp png_ptr)
 {
