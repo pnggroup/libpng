@@ -2232,7 +2232,8 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  */
 
 /* The last ordinal number (this is the *last* one already used; the next
- * one to use is one more than this.)
+ * one to use is one more than this.)  Maintainer, remember to add an entry to
+ * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
   PNG_EXPORT_LAST_ORDINAL(216);

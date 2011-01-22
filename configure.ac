@@ -34,6 +34,7 @@ AC_CONFIG_SRCDIR([pngget.c])
 AM_CONFIG_HEADER(config.h)
 
 # Checks for programs.
+AC_LANG([C])
 AC_PROG_CC
 AC_PROG_LD
 AC_PROG_CPP
@@ -43,6 +44,28 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 LT_INIT([win32-dll])
+
+# On Solaris 10 and 12 CPP gets set to cc -E, however this still
+# does some input parsing.  We need strict ANSI-C style tokenization,
+# check this:
+AC_REQUIRE_CPP
+AC_MSG_CHECKING([for a C preprocessor that does not parse its input])
+AC_TRY_CPP([1.5.0 16BIT],
+   [DFNCPP="$CPP"],
+   [DFNCPP=""
+   sav_CPP="$CPP"
+   for CPP in "${CC-cc} -E" "${CC-cc} -E -traditional-cpp" "/lib/cpp" "cpp"; do
+      AC_TRY_CPP([1.5.0 16BIT],
+         [DFNCPP="$CPP"]
+         [break],,)
+   done
+   CPP="$sav_CPP"])
+if test -n "$DFNCPP"; then
+   AC_MSG_RESULT([$DFNCPP])
+   AC_SUBST(DFNCPP)
+else
+   AC_MSG_FAILURE([not found], 1)
+fi
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -76,7 +99,7 @@ AC_MSG_CHECKING([if libraries can be versioned])
 # support for version-script, but doesn't actually
 # DO anything with it.
 case $host in
-*cygwin* | *mingw32* )
+*cygwin* | *mingw32* | *interix* )
     have_ld_version_script=no
     AC_MSG_RESULT(no)
 ;;

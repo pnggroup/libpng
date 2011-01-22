@@ -81,6 +81,13 @@ CLEANFILES= dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
 config.sub configure depcomp install-sh ltmain.sh missing
 
+# DFNCPP is normally just CPP - the C preprocessor - but on Solaris and maybe
+# other operating systems (NeXT?) the C preprocessor selected by configure
+# checks input tokens for validity - effectively it performs part of the ANSI-C
+# parsing - and therefore fails with the .df files.  configure.ac has special
+# checks for this and sets DFNCPP appropriately.
+DFNCPP = @DFNCPP@
+
 SUFFIXES = .chk .dfn .out
 
 $(PNGLIB_BASENAME).pc: libpng.pc
@@ -119,7 +126,7 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 	rm -f $@ dfn.c dfn?.out
 	test -d scripts || mkdir scripts
 	echo '#include "$<"' >dfn.c
-	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
+	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c > dfn1.out
 	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p'\
 	    dfn1.out >dfn2.out

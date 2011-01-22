@@ -76,6 +76,10 @@ Version 1.5.1beta08 [January 22, 2011]
     to the manual. Removed the synopses from libpngpf.3 because they
     were out of date and no longer useful.  Better information can be
     obtained by reading the prototypes and comments in pngpriv.h
+  Attempted to fix cpp on Solaris with S. Studio 12 cc, fix build
+    Added a make macro DFNCPP that is a CPP that will accept the tokens in
+    a .dfn file and adds configure stuff to test for such a CPP.  ./configure
+    should fail if one is not available.
 
 Version 1.5.1rc01 [January 22, 2011]
 
