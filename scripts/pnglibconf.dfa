@@ -380,8 +380,10 @@ option WRITE_WEIGHTED_FILTER requires WRITE
 
 option WRITE_FLUSH requires WRITE
 
-# Note: this can be turned off explicitly, is this correct?
+# Note: these can be turned off explicitly if not required by the
+# apps implementing the user transforms
 option USER_TRANSFORM_PTR if READ_USER_TRANSFORM WRITE_USER_TRANSFORM
+option USER_TRANSFORM_INFO if READ_USER_TRANSFORM WRITE_USER_TRANSFORM
 
 # Any chunks you are not interested in, you can undef here.  The
 # ones that allocate memory may be expecially important (hIST,

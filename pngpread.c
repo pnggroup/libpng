@@ -41,6 +41,64 @@ png_process_data(png_structp png_ptr, png_infop info_ptr,
    }
 }
 
+png_size_t PNGAPI
+png_process_data_pause(png_structp png_ptr, int save)
+{
+   if (png_ptr != NULL)
+   {
+      /* It's easiest for the caller if we do the save, then the caller doesn't
+       * have to supply the same data again:
+       */
+      if (save)
+         png_push_save_buffer(png_ptr);
+      else
+      {
+         /* This includes any pending saved bytes: */
+         png_size_t remaining = png_ptr->buffer_size;
+         png_ptr->buffer_size = 0;
+
+         /* So subtract the saved buffer size, unless all the data
+          * is actually 'saved', in which case we just return 0
+          */
+         if (png_ptr->save_buffer_size < remaining)
+            return remaining - png_ptr->save_buffer_size;
+      }
+   }
+
+   return 0;
+}
+
+png_uint_32 PNGAPI
+png_process_data_skip(png_structp png_ptr)
+{
+   png_size_t remaining = 0;
+
+   if (png_ptr != NULL && png_ptr->process_mode == PNG_SKIP_MODE &&
+      png_ptr->skip_length > 0)
+   {
+      /* At the end of png_process_data the buffer size must be 0 (see the loop
+       * above) so we can detect a broken call here:
+       */
+      if (png_ptr->buffer_size != 0)
+         png_error(png_ptr,
+            "png_process_data_skip called inside png_process_data");
+
+      /* If is impossible for there to be a saved buffer at this point -
+       * otherwise we could not be in SKIP mode.  This will also happen if
+       * png_process_skip is called inside png_process_data (but only very
+       * rarely.)
+       */
+      if (png_ptr->save_buffer_size != 0)
+         png_error(png_ptr, "png_process_data_skip called with saved data");
+
+      remaining = png_ptr->skip_length;
+      png_ptr->skip_length = 0;
+      png_ptr->process_mode = PNG_READ_CHUNK_MODE;
+   }
+
+   return remaining;
+}
+
 /* What we do with the incoming data depends on what we were previously
  * doing before we ran out of data...
  */
@@ -1786,7 +1844,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
 }
 
 png_voidp PNGAPI
-png_get_progressive_ptr(const_png_structp png_ptr)
+png_get_progressive_ptr(png_const_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);

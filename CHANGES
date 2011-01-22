@@ -3197,7 +3197,13 @@ Version 1.5.1beta08 [January 22, 2011]
     a .dfn file and adds configure stuff to test for such a CPP.  ./configure
     should fail if one is not available.
 
-Version 1.5.1rc01 [January 22, 2011]
+Version 1.5.1beta09 [January 22, 2011]
+  Corrected const_png_ in png.h to png_const_ to avoid polluting the namespace.
+  Added png_get_current_row_number and png_get_current_pass_number for the
+  benefit of the user transform callback.
+  Added png_process_data_pause and png_process_data_skip for the benefit of
+  progressive readers that need to stop data processing or want to optimize
+  skipping of unread data (e.g. if the reader marks a chunk to be skipped.)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

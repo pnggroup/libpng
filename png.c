@@ -547,7 +547,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
 
 png_const_charp PNGAPI
-png_get_copyright(const_png_structp png_ptr)
+png_get_copyright(png_const_structp png_ptr)
 {
    PNG_UNUSED(png_ptr)  /* Silence compiler warning about unused png_ptr */
 #ifdef PNG_STRING_COPYRIGHT
@@ -578,14 +578,14 @@ png_get_copyright(const_png_structp png_ptr)
  * it is guaranteed that png.c uses the correct version of png.h.
  */
 png_const_charp PNGAPI
-png_get_libpng_ver(const_png_structp png_ptr)
+png_get_libpng_ver(png_const_structp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    return png_get_header_ver(png_ptr);
 }
 
 png_const_charp PNGAPI
-png_get_header_ver(const_png_structp png_ptr)
+png_get_header_ver(png_const_structp png_ptr)
 {
    /* Version of *.h files used when building libpng */
    PNG_UNUSED(png_ptr)  /* Silence compiler warning about unused png_ptr */
@@ -593,7 +593,7 @@ png_get_header_ver(const_png_structp png_ptr)
 }
 
 png_const_charp PNGAPI
-png_get_header_version(const_png_structp png_ptr)
+png_get_header_version(png_const_structp png_ptr)
 {
    /* Returns longer string containing both version and date */
    PNG_UNUSED(png_ptr)  /* Silence compiler warning about unused png_ptr */

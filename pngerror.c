@@ -423,7 +423,7 @@ png_set_error_fn(png_structp png_ptr, png_voidp error_ptr,
  * pointer before png_write_destroy and png_read_destroy are called.
  */
 png_voidp PNGAPI
-png_get_error_ptr(const_png_structp png_ptr)
+png_get_error_ptr(png_const_structp png_ptr)
 {
    if (png_ptr == NULL)
       return NULL;

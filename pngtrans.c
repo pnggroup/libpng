@@ -672,6 +672,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
 void PNGAPI
 png_set_user_transform_info(png_structp png_ptr, png_voidp
    user_transform_ptr, int user_transform_depth, int user_transform_channels)
@@ -680,33 +681,42 @@ png_set_user_transform_info(png_structp png_ptr, png_voidp
 
    if (png_ptr == NULL)
       return;
-#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
    png_ptr->user_transform_ptr = user_transform_ptr;
    png_ptr->user_transform_depth = (png_byte)user_transform_depth;
    png_ptr->user_transform_channels = (png_byte)user_transform_channels;
-#else
-   if (user_transform_ptr || user_transform_depth || user_transform_channels)
-      png_warning(png_ptr,
-        "This version of libpng does not support user transform info");
-#endif
 }
+#endif
 
 /* This function returns a pointer to the user_transform_ptr associated with
  * the user transform functions.  The application should free any memory
  * associated with this pointer before png_write_destroy and png_read_destroy
  * are called.
  */
+#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
 png_voidp PNGAPI
-png_get_user_transform_ptr(const_png_structp png_ptr)
+png_get_user_transform_ptr(png_const_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
 
-#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
    return ((png_voidp)png_ptr->user_transform_ptr);
-#else
-   return (NULL);
+}
 #endif
+
+png_uint_32 PNGAPI
+png_get_current_row_number(png_const_structp png_ptr)
+{
+   if (png_ptr != NULL)
+      return png_ptr->row_number;
+   return PNG_UINT_32_MAX; /* help the app not to fail silently */
+}
+
+png_byte PNGAPI
+png_get_current_pass_number(png_const_structp png_ptr)
+{
+   if (png_ptr != NULL)
+      return png_ptr->pass;
+   return 8; /* invalid */
 }
 #endif /* PNG_READ_USER_TRANSFORM_SUPPORTED ||
           PNG_WRITE_USER_TRANSFORM_SUPPORTED */
