@@ -3188,6 +3188,7 @@ Version 1.5.1beta07 [January 22, 2011]
 
 Version 1.5.1beta08 [January 22, 2011]
   Added png_get_io_chunk_type() and deprecated png_get_io_chunk_name()
+  Added synopses for the IO_STATE functions to the manual.
 
 Version 1.5.1rc01 [January 22, 2011]
 
