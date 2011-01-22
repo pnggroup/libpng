@@ -2747,11 +2747,13 @@ version 1.4.6beta02 [January 14, 2011]
 version 1.4.6beta03 [January 14, 2011]
   Fixed some typecasts in png_debug statements (Cosmin).
 
-version 1.4.6beta04 [January 21, 2011]
+version 1.4.6beta04 [January 22, 2011]
   Updated documentation of png_set|get_tRNS() (Thomas Klausner).
   Added const_png_structp and const_png_infop types, and used them in
     prototypes for most png_get_*() functions.
   In the manual, describe the png_get_IHDR() arguments in the correct order.
+  Ported change in png_do_rgb_to_gray() from libpng-1.5.1, to make
+    it more robust against internal libpng coding errors.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

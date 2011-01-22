@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.4.6 [January 21, 2011]
+ * Last changed in libpng 1.4.6 [January 22, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -470,7 +470,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
  * pointer before png_write_destroy() or png_read_destroy() are called.
  */
 png_voidp PNGAPI
-png_get_io_ptr(const_png_structp png_ptr)
+png_get_io_ptr(png_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
@@ -547,13 +547,13 @@ png_get_copyright(const_png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.6beta04 - January 21, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.4.6beta04 - January 22, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.6beta04 - January 21, 2011\
+      return ((png_charp) "libpng version 1.4.6beta04 - January 22, 2011\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
