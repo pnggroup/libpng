@@ -1,5 +1,5 @@
 
-Libpng 1.5.1beta08 - January 23, 2011
+Libpng 1.5.1beta09 - January 23, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.1beta08.tar.xz (LZMA-compressed, recommended)
-   1.5.1beta08.tar.gz
-   1.5.1beta08.tar.bz2
+   1.5.1beta09.tar.xz (LZMA-compressed, recommended)
+   1.5.1beta09.tar.gz
+   1.5.1beta09.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp151b08.7z  (LZMA-compressed, recommended)
-   lp151b08.zip
+   lp151b09.7z  (LZMA-compressed, recommended)
+   lp151b09.zip
 
 Other information:
 
-   1.5.1beta08-README.txt
-   1.5.1beta08-LICENSE.txt
+   1.5.1beta09-README.txt
+   1.5.1beta09-LICENSE.txt
 
 Changes since the last public release (1.5.0):
 
@@ -86,6 +86,8 @@ Version 1.5.1beta08 [January 23, 2011]
   Added png_process_data_pause and png_process_data_skip for the benefit of
     progressive readers that need to stop data processing or want to optimize
     skipping of unread data (e.g. if the reader marks a chunk to be skipped.)
+
+Version 1.5.1beta09 [January 23, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
