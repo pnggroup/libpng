@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.4.6 [March 8, 2011]
+ * Last changed in libpng 1.4.6 [January 14, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1337,8 +1337,8 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* Read rest of file, and get additional chunks in info_ptr - REQUIRED */
    png_read_end(png_ptr, info_ptr);
 
-   PNG_UNUSED(transforms)   /* Quiet compiler warnings */
-   PNG_UNUSED(params)
+   transforms = transforms; /* Quiet compiler warnings */
+   params = params;
 
 }
 #endif /* PNG_INFO_IMAGE_SUPPORTED */

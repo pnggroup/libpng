@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.6 [March 8, 2011]
+ * Last changed in libpng 1.4.6 [January 14, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -387,7 +387,7 @@ static void
 pngtest_flush(png_structp png_ptr)
 {
    /* Do nothing; fflush() is said to be just a waste of energy. */
-   PNG_UNUSED(png_ptr)   /* Stifle compiler warning */
+   png_ptr = png_ptr;  /* Stifle compiler warning */
 }
 #endif
 
