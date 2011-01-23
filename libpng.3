@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "January 22, 2011"
+.TH LIBPNG 3 "January 23, 2011"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 .SH SYNOPSIS
@@ -12,7 +12,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_benign_error (png_structp \fP\fIpng_ptr\fP\fB, png_const_charp \fIerror\fP\fB);\fP
+\fBvoid png_benign_errors (png_structp \fP\fIpng_ptr\fP\fB, png_const_charp \fIerror\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_build_grayscale_palette (int \fP\fIbit_depth\fP\fB, png_colorp \fIpalette\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_voidp png_calloc (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
 
 \fI\fB
 
@@ -48,7 +56,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_structp png_create_read_struct_2(png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+\fBpng_structp png_create_read_struct_2 (png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
 
 \fI\fB
 
@@ -56,7 +64,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_structp png_create_write_struct_2(png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+\fBpng_structp png_create_write_struct_2 (png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_data_freer (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIfreer\fP\fB, png_uint_32 \fImask)\fP\fB);\fP
 
 \fI\fB
 
@@ -72,6 +84,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
+\fBvoid png_err (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_error (png_structp \fP\fIpng_ptr\fP\fB, png_const_charp \fIerror\fP\fB);\fP
 
 \fI\fB
@@ -84,7 +100,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_free_default(png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fIptr\fP\fB);\fP
+\fBvoid png_free_default (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fIptr\fP\fB);\fP
 
 \fI\fB
 
@@ -92,75 +108,81 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_byte png_get_bit_depth (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_byte png_get_bit_depth (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_bKGD (const_png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_color_16p \fI*background\fP\fB);\fP
+\fBpng_uint_32 png_get_bKGD (png_const_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_color_16p \fI*background\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_byte png_get_channels (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_byte png_get_channels (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_cHRM (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, double \fP\fI*white_x\fP\fB, double \fP\fI*white_y\fP\fB, double \fP\fI*red_x\fP\fB, double \fP\fI*red_y\fP\fB, double \fP\fI*green_x\fP\fB, double \fP\fI*green_y\fP\fB, double \fP\fI*blue_x\fP\fB, double \fI*blue_y\fP\fB);\fP
+\fBpng_uint_32 png_get_cHRM (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, double \fP\fI*white_x\fP\fB, double \fP\fI*white_y\fP\fB, double \fP\fI*red_x\fP\fB, double \fP\fI*red_y\fP\fB, double \fP\fI*green_x\fP\fB, double \fP\fI*green_y\fP\fB, double \fP\fI*blue_x\fP\fB, double \fI*blue_y\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_cHRM_fixed (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*white_x\fP\fB, png_uint_32 \fP\fI*white_y\fP\fB, png_uint_32 \fP\fI*red_x\fP\fB, png_uint_32 \fP\fI*red_y\fP\fB, png_uint_32 \fP\fI*green_x\fP\fB, png_uint_32 \fP\fI*green_y\fP\fB, png_uint_32 \fP\fI*blue_x\fP\fB, png_uint_32 \fI*blue_y\fP\fB);\fP
+\fBpng_uint_32 png_get_cHRM_fixed (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*white_x\fP\fB, png_uint_32 \fP\fI*white_y\fP\fB, png_uint_32 \fP\fI*red_x\fP\fB, png_uint_32 \fP\fI*red_y\fP\fB, png_uint_32 \fP\fI*green_x\fP\fB, png_uint_32 \fP\fI*green_y\fP\fB, png_uint_32 \fP\fI*blue_x\fP\fB, png_uint_32 \fI*blue_y\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_chunk_cache_max (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_chunk_cache_max (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_byte png_get_color_type (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fI\fB
+
+\fBpng_alloc_size_t png_get_chunk_malloc_max (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_compression_buffer_size (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_byte png_get_color_type (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_byte png_get_compression_type (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_compression_buffer_size (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_byte png_get_copyright (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_byte png_get_compression_type (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_voidp png_get_error_ptr (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_byte png_get_copyright (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_byte png_get_filter_type (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_voidp png_get_error_ptr (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_gAMA (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, double \fI*file_gamma\fP\fB);\fP
+\fBpng_byte png_get_filter_type (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_gAMA_fixed (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fI*int_file_gamma\fP\fB);\fP
+\fBpng_uint_32 png_get_gAMA (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, double \fI*file_gamma\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_byte png_get_header_ver (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_gAMA_fixed (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fI*int_file_gamma\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_byte png_get_header_version (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_byte png_get_header_ver (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_hIST (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_uint_16p \fI*hist\fP\fB);\fP
+\fBpng_byte png_get_header_version (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_iCCP (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_charpp \fP\fIname\fP\fB, int \fP\fI*compression_type\fP\fB, png_charpp \fP\fIprofile\fP\fB, png_uint_32 \fI*proflen\fP\fB);\fP
+\fBpng_uint_32 png_get_hIST (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_16p \fI*hist\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_iCCP (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_charpp \fP\fIname\fP\fB, int \fP\fI*compression_type\fP\fB, png_bytepp \fP\fIprofile\fP\fB, png_uint_32 \fI*proflen\fP\fB);\fP
 
 \fI\fB
 
@@ -168,11 +190,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_uint_32 png_get_image_height (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_image_height (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_image_width (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_image_width (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -180,11 +202,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_byte png_get_interlace_type (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_byte png_get_interlace_type (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_voidp png_get_io_chunk_name (png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_const_bytep png_get_io_chunk_name (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -192,81 +214,105 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_byte png_get_libpng_ver (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_io_state (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_alloc_size_t png_get_chunk_malloc_max (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_byte png_get_libpng_ver (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_voidp png_get_mem_ptr(const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_voidp png_get_mem_ptr (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_oFFs (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*offset_x\fP\fB, png_uint_32 \fP\fI*offset_y\fP\fB, int \fI*unit_type\fP\fB);\fP
+\fBpng_uint_32 png_get_oFFs (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*offset_x\fP\fB, png_uint_32 \fP\fI*offset_y\fP\fB, int \fI*unit_type\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_pCAL (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fI*purpose\fP\fB, png_int_32 \fP\fI*X0\fP\fB, png_int_32 \fP\fI*X1\fP\fB, int \fP\fI*type\fP\fB, int \fP\fI*nparams\fP\fB, png_charp \fP\fI*units\fP\fB, png_charpp \fI*params\fP\fB);\fP
+\fBpng_uint_32 png_get_pCAL (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fI*purpose\fP\fB, png_int_32 \fP\fI*X0\fP\fB, png_int_32 \fP\fI*X1\fP\fB, int \fP\fI*type\fP\fB, int \fP\fI*nparams\fP\fB, png_charp \fP\fI*units\fP\fB, png_charpp \fI*params\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_pHYs (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*res_x\fP\fB, png_uint_32 \fP\fI*res_y\fP\fB, int \fI*unit_type\fP\fB);\fP
+\fBpng_uint_32 png_get_pHYs (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*res_x\fP\fB, png_uint_32 \fP\fI*res_y\fP\fB, int \fI*unit_type\fP\fB);\fP
 
 \fI\fB
 
-\fBfloat png_get_pixel_aspect_ratio (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBfloat png_get_pixel_aspect_ratio (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_pixels_per_meter (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_pHYs_dpi (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*res_x\fP\fB, png_uint_32 \fP\fI*res_y\fP\fB, int \fI*unit_type\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_voidp png_get_progressive_ptr (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_fixed_point png_get_pixel_aspect_ratio_fixed (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_PLTE (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_colorp \fP\fI*palette\fP\fB, int \fI*num_palette\fP\fB);\fP
+\fBpng_uint_32 png_get_pixels_per_inch (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_byte png_get_rgb_to_gray_status (const_png_structp \fIpng_ptr)
-
-\fBpng_uint_32 png_get_rowbytes (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_pixels_per_meter (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_bytepp png_get_rows (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_voidp png_get_progressive_ptr (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_sBIT (const_png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_color_8p \fI*sig_bit\fP\fB);\fP
+\fBpng_uint_32 png_get_PLTE (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_colorp \fP\fI*palette\fP\fB, int \fI*num_palette\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_bytep png_get_signature (const_png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_byte png_get_rgb_to_gray_status (png_const_structp \fIpng_ptr)
+
+\fBpng_uint_32 png_get_rowbytes (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_sPLT (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_spalette_p \fI*splt_ptr\fP\fB);\fP
+\fBpng_bytepp png_get_rows (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_sRGB (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, int \fI*intent\fP\fB);\fP
+\fBpng_uint_32 png_get_sBIT (png_const_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_color_8p \fI*sig_bit\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_text (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_textp \fP\fI*text_ptr\fP\fB, int \fI*num_text\fP\fB);\fP
+\fBvoid png_get_sCAL (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, int* \fP\fIunit\fP\fB, double* \fP\fIwidth\fP\fB, double* \fIheight\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_tIME (const_png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_timep \fI*mod_time\fP\fB);\fP
+\fBvoid png_get_sCAL_fixed (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, int* \fP\fIunit\fP\fB, png_fixed_pointp \fP\fIwidth\fP\fB, png_fixed_pointp \fIheight\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_tRNS (const_png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fP\fI*trans_alpha\fP\fB, int \fP\fI*num_trans\fP\fB, png_color_16p \fI*trans_color\fP\fB);\fP
+\fBvoid png_get_sCAL_s (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, int* \fP\fIunit\fP\fB, png_charpp \fP\fIwidth\fP\fB, png_charpp \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_bytep png_get_signature (png_const_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_sPLT (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_spalette_p \fI*splt_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_sRGB (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, int \fI*intent\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_text (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_textp \fP\fI*text_ptr\fP\fB, int \fI*num_text\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_tIME (png_const_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_timep \fI*mod_time\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_tRNS (png_const_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fP\fI*trans_alpha\fP\fB, int \fP\fI*num_trans\fP\fB, png_color_16p \fI*trans_color\fP\fB);\fP
 
 \fI\fB
 
@@ -276,7 +322,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_uint_32 png_get_uint_31 (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIbuf)
+\fBpng_uint_32 png_get_uint_31 (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIbuf\fP\fB);\fP
 
 \fI\fB
 
@@ -286,55 +332,83 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_uint_32 png_get_unknown_chunks (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_unknown_chunkpp \fIunknowns\fP\fB);\fP
+\fBpng_uint_32 png_get_unknown_chunks (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_unknown_chunkpp \fIunknowns\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_voidp png_get_user_chunk_ptr (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_voidp png_get_user_chunk_ptr (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_user_height_max(const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_user_height_max (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_voidp png_get_user_transform_ptr (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_voidp png_get_user_transform_ptr (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_user_width_max (const_png_structp \fIpng_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_user_width_max (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_valid (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fIflag\fP\fB);\fP
+\fBpng_uint_32 png_get_valid (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fIflag\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_int_32 png_get_x_offset_microns (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBfloat png_get_x_offset_inches (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_int_32 png_get_x_offset_pixels (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_fixed_point png_get_x_offset_inches_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_x_pixels_per_meter (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_int_32 png_get_x_offset_microns (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_int_32 png_get_y_offset_microns (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_int_32 png_get_x_offset_pixels (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_int_32 png_get_y_offset_pixels (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_x_pixels_per_inch (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBpng_uint_32 png_get_y_pixels_per_meter (const_png_structp \fP\fIpng_ptr\fP\fB, const_png_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_uint_32 png_get_x_pixels_per_meter (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBfloat png_get_y_offset_inches (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_fixed_point png_get_y_offset_inches_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_int_32 png_get_y_offset_microns (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_int_32 png_get_y_offset_pixels (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_y_pixels_per_inch (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_y_pixels_per_meter (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
 \fBint png_handle_as_unknown (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIchunk_name\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_info_init_3 (png_infopp \fP\fIinfo_ptr\fP\fB, png_size_t \fIpng_info_struct_size\fP\fB);\fP
 
 \fI\fB
 
@@ -346,15 +420,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_voidp png_malloc_default(png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
+\fBpng_voidp png_malloc_default (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
 
 \fI\fB
 
-\fBvoidp png_memcpy (png_voidp \fP\fIs1\fP\fB, png_voidp \fP\fIs2\fP\fB, png_size_t \fIsize\fP\fB);\fP
+\fBpng_voidp png_malloc_warn (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
 
 \fI\fB
 
-\fBvoidp png_memset (png_voidp \fP\fIs1\fP\fB, int \fP\fIvalue\fP\fB, png_size_t \fIsize\fP\fB);\fP
+\fBpng_uint_32 png_permit_mng_features (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fImng_features_permitted\fP\fB);\fP
 
 \fI\fB
 
@@ -394,7 +468,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBpng_save_int_32 (png_bytep \fP\fIbuf\fP\fB, png_int_32 \fIi\fP\fB);\fP
+\fBint png_reset_zstream (png_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_save_int_32 (png_bytep \fP\fIbuf\fP\fB, png_int_32 \fIi\fP\fB);\fP
 
 \fI\fB
 
@@ -411,6 +489,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 \fI\fB
 
 \fBvoid png_set_background (png_structp \fP\fIpng_ptr\fP\fB, png_color_16p \fP\fIbackground_color\fP\fB, int \fP\fIbackground_gamma_code\fP\fB, int \fP\fIneed_expand\fP\fB, double \fIbackground_gamma\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_background_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_color_16p \fP\fIbackground_color\fP\fB, int \fP\fIbackground_gamma_code\fP\fB, int \fP\fIneed_expand\fP\fB, png_uint_32 \fIbackground_gamma\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_benign_errors (png_structp \fP\fIpng_ptr\fP\fB, int \fIallowed\fP\fB);\fP
 
 \fI\fB
 
@@ -466,7 +552,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_expand_gray_1_2_4_to_8(png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_expand_gray_1_2_4_to_8 (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -482,11 +568,19 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
+\fBvoid png_set_filter_heuristics_fixed (png_structp \fP\fIpng_ptr\fP\fB, int \fP\fIheuristic_method\fP\fB, int \fP\fInum_weights\fP\fB, png_fixed_point_p \fP\fIfilter_weights\fP\fB, png_fixed_point_p \fIfilter_costs\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_set_flush (png_structp \fP\fIpng_ptr\fP\fB, int \fInrows\fP\fB);\fP
 
 \fI\fB
 
 \fBvoid png_set_gamma (png_structp \fP\fIpng_ptr\fP\fB, double \fP\fIscreen_gamma\fP\fB, double \fIdefault_file_gamma\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_gamma_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fP\fIscreen_gamma\fP\fB, png_uint_32 \fIdefault_file_gamma\fP\fB);\fP
 
 \fI\fB
 
@@ -498,7 +592,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_gray_1_2_4_to_8(png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_gray_1_2_4_to_8 (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -510,7 +604,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_charp \fP\fIprofile\fP\fB, png_uint_32 \fIproflen\fP\fB);\fP
+\fBvoid png_set_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_const_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_const_bytep \fP\fIprofile\fP\fB, png_uint_32 \fIproflen\fP\fB);\fP
 
 \fI\fB
 
@@ -546,7 +640,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_mem_fn(png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
+\fBvoid png_set_compression_buffer_size (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_mem_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
 
 \fI\fB
 
@@ -562,7 +660,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_palette_to_rgb(png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_palette_to_rgb (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -594,6 +692,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
+\fBvoid png_set_read_user_chunk_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIuser_chunk_ptr\fP\fB, png_user_chunk_ptr \fIread_user_chunk_fn\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_set_read_user_transform_fn (png_structp \fP\fIpng_ptr\fP\fB, png_user_transform_ptr \fIread_user_transform_fn\fP\fB);\fP
 
 \fI\fB
@@ -602,7 +704,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_rgb_to_gray_fixed (png_structp \fP\fIpng_ptr\fP\fB, int error_action png_fixed_point \fP\fIred\fP\fB, png_fixed_point \fIgreen\fP\fB);\fP
+\fBvoid png_set_rgb_to_gray_fixed (png_structp \fP\fIpng_ptr\fP\fB, int error_action png_uint_32 \fP\fIred\fP\fB, png_uint_32 \fIgreen\fP\fB);\fP
 
 \fI\fB
 
@@ -614,7 +716,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_sCAL (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_charp \fP\fIunit\fP\fB, double \fP\fIwidth\fP\fB, double \fIheight\fP\fB);\fP
+\fBvoid png_set_sCAL (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIunit\fP\fB, double \fP\fIwidth\fP\fB, double \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_sCAL_fixed (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIunit\fP\fB, png_fixed_point \fP\fIwidth\fP\fB, png_fixed_point \fIheight\fP\fB);\fP
+
+\fI\fB
+
+\fBvoid png_set_sCAL_s (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIunit\fP\fB, png_charp \fP\fIwidth\fP\fB, png_charp \fIheight\fP\fB);\fP
 
 \fI\fB
 
@@ -646,6 +756,10 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
+\fBvoid png_set_strip_error_numbers (png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIstrip_mode\fP\fB);\fP
+
+\fI\fB
+
 \fBvoid png_set_swap (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
@@ -666,7 +780,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_tRNS_to_alpha(png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_tRNS_to_alpha (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -674,11 +788,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 
 \fI\fB
 
-\fBvoid png_set_unknown_chunk_location(png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIchunk\fP\fB, int \fIlocation\fP\fB);\fP
-
-\fI\fB
-
-\fBvoid png_set_read_user_chunk_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fIuser_chunk_ptr\fP\fB, png_user_chunk_ptr \fIread_user_chunk_fn\fP\fB);\fP
+\fBvoid png_set_unknown_chunk_location (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIchunk\fP\fB, int \fIlocation\fP\fB);\fP
 
 \fI\fB
 
@@ -699,10 +809,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.6beta04
 \fI\fB
 
 \fBvoid png_set_write_user_transform_fn (png_structp \fP\fIpng_ptr\fP\fB, png_user_transform_ptr \fIwrite_user_transform_fn\fP\fB);\fP
-
-\fI\fB
-
-\fBvoid png_set_compression_buffer_size(png_structp \fP\fIpng_ptr\fP\fB, png_uint_32 \fIsize\fP\fB);\fP
 
 \fI\fB
 
@@ -785,11 +891,11 @@ library supports encoding, decoding, and various manipulations of
 the Portable Network Graphics (PNG) format image files.  It uses the
 .IR zlib(3)
 compression library.
-Following is a copy of the libpng.txt file that accompanies libpng.
+Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.6beta04 - January 22, 2011
+ libpng version 1.4.6beta04 - January 23, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
@@ -800,7 +906,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.6beta04 - January 22, 2011
+ libpng versions 0.97, January 1998, through 1.4.6beta04 - January 23, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -4094,7 +4200,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIII. Y2K Compliance in libpng
 
-January 22, 2011
+January 23, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -4349,7 +4455,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.4.6beta04 - January 22, 2011:
+Libpng version 1.4.6beta04 - January 23, 2011:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4372,7 +4478,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.4.6beta04, January 22, 2011, are
+libpng versions 1.2.6, August 15, 2004, through 1.4.6beta04, January 23, 2011, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4471,7 +4577,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-January 22, 2011
+January 23, 2011
 
 .\" end of man page
 
