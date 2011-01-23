@@ -2754,9 +2754,15 @@ version 1.4.6beta04 [January 22, 2011]
   In the manual, describe the png_get_IHDR() arguments in the correct order.
   Ported change in png_do_rgb_to_gray() from libpng-1.5.1, to make
     it more robust against internal libpng coding errors.
+
+version 1.4.6beta05 [January 23, 2011]
+
   Updated the synopses in the manual to reflect recent changes.
   Fixed a typo in the *.def files and deleted entries that are now
     declared in pngpriv.h
+
+version 1.4.6beta06 [January 23, 2011]
+
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

@@ -1,5 +1,5 @@
 
-Libpng 1.4.6beta04 - January 23, 2011
+Libpng 1.4.6beta05 - January 23, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.6beta04.tar.xz (LZMA-compressed, recommended)
-   1.4.6beta04.tar.gz
-   1.4.6beta04.tar.bz2
+   1.4.6beta05.tar.xz (LZMA-compressed, recommended)
+   1.4.6beta05.tar.gz
+   1.4.6beta05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp146b04.7z (LZMA-compressed, recommended)
-   lp146b04.zip
+   lp146b05.7z (LZMA-compressed, recommended)
+   lp146b05.zip
 
 Other information:
 
-   1.4.6beta04-README.txt
-   1.4.6beta04-LICENSE.txt
+   1.4.6beta05-README.txt
+   1.4.6beta05-LICENSE.txt
 
 Changes since the last public release (1.4.5):
 
@@ -43,9 +43,13 @@ version 1.4.6beta04 [January 22, 2011]
   Added png_const_structp and png_const_infop types, and used them in
     prototypes for most png_get_*() functions.
   In the manual, describe the png_get_IHDR() arguments in the correct order.
+
+version 1.4.6beta05 [January 23, 2011]
   Updated the synopses in the manual to reflect recent changes.
   Fixed a typo in the *.def files and deleted entries that are now
     declared in pngpriv.h
+
+version 1.4.6beta06 [January 23, 2011]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
