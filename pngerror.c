@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.6 [January 22, 2011]
+ * Last changed in libpng 1.4.6 [January 23, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -380,7 +380,7 @@ png_set_error_fn(png_structp png_ptr, png_voidp error_ptr,
  * pointer before png_write_destroy and png_read_destroy are called.
  */
 png_voidp PNGAPI
-png_get_error_ptr(const_png_structp png_ptr)
+png_get_error_ptr(png_const_structp png_ptr)
 {
    if (png_ptr == NULL)
       return NULL;

@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.4.6 [January 22, 2011]
+ * Last changed in libpng 1.4.6 [January 23, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1757,7 +1757,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
 }
 
 png_voidp PNGAPI
-png_get_progressive_ptr(const_png_structp png_ptr)
+png_get_progressive_ptr(png_const_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
