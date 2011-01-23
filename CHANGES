@@ -3201,7 +3201,7 @@ Version 1.5.1beta08 [January 23, 2011]
     benefit of the user transform callback.
   Added png_process_data_pause and png_process_data_skip for the benefit of
     progressive readers that need to stop data processing or want to optimize
-    skipping of unread data (e.g. if the reader marks a chunk to be skipped.)
+    skipping of unread data (e.g., if the reader marks a chunk to be skipped.)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
