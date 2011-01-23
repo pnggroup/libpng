@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "January 22, 2011"
+.TH LIBPNG 3 "January 23, 2011"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 .SH SYNOPSIS
@@ -151,6 +151,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 \fI\fB
 
 \fBpng_byte png_get_copyright (png_const_structp \fIpng_ptr\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_get_current_row_number \fI(png_const_structp\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_byte png_get_current_pass_number \fI(png_const_structp\fP\fB);\fP
 
 \fI\fB
 
@@ -441,6 +449,14 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.1beta08
 \fI\fB
 
 \fBvoid png_process_data (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fP\fIbuffer\fP\fB, png_size_t \fIbuffer_size\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_size_t png_process_data_pause \fP\fI(png_structp\fP\fB, int \fIsave\fP\fB);\fP
+
+\fI\fB
+
+\fBpng_uint_32 png_process_data_skip \fI(png_structp\fP\fB);\fP
 
 \fI\fB
 
@@ -903,7 +919,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.1beta08 - January 22, 2011
+ libpng version 1.5.1beta08 - January 23, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -914,7 +930,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.1beta08 - January 22, 2011
+ libpng versions 0.97, January 1998, through 1.5.1beta08 - January 23, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -2418,7 +2434,20 @@ You must supply the function
         row_info, png_bytep data)
 
 See pngtest.c for a working example.  Your function will be called
-after all of the other transformations have been processed.
+after all of the other transformations have been processed.  Take care with
+interlaced images if you do the interlace yourself - the width of the row is the
+width in 'row_info', not the overall image width.
+
+If supported libpng provides two information routines that you can use to find
+where you are in processing the image:
+
+   png_get_current_pass_number(png_structp png_ptr);
+   png_get_current_row_number(png_structp png_ptr);
+
+Don't try using these outside a transform callback - firstly they are only
+supported if user transforms are supported, secondly they may well return
+unexpected results unless the row is actually being processed at the moment they
+are called.
 
 You can also set up a pointer to a user structure for use by your
 callback function, and you can inform libpng that your transform
@@ -2848,6 +2877,12 @@ png_infop info_ptr;
        so there.
      */
     png_process_data(png_ptr, info_ptr, buffer, length);
+
+    /* At this point you can call png_process_data_skip if
+       you want to handle data the library will skip yourself;
+       it simply returns the number of bytes to skip (and stops
+       libpng skipping that number of bytes on the next
+       png_process_data call).
     return 0;
  }
 
@@ -2871,6 +2906,16 @@ png_infop info_ptr;
 
        This is where you turn on interlace handling,
        assuming you don't want to do it yourself.
+
+       If you need to you can stop the processing of
+       your original input data at this point by calling
+       png_process_data_pause.  This returns the number
+       of unprocessed bytes from the last png_process_data
+       call - it is up to you to ensure that the next call
+       sees these bytes again.  If you don't want to bother
+       with this you can get libpng to cache the unread
+       bytes by setting the 'save' parameter (see png.h) but
+       then libpng will have to copy the data internally.
      */
  }
 
@@ -2920,6 +2965,9 @@ png_infop info_ptr;
        for interlaced images), you will have to pass
        the current row, and the function will combine
        the old row and the new row.
+
+       You can also call png_process_data_pause in this
+       callback - see above.
     */
  }
 
@@ -3651,7 +3699,14 @@ You must supply the function
        row_info, png_bytep data)
 
 See pngtest.c for a working example.  Your function will be called
-before any of the other transformations are processed.
+before any of the other transformations are processed.  If supported
+libpng also supplies an information routine that may be called from
+your callback:
+
+   png_get_current_row_number(png_ptr);
+
+This returns the current row passed to the transform.  Even with interlaced
+images the value returned is the row in the final output image.
 
 You can also set up a pointer to a user structure for use by your
 callback function.
@@ -4941,7 +4996,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIV. Y2K Compliance in libpng
 
-January 22, 2011
+January 23, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -5187,7 +5242,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.5.1beta08 - January 22, 2011:
+Libpng version 1.5.1beta08 - January 23, 2011:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5210,7 +5265,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.5.1beta08, January 22, 2011, are
+libpng versions 1.2.6, August 15, 2004, through 1.5.1beta08, January 23, 2011, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -5309,7 +5364,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-January 22, 2011
+January 23, 2011
 
 .\" end of man page
 
