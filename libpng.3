@@ -1374,7 +1374,7 @@ Choices for (int) ancil_action are
 You can set up a callback function to handle any unknown chunks in the
 input stream. You must supply the function
 
-    read_chunk_callback(png_ptr ptr,
+    read_chunk_callback(png_structp png_ptr,
          png_unknown_chunkp chunk);
     {
        /* The unknown chunk structure contains your
@@ -1420,8 +1420,8 @@ called after each row has been read, which you can use to control
 a progress meter or the like.  It's demonstrated in pngtest.c.
 You must supply a function
 
-    void read_row_callback(png_ptr ptr, png_uint_32 row,
-       int pass);
+    void read_row_callback(png_structp png_ptr,
+       png_uint_32 row, int pass);
     {
       /* put your code here */
     }
@@ -2426,7 +2426,7 @@ with
 
 You must supply the function
 
-    void read_transform_fn(png_ptr ptr, row_info_ptr
+    void read_transform_fn(png_structp png_ptr, row_info_ptr
         row_info, png_bytep data)
 
 See pngtest.c for a working example.  Your function will be called
@@ -3086,7 +3086,7 @@ called after each row has been written, which you can use to control
 a progress meter or the like.  It's demonstrated in pngtest.c.
 You must supply a function
 
-    void write_row_callback(png_ptr, png_uint_32 row,
+    void write_row_callback(png_structp png_ptr, png_uint_32 row,
        int pass);
     {
       /* put your code here */
@@ -3691,8 +3691,8 @@ with
 
 You must supply the function
 
-    void write_transform_fn(png_ptr ptr, row_info_ptr
-       row_info, png_bytep data)
+    void write_transform_fn(png_structp png_ptr ptr,
+       row_info_ptr row_info, png_bytep data)
 
 See pngtest.c for a working example.  Your function will be called
 before any of the other transformations are processed.  If supported

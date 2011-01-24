@@ -97,6 +97,7 @@ Version 1.5.1beta09 [January 24, 2011]
     converting RGB to gray.
 
 Version 1.5.1beta10 [January 24, 2011]
+  Fixed incorrect examples of callback prototypes in the manual.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
