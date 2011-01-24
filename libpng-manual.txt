@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.1beta09 - January 23, 2011
+ libpng version 1.5.1beta09 - January 24, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.1beta09 - January 23, 2011
+ libpng versions 0.97, January 1998, through 1.5.1beta09 - January 24, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -1341,7 +1341,7 @@ Copyright (c) 1998-01-04 Charles Poynton <poynton at inforamp.net>
 
     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
 
-Libpng approximates this integers scaled by 32768:
+Libpng approximates this with integers scaled by 32768:
 
     Y = (6968 * R + 23434 * G + 2366 * B)/32768
 
@@ -4073,7 +4073,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-January 23, 2011
+January 24, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
