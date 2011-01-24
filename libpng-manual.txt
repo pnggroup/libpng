@@ -1341,16 +1341,12 @@ Copyright (c) 1998-01-04 Charles Poynton <poynton at inforamp.net>
 
     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
 
-Libpng approximates this with
+Libpng approximates this integers scaled by 32768:
 
-    Y = 0.21268 * R    + 0.7151 * G    + 0.07217 * B
-
-which can be expressed with integers as
-
-    Y = (6969 * R + 23434 * G + 2365 * B)/32768
+    Y = (6968 * R + 23434 * G + 2366 * B)/32768
 
 The calculation is done in a linear colorspace, if the image gamma
-is known.
+can be determined.
 
 If you have a grayscale and you are using png_set_expand_depth(),
 png_set_expand(), or png_set_gray_to_rgb to change to truecolor or to

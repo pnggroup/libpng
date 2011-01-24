@@ -3204,6 +3204,7 @@ Version 1.5.1beta08 [January 23, 2011]
     skipping of unread data (e.g., if the reader marks a chunk to be skipped.)
 
 Version 1.5.1beta09 [January 23, 2011]
+Subject: [PATCH] Enhance pngvalid, correct an error in gray_to_rgb, correct doc error.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

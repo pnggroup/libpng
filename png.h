@@ -1067,7 +1067,9 @@ PNG_EXPORT(30, void, png_set_bgr, (png_structp png_ptr));
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
 /* Expand the grayscale to 24-bit RGB if necessary. */
 PNG_EXPORT(31, void, png_set_gray_to_rgb, (png_structp png_ptr));
+#endif
 
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 /* Reduce RGB to grayscale. */
 PNG_FP_EXPORT(32, void, png_set_rgb_to_gray, (png_structp png_ptr,
     int error_action, double red, double green));
@@ -2203,31 +2205,6 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
      (png_uint_32)32767) / (png_uint_32)65535L)
 #endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
 
-#ifdef PNG_USE_READ_MACROS
-/* Inline macros to do direct reads of bytes from the input buffer.
- * The png_get_int_32() routine assumes we are using two's complement
- * format for negative values, which is almost certainly true.
- */
-#  define png_get_uint_32(buf) \
-     (((png_uint_32)(*(buf)) << 24) + \
-      ((png_uint_32)(*((buf) + 1)) << 16) + \
-      ((png_uint_32)(*((buf) + 2)) << 8) + \
-      ((png_uint_32)(*((buf) + 3))))
-
-   /* From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
-    * function) incorrectly returned a value of type png_uint_32.
-    */
-#  define png_get_uint_16(buf) \
-     ((png_uint_16) \
-      (((unsigned int)(*(buf)) << 8) + \
-       ((unsigned int)(*((buf) + 1)))))
-
-#  define png_get_int_32(buf) \
-     ((png_int_32)((*(buf) & 0x80) \
-      ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
-      : (png_int_32)png_get_uint_32(buf)))
-#endif
-
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
 PNG_EXPORT(201, png_uint_32, png_get_uint_32, (png_const_bytep buf));
 PNG_EXPORT(202, png_uint_16, png_get_uint_16, (png_const_bytep buf));
@@ -2253,6 +2230,31 @@ PNG_EXPORT(206, void, png_save_int_32, (png_bytep buf, png_int_32 i));
 #ifdef PNG_WRITE_INT_FUNCTIONS_SUPPORTED
 PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 /* No png_save_int_16 -- may be added if there's a real need for it. */
+#endif
+
+#ifdef PNG_USE_READ_MACROS
+/* Inline macros to do direct reads of bytes from the input buffer.
+ * The png_get_int_32() routine assumes we are using two's complement
+ * format for negative values, which is almost certainly true.
+ */
+#  define png_get_uint_32(buf) \
+     (((png_uint_32)(*(buf)) << 24) + \
+      ((png_uint_32)(*((buf) + 1)) << 16) + \
+      ((png_uint_32)(*((buf) + 2)) << 8) + \
+      ((png_uint_32)(*((buf) + 3))))
+
+   /* From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
+    * function) incorrectly returned a value of type png_uint_32.
+    */
+#  define png_get_uint_16(buf) \
+     ((png_uint_16) \
+      (((unsigned int)(*(buf)) << 8) + \
+       ((unsigned int)(*((buf) + 1)))))
+
+#  define png_get_int_32(buf) \
+     ((png_int_32)((*(buf) & 0x80) \
+      ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
+      : (png_int_32)png_get_uint_32(buf)))
 #endif
 
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project

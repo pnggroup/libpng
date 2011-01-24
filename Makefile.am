@@ -120,7 +120,8 @@ pngvalid.o pngtest.o: pnglibconf.h
 
 SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
-		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'
+		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'\
+		-DPNG_NO_USE_READ_MACROS
 
 .dfn.out:
 	rm -f $@ dfn.c dfn?.out
