@@ -3212,6 +3212,8 @@ Version 1.5.1beta09 [January 24, 2011]
     documentation did not accurately describe what libpng really does when
     converting RGB to gray.
 
+Version 1.5.1beta10 [January 24, 2011]
+
 In addition the order of the png_get_uint macros with respect to the relevant
 function definitions has been reversed.  This helps the preprocessing of the
 symbol files be more robust.  Further the symbol file preprocessing now uses
