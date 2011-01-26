@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.1beta10 - January 24, 2011
+ libpng version 1.5.1beta10 - January 26, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.1beta10 - January 24, 2011
+ libpng versions 0.97, January 1998, through 1.5.1beta10 - January 26, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -848,10 +848,14 @@ pointer into the info_ptr is returned for any complex types.
 
     num_palette    - number of entries in the palette
 
-    png_get_gAMA(png_ptr, info_ptr, &gamma);
+    png_get_gAMA(png_ptr, info_ptr, &file_gamma);
+    png_set_gAMA_fixed(png_ptr, info_ptr, int_file_gamma);
 
-    gamma          - the gamma the file is written
-                     at (PNG_INFO_gAMA)
+    file_gamma     - the gamma at which the file is
+                     written (PNG_INFO_gAMA)
+
+    int_file_gamma - 100,000 times the gamma at which the
+                     file is written
 
     png_get_sRGB(png_ptr, info_ptr, &srgb_intent);
 
@@ -1430,8 +1434,8 @@ on gamma in the PNG specification for an excellent description of what
 gamma is, and why all applications should support it.  It is strongly
 recommended that PNG viewers support gamma correction.
 
-   if (png_get_gAMA(png_ptr, info_ptr, &gamma))
-      png_set_gamma(png_ptr, screen_gamma, gamma);
+   if (png_get_gAMA(png_ptr, info_ptr, &file_gamma))
+      png_set_gamma(png_ptr, screen_gamma, file_gamma);
 
    else
       png_set_gamma(png_ptr, screen_gamma, 0.45455);
@@ -2314,10 +2318,14 @@ width, height, bit_depth, and color_type must be the same in each call.
                      (array of png_color)
     num_palette    - number of entries in the palette
 
-    png_set_gAMA(png_ptr, info_ptr, gamma);
+    png_set_gAMA(png_ptr, info_ptr, file_gamma);
+    png_set_gAMA_fixed(png_ptr, info_ptr, int_file_gamma);
 
-    gamma          - the gamma the image was created
-                     at (PNG_INFO_gAMA)
+    file_gamma     - the gamma at which the image was
+                     created (PNG_INFO_gAMA)
+
+    int_file_gamma - 100,000 times the gamma at which
+                     the image was created
 
     png_set_sRGB(png_ptr, info_ptr, srgb_intent);
 
@@ -2388,10 +2396,9 @@ width, height, bit_depth, and color_type must be the same in each call.
                      (PNG_INFO_tRNS)
 
     png_set_hIST(png_ptr, info_ptr, hist);
-                    (PNG_INFO_hIST)
 
     hist           - histogram of palette (array of
-                     png_uint_16)
+                     png_uint_16) (PNG_INFO_hIST)
 
     png_set_tIME(png_ptr, info_ptr, mod_time);
 
@@ -4073,7 +4080,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-January 24, 2011
+January 26, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

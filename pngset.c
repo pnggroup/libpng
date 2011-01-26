@@ -522,27 +522,27 @@ png_set_sBIT(png_structp png_ptr, png_infop info_ptr,
 
 #ifdef PNG_sRGB_SUPPORTED
 void PNGAPI
-png_set_sRGB(png_structp png_ptr, png_infop info_ptr, int intent)
+png_set_sRGB(png_structp png_ptr, png_infop info_ptr, int srgb_intent)
 {
    png_debug1(1, "in %s storage function", "sRGB");
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   info_ptr->srgb_intent = (png_byte)intent;
+   info_ptr->srgb_intent = (png_byte)srgb_intent;
    info_ptr->valid |= PNG_INFO_sRGB;
 }
 
 void PNGAPI
 png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
-    int intent)
+    int srgb_intent)
 {
    png_debug1(1, "in %s storage function", "sRGB_gAMA_and_cHRM");
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   png_set_sRGB(png_ptr, info_ptr, intent);
+   png_set_sRGB(png_ptr, info_ptr, srgb_intent);
 
 #  ifdef PNG_gAMA_SUPPORTED
    png_set_gAMA_fixed(png_ptr, info_ptr, 45455L);

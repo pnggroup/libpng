@@ -3212,14 +3212,16 @@ Version 1.5.1beta09 [January 24, 2011]
     documentation did not accurately describe what libpng really does when
     converting RGB to gray.
 
-Version 1.5.1beta10 [January 24, 2011]
-  Fixed incorrect examples of callback prototypes in the manual.
-
-In addition the order of the png_get_uint macros with respect to the relevant
-function definitions has been reversed.  This helps the preprocessing of the
-symbol files be more robust.  Further the symbol file preprocessing now uses
--DPNG_NO_USE_READ_MACROS; this stops the read macros interfering with the symbol
-file format.
+Version 1.5.1beta10 [January 26, 2011]
+  Fixed incorrect examples of callback prototypes in the manual, that were
+    introduced in libpng-1.0.0.
+  In addition the order of the png_get_uint macros with respect to the
+    relevant function definitions has been reversed.  This helps the
+    preprocessing of the symbol files be more robust.  Furthermore, the
+    symbol file preprocessing now uses -DPNG_NO_USE_READ_MACROS; this stops
+    the read macros interfering with the symbol file format.
+  Made the manual, synopses, and function prototypes use the function
+    argument names file_gamma, int_file_gamma, and srgb_intent consistent.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
