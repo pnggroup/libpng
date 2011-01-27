@@ -3225,7 +3225,7 @@ Version 1.5.1beta10 [January 27, 2010]
     argument names file_gamma, int_file_gamma, and srgb_intent consistently.
 
 Version 1.5.1beta11 [January 27, 2011]
-  Changed PNG_UNUSED from "param=param;" to "(void)(param ? 0 : 0));" (Cosmin)
+  Changed PNG_UNUSED from "param=param;" to "{(void)param;}".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
