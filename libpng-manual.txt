@@ -849,7 +849,7 @@ pointer into the info_ptr is returned for any complex types.
     num_palette    - number of entries in the palette
 
     png_get_gAMA(png_ptr, info_ptr, &file_gamma);
-    png_set_gAMA_fixed(png_ptr, info_ptr, int_file_gamma);
+    png_get_gAMA_fixed(png_ptr, info_ptr, &int_file_gamma);
 
     file_gamma     - the gamma at which the file is
                      written (PNG_INFO_gAMA)
@@ -859,7 +859,7 @@ pointer into the info_ptr is returned for any complex types.
 
     png_get_sRGB(png_ptr, info_ptr, &srgb_intent);
 
-    srgb_intent    - the rendering intent (PNG_INFO_sRGB)
+    file_srgb_intent - the rendering intent (PNG_INFO_sRGB)
                      The presence of the sRGB chunk
                      means that the pixel data is in the
                      sRGB color space.  This chunk also

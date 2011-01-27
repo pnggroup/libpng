@@ -89,7 +89,13 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
  * the terminating semicolon.
  */
 #ifndef PNG_UNUSED
-#  define PNG_UNUSED(param) param = param;
+/* Different possiblities being discussed on png-mng-implement, Jan 2011 */
+/* #  define PNG_UNUSED(param) param = param; */
+/* #  define PNG_UNUSED(param) if(param); */
+/* #  define PNG_UNUSED(param) if(param){} */
+/* #  define PNG_UNUSED(param) {if(param){}} */
+/* #  define PNG_UNUSED(param) {(void)param;} */
+#  define PNG_UNUSED(param) ((void)(param ? 0 : 0));
 #endif
 
 /* Just a little check that someone hasn't tried to define something
