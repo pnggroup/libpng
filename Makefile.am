@@ -118,6 +118,9 @@ scripts/pnglibconf.h.prebuilt:
 # 'make test' is the first thing the user does.)
 pngvalid.o pngtest.o: pnglibconf.h
 
+# We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
+# be built with PNG_USE_READ_MACROS; this stops the read macros interfering
+# with the symbol file format.
 SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'\

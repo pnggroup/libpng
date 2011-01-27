@@ -355,6 +355,10 @@ MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
 config.sub configure depcomp install-sh ltmain.sh missing
 
 SUFFIXES = .chk .dfn .out
+
+# We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
+# be built with PNG_USE_READ_MACROS; this stops the read macros interfering
+# with the symbol file format.
 SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'\
