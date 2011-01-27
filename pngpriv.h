@@ -89,13 +89,22 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
  * the terminating semicolon.
  */
 #ifndef PNG_UNUSED
-#  define PNG_UNUSED(param) {(void)param;}
+#  define PNG_UNUSED(param) {if(param){}}
 /* Other possiblities being discussed on png-mng-implement, Jan 2011 */
-/* #  define PNG_UNUSED(param) param = param; */
-/* #  define PNG_UNUSED(param) if(param); */ /* gcc-4.2 warns about this one */
-/* #  define PNG_UNUSED(param) if(param){} */
-/* #  define PNG_UNUSED(param) {if(param){}} */
-/* #  define PNG_UNUSED(param) ((void)(param ? 0 : 0)); */
+/* #define PNG_UNUSED(param) param = param; */         /* What we used before */
+/* #define PNG_UNUSED(param) {(void)param;} */         /* Visual C complains */
+/* #define PNG_UNUSED(param) if(param);     */         /* gcc-4.2 complains */
+/* #define PNG_UNUSED(param) if(param){}    */
+/* #define PNG_UNUSED(param) ((void)(param ? 0 : 0)); */ /* 0:0 might be seen */
+/* #define PNG_UNUSED(param) {if(&param){}} */         /* gcc-4 complains */
+/* #define PNG_UNUSED(param) {if(&param-&param){}} */  /* No comment. */
+/*
+ * #if defined(__GNUC__) || defined(_MSC_VER)
+ * #  define UNUSED(param) (void)param;
+ * #else
+ * #  define UNUSED(param)
+ * #endif
+*/
 #endif
 
 /* Just a little check that someone hasn't tried to define something
