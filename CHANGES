@@ -3224,8 +3224,12 @@ Version 1.5.1beta10 [January 27, 2010]
   Made the manual, synopses, and function prototypes use the function
     argument names file_gamma, int_file_gamma, and srgb_intent consistently.
 
-Version 1.5.1beta11 [January 27, 2011]
+Version 1.5.1beta11 [January 28, 2011]
   Changed PNG_UNUSED from "param=param;" to "{if(param){}}".
+  Corrected local variable type in new API png_process_data_skip()
+    The type was self-evidently incorrect but only causes problems on 64 bit
+    architectures.
+  Added transform tests to pngvalid and simplified the arguments.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
