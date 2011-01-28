@@ -71,7 +71,7 @@ png_process_data_pause(png_structp png_ptr, int save)
 png_uint_32 PNGAPI
 png_process_data_skip(png_structp png_ptr)
 {
-   png_size_t remaining = 0;
+   png_uint_32 remaining = 0;
 
    if (png_ptr != NULL && png_ptr->process_mode == PNG_SKIP_MODE &&
       png_ptr->skip_length > 0)
