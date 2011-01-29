@@ -3865,7 +3865,8 @@ Version 1.5.11beta01 [April 28, 2012]
   Added -lssp_nonshared in a comment in scripts/makefile.freebsd
     and changed deprecated NOOBJ and NOPROFILE to NO_OBJ and NO_PROFILE.
 
-Version 1.5.11beta02 [April 28, 2012]
+Version 1.5.11rc01 [May 22, 2012]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
