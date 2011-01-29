@@ -3231,6 +3231,8 @@ Version 1.5.1beta11 [January 28, 2011]
     architectures.
   Added transform tests to pngvalid and simplified the arguments.
 
+Version 1.5.1rc01 [January 29, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
