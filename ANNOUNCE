@@ -1,5 +1,5 @@
 
-Libpng 1.5.1rc01 - January 29, 2011
+Libpng 1.5.1rc02 - January 29, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.1rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.1rc01.tar.gz
-   1.5.1rc01.tar.bz2
+   1.5.1rc02.tar.xz (LZMA-compressed, recommended)
+   1.5.1rc02.tar.gz
+   1.5.1rc02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp151r01.7z  (LZMA-compressed, recommended)
-   lp151r01.zip
+   lp151r02.7z  (LZMA-compressed, recommended)
+   lp151r02.zip
 
 Other information:
 
-   1.5.1rc01-README.txt
-   1.5.1rc01-LICENSE.txt
+   1.5.1rc02-README.txt
+   1.5.1rc02-LICENSE.txt
 
 Changes since the last public release (1.5.0):
 
@@ -116,6 +116,12 @@ Version 1.5.1beta11 [January 28, 2011]
   Added transform tests to pngvalid and simplified the arguments.
 
 Version 1.5.1rc01 [January 29, 2011]
+  No changes.
+
+Version 1.5.1rc02 [January 29, 2011]
+  Added a request in the manual that applications do not use "png_" or
+    "PNG_" to begin any of their own symbols.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
