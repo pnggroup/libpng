@@ -89,7 +89,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
  * the terminating semicolon.  Also note that some of these might not
  * work when "param" is a structure, but that is never the case in libpng.
  */
-#define PNG_UNUSED(param) {if(param){}}
+#define PNG_UNUSED(param) (void)param;
 
 #if 0 /* Possibilities discussed on png-mng-implement, starting 27 Jan 2011 */
 #ifndef PNG_UNUSED                                 /* "best" but complex */
@@ -98,6 +98,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
  #else
  #  define PNG_UNUSED(param)
  #endif
+#define PNG_UNUSED(param) {if(param){}}
 #define PNG_UNUSED(param) param = param;            /* What we used before */
 #define PNG_UNUSED(param) {(void)param;}            /* Visual C complains */
 #define PNG_UNUSED(param) if(param);                /* gcc-4.2 complains */
