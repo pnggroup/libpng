@@ -83,32 +83,13 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  define PNG_MAX_MALLOC_64K
 #endif
 
-/* Unused formal parameter errors are removed using the following macro
- * which is expected to have no bad effects on performance.  Note that
- * if you replace it with something other than whitespace, you must include
- * the terminating semicolon.  Also note that some of these might not
- * work when "param" is a structure, but that is never the case in libpng.
+/* Unused formal parameter warnings are silenced using the following macro
+ * which is expected to have no bad effects on performance (optimizing
+ * compilers will probably remove it entirely).  Note that if you replace
+ * it with something other than whitespace, you must include the terminating
+ * semicolon.
  */
 #define PNG_UNUSED(param) (void)param;
-
-#if 0 /* Possibilities discussed on png-mng-implement, starting 27 Jan 2011 */
-#ifndef PNG_UNUSED                                 /* "best" but complex */
- #if defined(__GNUC__) || defined(_MSC_VER)
- #  define PNG_UNUSED(param) (void)param;
- #else
- #  define PNG_UNUSED(param)
- #endif
-#define PNG_UNUSED(param) {if(param){}}
-#define PNG_UNUSED(param) param = param;            /* What we used before */
-#define PNG_UNUSED(param) {(void)param;}            /* Visual C complains */
-#define PNG_UNUSED(param) if(param);                /* gcc-4.2 complains */
-#define PNG_UNUSED(param) if(param){}               /* more brackets nicer */
-#define PNG_UNUSED(param) ((void)(param ? 0 : 0));  /* 0:0 might be seen */
-#define PNG_UNUSED(param) {if(&param){}}            /* gcc-4 complains */
-#define PNG_UNUSED(param) {if(&param-&param){}}     /* No comment. */
-#define PNG_UNUSED(param) /* generates smallest (no) code but emits warning */
-#endif /* 0 */
-#endif /* PNG_UNUSED */
 
 /* Just a little check that someone hasn't tried to define something
  * contradictory.

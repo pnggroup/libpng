@@ -1,5 +1,5 @@
 
-Libpng 1.5.1rc02 - January 30, 2011
+Libpng 1.5.1rc02 - January 31, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -115,13 +115,13 @@ Version 1.5.1beta11 [January 28, 2011]
     architectures.
   Added transform tests to pngvalid and simplified the arguments.
 
-Version 1.5.1rc01 [January 30, 2011]
+Version 1.5.1rc01 [January 31, 2011]
   No changes.
 
-Version 1.5.1rc02 [January 30, 2011]
+Version 1.5.1rc02 [January 31, 2011]
   Added a request in the manual that applications do not use "png_" or
     "PNG_" to begin any of their own symbols.
-  Changed PNG_UNUSED to "(void)param;"
+  Changed PNG_UNUSED to "(void)param;" and updated the commentary in pngpriv.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
