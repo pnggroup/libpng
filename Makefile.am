@@ -162,7 +162,7 @@ scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
 	test -z "$(CPPFLAGS)" 
 	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out\
-	    logunsupported=1 - ${srcdir}/scripts/pnglibconf.dfa 1>&2
+	    logunsupported=2 - ${srcdir}/scripts/pnglibconf.dfa 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	rm dfn1.out
 	mv dfn2.out $@
