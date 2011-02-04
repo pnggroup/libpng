@@ -1184,13 +1184,13 @@ PNG_EXTERN int png_check_fp_string PNGARG((png_const_charp string,
  * holds the result.
  */
 PNG_EXTERN int png_muldiv PNGARG((png_fixed_point_p res, png_fixed_point a,
-    png_int_32 times, png_int_32 div));
+    png_int_32 multiplied_by, png_int_32 divided_by));
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)
 /* Same deal, but issue a warning on overflow and return 0. */
 PNG_EXTERN png_fixed_point png_muldiv_warn PNGARG((png_structp png_ptr,
-    png_fixed_point a, png_int_32 times, png_int_32 div));
+    png_fixed_point a, png_int_32 multiplied_by, png_int_32 divided_by));
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
@@ -1217,12 +1217,12 @@ PNG_EXTERN png_fixed_point png_reciprocal2 PNGARG((png_fixed_point a,
  * correct bit value - 0..255 or 0..65535 as required.
  */
 PNG_EXTERN png_uint_16 png_gamma_correct PNGARG((png_structp png_ptr,
-    unsigned int value, png_fixed_point gamma));
-PNG_EXTERN int png_gamma_significant PNGARG((png_fixed_point gamma));
+    unsigned int value, png_fixed_point gamma_value));
+PNG_EXTERN int png_gamma_significant PNGARG((png_fixed_point gamma_value));
 PNG_EXTERN png_uint_16 png_gamma_16bit_correct PNGARG((unsigned int value,
-    png_fixed_point gamma));
+    png_fixed_point gamma_value));
 PNG_EXTERN png_byte png_gamma_8bit_correct PNGARG((unsigned int value,
-    png_fixed_point gamma));
+    png_fixed_point gamma_value));
 PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
     int bit_depth));
 #endif
