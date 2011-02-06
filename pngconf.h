@@ -287,10 +287,10 @@
  * PNG_EXPORT function for every compiler.
  */
 #ifndef PNG_FUNCTION
-#  if defined(__GNUC__) && !defined(__clang__)
+#  if defined(__GNUC__)
 #     define PNG_FUNCTION(type, name, args, attributes)\
          attributes type name args
-#  else /* !GNUC || clang */
+#  else /* !GNUC */
 #     ifdef _MSC_VER
 #        define PNG_FUNCTION(type, name, args, attributes)\
          attributes type name args
@@ -347,7 +347,7 @@
    * functions in png.h will generate compiler warnings.  Added at libpng
    * version 1.2.41.
    */
-#  if defined(__GNUC__) && !defined(__clang__)
+#  if defined(__GNUC__)
 #    ifndef PNG_USE_RESULT
 #      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
 #    endif

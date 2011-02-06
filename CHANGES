@@ -3242,11 +3242,10 @@ Version 1.5.1rc02 [January 31, 2011]
 Version 1.5.1 [February 3, 2011]
   No changes.
 
-Version 1.5.2beta01 [February 5, 2011]
+Version 1.5.2beta01 [February 6, 2011]
   More -Wshadow fixes for older gcc compilers.  Older gcc versions apparently
     check formal parameters names in function declarations (as well as
     definitions) to see if they match a name in the global namespace.
-  Add __clang__ special case in pngconf.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
