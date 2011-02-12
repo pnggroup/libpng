@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.2beta01 - February 12, 2011
+ * libpng version 1.5.2beta01 - February 4, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.2beta01 - February 12, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.2beta01 - February 4, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -179,7 +179,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.2beta01, February 12, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.2beta01, February 4, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -291,7 +291,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    February 12, 2011
+ *    February 4, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -355,7 +355,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.2beta01"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.2beta01 - February 12, 2011\n"
+     " libpng version 1.5.2beta01 - February 4, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -420,7 +420,6 @@
 #endif
 
 /* Machine specific configuration. */
-#  define PNG_BLANK
 #  include "pngconf.h"
 #endif
 
@@ -798,37 +797,35 @@ typedef struct png_struct_def png_struct;
 typedef PNG_CONST png_struct FAR * png_const_structp;
 typedef png_struct FAR * png_structp;
 
-typedef PNG_CALLBACK(void, *png_error_ptr, (png_structp, png_const_charp),
-    PNG_BLANK);
-typedef PNG_CALLBACK(void, *png_rw_ptr, (png_structp, png_bytep, png_size_t),
-    PNG_BLANK);
-typedef PNG_CALLBACK(void, *png_flush_ptr, (png_structp), PNG_BLANK);
+typedef PNG_CALLBACK(void, *png_error_ptr, (png_structp, png_const_charp), );
+typedef PNG_CALLBACK(void, *png_rw_ptr, (png_structp, png_bytep, png_size_t), );
+typedef PNG_CALLBACK(void, *png_flush_ptr, (png_structp), );
 typedef PNG_CALLBACK(void, *png_read_status_ptr, (png_structp, png_uint_32, 
-    int), PNG_BLANK);
+    int), );
 typedef PNG_CALLBACK(void, *png_write_status_ptr, (png_structp, png_uint_32, 
-    int), PNG_BLANK);
+    int), );
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef PNG_CALLBACK(void, *png_progressive_info_ptr, 
-    (png_structp, png_infop), PNG_BLANK);
+    (png_structp, png_infop), );
 typedef PNG_CALLBACK(void, *png_progressive_end_ptr,
-    (png_structp, png_infop), PNG_BLANK);
+    (png_structp, png_infop), );
 typedef PNG_CALLBACK(void, *png_progressive_row_ptr,
-    (png_structp, png_bytep, png_uint_32, int), PNG_BLANK);
+    (png_structp, png_bytep, png_uint_32, int), );
 #endif
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 typedef PNG_CALLBACK(void, *png_user_transform_ptr,
-    (png_structp, png_row_infop, png_bytep), PNG_BLANK);
+    (png_structp, png_row_infop, png_bytep), );
 #endif
 
 #ifdef PNG_USER_CHUNKS_SUPPORTED
 typedef PNG_CALLBACK(int, *png_user_chunk_ptr, (png_structp, 
-    png_unknown_chunkp), PNG_BLANK);
+    png_unknown_chunkp), );
 #endif
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
-typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp), PNG_BLANK);
+typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp), );
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -885,8 +882,8 @@ typedef PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)),
  * following.
  */
 typedef PNG_CALLBACK(png_voidp, *png_malloc_ptr, (png_structp, 
-    png_alloc_size_t), PNG_BLANK);
-typedef PNG_CALLBACK(void, *png_free_ptr, (png_structp, png_voidp), PNG_BLANK);
+    png_alloc_size_t), );
+typedef PNG_CALLBACK(void, *png_free_ptr, (png_structp, png_voidp), );
 
 typedef png_struct FAR * FAR * png_structpp;
 
