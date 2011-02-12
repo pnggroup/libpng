@@ -797,35 +797,33 @@ typedef struct png_struct_def png_struct;
 typedef PNG_CONST png_struct FAR * png_const_structp;
 typedef png_struct FAR * png_structp;
 
-typedef PNG_CALLBACK(void, *png_error_ptr, (png_structp, png_const_charp), );
-typedef PNG_CALLBACK(void, *png_rw_ptr, (png_structp, png_bytep, png_size_t), );
-typedef PNG_CALLBACK(void, *png_flush_ptr, (png_structp), );
-typedef PNG_CALLBACK(void, *png_read_status_ptr, (png_structp, png_uint_32, 
-    int), );
-typedef PNG_CALLBACK(void, *png_write_status_ptr, (png_structp, png_uint_32, 
-    int), );
+typedef PNG_CALLBACK(void, *png_error_ptr, (png_structp, png_const_charp));
+typedef PNG_CALLBACK(void, *png_rw_ptr, (png_structp, png_bytep, png_size_t));
+typedef PNG_CALLBACK(void, *png_flush_ptr, (png_structp));
+typedef PNG_CALLBACK(void, *png_read_status_ptr, (png_structp, png_uint_32,
+    int));
+typedef PNG_CALLBACK(void, *png_write_status_ptr, (png_structp, png_uint_32,
+    int));
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-typedef PNG_CALLBACK(void, *png_progressive_info_ptr, 
-    (png_structp, png_infop), );
-typedef PNG_CALLBACK(void, *png_progressive_end_ptr,
-    (png_structp, png_infop), );
-typedef PNG_CALLBACK(void, *png_progressive_row_ptr,
-    (png_structp, png_bytep, png_uint_32, int), );
+typedef PNG_CALLBACK(void, *png_progressive_info_ptr, (png_structp, png_infop));
+typedef PNG_CALLBACK(void, *png_progressive_end_ptr, (png_structp, png_infop));
+typedef PNG_CALLBACK(void, *png_progressive_row_ptr, (png_structp, png_bytep,
+   png_uint_32, int));
 #endif
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-typedef PNG_CALLBACK(void, *png_user_transform_ptr,
-    (png_structp, png_row_infop, png_bytep), );
+typedef PNG_CALLBACK(void, *png_user_transform_ptr, (png_structp, png_row_infop,
+   png_bytep));
 #endif
 
 #ifdef PNG_USER_CHUNKS_SUPPORTED
-typedef PNG_CALLBACK(int, *png_user_chunk_ptr, (png_structp, 
-    png_unknown_chunkp), );
+typedef PNG_CALLBACK(int, *png_user_chunk_ptr, (png_structp,
+   png_unknown_chunkp));
 #endif
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
-typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp), );
+typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp));
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -882,8 +880,8 @@ typedef PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)),
  * following.
  */
 typedef PNG_CALLBACK(png_voidp, *png_malloc_ptr, (png_structp, 
-    png_alloc_size_t), );
-typedef PNG_CALLBACK(void, *png_free_ptr, (png_structp, png_voidp), );
+    png_alloc_size_t));
+typedef PNG_CALLBACK(void, *png_free_ptr, (png_structp, png_voidp));
 
 typedef png_struct FAR * FAR * png_structpp;
 

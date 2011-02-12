@@ -282,23 +282,15 @@
 #  endif
 #endif
 
-/* THe following complexity is concerned with getting the 'attributes' of the
- * declared function in the correct place.  This potentially requires a separate
- * PNG_EXPORT function for every compiler.
+/* In 1.5.2 the definition of PNG_FUNCTION has been changed to always treat
+ * 'attributes' as a storage class - the attributes go at the start of the
+ * function definition, and attributes are always appended regardless of the
+ * compiler.  This considerably simplifies these macros but may cause problems
+ * if any compilers both need function attributes and fail to handle them as
+ * a storage class (this is unlikely.)
  */
 #ifndef PNG_FUNCTION
-#  if defined(__GNUC__)
-#     define PNG_FUNCTION(type, name, args, attributes)\
-         attributes type name args
-#  else /* !GNUC */
-#     ifdef _MSC_VER
-#        define PNG_FUNCTION(type, name, args, attributes)\
-         attributes type name args
-#     else /* !MSC */
-#        define PNG_FUNCTION(type, name, args, attributes)\
-            type name args
-#     endif
-#  endif
+#  define PNG_FUNCTION(type, name, args, attributes) attributes type name args
 #endif
 
 #ifndef PNG_EXPORT_TYPE
@@ -311,12 +303,17 @@
     */
 #ifndef PNG_EXPORTA
 #  define PNG_EXPORTA(ordinal, type, name, args, attributes)\
-      extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),\
+      PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args), extern\
          attributes)
 #endif
 
+/* ANSI-C (C90) does not permit a macro to be invoked with an empty argument,
+ * so make something non-empty to satisfy the requirement:
+ */
+#define PNG_EMPTY /*empty list*/
+
 #define PNG_EXPORT(ordinal, type, name, args)\
-   PNG_EXPORTA(ordinal, type, name, args, )
+   PNG_EXPORTA(ordinal, type, name, args, PNG_EMPTY)
 
 /* Use PNG_REMOVED to comment out a removed interface. */
 #ifndef PNG_REMOVED
@@ -324,8 +321,7 @@
 #endif
 
 #ifndef PNG_CALLBACK
-#  define PNG_CALLBACK(type, name, args, attributes)\
-   type (PNGCBAPI name) PNGARG(args) attributes
+#  define PNG_CALLBACK(type, name, args) type (PNGCBAPI name) PNGARG(args)
 #endif
 
 /* Support for compiler specific function attributes.  These are used
@@ -355,7 +351,21 @@
 #      define PNG_NORETURN   __attribute__((__noreturn__))
 #    endif
 #    ifndef PNG_PTR_NORETURN
-#      define PNG_PTR_NORETURN   __attribute__((__noreturn__))
+       /* It's not enough to have the compiler be the correct compiler at
+        * this point - it's necessary for the library (which defines
+        * the type of the library longjmp) to also be the GNU library.
+        * This is because many systems use the GNU compiler with a
+        * non-GNU libc implementation.  Min/GW headers are also compatible
+        * with GCC as well as uclibc, so it seems best to exclude known
+        * problem libcs here rather than just including known libcs.
+        *
+        * NOTE: this relies on the only use of PNG_PTR_NORETURN being with
+        * the system longjmp.  If the same type is used elsewhere then this
+        * will need to be changed.
+        */
+#      if !defined(__CYGWIN__)
+#         define PNG_PTR_NORETURN   __attribute__((__noreturn__))
+#      endif
 #    endif
 #    ifndef PNG_ALLOCATED
 #      define PNG_ALLOCATED  __attribute__((__malloc__))
@@ -380,7 +390,7 @@
 #          define PNG_PRIVATE \
             __attribute__((__deprecated__))
 #        endif
-#      endif /* PNG_PRIVATE */
+#      endif
 #    endif /* PNGLIB_BUILD */
 #  endif /* __GNUC__ */
 #  ifdef _MSC_VER /* may need to check value */
@@ -410,9 +420,9 @@
 #      endif
 #      ifndef PNG_PRIVATE
 #        define PNG_PRIVATE __declspec(deprecated)
-#      endif /* PNG_PRIVATE */
+#      endif
 #    endif /* PNGLIB_BUILD */
-#  endif /* __GNUC__ */
+#  endif /* _MSC_VER */
 #endif /* PNG_PEDANTIC_WARNINGS */
 
 #ifndef PNG_DEPRECATED
@@ -423,6 +433,9 @@
 #endif
 #ifndef PNG_NORETURN
 #  define PNG_NORETURN    /* This function does not return */
+#endif
+#ifndef PNG_PTR_NORETURN
+#  define PNG_PTR_NORETURN /* This function does not return */
 #endif
 #ifndef PNG_ALLOCATED
 #  define PNG_ALLOCATED   /* The result of the function is new memory */

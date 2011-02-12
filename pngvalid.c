@@ -979,7 +979,7 @@ store_pool_delete(png_store *ps, store_pool *pool)
          next->next = NULL;
 
          fprintf(stderr, "\t%lu bytes @ %p\n",
-             (unsigned long)next->size, next+1);
+             (unsigned long)next->size, (PNG_CONST void*)(next+1));
          /* The NULL means this will always return, even if the memory is
           * corrupted.
           */
