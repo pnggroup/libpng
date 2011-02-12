@@ -1311,7 +1311,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 {
    int row;
 
-   if (png_ptr == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    /* png_read_info() gives us all of the information from the
@@ -1425,6 +1425,11 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 #endif
 
    /* We don't handle adding filler bytes */
+
+   /* We use png_read_image and rely on that for interlace handling, but we also
+    * call png_read_update_info therefore must turn on interlace handling now:
+    */
+   (void)png_set_interlace_handling(png_ptr);
 
    /* Optional call to gamma correct and add the background to the palette
     * and update info structure.  REQUIRED if you are expecting libpng to
