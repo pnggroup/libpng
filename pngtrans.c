@@ -703,11 +703,21 @@ png_get_user_transform_ptr(png_const_structp png_ptr)
 }
 #endif
 
+#ifdef PNG_USER_TRANSFORM_INFO_SUPPORTED
 png_uint_32 PNGAPI
 png_get_current_row_number(png_const_structp png_ptr)
 {
+   /* This API returns the row in output, not the input row: */
    if (png_ptr != NULL)
-      return png_ptr->row_number;
+   {
+      if (png_ptr->interlaced == PNG_INTERLACE_NONE)
+         return png_ptr->row_number;
+      else if (png_ptr->interlaced == PNG_INTERLACE_ADAM7)
+         return PNG_ROW_FROM_PASS_ROW(png_ptr->row_number, png_ptr->pass);
+
+      /* Else something bad is happening: */
+   }
+
    return PNG_UINT_32_MAX; /* help the app not to fail silently */
 }
 
@@ -718,6 +728,7 @@ png_get_current_pass_number(png_const_structp png_ptr)
       return png_ptr->pass;
    return 8; /* invalid */
 }
+#endif /* PNG_USER_TRANSFORM_INFO_SUPPORTED */
 #endif /* PNG_READ_USER_TRANSFORM_SUPPORTED ||
           PNG_WRITE_USER_TRANSFORM_SUPPORTED */
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

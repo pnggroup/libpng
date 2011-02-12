@@ -1477,6 +1477,10 @@ PNG_EXPORT(87, png_voidp, png_get_user_transform_ptr,
  * row number is still the row in the final, de-interlaced, image but the row
  * only contains the data of the current pass - consult png_row_info for the
  * actual width of the row!
+ *
+ * In contrast the row numbers passed to the progressive reader and sequential
+ * reader callbacks are actually the rows in the input data - so the row in the
+ * interlaced pass for an interlaced image.
  */
 PNG_EXPORT(217, png_uint_32, png_get_current_row_number, (png_const_structp));
 PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structp));
