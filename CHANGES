@@ -3242,10 +3242,13 @@ Version 1.5.1rc02 [January 31, 2011]
 Version 1.5.1 [February 3, 2011]
   No changes.
 
-Version 1.5.2beta01 [February 6, 2011]
+Version 1.5.2beta01 [February 12, 2011]
   More -Wshadow fixes for older gcc compilers.  Older gcc versions apparently
     check formal parameters names in function declarations (as well as
     definitions) to see if they match a name in the global namespace.
+  Changed empty parameter to PNG_BLANK in PNG_EXPORTA definition to
+    accommodate the old VisualC++ preprocessor.
+  Defined PNG_ALLOCATED to empty for MSC_VER < 1300.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

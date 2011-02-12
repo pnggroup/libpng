@@ -287,7 +287,7 @@
  * PNG_EXPORT function for every compiler.
  */
 #ifndef PNG_FUNCTION
-#  if defined(__GNUC__)
+#  ifdef __GNUC__
 #     define PNG_FUNCTION(type, name, args, attributes)\
          attributes type name args
 #  else /* !GNUC */
@@ -310,13 +310,19 @@
     * scripts directory.
     */
 #ifndef PNG_EXPORTA
+#if defined(_MSC_VER) && (_MSC_VER < 1300)
+#  define PNG_EXPORTA(ordinal, type, name, args, attributes)\
+      extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),\
+         PNG_BLANK)
+#else
 #  define PNG_EXPORTA(ordinal, type, name, args, attributes)\
       extern PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args),\
          attributes)
 #endif
+#endif
 
 #define PNG_EXPORT(ordinal, type, name, args)\
-   PNG_EXPORTA(ordinal, type, name, args, )
+   PNG_EXPORTA(ordinal, type, name, args, PNG_BLANK)
 
 /* Use PNG_REMOVED to comment out a removed interface. */
 #ifndef PNG_REMOVED
@@ -347,7 +353,7 @@
    * functions in png.h will generate compiler warnings.  Added at libpng
    * version 1.2.41.
    */
-#  if defined(__GNUC__)
+#  ifdef __GNUC__
 #    ifndef PNG_USE_RESULT
 #      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
 #    endif
@@ -385,16 +391,20 @@
 #  endif /* __GNUC__ */
 #  ifdef _MSC_VER /* may need to check value */
 #    ifndef PNG_USE_RESULT
-#      define PNG_USE_RESULT /*not supported*/
+#      define PNG_USE_RESULT /* not supported */
 #    endif
 #    ifndef PNG_NORETURN
 #      define PNG_NORETURN   __declspec(noreturn)
 #    endif
 #    ifndef PNG_PTR_NORETURN
-#      define PNG_PTR_NORETURN /*not supported*/
+#      define PNG_PTR_NORETURN /* not supported */
 #    endif
 #    ifndef PNG_ALLOCATED
-#      define PNG_ALLOCATED __declspec(restrict)
+#      if (_MSC_VER < 1300)
+#        define PNG_ALLOCATED  /* not supported */
+#      else
+#        define PNG_ALLOCATED __declspec(restrict)
+#      endif
 #    endif
 
     /* This specifically protects structure members that should only be
