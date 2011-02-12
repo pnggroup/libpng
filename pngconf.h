@@ -395,13 +395,13 @@
 #  endif /* __GNUC__ */
 #  ifdef _MSC_VER /* may need to check value */
 #    ifndef PNG_USE_RESULT
-#      define PNG_USE_RESULT /*not supported*/
+#      define PNG_USE_RESULT /* not supported */
 #    endif
 #    ifndef PNG_NORETURN
 #      define PNG_NORETURN   __declspec(noreturn)
 #    endif
 #    ifndef PNG_PTR_NORETURN
-#      define PNG_PTR_NORETURN /*not supported*/
+#      define PNG_PTR_NORETURN /* not supported */
 #    endif
 #    ifndef PNG_ALLOCATED
 #      define PNG_ALLOCATED __declspec(restrict)

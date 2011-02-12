@@ -1467,6 +1467,7 @@ png_do_read_transformations(png_structp png_ptr)
          png_do_expand_palette(&(png_ptr->row_info), png_ptr->row_buf + 1,
              png_ptr->palette, png_ptr->trans_alpha, png_ptr->num_trans);
       }
+
       else
       {
          if (png_ptr->num_trans &&
@@ -1481,8 +1482,9 @@ png_do_read_transformations(png_structp png_ptr)
    }
 #endif
 
-   /* Delay the 'expand 16' step until later for efficiency - so that the
-    * intermediate steps work with 8 bit data. */
+   /* Delay the 'expand 16' step until later for efficiency, so that the
+    * intermediate steps work with 8 bit data.
+    */
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
    if ((png_ptr->transformations & PNG_STRIP_ALPHA) &&
@@ -1850,7 +1852,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
       switch (row_info->bit_depth)
       {
          default:
-            break; 
+            break;
 
          case 2:
          {

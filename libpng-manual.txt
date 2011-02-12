@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.2beta01 - February 4, 2011
+ libpng version 1.5.2beta01 - February 12, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.2beta01 - February 4, 2011
+ libpng versions 0.97, January 1998, through 1.5.2beta01 - February 12, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -1069,7 +1069,7 @@ forms:
        72 dpi is stored as 0.28346 pixels/meter, and
        when this is retrieved it is 71.9988 dpi, so
        be sure to round the returned value appropriately
-       if you want to display a reasonable-looking result. 
+       if you want to display a reasonable-looking result.
 
 The data from the oFFs chunk can be retrieved in several convenient
 forms:
@@ -1176,8 +1176,8 @@ As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
 As of libpng version 1.5.2, png_set_expand_16() was added.  It behaves as
-png_set_expand however the resultant channels have 16 bits rather than 8.  Use
-this when the output color or gray channels are made linear to avoid fairly
+png_set_expand(), however, the resultant channels have 16 bits rather than 8.
+Use this when the output color or gray channels are made linear to avoid fairly
 severe accuracy loss.
 
    if (bit_depth < 16)
@@ -1212,7 +1212,7 @@ indexed with depth<8, other numerals represent the color type, "T" means
 the tRNS chunk is present, A means an alpha channel is present, and O
 means tRNS or alpha is present but all pixels in the image are opaque.
 
-  FROM  01  31   0  0T  0O   2  2T  2O   3  3T  3O  4A  4O  6A  6O 
+  FROM  01  31   0  0T  0O   2  2T  2O   3  3T  3O  4A  4O  6A  6O
    TO
    01    -  [G]  -   -   -   -   -   -   -   -   -   -   -   -   -
    31   [Q]  Q  [Q] [Q] [Q]  Q   Q   Q   Q   Q   Q  [Q] [Q]  Q   Q
@@ -3661,7 +3661,7 @@ expanded any tRNS chunk to an alpha channel.
 Macros for png_get_uint_16, png_get_uint_32, and png_get_int_32
 were added and are used by default instead of the corresponding
 functions. Unfortunately,
-from libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the  
+from libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
 
 We changed the prototype for png_malloc() from
@@ -3704,7 +3704,7 @@ We removed the trailing '.' from the warning and error messages.
 
 X.  Changes to Libpng from version 1.4.x to 1.5.x
 
-From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the  
+From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
 
 A. Changes that affect users of libpng
@@ -3795,7 +3795,7 @@ reset by pngusr.h or by explicit settings on the compiler command line.
 These settings may produce compiler warnings or errors in 1.5.0 because
 of macro redefinition.
 
-From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the  
+From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.  libpng 1.5.0
 is consistent with the implementation in 1.4.5 and 1.2.x (where the macro
 did not exist.)
@@ -4114,7 +4114,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-February 4, 2011
+February 12, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

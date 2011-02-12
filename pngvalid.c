@@ -6587,7 +6587,7 @@ int main(int argc, PNG_CONST char **argv)
       pm.test_gamma_sbit = 1;
       pm.test_gamma_strip16 = 1;
    }
-   
+
    else if (pm.ngammas == 0)
    {
       /* Nothing to test so turn everything off: */

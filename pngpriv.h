@@ -140,7 +140,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
     defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
    /* png.c requires the following ANSI-C constants if the conversion of
     * floating point to ASCII is implemented therein:
-    * 
+    *
     *  DBL_DIG  Maximum number of decimal digits (can be set to any constant)
     *  DBL_MIN  Smallest normalized fp number (can be set to an arbitrary value)
     *  DBL_MAX  Maximum floating point number (can be set to an arbitrary value)
