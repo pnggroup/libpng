@@ -1060,6 +1060,13 @@ PNG_EXPORT(28, void, png_set_palette_to_rgb, (png_structp png_ptr));
 PNG_EXPORT(29, void, png_set_tRNS_to_alpha, (png_structp png_ptr));
 #endif
 
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+/* Expand to 16 bit channels, forces conversion of palette to RGB and expansion
+ * of a tRNS chunk if present.
+ */
+PNG_EXPORT(221, void, png_set_expand_16, (png_structp png_ptr));
+#endif
+
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* Use blue, green, red order for pixels. */
 PNG_EXPORT(30, void, png_set_bgr, (png_structp png_ptr));
@@ -2271,7 +2278,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(220);
+  PNG_EXPORT_LAST_ORDINAL(221);
 #endif
 
 #ifdef __cplusplus

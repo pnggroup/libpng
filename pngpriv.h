@@ -286,7 +286,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_QUANTIZE            0x0040
 #define PNG_BACKGROUND          0x0080
 #define PNG_BACKGROUND_EXPAND   0x0100
-                          /*    0x0200 unused */
+#define PNG_EXPAND_16           0x0200     /* Added to libpng 1.5.2 */
 #define PNG_16_TO_8             0x0400
 #define PNG_RGBA                0x0800
 #define PNG_EXPAND              0x1000
@@ -873,6 +873,11 @@ PNG_EXTERN void png_do_expand_palette PNGARG((png_row_infop row_info,
     int num_trans));
 PNG_EXTERN void png_do_expand PNGARG((png_row_infop row_info,
     png_bytep row, png_const_color_16p trans_color));
+#endif
+
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+PNG_EXTERN void png_do_expand_16 PNGARG((png_row_infop row_info,
+    png_bytep row));
 #endif
 
 /* The following decodes the appropriate chunks, and does error correction,

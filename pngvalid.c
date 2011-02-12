@@ -4465,6 +4465,48 @@ image_transform_png_set_expand_gray_1_2_4_to_8_add(image_transform *this,
 }
 
 IT(expand_gray_1_2_4_to_8, expand);
+/* png_set_expand_16 */
+static void
+image_transform_png_set_expand_16_set(PNG_CONST image_transform *this,
+    transform_display *that, png_structp pp, png_infop pi)
+{
+   png_set_expand_16(pp);
+   this->next->set(this->next, that, pp, pi);
+}
+
+static void
+image_transform_png_set_expand_16_mod(PNG_CONST image_transform *this,
+    image_pixel *that, png_structp pp, PNG_CONST transform_display *display)
+{
+   /* Expect expand_16 to expand everything to 16 bits as a result of also
+    * causing 'expand' to happen.
+    */
+   if (that->colour_type == PNG_COLOR_TYPE_PALETTE)
+      image_pixel_convert_PLTE(that, &display->this);
+
+   if (that->have_tRNS)
+      image_pixel_add_alpha(that, &display->this);
+
+   if (that->bit_depth < 16)
+      that->sample_depth = that->bit_depth = 16;
+
+   this->next->mod(this->next, that, pp, display);
+}
+
+static int
+image_transform_png_set_expand_16_add(image_transform *this,
+    PNG_CONST image_transform **that, png_byte colour_type, png_byte bit_depth)
+{
+   UNUSED(colour_type)
+
+   this->next = *that;
+   *that = this;
+
+   /* expand_16 does something unless the bit depth is already 16. */
+   return bit_depth < 16;
+}
+
+IT(expand_16, expand_gray_1_2_4_to_8);
 
 /* png_set_strip_16 */
 static void
@@ -4516,7 +4558,7 @@ image_transform_png_set_strip_16_add(image_transform *this,
    return bit_depth > 8;
 }
 
-IT(strip_16, expand_gray_1_2_4_to_8);
+IT(strip_16, expand_16);
 
 /* png_set_strip_alpha */
 static void
