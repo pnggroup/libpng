@@ -340,8 +340,8 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_FLAG_STRIP_ERROR_NUMBERS      0x40000L
 #define PNG_FLAG_STRIP_ERROR_TEXT         0x80000L
 #define PNG_FLAG_MALLOC_NULL_MEM_OK       0x100000L
-#define PNG_FLAG_ADD_ALPHA                0x200000L  /* Added to libpng-1.2.8 */
-#define PNG_FLAG_STRIP_ALPHA              0x400000L  /* Added to libpng-1.2.8 */
+                                  /*      0x200000L  unused */
+                                  /*      0x400000L  unused */
 #define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000L  /* Added to libpng-1.4.0 */
                                   /*     0x1000000L  unused */
                                   /*     0x2000000L  unused */
@@ -772,8 +772,8 @@ PNG_EXTERN void png_do_write_invert_alpha PNGARG((png_row_infop row_info,
 
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
-PNG_EXTERN void png_do_strip_filler PNGARG((png_row_infop row_info,
-    png_bytep row, png_uint_32 flags));
+PNG_EXTERN void png_do_strip_channel PNGARG((png_row_infop row_info,
+    png_bytep row, int at_start));
 #endif
 
 #ifdef PNG_16BIT_SUPPORTED

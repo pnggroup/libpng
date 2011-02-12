@@ -1026,7 +1026,7 @@ png_push_process_row(png_structp png_ptr)
 
    png_memcpy(png_ptr->prev_row, png_ptr->row_buf, png_ptr->rowbytes + 1);
 
-   if (png_ptr->transformations || (png_ptr->flags&PNG_FLAG_STRIP_ALPHA))
+   if (png_ptr->transformations)
       png_do_read_transformations(png_ptr);
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED

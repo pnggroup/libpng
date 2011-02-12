@@ -149,7 +149,7 @@ png_set_strip_alpha(png_structp png_ptr)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
+   png_ptr->transformations |= PNG_STRIP_ALPHA;
 }
 #endif
 
@@ -1073,7 +1073,7 @@ png_init_read_transformations(png_structp png_ptr)
              */
             png_ptr->transformations &= ~PNG_BACKGROUND;
             png_ptr->transformations &= ~PNG_GAMMA;
-            png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
+            png_ptr->transformations |= PNG_STRIP_ALPHA;
          }
 
          /* if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN) */
@@ -1207,7 +1207,7 @@ png_init_read_transformations(png_structp png_ptr)
 
       /* Handled alpha, still need to strip the channel. */
       png_ptr->transformations &= ~PNG_BACKGROUND;
-      png_ptr->flags |= PNG_FLAG_STRIP_ALPHA;
+      png_ptr->transformations |= PNG_STRIP_ALPHA;
    }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED */
 
@@ -1353,7 +1353,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       info_ptr->channels = 1;
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
-   if (png_ptr->flags & PNG_FLAG_STRIP_ALPHA)
+   if (png_ptr->transformations & PNG_STRIP_ALPHA)
       info_ptr->color_type &= ~PNG_COLOR_MASK_ALPHA;
 #endif
 
@@ -1454,9 +1454,11 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
-   if (png_ptr->flags & PNG_FLAG_STRIP_ALPHA)
-      png_do_strip_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
-          PNG_FLAG_FILLER_AFTER | (png_ptr->flags & PNG_FLAG_STRIP_ALPHA));
+   if ((png_ptr->transformations & PNG_STRIP_ALPHA) &&
+      (png_ptr->row_info.color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
+      png_ptr->row_info.color_type == PNG_COLOR_TYPE_GRAY_ALPHA))
+      png_do_strip_channel(&(png_ptr->row_info), png_ptr->row_buf + 1,
+         0/*!at_start, because SWAP_ALPHA happens later*/);
 #endif
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED

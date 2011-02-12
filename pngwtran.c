@@ -44,8 +44,8 @@ png_do_write_transformations(png_structp png_ptr)
 
 #ifdef PNG_WRITE_FILLER_SUPPORTED
    if (png_ptr->transformations & PNG_FILLER)
-      png_do_strip_filler(&(png_ptr->row_info), png_ptr->row_buf + 1,
-          png_ptr->flags);
+      png_do_strip_channel(&(png_ptr->row_info), png_ptr->row_buf + 1,
+         !(png_ptr->flags & PNG_FILLER_AFTER));
 #endif
 
 #ifdef PNG_WRITE_PACKSWAP_SUPPORTED

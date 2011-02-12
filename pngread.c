@@ -702,7 +702,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 #endif
 
 
-   if (png_ptr->transformations || (png_ptr->flags&PNG_FLAG_STRIP_ALPHA))
+   if (png_ptr->transformations)
       png_do_read_transformations(png_ptr);
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
