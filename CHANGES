@@ -3255,6 +3255,8 @@ Version 1.5.2beta01 [February 13, 2011]
   Cleaned up ALPHA flags and transformations.
   Implemented expansion to 16 bits.
 
+Version 1.5.2beta02 [February 13, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
