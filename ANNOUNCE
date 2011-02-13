@@ -1,5 +1,5 @@
 
-Libpng 1.5.2beta01 - February 6, 2011
+Libpng 1.5.2beta01 - February 13, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,10 +26,13 @@ Other information:
 
 Changes since the last public release (1.5.1):
 
-Version 1.5.2beta01 [February 6, 2011]
+Version 1.5.2beta01 [February 13, 2011]
   More -Wshadow fixes for older gcc compilers.  Older gcc versions apparently
     check formal parameters names in function declarations (as well as
     definitions) to see if they match a name in the global namespace.
+  Changed empty parameter to PNG_BLANK in PNG_EXPORTA definition to
+    accommodate the old VisualC++ preprocessor.
+  Defined PNG_ALLOCATED to empty for MSC_VER < 1300.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
