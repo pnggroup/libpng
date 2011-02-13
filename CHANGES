@@ -3246,9 +3246,14 @@ Version 1.5.2beta01 [February 13, 2011]
   More -Wshadow fixes for older gcc compilers.  Older gcc versions apparently
     check formal parameters names in function declarations (as well as
     definitions) to see if they match a name in the global namespace.
-  Changed empty parameter to PNG_BLANK in PNG_EXPORTA definition to
-    accommodate the old VisualC++ preprocessor.
-  Defined PNG_ALLOCATED to empty for MSC_VER < 1300.
+  Revised PNG_EXPORTA macro to not use an empty parameter, to accommodate the
+    old VisualC++ preprocessor.
+  Turned on interlace handling in png_read_png().
+  Fixed gcc pendantic warnings.
+  Handle longjmp in Cygwin.
+  Fixed png_get_current_row_number() in the interlaced case.
+  Cleaned up ALPHA flags and transformations.
+  Implemented expansion to 16 bits.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
