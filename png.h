@@ -808,6 +808,17 @@ typedef PNG_CALLBACK(void, *png_write_status_ptr, (png_structp, png_uint_32,
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef PNG_CALLBACK(void, *png_progressive_info_ptr, (png_structp, png_infop));
 typedef PNG_CALLBACK(void, *png_progressive_end_ptr, (png_structp, png_infop));
+
+/* The following callback receives png_uint_32 row_number, int pass for the
+ * png_bytep data of the row.  When transforming an interlaced image the
+ * row number is the row number within the sub-image of the interlace pass, so
+ * the value will increase to the height of the sub-image (not the full image)
+ * then reset to 0 for the next pass.
+ *
+ * Use PNG_ROW_FROM_PASS_ROW(row, pass) and PNG_COL_FROM_PASS_COL(col, pass) to
+ * find the output pixel (x,y) given an interlaced sub-image pixel
+ * (row,col,pass).  (See below for these macros.)
+ */
 typedef PNG_CALLBACK(void, *png_progressive_row_ptr, (png_structp, png_bytep,
     png_uint_32, int));
 #endif
@@ -1481,13 +1492,13 @@ PNG_EXPORT(87, png_voidp, png_get_user_transform_ptr,
 /* Return information about the row currently being processed.  Note that these
  * APIs do not fail but will return unexpected results if called outside a user
  * transform callback.  Also note that when transforming an interlaced image the
- * row number is still the row in the final, de-interlaced, image but the row
- * only contains the data of the current pass - consult png_row_info for the
- * actual width of the row!
+ * row number is the row number within the sub-image of the interlace pass, so
+ * the value will increase to the height of the sub-image (not the full image)
+ * then reset to 0 for the next pass.
  *
- * In contrast the row numbers passed to the progressive reader and sequential
- * reader callbacks are actually the rows in the input data - so the row in the
- * interlaced pass for an interlaced image.
+ * Use PNG_ROW_FROM_PASS_ROW(row, pass) and PNG_COL_FROM_PASS_COL(col, pass) to
+ * find the output pixel (x,y) given an interlaced sub-image pixel
+ * (row,col,pass).  (See below for these macros.)
  */
 PNG_EXPORT(217, png_uint_32, png_get_current_row_number, (png_const_structp));
 PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structp));
@@ -2152,8 +2163,9 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
 #define PNG_PASS_COLS(width, pass) (((width)+(((1<<PNG_PASS_COL_SHIFT(pass))\
    -1)-PNG_PASS_START_COL(pass)))>>PNG_PASS_COL_SHIFT(pass))
 
-/* For the progressive reader it is necessary to find the row in the output
- * image given a row in an interlaced image, so two more macros:
+/* For the reader row callbacks (both progressive and sequential) it is
+ * necessary to find the row in the output image given a row in an interlaced
+ * image, so two more macros:
  */
 #define PNG_ROW_FROM_PASS_ROW(yIn, pass) \
    (((yIn)<<PNG_PASS_ROW_SHIFT(pass))+PNG_PASS_START_ROW(pass))

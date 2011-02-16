@@ -3073,11 +3073,14 @@ progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
        */
       if (dp->do_interlace && dp->interlace_type == PNG_INTERLACE_ADAM7)
       {
-         if (pass != png_get_current_pass_number(pp))
-            png_error(pp, "png_get_current_pass_number is broken");
-         y = PNG_ROW_FROM_PASS_ROW(y, pass);
+         /* Use this opportunity to validate the png 'current' APIs: */
          if (y != png_get_current_row_number(pp))
             png_error(pp, "png_get_current_row_number is broken");
+
+         if (pass != png_get_current_pass_number(pp))
+            png_error(pp, "png_get_current_pass_number is broken");
+
+         y = PNG_ROW_FROM_PASS_ROW(y, pass);
       }
 
       /* Validate this just in case. */

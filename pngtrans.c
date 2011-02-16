@@ -652,16 +652,11 @@ png_get_user_transform_ptr(png_const_structp png_ptr)
 png_uint_32 PNGAPI
 png_get_current_row_number(png_const_structp png_ptr)
 {
-   /* This API returns the row in output, not the input row: */
+   /* See the comments in png.h - this is the sub-image row when reading and
+    * interlaced image.
+    */
    if (png_ptr != NULL)
-   {
-      if (png_ptr->interlaced == PNG_INTERLACE_NONE)
-         return png_ptr->row_number;
-      else if (png_ptr->interlaced == PNG_INTERLACE_ADAM7)
-         return PNG_ROW_FROM_PASS_ROW(png_ptr->row_number, png_ptr->pass);
-
-      /* Else something bad is happening: */
-   }
+      return png_ptr->row_number;
 
    return PNG_UINT_32_MAX; /* help the app not to fail silently */
 }
