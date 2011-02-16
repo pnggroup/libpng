@@ -2490,6 +2490,14 @@ supported if user transforms are supported, secondly they may well return
 unexpected results unless the row is actually being processed at the moment they
 are called.
 
+With interlaced
+images the value returned is the row in the input sub-image image.  Use
+PNG_ROW_FROM_PASS_ROW(row, pass) and PNG_COL_FROM_PASS_COL(col, pass) to
+find the output pixel (x,y) given an interlaced sub-image pixel (row,col,pass).
+
+The discussion of interlace handling above contains more information on how to
+use these values.
+
 You can also set up a pointer to a user structure for use by your
 callback function, and you can inform libpng that your transform
 function will change the number of channels or bit depth with the
@@ -3748,9 +3756,15 @@ libpng also supplies an information routine that may be called from
 your callback:
 
    png_get_current_row_number(png_ptr);
+   png_get_current_pass_number(png_ptr);
 
-This returns the current row passed to the transform.  Even with interlaced
-images the value returned is the row in the final output image.
+This returns the current row passed to the transform.  With interlaced
+images the value returned is the row in the input sub-image image.  Use
+PNG_ROW_FROM_PASS_ROW(row, pass) and PNG_COL_FROM_PASS_COL(col, pass) to
+find the output pixel (x,y) given an interlaced sub-image pixel (row,col,pass).
+
+The discussion of interlace handling above contains more information on how to
+use these values.
 
 You can also set up a pointer to a user structure for use by your
 callback function.
