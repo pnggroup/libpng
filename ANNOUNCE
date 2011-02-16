@@ -1,5 +1,5 @@
 
-Libpng 1.5.2beta02 - February 14, 2011
+Libpng 1.5.2beta02 - February 16, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -39,9 +39,14 @@ Version 1.5.2beta01 [February 13, 2011]
   Cleaned up ALPHA flags and transformations.
   Implemented expansion to 16 bits.
 
-Version 1.5.2beta02 [February 14, 2011]
+Version 1.5.2beta02 [February 16, 2011]
   Fixed mistake in the descriptions of user read_transform and write_transform
     function prototypes in the manual.  The row_info struct is png_row_infop.
+  Reverted png_get_current_row_number() to previous (1.5.2beta01) behavior.
+  Corrected png_get_current_row_number documentation
+  Fixed the read/write row callback documentation.
+    This documents the current behavior, where the callback is called after
+    every row with information pertaining to the next row.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
