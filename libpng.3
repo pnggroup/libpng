@@ -1440,6 +1440,19 @@ To inform libpng about your function, use
 
     png_set_read_status_fn(png_ptr, read_row_callback);
 
+When this function is called the row has already been completely processed and
+the 'row' and 'pass' refer to the next row to be handled.  For the
+non-interlaced case the row that was just handled is simply one less than the
+passed in row number, and pass will always be 0.  For the interlaced case the
+same applies unless the row value is 0, in which case the row just handled was
+the last one from one of the preceding passes.  Because interlacing may skip a
+pass you cannot be sure that the preceding pass is just 'pass-1', if you really
+need to know what the last pass is record (row,pass) from the callback and use
+the last recorded value each time.
+
+As with the user transform you can find the output row using the
+PNG_ROW_FROM_PASS_ROW macro.
+
 .SS Unknown-chunk handling
 
 Now you get to set the way the library processes unknown chunks in the
@@ -3150,6 +3163,20 @@ You must supply a function
 To inform libpng about your function, use
 
     png_set_write_status_fn(png_ptr, write_row_callback);
+
+When this function is called the row has already been completely processed and
+it has also been written out.  The 'row' and 'pass' refer to the next row to be
+handled.  For the
+non-interlaced case the row that was just handled is simply one less than the
+passed in row number, and pass will always be 0.  For the interlaced case the
+same applies unless the row value is 0, in which case the row just handled was
+the last one from one of the preceding passes.  Because interlacing may skip a
+pass you cannot be sure that the preceding pass is just 'pass-1', if you really
+need to know what the last pass is record (row,pass) from the callback and use
+the last recorded value each time.
+
+As with the user transform you can find the output row using the
+PNG_ROW_FROM_PASS_ROW macro.
 
 You now have the option of modifying how the compression library will
 run.  The following functions are mainly for testing, but may be useful
