@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "February 14, 2011"
+.TH LIBPNG 3 "February 19, 2011"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.2beta02
 .SH SYNOPSIS
@@ -572,11 +572,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.5.2beta02
 
 \fI\fB
 
-\fBvoid png_set_expand_16 (png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_expand (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBvoid png_set_expand (png_structp \fIpng_ptr\fP\fB);\fP
+\fBvoid png_set_expand_16 (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -923,7 +923,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.2beta02 - February 14, 2011
+ libpng version 1.5.2beta02 - February 19, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -934,7 +934,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.2beta02 - February 14, 2011
+ libpng versions 0.97, January 1998, through 1.5.2beta02 - February 19, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -4705,7 +4705,8 @@ application code.  (It is extremely rare for an application to do this.)
 
 Any program that compiled against libpng 1.4 and did not use deprecated
 features or access internal library structures should compile and work
-against libpng 1.5.
+against libpng 1.5, except for the change in the prototype for
+png_get_iCCP() and png_set_iCCP() API functions mentioned above.
 
 libpng 1.5.0 adds PNG_ PASS macros to help in the reading and writing of
 interlaced images.  The macros return the number of rows and columns in
@@ -4713,7 +4714,7 @@ each pass and information that can be used to de-interlace and (if
 absolutely necessary) interlace an image.
 
 libpng 1.5.0 adds an API png_longjmp(png_ptr, value).  This API calls
-the application provided png_longjmp_ptr on the internal, but application
+the application-provided png_longjmp_ptr on the internal, but application
 initialized, jmpbuf.  It is provided as a convenience to avoid the need
 to use the png_jmpbuf macro, which had the unnecessary side effect of
 resetting the internal png_longjmp_ptr value.
@@ -5078,7 +5079,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIV. Y2K Compliance in libpng
 
-February 14, 2011
+February 19, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -5327,7 +5328,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.5.2beta02 - February 14, 2011:
+Libpng version 1.5.2beta02 - February 19, 2011:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5350,7 +5351,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.5.2beta02, February 14, 2011, are
+libpng versions 1.2.6, August 15, 2004, through 1.5.2beta02, February 19, 2011, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -5449,7 +5450,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-February 14, 2011
+February 19, 2011
 
 .\" end of man page
 
