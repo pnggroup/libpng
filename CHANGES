@@ -3264,9 +3264,7 @@ Version 1.5.2beta02 [February 19, 2011]
     This documents the current behavior, where the callback is called after
     every row with information pertaining to the next row.
 
-This documents the current behavior, where the callback is called after every
-row with information pertaining to the next row.  1.6 may well call the callback
-before every row with information for the next row.
+Version 1.5.2beta03 [February 19, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
