@@ -3264,7 +3264,8 @@ Version 1.5.2beta02 [February 19, 2011]
     This documents the current behavior, where the callback is called after
     every row with information pertaining to the next row.
 
-Version 1.5.2beta03 [February 19, 2011]
+Version 1.5.2beta03 [February 20, 2011]
+  Fixed scripts/makefile.vcwin32
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
