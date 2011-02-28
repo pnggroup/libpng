@@ -1,10 +1,10 @@
 
 pngsuite
 --------
-(c) Willem van Schaik, 1999
+(c) Willem van Schaik, 1999, 2011
 
-Permission to use, copy, and distribute these images for any purpose and
-without fee is hereby granted.
+Permission to use, copy, modify, and distribute these images for any
+purpose and without fee is hereby granted.
 
 The 15 "bas*.png" images are part of the much larger PngSuite test-set of 
 images, available for developers of PNG supporting software. The 
@@ -52,7 +52,7 @@ can use them to test the proper functioning of PNG software.
     ftp0n3p08.png  8-bit paletted, opaque
     ftp1n3p08.png  8-bit paletted, no bKGD
 
-Here is the correct result of typing "pngtest -m *.png" in
+Here is the correct result of typing "pngtest -m bas*.png" in
 this directory:
 
 Testing basn0g01.png: PASS (524 zero samples)

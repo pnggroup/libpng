@@ -1,5 +1,5 @@
 
-Libpng 1.5.2beta03 - February 20, 2011
+Libpng 1.5.2beta03 - February 28, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -48,8 +48,9 @@ Version 1.5.2beta02 [February 19, 2011]
     This documents the current behavior, where the callback is called after
     every row with information pertaining to the next row.
 
-Version 1.5.2beta03 [February 20, 2011]
+Version 1.5.2beta03 [February 28, 2011]
   Fixed scripts/makefile.vcwin32
+  Updated contrib/pngsuite/README to add the word "modify".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
