@@ -1,5 +1,5 @@
 
-Libpng 1.5.2beta03 - March 3, 2011
+Libpng 1.5.2beta04 - March 3, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.2beta03.tar.xz (LZMA-compressed, recommended)
-   1.5.2beta03.tar.gz
-   1.5.2beta03.tar.bz2
+   1.5.2beta04.tar.xz (LZMA-compressed, recommended)
+   1.5.2beta04.tar.gz
+   1.5.2beta04.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp152b03.7z  (LZMA-compressed, recommended)
-   lp152b03.zip
+   lp152b04.7z  (LZMA-compressed, recommended)
+   lp152b04.zip
 
 Other information:
 
-   1.5.2beta03-README.txt
-   1.5.2beta03-LICENSE.txt
+   1.5.2beta04-README.txt
+   1.5.2beta04-LICENSE.txt
 
 Changes since the last public release (1.5.1):
 
@@ -52,6 +52,8 @@ Version 1.5.2beta03 [March 3, 2011]
   Fixed scripts/makefile.vcwin32
   Updated contrib/pngsuite/README to add the word "modify".
   Define PNG_ALLOCATED to blank when _MSC_VER<1300.
+
+Version 1.5.2beta04 [March 3, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

@@ -3269,6 +3269,8 @@ Version 1.5.2beta03 [March 3, 2011]
   Updated contrib/pngsuite/README to add the word "modify".
   Define PNG_ALLOCATED to blank when _MSC_VER<1300.
 
+Version 1.5.2beta04 [March 3, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
