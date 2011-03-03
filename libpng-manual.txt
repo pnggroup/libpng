@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.2beta03 - February 19, 2011
+ libpng version 1.5.2beta03 - March 3, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.2beta03 - February 19, 2011
+ libpng versions 0.97, January 1998, through 1.5.2beta03 - March 3, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -2295,6 +2295,8 @@ which changes how much time zlib spends on trying to compress the image
 data.  See the Compression Library (zlib.h and algorithm.txt, distributed
 with zlib) for details on the compression levels.
 
+    #include zlib.h
+
     /* set the zlib compression level */
     png_set_compression_level(png_ptr,
         Z_BEST_COMPRESSION);
@@ -3284,6 +3286,7 @@ specify no compression (Z_NO_COMPRESSION = 0), but this would create
 files larger than just storing the raw bitmap.  You can specify the
 compression level by calling:
 
+    #include zlib.h
     png_set_compression_level(png_ptr, level);
 
 Another useful one is to reduce the memory level used by the library.
@@ -3294,12 +3297,14 @@ other things, lower levels will result in sections of incompressible
 data being emitted in smaller stored blocks, with a correspondingly
 larger relative overhead of up to 15% in the worst case.
 
+    #include zlib.h
     png_set_compression_mem_level(png_ptr, level);
 
 The other functions are for configuring zlib.  They are not recommended
 for normal use and may result in writing an invalid PNG file.  See
 zlib.h for more information on what these mean.
 
+    #include zlib.h
     png_set_compression_strategy(png_ptr,
         strategy);
 
@@ -4156,7 +4161,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-February 19, 2011
+March 3, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
