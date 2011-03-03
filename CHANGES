@@ -3264,9 +3264,10 @@ Version 1.5.2beta02 [February 19, 2011]
     This documents the current behavior, where the callback is called after
     every row with information pertaining to the next row.
 
-Version 1.5.2beta03 [February 28, 2011]
+Version 1.5.2beta03 [March 3, 2011]
   Fixed scripts/makefile.vcwin32
   Updated contrib/pngsuite/README to add the word "modify".
+  Define PNG_ALLOCATED to blank when _MSC_VER<1300.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -404,7 +404,11 @@
 #      define PNG_PTR_NORETURN /* not supported */
 #    endif
 #    ifndef PNG_ALLOCATED
-#      define PNG_ALLOCATED __declspec(restrict)
+#      if (_MSC_VER < 1300)
+#         define PNG_ALLOCATED /* not supported */
+#      else
+#         define PNG_ALLOCATED __declspec(restrict)
+#      endif
 #    endif
 
     /* This specifically protects structure members that should only be
