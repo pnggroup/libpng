@@ -302,9 +302,10 @@
     * scripts directory.
     */
 #ifndef PNG_EXPORTA
+
 #  define PNG_EXPORTA(ordinal, type, name, args, attributes)\
-      PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args), extern\
-         attributes)
+      PNG_FUNCTION(PNG_EXPORT_TYPE(type),(PNGAPI name),PNGARG(args), \
+        extern attributes)
 #endif
 
 /* ANSI-C (C90) does not permit a macro to be invoked with an empty argument,
@@ -393,7 +394,8 @@
 #      endif
 #    endif /* PNGLIB_BUILD */
 #  endif /* __GNUC__ */
-#  ifdef _MSC_VER /* may need to check value */
+
+#  if defined(_MSC_VER)  && (_MSC_VER >= 1300)
 #    ifndef PNG_USE_RESULT
 #      define PNG_USE_RESULT /* not supported */
 #    endif
@@ -404,11 +406,7 @@
 #      define PNG_PTR_NORETURN /* not supported */
 #    endif
 #    ifndef PNG_ALLOCATED
-#      if (_MSC_VER < 1300)
-#         define PNG_ALLOCATED /* not supported */
-#      else
-#         define PNG_ALLOCATED __declspec(restrict)
-#      endif
+#      define PNG_ALLOCATED __declspec(restrict)
 #    endif
 
     /* This specifically protects structure members that should only be

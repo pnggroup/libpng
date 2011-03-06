@@ -1,5 +1,5 @@
 
-Libpng 1.5.2beta04 - March 3, 2011
+Libpng 1.5.2beta04 - March 6, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -53,7 +53,8 @@ Version 1.5.2beta03 [March 3, 2011]
   Updated contrib/pngsuite/README to add the word "modify".
   Define PNG_ALLOCATED to blank when _MSC_VER<1300.
 
-Version 1.5.2beta04 [March 3, 2011]
+Version 1.5.2beta04 [March 6, 2011]
+  Define remaining attributes to blank when MSC_VER<1300.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
