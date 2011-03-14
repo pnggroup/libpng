@@ -1,5 +1,5 @@
 
-Libpng 1.4.6beta06 - March 8, 2011
+Libpng 1.4.6beta06 - March 14, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -49,9 +49,9 @@ version 1.4.6beta05 [January 23, 2011]
   Fixed a typo in the *.def files and deleted entries that are now
     declared in pngpriv.h
 
-version 1.4.6beta06 [March 8, 2011]
+version 1.4.6beta06 [March 14, 2011]
   Updated contrib/pngsuite/README to add the word "modify".
-  Added the private PNG_UNUSED() macro definition in pngpriv.h.
+  Added the private PNG_UNUSED() macro definition in pngconf.h.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
