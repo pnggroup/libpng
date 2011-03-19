@@ -56,6 +56,7 @@ version 1.4.6beta06 [March 19, 2011]
 version 1.4.6beta07 [March 19, 2011]
   ifdef out mask arrays in pngread.c when interlacing is not supported.
   Added attribute definition (warnings) for MSC_VER >= 1300 in pngconf.h
+  Added -D_CRT_SECURE_NO_DEPRECATE to CFLAGS in makefile.vcwin32
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
