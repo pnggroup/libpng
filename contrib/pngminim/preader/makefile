@@ -9,6 +9,12 @@ STRIP=strip
 # If awk fails try
 # make AWK=nawk
 
+# If cpp fails try
+# make CPP=/lib/cpp
+
+# If strip fails try
+# make STRIP=touch
+
 RM=rm -f
 COPY=cp
 

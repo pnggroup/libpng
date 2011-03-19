@@ -1,5 +1,5 @@
 
-Libpng 1.5.2rc01 - March 19, 2011
+Libpng 1.5.2rc02 - March 19, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.2rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.2rc01.tar.gz
-   1.5.2rc01.tar.bz2
+   1.5.2rc02.tar.xz (LZMA-compressed, recommended)
+   1.5.2rc02.tar.gz
+   1.5.2rc02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp152r01.7z  (LZMA-compressed, recommended)
-   lp152r01.zip
+   lp152r02.7z  (LZMA-compressed, recommended)
+   lp152r02.zip
 
 Other information:
 
-   1.5.2rc01-README.txt
-   1.5.2rc01-LICENSE.txt
+   1.5.2rc02-README.txt
+   1.5.2rc02-LICENSE.txt
 
 Changes since the last public release (1.5.1):
 
@@ -55,6 +55,12 @@ Version 1.5.2beta03 [March 3, 2011]
 
 Version 1.5.2rc01 [March 19, 2011]
   Define remaining attributes to blank when MSC_VER<1300.
+  ifdef out mask arrays in pngread.c when interlacing is not supported.
+
+Version 1.5.2rc02 [March 19, 2011]
+  Added a hint to try CPP=/bin/cpp if "cpp -E" fails in scripts/pnglibconf.mak
+    and in contrib/pngminim/*/makefile and to try "STRIP=touch" if strip is
+    missing, eg., on SunOS 5.10
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

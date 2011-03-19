@@ -6,8 +6,14 @@ CC=gcc
 LD=$(CC)
 STRIP=strip
 
+#if strip fails try
+# make STRIP=touch
+
 # If awk fails try
 # make AWK=nawk
+
+# If cpp fails try
+# make CPP=/lib/cpp
 
 RM=rm -f
 COPY=cp
