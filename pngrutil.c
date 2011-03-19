@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.6 [January 23, 2011]
+ * Last changed in libpng 1.4.6 [March 8, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -703,7 +703,7 @@ png_handle_IEND(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
    png_crc_finish(png_ptr, length);
 
-   info_ptr = info_ptr; /* Quiet compiler warnings about unused info_ptr */
+   PNG_UNUSED(info_ptr) /* Quiet compiler warnings about unused info_ptr */
 }
 
 #ifdef PNG_READ_gAMA_SUPPORTED
@@ -2505,7 +2505,7 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_crc_finish(png_ptr, skip);
 
 #ifndef PNG_READ_USER_CHUNKS_SUPPORTED
-   info_ptr = info_ptr; /* Quiet compiler warnings about unused info_ptr */
+   PNG_UNUSED(info_ptr) /* Quiet compiler warnings about unused info_ptr */
 #endif
 }
 
@@ -2961,7 +2961,7 @@ png_do_read_interlace(png_structp png_ptr)
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth, final_width);
    }
 #ifndef PNG_READ_PACKSWAP_SUPPORTED
-   transformations = transformations; /* Silence compiler warning */
+   PNG_UNUSED(transformations)  /* Silence compiler warning */
 #endif
 }
 #endif /* PNG_READ_INTERLACING_SUPPORTED */

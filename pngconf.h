@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.6beta06 - January 23, 2011
+ * libpng version 1.4.6beta06 - March 19, 2011
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -83,6 +83,18 @@
 #endif /* __STDC__ */
 
 /* End of material added to libpng-1.2.8 */
+
+/* Added at libpng-1.4.6 */
+#ifndef PNG_UNUSED
+/* Unused formal parameter warnings are silenced using the following macro
+ * which is expected to have no bad effects on performance (optimizing
+ * compilers will probably remove it entirely).  Note that if you replace
+ * it with something other than whitespace, you must include the terminating
+ * semicolon.
+ */
+#  define PNG_UNUSED(param) (void)param;
+#endif
+/* End of material added to libpng-1.4.6 */
 
 #ifndef PNG_VERSION_INFO_ONLY
 
