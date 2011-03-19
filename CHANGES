@@ -2765,6 +2765,10 @@ version 1.4.6beta06 [March 19, 2011]
   Updated contrib/pngsuite/README to add the word "modify".
   Added the private PNG_UNUSED() macro definition in pngconf.h.
 
+version 1.4.6beta07 [March 19, 2011]
+  ifdef out mask arrays in pngread.c when interlacing is not supported.
+  Added attribute definition (warnings) for MSC_VER >= 1300 in pngconf.h
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
