@@ -57,6 +57,10 @@ version 1.4.6beta07 [March 19, 2011]
   ifdef out mask arrays in pngread.c when interlacing is not supported.
   Added attribute definition (warnings) for MSC_VER >= 1300 in pngconf.h
   Added -D_CRT_SECURE_NO_DEPRECATE to CFLAGS in makefile.vcwin32
+  Fixed mistake in the descriptions of user read_transform and write_transform
+    function prototypes in the manual.  The row_info struct is png_row_infop.
+  Added a request in the manual that applications do not use "png_" or
+    "PNG_" to begin any of their own symbols.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
