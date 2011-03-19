@@ -2773,6 +2773,8 @@ version 1.4.6beta07 [March 19, 2011]
     function prototypes in the manual.  The row_info struct is png_row_infop.
   Added a request in the manual that applications do not use "png_" or
     "PNG_" to begin any of their own symbols.
+  Fixed incorrect examples of callback prototypes in the manual, that were
+    introduced in libpng-1.0.0.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
