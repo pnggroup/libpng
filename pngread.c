@@ -488,9 +488,11 @@ void PNGAPI
 png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 {
    PNG_IDAT;
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    PNG_CONST int png_pass_dsp_mask[7] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55,
        0xff};
    PNG_CONST int png_pass_mask[7] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
+#endif
    int ret;
 
    if (png_ptr == NULL)

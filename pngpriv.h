@@ -83,13 +83,15 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  define PNG_MAX_MALLOC_64K
 #endif
 
+#ifndef PNG_UNUSED
 /* Unused formal parameter warnings are silenced using the following macro
  * which is expected to have no bad effects on performance (optimizing
  * compilers will probably remove it entirely).  Note that if you replace
  * it with something other than whitespace, you must include the terminating
  * semicolon.
  */
-#define PNG_UNUSED(param) (void)param;
+#  define PNG_UNUSED(param) (void)param;
+#endif
 
 /* Just a little check that someone hasn't tried to define something
  * contradictory.
