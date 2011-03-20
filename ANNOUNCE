@@ -1,5 +1,5 @@
 
-Libpng 1.5.2rc02 - March 19, 2011
+Libpng 1.5.2rc02 - March 20, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -57,10 +57,10 @@ Version 1.5.2rc01 [March 19, 2011]
   Define remaining attributes to blank when MSC_VER<1300.
   ifdef out mask arrays in pngread.c when interlacing is not supported.
 
-Version 1.5.2rc02 [March 19, 2011]
+Version 1.5.2rc02 [March 20, 2011]
   Added a hint to try CPP=/bin/cpp if "cpp -E" fails in scripts/pnglibconf.mak
-    and in contrib/pngminim/*/makefile and to try "STRIP=touch" if strip is
-    missing, eg., on SunOS 5.10
+    and in contrib/pngminim/*/makefile, eg., on SunOS 5.10, and removed "strip"
+    from the makefiles.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

@@ -4,16 +4,12 @@
 #CC=cc
 CC=gcc
 LD=$(CC)
-STRIP=strip
 
 # If awk fails try
 # make AWK=nawk
 
 # If cpp fails try
 # make CPP=/lib/cpp
-
-# If strip fails try
-# make STRIP=touch
 
 RM=rm -f
 COPY=cp
@@ -92,7 +88,6 @@ all: pnm2pngm$(E)
 
 pnm2pngm$(E): $(OBJS)
 	$(LD) -o pnm2pngm$(E) $(OBJS)
-	$(STRIP) pnm2pngm$(E)
 
 # The DFA_XTRA setting turns all libpng options off then
 # turns on those required for this minimal build.
