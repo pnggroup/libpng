@@ -50,7 +50,6 @@ all: rpng2-x$(E)
 
 rpng2-x$(E): $(OBJS)
 	$(LD) -o rpng2-x$(E) $(OBJS) $(LIBS)
-	strip rpng2-x$(E)
 
 clean:
 	$(RM) rpng2-x$(O)

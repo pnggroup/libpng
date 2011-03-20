@@ -32,7 +32,6 @@ all: pnm2pngm$(E)
 
 pnm2pngm$(E): $(OBJS)
 	$(LD) -o pnm2pngm$(E) $(OBJS)
-	strip pnm2pngm$(E)
 
 clean:
 	$(RM) pnm2pngm$(O)
