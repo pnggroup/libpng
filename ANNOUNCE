@@ -1,5 +1,5 @@
 
-Libpng 1.4.6beta07 - March 20, 2011
+Libpng 1.4.6beta07 - March 21, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -53,7 +53,7 @@ version 1.4.6beta06 [March 19, 2011]
   Updated contrib/pngsuite/README to add the word "modify".
   Added the private PNG_UNUSED() macro definition in pngconf.h.
 
-version 1.4.6beta07 [March 20, 2011]
+version 1.4.6beta07 [March 21, 2011]
   ifdef out mask arrays in pngread.c when interlacing is not supported.
   Added attribute definition (warnings) for MSC_VER >= 1300 in pngconf.h
   Added -D_CRT_SECURE_NO_DEPRECATE to CFLAGS in makefile.vcwin32
@@ -64,6 +64,8 @@ version 1.4.6beta07 [March 20, 2011]
   Fixed incorrect examples of callback prototypes in the manual, that were
     introduced in libpng-1.0.0.
   Removed "strip" from contrib/pngminim/*/makefile.
+  Fixed a bug (present since libpng-1.0.7) that makes png_handle_sPLT() fail
+    to compile when PNG_NO_POINTER_INDEXING is defined.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

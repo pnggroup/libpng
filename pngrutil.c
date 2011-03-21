@@ -1216,9 +1216,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_bytep entry_start;
    png_sPLT_t new_palette;
-#ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_sPLT_entryp pp;
-#endif
    int data_length, entry_size, i;
    png_uint_32 skip = 0;
    png_size_t slength;
@@ -1357,7 +1355,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           pp[i].blue  = png_get_uint_16(entry_start); entry_start += 2;
           pp[i].alpha = png_get_uint_16(entry_start); entry_start += 2;
       }
-      pp->frequency = png_get_uint_16(entry_start); entry_start += 2;
+      pp[i].frequency = png_get_uint_16(entry_start); entry_start += 2;
    }
 #endif
 
