@@ -22,29 +22,31 @@
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
+#ifndef PNG_BUILDING_SYMBOL_TABLE
 /* PNG_NO_LIMITS_H may be used to turn off the use of the standard C
  * definition file for  machine specific limits, this may impact the
  * correctness of the definitons below (see uses of INT_MAX).
  */
-#ifndef PNG_NO_LIMITS_H
-#  include <limits.h>
-#endif
+#  ifndef PNG_NO_LIMITS_H
+#    include <limits.h>
+#  endif
 
 /* For the memory copy APIs (i.e. the standard definitions of these),
  * because this file defines png_memcpy and so on the base APIs must
  * be defined here.
  */
-#ifdef BSD
-#  include <strings.h>
-#else
-#  include <string.h>
-#endif
+#  ifdef BSD
+#    include <strings.h>
+#  else
+#    include <string.h>
+#  endif
 
 /* For png_FILE_p - this provides the standard definition of a
  * FILE
  */
-#ifdef PNG_STDIO_SUPPORTED
-#  include <stdio.h>
+#  ifdef PNG_STDIO_SUPPORTED
+#    include <stdio.h>
+#  endif
 #endif
 
 /* This controls optimization of the reading of 16 and 32 bit values

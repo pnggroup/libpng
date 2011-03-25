@@ -3280,7 +3280,9 @@ Version 1.5.2rc02 [March 22, 2011]
   Fixed a bug (present since libpng-1.0.7) that makes png_handle_sPLT() fail
     to compile when PNG_NO_POINTER_INDEXING is defined (Chubanov Kirill)
 
-Version 1.5.2rc03 [March 24, 2011]
+Version 1.5.2rc03 [March 25, 2011]
+  Don't include standard header files in png.h while building the symbol table,
+    to avoid cpp failure on SunOS (introduced PNG_BUILDING_SYMBOL_TABLE macro).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
