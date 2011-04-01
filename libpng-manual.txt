@@ -2295,11 +2295,11 @@ with zlib) for details on the compression levels.
 
     #include zlib.h
 
-    /* set the zlib compression level */
+    /* Set the zlib compression level */
     png_set_compression_level(png_ptr,
         Z_BEST_COMPRESSION);
 
-    /* set other zlib parameters */
+    /* Set other zlib parameters for compressing IDAT */
     png_set_compression_mem_level(png_ptr, 8);
     png_set_compression_strategy(png_ptr,
         Z_DEFAULT_STRATEGY);
@@ -2307,7 +2307,10 @@ with zlib) for details on the compression levels.
     png_set_compression_method(png_ptr, 8);
     png_set_compression_buffer_size(png_ptr, 8192)
 
-    /* set zlib parameters for text compression */
+    /* Set zlib parameters for text compression
+     * If you don't call these, the parameters
+     * fall back on those defined for IDAT chunks
+     */
     png_set_text_compression_mem_level(png_ptr, 8);
     png_set_text_compression_strategy(png_ptr,
         Z_DEFAULT_STRATEGY);
