@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.5.1 [February 3, 2011]
+ * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1490,6 +1490,86 @@ png_set_compression_method(png_structp png_ptr, int method)
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_METHOD;
    png_ptr->zlib_method = method;
 }
+
+/* The following were added to libpng-1.5.2 */
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION
+void PNGAPI
+png_set_text_compression_level(png_structp png_ptr, int level)
+{
+   png_debug(1, "in png_set_text_compression_level");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_LEVEL;
+   png_ptr->zlib_text_level = level;
+}
+
+void PNGAPI
+png_set_text_compression_mem_level(png_structp png_ptr, int mem_level)
+{
+   png_debug(1, "in png_set_text_compression_mem_level");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL;
+   png_ptr->zlib_text_mem_level = mem_level;
+}
+
+void PNGAPI
+png_set_text_compression_strategy(png_structp png_ptr, int strategy)
+{
+   png_debug(1, "in png_set_text_compression_strategy");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_STRATEGY;
+   png_ptr->zlib_text_strategy = strategy;
+}
+
+void PNGAPI
+png_set_text_compression_window_bits(png_structp png_ptr, int window_bits)
+{
+   if (png_ptr == NULL)
+      return;
+
+   if (window_bits > 15)
+      png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
+
+   else if (window_bits < 8)
+      png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
+
+#ifndef WBITS_8_OK
+   /* Avoid libpng bug with 256-byte windows */
+   if (window_bits == 8)
+      {
+        png_warning(png_ptr, "Text compression window is being reset to 512");
+        window_bits = 9;
+      }
+
+#endif
+   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS;
+   png_ptr->zlib_text_window_bits = window_bits;
+}
+
+void PNGAPI
+png_set_text_compression_method(png_structp png_ptr, int method)
+{
+   png_debug(1, "in png_set_text_compression_method");
+
+   if (png_ptr == NULL)
+      return;
+
+   if (method != 8)
+      png_warning(png_ptr, "Only compression method 8 is supported by PNG");
+
+   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_METHOD;
+   png_ptr->zlib_text_method = method;
+}
+#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+/* end of API added to libpng-1.5.2 */
 
 void PNGAPI
 png_set_write_status_fn(png_structp png_ptr, png_write_status_ptr write_row_fn)

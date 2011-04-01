@@ -3285,6 +3285,10 @@ Version 1.5.2rc03 [March 24, 2011]
     to avoid cpp failure on SunOS (introduced PNG_BUILDING_SYMBOL_TABLE macro).
 
 Version 1.5.2 [March 31, 2011]
+  No changes.
+
+Version 1.5.3beta01 [April 1, 2011]
+  Re-initialize the zlib compressor before compressing non-IDAT chunks.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

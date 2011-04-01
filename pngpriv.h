@@ -345,13 +345,13 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
                                   /*      0x200000L  unused */
                                   /*      0x400000L  unused */
 #define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000L  /* Added to libpng-1.4.0 */
-                                  /*     0x1000000L  unused */
-                                  /*     0x2000000L  unused */
-                                  /*     0x4000000L  unused */
-                                  /*     0x8000000L  unused */
-                                  /*    0x10000000L  unused */
-                                  /*    0x20000000L  unused */
-                                  /*    0x40000000L  unused */
+#define PNG_FLAG_ZTXT_CUSTOM_STRATEGY    0x1000000L  /* 5 lines added */
+#define PNG_FLAG_ZTXT_CUSTOM_LEVEL       0x2000000L  /* to libpng-1.5.2 */
+#define PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL   0x4000000L
+#define PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS 0x8000000L
+#define PNG_FLAG_ZTXT_CUSTOM_METHOD      0x10000000L
+                                  /*     0x20000000L  unused */
+                                  /*     0x40000000L  unused */
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
                                      PNG_FLAG_CRC_ANCILLARY_NOWARN)

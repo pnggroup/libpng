@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -256,9 +256,33 @@ png_text_compress(png_structp png_ptr,
     * wouldn't cause a failure, just a slowdown due to swapping).
     */
 
+   /* Initialize the compressor.  To do: Why do we need this? */
+   ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_text_level,
+       png_ptr->zlib_text_method, png_ptr->zlib_text_window_bits,
+       png_ptr->zlib_text_mem_level, png_ptr->zlib_text_strategy);
+
+   if (ret != Z_OK)
+   {
+      if (ret == Z_VERSION_ERROR)
+         png_error(png_ptr,
+            "zlib failed to initialize compressor for text-- version error");
+
+      if (ret == Z_STREAM_ERROR)
+         png_error(png_ptr,
+             "zlib failed to initialize compressor for text-- stream error");
+
+      if (ret == Z_MEM_ERROR)
+         png_error(png_ptr,
+             "zlib failed to initialize compressor for text-- mem error");
+
+      png_error(png_ptr, "zlib failed to initialize compressor for text");
+   }
+
    /* Set up the compression buffers */
+
    /* TODO: the following cast hides a potential overflow problem. */
    png_ptr->zstream.avail_in = (uInt)text_len;
+
    /* NOTE: assume zlib doesn't overwrite the input */
    png_ptr->zstream.next_in = (Bytef *)text;
    png_ptr->zstream.avail_out = png_ptr->zbuf_size;
@@ -437,7 +461,6 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
 
    /* Reset zlib for another zTXt/iTXt or image data */
    deflateReset(&png_ptr->zstream);
-   png_ptr->zstream.data_type = Z_BINARY;
 }
 #endif
 
@@ -632,33 +655,33 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    if (!(png_ptr->flags & PNG_FLAG_ZLIB_CUSTOM_METHOD))
       png_ptr->zlib_method = 8;
 
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION
+   if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_STRATEGY))
+      png_ptr->zlib_text_strategy = Z_DEFAULT_STRATEGY;
+
+   if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_LEVEL))
+      png_ptr->zlib_text_level = Z_DEFAULT_COMPRESSION;
+
+   if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL))
+      png_ptr->zlib_text_mem_level = 8;
+
+   if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS))
+      png_ptr->zlib_text_window_bits = 15;
+
+   if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_METHOD))
+      png_ptr->zlib_text_method = 8;
+#else
+   png_ptr->zlib_text_strategy = Z_DEFAULT_STRATEGY;
+   png_ptr->zlib_text_level = Z_DEFAULT_COMPRESSION;
+   png_ptr->zlib_text_mem_level = 8;
+   png_ptr->zlib_text_window_bits = 15;
+   png_ptr->zlib_text_method = 8;
+#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+
+   /* Initialize the zlib compressor */
    ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
        png_ptr->zlib_method, png_ptr->zlib_window_bits,
        png_ptr->zlib_mem_level, png_ptr->zlib_strategy);
-
-   if (ret != Z_OK)
-   {
-      if (ret == Z_VERSION_ERROR)
-         png_error(png_ptr,
-            "zlib failed to initialize compressor -- version error");
-
-      if (ret == Z_STREAM_ERROR)
-         png_error(png_ptr,
-             "zlib failed to initialize compressor -- stream error");
-
-      if (ret == Z_MEM_ERROR)
-         png_error(png_ptr,
-             "zlib failed to initialize compressor -- mem error");
-
-      png_error(png_ptr, "zlib failed to initialize compressor");
-   }
-
-   png_ptr->zstream.next_out = png_ptr->zbuf;
-   png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-   /* libpng is not interested in zstream.data_type, so set it
-    * to a predefined value, to avoid its evaluation inside zlib
-    */
-   png_ptr->zstream.data_type = Z_BINARY;
 
    png_ptr->mode = PNG_HAVE_IHDR;
 }
@@ -750,7 +773,39 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
    if (!(png_ptr->mode & PNG_HAVE_IDAT) &&
        png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
    {
-      unsigned int z_cmf = data[0];  /* zlib compression method and flags */
+      int ret;
+      unsigned int z_cmf;  /* zlib compression method and flags */
+
+      ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
+          png_ptr->zlib_method, png_ptr->zlib_window_bits,
+          png_ptr->zlib_mem_level, png_ptr->zlib_strategy);
+
+      if (ret != Z_OK)
+      {
+         if (ret == Z_VERSION_ERROR)
+            png_error(png_ptr,
+               "zlib failed to initialize compressor -- version error");
+
+         if (ret == Z_STREAM_ERROR)
+            png_error(png_ptr,
+                "zlib failed to initialize compressor -- stream error");
+
+         if (ret == Z_MEM_ERROR)
+            png_error(png_ptr,
+                "zlib failed to initialize compressor -- mem error");
+
+         png_error(png_ptr, "zlib failed to initialize compressor");
+      }
+
+      png_ptr->zstream.next_out = png_ptr->zbuf;
+      png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+      /* libpng is not interested in zstream.data_type, so set it
+       * to a predefined value, to avoid its evaluation inside zlib
+       */
+      png_ptr->zstream.data_type = Z_BINARY;
+
+      z_cmf = data[0];
+
       if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
       {
          /* Avoid memory underflows and multiplication overflows.
