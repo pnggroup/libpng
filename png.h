@@ -150,6 +150,7 @@
  *    1.5.2beta01-03          15    10502  15.so.15.2[.0]
  *    1.5.2rc01-03            15    10502  15.so.15.2[.0]
  *    1.5.2                   15    10502  15.so.15.2[.0]
+ *    1.5.3beta01             15    10503  15.so.15.3[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
