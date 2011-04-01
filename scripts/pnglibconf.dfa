@@ -506,7 +506,7 @@ chunk cHRM
 chunk gAMA
 chunk hIST
 chunk iCCP
-chunk iTXt requires TEXT
+chunk iTXt
 chunk oFFs
 chunk pCAL
 chunk sCAL
@@ -517,7 +517,7 @@ chunk sRGB
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS
-chunk zTXt requires TEXT
+chunk zTXt
 
 # This only affects support of the optional PLTE chunk in RGB and RGBA
 # images.  Notice that READ_ANCILLARY_CHUNKS therefore disables part
@@ -546,8 +546,20 @@ option SAVE_INT_32 requires WRITE
 
 # png_save_int_32 is required by the ancillary chunks oFFs and pCAL
 
+option READ_iCCP enables READ_COMPRESSED_TEXT
+option READ_iTXt enables READ_COMPRESSED_TEXT
+option READ_sPLT enables READ_COMPRESSED_TEXT
+option READ_zTXt enables READ_COMPRESSED_TEXT
+option READ_COMPRESSED_TEXT enables READ_TEXT
+
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32
+
+option WRITE_iCCP enables WRITE_COMPRESSED_TEXT
+option WRITE_iTXt enables WRITE_COMPRESSED_TEXT
+option WRITE_sPLT enables WRITE_COMPRESSED_TEXT
+option WRITE_zTXt enables WRITE_COMPRESSED_TEXT
+option WRITE_COMPRESSED_TEXT enables WRITE_TEXT
 
 # Turn this off to disable png_read_png() and png_write_png() and
 # leave the row_pointers member out of the info structure.

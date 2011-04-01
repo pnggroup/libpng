@@ -278,8 +278,7 @@ png_crc_error(png_structp png_ptr)
       return (0);
 }
 
-#if defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_READ_iTXt_SUPPORTED) || \
-    defined(PNG_READ_iCCP_SUPPORTED)
+#ifdef PNG_READ_COMPRESSED_TEXT_SUPPORTED
 static png_size_t
 png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
     png_bytep output, png_size_t output_size)
@@ -536,7 +535,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
    *newlength = prefix_size;
 }
-#endif
+#endif /* PNG_READ_COMPRESSED_TEXT_SUPPORTED */
 
 /* Read and check the IDHR chunk */
 void /* PRIVATE */
