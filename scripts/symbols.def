@@ -227,3 +227,8 @@ EXPORTS
  png_process_data_pause @219
  png_process_data_skip @220
  png_set_expand_16 @221
+ png_set_text_compression_level @222
+ png_set_text_compression_mem_level @223
+ png_set_text_compression_strategy @224
+ png_set_text_compression_window_bits @225
+ png_set_text_compression_level @226

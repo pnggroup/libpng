@@ -3289,8 +3289,10 @@ Version 1.5.2 [March 31, 2011]
 
 Version 1.5.3beta01 [April 1, 2011]
   Re-initialize the zlib compressor before compressing non-IDAT chunks.
+  Added API functions to set parameters for zlib compression of non-IDAT chunks.
 
 Version 1.5.3beta02 [April 1, 2011]
+  Updated scripts/symbols.def with new API functions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
