@@ -779,8 +779,6 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
 
    png_debug(1, "in png_write_IDAT");
 
-   /* Optimize the CMF field in the zlib stream. */
-   /* This hack of the zlib stream is compliant to the stream specification. */
    if (!(png_ptr->mode & PNG_HAVE_IDAT) &&
        png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
    {
@@ -788,10 +786,10 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
 
 #ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
       int ret;
+
+      /* Reinitialize the compressor if necessary */
       if (png_ptr->mode & PNG_ZLIB_READY_FOR_ZTXT)
       {
-         /* png_warning(png_ptr, "Initialize compressor for IDAT"); */
-
          /* Free memory from previously opened zstream */
          deflateEnd(&png_ptr->zstream);
 
@@ -826,6 +824,9 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
        */
       png_ptr->zstream.data_type = Z_BINARY;
 
+      /* Optimize the CMF field in the zlib stream.  This hack of the zlib
+       * stream is compliant to the stream specification.
+       */
       z_cmf = data[0];
 
       if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
@@ -838,6 +839,10 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
          if (length >= 2 &&
              png_ptr->height < 16384 && png_ptr->width < 16384)
          {
+            /* Compute the maximum possible length of the datastream
+             *
+             * To do: verify that this works with interlaced files
+             */
             png_uint_32 uncompressed_idat_size = png_ptr->height *
                 ((png_ptr->width *
                 png_ptr->channels * png_ptr->bit_depth + 15) >> 3);
