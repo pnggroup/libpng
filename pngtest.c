@@ -913,6 +913,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #  endif
 #endif
 
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION
+   png_set_text_compression_strategy(write_ptr, Z_FILTERED);
+#endif
+
    if (status_dots_requested == 1)
    {
 #ifdef PNG_WRITE_SUPPORTED
