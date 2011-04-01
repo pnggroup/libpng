@@ -678,6 +678,8 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->zlib_text_method = 8;
 #endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 
+   /* Free memory from previously opened zstream */
+   deflateEnd(&png_ptr->zstream);
    /* Initialize the zlib compressor */
    ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
        png_ptr->zlib_method, png_ptr->zlib_window_bits,
@@ -775,6 +777,9 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
    {
       int ret;
       unsigned int z_cmf;  /* zlib compression method and flags */
+
+      /* Free memory from previously opened zstream */
+      deflateEnd(&png_ptr->zstream);
 
       ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
           png_ptr->zlib_method, png_ptr->zlib_window_bits,
