@@ -277,6 +277,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_BACKGROUND_IS_GRAY     0x800
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
+#define PNG_ZLIB_READY_FOR_ZTXT   0x4000 /* 1: ready for ZTXT; 0: for IDAT */
 
 /* Flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                 0x0001

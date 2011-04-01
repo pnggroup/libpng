@@ -256,26 +256,33 @@ png_text_compress(png_structp png_ptr,
     * wouldn't cause a failure, just a slowdown due to swapping).
     */
 
-   /* Initialize the compressor.  To do: Why do we need this? */
-   ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_text_level,
-       png_ptr->zlib_text_method, png_ptr->zlib_text_window_bits,
-       png_ptr->zlib_text_mem_level, png_ptr->zlib_text_strategy);
+   if (!(png_ptr->mode & PNG_ZLIB_READY_FOR_ZTXT))
+     {
+        /* Free memory from previously opened zstream */
+        deflateEnd(&png_ptr->zstream);
 
-   if (ret != Z_OK)
-   {
-      if (ret == Z_VERSION_ERROR)
-         png_error(png_ptr,
-            "zlib failed to initialize compressor for text-- version error");
+        /* Initialize the compressor for zTXt compression. */
+        ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_text_level,
+            png_ptr->zlib_text_method, png_ptr->zlib_text_window_bits,
+            png_ptr->zlib_text_mem_level, png_ptr->zlib_text_strategy);
 
-      if (ret == Z_STREAM_ERROR)
-         png_error(png_ptr,
+        if (ret != Z_OK)
+        {
+           if (ret == Z_VERSION_ERROR)
+              png_error(png_ptr,
+              "zlib failed to initialize compressor for text-- version error");
+
+           if (ret == Z_STREAM_ERROR)
+              png_error(png_ptr,
              "zlib failed to initialize compressor for text-- stream error");
 
-      if (ret == Z_MEM_ERROR)
-         png_error(png_ptr,
+           if (ret == Z_MEM_ERROR)
+              png_error(png_ptr,
              "zlib failed to initialize compressor for text-- mem error");
 
-      png_error(png_ptr, "zlib failed to initialize compressor for text");
+           png_error(png_ptr, "zlib failed to initialize compressor for text");
+      }
+      png_ptr->mode |= PNG_ZLIB_READY_FOR_ZTXT;
    }
 
    /* Set up the compression buffers */
@@ -685,7 +692,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
        png_ptr->zlib_method, png_ptr->zlib_window_bits,
        png_ptr->zlib_mem_level, png_ptr->zlib_strategy);
 
-   png_ptr->mode = PNG_HAVE_IHDR;
+   png_ptr->mode = PNG_HAVE_IHDR; /* not READY_FOR_ZTXT */
 }
 
 /* Write the palette.  We are careful not to trust png_color to be in the
@@ -778,28 +785,32 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
       int ret;
       unsigned int z_cmf;  /* zlib compression method and flags */
 
-      /* Free memory from previously opened zstream */
-      deflateEnd(&png_ptr->zstream);
-
-      ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
-          png_ptr->zlib_method, png_ptr->zlib_window_bits,
-          png_ptr->zlib_mem_level, png_ptr->zlib_strategy);
-
-      if (ret != Z_OK)
+      if (png_ptr->mode & PNG_ZLIB_READY_FOR_ZTXT)
       {
-         if (ret == Z_VERSION_ERROR)
-            png_error(png_ptr,
-               "zlib failed to initialize compressor -- version error");
+         /* Free memory from previously opened zstream */
+         deflateEnd(&png_ptr->zstream);
 
-         if (ret == Z_STREAM_ERROR)
-            png_error(png_ptr,
-                "zlib failed to initialize compressor -- stream error");
+         ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
+             png_ptr->zlib_method, png_ptr->zlib_window_bits,
+             png_ptr->zlib_mem_level, png_ptr->zlib_strategy);
 
-         if (ret == Z_MEM_ERROR)
-            png_error(png_ptr,
-                "zlib failed to initialize compressor -- mem error");
+         if (ret != Z_OK)
+         {
+            if (ret == Z_VERSION_ERROR)
+               png_error(png_ptr,
+                  "zlib failed to initialize compressor -- version error");
 
-         png_error(png_ptr, "zlib failed to initialize compressor");
+            if (ret == Z_STREAM_ERROR)
+               png_error(png_ptr,
+                   "zlib failed to initialize compressor -- stream error");
+
+            if (ret == Z_MEM_ERROR)
+               png_error(png_ptr,
+                   "zlib failed to initialize compressor -- mem error");
+
+            png_error(png_ptr, "zlib failed to initialize compressor");
+         }
+         png_ptr->mode &= ~PNG_ZLIB_READY_FOR_ZTXT; /* Ready for IDAT */
       }
 
       png_ptr->zstream.next_out = png_ptr->zbuf;
