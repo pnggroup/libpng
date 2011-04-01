@@ -3293,6 +3293,7 @@ Version 1.5.3beta01 [April 1, 2011]
 
 Version 1.5.3beta02 [April 1, 2011]
   Updated scripts/symbols.def with new API functions.
+  Only compile the new zlib re-initializing code when text or iCCP is supported.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

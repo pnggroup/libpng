@@ -687,9 +687,6 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->zlib_text_method = 8;
 #endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 
-   /* png_warning(png_ptr, "Initialize compressor for IDAT"); */
-   /* Free memory from previously opened zstream */
-   deflateEnd(&png_ptr->zstream);
    /* Initialize the zlib compressor */
    ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
        png_ptr->zlib_method, png_ptr->zlib_window_bits,
@@ -788,6 +785,7 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
       int ret;
       unsigned int z_cmf;  /* zlib compression method and flags */
 
+#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_iCCP_SUPPORTED)
       if (png_ptr->mode & PNG_ZLIB_READY_FOR_ZTXT)
       {
          /* png_warning(png_ptr, "Initialize compressor for IDAT"); */
@@ -817,6 +815,7 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
          }
          png_ptr->mode &= ~PNG_ZLIB_READY_FOR_ZTXT; /* Ready for IDAT */
       }
+#endif /* PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_iCCP_SUPPORTED */
 
       png_ptr->zstream.next_out = png_ptr->zbuf;
       png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
