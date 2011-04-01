@@ -2315,7 +2315,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(221);
+  PNG_EXPORT_LAST_ORDINAL(226);
 #endif
 
 #ifdef __cplusplus
