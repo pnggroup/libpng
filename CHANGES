@@ -3290,6 +3290,8 @@ Version 1.5.2 [March 31, 2011]
 Version 1.5.3beta01 [April 1, 2011]
   Re-initialize the zlib compressor before compressing non-IDAT chunks.
 
+Version 1.5.3beta02 [April 1, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
