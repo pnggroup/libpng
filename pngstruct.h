@@ -70,7 +70,7 @@ struct png_struct_def
    int zlib_mem_level;        /* holds zlib compression memory level */
    int zlib_strategy;         /* holds zlib compression strategy */
 /* Added at libpng 1.5.3 */
-#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_iCCP_SUPPORTED) || \
+#if defined(PNG_WRITE_COMPRESSED_TEXT_SUPPORTED) || \
     defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION)
    int zlib_text_level;            /* holds zlib compression level */
    int zlib_text_method;           /* holds zlib compression method */
