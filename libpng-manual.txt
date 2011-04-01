@@ -2307,7 +2307,12 @@ with zlib) for details on the compression levels.
     png_set_compression_method(png_ptr, 8);
     png_set_compression_buffer_size(png_ptr, 8192)
 
-extern PNG_EXPORT(void,png_set_zbuf_size)
+    /* set zlib parameters for text compression */
+    png_set_text_compression_mem_level(png_ptr, 8);
+    png_set_text_compression_strategy(png_ptr,
+        Z_DEFAULT_STRATEGY);
+    png_set_text_compression_window_bits(png_ptr, 15);
+    png_set_text_compression_method(png_ptr, 8);
 
 Setting the contents of info for output
 
@@ -3850,6 +3855,12 @@ corresponding function by defining PNG_USE_READ_MACROS or
 PNG_NO_USE_READ_MACROS before including png.h.  Notice that this is
 only supported from 1.5.0 -defining PNG_NO_USE_READ_MACROS prior to 1.5.0
  will lead to a link failure.
+
+Prior to libpng-1.5.3, the zlib compressor used the same set of parameters
+when compressing the IDAT data and textual data such as zTXt and iCCP.
+In libpng-1.5.3 we reinitialized the zlib stream for each type of data.
+We added five png_set_text_*() functions for setting the parameters to
+use with textual data.
 
 B. Changes to the build and configuration of libpng
 
