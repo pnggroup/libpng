@@ -386,6 +386,11 @@ option WRITE_FLUSH requires WRITE
 option USER_TRANSFORM_PTR if READ_USER_TRANSFORM WRITE_USER_TRANSFORM
 option USER_TRANSFORM_INFO if READ_USER_TRANSFORM WRITE_USER_TRANSFORM
 
+# This enables API to set compression parameters for compressing
+# non-IDAT chunks (zTXt, iTXt, iCCP, and unknown chunks).  This feature
+# was added at libpng-1.5.3.
+option WRITE_CUSTOMIZE_ZTXT_COMPRESSION requires WRITE
+
 # Any chunks you are not interested in, you can undef here.  The
 # ones that allocate memory may be expecially important (hIST,
 # tEXt, zTXt, tRNS, pCAL).  Others will just save time and make png_info
